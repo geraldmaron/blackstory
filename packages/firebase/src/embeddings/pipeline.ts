@@ -1,4 +1,3 @@
-
 /**
  * Embedding pipeline orchestration: text -> provider -> truncate/normalize -> record.
  *
@@ -16,7 +15,11 @@
 import { createHash } from 'node:crypto';
 import { APPROX_TOKENS_PER_CHAR, APPROX_USD_PER_1K_TOKENS, EMBEDDING_DIMS } from './constants.js';
 import type { EmbeddingProvider } from './provider.js';
-import { truncateAndNormalize, assertValidEmbeddingVector, type EmbeddingVector } from './vector-math.js';
+import {
+  truncateAndNormalize,
+  assertValidEmbeddingVector,
+  type EmbeddingVector,
+} from './vector-math.js';
 import {
   buildEntityEmbeddingText,
   deriveEntityFilters,
@@ -101,7 +104,6 @@ export type BatchEmbedResult = {
   readonly stoppedForBudget: boolean;
 };
 
-
 /**
  * Embeds a list of entities sequentially, honoring a soft item cap and a cost budget. Sequential
  * (not concurrent) on purpose: this keeps retry/backoff behavior simple and the call pattern
@@ -146,7 +148,6 @@ export async function embedEntitiesBatch(
 
   return { results, skipped, stoppedForBudget };
 }
-
 
 /**
  * Rough cost estimate from the brief anchor (~$7.50 100k docs of ~500 tokens). This is a

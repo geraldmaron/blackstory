@@ -5,11 +5,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type {
-  PublicSearchIndexDoc,
-  SearchResultView,
-  SearchableEntityRecord,
-} from './types.js';
+import type { PublicSearchIndexDoc, SearchResultView, SearchableEntityRecord } from './types.js';
 
 test('a PublicSearchIndexDoc is assignable to a SearchableEntityRecord', () => {
   const doc: PublicSearchIndexDoc = {

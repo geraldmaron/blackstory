@@ -126,8 +126,6 @@ export function resolveGraphNodeIdByTitle(
   categoryTitle: string,
 ): string | undefined {
   const normalized = normalizeCategoryTitle(categoryTitle);
-  const match = graph.nodes.find(
-    (node) => normalizeCategoryTitle(node.title) === normalized,
-  );
+  const match = graph.nodes.find((node) => normalizeCategoryTitle(node.title) === normalized);
   return match?.id;
 }

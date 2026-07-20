@@ -55,10 +55,7 @@ test('prepareLocate fails closed on empty address', async () => {
   const client: SafeHttpClient = async () => {
     throw new Error('should not fetch');
   };
-  const outcome = await prepareLocate(
-    { entityId: 'ent_x', address: '   ' },
-    { client },
-  );
+  const outcome = await prepareLocate({ entityId: 'ent_x', address: '   ' }, { client });
   assert.equal(outcome.ok, false);
   if (outcome.ok) return;
   assert.equal(outcome.reason, 'empty_address');

@@ -48,7 +48,10 @@ export function DecadeStepper({ decades, viewState, className, onSelect }: Decad
         <li role="presentation">
           <Link
             role="tab"
-            className={cx('ds-history-stepper__tab', viewState.mode === 'all-time' && 'ds-history-stepper__tab--active')}
+            className={cx(
+              'ds-history-stepper__tab',
+              viewState.mode === 'all-time' && 'ds-history-stepper__tab--active',
+            )}
             href={stepHref(viewState)}
             scroll={false}
             aria-selected={viewState.mode === 'all-time'}

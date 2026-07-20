@@ -4,11 +4,7 @@
  * Both functions are pure. `computeFacetCounts` is a plain counting aggregation; `applyFilters`
  * enforces the 6 allowlisted filter fields with AND semantics across fields.
  */
-import type {
-  SearchFacetCounts,
-  SearchFilter,
-  SearchableEntityRecord,
-} from './types.js';
+import type { SearchFacetCounts, SearchFilter, SearchableEntityRecord } from './types.js';
 import { isValidTopicId } from '../taxonomy/topics.js';
 
 function increment(counts: Record<string, number>, key: string | undefined): void {

@@ -62,7 +62,11 @@ test('DETERMINISTIC: re-running the build against identical input yields a byte-
 
 test('RE-RUNNABLE: building twice in sequence (simulating a publication-worker retry) never throws and stays reproducible', () => {
   const input = sampleInput();
-  const runs = [buildGraphReleaseArtifact(input), buildGraphReleaseArtifact(input), buildGraphReleaseArtifact(input)];
+  const runs = [
+    buildGraphReleaseArtifact(input),
+    buildGraphReleaseArtifact(input),
+    buildGraphReleaseArtifact(input),
+  ];
   const digests = new Set(runs.map((r) => r.contentHash.digest));
   assert.equal(digests.size, 1, 'every rebuild must hash identically');
 });
@@ -87,7 +91,10 @@ test('acceptance criterion 4 path shape: publicReleases/{releaseId}/graph/... mi
     publicGraphAdjacencyPath('release-1', 'ent-a'),
     'publicReleases/release-1/graphAdjacency/ent-a',
   );
-  assert.equal(publicGraphDecadePath('release-1', '1960s'), 'publicReleases/release-1/graphDecades/1960s');
+  assert.equal(
+    publicGraphDecadePath('release-1', '1960s'),
+    'publicReleases/release-1/graphDecades/1960s',
+  );
   assert.equal(publicGraphAllTimePath('release-1'), 'publicReleases/release-1/graph/all-time');
 });
 

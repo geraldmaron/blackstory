@@ -73,8 +73,7 @@ export default function GraylistPage() {
             release desks.
           </p>
           <p className="story-review__notice">
-            Next:{' '}
-            <Link href="/inbox">Open inbox</Link>
+            Next: <Link href="/inbox">Open inbox</Link>
             {' · '}
             <Link href="/discovery">Campaign runs</Link>
           </p>

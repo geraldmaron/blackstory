@@ -4,7 +4,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { getSnapshotSearchIndex, resetSnapshotSearchIndexCache } from './snapshot-search-index';
-import { buildSnapshotVectorIndex, createSnapshotVectorLane, deterministicTextEmbedding } from './snapshot-vector-lane';
+import {
+  buildSnapshotVectorIndex,
+  createSnapshotVectorLane,
+  deterministicTextEmbedding,
+} from './snapshot-vector-lane';
 import { readHybridFlagFromParams, runWebHybridSearch } from './hybrid-search';
 
 test('deterministicTextEmbedding is stable', () => {

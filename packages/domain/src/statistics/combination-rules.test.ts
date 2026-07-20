@@ -28,7 +28,10 @@ function observation(overrides: Partial<StatisticalObservation> = {}): Statistic
 }
 
 test('jurisdictionsAreDisjoint rejects an identical jurisdiction regardless of caller input', () => {
-  assert.equal(jurisdictionsAreDisjoint('us-06-001', 'us-06-001', { isDisjoint: () => true }), false);
+  assert.equal(
+    jurisdictionsAreDisjoint('us-06-001', 'us-06-001', { isDisjoint: () => true }),
+    false,
+  );
 });
 
 test('jurisdictionsAreDisjoint defers to a caller-supplied predicate', () => {

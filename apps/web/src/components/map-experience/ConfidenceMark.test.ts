@@ -6,11 +6,7 @@ import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
-import {
-  ConfidenceMark,
-  confidenceLabel,
-  confidenceShortLabel,
-} from './ConfidenceMark';
+import { ConfidenceMark, confidenceLabel, confidenceShortLabel } from './ConfidenceMark';
 
 test('confidenceLabel defaults to the full phrase without a field title', () => {
   assert.equal(confidenceLabel('high'), 'high confidence');

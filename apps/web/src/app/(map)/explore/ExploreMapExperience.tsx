@@ -46,7 +46,10 @@ import { NarrativeCard } from '../../../components/map-experience/NarrativeCard'
 import { SynchronizedResultList } from '../../../components/map-experience/SynchronizedResultList';
 import { MetaFieldLabel } from '../../../components/map-experience/MetaFieldLabel';
 import { shouldFadeDecadePatch } from '../../map/decade-layer-transition';
-import { CAMERA_POINT_ZOOM, prefersReducedMotion } from '../../../lib/map-experience/camera-presets';
+import {
+  CAMERA_POINT_ZOOM,
+  prefersReducedMotion,
+} from '../../../lib/map-experience/camera-presets';
 import { resolveCloseCameraTarget } from '../../../lib/map-experience/close-camera';
 import { buildActiveDensityByDecade } from '../../../lib/map-experience/decade-flow';
 import {
@@ -138,6 +141,7 @@ function mergeViewState(
     readonly clearDecade?: boolean;
     readonly clearRadius?: boolean;
     readonly clearNear?: boolean;
+    readonly clearPopulationDecades?: boolean;
   },
 ): ExploreViewState {
   const next: ExploreViewState = {
@@ -222,8 +226,8 @@ function resolvePopulationDecades(
   }
   if (layerMode === 'blackChange') {
     return {
-      ...(patch.popFrom ?? base.popFrom ? { popFrom: patch.popFrom ?? base.popFrom! } : {}),
-      ...(patch.popTo ?? base.popTo ? { popTo: patch.popTo ?? base.popTo! } : {}),
+      ...((patch.popFrom ?? base.popFrom) ? { popFrom: patch.popFrom ?? base.popFrom! } : {}),
+      ...((patch.popTo ?? base.popTo) ? { popTo: patch.popTo ?? base.popTo! } : {}),
     };
   }
   return {};
@@ -444,25 +448,21 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     // Rank against the live facet set — never force a state lock from place search.
     const catalog = applyExploreFilters(view.allFeatures, view.viewState.filters);
     const within = featuresWithinRadius(catalog, placeSearchCenter, placeSearchRadiusMeters);
-    const closest =
-      within.length > 0 ? [] : closestFeatures(catalog, placeSearchCenter, 3);
+    const closest = within.length > 0 ? [] : closestFeatures(catalog, placeSearchCenter, 3);
     setPlaceSearchFocus((prev) => {
       if (!prev) return prev;
       return { ...prev, within, closest };
     });
-  }, [
-    view.allFeatures,
-    view.viewState.filters,
-    placeSearchCenter,
-    placeSearchRadiusMeters,
-  ]);
+  }, [view.allFeatures, view.viewState.filters, placeSearchCenter, placeSearchRadiusMeters]);
 
   // Resolve from the full catalog so a deep-linked `?selected=` still orients the copper ring
   // (and list highlight) even when the current facet set would hide that row.
   const selectedFeature = useMemo(
     () =>
       view.viewState.selected
-        ? view.allFeatures.find((feature) => feature.properties.entityId === view.viewState.selected)
+        ? view.allFeatures.find(
+            (feature) => feature.properties.entityId === view.viewState.selected,
+          )
         : undefined,
     [view.allFeatures, view.viewState.selected],
   );
@@ -473,7 +473,9 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
       // pan after Hide / Select rewrites the URL from a stale panel/selection snapshot.
       viewStateRef.current = next;
       const edgeSlice = pickExploreEdgeSlice(view.edgeLineCatalog, next);
-      const selectedEdge = next.edge ? edgeSlice.edges.find((edge) => edge.edgeId === next.edge) : undefined;
+      const selectedEdge = next.edge
+        ? edgeSlice.edges.find((edge) => edge.edgeId === next.edge)
+        : undefined;
       const filtered = applyExploreFilters(view.allFeatures, next.filters, next.state);
       setView((current) => {
         const { selectedEdge: _previousEdge, ...rest } = current;
@@ -584,7 +586,9 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   const reconcileCamera = useCallback(
     (viewState: ExploreViewState, mode: 'fly' | 'ease') => {
       if (viewState.selected) {
-        const feature = view.allFeatures.find((item) => item.properties.entityId === viewState.selected);
+        const feature = view.allFeatures.find(
+          (item) => item.properties.entityId === viewState.selected,
+        );
         if (feature && feature.geometry.type === 'Point') {
           const [lng, lat] = feature.geometry.coordinates;
           stage.flyPreset(
@@ -598,7 +602,11 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
       if (viewState.state) {
         const viewport = viewportForState(viewState.state);
         if (viewport) {
-          stage.flyPreset('state', { center: [viewport.lng, viewport.lat], zoom: viewport.zoom }, { mode });
+          stage.flyPreset(
+            'state',
+            { center: [viewport.lng, viewport.lat], zoom: viewport.zoom },
+            { mode },
+          );
           return;
         }
       }
@@ -623,7 +631,10 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
       if (viewState.viewport) {
         stage.flyPreset(
           'locality',
-          { center: [viewState.viewport.lng, viewState.viewport.lat], zoom: viewState.viewport.zoom },
+          {
+            center: [viewState.viewport.lng, viewState.viewport.lat],
+            zoom: viewState.viewport.zoom,
+          },
           { mode },
         );
         return;
@@ -658,7 +669,9 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
       const raw = Object.fromEntries(new URLSearchParams(window.location.search).entries());
       const next = parseExploreSearchParams(raw);
       const edgeSlice = pickExploreEdgeSlice(view.edgeLineCatalog, next);
-      const selectedEdge = next.edge ? edgeSlice.edges.find((edge) => edge.edgeId === next.edge) : undefined;
+      const selectedEdge = next.edge
+        ? edgeSlice.edges.find((edge) => edge.edgeId === next.edge)
+        : undefined;
       const filtered = applyExploreFilters(view.allFeatures, next.filters, next.state);
       setView((current) => {
         const { selectedEdge: _previousEdge, ...rest } = current;
@@ -691,9 +704,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
    * required whenever both sections were URL-visible (the default). */
   const handleHideInstruments = useCallback(() => {
     setLeftTabPreference(null);
-    commitViewState(
-      mergeViewState(view.viewState, { showFilters: false, showKey: false }),
-    );
+    commitViewState(mergeViewState(view.viewState, { showFilters: false, showKey: false }));
   }, [commitViewState, view.viewState]);
 
   const handleShowFilters = useCallback(() => {
@@ -801,9 +812,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
           { padding: SELECTION_CAMERA_PADDING },
         );
       }
-      commitViewState(
-        mergeViewState(view.viewState, { selected: entityId, clearEdge: true }),
-      );
+      commitViewState(mergeViewState(view.viewState, { selected: entityId, clearEdge: true }));
     },
     [commitViewState, stage, view.allFeatures, view.viewState],
   );
@@ -852,8 +861,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
         stage.flyPreset(target.preset === 'state' ? 'state' : 'locality', { bounds });
         const catalog = applyExploreFilters(view.allFeatures, view.viewState.filters);
         const within = featuresWithinRadius(catalog, center, radiusMeters);
-        const closest =
-          within.length > 0 ? [] : closestFeatures(catalog, center, 3);
+        const closest = within.length > 0 ? [] : closestFeatures(catalog, center, 3);
         setPlaceSearchFocus({
           center,
           radiusMeters,
@@ -878,9 +886,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   const handleClearPlaceSearch = useCallback(() => {
     setPlaceSearchFocus(null);
     urlRadiusAppliedRef.current = null;
-    commitViewState(
-      mergeViewState(view.viewState, { clearRadius: true, clearNear: true }),
-    );
+    commitViewState(mergeViewState(view.viewState, { clearRadius: true, clearNear: true }));
   }, [commitViewState, view.viewState]);
 
   const handleClearState = useCallback(() => {
@@ -973,14 +979,21 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   const handleLinesToggle = useCallback(() => {
     const lines = !view.viewState.lines;
     commitViewState(
-      mergeViewState(view.viewState, { lines, ...(lines ? {} : { clearEdge: true, clearDecade: true }) }),
+      mergeViewState(view.viewState, {
+        lines,
+        ...(lines ? {} : { clearEdge: true, clearDecade: true }),
+      }),
     );
   }, [commitViewState, view.viewState]);
 
   const handleDecadeSelect = useCallback(
     (decade: string | undefined) => {
       commitViewState(
-        mergeViewState(view.viewState, { lines: true, clearEdge: true, ...(decade ? { decade } : { clearDecade: true }) }),
+        mergeViewState(view.viewState, {
+          lines: true,
+          clearEdge: true,
+          ...(decade ? { decade } : { clearDecade: true }),
+        }),
       );
     },
     [commitViewState, view.viewState],
@@ -988,7 +1001,9 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
 
   const handleEdgeSelect = useCallback(
     (edgeId: string) => {
-      commitViewState(mergeViewState(view.viewState, { edge: edgeId, lines: true, clearSelected: true }));
+      commitViewState(
+        mergeViewState(view.viewState, { edge: edgeId, lines: true, clearSelected: true }),
+      );
     },
     [commitViewState, view.viewState],
   );
@@ -1057,7 +1072,9 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   }, [stage, handleSelect, handleStateSelect, handleEdgeSelect, handleViewportChange]);
 
   const degradedCopy = stage.mapAvailable ? null : DEGRADED_MODE_COPY.map_canvas_unavailable;
-  const selectedStateName = view.viewState.state ? findUsStateByPostalCode(view.viewState.state)?.name : undefined;
+  const selectedStateName = view.viewState.state
+    ? findUsStateByPostalCode(view.viewState.state)?.name
+    : undefined;
   const filtersVisible = view.viewState.showFilters;
   const resultsVisible = view.viewState.showResults;
   const keyVisible = view.viewState.showKey;
@@ -1088,11 +1105,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   return (
     /* Instruments follow the site theme (light/dark) — map plate syncs via MapStage. */
     <div
-      className={
-        entering
-          ? 'ds-explore-stage ds-explore-stage--entering'
-          : 'ds-explore-stage'
-      }
+      className={entering ? 'ds-explore-stage ds-explore-stage--entering' : 'ds-explore-stage'}
       data-map-journey={entering ? 'entering' : 'explore'}
       {...stageChrome}
     >
@@ -1160,7 +1173,10 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
           aria-labelledby="explore-tab-filters"
           {...(leftTab === 'filters' ? {} : { hidden: true })}
         >
-          <p className="ds-explore-stage__panel-title ds-visually-hidden" id="explore-facets-heading">
+          <p
+            className="ds-explore-stage__panel-title ds-visually-hidden"
+            id="explore-facets-heading"
+          >
             Filters
           </p>
           <ExploreAddressSearch onResolved={handleAddressResolved} />
@@ -1222,7 +1238,11 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
           ) : null}
           <div className="ds-explore__facets" role="group" aria-labelledby="explore-facets-heading">
             {FACET_ROWS.map(({ key, label, field }) => (
-              <label className="ds-pill-select ds-explore__facet" key={key} htmlFor={`explore-${key}`}>
+              <label
+                className="ds-pill-select ds-explore__facet"
+                key={key}
+                htmlFor={`explore-${key}`}
+              >
                 <MetaFieldLabel field={field} as="span" className="ds-pill-select__label">
                   {label}
                 </MetaFieldLabel>
@@ -1262,7 +1282,9 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
               onPopFromChange={handlePopFromChange}
               onPopToChange={handlePopToChange}
             />
-            {isPopulationLayerMode(view.viewState.layerMode) && populationIndexLoaded && !populationIndex ? (
+            {isPopulationLayerMode(view.viewState.layerMode) &&
+            populationIndexLoaded &&
+            !populationIndex ? (
               <p className="ds-sans ds-explore__settings-note">
                 County population data is not loaded yet — choropleth tiers stay neutral until the
                 static index is available.
@@ -1318,7 +1340,8 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
                 ) : null}
 
                 <p className="ds-sans">
-                  <Link href="/history">Open the full history graph</Link> for the decade narrative panel.
+                  <Link href="/history">Open the full history graph</Link> for the decade narrative
+                  panel.
                 </p>
               </div>
             </details>

@@ -28,9 +28,7 @@ test('explains points, clusters, the density layer, and confidence glyphs in wor
 });
 
 test('off layer mode invites choosing a map data model', () => {
-  const html = renderToStaticMarkup(
-    createElement(MapExperienceLegend, { layerMode: 'off' }),
-  );
+  const html = renderToStaticMarkup(MapExperienceLegend({ layerMode: 'off' }));
   assert.match(html, /Choose a model/);
 });
 
@@ -105,6 +103,16 @@ test('shows a visible color key for boundaries, kinds, and historical tones', ()
   assert.doesNotMatch(html, /Hide key/);
 });
 
+test('SSR without colorScheme uses light plate swatches (hydration-safe; no document read)', () => {
+  // Light stateBounds = copperTextLight #8E4F2A; dark would be pageSand #D8A178.
+  // Reading document during render/SSR caused dark-theme clients to hydrate mismatched inline styles.
+  const html = renderToStaticMarkup(createElement(MapExperienceLegend));
+  assert.match(html, /background-color:#8[Ee]4[Ff]2[Aa]|backgroundColor:#8[Ee]4[Ff]2[Aa]|#8E4F2A/);
+  assert.match(html, /#6[Dd]675[Ff]|#6D675F/);
+  assert.doesNotMatch(html, /#D8A178/);
+  assert.doesNotMatch(html, /#F4EFE5/);
+});
+
 test('onHide renders an accessible Hide key control beside the Color key heading', () => {
   const html = renderToStaticMarkup(
     createElement<MapExperienceLegendProps>(MapExperienceLegend, {
@@ -145,8 +153,9 @@ test('color key includes share tiers when blackShare layer is active', () => {
 
 test('kind and tone swatches are aria-hidden (the accessible content is the adjacent text)', () => {
   const html = renderToStaticMarkup(createElement(MapExperienceLegend));
-  const glyphSwatchCount = (html.match(/class="ds-legend-glyph[^"]*"[^>]*aria-hidden="true"/g) ?? [])
-    .length;
+  const glyphSwatchCount = (
+    html.match(/class="ds-legend-glyph[^"]*"[^>]*aria-hidden="true"/g) ?? []
+  ).length;
   // Color key + Reading this map each list kinds and tones (2× each vocabulary).
   // Default layerMode is presence, which adds three presence-tier discs in the color key.
   const presenceTier = 3;

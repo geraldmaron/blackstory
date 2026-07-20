@@ -16,7 +16,11 @@ function buildAiTxt(): string {
     '# unrestricted AI-training ingestion. Contact the security contact in',
     '# /.well-known/security.txt for licensing or bulk-access questions.',
     '',
-    ...AI_TRAINING_USER_AGENTS.flatMap((userAgent) => [`User-Agent: ${userAgent}`, 'Disallow: /', '']),
+    ...AI_TRAINING_USER_AGENTS.flatMap((userAgent) => [
+      `User-Agent: ${userAgent}`,
+      'Disallow: /',
+      '',
+    ]),
   ];
   return lines.join('\n');
 }

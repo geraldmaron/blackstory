@@ -42,9 +42,7 @@ export async function POST(request: Request): Promise<Response> {
     const transitionRequest: AdminCaseTransitionRequest = {
       action: body.action as AdminCaseTransitionAction,
       reason: body.reason.trim(),
-      ...(body.reasonCode
-        ? { reasonCode: body.reasonCode as ResearchCaseReasonCode }
-        : {}),
+      ...(body.reasonCode ? { reasonCode: body.reasonCode as ResearchCaseReasonCode } : {}),
       ...(body.mergedIntoCaseId ? { mergedIntoCaseId: body.mergedIntoCaseId } : {}),
     };
 

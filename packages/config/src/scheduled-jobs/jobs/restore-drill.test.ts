@@ -1,4 +1,3 @@
-
 /**
  * Proves the restore-drill job body is REAL hermetic unit coverage plus a genuine
  * integration test that runs the actual, already-existing scripts/backup-restore/
@@ -17,7 +16,11 @@ test('a successful drill print completes the job as success and returns the prin
   const fakeExecFile: ExecFileFn = async (command, args) => {
     assert.equal(command, 'bash');
     assert.ok(args[0]?.endsWith('staging-restore.stub.sh'));
-    return { stdout: '#  staging import stub\ngcloud firestore import ...', stderr: '', exitCode: 0 };
+    return {
+      stdout: '#  staging import stub\ngcloud firestore import ...',
+      stderr: '',
+      exitCode: 0,
+    };
   };
   const result = await runRestoreDrillJob({
     jobRunId: 'run-1',
@@ -55,7 +58,11 @@ test('integration: runs the real staging-restore.stub.sh, which stays print-only
       return { stdout, stderr, exitCode: 0 };
     } catch (error) {
       const err = error as { stdout?: string; stderr?: string; code?: number };
-      return { stdout: err.stdout ?? '', stderr: err.stderr ?? String(error), exitCode: err.code ?? 1 };
+      return {
+        stdout: err.stdout ?? '',
+        stderr: err.stderr ?? String(error),
+        exitCode: err.code ?? 1,
+      };
     }
   };
 

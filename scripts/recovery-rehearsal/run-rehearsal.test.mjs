@@ -1,4 +1,3 @@
-
 /**
  * Unit tests for recovery rehearsal dry-run helpers.
  */

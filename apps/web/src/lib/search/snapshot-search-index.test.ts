@@ -10,10 +10,7 @@ test('every seed fixture with a notabilityLabel survives the real AC5 gate and l
   resetSnapshotSearchIndexCache();
   const index = getSnapshotSearchIndex();
   const seedIds = listPublicEntities().map((entity) => entity.id);
-  assert.deepEqual(
-    index.map((doc) => doc.id).sort(),
-    [...seedIds].sort(),
-  );
+  assert.deepEqual(index.map((doc) => doc.id).sort(), [...seedIds].sort());
 });
 
 test('the index is memoized across calls', () => {
@@ -31,7 +28,10 @@ test('notabilityBasis resolves the real rubric criterion since seed labels now q
   resetSnapshotSearchIndexCache();
   const index = getSnapshotSearchIndex();
   const byId = new Map(index.map((doc) => [doc.id, doc]));
-  assert.equal(byId.get('ent_15th_st_church_001')?.notabilityBasis[0]?.criterion, 'community_anchor');
+  assert.equal(
+    byId.get('ent_15th_st_church_001')?.notabilityBasis[0]?.criterion,
+    'community_anchor',
+  );
   assert.equal(byId.get('ent_dunbar_school_001')?.notabilityBasis[0]?.criterion, 'first_to_do_x');
   assert.equal(
     byId.get('ent_dc_landmark_listing_1975')?.notabilityBasis[0]?.criterion,

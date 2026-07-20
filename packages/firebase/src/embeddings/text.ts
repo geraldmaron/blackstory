@@ -1,4 +1,3 @@
-
 /**
  * Builds the text an entity is embedded from, and the pre-filter fields (kind/state/eraBucket)
  * stored alongside its vector. Pure string/number logic no I/O.
@@ -99,7 +98,6 @@ export function resolveEntityYearSpan(entity: EntityEmbeddingSource): EntityYear
   }
 }
 
-
 /**
  * Buckets a year span into a single decade label ("1950s"), preferring the start year.
  * Undefined when no temporal anchor exists at all the pre-filter simply omits eraBucket for
@@ -155,14 +153,16 @@ function eraLabel(entity: EntityEmbeddingSource): string | undefined {
   return `${startYear ?? endYear}`;
 }
 
-function placeLabelFor(entity: EntityEmbeddingSource, location?: EntityLocationContext): string | undefined {
+function placeLabelFor(
+  entity: EntityEmbeddingSource,
+  location?: EntityLocationContext,
+): string | undefined {
   if (location?.placeLabel) return location.placeLabel;
   if (entity.kind === 'place' && entity.place?.historicalNames?.length) {
     return entity.place.historicalNames.join(', ');
   }
   return undefined;
 }
-
 
 /**
  * Concatenates title + summary + place/era context into the text that gets embedded.

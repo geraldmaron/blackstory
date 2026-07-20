@@ -38,7 +38,10 @@ const WIKIPEDIA_USER_AGENT = 'BlackStory research pipeline (contact: geraldmaron
 type WikipediaSearchHit = { readonly title: string };
 
 /** Wikipedia's own search API with retry/backoff — mirrors discover-candidates.ts's proven pattern. */
-async function searchWikipediaApi(query: string, attempts = 3): Promise<readonly WikipediaSearchHit[]> {
+async function searchWikipediaApi(
+  query: string,
+  attempts = 3,
+): Promise<readonly WikipediaSearchHit[]> {
   const params = new URLSearchParams({
     action: 'query',
     list: 'search',
@@ -54,14 +57,18 @@ async function searchWikipediaApi(query: string, attempts = 3): Promise<readonly
         signal: AbortSignal.timeout(15_000),
       });
       if (response.ok) {
-        const raw = (await response.json()) as { query?: { search?: readonly WikipediaSearchHit[] } };
+        const raw = (await response.json()) as {
+          query?: { search?: readonly WikipediaSearchHit[] };
+        };
         return raw.query?.search ?? [];
       }
       if (response.status !== 429 && response.status < 500) return [];
     } catch {
       // fall through to retry
     }
-    await new Promise((resolve) => setTimeout(resolve, Math.min(8_000, 1_000 * 2 ** (attempt - 1))));
+    await new Promise((resolve) =>
+      setTimeout(resolve, Math.min(8_000, 1_000 * 2 ** (attempt - 1))),
+    );
   }
   return [];
 }
@@ -109,7 +116,10 @@ function throttledSearxngCall<T>(run: () => Promise<T>): Promise<T> {
 }
 
 /** Checks a fetched page's own outbound links for a reachable Tier-1 hit. */
-async function findViaCitationTrail(html: string, baseUrl: string): Promise<CorroboratingSource | undefined> {
+async function findViaCitationTrail(
+  html: string,
+  baseUrl: string,
+): Promise<CorroboratingSource | undefined> {
   const tier1Links = extractOutboundLinks(html, baseUrl).filter(isTier1Host);
   for (const link of tier1Links.slice(0, 3)) {
     const page = await fetchPage(link);
@@ -121,7 +131,9 @@ async function findViaCitationTrail(html: string, baseUrl: string): Promise<Corr
 async function searchAndFetch(
   query: string,
   searxngBaseUrl: string,
-  pick: (results: readonly { readonly url: string; readonly title?: string }[]) => { readonly url: string; readonly title?: string } | undefined,
+  pick: (
+    results: readonly { readonly url: string; readonly title?: string }[],
+  ) => { readonly url: string; readonly title?: string } | undefined,
 ): Promise<CorroboratingSource | undefined> {
   const hit = await throttledSearxngCall(async () => {
     try {
@@ -139,12 +151,22 @@ async function searchAndFetch(
   if (!hit) return undefined;
   const page = await fetchPage(hit.url);
   if (!page) return undefined;
-  return { url: hit.url, ...(hit.title ? { title: hit.title } : {}), text: page.text, method: 'search' };
+  return {
+    url: hit.url,
+    ...(hit.title ? { title: hit.title } : {}),
+    text: page.text,
+    method: 'search',
+  };
 }
 
-async function findViaSearch(subjectName: string, searxngBaseUrl: string): Promise<CorroboratingSource | undefined> {
+async function findViaSearch(
+  subjectName: string,
+  searxngBaseUrl: string,
+): Promise<CorroboratingSource | undefined> {
   const query = `"${subjectName}" (site:nps.gov OR site:loc.gov OR site:archives.gov OR site:si.edu OR site:census.gov)`;
-  return searchAndFetch(query, searxngBaseUrl, (results) => results.find((r) => isTier1Host(r.url)));
+  return searchAndFetch(query, searxngBaseUrl, (results) =>
+    results.find((r) => isTier1Host(r.url)),
+  );
 }
 
 /**

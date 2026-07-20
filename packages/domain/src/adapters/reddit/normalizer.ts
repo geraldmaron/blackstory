@@ -4,7 +4,10 @@
  * evidence-pointer snippet limits, stamp provenance, and fail closed on any doctrine
  * violation via ./guards.ts rather than silently dropping a field.
  */
-import { MAX_EVIDENCE_SNIPPET_CHARACTERS, MAX_EVIDENCE_SNIPPET_WORDS } from '../../rights/evidence-pointer.js';
+import {
+  MAX_EVIDENCE_SNIPPET_CHARACTERS,
+  MAX_EVIDENCE_SNIPPET_WORDS,
+} from '../../rights/evidence-pointer.js';
 import { stampCandidateProvenance } from '../candidates.js';
 import type { SourceRegistryEntry } from '../types.js';
 import { isPostRemovedOrDeleted } from './client.js';
@@ -32,13 +35,17 @@ export function capRedditSnippet(text: string | undefined): string | undefined {
 }
 
 function buildTriageText(post: RawRedditPostData): string | undefined {
-  const parts = [post.title, post.selftext].filter((part): part is string => Boolean(part && part.trim()));
+  const parts = [post.title, post.selftext].filter((part): part is string =>
+    Boolean(part && part.trim()),
+  );
   if (!parts.length) return undefined;
   return parts.join(' — ');
 }
 
 export function buildRedditPermalink(post: RawRedditPostData): string {
-  return post.permalink.startsWith('http') ? post.permalink : `https://www.reddit.com${post.permalink}`;
+  return post.permalink.startsWith('http')
+    ? post.permalink
+    : `https://www.reddit.com${post.permalink}`;
 }
 
 function buildStableIdentifier(subredditRegistryId: string, postId: string): string {
@@ -123,7 +130,12 @@ export function assertRedditCandidate(candidate: RedditCandidateRecord): void {
   if (payload.snippet && payload.snippet.length > MAX_EVIDENCE_SNIPPET_CHARACTERS) {
     throw new Error('Reddit candidate snippet exceeds the evidence-pointer snippet cap');
   }
-  if (!payload.subreddit.trim() || !payload.postId.trim() || !payload.permalink.trim() || !payload.postedAt.trim()) {
+  if (
+    !payload.subreddit.trim() ||
+    !payload.postId.trim() ||
+    !payload.permalink.trim() ||
+    !payload.postedAt.trim()
+  ) {
     throw new Error('Reddit candidate payload is missing a required pointer field');
   }
 }

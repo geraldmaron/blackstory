@@ -21,10 +21,7 @@ import type { RelevanceEvidence } from './types.js';
 import type { NotabilityBasisRecord } from '../entity-status.js';
 import { hasRequiredNotabilityBasis } from '../entity-status.js';
 import { assertNoPassiveEuphemisms } from './why-public-editorial.js';
-import {
-  classifyStoryDimensions,
-  type StoryDimension,
-} from './why-public-dimensions.js';
+import { classifyStoryDimensions, type StoryDimension } from './why-public-dimensions.js';
 import {
   deriveTraumaContentNotice,
   type TraumaContentNoticeDecision,
@@ -135,7 +132,9 @@ export function assertExplanationDerivesFromAcceptedEvidence(
  * payload, mirroring ./notability-gate.test.ts's own `assertNoNumericLeaf` check. */
 function assertNoNumericLeaf(value: unknown, path = '$'): void {
   if (typeof value === 'number') {
-    throw new Error(`Public "why this appears" payload must never expose a number (found at ${path}).`);
+    throw new Error(
+      `Public "why this appears" payload must never expose a number (found at ${path}).`,
+    );
   }
   if (Array.isArray(value)) {
     value.forEach((item, index) => assertNoNumericLeaf(item, `${path}[${index}]`));

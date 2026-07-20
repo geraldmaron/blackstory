@@ -1,4 +1,3 @@
-
 /**
  * Citation block with source label and optional external link (non-color provenance cue).
  *
@@ -92,9 +91,9 @@ export function Citation({
             <p className="ds-notice__title">Content may have changed since capture</p>
             <div className="ds-notice__body">
               <p>
-                This link is reachable, but its current content no longer matches what was
-                captured. Flagged for research review — the original capture remains the
-                evidentiary anchor for this citation.
+                This link is reachable, but its current content no longer matches what was captured.
+                Flagged for research review — the original capture remains the evidentiary anchor
+                for this citation.
               </p>
             </div>
           </div>

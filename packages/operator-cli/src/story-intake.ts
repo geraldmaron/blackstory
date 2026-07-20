@@ -27,9 +27,7 @@ export function prepareStoryPacketIntake(
     packet.relatedEntityIds.length
       ? `relatedEntityIds=${packet.relatedEntityIds.join(',')}`
       : undefined,
-    packet.relatedFactIds.length
-      ? `relatedFactIds=${packet.relatedFactIds.join(',')}`
-      : undefined,
+    packet.relatedFactIds.length ? `relatedFactIds=${packet.relatedFactIds.join(',')}` : undefined,
     packet.validationIssues.length
       ? `validationIssues=${packet.validationIssues.slice(0, 8).join('; ')}`
       : undefined,
@@ -49,8 +47,7 @@ export function prepareStoryPacketIntake(
     },
     context,
     {
-      openDraftCase:
-        packet.decision === 'recommend' || packet.decision === 'needs_evidence',
+      openDraftCase: packet.decision === 'recommend' || packet.decision === 'needs_evidence',
     },
   );
 

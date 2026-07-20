@@ -2,10 +2,7 @@
  * Pathname-based selection of transparent page-field atmosphere motifs for shell pages.
  * Map and home explore surfaces receive null so `--ds-canvas` stays unobstructed.
  */
-import {
-  pageFieldMotifById,
-  type PageFieldMotifId,
-} from './geometric-fallbacks';
+import { pageFieldMotifById, type PageFieldMotifId } from './geometric-fallbacks';
 
 export type { PageFieldMotifId };
 

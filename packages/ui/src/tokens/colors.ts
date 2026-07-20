@@ -1,4 +1,3 @@
-
 /**
  * BlackStory color tokens: Archive Paper / Black Ink primary surfaces and ink,
  * Copper Pin Page Sand brand accent, and reserved status hues.

@@ -23,7 +23,10 @@ function asStringArray(value: unknown): readonly string[] | undefined {
   return undefined;
 }
 
-function parseDoc(raw: unknown, index: number): { doc: InternetArchiveSearchDoc } | { rejected: InternetArchiveRejectedDoc } {
+function parseDoc(
+  raw: unknown,
+  index: number,
+): { doc: InternetArchiveSearchDoc } | { rejected: InternetArchiveRejectedDoc } {
   if (!raw || typeof raw !== 'object') {
     return { rejected: { index, reason: 'not_an_object' } };
   }
@@ -109,7 +112,15 @@ export function buildAdvancedSearchUrl(query: string, rows: number, page: number
     rows: String(rows),
     page: String(page),
   });
-  for (const field of ['identifier', 'title', 'description', 'date', 'mediatype', 'subject', 'collection']) {
+  for (const field of [
+    'identifier',
+    'title',
+    'description',
+    'date',
+    'mediatype',
+    'subject',
+    'collection',
+  ]) {
     params.append('fl[]', field);
   }
   return `https://archive.org/advancedsearch.php?${params.toString()}`;

@@ -5,8 +5,7 @@
 import type { ClaimClass } from '@repo/schemas';
 import type { AuditedConfidenceResult } from './engine.js';
 
-export const CONFIDENCE_CALIBRATION_DATASET_VERSION =
-  'confidence-calibration-dataset.v1' as const;
+export const CONFIDENCE_CALIBRATION_DATASET_VERSION = 'confidence-calibration-dataset.v1' as const;
 
 export type ConfidenceCalibrationCase = {
   readonly claimId: string;
@@ -57,24 +56,26 @@ export function exportConfidenceCalibrationDataset(input: {
           left.claimId.localeCompare(right.claimId) ||
           left.claimVersionId.localeCompare(right.claimVersionId),
       )
-      .map(({ claimId, claimVersionId, claimClass, confidence, observedOutcome, outcomeSource }) => ({
-        claimId,
-        claimVersionId,
-        claimClass,
-        score: confidence.score,
-        threshold: confidence.threshold,
-        passesPublishThreshold: confidence.passesPublishThreshold,
-        components: confidence.components,
-        policyVersion: confidence.policyVersion,
-        engineVersion: confidence.audit.engineVersion,
-        componentVersions: confidence.audit.componentVersions,
-        independentLineageCount: confidence.independentLineageCount,
-        supportingEvidenceCount: confidence.supportingEvidenceCount,
-        contradictingEvidenceCount: confidence.contradictingEvidenceCount,
-        inputFingerprints: confidence.audit.inputFingerprints,
-        calculatedAt: confidence.calculatedAt,
-        ...(observedOutcome !== undefined ? { observedOutcome } : {}),
-        ...(outcomeSource !== undefined ? { outcomeSource } : {}),
-      })),
+      .map(
+        ({ claimId, claimVersionId, claimClass, confidence, observedOutcome, outcomeSource }) => ({
+          claimId,
+          claimVersionId,
+          claimClass,
+          score: confidence.score,
+          threshold: confidence.threshold,
+          passesPublishThreshold: confidence.passesPublishThreshold,
+          components: confidence.components,
+          policyVersion: confidence.policyVersion,
+          engineVersion: confidence.audit.engineVersion,
+          componentVersions: confidence.audit.componentVersions,
+          independentLineageCount: confidence.independentLineageCount,
+          supportingEvidenceCount: confidence.supportingEvidenceCount,
+          contradictingEvidenceCount: confidence.contradictingEvidenceCount,
+          inputFingerprints: confidence.audit.inputFingerprints,
+          calculatedAt: confidence.calculatedAt,
+          ...(observedOutcome !== undefined ? { observedOutcome } : {}),
+          ...(outcomeSource !== undefined ? { outcomeSource } : {}),
+        }),
+      ),
   };
 }

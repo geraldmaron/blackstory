@@ -1,4 +1,3 @@
-
 /**
  * Tests for the Census Gazetteer county file parser and bbox approximation.
  *
@@ -19,7 +18,9 @@ import {
   parseGazetteerCountyFile,
 } from './tiger-gazetteer.js';
 
-const FIXTURE_PATH = fileURLToPath(new URL('./fixtures/sample-gazetteer-counties.txt', import.meta.url));
+const FIXTURE_PATH = fileURLToPath(
+  new URL('./fixtures/sample-gazetteer-counties.txt', import.meta.url),
+);
 
 async function loadFixture(): Promise<string> {
   return readFile(FIXTURE_PATH, 'utf-8');
@@ -100,7 +101,9 @@ test('approximateCountyBBox produces a bbox centered on the centroid that grows 
 test('buildCountyJurisdictionDocs excludes out-of-scope territory rows (50 states + D.C. only)', async () => {
   const text = await loadFixture();
   const { rows } = parseGazetteerCountyFile(text);
-  const { docs, outOfScope } = buildCountyJurisdictionDocs(rows, { now: () => '2026-01-01T00:00:00.000Z' });
+  const { docs, outOfScope } = buildCountyJurisdictionDocs(rows, {
+    now: () => '2026-01-01T00:00:00.000Z',
+  });
 
   // 5 fixture rows: 4 in-scope (AL/CA/IL/NY) + 1 out-of-scope (PR).
   assert.equal(docs.length, 4);
@@ -133,8 +136,5 @@ test('county doc ids are deterministic across repeated builds (idempotent)', asy
   const { rows } = parseGazetteerCountyFile(text);
   const first = buildCountyJurisdictionDocs(rows, { now: () => '2026-01-01T00:00:00.000Z' });
   const second = buildCountyJurisdictionDocs(rows, { now: () => '2027-01-01T00:00:00.000Z' });
-  assert.deepEqual(
-    first.docs.map((d) => d.id).sort(),
-    second.docs.map((d) => d.id).sort(),
-  );
+  assert.deepEqual(first.docs.map((d) => d.id).sort(), second.docs.map((d) => d.id).sort());
 });

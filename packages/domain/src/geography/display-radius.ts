@@ -27,7 +27,10 @@ export function isCoarserGeoPrecisionTier(a: GeoPrecisionTier, b: GeoPrecisionTi
 }
 
 /** The coarser of two geoPrecision tiers (never returns a finer tier than either input). */
-export function coarserGeoPrecisionTier(a: GeoPrecisionTier, b: GeoPrecisionTier): GeoPrecisionTier {
+export function coarserGeoPrecisionTier(
+  a: GeoPrecisionTier,
+  b: GeoPrecisionTier,
+): GeoPrecisionTier {
   return GEO_PRECISION_TIER_RANK[a] >= GEO_PRECISION_TIER_RANK[b] ? a : b;
 }
 

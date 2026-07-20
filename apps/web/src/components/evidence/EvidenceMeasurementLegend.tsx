@@ -12,7 +12,9 @@ import { EVIDENCE_DIMENSION_COPY } from '../../lib/evidence';
 export function EvidenceMeasurementLegend() {
   return (
     <details className="ds-evidence-legend">
-      <summary className="ds-evidence-legend__summary">How to read this record&rsquo;s measurements</summary>
+      <summary className="ds-evidence-legend__summary">
+        How to read this record&rsquo;s measurements
+      </summary>
       <dl className="ds-sans ds-evidence-legend__body">
         {Object.values(EVIDENCE_DIMENSION_COPY).map((entry) => (
           <React.Fragment key={entry.label}>

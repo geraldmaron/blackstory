@@ -68,10 +68,7 @@ export {
   type ValidateOverrideInput,
 } from './override.js';
 
-export {
-  toPublicRelevanceExplanation,
-  assertPublicRelevanceHasNoScore,
-} from './public.js';
+export { toPublicRelevanceExplanation, assertPublicRelevanceHasNoScore } from './public.js';
 
 export {
   evaluateCandidateRelevance,

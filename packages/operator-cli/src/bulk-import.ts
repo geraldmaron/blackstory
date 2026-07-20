@@ -1,4 +1,3 @@
-
 /**
  * CSV and markdown bulk-import parsing for operator leads, plus the batch runner. Also carries
  * the corpus-vetted bulk-import batch runner (see the module doc further down this file,
@@ -35,7 +34,6 @@ import {
   type OperatorIntakeOutcome,
   type OperatorSubmission,
 } from './intake.js';
-
 
 /**
  * CSV columns (header row required, order-independent): title, description, url, sourceUrls
@@ -130,7 +128,6 @@ const MARKDOWN_FIELD_KEYS: Record<string, keyof LeadInput> = {
   targetrecordid: 'targetRecordId',
   contact: 'submitterContact',
 };
-
 
 /**
  * Markdown bulk-import format: one `### <title>` heading per lead, followed by `Key: value`
@@ -245,7 +242,6 @@ export type BulkImportSummary = {
   readonly rows: readonly BulkImportRowOutcome[];
 };
 
-
 /**
  * Runs every parsed row through the same intake path as `submit-lead`, one row at a time.
  * A rejected row never blocks the rest of the batch and never receives special-cased handling.
@@ -328,9 +324,11 @@ function candidateSourceUrls(candidate: CorpusBulkRecordCandidate): readonly str
 
 function stringifyRejection(outcome: OperatorIntakeOutcome): string | undefined {
   if (outcome.accepted) return undefined;
-  return outcome.rejection.issues.map((issue) => `${issue.field}: ${issue.message}`).join('; ') || 'rejected';
+  return (
+    outcome.rejection.issues.map((issue) => `${issue.field}: ${issue.message}`).join('; ') ||
+    'rejected'
+  );
 }
-
 
 /**
  * Runs one corpus-vetted bulk-import batch through every hard gate and the standard quarantine
@@ -390,7 +388,8 @@ export function prepareCorpusBulkImportBatch(
       spotCheckSelected,
       ...(spotCheckVerdict ? { spotCheckVerdict } : {}),
       evidenceIds: candidate.citations.map(
-        (_citation, citationIndex) => `${input.corpusId}:${candidate.sourceRecordId}:citation:${citationIndex}`,
+        (_citation, citationIndex) =>
+          `${input.corpusId}:${candidate.sourceRecordId}:citation:${citationIndex}`,
       ),
     });
 

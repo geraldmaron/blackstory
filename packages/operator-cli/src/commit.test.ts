@@ -1,4 +1,3 @@
-
 /**
  * Verifies commitOperatorIntake calls the real commitWithAudit atomically, including
  * idempotent replay on a repeated call proving this package does not reimplement that path.

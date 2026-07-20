@@ -62,8 +62,7 @@ export default function DiscoveryRunsPage() {
         feed Inbox triage — this desk does not publish or edit canonical entities.
       </p>
       <p className="story-review__notice">
-        Next:{' '}
-        <Link href="/inbox">Open inbox</Link>
+        Next: <Link href="/inbox">Open inbox</Link>
         {' · '}
         <Link href="/graylist">Review graylist</Link>
       </p>

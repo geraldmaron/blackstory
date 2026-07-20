@@ -69,11 +69,7 @@
     "identity": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "authMethod",
-        "workloadIdentityProvider",
-        "serviceAccountEmail"
-      ],
+      "required": ["authMethod", "workloadIdentityProvider", "serviceAccountEmail"],
       "properties": {
         "authMethod": {
           "type": "string",

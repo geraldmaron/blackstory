@@ -16,7 +16,8 @@ test('a seed-depth disputed claim preserves its dispute note', () => {
   const view = buildDisputeView({
     primaryValue: '1867',
     disputed: true,
-    disputeNote: 'A credible alternate founding year (1868) is preserved; both values remain visible.',
+    disputeNote:
+      'A credible alternate founding year (1868) is preserved; both values remain visible.',
   });
   assert.equal(view.hasDispute, true);
   assert.equal(view.primaryValue, '1867');

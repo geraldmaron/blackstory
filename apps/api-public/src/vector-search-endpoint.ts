@@ -67,7 +67,9 @@ export type FindNearestHttpResponse =
     };
 
 export type FindNearestEndpointOptions = {
-  readonly appCheckGuard: (request: { readonly headers: AppCheckHeaders }) => Promise<AppCheckDecision>;
+  readonly appCheckGuard: (request: {
+    readonly headers: AppCheckHeaders;
+  }) => Promise<AppCheckDecision>;
   readonly embeddingProvider: EmbeddingProvider;
   readonly vectorStore: VectorIndexStore;
   readonly loadKillSwitchSnapshot: () => Promise<KillSwitchSnapshot> | KillSwitchSnapshot;
@@ -82,7 +84,9 @@ export type FindNearestEndpoint = {
  * Builds the composed `find_nearest` handler. Construction never touches Firestore or the
  * network every side effect happens inside `.handle`.
  */
-export function createFindNearestEndpoint(options: FindNearestEndpointOptions): FindNearestEndpoint {
+export function createFindNearestEndpoint(
+  options: FindNearestEndpointOptions,
+): FindNearestEndpoint {
   const rateLimitGuard = createPublicRateLimitGuard(options.rateLimitGuardOptions ?? {});
 
   return {
@@ -135,7 +139,9 @@ export function createFindNearestEndpoint(options: FindNearestEndpointOptions): 
       }
 
       try {
-        const [rawQueryVector] = await options.embeddingProvider.embed([guardDecision.canonical.queryText]);
+        const [rawQueryVector] = await options.embeddingProvider.embed([
+          guardDecision.canonical.queryText,
+        ]);
         if (!rawQueryVector) {
           throw new Error('Embedding provider returned no vector for the query text');
         }
@@ -147,7 +153,9 @@ export function createFindNearestEndpoint(options: FindNearestEndpointOptions): 
           distanceThreshold: guardDecision.canonical.distanceThreshold,
           ...(guardDecision.canonical.kind ? { kind: guardDecision.canonical.kind } : {}),
           ...(guardDecision.canonical.state ? { state: guardDecision.canonical.state } : {}),
-          ...(guardDecision.canonical.eraBucket ? { eraBucket: guardDecision.canonical.eraBucket } : {}),
+          ...(guardDecision.canonical.eraBucket
+            ? { eraBucket: guardDecision.canonical.eraBucket }
+            : {}),
         });
 
         const matches: readonly FindNearestMatch[] = rawMatches.map((match) => ({

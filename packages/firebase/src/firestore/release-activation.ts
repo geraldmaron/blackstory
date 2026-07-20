@@ -1,4 +1,3 @@
-
 /**
  * Atomic Firestore release activation and rollback.
  *
@@ -69,7 +68,7 @@ export type ActivateReleaseInput = {
   /**
    * Synchronous verification against a trusted publication public key.
    * It must not perform I/O because Firestore may retry transaction callbacks.
- */
+   */
   readonly verifySignedManifest: (release: ImmutablePublicationReleaseDoc) => boolean;
 };
 
@@ -195,7 +194,6 @@ function assertActivationAudit(
     throw new Error('Activation outbox message must match its audit event and start pending');
   }
 }
-
 
 /**
  * Atomically flips the public pointer to a signed release. Normal activation accepts only

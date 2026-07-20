@@ -39,7 +39,11 @@ test('DecadeStepper renders tablist with all-time and decade tabs', () => {
 
 test('HistoryResultList renders entity links', () => {
   const html = renderToStaticMarkup(
-    <HistoryResultList nodes={[sampleNode]} labelledBy="history-results" selectedId="ent_dunbar_school_001" />,
+    <HistoryResultList
+      nodes={[sampleNode]}
+      labelledBy="history-results"
+      selectedId="ent_dunbar_school_001"
+    />,
   );
   assert.match(html, /href="\/entity\/ent_dunbar_school_001"/);
   assert.match(html, /aria-current="true"/);

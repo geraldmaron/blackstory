@@ -75,12 +75,19 @@ test('no color in DIGNITY_PALETTE is red-hued except the allowlisted massacre to
     assert.ok(rgb, `expected a parseable color for ${color}`);
     assert.equal(isRedHued(rgb!), false, `${color} must not be red-hued (dignity rule)`);
   }
-  assert.equal(isRedHued(hexToRgb(DIGNITY_PALETTE.kindMassacre)), true, 'massacre tone must be red');
+  assert.equal(
+    isRedHued(hexToRgb(DIGNITY_PALETTE.kindMassacre)),
+    true,
+    'massacre tone must be red',
+  );
 });
 
 test('every kind shade is paired with a non-color glyph channel (WCAG 1.4.1)', () => {
   for (const [kind, entry] of KIND_ENCODING_ENTRIES) {
-    assert.ok(typeof entry.glyph === 'string' && entry.glyph.length > 0, `kind "${kind}" must have a glyph`);
+    assert.ok(
+      typeof entry.glyph === 'string' && entry.glyph.length > 0,
+      `kind "${kind}" must have a glyph`,
+    );
   }
   const signatures = KIND_ENCODING_ENTRIES.map(([, entry]) => `${entry.shade}::${entry.glyph}`);
   assert.equal(
@@ -101,7 +108,11 @@ test('semantic tones keep distinct shades for massacre, plantation, and epicente
 test('no status or skin framing in kind labels or legend prose', () => {
   const bannedPattern = /\b(skin|racial|complexion|light[- ]skinned|dark[- ]skinned|caste)\b/i;
   for (const [kind, entry] of KIND_ENCODING_ENTRIES) {
-    assert.doesNotMatch(entry.label, bannedPattern, `kind "${kind}" label must not use status/skin framing`);
+    assert.doesNotMatch(
+      entry.label,
+      bannedPattern,
+      `kind "${kind}" label must not use status/skin framing`,
+    );
   }
 
   const legendSource = readFileSync(
@@ -112,7 +123,11 @@ test('no status or skin framing in kind labels or legend prose', () => {
     .split('\n')
     .filter((line) => !line.trim().startsWith('*') && !line.trim().startsWith('//'));
   const renderedProse = jsxTextLines.join('\n');
-  assert.doesNotMatch(renderedProse, bannedPattern, 'MapExperienceLegend.tsx JSX copy must not use status/skin framing');
+  assert.doesNotMatch(
+    renderedProse,
+    bannedPattern,
+    'MapExperienceLegend.tsx JSX copy must not use status/skin framing',
+  );
   assert.match(
     renderedProse,
     /kind of place or record/i,
@@ -135,7 +150,10 @@ test('density tiers share the same hue family (opacity scale, not hue-shift towa
     .map(hue);
   const [first, ...rest] = hues;
   for (const h of rest) {
-    assert.ok(Math.abs(h - first!) < 1, 'all density tiers must share one hue, varying only opacity');
+    assert.ok(
+      Math.abs(h - first!) < 1,
+      'all density tiers must share one hue, varying only opacity',
+    );
   }
 });
 

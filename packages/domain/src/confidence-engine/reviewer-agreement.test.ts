@@ -90,11 +90,21 @@ test('computeReviewerAgreementSignal assigns zero weight to disputes and inconcl
 
 test('computeReviewerAgreementSignal validates its inputs', () => {
   assert.throws(
-    () => computeReviewerAgreementSignal({ reviewCount: -1, agreementRatio: 1, verdict: 'corroborates' }),
+    () =>
+      computeReviewerAgreementSignal({
+        reviewCount: -1,
+        agreementRatio: 1,
+        verdict: 'corroborates',
+      }),
     /reviewCount/,
   );
   assert.throws(
-    () => computeReviewerAgreementSignal({ reviewCount: 3, agreementRatio: 1.5, verdict: 'corroborates' }),
+    () =>
+      computeReviewerAgreementSignal({
+        reviewCount: 3,
+        agreementRatio: 1.5,
+        verdict: 'corroborates',
+      }),
     /agreementRatio/,
   );
 });
@@ -109,7 +119,10 @@ test('withReviewerAgreementCorroboration boosts score for a corroborating signal
   const adjusted = withReviewerAgreementCorroboration(result, signal);
   assert.ok(adjusted.score >= result.score);
   assert.ok(adjusted.score <= 1);
-  assert.equal(adjusted.score, Math.min(1, Math.round((result.score + signal.corroborationWeight) * 10_000) / 10_000));
+  assert.equal(
+    adjusted.score,
+    Math.min(1, Math.round((result.score + signal.corroborationWeight) * 10_000) / 10_000),
+  );
   assert.equal(adjusted.passesPublishThreshold, adjusted.score >= adjusted.threshold);
 });
 

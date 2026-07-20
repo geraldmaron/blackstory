@@ -91,7 +91,10 @@ test('National Archives adapter strips large export fields from payload', () => 
   assert.equal(result.filteredExportCount, 1);
   assert.equal(result.candidates[0]?.payload?.fullText, undefined);
   assert.equal(result.candidates[0]?.payload?.recordGroup, 'RG-123');
-  assert.equal(result.rejected.some((record) => record.reason === 'missing_canonical_url'), true);
+  assert.equal(
+    result.rejected.some((record) => record.reason === 'missing_canonical_url'),
+    true,
+  );
 });
 
 test('DPLA adapter retains only qualifying metadata under export filter policy', () => {
@@ -198,8 +201,5 @@ test('adapter runtime errors dead-letter without publication impact', () => {
 
 test('NARA adapter id remains stable for cross-bead registry compatibility', () => {
   assert.equal(NARA_ADAPTER_ID, 'nara-catalog-v1');
-  assert.equal(
-    naraAdapterDefinition.killSwitchId,
-    federalAdapterKillSwitchId('nara-catalog-v1'),
-  );
+  assert.equal(naraAdapterDefinition.killSwitchId, federalAdapterKillSwitchId('nara-catalog-v1'));
 });

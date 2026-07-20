@@ -10,11 +10,7 @@ import {
   type ClaimClass,
   type ProductConstitution,
 } from '@repo/schemas';
-import {
-  claimClassThreshold,
-  isClaimPublished,
-  type CanonicalClaim,
-} from './claim.js';
+import { claimClassThreshold, isClaimPublished, type CanonicalClaim } from './claim.js';
 import type { ConfidenceScore } from './confidence.js';
 
 export type PublicationThresholdResult = {
@@ -99,7 +95,10 @@ export function assertClaimMayPublish(input: {
   if (input.claim.workflowStatus !== 'accepted') {
     throw new Error('Only accepted claims may publish');
   }
-  if (policy.publicationRestrictions.requireAcceptedClaimAndEvidence && !input.hasQualifyingEvidence) {
+  if (
+    policy.publicationRestrictions.requireAcceptedClaimAndEvidence &&
+    !input.hasQualifyingEvidence
+  ) {
     throw new Error('Publication requires accepted claim and qualifying evidence');
   }
 

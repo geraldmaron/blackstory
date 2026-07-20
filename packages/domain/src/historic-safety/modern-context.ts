@@ -18,7 +18,10 @@
  * this module ever holding, deriving from, or scoring advisory data itself.
  */
 import type { PlaceAdvisoryRecord } from '../advisory.js';
-import { GENERAL_CRIME_CONTEXT_BIAS_CAVEAT, type GeneralCrimeContextRecord } from './scoring-guard.js';
+import {
+  GENERAL_CRIME_CONTEXT_BIAS_CAVEAT,
+  type GeneralCrimeContextRecord,
+} from './scoring-guard.js';
 import { assertLayerCitationValid, type LayerCitation, type LayerSignal } from './types.js';
 
 export const MODERN_CONTEXT_METHODOLOGY_VERSION = 'modern-context-methodology.v1' as const;
@@ -42,11 +45,18 @@ export type HateCrimeStatRecord = {
 };
 
 export function assertHateCrimeStatRecordValid(record: HateCrimeStatRecord): void {
-  if (!record.placeEntityId.trim()) throw new Error('HateCrimeStatRecord.placeEntityId is required');
-  if (!Number.isFinite(record.biasMotivatedIncidentCount) || record.biasMotivatedIncidentCount < 0) {
-    throw new RangeError('HateCrimeStatRecord.biasMotivatedIncidentCount must be a non-negative number');
+  if (!record.placeEntityId.trim())
+    throw new Error('HateCrimeStatRecord.placeEntityId is required');
+  if (
+    !Number.isFinite(record.biasMotivatedIncidentCount) ||
+    record.biasMotivatedIncidentCount < 0
+  ) {
+    throw new RangeError(
+      'HateCrimeStatRecord.biasMotivatedIncidentCount must be a non-negative number',
+    );
   }
-  if (!record.reportingYear.trim()) throw new Error('HateCrimeStatRecord.reportingYear is required');
+  if (!record.reportingYear.trim())
+    throw new Error('HateCrimeStatRecord.reportingYear is required');
   assertLayerCitationValid(record.citation);
 }
 
@@ -125,8 +135,12 @@ export function buildGeneralCrimeContextView(
 ): GeneralCrimeContextRecord {
   const record: GeneralCrimeContextRecord = {
     placeEntityId: input.placeEntityId,
-    ...(input.nibrsOffenseCount !== undefined ? { nibrsOffenseCount: input.nibrsOffenseCount } : {}),
-    ...(input.reportedCrimeRate !== undefined ? { reportedCrimeRate: input.reportedCrimeRate } : {}),
+    ...(input.nibrsOffenseCount !== undefined
+      ? { nibrsOffenseCount: input.nibrsOffenseCount }
+      : {}),
+    ...(input.reportedCrimeRate !== undefined
+      ? { reportedCrimeRate: input.reportedCrimeRate }
+      : {}),
     asOf: input.asOf,
     sourceLabel: input.sourceLabel,
     policingPatternCaveat: GENERAL_CRIME_CONTEXT_BIAS_CAVEAT,
@@ -138,11 +152,13 @@ export function buildGeneralCrimeContextView(
 /** Fails closed if the mandatory bias caveat is missing or altered \u2014 the caveat text is not
  * caller-configurable. */
 export function assertGeneralCrimeContextValid(record: GeneralCrimeContextRecord): void {
-  if (!record.placeEntityId.trim()) throw new Error('GeneralCrimeContextRecord.placeEntityId is required');
+  if (!record.placeEntityId.trim())
+    throw new Error('GeneralCrimeContextRecord.placeEntityId is required');
   if (!Number.isFinite(Date.parse(record.asOf))) {
     throw new Error('GeneralCrimeContextRecord.asOf must be an ISO date');
   }
-  if (!record.sourceLabel.trim()) throw new Error('GeneralCrimeContextRecord.sourceLabel is required');
+  if (!record.sourceLabel.trim())
+    throw new Error('GeneralCrimeContextRecord.sourceLabel is required');
   if (record.policingPatternCaveat !== GENERAL_CRIME_CONTEXT_BIAS_CAVEAT) {
     throw new Error(
       'GeneralCrimeContextRecord.policingPatternCaveat must equal GENERAL_CRIME_CONTEXT_BIAS_CAVEAT ' +
@@ -153,7 +169,13 @@ export function assertGeneralCrimeContextValid(record: GeneralCrimeContextRecord
   // shape (e.g. an accidental `value` or `score` field bolted on by a future edit). Its own
   // crime-context field names (nibrsOffenseCount, etc.) are expected here only composite shapes
   // are forbidden.
-  const forbiddenScoringShapeKeys = ['value', 'score', 'layerContributions', 'layerId', 'missingLayers'] as const;
+  const forbiddenScoringShapeKeys = [
+    'value',
+    'score',
+    'layerContributions',
+    'layerId',
+    'missingLayers',
+  ] as const;
   for (const key of forbiddenScoringShapeKeys) {
     if (key in (record as Record<string, unknown>)) {
       throw new Error(

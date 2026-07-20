@@ -46,5 +46,9 @@ export function computeRotRateBySourceClass(
       rotRate: bucket.total === 0 ? 0 : bucket.dead / bucket.total,
       attentionRate: bucket.total === 0 ? 0 : (bucket.dead + bucket.drifted) / bucket.total,
     }))
-    .sort((left, right) => right.rotRate - left.rotRate || left.sourceClassification.localeCompare(right.sourceClassification));
+    .sort(
+      (left, right) =>
+        right.rotRate - left.rotRate ||
+        left.sourceClassification.localeCompare(right.sourceClassification),
+    );
 }

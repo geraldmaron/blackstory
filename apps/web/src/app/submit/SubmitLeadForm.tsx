@@ -15,7 +15,11 @@ type SubmitState =
   | { readonly status: 'idle' }
   | { readonly status: 'submitting' }
   | { readonly status: 'success'; readonly submissionId: string }
-  | { readonly status: 'error'; readonly message: string; readonly fieldIssues?: readonly { field: string; message: string }[] };
+  | {
+      readonly status: 'error';
+      readonly message: string;
+      readonly fieldIssues?: readonly { field: string; message: string }[];
+    };
 
 const DEFAULT_ERROR_MESSAGE =
   'Something went wrong submitting this lead. Please try again in a moment.';
@@ -91,16 +95,18 @@ export function SubmitLeadForm() {
   if (state.status === 'success') {
     return (
       <Notice tone="warning" title="Lead received">
-        Thank you — this lead (reference <code>{state.submissionId}</code>) has entered a
-        moderated review queue. It is not public, and it will only ever seed research after
-        independent reviewers agree it is worth pursuing. Nothing you submitted is visible to
-        anyone but the moderation team.
+        Thank you — this lead (reference <code>{state.submissionId}</code>) has entered a moderated
+        review queue. It is not public, and it will only ever seed research after independent
+        reviewers agree it is worth pursuing. Nothing you submitted is visible to anyone but the
+        moderation team.
       </Notice>
     );
   }
 
   const fieldIssue = (field: string) =>
-    state.status === 'error' ? state.fieldIssues?.find((issue) => issue.field === field) : undefined;
+    state.status === 'error'
+      ? state.fieldIssues?.find((issue) => issue.field === field)
+      : undefined;
 
   return (
     <form className="ds-stack" onSubmit={handleSubmit} noValidate>
@@ -197,9 +203,13 @@ export function SubmitLeadForm() {
 
       <div className="ds-row" style={{ alignItems: 'flex-start' }}>
         <input id={attestationId} name="attestation" type="checkbox" />
-        <label htmlFor={attestationId} className="ds-sans" style={{ marginLeft: 'var(--ds-space-2)' }}>
-          I believe this information is accurate to the best of my knowledge (optional
-          attestation — leads are reviewed either way).
+        <label
+          htmlFor={attestationId}
+          className="ds-sans"
+          style={{ marginLeft: 'var(--ds-space-2)' }}
+        >
+          I believe this information is accurate to the best of my knowledge (optional attestation —
+          leads are reviewed either way).
         </label>
       </div>
 

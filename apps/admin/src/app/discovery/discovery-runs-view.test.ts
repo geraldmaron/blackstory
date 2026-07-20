@@ -3,10 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import {
-  formatSurvivorCount,
-  shouldShowSurvivorsColumn,
-} from './discovery-runs-view.ts';
+import { formatSurvivorCount, shouldShowSurvivorsColumn } from './discovery-runs-view.ts';
 
 test('shouldShowSurvivorsColumn is true when the row type includes survivors', () => {
   assert.equal(shouldShowSurvivorsColumn([]), true);

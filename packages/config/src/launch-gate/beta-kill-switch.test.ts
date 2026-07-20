@@ -1,4 +1,3 @@
-
 /**
  * Contract tests for beta disable config keys and runbook hooks.
  */

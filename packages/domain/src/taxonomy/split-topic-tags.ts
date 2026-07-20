@@ -33,7 +33,10 @@ export function splitTopicTags(topicTags: readonly string[]): SplitTopicTagsResu
   for (const tag of topicTags) {
     if (isValidTopicId(tag)) {
       topicIds.push(tag);
-    } else if (ORGANIZATION_SHAPED_LEGACY_TAGS.has(tag) || EVENT_OR_LAW_SHAPED_LEGACY_TAGS.has(tag)) {
+    } else if (
+      ORGANIZATION_SHAPED_LEGACY_TAGS.has(tag) ||
+      EVENT_OR_LAW_SHAPED_LEGACY_TAGS.has(tag)
+    ) {
       mentionedEntityIds.push(tag);
     } else {
       keywords.push(tag);

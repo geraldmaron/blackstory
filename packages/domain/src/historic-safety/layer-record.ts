@@ -157,7 +157,9 @@ export function assertSundownTownDesignationValid(record: SundownTownDesignation
   }
 }
 
-export function assertRedliningGradeDesignationValid(record: RedliningGradeDesignationRecord): void {
+export function assertRedliningGradeDesignationValid(
+  record: RedliningGradeDesignationRecord,
+): void {
   assertBaseDesignationRecordValid(record);
   if (!isHolcGrade(record.grade)) {
     throw new Error(`Unknown HOLC grade: ${record.grade}`);
@@ -173,7 +175,9 @@ export function assertRestrictiveCovenantDesignationValid(
   }
 }
 
-export function assertPlaceConditionDesignationValid(record: PlaceConditionDesignationRecord): void {
+export function assertPlaceConditionDesignationValid(
+  record: PlaceConditionDesignationRecord,
+): void {
   if (record.designation === 'sundown_town') {
     assertSundownTownDesignationValid(record);
     return;

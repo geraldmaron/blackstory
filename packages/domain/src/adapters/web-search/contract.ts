@@ -6,9 +6,7 @@
  * `WebSearchProviderConfig.storageTermsConfirmed` is also true (./normalizer.ts
  * `assertStorageTermsConfirmed`).
  */
-import {
-  ADAPTER_CANDIDATE_SCHEMA_VERSION,
-} from '../candidates.js';
+import { ADAPTER_CANDIDATE_SCHEMA_VERSION } from '../candidates.js';
 import type { SourceAdapterContract } from '../types.js';
 import {
   BRAVE_SEARCH_ADAPTER_ID,
@@ -18,7 +16,9 @@ import {
   WEB_SEARCH_STABLE_ID_SCHEME,
 } from './types.js';
 
-export function createBraveSearchAdapterContract(overrides: Partial<SourceAdapterContract> = {}): SourceAdapterContract {
+export function createBraveSearchAdapterContract(
+  overrides: Partial<SourceAdapterContract> = {},
+): SourceAdapterContract {
   return {
     adapterId: BRAVE_SEARCH_ADAPTER_ID,
     parserVersion: WEB_SEARCH_PARSER_VERSION,

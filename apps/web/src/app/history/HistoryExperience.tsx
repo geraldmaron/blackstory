@@ -24,14 +24,8 @@ import {
   type HistoryFacetOption,
   type HistorySort,
 } from '../../lib/history/filters';
-import {
-  buildHistoryHref,
-  type HistoryViewState,
-} from '../../lib/history/url-state';
-import {
-  HISTORY_DECADE_FRAMING,
-  HISTORY_DIGNITY_FRAMING,
-} from '../../lib/history/copy';
+import { buildHistoryHref, type HistoryViewState } from '../../lib/history/url-state';
+import { HISTORY_DECADE_FRAMING, HISTORY_DIGNITY_FRAMING } from '../../lib/history/copy';
 import { HISTORY_DEGRADED_MODE_COPY } from '../../lib/history/snapshot-mode';
 import { kindEncodingFor } from '../../lib/map-experience/kind-encoding';
 import type { HistoryViewModel } from './history-view-model';
@@ -52,7 +46,10 @@ function formatFacetOptionLabel(option: HistoryFacetOption): string {
 
 function mergeViewState(
   base: HistoryViewState,
-  patch: Partial<HistoryViewState> & { readonly clearSelected?: boolean; readonly clearEdge?: boolean },
+  patch: Partial<HistoryViewState> & {
+    readonly clearSelected?: boolean;
+    readonly clearEdge?: boolean;
+  },
 ): HistoryViewState {
   const next: HistoryViewState = {
     mode: patch.mode ?? base.mode,
@@ -88,9 +85,9 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
   const router = useRouter();
   const [view, setView] = useState(initial);
   const [queryDraft, setQueryDraft] = useState(initial.viewState.filters.q);
-  const [degradedReason, setDegradedReason] = useState<keyof typeof HISTORY_DEGRADED_MODE_COPY | null>(
-    null,
-  );
+  const [degradedReason, setDegradedReason] = useState<
+    keyof typeof HISTORY_DEGRADED_MODE_COPY | null
+  >(null);
 
   useEffect(() => {
     setView(initial);
@@ -208,7 +205,9 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
   const handleConnectionsChange = useCallback(
     (connections: string) => {
       const next =
-        connections === 'with' || connections === 'without' ? connections : DEFAULT_HISTORY_FILTERS.connections;
+        connections === 'with' || connections === 'without'
+          ? connections
+          : DEFAULT_HISTORY_FILTERS.connections;
       applyFilters({ connections: next });
     },
     [applyFilters],
@@ -216,9 +215,9 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
 
   const handleSortChange = useCallback(
     (sort: string) => {
-      const nextSort = (HISTORY_SORT_OPTIONS.some((option) => option.value === sort)
-        ? sort
-        : 'name') as HistorySort;
+      const nextSort = (
+        HISTORY_SORT_OPTIONS.some((option) => option.value === sort) ? sort : 'name'
+      ) as HistorySort;
       applyFilters({ sort: nextSort });
     },
     [applyFilters],
@@ -315,8 +314,7 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
           <legend className="ds-history-kind-chips__legend">Kind</legend>
           {view.facetOptions.kind.map((option) => {
             const isActive = view.viewState.filters.kind === option.value;
-            const encoding =
-              option.value === 'all' ? undefined : kindEncodingFor(option.value);
+            const encoding = option.value === 'all' ? undefined : kindEncodingFor(option.value);
             return (
               <button
                 key={option.value}
@@ -415,14 +413,20 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
         </label>
 
         {hasActiveFilters ? (
-          <button className="ds-button ds-button--secondary" type="button" onClick={handleClearFilters}>
+          <button
+            className="ds-button ds-button--secondary"
+            type="button"
+            onClick={handleClearFilters}
+          >
             Clear
           </button>
         ) : null}
 
         <p className="ds-sans ds-history__count">
           {view.totalMatched} record{view.totalMatched === 1 ? '' : 's'} in view
-          {view.viewState.mode === 'decade' && view.activeDecade ? ` · ${view.activeDecade}` : ' · all time'}
+          {view.viewState.mode === 'decade' && view.activeDecade
+            ? ` · ${view.activeDecade}`
+            : ' · all time'}
         </p>
 
         <p className="ds-history__release-meta" aria-label="Release metadata">
@@ -431,14 +435,11 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
       </div>
 
       <div className="ds-history__layout">
-      <div className="ds-history-graph-panel">
+        <div className="ds-history-graph-panel">
           <h2 className="ds-section__kicker" id="history-graph-heading">
             Records &amp; connections
           </h2>
-          <HistoryGraphPanel
-            {...graphProps}
-            activeKind={view.viewState.filters.kind}
-          />
+          <HistoryGraphPanel {...graphProps} activeKind={view.viewState.filters.kind} />
         </div>
 
         <div className="ds-history__list-panel">

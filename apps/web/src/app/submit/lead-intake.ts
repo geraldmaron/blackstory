@@ -54,7 +54,11 @@ function composeStatement(input: LeadSubmissionInput): string {
   return lines.join('\n\n');
 }
 
-function fieldTooLong(value: string | undefined, field: string, max: number): LeadSubmissionFieldIssue | undefined {
+function fieldTooLong(
+  value: string | undefined,
+  field: string,
+  max: number,
+): LeadSubmissionFieldIssue | undefined {
   if (value !== undefined && value.length > max) {
     return { field, message: `${field} must be ${max} characters or fewer.` };
   }

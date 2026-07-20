@@ -33,10 +33,13 @@ export function registerTrustedTypesPolicyStub(): TrustedTypesPolicy | null {
   if (typeof globalThis === 'undefined') {
     return null;
   }
-  const trustedTypes = (globalThis as { trustedTypes?: { createPolicy: (
-    name: string,
-    rules: TrustedTypesPolicy,
-  ) => TrustedTypesPolicy } }).trustedTypes;
+  const trustedTypes = (
+    globalThis as {
+      trustedTypes?: {
+        createPolicy: (name: string, rules: TrustedTypesPolicy) => TrustedTypesPolicy;
+      };
+    }
+  ).trustedTypes;
   if (!trustedTypes?.createPolicy) {
     return createTrustedTypesPolicyStub();
   }

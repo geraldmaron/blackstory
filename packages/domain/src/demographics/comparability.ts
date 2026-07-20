@@ -42,7 +42,8 @@ export const DECADE_RACE_CATEGORY_BANDS: readonly DecadeRaceCategoryBand[] = [
   {
     decades: ['1790', '1800', '1810', '1820', '1830', '1840'],
     band: '1790-1840-slave-and-free-colored',
-    raceCategoryLabel: 'Enslaved persons and free colored persons (separate counts; definitions vary by decade)',
+    raceCategoryLabel:
+      'Enslaved persons and free colored persons (separate counts; definitions vary by decade)',
     notes:
       'Early decennial schedules counted enslaved and free colored populations under evolving ' +
       'statutory categories. These figures are historical records of what was asked and tabulated — ' +

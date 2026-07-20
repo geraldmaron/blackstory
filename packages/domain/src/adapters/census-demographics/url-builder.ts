@@ -17,10 +17,7 @@ export const CENSUS_DECENNIAL_HOMEPAGE_BY_DECADE: Readonly<
 };
 
 /** All counties in all states, both variables + NAME, one request per vintage. */
-export function buildCountyPopulationUrl(
-  vintage: CensusDecennialVintage,
-  apiKey?: string,
-): string {
+export function buildCountyPopulationUrl(vintage: CensusDecennialVintage, apiKey?: string): string {
   const params = new URLSearchParams({
     get: `NAME,${vintage.totalVariable},${vintage.blackAloneVariable}`,
     for: 'county:*',

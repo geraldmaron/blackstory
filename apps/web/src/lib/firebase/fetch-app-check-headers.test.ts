@@ -4,8 +4,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { AppCheck } from 'firebase/app-check';
-import { fetchAppCheckHeaders } from './fetch-app-check-headers.ts';
-import { buildContentSecurityPolicy } from '../web-security/csp.ts';
+import { fetchAppCheckHeaders } from './fetch-app-check-headers';
+import { buildContentSecurityPolicy } from '../web-security/csp';
 
 test('fetchAppCheckHeaders returns {} when App Check is undefined', async () => {
   assert.deepEqual(await fetchAppCheckHeaders(undefined), {});
@@ -14,11 +14,7 @@ test('fetchAppCheckHeaders returns {} when App Check is undefined', async () => 
 test('fetchAppCheckHeaders times out instead of hanging when getToken never settles', async () => {
   const never = {} as AppCheck;
   const start = Date.now();
-  const headers = await fetchAppCheckHeaders(
-    never,
-    50,
-    () => new Promise(() => {}),
-  );
+  const headers = await fetchAppCheckHeaders(never, 50, () => new Promise(() => {}));
   assert.deepEqual(headers, {});
   assert.ok(Date.now() - start >= 45);
 });

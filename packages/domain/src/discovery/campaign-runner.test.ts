@@ -65,9 +65,7 @@ function buildCandidate(
   return { ...base, ...overrides };
 }
 
-function buildCampaign(
-  candidates: readonly DiscoveryCandidateRecord[],
-): DiscoveryCampaignResult {
+function buildCampaign(candidates: readonly DiscoveryCandidateRecord[]): DiscoveryCampaignResult {
   return {
     campaignId: 'camp_test',
     run: {
@@ -103,9 +101,7 @@ test('assertCampaignCannotPublish confirms guard is armed and rejects forbidden 
     () => assertCampaignCannotPublish({ operation: 'create_public_entity' }),
     /Discovery cannot publish/,
   );
-  assert.doesNotThrow(() =>
-    assertCampaignCannotPublish({ operation: 'ingest_candidate' }),
-  );
+  assert.doesNotThrow(() => assertCampaignCannotPublish({ operation: 'ingest_candidate' }));
 });
 
 test('assertSurvivorSnippetsCapped passes capped summaries and rejects oversize prose', () => {

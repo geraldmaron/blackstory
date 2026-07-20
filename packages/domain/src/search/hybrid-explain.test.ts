@@ -28,7 +28,12 @@ test('buildWhyThisResult includes structured and era reasons', () => {
     REC,
     { record: REC, matchedOn: 'displayName', matchedText: REC.displayName },
     'freedom',
-    { fromStructuredLane: true, fromVectorLane: false, placeAnchored: false, eraPreFilter: '1860s' },
+    {
+      fromStructuredLane: true,
+      fromVectorLane: false,
+      placeAnchored: false,
+      eraPreFilter: '1860s',
+    },
   );
   assert.ok(reasons.some((r) => r.includes('Matched on name')));
   assert.ok(reasons.some((r) => r.includes('1860s')));
@@ -45,5 +50,8 @@ test('vector-only match explains semantic recall', () => {
 });
 
 test('assertHybridExplanationHasNoNumericScore rejects score leaks', () => {
-  assert.throws(() => assertHybridExplanationHasNoNumericScore(['distance: 0.85']), /numeric scores/);
+  assert.throws(
+    () => assertHybridExplanationHasNoNumericScore(['distance: 0.85']),
+    /numeric scores/,
+  );
 });

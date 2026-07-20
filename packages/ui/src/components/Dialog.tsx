@@ -1,11 +1,10 @@
-
 /**
  * Modal dialog built on the native <dialog> element with Escape close and labelled title.
  */
 
 'use client';
 
-import React, {  useEffect, useId, useRef, type ReactNode  } from 'react';
+import React, { useEffect, useId, useRef, type ReactNode } from 'react';
 
 // Defensive: apps/web SSR tests may classic-transform this package's TSX source.
 void React;

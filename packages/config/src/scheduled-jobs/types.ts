@@ -1,4 +1,3 @@
-
 /**
  * Scheduled-job registry contracts that other packages' recurring jobs plug into.
  * ADR-007 already picked the mechanism (Cloud Scheduler -> Cloud Tasks -> Cloud Run
@@ -18,7 +17,6 @@ export const SCHEDULED_JOB_REGISTRY_VERSION = '1.0.0' as const;
 export const TARGET_WORKER_PACKAGES = ['research', 'publication', 'security'] as const;
 export type TargetWorkerPackage = (typeof TARGET_WORKER_PACKAGES)[number];
 
-
 /**
  * Environment every scheduled job runs in. (ADR-012, landed in parallel with this)
  * names the research/admin pipeline project `repo-internal`; that ADR is committed, so we
@@ -27,7 +25,6 @@ export type TargetWorkerPackage = (typeof TARGET_WORKER_PACKAGES)[number];
  */
 export const SCHEDULED_JOB_ENVIRONMENTS = ['repo-internal'] as const;
 export type ScheduledJobEnvironment = (typeof SCHEDULED_JOB_ENVIRONMENTS)[number];
-
 
 /**
  * Automation proposes, humans dispose. Every scheduled job's declared public-facing effect is

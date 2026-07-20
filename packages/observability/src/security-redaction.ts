@@ -1,4 +1,3 @@
-
 /**
  * Security telemetry redaction strips App Check tokens, credentials, and protected
  * addresses before events reach logs or exported metrics.

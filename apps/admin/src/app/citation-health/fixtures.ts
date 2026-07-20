@@ -15,7 +15,11 @@ export const CITATION_HEALTH_FIXTURES: readonly Citation[] = [
     sourceClassification: 'federal_archive',
     title: 'Grand jury report',
     location: { kind: 'url', url: 'https://archives.gov/record/1923-01' },
-    capture: { captureId: 'capture-fed-1', waybackCaptureUrl: 'https://web.archive.org/web/20260101000000/https://archives.gov/record/1923-01' },
+    capture: {
+      captureId: 'capture-fed-1',
+      waybackCaptureUrl:
+        'https://web.archive.org/web/20260101000000/https://archives.gov/record/1923-01',
+    },
     retrievalDate: '2026-01-01T00:00:00.000Z',
     linkStatus: 'alive',
     linkStatusAsOf: '2026-07-16T09:00:00.000Z',
@@ -29,7 +33,11 @@ export const CITATION_HEALTH_FIXTURES: readonly Citation[] = [
     sourceClassification: 'federal_archive',
     title: 'Federal census extract',
     location: { kind: 'url', url: 'https://archives.gov/record/1923-02' },
-    capture: { captureId: 'capture-fed-2', waybackCaptureUrl: 'https://web.archive.org/web/20260101000000/https://archives.gov/record/1923-02' },
+    capture: {
+      captureId: 'capture-fed-2',
+      waybackCaptureUrl:
+        'https://web.archive.org/web/20260101000000/https://archives.gov/record/1923-02',
+    },
     retrievalDate: '2026-01-01T00:00:00.000Z',
     linkStatus: 'alive',
     linkStatusAsOf: '2026-07-16T09:00:00.000Z',
@@ -61,9 +69,16 @@ export const CITATION_HEALTH_FIXTURES: readonly Citation[] = [
     title: 'County clerk records fire damage',
     authorName: 'County Clerk',
     namedEntities: ['Levy County', 'Florida'],
-    location: { kind: 'url', url: 'https://web.archive.org/web/20260110000000/https://gazette.example/story/fire-damage' },
+    location: {
+      kind: 'url',
+      url: 'https://web.archive.org/web/20260110000000/https://gazette.example/story/fire-damage',
+    },
     originallyPublishedAtUrl: 'https://gazette.example/story/fire-damage',
-    capture: { captureId: 'capture-news-2', waybackCaptureUrl: 'https://web.archive.org/web/20260110000000/https://gazette.example/story/fire-damage' },
+    capture: {
+      captureId: 'capture-news-2',
+      waybackCaptureUrl:
+        'https://web.archive.org/web/20260110000000/https://gazette.example/story/fire-damage',
+    },
     retrievalDate: '2026-01-10T00:00:00.000Z',
     linkStatus: 'dead',
     linkStatusAsOf: '2026-07-15T09:00:00.000Z',

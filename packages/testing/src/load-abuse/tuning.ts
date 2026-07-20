@@ -1,4 +1,3 @@
-
 /**
  * Concrete tuning recommendations derived from load/abuse simulations.
  * Values reference current policy defaults in @repo/security adjust after staging soak.
@@ -13,7 +12,11 @@ import type { TuningRecommendation } from './types.js';
 
 const searchAnon = resolveEndpointPolicy(DEFAULT_ENDPOINT_QUOTA_MATRIX, 'search', 'anonymous');
 const geocodeAnon = resolveEndpointPolicy(DEFAULT_ENDPOINT_QUOTA_MATRIX, 'geocoding', 'anonymous');
-const entityAnon = resolveEndpointPolicy(DEFAULT_ENDPOINT_QUOTA_MATRIX, 'entityRetrieval', 'anonymous');
+const entityAnon = resolveEndpointPolicy(
+  DEFAULT_ENDPOINT_QUOTA_MATRIX,
+  'entityRetrieval',
+  'anonymous',
+);
 
 /** Actionable tuning rows for operators not auto-applied. */
 export function loadAbuseTuningRecommendations(): readonly TuningRecommendation[] {
@@ -64,8 +67,7 @@ export function loadAbuseTuningRecommendations(): readonly TuningRecommendation[
       controlLayer: 'rate_limit_daily_cap',
       currentValue: `${entityAnon.dailyCap}/day entity reads`,
       recommendedValue: 'keep; CDN cache hit ratio target >85% for entity HTML',
-      rationale:
-        'Static traffic should terminate at edge/CDN; origin daily cap is backstop only.',
+      rationale: 'Static traffic should terminate at edge/CDN; origin daily cap is backstop only.',
       priority: 'P2',
     },
     {
@@ -114,8 +116,7 @@ export function loadAbuseTuningRecommendations(): readonly TuningRecommendation[
       controlLayer: 'resource_queue_dispatch',
       currentValue: 'submissions-intake maxAttempts 5',
       recommendedValue: 'maxAttempts 4 if retry storm metrics >100/hour in staging',
-      rationale:
-        'Retry budget exhaustion stops amplification before queue depth fills.',
+      rationale: 'Retry budget exhaustion stops amplification before queue depth fills.',
       priority: 'P2',
     },
     {
@@ -141,6 +142,8 @@ export function loadAbuseTuningRecommendations(): readonly TuningRecommendation[
   ] satisfies readonly TuningRecommendation[];
 }
 
-export function tuningRecommendationsByPriority(priority: TuningRecommendation['priority']): readonly TuningRecommendation[] {
+export function tuningRecommendationsByPriority(
+  priority: TuningRecommendation['priority'],
+): readonly TuningRecommendation[] {
   return loadAbuseTuningRecommendations().filter((row) => row.priority === priority);
 }

@@ -31,7 +31,13 @@ import type { ContentDriftResult } from './drift-detection.js';
 import { compareCapturedContent } from './drift-detection.js';
 import type { LinkHealthStatus } from './citation.js';
 
-export const DEAD_LINK_REASONS = ['not_found', 'gone', 'dns_not_found', 'paywalled', 'other'] as const;
+export const DEAD_LINK_REASONS = [
+  'not_found',
+  'gone',
+  'dns_not_found',
+  'paywalled',
+  'other',
+] as const;
 export type DeadLinkReason = (typeof DEAD_LINK_REASONS)[number];
 
 /** Structural port for a -driven re-verification fetch see module doc above. */
@@ -112,7 +118,9 @@ export function classifyLinkCheckAttempt(input: {
       return {
         status: 'redirected',
         redirectTarget: fetch.finalUrl,
-        ...(fetch.permanentRedirect !== undefined ? { permanentRedirect: fetch.permanentRedirect } : {}),
+        ...(fetch.permanentRedirect !== undefined
+          ? { permanentRedirect: fetch.permanentRedirect }
+          : {}),
       };
     }
     return { status: 'alive', ...(drift ? { drift } : {}) };
@@ -155,7 +163,11 @@ export function advanceLinkHealthState(
 ): LinkHealthState {
   const maxRetries = input.maxRetriesBeforeDead ?? DEFAULT_MAX_RETRIES_BEFORE_DEAD;
 
-  if (attempt.status === 'alive' || attempt.status === 'redirected' || attempt.status === 'drifted') {
+  if (
+    attempt.status === 'alive' ||
+    attempt.status === 'redirected' ||
+    attempt.status === 'drifted'
+  ) {
     return {
       citationId: previous.citationId,
       status: attempt.status,

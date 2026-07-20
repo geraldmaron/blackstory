@@ -20,7 +20,7 @@ on:
       confirm:
         description: Type deploy to run production pipeline
         required: true
-        default: ""
+        default: ''
 
 permissions:
   contents: read

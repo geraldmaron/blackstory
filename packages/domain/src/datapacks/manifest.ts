@@ -30,8 +30,16 @@
  * contract sized for the resource kinds BlackStory actually ingests.
  */
 import { sign as signBytes, verify as verifyBytes, type KeyLike } from 'node:crypto';
-import { canonicalJson, sha256Bytes, type JsonValue, type Sha256Hash } from '../publication/index.js';
-import { EXTERNAL_SOURCE_LICENSE_VERDICTS, type ExternalSourceLicenseVerdict } from '../external-data-sources.js';
+import {
+  canonicalJson,
+  sha256Bytes,
+  type JsonValue,
+  type Sha256Hash,
+} from '../publication/index.js';
+import {
+  EXTERNAL_SOURCE_LICENSE_VERDICTS,
+  type ExternalSourceLicenseVerdict,
+} from '../external-data-sources.js';
 import { isRefreshCadence, type RefreshCadence } from '../corpus-vetting.js';
 
 export const DATA_PACK_SCHEMA_VERSION = 1 as const;
@@ -154,7 +162,10 @@ export function assertDataPackManifestShapeValid(manifest: DataPackManifest): vo
     if (!isDataPackResourceKind(resource.kind)) {
       throw new Error(`resource ${resource.name}: unknown kind ${resource.kind}`);
     }
-    if (resource.sha256.algorithm !== 'sha256' || !SHA256_DIGEST_PATTERN.test(resource.sha256.digest)) {
+    if (
+      resource.sha256.algorithm !== 'sha256' ||
+      !SHA256_DIGEST_PATTERN.test(resource.sha256.digest)
+    ) {
       throw new Error(`resource ${resource.name}: invalid sha256 hash`);
     }
     if (!Number.isInteger(resource.byteSize) || resource.byteSize < 0) {
@@ -217,9 +228,11 @@ export function signDataPackManifest(
   if (!input.publicKeyId) throw new Error('publicKeyId is required');
   const manifestJson = canonicalJson(manifestToJson(manifest));
   const manifestHash = sha256Bytes(manifestJson);
-  const signature = signBytes('sha256', textEncoder.encode(manifestJson), input.privateKey).toString(
-    'base64',
-  );
+  const signature = signBytes(
+    'sha256',
+    textEncoder.encode(manifestJson),
+    input.privateKey,
+  ).toString('base64');
   return Object.freeze({
     manifest,
     manifestHash,

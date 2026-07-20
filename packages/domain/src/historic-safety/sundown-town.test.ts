@@ -8,7 +8,16 @@ import { computeSundownTownLayerSignal, SUNDOWN_TOWN_CONFIDENCE_WEIGHTS } from '
 import type { LayerCitation } from './types.js';
 
 const AREA_GEOMETRY = {
-  shape: { type: 'Polygon' as const, coordinates: [[-90, 32], [-90, 33], [-89, 33], [-89, 32], [-90, 32]] },
+  shape: {
+    type: 'Polygon' as const,
+    coordinates: [
+      [-90, 32],
+      [-90, 33],
+      [-89, 33],
+      [-89, 32],
+      [-90, 32],
+    ],
+  },
   documentedPrecisionTier: 'locality' as const,
 };
 

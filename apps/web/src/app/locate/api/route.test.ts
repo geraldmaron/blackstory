@@ -13,10 +13,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { AppCheckVerifier } from '@repo/firebase';
 import type { CensusGeocodeMatch } from '@repo/domain';
-import {
-  DEFAULT_ENDPOINT_QUOTA_MATRIX,
-  resolveEndpointPolicy,
-} from '@repo/security';
+import { DEFAULT_ENDPOINT_QUOTA_MATRIX, resolveEndpointPolicy } from '@repo/security';
 import { createLocateCache } from '../../../lib/geocode/pipeline';
 import { createLocateAppCheckGuard } from './app-check-guard';
 import { createLocateRateLimitGuard } from './rate-limit-guard';
@@ -92,14 +89,27 @@ type LocateSuccessBody = {
   readonly cacheHit: boolean;
   readonly resolution: {
     readonly match: { readonly placeName?: string; readonly stateName?: string };
-    readonly jurisdictionIds: { readonly countryId: string; readonly stateId?: string; readonly countyId?: string };
-    readonly precision: { readonly tier: string; readonly exactCoordinatesRetained: boolean; readonly lat?: number; readonly lng?: number };
+    readonly jurisdictionIds: {
+      readonly countryId: string;
+      readonly stateId?: string;
+      readonly countyId?: string;
+    };
+    readonly precision: {
+      readonly tier: string;
+      readonly exactCoordinatesRetained: boolean;
+      readonly lat?: number;
+      readonly lng?: number;
+    };
   };
 };
 
 type LocateFailureBody = {
   readonly ok: false;
-  readonly fallback: { readonly available: true; readonly reason: string; readonly searchHref: string };
+  readonly fallback: {
+    readonly available: true;
+    readonly reason: string;
+    readonly searchHref: string;
+  };
 };
 
 test('resolves a real address to jurisdiction ids with exact coordinates dropped (AC3, AC6)', async () => {
@@ -181,7 +191,10 @@ test('reverse-geocodes browser coordinates to jurisdiction ids (AC6)', async () 
 
 test('camera=1 retains coordinates on reverse-geocode for explore handoff', async () => {
   const deps = await buildDeps({ fetchCoordinatesGeocode: fakeCoordinatesFetcher(DC_MATCH) });
-  const response = await handleLocateRequest(locateRequest('?lat=38.846&lng=-76.927&camera=1'), deps);
+  const response = await handleLocateRequest(
+    locateRequest('?lat=38.846&lng=-76.927&camera=1'),
+    deps,
+  );
   assert.equal(response.status, 200);
 
   const body = (await response.json()) as LocateSuccessBody;
@@ -193,7 +206,10 @@ test('camera=1 retains coordinates on reverse-geocode for explore handoff', asyn
 
 test('a Puerto Rico match is out of the 50-states-+-D.C. scope and falls back to manual search (AC1, AC4)', async () => {
   const deps = await buildDeps({ fetchAddressGeocode: fakeAddressFetcher([PUERTO_RICO_MATCH]) });
-  const response = await handleLocateRequest(locateRequest('?address=1+Calle+Sol%2C+San+Juan%2C+PR'), deps);
+  const response = await handleLocateRequest(
+    locateRequest('?address=1+Calle+Sol%2C+San+Juan%2C+PR'),
+    deps,
+  );
   assert.equal(response.status, 200);
 
   const body = (await response.json()) as LocateFailureBody;
@@ -213,7 +229,9 @@ test('a no-match geocoder response falls back to manual place search (AC4)', asy
 });
 
 test('an ambiguous (multi-match) geocoder response falls back to manual place search (AC4)', async () => {
-  const deps = await buildDeps({ fetchAddressGeocode: fakeAddressFetcher([DC_MATCH, PUERTO_RICO_MATCH]) });
+  const deps = await buildDeps({
+    fetchAddressGeocode: fakeAddressFetcher([DC_MATCH, PUERTO_RICO_MATCH]),
+  });
   const response = await handleLocateRequest(locateRequest('?address=main+st'), deps);
   assert.equal(response.status, 200);
 

@@ -71,9 +71,7 @@ export type CampaignEditorialHook = {
  * - No attempt: confirms the forbidden-op set is armed (non-empty).
  * - With attempt: throws if that attempt is a forbidden publish operation.
  */
-export function assertCampaignCannotPublish(
-  attempt?: DiscoveryOperationAttempt,
-): void {
+export function assertCampaignCannotPublish(attempt?: DiscoveryOperationAttempt): void {
   // Length is fixed in source; keep a runtime guard for misconfigured forks.
   if ((FORBIDDEN_DISCOVERY_OPERATIONS as readonly string[]).length === 0) {
     throw new Error('Discovery publish guard is unconfigured');
@@ -199,9 +197,7 @@ export async function runOptionalEditorialHook(
   return await hook.review(slice);
 }
 
-export function toEditorialLeadPreview(
-  candidate: DiscoveryCandidateRecord,
-): EditorialLeadPreview {
+export function toEditorialLeadPreview(candidate: DiscoveryCandidateRecord): EditorialLeadPreview {
   const summary = payloadSummary(candidate);
   return {
     candidateId: candidate.id,

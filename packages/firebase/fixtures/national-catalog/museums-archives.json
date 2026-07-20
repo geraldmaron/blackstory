@@ -4,15 +4,8 @@
     "kind": "institution",
     "displayName": "California African American Museum",
     "summary": "Chartered by the State of California in 1977 and opened in Exposition Park in 1981, CAAM is a state-supported Smithsonian Affiliate devoted to the art, history, and culture of African Americans with emphasis on California and the West. Its permanent collection, research library, and rotating exhibitions anchor one of the West Coast's principal public Black history institutions.",
-    "eraBuckets": [
-      "1970s",
-      "1980s"
-    ],
-    "topicTags": [
-      "museum",
-      "art",
-      "history"
-    ],
+    "eraBuckets": ["1970s", "1980s"],
+    "topicTags": ["museum", "art", "history"],
     "jurisdictionLabel": "Los Angeles, California",
     "locationPrecision": "institution",
     "locationLabel": "600 State Drive, Exposition Park, Los Angeles",
@@ -37,11 +30,7 @@
       }
     ],
     "historicalContext": "CAAM opened as Los Angeles prepared to host the 1984 Olympics, giving a permanent state-funded home to collections that had long circulated through community exhibitions rather than a dedicated museum building on the West Coast.",
-    "topicIds": [
-      "museum",
-      "art",
-      "history"
-    ],
+    "topicIds": ["museum", "art", "history"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -50,14 +39,8 @@
     "kind": "institution",
     "displayName": "Museum of the African Diaspora (MoAD)",
     "summary": "Opened in San Francisco in 2005, MoAD is among the few U.S. museums devoted exclusively to contemporary art and culture of the global African diaspora. A Smithsonian Affiliate, it presents exhibitions and programs that place artists of African descent at the center of international cultural conversation.",
-    "eraBuckets": [
-      "2000s"
-    ],
-    "topicTags": [
-      "museum",
-      "art",
-      "culture"
-    ],
+    "eraBuckets": ["2000s"],
+    "topicTags": ["museum", "art", "culture"],
     "jurisdictionLabel": "San Francisco, California",
     "locationPrecision": "institution",
     "locationLabel": "685 Mission Street, San Francisco",
@@ -82,11 +65,7 @@
       }
     ],
     "historicalContext": "MoAD emerged from a redevelopment plan for San Francisco's Yerba Buena cultural district, giving the Bay Area a dedicated diaspora-focused counterpart to encyclopedic museums that had historically underrepresented Black contemporary art.",
-    "topicIds": [
-      "museum",
-      "art",
-      "culture"
-    ],
+    "topicIds": ["museum", "art", "culture"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -95,14 +74,8 @@
     "kind": "institution",
     "displayName": "Northwest African American Museum",
     "summary": "NAAM opened in Seattle's Central District in 2008 in the renovated Colman School building, a community victory after years of advocacy to preserve a neighborhood landmark. The museum documents Black life in the Pacific Northwest from enslavement-era migration through recent East African and Caribbean immigration.",
-    "eraBuckets": [
-      "2000s"
-    ],
-    "topicTags": [
-      "museum",
-      "history",
-      "culture"
-    ],
+    "eraBuckets": ["2000s"],
+    "topicTags": ["museum", "history", "culture"],
     "jurisdictionLabel": "Seattle, Washington",
     "locationPrecision": "institution",
     "locationLabel": "2300 South Massachusetts Street, Seattle",
@@ -127,11 +100,7 @@
       }
     ],
     "historicalContext": "Seattle's Central District was the heart of the city's Black community for much of the twentieth century; NAAM's placement in a former segregated school building links preservation of architecture to preservation of neighborhood memory.",
-    "topicIds": [
-      "museum",
-      "history",
-      "culture"
-    ],
+    "topicIds": ["museum", "history", "culture"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -140,15 +109,8 @@
     "kind": "institution",
     "displayName": "African American Museum, Dallas",
     "summary": "Founded in 1974 at Bishop College as the Southwest Research Center and Museum of African-American Life and Culture, the museum became independent in 1979 and opened its 38,000-square-foot Fair Park building in November 1993. It holds major folk-art, archival, and Texas Black history collections for the Southwest.",
-    "eraBuckets": [
-      "1970s",
-      "1990s"
-    ],
-    "topicTags": [
-      "museum",
-      "history",
-      "archives"
-    ],
+    "eraBuckets": ["1970s", "1990s"],
+    "topicTags": ["museum", "history", "archives"],
     "jurisdictionLabel": "Dallas, Texas",
     "locationPrecision": "institution",
     "locationLabel": "3536 Grand Avenue, Fair Park, Dallas",
@@ -173,11 +135,7 @@
       }
     ],
     "historicalContext": "Fair Park hosted the 1936 Hall of Negro Life during the Texas Centennial before that structure was demolished; the Dallas museum's permanent home near the same grounds revived a public space for Black history the city had erased.",
-    "topicIds": [
-      "museum",
-      "history",
-      "archives"
-    ],
+    "topicIds": ["museum", "history", "archives"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -186,15 +144,8 @@
     "kind": "institution",
     "displayName": "Harvey B. Gantt Center for African-American Arts + Culture",
     "summary": "Tracing its roots to the Afro-American Cultural Center founded in 1974, the Gantt Center opened its current uptown Charlotte facility in October 2009, named for Harvey Gantt, the city's first Black mayor and Clemson University's first Black student. The center presents African American visual and performing arts for the Carolinas.",
-    "eraBuckets": [
-      "1970s",
-      "2000s"
-    ],
-    "topicTags": [
-      "museum",
-      "art",
-      "culture"
-    ],
+    "eraBuckets": ["1970s", "2000s"],
+    "topicTags": ["museum", "art", "culture"],
     "jurisdictionLabel": "Charlotte, North Carolina",
     "locationPrecision": "institution",
     "locationLabel": "551 South Tryon Street, Charlotte",
@@ -219,11 +170,7 @@
       }
     ],
     "historicalContext": "Charlotte's Afro-American Cultural Center grew from UNCC student demands for Black studies programming during the 1960s campus protest era, linking university activism to a durable regional arts institution.",
-    "topicIds": [
-      "museum",
-      "art",
-      "culture"
-    ],
+    "topicIds": ["museum", "art", "culture"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -232,15 +179,8 @@
     "kind": "institution",
     "displayName": "Museum of African American History",
     "summary": "New England's largest museum devoted to African American history, MAAH stewards four historic sites in Boston and Nantucket, including the Abiel Smith School and the African Meeting House on Beacon Hill. Public exhibitions and Black Heritage Trails connect colonial and nineteenth-century Black community life to abolition and Reconstruction.",
-    "eraBuckets": [
-      "1800s",
-      "1960s"
-    ],
-    "topicTags": [
-      "museum",
-      "history",
-      "education"
-    ],
+    "eraBuckets": ["1800s", "1960s"],
+    "topicTags": ["museum", "history", "education"],
     "jurisdictionLabel": "Boston, Massachusetts",
     "locationPrecision": "institution",
     "locationLabel": "46 Joy Street, Beacon Hill, Boston",
@@ -265,14 +205,8 @@
       }
     ],
     "historicalContext": "Boston's free Black community on Beacon Hill produced the African Meeting House and Abiel Smith School — institutions that anchored antislavery organizing and early Black public education in the antebellum North.",
-    "topicIds": [
-      "museum",
-      "history",
-      "education"
-    ],
-    "mentionedEntityIds": [
-      "ent_african_meeting_house_001"
-    ],
+    "topicIds": ["museum", "history", "education"],
+    "mentionedEntityIds": ["ent_african_meeting_house_001"],
     "keywords": []
   },
   {
@@ -280,14 +214,8 @@
     "kind": "institution",
     "displayName": "Black Archives of Mid-America",
     "summary": "Founded May 8, 1974 by Horace M. Peterson III, the Black Archives collects and preserves materials on African American life in the central United States from its Horace M. Peterson III Building in Kansas City's 18th & Vine Historic District. Its holdings support research, traveling exhibitions, and community history programming across the Midwest.",
-    "eraBuckets": [
-      "1970s"
-    ],
-    "topicTags": [
-      "archives",
-      "history",
-      "culture"
-    ],
+    "eraBuckets": ["1970s"],
+    "topicTags": ["archives", "history", "culture"],
     "jurisdictionLabel": "Kansas City, Missouri",
     "locationPrecision": "institution",
     "locationLabel": "1722 East 17th Terrace, 18th & Vine, Kansas City",
@@ -312,14 +240,8 @@
       }
     ],
     "historicalContext": "Peterson's vision for 18th & Vine helped catalyze the district's revival alongside the Kansas City Jazz Museum and Negro Leagues Baseball Museum, making the Archives a research anchor for Midwestern Black urban history.",
-    "topicIds": [
-      "archives",
-      "history",
-      "culture"
-    ],
-    "mentionedEntityIds": [
-      "ent_negro_leagues_baseball_museum_001"
-    ],
+    "topicIds": ["archives", "history", "culture"],
+    "mentionedEntityIds": ["ent_negro_leagues_baseball_museum_001"],
     "keywords": []
   },
   {
@@ -327,15 +249,8 @@
     "kind": "institution",
     "displayName": "African American Museum and Library at Oakland",
     "summary": "AAMLO is a museum and non-circulating reference library operated by the Oakland Public Library, dedicated to preserving African American history in California and the West. Its archives hold more than 160 collections documenting families, churches, and political organizations of the Bay Area.",
-    "eraBuckets": [
-      "1940s",
-      "1990s"
-    ],
-    "topicTags": [
-      "museum",
-      "library",
-      "archives"
-    ],
+    "eraBuckets": ["1940s", "1990s"],
+    "topicTags": ["museum", "library", "archives"],
     "jurisdictionLabel": "Oakland, California",
     "locationPrecision": "institution",
     "locationLabel": "659 14th Street, Downtown Oakland",
@@ -360,11 +275,7 @@
       }
     ],
     "historicalContext": "AAMLO grew from a private collection begun in 1946 by Eugene and Ruth Lasartemay and others, evolving through the East Bay Negro Historical Society into a permanent civic institution in Oakland's downtown Carnegie library building.",
-    "topicIds": [
-      "museum",
-      "library",
-      "archives"
-    ],
+    "topicIds": ["museum", "library", "archives"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -373,14 +284,8 @@
     "kind": "institution",
     "displayName": "The Legacy Museum",
     "summary": "Opened April 26, 2018 by Bryan Stevenson's Equal Justice Initiative on the site of a Montgomery cotton warehouse where enslaved people were held, the Legacy Museum traces the line from the domestic slave trade through Jim Crow lynching to mass incarceration. A major 2021 expansion enlarged the museum on North Court Street.",
-    "eraBuckets": [
-      "2010s"
-    ],
-    "topicTags": [
-      "museum",
-      "history",
-      "memory"
-    ],
+    "eraBuckets": ["2010s"],
+    "topicTags": ["museum", "history", "memory"],
     "jurisdictionLabel": "Montgomery, Alabama",
     "locationPrecision": "institution",
     "locationLabel": "400 North Court Street, Montgomery",
@@ -405,11 +310,7 @@
       }
     ],
     "historicalContext": "Montgomery's riverfront and warehouse district was a hub of the domestic slave trade; EJI's museum deliberately occupies that landscape alongside its National Memorial for Peace and Justice to connect past racial terror to present criminal justice inequities.",
-    "topicIds": [
-      "museum",
-      "history",
-      "memory"
-    ],
+    "topicIds": ["museum", "history", "memory"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -418,14 +319,8 @@
     "kind": "institution",
     "displayName": "National Voting Rights Museum and Institute",
     "summary": "Located at the foot of the Edmund Pettus Bridge in Selma, the National Voting Rights Museum and Institute preserves the history of the 1965 Selma voting-rights campaign, including Bloody Sunday and the march to Montgomery. Its exhibits document foot soldiers, local organizers, and the legislative struggle that produced the Voting Rights Act.",
-    "eraBuckets": [
-      "1960s"
-    ],
-    "topicTags": [
-      "museum",
-      "civil-rights",
-      "history"
-    ],
+    "eraBuckets": ["1960s"],
+    "topicTags": ["museum", "civil-rights", "history"],
     "jurisdictionLabel": "Selma, Alabama",
     "locationPrecision": "institution",
     "locationLabel": "6 U.S. Highway 80 East, Selma",
@@ -450,15 +345,8 @@
       }
     ],
     "historicalContext": "Selma's bridge and surrounding streets were the stage for televised violence that shifted national opinion toward federal voting-rights protection; the museum keeps the stories of local activists at the center of that narrative.",
-    "topicIds": [
-      "museum",
-      "civil-rights",
-      "history"
-    ],
-    "mentionedEntityIds": [
-      "ent_edmund_pettus_bridge_001",
-      "ent_law_voting_rights_act_1965"
-    ],
+    "topicIds": ["museum", "civil-rights", "history"],
+    "mentionedEntityIds": ["ent_edmund_pettus_bridge_001", "ent_law_voting_rights_act_1965"],
     "keywords": []
   },
   {
@@ -466,15 +354,8 @@
     "kind": "institution",
     "displayName": "Amistad Research Center",
     "summary": "Created in 1966 to house the American Missionary Association archives and independent since 1969, the Amistad Research Center is the nation's oldest, largest independent archive specializing in African American history. Since 1987 it has occupied Tilton Memorial Hall on Tulane University's campus in New Orleans.",
-    "eraBuckets": [
-      "1960s",
-      "1980s"
-    ],
-    "topicTags": [
-      "archives",
-      "research",
-      "history"
-    ],
+    "eraBuckets": ["1960s", "1980s"],
+    "topicTags": ["archives", "research", "history"],
     "jurisdictionLabel": "New Orleans, Louisiana",
     "locationPrecision": "institution",
     "locationLabel": "6823 St. Charles Avenue, Tulane University, New Orleans",
@@ -499,11 +380,7 @@
       }
     ],
     "historicalContext": "Named for the 1839 Amistad revolt, the Center's civil-rights-era founding preserved missionary and movement records that might otherwise have been scattered, making New Orleans a major destination for scholars of Black protest and print culture.",
-    "topicIds": [
-      "archives",
-      "research",
-      "history"
-    ],
+    "topicIds": ["archives", "research", "history"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -512,14 +389,8 @@
     "kind": "institution",
     "displayName": "Hampton University Museum",
     "summary": "Founded in 1868 the same year as Hampton University, the museum began as General Samuel Chapman Armstrong's Curiosity Room and is the oldest African American museum in the United States. Its more than 9,000 objects span African American fine art, African art, and collections from the Americas, Asia, and the Pacific.",
-    "eraBuckets": [
-      "1860s"
-    ],
-    "topicTags": [
-      "museum",
-      "art",
-      "history"
-    ],
+    "eraBuckets": ["1860s"],
+    "topicTags": ["museum", "art", "history"],
     "jurisdictionLabel": "Hampton, Virginia",
     "locationPrecision": "institution",
     "locationLabel": "Hampton University campus, Hampton",
@@ -544,14 +415,8 @@
       }
     ],
     "historicalContext": "For decades the Hampton museum was among the few Southern institutions open to African American visitors and students, linking Hampton's industrial-education mission to collecting art and material culture as tools of racial uplift.",
-    "topicIds": [
-      "museum",
-      "art",
-      "history"
-    ],
-    "mentionedEntityIds": [
-      "ent_hampton_university_001"
-    ],
+    "topicIds": ["museum", "art", "history"],
+    "mentionedEntityIds": ["ent_hampton_university_001"],
     "keywords": []
   },
   {
@@ -559,15 +424,8 @@
     "kind": "institution",
     "displayName": "African American Museum in Cleveland",
     "summary": "Founded April 15, 1953 by Icabod Flewellen, the African American Museum in Cleveland is among the earliest independent nonprofit Black history museums in the United States. It has operated from the former Cleveland Public Library Treasure House at 1765 Crawford Road in the Hough neighborhood since 1983.",
-    "eraBuckets": [
-      "1950s",
-      "1980s"
-    ],
-    "topicTags": [
-      "museum",
-      "history",
-      "culture"
-    ],
+    "eraBuckets": ["1950s", "1980s"],
+    "topicTags": ["museum", "history", "culture"],
     "jurisdictionLabel": "Cleveland, Ohio",
     "locationPrecision": "institution",
     "locationLabel": "1765 Crawford Road, Hough, Cleveland",
@@ -592,11 +450,7 @@
       }
     ],
     "historicalContext": "Flewellen built the collection from clippings and artifacts after an arson fire destroyed his childhood hoard, modeling community-based Black museology decades before major institutions invested in African American history.",
-    "topicIds": [
-      "museum",
-      "history",
-      "culture"
-    ],
+    "topicIds": ["museum", "history", "culture"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -605,14 +459,8 @@
     "kind": "institution",
     "displayName": "National Center for Civil and Human Rights",
     "summary": "Opened in downtown Atlanta in 2014, the National Center for Civil and Human Rights connects the U.S. civil rights movement to contemporary global human-rights struggles through immersive exhibitions. Conceived by Evelyn Lowery, Andrew Young, and Shirley Franklin, it stands on donated land in Pemberton Place near Centennial Olympic Park.",
-    "eraBuckets": [
-      "2010s"
-    ],
-    "topicTags": [
-      "museum",
-      "civil-rights",
-      "education"
-    ],
+    "eraBuckets": ["2010s"],
+    "topicTags": ["museum", "civil-rights", "education"],
     "jurisdictionLabel": "Atlanta, Georgia",
     "locationPrecision": "institution",
     "locationLabel": "100 Ivan Allen Jr Boulevard NW, Atlanta",
@@ -637,14 +485,8 @@
       }
     ],
     "historicalContext": "Atlanta's civil-rights leadership sought a institution that would bridge domestic movement history with international human-rights law, placing the city alongside Memphis and Birmingham as a major interpretive center for the freedom struggle.",
-    "topicIds": [
-      "museum",
-      "civil-rights",
-      "education"
-    ],
-    "mentionedEntityIds": [
-      "ent_andrew_young_001"
-    ],
+    "topicIds": ["museum", "civil-rights", "education"],
+    "mentionedEntityIds": ["ent_andrew_young_001"],
     "keywords": []
   },
   {
@@ -652,14 +494,8 @@
     "kind": "institution",
     "displayName": "African American Museum of Iowa",
     "summary": "Founded in Cedar Rapids in 1993, the African American Museum of Iowa is a statewide institution preserving and teaching Iowa's African American history through permanent and traveling exhibitions. It serves more than 30,000 learners annually across a state whose Black communities include antebellum settlers, Great Migration industrial workers, and contemporary residents.",
-    "eraBuckets": [
-      "1990s"
-    ],
-    "topicTags": [
-      "museum",
-      "history",
-      "education"
-    ],
+    "eraBuckets": ["1990s"],
+    "topicTags": ["museum", "history", "education"],
     "jurisdictionLabel": "Cedar Rapids, Iowa",
     "locationPrecision": "institution",
     "locationLabel": "55 12th Avenue SE, Cedar Rapids",
@@ -684,11 +520,7 @@
       }
     ],
     "historicalContext": "Iowa's early Black settlements and later railroad and meatpacking workforces are often omitted from national narratives of African American history; the museum makes that Midwestern record visible for schools statewide.",
-    "topicIds": [
-      "museum",
-      "history",
-      "education"
-    ],
+    "topicIds": ["museum", "history", "education"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -697,15 +529,8 @@
     "kind": "institution",
     "displayName": "Louis Armstrong House Museum",
     "summary": "Lucille Armstrong willed the Corona, Queens home she shared with Louis Armstrong to New York City; after decades of archival work, the historic house opened for public tours in 2003 and the expanded Louis Armstrong Center campus followed. The museum preserves Armstrong's domestic life, recordings, and collections in the neighborhood where he lived from 1943 until his death.",
-    "eraBuckets": [
-      "1940s",
-      "2000s"
-    ],
-    "topicTags": [
-      "museum",
-      "music",
-      "culture"
-    ],
+    "eraBuckets": ["1940s", "2000s"],
+    "topicTags": ["museum", "music", "culture"],
     "jurisdictionLabel": "Queens, New York",
     "locationPrecision": "institution",
     "locationLabel": "34-56 107th Street, Corona, Queens",
@@ -730,14 +555,8 @@
       }
     ],
     "historicalContext": "Armstrong chose a modest brick house in a working-class immigrant neighborhood rather than a Manhattan address, and the preserved interior reveals the private world of an artist who shaped twentieth-century American music from that Queens block.",
-    "topicIds": [
-      "museum",
-      "music",
-      "culture"
-    ],
-    "mentionedEntityIds": [
-      "ent_louis_armstrong_001"
-    ],
+    "topicIds": ["museum", "music", "culture"],
+    "mentionedEntityIds": ["ent_louis_armstrong_001"],
     "keywords": []
   },
   {
@@ -745,14 +564,8 @@
     "kind": "institution",
     "displayName": "National Great Blacks In Wax Museum",
     "summary": "Founded by Dr. Joanne and Elmer P. Martin, the museum began with four wax figures in 1980 and opened a storefront in downtown Baltimore in 1983 before moving to its 10,000-square-foot East North Avenue facility in 1988. Its lifelike tableaux present African American history with an emphasis on youth education and community revitalization.",
-    "eraBuckets": [
-      "1980s"
-    ],
-    "topicTags": [
-      "museum",
-      "history",
-      "education"
-    ],
+    "eraBuckets": ["1980s"],
+    "topicTags": ["museum", "history", "education"],
     "jurisdictionLabel": "Baltimore, Maryland",
     "locationPrecision": "institution",
     "locationLabel": "1601 East North Avenue, Baltimore",
@@ -777,11 +590,7 @@
       }
     ],
     "historicalContext": "The Martins deliberately placed the museum in East Baltimore to pair cultural development with neighborhood renewal, using dramatic wax dioramas to reach schoolchildren who might not otherwise encounter comprehensive Black history exhibits.",
-    "topicIds": [
-      "museum",
-      "history",
-      "education"
-    ],
+    "topicIds": ["museum", "history", "education"],
     "mentionedEntityIds": [],
     "keywords": []
   }

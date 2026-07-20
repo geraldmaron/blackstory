@@ -61,7 +61,11 @@ test('bounded depth: a chain longer than MAX_CONTAINMENT_DEPTH is truncated, not
   const entities: ContainmentEntityInput[] = [];
   for (let i = 0; i < MAX_CONTAINMENT_DEPTH + 5; i += 1) {
     entities.push({ entityId: `hop-${i}`, jurisdictionIds: [`jur-${i}`] });
-    relationships.push({ fromEntityId: `hop-${i}`, toEntityId: `hop-${i + 1}`, type: 'part_of' as const });
+    relationships.push({
+      fromEntityId: `hop-${i}`,
+      toEntityId: `hop-${i + 1}`,
+      type: 'part_of' as const,
+    });
   }
   const index = buildContainmentIndex(relationships);
   const entitiesById = new Map(entities.map((e) => [e.entityId, e]));

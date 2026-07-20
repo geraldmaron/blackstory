@@ -20,9 +20,11 @@ export function historyDegradedFor(reason: HistoryDegradedReason): HistoryDegrad
 }
 
 export const HISTORY_DEGRADED_MODE_COPY: Readonly<Record<HistoryDegradedReason, string>> = {
-  refine_network_error: 'Live refinement is unavailable right now — showing the last-loaded snapshot.',
+  refine_network_error:
+    'Live refinement is unavailable right now — showing the last-loaded snapshot.',
   refine_rate_limited: 'Refinement is temporarily rate-limited — showing the last-loaded snapshot.',
   refine_app_check_denied:
     'This browser could not be verified for live refinement — showing the last-loaded snapshot.',
-  refine_invalid_query: 'That filter combination could not be refined live — showing the last-loaded snapshot.',
+  refine_invalid_query:
+    'That filter combination could not be refined live — showing the last-loaded snapshot.',
 };

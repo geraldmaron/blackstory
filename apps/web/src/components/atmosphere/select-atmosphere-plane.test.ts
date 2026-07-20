@@ -56,10 +56,7 @@ test('selectMosaicTiles fills from seed rotation when related entities miss the 
 test('different seed keys rotate mosaic tile order', () => {
   const a = selectMosaicTiles('slug-a', 16);
   const b = selectMosaicTiles('slug-b', 16);
-  assert.notEqual(
-    a.map((tile) => tile.index).join(','),
-    b.map((tile) => tile.index).join(','),
-  );
+  assert.notEqual(a.map((tile) => tile.index).join(','), b.map((tile) => tile.index).join(','));
 });
 
 test('planeId is a stable hex hash prefix', () => {

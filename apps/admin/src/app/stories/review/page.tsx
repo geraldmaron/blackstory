@@ -343,9 +343,7 @@ export default function StoryReviewPage() {
           <span>Sort</span>
           <select
             value={query.sortKey}
-            onChange={(event) =>
-              patchQuery({ sortKey: event.target.value as StoryReviewSortKey })
-            }
+            onChange={(event) => patchQuery({ sortKey: event.target.value as StoryReviewSortKey })}
           >
             <option value="createdAt">Created</option>
             <option value="title">Title</option>
@@ -491,7 +489,9 @@ export default function StoryReviewPage() {
                           <p className="story-review__row-meta ds-mono">{row.submissionId}</p>
                         </td>
                         <td>
-                          <span className={`story-review__badge story-review__badge--${reviewLabel(row)}`}>
+                          <span
+                            className={`story-review__badge story-review__badge--${reviewLabel(row)}`}
+                          >
                             {reviewLabel(row)}
                           </span>
                         </td>
@@ -622,18 +622,22 @@ export default function StoryReviewPage() {
                 <h3 className="acq-sheet__decide-title">Decide</h3>
                 <p className="acq-sheet__decide-lede">
                   Approval records your review and may return a seed handoff — it does not publish.
-                  For missing sources,{' '}
-                  <Link href="/evidence">attach evidence</Link> before re-running story research.
+                  For missing sources, <Link href="/evidence">attach evidence</Link> before
+                  re-running story research.
                 </p>
                 <ul className="acq-sheet__action-help">
-                  {(['approved', 'needs_evidence', 'rejected'] as const satisfies readonly StoryReviewAction[]).map(
-                    (action) => (
-                      <li key={action}>
-                        <strong>{storyReviewActionLabel(action)}.</strong>{' '}
-                        {storyReviewActionHelp(action)}
-                      </li>
-                    ),
-                  )}
+                  {(
+                    [
+                      'approved',
+                      'needs_evidence',
+                      'rejected',
+                    ] as const satisfies readonly StoryReviewAction[]
+                  ).map((action) => (
+                    <li key={action}>
+                      <strong>{storyReviewActionLabel(action)}.</strong>{' '}
+                      {storyReviewActionHelp(action)}
+                    </li>
+                  ))}
                 </ul>
               </div>
 
@@ -685,9 +689,7 @@ export default function StoryReviewPage() {
               {bulkResult && bulkResult.seedHandoffs.length > 1 ? (
                 <div className="story-review__handoff">
                   <h3 className="ds-section__title">Bulk seed handoffs</h3>
-                  <pre className="ds-mono">
-                    {JSON.stringify(bulkResult.seedHandoffs, null, 2)}
-                  </pre>
+                  <pre className="ds-mono">{JSON.stringify(bulkResult.seedHandoffs, null, 2)}</pre>
                 </div>
               ) : null}
             </>

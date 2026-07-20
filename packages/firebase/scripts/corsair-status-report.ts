@@ -80,7 +80,9 @@ function readLatestTriageInventory(): unknown | undefined {
 
 async function main(): Promise<void> {
   const activeReleaseDoc = await db.doc('publicMeta/activeRelease').get();
-  const activeRelease = activeReleaseDoc.exists ? (activeReleaseDoc.data()?.releaseId as string) : undefined;
+  const activeRelease = activeReleaseDoc.exists
+    ? (activeReleaseDoc.data()?.releaseId as string)
+    : undefined;
 
   const [researchCaseStates, submissionModerationStates, publicEntities, entityRelationships] =
     await Promise.all([
@@ -106,7 +108,9 @@ async function main(): Promise<void> {
         (researchCaseStates.excluded ?? 0) -
         (researchCaseStates.merged ?? 0),
     },
-    corsairTriage: readLatestTriageInventory() ?? '(no local triage inventory — run triage-corsair-candidates.ts)',
+    corsairTriage:
+      readLatestTriageInventory() ??
+      '(no local triage inventory — run triage-corsair-candidates.ts)',
     overnightRuns: readLatestOvernightSummaries(),
   };
 

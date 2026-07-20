@@ -1,4 +1,3 @@
-
 /**
  * Security-layer tests: production access must fail closed.
  */

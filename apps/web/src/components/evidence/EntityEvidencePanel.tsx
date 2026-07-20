@@ -12,7 +12,11 @@
 
 import React from 'react';
 import { EmptyState } from '@repo/ui';
-import { buildEvidenceCards, mostRecentLastCheckedAt, resolveRecordSourceLineage } from '../../lib/evidence';
+import {
+  buildEvidenceCards,
+  mostRecentLastCheckedAt,
+  resolveRecordSourceLineage,
+} from '../../lib/evidence';
 import type {
   EvidenceClaimInput,
   EvidenceResearchCoverageInput,
@@ -57,7 +61,9 @@ export function EntityEvidencePanel({
   return (
     <div className="ds-stack ds-entity-evidence" aria-labelledby={labelledBy}>
       {cards.length === 0 ? (
-        <EmptyState title={EVIDENCE_GAP_COPY.claims.title}>{EVIDENCE_GAP_COPY.claims.body}</EmptyState>
+        <EmptyState title={EVIDENCE_GAP_COPY.claims.title}>
+          {EVIDENCE_GAP_COPY.claims.body}
+        </EmptyState>
       ) : (
         <div className="ds-stack">
           {cards.map((card) => (

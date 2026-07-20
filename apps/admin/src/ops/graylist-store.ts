@@ -55,9 +55,7 @@ function toListItem(docId: string, data: Record<string, unknown>): GraylistListI
   };
 }
 
-export async function listDiscoveryGraylist(
-  limit = 100,
-): Promise<readonly GraylistListItem[]> {
+export async function listDiscoveryGraylist(limit = 100): Promise<readonly GraylistListItem[]> {
   const db = getDb();
   const cappedLimit = Math.min(200, Math.max(1, limit));
 

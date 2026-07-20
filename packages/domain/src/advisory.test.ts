@@ -82,10 +82,7 @@ test('assertAdvisoryRecordValid requires >=1 sourcedClaimId, a non-blank asOf, a
     () => assertAdvisoryRecordValid(baseRecord({ sourcedClaimIds: [] })),
     AdvisoryValidationError,
   );
-  assert.throws(
-    () => assertAdvisoryRecordValid(baseRecord({ asOf: '' })),
-    AdvisoryValidationError,
-  );
+  assert.throws(() => assertAdvisoryRecordValid(baseRecord({ asOf: '' })), AdvisoryValidationError);
   assert.throws(
     () => assertAdvisoryRecordValid(baseRecord({ reviewCadence: '' })),
     AdvisoryValidationError,
@@ -93,7 +90,9 @@ test('assertAdvisoryRecordValid requires >=1 sourcedClaimId, a non-blank asOf, a
   assert.throws(
     () =>
       assertAdvisoryRecordValid(
-        baseRecord({ advisoryClass: 'evicted_by_state' as unknown as PlaceAdvisoryRecord['advisoryClass'] }),
+        baseRecord({
+          advisoryClass: 'evicted_by_state' as unknown as PlaceAdvisoryRecord['advisoryClass'],
+        }),
       ),
     AdvisoryValidationError,
   );
@@ -119,7 +118,10 @@ test('advisory copy never uses "dangerous today" or any danger-framing language'
     assert.throws(() => assertProceduralAdvisoryLanguage(`This place is ${phrase}.`));
   }
   assert.throws(() =>
-    buildAdvisoryStatement({ advisoryClass: 'private_property', asOf: '2024' }, 'a dangerous source'),
+    buildAdvisoryStatement(
+      { advisoryClass: 'private_property', asOf: '2024' },
+      'a dangerous source',
+    ),
   );
   // Every rendered ADVISORY_CLASS_LABELS entry itself must already be clean.
   for (const label of Object.values(ADVISORY_CLASS_LABELS)) {
@@ -150,7 +152,10 @@ function buildRealRelevanceAssessment(): RelevanceAssessment {
   const pack = loadQueryPack();
   const base = loadAdapterBatch()[0]!;
   const record = { ...base, title: 'Montgomery civil rights activist during segregation' };
-  const candidate = ingestApiCandidate({ record }, pack, { now: FIXED_NOW, candidateId: 'rel_scoring_guard' });
+  const candidate = ingestApiCandidate({ record }, pack, {
+    now: FIXED_NOW,
+    candidateId: 'rel_scoring_guard',
+  });
   return evaluateCandidateRelevance({ candidate, assessedAt: FIXED_NOW });
 }
 
@@ -188,7 +193,10 @@ test('assertAdvisoryAbsentFromScoringInput throws when a composite/scoring-shape
     rationale: 'ok',
     advisoryClass: 'private_property',
   };
-  assert.throws(() => assertAdvisoryAbsentFromScoringInput(poisonedFeature), AdvisoryValidationError);
+  assert.throws(
+    () => assertAdvisoryAbsentFromScoringInput(poisonedFeature),
+    AdvisoryValidationError,
+  );
 
   const poisonedNested = {
     schemaVersion: 'relevance-assessment.v1',
@@ -197,7 +205,10 @@ test('assertAdvisoryAbsentFromScoringInput throws when a composite/scoring-shape
     ],
     modernContext: { sourcedClaimIds: ['claim_x'], reviewCadence: 'annual' },
   };
-  assert.throws(() => assertAdvisoryAbsentFromScoringInput(poisonedNested), AdvisoryValidationError);
+  assert.throws(
+    () => assertAdvisoryAbsentFromScoringInput(poisonedNested),
+    AdvisoryValidationError,
+  );
 });
 
 test('the REAL relevance composite (evaluateCandidateRelevance) never carries advisory fields', () => {

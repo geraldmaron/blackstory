@@ -50,7 +50,11 @@ function pickWeight(u: number): NamesWallWeight {
   return 'whisper';
 }
 
-function metricsForWeight(weight: NamesWallWeight, uScale: number, uInk: number): {
+function metricsForWeight(
+  weight: NamesWallWeight,
+  uScale: number,
+  uInk: number,
+): {
   readonly scale: number;
   readonly ink: number;
 } {
@@ -70,7 +74,11 @@ function tooClose(
   x: number,
   y: number,
   weight: NamesWallWeight,
-  placed: readonly { readonly xPct: number; readonly yPct: number; readonly weight: NamesWallWeight }[],
+  placed: readonly {
+    readonly xPct: number;
+    readonly yPct: number;
+    readonly weight: NamesWallWeight;
+  }[],
 ): boolean {
   const minDist = weight === 'accent' ? 11 : weight === 'clear' ? 7.5 : 4.5;
   for (const other of placed) {
@@ -98,7 +106,11 @@ export function computeNamesWallLayout(
   const pool = Math.max(12, Math.floor(poolSize));
   const area = width * height;
 
-  const targetDensity = clamp(Math.round(area / PX_PER_NAME), MIN_DENSITY, Math.min(MAX_DENSITY, pool));
+  const targetDensity = clamp(
+    Math.round(area / PX_PER_NAME),
+    MIN_DENSITY,
+    Math.min(MAX_DENSITY, pool),
+  );
   const slotCount = clamp(
     Math.round(targetDensity * (1 + VACANCY_RATIO)),
     targetDensity,
@@ -142,16 +154,8 @@ export function computeNamesWallLayout(
     // Rejection sampling for accents/clear; whisper may settle after a few tries.
     let placed = false;
     for (let attempt = 0; attempt < 8; attempt += 1) {
-      const ax = clamp(
-        4 + unit(`names-x:${seedKey}:${i}:${attempt}`) * 88,
-        2,
-        92,
-      );
-      const ay = clamp(
-        3 + unit(`names-y:${seedKey}:${i}:${attempt}`) * 90,
-        2,
-        94,
-      );
+      const ax = clamp(4 + unit(`names-x:${seedKey}:${i}:${attempt}`) * 88, 2, 92);
+      const ay = clamp(3 + unit(`names-y:${seedKey}:${i}:${attempt}`) * 90, 2, 94);
       const candidateX = attempt === 0 ? xPct : ax;
       const candidateY = attempt === 0 ? yPct : ay;
       if (!tooClose(candidateX, candidateY, weight, slots)) {

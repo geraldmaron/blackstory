@@ -33,10 +33,14 @@ function arg(name: string): string | undefined {
 }
 
 function loadCatalogEntities(limit?: number): EntityMediaEnrichmentInput[] {
-  const files = readdirSync(catalogDir).filter((name) => name.endsWith('.json')).sort();
+  const files = readdirSync(catalogDir)
+    .filter((name) => name.endsWith('.json'))
+    .sort();
   const entities: EntityMediaEnrichmentInput[] = [];
   for (const file of files) {
-    const parsed = JSON.parse(readFileSync(join(catalogDir, file), 'utf8')) as ReleaseSourceEntity[];
+    const parsed = JSON.parse(
+      readFileSync(join(catalogDir, file), 'utf8'),
+    ) as ReleaseSourceEntity[];
     for (const entry of parsed) {
       entities.push({
         entityId: entry.id,
@@ -96,9 +100,7 @@ async function main(): Promise<void> {
     `total API batches:    ${apiBatches.titleResolve + apiBatches.entityClaims + apiBatches.commonsImageinfo}`,
   );
   console.log(`elapsedMs:            ${elapsedMs}`);
-  console.log(
-    `naive 3-calls/entity: ${entities.length * 3} (avoided via batching + QID dedupe)`,
-  );
+  console.log(`naive 3-calls/entity: ${entities.length * 3} (avoided via batching + QID dedupe)`);
 
   const auto = proposes.filter((p) => p.outcome === 'auto_propose');
   console.log(`\n=== Sample auto_propose (up to ${sampleN}) ===`);

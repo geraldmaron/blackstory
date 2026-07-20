@@ -6,7 +6,11 @@
  * criterion 3 raises, rather than to an empty section. This module never claims a dimension is
  * ABSENT from the entity's actual history only that accepted evidence has not documented it yet.
  */
-import { STORY_DIMENSIONS, STORY_DIMENSION_LABELS, type StoryDimension } from './why-public-dimensions.js';
+import {
+  STORY_DIMENSIONS,
+  STORY_DIMENSION_LABELS,
+  type StoryDimension,
+} from './why-public-dimensions.js';
 
 const BALANCING_DIMENSIONS: readonly StoryDimension[] = STORY_DIMENSIONS.filter(
   (dimension) => dimension !== 'harm',

@@ -3,11 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import {
-  PRIMARY_NAV,
-  absolutizeShellNav,
-  isShellNavActive,
-} from './shell-nav.ts';
+import { PRIMARY_NAV, absolutizeShellNav, isShellNavActive } from './shell-nav.ts';
 
 test('absolutizeShellNav prefixes relative hrefs with the public origin', () => {
   const items = absolutizeShellNav(PRIMARY_NAV, 'http://localhost:3048/');

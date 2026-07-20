@@ -36,8 +36,7 @@ export async function POST(request: Request): Promise<Response> {
       releaseId: body.releaseId.trim(),
       actor: { uid: caller.uid, email: caller.email },
       reason: body.reason.trim(),
-      note:
-        'Release activation requires signed-manifest verification and privileged reauth in this runtime. Staging recorded for operator review only — active public pointer was not changed.',
+      note: 'Release activation requires signed-manifest verification and privileged reauth in this runtime. Staging recorded for operator review only — active public pointer was not changed.',
     });
   } catch (error) {
     return authErrorResponse(error);

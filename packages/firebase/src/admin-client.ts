@@ -1,4 +1,3 @@
-
 /**
  * Admin console Firebase client initialization boundary.
  * Authorization remains IAP/server-side; this only configures the client SDK.
@@ -14,7 +13,6 @@ export type AdminFirebaseClient = {
 };
 
 const ADMIN_APP_NAME = 'the related workstream';
-
 
 /**
  * Initialize (or reuse) the admin Firebase app under a distinct named instance.

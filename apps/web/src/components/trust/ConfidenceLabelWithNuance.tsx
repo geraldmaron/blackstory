@@ -25,9 +25,11 @@ export function ConfidenceLabelWithNuance({
   return (
     <div>
       <Confidence level={level} label={label} />
-      <p className="ds-sans" style={{ margin: 'var(--ds-space-2) 0 0 0', color: 'var(--ds-ink-muted)' }}>
-        {FACT_CONFIDENCE_DEFINITIONS[confidence]}
-        {' '}
+      <p
+        className="ds-sans"
+        style={{ margin: 'var(--ds-space-2) 0 0 0', color: 'var(--ds-ink-muted)' }}
+      >
+        {FACT_CONFIDENCE_DEFINITIONS[confidence]}{' '}
         <Link href={methodologyHref}>See grade definitions</Link>.
       </p>
       {confidenceNote ? (

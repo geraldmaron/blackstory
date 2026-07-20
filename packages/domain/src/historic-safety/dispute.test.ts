@@ -12,7 +12,16 @@ import {
 import type { LayerSignal } from './types.js';
 
 const AREA = {
-  shape: { type: 'Polygon' as const, coordinates: [[-90, 32], [-90, 33], [-89, 33], [-89, 32], [-90, 32]] },
+  shape: {
+    type: 'Polygon' as const,
+    coordinates: [
+      [-90, 32],
+      [-90, 33],
+      [-89, 33],
+      [-89, 32],
+      [-90, 32],
+    ],
+  },
   documentedPrecisionTier: 'county' as const,
 };
 
@@ -27,10 +36,7 @@ test('designationDisputeTargets exposes every basisClaimId as an independently d
     basisClaimIds: ['claim_a', 'claim_b'],
     areaGeometry: AREA,
   });
-  assert.deepEqual(
-    targets.map((t) => t.claimId).sort(),
-    ['claim_a', 'claim_b'],
-  );
+  assert.deepEqual(targets.map((t) => t.claimId).sort(), ['claim_a', 'claim_b']);
   assert.ok(targets.every((t) => t.recordKind === 'sundown_town'));
 });
 

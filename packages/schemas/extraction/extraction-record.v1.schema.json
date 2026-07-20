@@ -78,13 +78,7 @@
                 "directness": { "type": "number", "exclusiveMinimum": 0 },
                 "extractionQuality": { "type": "number", "exclusiveMinimum": 0 }
               },
-              "required": [
-                "role",
-                "credible",
-                "directness",
-                "extractionQuality",
-                "assertedValue"
-              ]
+              "required": ["role", "credible", "directness", "extractionQuality", "assertedValue"]
             }
           }
         }

@@ -49,7 +49,10 @@ export function ManualPlaceSearchForm({
   className,
 }: ManualPlaceSearchFormProps) {
   return (
-    <div className={className ?? 'ds-stack'} style={className ? undefined : { gap: 'var(--ds-space-2)' }}>
+    <div
+      className={className ?? 'ds-stack'}
+      style={className ? undefined : { gap: 'var(--ds-space-2)' }}
+    >
       {helperText ? <p className="ds-sans">{helperText}</p> : null}
       <FilterBar
         legend={legend}

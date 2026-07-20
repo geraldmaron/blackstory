@@ -1,4 +1,3 @@
-
 /**
  * Documented accessible peers for search/map journeys.
  * Kept outside test files so `@repo/testing` can re-export the contract.

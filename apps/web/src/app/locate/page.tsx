@@ -30,7 +30,10 @@ export default function LocatePage() {
         </p>
       </header>
 
-      <div className="ds-stack" style={{ marginTop: 'var(--ds-space-6)', gap: 'var(--ds-space-4)' }}>
+      <div
+        className="ds-stack"
+        style={{ marginTop: 'var(--ds-space-6)', gap: 'var(--ds-space-4)' }}
+      >
         <LocationPrivacyNotice />
         <LocateExperience />
         <noscript>

@@ -98,9 +98,5 @@ export {
 } from './evidence.js';
 export type { EvidenceLocator, EvidenceRecord } from './evidence.js';
 
-export {
-  LINEAGE_KINDS,
-  assertLineageEndpointsDistinct,
-  resolveLineageRoot,
-} from './lineage.js';
+export { LINEAGE_KINDS, assertLineageEndpointsDistinct, resolveLineageRoot } from './lineage.js';
 export type { LineageKind, EvidenceLineage } from './lineage.js';

@@ -6,7 +6,10 @@ import { test } from 'node:test';
 import type { HistoryEdgeView } from '../history/build-history-graph';
 import { buildHistoryEdgeLineCollection } from './build-history-edge-lines';
 
-function edge(partial: Partial<HistoryEdgeView> & Pick<HistoryEdgeView, 'edgeId' | 'fromEntityId' | 'toEntityId'>): HistoryEdgeView {
+function edge(
+  partial: Partial<HistoryEdgeView> &
+    Pick<HistoryEdgeView, 'edgeId' | 'fromEntityId' | 'toEntityId'>,
+): HistoryEdgeView {
   return {
     relationshipId: partial.edgeId,
     type: 'located_at',

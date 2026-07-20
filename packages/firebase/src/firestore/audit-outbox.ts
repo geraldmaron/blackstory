@@ -1,4 +1,3 @@
-
 /**
  * Firestore transaction helpers for append-only audit events and outbox delivery.
  * Consumer handlers may stage Firestore writes only; external I/O belongs in a later Cloud Tasks adapter.
@@ -128,7 +127,6 @@ export function createAdminAtomicStore(firestore: Firestore): AtomicStore {
   };
 }
 
-
 /**
  * Atomically commits domain state, one immutable audit event, one pending outbox message,
  * and the idempotency record. A repeated key returns the original ids without writing.
@@ -201,7 +199,6 @@ function errorMessage(error: unknown): string {
   const message = error instanceof Error ? error.message : String(error);
   return message.slice(0, 2_000) || 'Unknown consumer failure';
 }
-
 
 /**
  * Consumes a message with an atomic Firestore effect + receipt. The handler must only use the
@@ -312,7 +309,6 @@ export async function consumeOutboxMessage(
     });
   }
 }
-
 
 /**
  * Loads all audit events for an entity and reconstructs publication/correction/retraction history.

@@ -36,7 +36,11 @@ export function EntityTopicTags({ entity }: EntityTopicTagsProps) {
         </Link>
       ))}
       {eras.map((era) => (
-        <Link key={`era-${era}`} className="ds-entity-tag ds-entity-tag--era" href={chipHref('era', era)}>
+        <Link
+          key={`era-${era}`}
+          className="ds-entity-tag ds-entity-tag--era"
+          href={chipHref('era', era)}
+        >
           {era}
         </Link>
       ))}

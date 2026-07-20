@@ -13,7 +13,12 @@ import { test } from 'node:test';
 import type { EvidenceSource } from '../../provenance/source.js';
 import { buildQueryPack, parseQueryPackFixture } from '../../query-packs/pack.js';
 import type { QueryPack } from '../../query-packs/types.js';
-import { approveSourcePolicy, createInMemorySourceRegistry, registerSource, type SourceRegistryEntry } from '../index.js';
+import {
+  approveSourcePolicy,
+  createInMemorySourceRegistry,
+  registerSource,
+  type SourceRegistryEntry,
+} from '../index.js';
 import type { SafeHttpRequest, SafeHttpResponse } from '../internet-archive/shared/http-port.js';
 import {
   assertQueryTextHasNoResearchOnlyOffensiveTerms,
@@ -51,13 +56,28 @@ function loadFixture<T>(name: string): T {
 
 function loadPack(): QueryPack {
   const raw = JSON.parse(
-    readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'query-packs', 'fixtures', 'person-civil-rights-fixture.v1.json'), 'utf8'),
+    readFileSync(
+      join(
+        dirname(fileURLToPath(import.meta.url)),
+        '..',
+        '..',
+        'query-packs',
+        'fixtures',
+        'person-civil-rights-fixture.v1.json',
+      ),
+      'utf8',
+    ),
   ) as unknown;
   return parseQueryPackFixture(raw).pack;
 }
 
 function unconfirmedConfig(): WebSearchProviderConfig {
-  return { provider: 'brave', apiKey: FAKE_API_KEY, storageTermsConfirmed: false, planTermsVersion: 'brave-storage-rights-tier-2026-07' };
+  return {
+    provider: 'brave',
+    apiKey: FAKE_API_KEY,
+    storageTermsConfirmed: false,
+    planTermsVersion: 'brave-storage-rights-tier-2026-07',
+  };
 }
 
 function confirmedConfig(): WebSearchProviderConfig {
@@ -125,7 +145,11 @@ test('Brave search adapter starts disabled by default in the  registry', () => {
     createdAt: FIXED_NOW,
   });
   assert.equal(store.get('reg_brave')?.registryState, 'disabled');
-  const approved = approveSourcePolicy(store, { id: 'reg_brave', approvedBy: 'admin@blackbook.local', approvedAt: FIXED_NOW });
+  const approved = approveSourcePolicy(store, {
+    id: 'reg_brave',
+    approvedBy: 'admin@blackbook.local',
+    approvedAt: FIXED_NOW,
+  });
   assert.equal(approved.registryState, 'approved');
 });
 
@@ -134,7 +158,11 @@ test('Brave search adapter starts disabled by default in the  registry', () => {
 // ---------------------------------------------------------------------------------------------
 
 test('buildBraveWebSearchUrl produces a well-formed query URL and requires a query', () => {
-  const url = buildBraveWebSearchUrl({ query: 'freedom rider Montgomery Alabama', count: 10, offset: 5 });
+  const url = buildBraveWebSearchUrl({
+    query: 'freedom rider Montgomery Alabama',
+    count: 10,
+    offset: 5,
+  });
   const parsed = new URL(url);
   assert.equal(parsed.hostname, 'api.search.brave.com');
   assert.equal(parsed.searchParams.get('q'), 'freedom rider Montgomery Alabama');
@@ -162,7 +190,10 @@ test('buildSearxngSearchUrl targets operator base URL with format=json', () => {
   assert.equal(parsed.pathname, '/search');
   assert.equal(parsed.searchParams.get('format'), 'json');
   assert.equal(parsed.searchParams.get('q'), 'freedom rider Montgomery Alabama');
-  assert.throws(() => buildSearxngSearchUrl({ baseUrl: 'http://x', query: '  ' }), /query text is required/);
+  assert.throws(
+    () => buildSearxngSearchUrl({ baseUrl: 'http://x', query: '  ' }),
+    /query text is required/,
+  );
 });
 
 test('parseSearxngSearchResponse maps content→description and rejects missing urls', () => {
@@ -185,8 +216,13 @@ test('SearXNG adapter contract uses searxng_search id', () => {
 
 test('buildWebSearchQueryTexts includes geographic seeds but never a researchOnlyOffensive term', () => {
   const pack = loadPack();
-  const hasOffensiveTerm = pack.terms.some((term) => term.researchOnlyOffensive === true && term.text === 'colored school');
-  assert.ok(hasOffensiveTerm, 'fixture must contain a researchOnlyOffensive term for this test to be meaningful');
+  const hasOffensiveTerm = pack.terms.some(
+    (term) => term.researchOnlyOffensive === true && term.text === 'colored school',
+  );
+  assert.ok(
+    hasOffensiveTerm,
+    'fixture must contain a researchOnlyOffensive term for this test to be meaningful',
+  );
 
   const queries = buildWebSearchQueryTexts({
     pack,
@@ -202,10 +238,19 @@ test('buildWebSearchQueryTexts includes geographic seeds but never a researchOnl
 test('assertQueryTextHasNoResearchOnlyOffensiveTerms throws when offensive text is present, passes otherwise', () => {
   const pack = loadPack();
   assert.throws(
-    () => assertQueryTextHasNoResearchOnlyOffensiveTerms('search for colored school enrollment records', pack),
+    () =>
+      assertQueryTextHasNoResearchOnlyOffensiveTerms(
+        'search for colored school enrollment records',
+        pack,
+      ),
     /researchOnlyOffensive term/,
   );
-  assert.doesNotThrow(() => assertQueryTextHasNoResearchOnlyOffensiveTerms('civil rights activist Montgomery Alabama', pack));
+  assert.doesNotThrow(() =>
+    assertQueryTextHasNoResearchOnlyOffensiveTerms(
+      'civil rights activist Montgomery Alabama',
+      pack,
+    ),
+  );
 });
 
 test('buildWebSearchQueryTexts requires at least one geographic seed and public-safe core terms', () => {
@@ -252,7 +297,16 @@ test('stampExternalQueryProvenance stamps API name, query text, timestamp, and p
   assert.equal(stamped.queryText, 'civil rights activist Montgomery Alabama');
   assert.equal(stamped.executedAt, FIXED_NOW);
   assert.equal(stamped.planTermsVersion, 'brave-storage-rights-tier-2026-07');
-  assert.throws(() => stampExternalQueryProvenance({ provider: 'brave', queryText: '', executedAt: FIXED_NOW, planTermsVersion: 'v1' }), /queryText/);
+  assert.throws(
+    () =>
+      stampExternalQueryProvenance({
+        provider: 'brave',
+        queryText: '',
+        executedAt: FIXED_NOW,
+        planTermsVersion: 'v1',
+      }),
+    /queryText/,
+  );
 });
 
 // ---------------------------------------------------------------------------------------------
@@ -260,7 +314,10 @@ test('stampExternalQueryProvenance stamps API name, query text, timestamp, and p
 // ---------------------------------------------------------------------------------------------
 
 test('assertStorageTermsConfirmed throws when false, passes when true', () => {
-  assert.throws(() => assertStorageTermsConfirmed(unconfirmedConfig()), /storageTermsConfirmed is false/);
+  assert.throws(
+    () => assertStorageTermsConfirmed(unconfirmedConfig()),
+    /storageTermsConfirmed is false/,
+  );
   assert.doesNotThrow(() => assertStorageTermsConfirmed(confirmedConfig()));
 });
 
@@ -275,7 +332,11 @@ test('CRITICAL: a search result cannot be normalized/persisted without storageTe
   assert.throws(
     () =>
       normalizeWebSearchResult({
-        result: { title: 'Example', url: 'https://example.org/page', description: 'A description.' },
+        result: {
+          title: 'Example',
+          url: 'https://example.org/page',
+          description: 'A description.',
+        },
         registryEntry: entry,
         runId: 'run_1',
         capturedAt: FIXED_NOW,
@@ -348,7 +409,11 @@ test('fetchBraveWebSearch sends the API key as a header (never a query param) th
   });
   assert.equal(requests.length, 1);
   assert.equal(requests[0]?.headers?.[BRAVE_API_KEY_HEADER], FAKE_API_KEY);
-  assert.equal(requests[0]?.url.includes(FAKE_API_KEY), false, 'API key must never appear in the URL');
+  assert.equal(
+    requests[0]?.url.includes(FAKE_API_KEY),
+    false,
+    'API key must never appear in the URL',
+  );
   assert.equal(candidates.length, 3);
 });
 
@@ -376,7 +441,11 @@ test('fetchBraveWebSearch performs the live query even when storageTermsConfirme
       }),
     /storageTermsConfirmed is false/,
   );
-  assert.equal(calls, 1, 'the search call itself is not gated by storage-rights confirmation, only persistence is');
+  assert.equal(
+    calls,
+    1,
+    'the search call itself is not gated by storage-rights confirmation, only persistence is',
+  );
 });
 
 // ---------------------------------------------------------------------------------------------
@@ -391,7 +460,12 @@ test('evaluateWebSearchQueryBudget denies once the per-campaign query cap is rea
   let evaluatorCalls = 0;
   const evaluator: DailyBudgetEvaluator = () => {
     evaluatorCalls += 1;
-    return { allowed: true, percentUsed: 0, softShutdownTriggered: false, hardStopTriggered: false };
+    return {
+      allowed: true,
+      percentUsed: 0,
+      softShutdownTriggered: false,
+      hardStopTriggered: false,
+    };
   };
   const decision = evaluateWebSearchQueryBudget({
     policy: {
@@ -417,7 +491,13 @@ test('evaluateWebSearchQueryBudget delegates the monthly spend ceiling to the in
       monthlyBudgetCategory: 'research_campaign',
     },
     state: { queriesIssuedThisCampaign: 1, queriesIssuedThisMonth: 500 },
-    evaluateDailyBudget: fakeEvaluator({ allowed: false, percentUsed: 100, softShutdownTriggered: true, hardStopTriggered: true, reason: 'daily_budget_exceeded' }),
+    evaluateDailyBudget: fakeEvaluator({
+      allowed: false,
+      percentUsed: 100,
+      softShutdownTriggered: true,
+      hardStopTriggered: true,
+      reason: 'daily_budget_exceeded',
+    }),
   });
   assert.equal(denied.allowed, false);
   assert.equal(denied.monthlyBudget?.hardStopTriggered, true);
@@ -430,7 +510,12 @@ test('evaluateWebSearchQueryBudget delegates the monthly spend ceiling to the in
       monthlyBudgetCategory: 'research_campaign',
     },
     state: { queriesIssuedThisCampaign: 1, queriesIssuedThisMonth: 5 },
-    evaluateDailyBudget: fakeEvaluator({ allowed: true, percentUsed: 25, softShutdownTriggered: false, hardStopTriggered: false }),
+    evaluateDailyBudget: fakeEvaluator({
+      allowed: true,
+      percentUsed: 25,
+      softShutdownTriggered: false,
+      hardStopTriggered: false,
+    }),
   });
   assert.equal(allowed.allowed, true);
 });
@@ -440,7 +525,12 @@ test('fetchBraveWebSearchBudgeted refuses to call the network at all when the bu
   let clientCalls = 0;
   const client = async (): Promise<SafeHttpResponse> => {
     clientCalls += 1;
-    return { status: 200, headers: { 'content-type': 'application/json' }, bodyText: JSON.stringify(loadFixture('brave-search-response.json')), finalUrl: '' };
+    return {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+      bodyText: JSON.stringify(loadFixture('brave-search-response.json')),
+      finalUrl: '',
+    };
   };
   await assert.rejects(
     () =>
@@ -451,9 +541,19 @@ test('fetchBraveWebSearchBudgeted refuses to call the network at all when the bu
         runId: 'run_1',
         capturedAt: FIXED_NOW,
         client,
-        budgetPolicy: { maxQueriesPerCampaign: 0, monthlySpendCapUsdCents: 10_000, costPerQueryUsdCents: 50, monthlyBudgetCategory: 'research_campaign' },
+        budgetPolicy: {
+          maxQueriesPerCampaign: 0,
+          monthlySpendCapUsdCents: 10_000,
+          costPerQueryUsdCents: 50,
+          monthlyBudgetCategory: 'research_campaign',
+        },
         budgetState: { queriesIssuedThisCampaign: 0, queriesIssuedThisMonth: 0 },
-        evaluateDailyBudget: fakeEvaluator({ allowed: true, percentUsed: 0, softShutdownTriggered: false, hardStopTriggered: false }),
+        evaluateDailyBudget: fakeEvaluator({
+          allowed: true,
+          percentUsed: 0,
+          softShutdownTriggered: false,
+          hardStopTriggered: false,
+        }),
       }),
     /Web search query budget denied/,
   );
@@ -475,9 +575,19 @@ test('fetchBraveWebSearchBudgeted proceeds and reports the budget decision when 
     runId: 'run_1',
     capturedAt: FIXED_NOW,
     client,
-    budgetPolicy: { maxQueriesPerCampaign: 10, monthlySpendCapUsdCents: 10_000, costPerQueryUsdCents: 50, monthlyBudgetCategory: 'research_campaign' },
+    budgetPolicy: {
+      maxQueriesPerCampaign: 10,
+      monthlySpendCapUsdCents: 10_000,
+      costPerQueryUsdCents: 50,
+      monthlyBudgetCategory: 'research_campaign',
+    },
     budgetState: { queriesIssuedThisCampaign: 0, queriesIssuedThisMonth: 0 },
-    evaluateDailyBudget: fakeEvaluator({ allowed: true, percentUsed: 0, softShutdownTriggered: false, hardStopTriggered: false }),
+    evaluateDailyBudget: fakeEvaluator({
+      allowed: true,
+      percentUsed: 0,
+      softShutdownTriggered: false,
+      hardStopTriggered: false,
+    }),
   });
   assert.equal(result.candidates.length, 3);
   assert.equal(result.budgetDecision.allowed, true);
@@ -497,7 +607,11 @@ test('ingestWebSearchCandidatesThroughPipeline routes candidates through the Way
     planTermsVersion: 'brave-storage-rights-tier-2026-07',
   });
   const candidate = normalizeWebSearchResult({
-    result: { title: 'Piedmont County history', url: 'https://piedmontcountyhistory.example.org/freedom-riders', description: 'History page.' },
+    result: {
+      title: 'Piedmont County history',
+      url: 'https://piedmontcountyhistory.example.org/freedom-riders',
+      description: 'History page.',
+    },
     registryEntry: entry,
     runId: 'run_1',
     capturedAt: FIXED_NOW,
@@ -509,12 +623,21 @@ test('ingestWebSearchCandidatesThroughPipeline routes candidates through the Way
   const client = async (request: SafeHttpRequest): Promise<SafeHttpResponse> => {
     if (request.url === 'https://web.archive.org/save') {
       submitCount += 1;
-      return { status: 200, headers: { 'content-type': 'application/json' }, bodyText: JSON.stringify({ job_id: 'job-1' }), finalUrl: '' };
+      return {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+        bodyText: JSON.stringify({ job_id: 'job-1' }),
+        finalUrl: '',
+      };
     }
     return {
       status: 200,
       headers: { 'content-type': 'application/json' },
-      bodyText: JSON.stringify({ status: 'success', timestamp: '20260717140512', original_url: candidate.canonicalUrl }),
+      bodyText: JSON.stringify({
+        status: 'success',
+        timestamp: '20260717140512',
+        original_url: candidate.canonicalUrl,
+      }),
       finalUrl: '',
     };
   };
@@ -528,7 +651,11 @@ test('ingestWebSearchCandidatesThroughPipeline routes candidates through the Way
     now: FIXED_NOW,
   });
 
-  assert.equal(submitCount, 1, 'the discovered URL must go through a real Wayback capture before ingestion');
+  assert.equal(
+    submitCount,
+    1,
+    'the discovered URL must go through a real Wayback capture before ingestion',
+  );
   assert.equal(ingested.length, 1);
   assert.equal(ingested[0]?.ingestMode, 'api');
   assert.equal(ingested[0]?.status, 'pending');
@@ -545,7 +672,11 @@ test('ingestWebSearchCandidatesThroughPipeline fails closed when the Wayback cap
     planTermsVersion: 'brave-storage-rights-tier-2026-07',
   });
   const candidate = normalizeWebSearchResult({
-    result: { title: 'Broken capture page', url: 'https://example.org/broken', description: 'History page.' },
+    result: {
+      title: 'Broken capture page',
+      url: 'https://example.org/broken',
+      description: 'History page.',
+    },
     registryEntry: entry,
     runId: 'run_1',
     capturedAt: FIXED_NOW,
@@ -555,9 +686,19 @@ test('ingestWebSearchCandidatesThroughPipeline fails closed when the Wayback cap
 
   const client = async (request: SafeHttpRequest): Promise<SafeHttpResponse> => {
     if (request.url === 'https://web.archive.org/save') {
-      return { status: 200, headers: { 'content-type': 'application/json' }, bodyText: JSON.stringify({ job_id: 'job-1' }), finalUrl: '' };
+      return {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+        bodyText: JSON.stringify({ job_id: 'job-1' }),
+        finalUrl: '',
+      };
     }
-    return { status: 200, headers: { 'content-type': 'application/json' }, bodyText: JSON.stringify({ status: 'error', message: 'blocked_by_robots' }), finalUrl: '' };
+    return {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+      bodyText: JSON.stringify({ status: 'error', message: 'blocked_by_robots' }),
+      finalUrl: '',
+    };
   };
 
   await assert.rejects(
@@ -582,10 +723,12 @@ test('a real -backed DailyBudgetEvaluator (thin wrapper over the real evaluateDa
   const { evaluateDailyBudget: realEvaluateDailyBudget } = await import('@repo/security');
 
   const realBackedEvaluator: DailyBudgetEvaluator = (input, budgets) => {
-    const result = (realEvaluateDailyBudget as unknown as (
-      i: { category: string; consumed: number; billingAlertPercent?: number },
-      b?: unknown,
-    ) => DailyBudgetDecision & { failClosed?: boolean; policyVersion?: string })(input, budgets);
+    const result = (
+      realEvaluateDailyBudget as unknown as (
+        i: { category: string; consumed: number; billingAlertPercent?: number },
+        b?: unknown,
+      ) => DailyBudgetDecision & { failClosed?: boolean; policyVersion?: string }
+    )(input, budgets);
     return result;
   };
 
@@ -599,7 +742,11 @@ test('a real -backed DailyBudgetEvaluator (thin wrapper over the real evaluateDa
     state: { queriesIssuedThisCampaign: 1, queriesIssuedThisMonth: 100 },
     evaluateDailyBudget: realBackedEvaluator,
   });
-  assert.equal(denied.allowed, false, 'consuming 5000 cents against a 1000-cent cap must be denied by the real evaluator');
+  assert.equal(
+    denied.allowed,
+    false,
+    'consuming 5000 cents against a 1000-cent cap must be denied by the real evaluator',
+  );
   assert.equal(denied.monthlyBudget?.hardStopTriggered, true);
 
   const allowed = evaluateWebSearchQueryBudget({

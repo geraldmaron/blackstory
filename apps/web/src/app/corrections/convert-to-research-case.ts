@@ -33,8 +33,7 @@ export type CorrectionResearchCaseConversion = {
 };
 
 export type CorrectionResearchCaseConversionError =
-  | { readonly error: 'not_found' }
-  | { readonly error: 'not_eligible'; readonly reason: string };
+  { readonly error: 'not_found' } | { readonly error: 'not_eligible'; readonly reason: string };
 
 export function prepareCorrectionResearchCaseConversion(
   submissionId: string,
@@ -49,8 +48,14 @@ export function prepareCorrectionResearchCaseConversion(
   if (!stored) {
     return { error: 'not_found' };
   }
-  if (stored.record.destination !== 'submission_quarantine' || stored.record.canonicalWriteAllowed) {
-    return { error: 'not_eligible', reason: 'Only quarantine-only correction records can convert.' };
+  if (
+    stored.record.destination !== 'submission_quarantine' ||
+    stored.record.canonicalWriteAllowed
+  ) {
+    return {
+      error: 'not_eligible',
+      reason: 'Only quarantine-only correction records can convert.',
+    };
   }
   if (stored.record.moderationState === 'coordinated_campaign') {
     return {

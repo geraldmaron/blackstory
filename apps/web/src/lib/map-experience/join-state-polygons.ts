@@ -52,9 +52,7 @@ export function joinDensityOntoStatePolygons(
 }
 
 /** Map FIPS → settled fillColor after a join/setData (decade morph colorA source). */
-export function indexDensityFillColors(
-  collection: LooseFeatureCollection,
-): Map<string, string> {
+export function indexDensityFillColors(collection: LooseFeatureCollection): Map<string, string> {
   const byFips = new Map<string, string>();
   for (const feature of collection.features) {
     const fips = String(feature.properties.fips ?? feature.id ?? '');

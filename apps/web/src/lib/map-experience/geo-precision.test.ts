@@ -4,7 +4,12 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { geoPrecisionTierForPublicPrecision, resolveDisplayRadiusMeters } from './geo-precision';
+import {
+  formatDisplayRadiusSpan,
+  geoPrecisionTierForPublicPrecision,
+  radiusAffordanceLabel,
+  resolveDisplayRadiusMeters,
+} from './geo-precision';
 
 test('institution/campus precisions map to the finest tiers', () => {
   assert.equal(geoPrecisionTierForPublicPrecision('institution'), 'exact-site');
@@ -58,4 +63,23 @@ test('state tier fails closed when the state postal code is unresolvable', () =>
 test('county tier fails closed — no county-bbox reference data is wired yet', () => {
   const result = resolveDisplayRadiusMeters('county', { statePostalCode: 'GA' });
   assert.equal(result.ok, false);
+});
+
+test('formatDisplayRadiusSpan prefers feet below a mile and miles at mile scale', () => {
+  assert.equal(formatDisplayRadiusSpan(30), '100 ft');
+  assert.equal(formatDisplayRadiusSpan(200), '660 ft');
+  assert.match(formatDisplayRadiusSpan(2000), /^1(\.2)? mi$/);
+  assert.match(formatDisplayRadiusSpan(120_000), /^\d+ mi$/);
+});
+
+test('radiusAffordanceLabel uses feet for block-tier affordances and avoids em dashes', () => {
+  assert.equal(
+    radiusAffordanceLabel('block', 200),
+    'Shown at block precision. The marker represents a ±660 ft area, not an exact address.',
+  );
+  assert.doesNotMatch(radiusAffordanceLabel('block', 200), /—/);
+  assert.equal(
+    radiusAffordanceLabel('locality', undefined),
+    'Shown at locality precision (radius affordance unavailable).',
+  );
 });

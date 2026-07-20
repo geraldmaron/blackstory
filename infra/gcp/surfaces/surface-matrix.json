@@ -22,7 +22,12 @@
       "appHostingBackend": "black-book-web-production",
       "configFiles": ["apps/web/apphosting.yaml", "apps/web/apphosting.production.yaml"],
       "allowedOperations": ["read:public-projections", "read:search", "read:location"],
-      "deniedOperations": ["write:canonical", "write:quarantine", "publish:projection", "promote:release"],
+      "deniedOperations": [
+        "write:canonical",
+        "write:quarantine",
+        "publish:projection",
+        "promote:release"
+      ],
       "acceptedAuth": ["anonymous", "end-user-token"],
       "mustNotAcceptAuth": ["service-identity"],
       "deployPipeline": {
@@ -41,7 +46,12 @@
       "cloudRunService": "black-book-api-public",
       "ingress": "all",
       "allowedOperations": ["read:public-projections", "read:search", "read:location"],
-      "deniedOperations": ["write:canonical", "write:quarantine", "publish:projection", "promote:release"],
+      "deniedOperations": [
+        "write:canonical",
+        "write:quarantine",
+        "publish:projection",
+        "promote:release"
+      ],
       "acceptedAuth": ["anonymous", "end-user-token"],
       "mustNotAcceptAuth": ["service-identity"],
       "firestorePosture": "read public/** only via Admin SDK",
@@ -80,7 +90,12 @@
       "networkPosture": "private-network",
       "cloudRunService": "black-book-api-internal",
       "ingress": "internal-and-cloud-load-balancing",
-      "allowedOperations": ["write:canonical", "publish:projection", "promote:release", "read:public-projections"],
+      "allowedOperations": [
+        "write:canonical",
+        "publish:projection",
+        "promote:release",
+        "read:public-projections"
+      ],
       "deniedOperations": [],
       "acceptedAuth": ["service-identity"],
       "mustNotAcceptAuth": ["anonymous", "end-user-token", "iap-session"],
@@ -100,7 +115,11 @@
       "networkPosture": "iap-protected",
       "cloudRunService": "black-book-admin",
       "ingress": "internal-and-cloud-load-balancing-with-iap",
-      "allowedOperations": ["read:public-projections", "admin:research-console", "admin:publication-review"],
+      "allowedOperations": [
+        "read:public-projections",
+        "admin:research-console",
+        "admin:publication-review"
+      ],
       "deniedOperations": ["publish:projection", "promote:release"],
       "acceptedAuth": ["iap-session", "app-authorization"],
       "mustNotAcceptAuth": ["anonymous"],

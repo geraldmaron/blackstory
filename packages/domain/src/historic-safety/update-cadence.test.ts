@@ -20,7 +20,10 @@ test('HISTORIC_SAFETY_SOURCE_CADENCES entries carry -compatible JobCadence field
 
 test('FBI hate-crime cadence is annual; Tougaloo/Mapping Inequality is quarterly', () => {
   assert.match(HISTORIC_SAFETY_SOURCE_CADENCES['fbi-hate-crime'].humanReadable, /annually/i);
-  assert.match(HISTORIC_SAFETY_SOURCE_CADENCES['tougaloo-mapping-inequality'].humanReadable, /quarterly/i);
+  assert.match(
+    HISTORIC_SAFETY_SOURCE_CADENCES['tougaloo-mapping-inequality'].humanReadable,
+    /quarterly/i,
+  );
 });
 
 test('isLayerAsOfOverdueForCadence flags stale asOf relative to nominalIntervalMs', () => {

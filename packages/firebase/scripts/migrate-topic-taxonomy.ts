@@ -30,7 +30,12 @@ type CatalogEntry = Record<string, unknown> & {
   readonly topicTags?: readonly string[];
 };
 
-function migrateFile(file: string): { entities: number; topicIds: number; mentionedEntityIds: number; keywords: number } {
+function migrateFile(file: string): {
+  entities: number;
+  topicIds: number;
+  mentionedEntityIds: number;
+  keywords: number;
+} {
   const filePath = join(catalogDir, file);
   const entries = JSON.parse(readFileSync(filePath, 'utf8')) as CatalogEntry[];
 
@@ -53,7 +58,12 @@ function migrateFile(file: string): { entities: number; topicIds: number; mentio
   });
 
   writeFileSync(filePath, `${JSON.stringify(migrated, null, 2)}\n`, 'utf8');
-  return { entities: entries.length, topicIds: topicIdsTotal, mentionedEntityIds: mentionedTotal, keywords: keywordsTotal };
+  return {
+    entities: entries.length,
+    topicIds: topicIdsTotal,
+    mentionedEntityIds: mentionedTotal,
+    keywords: keywordsTotal,
+  };
 }
 
 function main(): void {

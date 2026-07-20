@@ -45,7 +45,10 @@ test('assertMapOverlayLayerConfigValid rejects blank narrativeOffRampUrl', () =>
 
 test('assertNoDangerShadingStyleTerm rejects prohibited style tokens', () => {
   for (const term of PROHIBITED_MAP_OVERLAY_STYLE_TERMS) {
-    assert.throws(() => assertNoDangerShadingStyleTerm(`overlay-${term}-fill`), MapOverlayDignityViolationError);
+    assert.throws(
+      () => assertNoDangerShadingStyleTerm(`overlay-${term}-fill`),
+      MapOverlayDignityViolationError,
+    );
   }
   assert.doesNotThrow(() => assertNoDangerShadingStyleTerm('overlay-muted-neutral-fill'));
 });

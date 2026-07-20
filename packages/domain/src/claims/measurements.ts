@@ -55,10 +55,7 @@ export function assertUnitInterval(value: number, label: string): number {
 }
 
 /** Build a relevance measurement from a score + decision using the constitution. */
-export function measureRelevance(
-  score: number,
-  decision: RelevanceDecision,
-): RelevanceMeasurement {
+export function measureRelevance(score: number, decision: RelevanceDecision): RelevanceMeasurement {
   assertUnitInterval(score, 'relevance score');
   const evaluated = evaluateRelevance(score, decision);
   return {

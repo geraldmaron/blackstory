@@ -1,4 +1,3 @@
-
 /**
  * Real gemini-embedding-001 provider, built on the official `@google/genai` client.
  *
@@ -54,7 +53,6 @@ function defaultClientFactory(apiKey: string): GeminiEmbedContentClient {
   return new GoogleGenAI({ apiKey }) as unknown as GeminiEmbedContentClient;
 }
 
-
 /**
  * Creates a provider that calls the real Gemini Developer API. Construction never touches the
  * network or throws for a missing key the key is resolved and the client is built lazily on
@@ -97,7 +95,9 @@ export function createGeminiEmbeddingProvider(
       return embeddings.map((embedding, index) => {
         const values = embedding.values;
         if (!values || values.length === 0) {
-          throw new EmbeddingProviderError(`Gemini embedContent returned no values at index ${index}`);
+          throw new EmbeddingProviderError(
+            `Gemini embedContent returned no values at index ${index}`,
+          );
         }
         return values;
       });

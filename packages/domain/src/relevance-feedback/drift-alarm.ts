@@ -57,7 +57,8 @@ export function evaluateRelevanceDriftAlarm(input: {
   const disagreementCount = windowed.filter((entry) => entry.disposition !== 'accept').length;
   const disagreementRate = sampleSize === 0 ? 0 : disagreementCount / sampleSize;
   const meetsMinimumSample = sampleSize >= input.thresholds.minimumSampleSize;
-  const triggered = meetsMinimumSample && disagreementRate > input.thresholds.disagreementRateThreshold;
+  const triggered =
+    meetsMinimumSample && disagreementRate > input.thresholds.disagreementRateThreshold;
 
   const reason = triggered
     ? `Human-vs-engine disagreement rate ${formatPercent(disagreementRate)} exceeds threshold ${formatPercent(

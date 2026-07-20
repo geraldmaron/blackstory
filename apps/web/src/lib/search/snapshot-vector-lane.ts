@@ -44,7 +44,9 @@ export function buildSnapshotVectorIndex(
 ): readonly SnapshotVectorIndexEntry[] {
   return docs.map((doc) => ({
     entityId: doc.id,
-    vector: deterministicTextEmbedding(`${doc.displayName}\n${doc.summary ?? ''}\n${doc.topicTags.join(' ')}`),
+    vector: deterministicTextEmbedding(
+      `${doc.displayName}\n${doc.summary ?? ''}\n${doc.topicTags.join(' ')}`,
+    ),
   }));
 }
 

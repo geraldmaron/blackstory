@@ -3,12 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import {
-  DATE_PRECISIONS,
-  deriveDecadeLabel,
-  deriveEraBuckets,
-  isDatePrecision,
-} from './era.js';
+import { DATE_PRECISIONS, deriveDecadeLabel, deriveEraBuckets, isDatePrecision } from './era.js';
 
 test('DATE_PRECISIONS carries the full day|month|year|decade|circa vocabulary', () => {
   assert.deepEqual(DATE_PRECISIONS, ['day', 'month', 'year', 'decade', 'circa']);
@@ -30,17 +25,13 @@ test('deriveEraBuckets maps a multi-decade span to every overlapping decade', ()
 
 test('deriveEraBuckets yields exactly one bucket for a single-point span', () => {
   assert.deepEqual(deriveEraBuckets({ validFrom: '1957', datePrecision: 'year' }), ['1950s']);
-  assert.deepEqual(
-    deriveEraBuckets({ validFrom: '1957', validTo: null, datePrecision: 'year' }),
-    ['1950s'],
-  );
+  assert.deepEqual(deriveEraBuckets({ validFrom: '1957', validTo: null, datePrecision: 'year' }), [
+    '1950s',
+  ]);
 });
 
 test('deriveEraBuckets resolves day/month precision dates by their year component', () => {
-  assert.deepEqual(
-    deriveEraBuckets({ validFrom: '1963-08-28', datePrecision: 'day' }),
-    ['1960s'],
-  );
+  assert.deepEqual(deriveEraBuckets({ validFrom: '1963-08-28', datePrecision: 'day' }), ['1960s']);
 });
 
 test('deriveEraBuckets tolerates a reversed or out-of-order range', () => {

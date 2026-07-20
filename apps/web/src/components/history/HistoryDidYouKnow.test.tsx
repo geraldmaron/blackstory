@@ -6,10 +6,7 @@ import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
-import {
-  HISTORY_DID_YOU_KNOW_FACTS,
-  selectDidYouKnowFacts,
-} from '../../lib/history/did-you-know';
+import { HISTORY_DID_YOU_KNOW_FACTS, selectDidYouKnowFacts } from '../../lib/history/did-you-know';
 import { HistoryDidYouKnow } from './HistoryDidYouKnow';
 
 test('HISTORY_DID_YOU_KNOW_FACTS entries are sourced and non-empty', () => {

@@ -37,16 +37,9 @@ export {
 
 export { hashCandidateContent, stampDiscoveryReproducibility } from './hashing.js';
 
-export {
-  buildSourceReference,
-  candidateIdentityKey,
-  buildCandidateIdentity,
-} from './identity.js';
+export { buildSourceReference, candidateIdentityKey, buildCandidateIdentity } from './identity.js';
 
-export {
-  extractGeographicHints,
-  geographicHintWithinCountries,
-} from './geography.js';
+export { extractGeographicHints, geographicHintWithinCountries } from './geography.js';
 
 export {
   matchTermsInCandidate,

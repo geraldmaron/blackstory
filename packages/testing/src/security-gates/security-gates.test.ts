@@ -1,4 +1,3 @@
-
 /**
  * local security contracts: API abuse, browser attacks, SSRF, BOLA,
  * mass assignment, resource exhaustion, suppression expiry, and release evidence.

@@ -4,15 +4,8 @@
     "kind": "person",
     "displayName": "Hiram Revels",
     "summary": "In February 1870, Mississippi minister and Civil War chaplain Hiram Revels became the first African American to serve in the U.S. Senate, filling the seat once held by Jefferson Davis. He resigned within a year to become the founding president of Alcorn University, the nation's first state-supported land-grant college for Black Americans.",
-    "eraBuckets": [
-      "1870s"
-    ],
-    "topicTags": [
-      "reconstruction",
-      "firsts",
-      "senate",
-      "education"
-    ],
+    "eraBuckets": ["1870s"],
+    "topicTags": ["reconstruction", "firsts", "senate", "education"],
     "jurisdictionLabel": "Lorman, Mississippi",
     "locationPrecision": "campus",
     "locationLabel": "Alcorn State University (founded as Alcorn University), Lorman, Mississippi",
@@ -37,12 +30,7 @@
       }
     ],
     "historicalContext": "Revels is anchored at Alcorn rather than the U.S. Capitol because his most enduring legacy was institutional: he left the Senate after roughly a year to build the college he considered his life's real work.",
-    "topicIds": [
-      "reconstruction",
-      "firsts",
-      "senate",
-      "education"
-    ],
+    "topicIds": ["reconstruction", "firsts", "senate", "education"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -51,14 +39,8 @@
     "kind": "person",
     "displayName": "Joseph Rainey",
     "summary": "Joseph Hayne Rainey, born enslaved in Georgetown, South Carolina, escaped to Bermuda during the Civil War and returned to become the first African American to serve in the U.S. House of Representatives, seated December 12, 1870. In 1874 he became the first Black lawmaker to preside over the House from the Speaker's chair.",
-    "eraBuckets": [
-      "1870s"
-    ],
-    "topicTags": [
-      "reconstruction",
-      "firsts",
-      "house-of-representatives"
-    ],
+    "eraBuckets": ["1870s"],
+    "topicTags": ["reconstruction", "firsts", "house-of-representatives"],
     "jurisdictionLabel": "Georgetown, South Carolina",
     "locationPrecision": "institution",
     "locationLabel": "Joseph H. Rainey House, 909 Prince Street, Georgetown, South Carolina",
@@ -83,14 +65,8 @@
       }
     ],
     "historicalContext": "Rainey later became, on April 29, 1874, the first Black member to preside over the House chamber, overseeing debate as Speaker pro tempore.",
-    "topicIds": [
-      "reconstruction",
-      "firsts",
-      "house-of-representatives"
-    ],
-    "mentionedEntityIds": [
-      "ent_fort_concho_nhl_001"
-    ],
+    "topicIds": ["reconstruction", "firsts", "house-of-representatives"],
+    "mentionedEntityIds": ["ent_fort_concho_nhl_001"],
     "keywords": []
   },
   {
@@ -98,14 +74,8 @@
     "kind": "person",
     "displayName": "Blanche K. Bruce",
     "summary": "Born into slavery near Farmville, Virginia, Blanche K. Bruce rose to become, in 1875, the first African American to serve a full six-year term in the U.S. Senate, representing Mississippi. He later served as Register of the U.S. Treasury and Recorder of Deeds for the District of Columbia.",
-    "eraBuckets": [
-      "1870s"
-    ],
-    "topicTags": [
-      "reconstruction",
-      "firsts",
-      "senate"
-    ],
+    "eraBuckets": ["1870s"],
+    "topicTags": ["reconstruction", "firsts", "senate"],
     "jurisdictionLabel": "Prince Edward County, Virginia",
     "locationPrecision": "institution",
     "locationLabel": "Blanche Kelso Bruce birthplace marker, intersection of Route 360 and Route 623, Green Bay, Prince Edward County, Virginia",
@@ -130,11 +100,7 @@
       }
     ],
     "historicalContext": "Bruce is anchored at his Virginia birthplace marker rather than his Senate seat or his later Washington, D.C. career, since it is the site most directly and durably commemorated in his honor.",
-    "topicIds": [
-      "reconstruction",
-      "firsts",
-      "senate"
-    ],
+    "topicIds": ["reconstruction", "firsts", "senate"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -143,14 +109,8 @@
     "kind": "person",
     "displayName": "P.B.S. Pinchback",
     "summary": "Pinckney Benton Stewart Pinchback, a Union Army officer and Louisiana state senator, served as acting governor of Louisiana from December 9, 1872 to January 13, 1873, becoming the first Black governor of a U.S. state. He later helped found Southern University and was buried in New Orleans.",
-    "eraBuckets": [
-      "1870s"
-    ],
-    "topicTags": [
-      "reconstruction",
-      "firsts",
-      "governors"
-    ],
+    "eraBuckets": ["1870s"],
+    "topicTags": ["reconstruction", "firsts", "governors"],
     "jurisdictionLabel": "New Orleans, Louisiana",
     "locationPrecision": "campus",
     "locationLabel": "Pinchback family plot, Metairie Cemetery, New Orleans, Louisiana",
@@ -175,14 +135,8 @@
       }
     ],
     "historicalContext": "Before his brief governorship, Pinchback had already become president pro tempore of the Louisiana State Senate and acting lieutenant governor after Oscar Dunn's death in 1871.",
-    "topicIds": [
-      "reconstruction",
-      "firsts",
-      "governors"
-    ],
-    "mentionedEntityIds": [
-      "ent_southern_university_001"
-    ],
+    "topicIds": ["reconstruction", "firsts", "governors"],
+    "mentionedEntityIds": ["ent_southern_university_001"],
     "keywords": []
   },
   {
@@ -190,15 +144,8 @@
     "kind": "person",
     "displayName": "Jonathan Jasper Wright",
     "summary": "Elected associate justice of the South Carolina Supreme Court in February 1870, Jonathan Jasper Wright became the first Black state supreme court justice in U.S. history and the first Black man elected to any state or federal appellate judgeship. He practiced law in Charleston until his death in 1885.",
-    "eraBuckets": [
-      "1870s",
-      "1880s"
-    ],
-    "topicTags": [
-      "reconstruction",
-      "firsts",
-      "judiciary"
-    ],
+    "eraBuckets": ["1870s", "1880s"],
+    "topicTags": ["reconstruction", "firsts", "judiciary"],
     "jurisdictionLabel": "Charleston, South Carolina",
     "locationPrecision": "city",
     "locationLabel": "Charleston, South Carolina, where Wright practiced law and died",
@@ -223,11 +170,7 @@
       }
     ],
     "historicalContext": "Wright served on the court for nearly seven years and wrote roughly ninety opinions; he remained the only Black state supreme court justice in the country for almost a century after Reconstruction ended.",
-    "topicIds": [
-      "reconstruction",
-      "firsts",
-      "judiciary"
-    ],
+    "topicIds": ["reconstruction", "firsts", "judiciary"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -236,17 +179,8 @@
     "kind": "person",
     "displayName": "Robert Smalls",
     "summary": "Born enslaved in Beaufort, South Carolina, Robert Smalls commandeered the Confederate steamer CSS Planter in 1862 and delivered it to the Union blockade, freeing himself and his crew. He went on to serve five terms in Congress and became the first Black captain of a U.S. vessel.",
-    "eraBuckets": [
-      "1860s",
-      "1870s",
-      "1880s"
-    ],
-    "topicTags": [
-      "reconstruction",
-      "firsts",
-      "house-of-representatives",
-      "civil-war"
-    ],
+    "eraBuckets": ["1860s", "1870s", "1880s"],
+    "topicTags": ["reconstruction", "firsts", "house-of-representatives", "civil-war"],
     "jurisdictionLabel": "Beaufort, South Carolina",
     "locationPrecision": "institution",
     "locationLabel": "Robert Smalls House, 511 Prince Street, Beaufort, South Carolina",
@@ -271,16 +205,8 @@
       }
     ],
     "historicalContext": "Smalls represented Beaufort in Congress for five terms between 1875 and 1887 and rose to major general in the South Carolina militia, one of the era's most decorated Black public figures.",
-    "topicIds": [
-      "reconstruction",
-      "firsts",
-      "house-of-representatives",
-      "civil-war"
-    ],
-    "mentionedEntityIds": [
-      "ent_core_founding_001",
-      "ent_fort_concho_nhl_001"
-    ],
+    "topicIds": ["reconstruction", "firsts", "house-of-representatives", "civil-war"],
+    "mentionedEntityIds": ["ent_core_founding_001", "ent_fort_concho_nhl_001"],
     "keywords": []
   },
   {
@@ -288,16 +214,8 @@
     "kind": "person",
     "displayName": "John Mercer Langston",
     "summary": "John Mercer Langston, the first Black lawyer admitted to the Ohio bar, became the founding dean of Howard University's law school and, in 1885, the first president of what is now Virginia State University. In 1890 he was seated as Virginia's first Black member of Congress.",
-    "eraBuckets": [
-      "1880s",
-      "1890s"
-    ],
-    "topicTags": [
-      "reconstruction",
-      "firsts",
-      "education",
-      "house-of-representatives"
-    ],
+    "eraBuckets": ["1880s", "1890s"],
+    "topicTags": ["reconstruction", "firsts", "education", "house-of-representatives"],
     "jurisdictionLabel": "Petersburg, Virginia",
     "locationPrecision": "campus",
     "locationLabel": "Virginia State University (founded as Virginia Normal and Collegiate Institute), Ettrick, Virginia, near Petersburg",
@@ -322,16 +240,8 @@
       }
     ],
     "historicalContext": "Until 1992, Langston remained the only Black Virginian ever elected to Congress; he was also the great-uncle of poet Langston Hughes.",
-    "topicIds": [
-      "reconstruction",
-      "firsts",
-      "education",
-      "house-of-representatives"
-    ],
-    "mentionedEntityIds": [
-      "ent_howard_university_001",
-      "ent_langston_hughes_001"
-    ],
+    "topicIds": ["reconstruction", "firsts", "education", "house-of-representatives"],
+    "mentionedEntityIds": ["ent_howard_university_001", "ent_langston_hughes_001"],
     "keywords": []
   },
   {
@@ -339,13 +249,8 @@
     "kind": "person",
     "displayName": "Macon Bolling Allen",
     "summary": "On July 3, 1844, Macon Bolling Allen was admitted to the Maine bar by examination, becoming the first African American licensed to practice law in the United States. He later co-founded the first known Black law firm in the country in Charleston, South Carolina.",
-    "eraBuckets": [
-      "1840s"
-    ],
-    "topicTags": [
-      "firsts",
-      "law"
-    ],
+    "eraBuckets": ["1840s"],
+    "topicTags": ["firsts", "law"],
     "jurisdictionLabel": "Portland, Maine",
     "locationPrecision": "city",
     "locationLabel": "Portland, Maine, where Allen was admitted to the bar in 1844",
@@ -370,10 +275,7 @@
       }
     ],
     "historicalContext": "Allen later moved to Charleston, South Carolina, where his firm, Whipper, Elliott, and Allen, is recognized as the first known African American law firm in the country.",
-    "topicIds": [
-      "firsts",
-      "law"
-    ],
+    "topicIds": ["firsts", "law"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -382,14 +284,8 @@
     "kind": "person",
     "displayName": "Charlotte E. Ray",
     "summary": "Charlotte E. Ray graduated from Howard University's law school in 1872, applying under the initials \"C.E. Ray\" to disguise her gender, and became the first Black woman lawyer in the United States and the first woman admitted to practice before the D.C. Supreme Court.",
-    "eraBuckets": [
-      "1870s"
-    ],
-    "topicTags": [
-      "firsts",
-      "law",
-      "education"
-    ],
+    "eraBuckets": ["1870s"],
+    "topicTags": ["firsts", "law", "education"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "campus",
     "locationLabel": "Howard University, Washington, D.C., where Ray earned her law degree in 1872",
@@ -414,14 +310,8 @@
       }
     ],
     "historicalContext": "Discrimination against both her race and her gender made it impossible to sustain a law practice, and Ray later moved to New York to teach; her bar admission nonetheless became a legal precedent cited by women in other states.",
-    "topicIds": [
-      "firsts",
-      "law",
-      "education"
-    ],
-    "mentionedEntityIds": [
-      "ent_howard_university_001"
-    ],
+    "topicIds": ["firsts", "law", "education"],
+    "mentionedEntityIds": ["ent_howard_university_001"],
     "keywords": []
   },
   {
@@ -429,14 +319,8 @@
     "kind": "person",
     "displayName": "Mifflin Wistar Gibbs",
     "summary": "Mifflin Wistar Gibbs, a California gold-rush merchant and abolitionist newspaper founder, moved to Little Rock, Arkansas after the Civil War and in 1873 became the first elected African American municipal judge in the United States, serving as Little Rock's police judge.",
-    "eraBuckets": [
-      "1870s"
-    ],
-    "topicTags": [
-      "reconstruction",
-      "firsts",
-      "judiciary"
-    ],
+    "eraBuckets": ["1870s"],
+    "topicTags": ["reconstruction", "firsts", "judiciary"],
     "jurisdictionLabel": "Little Rock, Arkansas",
     "locationPrecision": "city",
     "locationLabel": "Little Rock, Arkansas, where Gibbs served as police judge and later died",
@@ -461,11 +345,7 @@
       }
     ],
     "historicalContext": "Gibbs later served as U.S. consul to Madagascar and lived out his life in Little Rock, where he died in 1915.",
-    "topicIds": [
-      "reconstruction",
-      "firsts",
-      "judiciary"
-    ],
+    "topicIds": ["reconstruction", "firsts", "judiciary"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -474,14 +354,8 @@
     "kind": "person",
     "displayName": "John Roy Lynch",
     "summary": "Born enslaved in Louisiana, John Roy Lynch became, at age 24, the first African American speaker of the Mississippi House of Representatives in 1872, then represented Mississippi in Congress for three terms, one of the most prominent Black Reconstruction-era officeholders.",
-    "eraBuckets": [
-      "1870s"
-    ],
-    "topicTags": [
-      "reconstruction",
-      "firsts",
-      "house-of-representatives"
-    ],
+    "eraBuckets": ["1870s"],
+    "topicTags": ["reconstruction", "firsts", "house-of-representatives"],
     "jurisdictionLabel": "Jackson, Mississippi",
     "locationPrecision": "institution",
     "locationLabel": "Old Mississippi State Capitol Museum, 100 State Street, Jackson, Mississippi",
@@ -506,11 +380,7 @@
       }
     ],
     "historicalContext": "The Old Capitol, now a state history museum, maintains a permanent exhibit honoring Lynch's tenure as speaker.",
-    "topicIds": [
-      "reconstruction",
-      "firsts",
-      "house-of-representatives"
-    ],
+    "topicIds": ["reconstruction", "firsts", "house-of-representatives"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -519,16 +389,8 @@
     "kind": "person",
     "displayName": "Alexander Thomas Augusta",
     "summary": "Alexander Thomas Augusta, commissioned an Army surgeon in 1863, became the highest-ranking Black officer of the Civil War and the first African American to head a U.S. hospital and to teach at a U.S. medical college. In 1890 he became the first Black officer buried at Arlington National Cemetery.",
-    "eraBuckets": [
-      "1860s",
-      "1890s"
-    ],
-    "topicTags": [
-      "firsts",
-      "military",
-      "civil-war",
-      "medicine"
-    ],
+    "eraBuckets": ["1860s", "1890s"],
+    "topicTags": ["firsts", "military", "civil-war", "medicine"],
     "jurisdictionLabel": "Arlington, Virginia",
     "locationPrecision": "campus",
     "locationLabel": "Arlington National Cemetery, Section 1, Arlington, Virginia",
@@ -553,15 +415,8 @@
       }
     ],
     "historicalContext": "Augusta also became the first Black professor of medicine in the United States, teaching at the newly founded Howard University Medical School after the war.",
-    "topicIds": [
-      "firsts",
-      "military",
-      "civil-war",
-      "medicine"
-    ],
-    "mentionedEntityIds": [
-      "ent_howard_university_001"
-    ],
+    "topicIds": ["firsts", "military", "civil-war", "medicine"],
+    "mentionedEntityIds": ["ent_howard_university_001"],
     "keywords": []
   },
   {
@@ -569,15 +424,8 @@
     "kind": "person",
     "displayName": "Martin Delany",
     "summary": "Abolitionist, physician, and writer Martin Delany was commissioned a major in February 1865, becoming the first Black field officer in the U.S. Army. He recruited formerly enslaved men into United States Colored Troops regiments in the South Carolina Lowcountry.",
-    "eraBuckets": [
-      "1860s",
-      "1880s"
-    ],
-    "topicTags": [
-      "firsts",
-      "military",
-      "civil-war"
-    ],
+    "eraBuckets": ["1860s", "1880s"],
+    "topicTags": ["firsts", "military", "civil-war"],
     "jurisdictionLabel": "Cedarville, Ohio",
     "locationPrecision": "campus",
     "locationLabel": "Massies Creek Cemetery, Cedarville, Ohio, near Delany's Wilberforce home",
@@ -602,11 +450,7 @@
       }
     ],
     "historicalContext": "Delany was among the era's leading proponents of Black nationalism and emigration before the war, then served the Union cause directly as its highest-ranking Black officer.",
-    "topicIds": [
-      "firsts",
-      "military",
-      "civil-war"
-    ],
+    "topicIds": ["firsts", "military", "civil-war"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -615,15 +459,8 @@
     "kind": "person",
     "displayName": "William Harvey Carney",
     "summary": "Sergeant William Harvey Carney of the 54th Massachusetts Volunteer Infantry retrieved and carried the regimental colors during the July 1863 assault on Fort Wagner despite severe wounds. His 1900 Medal of Honor recognized the earliest action of any Black Medal of Honor recipient.",
-    "eraBuckets": [
-      "1860s",
-      "1900s"
-    ],
-    "topicTags": [
-      "firsts",
-      "military",
-      "civil-war"
-    ],
+    "eraBuckets": ["1860s", "1900s"],
+    "topicTags": ["firsts", "military", "civil-war"],
     "jurisdictionLabel": "New Bedford, Massachusetts",
     "locationPrecision": "institution",
     "locationLabel": "Oak Grove Cemetery, 185 Parker Street, New Bedford, Massachusetts",
@@ -648,11 +485,7 @@
       }
     ],
     "historicalContext": "Carney later became one of the first documented Black postal mail carriers in New Bedford, Massachusetts.",
-    "topicIds": [
-      "firsts",
-      "military",
-      "civil-war"
-    ],
+    "topicIds": ["firsts", "military", "civil-war"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -661,14 +494,8 @@
     "kind": "person",
     "displayName": "Carl Stokes",
     "summary": "Carl B. Stokes was elected mayor of Cleveland in November 1967 and took office January 1, 1968, becoming the first African American elected mayor of a major U.S. city. His administration pursued police reform and community investment amid the era's urban unrest.",
-    "eraBuckets": [
-      "1960s",
-      "1970s"
-    ],
-    "topicTags": [
-      "firsts",
-      "mayors"
-    ],
+    "eraBuckets": ["1960s", "1970s"],
+    "topicTags": ["firsts", "mayors"],
     "jurisdictionLabel": "Cleveland, Ohio",
     "locationPrecision": "institution",
     "locationLabel": "Cleveland City Hall, 601 Lakeside Avenue, Cleveland, Ohio",
@@ -693,13 +520,8 @@
       }
     ],
     "historicalContext": "Stokes took office the same day as Richard Hatcher of Gary, Indiana, though Stokes was inaugurated first.",
-    "topicIds": [
-      "firsts",
-      "mayors"
-    ],
-    "mentionedEntityIds": [
-      "ent_richard_hatcher_001"
-    ],
+    "topicIds": ["firsts", "mayors"],
+    "mentionedEntityIds": ["ent_richard_hatcher_001"],
     "keywords": []
   },
   {
@@ -707,15 +529,8 @@
     "kind": "person",
     "displayName": "Richard Hatcher",
     "summary": "Richard Gordon Hatcher won election as mayor of Gary, Indiana in November 1967, becoming, alongside Cleveland's Carl Stokes, one of the first two African Americans elected mayor of a U.S. city with more than 100,000 people. He served twenty years, from 1968 to 1988.",
-    "eraBuckets": [
-      "1960s",
-      "1970s",
-      "1980s"
-    ],
-    "topicTags": [
-      "firsts",
-      "mayors"
-    ],
+    "eraBuckets": ["1960s", "1970s", "1980s"],
+    "topicTags": ["firsts", "mayors"],
     "jurisdictionLabel": "Gary, Indiana",
     "locationPrecision": "city",
     "locationLabel": "Gary, Indiana, where Hatcher served twenty years as mayor",
@@ -740,13 +555,8 @@
       }
     ],
     "historicalContext": "Hatcher's win and Stokes's win came in the same November 1967 elections, marking the first wave of Black mayors elected in major American cities.",
-    "topicIds": [
-      "firsts",
-      "mayors"
-    ],
-    "mentionedEntityIds": [
-      "ent_carl_stokes_001"
-    ],
+    "topicIds": ["firsts", "mayors"],
+    "mentionedEntityIds": ["ent_carl_stokes_001"],
     "keywords": []
   },
   {
@@ -754,15 +564,8 @@
     "kind": "person",
     "displayName": "Coleman Young",
     "summary": "Coleman Alexander Young took office as Detroit's first Black mayor in January 1974 and served five terms through 1994, disbanding a controversial police unit and pursuing police integration during a pivotal era in the city's history.",
-    "eraBuckets": [
-      "1970s",
-      "1980s",
-      "1990s"
-    ],
-    "topicTags": [
-      "firsts",
-      "mayors"
-    ],
+    "eraBuckets": ["1970s", "1980s", "1990s"],
+    "topicTags": ["firsts", "mayors"],
     "jurisdictionLabel": "Detroit, Michigan",
     "locationPrecision": "institution",
     "locationLabel": "Coleman A. Young Municipal Center (Detroit City Hall), 2 Woodward Avenue, Detroit, Michigan",
@@ -787,10 +590,7 @@
       }
     ],
     "historicalContext": "Young's platform centered on police reform; as mayor, he disbanded the controversial STRESS police unit and expanded integration within the department.",
-    "topicIds": [
-      "firsts",
-      "mayors"
-    ],
+    "topicIds": ["firsts", "mayors"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -799,15 +599,8 @@
     "kind": "person",
     "displayName": "Tom Bradley",
     "summary": "Tom Bradley, a former Los Angeles police lieutenant and city councilman, defeated incumbent Sam Yorty on May 29, 1973, to become the first Black mayor of Los Angeles. He served an unprecedented five terms, twenty years, until 1993.",
-    "eraBuckets": [
-      "1970s",
-      "1980s",
-      "1990s"
-    ],
-    "topicTags": [
-      "firsts",
-      "mayors"
-    ],
+    "eraBuckets": ["1970s", "1980s", "1990s"],
+    "topicTags": ["firsts", "mayors"],
     "jurisdictionLabel": "Los Angeles, California",
     "locationPrecision": "institution",
     "locationLabel": "Los Angeles City Hall, 200 North Spring Street, Los Angeles, California",
@@ -832,10 +625,7 @@
       }
     ],
     "historicalContext": "Bradley rose to lieutenant in the LAPD, the highest rank a Black officer had achieved at the time, before turning to elected office.",
-    "topicIds": [
-      "firsts",
-      "mayors"
-    ],
+    "topicIds": ["firsts", "mayors"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -844,13 +634,8 @@
     "kind": "person",
     "displayName": "Harold Washington",
     "summary": "Harold Washington won a multiracial coalition campaign to become Chicago's first Black mayor, inaugurated April 29, 1983, after a voter registration drive added over 127,000 African Americans to the rolls. He served until his death in office in 1987.",
-    "eraBuckets": [
-      "1980s"
-    ],
-    "topicTags": [
-      "firsts",
-      "mayors"
-    ],
+    "eraBuckets": ["1980s"],
+    "topicTags": ["firsts", "mayors"],
     "jurisdictionLabel": "Chicago, Illinois",
     "locationPrecision": "institution",
     "locationLabel": "Chicago City Hall, 121 North LaSalle Street, Chicago, Illinois",
@@ -875,13 +660,8 @@
       }
     ],
     "historicalContext": "Washington's multiracial coalition and progressive agenda are widely cited as an early influence on Barack Obama's political career in Chicago.",
-    "topicIds": [
-      "firsts",
-      "mayors"
-    ],
-    "mentionedEntityIds": [
-      "ent_barack_obama_001"
-    ],
+    "topicIds": ["firsts", "mayors"],
+    "mentionedEntityIds": ["ent_barack_obama_001"],
     "keywords": []
   },
   {
@@ -889,13 +669,8 @@
     "kind": "person",
     "displayName": "David Dinkins",
     "summary": "David N. Dinkins, a former Manhattan borough president, was inaugurated January 1, 1990 as the 106th Mayor of New York City, becoming the first African American to hold the office. He implemented the Safe Streets, Safe City initiative during his single term.",
-    "eraBuckets": [
-      "1990s"
-    ],
-    "topicTags": [
-      "firsts",
-      "mayors"
-    ],
+    "eraBuckets": ["1990s"],
+    "topicTags": ["firsts", "mayors"],
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "institution",
     "locationLabel": "New York City Hall, City Hall Park, Manhattan, New York",
@@ -920,10 +695,7 @@
       }
     ],
     "historicalContext": "Before becoming mayor, Dinkins served in the New York State Assembly and as Manhattan borough president.",
-    "topicIds": [
-      "firsts",
-      "mayors"
-    ],
+    "topicIds": ["firsts", "mayors"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -932,14 +704,8 @@
     "kind": "person",
     "displayName": "Wilson Goode",
     "summary": "W. Wilson Goode Sr., a former city administrator who grew up in poverty in rural North Carolina, was inaugurated as Philadelphia's first Black mayor in January 1984 after defeating Frank Rizzo in the Democratic primary. He served two terms, from 1984 to 1992.",
-    "eraBuckets": [
-      "1980s",
-      "1990s"
-    ],
-    "topicTags": [
-      "firsts",
-      "mayors"
-    ],
+    "eraBuckets": ["1980s", "1990s"],
+    "topicTags": ["firsts", "mayors"],
     "jurisdictionLabel": "Philadelphia, Pennsylvania",
     "locationPrecision": "institution",
     "locationLabel": "Philadelphia City Hall, 1500 Market Street area, Philadelphia, Pennsylvania",
@@ -964,10 +730,7 @@
       }
     ],
     "historicalContext": "Goode's election capped decades of civil rights organizing and demographic change in Philadelphia city politics.",
-    "topicIds": [
-      "firsts",
-      "mayors"
-    ],
+    "topicIds": ["firsts", "mayors"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -976,15 +739,8 @@
     "kind": "person",
     "displayName": "Willie Brown",
     "summary": "Willie L. Brown Jr. served as the first African American Speaker of the California State Assembly from 1980 to 1995, a record fourteen-year tenure, before winning election as San Francisco's first Black mayor, serving from 1996 to 2004.",
-    "eraBuckets": [
-      "1980s",
-      "1990s",
-      "2000s"
-    ],
-    "topicTags": [
-      "firsts",
-      "mayors"
-    ],
+    "eraBuckets": ["1980s", "1990s", "2000s"],
+    "topicTags": ["firsts", "mayors"],
     "jurisdictionLabel": "San Francisco, California",
     "locationPrecision": "institution",
     "locationLabel": "San Francisco City Hall, 1 Dr. Carlton B. Goodlett Place, San Francisco, California",
@@ -1009,10 +765,7 @@
       }
     ],
     "historicalContext": "Brown's fourteen years as Assembly speaker made him one of the most powerful Black elected officials in the country before he turned to City Hall.",
-    "topicIds": [
-      "firsts",
-      "mayors"
-    ],
+    "topicIds": ["firsts", "mayors"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1021,14 +774,8 @@
     "kind": "person",
     "displayName": "Kenneth Gibson",
     "summary": "Kenneth A. Gibson, a former city engineer, defeated two-term incumbent Hugh Addonizio in 1970 to become the first African American mayor of a major northeastern U.S. city, leading Newark, New Jersey for sixteen years until 1986.",
-    "eraBuckets": [
-      "1970s",
-      "1980s"
-    ],
-    "topicTags": [
-      "firsts",
-      "mayors"
-    ],
+    "eraBuckets": ["1970s", "1980s"],
+    "topicTags": ["firsts", "mayors"],
     "jurisdictionLabel": "Newark, New Jersey",
     "locationPrecision": "institution",
     "locationLabel": "Newark City Hall, 920 Broad Street, Newark, New Jersey",
@@ -1053,10 +800,7 @@
       }
     ],
     "historicalContext": "Gibson served sixteen years as mayor of Newark, from 1970 to 1986, guiding the city through a period of significant fiscal and social strain.",
-    "topicIds": [
-      "firsts",
-      "mayors"
-    ],
+    "topicIds": ["firsts", "mayors"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1065,15 +809,8 @@
     "kind": "person",
     "displayName": "Maynard Jackson",
     "summary": "Maynard Holbrook Jackson Jr. was sworn in January 7, 1974, as Atlanta's first Black mayor and the first Black mayor of any major city in the American South. He served three non-consecutive terms and pioneered minority business inclusion programs.",
-    "eraBuckets": [
-      "1970s",
-      "1980s",
-      "1990s"
-    ],
-    "topicTags": [
-      "firsts",
-      "mayors"
-    ],
+    "eraBuckets": ["1970s", "1980s", "1990s"],
+    "topicTags": ["firsts", "mayors"],
     "jurisdictionLabel": "Atlanta, Georgia",
     "locationPrecision": "institution",
     "locationLabel": "Atlanta City Hall, 55 Trinity Avenue SW, Atlanta, Georgia",
@@ -1098,10 +835,7 @@
       }
     ],
     "historicalContext": "Jackson's administration required that Black-owned firms receive a substantial share of contracts for the new Hartsfield-Jackson airport terminal, a landmark minority-inclusion program.",
-    "topicIds": [
-      "firsts",
-      "mayors"
-    ],
+    "topicIds": ["firsts", "mayors"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1110,14 +844,8 @@
     "kind": "person",
     "displayName": "Ernest \"Dutch\" Morial",
     "summary": "Ernest Nathan \"Dutch\" Morial took office May 2, 1978 as the first African American mayor of New Orleans, capping a career that also included being the city's first Black assistant U.S. attorney and the first Black Louisiana state legislator since Reconstruction.",
-    "eraBuckets": [
-      "1970s",
-      "1980s"
-    ],
-    "topicTags": [
-      "firsts",
-      "mayors"
-    ],
+    "eraBuckets": ["1970s", "1980s"],
+    "topicTags": ["firsts", "mayors"],
     "jurisdictionLabel": "New Orleans, Louisiana",
     "locationPrecision": "city",
     "locationLabel": "New Orleans, Louisiana, where Morial served as the city's first Black mayor",
@@ -1142,10 +870,7 @@
       }
     ],
     "historicalContext": "Morial was married to civil rights activist Sybil Haydel Morial, and their son Marc Morial later served as New Orleans mayor from 1994 to 2002.",
-    "topicIds": [
-      "firsts",
-      "mayors"
-    ],
+    "topicIds": ["firsts", "mayors"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1154,13 +879,8 @@
     "kind": "person",
     "displayName": "Sharon Pratt",
     "summary": "Sharon Pratt Dixon was sworn in January 2, 1991 as mayor of Washington, D.C., becoming the first African American woman to lead a major American city. She served a single term, from 1991 to 1995, as the district's first mayor born in the city since 1861.",
-    "eraBuckets": [
-      "1990s"
-    ],
-    "topicTags": [
-      "firsts",
-      "mayors"
-    ],
+    "eraBuckets": ["1990s"],
+    "topicTags": ["firsts", "mayors"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "John A. Wilson Building, 1350 Pennsylvania Avenue NW, Washington, D.C.",
@@ -1185,10 +905,7 @@
       }
     ],
     "historicalContext": "Pratt served one term as mayor, from 1991 to 1995, governing from the John A. Wilson Building, seat of the District's government.",
-    "topicIds": [
-      "firsts",
-      "mayors"
-    ],
+    "topicIds": ["firsts", "mayors"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1197,14 +914,8 @@
     "kind": "person",
     "displayName": "Karen Bass",
     "summary": "Karen Bass, a former physician assistant and community organizer, was elected the first woman mayor of Los Angeles in 2022. She had earlier become, in 2008, the first Black woman in U.S. history to serve as speaker of a state legislative body, leading the California State Assembly.",
-    "eraBuckets": [
-      "2000s",
-      "2020s"
-    ],
-    "topicTags": [
-      "firsts",
-      "mayors"
-    ],
+    "eraBuckets": ["2000s", "2020s"],
+    "topicTags": ["firsts", "mayors"],
     "jurisdictionLabel": "Los Angeles, California",
     "locationPrecision": "institution",
     "locationLabel": "Los Angeles City Hall, 200 North Spring Street, Los Angeles, California",
@@ -1229,10 +940,7 @@
       }
     ],
     "historicalContext": "Bass anchors this record at Los Angeles City Hall, the site of her mayoral inauguration, though her first legislative-leadership milestone occurred in Sacramento.",
-    "topicIds": [
-      "firsts",
-      "mayors"
-    ],
+    "topicIds": ["firsts", "mayors"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1241,14 +949,8 @@
     "kind": "person",
     "displayName": "Oscar De Priest",
     "summary": "Oscar Stanton De Priest, a Chicago alderman and real estate businessman, won a special 1928 election to Congress, becoming the first African American elected to Congress outside the South and the first Black member of Congress in the twentieth century.",
-    "eraBuckets": [
-      "1920s",
-      "1930s"
-    ],
-    "topicTags": [
-      "firsts",
-      "house-of-representatives"
-    ],
+    "eraBuckets": ["1920s", "1930s"],
+    "topicTags": ["firsts", "house-of-representatives"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "United States Capitol, Washington, D.C.",
@@ -1273,10 +975,7 @@
       }
     ],
     "historicalContext": "De Priest was the first Black member of Congress since George White of North Carolina left office in 1901, ending a 28-year absence of Black representation in Washington.",
-    "topicIds": [
-      "firsts",
-      "house-of-representatives"
-    ],
+    "topicIds": ["firsts", "house-of-representatives"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1285,14 +984,8 @@
     "kind": "person",
     "displayName": "Shirley Chisholm",
     "summary": "Shirley Anita Chisholm won election to Congress from Brooklyn's 12th district in November 1968, becoming the first Black woman elected to the U.S. Congress. In 1972 she became the first Black candidate for a major party's presidential nomination.",
-    "eraBuckets": [
-      "1960s",
-      "1970s"
-    ],
-    "topicTags": [
-      "firsts",
-      "house-of-representatives"
-    ],
+    "eraBuckets": ["1960s", "1970s"],
+    "topicTags": ["firsts", "house-of-representatives"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "United States Capitol, Washington, D.C.",
@@ -1317,13 +1010,8 @@
       }
     ],
     "historicalContext": "Chisholm represented her Brooklyn district for seven terms, from 1969 to 1983, and was a founding member of the Congressional Black Caucus in 1971.",
-    "topicIds": [
-      "firsts",
-      "house-of-representatives"
-    ],
-    "mentionedEntityIds": [
-      "ent_mfdp_dnc_challenge_001"
-    ],
+    "topicIds": ["firsts", "house-of-representatives"],
+    "mentionedEntityIds": ["ent_mfdp_dnc_challenge_001"],
     "keywords": []
   },
   {
@@ -1331,14 +1019,8 @@
     "kind": "person",
     "displayName": "Edward Brooke",
     "summary": "Edward W. Brooke III, Massachusetts's attorney general since 1963, won election to the U.S. Senate in 1966, becoming the first African American senator elected by popular vote and the first Black senator since Reconstruction. He served two terms, from 1967 to 1979.",
-    "eraBuckets": [
-      "1960s",
-      "1970s"
-    ],
-    "topicTags": [
-      "firsts",
-      "senate"
-    ],
+    "eraBuckets": ["1960s", "1970s"],
+    "topicTags": ["firsts", "senate"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "United States Capitol, Washington, D.C.",
@@ -1363,13 +1045,8 @@
       }
     ],
     "historicalContext": "In the Senate, Brooke co-authored the Fair Housing Act of 1968 and became the first Black senator ever re-elected, in 1972.",
-    "topicIds": [
-      "firsts",
-      "senate"
-    ],
-    "mentionedEntityIds": [
-      "ent_law_fair_housing_act_1968"
-    ],
+    "topicIds": ["firsts", "senate"],
+    "mentionedEntityIds": ["ent_law_fair_housing_act_1968"],
     "keywords": []
   },
   {
@@ -1377,14 +1054,8 @@
     "kind": "person",
     "displayName": "Barbara Jordan",
     "summary": "Barbara Jordan, the first Black woman elected to the Texas Senate since Reconstruction, was elected to the U.S. House in 1972, becoming the first woman descended from enslaved Americans elected to Congress. In 1976 she became the first Black keynote speaker at a major-party convention.",
-    "eraBuckets": [
-      "1960s",
-      "1970s"
-    ],
-    "topicTags": [
-      "firsts",
-      "house-of-representatives"
-    ],
+    "eraBuckets": ["1960s", "1970s"],
+    "topicTags": ["firsts", "house-of-representatives"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "United States Capitol, Washington, D.C.",
@@ -1409,14 +1080,8 @@
       }
     ],
     "historicalContext": "Jordan gained further national attention for her televised opening statement during the 1974 House Judiciary Committee hearings on the impeachment of Richard Nixon.",
-    "topicIds": [
-      "firsts",
-      "house-of-representatives"
-    ],
-    "mentionedEntityIds": [
-      "ent_andrew_young_001",
-      "ent_mfdp_dnc_challenge_001"
-    ],
+    "topicIds": ["firsts", "house-of-representatives"],
+    "mentionedEntityIds": ["ent_andrew_young_001", "ent_mfdp_dnc_challenge_001"],
     "keywords": []
   },
   {
@@ -1424,13 +1089,8 @@
     "kind": "person",
     "displayName": "Andrew Young",
     "summary": "Andrew Young, a former aide to Martin Luther King Jr., was elected to Congress from Georgia in 1972, the first Black congressman from the state since Reconstruction. In 1977 he became the first African American U.S. Ambassador to the United Nations.",
-    "eraBuckets": [
-      "1970s"
-    ],
-    "topicTags": [
-      "firsts",
-      "house-of-representatives"
-    ],
+    "eraBuckets": ["1970s"],
+    "topicTags": ["firsts", "house-of-representatives"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "United States Capitol, Washington, D.C.",
@@ -1455,10 +1115,7 @@
       }
     ],
     "historicalContext": "Young later served as mayor of Atlanta from 1982 to 1990, continuing a career that spanned the civil rights movement, Congress, diplomacy, and city government.",
-    "topicIds": [
-      "firsts",
-      "house-of-representatives"
-    ],
+    "topicIds": ["firsts", "house-of-representatives"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1467,14 +1124,8 @@
     "kind": "person",
     "displayName": "Douglas Wilder",
     "summary": "L. Douglas Wilder, grandson of enslaved Virginians, was sworn in January 13, 1990 as governor of Virginia, becoming the first African American ever elected governor of a U.S. state. He had earlier become Virginia's first Black lieutenant governor.",
-    "eraBuckets": [
-      "1980s",
-      "1990s"
-    ],
-    "topicTags": [
-      "firsts",
-      "governors"
-    ],
+    "eraBuckets": ["1980s", "1990s"],
+    "topicTags": ["firsts", "governors"],
     "jurisdictionLabel": "Richmond, Virginia",
     "locationPrecision": "institution",
     "locationLabel": "Virginia State Capitol, Richmond, Virginia",
@@ -1499,10 +1150,7 @@
       }
     ],
     "historicalContext": "Wilder had previously served as Virginia's first Black lieutenant governor, elected in 1985, before his historic 1989 gubernatorial win.",
-    "topicIds": [
-      "firsts",
-      "governors"
-    ],
+    "topicIds": ["firsts", "governors"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1511,13 +1159,8 @@
     "kind": "person",
     "displayName": "Carol Moseley Braun",
     "summary": "Carol Moseley Braun, a former Illinois state legislator and Cook County recorder of deeds, was elected to the U.S. Senate in 1992, becoming the first African American woman to serve in the Senate and only the second Black senator since Reconstruction.",
-    "eraBuckets": [
-      "1990s"
-    ],
-    "topicTags": [
-      "firsts",
-      "senate"
-    ],
+    "eraBuckets": ["1990s"],
+    "topicTags": ["firsts", "senate"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "United States Capitol, Washington, D.C.",
@@ -1542,10 +1185,7 @@
       }
     ],
     "historicalContext": "After leaving the Senate, Moseley Braun served as U.S. Ambassador to New Zealand and Samoa from 1999 to 2001.",
-    "topicIds": [
-      "firsts",
-      "senate"
-    ],
+    "topicIds": ["firsts", "senate"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1554,14 +1194,8 @@
     "kind": "person",
     "displayName": "Deval Patrick",
     "summary": "Deval Patrick, a former assistant U.S. attorney general for civil rights under President Clinton, took office January 4, 2007, as the first African American governor of Massachusetts and the second Black elected governor in U.S. history, after Douglas Wilder.",
-    "eraBuckets": [
-      "2000s",
-      "2010s"
-    ],
-    "topicTags": [
-      "firsts",
-      "governors"
-    ],
+    "eraBuckets": ["2000s", "2010s"],
+    "topicTags": ["firsts", "governors"],
     "jurisdictionLabel": "Boston, Massachusetts",
     "locationPrecision": "institution",
     "locationLabel": "Massachusetts State House, 24 Beacon Street, Boston, Massachusetts",
@@ -1586,13 +1220,8 @@
       }
     ],
     "historicalContext": "Patrick's election followed the state's first Democratic governor since Michael Dukakis left office in 1991.",
-    "topicIds": [
-      "firsts",
-      "governors"
-    ],
-    "mentionedEntityIds": [
-      "ent_douglas_wilder_001"
-    ],
+    "topicIds": ["firsts", "governors"],
+    "mentionedEntityIds": ["ent_douglas_wilder_001"],
     "keywords": []
   },
   {
@@ -1600,14 +1229,8 @@
     "kind": "person",
     "displayName": "David Paterson",
     "summary": "David A. Paterson, New York's first Black lieutenant governor, was sworn in as governor on March 17, 2008, after Eliot Spitzer's resignation, becoming the first African American governor of New York and the fourth Black governor in U.S. history.",
-    "eraBuckets": [
-      "2000s",
-      "2010s"
-    ],
-    "topicTags": [
-      "firsts",
-      "governors"
-    ],
+    "eraBuckets": ["2000s", "2010s"],
+    "topicTags": ["firsts", "governors"],
     "jurisdictionLabel": "Albany, New York",
     "locationPrecision": "institution",
     "locationLabel": "New York State Capitol, Albany, New York",
@@ -1632,10 +1255,7 @@
       }
     ],
     "historicalContext": "Paterson was also the first legally blind person to serve as governor of a U.S. state.",
-    "topicIds": [
-      "firsts",
-      "governors"
-    ],
+    "topicIds": ["firsts", "governors"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1644,13 +1264,8 @@
     "kind": "person",
     "displayName": "Augustus Hawkins",
     "summary": "Augustus \"Gus\" Hawkins, first elected to the California State Assembly in 1934, won election to Congress in 1962, becoming California's first Black congressman and the first Black member of Congress from any state west of the Mississippi River.",
-    "eraBuckets": [
-      "1960s"
-    ],
-    "topicTags": [
-      "firsts",
-      "house-of-representatives"
-    ],
+    "eraBuckets": ["1960s"],
+    "topicTags": ["firsts", "house-of-representatives"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "United States Capitol, Washington, D.C.",
@@ -1675,10 +1290,7 @@
       }
     ],
     "historicalContext": "Hawkins later co-authored the Humphrey-Hawkins Full Employment Act of 1978, one of the signature legislative achievements of his congressional career.",
-    "topicIds": [
-      "firsts",
-      "house-of-representatives"
-    ],
+    "topicIds": ["firsts", "house-of-representatives"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1687,15 +1299,8 @@
     "kind": "person",
     "displayName": "William L. Dawson",
     "summary": "William Levi Dawson represented a Chicago congressional district for more than 27 years and, in 1949, became the first African American to chair a standing committee of the U.S. House of Representatives, leading the Committee on Expenditures in the Executive Departments.",
-    "eraBuckets": [
-      "1940s",
-      "1950s",
-      "1960s"
-    ],
-    "topicTags": [
-      "firsts",
-      "house-of-representatives"
-    ],
+    "eraBuckets": ["1940s", "1950s", "1960s"],
+    "topicTags": ["firsts", "house-of-representatives"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "United States Capitol, Washington, D.C.",
@@ -1720,13 +1325,8 @@
       }
     ],
     "historicalContext": "Dawson's committee chairmanship predated Adam Clayton Powell Jr.'s better-known 1961 chairmanship of the Education and Labor Committee by more than a decade.",
-    "topicIds": [
-      "firsts",
-      "house-of-representatives"
-    ],
-    "mentionedEntityIds": [
-      "ent_adam_clayton_powell_001"
-    ],
+    "topicIds": ["firsts", "house-of-representatives"],
+    "mentionedEntityIds": ["ent_adam_clayton_powell_001"],
     "keywords": []
   },
   {
@@ -1734,13 +1334,8 @@
     "kind": "person",
     "displayName": "Adam Clayton Powell Jr.",
     "summary": "Adam Clayton Powell Jr. represented Harlem in Congress from 1945 to 1971 and, in 1961, became chairman of the House Education and Labor Committee, then the most powerful position held by an African American in Congress, shepherding major Great Society legislation.",
-    "eraBuckets": [
-      "1960s"
-    ],
-    "topicTags": [
-      "firsts",
-      "house-of-representatives"
-    ],
+    "eraBuckets": ["1960s"],
+    "topicTags": ["firsts", "house-of-representatives"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "United States Capitol, Washington, D.C.",
@@ -1765,10 +1360,7 @@
       }
     ],
     "historicalContext": "Powell represented New York's Harlem-based district for thirteen terms before the House Democratic Caucus stripped his chairmanship in January 1967 amid a contempt case and ethics disputes.",
-    "topicIds": [
-      "firsts",
-      "house-of-representatives"
-    ],
+    "topicIds": ["firsts", "house-of-representatives"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1777,13 +1369,8 @@
     "kind": "person",
     "displayName": "Mervyn Dymally",
     "summary": "Mervyn Dymally, a Trinidad-born California state senator, was elected the state's first Black lieutenant governor in 1974, serving from 1975 to 1979, when he cast the tie-breaking vote enacting California's first major gay rights legislation.",
-    "eraBuckets": [
-      "1970s"
-    ],
-    "topicTags": [
-      "firsts",
-      "governors"
-    ],
+    "eraBuckets": ["1970s"],
+    "topicTags": ["firsts", "governors"],
     "jurisdictionLabel": "Sacramento, California",
     "locationPrecision": "institution",
     "locationLabel": "California State Capitol, Sacramento, California",
@@ -1808,10 +1395,7 @@
       }
     ],
     "historicalContext": "Dymally and George L. Brown of Colorado, elected the same year, were the first two African Americans elected lieutenant governor since Oscar Dunn's Reconstruction-era tenure in Louisiana.",
-    "topicIds": [
-      "firsts",
-      "governors"
-    ],
+    "topicIds": ["firsts", "governors"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1820,13 +1404,8 @@
     "kind": "person",
     "displayName": "Robert C. Weaver",
     "summary": "Robert C. Weaver was appointed by President Lyndon Johnson to lead the newly created Department of Housing and Urban Development on January 13, 1966, becoming the first African American to serve in a presidential Cabinet. HUD's headquarters building is named for him.",
-    "eraBuckets": [
-      "1960s"
-    ],
-    "topicTags": [
-      "firsts",
-      "cabinet"
-    ],
+    "eraBuckets": ["1960s"],
+    "topicTags": ["firsts", "cabinet"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "Robert C. Weaver Federal Building (HUD Headquarters), 451 7th Street SW, Washington, D.C.",
@@ -1851,13 +1430,8 @@
       }
     ],
     "historicalContext": "As HUD secretary, Weaver championed the Fair Housing Act of 1968, which banned housing discrimination nationwide.",
-    "topicIds": [
-      "firsts",
-      "cabinet"
-    ],
-    "mentionedEntityIds": [
-      "ent_law_fair_housing_act_1968"
-    ],
+    "topicIds": ["firsts", "cabinet"],
+    "mentionedEntityIds": ["ent_law_fair_housing_act_1968"],
     "keywords": []
   },
   {
@@ -1865,14 +1439,8 @@
     "kind": "person",
     "displayName": "Patricia Roberts Harris",
     "summary": "Patricia Roberts Harris, daughter of a Pullman car waiter, was appointed Secretary of Housing and Urban Development by President Carter in 1977, becoming the first African American woman in a U.S. presidential Cabinet; she later also led the Department of Health and Human Services.",
-    "eraBuckets": [
-      "1970s",
-      "1980s"
-    ],
-    "topicTags": [
-      "firsts",
-      "cabinet"
-    ],
+    "eraBuckets": ["1970s", "1980s"],
+    "topicTags": ["firsts", "cabinet"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "Robert C. Weaver Federal Building (HUD Headquarters), 451 7th Street SW, Washington, D.C.",
@@ -1897,13 +1465,8 @@
       }
     ],
     "historicalContext": "Harris served in the same HUD headquarters building later named for her Cabinet predecessor Robert C. Weaver, the first Black Cabinet secretary.",
-    "topicIds": [
-      "firsts",
-      "cabinet"
-    ],
-    "mentionedEntityIds": [
-      "ent_robert_c_weaver_001"
-    ],
+    "topicIds": ["firsts", "cabinet"],
+    "mentionedEntityIds": ["ent_robert_c_weaver_001"],
     "keywords": []
   },
   {
@@ -1911,17 +1474,8 @@
     "kind": "person",
     "displayName": "Thurgood Marshall",
     "summary": "Thurgood Marshall, the NAACP Legal Defense Fund attorney who argued Brown v. Board of Education, was sworn in October 2, 1967, as the first African American justice of the U.S. Supreme Court, serving 24 years and consistently opposing racial and gender discrimination.",
-    "eraBuckets": [
-      "1960s",
-      "1970s",
-      "1980s",
-      "1990s"
-    ],
-    "topicTags": [
-      "firsts",
-      "supreme-court",
-      "judiciary"
-    ],
+    "eraBuckets": ["1960s", "1970s", "1980s", "1990s"],
+    "topicTags": ["firsts", "supreme-court", "judiciary"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "Supreme Court of the United States, 1 First Street NE, Washington, D.C.",
@@ -1946,14 +1500,8 @@
       }
     ],
     "historicalContext": "Marshall served on the Supreme Court for 24 years, until 1991, consistently opposing the death penalty and defending civil rights and affirmative action.",
-    "topicIds": [
-      "firsts",
-      "supreme-court",
-      "judiciary"
-    ],
-    "mentionedEntityIds": [
-      "ent_case_brown_v_board_of_education_1954"
-    ],
+    "topicIds": ["firsts", "supreme-court", "judiciary"],
+    "mentionedEntityIds": ["ent_case_brown_v_board_of_education_1954"],
     "keywords": []
   },
   {
@@ -1961,14 +1509,8 @@
     "kind": "person",
     "displayName": "Constance Baker Motley",
     "summary": "Constance Baker Motley, an NAACP Legal Defense Fund attorney who won nine of ten civil rights cases she argued before the Supreme Court, was confirmed to the U.S. District Court for the Southern District of New York in 1966, becoming the first Black woman federal judge.",
-    "eraBuckets": [
-      "1960s",
-      "1980s"
-    ],
-    "topicTags": [
-      "firsts",
-      "judiciary"
-    ],
+    "eraBuckets": ["1960s", "1980s"],
+    "topicTags": ["firsts", "judiciary"],
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "city",
     "locationLabel": "New York, New York, seat of the U.S. District Court for the Southern District of New York",
@@ -1993,10 +1535,7 @@
       }
     ],
     "historicalContext": "Motley later served as Chief Judge of the Southern District of New York from 1982 to 1986, after facing a seven-month confirmation delay led by Senator James Eastland.",
-    "topicIds": [
-      "firsts",
-      "judiciary"
-    ],
+    "topicIds": ["firsts", "judiciary"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2005,13 +1544,8 @@
     "kind": "person",
     "displayName": "Jane Bolin",
     "summary": "Jane Matilda Bolin, the first Black woman to graduate from Yale Law School, was appointed by Mayor Fiorello La Guardia at the 1939 New York World's Fair to the city's Domestic Relations Court, becoming the first Black woman judge in the United States.",
-    "eraBuckets": [
-      "1930s"
-    ],
-    "topicTags": [
-      "firsts",
-      "judiciary"
-    ],
+    "eraBuckets": ["1930s"],
+    "topicTags": ["firsts", "judiciary"],
     "jurisdictionLabel": "Queens, New York",
     "locationPrecision": "institution",
     "locationLabel": "Flushing Meadows Corona Park, site of the 1939 New York World's Fair, Queens, New York",
@@ -2036,10 +1570,7 @@
       }
     ],
     "historicalContext": "Bolin served on the bench for forty years, through three renewed appointments, remaining the only Black woman judge in the country for two decades.",
-    "topicIds": [
-      "firsts",
-      "judiciary"
-    ],
+    "topicIds": ["firsts", "judiciary"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2048,15 +1579,8 @@
     "kind": "person",
     "displayName": "William Henry Hastie",
     "summary": "William Henry Hastie, appointed by President Roosevelt to the District Court of the Virgin Islands in 1937, became the first Black federal judge. In 1949 President Truman named him to the U.S. Court of Appeals for the Third Circuit, seated in Philadelphia, the first Black federal appellate judge.",
-    "eraBuckets": [
-      "1930s",
-      "1940s",
-      "1950s"
-    ],
-    "topicTags": [
-      "firsts",
-      "judiciary"
-    ],
+    "eraBuckets": ["1930s", "1940s", "1950s"],
+    "topicTags": ["firsts", "judiciary"],
     "jurisdictionLabel": "Philadelphia, Pennsylvania",
     "locationPrecision": "city",
     "locationLabel": "Philadelphia, Pennsylvania, seat of the U.S. Court of Appeals for the Third Circuit",
@@ -2081,10 +1605,7 @@
       }
     ],
     "historicalContext": "Hastie later served as a member of the Judicial Conference of the United States and assumed senior status on the Third Circuit in 1971.",
-    "topicIds": [
-      "firsts",
-      "judiciary"
-    ],
+    "topicIds": ["firsts", "judiciary"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2093,13 +1614,8 @@
     "kind": "person",
     "displayName": "Ron Brown",
     "summary": "Ron Brown, former chairman of the Democratic National Committee, was confirmed as U.S. Secretary of Commerce in January 1993, becoming the first African American to hold the post. He led major overseas trade missions before his death in a 1996 plane crash.",
-    "eraBuckets": [
-      "1990s"
-    ],
-    "topicTags": [
-      "firsts",
-      "cabinet"
-    ],
+    "eraBuckets": ["1990s"],
+    "topicTags": ["firsts", "cabinet"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "city",
     "locationLabel": "Washington, D.C., seat of the U.S. Department of Commerce",
@@ -2124,10 +1640,7 @@
       }
     ],
     "historicalContext": "Brown had previously chaired the Democratic National Committee from 1987 to 1993, the first African American to lead a major U.S. political party.",
-    "topicIds": [
-      "firsts",
-      "cabinet"
-    ],
+    "topicIds": ["firsts", "cabinet"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2136,13 +1649,8 @@
     "kind": "person",
     "displayName": "Mike Espy",
     "summary": "Mike Espy, a former Mississippi congressman, was confirmed as U.S. Secretary of Agriculture in January 1993, becoming the first African American and the first Deep South native to hold the post.",
-    "eraBuckets": [
-      "1990s"
-    ],
-    "topicTags": [
-      "firsts",
-      "cabinet"
-    ],
+    "eraBuckets": ["1990s"],
+    "topicTags": ["firsts", "cabinet"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "city",
     "locationLabel": "Washington, D.C., seat of the U.S. Department of Agriculture",
@@ -2167,10 +1675,7 @@
       }
     ],
     "historicalContext": "Espy resigned as Agriculture Secretary in October 1994 amid a gifts investigation and was later acquitted of all charges in 1998.",
-    "topicIds": [
-      "firsts",
-      "cabinet"
-    ],
+    "topicIds": ["firsts", "cabinet"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2179,14 +1684,8 @@
     "kind": "person",
     "displayName": "Alexis Herman",
     "summary": "Alexis Herman, raised in the segregated South, was sworn in May 9, 1997, as U.S. Secretary of Labor, becoming the first African American to hold the post. She mediated the 1997 UPS workers' strike within her first months in office.",
-    "eraBuckets": [
-      "1990s",
-      "2000s"
-    ],
-    "topicTags": [
-      "firsts",
-      "cabinet"
-    ],
+    "eraBuckets": ["1990s", "2000s"],
+    "topicTags": ["firsts", "cabinet"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "city",
     "locationLabel": "Washington, D.C., seat of the U.S. Department of Labor",
@@ -2211,10 +1710,7 @@
       }
     ],
     "historicalContext": "Herman served as Secretary of Labor from 1997 to 2001, under President Clinton.",
-    "topicIds": [
-      "firsts",
-      "cabinet"
-    ],
+    "topicIds": ["firsts", "cabinet"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2223,15 +1719,8 @@
     "kind": "person",
     "displayName": "William T. Coleman Jr.",
     "summary": "William T. Coleman Jr., co-author of the legal brief in Brown v. Board of Education and the Supreme Court's first Black law clerk, was appointed Secretary of Transportation in 1975, becoming only the second African American Cabinet secretary in U.S. history.",
-    "eraBuckets": [
-      "1940s",
-      "1950s",
-      "1970s"
-    ],
-    "topicTags": [
-      "firsts",
-      "cabinet"
-    ],
+    "eraBuckets": ["1940s", "1950s", "1970s"],
+    "topicTags": ["firsts", "cabinet"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "city",
     "locationLabel": "Washington, D.C., seat of the U.S. Department of Transportation",
@@ -2256,14 +1745,8 @@
       }
     ],
     "historicalContext": "Coleman was awarded the Presidential Medal of Freedom in 1995 for a career spanning civil rights litigation and federal service.",
-    "topicIds": [
-      "firsts",
-      "cabinet"
-    ],
-    "mentionedEntityIds": [
-      "ent_case_brown_v_board_of_education_1954",
-      "ent_robert_c_weaver_001"
-    ],
+    "topicIds": ["firsts", "cabinet"],
+    "mentionedEntityIds": ["ent_case_brown_v_board_of_education_1954", "ent_robert_c_weaver_001"],
     "keywords": []
   },
   {
@@ -2271,14 +1754,8 @@
     "kind": "person",
     "displayName": "Jesse Brown",
     "summary": "Jesse Brown, a disabled Marine Corps veteran of the Vietnam War, was confirmed unanimously as U.S. Secretary of Veterans Affairs in January 1993, becoming the first African American to hold the post and the first former enlisted service member to lead the department.",
-    "eraBuckets": [
-      "1990s"
-    ],
-    "topicTags": [
-      "firsts",
-      "cabinet",
-      "military"
-    ],
+    "eraBuckets": ["1990s"],
+    "topicTags": ["firsts", "cabinet", "military"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "city",
     "locationLabel": "Washington, D.C., seat of the U.S. Department of Veterans Affairs",
@@ -2303,11 +1780,7 @@
       }
     ],
     "historicalContext": "Brown led the VA from 1993 to 1997, expanding services for female, homeless, and chemically exposed veterans while increasing the department's funding.",
-    "topicIds": [
-      "firsts",
-      "cabinet",
-      "military"
-    ],
+    "topicIds": ["firsts", "cabinet", "military"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2316,13 +1789,8 @@
     "kind": "person",
     "displayName": "Hazel O'Leary",
     "summary": "Hazel R. O'Leary was confirmed by unanimous consent as U.S. Secretary of Energy in January 1993, becoming the first woman and first African American to hold the post. She later declassified Cold War-era radiation experiment records.",
-    "eraBuckets": [
-      "1990s"
-    ],
-    "topicTags": [
-      "firsts",
-      "cabinet"
-    ],
+    "eraBuckets": ["1990s"],
+    "topicTags": ["firsts", "cabinet"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "city",
     "locationLabel": "Washington, D.C., seat of the U.S. Department of Energy",
@@ -2347,10 +1815,7 @@
       }
     ],
     "historicalContext": "O'Leary served as Energy Secretary from 1993 to 1997 under President Clinton.",
-    "topicIds": [
-      "firsts",
-      "cabinet"
-    ],
+    "topicIds": ["firsts", "cabinet"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2359,13 +1824,8 @@
     "kind": "person",
     "displayName": "Franklin Raines",
     "summary": "Franklin Raines was named director of the White House Office of Management and Budget in 1996, becoming the first African American to hold the post overseeing the entire federal budget, and helped negotiate the Balanced Budget Act of 1997.",
-    "eraBuckets": [
-      "1990s"
-    ],
-    "topicTags": [
-      "firsts",
-      "cabinet"
-    ],
+    "eraBuckets": ["1990s"],
+    "topicTags": ["firsts", "cabinet"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "city",
     "locationLabel": "Washington, D.C., seat of the Office of Management and Budget",
@@ -2390,10 +1850,7 @@
       }
     ],
     "historicalContext": "Raines's OMB tenure came amid a wave of Clinton-era Black Cabinet-level appointments across federal agencies.",
-    "topicIds": [
-      "firsts",
-      "cabinet"
-    ],
+    "topicIds": ["firsts", "cabinet"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2402,14 +1859,8 @@
     "kind": "person",
     "displayName": "Rod Paige",
     "summary": "Rod Paige, former superintendent of the Houston Independent School District, was confirmed January 21, 2001, as U.S. Secretary of Education, becoming the first African American to hold the post and the first former school superintendent to lead the department.",
-    "eraBuckets": [
-      "2000s"
-    ],
-    "topicTags": [
-      "firsts",
-      "cabinet",
-      "education"
-    ],
+    "eraBuckets": ["2000s"],
+    "topicTags": ["firsts", "cabinet", "education"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "city",
     "locationLabel": "Washington, D.C., seat of the U.S. Department of Education",
@@ -2434,11 +1885,7 @@
       }
     ],
     "historicalContext": "Paige served as Education Secretary from 2001 to 2005 and was central to developing the No Child Left Behind Act of 2002.",
-    "topicIds": [
-      "firsts",
-      "cabinet",
-      "education"
-    ],
+    "topicIds": ["firsts", "cabinet", "education"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2447,16 +1894,8 @@
     "kind": "person",
     "displayName": "Colin Powell",
     "summary": "Colin Powell became the youngest and first Black Chairman of the Joint Chiefs of Staff in 1989, serving through the Gulf War, then in 2001 became the first African American U.S. Secretary of State, the highest-ranking Black American in the federal executive branch before Barack Obama's election.",
-    "eraBuckets": [
-      "1980s",
-      "1990s",
-      "2000s"
-    ],
-    "topicTags": [
-      "firsts",
-      "military",
-      "cabinet"
-    ],
+    "eraBuckets": ["1980s", "1990s", "2000s"],
+    "topicTags": ["firsts", "military", "cabinet"],
     "jurisdictionLabel": "Arlington, Virginia",
     "locationPrecision": "institution",
     "locationLabel": "The Pentagon, Arlington, Virginia",
@@ -2481,15 +1920,8 @@
       }
     ],
     "historicalContext": "Powell served as Chairman of the Joint Chiefs at the Pentagon before his later Cabinet post; he remained, with successor Condoleezza Rice, the highest-ranking Black American in the federal executive branch until Barack Obama's 2008 election.",
-    "topicIds": [
-      "firsts",
-      "military",
-      "cabinet"
-    ],
-    "mentionedEntityIds": [
-      "ent_barack_obama_001",
-      "ent_condoleezza_rice_001"
-    ],
+    "topicIds": ["firsts", "military", "cabinet"],
+    "mentionedEntityIds": ["ent_barack_obama_001", "ent_condoleezza_rice_001"],
     "keywords": []
   },
   {
@@ -2497,13 +1929,8 @@
     "kind": "person",
     "displayName": "Condoleezza Rice",
     "summary": "Condoleezza Rice was sworn in January 26, 2005, as the first African American woman to serve as U.S. Secretary of State; she had already become the first woman to serve as National Security Advisor under President George W. Bush.",
-    "eraBuckets": [
-      "2000s"
-    ],
-    "topicTags": [
-      "firsts",
-      "cabinet"
-    ],
+    "eraBuckets": ["2000s"],
+    "topicTags": ["firsts", "cabinet"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "city",
     "locationLabel": "Washington, D.C., seat of the U.S. Department of State",
@@ -2528,13 +1955,8 @@
       }
     ],
     "historicalContext": "Rice was the second consecutive Black Secretary of State, following Colin Powell, during the George W. Bush administration.",
-    "topicIds": [
-      "firsts",
-      "cabinet"
-    ],
-    "mentionedEntityIds": [
-      "ent_colin_powell_001"
-    ],
+    "topicIds": ["firsts", "cabinet"],
+    "mentionedEntityIds": ["ent_colin_powell_001"],
     "keywords": []
   },
   {
@@ -2542,14 +1964,8 @@
     "kind": "person",
     "displayName": "Eric Holder",
     "summary": "Eric Holder was confirmed by the Senate on February 2, 2009, and installed the next day as U.S. Attorney General, becoming the first African American to hold the nation's chief law enforcement post.",
-    "eraBuckets": [
-      "2000s",
-      "2010s"
-    ],
-    "topicTags": [
-      "firsts",
-      "cabinet"
-    ],
+    "eraBuckets": ["2000s", "2010s"],
+    "topicTags": ["firsts", "cabinet"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "city",
     "locationLabel": "Washington, D.C., seat of the U.S. Department of Justice",
@@ -2574,10 +1990,7 @@
       }
     ],
     "historicalContext": "Holder's tenure spanned the first six years of the Obama administration, including major civil rights and voting rights enforcement initiatives.",
-    "topicIds": [
-      "firsts",
-      "cabinet"
-    ],
+    "topicIds": ["firsts", "cabinet"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2586,14 +1999,8 @@
     "kind": "person",
     "displayName": "Barack Obama",
     "summary": "Barack Obama was inaugurated January 20, 2009, on the steps of the U.S. Capitol as the 44th President of the United States, becoming the first African American to hold the nation's highest office, before an estimated crowd of 1.8 million people.",
-    "eraBuckets": [
-      "2000s",
-      "2010s"
-    ],
-    "topicTags": [
-      "firsts",
-      "president"
-    ],
+    "eraBuckets": ["2000s", "2010s"],
+    "topicTags": ["firsts", "president"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "United States Capitol, Washington, D.C.",
@@ -2618,10 +2025,7 @@
       }
     ],
     "historicalContext": "Obama took his oath on the Bible used at Abraham Lincoln's first 1861 inauguration, administered by Chief Justice John Roberts.",
-    "topicIds": [
-      "firsts",
-      "president"
-    ],
+    "topicIds": ["firsts", "president"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2630,13 +2034,8 @@
     "kind": "person",
     "displayName": "Kamala Harris",
     "summary": "Kamala Harris was sworn in January 20, 2021, outside the U.S. Capitol as the 49th Vice President of the United States, becoming the first woman, first Black American, and first person of South Asian descent to hold the office.",
-    "eraBuckets": [
-      "2020s"
-    ],
-    "topicTags": [
-      "firsts",
-      "vice-president"
-    ],
+    "eraBuckets": ["2020s"],
+    "topicTags": ["firsts", "vice-president"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "United States Capitol, Washington, D.C.",
@@ -2661,13 +2060,8 @@
       }
     ],
     "historicalContext": "Harris was sworn in on the 100th anniversary year of the ratification of women's suffrage in the United States.",
-    "topicIds": [
-      "firsts",
-      "vice-president"
-    ],
-    "mentionedEntityIds": [
-      "ent_thurgood_marshall_001"
-    ],
+    "topicIds": ["firsts", "vice-president"],
+    "mentionedEntityIds": ["ent_thurgood_marshall_001"],
     "keywords": []
   },
   {
@@ -2675,14 +2069,8 @@
     "kind": "person",
     "displayName": "Ketanji Brown Jackson",
     "summary": "Ketanji Brown Jackson, a former federal public defender, was confirmed by the Senate in April 2022 and sworn in June 30, 2022, as the 116th Justice of the U.S. Supreme Court, becoming the first Black woman to serve on the nation's highest court.",
-    "eraBuckets": [
-      "2020s"
-    ],
-    "topicTags": [
-      "firsts",
-      "supreme-court",
-      "judiciary"
-    ],
+    "eraBuckets": ["2020s"],
+    "topicTags": ["firsts", "supreme-court", "judiciary"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "Supreme Court of the United States, 1 First Street NE, Washington, D.C.",
@@ -2707,11 +2095,7 @@
       }
     ],
     "historicalContext": "The Senate confirmed Jackson 53-47 in April 2022; she took her seat when Justice Stephen Breyer's retirement took effect that June.",
-    "topicIds": [
-      "firsts",
-      "supreme-court",
-      "judiciary"
-    ],
+    "topicIds": ["firsts", "supreme-court", "judiciary"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2720,13 +2104,8 @@
     "kind": "person",
     "displayName": "Loretta Lynch",
     "summary": "Loretta Lynch was sworn in April 27, 2015, as U.S. Attorney General, becoming the first African American woman to hold the nation's chief law enforcement post, after one of the longest Senate confirmation processes in history.",
-    "eraBuckets": [
-      "2010s"
-    ],
-    "topicTags": [
-      "firsts",
-      "cabinet"
-    ],
+    "eraBuckets": ["2010s"],
+    "topicTags": ["firsts", "cabinet"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "city",
     "locationLabel": "Washington, D.C., seat of the U.S. Department of Justice",
@@ -2751,10 +2130,7 @@
       }
     ],
     "historicalContext": "As Attorney General from 2015 to 2017, Lynch prioritized police reform, opening a civil rights investigation of the Baltimore Police Department in her first weeks in office.",
-    "topicIds": [
-      "firsts",
-      "cabinet"
-    ],
+    "topicIds": ["firsts", "cabinet"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2763,14 +2139,8 @@
     "kind": "person",
     "displayName": "Susan Rice",
     "summary": "Susan Rice was sworn in as U.S. Ambassador to the United Nations in 2009, becoming the first African American woman to hold the post, before serving as National Security Advisor from 2013 to 2017.",
-    "eraBuckets": [
-      "2000s",
-      "2010s"
-    ],
-    "topicTags": [
-      "firsts",
-      "cabinet"
-    ],
+    "eraBuckets": ["2000s", "2010s"],
+    "topicTags": ["firsts", "cabinet"],
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "institution",
     "locationLabel": "United States Mission to the United Nations, 799 United Nations Plaza, New York, New York",
@@ -2795,13 +2165,8 @@
       }
     ],
     "historicalContext": "Rice's UN ambassadorship anchors this record since it was her first singular \"first,\" carried out from the U.S. Mission's headquarters across from UN headquarters in New York.",
-    "topicIds": [
-      "firsts",
-      "cabinet"
-    ],
-    "mentionedEntityIds": [
-      "ent_condoleezza_rice_001"
-    ],
+    "topicIds": ["firsts", "cabinet"],
+    "mentionedEntityIds": ["ent_condoleezza_rice_001"],
     "keywords": []
   },
   {
@@ -2809,14 +2174,8 @@
     "kind": "person",
     "displayName": "Lloyd Austin",
     "summary": "Retired four-star Army general Lloyd Austin was confirmed by the Senate 93-2 and sworn in January 22, 2021, as U.S. Secretary of Defense, becoming the first African American to lead the Pentagon.",
-    "eraBuckets": [
-      "2020s"
-    ],
-    "topicTags": [
-      "firsts",
-      "cabinet",
-      "military"
-    ],
+    "eraBuckets": ["2020s"],
+    "topicTags": ["firsts", "cabinet", "military"],
     "jurisdictionLabel": "Arlington, Virginia",
     "locationPrecision": "institution",
     "locationLabel": "The Pentagon, Arlington, Virginia",
@@ -2841,14 +2200,8 @@
       }
     ],
     "historicalContext": "Austin served as a four-star Army general before his Cabinet appointment, leading U.S. Central Command from 2013 to 2016.",
-    "topicIds": [
-      "firsts",
-      "cabinet",
-      "military"
-    ],
-    "mentionedEntityIds": [
-      "ent_kamala_harris_001"
-    ],
+    "topicIds": ["firsts", "cabinet", "military"],
+    "mentionedEntityIds": ["ent_kamala_harris_001"],
     "keywords": []
   },
   {
@@ -2856,15 +2209,8 @@
     "kind": "person",
     "displayName": "Henry O. Flipper",
     "summary": "Henry Ossian Flipper, born enslaved in Georgia, graduated from the United States Military Academy at West Point on June 14, 1877, becoming the first African American to graduate from West Point and the first non-white officer to lead Buffalo Soldiers of the 10th Cavalry.",
-    "eraBuckets": [
-      "1870s",
-      "1880s"
-    ],
-    "topicTags": [
-      "firsts",
-      "military",
-      "army"
-    ],
+    "eraBuckets": ["1870s", "1880s"],
+    "topicTags": ["firsts", "military", "army"],
     "jurisdictionLabel": "West Point, New York",
     "locationPrecision": "campus",
     "locationLabel": "United States Military Academy, West Point, New York",
@@ -2889,11 +2235,7 @@
       }
     ],
     "historicalContext": "Flipper was dismissed from the Army in 1882 on disputed charges; the Army upgraded his discharge to honorable in 1976, and President Clinton granted him a full pardon in 1999.",
-    "topicIds": [
-      "firsts",
-      "military",
-      "army"
-    ],
+    "topicIds": ["firsts", "military", "army"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2902,14 +2244,8 @@
     "kind": "person",
     "displayName": "Benjamin O. Davis Sr.",
     "summary": "Benjamin Oliver Davis Sr. was promoted to brigadier general on October 25, 1940, becoming the U.S. Army's first African American general officer, after rising through the ranks including command of the New York National Guard's 369th Infantry Regiment.",
-    "eraBuckets": [
-      "1940s"
-    ],
-    "topicTags": [
-      "firsts",
-      "military",
-      "army"
-    ],
+    "eraBuckets": ["1940s"],
+    "topicTags": ["firsts", "military", "army"],
     "jurisdictionLabel": "Arlington, Virginia",
     "locationPrecision": "campus",
     "locationLabel": "Arlington National Cemetery, Section 2, Arlington, Virginia",
@@ -2934,14 +2270,8 @@
       }
     ],
     "historicalContext": "From 1941 to 1944, Davis Sr. conducted inspection tours of African American Army units and advised on policies affecting Black troop deployment and training.",
-    "topicIds": [
-      "firsts",
-      "military",
-      "army"
-    ],
-    "mentionedEntityIds": [
-      "ent_benjamin_davis_jr_001"
-    ],
+    "topicIds": ["firsts", "military", "army"],
+    "mentionedEntityIds": ["ent_benjamin_davis_jr_001"],
     "keywords": []
   },
   {
@@ -2949,16 +2279,8 @@
     "kind": "person",
     "displayName": "Benjamin O. Davis Jr.",
     "summary": "Benjamin O. Davis Jr., the only Black cadet at West Point during his four years there, commanded the Tuskegee Airmen's 99th Fighter Squadron and 332nd Fighter Group in World War II and became the first Black general in the U.S. Air Force; in 1998 he was advanced to four-star general in retirement.",
-    "eraBuckets": [
-      "1940s",
-      "1950s",
-      "1990s"
-    ],
-    "topicTags": [
-      "firsts",
-      "military",
-      "air-force"
-    ],
+    "eraBuckets": ["1940s", "1950s", "1990s"],
+    "topicTags": ["firsts", "military", "air-force"],
     "jurisdictionLabel": "Arlington, Virginia",
     "locationPrecision": "campus",
     "locationLabel": "Arlington National Cemetery, Section 2, Arlington, Virginia",
@@ -2983,15 +2305,8 @@
       }
     ],
     "historicalContext": "The Tuskegee Airmen under Davis Jr.'s command flew more than 15,000 sorties and shot down 112 enemy aircraft, one of the most decorated fighter units of the war.",
-    "topicIds": [
-      "firsts",
-      "military",
-      "air-force"
-    ],
-    "mentionedEntityIds": [
-      "ent_benjamin_davis_sr_001",
-      "ent_tuskegee_university_001"
-    ],
+    "topicIds": ["firsts", "military", "air-force"],
+    "mentionedEntityIds": ["ent_benjamin_davis_sr_001", "ent_tuskegee_university_001"],
     "keywords": []
   },
   {
@@ -2999,15 +2314,8 @@
     "kind": "person",
     "displayName": "Charles Young",
     "summary": "Charles Young, the third African American graduate of West Point, became the U.S. Army's first Black colonel and its highest-ranking Black officer until his death in 1922. He led a cavalry charge against Pancho Villa's forces in 1916 and taught military science at Wilberforce University.",
-    "eraBuckets": [
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "firsts",
-      "military",
-      "army"
-    ],
+    "eraBuckets": ["1910s", "1920s"],
+    "topicTags": ["firsts", "military", "army"],
     "jurisdictionLabel": "Wilberforce, Ohio",
     "locationPrecision": "institution",
     "locationLabel": "Charles Young Buffalo Soldiers National Monument, 1120 US Route 42, Wilberforce, Ohio",
@@ -3032,14 +2340,8 @@
       }
     ],
     "historicalContext": "In 1916, Young led a cavalry charge against Pancho Villa's forces in Mexico without losing a single soldier, one of the highlights of a career that also included service as the first Black U.S. national park superintendent.",
-    "topicIds": [
-      "firsts",
-      "military",
-      "army"
-    ],
-    "mentionedEntityIds": [
-      "ent_wilberforce_university_001"
-    ],
+    "topicIds": ["firsts", "military", "army"],
+    "mentionedEntityIds": ["ent_wilberforce_university_001"],
     "keywords": []
   },
   {
@@ -3047,14 +2349,8 @@
     "kind": "person",
     "displayName": "Doris \"Dorie\" Miller",
     "summary": "Doris \"Dorie\" Miller, a mess attendant aboard the USS West Virginia, carried wounded sailors to safety and manned an anti-aircraft gun during the December 7, 1941 attack on Pearl Harbor. In May 1942 he became the first Black American awarded the Navy Cross.",
-    "eraBuckets": [
-      "1940s"
-    ],
-    "topicTags": [
-      "firsts",
-      "military",
-      "navy"
-    ],
+    "eraBuckets": ["1940s"],
+    "topicTags": ["firsts", "military", "navy"],
     "jurisdictionLabel": "Waco, Texas",
     "locationPrecision": "city",
     "locationLabel": "Waco, Texas, Miller's hometown and site of the Doris Miller Memorial",
@@ -3079,11 +2375,7 @@
       }
     ],
     "historicalContext": "Miller was killed in action in November 1943 when his escort carrier, USS Liscome Bay, was torpedoed during the Gilbert Islands campaign.",
-    "topicIds": [
-      "firsts",
-      "military",
-      "navy"
-    ],
+    "topicIds": ["firsts", "military", "navy"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -3092,15 +2384,8 @@
     "kind": "person",
     "displayName": "Vernon Baker",
     "summary": "Vernon Baker, an Army lieutenant, led an assault that eliminated multiple enemy positions near Viareggio, Italy in April 1945. Denied recognition for decades due to racial bias in the awards process, he received the Medal of Honor from President Clinton in 1997, one of seven Black World War II recipients.",
-    "eraBuckets": [
-      "1940s",
-      "1990s"
-    ],
-    "topicTags": [
-      "firsts",
-      "military",
-      "army"
-    ],
+    "eraBuckets": ["1940s", "1990s"],
+    "topicTags": ["firsts", "military", "army"],
     "jurisdictionLabel": "Arlington, Virginia",
     "locationPrecision": "campus",
     "locationLabel": "Arlington National Cemetery, Section 59, Arlington, Virginia",
@@ -3125,14 +2410,8 @@
       }
     ],
     "historicalContext": "A 1993 Army-commissioned Shaw University study found systematic racial discrimination had denied Black World War II soldiers Medal of Honor consideration, leading to the 1997 awards.",
-    "topicIds": [
-      "firsts",
-      "military",
-      "army"
-    ],
-    "mentionedEntityIds": [
-      "ent_shaw_university_001"
-    ],
+    "topicIds": ["firsts", "military", "army"],
+    "mentionedEntityIds": ["ent_shaw_university_001"],
     "keywords": []
   },
   {
@@ -3140,14 +2419,8 @@
     "kind": "person",
     "displayName": "Marcelite Harris",
     "summary": "Marcelite Jordan Harris, a Spelman College graduate and Air Force maintenance officer, became the first Black woman general in the U.S. Air Force in 1991 and, in 1995, the first Black woman major general in the history of the U.S. armed forces.",
-    "eraBuckets": [
-      "1990s"
-    ],
-    "topicTags": [
-      "firsts",
-      "military",
-      "air-force"
-    ],
+    "eraBuckets": ["1990s"],
+    "topicTags": ["firsts", "military", "air-force"],
     "jurisdictionLabel": "Arlington, Virginia",
     "locationPrecision": "campus",
     "locationLabel": "Arlington National Cemetery, Arlington, Virginia",
@@ -3172,14 +2445,8 @@
       }
     ],
     "historicalContext": "Harris retired in 1997 as the highest-ranking female officer in the Air Force and the nation's highest-ranking African American woman in the Department of Defense.",
-    "topicIds": [
-      "firsts",
-      "military",
-      "air-force"
-    ],
-    "mentionedEntityIds": [
-      "ent_spelman_college_001"
-    ],
+    "topicIds": ["firsts", "military", "air-force"],
+    "mentionedEntityIds": ["ent_spelman_college_001"],
     "keywords": []
   },
   {
@@ -3187,15 +2454,8 @@
     "kind": "person",
     "displayName": "Michelle Howard",
     "summary": "Michelle Howard, a 1982 U.S. Naval Academy graduate, became the first Black woman to command a Navy combatant ship in 1999 and, in 2014, the first woman four-star admiral in U.S. history, later commanding NATO's Allied Joint Force Command Naples.",
-    "eraBuckets": [
-      "1980s",
-      "2010s"
-    ],
-    "topicTags": [
-      "firsts",
-      "military",
-      "navy"
-    ],
+    "eraBuckets": ["1980s", "2010s"],
+    "topicTags": ["firsts", "military", "navy"],
     "jurisdictionLabel": "Annapolis, Maryland",
     "locationPrecision": "campus",
     "locationLabel": "United States Naval Academy, Annapolis, Maryland",
@@ -3220,11 +2480,7 @@
       }
     ],
     "historicalContext": "Howard graduated from the U.S. Naval Academy in 1982 and went on to command U.S. Naval Forces Europe-Africa and NATO's Allied Joint Force Command Naples from 2016 to 2017.",
-    "topicIds": [
-      "firsts",
-      "military",
-      "navy"
-    ],
+    "topicIds": ["firsts", "military", "navy"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -3233,15 +2489,8 @@
     "kind": "person",
     "displayName": "Roscoe Robinson Jr.",
     "summary": "Roscoe Robinson Jr., a 1951 West Point graduate decorated for combat leadership in Vietnam, became the first African American to command the 82nd Airborne Division in 1976 and, on August 30, 1982, the first Black four-star general in U.S. Army history.",
-    "eraBuckets": [
-      "1970s",
-      "1980s"
-    ],
-    "topicTags": [
-      "firsts",
-      "military",
-      "army"
-    ],
+    "eraBuckets": ["1970s", "1980s"],
+    "topicTags": ["firsts", "military", "army"],
     "jurisdictionLabel": "Arlington, Virginia",
     "locationPrecision": "campus",
     "locationLabel": "Arlington National Cemetery, Arlington, Virginia",
@@ -3266,11 +2515,7 @@
       }
     ],
     "historicalContext": "Robinson died in 1993 at Walter Reed Army Medical Center and was buried at Arlington National Cemetery.",
-    "topicIds": [
-      "firsts",
-      "military",
-      "army"
-    ],
+    "topicIds": ["firsts", "military", "army"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -3279,14 +2524,8 @@
     "kind": "person",
     "displayName": "Daniel \"Chappie\" James Jr.",
     "summary": "Daniel \"Chappie\" James Jr., a Tuskegee-trained fighter pilot who flew combat missions in Korea and Vietnam, was promoted to four-star general on September 1, 1975, becoming the first African American to reach four-star rank in any branch of the U.S. armed forces.",
-    "eraBuckets": [
-      "1970s"
-    ],
-    "topicTags": [
-      "firsts",
-      "military",
-      "air-force"
-    ],
+    "eraBuckets": ["1970s"],
+    "topicTags": ["firsts", "military", "air-force"],
     "jurisdictionLabel": "Arlington, Virginia",
     "locationPrecision": "campus",
     "locationLabel": "Arlington National Cemetery, Section 2, Arlington, Virginia",
@@ -3311,14 +2550,8 @@
       }
     ],
     "historicalContext": "James trained Black pilots at Tuskegee during World War II before a combat career spanning the Korean and Vietnam wars.",
-    "topicIds": [
-      "firsts",
-      "military",
-      "air-force"
-    ],
-    "mentionedEntityIds": [
-      "ent_tuskegee_university_001"
-    ],
+    "topicIds": ["firsts", "military", "air-force"],
+    "mentionedEntityIds": ["ent_tuskegee_university_001"],
     "keywords": []
   },
   {
@@ -3326,15 +2559,8 @@
     "kind": "person",
     "displayName": "Samuel L. Gravely Jr.",
     "summary": "Samuel L. Gravely Jr. became, in 1961, the first Black naval officer to command a U.S. Navy ship, and in 1971 the first Black officer promoted to flag rank in the Navy, ultimately retiring as a vice admiral after commanding the Third Fleet.",
-    "eraBuckets": [
-      "1960s",
-      "1970s"
-    ],
-    "topicTags": [
-      "firsts",
-      "military",
-      "navy"
-    ],
+    "eraBuckets": ["1960s", "1970s"],
+    "topicTags": ["firsts", "military", "navy"],
     "jurisdictionLabel": "Arlington, Virginia",
     "locationPrecision": "campus",
     "locationLabel": "Arlington National Cemetery, Section 66, Arlington, Virginia",
@@ -3359,11 +2585,7 @@
       }
     ],
     "historicalContext": "Gravely is buried in Section 66 of Arlington National Cemetery following his death in 2004.",
-    "topicIds": [
-      "firsts",
-      "military",
-      "navy"
-    ],
+    "topicIds": ["firsts", "military", "navy"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -3372,15 +2594,8 @@
     "kind": "person",
     "displayName": "Frank E. Petersen Jr.",
     "summary": "Frank E. Petersen Jr., commissioned in 1952, became the first African American Marine Corps aviator, and on February 23, 1979, the first Black general in Marine Corps history, after flying 350 combat missions over two wars.",
-    "eraBuckets": [
-      "1950s",
-      "1970s"
-    ],
-    "topicTags": [
-      "firsts",
-      "military",
-      "marine-corps"
-    ],
+    "eraBuckets": ["1950s", "1970s"],
+    "topicTags": ["firsts", "military", "marine-corps"],
     "jurisdictionLabel": "Arlington, Virginia",
     "locationPrecision": "campus",
     "locationLabel": "Arlington National Cemetery, Arlington, Virginia",
@@ -3405,11 +2620,7 @@
       }
     ],
     "historicalContext": "Petersen retired in 1988 after 38 years of service and was buried at Arlington National Cemetery following his death in 2015.",
-    "topicIds": [
-      "firsts",
-      "military",
-      "marine-corps"
-    ],
+    "topicIds": ["firsts", "military", "marine-corps"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -3418,15 +2629,8 @@
     "kind": "person",
     "displayName": "Hazel Johnson-Brown",
     "summary": "Hazel Winifred Johnson-Brown, who had been denied nursing school admission in her native Pennsylvania because she was Black, became in 1979 the first Black woman general in the U.S. Army and the first Black chief of the Army Nurse Corps, commanding more than 7,000 nurses.",
-    "eraBuckets": [
-      "1970s"
-    ],
-    "topicTags": [
-      "firsts",
-      "military",
-      "army",
-      "medicine"
-    ],
+    "eraBuckets": ["1970s"],
+    "topicTags": ["firsts", "military", "army", "medicine"],
     "jurisdictionLabel": "Arlington, Virginia",
     "locationPrecision": "campus",
     "locationLabel": "Arlington National Cemetery, Section 60, Arlington, Virginia",
@@ -3451,12 +2655,7 @@
       }
     ],
     "historicalContext": "Johnson-Brown served in the Army from 1955 to 1983 and went on to earn a doctorate in educational administration from the Catholic University of America.",
-    "topicIds": [
-      "firsts",
-      "military",
-      "army",
-      "medicine"
-    ],
+    "topicIds": ["firsts", "military", "army", "medicine"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -3465,15 +2664,8 @@
     "kind": "person",
     "displayName": "Charity Adams Earley",
     "summary": "Charity Adams Earley became the first African American woman commissioned as an officer in the Women's Army Auxiliary Corps in 1942, and in 1945 commanded the 6888th Central Postal Directory Battalion, the only Black WAC unit deployed overseas in World War II. Fort Lee, Virginia was renamed Fort Gregg-Adams in her honor in 2023.",
-    "eraBuckets": [
-      "1940s",
-      "2020s"
-    ],
-    "topicTags": [
-      "firsts",
-      "military",
-      "army"
-    ],
+    "eraBuckets": ["1940s", "2020s"],
+    "topicTags": ["firsts", "military", "army"],
     "jurisdictionLabel": "Prince George County, Virginia",
     "locationPrecision": "campus",
     "locationLabel": "Fort Gregg-Adams (formerly Fort Lee), Prince George County, Virginia",
@@ -3498,11 +2690,7 @@
       }
     ],
     "historicalContext": "In 1945, Adams commanded the 6888th Central Postal Directory Battalion, the only African American and multi-ethnic WAC unit deployed overseas, which cleared a six-month mail backlog in England in three months; she and the battalion received the Congressional Gold Medal in 2022.",
-    "topicIds": [
-      "firsts",
-      "military",
-      "army"
-    ],
+    "topicIds": ["firsts", "military", "army"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -3511,15 +2699,8 @@
     "kind": "person",
     "displayName": "Nancy Leftenant-Colon",
     "summary": "Nancy Leftenant-Colon, repeatedly denied entry to the military as a Black nurse, was accepted as an Army Nurse Corps reservist in 1945 and, after President Truman's 1948 desegregation order, became the first Black woman integrated into the Regular Army Nurse Corps.",
-    "eraBuckets": [
-      "1940s"
-    ],
-    "topicTags": [
-      "firsts",
-      "military",
-      "army",
-      "medicine"
-    ],
+    "eraBuckets": ["1940s"],
+    "topicTags": ["firsts", "military", "army", "medicine"],
     "jurisdictionLabel": "Amityville, New York",
     "locationPrecision": "city",
     "locationLabel": "Amityville, New York, Leftenant-Colon's longtime home",
@@ -3544,15 +2725,8 @@
       }
     ],
     "historicalContext": "Leftenant-Colon later served as a flight nurse in the Air Force and died in Amityville, New York, in January 2025 at age 104.",
-    "topicIds": [
-      "firsts",
-      "military",
-      "army",
-      "medicine"
-    ],
-    "mentionedEntityIds": [
-      "ent_law_executive_order_9981_1948"
-    ],
+    "topicIds": ["firsts", "military", "army", "medicine"],
+    "mentionedEntityIds": ["ent_law_executive_order_9981_1948"],
     "keywords": []
   },
   {
@@ -3560,13 +2734,8 @@
     "kind": "person",
     "displayName": "Frederick Douglass (U.S. Marshal and 1872 Vice-Presidential Nominee)",
     "summary": "Beyond his abolitionist career, Frederick Douglass was confirmed by the Senate on March 17, 1877, as U.S. Marshal for the District of Columbia, the first African American to hold the post, and in 1872 became the first Black person nominated for U.S. Vice President, on Victoria Woodhull's Equal Rights Party ticket.",
-    "eraBuckets": [
-      "1870s"
-    ],
-    "topicTags": [
-      "firsts",
-      "reconstruction"
-    ],
+    "eraBuckets": ["1870s"],
+    "topicTags": ["firsts", "reconstruction"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "Cedar Hill (Frederick Douglass National Historic Site), 1411 W Street SE, Washington, D.C.",
@@ -3591,10 +2760,7 @@
       }
     ],
     "historicalContext": "This record is anchored at Cedar Hill, Douglass's Anacostia home from 1877 until his death in 1895, as his primary documented Washington residence during the years of both these government-related firsts; the site itself is catalogued separately as an existing place-kind entry.",
-    "topicIds": [
-      "firsts",
-      "reconstruction"
-    ],
+    "topicIds": ["firsts", "reconstruction"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -3603,14 +2769,8 @@
     "kind": "person",
     "displayName": "Edward R. Dudley",
     "summary": "Edward R. Dudley, a civil rights lawyer recruited by Thurgood Marshall to the NAACP, was promoted to Ambassador upon the 1949 elevation of the U.S. mission in Liberia, becoming the first African American to hold the rank of U.S. Ambassador.",
-    "eraBuckets": [
-      "1940s",
-      "1950s"
-    ],
-    "topicTags": [
-      "firsts",
-      "diplomacy"
-    ],
+    "eraBuckets": ["1940s", "1950s"],
+    "topicTags": ["firsts", "diplomacy"],
     "jurisdictionLabel": "Roanoke, Virginia",
     "locationPrecision": "city",
     "locationLabel": "Roanoke, Virginia, Dudley's hometown",
@@ -3635,13 +2795,8 @@
       }
     ],
     "historicalContext": "Dudley later served as a justice of the New York State Supreme Court; his diplomatic career is commemorated in his hometown of Roanoke, Virginia.",
-    "topicIds": [
-      "firsts",
-      "diplomacy"
-    ],
-    "mentionedEntityIds": [
-      "ent_thurgood_marshall_001"
-    ],
+    "topicIds": ["firsts", "diplomacy"],
+    "mentionedEntityIds": ["ent_thurgood_marshall_001"],
     "keywords": []
   },
   {
@@ -3649,14 +2804,8 @@
     "kind": "person",
     "displayName": "James Wormley Jones",
     "summary": "James Wormley Jones, a Washington, D.C. police detective and decorated World War I infantry captain, was sworn in on November 19, 1919, as the first African American special agent of the Bureau of Investigation, later the FBI.",
-    "eraBuckets": [
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "firsts",
-      "law-enforcement"
-    ],
+    "eraBuckets": ["1910s", "1920s"],
+    "topicTags": ["firsts", "law-enforcement"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "city",
     "locationLabel": "Washington, D.C., where Jones served in the Bureau of Investigation's General Intelligence Division",
@@ -3681,10 +2830,7 @@
       }
     ],
     "historicalContext": "Before joining the Bureau, Jones served with the Washington Metropolitan Police Department and commanded a company of the 368th Infantry, 92nd Division, in combat in France during World War I.",
-    "topicIds": [
-      "firsts",
-      "law-enforcement"
-    ],
+    "topicIds": ["firsts", "law-enforcement"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -3693,13 +2839,8 @@
     "kind": "person",
     "displayName": "Patrick H. Raymond",
     "summary": "Patrick H. Raymond, son of a formerly enslaved abolitionist, was appointed Chief Engineer of the Cambridge, Massachusetts Fire Department on January 5, 1871, becoming the first known Black fire chief in the United States. He commanded the department during the Great Boston Fire of 1872.",
-    "eraBuckets": [
-      "1870s"
-    ],
-    "topicTags": [
-      "firsts",
-      "public-safety"
-    ],
+    "eraBuckets": ["1870s"],
+    "topicTags": ["firsts", "public-safety"],
     "jurisdictionLabel": "Cambridge, Massachusetts",
     "locationPrecision": "city",
     "locationLabel": "Cambridge, Massachusetts, where Raymond served as fire chief",
@@ -3724,13 +2865,8 @@
       }
     ],
     "historicalContext": "Raymond's father was a formerly enslaved abolitionist and early pastor of Boston's African Meeting House; Raymond served as chief until 1879 and died in Cambridge in 1892.",
-    "topicIds": [
-      "firsts",
-      "public-safety"
-    ],
-    "mentionedEntityIds": [
-      "ent_african_meeting_house_001"
-    ],
+    "topicIds": ["firsts", "public-safety"],
+    "mentionedEntityIds": ["ent_african_meeting_house_001"],
     "keywords": []
   },
   {
@@ -3738,16 +2874,8 @@
     "kind": "person",
     "displayName": "Lee P. Brown",
     "summary": "Lee P. Brown led police departments in Atlanta, Houston, and New York City before becoming, in 1997, the first African American elected mayor of Houston, Texas, serving three terms through 2004.",
-    "eraBuckets": [
-      "1980s",
-      "1990s",
-      "2000s"
-    ],
-    "topicTags": [
-      "firsts",
-      "mayors",
-      "law-enforcement"
-    ],
+    "eraBuckets": ["1980s", "1990s", "2000s"],
+    "topicTags": ["firsts", "mayors", "law-enforcement"],
     "jurisdictionLabel": "Houston, Texas",
     "locationPrecision": "city",
     "locationLabel": "Houston, Texas, where Brown served as police chief and later mayor",
@@ -3772,11 +2900,7 @@
       }
     ],
     "historicalContext": "Brown also served as Atlanta's public safety commissioner from 1978 to 1982 and as New York City police commissioner from 1990 to 1992, before leading the White House drug policy office under President Clinton.",
-    "topicIds": [
-      "firsts",
-      "mayors",
-      "law-enforcement"
-    ],
+    "topicIds": ["firsts", "mayors", "law-enforcement"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -3785,14 +2909,8 @@
     "kind": "person",
     "displayName": "Willie L. Williams",
     "summary": "Willie L. Williams became Philadelphia's first African American police commissioner in 1988, then in 1992 the first Black chief of the Los Angeles Police Department, leading it through the department's post-Rodney King reform effort.",
-    "eraBuckets": [
-      "1980s",
-      "1990s"
-    ],
-    "topicTags": [
-      "firsts",
-      "law-enforcement"
-    ],
+    "eraBuckets": ["1980s", "1990s"],
+    "topicTags": ["firsts", "law-enforcement"],
     "jurisdictionLabel": "Philadelphia, Pennsylvania",
     "locationPrecision": "city",
     "locationLabel": "Philadelphia, Pennsylvania, where Williams began his law enforcement career",
@@ -3817,13 +2935,8 @@
       }
     ],
     "historicalContext": "Williams served as LAPD chief until 1997 and later worked as federal security director for Atlanta's Hartsfield-Jackson International Airport.",
-    "topicIds": [
-      "firsts",
-      "law-enforcement"
-    ],
-    "mentionedEntityIds": [
-      "ent_aamp_philadelphia_001"
-    ],
+    "topicIds": ["firsts", "law-enforcement"],
+    "mentionedEntityIds": ["ent_aamp_philadelphia_001"],
     "keywords": []
   }
 ]

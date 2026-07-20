@@ -21,7 +21,14 @@
  *   --skip-existing=0  (default skips entities that already have primaryImage.url)
  *   DRY_RUN=1
  */
-import { createWriteStream, mkdirSync, readFileSync, rmSync, existsSync, writeFileSync } from 'node:fs';
+import {
+  createWriteStream,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  existsSync,
+  writeFileSync,
+} from 'node:fs';
 import { dirname, extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { pipeline } from 'node:stream/promises';
@@ -39,10 +46,7 @@ const USER_AGENT =
   'BlackStoryCommonsEnrichment/1.0 (https://blackstory.app; promote-batch; mailto:ops@blackstory.app)';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
-const defaultFrom = join(
-  scriptDir,
-  '../fixtures/release-artifacts/commons-media-dry-run.json',
-);
+const defaultFrom = join(scriptDir, '../fixtures/release-artifacts/commons-media-dry-run.json');
 const tmpRoot = join(scriptDir, '../fixtures/release-artifacts/.commons-promote-tmp');
 
 type AutoPropose = {
@@ -199,7 +203,9 @@ async function main(): Promise<void> {
 
   console.log(`Project: ${PROJECT_ID}`);
   console.log(`From: ${fromPath}`);
-  console.log(`Candidates: ${work.length} (concurrency=${concurrency})${DRY_RUN ? ' DRY_RUN' : ''}`);
+  console.log(
+    `Candidates: ${work.length} (concurrency=${concurrency})${DRY_RUN ? ' DRY_RUN' : ''}`,
+  );
 
   if (getApps().length === 0) {
     initializeApp({

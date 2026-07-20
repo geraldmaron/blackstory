@@ -1,4 +1,3 @@
-
 /**
  * Verifies the CLI is a thin dispatcher: it parses flags, calls the real prepare/commit
  * functions, and is safe-by-default (no writes without an explicit `--commit`).
@@ -64,7 +63,12 @@ test('submit-lead without --commit prepares an outcome but writes nothing', asyn
       'https://archive.example.org/cli-test',
       ...BASE_FLAGS,
     ],
-    { store, stdout: out.stdout, stderr: out.stderr, nowMs: Date.parse('2026-07-17T04:00:00.000Z') },
+    {
+      store,
+      stdout: out.stdout,
+      stderr: out.stderr,
+      nowMs: Date.parse('2026-07-17T04:00:00.000Z'),
+    },
   );
   assert.equal(code, 0);
   const result = JSON.parse(out.lines[0] ?? '{}');
@@ -86,7 +90,12 @@ test('submit-lead with --commit writes through the real commit path', async () =
       '--commit',
       ...BASE_FLAGS,
     ],
-    { store, stdout: out.stdout, stderr: out.stderr, nowMs: Date.parse('2026-07-17T04:00:00.000Z') },
+    {
+      store,
+      stdout: out.stdout,
+      stderr: out.stderr,
+      nowMs: Date.parse('2026-07-17T04:00:00.000Z'),
+    },
   );
   assert.equal(code, 0);
   const result = JSON.parse(out.lines[0] ?? '{}');
@@ -182,7 +191,12 @@ test('propose-edge without --commit prepares a real quarantine proposal but writ
       'https://archive.example.org/authored-citation',
       ...BASE_FLAGS,
     ],
-    { store, stdout: out.stdout, stderr: out.stderr, nowMs: Date.parse('2026-07-17T04:00:00.000Z') },
+    {
+      store,
+      stdout: out.stdout,
+      stderr: out.stderr,
+      nowMs: Date.parse('2026-07-17T04:00:00.000Z'),
+    },
   );
   assert.equal(code, 0);
   const result = JSON.parse(out.lines[0] ?? '{}');

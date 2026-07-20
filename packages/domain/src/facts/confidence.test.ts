@@ -29,9 +29,14 @@ test('single-source and contested require a confidenceNote; established/corrobor
 
 test('assertFactConfidenceValid fails closed when a note is required but missing', () => {
   assert.throws(() => assertFactConfidenceValid({ confidence: 'contested' }));
-  assert.throws(() => assertFactConfidenceValid({ confidence: 'contested', confidenceNote: '   ' }));
+  assert.throws(() =>
+    assertFactConfidenceValid({ confidence: 'contested', confidenceNote: '   ' }),
+  );
   assert.doesNotThrow(() =>
-    assertFactConfidenceValid({ confidence: 'contested', confidenceNote: 'Two credible sources disagree.' }),
+    assertFactConfidenceValid({
+      confidence: 'contested',
+      confidenceNote: 'Two credible sources disagree.',
+    }),
   );
   assert.doesNotThrow(() => assertFactConfidenceValid({ confidence: 'established' }));
 });
@@ -44,6 +49,10 @@ test('status and confidence axes never derive from one another', () => {
   assert.doesNotThrow(() =>
     assertStatusConfidenceAxesIndependent({ status: 'published', confidence: 'contested' }),
   );
-  assert.doesNotThrow(() => assertStatusConfidenceAxesIndependent({ status: 'draft', confidence: 'established' }));
-  assert.throws(() => assertStatusConfidenceAxesIndependent({ status: 'published', confidence: 'unknown-grade' }));
+  assert.doesNotThrow(() =>
+    assertStatusConfidenceAxesIndependent({ status: 'draft', confidence: 'established' }),
+  );
+  assert.throws(() =>
+    assertStatusConfidenceAxesIndependent({ status: 'published', confidence: 'unknown-grade' }),
+  );
 });

@@ -31,13 +31,7 @@ function readDocumentColorScheme(): MapColorScheme {
   return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
 }
 
-export function EntityLocationMap({
-  lat,
-  lng,
-  label,
-  precision,
-  caption,
-}: EntityLocationMapProps) {
+export function EntityLocationMap({ lat, lng, label, precision, caption }: EntityLocationMapProps) {
   const titleId = useId();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
@@ -137,7 +131,9 @@ export function EntityLocationMap({
           Map tiles could not load. Use Open in maps for street context.
         </p>
       ) : null}
-      {caption ? <figcaption className="ds-entity-location-map__caption">{caption}</figcaption> : null}
+      {caption ? (
+        <figcaption className="ds-entity-location-map__caption">{caption}</figcaption>
+      ) : null}
     </figure>
   );
 }

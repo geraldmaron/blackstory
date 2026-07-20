@@ -91,7 +91,9 @@ export function AppealForm({ receiptCode }: { readonly receiptCode?: string | un
   }
 
   const fieldIssue = (field: string) =>
-    state.status === 'error' ? state.fieldIssues?.find((issue) => issue.field === field) : undefined;
+    state.status === 'error'
+      ? state.fieldIssues?.find((issue) => issue.field === field)
+      : undefined;
 
   if (state.status === 'success') {
     return (
@@ -158,7 +160,13 @@ export function AppealForm({ receiptCode }: { readonly receiptCode?: string | un
         <label className="ds-filters__label" htmlFor={sourceUrlId}>
           Supporting HTTPS link <span aria-hidden="true">*</span>
         </label>
-        <input className="ds-filters__control" id={sourceUrlId} name="sourceUrl" type="url" required />
+        <input
+          className="ds-filters__control"
+          id={sourceUrlId}
+          name="sourceUrl"
+          type="url"
+          required
+        />
         {fieldIssue('sourceUrl') ? (
           <p className="ds-sans" role="alert">
             {fieldIssue('sourceUrl')!.message}

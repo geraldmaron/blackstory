@@ -5,13 +5,7 @@
   "description": "A complete algorithm prediction set for one version of the gold corpus.",
   "type": "object",
   "additionalProperties": false,
-  "required": [
-    "schemaVersion",
-    "algorithmVersion",
-    "corpusVersion",
-    "generatedAt",
-    "predictions"
-  ],
+  "required": ["schemaVersion", "algorithmVersion", "corpusVersion", "generatedAt", "predictions"],
   "properties": {
     "schemaVersion": { "const": "gold-predictions.v1" },
     "algorithmVersion": { "type": "string", "minLength": 1 },

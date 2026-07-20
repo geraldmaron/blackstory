@@ -42,9 +42,24 @@ test('nationalChangeStripItems formats signed Δ Black and share note', () => {
 
 test('rankStateMovers separates gains and losses by absolute Black change', () => {
   const rows: readonly StateChangeLike[] = [
-    { stateFips: '06', blackAbsoluteChange: 100_000, shareChangePp: 0.2, blackPopulationTo: 2_000_000 },
-    { stateFips: '36', blackAbsoluteChange: 50_000, shareChangePp: 0.1, blackPopulationTo: 3_000_000 },
-    { stateFips: '26', blackAbsoluteChange: -80_000, shareChangePp: -0.5, blackPopulationTo: 1_200_000 },
+    {
+      stateFips: '06',
+      blackAbsoluteChange: 100_000,
+      shareChangePp: 0.2,
+      blackPopulationTo: 2_000_000,
+    },
+    {
+      stateFips: '36',
+      blackAbsoluteChange: 50_000,
+      shareChangePp: 0.1,
+      blackPopulationTo: 3_000_000,
+    },
+    {
+      stateFips: '26',
+      blackAbsoluteChange: -80_000,
+      shareChangePp: -0.5,
+      blackPopulationTo: 1_200_000,
+    },
     { stateFips: '17', blackAbsoluteChange: 0, shareChangePp: 0, blackPopulationTo: 1_800_000 },
   ];
   const { gains, losses } = rankStateMovers(rows, 8);

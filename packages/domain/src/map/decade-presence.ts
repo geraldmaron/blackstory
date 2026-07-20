@@ -73,7 +73,10 @@ function decadeStartYear(label: string): number {
 function aggregateByState(
   entities: readonly StatePresenceEntityInput[],
 ): readonly StateAggregateCount[] {
-  const byState = new Map<string, { stateFips: string; statePostalCode: string; stateName: string; count: number }>();
+  const byState = new Map<
+    string,
+    { stateFips: string; statePostalCode: string; stateName: string; count: number }
+  >();
   for (const entity of entities) {
     const entry = byState.get(entity.stateFips);
     if (entry) {

@@ -75,7 +75,8 @@ export function pickMemorialNameSwap(
   }
 
   if (roll < 58 && vacant.length > 0 && candidates.length > 0) {
-    const cellIndex = vacant[hashString(`memorial-arrive-slot:${seedKey}:${tick}`) % vacant.length]!;
+    const cellIndex =
+      vacant[hashString(`memorial-arrive-slot:${seedKey}:${tick}`) % vacant.length]!;
     const next =
       candidates[hashString(`memorial-arrive-name:${seedKey}:${tick}`) % candidates.length]!;
     return { cellIndex, kind: 'arrive', next };
@@ -83,7 +84,8 @@ export function pickMemorialNameSwap(
 
   if (occupied.length === 0 || candidates.length === 0) {
     if (vacant.length > 0 && candidates.length > 0) {
-      const cellIndex = vacant[hashString(`memorial-arrive-slot:${seedKey}:${tick}`) % vacant.length]!;
+      const cellIndex =
+        vacant[hashString(`memorial-arrive-slot:${seedKey}:${tick}`) % vacant.length]!;
       const next =
         candidates[hashString(`memorial-arrive-name:${seedKey}:${tick}`) % candidates.length]!;
       return { cellIndex, kind: 'arrive', next };
@@ -91,7 +93,8 @@ export function pickMemorialNameSwap(
     return null;
   }
 
-  const cellIndex = occupied[hashString(`memorial-swap-cell:${seedKey}:${tick}`) % occupied.length]!;
+  const cellIndex =
+    occupied[hashString(`memorial-swap-cell:${seedKey}:${tick}`) % occupied.length]!;
   const next = candidates[hashString(`memorial-swap-name:${seedKey}:${tick}`) % candidates.length]!;
   return { cellIndex, kind: 'replace', next };
 }

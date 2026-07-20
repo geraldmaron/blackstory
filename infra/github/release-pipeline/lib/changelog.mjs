@@ -4,8 +4,7 @@
  */
 import { spawnSync } from 'node:child_process';
 
-const CONVENTIONAL_RE =
-  /^(?<type>[a-z]+)(?:\((?<scope>[^)]+)\))?(?<breaking>!)?: (?<subject>.+)$/i;
+const CONVENTIONAL_RE = /^(?<type>[a-z]+)(?:\((?<scope>[^)]+)\))?(?<breaking>!)?: (?<subject>.+)$/i;
 
 const TYPE_ORDER = ['feat', 'fix', 'perf', 'refactor', 'docs', 'test', 'chore', 'ci', 'build'];
 

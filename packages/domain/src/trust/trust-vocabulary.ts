@@ -45,8 +45,7 @@ export const TRUST_PROJECT_INDICATORS = [
     id: 'diverse_voices',
     schemaProperty: 'knowsAbout',
     title: 'Diverse voices',
-    summary:
-      'Inclusion rubrics require documented community significance, not popularity alone.',
+    summary: 'Inclusion rubrics require documented community significance, not popularity alone.',
   },
   {
     id: 'actionable_feedback',
@@ -71,32 +70,27 @@ export const IFCN_COMMITMENTS = [
   {
     id: 'nonpartisanship',
     title: 'Nonpartisanship and fairness',
-    body:
-      'Signatories do not unduly favor one side. We publish the same verification standards for every record regardless of subject.',
+    body: 'Signatories do not unduly favor one side. We publish the same verification standards for every record regardless of subject.',
   },
   {
     id: 'sources',
     title: 'Sources',
-    body:
-      'Signatories identify sources transparently, with links and archived captures wherever a web source exists.',
+    body: 'Signatories identify sources transparently, with links and archived captures wherever a web source exists.',
   },
   {
     id: 'transparency',
     title: 'Transparency of funding and organization',
-    body:
-      'Signatories disclose ownership, funding, and organizational structure. Our methodology page carries that disclosure.',
+    body: 'Signatories disclose ownership, funding, and organizational structure. Our methodology page carries that disclosure.',
   },
   {
     id: 'methodology',
     title: 'Transparency of methodology',
-    body:
-      'Signatories explain the methods by which claims are verified. Our verification and triangulation section is that explanation.',
+    body: 'Signatories explain the methods by which claims are verified. Our verification and triangulation section is that explanation.',
   },
   {
     id: 'corrections',
     title: 'Corrections',
-    body:
-      'Signatories correct errors promptly and transparently. Corrections are logged publicly, timestamped, and never silently edited.',
+    body: 'Signatories correct errors promptly and transparently. Corrections are logged publicly, timestamped, and never silently edited.',
   },
 ] as const;
 
@@ -111,12 +105,15 @@ export const PREBUNK_TECHNIQUE_FRAMES = [
   },
   {
     id: 'single_official_document',
-    technique: 'Demanding a single official document for events that were deliberately never documented',
-    readerAction: 'Check whether the record lists multiple independent primary sources and states known gaps plainly.',
+    technique:
+      'Demanding a single official document for events that were deliberately never documented',
+    readerAction:
+      'Check whether the record lists multiple independent primary sources and states known gaps plainly.',
   },
   {
     id: 'shoot_the_messenger',
     technique: 'Attacking the messenger instead of the evidence',
-    readerAction: 'Follow the citation chain — every claim should trace to a named source, not to editorial opinion.',
+    readerAction:
+      'Follow the citation chain — every claim should trace to a named source, not to editorial opinion.',
   },
 ] as const;

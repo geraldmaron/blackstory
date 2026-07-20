@@ -60,7 +60,11 @@ export {
   buildSuccessionLinkedContext,
   buildSuccessorPublicView,
 } from './succession.js';
-export type { SuccessionEdge, LinkedHistoricalContextEntry, SuccessorPublicView } from './succession.js';
+export type {
+  SuccessionEdge,
+  LinkedHistoricalContextEntry,
+  SuccessorPublicView,
+} from './succession.js';
 
 export {
   publicGraphAdjacencyPath,
@@ -72,10 +76,7 @@ export {
 } from './build.js';
 export type { GraphReleaseArtifactInput, GraphReleaseArtifact } from './build.js';
 
-export {
-  extractCatalogRelationships,
-  relatedEntriesFromRelationships,
-} from './catalog-related.js';
+export { extractCatalogRelationships, relatedEntriesFromRelationships } from './catalog-related.js';
 export type {
   CatalogRelatedEntry,
   CatalogEntityForRelationships,

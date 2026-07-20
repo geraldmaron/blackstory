@@ -27,7 +27,11 @@ test('denies an anonymous submission without App Check verification', () => {
 test('allows a verified anonymous submission and denies once the rolling window is exhausted', () => {
   const clock = fakeClock(0);
   const guard = createSubmitLeadRateLimitGuard({ now: clock.now });
-  const request = { subject: 'anonymous' as const, clientIp: '203.0.113.2', appCheckVerified: true };
+  const request = {
+    subject: 'anonymous' as const,
+    clientIp: '203.0.113.2',
+    appCheckVerified: true,
+  };
 
   const first = guard.evaluate(request);
   assert.equal(first.allowed, true);
@@ -47,7 +51,11 @@ test('allows a verified anonymous submission and denies once the rolling window 
 
 test('a second concurrent submission from the same key is denied until the first releases', () => {
   const guard = createSubmitLeadRateLimitGuard({ now: () => 1_000 });
-  const request = { subject: 'anonymous' as const, clientIp: '203.0.113.3', appCheckVerified: true };
+  const request = {
+    subject: 'anonymous' as const,
+    clientIp: '203.0.113.3',
+    appCheckVerified: true,
+  };
 
   const first = guard.evaluate(request);
   assert.equal(first.allowed, true);
@@ -65,7 +73,11 @@ test('a second concurrent submission from the same key is denied until the first
 test('the rolling window resets once enough time has passed', () => {
   const clock = fakeClock(0);
   const guard = createSubmitLeadRateLimitGuard({ now: clock.now });
-  const request = { subject: 'anonymous' as const, clientIp: '203.0.113.4', appCheckVerified: true };
+  const request = {
+    subject: 'anonymous' as const,
+    clientIp: '203.0.113.4',
+    appCheckVerified: true,
+  };
 
   const first = guard.evaluate(request);
   assert.equal(first.allowed, true);
@@ -84,8 +96,16 @@ test('the rolling window resets once enough time has passed', () => {
 
 test('different client IPs get independent rate-limit keys', () => {
   const guard = createSubmitLeadRateLimitGuard({ now: () => 0 });
-  const a = guard.evaluate({ subject: 'anonymous', clientIp: '203.0.113.5', appCheckVerified: true });
-  const b = guard.evaluate({ subject: 'anonymous', clientIp: '203.0.113.6', appCheckVerified: true });
+  const a = guard.evaluate({
+    subject: 'anonymous',
+    clientIp: '203.0.113.5',
+    appCheckVerified: true,
+  });
+  const b = guard.evaluate({
+    subject: 'anonymous',
+    clientIp: '203.0.113.6',
+    appCheckVerified: true,
+  });
   assert.equal(a.allowed, true);
   assert.equal(b.allowed, true);
   if (a.allowed && b.allowed) assert.notEqual(a.key, b.key);

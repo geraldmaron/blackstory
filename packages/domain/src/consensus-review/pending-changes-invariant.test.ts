@@ -78,7 +78,11 @@ test('a community lead cannot reach a public read path without both consensus re
 
   const researchCase = advancement.researchCase;
   assert.equal(researchCase.state, 'candidate');
-  assert.equal(researchCase.history.length, 0, 'consensus review must not itself advance the case further');
+  assert.equal(
+    researchCase.history.length,
+    0,
+    'consensus review must not itself advance the case further',
+  );
   assert.equal(researchCase.publication, undefined, 'a fresh candidate is never published');
 
   // Step 4 (the invariant): the standard, unmodified gate refuses to publish this case.
@@ -91,10 +95,10 @@ test('a community lead cannot reach a public read path without both consensus re
     candidateClaims: [],
   });
   assert.equal(promotionPreview.eligible, false);
-  assert.deepEqual(
-    [...promotionPreview.reasonCodes].sort(),
-    ['minimum_record_incomplete', 'relevance_not_confirmed'],
-  );
+  assert.deepEqual([...promotionPreview.reasonCodes].sort(), [
+    'minimum_record_incomplete',
+    'relevance_not_confirmed',
+  ]);
   assert.equal(promotionPreview.preview.publishable, false);
 
   assert.throws(

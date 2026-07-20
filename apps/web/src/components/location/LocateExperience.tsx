@@ -52,10 +52,14 @@ function recordOutcome(
     return;
   }
   if (result.kind === 'fallback') {
-    recordCoarseLocationAnalyticsEvent(buildCoarseLocationAnalyticsEvent('manual_fallback_used', undefined));
+    recordCoarseLocationAnalyticsEvent(
+      buildCoarseLocationAnalyticsEvent('manual_fallback_used', undefined),
+    );
     return;
   }
-  recordCoarseLocationAnalyticsEvent(buildCoarseLocationAnalyticsEvent('geocode_failed', undefined));
+  recordCoarseLocationAnalyticsEvent(
+    buildCoarseLocationAnalyticsEvent('geocode_failed', undefined),
+  );
 }
 
 export function LocateExperience() {
@@ -81,14 +85,20 @@ export function LocateExperience() {
   }
 
   function handleDenied() {
-    recordCoarseLocationAnalyticsEvent(buildCoarseLocationAnalyticsEvent('manual_fallback_used', undefined));
+    recordCoarseLocationAnalyticsEvent(
+      buildCoarseLocationAnalyticsEvent('manual_fallback_used', undefined),
+    );
   }
 
   const loading = state.status === 'loading';
 
   return (
     <div className="ds-stack" style={{ gap: 'var(--ds-space-4)' }}>
-      <LocationConsentButton onResolved={handleCoordinates} onDenied={handleDenied} disabled={loading} />
+      <LocationConsentButton
+        onResolved={handleCoordinates}
+        onDenied={handleDenied}
+        disabled={loading}
+      />
 
       <ManualPlaceSearchForm onSubmit={handleAddress} disabled={loading} />
 

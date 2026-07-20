@@ -1,4 +1,3 @@
-
 /**
  * Unit tests for Firestore claim helpers and converters (no emulator required).
  * Covers entity/geography, provenance, and claims/confidence.

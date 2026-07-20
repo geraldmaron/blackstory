@@ -135,10 +135,7 @@ test('bulk batch retains revision metadata and category gate outcomes', () => {
 });
 
 test('external reference routing resolves known authority URLs', () => {
-  assert.equal(
-    routeExternalReferenceUrl('VIAF', '123456789'),
-    'https://viaf.org/viaf/123456789/',
-  );
+  assert.equal(routeExternalReferenceUrl('VIAF', '123456789'), 'https://viaf.org/viaf/123456789/');
   assert.equal(
     routeExternalReferenceUrl('LCCN', 'n79033051'),
     'https://id.loc.gov/authorities/n79033051',

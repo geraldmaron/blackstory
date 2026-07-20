@@ -4,16 +4,8 @@
     "kind": "person",
     "displayName": "Madam C.J. Walker",
     "summary": "Sarah Breedlove built a hair-care and cosmetics business that trained tens of thousands of Black sales agents and made her, by most historical accounts, the first female self-made millionaire in the United States. She commissioned Villa Lewaro, her Irvington-on-Hudson estate, as a showcase of Black achievement and a Harlem Renaissance gathering place.",
-    "eraBuckets": [
-      "1900s",
-      "1910s"
-    ],
-    "topicTags": [
-      "business",
-      "entrepreneurship",
-      "firsts",
-      "philanthropy"
-    ],
+    "eraBuckets": ["1900s", "1910s"],
+    "topicTags": ["business", "entrepreneurship", "firsts", "philanthropy"],
     "jurisdictionLabel": "Irvington, New York",
     "locationPrecision": "institution",
     "locationLabel": "Villa Lewaro, 67 North Broadway, Irvington, New York",
@@ -62,12 +54,7 @@
       }
     ],
     "historicalContext": "Villa Lewaro is anchored here rather than at a birthplace because Walker built it deliberately as a monument to Black enterprise, hosting W.E.B. Du Bois, James Weldon Johnson, and other Harlem Renaissance figures; it remains the most concretely documented site tied to her achievement.",
-    "topicIds": [
-      "business",
-      "entrepreneurship",
-      "firsts",
-      "philanthropy"
-    ],
+    "topicIds": ["business", "entrepreneurship", "firsts", "philanthropy"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -76,17 +63,8 @@
     "kind": "person",
     "displayName": "Maggie L. Walker",
     "summary": "Maggie Lena Walker chartered the St. Luke Penny Savings Bank in Richmond, Virginia in 1903, becoming the first woman of any race to charter a bank in the United States. She served as its president for nearly three decades, helping Black Richmonders finance homes and small businesses.",
-    "eraBuckets": [
-      "1900s",
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "business",
-      "banking",
-      "firsts",
-      "entrepreneurship"
-    ],
+    "eraBuckets": ["1900s", "1910s", "1920s"],
+    "topicTags": ["business", "banking", "firsts", "entrepreneurship"],
     "jurisdictionLabel": "Richmond, Virginia",
     "locationPrecision": "institution",
     "locationLabel": "Maggie L. Walker National Historic Site, 110½ East Leigh Street, Richmond, Virginia",
@@ -119,15 +97,8 @@
       }
     ],
     "historicalContext": "The bank Walker founded survives today as Consolidated Bank and Trust, the oldest continuously operated African American-run bank in the United States. Her Jackson Ward home, preserved by the National Park Service, is the best-documented site tied to her life and work.",
-    "topicIds": [
-      "business",
-      "banking",
-      "firsts",
-      "entrepreneurship"
-    ],
-    "mentionedEntityIds": [
-      "ent_core_founding_001"
-    ],
+    "topicIds": ["business", "banking", "firsts", "entrepreneurship"],
+    "mentionedEntityIds": ["ent_core_founding_001"],
     "keywords": []
   },
   {
@@ -135,16 +106,8 @@
     "kind": "person",
     "displayName": "Reginald F. Lewis",
     "summary": "Reginald F. Lewis engineered the 1984 leveraged buyout of Beatrice International Foods, and by 1987 the resulting TLC Beatrice International Holdings reported $1.8 billion in annual sales, making it the first Black-owned company with more than $1 billion in revenue. He attended Dunbar High School in Baltimore before Virginia State and Harvard Law School.",
-    "eraBuckets": [
-      "1980s",
-      "1990s"
-    ],
-    "topicTags": [
-      "business",
-      "finance",
-      "firsts",
-      "entrepreneurship"
-    ],
+    "eraBuckets": ["1980s", "1990s"],
+    "topicTags": ["business", "finance", "firsts", "entrepreneurship"],
     "jurisdictionLabel": "Baltimore, Maryland",
     "locationPrecision": "institution",
     "locationLabel": "Paul Laurence Dunbar High School, 1400 Orleans Street, Baltimore, Maryland",
@@ -169,12 +132,7 @@
       }
     ],
     "historicalContext": "Lewis grew up in East Baltimore and starred in three sports at Dunbar before a football scholarship took him to Virginia State University. His billion-dollar 1992 gift to Harvard Law School was, at the time, the largest single donation in the school's history, and his foundation later endowed the Reginald F. Lewis Museum of Maryland African American History and Culture in Baltimore.",
-    "topicIds": [
-      "business",
-      "finance",
-      "firsts",
-      "entrepreneurship"
-    ],
+    "topicIds": ["business", "finance", "firsts", "entrepreneurship"],
     "mentionedEntityIds": [
       "ent_paul_laurence_dunbar_high_school_historic_001",
       "ent_reginald_lewis_museum_001"
@@ -186,15 +144,8 @@
     "kind": "person",
     "displayName": "Ursula Burns",
     "summary": "Ursula Burns rose from a Xerox internship to the company's presidency in 2007 and, in July 2009, became CEO — the first Black woman to lead a Fortune 500 company. She also became the first woman to succeed another woman, Anne Mulcahy, as head of a Fortune 500 firm.",
-    "eraBuckets": [
-      "2000s",
-      "2010s"
-    ],
-    "topicTags": [
-      "business",
-      "technology",
-      "firsts"
-    ],
+    "eraBuckets": ["2000s", "2010s"],
+    "topicTags": ["business", "technology", "firsts"],
     "jurisdictionLabel": "Norwalk, Connecticut",
     "locationPrecision": "institution",
     "locationLabel": "Former Xerox Corporation world headquarters, 45 Glover Avenue, Norwalk, Connecticut",
@@ -219,11 +170,7 @@
       }
     ],
     "historicalContext": "Xerox's world headquarters moved to Norwalk, Connecticut in 2007, shortly before Burns became president and then CEO there; the Norwalk campus is the most precisely documented site tied to the tenure that made her historic.",
-    "topicIds": [
-      "business",
-      "technology",
-      "firsts"
-    ],
+    "topicIds": ["business", "technology", "firsts"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -232,15 +179,8 @@
     "kind": "person",
     "displayName": "Kenneth Chenault",
     "summary": "Kenneth Chenault joined American Express in 1981 and rose to chairman and CEO in 2001, becoming the company's first Black chief executive and, at the time, only the third African American to lead a Fortune 500 corporation. He led the company until 2018.",
-    "eraBuckets": [
-      "2000s",
-      "2010s"
-    ],
-    "topicTags": [
-      "business",
-      "finance",
-      "firsts"
-    ],
+    "eraBuckets": ["2000s", "2010s"],
+    "topicTags": ["business", "finance", "firsts"],
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "institution",
     "locationLabel": "American Express headquarters, 200 Vesey Street, New York, New York",
@@ -265,11 +205,7 @@
       }
     ],
     "historicalContext": "American Express has been headquartered at 200 Vesey Street in Lower Manhattan since the mid-1980s, spanning nearly all of Chenault's tenure at the company, making it the most concretely documented site tied to his leadership.",
-    "topicIds": [
-      "business",
-      "finance",
-      "firsts"
-    ],
+    "topicIds": ["business", "finance", "firsts"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -278,16 +214,8 @@
     "kind": "person",
     "displayName": "Robert L. Johnson",
     "summary": "Robert L. Johnson founded Black Entertainment Television in 1980 and took it public in 1991, the first Black-owned company listed on the New York Stock Exchange. When Viacom bought BET for roughly $3 billion in 2001, Johnson became the first Black American billionaire.",
-    "eraBuckets": [
-      "1980s",
-      "1990s",
-      "2000s"
-    ],
-    "topicTags": [
-      "business",
-      "media",
-      "firsts"
-    ],
+    "eraBuckets": ["1980s", "1990s", "2000s"],
+    "topicTags": ["business", "media", "firsts"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "Former BET Networks headquarters, 1235 W Street NE, Washington, D.C.",
@@ -320,11 +248,7 @@
       }
     ],
     "historicalContext": "BET's Northeast Washington headquarters, where the network was run through its NYSE listing and eventual sale, is the site most directly tied to Johnson's business milestones; the company relocated its headquarters functions to New York after the Viacom sale.",
-    "topicIds": [
-      "business",
-      "media",
-      "firsts"
-    ],
+    "topicIds": ["business", "media", "firsts"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -333,16 +257,8 @@
     "kind": "person",
     "displayName": "Oprah Winfrey",
     "summary": "Oprah Winfrey built a media empire from her Chicago-based Harpo Productions, which produced her nationally syndicated talk show. In 2003, Forbes named her the first Black woman billionaire, a title she held alone on the magazine's billionaires list for several years.",
-    "eraBuckets": [
-      "1980s",
-      "1990s",
-      "2000s"
-    ],
-    "topicTags": [
-      "business",
-      "media",
-      "firsts"
-    ],
+    "eraBuckets": ["1980s", "1990s", "2000s"],
+    "topicTags": ["business", "media", "firsts"],
     "jurisdictionLabel": "Chicago, Illinois",
     "locationPrecision": "institution",
     "locationLabel": "Former Harpo Studios site, 1058 West Washington Boulevard, Chicago, Illinois",
@@ -367,11 +283,7 @@
       }
     ],
     "historicalContext": "Harpo Studios operated at this West Loop address from 1990 until production wound down in the mid-2010s; the site was demolished in 2016 and redeveloped, but its address remains the most precisely documented location tied to the business that made Winfrey a billionaire.",
-    "topicIds": [
-      "business",
-      "media",
-      "firsts"
-    ],
+    "topicIds": ["business", "media", "firsts"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -380,15 +292,8 @@
     "kind": "person",
     "displayName": "Cynt Marshall",
     "summary": "After 36 years in leadership roles at AT&T, Cynthia \"Cynt\" Marshall became CEO of the Dallas Mavericks in February 2018, the first Black woman to lead an NBA franchise. She was hired to overhaul the team's workplace culture after a misconduct investigation.",
-    "eraBuckets": [
-      "2010s",
-      "2020s"
-    ],
-    "topicTags": [
-      "business",
-      "sports",
-      "firsts"
-    ],
+    "eraBuckets": ["2010s", "2020s"],
+    "topicTags": ["business", "sports", "firsts"],
     "jurisdictionLabel": "Dallas, Texas",
     "locationPrecision": "institution",
     "locationLabel": "American Airlines Center, 2500 Victory Avenue, Dallas, Texas",
@@ -413,11 +318,7 @@
       }
     ],
     "historicalContext": "Marshall retired from the Mavericks CEO role effective December 2024 after six years leading the franchise from its arena, American Airlines Center, the team's home and business headquarters throughout her tenure.",
-    "topicIds": [
-      "business",
-      "sports",
-      "firsts"
-    ],
+    "topicIds": ["business", "sports", "firsts"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -426,15 +327,8 @@
     "kind": "person",
     "displayName": "Cathy Hughes",
     "summary": "Cathy Hughes built Radio One from a single Washington, D.C. station she bought in 1980 into the nation's largest Black-owned broadcasting company. When Radio One went public on NASDAQ in 1999, Hughes became the first African American woman to head a publicly traded corporation.",
-    "eraBuckets": [
-      "1980s",
-      "1990s"
-    ],
-    "topicTags": [
-      "business",
-      "media",
-      "firsts"
-    ],
+    "eraBuckets": ["1980s", "1990s"],
+    "topicTags": ["business", "media", "firsts"],
     "jurisdictionLabel": "Silver Spring, Maryland",
     "locationPrecision": "institution",
     "locationLabel": "Urban One headquarters, 1010 Wayne Avenue, Silver Spring, Maryland",
@@ -459,11 +353,7 @@
       }
     ],
     "historicalContext": "Urban One's Silver Spring headquarters is the company's long-documented corporate base; Hughes remains chairperson of the company she founded.",
-    "topicIds": [
-      "business",
-      "media",
-      "firsts"
-    ],
+    "topicIds": ["business", "media", "firsts"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -472,15 +362,8 @@
     "kind": "person",
     "displayName": "Arthur George Gaston",
     "summary": "A.G. Gaston built a $40 million Birmingham business empire spanning banking, insurance, construction, and hospitality, overcoming Jim Crow-era barriers from humble beginnings in Demopolis, Alabama. His A.G. Gaston Motel, opened in 1954, became a strategic headquarters for civil rights leaders during the 1963 Birmingham campaign.",
-    "eraBuckets": [
-      "1950s",
-      "1960s"
-    ],
-    "topicTags": [
-      "business",
-      "entrepreneurship",
-      "civil-rights"
-    ],
+    "eraBuckets": ["1950s", "1960s"],
+    "topicTags": ["business", "entrepreneurship", "civil-rights"],
     "jurisdictionLabel": "Birmingham, Alabama",
     "locationPrecision": "institution",
     "locationLabel": "A.G. Gaston Motel, 1527 Fifth Avenue North, Birmingham, Alabama",
@@ -505,11 +388,7 @@
       }
     ],
     "historicalContext": "Gaston used his considerable business wealth to quietly underwrite the movement, including posting bail for arrested demonstrators; his motel now anchors the Birmingham Civil Rights National Monument alongside Kelly Ingram Park.",
-    "topicIds": [
-      "business",
-      "entrepreneurship",
-      "civil-rights"
-    ],
+    "topicIds": ["business", "entrepreneurship", "civil-rights"],
     "mentionedEntityIds": [
       "ent_gaston_motel_001",
       "ent_kelly_ingram_park_001",
@@ -523,16 +402,8 @@
     "kind": "person",
     "displayName": "John H. Johnson",
     "summary": "John H. Johnson built Johnson Publishing Company from a $500 loan against his mother's furniture into the largest Black-owned publishing company in the world, launching Negro Digest, Ebony, and Jet. In 1982 he became the first African American to appear on Forbes' list of the 400 wealthiest Americans.",
-    "eraBuckets": [
-      "1940s",
-      "1950s",
-      "1980s"
-    ],
-    "topicTags": [
-      "business",
-      "publishing",
-      "firsts"
-    ],
+    "eraBuckets": ["1940s", "1950s", "1980s"],
+    "topicTags": ["business", "publishing", "firsts"],
     "jurisdictionLabel": "Chicago, Illinois",
     "locationPrecision": "institution",
     "locationLabel": "Johnson Publishing Company Building, 820 South Michigan Avenue, Chicago, Illinois",
@@ -557,11 +428,7 @@
       }
     ],
     "historicalContext": "Completed in 1971 and designed by African American architect John Moutoussamy, the 820 S. Michigan Avenue tower was the first downtown Chicago high-rise designed by a Black architect and Johnson Publishing's headquarters until 2010; it is now a National Historic Landmark and Chicago Landmark.",
-    "topicIds": [
-      "business",
-      "publishing",
-      "firsts"
-    ],
+    "topicIds": ["business", "publishing", "firsts"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -570,16 +437,8 @@
     "kind": "person",
     "displayName": "Annie Malone",
     "summary": "Annie Turnbo Malone developed hair-care products for Black women and built the Poro Company into a national beauty empire, becoming a millionaire and training tens of thousands of sales agents. Her Poro College campus in St. Louis's Ville neighborhood combined a factory, cosmetology school, and community center.",
-    "eraBuckets": [
-      "1900s",
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "business",
-      "entrepreneurship",
-      "philanthropy"
-    ],
+    "eraBuckets": ["1900s", "1910s", "1920s"],
+    "topicTags": ["business", "entrepreneurship", "philanthropy"],
     "jurisdictionLabel": "St. Louis, Missouri",
     "locationPrecision": "institution",
     "locationLabel": "Former Poro College site, 4300 St. Ferdinand Avenue, The Ville, St. Louis, Missouri",
@@ -612,11 +471,7 @@
       }
     ],
     "historicalContext": "The Poro College building was sold and later razed in 1965 for a public housing development; the St. Ferdinand Avenue address remains the documented site of the campus that anchored The Ville as a hub of Black St. Louis business and civic life.",
-    "topicIds": [
-      "business",
-      "entrepreneurship",
-      "philanthropy"
-    ],
+    "topicIds": ["business", "entrepreneurship", "philanthropy"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -625,14 +480,8 @@
     "kind": "person",
     "displayName": "Earl G. Graves Sr.",
     "summary": "Earl G. Graves Sr. founded Black Enterprise magazine in 1970 to chronicle and support African American entrepreneurship, building it into the leading business publication and media company serving Black professionals. A Morgan State University economics graduate, he later had the university's business school named in his honor.",
-    "eraBuckets": [
-      "1970s"
-    ],
-    "topicTags": [
-      "business",
-      "publishing",
-      "entrepreneurship"
-    ],
+    "eraBuckets": ["1970s"],
+    "topicTags": ["business", "publishing", "entrepreneurship"],
     "jurisdictionLabel": "Baltimore, Maryland",
     "locationPrecision": "institution",
     "locationLabel": "Earl G. Graves School of Business and Management, Morgan State University, Baltimore, Maryland",
@@ -657,14 +506,8 @@
       }
     ],
     "historicalContext": "Graves entered business after serving as U.S. Senator Robert F. Kennedy's administrative assistant; Black Enterprise remains a leading chronicle of African American business achievement, and Morgan State's naming reflects his standing as one of its most prominent alumni.",
-    "topicIds": [
-      "business",
-      "publishing",
-      "entrepreneurship"
-    ],
-    "mentionedEntityIds": [
-      "ent_morgan_state_university_001"
-    ],
+    "topicIds": ["business", "publishing", "entrepreneurship"],
+    "mentionedEntityIds": ["ent_morgan_state_university_001"],
     "keywords": []
   },
   {
@@ -672,14 +515,8 @@
     "kind": "person",
     "displayName": "Bessie Coleman",
     "summary": "Denied flight training in the United States because of her race and sex, Bessie Coleman traveled to France and, on June 15, 1921, earned an international pilot's license from the Fédération Aéronautique Internationale, becoming the first Black woman and first Black American to hold a pilot's license. She toured the U.S. as a barnstorming exhibition flier until her death in 1926.",
-    "eraBuckets": [
-      "1920s"
-    ],
-    "topicTags": [
-      "aviation",
-      "firsts",
-      "women"
-    ],
+    "eraBuckets": ["1920s"],
+    "topicTags": ["aviation", "firsts", "women"],
     "jurisdictionLabel": "Alsip, Illinois",
     "locationPrecision": "institution",
     "locationLabel": "Bessie Coleman's grave, Lincoln Cemetery, 12300 South Kedzie Avenue, Alsip, Illinois",
@@ -704,11 +541,7 @@
       }
     ],
     "historicalContext": "Coleman studied French and self-funded travel to France for flight school since no American school would train a Black woman. She dreamed of opening a flight school for Black aviators but died in a 1926 exhibition-flight accident in Jacksonville, Florida before realizing it; her Chicago grave remains the most visited site tied to her legacy.",
-    "topicIds": [
-      "aviation",
-      "firsts",
-      "women"
-    ],
+    "topicIds": ["aviation", "firsts", "women"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -717,15 +550,8 @@
     "kind": "person",
     "displayName": "Eugene Bullard",
     "summary": "Eugene Bullard fled Jim Crow Georgia as a teenager, eventually reaching France, where he flew combat missions for the French Air Service in World War I, becoming the first Black military pilot in history. Barred from flying for the United States, which excluded Black pilots at the time, he later ran nightclubs in Paris and was later decorated by France as a Knight of the Legion of Honor.",
-    "eraBuckets": [
-      "1910s",
-      "1950s"
-    ],
-    "topicTags": [
-      "aviation",
-      "military",
-      "firsts"
-    ],
+    "eraBuckets": ["1910s", "1950s"],
+    "topicTags": ["aviation", "military", "firsts"],
     "jurisdictionLabel": "Columbus, Georgia",
     "locationPrecision": "campus",
     "locationLabel": "Eugene Bullard historical marker, Talbotton Road near Midland Avenue, Columbus, Georgia",
@@ -750,11 +576,7 @@
       }
     ],
     "historicalContext": "Bullard grew up near this site before fleeing Georgia around age 11; the United States barred Black pilots when it entered World War I, so his aviation career unfolded entirely in France. The exact address of his childhood home is not preserved, so the marker site is the most concretely documented location tied to his early life.",
-    "topicIds": [
-      "aviation",
-      "military",
-      "firsts"
-    ],
+    "topicIds": ["aviation", "military", "firsts"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -763,16 +585,8 @@
     "kind": "person",
     "displayName": "Willa Brown",
     "summary": "Willa Brown earned her U.S. pilot's license in 1937 and, with Cornelius Coffey, co-founded the Coffey School of Aeronautics in 1938, the first flight school owned and operated by African Americans. In 1941 she became the first Black officer in the Civil Air Patrol, and the school she ran trained pilots who went on to join the Tuskegee Airmen.",
-    "eraBuckets": [
-      "1930s",
-      "1940s"
-    ],
-    "topicTags": [
-      "aviation",
-      "firsts",
-      "women",
-      "education"
-    ],
+    "eraBuckets": ["1930s", "1940s"],
+    "topicTags": ["aviation", "firsts", "women", "education"],
     "jurisdictionLabel": "Bridgeview, Illinois",
     "locationPrecision": "campus",
     "locationLabel": "Former Harlem Airport / Coffey School of Aeronautics site, near 87th Street and Harlem Avenue (now Southfield Shopping Center), Bridgeview, Illinois",
@@ -797,15 +611,8 @@
       }
     ],
     "historicalContext": "Harlem Airport closed in 1956 and its 87th-and-Harlem site in Bridgeview is now a shopping center, but it remains the documented location of the school Brown ran with Coffey, whom she married in 1939; the school was one of only two non-collegiate sites nationally selected for the federal Civilian Pilot Training Program's Black training unit.",
-    "topicIds": [
-      "aviation",
-      "firsts",
-      "women",
-      "education"
-    ],
-    "mentionedEntityIds": [
-      "ent_tuskegee_university_001"
-    ],
+    "topicIds": ["aviation", "firsts", "women", "education"],
+    "mentionedEntityIds": ["ent_tuskegee_university_001"],
     "keywords": []
   },
   {
@@ -813,16 +620,8 @@
     "kind": "person",
     "displayName": "Guion Bluford",
     "summary": "Guion \"Guy\" Bluford, an Air Force veteran of 144 Vietnam combat missions with a doctorate in aerospace engineering, became the first African American in space aboard Space Shuttle Challenger's STS-8 mission, launched from Kennedy Space Center on August 30, 1983. He flew four shuttle missions between 1983 and 1992.",
-    "eraBuckets": [
-      "1980s",
-      "1990s"
-    ],
-    "topicTags": [
-      "aviation",
-      "space",
-      "firsts",
-      "science"
-    ],
+    "eraBuckets": ["1980s", "1990s"],
+    "topicTags": ["aviation", "space", "firsts", "science"],
     "jurisdictionLabel": "Cape Canaveral, Florida",
     "locationPrecision": "campus",
     "locationLabel": "Launch Complex 39A, Kennedy Space Center, Florida",
@@ -847,12 +646,7 @@
       }
     ],
     "historicalContext": "Bluford was recruited as part of NASA's push, aided by Nichelle Nichols, to diversify its astronaut corps starting in 1978; STS-8 launched from Pad 39A, making it the most precise documented site of his historic flight.",
-    "topicIds": [
-      "aviation",
-      "space",
-      "firsts",
-      "science"
-    ],
+    "topicIds": ["aviation", "space", "firsts", "science"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -861,16 +655,8 @@
     "kind": "person",
     "displayName": "Mae Jemison",
     "summary": "Mae Jemison, a physician and engineer who previously served as a Peace Corps medical officer in West Africa, became the first African American woman in space as a mission specialist aboard Space Shuttle Endeavour's STS-47 mission, launched from Kennedy Space Center on September 12, 1992.",
-    "eraBuckets": [
-      "1990s"
-    ],
-    "topicTags": [
-      "aviation",
-      "space",
-      "firsts",
-      "science",
-      "women"
-    ],
+    "eraBuckets": ["1990s"],
+    "topicTags": ["aviation", "space", "firsts", "science", "women"],
     "jurisdictionLabel": "Cape Canaveral, Florida",
     "locationPrecision": "campus",
     "locationLabel": "Launch Complex 39B, Kennedy Space Center, Florida",
@@ -895,13 +681,7 @@
       }
     ],
     "historicalContext": "Jemison joined NASA's astronaut corps in 1987 after working as a general practitioner and Peace Corps medical officer in Liberia and Sierra Leone; she left NASA in 1993 to found a technology research company.",
-    "topicIds": [
-      "aviation",
-      "space",
-      "firsts",
-      "science",
-      "women"
-    ],
+    "topicIds": ["aviation", "space", "firsts", "science", "women"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -910,15 +690,8 @@
     "kind": "person",
     "displayName": "Ronald McNair",
     "summary": "Ronald McNair, a physicist with a doctorate from MIT, became the second African American in space when he flew aboard Space Shuttle Challenger's STS-41-B mission in 1984. He died in the Challenger disaster on January 28, 1986, during his second shuttle flight, STS-51-L.",
-    "eraBuckets": [
-      "1980s"
-    ],
-    "topicTags": [
-      "aviation",
-      "space",
-      "science",
-      "firsts"
-    ],
+    "eraBuckets": ["1980s"],
+    "topicTags": ["aviation", "space", "science", "firsts"],
     "jurisdictionLabel": "Lake City, South Carolina",
     "locationPrecision": "institution",
     "locationLabel": "Ronald E. McNair Life History Center, 221 East Main Street, Lake City, South Carolina",
@@ -943,12 +716,7 @@
       }
     ],
     "historicalContext": "McNair grew up the son of an auto mechanic in segregated Lake City and graduated valedictorian of his high school before earning a physics doctorate from MIT; he died along with six crewmates when Challenger broke apart 73 seconds after launch on his second spaceflight.",
-    "topicIds": [
-      "aviation",
-      "space",
-      "science",
-      "firsts"
-    ],
+    "topicIds": ["aviation", "space", "science", "firsts"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -957,16 +725,8 @@
     "kind": "person",
     "displayName": "Charles Bolden",
     "summary": "Charles Bolden, a Marine Corps aviator and four-time Space Shuttle astronaut who piloted the 1990 mission that deployed the Hubble Space Telescope, became NASA's first Black Administrator when the Senate confirmed his nomination by President Obama on July 15, 2009. He led the agency until 2017.",
-    "eraBuckets": [
-      "2000s",
-      "2010s"
-    ],
-    "topicTags": [
-      "aviation",
-      "space",
-      "firsts",
-      "government"
-    ],
+    "eraBuckets": ["2000s", "2010s"],
+    "topicTags": ["aviation", "space", "firsts", "government"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "Former NASA Headquarters, 300 E Street SW, Washington, D.C.",
@@ -991,12 +751,7 @@
       }
     ],
     "historicalContext": "Bolden led NASA headquarters in Washington through the end of the Space Shuttle program and the start of the commercial crew program; the agency's headquarters building at 300 E Street SW served as his administrative base throughout his tenure.",
-    "topicIds": [
-      "aviation",
-      "space",
-      "firsts",
-      "government"
-    ],
+    "topicIds": ["aviation", "space", "firsts", "government"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1005,16 +760,8 @@
     "kind": "person",
     "displayName": "Frederick Gregory",
     "summary": "Frederick Gregory, a Vietnam combat rescue pilot and graduate of Washington, D.C.'s Anacostia High School, became the first Black astronaut to pilot a space shuttle when he flew Challenger's STS-51-B mission in 1985, and the first Black mission commander when he led Discovery's STS-33 in 1989.",
-    "eraBuckets": [
-      "1980s",
-      "1990s"
-    ],
-    "topicTags": [
-      "aviation",
-      "space",
-      "firsts",
-      "military"
-    ],
+    "eraBuckets": ["1980s", "1990s"],
+    "topicTags": ["aviation", "space", "firsts", "military"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "Anacostia High School, 1601 16th Street SE, Washington, D.C.",
@@ -1039,12 +786,7 @@
       }
     ],
     "historicalContext": "Gregory later served as NASA Deputy Administrator during the 2003 Columbia disaster response and briefly as acting Administrator in 2005; his nephew connection to blood-plasma pioneer Charles R. Drew (his uncle) is documented in Smithsonian's profile of his family.",
-    "topicIds": [
-      "aviation",
-      "space",
-      "firsts",
-      "military"
-    ],
+    "topicIds": ["aviation", "space", "firsts", "military"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1053,15 +795,8 @@
     "kind": "person",
     "displayName": "Robert Henry Lawrence Jr.",
     "summary": "Robert Henry Lawrence Jr., a chemist with a Ph.D. from Ohio State and an Air Force test pilot, became the first African American selected as an astronaut when the U.S. Air Force chose him for its Manned Orbiting Laboratory program in June 1967. He died in a training-flight crash at Edwards Air Force Base six months later, before he could fly in space.",
-    "eraBuckets": [
-      "1960s"
-    ],
-    "topicTags": [
-      "aviation",
-      "space",
-      "firsts",
-      "military"
-    ],
+    "eraBuckets": ["1960s"],
+    "topicTags": ["aviation", "space", "firsts", "military"],
     "jurisdictionLabel": "Edwards Air Force Base, California",
     "locationPrecision": "campus",
     "locationLabel": "Edwards Air Force Base, California",
@@ -1086,12 +821,7 @@
       }
     ],
     "historicalContext": "When the Nixon administration canceled the Manned Orbiting Laboratory program in 1969, younger MOL astronauts transferred to NASA; had he lived, Lawrence would likely have transferred and could have been the first Black NASA astronaut to fly. NASA named an asteroid after him in 2020 in recognition of his pioneering selection.",
-    "topicIds": [
-      "aviation",
-      "space",
-      "firsts",
-      "military"
-    ],
+    "topicIds": ["aviation", "space", "firsts", "military"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1100,14 +830,8 @@
     "kind": "person",
     "displayName": "Victor Glover",
     "summary": "Victor Glover piloted SpaceX Crew Dragon's first operational flight, Crew-1, from Kennedy Space Center in November 2020, becoming the first Black astronaut to serve a long-duration mission aboard the International Space Station. In 2026 he piloted Artemis II, becoming the first Black astronaut to travel beyond low Earth orbit toward the Moon.",
-    "eraBuckets": [
-      "2020s"
-    ],
-    "topicTags": [
-      "aviation",
-      "space",
-      "firsts"
-    ],
+    "eraBuckets": ["2020s"],
+    "topicTags": ["aviation", "space", "firsts"],
     "jurisdictionLabel": "Cape Canaveral, Florida",
     "locationPrecision": "campus",
     "locationLabel": "Launch Complex 39A, Kennedy Space Center, Florida",
@@ -1132,11 +856,7 @@
       }
     ],
     "historicalContext": "Both of Glover's historic missions launched from Kennedy Space Center's Launch Complex 39A, the same pad used for Apollo 11 and many shuttle missions, making it the concrete site tied to his two space-history milestones.",
-    "topicIds": [
-      "aviation",
-      "space",
-      "firsts"
-    ],
+    "topicIds": ["aviation", "space", "firsts"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1145,15 +865,8 @@
     "kind": "person",
     "displayName": "Bernard Harris",
     "summary": "Bernard Harris, a physician who studied astronaut bone loss at NASA Ames before joining the astronaut corps in 1991, became the first African American to perform a spacewalk on February 9, 1995, during Space Shuttle Discovery's STS-63 mission, the first Shuttle rendezvous with Russia's Mir space station.",
-    "eraBuckets": [
-      "1990s"
-    ],
-    "topicTags": [
-      "aviation",
-      "space",
-      "firsts",
-      "medicine"
-    ],
+    "eraBuckets": ["1990s"],
+    "topicTags": ["aviation", "space", "firsts", "medicine"],
     "jurisdictionLabel": "Cape Canaveral, Florida",
     "locationPrecision": "campus",
     "locationLabel": "Launch Complex 39B, Kennedy Space Center, Florida",
@@ -1178,12 +891,7 @@
       }
     ],
     "historicalContext": "After leaving NASA, Harris founded the National Math and Science Initiative and Vesalius Ventures to expand STEM education and medical technology access.",
-    "topicIds": [
-      "aviation",
-      "space",
-      "firsts",
-      "medicine"
-    ],
+    "topicIds": ["aviation", "space", "firsts", "medicine"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1192,16 +900,8 @@
     "kind": "person",
     "displayName": "Marlon Green",
     "summary": "After Continental Airlines refused to hire him despite his qualifications, Marlon Green fought a six-year legal battle that reached the U.S. Supreme Court. The Court's 1963 ruling in Colorado Anti-Discrimination Commission v. Continental Air Lines forced the Denver-based carrier to hire him, opening major U.S. airline cockpits to Black pilots.",
-    "eraBuckets": [
-      "1950s",
-      "1960s"
-    ],
-    "topicTags": [
-      "aviation",
-      "firsts",
-      "civil-rights",
-      "law"
-    ],
+    "eraBuckets": ["1950s", "1960s"],
+    "topicTags": ["aviation", "firsts", "civil-rights", "law"],
     "jurisdictionLabel": "Denver, Colorado",
     "locationPrecision": "city",
     "locationLabel": "Denver, Colorado",
@@ -1226,12 +926,7 @@
       }
     ],
     "historicalContext": "Green applied to Denver-based Continental in 1957 by omitting a photo and leaving the race question blank; when the airline rescinded its offer on learning he was Black, his case became a landmark in dismantling employment discrimination in commercial aviation nationwide. No single Denver building is documented as the site of his application, so the city is used at city-level precision.",
-    "topicIds": [
-      "aviation",
-      "firsts",
-      "civil-rights",
-      "law"
-    ],
+    "topicIds": ["aviation", "firsts", "civil-rights", "law"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1240,14 +935,8 @@
     "kind": "person",
     "displayName": "Perry Young",
     "summary": "A former Tuskegee Airmen flight instructor, Perry Young was hired by New York Airways in December 1956 and, on February 5, 1957, flew as co-pilot on a scheduled helicopter flight from LaGuardia Airport, becoming the first African American pilot for a scheduled U.S. commercial airline.",
-    "eraBuckets": [
-      "1950s"
-    ],
-    "topicTags": [
-      "aviation",
-      "firsts",
-      "military"
-    ],
+    "eraBuckets": ["1950s"],
+    "topicTags": ["aviation", "firsts", "military"],
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "institution",
     "locationLabel": "LaGuardia Airport, Queens, New York",
@@ -1272,15 +961,8 @@
       }
     ],
     "historicalContext": "New York Airways management chose to hire Young in part to generate favorable publicity for its new helicopter service, despite his having fewer helicopter hours than their stated minimum; his hiring predates the more widely cited 1963 Marlon Green case by six years but involved a helicopter carrier rather than a mainline jet airline.",
-    "topicIds": [
-      "aviation",
-      "firsts",
-      "military"
-    ],
-    "mentionedEntityIds": [
-      "ent_marlon_green_001",
-      "ent_tuskegee_university_001"
-    ],
+    "topicIds": ["aviation", "firsts", "military"],
+    "mentionedEntityIds": ["ent_marlon_green_001", "ent_tuskegee_university_001"],
     "keywords": []
   },
   {
@@ -1288,17 +970,8 @@
     "kind": "person",
     "displayName": "Katherine Johnson",
     "summary": "Katherine Johnson joined NACA's segregated West Area Computing unit at Langley Research Center in 1953 and spent 33 years calculating flight trajectories, including the launch window for John Glenn's 1962 orbital flight and the rendezvous paths for the Apollo Moon missions. President Obama awarded her the Presidential Medal of Freedom in 2015.",
-    "eraBuckets": [
-      "1950s",
-      "1960s",
-      "1970s"
-    ],
-    "topicTags": [
-      "science",
-      "space",
-      "mathematics",
-      "women"
-    ],
+    "eraBuckets": ["1950s", "1960s", "1970s"],
+    "topicTags": ["science", "space", "mathematics", "women"],
     "jurisdictionLabel": "Hampton, Virginia",
     "locationPrecision": "campus",
     "locationLabel": "NASA Langley Research Center, Hampton, Virginia",
@@ -1323,12 +996,7 @@
       }
     ],
     "historicalContext": "Johnson worked alongside fellow West Area Computing mathematicians Dorothy Vaughan and Mary Jackson at Langley; the three were later profiled in Margot Lee Shetterly's book and the film Hidden Figures. She retired from Langley in 1986 after a 33-year career. She died February 24, 2020.",
-    "topicIds": [
-      "science",
-      "space",
-      "mathematics",
-      "women"
-    ],
+    "topicIds": ["science", "space", "mathematics", "women"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1337,17 +1005,8 @@
     "kind": "person",
     "displayName": "Dorothy Vaughan",
     "summary": "Dorothy Vaughan, hired as a mathematician at NACA's segregated Langley laboratory in 1943, became acting supervisor of the West Area Computing unit in 1949 — the first African American supervisor at the agency. She later taught herself and her staff FORTRAN to prepare them for NASA's transition to electronic computing.",
-    "eraBuckets": [
-      "1940s",
-      "1950s",
-      "1960s"
-    ],
-    "topicTags": [
-      "science",
-      "mathematics",
-      "firsts",
-      "women"
-    ],
+    "eraBuckets": ["1940s", "1950s", "1960s"],
+    "topicTags": ["science", "mathematics", "firsts", "women"],
     "jurisdictionLabel": "Hampton, Virginia",
     "locationPrecision": "campus",
     "locationLabel": "NASA Langley Research Center, Hampton, Virginia",
@@ -1372,12 +1031,7 @@
       }
     ],
     "historicalContext": "Vaughan advocated for pay and promotions for all Langley computers regardless of race, and moved into the integrated Analysis and Computation Division after 1958, where she worked on the Scout Launch Vehicle Program.",
-    "topicIds": [
-      "science",
-      "mathematics",
-      "firsts",
-      "women"
-    ],
+    "topicIds": ["science", "mathematics", "firsts", "women"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1386,17 +1040,8 @@
     "kind": "person",
     "displayName": "Mary Jackson",
     "summary": "Mary Jackson petitioned the City of Hampton to attend then-segregated night classes so she could qualify for promotion, and in 1958 became NASA's first Black female engineer, authoring research on airflow around aircraft at Langley for nearly two decades. In 2021 NASA renamed its Washington headquarters building in her honor.",
-    "eraBuckets": [
-      "1950s",
-      "1960s",
-      "1970s"
-    ],
-    "topicTags": [
-      "science",
-      "engineering",
-      "firsts",
-      "women"
-    ],
+    "eraBuckets": ["1950s", "1960s", "1970s"],
+    "topicTags": ["science", "engineering", "firsts", "women"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "institution",
     "locationLabel": "Mary W. Jackson NASA Headquarters, 300 E Street SW, Washington, D.C.",
@@ -1437,12 +1082,7 @@
       }
     ],
     "historicalContext": "Jackson spent most of her nearly two-decade engineering career at Langley Research Center in Hampton, Virginia, but is anchored here at NASA's Washington headquarters because the agency renamed that building for her in 2021, the most concretely NASA-designated site bearing her name today.",
-    "topicIds": [
-      "science",
-      "engineering",
-      "firsts",
-      "women"
-    ],
+    "topicIds": ["science", "engineering", "firsts", "women"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1451,17 +1091,8 @@
     "kind": "person",
     "displayName": "Percy Julian",
     "summary": "Percy Julian, grandson of enslaved people, became a pioneering research chemist who synthesized physostigmine and developed low-cost methods to produce synthetic cortisone and steroid hormones from soybeans, laying groundwork for the modern steroid drug industry. He held more than 130 patents and moved his family to Oak Park, Illinois in 1950.",
-    "eraBuckets": [
-      "1930s",
-      "1940s",
-      "1950s"
-    ],
-    "topicTags": [
-      "science",
-      "chemistry",
-      "invention",
-      "firsts"
-    ],
+    "eraBuckets": ["1930s", "1940s", "1950s"],
+    "topicTags": ["science", "chemistry", "invention", "firsts"],
     "jurisdictionLabel": "Oak Park, Illinois",
     "locationPrecision": "institution",
     "locationLabel": "Percy Julian House, 515 North East Avenue, Oak Park, Illinois",
@@ -1486,12 +1117,7 @@
       }
     ],
     "historicalContext": "Julian's Oak Park home, where he lived and worked as a scientist and entrepreneur until his death, is the subject of ongoing local and congressional preservation efforts; the attack on the house is recounted here to document the community's resilience and Julian's determination to stay, not to center the violence itself.",
-    "topicIds": [
-      "science",
-      "chemistry",
-      "invention",
-      "firsts"
-    ],
+    "topicIds": ["science", "chemistry", "invention", "firsts"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1500,15 +1126,8 @@
     "kind": "person",
     "displayName": "Charles Drew",
     "summary": "Charles Drew's research on blood chemistry and preservation at Columbia University led to his 1940 doctoral thesis on blood banking, and he directed the \"Blood for Britain\" program that shipped thousands of liters of plasma during World War II. As chair of surgery at Howard University College of Medicine, he trained a generation of Black surgeons.",
-    "eraBuckets": [
-      "1930s",
-      "1940s"
-    ],
-    "topicTags": [
-      "science",
-      "medicine",
-      "firsts"
-    ],
+    "eraBuckets": ["1930s", "1940s"],
+    "topicTags": ["science", "medicine", "firsts"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "campus",
     "locationLabel": "Howard University College of Medicine / Howard University Hospital, Georgia Avenue NW, Washington, D.C.",
@@ -1549,14 +1168,8 @@
       }
     ],
     "historicalContext": "Freedmen's Hospital, where Drew served as chief of surgery, was the teaching hospital affiliated with Howard's medical school and has since been succeeded by Howard University Hospital on the same Georgia Avenue campus.",
-    "topicIds": [
-      "science",
-      "medicine",
-      "firsts"
-    ],
-    "mentionedEntityIds": [
-      "ent_howard_university_001"
-    ],
+    "topicIds": ["science", "medicine", "firsts"],
+    "mentionedEntityIds": ["ent_howard_university_001"],
     "keywords": []
   },
   {
@@ -1564,17 +1177,8 @@
     "kind": "person",
     "displayName": "Patricia Bath",
     "summary": "Patricia Bath, the first woman appointed to UCLA's Jules Stein Eye Institute faculty in 1974, invented the Laserphaco Probe for cataract treatment and in 1988 became the first African American female physician to receive a U.S. patent for a medical device. She was also the first woman in the U.S. to chair an ophthalmology residency program.",
-    "eraBuckets": [
-      "1970s",
-      "1980s"
-    ],
-    "topicTags": [
-      "science",
-      "medicine",
-      "invention",
-      "firsts",
-      "women"
-    ],
+    "eraBuckets": ["1970s", "1980s"],
+    "topicTags": ["science", "medicine", "invention", "firsts", "women"],
     "jurisdictionLabel": "Los Angeles, California",
     "locationPrecision": "institution",
     "locationLabel": "Jules Stein Eye Institute, UCLA, Los Angeles, California",
@@ -1599,13 +1203,7 @@
       }
     ],
     "historicalContext": "Bath also co-founded the American Institute for the Prevention of Blindness in 1976 to bring eye care to underserved communities; her UCLA appointment marked the start of the academic career during which she developed the Laserphaco Probe.",
-    "topicIds": [
-      "science",
-      "medicine",
-      "invention",
-      "firsts",
-      "women"
-    ],
+    "topicIds": ["science", "medicine", "invention", "firsts", "women"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1614,15 +1212,8 @@
     "kind": "person",
     "displayName": "Daniel Hale Williams",
     "summary": "Daniel Hale Williams founded Provident Hospital in Chicago in 1891, the first Black-owned hospital and nursing school in the United States, open to patients and staff of all races. There on July 10, 1893, he performed one of the world's first successful open-heart surgeries, repairing a stab wound to a patient's pericardium without antibiotics or blood transfusion.",
-    "eraBuckets": [
-      "1890s",
-      "1900s"
-    ],
-    "topicTags": [
-      "science",
-      "medicine",
-      "firsts"
-    ],
+    "eraBuckets": ["1890s", "1900s"],
+    "topicTags": ["science", "medicine", "firsts"],
     "jurisdictionLabel": "Chicago, Illinois",
     "locationPrecision": "institution",
     "locationLabel": "Provident Hospital of Cook County, 500 East 51st Street, Chicago, Illinois",
@@ -1647,11 +1238,7 @@
       }
     ],
     "historicalContext": "Provident Hospital has operated at several Chicago sites since 1891; the present Cook County-operated facility at 500 East 51st Street carries on the institution Williams founded. In 1913 Williams became the first African American inducted into the American College of Surgeons.",
-    "topicIds": [
-      "science",
-      "medicine",
-      "firsts"
-    ],
+    "topicIds": ["science", "medicine", "firsts"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1660,16 +1247,8 @@
     "kind": "person",
     "displayName": "Ernest Everett Just",
     "summary": "Ernest Everett Just, a Dartmouth-trained biologist who earned a University of Chicago PhD in zoology in 1916, spent roughly two decades of summers researching cell fertilization and marine invertebrate development at the Marine Biological Laboratory in Woods Hole, Massachusetts. In 1915 he received the first NAACP Spingarn Medal for his scientific achievement.",
-    "eraBuckets": [
-      "1910s",
-      "1920s",
-      "1930s"
-    ],
-    "topicTags": [
-      "science",
-      "biology",
-      "firsts"
-    ],
+    "eraBuckets": ["1910s", "1920s", "1930s"],
+    "topicTags": ["science", "biology", "firsts"],
     "jurisdictionLabel": "Woods Hole, Massachusetts",
     "locationPrecision": "institution",
     "locationLabel": "Marine Biological Laboratory, Woods Hole, Massachusetts",
@@ -1694,14 +1273,8 @@
       }
     ],
     "historicalContext": "Just taught for years at Howard University but built his research reputation almost entirely through his Woods Hole summers, mentored by MBL director Frank Lillie; limited opportunities for Black scientists at American research universities later led him to work extensively in European laboratories as well.",
-    "topicIds": [
-      "science",
-      "biology",
-      "firsts"
-    ],
-    "mentionedEntityIds": [
-      "ent_howard_university_001"
-    ],
+    "topicIds": ["science", "biology", "firsts"],
+    "mentionedEntityIds": ["ent_howard_university_001"],
     "keywords": []
   },
   {
@@ -1709,15 +1282,8 @@
     "kind": "person",
     "displayName": "David Blackwell",
     "summary": "David Blackwell, a statistician who earned his PhD at age 22 from the University of Illinois, became UC Berkeley's first Black tenured professor in 1954 and, in 1965, the first African American elected to the National Academy of Sciences. He co-developed the Rao-Blackwell theorem and mentored more than 60 doctoral students.",
-    "eraBuckets": [
-      "1950s",
-      "1960s"
-    ],
-    "topicTags": [
-      "science",
-      "mathematics",
-      "firsts"
-    ],
+    "eraBuckets": ["1950s", "1960s"],
+    "topicTags": ["science", "mathematics", "firsts"],
     "jurisdictionLabel": "Berkeley, California",
     "locationPrecision": "campus",
     "locationLabel": "University of California, Berkeley, California",
@@ -1742,15 +1308,8 @@
       }
     ],
     "historicalContext": "Before Berkeley, Blackwell was repeatedly denied faculty positions at predominantly white universities and taught at Southern University, Clark College, and Howard University, where he chaired the math department; UC Berkeley named a residence hall for him in 2018.",
-    "topicIds": [
-      "science",
-      "mathematics",
-      "firsts"
-    ],
-    "mentionedEntityIds": [
-      "ent_howard_university_001",
-      "ent_southern_university_001"
-    ],
+    "topicIds": ["science", "mathematics", "firsts"],
+    "mentionedEntityIds": ["ent_howard_university_001", "ent_southern_university_001"],
     "keywords": []
   },
   {
@@ -1758,15 +1317,8 @@
     "kind": "person",
     "displayName": "Shirley Ann Jackson",
     "summary": "Shirley Ann Jackson earned a PhD in theoretical elementary particle physics from MIT in 1973, becoming the first Black woman to earn a doctorate from that institution. After a research career at Bell Laboratories and chairing the U.S. Nuclear Regulatory Commission, she became president of Rensselaer Polytechnic Institute in 1999.",
-    "eraBuckets": [
-      "1970s"
-    ],
-    "topicTags": [
-      "science",
-      "physics",
-      "firsts",
-      "women"
-    ],
+    "eraBuckets": ["1970s"],
+    "topicTags": ["science", "physics", "firsts", "women"],
     "jurisdictionLabel": "Cambridge, Massachusetts",
     "locationPrecision": "campus",
     "locationLabel": "Massachusetts Institute of Technology, Cambridge, Massachusetts",
@@ -1791,12 +1343,7 @@
       }
     ],
     "historicalContext": "Jackson researched theoretical physics at AT&T Bell Laboratories starting in 1976, later chaired the Nuclear Regulatory Commission, and has served as president of Rensselaer Polytechnic Institute in Troy, New York since 1999.",
-    "topicIds": [
-      "science",
-      "physics",
-      "firsts",
-      "women"
-    ],
+    "topicIds": ["science", "physics", "firsts", "women"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1805,17 +1352,8 @@
     "kind": "person",
     "displayName": "Marie Maynard Daly",
     "summary": "Marie Maynard Daly earned her PhD in chemistry from Columbia University on June 3, 1947, becoming the first Black woman in the United States to hold a doctorate in chemistry. Her subsequent research at Rockefeller University and Albert Einstein College of Medicine advanced understanding of protein synthesis and the links between cholesterol, hypertension, and atherosclerosis.",
-    "eraBuckets": [
-      "1940s",
-      "1950s",
-      "1960s"
-    ],
-    "topicTags": [
-      "science",
-      "chemistry",
-      "firsts",
-      "women"
-    ],
+    "eraBuckets": ["1940s", "1950s", "1960s"],
+    "topicTags": ["science", "chemistry", "firsts", "women"],
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "campus",
     "locationLabel": "Columbia University, New York, New York",
@@ -1840,12 +1378,7 @@
       }
     ],
     "historicalContext": "Daly also created a scholarship fund at Queens College, her undergraduate alma mater, to support Black students in the sciences, extending her commitment to broadening access to scientific careers.",
-    "topicIds": [
-      "science",
-      "chemistry",
-      "firsts",
-      "women"
-    ],
+    "topicIds": ["science", "chemistry", "firsts", "women"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1854,15 +1387,8 @@
     "kind": "person",
     "displayName": "Ralph Bunche",
     "summary": "Ralph Bunche, a Howard University political scientist who helped draft the United Nations charter, mediated the 1949 Arab-Israeli armistice agreements after his predecessor was assassinated. In 1950 he became the first Black person and first person of color to win the Nobel Peace Prize.",
-    "eraBuckets": [
-      "1940s",
-      "1950s"
-    ],
-    "topicTags": [
-      "science",
-      "diplomacy",
-      "firsts"
-    ],
+    "eraBuckets": ["1940s", "1950s"],
+    "topicTags": ["science", "diplomacy", "firsts"],
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "institution",
     "locationLabel": "Ralph Bunche Park, First Avenue at 42nd Street, New York, New York",
@@ -1903,14 +1429,8 @@
       }
     ],
     "historicalContext": "New York City dedicated this small park directly across First Avenue from UN Headquarters in Bunche's honor in 1979, the same stretch of Turtle Bay where he carried out much of his UN diplomatic career; it was designated the city's first 'peace park' in 1985.",
-    "topicIds": [
-      "science",
-      "diplomacy",
-      "firsts"
-    ],
-    "mentionedEntityIds": [
-      "ent_howard_university_001"
-    ],
+    "topicIds": ["science", "diplomacy", "firsts"],
+    "mentionedEntityIds": ["ent_howard_university_001"],
     "keywords": []
   },
   {
@@ -1918,17 +1438,8 @@
     "kind": "person",
     "displayName": "Toni Morrison",
     "summary": "Toni Morrison, a novelist and Howard University graduate whose works include Song of Solomon and Beloved, became the first Black woman to win the Nobel Prize in Literature in 1993. She joined Princeton University's faculty in 1989 as the Robert F. Goheen Professor, teaching literature and creative writing until her 2006 retirement.",
-    "eraBuckets": [
-      "1970s",
-      "1980s",
-      "1990s"
-    ],
-    "topicTags": [
-      "science",
-      "literature",
-      "firsts",
-      "women"
-    ],
+    "eraBuckets": ["1970s", "1980s", "1990s"],
+    "topicTags": ["science", "literature", "firsts", "women"],
     "jurisdictionLabel": "Princeton, New Jersey",
     "locationPrecision": "campus",
     "locationLabel": "Princeton University, Princeton, New Jersey",
@@ -1969,15 +1480,8 @@
       }
     ],
     "historicalContext": "Morrison's Nobel followed her 1988 Pulitzer Prize for Beloved; she is anchored at Princeton, where she spent 17 years on the faculty, rather than Howard, her undergraduate alma mater, which is already documented elsewhere in this catalog.",
-    "topicIds": [
-      "science",
-      "literature",
-      "firsts",
-      "women"
-    ],
-    "mentionedEntityIds": [
-      "ent_howard_university_001"
-    ],
+    "topicIds": ["science", "literature", "firsts", "women"],
+    "mentionedEntityIds": ["ent_howard_university_001"],
     "keywords": []
   },
   {
@@ -1985,16 +1489,8 @@
     "kind": "person",
     "displayName": "Rebecca Lee Crumpler",
     "summary": "Rebecca Lee Crumpler, the only Black student at Boston's New England Female Medical College, graduated on March 1, 1864, becoming the first African American woman to earn a medical degree in the United States. She practiced in Boston and postwar Richmond, Virginia, focusing on care for formerly enslaved people, women, and children.",
-    "eraBuckets": [
-      "1860s",
-      "1880s"
-    ],
-    "topicTags": [
-      "science",
-      "medicine",
-      "firsts",
-      "women"
-    ],
+    "eraBuckets": ["1860s", "1880s"],
+    "topicTags": ["science", "medicine", "firsts", "women"],
     "jurisdictionLabel": "Boston, Massachusetts",
     "locationPrecision": "campus",
     "locationLabel": "Fairview Cemetery, Hyde Park, Boston, Massachusetts",
@@ -2019,12 +1515,7 @@
       }
     ],
     "historicalContext": "Crumpler's 1883 'A Book of Medical Discourses' was among the first medical texts published by an African American; the New England Female Medical College building no longer stands, so her rediscovered and rededicated gravesite is now the most concretely marked site tied to her life.",
-    "topicIds": [
-      "science",
-      "medicine",
-      "firsts",
-      "women"
-    ],
+    "topicIds": ["science", "medicine", "firsts", "women"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2033,16 +1524,8 @@
     "kind": "person",
     "displayName": "James McCune Smith",
     "summary": "James McCune Smith, denied admission to American medical schools because of his race, earned three degrees including a medical doctorate from the University of Glasgow before returning to New York City in 1837 to open a medical practice and pharmacy, becoming the first African American to hold a medical degree and to operate a pharmacy in the United States.",
-    "eraBuckets": [
-      "1830s",
-      "1840s",
-      "1850s"
-    ],
-    "topicTags": [
-      "science",
-      "medicine",
-      "firsts"
-    ],
+    "eraBuckets": ["1830s", "1840s", "1850s"],
+    "topicTags": ["science", "medicine", "firsts"],
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "campus",
     "locationLabel": "Site of Smith's medical office and pharmacy, West Broadway near Chambers Street, Manhattan, New York",
@@ -2067,11 +1550,7 @@
       }
     ],
     "historicalContext": "Smith trained at Glasgow because U.S. medical schools barred Black applicants; his New York practice and pharmacy, rather than his Scottish alma mater, is used here to anchor his U.S.-based career and keep this entry within the catalog's United States scope.",
-    "topicIds": [
-      "science",
-      "medicine",
-      "firsts"
-    ],
+    "topicIds": ["science", "medicine", "firsts"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2080,16 +1559,8 @@
     "kind": "person",
     "displayName": "Alexa Canady",
     "summary": "Alexa Canady completed her neurosurgical residency at the University of Minnesota in 1981, becoming the first African American woman to train and qualify as a neurosurgeon in the United States. She later served as chief of neurosurgery at the Children's Hospital of Michigan in Detroit and co-developed a widely used programmable shunt for treating hydrocephalus.",
-    "eraBuckets": [
-      "1980s",
-      "1990s"
-    ],
-    "topicTags": [
-      "science",
-      "medicine",
-      "firsts",
-      "women"
-    ],
+    "eraBuckets": ["1980s", "1990s"],
+    "topicTags": ["science", "medicine", "firsts", "women"],
     "jurisdictionLabel": "Detroit, Michigan",
     "locationPrecision": "institution",
     "locationLabel": "Children's Hospital of Michigan, Detroit, Michigan",
@@ -2114,12 +1585,7 @@
       }
     ],
     "historicalContext": "Canady, daughter of a Fisk- and Meharry-trained dentist and a Delta Sigma Theta national president, faced open skepticism early in her career; she came out of retirement in the 2000s to help establish pediatric neurosurgery at a Florida hospital before fully retiring in 2012.",
-    "topicIds": [
-      "science",
-      "medicine",
-      "firsts",
-      "women"
-    ],
+    "topicIds": ["science", "medicine", "firsts", "women"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2128,14 +1594,8 @@
     "kind": "person",
     "displayName": "Ben Carson",
     "summary": "As director of pediatric neurosurgery at Johns Hopkins, Ben Carson led a 70-person surgical team that on September 6, 1987 separated 7-month-old craniopagus (head-conjoined) twins Patrick and Benjamin Binder, the first such separation in which both twins survived the operation itself, after 23 previous attempts worldwide had ended in at least one death.",
-    "eraBuckets": [
-      "1980s"
-    ],
-    "topicTags": [
-      "science",
-      "medicine",
-      "firsts"
-    ],
+    "eraBuckets": ["1980s"],
+    "topicTags": ["science", "medicine", "firsts"],
     "jurisdictionLabel": "Baltimore, Maryland",
     "locationPrecision": "institution",
     "locationLabel": "Johns Hopkins Hospital, Baltimore, Maryland",
@@ -2160,11 +1620,7 @@
       }
     ],
     "historicalContext": "Both Binder twins survived the surgery itself but were left with severe neurological disabilities and required lifelong institutional care in Germany; the operation is documented as a landmark in surgical technique even though its long-term outcome for the twins was not a full recovery.",
-    "topicIds": [
-      "science",
-      "medicine",
-      "firsts"
-    ],
+    "topicIds": ["science", "medicine", "firsts"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2173,16 +1629,8 @@
     "kind": "person",
     "displayName": "Alain Locke",
     "summary": "Alain Locke graduated with honors from Harvard in 1907 and became the first African American selected as a Rhodes Scholar, studying at Oxford's Hertford College from 1907 to 1910 despite being denied admission to several colleges because of his race. He later chaired Howard University's philosophy department for nearly 40 years, remembered as the philosophical architect of the Harlem Renaissance.",
-    "eraBuckets": [
-      "1900s",
-      "1920s"
-    ],
-    "topicTags": [
-      "science",
-      "philosophy",
-      "firsts",
-      "arts"
-    ],
+    "eraBuckets": ["1900s", "1920s"],
+    "topicTags": ["science", "philosophy", "firsts", "arts"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "campus",
     "locationLabel": "Howard University, Washington, D.C.",
@@ -2207,15 +1655,8 @@
       }
     ],
     "historicalContext": "Locke's 1925 anthology 'The New Negro' helped define and promote the Harlem Renaissance as a literary and artistic movement; he taught English and later philosophy at Howard for most of his career.",
-    "topicIds": [
-      "science",
-      "philosophy",
-      "firsts",
-      "arts"
-    ],
-    "mentionedEntityIds": [
-      "ent_howard_university_001"
-    ],
+    "topicIds": ["science", "philosophy", "firsts", "arts"],
+    "mentionedEntityIds": ["ent_howard_university_001"],
     "keywords": []
   },
   {
@@ -2223,18 +1664,8 @@
     "kind": "person",
     "displayName": "Euphemia Lofton Haynes",
     "summary": "Euphemia Lofton Haynes earned her PhD in mathematics from the Catholic University of America in 1943, becoming the first African American woman to hold a doctorate in mathematics. She founded the math department at Miner Teachers College in Washington, D.C. in 1930 and later became the first woman to chair the D.C. Board of Education.",
-    "eraBuckets": [
-      "1930s",
-      "1940s",
-      "1960s"
-    ],
-    "topicTags": [
-      "science",
-      "mathematics",
-      "firsts",
-      "women",
-      "education"
-    ],
+    "eraBuckets": ["1930s", "1940s", "1960s"],
+    "topicTags": ["science", "mathematics", "firsts", "women", "education"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "campus",
     "locationLabel": "Catholic University of America, Washington, D.C.",
@@ -2259,13 +1690,7 @@
       }
     ],
     "historicalContext": "Haynes founded and chaired the math department at Miner Teachers College, later part of the University of the District of Columbia, for nearly 30 years; her advocacy on the D.C. school board helped bring the 1967 Hobson v. Gardner ruling that ended the district's discriminatory tracking system.",
-    "topicIds": [
-      "science",
-      "mathematics",
-      "firsts",
-      "women",
-      "education"
-    ],
+    "topicIds": ["science", "mathematics", "firsts", "women", "education"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2274,18 +1699,8 @@
     "kind": "person",
     "displayName": "Evelyn Boyd Granville",
     "summary": "Evelyn Boyd Granville earned her PhD in mathematics from Yale University in 1949, becoming, together with Marjorie Lee Browne that same year, one of the first two African American women to earn a mathematics doctorate. She later worked at IBM and NASA contractors calculating orbital trajectories for the Mercury and Apollo space programs.",
-    "eraBuckets": [
-      "1940s",
-      "1950s",
-      "1960s"
-    ],
-    "topicTags": [
-      "science",
-      "mathematics",
-      "firsts",
-      "women",
-      "space"
-    ],
+    "eraBuckets": ["1940s", "1950s", "1960s"],
+    "topicTags": ["science", "mathematics", "firsts", "women", "space"],
     "jurisdictionLabel": "New Haven, Connecticut",
     "locationPrecision": "campus",
     "locationLabel": "Yale University, New Haven, Connecticut",
@@ -2310,17 +1725,8 @@
       }
     ],
     "historicalContext": "Granville and Browne earned their doctorates the same year at different universities; mathematician Euphemia Lofton Haynes preceded both by six years, earning the first PhD in mathematics by an African American woman from the Catholic University of America in 1943. Granville is anchored at Yale, the site of her own doctoral achievement.",
-    "topicIds": [
-      "science",
-      "mathematics",
-      "firsts",
-      "women",
-      "space"
-    ],
-    "mentionedEntityIds": [
-      "ent_euphemia_lofton_haynes_001",
-      "ent_marjorie_lee_browne_001"
-    ],
+    "topicIds": ["science", "mathematics", "firsts", "women", "space"],
+    "mentionedEntityIds": ["ent_euphemia_lofton_haynes_001", "ent_marjorie_lee_browne_001"],
     "keywords": []
   },
   {
@@ -2328,19 +1734,8 @@
     "kind": "person",
     "displayName": "Marjorie Lee Browne",
     "summary": "Marjorie Lee Browne completed her mathematics doctorate at the University of Michigan in 1949, becoming, together with Evelyn Boyd Granville that same year, one of the first two African American women to earn a PhD in mathematics. She spent 30 years on the faculty of North Carolina College (now North Carolina Central University), securing a rare early IBM computer for her students in 1960.",
-    "eraBuckets": [
-      "1940s",
-      "1950s",
-      "1960s",
-      "1970s"
-    ],
-    "topicTags": [
-      "science",
-      "mathematics",
-      "firsts",
-      "women",
-      "education"
-    ],
+    "eraBuckets": ["1940s", "1950s", "1960s", "1970s"],
+    "topicTags": ["science", "mathematics", "firsts", "women", "education"],
     "jurisdictionLabel": "Durham, North Carolina",
     "locationPrecision": "campus",
     "locationLabel": "North Carolina Central University, Durham, North Carolina",
@@ -2365,13 +1760,7 @@
       }
     ],
     "historicalContext": "Browne chaired the mathematics department at North Carolina College (renamed North Carolina Central University in 1969) for much of her three-decade career there, training generations of Black mathematics teachers in the segregated South.",
-    "topicIds": [
-      "science",
-      "mathematics",
-      "firsts",
-      "women",
-      "education"
-    ],
+    "topicIds": ["science", "mathematics", "firsts", "women", "education"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2380,14 +1769,8 @@
     "kind": "person",
     "displayName": "Garrett Morgan",
     "summary": "Garrett Morgan patented a smoke-protective safety hood in 1912 and personally led rescuers wearing it into a gas-filled tunnel beneath Lake Erie after the July 1916 Cleveland Waterworks disaster, saving several lives. He patented a three-position traffic signal with a caution position in 1923 and sold the rights to General Electric.",
-    "eraBuckets": [
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "invention",
-      "firsts"
-    ],
+    "eraBuckets": ["1910s", "1920s"],
+    "topicTags": ["invention", "firsts"],
     "jurisdictionLabel": "Cleveland, Ohio",
     "locationPrecision": "city",
     "locationLabel": "Cleveland, Ohio",
@@ -2420,10 +1803,7 @@
       }
     ],
     "historicalContext": "Morgan moved to Cleveland in 1895 and became one of Ohio's most prolific Black inventors and entrepreneurs; the tunnel disaster site lies roughly 120 feet below Lake Erie and is not a documented visitable location, so this entry is anchored at city precision in the Cleveland community where Morgan lived and worked.",
-    "topicIds": [
-      "invention",
-      "firsts"
-    ],
+    "topicIds": ["invention", "firsts"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2432,16 +1812,8 @@
     "kind": "person",
     "displayName": "Frederick McKinley Jones",
     "summary": "Frederick McKinley Jones patented the first practical automatic refrigeration unit for long-haul trucks in 1940, work that led to the 1938 founding of Thermo King in Minneapolis, where he served as chief engineer. He held more than 60 patents and in 1944 became the first African American elected to the American Society of Refrigeration Engineers.",
-    "eraBuckets": [
-      "1930s",
-      "1940s",
-      "1950s"
-    ],
-    "topicTags": [
-      "invention",
-      "firsts",
-      "transportation"
-    ],
+    "eraBuckets": ["1930s", "1940s", "1950s"],
+    "topicTags": ["invention", "firsts", "transportation"],
     "jurisdictionLabel": "Minneapolis, Minnesota",
     "locationPrecision": "city",
     "locationLabel": "Minneapolis, Minnesota",
@@ -2466,11 +1838,7 @@
       }
     ],
     "historicalContext": "Jones served as Thermo King's chief engineer and vice president of engineering for 15 years, generating more than 40 refrigeration-related patents that made refrigerated trucking, shipping, and rail transport practical nationwide.",
-    "topicIds": [
-      "invention",
-      "firsts",
-      "transportation"
-    ],
+    "topicIds": ["invention", "firsts", "transportation"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2479,14 +1847,8 @@
     "kind": "person",
     "displayName": "Lewis Latimer",
     "summary": "Lewis Latimer, self-taught son of formerly enslaved parents, patented an improved method of manufacturing durable carbon filaments for incandescent light bulbs in 1882, helping make electric lighting affordable. In 1918 he became the first person of color admitted to the Edison Pioneers, the group of engineers who had worked directly with Thomas Edison.",
-    "eraBuckets": [
-      "1880s",
-      "1910s"
-    ],
-    "topicTags": [
-      "invention",
-      "firsts"
-    ],
+    "eraBuckets": ["1880s", "1910s"],
+    "topicTags": ["invention", "firsts"],
     "jurisdictionLabel": "Flushing, New York",
     "locationPrecision": "institution",
     "locationLabel": "Lewis H. Latimer House Museum, 34-41 137th Street, Flushing, Queens, New York",
@@ -2519,10 +1881,7 @@
       }
     ],
     "historicalContext": "Latimer's Flushing home, where he lived from 1902 until his death in 1928, was relocated a short distance to a park site and preserved as a landmarked museum documenting his career as a draftsman and inventor for the U.S. Electric Lighting Company and Edison's companies.",
-    "topicIds": [
-      "invention",
-      "firsts"
-    ],
+    "topicIds": ["invention", "firsts"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2531,14 +1890,8 @@
     "kind": "person",
     "displayName": "Granville Woods",
     "summary": "Granville Woods, known as \"Black Edison,\" patented the multiplex telegraph (also called the induction telegraph) in 1887 while running his own machine shop in Cincinnati, allowing moving trains to communicate by voice over telegraph wires and helping prevent collisions. He successfully defended his patent against an infringement lawsuit from Thomas Edison.",
-    "eraBuckets": [
-      "1880s",
-      "1890s"
-    ],
-    "topicTags": [
-      "invention",
-      "transportation"
-    ],
+    "eraBuckets": ["1880s", "1890s"],
+    "topicTags": ["invention", "transportation"],
     "jurisdictionLabel": "Cincinnati, Ohio",
     "locationPrecision": "city",
     "locationLabel": "Cincinnati, Ohio",
@@ -2563,10 +1916,7 @@
       }
     ],
     "historicalContext": "Woods registered nearly 60 patents over his career, founding the Woods Electric Company in Cincinnati before relocating to New York City in 1890 to work alongside his brother Lyates, also an inventor.",
-    "topicIds": [
-      "invention",
-      "transportation"
-    ],
+    "topicIds": ["invention", "transportation"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2575,14 +1925,8 @@
     "kind": "person",
     "displayName": "Elijah McCoy",
     "summary": "Elijah McCoy, a mechanical engineer trained in Scotland who could only find work as a railroad fireman in the segregated United States, patented an automatic lubricating cup for steam engines in 1872 that distributed oil continuously without stopping the machine. Railroad engineers came to insist on \"the real McCoy\" over imitators, and he held more than 57 patents in his lifetime.",
-    "eraBuckets": [
-      "1870s",
-      "1890s"
-    ],
-    "topicTags": [
-      "invention",
-      "transportation"
-    ],
+    "eraBuckets": ["1870s", "1890s"],
+    "topicTags": ["invention", "transportation"],
     "jurisdictionLabel": "Ypsilanti, Michigan",
     "locationPrecision": "city",
     "locationLabel": "Ypsilanti, Michigan",
@@ -2607,10 +1951,7 @@
       }
     ],
     "historicalContext": "McCoy settled with his family in Ypsilanti, Michigan after returning from engineering studies in Scotland; barred from engineering jobs by racial discrimination, he worked as a railroad fireman and oilman while developing his lubrication inventions, eventually forming the Elijah McCoy Manufacturing Company in 1920.",
-    "topicIds": [
-      "invention",
-      "transportation"
-    ],
+    "topicIds": ["invention", "transportation"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2619,14 +1960,8 @@
     "kind": "person",
     "displayName": "Sarah Boone",
     "summary": "Sarah Boone, a dressmaker who had escaped slavery in North Carolina and settled in New Haven, Connecticut, patented an improved ironing board on April 26, 1892 — a narrow, curved, reversible board designed to press sleeves and fitted garment seams. She was the first Black woman in Connecticut, and only the fourth known Black woman in the U.S., to hold a patent.",
-    "eraBuckets": [
-      "1890s"
-    ],
-    "topicTags": [
-      "invention",
-      "firsts",
-      "women"
-    ],
+    "eraBuckets": ["1890s"],
+    "topicTags": ["invention", "firsts", "women"],
     "jurisdictionLabel": "New Haven, Connecticut",
     "locationPrecision": "city",
     "locationLabel": "New Haven, Connecticut",
@@ -2651,11 +1986,7 @@
       }
     ],
     "historicalContext": "Boone worked as a dressmaker for decades in New Haven, where she and her husband James, a bricklayer, raised eight children; she is buried with him in the city's Evergreen Cemetery.",
-    "topicIds": [
-      "invention",
-      "firsts",
-      "women"
-    ],
+    "topicIds": ["invention", "firsts", "women"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2664,14 +1995,8 @@
     "kind": "person",
     "displayName": "Marie Van Brittan Brown",
     "summary": "Marie Van Brittan Brown, a nurse in Jamaica, Queens who often worked irregular hours in a neighborhood with slow police response, co-invented an audio-visual home security system with her husband Albert, an electronics technician. Their 1969 patent for a peephole camera, monitor, and remote door lock is widely credited as a forerunner of modern home security and CCTV systems.",
-    "eraBuckets": [
-      "1960s"
-    ],
-    "topicTags": [
-      "invention",
-      "firsts",
-      "women"
-    ],
+    "eraBuckets": ["1960s"],
+    "topicTags": ["invention", "firsts", "women"],
     "jurisdictionLabel": "Queens, New York",
     "locationPrecision": "city",
     "locationLabel": "Jamaica, Queens, New York",
@@ -2696,11 +2021,7 @@
       }
     ],
     "historicalContext": "Brown lived most of her life in Jamaica, Queens, where rising neighborhood crime and her own irregular nursing hours motivated the invention; her patent is now held up as one of the earliest examples of a home security and surveillance system.",
-    "topicIds": [
-      "invention",
-      "firsts",
-      "women"
-    ],
+    "topicIds": ["invention", "firsts", "women"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2709,18 +2030,8 @@
     "kind": "person",
     "displayName": "George Washington Carver",
     "summary": "George Washington Carver, born into slavery near Diamond, Missouri, became Tuskegee Institute's leading agricultural scientist, developing more than 300 uses for the peanut and 100 for the sweet potato to help Southern farmers diversify away from cotton monoculture. The 1943 George Washington Carver National Monument was the first U.S. national memorial to an African American.",
-    "eraBuckets": [
-      "1900s",
-      "1910s",
-      "1920s",
-      "1930s"
-    ],
-    "topicTags": [
-      "invention",
-      "science",
-      "agriculture",
-      "firsts"
-    ],
+    "eraBuckets": ["1900s", "1910s", "1920s", "1930s"],
+    "topicTags": ["invention", "science", "agriculture", "firsts"],
     "jurisdictionLabel": "Diamond, Missouri",
     "locationPrecision": "institution",
     "locationLabel": "George Washington Carver National Monument, Diamond, Missouri",
@@ -2769,15 +2080,8 @@
       }
     ],
     "historicalContext": "Carver is anchored at his birthplace monument in Diamond, Missouri, rather than Tuskegee, since Tuskegee University's campus already appears elsewhere in this catalog; Carver is buried on the Tuskegee campus near Booker T. Washington.",
-    "topicIds": [
-      "invention",
-      "science",
-      "agriculture",
-      "firsts"
-    ],
-    "mentionedEntityIds": [
-      "ent_tuskegee_university_001"
-    ],
+    "topicIds": ["invention", "science", "agriculture", "firsts"],
+    "mentionedEntityIds": ["ent_tuskegee_university_001"],
     "keywords": []
   },
   {
@@ -2785,15 +2089,8 @@
     "kind": "person",
     "displayName": "Otis Boykin",
     "summary": "Otis Boykin, a Chicago engineer who patented as many as 26 devices, developed a low-cost, high-precision wire resistor in 1959 that could withstand extreme temperature and pressure changes. Versions of his resistor technology were used in guided missiles, televisions, and a control unit for the artificial cardiac pacemaker that helped regulate heartbeats.",
-    "eraBuckets": [
-      "1950s",
-      "1960s",
-      "1970s"
-    ],
-    "topicTags": [
-      "invention",
-      "medicine"
-    ],
+    "eraBuckets": ["1950s", "1960s", "1970s"],
+    "topicTags": ["invention", "medicine"],
     "jurisdictionLabel": "Chicago, Illinois",
     "locationPrecision": "city",
     "locationLabel": "Chicago, Illinois",
@@ -2818,14 +2115,8 @@
       }
     ],
     "historicalContext": "Boykin, valedictorian of Dallas's Booker T. Washington High School, moved to Chicago for work after studying at Fisk University; he held roughly 26 patents over his career before his 1982 death.",
-    "topicIds": [
-      "invention",
-      "medicine"
-    ],
-    "mentionedEntityIds": [
-      "ent_fisk_university_001",
-      "ent_tuskegee_university_001"
-    ],
+    "topicIds": ["invention", "medicine"],
+    "mentionedEntityIds": ["ent_fisk_university_001", "ent_tuskegee_university_001"],
     "keywords": []
   },
   {
@@ -2833,16 +2124,8 @@
     "kind": "person",
     "displayName": "Valerie Thomas",
     "summary": "Valerie Thomas, a NASA physicist who managed image-processing systems for the pioneering Landsat Earth-observation satellites, patented an illusion transmitter in 1980 — a device using concave mirrors to produce three-dimensional optical illusions — technology NASA later adapted and which influenced surgical imaging and video display research.",
-    "eraBuckets": [
-      "1970s",
-      "1980s"
-    ],
-    "topicTags": [
-      "invention",
-      "science",
-      "space",
-      "women"
-    ],
+    "eraBuckets": ["1970s", "1980s"],
+    "topicTags": ["invention", "science", "space", "women"],
     "jurisdictionLabel": "Greenbelt, Maryland",
     "locationPrecision": "campus",
     "locationLabel": "NASA Goddard Space Flight Center, Greenbelt, Maryland",
@@ -2867,15 +2150,8 @@
       }
     ],
     "historicalContext": "Thomas, a 1964 Morgan State physics graduate, worked at NASA Goddard from the 1970s until her 1995 retirement and was inducted into the National Inventors Hall of Fame in 2018.",
-    "topicIds": [
-      "invention",
-      "science",
-      "space",
-      "women"
-    ],
-    "mentionedEntityIds": [
-      "ent_morgan_state_university_001"
-    ],
+    "topicIds": ["invention", "science", "space", "women"],
+    "mentionedEntityIds": ["ent_morgan_state_university_001"],
     "keywords": []
   },
   {
@@ -2883,15 +2159,8 @@
     "kind": "person",
     "displayName": "Mark Dean",
     "summary": "Mark Dean co-invented the IBM Personal Computer in 1981 while working at IBM's Boca Raton, Florida development lab, and holds three of IBM's original nine PC patents, including the ISA bus architecture that let printers, monitors, and other peripherals connect to computers. In 1995 he became the first African American named an IBM Fellow, the company's highest technical honor.",
-    "eraBuckets": [
-      "1980s",
-      "1990s"
-    ],
-    "topicTags": [
-      "invention",
-      "technology",
-      "firsts"
-    ],
+    "eraBuckets": ["1980s", "1990s"],
+    "topicTags": ["invention", "technology", "firsts"],
     "jurisdictionLabel": "Boca Raton, Florida",
     "locationPrecision": "city",
     "locationLabel": "Boca Raton, Florida",
@@ -2916,11 +2185,7 @@
       }
     ],
     "historicalContext": "Dean holds three of IBM's original nine patents for the 1981 IBM PC, developed at IBM's Boca Raton facility; in 1999 he led the team that built the first one-gigahertz computer processor chip.",
-    "topicIds": [
-      "invention",
-      "technology",
-      "firsts"
-    ],
+    "topicIds": ["invention", "technology", "firsts"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2929,17 +2194,8 @@
     "kind": "person",
     "displayName": "Marian Croak",
     "summary": "Marian Croak spent three decades at Bell Labs and AT&T developing Voice over Internet Protocol (VoIP) technology, filing more than 200 patents including foundational methods for monitoring call quality over internet networks. In 2022 she became one of the first two Black women inducted into the National Inventors Hall of Fame.",
-    "eraBuckets": [
-      "1990s",
-      "2000s",
-      "2010s"
-    ],
-    "topicTags": [
-      "invention",
-      "technology",
-      "firsts",
-      "women"
-    ],
+    "eraBuckets": ["1990s", "2000s", "2010s"],
+    "topicTags": ["invention", "technology", "firsts", "women"],
     "jurisdictionLabel": "Murray Hill, New Jersey",
     "locationPrecision": "campus",
     "locationLabel": "Bell Labs, Murray Hill, New Jersey",
@@ -2964,12 +2220,7 @@
       }
     ],
     "historicalContext": "Croak's team also created text-to-donate technology that raised $130,000 after Hurricane Katrina in 2005 and $43 million after the 2010 Haiti earthquake; she has worked at Google as a vice president of engineering since 2014.",
-    "topicIds": [
-      "invention",
-      "technology",
-      "firsts",
-      "women"
-    ],
+    "topicIds": ["invention", "technology", "firsts", "women"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -2978,17 +2229,8 @@
     "kind": "person",
     "displayName": "Jane Cooke Wright",
     "summary": "Jane Cooke Wright pioneered the use of human tissue culture, rather than laboratory mice, to test cancer drugs and helped introduce chemotherapy combinations including nitrogen mustard and methotrexate into standard cancer treatment. In 1967 she became an associate dean of New York Medical College, the highest-ranking Black woman at a U.S. medical institution at the time.",
-    "eraBuckets": [
-      "1950s",
-      "1960s",
-      "1970s"
-    ],
-    "topicTags": [
-      "science",
-      "medicine",
-      "firsts",
-      "women"
-    ],
+    "eraBuckets": ["1950s", "1960s", "1970s"],
+    "topicTags": ["science", "medicine", "firsts", "women"],
     "jurisdictionLabel": "Valhalla, New York",
     "locationPrecision": "campus",
     "locationLabel": "New York Medical College, Valhalla, New York",
@@ -3013,12 +2255,7 @@
       }
     ],
     "historicalContext": "Wright began her oncology career at Harlem Hospital under her father, Louis T. Wright, one of the first Black graduates of Harvard Medical School; she later moved her chemotherapy research to New York Medical College, now located in Valhalla, New York.",
-    "topicIds": [
-      "science",
-      "medicine",
-      "firsts",
-      "women"
-    ],
+    "topicIds": ["science", "medicine", "firsts", "women"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -3027,13 +2264,8 @@
     "kind": "person",
     "displayName": "Norbert Rillieux",
     "summary": "Norbert Rillieux, a free man of color trained in engineering in Paris, returned to New Orleans in 1840 and patented the multiple-effect vacuum evaporator in 1843 and 1846, a system that reused heat across stages to refine sugar faster and cheaper with far less fuel. The process became the foundation of modern industrial evaporation.",
-    "eraBuckets": [
-      "1840s"
-    ],
-    "topicTags": [
-      "invention",
-      "engineering"
-    ],
+    "eraBuckets": ["1840s"],
+    "topicTags": ["invention", "engineering"],
     "jurisdictionLabel": "New Orleans, Louisiana",
     "locationPrecision": "city",
     "locationLabel": "New Orleans, Louisiana",
@@ -3058,10 +2290,7 @@
       }
     ],
     "historicalContext": "Rillieux's evaporator remains the basis for large-scale industrial evaporation processes worldwide; a precise surviving address for his 1840s refinery work was not identified, so this entry uses city-level precision for New Orleans.",
-    "topicIds": [
-      "invention",
-      "engineering"
-    ],
+    "topicIds": ["invention", "engineering"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -3070,15 +2299,8 @@
     "kind": "person",
     "displayName": "Thomas L. Jennings",
     "summary": "Thomas L. Jennings, a free-born New York City tailor, patented a clothes-cleaning process he called \"dry scouring\" on March 3, 1821, becoming the first African American to hold a U.S. patent. He used his resulting fortune to fund the abolitionist movement and later organized the legal fight after his daughter Elizabeth was forcibly removed from a New York streetcar in 1854.",
-    "eraBuckets": [
-      "1820s",
-      "1850s"
-    ],
-    "topicTags": [
-      "invention",
-      "firsts",
-      "civil-rights"
-    ],
+    "eraBuckets": ["1820s", "1850s"],
+    "topicTags": ["invention", "firsts", "civil-rights"],
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "city",
     "locationLabel": "Manhattan, New York",
@@ -3103,11 +2325,7 @@
       }
     ],
     "historicalContext": "As a free-born Black tradesman, Jennings could legally hold a patent under the Patent Act of 1793's citizenship requirement, unlike enslaved inventors whose work legally belonged to enslavers; his exact shop address is not consistently documented, so this entry uses city-level precision for Manhattan.",
-    "topicIds": [
-      "invention",
-      "firsts",
-      "civil-rights"
-    ],
+    "topicIds": ["invention", "firsts", "civil-rights"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -3116,14 +2334,8 @@
     "kind": "person",
     "displayName": "Sarah E. Goode",
     "summary": "Sarah E. Goode, born into slavery and later a Chicago furniture store owner, received a U.S. patent on July 14, 1885 for a folding cabinet bed that converted into a desk, designed for customers in small apartments. She is widely credited as the first African American woman to receive a U.S. patent.",
-    "eraBuckets": [
-      "1880s"
-    ],
-    "topicTags": [
-      "invention",
-      "firsts",
-      "women"
-    ],
+    "eraBuckets": ["1880s"],
+    "topicTags": ["invention", "firsts", "women"],
     "jurisdictionLabel": "Chicago, Illinois",
     "locationPrecision": "city",
     "locationLabel": "Chicago, Illinois",
@@ -3148,11 +2360,7 @@
       }
     ],
     "historicalContext": "Goode and her husband Archibald, a carpenter, ran a Chicago furniture store together; her invention addressed the needs of working-class customers living in cramped apartments who lacked space for a full bed.",
-    "topicIds": [
-      "invention",
-      "firsts",
-      "women"
-    ],
+    "topicIds": ["invention", "firsts", "women"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -3161,16 +2369,8 @@
     "kind": "person",
     "displayName": "James West",
     "summary": "James West and fellow Bell Labs scientist Gerhard Sessler patented the foil electret microphone in 1962, a design so efficient and inexpensive that it is used in roughly 90 percent of the two billion microphones manufactured each year, from telephones to hearing aids. West later became a research professor at Johns Hopkins University after more than four decades at Bell Labs.",
-    "eraBuckets": [
-      "1960s",
-      "1990s",
-      "2000s"
-    ],
-    "topicTags": [
-      "invention",
-      "technology",
-      "firsts"
-    ],
+    "eraBuckets": ["1960s", "1990s", "2000s"],
+    "topicTags": ["invention", "technology", "firsts"],
     "jurisdictionLabel": "Baltimore, Maryland",
     "locationPrecision": "campus",
     "locationLabel": "Johns Hopkins University, Baltimore, Maryland",
@@ -3195,11 +2395,7 @@
       }
     ],
     "historicalContext": "West was born at home in Prince Edward County, Virginia because the local hospital in Farmville admitted only white patients; he and Sessler were jointly inducted into the National Inventors Hall of Fame in 1999, and West also led Bell System diversity programs for women and underrepresented minority researchers.",
-    "topicIds": [
-      "invention",
-      "technology",
-      "firsts"
-    ],
+    "topicIds": ["invention", "technology", "firsts"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -3208,15 +2404,8 @@
     "kind": "person",
     "displayName": "George Robert Carruthers",
     "summary": "George Robert Carruthers, a physicist at the U.S. Naval Research Laboratory, designed the Far Ultraviolet Camera/Spectrograph that Apollo 16 astronauts set up on the Moon in April 1972 — the first telescope operated from the surface of another world. The instrument, based on Carruthers's patented image converter, captured the first global images of Earth's outer atmosphere from space.",
-    "eraBuckets": [
-      "1960s",
-      "1970s"
-    ],
-    "topicTags": [
-      "invention",
-      "science",
-      "space"
-    ],
+    "eraBuckets": ["1960s", "1970s"],
+    "topicTags": ["invention", "science", "space"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "campus",
     "locationLabel": "U.S. Naval Research Laboratory, Washington, D.C.",
@@ -3241,11 +2430,7 @@
       }
     ],
     "historicalContext": "Carruthers spent nearly his entire career at the Naval Research Laboratory starting in 1964, also designing an instrument that captured ultraviolet images of Halley's Comet and one flown on the STS-39 space shuttle mission in 1991.",
-    "topicIds": [
-      "invention",
-      "science",
-      "space"
-    ],
+    "topicIds": ["invention", "science", "space"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -3254,16 +2439,8 @@
     "kind": "person",
     "displayName": "Emmett Chappelle",
     "summary": "Emmett Chappelle, a NASA exobiologist who worked on instruments for the Viking Mars landers, discovered how to harness the firefly's luciferin-luciferase bioluminescence reaction as a rapid method of detecting bacteria in blood, water, and food. He held more than 14 U.S. patents and was inducted into the National Inventors Hall of Fame in 2007.",
-    "eraBuckets": [
-      "1960s",
-      "1970s",
-      "1980s"
-    ],
-    "topicTags": [
-      "invention",
-      "science",
-      "space"
-    ],
+    "eraBuckets": ["1960s", "1970s", "1980s"],
+    "topicTags": ["invention", "science", "space"],
     "jurisdictionLabel": "Greenbelt, Maryland",
     "locationPrecision": "campus",
     "locationLabel": "NASA Goddard Space Flight Center, Greenbelt, Maryland",
@@ -3288,11 +2465,7 @@
       }
     ],
     "historicalContext": "Chappelle grew up on a farm in Phoenix, Arizona and earned degrees at UC Berkeley and the University of Washington before joining NASA; he received NASA's Exceptional Scientific Achievement Medal in 1994.",
-    "topicIds": [
-      "invention",
-      "science",
-      "space"
-    ],
+    "topicIds": ["invention", "science", "space"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -3301,17 +2474,8 @@
     "kind": "person",
     "displayName": "Solomon Carter Fuller",
     "summary": "Solomon Carter Fuller became the first Black psychiatrist in the United States in 1897 after earning his medical degree from Boston University. Selected as one of five research assistants under Dr. Alois Alzheimer in Munich, Fuller published the first comprehensive English-language review of Alzheimer's disease in 1912 and became a Boston University associate professor of pathology and neurology.",
-    "eraBuckets": [
-      "1890s",
-      "1900s",
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "science",
-      "medicine",
-      "firsts"
-    ],
+    "eraBuckets": ["1890s", "1900s", "1910s", "1920s"],
+    "topicTags": ["science", "medicine", "firsts"],
     "jurisdictionLabel": "Boston, Massachusetts",
     "locationPrecision": "campus",
     "locationLabel": "Boston University School of Medicine, Boston, Massachusetts",
@@ -3336,11 +2500,7 @@
       }
     ],
     "historicalContext": "Fuller rose to associate professor of pathology and neurology at Boston University by 1921; the American Psychiatric Association established the Solomon Carter Fuller Award in 1969 to honor Black psychiatric pioneers, and his portrait hangs at APA headquarters in Washington, D.C.",
-    "topicIds": [
-      "science",
-      "medicine",
-      "firsts"
-    ],
+    "topicIds": ["science", "medicine", "firsts"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -3349,16 +2509,8 @@
     "kind": "person",
     "displayName": "William Augustus Hinton",
     "summary": "William Augustus Hinton developed the Hinton test, a highly accurate blood-serum diagnostic for syphilis adopted by the U.S. Public Health Service, and in 1936 became the first Black person to publish a medical textbook, \"Syphilis and Its Treatment.\" In 1949 he became Harvard Medical School's first Black tenured professor.",
-    "eraBuckets": [
-      "1910s",
-      "1930s",
-      "1940s"
-    ],
-    "topicTags": [
-      "science",
-      "medicine",
-      "firsts"
-    ],
+    "eraBuckets": ["1910s", "1930s", "1940s"],
+    "topicTags": ["science", "medicine", "firsts"],
     "jurisdictionLabel": "Boston, Massachusetts",
     "locationPrecision": "campus",
     "locationLabel": "Harvard Medical School, Boston, Massachusetts",
@@ -3383,11 +2535,7 @@
       }
     ],
     "historicalContext": "Barred from surgical training by racial discrimination despite graduating with honors from Harvard Medical School in 1912, Hinton built his career in laboratory science instead, publishing 'Syphilis and Its Treatment' in 1936, the first medical textbook authored by a Black American.",
-    "topicIds": [
-      "science",
-      "medicine",
-      "firsts"
-    ],
+    "topicIds": ["science", "medicine", "firsts"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -3396,17 +2544,8 @@
     "kind": "person",
     "displayName": "Charles Henry Turner",
     "summary": "Charles Henry Turner, the first African American to earn a PhD from the University of Chicago (1907), conducted pioneering experiments proving insects can hear, learn, and modify behavior. Barred by racism from university faculty positions despite authoring more than 70 papers, he taught for 14 years at Sumner High School in St. Louis, the first Black public high school west of the Mississippi.",
-    "eraBuckets": [
-      "1900s",
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "science",
-      "biology",
-      "firsts",
-      "education"
-    ],
+    "eraBuckets": ["1900s", "1910s", "1920s"],
+    "topicTags": ["science", "biology", "firsts", "education"],
     "jurisdictionLabel": "St. Louis, Missouri",
     "locationPrecision": "campus",
     "locationLabel": "Sumner High School, St. Louis, Missouri",
@@ -3431,12 +2570,7 @@
       }
     ],
     "historicalContext": "Despite an advanced degree and more than 20 publications before 1908, Turner could not secure a university research position because of racial discrimination; his classroom research on bee and ant cognition at Sumner High School nonetheless produced findings still cited in animal behavior science today.",
-    "topicIds": [
-      "science",
-      "biology",
-      "firsts",
-      "education"
-    ],
+    "topicIds": ["science", "biology", "firsts", "education"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -3445,15 +2579,8 @@
     "kind": "person",
     "displayName": "David E. Harris",
     "summary": "David E. Harris, an Ohio State University graduate and Air Force B-47 and B-52 pilot, was hired by American Airlines on December 3, 1964, becoming the first African American pilot for a major U.S. commercial airline. He flew for American for 30 years, retiring in 1994 as a captain on the Boeing 747.",
-    "eraBuckets": [
-      "1960s",
-      "1990s"
-    ],
-    "topicTags": [
-      "aviation",
-      "firsts",
-      "military"
-    ],
+    "eraBuckets": ["1960s", "1990s"],
+    "topicTags": ["aviation", "firsts", "military"],
     "jurisdictionLabel": "Columbus, Ohio",
     "locationPrecision": "campus",
     "locationLabel": "Ohio State University, Columbus, Ohio",
@@ -3478,14 +2605,8 @@
       }
     ],
     "historicalContext": "Harris, a 1957 Ohio State graduate commissioned into the Air Force, left military service partly over race-based housing discrimination he faced on assignments; his hiring came a year after Marlon Green's Supreme Court case forced Continental Airlines to hire Black pilots.",
-    "topicIds": [
-      "aviation",
-      "firsts",
-      "military"
-    ],
-    "mentionedEntityIds": [
-      "ent_marlon_green_001"
-    ],
+    "topicIds": ["aviation", "firsts", "military"],
+    "mentionedEntityIds": ["ent_marlon_green_001"],
     "keywords": []
   },
   {
@@ -3493,14 +2614,8 @@
     "kind": "person",
     "displayName": "Jill Brown",
     "summary": "Jill Elaine Brown, a Baltimore-born pilot who built flight hours flying for a small Black-owned commuter carrier, was hired by Texas International Airlines in 1978, becoming the first African American woman pilot for a major U.S. airline.",
-    "eraBuckets": [
-      "1970s"
-    ],
-    "topicTags": [
-      "aviation",
-      "firsts",
-      "women"
-    ],
+    "eraBuckets": ["1970s"],
+    "topicTags": ["aviation", "firsts", "women"],
     "jurisdictionLabel": "Baltimore, Maryland",
     "locationPrecision": "city",
     "locationLabel": "Baltimore, Maryland",
@@ -3525,11 +2640,7 @@
       }
     ],
     "historicalContext": "Brown grew up in Baltimore and took her first flying lessons with family members at 17; she left Texas International after a year and continued flying professionally for cargo carrier Zantop International Airlines.",
-    "topicIds": [
-      "aviation",
-      "firsts",
-      "women"
-    ],
+    "topicIds": ["aviation", "firsts", "women"],
     "mentionedEntityIds": [],
     "keywords": []
   }

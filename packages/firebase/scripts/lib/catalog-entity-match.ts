@@ -42,7 +42,10 @@ const TITLE_SUFFIX =
   /\s*([|\-–—:]|\bWikipedia\b|\bNASA\+?\b|\bNational Park Service\b|\bU\.S\. National.*|\bSmithsonian.*|\bLibrary of Congress\b).*$/i;
 
 /** High-frequency Corsair collisions → canonical catalog ids. */
-const KNOWN_TITLE_TO_ENTITY: ReadonlyArray<{ readonly pattern: RegExp; readonly entityId: string }> = [
+const KNOWN_TITLE_TO_ENTITY: ReadonlyArray<{
+  readonly pattern: RegExp;
+  readonly entityId: string;
+}> = [
   { pattern: /\bkatherine(\s+g\.?)?\s+johnson\b/i, entityId: 'ent_katherine_johnson_001' },
   { pattern: /\bbirthplace of a hidden figure\b/i, entityId: 'ent_katherine_johnson_001' },
   { pattern: /\bmary(\s+w\.?)?\s+jackson\b/i, entityId: 'ent_mary_jackson_001' },
@@ -51,8 +54,14 @@ const KNOWN_TITLE_TO_ENTITY: ReadonlyArray<{ readonly pattern: RegExp; readonly 
   { pattern: /\bmarjorie(\s+stewart|\s+s\.?)?\s+joyner\b/i, entityId: 'ent_marjorie_joyner_001' },
   { pattern: /\bellen(\s+f\.?)?\s+eglin\b/i, entityId: 'ent_ellen_eglin_001' },
   { pattern: /\bcarter\s+g\.?\s+woodson\b/i, entityId: 'ent_carter_g_woodson_001' },
-  { pattern: /\bgreenwood(\s+district)?\b|\bblack wall street\b/i, entityId: 'ent_greenwood_district_001' },
-  { pattern: /\btuskegee(\s+institute|\s+university)?\b/i, entityId: 'ent_tuskegee_university_001' },
+  {
+    pattern: /\bgreenwood(\s+district)?\b|\bblack wall street\b/i,
+    entityId: 'ent_greenwood_district_001',
+  },
+  {
+    pattern: /\btuskegee(\s+institute|\s+university)?\b/i,
+    entityId: 'ent_tuskegee_university_001',
+  },
   { pattern: /\bfort monroe\b/i, entityId: 'ent_fort_monroe_001' },
   { pattern: /\bmadam\s+c\.?\s*j\.?\s+walker\b/i, entityId: 'ent_madam_cj_walker_001' },
   { pattern: /\bbooker\s+t\.?\s+washington\b/i, entityId: 'ent_tuskegee_university_001' },
@@ -115,7 +124,7 @@ export function loadCatalogEntitiesFromFixtures(catalogDir: string): CatalogEnti
     const ents = Array.isArray(raw)
       ? raw
       : Array.isArray((raw as { entities?: unknown }).entities)
-        ? ((raw as { entities: FixtureEntity[] }).entities)
+        ? (raw as { entities: FixtureEntity[] }).entities
         : [];
     for (const entry of ents) {
       if (!entry || typeof entry !== 'object') continue;
@@ -135,10 +144,7 @@ export function loadCatalogEntitiesFromFixtures(catalogDir: string): CatalogEnti
   return out;
 }
 
-function resolveEntity(
-  index: CatalogMatchIndex,
-  entityId: string,
-): CatalogEntityRef | undefined {
+function resolveEntity(index: CatalogMatchIndex, entityId: string): CatalogEntityRef | undefined {
   return index.entities.find((entity) => entity.id === entityId);
 }
 
@@ -160,7 +166,8 @@ export function classifyLeadAgainstCatalog(input: {
       kind: 'non_entity',
       title,
       coreName,
-      reason: 'Title/summary looks like a list, index, guide, tour, or collection landing page — not a catalog entity.',
+      reason:
+        'Title/summary looks like a list, index, guide, tour, or collection landing page — not a catalog entity.',
     };
   }
 
@@ -231,6 +238,7 @@ export function classifyLeadAgainstCatalog(input: {
     kind: 'new_candidate',
     title,
     coreName,
-    reason: 'No catalog name/alias/known-map hit — candidate for new entity after human validation.',
+    reason:
+      'No catalog name/alias/known-map hit — candidate for new entity after human validation.',
   };
 }

@@ -47,7 +47,10 @@ export type CorpusBulkRecordCandidate = {
   readonly sourceRecordId: string;
   readonly title: string;
   /** At least one must be structurally complete (citation completeness gate). */
-  readonly citations: readonly Pick<Citation, 'sourceName' | 'location' | 'capture' | 'retrievalDate'>[];
+  readonly citations: readonly Pick<
+    Citation,
+    'sourceName' | 'location' | 'capture' | 'retrievalDate'
+  >[];
   /** Finest tier this specific record is actually documented at never coarsened by default. */
   readonly documentedGeoPrecisionTier: GeoPrecisionTier;
   readonly geometryType: CorpusGeometryType;

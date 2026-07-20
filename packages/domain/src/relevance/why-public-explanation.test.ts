@@ -13,7 +13,11 @@ import {
 
 const ACCEPTED_EVIDENCE: readonly RelevanceEvidence[] = [
   { kind: 'thematic', summary: 'Thematic term classes matched.', detail: 'freedmen, schools' },
-  { kind: 'geographic', summary: 'Geographic place connection detected.', detail: 'Washington, D.C.' },
+  {
+    kind: 'geographic',
+    summary: 'Geographic place connection detected.',
+    detail: 'Washington, D.C.',
+  },
 ];
 
 const BASIS = [
@@ -56,7 +60,8 @@ test('AC1: throws when notabilityBasis is empty even if the explanation reads we
 
 test('AC1: assertSubstantiveConnectionExplained throws on a too-short explanation', () => {
   assert.throws(
-    () => assertSubstantiveConnectionExplained({ explanation: 'Included.', notabilityBasis: BASIS }),
+    () =>
+      assertSubstantiveConnectionExplained({ explanation: 'Included.', notabilityBasis: BASIS }),
     /too short/,
   );
 });

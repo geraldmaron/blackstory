@@ -162,7 +162,11 @@ export function buildCitationFromEvidence(input: {
   readonly evidence: { readonly sourceItemId: string; readonly sourceId: string };
   readonly sourceItem: { readonly canonicalUrl?: string; readonly title?: string };
   readonly source: { readonly displayName: string; readonly classification?: string };
-  readonly capture?: { readonly id: string; readonly contentHash?: ContentHash; readonly retrievedAt: string };
+  readonly capture?: {
+    readonly id: string;
+    readonly contentHash?: ContentHash;
+    readonly retrievedAt: string;
+  };
   readonly offlineDesignation?: OfflineSourceDesignation;
   readonly waybackCaptureUrl?: string;
   readonly waybackCapturedAt?: string;

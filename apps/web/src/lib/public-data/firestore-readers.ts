@@ -146,9 +146,7 @@ export async function fetchPublicStoryProjection(
   releaseId: string,
   slug: string,
 ): Promise<PublicStoryProjectionDoc | undefined> {
-  const snap = await getServerFirestore()
-    .doc(firestorePaths.publicStory(releaseId, slug))
-    .get();
+  const snap = await getServerFirestore().doc(firestorePaths.publicStory(releaseId, slug)).get();
   if (!snap.exists) return undefined;
   return parseStoryProjection(snap.data());
 }

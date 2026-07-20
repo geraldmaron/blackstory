@@ -14,7 +14,11 @@
  * integration can map one onto the other without redesigning either side. Do not build the
  * public page here; it does not exist yet.
  */
-import { evaluateLivingStatus, loadProductConstitution, type ProductConstitution } from '@repo/schemas';
+import {
+  evaluateLivingStatus,
+  loadProductConstitution,
+  type ProductConstitution,
+} from '@repo/schemas';
 
 export const TAKEDOWN_REASONS = [
   'privacy_deletion_request',

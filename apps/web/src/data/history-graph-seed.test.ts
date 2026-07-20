@@ -62,7 +62,10 @@ test('all-time node count matches injected catalog including an undated entity',
 
 test('live and seed catalogs do not share memoized artifacts', () => {
   const seedArtifact = getHistoryGraphReleaseArtifact(listPublicEntities());
-  const extendedArtifact = getHistoryGraphReleaseArtifact([...listPublicEntities(), undatedFixture()]);
+  const extendedArtifact = getHistoryGraphReleaseArtifact([
+    ...listPublicEntities(),
+    undatedFixture(),
+  ]);
   assert.notEqual(seedArtifact.contentHash.digest, extendedArtifact.contentHash.digest);
   assert.equal(seedArtifact.allTimeView.nodeIds.length, listPublicEntities().length);
   assert.equal(extendedArtifact.allTimeView.nodeIds.length, listPublicEntities().length + 1);

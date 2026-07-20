@@ -29,7 +29,10 @@ export function HistoryNarrativeCard({ node, decadeLabel, onClose }: HistoryNarr
       title={node.displayName}
       meta={
         <>
-          <Link className="ds-mono ds-history-narrative-card__kind-link" href={exploreHrefForKind(node.kind)}>
+          <Link
+            className="ds-mono ds-history-narrative-card__kind-link"
+            href={exploreHrefForKind(node.kind)}
+          >
             {node.kind}
           </Link>
           <span className="ds-sans">{statusMeta}</span>
@@ -58,7 +61,10 @@ export function HistoryNarrativeCard({ node, decadeLabel, onClose }: HistoryNarr
         <div>
           <dt>Evidence</dt>
           <dd>
-            <Link className="ds-history-narrative-card__fact-link" href={entityEvidenceHref(node.href)}>
+            <Link
+              className="ds-history-narrative-card__fact-link"
+              href={entityEvidenceHref(node.href)}
+            >
               {node.evidenceCount} accepted claim{node.evidenceCount === 1 ? '' : 's'}
             </Link>
           </dd>

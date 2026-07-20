@@ -36,7 +36,11 @@ export type GeocodeResolution = {
   readonly precision: GeocodePrecisionResult;
 };
 
-export type GeocodeSuccess = { readonly ok: true; readonly resolution: GeocodeResolution; readonly cacheHit: boolean };
+export type GeocodeSuccess = {
+  readonly ok: true;
+  readonly resolution: GeocodeResolution;
+  readonly cacheHit: boolean;
+};
 export type GeocodeFailure = { readonly ok: false; readonly fallback: ManualPlaceSearchFallback };
 export type GeocodeOutcome = GeocodeSuccess | GeocodeFailure;
 
@@ -76,7 +80,10 @@ function expandCommonAbbreviations(text: string): string {
   });
 }
 
-function normalizeAddressInput(raw: string): { readonly queryText: string; readonly cacheKey: string } {
+function normalizeAddressInput(raw: string): {
+  readonly queryText: string;
+  readonly cacheKey: string;
+} {
   const queryText = expandCommonAbbreviations(normalizeAddressText(raw));
   return { queryText, cacheKey: `addr:${queryText.toUpperCase()}` };
 }
@@ -86,7 +93,10 @@ function coordinateCacheKey(lat: number, lng: number, retainExactCoordinates: bo
   return retainExactCoordinates ? `${base}:cam` : base;
 }
 
-function toResolution(match: CensusGeocodeMatch, retainExactCoordinates: boolean): GeocodeResolution {
+function toResolution(
+  match: CensusGeocodeMatch,
+  retainExactCoordinates: boolean,
+): GeocodeResolution {
   const jurisdictionIds = resolveJurisdictionIdsFromMatch(match);
   const tier = geoPrecisionTierForMatch(match);
   const precision = reduceGeocodeCoordinatePrecision({ match, tier, retainExactCoordinates });
@@ -218,7 +228,9 @@ export type ReverseGeocodeOptions = {
 };
 
 /** Reverse geocode: browser-supplied lat/lng -> jurisdiction ids, or a manual-search fallback.  */
-export async function reverseGeocodeCoordinates(options: ReverseGeocodeOptions): Promise<GeocodeOutcome> {
+export async function reverseGeocodeCoordinates(
+  options: ReverseGeocodeOptions,
+): Promise<GeocodeOutcome> {
   const retainExactCoordinates = options.retainExactCoordinates === true;
   const nowMs = options.now?.() ?? Date.now();
   const cacheKey = coordinateCacheKey(options.lat, options.lng, retainExactCoordinates);
@@ -244,7 +256,6 @@ export async function reverseGeocodeCoordinates(options: ReverseGeocodeOptions):
   options.cache.set(cacheKey, resolution, nowMs);
   return { ok: true, resolution, cacheHit: false };
 }
-
 
 /**
  * ZIP-to-place translate-then-discard (mirrors

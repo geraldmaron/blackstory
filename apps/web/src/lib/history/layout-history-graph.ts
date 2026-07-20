@@ -241,7 +241,9 @@ function layoutNeighborhood(
   const neighbors = [...neighborIds]
     .map((id) => byId.get(id))
     .filter((node): node is HistoryNodeView => node !== undefined)
-    .sort((a, b) => b.connectionCount - a.connectionCount || a.displayName.localeCompare(b.displayName))
+    .sort(
+      (a, b) => b.connectionCount - a.connectionCount || a.displayName.localeCompare(b.displayName),
+    )
     .slice(0, neighborhoodMax);
 
   const truncated = neighborIds.size > neighbors.length;
@@ -353,7 +355,9 @@ function layoutRecords(
     kindNodes.forEach((node, nodeIndex) => {
       const encoding = encodingForNode(node);
       const nodeAngle =
-        kindNodes.length === 1 ? clusterAngle + Math.PI : (nodeIndex / kindNodes.length) * Math.PI * 2;
+        kindNodes.length === 1
+          ? clusterAngle + Math.PI
+          : (nodeIndex / kindNodes.length) * Math.PI * 2;
       const jitter = (random() - 0.5) * 10;
       layoutNodes.push({
         id: node.entityId,

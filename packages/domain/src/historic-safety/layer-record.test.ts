@@ -21,7 +21,16 @@ import {
 } from './layer-record.js';
 
 const COUNTY_POLYGON_GEOMETRY = {
-  shape: { type: 'Polygon' as const, coordinates: [[-90, 32], [-90, 33], [-89, 33], [-89, 32], [-90, 32]] },
+  shape: {
+    type: 'Polygon' as const,
+    coordinates: [
+      [-90, 32],
+      [-90, 33],
+      [-89, 33],
+      [-89, 32],
+      [-90, 32],
+    ],
+  },
   documentedPrecisionTier: 'county' as const,
   jurisdictionId: 'us-28-001',
 };
@@ -32,7 +41,12 @@ test('Tougaloo taxonomy is preserved verbatim as possible/probable/surely, never
 
 test('HOLC grades are the distinct A-D vocabulary, never the sundown taxonomy', () => {
   assert.deepEqual(HOLC_GRADES, ['A', 'B', 'C', 'D']);
-  assert.equal((HOLC_GRADES as readonly string[]).some((g) => (SUNDOWN_TOWN_CONFIDENCE_LEVELS as readonly string[]).includes(g)), false);
+  assert.equal(
+    (HOLC_GRADES as readonly string[]).some((g) =>
+      (SUNDOWN_TOWN_CONFIDENCE_LEVELS as readonly string[]).includes(g),
+    ),
+    false,
+  );
 });
 
 test('area-condition geometry rejects a Point \u2014 area conditions never render as a point marker (AC9)', () => {
@@ -66,10 +80,16 @@ test('render precision must never be finer than documented precision (AC11)', ()
     /finer than the documented precision/,
   );
   assert.doesNotThrow(() =>
-    assertAreaConditionRenderPrecisionValid({ documentedPrecisionTier: 'county', renderPrecisionTier: 'county' }),
+    assertAreaConditionRenderPrecisionValid({
+      documentedPrecisionTier: 'county',
+      renderPrecisionTier: 'county',
+    }),
   );
   assert.doesNotThrow(() =>
-    assertAreaConditionRenderPrecisionValid({ documentedPrecisionTier: 'county', renderPrecisionTier: 'state' }),
+    assertAreaConditionRenderPrecisionValid({
+      documentedPrecisionTier: 'county',
+      renderPrecisionTier: 'state',
+    }),
   );
 });
 
@@ -176,5 +196,8 @@ test('in-memory store lists records for a place sorted by validFrom', () => {
     areaGeometry: COUNTY_POLYGON_GEOMETRY,
   });
   const listed = store.listForPlace('place_4');
-  assert.deepEqual(listed.map((r) => r.id), ['holc_1', 'holc_2']);
+  assert.deepEqual(
+    listed.map((r) => r.id),
+    ['holc_1', 'holc_2'],
+  );
 });

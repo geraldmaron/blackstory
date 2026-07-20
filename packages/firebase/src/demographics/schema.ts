@@ -196,10 +196,7 @@ export const censusStateDecadeSchema = z
 
 export type CensusStateDecadeDoc = z.infer<typeof censusStateDecadeSchema>;
 
-export function censusStateDecadeId(
-  stateFips: string,
-  decade: CensusNationalDecadeDecade,
-): string {
+export function censusStateDecadeId(stateFips: string, decade: CensusNationalDecadeDecade): string {
   return `${stateFips}_${decade}`;
 }
 

@@ -18,7 +18,10 @@ const uiShellHeaderCss = readFileSync(
 
 describe('shell sticky clearance', () => {
   it('gives non-map body top clearance and zeros it on map surfaces', () => {
-    assert.match(shellCss, /\.ds-shell-body\s*\{[^}]*padding-top:\s*calc\(var\(--ds-island-clearance\)\)/s);
+    assert.match(
+      shellCss,
+      /\.ds-shell-body\s*\{[^}]*padding-top:\s*calc\(var\(--ds-island-clearance\)\)/s,
+    );
     assert.match(
       shellCss,
       /\.ds-shell-body:has\(\[data-surface='map'\]\)\s*\{[^}]*padding-top:\s*0/s,
@@ -26,15 +29,28 @@ describe('shell sticky clearance', () => {
   });
 
   it('clears the fixed header above the footer mast', () => {
-    assert.match(shellCss, /\.ds-shell-footer\s*\{[^}]*padding-top:\s*max\(var\(--ds-space-16\),\s*var\(--ds-island-clearance\)\)/s);
-    assert.match(shellCss, /\.ds-shell-footer\s*\{[^}]*scroll-margin-top:\s*var\(--ds-island-clearance\)/s);
+    assert.match(
+      shellCss,
+      /\.ds-shell-footer\s*\{[^}]*padding-top:\s*max\(var\(--ds-space-16\),\s*var\(--ds-island-clearance\)\)/s,
+    );
+    assert.match(
+      shellCss,
+      /\.ds-shell-footer\s*\{[^}]*scroll-margin-top:\s*var\(--ds-island-clearance\)/s,
+    );
   });
 });
 
-describe('shell explore header condensation selectors', () => {
-  it('scopes explore bar rules from .ds-shell so the sibling header matches', () => {
-    assert.match(shellCss, /\.ds-shell:has\(\.ds-explore-stage\)\s+\.ds-shell-header__inner/);
-    assert.match(shellCss, /\.ds-shell:has\(\.ds-explore-stage\)\s+\.ds-shell-nav--desktop/);
+describe('shell explore header keeps the shared primary nav', () => {
+  it('never strips the desktop nav, mobile menu, or CTA on the explore surface', () => {
+    // Regression guard: explore is a map surface that must show the same header
+    // navigation as the homepage hero and every other route (no explore-only
+    // display:none on nav chrome).
+    assert.doesNotMatch(shellCss, /\.ds-shell:has\(\.ds-explore-stage\)\s+\.ds-shell-nav--desktop/);
+    assert.doesNotMatch(shellCss, /\.ds-shell:has\(\.ds-explore-stage\)\s+\.ds-shell-menu\b/);
+    assert.doesNotMatch(shellCss, /\.ds-shell:has\(\.ds-explore-stage\)\s+\.ds-shell-header__cta/);
+  });
+
+  it('scopes any explore rule from .ds-shell so the sibling header can match', () => {
     assert.doesNotMatch(shellCss, /\.ds-shell-body:has\(\.ds-explore-stage\)\s+\.ds-shell-header/);
   });
 });
@@ -67,10 +83,7 @@ describe('on-map shell header treatment', () => {
 });
 
 describe('horizontal overflow guards', () => {
-  const baseCss = readFileSync(
-    join(here, '../../../../packages/ui/src/styles/base.css'),
-    'utf8',
-  );
+  const baseCss = readFileSync(join(here, '../../../../packages/ui/src/styles/base.css'), 'utf8');
   const mapSurfacesCss = readFileSync(join(here, '(map)/map-surfaces.css'), 'utf8');
 
   it('clips document and shell sideways overflow without orphaning overflow-y', () => {
@@ -83,8 +96,14 @@ describe('horizontal overflow guards', () => {
   it('does not size explore chrome with 100vw (scrollbar gutter / hide-translate overflow)', () => {
     assert.doesNotMatch(mapSurfacesCss, /calc\(\s*100vw/);
     assert.doesNotMatch(mapSurfacesCss, /min\(\s*\d+vw/);
-    assert.match(mapSurfacesCss, /\.ds-explore-stage__instruments\s*\{[^}]*left:\s*var\(--ds-explore-edge\)/s);
-    assert.match(mapSurfacesCss, /\.ds-explore-stage__results\s*\{[^}]*right:\s*var\(--ds-explore-edge\)/s);
+    assert.match(
+      mapSurfacesCss,
+      /\.ds-explore-stage__instruments\s*\{[^}]*left:\s*var\(--ds-explore-edge\)/s,
+    );
+    assert.match(
+      mapSurfacesCss,
+      /\.ds-explore-stage__results\s*\{[^}]*right:\s*var\(--ds-explore-edge\)/s,
+    );
     assert.match(
       mapSurfacesCss,
       /@media\s*\(max-width:\s*39\.9375rem\)\s*\{[^}]*--ds-explore-instruments-width:\s*auto/s,

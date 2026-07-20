@@ -143,10 +143,7 @@ export async function listStoryPackets(limit = 200): Promise<readonly StoryPacke
   return Object.freeze(items);
 }
 
-
-export async function getStoryPacket(
-  submissionId: string,
-): Promise<StoryPacketListItem | null> {
+export async function getStoryPacket(submissionId: string): Promise<StoryPacketListItem | null> {
   const db = getDb();
   const doc = await db.collection(FIRESTORE_ROOT.submissionInbox).doc(submissionId).get();
   if (!doc.exists) return null;
@@ -215,19 +212,22 @@ export async function recordStoryPacketReview(input: {
 
   const reviewedAt = new Date().toISOString();
   const db = getDb();
-  await db.collection(STORY_PACKET_REVIEW_COLLECTION).doc(input.submissionId).set(
-    {
-      submissionId: input.submissionId,
-      decision: input.decision,
-      reviewedAt,
-      reviewedByEmail: input.reviewedByEmail,
-      reviewedByUid: input.reviewedByUid,
-      topicId: item.topicId,
-      packetKind: item.packet.kind,
-      ...(input.note !== undefined ? { note: input.note } : {}),
-    },
-    { merge: true },
-  );
+  await db
+    .collection(STORY_PACKET_REVIEW_COLLECTION)
+    .doc(input.submissionId)
+    .set(
+      {
+        submissionId: input.submissionId,
+        decision: input.decision,
+        reviewedAt,
+        reviewedByEmail: input.reviewedByEmail,
+        reviewedByUid: input.reviewedByUid,
+        topicId: item.topicId,
+        packetKind: item.packet.kind,
+        ...(input.note !== undefined ? { note: input.note } : {}),
+      },
+      { merge: true },
+    );
 
   const review = {
     decision: input.decision,

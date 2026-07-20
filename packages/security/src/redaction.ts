@@ -1,4 +1,3 @@
-
 /**
  * Central redaction primitives for BlackStory.
  *
@@ -83,7 +82,6 @@ export type PrecisionReductionResult = {
 function reduceTo(current: string, target: string): string {
   return rankOf(target) < rankOf(current) ? target : current;
 }
-
 
 /**
  * Reduce a source precision to a value that is safe to publish.
@@ -213,7 +211,6 @@ function coarsenCoordinate(value: number, precision: string): number | undefined
   return Math.round(value * factor) / factor;
 }
 
-
 /**
  * Produce a public-safe location, or `undefined` when nothing may be shown.
  * Exact coordinates, street/unit/parcel labels, and fine geohashes are stripped;
@@ -342,7 +339,6 @@ export type RedactorOptions = {
   readonly dropKeys?: boolean;
   readonly maxDepth?: number;
 };
-
 
 /**
  * Build a deep redactor that strips protected values from arbitrary structures.

@@ -22,8 +22,12 @@ test('censusCountyDecadeToObservations maps county decade docs to observed stats
   });
 
   assert.equal(observations.length, 2);
-  const black = observations.find((row) => row.seriesId === CENSUS_COUNTY_BLACK_POPULATION_SERIES_ID);
-  const total = observations.find((row) => row.seriesId === CENSUS_COUNTY_TOTAL_POPULATION_SERIES_ID);
+  const black = observations.find(
+    (row) => row.seriesId === CENSUS_COUNTY_BLACK_POPULATION_SERIES_ID,
+  );
+  const total = observations.find(
+    (row) => row.seriesId === CENSUS_COUNTY_TOTAL_POPULATION_SERIES_ID,
+  );
   assert.ok(black);
   assert.ok(total);
   assert.equal(black!.estimate, 800_000);

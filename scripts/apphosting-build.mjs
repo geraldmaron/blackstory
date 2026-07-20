@@ -24,7 +24,9 @@ const APPS = {
 
 const app = APPS[buildable];
 if (!app) {
-  throw new Error(`Unknown GOOGLE_BUILDABLE "${buildable}" — add it to scripts/apphosting-build.mjs`);
+  throw new Error(
+    `Unknown GOOGLE_BUILDABLE "${buildable}" — add it to scripts/apphosting-build.mjs`,
+  );
 }
 
 execSync(`pnpm --filter ${app.filter}... --workspace-concurrency=1 build`, { stdio: 'inherit' });
@@ -32,4 +34,6 @@ execSync(`pnpm --filter ${app.filter}... --workspace-concurrency=1 build`, { std
 const standaloneNext = `${buildable}/.next/standalone/${buildable}/.next`;
 mkdirSync(standaloneNext, { recursive: true });
 cpSync(`${buildable}/.next/static`, `${standaloneNext}/static`, { recursive: true });
-cpSync(`${buildable}/public`, `${buildable}/.next/standalone/${buildable}/public`, { recursive: true });
+cpSync(`${buildable}/public`, `${buildable}/.next/standalone/${buildable}/public`, {
+  recursive: true,
+});

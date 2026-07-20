@@ -25,7 +25,9 @@ function parseGeographiesBlock(value: unknown): RawCensusGeographiesBlock | unde
   const block: Record<string, readonly RawCensusGeographyEntry[]> = {};
   for (const [layerName, rows] of Object.entries(value)) {
     if (!Array.isArray(rows)) continue;
-    const entries = rows.map(asGeographyEntry).filter((row): row is RawCensusGeographyEntry => row !== undefined);
+    const entries = rows
+      .map(asGeographyEntry)
+      .filter((row): row is RawCensusGeographyEntry => row !== undefined);
     block[layerName] = entries;
   }
   return block;
@@ -65,7 +67,9 @@ export function parseCensusAddressGeocodeResponse(raw: unknown): readonly RawCen
 }
 
 /** Parses a `geographies/coordinates` (reverse geocode) JSON response defensively. */
-export function parseCensusCoordinatesGeocodeResponse(raw: unknown): RawCensusGeographiesBlock | undefined {
+export function parseCensusCoordinatesGeocodeResponse(
+  raw: unknown,
+): RawCensusGeographiesBlock | undefined {
   const response = raw as RawCensusCoordinatesGeocodeResponse;
   return parseGeographiesBlock(response?.result?.geographies);
 }

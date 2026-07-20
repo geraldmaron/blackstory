@@ -1,10 +1,17 @@
 /**
  * Normalize defensively-parsed DPLA v2 docs into AdapterCandidateRecord output.
  */
-import { MAX_EVIDENCE_SNIPPET_CHARACTERS, MAX_EVIDENCE_SNIPPET_WORDS } from '../../rights/evidence-pointer.js';
+import {
+  MAX_EVIDENCE_SNIPPET_CHARACTERS,
+  MAX_EVIDENCE_SNIPPET_WORDS,
+} from '../../rights/evidence-pointer.js';
 import { stampCandidateProvenance } from '../candidates.js';
 import type { SourceRegistryEntry } from '../types.js';
-import { DPLA_V2_ADAPTER_ID, DPLA_V2_DEFAULT_CLASSIFICATION, DPLA_V2_PAYLOAD_SCHEMA_VERSION } from './types.js';
+import {
+  DPLA_V2_ADAPTER_ID,
+  DPLA_V2_DEFAULT_CLASSIFICATION,
+  DPLA_V2_PAYLOAD_SCHEMA_VERSION,
+} from './types.js';
 import type { DplaCandidatePayload, DplaCandidateRecord, DplaNormalizedDoc } from './types.js';
 
 function capSummary(text: string | undefined): string | undefined {
@@ -82,7 +89,10 @@ export function assertDplaCandidate(candidate: DplaCandidateRecord): void {
   if (candidate.payload.schemaVersion !== DPLA_V2_PAYLOAD_SCHEMA_VERSION) {
     throw new Error(`Unexpected payload schema version: ${candidate.payload.schemaVersion}`);
   }
-  if (candidate.payload.summary && candidate.payload.summary.length > MAX_EVIDENCE_SNIPPET_CHARACTERS) {
+  if (
+    candidate.payload.summary &&
+    candidate.payload.summary.length > MAX_EVIDENCE_SNIPPET_CHARACTERS
+  ) {
     throw new Error('DPLA candidate summary exceeds the evidence-pointer snippet cap');
   }
 }

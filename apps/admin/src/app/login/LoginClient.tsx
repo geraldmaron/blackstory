@@ -20,10 +20,7 @@ export default function LoginClient() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const nextPath = useMemo(
-    () => safeAdminNextPath(searchParams.get('next')),
-    [searchParams],
-  );
+  const nextPath = useMemo(() => safeAdminNextPath(searchParams.get('next')), [searchParams]);
 
   useEffect(() => {
     if (ready && user) {
@@ -52,13 +49,13 @@ export default function LoginClient() {
           Sign in
         </h1>
         <p className="admin-login__lede">
-          Private operations desk for research triage, story review, and releases. Nothing
-          here publishes to the public site by itself.
+          Private operations desk for research triage, story review, and releases. Nothing here
+          publishes to the public site by itself.
         </p>
         <p className="admin-login__meta">
-          After sign-in you land on Home — pick Inbox for pending cases, or open the desk you
-          need from the nav. Use an administrator account provisioned in Firebase
-          Authentication. There is no public sign-up on this portal.
+          After sign-in you land on Home — pick Inbox for pending cases, or open the desk you need
+          from the nav. Use an administrator account provisioned in Firebase Authentication. There
+          is no public sign-up on this portal.
         </p>
 
         {error ? (

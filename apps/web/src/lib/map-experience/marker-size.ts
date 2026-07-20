@@ -29,7 +29,9 @@ export const MARKER_RADIUS_EVIDENCE_COEFFICIENT = 1.6;
 /** Halo renders `MARKER_HALO_OFFSET`px larger than its point marker (design-direction-v3.md). */
 export const MARKER_HALO_OFFSET = 3;
 
-export const CONFIDENCE_SIZE_MODIFIER: Readonly<Record<'high' | 'medium' | 'low' | 'unrated', number>> = {
+export const CONFIDENCE_SIZE_MODIFIER: Readonly<
+  Record<'high' | 'medium' | 'low' | 'unrated', number>
+> = {
   high: 1.0,
   medium: 0.9,
   low: 0.8,
@@ -38,7 +40,8 @@ export const CONFIDENCE_SIZE_MODIFIER: Readonly<Record<'high' | 'medium' | 'low'
 
 function confidenceModifierFor(tier: ConfidenceTierLike): number {
   return (
-    CONFIDENCE_SIZE_MODIFIER[tier as keyof typeof CONFIDENCE_SIZE_MODIFIER] ?? CONFIDENCE_SIZE_MODIFIER.unrated
+    CONFIDENCE_SIZE_MODIFIER[tier as keyof typeof CONFIDENCE_SIZE_MODIFIER] ??
+    CONFIDENCE_SIZE_MODIFIER.unrated
   );
 }
 
@@ -66,7 +69,10 @@ export function markerRadius(evidenceCount: number, confidenceTier: ConfidenceTi
 /** `markerRadius()` plus the fixed halo offset. Computed from the already-clamped marker radius
  * (not the raw unclamped term), so a maxed-out marker's halo never implies a bigger record than
  * the clamp itself already communicates. */
-export function markerHaloRadius(evidenceCount: number, confidenceTier: ConfidenceTierLike): number {
+export function markerHaloRadius(
+  evidenceCount: number,
+  confidenceTier: ConfidenceTierLike,
+): number {
   return markerRadius(evidenceCount, confidenceTier) + MARKER_HALO_OFFSET;
 }
 
@@ -134,16 +140,23 @@ export function markerRadiusAtZoom(
  * exceeds `MARKER_RADIUS_MAX` even before the confidence modifier is applied, so the final clamp
  * (not the interpolation's flat extrapolation past its last stop) is what governs large counts.
  */
-export const MARKER_RADIUS_EVIDENCE_STOPS: ReadonlyArray<readonly [evidenceCount: number, radius: number]> = [
-  0, 1, 2, 4, 8, 16, 32, 64, 128, 256,
-].map((count) => [count, evidenceBaseRadius(count)] as const);
+export const MARKER_RADIUS_EVIDENCE_STOPS: ReadonlyArray<
+  readonly [evidenceCount: number, radius: number]
+> = [0, 1, 2, 4, 8, 16, 32, 64, 128, 256].map(
+  (count) => [count, evidenceBaseRadius(count)] as const,
+);
 
 /** MapLibre `interpolate` expression for the pre-modifier evidence-count term, built from
  * `MARKER_RADIUS_EVIDENCE_STOPS`. Missing `evidenceCount` coalesces to `0` (a brand-new,
  * zero-evidence feature still renders at `MARKER_RADIUS_MIN`, never `undefined`/NaN). */
 export function markerRadiusEvidenceExpression(): ExpressionSpecification {
   const stops = MARKER_RADIUS_EVIDENCE_STOPS.flatMap(([count, radius]) => [count, radius]);
-  return ['interpolate', ['linear'], ['coalesce', ['get', 'evidenceCount'], 0], ...stops] as ExpressionSpecification;
+  return [
+    'interpolate',
+    ['linear'],
+    ['coalesce', ['get', 'evidenceCount'], 0],
+    ...stops,
+  ] as ExpressionSpecification;
 }
 
 /** MapLibre `match` expression for the confidence-tier size modifier, built from

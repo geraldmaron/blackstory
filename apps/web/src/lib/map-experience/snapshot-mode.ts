@@ -26,10 +26,12 @@ export function degradedFor(reason: ExploreDegradedReason): ExploreDegradedState
 /** Human-readable, non-alarming copy for each degraded reason always paired with "showing the
  * last-loaded snapshot," never a bare error message. */
 export const DEGRADED_MODE_COPY: Readonly<Record<ExploreDegradedReason, string>> = {
-  refine_network_error: 'Live refinement is unavailable right now — showing the last-loaded snapshot.',
+  refine_network_error:
+    'Live refinement is unavailable right now — showing the last-loaded snapshot.',
   refine_rate_limited: 'Refinement is temporarily rate-limited — showing the last-loaded snapshot.',
   refine_app_check_denied:
     'This browser could not be verified for live refinement — showing the last-loaded snapshot.',
-  refine_invalid_query: 'That filter combination could not be refined live — showing the last-loaded snapshot.',
+  refine_invalid_query:
+    'That filter combination could not be refined live — showing the last-loaded snapshot.',
   map_canvas_unavailable: 'The interactive map could not load — showing the accessible list view.',
 };

@@ -31,7 +31,9 @@ export type FetchCommonCrawlCdxInput = {
   readonly classification?: string;
 };
 
-export async function fetchCommonCrawlCdx(input: FetchCommonCrawlCdxInput): Promise<readonly CommonCrawlCandidateRecord[]> {
+export async function fetchCommonCrawlCdx(
+  input: FetchCommonCrawlCdxInput,
+): Promise<readonly CommonCrawlCandidateRecord[]> {
   const url = buildCdxIndexUrlFromQuery(input.query);
   const response = await withRetry(
     () => input.client({ url, method: 'GET', allowedContentTypes: CDX_ALLOWED_CONTENT_TYPES }),
@@ -52,7 +54,9 @@ export async function fetchCommonCrawlCdx(input: FetchCommonCrawlCdxInput): Prom
     registryEntry: input.registryEntry,
     runId: input.runId,
     capturedAt: input.capturedAt,
-    ...(input.query.filterPattern !== undefined ? { filterPattern: input.query.filterPattern } : {}),
+    ...(input.query.filterPattern !== undefined
+      ? { filterPattern: input.query.filterPattern }
+      : {}),
     ...(input.classification !== undefined ? { classification: input.classification } : {}),
   });
 }

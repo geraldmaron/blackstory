@@ -152,7 +152,11 @@ function arg(name: string): string | undefined {
   return hit ? hit.slice(prefix.length) : undefined;
 }
 
-async function fetchRaw(url: string, lane: Lane, cacheName: string): Promise<{
+async function fetchRaw(
+  url: string,
+  lane: Lane,
+  cacheName: string,
+): Promise<{
   readonly text: string;
   readonly capture: SourceCapture;
 }> {
@@ -187,9 +191,7 @@ function cleanOcrText(value: string): string {
 
 /** Deterministic title case for all-caps OCR locality strings ("EAST ST. LOUIS"). */
 function titleCase(value: string): string {
-  return value
-    .toLowerCase()
-    .replace(/(^|[\s\-./'])([a-z])/g, (match) => match.toUpperCase());
+  return value.toLowerCase().replace(/(^|[\s\-./'])([a-z])/g, (match) => match.toUpperCase());
 }
 
 function roundCoord(value: number): number {
@@ -224,13 +226,7 @@ interface Greenbook1947File {
 }
 
 /** rows: [name, address, type, year, [lat, lng]] */
-type Greenbook1956Row = readonly [
-  string,
-  string,
-  string,
-  string,
-  readonly [number, number] | null,
-];
+type Greenbook1956Row = readonly [string, string, string, string, readonly [number, number] | null];
 
 interface Greenbook1956File {
   readonly rows: readonly Greenbook1956Row[];
@@ -476,9 +472,8 @@ async function runDcSitesLane(now: string): Promise<LaneResult> {
   features.forEach((feature, index) => {
     const props = feature.properties ?? {};
     const fallbackId = props.ObjectId !== undefined ? `objectid-${props.ObjectId}` : `row-${index}`;
-    const sourceItemId = props.UniqueID && props.UniqueID.trim().length > 0
-      ? props.UniqueID.trim()
-      : fallbackId;
+    const sourceItemId =
+      props.UniqueID && props.UniqueID.trim().length > 0 ? props.UniqueID.trim() : fallbackId;
     const name = (props.Resource ?? '').replace(/\s+/g, ' ').trim();
     if (name.length === 0) {
       dropped.push({ sourceItemId, reason: 'empty Resource (site name)' });

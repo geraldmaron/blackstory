@@ -48,7 +48,10 @@ test('recordReview rejects a review targeting a different submission than the ex
   const log = [review('r1', 'reviewer-a', 'legitimate_lead')];
   assert.throws(
     () =>
-      recordReview(log, review('r2', 'reviewer-b', 'legitimate_lead', { submissionId: 'submission-2' })),
+      recordReview(
+        log,
+        review('r2', 'reviewer-b', 'legitimate_lead', { submissionId: 'submission-2' }),
+      ),
     /targets submission/,
   );
 });
@@ -220,14 +223,20 @@ test('routeConsensusReview only reflects decidedAt from the caller-supplied now'
 test('routeConsensusReview rejects an invalid policy rather than silently normalizing it', () => {
   const reviews = [review('r1', 'reviewer-a', 'legitimate_lead')];
   const badPolicy: ConsensusPolicy = { ...DEFAULT_CONSENSUS_POLICY, agreementThreshold: 1.5 };
-  assert.throws(() => routeConsensusReview('submission-1', reviews, NOW, badPolicy), /agreementThreshold/);
+  assert.throws(
+    () => routeConsensusReview('submission-1', reviews, NOW, badPolicy),
+    /agreementThreshold/,
+  );
 
   const samePolicy: ConsensusPolicy = {
     ...DEFAULT_CONSENSUS_POLICY,
     advanceVerdict: 'legitimate_lead',
     rejectVerdict: 'legitimate_lead',
   };
-  assert.throws(() => routeConsensusReview('submission-1', reviews, NOW, samePolicy), /must differ/);
+  assert.throws(
+    () => routeConsensusReview('submission-1', reviews, NOW, samePolicy),
+    /must differ/,
+  );
 });
 
 test('a custom, stricter policy can require more reviewers and a higher bar', () => {

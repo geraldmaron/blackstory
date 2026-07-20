@@ -47,14 +47,18 @@ export function placeJurisdictionId(stateFips: string, placeFips: string): strin
  * deterministically so a caller can check for the doc's existence, and `placeCreateHint` is
  * attached so the on-demand-creation pass has everything it needs.
  */
-export function resolveJurisdictionIdsFromMatch(match: CensusGeocodeMatch): ResolvedJurisdictionIds {
+export function resolveJurisdictionIdsFromMatch(
+  match: CensusGeocodeMatch,
+): ResolvedJurisdictionIds {
   const countryId = countryJurisdictionId();
   if (!match.stateFips) {
     return { countryId };
   }
 
   const stateId = stateJurisdictionId(match.stateFips);
-  const countyId = match.countyFips3 ? countyJurisdictionId(match.stateFips, match.countyFips3) : undefined;
+  const countyId = match.countyFips3
+    ? countyJurisdictionId(match.stateFips, match.countyFips3)
+    : undefined;
 
   if (!match.placeFips) {
     return {

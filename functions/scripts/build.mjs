@@ -43,12 +43,7 @@ await build({
   banner: {
     js: "import { dirname as __dsDirname } from 'node:path'; import { fileURLToPath as __dsFileURLToPath } from 'node:url'; process.env.DISCOVERY_REPO_ROOT ??= __dsDirname(__dsFileURLToPath(import.meta.url));",
   },
-  external: [
-    'firebase-admin',
-    'firebase-admin/*',
-    'firebase-functions',
-    'firebase-functions/*',
-  ],
+  external: ['firebase-admin', 'firebase-admin/*', 'firebase-functions', 'firebase-functions/*'],
   logLevel: 'info',
 });
 

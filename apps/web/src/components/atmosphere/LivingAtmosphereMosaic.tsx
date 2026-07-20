@@ -10,10 +10,7 @@
 import Link from 'next/link';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { computeFillMosaicLayout } from './compute-fill-mosaic-layout';
-import {
-  applyLivingTileSwap,
-  pickLivingTileSwap,
-} from './select-living-swap';
+import { applyLivingTileSwap, pickLivingTileSwap } from './select-living-swap';
 import {
   selectAtmospherePlane,
   selectMosaicTiles,
@@ -93,7 +90,11 @@ export function LivingAtmosphereMosaic({
         },
   );
 
-  const geometric = selectAtmospherePlane({ seedKey, density: 16, preferGeometric: true }).geometric;
+  const geometric = selectAtmospherePlane({
+    seedKey,
+    density: 16,
+    preferGeometric: true,
+  }).geometric;
   const planeId = selectAtmospherePlane({ seedKey, density: layout.density }).planeId;
   const tiles = selectMosaicTiles(seedKey, layout.density);
 
@@ -162,8 +163,7 @@ export function LivingAtmosphereMosaic({
       typeof navigator !== 'undefined' &&
       'connection' in navigator &&
       Boolean(
-        (navigator as Navigator & { connection?: { saveData?: boolean } }).connection
-          ?.saveData,
+        (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData,
       );
     if (reducedMotion || saveData) {
       setPreferStatic(true);
@@ -250,9 +250,7 @@ export function LivingAtmosphereMosaic({
   }, [preferStatic, mosaicFailed, cells.length, seedKey, swapIntervalMs]);
 
   const showLive = cells.length > 0 && !mosaicFailed && !preferStatic;
-  const renderCells: readonly CellLayers[] = showLive
-    ? cells
-    : cellsFromTiles(tiles);
+  const renderCells: readonly CellLayers[] = showLive ? cells : cellsFromTiles(tiles);
 
   const showMosaic = renderCells.length > 0 && !mosaicFailed;
 

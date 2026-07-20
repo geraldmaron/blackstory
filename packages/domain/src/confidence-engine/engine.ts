@@ -99,7 +99,9 @@ function canonicalize(value: unknown): unknown {
 }
 
 function fingerprint(value: unknown): string {
-  return `sha256:${createHash('sha256').update(JSON.stringify(canonicalize(value))).digest('hex')}`;
+  return `sha256:${createHash('sha256')
+    .update(JSON.stringify(canonicalize(value)))
+    .digest('hex')}`;
 }
 
 function sortedLinks(links: readonly ClaimEvidenceLink[]): ClaimEvidenceLink[] {
@@ -267,7 +269,11 @@ export function evaluatePublicLanguage(input: {
  * evidence for a claim traces back to these adapters (RSS, Internet Archive, DPLA v2) before
  * treating `passesPublishThreshold` as authoritative.
  */
-export const CROWDSOURCED_CLAIM_SOURCE_TIERS = ['community_oral', 'self_published', 'news_reportage'] as const;
+export const CROWDSOURCED_CLAIM_SOURCE_TIERS = [
+  'community_oral',
+  'self_published',
+  'news_reportage',
+] as const;
 
 export type CrowdsourcedClaimSourceTier = (typeof CROWDSOURCED_CLAIM_SOURCE_TIERS)[number];
 
@@ -285,9 +291,13 @@ export type EvidenceSourceTierSummary = {
  * independent institutional/archival corroboration at all, the case says must never
  * publish on its own regardless of how the weighted score computes.
  */
-export function isPurelyCrowdsourcedEvidence(supportingSources: readonly EvidenceSourceTierSummary[]): boolean {
+export function isPurelyCrowdsourcedEvidence(
+  supportingSources: readonly EvidenceSourceTierSummary[],
+): boolean {
   if (supportingSources.length === 0) return false;
-  return supportingSources.every((source) => isCrowdsourcedClaimSourceTier(source.sourceClassification));
+  return supportingSources.every((source) =>
+    isCrowdsourcedClaimSourceTier(source.sourceClassification),
+  );
 }
 
 /**
@@ -297,10 +307,9 @@ export function isPurelyCrowdsourcedEvidence(supportingSources: readonly Evidenc
  * the candidate can still surface as a research lead only `passesPublishThreshold` is forced
  * closed.
  */
-export function enforceCrowdsourcedCannotPublishAlone<T extends { readonly passesPublishThreshold: boolean }>(
-  result: T,
-  supportingSources: readonly EvidenceSourceTierSummary[],
-): T {
+export function enforceCrowdsourcedCannotPublishAlone<
+  T extends { readonly passesPublishThreshold: boolean },
+>(result: T, supportingSources: readonly EvidenceSourceTierSummary[]): T {
   if (isPurelyCrowdsourcedEvidence(supportingSources)) {
     return { ...result, passesPublishThreshold: false };
   }
@@ -372,12 +381,19 @@ export function computeReviewerAgreementSignal(
   if (!Number.isInteger(input.reviewCount) || input.reviewCount < 0) {
     throw new Error('reviewCount must be a non-negative integer');
   }
-  if (!Number.isFinite(input.agreementRatio) || input.agreementRatio < 0 || input.agreementRatio > 1) {
+  if (
+    !Number.isFinite(input.agreementRatio) ||
+    input.agreementRatio < 0 ||
+    input.agreementRatio > 1
+  ) {
     throw new Error('agreementRatio must be between 0 and 1');
   }
   const corroborationWeight =
     input.verdict === 'corroborates'
-      ? Math.min(REVIEWER_AGREEMENT_MAX_WEIGHT, input.agreementRatio * REVIEWER_AGREEMENT_MAX_WEIGHT)
+      ? Math.min(
+          REVIEWER_AGREEMENT_MAX_WEIGHT,
+          input.agreementRatio * REVIEWER_AGREEMENT_MAX_WEIGHT,
+        )
       : 0;
 
   return {

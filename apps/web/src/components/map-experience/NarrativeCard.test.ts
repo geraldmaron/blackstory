@@ -58,9 +58,11 @@ test('links Where to external maps and other metadata to the right site views', 
 
 test('renders an em dash for Where when no postal code is present', () => {
   const feature = requireFeature('ent_15th_st_church_001');
+  const { statePostalCode: _omit, ...propertiesWithoutState } = feature.properties;
+  void _omit;
   const withoutState = {
     ...feature,
-    properties: { ...feature.properties, statePostalCode: undefined },
+    properties: propertiesWithoutState,
   };
   const html = renderToStaticMarkup(createElement(NarrativeCard, { feature: withoutState }));
   assert.match(html, /—/);
@@ -73,6 +75,8 @@ test('renders the radius affordance as words, never as a bare number with no con
   const html = renderToStaticMarkup(createElement(NarrativeCard, { feature }));
   assert.match(html, /precision/);
   assert.match(html, /not an exact address/);
+  assert.match(html, /±660 ft/);
+  assert.doesNotMatch(html, /±200 m/);
 });
 
 test('never labels a coarsened point with a street-address-shaped string', () => {

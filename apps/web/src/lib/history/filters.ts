@@ -30,7 +30,10 @@ export const DEFAULT_HISTORY_FILTERS: HistoryFilterState = {
   connections: 'all',
 };
 
-export const HISTORY_SORT_OPTIONS: readonly { readonly value: HistorySort; readonly label: string }[] = [
+export const HISTORY_SORT_OPTIONS: readonly {
+  readonly value: HistorySort;
+  readonly label: string;
+}[] = [
   { value: 'name', label: 'Name A–Z' },
   { value: 'kind', label: 'Kind' },
   { value: 'connections', label: 'Connections' },
@@ -147,9 +150,10 @@ export function applyHistoryTopicFilter<T extends { readonly topicTags: readonly
   return items.filter((item) => item.topicTags.includes(topic));
 }
 
-export function applyHistoryConnectionsFilter<
-  T extends { readonly connectionCount: number },
->(items: readonly T[], connections: HistoryConnectionsFilter): readonly T[] {
+export function applyHistoryConnectionsFilter<T extends { readonly connectionCount: number }>(
+  items: readonly T[],
+  connections: HistoryConnectionsFilter,
+): readonly T[] {
   if (connections === 'all') return items;
   if (connections === 'with') return items.filter((item) => item.connectionCount > 0);
   return items.filter((item) => item.connectionCount === 0);
@@ -178,7 +182,11 @@ export function parseHistoryConnectionsFilter(raw: string | undefined): HistoryC
 }
 
 export function sortHistoryNodes<
-  T extends { readonly displayName: string; readonly kind: string; readonly connectionCount: number },
+  T extends {
+    readonly displayName: string;
+    readonly kind: string;
+    readonly connectionCount: number;
+  },
 >(items: readonly T[], sort: HistorySort): readonly T[] {
   const copy = [...items];
   if (sort === 'kind') {
@@ -197,7 +205,5 @@ export function sortHistoryNodes<
 export function trimHistoryEdgesToNodes<
   T extends { readonly fromEntityId: string; readonly toEntityId: string },
 >(edges: readonly T[], nodeIds: ReadonlySet<string>): readonly T[] {
-  return edges.filter(
-    (edge) => nodeIds.has(edge.fromEntityId) && nodeIds.has(edge.toEntityId),
-  );
+  return edges.filter((edge) => nodeIds.has(edge.fromEntityId) && nodeIds.has(edge.toEntityId));
 }

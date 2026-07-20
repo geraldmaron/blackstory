@@ -87,7 +87,10 @@ function request(query = ''): Request {
 }
 
 test('returns filtered node ids for a valid decade refine query', async () => {
-  const response = await handleHistoryRefineRequest(request('?decade=1970s&kind=event'), createDeps());
+  const response = await handleHistoryRefineRequest(
+    request('?decade=1970s&kind=event'),
+    createDeps(),
+  );
   assert.equal(response.status, 200);
   const body = (await response.json()) as {
     nodeIds: string[];
@@ -107,7 +110,10 @@ test('denies prohibited guardrail keys', async () => {
 });
 
 test('requires App Check when guard denies', async () => {
-  const response = await handleHistoryRefineRequest(request('?decade=1950s'), createDeps({ appCheckAllowed: false }));
+  const response = await handleHistoryRefineRequest(
+    request('?decade=1950s'),
+    createDeps({ appCheckAllowed: false }),
+  );
   assert.equal(response.status, 401);
   const body = (await response.json()) as { error: string };
   assert.equal(body.error, 'app_check_required');

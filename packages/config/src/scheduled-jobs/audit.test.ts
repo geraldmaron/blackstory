@@ -1,4 +1,3 @@
-
 /**
  * Every automated write a job makes carries the job-run id as (or alongside)
  * the correlation id, and is traceable back to the exact run that made it. This test
@@ -10,16 +9,20 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import {
-  commitWithAudit,
-  type AtomicStore,
-  type AtomicTransaction,
-} from '@repo/firebase';
+import { commitWithAudit, type AtomicStore, type AtomicTransaction } from '@repo/firebase';
 import { buildJobRunAuditEvent, buildJobRunOutboxMessage } from './audit.ts';
 
 type StagedOperation =
-  | { readonly kind: 'create' | 'set'; readonly path: string; readonly data: Readonly<Record<string, unknown>> }
-  | { readonly kind: 'update'; readonly path: string; readonly data: Readonly<Record<string, unknown>> };
+  | {
+      readonly kind: 'create' | 'set';
+      readonly path: string;
+      readonly data: Readonly<Record<string, unknown>>;
+    }
+  | {
+      readonly kind: 'update';
+      readonly path: string;
+      readonly data: Readonly<Record<string, unknown>>;
+    };
 
 /** Minimal in-memory AtomicStore double, mirroring packages/firebase/src/audit-outbox.test.ts. */
 class MemoryAtomicStore implements AtomicStore {

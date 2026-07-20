@@ -60,8 +60,7 @@ export function blackPopulationChange(
   const toShare = blackSharePercent(to);
   const shareDeltaPp =
     fromShare !== undefined && toShare !== undefined ? toShare - fromShare : undefined;
-  const countDelta =
-    from && to ? to.blackPopulation - from.blackPopulation : undefined;
+  const countDelta = from && to ? to.blackPopulation - from.blackPopulation : undefined;
   return { shareDeltaPp, countDelta };
 }
 
@@ -79,13 +78,11 @@ export function bucketBlackShareTier(sharePercent: number | undefined): BlackSha
 
 /** Bidirectional change tiers: copper family for gain, stone for loss — never red heat. */
 export type BlackChangeTier =
-  | 'gainStrong'
-  | 'gainModerate'
-  | 'neutral'
-  | 'lossModerate'
-  | 'lossStrong';
+  'gainStrong' | 'gainModerate' | 'neutral' | 'lossModerate' | 'lossStrong';
 
-export function bucketBlackChangeTier(shareDeltaPp: number | undefined): BlackChangeTier | 'unknown' {
+export function bucketBlackChangeTier(
+  shareDeltaPp: number | undefined,
+): BlackChangeTier | 'unknown' {
   if (shareDeltaPp === undefined || !Number.isFinite(shareDeltaPp)) return 'unknown';
   if (shareDeltaPp >= 5) return 'gainStrong';
   if (shareDeltaPp >= 1) return 'gainModerate';

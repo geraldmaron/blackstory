@@ -15,10 +15,7 @@ export {
   assertTemporalContextValid,
 } from './validation.js';
 export { evaluateClaimExtraction } from './pipeline.js';
-export {
-  EXTRACTION_METHODS,
-  EXTRACTION_UNCERTAINTY_CODES,
-} from './types.js';
+export { EXTRACTION_METHODS, EXTRACTION_UNCERTAINTY_CODES } from './types.js';
 export type {
   AtomicityAssessment,
   ClaimDraft,

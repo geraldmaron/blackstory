@@ -39,7 +39,11 @@ test('wires an aria-live status region referenced by aria-describedby', () => {
 
 test('respects an externally disabled state (e.g. while a manual lookup is in flight)', () => {
   const html = renderToStaticMarkup(
-    createElement(LocationConsentButton, { onResolved: () => {}, onDenied: () => {}, disabled: true }),
+    createElement(LocationConsentButton, {
+      onResolved: () => {},
+      onDenied: () => {},
+      disabled: true,
+    }),
   );
   assert.match(html, /<button[^>]*disabled/);
 });

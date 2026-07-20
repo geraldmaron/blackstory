@@ -1,4 +1,3 @@
-
 /**
  * REAL roster entry: relevance/confidence recalibration report. Wraps
  * @repo/domain's relevance-feedback module buildRecalibrationReport (per-dimension
@@ -31,7 +30,11 @@ import {
   type RelevanceDriftAlarmThresholds,
   type RelevanceDriftWindow,
 } from '@repo/domain';
-import { DEFAULT_ALERT_POLICIES, buildAlertPayload, type SecurityAlertPayload } from '@repo/observability';
+import {
+  DEFAULT_ALERT_POLICIES,
+  buildAlertPayload,
+  type SecurityAlertPayload,
+} from '@repo/observability';
 import { completeJobRun, startJobRun, type JobRunRecord } from '../run-record.js';
 
 export const RECALIBRATION_REPORT_JOB_ID = 'relevance-confidence-recalibration-report';
@@ -83,7 +86,9 @@ export type RecalibrationReportJobInput = {
   readonly driftThresholds?: RelevanceDriftAlarmThresholds;
   readonly queryPackRecords?: Parameters<typeof buildRecalibrationReport>[0]['queryPackRecords'];
   readonly queryPacks?: Parameters<typeof buildRecalibrationReport>[0]['queryPacks'];
-  readonly graylistYieldInput?: Parameters<typeof buildRecalibrationReport>[0]['graylistYieldInput'];
+  readonly graylistYieldInput?: Parameters<
+    typeof buildRecalibrationReport
+  >[0]['graylistYieldInput'];
 };
 
 export type RecalibrationReportJobResult = {

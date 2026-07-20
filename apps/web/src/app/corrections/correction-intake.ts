@@ -31,7 +31,11 @@ export type CorrectionSubmissionInput = {
 export type CorrectionFieldIssue = { readonly field: string; readonly message: string };
 
 export type CorrectionSubmissionValidation =
-  | { readonly valid: true; readonly payload: SubmissionInput; readonly metadata: CorrectionSubmissionMetadata }
+  | {
+      readonly valid: true;
+      readonly payload: SubmissionInput;
+      readonly metadata: CorrectionSubmissionMetadata;
+    }
   | { readonly valid: false; readonly issues: readonly CorrectionFieldIssue[] };
 
 export type CorrectionSubmissionMetadata = {
@@ -84,7 +88,10 @@ export function validateCorrectionSubmission(
     issues.push({ field: 'category', message: 'Choose a correction category.' });
   }
   if (!input.targetRecordId?.trim()) {
-    issues.push({ field: 'targetRecordId', message: 'Provide the record identifier you are correcting.' });
+    issues.push({
+      field: 'targetRecordId',
+      message: 'Provide the record identifier you are correcting.',
+    });
   }
   if (!input.statement?.trim() || input.statement.trim().length < MIN_STATEMENT_LENGTH) {
     issues.push({

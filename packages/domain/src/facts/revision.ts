@@ -13,7 +13,12 @@
  * no revision log at all.
  */
 
-export const FACT_REVISION_CHANGE_TYPES = ['correction', 'clarification', 'update', 'style'] as const;
+export const FACT_REVISION_CHANGE_TYPES = [
+  'correction',
+  'clarification',
+  'update',
+  'style',
+] as const;
 export type FactRevisionChangeType = (typeof FACT_REVISION_CHANGE_TYPES)[number];
 
 export function isFactRevisionChangeType(value: string): value is FactRevisionChangeType {
@@ -81,7 +86,9 @@ export function assertRevisionsAppendOnly(
   }
   for (let i = 0; i < previous.length; i += 1) {
     if (JSON.stringify(previous[i]) !== JSON.stringify(next[i])) {
-      throw new Error(`FactRecord revision #${previous[i]!.revisionNumber} was mutated — append-only violation`);
+      throw new Error(
+        `FactRecord revision #${previous[i]!.revisionNumber} was mutated — append-only violation`,
+      );
     }
   }
   next.forEach((revision, index) => {

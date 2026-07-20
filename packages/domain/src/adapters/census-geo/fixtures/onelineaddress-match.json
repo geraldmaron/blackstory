@@ -2,7 +2,12 @@
   "result": {
     "input": {
       "address": { "address": "4600 Silver Hill Rd, Washington, DC 20233" },
-      "benchmark": { "isDefault": true, "benchmarkDescription": "Public Address Ranges - Current Benchmark", "id": "4", "benchmarkName": "Public_AR_Current" }
+      "benchmark": {
+        "isDefault": true,
+        "benchmarkDescription": "Public Address Ranges - Current Benchmark",
+        "id": "4",
+        "benchmarkName": "Public_AR_Current"
+      }
     },
     "addressMatches": [
       {
@@ -25,16 +30,39 @@
         "matchedAddress": "4600 SILVER HILL RD, WASHINGTON, DC, 20233",
         "geographies": {
           "States": [
-            { "STATE": "11", "NAME": "District of Columbia", "GEOID": "11", "BASENAME": "District of Columbia" }
+            {
+              "STATE": "11",
+              "NAME": "District of Columbia",
+              "GEOID": "11",
+              "BASENAME": "District of Columbia"
+            }
           ],
           "Counties": [
-            { "STATE": "11", "COUNTY": "001", "NAME": "District of Columbia", "GEOID": "11001", "BASENAME": "District of Columbia" }
+            {
+              "STATE": "11",
+              "COUNTY": "001",
+              "NAME": "District of Columbia",
+              "GEOID": "11001",
+              "BASENAME": "District of Columbia"
+            }
           ],
           "Incorporated Places": [
-            { "STATE": "11", "PLACE": "50000", "NAME": "Washington", "GEOID": "1150000", "BASENAME": "Washington" }
+            {
+              "STATE": "11",
+              "PLACE": "50000",
+              "NAME": "Washington",
+              "GEOID": "1150000",
+              "BASENAME": "Washington"
+            }
           ],
           "Census Tracts": [
-            { "STATE": "11", "COUNTY": "001", "TRACT": "007803", "GEOID": "11001007803", "BASENAME": "7803" }
+            {
+              "STATE": "11",
+              "COUNTY": "001",
+              "TRACT": "007803",
+              "GEOID": "11001007803",
+              "BASENAME": "7803"
+            }
           ]
         }
       }

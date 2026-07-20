@@ -58,5 +58,8 @@ test('archive-dpla discovery job completes with dual-lane survivors', async () =
   assert.ok(adapterIds.has(INTERNET_ARCHIVE_ADAPTER_ID));
   assert.ok(adapterIds.has(DPLA_V2_ADAPTER_ID));
   assert.ok(!adapterIds.has('dpla-items-v1'));
-  assert.deepEqual([...result.campaign.adapterIds], [INTERNET_ARCHIVE_ADAPTER_ID, DPLA_V2_ADAPTER_ID]);
+  assert.deepEqual(
+    [...result.campaign.adapterIds],
+    [INTERNET_ARCHIVE_ADAPTER_ID, DPLA_V2_ADAPTER_ID],
+  );
 });

@@ -1,4 +1,3 @@
-
 /**
  * Proves the legal-change-monitoring job proposes review_queue events from fixture adapters.
  */

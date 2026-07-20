@@ -107,13 +107,19 @@ test('sensitivity presentation labels cover every SensitivityClass and stay cond
 });
 
 test('non-endorsement and sensitive-content disclaimer copy never references identity attributes', () => {
-  assert.doesNotThrow(() => assertNoIdentityAttributeFraming(getDisclaimer('non_endorsement').body));
-  assert.doesNotThrow(() => assertNoIdentityAttributeFraming(getDisclaimer('sensitive_content').body));
+  assert.doesNotThrow(() =>
+    assertNoIdentityAttributeFraming(getDisclaimer('non_endorsement').body),
+  );
+  assert.doesNotThrow(() =>
+    assertNoIdentityAttributeFraming(getDisclaimer('sensitive_content').body),
+  );
 });
 
 test('assertNoIdentityAttributeFraming actually catches identity-attribute language', () => {
   for (const term of IDENTITY_ATTRIBUTE_TERMS) {
-    assert.throws(() => assertNoIdentityAttributeFraming(`Flagged because the subject was ${term}.`));
+    assert.throws(() =>
+      assertNoIdentityAttributeFraming(`Flagged because the subject was ${term}.`),
+    );
   }
 });
 
@@ -151,7 +157,7 @@ async function collectSourceFiles(directory: string): Promise<string[]> {
 const DISCLAIMER_SIGNAL_PHRASES = [
   'not legal advice, not travel advice',
   'does not grant, imply, or facilitate access',
-  "inclusion in this index is never an endorsement",
+  'inclusion in this index is never an endorsement',
   'not a real-time safety assessment',
   'confirm current access and any visiting requirements',
 ] as const;

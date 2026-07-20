@@ -53,13 +53,23 @@ export function OpportunityAtlasCoverageChart({ coverage }: OpportunityAtlasCove
   const fieldPlotLeft = FIELD_LABEL_WIDTH;
   const fieldPlotRight = CHART_WIDTH - CHART_MARGIN.right - 64;
   const fieldBarMaxWidth = Math.max(fieldPlotRight - fieldPlotLeft, 1);
-  const fieldXScale = scaleLinear(0, maxFieldValue, fieldPlotLeft, fieldPlotLeft + fieldBarMaxWidth);
+  const fieldXScale = scaleLinear(
+    0,
+    maxFieldValue,
+    fieldPlotLeft,
+    fieldPlotLeft + fieldBarMaxWidth,
+  );
   const fieldViewHeight =
     CHART_MARGIN.top + Math.max(fieldSeries.length, 1) * FIELD_ROW_HEIGHT + CHART_MARGIN.bottom;
 
   const binGroupWidth = plotWidth() / Math.max(histogram.length, 1);
   const binBarWidth = binGroupWidth * 0.65;
-  const binXScale = scaleLinear(0, histogram.length, CHART_MARGIN.left, CHART_MARGIN.left + plotWidth());
+  const binXScale = scaleLinear(
+    0,
+    histogram.length,
+    CHART_MARGIN.left,
+    CHART_MARGIN.left + plotWidth(),
+  );
   const binYScale = scaleLinear(0, maxBinValue, CHART_MARGIN.top + plotHeight(), CHART_MARGIN.top);
 
   return (
@@ -206,7 +216,12 @@ export function OpportunityAtlasCoverageChart({ coverage }: OpportunityAtlasCove
                   height={barBottom - barTop}
                   fill="var(--ds-accent-graphic)"
                 />
-                <text className="ds-data-chart__axis-label" x={centerX} y={barTop - 8} textAnchor="middle">
+                <text
+                  className="ds-data-chart__axis-label"
+                  x={centerX}
+                  y={barTop - 8}
+                  textAnchor="middle"
+                >
                   {formatChartCount(bin.tractCount)}
                 </text>
                 <text

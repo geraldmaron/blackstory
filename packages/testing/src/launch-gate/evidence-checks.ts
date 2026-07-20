@@ -1,4 +1,3 @@
-
 /**
  * Machine-checkable evidence probes for launch gates (filesystem + harness smoke).
  */
@@ -25,7 +24,8 @@ function readJson(repoRoot: string, relativePath: string): unknown {
   return JSON.parse(readFileSync(join(repoRoot, relativePath), 'utf8')) as unknown;
 }
 
-export type MachineCheckResult = { readonly pass: true } | { readonly pass: false; readonly message: string };
+export type MachineCheckResult =
+  { readonly pass: true } | { readonly pass: false; readonly message: string };
 
 export function checkGoldCorpusPrecision(repoRoot: string): MachineCheckResult {
   const corpusPath = 'packages/testing/src/gold-corpus/fixtures/gold-corpus.v1.json';
@@ -155,8 +155,14 @@ export function checkBetaDisablePath(repoRoot: string): MachineCheckResult {
     return { pass: false, message: `Missing disable runbook: ${BETA_DISABLE_RUNBOOK}` };
   }
   const runbook = readFileSync(join(repoRoot, BETA_DISABLE_RUNBOOK), 'utf8');
-  if (!runbook.includes(PUBLIC_READ_API_DISABLED_ENV) || !runbook.includes(PUBLIC_STATIC_MODE_SWITCH_ID)) {
-    return { pass: false, message: 'Disable runbook must document env flag and static-mode switch.' };
+  if (
+    !runbook.includes(PUBLIC_READ_API_DISABLED_ENV) ||
+    !runbook.includes(PUBLIC_STATIC_MODE_SWITCH_ID)
+  ) {
+    return {
+      pass: false,
+      message: 'Disable runbook must document env flag and static-mode switch.',
+    };
   }
   return { pass: true };
 }
@@ -180,9 +186,7 @@ export function checkEvidencePointersExist(
   return { pass: true };
 }
 
-const MACHINE_CHECKS: Readonly<
-  Record<string, (repoRoot: string) => MachineCheckResult>
-> = {
+const MACHINE_CHECKS: Readonly<Record<string, (repoRoot: string) => MachineCheckResult>> = {
   'gold-corpus-precision': checkGoldCorpusPrecision,
   'restore-rehearsal-complete': checkRestoreRehearsal,
   'load-abuse-verified': checkLoadAbuseVerified,

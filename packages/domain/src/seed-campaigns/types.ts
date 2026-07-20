@@ -32,7 +32,10 @@ export type UsCensusRegion = (typeof US_CENSUS_REGIONS)[number];
 export type SeedRecordCompleteness = 'sparse' | 'partial' | 'substantial';
 
 /** Citation fields required by structural completeness no invented capture content. */
-export type SeedCitation = Pick<Citation, 'sourceName' | 'location' | 'capture' | 'retrievalDate'> & {
+export type SeedCitation = Pick<
+  Citation,
+  'sourceName' | 'location' | 'capture' | 'retrievalDate'
+> & {
   readonly id: string;
 };
 
@@ -91,7 +94,11 @@ export type SeedValidationFailure = {
 };
 
 export type SeedValidationResult =
-  | { readonly ok: true; readonly recordCount: number; readonly byCampaign: Readonly<Record<SeedCampaignId, number>> }
+  | {
+      readonly ok: true;
+      readonly recordCount: number;
+      readonly byCampaign: Readonly<Record<SeedCampaignId, number>>;
+    }
   | { readonly ok: false; readonly failures: readonly SeedValidationFailure[] };
 
 export type GeographicCoverageReport = {

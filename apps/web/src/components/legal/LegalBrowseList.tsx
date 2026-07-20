@@ -36,7 +36,10 @@ export function LegalBrowseList({ items, labelledBy }: LegalBrowseListProps) {
             <p className="ds-result-list__summary" style={{ margin: 'var(--ds-space-2) 0 0 0' }}>
               <span className="ds-mono">{item.citation}</span>
             </p>
-            <div className="ds-row" style={{ marginTop: 'var(--ds-space-2)', gap: 'var(--ds-space-2)', flexWrap: 'wrap' }}>
+            <div
+              className="ds-row"
+              style={{ marginTop: 'var(--ds-space-2)', gap: 'var(--ds-space-2)', flexWrap: 'wrap' }}
+            >
               <span className="ds-sans">{humanizeLegalKind(item.kind)}</span>
               <LegalStatusBadge status={item.lawStatus} />
               {item.topics.map((topic) => (

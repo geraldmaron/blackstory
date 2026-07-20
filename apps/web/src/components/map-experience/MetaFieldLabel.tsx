@@ -16,12 +16,7 @@ export type MetaFieldLabelProps = {
   readonly as?: 'dt' | 'span';
 };
 
-export function MetaFieldLabel({
-  field,
-  children,
-  className,
-  as = 'dt',
-}: MetaFieldLabelProps) {
+export function MetaFieldLabel({ field, children, className, as = 'dt' }: MetaFieldLabelProps) {
   const help = metaFieldHelp(field);
   const Tag = as;
   return (

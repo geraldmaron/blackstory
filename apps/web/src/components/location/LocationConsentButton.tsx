@@ -31,22 +31,26 @@ export type LocationConsentButtonProps = {
 };
 
 const DENIAL_MESSAGES: Readonly<Record<GeolocationDenialReason, string>> = {
-  unsupported: 'Your browser does not support location lookup here. Use the search form below instead.',
+  unsupported:
+    'Your browser does not support location lookup here. Use the search form below instead.',
   permission_denied: 'Location access was denied. Use the search form below instead.',
   position_unavailable: 'Your location could not be determined. Use the search form below instead.',
   timeout: 'Location lookup timed out. Use the search form below instead.',
   unknown_error: 'Something went wrong getting your location. Use the search form below instead.',
 };
 
-export function LocationConsentButton({ onResolved, onDenied, disabled = false }: LocationConsentButtonProps) {
+export function LocationConsentButton({
+  onResolved,
+  onDenied,
+  disabled = false,
+}: LocationConsentButtonProps) {
   const [status, setStatus] = useState<'idle' | 'requesting' | 'denied'>('idle');
   const [denialMessage, setDenialMessage] = useState<string | undefined>(undefined);
 
   async function handleClick() {
     setStatus('requesting');
     setDenialMessage(undefined);
-    const geolocation =
-      typeof navigator !== 'undefined' ? navigator.geolocation : undefined;
+    const geolocation = typeof navigator !== 'undefined' ? navigator.geolocation : undefined;
     const outcome = await requestBrowserLocation(geolocation);
     if (outcome.ok) {
       setStatus('idle');

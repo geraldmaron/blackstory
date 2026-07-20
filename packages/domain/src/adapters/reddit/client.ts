@@ -47,7 +47,11 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
 }
 
-function extractPostData(child: unknown, index: number, rejected: RedditRejectedPost[]): RawRedditPostData | undefined {
+function extractPostData(
+  child: unknown,
+  index: number,
+  rejected: RedditRejectedPost[],
+): RawRedditPostData | undefined {
   if (!isRecord(child) || child.kind !== 't3' || !isRecord(child.data)) {
     rejected.push({ index, reason: 'not a t3 (post) listing child' });
     return undefined;
@@ -86,7 +90,12 @@ function extractPostData(child: unknown, index: number, rejected: RedditRejected
  * built the wrong URL or Reddit changed the envelope shape entirely.
  */
 export function parseRedditListingResponse(raw: unknown): RedditParsedListing {
-  if (!isRecord(raw) || raw.kind !== 'Listing' || !isRecord(raw.data) || !Array.isArray(raw.data.children)) {
+  if (
+    !isRecord(raw) ||
+    raw.kind !== 'Listing' ||
+    !isRecord(raw.data) ||
+    !Array.isArray(raw.data.children)
+  ) {
     throw new Error('Reddit response is not a recognized Listing envelope');
   }
   const rejected: RedditRejectedPost[] = [];

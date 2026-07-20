@@ -161,8 +161,7 @@ export function HeroHeadlineMorph() {
     const startedAt = morphSequenceStartedAt;
     let frameId = 0;
     // Hold rAF until the Black Story entry transition has settled.
-    const holdAfterMs =
-      heroHeadlinePhaseStartMs(FINAL_INDEX) + FINAL_PHASE.transitionMs + 32;
+    const holdAfterMs = heroHeadlinePhaseStartMs(FINAL_INDEX) + FINAL_PHASE.transitionMs + 32;
 
     const tick = (now: number) => {
       const elapsed = now - startedAt;
@@ -187,11 +186,7 @@ export function HeroHeadlineMorph() {
   const prefixMs = phase.transitionMs > 0 ? phase.transitionMs : 700;
 
   return (
-    <h1
-      className="ds-hero-stage__headline"
-      id="hero-headline"
-      aria-label={phase.accessibleLabel}
-    >
+    <h1 className="ds-hero-stage__headline" id="hero-headline" aria-label={phase.accessibleLabel}>
       <span
         className="ds-hero-headline-morph"
         aria-hidden="true"

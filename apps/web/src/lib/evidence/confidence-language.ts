@@ -28,7 +28,8 @@ const CONFIDENCE_LEVEL_TEXT: Readonly<Record<ConfidenceLevel, string>> = {
   low: 'low',
 };
 
-const PROBABILITY_LANGUAGE_PATTERN = /\bprobability\b|\bchance(?:s)? (?:of|that)\b|\blikely to be true\b/i;
+const PROBABILITY_LANGUAGE_PATTERN =
+  /\bprobability\b|\bchance(?:s)? (?:of|that)\b|\blikely to be true\b/i;
 
 /**
  * Defense-in-depth guard: fails closed if uncalibrated confidence copy drifts toward probability
@@ -38,7 +39,9 @@ const PROBABILITY_LANGUAGE_PATTERN = /\bprobability\b|\bchance(?:s)? (?:of|that)
  */
 export function assertNoUncalibratedProbabilityLanguage(text: string, calibrated: boolean): void {
   if (!calibrated && PROBABILITY_LANGUAGE_PATTERN.test(text)) {
-    throw new Error(`Confidence copy uses probability language without a calibrated score: "${text}"`);
+    throw new Error(
+      `Confidence copy uses probability language without a calibrated score: "${text}"`,
+    );
   }
 }
 
@@ -62,7 +65,8 @@ export function formatEvidenceScoreLabel(
   return label;
 }
 
-export type EvidenceDimensionKey = 'confidence' | 'relevance' | 'connectionStrength' | 'researchCoverage';
+export type EvidenceDimensionKey =
+  'confidence' | 'relevance' | 'connectionStrength' | 'researchCoverage';
 
 export type EvidenceDimensionCopy = {
   readonly label: string;
@@ -71,7 +75,9 @@ export type EvidenceDimensionCopy = {
 
 /** Distinguishing copy for each measurement dimension — deliberately never merged into one
  * blended figure or label. Each answers a different question about a claim or record. */
-export const EVIDENCE_DIMENSION_COPY: Readonly<Record<EvidenceDimensionKey, EvidenceDimensionCopy>> = {
+export const EVIDENCE_DIMENSION_COPY: Readonly<
+  Record<EvidenceDimensionKey, EvidenceDimensionCopy>
+> = {
   confidence: {
     label: 'Confidence \u2014 evidence score',
     description:

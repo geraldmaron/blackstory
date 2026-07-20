@@ -1,4 +1,3 @@
-
 /**
  * Nothing scheduled can publish. This proves assertScheduledJobOperationAllowed
  * calls through the REAL guard (assertDiscoveryCannotPublish from @repo/domain)

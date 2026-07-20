@@ -1,4 +1,3 @@
-
 /**
  * Contracts for beta launch gate evaluation, attestation, and recorded decisions.
  */

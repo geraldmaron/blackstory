@@ -82,7 +82,8 @@ export async function withRetry(
   run: () => Promise<SafeHttpResponse>,
   options: RetryOptions,
 ): Promise<SafeHttpResponse> {
-  const sleep = options.sleep ?? ((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
+  const sleep =
+    options.sleep ?? ((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
   let attempt = 0;
   while (true) {
     try {
@@ -105,7 +106,10 @@ export async function withRetry(
 }
 
 /** Default retry predicate: retry on 429/5xx statuses or a thrown SafeHttpError/network error. */
-export function defaultIsRetryable(response: SafeHttpResponse | undefined, error: unknown): boolean {
+export function defaultIsRetryable(
+  response: SafeHttpResponse | undefined,
+  error: unknown,
+): boolean {
   if (response) {
     return DEFAULT_RETRYABLE_STATUSES.has(response.status);
   }

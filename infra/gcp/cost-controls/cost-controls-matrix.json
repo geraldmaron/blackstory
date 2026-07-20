@@ -76,7 +76,12 @@
       "maxDispatchesPerSecond": 10,
       "maxConcurrentDispatches": 20,
       "maxAttempts": 5,
-      "retry": { "maxAttempts": 5, "initialBackoffMs": 1000, "maxBackoffMs": 300000, "multiplier": 2 },
+      "retry": {
+        "maxAttempts": 5,
+        "initialBackoffMs": 1000,
+        "maxBackoffMs": 300000,
+        "multiplier": 2
+      },
       "maxQueueDepth": 5000
     },
     {
@@ -85,7 +90,12 @@
       "maxDispatchesPerSecond": 5,
       "maxConcurrentDispatches": 10,
       "maxAttempts": 4,
-      "retry": { "maxAttempts": 4, "initialBackoffMs": 1000, "maxBackoffMs": 300000, "multiplier": 2 },
+      "retry": {
+        "maxAttempts": 4,
+        "initialBackoffMs": 1000,
+        "maxBackoffMs": 300000,
+        "multiplier": 2
+      },
       "maxQueueDepth": 2000
     },
     {
@@ -94,7 +104,12 @@
       "maxDispatchesPerSecond": 2,
       "maxConcurrentDispatches": 4,
       "maxAttempts": 3,
-      "retry": { "maxAttempts": 3, "initialBackoffMs": 1000, "maxBackoffMs": 120000, "multiplier": 2 },
+      "retry": {
+        "maxAttempts": 3,
+        "initialBackoffMs": 1000,
+        "maxBackoffMs": 120000,
+        "multiplier": 2
+      },
       "maxQueueDepth": 500
     },
     {
@@ -103,7 +118,12 @@
       "maxDispatchesPerSecond": 20,
       "maxConcurrentDispatches": 30,
       "maxAttempts": 5,
-      "retry": { "maxAttempts": 5, "initialBackoffMs": 1000, "maxBackoffMs": 300000, "multiplier": 2 },
+      "retry": {
+        "maxAttempts": 5,
+        "initialBackoffMs": 1000,
+        "maxBackoffMs": 300000,
+        "multiplier": 2
+      },
       "maxQueueDepth": 10000
     },
     {
@@ -112,7 +132,12 @@
       "maxDispatchesPerSecond": 1,
       "maxConcurrentDispatches": 2,
       "maxAttempts": 3,
-      "retry": { "maxAttempts": 3, "initialBackoffMs": 1000, "maxBackoffMs": 300000, "multiplier": 2 },
+      "retry": {
+        "maxAttempts": 3,
+        "initialBackoffMs": 1000,
+        "maxBackoffMs": 300000,
+        "multiplier": 2
+      },
       "maxQueueDepth": 200
     }
   ],
@@ -124,7 +149,12 @@
       "memoryMiB": 1024,
       "maxDurationSec": 3600,
       "maxRetries": 2,
-      "retry": { "maxAttempts": 3, "initialBackoffMs": 1000, "maxBackoffMs": 300000, "multiplier": 2 },
+      "retry": {
+        "maxAttempts": 3,
+        "initialBackoffMs": 1000,
+        "maxBackoffMs": 300000,
+        "multiplier": 2
+      },
       "taskCount": 1,
       "parallelism": 1
     },
@@ -135,7 +165,12 @@
       "memoryMiB": 2048,
       "maxDurationSec": 14400,
       "maxRetries": 1,
-      "retry": { "maxAttempts": 2, "initialBackoffMs": 1000, "maxBackoffMs": 600000, "multiplier": 2 },
+      "retry": {
+        "maxAttempts": 2,
+        "initialBackoffMs": 1000,
+        "maxBackoffMs": 600000,
+        "multiplier": 2
+      },
       "taskCount": 1,
       "parallelism": 1
     },
@@ -146,7 +181,12 @@
       "memoryMiB": 2048,
       "maxDurationSec": 7200,
       "maxRetries": 2,
-      "retry": { "maxAttempts": 3, "initialBackoffMs": 1000, "maxBackoffMs": 300000, "multiplier": 2 },
+      "retry": {
+        "maxAttempts": 3,
+        "initialBackoffMs": 1000,
+        "maxBackoffMs": 300000,
+        "multiplier": 2
+      },
       "taskCount": 1,
       "parallelism": 1
     },
@@ -157,7 +197,12 @@
       "memoryMiB": 1024,
       "maxDurationSec": 1800,
       "maxRetries": 1,
-      "retry": { "maxAttempts": 2, "initialBackoffMs": 1000, "maxBackoffMs": 300000, "multiplier": 2 },
+      "retry": {
+        "maxAttempts": 2,
+        "initialBackoffMs": 1000,
+        "maxBackoffMs": 300000,
+        "multiplier": 2
+      },
       "taskCount": 1,
       "parallelism": 1
     },
@@ -168,7 +213,12 @@
       "memoryMiB": 512,
       "maxDurationSec": 300,
       "maxRetries": 2,
-      "retry": { "maxAttempts": 3, "initialBackoffMs": 1000, "maxBackoffMs": 60000, "multiplier": 2 },
+      "retry": {
+        "maxAttempts": 3,
+        "initialBackoffMs": 1000,
+        "maxBackoffMs": 60000,
+        "multiplier": 2
+      },
       "taskCount": 1,
       "parallelism": 1
     },
@@ -179,7 +229,12 @@
       "memoryMiB": 512,
       "maxDurationSec": 600,
       "maxRetries": 2,
-      "retry": { "maxAttempts": 3, "initialBackoffMs": 1000, "maxBackoffMs": 300000, "multiplier": 2 },
+      "retry": {
+        "maxAttempts": 3,
+        "initialBackoffMs": 1000,
+        "maxBackoffMs": 300000,
+        "multiplier": 2
+      },
       "taskCount": 1,
       "parallelism": 1
     }

@@ -30,7 +30,9 @@ export type FetchDplaSearchInput = {
   readonly classification?: string;
 };
 
-export async function fetchDplaSearch(input: FetchDplaSearchInput): Promise<readonly DplaCandidateRecord[]> {
+export async function fetchDplaSearch(
+  input: FetchDplaSearchInput,
+): Promise<readonly DplaCandidateRecord[]> {
   if (!input.apiKey.trim()) {
     throw new Error('DPLA_API_KEY is required — see .env.example (never hardcode a key)');
   }

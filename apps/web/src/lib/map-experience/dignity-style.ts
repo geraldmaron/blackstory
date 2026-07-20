@@ -84,7 +84,9 @@ export const DIGNITY_PALETTE = {
   streetLabelLight: 'rgba(10, 10, 10, 0.55)',
 } as const;
 
-export const DENSITY_TIER_FILL: Readonly<Record<'documented' | 'emerging' | 'concentrated', string>> = {
+export const DENSITY_TIER_FILL: Readonly<
+  Record<'documented' | 'emerging' | 'concentrated', string>
+> = {
   documented: DIGNITY_PALETTE.densityLow,
   emerging: DIGNITY_PALETTE.densityMid,
   concentrated: DIGNITY_PALETTE.densityHigh,

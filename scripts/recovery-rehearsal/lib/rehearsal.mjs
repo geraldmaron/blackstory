@@ -1,4 +1,3 @@
-
 /**
  * Core recovery rehearsal logic. Simulates procedure timing from fixtures,
  * validates break-glass paths, and aggregates measured recovery times no live GCP calls.

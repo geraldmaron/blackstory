@@ -124,10 +124,7 @@ function renderNodeShape(node: LayoutHistoryGraphNode, selected: boolean): React
   }
 }
 
-function aggregateEdgePath(
-  from: LayoutHistoryGraphNode,
-  to: LayoutHistoryGraphNode,
-): string {
+function aggregateEdgePath(from: LayoutHistoryGraphNode, to: LayoutHistoryGraphNode): string {
   const midX = (from.x + to.x) / 2;
   const midY = (from.y + to.y) / 2;
   // Soft bow toward the board center so grid links stay distinct from label bands.
@@ -165,7 +162,10 @@ export function HistoryGraphViz({
   );
 
   const legendKinds = useMemo(() => {
-    const seen = new Map<string, { kind: string; shade: string; glyph: MapEntityGlyph; label: string }>();
+    const seen = new Map<
+      string,
+      { kind: string; shade: string; glyph: MapEntityGlyph; label: string }
+    >();
     for (const node of layout.layoutNodes) {
       if (seen.has(node.kind)) continue;
       const encoding = kindEncodingFor(node.kind);
@@ -272,8 +272,7 @@ export function HistoryGraphViz({
             const isSelected = node.role === 'record' ? node.entityId === selectedId : false;
             const showLabel = shouldShowLabel(node, layout.mode, selectedId, showLabelsForCount);
             const kindLabel = node.label;
-            const countLabel =
-              node.role === 'kind-hub' ? String(node.recordCount ?? 0) : undefined;
+            const countLabel = node.role === 'kind-hub' ? String(node.recordCount ?? 0) : undefined;
             const recordLabel = node.role === 'record' ? truncateLabel(node.label) : undefined;
             const plateWidth = estimateLabelWidth(
               node.role === 'kind-hub' ? `${kindLabel} ${countLabel}` : (recordLabel ?? kindLabel),

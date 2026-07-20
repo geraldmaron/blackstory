@@ -40,5 +40,7 @@ export async function ingestWebSearchCandidatesThroughPipeline(
     ...(input.captureConcurrency !== undefined ? { concurrency: input.captureConcurrency } : {}),
   });
 
-  return captured.map((entry) => ingestApiCandidate({ record: entry.candidate }, input.pack, { now: input.now }));
+  return captured.map((entry) =>
+    ingestApiCandidate({ record: entry.candidate }, input.pack, { now: input.now }),
+  );
 }

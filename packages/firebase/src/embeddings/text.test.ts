@@ -1,4 +1,3 @@
-
 /**
  * Tests for embedding text construction and pre-filter derivation.
  */

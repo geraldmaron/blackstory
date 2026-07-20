@@ -66,7 +66,10 @@ test('assertAllSeedRecordsPassGates is fail-closed on a record missing citations
 
 test('national seed is not a bulk U.S. school import ( AC4)', () => {
   assertNationalSeedNotBulkImport(ALL_SEED_RECORDS);
-  assert.ok(ALL_SEED_RECORDS.length < 100, 'sample must stay orders of magnitude below school inventory');
+  assert.ok(
+    ALL_SEED_RECORDS.length < 100,
+    'sample must stay orders of magnitude below school inventory',
+  );
   assert.ok(ALL_SEED_RECORDS.length <= NATIONAL_SEED_MAX_RECORDS);
 });
 
@@ -98,7 +101,9 @@ test('geographic diversity spans multiple Census regions with documented gaps', 
   const coverage = computeGeographicCoverage(ALL_SEED_RECORDS);
   assert.ok(coverage.representedRegions.length >= 3, 'sample should span at least three regions');
   assert.ok(coverage.byRegion.South > 0);
-  assert.ok(coverage.byRegion.Northeast > 0 || coverage.byRegion.Midwest > 0 || coverage.byRegion.West > 0);
+  assert.ok(
+    coverage.byRegion.Northeast > 0 || coverage.byRegion.Midwest > 0 || coverage.byRegion.West > 0,
+  );
 
   const gapsDoc = readFileSync(join(__dirname, 'gaps.md'), 'utf8');
   assert.match(gapsDoc, /Geographic gaps/iu);
@@ -110,7 +115,8 @@ test(' gold corpus included_school adjudications align with seed publication pos
   const gold = loadGoldCorpus(GOLD_CORPUS_PATH);
   const includedSchools = gold.examples.filter(
     (example) =>
-      example.categories.includes('included_school') && example.adjudication.relevance === 'include',
+      example.categories.includes('included_school') &&
+      example.adjudication.relevance === 'include',
   );
   assert.ok(includedSchools.length > 0, 'gold corpus must include included_school examples');
 

@@ -3,11 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import {
-  SurfaceCapabilityError,
-  deniesCanonicalWrite,
-  deniesPublication,
-} from '@repo/config';
+import { SurfaceCapabilityError, deniesCanonicalWrite, deniesPublication } from '@repo/config';
 import type { AppCheckTelemetryEvent } from '@repo/firebase';
 import { createPublicApiAppCheckGuard } from './app-check.ts';
 import { health } from './index.ts';

@@ -7,12 +7,7 @@
  */
 
 export type RecordGapKind =
-  | 'claims'
-  | 'related'
-  | 'timeline'
-  | 'statusHistory'
-  | 'context'
-  | 'relevance';
+  'claims' | 'related' | 'timeline' | 'statusHistory' | 'context' | 'relevance';
 
 export type RecordGapCopy = {
   readonly title: string;

@@ -11,12 +11,7 @@ import type {
   ResearchCoverage,
 } from './measurements.js';
 
-export const CLAIM_WORKFLOW_STATUSES = [
-  'proposed',
-  'accepted',
-  'rejected',
-  'superseded',
-] as const;
+export const CLAIM_WORKFLOW_STATUSES = ['proposed', 'accepted', 'rejected', 'superseded'] as const;
 export type ClaimWorkflowStatus = (typeof CLAIM_WORKFLOW_STATUSES)[number];
 
 export const CLAIM_PUBLICATION_STATUSES = ['unpublished', 'published', 'retracted'] as const;
@@ -150,7 +145,12 @@ export function assertCanonicalClaimValid(claim: CanonicalClaim): void {
 export function assertCanonicalClaimMatchesCurrentVersion(
   claim: Pick<
     CanonicalClaim,
-    'id' | 'currentVersionId' | 'workflowStatus' | 'publicationStatus' | 'proceduralStatus' | 'claimClass'
+    | 'id'
+    | 'currentVersionId'
+    | 'workflowStatus'
+    | 'publicationStatus'
+    | 'proceduralStatus'
+    | 'claimClass'
   >,
   currentVersion: ClaimVersion,
 ): void {
@@ -175,7 +175,9 @@ export function assertCanonicalClaimMatchesCurrentVersion(
 }
 
 /** True when a claim is published and accepted (eligible for public narrative citation). */
-export function isClaimPublished(claim: Pick<CanonicalClaim, 'workflowStatus' | 'publicationStatus'>): boolean {
+export function isClaimPublished(
+  claim: Pick<CanonicalClaim, 'workflowStatus' | 'publicationStatus'>,
+): boolean {
   return claim.workflowStatus === 'accepted' && claim.publicationStatus === 'published';
 }
 
@@ -199,7 +201,10 @@ export function claimClassThreshold(
   claimClass: ClaimClass,
   policy = loadProductConstitution(),
 ): number {
-  if (claimClass === 'high_impact' && policy.publicationRestrictions.highImpactRequiresHigherThreshold) {
+  if (
+    claimClass === 'high_impact' &&
+    policy.publicationRestrictions.highImpactRequiresHigherThreshold
+  ) {
     return policy.claimConfidenceThresholds.highImpactPublish;
   }
   return policy.claimConfidenceThresholds.standardPublish;

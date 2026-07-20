@@ -1,4 +1,3 @@
-
 /**
  * Embedding pipeline and Firestore vector-search constants.
  *
@@ -29,7 +28,6 @@ export const VECTOR_FIELD_NAME = 'embedding' as const;
 /** DOT_PRODUCT is equivalent to cosine similarity for unit-normalized vectors but cheaper. */
 export const DISTANCE_MEASURE = 'DOT_PRODUCT' as const;
 
-
 /**
  * Firestore doubles the normal per-1000-entries read metering to 1 read per 100 vector index
  * entries scanned, on top of 1 read per document returned. Pre-filtering (kind/state/eraBucket)
@@ -38,7 +36,6 @@ export const DISTANCE_MEASURE = 'DOT_PRODUCT' as const;
  */
 export const VECTOR_INDEX_READ_METERING_DIVISOR = 100 as const;
 export const STANDARD_INDEX_READ_METERING_DIVISOR = 1_000 as const;
-
 
 /**
  * Rough embedding cost anchor from the brief: ~$7.50 to embed 100k docs of ~500 tokens

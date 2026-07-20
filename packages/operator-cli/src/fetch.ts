@@ -1,4 +1,3 @@
-
 /**
  * Real safe-fetch dependencies (DNS pinning + HTTP transport) plus citation prefill
  * and a capture-plan preview for the admin quick-add surface and the CLI's URL-based intake.
@@ -41,7 +40,6 @@ function normalizeHeaders(headers: IncomingMessage['headers']): Record<string, s
   }
   return normalized;
 }
-
 
 /**
  * Connects directly to `pinnedAddress` (never re-resolves the hostname) while retaining
@@ -138,14 +136,11 @@ export type CapturePlan = {
   readonly notes: string;
 };
 
-
 /**
  * Documents where a Wayback (or other archival) capture would be triggered for this fetch.
  * Deliberately does NOT call any archival API see the module doc comment above.
  */
-export function planSelectiveCapture(
-  result: Extract<SafeFetchResult, { ok: true }>,
-): CapturePlan {
+export function planSelectiveCapture(result: Extract<SafeFetchResult, { ok: true }>): CapturePlan {
   return {
     snapshotMode: 'selective',
     waybackIntegration: 'not_wired',

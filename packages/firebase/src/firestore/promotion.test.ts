@@ -1,4 +1,3 @@
-
 /**
  * In-memory transaction tests for atomic claim promotion and audit recording.
  */

@@ -119,7 +119,9 @@ function triage(input: {
   if (matchesAny(host, REJECT_HOST_PATTERNS)) {
     return { bucket: 'reject', reason: `reject_host:${host}`, score: 0 };
   }
-  if (REJECT_TITLE_PATTERNS.some((pattern) => pattern.test(input.title) || pattern.test(input.url))) {
+  if (
+    REJECT_TITLE_PATTERNS.some((pattern) => pattern.test(input.title) || pattern.test(input.url))
+  ) {
     return { bucket: 'reject', reason: 'listicle_or_bhm_landing', score: 0 };
   }
   if (
@@ -318,8 +320,7 @@ async function main(): Promise<void> {
   const rejectResult = await applyTwoStep({
     caseIds: rejectIds,
     secondAction: 'exclude',
-    secondReason:
-      'Corsair triage: low-signal listicle/spam host — excluded from catalog pipeline.',
+    secondReason: 'Corsair triage: low-signal listicle/spam host — excluded from catalog pipeline.',
     reasonCode: 'outside_scope',
   });
 

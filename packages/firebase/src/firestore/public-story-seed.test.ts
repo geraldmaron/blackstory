@@ -3,10 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import {
-  getSeedStoryProjection,
-  listSeedStoryProjections,
-} from './public-story-seed.js';
+import { getSeedStoryProjection, listSeedStoryProjections } from './public-story-seed.js';
 import { publicStoryProjectionSchema } from './types.js';
 
 test('seed story catalog is exactly five Zod-valid longform articles', () => {

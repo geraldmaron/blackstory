@@ -1,4 +1,3 @@
-
 /**
  * Test data builder for historical entity fixtures.
  */

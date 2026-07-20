@@ -19,7 +19,10 @@ test('extractMessageContent prefers content over reasoning', () => {
 
 test('extractMessageContent pulls JSON from reasoning when content empty', () => {
   const reasoning = 'thinking… {"decision":"keep","rationale":"x"} trailing';
-  assert.equal(extractMessageContent({ content: '', reasoning }), '{"decision":"keep","rationale":"x"}');
+  assert.equal(
+    extractMessageContent({ content: '', reasoning }),
+    '{"decision":"keep","rationale":"x"}',
+  );
 });
 
 test('hybrid fails over to ollama when openrouter returns retryable error', async () => {
@@ -189,7 +192,11 @@ test('openrouter rotates through the model roster on retryable failures', async 
   const { createOpenRouterLlmProvider } = await import('./llm-provider.ts');
   const provider = createOpenRouterLlmProvider({
     apiKey: 'test-key',
-    models: ['tencent/hy3:free', 'nvidia/nemotron-3-super-120b-a12b:free', 'google/gemma-4-31b-it:free'],
+    models: [
+      'tencent/hy3:free',
+      'nvidia/nemotron-3-super-120b-a12b:free',
+      'google/gemma-4-31b-it:free',
+    ],
     fetchImpl,
   });
   const result = await provider.complete({ model: '', messages: [{ role: 'user', content: 'x' }] });

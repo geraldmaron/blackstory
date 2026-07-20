@@ -52,9 +52,7 @@ function draft(overrides: Partial<ClaimDraft> = {}): ClaimDraft {
   };
 }
 
-function link(
-  overrides: Partial<ClaimEvidenceLink> = {},
-): ClaimEvidenceLink {
+function link(overrides: Partial<ClaimEvidenceLink> = {}): ClaimEvidenceLink {
   return {
     id: 'link-1',
     claimId: 'claim-1',
@@ -88,7 +86,8 @@ function registeredSpan() {
 }
 
 test('line parser is deterministic and records atomicity uncertainty', () => {
-  const source = '# claims\nschool-1 | opened in | 1961\nschool-2 | served Atlanta and Birmingham | 1962';
+  const source =
+    '# claims\nschool-1 | opened in | 1961\nschool-2 | served Atlanta and Birmingham | 1962';
   assert.deepEqual(parseClaimLines(source), parseClaimLines(source));
   const parsed = parseClaimLines(source);
   assert.equal(parsed.length, 2);
@@ -218,7 +217,9 @@ test('multi-assertion and unsupported procedural language are rejected', () => {
     extractedBy: 'researcher-1',
   });
   assert.equal(procedural.decision, 'rejected');
-  assert.ok(procedural.rejectionReasons.some((reason) => reason.includes('Unsupported procedural')));
+  assert.ok(
+    procedural.rejectionReasons.some((reason) => reason.includes('Unsupported procedural')),
+  );
 });
 
 test('credible contradictions are attached without collapsing values', () => {

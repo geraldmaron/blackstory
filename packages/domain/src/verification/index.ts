@@ -11,7 +11,12 @@ export {
   assertVerificationPolicyValid,
   resolveVerificationPolicy,
 } from './policy.js';
-export type { VolatilityClass, ReviewIntervalUnit, ReviewInterval, VerificationPolicy } from './policy.js';
+export type {
+  VolatilityClass,
+  ReviewIntervalUnit,
+  ReviewInterval,
+  VerificationPolicy,
+} from './policy.js';
 
 export { VERIFICATION_CADENCE_SCENARIOS, DEFAULT_VERIFICATION_CADENCES } from './cadence-table.js';
 export type { VerificationCadenceScenario, SeedCadenceEntry } from './cadence-table.js';

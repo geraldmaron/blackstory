@@ -94,7 +94,11 @@ test('SensitivityContextBanner renders non-endorsement copy for person-kind flag
 test('SensitivityContextBanner never renders a suppression/hide affordance — it is additive markup only', () => {
   const html = renderToStaticMarkup(
     createElement(SensitivityContextBanner, {
-      sensitivity: { class: 'enslaver_or_segregationist', note: 'Documented plantation ownership per probate record.', basisClaimIds: ['claim_4'] },
+      sensitivity: {
+        class: 'enslaver_or_segregationist',
+        note: 'Documented plantation ownership per probate record.',
+        basisClaimIds: ['claim_4'],
+      },
       classLabel: 'Documented enslaver or segregationist conduct',
       sensitiveContentDisclaimer: SENSITIVE_CONTENT_COPY,
     }),

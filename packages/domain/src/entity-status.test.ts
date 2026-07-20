@@ -28,8 +28,20 @@ test('kind-specific status vocabularies match the spec exactly', () => {
 
 test('currentStatus derives from the open-ended record only, never a hand-edited scalar', () => {
   const history: readonly StatusHistoryEntry[] = [
-    { status: 'active', validFrom: '1868', validTo: '1954', datePrecision: 'year', basisClaimIds: ['c1'] },
-    { status: 'historic', validFrom: '1954', validTo: null, datePrecision: 'year', basisClaimIds: ['c2'] },
+    {
+      status: 'active',
+      validFrom: '1868',
+      validTo: '1954',
+      datePrecision: 'year',
+      basisClaimIds: ['c1'],
+    },
+    {
+      status: 'historic',
+      validFrom: '1954',
+      validTo: null,
+      datePrecision: 'year',
+      basisClaimIds: ['c2'],
+    },
   ];
   assert.equal(currentStatus(history), 'historic');
   assert.equal(currentStatus([]), undefined);
@@ -46,8 +58,20 @@ test('currentStatus prefers the latest-starting open-ended record when more than
 
 test('statusAsOf answers "what was this entity\'s status in decade D" point-in-time queries', () => {
   const history: readonly StatusHistoryEntry[] = [
-    { status: 'active', validFrom: '1868', validTo: '1954', datePrecision: 'year', basisClaimIds: ['c1'] },
-    { status: 'historic', validFrom: '1954', validTo: null, datePrecision: 'year', basisClaimIds: ['c2'] },
+    {
+      status: 'active',
+      validFrom: '1868',
+      validTo: '1954',
+      datePrecision: 'year',
+      basisClaimIds: ['c1'],
+    },
+    {
+      status: 'historic',
+      validFrom: '1954',
+      validTo: null,
+      datePrecision: 'year',
+      basisClaimIds: ['c2'],
+    },
   ];
 
   // Decade-anchored point-in-time reads: 1930s -> still "active"; 1980s -> "historic".

@@ -22,7 +22,9 @@ test('parseTextOnly treats ordinary <script>-bearing HTML as safe', async () => 
 });
 
 test('checkMalwareSignatures still flags the EICAR test signature', () => {
-  const content = new TextEncoder().encode('X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*');
+  const content = new TextEncoder().encode(
+    'X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*',
+  );
   assert.deepEqual(checkMalwareSignatures(content), ['eicar_test_signature']);
 });
 
@@ -32,6 +34,8 @@ test('checkMalwareSignatures still flags executable magic bytes (MZ)', () => {
 });
 
 test('checkMalwareSignatures does not flag ordinary text', () => {
-  const content = new TextEncoder().encode('<html><body><p>Nothing suspicious here.</p></body></html>');
+  const content = new TextEncoder().encode(
+    '<html><body><p>Nothing suspicious here.</p></body></html>',
+  );
   assert.deepEqual(checkMalwareSignatures(content), []);
 });

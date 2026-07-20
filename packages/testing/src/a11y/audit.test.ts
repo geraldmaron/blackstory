@@ -1,4 +1,3 @@
-
 /**
  * Extended HTML fixture audit tests.
  */

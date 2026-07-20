@@ -1,4 +1,3 @@
-
 /**
  * Sensitivity vocabulary and precision-tier model for BlackStory.
  *
@@ -8,7 +7,6 @@
  * read-only vocabularies used by the central redaction serialization layer.
  */
 import { loadProductConstitution } from '@repo/schemas';
-
 
 /**
  * Precision tiers for a located fact. Evidence and internal tiers may hold exact

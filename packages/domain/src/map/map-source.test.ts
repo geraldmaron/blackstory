@@ -5,7 +5,11 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { buildMapSource, type MapRedactLocationFn, type MapSourceEntityInput } from './map-source.js';
+import {
+  buildMapSource,
+  type MapRedactLocationFn,
+  type MapSourceEntityInput,
+} from './map-source.js';
 import {
   EVENT_NO_LOCATION_FIXTURE,
   INSTITUTION_NYC_NY_FIXTURE,

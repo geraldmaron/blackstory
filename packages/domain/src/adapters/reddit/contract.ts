@@ -11,7 +11,13 @@
  */
 import { ADAPTER_CANDIDATE_SCHEMA_VERSION } from '../candidates.js';
 import type { SourceAdapterContract } from '../types.js';
-import { REDDIT_ADAPTER_ID, REDDIT_DEFAULT_CLASSIFICATION, REDDIT_FREE_TIER_QPM_LIMIT, REDDIT_PARSER_VERSION, REDDIT_STABLE_ID_SCHEME } from './types.js';
+import {
+  REDDIT_ADAPTER_ID,
+  REDDIT_DEFAULT_CLASSIFICATION,
+  REDDIT_FREE_TIER_QPM_LIMIT,
+  REDDIT_PARSER_VERSION,
+  REDDIT_STABLE_ID_SCHEME,
+} from './types.js';
 
 export const REDDIT_ATTRIBUTION_NOTICE =
   'Reddit threads are discovery leads that point researchers at verifiable primary sources — ' +
@@ -26,7 +32,9 @@ export const REDDIT_ATTRIBUTION_NOTICE =
  * recorded — see `docs/runbooks/operator-session.md`. If Reddit denies the application, route
  * Reddit leads through the manual submission lane instead.
  */
-export function createRedditAdapterContract(overrides: Partial<SourceAdapterContract> = {}): SourceAdapterContract {
+export function createRedditAdapterContract(
+  overrides: Partial<SourceAdapterContract> = {},
+): SourceAdapterContract {
   return {
     adapterId: REDDIT_ADAPTER_ID,
     parserVersion: REDDIT_PARSER_VERSION,
@@ -59,7 +67,11 @@ export function createRedditAdapterContract(overrides: Partial<SourceAdapterCont
     // assertion and ./types.ts REDDIT_LISTING_MAX_ITEMS REDDIT_LISTING_MAX_PAGE_SIZE.
     rateLimits: { requestsPerMinute: REDDIT_FREE_TIER_QPM_LIMIT, burst: 10 },
     volume: { expectedRecordsPerRun: 100, countToleranceFraction: 0.6 },
-    geographicCoverage: { countries: ['US'], notes: 'Curated topical + city/state subreddits (AskHistorians, BlackHistory, city/state subs)' },
+    geographicCoverage: {
+      countries: ['US'],
+      notes:
+        'Curated topical + city/state subreddits (AskHistorians, BlackHistory, city/state subs)',
+    },
     expectedSchemaVersion: ADAPTER_CANDIDATE_SCHEMA_VERSION,
     canarySampleFraction: 0.05,
     ...overrides,

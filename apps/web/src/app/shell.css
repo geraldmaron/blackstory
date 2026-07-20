@@ -60,38 +60,13 @@
   height: 100%;
 }
 
-/* Explore: condense the bar — symbol mark, hide primary nav; map instruments own the frame
-   (ADR-017 transition contract). Header is a sibling of `.ds-shell-body`, so scope from
-   `.ds-shell:has(...)` — not `.ds-shell-body:has(...)` (that never matched the header). */
-.ds-shell:has(.ds-explore-stage) .ds-shell-header__inner {
-  gap: var(--ds-space-1);
-  padding-inline: var(--ds-gutter);
-}
-
-.ds-shell:has(.ds-explore-stage) .ds-shell-nav--desktop,
-.ds-shell:has(.ds-explore-stage) .ds-shell-menu {
-  display: none;
-}
-
-.ds-shell:has(.ds-explore-stage) .ds-shell-wordmark__img--lockup {
-  display: none !important;
-}
-
-.ds-shell:has(.ds-explore-stage) .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-light {
-  display: none;
-}
-
-.ds-shell:has(.ds-explore-stage) .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-dark {
-  display: block;
-}
-
-.ds-shell:has(.ds-explore-stage) .ds-shell-header__cta {
-  display: none;
-}
-
-.ds-shell:has(.ds-explore-stage) .ds-shell-header__tools {
-  margin-left: auto;
-}
+/* Explore keeps the shared primary nav. It is a map surface (`data-surface="map"`),
+   so the header already picks up the on-map ink treatment (dark lockup + full nav)
+   from `@repo/ui` shell-header.css — identical to the homepage hero and every other
+   route. Only the layout above is explore-specific (viewport-locked, footer omitted);
+   the navigation chrome is never stripped. Header is a sibling of `.ds-shell-body`,
+   so any explore-scoped rule must read from `.ds-shell:has(...)`, never
+   `.ds-shell-body:has(...)` (that selector never matches the header). */
 
 .ds-shell-offline {
   padding: calc(var(--ds-island-clearance)) 0 0;

@@ -23,11 +23,14 @@ import type { InternetArchiveCandidateRecord } from './types.js';
 const IA_ALLOWED_CONTENT_TYPES = ['application/json', 'text/json', 'text/plain'];
 
 async function getJson(client: SafeHttpClient, url: string, retries: number): Promise<unknown> {
-  const response = await withRetry(() => client({ url, method: 'GET', allowedContentTypes: IA_ALLOWED_CONTENT_TYPES }), {
-    retries,
-    baseDelayMs: 250,
-    isRetryable: defaultIsRetryable,
-  });
+  const response = await withRetry(
+    () => client({ url, method: 'GET', allowedContentTypes: IA_ALLOWED_CONTENT_TYPES }),
+    {
+      retries,
+      baseDelayMs: 250,
+      isRetryable: defaultIsRetryable,
+    },
+  );
   assertAllowedContentType(response, IA_ALLOWED_CONTENT_TYPES);
   return JSON.parse(response.bodyText) as unknown;
 }
@@ -72,7 +75,9 @@ export type FetchScrapeInput = {
 };
 
 /** Cursor-based Scrape API pagination: follows `cursor` until absent or `maxPages` is reached. */
-export async function fetchScrapeAll(input: FetchScrapeInput): Promise<readonly InternetArchiveCandidateRecord[]> {
+export async function fetchScrapeAll(
+  input: FetchScrapeInput,
+): Promise<readonly InternetArchiveCandidateRecord[]> {
   const results: InternetArchiveCandidateRecord[] = [];
   let cursor: string | undefined;
   let pages = 0;
@@ -108,7 +113,9 @@ export type FetchMetadataInput = {
   readonly classification?: string;
 };
 
-export async function fetchMetadata(input: FetchMetadataInput): Promise<InternetArchiveCandidateRecord | undefined> {
+export async function fetchMetadata(
+  input: FetchMetadataInput,
+): Promise<InternetArchiveCandidateRecord | undefined> {
   const url = buildMetadataUrl(input.identifier);
   const raw = await getJson(input.client, url, input.retries ?? 3);
   const doc = parseMetadataResponse(raw);

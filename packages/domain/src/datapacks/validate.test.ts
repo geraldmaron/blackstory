@@ -75,7 +75,13 @@ test('checkDataPackImportBudget rejects when resource count exceeds the cap', ()
   const manifest = baseManifest({
     resources: [
       ...baseManifest().resources,
-      { name: 'claims', path: 'claims.json', kind: 'claims', sha256: sha256Bytes('[]'), byteSize: 2 },
+      {
+        name: 'claims',
+        path: 'claims.json',
+        kind: 'claims',
+        sha256: sha256Bytes('[]'),
+        byteSize: 2,
+      },
     ],
   });
   const result = checkDataPackImportBudget(manifest, { maxResources: 1, maxTotalBytes: 1_000 });

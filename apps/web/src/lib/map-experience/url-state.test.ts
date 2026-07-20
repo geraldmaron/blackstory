@@ -22,9 +22,9 @@ test('an empty query string parses to the "all" default filter state with no vie
   assert.equal(parsed.lines, false);
   assert.equal(parsed.decade, undefined);
   assert.equal(parsed.edge, undefined);
-  assert.equal(parsed.showFilters, true);
-  assert.equal(parsed.showResults, true);
-  assert.equal(parsed.showKey, true);
+  assert.equal(parsed.showFilters, false);
+  assert.equal(parsed.showResults, false);
+  assert.equal(parsed.showKey, false);
 });
 
 test('round-trips a full view state through build -> parse', () => {
@@ -38,9 +38,9 @@ test('round-trips a full view state through build -> parse', () => {
     lines: true,
     decade: '1970s',
     edge: 'rel_landmark_occurred_at_school',
-    showFilters: true,
-    showResults: true,
-    showKey: true,
+    showFilters: false,
+    showResults: false,
+    showKey: false,
   };
 
   const href = buildExploreHref(state);
@@ -74,9 +74,9 @@ test('shareable explore URLs without an intentional camera omit lat/lng/zoom', (
     layerMode: 'presence',
     group: false,
     lines: false,
-    showFilters: true,
-    showResults: true,
-    showKey: true,
+    showFilters: false,
+    showResults: false,
+    showKey: false,
     state: 'DC',
   });
   assert.equal(qs, 'era=1970s&state=DC');
@@ -91,9 +91,9 @@ test('default filter values are omitted from the query string (minimal shareable
     layerMode: 'presence',
     group: false,
     lines: false,
-    showFilters: true,
-    showResults: true,
-    showKey: true,
+    showFilters: false,
+    showResults: false,
+    showKey: false,
   });
   assert.equal(qs, '');
 });
@@ -105,9 +105,9 @@ test('layerMode=off is emitted; presence (default) is omitted', () => {
       layerMode: 'off',
       group: false,
       lines: false,
-      showFilters: true,
-      showResults: true,
-      showKey: true,
+      showFilters: false,
+      showResults: false,
+      showKey: false,
     }),
     'layerMode=off',
   );
@@ -117,9 +117,9 @@ test('layerMode=off is emitted; presence (default) is omitted', () => {
       layerMode: 'presence',
       group: false,
       lines: false,
-      showFilters: true,
-      showResults: true,
-      showKey: true,
+      showFilters: false,
+      showResults: false,
+      showKey: false,
     }),
     '',
   );
@@ -137,13 +137,16 @@ test('population modes round-trip decade params', () => {
     popDecade: '2010' as const,
     group: false,
     lines: false,
-    showFilters: true,
-    showResults: true,
-    showKey: true,
+    showFilters: false,
+    showResults: false,
+    showKey: false,
   };
   const shareQs = buildExploreSearchParams(share);
   assert.equal(shareQs, 'layerMode=blackShare&popDecade=2010');
-  assert.deepEqual(parseExploreSearchParams(Object.fromEntries(new URLSearchParams(shareQs))), share);
+  assert.deepEqual(
+    parseExploreSearchParams(Object.fromEntries(new URLSearchParams(shareQs))),
+    share,
+  );
 
   const change = {
     filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
@@ -152,9 +155,9 @@ test('population modes round-trip decade params', () => {
     popTo: '2020' as const,
     group: false,
     lines: false,
-    showFilters: true,
-    showResults: true,
-    showKey: true,
+    showFilters: false,
+    showResults: false,
+    showKey: false,
   };
   const changeQs = buildExploreSearchParams(change);
   assert.equal(changeQs, 'layerMode=blackChange&popFrom=2000');
@@ -179,9 +182,9 @@ test('buildExploreSearchParams emits group=1 only when grouping is on', () => {
       layerMode: 'presence',
       group: true,
       lines: false,
-      showFilters: true,
-      showResults: true,
-      showKey: true,
+      showFilters: false,
+      showResults: false,
+      showKey: false,
     }),
     /^group=1$/,
   );
@@ -191,126 +194,110 @@ test('buildExploreSearchParams emits group=1 only when grouping is on', () => {
       layerMode: 'presence',
       group: false,
       lines: false,
-      showFilters: true,
-      showResults: true,
-      showKey: true,
+      showFilters: false,
+      showResults: false,
+      showKey: false,
     }),
     '',
   );
 });
 
-test('hidePanels defaults all panels to shown when param is absent', () => {
+test('absent panel params default map-first (all chrome collapsed)', () => {
   const parsed = parseExploreSearchParams({});
-  assert.equal(parsed.showFilters, true);
-  assert.equal(parsed.showResults, true);
-  assert.equal(parsed.showKey, true);
+  assert.equal(parsed.showFilters, false);
+  assert.equal(parsed.showResults, false);
+  assert.equal(parsed.showKey, false);
   assert.equal(
     buildExploreSearchParams({
       filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
       layerMode: 'presence',
       group: false,
       lines: false,
-      showFilters: true,
-      showResults: true,
-      showKey: true,
+      showFilters: false,
+      showResults: false,
+      showKey: false,
     }),
     '',
   );
 });
 
-test('hidePanels=filters hides only the filters panel', () => {
+test('panels= opt-in opens listed chrome and round-trips', () => {
+  const filtersOnly = {
+    filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+    layerMode: 'presence' as const,
+    group: false,
+    lines: false,
+    showFilters: true,
+    showResults: false,
+    showKey: false,
+  };
+  assert.equal(buildExploreSearchParams(filtersOnly), 'panels=filters');
+  assert.deepEqual(
+    parseExploreSearchParams(Object.fromEntries(new URLSearchParams('panels=filters'))),
+    filtersOnly,
+  );
+
+  const resultsOnly = {
+    ...filtersOnly,
+    showFilters: false,
+    showResults: true,
+  };
+  assert.equal(buildExploreSearchParams(resultsOnly), 'panels=results');
+
+  const keyOnly = {
+    ...filtersOnly,
+    showFilters: false,
+    showKey: true,
+  };
+  assert.equal(buildExploreSearchParams(keyOnly), 'panels=key');
+
+  const allOpen = {
+    ...filtersOnly,
+    showFilters: true,
+    showResults: true,
+    showKey: true,
+  };
+  assert.equal(buildExploreSearchParams(allOpen), 'panels=filters,results,key');
+  assert.deepEqual(
+    parseExploreSearchParams(
+      Object.fromEntries(new URLSearchParams('panels=filters,results,key')),
+    ),
+    allOpen,
+  );
+});
+
+test('legacy hidePanels= still parses (start open, hide listed)', () => {
   const parsed = parseExploreSearchParams({ hidePanels: 'filters' });
   assert.equal(parsed.showFilters, false);
   assert.equal(parsed.showResults, true);
   assert.equal(parsed.showKey, true);
 
-  const state = {
-    filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
-    layerMode: 'presence' as const,
-    group: false,
-    lines: false,
-    showFilters: false,
-    showResults: true,
-    showKey: true,
-  };
-  assert.equal(buildExploreSearchParams(state), 'hidePanels=filters');
-  assert.deepEqual(parseExploreSearchParams(Object.fromEntries(new URLSearchParams('hidePanels=filters'))), state);
-});
+  assert.deepEqual(
+    parseExploreSearchParams(Object.fromEntries(new URLSearchParams('hidePanels=results'))),
+    {
+      filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+      layerMode: 'presence',
+      group: false,
+      lines: false,
+      showFilters: true,
+      showResults: false,
+      showKey: true,
+    },
+  );
 
-test('hidePanels=results hides only the results rail', () => {
-  const parsed = parseExploreSearchParams({ hidePanels: 'results' });
-  assert.equal(parsed.showFilters, true);
-  assert.equal(parsed.showResults, false);
-  assert.equal(parsed.showKey, true);
-
-  const state = {
-    filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
-    layerMode: 'presence' as const,
-    group: false,
-    lines: false,
-    showFilters: true,
-    showResults: false,
-    showKey: true,
-  };
-  assert.equal(buildExploreSearchParams(state), 'hidePanels=results');
-  assert.deepEqual(parseExploreSearchParams(Object.fromEntries(new URLSearchParams('hidePanels=results'))), state);
-});
-
-test('hidePanels=key hides only the color key legend', () => {
-  const parsed = parseExploreSearchParams({ hidePanels: 'key' });
-  assert.equal(parsed.showFilters, true);
-  assert.equal(parsed.showResults, true);
-  assert.equal(parsed.showKey, false);
-
-  const state = {
-    filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
-    layerMode: 'presence' as const,
-    group: false,
-    lines: false,
-    showFilters: true,
-    showResults: true,
-    showKey: false,
-  };
-  assert.equal(buildExploreSearchParams(state), 'hidePanels=key');
-  assert.deepEqual(parseExploreSearchParams(Object.fromEntries(new URLSearchParams('hidePanels=key'))), state);
-});
-
-test('hidePanels=filters,results,key hides all panels regardless of token order', () => {
   for (const hidePanels of [
     'filters,results,key',
     'key,results,filters',
     'results, key , filters, key',
   ]) {
-    const parsed = parseExploreSearchParams({ hidePanels });
-    assert.equal(parsed.showFilters, false, hidePanels);
-    assert.equal(parsed.showResults, false, hidePanels);
-    assert.equal(parsed.showKey, false, hidePanels);
+    const allHidden = parseExploreSearchParams({ hidePanels });
+    assert.equal(allHidden.showFilters, false, hidePanels);
+    assert.equal(allHidden.showResults, false, hidePanels);
+    assert.equal(allHidden.showKey, false, hidePanels);
   }
-
-  const state = {
-    filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
-    layerMode: 'presence' as const,
-    group: false,
-    lines: false,
-    showFilters: false,
-    showResults: false,
-    showKey: false,
-  };
-  assert.equal(
-    new URLSearchParams(buildExploreSearchParams(state)).get('hidePanels'),
-    'filters,results,key',
-  );
-  assert.deepEqual(
-    parseExploreSearchParams(Object.fromEntries(new URLSearchParams('hidePanels=filters,results,key'))),
-    state,
-  );
-  assert.deepEqual(
-    parseExploreSearchParams(Object.fromEntries(new URLSearchParams('hidePanels=key,results,filters'))),
-    state,
-  );
 });
 
-test('hidePanels ignores unknown tokens', () => {
+test('legacy hidePanels ignores unknown tokens', () => {
   const parsed = parseExploreSearchParams({ hidePanels: 'filters,sidebar,results,key' });
   assert.equal(parsed.showFilters, false);
   assert.equal(parsed.showResults, false);
@@ -356,9 +343,9 @@ test('round-trips radius and near place-search params', () => {
     layerMode: 'presence' as const,
     group: false,
     lines: false,
-    showFilters: true,
-    showResults: true,
-    showKey: true,
+    showFilters: false,
+    showResults: false,
+    showKey: false,
   };
 
   const href = buildExploreHref(state);
@@ -373,7 +360,12 @@ test('round-trips radius and near place-search params', () => {
 });
 
 test('parseExploreSearchParams ignores an invalid radius token', () => {
-  const parsed = parseExploreSearchParams({ radius: '999mi', lat: '26.7', lng: '-80.0', zoom: '9' });
+  const parsed = parseExploreSearchParams({
+    radius: '999mi',
+    lat: '26.7',
+    lng: '-80.0',
+    zoom: '9',
+  });
   assert.equal(parsed.radius, undefined);
   assert.ok(parsed.viewport);
 });

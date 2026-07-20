@@ -1,4 +1,3 @@
-
 /**
  * Imports the execution plan into the repository's tracker.
  *
@@ -60,7 +59,9 @@ function parseRows(markdown) {
 
   const unique = new Map(rows.map((row) => [row.externalRef, row]));
   if (rows.length !== 66 || unique.size !== 66) {
-    throw new Error(`Expected 66 unique execution beads; found ${rows.length} rows / ${unique.size} IDs`);
+    throw new Error(
+      `Expected 66 unique execution beads; found ${rows.length} rows / ${unique.size} IDs`,
+    );
   }
 
   return [...unique.values()].sort((a, b) => a.externalRef.localeCompare(b.externalRef));
@@ -226,9 +227,9 @@ const counts = imported.reduce((summary, issue) => {
 }, {});
 
 if (imported.length !== 66) {
-  throw new Error(`Import verification failed: expected 66 execution beads, found ${imported.length}`);
+  throw new Error(
+    `Import verification failed: expected 66 execution beads, found ${imported.length}`,
+  );
 }
 
-process.stdout.write(
-  `${JSON.stringify({ imported: imported.length, counts }, null, 2)}\n`,
-);
+process.stdout.write(`${JSON.stringify({ imported: imported.length, counts }, null, 2)}\n`);

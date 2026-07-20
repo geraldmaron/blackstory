@@ -47,7 +47,8 @@ function uniqueClaims(claims: readonly PreviewClaim[], label: string): Map<strin
   const byId = new Map<string, PreviewClaim>();
   for (const claim of claims) {
     if (!claim.claimId.trim()) throw new Error(`${label} claimId is required`);
-    if (byId.has(claim.claimId)) throw new Error(`${label} contains duplicate claim ${claim.claimId}`);
+    if (byId.has(claim.claimId))
+      throw new Error(`${label} contains duplicate claim ${claim.claimId}`);
     byId.set(claim.claimId, claim);
   }
   return byId;

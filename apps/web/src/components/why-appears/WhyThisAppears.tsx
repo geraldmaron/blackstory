@@ -42,9 +42,7 @@ type BasisGroup = {
   readonly items: readonly PublicNotabilityBasisItem[];
 };
 
-function groupBasisByCriterion(
-  items: readonly PublicNotabilityBasisItem[],
-): readonly BasisGroup[] {
+function groupBasisByCriterion(items: readonly PublicNotabilityBasisItem[]): readonly BasisGroup[] {
   const groups: BasisGroup[] = [];
   for (const item of items) {
     const last = groups[groups.length - 1];
@@ -100,7 +98,9 @@ function CitationList({
   const { resolved, hadEvidenceIds } = uniqueCitationsForGroup(items, evidenceById);
 
   if (!hadEvidenceIds || resolved.length === 0) {
-    return <p className="ds-sans ds-why-appears__cite-gap">{WHY_THIS_APPEARS_COPY.noLinkedCitations}</p>;
+    return (
+      <p className="ds-sans ds-why-appears__cite-gap">{WHY_THIS_APPEARS_COPY.noLinkedCitations}</p>
+    );
   }
 
   return (

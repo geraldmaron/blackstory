@@ -5,10 +5,7 @@
  */
 import React from 'react';
 import Link from 'next/link';
-import {
-  currentFactRevision,
-  type FactRecord,
-} from '@repo/domain/facts';
+import { currentFactRevision, type FactRecord } from '@repo/domain/facts';
 import { formatIsoDate, humanizeToken } from '../facts/format';
 
 export type RevisionUpdateChromeProps = {
@@ -37,10 +34,7 @@ export function RevisionUpdateChrome({ fact, errataHref = '/errata' }: RevisionU
       {isCorrection ? (
         <>
           {' '}
-          ·{' '}
-          <Link href={errataHref}>
-            public errata
-          </Link>
+          · <Link href={errataHref}>public errata</Link>
         </>
       ) : null}
       {revision ? (

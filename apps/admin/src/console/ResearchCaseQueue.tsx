@@ -161,7 +161,11 @@ export function ResearchCaseQueue({ rows, dataSource, surfaceId }: ResearchCaseQ
             >
               Needs evidence
             </button>
-            <button type="button" className="rcq__button rcq__button--ghost" onClick={clearSelection}>
+            <button
+              type="button"
+              className="rcq__button rcq__button--ghost"
+              onClick={clearSelection}
+            >
               Clear
             </button>
           </div>
@@ -176,9 +180,7 @@ export function ResearchCaseQueue({ rows, dataSource, surfaceId }: ResearchCaseQ
       ) : (
         <div className="rcq__table-wrap">
           <table className="rcq__table">
-            <caption className="ds-visually-hidden">
-              Research case queue: {countLabel}
-            </caption>
+            <caption className="ds-visually-hidden">Research case queue: {countLabel}</caption>
             <thead>
               <tr>
                 <th scope="col">
@@ -239,10 +241,7 @@ export function ResearchCaseQueue({ rows, dataSource, surfaceId }: ResearchCaseQ
 
       <p className="rcq__foot">{countLabel}</p>
 
-      <div
-        className={`rcq-sheet-portal${activeRow ? ' is-open' : ''}`}
-        aria-hidden={!activeRow}
-      >
+      <div className={`rcq-sheet-portal${activeRow ? ' is-open' : ''}`} aria-hidden={!activeRow}>
         {activeRow ? (
           <>
             <button

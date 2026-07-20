@@ -1,4 +1,3 @@
-
 /**
  * Search and query resource guardrails.
  *
@@ -16,12 +15,7 @@ export const SEARCH_ENDPOINT_CLASS = 'search' as const satisfies EndpointClass;
 
 /** Allowlisted sort keys no user-defined sort expressions. */
 export type SearchSortKey =
-  | 'relevance'
-  | 'name_asc'
-  | 'name_desc'
-  | 'date_asc'
-  | 'date_desc'
-  | 'distance';
+  'relevance' | 'name_asc' | 'name_desc' | 'date_asc' | 'date_desc' | 'distance';
 
 export const searchSortKeys = [
   'relevance',
@@ -31,7 +25,6 @@ export const searchSortKeys = [
   'date_desc',
   'distance',
 ] as const satisfies readonly SearchSortKey[];
-
 
 /**
  * Allowlisted filter fields no arbitrary column selection. `status` and `era` were added for
@@ -51,12 +44,7 @@ export const searchFilterFields = [
 
 /** Approved query shapes executed by api-public (no ad-hoc SQL). */
 export type ApprovedQueryShape =
-  | 'text'
-  | 'text_filters'
-  | 'text_geo'
-  | 'text_geo_filters'
-  | 'filters_only'
-  | 'geo_only';
+  'text' | 'text_filters' | 'text_geo' | 'text_geo_filters' | 'filters_only' | 'geo_only';
 
 export type SearchFilter = {
   readonly field: SearchFilterField;
@@ -150,9 +138,7 @@ export type QueryGuardrailDecisionDenied = {
   readonly policyVersion: typeof QUERY_GUARDRAIL_POLICY_VERSION;
 };
 
-export type QueryGuardrailDecision =
-  | QueryGuardrailDecisionAllowed
-  | QueryGuardrailDecisionDenied;
+export type QueryGuardrailDecision = QueryGuardrailDecisionAllowed | QueryGuardrailDecisionDenied;
 
 export type QueryGuardrailLimits = {
   readonly minQueryLength: number;
@@ -223,14 +209,7 @@ export type EvaluateSearchQueryOptions = {
 
 const WILDCARD_ONLY_PATTERN = /^[\s*?%_]+$/;
 const REGEX_LIKE_PATTERN = /^\/.*\/[gimsuy]*$/;
-const PROHIBITED_INPUT_KEYS = [
-  'fields',
-  'select',
-  'orderBy',
-  'sql',
-  'regex',
-  'pattern',
-] as const;
+const PROHIBITED_INPUT_KEYS = ['fields', 'select', 'orderBy', 'sql', 'regex', 'pattern'] as const;
 
 const FILTER_FIELD_SET = new Set<string>(searchFilterFields);
 const SORT_KEY_SET = new Set<string>(searchSortKeys);
@@ -243,14 +222,16 @@ function mergeLimits(partial?: Partial<QueryGuardrailLimits>): QueryGuardrailLim
 
 /** NFKC normalize, trim, collapse internal whitespace. */
 export function normalizeSearchText(raw: string): string {
-  return raw
-    .normalize('NFKC')
-    // Deliberate control-character strip (C0/C1, zero-width, line/paragraph
-    // separators, BOM) — this is input sanitization, not an accidental regex.
-    // eslint-disable-next-line no-control-regex
-    .replace(/[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u2028-\u2029\ufeff]/g, '')
-    .trim()
-    .replace(/\s+/g, ' ');
+  return (
+    raw
+      .normalize('NFKC')
+      // Deliberate control-character strip (C0/C1, zero-width, line/paragraph
+      // separators, BOM) — this is input sanitization, not an accidental regex.
+      // eslint-disable-next-line no-control-regex
+      .replace(/[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u2028-\u2029\ufeff]/g, '')
+      .trim()
+      .replace(/\s+/g, ' ')
+  );
 }
 
 /** Lowercase normalized text for stable cache keys. */
@@ -283,9 +264,7 @@ function stableSerialize(value: unknown): string {
   return JSON.stringify(String(value));
 }
 
-function isGuardrailDenial(
-  value: unknown,
-): value is QueryGuardrailDecisionDenied {
+function isGuardrailDenial(value: unknown): value is QueryGuardrailDecisionDenied {
   return (
     typeof value === 'object' &&
     value !== null &&
@@ -294,10 +273,7 @@ function isGuardrailDenial(
   );
 }
 
-function deny(
-  reason: QueryGuardrailDenialReason,
-  message: string,
-): QueryGuardrailDecisionDenied {
+function deny(reason: QueryGuardrailDenialReason, message: string): QueryGuardrailDecisionDenied {
   return {
     allowed: false,
     reason,
@@ -331,7 +307,9 @@ function allow(
 }
 
 /** Rejects user-provided SQL, sort expressions, field selection, and regex inputs. */
-export function assertNoProhibitedQueryFields(input: SearchQueryInput): QueryGuardrailDecisionDenied | null {
+export function assertNoProhibitedQueryFields(
+  input: SearchQueryInput,
+): QueryGuardrailDecisionDenied | null {
   for (const key of PROHIBITED_INPUT_KEYS) {
     const value = input[key as keyof SearchQueryInput];
     if (value !== undefined && value !== null && value !== '') {
@@ -374,7 +352,10 @@ function parseIsoDate(value: string): number | null {
   return Number.isFinite(ms) ? ms : null;
 }
 
-function resolveSort(raw: string | undefined, hasGeo: boolean): SearchSortKey | QueryGuardrailDecisionDenied {
+function resolveSort(
+  raw: string | undefined,
+  hasGeo: boolean,
+): SearchSortKey | QueryGuardrailDecisionDenied {
   if (!raw || raw === 'relevance') {
     return hasGeo ? 'distance' : 'relevance';
   }
@@ -478,7 +459,10 @@ function resolveDateRange(
 
   const spanDays = (toMs - fromMs) / MS_PER_DAY;
   if (spanDays > limits.maxDateRangeDays) {
-    return deny('date_range_exceeded', `Date range must not exceed ${limits.maxDateRangeDays} days.`);
+    return deny(
+      'date_range_exceeded',
+      `Date range must not exceed ${limits.maxDateRangeDays} days.`,
+    );
   }
 
   return { from: dateFrom, to: dateTo };
@@ -518,7 +502,10 @@ function resolveShape(
   return 'text';
 }
 
-function resolvePageSize(raw: number | undefined, limits: QueryGuardrailLimits): number | QueryGuardrailDecisionDenied {
+function resolvePageSize(
+  raw: number | undefined,
+  limits: QueryGuardrailLimits,
+): number | QueryGuardrailDecisionDenied {
   const pageSize = raw ?? limits.defaultPageSize;
   if (!Number.isInteger(pageSize) || pageSize < 1) {
     return deny('page_size_exceeded', 'pageSize must be a positive integer.');
@@ -643,7 +630,10 @@ export function decodeSearchCursor(
     return deny('cursor_invalid', 'Cursor depth must be a positive integer.');
   }
   if (record.depth > limits.maxPaginationDepth) {
-    return deny('pagination_depth_exceeded', `Pagination depth must not exceed ${limits.maxPaginationDepth}.`);
+    return deny(
+      'pagination_depth_exceeded',
+      `Pagination depth must not exceed ${limits.maxPaginationDepth}.`,
+    );
   }
   if (typeof record.queryHash !== 'string' || record.queryHash.length !== 64) {
     return deny('cursor_invalid', 'Cursor query hash is invalid.');
@@ -677,10 +667,7 @@ export function getQueryTimeoutPolicy(
 }
 
 /** Fail-closed timeout decision callers must abort work and release pool slots. */
-export function createTimeoutFailure(
-  queryHash: string,
-  durationMs: number,
-): SlowQueryLogEvent {
+export function createTimeoutFailure(queryHash: string, durationMs: number): SlowQueryLogEvent {
   return {
     event: 'slow_query',
     endpointClass: SEARCH_ENDPOINT_CLASS,
@@ -734,7 +721,6 @@ export function searchQueryEndpointMetadata(decision: QueryGuardrailDecisionAllo
   };
 }
 
-
 /**
  * Validates and canonicalizes a public search query.
  * SQL statement timeouts for Cloud SQL remain deferred (ADR-011); Firestore budgets apply now.
@@ -772,7 +758,11 @@ export function evaluateSearchQueryGuardrails(
     input.lng !== undefined ||
     input.radiusM !== undefined;
 
-  if (normalizedQ.length > 0 && normalizedQ.length < limits.minQueryLength && !hasOtherConstraints) {
+  if (
+    normalizedQ.length > 0 &&
+    normalizedQ.length < limits.minQueryLength &&
+    !hasOtherConstraints
+  ) {
     return deny('query_too_short', `Query must be at least ${limits.minQueryLength} characters.`);
   }
   if (normalizedQ.length > limits.maxQueryLength) {

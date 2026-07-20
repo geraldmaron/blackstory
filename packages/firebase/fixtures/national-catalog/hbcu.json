@@ -4,16 +4,8 @@
     "kind": "school",
     "displayName": "Cheyney University of Pennsylvania",
     "summary": "Established February 25, 1837, through Quaker philanthropist Richard Humphreys' bequest of $10,000 to educate people of African descent and prepare them as teachers. Begun in Philadelphia as the Institute for Colored Youth, it is the nation's oldest historically Black institution of higher learning.",
-    "eraBuckets": [
-      "1830s",
-      "1900s",
-      "1910s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "teaching"
-    ],
+    "eraBuckets": ["1830s", "1900s", "1910s"],
+    "topicTags": ["education", "hbcu", "teaching"],
     "jurisdictionLabel": "Cheyney, Pennsylvania",
     "locationPrecision": "campus",
     "locationLabel": "Cheyney University campus, Delaware and Chester Counties",
@@ -38,11 +30,7 @@
       }
     ],
     "historicalContext": "Cheyney's founding predates emancipation by nearly three decades, opening the era of institution-building that all later HBCUs would extend. Its early decades in Philadelphia produced generations of Black teachers for schools across the country.",
-    "topicIds": [
-      "education",
-      "hbcu",
-      "teaching"
-    ],
+    "topicIds": ["education", "hbcu", "teaching"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -51,16 +39,8 @@
     "kind": "school",
     "displayName": "Lincoln University",
     "summary": "Chartered April 29, 1854, as Ashmun Institute by John Miller Dickey and Sarah Emlen Cresson, becoming the nation's first degree-granting HBCU. Renamed for Abraham Lincoln in 1866, it educated Thurgood Marshall, Langston Hughes, and future heads of state across Africa.",
-    "eraBuckets": [
-      "1850s",
-      "1860s",
-      "1920s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "liberal-arts"
-    ],
+    "eraBuckets": ["1850s", "1860s", "1920s"],
+    "topicTags": ["education", "hbcu", "liberal-arts"],
     "jurisdictionLabel": "Lincoln University, Pennsylvania",
     "locationPrecision": "campus",
     "locationLabel": "Lincoln University campus, Chester County",
@@ -85,15 +65,8 @@
       }
     ],
     "historicalContext": "Founded before the Civil War, Lincoln belongs to the small group of antebellum institutions that proved higher education for Black men could be built and sustained. Its alumni network shaped law, letters, and independence movements on two continents.",
-    "topicIds": [
-      "education",
-      "hbcu",
-      "liberal-arts"
-    ],
-    "mentionedEntityIds": [
-      "ent_langston_hughes_001",
-      "ent_thurgood_marshall_001"
-    ],
+    "topicIds": ["education", "hbcu", "liberal-arts"],
+    "mentionedEntityIds": ["ent_langston_hughes_001", "ent_thurgood_marshall_001"],
     "keywords": []
   },
   {
@@ -101,15 +74,8 @@
     "kind": "school",
     "displayName": "Wilberforce University",
     "summary": "Founded in 1856 at Tawawa Springs near Xenia, Ohio, by the Methodist Episcopal Church and purchased in 1863 by the A.M.E. Church under Bishop Daniel A. Payne, making it the nation's first college owned and operated by African Americans. Payne became the first Black president of an American university.",
-    "eraBuckets": [
-      "1850s",
-      "1860s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "religion"
-    ],
+    "eraBuckets": ["1850s", "1860s"],
+    "topicTags": ["education", "hbcu", "religion"],
     "jurisdictionLabel": "Wilberforce, Ohio",
     "locationPrecision": "campus",
     "locationLabel": "Wilberforce University campus, Greene County",
@@ -134,15 +100,8 @@
       }
     ],
     "historicalContext": "Named for abolitionist William Wilberforce, the university demonstrated Black institutional self-governance a decade before Reconstruction. Its A.M.E. stewardship set a model of church-sustained higher education that other denominations followed.",
-    "topicIds": [
-      "education",
-      "hbcu",
-      "religion"
-    ],
-    "mentionedEntityIds": [
-      "ent_bethel_ame_indianapolis_001",
-      "ent_mother_emanuel_ame_001"
-    ],
+    "topicIds": ["education", "hbcu", "religion"],
+    "mentionedEntityIds": ["ent_bethel_ame_indianapolis_001", "ent_mother_emanuel_ame_001"],
     "keywords": []
   },
   {
@@ -150,17 +109,8 @@
     "kind": "school",
     "displayName": "Howard University",
     "summary": "Chartered by Congress on March 2, 1867, and named for Freedmen's Bureau commissioner Gen. Oliver O. Howard. From a single frame building it grew into a comprehensive research university whose law school trained the litigators, Charles Hamilton Houston and Thurgood Marshall among them, who dismantled legal segregation.",
-    "eraBuckets": [
-      "1860s",
-      "1930s",
-      "1950s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "law",
-      "civil-rights"
-    ],
+    "eraBuckets": ["1860s", "1930s", "1950s"],
+    "topicTags": ["education", "hbcu", "law", "civil-rights"],
     "jurisdictionLabel": "Washington, D.C.",
     "locationPrecision": "campus",
     "locationLabel": "Main campus, Georgia Avenue NW, Shaw and Pleasant Plains",
@@ -192,12 +142,7 @@
         "direction": "incoming"
       }
     ],
-    "topicIds": [
-      "education",
-      "hbcu",
-      "law",
-      "civil-rights"
-    ],
+    "topicIds": ["education", "hbcu", "law", "civil-rights"],
     "mentionedEntityIds": [
       "ent_case_brown_v_board_of_education_1954",
       "ent_law_freedmens_bureau_act_1865"
@@ -209,16 +154,8 @@
     "kind": "school",
     "displayName": "Fisk University",
     "summary": "Convened its first classes January 9, 1866, in former Union Army barracks in Nashville under the American Missionary Association. In 1871 its Jubilee Singers toured to save the school, carrying spirituals to concert stages worldwide and funding Jubilee Hall; in 1930 Fisk became the first Black college accredited by SACS.",
-    "eraBuckets": [
-      "1860s",
-      "1870s",
-      "1930s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "music"
-    ],
+    "eraBuckets": ["1860s", "1870s", "1930s"],
+    "topicTags": ["education", "hbcu", "music"],
     "jurisdictionLabel": "Nashville, Tennessee",
     "locationPrecision": "campus",
     "locationLabel": "Fisk University campus, North Nashville",
@@ -243,11 +180,7 @@
       }
     ],
     "historicalContext": "Fisk exemplified the liberal-arts wing of the freedmen's colleges, insisting from the start on a classical curriculum. Its campus later became a hub of the Harlem Renaissance generation, with W. E. B. Du Bois among its earliest graduates.",
-    "topicIds": [
-      "education",
-      "hbcu",
-      "music"
-    ],
+    "topicIds": ["education", "hbcu", "music"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -256,17 +189,8 @@
     "kind": "school",
     "displayName": "Morehouse College",
     "summary": "Founded February 14, 1867, as the Augusta Institute in the basement of Springfield Baptist Church in Augusta, Georgia, to educate Black men for ministry and teaching. Relocated to Atlanta in 1879 and renamed Morehouse in 1913, it remains the nation's only historically Black liberal arts college for men.",
-    "eraBuckets": [
-      "1860s",
-      "1910s",
-      "1940s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "religion",
-      "leadership"
-    ],
+    "eraBuckets": ["1860s", "1910s", "1940s"],
+    "topicTags": ["education", "hbcu", "religion", "leadership"],
     "jurisdictionLabel": "Atlanta, Georgia",
     "locationPrecision": "campus",
     "locationLabel": "Morehouse campus, Atlanta University Center, West End",
@@ -291,15 +215,8 @@
       }
     ],
     "historicalContext": "Morehouse grew within the Atlanta University Center, the densest concentration of Black higher education in the country. Its tradition of producing ministers, scholars, and public leaders reached worldwide visibility through alumnus Martin Luther King Jr., class of 1948.",
-    "topicIds": [
-      "education",
-      "hbcu",
-      "religion",
-      "leadership"
-    ],
-    "mentionedEntityIds": [
-      "ent_martin_luther_king_jr_001"
-    ],
+    "topicIds": ["education", "hbcu", "religion", "leadership"],
+    "mentionedEntityIds": ["ent_martin_luther_king_jr_001"],
     "keywords": []
   },
   {
@@ -307,16 +224,8 @@
     "kind": "school",
     "displayName": "Morgan State University",
     "summary": "Founded in 1867 as the Centenary Biblical Institute by the Baltimore Conference of the Methodist Episcopal Church to train ministers. Renamed Morgan College in 1890 for trustee Rev. Lyttleton Morgan, it remained private until Maryland purchased it in 1939 to widen public higher education for Black citizens.",
-    "eraBuckets": [
-      "1860s",
-      "1890s",
-      "1930s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "religion"
-    ],
+    "eraBuckets": ["1860s", "1890s", "1930s"],
+    "topicTags": ["education", "hbcu", "religion"],
     "jurisdictionLabel": "Baltimore, Maryland",
     "locationPrecision": "campus",
     "locationLabel": "Morgan State campus, Northeast Baltimore",
@@ -341,14 +250,8 @@
       }
     ],
     "historicalContext": "Morgan traces the common arc of many HBCUs, from denominational seminary to teacher training to state university. Its 1939 purchase by Maryland reflected growing pressure on states to fund Black public higher education in the decades before Brown.",
-    "topicIds": [
-      "education",
-      "hbcu",
-      "religion"
-    ],
-    "mentionedEntityIds": [
-      "ent_reginald_lewis_museum_001"
-    ],
+    "topicIds": ["education", "hbcu", "religion"],
+    "mentionedEntityIds": ["ent_reginald_lewis_museum_001"],
     "keywords": []
   },
   {
@@ -356,15 +259,8 @@
     "kind": "school",
     "displayName": "Hampton University",
     "summary": "Founded April 1, 1868, on the Virginia Peninsula by Brig. Gen. Samuel Chapman Armstrong with American Missionary Association backing. Its normal-and-agricultural model of learning by doing trained thousands of teachers for freedpeople's schools, among them Booker T. Washington, class of 1875.",
-    "eraBuckets": [
-      "1860s",
-      "1870s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "teaching"
-    ],
+    "eraBuckets": ["1860s", "1870s"],
+    "topicTags": ["education", "hbcu", "teaching"],
     "jurisdictionLabel": "Hampton, Virginia",
     "locationPrecision": "campus",
     "locationLabel": "Hampton University campus, waterfront on Hampton Roads",
@@ -396,11 +292,7 @@
         "direction": "incoming"
       }
     ],
-    "topicIds": [
-      "education",
-      "hbcu",
-      "teaching"
-    ],
+    "topicIds": ["education", "hbcu", "teaching"],
     "mentionedEntityIds": [
       "ent_emancipation_oak_001",
       "ent_law_emancipation_proclamation_1863",
@@ -413,15 +305,8 @@
     "kind": "school",
     "displayName": "Clark Atlanta University",
     "summary": "Formed July 1, 1988, by consolidating Atlanta University, founded 1865 as the nation's first institution to award graduate degrees to African Americans, with Clark College, founded 1869 as the first four-year liberal arts college serving a primarily Black student body. W. E. B. Du Bois taught on the Atlanta University faculty.",
-    "eraBuckets": [
-      "1860s",
-      "1980s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "research"
-    ],
+    "eraBuckets": ["1860s", "1980s"],
+    "topicTags": ["education", "hbcu", "research"],
     "jurisdictionLabel": "Atlanta, Georgia",
     "locationPrecision": "campus",
     "locationLabel": "Clark Atlanta campus, Atlanta University Center",
@@ -446,11 +331,7 @@
       }
     ],
     "historicalContext": "The 1988 consolidation joined two Reconstruction-era institutions that had shared the Atlanta University Center for a century. Atlanta University's sociology school, led for years by Du Bois, produced some of the earliest systematic scholarship on Black life in America.",
-    "topicIds": [
-      "education",
-      "hbcu",
-      "research"
-    ],
+    "topicIds": ["education", "hbcu", "research"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -459,15 +340,8 @@
     "kind": "school",
     "displayName": "Meharry Medical College",
     "summary": "Founded in 1876 as the Medical Department of Central Tennessee College with a $30,000 gift from Samuel Meharry and his brothers, repaying a debt of kindness to a formerly enslaved family. It was the first medical school for African Americans in the South and received its independent charter in 1915.",
-    "eraBuckets": [
-      "1870s",
-      "1910s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "medicine"
-    ],
+    "eraBuckets": ["1870s", "1910s"],
+    "topicTags": ["education", "hbcu", "medicine"],
     "jurisdictionLabel": "Nashville, Tennessee",
     "locationPrecision": "campus",
     "locationLabel": "Meharry campus, North Nashville, adjacent to Fisk University",
@@ -492,11 +366,7 @@
       }
     ],
     "historicalContext": "For most of the twentieth century Meharry and Howard together trained the majority of Black physicians and dentists in the United States. Its graduates staffed clinics and hospitals in communities that segregated medicine otherwise left unserved.",
-    "topicIds": [
-      "education",
-      "hbcu",
-      "medicine"
-    ],
+    "topicIds": ["education", "hbcu", "medicine"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -505,15 +375,8 @@
     "kind": "school",
     "displayName": "Prairie View A&M University",
     "summary": "Established August 14, 1876, by the Texas Legislature as the Agricultural and Mechanical College of Texas for Colored Youths, opening at Prairie View in 1878. It was the first state-supported college for African Americans in Texas and is the state's second-oldest public institution of higher education.",
-    "eraBuckets": [
-      "1870s",
-      "1890s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "land-grant"
-    ],
+    "eraBuckets": ["1870s", "1890s"],
+    "topicTags": ["education", "hbcu", "land-grant"],
     "jurisdictionLabel": "Prairie View, Texas",
     "locationPrecision": "campus",
     "locationLabel": "Prairie View A&M campus, Waller County",
@@ -538,11 +401,7 @@
       }
     ],
     "historicalContext": "Prairie View was created during Reconstruction and later folded into the 1890 land-grant system, which required Southern states to fund Black colleges to keep receiving federal agricultural money. It anchored teacher training and agricultural extension for Black Texans for generations.",
-    "topicIds": [
-      "education",
-      "hbcu",
-      "land-grant"
-    ],
+    "topicIds": ["education", "hbcu", "land-grant"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -551,15 +410,8 @@
     "kind": "school",
     "displayName": "Southern University and A&M College",
     "summary": "Chartered by Louisiana's Legislative Act 87 of 1880 through the efforts of Reconstruction-era leaders including P.B.S. Pinchback, T.T. Allain, and Henry Demas, opening in New Orleans with 12 students. Relocated in 1914 to a bluff above the Mississippi at Scotlandville, it anchors the nation's only HBCU system.",
-    "eraBuckets": [
-      "1880s",
-      "1910s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "land-grant"
-    ],
+    "eraBuckets": ["1880s", "1910s"],
+    "topicTags": ["education", "hbcu", "land-grant"],
     "jurisdictionLabel": "Baton Rouge, Louisiana",
     "locationPrecision": "campus",
     "locationLabel": "Southern University campus, Scotlandville, on Scott's Bluff",
@@ -584,14 +436,8 @@
       }
     ],
     "historicalContext": "Southern was willed into being by Black legislators who held office during Reconstruction, then sustained through the era that stripped their power. Its Baton Rouge campus became the flagship of a five-campus system unique among HBCUs.",
-    "topicIds": [
-      "education",
-      "hbcu",
-      "land-grant"
-    ],
-    "mentionedEntityIds": [
-      "ent_pbs_pinchback_001"
-    ],
+    "topicIds": ["education", "hbcu", "land-grant"],
+    "mentionedEntityIds": ["ent_pbs_pinchback_001"],
     "keywords": []
   },
   {
@@ -599,15 +445,8 @@
     "kind": "school",
     "displayName": "Spelman College",
     "summary": "Opened April 11, 1881, in the basement of Atlanta's Friendship Baptist Church by New England educators Sophia B. Packard and Harriet E. Giles as the Atlanta Baptist Female Seminary. Renamed for the Spelman family in 1884, it became the nation's foremost college for women of African descent.",
-    "eraBuckets": [
-      "1880s",
-      "1920s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "womens-education"
-    ],
+    "eraBuckets": ["1880s", "1920s"],
+    "topicTags": ["education", "hbcu", "womens-education"],
     "jurisdictionLabel": "Atlanta, Georgia",
     "locationPrecision": "campus",
     "locationLabel": "Spelman campus, Atlanta University Center, West End",
@@ -632,11 +471,7 @@
       }
     ],
     "historicalContext": "Spelman gave institutional form to the education of Black women at a moment when almost no college would admit them. Its early support from the Rockefeller family, honoring the abolitionist Spelmans, tied Northern philanthropy to Black women's higher education for decades.",
-    "topicIds": [
-      "education",
-      "hbcu",
-      "womens-education"
-    ],
+    "topicIds": ["education", "hbcu", "womens-education"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -645,17 +480,8 @@
     "kind": "school",
     "displayName": "Tuskegee University",
     "summary": "Opened July 4, 1881, in a one-room shanty near Butler Chapel A.M.E. Zion Church with Booker T. Washington as founding principal. Students made the bricks and raised the buildings themselves; by Washington's death in 1915 the campus counted about 100 buildings, 1,500 students, and a $2 million endowment.",
-    "eraBuckets": [
-      "1880s",
-      "1890s",
-      "1940s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "agriculture",
-      "science"
-    ],
+    "eraBuckets": ["1880s", "1890s", "1940s"],
+    "topicTags": ["education", "hbcu", "agriculture", "science"],
     "jurisdictionLabel": "Tuskegee, Alabama",
     "locationPrecision": "campus",
     "locationLabel": "Tuskegee University campus, Macon County",
@@ -687,15 +513,8 @@
         "direction": "incoming"
       }
     ],
-    "topicIds": [
-      "education",
-      "hbcu",
-      "agriculture",
-      "science"
-    ],
-    "mentionedEntityIds": [
-      "ent_george_washington_carver_001"
-    ],
+    "topicIds": ["education", "hbcu", "agriculture", "science"],
+    "mentionedEntityIds": ["ent_george_washington_carver_001"],
     "keywords": []
   },
   {
@@ -703,16 +522,8 @@
     "kind": "school",
     "displayName": "Florida A&M University",
     "summary": "Opened October 3, 1887, as the State Normal College for Colored Students in Tallahassee with 15 students and two instructors under founding president Thomas DeSaille Tucker. Designated Florida's land-grant institution for Black students in 1891 under the Second Morrill Act.",
-    "eraBuckets": [
-      "1880s",
-      "1890s",
-      "1950s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "land-grant"
-    ],
+    "eraBuckets": ["1880s", "1890s", "1950s"],
+    "topicTags": ["education", "hbcu", "land-grant"],
     "jurisdictionLabel": "Tallahassee, Florida",
     "locationPrecision": "campus",
     "locationLabel": "FAMU campus, on the highest hill in Tallahassee",
@@ -737,11 +548,7 @@
       }
     ],
     "historicalContext": "FAMU grew from a normal school into one of the largest HBCUs in the country, adding law, pharmacy, and graduate schools in the 1950s. Its students helped lead the 1956 Tallahassee bus boycott, an early campaign of the Southern civil rights movement.",
-    "topicIds": [
-      "education",
-      "hbcu",
-      "land-grant"
-    ],
+    "topicIds": ["education", "hbcu", "land-grant"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -750,16 +557,8 @@
     "kind": "school",
     "displayName": "North Carolina A&T State University",
     "summary": "Founded March 9, 1891, as the Agricultural and Mechanical College for the Colored Race under the Second Morrill Act, moving from Raleigh to donated land in Greensboro in 1893. On February 1, 1960, four freshmen remembered as the A&T Four began the Greensboro sit-ins at a downtown Woolworth lunch counter.",
-    "eraBuckets": [
-      "1890s",
-      "1960s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "land-grant",
-      "civil-rights"
-    ],
+    "eraBuckets": ["1890s", "1960s"],
+    "topicTags": ["education", "hbcu", "land-grant", "civil-rights"],
     "jurisdictionLabel": "Greensboro, North Carolina",
     "locationPrecision": "campus",
     "locationLabel": "N.C. A&T campus, East Market Street, Greensboro",
@@ -791,15 +590,8 @@
         "direction": "incoming"
       }
     ],
-    "topicIds": [
-      "education",
-      "hbcu",
-      "land-grant",
-      "civil-rights"
-    ],
-    "mentionedEntityIds": [
-      "ent_greensboro_woolworth_sit_in_site_001"
-    ],
+    "topicIds": ["education", "hbcu", "land-grant", "civil-rights"],
+    "mentionedEntityIds": ["ent_greensboro_woolworth_sit_in_site_001"],
     "keywords": []
   },
   {
@@ -807,16 +599,8 @@
     "kind": "school",
     "displayName": "Xavier University of Louisiana",
     "summary": "Founded in New Orleans by St. Katharine Drexel and the Sisters of the Blessed Sacrament, opening as a high school in 1915 and establishing its College of Liberal Arts and Sciences in 1925. It is the nation's only historically Black and Catholic university and a leading source of Black graduates who earn medical degrees.",
-    "eraBuckets": [
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "religion",
-      "medicine"
-    ],
+    "eraBuckets": ["1910s", "1920s"],
+    "topicTags": ["education", "hbcu", "religion", "medicine"],
     "jurisdictionLabel": "New Orleans, Louisiana",
     "locationPrecision": "campus",
     "locationLabel": "Xavier campus, Gert Town, along Washington Avenue and Pine Street",
@@ -841,12 +625,7 @@
       }
     ],
     "historicalContext": "Xavier joined the later wave of HBCU founding, built by Catholic religious philanthropy rather than Protestant missionary societies or state legislatures. Its pharmacy college, opened in 1927, and premedical programs became national pipelines into the health professions.",
-    "topicIds": [
-      "education",
-      "hbcu",
-      "religion",
-      "medicine"
-    ],
+    "topicIds": ["education", "hbcu", "religion", "medicine"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -855,16 +634,8 @@
     "kind": "school",
     "displayName": "Dillard University",
     "summary": "Chartered June 6, 1930, by merging two Reconstruction-era institutions, Straight University, founded 1869, and New Orleans University, founded 1873, and named for education reformer James Hardy Dillard. Its oak-lined Gentilly campus of white buildings opened to students in 1935.",
-    "eraBuckets": [
-      "1860s",
-      "1870s",
-      "1930s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "liberal-arts"
-    ],
+    "eraBuckets": ["1860s", "1870s", "1930s"],
+    "topicTags": ["education", "hbcu", "liberal-arts"],
     "jurisdictionLabel": "New Orleans, Louisiana",
     "locationPrecision": "campus",
     "locationLabel": "Dillard campus, Gentilly Boulevard",
@@ -889,11 +660,7 @@
       }
     ],
     "historicalContext": "Dillard consolidated the Congregationalist and Methodist strands of New Orleans's freedmen's colleges into a single modern university. The merger, backed by the Rosenwald Fund and local philanthropy, typified the interwar reorganization of Black higher education.",
-    "topicIds": [
-      "education",
-      "hbcu",
-      "liberal-arts"
-    ],
+    "topicIds": ["education", "hbcu", "liberal-arts"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -902,17 +669,8 @@
     "kind": "school",
     "displayName": "Shaw University",
     "summary": "Founded in 1865 as the Raleigh Institute by the American Baptist Home Mission Society, Shaw became the first historically Black college in the American South. Its Estey Hall (1873) was among the first college dormitories for African American women, and its Leonard Medical School (1881) and law school (1888) were early professional programs for Black students.",
-    "eraBuckets": [
-      "1860s",
-      "1870s",
-      "1960s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "medicine",
-      "civil-rights"
-    ],
+    "eraBuckets": ["1860s", "1870s", "1960s"],
+    "topicTags": ["education", "hbcu", "medicine", "civil-rights"],
     "jurisdictionLabel": "Raleigh, North Carolina",
     "locationPrecision": "campus",
     "locationLabel": "Shaw University campus, downtown Raleigh",
@@ -938,15 +696,8 @@
     ],
     "historicalContext": "Shaw's downtown Raleigh campus became a seedbed of civil rights organizing; the 1960 conference on campus that produced the Student Nonviolent Coordinating Committee linked student activism to the wider movement. Its medical and legal schools, closed in the twentieth century, had trained generations of Black professionals when Southern white institutions barred their admission.",
     "related": [],
-    "topicIds": [
-      "education",
-      "hbcu",
-      "medicine",
-      "civil-rights"
-    ],
-    "mentionedEntityIds": [
-      "ent_sncc_founding_001"
-    ],
+    "topicIds": ["education", "hbcu", "medicine", "civil-rights"],
+    "mentionedEntityIds": ["ent_sncc_founding_001"],
     "keywords": []
   },
   {
@@ -954,16 +705,8 @@
     "kind": "school",
     "displayName": "Bennett College",
     "summary": "Established in 1873 in the basement of Warnersville Methodist Episcopal Church in Greensboro, North Carolina, Bennett began as a coeducational school for freedpeople. In 1926 it became a college for women, one of only two historically Black women's colleges in the United States.",
-    "eraBuckets": [
-      "1870s",
-      "1920s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "womens-education",
-      "religion"
-    ],
+    "eraBuckets": ["1870s", "1920s"],
+    "topicTags": ["education", "hbcu", "womens-education", "religion"],
     "jurisdictionLabel": "Greensboro, North Carolina",
     "locationPrecision": "campus",
     "locationLabel": "Bennett College campus, east Greensboro",
@@ -989,12 +732,7 @@
     ],
     "historicalContext": "Bennett's survival through Reconstruction-era poverty, Jim Crow, and twentieth-century accreditation battles made it a pillar of Black women's higher education in the Piedmont. Its graduates, known as Bennett Belles, carried teacher training and leadership into schools and civic life across the South.",
     "related": [],
-    "topicIds": [
-      "education",
-      "hbcu",
-      "womens-education",
-      "religion"
-    ],
+    "topicIds": ["education", "hbcu", "womens-education", "religion"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1003,17 +741,8 @@
     "kind": "school",
     "displayName": "Claflin University",
     "summary": "Chartered in 1869 and named for Massachusetts governor William Claflin and his father, Claflin was South Carolina's first college open to all students regardless of race, sex, or religion. Its 1882 graduates Nathaniel Middleton and William Bulkley were among the earliest African Americans to complete a four-year collegiate course in the state.",
-    "eraBuckets": [
-      "1860s",
-      "1880s",
-      "1870s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "liberal-arts",
-      "religion"
-    ],
+    "eraBuckets": ["1860s", "1880s", "1870s"],
+    "topicTags": ["education", "hbcu", "liberal-arts", "religion"],
     "jurisdictionLabel": "Orangeburg, South Carolina",
     "locationPrecision": "campus",
     "locationLabel": "Claflin University campus, Orangeburg",
@@ -1039,12 +768,7 @@
     ],
     "historicalContext": "Claflin's Methodist roots and Reconstruction-era charter placed it at the center of Orangeburg's Black institutional life. The 1872 Morrill land-grant department on its campus later separated to become South Carolina State University, splitting teacher and agricultural training between two HBCU neighbors.",
     "related": [],
-    "topicIds": [
-      "education",
-      "hbcu",
-      "liberal-arts",
-      "religion"
-    ],
+    "topicIds": ["education", "hbcu", "liberal-arts", "religion"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1053,16 +777,8 @@
     "kind": "school",
     "displayName": "Benedict College",
     "summary": "Philanthropist Bathsheba A. Benedict of Rhode Island helped found Benedict Institute on an eighty-acre Columbia, South Carolina plantation in 1870 through the American Baptist Home Mission Society. The South Carolina legislature chartered it as Benedict College in 1894, expanding from teacher and preacher training into a liberal arts institution.",
-    "eraBuckets": [
-      "1870s",
-      "1890s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "religion",
-      "teaching"
-    ],
+    "eraBuckets": ["1870s", "1890s"],
+    "topicTags": ["education", "hbcu", "religion", "teaching"],
     "jurisdictionLabel": "Columbia, South Carolina",
     "locationPrecision": "campus",
     "locationLabel": "Benedict College campus, Columbia",
@@ -1088,12 +804,7 @@
     ],
     "historicalContext": "Benedict opened in a former slaveholder's mansion with tuition-free instruction for freedpeople when public schooling for Black South Carolinians barely existed. Its partnership with the Baptist Education and Missionary Convention of South Carolina sustained the college through decades when state support for Black higher education was minimal.",
     "related": [],
-    "topicIds": [
-      "education",
-      "hbcu",
-      "religion",
-      "teaching"
-    ],
+    "topicIds": ["education", "hbcu", "religion", "teaching"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1102,15 +813,8 @@
     "kind": "school",
     "displayName": "Lane College",
     "summary": "The Christian Methodist Episcopal Church opened the CME High School in Jackson, Tennessee, on November 12, 1882, under principal Jennie E. Lane and founder Bishop Isaac Lane. A college department organized in 1896 led the Board of Trustees to rename the institution Lane College.",
-    "eraBuckets": [
-      "1880s",
-      "1890s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "religion"
-    ],
+    "eraBuckets": ["1880s", "1890s"],
+    "topicTags": ["education", "hbcu", "religion"],
     "jurisdictionLabel": "Jackson, Tennessee",
     "locationPrecision": "campus",
     "locationLabel": "Lane College campus, east Jackson",
@@ -1136,11 +840,7 @@
     ],
     "historicalContext": "Lane was the first four-year institution established by the CME Church, extending denominational education beyond the seminary model. Its Jackson campus served West Tennessee's Black communities when segregated public colleges barred most African American applicants.",
     "related": [],
-    "topicIds": [
-      "education",
-      "hbcu",
-      "religion"
-    ],
+    "topicIds": ["education", "hbcu", "religion"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1149,16 +849,8 @@
     "kind": "school",
     "displayName": "LeMoyne-Owen College",
     "summary": "Tracing to Lincoln Chapel at Camp Shiloh in 1862, the American Missionary Association school became LeMoyne Normal and Commercial School in 1871 after abolitionist Francis J. LeMoyne's gift. It merged with Owen Junior College in 1968, forming Memphis's only historically Black college.",
-    "eraBuckets": [
-      "1860s",
-      "1870s",
-      "1960s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "religion"
-    ],
+    "eraBuckets": ["1860s", "1870s", "1960s"],
+    "topicTags": ["education", "hbcu", "religion"],
     "jurisdictionLabel": "Memphis, Tennessee",
     "locationPrecision": "campus",
     "locationLabel": "LeMoyne-Owen College campus, Soulsville, Walker Avenue",
@@ -1184,11 +876,7 @@
     ],
     "historicalContext": "Rebuilt after the 1866 Memphis race massacre destroyed its first building, LeMoyne educated teachers and professionals through yellow fever epidemics and segregation. Its Walker Avenue campus sits in Soulsville, near Stax Records, linking the college to Memphis's Black cultural and musical history.",
     "related": [],
-    "topicIds": [
-      "education",
-      "hbcu",
-      "religion"
-    ],
+    "topicIds": ["education", "hbcu", "religion"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1197,16 +885,8 @@
     "kind": "school",
     "displayName": "Wiley University",
     "summary": "The Freedmen's Aid Society of the Methodist Episcopal Church founded Wiley near Marshall, Texas, in 1873 to educate Black youth in the arts and sciences. By 1880 the college occupied its present fifty-five-acre campus and became the first Black college west of the Mississippi River.",
-    "eraBuckets": [
-      "1870s",
-      "1880s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "religion",
-      "debate"
-    ],
+    "eraBuckets": ["1870s", "1880s"],
+    "topicTags": ["education", "hbcu", "religion", "debate"],
     "jurisdictionLabel": "Marshall, Texas",
     "locationPrecision": "campus",
     "locationLabel": "Wiley University campus, Marshall",
@@ -1232,12 +912,7 @@
     ],
     "historicalContext": "Wiley's debate team gained national attention in the 1930s when students challenged Jim Crow restrictions on interracial competition. The Marshall campus anchored higher education for East Texas Black communities when state universities remained closed to them.",
     "related": [],
-    "topicIds": [
-      "education",
-      "hbcu",
-      "religion",
-      "debate"
-    ],
+    "topicIds": ["education", "hbcu", "religion", "debate"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1246,17 +921,8 @@
     "kind": "school",
     "displayName": "Virginia Union University",
     "summary": "The American Baptist Home Mission Society began classes for freedpeople in Richmond in 1865, opening Richmond Theological School for Freedmen near the site of Lumpkin's Jail. Richmond Theological Institute merged with Wayland Seminary in 1899 to form Virginia Union University on its Lombardy Street campus.",
-    "eraBuckets": [
-      "1860s",
-      "1890s",
-      "1930s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "religion",
-      "civil-rights"
-    ],
+    "eraBuckets": ["1860s", "1890s", "1930s"],
+    "topicTags": ["education", "hbcu", "religion", "civil-rights"],
     "jurisdictionLabel": "Richmond, Virginia",
     "locationPrecision": "campus",
     "locationLabel": "Virginia Union campus, Northside Richmond, Lombardy Street",
@@ -1282,15 +948,8 @@
     ],
     "historicalContext": "Virginia Union's early classes met in buildings that had confined enslaved people, transforming a site of bondage into a campus of learning. Hartshorn Memorial College, a women's school merged in 1932, and later Storer College strengthened its mission of training Black clergy, teachers, and civic leaders.",
     "related": [],
-    "topicIds": [
-      "education",
-      "hbcu",
-      "religion",
-      "civil-rights"
-    ],
-    "mentionedEntityIds": [
-      "ent_storer_college_historic_site_001"
-    ],
+    "topicIds": ["education", "hbcu", "religion", "civil-rights"],
+    "mentionedEntityIds": ["ent_storer_college_historic_site_001"],
     "keywords": []
   },
   {
@@ -1298,16 +957,8 @@
     "kind": "school",
     "displayName": "Bowie State University",
     "summary": "School #1 opened January 9, 1865, in Baltimore's African Baptist Church through the Baltimore Association for the Moral and Educational Improvement of the Colored People. Relocated to Bowie, Maryland, in 1911, it is Maryland's oldest historically Black college and among the ten oldest HBCUs in the country.",
-    "eraBuckets": [
-      "1860s",
-      "1910s",
-      "1980s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "teaching"
-    ],
+    "eraBuckets": ["1860s", "1910s", "1980s"],
+    "topicTags": ["education", "hbcu", "teaching"],
     "jurisdictionLabel": "Bowie, Maryland",
     "locationPrecision": "campus",
     "locationLabel": "Bowie State University campus, Prince George's County",
@@ -1333,11 +984,7 @@
     ],
     "historicalContext": "Born when Maryland refused to fund schools for Black citizens, Bowie's normal-school mission supplied teachers to segregated classrooms for decades before expanding into a university system member. Its Baltimore founding site is marked by Bowie State University Way at Calvert and Saratoga streets.",
     "related": [],
-    "topicIds": [
-      "education",
-      "hbcu",
-      "teaching"
-    ],
+    "topicIds": ["education", "hbcu", "teaching"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1346,16 +993,8 @@
     "kind": "school",
     "displayName": "Coppin State University",
     "summary": "Baltimore's Colored High School hosted a one-year teacher training course in 1900 that grew into Fanny Jackson Coppin Normal School by 1926. Named for the Oberlin-educated educator and missionary, Coppin became a four-year teachers college in 1938 and a university in 2004.",
-    "eraBuckets": [
-      "1900s",
-      "1920s",
-      "1930s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "teaching"
-    ],
+    "eraBuckets": ["1900s", "1920s", "1930s"],
+    "topicTags": ["education", "hbcu", "teaching"],
     "jurisdictionLabel": "Baltimore, Maryland",
     "locationPrecision": "campus",
     "locationLabel": "Coppin State campus, West North Avenue, Baltimore",
@@ -1381,14 +1020,8 @@
     ],
     "historicalContext": "Coppin emerged from Baltimore's public school system to train Black elementary teachers when professional credentials were gatekept by race. Its West North Avenue campus anchors education and nursing programs focused on Baltimore's central city and surrounding metropolitan communities.",
     "related": [],
-    "topicIds": [
-      "education",
-      "hbcu",
-      "teaching"
-    ],
-    "mentionedEntityIds": [
-      "ent_oberlin_wellington_rescue_001"
-    ],
+    "topicIds": ["education", "hbcu", "teaching"],
+    "mentionedEntityIds": ["ent_oberlin_wellington_rescue_001"],
     "keywords": []
   },
   {
@@ -1396,17 +1029,8 @@
     "kind": "school",
     "displayName": "Central State University",
     "summary": "Ohio's General Assembly created the Combined Normal and Industrial Department at Wilberforce in 1887, a state-supported teacher and vocational program alongside the private A.M.E. Wilberforce University. Separated in 1947 and renamed Central State College in 1951, it is Ohio's only public historically Black university and an 1890 land-grant institution.",
-    "eraBuckets": [
-      "1880s",
-      "1940s",
-      "1950s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "land-grant",
-      "teaching"
-    ],
+    "eraBuckets": ["1880s", "1940s", "1950s"],
+    "topicTags": ["education", "hbcu", "land-grant", "teaching"],
     "jurisdictionLabel": "Wilberforce, Ohio",
     "locationPrecision": "campus",
     "locationLabel": "Central State University campus, Greene County",
@@ -1432,15 +1056,8 @@
     ],
     "historicalContext": "Central State shares the Wilberforce hilltop with Wilberforce University but followed a distinct path as a state-funded normal and industrial school. A 1974 tornado devastated the campus; rebuilding preserved its role as a Midwestern land-grant HBCU training educators, scientists, and musicians.",
     "related": [],
-    "topicIds": [
-      "education",
-      "hbcu",
-      "land-grant",
-      "teaching"
-    ],
-    "mentionedEntityIds": [
-      "ent_wilberforce_university_001"
-    ],
+    "topicIds": ["education", "hbcu", "land-grant", "teaching"],
+    "mentionedEntityIds": ["ent_wilberforce_university_001"],
     "keywords": []
   },
   {
@@ -1448,16 +1065,8 @@
     "kind": "school",
     "displayName": "Kentucky State University",
     "summary": "Kentucky chartered the State Normal School for Colored Persons on May 18, 1886, locating it in Frankfort after the city donated funds and a bluff-top site. Classes began October 11, 1887, in Recitation Hall — now Jackson Hall — under first president John Henry Jackson.",
-    "eraBuckets": [
-      "1880s",
-      "1890s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "land-grant",
-      "teaching"
-    ],
+    "eraBuckets": ["1880s", "1890s"],
+    "topicTags": ["education", "hbcu", "land-grant", "teaching"],
     "jurisdictionLabel": "Frankfort, Kentucky",
     "locationPrecision": "campus",
     "locationLabel": "Kentucky State University campus, Frankfort bluff",
@@ -1483,12 +1092,7 @@
     ],
     "historicalContext": "Kentucky State was the Commonwealth's second state-supported higher education institution and later its 1890 land-grant college for Black students. Frankfort's civic campaign to host the normal school reflected Reconstruction-era ambitions to train teachers for segregated Black schools across the Bluegrass region.",
     "related": [],
-    "topicIds": [
-      "education",
-      "hbcu",
-      "land-grant",
-      "teaching"
-    ],
+    "topicIds": ["education", "hbcu", "land-grant", "teaching"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1497,17 +1101,8 @@
     "kind": "school",
     "displayName": "Grambling State University",
     "summary": "The North Louisiana Colored Agriculture Relief Association opened the Colored Industrial and Agricultural School on November 1, 1901, in Grambling, Louisiana. Booker T. Washington sent Charles P. Adams to organize the school; Adams served as founding president for thirty-six years as it grew into a state university.",
-    "eraBuckets": [
-      "1900s",
-      "1920s",
-      "1940s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "agriculture",
-      "teaching"
-    ],
+    "eraBuckets": ["1900s", "1920s", "1940s"],
+    "topicTags": ["education", "hbcu", "agriculture", "teaching"],
     "jurisdictionLabel": "Grambling, Louisiana",
     "locationPrecision": "campus",
     "locationLabel": "Grambling State University campus, Lincoln Parish",
@@ -1533,15 +1128,8 @@
     ],
     "historicalContext": "Grambling began as a farmer-led industrial school in rural north Louisiana and became a teacher-training hub under state support. Its marching band and football program later brought global visibility to a campus rooted in community self-help and Tuskegee-inspired vocational education.",
     "related": [],
-    "topicIds": [
-      "education",
-      "hbcu",
-      "agriculture",
-      "teaching"
-    ],
-    "mentionedEntityIds": [
-      "ent_tuskegee_university_001"
-    ],
+    "topicIds": ["education", "hbcu", "agriculture", "teaching"],
+    "mentionedEntityIds": ["ent_tuskegee_university_001"],
     "keywords": []
   },
   {
@@ -1549,16 +1137,8 @@
     "kind": "school",
     "displayName": "Philander Smith College",
     "summary": "Walden Seminary opened in Little Rock in 1877 as the Little Rock Annual Conference's school for freedmen, the first such effort west of the Mississippi River. Renamed Philander Smith College in 1882 after a gift from Adeline Smith, it received a four-year charter in 1883.",
-    "eraBuckets": [
-      "1870s",
-      "1880s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "religion",
-      "liberal-arts"
-    ],
+    "eraBuckets": ["1870s", "1880s"],
+    "topicTags": ["education", "hbcu", "religion", "liberal-arts"],
     "jurisdictionLabel": "Little Rock, Arkansas",
     "locationPrecision": "campus",
     "locationLabel": "Philander Smith campus, Daisy Bates Drive, Little Rock",
@@ -1584,12 +1164,7 @@
     ],
     "historicalContext": "Philander Smith grew from a Methodist seminary in Wesley Chapel into a liberal arts college near the Arkansas state capitol. Its graduates joined Little Rock's civil rights struggles and professional ranks when Arkansas's public universities remained segregated into the mid-twentieth century.",
     "related": [],
-    "topicIds": [
-      "education",
-      "hbcu",
-      "religion",
-      "liberal-arts"
-    ],
+    "topicIds": ["education", "hbcu", "religion", "liberal-arts"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1598,16 +1173,8 @@
     "kind": "school",
     "displayName": "Livingstone College",
     "summary": "A.M.E. Zion ministers founded Zion Wesley Institute in Concord, North Carolina, in 1879 to train clergy. After relocating to Salisbury in 1882 on J. M. Gray's Delta Grove farm, the legislature renamed it Livingstone College in 1887 for missionary David Livingstone.",
-    "eraBuckets": [
-      "1870s",
-      "1880s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "religion",
-      "teaching"
-    ],
+    "eraBuckets": ["1870s", "1880s"],
+    "topicTags": ["education", "hbcu", "religion", "teaching"],
     "jurisdictionLabel": "Salisbury, North Carolina",
     "locationPrecision": "campus",
     "locationLabel": "Livingstone College campus, Salisbury",
@@ -1633,12 +1200,7 @@
     ],
     "historicalContext": "Joseph Charles Price, Livingstone's first president, became a nationally known advocate for Black higher education through A.M.E. Zion networks. The Salisbury campus, adjacent to Hood Theological Seminary, sustained church-related liberal arts training in the Piedmont when public options for Black students were scarce.",
     "related": [],
-    "topicIds": [
-      "education",
-      "hbcu",
-      "religion",
-      "teaching"
-    ],
+    "topicIds": ["education", "hbcu", "religion", "teaching"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -1647,17 +1209,8 @@
     "kind": "school",
     "displayName": "Paul Quinn College",
     "summary": "African Methodist Episcopal preachers founded the Connectional School for the Education of Negro Youth in Austin, Texas, on April 4, 1872. The school moved to Waco in 1877, received a state charter as Paul Quinn College in 1881, and relocated to Dallas in 1990.",
-    "eraBuckets": [
-      "1870s",
-      "1880s",
-      "1990s"
-    ],
-    "topicTags": [
-      "education",
-      "hbcu",
-      "religion",
-      "agriculture"
-    ],
+    "eraBuckets": ["1870s", "1880s", "1990s"],
+    "topicTags": ["education", "hbcu", "religion", "agriculture"],
     "jurisdictionLabel": "Dallas, Texas",
     "locationPrecision": "campus",
     "locationLabel": "Paul Quinn College campus, southern Dallas",
@@ -1683,15 +1236,8 @@
     ],
     "historicalContext": "Paul Quinn is among the oldest HBCUs west of the Mississippi, beginning in a church basement when Texas freedom was still uncertain. Its move to Dallas and later urban-work-college model extended A.M.E. Church education from Reconstruction trade training to twenty-first-century community development.",
     "related": [],
-    "topicIds": [
-      "education",
-      "hbcu",
-      "religion",
-      "agriculture"
-    ],
-    "mentionedEntityIds": [
-      "ent_bethel_ame_indianapolis_001"
-    ],
+    "topicIds": ["education", "hbcu", "religion", "agriculture"],
+    "mentionedEntityIds": ["ent_bethel_ame_indianapolis_001"],
     "keywords": []
   }
 ]

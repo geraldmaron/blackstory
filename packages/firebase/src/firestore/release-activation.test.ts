@@ -1,4 +1,3 @@
-
 /**
  * In-memory transaction tests for atomic activation, rollback, idempotency,
  * immutable manifests, and active-release public-read guards.

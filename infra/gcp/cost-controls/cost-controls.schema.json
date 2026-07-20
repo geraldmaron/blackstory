@@ -94,7 +94,16 @@
     "serviceScaling": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "runtime", "tier", "minInstances", "maxInstances", "concurrency", "cpu", "memoryMiB"],
+      "required": [
+        "id",
+        "runtime",
+        "tier",
+        "minInstances",
+        "maxInstances",
+        "concurrency",
+        "cpu",
+        "memoryMiB"
+      ],
       "properties": {
         "id": { "type": "string" },
         "runtime": { "type": "string", "enum": ["firebase-app-hosting", "cloud-run"] },
@@ -110,7 +119,15 @@
     "cloudTasksQueue": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "tier", "maxDispatchesPerSecond", "maxConcurrentDispatches", "maxAttempts", "retry", "maxQueueDepth"],
+      "required": [
+        "id",
+        "tier",
+        "maxDispatchesPerSecond",
+        "maxConcurrentDispatches",
+        "maxAttempts",
+        "retry",
+        "maxQueueDepth"
+      ],
       "properties": {
         "id": { "type": "string" },
         "tier": { "$ref": "#/definitions/workloadTier" },
@@ -124,7 +141,17 @@
     "cloudRunJob": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "tier", "cpu", "memoryMiB", "maxDurationSec", "maxRetries", "retry", "taskCount", "parallelism"],
+      "required": [
+        "id",
+        "tier",
+        "cpu",
+        "memoryMiB",
+        "maxDurationSec",
+        "maxRetries",
+        "retry",
+        "taskCount",
+        "parallelism"
+      ],
       "properties": {
         "id": { "type": "string" },
         "tier": { "$ref": "#/definitions/workloadTier" },
@@ -140,7 +167,13 @@
     "databaseLimit": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["role", "maxConnections", "statementTimeoutMs", "idleTransactionTimeoutMs", "lockTimeoutMs"],
+      "required": [
+        "role",
+        "maxConnections",
+        "statementTimeoutMs",
+        "idleTransactionTimeoutMs",
+        "lockTimeoutMs"
+      ],
       "properties": {
         "role": { "type": "string" },
         "maxConnections": { "type": "integer", "minimum": 1 },
@@ -152,7 +185,14 @@
     "dailyBudget": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["category", "dailyCap", "unit", "softShutdownAtPercent", "hardStopAtPercent", "automatedResponse"],
+      "required": [
+        "category",
+        "dailyCap",
+        "unit",
+        "softShutdownAtPercent",
+        "hardStopAtPercent",
+        "automatedResponse"
+      ],
       "properties": {
         "category": {
           "type": "string",
@@ -164,14 +204,27 @@
         "hardStopAtPercent": { "type": "integer", "const": 100 },
         "automatedResponse": {
           "type": "string",
-          "enum": ["alert_only", "throttle_optional", "pause_research", "disable_geocoder", "disable_model", "disable_source_fetch"]
+          "enum": [
+            "alert_only",
+            "throttle_optional",
+            "pause_research",
+            "disable_geocoder",
+            "disable_model",
+            "disable_source_fetch"
+          ]
         }
       }
     },
     "researchCampaignBudget": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["maxCandidatesPerRun", "maxConcurrentAdapters", "maxDailyRuns", "maxWallClockSec", "maxEgressBytes"],
+      "required": [
+        "maxCandidatesPerRun",
+        "maxConcurrentAdapters",
+        "maxDailyRuns",
+        "maxWallClockSec",
+        "maxEgressBytes"
+      ],
       "properties": {
         "maxCandidatesPerRun": { "type": "integer", "minimum": 1 },
         "maxConcurrentAdapters": { "type": "integer", "minimum": 1 },
@@ -183,13 +236,26 @@
     "billingAlert": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["alertId", "thresholdPercent", "automatedResponse", "notifyChannels", "runbookRef"],
+      "required": [
+        "alertId",
+        "thresholdPercent",
+        "automatedResponse",
+        "notifyChannels",
+        "runbookRef"
+      ],
       "properties": {
         "alertId": { "type": "string" },
         "thresholdPercent": { "type": "integer", "minimum": 1, "maximum": 100 },
         "automatedResponse": {
           "type": "string",
-          "enum": ["alert_only", "throttle_optional", "pause_research", "disable_geocoder", "disable_model", "disable_source_fetch"]
+          "enum": [
+            "alert_only",
+            "throttle_optional",
+            "pause_research",
+            "disable_geocoder",
+            "disable_model",
+            "disable_source_fetch"
+          ]
         },
         "notifyChannels": {
           "type": "array",

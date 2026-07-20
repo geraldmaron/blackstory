@@ -39,7 +39,9 @@ export type TranslateZipToPlaceInput = {
   readonly lookupZipCentroid?: LookupUsZipCentroid;
 };
 
-export async function translateZipToPlace(input: TranslateZipToPlaceInput): Promise<ZipTranslationResult> {
+export async function translateZipToPlace(
+  input: TranslateZipToPlaceInput,
+): Promise<ZipTranslationResult> {
   const zip5 = normalizeUsZipInput(input.zip);
   if (!zip5) {
     return { ok: false, fallback: buildManualPlaceSearchFallback('no_match') };

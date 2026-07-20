@@ -38,9 +38,7 @@ function toCatalogMatch(result: ResolutionResult, matchedAt: string): DiscoveryC
   }));
   return {
     outcome: result.outcome,
-    ...(result.selectedEntityId !== undefined
-      ? { selectedEntityId: result.selectedEntityId }
-      : {}),
+    ...(result.selectedEntityId !== undefined ? { selectedEntityId: result.selectedEntityId } : {}),
     topMatches,
     rationale: result.rationale,
     matchedAt,

@@ -7,10 +7,7 @@ import { SURFACE_ID } from './posture.js';
 
 export { createSubmissionsApiAppCheckGuard } from './app-check.js';
 export type { SubmissionsApiAppCheckOptions } from './app-check.js';
-export {
-  createSubmissionsRateLimitGuard,
-  resolveSubmissionsEndpointClass,
-} from './rate-limits.js';
+export { createSubmissionsRateLimitGuard, resolveSubmissionsEndpointClass } from './rate-limits.js';
 export type {
   SubmissionsRateLimitGuardDecision,
   SubmissionsRateLimitGuardOptions,

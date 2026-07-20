@@ -1,4 +1,3 @@
-
 /**
  * Pure vector arithmetic for the embedding pipeline. No I/O, no Firestore every
  * function here is a deterministic, synchronously testable building block for truncation,
@@ -47,13 +46,15 @@ export function normalizeVector(vector: EmbeddingVector): EmbeddingVector {
   return vector.map((value) => value / norm);
 }
 
-
 /**
  * Matryoshka-safe truncation: gemini-embedding-001's representation is trained so that any
  * prefix of the native output is itself a valid (lower-fidelity) embedding. Truncating is
  * therefore just a slice but the slice is no longer unit-norm, so callers must renormalize.
  */
-export function truncateVector(vector: EmbeddingVector, dims: number = EMBEDDING_DIMS): EmbeddingVector {
+export function truncateVector(
+  vector: EmbeddingVector,
+  dims: number = EMBEDDING_DIMS,
+): EmbeddingVector {
   assertFiniteVector(vector, 'truncateVector');
   if (!Number.isInteger(dims) || dims <= 0) {
     throw new InvalidEmbeddingVectorError('truncateVector: dims must be a positive integer');
@@ -93,7 +94,6 @@ export function dotProduct(a: EmbeddingVector, b: EmbeddingVector): number {
   return sum;
 }
 
-
 /**
  * DOT_PRODUCT "distance" as Firestore reports it: for unit-normalized vectors this equals
  * cosine similarity, and unlike COSINE/EUCLIDEAN *higher* values mean *more* similar.
@@ -103,10 +103,12 @@ export function dotProductDistance(a: EmbeddingVector, b: EmbeddingVector): numb
 }
 
 /** True when a vector's L2 norm is within epsilon of 1 (allows float roundoff). */
-export function isUnitVector(vector: EmbeddingVector, epsilon: number = UNIT_NORM_EPSILON): boolean {
+export function isUnitVector(
+  vector: EmbeddingVector,
+  epsilon: number = UNIT_NORM_EPSILON,
+): boolean {
   return Math.abs(magnitude(vector) - 1) <= epsilon;
 }
-
 
 /**
  * Asserts the invariant every stored/query vector must satisfy: finite values, the expected

@@ -35,7 +35,9 @@ type LegiScanMasterlistFixture = {
 };
 
 function loadFixture(): LegiScanMasterlistFixture {
-  return JSON.parse(readFileSync(join(FIXTURES_DIR, 'masterlist-ga-2025.json'), 'utf8')) as LegiScanMasterlistFixture;
+  return JSON.parse(
+    readFileSync(join(FIXTURES_DIR, 'masterlist-ga-2025.json'), 'utf8'),
+  ) as LegiScanMasterlistFixture;
 }
 
 function toSnapshot(bill: LegiScanBillFixture, stateId: number): LegalSnapshot {

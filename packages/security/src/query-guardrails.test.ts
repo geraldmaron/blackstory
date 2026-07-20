@@ -1,4 +1,3 @@
-
 /**
  * Search and query resource guardrail tests.
  */
@@ -124,10 +123,7 @@ test('allowlists the  status and era filter fields', () => {
 });
 
 test('bounds geo radius and requires complete geo tuple', () => {
-  assert.equal(
-    evaluateSearchQueryGuardrails({ q: 'test', lat: 40.7, lng: -74.0 }).allowed,
-    false,
-  );
+  assert.equal(evaluateSearchQueryGuardrails({ q: 'test', lat: 40.7, lng: -74.0 }).allowed, false);
   assert.equal(
     evaluateSearchQueryGuardrails({
       q: 'test',
@@ -149,10 +145,7 @@ test('bounds geo radius and requires complete geo tuple', () => {
 });
 
 test('bounds page size and pagination depth via cursor', () => {
-  assert.equal(
-    evaluateSearchQueryGuardrails({ q: 'test', pageSize: 999 }).allowed,
-    false,
-  );
+  assert.equal(evaluateSearchQueryGuardrails({ q: 'test', pageSize: 999 }).allowed, false);
 
   const first = evaluateSearchQueryGuardrails({ q: 'test', pageSize: 10 });
   assert.equal(first.allowed, true);
@@ -188,7 +181,10 @@ test('cursor decode validates hash binding and shape', () => {
 });
 
 test('cache key is stable for equivalent normalized input', () => {
-  const left = evaluateSearchQueryGuardrails({ q: '  Harriet  Tubman ', filters: { kind: 'person' } });
+  const left = evaluateSearchQueryGuardrails({
+    q: '  Harriet  Tubman ',
+    filters: { kind: 'person' },
+  });
   const right = evaluateSearchQueryGuardrails({ q: 'harriet tubman', filters: { kind: 'person' } });
   assert.equal(left.allowed, true);
   assert.equal(right.allowed, true);
@@ -260,7 +256,16 @@ function seededVariants(seed: number, count: number): SearchQueryInput[] {
         variants.push({ q: '***' });
         break;
       case 2:
-        variants.push({ q, filters: { kind: 'person', state: 'NY', precision: 'city', releaseId: 'rel-1', extra: 'x' } as Record<string, string> });
+        variants.push({
+          q,
+          filters: {
+            kind: 'person',
+            state: 'NY',
+            precision: 'city',
+            releaseId: 'rel-1',
+            extra: 'x',
+          } as Record<string, string>,
+        });
         break;
       case 3:
         variants.push({ q, lat: 40 + (next() % 10), lng: -75, radiusM: next() % 100_000 });

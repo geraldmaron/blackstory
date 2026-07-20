@@ -1,4 +1,3 @@
-
 /**
  * Security telemetry recorder redacts, emits metrics, evaluates anomalies, and
  * builds alert payloads from normalized security events.
@@ -57,9 +56,7 @@ function metricValueForEvent(event: SecurityTelemetryEvent): number {
   }
 }
 
-export function createSecurityTelemetryRecorder(
-  options: SecurityTelemetryRecorderOptions,
-): {
+export function createSecurityTelemetryRecorder(options: SecurityTelemetryRecorderOptions): {
   record(event: SecurityTelemetryEvent): SecurityTelemetryRecordResult;
   evaluateSamples(samples: readonly SecurityMetricSample[]): readonly AnomalyEvaluation[];
 } {

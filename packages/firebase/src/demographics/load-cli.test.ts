@@ -1,4 +1,3 @@
-
 /**
  * Tests for the idempotent census county-decade load (`runDemographicsLoad`). Uses an injected
  * in-memory writer plus a fake `fetchImpl` replaying the Census data API's array-of-arrays
@@ -23,7 +22,9 @@ function fakeVariablesJson(vintage: typeof VINTAGE_2020) {
   return {
     variables: {
       [vintage.totalVariable]: { label: 'Total' },
-      [vintage.blackAloneVariable]: { label: ' !!Total:!!Population of one race:!!Black or African American alone' },
+      [vintage.blackAloneVariable]: {
+        label: ' !!Total:!!Population of one race:!!Black or African American alone',
+      },
     },
   };
 }
@@ -32,10 +33,7 @@ function fakeDataPayload(vintage: typeof VINTAGE_2020, rows: readonly (readonly 
   return [['NAME', vintage.totalVariable, vintage.blackAloneVariable, 'state', 'county'], ...rows];
 }
 
-function createFakeFetch(
-  vintage: typeof VINTAGE_2020,
-  dataRows: readonly (readonly string[])[],
-) {
+function createFakeFetch(vintage: typeof VINTAGE_2020, dataRows: readonly (readonly string[])[]) {
   return async (url: string) => {
     const payload = url.endsWith('/variables.json')
       ? fakeVariablesJson(vintage)

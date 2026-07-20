@@ -36,11 +36,7 @@ const sampleEdge: HistoryEdgeView = {
   sentence: 'Paul Laurence Dunbar High School is located at Washington, D.C.',
 };
 
-function makeNode(
-  entityId: string,
-  kind: string,
-  connectionCount: number,
-): HistoryNodeView {
+function makeNode(entityId: string, kind: string, connectionCount: number): HistoryNodeView {
   return {
     ...sampleNode,
     entityId,

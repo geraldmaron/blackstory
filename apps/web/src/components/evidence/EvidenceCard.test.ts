@@ -24,13 +24,17 @@ const BASE_CLAIM: EvidenceClaimInput = {
 };
 
 test('renders an evidence-score label rather than probability language (AC1)', () => {
-  const html = renderToStaticMarkup(createElement(EvidenceCard, { card: buildEvidenceCard(BASE_CLAIM) }));
+  const html = renderToStaticMarkup(
+    createElement(EvidenceCard, { card: buildEvidenceCard(BASE_CLAIM) }),
+  );
   assert.match(html, /Evidence score: high \(0\.78 of 1\.00\)/);
   assert.doesNotMatch(html, /probability/i);
 });
 
 test('associates the claim card with its citation block via aria-describedby (WCAG claim<->citation)', () => {
-  const html = renderToStaticMarkup(createElement(EvidenceCard, { card: buildEvidenceCard(BASE_CLAIM) }));
+  const html = renderToStaticMarkup(
+    createElement(EvidenceCard, { card: buildEvidenceCard(BASE_CLAIM) }),
+  );
   assert.match(html, /aria-describedby="claim_seed_001-evidence-citation"/);
   assert.match(html, /id="claim_seed_001-evidence-citation"/);
 });
@@ -64,7 +68,8 @@ test('renders a preserved contradiction notice rather than silently resolving a 
         dispute: {
           primaryValue: '1867',
           disputed: true,
-          disputeNote: 'A credible alternate founding year (1868) is preserved; both values remain visible.',
+          disputeNote:
+            'A credible alternate founding year (1868) is preserved; both values remain visible.',
           alternates: [{ value: '1868', credible: true, kind: 'contradicting' }],
         },
       }),
@@ -76,7 +81,9 @@ test('renders a preserved contradiction notice rather than silently resolving a 
 });
 
 test('does not render a dispute notice at all when there is no dispute', () => {
-  const html = renderToStaticMarkup(createElement(EvidenceCard, { card: buildEvidenceCard(BASE_CLAIM) }));
+  const html = renderToStaticMarkup(
+    createElement(EvidenceCard, { card: buildEvidenceCard(BASE_CLAIM) }),
+  );
   assert.doesNotMatch(html, /Preserved contradiction/);
 });
 
@@ -133,7 +140,9 @@ test('renders a visible excerpt as a blockquote when rights permit it', () => {
 });
 
 test('does not surface raw claim ids on the public card surface', () => {
-  const html = renderToStaticMarkup(createElement(EvidenceCard, { card: buildEvidenceCard(BASE_CLAIM) }));
+  const html = renderToStaticMarkup(
+    createElement(EvidenceCard, { card: buildEvidenceCard(BASE_CLAIM) }),
+  );
   assert.doesNotMatch(html, />claim_seed_001</);
   assert.match(html, /Primary archival/);
 });
@@ -161,7 +170,12 @@ test('renders revision history and a retraction notice when present', () => {
       card: buildEvidenceCard({
         ...BASE_CLAIM,
         revisionHistory: [
-          { id: 'rev_1', changedAt: '2026-05-01T00:00:00.000Z', changeKind: 'created', summary: 'Initial claim recorded.' },
+          {
+            id: 'rev_1',
+            changedAt: '2026-05-01T00:00:00.000Z',
+            changeKind: 'created',
+            summary: 'Initial claim recorded.',
+          },
         ],
         retraction: {
           retractedAt: '2026-07-01T00:00:00.000Z',

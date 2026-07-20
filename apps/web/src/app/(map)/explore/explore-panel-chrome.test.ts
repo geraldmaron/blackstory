@@ -38,21 +38,12 @@ test('results panel class combines hidden and dimmed modifiers independently', (
 });
 
 test('resolveExploreLeftTab closes chassis when both sections are hidden', () => {
-  assert.equal(
-    resolveExploreLeftTab({ showFilters: false, showKey: false }),
-    null,
-  );
+  assert.equal(resolveExploreLeftTab({ showFilters: false, showKey: false }), null);
 });
 
 test('resolveExploreLeftTab follows the only visible section', () => {
-  assert.equal(
-    resolveExploreLeftTab({ showFilters: true, showKey: false }),
-    'filters',
-  );
-  assert.equal(
-    resolveExploreLeftTab({ showFilters: false, showKey: true }),
-    'key',
-  );
+  assert.equal(resolveExploreLeftTab({ showFilters: true, showKey: false }), 'filters');
+  assert.equal(resolveExploreLeftTab({ showFilters: false, showKey: true }), 'key');
 });
 
 test('resolveExploreLeftTab uses preferredTab when both sections are visible', () => {

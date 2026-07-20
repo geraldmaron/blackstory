@@ -82,7 +82,9 @@ export function assertSnapshotIsSelective(mode: SnapshotMode): void {
   }
 }
 
-export function assertEvidenceSourceValid(source: Pick<EvidenceSource, 'classification' | 'policy'>): void {
+export function assertEvidenceSourceValid(
+  source: Pick<EvidenceSource, 'classification' | 'policy'>,
+): void {
   assertSourceClassification(source.classification);
   assertSnapshotIsSelective(source.policy.snapshotMode);
 }

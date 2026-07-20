@@ -9,7 +9,12 @@ import {
 
 function webCitation(overrides: Partial<FactCitation> = {}): FactCitation {
   return {
-    csl: { id: 'csl-1', type: 'webpage', title: 'Montgomery bus boycott record', URL: 'https://example.gov/mia' },
+    csl: {
+      id: 'csl-1',
+      type: 'webpage',
+      title: 'Montgomery bus boycott record',
+      URL: 'https://example.gov/mia',
+    },
     sourceClass: 'primary',
     role: 'supports',
     excerpt: 'Rosa Parks was arrested on December 1, 1955.',
@@ -59,6 +64,10 @@ test('a citation with an empty excerpt fails closed', () => {
 });
 
 test('a citation with an unknown sourceClass or role throws', () => {
-  assert.throws(() => assertFactCitationStructurallyComplete(webCitation({ sourceClass: 'quaternary' as never })));
-  assert.throws(() => assertFactCitationStructurallyComplete(webCitation({ role: 'endorses' as never })));
+  assert.throws(() =>
+    assertFactCitationStructurallyComplete(webCitation({ sourceClass: 'quaternary' as never })),
+  );
+  assert.throws(() =>
+    assertFactCitationStructurallyComplete(webCitation({ role: 'endorses' as never })),
+  );
 });

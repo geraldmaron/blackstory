@@ -40,7 +40,9 @@ export type BuildFactSearchIndexResult = {
  * (independently-checked evidence) count as `substantial`; `single-source` as `partial`;
  * `contested` as `minimal` a deterministic, documented mapping, not a hidden score.
  */
-function researchCoverageFromConfidence(confidence: FactRecord['confidence']): SearchableEntityRecord['researchCoverage'] {
+function researchCoverageFromConfidence(
+  confidence: FactRecord['confidence'],
+): SearchableEntityRecord['researchCoverage'] {
   switch (confidence) {
     case 'established':
     case 'corroborated':

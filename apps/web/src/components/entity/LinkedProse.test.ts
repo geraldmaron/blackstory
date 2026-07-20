@@ -31,7 +31,9 @@ test('LinkedProse linkifies plain text against catalog when no markup is present
   const html = renderToStaticMarkup(
     createElement(LinkedProse, {
       text: 'Worship continued at Fifteenth Street Presbyterian Church.',
-      catalog: [{ id: 'ent_15th_st_church_001', displayName: 'Fifteenth Street Presbyterian Church' }],
+      catalog: [
+        { id: 'ent_15th_st_church_001', displayName: 'Fifteenth Street Presbyterian Church' },
+      ],
     }),
   );
   assert.match(html, /href="\/entity\/ent_15th_st_church_001"/);

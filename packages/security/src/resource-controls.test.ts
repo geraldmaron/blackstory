@@ -1,4 +1,3 @@
-
 /**
  * Tests for cost and resource exhaustion controls.
  */
@@ -216,10 +215,7 @@ test('simulateAbusiveTrafficPattern validates spike containment', () => {
   assert.ok(result.budgetHardStops >= 1);
   assert.ok(result.researchSoftShutdowns >= 1);
   assert.equal(result.publicServingPreserved, true);
-  assert.equal(
-    result.maxObservedInstances.web,
-    DEFAULT_SERVICE_SCALING_LIMITS.web.maxInstances,
-  );
+  assert.equal(result.maxObservedInstances.web, DEFAULT_SERVICE_SCALING_LIMITS.web.maxInstances);
   assert.equal(
     result.maxObservedInstances['api-public'],
     DEFAULT_SERVICE_SCALING_LIMITS['api-public'].maxInstances,

@@ -12,11 +12,23 @@ import {
 } from './catalog-entity-match.ts';
 
 const FIXTURES: CatalogEntityRef[] = [
-  { id: 'ent_katherine_johnson_001', displayName: 'Katherine Johnson', aliases: ['Katherine G. Johnson'] },
+  {
+    id: 'ent_katherine_johnson_001',
+    displayName: 'Katherine Johnson',
+    aliases: ['Katherine G. Johnson'],
+  },
   { id: 'ent_mary_jackson_001', displayName: 'Mary Jackson', aliases: ['Mary W. Jackson'] },
   { id: 'ent_dorothy_vaughan_001', displayName: 'Dorothy Vaughan', aliases: [] },
-  { id: 'ent_greenwood_district_001', displayName: 'Greenwood District', aliases: ['Black Wall Street'] },
-  { id: 'ent_tuskegee_university_001', displayName: 'Tuskegee University', aliases: ['Tuskegee Institute'] },
+  {
+    id: 'ent_greenwood_district_001',
+    displayName: 'Greenwood District',
+    aliases: ['Black Wall Street'],
+  },
+  {
+    id: 'ent_tuskegee_university_001',
+    displayName: 'Tuskegee University',
+    aliases: ['Tuskegee Institute'],
+  },
   { id: 'ent_ellen_eglin_001', displayName: 'Ellen Eglin', aliases: [] },
 ];
 

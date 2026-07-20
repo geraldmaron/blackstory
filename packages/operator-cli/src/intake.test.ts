@@ -1,4 +1,3 @@
-
 /**
  * Verifies that lead/source/evidence proposals land in the real quarantine pipeline
  * and, for leads, open a real draft research case never a canonical or promoted record.

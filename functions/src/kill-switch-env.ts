@@ -2,9 +2,7 @@
  * Resolve research-campaigns kill-switch engagement from env override or Firestore.
  * Missing Firestore doc fails closed (engaged). Env DISCOVERY_KILL_SWITCH wins when set.
  */
-import {
-  firestorePaths,
-} from '../../packages/firebase/src/firestore/paths.js';
+import { firestorePaths } from '../../packages/firebase/src/firestore/paths.js';
 import { isResearchCampaignsKillSwitchEngaged } from '../../packages/firebase/src/discovery/kill-switch.js';
 import { RESEARCH_CAMPAIGNS_KILL_SWITCH_ID } from '../../packages/firebase/src/discovery/campaign-run.js';
 import type { KillSwitchDoc } from '../../packages/firebase/src/firestore/types.js';

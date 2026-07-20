@@ -25,7 +25,10 @@ export function parseMediaWikiPageResponse(raw: unknown): MediaWikiPage {
   return page;
 }
 
-export function parseWikidataEntityResponse(raw: unknown, entityId: string): WikidataEntity | undefined {
+export function parseWikidataEntityResponse(
+  raw: unknown,
+  entityId: string,
+): WikidataEntity | undefined {
   if (!raw || typeof raw !== 'object') {
     return undefined;
   }

@@ -102,7 +102,9 @@ export function HateCrimeYearSeriesChart({ summaries }: HateCrimeYearSeriesChart
               <tr key={row.year}>
                 <th scope="row">{row.year}</th>
                 <td>{row.antiBlackSharePct === null ? '—' : formatPct(row.antiBlackSharePct)}</td>
-                <td>{row.participationPct === undefined ? '—' : formatPct(row.participationPct)}</td>
+                <td>
+                  {row.participationPct === undefined ? '—' : formatPct(row.participationPct)}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -126,7 +128,12 @@ export function HateCrimeYearSeriesChart({ summaries }: HateCrimeYearSeriesChart
                 y1={y}
                 y2={y}
               />
-              <text className="ds-data-chart__axis-label" x={CHART_MARGIN.left - 8} y={y + 4} textAnchor="end">
+              <text
+                className="ds-data-chart__axis-label"
+                x={CHART_MARGIN.left - 8}
+                y={y + 4}
+                textAnchor="end"
+              >
                 {formatPct(tick)}
               </text>
             </g>
@@ -139,7 +146,8 @@ export function HateCrimeYearSeriesChart({ summaries }: HateCrimeYearSeriesChart
           const shareX = centerX - barWidth - pairGap / 2;
           const participationX = centerX + pairGap / 2;
           const shareTop = yScale(shareValue);
-          const participationTop = row.participationPct !== undefined ? yScale(participationValue) : null;
+          const participationTop =
+            row.participationPct !== undefined ? yScale(participationValue) : null;
           return (
             <g key={row.year}>
               {row.antiBlackSharePct !== null ? (
@@ -183,11 +191,17 @@ export function HateCrimeYearSeriesChart({ summaries }: HateCrimeYearSeriesChart
       </svg>
       <ul className="ds-data-chart__legend" aria-hidden="true">
         <li className="ds-data-chart__legend-item">
-          <span className="ds-data-chart__legend-swatch" style={{ background: 'var(--ds-accent-graphic)' }} />
+          <span
+            className="ds-data-chart__legend-swatch"
+            style={{ background: 'var(--ds-accent-graphic)' }}
+          />
           Anti-Black share of reported incidents
         </li>
         <li className="ds-data-chart__legend-item">
-          <span className="ds-data-chart__legend-swatch" style={{ background: 'var(--ds-accent-muted)' }} />
+          <span
+            className="ds-data-chart__legend-swatch"
+            style={{ background: 'var(--ds-accent-muted)' }}
+          />
           Agencies participating nationally
         </li>
       </ul>

@@ -49,11 +49,15 @@ async function main(): Promise<void> {
   const max = Number(readArgFlag('--max') ?? '200');
   const concurrency = Number(readArgFlag('--concurrency') ?? '4');
   if (!candidatesPath || !outPath) {
-    console.error('Usage: --candidates <gap-fill-*.json> --out <subjects.json> [--min-mentions 2] [--max 200] [--concurrency 4]');
+    console.error(
+      'Usage: --candidates <gap-fill-*.json> --out <subjects.json> [--min-mentions 2] [--max 200] [--concurrency 4]',
+    );
     process.exit(2);
   }
 
-  const data = JSON.parse(readFileSync(candidatesPath, 'utf8')) as { candidates?: readonly GapCandidate[] };
+  const data = JSON.parse(readFileSync(candidatesPath, 'utf8')) as {
+    candidates?: readonly GapCandidate[];
+  };
   const candidates = (data.candidates ?? [])
     .filter((candidate) => candidate.gapFill.mentionedByEntityIds.length >= minMentions)
     .slice(0, max);
@@ -84,13 +88,17 @@ async function main(): Promise<void> {
       }
       if (tier1 && tier1.url !== primary?.url) {
         foundTier1 += 1;
-        snippets.push(`INDEPENDENT TIER-1 SOURCE (via ${tier1.method}) ${tier1.url}\n${tier1.text}`);
+        snippets.push(
+          `INDEPENDENT TIER-1 SOURCE (via ${tier1.method}) ${tier1.url}\n${tier1.text}`,
+        );
       } else if (tier1) {
         foundTier1 += 1;
       }
       if (!primary && !tier1) {
         noSource += 1;
-        snippets.push('(no fetchable source found; judge only from the mention context above — decision should be needs_evidence unless the context alone is sufficient)');
+        snippets.push(
+          '(no fetchable source found; judge only from the mention context above — decision should be needs_evidence unless the context alone is sufficient)',
+        );
       }
 
       return {
@@ -106,7 +114,10 @@ async function main(): Promise<void> {
   );
 
   mkdirSync(dirname(outPath), { recursive: true });
-  writeFileSync(outPath, `${JSON.stringify({ subjects, count: subjects.length, source: candidatesPath }, null, 2)}\n`);
+  writeFileSync(
+    outPath,
+    `${JSON.stringify({ subjects, count: subjects.length, source: candidatesPath }, null, 2)}\n`,
+  );
   console.log(
     JSON.stringify({
       candidatesConsidered: candidates.length,

@@ -24,7 +24,8 @@ import type { FactSubjectSource } from './fact-subjects.js';
 const EV = ['gg-ev-1'] as const; // shared placeholder evidence id for fixture relationships
 
 function rel(
-  overrides: Partial<EntityRelationship> & Pick<EntityRelationship, 'id' | 'fromEntityId' | 'toEntityId' | 'type'>,
+  overrides: Partial<EntityRelationship> &
+    Pick<EntityRelationship, 'id' | 'fromEntityId' | 'toEntityId' | 'type'>,
 ): EntityRelationship {
   return {
     evidenceIds: [...EV],
@@ -45,9 +46,24 @@ export const CONTAINMENT_CHAIN_ENTITIES: readonly ContainmentEntityInput[] = [
 ];
 
 export const CONTAINMENT_CHAIN_RELATIONSHIPS: readonly EntityRelationship[] = [
-  rel({ id: 'gg-rel-loc-1', fromEntityId: 'gg-place-spot', toEntityId: 'gg-place-city', type: 'located_at' }),
-  rel({ id: 'gg-rel-loc-2', fromEntityId: 'gg-place-city', toEntityId: 'gg-place-county', type: 'part_of' }),
-  rel({ id: 'gg-rel-loc-3', fromEntityId: 'gg-place-county', toEntityId: 'gg-place-state', type: 'part_of' }),
+  rel({
+    id: 'gg-rel-loc-1',
+    fromEntityId: 'gg-place-spot',
+    toEntityId: 'gg-place-city',
+    type: 'located_at',
+  }),
+  rel({
+    id: 'gg-rel-loc-2',
+    fromEntityId: 'gg-place-city',
+    toEntityId: 'gg-place-county',
+    type: 'part_of',
+  }),
+  rel({
+    id: 'gg-rel-loc-3',
+    fromEntityId: 'gg-place-county',
+    toEntityId: 'gg-place-state',
+    type: 'part_of',
+  }),
 ];
 
 // ---------------------------------------------------------------------------
@@ -59,8 +75,18 @@ export const CONTAINMENT_CYCLE_ENTITIES: readonly ContainmentEntityInput[] = [
 ];
 
 export const CONTAINMENT_CYCLE_RELATIONSHIPS: readonly EntityRelationship[] = [
-  rel({ id: 'gg-rel-cycle-1', fromEntityId: 'gg-place-cycle-a', toEntityId: 'gg-place-cycle-b', type: 'part_of' }),
-  rel({ id: 'gg-rel-cycle-2', fromEntityId: 'gg-place-cycle-b', toEntityId: 'gg-place-cycle-a', type: 'part_of' }),
+  rel({
+    id: 'gg-rel-cycle-1',
+    fromEntityId: 'gg-place-cycle-a',
+    toEntityId: 'gg-place-cycle-b',
+    type: 'part_of',
+  }),
+  rel({
+    id: 'gg-rel-cycle-2',
+    fromEntityId: 'gg-place-cycle-b',
+    toEntityId: 'gg-place-cycle-a',
+    type: 'part_of',
+  }),
 ];
 
 // ---------------------------------------------------------------------------
@@ -121,7 +147,7 @@ export const CAUSATION_VOCAB_RELATIONSHIPS: readonly EntityRelationship[] = [
     temporal: { validFrom: '1935', validTo: '1968' },
     notes:
       'Fixture for the settled-systemic-causation case (acceptance criterion 9) — a ' +
-      'documented lending policy causing measurable disinvestment, the shape of the bead\'s own ' +
+      "documented lending policy causing measurable disinvestment, the shape of the bead's own " +
       'HOLC-redlining example without naming the real historical policy.',
   }),
 ];
@@ -137,22 +163,23 @@ export const SUCCESSION_RELATIONSHIP: EntityRelationship = rel({
   temporal: { validFrom: '1962' },
 });
 
-export const HISTORIC_PREDECESSOR_STATUS_HISTORY: readonly StatusHistoryEntry<EntityStatusValue>[] = [
-  {
-    status: 'active',
-    validFrom: '1880',
-    validTo: '1962',
-    datePrecision: 'year',
-    basisClaimIds: ['gg-claim-historic-active'],
-  },
-  {
-    status: 'historic',
-    validFrom: '1962',
-    validTo: null,
-    datePrecision: 'year',
-    basisClaimIds: ['gg-claim-historic-annexed'],
-  },
-];
+export const HISTORIC_PREDECESSOR_STATUS_HISTORY: readonly StatusHistoryEntry<EntityStatusValue>[] =
+  [
+    {
+      status: 'active',
+      validFrom: '1880',
+      validTo: '1962',
+      datePrecision: 'year',
+      basisClaimIds: ['gg-claim-historic-active'],
+    },
+    {
+      status: 'historic',
+      validFrom: '1962',
+      validTo: null,
+      datePrecision: 'year',
+      basisClaimIds: ['gg-claim-historic-annexed'],
+    },
+  ];
 
 export const MODERN_SUCCESSOR_STATUS_HISTORY: readonly StatusHistoryEntry<EntityStatusValue>[] = [
   {

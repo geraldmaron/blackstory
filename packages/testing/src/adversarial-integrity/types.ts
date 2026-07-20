@@ -1,4 +1,3 @@
-
 /**
  * Shared types for adversarial integrity exercise harnesses.
  * Scenarios compose @repo/security and @repo/domain gates locally no live attacks.

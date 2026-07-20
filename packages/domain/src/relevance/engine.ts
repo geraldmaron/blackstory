@@ -5,22 +5,11 @@ import { evaluateRelevance, loadProductConstitution } from '@repo/schemas';
 import type { ProductConstitution } from '@repo/schemas';
 import { deriveProvisionalDecision } from './decisions.js';
 import { composeCompositeScore, extractRelevanceFeatures } from './dimensions.js';
-import {
-  computeDistinctivenessKey,
-  detectDuplicateCandidate,
-} from './distinctiveness.js';
-import {
-  buildRelevanceEvidence,
-  hasIncludeEvidence,
-  runRelevanceGates,
-} from './gates.js';
+import { computeDistinctivenessKey, detectDuplicateCandidate } from './distinctiveness.js';
+import { buildRelevanceEvidence, hasIncludeEvidence, runRelevanceGates } from './gates.js';
 import { validateRelevanceOverride } from './override.js';
 import { buildWhyThisAppears } from './why.js';
-import type {
-  EvaluateRelevanceInput,
-  RelevanceAssessment,
-  RelevanceGateResult,
-} from './types.js';
+import type { EvaluateRelevanceInput, RelevanceAssessment, RelevanceGateResult } from './types.js';
 import type { DiscoveryCandidateRecord } from '../discovery/types.js';
 
 export type EvaluateRelevanceOptions = EvaluateRelevanceInput & {
@@ -33,7 +22,11 @@ function finalizeIncludeEvidenceGate(
   candidate: EvaluateRelevanceInput['candidate'],
   evidence: ReturnType<typeof buildRelevanceEvidence>,
   gates: readonly RelevanceGateResult[],
-): { decision: RelevanceAssessment['decision']; gates: readonly RelevanceGateResult[]; exclusionReason?: string } {
+): {
+  decision: RelevanceAssessment['decision'];
+  gates: readonly RelevanceGateResult[];
+  exclusionReason?: string;
+} {
   if (decision !== 'include') {
     return { decision, gates };
   }
@@ -60,19 +53,13 @@ function finalizeIncludeEvidenceGate(
 }
 
 /** Evaluate a discovery candidate through deterministic relevance gates and scoring. */
-export function evaluateCandidateRelevance(
-  input: EvaluateRelevanceOptions,
-): RelevanceAssessment {
+export function evaluateCandidateRelevance(input: EvaluateRelevanceOptions): RelevanceAssessment {
   const policy = input.policy ?? loadProductConstitution();
   const assessedAt = input.assessedAt ?? new Date().toISOString();
   const existing = input.existingAssessments ?? [];
   const override = input.override ? validateRelevanceOverride(input.override) : undefined;
 
-  const isDuplicate = detectDuplicateCandidate(
-    input.candidate,
-    existing,
-    input.candidatesById,
-  );
+  const isDuplicate = detectDuplicateCandidate(input.candidate, existing, input.candidatesById);
 
   const featureValues = extractRelevanceFeatures(input.candidate, isDuplicate);
   const compositeScore = composeCompositeScore(featureValues);

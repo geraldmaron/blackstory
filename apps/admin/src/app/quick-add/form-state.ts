@@ -9,7 +9,11 @@ import type { ResearchIntakeOutcome } from '@repo/operator-cli';
 export type QuickAddFormState =
   | { readonly status: 'idle' }
   | { readonly status: 'error'; readonly error: string }
-  | { readonly status: 'result'; readonly outcome: ResearchIntakeOutcome; readonly sessionId: string }
+  | {
+      readonly status: 'result';
+      readonly outcome: ResearchIntakeOutcome;
+      readonly sessionId: string;
+    }
   | {
       readonly status: 'committed';
       readonly outcome: ResearchIntakeOutcome;

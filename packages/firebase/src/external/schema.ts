@@ -1,4 +1,3 @@
-
 /**
  * Firestore document schemas for tier-1 external datasets (see
  * @repo/domain's `external-data-sources.ts` for the acquisition registry):

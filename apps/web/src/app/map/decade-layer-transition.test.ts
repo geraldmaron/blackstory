@@ -42,7 +42,9 @@ test('crossfade out targets cover pins, edges, and clusters — not density (col
   assert.ok(keys.some((key) => key.includes('history-edges') && key.endsWith('line-opacity')));
   assert.ok(keys.some((key) => key.includes('explore-point') && key.includes('circle-opacity')));
   assert.ok(
-    keys.some((key) => key.includes(EXPLORE_CLUSTER_COUNT_LAYER_ID) && key.endsWith('text-opacity')),
+    keys.some(
+      (key) => key.includes(EXPLORE_CLUSTER_COUNT_LAYER_ID) && key.endsWith('text-opacity'),
+    ),
   );
   for (const target of DECADE_CROSSFADE_OUT_TARGETS) {
     assert.match(target.paintKey, /opacity/);

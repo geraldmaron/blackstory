@@ -274,7 +274,9 @@ export function createOpenRouterLlmProvider(options: {
 }): LlmProvider {
   const apiKey = options.apiKey ?? process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
-    throw new Error('OPENROUTER_API_KEY is required for provider=openrouter (use run-with-dev-secrets)');
+    throw new Error(
+      'OPENROUTER_API_KEY is required for provider=openrouter (use run-with-dev-secrets)',
+    );
   }
   const fetchImpl = options.fetchImpl ?? fetch;
   const models = resolveOpenRouterModels(options);
@@ -333,7 +335,11 @@ export function createOllamaLlmProvider(options: {
     id: 'ollama',
     complete(request) {
       return withRetries('ollama', maxAttempts, () =>
-        completeOllamaNative(baseUrl, { ...request, model: request.model || defaultModel }, fetchImpl),
+        completeOllamaNative(
+          baseUrl,
+          { ...request, model: request.model || defaultModel },
+          fetchImpl,
+        ),
       );
     },
   };

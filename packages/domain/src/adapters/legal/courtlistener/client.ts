@@ -21,7 +21,9 @@ type CourtListenerOpinionFixture = {
 };
 
 function loadFixture(): readonly CourtListenerOpinionFixture[] {
-  return JSON.parse(readFileSync(join(FIXTURES_DIR, 'opinions-bulk.json'), 'utf8')) as readonly CourtListenerOpinionFixture[];
+  return JSON.parse(
+    readFileSync(join(FIXTURES_DIR, 'opinions-bulk.json'), 'utf8'),
+  ) as readonly CourtListenerOpinionFixture[];
 }
 
 function inferTopics(caseName: string): readonly ('voting' | 'education' | 'constitutional')[] {
@@ -39,7 +41,10 @@ function toSnapshot(opinion: CourtListenerOpinionFixture): LegalSnapshot {
   const externalId = String(opinion.id);
   return {
     id: `legal-cl-${opinion.id}`,
-    slug: opinion.caseName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+    slug: opinion.caseName
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, ''),
     kind: 'landmark-case',
     title: opinion.caseName,
     jurisdictionId: 'us',

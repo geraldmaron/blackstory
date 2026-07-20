@@ -239,10 +239,7 @@ export function buildMemorialNameFeatures(options?: {
       id,
       geometry: {
         type: 'Point',
-        coordinates: [
-          Math.round(point.lng * 1000) / 1000,
-          Math.round(point.lat * 1000) / 1000,
-        ],
+        coordinates: [Math.round(point.lng * 1000) / 1000, Math.round(point.lat * 1000) / 1000],
       },
       properties: {
         id,

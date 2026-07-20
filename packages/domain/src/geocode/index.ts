@@ -41,13 +41,12 @@ export {
   type ReduceGeocodeCoordinatePrecisionInput,
 } from './coordinate-precision.js';
 
-export { buildManualPlaceSearchFallback, type BuildManualPlaceSearchFallbackOptions } from './manual-fallback.js';
-
 export {
-  normalizeUsZipInput,
-  isUsZipOnlyInput,
-  US_ZIP_INPUT_PATTERN,
-} from './zip-normalize.js';
+  buildManualPlaceSearchFallback,
+  type BuildManualPlaceSearchFallbackOptions,
+} from './manual-fallback.js';
+
+export { normalizeUsZipInput, isUsZipOnlyInput, US_ZIP_INPUT_PATTERN } from './zip-normalize.js';
 
 export {
   lookupUsZipCentroid,
@@ -55,7 +54,11 @@ export {
   type LookupUsZipCentroid,
 } from './zip-centroid.js';
 
-export { isInProductScopeStateFips, evaluateGeocodeProductScope, type GeocodeProductScopeResult } from './product-scope.js';
+export {
+  isInProductScopeStateFips,
+  evaluateGeocodeProductScope,
+  type GeocodeProductScopeResult,
+} from './product-scope.js';
 
 export {
   translateZipToPlace,
@@ -75,7 +78,10 @@ export {
   type GeocodeFailure,
 } from './pipeline.js';
 
-export { buildCoarseLocationAnalyticsEvent, type BuildCoarseLocationAnalyticsEventOptions } from './analytics.js';
+export {
+  buildCoarseLocationAnalyticsEvent,
+  type BuildCoarseLocationAnalyticsEventOptions,
+} from './analytics.js';
 
 export type {
   ResolvedJurisdictionIds,

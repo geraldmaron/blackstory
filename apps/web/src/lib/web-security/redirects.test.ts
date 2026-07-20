@@ -16,7 +16,10 @@ test('assertSafeRedirect rejects protocol-relative URLs', () => {
 
 test('assertSafeRedirect rejects javascript and data schemes', () => {
   assert.throws(() => assertSafeRedirect('javascript:alert(1)'), UnsafeRedirectError);
-  assert.throws(() => assertSafeRedirect('data:text/html,<script>alert(1)</script>'), UnsafeRedirectError);
+  assert.throws(
+    () => assertSafeRedirect('data:text/html,<script>alert(1)</script>'),
+    UnsafeRedirectError,
+  );
 });
 
 test('assertSafeRedirect rejects backslash paths', () => {

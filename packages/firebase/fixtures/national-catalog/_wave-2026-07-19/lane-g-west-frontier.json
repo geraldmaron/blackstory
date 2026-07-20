@@ -4,15 +4,8 @@
     "kind": "place",
     "displayName": "Fort Davis National Historic Site",
     "summary": "Re-established in 1867 on the San Antonio–El Paso Road, Fort Davis became one of the largest frontier posts where Buffalo Soldiers of the 9th and 10th Cavalry and 24th and 25th Infantry garrisoned, patrolled, and built infrastructure across West Texas until the 1890s. The restored post is a National Park Service unit documenting African American service on the frontier.",
-    "eraBuckets": [
-      "1860s",
-      "1870s",
-      "1880s"
-    ],
-    "topicTags": [
-      "military",
-      "frontier"
-    ],
+    "eraBuckets": ["1860s", "1870s", "1880s"],
+    "topicTags": ["military", "frontier"],
     "jurisdictionLabel": "Fort Davis, Texas",
     "locationPrecision": "campus",
     "locationLabel": "Fort Davis National Historic Site, 101 Lt. Flipper Drive, Fort Davis",
@@ -37,10 +30,7 @@
       }
     ],
     "historicalContext": "Buffalo Soldier units at Fort Davis mapped passes, escorted mail and wagon trains, and pursued raiders across the Trans-Pecos. Second Lieutenant Henry O. Flipper, the first Black West Point graduate, served at the post before his controversial court-martial — a story told today alongside the broader record of Black regulars on the frontier.",
-    "topicIds": [
-      "military",
-      "frontier"
-    ],
+    "topicIds": ["military", "frontier"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -49,15 +39,8 @@
     "kind": "place",
     "displayName": "Fort Huachuca",
     "summary": "Established in 1877 in southeastern Arizona, Fort Huachuca became the headquarters of the 10th Cavalry and a long-term home for Buffalo Soldier regiments that patrolled the borderlands, fought in the Apache campaigns, and later served through two world wars. Its historic district and museum document more than a century of Black military service in the West.",
-    "eraBuckets": [
-      "1870s",
-      "1880s",
-      "1890s"
-    ],
-    "topicTags": [
-      "military",
-      "frontier"
-    ],
+    "eraBuckets": ["1870s", "1880s", "1890s"],
+    "topicTags": ["military", "frontier"],
     "jurisdictionLabel": "Fort Huachuca, Arizona",
     "locationPrecision": "campus",
     "locationLabel": "Fort Huachuca Old Post, 41401 Grierson Avenue, Fort Huachuca",
@@ -82,10 +65,7 @@
       }
     ],
     "historicalContext": "From the 1870s through the early twentieth century, Black troopers at Huachuca mapped trails, built telegraph lines, and fought in campaigns against Apache leaders including Geronimo. The post remains an active U.S. Army installation and houses the Fort Huachuca Museum on its historic Old Post.",
-    "topicIds": [
-      "military",
-      "frontier"
-    ],
+    "topicIds": ["military", "frontier"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -94,15 +74,8 @@
     "kind": "place",
     "displayName": "Fort Concho National Historic Landmark",
     "summary": "Built in 1867 at the junction of the North and Middle Concho Rivers in San Angelo, Fort Concho anchored U.S. control of West Texas. Buffalo Soldiers of the 9th Cavalry and 24th and 25th Infantry garrisoned the post from 1869 to 1885, scouting, building roads, and protecting settlers on the frontier.",
-    "eraBuckets": [
-      "1860s",
-      "1870s",
-      "1880s"
-    ],
-    "topicTags": [
-      "military",
-      "frontier"
-    ],
+    "eraBuckets": ["1860s", "1870s", "1880s"],
+    "topicTags": ["military", "frontier"],
     "jurisdictionLabel": "San Angelo, Texas",
     "locationPrecision": "campus",
     "locationLabel": "Fort Concho National Historic Landmark, 630 South Oakes Street, San Angelo",
@@ -127,10 +100,7 @@
       }
     ],
     "historicalContext": "San Angelo's fort was a supply hub for campaigns across the Llano Estacado. Black troopers here faced harsh desert duty and earned the respect — and the nickname — that frontier peoples applied to the segregated regiments across the West.",
-    "topicIds": [
-      "military",
-      "frontier"
-    ],
+    "topicIds": ["military", "frontier"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -139,14 +109,8 @@
     "kind": "place",
     "displayName": "Fort Garland Museum",
     "summary": "Built in 1858 in the San Luis Valley, Fort Garland guarded settlers in southern Colorado. From 1876 to 1879 the 9th Cavalry — Buffalo Soldiers — garrisoned the post under Colonel Kit Carson's successor command structure, patrolling Ute country before the fort closed in 1883.",
-    "eraBuckets": [
-      "1870s",
-      "1880s"
-    ],
-    "topicTags": [
-      "military",
-      "frontier"
-    ],
+    "eraBuckets": ["1870s", "1880s"],
+    "topicTags": ["military", "frontier"],
     "jurisdictionLabel": "Fort Garland, Colorado",
     "locationPrecision": "campus",
     "locationLabel": "Fort Garland Museum, 29477 Highway 159, Fort Garland",
@@ -171,10 +135,7 @@
       }
     ],
     "historicalContext": "The San Luis Valley assignment placed Black cavalrymen between Ute communities and incoming Anglo and Hispanic settlers during a volatile period of treaty breakdown. Fort Garland today interprets both the Buffalo Soldier era and the broader military occupation of Colorado's mountain frontier.",
-    "topicIds": [
-      "military",
-      "frontier"
-    ],
+    "topicIds": ["military", "frontier"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -183,15 +144,8 @@
     "kind": "place",
     "displayName": "Fort Selden Historic Site",
     "summary": "Established in 1865 on the Rio Grande near Las Cruces, Fort Selden housed Buffalo Soldiers of the 9th Cavalry and 24th and 25th Infantry who protected settlers, mail routes, and railroad construction in southern New Mexico. Ruins of the adobe post are preserved as a New Mexico Historic Site.",
-    "eraBuckets": [
-      "1860s",
-      "1870s",
-      "1880s"
-    ],
-    "topicTags": [
-      "military",
-      "frontier"
-    ],
+    "eraBuckets": ["1860s", "1870s", "1880s"],
+    "topicTags": ["military", "frontier"],
     "jurisdictionLabel": "Radium Springs, New Mexico",
     "locationPrecision": "campus",
     "locationLabel": "Fort Selden Historic Site, 1280 Fort Selden Road, Radium Springs",
@@ -216,10 +170,7 @@
       }
     ],
     "historicalContext": "Among the children who lived at Fort Selden during the Buffalo Soldier era was Douglas MacArthur, whose father commanded the post — a reminder that Black regulars served alongside and under white officers across the Southwestern garrison network.",
-    "topicIds": [
-      "military",
-      "frontier"
-    ],
+    "topicIds": ["military", "frontier"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -228,14 +179,8 @@
     "kind": "place",
     "displayName": "Camp Naco Historic District",
     "summary": "Built between 1919 and 1923 near the Arizona–Sonora border, Camp Naco is the last surviving adobe post from the U.S. Army's Mexican Border Defense network. Buffalo Soldiers of the 9th and 10th Cavalry and 25th Infantry garrisoned the cantonment from 1911 to 1924, patrolling a border crossed daily by revolution-era violence.",
-    "eraBuckets": [
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "military",
-      "frontier"
-    ],
+    "eraBuckets": ["1910s", "1920s"],
+    "topicTags": ["military", "frontier"],
     "jurisdictionLabel": "Naco, Arizona",
     "locationPrecision": "campus",
     "locationLabel": "Camp Naco Historic District, 2118 West Newell Street, Naco",
@@ -260,10 +205,7 @@
       }
     ],
     "historicalContext": "Camp Naco's Buffalo Soldiers watched battles of the Mexican Revolution from the American side of the line while protecting railroads and towns. Community-led stabilization efforts continue to preserve the adobe officers' quarters and enlisted men's barracks.",
-    "topicIds": [
-      "military",
-      "frontier"
-    ],
+    "topicIds": ["military", "frontier"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -272,15 +214,8 @@
     "kind": "place",
     "displayName": "Fort Craig National Historic Site",
     "summary": "Fort Craig guarded the Rio Grande crossing on the El Camino Real de Tierra Adentro south of Socorro. After the Civil War, Buffalo Soldiers of the 9th Cavalry and 38th and 125th Infantry rotated through the post, patrolling Apache country until the fort was abandoned in 1885.",
-    "eraBuckets": [
-      "1860s",
-      "1870s",
-      "1880s"
-    ],
-    "topicTags": [
-      "military",
-      "frontier"
-    ],
+    "eraBuckets": ["1860s", "1870s", "1880s"],
+    "topicTags": ["military", "frontier"],
     "jurisdictionLabel": "Socorro County, New Mexico",
     "locationPrecision": "site",
     "locationLabel": "Fort Craig National Historic Site, 15700 Highway 1, San Antonio, New Mexico",
@@ -305,10 +240,7 @@
       }
     ],
     "historicalContext": "The fort's Civil War earthworks and adobe ruins sit along a trade route older than the Army itself. Buffalo Soldier patrols from Fort Craig linked a chain of posts — Selden, McRae, and Stanton — that controlled movement through Apache homelands.",
-    "topicIds": [
-      "military",
-      "frontier"
-    ],
+    "topicIds": ["military", "frontier"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -317,15 +249,8 @@
     "kind": "place",
     "displayName": "Boley Historic District",
     "summary": "Founded in 1903 on Creek Nation land in Okfuskee County, Boley grew from a railroad construction camp into one of the largest and most prosperous all-Black towns in the United States, with its own bank, schools, and businesses. Its surviving commercial core is a National Historic Landmark District.",
-    "eraBuckets": [
-      "1900s",
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "town",
-      "community"
-    ],
+    "eraBuckets": ["1900s", "1910s", "1920s"],
+    "topicTags": ["town", "community"],
     "jurisdictionLabel": "Boley, Oklahoma",
     "locationPrecision": "district",
     "locationLabel": "Boley Historic District, bounded by Seward Avenue, Cedar Street, Walnut Street, and southern city limits",
@@ -350,10 +275,7 @@
       }
     ],
     "historicalContext": "Booker T. Washington visited Boley and praised it as proof that Black towns could thrive in the West. The annual Boley Rodeo, begun in the early twentieth century, remains a living tradition of the town's ranching culture.",
-    "topicIds": [
-      "town",
-      "community"
-    ],
+    "topicIds": ["town", "community"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -362,14 +284,8 @@
     "kind": "place",
     "displayName": "Langston",
     "summary": "Opened for settlement in April 1890 in Oklahoma Territory, Langston was promoted by Black town builders including Edward P. McCabe as a self-governing community where African Americans could own land and vote. Langston University, established in 1897, helped the town survive as one of Oklahoma's thirteen remaining historic all-Black towns.",
-    "eraBuckets": [
-      "1890s",
-      "1900s"
-    ],
-    "topicTags": [
-      "town",
-      "community"
-    ],
+    "eraBuckets": ["1890s", "1900s"],
+    "topicTags": ["town", "community"],
     "jurisdictionLabel": "Langston, Oklahoma",
     "locationPrecision": "city",
     "locationLabel": "Langston, Logan County, Oklahoma",
@@ -394,10 +310,7 @@
       }
     ],
     "historicalContext": "Unlike All-Black towns founded in Indian Territory, Langston and nearby Brooksville were planted in Oklahoma Territory during the land-run era. McCabe's Langston City Herald urged migrants to build political power through concentrated settlement — a western counterpart to Exoduster colonization in Kansas.",
-    "topicIds": [
-      "town",
-      "community"
-    ],
+    "topicIds": ["town", "community"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -406,14 +319,8 @@
     "kind": "place",
     "displayName": "Dearfield",
     "summary": "Founded in 1910 by Oliver Toussaint Jackson on the dry plains of Weld County, Dearfield became the largest Black homesteading settlement in Colorado, reaching roughly 300 residents and profitable dryland farms before drought and the Dust Bowl emptied the town. Two buildings and the townsite survive as a National Register historic district.",
-    "eraBuckets": [
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "town",
-      "community"
-    ],
+    "eraBuckets": ["1910s", "1920s"],
+    "topicTags": ["town", "community"],
     "jurisdictionLabel": "Weld County, Colorado",
     "locationPrecision": "site",
     "locationLabel": "Dearfield Historic District, along Colorado Highway 34 west of Wiggins",
@@ -438,10 +345,7 @@
       }
     ],
     "historicalContext": "Dearfield's prosperity during World War I — when homesteaders netted more than $50,000 from a single harvest — showed that Black farmers could succeed on Colorado's arid land before climate and markets turned. The Black American West Museum in Denver holds preservation efforts at the site.",
-    "topicIds": [
-      "town",
-      "community"
-    ],
+    "topicIds": ["town", "community"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -450,15 +354,8 @@
     "kind": "place",
     "displayName": "Blackdom",
     "summary": "Incorporated in 1903 by Frank and Ella Boyer and twelve other African American founders, Blackdom was the first all-Black settlement in New Mexico, peaking at roughly 300 residents with a church, school, post office, and store on the Pecos Valley prairie south of Roswell before drought drove families out by the mid-1920s.",
-    "eraBuckets": [
-      "1900s",
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "town",
-      "community"
-    ],
+    "eraBuckets": ["1900s", "1910s", "1920s"],
+    "topicTags": ["town", "community"],
     "jurisdictionLabel": "Chaves County, New Mexico",
     "locationPrecision": "site",
     "locationLabel": "Blackdom Townsite historical marker, near Hagerman, Chaves County",
@@ -483,10 +380,7 @@
       }
     ],
     "historicalContext": "Frank Boyer walked from Georgia to New Mexico carrying his father's stories of free land in the West. Blackdom's street names — Washington, Lincoln, and Love — mapped political aspirations onto desert homesteads at a time when Roswell's growing white population offered Black settlers few alternatives.",
-    "topicIds": [
-      "town",
-      "community"
-    ],
+    "topicIds": ["town", "community"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -495,16 +389,8 @@
     "kind": "place",
     "displayName": "Tennessee Town",
     "summary": "In 1879 Exodusters — many from Tennessee — purchased land in Topeka's King's Addition and built Tennessee Town, one of the first concentrated Black neighborhoods in Kansas's capital and a western anchor of the Exoduster migration. By the 1890s the community supported churches, schools, and the first Black kindergarten west of the Mississippi River.",
-    "eraBuckets": [
-      "1870s",
-      "1880s",
-      "1890s"
-    ],
-    "topicTags": [
-      "town",
-      "community",
-      "migration"
-    ],
+    "eraBuckets": ["1870s", "1880s", "1890s"],
+    "topicTags": ["town", "community", "migration"],
     "jurisdictionLabel": "Topeka, Kansas",
     "locationPrecision": "neighborhood",
     "locationLabel": "Tennessee Town neighborhood, bounded by SW Munson Avenue, SW Clay Street, SW Huntoon Street, and SW Washburn Avenue",
@@ -529,11 +415,7 @@
       }
     ],
     "historicalContext": "Topeka was the only Kansas city with an organized Exoduster relief program through the Kansas Freedmen's Relief Association. Skilled Exoduster carpenters and masons helped build the expanding state capitol while Tennessee Town's churches anchored community life a mile southwest of the dome.",
-    "topicIds": [
-      "town",
-      "community",
-      "migration"
-    ],
+    "topicIds": ["town", "community", "migration"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -542,15 +424,8 @@
     "kind": "place",
     "displayName": "Bill Pickett Memorial, Fort Worth Stockyards",
     "summary": "Born in 1870 in Texas's Williamson County, Bill Pickett invented bulldogging — wrestling steers by the lip — and became one of the most famous Black cowboys in the West, performing with the 101 Ranch Wild West Show. A bronze memorial at the Fort Worth Stockyards honors his legacy in the cattle-driving culture Black Texans helped build.",
-    "eraBuckets": [
-      "1890s",
-      "1900s",
-      "1910s"
-    ],
-    "topicTags": [
-      "culture",
-      "frontier"
-    ],
+    "eraBuckets": ["1890s", "1900s", "1910s"],
+    "topicTags": ["culture", "frontier"],
     "jurisdictionLabel": "Fort Worth, Texas",
     "locationPrecision": "campus",
     "locationLabel": "Bill Pickett Memorial, Fort Worth Stockyards National Historic District, East Exchange Avenue",
@@ -575,10 +450,7 @@
       }
     ],
     "historicalContext": "Historians estimate that one in four cowboys in the late nineteenth-century cattle trade was Black, though rodeo and Hollywood later erased that presence. Pickett's bulldogging technique — biting a steer's lip to bring it down — made him a star but also underscored the raw skill Black horsemen brought to the range.",
-    "topicIds": [
-      "culture",
-      "frontier"
-    ],
+    "topicIds": ["culture", "frontier"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -587,14 +459,8 @@
     "kind": "place",
     "displayName": "Folsom Site",
     "summary": "In 1908 the Black cowboy and ranch foreman George McJunkin discovered ancient bison bones in a arroyo after a flood on Crowfoot Ranch near Folsom, New Mexico — evidence that led archaeologists to the 1926 Folsom excavation proving human presence in North America more than 10,000 years ago. The Folsom Site is listed in the National Register of Historic Places.",
-    "eraBuckets": [
-      "1900s",
-      "1920s"
-    ],
-    "topicTags": [
-      "culture",
-      "frontier"
-    ],
+    "eraBuckets": ["1900s", "1920s"],
+    "topicTags": ["culture", "frontier"],
     "jurisdictionLabel": "Folsom, New Mexico",
     "locationPrecision": "site",
     "locationLabel": "Folsom Site, Wild Horse Arroyo, near Folsom, Union County",
@@ -619,10 +485,7 @@
       }
     ],
     "historicalContext": "McJunkin spent years trying to interest scientists in the bones he found while working cattle on the High Plains. His discovery did not bring him recognition in his lifetime, but the Folsom Site now stands as a landmark where a Black cowboy's eye for the land changed American archaeology.",
-    "topicIds": [
-      "culture",
-      "frontier"
-    ],
+    "topicIds": ["culture", "frontier"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -631,16 +494,8 @@
     "kind": "place",
     "displayName": "Buffalo Soldier Memorial, Fort Bliss",
     "summary": "Buffalo Soldier regiments garrisoned Fort Bliss and the El Paso borderlands from 1869 to 1885, protecting routes through the Southwest. The 1999 bronze memorial titled The Errand of Corporal Ross, depicting 9th Cavalry trooper John Ross, stands at the post's Buffalo Soldier Road entrance.",
-    "eraBuckets": [
-      "1860s",
-      "1870s",
-      "1880s",
-      "1990s"
-    ],
-    "topicTags": [
-      "military",
-      "frontier"
-    ],
+    "eraBuckets": ["1860s", "1870s", "1880s", "1990s"],
+    "topicTags": ["military", "frontier"],
     "jurisdictionLabel": "El Paso, Texas",
     "locationPrecision": "campus",
     "locationLabel": "Buffalo Soldier Memorial, Buffalo Soldier Road, Fort Bliss",
@@ -665,10 +520,7 @@
       }
     ],
     "historicalContext": "Buffalo Soldier units produced twenty-three Medal of Honor recipients during the Indian Wars and later conflicts. Fifty-two Buffalo Soldiers are buried at Fort Bliss National Cemetery and nearby Concordia Cemetery in El Paso.",
-    "topicIds": [
-      "military",
-      "frontier"
-    ],
+    "topicIds": ["military", "frontier"],
     "mentionedEntityIds": [],
     "keywords": []
   }

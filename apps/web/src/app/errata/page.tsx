@@ -34,7 +34,12 @@ export default function ErrataPage() {
         and preserved — nothing is silently edited.
       </p>
 
-      <section className="ds-section" aria-labelledby="errata-policy" id="policy" style={{ paddingTop: 0 }}>
+      <section
+        className="ds-section"
+        aria-labelledby="errata-policy"
+        id="policy"
+        style={{ paddingTop: 0 }}
+      >
         <h2 className="ds-section__title" id="errata-policy">
           Corrections policy
         </h2>
@@ -43,7 +48,8 @@ export default function ErrataPage() {
           <strong>clarification</strong> (wording sharpened without changing the fact),{' '}
           <strong>update</strong> (new evidence added or status changed), and{' '}
           <strong>editor&apos;s note</strong> (editorial framing only). Corrected facts also carry
-          schema.org <span className="ds-mono">CorrectionComment</span> markup on their record pages.
+          schema.org <span className="ds-mono">CorrectionComment</span> markup on their record
+          pages.
         </p>
         <p className="ds-sans">
           Report a new issue through the <a href="/corrections">corrections lane</a>. Subscribe via{' '}
@@ -73,7 +79,9 @@ export default function ErrataPage() {
                   {' · '}
                   <span className="ds-mono">{ERRATA_CHANGE_TYPE_LABELS[entry.changeType]}</span>
                 </p>
-                <h3 className="ds-subheading" style={{ margin: 'var(--ds-space-2) 0' }}>{entry.headline}</h3>
+                <h3 className="ds-subheading" style={{ margin: 'var(--ds-space-2) 0' }}>
+                  {entry.headline}
+                </h3>
                 <p style={{ margin: 0 }}>{entry.summary}</p>
                 {entry.affectedUrl ? (
                   <p style={{ margin: 'var(--ds-space-2) 0 0 0' }}>

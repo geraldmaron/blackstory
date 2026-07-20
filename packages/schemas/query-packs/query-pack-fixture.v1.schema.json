@@ -14,15 +14,7 @@
     "pack": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "id",
-        "displayName",
-        "entityKind",
-        "theme",
-        "version",
-        "terms",
-        "createdAt"
-      ],
+      "required": ["id", "displayName", "entityKind", "theme", "version", "terms", "createdAt"],
       "properties": {
         "schemaVersion": { "type": "string", "const": "query-pack.v1" },
         "id": { "type": "string", "minLength": 1 },

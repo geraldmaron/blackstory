@@ -31,9 +31,7 @@ const IN_SCOPE_STATE_FIPS = new Set(US_STATES.map((state) => state.fips));
 type CompactCounts = { total: number; black: number };
 type CountyIndexFile = {
   readonly vintages?: readonly string[];
-  readonly counties?: Readonly<
-    Record<string, Readonly<Partial<Record<string, CompactCounts>>>>
-  >;
+  readonly counties?: Readonly<Record<string, Readonly<Partial<Record<string, CompactCounts>>>>>;
 };
 
 function rollupCountiesToStates(countyPath: string): {

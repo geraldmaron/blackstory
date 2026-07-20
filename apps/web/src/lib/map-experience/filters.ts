@@ -47,8 +47,10 @@ export function applyExploreFilters(
   return features.filter((feature) => {
     if (filters.kind !== 'all' && feature.properties.kind !== filters.kind) return false;
     if (filters.era !== 'all' && !feature.properties.eraBuckets.includes(filters.era)) return false;
-    if (filters.theme !== 'all' && !feature.properties.topicTags.includes(filters.theme)) return false;
-    if (filters.confidence !== 'all' && feature.properties.confidenceTier !== filters.confidence) return false;
+    if (filters.theme !== 'all' && !feature.properties.topicTags.includes(filters.theme))
+      return false;
+    if (filters.confidence !== 'all' && feature.properties.confidenceTier !== filters.confidence)
+      return false;
     if (stateFilter && feature.properties.statePostalCode !== stateFilter) return false;
     return true;
   });
@@ -126,10 +128,19 @@ export type ExploreFacetOptions = {
 /** Facet counts (and thus options) are always derived from the CURRENT filtered set the caller
  * passes in pass the full unfiltered collection to build "browse" options, or the
  * already-filtered collection to reflect what's left after other filters are applied. */
-export function buildExploreFacetOptions(features: readonly ExploreMapFeature[]): ExploreFacetOptions {
+export function buildExploreFacetOptions(
+  features: readonly ExploreMapFeature[],
+): ExploreFacetOptions {
   return {
-    kind: toOptions(countBy(features, (feature) => [feature.properties.kind]), 'All kinds'),
-    era: toOptions(countBy(features, (feature) => feature.properties.eraBuckets), 'All eras', 'chrono'),
+    kind: toOptions(
+      countBy(features, (feature) => [feature.properties.kind]),
+      'All kinds',
+    ),
+    era: toOptions(
+      countBy(features, (feature) => feature.properties.eraBuckets),
+      'All eras',
+      'chrono',
+    ),
     theme: toOptions(countBy(features, effectiveTopicIds), 'All themes'),
     confidence: toOptions(
       countBy(features, (feature) => [feature.properties.confidenceTier]),

@@ -1,4 +1,3 @@
-
 /**
  * Tests for the Firestore vector index store.
  *
@@ -13,7 +12,12 @@ import { test } from 'node:test';
 import { createAdminVectorIndexStore, createInMemoryVectorIndexStore } from './vector-store.js';
 import { DISTANCE_MEASURE, VECTOR_FIELD_NAME } from './constants.js';
 
-function doc(entityId: string, kind: 'person' | 'event' | 'place', vector: readonly number[], extra: { state?: string; eraBucket?: string } = {}) {
+function doc(
+  entityId: string,
+  kind: 'person' | 'event' | 'place',
+  vector: readonly number[],
+  extra: { state?: string; eraBucket?: string } = {},
+) {
   return {
     entityId,
     kind,
@@ -42,8 +46,12 @@ test('in-memory store: findNearest sorts by DOT_PRODUCT distance descending and 
 
 test('in-memory store: pre-filters by kind/state/eraBucket before ranking', async () => {
   const store = createInMemoryVectorIndexStore();
-  await store.writeEmbedding(doc('person-nc', 'person', [1, 0], { state: 'NC', eraBucket: '1960s' }));
-  await store.writeEmbedding(doc('person-ny', 'person', [1, 0], { state: 'NY', eraBucket: '1960s' }));
+  await store.writeEmbedding(
+    doc('person-nc', 'person', [1, 0], { state: 'NC', eraBucket: '1960s' }),
+  );
+  await store.writeEmbedding(
+    doc('person-ny', 'person', [1, 0], { state: 'NY', eraBucket: '1960s' }),
+  );
   await store.writeEmbedding(doc('event-nc', 'event', [1, 0], { state: 'NC', eraBucket: '1960s' }));
 
   const matches = await store.findNearest({
@@ -63,7 +71,11 @@ test('in-memory store: DOT_PRODUCT threshold keeps matches with distance >= thre
   await store.writeEmbedding(doc('close', 'event', [1, 0]));
   await store.writeEmbedding(doc('far', 'event', [0, 1]));
 
-  const matches = await store.findNearest({ queryVector: [1, 0], limit: 10, distanceThreshold: 0.5 });
+  const matches = await store.findNearest({
+    queryVector: [1, 0],
+    limit: 10,
+    distanceThreshold: 0.5,
+  });
   assert.deepEqual(
     matches.map((match) => match.entityId),
     ['close'],
@@ -129,8 +141,12 @@ function createFakeCollection(resultDocs: Array<{ id: string; data: Record<strin
 }
 
 test('admin store: findNearest applies kind/state/eraBucket as equality where clauses', async () => {
-  const fake = createFakeCollection([{ id: 'e1', data: { kind: 'person', state: 'NC', distance: 0.87 } }]);
-  const firestore = { collection: () => fake } as unknown as Parameters<typeof createAdminVectorIndexStore>[0];
+  const fake = createFakeCollection([
+    { id: 'e1', data: { kind: 'person', state: 'NC', distance: 0.87 } },
+  ]);
+  const firestore = { collection: () => fake } as unknown as Parameters<
+    typeof createAdminVectorIndexStore
+  >[0];
   const store = createAdminVectorIndexStore(firestore);
 
   const matches = await store.findNearest({
@@ -157,7 +173,9 @@ test('admin store: findNearest applies kind/state/eraBucket as equality where cl
 
 test('admin store: clamps an oversized limit to the platform ceiling of 1000', async () => {
   const fake = createFakeCollection([]);
-  const firestore = { collection: () => fake } as unknown as Parameters<typeof createAdminVectorIndexStore>[0];
+  const firestore = { collection: () => fake } as unknown as Parameters<
+    typeof createAdminVectorIndexStore
+  >[0];
   const store = createAdminVectorIndexStore(firestore);
 
   await store.findNearest({ queryVector: [1, 0], limit: 5000 });

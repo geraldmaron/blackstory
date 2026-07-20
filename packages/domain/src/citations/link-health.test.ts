@@ -22,7 +22,12 @@ import {
 
 test('a 200 response with no redirects classifies as alive', () => {
   const result = classifyLinkCheckAttempt({
-    fetch: { ok: true, finalUrl: 'https://example.gov/a', redirectCount: 0, contentHash: 'a'.repeat(64) },
+    fetch: {
+      ok: true,
+      finalUrl: 'https://example.gov/a',
+      redirectCount: 0,
+      contentHash: 'a'.repeat(64),
+    },
   });
   assert.equal(result.status, 'alive');
 });
@@ -63,7 +68,13 @@ test('a DNS resolution failure classifies as dead (NXDOMAIN-shaped)', () => {
 
 test('a 402/403 classifies as dead with paywalled reason', () => {
   const result = classifyLinkCheckAttempt({
-    fetch: { ok: true, finalUrl: 'https://example.gov/a', redirectCount: 0, contentHash: 'c'.repeat(64), httpStatus: 402 },
+    fetch: {
+      ok: true,
+      finalUrl: 'https://example.gov/a',
+      redirectCount: 0,
+      contentHash: 'c'.repeat(64),
+      httpStatus: 402,
+    },
   });
   assert.deepEqual([result.status, result.deadReason], ['dead', 'paywalled']);
 });
@@ -91,7 +102,12 @@ test('a content-hash mismatch with divergent text classifies as drifted', () => 
 
 test('a content-hash mismatch with similar text does not flag drift', () => {
   const result = classifyLinkCheckAttempt({
-    fetch: { ok: true, finalUrl: 'https://example.gov/a', redirectCount: 0, contentHash: 'f'.repeat(64) },
+    fetch: {
+      ok: true,
+      finalUrl: 'https://example.gov/a',
+      redirectCount: 0,
+      contentHash: 'f'.repeat(64),
+    },
     capturedContentHash: contentHashFromHex('e'.repeat(64)),
     capturedText: 'The grand jury convened in Levy County to review the events of January 1923.',
     liveText: 'The grand jury convened in Levy County to review the events of January 1923!',
@@ -103,15 +119,24 @@ test('retry-before-death: consecutive pending_retry attempts do not flip to dead
   let state = initialLinkHealthState('cit-1', '2026-01-01T00:00:00.000Z');
   const attempt = classifyLinkCheckAttempt({ fetch: { ok: false, reason: 'transport_failed' } });
 
-  state = advanceLinkHealthState(state, attempt, { checkedAt: '2026-01-08T00:00:00.000Z', maxRetriesBeforeDead: 3 });
+  state = advanceLinkHealthState(state, attempt, {
+    checkedAt: '2026-01-08T00:00:00.000Z',
+    maxRetriesBeforeDead: 3,
+  });
   assert.equal(state.status, 'alive', 'first failure must not declare death');
   assert.equal(state.consecutiveFailures, 1);
 
-  state = advanceLinkHealthState(state, attempt, { checkedAt: '2026-01-15T00:00:00.000Z', maxRetriesBeforeDead: 3 });
+  state = advanceLinkHealthState(state, attempt, {
+    checkedAt: '2026-01-15T00:00:00.000Z',
+    maxRetriesBeforeDead: 3,
+  });
   assert.equal(state.status, 'alive', 'second failure must still not declare death');
   assert.equal(state.consecutiveFailures, 2);
 
-  state = advanceLinkHealthState(state, attempt, { checkedAt: '2026-01-22T00:00:00.000Z', maxRetriesBeforeDead: 3 });
+  state = advanceLinkHealthState(state, attempt, {
+    checkedAt: '2026-01-22T00:00:00.000Z',
+    maxRetriesBeforeDead: 3,
+  });
   assert.equal(state.status, 'dead', 'third consecutive failure exhausts the retry budget');
   assert.equal(state.consecutiveFailures, 3);
 });
@@ -120,7 +145,12 @@ test('retry-before-death: a success in between resets the consecutive-failure co
   let state = initialLinkHealthState('cit-1', '2026-01-01T00:00:00.000Z');
   const failure = classifyLinkCheckAttempt({ fetch: { ok: false, reason: 'transport_failed' } });
   const success = classifyLinkCheckAttempt({
-    fetch: { ok: true, finalUrl: 'https://example.gov/a', redirectCount: 0, contentHash: 'a'.repeat(64) },
+    fetch: {
+      ok: true,
+      finalUrl: 'https://example.gov/a',
+      redirectCount: 0,
+      contentHash: 'a'.repeat(64),
+    },
   });
 
   state = advanceLinkHealthState(state, failure, { checkedAt: '2026-01-08T00:00:00.000Z' });
@@ -132,8 +162,13 @@ test('retry-before-death: a success in between resets the consecutive-failure co
 
 test('an explicit dead classification (e.g. 404) is not subject to the retry budget', () => {
   const state = initialLinkHealthState('cit-1', '2026-01-01T00:00:00.000Z');
-  const notFound = classifyLinkCheckAttempt({ fetch: { ok: false, reason: 'transport_failed', httpStatus: 404 } });
-  const advanced = advanceLinkHealthState(state, notFound, { checkedAt: '2026-01-08T00:00:00.000Z', maxRetriesBeforeDead: 3 });
+  const notFound = classifyLinkCheckAttempt({
+    fetch: { ok: false, reason: 'transport_failed', httpStatus: 404 },
+  });
+  const advanced = advanceLinkHealthState(state, notFound, {
+    checkedAt: '2026-01-08T00:00:00.000Z',
+    maxRetriesBeforeDead: 3,
+  });
   assert.equal(advanced.status, 'dead');
 });
 

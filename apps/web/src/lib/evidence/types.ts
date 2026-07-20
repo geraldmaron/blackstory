@@ -97,7 +97,12 @@ export type EvidenceDisputeView = {
   readonly alternates: readonly EvidenceAlternateValue[];
 };
 
-export const EVIDENCE_REVISION_CHANGE_KINDS = ['created', 'revised', 'corrected', 'retracted'] as const;
+export const EVIDENCE_REVISION_CHANGE_KINDS = [
+  'created',
+  'revised',
+  'corrected',
+  'retracted',
+] as const;
 export type EvidenceRevisionChangeKind = (typeof EVIDENCE_REVISION_CHANGE_KINDS)[number];
 
 export type EvidenceRevisionEntry = {

@@ -73,7 +73,10 @@ function extractId(record: Record<string, unknown>): string | undefined {
   return undefined;
 }
 
-function parseDoc(raw: unknown, index: number): { doc: DplaNormalizedDoc } | { rejected: DplaRejectedDoc } {
+function parseDoc(
+  raw: unknown,
+  index: number,
+): { doc: DplaNormalizedDoc } | { rejected: DplaRejectedDoc } {
   if (!raw || typeof raw !== 'object') {
     return { rejected: { index, reason: 'not_an_object' } };
   }
@@ -123,7 +126,11 @@ export function parseDplaSearchResponse(raw: unknown): DplaParsedBatch {
     throw new Error('DPLA search response must be an object');
   }
   const record = raw as Record<string, unknown>;
-  const rawDocs = Array.isArray(record.docs) ? record.docs : Array.isArray(record.items) ? record.items : [];
+  const rawDocs = Array.isArray(record.docs)
+    ? record.docs
+    : Array.isArray(record.items)
+      ? record.items
+      : [];
 
   const docs: DplaNormalizedDoc[] = [];
   const rejected: DplaRejectedDoc[] = [];
@@ -143,7 +150,12 @@ export function parseDplaSearchResponse(raw: unknown): DplaParsedBatch {
   };
 }
 
-export function buildDplaSearchUrl(input: { readonly query: string; readonly apiKey: string; readonly page?: number; readonly pageSize?: number }): string {
+export function buildDplaSearchUrl(input: {
+  readonly query: string;
+  readonly apiKey: string;
+  readonly page?: number;
+  readonly pageSize?: number;
+}): string {
   const params = new URLSearchParams({
     q: input.query,
     api_key: input.apiKey,

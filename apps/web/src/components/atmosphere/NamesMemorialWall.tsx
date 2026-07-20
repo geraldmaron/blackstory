@@ -145,15 +145,18 @@ export function NamesMemorialWall({
 
       busy.add(swap.cellIndex);
       setGlyphs((prev) => applyMemorialNameSwap(prev, swap));
-      const clearId = window.setTimeout(() => {
-        busy.delete(swap.cellIndex);
-        if (cancelled) return;
-        setGlyphs((prev) =>
-          prev.map((glyph, index) =>
-            index === swap.cellIndex ? { ...glyph, fading: false } : glyph,
-          ),
-        );
-      }, CROSSFADE_MS + 80 + staggerIndex * 30);
+      const clearId = window.setTimeout(
+        () => {
+          busy.delete(swap.cellIndex);
+          if (cancelled) return;
+          setGlyphs((prev) =>
+            prev.map((glyph, index) =>
+              index === swap.cellIndex ? { ...glyph, fading: false } : glyph,
+            ),
+          );
+        },
+        CROSSFADE_MS + 80 + staggerIndex * 30,
+      );
       timeoutIds.push(clearId);
     };
 
@@ -193,7 +196,9 @@ export function NamesMemorialWall({
             className={[
               'ds-map-names-wall__glyph',
               `ds-map-names-wall__glyph--${slot.weight}`,
-              glyph.present ? 'ds-map-names-wall__glyph--present' : 'ds-map-names-wall__glyph--empty',
+              glyph.present
+                ? 'ds-map-names-wall__glyph--present'
+                : 'ds-map-names-wall__glyph--empty',
               glyph.fading ? 'ds-map-names-wall__glyph--fading' : '',
             ]
               .filter(Boolean)

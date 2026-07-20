@@ -9,9 +9,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { ExploreAddressSearch } from './ExploreAddressSearch';
 
 test('renders place field, All radius chip, and live status region', () => {
-  const html = renderToStaticMarkup(
-    createElement(ExploreAddressSearch, { onResolved: () => {} }),
-  );
+  const html = renderToStaticMarkup(createElement(ExploreAddressSearch, { onResolved: () => {} }));
   assert.match(html, /Place/);
   assert.match(html, /City, state, or ZIP/);
   assert.match(html, />Go</);

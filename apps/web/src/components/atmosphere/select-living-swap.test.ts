@@ -4,10 +4,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { ATMOSPHERE_TILE_CREDITS } from './tile-credits';
-import {
-  applyLivingTileSwap,
-  pickLivingTileSwap,
-} from './select-living-swap';
+import { applyLivingTileSwap, pickLivingTileSwap } from './select-living-swap';
 import { selectMosaicTiles } from './select-atmosphere-plane';
 
 test('pickLivingTileSwap returns a fresh tile for a visible slot', () => {

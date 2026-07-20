@@ -28,7 +28,18 @@ export const naraAdapterDefinition = buildFederalAdapterDefinition({
   retention: DEFAULT_FEDERAL_RETENTION,
   exportFilter: {
     ...DEFAULT_FEDERAL_EXPORT_FILTER,
-    stripKeys: [...DEFAULT_FEDERAL_EXPORT_FILTER.stripKeys, 'digitalObjects', 'scopeAndContentNote'],
-    essentialKeys: ['stableIdentifier', 'title', 'canonicalUrl', 'classification', 'recordGroup', 'series'],
+    stripKeys: [
+      ...DEFAULT_FEDERAL_EXPORT_FILTER.stripKeys,
+      'digitalObjects',
+      'scopeAndContentNote',
+    ],
+    essentialKeys: [
+      'stableIdentifier',
+      'title',
+      'canonicalUrl',
+      'classification',
+      'recordGroup',
+      'series',
+    ],
   },
 });

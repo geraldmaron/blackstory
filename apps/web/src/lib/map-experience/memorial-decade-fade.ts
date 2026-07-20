@@ -127,10 +127,7 @@ export function memorialStaggerDelays(
 
 function setPassed(map: MapLibreMap, id: string, passed: boolean): void {
   try {
-    map.setFeatureState(
-      { source: MEMORIAL_SOURCE_ID, id },
-      { [MEMORIAL_PASSED_STATE]: passed },
-    );
+    map.setFeatureState({ source: MEMORIAL_SOURCE_ID, id }, { [MEMORIAL_PASSED_STATE]: passed });
   } catch (error) {
     console.error(`[memorial-decade] setFeatureState ${id} failed`, error);
   }
@@ -178,7 +175,10 @@ export function applyMemorialDecadeFrame(
     };
   }
 
-  const schedule = memorialStaggerDelays(plan.staggerPass, options?.staggerWindowMs ?? MEMORIAL_STAGGER_WINDOW_MS);
+  const schedule = memorialStaggerDelays(
+    plan.staggerPass,
+    options?.staggerWindowMs ?? MEMORIAL_STAGGER_WINDOW_MS,
+  );
   for (const entry of schedule) {
     const timeoutId = window.setTimeout(() => {
       if (cancelled) return;

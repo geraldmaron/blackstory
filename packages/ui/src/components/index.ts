@@ -1,4 +1,3 @@
-
 /**
  * Public exports for BlackStory accessible UI components.
  */
@@ -18,7 +17,12 @@ export {
   type MapExplorerStateAggregate,
 } from './MapExplorer.js';
 export { Notice, type NoticeProps, type NoticeTone } from './Notice.js';
-export { ResultList, type ResultItem, type ResultListProps, type ResultListLinkProps } from './ResultList.js';
+export {
+  ResultList,
+  type ResultItem,
+  type ResultListProps,
+  type ResultListLinkProps,
+} from './ResultList.js';
 export { ThemeToggle, type ThemeToggleProps } from './ThemeToggle.js';
 export {
   ShellHeader,

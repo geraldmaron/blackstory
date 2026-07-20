@@ -25,7 +25,10 @@ import { HowToReadThisRecord } from '../../../components/trust';
 import { WhyThisAppears } from '../../../components/why-appears';
 import { geoAnchorFor } from '../../../lib/map-experience/entity-geo';
 import { buildExternalMapsSearchUrl } from '../../../lib/geography/external-maps-url';
-import { buildExploreHref, defaultExploreOverlayState } from '../../../lib/map-experience/url-state';
+import {
+  buildExploreHref,
+  defaultExploreOverlayState,
+} from '../../../lib/map-experience/url-state';
 import { highestConfidence } from '../../../lib/map-experience/build-explore-map-source';
 import { mapToneFromTopics } from '../../../lib/map-experience/kind-encoding';
 import { buildEntityPageMetadata } from '../../../lib/seo/metadata-builders';
@@ -116,9 +119,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
     filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
     ...defaultExploreOverlayState(),
     selected: entity.id,
-    ...(geoAnchor
-      ? { viewport: { lat: geoAnchor.lat, lng: geoAnchor.lng, zoom: 11 } }
-      : {}),
+    ...(geoAnchor ? { viewport: { lat: geoAnchor.lat, lng: geoAnchor.lng, zoom: 11 } } : {}),
   });
 
   return (
@@ -137,10 +138,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
         <div className="ds-entity-mast__identity">
           <p className="ds-page__eyebrow">
             <span className="ds-entity-mast__meta">
-              <KindBadge
-                kind={entity.kind}
-                {...(mapTone !== undefined ? { mapTone } : {})}
-              />
+              <KindBadge kind={entity.kind} {...(mapTone !== undefined ? { mapTone } : {})} />
               {jurisdictionLabel ? (
                 <>
                   <span className="ds-entity-mast__meta-sep" aria-hidden="true">
@@ -402,7 +400,8 @@ export default async function EntityPage({ params }: EntityPageProps) {
             </p>
             <p className="ds-entity-aside__precision ds-sans">
               Location precision: <strong>{entity.locationPrecision}</strong>. Showing{' '}
-              {entity.locationLabel}. Exact residential addresses are never rendered on public pages.
+              {entity.locationLabel}. Exact residential addresses are never rendered on public
+              pages.
             </p>
 
             <section className="ds-aside-block" aria-labelledby="maturity-heading">

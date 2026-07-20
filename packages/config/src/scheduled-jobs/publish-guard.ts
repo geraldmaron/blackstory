@@ -1,4 +1,3 @@
-
 /**
  * The non-negotiable invariant for this whole: automation cannot publish. This module does
  * not reimplement that guard it calls straight through to assertDiscoveryCannotPublish

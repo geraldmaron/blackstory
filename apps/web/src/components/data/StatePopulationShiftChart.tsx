@@ -4,12 +4,7 @@
  */
 import React from 'react';
 import { DataChartFrame } from './DataChartFrame';
-import {
-  CHART_MARGIN,
-  CHART_WIDTH,
-  formatChartCount,
-  scaleLinear,
-} from './chart-utils';
+import { CHART_MARGIN, CHART_WIDTH, formatChartCount, scaleLinear } from './chart-utils';
 import {
   buildStateShiftBarRows,
   divergingBarDomain,
@@ -171,11 +166,17 @@ export function StatePopulationShiftChart({
       </svg>
       <ul className="ds-data-chart__legend" aria-hidden="true">
         <li className="ds-data-chart__legend-item">
-          <span className="ds-data-chart__legend-swatch" style={{ background: 'var(--ds-accent-graphic)' }} />
+          <span
+            className="ds-data-chart__legend-swatch"
+            style={{ background: 'var(--ds-accent-graphic)' }}
+          />
           Black population gains
         </li>
         <li className="ds-data-chart__legend-item">
-          <span className="ds-data-chart__legend-swatch" style={{ background: 'var(--ds-accent-muted)' }} />
+          <span
+            className="ds-data-chart__legend-swatch"
+            style={{ background: 'var(--ds-accent-muted)' }}
+          />
           Black population losses
         </li>
       </ul>

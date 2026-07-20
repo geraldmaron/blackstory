@@ -258,9 +258,15 @@ async function judgeOneSubject(input: {
             ),
           }
         : {}),
-      ...(draftsIn.topicIds !== undefined ? { topicIds: toSafeStringArray(draftsIn.topicIds) } : {}),
-      ...(draftsIn.eraBuckets !== undefined ? { eraBuckets: toSafeStringArray(draftsIn.eraBuckets) } : {}),
-      ...(draftsIn.keywords !== undefined ? { keywords: toSafeStringArray(draftsIn.keywords) } : {}),
+      ...(draftsIn.topicIds !== undefined
+        ? { topicIds: toSafeStringArray(draftsIn.topicIds) }
+        : {}),
+      ...(draftsIn.eraBuckets !== undefined
+        ? { eraBuckets: toSafeStringArray(draftsIn.eraBuckets) }
+        : {}),
+      ...(draftsIn.keywords !== undefined
+        ? { keywords: toSafeStringArray(draftsIn.keywords) }
+        : {}),
     };
     // Claims may cite only URLs the judge was actually shown — fabricated hrefs fail validation.
     const allowedCitationHrefs = (subject.sourceSnippets ?? []).flatMap(

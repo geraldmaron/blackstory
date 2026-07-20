@@ -23,9 +23,7 @@ function seedCorrection(moderationState?: 'coordinated_campaign') {
   assert.equal(result.accepted, true);
   if (!result.accepted) return undefined;
   const record =
-    moderationState !== undefined
-      ? { ...result.record, moderationState }
-      : result.record;
+    moderationState !== undefined ? { ...result.record, moderationState } : result.record;
   const store = createCorrectionSubmissionStore();
   const stored = buildStoredCorrection({
     record,

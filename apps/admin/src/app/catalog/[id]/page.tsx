@@ -116,8 +116,7 @@ export default function CatalogEntityDetailPage() {
 
           {detail.sensitivity && detail.sensitivity.length > 0 ? (
             <p className="ds-sans">
-              Sensitivity:{' '}
-              <span className="ds-mono">{detail.sensitivity.join(', ')}</span>
+              Sensitivity: <span className="ds-mono">{detail.sensitivity.join(', ')}</span>
             </p>
           ) : null}
 

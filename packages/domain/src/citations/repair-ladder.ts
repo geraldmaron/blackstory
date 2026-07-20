@@ -100,7 +100,9 @@ export async function applyRepairLadder(input: {
   }
 
   if (classification.status !== 'dead') {
-    throw new Error(`applyRepairLadder called for a status that needs no repair: ${classification.status}`);
+    throw new Error(
+      `applyRepairLadder called for a status that needs no repair: ${classification.status}`,
+    );
   }
 
   if (citation.capture.waybackCaptureUrl) {

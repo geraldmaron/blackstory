@@ -83,11 +83,16 @@ export type LearningIndexContractIssue = {
  * Validate summary length against the learning-index contract.
  * Returns issues (empty = ok). Does not throw.
  */
-export function validateLearningSummary(summary: string | undefined): readonly LearningIndexContractIssue[] {
+export function validateLearningSummary(
+  summary: string | undefined,
+): readonly LearningIndexContractIssue[] {
   const issues: LearningIndexContractIssue[] = [];
   const trimmed = summary?.trim() ?? '';
   if (trimmed.length === 0) {
-    issues.push({ code: 'summary_missing', message: 'Released entities require a non-empty summary.' });
+    issues.push({
+      code: 'summary_missing',
+      message: 'Released entities require a non-empty summary.',
+    });
     return issues;
   }
   if (trimmed.length < LEARNING_SUMMARY_MIN_CHARS) {
@@ -118,12 +123,21 @@ export function validatePrimaryImageForPublication(
     issues.push({ code: 'primary_image_url', message: 'primaryImage.url must be non-empty.' });
   }
   if (!image.alt.trim()) {
-    issues.push({ code: 'primary_image_alt', message: 'primaryImage.alt is required for accessibility.' });
+    issues.push({
+      code: 'primary_image_alt',
+      message: 'primaryImage.alt is required for accessibility.',
+    });
   }
   if (!image.credit.trim()) {
-    issues.push({ code: 'primary_image_credit', message: 'primaryImage.credit is required for attribution.' });
+    issues.push({
+      code: 'primary_image_credit',
+      message: 'primaryImage.credit is required for attribution.',
+    });
   }
-  if (requiresResolvedRights('media') && !isPublishableRightsStatus(image.rightsStatus as RightsStatus)) {
+  if (
+    requiresResolvedRights('media') &&
+    !isPublishableRightsStatus(image.rightsStatus as RightsStatus)
+  ) {
     issues.push({
       code: 'primary_image_rights',
       message: `primaryImage.rightsStatus "${image.rightsStatus}" is not publishable for display_media.`,
@@ -151,7 +165,9 @@ export function validateLearningIndexProjection(
 export function assertLearningIndexProjection(fields: LearningIndexProjectionFields): void {
   const issues = validateLearningIndexProjection(fields);
   if (issues.length > 0) {
-    throw new Error(`Learning-index projection rejected: ${issues.map((i) => i.message).join(' ')}`);
+    throw new Error(
+      `Learning-index projection rejected: ${issues.map((i) => i.message).join(' ')}`,
+    );
   }
 }
 

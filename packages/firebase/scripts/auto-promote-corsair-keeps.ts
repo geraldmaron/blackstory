@@ -40,7 +40,11 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildReleaseEntityArtifacts, type ReleaseSourceClaim, type ReleaseSourceEntity } from '@repo/domain';
+import {
+  buildReleaseEntityArtifacts,
+  type ReleaseSourceClaim,
+  type ReleaseSourceEntity,
+} from '@repo/domain';
 import { computeClaimConfidence, type SourceForConfidence } from './lib/confidence.ts';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
@@ -130,15 +134,27 @@ function main(): void {
       continue;
     }
     if (packet.validationIssues.length > 0) {
-      held.push({ subjectId: packet.subjectId, title, reason: `validation issues: ${packet.validationIssues.join('; ')}` });
+      held.push({
+        subjectId: packet.subjectId,
+        title,
+        reason: `validation issues: ${packet.validationIssues.join('; ')}`,
+      });
       continue;
     }
     if (!subject) {
-      held.push({ subjectId: packet.subjectId, title, reason: 'no matching subject metadata (location/kind unknown)' });
+      held.push({
+        subjectId: packet.subjectId,
+        title,
+        reason: 'no matching subject metadata (location/kind unknown)',
+      });
       continue;
     }
     if (subject.kind === 'person') {
-      held.push({ subjectId: packet.subjectId, title, reason: 'person entities require human living-status/privacy review' });
+      held.push({
+        subjectId: packet.subjectId,
+        title,
+        reason: 'person entities require human living-status/privacy review',
+      });
       continue;
     }
     const draftClaims = packet.drafts.claims ?? [];
@@ -147,7 +163,11 @@ function main(): void {
       continue;
     }
     if (!subject.jurisdictionLabel || !subject.locationLabel || !subject.locationPrecision) {
-      held.push({ subjectId: packet.subjectId, title, reason: 'missing jurisdiction/location fields' });
+      held.push({
+        subjectId: packet.subjectId,
+        title,
+        reason: 'missing jurisdiction/location fields',
+      });
       continue;
     }
 
@@ -157,7 +177,9 @@ function main(): void {
         belowThreshold.push(`claims[${index}]: no citationHref`);
         return;
       }
-      const sources: SourceForConfidence[] = [{ url: claim.citationHref, textContainsSubjectName: true }];
+      const sources: SourceForConfidence[] = [
+        { url: claim.citationHref, textContainsSubjectName: true },
+      ];
       if (subject.corroboratingSourceUrl && subject.corroboratingSourceUrl !== claim.citationHref) {
         sources.push({ url: subject.corroboratingSourceUrl, textContainsSubjectName: true });
       }
@@ -170,7 +192,11 @@ function main(): void {
       }
     });
     if (belowThreshold.length > 0) {
-      held.push({ subjectId: packet.subjectId, title, reason: `insufficient confidence: ${belowThreshold.join('; ')}` });
+      held.push({
+        subjectId: packet.subjectId,
+        title,
+        reason: `insufficient confidence: ${belowThreshold.join('; ')}`,
+      });
       continue;
     }
 
@@ -178,10 +204,13 @@ function main(): void {
       predicate: claim.predicate ?? 'documented_site',
       object: claim.object ?? '',
       confidenceLevel:
-        claim.confidenceLevel === 'high' || claim.confidenceLevel === 'medium' || claim.confidenceLevel === 'low'
+        claim.confidenceLevel === 'high' ||
+        claim.confidenceLevel === 'medium' ||
+        claim.confidenceLevel === 'low'
           ? claim.confidenceLevel
           : 'medium',
-      citationSource: claim.citationSource ?? new URL(claim.citationHref ?? 'https://unknown').hostname,
+      citationSource:
+        claim.citationSource ?? new URL(claim.citationHref ?? 'https://unknown').hostname,
       citationHref: claim.citationHref,
       citationLabel: claim.citationLabel ?? claim.citationSource ?? 'Source',
     }));
@@ -192,7 +221,9 @@ function main(): void {
       displayName: title,
       summary: packet.drafts.publicSummary ?? '',
       ...(packet.drafts.eraBuckets ? { eraBuckets: packet.drafts.eraBuckets } : {}),
-      ...(packet.drafts.topicIds ? { topicTags: packet.drafts.topicIds, topicIds: packet.drafts.topicIds } : {}),
+      ...(packet.drafts.topicIds
+        ? { topicTags: packet.drafts.topicIds, topicIds: packet.drafts.topicIds }
+        : {}),
       mentionedEntityIds: [],
       ...(packet.drafts.keywords ? { keywords: packet.drafts.keywords } : {}),
       jurisdictionLabel: subject.jurisdictionLabel,
@@ -201,7 +232,9 @@ function main(): void {
       lat: subject.lat ?? 0,
       lng: subject.lng ?? 0,
       claims,
-      ...(packet.drafts.historicalContext ? { historicalContext: packet.drafts.historicalContext } : {}),
+      ...(packet.drafts.historicalContext
+        ? { historicalContext: packet.drafts.historicalContext }
+        : {}),
     };
 
     // Reuse the SAME builder the manual publish path uses — fact-publish gate,
@@ -212,7 +245,11 @@ function main(): void {
       generatedAt: new Date().toISOString(),
     });
     if (!build.ok) {
-      held.push({ subjectId: packet.subjectId, title, reason: `${build.reason}: ${build.message}` });
+      held.push({
+        subjectId: packet.subjectId,
+        title,
+        reason: `${build.reason}: ${build.message}`,
+      });
       continue;
     }
 
@@ -225,7 +262,12 @@ function main(): void {
   writeFileSync(
     join(reportDir, `report-${stamp}.json`),
     `${JSON.stringify(
-      { total: runData.items.length, promoted: promoted.length, held: held.length, heldReasons: held },
+      {
+        total: runData.items.length,
+        promoted: promoted.length,
+        held: held.length,
+        heldReasons: held,
+      },
       null,
       2,
     )}\n`,

@@ -6,10 +6,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import { APP_HOSTING_RUN_LIMITS, RESPONSE_SIZE_LIMITS } from './constants';
-import {
-  assertPublicRenderPathSafe,
-  collectPublicRenderPathFindings,
-} from './public-render-path';
+import { assertPublicRenderPathSafe, collectPublicRenderPathFindings } from './public-render-path';
 import {
   assertResponseWithinLimit,
   isWithinResponseLimit,

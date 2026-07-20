@@ -91,9 +91,21 @@ const IDENTITY_EASING: CameraEasing = (t) => t;
  * into place, never a jump cut.
  */
 export const CAMERA_PRESETS: Readonly<Record<CameraPresetName, CameraPreset>> = {
-  national: { duration: 2400, curve: 1.36, speed: 0.85, easing: CAMERA_EASING_SLOW_OUT, padding: 64 },
+  national: {
+    duration: 2400,
+    curve: 1.36,
+    speed: 0.85,
+    easing: CAMERA_EASING_SLOW_OUT,
+    padding: 64,
+  },
   state: { duration: 2200, curve: 1.35, speed: 0.9, easing: CAMERA_EASING_SLOW_OUT, padding: 48 },
-  locality: { duration: 1600, curve: 1.38, speed: 1.0, easing: CAMERA_EASING_SLOW_OUT, padding: 32 },
+  locality: {
+    duration: 1600,
+    curve: 1.38,
+    speed: 1.0,
+    easing: CAMERA_EASING_SLOW_OUT,
+    padding: 32,
+  },
   point: { duration: 1200, curve: 1.4, speed: 1.1, easing: CAMERA_EASING_SLOW_OUT, padding: 24 },
 } as const;
 

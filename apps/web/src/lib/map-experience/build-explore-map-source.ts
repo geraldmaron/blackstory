@@ -78,7 +78,10 @@ export type ExploreMapFeatureProperties = {
 export type ExploreMapFeature = {
   readonly type: 'Feature';
   readonly id: string;
-  readonly geometry: { readonly type: 'Point'; readonly coordinates: readonly [lng: number, lat: number] };
+  readonly geometry: {
+    readonly type: 'Point';
+    readonly coordinates: readonly [lng: number, lat: number];
+  };
   readonly properties: ExploreMapFeatureProperties;
 };
 
@@ -196,7 +199,9 @@ function toMapSourceInput(entity: PublicEntityView, anchor: EntityGeoAnchor): Ma
 function enrichFeature(feature: MapPointFeature, entity: PublicEntityView): ExploreMapFeature {
   const tier = geoPrecisionTierForPublicPrecision(feature.properties.precision);
   const radius = resolveDisplayRadiusMeters(tier, {
-    ...(feature.properties.statePostalCode ? { statePostalCode: feature.properties.statePostalCode } : {}),
+    ...(feature.properties.statePostalCode
+      ? { statePostalCode: feature.properties.statePostalCode }
+      : {}),
   });
   const mapTone = mapToneFromTopics(entity.topicTags);
   const encoding = displayEncodingFor(feature.properties.kind, mapTone);
@@ -225,9 +230,13 @@ function enrichFeature(feature: MapPointFeature, entity: PublicEntityView): Expl
       shade: encoding.shade,
       glyph: encoding.glyph,
       ...(feature.properties.stateFips ? { stateFips: feature.properties.stateFips } : {}),
-      ...(feature.properties.statePostalCode ? { statePostalCode: feature.properties.statePostalCode } : {}),
+      ...(feature.properties.statePostalCode
+        ? { statePostalCode: feature.properties.statePostalCode }
+        : {}),
       ...(feature.properties.stateName ? { stateName: feature.properties.stateName } : {}),
-      ...(entity.locationLabel.trim().length > 0 ? { locationLabel: entity.locationLabel.trim() } : {}),
+      ...(entity.locationLabel.trim().length > 0
+        ? { locationLabel: entity.locationLabel.trim() }
+        : {}),
     },
   };
 }
@@ -271,7 +280,9 @@ export function buildExploreMapSource(
   const features = built.featureCollection.features.map((feature) => {
     const entity = entityById.get(feature.properties.entityId);
     if (!entity) {
-      throw new Error(`buildExploreMapSource: feature "${feature.id}" has no matching active-release entity`);
+      throw new Error(
+        `buildExploreMapSource: feature "${feature.id}" has no matching active-release entity`,
+      );
     }
     return enrichFeature(feature, entity);
   });

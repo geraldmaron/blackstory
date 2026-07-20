@@ -3,10 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import {
-  createSubmissionsRateLimitGuard,
-  resolveSubmissionsEndpointClass,
-} from './rate-limits.ts';
+import { createSubmissionsRateLimitGuard, resolveSubmissionsEndpointClass } from './rate-limits.ts';
 
 test('resolveSubmissionsEndpointClass maps intake and admin paths', () => {
   assert.equal(resolveSubmissionsEndpointClass('/v1/corrections'), 'corrections');

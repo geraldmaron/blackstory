@@ -8,11 +8,7 @@ import type { PublicCorrectionStatus } from './public-status';
 import { AppealForm } from './AppealForm';
 import { AbuseReportForm } from './AbuseReportForm';
 
-export function CorrectionStatusPanel({
-  status,
-}: {
-  readonly status: PublicCorrectionStatus;
-}) {
+export function CorrectionStatusPanel({ status }: { readonly status: PublicCorrectionStatus }) {
   return (
     <div className="ds-stack">
       <Notice tone="warning" title="Status">
@@ -48,7 +44,11 @@ export function CorrectionStatusPanel({
 
       {status.appealAvailable ? (
         <section aria-labelledby="appeal-heading">
-          <h2 id="appeal-heading" className="ds-page__title" style={{ fontSize: 'var(--ds-text-lg)' }}>
+          <h2
+            id="appeal-heading"
+            className="ds-page__title"
+            style={{ fontSize: 'var(--ds-text-lg)' }}
+          >
             Appeal
           </h2>
           <AppealForm receiptCode={status.receiptCode} />

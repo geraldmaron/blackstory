@@ -4,20 +4,10 @@
     "kind": "school",
     "displayName": "Shiloh Rosenwald School",
     "summary": "NPS documents this as a Rosenwald Fund school building in Notasulga, Alabama. The site is in Notasulga, Macon County, Alabama. Documented by National Park Service (Tier 1 — federal).",
-    "topicTags": [
-      "education",
-      "civil-rights"
-    ],
-    "topicIds": [
-      "education",
-      "civil-rights"
-    ],
+    "topicTags": ["education", "civil-rights"],
+    "topicIds": ["education", "civil-rights"],
     "mentionedEntityIds": [],
-    "keywords": [
-      "school",
-      "Macon County",
-      "Alabama"
-    ],
+    "keywords": ["school", "Macon County", "Alabama"],
     "jurisdictionLabel": "Notasulga, Alabama",
     "locationPrecision": "site",
     "locationLabel": "Shiloh Rosenwald School, Notasulga, AL",
@@ -40,20 +30,10 @@
     "kind": "school",
     "displayName": "Ridgeley Rosenwald School",
     "summary": "NPS documents Ridgeley as a Rosenwald school in Prince George's County, Maryland. The site is in Capitol Heights, Prince George's County, Maryland. Documented by National Park Service (Tier 1 — federal).",
-    "topicTags": [
-      "education",
-      "civil-rights"
-    ],
-    "topicIds": [
-      "education",
-      "civil-rights"
-    ],
+    "topicTags": ["education", "civil-rights"],
+    "topicIds": ["education", "civil-rights"],
     "mentionedEntityIds": [],
-    "keywords": [
-      "school",
-      "Prince George's County",
-      "Maryland"
-    ],
+    "keywords": ["school", "Prince George's County", "Maryland"],
     "jurisdictionLabel": "Capitol Heights, Maryland",
     "locationPrecision": "site",
     "locationLabel": "Ridgeley Rosenwald School, Capitol Heights, MD",
@@ -76,27 +56,11 @@
     "kind": "school",
     "displayName": "Switchback School",
     "summary": "Fisk's Rosenwald Fund Collection identifies Switchback School in Bath County, Virginia. The site is in Bath County, Virginia. Documented by Fisk University Rosenwald Fund Collection (Tier 2 — university archive). Do not republish Fisk images without permission.",
-    "eraBuckets": [
-      "1910s",
-      "1920s",
-      "1930s"
-    ],
-    "topicTags": [
-      "education",
-      "segregation",
-      "philanthropy"
-    ],
-    "topicIds": [
-      "education",
-      "segregation",
-      "philanthropy"
-    ],
+    "eraBuckets": ["1910s", "1920s", "1930s"],
+    "topicTags": ["education", "segregation", "philanthropy"],
+    "topicIds": ["education", "segregation", "philanthropy"],
     "mentionedEntityIds": [],
-    "keywords": [
-      "Rosenwald school",
-      "Bath County",
-      "Virginia"
-    ],
+    "keywords": ["Rosenwald school", "Bath County", "Virginia"],
     "jurisdictionLabel": "Bath County, Virginia",
     "locationPrecision": "community",
     "locationLabel": "Bath County, Virginia (community-level; exact site pending geo review)",
@@ -127,24 +91,10 @@
     "kind": "school",
     "displayName": "Friendly School",
     "summary": "Fisk's Rosenwald Fund Collection identifies Friendly School in Harrison County, Texas. The site is in Harrison County, Texas. Documented by Fisk University Rosenwald Fund Collection (Tier 2 — university archive).",
-    "topicTags": [
-      "education",
-      "segregation",
-      "philanthropy"
-    ],
-    "topicIds": [
-      "education",
-      "segregation",
-      "philanthropy"
-    ],
-    "mentionedEntityIds": [
-      "ent_fisk_university_001"
-    ],
-    "keywords": [
-      "Rosenwald school",
-      "Harrison County",
-      "Texas"
-    ],
+    "topicTags": ["education", "segregation", "philanthropy"],
+    "topicIds": ["education", "segregation", "philanthropy"],
+    "mentionedEntityIds": ["ent_fisk_university_001"],
+    "keywords": ["Rosenwald school", "Harrison County", "Texas"],
     "jurisdictionLabel": "Harrison County, Texas",
     "locationPrecision": "community",
     "locationLabel": "Harrison County, Texas (community-level; exact site pending geo review)",
@@ -167,29 +117,11 @@
     "kind": "school",
     "displayName": "Liberty Hill School",
     "summary": "Fisk's Rosenwald Fund Collection identifies Liberty Hill School, also called Almont School or Liberty Hill District School. The site is in Bowie County, Texas. Documented by Fisk University Rosenwald Fund Collection (Tier 2 — university archive). Alternate names should be retained as aliases.",
-    "eraBuckets": [
-      "1910s",
-      "1920s",
-      "1930s"
-    ],
-    "topicTags": [
-      "education",
-      "segregation",
-      "philanthropy"
-    ],
-    "topicIds": [
-      "education",
-      "segregation",
-      "philanthropy"
-    ],
-    "mentionedEntityIds": [
-      "ent_fisk_university_001"
-    ],
-    "keywords": [
-      "Rosenwald school",
-      "Bowie County",
-      "Texas"
-    ],
+    "eraBuckets": ["1910s", "1920s", "1930s"],
+    "topicTags": ["education", "segregation", "philanthropy"],
+    "topicIds": ["education", "segregation", "philanthropy"],
+    "mentionedEntityIds": ["ent_fisk_university_001"],
+    "keywords": ["Rosenwald school", "Bowie County", "Texas"],
     "jurisdictionLabel": "Bowie County, Texas",
     "locationPrecision": "community",
     "locationLabel": "Bowie County, Texas (community-level; exact site pending geo review)",
@@ -220,24 +152,10 @@
     "kind": "school",
     "displayName": "Separate District No. 23 School",
     "summary": "Fisk's Rosenwald Fund Collection identifies Separate District No. 23 School in Garvin County, Oklahoma. The site is in Garvin County, Oklahoma. Documented by Fisk University Rosenwald Fund Collection (Tier 2 — university archive).",
-    "topicTags": [
-      "education",
-      "segregation",
-      "philanthropy"
-    ],
-    "topicIds": [
-      "education",
-      "segregation",
-      "philanthropy"
-    ],
-    "mentionedEntityIds": [
-      "ent_fisk_university_001"
-    ],
-    "keywords": [
-      "Rosenwald school",
-      "Garvin County",
-      "Oklahoma"
-    ],
+    "topicTags": ["education", "segregation", "philanthropy"],
+    "topicIds": ["education", "segregation", "philanthropy"],
+    "mentionedEntityIds": ["ent_fisk_university_001"],
+    "keywords": ["Rosenwald school", "Garvin County", "Oklahoma"],
     "jurisdictionLabel": "Garvin County, Oklahoma",
     "locationPrecision": "community",
     "locationLabel": "Garvin County, Oklahoma (community-level; exact site pending geo review)",
@@ -260,24 +178,10 @@
     "kind": "school",
     "displayName": "County Training School (Buena Vista School)",
     "summary": "Fisk's Rosenwald Fund Collection identifies this Carroll County training school and records Buena Vista School as an alternate name. The site is in Buena Vista, Carroll County, Tennessee. Documented by Fisk University Rosenwald Fund Collection (Tier 2 — university archive).",
-    "topicTags": [
-      "education",
-      "segregation",
-      "philanthropy"
-    ],
-    "topicIds": [
-      "education",
-      "segregation",
-      "philanthropy"
-    ],
-    "mentionedEntityIds": [
-      "ent_fisk_university_001"
-    ],
-    "keywords": [
-      "Rosenwald school",
-      "Carroll County",
-      "Tennessee"
-    ],
+    "topicTags": ["education", "segregation", "philanthropy"],
+    "topicIds": ["education", "segregation", "philanthropy"],
+    "mentionedEntityIds": ["ent_fisk_university_001"],
+    "keywords": ["Rosenwald school", "Carroll County", "Tennessee"],
     "jurisdictionLabel": "Buena Vista, Tennessee",
     "locationPrecision": "community",
     "locationLabel": "Carroll County, Tennessee (community-level; exact site pending geo review)",
@@ -300,29 +204,11 @@
     "kind": "school",
     "displayName": "Franklin School",
     "summary": "Fisk's Rosenwald Fund Collection identifies Franklin School in St. Mary Parish and records Parish Training School as an alternate name. The site is in Franklin, St. Mary Parish, Louisiana. Documented by Fisk University Rosenwald Fund Collection (Tier 2 — university archive).",
-    "eraBuckets": [
-      "1910s",
-      "1920s",
-      "1930s"
-    ],
-    "topicTags": [
-      "education",
-      "segregation",
-      "philanthropy"
-    ],
-    "topicIds": [
-      "education",
-      "segregation",
-      "philanthropy"
-    ],
-    "mentionedEntityIds": [
-      "ent_fisk_university_001"
-    ],
-    "keywords": [
-      "Rosenwald school",
-      "St. Mary Parish",
-      "Louisiana"
-    ],
+    "eraBuckets": ["1910s", "1920s", "1930s"],
+    "topicTags": ["education", "segregation", "philanthropy"],
+    "topicIds": ["education", "segregation", "philanthropy"],
+    "mentionedEntityIds": ["ent_fisk_university_001"],
+    "keywords": ["Rosenwald school", "St. Mary Parish", "Louisiana"],
     "jurisdictionLabel": "Franklin, Louisiana",
     "locationPrecision": "community",
     "locationLabel": "St. Mary Parish, Louisiana (community-level; exact site pending geo review)",
@@ -353,29 +239,11 @@
     "kind": "school",
     "displayName": "Coffeeville School",
     "summary": "Fisk's Rosenwald Fund Collection identifies Coffeeville School in Yalobusha County, Mississippi. The site is in Coffeeville, Yalobusha County, Mississippi. Documented by Fisk University Rosenwald Fund Collection (Tier 2 — university archive).",
-    "eraBuckets": [
-      "1910s",
-      "1920s",
-      "1930s"
-    ],
-    "topicTags": [
-      "education",
-      "segregation",
-      "philanthropy"
-    ],
-    "topicIds": [
-      "education",
-      "segregation",
-      "philanthropy"
-    ],
-    "mentionedEntityIds": [
-      "ent_fisk_university_001"
-    ],
-    "keywords": [
-      "Rosenwald school",
-      "Yalobusha County",
-      "Mississippi"
-    ],
+    "eraBuckets": ["1910s", "1920s", "1930s"],
+    "topicTags": ["education", "segregation", "philanthropy"],
+    "topicIds": ["education", "segregation", "philanthropy"],
+    "mentionedEntityIds": ["ent_fisk_university_001"],
+    "keywords": ["Rosenwald school", "Yalobusha County", "Mississippi"],
     "jurisdictionLabel": "Coffeeville, Mississippi",
     "locationPrecision": "community",
     "locationLabel": "Yalobusha County, Mississippi (community-level; exact site pending geo review)",
@@ -406,29 +274,11 @@
     "kind": "school",
     "displayName": "Isola School",
     "summary": "Fisk's Rosenwald Fund Collection identifies Isola School in Humphreys County, Mississippi. The site is in Isola, Humphreys County, Mississippi. Documented by Fisk University Rosenwald Fund Collection (Tier 2 — university archive).",
-    "eraBuckets": [
-      "1910s",
-      "1920s",
-      "1930s"
-    ],
-    "topicTags": [
-      "education",
-      "segregation",
-      "philanthropy"
-    ],
-    "topicIds": [
-      "education",
-      "segregation",
-      "philanthropy"
-    ],
-    "mentionedEntityIds": [
-      "ent_fisk_university_001"
-    ],
-    "keywords": [
-      "Rosenwald school",
-      "Humphreys County",
-      "Mississippi"
-    ],
+    "eraBuckets": ["1910s", "1920s", "1930s"],
+    "topicTags": ["education", "segregation", "philanthropy"],
+    "topicIds": ["education", "segregation", "philanthropy"],
+    "mentionedEntityIds": ["ent_fisk_university_001"],
+    "keywords": ["Rosenwald school", "Humphreys County", "Mississippi"],
     "jurisdictionLabel": "Isola, Mississippi",
     "locationPrecision": "community",
     "locationLabel": "Humphreys County, Mississippi (community-level; exact site pending geo review)",
@@ -459,29 +309,11 @@
     "kind": "school",
     "displayName": "Buffalo School",
     "summary": "Fisk's Rosenwald Fund Collection identifies Buffalo School in Attala County, Mississippi. The site is in Attala County, Mississippi. Documented by Fisk University Rosenwald Fund Collection (Tier 2 — university archive).",
-    "eraBuckets": [
-      "1910s",
-      "1920s",
-      "1930s"
-    ],
-    "topicTags": [
-      "education",
-      "segregation",
-      "philanthropy"
-    ],
-    "topicIds": [
-      "education",
-      "segregation",
-      "philanthropy"
-    ],
-    "mentionedEntityIds": [
-      "ent_fisk_university_001"
-    ],
-    "keywords": [
-      "Rosenwald school",
-      "Attala County",
-      "Mississippi"
-    ],
+    "eraBuckets": ["1910s", "1920s", "1930s"],
+    "topicTags": ["education", "segregation", "philanthropy"],
+    "topicIds": ["education", "segregation", "philanthropy"],
+    "mentionedEntityIds": ["ent_fisk_university_001"],
+    "keywords": ["Rosenwald school", "Attala County", "Mississippi"],
     "jurisdictionLabel": "Attala County, Mississippi",
     "locationPrecision": "community",
     "locationLabel": "Attala County, Mississippi (community-level; exact site pending geo review)",
@@ -512,29 +344,11 @@
     "kind": "school",
     "displayName": "Henning Rosenwald School",
     "summary": "Fisk's Rosenwald Fund Collection identifies Henning Rosenwald School in Lauderdale County, Tennessee. The site is in Henning, Lauderdale County, Tennessee. Documented by Fisk University Rosenwald Fund Collection (Tier 2 — university archive).",
-    "eraBuckets": [
-      "1910s",
-      "1920s",
-      "1930s"
-    ],
-    "topicTags": [
-      "education",
-      "segregation",
-      "philanthropy"
-    ],
-    "topicIds": [
-      "education",
-      "segregation",
-      "philanthropy"
-    ],
-    "mentionedEntityIds": [
-      "ent_fisk_university_001"
-    ],
-    "keywords": [
-      "Rosenwald school",
-      "Lauderdale County",
-      "Tennessee"
-    ],
+    "eraBuckets": ["1910s", "1920s", "1930s"],
+    "topicTags": ["education", "segregation", "philanthropy"],
+    "topicIds": ["education", "segregation", "philanthropy"],
+    "mentionedEntityIds": ["ent_fisk_university_001"],
+    "keywords": ["Rosenwald school", "Lauderdale County", "Tennessee"],
     "jurisdictionLabel": "Henning, Tennessee",
     "locationPrecision": "community",
     "locationLabel": "Lauderdale County, Tennessee (community-level; exact site pending geo review)",
@@ -565,22 +379,10 @@
     "kind": "school",
     "displayName": "Lincoln University of Missouri",
     "summary": "The U.S. Department of Education includes Lincoln University of Missouri on its accredited HBCU listing. The site is in Jefferson City, Cole County, Missouri. Documented by U.S. Department of Education — White House Initiative on HBCUs (Tier 1 — federal).",
-    "topicTags": [
-      "hbcu",
-      "higher-education",
-      "education"
-    ],
-    "topicIds": [
-      "hbcu",
-      "higher-education",
-      "education"
-    ],
+    "topicTags": ["hbcu", "higher-education", "education"],
+    "topicIds": ["hbcu", "higher-education", "education"],
     "mentionedEntityIds": [],
-    "keywords": [
-      "HBCU",
-      "Cole County",
-      "Missouri"
-    ],
+    "keywords": ["HBCU", "Cole County", "Missouri"],
     "jurisdictionLabel": "Jefferson City, Missouri",
     "locationPrecision": "community",
     "locationLabel": "Cole County, Missouri (community-level; exact site pending geo review)",
@@ -603,20 +405,10 @@
     "kind": "school",
     "displayName": "Storer College Historic Site",
     "summary": "NPS documents Storer College as a Freedmen's Bureau-era educational institution at Harpers Ferry. The site is in Harpers Ferry, Jefferson County, West Virginia. Documented by National Park Service (Tier 1 — federal).",
-    "topicTags": [
-      "education",
-      "civil-rights"
-    ],
-    "topicIds": [
-      "education",
-      "civil-rights"
-    ],
+    "topicTags": ["education", "civil-rights"],
+    "topicIds": ["education", "civil-rights"],
     "mentionedEntityIds": [],
-    "keywords": [
-      "historic college site",
-      "Jefferson County",
-      "West Virginia"
-    ],
+    "keywords": ["historic college site", "Jefferson County", "West Virginia"],
     "jurisdictionLabel": "Harpers Ferry, West Virginia",
     "locationPrecision": "site",
     "locationLabel": "Storer College Historic Site, Harpers Ferry, WV",
@@ -639,20 +431,10 @@
     "kind": "school",
     "displayName": "Penn Center",
     "summary": "NPS documents Penn School's Reconstruction-era origins and the site's later civil-rights significance. The site is in St. Helena Island, Beaufort County, South Carolina. Documented by National Park Service (Tier 1 — federal).",
-    "topicTags": [
-      "education",
-      "civil-rights"
-    ],
-    "topicIds": [
-      "education",
-      "civil-rights"
-    ],
+    "topicTags": ["education", "civil-rights"],
+    "topicIds": ["education", "civil-rights"],
     "mentionedEntityIds": [],
-    "keywords": [
-      "historic educational and civil-rights site",
-      "Beaufort County",
-      "South Carolina"
-    ],
+    "keywords": ["historic educational and civil-rights site", "Beaufort County", "South Carolina"],
     "jurisdictionLabel": "St. Helena Island, South Carolina",
     "locationPrecision": "site",
     "locationLabel": "Penn Center, St. Helena Island, SC",
@@ -675,20 +457,10 @@
     "kind": "school",
     "displayName": "Clinton High School",
     "summary": "The Tennessee Encyclopedia documents the Clinton desegregation crisis and the school's desegregation after Brown. The site is in Clinton, Anderson County, Tennessee. Documented by Tennessee Encyclopedia / Tennessee Historical Society (Tier 2 — state historical authority).",
-    "topicTags": [
-      "education",
-      "civil-rights"
-    ],
-    "topicIds": [
-      "education",
-      "civil-rights"
-    ],
+    "topicTags": ["education", "civil-rights"],
+    "topicIds": ["education", "civil-rights"],
     "mentionedEntityIds": [],
-    "keywords": [
-      "school and civil-rights site",
-      "Anderson County",
-      "Tennessee"
-    ],
+    "keywords": ["school and civil-rights site", "Anderson County", "Tennessee"],
     "jurisdictionLabel": "Clinton, Tennessee",
     "locationPrecision": "site",
     "locationLabel": "Clinton High School, Clinton, TN",
@@ -711,22 +483,10 @@
     "kind": "school",
     "displayName": "Scott's Branch High School",
     "summary": "NPS documents Clarendon County schools, including Scott's Branch, in the Briggs v. Elliott litigation. The site is in Summerton, Clarendon County, South Carolina. Documented by National Park Service — Brown v. Board of Education (Tier 1 — federal).",
-    "topicTags": [
-      "education",
-      "civil-rights"
-    ],
-    "topicIds": [
-      "education",
-      "civil-rights"
-    ],
-    "mentionedEntityIds": [
-      "ent_case_brown_v_board_of_education_1954"
-    ],
-    "keywords": [
-      "school and civil-rights site",
-      "Clarendon County",
-      "South Carolina"
-    ],
+    "topicTags": ["education", "civil-rights"],
+    "topicIds": ["education", "civil-rights"],
+    "mentionedEntityIds": ["ent_case_brown_v_board_of_education_1954"],
+    "keywords": ["school and civil-rights site", "Clarendon County", "South Carolina"],
     "jurisdictionLabel": "Summerton, South Carolina",
     "locationPrecision": "community",
     "locationLabel": "Clarendon County, South Carolina (community-level; exact site pending geo review)",
@@ -749,22 +509,10 @@
     "kind": "school",
     "displayName": "Mansfield High School",
     "summary": "The Texas State Historical Association documents the 1956 Mansfield school desegregation incident. The site is in Mansfield, Tarrant County, Texas. Documented by Texas State Historical Association Handbook (Tier 2 — state historical authority).",
-    "topicTags": [
-      "education",
-      "civil-rights"
-    ],
-    "topicIds": [
-      "education",
-      "civil-rights"
-    ],
-    "mentionedEntityIds": [
-      "ent_mansfield_school_desegregation_incident_001"
-    ],
-    "keywords": [
-      "school and civil-rights site",
-      "Tarrant County",
-      "Texas"
-    ],
+    "topicTags": ["education", "civil-rights"],
+    "topicIds": ["education", "civil-rights"],
+    "mentionedEntityIds": ["ent_mansfield_school_desegregation_incident_001"],
+    "keywords": ["school and civil-rights site", "Tarrant County", "Texas"],
     "jurisdictionLabel": "Mansfield, Texas",
     "locationPrecision": "community",
     "locationLabel": "Tarrant County, Texas (community-level; exact site pending geo review)",
@@ -787,20 +535,10 @@
     "kind": "school",
     "displayName": "Paul Laurence Dunbar High School (historic)",
     "summary": "NPS documents Dunbar High School as a pioneering public high school for Black students. The site is in Washington, District of Columbia, District of Columbia. Documented by National Park Service — African American Heritage (Tier 1 — federal).",
-    "topicTags": [
-      "education",
-      "civil-rights"
-    ],
-    "topicIds": [
-      "education",
-      "civil-rights"
-    ],
+    "topicTags": ["education", "civil-rights"],
+    "topicIds": ["education", "civil-rights"],
     "mentionedEntityIds": [],
-    "keywords": [
-      "school",
-      "District of Columbia",
-      "District of Columbia"
-    ],
+    "keywords": ["school", "District of Columbia", "District of Columbia"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "site",
     "locationLabel": "Paul Laurence Dunbar High School (historic), Washington, DC",
@@ -823,22 +561,10 @@
     "kind": "place",
     "displayName": "Kingsley Plantation",
     "summary": "NPS preserves Kingsley Plantation and interprets the lives and labor of enslaved people at the site. The site is in Jacksonville / Fort George Island, Duval County, Florida. Documented by National Park Service — Timucuan Ecological & Historic Preserve (Tier 1 — federal). Coordinate is the NPS visitor/site location, not a private residence.",
-    "topicTags": [
-      "enslavement",
-      "history",
-      "preservation"
-    ],
-    "topicIds": [
-      "enslavement",
-      "history",
-      "preservation"
-    ],
+    "topicTags": ["enslavement", "history", "preservation"],
+    "topicIds": ["enslavement", "history", "preservation"],
     "mentionedEntityIds": [],
-    "keywords": [
-      "plantation site",
-      "Duval County",
-      "Florida"
-    ],
+    "keywords": ["plantation site", "Duval County", "Florida"],
     "jurisdictionLabel": "Jacksonville / Fort George Island, Florida",
     "locationPrecision": "site",
     "locationLabel": "Kingsley Plantation, Jacksonville / Fort George Island, FL",
@@ -861,23 +587,11 @@
     "kind": "event",
     "displayName": "Little Rock School Desegregation Crisis",
     "summary": "The 1957 desegregation crisis centered on Little Rock Central High School and the Little Rock Nine. The event took place in Little Rock, Pulaski County, Arkansas. Documented by National Park Service (Tier 1 — federal). Model as an event related to the school place, not as a duplicate place.",
-    "eraBuckets": [
-      "1950s"
-    ],
-    "topicTags": [
-      "civil-rights"
-    ],
-    "topicIds": [
-      "civil-rights"
-    ],
-    "mentionedEntityIds": [
-      "ent_little_rock_central_high_school_001"
-    ],
-    "keywords": [
-      "civil-rights event",
-      "Pulaski County",
-      "Arkansas"
-    ],
+    "eraBuckets": ["1950s"],
+    "topicTags": ["civil-rights"],
+    "topicIds": ["civil-rights"],
+    "mentionedEntityIds": ["ent_little_rock_central_high_school_001"],
+    "keywords": ["civil-rights event", "Pulaski County", "Arkansas"],
     "jurisdictionLabel": "Little Rock, Arkansas",
     "locationPrecision": "community",
     "locationLabel": "Pulaski County, Arkansas (community-level; exact site pending geo review)",
@@ -908,24 +622,11 @@
     "kind": "event",
     "displayName": "Moton High School Student Strike",
     "summary": "Students at Robert Russa Moton High School struck in 1951; the resulting case became one of the Brown v. Board companion cases. The event took place in Farmville, Prince Edward County, Virginia. Documented by National Park Service — Brown v. Board of Education (Tier 1 — federal).",
-    "eraBuckets": [
-      "1950s"
-    ],
-    "topicTags": [
-      "civil-rights"
-    ],
-    "topicIds": [
-      "civil-rights"
-    ],
-    "mentionedEntityIds": [
-      "ent_case_brown_v_board_of_education_1954",
-      "ent_moton_high_school_001"
-    ],
-    "keywords": [
-      "civil-rights and education event",
-      "Prince Edward County",
-      "Virginia"
-    ],
+    "eraBuckets": ["1950s"],
+    "topicTags": ["civil-rights"],
+    "topicIds": ["civil-rights"],
+    "mentionedEntityIds": ["ent_case_brown_v_board_of_education_1954", "ent_moton_high_school_001"],
+    "keywords": ["civil-rights and education event", "Prince Edward County", "Virginia"],
     "jurisdictionLabel": "Farmville, Virginia",
     "locationPrecision": "community",
     "locationLabel": "Prince Edward County, Virginia (community-level; exact site pending geo review)",
@@ -956,21 +657,11 @@
     "kind": "event",
     "displayName": "Mansfield School Desegregation Incident",
     "summary": "The Texas State Historical Association documents the 1956 Mansfield school desegregation incident. The event took place in Mansfield, Tarrant County, Texas. Documented by Texas State Historical Association Handbook (Tier 2 — state historical authority).",
-    "eraBuckets": [
-      "1950s"
-    ],
-    "topicTags": [
-      "civil-rights"
-    ],
-    "topicIds": [
-      "civil-rights"
-    ],
+    "eraBuckets": ["1950s"],
+    "topicTags": ["civil-rights"],
+    "topicIds": ["civil-rights"],
     "mentionedEntityIds": [],
-    "keywords": [
-      "civil-rights event",
-      "Tarrant County",
-      "Texas"
-    ],
+    "keywords": ["civil-rights event", "Tarrant County", "Texas"],
     "jurisdictionLabel": "Mansfield, Texas",
     "locationPrecision": "community",
     "locationLabel": "Tarrant County, Texas (community-level; exact site pending geo review)",
@@ -1001,14 +692,8 @@
     "kind": "person",
     "displayName": "Harriet Tubman",
     "summary": "NPS operates the Harriet Tubman Underground Railroad Visitor Center as a public orientation site for Tubman's life and Maryland landscape. Documented life dates: unknown–1913. The associated public historic site is in Church Creek, Dorchester County, Maryland. Documented by National Park Service — Harriet Tubman Underground Railroad NHP (Tier 1 — federal).",
-    "topicTags": [
-      "civil-rights",
-      "history"
-    ],
-    "topicIds": [
-      "civil-rights",
-      "history"
-    ],
+    "topicTags": ["civil-rights", "history"],
+    "topicIds": ["civil-rights", "history"],
     "mentionedEntityIds": [],
     "keywords": [
       "freedom seeker, Underground Railroad conductor, activist, and nurse",
@@ -1037,29 +722,11 @@
     "kind": "person",
     "displayName": "Booker T. Washington",
     "summary": "NPS preserves The Oaks, Washington's historic home on the Tuskegee campus. Documented life dates: 1856–1915. The associated public historic site is in Tuskegee, Macon County, Alabama. Documented by National Park Service — Tuskegee Institute NHS (Tier 1 — federal).",
-    "eraBuckets": [
-      "1850s",
-      "1860s",
-      "1870s",
-      "1880s",
-      "1890s",
-      "1900s",
-      "1910s"
-    ],
-    "topicTags": [
-      "civil-rights",
-      "history"
-    ],
-    "topicIds": [
-      "civil-rights",
-      "history"
-    ],
+    "eraBuckets": ["1850s", "1860s", "1870s", "1880s", "1890s", "1900s", "1910s"],
+    "topicTags": ["civil-rights", "history"],
+    "topicIds": ["civil-rights", "history"],
     "mentionedEntityIds": [],
-    "keywords": [
-      "educator, author, and institution builder",
-      "Macon County",
-      "Alabama"
-    ],
+    "keywords": ["educator, author, and institution builder", "Macon County", "Alabama"],
     "jurisdictionLabel": "Tuskegee, Alabama",
     "locationPrecision": "site",
     "locationLabel": "Booker T. Washington, Tuskegee, AL",

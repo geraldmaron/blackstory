@@ -9,11 +9,7 @@ import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { assertNoAutomaticRollouts } from './lib/auto-rollout-guard.mjs';
 import { generateChangelog, resolveCommitMessage } from './lib/changelog.mjs';
-import {
-  assertPinnedCommit,
-  buildProvenance,
-  validateProvenance,
-} from './lib/provenance.mjs';
+import { assertPinnedCommit, buildProvenance, validateProvenance } from './lib/provenance.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const FIXTURE_SHA = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
@@ -98,10 +94,14 @@ test('example provenance fixture validates against schema', async () => {
 test('rollback dry-run script exits zero with valid SHA', () => {
   const head = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' });
   const sha = head.stdout.trim();
-  const result = spawnSync('bash', [path.join(ROOT, 'infra/github/release-pipeline/rollback-dry-run.sh'), sha], {
-    cwd: ROOT,
-    encoding: 'utf8',
-  });
+  const result = spawnSync(
+    'bash',
+    [path.join(ROOT, 'infra/github/release-pipeline/rollback-dry-run.sh'), sha],
+    {
+      cwd: ROOT,
+      encoding: 'utf8',
+    },
+  );
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /DRY-RUN/);
 });

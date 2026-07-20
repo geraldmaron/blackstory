@@ -6,16 +6,19 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { currentStatus, type StatusHistoryEntry, type EntityStatusValue } from '../entity-status.js';
-import type { EntityRelationship } from '../relationship.js';
 import {
-  buildAllTimeView,
-  buildDecadeViews,
-  deriveActiveDecadeBuckets,
-} from './decades.js';
+  currentStatus,
+  type StatusHistoryEntry,
+  type EntityStatusValue,
+} from '../entity-status.js';
+import type { EntityRelationship } from '../relationship.js';
+import { buildAllTimeView, buildDecadeViews, deriveActiveDecadeBuckets } from './decades.js';
 import { GRAPH_GOLD_FIXTURES } from './fixtures.js';
 
-function rel(overrides: Partial<EntityRelationship> & Pick<EntityRelationship, 'id' | 'fromEntityId' | 'toEntityId' | 'type'>): EntityRelationship {
+function rel(
+  overrides: Partial<EntityRelationship> &
+    Pick<EntityRelationship, 'id' | 'fromEntityId' | 'toEntityId' | 'type'>,
+): EntityRelationship {
   return {
     evidenceIds: ['ev-1'],
     createdAt: '2026-01-01T00:00:00.000Z',
@@ -32,7 +35,13 @@ function rel(overrides: Partial<EntityRelationship> & Pick<EntityRelationship, '
 test('an entity founded in the 1950s with an open-ended (still active) status appears in EVERY decade through the cutoff, not just its founding decade', () => {
   // Real statusHistory shape: founded 1957, open-ended (still active) record.
   const statusHistory: readonly StatusHistoryEntry<EntityStatusValue>[] = [
-    { status: 'active', validFrom: '1957', validTo: null, datePrecision: 'year', basisClaimIds: ['c1'] },
+    {
+      status: 'active',
+      validFrom: '1957',
+      validTo: null,
+      datePrecision: 'year',
+      basisClaimIds: ['c1'],
+    },
   ];
   // Caller resolves statusHistory into EraSpan windows (this module never re-derives logic).
   const activeSpans = statusHistory.map((entry) => ({
@@ -48,9 +57,19 @@ test('an entity founded in the 1950s with an open-ended (still active) status ap
 
   // NOT just ["1950s"] every decade from founding through the cutoff.
   assert.deepEqual(buckets, [
-    '1950s', '1960s', '1970s', '1980s', '1990s', '2000s', '2010s', '2020s',
+    '1950s',
+    '1960s',
+    '1970s',
+    '1980s',
+    '1990s',
+    '2000s',
+    '2010s',
+    '2020s',
   ]);
-  assert.ok(buckets.length > 1, 'a still-active entity must span more than its founding decade alone');
+  assert.ok(
+    buckets.length > 1,
+    'a still-active entity must span more than its founding decade alone',
+  );
 });
 
 test('WITHOUT a stillActiveCutoff, an open-ended span resolves to only its founding decade (documents the failure mode this option prevents)', () => {
@@ -70,7 +89,15 @@ test('a closed (non-open-ended) span buckets only its actual active decades, no 
     { stillActiveCutoff: '2026' },
   );
   assert.deepEqual(buckets, [
-    '1880s', '1890s', '1900s', '1910s', '1920s', '1930s', '1940s', '1950s', '1960s',
+    '1880s',
+    '1890s',
+    '1900s',
+    '1910s',
+    '1920s',
+    '1930s',
+    '1940s',
+    '1950s',
+    '1960s',
   ]);
   assert.ok(!buckets.includes('2020s'), 'a closed span must not extend to the present cutoff');
 });
@@ -164,7 +191,13 @@ test('buildAllTimeView includes entityIds that never appear in any decade bucket
 // reimplemented locally) so the "still active" premise above is grounded in the real function.
 test('sanity: currentStatus derives "active" from the same open-ended record used above', () => {
   const statusHistory: readonly StatusHistoryEntry<EntityStatusValue>[] = [
-    { status: 'active', validFrom: '1957', validTo: null, datePrecision: 'year', basisClaimIds: ['c1'] },
+    {
+      status: 'active',
+      validFrom: '1957',
+      validTo: null,
+      datePrecision: 'year',
+      basisClaimIds: ['c1'],
+    },
   ];
   assert.equal(currentStatus(statusHistory), 'active');
 });

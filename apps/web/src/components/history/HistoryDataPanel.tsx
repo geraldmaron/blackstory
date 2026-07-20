@@ -28,7 +28,10 @@ export type HistoryDataPanelProps = {
   readonly className?: string;
 };
 
-function edgesForNode(nodeId: string, edges: readonly HistoryEdgeView[]): readonly HistoryEdgeView[] {
+function edgesForNode(
+  nodeId: string,
+  edges: readonly HistoryEdgeView[],
+): readonly HistoryEdgeView[] {
   return edges.filter((edge) => edge.fromEntityId === nodeId || edge.toEntityId === nodeId);
 }
 

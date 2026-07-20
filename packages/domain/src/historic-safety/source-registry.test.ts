@@ -43,7 +43,10 @@ test('buildHistoricSafetySourceRegistrationInputs records mandatory EJI and Toug
 
   const tougaloo = inputs.find((input) => input.sourceId === 'tougaloo-sundown-towns');
   assert.ok(tougaloo);
-  assert.match(tougaloo!.citationRequirements, /Tougaloo College Historical Database of Sundown Towns/i);
+  assert.match(
+    tougaloo!.citationRequirements,
+    /Tougaloo College Historical Database of Sundown Towns/i,
+  );
   assert.match(tougaloo!.citationRequirements, /possible\/probable\/surely/i);
   assert.equal(tougaloo!.feedsLayerId, 'sundown_town');
 });

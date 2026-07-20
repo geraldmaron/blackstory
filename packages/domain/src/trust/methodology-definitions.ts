@@ -28,7 +28,10 @@ export const FACT_STATUS_LIFECYCLE_DEFINITIONS: Readonly<Record<FactStatus, stri
 
 /** Entity-level status vocabulary summaries for place-like, law, and movement kinds. */
 export const ENTITY_STATUS_VOCABULARY: Readonly<
-  Record<'place_like' | 'law' | 'movement', readonly { readonly value: EntityStatusValue; readonly definition: string }[]>
+  Record<
+    'place_like' | 'law' | 'movement',
+    readonly { readonly value: EntityStatusValue; readonly definition: string }[]
+  >
 > = {
   place_like: PLACE_LIKE_STATUSES.map((status) => ({
     value: status,

@@ -94,10 +94,7 @@ export async function listDiscoveryCampaignRuns(
       .limit(cappedLimit)
       .get();
   } catch (error) {
-    console.error(
-      'admin discoveryCampaignRuns orderBy failed; falling back to plain limit',
-      error,
-    );
+    console.error('admin discoveryCampaignRuns orderBy failed; falling back to plain limit', error);
     snap = await db.collection(FIRESTORE_ROOT.discoveryCampaignRuns).limit(cappedLimit).get();
   }
 

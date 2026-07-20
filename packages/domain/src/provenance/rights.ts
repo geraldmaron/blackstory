@@ -85,7 +85,10 @@ export function assertRightsStatusForPublication(input: RightsGateInput): void {
     return;
   }
 
-  if (input.prohibitedUses?.includes('full_text_republication') && input.contentKind !== 'citation') {
+  if (
+    input.prohibitedUses?.includes('full_text_republication') &&
+    input.contentKind !== 'citation'
+  ) {
     throw new Error('Publication blocked: prohibited use full_text_republication');
   }
 
@@ -104,7 +107,9 @@ export function assertRightsStatusForPublication(input: RightsGateInput): void {
   }
 
   if (!isPublishableRightsStatus(input.rightsStatus)) {
-    throw new Error(`Rights status "${input.rightsStatus}" is not publishable for ${input.contentKind}`);
+    throw new Error(
+      `Rights status "${input.rightsStatus}" is not publishable for ${input.contentKind}`,
+    );
   }
 
   const needed: PublicationPermission =

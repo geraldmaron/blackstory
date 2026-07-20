@@ -12,8 +12,17 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import { assertNoDeanonymization } from '../../rights/index.js';
-import { getSourceObligationsOrThrow, defaultSourceObligationsSeed, createInMemoryObligationsRegistry } from '../../rights/index.js';
-import { approveSourcePolicy, createInMemorySourceRegistry, registerSource, type SourceRegistryEntry } from '../index.js';
+import {
+  getSourceObligationsOrThrow,
+  defaultSourceObligationsSeed,
+  createInMemoryObligationsRegistry,
+} from '../../rights/index.js';
+import {
+  approveSourcePolicy,
+  createInMemorySourceRegistry,
+  registerSource,
+  type SourceRegistryEntry,
+} from '../index.js';
 import type { SafeHttpResponse } from '../internet-archive/shared/http-port.js';
 import * as redditAdapter from './index.js';
 import {
@@ -134,7 +143,9 @@ test('Reddit adapter contract respects the 100 QPM free tier ceiling', () => {
 });
 
 test('Reddit adapter has a registered  obligations entry with the contractual 48h deletion-sync window', () => {
-  const obligationsStore = createInMemoryObligationsRegistry(defaultSourceObligationsSeed(FIXED_NOW));
+  const obligationsStore = createInMemoryObligationsRegistry(
+    defaultSourceObligationsSeed(FIXED_NOW),
+  );
   const obligations = getSourceObligationsOrThrow(obligationsStore, REDDIT_ADAPTER_ID);
   assert.equal(obligations.sourceClass, 'reddit');
   assert.equal(obligations.deletionSync.required, true);
@@ -162,14 +173,25 @@ test('structural gaps are documented as constraints, not bugs', () => {
 
 test('the curated seed list at a 15-minute cadence stays far under the 100 QPM free tier, even worst-case', () => {
   const seed = defaultSubredditRegistrySeed(FIXED_NOW);
-  const worstCase = estimateWorstCaseRequestsPerMinute({ subredditCount: seed.length, cadenceMinutes: 15 });
-  assert.ok(worstCase < REDDIT_FREE_TIER_QPM_LIMIT, `worst-case ${worstCase} req/min must be under ${REDDIT_FREE_TIER_QPM_LIMIT}`);
+  const worstCase = estimateWorstCaseRequestsPerMinute({
+    subredditCount: seed.length,
+    cadenceMinutes: 15,
+  });
+  assert.ok(
+    worstCase < REDDIT_FREE_TIER_QPM_LIMIT,
+    `worst-case ${worstCase} req/min must be under ${REDDIT_FREE_TIER_QPM_LIMIT}`,
+  );
 });
 
 // --- Parsing normalization -----------------------------------------------------------------
 
 test('parses a Reddit /new listing page into normalized candidates', () => {
-  const entry = { ...redditRegistryEntry(), registryState: 'approved' as const, approvedAt: FIXED_NOW, approvedBy: 'admin@blackbook.local' };
+  const entry = {
+    ...redditRegistryEntry(),
+    registryState: 'approved' as const,
+    approvedAt: FIXED_NOW,
+    approvedBy: 'admin@blackbook.local',
+  };
   const raw = loadFixtureJson('askhistorians-new-page1.json');
   const parsed = parseRedditListingResponse(raw);
   assert.equal(parsed.posts.length, 2);
@@ -186,14 +208,22 @@ test('parses a Reddit /new listing page into normalized candidates', () => {
   assert.equal(candidates[0]?.provenance.adapterId, REDDIT_ADAPTER_ID);
   assert.equal(candidates[0]?.payload.subreddit, 'AskHistorians');
   assert.equal(candidates[0]?.payload.postId, 'pc1abc');
-  assert.equal(candidates[0]?.payload.permalink, 'https://www.reddit.com/r/AskHistorians/comments/pc1abc/sources_for_a_freedmens_bureau_field_office_in/');
+  assert.equal(
+    candidates[0]?.payload.permalink,
+    'https://www.reddit.com/r/AskHistorians/comments/pc1abc/sources_for_a_freedmens_bureau_field_office_in/',
+  );
   assert.equal(candidates[0]?.payload.authorHandle, 'piedmont_researcher');
   assert.ok(candidates[0]?.stableIdentifier.startsWith('reddit:sub_askhistorians:'));
   assert.ok(candidates[0]?.payload.snippet!.length <= 320);
 });
 
 test('normalization skips already-removed or already-deleted posts at ingest time', () => {
-  const entry = { ...redditRegistryEntry(), registryState: 'approved' as const, approvedAt: FIXED_NOW, approvedBy: 'admin@blackbook.local' };
+  const entry = {
+    ...redditRegistryEntry(),
+    registryState: 'approved' as const,
+    approvedAt: FIXED_NOW,
+    approvedBy: 'admin@blackbook.local',
+  };
   const raw = loadFixtureJson('blackhistory-new-listing.json');
   const parsed = parseRedditListingResponse(raw);
   assert.equal(parsed.posts.length, 3);
@@ -210,12 +240,33 @@ test('normalization skips already-removed or already-deleted posts at ingest tim
 });
 
 test('normalized payload never carries a full post body, comments, or an identity-resolving field', () => {
-  const entry = { ...redditRegistryEntry(), registryState: 'approved' as const, approvedAt: FIXED_NOW, approvedBy: 'admin@blackbook.local' };
+  const entry = {
+    ...redditRegistryEntry(),
+    registryState: 'approved' as const,
+    approvedAt: FIXED_NOW,
+    approvedBy: 'admin@blackbook.local',
+  };
   const raw = loadFixtureJson('askhistorians-new-page1.json');
   const parsed = parseRedditListingResponse(raw);
-  const [candidate] = normalizeRedditBatch({ subreddit: askHistorians(), posts: parsed.posts, registryEntry: entry, runId: 'run_3', capturedAt: FIXED_NOW });
+  const [candidate] = normalizeRedditBatch({
+    subreddit: askHistorians(),
+    posts: parsed.posts,
+    registryEntry: entry,
+    runId: 'run_3',
+    capturedAt: FIXED_NOW,
+  });
   const payloadKeys = Object.keys(candidate!.payload).map((key) => key.toLowerCase());
-  for (const forbidden of ['selftext', 'body', 'comments', 'email', 'realname', 'fullname', 'authorfullname', 'ipaddress', 'accountid']) {
+  for (const forbidden of [
+    'selftext',
+    'body',
+    'comments',
+    'email',
+    'realname',
+    'fullname',
+    'authorfullname',
+    'ipaddress',
+    'accountid',
+  ]) {
     assert.equal(payloadKeys.includes(forbidden), false, `payload must not include "${forbidden}"`);
   }
   // Author is stored as a bare handle string only.
@@ -231,7 +282,13 @@ test('subreddit registry add/remove is versioned and produces a  audit event', (
   const added = addSubredditToRegistry(
     store,
     { id: 'sub_detroit', subredditName: 'Detroit', displayName: 'r/Detroit', category: 'city' },
-    { actor, reason: 'Curated seed list — city sub with active neighborhood-history threads.', requestId: 'req_1', correlationId: 'corr_1', now: FIXED_NOW },
+    {
+      actor,
+      reason: 'Curated seed list — city sub with active neighborhood-history threads.',
+      requestId: 'req_1',
+      correlationId: 'corr_1',
+      now: FIXED_NOW,
+    },
   );
   assert.equal(added.entry.status, 'active');
   assert.equal(added.entry.revision, 1);
@@ -283,20 +340,33 @@ test('the default subreddit seed is a small, realistic, versioned list', () => {
   assert.ok(names.includes('BlackHistory'));
   assert.ok(seed.some((entry) => entry.category === 'city' || entry.category === 'state'));
   // Revisions are monotonic starting at 1 versioned config, not a flat unordered list.
-  assert.deepEqual(seed.map((entry) => entry.revision), seed.map((_, index) => index + 1));
+  assert.deepEqual(
+    seed.map((entry) => entry.revision),
+    seed.map((_, index) => index + 1),
+  );
 });
 
 // --- Fetch pagination -----------------------------------------------------------------------
 
 test('fetchSubredditNewListing paginates via the after cursor through an injected SafeHttpClient (mock, no live network)', async () => {
-  const entry = { ...redditRegistryEntry(), registryState: 'approved' as const, approvedAt: FIXED_NOW, approvedBy: 'admin@blackbook.local' };
+  const entry = {
+    ...redditRegistryEntry(),
+    registryState: 'approved' as const,
+    approvedAt: FIXED_NOW,
+    approvedBy: 'admin@blackbook.local',
+  };
   const page1 = loadFixtureJson('askhistorians-new-page1.json');
   const page2 = loadFixtureJson('askhistorians-new-page2.json');
   let calls = 0;
   const client = async (request: { url: string }): Promise<SafeHttpResponse> => {
     calls += 1;
     const body = request.url.includes('after=t3_pc1def') ? page2 : page1;
-    return { status: 200, headers: { 'content-type': 'application/json' }, bodyText: JSON.stringify(body), finalUrl: request.url };
+    return {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+      bodyText: JSON.stringify(body),
+      finalUrl: request.url,
+    };
   };
 
   const candidates = await fetchSubredditNewListing({
@@ -313,12 +383,22 @@ test('fetchSubredditNewListing paginates via the after cursor through an injecte
 });
 
 test('fetchSubredditNewListing stops once maxItems is reached without requesting further pages', async () => {
-  const entry = { ...redditRegistryEntry(), registryState: 'approved' as const, approvedAt: FIXED_NOW, approvedBy: 'admin@blackbook.local' };
+  const entry = {
+    ...redditRegistryEntry(),
+    registryState: 'approved' as const,
+    approvedAt: FIXED_NOW,
+    approvedBy: 'admin@blackbook.local',
+  };
   const page1 = loadFixtureJson('askhistorians-new-page1.json');
   let calls = 0;
   const client = async (request: { url: string }): Promise<SafeHttpResponse> => {
     calls += 1;
-    return { status: 200, headers: { 'content-type': 'application/json' }, bodyText: JSON.stringify(page1), finalUrl: request.url };
+    return {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+      bodyText: JSON.stringify(page1),
+      finalUrl: request.url,
+    };
   };
 
   const candidates = await fetchSubredditNewListing({
@@ -335,15 +415,30 @@ test('fetchSubredditNewListing stops once maxItems is reached without requesting
 });
 
 test('fetchSubredditNewListing retries on 429 and eventually succeeds', async () => {
-  const entry = { ...redditRegistryEntry(), registryState: 'approved' as const, approvedAt: FIXED_NOW, approvedBy: 'admin@blackbook.local' };
+  const entry = {
+    ...redditRegistryEntry(),
+    registryState: 'approved' as const,
+    approvedAt: FIXED_NOW,
+    approvedBy: 'admin@blackbook.local',
+  };
   const page2 = loadFixtureJson('askhistorians-new-page2.json');
   let attempts = 0;
   const client = async (request: { url: string }): Promise<SafeHttpResponse> => {
     attempts += 1;
     if (attempts < 3) {
-      return { status: 429, headers: { 'content-type': 'text/plain' }, bodyText: '', finalUrl: request.url };
+      return {
+        status: 429,
+        headers: { 'content-type': 'text/plain' },
+        bodyText: '',
+        finalUrl: request.url,
+      };
     }
-    return { status: 200, headers: { 'content-type': 'application/json' }, bodyText: JSON.stringify(page2), finalUrl: request.url };
+    return {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+      bodyText: JSON.stringify(page2),
+      finalUrl: request.url,
+    };
   };
 
   const candidates = await fetchSubredditNewListing({
@@ -360,7 +455,12 @@ test('fetchSubredditNewListing retries on 429 and eventually succeeds', async ()
 });
 
 test('fetchSubredditNewListings fans out with modest bounded concurrency', async () => {
-  const entry = { ...redditRegistryEntry(), registryState: 'approved' as const, approvedAt: FIXED_NOW, approvedBy: 'admin@blackbook.local' };
+  const entry = {
+    ...redditRegistryEntry(),
+    registryState: 'approved' as const,
+    approvedAt: FIXED_NOW,
+    approvedBy: 'admin@blackbook.local',
+  };
   const askHistoriansPage = loadFixtureJson('askhistorians-new-page2.json');
   const blackHistoryPage = loadFixtureJson('blackhistory-new-listing.json');
   let inFlight = 0;
@@ -395,7 +495,9 @@ test('fetchSubredditNewListings fans out with modest bounded concurrency', async
 // --- Fail-closed compliance guards ------------------------------------------------------------
 
 test('the adapter export surface has no republication, ML-training, or deanonymization path', () => {
-  assert.doesNotThrow(() => assertNoForbiddenExportSurface(redditAdapter as unknown as Record<string, unknown>));
+  assert.doesNotThrow(() =>
+    assertNoForbiddenExportSurface(redditAdapter as unknown as Record<string, unknown>),
+  );
 });
 
 test(' deanonymization guard rejects a Reddit-targeted attempt (adapter does not bypass it)', () => {
@@ -418,7 +520,8 @@ function storedPointer(overrides: Partial<RedditStoredPointer> = {}): RedditStor
     subredditRegistryId: 'sub_askhistorians',
     subreddit: 'AskHistorians',
     postId: 'pc1abc',
-    permalink: 'https://www.reddit.com/r/AskHistorians/comments/pc1abc/sources_for_a_freedmens_bureau_field_office_in/',
+    permalink:
+      'https://www.reddit.com/r/AskHistorians/comments/pc1abc/sources_for_a_freedmens_bureau_field_office_in/',
     authorHandle: 'piedmont_researcher',
     capturedAt: FIXED_NOW,
     snippet: 'Sources for a Freedmen’s Bureau field office in Piedmont County, 1866-1870?',
@@ -431,7 +534,10 @@ test('checkRedditPostLivenessViaListingLookup classifies live, removed, deleted,
   const removedPage = loadFixtureJson('blackhistory-new-listing.json');
   const notFoundPage = loadFixtureJson('info-lookup-not-found.json');
 
-  async function checkWith(page: unknown, pointer: RedditStoredPointer): Promise<RedditLivenessCheckResult> {
+  async function checkWith(
+    page: unknown,
+    pointer: RedditStoredPointer,
+  ): Promise<RedditLivenessCheckResult> {
     const client = async (): Promise<SafeHttpResponse> => ({
       status: 200,
       headers: { 'content-type': 'application/json' },
@@ -452,12 +558,24 @@ test('checkRedditPostLivenessViaListingLookup classifies live, removed, deleted,
   // blackhistory-new-listing.json's parsed posts[0] is the live one; the classifier only ever
   // looks at the single post the /api/info lookup returns for a given id, so wrap a
   // single-child listing for the removed/deleted cases specifically.
-  const removedOnly = { kind: 'Listing', data: { after: null, children: [(removedPage as { data: { children: unknown[] } }).data.children[1]] } };
+  const removedOnly = {
+    kind: 'Listing',
+    data: {
+      after: null,
+      children: [(removedPage as { data: { children: unknown[] } }).data.children[1]],
+    },
+  };
   const removed = await checkWith(removedOnly, storedPointer({ postId: 'bh1removed' }));
   assert.equal(removed.live, false);
   assert.equal(removed.reason, 'removed_by_moderator_or_admin');
 
-  const deletedOnly = { kind: 'Listing', data: { after: null, children: [(removedPage as { data: { children: unknown[] } }).data.children[2]] } };
+  const deletedOnly = {
+    kind: 'Listing',
+    data: {
+      after: null,
+      children: [(removedPage as { data: { children: unknown[] } }).data.children[2]],
+    },
+  };
   const deleted = await checkWith(deletedOnly, storedPointer({ postId: 'bh1deleted' }));
   assert.equal(deleted.live, false);
   assert.equal(deleted.reason, 'deleted_by_author');
@@ -465,11 +583,21 @@ test('checkRedditPostLivenessViaListingLookup classifies live, removed, deleted,
 
 test('assertPointerLiveBeforeReview passes on a fresh live check and throws on a fresh dead check', async () => {
   const pointer = storedPointer();
-  const liveChecker: RedditLivenessChecker = async (p) => ({ pointerId: p.id, checkedAt: FIXED_NOW, live: true, reason: 'live' });
+  const liveChecker: RedditLivenessChecker = async (p) => ({
+    pointerId: p.id,
+    checkedAt: FIXED_NOW,
+    live: true,
+    reason: 'live',
+  });
   const result = await assertPointerLiveBeforeReview(pointer, liveChecker);
   assert.equal(result.live, true);
 
-  const deadChecker: RedditLivenessChecker = async (p) => ({ pointerId: p.id, checkedAt: FIXED_NOW, live: false, reason: 'deleted_by_author' });
+  const deadChecker: RedditLivenessChecker = async (p) => ({
+    pointerId: p.id,
+    checkedAt: FIXED_NOW,
+    live: false,
+    reason: 'deleted_by_author',
+  });
   await assert.rejects(() => assertPointerLiveBeforeReview(pointer, deadChecker), /no longer live/);
 });
 
@@ -492,7 +620,10 @@ test('planRedditPointerPurge builds a real  DeletionSyncPlan covering every casc
   });
 
   assert.equal(plan.mutations.length, 3);
-  assert.deepEqual(plan.mutations.map((m) => m.kind).sort(), ['graylist', 'quarantine', 'research_case_attachment'].sort());
+  assert.deepEqual(
+    plan.mutations.map((m) => m.kind).sort(),
+    ['graylist', 'quarantine', 'research_case_attachment'].sort(),
+  );
   assert.equal(plan.record.adapterId, REDDIT_ADAPTER_ID);
   assert.equal(plan.record.purgedTargetCount, 3);
   assert.equal(plan.auditEvent.action, 'deletion.purged');
@@ -501,7 +632,9 @@ test('planRedditPointerPurge builds a real  DeletionSyncPlan covering every casc
 
 test('buildRedditPointerCascadeTargets includes only the stages the caller supplies paths for', () => {
   const pointer = storedPointer();
-  const targets = buildRedditPointerCascadeTargets(pointer, { quarantinePath: `submissionQuarantine/${pointer.id}` });
+  const targets = buildRedditPointerCascadeTargets(pointer, {
+    quarantinePath: `submissionQuarantine/${pointer.id}`,
+  });
   assert.equal(targets.length, 1);
   assert.equal(targets[0]?.kind, 'quarantine');
 });
@@ -513,13 +646,21 @@ test('sweepRedditPointerLiveness purges only the pointers a fresh liveness check
 
   const checker: RedditLivenessChecker = async (pointer) =>
     pointer.id === 'ptr_dead'
-      ? { pointerId: pointer.id, checkedAt: FIXED_NOW, live: false, reason: 'removed_by_moderator_or_admin' }
+      ? {
+          pointerId: pointer.id,
+          checkedAt: FIXED_NOW,
+          live: false,
+          reason: 'removed_by_moderator_or_admin',
+        }
       : { pointerId: pointer.id, checkedAt: FIXED_NOW, live: true, reason: 'live' };
 
   const outcomes = await sweepRedditPointerLiveness({
     pointers: [alivePointer, deadPointer],
     checkLiveness: checker,
-    cascadePathsFor: (pointer) => ({ quarantinePath: `submissionQuarantine/${pointer.id}`, graylistPath: `discoveryGraylist/${pointer.id}` }),
+    cascadePathsFor: (pointer) => ({
+      quarantinePath: `submissionQuarantine/${pointer.id}`,
+      graylistPath: `discoveryGraylist/${pointer.id}`,
+    }),
     correlationIdFor: (pointer) => `corr_${pointer.id}`,
     requestedAt: FIXED_NOW,
     actor,
@@ -536,5 +677,8 @@ test('sweepRedditPointerLiveness purges only the pointers a fresh liveness check
   const deleted: string[] = [];
   const store = { delete: (path: string) => deleted.push(path) };
   applyRedditPointerPurge(store, deadOutcome!.purgePlan!);
-  assert.deepEqual(deleted.sort(), [`discoveryGraylist/${deadPointer.id}`, `submissionQuarantine/${deadPointer.id}`].sort());
+  assert.deepEqual(
+    deleted.sort(),
+    [`discoveryGraylist/${deadPointer.id}`, `submissionQuarantine/${deadPointer.id}`].sort(),
+  );
 });

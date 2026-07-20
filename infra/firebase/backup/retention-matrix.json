@@ -46,12 +46,7 @@
     },
     "audit": {
       "label": "Append-only audit and outbox",
-      "collections": [
-        "auditEvents",
-        "outboxMessages",
-        "idempotencyKeys",
-        "outboxConsumerReceipts"
-      ],
+      "collections": ["auditEvents", "outboxMessages", "idempotencyKeys", "outboxConsumerReceipts"],
       "exportCadence": "daily",
       "retentionDays": 2555,
       "retentionPolicy": "Immutable; 7+ years; never shortened without legal review",

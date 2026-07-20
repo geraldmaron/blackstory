@@ -6,7 +6,10 @@ import { test } from 'node:test';
 import { assertNoPassiveEuphemisms, findPassiveEuphemisms } from './why-public-editorial.js';
 
 test('findPassiveEuphemisms is case-insensitive and returns no matches for clean prose', () => {
-  assert.deepEqual(findPassiveEuphemisms('The school was founded in 1867 by formerly enslaved residents.'), []);
+  assert.deepEqual(
+    findPassiveEuphemisms('The school was founded in 1867 by formerly enslaved residents.'),
+    [],
+  );
 });
 
 test('findPassiveEuphemisms matches known euphemistic phrasing', () => {
@@ -17,7 +20,9 @@ test('findPassiveEuphemisms matches known euphemistic phrasing', () => {
 
 test('assertNoPassiveEuphemisms does not throw for clean prose', () => {
   assert.doesNotThrow(() =>
-    assertNoPassiveEuphemisms('A mob of white residents burned the church on the night of March 3.'),
+    assertNoPassiveEuphemisms(
+      'A mob of white residents burned the church on the night of March 3.',
+    ),
   );
 });
 

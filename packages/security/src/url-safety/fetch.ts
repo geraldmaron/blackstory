@@ -1,4 +1,3 @@
-
 /**
  * Defines the dependency-injected safe-fetch state machine used only by the
  * asynchronous URL worker. Each redirect is reparsed and re-resolved, the
@@ -43,9 +42,7 @@ export type PinnedTransportResponse = {
   readonly body: AsyncIterable<Uint8Array>;
 };
 
-export type PinnedTransport = (
-  request: PinnedTransportRequest,
-) => Promise<PinnedTransportResponse>;
+export type PinnedTransport = (request: PinnedTransportRequest) => Promise<PinnedTransportResponse>;
 
 export type SafeFetchFailureReason =
   | UrlDenialReason
@@ -57,10 +54,7 @@ export type SafeFetchFailureReason =
   | 'transport_failed'
   | 'malware_indicator';
 
-export type MalwareIndicator =
-  | 'eicar_test_signature'
-  | 'executable_magic'
-  | 'active_content';
+export type MalwareIndicator = 'eicar_test_signature' | 'executable_magic' | 'active_content';
 
 export type SafeParserResult = {
   readonly safe: boolean;
@@ -68,10 +62,7 @@ export type SafeParserResult = {
   readonly extractedText: string;
 };
 
-export type SafeParser = (
-  content: Uint8Array,
-  contentType: string,
-) => Promise<SafeParserResult>;
+export type SafeParser = (content: Uint8Array, contentType: string) => Promise<SafeParserResult>;
 
 export type SafeFetchResult =
   | {
@@ -121,7 +112,10 @@ function contentTypeBase(value: string | undefined): string {
 
 function equalAddress(left: string, right: string): boolean {
   const unwrap = (value: string) =>
-    value.toLowerCase().replace(/^\[|\]$/gu, '').replace(/^::ffff:/u, '');
+    value
+      .toLowerCase()
+      .replace(/^\[|\]$/gu, '')
+      .replace(/^::ffff:/u, '');
   return unwrap(left) === unwrap(right);
 }
 
@@ -181,7 +175,6 @@ export async function parseContentInSandbox(
   };
 }
 
-
 /**
  * Performs a bounded fetch through a transport that must connect directly to
  * `pinnedAddress` while retaining `hostname` for TLS SNI and the Host header.
@@ -228,9 +221,11 @@ export async function executeSafeFetch(
           now,
         );
       } catch (error) {
-        return fail(error instanceof Error && error.message.includes('deadline')
-          ? 'duration_exceeded'
-          : 'transport_failed');
+        return fail(
+          error instanceof Error && error.message.includes('deadline')
+            ? 'duration_exceeded'
+            : 'transport_failed',
+        );
       }
       if (!equalAddress(response.remoteAddress, destination.value.pinnedAddress)) {
         return fail('connected_address_mismatch');
@@ -301,9 +296,11 @@ export async function executeSafeFetch(
     }
     return fail('redirect_limit_exceeded');
   } catch (error) {
-    return fail(error instanceof Error && error.message.includes('deadline')
-      ? 'duration_exceeded'
-      : 'transport_failed');
+    return fail(
+      error instanceof Error && error.message.includes('deadline')
+        ? 'duration_exceeded'
+        : 'transport_failed',
+    );
   } finally {
     controller.abort();
   }

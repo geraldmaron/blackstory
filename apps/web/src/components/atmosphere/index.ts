@@ -5,10 +5,7 @@
 export { AtmospherePlane } from './AtmospherePlane';
 export type { AtmospherePlaneProps } from './AtmospherePlane';
 export { LivingAtmosphereMosaic } from './LivingAtmosphereMosaic';
-export type {
-  LivingAtmosphereMosaicProps,
-  MosaicEntityLink,
-} from './LivingAtmosphereMosaic';
+export type { LivingAtmosphereMosaicProps, MosaicEntityLink } from './LivingAtmosphereMosaic';
 export { NamesMemorialWall } from './NamesMemorialWall';
 export type { NamesMemorialWallProps } from './NamesMemorialWall';
 export { AboutMosaicMast, AboutMosaicRail } from './AboutMosaicRail';
@@ -39,15 +36,9 @@ export { computeFillMosaicLayout } from './compute-fill-mosaic-layout';
 export type { FillMosaicLayout } from './compute-fill-mosaic-layout';
 export { computeNamesWallLayout } from './compute-names-wall-layout';
 export type { NamesWallLayout } from './compute-names-wall-layout';
-export {
-  applyLivingTileSwap,
-  pickLivingTileSwap,
-} from './select-living-swap';
+export { applyLivingTileSwap, pickLivingTileSwap } from './select-living-swap';
 export type { LivingTileSwap } from './select-living-swap';
-export {
-  applyMemorialNameSwap,
-  pickMemorialNameSwap,
-} from './select-memorial-swap';
+export { applyMemorialNameSwap, pickMemorialNameSwap } from './select-memorial-swap';
 export type { MemorialNameLayers, MemorialNameSwap } from './select-memorial-swap';
 export {
   MEMORIAL_NAMES,
@@ -58,9 +49,6 @@ export {
   selectMemorialNames,
 } from './memorial-names';
 export type { MemorialNameCategory, MemorialNameEntry } from './memorial-names';
-export {
-  ATMOSPHERE_ATTRIBUTION_HREF,
-  ATMOSPHERE_TILE_CREDITS,
-} from './tile-credits';
+export { ATMOSPHERE_ATTRIBUTION_HREF, ATMOSPHERE_TILE_CREDITS } from './tile-credits';
 export type { AtmosphereTileCredit } from './tile-credits';
 export { renderStoryTitle, STORY_TITLE_ACCENTS } from './story-title';

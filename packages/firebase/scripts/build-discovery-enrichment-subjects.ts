@@ -51,11 +51,15 @@ async function main(): Promise<void> {
   const max = Number(readArgFlag('--max') ?? '200');
   const concurrency = Number(readArgFlag('--concurrency') ?? '4');
   if (!candidatesPath || !outPath) {
-    console.error('Usage: --candidates <run-*.json> --out <subjects.json> [--max 200] [--concurrency 4]');
+    console.error(
+      'Usage: --candidates <run-*.json> --out <subjects.json> [--max 200] [--concurrency 4]',
+    );
     process.exit(2);
   }
 
-  const data = JSON.parse(readFileSync(candidatesPath, 'utf8')) as { candidates?: readonly Candidate[] };
+  const data = JSON.parse(readFileSync(candidatesPath, 'utf8')) as {
+    candidates?: readonly Candidate[];
+  };
   const candidates = (data.candidates ?? []).slice(0, max);
 
   let fetched = 0;
@@ -79,9 +83,12 @@ async function main(): Promise<void> {
           );
         }
       }
-      const corroboration = await findCorroboratingTier1Source(candidate.displayName ?? candidate.id, {
-        ...(originalPage ? { html: originalPage.html, url: candidate.canonicalUrl } : {}),
-      });
+      const corroboration = await findCorroboratingTier1Source(
+        candidate.displayName ?? candidate.id,
+        {
+          ...(originalPage ? { html: originalPage.html, url: candidate.canonicalUrl } : {}),
+        },
+      );
       if (corroboration) {
         corroborated += 1;
         snippets.push(
@@ -110,7 +117,13 @@ async function main(): Promise<void> {
     `${JSON.stringify({ subjects, count: subjects.length, source: candidatesPath }, null, 2)}\n`,
   );
   console.log(
-    JSON.stringify({ subjects: subjects.length, sourcesFetched: fetched, sourcesUnreachable: unreachable, corroborated, outPath }),
+    JSON.stringify({
+      subjects: subjects.length,
+      sourcesFetched: fetched,
+      sourcesUnreachable: unreachable,
+      corroborated,
+      outPath,
+    }),
   );
 }
 

@@ -1,4 +1,3 @@
-
 /**
  * CLI entry for beta launch gate evaluation.
  */

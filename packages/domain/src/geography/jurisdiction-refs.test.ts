@@ -37,10 +37,7 @@ test('evaluateJurisdictionReferences: reports every dangling reference, not just
   assert.equal(result.ok, false);
   if (result.ok) throw new Error('unreachable');
   assert.equal(result.dangling.length, 2);
-  assert.deepEqual(
-    result.dangling.map((d) => d.jurisdictionId).sort(),
-    ['us-77-999', 'us-99'],
-  );
+  assert.deepEqual(result.dangling.map((d) => d.jurisdictionId).sort(), ['us-77-999', 'us-99']);
 });
 
 test('evaluateJurisdictionReferences: an empty/whitespace jurisdictionId is dangling', async () => {

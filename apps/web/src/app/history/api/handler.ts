@@ -15,7 +15,11 @@ import {
   resolveHistoryGraphSlice,
 } from '../../../lib/history/build-history-graph';
 import { listPublicEntityViews } from '../../../lib/public-data/source';
-import { parseHistoryConnectionsFilter, parseHistorySort, type HistoryFilterState } from '../../../lib/history/filters';
+import {
+  parseHistoryConnectionsFilter,
+  parseHistorySort,
+  type HistoryFilterState,
+} from '../../../lib/history/filters';
 import { parseDecadeParam } from '../../../lib/history/url-state';
 import type { HistoryAppCheckGuard } from './app-check-guard';
 import type { createHistoryRateLimitGuard } from './rate-limit-guard';

@@ -1,4 +1,3 @@
-
 /**
  * threat corpus loader and validators for security test scaffolds.
  * Reads docs/security/threat-corpus.json and asserts acceptance criteria.

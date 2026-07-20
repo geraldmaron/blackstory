@@ -164,14 +164,19 @@ export function parkCandidate(
 }
 
 /** Queryable-for-corroboration lookup: exact match on the normalized key. */
-export function queryGraylistByCorroborationKey(store: GraylistStore, key: string): readonly GraylistEntry[] {
+export function queryGraylistByCorroborationKey(
+  store: GraylistStore,
+  key: string,
+): readonly GraylistEntry[] {
   const normalized = key
     .toLowerCase()
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
-  return store.list().filter((entry) => entry.corroborationKey === normalized && entry.status !== 'archived');
+  return store
+    .list()
+    .filter((entry) => entry.corroborationKey === normalized && entry.status !== 'archived');
 }
 
 export function listGraylistByDisposition(

@@ -34,8 +34,7 @@ export async function GET(request: Request): Promise<Response> {
     ) {
       return Response.json(
         {
-          error:
-            'Firestore unavailable. Start emulators or configure production ADC, then retry.',
+          error: 'Firestore unavailable. Start emulators or configure production ADC, then retry.',
           code: 'FIRESTORE_UNAVAILABLE',
         },
         { status: 503 },

@@ -1,4 +1,3 @@
-
 /**
  * /: proves the Reddit deletion-sync job body is REAL it calls
  * `@repo/domain`'s `sweepRedditPointerLiveness`/`applyRedditPointerPurge` (which in turn
@@ -28,7 +27,12 @@ function pointer(overrides: Partial<RedditStoredPointer> = {}): RedditStoredPoin
 }
 
 test('a sweep with no dead pointers completes as success and purges nothing', async () => {
-  const checker: RedditLivenessChecker = async (p) => ({ pointerId: p.id, checkedAt: '2026-07-17T20:00:00.000Z', live: true, reason: 'live' });
+  const checker: RedditLivenessChecker = async (p) => ({
+    pointerId: p.id,
+    checkedAt: '2026-07-17T20:00:00.000Z',
+    live: true,
+    reason: 'live',
+  });
   const deleted: string[] = [];
   const result = await runRedditDeletionSyncJob({
     jobRunId: 'run-1',
@@ -54,7 +58,12 @@ test('a sweep with a dead pointer purges it through the real  purge mutation pat
   const dead = pointer({ id: 'ptr_dead', postId: 'bh1removed' });
   const checker: RedditLivenessChecker = async (p) =>
     p.id === 'ptr_dead'
-      ? { pointerId: p.id, checkedAt: '2026-07-17T20:00:00.000Z', live: false, reason: 'removed_by_moderator_or_admin' }
+      ? {
+          pointerId: p.id,
+          checkedAt: '2026-07-17T20:00:00.000Z',
+          live: false,
+          reason: 'removed_by_moderator_or_admin',
+        }
       : { pointerId: p.id, checkedAt: '2026-07-17T20:00:00.000Z', live: true, reason: 'live' };
   const deleted: string[] = [];
 
@@ -64,7 +73,10 @@ test('a sweep with a dead pointer purges it through the real  purge mutation pat
     completedAt: '2026-07-17T20:01:00.000Z',
     pointers: [alive, dead],
     checkLiveness: checker,
-    cascadePathsFor: (p) => ({ quarantinePath: `submissionQuarantine/${p.id}`, graylistPath: `discoveryGraylist/${p.id}` }),
+    cascadePathsFor: (p) => ({
+      quarantinePath: `submissionQuarantine/${p.id}`,
+      graylistPath: `discoveryGraylist/${p.id}`,
+    }),
     correlationIdFor: (p) => `corr_${p.id}`,
     actor: ACTOR,
     purgeStore: { delete: (path) => deleted.push(path) },
@@ -73,7 +85,10 @@ test('a sweep with a dead pointer purges it through the real  purge mutation pat
   assert.equal(result.summary.checked, 2);
   assert.equal(result.summary.purged, 1);
   assert.equal(result.summary.stillLive, 1);
-  assert.deepEqual(deleted.sort(), [`discoveryGraylist/${dead.id}`, `submissionQuarantine/${dead.id}`].sort());
+  assert.deepEqual(
+    deleted.sort(),
+    [`discoveryGraylist/${dead.id}`, `submissionQuarantine/${dead.id}`].sort(),
+  );
   assert.equal(result.run.status, 'quarantined'); // completeJobRun marks any run with issues as quarantined, matching every other job body's convention.
   assert.ok(result.run.issues?.includes(`${dead.id}:purged`));
 });

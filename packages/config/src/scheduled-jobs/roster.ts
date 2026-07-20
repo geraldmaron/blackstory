@@ -1,4 +1,3 @@
-
 /**
  * Initial scheduled-job roster. Registry ENTRIES only most
  * job bodies belong to that are not built yet, or are being built in parallel by other
@@ -13,7 +12,11 @@
  */
 import { EVENT_DRIVEN_CADENCE_SENTINEL } from './cron.js';
 import { scheduledJobKillSwitchId } from './kill-switch.js';
-import { createInMemoryScheduledJobRegistry, registerScheduledJob, type ScheduledJobRegistryStore } from './registry.js';
+import {
+  createInMemoryScheduledJobRegistry,
+  registerScheduledJob,
+  type ScheduledJobRegistryStore,
+} from './registry.js';
 import type { ScheduledJobDefinition } from './types.js';
 
 const HOUR_MS = 60 * 60 * 1000;
@@ -35,12 +38,19 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     owner: 'discovery/wikimedia-federal',
     description:
       'Per-adapter discovery campaigns for Wikimedia and federal sources (LOC, NARA, NPS, DPLA, school-history) on their weekly-to-monthly cadences.',
-    cadence: { cronExpression: '0 6 * * 1', nominalIntervalMs: WEEK_MS, humanReadable: 'weekly, Mondays 06:00 UTC' },
+    cadence: {
+      cronExpression: '0 6 * * 1',
+      nominalIntervalMs: WEEK_MS,
+      humanReadable: 'weekly, Mondays 06:00 UTC',
+    },
     budget: { unit: 'candidates', maxPerRun: 500 },
     timeoutSec: 3_600,
     idempotencyKeyScheme: 'job:{jobId}:{isoWeekStart}',
     killSwitchId: RESEARCH_CAMPAIGNS_KILL_SWITCH,
-    targetWorker: { package: 'research', function: 'discovery.campaign.run_wikimedia_federal_campaign' },
+    targetWorker: {
+      package: 'research',
+      function: 'discovery.campaign.run_wikimedia_federal_campaign',
+    },
     environment: 'repo-internal',
     publicEffect: 'none',
     rosterStatus: 'real',
@@ -94,7 +104,11 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     owner: 'discovery/archive-web',
     description:
       'Internet Archive + community DPLA v2 discovery (not federal dpla-items-v1). Private candidates only.',
-    cadence: { cronExpression: '0 7 * * 2', nominalIntervalMs: WEEK_MS, humanReadable: 'weekly, Tuesdays 07:00 UTC' },
+    cadence: {
+      cronExpression: '0 7 * * 2',
+      nominalIntervalMs: WEEK_MS,
+      humanReadable: 'weekly, Tuesdays 07:00 UTC',
+    },
     budget: { unit: 'candidates', maxPerRun: 500 },
     timeoutSec: 3_600,
     idempotencyKeyScheme: 'job:{jobId}:{isoWeekStart}',
@@ -111,7 +125,11 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     owner: 'discovery/archive-web',
     description:
       'Budget-gated web-search discovery (SearXNG preferred; Brave fallback). Fails closed without storageTermsConfirmed; see cost-controls-matrix.json.',
-    cadence: { cronExpression: '30 8 * * *', nominalIntervalMs: DAY_MS, humanReadable: 'daily 08:30 UTC' },
+    cadence: {
+      cronExpression: '30 8 * * *',
+      nominalIntervalMs: DAY_MS,
+      humanReadable: 'daily 08:30 UTC',
+    },
     budget: { unit: 'requests', maxPerRun: 50 },
     timeoutSec: 3_600,
     idempotencyKeyScheme: 'job:{jobId}:{dayStart}',
@@ -138,7 +156,11 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     owner: 'discovery/reddit-rights',
     description:
       'Reddit deletion-sync: honors the contractual 48h deletion window by re-checking liveness and purging deleted pointers (including snippets).',
-    cadence: { cronExpression: '0 */6 * * *', nominalIntervalMs: 6 * HOUR_MS, humanReadable: 'every 6 hours' },
+    cadence: {
+      cronExpression: '0 */6 * * *',
+      nominalIntervalMs: 6 * HOUR_MS,
+      humanReadable: 'every 6 hours',
+    },
     budget: { unit: 'items', maxPerRun: 1_000 },
     timeoutSec: 1_800,
     idempotencyKeyScheme: 'job:{jobId}:{sixHourWindowStart}',
@@ -158,7 +180,11 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     owner: 'legal-change-monitoring',
     description:
       'Legal landscape change monitoring: propose review_queue events from free public sources; never auto-apply public writes.',
-    cadence: { cronExpression: '0 8 * * *', nominalIntervalMs: DAY_MS, humanReadable: 'daily, 08:00 UTC' },
+    cadence: {
+      cronExpression: '0 8 * * *',
+      nominalIntervalMs: DAY_MS,
+      humanReadable: 'daily, 08:00 UTC',
+    },
     budget: { unit: 'items', maxPerRun: 500 },
     timeoutSec: 1_800,
     idempotencyKeyScheme: 'job:{jobId}:{dayStart}',
@@ -181,7 +207,11 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     owner: 'citation-link-health',
     description:
       'Citation link-health sweeps; the only automatic write this job may make is repairing a dead link to an archived copy.',
-    cadence: { cronExpression: '0 9 * * 3', nominalIntervalMs: WEEK_MS, humanReadable: 'weekly, Wednesdays 09:00 UTC' },
+    cadence: {
+      cronExpression: '0 9 * * 3',
+      nominalIntervalMs: WEEK_MS,
+      humanReadable: 'weekly, Wednesdays 09:00 UTC',
+    },
     budget: { unit: 'links', maxPerRun: 2_000 },
     timeoutSec: 3_600,
     idempotencyKeyScheme: 'job:{jobId}:{isoWeekStart}',
@@ -198,7 +228,11 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     id: 'external-dataset-refresh-fbi-hate-crime',
     owner: 'historic-safety',
     description: 'Checks for the FBI hate-crime annual statistics release.',
-    cadence: { cronExpression: '0 6 1 10 *', nominalIntervalMs: YEAR_MS, humanReadable: 'annually, Oct 1 06:00 UTC' },
+    cadence: {
+      cronExpression: '0 6 1 10 *',
+      nominalIntervalMs: YEAR_MS,
+      humanReadable: 'annually, Oct 1 06:00 UTC',
+    },
     budget: { unit: 'requests', maxPerRun: 10 },
     timeoutSec: 600,
     idempotencyKeyScheme: 'job:{jobId}:{yearStart}',
@@ -214,12 +248,19 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     id: 'external-dataset-refresh-tougaloo-mapping-inequality',
     owner: 'historic-safety',
     description: 'Checks for Tougaloo/Mapping Inequality dataset revisions.',
-    cadence: { cronExpression: '0 6 1 */3 *', nominalIntervalMs: QUARTER_MS, humanReadable: 'quarterly, 1st 06:00 UTC' },
+    cadence: {
+      cronExpression: '0 6 1 */3 *',
+      nominalIntervalMs: QUARTER_MS,
+      humanReadable: 'quarterly, 1st 06:00 UTC',
+    },
     budget: { unit: 'requests', maxPerRun: 10 },
     timeoutSec: 600,
     idempotencyKeyScheme: 'job:{jobId}:{quarterStart}',
     killSwitchId: scheduledJobKillSwitchId('external-dataset-refresh-tougaloo-mapping-inequality'),
-    targetWorker: { package: 'research', function: 'dataset_refresh.check_tougaloo_mapping_inequality' },
+    targetWorker: {
+      package: 'research',
+      function: 'dataset_refresh.check_tougaloo_mapping_inequality',
+    },
     environment: 'repo-internal',
     publicEffect: 'none',
     rosterStatus: 'stub',
@@ -235,13 +276,21 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
   {
     id: 'relevance-confidence-recalibration-report',
     owner: 'relevance-feedback',
-    description: 'Monthly relevance/confidence recalibration report (proposal only, no auto-tuning).',
-    cadence: { cronExpression: '0 5 1 * *', nominalIntervalMs: MONTH_MS, humanReadable: 'monthly, 1st 05:00 UTC' },
+    description:
+      'Monthly relevance/confidence recalibration report (proposal only, no auto-tuning).',
+    cadence: {
+      cronExpression: '0 5 1 * *',
+      nominalIntervalMs: MONTH_MS,
+      humanReadable: 'monthly, 1st 05:00 UTC',
+    },
     budget: { unit: 'claims', maxPerRun: 50_000 },
     timeoutSec: 7_200,
     idempotencyKeyScheme: 'job:{jobId}:{monthStart}',
     killSwitchId: scheduledJobKillSwitchId('relevance-confidence-recalibration-report'),
-    targetWorker: { package: 'research', function: 'confidence_engine.recalibration_report.generate' },
+    targetWorker: {
+      package: 'research',
+      function: 'confidence_engine.recalibration_report.generate',
+    },
     environment: 'repo-internal',
     publicEffect: 'none',
     rosterStatus: 'real',
@@ -254,7 +303,11 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     id: 'source-drift-run-health-check',
     owner: 'adapter-run-health',
     description: 'Daily source-adapter record-count/schema drift and run-health checks.',
-    cadence: { cronExpression: '0 4 * * *', nominalIntervalMs: DAY_MS, humanReadable: 'daily 04:00 UTC' },
+    cadence: {
+      cronExpression: '0 4 * * *',
+      nominalIntervalMs: DAY_MS,
+      humanReadable: 'daily 04:00 UTC',
+    },
     budget: { unit: 'adapters', maxPerRun: 50 },
     timeoutSec: 1_800,
     idempotencyKeyScheme: 'job:{jobId}:{dayStart}',
@@ -272,7 +325,11 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     id: 'gold-corpus-regression',
     owner: 'gold-corpus-regression',
     description: 'Nightly (and on-engine-change) gold-corpus regression evaluation; report-only.',
-    cadence: { cronExpression: '0 3 * * *', nominalIntervalMs: DAY_MS, humanReadable: 'daily 03:00 UTC' },
+    cadence: {
+      cronExpression: '0 3 * * *',
+      nominalIntervalMs: DAY_MS,
+      humanReadable: 'daily 03:00 UTC',
+    },
     budget: { unit: 'examples', maxPerRun: 10_000 },
     timeoutSec: 1_800,
     idempotencyKeyScheme: 'job:{jobId}:{dayStart}',
@@ -295,8 +352,13 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
   {
     id: 'backup-verification-daily',
     owner: 'backup-verification',
-    description: 'Daily Firestore export verification (document counts, collection hashes, manifest checks).',
-    cadence: { cronExpression: '0 5 * * *', nominalIntervalMs: DAY_MS, humanReadable: 'daily 05:00 UTC' },
+    description:
+      'Daily Firestore export verification (document counts, collection hashes, manifest checks).',
+    cadence: {
+      cronExpression: '0 5 * * *',
+      nominalIntervalMs: DAY_MS,
+      humanReadable: 'daily 05:00 UTC',
+    },
     budget: { unit: 'exports', maxPerRun: 5 },
     timeoutSec: 900,
     idempotencyKeyScheme: 'job:{jobId}:{dayStart}',
@@ -315,13 +377,21 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
   {
     id: 'restore-drill-quarterly',
     owner: 'restore-drill',
-    description: 'Quarterly restore-drill scheduling; prints the staging-restore command for human execution.',
-    cadence: { cronExpression: '0 6 1 1,4,7,10 *', nominalIntervalMs: QUARTER_MS, humanReadable: 'quarterly, 1st 06:00 UTC' },
+    description:
+      'Quarterly restore-drill scheduling; prints the staging-restore command for human execution.',
+    cadence: {
+      cronExpression: '0 6 1 1,4,7,10 *',
+      nominalIntervalMs: QUARTER_MS,
+      humanReadable: 'quarterly, 1st 06:00 UTC',
+    },
     budget: { unit: 'drills', maxPerRun: 1 },
     timeoutSec: 600,
     idempotencyKeyScheme: 'job:{jobId}:{quarterStart}',
     killSwitchId: scheduledJobKillSwitchId('restore-drill-quarterly'),
-    targetWorker: { package: 'security', function: 'ops.backup_verification.staging_restore_drill' },
+    targetWorker: {
+      package: 'security',
+      function: 'ops.backup_verification.staging_restore_drill',
+    },
     environment: 'repo-internal',
     publicEffect: 'none',
     rosterStatus: 'real',
@@ -337,7 +407,11 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     owner: 'degraded-mode',
     description:
       'Daily cost/budget report. Real evaluator already exists (packages/security/src/resource-controls.ts evaluateDailyBudget) but is not yet wired into a schedulable job body.',
-    cadence: { cronExpression: '0 7 * * *', nominalIntervalMs: DAY_MS, humanReadable: 'daily 07:00 UTC' },
+    cadence: {
+      cronExpression: '0 7 * * *',
+      nominalIntervalMs: DAY_MS,
+      humanReadable: 'daily 07:00 UTC',
+    },
     budget: { unit: 'reports', maxPerRun: 1 },
     timeoutSec: 600,
     idempotencyKeyScheme: 'job:{jobId}:{dayStart}',
@@ -359,7 +433,11 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     owner: 'map-platform',
     description:
       'Rebuilds map source tiles and the search index after a release activation. Event-driven; nominalIntervalMs below is the safety-net poll window.',
-    cadence: { cronExpression: EVENT_DRIVEN_CADENCE_SENTINEL, nominalIntervalMs: HOUR_MS, humanReadable: 'on release activation (event-driven); hourly safety-net poll' },
+    cadence: {
+      cronExpression: EVENT_DRIVEN_CADENCE_SENTINEL,
+      nominalIntervalMs: HOUR_MS,
+      humanReadable: 'on release activation (event-driven); hourly safety-net poll',
+    },
     budget: { unit: 'rebuilds', maxPerRun: 3 },
     timeoutSec: 3_600,
     idempotencyKeyScheme: 'job:{jobId}:{releaseId}',

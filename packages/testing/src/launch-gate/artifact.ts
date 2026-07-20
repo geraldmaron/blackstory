@@ -1,4 +1,3 @@
-
 /**
  * JSON decision artifact schema validation and writer for launch records.
  */
@@ -7,7 +6,15 @@ import { dirname } from 'node:path';
 import type { BetaLaunchEvaluationReport, HumanAttestationBundle } from './types.js';
 import { BETA_LAUNCH_DECISION_SCHEMA_VERSION } from './types.js';
 
-const GATE_RESULT_REQUIRED = ['id', 'title', 'kind', 'required', 'status', 'message', 'evidence'] as const;
+const GATE_RESULT_REQUIRED = [
+  'id',
+  'title',
+  'kind',
+  'required',
+  'status',
+  'message',
+  'evidence',
+] as const;
 const EVIDENCE_REQUIRED = ['type', 'ref'] as const;
 
 function assertRecord(value: unknown, label: string): Record<string, unknown> {

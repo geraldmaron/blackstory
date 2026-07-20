@@ -36,7 +36,9 @@ const FORBIDDEN_EXPORT_NAME_PATTERNS: readonly RegExp[] = [
  * `import * as redditAdapter from './index.js'` to check the adapter's real, live export
  * surface not a hand-maintained list that could drift from what's actually exported.
  */
-export function assertNoForbiddenExportSurface(moduleExports: Readonly<Record<string, unknown>>): void {
+export function assertNoForbiddenExportSurface(
+  moduleExports: Readonly<Record<string, unknown>>,
+): void {
   for (const name of Object.keys(moduleExports)) {
     for (const pattern of FORBIDDEN_EXPORT_NAME_PATTERNS) {
       if (pattern.test(name)) {

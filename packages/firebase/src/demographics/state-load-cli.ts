@@ -111,7 +111,9 @@ export function parseTwps0056StateCsv(csvText: string): Twps0056StateRow[] {
 
     if (hasFree) {
       if (!split.has(decade)) {
-        throw new Error(`twps0056 state parse: ${key} must NOT carry free/slave (post-emancipation)`);
+        throw new Error(
+          `twps0056 state parse: ${key} must NOT carry free/slave (post-emancipation)`,
+        );
       }
       const freeBlackPopulation = parseIntStrict(freeRaw, 'blackFree', key);
       const enslavedBlackPopulation = parseIntStrict(slaveRaw, 'blackSlave', key);

@@ -188,13 +188,23 @@ export const seedSchoolEntity: CanonicalEntityDoc = {
   kind: 'school',
   displayName: 'Paul Laurence Dunbar High School',
   aliases: [
-    { value: 'Preparatory High School for Colored Youth', kind: 'former_name', validFrom: '1870', validTo: '1891' },
+    {
+      value: 'Preparatory High School for Colored Youth',
+      kind: 'former_name',
+      validFrom: '1870',
+      validTo: '1891',
+    },
     { value: 'M Street High School', kind: 'former_name', validFrom: '1891', validTo: '1916' },
   ],
   livingStatus: 'unknown',
   school: {
     names: [
-      { name: 'Preparatory High School for Colored Youth', validFrom: '1870', validTo: '1891', primary: false },
+      {
+        name: 'Preparatory High School for Colored Youth',
+        validFrom: '1870',
+        validTo: '1891',
+        primary: false,
+      },
       { name: 'M Street High School', validFrom: '1891', validTo: '1916', primary: false },
       { name: 'Paul Laurence Dunbar High School', validFrom: '1916', validTo: null, primary: true },
     ],
@@ -267,7 +277,8 @@ export const seedSchoolCurrentLocation: EntityLocationDoc = {
   validFrom: '1891',
   validTo: null,
   modernZip: { zip: '20001', role: 'modern_lookup' },
-  label: 'Current campus (New Jersey Avenue NW; present 2013 building on the same footprint since 1916)',
+  label:
+    'Current campus (New Jersey Avenue NW; present 2013 building on the same footprint since 1916)',
   evidenceIds: ['ev_seed_school_move'],
 };
 

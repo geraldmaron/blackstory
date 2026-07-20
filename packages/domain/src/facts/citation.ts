@@ -34,8 +34,15 @@ export type CslJsonReference = {
   /** CSL item type, e.g. "webpage", "book", "legal_case", "personal_communication". */
   readonly type: string;
   readonly title?: string;
-  readonly author?: readonly { readonly family?: string; readonly given?: string; readonly literal?: string }[];
-  readonly issued?: { readonly 'date-parts'?: readonly (readonly number[])[]; readonly raw?: string };
+  readonly author?: readonly {
+    readonly family?: string;
+    readonly given?: string;
+    readonly literal?: string;
+  }[];
+  readonly issued?: {
+    readonly 'date-parts'?: readonly (readonly number[])[];
+    readonly raw?: string;
+  };
   readonly URL?: string;
   readonly publisher?: string;
   readonly 'container-title'?: string;
@@ -98,7 +105,11 @@ export function assertFactCitationStructurallyComplete(citation: FactCitation): 
     throw new Error('Fact citation requires a non-empty excerpt (the supporting passage)');
   }
   if (isWebFactCitation(citation)) {
-    if (!isNonEmpty(citation.archivedUrl) || !isNonEmpty(citation.archivedAt) || !isIsoDate(citation.archivedAt)) {
+    if (
+      !isNonEmpty(citation.archivedUrl) ||
+      !isNonEmpty(citation.archivedAt) ||
+      !isIsoDate(citation.archivedAt)
+    ) {
       throw new Error(
         'Web fact citations require an archivedUrl and a valid ISO archivedAt ( capture pointer)',
       );
@@ -107,7 +118,9 @@ export function assertFactCitationStructurallyComplete(citation: FactCitation): 
       throw new Error('Web fact citations require a valid ISO accessedAt (retrieval date)');
     }
   } else if (!isNonEmpty(citation.accessedAt) || !isIsoDate(citation.accessedAt)) {
-    throw new Error('Fact citations require a valid ISO accessedAt (retrieval date), web or offline');
+    throw new Error(
+      'Fact citations require a valid ISO accessedAt (retrieval date), web or offline',
+    );
   }
 }
 

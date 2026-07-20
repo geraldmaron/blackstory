@@ -139,6 +139,9 @@ export function rankStateMovers(
   return { gains, losses };
 }
 
-export function formatStateChangeLine(row: StateChangeLike, stateName: string): string {
+export function formatStateChangeLine(
+  row: Pick<StateChangeLike, 'blackAbsoluteChange' | 'shareChangePp'>,
+  stateName: string,
+): string {
   return `${stateName}: ${formatSignedCount(row.blackAbsoluteChange)} Black population (${formatSignedPp(row.shareChangePp)} share)`;
 }

@@ -3,11 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {
-  confidenceHelp,
-  metaFieldHelp,
-  statusHelp,
-} from './metadata-help';
+import { confidenceHelp, metaFieldHelp, statusHelp } from './metadata-help';
 
 test('metaFieldHelp explains confidence as an evidence score', () => {
   const help = metaFieldHelp('confidence');

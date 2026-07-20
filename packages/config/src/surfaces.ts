@@ -1,4 +1,3 @@
-
 /**
  * Typed surface identity and capability matrix for BlackStory deployables (ADR-005).
  * Fail-closed operation and auth checks mirror infra/gcp/surfaces/surface-matrix.json.
@@ -15,18 +14,10 @@ export const SURFACE_IDS = [
 export type SurfaceId = (typeof SURFACE_IDS)[number];
 
 export type NetworkPosture =
-  | 'public-cdn'
-  | 'public-read'
-  | 'public-rate-limited'
-  | 'private-network'
-  | 'iap-protected';
+  'public-cdn' | 'public-read' | 'public-rate-limited' | 'private-network' | 'iap-protected';
 
 export type AuthMode =
-  | 'anonymous'
-  | 'end-user-token'
-  | 'service-identity'
-  | 'iap-session'
-  | 'app-authorization';
+  'anonymous' | 'end-user-token' | 'service-identity' | 'iap-session' | 'app-authorization';
 
 export type OperationId =
   | 'read:public-projections'
@@ -51,7 +42,10 @@ export interface SurfaceDefinition {
   readonly mustNotAcceptAuth: readonly AuthMode[];
 }
 
-const ALL_PUBLISH_OPS = ['publish:projection', 'promote:release'] as const satisfies readonly OperationId[];
+const ALL_PUBLISH_OPS = [
+  'publish:projection',
+  'promote:release',
+] as const satisfies readonly OperationId[];
 const ALL_CANONICAL_WRITES = ['write:canonical'] as const satisfies readonly OperationId[];
 
 export const SURFACE_DEFINITIONS: Readonly<Record<SurfaceId, SurfaceDefinition>> = {

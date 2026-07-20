@@ -1,4 +1,3 @@
-
 /**
  * Tests for embedding pipeline orchestration, using the deterministic mock provider
  * no network access or API key required. See ADR-014 for what a real recall number needs.
@@ -6,7 +5,12 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createDeterministicMockEmbeddingProvider } from './provider.js';
-import { embedEntitiesBatch, embedEntity, estimateEmbeddingCostUsd, sha256Hex } from './pipeline.js';
+import {
+  embedEntitiesBatch,
+  embedEntity,
+  estimateEmbeddingCostUsd,
+  sha256Hex,
+} from './pipeline.js';
 import { isUnitVector } from './vector-math.js';
 
 test('embedEntity produces a unit-normalized, correctly-dimensioned vector with derived filters', async () => {

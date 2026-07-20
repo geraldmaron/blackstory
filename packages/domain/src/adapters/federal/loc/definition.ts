@@ -32,6 +32,14 @@ export const locAdapterDefinition = buildFederalAdapterDefinition({
   exportFilter: {
     ...DEFAULT_FEDERAL_EXPORT_FILTER,
     stripKeys: [...DEFAULT_FEDERAL_EXPORT_FILTER.stripKeys, 'imageTiles', 'marcRecord'],
-    essentialKeys: ['stableIdentifier', 'title', 'canonicalUrl', 'classification', 'lccn', 'date', 'subjects'],
+    essentialKeys: [
+      'stableIdentifier',
+      'title',
+      'canonicalUrl',
+      'classification',
+      'lccn',
+      'date',
+      'subjects',
+    ],
   },
 });

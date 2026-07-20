@@ -1,4 +1,3 @@
-
 /**
  * WCAG relative-luminance and contrast-ratio helpers for design-token validation.
  */

@@ -16,7 +16,11 @@ export const RSS_PAYLOAD_SCHEMA_VERSION = 'rss-payload.v1' as const;
  * (packages/schemas/constitution/policy.v1.json `sourceClassifications`). A feed registry
  * entry picks the tier that best matches its publisher type; see feed-registry.ts.
  */
-export const RSS_FEED_CLASSIFICATIONS = ['news_reportage', 'self_published', 'community_oral'] as const;
+export const RSS_FEED_CLASSIFICATIONS = [
+  'news_reportage',
+  'self_published',
+  'community_oral',
+] as const;
 
 export type RssFeedClassification = (typeof RSS_FEED_CLASSIFICATIONS)[number];
 

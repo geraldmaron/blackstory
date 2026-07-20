@@ -74,7 +74,11 @@ test('mirroring is deterministic regardless of subjects[] input order (id-sorted
 
 test('a fact with no evidenceIds falls back to citing itself as evidence (fail-safe, never empty)', () => {
   const mirrored = mirrorFactSubjectsIntoRelationships([
-    { factId: 'fact-no-evidence', subjects: [{ subjectEntityId: 'a' }, { subjectEntityId: 'b' }], evidenceIds: [] },
+    {
+      factId: 'fact-no-evidence',
+      subjects: [{ subjectEntityId: 'a' }, { subjectEntityId: 'b' }],
+      evidenceIds: [],
+    },
   ]);
   assert.deepEqual(mirrored[0]!.evidenceIds, ['fact-no-evidence']);
 });

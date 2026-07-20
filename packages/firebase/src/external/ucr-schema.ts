@@ -1,4 +1,3 @@
-
 /**
  * Firestore schemas for FBI UCR data (the related workstream) — hate crime bulk records plus the
  * two reference layers that make them interpretable and joinable.
@@ -60,14 +59,20 @@ export const ucrAgencySchema = z.object({
   stateAbbr: z.string().length(2),
   /** 5-digit county GEOID — the join key to every county-keyed collection. Absent for
    * federal/tribal/special agencies with no resolvable county (~1.4% of agencies). */
-  fips5: z.string().regex(/^\d{5}$/).optional(),
+  fips5: z
+    .string()
+    .regex(/^\d{5}$/)
+    .optional(),
   countyName: z.string().optional(),
   /** FBI's raw `counties` string, verbatim — may name several counties. */
   countyNameRaw: z.string().optional(),
   fipsBasis: ucrFipsBasisSchema.optional(),
   /** County resolved from the agency's own coordinates, kept even when it disagrees with
    * the name match so the disagreement stays inspectable rather than silently dropped. */
-  fips5FromPoint: z.string().regex(/^\d{5}$/).optional(),
+  fips5FromPoint: z
+    .string()
+    .regex(/^\d{5}$/)
+    .optional(),
   /** True when FBI lists more than one county for this agency — incident attribution to a
    * single county is an approximation for these. */
   multiCounty: z.boolean(),

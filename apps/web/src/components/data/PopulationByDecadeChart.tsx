@@ -243,24 +243,15 @@ export function PopulationByDecadeChart({ rows, sources }: PopulationByDecadeCha
       </svg>
       <ul className="ds-data-chart__legend" aria-hidden="true">
         <li className="ds-data-chart__legend-item">
-          <span
-            className="ds-data-chart__legend-swatch"
-            style={{ background: FILL_ENSLAVED }}
-          />
+          <span className="ds-data-chart__legend-swatch" style={{ background: FILL_ENSLAVED }} />
           Enslaved (1790–1860)
         </li>
         <li className="ds-data-chart__legend-item">
-          <span
-            className="ds-data-chart__legend-swatch"
-            style={{ background: FILL_FREE }}
-          />
+          <span className="ds-data-chart__legend-swatch" style={{ background: FILL_FREE }} />
           Free (1790–1860)
         </li>
         <li className="ds-data-chart__legend-item">
-          <span
-            className="ds-data-chart__legend-swatch"
-            style={{ background: FILL_BLACK_TOTAL }}
-          />
+          <span className="ds-data-chart__legend-swatch" style={{ background: FILL_BLACK_TOTAL }} />
           Black population (1870–2020)
         </li>
       </ul>

@@ -18,7 +18,11 @@ export type EntityMetadataSource = {
   readonly imageUrl?: string;
   readonly confidenceScore?: number;
   readonly mapPin?: { readonly x: number; readonly y: number };
-  readonly sensitivity?: { readonly class: string; readonly note?: string; readonly basisClaimIds?: readonly string[] };
+  readonly sensitivity?: {
+    readonly class: string;
+    readonly note?: string;
+    readonly basisClaimIds?: readonly string[];
+  };
   readonly disputeNote?: string;
 };
 

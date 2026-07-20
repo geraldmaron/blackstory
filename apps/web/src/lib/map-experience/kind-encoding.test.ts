@@ -63,27 +63,40 @@ test('no two kinds share both shade and glyph (color is never the sole signal)',
   const seen = new Set<string>();
   for (const [kind, entry] of KIND_ENCODING_ENTRIES) {
     const signature = `${entry.shade}::${entry.glyph}`;
-    assert.ok(!seen.has(signature), `kind "${kind}" duplicates another kind's shade+glyph signature`);
+    assert.ok(
+      !seen.has(signature),
+      `kind "${kind}" duplicates another kind's shade+glyph signature`,
+    );
     seen.add(signature);
   }
 });
 
 test('every kind has a distinct shade', () => {
   const shades = KIND_ENCODING_ENTRIES.map(([, entry]) => entry.shade);
-  assert.equal(new Set(shades).size, shades.length, 'shades must be mutually distinct across kinds');
+  assert.equal(
+    new Set(shades).size,
+    shades.length,
+    'shades must be mutually distinct across kinds',
+  );
 });
 
 test('every glyph value is one of the four documented glyph identifiers', () => {
   const allowed: readonly MapEntityGlyph[] = ['circle', 'square', 'diamond', 'ring'];
   for (const [, entry] of KIND_ENCODING_ENTRIES) {
-    assert.ok(allowed.includes(entry.glyph), `glyph "${entry.glyph}" is not a documented glyph identifier`);
+    assert.ok(
+      allowed.includes(entry.glyph),
+      `glyph "${entry.glyph}" is not a documented glyph identifier`,
+    );
   }
 });
 
 test('every shade traces back to a DIGNITY_PALETTE value (zero ad-hoc hex)', () => {
   const allowed = new Set<string>(Object.values(DIGNITY_PALETTE));
   for (const [kind, entry] of KIND_ENCODING_ENTRIES) {
-    assert.ok(allowed.has(entry.shade), `kind "${kind}" shade ${entry.shade} must come from DIGNITY_PALETTE`);
+    assert.ok(
+      allowed.has(entry.shade),
+      `kind "${kind}" shade ${entry.shade} must come from DIGNITY_PALETTE`,
+    );
   }
 });
 
@@ -121,7 +134,11 @@ test('displayEncodingFor prefers semantic tone shade while keeping kind glyph', 
   assert.equal(plantation.label, MAP_SEMANTIC_TONE_ENCODING.plantation.label);
 
   const schoolPlantation = displayEncodingFor('school', 'plantation');
-  assert.equal(schoolPlantation.glyph, 'square', 'school keeps its square identity under plantation tone');
+  assert.equal(
+    schoolPlantation.glyph,
+    'square',
+    'school keeps its square identity under plantation tone',
+  );
 });
 
 test('semantic tones are shade-only (no glyph channel of their own)', () => {

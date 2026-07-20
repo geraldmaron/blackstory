@@ -1,4 +1,3 @@
-
 /**
  * Search and map must expose accessible list peers.
  * Asserts peer modules exist and document the no-JS screen-reader path without

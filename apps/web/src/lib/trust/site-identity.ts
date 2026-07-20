@@ -46,7 +46,10 @@ export function buildNewsMediaOrganizationInput(baseUrl?: string) {
     name: TRUST_SITE_NAME,
     url: resolveTrustUrl('/', baseUrl),
     correctionsPolicyUrl: resolveTrustUrl(`${TRUST_PATHS.errata}#policy`, baseUrl),
-    verificationFactCheckingPolicyUrl: resolveTrustUrl(`${TRUST_PATHS.methodology}#verification`, baseUrl),
+    verificationFactCheckingPolicyUrl: resolveTrustUrl(
+      `${TRUST_PATHS.methodology}#verification`,
+      baseUrl,
+    ),
     ethicsPolicyUrl: resolveTrustUrl(`${TRUST_PATHS.methodology}#independence`, baseUrl),
     ownershipFundingInfoUrl: resolveTrustUrl(`${TRUST_PATHS.methodology}#funding`, baseUrl),
     mastheadUrl: resolveTrustUrl(`${TRUST_PATHS.methodology}#masthead`, baseUrl),

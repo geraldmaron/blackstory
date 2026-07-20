@@ -52,19 +52,31 @@ export type DecadeCrossfadePaintTarget = {
 export const DECADE_CROSSFADE_OUT_TARGETS: readonly DecadeCrossfadePaintTarget[] = [
   { layerId: EXPLORE_HISTORY_EDGES_LAYER_ID, paintKey: 'line-opacity', restOpacity: 0.9 },
   { layerId: EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID, paintKey: 'line-opacity', restOpacity: 1 },
-  { layerId: EXPLORE_UNCLUSTERED_HALO_LAYER_ID, paintKey: 'circle-opacity', restOpacity: ENTITY_HALO_OPACITY },
+  {
+    layerId: EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
+    paintKey: 'circle-opacity',
+    restOpacity: ENTITY_HALO_OPACITY,
+  },
   {
     layerId: EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
     paintKey: 'circle-opacity',
     restOpacity: ENTITY_POINT_FILL_OPACITY,
   },
-  { layerId: EXPLORE_UNCLUSTERED_POINT_LAYER_ID, paintKey: 'circle-stroke-opacity', restOpacity: 0.9 },
+  {
+    layerId: EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
+    paintKey: 'circle-stroke-opacity',
+    restOpacity: 0.9,
+  },
   {
     layerId: EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
     paintKey: 'circle-stroke-opacity',
     restOpacity: 0.9,
   },
-  { layerId: EXPLORE_CLUSTER_LAYER_ID, paintKey: 'circle-opacity', restOpacity: ENTITY_CLUSTER_OPACITY },
+  {
+    layerId: EXPLORE_CLUSTER_LAYER_ID,
+    paintKey: 'circle-opacity',
+    restOpacity: ENTITY_CLUSTER_OPACITY,
+  },
   { layerId: EXPLORE_CLUSTER_COUNT_LAYER_ID, paintKey: 'text-opacity', restOpacity: 1 },
 ];
 
@@ -100,10 +112,15 @@ export const DECADE_CROSSFADE_IN_TARGETS: readonly DecadeCrossfadePaintTarget[] 
 ];
 
 /** @deprecated Use DECADE_CROSSFADE_OUT_TARGETS — kept for call-site compatibility during migration. */
-export const DECADE_FADE_PAINT_TARGETS: readonly { readonly layerId: string; readonly paintKey: string }[] =
-  DECADE_CROSSFADE_OUT_TARGETS.map(({ layerId, paintKey }) => ({ layerId, paintKey }));
+export const DECADE_FADE_PAINT_TARGETS: readonly {
+  readonly layerId: string;
+  readonly paintKey: string;
+}[] = DECADE_CROSSFADE_OUT_TARGETS.map(({ layerId, paintKey }) => ({ layerId, paintKey }));
 
-const ALL_DECADE_MORPH_TARGETS = [...DECADE_CROSSFADE_OUT_TARGETS, ...DECADE_CROSSFADE_IN_TARGETS] as const;
+const ALL_DECADE_MORPH_TARGETS = [
+  ...DECADE_CROSSFADE_OUT_TARGETS,
+  ...DECADE_CROSSFADE_IN_TARGETS,
+] as const;
 
 const DECADE_CROSSFADE_CHANNEL_KEYS = new Set(
   ALL_DECADE_MORPH_TARGETS.map((target) => `${target.layerId}:${target.paintKey}`),
@@ -154,7 +171,9 @@ export function easeInOutCubic(progress: number): number {
 /** Linear RGB channel lerp for unit tests and non-MapLibre helpers. */
 export function lerpHexColor(colorA: string, colorB: string, progress: number): string {
   const parse = (color: string): [number, number, number, number] => {
-    const rgba = color.match(/rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+)\s*)?\)/i);
+    const rgba = color.match(
+      /rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*(?:,\s*([\d.]+)\s*)?\)/i,
+    );
     if (rgba) {
       return [
         Number(rgba[1]),

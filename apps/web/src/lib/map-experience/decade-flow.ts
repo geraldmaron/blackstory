@@ -98,9 +98,7 @@ function earliestDecadeOf(feature: ExploreMapFeature): number | undefined {
   return earliest;
 }
 
-function stateResolved(
-  feature: ExploreMapFeature,
-): feature is ExploreMapFeature & {
+function stateResolved(feature: ExploreMapFeature): feature is ExploreMapFeature & {
   properties: { stateFips: string; statePostalCode: string; stateName: string };
 } {
   const { stateFips, statePostalCode, stateName } = feature.properties;
@@ -109,7 +107,9 @@ function stateResolved(
 
 /** Era-agnostic state presence over every state-resolved feature, dated or not — the
  * closing/complete frame's "today" density when population data is unavailable. */
-function densityOfAllFeatures(features: readonly ExploreMapFeature[]): readonly StateDensityLevel[] {
+function densityOfAllFeatures(
+  features: readonly ExploreMapFeature[],
+): readonly StateDensityLevel[] {
   const byState = new Map<string, { fips: string; postal: string; name: string; count: number }>();
   for (const feature of features) {
     if (!stateResolved(feature)) continue;
@@ -118,7 +118,12 @@ function densityOfAllFeatures(features: readonly ExploreMapFeature[]): readonly 
     if (entry) {
       entry.count += 1;
     } else {
-      byState.set(stateFips, { fips: stateFips, postal: statePostalCode, name: stateName, count: 1 });
+      byState.set(stateFips, {
+        fips: stateFips,
+        postal: statePostalCode,
+        name: stateName,
+        count: 1,
+      });
     }
   }
   const aggregates: StateAggregateCount[] = [...byState.values()].map((entry) => ({

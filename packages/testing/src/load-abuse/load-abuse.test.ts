@@ -1,4 +1,3 @@
-
 /**
  * acceptance tests: load, abuse, and cost simulations against security guardrails.
  * No live network attacks fixtures import @repo/security evaluators directly.
@@ -63,8 +62,13 @@ describe(' layered control independence', () => {
   });
 
   it('survives single-layer bypass when rate and resource families both present', () => {
-    const resilient = runAllLoadAbuseScenarios().filter(({ proof }) => proof.survivesSingleLayerBypass);
-    assert.ok(resilient.length >= 4, `expected cross-family layering in >=4 scenarios, got ${resilient.length}`);
+    const resilient = runAllLoadAbuseScenarios().filter(
+      ({ proof }) => proof.survivesSingleLayerBypass,
+    );
+    assert.ok(
+      resilient.length >= 4,
+      `expected cross-family layering in >=4 scenarios, got ${resilient.length}`,
+    );
   });
 
   it('documents independent families for search flood and geocoder abuse', () => {
@@ -74,7 +78,10 @@ describe(' layered control independence', () => {
     assert.ok(geocoder);
     assert.ok(search!.proof.independentLayers >= 2);
     assert.ok(geocoder!.proof.independentLayers >= 2);
-    assert.equal(proveLayeredControls('search_flood', search!.result.layersTriggered).independentLayers >= 1, true);
+    assert.equal(
+      proveLayeredControls('search_flood', search!.result.layersTriggered).independentLayers >= 1,
+      true,
+    );
   });
 });
 
@@ -91,7 +98,11 @@ describe(' cost and tuning outputs', () => {
   it('denied requests carry zero marginal cost in simulations', () => {
     for (const { result } of runAllLoadAbuseScenarios()) {
       if (result.deniedCount === result.stepsExecuted) {
-        assert.equal(result.totalEstimatedCostUnits, 0, `${result.scenarioId} should be zero-cost when fully denied`);
+        assert.equal(
+          result.totalEstimatedCostUnits,
+          0,
+          `${result.scenarioId} should be zero-cost when fully denied`,
+        );
       }
     }
   });

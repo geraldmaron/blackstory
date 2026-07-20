@@ -89,7 +89,9 @@ async function main(): Promise<void> {
         snippets.push(`SOURCE ${url}\n${text}`);
       } else {
         unreachable += 1;
-        snippets.push(`SOURCE ${url}\n(page not fetchable at build time; cite only if the summary supports the claim)`);
+        snippets.push(
+          `SOURCE ${url}\n(page not fetchable at build time; cite only if the summary supports the claim)`,
+        );
       }
       await new Promise((resolve) => setTimeout(resolve, 400));
     }
@@ -111,8 +113,22 @@ async function main(): Promise<void> {
 
   const stamp = new Date().toISOString().replace(/[:.]/gu, '-');
   const outPath = join(outDir, `subjects-${stamp}.json`);
-  writeFileSync(outPath, `${JSON.stringify({ subjects, count: subjects.length, source: 'starter-seed-2026-07 + enrichment targets' }, null, 2)}\n`);
-  console.log(JSON.stringify({ subjects: subjects.length, sourcesFetched: fetched, sourcesUnreachable: unreachable, outPath }, null, 2));
+  writeFileSync(
+    outPath,
+    `${JSON.stringify({ subjects, count: subjects.length, source: 'starter-seed-2026-07 + enrichment targets' }, null, 2)}\n`,
+  );
+  console.log(
+    JSON.stringify(
+      {
+        subjects: subjects.length,
+        sourcesFetched: fetched,
+        sourcesUnreachable: unreachable,
+        outPath,
+      },
+      null,
+      2,
+    ),
+  );
 }
 
 main().catch((error) => {

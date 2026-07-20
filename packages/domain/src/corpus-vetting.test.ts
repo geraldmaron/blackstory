@@ -21,7 +21,9 @@ import {
 
 const NOW = '2026-07-17T12:00:00.000Z';
 
-function baseInput(overrides: Partial<RegisterCorpusVettingInput> = {}): RegisterCorpusVettingInput {
+function baseInput(
+  overrides: Partial<RegisterCorpusVettingInput> = {},
+): RegisterCorpusVettingInput {
   return {
     corpus: 'test-corpus',
     corpusDisplayName: 'Test Corpus',
@@ -143,10 +145,17 @@ test('bulk batches fail closed when the corpus kill switch is engaged', () => {
 test('bulk batches fail closed when the vetting record points at a missing registry entry', () => {
   const registryStore = createInMemorySourceRegistry();
   const vettingStore = createInMemoryCorpusVettingStore();
-  const record = registerCorpusVetting(registryStore, vettingStore, baseInput({ corpus: 'orphaned-corpus' }));
+  const record = registerCorpusVetting(
+    registryStore,
+    vettingStore,
+    baseInput({ corpus: 'orphaned-corpus' }),
+  );
   // Simulate the registry entry disappearing (or never having been registered) independently of
   // the vetting record the gate must still fail closed rather than assume approval.
-  const orphaned: CorpusVettingRecord = { ...record, sourceRegistryEntryId: 'corpus_registry:does-not-exist' };
+  const orphaned: CorpusVettingRecord = {
+    ...record,
+    sourceRegistryEntryId: 'corpus_registry:does-not-exist',
+  };
   vettingStore.save(orphaned);
 
   assert.throws(
@@ -176,14 +185,19 @@ test('registerCorpusVetting refuses to register an excluded-lane corpus', () => 
 test('assertCorpusVettingRecordValid rejects malformed records', () => {
   const registryStore = createInMemorySourceRegistry();
   const vettingStore = createInMemoryCorpusVettingStore();
-  const record = registerCorpusVetting(registryStore, vettingStore, baseInput({ corpus: 'valid-corpus' }));
+  const record = registerCorpusVetting(
+    registryStore,
+    vettingStore,
+    baseInput({ corpus: 'valid-corpus' }),
+  );
 
   assert.throws(
     () => assertCorpusVettingRecordValid({ ...record, provenanceFieldsRetained: [] }),
     /provenanceFieldsRetained/u,
   );
   assert.throws(
-    () => assertCorpusVettingRecordValid({ ...record, licenseVerdict: 'not-a-real-verdict' as never }),
+    () =>
+      assertCorpusVettingRecordValid({ ...record, licenseVerdict: 'not-a-real-verdict' as never }),
     /Unknown licenseVerdict/u,
   );
   assert.throws(

@@ -26,7 +26,11 @@ test('buildFactArticleJsonLd includes a schema.org Correction only when status i
   assert.equal('correction' in published, false);
 
   const corrected = buildFactArticleJsonLd(
-    buildFixtureFact({ status: 'corrected', confidence: 'contested', confidenceNote: 'Date corrected from Dec 2 to Dec 1.' }),
+    buildFixtureFact({
+      status: 'corrected',
+      confidence: 'contested',
+      confidenceNote: 'Date corrected from Dec 2 to Dec 1.',
+    }),
   );
   assert.equal((corrected.correction as { '@type': string })['@type'], 'CorrectionComment');
 });

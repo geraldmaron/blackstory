@@ -1,4 +1,3 @@
-
 /**
  * Alert policy metadata contracts for severity, runbook, release, service,
  * and correlation identifiers required on every alert payload.

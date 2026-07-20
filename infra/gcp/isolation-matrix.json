@@ -207,7 +207,10 @@
         "roles/datastore.viewer (scoped, both blackbook-internal named databases; cross-project condition, see multi-project/iam-cross-project.tf admin_reads_internal_databases)"
       ],
       "bucketAccess": [
-        { "bucket": "private-evidence", "access": "objectViewer (same-project in blackbook-internal)" }
+        {
+          "bucket": "private-evidence",
+          "access": "objectViewer (same-project in blackbook-internal)"
+        }
       ],
       "mustNotHave": [
         "public internet ingress without IAP",
@@ -244,7 +247,10 @@
         "roles/datastore.user (scoped to raw-ingest named database only, blackbook-internal)"
       ],
       "bucketAccess": [
-        { "bucket": "private-evidence", "access": "objectAdmin (same-project in blackbook-internal)" }
+        {
+          "bucket": "private-evidence",
+          "access": "objectAdmin (same-project in blackbook-internal)"
+        }
       ],
       "mustNotHave": [
         "any publication, deployment, project-admin, or service-account impersonation role",
@@ -269,7 +275,10 @@
         "roles/datastore.user (scoped to curated named database, blackbook-internal)"
       ],
       "bucketAccess": [
-        { "bucket": "private-evidence", "access": "objectViewer (same-project in blackbook-internal, read-only)" }
+        {
+          "bucket": "private-evidence",
+          "access": "objectViewer (same-project in blackbook-internal, read-only)"
+        }
       ],
       "mustNotHave": [
         "write access to raw evidence objects",
@@ -287,9 +296,18 @@
       "dbRole": "role_security",
       "roles": ["roles/secretmanager.secretAccessor (scoped)", "roles/monitoring.metricWriter"],
       "bucketAccess": [
-        { "bucket": "quarantine", "access": "objectAdmin (cross-project into blackbook-prod, see crossProjectGrants id=security-quarantine-prod)" },
-        { "bucket": "public-media", "access": "objectCreator (cross-project into blackbook-prod, post-scan promotion, see crossProjectGrants id=security-quarantine-prod)" },
-        { "bucket": "private-evidence", "access": "objectAdmin (same-project in blackbook-internal)" }
+        {
+          "bucket": "quarantine",
+          "access": "objectAdmin (cross-project into blackbook-prod, see crossProjectGrants id=security-quarantine-prod)"
+        },
+        {
+          "bucket": "public-media",
+          "access": "objectCreator (cross-project into blackbook-prod, post-scan promotion, see crossProjectGrants id=security-quarantine-prod)"
+        },
+        {
+          "bucket": "private-evidence",
+          "access": "objectAdmin (same-project in blackbook-internal)"
+        }
       ],
       "mustNotHave": ["public internet ingress", "publication or release-activation permission"]
     },

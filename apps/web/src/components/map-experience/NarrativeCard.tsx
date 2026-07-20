@@ -14,6 +14,7 @@ import {
   searchHrefForStatus,
 } from '../../lib/map-experience/metadata-hrefs';
 import { exploreWhereMapsLink } from '../../lib/map-experience/explore-where-maps-link';
+import { radiusAffordanceLabel } from '../../lib/map-experience/geo-precision';
 import { ConfidenceMark } from './ConfidenceMark';
 import { KindBadge } from './KindBadge';
 import { StatusMark } from './StatusMark';
@@ -27,16 +28,6 @@ export type NarrativeCardProps = {
   readonly feature: ExploreMapFeature;
   readonly onClose?: () => void;
 };
-
-function radiusAffordanceLabel(feature: ExploreMapFeature): string {
-  const { geoPrecisionTier, radiusMeters } = feature.properties;
-  if (radiusMeters === undefined) {
-    return `Shown at ${geoPrecisionTier} precision (radius affordance unavailable).`;
-  }
-  const km = radiusMeters / 1000;
-  const distance = km >= 1 ? `${km.toFixed(km < 10 ? 1 : 0)} km` : `${Math.round(radiusMeters)} m`;
-  return `Shown at ${geoPrecisionTier} precision — the marker represents a ±${distance} area, not an exact address.`;
-}
 
 export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
   const { properties } = feature;
@@ -57,10 +48,7 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
     >
       <p className="ds-nc__kicker">Selected record</p>
       <div className="ds-nc__top">
-        <div
-          className="ds-nc__kind-rule"
-          style={{ borderColor: kindEncoding.shade }}
-        >
+        <div className="ds-nc__kind-rule" style={{ borderColor: kindEncoding.shade }}>
           <Link
             className="ds-nc__kind-link"
             href={exploreHrefForKind(properties.kind)}
@@ -188,7 +176,9 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
         </p>
       ) : null}
 
-      <p className="ds-nc__precision">{radiusAffordanceLabel(feature)}</p>
+      <p className="ds-nc__precision">
+        {radiusAffordanceLabel(feature.properties.geoPrecisionTier, feature.properties.radiusMeters)}
+      </p>
 
       <Link className="ds-cta ds-cta--copper ds-nc__action" href={properties.href} scroll={false}>
         Open full record

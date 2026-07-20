@@ -17,6 +17,9 @@ import {
 } from '@repo/domain/geography/display-radius';
 import { US_STATES } from '@repo/domain/map/geography';
 
+const METERS_PER_MILE = 1609.344;
+const METERS_PER_FOOT = 0.3048;
+
 /** Finest-known public precision -> the GeoPrecisionTier its radius circle should render at.  */
 const PUBLIC_PRECISION_TO_GEO_TIER: Readonly<Record<string, GeoPrecisionTier>> = {
   institution: 'exact-site',
@@ -43,11 +46,16 @@ export function geoPrecisionTierForPublicPrecision(publicPrecision: string): Geo
  * every other state/locality combination fails closed (see `resolveDisplayRadiusMeters` below)
  * rather than guessing, matching fail-closed radius policy (`precision.ts` module doc).
  */
-const DC_BBOX: JurisdictionBBox | undefined = US_STATES.find((state) => state.postalCode === 'DC')?.bbox;
+const DC_BBOX: JurisdictionBBox | undefined = US_STATES.find(
+  (state) => state.postalCode === 'DC',
+)?.bbox;
 
 export type RadiusResolution =
   | { readonly ok: true; readonly radiusMeters: number }
-  | { readonly ok: false; readonly reason: 'jurisdiction_bbox_unresolved' | 'state_bbox_unresolved' };
+  | {
+      readonly ok: false;
+      readonly reason: 'jurisdiction_bbox_unresolved' | 'state_bbox_unresolved';
+    };
 
 /**
  * Resolves the display-radius affordance for a rendered point. Never guesses: a
@@ -74,4 +82,28 @@ export function resolveDisplayRadiusMeters(
     return { ok: true, radiusMeters: displayRadiusMeters({ tier, jurisdictionBBox: state.bbox }) };
   }
   return { ok: false, reason: 'jurisdiction_bbox_unresolved' };
+}
+
+/** User-facing ± span for a display-radius affordance (US framing: feet below a mile, miles at mile+). */
+export function formatDisplayRadiusSpan(meters: number): string {
+  const safe = Math.max(0, meters);
+  if (safe >= METERS_PER_MILE) {
+    const miles = safe / METERS_PER_MILE;
+    const rounded = miles >= 10 ? Math.round(miles) : Math.round(miles * 10) / 10;
+    return `${rounded} mi`;
+  }
+  const feet = safe / METERS_PER_FOOT;
+  return `${Math.round(feet / 10) * 10} ft`;
+}
+
+/** Words-only radius affordance line for map cards and entity previews. */
+export function radiusAffordanceLabel(
+  geoPrecisionTier: string,
+  radiusMeters: number | undefined,
+): string {
+  if (radiusMeters === undefined) {
+    return `Shown at ${geoPrecisionTier} precision (radius affordance unavailable).`;
+  }
+  const span = formatDisplayRadiusSpan(radiusMeters);
+  return `Shown at ${geoPrecisionTier} precision. The marker represents a ±${span} area, not an exact address.`;
 }

@@ -227,9 +227,15 @@ export function assertAdvisoryAbsentFromScoringInput(value: unknown, path = '$')
 type NoKeyOverlap<A, B> = Extract<keyof A, keyof B> extends never ? true : false;
 
 export const ADVISORY_SCORING_TYPE_INVARIANTS: {
-  readonly noOverlapWithRelevanceFeatureValue: NoKeyOverlap<PlaceAdvisoryRecord, RelevanceFeatureValue>;
+  readonly noOverlapWithRelevanceFeatureValue: NoKeyOverlap<
+    PlaceAdvisoryRecord,
+    RelevanceFeatureValue
+  >;
   readonly noOverlapWithRelevanceAssessment: NoKeyOverlap<PlaceAdvisoryRecord, RelevanceAssessment>;
-  readonly noOverlapWithConfidenceComponents: NoKeyOverlap<PlaceAdvisoryRecord, ConfidenceComponents>;
+  readonly noOverlapWithConfidenceComponents: NoKeyOverlap<
+    PlaceAdvisoryRecord,
+    ConfidenceComponents
+  >;
 } = {
   noOverlapWithRelevanceFeatureValue: true,
   noOverlapWithRelevanceAssessment: true,

@@ -1,4 +1,3 @@
-
 /**
  * Validates workspace dependency direction, deployable isolation, and dependency cycles.
  */
@@ -189,9 +188,7 @@ async function main() {
 
     // Public web must never depend on server DB helpers.
     if (workspace.name === '@repo/web' && dependencies.has('@repo/data-access')) {
-      errors.push(
-        '@repo/web cannot depend on @repo/data-access (no browser DB credentials)',
-      );
+      errors.push('@repo/web cannot depend on @repo/data-access (no browser DB credentials)');
     }
 
     for (const file of await collectSourceFiles(path.join(workspace.directory, 'src'))) {
@@ -204,8 +201,7 @@ async function main() {
         }
         if (
           workspace.name === '@repo/web' &&
-          (importedName === '@repo/data-access' ||
-            importedName.startsWith('@repo/data-access/'))
+          (importedName === '@repo/data-access' || importedName.startsWith('@repo/data-access/'))
         ) {
           errors.push(
             `${path.relative(ROOT, file)} cannot import @repo/data-access in the public web app`,

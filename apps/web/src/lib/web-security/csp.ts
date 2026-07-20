@@ -70,9 +70,7 @@ export function buildContentSecurityPolicy(options: CspBuildOptions = {}): strin
     ? ["'self'", "'unsafe-inline'", "'unsafe-eval'", ...APP_CHECK_SCRIPT_SRC]
     : ["'self'", "'unsafe-inline'", ...APP_CHECK_SCRIPT_SRC];
   const workerSrc = ["'self'", 'blob:'];
-  const resolvedConnectSrc = isDev
-    ? [...connectSrc, 'ws:', 'wss:']
-    : connectSrc;
+  const resolvedConnectSrc = isDev ? [...connectSrc, 'ws:', 'wss:'] : connectSrc;
 
   const directives: Record<string, string[]> = {
     'default-src': ["'self'"],
@@ -101,8 +99,6 @@ export function buildContentSecurityPolicy(options: CspBuildOptions = {}): strin
   }
 
   return Object.entries(directives)
-    .map(([name, values]) =>
-      values.length === 0 ? name : `${name} ${values.join(' ')}`,
-    )
+    .map(([name, values]) => (values.length === 0 ? name : `${name} ${values.join(' ')}`))
     .join('; ');
 }

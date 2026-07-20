@@ -1,4 +1,3 @@
-
 /**
  * Operator identity and session stamping for proposer contribution lane.
  *
@@ -13,7 +12,12 @@
  */
 import type { AuditActor } from '@repo/domain';
 
-export const OPERATOR_SOURCES = ['claude_session', 'cursor_session', 'cli', 'admin_console'] as const;
+export const OPERATOR_SOURCES = [
+  'claude_session',
+  'cursor_session',
+  'cli',
+  'admin_console',
+] as const;
 
 /** Where the operator proposal originated. Never a `system`/automated-worker actor type. */
 export type OperatorSource = (typeof OPERATOR_SOURCES)[number];
@@ -38,7 +42,6 @@ export function assertOperatorIdentity(identity: OperatorIdentity): void {
     throw new Error(`Unknown operator source: ${String(identity.source)}`);
   }
 }
-
 
 /**
  * Builds the audit actor for an operator-proposed record. Operators are always

@@ -1,4 +1,3 @@
-
 /**
  * Public exports for adversarial integrity exercise harnesses.
  */
@@ -35,9 +34,7 @@ export {
   runAllAdversarialIntegrityScenarios,
 } from './scenarios.js';
 
-export {
-  ALL_ADVERSARIAL_INTEGRITY_SCENARIO_IDS,
-} from './types.js';
+export { ALL_ADVERSARIAL_INTEGRITY_SCENARIO_IDS } from './types.js';
 export type {
   AdversarialIntegrityScenarioId,
   AdversarialIntegritySummary,

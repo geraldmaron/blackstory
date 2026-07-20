@@ -1,4 +1,3 @@
-
 /**
  * Deterministic fixtures shared by adversarial integrity scenario runners.
  */

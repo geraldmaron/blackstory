@@ -63,10 +63,7 @@ export {
 } from './status.js';
 export type { LawStatus, LawStatusTone } from './status.js';
 
-export {
-  proposeLegalReviewEvents,
-  snapshotsToMonitoringRows,
-} from './monitoring.js';
+export { proposeLegalReviewEvents, snapshotsToMonitoringRows } from './monitoring.js';
 export type {
   LegalMonitoringSourceSnapshot,
   LegalMonitoringPriorState,

@@ -24,10 +24,7 @@ test('isRecordDue rejects invalid ISO input', () => {
 });
 
 test('deriveVerificationStatus: unverified when never scheduled or verified', () => {
-  assert.equal(
-    deriveVerificationStatus({ now: '2026-07-18T00:00:00.000Z' }),
-    'unverified',
-  );
+  assert.equal(deriveVerificationStatus({ now: '2026-07-18T00:00:00.000Z' }), 'unverified');
 });
 
 test('deriveVerificationStatus: current before nextReviewAt', () => {
@@ -89,8 +86,5 @@ test('selectDueVerificationStates filters an in-memory provider to due/never-sch
     state({ subjectId: 'claim-never-scheduled' }),
   ];
   const due = selectDueVerificationStates(() => states, '2026-07-18T00:00:00.000Z');
-  assert.deepEqual(
-    due.map((s) => s.subjectId).sort(),
-    ['claim-due', 'claim-never-scheduled'],
-  );
+  assert.deepEqual(due.map((s) => s.subjectId).sort(), ['claim-due', 'claim-never-scheduled']);
 });

@@ -158,7 +158,10 @@ test('no adapter runs without approved source policy', () => {
     updatedAt: FIXED_NOW,
   });
   const disabledEntry = getSourceEntry(store, 'reg_nara')!;
-  assert.throws(() => assertAdapterMayRun(disabledEntry), /cannot run in registry state "disabled"/);
+  assert.throws(
+    () => assertAdapterMayRun(disabledEntry),
+    /cannot run in registry state "disabled"/,
+  );
 
   setRegistryState(store, {
     id: 'reg_nara',
@@ -263,10 +266,16 @@ test('parser drift metrics record null-field rates', () => {
 });
 
 test('quarantine and dead-letter registry states block runs', () => {
-  const quarantined = approvedEntry({ registryState: 'quarantined', quarantineReason: 'count drift' });
+  const quarantined = approvedEntry({
+    registryState: 'quarantined',
+    quarantineReason: 'count drift',
+  });
   assert.throws(() => assertAdapterMayRun(quarantined), /quarantined/);
 
-  const deadLetter = approvedEntry({ registryState: 'dead_letter', deadLetterReason: 'repeated drift' });
+  const deadLetter = approvedEntry({
+    registryState: 'dead_letter',
+    deadLetterReason: 'repeated drift',
+  });
   assert.throws(() => assertAdapterMayRun(deadLetter), /dead_letter/);
 });
 

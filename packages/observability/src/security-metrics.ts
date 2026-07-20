@@ -1,4 +1,3 @@
-
 /**
  * Security metric descriptors and Cloud Monitoring mapping contracts.
  * Metrics are designed for synthetic validation before production traffic exists.
@@ -147,29 +146,30 @@ export const SECURITY_METRIC_DESCRIPTORS: Readonly<Record<string, SecurityMetric
 };
 
 /** Maps security event kinds to one or more metric names for emission. */
-export const EVENT_KIND_TO_METRICS: Readonly<Partial<Record<SecurityEventKind, readonly string[]>>> =
-  {
-    'armor.deny': ['armor_denies_total'],
-    'armor.throttle': ['armor_throttles_total'],
-    'app_check.failure': ['app_check_failures_total'],
-    'authentication.failure': ['authentication_failures_total'],
-    'administrator.role_changed': ['administrator_role_changes_total'],
-    'submission.spike': ['submission_requests_total'],
-    'search.abuse': ['search_guardrail_denials_total'],
-    'geocoder.abuse': ['geocoder_guardrail_denials_total'],
-    'database.connection': ['database_connections_active'],
-    'database.slow_query': ['database_slow_queries_total'],
-    'database.unexpected_public_write': ['database_unexpected_public_writes_total'],
-    'queue.depth': ['queue_depth'],
-    'queue.retry': ['queue_retries_total'],
-    'source_adapter.anomaly': ['source_adapter_anomalies_total'],
-    'publication.activity': ['publication_events_total'],
-    'retraction.activity': ['retraction_events_total'],
-    'storage.access_denied': ['storage_access_denials_total'],
-    'service.error_rate': ['service_errors_total'],
-    'service.latency': ['service_latency_ms'],
-    'cost.anomaly': ['cost_anomaly_score'],
-  };
+export const EVENT_KIND_TO_METRICS: Readonly<
+  Partial<Record<SecurityEventKind, readonly string[]>>
+> = {
+  'armor.deny': ['armor_denies_total'],
+  'armor.throttle': ['armor_throttles_total'],
+  'app_check.failure': ['app_check_failures_total'],
+  'authentication.failure': ['authentication_failures_total'],
+  'administrator.role_changed': ['administrator_role_changes_total'],
+  'submission.spike': ['submission_requests_total'],
+  'search.abuse': ['search_guardrail_denials_total'],
+  'geocoder.abuse': ['geocoder_guardrail_denials_total'],
+  'database.connection': ['database_connections_active'],
+  'database.slow_query': ['database_slow_queries_total'],
+  'database.unexpected_public_write': ['database_unexpected_public_writes_total'],
+  'queue.depth': ['queue_depth'],
+  'queue.retry': ['queue_retries_total'],
+  'source_adapter.anomaly': ['source_adapter_anomalies_total'],
+  'publication.activity': ['publication_events_total'],
+  'retraction.activity': ['retraction_events_total'],
+  'storage.access_denied': ['storage_access_denials_total'],
+  'service.error_rate': ['service_errors_total'],
+  'service.latency': ['service_latency_ms'],
+  'cost.anomaly': ['cost_anomaly_score'],
+};
 
 export type SecurityMetricSample = {
   readonly metric: string;

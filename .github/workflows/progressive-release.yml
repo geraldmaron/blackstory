@@ -18,7 +18,7 @@ on:
       confirm:
         description: Type release to generate artifacts
         required: true
-        default: ""
+        default: ''
 
 permissions:
   contents: read

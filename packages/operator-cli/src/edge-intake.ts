@@ -1,4 +1,3 @@
-
 /**
  * Edge intake: propose a new `EntityRelationship` through the existing operator
  * CLI/research-case pipeline (no parallel writer). Every proposal lands in the SAME quarantine
@@ -69,7 +68,7 @@ function composeEdgeStatement(input: EdgeIntakeInput): string {
   if (input.temporal) {
     lines.push(
       `Temporal: validFrom=${input.temporal.validFrom ?? '(none)'}, ` +
-        `validTo=${input.temporal.validTo === null ? '(open)' : input.temporal.validTo ?? '(unset)'}` +
+        `validTo=${input.temporal.validTo === null ? '(open)' : (input.temporal.validTo ?? '(unset)')}` +
         (input.temporal.label ? `, label=${input.temporal.label}` : ''),
     );
   }
@@ -111,7 +110,6 @@ function assertTemporalRequirement(input: EdgeIntakeInput): void {
     );
   }
 }
-
 
 /**
  * Validates and prepares a proposed `EntityRelationship` for the same quarantine intake

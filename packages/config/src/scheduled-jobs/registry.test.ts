@@ -1,4 +1,3 @@
-
 /**
  * No unregistered recurring job can run, and every field the registry
  * requires (owner, cadence, budget, timeout, idempotency scheme, kill switch, target worker) is
@@ -39,8 +38,14 @@ function validJob(overrides: Partial<ScheduledJobDefinition> = {}): ScheduledJob
 test('an unregistered job id is rejected — no unregistered recurring job can run', () => {
   const store = createInMemoryScheduledJobRegistry();
   assert.equal(getScheduledJob(store, 'never-registered'), undefined);
-  assert.throws(() => requireScheduledJob(store, 'never-registered'), ScheduledJobNotRegisteredError);
-  assert.throws(() => assertJobMayBeDispatched(store, 'never-registered'), ScheduledJobNotRegisteredError);
+  assert.throws(
+    () => requireScheduledJob(store, 'never-registered'),
+    ScheduledJobNotRegisteredError,
+  );
+  assert.throws(
+    () => assertJobMayBeDispatched(store, 'never-registered'),
+    ScheduledJobNotRegisteredError,
+  );
 });
 
 test('a registered job dispatches by id and round-trips its fields', () => {
@@ -63,7 +68,9 @@ test('rejects an invalid cron expression', () => {
   assert.throws(() =>
     registerScheduledJob(
       store,
-      validJob({ cadence: { cronExpression: 'not a cron', nominalIntervalMs: 1000, humanReadable: 'bad' } }),
+      validJob({
+        cadence: { cronExpression: 'not a cron', nominalIntervalMs: 1000, humanReadable: 'bad' },
+      }),
     ),
   );
 });
@@ -83,8 +90,12 @@ test('rejects a timeout out of range', () => {
 
 test('rejects an idempotency key scheme missing {jobId} or a time-window token', () => {
   const store = createInMemoryScheduledJobRegistry();
-  assert.throws(() => registerScheduledJob(store, validJob({ idempotencyKeyScheme: 'no-tokens-here' })));
-  assert.throws(() => registerScheduledJob(store, validJob({ idempotencyKeyScheme: 'job:{jobId}' })));
+  assert.throws(() =>
+    registerScheduledJob(store, validJob({ idempotencyKeyScheme: 'no-tokens-here' })),
+  );
+  assert.throws(() =>
+    registerScheduledJob(store, validJob({ idempotencyKeyScheme: 'job:{jobId}' })),
+  );
 });
 
 test('rejects a target worker package outside research/publication/security (ADR-007)', () => {
@@ -113,7 +124,10 @@ test('a stub job must declare its implementation-owner bead', () => {
   const store = createInMemoryScheduledJobRegistry();
   assert.throws(() => registerScheduledJob(store, validJob({ rosterStatus: 'stub' })));
   assert.doesNotThrow(() =>
-    registerScheduledJob(store, validJob({ rosterStatus: 'stub', implementationOwnerBead: 'workstream' })),
+    registerScheduledJob(
+      store,
+      validJob({ rosterStatus: 'stub', implementationOwnerBead: 'workstream' }),
+    ),
   );
 });
 
@@ -124,7 +138,10 @@ test('rejects a non-positive consecutiveMissedRunThreshold', () => {
 
 test('listScheduledJobs filters by owner, rosterStatus, and target worker package', () => {
   const store = createInMemoryScheduledJobRegistry();
-  registerScheduledJob(store, validJob({ id: 'job-a', owner: 'sample-workstream', rosterStatus: 'real' }));
+  registerScheduledJob(
+    store,
+    validJob({ id: 'job-a', owner: 'sample-workstream', rosterStatus: 'real' }),
+  );
   registerScheduledJob(
     store,
     validJob({

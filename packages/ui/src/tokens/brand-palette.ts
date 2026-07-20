@@ -1,4 +1,3 @@
-
 /**
  * Fixed BlackStory brand palette (the "Pinned Page" identity, brand pack v3).
  *

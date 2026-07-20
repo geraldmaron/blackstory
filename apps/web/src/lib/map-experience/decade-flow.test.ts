@@ -174,7 +174,7 @@ test('per-decade density levels cover exactly the states of entities ACTIVE that
   }
 });
 
-test('ACTIVE vs CUMULATIVE genuinely diverge: an entity that is no longer active drops out of a later decade\'s density, even though its pin never leaves once arrived', () => {
+test("ACTIVE vs CUMULATIVE genuinely diverge: an entity that is no longer active drops out of a later decade's density, even though its pin never leaves once arrived", () => {
   const frames = buildDecadeFlowFrames(
     collectionOf([
       feature('short-lived', ['1870s'], DC),
@@ -188,11 +188,12 @@ test('ACTIVE vs CUMULATIVE genuinely diverge: an entity that is no longer active
   const d1900s = frames.find((frame) => frame.decade === '1900s')!;
 
   assert.deepEqual(d1870s.densityLevels.map((l) => l.statePostalCode).sort(), ['DC', 'GA']);
-  assert.deepEqual(d1900s.densityLevels.map((l) => l.statePostalCode), ['GA']);
-  assert.equal(d1900s.cumulativeCount, 3);
-  assert.ok(
-    d1900s.featureCollection.features.some((f) => f.properties.entityId === 'short-lived'),
+  assert.deepEqual(
+    d1900s.densityLevels.map((l) => l.statePostalCode),
+    ['GA'],
   );
+  assert.equal(d1900s.cumulativeCount, 3);
+  assert.ok(d1900s.featureCollection.features.some((f) => f.properties.entityId === 'short-lived'));
 });
 
 test('the closing/complete frame density is era-agnostic cumulative — includes an undated-but-located record no decade could honestly claim', () => {
@@ -203,22 +204,17 @@ test('the closing/complete frame density is era-agnostic cumulative — includes
 
   const finalFrame = frames.at(-1)!;
   assert.equal(finalFrame.isComplete, true);
-  assert.deepEqual(
-    finalFrame.densityLevels.map((level) => level.statePostalCode).sort(),
-    ['DC', 'GA'],
-  );
+  assert.deepEqual(finalFrame.densityLevels.map((level) => level.statePostalCode).sort(), [
+    'DC',
+    'GA',
+  ]);
 });
 
 test('population index drives fills from absolute Black counts and unions census vintages onto the frame axis', () => {
-  const frames = buildDecadeFlowFrames(
-    collectionOf([feature('a', ['1870s'], DC)]),
-    {},
-    undefined,
-    {
-      statePopulationIndex: POP_INDEX,
-      nationalBlackByDecade: { '1870': 4_880_009, '2020': 41_104_200 },
-    },
-  );
+  const frames = buildDecadeFlowFrames(collectionOf([feature('a', ['1870s'], DC)]), {}, undefined, {
+    statePopulationIndex: POP_INDEX,
+    nationalBlackByDecade: { '1870': 4_880_009, '2020': 41_104_200 },
+  });
 
   const labels = frames.map((frame) => frame.decade);
   assert.ok(labels.includes('1790s'));

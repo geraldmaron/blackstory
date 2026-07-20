@@ -46,12 +46,20 @@ function activeSpansFor(entity: PublicEntityView): DecadeBucketEntityInput['acti
     const last = entity.eraBuckets[entity.eraBuckets.length - 1]!;
     const startYear = first.slice(0, 4);
     const endYear = last.slice(0, 4);
-    return [{ validFrom: startYear, validTo: `${Number.parseInt(endYear, 10) + 9}`, datePrecision: 'year' }];
+    return [
+      {
+        validFrom: startYear,
+        validTo: `${Number.parseInt(endYear, 10) + 9}`,
+        datePrecision: 'year',
+      },
+    ];
   }
   return [];
 }
 
-function decadeBucketInputs(entities: readonly PublicEntityView[]): readonly DecadeBucketEntityInput[] {
+function decadeBucketInputs(
+  entities: readonly PublicEntityView[],
+): readonly DecadeBucketEntityInput[] {
   return entities
     .map((entity) => {
       const activeSpans = activeSpansFor(entity);

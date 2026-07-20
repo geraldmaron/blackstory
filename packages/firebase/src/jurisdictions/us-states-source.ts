@@ -1,4 +1,3 @@
-
 /**
  * Adapts `@repo/domain`'s existing `US_STATES` table (51 states + D.C.) into
  * `jurisdictions` collection docs. State docs must be sourced from the existing us-geography
@@ -16,7 +15,9 @@ export type BuildStateJurisdictionDocsOptions = {
 };
 
 /** The single country-level row every state doc's `parentId` points at. */
-export function buildCountryJurisdictionDoc(options: BuildStateJurisdictionDocsOptions = {}): JurisdictionDoc {
+export function buildCountryJurisdictionDoc(
+  options: BuildStateJurisdictionDocsOptions = {},
+): JurisdictionDoc {
   const now = (options.now ?? (() => new Date().toISOString()))();
   return {
     id: countryJurisdictionId(),
@@ -50,7 +51,6 @@ function toStateJurisdictionDoc(
     updatedAt: now,
   };
 }
-
 
 /**
  * Builds all 51 state jurisdiction docs (50 states + D.C.) plus the single country row, every

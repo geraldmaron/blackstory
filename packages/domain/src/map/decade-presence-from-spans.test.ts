@@ -12,7 +12,9 @@ import {
   type DecadePresenceEntityInput,
 } from './decade-presence-from-spans.js';
 
-function entity(overrides: Partial<DecadePresenceEntityInput> & Pick<DecadePresenceEntityInput, 'entityId'>): DecadePresenceEntityInput {
+function entity(
+  overrides: Partial<DecadePresenceEntityInput> & Pick<DecadePresenceEntityInput, 'entityId'>,
+): DecadePresenceEntityInput {
   return {
     activeSpans: [],
     stateFips: '11',
@@ -39,8 +41,16 @@ test('an entity active only in the 1920s counts toward 1920s ACTIVE but not 1930
   const d1930s = decades.find((d) => d.decade === '1930s')!;
 
   assert.equal(d1920s.active[0]?.count, 1);
-  assert.equal(d1930s.active.length, 1, '1930s ACTIVE excludes the entity that closed in the 1920s');
-  assert.equal(d1930s.cumulative[0]?.count, 2, '1930s CUMULATIVE includes the since-closed entity too');
+  assert.equal(
+    d1930s.active.length,
+    1,
+    '1930s ACTIVE excludes the entity that closed in the 1920s',
+  );
+  assert.equal(
+    d1930s.cumulative[0]?.count,
+    2,
+    '1930s CUMULATIVE includes the since-closed entity too',
+  );
 });
 
 test('a still-active entity spans every decade through the supplied cutoff, in both active and cumulative views', () => {
@@ -57,8 +67,16 @@ test('a still-active entity spans every decade through the supplied cutoff, in b
     ['1950s', '1960s', '1970s', '1980s'],
   );
   for (const view of decades) {
-    assert.equal(view.active[0]?.count, 1, `${view.decade} ACTIVE must carry the still-active entity`);
-    assert.equal(view.cumulative[0]?.count, 1, `${view.decade} CUMULATIVE must carry the still-active entity`);
+    assert.equal(
+      view.active[0]?.count,
+      1,
+      `${view.decade} ACTIVE must carry the still-active entity`,
+    );
+    assert.equal(
+      view.cumulative[0]?.count,
+      1,
+      `${view.decade} CUMULATIVE must carry the still-active entity`,
+    );
   }
 });
 
@@ -72,7 +90,10 @@ test('an entity with no parseable active span contributes to no decade (never gu
   ];
 
   const decades = buildDecadePresenceAggregates(entities);
-  assert.deepEqual(decades.map((d) => d.decade), ['1960s']);
+  assert.deepEqual(
+    decades.map((d) => d.decade),
+    ['1960s'],
+  );
   assert.equal(decades[0]!.active[0]?.count, 1, 'only the dated entity appears');
   assert.equal(decades[0]!.cumulative[0]?.count, 1);
 });
@@ -100,7 +121,10 @@ test('decades are returned in chronological order and aggregate correctly across
   ];
 
   const decades = buildDecadePresenceAggregates(entities);
-  assert.deepEqual(decades.map((d) => d.decade), ['1880s', '1900s']);
+  assert.deepEqual(
+    decades.map((d) => d.decade),
+    ['1880s', '1900s'],
+  );
 
   const d1900s = decades.find((d) => d.decade === '1900s')!;
   const gaAggregate = d1900s.active.find((a) => a.statePostalCode === 'GA');

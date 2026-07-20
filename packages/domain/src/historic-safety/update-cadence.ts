@@ -44,7 +44,9 @@ export type HistoricSafetySourceCadenceId = (typeof HISTORIC_SAFETY_SOURCE_CADEN
  * string for the same dependency-direction reason as the type above) with an hourly safety-net
  * poll, mirroring `release-coupled-rebuild`'s own roster entry.
  */
-export const HISTORIC_SAFETY_SOURCE_CADENCES: Readonly<Record<HistoricSafetySourceCadenceId, HistoricSafetySourceCadence>> = {
+export const HISTORIC_SAFETY_SOURCE_CADENCES: Readonly<
+  Record<HistoricSafetySourceCadenceId, HistoricSafetySourceCadence>
+> = {
   'fbi-hate-crime': {
     cronExpression: '0 6 1 10 *',
     nominalIntervalMs: YEAR_MS,
@@ -63,7 +65,8 @@ export const HISTORIC_SAFETY_SOURCE_CADENCES: Readonly<Record<HistoricSafetySour
   'eji-lynching-records': {
     cronExpression: '0 6 1 */3 *',
     nominalIntervalMs: QUARTER_MS,
-    humanReadable: 'quarterly, 1st 06:00 UTC (checked for dataset revisions, same cadence as Tougaloo/Mapping Inequality)',
+    humanReadable:
+      'quarterly, 1st 06:00 UTC (checked for dataset revisions, same cadence as Tougaloo/Mapping Inequality)',
   },
   'own-corpus-layers': {
     cronExpression: 'event-driven',

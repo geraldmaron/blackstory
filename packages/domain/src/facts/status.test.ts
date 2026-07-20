@@ -43,7 +43,10 @@ test('only published/corrected are search-indexable', () => {
 test('assertFactResolutionBannerValid requires a reason and a supersededByFactId when superseded', () => {
   assert.throws(() => assertFactResolutionBannerValid({ status: 'superseded', reason: '' }));
   assert.throws(() =>
-    assertFactResolutionBannerValid({ status: 'superseded', reason: 'Replaced by a corrected record' }),
+    assertFactResolutionBannerValid({
+      status: 'superseded',
+      reason: 'Replaced by a corrected record',
+    }),
   );
   assert.doesNotThrow(() =>
     assertFactResolutionBannerValid({
@@ -53,6 +56,9 @@ test('assertFactResolutionBannerValid requires a reason and a supersededByFactId
     }),
   );
   assert.doesNotThrow(() =>
-    assertFactResolutionBannerValid({ status: 'deprecated', reason: 'Source found to be fabricated' }),
+    assertFactResolutionBannerValid({
+      status: 'deprecated',
+      reason: 'Source found to be fabricated',
+    }),
   );
 });

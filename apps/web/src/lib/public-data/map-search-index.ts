@@ -5,9 +5,7 @@
 import type { NotabilityBasisRecord, PublicSearchIndexDoc } from '@repo/domain';
 import type { PublicSearchIndexDoc as FirestoreSearchIndexDoc } from '@repo/firebase';
 
-export function mapFirestoreSearchIndexDoc(
-  doc: FirestoreSearchIndexDoc,
-): PublicSearchIndexDoc {
+export function mapFirestoreSearchIndexDoc(doc: FirestoreSearchIndexDoc): PublicSearchIndexDoc {
   const notabilityBasis: readonly NotabilityBasisRecord[] = doc.notabilityBasis.map((entry) => ({
     criterion: entry.criterion as NotabilityBasisRecord['criterion'],
     note: entry.note,
@@ -24,9 +22,7 @@ export function mapFirestoreSearchIndexDoc(
     ...(doc.summary !== undefined ? { summary: doc.summary } : {}),
     topicTags: doc.topicTags,
     ...(doc.topicIds.length > 0 ? { topicIds: doc.topicIds } : {}),
-    ...(doc.jurisdictionState !== undefined
-      ? { jurisdictionState: doc.jurisdictionState }
-      : {}),
+    ...(doc.jurisdictionState !== undefined ? { jurisdictionState: doc.jurisdictionState } : {}),
     ...(doc.status !== undefined ? { status: doc.status } : {}),
     eraBuckets: doc.eraBuckets,
     notabilityBasis,

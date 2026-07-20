@@ -1,4 +1,3 @@
-
 /**
  * Proves the gold-corpus-regression job body is REAL it calls @repo/testing's
  * evaluateCorpus (the same evaluator the gold-corpus CLI runs) rather than reimplementing
@@ -48,7 +47,9 @@ const CORPUS: GoldCorpus = {
   ],
 };
 
-function predictions(overrides: Partial<GoldPredictions['predictions'][number]> = {}): GoldPredictions {
+function predictions(
+  overrides: Partial<GoldPredictions['predictions'][number]> = {},
+): GoldPredictions {
   return {
     schemaVersion: GOLD_PREDICTIONS_SCHEMA_VERSION,
     algorithmVersion: 'algo-v1',

@@ -1,4 +1,3 @@
-
 /**
  * Parser for the U.S. Census Bureau's national county Gazetteer file, transformed into
  * `jurisdictions` collection county docs.
@@ -62,7 +61,6 @@ export type ParseGazetteerResult = {
   /** Lines skipped (blank, malformed, or non-numeric fields), with a reason, for audit. */
   readonly rejected: readonly { readonly line: number; readonly reason: string }[];
 };
-
 
 /**
  * Parses raw Gazetteer county file text into rows. Fails closed per-row (a malformed row is
@@ -149,7 +147,6 @@ export function parseGazetteerCountyFile(text: string): ParseGazetteerResult {
 const MILES_PER_DEGREE_LATITUDE = 69.0;
 const MILES_PER_DEGREE_LONGITUDE_AT_EQUATOR = 69.172;
 
-
 /**
  * Approximates a county bbox by centering a square (area = land + water area) on the Census
  * internal point. See the module doc's BBOX CAVEAT this is a labeled approximation, not a
@@ -181,7 +178,6 @@ export type BuildCountyDocsResult = {
   /** Rows outside the 50-states-+-D.C. product scope (territories), skipped per ADR-008. */
   readonly outOfScope: readonly { readonly geoid: string; readonly usps: string }[];
 };
-
 
 /**
  * Transforms parsed Gazetteer rows into `jurisdictions` county docs. Rows whose state FIPS

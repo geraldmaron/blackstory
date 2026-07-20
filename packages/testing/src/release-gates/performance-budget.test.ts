@@ -1,4 +1,3 @@
-
 /**
  * performance budget gate tests synthetic samples prove CI can fail on regressions.
  */
@@ -54,10 +53,7 @@ test('evaluatePerformanceBudget fails CI when LCP exceeds budget', () => {
 
 test('assertPerformanceBudget throws with violation detail', () => {
   assert.throws(
-    () =>
-      assertPerformanceBudget([
-        { metric: 'js_transfer_kb', value: 999 },
-      ]),
+    () => assertPerformanceBudget([{ metric: 'js_transfer_kb', value: 999 }]),
     /Performance budget exceeded.*js_transfer_kb/,
   );
 });

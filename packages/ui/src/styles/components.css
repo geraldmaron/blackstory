@@ -1,4 +1,3 @@
-
 /**
  * Component-level styles for BlackStory design-system primitives (brand pack
  * v3). Radius language 8/16/28, Rule hairlines carry all separation, no
@@ -94,7 +93,6 @@
 .ds-citation--compact .ds-citation__label {
   font-size: 0.625rem;
 }
-
 
 .ds-confidence {
   display: inline-flex;
@@ -214,7 +212,6 @@
   font-family: var(--ds-font-sans);
   font-size: 0.8125rem;
 }
-
 
 /**
  * MapExplorer: real geographic map + accessible legend. The canvas

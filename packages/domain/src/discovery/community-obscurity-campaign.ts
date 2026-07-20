@@ -97,10 +97,7 @@ function defaultCommunityObscurityPack(createdAt: string): QueryPack {
   });
 }
 
-function ensureApprovedRssRegistry(
-  store: SourceRegistryStore,
-  now: string,
-): SourceRegistryEntry {
+function ensureApprovedRssRegistry(store: SourceRegistryStore, now: string): SourceRegistryEntry {
   const existing = store.get('reg_rss_community_obscurity');
   if (existing?.registryState === 'approved' || existing?.registryState === 'canary') {
     return existing;
@@ -182,7 +179,8 @@ export function runCommunityObscurityCampaign(
     const xml = input.feedXmlByFeedId.get(seed.id);
     if (xml === undefined) continue;
     feedIds.push(seed.id);
-    const feed = feedRegistry.get(seed.id) ?? toFeedRegistryEntry(seed.id, input.stampedAt, actor.id);
+    const feed =
+      feedRegistry.get(seed.id) ?? toFeedRegistryEntry(seed.id, input.stampedAt, actor.id);
     records.push(
       ...normalizeFeedXml({
         feed,
@@ -243,14 +241,19 @@ export function runCommunityObscurityCampaign(
   const followUps = campaign.authorityFollowUps ?? [];
   const followUpCounts = new Map<string, number>();
   for (const lead of followUps) {
-    followUpCounts.set(lead.parentCandidateId, (followUpCounts.get(lead.parentCandidateId) ?? 0) + 1);
+    followUpCounts.set(
+      lead.parentCandidateId,
+      (followUpCounts.get(lead.parentCandidateId) ?? 0) + 1,
+    );
   }
 
   const ranked: CommunityObscurityRankedLead[] = rankedAssessments.map((obscurity) => {
     const candidate = campaign.candidates.find((entry) => entry.id === obscurity.candidateId)!;
     return {
       candidateId: candidate.id,
-      ...(candidate.adapterRecord.title !== undefined ? { title: candidate.adapterRecord.title } : {}),
+      ...(candidate.adapterRecord.title !== undefined
+        ? { title: candidate.adapterRecord.title }
+        : {}),
       ...(candidate.adapterRecord.canonicalUrl !== undefined
         ? { canonicalUrl: candidate.adapterRecord.canonicalUrl }
         : {}),

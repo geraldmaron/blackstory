@@ -45,7 +45,10 @@ test('CSP includes strict defaults and frame-ancestors none', () => {
 test('CSP development relaxes script-src for Next.js hydration and HMR', () => {
   const csp = buildContentSecurityPolicy({ isDev: true });
   assert.match(csp, /script-src 'self' 'unsafe-inline' 'unsafe-eval'/);
-  assert.match(csp, /connect-src 'self' https:\/\/demotiles\.maplibre\.org https:\/\/tiles\.openfreemap\.org/);
+  assert.match(
+    csp,
+    /connect-src 'self' https:\/\/demotiles\.maplibre\.org https:\/\/tiles\.openfreemap\.org/,
+  );
   assert.match(csp, /connect-src[^;]*recaptchaenterprise\.googleapis\.com/);
   assert.match(csp, /connect-src[^;]* ws: wss:/);
   assert.doesNotMatch(csp, /upgrade-insecure-requests/);
@@ -99,23 +102,14 @@ test('csrf cookie uses __Host prefix defaults', () => {
 
 test('CSRF validation uses double-submit timing-safe compare', () => {
   const token = generateCsrfToken();
-  assert.equal(
-    validateCsrfToken({ cookieToken: token, headerToken: token }),
-    true,
-  );
-  assert.equal(
-    validateCsrfToken({ cookieToken: token, headerToken: `${token}x` }),
-    false,
-  );
+  assert.equal(validateCsrfToken({ cookieToken: token, headerToken: token }), true);
+  assert.equal(validateCsrfToken({ cookieToken: token, headerToken: `${token}x` }), false);
   assert.equal(validateCsrfToken({ cookieToken: token }), false);
 });
 
 test('request size limits reject oversized bodies', () => {
   const limit = REQUEST_SIZE_LIMITS.jsonBody;
-  assert.throws(
-    () => assertRequestWithinLimit(limit + 1, 'jsonBody'),
-    RequestTooLargeError,
-  );
+  assert.throws(() => assertRequestWithinLimit(limit + 1, 'jsonBody'), RequestTooLargeError);
   assert.doesNotThrow(() => assertRequestWithinLimit(limit, 'jsonBody'));
 });
 

@@ -8,9 +8,11 @@ import type { ManualPlaceSearchFallback, ManualPlaceSearchReason } from './types
 
 const FALLBACK_MESSAGES: Readonly<Record<ManualPlaceSearchReason, string>> = {
   no_match: 'We could not match that address. Try searching by city, county, or state instead.',
-  geocoder_unavailable: 'The address lookup service is temporarily unavailable. Search by place instead.',
+  geocoder_unavailable:
+    'The address lookup service is temporarily unavailable. Search by place instead.',
   geocoder_error: 'Something went wrong looking up that address. Search by place instead.',
-  ambiguous_match: 'That address matched more than one place. Search by city, county, or state to narrow it down.',
+  ambiguous_match:
+    'That address matched more than one place. Search by city, county, or state to narrow it down.',
 };
 
 export type BuildManualPlaceSearchFallbackOptions = {

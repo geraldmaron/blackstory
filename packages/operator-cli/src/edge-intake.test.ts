@@ -1,4 +1,3 @@
-
 /**
  * Verifies edge intake lands proposed EntityRelationship claims
  * in the same real quarantine pipeline every other operator-cli proposal uses never a
@@ -36,7 +35,10 @@ function baseInput(overrides: Partial<EdgeIntakeInput> = {}): EdgeIntakeInput {
 }
 
 test('proposing an attended edge with a role lands in the real quarantine pipeline and opens a draft research case — no parallel writer', () => {
-  const outcome = prepareEdgeIntake(baseInput({ role: 'organizer', temporal: { validFrom: '1963' } }), context());
+  const outcome = prepareEdgeIntake(
+    baseInput({ role: 'organizer', temporal: { validFrom: '1963' } }),
+    context(),
+  );
   assert.equal(outcome.accepted, true);
   if (!outcome.accepted) return;
   assert.equal(outcome.proposalKind, 'lead');
@@ -60,7 +62,11 @@ test('an unrecognized relationship type is rejected before quarantine', () => {
 
 test('a role on a non-attended type is rejected before quarantine', () => {
   assert.throws(
-    () => prepareEdgeIntake(baseInput({ type: 'founded', role: 'organizer', temporal: undefined }), context()),
+    () =>
+      prepareEdgeIntake(
+        baseInput({ type: 'founded', role: 'organizer', temporal: undefined }),
+        context(),
+      ),
     /only valid on "attended"/,
   );
 });
@@ -69,7 +75,10 @@ test('a causal historical-causation type missing TemporalContext.validFrom is re
   assert.throws(
     () =>
       prepareEdgeIntake(
-        baseInput({ type: 'caused', causalReview: { scope: 'systemic_consensus', consensusBasis: 'x' } }),
+        baseInput({
+          type: 'caused',
+          causalReview: { scope: 'systemic_consensus', consensusBasis: 'x' },
+        }),
         context(),
       ),
     /requires a TemporalContext/,
@@ -78,10 +87,7 @@ test('a causal historical-causation type missing TemporalContext.validFrom is re
 
 test('acceptance criterion 9: a caused/enabled edge with NO causalReview is rejected (silence defaults to rejection, not permissiveness)', () => {
   const outcome = () =>
-    prepareEdgeIntake(
-      baseInput({ type: 'enabled', temporal: { validFrom: '1964' } }),
-      context(),
-    );
+    prepareEdgeIntake(baseInput({ type: 'enabled', temporal: { validFrom: '1964' } }), context());
   assert.throws(outcome, /reserved for consensus, citable systemic historical causation/);
 });
 
@@ -119,7 +125,11 @@ test('acceptance criterion 9: a settled systemic-causation claim with a document
 
 test('non-causal types (e.g. commemorates, participated_in) are never gated by the causal guardrail', () => {
   const outcome = prepareEdgeIntake(
-    baseInput({ type: 'commemorates', fromEntityId: 'ent-place-modern-city', toEntityId: 'ent-event-rally' }),
+    baseInput({
+      type: 'commemorates',
+      fromEntityId: 'ent-place-modern-city',
+      toEntityId: 'ent-event-rally',
+    }),
     context(),
   );
   assert.equal(outcome.accepted, true);

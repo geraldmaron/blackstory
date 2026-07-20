@@ -71,19 +71,17 @@ export async function submitEvidenceAttach(
     if (!outcome.accepted) {
       return {
         status: 'error',
-        error: outcome.rejection.issues
-          .map((issue: { readonly message: string }) => issue.message)
-          .join('; ') || 'Rejected',
+        error:
+          outcome.rejection.issues
+            .map((issue: { readonly message: string }) => issue.message)
+            .join('; ') || 'Rejected',
       };
     }
 
     if (shouldCommit) {
       const { app } = createServerFirebaseApp(process.env);
       const store = createAdminAtomicStore(getFirestore(app));
-      const commitResult = await commitOperatorIntake(
-        store,
-        outcome as OperatorIntakeAccepted,
-      );
+      const commitResult = await commitOperatorIntake(store, outcome as OperatorIntakeAccepted);
       return {
         status: 'committed',
         submissionId: outcome.submission.id,

@@ -1,4 +1,3 @@
-
 /**
  * Deterministic identifier factories for tests.
  * Prefer these over random UUIDs so fixtures and assertions stay stable.
@@ -9,7 +8,6 @@ export type IdFactory = {
   readonly peek: () => string;
   readonly reset: (startAt?: number) => void;
 };
-
 
 /**
  * Builds sequential IDs like `ent_0001`, `clm_0002`.

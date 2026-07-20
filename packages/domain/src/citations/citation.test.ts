@@ -84,7 +84,10 @@ test('buildCitationFromEvidence adapts a  evidence chain into a citation', () =>
   assert.equal(citation.sourceName, 'National Archives');
   assert.equal(citation.title, 'Grand jury report');
   assert.equal(citation.capture.captureId, 'capture-2');
-  assert.equal(citation.capture.waybackCaptureUrl, 'https://web.archive.org/web/20260601000000/https://archives.gov/item/1');
+  assert.equal(
+    citation.capture.waybackCaptureUrl,
+    'https://web.archive.org/web/20260601000000/https://archives.gov/item/1',
+  );
   assert.equal(isCitationStructurallyComplete(citation), true);
 });
 
@@ -110,26 +113,22 @@ test('evaluateClaimCitationCompleteness fails a claim with zero citations', () =
 });
 
 test('evaluateClaimCitationCompleteness fails a claim whose only citation is incomplete', () => {
-  const result = evaluateClaimCitationCompleteness(
-    { id: 'claim-1' },
-    [urlCitation({ retrievalDate: 'not-a-date' })],
-  );
+  const result = evaluateClaimCitationCompleteness({ id: 'claim-1' }, [
+    urlCitation({ retrievalDate: 'not-a-date' }),
+  ]);
   assert.equal(result.ok, false);
 });
 
 test('evaluateClaimCitationCompleteness passes a claim with at least one complete citation', () => {
-  const result = evaluateClaimCitationCompleteness(
-    { id: 'claim-1' },
-    [urlCitation({ id: 'incomplete', capture: { captureId: '' } }), urlCitation({ id: 'complete' })],
-  );
+  const result = evaluateClaimCitationCompleteness({ id: 'claim-1' }, [
+    urlCitation({ id: 'incomplete', capture: { captureId: '' } }),
+    urlCitation({ id: 'complete' }),
+  ]);
   assert.equal(result.ok, true);
 });
 
 test('assertClaimCitationComplete throws for an unsourced claim', () => {
-  assert.throws(
-    () => assertClaimCitationComplete({ id: 'claim-1' }, []),
-    /cannot publish/,
-  );
+  assert.throws(() => assertClaimCitationComplete({ id: 'claim-1' }, []), /cannot publish/);
 });
 
 test('evaluateProjectionCitationCompleteness aggregates failures across every claim', () => {

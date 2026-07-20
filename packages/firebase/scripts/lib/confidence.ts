@@ -14,7 +14,11 @@
  * government_record-authority) can clear it. That is "use multiple sources
  * together to build confidence" as an actual formula, not a slogan.
  */
-import { calculateClaimConfidence, type ClaimEvidenceLink, type ConfidenceEngineResult } from '@repo/domain';
+import {
+  calculateClaimConfidence,
+  type ClaimEvidenceLink,
+  type ConfidenceEngineResult,
+} from '@repo/domain';
 import { isTier1Host } from './tier1-sources.ts';
 
 const GOVERNMENT_HOST_PATTERNS = [/\.gov$/iu, /\.mil$/iu, /(^|\.)si\.edu$/iu];
@@ -28,7 +32,8 @@ export function classifySourceForConfidence(url: string): string {
   } catch {
     return 'unknown';
   }
-  if (GOVERNMENT_HOST_PATTERNS.some((pattern) => pattern.test(hostname))) return 'government_record';
+  if (GOVERNMENT_HOST_PATTERNS.some((pattern) => pattern.test(hostname)))
+    return 'government_record';
   if (/(^|\.)(rosenwald\.fisk|archive)\./u.test(hostname) || hostname.endsWith('.edu')) {
     // University archival collections hold scanned original records; general .edu pages
     // (e.g. an alma mater mentioned in passing) do not carry the same evidentiary weight,
@@ -36,7 +41,8 @@ export function classifySourceForConfidence(url: string): string {
     // have — treat .edu as reputable_secondary, the conservative (lower-authority) choice.
     return 'reputable_secondary';
   }
-  if (hostname.includes('wikipedia.org') || hostname.includes('wikidata.org')) return 'reputable_secondary';
+  if (hostname.includes('wikipedia.org') || hostname.includes('wikidata.org'))
+    return 'reputable_secondary';
   if (NEWS_HOST_HINTS.some((hint) => hostname.includes(hint))) return 'news_reportage';
   return 'unknown';
 }
@@ -99,7 +105,9 @@ export function computeClaimConfidence(
   options: { readonly claimClass?: 'standard' | 'high_impact'; readonly now?: string } = {},
 ): ConfidenceEngineResult {
   const now = options.now ?? new Date().toISOString();
-  const evidenceLinks = sources.map((source, index) => buildEvidenceLink(claimId, source, index, now));
+  const evidenceLinks = sources.map((source, index) =>
+    buildEvidenceLink(claimId, source, index, now),
+  );
   return calculateClaimConfidence({
     claimClass: options.claimClass ?? 'standard',
     evidenceLinks,

@@ -3,11 +3,7 @@
  * decade pair on `/data`. Presence-of-people framing; never deficit/crime heat.
  */
 import React from 'react';
-import {
-  formatStateChangeLine,
-  rankStateMovers,
-  type StateChangeLike,
-} from './population-change';
+import { formatStateChangeLine, rankStateMovers, type StateChangeLike } from './population-change';
 import { StatePopulationShiftChart } from './StatePopulationShiftChart';
 
 void React;
@@ -50,9 +46,8 @@ export function StatePopulationShift({
         State shift, {fromDecade}→{toDecade}
       </h3>
       <p className="ds-section__lede ds-data-state-shift__lede">
-        Where Black population counts rose or fell across states (sum of county
-        decennial totals). Share change is percentage points of each state&rsquo;s
-        total population.
+        Where Black population counts rose or fell across states (sum of county decennial totals).
+        Share change is percentage points of each state&rsquo;s total population.
       </p>
       <div className="ds-data-state-shift__columns">
         {gains.length > 0 ? (
@@ -61,11 +56,7 @@ export function StatePopulationShift({
             <ol className="ds-data-state-shift__list">
               {gains.map((row) => {
                 const name = resolveStateName(row.stateFips, stateNameByFips);
-                return (
-                  <li key={`gain-${row.stateFips}`}>
-                    {formatStateChangeLine(row, name)}
-                  </li>
-                );
+                return <li key={`gain-${row.stateFips}`}>{formatStateChangeLine(row, name)}</li>;
               })}
             </ol>
           </section>
@@ -76,11 +67,7 @@ export function StatePopulationShift({
             <ol className="ds-data-state-shift__list">
               {losses.map((row) => {
                 const name = resolveStateName(row.stateFips, stateNameByFips);
-                return (
-                  <li key={`loss-${row.stateFips}`}>
-                    {formatStateChangeLine(row, name)}
-                  </li>
-                );
+                return <li key={`loss-${row.stateFips}`}>{formatStateChangeLine(row, name)}</li>;
               })}
             </ol>
           </section>

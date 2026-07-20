@@ -25,7 +25,10 @@ function firebaseVerifierFromAdminSdk() {
   const { app } = createServerFirebaseApp(process.env);
   const auth = getAuth(app);
   return {
-    async verifyIdToken(idToken: string, checkRevoked: true): Promise<VerifiedFirebaseAdminIdentity> {
+    async verifyIdToken(
+      idToken: string,
+      checkRevoked: true,
+    ): Promise<VerifiedFirebaseAdminIdentity> {
       const decoded = await auth.verifyIdToken(idToken, checkRevoked);
       return decoded as VerifiedFirebaseAdminIdentity;
     },

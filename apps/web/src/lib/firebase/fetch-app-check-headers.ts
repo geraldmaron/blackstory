@@ -7,9 +7,7 @@ import { getToken, type AppCheck } from 'firebase/app-check';
 
 export const APP_CHECK_HEADER_FETCH_TIMEOUT_MS = 8_000;
 
-export type AppCheckTokenFetcher = (
-  appCheck: AppCheck,
-) => Promise<{ readonly token: string }>;
+export type AppCheckTokenFetcher = (appCheck: AppCheck) => Promise<{ readonly token: string }>;
 
 export async function fetchAppCheckHeaders(
   appCheck: AppCheck | undefined,

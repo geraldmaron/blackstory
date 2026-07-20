@@ -1,4 +1,3 @@
-
 /**
  * Defines the asynchronous URL-evaluation job and quarantine lifecycle.
  * Submission handlers may enqueue this immutable contract but must never fetch;
@@ -7,12 +6,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { URL_SAFETY_POLICY_VERSION } from './policy.js';
 
-export type UrlEvaluationState =
-  | 'queued'
-  | 'fetching'
-  | 'validating'
-  | 'validated'
-  | 'rejected';
+export type UrlEvaluationState = 'queued' | 'fetching' | 'validating' | 'validated' | 'rejected';
 
 export type UrlEvaluationJob = {
   readonly id: string;

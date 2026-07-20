@@ -57,7 +57,8 @@ const stubPublicationRelease = {
     createdAt: seedActiveRelease.activatedAt,
     createdBy: 'bootstrap-public-seed',
     activatedAt: seedActiveRelease.activatedAt,
-    notes: 'Bootstrap seed release for black-book-efaaf stand-up (not a signed production promote).',
+    notes:
+      'Bootstrap seed release for black-book-efaaf stand-up (not a signed production promote).',
     signedManifest: {
       manifestHash: seedActiveRelease.manifestHash,
       algorithm: 'bootstrap-unsigned',
@@ -105,9 +106,7 @@ const STORIES_COLLECTION = 'publicReleases/rel_seed_001/stories';
  * surface on `/stories`. Delete any story doc whose id is not in the canonical set
  * so the live collection always converges to exactly the seeded stories.
  */
-async function pruneOrphanStories(
-  db: ReturnType<typeof getFirestore>,
-): Promise<readonly string[]> {
+async function pruneOrphanStories(db: ReturnType<typeof getFirestore>): Promise<readonly string[]> {
   const snapshot = await db.collection(STORIES_COLLECTION).get();
   const orphans = snapshot.docs.filter((doc) => !CANONICAL_STORY_SLUGS.has(doc.id));
   if (orphans.length === 0) return [];

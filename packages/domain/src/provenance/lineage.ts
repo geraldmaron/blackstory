@@ -32,7 +32,11 @@ export function assertLineageEndpointsDistinct(
 }
 
 export function resolveLineageRoot(
-  evidence: { readonly id: string; readonly lineageRootId?: string; readonly syndicatedFromEvidenceId?: string },
+  evidence: {
+    readonly id: string;
+    readonly lineageRootId?: string;
+    readonly syndicatedFromEvidenceId?: string;
+  },
   parent?: { readonly id: string; readonly lineageRootId?: string } | null,
 ): string {
   if (evidence.lineageRootId?.trim()) {

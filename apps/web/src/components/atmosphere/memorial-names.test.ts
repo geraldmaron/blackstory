@@ -13,7 +13,10 @@ import {
 } from './memorial-names';
 
 test('memorial names pool is large and fully identified', () => {
-  assert.ok(MEMORIAL_NAMES.length >= 1000, `expected hundreds of names, got ${MEMORIAL_NAMES.length}`);
+  assert.ok(
+    MEMORIAL_NAMES.length >= 1000,
+    `expected hundreds of names, got ${MEMORIAL_NAMES.length}`,
+  );
   for (const entry of MEMORIAL_NAMES) {
     assert.ok(entry.name.trim().length > 0);
     assert.ok(Number.isInteger(entry.year));
@@ -39,7 +42,10 @@ test('Nat Turner carries accurate state-execution context', () => {
   assert.equal(nat!.category, 'state_execution');
   assert.equal(nat!.year, 1831);
   assert.ok(nat!.place?.toLowerCase().includes('virginia'));
-  assert.ok(nat!.context?.toLowerCase().includes('rebellion') || nat!.context?.toLowerCase().includes('executed'));
+  assert.ok(
+    nat!.context?.toLowerCase().includes('rebellion') ||
+      nat!.context?.toLowerCase().includes('executed'),
+  );
 });
 
 test('memorial name keys are unique by name+year', () => {
@@ -70,8 +76,14 @@ test('memorialNameLabel includes person, year, and place when known', () => {
 });
 
 test('plate eligibility requires a full name (rejects single-token entries)', () => {
-  assert.equal(isMemorialNamePlateEligible({ name: 'Adam', year: 1900, category: 'racial_terror' }), false);
-  assert.equal(isMemorialNamePlateEligible({ name: 'Jim', year: 1900, category: 'racial_terror' }), false);
+  assert.equal(
+    isMemorialNamePlateEligible({ name: 'Adam', year: 1900, category: 'racial_terror' }),
+    false,
+  );
+  assert.equal(
+    isMemorialNamePlateEligible({ name: 'Jim', year: 1900, category: 'racial_terror' }),
+    false,
+  );
   assert.equal(
     isMemorialNamePlateEligible({ name: 'Emmett Till', year: 1955, category: 'racial_terror' }),
     true,

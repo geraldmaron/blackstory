@@ -1,4 +1,3 @@
-
 /**
  * Core operator-proposal intake: submit a lead, register a source, or attach evidence.
  *
@@ -22,10 +21,7 @@
  * This function only queues the proposed evidence against the target case id.
  */
 import { randomUUID } from 'node:crypto';
-import {
-  createResearchCase,
-  type ResearchCaseRecord,
-} from '@repo/domain';
+import { createResearchCase, type ResearchCaseRecord } from '@repo/domain';
 import {
   createQuarantinedSubmission,
   createSubmissionCampaignDetector,
@@ -91,7 +87,10 @@ export type OperatorIntakeRejected = {
 
 export type OperatorIntakeOutcome = OperatorIntakeAccepted | OperatorIntakeRejected;
 
-const AUDIT_ACTION_BY_PROPOSAL: Record<OperatorProposalKind, 'research.created' | 'source.registered'> = {
+const AUDIT_ACTION_BY_PROPOSAL: Record<
+  OperatorProposalKind,
+  'research.created' | 'source.registered'
+> = {
   lead: 'research.created',
   source_registration: 'source.registered',
   evidence_attachment: 'research.created',
@@ -106,7 +105,6 @@ export type PrepareOperatorIntakeOptions = {
   readonly openDraftCase?: boolean;
   readonly caseTitle?: string;
 };
-
 
 /**
  * Runs one operator submission through the real quarantine intake and, optionally,
@@ -190,14 +188,22 @@ export function prepareOperatorIntake(
     now,
     idempotencyKey,
     ...(researchCase ? { entityId: researchCase.id } : {}),
-    data: { proposalKind, operator: stamp, ...(researchCase ? { researchCaseId: researchCase.id } : {}) },
+    data: {
+      proposalKind,
+      operator: stamp,
+      ...(researchCase ? { researchCaseId: researchCase.id } : {}),
+    },
   });
   const outboxMessage = buildOperatorOutboxMessage({
     auditEvent,
     topic: 'operator.submission.created',
     aggregateType: 'submissionInbox',
     aggregateId: submissionId,
-    payload: { proposalKind, submissionId, ...(researchCase ? { researchCaseId: researchCase.id } : {}) },
+    payload: {
+      proposalKind,
+      submissionId,
+      ...(researchCase ? { researchCaseId: researchCase.id } : {}),
+    },
     now,
   });
 
@@ -237,7 +243,10 @@ function composeStatement(description: string, location?: string, era?: string):
   return lines.join('\n\n');
 }
 
-function collectSourceUrls(url: string | undefined, sourceUrls: readonly string[] | undefined): string[] {
+function collectSourceUrls(
+  url: string | undefined,
+  sourceUrls: readonly string[] | undefined,
+): string[] {
   const urls = [...(url ? [url] : []), ...(sourceUrls ?? [])];
   return [...new Set(urls)];
 }
@@ -301,7 +310,6 @@ export type EvidenceAttachmentInput = {
   readonly sourceUrls: readonly string[];
   readonly submitterContact?: string;
 };
-
 
 /**
  * Attach evidence to a research case: queues the proposal against `researchCaseId`. Applying

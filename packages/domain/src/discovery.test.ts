@@ -46,7 +46,9 @@ function loadQueryPack() {
   return parseQueryPackFixture(raw).pack;
 }
 
-function sampleCampaignConfig(overrides: Partial<Parameters<typeof createDiscoveryCampaignConfig>[0]> = {}) {
+function sampleCampaignConfig(
+  overrides: Partial<Parameters<typeof createDiscoveryCampaignConfig>[0]> = {},
+) {
   return createDiscoveryCampaignConfig({
     campaignId: 'camp_test',
     budget: {

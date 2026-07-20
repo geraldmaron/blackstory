@@ -21,10 +21,7 @@ export function buildSourceReference(record: AdapterCandidateRecord): SourceRefe
   };
 }
 
-export function candidateIdentityKey(
-  stableIdentifier: string,
-  contentHash: ContentHash,
-): string {
+export function candidateIdentityKey(stableIdentifier: string, contentHash: ContentHash): string {
   const material = `${stableIdentifier.trim()}::${contentHash.algorithm}:${contentHash.digest}`;
   return hashUtf8(material).digest.slice(0, 32);
 }

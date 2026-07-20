@@ -4,10 +4,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { CAMERA_COUNTY_ZOOM } from '../map-experience/camera-presets';
-import {
-  buildLocateExploreHref,
-  LOCATE_EXPLORE_DEFAULT_RADIUS_ID,
-} from './locate-explore-href';
+import { buildLocateExploreHref, LOCATE_EXPLORE_DEFAULT_RADIUS_ID } from './locate-explore-href';
 import { parseExploreSearchParams } from '../map-experience/url-state';
 
 const PALM_BEACH_RESOLUTION = {
@@ -51,7 +48,9 @@ test('state-only fallback links to explore without a finite radius', () => {
   assert.match(href, /^\/explore\?/);
   assert.doesNotMatch(href, /radius=/);
   assert.match(href, /near=Georgia/);
-  assert.ok(parseExploreSearchParams(Object.fromEntries(new URLSearchParams(href.split('?')[1]!))).viewport);
+  assert.ok(
+    parseExploreSearchParams(Object.fromEntries(new URLSearchParams(href.split('?')[1]!))).viewport,
+  );
 });
 
 test('falls back to bare /explore when neither coords nor state can be framed', () => {

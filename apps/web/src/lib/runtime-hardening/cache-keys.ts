@@ -10,8 +10,7 @@ export function buildPublicPageCacheKey(
   pathname: string,
   search?: URLSearchParams | QueryParamBag,
 ): string {
-  const path =
-    pathname.endsWith('/') && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
+  const path = pathname.endsWith('/') && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
   if (!search) {
     return path || '/';
   }

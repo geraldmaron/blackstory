@@ -106,10 +106,7 @@ test('groups same-criterion notes and dedupes identical citations', () => {
   assert.match(html, /Served as the Birmingham campaign/);
   assert.match(html, /Bombed on May 11, 1963/);
   assert.equal((html.match(/Documented site/g) ?? []).length, 1);
-  assert.equal(
-    (html.match(/National Park Service: The A\.G\. Gaston Motel/g) ?? []).length,
-    1,
-  );
+  assert.equal((html.match(/National Park Service: The A\.G\. Gaston Motel/g) ?? []).length, 1);
   assert.match(html, /\(nps\.gov\)/);
   assert.doesNotMatch(html, /served as:/i);
   assert.doesNotMatch(html, /Cited from nps\.gov/i);
@@ -176,7 +173,9 @@ test('renders the shared trauma-content disclaimer only when the harm dimension 
         evidenceIds: ['ev-4'],
       },
     ],
-    storyTexts: ['The community founded the school and organized mutual aid alongside daily celebrations.'],
+    storyTexts: [
+      'The community founded the school and organized mutual aid alongside daily celebrations.',
+    ],
   });
   const balancedHtml = renderToStaticMarkup(
     createElement(WhyThisAppears, {

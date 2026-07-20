@@ -34,8 +34,7 @@ export function AtmospherePlane({
       typeof navigator !== 'undefined' &&
       'connection' in navigator &&
       Boolean(
-        (navigator as Navigator & { connection?: { saveData?: boolean } }).connection
-          ?.saveData,
+        (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData,
       );
     if (reducedMotion || saveData) {
       setPreferGeometricClientEnv(true);

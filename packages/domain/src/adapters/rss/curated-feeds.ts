@@ -78,7 +78,12 @@ export function getCuratedCommunityFeedSeed(id: string): CuratedCommunityFeedSee
 }
 
 export function assertCommunityFeedCarePolicy(care: CommunityFeedCarePolicy): void {
-  if (!care.requireAuthorityHarvest || !care.preferCatalogMatch || !care.snippetOnly || !care.cannotPublishAlone) {
+  if (
+    !care.requireAuthorityHarvest ||
+    !care.preferCatalogMatch ||
+    !care.snippetOnly ||
+    !care.cannotPublishAlone
+  ) {
     throw new Error('Community feed care policy missing required extra-care flags');
   }
   if (!care.operatorCaution.trim()) {

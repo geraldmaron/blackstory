@@ -8,11 +8,7 @@ import {
   type StoryPacketReviewDecision,
 } from '../../../../../../stories/story-packet-store';
 
-const DECISIONS = new Set<StoryPacketReviewDecision>([
-  'approved',
-  'rejected',
-  'needs_evidence',
-]);
+const DECISIONS = new Set<StoryPacketReviewDecision>(['approved', 'rejected', 'needs_evidence']);
 
 type Body = {
   readonly decision?: string;

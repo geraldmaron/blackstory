@@ -1,4 +1,3 @@
-
 /**
  * Shared idempotent batch upsert for contentHash-carrying statistic/dataset docs — the ONE
  * implementation of the compare-then-set discipline every bulk loader uses (consolidated
@@ -52,7 +51,10 @@ export async function loadExistingHashes(
   const query = where ? collection.where(where.field, '==', where.value) : collection;
   const snapshot = await query.select('contentHash', 'createdAt').get();
   return new Map(
-    snapshot.docs.map((doc) => [doc.id, doc.data() as { contentHash?: string; createdAt?: string }]),
+    snapshot.docs.map((doc) => [
+      doc.id,
+      doc.data() as { contentHash?: string; createdAt?: string },
+    ]),
   );
 }
 
@@ -79,7 +81,10 @@ export async function idempotentBatchUpsert<T extends HashedDoc>(
       unchanged += 1;
       continue;
     }
-    batch.set(collection.doc(doc.id), prior?.createdAt ? { ...doc, createdAt: prior.createdAt } : doc);
+    batch.set(
+      collection.doc(doc.id),
+      prior?.createdAt ? { ...doc, createdAt: prior.createdAt } : doc,
+    );
     ops += 1;
     if (prior) updated += 1;
     else created += 1;

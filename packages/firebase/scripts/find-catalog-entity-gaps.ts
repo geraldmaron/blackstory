@@ -43,7 +43,11 @@
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildCatalogMatchIndex, classifyLeadAgainstCatalog, type CatalogEntityRef } from './lib/catalog-entity-match.ts';
+import {
+  buildCatalogMatchIndex,
+  classifyLeadAgainstCatalog,
+  type CatalogEntityRef,
+} from './lib/catalog-entity-match.ts';
 // Relative imports across the package boundary — see module doc for why.
 import { createLlmProvider } from '../../operator-cli/src/llm-provider.ts';
 import { mapPool } from '../../operator-cli/src/map-pool.ts';
@@ -54,7 +58,11 @@ const catalogDir = join(repoRoot, 'packages/firebase/fixtures/national-catalog')
 const discoveryDir = join(repoRoot, 'packages/firebase/fixtures/discovery-candidates');
 const reportPath = join(repoRoot, '.cache/entity-gaps/report.json');
 
-type CatalogClaim = { readonly predicate?: string; readonly object?: string; readonly citationHref?: string };
+type CatalogClaim = {
+  readonly predicate?: string;
+  readonly object?: string;
+  readonly citationHref?: string;
+};
 type CatalogEntity = CatalogEntityRef & {
   readonly summary?: string;
   readonly historicalContext?: string;
@@ -83,7 +91,11 @@ function loadCatalogFiles(): FileRecord[] {
   return files;
 }
 
-type ExtractedMention = { readonly name: string; readonly kindGuess: string; readonly quote: string };
+type ExtractedMention = {
+  readonly name: string;
+  readonly kindGuess: string;
+  readonly quote: string;
+};
 
 const KIND_MAP: Record<string, string> = {
   person: 'person',
@@ -195,7 +207,11 @@ async function extractMentions(
         { role: 'system', content: SYSTEM_PROMPT },
         {
           role: 'user',
-          content: JSON.stringify({ subjectName: entity.displayName, subjectKind: entity.kind, text }),
+          content: JSON.stringify({
+            subjectName: entity.displayName,
+            subjectKind: entity.kind,
+            text,
+          }),
         },
       ],
       maxTokens: 500,
@@ -203,14 +219,19 @@ async function extractMentions(
     const parsed = extractJson(completion.content);
     if (!Array.isArray(parsed.mentions)) return [];
     return parsed.mentions
-      .filter((mention): mention is ExtractedMention => typeof mention?.name === 'string' && mention.name.trim().length > 0)
+      .filter(
+        (mention): mention is ExtractedMention =>
+          typeof mention?.name === 'string' && mention.name.trim().length > 0,
+      )
       .map((mention) => ({
         name: mention.name.trim(),
         kindGuess: normalizeKindGuess(mention.kindGuess),
         quote: typeof mention.quote === 'string' ? mention.quote.slice(0, 300) : '',
       }));
   } catch (error) {
-    console.error(`extraction failed for ${entity.id}: ${error instanceof Error ? error.message : String(error)}`);
+    console.error(
+      `extraction failed for ${entity.id}: ${error instanceof Error ? error.message : String(error)}`,
+    );
     return [];
   }
 }
@@ -231,31 +252,38 @@ async function main(): Promise<void> {
   const index = buildCatalogMatchIndex(
     allEntities.map((entity) => ({ ...entity, aliases: entity.aliases ?? [] })),
   );
-  const provider = createLlmProvider({ provider: (process.env.EDITORIAL_LLM_PROVIDER as never) ?? 'hybrid' });
+  const provider = createLlmProvider({
+    provider: (process.env.EDITORIAL_LLM_PROVIDER as never) ?? 'hybrid',
+  });
 
-  const eligible = allEntities.filter((entity) => (entity.claims?.length ?? 0) > 0).slice(0, MAX_ENTITIES);
-  console.error(`scanning ${eligible.length} entities with claims (of ${allEntities.length} total)`);
+  const eligible = allEntities
+    .filter((entity) => (entity.claims?.length ?? 0) > 0)
+    .slice(0, MAX_ENTITIES);
+  console.error(
+    `scanning ${eligible.length} entities with claims (of ${allEntities.length} total)`,
+  );
 
   const mentionedIdPatches = new Map<string, Set<string>>(); // entityId -> new mentionedEntityIds
   const newCandidatesByNormalizedName = new Map<
     string,
-    { name: string; kindGuess: string; mentionedBy: Array<{ entityId: string; quote: string; sourceHref?: string }> }
+    {
+      name: string;
+      kindGuess: string;
+      mentionedBy: Array<{ entityId: string; quote: string; sourceHref?: string }>;
+    }
   >();
   let existingMatchCount = 0;
   let nonEntityCount = 0;
   let processed = 0;
 
-  const mentionsByEntity = await mapPool(
-    eligible,
-    (entity) => extractMentions(provider, entity),
-    {
-      concurrency: CONCURRENCY,
-      onItemComplete: (_result, _index, total) => {
-        processed += 1;
-        if (processed % 10 === 0 || processed === total) console.error(`  ${processed}/${total} entities scanned`);
-      },
+  const mentionsByEntity = await mapPool(eligible, (entity) => extractMentions(provider, entity), {
+    concurrency: CONCURRENCY,
+    onItemComplete: (_result, _index, total) => {
+      processed += 1;
+      if (processed % 10 === 0 || processed === total)
+        console.error(`  ${processed}/${total} entities scanned`);
     },
-  );
+  });
 
   for (let entityIndex = 0; entityIndex < eligible.length; entityIndex += 1) {
     const entity = eligible[entityIndex]!;
@@ -266,7 +294,10 @@ async function main(): Promise<void> {
         continue;
       }
       const classification = classifyLeadAgainstCatalog({ title: mention.name, index });
-      if (classification.kind === 'existing_match' && classification.matchedEntityId !== entity.id) {
+      if (
+        classification.kind === 'existing_match' &&
+        classification.matchedEntityId !== entity.id
+      ) {
         existingMatchCount += 1;
         const set = mentionedIdPatches.get(entity.id) ?? new Set(entity.mentionedEntityIds ?? []);
         set.add(classification.matchedEntityId!);
@@ -276,12 +307,18 @@ async function main(): Promise<void> {
         const sourceHref = entity.claims?.find((claim) => claim.citationHref)?.citationHref;
         const existing = newCandidatesByNormalizedName.get(key);
         if (existing) {
-          existing.mentionedBy.push({ entityId: entity.id, quote: mention.quote, ...(sourceHref ? { sourceHref } : {}) });
+          existing.mentionedBy.push({
+            entityId: entity.id,
+            quote: mention.quote,
+            ...(sourceHref ? { sourceHref } : {}),
+          });
         } else {
           newCandidatesByNormalizedName.set(key, {
             name: classification.coreName,
             kindGuess: mention.kindGuess,
-            mentionedBy: [{ entityId: entity.id, quote: mention.quote, ...(sourceHref ? { sourceHref } : {}) }],
+            mentionedBy: [
+              { entityId: entity.id, quote: mention.quote, ...(sourceHref ? { sourceHref } : {}) },
+            ],
           });
         }
       } else {
@@ -299,7 +336,9 @@ async function main(): Promise<void> {
     gapFill: {
       mentionedByEntityIds: value.mentionedBy.map((m) => m.entityId),
       mentionContexts: value.mentionedBy.map((m) => m.quote),
-      candidateSourceHrefs: [...new Set(value.mentionedBy.map((m) => m.sourceHref).filter(Boolean))],
+      candidateSourceHrefs: [
+        ...new Set(value.mentionedBy.map((m) => m.sourceHref).filter(Boolean)),
+      ],
     },
   }));
 
@@ -309,14 +348,20 @@ async function main(): Promise<void> {
     newCandidateMentions: newCandidates.length,
     nonEntityMentions: nonEntityCount,
     mentionedIdPatchCount: mentionedIdPatches.size,
-    newCandidates: newCandidates.map((c) => ({ id: c.id, displayName: c.displayName, mentionedBy: c.gapFill.mentionedByEntityIds })),
+    newCandidates: newCandidates.map((c) => ({
+      id: c.id,
+      displayName: c.displayName,
+      mentionedBy: c.gapFill.mentionedByEntityIds,
+    })),
   };
   console.log(JSON.stringify(report, null, 2));
   mkdirSync(dirname(reportPath), { recursive: true });
   writeFileSync(reportPath, `${JSON.stringify({ ...report, newCandidates }, null, 2)}\n`);
 
   if (!APPLY) {
-    console.error('\nDry run — no files written. Re-run with --apply to write mentionedEntityIds patches + new candidates.');
+    console.error(
+      '\nDry run — no files written. Re-run with --apply to write mentionedEntityIds patches + new candidates.',
+    );
     return;
   }
 
@@ -336,11 +381,16 @@ async function main(): Promise<void> {
   if (newCandidates.length > 0) {
     const stamp = new Date().toISOString().replace(/[:.]/gu, '-');
     const outPath = join(discoveryDir, `gap-fill-${stamp}.json`);
-    writeFileSync(outPath, `${JSON.stringify({ candidates: newCandidates, generatedBy: 'find-catalog-entity-gaps.ts' }, null, 2)}\n`);
+    writeFileSync(
+      outPath,
+      `${JSON.stringify({ candidates: newCandidates, generatedBy: 'find-catalog-entity-gaps.ts' }, null, 2)}\n`,
+    );
     console.error(`wrote ${newCandidates.length} new-candidate stubs → ${outPath}`);
   }
 
-  console.error(`Applied: ${mentionedIdPatches.size} entities patched with mentionedEntityIds, ${newCandidates.length} new candidates staged.`);
+  console.error(
+    `Applied: ${mentionedIdPatches.size} entities patched with mentionedEntityIds, ${newCandidates.length} new candidates staged.`,
+  );
 }
 
 main().catch((error) => {

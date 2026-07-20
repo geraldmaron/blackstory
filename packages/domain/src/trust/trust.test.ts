@@ -24,7 +24,10 @@ test('buildNewsMediaOrganizationJsonLd emits required Trust Project schema prope
   });
   assert.equal(jsonLd['@type'], 'NewsMediaOrganization');
   assert.equal(jsonLd.correctionsPolicy, 'https://example.org/errata');
-  assert.equal(jsonLd.verificationFactCheckingPolicy, 'https://example.org/methodology#verification');
+  assert.equal(
+    jsonLd.verificationFactCheckingPolicy,
+    'https://example.org/methodology#verification',
+  );
 });
 
 test('assertClaimReviewPathExclusive allows only /myths/<slug> paths', () => {

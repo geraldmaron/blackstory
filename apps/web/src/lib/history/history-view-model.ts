@@ -31,7 +31,11 @@ import {
   type HistoryFilterState,
 } from './filters';
 import { buildHistoryOverview, type HistoryOverview } from './overview';
-import { parseHistorySearchParams, type HistoryViewState, type RawHistorySearchParams } from './url-state';
+import {
+  parseHistorySearchParams,
+  type HistoryViewState,
+  type RawHistorySearchParams,
+} from './url-state';
 
 export type HistoryViewModel = {
   readonly viewState: HistoryViewState;
@@ -75,7 +79,12 @@ export function buildHistoryViewModel(
 
   const kindFiltered = buildSliceNodesWithCounts(slice, viewState.filters, context.entitiesById);
   const visibleNodeIds = new Set(kindFiltered.map((node) => node.entityId));
-  const edges = buildHistoryEdges(slice, SEED_ENTITY_RELATIONSHIPS, context.entitiesById, visibleNodeIds);
+  const edges = buildHistoryEdges(
+    slice,
+    SEED_ENTITY_RELATIONSHIPS,
+    context.entitiesById,
+    visibleNodeIds,
+  );
 
   const sliceForKindFacets = buildSliceNodesWithCounts(
     slice,

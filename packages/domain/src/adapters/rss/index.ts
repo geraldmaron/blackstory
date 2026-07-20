@@ -44,7 +44,11 @@ export {
   type NormalizeFeedItemInput,
 } from './normalizer.js';
 
-export { fetchAndNormalizeFeed, fetchAndNormalizeFeeds, type FetchFeedInput } from './fetch-feed.js';
+export {
+  fetchAndNormalizeFeed,
+  fetchAndNormalizeFeeds,
+  type FetchFeedInput,
+} from './fetch-feed.js';
 
 export {
   CURATED_COMMUNITY_FEED_SEED_VERSION,

@@ -1,4 +1,3 @@
-
 /**
  * Pure helpers for restore verification: document counts, collection hashes,
  * and release manifest integrity checks (structure + digest, no live I/O).
@@ -42,7 +41,6 @@ export function sha256Json(value) {
   return sha256Hex(canonicalJson(value));
 }
 
-
 /**
  * @param {Record<string, number>} counts
  * @param {Record<string, number>} baseline
@@ -59,7 +57,6 @@ export function compareDocumentCounts(counts, baseline) {
   }
   return { ok: mismatches.length === 0, mismatches };
 }
-
 
 /**
  * @param {Record<string, string>} hashes
@@ -98,7 +95,6 @@ function manifestToJson(manifest) {
     })),
   };
 }
-
 
 /**
  * Verifies manifest envelope structure and manifestHash digest. Signature optional.
@@ -166,7 +162,6 @@ export function verifyManifestEnvelope(signedManifest, publicKey = undefined) {
   return { ok: errors.length === 0, errors, signatureValid };
 }
 
-
 /**
  * @param {object} metadata export sidecar from backup job
  * @param {object} options
@@ -217,7 +212,6 @@ export function verifyExportMetadata(metadata, options = {}) {
   };
 }
 
-
 /**
  * @param {object} activePointer publicMeta/activeRelease shape
  * @param {object} release publicationReleases doc with signedManifest
@@ -243,7 +237,6 @@ export function verifyActiveReleasePointer(activePointer, release) {
   }
   return { ok: errors.length === 0, errors, envelope };
 }
-
 
 /**
  * Parses retention matrix and asserts runtime SAs are listed as non-deleters.

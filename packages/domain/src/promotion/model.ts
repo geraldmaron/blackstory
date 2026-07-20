@@ -14,14 +14,15 @@ export const PROMOTION_STAGES = [
 
 export type PromotionStage = (typeof PROMOTION_STAGES)[number];
 
-export const PROMOTION_STAGE_TRANSITIONS: Readonly<Record<PromotionStage, PromotionStage | null>> = {
-  submission_discovery: 'research_case',
-  research_case: 'proposed_claim',
-  proposed_claim: 'accepted_claim',
-  accepted_claim: 'publication_candidate',
-  publication_candidate: 'release',
-  release: null,
-};
+export const PROMOTION_STAGE_TRANSITIONS: Readonly<Record<PromotionStage, PromotionStage | null>> =
+  {
+    submission_discovery: 'research_case',
+    research_case: 'proposed_claim',
+    proposed_claim: 'accepted_claim',
+    accepted_claim: 'publication_candidate',
+    publication_candidate: 'release',
+    release: null,
+  };
 
 export type SourceReputation = 'blocked' | 'unknown' | 'limited' | 'established' | 'authoritative';
 export type EvidenceRole = 'supporting' | 'contradicting' | 'contextual';

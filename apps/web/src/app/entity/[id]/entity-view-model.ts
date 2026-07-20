@@ -26,5 +26,9 @@ export function deriveHistoricalFraming(entity: PublicEntityView): HistoricalFra
  * render approved missing-information language rather than an
  * empty section with no explanation. */
 export function isSparseRecord(entity: PublicEntityView): boolean {
-  return entity.claims.length === 0 && (entity.related ?? []).length === 0 && entity.timeline.length === 0;
+  return (
+    entity.claims.length === 0 &&
+    (entity.related ?? []).length === 0 &&
+    entity.timeline.length === 0
+  );
 }

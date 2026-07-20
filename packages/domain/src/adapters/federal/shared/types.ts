@@ -1,16 +1,15 @@
 /**
  * Shared federal adapter types for fixture-based discovery.
  */
-import type { AdapterCandidateRecord, AdapterRunOutcome, SourceAdapterContract } from '../../types.js';
+import type {
+  AdapterCandidateRecord,
+  AdapterRunOutcome,
+  SourceAdapterContract,
+} from '../../types.js';
 import type { EvidenceSource } from '../../../provenance/source.js';
 import type { RightsPolicy } from '../../../provenance/rights.js';
 
-export type FederalAdapterFamily =
-  | 'loc'
-  | 'nara'
-  | 'dpla'
-  | 'nps'
-  | 'school_history';
+export type FederalAdapterFamily = 'loc' | 'nara' | 'dpla' | 'nps' | 'school_history';
 
 export type FederalRetentionRules = {
   readonly requiredFields: readonly string[];

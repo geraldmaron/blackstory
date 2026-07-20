@@ -28,7 +28,9 @@ export async function fetchCountyPopulations(
 
   const variablesResponse = await fetchImpl(buildVariablesUrl(vintage));
   if (!variablesResponse.ok) {
-    throw new Error(`${vintage.dataset}: variables.json fetch failed (${variablesResponse.status})`);
+    throw new Error(
+      `${vintage.dataset}: variables.json fetch failed (${variablesResponse.status})`,
+    );
   }
   assertVariableLabels(
     vintage,

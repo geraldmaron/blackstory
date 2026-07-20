@@ -27,10 +27,7 @@ import type {
   WikimediaCandidateRecord,
   WikimediaIngestMode,
 } from './types.js';
-import {
-  WIKIMEDIA_ADAPTER_ID,
-  WIKIMEDIA_PAYLOAD_SCHEMA_VERSION,
-} from './types.js';
+import { WIKIMEDIA_ADAPTER_ID, WIKIMEDIA_PAYLOAD_SCHEMA_VERSION } from './types.js';
 
 export type NormalizeWikimediaPageInput = {
   readonly project: string;
@@ -42,7 +39,9 @@ export type NormalizeWikimediaPageInput = {
   readonly capturedAt: string;
 };
 
-export function normalizeWikimediaPage(input: NormalizeWikimediaPageInput): WikimediaCandidateRecord {
+export function normalizeWikimediaPage(
+  input: NormalizeWikimediaPageInput,
+): WikimediaCandidateRecord {
   const categories = extractPageCategories(input.page);
   const categoryGate = evaluateCategoryGate({ pageCategories: categories });
   const revision = readLatestRevision(input.page);
@@ -70,18 +69,13 @@ export function normalizeWikimediaPage(input: NormalizeWikimediaPageInput): Wiki
   const stableIdentifier = buildStableIdentifier(input.project, input.page.pageid);
   const title = resolvePageTitle(input.wikidata, input.page);
 
-  const candidate = stampCandidateProvenance(
-    input.registryEntry,
-    input.runId,
-    input.capturedAt,
-    {
-      stableIdentifier,
-      title,
-      canonicalUrl: buildWikipediaCanonicalUrl(input.project, input.page.title),
-      classification: input.registryEntry.contract.classification,
-      payload: payload as Readonly<Record<string, unknown>>,
-    },
-  );
+  const candidate = stampCandidateProvenance(input.registryEntry, input.runId, input.capturedAt, {
+    stableIdentifier,
+    title,
+    canonicalUrl: buildWikipediaCanonicalUrl(input.project, input.page.title),
+    classification: input.registryEntry.contract.classification,
+    payload: payload as Readonly<Record<string, unknown>>,
+  });
 
   assertWikimediaCandidate(candidate as WikimediaCandidateRecord);
   return candidate as WikimediaCandidateRecord;

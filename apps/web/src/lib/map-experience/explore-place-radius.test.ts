@@ -16,12 +16,7 @@ import {
   placeOnlyStatusMessage,
 } from './explore-place-radius';
 
-function pointFeature(
-  id: string,
-  lng: number,
-  lat: number,
-  name = id,
-): ExploreMapFeature {
+function pointFeature(id: string, lng: number, lat: number, name = id): ExploreMapFeature {
   return {
     type: 'Feature',
     id,

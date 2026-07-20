@@ -144,13 +144,18 @@ function parseAtomEntry(block: string): ParsedFeedItem {
 
 function detectFormat(xml: string): ParsedFeedFormat {
   const withoutProlog = xml.replace(/<\?xml[\s\S]*?\?>/, '').trimStart();
-  if (/<feed[\s>]/i.test(withoutProlog.slice(0, 200)) || /xmlns=["']http:\/\/www\.w3\.org\/2005\/Atom["']/i.test(xml)) {
+  if (
+    /<feed[\s>]/i.test(withoutProlog.slice(0, 200)) ||
+    /xmlns=["']http:\/\/www\.w3\.org\/2005\/Atom["']/i.test(xml)
+  ) {
     return 'atom';
   }
   if (/<rss[\s>]/i.test(xml) || /<channel[\s>]/i.test(xml)) {
     return 'rss';
   }
-  throw new Error('Unrecognized feed format: expected an RSS <rss>/<channel> or Atom <feed> document');
+  throw new Error(
+    'Unrecognized feed format: expected an RSS <rss>/<channel> or Atom <feed> document',
+  );
 }
 
 /** Parses a raw RSS/Atom XML string into a normalized, format-agnostic shape. Throws on unrecognized input. */

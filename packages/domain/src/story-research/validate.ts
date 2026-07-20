@@ -3,7 +3,10 @@
  * public-language procedural checks, and dignity heuristics (no trauma-hook openers).
  */
 
-import { evaluatePublicLanguage, type PublicLanguageEvaluation } from '../confidence-engine/index.js';
+import {
+  evaluatePublicLanguage,
+  type PublicLanguageEvaluation,
+} from '../confidence-engine/index.js';
 import { narrativeMayCiteClaim, type CanonicalClaim } from '../claims/index.js';
 import { citeEntryIsResolved, type StoryCiteEntry } from './cite-map.js';
 import type { StoryDraft, StoryResearchDecision } from './packet.js';
@@ -81,9 +84,7 @@ function dignityIssues(draft: StoryDraft, citeMap: readonly StoryCiteEntry[]): s
     if (!pattern.test(full)) continue;
     const hasSupportingCite = citeMap.some(
       (entry) =>
-        citeEntryIsResolved(entry) &&
-        entry.citeKind !== 'framing' &&
-        pattern.test(entry.text),
+        citeEntryIsResolved(entry) && entry.citeKind !== 'framing' && pattern.test(entry.text),
     );
     if (!hasSupportingCite) {
       issues.push(
@@ -103,7 +104,9 @@ function citeMapIssues(
     if (entry.citeKind === 'framing') continue;
 
     if (entry.citeKind === 'unresolved' || !citeEntryIsResolved(entry)) {
-      issues.push(`Unresolved cite for sentence ${entry.sentenceId}: needs published claim/fact/entity.`);
+      issues.push(
+        `Unresolved cite for sentence ${entry.sentenceId}: needs published claim/fact/entity.`,
+      );
       continue;
     }
 

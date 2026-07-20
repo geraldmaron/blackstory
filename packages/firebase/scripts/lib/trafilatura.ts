@@ -21,7 +21,14 @@ function runTrafilaturaProcess(input: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const child = spawn(
       'uv',
-      ['run', '--project', 'workers/research', 'python3', '-m', 'black_book_research.crawl.trafilatura_extract'],
+      [
+        'run',
+        '--project',
+        'workers/research',
+        'python3',
+        '-m',
+        'black_book_research.crawl.trafilatura_extract',
+      ],
       { cwd: REPO_ROOT, timeout: EXTRACT_TIMEOUT_MS },
     );
     const chunks: Buffer[] = [];
@@ -39,11 +46,15 @@ function runTrafilaturaProcess(input: string): Promise<string> {
 }
 
 /** Re-extracts main-text from raw HTML via Trafilatura. Returns undefined on any failure. */
-export async function extractWithTrafilatura(html: string, url?: string): Promise<TrafilaturaResult | undefined> {
+export async function extractWithTrafilatura(
+  html: string,
+  url?: string,
+): Promise<TrafilaturaResult | undefined> {
   try {
     const stdout = await runTrafilaturaProcess(JSON.stringify({ html, url }));
     const parsed = JSON.parse(stdout) as { text?: string; title?: string; error?: string };
-    if (parsed.error || typeof parsed.text !== 'string' || parsed.text.trim().length < 50) return undefined;
+    if (parsed.error || typeof parsed.text !== 'string' || parsed.text.trim().length < 50)
+      return undefined;
     return { text: parsed.text, ...(parsed.title ? { title: parsed.title } : {}) };
   } catch {
     return undefined;

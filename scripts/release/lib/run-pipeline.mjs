@@ -1,4 +1,3 @@
-
 /**
  * Thin wrappers for release pipeline scripts.
  * Core logic lives in infra/github/release-pipeline/.
@@ -9,7 +8,6 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PIPELINE = path.join(ROOT, 'infra/github/release-pipeline');
-
 
 /**
  * @param {string} scriptName

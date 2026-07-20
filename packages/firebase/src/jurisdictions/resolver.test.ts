@@ -1,4 +1,3 @@
-
 /**
  * Tests for the jurisdiction resolver's in-memory implementation (no Firestore
  * dependency). The Firestore-backed `createFirestoreJurisdictionResolver` shares the exact

@@ -12,7 +12,11 @@ export const SEED_CAMPAIGN_METADATA: readonly SeedCampaignMeta[] = [
       'NRHP- or NPS-documented Rosenwald Fund school buildings. Fisk Rosenwald database bulk ' +
       'import remains deferred (); only individually verified public listings ship here.',
     qualityTargetCount: 6,
-    preferredNotabilityCriteria: ['landmark_or_national_register', 'only_or_oldest', 'documented_site'],
+    preferredNotabilityCriteria: [
+      'landmark_or_national_register',
+      'only_or_oldest',
+      'documented_site',
+    ],
   },
   {
     id: 'freedmens-schools',
@@ -39,7 +43,11 @@ export const SEED_CAMPAIGN_METADATA: readonly SeedCampaignMeta[] = [
       'Schools named in or central to consequential desegregation litigation with court or NPS ' +
       'primary documentation.',
     qualityTargetCount: 5,
-    preferredNotabilityCriteria: ['court_precedent', 'documented_site', 'landmark_or_national_register'],
+    preferredNotabilityCriteria: [
+      'court_precedent',
+      'documented_site',
+      'landmark_or_national_register',
+    ],
   },
   {
     id: 'black-educational-movements',

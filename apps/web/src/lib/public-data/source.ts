@@ -154,9 +154,7 @@ function projectionsFromArtifactEntities(
   return out;
 }
 
-function searchDocsFromArtifact(
-  docs: readonly unknown[],
-): PublicSearchIndexDoc[] {
+function searchDocsFromArtifact(docs: readonly unknown[]): PublicSearchIndexDoc[] {
   const out: PublicSearchIndexDoc[] = [];
   for (const doc of docs) {
     const parsed = parseSearchIndexDoc(doc);
@@ -297,18 +295,12 @@ async function loadLiveEntity(entityId: string): Promise<PublicEntityView | unde
 
   try {
     const oneHopIds = collectOneHopNeighborIds(entity);
-    const oneHopProjections = await fetchPublicEntityProjectionsByIds(
-      active.releaseId,
-      oneHopIds,
-    );
+    const oneHopProjections = await fetchPublicEntityProjectionsByIds(active.releaseId, oneHopIds);
     const oneHopViews = oneHopProjections.map((item) =>
       mapProjectionToPublicEntityView(item as PublicProjectionInput),
     );
     const twoHopIds = collectTwoHopNeighborIds(entityId, oneHopIds, oneHopViews);
-    const twoHopProjections = await fetchPublicEntityProjectionsByIds(
-      active.releaseId,
-      twoHopIds,
-    );
+    const twoHopProjections = await fetchPublicEntityProjectionsByIds(active.releaseId, twoHopIds);
     const twoHopViews = twoHopProjections.map((item) =>
       mapProjectionToPublicEntityView(item as PublicProjectionInput),
     );
@@ -320,13 +312,11 @@ async function loadLiveEntity(entityId: string): Promise<PublicEntityView | unde
 }
 
 /** Resolve one entity: live projection first, then bundled seed snapshot.  */
-export const resolvePublicEntityView = cache(
-  async function resolvePublicEntityView(
-    entityId: string,
-  ): Promise<PublicReadResult<PublicEntityView>> {
-    return resolvePublicEntity(entityId, () => loadLiveEntity(entityId));
-  },
-);
+export const resolvePublicEntityView = cache(async function resolvePublicEntityView(
+  entityId: string,
+): Promise<PublicReadResult<PublicEntityView>> {
+  return resolvePublicEntity(entityId, () => loadLiveEntity(entityId));
+});
 
 /** List entities from live release artifacts/cache, falling back to seed.  */
 export const listPublicEntityViews = cache(async function listPublicEntityViews(): Promise<{
@@ -430,26 +420,22 @@ export const listPublicStoryViews = cache(async function listPublicStoryViews():
 });
 
 /** Resolve one story by slug: live projection, then Firebase seed snapshot. */
-export const resolvePublicStoryView = cache(
-  async function resolvePublicStoryView(
-    slug: string,
-  ): Promise<PublicReadResult<PublicStoryView>> {
-    if (isPublicReadApiDisabled()) {
-      const snapshot = getSnapshotStoryProjection(slug);
-      return snapshot
-        ? { data: snapshot, source: 'snapshot' }
-        : { data: undefined, source: 'none' };
-    }
-
-    try {
-      const live = await loadLiveStory(slug);
-      if (live) return { data: live, source: 'live' };
-    } catch {
-      // fall through
-    }
-
+export const resolvePublicStoryView = cache(async function resolvePublicStoryView(
+  slug: string,
+): Promise<PublicReadResult<PublicStoryView>> {
+  if (isPublicReadApiDisabled()) {
     const snapshot = getSnapshotStoryProjection(slug);
-    if (snapshot) return { data: snapshot, source: 'snapshot' };
-    return { data: undefined, source: 'none' };
-  },
-);
+    return snapshot ? { data: snapshot, source: 'snapshot' } : { data: undefined, source: 'none' };
+  }
+
+  try {
+    const live = await loadLiveStory(slug);
+    if (live) return { data: live, source: 'live' };
+  } catch {
+    // fall through
+  }
+
+  const snapshot = getSnapshotStoryProjection(slug);
+  if (snapshot) return { data: snapshot, source: 'snapshot' };
+  return { data: undefined, source: 'none' };
+});

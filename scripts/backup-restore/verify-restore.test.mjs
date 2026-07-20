@@ -1,4 +1,3 @@
-
 /**
  * Unit tests for backup-restore verification helpers (dry-run safe).
  */
@@ -37,10 +36,7 @@ test('compareDocumentCounts detects mismatches', () => {
 });
 
 test('compareCollectionHashes requires valid sha256 hex', () => {
-  const ok = compareCollectionHashes(
-    { entities: 'a'.repeat(64) },
-    { entities: 'a'.repeat(64) },
-  );
+  const ok = compareCollectionHashes({ entities: 'a'.repeat(64) }, { entities: 'a'.repeat(64) });
   assert.equal(ok.ok, true);
   const bad = compareCollectionHashes({ entities: 'short' }, { entities: 'a'.repeat(64) });
   assert.equal(bad.ok, false);

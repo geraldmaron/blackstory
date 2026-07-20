@@ -62,7 +62,8 @@ export function runRelevanceGates(input: RunRelevanceGatesInput): readonly Relev
 
   const weakIndependentBlocked =
     !isWeakOnlySignal(candidate) ||
-    (compositeScore <= thresholds.weakSignalIndependentCeiling && !hasCorroboratingContext(candidate));
+    (compositeScore <= thresholds.weakSignalIndependentCeiling &&
+      !hasCorroboratingContext(candidate));
   gates.push(
     gate(
       'weak_signal_independent',
@@ -224,12 +225,19 @@ export function hasIncludeEvidence(
  * reach `include`, mirroring `isWeakOnlySignal` / `hasCorroboratingContext` above but keyed on
  * source tier so callers don't have to re-derive the rule.
  */
-export const LOW_AUTHORITY_SOURCE_TIERS = ['community_oral', 'self_published', 'news_reportage'] as const;
+export const LOW_AUTHORITY_SOURCE_TIERS = [
+  'community_oral',
+  'self_published',
+  'news_reportage',
+] as const;
 
 export type LowAuthoritySourceTier = (typeof LOW_AUTHORITY_SOURCE_TIERS)[number];
 
 export function isLowAuthoritySourceTier(classification: string | undefined): boolean {
-  return classification !== undefined && (LOW_AUTHORITY_SOURCE_TIERS as readonly string[]).includes(classification);
+  return (
+    classification !== undefined &&
+    (LOW_AUTHORITY_SOURCE_TIERS as readonly string[]).includes(classification)
+  );
 }
 
 /**

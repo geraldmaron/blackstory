@@ -47,9 +47,15 @@ function sortRanked(ranked: readonly RankedRecord[], sort: SearchSort): readonly
   copy.sort((a, b) => {
     switch (sort) {
       case 'name_asc':
-        return a.record.nameLower.localeCompare(b.record.nameLower) || a.record.id.localeCompare(b.record.id);
+        return (
+          a.record.nameLower.localeCompare(b.record.nameLower) ||
+          a.record.id.localeCompare(b.record.id)
+        );
       case 'name_desc':
-        return b.record.nameLower.localeCompare(a.record.nameLower) || a.record.id.localeCompare(b.record.id);
+        return (
+          b.record.nameLower.localeCompare(a.record.nameLower) ||
+          a.record.id.localeCompare(b.record.id)
+        );
       case 'date_asc':
         return (
           earliestEraYear(a.record.eraBuckets) - earliestEraYear(b.record.eraBuckets) ||

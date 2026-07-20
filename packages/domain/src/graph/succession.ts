@@ -30,9 +30,10 @@ export type SuccessionEdge = Pick<EntityRelationship, 'type' | 'fromEntityId' | 
  * the predecessor. Throws on any other edge type this module only ever operates on
  * `successor_of` edges.
  */
-export function resolveSuccessionEndpoints(
-  edge: SuccessionEdge,
-): { readonly successorEntityId: string; readonly predecessorEntityId: string } {
+export function resolveSuccessionEndpoints(edge: SuccessionEdge): {
+  readonly successorEntityId: string;
+  readonly predecessorEntityId: string;
+} {
   if (edge.type !== 'successor_of') {
     throw new Error(
       `resolveSuccessionEndpoints requires a "successor_of" edge (got type "${edge.type}")`,
@@ -53,7 +54,7 @@ export type LinkedHistoricalContextEntry = {
 
 const LINKED_CONTEXT_NOTE =
   'Historical designation of the superseded predecessor entity — linked context only; this is ' +
-  'never the successor entity\'s current status.';
+  "never the successor entity's current status.";
 
 /**
  * Builds the "linked historical context" view for a `successor_of` edge: every one of the

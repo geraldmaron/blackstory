@@ -57,7 +57,10 @@ test('prepareDiscoverySurvivorIntake opens draft cases for SearXNG campaign surv
   });
 
   assert.ok(intake.prepared >= 2);
-  assert.equal(intake.items.every((item) => item.outcome.accepted), true);
+  assert.equal(
+    intake.items.every((item) => item.outcome.accepted),
+    true,
+  );
   const first = intake.items[0];
   assert.ok(first);
   if (first.outcome.accepted) {

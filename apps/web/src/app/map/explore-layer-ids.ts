@@ -38,7 +38,8 @@ export const EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID = 'explore-point-incomi
  * offset around the point marker (see kind-encoding.ts's module doc for why this is an
  * approximation rather than literal diamond geometry). */
 export const EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID = 'explore-point-event-glyph';
-export const EXPLORE_UNCLUSTERED_EVENT_GLYPH_INCOMING_LAYER_ID = 'explore-point-event-glyph-incoming';
+export const EXPLORE_UNCLUSTERED_EVENT_GLYPH_INCOMING_LAYER_ID =
+  'explore-point-event-glyph-incoming';
 /** Copper orientation ring for the currently selected entity (not a heat signal). */
 export const EXPLORE_SELECTED_POINT_LAYER_ID = 'explore-point-selected';
 export const EXPLORE_STATE_DENSITY_LAYER_ID = 'explore-state-density-fill';

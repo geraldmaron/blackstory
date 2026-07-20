@@ -22,10 +22,7 @@ import {
 } from '@repo/domain/map/county-population';
 import { findUsStateByPostalCode, US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import { DEFAULT_EXPLORE_FILTERS, type ExploreFilterState } from './filters';
-import {
-  EXPLORE_RADIUS_PRESETS,
-  type ExploreRadiusPresetId,
-} from './explore-place-radius';
+import { EXPLORE_RADIUS_PRESETS, type ExploreRadiusPresetId } from './explore-place-radius';
 
 export type ExploreViewport = {
   readonly lat: number;
@@ -85,7 +82,9 @@ export type ExploreViewState = {
   readonly near?: string;
 };
 
-export type RawExploreSearchParams = Readonly<Record<string, string | readonly string[] | undefined>>;
+export type RawExploreSearchParams = Readonly<
+  Record<string, string | readonly string[] | undefined>
+>;
 
 function firstValue(raw: string | readonly string[] | undefined): string | undefined {
   if (raw === undefined) return undefined;
@@ -124,39 +123,73 @@ function parseLayerMode(raw: RawExploreSearchParams): ExploreLayerMode {
   return 'presence';
 }
 
-function parsePopulationDecade(raw: string | undefined, fallback: CensusPopulationDecade): CensusPopulationDecade {
+function parsePopulationDecade(
+  raw: string | undefined,
+  fallback: CensusPopulationDecade,
+): CensusPopulationDecade {
   const trimmed = raw?.trim();
   return trimmed && isCensusPopulationDecade(trimmed) ? trimmed : fallback;
 }
 
-type HidePanelsToken = 'filters' | 'results' | 'key';
+type PanelToken = 'filters' | 'results' | 'key';
 
-function parseHidePanels(
+/** Map-first default: instruments + records collapsed until the reader opens them. */
+const DEFAULT_PANEL_VISIBILITY = {
+  showFilters: false,
+  showResults: false,
+  showKey: false,
+} as const;
+
+/**
+ * Panel chrome visibility.
+ *
+ * - Absent params → map-first (all collapsed).
+ * - `panels=` opt-in list of open chrome (`filters`, `results`, `key`).
+ * - Legacy `hidePanels=` (start open, hide listed) still parses for old shared links.
+ */
+function parsePanelVisibility(
   raw: RawExploreSearchParams,
 ): Pick<ExploreViewState, 'showFilters' | 'showResults' | 'showKey'> {
   const hidePanelsRaw = firstValue(raw.hidePanels)?.trim();
-  if (!hidePanelsRaw) {
-    return { showFilters: true, showResults: true, showKey: true };
+  const panelsRaw = firstValue(raw.panels)?.trim();
+
+  // Legacy contract: start open, hide listed tokens.
+  if (hidePanelsRaw) {
+    let showFilters = true;
+    let showResults = true;
+    let showKey = true;
+    for (const token of hidePanelsRaw.split(',')) {
+      const trimmed = token.trim();
+      if (trimmed === 'filters') showFilters = false;
+      else if (trimmed === 'results') showResults = false;
+      else if (trimmed === 'key') showKey = false;
+    }
+    return { showFilters, showResults, showKey };
   }
 
-  let showFilters = true;
-  let showResults = true;
-  let showKey = true;
-  for (const token of hidePanelsRaw.split(',')) {
-    const trimmed = token.trim();
-    if (trimmed === 'filters') showFilters = false;
-    else if (trimmed === 'results') showResults = false;
-    else if (trimmed === 'key') showKey = false;
+  // Opt-in open list (including `panels=` with no tokens → all closed).
+  if (panelsRaw !== undefined) {
+    const tokens = new Set(
+      panelsRaw
+        .split(',')
+        .map((token) => token.trim())
+        .filter(Boolean),
+    );
+    return {
+      showFilters: tokens.has('filters'),
+      showResults: tokens.has('results'),
+      showKey: tokens.has('key'),
+    };
   }
 
-  return { showFilters, showResults, showKey };
+  return { ...DEFAULT_PANEL_VISIBILITY };
 }
 
-function serializeHidePanels(state: ExploreViewState): string | undefined {
-  const tokens: HidePanelsToken[] = [];
-  if (!state.showFilters) tokens.push('filters');
-  if (!state.showResults) tokens.push('results');
-  if (!state.showKey) tokens.push('key');
+function serializeOpenPanels(state: ExploreViewState): string | undefined {
+  const tokens: PanelToken[] = [];
+  if (state.showFilters) tokens.push('filters');
+  if (state.showResults) tokens.push('results');
+  if (state.showKey) tokens.push('key');
   return tokens.length > 0 ? tokens.join(',') : undefined;
 }
 
@@ -201,14 +234,18 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
   const groupOn = groupRaw === '1' || groupRaw === 'true';
 
   const popDecade =
-    layerMode === 'blackShare' ? parsePopulationDecade(popDecadeRaw, DEFAULT_POPULATION_DECADE) : undefined;
+    layerMode === 'blackShare'
+      ? parsePopulationDecade(popDecadeRaw, DEFAULT_POPULATION_DECADE)
+      : undefined;
   const popFrom =
     layerMode === 'blackChange'
       ? parsePopulationDecade(popFromRaw, DEFAULT_POPULATION_CHANGE_FROM)
       : undefined;
   const popTo =
-    layerMode === 'blackChange' ? parsePopulationDecade(popToRaw, DEFAULT_POPULATION_CHANGE_TO) : undefined;
-  const { showFilters, showResults, showKey } = parseHidePanels(raw);
+    layerMode === 'blackChange'
+      ? parsePopulationDecade(popToRaw, DEFAULT_POPULATION_CHANGE_TO)
+      : undefined;
+  const { showFilters, showResults, showKey } = parsePanelVisibility(raw);
   const radius = parseRadius(radiusRaw);
   const near = parseNear(nearRaw);
 
@@ -241,7 +278,8 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   const params = new URLSearchParams();
   if (state.filters.era !== DEFAULT_EXPLORE_FILTERS.era) params.set('era', state.filters.era);
   if (state.filters.kind !== DEFAULT_EXPLORE_FILTERS.kind) params.set('kind', state.filters.kind);
-  if (state.filters.theme !== DEFAULT_EXPLORE_FILTERS.theme) params.set('theme', state.filters.theme);
+  if (state.filters.theme !== DEFAULT_EXPLORE_FILTERS.theme)
+    params.set('theme', state.filters.theme);
   if (state.filters.confidence !== DEFAULT_EXPLORE_FILTERS.confidence) {
     params.set('confidence', state.filters.confidence);
   }
@@ -253,7 +291,11 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   if (state.selected) params.set('selected', state.selected);
   if (state.state) params.set('state', state.state);
   if (state.layerMode !== 'presence') params.set('layerMode', state.layerMode);
-  if (state.layerMode === 'blackShare' && state.popDecade && state.popDecade !== DEFAULT_POPULATION_DECADE) {
+  if (
+    state.layerMode === 'blackShare' &&
+    state.popDecade &&
+    state.popDecade !== DEFAULT_POPULATION_DECADE
+  ) {
     params.set('popDecade', state.popDecade);
   }
   if (
@@ -263,15 +305,19 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   ) {
     params.set('popFrom', state.popFrom);
   }
-  if (state.layerMode === 'blackChange' && state.popTo && state.popTo !== DEFAULT_POPULATION_CHANGE_TO) {
+  if (
+    state.layerMode === 'blackChange' &&
+    state.popTo &&
+    state.popTo !== DEFAULT_POPULATION_CHANGE_TO
+  ) {
     params.set('popTo', state.popTo);
   }
   if (state.group) params.set('group', '1');
   if (state.lines) params.set('lines', '1');
   if (state.decade) params.set('decade', state.decade);
   if (state.edge) params.set('edge', state.edge);
-  const hidePanels = serializeHidePanels(state);
-  if (hidePanels) params.set('hidePanels', hidePanels);
+  const panels = serializeOpenPanels(state);
+  if (panels) params.set('panels', panels);
   if (state.radius && state.radius !== 'all') params.set('radius', state.radius);
   if (state.near) params.set('near', state.near);
   return params.toString();
@@ -291,9 +337,7 @@ export function defaultExploreOverlayState(): Pick<
     layerMode: 'presence',
     group: false,
     lines: false,
-    showFilters: true,
-    showResults: true,
-    showKey: true,
+    ...DEFAULT_PANEL_VISIBILITY,
   };
 }
 

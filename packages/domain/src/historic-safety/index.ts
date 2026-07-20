@@ -63,7 +63,11 @@ export {
   eraBandsForEvents,
   computeDocumentedEventsLayerSignal,
 } from './documented-events.js';
-export type { DocumentedEventCategory, DocumentedEventRecord, ComputeDocumentedEventsLayerInput } from './documented-events.js';
+export type {
+  DocumentedEventCategory,
+  DocumentedEventRecord,
+  ComputeDocumentedEventsLayerInput,
+} from './documented-events.js';
 
 export {
   SUNDOWN_TOWN_METHODOLOGY_VERSION,
@@ -168,7 +172,10 @@ export {
   HISTORIC_SAFETY_SOURCE_CADENCES,
   isLayerAsOfOverdueForCadence,
 } from './update-cadence.js';
-export type { HistoricSafetySourceCadence, HistoricSafetySourceCadenceId } from './update-cadence.js';
+export type {
+  HistoricSafetySourceCadence,
+  HistoricSafetySourceCadenceId,
+} from './update-cadence.js';
 
 export {
   designationDisputeTargets,

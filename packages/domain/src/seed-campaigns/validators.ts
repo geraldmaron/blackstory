@@ -16,7 +16,10 @@ import {
   createInMemoryCorpusVettingStore,
 } from '../corpus-vetting.js';
 import { registerLaunchCorpora } from '../launch-corpora.js';
-import { evaluateCorpusBulkPromotion, type CorpusBulkRecordCandidate } from '../promotion/corpus-promotion.js';
+import {
+  evaluateCorpusBulkPromotion,
+  type CorpusBulkRecordCandidate,
+} from '../promotion/corpus-promotion.js';
 import { assertKnownUsState } from './regions.js';
 import { NATIONAL_SEED_MAX_RECORDS } from './bundle.js';
 import { seedCampaignMeta } from './campaigns.js';
@@ -48,7 +51,8 @@ export function assertSeedRecordSchemaValid(record: SeedRecord): void {
   if (!(SEED_CAMPAIGN_IDS as readonly string[]).includes(record.campaignId)) {
     throw new Error(`Unknown campaignId: ${record.campaignId}`);
   }
-  if (!record.displayName.trim()) throw new Error(`Seed record ${record.id}: displayName is required`);
+  if (!record.displayName.trim())
+    throw new Error(`Seed record ${record.id}: displayName is required`);
   if (!['school', 'institution'].includes(record.kind)) {
     throw new Error(`Seed record ${record.id}: invalid kind`);
   }
@@ -91,7 +95,9 @@ export function assertSeedRecordEvidenceGate(record: SeedRecord): void {
 
 /** notability gate publishable entities require >=1 notability basis record. */
 export function assertSeedRecordNotabilityGate(record: SeedRecord): void {
-  const gate = evaluateNotabilityGate(record.notabilityBasis ? [record.notabilityBasis] : undefined);
+  const gate = evaluateNotabilityGate(
+    record.notabilityBasis ? [record.notabilityBasis] : undefined,
+  );
   if (!gate.passed) {
     throw new Error(`Seed record ${record.id}: ${gate.reason}`);
   }
@@ -123,7 +129,11 @@ export function assertSeedRecordCorpusPromotionGate(
   const vettingStore = createInMemoryCorpusVettingStore();
   registerLaunchCorpora(registryStore, vettingStore, input);
 
-  const { vetting } = assertCorpusVettedForBulkImport(registryStore, vettingStore, record.sourceCorpus);
+  const { vetting } = assertCorpusVettedForBulkImport(
+    registryStore,
+    vettingStore,
+    record.sourceCorpus,
+  );
 
   const candidate: CorpusBulkRecordCandidate = {
     corpusId: record.sourceCorpus,
@@ -216,7 +226,9 @@ export function assertNationalSeedNotBulkImport(records: readonly SeedRecord[]):
   }
 }
 
-export function computeGeographicCoverage(records: readonly SeedRecord[]): GeographicCoverageReport {
+export function computeGeographicCoverage(
+  records: readonly SeedRecord[],
+): GeographicCoverageReport {
   const byRegion = Object.fromEntries(US_CENSUS_REGIONS.map((region) => [region, 0])) as Record<
     UsCensusRegion,
     number
@@ -271,7 +283,10 @@ export function validateNationalSeedCampaign(input: {
   }
 
   const byCampaign = Object.fromEntries(
-    SEED_CAMPAIGN_IDS.map((id) => [id, input.records.filter((record) => record.campaignId === id).length]),
+    SEED_CAMPAIGN_IDS.map((id) => [
+      id,
+      input.records.filter((record) => record.campaignId === id).length,
+    ]),
   ) as Record<SeedCampaignId, number>;
 
   return Object.freeze({

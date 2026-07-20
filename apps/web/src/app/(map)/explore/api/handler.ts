@@ -87,7 +87,9 @@ export function parseExploreRefineQuery(params: URLSearchParams): SearchQueryInp
   };
 }
 
-export function parseExploreFilterState(params: URLSearchParams): ExploreFilterState | { error: string } {
+export function parseExploreFilterState(
+  params: URLSearchParams,
+): ExploreFilterState | { error: string } {
   const kind = cleanSelectParam(params.get('kind'));
   const era = cleanSelectParam(params.get('era'));
   const themeRaw = cleanSelectParam(params.get('theme'));

@@ -71,7 +71,8 @@ export const EXPLORE_SINGLE_PANEL_MEDIA = '(max-width: 64rem)';
  */
 export function exploreNarrowExclusivePatch(options: {
   readonly opening: 'instruments' | 'results';
-}): { readonly showResults: boolean } | { readonly showFilters: boolean; readonly showKey: boolean } {
+}):
+  { readonly showResults: boolean } | { readonly showFilters: boolean; readonly showKey: boolean } {
   if (options.opening === 'instruments') {
     return { showResults: false };
   }

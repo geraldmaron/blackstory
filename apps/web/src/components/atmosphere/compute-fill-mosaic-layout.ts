@@ -30,7 +30,17 @@ export function computeFillMosaicLayout(
 
   // Ideal cell edge (px): denser grids as the mast grows; ultra-wide packs again.
   const target =
-    width < 480 ? 76 : width < 768 ? 88 : width < 1100 ? 96 : width < 1440 ? 100 : width < 1800 ? 104 : 96;
+    width < 480
+      ? 76
+      : width < 768
+        ? 88
+        : width < 1100
+          ? 96
+          : width < 1440
+            ? 100
+            : width < 1800
+              ? 104
+              : 96;
 
   const minCell = width < 480 ? MIN_CELL_COMPACT_PX : MIN_CELL_PX;
   const maxColumns = Math.max(3, Math.floor(width / minCell));

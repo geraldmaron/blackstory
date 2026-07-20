@@ -1,4 +1,3 @@
-
 /**
  * Commits a prepared operator intake outcome through the real audit/outbox path.
  *

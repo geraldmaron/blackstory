@@ -59,7 +59,11 @@ export type PublicRelatedEntry = {
   readonly id: string;
   readonly type: string;
   readonly direction: 'outgoing' | 'incoming';
-  readonly timespan?: { readonly label?: string; readonly validFrom?: string; readonly validTo?: string | null };
+  readonly timespan?: {
+    readonly label?: string;
+    readonly validFrom?: string;
+    readonly validTo?: string | null;
+  };
 };
 
 /** Event when-span: the event kind's when-span is authoritative in place of a `statusHistory`
@@ -373,7 +377,8 @@ const SEED_ENTITY_DRAFTS: readonly Omit<PublicEntityView, 'timeline'>[] = [
         confidenceScore: 0.78,
         confidenceLevel: confidenceLevel(0.78),
         citationSource: 'National Trust for Historic Preservation',
-        citationHref: 'https://savingplaces.org/stories/americas-first-african-american-public-high-school',
+        citationHref:
+          'https://savingplaces.org/stories/americas-first-african-american-public-high-school',
         citationLabel: 'Preservation feature',
       },
     ],
@@ -439,7 +444,9 @@ const SEED_ENTITY_DRAFTS: readonly Omit<PublicEntityView, 'timeline'>[] = [
       'scholarship support to its students and alumni.',
     era: 'contemporary',
     ...(INSTITUTION_STATUS !== undefined ? { status: INSTITUTION_STATUS } : {}),
-    ...(INSTITUTION_STATUS_HISTORY !== undefined ? { statusHistory: INSTITUTION_STATUS_HISTORY } : {}),
+    ...(INSTITUTION_STATUS_HISTORY !== undefined
+      ? { statusHistory: INSTITUTION_STATUS_HISTORY }
+      : {}),
     eraBuckets: ['2000s'],
     notabilityLabels: [NOTABILITY_RUBRIC.community_anchor],
     topicTags: ['alumni', 'preservation', 'community'],
@@ -489,9 +496,7 @@ const DISPLAY_NAME_LOOKUP: ReadonlyMap<string, { readonly displayName: string }>
   SEED_ENTITY_DRAFTS.map((entity) => [entity.id, { displayName: entity.displayName }]),
 );
 
-function hydrateLearningLinks(
-  entities: readonly PublicEntityView[],
-): readonly PublicEntityView[] {
+function hydrateLearningLinks(entities: readonly PublicEntityView[]): readonly PublicEntityView[] {
   const neighborsById = new Map(
     entities.map((entity) => [
       entity.id,

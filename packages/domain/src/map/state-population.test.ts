@@ -17,7 +17,12 @@ import {
 } from './state-population.js';
 
 const LOOKUP = [
-  { fips: '11', postalCode: 'DC', name: 'District of Columbia', bbox: [-77.12, 38.79, -76.9, 39.0] as const },
+  {
+    fips: '11',
+    postalCode: 'DC',
+    name: 'District of Columbia',
+    bbox: [-77.12, 38.79, -76.9, 39.0] as const,
+  },
   { fips: '13', postalCode: 'GA', name: 'Georgia', bbox: [-85.7, 30.35, -80.8, 35.0] as const },
   { fips: '02', postalCode: 'AK', name: 'Alaska', bbox: [-179.9, 51.0, -129.9, 71.5] as const },
 ] as const;

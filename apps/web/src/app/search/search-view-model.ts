@@ -17,11 +17,7 @@
  * mechanism for this server-rendered page's own forward/back links.
  */
 import { runPublicSearch } from '@repo/domain';
-import type {
-  PublicSearchIndexDoc,
-  SearchFilter,
-  SearchResultView,
-} from '@repo/domain';
+import type { PublicSearchIndexDoc, SearchFilter, SearchResultView } from '@repo/domain';
 import { normalizeSearchText } from '@repo/security';
 
 /** Matches `DEFAULT_QUERY_GUARDRAIL_LIMITS.defaultPageSize`. Kept as a local constant

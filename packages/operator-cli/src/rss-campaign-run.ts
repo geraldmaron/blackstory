@@ -5,10 +5,7 @@
  * real domain campaign, prints JSON. Never publishes. Curated ABS feeds are excluded unless
  * --include-curated is passed. Live network fetch is out of scope — pass downloaded feed files.
  */
-import {
-  runRssDiscoveryCampaign,
-  type RssDiscoveryCampaignResult,
-} from '@repo/domain';
+import { runRssDiscoveryCampaign, type RssDiscoveryCampaignResult } from '@repo/domain';
 
 export type RssCampaignRunInput = {
   readonly feedXmlByFeedId: ReadonlyMap<string, string>;
@@ -53,9 +50,7 @@ export function summarizeRssCampaignRun(
   };
 }
 
-export async function runRssOperatorCampaign(
-  input: RssCampaignRunInput,
-): Promise<{
+export async function runRssOperatorCampaign(input: RssCampaignRunInput): Promise<{
   readonly result: RssDiscoveryCampaignResult;
   readonly summary: RssCampaignRunSummary;
 }> {
@@ -66,9 +61,7 @@ export async function runRssOperatorCampaign(
     ...(input.campaignId !== undefined ? { campaignId: input.campaignId } : {}),
     ...(input.runId !== undefined ? { runId: input.runId } : {}),
     ...(input.maxCandidates !== undefined ? { maxCandidates: input.maxCandidates } : {}),
-    ...(input.includeCuratedCommunityFeeds === true
-      ? { excludeCuratedCommunityFeeds: false }
-      : {}),
+    ...(input.includeCuratedCommunityFeeds === true ? { excludeCuratedCommunityFeeds: false } : {}),
   });
   return { result, summary: summarizeRssCampaignRun(result) };
 }

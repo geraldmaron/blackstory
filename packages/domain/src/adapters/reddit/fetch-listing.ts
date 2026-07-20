@@ -51,7 +51,10 @@ export async function fetchSubredditNewListing(
   input: FetchSubredditListingInput,
 ): Promise<readonly RedditCandidateRecord[]> {
   const maxItems = Math.min(input.maxItems ?? REDDIT_LISTING_MAX_ITEMS, REDDIT_LISTING_MAX_ITEMS);
-  const pageSize = Math.min(input.pageSize ?? REDDIT_LISTING_MAX_PAGE_SIZE, REDDIT_LISTING_MAX_PAGE_SIZE);
+  const pageSize = Math.min(
+    input.pageSize ?? REDDIT_LISTING_MAX_PAGE_SIZE,
+    REDDIT_LISTING_MAX_PAGE_SIZE,
+  );
 
   const candidates: RedditCandidateRecord[] = [];
   let after: string | undefined;
@@ -102,15 +105,20 @@ export async function fetchSubredditNewListings(input: {
   readonly concurrency?: number;
   readonly maxItemsPerSubreddit?: number;
 }): Promise<readonly RedditCandidateRecord[]> {
-  const perSubreddit = await mapWithConcurrency(input.subreddits, input.concurrency ?? 2, (subreddit) =>
-    fetchSubredditNewListing({
-      subreddit,
-      registryEntry: input.registryEntry,
-      runId: input.runId,
-      capturedAt: input.capturedAt,
-      client: input.client,
-      ...(input.maxItemsPerSubreddit !== undefined ? { maxItems: input.maxItemsPerSubreddit } : {}),
-    }),
+  const perSubreddit = await mapWithConcurrency(
+    input.subreddits,
+    input.concurrency ?? 2,
+    (subreddit) =>
+      fetchSubredditNewListing({
+        subreddit,
+        registryEntry: input.registryEntry,
+        runId: input.runId,
+        capturedAt: input.capturedAt,
+        client: input.client,
+        ...(input.maxItemsPerSubreddit !== undefined
+          ? { maxItems: input.maxItemsPerSubreddit }
+          : {}),
+      }),
   );
   return perSubreddit.flat();
 }

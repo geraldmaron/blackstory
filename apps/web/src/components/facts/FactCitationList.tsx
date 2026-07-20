@@ -71,13 +71,17 @@ export function FactCitationList({ citations, labelledBy }: FactCitationListProp
                 {citation.accessedAt ? (
                   <>
                     <dt style={{ fontWeight: 600 }}>Retrieved</dt>
-                    <dd style={{ margin: '0 0 var(--ds-space-2) 0' }}>{formatIsoDate(citation.accessedAt)}</dd>
+                    <dd style={{ margin: '0 0 var(--ds-space-2) 0' }}>
+                      {formatIsoDate(citation.accessedAt)}
+                    </dd>
                   </>
                 ) : null}
                 {citation.archivedAt ? (
                   <>
                     <dt style={{ fontWeight: 600 }}>Archived capture</dt>
-                    <dd style={{ margin: '0 0 var(--ds-space-2) 0' }}>{formatIsoDate(citation.archivedAt)}</dd>
+                    <dd style={{ margin: '0 0 var(--ds-space-2) 0' }}>
+                      {formatIsoDate(citation.archivedAt)}
+                    </dd>
                   </>
                 ) : null}
                 {citation.pageLocator ? (

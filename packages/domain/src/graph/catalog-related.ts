@@ -107,9 +107,7 @@ export function extractCatalogRelationships(
   for (const entity of sortedEntities) {
     for (const entry of entity.related ?? []) {
       if (!isRelationshipType(entry.type)) {
-        skipped.push(
-          `${entity.id} -> ${entry.id}: unsupported relationship type "${entry.type}"`,
-        );
+        skipped.push(`${entity.id} -> ${entry.id}: unsupported relationship type "${entry.type}"`);
         continue;
       }
       if (!entityById.has(entry.id)) {
@@ -140,7 +138,9 @@ export function extractCatalogRelationships(
 
   const relationships: EntityRelationship[] = [];
 
-  for (const [key, canonical] of [...canonicalByKey.entries()].sort(([a], [b]) => a.localeCompare(b))) {
+  for (const [key, canonical] of [...canonicalByKey.entries()].sort(([a], [b]) =>
+    a.localeCompare(b),
+  )) {
     const type = key.split('|').at(-1) as RelationshipType;
     const fromEntity = entityById.get(canonical.endpoints.fromEntityId);
     const toEntity = entityById.get(canonical.endpoints.toEntityId);

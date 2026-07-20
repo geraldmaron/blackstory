@@ -91,11 +91,7 @@ export type SourceFootnoteProps = {
   readonly className?: string;
 };
 
-export function SourceFootnote({
-  sources,
-  density = 'group',
-  className,
-}: SourceFootnoteProps) {
+export function SourceFootnote({ sources, density = 'group', className }: SourceFootnoteProps) {
   const unique = dedupeSources(sources);
   if (unique.length === 0) return null;
 

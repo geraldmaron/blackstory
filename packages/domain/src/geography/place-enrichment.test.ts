@@ -43,18 +43,14 @@ test('placeTitleCandidateFromLabel takes head before comma', () => {
 });
 
 test('placeTitleCandidatesFromLabel includes parent campus sites', () => {
-  const titles = placeTitleCandidatesFromLabel(
-    'Launch Complex 39A, Kennedy Space Center, Florida',
-  );
+  const titles = placeTitleCandidatesFromLabel('Launch Complex 39A, Kennedy Space Center, Florida');
   assert.equal(titles[0], 'Launch Complex 39A');
   assert.ok(titles.includes('Kennedy Space Center'));
   assert.ok(!titles.includes('Florida'));
 });
 
 test('placeTitleCandidatesFromLabel omits US state jurisdiction tails', () => {
-  const titles = placeTitleCandidatesFromLabel(
-    'NASA Langley Research Center, Hampton, Virginia',
-  );
+  const titles = placeTitleCandidatesFromLabel('NASA Langley Research Center, Hampton, Virginia');
   assert.ok(titles.includes('NASA Langley Research Center'));
   assert.ok(!titles.includes('Virginia'));
   assert.ok(!titles.includes('Hampton'));

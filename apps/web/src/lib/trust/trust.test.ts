@@ -28,7 +28,10 @@ test('buildErrataJsonFeed emits JSON Feed 1.1 items with taxonomy tags', () => {
 });
 
 test('buildErrataRssFeed emits well-formed RSS with categories', () => {
-  const xml = buildErrataRssFeed(listErrataEntries().slice(0, 1), 'https://example.org/errata/feed.xml');
+  const xml = buildErrataRssFeed(
+    listErrataEntries().slice(0, 1),
+    'https://example.org/errata/feed.xml',
+  );
   assert.match(xml, /<rss version="2.0">/);
   assert.match(xml, /<category>Editor&apos;s note<\/category>/);
 });

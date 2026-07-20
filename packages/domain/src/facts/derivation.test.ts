@@ -6,7 +6,9 @@ import {
   type FactDerivationBackingClaim,
 } from './derivation.js';
 
-function backingClaim(overrides: Partial<FactDerivationBackingClaim> = {}): FactDerivationBackingClaim {
+function backingClaim(
+  overrides: Partial<FactDerivationBackingClaim> = {},
+): FactDerivationBackingClaim {
   return {
     id: 'claim-1',
     workflowStatus: 'accepted',
@@ -85,7 +87,9 @@ test('maxFactConfidenceGradeForClaim caps at single-source for exactly one linea
 });
 
 test('a fact cannot claim stronger confidence than its backing claim supports', () => {
-  const weakClaim = backingClaim({ confidence: { ...backingClaim().confidence!, independentLineageCount: 1 } });
+  const weakClaim = backingClaim({
+    confidence: { ...backingClaim().confidence!, independentLineageCount: 1 },
+  });
   const result = evaluateFactDerivationConsistency({
     fact: { citations: [], confidence: 'established', derivedFromClaimIds: ['claim-1'] },
     backingClaims: [weakClaim],
@@ -109,7 +113,11 @@ test('a fact derived from multiple claims is capped by the WEAKEST backing claim
     confidence: { ...backingClaim().confidence!, independentLineageCount: 1 },
   });
   const result = evaluateFactDerivationConsistency({
-    fact: { citations: [], confidence: 'established', derivedFromClaimIds: ['claim-strong', 'claim-weak'] },
+    fact: {
+      citations: [],
+      confidence: 'established',
+      derivedFromClaimIds: ['claim-strong', 'claim-weak'],
+    },
     backingClaims: [strongClaim, weakClaim],
   });
   assert.equal(result.ok, false);
@@ -131,7 +139,9 @@ test('a citation documentId not among the backing claims evidence is flagged unt
       confidence: 'single-source',
       derivedFromClaimIds: ['claim-1'],
     },
-    backingClaims: [backingClaim({ confidence: { ...backingClaim().confidence!, independentLineageCount: 1 } })],
+    backingClaims: [
+      backingClaim({ confidence: { ...backingClaim().confidence!, independentLineageCount: 1 } }),
+    ],
   });
   assert.equal(result.ok, false);
   if (!result.ok) assert.equal(result.reason, 'citation_untraceable_to_backing_evidence');

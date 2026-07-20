@@ -1,9 +1,6 @@
 {
   "count": 1660,
-  "yearSpan": [
-    1831,
-    2024
-  ],
+  "yearSpan": [1831, 2024],
   "categories": {
     "police_violence": 1097,
     "racial_terror": 562,

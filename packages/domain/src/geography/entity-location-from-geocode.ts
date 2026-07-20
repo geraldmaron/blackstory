@@ -33,7 +33,11 @@ export function buildEntityLocationFromResolution(
 ): EntityLocation {
   const point = buildGeoPointFields(input.lat, input.lng, input.geohashPrecision ?? 9);
   const confidence =
-    input.evidenceClass === 'street_address' ? 0.9 : input.evidenceClass === 'named_place' ? 0.7 : 0.5;
+    input.evidenceClass === 'street_address'
+      ? 0.9
+      : input.evidenceClass === 'named_place'
+        ? 0.7
+        : 0.5;
 
   return {
     id: input.locationId,

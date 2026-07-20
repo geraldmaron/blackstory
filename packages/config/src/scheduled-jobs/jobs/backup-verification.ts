@@ -1,4 +1,3 @@
-
 /**
  * REAL roster entry: backup verification + restore-drill scheduling. Rather
  * than re-importing scripts/backup-restore's plain-.mjs verification helpers into this
@@ -19,10 +18,7 @@ export type ExecFileResult = {
   readonly exitCode: number;
 };
 
-export type ExecFileFn = (
-  command: string,
-  args: readonly string[],
-) => Promise<ExecFileResult>;
+export type ExecFileFn = (command: string, args: readonly string[]) => Promise<ExecFileResult>;
 
 export type BackupVerificationJobInput = {
   readonly jobRunId: string;
@@ -45,11 +41,16 @@ export type BackupVerificationJobResult = {
 };
 
 export function buildVerifyRestoreArgs(
-  input: Omit<BackupVerificationJobInput, 'jobRunId' | 'startedAt' | 'completedAt' | 'execFile' | 'scriptPath'>,
+  input: Omit<
+    BackupVerificationJobInput,
+    'jobRunId' | 'startedAt' | 'completedAt' | 'execFile' | 'scriptPath'
+  >,
 ): string[] {
   const args = ['--json', '--metadata', input.metadataPath];
-  if (input.baselineCountsPath !== undefined) args.push('--baseline-counts', input.baselineCountsPath);
-  if (input.baselineHashesPath !== undefined) args.push('--baseline-hashes', input.baselineHashesPath);
+  if (input.baselineCountsPath !== undefined)
+    args.push('--baseline-counts', input.baselineCountsPath);
+  if (input.baselineHashesPath !== undefined)
+    args.push('--baseline-hashes', input.baselineHashesPath);
   if (input.activePointerPath !== undefined) args.push('--active-pointer', input.activePointerPath);
   if (input.releasePath !== undefined) args.push('--release', input.releasePath);
   return args;
@@ -75,7 +76,11 @@ export async function runBackupVerificationJob(
 
   const ok = exitCode === 0;
   const run = ok
-    ? completeJobRun(started, { completedAt: input.completedAt, itemsExpected: 1, itemsProcessed: 1 })
+    ? completeJobRun(started, {
+        completedAt: input.completedAt,
+        itemsExpected: 1,
+        itemsProcessed: 1,
+      })
     : failJobRun(started, {
         completedAt: input.completedAt,
         errorSummary: `scripts/backup-restore/verify-restore.mjs exited ${exitCode}`,

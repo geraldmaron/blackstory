@@ -33,7 +33,10 @@ const SEED_AT = '2026-07-17T00:00:00.000Z';
 
 test('obligations registry rejects lookups for an unregistered source (fail-closed)', () => {
   const store = createInMemoryObligationsRegistry();
-  assert.throws(() => getSourceObligationsOrThrow(store, 'unknown-adapter'), /no registered obligations entry/);
+  assert.throws(
+    () => getSourceObligationsOrThrow(store, 'unknown-adapter'),
+    /no registered obligations entry/,
+  );
   assert.throws(() => assertAdapterHasObligations(store, 'unknown-adapter'));
   assert.equal(hasSourceObligationsEntry(store, 'unknown-adapter'), false);
 });
@@ -300,7 +303,9 @@ test('a takedown request record computes SLA deadlines and elevated priority', (
   assert.equal(record.elevatedPriority, true);
   assert.equal(
     record.sla.acknowledgeBy,
-    new Date(new Date(SEED_AT).getTime() + TAKEDOWN_ACKNOWLEDGEMENT_SLA_HOURS * 3_600_000).toISOString(),
+    new Date(
+      new Date(SEED_AT).getTime() + TAKEDOWN_ACKNOWLEDGEMENT_SLA_HOURS * 3_600_000,
+    ).toISOString(),
   );
   assert.equal(
     record.sla.resolveBy,

@@ -326,10 +326,7 @@ export function shouldUseHybridSearch(input: {
   readonly hybridFlag?: string | boolean;
   readonly normalizedQuery: string;
 }): boolean {
-  const flag =
-    input.hybridFlag === true ||
-    input.hybridFlag === '1' ||
-    input.hybridFlag === 'true';
+  const flag = input.hybridFlag === true || input.hybridFlag === '1' || input.hybridFlag === 'true';
   return flag && input.normalizedQuery.trim().length > 0;
 }
 

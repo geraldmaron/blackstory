@@ -69,9 +69,7 @@ function toListItem(docId: string, data: Record<string, unknown>): AuditEventLis
   };
 }
 
-export async function listRecentAuditEvents(
-  limit = 100,
-): Promise<readonly AuditEventListItem[]> {
+export async function listRecentAuditEvents(limit = 100): Promise<readonly AuditEventListItem[]> {
   const db = getDb();
   const cappedLimit = Math.min(100, Math.max(1, limit));
   const collection = db.collection(FIRESTORE_ROOT.auditEvents);

@@ -109,13 +109,15 @@ export function buildLaunchCorpusVettingInputs(input: {
       permittedClaimClasses: ['geographic_fact', 'institutional_fact', 'biographical_fact'],
       stableIdScheme: 'nps-nrhp-ref',
       organizationId: 'org_nps',
-      citationRequirements: 'Cite the NPS NRHP database entry and reference number; link to the nps.gov listing page.',
+      citationRequirements:
+        'Cite the NPS NRHP database entry and reference number; link to the nps.gov listing page.',
       vettedBy,
       vettedAt,
     },
     {
       corpus: 'habs-haer',
-      corpusDisplayName: 'Historic American Buildings Survey / Historic American Engineering Record',
+      corpusDisplayName:
+        'Historic American Buildings Survey / Historic American Engineering Record',
       custodian: 'Library of Congress (LoC), Prints & Photographs Division',
       licenseVerdict: 'public-domain',
       licenseNotes: 'U.S. federal government survey record; public domain per 17 U.S.C. §105.',
@@ -148,7 +150,7 @@ export function buildLaunchCorpusVettingInputs(input: {
       licenseNotes:
         'NYPL public-domain marks apply per item/per derivative — each digitized Green Book ' +
         'edition and the "Navigating the Green Book" extracted-listing dataset must be verified ' +
-        'individually before use, and attributed per NYPL\'s terms.',
+        "individually before use, and attributed per NYPL's terms.",
       authorityTier: 'established_nonprofit',
       provenanceFieldsRetained: [
         'greenBookEdition',
@@ -175,13 +177,14 @@ export function buildLaunchCorpusVettingInputs(input: {
     },
     {
       corpus: 'documented-massacres-riots',
-      corpusDisplayName: 'Documented Massacres and Riots (EJI-linked, NPS/state-archive corroborated)',
+      corpusDisplayName:
+        'Documented Massacres and Riots (EJI-linked, NPS/state-archive corroborated)',
       custodian:
         'Equal Justice Initiative (EJI) reports (link + attribute only); National Park Service ' +
         'and state archives for corroborating primary records',
       licenseVerdict: 'restricted-attribution-required',
       licenseNotes:
-        'EJI report content is link+attribute only per EJI\'s citation terms — never bulk-' +
+        "EJI report content is link+attribute only per EJI's citation terms — never bulk-" +
         'reproduced. Underlying NPS/state-archive records are public domain / government record ' +
         'and may be cited directly.',
       authorityTier: 'established_nonprofit',
@@ -202,7 +205,7 @@ export function buildLaunchCorpusVettingInputs(input: {
       stableIdScheme: 'eji-report-ref',
       organizationId: 'org_eji',
       citationRequirements:
-        'Link + attribute the EJI report per EJI\'s terms; never reproduce EJI report text beyond ' +
+        "Link + attribute the EJI report per EJI's terms; never reproduce EJI report text beyond " +
         'a short citation excerpt; corroborate with an NPS/state-archive primary record where one ' +
         'exists.',
       vettedBy,
@@ -246,7 +249,7 @@ export function buildLaunchCorpusVettingInputs(input: {
       // until a real license verdict replaces this one.
       licenseVerdict: 'deferred-unverified',
       licenseNotes:
-        'Fisk\'s Rosenwald Fund Card File Database terms of use have not yet been verified as ' +
+        "Fisk's Rosenwald Fund Card File Database terms of use have not yet been verified as " +
         'compatible with bulk import. DO NOT bulk-import until a license verdict (public domain, ' +
         'permissive, or restricted-attribution-required) replaces this deferred entry.',
       authorityTier: 'academic_institution',
@@ -267,19 +270,21 @@ export function buildLaunchCorpusVettingInputs(input: {
       permittedClaimClasses: ['institutional_fact'],
       stableIdScheme: 'fisk-rosenwald-card-id',
       organizationId: 'org_fisk',
-      citationRequirements: 'Deferred pending Fisk terms-of-use verification — do not cite for publication yet.',
+      citationRequirements:
+        'Deferred pending Fisk terms-of-use verification — do not cite for publication yet.',
       vettedBy,
       vettedAt,
     },
     {
       corpus: 'mapping-inequality-holc',
       corpusDisplayName: 'Mapping Inequality: HOLC Residential Security Maps',
-      custodian: 'University of Richmond Digital Scholarship Lab (DSL); source records held by NARA',
+      custodian:
+        'University of Richmond Digital Scholarship Lab (DSL); source records held by NARA',
       licenseVerdict: 'restricted-attribution-required',
       licenseNotes:
         'Two distinct rights layers (corrected 2026-07-18; previously misrecorded as wholly ' +
         'public-domain). (1) The underlying HOLC Residential Security Maps are U.S. federal ' +
-        'government records held by NARA — public domain per 17 U.S.C. §105. (2) DSL\'s ' +
+        "government records held by NARA — public domain per 17 U.S.C. §105. (2) DSL's " +
         'downloadable georectified/vectorized boundary+grade DATASET — the artifact this corpus ' +
         'actually ingests — is offered by DSL under CC BY-NC-SA 4.0: attribution required, ' +
         'noncommercial use only, share-alike. Any revenue-bearing public surface using ' +
@@ -313,11 +318,11 @@ export function buildLaunchCorpusVettingInputs(input: {
         'Feeds the  exclusion-infrastructure layer as corroborating historical evidence — ' +
         'registered ONCE here ( acceptance criterion 5) and referenced by, never ' +
         're-ingested by  as a second copy. Actual polygon ingestion into map tile assets ' +
-        'integrates with \'s map data platform (packages/domain/src/map/) — building that ' +
-        'tile-compilation step is explicit, documented follow-up, not part of \'s scope: ' +
-        '\'s `buildMapSource` (packages/domain/src/map/map-source.ts) already accepts ' +
+        "integrates with 's map data platform (packages/domain/src/map/) — building that " +
+        "tile-compilation step is explicit, documented follow-up, not part of 's scope: " +
+        "'s `buildMapSource` (packages/domain/src/map/map-source.ts) already accepts " +
         '`GeoGeometry` (`Point | Polygon | BBox`, packages/domain/src/geography/location.ts) — ' +
-        'the follow-up is calling it with this corpus\'s vetted Polygon records the same way ' +
+        "the follow-up is calling it with this corpus's vetted Polygon records the same way " +
         'the "INTEGRATION POINT" comments in map-source.ts and completeness-gate.ts document for ' +
         'their own release-coupled builds.',
       vettedBy,
@@ -358,7 +363,10 @@ export const LAUNCH_CORPUS_SLUGS: readonly string[] = [
 ];
 
 /** Slugs deliberately excluded from this module's corpus list. */
-export const BOUNDARY_EXCLUDED_CORPUS_SLUGS: readonly { readonly slug: string; readonly ownerBead: string }[] = [
+export const BOUNDARY_EXCLUDED_CORPUS_SLUGS: readonly {
+  readonly slug: string;
+  readonly ownerBead: string;
+}[] = [
   { slug: 'statutes', ownerBead: '' },
   { slug: 'cases', ownerBead: '' },
   { slug: 'tougaloo-sundown-data', ownerBead: '' },

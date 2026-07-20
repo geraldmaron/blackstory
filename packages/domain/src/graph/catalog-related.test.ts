@@ -52,7 +52,10 @@ test('extractCatalogRelationships dedups Rosa Parks museum and arrest site locat
   assert.equal(relationships.length, 1);
 
   const [relationship] = relationships;
-  assert.equal(relationship?.id, 'rel_ent_rosa_parks_museum_001_located_at_ent_rosa_parks_arrest_site_001');
+  assert.equal(
+    relationship?.id,
+    'rel_ent_rosa_parks_museum_001_located_at_ent_rosa_parks_arrest_site_001',
+  );
   assert.equal(relationship?.fromEntityId, 'ent_rosa_parks_museum_001');
   assert.equal(relationship?.toEntityId, 'ent_rosa_parks_arrest_site_001');
   assert.equal(relationship?.type, 'located_at');
@@ -101,12 +104,28 @@ test('extractCatalogRelationships collapses bidirectional duplicates into one ca
   const entities: CatalogEntityForRelationships[] = [
     {
       id: 'ent_a',
-      claims: [{ predicate: 'p', object: 'o', confidenceLevel: 'high', citationSource: 'src', citationLabel: 'lbl' }],
+      claims: [
+        {
+          predicate: 'p',
+          object: 'o',
+          confidenceLevel: 'high',
+          citationSource: 'src',
+          citationLabel: 'lbl',
+        },
+      ],
       related: [{ id: 'ent_b', type: 'related_to', direction: 'outgoing' }],
     },
     {
       id: 'ent_b',
-      claims: [{ predicate: 'p', object: 'o', confidenceLevel: 'high', citationSource: 'src', citationLabel: 'lbl' }],
+      claims: [
+        {
+          predicate: 'p',
+          object: 'o',
+          confidenceLevel: 'high',
+          citationSource: 'src',
+          citationLabel: 'lbl',
+        },
+      ],
       related: [{ id: 'ent_a', type: 'related_to', direction: 'incoming' }],
     },
   ];

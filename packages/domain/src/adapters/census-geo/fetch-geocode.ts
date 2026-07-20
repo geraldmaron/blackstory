@@ -12,8 +12,14 @@ import {
   type SafeHttpClient,
 } from '../internet-archive/shared/http-port.js';
 import { buildCensusCoordinatesUrl, buildCensusOneLineAddressUrl } from './url-builder.js';
-import { normalizeCensusAddressMatch, normalizeCensusCoordinatesGeographies } from './normalizer.js';
-import { parseCensusAddressGeocodeResponse, parseCensusCoordinatesGeocodeResponse } from './response-parser.js';
+import {
+  normalizeCensusAddressMatch,
+  normalizeCensusCoordinatesGeographies,
+} from './normalizer.js';
+import {
+  parseCensusAddressGeocodeResponse,
+  parseCensusCoordinatesGeocodeResponse,
+} from './response-parser.js';
 import type { CensusGeocodeMatch } from './types.js';
 
 const CENSUS_ALLOWED_CONTENT_TYPES = ['application/json', 'text/json', 'application/javascript'];

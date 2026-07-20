@@ -8,7 +8,11 @@
  * candidate. See `pending-changes-invariant.test.ts` for the boundary this function cannot
  * cross.
  */
-import { createResearchCase, type EvidenceChecklist, type ResearchCaseRecord } from '../research-case/index.js';
+import {
+  createResearchCase,
+  type EvidenceChecklist,
+  type ResearchCaseRecord,
+} from '../research-case/index.js';
 import type { ConsensusRoutingDecision } from './types.js';
 
 export type QuarantinedLeadSummary = {

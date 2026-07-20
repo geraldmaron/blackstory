@@ -7,10 +7,7 @@
  */
 
 import React from 'react';
-import {
-  getDisclaimer,
-  SENSITIVITY_CLASS_PRESENTATION_LABELS,
-} from '@repo/domain/disclaimers';
+import { getDisclaimer, SENSITIVITY_CLASS_PRESENTATION_LABELS } from '@repo/domain/disclaimers';
 import type { EntityKind } from '@repo/domain/entity-kinds';
 import type { EntitySensitivity } from '@repo/domain/entity-status';
 import { SensitivityContextBanner } from '../SensitivityContextBanner';

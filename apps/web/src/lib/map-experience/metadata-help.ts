@@ -5,13 +5,7 @@
  */
 
 export type MetaFieldKey =
-  | 'kind'
-  | 'era'
-  | 'theme'
-  | 'confidence'
-  | 'evidence'
-  | 'where'
-  | 'status';
+  'kind' | 'era' | 'theme' | 'confidence' | 'evidence' | 'where' | 'status';
 
 const FIELD_HELP: Readonly<Record<MetaFieldKey, string>> = {
   kind: 'What kind of record this is — person, place, school, event, institution, and related types.',
@@ -34,7 +28,8 @@ const CONFIDENCE_HELP: Readonly<Record<string, string>> = {
 
 const STATUS_HELP: Readonly<Record<string, string>> = {
   active: 'Active: still operating or recognized as a present-day place or institution.',
-  historic: 'Historic: no longer active as a present-day place or institution; remembered historically.',
+  historic:
+    'Historic: no longer active as a present-day place or institution; remembered historically.',
   inactive: 'Inactive: not currently operating.',
   living: 'Living: concerns a living person (privacy rules apply on the public map).',
   deceased: 'Deceased: concerns a person who has died.',

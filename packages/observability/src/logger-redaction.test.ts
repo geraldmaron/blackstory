@@ -1,4 +1,3 @@
-
 /**
  * Proves the observability logger wired with @repo/security redaction keeps residential
  * addresses and exact coordinates out of log output and error telemetry.

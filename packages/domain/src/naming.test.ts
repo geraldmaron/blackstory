@@ -44,7 +44,9 @@ test('migrateEntityNames unifies displayName, aliases, school names, and place h
   assert.ok(names.some((name) => name.value === 'Washington Heritage Academy' && name.isPreferred));
   assert.ok(names.some((name) => name.value === 'WHA' && name.nameType === 'aka'));
   assert.ok(
-    names.some((name) => name.value === 'Booker T. Washington High School' && name.validTo === '1971'),
+    names.some(
+      (name) => name.value === 'Booker T. Washington High School' && name.validTo === '1971',
+    ),
   );
   assert.ok(names.every((name) => name.entityId === 'ent-school-1'));
   assert.ok(names.every((name) => name.normalizedValue === name.normalizedValue.toLowerCase()));
@@ -89,9 +91,27 @@ test('migrateEntityIdentifiers carries system -> namespace', () => {
 
 test('findIdentifierUniquenessViolations flags a namespace/value pair claimed by 2+ entities', () => {
   const records: readonly EntityIdentifierRecord[] = [
-    { entityId: 'ent-a', namespace: 'wikidata', value: 'Q1', normalizedValue: 'q1', evidenceIds: [] },
-    { entityId: 'ent-b', namespace: 'wikidata', value: 'Q1', normalizedValue: 'q1', evidenceIds: [] },
-    { entityId: 'ent-c', namespace: 'wikidata', value: 'Q2', normalizedValue: 'q2', evidenceIds: [] },
+    {
+      entityId: 'ent-a',
+      namespace: 'wikidata',
+      value: 'Q1',
+      normalizedValue: 'q1',
+      evidenceIds: [],
+    },
+    {
+      entityId: 'ent-b',
+      namespace: 'wikidata',
+      value: 'Q1',
+      normalizedValue: 'q1',
+      evidenceIds: [],
+    },
+    {
+      entityId: 'ent-c',
+      namespace: 'wikidata',
+      value: 'Q2',
+      normalizedValue: 'q2',
+      evidenceIds: [],
+    },
   ];
   const violations = findIdentifierUniquenessViolations(records);
   assert.equal(violations.length, 1);
@@ -102,8 +122,20 @@ test('findIdentifierUniquenessViolations flags a namespace/value pair claimed by
 
 test('findIdentifierUniquenessViolations exempts entities explicitly flagged ambiguous', () => {
   const records: readonly EntityIdentifierRecord[] = [
-    { entityId: 'ent-a', namespace: 'wikidata', value: 'Q1', normalizedValue: 'q1', evidenceIds: [] },
-    { entityId: 'ent-b', namespace: 'wikidata', value: 'Q1', normalizedValue: 'q1', evidenceIds: [] },
+    {
+      entityId: 'ent-a',
+      namespace: 'wikidata',
+      value: 'Q1',
+      normalizedValue: 'q1',
+      evidenceIds: [],
+    },
+    {
+      entityId: 'ent-b',
+      namespace: 'wikidata',
+      value: 'Q1',
+      normalizedValue: 'q1',
+      evidenceIds: [],
+    },
   ];
   const violations = findIdentifierUniquenessViolations(records, {
     ambiguousEntityIds: new Set(['ent-b']),

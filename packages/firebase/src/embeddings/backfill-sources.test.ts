@@ -58,10 +58,7 @@ test('mapCatalogFixtureRecordToEmbeddingInput prefers locationLabel for placeLab
   });
   assert.ok(mapped);
   assert.equal(mapped.location?.state, 'PA');
-  assert.equal(
-    mapped.location?.placeLabel,
-    '419 S. 6th Street at Lombard Street, Society Hill',
-  );
+  assert.equal(mapped.location?.placeLabel, '419 S. 6th Street at Lombard Street, Society Hill');
 });
 
 test('createNationalCatalogFixtureEntitySource pages unique fixture entities', async () => {

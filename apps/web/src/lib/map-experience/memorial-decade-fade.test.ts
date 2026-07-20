@@ -18,11 +18,11 @@ function feature(id: string, decadeStart: number): MemorialNameFeature {
     properties: {
       id,
       name: id,
-      meta: String(decadeStart),
       year: decadeStart + 4,
       decadeStart,
       ink: 0.3,
       size: 12,
+      rotate: 0,
       priority: 1,
     },
   };
@@ -43,11 +43,7 @@ test('complete frame restores every name', () => {
 });
 
 test('newest→oldest: current decade staggers, newer already passed, older wait', () => {
-  const features = [
-    feature('newer', 2020),
-    feature('current', 2010),
-    feature('older', 1990),
-  ];
+  const features = [feature('newer', 2020), feature('current', 2010), feature('older', 1990)];
   const plan = planMemorialDecadeFade(features, { decade: '2010s' });
   assert.deepEqual(plan.passImmediate, ['newer']);
   assert.deepEqual(plan.staggerPass, ['current']);

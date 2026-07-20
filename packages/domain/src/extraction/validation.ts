@@ -43,9 +43,7 @@ export function assertTemporalContextValid(temporal: TemporalContext | undefined
   }
 }
 
-export function assertGeographicContextValid(
-  geographic: ClaimGeographicContext | undefined,
-): void {
+export function assertGeographicContextValid(geographic: ClaimGeographicContext | undefined): void {
   if (!geographic) return;
   if (
     !geographic.locationId?.trim() &&
@@ -76,10 +74,7 @@ export function assertAtomicDraftValid(draft: ClaimDraft): void {
   if (!draft.entityId.trim()) throw new Error('Entity id is required');
   if (!draft.predicate.trim()) throw new Error('Claim predicate is required');
   if (!draft.object.trim()) throw new Error('Claim object is required');
-  if (
-    draft.atomicity.assertionCount !== 1 ||
-    !draft.atomicity.independentlySupportable
-  ) {
+  if (draft.atomicity.assertionCount !== 1 || !draft.atomicity.independentlySupportable) {
     throw new Error('A claim must contain one independently supportable assertion');
   }
   if (!draft.atomicity.rationale.trim()) throw new Error('Atomicity rationale is required');

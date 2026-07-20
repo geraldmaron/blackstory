@@ -2,7 +2,11 @@
  * Candidate retention rules for federal archive adapters.
  * Only qualifying metadata and evidence fields proceed toward discovery.
  */
-import type { FederalRejectedRecord, FederalRetentionRules, RawFederalExportRecord } from './types.js';
+import type {
+  FederalRejectedRecord,
+  FederalRetentionRules,
+  RawFederalExportRecord,
+} from './types.js';
 
 function readString(raw: RawFederalExportRecord, field: string): string | undefined {
   const value = raw[field];
@@ -48,9 +52,7 @@ export function partitionByRetention(
 
   for (const record of records) {
     const stableIdentifier =
-      readString(record, 'stableIdentifier') ??
-      readString(record, 'id') ??
-      'unknown';
+      readString(record, 'stableIdentifier') ?? readString(record, 'id') ?? 'unknown';
     const gate = qualifiesForCandidateRetention(record, rules);
     if (gate.qualified) {
       qualified.push(record);

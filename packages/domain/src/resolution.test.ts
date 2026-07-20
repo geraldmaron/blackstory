@@ -241,8 +241,12 @@ test('an exact trusted-namespace identifier match outranks a merely-similar name
   const identifierRanked = result.rankedMatches.find(
     (match) => match.entityId === 'person-identifier-match',
   )!;
-  const nameRanked = result.rankedMatches.find((match) => match.entityId === 'person-name-lookalike')!;
-  const identifierFactorScore = identifierRanked.factors.find((f) => f.factor === 'identifier')!.score;
+  const nameRanked = result.rankedMatches.find(
+    (match) => match.entityId === 'person-name-lookalike',
+  )!;
+  const identifierFactorScore = identifierRanked.factors.find(
+    (f) => f.factor === 'identifier',
+  )!.score;
   const nameFactorScore = nameRanked.factors.find((f) => f.factor === 'name')!.score;
   assert.ok(
     identifierFactorScore > nameFactorScore,

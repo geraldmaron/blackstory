@@ -31,7 +31,9 @@ export function EntityStatusPanel({ entity, framing: _framing }: EntityStatusPan
       <div className="ds-entity-status">
         <p className="ds-sans" style={{ margin: 0 }}>
           {entity.eventWindow ? formatEventWindow(entity.eventWindow) : 'Undated'}
-          {entity.eventWindow?.eventType ? ` \u00b7 ${humanizeToken(entity.eventWindow.eventType)}` : ''}
+          {entity.eventWindow?.eventType
+            ? ` \u00b7 ${humanizeToken(entity.eventWindow.eventType)}`
+            : ''}
         </p>
         <p className="ds-sans ds-entity-status__note">
           Events carry no active/historic status of their own — a when-span is authoritative

@@ -44,22 +44,27 @@ export function MethodologySections() {
     <div className="ds-stack" style={{ marginTop: 'var(--ds-space-8)' }}>
       <TrustSiteDisclaimer />
 
-      <section className="ds-section" aria-labelledby="mission-method" style={{ paddingTop: 0 }} id="mission">
+      <section
+        className="ds-section"
+        aria-labelledby="mission-method"
+        style={{ paddingTop: 0 }}
+        id="mission"
+      >
         <h2 className="ds-section__title" id="mission-method">
           Mission &amp; scope
         </h2>
         <p className="ds-section__lede">
           BlackStory publishes released historical projections — place-connected Black history with
-          provenance, confidence grades, and living-person protections. History should not be erased:
-          corrections append; disagreements stay visible; withdrawn records remain resolvable. History
-          should not be hard to find: every public claim carries citations and a path back to sources.
-          History should be accessible because it is about you — pinned to states, cities, campuses,
-          and documented sites near where people live and learn.
+          provenance, confidence grades, and living-person protections. History should not be
+          erased: corrections append; disagreements stay visible; withdrawn records remain
+          resolvable. History should not be hard to find: every public claim carries citations and a
+          path back to sources. History should be accessible because it is about you — pinned to
+          states, cities, campuses, and documented sites near where people live and learn.
         </p>
         <p className="ds-sans">
-          We document what primary and secondary sources support, state what they do not, and preserve
-          disagreements instead of collapsing them into a single winner. Presence and proof travel
-          together: the map shows scale; each record shows receipts.
+          We document what primary and secondary sources support, state what they do not, and
+          preserve disagreements instead of collapsing them into a single winner. Presence and proof
+          travel together: the map shows scale; each record shows receipts.
         </p>
       </section>
 
@@ -92,10 +97,12 @@ export function MethodologySections() {
           surfaces. Draft and under-review work stay off the public projection and search index.
         </p>
         <DefinitionList
-          entries={Object.entries(FACT_STATUS_LIFECYCLE_DEFINITIONS).map(([status, definition]) => ({
-            term: humanizeToken(status),
-            definition,
-          }))}
+          entries={Object.entries(FACT_STATUS_LIFECYCLE_DEFINITIONS).map(
+            ([status, definition]) => ({
+              term: humanizeToken(status),
+              definition,
+            }),
+          )}
         />
         <h3 className="ds-section__title ds-subheading" style={{ marginTop: 'var(--ds-space-6)' }}>
           Entity status vocabularies
@@ -123,8 +130,8 @@ export function MethodologySections() {
           Source hierarchy
         </h2>
         <p className="ds-section__lede">
-          Sources are ranked by proximity to the event and by independence. Discovery tools help find
-          candidates; they do not substitute for verification.
+          Sources are ranked by proximity to the event and by independence. Discovery tools help
+          find candidates; they do not substitute for verification.
         </p>
         <DefinitionList
           entries={SOURCE_HIERARCHY_LEVELS.map((level) => ({
@@ -147,7 +154,9 @@ export function MethodologySections() {
         <ol className="ds-sans" style={{ paddingLeft: 'var(--ds-space-5)' }}>
           <li>Identify primary sources closest to the event or record creation.</li>
           <li>Cross-check against independent secondary scholarship where primaries are sparse.</li>
-          <li>Document contradictions in confidence notes and counter-claims rather than hiding them.</li>
+          <li>
+            Document contradictions in confidence notes and counter-claims rather than hiding them.
+          </li>
           <li>Append every change to the revision log with a mandatory edit summary.</li>
         </ol>
       </section>
@@ -158,8 +167,8 @@ export function MethodologySections() {
         </h2>
         <p className="ds-section__lede">
           Confidence is never color alone. Every grade carries a text label and a non-color glyph so
-          the signal survives colorblind reading, screenshots, and print. Crime statistics never enter
-          the composite confidence score.
+          the signal survives colorblind reading, screenshots, and print. Crime statistics never
+          enter the composite confidence score.
         </p>
         <DefinitionList
           entries={Object.entries(FACT_CONFIDENCE_DEFINITIONS).map(([grade, definition]) => ({
@@ -174,25 +183,25 @@ export function MethodologySections() {
           Geographic precision &amp; map dignity
         </h2>
         <p className="ds-section__lede">
-          Place is the product&apos;s organizing idea — and also where harm is easiest to cause. Public
-          maps follow dignity rules that are load-bearing, not decorative.
+          Place is the product&apos;s organizing idea — and also where harm is easiest to cause.
+          Public maps follow dignity rules that are load-bearing, not decorative.
         </p>
         <ul className="ds-sans" style={{ paddingLeft: 'var(--ds-space-5)' }}>
           <li>
-            Public precision runs from country through campus or institution — never street addresses
-            or exact residence coordinates for living people.
+            Public precision runs from country through campus or institution — never street
+            addresses or exact residence coordinates for living people.
           </li>
           <li>
-            Points render no sharper than stored public precision. A coarsened point is never labeled
-            as an exact address.
+            Points render no sharper than stored public precision. A coarsened point is never
+            labeled as an exact address.
           </li>
           <li>
-            No red or alarm hues for violence-adjacent records; no crime-heat rendering. Color is never
-            the only signal.
+            No red or alarm hues for violence-adjacent records; no crime-heat rendering. Color is
+            never the only signal.
           </li>
           <li>
-            Unknown living status is treated as living. Current residential addresses do not appear on
-            public pages or hand-offs.
+            Unknown living status is treated as living. Current residential addresses do not appear
+            on public pages or hand-offs.
           </li>
           <li>
             Hard history is documented where the sources support it, but presence — people,
@@ -224,8 +233,8 @@ export function MethodologySections() {
             limits; participation and suppression are part of the reading, not optional footnotes.
           </li>
           <li>
-            Link rot and missing archives happen. Where a web source was captured, the capture travels
-            with the citation; where it was not, the gap is visible.
+            Link rot and missing archives happen. Where a web source was captured, the capture
+            travels with the citation; where it was not, the gap is visible.
           </li>
         </ul>
       </section>
@@ -248,10 +257,10 @@ export function MethodologySections() {
         </h2>
         <p className="ds-section__lede">
           Use the <Link href="/corrections">corrections lane</Link> to challenge a published record,
-          suggest missing evidence, or report a precision issue. Submissions enter a restricted review
-          queue; nothing changes publicly until it passes independent verification. You receive a
-          receipt code to track status. A correction is normal system function — not an admission that
-          the archive failed; it is how the archive refuses silent erasure.
+          suggest missing evidence, or report a precision issue. Submissions enter a restricted
+          review queue; nothing changes publicly until it passes independent verification. You
+          receive a receipt code to track status. A correction is normal system function — not an
+          admission that the archive failed; it is how the archive refuses silent erasure.
         </p>
       </section>
 
@@ -260,9 +269,10 @@ export function MethodologySections() {
           Funding &amp; independence
         </h2>
         <p className="ds-section__lede" id="independence">
-          BlackStory is an independent editorial project. Funding sources, when applicable, are listed
-          here and updated when they change. No funder receives advance editorial review or veto over
-          published records. Research promotion and admin tooling remain on private surfaces.
+          BlackStory is an independent editorial project. Funding sources, when applicable, are
+          listed here and updated when they change. No funder receives advance editorial review or
+          veto over published records. Research promotion and admin tooling remain on private
+          surfaces.
         </p>
         <p className="ds-sans" style={{ color: 'var(--ds-ink-muted)' }}>
           When formal funding disclosures apply, they will appear in this section with dates. Until
@@ -275,8 +285,8 @@ export function MethodologySections() {
           Masthead
         </h2>
         <p className="ds-section__lede">
-          Editorial accountability is named by role, not hidden behind an anonymous brand voice. Public
-          bios link here as the team publishes them.
+          Editorial accountability is named by role, not hidden behind an anonymous brand voice.
+          Public bios link here as the team publishes them.
         </p>
         <ul className="ds-sans" style={{ paddingLeft: 'var(--ds-space-5)' }}>
           <li>Editorial lead — methodology, corrections policy, and publish gate</li>
@@ -290,9 +300,9 @@ export function MethodologySections() {
           Transparency indicators
         </h2>
         <p className="ds-section__lede">
-          We adopt the eight transparency practices and their schema.org vocabulary (CC-BY-SA) without
-          using any trademarked program name or badge. Each indicator maps to a published policy URL
-          on this site.
+          We adopt the eight transparency practices and their schema.org vocabulary (CC-BY-SA)
+          without using any trademarked program name or badge. Each indicator maps to a published
+          policy URL on this site.
         </p>
         <DefinitionList
           entries={TRUST_PROJECT_INDICATORS.map((indicator) => ({
@@ -308,8 +318,8 @@ export function MethodologySections() {
         </h2>
         <p className="ds-section__lede">
           The five International Fact-Checking Network commitments below are reproduced as editorial
-          alignment. BlackStory is not a paid IFCN signatory; the badge requires signatory status. The
-          commitment language is public and guides our corrections and verification posture.
+          alignment. BlackStory is not a paid IFCN signatory; the badge requires signatory status.
+          The commitment language is public and guides our corrections and verification posture.
         </p>
         <DefinitionList
           entries={IFCN_COMMITMENTS.map((commitment) => ({

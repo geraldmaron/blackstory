@@ -38,7 +38,10 @@ test('a draft fact with zero citations is exempt from the publish gate', () => {
 });
 
 test('a contested-confidence fact still passes the publish gate (axes are independent)', () => {
-  const fact = buildFixtureFact({ confidence: 'contested', confidenceNote: 'Disputed by a contemporary account.' });
+  const fact = buildFixtureFact({
+    confidence: 'contested',
+    confidenceNote: 'Disputed by a contemporary account.',
+  });
   assert.deepEqual(evaluateFactPublishGate(fact), { ok: true });
 });
 
@@ -59,8 +62,12 @@ test('evaluateFactProjectionPublishGate aggregates every failing fact in one pas
 });
 
 test('assertFactRemainsResolvable allows superseded/deprecated but rejects draft', () => {
-  assert.doesNotThrow(() => assertFactRemainsResolvable(buildFixtureFact({ status: 'superseded' })));
-  assert.doesNotThrow(() => assertFactRemainsResolvable(buildFixtureFact({ status: 'deprecated' })));
+  assert.doesNotThrow(() =>
+    assertFactRemainsResolvable(buildFixtureFact({ status: 'superseded' })),
+  );
+  assert.doesNotThrow(() =>
+    assertFactRemainsResolvable(buildFixtureFact({ status: 'deprecated' })),
+  );
   assert.throws(() => assertFactRemainsResolvable(buildFixtureFact({ status: 'draft' })));
 });
 
@@ -117,6 +124,10 @@ test('a fact whose confidence exceeds its backing claim is rejected by the wired
 });
 
 test('a fact consistent with its backing claim passes the wired gate', () => {
-  const fact = buildFixtureFact({ confidence: 'single-source', confidenceNote: 'One source.', derivedFromClaimIds: ['claim-1'] });
+  const fact = buildFixtureFact({
+    confidence: 'single-source',
+    confidenceNote: 'One source.',
+    derivedFromClaimIds: ['claim-1'],
+  });
   assert.deepEqual(evaluateFactPublishGate(fact, { backingClaims: [BACKING_CLAIM] }), { ok: true });
 });

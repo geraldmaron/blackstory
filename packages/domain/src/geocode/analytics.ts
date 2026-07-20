@@ -19,7 +19,8 @@ export function buildCoarseLocationAnalyticsEvent(
   options: BuildCoarseLocationAnalyticsEventOptions = {},
 ): CoarseLocationAnalyticsEvent {
   const occurredAt = (options.now ?? (() => new Date().toISOString()))();
-  const jurisdictionId = resolution?.jurisdictionIds.countyId ?? resolution?.jurisdictionIds.stateId;
+  const jurisdictionId =
+    resolution?.jurisdictionIds.countyId ?? resolution?.jurisdictionIds.stateId;
 
   return {
     kind,

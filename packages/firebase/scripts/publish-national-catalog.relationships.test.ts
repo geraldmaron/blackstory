@@ -11,9 +11,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
-import {
-  buildGraphReleaseArtifact,
-} from '../../domain/src/graph/build.ts';
+import { buildGraphReleaseArtifact } from '../../domain/src/graph/build.ts';
 import {
   extractCatalogRelationships,
   relatedEntriesFromRelationships,
@@ -28,7 +26,9 @@ function loadCatalog(): ReleaseSourceEntity[] {
   const files = readdirSync(catalogDir).filter((name) => name.endsWith('.json'));
   const entries: ReleaseSourceEntity[] = [];
   for (const file of files.sort()) {
-    const parsed = JSON.parse(readFileSync(join(catalogDir, file), 'utf8')) as ReleaseSourceEntity[];
+    const parsed = JSON.parse(
+      readFileSync(join(catalogDir, file), 'utf8'),
+    ) as ReleaseSourceEntity[];
     for (const entry of parsed) entries.push(entry);
   }
   return entries;

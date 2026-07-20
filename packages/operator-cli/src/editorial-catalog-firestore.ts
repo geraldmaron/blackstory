@@ -67,7 +67,10 @@ export function extractEmbeddingVector(value: unknown): EmbeddingVector | undefi
  */
 export function mergeEditorialCatalogFromDocs(input: {
   readonly embeddings: readonly EditorialCatalogFirestoreDoc[];
-  readonly searchIndexById: ReadonlyMap<string, { displayName?: string; aliases?: readonly string[] }>;
+  readonly searchIndexById: ReadonlyMap<
+    string,
+    { displayName?: string; aliases?: readonly string[] }
+  >;
   readonly expectedDims?: number;
 }): EditorialCatalogEntity[] {
   const expectedDims = input.expectedDims ?? EMBEDDING_DIMS;
@@ -149,8 +152,7 @@ async function loadSearchIndexMap(
     if (snapshot.empty) break;
     for (const doc of snapshot.docs) {
       const data = doc.data() as Record<string, unknown>;
-      const displayName =
-        typeof data.displayName === 'string' ? data.displayName : undefined;
+      const displayName = typeof data.displayName === 'string' ? data.displayName : undefined;
       const aliases = asStringArray(data.aliases);
       map.set(doc.id, {
         ...(displayName !== undefined ? { displayName } : {}),
@@ -190,9 +192,7 @@ export async function loadEditorialCatalogFromFirestore(
         id: doc.id,
         ...(typeof data.displayName === 'string' ? { displayName: data.displayName } : {}),
         ...(aliases !== undefined ? { aliases } : {}),
-        ...(data[VECTOR_FIELD_NAME] !== undefined
-          ? { embedding: data[VECTOR_FIELD_NAME] }
-          : {}),
+        ...(data[VECTOR_FIELD_NAME] !== undefined ? { embedding: data[VECTOR_FIELD_NAME] } : {}),
         ...(typeof data.dims === 'number' ? { dims: data.dims } : {}),
       });
     }

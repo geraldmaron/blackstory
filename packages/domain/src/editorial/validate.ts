@@ -2,7 +2,10 @@
  * Editorial draft validation: learning-index summary contract and public-language
  * procedural-status gates over stripped prose-link markup.
  */
-import { evaluatePublicLanguage, type PublicLanguageEvaluation } from '../confidence-engine/index.js';
+import {
+  evaluatePublicLanguage,
+  type PublicLanguageEvaluation,
+} from '../confidence-engine/index.js';
 import {
   validateLearningSummary,
   type LearningIndexContractIssue,
@@ -117,7 +120,11 @@ export function validateEditorialDrafts(
       : undefined;
     drafts.claims.forEach((claim, index) => {
       validateClaimDraft(claim, index, issues);
-      if (allowed && isNonEmptyString(claim.citationHref) && !allowed.has(claim.citationHref.trim())) {
+      if (
+        allowed &&
+        isNonEmptyString(claim.citationHref) &&
+        !allowed.has(claim.citationHref.trim())
+      ) {
         issues.push(
           `claims[${index}]: citationHref is not one of the judge-supplied source URLs (possible fabrication)`,
         );

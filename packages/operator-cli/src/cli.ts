@@ -1,4 +1,3 @@
-
 /**
  * Thin argument-parsing CLI over this package's real, tested functions mirrors the
  * parse-args-then-call-a-tested-function shape of
@@ -23,14 +22,10 @@ import {
   type BulkImportSummary,
 } from './bulk-import.js';
 import { commitOperatorIntake } from './commit.js';
-import {
-  prepareDiscoverySurvivorIntake,
-} from './discovery-survivor-intake.js';
+import { prepareDiscoverySurvivorIntake } from './discovery-survivor-intake.js';
 import type { DiscoveryRunBatch } from './discovery-run.js';
 import { runBoundedDiscoveryCampaign } from './discovery-run.js';
-import {
-  runCommunityObscurityOperatorCampaign,
-} from './community-obscurity-run.js';
+import { runCommunityObscurityOperatorCampaign } from './community-obscurity-run.js';
 import { runRssOperatorCampaign } from './rss-campaign-run.js';
 import { dispatchDiscoveryCampaign } from '@repo/config/scheduled-jobs';
 import {
@@ -147,7 +142,9 @@ function defaultModelForProvider(
     case 'openrouter':
     case 'hybrid':
       // Empty model when a rotation roster is configured — the provider picks per attempt.
-      return process.env.OPENROUTER_MODEL ?? (process.env.OPENROUTER_MODELS ? '' : 'openrouter/free');
+      return (
+        process.env.OPENROUTER_MODEL ?? (process.env.OPENROUTER_MODELS ? '' : 'openrouter/free')
+      );
     case 'ollama':
       return ollamaModel ?? process.env.OLLAMA_MODEL ?? 'qwen3:8b';
     case 'mock':
@@ -395,11 +392,17 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
           stdout(JSON.stringify({ fetch: research.fetch }, null, 2));
           return 0;
         }
-        const intakeSummary = research.intake ? await finish(research.intake, flags, deps) : undefined;
+        const intakeSummary = research.intake
+          ? await finish(research.intake, flags, deps)
+          : undefined;
         stdout(
           JSON.stringify(
             {
-              fetch: { ok: true, finalUrl: research.fetch.finalUrl, contentHash: research.fetch.contentHash },
+              fetch: {
+                ok: true,
+                finalUrl: research.fetch.finalUrl,
+                contentHash: research.fetch.contentHash,
+              },
               citation: research.citation,
               capturePlan: research.capturePlan,
               intake: intakeSummary,
@@ -488,7 +491,10 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
             : undefined;
         const causalReview: EdgeIntakeInput['causalReview'] =
           causalScope === 'systemic_consensus'
-            ? { scope: 'systemic_consensus' as const, ...(consensusBasis ? { consensusBasis } : {}) }
+            ? {
+                scope: 'systemic_consensus' as const,
+                ...(consensusBasis ? { consensusBasis } : {}),
+              }
             : causalScope === 'contested_or_single_incident'
               ? { scope: 'contested_or_single_incident' as const }
               : undefined;
@@ -510,7 +516,9 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
       case 'discovery-run': {
         const batchPath = requireFlag(flags, '--batch');
         const batch = JSON.parse(readFile(batchPath)) as DiscoveryRunBatch;
-        const countries = (optionalFlag(flags, '--countries') ?? 'US').split(',').map((c) => c.trim());
+        const countries = (optionalFlag(flags, '--countries') ?? 'US')
+          .split(',')
+          .map((c) => c.trim());
         const { summary } = runBoundedDiscoveryCampaign({
           batch,
           config: {
@@ -566,9 +574,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
           nowIso,
           ...(campaignId !== undefined ? { campaignId } : {}),
           ...(runId !== undefined ? { runId } : {}),
-          ...(maxCandidatesRaw !== undefined
-            ? { maxCandidates: Number(maxCandidatesRaw) }
-            : {}),
+          ...(maxCandidatesRaw !== undefined ? { maxCandidates: Number(maxCandidatesRaw) } : {}),
         });
         const full = flags.booleans.has('--full');
         stdout(JSON.stringify(full ? { summary, result } : summary, null, 2));
@@ -600,9 +606,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
           nowIso,
           ...(campaignId !== undefined ? { campaignId } : {}),
           ...(runId !== undefined ? { runId } : {}),
-          ...(maxCandidatesRaw !== undefined
-            ? { maxCandidates: Number(maxCandidatesRaw) }
-            : {}),
+          ...(maxCandidatesRaw !== undefined ? { maxCandidates: Number(maxCandidatesRaw) } : {}),
           ...(flags.booleans.has('--include-curated')
             ? { includeCuratedCommunityFeeds: true }
             : {}),
@@ -633,9 +637,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
           nowIso,
           includeCampaign: queueSurvivors,
           ...(jobRunId !== undefined ? { jobRunId } : {}),
-          ...(maxCandidatesRaw !== undefined
-            ? { maxCandidates: Number(maxCandidatesRaw) }
-            : {}),
+          ...(maxCandidatesRaw !== undefined ? { maxCandidates: Number(maxCandidatesRaw) } : {}),
         });
 
         let queueSummary: Record<string, unknown> | undefined;
@@ -643,9 +645,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
           const intake = prepareDiscoverySurvivorIntake({
             campaign: result.campaign,
             context: buildContext(flags, deps),
-            ...(maxSurvivorsRaw !== undefined
-              ? { maxSurvivors: Number(maxSurvivorsRaw) }
-              : {}),
+            ...(maxSurvivorsRaw !== undefined ? { maxSurvivors: Number(maxSurvivorsRaw) } : {}),
           });
           const commits: Record<string, unknown>[] = [];
           if (flags.booleans.has('--commit')) {
@@ -706,7 +706,9 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         const single = optionalFlag(flags, '--from');
         const fromPaths = paths.length > 0 ? paths : single ? [single] : [];
         if (fromPaths.length === 0) {
-          throw new Error('pending-list requires --from path/to/obscurity-or-subjects.json (repeatable)');
+          throw new Error(
+            'pending-list requires --from path/to/obscurity-or-subjects.json (repeatable)',
+          );
         }
         stdout(JSON.stringify(loadPendingEditorialItems(fromPaths), null, 2));
         return 0;
@@ -716,12 +718,12 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         const subjectsPath = requireFlag(flags, '--subjects');
         const catalogPath = optionalFlag(flags, '--catalog');
         const catalogFrom = optionalFlag(flags, '--catalog-from');
-        const subjectsJson = JSON.parse(readFile(subjectsPath)) as {
-          subjects?: EditorialSubjectFile[];
-        } | EditorialSubjectFile[];
-        const subjects = Array.isArray(subjectsJson)
-          ? subjectsJson
-          : (subjectsJson.subjects ?? []);
+        const subjectsJson = JSON.parse(readFile(subjectsPath)) as
+          | {
+              subjects?: EditorialSubjectFile[];
+            }
+          | EditorialSubjectFile[];
+        const subjects = Array.isArray(subjectsJson) ? subjectsJson : (subjectsJson.subjects ?? []);
         if (subjects.length === 0) {
           throw new Error('--subjects must be a JSON array or { subjects: [...] }');
         }
@@ -729,7 +731,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         const jsonCatalogEntries: EditorialCatalogEntity[] = Array.isArray(catalogRaw)
           ? (catalogRaw as EditorialCatalogEntity[])
           : Array.isArray((catalogRaw as { entities?: unknown } | undefined)?.entities)
-            ? ((catalogRaw as { entities: EditorialCatalogEntity[] }).entities)
+            ? (catalogRaw as { entities: EditorialCatalogEntity[] }).entities
             : [];
         let catalogEntries: EditorialCatalogEntity[] =
           jsonCatalogEntries.length > 0
@@ -753,10 +755,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
           throw new Error('--catalog-from must be "firestore" when set');
         }
         const providerName = (optionalFlag(flags, '--provider') ?? 'mock') as
-          | 'mock'
-          | 'openrouter'
-          | 'ollama'
-          | 'hybrid';
+          'mock' | 'openrouter' | 'ollama' | 'hybrid';
         if (!['mock', 'openrouter', 'ollama', 'hybrid'].includes(providerName)) {
           throw new Error('--provider must be mock|openrouter|ollama|hybrid');
         }
@@ -829,7 +828,9 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
           const commits = [];
           for (const item of result.items) {
             if (item.packet.decision === 'reject') continue;
-            commits.push(await finish(prepareEditorialPacketIntake(item.packet, context), flags, deps));
+            commits.push(
+              await finish(prepareEditorialPacketIntake(item.packet, context), flags, deps),
+            );
           }
           emitRunJson({
             payload: { result, commits },
@@ -849,18 +850,17 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
       }
       case 'story-research-run': {
         const topicsPath = requireFlag(flags, '--topics');
-        const topicsJson = JSON.parse(readFile(topicsPath)) as {
-          topics?: StoryTopicSeed[];
-        } | StoryTopicSeed[];
+        const topicsJson = JSON.parse(readFile(topicsPath)) as
+          | {
+              topics?: StoryTopicSeed[];
+            }
+          | StoryTopicSeed[];
         const topics = Array.isArray(topicsJson) ? topicsJson : (topicsJson.topics ?? []);
         if (topics.length === 0) {
           throw new Error('--topics must be a JSON array or { topics: [...] }');
         }
         const providerName = (optionalFlag(flags, '--provider') ?? 'mock') as
-          | 'mock'
-          | 'openrouter'
-          | 'ollama'
-          | 'hybrid';
+          'mock' | 'openrouter' | 'ollama' | 'hybrid';
         if (!['mock', 'openrouter', 'ollama', 'hybrid'].includes(providerName)) {
           throw new Error('--provider must be mock|openrouter|ollama|hybrid');
         }
@@ -905,10 +905,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         const locationPrecision = optionalFlag(flags, '--precision');
         const locationId = optionalFlag(flags, '--location-id');
         const role = optionalFlag(flags, '--role') as
-          | 'historical'
-          | 'current'
-          | 'approximate'
-          | undefined;
+          'historical' | 'current' | 'approximate' | undefined;
         const outcome = await prepareLocate(
           {
             entityId: requireFlag(flags, '--entity-id'),

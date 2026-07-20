@@ -39,7 +39,10 @@ describe('BB-084 scheduled-jobs Cloud Scheduler mirror', () => {
       assert.ok(job.cronExpression, `${job.id} missing cronExpression`);
       assert.ok(job.budget?.unit && job.budget.maxPerRun > 0, `${job.id} missing/invalid budget`);
       assert.ok(job.timeoutSec > 0 && job.timeoutSec <= 86_400, `${job.id} invalid timeoutSec`);
-      assert.ok(job.idempotencyKeyScheme?.includes('{jobId}'), `${job.id} idempotencyKeyScheme missing {jobId}`);
+      assert.ok(
+        job.idempotencyKeyScheme?.includes('{jobId}'),
+        `${job.id} idempotencyKeyScheme missing {jobId}`,
+      );
       assert.ok(job.killSwitchId, `${job.id} missing killSwitchId`);
       assert.ok(
         ['research', 'publication', 'security'].includes(job.targetWorker?.package),
@@ -70,7 +73,10 @@ describe('BB-084 scheduled-jobs Cloud Scheduler mirror', () => {
 
   it('exactly nine jobs are marked real (prior five plus four unstubbed discovery campaigns)', () => {
     const config = readJson('scheduled-jobs.json');
-    const real = config.jobs.filter((job) => job.rosterStatus === 'real').map((job) => job.id).sort();
+    const real = config.jobs
+      .filter((job) => job.rosterStatus === 'real')
+      .map((job) => job.id)
+      .sort();
     assert.deepEqual(real, [
       'backup-verification-daily',
       'community-obscurity-discovery',
@@ -104,8 +110,12 @@ describe('BB-084 scheduled-jobs Cloud Scheduler mirror', () => {
     assert.equal(config.environment, schema.properties.environment.const);
     for (const job of config.jobs) {
       assert.match(job.id, new RegExp(schema.properties.jobs.items.properties.id.pattern));
-      assert.ok(schema.properties.jobs.items.properties.rosterStatus.enum.includes(job.rosterStatus));
-      assert.ok(schema.properties.jobs.items.properties.publicEffect.enum.includes(job.publicEffect));
+      assert.ok(
+        schema.properties.jobs.items.properties.rosterStatus.enum.includes(job.rosterStatus),
+      );
+      assert.ok(
+        schema.properties.jobs.items.properties.publicEffect.enum.includes(job.publicEffect),
+      );
     }
   });
 });

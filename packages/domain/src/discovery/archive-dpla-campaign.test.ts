@@ -43,7 +43,9 @@ function loadIaFixture(): unknown {
 }
 
 function loadDplaFixture(): unknown {
-  return JSON.parse(readFileSync(join(FIXTURES_DPLA, 'search-response-current-shape.json'), 'utf8'));
+  return JSON.parse(
+    readFileSync(join(FIXTURES_DPLA, 'search-response-current-shape.json'), 'utf8'),
+  );
 }
 
 function stubRecord(adapterId: string, index: number): AdapterCandidateRecord {
@@ -70,7 +72,11 @@ test('ARCHIVE_DPLA_ADAPTER_IDS includes community IA + DPLA v2 only', () => {
   assert.equal(DPLA_V2_ADAPTER_ID, 'dpla');
   assert.notEqual(DPLA_V2_ADAPTER_ID, DPLA_ADAPTER_ID);
   assert.equal(DPLA_ADAPTER_ID, 'dpla-items-v1');
-  assert.ok(!ARCHIVE_DPLA_ADAPTER_IDS.includes(DPLA_ADAPTER_ID as (typeof ARCHIVE_DPLA_ADAPTER_IDS)[number]));
+  assert.ok(
+    !ARCHIVE_DPLA_ADAPTER_IDS.includes(
+      DPLA_ADAPTER_ID as (typeof ARCHIVE_DPLA_ADAPTER_IDS)[number],
+    ),
+  );
 });
 
 test('applyArchiveDplaSubBudgets enforces per-lane and shared caps', () => {
@@ -84,11 +90,16 @@ test('applyArchiveDplaSubBudgets enforces per-lane and shared caps', () => {
     internetArchiveRecords: iaRecords,
     dplaRecords,
   });
-  assert.equal(subBudget.internetArchiveIngested, ARCHIVE_DPLA_SUB_BUDGET_POLICY.maxInternetArchive);
+  assert.equal(
+    subBudget.internetArchiveIngested,
+    ARCHIVE_DPLA_SUB_BUDGET_POLICY.maxInternetArchive,
+  );
   assert.equal(subBudget.dplaIngested, ARCHIVE_DPLA_SUB_BUDGET_POLICY.maxDpla);
   assert.equal(subBudget.combinedIngested, ARCHIVE_DPLA_SUB_BUDGET_POLICY.maxCandidates);
   assert.equal(records.length, 500);
-  const iaCount = records.filter((r) => r.provenance.adapterId === INTERNET_ARCHIVE_ADAPTER_ID).length;
+  const iaCount = records.filter(
+    (r) => r.provenance.adapterId === INTERNET_ARCHIVE_ADAPTER_ID,
+  ).length;
   const dplaCount = records.filter((r) => r.provenance.adapterId === DPLA_V2_ADAPTER_ID).length;
   assert.equal(iaCount, 300);
   assert.equal(dplaCount, 200);
@@ -108,7 +119,9 @@ test('dual-lane fixture run yields survivors from both adapters', async () => {
   assert.equal(result.subBudget.combinedIngested, 4);
 
   assert.deepEqual(result.adapterIds, ARCHIVE_DPLA_ADAPTER_IDS);
-  assert.ok(!result.adapterIds.includes(DPLA_ADAPTER_ID as (typeof ARCHIVE_DPLA_ADAPTER_IDS)[number]));
+  assert.ok(
+    !result.adapterIds.includes(DPLA_ADAPTER_ID as (typeof ARCHIVE_DPLA_ADAPTER_IDS)[number]),
+  );
 
   const survivors = listCampaignSurvivors(result.campaign);
   assert.ok(survivors.length >= 2);

@@ -78,14 +78,18 @@ export function computeExclusionInfrastructureLayerSignal(
   const covenants = input.covenantRecords.filter((r) => r.placeEntityId === input.placeEntityId);
   if (redlining.length === 0 && covenants.length === 0) return undefined;
 
-  const grade = input.asOf ? redliningGradeAsOf(redlining, input.asOf) : currentRedliningGrade(redlining);
+  const grade = input.asOf
+    ? redliningGradeAsOf(redlining, input.asOf)
+    : currentRedliningGrade(redlining);
   const holcWeight = grade ? HOLC_GRADE_WEIGHTS[grade] : 0;
   const covenantWeight = covenants.length > 0 ? RESTRICTIVE_COVENANT_PRESENCE_WEIGHT : 0;
   const value = round4(clamp01(holcWeight + covenantWeight * (1 - holcWeight)));
 
   const activeRedliningRecord = grade
     ? redlining.find((record) =>
-        input.asOf ? redliningGradeAsOf([record], input.asOf) === grade : currentRedliningGrade([record]) === grade,
+        input.asOf
+          ? redliningGradeAsOf([record], input.asOf) === grade
+          : currentRedliningGrade([record]) === grade,
       )
     : undefined;
 
@@ -96,7 +100,11 @@ export function computeExclusionInfrastructureLayerSignal(
   if (basisClaimIds.length === 0) return undefined;
 
   const citations = resolveCitations(basisClaimIds, input.citationsByClaimId);
-  const asOf = input.asOf ?? activeRedliningRecord?.validFrom ?? covenants[0]?.validFrom ?? new Date().toISOString();
+  const asOf =
+    input.asOf ??
+    activeRedliningRecord?.validFrom ??
+    covenants[0]?.validFrom ??
+    new Date().toISOString();
 
   const noteParts: string[] = [
     'HOLC Residential Security Map grades (Mapping Inequality, Univ. of Richmond DSL, source ' +

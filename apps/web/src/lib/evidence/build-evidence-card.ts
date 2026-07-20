@@ -36,11 +36,15 @@ export function buildEvidenceCard(input: EvidenceClaimInput): EvidenceClaimView 
     revisionHistory: input.revisionHistory ?? [],
     ...(input.retraction ? { retraction: input.retraction } : {}),
     ...(input.relevanceNote ? { relevanceNote: input.relevanceNote } : {}),
-    ...(input.connectionStrengthNote ? { connectionStrengthNote: input.connectionStrengthNote } : {}),
+    ...(input.connectionStrengthNote
+      ? { connectionStrengthNote: input.connectionStrengthNote }
+      : {}),
   };
 }
 
-export function buildEvidenceCards(inputs: readonly EvidenceClaimInput[]): readonly EvidenceClaimView[] {
+export function buildEvidenceCards(
+  inputs: readonly EvidenceClaimInput[],
+): readonly EvidenceClaimView[] {
   return inputs.map(buildEvidenceCard);
 }
 

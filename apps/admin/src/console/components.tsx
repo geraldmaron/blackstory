@@ -19,7 +19,11 @@ function recordCountLabel(count: number, dataSource: ConsoleDataSource): string 
   }
 }
 
-function recordTableCaption(surfaceLabel: string, count: number, dataSource: ConsoleDataSource): string {
+function recordTableCaption(
+  surfaceLabel: string,
+  count: number,
+  dataSource: ConsoleDataSource,
+): string {
   switch (dataSource) {
     case 'live':
       return `${surfaceLabel}: ${count} live record${count === 1 ? '' : 's'}`;
@@ -46,14 +50,10 @@ function overviewCountLabel(
 
 export function ConsoleLegacyBanner() {
   return (
-    <div
-      className="console-legacy-banner"
-      role="note"
-      aria-label="Legacy console notice"
-    >
+    <div className="console-legacy-banner" role="note" aria-label="Legacy console notice">
       <p>
-        <strong>Legacy fixture shell.</strong> Live triage is{' '}
-        <Link href="/inbox">Inbox</Link> and <Link href="/cases">Cases</Link>.
+        <strong>Legacy fixture shell.</strong> Live triage is <Link href="/inbox">Inbox</Link> and{' '}
+        <Link href="/cases">Cases</Link>.
       </p>
       <div className="console-legacy-banner__actions">
         <Link className="console-legacy-banner__primary" href="/inbox">
@@ -181,9 +181,7 @@ function PermissionGatedAction({ action }: { readonly action: ConsoleAction }) {
         Target: <code>{action.destination}</code> through <code>{action.endpoint}</code>
       </p>
       {action.bulk ? (
-        <p>
-          Preview required · maximum {action.bulk.maximumItems} items · rollback token issued
-        </p>
+        <p>Preview required · maximum {action.bulk.maximumItems} items · rollback token issued</p>
       ) : null}
       {action.privilegedAction ? (
         <fieldset>
@@ -260,8 +258,8 @@ export function ConsoleSurfacePage({
         </div>
         {useResearchCaseQueue ? (
           <p>
-            Open the <Link href="/inbox">Inbox</Link> for searchable queues, full case sheets,
-            and live send-to-relevance / exclude / needs-evidence actions.
+            Open the <Link href="/inbox">Inbox</Link> for searchable queues, full case sheets, and
+            live send-to-relevance / exclude / needs-evidence actions.
           </p>
         ) : (
           <div className="console-table-wrap">

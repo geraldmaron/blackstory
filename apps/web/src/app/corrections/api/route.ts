@@ -2,10 +2,7 @@
  * Public correction intake endpoint. Node.js runtime (App Check Admin verifier).
  * Writes create-only into quarantine via `createQuarantinedSubmission`.
  */
-import {
-  buildDefaultCorrectionRouteDependencies,
-  handleCorrectionSubmitRequest,
-} from './handler';
+import { buildDefaultCorrectionRouteDependencies, handleCorrectionSubmitRequest } from './handler';
 
 export const runtime = 'nodejs';
 

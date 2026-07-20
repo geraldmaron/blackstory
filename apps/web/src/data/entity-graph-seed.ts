@@ -82,9 +82,16 @@ export function relatedEntriesFor(entityId: string): readonly PublicRelatedEntry
 // authoritative (see `eventWindow` on `PublicEntityView` in./public-seed.ts).
 // ---------------------------------------------------------------------------
 
-export const SEED_STATUS_HISTORY: Readonly<Record<string, readonly StatusHistoryEntry<EntityStatusValue>[]>> = {
+export const SEED_STATUS_HISTORY: Readonly<
+  Record<string, readonly StatusHistoryEntry<EntityStatusValue>[]>
+> = {
   ent_15th_st_church_001: [
-    { status: 'active', validFrom: '1841', datePrecision: 'year', basisClaimIds: ['claim_church_founded_1841'] },
+    {
+      status: 'active',
+      validFrom: '1841',
+      datePrecision: 'year',
+      basisClaimIds: ['claim_church_founded_1841'],
+    },
   ],
   ent_dunbar_school_001: [
     {
@@ -102,7 +109,12 @@ export const SEED_STATUS_HISTORY: Readonly<Record<string, readonly StatusHistory
     },
   ],
   ent_dunbar_alumni_federation_001: [
-    { status: 'active', validFrom: '2002', datePrecision: 'year', basisClaimIds: ['claim_alumni_organized_2002'] },
+    {
+      status: 'active',
+      validFrom: '2002',
+      datePrecision: 'year',
+      basisClaimIds: ['claim_alumni_organized_2002'],
+    },
   ],
 };
 
@@ -113,7 +125,9 @@ export function currentStatusFor(entityId: string): EntityStatusValue | undefine
   return currentStatus(SEED_STATUS_HISTORY[entityId]);
 }
 
-export function statusHistoryFor(entityId: string): readonly StatusHistoryEntry<EntityStatusValue>[] | undefined {
+export function statusHistoryFor(
+  entityId: string,
+): readonly StatusHistoryEntry<EntityStatusValue>[] | undefined {
   return SEED_STATUS_HISTORY[entityId];
 }
 
@@ -181,7 +195,9 @@ function humanizeToken(value: string): string {
  * uses, plus a generic fallback for any other `RelationshipType` a future edit might add. Mirrors
  * the direction semantics documented in `RELATIONSHIP_TYPE_SEMANTICS`
  * (packages/domain/src/relationship.ts). */
-const RELATIONSHIP_SENTENCE_TEMPLATES: Readonly<Record<string, (from: string, to: string) => string>> = {
+const RELATIONSHIP_SENTENCE_TEMPLATES: Readonly<
+  Record<string, (from: string, to: string) => string>
+> = {
   located_at: (from, to) => `${from} is located at ${to}.`,
   occurred_at: (from, to) => `${from} occurred at ${to}.`,
   commemorates: (from, to) => `${from} commemorates ${to}.`,
@@ -219,7 +235,8 @@ export function buildGraphTimeline(
   const dated: { readonly sortKey: string; readonly entry: GraphTimelineEntry }[] = [];
 
   (entity.statusHistory ?? []).forEach((record, index) => {
-    const basis = record.basisClaimIds.length > 0 ? record.basisClaimIds.join(', ') : 'none recorded';
+    const basis =
+      record.basisClaimIds.length > 0 ? record.basisClaimIds.join(', ') : 'none recorded';
     dated.push({
       sortKey: record.validFrom ?? '',
       entry: {
@@ -243,7 +260,9 @@ export function buildGraphTimeline(
         id: `${entity.id}_rel_${rel.id}_${rel.type}`,
         time: rel.timespan.validFrom,
         title: humanizeToken(rel.type),
-        body: rel.timespan.validTo ? `${sentence} Through ${rel.timespan.validTo}.` : `${sentence} Ongoing connection.`,
+        body: rel.timespan.validTo
+          ? `${sentence} Through ${rel.timespan.validTo}.`
+          : `${sentence} Ongoing connection.`,
       },
     });
   }

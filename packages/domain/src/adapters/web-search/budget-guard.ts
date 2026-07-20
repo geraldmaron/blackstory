@@ -47,7 +47,11 @@ export type BudgetGuardPolicyRow = {
 
 /** Structurally identical call shape to `evaluateDailyBudget` (see module doc comment). */
 export type DailyBudgetEvaluator = (
-  input: { readonly category: string; readonly consumed: number; readonly billingAlertPercent?: number },
+  input: {
+    readonly category: string;
+    readonly consumed: number;
+    readonly billingAlertPercent?: number;
+  },
   budgets?: Readonly<Record<string, BudgetGuardPolicyRow>>,
 ) => DailyBudgetDecision;
 
@@ -89,7 +93,8 @@ export function evaluateWebSearchQueryBudget(input: {
     return { allowed: false, reason: 'campaign_query_budget_exceeded' };
   }
 
-  const monthlySpendUsdCents = input.state.queriesIssuedThisMonth * input.policy.costPerQueryUsdCents;
+  const monthlySpendUsdCents =
+    input.state.queriesIssuedThisMonth * input.policy.costPerQueryUsdCents;
   const monthlyBudgetPolicy: Record<string, BudgetGuardPolicyRow> = {
     [input.policy.monthlyBudgetCategory]: {
       category: input.policy.monthlyBudgetCategory,
@@ -107,7 +112,11 @@ export function evaluateWebSearchQueryBudget(input: {
   );
 
   if (!monthlyBudget.allowed) {
-    return { allowed: false, reason: monthlyBudget.reason ?? 'monthly_spend_cap_exceeded', monthlyBudget };
+    return {
+      allowed: false,
+      reason: monthlyBudget.reason ?? 'monthly_spend_cap_exceeded',
+      monthlyBudget,
+    };
   }
   return { allowed: true, monthlyBudget };
 }

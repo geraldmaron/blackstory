@@ -32,7 +32,9 @@ export async function assertNoAutomaticRollouts() {
   try {
     const runbook = await readFile(path.join(ROOT, RUNBOOK_PATH), 'utf8');
     if (!DISABLED_PHRASE_RE.test(runbook)) {
-      errors.push(`${RUNBOOK_PATH}: must document that automatic App Hosting rollouts are disabled`);
+      errors.push(
+        `${RUNBOOK_PATH}: must document that automatic App Hosting rollouts are disabled`,
+      );
     }
   } catch {
     errors.push(`missing release runbook: ${RUNBOOK_PATH}`);

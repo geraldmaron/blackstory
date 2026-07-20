@@ -6,10 +6,7 @@ import React from 'react';
 import Link from 'next/link';
 import { cx } from '@repo/ui';
 import { SourceFootnote } from '../data/SourceFootnote';
-import {
-  selectDidYouKnowFacts,
-  type HistoryDidYouKnowFact,
-} from '../../lib/history/did-you-know';
+import { selectDidYouKnowFacts, type HistoryDidYouKnowFact } from '../../lib/history/did-you-know';
 
 void React;
 
@@ -31,10 +28,7 @@ export function HistoryDidYouKnow({
   if (selected.length === 0) return null;
 
   return (
-    <section
-      className={cx('ds-history-dyk', className)}
-      aria-labelledby="history-dyk-heading"
-    >
+    <section className={cx('ds-history-dyk', className)} aria-labelledby="history-dyk-heading">
       <h3 className="ds-section__kicker" id="history-dyk-heading">
         From the archive
       </h3>

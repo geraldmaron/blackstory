@@ -61,9 +61,7 @@ export type BuildStoryResearchBriefInput = {
 };
 
 /** Pure builder; freezes arrays. */
-export function buildStoryResearchBrief(
-  input: BuildStoryResearchBriefInput,
-): StoryResearchBrief {
+export function buildStoryResearchBrief(input: BuildStoryResearchBriefInput): StoryResearchBrief {
   return Object.freeze({
     thesisQuestion: input.thesisQuestion.trim(),
     conventionalStartLine: input.conventionalStartLine.trim(),

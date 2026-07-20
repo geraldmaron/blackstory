@@ -31,11 +31,7 @@ export function buildLocateExploreHref(resolution: LocateResolution): string {
   const near = placeLabelFromResolution(resolution);
   const { lat, lng, exactCoordinatesRetained } = resolution.precision;
 
-  if (
-    exactCoordinatesRetained &&
-    finiteCoordinate(lat) &&
-    finiteCoordinate(lng)
-  ) {
+  if (exactCoordinatesRetained && finiteCoordinate(lat) && finiteCoordinate(lng)) {
     return buildExploreHref({
       filters: DEFAULT_EXPLORE_FILTERS,
       ...defaultExploreOverlayState(),

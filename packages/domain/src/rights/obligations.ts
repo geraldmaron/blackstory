@@ -116,7 +116,10 @@ export function getSourceObligationsOrThrow(
 }
 
 /** Fail-closed gate for callers that only need a boolean-or-throw check. */
-export function assertAdapterHasObligations(store: ObligationsRegistryStore, adapterId: string): void {
+export function assertAdapterHasObligations(
+  store: ObligationsRegistryStore,
+  adapterId: string,
+): void {
   getSourceObligationsOrThrow(store, adapterId);
 }
 

@@ -27,7 +27,10 @@ export {
 
 export { filterLargeExportPayload, type ExportFilterResult } from './shared/export-filter.js';
 
-export { buildIsolatedFederalRunResult, type BuildIsolatedRunInput } from './shared/failure-isolation.js';
+export {
+  buildIsolatedFederalRunResult,
+  type BuildIsolatedRunInput,
+} from './shared/failure-isolation.js';
 
 export {
   FEDERAL_ADAPTER_KILL_SWITCH_PREFIX,
@@ -66,6 +69,8 @@ export const FEDERAL_ADAPTER_DEFINITIONS: readonly FederalAdapterDefinition[] = 
   schoolHistoryAdapterDefinition,
 ] as const;
 
-export function getFederalAdapterDefinition(adapterId: string): FederalAdapterDefinition | undefined {
+export function getFederalAdapterDefinition(
+  adapterId: string,
+): FederalAdapterDefinition | undefined {
   return FEDERAL_ADAPTER_DEFINITIONS.find((definition) => definition.adapterId === adapterId);
 }

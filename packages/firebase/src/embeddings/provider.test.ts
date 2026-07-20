@@ -1,4 +1,3 @@
-
 /**
  * Tests for the embedding provider abstraction: retry/backoff and the deterministic mock
  * provider used by every other test in this instead of live network calls.
@@ -36,7 +35,10 @@ test('createDeterministicMockEmbeddingProvider preserves input order for batches
   });
 });
 
-function flakyProvider(failuresBeforeSuccess: number): { provider: EmbeddingProvider; calls: number[] } {
+function flakyProvider(failuresBeforeSuccess: number): {
+  provider: EmbeddingProvider;
+  calls: number[];
+} {
   const calls: number[] = [];
   let attempt = 0;
   return {
@@ -85,7 +87,8 @@ test('createRetryingEmbeddingProvider throws EmbeddingProviderError after exhaus
 
 test('createRetryingEmbeddingProvider rejects a non-positive maxAttempts', () => {
   assert.throws(
-    () => createRetryingEmbeddingProvider({ model: 'm', embed: async () => [] }, { maxAttempts: 0 }),
+    () =>
+      createRetryingEmbeddingProvider({ model: 'm', embed: async () => [] }, { maxAttempts: 0 }),
     EmbeddingProviderError,
   );
 });

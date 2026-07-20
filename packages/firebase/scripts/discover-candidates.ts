@@ -238,9 +238,10 @@ async function getJson(url: string, attempts = 5): Promise<unknown> {
       lastError = err;
       if (!retryable || attempt >= attempts) throw err;
       const retryAfter = Number(response.headers.get('retry-after'));
-      const backoffMs = Number.isFinite(retryAfter) && retryAfter > 0
-        ? retryAfter * 1000
-        : Math.min(60_000, 1_000 * 2 ** (attempt - 1));
+      const backoffMs =
+        Number.isFinite(retryAfter) && retryAfter > 0
+          ? retryAfter * 1000
+          : Math.min(60_000, 1_000 * 2 ** (attempt - 1));
       await sleep(backoffMs);
     } catch (error) {
       lastError = error;
@@ -269,7 +270,9 @@ async function searchWikipedia(query: string, limit: number): Promise<readonly S
 function loadCatalog(): CatalogEntry[] {
   const out: CatalogEntry[] = [];
   if (!existsSync(CATALOG_DIR)) return out;
-  for (const file of readdirSync(CATALOG_DIR).filter((f) => f.endsWith('.json')).sort()) {
+  for (const file of readdirSync(CATALOG_DIR)
+    .filter((f) => f.endsWith('.json'))
+    .sort()) {
     const entries = JSON.parse(readFileSync(join(CATALOG_DIR, file), 'utf8')) as Array<
       Record<string, unknown>
     >;
@@ -327,11 +330,7 @@ function looksLikeClassDefinition(description: string): boolean {
 }
 
 /** Drop Wikidata disambiguation / category / metaclass / media / demonym pages. */
-function isNonEntityPage(
-  title: string,
-  label: string,
-  description: string | undefined,
-): boolean {
+function isNonEntityPage(title: string, label: string, description: string | undefined): boolean {
   const t = title.toLowerCase();
   const l = label.toLowerCase();
   const d = (description ?? '').toLowerCase();
@@ -448,9 +447,7 @@ async function main(): Promise<void> {
   let skippedFilter = 0;
   let skippedCatalog = 0;
   let queryFailures = 0;
-  const queryConcurrency = arg('concurrency')
-    ? Math.max(1, Number(arg('concurrency')))
-    : 2;
+  const queryConcurrency = arg('concurrency') ? Math.max(1, Number(arg('concurrency'))) : 2;
 
   type QueryOutcome = {
     readonly query: string;
@@ -508,9 +505,7 @@ async function main(): Promise<void> {
     const { query, hits, resolved, entities } = outcome;
     searchHits += hits.length;
 
-    const resolvedByTitle = new Map(
-      resolved.map((r) => [normalizeTitleKey(r.title), r] as const),
-    );
+    const resolvedByTitle = new Map(resolved.map((r) => [normalizeTitleKey(r.title), r] as const));
 
     for (const hit of hits) {
       const titleKey = normalizeTitleKey(hit.title);

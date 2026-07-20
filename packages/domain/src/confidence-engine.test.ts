@@ -78,9 +78,7 @@ test('recalculation audits source, evidence, contradiction, and policy changes',
 
   const sourceChanged = recalculateConfidence({
     claimClass: 'standard',
-    evidenceLinks: [
-      evidence('a', 'root_a', { sourceClassification: 'primary_archival' }),
-    ],
+    evidenceLinks: [evidence('a', 'root_a', { sourceClassification: 'primary_archival' })],
     calculatedAt: FIXED_NOW,
     policy: POLICY,
     previous: initial,
@@ -186,7 +184,10 @@ test('calibration export is stable, versioned, and carries audit metadata', () =
   });
 
   assert.equal(dataset.schemaVersion, 'confidence-calibration-dataset.v1');
-  assert.deepEqual(dataset.rows.map((row) => row.claimId), ['claim_a', 'claim_b']);
+  assert.deepEqual(
+    dataset.rows.map((row) => row.claimId),
+    ['claim_a', 'claim_b'],
+  );
   assert.equal(dataset.rows[0]?.engineVersion, 'confidence-engine.v1');
   assert.equal(dataset.rows[0]?.componentVersions.threshold, 'constitution-policy.v1');
   assert.match(dataset.rows[0]?.inputFingerprints.evidence ?? '', /^sha256:[a-f0-9]{64}$/);

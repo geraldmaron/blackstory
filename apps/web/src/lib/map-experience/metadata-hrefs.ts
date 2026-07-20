@@ -10,11 +10,7 @@
  */
 import { findUsStateByPostalCode } from '@repo/domain/map/geography';
 import { DEFAULT_EXPLORE_FILTERS } from './filters';
-import {
-  buildExploreHref,
-  defaultExploreOverlayState,
-  type ExploreViewState,
-} from './url-state';
+import { buildExploreHref, defaultExploreOverlayState, type ExploreViewState } from './url-state';
 
 const ACCEPTED_CLAIMS_HASH = 'accepted-claims';
 
@@ -114,9 +110,10 @@ export function entityEvidenceHref(entityHref: string): string {
  * - one bucket → { label, href: exploreHrefForEra(bucket) }
  * - many → { label: `${first} – ${last}`, href: exploreHrefForEra(first) }
  */
-export function eraFactLink(
-  eraBuckets: readonly string[],
-): { readonly label: string; readonly href?: string } {
+export function eraFactLink(eraBuckets: readonly string[]): {
+  readonly label: string;
+  readonly href?: string;
+} {
   const buckets = eraBuckets.map((bucket) => bucket.trim()).filter((bucket) => bucket.length > 0);
   if (buckets.length === 0) {
     return { label: 'Undated' };

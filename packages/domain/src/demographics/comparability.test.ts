@@ -30,7 +30,11 @@ test('every band documents notes without embedding numeric claims', () => {
     assert.ok(band.decades.length > 0);
     assert.ok(band.raceCategoryLabel.length > 0);
     assert.ok(band.notes.length > 20);
-    assert.doesNotMatch(band.notes, /\b\d{1,3}(,\d{3})+\b/, `${band.band}: no population counts in notes`);
+    assert.doesNotMatch(
+      band.notes,
+      /\b\d{1,3}(,\d{3})+\b/,
+      `${band.band}: no population counts in notes`,
+    );
   }
 });
 

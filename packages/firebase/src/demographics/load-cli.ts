@@ -1,4 +1,3 @@
-
 /**
  * Idempotent load/refresh CLI for the `censusCountyDecades` collection (the related workstream).
  *

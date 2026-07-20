@@ -1,12 +1,12 @@
 :root {
   --blackstory-ebonyInk: #111111;
-  --blackstory-archivePaper: #F7F3EE;
-  --blackstory-sand: #E7D9C3;
-  --blackstory-bronze: #B87333;
-  --blackstory-mahogany: #7A2E22;
-  --blackstory-copperPin: #D47A42;
-  --blackstory-font-display: "Sora", sans-serif;
-  --blackstory-font-ui: "Inter", sans-serif;
-  --blackstory-font-editorial: "Source Serif 4", serif;
-  --blackstory-font-mono: "IBM Plex Mono", monospace;
+  --blackstory-archivePaper: #f7f3ee;
+  --blackstory-sand: #e7d9c3;
+  --blackstory-bronze: #b87333;
+  --blackstory-mahogany: #7a2e22;
+  --blackstory-copperPin: #d47a42;
+  --blackstory-font-display: 'Sora', sans-serif;
+  --blackstory-font-ui: 'Inter', sans-serif;
+  --blackstory-font-editorial: 'Source Serif 4', serif;
+  --blackstory-font-mono: 'IBM Plex Mono', monospace;
 }

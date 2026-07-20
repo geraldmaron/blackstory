@@ -6,20 +6,12 @@
 export const STORY_REVIEW_BULK_LIMIT = 50;
 
 export type StoryReviewStatusFilter =
-  | 'pending'
-  | 'approved'
-  | 'rejected'
-  | 'needs_evidence'
-  | 'all';
+  'pending' | 'approved' | 'rejected' | 'needs_evidence' | 'all';
 
 export type StoryPacketDecisionFilter = 'all' | 'recommend' | 'needs_evidence' | 'reject';
 
 export type StoryReviewSortKey =
-  | 'createdAt'
-  | 'title'
-  | 'packetDecision'
-  | 'issueCount'
-  | 'reviewStatus';
+  'createdAt' | 'title' | 'packetDecision' | 'issueCount' | 'reviewStatus';
 
 export type StoryReviewSortDirection = 'asc' | 'desc';
 
@@ -32,7 +24,11 @@ export type StoryReviewQueueItem = {
   readonly validationIssueCount: number;
   readonly review: { readonly decision: string } | null;
   readonly packet: {
-    readonly draft: { readonly dek?: string; readonly placeLabel?: string; readonly eraLabel?: string };
+    readonly draft: {
+      readonly dek?: string;
+      readonly placeLabel?: string;
+      readonly eraLabel?: string;
+    };
     readonly rationale?: string;
     readonly topicTitle?: string;
   };

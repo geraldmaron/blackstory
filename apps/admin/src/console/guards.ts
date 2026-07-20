@@ -54,10 +54,7 @@ export class ConsoleActionError extends Error {
   }
 }
 
-export function assertNoActiveProjectionWrite(
-  endpoint: string,
-  destination: string,
-): void {
+export function assertNoActiveProjectionWrite(endpoint: string, destination: string): void {
   const normalizedEndpoint = endpoint.toLowerCase();
   if (
     destination === 'active-public-projection' ||
@@ -102,7 +99,10 @@ export async function authorizeConsoleAction(
 }
 
 function rollbackToken(actionId: string, itemIds: readonly string[]): string {
-  const fingerprint = itemIds.join('|').split('').reduce((sum, value) => sum + value.charCodeAt(0), 0);
+  const fingerprint = itemIds
+    .join('|')
+    .split('')
+    .reduce((sum, value) => sum + value.charCodeAt(0), 0);
   return `rollback:${actionId}:${itemIds.length}:${fingerprint.toString(36)}`;
 }
 
@@ -116,10 +116,7 @@ export function previewBulkAction(
     throw new ConsoleActionError('BULK_EMPTY', 'Bulk previews require at least one item');
   }
   if (itemIds.length > limit) {
-    throw new ConsoleActionError(
-      'BULK_LIMIT_EXCEEDED',
-      `Bulk action limit is ${limit} items`,
-    );
+    throw new ConsoleActionError('BULK_LIMIT_EXCEEDED', `Bulk action limit is ${limit} items`);
   }
   if (new Set(itemIds).size !== itemIds.length) {
     throw new ConsoleActionError(

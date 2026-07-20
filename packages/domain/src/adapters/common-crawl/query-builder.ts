@@ -23,7 +23,10 @@ function escapeRegExp(text: string): string {
  */
 export function buildCommonCrawlFilterPattern(pack: QueryPack): string | undefined {
   const safeTerms = toPublicSafeTerms(pack.terms).filter(
-    (term) => term.termClass === 'positive' || term.termClass === 'alias' || term.termClass === 'geographic',
+    (term) =>
+      term.termClass === 'positive' ||
+      term.termClass === 'alias' ||
+      term.termClass === 'geographic',
   );
   if (safeTerms.length === 0) {
     return undefined;
@@ -33,7 +36,10 @@ export function buildCommonCrawlFilterPattern(pack: QueryPack): string | undefin
 }
 
 /** Throws unless `seed.geographicLabel` matches a `geographic`-classed term in `pack`. */
-export function assertSeedGeographicLabelMatchesPack(seed: CommonCrawlSeedTarget, pack: QueryPack): void {
+export function assertSeedGeographicLabelMatchesPack(
+  seed: CommonCrawlSeedTarget,
+  pack: QueryPack,
+): void {
   const geoTerms = pack.terms
     .filter((term) => term.termClass === 'geographic')
     .map((term) => term.text.trim().toLowerCase());
@@ -46,7 +52,10 @@ export function assertSeedGeographicLabelMatchesPack(seed: CommonCrawlSeedTarget
 }
 
 /** Defense-in-depth: throws if the built filter pattern contains offensive term text verbatim. */
-export function assertFilterPatternHasNoResearchOnlyOffensiveTerms(filterPattern: string, pack: QueryPack): void {
+export function assertFilterPatternHasNoResearchOnlyOffensiveTerms(
+  filterPattern: string,
+  pack: QueryPack,
+): void {
   const lower = filterPattern.toLowerCase();
   for (const term of pack.terms) {
     if (term.researchOnlyOffensive !== true) continue;
@@ -68,7 +77,9 @@ export type BuildCommonCrawlQueriesInput = {
 };
 
 /** Builds one CDX query per (crawlId x seedTarget) pair, all sharing the pack-derived filter pattern. */
-export function buildCommonCrawlQueries(input: BuildCommonCrawlQueriesInput): readonly CommonCrawlQuery[] {
+export function buildCommonCrawlQueries(
+  input: BuildCommonCrawlQueriesInput,
+): readonly CommonCrawlQuery[] {
   if (input.seedTargets.length === 0) {
     throw new Error('At least one Common Crawl seed target is required');
   }

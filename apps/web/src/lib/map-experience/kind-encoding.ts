@@ -58,7 +58,9 @@ export const MAP_KIND_ENCODING: Readonly<Record<MapKind, KindEncodingEntry>> = {
   other: { shade: DIGNITY_PALETTE.kindOther, glyph: 'circle', label: 'Other' },
 };
 
-export const MAP_SEMANTIC_TONE_ENCODING: Readonly<Record<MapSemanticTone, SemanticToneEncodingEntry>> = {
+export const MAP_SEMANTIC_TONE_ENCODING: Readonly<
+  Record<MapSemanticTone, SemanticToneEncodingEntry>
+> = {
   massacre: { shade: DIGNITY_PALETTE.kindMassacre, label: 'Massacre / atrocity' },
   plantation: { shade: DIGNITY_PALETTE.kindPlantation, label: 'Plantation' },
   epicenter: { shade: DIGNITY_PALETTE.kindEpicenter, label: 'Black epicenter' },
@@ -106,7 +108,9 @@ export function mapToneFromTopics(topicTags: readonly string[]): MapSemanticTone
   const normalized = topicTags.map((tag) => tag.toLowerCase());
   const blob = normalized.join(' | ');
   if (
-    normalized.some((tag) => tag.includes('massacre') || tag.includes('pogrom') || tag.includes('atrocity')) ||
+    normalized.some(
+      (tag) => tag.includes('massacre') || tag.includes('pogrom') || tag.includes('atrocity'),
+    ) ||
     blob.includes('race massacre')
   ) {
     return 'massacre';
@@ -128,8 +132,9 @@ export function mapToneFromTopics(topicTags: readonly string[]): MapSemanticTone
   return undefined;
 }
 
-export const KIND_ENCODING_ENTRIES: ReadonlyArray<readonly [kind: MapKind, entry: KindEncodingEntry]> =
-  KNOWN_KINDS.map((kind) => [kind, MAP_KIND_ENCODING[kind]] as const);
+export const KIND_ENCODING_ENTRIES: ReadonlyArray<
+  readonly [kind: MapKind, entry: KindEncodingEntry]
+> = KNOWN_KINDS.map((kind) => [kind, MAP_KIND_ENCODING[kind]] as const);
 
 export const SEMANTIC_TONE_ENTRIES: ReadonlyArray<
   readonly [tone: MapSemanticTone, entry: SemanticToneEncodingEntry]

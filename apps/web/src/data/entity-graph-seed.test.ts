@@ -18,7 +18,11 @@ import {
 
 test('relatedEntriesFor derives both directions of an adjacency from the raw typed edges', () => {
   const schoolRelated = relatedEntriesFor('ent_dunbar_school_001');
-  assert.equal(schoolRelated.length, 2, 'school is located_at church (outgoing) and occurred_at target of the landmark listing (incoming)');
+  assert.equal(
+    schoolRelated.length,
+    2,
+    'school is located_at church (outgoing) and occurred_at target of the landmark listing (incoming)',
+  );
   const toPlace = schoolRelated.find((entry) => entry.id === 'ent_15th_st_church_001');
   assert.ok(toPlace);
   assert.equal(toPlace.type, 'located_at');
@@ -73,12 +77,18 @@ test('buildGraphTimeline merges status-history and dated related-edge entries in
       id: 'ent_dunbar_school_001',
       displayName: 'Paul Laurence Dunbar High School',
       ...(history !== undefined ? { statusHistory: history } : {}),
-      related: relatedEntriesFor('ent_dunbar_school_001').filter((entry) => entry.timespan?.validFrom),
+      related: relatedEntriesFor('ent_dunbar_school_001').filter(
+        (entry) => entry.timespan?.validFrom,
+      ),
     },
     entitiesById,
   );
   const times = timeline.map((entry) => entry.time);
-  assert.deepEqual(times, [...times].sort((a, b) => a.localeCompare(b)), 'timeline must be chronologically sorted');
+  assert.deepEqual(
+    times,
+    [...times].sort((a, b) => a.localeCompare(b)),
+    'timeline must be chronologically sorted',
+  );
   assert.ok(timeline.some((entry) => entry.time === '1870'));
   assert.ok(timeline.some((entry) => entry.time === '1891'));
 });

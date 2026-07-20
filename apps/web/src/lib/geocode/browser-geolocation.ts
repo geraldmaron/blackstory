@@ -17,11 +17,7 @@ export type BrowserCoordinates = {
 };
 
 export type GeolocationDenialReason =
-  | 'unsupported'
-  | 'permission_denied'
-  | 'position_unavailable'
-  | 'timeout'
-  | 'unknown_error';
+  'unsupported' | 'permission_denied' | 'position_unavailable' | 'timeout' | 'unknown_error';
 
 export type GeolocationOutcome =
   | { readonly ok: true; readonly position: BrowserCoordinates }
@@ -30,7 +26,9 @@ export type GeolocationOutcome =
 /** Structural subset of the DOM `Geolocation` interface this module actually calls.  */
 export type GeolocationApi = {
   getCurrentPosition(
-    onSuccess: (position: { readonly coords: { readonly latitude: number; readonly longitude: number } }) => void,
+    onSuccess: (position: {
+      readonly coords: { readonly latitude: number; readonly longitude: number };
+    }) => void,
     onError: (error: { readonly code: number; readonly message: string }) => void,
     options?: PositionOptionsLike,
   ): void;

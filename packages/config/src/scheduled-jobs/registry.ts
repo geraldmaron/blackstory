@@ -1,4 +1,3 @@
-
 /**
  * In-memory scheduled-job registry: register/get/list/require, mirroring the adapter
  * registry (packages/domain/src/adapters/registry.ts) and query-pack registry
@@ -82,9 +81,7 @@ export function assertScheduledJobDefinitionValid(definition: ScheduledJobDefini
     );
   }
   if (!(definition.consecutiveMissedRunThreshold >= 1)) {
-    throw new Error(
-      `Scheduled job "${definition.id}" consecutiveMissedRunThreshold must be >= 1`,
-    );
+    throw new Error(`Scheduled job "${definition.id}" consecutiveMissedRunThreshold must be >= 1`);
   }
 }
 

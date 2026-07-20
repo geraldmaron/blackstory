@@ -1,4 +1,3 @@
-
 /**
  * Builds job-run audit events and outbox messages using the exact DomainAuditEvent
  * DomainOutboxMessage shapes (packages/domain/src/audit/index.ts) that
@@ -19,7 +18,12 @@
  * correlation id, so it is traceable back to the exact run that made it (.
  */
 import { auditCategoryFor } from '@repo/domain';
-import type { AuditActor, AuditEventAction, DomainAuditEvent, DomainOutboxMessage } from '@repo/domain';
+import type {
+  AuditActor,
+  AuditEventAction,
+  DomainAuditEvent,
+  DomainOutboxMessage,
+} from '@repo/domain';
 
 export type BuildJobRunAuditEventInput = {
   readonly jobRunId: string;
@@ -64,7 +68,9 @@ export type BuildJobRunOutboxMessageInput = {
   readonly maxAttempts?: number;
 };
 
-export function buildJobRunOutboxMessage(input: BuildJobRunOutboxMessageInput): DomainOutboxMessage {
+export function buildJobRunOutboxMessage(
+  input: BuildJobRunOutboxMessageInput,
+): DomainOutboxMessage {
   return {
     id: input.outboxMessageId,
     eventId: input.auditEvent.id,

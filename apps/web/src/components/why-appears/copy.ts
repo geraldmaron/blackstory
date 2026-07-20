@@ -11,7 +11,8 @@ export const WHY_THIS_APPEARS_COPY = {
   heading: 'Why this appears',
   auditableTag: 'Cited from external sources \u2014 not a ranking score',
   basisHeading: 'Inclusion evidence',
-  noBasisRecorded: 'No inclusion evidence with linked citations has been recorded for this record yet.',
+  noBasisRecorded:
+    'No inclusion evidence with linked citations has been recorded for this record yet.',
   noLinkedCitations: 'No linked source citations for this inclusion reason yet.',
   missingPerspectiveHeading: 'Coverage note',
   citationsHeading: 'Sources',

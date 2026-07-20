@@ -122,9 +122,7 @@ function mapClaims(claims: PublicProjectionInput['claims']): PublicEntityView['c
   }));
 }
 
-function mapGeoAnchor(
-  location: PublicProjectionInput['location'],
-): PublicEntityView['geoAnchor'] {
+function mapGeoAnchor(location: PublicProjectionInput['location']): PublicEntityView['geoAnchor'] {
   if (!location) return undefined;
   return {
     lat: location.lat,
@@ -185,8 +183,10 @@ export function resolveJurisdictionLabel(projection: PublicProjectionInput): str
 export function mapProjectionToPublicEntityView(
   projection: PublicProjectionInput,
 ): PublicEntityView {
-  const summary = projection.summary && projection.summary.trim().length > 0 ? projection.summary : '';
-  const topicTags = projection.topicTags && projection.topicTags.length > 0 ? projection.topicTags : [];
+  const summary =
+    projection.summary && projection.summary.trim().length > 0 ? projection.summary : '';
+  const topicTags =
+    projection.topicTags && projection.topicTags.length > 0 ? projection.topicTags : [];
   const primaryImage = mapPrimaryImage(projection.primaryImage);
   const geoAnchor = mapGeoAnchor(projection.location);
   const claims = mapClaims(projection.claims);

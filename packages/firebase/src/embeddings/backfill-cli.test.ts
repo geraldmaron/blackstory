@@ -1,11 +1,14 @@
-
 /**
  * Tests for the budget-aware backfill runner, fully in-memory no Firestore, no
  * network access. Exercises: pagination, skip-unchanged-hash, --force, item cap, cost budget.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { runBackfill, type CanonicalEntitySource, type EntityEmbeddingInput } from './backfill-cli.js';
+import {
+  runBackfill,
+  type CanonicalEntitySource,
+  type EntityEmbeddingInput,
+} from './backfill-cli.js';
 import { createDeterministicMockEmbeddingProvider } from './provider.js';
 import { createInMemoryVectorIndexStore } from './vector-store.js';
 import { buildEntityEmbeddingText } from './text.js';
@@ -76,7 +79,9 @@ test('runBackfill skips entities whose source text hash is unchanged unless --fo
 });
 
 test('runBackfill stops once maxItems is reached, across page boundaries', async () => {
-  const inputs = Array.from({ length: 5 }, (_, index) => entityInput(`e${index}`, `Entity ${index}`));
+  const inputs = Array.from({ length: 5 }, (_, index) =>
+    entityInput(`e${index}`, `Entity ${index}`),
+  );
   const summary = await runBackfill({
     source: makeSource(inputs, 2),
     provider: createDeterministicMockEmbeddingProvider(),
@@ -88,7 +93,9 @@ test('runBackfill stops once maxItems is reached, across page boundaries', async
 });
 
 test('runBackfill stops for budget before exceeding maxEstimatedCostUsd', async () => {
-  const inputs = Array.from({ length: 10 }, (_, index) => entityInput(`e${index}`, `Entity number ${index} with extra text`));
+  const inputs = Array.from({ length: 10 }, (_, index) =>
+    entityInput(`e${index}`, `Entity number ${index} with extra text`),
+  );
   const summary = await runBackfill({
     source: makeSource(inputs),
     provider: createDeterministicMockEmbeddingProvider(),

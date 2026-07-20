@@ -3,10 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import {
-  createPublicRateLimitGuard,
-  resolvePublicEndpointClass,
-} from './rate-limits.ts';
+import { createPublicRateLimitGuard, resolvePublicEndpointClass } from './rate-limits.ts';
 
 test('resolvePublicEndpointClass maps read paths to endpoint classes', () => {
   assert.equal(resolvePublicEndpointClass('/v1/search', 'GET'), 'search');

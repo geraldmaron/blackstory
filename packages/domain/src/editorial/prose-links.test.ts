@@ -26,7 +26,10 @@ test('stripProseEntityLinks keeps labels as visible text', () => {
 });
 
 test('serializeProseEntityLink round-trips markup', () => {
-  assert.equal(serializeProseEntityLink({ entityId: 'entity-a', label: 'Alpha' }), '[[entity-a|Alpha]]');
+  assert.equal(
+    serializeProseEntityLink({ entityId: 'entity-a', label: 'Alpha' }),
+    '[[entity-a|Alpha]]',
+  );
   assert.equal(serializeProseEntityLink({ entityId: 'entity-a' }), '[[entity-a]]');
 });
 
@@ -54,7 +57,9 @@ test('linkifyProseAgainstCatalog prefers longest names and skips protected marku
 
 test('linkifyProseAgainstCatalog skips subject ids and uses case-sensitive boundaries', () => {
   const catalog = [{ id: 'entity-a', displayName: 'Alpha' }];
-  const skipped = linkifyProseAgainstCatalog('Alpha alpha', catalog, { skipEntityIds: ['entity-a'] });
+  const skipped = linkifyProseAgainstCatalog('Alpha alpha', catalog, {
+    skipEntityIds: ['entity-a'],
+  });
   assert.equal(skipped.text, 'Alpha alpha');
   assert.equal(skipped.links.length, 0);
 

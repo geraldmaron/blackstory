@@ -1,4 +1,3 @@
-
 /**
  * Cost and resource exhaustion controls.
  *
@@ -15,12 +14,7 @@ export const RESOURCE_CONTROL_POLICY_VERSION = '1.0.0' as const;
 /** Workload priority optional research stops before public serving under pressure. */
 export type WorkloadTier = 'public_serving' | 'essential_ops' | 'optional_research';
 
-export type ServiceId =
-  | 'web'
-  | 'api-public'
-  | 'api-submissions'
-  | 'api-internal'
-  | 'admin';
+export type ServiceId = 'web' | 'api-public' | 'api-submissions' | 'api-internal' | 'admin';
 
 export type WorkerJobId =
   | 'research-discovery'
@@ -37,12 +31,7 @@ export type CloudTasksQueueId =
   | 'outbox-dispatch'
   | 'research-campaign';
 
-export type BudgetCategory =
-  | 'geocoder'
-  | 'model'
-  | 'ocr'
-  | 'source_fetch'
-  | 'research_campaign';
+export type BudgetCategory = 'geocoder' | 'model' | 'ocr' | 'source_fetch' | 'research_campaign';
 
 export type CircuitBreakerState = 'closed' | 'open' | 'half_open';
 
@@ -170,9 +159,7 @@ export type ResourceControlDecisionDenied = {
 };
 
 export type ResourceControlDecision =
-  | ResourceControlDecisionAllowed
-  | ResourceControlDecisionDenied;
-
+  ResourceControlDecisionAllowed | ResourceControlDecisionDenied;
 
 /**
  * App Hosting caps mirrored here for cross-service validation only.
@@ -529,10 +516,7 @@ function deny(
 }
 
 /** Capped exponential backoff for queue/job retries (attempt is 1-based). */
-export function computeRetryDelay(
-  attempt: number,
-  policy: RetryPolicy = DEFAULT_RETRY,
-): number {
+export function computeRetryDelay(attempt: number, policy: RetryPolicy = DEFAULT_RETRY): number {
   if (attempt < 1) {
     return policy.initialBackoffMs;
   }
@@ -680,7 +664,12 @@ export function evaluateDailyBudget(
 ): BudgetEvaluation {
   const policy = budgets[input.category];
   if (!policy) {
-    return { ...deny('unknown_policy', 60_000), percentUsed: 100, softShutdownTriggered: true, hardStopTriggered: true };
+    return {
+      ...deny('unknown_policy', 60_000),
+      percentUsed: 100,
+      softShutdownTriggered: true,
+      hardStopTriggered: true,
+    };
   }
 
   const percentUsed = Math.min(100, Math.floor((input.consumed / policy.dailyCap) * 100));
@@ -694,7 +683,7 @@ export function evaluateDailyBudget(
   const automatedResponse = hardStopTriggered
     ? policy.automatedResponse
     : softShutdownTriggered
-      ? billingResponse?.automatedResponse ?? policy.automatedResponse
+      ? (billingResponse?.automatedResponse ?? policy.automatedResponse)
       : undefined;
 
   if (hardStopTriggered) {
@@ -738,10 +727,7 @@ export function evaluateSoftShutdown(
   }
 
   const researchSoft = budgets.research_campaign.softShutdownAtPercent;
-  if (
-    input.budgetPercentUsed >= researchSoft &&
-    policy.shutdownOrder.includes(input.tier)
-  ) {
+  if (input.budgetPercentUsed >= researchSoft && policy.shutdownOrder.includes(input.tier)) {
     if (input.tier === 'optional_research') {
       return deny('soft_shutdown_active', 1_800_000, 'pause_research');
     }
@@ -792,7 +778,12 @@ export function evaluateCircuitBreaker(
     if (snapshot.halfOpenAttempts >= config.halfOpenMaxAttempts) {
       return {
         decision: deny('circuit_breaker_open', config.recoveryTimeoutMs),
-        next: { state: 'open', failureCount: snapshot.failureCount, openedAtMs: nowMs, halfOpenAttempts: 0 },
+        next: {
+          state: 'open',
+          failureCount: snapshot.failureCount,
+          openedAtMs: nowMs,
+          halfOpenAttempts: 0,
+        },
       };
     }
     return { decision: allow(), next: snapshot };
@@ -801,7 +792,12 @@ export function evaluateCircuitBreaker(
   if (snapshot.failureCount >= config.failureThreshold) {
     return {
       decision: deny('circuit_breaker_open', config.recoveryTimeoutMs),
-      next: { state: 'open', failureCount: snapshot.failureCount, openedAtMs: nowMs, halfOpenAttempts: 0 },
+      next: {
+        state: 'open',
+        failureCount: snapshot.failureCount,
+        openedAtMs: nowMs,
+        halfOpenAttempts: 0,
+      },
     };
   }
 
@@ -846,7 +842,6 @@ export type AbusiveTrafficSimulationResult = {
   readonly maxObservedInstances: Record<ServiceId, number>;
 };
 
-
 /**
  * Simulates abusive traffic pattern: spike scaling, queue flood, budget burn.
  * Validates traffic cannot scale without bound and optional research stops first.
@@ -875,7 +870,9 @@ export function simulateAbusiveTrafficPattern(
     });
     maxObservedInstances[step.serviceId] = Math.max(
       maxObservedInstances[step.serviceId],
-      scaling.allowed ? step.requestedInstances : DEFAULT_SERVICE_SCALING_LIMITS[step.serviceId].maxInstances,
+      scaling.allowed
+        ? step.requestedInstances
+        : DEFAULT_SERVICE_SCALING_LIMITS[step.serviceId].maxInstances,
     );
     if (!scaling.allowed) {
       scalingDenials += 1;

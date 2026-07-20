@@ -56,7 +56,11 @@ export function buildRedditPointerCascadeTargets(
     targets.push({ kind: 'graylist', path: paths.graylistPath, id: pointer.id });
   }
   if (paths.researchCaseAttachmentPath) {
-    targets.push({ kind: 'research_case_attachment', path: paths.researchCaseAttachmentPath, id: pointer.id });
+    targets.push({
+      kind: 'research_case_attachment',
+      path: paths.researchCaseAttachmentPath,
+      id: pointer.id,
+    });
   }
   return targets;
 }
@@ -112,7 +116,9 @@ export type SweepRedditPointerLivenessInput = {
 export async function sweepRedditPointerLiveness(
   input: SweepRedditPointerLivenessInput,
 ): Promise<readonly RedditDeletionSyncSweepOutcome[]> {
-  const reason = input.reason ?? `Reddit deletion-sync liveness sweep (<= ${REDDIT_DELETION_SYNC_MAX_HOURS}h contractual window)`;
+  const reason =
+    input.reason ??
+    `Reddit deletion-sync liveness sweep (<= ${REDDIT_DELETION_SYNC_MAX_HOURS}h contractual window)`;
   const outcomes: RedditDeletionSyncSweepOutcome[] = [];
   for (const pointer of input.pointers) {
     const livenessResult = await input.checkLiveness(pointer);

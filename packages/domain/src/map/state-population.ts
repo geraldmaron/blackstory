@@ -57,10 +57,14 @@ export type StatePopulationIndexFile = {
   >;
 };
 
-function parseRecord(raw: {
-  readonly total?: number;
-  readonly black?: number;
-} | undefined): StatePopulationRecord | undefined {
+function parseRecord(
+  raw:
+    | {
+        readonly total?: number;
+        readonly black?: number;
+      }
+    | undefined,
+): StatePopulationRecord | undefined {
   if (!raw || typeof raw.total !== 'number' || typeof raw.black !== 'number') return undefined;
   if (!Number.isFinite(raw.total) || !Number.isFinite(raw.black)) return undefined;
   if (raw.total < 0 || raw.black < 0) return undefined;
@@ -68,7 +72,9 @@ function parseRecord(raw: {
 }
 
 /** Normalize the committed static JSON (compact `total`/`black` keys) into the domain index. */
-export function parseStatePopulationIndexFile(payload: StatePopulationIndexFile): StatePopulationIndex {
+export function parseStatePopulationIndexFile(
+  payload: StatePopulationIndexFile,
+): StatePopulationIndex {
   const vintages = [...(payload.vintages ?? [])].filter((v) => /^\d{4}$/.test(v));
   const states: Record<string, Partial<Record<string, StatePopulationRecord>>> = {};
   for (const [fips, byDecade] of Object.entries(payload.states ?? {})) {

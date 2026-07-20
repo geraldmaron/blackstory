@@ -29,7 +29,12 @@ export function isFactStatus(value: string): value is FactStatus {
 }
 
 /** Statuses that are part of the public projection at all (pre-publication statuses never are). */
-export const PUBLISHABLE_FACT_STATUSES = ['published', 'corrected', 'superseded', 'deprecated'] as const;
+export const PUBLISHABLE_FACT_STATUSES = [
+  'published',
+  'corrected',
+  'superseded',
+  'deprecated',
+] as const;
 export type PublishableFactStatus = (typeof PUBLISHABLE_FACT_STATUSES)[number];
 
 export function isPublishableFactStatus(value: FactStatus): value is PublishableFactStatus {
@@ -85,6 +90,8 @@ export function assertFactResolutionBannerValid(banner: FactResolutionBanner): v
     throw new Error(`A "${banner.status}" fact requires a non-empty banner reason.`);
   }
   if (banner.status === 'superseded' && !banner.supersededByFactId) {
-    throw new Error('A "superseded" fact requires a supersededByFactId pointing at its replacement.');
+    throw new Error(
+      'A "superseded" fact requires a supersededByFactId pointing at its replacement.',
+    );
   }
 }

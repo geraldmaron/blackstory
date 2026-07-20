@@ -1,4 +1,3 @@
-
 /**
  * Dataset-acquisition provenance — the bridge between external dataset ingestion and the
  * EXISTING evidence-provenance harness (`evidenceSources` → `sourceItems` →
@@ -15,10 +14,7 @@
  * acquisition a no-op upsert, matching the loaders' idempotency discipline.
  */
 import type { Firestore } from 'firebase-admin/firestore';
-import {
-  rightsPolicyForVerdict,
-  type ExternalDataSource,
-} from '@repo/domain';
+import { rightsPolicyForVerdict, type ExternalDataSource } from '@repo/domain';
 import { FIRESTORE_ROOT } from '../firestore/paths.js';
 import { setPreservingCreatedAt } from './batch-upsert.js';
 import {
@@ -105,7 +101,10 @@ export async function recordDatasetAcquisition(
   // Preserve createdAt on the upsertable docs; event/capture docs are append-once by id.
   await setPreservingCreatedAt(firestore, FIRESTORE_ROOT.evidenceSources, evidenceSource);
   await setPreservingCreatedAt(firestore, FIRESTORE_ROOT.sourceItems, sourceItem);
-  await firestore.collection(FIRESTORE_ROOT.retrievalEvents).doc(retrievalEventId).set(retrievalEvent);
+  await firestore
+    .collection(FIRESTORE_ROOT.retrievalEvents)
+    .doc(retrievalEventId)
+    .set(retrievalEvent);
 
   if (!input.snapshotStorageObject) {
     return { evidenceSourceId, sourceItemId, retrievalEventId };

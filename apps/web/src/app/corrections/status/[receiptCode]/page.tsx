@@ -30,8 +30,8 @@ export default async function CorrectionStatusPage({ params }: PageProps) {
       <main className="ds-container ds-page" id="main">
         <h1 className="ds-page__title">Correction status</h1>
         <Notice tone="error" title="Receipt not found">
-          We could not find a correction with that receipt code. Check the code and try again — there
-          is no way to browse other submissions.
+          We could not find a correction with that receipt code. Check the code and try again —
+          there is no way to browse other submissions.
         </Notice>
         <EmptyState
           title="Need to submit a correction?"

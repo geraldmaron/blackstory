@@ -80,9 +80,7 @@
       "displayName": "Harriet Tubman Underground Railroad National Monument",
       "summary": "National Historical Park of the United States in Maryland",
       "wikidataId": "Q14691942",
-      "aliases": [
-        "HATU"
-      ],
+      "aliases": ["HATU"],
       "sourceQuery": "Underground Railroad sites",
       "canonicalUrl": "https://en.wikipedia.org/wiki/Harriet_Tubman_Underground_Railroad_National_Historical_Park",
       "lat": 38.4483,
@@ -108,9 +106,7 @@
       "displayName": "The Underground Rail Road",
       "summary": "1872 book by William Still",
       "wikidataId": "Q7771382",
-      "aliases": [
-        "The Underground Railroad"
-      ],
+      "aliases": ["The Underground Railroad"],
       "sourceQuery": "Underground Railroad sites",
       "canonicalUrl": "https://en.wikipedia.org/wiki/The_Underground_Railroad_(Still)",
       "discoveredAt": "2026-07-19T02:35:01.603Z"
@@ -121,11 +117,7 @@
       "displayName": "Black Press",
       "summary": "Canadian publisher of newspapers",
       "wikidataId": "Q4921504",
-      "aliases": [
-        "Black Press Group",
-        "Black Press Media",
-        "Black Press Group Ltd"
-      ],
+      "aliases": ["Black Press Group", "Black Press Media", "Black Press Group Ltd"],
       "sourceQuery": "Black owned newspapers",
       "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Press",
       "discoveredAt": "2026-07-19T02:35:02.226Z"
@@ -155,9 +147,7 @@
       "displayName": "Seattle Medium",
       "summary": "Black newspaper serving Seattle",
       "wikidataId": "Q7442135",
-      "aliases": [
-        "The Medium"
-      ],
+      "aliases": ["The Medium"],
       "sourceQuery": "Black owned newspapers",
       "canonicalUrl": "https://en.wikipedia.org/wiki/Seattle_Medium",
       "discoveredAt": "2026-07-19T02:35:02.226Z"
@@ -168,10 +158,7 @@
       "displayName": "California African American Museum",
       "summary": "museum in Los Angeles, California",
       "wikidataId": "Q5020212",
-      "aliases": [
-        "CAAM",
-        "California Afro-American Museum"
-      ],
+      "aliases": ["CAAM", "California Afro-American Museum"],
       "sourceQuery": "African American museums",
       "canonicalUrl": "https://en.wikipedia.org/wiki/California_African_American_Museum",
       "lat": 34.0158,

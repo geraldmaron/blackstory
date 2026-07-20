@@ -55,7 +55,10 @@ test('slugifyFactStatement throws on input with no sluggable characters', () => 
 test('buildFactPath / buildFactRevisionPath / buildFactJsonPath produce canonical permalinks', () => {
   const id = asFactId('BB-F-000042');
   assert.equal(buildFactPath(id, 'rosa-parks-refused'), '/facts/rosa-parks-refused');
-  assert.equal(buildLegacyFactPath(id, 'rosa-parks-refused'), '/facts/BB-F-000042/rosa-parks-refused');
+  assert.equal(
+    buildLegacyFactPath(id, 'rosa-parks-refused'),
+    '/facts/BB-F-000042/rosa-parks-refused',
+  );
   assert.equal(buildFactRevisionPath(id, 3), '/facts/BB-F-000042/rev/3');
   assert.equal(buildFactJsonPath(id), '/facts/BB-F-000042.json');
 });
@@ -69,7 +72,10 @@ test('buildFactRevisionPath rejects non-positive revision numbers', () => {
 test('slugNeedsRedirect detects a stale slug and accepts a current one', () => {
   assert.equal(slugNeedsRedirect('old-slug', 'Rosa Parks refused to give up her seat'), true);
   assert.equal(
-    slugNeedsRedirect('rosa-parks-refused-to-give-up-her-seat', 'Rosa Parks refused to give up her seat'),
+    slugNeedsRedirect(
+      'rosa-parks-refused-to-give-up-her-seat',
+      'Rosa Parks refused to give up her seat',
+    ),
     false,
   );
 });

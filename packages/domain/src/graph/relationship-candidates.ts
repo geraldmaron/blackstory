@@ -89,7 +89,9 @@ function suggestedTypeForSignals(
   return 'related_to';
 }
 
-function primaryReason(reasons: ReadonlySet<RelationshipCandidateReason>): RelationshipCandidateReason {
+function primaryReason(
+  reasons: ReadonlySet<RelationshipCandidateReason>,
+): RelationshipCandidateReason {
   return [...reasons].sort(
     (a, b) => REASON_PRIORITY[a] - REASON_PRIORITY[b],
   )[0] as RelationshipCandidateReason;
@@ -188,10 +190,7 @@ export function proposeRelationshipCandidates(
 
       const mentionsA = mentionSets.get(entityA.id);
       const mentionsB = mentionSets.get(entityB.id);
-      if (
-        (mentionsA?.has(entityB.id) ?? false) ||
-        (mentionsB?.has(entityA.id) ?? false)
-      ) {
+      if ((mentionsA?.has(entityB.id) ?? false) || (mentionsB?.has(entityA.id) ?? false)) {
         reasons.add('mutual_mention');
       }
 

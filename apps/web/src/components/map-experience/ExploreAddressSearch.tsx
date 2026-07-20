@@ -145,11 +145,7 @@ export function ExploreAddressSearch({ onResolved, disabled = false }: ExploreAd
         </Button>
       </form>
 
-      <div
-        className="ds-explore-place__radius"
-        role="radiogroup"
-        aria-labelledby={radiusGroupId}
-      >
+      <div className="ds-explore-place__radius" role="radiogroup" aria-labelledby={radiusGroupId}>
         <p className="ds-explore-place__label" id={radiusGroupId}>
           Radius
         </p>

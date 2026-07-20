@@ -1,4 +1,3 @@
-
 /**
  * acceptance tests for independent, default-safe runtime kill switches.
  * Covers static read-only serving, queue retention, adapter isolation, and containment order.

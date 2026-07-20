@@ -1,4 +1,3 @@
-
 /**
  * Embedding pipeline + Firestore vector-search public surface.
  */
@@ -45,9 +44,17 @@ export {
 export type { EmbeddingProvider, RetryOptions, MockEmbeddingProviderOptions } from './provider.js';
 
 export { createGeminiEmbeddingProvider } from './gemini-provider.js';
-export type { GeminiEmbeddingProviderOptions, GeminiEmbedContentClient } from './gemini-provider.js';
+export type {
+  GeminiEmbeddingProviderOptions,
+  GeminiEmbedContentClient,
+} from './gemini-provider.js';
 
-export { embedEntity, embedEntitiesBatch, estimateEmbeddingCostUsd, sha256Hex } from './pipeline.js';
+export {
+  embedEntity,
+  embedEntitiesBatch,
+  estimateEmbeddingCostUsd,
+  sha256Hex,
+} from './pipeline.js';
 export type {
   EntityEmbeddingInput,
   EntityEmbeddingResult,

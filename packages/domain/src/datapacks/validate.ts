@@ -144,7 +144,10 @@ export function checkDataPackImportBudget(
 
   if (budget.maxRecordsPerResource !== undefined) {
     for (const resource of manifest.resources) {
-      if (resource.recordCount !== undefined && resource.recordCount > budget.maxRecordsPerResource) {
+      if (
+        resource.recordCount !== undefined &&
+        resource.recordCount > budget.maxRecordsPerResource
+      ) {
         return {
           ok: false,
           reason: 'budget_exceeded',

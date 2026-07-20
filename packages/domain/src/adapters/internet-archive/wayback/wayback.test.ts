@@ -36,7 +36,12 @@ function loadFixture<T>(name: string): T {
 }
 
 function jsonResponse(body: unknown, status = 200): SafeHttpResponse {
-  return { status, headers: { 'content-type': 'application/json' }, bodyText: JSON.stringify(body), finalUrl: '' };
+  return {
+    status,
+    headers: { 'content-type': 'application/json' },
+    bodyText: JSON.stringify(body),
+    finalUrl: '',
+  };
 }
 
 test('submitSpnCapture sends an authenticated POST and returns the job id', async () => {
@@ -56,7 +61,8 @@ test('submitSpnCapture sends an authenticated POST and returns the job id', asyn
 });
 
 test('submitSpnCapture requires non-empty credentials', async () => {
-  const client = async (): Promise<SafeHttpResponse> => jsonResponse(loadFixture('spn-submit-response.json'));
+  const client = async (): Promise<SafeHttpResponse> =>
+    jsonResponse(loadFixture('spn-submit-response.json'));
   await assert.rejects(
     () => submitSpnCapture(client, { accessKey: '', secretKey: '' }, 'https://example.org/x'),
     /credentials/,
@@ -67,7 +73,10 @@ test('parseSpnStatusResponse is defensive against malformed payloads', () => {
   assert.equal(parseSpnStatusResponse(null).status, 'error');
   assert.equal(parseSpnStatusResponse({ status: 'not-a-real-status' }).status, 'error');
   assert.equal(parseSpnStatusResponse(loadFixture('spn-status-success.json')).status, 'success');
-  assert.equal(parseSpnStatusResponse(loadFixture('spn-status-success.json')).timestamp, '20260717140512');
+  assert.equal(
+    parseSpnStatusResponse(loadFixture('spn-status-success.json')).timestamp,
+    '20260717140512',
+  );
 });
 
 test('pollSpnStatus polls through pending states and returns on success (injectable sleep, no real timers)', async () => {
@@ -97,7 +106,8 @@ test('pollSpnStatus polls through pending states and returns on success (injecta
 });
 
 test('pollSpnStatus times out (fails closed) rather than waiting forever', async () => {
-  const client = async (): Promise<SafeHttpResponse> => jsonResponse(loadFixture('spn-status-pending.json'));
+  const client = async (): Promise<SafeHttpResponse> =>
+    jsonResponse(loadFixture('spn-status-pending.json'));
   const result = await pollSpnStatus(client, 'spn2-job-stuck', {
     maxAttempts: 3,
     delayMs: 10,
@@ -126,7 +136,8 @@ test('captureUrlToEvidencePointer produces a -valid EvidencePointer end to end',
   const pointer = await captureUrlToEvidencePointer({
     client,
     credentials: CREDENTIALS,
-    targetUrl: 'https://www.piedmonthistoricalsociety.example.org/news/freedmens-bureau-correspondence',
+    targetUrl:
+      'https://www.piedmonthistoricalsociety.example.org/news/freedmens-bureau-correspondence',
     snippet: 'The Society digitized 214 Freedmen’s Bureau letters from 1866-1870.',
     adapterId: 'rss',
     now: FIXED_NOW,
@@ -137,7 +148,10 @@ test('captureUrlToEvidencePointer produces a -valid EvidencePointer end to end',
     pointer.waybackCaptureUrl,
     'https://web.archive.org/web/20260717140512/https://www.piedmonthistoricalsociety.example.org/news/freedmens-bureau-correspondence',
   );
-  assert.equal(pointer.sourceUrl, 'https://www.piedmonthistoricalsociety.example.org/news/freedmens-bureau-correspondence');
+  assert.equal(
+    pointer.sourceUrl,
+    'https://www.piedmonthistoricalsociety.example.org/news/freedmens-bureau-correspondence',
+  );
   assert.equal(pointer.waybackCapturedAt, '2026-07-17T14:05:12.000Z');
 });
 
@@ -192,7 +206,11 @@ test('ORDERING INVARIANT: requireCaptureBeforeReview only marks a candidate elig
   const result = await requireCaptureBeforeReview(candidate, candidate.canonicalUrl, capture);
   order.push('marked_eligible');
 
-  assert.deepEqual(order, ['capture_started:https://example.org/article', 'capture_finished', 'marked_eligible']);
+  assert.deepEqual(order, [
+    'capture_started:https://example.org/article',
+    'capture_finished',
+    'marked_eligible',
+  ]);
   assert.equal(result.reviewEligible, true);
   assertReviewEligible(result);
 });
@@ -202,14 +220,18 @@ test('ORDERING INVARIANT: a failed capture never produces a review-eligible cand
   const failingCapture = async (): Promise<never> => {
     throw new Error('capture failed');
   };
-  await assert.rejects(() => requireCaptureBeforeReview(candidate, candidate.canonicalUrl, failingCapture), /capture failed/);
+  await assert.rejects(
+    () => requireCaptureBeforeReview(candidate, candidate.canonicalUrl, failingCapture),
+    /capture failed/,
+  );
 });
 
 test('requireCaptureBeforeReview rejects a candidate with no canonical URL to capture', async () => {
   await assert.rejects(
-    () => requireCaptureBeforeReview({ id: 'x' }, '', async () => {
-      throw new Error('should not be called');
-    }),
+    () =>
+      requireCaptureBeforeReview({ id: 'x' }, '', async () => {
+        throw new Error('should not be called');
+      }),
     /no canonical URL/,
   );
 });
@@ -232,7 +254,10 @@ test('END TO END: every real RSS-normalized candidate gets a capture pointer bef
     classification: 'community_oral',
     adapterId: 'rss',
     stableIdScheme: 'rss-item',
-    policy: { snapshotMode: 'selective', rights: { defaultStatus: 'licensed', publicationPermissions: ['cite'], prohibitedUses: [] } },
+    policy: {
+      snapshotMode: 'selective',
+      rights: { defaultStatus: 'licensed', publicationPermissions: ['cite'], prohibitedUses: [] },
+    },
     adapterEnabled: true,
     createdAt: FIXED_NOW,
     updatedAt: FIXED_NOW,
@@ -260,9 +285,23 @@ test('END TO END: every real RSS-normalized candidate gets a capture pointer bef
     createdAt: FIXED_NOW,
     updatedAt: FIXED_NOW,
   };
-  const rssFixturePath = join(FIXTURES_DIR, '..', '..', '..', 'rss', 'fixtures', 'historical-society-feed.rss.xml');
+  const rssFixturePath = join(
+    FIXTURES_DIR,
+    '..',
+    '..',
+    '..',
+    'rss',
+    'fixtures',
+    'historical-society-feed.rss.xml',
+  );
   const xml = readFileSync(rssFixturePath, 'utf8');
-  const candidates = normalizeFeedXml({ feed, xml, registryEntry, runId: 'run_e2e', capturedAt: FIXED_NOW });
+  const candidates = normalizeFeedXml({
+    feed,
+    xml,
+    registryEntry,
+    runId: 'run_e2e',
+    capturedAt: FIXED_NOW,
+  });
   assert.equal(candidates.length, 2);
 
   let submitCount = 0;
@@ -301,7 +340,11 @@ test('requireCaptureForAllCandidates fails the whole batch closed if any single 
       return jsonResponse({ url: request.body, job_id: isFailing ? 'job-fail' : 'job-ok' });
     }
     const isFailing = request.url.includes('job-fail');
-    return jsonResponse(isFailing ? { status: 'error', message: 'blocked_by_robots' } : { status: 'success', timestamp: '20260717140512', original_url: 'x' });
+    return jsonResponse(
+      isFailing
+        ? { status: 'error', message: 'blocked_by_robots' }
+        : { status: 'success', timestamp: '20260717140512', original_url: 'x' },
+    );
   };
 
   await assert.rejects(

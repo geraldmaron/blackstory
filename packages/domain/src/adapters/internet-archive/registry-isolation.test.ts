@@ -25,7 +25,11 @@ import type { SourceAdapterContract } from '../types.js';
 
 const FIXED_NOW = '2026-07-17T20:00:00.000Z';
 
-function entryFor(contract: SourceAdapterContract, adapterId: string, registryState: SourceRegistryEntry['registryState']): SourceRegistryEntry {
+function entryFor(
+  contract: SourceAdapterContract,
+  adapterId: string,
+  registryState: SourceRegistryEntry['registryState'],
+): SourceRegistryEntry {
   return {
     id: `reg_${adapterId}`,
     contract,
@@ -115,6 +119,8 @@ for (const [adapterId, contract] of CONTRACTS) {
       () => assertAdapterMayRun(approved, { id: `adapter:${adapterId}`, enabled: true }),
       /disabled and cannot create candidates/,
     );
-    assert.doesNotThrow(() => assertAdapterMayRun(approved, { id: `adapter:${adapterId}`, enabled: false }));
+    assert.doesNotThrow(() =>
+      assertAdapterMayRun(approved, { id: `adapter:${adapterId}`, enabled: false }),
+    );
   });
 }

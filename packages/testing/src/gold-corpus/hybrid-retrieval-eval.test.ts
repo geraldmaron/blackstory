@@ -1,4 +1,3 @@
-
 /**
  * Tests for hybrid retrieval eval harness (precision/recall/MRR gates).
  */
@@ -44,17 +43,13 @@ test('runHybridRetrievalEval computes precision recall and MRR', async () => {
 });
 
 test('eval fails when metrics fall below thresholds', async () => {
-  const result = await runHybridRetrievalEval(
-    MINI_QUERY_SET,
-    () => ['miss', 'miss', 'miss'],
-    {
-      thresholds: {
-        minimumPrecisionAt5: 0.99,
-        minimumRecallAt5: 0.99,
-        minimumMeanReciprocalRank: 0.99,
-      },
+  const result = await runHybridRetrievalEval(MINI_QUERY_SET, () => ['miss', 'miss', 'miss'], {
+    thresholds: {
+      minimumPrecisionAt5: 0.99,
+      minimumRecallAt5: 0.99,
+      minimumMeanReciprocalRank: 0.99,
     },
-  );
+  });
   assert.equal(result.passed, false);
   assert.ok(result.failures.length >= 1);
 });

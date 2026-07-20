@@ -164,10 +164,10 @@ test('parseLaneKillSwitches maps query params', () => {
     structuredEnabled: false,
     vectorEnabled: true,
   });
-  assert.deepEqual(
-    mergeLaneKillSwitches(parseLaneKillSwitches({ vector: '0' })),
-    { structuredEnabled: true, vectorEnabled: false },
-  );
+  assert.deepEqual(mergeLaneKillSwitches(parseLaneKillSwitches({ vector: '0' })), {
+    structuredEnabled: true,
+    vectorEnabled: false,
+  });
 });
 
 test('deterministic hybrid search returns identical order on repeat', async () => {

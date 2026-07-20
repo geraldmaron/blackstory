@@ -7,7 +7,7 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
 import { getDisclaimer } from '@repo/domain/disclaimers';
-import type { FactCounterClaim, FactRecord } from '@repo/domain/facts';
+import { asFactId, type FactCounterClaim, type FactRecord } from '@repo/domain/facts';
 import {
   CommonMisreadings,
   ConfidenceLabelWithNuance,
@@ -25,7 +25,7 @@ const SAMPLE_COUNTER_CLAIMS: readonly FactCounterClaim[] = [
 ];
 
 const MULTI_REVISION_FACT: Pick<FactRecord, 'id' | 'updatedAt' | 'revisions' | 'status'> = {
-  id: 'BB-F-000003',
+  id: asFactId('BB-F-000003'),
   updatedAt: '2026-07-16T15:00:00.000Z',
   status: 'corrected',
   revisions: [
@@ -83,7 +83,9 @@ test('ConfidenceLabelWithNuance includes grade definition link and optional note
 });
 
 test('RevisionUpdateChrome links multi-revision corrections to errata', () => {
-  const html = renderToStaticMarkup(createElement(RevisionUpdateChrome, { fact: MULTI_REVISION_FACT }));
+  const html = renderToStaticMarkup(
+    createElement(RevisionUpdateChrome, { fact: MULTI_REVISION_FACT }),
+  );
   assert.match(html, /see what changed/);
   assert.match(html, /href="\/errata"/);
   assert.match(html, /role="status"/);

@@ -13,7 +13,9 @@ import {
   DPLA_V2_STABLE_ID_SCHEME,
 } from './types.js';
 
-export function createDplaV2AdapterContract(overrides: Partial<SourceAdapterContract> = {}): SourceAdapterContract {
+export function createDplaV2AdapterContract(
+  overrides: Partial<SourceAdapterContract> = {},
+): SourceAdapterContract {
   return {
     adapterId: DPLA_V2_ADAPTER_ID,
     parserVersion: DPLA_V2_PARSER_VERSION,

@@ -4,16 +4,8 @@
     "kind": "place",
     "displayName": "Greenwood District",
     "summary": "By 1921 Greenwood Avenue anchored roughly 35 square blocks of Black-owned groceries, hotels, theaters, newspapers, and law and medical offices — the 'Black Wall Street' of the nation. Residents rebuilt after the district's 1921 destruction, and by the 1940s Greenwood again supported more than 200 Black-owned businesses.",
-    "eraBuckets": [
-      "1900s",
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "district",
-      "business",
-      "community"
-    ],
+    "eraBuckets": ["1900s", "1910s", "1920s"],
+    "topicTags": ["district", "business", "community"],
     "jurisdictionLabel": "Tulsa, Oklahoma",
     "locationPrecision": "neighborhood",
     "locationLabel": "Greenwood District, Tulsa",
@@ -46,11 +38,7 @@
         "direction": "incoming"
       }
     ],
-    "topicIds": [
-      "district",
-      "business",
-      "community"
-    ],
+    "topicIds": ["district", "business", "community"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -59,16 +47,8 @@
     "kind": "place",
     "displayName": "Sweet Auburn",
     "summary": "By the 1920s Auburn Avenue held Atlanta Life Insurance (founded 1905 by Alonzo Herndon), the 1912 Odd Fellows Building, Big Bethel AME, and the Atlanta Daily World (1928). Civic leader John Wesley Dobbs coined the name 'Sweet Auburn' for its prosperity; the district was designated a National Historic Landmark in 1976.",
-    "eraBuckets": [
-      "1900s",
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "district",
-      "business",
-      "community"
-    ],
+    "eraBuckets": ["1900s", "1910s", "1920s"],
+    "topicTags": ["district", "business", "community"],
     "jurisdictionLabel": "Atlanta, Georgia",
     "locationPrecision": "neighborhood",
     "locationLabel": "Auburn Avenue, Atlanta",
@@ -105,15 +85,8 @@
         "direction": "incoming"
       }
     ],
-    "topicIds": [
-      "district",
-      "business",
-      "community"
-    ],
-    "mentionedEntityIds": [
-      "ent_big_bethel_ame_001",
-      "ent_martin_luther_king_jr_001"
-    ],
+    "topicIds": ["district", "business", "community"],
+    "mentionedEntityIds": ["ent_big_bethel_ame_001", "ent_martin_luther_king_jr_001"],
     "keywords": []
   },
   {
@@ -121,16 +94,8 @@
     "kind": "place",
     "displayName": "Bronzeville",
     "summary": "Chicago's 'Black Metropolis' grew with the Great Migration after 1916, centered on State Street and South Parkway: the Chicago Defender, Overton Hygienic Building (1922-23), Chicago Bee Building, Supreme Life Insurance, and the 1913 Wabash Avenue YMCA. Chicago landmarked the Black Metropolis-Bronzeville District in 1998.",
-    "eraBuckets": [
-      "1910s",
-      "1920s",
-      "1930s"
-    ],
-    "topicTags": [
-      "district",
-      "business",
-      "community"
-    ],
+    "eraBuckets": ["1910s", "1920s", "1930s"],
+    "topicTags": ["district", "business", "community"],
     "jurisdictionLabel": "Chicago, Illinois",
     "locationPrecision": "neighborhood",
     "locationLabel": "Bronzeville, South Side Chicago",
@@ -162,11 +127,7 @@
         "direction": "incoming"
       }
     ],
-    "topicIds": [
-      "district",
-      "business",
-      "community"
-    ],
+    "topicIds": ["district", "business", "community"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -175,16 +136,8 @@
     "kind": "place",
     "displayName": "Harlem",
     "summary": "After Philip A. Payton Jr.'s Afro-American Realty Company began opening Harlem housing to Black tenants in 1904, the neighborhood went from roughly 10 percent African American in 1910 to about 70 percent by 1930, becoming the capital of the Harlem Renaissance and home to institutions like the Apollo Theater and the Schomburg collection.",
-    "eraBuckets": [
-      "1910s",
-      "1920s",
-      "1930s"
-    ],
-    "topicTags": [
-      "district",
-      "community",
-      "arts"
-    ],
+    "eraBuckets": ["1910s", "1920s", "1930s"],
+    "topicTags": ["district", "community", "arts"],
     "jurisdictionLabel": "New York, New York",
     "locationPrecision": "neighborhood",
     "locationLabel": "Central Harlem, Manhattan",
@@ -231,14 +184,8 @@
         "direction": "incoming"
       }
     ],
-    "topicIds": [
-      "district",
-      "community",
-      "arts"
-    ],
-    "mentionedEntityIds": [
-      "ent_apollo_theater_001"
-    ],
+    "topicIds": ["district", "community", "arts"],
+    "mentionedEntityIds": ["ent_apollo_theater_001"],
     "keywords": []
   },
   {
@@ -246,16 +193,8 @@
     "kind": "place",
     "displayName": "Beale Street",
     "summary": "From the 1890s Beale Street was the main street of Black Memphis: Robert Church Sr.'s Church Park and Auditorium opened in 1899, Ida B. Wells edited the Free Speech nearby, and W. C. Handy published 'The Memphis Blues' in 1912. The street's blues legacy earned it National Historic Landmark designation in 1966.",
-    "eraBuckets": [
-      "1890s",
-      "1900s",
-      "1910s"
-    ],
-    "topicTags": [
-      "district",
-      "business",
-      "music"
-    ],
+    "eraBuckets": ["1890s", "1900s", "1910s"],
+    "topicTags": ["district", "business", "music"],
     "jurisdictionLabel": "Memphis, Tennessee",
     "locationPrecision": "neighborhood",
     "locationLabel": "Beale Street, downtown Memphis",
@@ -280,15 +219,8 @@
       }
     ],
     "historicalContext": "Beale Street concentrated Black commerce, churches, fraternal halls, and entertainment in postbellum Memphis, and its saloons and theaters incubated the urban blues that W. C. Handy first set to paper — making it the model of the Black main street as cultural engine.",
-    "topicIds": [
-      "district",
-      "business",
-      "music"
-    ],
-    "mentionedEntityIds": [
-      "ent_fort_concho_nhl_001",
-      "ent_ida_b_wells_001"
-    ],
+    "topicIds": ["district", "business", "music"],
+    "mentionedEntityIds": ["ent_fort_concho_nhl_001", "ent_ida_b_wells_001"],
     "keywords": []
   },
   {
@@ -296,16 +228,8 @@
     "kind": "place",
     "displayName": "Greater U Street",
     "summary": "Between the 1890s and 1920s, U Street NW became Washington's 'Black Broadway' — the True Reformer Building (1903), Howard Theatre (1910), the nation's first full-service Black YMCA, and the Whitelaw Hotel among hundreds of Black-owned businesses. The historic district, designated in 1998, has a period of significance of 1862-1948.",
-    "eraBuckets": [
-      "1900s",
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "district",
-      "business",
-      "music"
-    ],
+    "eraBuckets": ["1900s", "1910s", "1920s"],
+    "topicTags": ["district", "business", "music"],
     "jurisdictionLabel": "Washington, District of Columbia",
     "locationPrecision": "neighborhood",
     "locationLabel": "U Street corridor NW, Washington",
@@ -337,15 +261,8 @@
         "direction": "outgoing"
       }
     ],
-    "topicIds": [
-      "district",
-      "business",
-      "music"
-    ],
-    "mentionedEntityIds": [
-      "ent_howard_theatre_dc_001",
-      "ent_howard_university_001"
-    ],
+    "topicIds": ["district", "business", "music"],
+    "mentionedEntityIds": ["ent_howard_theatre_dc_001", "ent_howard_university_001"],
     "keywords": []
   },
   {
@@ -353,16 +270,8 @@
     "kind": "place",
     "displayName": "Hayti",
     "summary": "Founded by freedpeople after the Civil War south of Durham's rail line, Hayti grew commercial spines along Fayetteville, Pettigrew, and Pine Streets, anchored by St. Joseph's AME Church (1891) and Lincoln Hospital (1901). Booker T. Washington praised the community, whose builders also created N.C. Mutual, the nation's largest Black-owned insurance company.",
-    "eraBuckets": [
-      "1890s",
-      "1900s",
-      "1910s"
-    ],
-    "topicTags": [
-      "district",
-      "business",
-      "community"
-    ],
+    "eraBuckets": ["1890s", "1900s", "1910s"],
+    "topicTags": ["district", "business", "community"],
     "jurisdictionLabel": "Durham, North Carolina",
     "locationPrecision": "neighborhood",
     "locationLabel": "Hayti, Durham",
@@ -387,14 +296,8 @@
       }
     ],
     "historicalContext": "Durham's tobacco economy and a cohort of Black entrepreneurs made Hayti and nearby Parrish Street a national exemplar of Black economic self-determination, studied and praised by both Booker T. Washington and W. E. B. Du Bois in the early 1900s.",
-    "topicIds": [
-      "district",
-      "business",
-      "community"
-    ],
-    "mentionedEntityIds": [
-      "ent_tuskegee_university_001"
-    ],
+    "topicIds": ["district", "business", "community"],
+    "mentionedEntityIds": ["ent_tuskegee_university_001"],
     "keywords": []
   },
   {
@@ -402,16 +305,8 @@
     "kind": "place",
     "displayName": "Jackson Ward",
     "summary": "By 1900 Richmond's Jackson Ward was the 'Cradle of Black Capitalism': the True Reformers' bank (chartered 1888) and Maggie L. Walker's St. Luke Penny Savings Bank (1903) — she was the first American woman to charter a bank — grew among fraternal orders and insurance firms. The 42-block district became a National Historic Landmark in 1978.",
-    "eraBuckets": [
-      "1880s",
-      "1890s",
-      "1900s"
-    ],
-    "topicTags": [
-      "district",
-      "business",
-      "community"
-    ],
+    "eraBuckets": ["1880s", "1890s", "1900s"],
+    "topicTags": ["district", "business", "community"],
     "jurisdictionLabel": "Richmond, Virginia",
     "locationPrecision": "neighborhood",
     "locationLabel": "Jackson Ward, Richmond",
@@ -436,14 +331,8 @@
       }
     ],
     "historicalContext": "Antebellum free Black Richmonders and postwar freedpeople built Jackson Ward's dense fabric of churches and fraternal societies into a financial center, proving Black-run banking and insurance viable a generation after emancipation.",
-    "topicIds": [
-      "district",
-      "business",
-      "community"
-    ],
-    "mentionedEntityIds": [
-      "ent_maggie_l_walker_001"
-    ],
+    "topicIds": ["district", "business", "community"],
+    "mentionedEntityIds": ["ent_maggie_l_walker_001"],
     "keywords": []
   },
   {
@@ -451,16 +340,8 @@
     "kind": "place",
     "displayName": "Tremé",
     "summary": "Subdivided in the 1790s from Claude Tremé's plantation just outside the French Quarter, Faubourg Tremé is among the oldest Black neighborhoods in the United States: free people of color owned property here before the Civil War, St. Augustine Catholic Church opened in 1841, and the gatherings at nearby Congo Square fed directly into the birth of jazz.",
-    "eraBuckets": [
-      "1840s",
-      "1890s",
-      "1900s"
-    ],
-    "topicTags": [
-      "district",
-      "community",
-      "music"
-    ],
+    "eraBuckets": ["1840s", "1890s", "1900s"],
+    "topicTags": ["district", "community", "music"],
     "jurisdictionLabel": "New Orleans, Louisiana",
     "locationPrecision": "neighborhood",
     "locationLabel": "Faubourg Tremé, New Orleans",
@@ -492,14 +373,8 @@
         "direction": "incoming"
       }
     ],
-    "topicIds": [
-      "district",
-      "community",
-      "music"
-    ],
-    "mentionedEntityIds": [
-      "ent_st_augustine_catholic_nola_001"
-    ],
+    "topicIds": ["district", "community", "music"],
+    "mentionedEntityIds": ["ent_st_augustine_catholic_nola_001"],
     "keywords": []
   },
   {
@@ -507,16 +382,8 @@
     "kind": "place",
     "displayName": "Farish Street district",
     "summary": "From the 1890s through the 1960s the 125-acre Farish Street district was the largest economically independent Black community in Mississippi — Black-owned banks, drugstores, funeral homes, churches, the Alamo Theatre, and record labels that cut Delta blues sides. The district was listed in the National Register of Historic Places in 1980.",
-    "eraBuckets": [
-      "1900s",
-      "1920s",
-      "1940s"
-    ],
-    "topicTags": [
-      "district",
-      "business",
-      "music"
-    ],
+    "eraBuckets": ["1900s", "1920s", "1940s"],
+    "topicTags": ["district", "business", "music"],
     "jurisdictionLabel": "Jackson, Mississippi",
     "locationPrecision": "neighborhood",
     "locationLabel": "Farish Street, Jackson",
@@ -541,11 +408,7 @@
       }
     ],
     "historicalContext": "In the capital of the most rigidly segregated Southern state, Farish Street's professionals, undertakers, publishers, and musicians built a parallel main street that sustained Black civic life — and sheltered civil rights organizing — for three generations.",
-    "topicIds": [
-      "district",
-      "business",
-      "music"
-    ],
+    "topicIds": ["district", "business", "music"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -554,15 +417,8 @@
     "kind": "place",
     "displayName": "Fourth Avenue District",
     "summary": "After 1900, Jim Crow ordinances pushed Birmingham's growing Black business community into the blocks along Third, Fourth, and Fifth Avenues North between 15th and 18th Streets. At its peak the district held more than 300 Black-owned businesses around the Colored Masonic Temple; it was listed in the National Register in 1982 and remains majority Black-owned.",
-    "eraBuckets": [
-      "1900s",
-      "1910s",
-      "1920s"
-    ],
-    "topicTags": [
-      "district",
-      "business"
-    ],
+    "eraBuckets": ["1900s", "1910s", "1920s"],
+    "topicTags": ["district", "business"],
     "jurisdictionLabel": "Birmingham, Alabama",
     "locationPrecision": "neighborhood",
     "locationLabel": "Fourth Avenue North, Birmingham",
@@ -594,13 +450,8 @@
         "direction": "incoming"
       }
     ],
-    "topicIds": [
-      "district",
-      "business"
-    ],
-    "mentionedEntityIds": [
-      "ent_duke_ellington_001"
-    ],
+    "topicIds": ["district", "business"],
+    "mentionedEntityIds": ["ent_duke_ellington_001"],
     "keywords": []
   },
   {
@@ -608,16 +459,8 @@
     "kind": "place",
     "displayName": "Deep Deuce",
     "summary": "By the 1920s the 300 block of Northeast Second Street — 'Deep Deuce' — was Oklahoma City's Black main street: barbershops, doctors' and lawyers' offices, a movie theater, and Roscoe Dunjee's Black Dispatch newspaper at 324 NE Second, with dance halls where Jimmy Rushing and Charlie Christian began national careers.",
-    "eraBuckets": [
-      "1910s",
-      "1920s",
-      "1930s"
-    ],
-    "topicTags": [
-      "district",
-      "business",
-      "music"
-    ],
+    "eraBuckets": ["1910s", "1920s", "1930s"],
+    "topicTags": ["district", "business", "music"],
     "jurisdictionLabel": "Oklahoma City, Oklahoma",
     "locationPrecision": "neighborhood",
     "locationLabel": "Northeast Second Street, Oklahoma City",
@@ -642,14 +485,8 @@
       }
     ],
     "historicalContext": "Segregated Oklahoma City compressed Black commerce and nightlife into a few blocks of Second Street, whose jazz scene — Jimmy Rushing, Charlie Christian, the Blue Devils orbit — projected a small district onto the national stage.",
-    "topicIds": [
-      "district",
-      "business",
-      "music"
-    ],
-    "mentionedEntityIds": [
-      "ent_black_dispatch_001"
-    ],
+    "topicIds": ["district", "business", "music"],
+    "mentionedEntityIds": ["ent_black_dispatch_001"],
     "keywords": []
   },
   {
@@ -657,15 +494,8 @@
     "kind": "place",
     "displayName": "Eatonville",
     "summary": "Incorporated on August 15, 1887, by 27 registered Black voters, Eatonville is the oldest incorporated African American municipality in the United States. The Hungerford Normal and Industrial School opened in 1897, and the town shaped the work of Zora Neale Hurston, who grew up here and set much of her writing in Eatonville.",
-    "eraBuckets": [
-      "1880s",
-      "1890s",
-      "1900s"
-    ],
-    "topicTags": [
-      "town",
-      "community"
-    ],
+    "eraBuckets": ["1880s", "1890s", "1900s"],
+    "topicTags": ["town", "community"],
     "jurisdictionLabel": "Eatonville, Florida",
     "locationPrecision": "city",
     "locationLabel": "Eatonville, Orange County, Florida",
@@ -690,13 +520,8 @@
       }
     ],
     "historicalContext": "Eatonville led the wave of self-governing all-Black towns founded after Reconstruction, proving Black municipal self-rule a generation before Oklahoma's town-building boom — and giving American literature the setting Zora Neale Hurston made famous.",
-    "topicIds": [
-      "town",
-      "community"
-    ],
-    "mentionedEntityIds": [
-      "ent_zora_neale_hurston_001"
-    ],
+    "topicIds": ["town", "community"],
+    "mentionedEntityIds": ["ent_zora_neale_hurston_001"],
     "keywords": []
   },
   {
@@ -704,16 +529,8 @@
     "kind": "place",
     "displayName": "Mound Bayou",
     "summary": "Founded July 12, 1887, in the Yazoo Delta by Isaiah T. Montgomery and Benjamin T. Green, formerly enslaved at Davis Bend, and incorporated in 1898, Mound Bayou became the nation's leading self-governing all-Black town, with private businesses, a high school, and two hospitals serving Black Mississippians across the Delta.",
-    "eraBuckets": [
-      "1880s",
-      "1890s",
-      "1900s"
-    ],
-    "topicTags": [
-      "town",
-      "community",
-      "business"
-    ],
+    "eraBuckets": ["1880s", "1890s", "1900s"],
+    "topicTags": ["town", "community", "business"],
     "jurisdictionLabel": "Mound Bayou, Mississippi",
     "locationPrecision": "city",
     "locationLabel": "Mound Bayou, Bolivar County, Mississippi",
@@ -738,11 +555,7 @@
       }
     ],
     "historicalContext": "Mound Bayou was the flagship of post-Reconstruction Black town-building in the Deep South — a cooperative, self-governed refuge whose farms, bank, and Taborian Hospital demonstrated Black institutional capacity inside the most repressive corner of the Jim Crow order.",
-    "topicIds": [
-      "town",
-      "community",
-      "business"
-    ],
+    "topicIds": ["town", "community", "business"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -751,14 +564,8 @@
     "kind": "place",
     "displayName": "Nicodemus",
     "summary": "Founded in 1877 by Black settlers from Kentucky on the high plains of Graham County, Nicodemus is the oldest surviving Black homesteader town west of the Mississippi. By 1880 it had a bank, two hotels, three churches, and general stores; five surviving buildings are preserved as Nicodemus National Historic Site, established in 1996.",
-    "eraBuckets": [
-      "1870s",
-      "1880s"
-    ],
-    "topicTags": [
-      "town",
-      "community"
-    ],
+    "eraBuckets": ["1870s", "1880s"],
+    "topicTags": ["town", "community"],
     "jurisdictionLabel": "Nicodemus, Kansas",
     "locationPrecision": "city",
     "locationLabel": "Nicodemus, Graham County, Kansas",
@@ -783,10 +590,7 @@
       }
     ],
     "historicalContext": "Nicodemus preceded and helped inspire the Exoduster migration of 1879-1881, when tens of thousands of Black Southerners moved to Kansas seeking land and self-government — the first great westward Black town-building movement after Reconstruction.",
-    "topicIds": [
-      "town",
-      "community"
-    ],
+    "topicIds": ["town", "community"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -795,16 +599,8 @@
     "kind": "place",
     "displayName": "Africatown",
     "summary": "Founded after 1865 at Magazine Point, north of Mobile, by West Africans trafficked aboard the schooner Clotilda in 1860, Africatown's founders bought land collectively, elected their own leaders, and established Union Missionary Baptist Church and a school while keeping African language and custom. The historic district was listed in the National Register in 2012.",
-    "eraBuckets": [
-      "1860s",
-      "1870s",
-      "1880s"
-    ],
-    "topicTags": [
-      "community",
-      "town",
-      "district"
-    ],
+    "eraBuckets": ["1860s", "1870s", "1880s"],
+    "topicTags": ["community", "town", "district"],
     "jurisdictionLabel": "Mobile, Alabama",
     "locationPrecision": "neighborhood",
     "locationLabel": "Africatown (Plateau and Magazine Point), Mobile",
@@ -829,11 +625,7 @@
       }
     ],
     "historicalContext": "Africatown is the only known U.S. community founded and governed by African-born survivors of the transatlantic slave trade — a direct transplant of West African social organization onto American soil, sustained through family lines that remain in the neighborhood today.",
-    "topicIds": [
-      "community",
-      "town",
-      "district"
-    ],
+    "topicIds": ["community", "town", "district"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -842,15 +634,8 @@
     "kind": "place",
     "displayName": "Weeksville",
     "summary": "Begun in 1838 when James Weeks, a free Black stevedore, purchased land in central Brooklyn, Weeksville grew into one of antebellum America's largest free Black communities, with churches, schools, an orphan asylum, and its own newspapers. The surviving Hunterfly Road Houses (c. 1840-1880) were designated New York City landmarks in 1970.",
-    "eraBuckets": [
-      "1830s",
-      "1840s",
-      "1850s"
-    ],
-    "topicTags": [
-      "community",
-      "town"
-    ],
+    "eraBuckets": ["1830s", "1840s", "1850s"],
+    "topicTags": ["community", "town"],
     "jurisdictionLabel": "Brooklyn, New York",
     "locationPrecision": "neighborhood",
     "locationLabel": "Weeksville, Crown Heights, Brooklyn",
@@ -875,10 +660,7 @@
       }
     ],
     "historicalContext": "Founded a decade after New York's 1827 abolition of slavery, Weeksville let Black men meet property qualifications for voting and built independent institutions — a rare, well-documented example of antebellum Northern Black community-building on its original site.",
-    "topicIds": [
-      "community",
-      "town"
-    ],
+    "topicIds": ["community", "town"],
     "mentionedEntityIds": [],
     "keywords": []
   },
@@ -887,14 +669,8 @@
     "kind": "place",
     "displayName": "Allensworth",
     "summary": "Founded in 1908 in Tulare County by Colonel Allen Allensworth — born enslaved, retired as the Army's highest-ranking Black chaplain — with William Payne and three partners, Allensworth was the only California town founded, financed, and governed by African Americans, with a school, library, church, hotel, and businesses on an 800-acre site.",
-    "eraBuckets": [
-      "1900s",
-      "1910s"
-    ],
-    "topicTags": [
-      "town",
-      "community"
-    ],
+    "eraBuckets": ["1900s", "1910s"],
+    "topicTags": ["town", "community"],
     "jurisdictionLabel": "Allensworth, California",
     "locationPrecision": "city",
     "locationLabel": "Allensworth, Tulare County, California",
@@ -919,10 +695,7 @@
       }
     ],
     "historicalContext": "Allensworth carried the all-Black town movement to the Far West, pairing Booker T. Washington-style self-help with California farmland — and though water shortfalls stalled its growth, the restored townsite now anchors the state's premier site of Black pioneer history.",
-    "topicIds": [
-      "town",
-      "community"
-    ],
+    "topicIds": ["town", "community"],
     "mentionedEntityIds": [],
     "keywords": []
   }

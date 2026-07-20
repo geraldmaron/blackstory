@@ -3,11 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import {
-  buildEntityCacheKey,
-  buildPublicPageCacheKey,
-  buildSearchCacheKey,
-} from './cache-keys';
+import { buildEntityCacheKey, buildPublicPageCacheKey, buildSearchCacheKey } from './cache-keys';
 import {
   buildNormalizedUrl,
   needsQueryNormalizationRedirect,

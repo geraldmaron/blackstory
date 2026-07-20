@@ -20,7 +20,9 @@ function requireEntity(id: string) {
 test('renders a linked entry for each graph-adjacency related record, with its relationship type', () => {
   const school = requireEntity('ent_dunbar_school_001');
   assert.ok((school.related?.length ?? 0) >= 2, 'the school fixture has 2 real graph edges');
-  const html = renderToStaticMarkup(createElement(EntityRelatedList, { entity: school, labelledBy: 'related-heading' }));
+  const html = renderToStaticMarkup(
+    createElement(EntityRelatedList, { entity: school, labelledBy: 'related-heading' }),
+  );
   assert.match(html, /Fifteenth Street Presbyterian Church/);
   assert.match(html, /D\.C\. Inventory of Historic Sites Listing/);
   assert.match(html, /href="\/entity\/ent_15th_st_church_001"/);

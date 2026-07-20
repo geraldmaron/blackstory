@@ -1,4 +1,3 @@
-
 /**
  * Auth custom-claim helpers for BlackStory staff roles.
  */

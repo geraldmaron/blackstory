@@ -1,4 +1,3 @@
-
 /**
  * Bridges scheduled-job health evaluations into existing operator-alert pattern
  * (packages/observability/src/security-alerts.ts + security-anomaly.ts) instead of inventing a
@@ -17,7 +16,11 @@
  * meaningful despite that. A follow-up could add dedicated SEC-JOB-* policies to
  * packages/observability if dedicated job-alert policies are needed.
  */
-import { DEFAULT_ALERT_POLICIES, buildAlertPayload, type SecurityAlertPayload } from '@repo/observability';
+import {
+  DEFAULT_ALERT_POLICIES,
+  buildAlertPayload,
+  type SecurityAlertPayload,
+} from '@repo/observability';
 import type { BudgetEvaluation, MissedRunEvaluation } from './health.js';
 import type { ScheduledJobDefinition } from './types.js';
 

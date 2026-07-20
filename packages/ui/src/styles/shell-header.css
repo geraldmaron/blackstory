@@ -8,7 +8,9 @@
   /* Fallback until ShellHeader measures the live bar (ResizeObserver). */
   --ds-island-height: 4.5rem;
   --ds-island-gap: var(--ds-space-3);
-  --ds-island-clearance: calc(var(--ds-island-offset) + var(--ds-island-height) + var(--ds-island-gap));
+  --ds-island-clearance: calc(
+    var(--ds-island-offset) + var(--ds-island-height) + var(--ds-island-gap)
+  );
 }
 
 html {
@@ -471,11 +473,13 @@ html {
 }
 
 /* Prefer dark-kit artwork over the ink bar regardless of reader [data-theme]. */
-.ds-shell:has([data-surface='map']) .ds-shell-wordmark__img--lockup.ds-shell-wordmark__img--theme-light {
+.ds-shell:has([data-surface='map'])
+  .ds-shell-wordmark__img--lockup.ds-shell-wordmark__img--theme-light {
   display: none;
 }
 
-.ds-shell:has([data-surface='map']) .ds-shell-wordmark__img--lockup.ds-shell-wordmark__img--theme-dark {
+.ds-shell:has([data-surface='map'])
+  .ds-shell-wordmark__img--lockup.ds-shell-wordmark__img--theme-dark {
   display: block;
 }
 
@@ -484,11 +488,13 @@ html {
     display: none !important;
   }
 
-  .ds-shell:has([data-surface='map']) .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-light {
+  .ds-shell:has([data-surface='map'])
+    .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-light {
     display: none;
   }
 
-  .ds-shell:has([data-surface='map']) .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-dark {
+  .ds-shell:has([data-surface='map'])
+    .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-dark {
     display: block;
   }
 }

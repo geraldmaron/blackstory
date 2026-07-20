@@ -1,4 +1,3 @@
-
 /**
  * Verifies CSV/markdown bulk-import parsing and the per-row batch runner.
  */
@@ -111,7 +110,9 @@ test('a bad row in a batch is rejected individually without blocking the rest of
 // exercise only the INTEGRATION surface: gating, idempotency, and routing through real intake.
 // ---------------------------------------------------------------------------
 
-function corpusVettingInput(overrides: Partial<RegisterCorpusVettingInput> = {}): RegisterCorpusVettingInput {
+function corpusVettingInput(
+  overrides: Partial<RegisterCorpusVettingInput> = {},
+): RegisterCorpusVettingInput {
   return {
     corpus: 'nrhp',
     corpusDisplayName: 'National Register of Historic Places',
@@ -138,7 +139,9 @@ function corpusVettingInput(overrides: Partial<RegisterCorpusVettingInput> = {})
   };
 }
 
-function corpusCandidate(overrides: Partial<CorpusBulkRecordCandidate> = {}): CorpusBulkRecordCandidate {
+function corpusCandidate(
+  overrides: Partial<CorpusBulkRecordCandidate> = {},
+): CorpusBulkRecordCandidate {
   return {
     corpusId: 'nrhp',
     batchId: 'batch-1',
@@ -220,7 +223,11 @@ test('prepareCorpusBulkImportBatch: a single-candidate batch is guaranteed spot-
 
   assert.equal(result.rows.length, 1);
   const [only] = result.rows;
-  assert.equal(only?.row.decision.spotCheckSelected, true, 'a 1-record batch always selects its only record');
+  assert.equal(
+    only?.row.decision.spotCheckSelected,
+    true,
+    'a 1-record batch always selects its only record',
+  );
   assert.equal(only?.row.decision.lane, 'standard_consensus');
   assert.ok(only?.row.decision.reasons.includes('spot_check_not_yet_sampled'));
   // Demoted to standard_consensus, but NOT dropped it still runs through real quarantine intake,
@@ -293,7 +300,11 @@ test('prepareCorpusBulkImportBatch: an already-imported sourceRecordId is skippe
   const newRow = result.rows.find((row) => row.row.candidate.sourceRecordId === 'nrhp-0002');
 
   assert.equal(duplicateRow?.row.outcome, 'skipped_duplicate');
-  assert.equal(duplicateRow?.intakeOutcome, undefined, 'a duplicate never reaches prepareOperatorIntake');
+  assert.equal(
+    duplicateRow?.intakeOutcome,
+    undefined,
+    'a duplicate never reaches prepareOperatorIntake',
+  );
   assert.equal(newRow?.intakeOutcome?.accepted, true);
   assert.equal(result.report.counts.skippedDuplicate, 1);
   assert.equal(result.report.counts.total, 2);
@@ -302,7 +313,7 @@ test('prepareCorpusBulkImportBatch: an already-imported sourceRecordId is skippe
   assert.equal(duplicateRow?.row.decision.spotCheckSelected, false);
 });
 
-test('prepareCorpusBulkImportBatch: a citation missing a required field demotes to standard_consensus, independently of (and stricter than) real intake\'s own basic URL check', () => {
+test("prepareCorpusBulkImportBatch: a citation missing a required field demotes to standard_consensus, independently of (and stricter than) real intake's own basic URL check", () => {
   const { registryStore, vettingStore } = vettedFixture();
   // A URL is present (satisfies real quarantine intake, which only requires a valid
   // HTTPS source URL) but `sourceName` is blank, which fails the stricter, corpus-vetting-layer

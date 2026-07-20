@@ -88,7 +88,9 @@ type ParserWithRawHtml = SafeParserResult & { readonly rawHtml: string };
  * `parseContentInSandbox`'s exact logic, not weakened; only `active_content`
  * is dropped, and only for this text-only consumption path.
  */
-export function checkMalwareSignatures(content: Uint8Array): readonly ('eicar_test_signature' | 'executable_magic')[] {
+export function checkMalwareSignatures(
+  content: Uint8Array,
+): readonly ('eicar_test_signature' | 'executable_magic')[] {
   const indicators: ('eicar_test_signature' | 'executable_magic')[] = [];
   const text = new TextDecoder('utf-8', { fatal: false }).decode(content);
   if (text.includes('EICAR-STANDARD-ANTIVIRUS-TEST-FILE')) indicators.push('eicar_test_signature');
@@ -102,7 +104,10 @@ export function checkMalwareSignatures(content: Uint8Array): readonly ('eicar_te
   return indicators;
 }
 
-export async function parseTextOnly(content: Uint8Array, contentType: string): Promise<ParserWithRawHtml> {
+export async function parseTextOnly(
+  content: Uint8Array,
+  contentType: string,
+): Promise<ParserWithRawHtml> {
   const rawHtml = new TextDecoder('utf-8', { fatal: false }).decode(content);
   const indicators = checkMalwareSignatures(content);
   const extractedText = contentType.includes('html')
@@ -120,7 +125,11 @@ export async function parseTextOnly(content: Uint8Array, contentType: string): P
   };
 }
 
-export type SafeFetchedPage = { readonly html: string; readonly text: string; readonly finalUrl: string };
+export type SafeFetchedPage = {
+  readonly html: string;
+  readonly text: string;
+  readonly finalUrl: string;
+};
 
 /**
  * Safely fetches `url` and returns its decoded text, or `undefined` if the
@@ -144,7 +153,9 @@ export async function safeFetchPage(
   const result: SafeFetchResult = await executeSafeFetch(
     url,
     { resolveHost, transport: performPinnedRequest, parser: parseTextOnly },
-    options.allowedContentTypes ? { limits: { allowedContentTypes: options.allowedContentTypes } } : {},
+    options.allowedContentTypes
+      ? { limits: { allowedContentTypes: options.allowedContentTypes } }
+      : {},
   );
   if (!result.ok || !result.parser.safe) return undefined;
   const parser = result.parser as ParserWithRawHtml;

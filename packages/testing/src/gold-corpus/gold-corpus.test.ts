@@ -1,4 +1,3 @@
-
 /**
  * Contract tests for corpus coverage, metric arithmetic, comparison reports, schemas,
  * command help, and the fail-closed automatic-publication gate.
@@ -12,29 +11,13 @@ import { assertCorpusEvaluationPassed } from './gate.ts';
 import { loadGoldCorpus, loadGoldPredictions } from './load.ts';
 import { calculateCorpusMetrics, evaluateCorpus } from './metrics.ts';
 import { generateBeforeAfterReport } from './report.ts';
-import type {
-  GoldCategory,
-  GoldCorpus,
-  GoldCorpusExample,
-  GoldPredictions,
-} from './types.ts';
+import type { GoldCategory, GoldCorpus, GoldCorpusExample, GoldPredictions } from './types.ts';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
-const fixtureDirectory = join(
-  repoRoot,
-  'packages',
-  'testing',
-  'src',
-  'gold-corpus',
-  'fixtures',
-);
+const fixtureDirectory = join(repoRoot, 'packages', 'testing', 'src', 'gold-corpus', 'fixtures');
 const corpus = loadGoldCorpus(join(fixtureDirectory, 'gold-corpus.v1.json'));
-const beforePredictions = loadGoldPredictions(
-  join(fixtureDirectory, 'predictions.before.v1.json'),
-);
-const afterPredictions = loadGoldPredictions(
-  join(fixtureDirectory, 'predictions.after.v1.json'),
-);
+const beforePredictions = loadGoldPredictions(join(fixtureDirectory, 'predictions.before.v1.json'));
+const afterPredictions = loadGoldPredictions(join(fixtureDirectory, 'predictions.after.v1.json'));
 const requiredCategories: readonly GoldCategory[] = [
   'included_school',
   'excluded_school',
@@ -103,9 +86,7 @@ function example(input: {
       citationEntailed: input.citationEntailed,
       confidenceOutcome: input.confidenceOutcome,
       entityResolution: input.expectedEntityId === undefined ? 'no_match' : 'match',
-      ...(input.expectedEntityId === undefined
-        ? {}
-        : { expectedEntityId: input.expectedEntityId }),
+      ...(input.expectedEntityId === undefined ? {} : { expectedEntityId: input.expectedEntityId }),
       rationale: 'Synthetic arithmetic fixture with an explicit consensus adjudication.',
     },
     context: {

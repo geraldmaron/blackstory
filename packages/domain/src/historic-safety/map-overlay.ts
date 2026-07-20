@@ -19,7 +19,7 @@ export const MAP_OVERLAY_DIGNITY_RULES = [
   'Rendering uses muted styling only \u2014 no red/danger shading or alert iconography.',
   'Every overlay links to a narrative off-ramp: the underlying evidence/layer-breakdown page, ' +
     'never a bare colored shape with no path to sourcing.',
-  'An overlay never renders finer geographic precision than its layer\'s documented tier ' +
+  "An overlay never renders finer geographic precision than its layer's documented tier " +
     '(see ../layer-record.ts assertAreaConditionRenderPrecisionValid).',
 ] as const;
 

@@ -88,11 +88,19 @@
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M8.5 14.5h12' stroke='%23f4efe5' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
-[data-theme='light'] .ds-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon {
+[data-theme='light']
+  .ds-map-stage
+  .maplibregl-ctrl
+  button.maplibregl-ctrl-zoom-in
+  .maplibregl-ctrl-icon {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M14.5 8.5v12M8.5 14.5h12' stroke='%230a0a0a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
-[data-theme='light'] .ds-map-stage .maplibregl-ctrl button.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
+[data-theme='light']
+  .ds-map-stage
+  .maplibregl-ctrl
+  button.maplibregl-ctrl-zoom-out
+  .maplibregl-ctrl-icon {
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M8.5 14.5h12' stroke='%230a0a0a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
@@ -612,7 +620,9 @@
   justify-content: flex-end;
 }
 
-.ds-explore-stage[data-instruments='open'] .ds-explore-stage__restore-dock .ds-explore-stage__panel-restore--results {
+.ds-explore-stage[data-instruments='open']
+  .ds-explore-stage__restore-dock
+  .ds-explore-stage__panel-restore--results {
   margin-left: 0;
 }
 

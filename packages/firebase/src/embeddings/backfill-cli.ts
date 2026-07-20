@@ -1,4 +1,3 @@
-
 /**
  * Budget-aware bulk (re)embedding CLI for entity corpora.
  *
@@ -68,7 +67,6 @@ export type BackfillSummary = {
   readonly stoppedForBudget: boolean;
   readonly stoppedForMaxItems: boolean;
 };
-
 
 /**
  * Iterates the entity source page by page, embedding entities whose source text changed since
@@ -167,7 +165,6 @@ export async function runBackfill(options: BackfillOptions): Promise<BackfillSum
 
 const CANONICAL_ENTITIES_PAGE_SIZE = 200;
 
-
 /**
  * Real Firestore-backed entity source. Location/state resolution is intentionally out of
  * scope here: entity documents don't carry a resolved state code directly, and joining the
@@ -181,7 +178,10 @@ export function createFirestoreCanonicalEntitySource(
 ): CanonicalEntitySource {
   return {
     async listPage(cursor) {
-      let query = firestore.collection('canonicalEntities').orderBy('__name__').limit(CANONICAL_ENTITIES_PAGE_SIZE);
+      let query = firestore
+        .collection('canonicalEntities')
+        .orderBy('__name__')
+        .limit(CANONICAL_ENTITIES_PAGE_SIZE);
       if (cursor) {
         query = query.startAfter(cursor);
       }
@@ -208,7 +208,9 @@ export function createFirestoreCanonicalEntitySource(
 }
 
 /** Reads existing embedding docs' sourceTextHash directly, one Firestore get per entity. */
-export function createFirestoreExistingHashLookup(firestore: Firestore): ExistingEmbeddingHashLookup {
+export function createFirestoreExistingHashLookup(
+  firestore: Firestore,
+): ExistingEmbeddingHashLookup {
   return {
     async get(entityId) {
       const snapshot = await firestore.collection('entityEmbeddings').doc(entityId).get();

@@ -6,10 +6,7 @@
 import memorialNamesJson from './memorial-names.json';
 import { hashString } from './hash';
 
-export type MemorialNameCategory =
-  | 'police_violence'
-  | 'racial_terror'
-  | 'state_execution';
+export type MemorialNameCategory = 'police_violence' | 'racial_terror' | 'state_execution';
 
 export type MemorialNameEntry = {
   readonly name: string;
@@ -45,8 +42,9 @@ export function isMemorialNamePlateEligible(entry: MemorialNameEntry): boolean {
 }
 
 /** Archive entries eligible for the map memorial field (full name present). */
-export const MEMORIAL_NAMES_PLATE: readonly MemorialNameEntry[] =
-  MEMORIAL_NAMES.filter(isMemorialNamePlateEligible);
+export const MEMORIAL_NAMES_PLATE: readonly MemorialNameEntry[] = MEMORIAL_NAMES.filter(
+  isMemorialNamePlateEligible,
+);
 
 /**
  * Seed-stable window into the memorial pool (no duplicates within the window).

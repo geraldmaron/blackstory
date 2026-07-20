@@ -1,4 +1,3 @@
-
 /**
  * Tests for the public serialization choke point: projections, search docs, exports,
  * and the fail-closed safety assertion. Proves stored exact addresses are

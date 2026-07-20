@@ -39,9 +39,7 @@ test('resolutionProfileFromCatalogLeaf maps aliases for soft match', () => {
     '2026-07-18T12:00:00.000Z',
   );
   assert.equal(profile.entity.id, 'ent_rosa');
-  assert.deepEqual(profile.entity.aliases, [
-    { value: 'Rosa Louise McCauley Parks', kind: 'aka' },
-  ]);
+  assert.deepEqual(profile.entity.aliases, [{ value: 'Rosa Louise McCauley Parks', kind: 'aka' }]);
 });
 
 test('loadDiscoveryCatalogProfiles pages until max and reports truncation', async () => {
@@ -58,9 +56,7 @@ test('loadDiscoveryCatalogProfiles pages until max and reports truncation', asyn
     async page(input) {
       calls += 1;
       const start =
-        input.cursor === undefined
-          ? 0
-          : rows.findIndex((row) => row.id === input.cursor) + 1;
+        input.cursor === undefined ? 0 : rows.findIndex((row) => row.id === input.cursor) + 1;
       const slice = rows.slice(start, start + input.limit);
       return { docs: slice };
     },

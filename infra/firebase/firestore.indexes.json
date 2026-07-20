@@ -109,9 +109,7 @@
     {
       "collectionGroup": "entityEmbeddings",
       "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "embedding", "vectorConfig": { "dimension": 768, "flat": {} } }
-      ]
+      "fields": [{ "fieldPath": "embedding", "vectorConfig": { "dimension": 768, "flat": {} } }]
     },
     {
       "collectionGroup": "entityEmbeddings",

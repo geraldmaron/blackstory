@@ -1,4 +1,3 @@
-
 /**
  * Security telemetry event vocabulary and typed envelopes.
  * Producers emit domain-specific signals; adapters normalize them into this contract
@@ -62,9 +61,7 @@ export type SecurityTelemetryEvent = {
 };
 
 /** Maps audit and security actions to telemetry kinds for integration. */
-export const AUDIT_ACTION_TO_SECURITY_KIND: Readonly<
-  Partial<Record<string, SecurityEventKind>>
-> = {
+export const AUDIT_ACTION_TO_SECURITY_KIND: Readonly<Partial<Record<string, SecurityEventKind>>> = {
   'authentication.failed': 'authentication.failure',
   'administrative.role_changed': 'administrator.role_changed',
   'publication.published': 'publication.activity',

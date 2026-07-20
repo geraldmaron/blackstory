@@ -1,4 +1,3 @@
-
 /**
  * Deterministic security-gate contracts for API authorization, browser request
  * defenses, staging DAST isolation, suppressions, and release provenance.

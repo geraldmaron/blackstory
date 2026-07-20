@@ -91,10 +91,25 @@ const outFixturePath = join(catalogDir, 'starter-seed-2026-07.json');
 const cacheDir = join(repoRoot, '.cache/starter-seed');
 
 const STATE_NAMES: Record<string, string> = {
-  AL: 'Alabama', AR: 'Arkansas', DC: 'District of Columbia', FL: 'Florida', GA: 'Georgia',
-  IA: 'Iowa', KS: 'Kansas', KY: 'Kentucky', LA: 'Louisiana', MD: 'Maryland', MO: 'Missouri',
-  MS: 'Mississippi', NC: 'North Carolina', OK: 'Oklahoma', SC: 'South Carolina',
-  TN: 'Tennessee', TX: 'Texas', VA: 'Virginia', WV: 'West Virginia',
+  AL: 'Alabama',
+  AR: 'Arkansas',
+  DC: 'District of Columbia',
+  FL: 'Florida',
+  GA: 'Georgia',
+  IA: 'Iowa',
+  KS: 'Kansas',
+  KY: 'Kentucky',
+  LA: 'Louisiana',
+  MD: 'Maryland',
+  MO: 'Missouri',
+  MS: 'Mississippi',
+  NC: 'North Carolina',
+  OK: 'Oklahoma',
+  SC: 'South Carolina',
+  TN: 'Tennessee',
+  TX: 'Texas',
+  VA: 'Virginia',
+  WV: 'West Virginia',
 };
 
 function normalizeName(name: string): string {
@@ -144,7 +159,9 @@ async function lookupCounty(
   const response = await fetch(url);
   if (!response.ok) return null;
   const json = (await response.json()) as {
-    result?: { geographies?: { Counties?: Array<{ NAME?: string; STUSAB?: string; STATE?: string }> } };
+    result?: {
+      geographies?: { Counties?: Array<{ NAME?: string; STUSAB?: string; STATE?: string }> };
+    };
   };
   const county = json.result?.geographies?.Counties?.[0];
   if (!county?.NAME) return null;
@@ -153,17 +170,13 @@ async function lookupCounty(
 
 function countyMatches(stated: string, geocoded: string): boolean {
   const clean = (value: string): string =>
-    normalizeName(value).replace(/\b(county|parish|city)\b/gu, '').trim();
+    normalizeName(value)
+      .replace(/\b(county|parish|city)\b/gu, '')
+      .trim();
   return clean(stated) === clean(geocoded) || normalizeName(stated) === normalizeName(geocoded);
 }
 
-type Category =
-  | 'rosenwald'
-  | 'school-site'
-  | 'plantation'
-  | 'hbcu'
-  | 'event'
-  | 'person';
+type Category = 'rosenwald' | 'school-site' | 'plantation' | 'hbcu' | 'event' | 'person';
 
 function categorize(record: StarterRecord): Category {
   const subtype = record.subtype.toLowerCase();
@@ -241,11 +254,7 @@ function buildEntry(record: StarterRecord, category: Category): CatalogEntry {
   // Non-exact research points publish at ~1 km until a parcel-level geo review lands.
   const lat = exact ? record.latitude : Math.round(record.latitude * 100) / 100;
   const lng = exact ? record.longitude : Math.round(record.longitude * 100) / 100;
-  const locationPrecision = exact
-    ? category === 'hbcu'
-      ? 'campus'
-      : 'site'
-    : 'community';
+  const locationPrecision = exact ? (category === 'hbcu' ? 'campus' : 'site') : 'community';
   const locationLabel = exact
     ? `${record.canonical_name}, ${locality}, ${record.state}`
     : `${record.county}, ${stateName} (community-level; exact site pending geo review)`;

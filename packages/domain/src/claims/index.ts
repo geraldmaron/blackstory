@@ -1,11 +1,7 @@
 /**
  * Claims, contradictions, and confidence model surface.
  */
-export {
-  asClaimId,
-  asClaimVersionId,
-  asClaimEvidenceLinkId,
-} from './ids.js';
+export { asClaimId, asClaimVersionId, asClaimEvidenceLinkId } from './ids.js';
 export type { ClaimId, ClaimVersionId, ClaimEvidenceLinkId } from './ids.js';
 
 export {
@@ -68,10 +64,7 @@ export type {
   ConnectionStrengthMeasurement,
 } from './measurements.js';
 
-export {
-  preserveContradictoryValues,
-  assertContradictionsPreserved,
-} from './contradictions.js';
+export { preserveContradictoryValues, assertContradictionsPreserved } from './contradictions.js';
 export type { ContradictionSet } from './contradictions.js';
 
 export {

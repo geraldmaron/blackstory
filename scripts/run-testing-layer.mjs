@@ -1,4 +1,3 @@
-
 /**
  * Runs Node.js test files for @repo/testing by layer.
  * Usage: node scripts/run-testing-layer.mjs <layer>

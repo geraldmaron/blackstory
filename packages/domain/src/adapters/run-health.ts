@@ -67,9 +67,7 @@ export function evaluateRunHealth(input: EvaluateRunHealthInput): EvaluateRunHea
     input.nullFieldRate > input.maxNullFieldRate
   ) {
     issues.push('null_field_spike');
-    details.push(
-      `Null field rate ${input.nullFieldRate} exceeds max ${input.maxNullFieldRate}`,
-    );
+    details.push(`Null field rate ${input.nullFieldRate} exceeds max ${input.maxNullFieldRate}`);
   }
 
   if (input.missingRequiredFields?.length) {
@@ -88,9 +86,6 @@ export function shouldQuarantineRun(result: EvaluateRunHealthResult): boolean {
   return result.outcome === 'quarantined';
 }
 
-export function shouldDeadLetterRun(
-  consecutiveQuarantines: number,
-  threshold = 3,
-): boolean {
+export function shouldDeadLetterRun(consecutiveQuarantines: number, threshold = 3): boolean {
   return consecutiveQuarantines >= threshold;
 }

@@ -52,7 +52,10 @@ export function referencedLaunchCorpusRegistryEntryId(
 // -owned registrations: EJI lynching records, Tougaloo sundown towns
 // ---------------------------------------------------------------------------
 
-export const HISTORIC_SAFETY_SOURCE_IDS = ['eji-lynching-records', 'tougaloo-sundown-towns'] as const;
+export const HISTORIC_SAFETY_SOURCE_IDS = [
+  'eji-lynching-records',
+  'tougaloo-sundown-towns',
+] as const;
 export type HistoricSafetySourceId = (typeof HISTORIC_SAFETY_SOURCE_IDS)[number];
 
 export function isHistoricSafetySourceId(value: string): value is HistoricSafetySourceId {
@@ -248,7 +251,7 @@ export function buildHistoricSafetySourceRegistrationInputs(input: {
       citationRequirements:
         'Cite "Equal Justice Initiative, Lynching in America" (or the specific EJI/Seguin-Rigby ' +
         'dataset release) with a link to eji.org; EJI report content is link+attribute only per ' +
-        'EJI\'s terms \u2014 never bulk-reproduced (matches ../launch-corpora.ts\'s ' +
+        "EJI's terms \u2014 never bulk-reproduced (matches ../launch-corpora.ts's " +
         '`documented-massacres-riots` citation convention for the same custodian).',
       licenseNotes:
         'EJI dataset content is link+attribute only; underlying corroborating primary records ' +
@@ -291,7 +294,11 @@ export function buildHistoricSafetySourceRegistrationInputs(input: {
 export function registerHistoricSafetySources(
   registryStore: SourceRegistryStore,
   sourceRegistryStore: HistoricSafetySourceRegistryStore,
-  input: { readonly registeredBy: string; readonly registeredAt: string; readonly rights: RightsPolicy },
+  input: {
+    readonly registeredBy: string;
+    readonly registeredAt: string;
+    readonly rights: RightsPolicy;
+  },
 ): readonly HistoricSafetySourceRegistration[] {
   return buildHistoricSafetySourceRegistrationInputs(input).map((sourceInput) =>
     registerHistoricSafetySource(registryStore, sourceRegistryStore, sourceInput),

@@ -106,7 +106,9 @@ export function CorrectionForm() {
   }
 
   const fieldIssue = (field: string) =>
-    state.status === 'error' ? state.fieldIssues?.find((issue) => issue.field === field) : undefined;
+    state.status === 'error'
+      ? state.fieldIssues?.find((issue) => issue.field === field)
+      : undefined;
 
   if (state.status === 'success') {
     return (
@@ -125,7 +127,12 @@ export function CorrectionForm() {
   }
 
   return (
-    <form className="ds-stack" onSubmit={handleSubmit} noValidate aria-describedby="correction-form-intro">
+    <form
+      className="ds-stack"
+      onSubmit={handleSubmit}
+      noValidate
+      aria-describedby="correction-form-intro"
+    >
       <p id="correction-form-intro" className="ds-sans">
         {CORRECTION_FORM_INTRO}
       </p>

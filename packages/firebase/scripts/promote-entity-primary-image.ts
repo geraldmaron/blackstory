@@ -57,10 +57,7 @@ async function main(): Promise<void> {
   const filePath = requireArg('file');
   const alt = requireArg('alt');
   const credit = requireArg('credit');
-  const rights = (arg('rights') ?? 'public_domain') as
-    | 'public_domain'
-    | 'licensed'
-    | 'fair_use';
+  const rights = (arg('rights') ?? 'public_domain') as 'public_domain' | 'licensed' | 'fair_use';
   const releaseId = arg('release-id') ?? 'rel_seed_001';
   const contentType = arg('content-type') ?? guessContentType(filePath);
 

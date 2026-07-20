@@ -120,10 +120,12 @@ test('parses shareable URL decade, filter, and selection state', () => {
 test('query filter matches display name or summary', () => {
   const view = buildHistoryViewModel({ q: 'dunbar' });
   assert.ok(view.totalMatched >= 1);
-  assert.ok(view.nodes.every((node) => {
-    const haystack = `${node.displayName} ${node.summary}`.toLowerCase();
-    return haystack.includes('dunbar');
-  }));
+  assert.ok(
+    view.nodes.every((node) => {
+      const haystack = `${node.displayName} ${node.summary}`.toLowerCase();
+      return haystack.includes('dunbar');
+    }),
+  );
 });
 
 test('sort by connections orders higher-degree nodes first', () => {
@@ -179,10 +181,14 @@ test('status filter matches slug derived from status label', () => {
 test('facet options include kind, status, and topic with counts', () => {
   const view = buildHistoryViewModel({});
   assert.ok(view.facetOptions.kind.length > 1);
-  assert.ok(view.facetOptions.kind.some((entry) => entry.value !== 'all' && (entry.count ?? 0) > 0));
+  assert.ok(
+    view.facetOptions.kind.some((entry) => entry.value !== 'all' && (entry.count ?? 0) > 0),
+  );
   assert.ok(view.facetOptions.status.length > 1);
   assert.ok(view.facetOptions.topic.length > 1);
-  const topicWithCount = view.facetOptions.topic.find((entry) => entry.value !== 'all' && (entry.count ?? 0) > 0);
+  const topicWithCount = view.facetOptions.topic.find(
+    (entry) => entry.value !== 'all' && (entry.count ?? 0) > 0,
+  );
   assert.ok(topicWithCount);
 });
 

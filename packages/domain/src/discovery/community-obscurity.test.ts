@@ -271,7 +271,10 @@ test('obscurity dry-run on ABS-shaped candidates: local obscure ranks above Buff
   assert.equal(ranked[0]?.methodologyVersion, OBSCURITY_METHODOLOGY_VERSION);
   assert.equal(ranked[0]?.disclaimerId, OBSCURITY_METHODOLOGY_DISCLAIMER.id);
 
-  const byTitle = new Map<string, { score: number; band: string; candidate: DiscoveryCandidateRecord }>();
+  const byTitle = new Map<
+    string,
+    { score: number; band: string; candidate: DiscoveryCandidateRecord }
+  >();
   for (const assessment of ranked) {
     const candidate = campaign.candidates.find((c) => c.id === assessment.candidateId)!;
     byTitle.set(candidate.adapterRecord.title ?? candidate.id, {

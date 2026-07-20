@@ -9,10 +9,17 @@
  * normalize/persist entry point in this module calls this assertion before constructing a
  * candidate -- there is no code path here that returns a `WebSearchCandidateRecord` without it.
  */
-import { MAX_EVIDENCE_SNIPPET_CHARACTERS, MAX_EVIDENCE_SNIPPET_WORDS } from '../../rights/evidence-pointer.js';
+import {
+  MAX_EVIDENCE_SNIPPET_CHARACTERS,
+  MAX_EVIDENCE_SNIPPET_WORDS,
+} from '../../rights/evidence-pointer.js';
 import { stampCandidateProvenance } from '../candidates.js';
 import type { SourceRegistryEntry } from '../types.js';
-import { WEB_SEARCH_DEFAULT_CLASSIFICATION, WEB_SEARCH_PAYLOAD_SCHEMA_VERSION, webSearchAdapterId } from './types.js';
+import {
+  WEB_SEARCH_DEFAULT_CLASSIFICATION,
+  WEB_SEARCH_PAYLOAD_SCHEMA_VERSION,
+  webSearchAdapterId,
+} from './types.js';
 import type {
   ExternalQueryProvenance,
   WebSearchCandidatePayload,
@@ -55,7 +62,9 @@ export type NormalizeWebSearchResultInput = {
   readonly classification?: string;
 };
 
-export function normalizeWebSearchResult(input: NormalizeWebSearchResultInput): WebSearchCandidateRecord {
+export function normalizeWebSearchResult(
+  input: NormalizeWebSearchResultInput,
+): WebSearchCandidateRecord {
   assertStorageTermsConfirmed(input.config);
   if (!input.result.url.trim()) {
     throw new Error('Web search result requires a url to normalize into a candidate');
@@ -109,12 +118,17 @@ export function normalizeWebSearchBatch(input: {
 export function assertWebSearchCandidate(candidate: WebSearchCandidateRecord): void {
   const expectedAdapterId = webSearchAdapterId(candidate.payload.provider);
   if (candidate.provenance.adapterId !== expectedAdapterId) {
-    throw new Error(`Expected adapterId ${expectedAdapterId} for provider ${candidate.payload.provider}`);
+    throw new Error(
+      `Expected adapterId ${expectedAdapterId} for provider ${candidate.payload.provider}`,
+    );
   }
   if (candidate.payload.schemaVersion !== WEB_SEARCH_PAYLOAD_SCHEMA_VERSION) {
     throw new Error(`Unexpected payload schema version: ${candidate.payload.schemaVersion}`);
   }
-  if (candidate.payload.summary && candidate.payload.summary.length > MAX_EVIDENCE_SNIPPET_CHARACTERS) {
+  if (
+    candidate.payload.summary &&
+    candidate.payload.summary.length > MAX_EVIDENCE_SNIPPET_CHARACTERS
+  ) {
     throw new Error('Web search candidate summary exceeds the evidence-pointer snippet cap');
   }
 }

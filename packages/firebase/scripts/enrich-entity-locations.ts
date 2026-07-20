@@ -99,7 +99,9 @@ function outsideStateBbox(lat: number, lng: number, jurisdictionLabel: string): 
 
 function loadCatalog(): CatalogEntry[] {
   const out: CatalogEntry[] = [];
-  for (const file of readdirSync(CATALOG_DIR).filter((f) => f.endsWith('.json')).sort()) {
+  for (const file of readdirSync(CATALOG_DIR)
+    .filter((f) => f.endsWith('.json'))
+    .sort()) {
     const entries = JSON.parse(readFileSync(join(CATALOG_DIR, file), 'utf8')) as Array<
       Record<string, unknown>
     >;
@@ -240,15 +242,21 @@ async function main(): Promise<void> {
   // Collect place titles for named_place candidates missing an override.
   const namedCandidates = entries.filter((entry) => {
     if (overridesFile.overrides[entry.id]) return false;
-    return classifyLocationEvidence({
-      locationLabel: entry.locationLabel,
-      locationPrecision: entry.locationPrecision,
-    }) === 'named_place';
+    return (
+      classifyLocationEvidence({
+        locationLabel: entry.locationLabel,
+        locationPrecision: entry.locationPrecision,
+      }) === 'named_place'
+    );
   });
 
-  const titles = namedCandidates.flatMap((e) => [...placeTitleCandidatesFromLabel(e.locationLabel)]);
+  const titles = namedCandidates.flatMap((e) => [
+    ...placeTitleCandidatesFromLabel(e.locationLabel),
+  ]);
   const uniqueTitles = [...new Set(titles.filter((t) => t.length >= 3))];
-  console.log(`Resolving ${uniqueTitles.length} enwiki titles for ${namedCandidates.length} named places…`);
+  console.log(
+    `Resolving ${uniqueTitles.length} enwiki titles for ${namedCandidates.length} named places…`,
+  );
   const resolved = await client.resolveEnwikiTitles(uniqueTitles);
   const titleToQid = new Map<string, string>();
   for (const row of resolved) {
@@ -284,7 +292,8 @@ async function main(): Promise<void> {
         const decision = decideLocationCorrection({
           entityId: entry.id,
           locationLabel: entry.locationLabel,
-          locationPrecision: entry.locationPrecision === 'city' ? 'institution' : entry.locationPrecision,
+          locationPrecision:
+            entry.locationPrecision === 'city' ? 'institution' : entry.locationPrecision,
           jurisdictionLabel: entry.jurisdictionLabel,
           stored: { lat: entry.lat, lng: entry.lng },
           outsideStateBbox: outsideStateBbox(entry.lat, entry.lng, entry.jurisdictionLabel),
@@ -348,9 +357,7 @@ async function main(): Promise<void> {
         const { coord, title, isParentSite } = matched;
         const drift = Math.round(haversineMeters({ lat: entry.lat, lng: entry.lng }, coord));
         const precision =
-          entry.locationPrecision === 'institution'
-            ? 'campus'
-            : entry.locationPrecision;
+          entry.locationPrecision === 'institution' ? 'campus' : entry.locationPrecision;
 
         if (drift <= 500) {
           overridesFile.overrides[entry.id] = {
@@ -360,12 +367,24 @@ async function main(): Promise<void> {
             matchMethod: 'geocode_other',
             source: 'wikidata_p625',
             wikidataId: coord.wikidataId,
-            contentHash: hashPayload({ qid: coord.wikidataId, coord, drift, mode: 'confirm', title }),
+            contentHash: hashPayload({
+              qid: coord.wikidataId,
+              coord,
+              drift,
+              mode: 'confirm',
+              title,
+            }),
             retrievedAt,
             notes: `manual_research confirmed by Wikidata P625 within ${drift}m (${coord.wikidataId}; title "${title}")`,
           };
           wikidataApplied += 1;
-          report.push({ id: entry.id, action: 'wikidata_confirm', drift, qid: coord.wikidataId, title });
+          report.push({
+            id: entry.id,
+            action: 'wikidata_confirm',
+            drift,
+            qid: coord.wikidataId,
+            title,
+          });
           continue;
         }
 
@@ -382,7 +401,13 @@ async function main(): Promise<void> {
             notes: `Wikidata P625 adopted via parent site "${title}"; prior pin was ${drift}m away (${coord.wikidataId})`,
           };
           wikidataApplied += 1;
-          report.push({ id: entry.id, action: 'wikidata_snap', drift, qid: coord.wikidataId, title });
+          report.push({
+            id: entry.id,
+            action: 'wikidata_snap',
+            drift,
+            qid: coord.wikidataId,
+            title,
+          });
           continue;
         }
 
@@ -402,10 +427,22 @@ async function main(): Promise<void> {
         };
         if (entry.locationPrecision === 'institution') {
           downgraded += 1;
-          report.push({ id: entry.id, action: 'downgrade_campus', drift, qid: coord.wikidataId, title });
+          report.push({
+            id: entry.id,
+            action: 'downgrade_campus',
+            drift,
+            qid: coord.wikidataId,
+            title,
+          });
         } else {
           retained += 1;
-          report.push({ id: entry.id, action: 'manual_retained_midrange', drift, qid: coord.wikidataId, title });
+          report.push({
+            id: entry.id,
+            action: 'manual_retained_midrange',
+            drift,
+            qid: coord.wikidataId,
+            title,
+          });
         }
         continue;
       }

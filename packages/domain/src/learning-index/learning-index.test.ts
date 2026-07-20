@@ -83,8 +83,24 @@ test('buildRelatedNeighborStubs denormalizes and caps', () => {
     { id: 'missing', type: 'related_to', direction: 'outgoing' },
   ];
   const map = new Map<string, NeighborLookup>([
-    ['b', { id: 'b', displayName: 'B', kind: 'school', summary: 'School summary text here for learning.' }],
-    ['c', { id: 'c', displayName: 'C', kind: 'event', summary: 'Event summary text here for learning.' }],
+    [
+      'b',
+      {
+        id: 'b',
+        displayName: 'B',
+        kind: 'school',
+        summary: 'School summary text here for learning.',
+      },
+    ],
+    [
+      'c',
+      {
+        id: 'c',
+        displayName: 'C',
+        kind: 'event',
+        summary: 'Event summary text here for learning.',
+      },
+    ],
   ]);
   const stubs = buildRelatedNeighborStubs(related, map, { displayCap: 1 });
   assert.equal(stubs.length, 1);

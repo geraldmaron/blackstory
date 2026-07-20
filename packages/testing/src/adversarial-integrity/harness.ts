@@ -1,4 +1,3 @@
-
 /**
  * adversarial integrity harness composes quarantine, promotion,
  * confidence/lineage, research-case workflow, and correction quarantine
@@ -57,7 +56,9 @@ export function summarizeAdversarialScenario(
   };
 }
 
-function dedupeControls(controls: readonly IntegrityControlProof[]): readonly IntegrityControlProof[] {
+function dedupeControls(
+  controls: readonly IntegrityControlProof[],
+): readonly IntegrityControlProof[] {
   const seen = new Set<string>();
   const out: IntegrityControlProof[] = [];
   for (const control of controls) {
