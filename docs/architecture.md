@@ -14,6 +14,7 @@ apps/admin               Private Next.js admin/research (Cloud Run + IAP — tar
 apps/api-public          Public read/search/location API (Cloud Run — target)
 apps/api-submissions     Corrections / contribution intake (Cloud Run — target)
 apps/api-internal        Publication / promotion / internal control (private Cloud Run — target)
+apps/docs                Public docs site (GitHub Pages static export)
 workers/research         Python + Node research compute (Jobs / Tasks)
 workers/publication      Projection, snapshot, indexing, release
 workers/security         Quarantine, content validation, integrity

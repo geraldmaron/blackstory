@@ -2,6 +2,8 @@
 
 > Required project state. All LLMs working in this repo, including Construct, should keep this file updated.
 
+**Public GitHub Pages site** (homepage): [geraldmaron.github.io/blackstory](https://geraldmaron.github.io/blackstory/) — built from `apps/docs` and synced here via `pnpm docs:publish` (`index.html`, `_next/`, `guides/`, `brand/`). Operating markdown below stays the source of truth for agents; do not delete it when republishing the site.
+
 ## Purpose
 
 Operating docs for the BlackStory monorepo: architecture, decisions, runbooks, and bead reports. Not a substitute for the execution tracker.
@@ -10,6 +12,7 @@ Operating docs for the BlackStory monorepo: architecture, decisions, runbooks, a
 
 | Doc | Contents |
 |-----|----------|
+| [Public docs site](https://geraldmaron.github.io/blackstory/) | GitHub Pages homepage (`docs/index.html` from `apps/docs`; `pnpm docs:publish`) |
 | [`../plan.md`](../plan.md) | Bead execution plan (–) |
 | [`architecture.md`](./architecture.md) | Target architecture and invariants |
 | [`adr/README.md`](./adr/README.md) | Architecture decision records |

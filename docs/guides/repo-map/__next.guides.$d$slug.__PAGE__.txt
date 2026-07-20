@@ -1,0 +1,57 @@
+1:"$Sreact.fragment"
+3:I[90879,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"OutletBoundary"]
+4:"$Sreact.suspense"
+2:T53a,<h1 id="repository-map"><a class="heading-anchor" href="#repository-map">Repository map</a></h1>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>apps/web</code></td>
+<td>Public Next.js app (Firebase App Hosting)</td>
+</tr>
+<tr>
+<td><code>apps/admin</code></td>
+<td>Private Next.js admin/research console</td>
+</tr>
+<tr>
+<td><code>apps/api-public</code></td>
+<td>Public read/search/location API</td>
+</tr>
+<tr>
+<td><code>apps/api-submissions</code></td>
+<td>Corrections / contribution intake API</td>
+</tr>
+<tr>
+<td><code>apps/api-internal</code></td>
+<td>Publication / internal control API</td>
+</tr>
+<tr>
+<td><code>apps/docs</code></td>
+<td>This GitHub Pages site (static export)</td>
+</tr>
+<tr>
+<td><code>workers/*</code></td>
+<td>Python research, publication, and security workers</td>
+</tr>
+<tr>
+<td><code>packages/*</code></td>
+<td>Shared TypeScript libraries (<code>@repo/*</code>)</td>
+</tr>
+<tr>
+<td><code>infra/*</code></td>
+<td>Firebase, GCP, GitHub, database scaffolding</td>
+</tr>
+<tr>
+<td><code>docs/</code></td>
+<td>Operating docs, ADRs, and research notes</td>
+</tr>
+</tbody>
+</table>
+<p>Code package scope is brand-agnostic: npm packages stay <code>@repo/*</code>, design tokens
+<code>ds-*</code>, env break-glass <code>APP_*</code>. Product rename does not rewrite the monorepo.</p>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"start"}]]}],["$","p",null,{"className":"doc-lede","children":"Where apps, packages, workers, and infra live in the monorepo."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","repo-map",".md"]}],"."," ",["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]]}]}]]}],null,["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"UW9vrt6hETcQnMoL0FLFN"}
+5:null

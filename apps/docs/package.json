@@ -1,0 +1,32 @@
+{
+  "name": "@repo/docs",
+  "version": "0.0.0",
+  "private": true,
+  "description": "BlackStory GitHub Pages docs site (static Next.js export)",
+  "scripts": {
+    "dev": "next dev --port ${PORT:-3050}",
+    "build": "next build",
+    "start": "next start --port 3050",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "next": "^16.2.10",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "remark-gfm": "^4.0.1",
+    "unified": "^11.0.5",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2",
+    "rehype-stringify": "^10.0.1",
+    "rehype-slug": "^6.0.0",
+    "rehype-autolink-headings": "^7.1.0"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:^",
+    "@types/node": "^22.16.5",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "typescript": "^5.8.3"
+  }
+}

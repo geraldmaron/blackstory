@@ -16,10 +16,20 @@ Architecture decisions: [`docs/adr/`](./docs/adr/README.md).
 | `apps/api-public` | Public read/search/location API |
 | `apps/api-submissions` | Corrections / contribution intake API |
 | `apps/api-internal` | Publication / internal control API (private) |
+| `apps/docs` | Public docs site (GitHub Pages static export) |
 | `workers/*` | Python research, publication, and security workers |
 | `packages/*` | Shared TypeScript libraries |
 | `infra/*` | Firebase, GCP, GitHub, database scaffolding |
 | `docs/` | Human docs, ADRs (`docs/adr/`), and bead reports |
+
+**Docs site:** [geraldmaron.github.io/blackstory](https://geraldmaron.github.io/blackstory/) — Next.js static export from `apps/docs`, published via GitHub Pages from the repo **`/docs`** folder on `main`.
+
+```bash
+pnpm --filter @repo/docs dev   # local preview (http://localhost:3050/)
+pnpm docs:publish              # build + sync into docs/ (commit docs/ and push)
+```
+
+Pages setting: **Deploy from a branch** → `main` → `/docs`. Do not point Pages at `/docs` expecting only the Next app — that folder also holds operating markdown (ADRs, architecture). The site homepage is `docs/index.html`; guides live under `/guides/…`.
 
 ## Prerequisites
 

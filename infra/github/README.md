@@ -31,6 +31,7 @@ Do not claim GitHub settings are live until `infra/github/scripts/check-governan
 | `scripts/check-wif.sh` | Read-only WIF inventory (`--allow-missing` for local) |
 | `oidc/` | Protected environment stubs + SA key removal path |
 | `release-metadata/` | Deployment provenance schema + stub (BB-062) |
+| `.github/workflows/pages.yml` | Optional Actions publish (manual); primary Pages source is branch `/docs` via `pnpm docs:publish` |
 | `../../scripts/validate-github-governance.mjs` | Local/CI policy checker (pins, permissions, events, files) |
 
 ## Required CI check names

@@ -1,0 +1,24 @@
+1:"$Sreact.fragment"
+3:I[90879,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"OutletBoundary"]
+4:"$Sreact.suspense"
+2:T547,<h1 id="research-methodology"><a class="heading-anchor" href="#research-methodology">Research methodology</a></h1>
+<p>BlackStory pins history to place. A publishable record needs claims, evidence,
+provenance, and confidence — not assertion alone.</p>
+<h2 id="principles"><a class="heading-anchor" href="#principles">Principles</a></h2>
+<ol>
+<li><strong>Evidence before assertion.</strong> Public prose cites released evidence.</li>
+<li><strong>Place is first-class.</strong> Locations carry precision; coarsened points are
+never labeled as exact addresses.</li>
+<li><strong>Confidence is visible.</strong> Uncertainty is glyph-encoded; color is never the
+only signal.</li>
+<li><strong>Living-person care.</strong> Unknown living status is treated as living; no public
+residential addresses.</li>
+<li><strong>Promotion gate.</strong> Research and LLM enrichment cannot publish. Human and
+policy gates promote released projections only.</li>
+</ol>
+<h2 id="pipeline-high-level"><a class="heading-anchor" href="#pipeline-high-level">Pipeline (high level)</a></h2>
+<p>Discovery adapters produce candidates → quarantine / triage → research cases →
+claims and evidence → confidence lineage → promotion → public projection.</p>
+<p>Operating detail lives in the repository under <code>docs/research/</code> and
+<code>docs/methodology/</code>.</p>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"concepts"}]]}],["$","p",null,{"className":"doc-lede","children":"How claims, evidence, and confidence reach a publishable record."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","methodology",".md"]}],"."," ",["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]]}]}]]}],null,["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"UW9vrt6hETcQnMoL0FLFN"}
+5:null

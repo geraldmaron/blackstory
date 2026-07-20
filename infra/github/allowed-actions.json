@@ -14,6 +14,9 @@
       "actions/setup-python@*",
       "actions/setup-java@*",
       "actions/upload-artifact@*",
+      "actions/upload-pages-artifact@*",
+      "actions/deploy-pages@*",
+      "actions/configure-pages@*",
       "pnpm/action-setup@*",
       "google-github-actions/auth@*"
     ]

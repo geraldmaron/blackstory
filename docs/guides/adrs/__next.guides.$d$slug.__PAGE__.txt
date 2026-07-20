@@ -1,0 +1,56 @@
+1:"$Sreact.fragment"
+3:I[90879,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"OutletBoundary"]
+4:"$Sreact.suspense"
+2:T416,<h1 id="architecture-decisions"><a class="heading-anchor" href="#architecture-decisions">Architecture decisions</a></h1>
+<p>Formal ADRs live in the repository at
+<a href="https://github.com/geraldmaron/blackstory/tree/main/docs/adr"><code>docs/adr/</code></a>.</p>
+<p>Selected topics:</p>
+<table>
+<thead>
+<tr>
+<th>ADR</th>
+<th>Topic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>001</td>
+<td>Firebase App Hosting vs Cloud Run</td>
+</tr>
+<tr>
+<td>004</td>
+<td>Public projection / immutable snapshots</td>
+</tr>
+<tr>
+<td>005</td>
+<td>Service surface separation</td>
+</tr>
+<tr>
+<td>006</td>
+<td>GitHub Actions deployment</td>
+</tr>
+<tr>
+<td>008</td>
+<td>Search and geocoding</td>
+</tr>
+<tr>
+<td>009</td>
+<td>Research isolation</td>
+</tr>
+<tr>
+<td>010</td>
+<td>Security and abuse assumptions</td>
+</tr>
+<tr>
+<td>011</td>
+<td>Firestore as system of record</td>
+</tr>
+<tr>
+<td>018</td>
+<td>Firebase scheduled functions for discovery</td>
+</tr>
+</tbody>
+</table>
+<p>Scaffold vs target is noted in each record. Cloud resources are not applied from
+ADRs alone.</p>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"reference"}]]}],["$","p",null,{"className":"doc-lede","children":"Pointers into the ADR set that shapes the platform."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","adrs",".md"]}],"."," ",["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]]}]}]]}],null,["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"UW9vrt6hETcQnMoL0FLFN"}
+5:null

@@ -1,0 +1,59 @@
+# BlackStory docs → GitHub Pages (optional Actions path).
+# Primary publish path: branch deploy from /docs via `pnpm docs:publish`.
+# This workflow is an alternate if Pages source is switched to GitHub Actions.
+# Permissions stay least-privilege. Actions are SHA-pinned (BB-009).
+
+name: GitHub Pages
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build docs site
+    runs-on: ubuntu-latest
+    if: vars.PAGES_ENABLED == 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+        with:
+          version: 9.12.3
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Install JavaScript dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build static site
+        env:
+          DOCS_BASE_PATH: /blackstory
+        run: pnpm --filter @repo/docs build
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # construct-pinned
+        with:
+          path: apps/docs/out
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    if: vars.PAGES_ENABLED == 'true'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # construct-pinned

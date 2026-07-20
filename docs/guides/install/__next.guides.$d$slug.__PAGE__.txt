@@ -1,0 +1,36 @@
+1:"$Sreact.fragment"
+3:I[90879,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"OutletBoundary"]
+4:"$Sreact.suspense"
+2:T621,<h1 id="install-and-bootstrap"><a class="heading-anchor" href="#install-and-bootstrap">Install and bootstrap</a></h1>
+<p>BlackStory is a TypeScript + Python monorepo. Local development does not require
+cloud credentials.</p>
+<h2 id="prerequisites"><a class="heading-anchor" href="#prerequisites">Prerequisites</a></h2>
+<ul>
+<li>Node.js 22+ (<code>nvm use</code> from <code>.nvmrc</code>)</li>
+<li><a href="https://pnpm.io/">pnpm</a> 9.x</li>
+<li><a href="https://docs.astral.sh/uv/">uv</a> (Python 3.12+)</li>
+</ul>
+<h2 id="bootstrap"><a class="heading-anchor" href="#bootstrap">Bootstrap</a></h2>
+<pre><code class="language-bash">git clone https://github.com/geraldmaron/blackstory.git
+cd blackstory
+./scripts/bootstrap.sh
+# or
+pnpm bootstrap
+</code></pre>
+<p>Copy <a href="https://github.com/geraldmaron/blackstory/blob/main/.env.example"><code>.env.example</code></a>
+for local emulator-oriented Firebase placeholders.</p>
+<h2 id="validate"><a class="heading-anchor" href="#validate">Validate</a></h2>
+<pre><code class="language-bash">pnpm validate
+pnpm test:preflight
+pnpm test
+</code></pre>
+<p>Build and typecheck (APIs consume built package declarations):</p>
+<pre><code class="language-bash">pnpm build &#x26;&#x26; pnpm typecheck
+</code></pre>
+<h2 id="this-docs-site"><a class="heading-anchor" href="#this-docs-site">This docs site</a></h2>
+<pre><code class="language-bash">pnpm --filter @repo/docs dev
+</code></pre>
+<p>Production-shaped static export:</p>
+<pre><code class="language-bash">DOCS_BASE_PATH=/blackstory pnpm --filter @repo/docs build
+</code></pre>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"start"}]]}],["$","p",null,{"className":"doc-lede","children":"Clone the monorepo and bring up a reproducible local environment."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","install",".md"]}],"."," ",["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]]}]}]]}],null,["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"UW9vrt6hETcQnMoL0FLFN"}
+5:null

@@ -1,0 +1,75 @@
+1:"$Sreact.fragment"
+3:I[90879,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"OutletBoundary"]
+4:"$Sreact.suspense"
+2:T8c5,<h1 id="brand-language"><a class="heading-anchor" href="#brand-language">Brand language</a></h1>
+<p><strong>Product name:</strong> BlackStory.<br>
+<strong>Core line:</strong> History, pinned to place.<br>
+<strong>Support:</strong> People. Places. Evidence. Context.</p>
+<p>Copy is specific over sweeping, evidence before assertion, pride without
+spectacle. Invite; do not lecture. Never sensational framings or completeness
+overclaims.</p>
+<h2 id="color"><a class="heading-anchor" href="#color">Color</a></h2>
+<p>Black and paper lead; copper points.</p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Hex</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Black Ink</td>
+<td><code>#0A0A0A</code></td>
+</tr>
+<tr>
+<td>Charcoal</td>
+<td><code>#161616</code></td>
+</tr>
+<tr>
+<td>Archive Paper</td>
+<td><code>#F4EFE5</code></td>
+</tr>
+<tr>
+<td>Surface</td>
+<td><code>#FBF8F2</code></td>
+</tr>
+<tr>
+<td>Copper Pin (graphic accent)</td>
+<td><code>#B86B2A</code></td>
+</tr>
+<tr>
+<td>Copper text on light</td>
+<td><code>#8E4F2A</code></td>
+</tr>
+<tr>
+<td>Copper text on dark</td>
+<td><code>#D07A32</code></td>
+</tr>
+<tr>
+<td>Stone</td>
+<td><code>#6D675F</code></td>
+</tr>
+<tr>
+<td>Rule</td>
+<td><code>#D7D0C4</code></td>
+</tr>
+</tbody>
+</table>
+<p>Copper is a navigational signal (~10–15% of a composition): active locations,
+selected filters, primary actions, evidence markers. Dark theme is first-class.</p>
+<p>Flat matte fills only — no bevels, shadows, glows, or gradients.</p>
+<h2 id="type"><a class="heading-anchor" href="#type">Type</a></h2>
+<ul>
+<li><strong>Sora SemiBold</strong> — headlines</li>
+<li><strong>Inter</strong> — UI / body</li>
+<li><strong>Source Serif 4</strong> — editorial / longform</li>
+<li><strong>IBM Plex Mono</strong> — data, citations, dates, confidence</li>
+</ul>
+<h2 id="the-mark"><a class="heading-anchor" href="#the-mark">The mark</a></h2>
+<p>Official lockup and book-and-pin symbol are artwork. Never reconstruct either by
+typing the wordmark beside a bare symbol render.</p>
+<h2 id="map-dignity"><a class="heading-anchor" href="#map-dignity">Map dignity</a></h2>
+<p>No red or alarm hues for violence-adjacent records; no crime-heat rendering;
+color is never the only signal. Points render no sharper than stored precision.</p>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"concepts"}]]}],["$","p",null,{"className":"doc-lede","children":"Signature, palette, type, and map dignity rules for anything users see."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","brand",".md"]}],"."," ",["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]]}]}]]}],null,["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"UW9vrt6hETcQnMoL0FLFN"}
+5:null
