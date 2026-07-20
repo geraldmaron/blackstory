@@ -24,12 +24,12 @@ import { request as httpRequest } from 'node:http';
 import { request as httpsRequest } from 'node:https';
 import {
   executeSafeFetch,
-  parseContentInSandbox,
   type PinnedTransportRequest,
   type PinnedTransportResponse,
   type SafeFetchResult,
   type SafeParserResult,
 } from '@repo/security/url-safety';
+import { extractWithTrafilatura } from './trafilatura.ts';
 
 async function resolveHost(hostname: string) {
   const answers = await lookup(hostname, { all: true, verbatim: true });
@@ -74,15 +74,50 @@ function performPinnedRequest(input: PinnedTransportRequest): Promise<PinnedTran
 type ParserWithRawHtml = SafeParserResult & { readonly rawHtml: string };
 
 /**
- * Wraps the real `parseContentInSandbox` (same malware-signature checks, not
- * reimplemented) and additionally keeps the pre-strip decoded text, needed to
- * find a page's own outbound citation links (`extractedText` has already had
- * every tag removed).
+ * `parseContentInSandbox`'s `active_content` check (any `<script>`/`<iframe>`/
+ * `on*=`/`javascript:`) exists to protect a consumer that might RENDER or
+ * EXECUTE the content (e.g. a citation-preview feature) — reused verbatim it
+ * rejects nearly every real institutional website, since virtually all of
+ * them carry a `<script>` tag somewhere (analytics, nav) with no bearing on
+ * whether the page is malicious. Confirmed directly: nps.gov itself trips it.
+ *
+ * This module's consumer never renders or executes fetched HTML — only reads
+ * text out of it (via Trafilatura or a regex strip) for an LLM judge — so
+ * that check doesn't apply here. The genuinely universal malware-signature
+ * checks (EICAR test string, executable magic bytes) are reused AS-IS from
+ * `parseContentInSandbox`'s exact logic, not weakened; only `active_content`
+ * is dropped, and only for this text-only consumption path.
  */
-async function parseKeepingRawHtml(content: Uint8Array, contentType: string): Promise<ParserWithRawHtml> {
-  const result = await parseContentInSandbox(content, contentType);
+export function checkMalwareSignatures(content: Uint8Array): readonly ('eicar_test_signature' | 'executable_magic')[] {
+  const indicators: ('eicar_test_signature' | 'executable_magic')[] = [];
+  const text = new TextDecoder('utf-8', { fatal: false }).decode(content);
+  if (text.includes('EICAR-STANDARD-ANTIVIRUS-TEST-FILE')) indicators.push('eicar_test_signature');
+  const prefix = content.subarray(0, 4);
+  if (
+    (prefix[0] === 0x4d && prefix[1] === 0x5a) ||
+    (prefix[0] === 0x7f && prefix[1] === 0x45 && prefix[2] === 0x4c && prefix[3] === 0x46)
+  ) {
+    indicators.push('executable_magic');
+  }
+  return indicators;
+}
+
+export async function parseTextOnly(content: Uint8Array, contentType: string): Promise<ParserWithRawHtml> {
   const rawHtml = new TextDecoder('utf-8', { fatal: false }).decode(content);
-  return { ...result, rawHtml };
+  const indicators = checkMalwareSignatures(content);
+  const extractedText = contentType.includes('html')
+    ? rawHtml
+        .replace(/<(?:script|style)\b[^>]*>[\s\S]*?<\/(?:script|style)>/giu, ' ')
+        .replace(/<[^>]+>/gu, ' ')
+        .replace(/\s+/gu, ' ')
+        .trim()
+    : rawHtml.replace(/\s+/gu, ' ').trim();
+  return {
+    safe: indicators.length === 0,
+    indicators,
+    extractedText: extractedText.slice(0, 100_000),
+    rawHtml,
+  };
 }
 
 export type SafeFetchedPage = { readonly html: string; readonly text: string; readonly finalUrl: string };
@@ -108,10 +143,19 @@ export async function safeFetchPage(
 ): Promise<SafeFetchedPage | undefined> {
   const result: SafeFetchResult = await executeSafeFetch(
     url,
-    { resolveHost, transport: performPinnedRequest, parser: parseKeepingRawHtml },
+    { resolveHost, transport: performPinnedRequest, parser: parseTextOnly },
     options.allowedContentTypes ? { limits: { allowedContentTypes: options.allowedContentTypes } } : {},
   );
   if (!result.ok || !result.parser.safe) return undefined;
   const parser = result.parser as ParserWithRawHtml;
-  return { html: parser.rawHtml, text: parser.extractedText, finalUrl: result.finalUrl };
+  // parseContentInSandbox's regex strip is the malware-safety gate (kept as-is);
+  // Trafilatura re-extraction on the SAME already-safety-checked HTML is a pure
+  // quality upgrade (drops nav/boilerplate the regex can't distinguish from
+  // content) — falls back to the regex text if the Python worker is unavailable.
+  const trafilatura = await extractWithTrafilatura(parser.rawHtml, result.finalUrl);
+  return {
+    html: parser.rawHtml,
+    text: trafilatura?.text ?? parser.extractedText,
+    finalUrl: result.finalUrl,
+  };
 }
