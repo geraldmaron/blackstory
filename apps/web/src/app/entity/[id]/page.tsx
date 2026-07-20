@@ -9,7 +9,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { MapFrame, Timeline } from '@repo/ui';
-import { KindBadge, ConfidenceMark } from '../../../components/map-experience';
+import { KindBadge, ConfidenceMark, MapsExternalLink } from '../../../components/map-experience';
 import { EntitySensitivityBanner } from '../../../components/entity/EntitySensitivityBanner';
 import '../../../components/entity/entity-page.css';
 import { EntityStatusPanel } from '../../../components/entity/EntityStatusPanel';
@@ -184,15 +184,14 @@ export default async function EntityPage({ params }: EntityPageProps) {
             <dt>Location shown</dt>
             <dd>
               {mapsHref ? (
-                <a
-                  className="ds-at-a-glance__link ds-maps-external-link"
+                <MapsExternalLink
+                  className="ds-at-a-glance__link"
                   href={mapsHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`Open ${entity.locationLabel} in maps`}
+                  placeLabel={entity.locationLabel}
+                  title={`Open ${entity.locationLabel} in your maps app`}
                 >
                   {entity.locationLabel} ({entity.locationPrecision} precision)
-                </a>
+                </MapsExternalLink>
               ) : (
                 <>
                   {entity.locationLabel} ({entity.locationPrecision} precision)
@@ -357,7 +356,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
           <aside className="ds-entity-aside" aria-label="Record context">
             <MapFrame
               title={`${entity.displayName} map context`}
-              caption="Schematic pin — not survey-grade geometry. Open the national map for the live geographic context."
+              caption="Schematic pin at public precision — not survey-grade. Use Open in maps for Google, Apple, or your default maps app."
               pins={[
                 {
                   id: entity.id,
@@ -368,8 +367,18 @@ export default async function EntityPage({ params }: EntityPageProps) {
               ]}
             />
             <p className="ds-entity-aside__cta">
+              {mapsHref ? (
+                <MapsExternalLink
+                  className="ds-cta ds-cta--copper"
+                  href={mapsHref}
+                  placeLabel={entity.locationLabel}
+                  title={`Open ${entity.locationLabel} in your maps app`}
+                >
+                  Open in maps
+                </MapsExternalLink>
+              ) : null}
               <Link className="ds-cta ds-cta--ink" href={exploreHref} scroll={false}>
-                View on map
+                View on national map
               </Link>
             </p>
             <p className="ds-entity-aside__precision ds-sans">

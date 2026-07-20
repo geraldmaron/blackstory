@@ -1,6 +1,8 @@
 /**
- * Builds external map-app search URLs (Google Maps universal link). Coordinates win over
- * prose labels so coarsened pins open at the stored public point, not a street guess.
+ * Builds external map-app search URLs (Google Maps universal link). On phones this typically
+ * opens Google Maps, Apple Maps, or the user’s default maps handler; desktop opens Maps in
+ * the browser. Coordinates win over prose labels so coarsened pins open at the stored public
+ * point, not a street guess.
  */
 
 export type ExternalMapsSearchInput = {

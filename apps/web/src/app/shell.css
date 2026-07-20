@@ -1929,14 +1929,15 @@
   text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
 }
 
-/* External maps deep links — inherit meta/link styling; underline on hover/focus. */
-.ds-maps-external-link {
+/* External maps deep links — inherit meta/link styling; underline on hover/focus.
+ * When also a `.ds-cta`, leave color to the CTA recipe (copper/ink). */
+.ds-maps-external-link:not(.ds-cta) {
   color: inherit;
   text-decoration: none;
 }
 
-.ds-maps-external-link:hover,
-.ds-maps-external-link:focus-visible {
+.ds-maps-external-link:not(.ds-cta):hover,
+.ds-maps-external-link:not(.ds-cta):focus-visible {
   color: var(--ds-accent);
   text-decoration: underline;
   text-decoration-thickness: 1px;

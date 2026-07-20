@@ -81,7 +81,14 @@
 }
 
 .ds-entity-aside__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
   margin: 0;
+}
+
+.ds-entity-aside__cta .ds-cta {
+  text-decoration: none;
 }
 
 .ds-entity-aside__precision {
