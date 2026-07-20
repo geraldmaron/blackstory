@@ -37,28 +37,47 @@ import {
   getServerFirestore,
   publicActiveReleaseSchema,
   publicEntityProjectionSchema,
+  publicSearchIndexSchema,
   type EnvironmentLike,
   type PublicClaimProjectionDoc,
   type PublicEntityProjectionDoc,
+  type PublicSearchIndexDoc as FirestoreSearchIndexDoc,
 } from '@repo/firebase';
+import type { NotabilityBasisRecord, PublicSearchIndexDoc } from '@repo/domain';
 import { findUsStateForPoint } from '@repo/domain';
 import { ENTITY_KINDS, entityV1Schema, type EntityV1 } from '@repo/public-contracts/v1/entity';
 import type { ClaimV1 } from '@repo/public-contracts/v1/claim';
 import type { CanonicalSearchQuery } from '@repo/security';
 import type { FirestoreDataAccessReaders, ReleasePointer, SearchPage } from './data-access.js';
-import { searchOverEntities } from './data-access.js';
+import { searchOverEntities, searchOverIndex } from './data-access.js';
 
 // ---------------------------------------------------------------------------
 // Injectable Firestore client seam (structurally compatible with firebase-admin's Firestore)
 // ---------------------------------------------------------------------------
 
 export type FirestoreDocSnapshotLike = {
+  readonly id?: string;
   readonly exists: boolean;
   data(): unknown;
 };
 
+export type FirestoreQuerySnapshotLike = {
+  readonly empty: boolean;
+  readonly size: number;
+  readonly docs: readonly FirestoreDocSnapshotLike[];
+};
+
+export type FirestoreQueryLike = {
+  where(field: string, op: '==', value: string): FirestoreQueryLike;
+  orderBy(field: string): FirestoreQueryLike;
+  limit(count: number): FirestoreQueryLike;
+  startAfter(doc: FirestoreDocSnapshotLike): FirestoreQueryLike;
+  get(): Promise<FirestoreQuerySnapshotLike>;
+};
+
 export type FirestoreCollectionRefLike = {
   limit(count: number): { get(): Promise<{ readonly docs: readonly FirestoreDocSnapshotLike[] }> };
+  where(field: string, op: '==', value: string): FirestoreQueryLike;
 };
 
 export type FirestoreClientLike = {
@@ -72,10 +91,14 @@ export type CreateFirestoreDataAccessReadersOptions = {
   readonly firestore?: FirestoreClientLike;
 };
 
-/** Bounds every live search list read (MOB-004: "bound every query"). This is a scan over the
- * release's entities collection, not an index-backed search — a documented, tracked scale gap
- * (repo-rw1p load/cost report), not a silent one. */
+/** Bounds entity-collection fallback reads when no `publicSearchIndex` rows exist for the active
+ * release (MOB-004 safety net — not the primary search path). Index-backed search uses the
+ * release-scoped composite query documented in `apps/web`'s `listPublicSearchIndexDocs`. */
 export const MAX_LIVE_SEARCH_SCAN = 500;
+
+/** Page size for paginated `publicSearchIndex` reads — matches
+ * `apps/web/src/lib/public-data/firestore-readers.ts`. */
+export const SEARCH_INDEX_PAGE_SIZE = 400;
 
 const SUPPORTED_KINDS = new Set<string>(ENTITY_KINDS);
 
@@ -225,6 +248,97 @@ function mapActiveReleaseToPointer(data: unknown): ReleasePointer | undefined {
   };
 }
 
+function parseSearchIndexDoc(data: unknown): FirestoreSearchIndexDoc | undefined {
+  const parsed = publicSearchIndexSchema.safeParse(data);
+  return parsed.success ? parsed.data : undefined;
+}
+
+/** Maps a Firestore `publicSearchIndex` doc into `@repo/domain`'s search pipeline input. */
+export function mapSearchIndexDoc(doc: FirestoreSearchIndexDoc): PublicSearchIndexDoc {
+  const notabilityBasis: readonly NotabilityBasisRecord[] = doc.notabilityBasis.map((entry) => ({
+    criterion: entry.criterion as NotabilityBasisRecord['criterion'],
+    note: entry.note,
+    evidenceIds: entry.evidenceIds,
+  }));
+
+  return {
+    id: doc.id,
+    releaseId: doc.releaseId,
+    kind: doc.kind,
+    displayName: doc.displayName,
+    nameLower: doc.nameLower,
+    aliases: doc.aliases,
+    ...(doc.summary !== undefined ? { summary: doc.summary } : {}),
+    topicTags: doc.topicTags,
+    ...(doc.topicIds !== undefined && doc.topicIds.length > 0 ? { topicIds: doc.topicIds } : {}),
+    ...(doc.jurisdictionState !== undefined ? { jurisdictionState: doc.jurisdictionState } : {}),
+    ...(doc.status !== undefined ? { status: doc.status } : {}),
+    eraBuckets: doc.eraBuckets,
+    notabilityBasis,
+    notabilityLabels: doc.notabilityLabels,
+    ...(doc.sensitivityClass !== undefined ? { sensitivityClass: doc.sensitivityClass } : {}),
+    recordMaturity: doc.recordMaturity,
+    researchCoverage: doc.researchCoverage,
+    relatedCount: doc.relatedCount,
+    claimCount: doc.claimCount,
+  };
+}
+
+/**
+ * Paginated, index-backed read of `publicSearchIndex` for one release — same query shape as
+ * `apps/web/src/lib/public-data/firestore-readers.ts` (`releaseId` equality + `__name__` order).
+ */
+export async function loadReleaseSearchIndexDocs(
+  firestore: FirestoreClientLike,
+  releaseId: string,
+): Promise<readonly PublicSearchIndexDoc[]> {
+  const docs: PublicSearchIndexDoc[] = [];
+  let query = firestore
+    .collection(FIRESTORE_ROOT.publicSearchIndex)
+    .where('releaseId', '==', releaseId)
+    .orderBy('__name__')
+    .limit(SEARCH_INDEX_PAGE_SIZE);
+
+  for (;;) {
+    const snap = await query.get();
+    if (snap.empty) break;
+    for (const doc of snap.docs) {
+      const parsed = parseSearchIndexDoc(doc.data());
+      if (parsed) docs.push(mapSearchIndexDoc(parsed));
+    }
+    if (snap.size < SEARCH_INDEX_PAGE_SIZE) break;
+    const last = snap.docs[snap.docs.length - 1];
+    if (!last) break;
+    query = firestore
+      .collection(FIRESTORE_ROOT.publicSearchIndex)
+      .where('releaseId', '==', releaseId)
+      .orderBy('__name__')
+      .startAfter(last)
+      .limit(SEARCH_INDEX_PAGE_SIZE);
+  }
+
+  return docs;
+}
+
+async function loadFallbackEntitySearchPool(
+  firestore: FirestoreClientLike,
+  releaseId: string,
+): Promise<readonly EntityV1[]> {
+  const snapshot = await firestore
+    .collection(`${FIRESTORE_ROOT.publicReleases}/${releaseId}/entities`)
+    .limit(MAX_LIVE_SEARCH_SCAN)
+    .get();
+
+  const entities: EntityV1[] = [];
+  for (const doc of snapshot.docs) {
+    const parsed = publicEntityProjectionSchema.safeParse(doc.data());
+    if (!parsed.success) continue;
+    const mapped = mapProjectionToEntityV1(parsed.data);
+    if (mapped) entities.push(mapped);
+  }
+  return entities;
+}
+
 /**
  * Builds the live `FirestoreDataAccessReaders` (bound into a `PublicDataAccess` port via
  * `./data-access.ts`'s `createFirestorePublicDataAccess`). Never throws on a malformed/missing
@@ -256,19 +370,12 @@ export function createFirestoreDataAccessReaders(
       canonical: CanonicalSearchQuery,
       searchOptions: { readonly releaseId: string },
     ): Promise<SearchPage> {
-      const snapshot = await firestore
-        .collection(`${FIRESTORE_ROOT.publicReleases}/${searchOptions.releaseId}/entities`)
-        .limit(MAX_LIVE_SEARCH_SCAN)
-        .get();
-
-      const entities: EntityV1[] = [];
-      for (const doc of snapshot.docs) {
-        const parsed = publicEntityProjectionSchema.safeParse(doc.data());
-        if (!parsed.success) continue;
-        const mapped = mapProjectionToEntityV1(parsed.data);
-        if (mapped) entities.push(mapped);
+      const indexDocs = await loadReleaseSearchIndexDocs(firestore, searchOptions.releaseId);
+      if (indexDocs.length > 0) {
+        return searchOverIndex(indexDocs, canonical);
       }
 
+      const entities = await loadFallbackEntitySearchPool(firestore, searchOptions.releaseId);
       return searchOverEntities(entities, canonical);
     },
   };

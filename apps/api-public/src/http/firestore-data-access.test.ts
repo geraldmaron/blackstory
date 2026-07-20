@@ -1,6 +1,6 @@
 /**
- * Unit tests for live Firestore `PublicDataAccess` bindings — mapping, gating, and reader
- * behavior over an injected fake Firestore client (no emulator or ADC required).
+ * Unit tests for live Firestore `PublicDataAccess` bindings — mapping, gating, index-backed
+ * search, fallback entity scan, and reader behavior over an injected fake Firestore client.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -8,10 +8,15 @@ import type { PublicEntityProjectionDoc } from '@repo/firebase';
 import { entityV1Schema } from '@repo/public-contracts/v1/entity';
 import {
   createFirestoreDataAccessReaders,
+  loadReleaseSearchIndexDocs,
   mapProjectionToEntityV1,
+  mapSearchIndexDoc,
   MAX_LIVE_SEARCH_SCAN,
+  SEARCH_INDEX_PAGE_SIZE,
   type FirestoreClientLike,
   type FirestoreDocSnapshotLike,
+  type FirestoreQueryLike,
+  type FirestoreQuerySnapshotLike,
 } from './firestore-data-access.js';
 import { createFirestorePublicDataAccess } from './data-access.js';
 
@@ -40,8 +45,36 @@ const sampleProjection: PublicEntityProjectionDoc = {
   eraBuckets: ['1860s'],
 };
 
-function doc(exists: boolean, data?: unknown): FirestoreDocSnapshotLike {
+const sampleSearchIndexDoc = {
+  id: 'ent_seed_place_001',
+  releaseId: RELEASE_ID,
+  kind: 'place' as const,
+  displayName: 'Seed Historical Place',
+  nameLower: 'seed historical place',
+  aliases: ['seed place'],
+  summary: sampleProjection.summary,
+  topicTags: ['community', 'education'],
+  eraBuckets: ['1860s'],
+  notabilityBasis: [{ criterion: 'community_landmark', note: 'Documented site.', evidenceIds: [] }],
+  notabilityLabels: ['Community landmark.'],
+  recordMaturity: 'projection_stub',
+  researchCoverage: 'minimal' as const,
+  relatedCount: 1,
+  claimCount: 0,
+};
+
+const secondSearchIndexDoc = {
+  ...sampleSearchIndexDoc,
+  id: 'ent_seed_place_002',
+  displayName: 'Second Seed Place',
+  nameLower: 'second seed place',
+  aliases: [],
+  summary: 'Another seed place for pagination coverage.',
+};
+
+function doc(exists: boolean, data?: unknown, id?: string): FirestoreDocSnapshotLike {
   return {
+    ...(id !== undefined ? { id } : {}),
     exists,
     data() {
       return data;
@@ -49,11 +82,66 @@ function doc(exists: boolean, data?: unknown): FirestoreDocSnapshotLike {
   };
 }
 
+type FakeFirestoreTrace = {
+  entityScans: number;
+  searchIndexQueries: number;
+};
+
 function fakeFirestore(options: {
   readonly activeRelease?: unknown;
   readonly entities?: ReadonlyMap<string, unknown>;
+  readonly searchIndex?: ReadonlyMap<string, unknown>;
+  readonly trace?: FakeFirestoreTrace;
 }): FirestoreClientLike {
   const entities = options.entities ?? new Map<string, unknown>();
+  const searchIndex = options.searchIndex ?? new Map<string, unknown>();
+  const trace = options.trace;
+
+  function buildSearchIndexQuery(releaseId: string): FirestoreQueryLike {
+    let startAfterId: string | undefined;
+    let pageLimit = SEARCH_INDEX_PAGE_SIZE;
+
+    const self: FirestoreQueryLike = {
+      where(field: string, op: '==', value: string) {
+        assert.equal(field, 'releaseId');
+        assert.equal(op, '==');
+        assert.equal(value, releaseId);
+        return self;
+      },
+      orderBy(field: string) {
+        assert.equal(field, '__name__');
+        return self;
+      },
+      limit(count: number) {
+        pageLimit = count;
+        return self;
+      },
+      startAfter(snapshot: FirestoreDocSnapshotLike) {
+        startAfterId = snapshot.id;
+        return self;
+      },
+      async get(): Promise<FirestoreQuerySnapshotLike> {
+        if (trace) trace.searchIndexQueries += 1;
+        const rows = [...searchIndex.entries()]
+          .map(([id, data]) => ({ id, data }))
+          .filter(({ data }) => {
+            const parsed = data as { releaseId?: string };
+            return parsed.releaseId === releaseId;
+          })
+          .sort((a, b) => a.id.localeCompare(b.id));
+
+        const startIndex =
+          startAfterId === undefined
+            ? 0
+            : rows.findIndex((row) => row.id === startAfterId) + 1;
+        const page = rows.slice(startIndex, startIndex + pageLimit);
+        const docs = page.map(({ id, data }) => doc(true, data, id));
+        return { empty: docs.length === 0, size: docs.length, docs };
+      },
+    };
+    return self;
+  }
+
   return {
     doc(path: string) {
       if (path.endsWith('/activeRelease')) {
@@ -73,12 +161,24 @@ function fakeFirestore(options: {
         },
       };
     },
-    collection(_path: string) {
+    collection(path: string) {
+      if (path === 'publicSearchIndex') {
+        return {
+          limit() {
+            throw new Error('publicSearchIndex reads must use where/orderBy, not bare limit');
+          },
+          where(_field: string, _op: '==', releaseId: string) {
+            return buildSearchIndexQuery(releaseId);
+          },
+        };
+      }
+
       return {
         limit(count: number) {
           assert.equal(count, MAX_LIVE_SEARCH_SCAN);
           return {
             async get() {
+              if (trace) trace.entityScans += 1;
               return {
                 docs: [...entities.entries()].map(([id, data]) => ({
                   exists: true,
@@ -89,6 +189,9 @@ function fakeFirestore(options: {
               };
             },
           };
+        },
+        where() {
+          throw new Error('entity fallback does not use where queries');
         },
       };
     },
@@ -151,6 +254,28 @@ test('mapProjectionToEntityV1 returns undefined for an unsupported kind (T3 indi
   assert.equal(mapped, undefined);
 });
 
+test('mapSearchIndexDoc maps Firestore search-index docs for runPublicSearch', () => {
+  const mapped = mapSearchIndexDoc(sampleSearchIndexDoc);
+  assert.equal(mapped.id, sampleSearchIndexDoc.id);
+  assert.equal(mapped.releaseId, RELEASE_ID);
+  assert.equal(mapped.nameLower, 'seed historical place');
+  assert.equal(mapped.relatedCount, 1);
+});
+
+test('loadReleaseSearchIndexDocs pages release-scoped publicSearchIndex queries', async () => {
+  const index = new Map<string, unknown>();
+  for (let i = 0; i < SEARCH_INDEX_PAGE_SIZE + 1; i += 1) {
+    const id = `ent_page_${String(i).padStart(3, '0')}`;
+    index.set(id, { ...sampleSearchIndexDoc, id, releaseId: RELEASE_ID, nameLower: `page ${i}` });
+  }
+  index.set('ent_other_release', { ...sampleSearchIndexDoc, id: 'ent_other_release', releaseId: 'rel_other' });
+
+  const firestore = fakeFirestore({ searchIndex: index });
+  const loaded = await loadReleaseSearchIndexDocs(firestore, RELEASE_ID);
+  assert.equal(loaded.length, SEARCH_INDEX_PAGE_SIZE + 1);
+  assert.ok(loaded.every((row) => row.releaseId === RELEASE_ID));
+});
+
 test('createFirestoreDataAccessReaders collapses missing active release to undefined', async () => {
   const readers = createFirestoreDataAccessReaders({ firestore: fakeFirestore({}) });
   assert.equal(await readers.readReleasePointer(), undefined);
@@ -186,17 +311,75 @@ test('createFirestoreDataAccessReaders collapses missing/invalid entity docs to 
   assert.equal(await readers.readEntity(RELEASE_ID, 'bad'), undefined);
 });
 
-test('createFirestoreDataAccessReaders search scans the release entities collection (bounded)', async () => {
+test('createFirestoreDataAccessReaders search uses publicSearchIndex when rows exist', async () => {
+  const trace = { entityScans: 0, searchIndexQueries: 0 };
   const readers = createFirestoreDataAccessReaders({
-    firestore: fakeFirestore({ entities: new Map([[sampleProjection.id, sampleProjection]]) }),
+    firestore: fakeFirestore({
+      trace,
+      searchIndex: new Map([[sampleSearchIndexDoc.id, sampleSearchIndexDoc]]),
+      entities: new Map([[sampleProjection.id, sampleProjection]]),
+    }),
   });
   const page = await readers.readSearchPage(
-    { q: 'seed', pageSize: 10, depth: 1, filters: {}, geo: undefined, dateRange: undefined },
+    { q: 'seed', pageSize: 10, depth: 1, filters: [], geo: undefined, dateRange: undefined, sort: 'relevance', shape: 'search' },
+    { releaseId: RELEASE_ID },
+  );
+  assert.equal(page.results.length, 1);
+  assert.equal(page.results[0]?.id, sampleSearchIndexDoc.id);
+  assert.equal(page.totalMatched, 1);
+  assert.equal(trace.searchIndexQueries, 1);
+  assert.equal(trace.entityScans, 0);
+  assert.equal(page.facets.kind.place, 1);
+});
+
+test('createFirestoreDataAccessReaders search paginates index-backed results by depth', async () => {
+  const readers = createFirestoreDataAccessReaders({
+    firestore: fakeFirestore({
+      searchIndex: new Map([
+        [sampleSearchIndexDoc.id, sampleSearchIndexDoc],
+        [secondSearchIndexDoc.id, secondSearchIndexDoc],
+      ]),
+    }),
+  });
+  const page1 = await readers.readSearchPage(
+    { q: 'seed', pageSize: 1, depth: 1, filters: [], geo: undefined, dateRange: undefined, sort: 'relevance', shape: 'search' },
+    { releaseId: RELEASE_ID },
+  );
+  const page2 = await readers.readSearchPage(
+    { q: 'seed', pageSize: 1, depth: 2, filters: [], geo: undefined, dateRange: undefined, sort: 'relevance', shape: 'search' },
+    { releaseId: RELEASE_ID },
+  );
+  assert.equal(page1.results.length, 1);
+  assert.equal(page1.hasMore, true);
+  assert.equal(page2.results.length, 1);
+  assert.notEqual(page1.results[0]?.id, page2.results[0]?.id);
+});
+
+test('createFirestoreDataAccessReaders search falls back to bounded entity scan when index is absent', async () => {
+  const trace = { entityScans: 0, searchIndexQueries: 0 };
+  const readers = createFirestoreDataAccessReaders({
+    firestore: fakeFirestore({
+      trace,
+      entities: new Map([[sampleProjection.id, sampleProjection]]),
+    }),
+  });
+  const page = await readers.readSearchPage(
+    { q: 'seed', pageSize: 10, depth: 1, filters: [], geo: undefined, dateRange: undefined, sort: 'relevance', shape: 'search' },
     { releaseId: RELEASE_ID },
   );
   assert.equal(page.results.length, 1);
   assert.equal(page.results[0]?.id, sampleProjection.id);
-  assert.equal(page.totalMatched, 1);
+  assert.equal(trace.searchIndexQueries, 1);
+  assert.equal(trace.entityScans, 1);
+  assert.deepEqual(page.facets, {
+    kind: {},
+    status: {},
+    era: {},
+    theme: {},
+    state: {},
+    recordMaturity: {},
+    researchCoverage: {},
+  });
 });
 
 test('createFirestorePublicDataAccess re-validates mapped entities at the port boundary', async () => {

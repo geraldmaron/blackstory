@@ -87,16 +87,18 @@ Handlers depend on the `PublicDataAccess` port (`data-access.ts`). Two adapters 
   `apps/web/src/lib/public-data/firestore-readers.ts`). Selected at boot by
   `createProductionHandlerDeps` (`./compose.ts`) when the live gate is true.
 
-**Live wiring gaps (honest, tracked in repo-rw1p):** index-backed search/facet filters (live search
-scans up to `MAX_LIVE_SEARCH_SCAN` entities; no `publicSearchIndex` query yet), timeline hydration
-(projection has no timeline field — always `[]` until release builder adds one), Firebase-emulator
-integration tests, timing-attack tests, load/read-budget tests, and SSRF-via-media-URL tests.
+**Live wiring gaps (honest, tracked in repo-rw1p):** release `search-index.json` artifact reads
+(web prefers artifact then Firestore — api-public uses Firestore `publicSearchIndex` only today),
+timeline hydration (projection has no timeline field — always `[]` until release builder adds one),
+Firebase-emulator integration tests, timing-attack tests, load/read-budget tests, and
+SSRF-via-media-URL tests.
 
-**Fixed in MOB-004 live-data pass:** inline `claims` on `publicEntityProjectionSchema` map through
-when present (bootstrap stubs with `claimIds` only still emit `claims: []`; no N+1 claim reads).
-`jurisdictionLabel`, `locationLabel`, `researchCoverage`, and revision timestamps map from the
-projection when present, with the same coordinate-derived jurisdiction fallback as
-`apps/web`'s `map-projection.ts`.
+**Fixed in MOB-004 index search pass:** live `/v1/search` prefers the release-scoped
+`publicSearchIndex` composite query (`releaseId == activeRelease`, `orderBy __name__`, paginated at
+400 docs/page — same shape as `apps/web/src/lib/public-data/firestore-readers.ts`) and runs
+`@repo/domain`'s `runPublicSearch` for filters, facets, ranking, and depth pagination. When no
+index rows exist for the release, search honestly falls back to a bounded entity-collection scan
+(`MAX_LIVE_SEARCH_SCAN`, free-text match only, empty facets).
 
 ## Local run against live Firebase (production project)
 

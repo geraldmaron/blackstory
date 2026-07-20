@@ -26,7 +26,9 @@
  * it leaves this module, so the response-redaction guarantee (no internal/ranking/precise-geo
  * fields — ADR-021 §3) holds regardless of adapter: the zod parse strips any unknown field.
  */
+import { runPublicSearch, type PublicSearchIndexDoc, type SearchExecutionResult } from '@repo/domain';
 import type { CanonicalSearchQuery } from '@repo/security';
+import { normalizeSearchText } from '@repo/security';
 import { entityV1Schema, type EntityV1 } from '@repo/public-contracts/v1/entity';
 import {
   type SearchFacetCountsV1,
@@ -122,13 +124,10 @@ export function createInMemoryPublicDataAccess(options: InMemoryPublicDataOption
 }
 
 /**
- * Pure substring match + cursor-offset pagination over an already-loaded entity array. Shared by
- * `createInMemoryPublicDataAccess` and the live Firestore reader (`./firestore-data-access.ts`) so
- * both adapters rank/paginate identically — this is a known, documented gap, not a hidden one:
- * neither adapter applies `canonical.filters`/`geo`/`dateRange` yet (no facet-backed index exists
- * behind this port today); only the free-text `q` substring match runs. Bounding every query by a
- * real search INDEX (rather than scanning a loaded entity array) is tracked in repo-rw1p's
- * load/cost-report follow-up, not solved here.
+ * Substring match + cursor-offset pagination over an already-loaded entity array. Used by the
+ * in-memory adapter and as a bounded safety-net fallback when live Firestore has no
+ * `publicSearchIndex` rows for the active release (`./firestore-data-access.ts`). Does not apply
+ * facet filters or domain ranking — only free-text `q` on displayName/summary.
  */
 export function searchOverEntities(
   entities: readonly EntityV1[],
@@ -152,6 +151,52 @@ export function searchOverEntities(
     facets: EMPTY_FACETS,
     totalMatched: matches.length,
     hasMore: offset + canonical.pageSize < matches.length,
+  };
+}
+
+/**
+ * Index-backed search via `@repo/domain`'s `runPublicSearch` (same pipeline as
+ * `apps/web/src/app/search/search-view-model.ts`). Applies facet filters, facets, ranking, and
+ * depth-based pagination over persisted `publicSearchIndex` docs loaded by
+ * `./firestore-data-access.ts`.
+ */
+export function searchOverIndex(
+  index: readonly PublicSearchIndexDoc[],
+  canonical: CanonicalSearchQuery,
+): SearchPage {
+  const execution = runPublicSearch(
+    {
+      normalizedQuery: normalizeSearchText(canonical.q),
+      filters: [...canonical.filters],
+      sort: canonical.sort,
+      offset: (canonical.depth - 1) * canonical.pageSize,
+      pageSize: canonical.pageSize,
+    },
+    index,
+  );
+  return mapSearchExecutionToPage(execution);
+}
+
+function mapSearchExecutionToPage(execution: SearchExecutionResult): SearchPage {
+  const results: SearchResultV1[] = execution.results.map((result) => ({
+    id: result.id,
+    kind: result.kind,
+    displayName: result.displayName,
+    ...(result.summary !== undefined ? { summary: result.summary } : {}),
+    matchedOn: result.matchedOn,
+    matchedText: result.matchedText,
+    explanation: result.explanation,
+    ...(result.status !== undefined ? { status: result.status } : {}),
+    eraBuckets: [...result.eraBuckets],
+    notabilityLabels: [...result.notabilityLabels],
+    ...(result.sensitivityClass !== undefined ? { sensitivityClass: result.sensitivityClass } : {}),
+  }));
+
+  return {
+    results,
+    facets: execution.facets,
+    totalMatched: execution.totalMatched,
+    hasMore: execution.hasMore,
   };
 }
 
