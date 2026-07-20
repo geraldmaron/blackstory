@@ -627,6 +627,23 @@
   background: var(--ds-surface-raised);
 }
 
+/* Quiet on fixed charcoal bands — paper hairline + paper text (same contract as
+   ghost-on-band). Theme --ds-ink is black in light mode and would vanish on charcoal. */
+.ds-band .ds-cta--quiet:link,
+.ds-band .ds-cta--quiet:visited,
+.ds-band .ds-cta--quiet {
+  border-color: color-mix(in srgb, var(--ds-fixed-paper) 45%, transparent);
+  color: var(--ds-fixed-paper);
+  background: transparent;
+}
+
+.ds-band .ds-cta--quiet:hover,
+.ds-band .ds-cta--quiet:focus-visible {
+  border-color: var(--ds-fixed-paper);
+  background: color-mix(in srgb, var(--ds-fixed-paper) 8%, transparent);
+  color: var(--ds-fixed-paper);
+}
+
 /* Ghost — hairline pill over themed surfaces (hero, cards).
    `:link`/`:visited` beat a single class (UA visited color), so pin both. */
 .ds-cta.ds-cta--ghost:link,

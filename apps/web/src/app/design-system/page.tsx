@@ -47,7 +47,9 @@ export default function DesignSystemPage() {
         <h2 id="actions-heading">Actions</h2>
         <p>
           One vocabulary, three weights (v5 §5): copper is THE primary action of a view — max one
-          per composition; solid inverts with theme; quiet is a hairline.
+          per composition; solid inverts with theme; quiet is a hairline. On fixed charcoal{' '}
+          <code className="ds-mono">.ds-band</code> surfaces, solid and quiet both use fixed-paper
+          tokens so light-mode site theme never paints black ink on charcoal.
         </p>
         <div className="ds-row">
           <Link className="ds-cta ds-cta--copper" href="#actions-heading">
@@ -70,6 +72,17 @@ export default function DesignSystemPage() {
           <Button type="button" variant="secondary">
             Form secondary
           </Button>
+        </div>
+        <div className="ds-band" style={{ marginTop: '1.5rem', padding: '1.5rem' }}>
+          <p className="ds-section__kicker">Fixed ink band</p>
+          <p className="ds-band__cta" style={{ marginTop: '1rem' }}>
+            <Link className="ds-cta ds-cta--solid" href="#actions-heading">
+              Solid on band
+            </Link>
+            <Link className="ds-cta ds-cta--quiet" href="#actions-heading">
+              Quiet on band
+            </Link>
+          </p>
         </div>
       </section>
 
