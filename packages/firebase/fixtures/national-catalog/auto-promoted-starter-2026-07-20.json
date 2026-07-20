@@ -1,0 +1,230 @@
+[
+  {
+    "id": "ent_little_rock_central_high_school_001",
+    "kind": "school",
+    "displayName": "Little Rock Central High School",
+    "summary": "Little Rock Central High School is preserved by the National Park Service as a National Historic Site in Little Rock, Arkansas. The NPS frames its history and culture around the 1957 struggle for school integration and the people connected to it.",
+    "eraBuckets": [
+      "1950s"
+    ],
+    "topicTags": [
+      "school-desegregation",
+      "civil-rights",
+      "segregation",
+      "education",
+      "history"
+    ],
+    "topicIds": [
+      "school-desegregation",
+      "civil-rights",
+      "segregation",
+      "education",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Little Rock",
+      "Central High School",
+      "National Historic Site",
+      "desegregation",
+      "NPS"
+    ],
+    "jurisdictionLabel": "Little Rock, Arkansas",
+    "locationPrecision": "site",
+    "locationLabel": "Little Rock Central High School, Little Rock, AR",
+    "lat": 34.736,
+    "lng": -92.298,
+    "claims": [
+      {
+        "predicate": "is preserved as",
+        "object": "Little Rock Central High School National Historic Site by the National Park Service",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/chsc/index.htm",
+        "citationLabel": "NPS Little Rock Central High School NHS"
+      },
+      {
+        "predicate": "has history focused on",
+        "object": "the struggle for integration and the 1957 desegregation crisis",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/chsc/index.htm",
+        "citationLabel": "NPS Little Rock Central High School NHS"
+      }
+    ],
+    "historicalContext": "The school is central to the 1957 desegregation crisis, when federal intervention enforced equal-protection mandates against state resistance. It shows how public schools became the front line of the legal and structural fight over segregation."
+  },
+  {
+    "id": "ent_magnolia_plantation_001",
+    "kind": "place",
+    "displayName": "Magnolia Plantation",
+    "summary": "Magnolia Plantation in Derry, Louisiana, is interpreted by the National Park Service as part of Cane River Creole National Historical Park. NPS offers ranger-led grounds tours of its outbuildings, tagging the site for Black and African American heritage.",
+    "eraBuckets": [],
+    "topicTags": [
+      "enslavement",
+      "history",
+      "preservation",
+      "architecture",
+      "community"
+    ],
+    "topicIds": [
+      "enslavement",
+      "history",
+      "preservation",
+      "architecture",
+      "community"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Magnolia Plantation",
+      "Cane River Creole",
+      "NPS tour",
+      "Black heritage",
+      "plantation architecture"
+    ],
+    "jurisdictionLabel": "Derry, Louisiana",
+    "locationPrecision": "site",
+    "locationLabel": "Magnolia Plantation, Derry, LA",
+    "lat": 31.550274,
+    "lng": -92.941718,
+    "claims": [
+      {
+        "predicate": "is interpreted as part of",
+        "object": "Cane River Creole National Historical Park",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/planyourvisit/event-details.htm?id=33EC8179-F95F-8BBA-FBFB4471BE5AA8D7",
+        "citationLabel": "Magnolia Plantation Grounds Tour event page, NPS"
+      },
+      {
+        "predicate": "is tagged for",
+        "object": "Black history and African American heritage by NPS",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/planyourvisit/event-details.htm?id=33EC8179-F95F-8BBA-FBFB4471BE5AA8D7",
+        "citationLabel": "Magnolia Plantation Grounds Tour event tags, NPS"
+      }
+    ],
+    "historicalContext": "Plantation sites like Magnolia, preserved under NPS, anchor the documented history of enslavement and Creole community life to specific Louisiana ground. Federal interpretation counters romanticized estate narratives by centering Black heritage within the Cane River landscape."
+  },
+  {
+    "id": "ent_oakland_plantation_001",
+    "kind": "place",
+    "displayName": "Oakland Plantation",
+    "summary": "Oakland Plantation in Natchez, LA, part of Cane River Creole National Historical Park, was founded ca. 1785 by Jean Pierre Emanuel Prud'homme. Its workforce was originally enslaved; after emancipation, sharecroppers and tenant farmers worked the cotton fields for nearly 200 years.",
+    "eraBuckets": [
+      "1780s",
+      "1860s",
+      "1870s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "emancipation",
+      "agriculture",
+      "land-ownership",
+      "history"
+    ],
+    "topicIds": [
+      "enslavement",
+      "emancipation",
+      "agriculture",
+      "land-ownership",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Creole plantation",
+      "enslaved laborers",
+      "sharecroppers",
+      "Cane River",
+      "Natchez Louisiana"
+    ],
+    "jurisdictionLabel": "Natchez, Louisiana",
+    "locationPrecision": "site",
+    "locationLabel": "Oakland Plantation, Natchez, LA",
+    "lat": 31.66561,
+    "lng": -93.00359,
+    "claims": [
+      {
+        "predicate": "founded by",
+        "object": "Jean Pierre Emanuel Prud'homme around 1785",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/places/oakland-plantation.htm",
+        "citationLabel": "NPS Oakland Plantation page"
+      },
+      {
+        "predicate": "workforce originally comprised of",
+        "object": "enslaved laborers",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/places/oakland-plantation.htm",
+        "citationLabel": "NPS Oakland Plantation page"
+      },
+      {
+        "predicate": "worked by after emancipation",
+        "object": "sharecroppers and tenant farmers",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/places/oakland-plantation.htm",
+        "citationLabel": "NPS Oakland Plantation page"
+      },
+      {
+        "predicate": "part of",
+        "object": "Cane River Creole National Historical Park",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/places/oakland-plantation.htm",
+        "citationLabel": "NPS Oakland Plantation page"
+      }
+    ],
+    "historicalContext": "As a preserved Creole plantation, Oakland documents the structural continuity from enslavement to post-emancipation agricultural labor systems like sharecropping, showing how Louisiana's colonial racial order persisted through Reconstruction and Jim Crow economies."
+  },
+  {
+    "id": "ent_marian_anderson_lincoln_memorial_concert_001",
+    "kind": "event",
+    "displayName": "Marian Anderson Lincoln Memorial Concert",
+    "summary": "In 1939, Marian Anderson performed an open-air concert on the Lincoln Memorial steps after being denied a segregated venue. The National Park Service records this as a landmark moment in the memorial's civic history in Washington, D.C.",
+    "eraBuckets": [
+      "1930s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "public-accommodations",
+      "national-mall",
+      "memory"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "public-accommodations",
+      "national-mall",
+      "memory"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Marian Anderson",
+      "Lincoln Memorial steps",
+      "1939 concert",
+      "segregated venue",
+      "civic expression"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "site",
+    "locationLabel": "Marian Anderson Lincoln Memorial Concert, Washington, DC",
+    "lat": 38.889321,
+    "lng": -77.050166,
+    "claims": [
+      {
+        "predicate": "performed open-air concert at",
+        "object": "Lincoln Memorial steps in 1939 after being denied a segregated venue",
+        "confidenceLevel": "high",
+        "citationSource": "home.nps.gov",
+        "citationHref": "https://home.nps.gov/places/lincolnsteps.htm",
+        "citationLabel": "NPS Lincoln Memorial Steps"
+      }
+    ],
+    "historicalContext": "The concert occurred within the era of legally enforced segregation in public accommodations, when Black Americans were routinely barred from white venues. Such exclusions propelled direct challenges to racial boundaries that fed the broader civil-rights movement."
+  }
+]
