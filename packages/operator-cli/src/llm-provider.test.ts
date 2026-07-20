@@ -8,6 +8,7 @@ import {
   createMockLlmProvider,
   createOllamaLlmProvider,
   extractMessageContent,
+  stripMarkdownCodeFence,
 } from './llm-provider.ts';
 import { runEditorialJudge } from './editorial-run.ts';
 
@@ -21,6 +22,64 @@ test('extractMessageContent prefers content over reasoning', () => {
 test('extractMessageContent pulls JSON from reasoning when content empty', () => {
   const reasoning = 'thinking… {"decision":"keep","rationale":"x"} trailing';
   assert.equal(extractMessageContent({ content: '', reasoning }), '{"decision":"keep","rationale":"x"}');
+});
+
+// Reproduces a live mistralai/mistral-small-3.2-24b-instruct response verbatim: the model
+// wrapped an otherwise-valid completion in a markdown code fence despite the "return ONLY
+// JSON" system prompt. Before this fix, extractMessageContent returned the fenced string
+// unchanged, looksLikeJsonObject's startsWith('{') check rejected it as "non-JSON", and the
+// hybrid provider failed over (or failed entirely) even though the JSON itself was fine —
+// this was ~10% of all enrichment items across the 2026-07-19/20 overnight run.
+test('stripMarkdownCodeFence removes a ```json fence', () => {
+  const fenced = '```json\n{\n  "decision": "keep"\n}\n```';
+  assert.equal(stripMarkdownCodeFence(fenced), '{\n  "decision": "keep"\n}');
+});
+
+test('stripMarkdownCodeFence removes a bare ``` fence', () => {
+  assert.equal(stripMarkdownCodeFence('```\n{"a":1}\n```'), '{"a":1}');
+});
+
+test('stripMarkdownCodeFence leaves unfenced content untouched', () => {
+  assert.equal(stripMarkdownCodeFence('{"a":1}'), '{"a":1}');
+});
+
+test('extractMessageContent strips a code fence so the content is usable JSON', () => {
+  const fenced = '```json\n{"decision":"keep","rationale":"x"}\n```';
+  assert.equal(extractMessageContent({ content: fenced }), '{"decision":"keep","rationale":"x"}');
+});
+
+test('hybrid does NOT fail over when openrouter wraps valid JSON in a code fence', async () => {
+  let ollamaCalls = 0;
+  const fetchImpl: typeof fetch = async (input) => {
+    const url = String(input);
+    if (url.includes('openrouter.ai')) {
+      return Response.json({
+        model: 'mistralai/mistral-small-3.2-24b-instruct',
+        choices: [
+          {
+            message: {
+              role: 'assistant',
+              content:
+                '```json\n{"decision":"keep","rationale":"ok","confidence":0.8,"drafts":{}}\n```',
+            },
+          },
+        ],
+      });
+    }
+    if (url.includes('/api/chat')) {
+      ollamaCalls += 1;
+      throw new Error('ollama should not be called');
+    }
+    throw new Error(`unexpected ${url}`);
+  };
+  const provider = createHybridLlmProvider({ apiKey: 'test-key', fetchImpl, maxAttempts: 1 });
+  const result = await provider.complete({
+    model: 'openrouter/free',
+    messages: [{ role: 'user', content: 'hi' }],
+  });
+  assert.equal(result.servedBy, 'openrouter');
+  assert.equal(ollamaCalls, 0);
+  assert.equal(result.content, '{"decision":"keep","rationale":"ok","confidence":0.8,"drafts":{}}');
 });
 
 test('hybrid fails over to ollama when openrouter returns retryable error', async () => {

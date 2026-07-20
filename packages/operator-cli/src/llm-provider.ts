@@ -87,18 +87,36 @@ type ChatMessagePayload = {
   readonly thinking?: string | null;
 };
 
+/**
+ * Strips a leading/trailing markdown code fence some models wrap JSON
+ * responses in despite "return ONLY JSON" instructions — observed live from
+ * mistralai/mistral-small-3.2-24b-instruct, whose response was the otherwise-
+ * valid ```json\n{...}\n``` verbatim. Left un-stripped, this content never
+ * even reaches JSON.parse: looksLikeJsonObject's startsWith('{') check
+ * rejects it outright as "non-JSON", which is what was producing ~10% of
+ * enrichment items silently degrading to needs_evidence with a
+ * "returned non-JSON content" error that had nothing to do with the JSON
+ * itself being malformed.
+ */
+export function stripMarkdownCodeFence(content: string): string {
+  const trimmed = content.trim();
+  const fenced = /^```[a-zA-Z]*\n([\s\S]*?)\n?```$/u.exec(trimmed);
+  return fenced?.[1] !== undefined ? fenced[1].trim() : trimmed;
+}
+
 /** Prefer message.content; fall back to reasoning/thinking (qwen3 OpenAI-compat quirk). */
 export function extractMessageContent(message: ChatMessagePayload | undefined): string {
   const content = message?.content?.trim();
-  if (content) return content;
+  if (content) return stripMarkdownCodeFence(content);
   const reasoning = message?.reasoning?.trim() || message?.thinking?.trim();
   if (!reasoning) return '';
-  const jsonStart = reasoning.indexOf('{');
-  const jsonEnd = reasoning.lastIndexOf('}');
+  const stripped = stripMarkdownCodeFence(reasoning);
+  const jsonStart = stripped.indexOf('{');
+  const jsonEnd = stripped.lastIndexOf('}');
   if (jsonStart >= 0 && jsonEnd > jsonStart) {
-    return reasoning.slice(jsonStart, jsonEnd + 1);
+    return stripped.slice(jsonStart, jsonEnd + 1);
   }
-  return reasoning;
+  return stripped;
 }
 
 function isRetryableStatus(status: number): boolean {
