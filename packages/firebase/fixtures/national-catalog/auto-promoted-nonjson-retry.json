@@ -1,0 +1,1067 @@
+[
+  {
+    "id": "gap_anacostia_high_school",
+    "kind": "school",
+    "displayName": "Anacostia High School",
+    "summary": "Anacostia High School, located in Washington, D.C., is a public high school established in 1937. It has been associated with notable alumni and has undergone significant educational reforms, including the Small Learning Community model.",
+    "eraBuckets": [
+      "1930s",
+      "2000s"
+    ],
+    "topicTags": [
+      "education",
+      "civil-rights",
+      "history"
+    ],
+    "topicIds": [
+      "education",
+      "civil-rights",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Anacostia High School",
+      "Washington, D.C.",
+      "Small Learning Community",
+      "educational reforms"
+    ],
+    "jurisdictionLabel": "Washington, D.C.",
+    "locationPrecision": "neighborhood",
+    "locationLabel": "Anacostia, Southeast quadrant",
+    "lat": 38.8698,
+    "lng": -76.9825,
+    "claims": [
+      {
+        "predicate": "established",
+        "object": "1937",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Anacostia_High_School",
+        "citationLabel": "Anacostia High School Wikipedia"
+      },
+      {
+        "predicate": "location",
+        "object": "Washington, D.C.",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Anacostia_High_School",
+        "citationLabel": "Anacostia High School Wikipedia"
+      },
+      {
+        "predicate": "associated_with",
+        "object": "Small Learning Community model",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Anacostia_High_School",
+        "citationLabel": "Anacostia High School Wikipedia"
+      },
+      {
+        "predicate": "alumni",
+        "object": "Frederick Drew Gregory",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Anacostia_High_School",
+        "citationLabel": "Anacostia High School Wikipedia"
+      },
+      {
+        "predicate": "alumni",
+        "object": "Lonny Baxter",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Anacostia_High_School",
+        "citationLabel": "Anacostia High School Wikipedia"
+      }
+    ],
+    "historicalContext": "Anacostia High School, established in 1937, is part of the District of Columbia Public Schools system. It has been a focal point for educational reforms, including the implementation of the Small Learning Community model, which aimed to improve student outcomes through specialized academies. The school's location in Southeast D.C. has historically been part of the broader context of urban education and community development."
+  },
+  {
+    "id": "gap_morris_brown_college",
+    "kind": "school",
+    "displayName": "Morris Brown College",
+    "summary": "Morris Brown College, founded in 1881 by African-Americans affiliated with the African Methodist Episcopal Church, was the first educational institution in Georgia to be owned and operated entirely by African-Americans. It played a significant role in the development of Black education in the United States.",
+    "eraBuckets": [
+      "1880s",
+      "1950s",
+      "2000s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "education",
+      "history",
+      "hbcu",
+      "jim-crow",
+      "segregation"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "education",
+      "history",
+      "hbcu",
+      "jim-crow",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Morris Brown College",
+      "African Methodist Episcopal Church",
+      "education",
+      "Georgia",
+      "National Historic Landmark"
+    ],
+    "jurisdictionLabel": "Atlanta, Georgia",
+    "locationPrecision": "building",
+    "locationLabel": "Fountain Hall",
+    "lat": 33.7548,
+    "lng": -84.4089,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "Morris Brown College",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Morris_Brown_College",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "owned_and_operated_by",
+        "object": "African-Americans",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Morris_Brown_College",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "first_educational_institution_in_georgia",
+        "object": "Morris Brown College",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Morris_Brown_College",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "associated_with",
+        "object": "African Methodist Episcopal Church",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Morris_Brown_College",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "national_historic_landmark",
+        "object": "Fountain Hall",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Morris_Brown_College",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Morris Brown College was established in the aftermath of the American Civil War, as part of the African Methodist Episcopal Church's efforts to provide education to freedmen in the South. The college's founding and operation by African-Americans marked a significant milestone in the history of Black education in the United States, particularly in Georgia."
+  },
+  {
+    "id": "gap_foster_auditorium",
+    "kind": "place",
+    "displayName": "Foster Auditorium",
+    "summary": "Foster Auditorium, located at the University of Alabama, is historically significant for its role in the Civil Rights Movement, particularly as the site of the 'Stand in the Schoolhouse Door' incident in 1963, where Governor George Wallace attempted to block two Black students from enrolling.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Civil Rights Movement",
+      "Stand in the Schoolhouse Door",
+      "George Wallace",
+      "Vivian Malone",
+      "James Hood"
+    ],
+    "jurisdictionLabel": "Tuscaloosa, Alabama",
+    "locationPrecision": "campus",
+    "locationLabel": "University of Alabama",
+    "lat": 33.20777778,
+    "lng": -87.54388889,
+    "claims": [
+      {
+        "predicate": "was_used_as",
+        "object": "site of the 'Stand in the Schoolhouse Door' incident",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Foster_Auditorium",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_named_after",
+        "object": "Richard Clarke Foster",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Foster_Auditorium",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_declared",
+        "object": "National Historic Landmark",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Foster_Auditorium",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_involved_in",
+        "object": "Civil Rights Movement",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Foster_Auditorium",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_part_of",
+        "object": "University of Alabama",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Foster_Auditorium",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Foster Auditorium is a multi-purpose facility at the University of Alabama, built in 1939. It became a focal point during the Civil Rights Movement when Governor George Wallace stood in its doorway to prevent the enrollment of Black students Vivian Malone and James Hood in 1963. This event is a pivotal moment in the fight against segregation and is recognized as a National Historic Landmark."
+  },
+  {
+    "id": "gap_charleston_s_african_church",
+    "kind": "institution",
+    "displayName": "Charleston's African Church",
+    "summary": "Charleston's African Church, founded in 1816, was a pivotal congregation that became Emanuel AME Church, a cornerstone of the African Methodist Episcopal denomination and a site of significant historical events, including the 2015 Charleston church shooting.",
+    "eraBuckets": [
+      "1810s",
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "church",
+      "history",
+      "jim-crow",
+      "freedom"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "church",
+      "history",
+      "jim-crow",
+      "freedom"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Charleston church",
+      "Emanuel AME",
+      "African Methodist Episcopal",
+      "Charleston church shooting",
+      "civil rights"
+    ],
+    "jurisdictionLabel": "Charleston, South Carolina",
+    "locationPrecision": "district",
+    "locationLabel": "Charleston Historic District",
+    "lat": 32.78722222,
+    "lng": -79.93305556,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "Charleston's African Church",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Emanuel_African_Methodist_Episcopal_Church",
+        "citationLabel": "Emanuel African Methodist Episcopal Church Wikipedia"
+      },
+      {
+        "predicate": "became",
+        "object": "Emanuel AME Church",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Emanuel_African_Methodist_Episcopal_Church",
+        "citationLabel": "Emanuel African Methodist Episcopal Church Wikipedia"
+      },
+      {
+        "predicate": "part_of",
+        "object": "African Methodist Episcopal Church",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Emanuel_African_Methodist_Episcopal_Church",
+        "citationLabel": "Emanuel African Methodist Episcopal Church Wikipedia"
+      },
+      {
+        "predicate": "location",
+        "object": "Charleston, South Carolina",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Emanuel_African_Methodist_Episcopal_Church",
+        "citationLabel": "Emanuel African Methodist Episcopal Church Wikipedia"
+      },
+      {
+        "predicate": "scene_of",
+        "object": "Charleston church shooting",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Emanuel_African_Methodist_Episcopal_Church",
+        "citationLabel": "Emanuel African Methodist Episcopal Church Wikipedia"
+      }
+    ],
+    "historicalContext": "Charleston's African Church, established in 1816, was a critical part of the African Methodist Episcopal Church's founding and played a role in the broader context of Black religious and civil rights history. It was also the site of the 2015 Charleston church shooting, highlighting its ongoing significance in American history."
+  },
+  {
+    "id": "gap_franklin_and_armfield",
+    "kind": "organization",
+    "displayName": "Franklin and Armfield",
+    "summary": "Franklin and Armfield's offices in Alexandria, Virginia, were the largest domestic slave-trading firm in the antebellum United States, trafficking at least 5,000 enslaved people. The site is now a National Historic Landmark and hosts the Freedom House Museum.",
+    "eraBuckets": [
+      "1810s",
+      "1820s",
+      "1830s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Franklin and Armfield",
+      "slavery",
+      "National Historic Landmark",
+      "Freedom House Museum",
+      "Alexandria, Virginia"
+    ],
+    "jurisdictionLabel": "Alexandria, Virginia",
+    "locationPrecision": "address",
+    "locationLabel": "1315 Duke Street",
+    "lat": 38.80388889,
+    "lng": -77.05472222,
+    "claims": [
+      {
+        "predicate": "was",
+        "object": "the largest domestic slave-trading firm in the antebellum United States",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Franklin_and_Armfield_Office",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "trafficked",
+        "object": "at least 5,000 slaves",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Franklin_and_Armfield_Office",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is",
+        "object": "a National Historic Landmark",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/78003146",
+        "citationLabel": "National Park Service"
+      },
+      {
+        "predicate": "houses",
+        "object": "the Freedom House Museum",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Franklin_and_Armfield_Office",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Franklin and Armfield's operations were central to the domestic slave trade in the United States, reflecting the economic and institutional structures of slavery. The site's designation as a National Historic Landmark underscores its role in documenting this history."
+  },
+  {
+    "id": "gap_levy_county",
+    "kind": "place",
+    "displayName": "Levy County",
+    "summary": "Levy County, Florida, was the site of the 1923 Rosewood Massacre, in which a white mob destroyed the predominantly Black town of Rosewood following a false accusation, killing several residents and displacing survivors. This event stands as a documented example of racial violence during the Jim Crow era.",
+    "eraBuckets": [
+      "1920s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "mass-mobilization",
+      "resistance",
+      "segregation"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "mass-mobilization",
+      "resistance",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Rosewood Massacre",
+      "Levy County",
+      "Florida",
+      "racial violence",
+      "Jim Crow"
+    ],
+    "jurisdictionLabel": "Levy County, Florida",
+    "locationPrecision": "county",
+    "locationLabel": "County in North Central Florida",
+    "lat": 29.28,
+    "lng": -82.79,
+    "claims": [
+      {
+        "predicate": "was the location of",
+        "object": "the Rosewood Massacre",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Levy_County%2C_Florida",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "has county seat",
+        "object": "Bronson",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Levy_County%2C_Florida",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was named after",
+        "object": "David Levy Yulee",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Levy_County%2C_Florida",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "experienced racial violence in",
+        "object": "1923",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Levy_County%2C_Florida",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was created in",
+        "object": "1845",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Levy_County%2C_Florida",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The Rosewood Massacre reflects the broader pattern of racial terror in the early 20th-century South, where false accusations against Black individuals triggered violent reprisals aimed at dismantling successful Black communities. Levy County's role in this event underscores the systemic nature of racial violence and the failure of state protection during the Jim Crow era."
+  },
+  {
+    "id": "gap_st_joseph_s_ame_church",
+    "kind": "institution",
+    "displayName": "St. Joseph's AME Church",
+    "summary": "St. Joseph's AME Church, founded in 1869 and built in 1891, is a historic Black church in Durham, North Carolina, central to the Hayti District's development as a self-sufficient Black community.",
+    "eraBuckets": [
+      "1860s",
+      "1890s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "jim-crow",
+      "history",
+      "community",
+      "church"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "jim-crow",
+      "history",
+      "community",
+      "church"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "St. Joseph's AME Church",
+      "Hayti District",
+      "Durham, North Carolina",
+      "National Register of Historic Places",
+      "Edian Markham"
+    ],
+    "jurisdictionLabel": "Durham, North Carolina",
+    "locationPrecision": "address",
+    "locationLabel": "Fayetteville St. and Durham Expwy.",
+    "lat": 35.98638889,
+    "lng": -78.89805556,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "by Black workers post-Civil War",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/St._Joseph's_African_Methodist_Episcopal_Church",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "built",
+        "object": "in 1891",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/St._Joseph's_African_Methodist_Episcopal_Church",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "located",
+        "object": "at Fayetteville St. and Durham Expwy., Durham, North Carolina",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/St._Joseph's_African_Methodist_Episcopal_Church",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "organized",
+        "object": "by Edian Markham, a former slave and AME missionary",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/St._Joseph's_African_Methodist_Episcopal_Church",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "recognized",
+        "object": "by the National Register of Historic Places in 1976",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/St._Joseph's_African_Methodist_Episcopal_Church",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "St. Joseph's AME Church is a key example of Black-led religious and community institutions in the post-Civil War era, reflecting the resilience and self-sufficiency of Black communities in the Jim Crow South. It is part of the Hayti District, a historically Black neighborhood in Durham, North Carolina, and was recognized by the National Register of Historic Places in 1976."
+  },
+  {
+    "id": "gap_south_carolina_state_university",
+    "kind": "school",
+    "displayName": "South Carolina State University",
+    "summary": "South Carolina State University, established in 1896 as a land-grant institution, played a significant role in the civil rights movement, including the 1968 Orangeburg massacre, and remains a historically Black university in South Carolina.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "hbcu",
+      "land-grant",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "hbcu",
+      "land-grant",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "land-grant",
+      "civil rights",
+      "Orangeburg massacre",
+      "historically Black university",
+      "South Carolina"
+    ],
+    "jurisdictionLabel": "Orangeburg, South Carolina",
+    "locationPrecision": "campus",
+    "locationLabel": "South Carolina State University campus",
+    "lat": 33.49722222,
+    "lng": -80.85,
+    "claims": [
+      {
+        "predicate": "was established",
+        "object": "South Carolina State University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/South_Carolina_State_University",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was a land-grant institution",
+        "object": "South Carolina State University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/South_Carolina_State_University",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was founded as",
+        "object": "Colored Normal Industrial Agricultural and Mechanical College of South Carolina",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/South_Carolina_State_University",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was involved in",
+        "object": "Orangeburg massacre",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/South_Carolina_State_University",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was a historically Black university",
+        "object": "South Carolina State University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/South_Carolina_State_University",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "South Carolina State University was founded as a land-grant institution under the 1862 Morrill Act, providing education to Black students during segregation. Its role in civil rights activism, including the 1968 Orangeburg massacre, highlights its significance in the fight against racial segregation and discrimination."
+  },
+  {
+    "id": "gap_fanny_jackson_coppin_normal_school",
+    "kind": "school",
+    "displayName": "Fanny Jackson Coppin Normal School",
+    "summary": "Fanny Jackson Coppin Normal School, established in 1900, was a pioneering institution for African-American teacher training and was later renamed in honor of Fanny Jackson Coppin, a key figure in Black education.",
+    "eraBuckets": [
+      "1900s",
+      "1920s",
+      "1930s",
+      "1960s"
+    ],
+    "topicTags": [
+      "education",
+      "civil-rights",
+      "history",
+      "hbcu",
+      "segregation"
+    ],
+    "topicIds": [
+      "education",
+      "civil-rights",
+      "history",
+      "hbcu",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "teacher training",
+      "historically black university",
+      "Fanny Jackson Coppin",
+      "Coppin State University",
+      "education"
+    ],
+    "jurisdictionLabel": "Baltimore, Maryland",
+    "locationPrecision": "city",
+    "locationLabel": "Baltimore, Maryland",
+    "lat": 39.31028,
+    "lng": -76.65861,
+    "claims": [
+      {
+        "predicate": "was_founded_in",
+        "object": "1900",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Coppin_State_University",
+        "citationLabel": "Coppin State University Wikipedia"
+      },
+      {
+        "predicate": "was_named_after",
+        "object": "Fanny Jackson Coppin",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Coppin_State_University",
+        "citationLabel": "Coppin State University Wikipedia"
+      },
+      {
+        "predicate": "was_part_of",
+        "object": "University System of Maryland",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Coppin_State_University",
+        "citationLabel": "Coppin State University Wikipedia"
+      },
+      {
+        "predicate": "was_renamed",
+        "object": "Coppin State University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Coppin_State_University",
+        "citationLabel": "Coppin State University Wikipedia"
+      },
+      {
+        "predicate": "was_established_as",
+        "object": "teacher_training_institution",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Coppin_State_University",
+        "citationLabel": "Coppin State University Wikipedia"
+      }
+    ],
+    "historicalContext": "Fanny Jackson Coppin Normal School was founded in 1900 as a teacher training institution for African-American students. It evolved into a historically Black university, reflecting broader trends in Black education and the establishment of institutions to support Black communities during the Jim Crow era."
+  },
+  {
+    "id": "gap_june_17_2015_racist_attack_at_emanuel_ame",
+    "kind": "event",
+    "displayName": "June 17, 2015 racist attack at Emanuel AME",
+    "summary": "On June 17, 2015, a racist mass shooting occurred at the Emanuel African Methodist Episcopal Church in Charleston, South Carolina, killing nine African American church members, including pastor Rev. Clementa Pinckney. The attack, motivated by white supremacist ideology, sparked national conversations about race, Confederate symbols, and racial violence.",
+    "eraBuckets": [
+      "2010s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "racist attack",
+      "Emanuel AME",
+      "Charleston church shooting",
+      "Clementa Pinckney",
+      "Dylann Roof"
+    ],
+    "jurisdictionLabel": "Charleston, South Carolina",
+    "locationPrecision": "institution",
+    "locationLabel": "Emanuel African Methodist Episcopal Church",
+    "lat": 32.7875,
+    "lng": -79.93305556,
+    "claims": [
+      {
+        "predicate": "was_targeted_by",
+        "object": "racist attack",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "was_killed_in",
+        "object": "racist attack",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "was_part_of",
+        "object": "history_of_black_resistance",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "was_associated_with",
+        "object": "Confederate symbols",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "was_part_of",
+        "object": "civil_rights_movement",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      }
+    ],
+    "historicalContext": "The Emanuel African Methodist Episcopal Church, founded in 1816, is one of the oldest Black churches in the South and has a long history of resistance against slavery and racial oppression. The 2015 attack, which targeted the church during a Bible study, was part of a broader pattern of racial violence and white supremacist ideology in the United States. The incident also reignited debates about the display of Confederate symbols and the legacy of slavery."
+  },
+  {
+    "id": "sundown_culver_city_california",
+    "kind": "place",
+    "displayName": "Culver City, California",
+    "summary": "Culver City, California, was planned as an all-white suburb with deed restrictions that barred property ownership by people of color, reflecting its history as a sundown town.",
+    "eraBuckets": [
+      "1910s",
+      "1920s"
+    ],
+    "topicTags": [
+      "segregation",
+      "civil-rights",
+      "jim-crow",
+      "housing"
+    ],
+    "topicIds": [
+      "segregation",
+      "civil-rights",
+      "jim-crow",
+      "housing"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "sundown town",
+      "deed restrictions",
+      "racial exclusion",
+      "suburban development",
+      "segregation"
+    ],
+    "jurisdictionLabel": "Culver City, California",
+    "locationPrecision": "city",
+    "locationLabel": "Culver City, California",
+    "lat": 34.00777778,
+    "lng": -118.40083333,
+    "claims": [
+      {
+        "predicate": "was_planned_as",
+        "object": "all-white suburb",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Culver_City%2C_California",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "had_deed_restrictions",
+        "object": "barred_property_ownership_by_people_of_color",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Culver_City%2C_California",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_part_of",
+        "object": "pattern_of_racial_exclusion_in_suburban_development",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Culver_City%2C_California",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_known_as",
+        "object": "sundown_town",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Culver_City%2C_California",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Culver City was explicitly founded as a whites-only sundown town, part of a broader pattern of racial exclusion in suburban development. Its deed restrictions and exclusionary practices are key examples of segregation and systemic racism in the U.S. during the early 20th century."
+  },
+  {
+    "id": "sundown_manhattan_beach_california",
+    "kind": "place",
+    "displayName": "Manhattan Beach, California",
+    "summary": "Manhattan Beach, California, was a sundown town in the 1920s where Black-owned businesses were condemned and Black home ownership restricted. Bruce's Beach, a popular African-American resort, was closed by the city in 1924 using eminent domain. In 2021, the Los Angeles County Board of Supervisors voted to return the land to the heirs of Charles and Willa Bruce.",
+    "eraBuckets": [
+      "1910s",
+      "1920s",
+      "2020s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "segregation",
+      "civil-rights",
+      "history"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "segregation",
+      "civil-rights",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Manhattan Beach",
+      "Bruce's Beach",
+      "sundown town",
+      "eminent domain",
+      "Black-owned businesses"
+    ],
+    "jurisdictionLabel": "Manhattan Beach, California",
+    "locationPrecision": "city",
+    "locationLabel": "Manhattan Beach, California",
+    "lat": 33.88888889,
+    "lng": -118.40527778,
+    "claims": [
+      {
+        "predicate": "was influenced by",
+        "object": "Ku Klux Klan",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Manhattan_Beach%2C_California",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "condemned",
+        "object": "Black-owned businesses",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Manhattan_Beach%2C_California",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "restricted",
+        "object": "Black home ownership",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Manhattan_Beach%2C_California",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "used eminent domain to close",
+        "object": "Bruce's Beach",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Manhattan_Beach%2C_California",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "voted to return land to",
+        "object": "heirs of Charles and Willa Bruce",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Manhattan_Beach%2C_California",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Manhattan Beach's history reflects the broader context of segregation and discriminatory practices in the United States, particularly the sundown town phenomenon. These practices were part of a larger system of racial exclusion that affected Black communities across the country, including through the enforcement of Jim Crow laws and the use of eminent domain to displace Black residents and businesses."
+  },
+  {
+    "id": "sundown_minden_nevada",
+    "kind": "place",
+    "displayName": "Minden, Nevada",
+    "summary": "Minden, Nevada, was a sundown town with a siren that warned Native Americans to leave by 6:30 PM, enforced from 1908 to 1974. The practice was part of a broader system of racial segregation and discrimination.",
+    "eraBuckets": [
+      "1900s",
+      "1910s",
+      "1970s"
+    ],
+    "topicTags": [
+      "segregation",
+      "jim-crow",
+      "civil-rights",
+      "history",
+      "migration"
+    ],
+    "topicIds": [
+      "segregation",
+      "jim-crow",
+      "civil-rights",
+      "history",
+      "migration"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "sundown town",
+      "Native Americans",
+      "segregation",
+      "Minden",
+      "Nevada"
+    ],
+    "jurisdictionLabel": "Minden, Nevada",
+    "locationPrecision": "city",
+    "locationLabel": "Minden, Nevada",
+    "lat": 38.95611111,
+    "lng": -119.76916667,
+    "claims": [
+      {
+        "predicate": "had_sundown_ordinance",
+        "object": "Minden, Nevada",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Minden%2C_Nevada",
+        "citationLabel": "Minden, Nevada Wikipedia"
+      },
+      {
+        "predicate": "enforced_sundown_siren",
+        "object": "Minden, Nevada",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Minden%2C_Nevada",
+        "citationLabel": "Minden, Nevada Wikipedia"
+      },
+      {
+        "predicate": "repealed_sundown_ordinance",
+        "object": "Minden, Nevada",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Minden%2C_Nevada",
+        "citationLabel": "Minden, Nevada Wikipedia"
+      },
+      {
+        "predicate": "associated_with_racial_discrimination",
+        "object": "Minden, Nevada",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Minden%2C_Nevada",
+        "citationLabel": "Minden, Nevada Wikipedia"
+      }
+    ],
+    "historicalContext": "Minden's sundown ordinance was part of a larger pattern of racial segregation and discrimination against Native Americans in the United States. Such ordinances were used to enforce racial boundaries and control the movement of Indigenous peoples, reflecting the systemic racism of the Jim Crow era."
+  },
+  {
+    "id": "sundown_mitchell_county_north_carolina",
+    "kind": "place",
+    "displayName": "Mitchell County, North Carolina",
+    "summary": "Mitchell County, North Carolina, was a sundown town in 1899, prohibiting Black people from living or working there. It experienced racial violence in 1923, with a white mob forcing Black residents to flee, marking a significant instance of segregation-era racial terror.",
+    "eraBuckets": [
+      "1910s",
+      "1920s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "segregation",
+      "civil-rights",
+      "migration"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "segregation",
+      "civil-rights",
+      "migration"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "sundown town",
+      "racial violence",
+      "Mitchell County",
+      "1923",
+      "martial law"
+    ],
+    "jurisdictionLabel": "Mitchell County, North Carolina",
+    "locationPrecision": "county",
+    "locationLabel": "Mitchell County, North Carolina",
+    "lat": 36.01,
+    "lng": -82.16,
+    "claims": [
+      {
+        "predicate": "was described as",
+        "object": "a sundown town",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mitchell_County%2C_North_Carolina",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "had a policy",
+        "object": "preventing Black Americans from living or working",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mitchell_County%2C_North_Carolina",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "experienced racial violence",
+        "object": "in 1923 with a white mob forcing Black residents to flee",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mitchell_County%2C_North_Carolina",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was the site of",
+        "object": "the first instance of martial law declared in response to mass racial violence in the U.S.",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mitchell_County%2C_North_Carolina",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Mitchell County's sundown town policy exemplifies the systemic racial exclusion enforced by segregation laws. The 1923 incident, where a white mob drove Black residents from the county, highlights the violence and legal impunity that characterized racial oppression in the Jim Crow South."
+  }
+]

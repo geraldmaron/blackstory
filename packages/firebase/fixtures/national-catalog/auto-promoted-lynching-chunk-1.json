@@ -340,24 +340,24 @@
     "jurisdictionLabel": "Toyah, Texas",
     "locationPrecision": "city",
     "locationLabel": "Site of lynching",
-    "lat": 36.1597,
-    "lng": -95.9858,
+    "lat": 31.31333333,
+    "lng": -103.79305556,
     "claims": [
       {
         "predicate": "was lynched",
         "object": "on October 26, 1906, in Toyah, Texas, following an accusation of living with a white woman",
         "confidenceLevel": "high",
         "citationSource": "wikipedia_api",
-        "citationHref": "https://en.wikipedia.org/wiki/Tulsa_race_massacre",
-        "citationLabel": "Wikipedia API (contextual mention via lynching documentation)"
+        "citationHref": "https://en.wikipedia.org/wiki/List_of_lynching_victims_in_the_United_States",
+        "citationLabel": "List of lynching victims in the United States (Wikipedia)"
       },
       {
         "predicate": "died by racial violence",
         "object": "after being dragged to death and hanged in Reeves County, Texas",
         "confidenceLevel": "high",
         "citationSource": "wikipedia_api",
-        "citationHref": "https://en.wikipedia.org/wiki/Tulsa_race_massacre",
-        "citationLabel": "Wikipedia API (contextual mention via lynching documentation)"
+        "citationHref": "https://en.wikipedia.org/wiki/List_of_lynching_victims_in_the_United_States",
+        "citationLabel": "List of lynching victims in the United States (Wikipedia)"
       }
     ],
     "historicalContext": "Pitts' lynching occurred during the Nadir of American race relations, a period marked by widespread anti-Black violence and the codification of racial segregation. Lynchings like his were acts of racial terror used to enforce white supremacy, particularly in response to perceived violations of racial and social boundaries, such as interracial relationships."

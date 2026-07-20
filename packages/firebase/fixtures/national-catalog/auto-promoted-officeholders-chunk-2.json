@@ -1,0 +1,73 @@
+[
+  {
+    "id": "recon_joseph_e_clark",
+    "kind": "person",
+    "displayName": "Joseph E. Clark",
+    "summary": "Joseph E. Clark was a formerly enslaved man who helped establish Eatonville, Florida—one of the first self-governing Black towns in the U.S.—and served as its postmaster from 1889 to 1907, a federally appointed role reflecting Black political agency during Reconstruction and its aftermath.",
+    "eraBuckets": [
+      "1880s",
+      "1890s",
+      "1900s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "self-governance",
+      "civil-rights",
+      "founding-era"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "self-governance",
+      "civil-rights",
+      "founding-era"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Eatonville",
+      "postmaster",
+      "Black town",
+      "Reconstruction",
+      "self-governance"
+    ],
+    "jurisdictionLabel": "Eatonville, Florida",
+    "locationPrecision": "town",
+    "locationLabel": "Historic town center",
+    "lat": 28.61666667,
+    "lng": -81.39055556,
+    "claims": [
+      {
+        "predicate": "helped found the town of Eatonville, Florida",
+        "object": "Eatonville, Florida",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Eatonville%2C_Florida",
+        "citationLabel": "Wikipedia: Eatonville, Florida"
+      },
+      {
+        "predicate": "served as postmaster of Eatonville",
+        "object": "Postmaster of Eatonville, FL",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Eatonville%2C_Florida",
+        "citationLabel": "Wikipedia: Eatonville, Florida"
+      },
+      {
+        "predicate": "was formerly enslaved",
+        "object": "formerly enslaved person",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Eatonville%2C_Florida",
+        "citationLabel": "Wikipedia: Eatonville, Florida"
+      },
+      {
+        "predicate": "held federal office during the Reconstruction era",
+        "object": "federal officeholder (postmaster)",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Eatonville%2C_Florida",
+        "citationLabel": "Wikipedia: Eatonville, Florida"
+      }
+    ],
+    "historicalContext": "Eatonville’s incorporation in 1887 as a self-governing Black municipality emerged during Reconstruction’s waning years, when Black communities sought autonomy amid rising white supremacist resistance. Federal appointments like the postmastership provided rare avenues for Black civic authority, economic access, and communication infrastructure in segregated communities."
+  }
+]

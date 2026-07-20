@@ -1,0 +1,160 @@
+[
+  {
+    "id": "lynching_albert_gooden_covington_tennessee",
+    "kind": "person",
+    "displayName": "Albert Gooden",
+    "summary": "Albert Gooden was lynched on August 16, 1937, in Covington, Tennessee, after being accused of killing a white police officer. A mob of about 100 men seized him from sheriff's custody and hanged him from a bridge over Beaver Creek; his body was later recovered from the river. This act reflects the pattern of racial terror during the Jim Crow era.",
+    "eraBuckets": [
+      "1930s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "criminal-justice",
+      "resistance"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "criminal-justice",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "Covington",
+      "Tipton County",
+      "mob violence",
+      "racial terror"
+    ],
+    "jurisdictionLabel": "Covington, Tennessee",
+    "locationPrecision": "site",
+    "locationLabel": "Bridge over Beaver Creek",
+    "lat": 35.56416667,
+    "lng": -89.64638889,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "in Covington, Tennessee",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Covington%2C_Tennessee",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was accused of",
+        "object": "murdering white police officer Marshall Chester Doyle",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.covingtontn.gov/",
+        "citationLabel": "City of Covington, TN official website"
+      },
+      {
+        "predicate": "was taken from sheriff's custody by",
+        "object": "a mob of approximately 100 men",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.covingtontn.gov/",
+        "citationLabel": "City of Covington, TN official website"
+      },
+      {
+        "predicate": "was executed by",
+        "object": "hanging from a bridge over Beaver Creek",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.covingtontn.gov/",
+        "citationLabel": "City of Covington, TN official website"
+      },
+      {
+        "predicate": "had body recovered from",
+        "object": "the river by sheriff's deputies",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.covingtontn.gov/",
+        "citationLabel": "City of Covington, TN official website"
+      },
+      {
+        "predicate": "is part of",
+        "object": "the history of racial terror lynching in Tennessee",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.covingtontn.gov/",
+        "citationLabel": "City of Covington, TN official website"
+      }
+    ],
+    "historicalContext": "Lynching was a tool of racial control in the post-Reconstruction South, used to enforce white supremacy and suppress Black autonomy. In Tennessee, despite Union occupation during the Civil War and a relatively smaller enslaved population than the Deep South, racial violence persisted into the 20th century. The lynching of Albert Gooden occurred amid a broader pattern of mob violence targeting Black men accused of crimes, often without due process, and highlights the systemic failure of law enforcement to protect Black lives."
+  },
+  {
+    "id": "lynching_alton_collier_coronado_california",
+    "kind": "person",
+    "displayName": "Alton Collier",
+    "summary": "Alton Collier, an African American man in Coronado, California, was forced from a ferry into San Diego Bay on April 27, 1946, by a group of white sailors following an alleged stabbing. He drowned and was initially ruled a suicide, but in 2024 the Equal Justice Initiative reclassified his death as a lynching due to racialized mob violence and official neglect.",
+    "eraBuckets": [
+      "1940s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "resistance",
+      "memory"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "resistance",
+      "memory"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "racial violence",
+      "ferry",
+      "Coronado",
+      "Equal Justice Initiative"
+    ],
+    "jurisdictionLabel": "Coronado, California",
+    "locationPrecision": "site",
+    "locationLabel": "Site of ferry where Alton Collier was forced into San Diego Bay",
+    "lat": 32.67805556,
+    "lng": -117.1725,
+    "claims": [
+      {
+        "predicate": "was lynched on",
+        "object": "April 27, 1946",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Coronado%2C_California",
+        "citationLabel": "Wikipedia - Coronado, California"
+      },
+      {
+        "predicate": "was forced off a ferry by white sailors in Coronado, California",
+        "object": "following an accusation of stabbing a white sailor",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Coronado%2C_California",
+        "citationLabel": "Wikipedia - Coronado, California"
+      },
+      {
+        "predicate": "drowned in San Diego Bay under circumstances of mob racial violence",
+        "object": "and was initially ruled a suicide",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Coronado%2C_California",
+        "citationLabel": "Wikipedia - Coronado, California"
+      },
+      {
+        "predicate": "had death reclassified as a lynching by the Equal Justice Initiative",
+        "object": "in 2024",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Coronado%2C_California",
+        "citationLabel": "Wikipedia - Coronado, California"
+      },
+      {
+        "predicate": "is an example of post-World War II racial terror against African Americans outside the Southern United States",
+        "object": "illustrating the national scope of anti-Black lynching",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Coronado%2C_California",
+        "citationLabel": "Wikipedia - Coronado, California"
+      }
+    ],
+    "historicalContext": "Collier’s lynching occurred during a wave of racial violence against Black Americans in the post-World War II era, even in Western states like California. His case reflects how racial terror persisted beyond the South and how official narratives often obscured racially motivated killings through misclassification, delaying accountability and remembrance."
+  }
+]
