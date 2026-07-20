@@ -28,6 +28,7 @@ import {
   parseCensusStateDecadeDoc,
   type CensusStateDecadeDoc,
 } from './schema.js';
+import { rebuildAllDataSummarySnapshots } from './data-summaries.js';
 
 export const TWPS0056_SOURCE_ID = 'us-census-historical-race-1790-1990';
 
@@ -278,5 +279,6 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   };
 
   const summary = await runStateDemographicsLoad({ writer: firestoreWriter });
-  console.log(JSON.stringify(summary, null, 2));
+  const snapshotOutcome = await rebuildAllDataSummarySnapshots(firestore);
+  console.log(JSON.stringify({ ...summary, snapshotOutcome }, null, 2));
 }

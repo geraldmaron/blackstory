@@ -25,6 +25,8 @@ import { applicationDefault, getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
 import { getExternalDataSource, sha256Json } from '@repo/domain';
+import { FIRESTORE_ROOT } from '../src/firestore/paths.ts';
+import { rebuildAllDataSummarySnapshots } from '../src/demographics/data-summaries.ts';
 import { idempotentBatchUpsert, loadExistingHashes } from '../src/external/batch-upsert.ts';
 import { recordDatasetAcquisition } from '../src/external/capture.ts';
 import {
@@ -245,7 +247,7 @@ async function main(): Promise<void> {
   }
 
   const firestore = getFirestore();
-  const collection = firestore.collection('opportunityAtlasTracts');
+  const collection = firestore.collection(FIRESTORE_ROOT.opportunityAtlasTracts);
 
   console.log('Reading existing contentHashes…');
   const existing = await loadExistingHashes(collection);
@@ -266,6 +268,9 @@ async function main(): Promise<void> {
   });
 
   console.log(JSON.stringify({ ...summary, skippedNoOutcome, badRows, acquisition }, null, 2));
+
+  const snapshotOutcome = await rebuildAllDataSummarySnapshots(firestore);
+  console.log(JSON.stringify({ snapshotOutcome }, null, 2));
 }
 
 await main();

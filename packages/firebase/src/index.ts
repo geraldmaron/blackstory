@@ -445,6 +445,24 @@ export type {
   NationalPopulationTimelineSnapshot,
   NationalTimelineSource,
 } from './demographics/national-timeline.js';
+export {
+  buildStatePopulationByDecadeSnapshot,
+  writeStatePopulationByDecadeSnapshot,
+  getStatePopulationByDecadeSnapshot,
+  buildOpportunityAtlasCoverageSnapshot,
+  writeOpportunityAtlasCoverageSnapshot,
+  getOpportunityAtlasCoverageSnapshot,
+  buildHistoricalStatePopulationCoverageSnapshot,
+  writeHistoricalStatePopulationCoverageSnapshot,
+  getHistoricalStatePopulationCoverageSnapshot,
+  rebuildAllDataSummarySnapshots,
+} from './demographics/data-summaries.js';
+export type {
+  StatePopulationByDecadeSnapshot,
+  OpportunityAtlasCoverageSnapshot,
+  HistoricalStatePopulationCoverageSnapshot,
+  RebuildDataSummarySnapshotsResult,
+} from './demographics/data-summaries.js';
 // Re-export the domain row/change contracts so web chart components can type snapshot data
 // without reaching past the firebase reader boundary.
 export type { NationalPopulationTimelineRow, NationalPopulationChange } from '@repo/domain';

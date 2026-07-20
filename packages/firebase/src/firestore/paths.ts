@@ -50,6 +50,8 @@ export const FIRESTORE_ROOT = {
   acsTractProfiles: 'acsTractProfiles',
   /** FBI UCR agency directory: ORI → county crosswalk, shared by every UCR dataset. */
   ucrAgencies: 'ucrAgencies',
+  /** Opportunity Atlas tract outcomes — curated starter subset (~72k); never scan at render. */
+  opportunityAtlasTracts: 'opportunityAtlasTracts',
   /** FBI hate crime incidents aggregated by county + year (joins on fips5). */
   hateCrimeCountyYears: 'hateCrimeCountyYears',
   /** UCR reporting participation by state + year — the coverage denominator. */
@@ -93,6 +95,13 @@ export const firestorePaths = {
   /** The single materialized national-population-timeline snapshot doc (1790–2020), rebuilt by
    * the snapshot builder and read once per page render instead of live aggregation. */
   publicNationalPopulationTimeline: () => `${FIRESTORE_ROOT.publicMeta}/nationalPopulationTimeline`,
+  /** Materialized state rollups from `censusCountyDecades` (2000/2010/2020) for `/data`. */
+  publicStatePopulationByDecade: () => `${FIRESTORE_ROOT.publicMeta}/statePopulationByDecade`,
+  /** Materialized Opportunity Atlas coverage histogram for `/data` — never scan tracts at render. */
+  publicOpportunityAtlasCoverage: () => `${FIRESTORE_ROOT.publicMeta}/opportunityAtlasCoverage`,
+  /** Materialized twps0056 state-lane coverage counts for `/data`. */
+  publicHistoricalStatePopulationCoverage: () =>
+    `${FIRESTORE_ROOT.publicMeta}/historicalStatePopulationCoverage`,
   publicEntity: (releaseId: string, entityId: string) =>
     `${FIRESTORE_ROOT.publicReleases}/${releaseId}/entities/${entityId}`,
   /** Longform editorial stories for `/stories` (Admin SDK / release artifact reads). */

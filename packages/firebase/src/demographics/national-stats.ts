@@ -1,7 +1,14 @@
 /**
- * National-rollup readers for the public `/data` page (apps/web). Every function here
- * computes an aggregate (never a per-record dump) via Firestore's server-side
- * `AggregateField` sum/count so a page render never scans tens of thousands of docs.
+ * National-rollup readers and pure helpers for the public `/data` page (apps/web).
+ *
+ * Render-time getters (`getStatePopulationByDecade`, `getOpportunityAtlasCoverageSummary`,
+ * `getHistoricalStatePopulationCoverage`) read materialized `publicMeta` snapshots only — one
+ * point-get each, with a 15-minute process cache and no collection-scan fallback. Operators
+ * rebuild those snapshots via `data-summaries.ts` (CLI or ingest hooks).
+ *
+ * Live aggregate queries remain for smaller rollups (`getNationalPopulationByDecade` uses
+ * `AggregateField` sum/count per decade; `getAcsCoverageSummary` and `getHateCrimeYearSummary`
+ * use bounded aggregate reads). Those paths never full-scan tens of thousands of docs.
  *
  * These are Admin-SDK reads (`getServerFirestore`), which is why collections that stay
  * CLOSED to the client SDK in firestore.rules (acsTractProfiles, hateCrimeCountyYears,
@@ -24,6 +31,11 @@ import { AggregateField } from 'firebase-admin/firestore';
 import { computeGrowthRecord } from '@repo/domain';
 import { getServerFirestore } from '../server.js';
 import { FIRESTORE_ROOT } from '../firestore/paths.js';
+import {
+  getHistoricalStatePopulationCoverageSnapshot,
+  getOpportunityAtlasCoverageSnapshot,
+  getStatePopulationByDecadeSnapshot,
+} from './data-summaries.js';
 import {
   censusCountyDecadeSchema,
   type CensusCountyDecadeDecade,
@@ -333,27 +345,13 @@ export async function getNationalPopulationChanges(
   }
 }
 
-/**
- * State rollups for each loaded decennial vintage. Firestore aggregate queries cannot group by
- * `stateFips`, so this streams county docs once per decade (~3k rows/vintage) and aggregates in
- * memory — acceptable for Admin SDK server reads on the public `/data` page.
- */
+/** State rollups for each loaded decennial vintage — reads the materialized snapshot only. */
 export async function getStatePopulationByDecade(
   firestore: Firestore = getServerFirestore(),
 ): Promise<readonly StatePopulationByDecade[]> {
   try {
-    const decades: readonly CensusCountyDecadeDecade[] = ['2000', '2010', '2020'];
-    const results: StatePopulationByDecade[] = [];
-    for (const decade of decades) {
-      const snap = await firestore
-        .collection(FIRESTORE_ROOT.censusCountyDecades)
-        .where('decade', '==', decade)
-        .get();
-      if (snap.empty) continue;
-      const counties = snap.docs.map((doc) => censusCountyDecadeSchema.parse(doc.data()));
-      results.push(...aggregateCountiesByState(counties, decade));
-    }
-    return results;
+    const snapshot = await getStatePopulationByDecadeSnapshot(firestore);
+    return snapshot?.rows ?? [];
   } catch {
     return [];
   }
@@ -416,49 +414,18 @@ export async function getAcsCoverageSummary(
   };
 }
 
-/** Row/state/decade coverage for twps0056 state tables loaded into `censusStateDecades`. */
+/** Row/state/decade coverage for twps0056 state tables — reads the materialized snapshot only. */
 export async function getHistoricalStatePopulationCoverage(
   firestore: Firestore = getServerFirestore(),
 ): Promise<HistoricalStatePopulationCoverage | undefined> {
-  const collection = firestore.collection(FIRESTORE_ROOT.censusStateDecades);
-  const [countAgg, sample] = await Promise.all([
-    collection.aggregate({ n: AggregateField.count() }).get(),
-    collection.limit(1).get(),
-  ]);
-  const rowCount = countAgg.data().n;
-  if (rowCount === 0 || sample.empty) return undefined;
-
-  const sampleDoc = sample.docs[0]!.data() as {
-    source?: string;
-    sourceUrl?: string;
-  };
-  if (!sampleDoc.source || !sampleDoc.sourceUrl) return undefined;
-
-  // Bounded scan: ~900 docs — fine as Admin-SDK coverage, not a public client path.
-  const snap = await collection.select('stateFips', 'decade').get();
-  const states = new Set<string>();
-  const decades = new Set<string>();
-  for (const doc of snap.docs) {
-    const data = doc.data() as { stateFips?: string; decade?: string };
-    if (data.stateFips) states.add(data.stateFips);
-    if (data.decade) decades.add(data.decade);
+  try {
+    const snapshot = await getHistoricalStatePopulationCoverageSnapshot(firestore);
+    if (!snapshot) return undefined;
+    const { generatedAt: _generatedAt, contentHash: _contentHash, ...coverage } = snapshot;
+    return coverage;
+  } catch {
+    return undefined;
   }
-  const sortedDecades = [...decades].sort();
-  const decadeMin = sortedDecades[0];
-  const decadeMax = sortedDecades.at(-1);
-  if (!decadeMin || !decadeMax) return undefined;
-
-  return {
-    rowCount,
-    stateCount: states.size,
-    decadeMin,
-    decadeMax,
-    source: sampleDoc.source,
-    sourceUrl: publicSourceUrl({
-      source: sampleDoc.source,
-      sourceUrl: sampleDoc.sourceUrl,
-    }),
-  };
 }
 
 export type HateCrimeYearSummary = {
@@ -683,42 +650,16 @@ export function aggregateOpportunityAtlasCoverage(
   };
 }
 
-const OPPORTUNITY_ATLAS_COVERAGE_CACHE_TTL_MS = 15 * 60 * 1000;
-let opportunityAtlasCoverageCache:
-  { readonly expiresAt: number; readonly value: OpportunityAtlasCoverageSummary } | undefined;
-
-/** Coverage counts + kfrBlackP25 distribution bins — never averages percentile ranks nationally. */
+/** Coverage counts + kfrBlackP25 distribution bins — reads the materialized snapshot only. */
 export async function getOpportunityAtlasCoverageSummary(
   firestore: Firestore = getServerFirestore(),
 ): Promise<OpportunityAtlasCoverageSummary | undefined> {
-  if (opportunityAtlasCoverageCache && opportunityAtlasCoverageCache.expiresAt > Date.now()) {
-    return opportunityAtlasCoverageCache.value;
+  try {
+    const snapshot = await getOpportunityAtlasCoverageSnapshot(firestore);
+    if (!snapshot) return undefined;
+    const { generatedAt: _generatedAt, contentHash: _contentHash, ...coverage } = snapshot;
+    return coverage;
+  } catch {
+    return undefined;
   }
-
-  const collection = firestore.collection('opportunityAtlasTracts');
-  const [sample, snap] = await Promise.all([
-    collection.limit(1).get(),
-    collection.select('outcomes').get(),
-  ]);
-  if (sample.empty) return undefined;
-  const doc = sample.docs[0]!.data() as { source?: string; sourceUrl?: string; license?: string };
-  if (!doc.source || !doc.sourceUrl || !doc.license) return undefined;
-
-  const tracts = snap.docs.map((row) => ({
-    outcomes: (row.data().outcomes ?? {}) as OpportunityAtlasTractOutcomesLike,
-  }));
-  const aggregate = aggregateOpportunityAtlasCoverage(tracts);
-  const value: OpportunityAtlasCoverageSummary = {
-    tractCount: aggregate.tractCount,
-    outcomeFieldCoverage: aggregate.outcomeFieldCoverage,
-    kfrBlackP25Histogram: aggregate.kfrBlackP25Histogram,
-    source: doc.source,
-    sourceUrl: publicSourceUrl({ source: doc.source, sourceUrl: doc.sourceUrl }),
-    license: doc.license,
-  };
-  opportunityAtlasCoverageCache = {
-    expiresAt: Date.now() + OPPORTUNITY_ATLAS_COVERAGE_CACHE_TTL_MS,
-    value,
-  };
-  return value;
 }

@@ -42,6 +42,7 @@ import {
   parseCensusCountyDecadeDoc,
   type CensusCountyDecadeDoc,
 } from './schema.js';
+import { rebuildAllDataSummarySnapshots } from './data-summaries.js';
 
 export type CensusCountyDecadeWriteOutcome = 'created' | 'updated' | 'unchanged';
 
@@ -181,5 +182,6 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     ...(process.env.CENSUS_API_KEY ? { apiKey: process.env.CENSUS_API_KEY } : {}),
   });
 
-  console.log(JSON.stringify(summary, null, 2));
+  const snapshotOutcome = await rebuildAllDataSummarySnapshots(firestore);
+  console.log(JSON.stringify({ ...summary, snapshotOutcome }, null, 2));
 }
