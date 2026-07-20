@@ -111,7 +111,7 @@ Candidates fixture: `packages/firebase/fixtures/discovery-candidates/run-*.json`
 | `COMMIT_SURVIVORS` | 1 | SearXNG survivors → Firestore |
 | `OLLAMA_MODEL` | `qwen3:8b` | Failover model |
 | `OPENROUTER_MODEL` | (empty) | Pin a single primary model; wins over the roster |
-| `OPENROUTER_MODELS` | hy3 + nemotron-3 + gemma-4 + gpt-oss roster | Free-model rotation: 429/5xx/empty advances to the next model |
+| `OPENROUTER_MODELS` | hy3 + nemotron-3 + gemma-4 + gpt-oss (free), then qwen3-235b + mistral-small-24b + qwen3-30b + mistral-nemo (paid, ordered by capability not cost) | Rotation advances to the next model on ANY error. Free models tried first — cost $0 when they work, which is nearly always. Paid tier only reached when every free model fails for that request (e.g. daily free-tier quota exhaustion, observed 2026-07-20) — real cost: well under $1 for the entire current gap-fill candidate pool even in the worst case (see [gap-fill runbook](./gap-fill-research.md)). Paid models are ordered most-capable-first, not cheapest-first: the editorial judge's job is relevance judgment (is this genuinely about Black history, not just mentioned), and a weaker model getting that wrong is a real quality problem observed directly (see gap-fill runbook) — the cost spread across all four options is trivial, so there's no reason to trade capability for pennies |
 
 Override via systemd drop-in:
 `~/.config/systemd/user/blackstory-overnight-enrichment.service.d/override.conf`.

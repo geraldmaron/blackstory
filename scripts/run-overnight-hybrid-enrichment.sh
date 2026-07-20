@@ -104,7 +104,14 @@ export EDITORIAL_LLM_PROVIDER="${EDITORIAL_LLM_PROVIDER:-hybrid}"
 # Free-model rotation roster: on 429/5xx/empty the provider advances to the next
 # model instead of retrying one rate-limited router. Set OPENROUTER_MODEL to pin
 # a single model instead (an explicit pin wins over the roster).
-export OPENROUTER_MODELS="${OPENROUTER_MODELS:-tencent/hy3:free,nvidia/nemotron-3-super-120b-a12b:free,nvidia/nemotron-3-nano-30b-a3b:free,google/gemma-4-31b-it:free,openai/gpt-oss-20b:free}"
+# Paid tier ordered by CAPABILITY (most capable first), not raw cost — the editorial
+# judge's job (deciding whether a subject is genuinely Black-history-relevant, not just
+# mentioned) needs real reasoning quality; a 2026-07-20 batch showed even free/weaker
+# models keeping subjects (West Point, Naismith Basketball Hall of Fame) with zero
+# Black-history-specific claim content. The cost spread across all four is trivial
+# (~$0.07 total for a 182-candidate batch even if every item fell through every free
+# model), so there's no reason to trade capability for pennies.
+export OPENROUTER_MODELS="${OPENROUTER_MODELS:-tencent/hy3:free,nvidia/nemotron-3-super-120b-a12b:free,nvidia/nemotron-3-nano-30b-a3b:free,google/gemma-4-31b-it:free,openai/gpt-oss-20b:free,qwen/qwen3-235b-a22b-2507,mistralai/mistral-small-3.2-24b-instruct,qwen/qwen3-30b-a3b-instruct-2507,mistralai/mistral-nemo}"
 export OPENROUTER_MODEL="${OPENROUTER_MODEL:-}"
 export OLLAMA_MODEL="${OLLAMA_MODEL:-qwen3:8b}"
 

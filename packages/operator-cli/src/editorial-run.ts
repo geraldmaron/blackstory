@@ -134,6 +134,14 @@ Rules:
   {predicate, object, confidenceLevel: high|medium|low, citationSource: hostname, citationHref, citationLabel}.
   citationHref MUST be one of the URLs provided in sourceSnippets — never invent or modify a URL.
   If the snippets support no verifiable claim, return an empty claims array and decision needs_evidence.
+  AT LEAST ONE claim MUST be substantively about the subject's OWN Black-history significance —
+  a documented first, a documented role in segregation/civil-rights/enslavement history, a named
+  person's specific achievement there, a specific discriminatory or liberating event. A subject whose
+  ONLY extractable claims are generic institutional facts (founding year, address, mission statement,
+  unrelated famous alumni, org structure) with no Black-history-specific claim is NOT keep-worthy even
+  if those generic facts are well-sourced — decide needs_evidence or reject instead. Being mentioned by
+  a Black historical figure (as an employer, school, or honor) is not itself sufficient; the claim must
+  document what happened there or through it that is actually part of that history.
 - topicIds: 2-5 ids chosen ONLY from this registry: ${TOPIC_ID_LIST}.
 - eraBuckets: decade strings like "1910s", only when the era is evidenced in the material.
 - keywords: 2-5 short search phrases from the material.
