@@ -17,6 +17,10 @@ import {
 } from '@repo/domain/map/county-population';
 import { findUsStateByPostalCode, US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import { DEFAULT_EXPLORE_FILTERS, type ExploreFilterState } from './filters';
+import {
+  EXPLORE_RADIUS_PRESETS,
+  type ExploreRadiusPresetId,
+} from './explore-place-radius';
 
 export type ExploreViewport = {
   readonly lat: number;
@@ -70,6 +74,10 @@ export type ExploreViewState = {
   readonly showResults: boolean;
   /** When false, the color key / “Reading this map” legend is hidden (default shown). */
   readonly showKey: boolean;
+  /** Finite place-search radius preset from a deep link (e.g. `10mi`). Omitted when All. */
+  readonly radius?: ExploreRadiusPresetId;
+  /** Human place label for place-search status UI (never raw coordinates). */
+  readonly near?: string;
 };
 
 export type RawExploreSearchParams = Readonly<Record<string, string | readonly string[] | undefined>>;
@@ -148,6 +156,19 @@ function serializeHidePanels(state: ExploreViewState): string | undefined {
   return tokens.length > 0 ? tokens.join(',') : undefined;
 }
 
+const VALID_RADIUS_IDS = new Set<string>(EXPLORE_RADIUS_PRESETS.map((preset) => preset.id));
+
+function parseRadius(raw: string | undefined): ExploreRadiusPresetId | undefined {
+  const trimmed = raw?.trim();
+  if (!trimmed || !VALID_RADIUS_IDS.has(trimmed)) return undefined;
+  return trimmed as ExploreRadiusPresetId;
+}
+
+function parseNear(raw: string | undefined): string | undefined {
+  const trimmed = raw?.trim();
+  return trimmed ? trimmed : undefined;
+}
+
 export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreViewState {
   const filters: ExploreFilterState = {
     era: cleanSelectParam(firstValue(raw.era)),
@@ -170,6 +191,8 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
   const popDecadeRaw = firstValue(raw.popDecade)?.trim();
   const popFromRaw = firstValue(raw.popFrom)?.trim();
   const popToRaw = firstValue(raw.popTo)?.trim();
+  const radiusRaw = firstValue(raw.radius)?.trim();
+  const nearRaw = firstValue(raw.near)?.trim();
 
   const groupOn = groupRaw === '1' || groupRaw === 'true';
 
@@ -182,6 +205,8 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
   const popTo =
     layerMode === 'blackChange' ? parsePopulationDecade(popToRaw, DEFAULT_POPULATION_CHANGE_TO) : undefined;
   const { showFilters, showResults, showKey } = parseHidePanels(raw);
+  const radius = parseRadius(radiusRaw);
+  const near = parseNear(nearRaw);
 
   return {
     filters,
@@ -201,6 +226,8 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
     showFilters,
     showResults,
     showKey,
+    ...(radius ? { radius } : {}),
+    ...(near ? { near } : {}),
   };
 }
 
@@ -241,6 +268,8 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   if (state.edge) params.set('edge', state.edge);
   const hidePanels = serializeHidePanels(state);
   if (hidePanels) params.set('hidePanels', hidePanels);
+  if (state.radius && state.radius !== 'all') params.set('radius', state.radius);
+  if (state.near) params.set('near', state.near);
   return params.toString();
 }
 

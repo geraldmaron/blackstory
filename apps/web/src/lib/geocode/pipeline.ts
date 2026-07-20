@@ -81,8 +81,9 @@ function normalizeAddressInput(raw: string): { readonly queryText: string; reado
   return { queryText, cacheKey: `addr:${queryText.toUpperCase()}` };
 }
 
-function coordinateCacheKey(lat: number, lng: number): string {
-  return `coord:${(Math.round(lat * 10_000) / 10_000).toFixed(4)},${(Math.round(lng * 10_000) / 10_000).toFixed(4)}`;
+function coordinateCacheKey(lat: number, lng: number, retainExactCoordinates: boolean): string {
+  const base = `coord:${(Math.round(lat * 10_000) / 10_000).toFixed(4)},${(Math.round(lng * 10_000) / 10_000).toFixed(4)}`;
+  return retainExactCoordinates ? `${base}:cam` : base;
 }
 
 function toResolution(match: CensusGeocodeMatch, retainExactCoordinates: boolean): GeocodeResolution {
@@ -208,12 +209,19 @@ export type ReverseGeocodeOptions = {
   readonly cache: LocateCache;
   readonly now?: () => number;
   readonly fetchCoordinatesGeocode?: typeof fetchCensusCoordinatesGeocode;
+  /**
+   * Opt in to keep lat/lng on the resolution for a single map-camera response
+   * (`/locate/api?camera=1`). Cached under a distinct key so ordinary locate lookups never
+   * inherit retained coordinates from a prior camera request.
+   */
+  readonly retainExactCoordinates?: boolean;
 };
 
 /** Reverse geocode: browser-supplied lat/lng -> jurisdiction ids, or a manual-search fallback.  */
 export async function reverseGeocodeCoordinates(options: ReverseGeocodeOptions): Promise<GeocodeOutcome> {
+  const retainExactCoordinates = options.retainExactCoordinates === true;
   const nowMs = options.now?.() ?? Date.now();
-  const cacheKey = coordinateCacheKey(options.lat, options.lng);
+  const cacheKey = coordinateCacheKey(options.lat, options.lng, retainExactCoordinates);
   const cached = options.cache.get(cacheKey, nowMs);
   if (cached) {
     return { ok: true, resolution: cached, cacheHit: true };
@@ -232,7 +240,7 @@ export async function reverseGeocodeCoordinates(options: ReverseGeocodeOptions):
     return { ok: false, fallback: buildManualPlaceSearchFallback('no_match') };
   }
 
-  const resolution = toResolution(match, false);
+  const resolution = toResolution(match, retainExactCoordinates);
   options.cache.set(cacheKey, resolution, nowMs);
   return { ok: true, resolution, cacheHit: false };
 }

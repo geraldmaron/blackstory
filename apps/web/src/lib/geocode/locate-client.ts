@@ -120,11 +120,22 @@ export function fetchLocateByAddress(
   return callLocateApi(params, appCheckHeaders);
 }
 
+export type FetchLocateByCoordinatesOptions = {
+  /**
+   * When true, asks `/locate/api` for lat/lng suitable for an explore camera fly-to
+   * (`camera=1`). Ordinary jurisdiction lookup leaves this unset.
+   */
+  readonly forCamera?: boolean;
+};
+
 /** Reverse geocode: browser-supplied coordinates (only ever called after explicit user consent).  */
 export function fetchLocateByCoordinates(
   lat: number,
   lng: number,
   appCheckHeaders: Readonly<Record<string, string>> = {},
+  options: FetchLocateByCoordinatesOptions = {},
 ): Promise<LocateClientResult> {
-  return callLocateApi(new URLSearchParams({ lat: String(lat), lng: String(lng) }), appCheckHeaders);
+  const params = new URLSearchParams({ lat: String(lat), lng: String(lng) });
+  if (options.forCamera) params.set('camera', '1');
+  return callLocateApi(params, appCheckHeaders);
 }

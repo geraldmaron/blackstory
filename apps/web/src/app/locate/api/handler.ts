@@ -140,11 +140,13 @@ export async function handleLocateRequest(
       return jsonError(400, 'invalid_locate_query', { reason: 'coordinates_out_of_range' });
     }
 
+    const retainExactCoordinates = url.searchParams.get('camera') === '1';
     const outcome = await reverseGeocodeCoordinates({
       lat,
       lng,
       cache: deps.cache,
       ...(deps.fetchCoordinatesGeocode ? { fetchCoordinatesGeocode: deps.fetchCoordinatesGeocode } : {}),
+      ...(retainExactCoordinates ? { retainExactCoordinates: true } : {}),
     });
     return NextResponse.json(outcome, { status: 200 });
   } finally {

@@ -1,6 +1,6 @@
 /**
  * Presentational result panel for the `/locate` geocode experience — renders either a
- * resolved jurisdiction (state/county/city names + a link into `/search`) or the
+ * resolved jurisdiction (state/county/city names + a link into `/explore`) or the
  * manual-place-search fallback notice. Pure and server-safe (no hooks) so it stays trivially
  * SSR-render-testable with `renderToStaticMarkup`, matching this app's existing
  * `DegradedModeNotice.test.ts` pattern.
@@ -13,6 +13,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Notice } from '@repo/ui';
 import type { LocateClientResult } from '../../lib/geocode/locate-client';
+import { buildLocateExploreHref } from '../../lib/geocode/locate-explore-href';
 
 // See LocationPrivacyNotice.tsx's identical note: keeps this file safe under a classic JSX
 // runtime (this app's own test runner) even though the automatic runtime doesn't need it.
@@ -45,8 +46,8 @@ export function LocationResolutionPanel({ result }: LocationResolutionPanelProps
           Jurisdiction: {jurisdictionIds.countyId ?? jurisdictionIds.stateId ?? jurisdictionIds.countryId}
         </p>
         <p className="ds-sans">
-          <Link className="ds-cta ds-cta--ink" href="/search">
-            Search records
+          <Link className="ds-cta ds-cta--ink" href={buildLocateExploreHref(result.resolution)}>
+            Explore nearby (10 mi)
           </Link>
         </p>
       </Notice>

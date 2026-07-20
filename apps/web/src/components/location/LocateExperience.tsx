@@ -65,7 +65,9 @@ export function LocateExperience() {
   async function handleCoordinates(position: { readonly lat: number; readonly lng: number }) {
     setState({ status: 'loading' });
     const appCheckHeaders = await getLocateAppCheckHeaders();
-    const result = await fetchLocateByCoordinates(position.lat, position.lng, appCheckHeaders);
+    const result = await fetchLocateByCoordinates(position.lat, position.lng, appCheckHeaders, {
+      forCamera: true,
+    });
     recordOutcome('browser_location_used', result);
     setState({ status: 'done', result });
   }
@@ -73,7 +75,7 @@ export function LocateExperience() {
   async function handleAddress(address: string) {
     setState({ status: 'loading' });
     const appCheckHeaders = await getLocateAppCheckHeaders();
-    const result = await fetchLocateByAddress(address, appCheckHeaders);
+    const result = await fetchLocateByAddress(address, appCheckHeaders, { forCamera: true });
     recordOutcome('address_lookup', result);
     setState({ status: 'done', result });
   }

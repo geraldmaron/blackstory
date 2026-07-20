@@ -325,3 +325,34 @@ test('nationalViewport centers the continental US resting frame', () => {
   assert.ok(national.lng > -126 && national.lng < -66);
   assert.ok(national.zoom > 0);
 });
+
+test('round-trips radius and near place-search params', () => {
+  const state = {
+    filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+    viewport: { lat: 26.7056, lng: -80.0364, zoom: 9.2 },
+    radius: '10mi' as const,
+    near: 'Palm Beach County, Florida',
+    layerMode: 'presence' as const,
+    group: false,
+    lines: false,
+    showFilters: true,
+    showResults: true,
+    showKey: true,
+  };
+
+  const href = buildExploreHref(state);
+  assert.match(href, /radius=10mi/);
+  assert.match(href, /near=Palm\+Beach\+County/);
+
+  const [, qs] = href.split('?');
+  const parsed = parseExploreSearchParams(Object.fromEntries(new URLSearchParams(qs)));
+  assert.equal(parsed.radius, '10mi');
+  assert.equal(parsed.near, 'Palm Beach County, Florida');
+  assert.equal(parsed.viewport!.lat, 26.7056);
+});
+
+test('parseExploreSearchParams ignores an invalid radius token', () => {
+  const parsed = parseExploreSearchParams({ radius: '999mi', lat: '26.7', lng: '-80.0', zoom: '9' });
+  assert.equal(parsed.radius, undefined);
+  assert.ok(parsed.viewport);
+});

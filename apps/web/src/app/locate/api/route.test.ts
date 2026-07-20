@@ -179,6 +179,18 @@ test('reverse-geocodes browser coordinates to jurisdiction ids (AC6)', async () 
   assert.equal(body.resolution.jurisdictionIds.stateId, 'us-11');
 });
 
+test('camera=1 retains coordinates on reverse-geocode for explore handoff', async () => {
+  const deps = await buildDeps({ fetchCoordinatesGeocode: fakeCoordinatesFetcher(DC_MATCH) });
+  const response = await handleLocateRequest(locateRequest('?lat=38.846&lng=-76.927&camera=1'), deps);
+  assert.equal(response.status, 200);
+
+  const body = (await response.json()) as LocateSuccessBody;
+  assert.equal(body.ok, true);
+  assert.equal(body.resolution.precision.exactCoordinatesRetained, true);
+  assert.equal(body.resolution.precision.lat, DC_MATCH.lat);
+  assert.equal(body.resolution.precision.lng, DC_MATCH.lng);
+});
+
 test('a Puerto Rico match is out of the 50-states-+-D.C. scope and falls back to manual search (AC1, AC4)', async () => {
   const deps = await buildDeps({ fetchAddressGeocode: fakeAddressFetcher([PUERTO_RICO_MATCH]) });
   const response = await handleLocateRequest(locateRequest('?address=1+Calle+Sol%2C+San+Juan%2C+PR'), deps);

@@ -11,7 +11,7 @@ import { test } from 'node:test';
 import { LocationResolutionPanel } from './LocationResolutionPanel';
 import type { LocateClientResult } from '../../lib/geocode/locate-client';
 
-test('renders resolved jurisdiction names and a link to search, never the raw coordinate', () => {
+test('renders resolved jurisdiction names and a link to explore with radius, never the raw coordinate', () => {
   const result: LocateClientResult = {
     kind: 'resolved',
     cacheHit: false,
@@ -24,9 +24,13 @@ test('renders resolved jurisdiction names and a link to search, never the raw co
   const html = renderToStaticMarkup(createElement(LocationResolutionPanel, { result }));
   assert.match(html, /Washington, District of Columbia, District of Columbia/);
   assert.match(html, /us-11-001/);
-  assert.match(html, /href="\/search"/);
-  assert.doesNotMatch(html, /38\.846/, 'exact lat must never appear in rendered markup');
-  assert.doesNotMatch(html, /-76\.927/, 'exact lng must never appear in rendered markup');
+  assert.match(html, /href="\/explore\?/);
+  assert.match(html, /radius=10mi/);
+  assert.match(html, /Explore nearby \(10 mi\)/);
+  assert.doesNotMatch(html, /href="\/search"/);
+  const visibleText = html.replace(/href="[^"]*"/g, '');
+  assert.doesNotMatch(visibleText, /38\.846/, 'exact lat must never appear in visible text');
+  assert.doesNotMatch(visibleText, /-76\.927/, 'exact lng must never appear in visible text');
 });
 
 test('renders the manual-place-search fallback with its message and search link', () => {

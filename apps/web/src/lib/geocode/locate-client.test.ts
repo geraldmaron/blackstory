@@ -118,7 +118,7 @@ test('sends the provided App Check headers on the outgoing request', async () =>
   }
 });
 
-test('forCamera appends camera=1 on the locate request URL', async () => {
+test('forCamera appends camera=1 on the address locate request URL', async () => {
   const original = globalThis.fetch;
   let capturedUrl = '';
   globalThis.fetch = (async (url: string) => {
@@ -136,6 +136,30 @@ test('forCamera appends camera=1 on the locate request URL', async () => {
     assert.match(capturedUrl, /\/locate\/api\?/);
     assert.match(capturedUrl, /camera=1/);
     assert.match(capturedUrl, /address=Washington/);
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
+test('forCamera appends camera=1 on coordinate locate request URL', async () => {
+  const original = globalThis.fetch;
+  let capturedUrl = '';
+  globalThis.fetch = (async (url: string) => {
+    capturedUrl = url;
+    return {
+      status: 200,
+      json: async () => ({
+        ok: false,
+        fallback: { available: true, reason: 'no_match', message: 'x', searchHref: '/search' },
+      }),
+    } as Response;
+  }) as typeof fetch;
+  try {
+    await fetchLocateByCoordinates(26.7, -80.0, {}, { forCamera: true });
+    assert.match(capturedUrl, /\/locate\/api\?/);
+    assert.match(capturedUrl, /camera=1/);
+    assert.match(capturedUrl, /lat=26\.7/);
+    assert.match(capturedUrl, /lng=-80/);
   } finally {
     globalThis.fetch = original;
   }

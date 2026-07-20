@@ -49,6 +49,7 @@ import { resolveCloseCameraTarget } from '../../../lib/map-experience/close-came
 import {
   closestFeatures,
   emptyRadiusStatusMessage,
+  exploreRadiusPresetById,
   featuresWithinRadius,
   formatExploreDistance,
   mapBoundsForRadius,
@@ -132,6 +133,8 @@ function mergeViewState(
     readonly clearState?: boolean;
     readonly clearEdge?: boolean;
     readonly clearDecade?: boolean;
+    readonly clearRadius?: boolean;
+    readonly clearNear?: boolean;
   },
 ): ExploreViewState {
   const next: ExploreViewState = {
@@ -151,6 +154,8 @@ function mergeViewState(
     ...resolveDecade(base, patch),
     ...resolveEdge(base, patch),
     ...resolvePopulationDecades(base, patch),
+    ...resolveRadius(base, patch),
+    ...resolveNear(base, patch),
   };
 
   if (patch.viewport) {
@@ -221,6 +226,26 @@ function resolvePopulationDecades(
   return {};
 }
 
+function resolveRadius(
+  base: ExploreViewState,
+  patch: Partial<ExploreViewState> & { readonly clearRadius?: boolean },
+): Pick<ExploreViewState, 'radius'> {
+  if (patch.clearRadius) return {};
+  if (patch.radius) return { radius: patch.radius };
+  if (base.radius) return { radius: base.radius };
+  return {};
+}
+
+function resolveNear(
+  base: ExploreViewState,
+  patch: Partial<ExploreViewState> & { readonly clearNear?: boolean },
+): Pick<ExploreViewState, 'near'> {
+  if (patch.clearNear) return {};
+  if (patch.near) return { near: patch.near };
+  if (base.near) return { near: base.near };
+  return {};
+}
+
 /** Facet render order matches how people actually narrow: what (kind) → when
  * (era) → about (theme) → how solid (confidence). One row each, auto-applying. */
 const FACET_ROWS: readonly {
@@ -258,6 +283,8 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   const [listBounds, setListBounds] = useState<ExploreMapBounds | undefined>(undefined);
   /** First data patch after mount snaps; later decade/filter patches fade (continuous flow). */
   const isInitialDataApplyRef = useRef(true);
+  /** Guards one-shot fly-to when applying place-search radius from a deep-linked URL. */
+  const urlRadiusAppliedRef = useRef<string | null>(null);
   /** Camera before the most recent point-selection flight (hierarchical close target). */
   const preSelectViewportRef = useRef<ExploreViewport | undefined>(initial.viewState.viewport);
   /** Preferred Filters | Color key tab when both URL sections are visible. */
@@ -277,7 +304,43 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
 
   useEffect(() => {
     setView(initial);
+    urlRadiusAppliedRef.current = null;
   }, [initial]);
+
+  useEffect(() => {
+    const { radius, near, viewport } = view.viewState;
+    if (!radius || radius === 'all' || !viewport) return;
+
+    const preset = exploreRadiusPresetById(radius);
+    if (preset.meters === null) return;
+
+    const applyKey = `${radius}:${viewport.lat.toFixed(4)}:${viewport.lng.toFixed(4)}:${near ?? ''}`;
+    if (urlRadiusAppliedRef.current === applyKey) return;
+    urlRadiusAppliedRef.current = applyKey;
+
+    const center = { lat: viewport.lat, lng: viewport.lng };
+    const bounds = mapBoundsForRadius(center, preset.meters);
+    stage.flyPreset('locality', { bounds });
+
+    const catalog = applyExploreFilters(view.allFeatures, view.viewState.filters);
+    const within = featuresWithinRadius(catalog, center, preset.meters);
+    const closest = within.length > 0 ? [] : closestFeatures(catalog, center, 3);
+    setPlaceSearchFocus({
+      center,
+      radiusMeters: preset.meters,
+      placeLabel: near ?? 'This place',
+      radiusLabel: preset.statusLabel,
+      within,
+      closest,
+    });
+  }, [
+    stage,
+    view.allFeatures,
+    view.viewState.filters,
+    view.viewState.near,
+    view.viewState.radius,
+    view.viewState.viewport,
+  ]);
 
   useEffect(() => {
     viewStateRef.current = view.viewState;
@@ -749,7 +812,11 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
 
   const handleClearPlaceSearch = useCallback(() => {
     setPlaceSearchFocus(null);
-  }, []);
+    urlRadiusAppliedRef.current = null;
+    commitViewState(
+      mergeViewState(view.viewState, { clearRadius: true, clearNear: true }),
+    );
+  }, [commitViewState, view.viewState]);
 
   const handleClearState = useCallback(() => {
     stage.flyPreset('national', { bounds: US_CONUS_BOUNDS }, { mode: 'ease' });
