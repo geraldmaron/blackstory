@@ -793,6 +793,12 @@ export function MapStageProvider({
   const lastViewportRef = useRef<ExploreViewportFrame | undefined>(undefined);
   const [mapAvailable, setMapAvailable] = useState(true);
   const mapAvailableRef = useRef(true);
+  /** Camera flights requested before MapLibre finished constructing — flushed on `load`. */
+  const pendingFlyRef = useRef<{
+    readonly name: CameraPresetName;
+    readonly target: CameraFlyTarget;
+    readonly options?: MapStageFlyOptions;
+  } | null>(null);
 
   const configRef = useRef<StageConfig>({
     style: initialStyle,
@@ -1229,9 +1235,9 @@ export function MapStageProvider({
     [updateStateLabelSelection],
   );
 
-  const flyPreset = useCallback((name: CameraPresetName, target: CameraFlyTarget, options?: MapStageFlyOptions) => {
+  const runFlyPreset = useCallback((name: CameraPresetName, target: CameraFlyTarget, options?: MapStageFlyOptions) => {
     const map = mapRef.current;
-    if (!map) return;
+    if (!map) return false;
     const reduced = prefersReducedMotion();
     const preset = cameraPresetFor(name, reduced);
 
@@ -1269,7 +1275,7 @@ export function MapStageProvider({
 
     if (reduced || preset.duration <= 0) {
       map.jumpTo({ center, zoom, padding });
-      return;
+      return true;
     }
     if ((options?.mode ?? 'fly') === 'ease') {
       map.easeTo({ center, zoom, padding, duration: preset.duration, easing: preset.easing, essential: true });
@@ -1285,7 +1291,18 @@ export function MapStageProvider({
         essential: true,
       });
     }
+    return true;
   }, []);
+
+  const flyPreset = useCallback((name: CameraPresetName, target: CameraFlyTarget, options?: MapStageFlyOptions) => {
+    if (runFlyPreset(name, target, options)) {
+      pendingFlyRef.current = null;
+      return;
+    }
+    // MapLibre is still constructing (common on locate → explore remount). Keep the latest
+    // request and apply it once the canvas fires `load`.
+    pendingFlyRef.current = { name, target, ...(options ? { options } : {}) };
+  }, [runFlyPreset]);
 
   const subscribe = useCallback(
     <E extends MapStageEventName>(event: E, handler: (...args: MapStageEvents[E]) => void): (() => void) => {
@@ -1454,6 +1471,13 @@ export function MapStageProvider({
             { isComplete: true },
           );
         }
+        // Flush camera requested while the canvas was still constructing (e.g. locate → explore
+        // deep link with radius bounds). Prefer the pending flight over the constructor CONUS frame.
+        const pending = pendingFlyRef.current;
+        if (pending) {
+          pendingFlyRef.current = null;
+          runFlyPreset(pending.name, pending.target, pending.options);
+        }
       });
 
       activeMap.on('moveend', () => {
@@ -1528,6 +1552,7 @@ export function MapStageProvider({
 
     return () => {
       cancelled = true;
+      pendingFlyRef.current = null;
       decadeFadeGenerationRef.current += 1;
       decadeDissolveInFlightRef.current = false;
       decadeMorphAnimationRef.current?.cancel();

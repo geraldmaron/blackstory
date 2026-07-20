@@ -572,6 +572,24 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
           return;
         }
       }
+      // Locate → explore deep links carry radius + viewport. Fit the search circle, not a
+      // county-zoom point or the constructor CONUS frame.
+      if (viewState.viewport && viewState.radius && viewState.radius !== 'all') {
+        const radiusPreset = exploreRadiusPresetById(viewState.radius);
+        if (radiusPreset.meters !== null) {
+          stage.flyPreset(
+            'locality',
+            {
+              bounds: mapBoundsForRadius(
+                { lat: viewState.viewport.lat, lng: viewState.viewport.lng },
+                radiusPreset.meters,
+              ),
+            },
+            { mode },
+          );
+          return;
+        }
+      }
       if (viewState.viewport) {
         stage.flyPreset(
           'locality',
