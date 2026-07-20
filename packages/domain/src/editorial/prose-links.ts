@@ -117,6 +117,20 @@ function buildNameCandidates(
   return candidates.sort((left, right) => right.name.length - left.name.length);
 }
 
+// A real, live incident: a lynching victim recorded under only a first name
+// ("John", "Jim" — common when a period source never captured an enslaved or
+// formerly enslaved person's surname) auto-linked from OTHER, unrelated
+// victims' summaries just because their names also start with "John"/"Jim",
+// and separately from the phrase "Jim Crow" anywhere it appeared. The catalog
+// name matched as a bare prefix of a longer, different proper-noun phrase
+// that happened to sit right next to it in the text. Rejecting a match
+// immediately followed by "<space><Capitalized word>" catches exactly this —
+// it means the text continues into a different multi-word name the shorter
+// candidate has no business claiming — without needing a name denylist.
+function isFollowedByCapitalizedWord(text: string, end: number): boolean {
+  return /^ [A-Z]/.test(text.slice(end, end + 2));
+}
+
 function findSpanMatches(plain: string, candidates: readonly NameCandidate[]): readonly SpanMatch[] {
   const occupied = new Array<boolean>(plain.length).fill(false);
   const matches: SpanMatch[] = [];
@@ -130,6 +144,7 @@ function findSpanMatches(plain: string, candidates: readonly NameCandidate[]): r
       const start = match.index ?? 0;
       const end = start + candidate.name.length;
       if (occupied.slice(start, end).some(Boolean)) continue;
+      if (isFollowedByCapitalizedWord(plain, end)) continue;
       for (let index = start; index < end; index += 1) {
         occupied[index] = true;
       }
