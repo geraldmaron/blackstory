@@ -1,0 +1,64 @@
+[
+  {
+    "id": "gap_eugene_and_ruth_lasartemay",
+    "kind": "person",
+    "displayName": "Eugene and Ruth Lasartemay",
+    "summary": "Eugene and Ruth Lasartemay co-founded a private collection in 1946 that became the African American Museum and Library at Oakland, preserving Black history through artifacts, documents, and oral histories. Their initiative laid the foundation for a public institution dedicated to African American culture and memory in the East Bay.",
+    "eraBuckets": [
+      "1940s",
+      "1960s"
+    ],
+    "topicTags": [
+      "archives",
+      "community-organizing",
+      "education",
+      "history"
+    ],
+    "topicIds": [
+      "archives",
+      "community-organizing",
+      "education",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "African American Museum and Library at Oakland",
+      "East Bay Negro Historical Society",
+      "private collection",
+      "Oakland",
+      "cultural preservation"
+    ],
+    "jurisdictionLabel": "Oakland, CA",
+    "locationPrecision": "address",
+    "locationLabel": "14th Street location of the African American Museum and Library at Oakland",
+    "lat": 37.80611111,
+    "lng": -122.27638889,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "the initial private collection that became the African American Museum and Library at Oakland",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/African_American_Museum_and_Library_at_Oakland",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "began collecting artifacts and documents in 1946",
+        "object": "a private collection focused on African American history",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/African_American_Museum_and_Library_at_Oakland",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "co-founded",
+        "object": "the East Bay Negro Historical Society in 1965",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/African_American_Museum_and_Library_at_Oakland",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The founding of the AAMLO in 1946 emerged during the early years of the modern civil rights movement, a period when Black communities increasingly sought to preserve their own histories outside mainstream institutions. This effort reflects broader trends of grassroots archiving and cultural self-determination in response to systemic exclusion from established historical narratives."
+  }
+]

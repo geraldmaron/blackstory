@@ -1,0 +1,232 @@
+[
+  {
+    "id": "gap_1994_reparations_bill_florida",
+    "kind": "law",
+    "displayName": "1994 reparations bill (Florida)",
+    "summary": "In 1994, Florida passed a reparations bill awarding $150,000 to each of the nine surviving Rosewood massacre victims and smaller sums to descendants, marking the first reparations legislation by a U.S. state government.",
+    "eraBuckets": [
+      "1990s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "civil-rights",
+      "segregation",
+      "history"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "civil-rights",
+      "segregation",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "reparations bill",
+      "Rosewood massacre",
+      "Florida",
+      "1994",
+      "Jim Crow"
+    ],
+    "jurisdictionLabel": "Levy County, Florida",
+    "locationPrecision": "community",
+    "locationLabel": "Rosewood, Florida",
+    "lat": 29.23916667,
+    "lng": -82.93194444,
+    "claims": [
+      {
+        "predicate": "passed",
+        "object": "1994 reparations bill",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Rosewood%2C_Florida",
+        "citationLabel": "Rosewood, Florida Wikipedia"
+      },
+      {
+        "predicate": "awarded",
+        "object": "$150,000",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Rosewood%2C_Florida",
+        "citationLabel": "Rosewood, Florida Wikipedia"
+      },
+      {
+        "predicate": "to",
+        "object": "nine living Rosewood survivors",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Rosewood%2C_Florida",
+        "citationLabel": "Rosewood, Florida Wikipedia"
+      },
+      {
+        "predicate": "and",
+        "object": "smaller sums for descendants",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Rosewood%2C_Florida",
+        "citationLabel": "Rosewood, Florida Wikipedia"
+      },
+      {
+        "predicate": "first",
+        "object": "reparations legislation of its kind passed by any U.S. state government",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Rosewood%2C_Florida",
+        "citationLabel": "Rosewood, Florida Wikipedia"
+      }
+    ],
+    "historicalContext": "The 1994 Florida reparations bill was a direct response to the 1923 Rosewood massacre, a violent racial incident that exemplifies the systemic racial violence and segregation under Jim Crow laws. The bill represents an attempt to address historical injustices and is significant in the context of reparative justice in U.S. history."
+  },
+  {
+    "id": "gap_constitution_hall",
+    "kind": "institution",
+    "displayName": "Constitution Hall",
+    "summary": "Constitution Hall, located in Washington, D.C., was a site of racial exclusion in the 1930s, notably barring African-American soprano Marian Anderson from performing there. This led to significant public protest and a pivotal moment in the civil rights movement.",
+    "eraBuckets": [
+      "1930s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "jim-crow",
+      "firsts"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "jim-crow",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Constitution Hall",
+      "Marian Anderson",
+      "segregation",
+      "civil rights",
+      "DAR"
+    ],
+    "jurisdictionLabel": "Washington, D.C.",
+    "locationPrecision": "address",
+    "locationLabel": "1776 D Street NW",
+    "lat": 38.89388889,
+    "lng": -77.04111111,
+    "claims": [
+      {
+        "predicate": "excluded",
+        "object": "Marian Anderson",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/DAR_Constitution_Hall",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "caused",
+        "object": "Eleanor Roosevelt's resignation",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/DAR_Constitution_Hall",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "performed",
+        "object": "Marian Anderson",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/DAR_Constitution_Hall",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "excluded",
+        "object": "Paul Robeson",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/DAR_Constitution_Hall",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "hosted",
+        "object": "National Symphony Orchestra",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/DAR_Constitution_Hall",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Constitution Hall, built in 1929, was a venue for cultural and political events in Washington, D.C. However, its exclusion of Black performers during the Jim Crow era highlights the racial segregation that persisted in the United States. The hall's role in denying African-American artists like Marian Anderson access to performance spaces underscores its significance in the broader context of civil rights struggles."
+  },
+  {
+    "id": "gap_cotton_club",
+    "kind": "institution",
+    "displayName": "Cotton Club",
+    "summary": "The Cotton Club, located in Harlem, New York, was a whites-only nightclub that hosted prominent Black entertainers during the Harlem Renaissance. It played a significant role in the cultural and racial dynamics of the era.",
+    "eraBuckets": [
+      "1920s",
+      "1930s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "harlem-renaissance",
+      "civil-rights"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "harlem-renaissance",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Cotton Club",
+      "Harlem",
+      "Duke Ellington",
+      "Jim Crow",
+      "Black performers"
+    ],
+    "jurisdictionLabel": "New York, NY",
+    "locationPrecision": "neighborhood",
+    "locationLabel": "Harlem",
+    "lat": 40.819,
+    "lng": -73.937,
+    "claims": [
+      {
+        "predicate": "located_at",
+        "object": "Harlem, New York",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Cotton_Club",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "hosted",
+        "object": "Duke Ellington's orchestra",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Cotton_Club",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "operated_during",
+        "object": "Jim Crow era",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Cotton_Club",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "excluded",
+        "object": "Black patrons",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Cotton_Club",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "represented",
+        "object": "racial stereotypes",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Cotton_Club",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The Cotton Club operated during the Jim Crow era and Prohibition, reflecting the racial segregation and discriminatory practices of the time. It was a key venue for Black performers, despite its exclusionary policies, and contributed to the Harlem Renaissance by showcasing Black art and culture."
+  }
+]

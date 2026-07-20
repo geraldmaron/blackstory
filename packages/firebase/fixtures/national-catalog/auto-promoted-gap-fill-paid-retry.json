@@ -1,0 +1,83 @@
+[
+  {
+    "id": "gap_sumner_high_school",
+    "kind": "school",
+    "displayName": "Sumner High School",
+    "summary": "Sumner High School, established in 1875, was the first Black public high school west of the Mississippi River. It was a critical institution in the fight for educational equity and reflects the broader context of segregation and civil rights struggles in the United States.",
+    "eraBuckets": [
+      "1870s",
+      "1900s",
+      "1920s",
+      "1950s",
+      "2000s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "education",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "education",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Sumner High School",
+      "St. Louis",
+      "Black history",
+      "segregation",
+      "education"
+    ],
+    "jurisdictionLabel": "St. Louis, Missouri",
+    "locationPrecision": "address",
+    "locationLabel": "4248 W. Cottage Avenue",
+    "lat": 38.6597,
+    "lng": -90.2391,
+    "claims": [
+      {
+        "predicate": "was",
+        "object": "the first Black public high school west of the Mississippi River",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Sumner_High_School_(St._Louis)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "established in 1875",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Sumner_High_School_(St._Louis)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "one of only two public high schools in St. Louis City for African-American students",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Sumner_High_School_(St._Louis)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "segregated",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Sumner_High_School_(St._Louis)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "named after the abolitionist senator Charles H. Sumner",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Sumner_High_School_(St._Louis)",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Sumner High School was founded in 1875 as a response to the demand for educational opportunities for African Americans following the abolition of slavery in Missouri. It was segregated and served as one of only two public high schools for Black students in St. Louis City until the opening of Vashon High School in 1927. The school's establishment and subsequent history are deeply tied to the broader civil rights and segregation movements in the United States."
+  }
+]

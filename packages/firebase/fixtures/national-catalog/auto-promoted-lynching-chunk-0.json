@@ -1,0 +1,280 @@
+[
+  {
+    "id": "lynching_bill_gilmer_memphis_tennessee",
+    "kind": "person",
+    "displayName": "Bill Gilmer",
+    "summary": "Bill Gilmer was lynched in Memphis, Tennessee, in March\u2013April 1879 after being accused of shooting white attorney Thomas J. Wood, who had whipped him for speaking near his wife. His killing reflects the pattern of racial terror lynching used to enforce racial hierarchy in the post-Reconstruction South.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "resistance"
+    ],
+    "topicIds": [
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "Memphis",
+      "racial violence",
+      "Reconstruction",
+      "extrajudicial killing"
+    ],
+    "jurisdictionLabel": "Memphis, Tennessee",
+    "locationPrecision": "city",
+    "locationLabel": "Site of lynching in Shelby County",
+    "lat": 35.14611111,
+    "lng": -90.05194444,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "in Memphis, Tennessee",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/List_of_lynching_victims_in_the_United_States",
+        "citationLabel": "List of lynching victims in the United States (Wikipedia)"
+      },
+      {
+        "predicate": "was accused of shooting",
+        "object": "attorney Thomas J. Wood",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/List_of_lynching_victims_in_the_United_States",
+        "citationLabel": "List of lynching victims in the United States (Wikipedia)"
+      },
+      {
+        "predicate": "was whipped by Thomas J. Wood",
+        "object": "for using offensive language near Wood's wife",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/List_of_lynching_victims_in_the_United_States",
+        "citationLabel": "List of lynching victims in the United States (Wikipedia)"
+      },
+      {
+        "predicate": "died as a result of racial terror lynching",
+        "object": "in the post-Reconstruction South",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/List_of_lynching_victims_in_the_United_States",
+        "citationLabel": "List of lynching victims in the United States (Wikipedia)"
+      }
+    ],
+    "historicalContext": "Lynching was a widespread tool of racial control in the late 19th century, particularly in Southern states like Tennessee, where Black men were often targeted for perceived transgressions against white social norms. Memphis, a major urban center with a growing Black population, experienced racial tensions exacerbated by economic competition and white supremacist backlash following Reconstruction."
+  },
+  {
+    "id": "lynching_bartley_james_grenada_mississippi",
+    "kind": "person",
+    "displayName": "Bartley James",
+    "summary": "Bartley James, a Black man, was lynched in Grenada, Mississippi, on July 7, 1885, after two white men accused of murdering peddlers implicated him and John Campbell during their own lynching. His death is part of a broader pattern of racial terror used to enforce white supremacy in the post-Reconstruction South.",
+    "eraBuckets": [
+      "1880s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "resistance"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "Grenada Mississippi",
+      "racial violence",
+      "1885",
+      "Bartley James"
+    ],
+    "jurisdictionLabel": "Grenada, Mississippi",
+    "locationPrecision": "city",
+    "locationLabel": "Site of lynching",
+    "lat": 33.775,
+    "lng": -89.80888889,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "Bartley James",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Grenada%2C_Mississippi",
+        "citationLabel": "Wikipedia - Grenada, Mississippi"
+      },
+      {
+        "predicate": "was lynched in",
+        "object": "Grenada, Mississippi",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Grenada%2C_Mississippi",
+        "citationLabel": "Wikipedia - Grenada, Mississippi"
+      },
+      {
+        "predicate": "was lynched on",
+        "object": "July 7, 1885",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Grenada%2C_Mississippi",
+        "citationLabel": "Wikipedia - Grenada, Mississippi"
+      },
+      {
+        "predicate": "was implicated during the lynching of",
+        "object": "Perry McChristian and Felix Williams",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Grenada%2C_Mississippi",
+        "citationLabel": "Wikipedia - Grenada, Mississippi"
+      },
+      {
+        "predicate": "was a victim of racial terror lynching",
+        "object": "Bartley James",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Grenada%2C_Mississippi",
+        "citationLabel": "Wikipedia - Grenada, Mississippi"
+      }
+    ],
+    "historicalContext": "Lynching was a tool of racial control in the post-Reconstruction South, used to terrorize Black communities and suppress civil rights. In Mississippi, such violence often followed accusations involving white victims and was rarely challenged by legal authorities, reinforcing Jim Crow segregation and disenfranchisement."
+  },
+  {
+    "id": "lynching_harriet_finch_north_carolina",
+    "kind": "person",
+    "displayName": "Harriet Finch",
+    "summary": "Harriet Finch was lynched on September 29, 1885, in Chatham County, North Carolina, as part of a mass lynching of four African Americans accused of murder. She was one of only four Black women lynched in the state.",
+    "eraBuckets": [
+      "1880s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "segregation",
+      "civil-rights"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "segregation",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "Harriet Finch",
+      "Chatham County",
+      "North Carolina",
+      "Black women"
+    ],
+    "jurisdictionLabel": "Pittsboro, North Carolina",
+    "locationPrecision": "institution",
+    "locationLabel": "Chatham County Jail",
+    "lat": 35.7,
+    "lng": -79.25,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "Harriet Finch",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chatham_County%2C_North_Carolina",
+        "citationLabel": "Chatham County, North Carolina Wikipedia"
+      },
+      {
+        "predicate": "occurred in",
+        "object": "Chatham County, North Carolina",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chatham_County%2C_North_Carolina",
+        "citationLabel": "Chatham County, North Carolina Wikipedia"
+      },
+      {
+        "predicate": "was part of",
+        "object": "mass lynching of four African Americans",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chatham_County%2C_North_Carolina",
+        "citationLabel": "Chatham County, North Carolina Wikipedia"
+      },
+      {
+        "predicate": "was one of only four Black women lynched in North Carolina",
+        "object": "Harriet Finch",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chatham_County%2C_North_Carolina",
+        "citationLabel": "Chatham County, North Carolina Wikipedia"
+      }
+    ],
+    "historicalContext": "Harriet Finch's lynching occurred in Chatham County, North Carolina, during a period of heightened racial violence against African Americans following emancipation. The county had a history of white supremacist violence, including the activities of secret terrorist organizations like the Ku Klux Klan. The lynching of Harriet Finch and others was part of a broader pattern of racial terror used to enforce white supremacy."
+  },
+  {
+    "id": "lynching_john_pattishall_north_carolina",
+    "kind": "person",
+    "displayName": "John Pattishall",
+    "summary": "John Pattishall was lynched on September 29, 1885, in Chatham County, North Carolina, following accusations of murdering two white families. He was taken from jail and hanged by a mob.",
+    "eraBuckets": [
+      "1880s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "civil-rights",
+      "segregation"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "civil-rights",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "Chatham County",
+      "North Carolina",
+      "Jim Crow",
+      "racial violence"
+    ],
+    "jurisdictionLabel": "Chatham County, North Carolina",
+    "locationPrecision": "county",
+    "locationLabel": "Chatham County, North Carolina",
+    "lat": 35.7,
+    "lng": -79.25,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "John Pattishall",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chatham_County%2C_North_Carolina",
+        "citationLabel": "Chatham County, North Carolina Wikipedia"
+      },
+      {
+        "predicate": "occurred in",
+        "object": "Chatham County, North Carolina",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chatham_County%2C_North_Carolina",
+        "citationLabel": "Chatham County, North Carolina Wikipedia"
+      },
+      {
+        "predicate": "accused of",
+        "object": "murders of two white families",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chatham_County%2C_North_Carolina",
+        "citationLabel": "Chatham County, North Carolina Wikipedia"
+      },
+      {
+        "predicate": "taken from jail and hanged",
+        "object": "John Pattishall",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chatham_County%2C_North_Carolina",
+        "citationLabel": "Chatham County, North Carolina Wikipedia"
+      },
+      {
+        "predicate": "part of a documented history of lynchings",
+        "object": "Chatham County, North Carolina",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chatham_County%2C_North_Carolina",
+        "citationLabel": "Chatham County, North Carolina Wikipedia"
+      }
+    ],
+    "historicalContext": "John Pattishall's lynching occurred during the Jim Crow era, a period marked by widespread racial violence and the use of lynching as a tool of white supremacy. His case is part of a documented history of six lynchings in Chatham County, reflecting the systemic racial terror faced by Black communities in the post-Reconstruction South."
+  }
+]

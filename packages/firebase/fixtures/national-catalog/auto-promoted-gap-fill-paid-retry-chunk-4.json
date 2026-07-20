@@ -1,0 +1,75 @@
+[
+  {
+    "id": "gap_springfield_baptist_church",
+    "kind": "place",
+    "displayName": "Springfield Baptist Church",
+    "summary": "The Springfield Baptist Church in Augusta, Georgia, is a historic site tied to the founding of the Augusta Institute in 1867, which educated Black men for ministry and teaching.",
+    "eraBuckets": [
+      "1800s",
+      "1860s",
+      "1870s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "education",
+      "segregation",
+      "black-codes",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "education",
+      "segregation",
+      "black-codes",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Springfield Baptist Church",
+      "Augusta Institute",
+      "Black education",
+      "Georgia",
+      "civil rights"
+    ],
+    "jurisdictionLabel": "Augusta, Georgia",
+    "locationPrecision": "institution",
+    "locationLabel": "Springfield Baptist Church",
+    "lat": 33.47861111,
+    "lng": -81.97166667,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "Augusta Institute",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Springfield_Baptist_Church_(Augusta%2C_Georgia)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "location",
+        "object": "Augusta, Georgia",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Springfield_Baptist_Church_(Augusta%2C_Georgia)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "hosted",
+        "object": "1866 Georgia State Freedmen's Conventions",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Springfield_Baptist_Church_(Augusta%2C_Georgia)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "connected_to",
+        "object": "Silver Bluff Baptist Church",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Springfield_Baptist_Church_(Augusta%2C_Georgia)",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The Springfield Baptist Church, built in 1801, is one of the oldest Black congregations in the U.S. and played a key role in the education of Black men during the Reconstruction era. It hosted the 1866 Georgia State Freedmen's Conventions and is connected to the Silver Bluff Baptist Church, one of the first Black Baptist congregations in the nation."
+  }
+]

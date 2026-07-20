@@ -1,0 +1,154 @@
+[
+  {
+    "id": "gap_denise_mcnair",
+    "kind": "person",
+    "displayName": "Denise McNair",
+    "summary": "Denise McNair was one of the four girls killed in the 16th Street Baptist Church bombing in Birmingham, Alabama, on September 15, 1963. Her death, along with Addie Mae Collins, [[gap_carole_robertson|Carole Robertson]], and Cynthia Wesley, was a tragic consequence of racial violence and segregation in the Jim Crow South.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "jim-crow"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "jim-crow"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "16th Street Baptist Church bombing",
+      "Denise McNair",
+      "civil rights",
+      "Birmingham",
+      "Ku Klux Klan"
+    ],
+    "jurisdictionLabel": "Birmingham, Alabama",
+    "locationPrecision": "institution",
+    "locationLabel": "16th Street Baptist Church",
+    "lat": 33.51666667,
+    "lng": -86.815,
+    "claims": [
+      {
+        "predicate": "killed_in",
+        "object": "16th Street Baptist Church bombing",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/16th_Street_Baptist_Church_bombing",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "victim_of",
+        "object": "Ku Klux Klan",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/16th_Street_Baptist_Church_bombing",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "date_of_death",
+        "object": "September 15, 1963",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/16th_Street_Baptist_Church_bombing",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "location_of_death",
+        "object": "Birmingham, Alabama",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/16th_Street_Baptist_Church_bombing",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "part_of",
+        "object": "Civil Rights movement",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/16th_Street_Baptist_Church_bombing",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The 16th Street Baptist Church bombing was a terrorist attack by the Ku Klux Klan, targeting the church as a center of the African American community in Birmingham, Alabama. The bombing, which killed four young girls, was a pivotal moment in the civil rights movement, contributing to the passage of the Civil Rights Act of 1964."
+  },
+  {
+    "id": "gap_carole_robertson",
+    "kind": "person",
+    "displayName": "Carole Robertson",
+    "summary": "Carole Robertson was one of the four girls killed in the 16th Street Baptist Church bombing in Birmingham, Alabama, on September 15, 1963. This event was a significant act of racial violence that galvanized the civil rights movement.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "jim-crow",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "jim-crow",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "16th Street Baptist Church bombing",
+      "Carole Robertson",
+      "civil rights",
+      "Birmingham",
+      "Ku Klux Klan"
+    ],
+    "jurisdictionLabel": "Birmingham, Alabama",
+    "locationPrecision": "institution",
+    "locationLabel": "16th Street Baptist Church",
+    "lat": 33.51666667,
+    "lng": -86.815,
+    "claims": [
+      {
+        "predicate": "killed_in",
+        "object": "16th Street Baptist Church bombing",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/16th_Street_Baptist_Church_bombing",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "victim_of",
+        "object": "Ku Klux Klan",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/16th_Street_Baptist_Church_bombing",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "date_of_death",
+        "object": "September 15, 1963",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/16th_Street_Baptist_Church_bombing",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "location_of_death",
+        "object": "Birmingham, Alabama, U.S.",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/16th_Street_Baptist_Church_bombing",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "part_of",
+        "object": "Civil Rights movement",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/16th_Street_Baptist_Church_bombing",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The 16th Street Baptist Church bombing was a terrorist attack by the Ku Klux Klan, targeting a prominent African American church in Birmingham, Alabama. The bombing killed four girls, including Carole Robertson, and was a pivotal moment in the civil rights movement, contributing to the passage of the Civil Rights Act of 1964."
+  }
+]

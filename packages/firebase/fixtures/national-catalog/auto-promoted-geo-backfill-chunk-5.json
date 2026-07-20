@@ -1,0 +1,237 @@
+[
+  {
+    "id": "gap_1866_memphis_race_massacre",
+    "kind": "event",
+    "displayName": "1866 Memphis race massacre",
+    "summary": "The 1866 Memphis race massacre was a violent event that resulted in the deaths of 47 Black individuals and the destruction of numerous homes, churches, and schools. It was a pivotal moment in the Reconstruction era, highlighting the racial tensions and systemic violence faced by freedmen.",
+    "eraBuckets": [
+      "1860s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "reconstruction",
+      "segregation",
+      "jim-crow",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "reconstruction",
+      "segregation",
+      "jim-crow",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Memphis massacre",
+      "Reconstruction",
+      "racial violence",
+      "Black history",
+      "Fourteenth Amendment"
+    ],
+    "jurisdictionLabel": "Memphis, Tennessee",
+    "locationPrecision": "city",
+    "locationLabel": "Memphis, Tennessee",
+    "lat": 35.14611111,
+    "lng": -90.05194444,
+    "claims": [
+      {
+        "predicate": "caused",
+        "object": "racial violence",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Memphis_massacre_of_1866",
+        "citationLabel": "Memphis Massacre of 1866"
+      },
+      {
+        "predicate": "resulted_in",
+        "object": "deaths",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Memphis_massacre_of_1866",
+        "citationLabel": "Memphis Massacre of 1866"
+      },
+      {
+        "predicate": "resulted_in",
+        "object": "destruction_of_property",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Memphis_massacre_of_1866",
+        "citationLabel": "Memphis Massacre of 1866"
+      },
+      {
+        "predicate": "influenced",
+        "object": "Fourteenth Amendment",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Memphis_massacre_of_1866",
+        "citationLabel": "Memphis Massacre of 1866"
+      },
+      {
+        "predicate": "resulted_in",
+        "object": "migration_of_black_populations",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Memphis_massacre_of_1866",
+        "citationLabel": "Memphis Massacre of 1866"
+      }
+    ],
+    "historicalContext": "The 1866 Memphis race massacre occurred during the Reconstruction era, a period marked by efforts to rebuild the South after the Civil War and integrate freed slaves into society. The violence was fueled by racial tensions and competition for economic and social resources, leading to significant loss of life and property among Black communities."
+  },
+  {
+    "id": "gap_stax_records",
+    "kind": "institution",
+    "displayName": "Stax Records",
+    "summary": "Stax Records, founded in 1957 in Memphis, Tennessee, was a pivotal label in the development of Southern soul music. It was known for its racially integrated staff and artists, contributing significantly to Black cultural and musical history.",
+    "eraBuckets": [
+      "1950s",
+      "1960s",
+      "1970s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "jim-crow",
+      "music",
+      "black-codes"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "jim-crow",
+      "music",
+      "black-codes"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Stax Records",
+      "Memphis soul",
+      "Southern soul",
+      "integrated",
+      "Black music"
+    ],
+    "jurisdictionLabel": "Memphis, Tennessee",
+    "locationPrecision": "city",
+    "locationLabel": "Memphis, Tennessee",
+    "lat": 35.14611111,
+    "lng": -90.05194444,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "1957",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Stax_Records",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "location",
+        "object": "Memphis, Tennessee",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Stax_Records",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "influenced",
+        "object": "Southern soul music",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Stax_Records",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "integrated",
+        "object": "staff and artists",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Stax_Records",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "recognized",
+        "object": "Memphis Soul music",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://obamawhitehouse.archives.gov/the-press-office/2013/04/02/upcoming-guidance-performance-white-house-memphis-soul",
+        "citationLabel": "White House Event"
+      }
+    ],
+    "historicalContext": "Stax Records emerged during the Jim Crow era, a time of severe racial segregation in the United States. Its racially integrated operations were unprecedented and played a key role in shaping the Black music scene in Memphis and beyond. The label's influence extended through its contributions to genres like soul, funk, and blues, and its legacy is recognized in national cultural events."
+  },
+  {
+    "id": "gap_gee_s_bend",
+    "kind": "place",
+    "displayName": "Gee's Bend",
+    "summary": "Gee's Bend, Alabama, is a historically significant African-American community known for its quilting traditions, sharecropping history, and role in the civil rights movement. The community's residents are descendants of enslaved people who worked on the Gee plantation, and their quilts have gained international acclaim.",
+    "eraBuckets": [
+      "1910s",
+      "1930s",
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "art",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "art",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Gee's Bend",
+      "quilting",
+      "civil rights",
+      "sharecropping",
+      "slavery"
+    ],
+    "jurisdictionLabel": "Selma, Alabama",
+    "locationPrecision": "town",
+    "locationLabel": "Gee's Bend, Alabama",
+    "lat": 32.06944444,
+    "lng": -87.29138889,
+    "claims": [
+      {
+        "predicate": "wasEstablishedBy",
+        "object": "Joseph Gee",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Quilts_of_Gee's_Bend",
+        "citationLabel": "Quilts of Gee's Bend"
+      },
+      {
+        "predicate": "wasPartOf",
+        "object": "sharecropping",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Quilts_of_Gee's_Bend",
+        "citationLabel": "Quilts of Gee's Bend"
+      },
+      {
+        "predicate": "wasInfluencedBy",
+        "object": "civil_rights_movement",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Quilts_of_Gee's_Bend",
+        "citationLabel": "Quilts of Gee's Bend"
+      },
+      {
+        "predicate": "wasRecognizedFor",
+        "object": "quilting",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Quilts_of_Gee's_Bend",
+        "citationLabel": "Quilts of Gee's Bend"
+      },
+      {
+        "predicate": "wasPartOf",
+        "object": "New_Deal",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Quilts_of_Gee's_Bend",
+        "citationLabel": "Quilts of Gee's Bend"
+      }
+    ],
+    "historicalContext": "Gee's Bend is a rural community in Alabama with deep roots in the history of slavery and sharecropping. The community's quilting tradition, which dates back to the 19th century, has become a significant cultural contribution to American art. The area's isolation and economic struggles were exacerbated by systemic racism, including the discontinuation of ferry service during the civil rights movement."
+  }
+]

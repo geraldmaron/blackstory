@@ -1,0 +1,65 @@
+[
+  {
+    "id": "gap_rev_jedson_white",
+    "kind": "person",
+    "displayName": "Rev. Jedson White",
+    "summary": "Rev. Jedson White organized [[gap_st_john_s_baptist_church|St. John's Baptist Church]] in Brooksville, Oklahoma, in 1906 and promoted the all-Black town to African Americans across the South, contributing to its early growth and community development during the Jim Crow era.",
+    "eraBuckets": [
+      "1900s"
+    ],
+    "topicTags": [
+      "community-organizing",
+      "church",
+      "great-migration",
+      "self-governance",
+      "jim-crow"
+    ],
+    "topicIds": [
+      "community-organizing",
+      "church",
+      "great-migration",
+      "self-governance",
+      "jim-crow"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "St. John's Baptist Church",
+      "Brooksville",
+      "all-Black towns",
+      "community organizing",
+      "Black settlement"
+    ],
+    "jurisdictionLabel": "Brooksville, Oklahoma",
+    "locationPrecision": "town",
+    "locationLabel": "Brooksville townsite",
+    "lat": 35.20972222,
+    "lng": -96.96111111,
+    "claims": [
+      {
+        "predicate": "organized",
+        "object": "St. John's Baptist Church in Brooksville, Oklahoma",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Brooksville%2C_Oklahoma",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "promoted",
+        "object": "Brooksville as a destination for African American settlement",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Brooksville%2C_Oklahoma",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "contributed to the development of",
+        "object": "an all-Black town during the Jim Crow era",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Brooksville%2C_Oklahoma",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Brooksville was one of over fifty all-Black towns established in Oklahoma during the early 20th century, many as responses to racial violence and segregation in the South. These towns represented acts of Black self-governance and resistance to disenfranchisement, enabled by available land and the promise of autonomy, though many later declined due to economic pressures and migration."
+  }
+]

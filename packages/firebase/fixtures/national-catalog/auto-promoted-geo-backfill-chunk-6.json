@@ -1,0 +1,527 @@
+[
+  {
+    "id": "gap_u_s_commission_on_civil_rights",
+    "kind": "organization",
+    "displayName": "U.S. Commission on Civil Rights",
+    "summary": "The U.S. Commission on Civil Rights was established in 1957 under the Civil Rights Act to investigate and report on civil rights issues, including discrimination based on race, sex, national origin, and disability.",
+    "eraBuckets": [
+      "1950s",
+      "1990s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "government",
+      "law",
+      "segregation"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "government",
+      "law",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "civil rights",
+      "commission",
+      "discrimination",
+      "civil rights act"
+    ],
+    "jurisdictionLabel": "Washington, D.C.",
+    "locationPrecision": "city",
+    "locationLabel": "Headquarters",
+    "lat": 38.90472222,
+    "lng": -77.01638889,
+    "claims": [
+      {
+        "predicate": "created_by",
+        "object": "Civil Rights Act of 1957",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/United_States_Commission_on_Civil_Rights",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "investigates",
+        "object": "discrimination based on race, sex, national origin, disability",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/United_States_Commission_on_Civil_Rights",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "terminated_statutory_authority",
+        "object": "September 30, 1996",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/United_States_Commission_on_Civil_Rights",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "appointed_chair",
+        "object": "Peter Kirsanow",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/United_States_Commission_on_Civil_Rights",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The U.S. Commission on Civil Rights was created during the Eisenhower administration as part of the Civil Rights Act of 1957, reflecting the federal government's response to persistent civil rights challenges. It has played a role in shaping civil rights policy and oversight, particularly in the context of voting discrimination and other forms of systemic inequality."
+  },
+  {
+    "id": "gap_bleeding_kansas",
+    "kind": "event",
+    "displayName": "Bleeding Kansas",
+    "summary": "Bleeding Kansas was a violent conflict in the Kansas Territory between 1854 and 1859, driven by opposing views on slavery. It involved political violence, electoral fraud, and paramilitary actions, ultimately contributing to the American Civil War.",
+    "eraBuckets": [
+      "1850s",
+      "1860s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "civil-war"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "civil-war"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Bleeding Kansas",
+      "slavery",
+      "civil war",
+      "popular sovereignty",
+      "political violence"
+    ],
+    "jurisdictionLabel": "Kansas, United States",
+    "locationPrecision": "territory",
+    "locationLabel": "Kansas Territory",
+    "lat": 39.31,
+    "lng": -94.92,
+    "claims": [
+      {
+        "predicate": "was_part_of",
+        "object": "American Civil War",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Bleeding_Kansas",
+        "citationLabel": "Bleeding Kansas Wikipedia"
+      },
+      {
+        "predicate": "involved",
+        "object": "pro-slavery settlers",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Bleeding_Kansas",
+        "citationLabel": "Bleeding Kansas Wikipedia"
+      },
+      {
+        "predicate": "involved",
+        "object": "anti-slavery settlers",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Bleeding_Kansas",
+        "citationLabel": "Bleeding Kansas Wikipedia"
+      },
+      {
+        "predicate": "resulted_in",
+        "object": "political violence",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Bleeding_Kansas",
+        "citationLabel": "Bleeding Kansas Wikipedia"
+      },
+      {
+        "predicate": "led_to",
+        "object": "national political tensions",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Bleeding_Kansas",
+        "citationLabel": "Bleeding Kansas Wikipedia"
+      },
+      {
+        "predicate": "was_a_prelude_to",
+        "object": "American Civil War",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Bleeding_Kansas",
+        "citationLabel": "Bleeding Kansas Wikipedia"
+      }
+    ],
+    "historicalContext": "Bleeding Kansas emerged from the Kansas-Nebraska Act of 1854, which allowed settlers to decide slavery's status through popular sovereignty. The conflict between pro-slavery and anti-slavery settlers led to widespread violence, influencing national politics and contributing to the Civil War."
+  },
+  {
+    "id": "gap_president_s_committee_on_equality_of_treatment_and_opportuni",
+    "kind": "organization",
+    "displayName": "President's Committee on Equality of Treatment and Opportunity in the Armed Services",
+    "summary": "The President's Committee on Equality of Treatment and Opportunity in the Armed Services, established by Harry Truman in 1946, was instrumental in advancing civil rights and desegregation in the U.S. military through its recommendations and subsequent executive orders.",
+    "eraBuckets": [
+      "1940s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "desegregation"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "desegregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "civil rights",
+      "desegregation",
+      "executive orders",
+      "armed services",
+      "Truman"
+    ],
+    "jurisdictionLabel": "Washington, D.C.",
+    "locationPrecision": "institution",
+    "locationLabel": "White House",
+    "lat": 38.89777778,
+    "lng": -77.03638889,
+    "claims": [
+      {
+        "predicate": "established_by",
+        "object": "Harry Truman",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/President's_Committee_on_Civil_Rights",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "created_by",
+        "object": "Executive Order 9808",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/President's_Committee_on_Civil_Rights",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "recommended_desegregation",
+        "object": "armed_services",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/President's_Committee_on_Civil_Rights",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "produced_report",
+        "object": "To Secure These Rights",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/President's_Committee_on_Civil_Rights",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "influenced_executive_orders",
+        "object": "9980 and 9981",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/President's_Committee_on_Civil_Rights",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The committee was created to investigate civil rights issues and propose measures to strengthen them, leading to significant reforms such as Executive Order 9981, which mandated the desegregation of the armed services. This marked a pivotal moment in the fight against racial discrimination in the military."
+  },
+  {
+    "id": "gap_brown_ii",
+    "kind": "case",
+    "displayName": "Brown II",
+    "summary": "Brown II (1955) was the Supreme Court's ruling on the implementation of its desegregation mandate, instructing states to integrate public schools 'with all deliberate speed.' This decision operationalized the original Brown ruling, shaping the prolonged struggle for racial equity in education across the United States.",
+    "eraBuckets": [
+      "1950s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "desegregation",
+      "education",
+      "supreme-court",
+      "equal-protection"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "desegregation",
+      "education",
+      "supreme-court",
+      "equal-protection"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "desegregation",
+      "Supreme Court",
+      "all deliberate speed",
+      "public schools",
+      "Equal Protection Clause"
+    ],
+    "jurisdictionLabel": "Washington, D.C.",
+    "locationPrecision": "institution",
+    "locationLabel": "U.S. Supreme Court Building",
+    "lat": 38.89055556,
+    "lng": -77.00444444,
+    "claims": [
+      {
+        "predicate": "issued ruling on",
+        "object": "desegregation of public schools",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Brown_v._Board_of_Education",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "ordered states to",
+        "object": "desegregate with all deliberate speed",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Brown_v._Board_of_Education",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was follow-up to",
+        "object": "Brown v. Board of Education (1954)",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Brown_v._Board_of_Education",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is part of",
+        "object": "civil rights movement legal strategy",
+        "confidenceLevel": "medium",
+        "citationSource": "citation_trail",
+        "citationHref": "https://americanhistory.si.edu/brown/history/3-organized/legal-campaign.html",
+        "citationLabel": "Smithsonian Institution"
+      }
+    ],
+    "historicalContext": "Brown II emerged in response to widespread resistance to desegregation, particularly in the South. By using the ambiguous phrase 'all deliberate speed,' the Court allowed room for delay, which many states exploited through 'massive resistance' strategies, thereby extending racial segregation in schools for years."
+  },
+  {
+    "id": "gap_grutter_v_bollinger",
+    "kind": "case",
+    "displayName": "Grutter v. Bollinger",
+    "summary": "Grutter v. Bollinger (2003) was a landmark Supreme Court case that upheld the use of race as a factor in university admissions to promote diversity, while rejecting a points-based system that automatically awarded preferences to minority applicants.",
+    "eraBuckets": [
+      "2000s"
+    ],
+    "topicTags": [
+      "affirmative-action",
+      "civil-rights",
+      "education",
+      "equal-protection",
+      "segregation"
+    ],
+    "topicIds": [
+      "affirmative-action",
+      "civil-rights",
+      "education",
+      "equal-protection",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "affirmative action",
+      "diversity",
+      "race",
+      "admissions",
+      "Supreme Court"
+    ],
+    "jurisdictionLabel": "Washington, D.C.",
+    "locationPrecision": "institution",
+    "locationLabel": "Supreme Court of the United States",
+    "lat": 38.89055556,
+    "lng": -77.00444444,
+    "claims": [
+      {
+        "predicate": "upheld",
+        "object": "use of race in admissions to promote diversity",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Grutter_v._Bollinger",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "rejected",
+        "object": "points-based admissions system that automatically awarded preferences to minority applicants",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Grutter_v._Bollinger",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "acknowledged",
+        "object": "need for race-conscious admissions policies to be narrowly tailored and time-limited",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Grutter_v._Bollinger",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "part of",
+        "object": "broader legal and social discourse on race and education in the United States",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Grutter_v._Bollinger",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Grutter v. Bollinger is significant in the context of affirmative action and the legal debates over racial equality in education. The decision reinforced the Court's stance on the use of race in admissions to achieve diversity, while also acknowledging the need for such policies to be narrowly tailored and time-limited. This case is part of a broader legal and social discourse on race and education in the United States."
+  },
+  {
+    "id": "gap_hall_of_negro_life",
+    "kind": "event",
+    "displayName": "Hall of Negro Life",
+    "summary": "The Hall of Negro Life, hosted at the 1936 Texas Centennial Exposition, was the first major Black arts and culture exhibit at a world's fair, showcasing Black contributions to American culture and history.",
+    "eraBuckets": [
+      "1930s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "jim-crow",
+      "art",
+      "firsts"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "jim-crow",
+      "art",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Hall of Negro Life",
+      "Texas Centennial Exposition",
+      "Black arts",
+      "cultural exhibit",
+      "Alonzo J. Aden"
+    ],
+    "jurisdictionLabel": "Dallas, Texas",
+    "locationPrecision": "site",
+    "locationLabel": "Fair Park",
+    "lat": 32.78194444,
+    "lng": -96.76555556,
+    "claims": [
+      {
+        "predicate": "hosted",
+        "object": "Hall of Negro Life",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Alonzo_J._Aden",
+        "citationLabel": "Alonzo J. Aden"
+      },
+      {
+        "predicate": "first_major_black_arts_exhibit",
+        "object": "Hall of Negro Life",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Alonzo_J._Aden",
+        "citationLabel": "Alonzo J. Aden"
+      },
+      {
+        "predicate": "attracted_visitors",
+        "object": "more_than_400000",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Alonzo_J._Aden",
+        "citationLabel": "Alonzo J. Aden"
+      },
+      {
+        "predicate": "part_of",
+        "object": "Texas Centennial Exposition",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Alonzo_J._Aden",
+        "citationLabel": "Alonzo J. Aden"
+      }
+    ],
+    "historicalContext": "The Hall of Negro Life was a pivotal moment in the representation of Black culture at a national level, occurring during the era of Jim Crow laws and reflecting the growing efforts to challenge racial stereotypes through cultural exhibitions. It was part of a broader movement to assert Black identity and visibility in American society."
+  },
+  {
+    "id": "gap_sovereignty_commission",
+    "kind": "organization",
+    "displayName": "Sovereignty Commission",
+    "summary": "The Mississippi State Sovereignty Commission was a state agency formed in 1956 to oppose civil rights activism and protect segregation. It spied on activists, used economic pressure, and collaborated with local officials to suppress civil rights efforts.",
+    "eraBuckets": [
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "jim-crow",
+      "segregation",
+      "black-codes",
+      "anti-miscegenation"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "jim-crow",
+      "segregation",
+      "black-codes",
+      "anti-miscegenation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Mississippi",
+      "civil rights",
+      "surveillance",
+      "segregation",
+      "Sov-Com"
+    ],
+    "jurisdictionLabel": "Jackson, Mississippi",
+    "locationPrecision": "institution",
+    "locationLabel": "Mississippi State Capitol",
+    "lat": 32.30388889,
+    "lng": -90.18222222,
+    "claims": [
+      {
+        "predicate": "formed",
+        "object": "1956",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mississippi_State_Sovereignty_Commission",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "dissolved",
+        "object": "1977",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mississippi_State_Sovereignty_Commission",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "tasked_with",
+        "object": "fighting integration and controlling civil rights activism",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mississippi_State_Sovereignty_Commission",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "spied_on",
+        "object": "civil rights activists",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mississippi_State_Sovereignty_Commission",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "used_economic_pressures",
+        "object": "to suppress civil rights activism",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mississippi_State_Sovereignty_Commission",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "collaborated_with",
+        "object": "local white officials to pressure African Americans",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mississippi_State_Sovereignty_Commission",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The Sovereignty Commission was established in response to the 1954 Brown v. Board of Education ruling, which mandated the desegregation of public schools. It was part of a broader network of state and local efforts to resist federal civil rights legislation and maintain racial segregation in Mississippi."
+  }
+]

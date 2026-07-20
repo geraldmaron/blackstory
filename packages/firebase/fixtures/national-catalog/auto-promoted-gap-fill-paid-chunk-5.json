@@ -1,0 +1,158 @@
+[
+  {
+    "id": "gap_1963_klan_bombing",
+    "kind": "event",
+    "displayName": "1963 Klan bombing",
+    "summary": "The 1963 bombing of the 16th Street Baptist Church in Birmingham, Alabama, killed four young Black girls and was a pivotal moment in the civil rights movement, contributing to the passage of the Civil Rights Act of 1964.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "history",
+      "jim-crow",
+      "movement"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "history",
+      "jim-crow",
+      "movement"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "bombing",
+      "civil rights",
+      "Birmingham",
+      "KKK",
+      "16th Street Baptist Church"
+    ],
+    "jurisdictionLabel": "Birmingham, Alabama",
+    "locationPrecision": "institution",
+    "locationLabel": "16th Street Baptist Church",
+    "lat": 33.51666667,
+    "lng": -86.815,
+    "claims": [
+      {
+        "predicate": "was_part_of",
+        "object": "civil-rights",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/16th_Street_Baptist_Church_bombing",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "killed",
+        "object": "four_black_girls",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/16th_Street_Baptist_Church_bombing",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "committed_by",
+        "object": "ku_klux_klan",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/16th_Street_Baptist_Church_bombing",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "contributed_to",
+        "object": "civil_rights_act_of_1964",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/16th_Street_Baptist_Church_bombing",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "occurred_in",
+        "object": "birmingham_alabama",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/16th_Street_Baptist_Church_bombing",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The bombing was part of the broader civil rights movement and the Birmingham campaign, which aimed to desegregate the city. It occurred in a deeply segregated city where racial violence was common, and it galvanized national support for civil rights legislation."
+  },
+  {
+    "id": "gap_rural_training_and_research_center",
+    "kind": "place",
+    "displayName": "Rural Training and Research Center",
+    "summary": "The Federation of Southern Cooperatives established the Rural Training and Research Center near Epes, Alabama in 1971, using land purchased through the Panola Land Buying Association. The center trained members in cooperative management and land retention, playing a key role in Black agricultural empowerment.",
+    "eraBuckets": [
+      "1970s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "land-ownership",
+      "cooperatives",
+      "agriculture"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "land-ownership",
+      "cooperatives",
+      "agriculture"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Rural Training and Research Center",
+      "Federation of Southern Cooperatives",
+      "land ownership",
+      "cooperative management",
+      "Alabama"
+    ],
+    "jurisdictionLabel": "Epes, Alabama",
+    "locationPrecision": "site",
+    "locationLabel": "Rural Training and Research Center",
+    "lat": 32.75527778,
+    "lng": -88.12611111,
+    "claims": [
+      {
+        "predicate": "established",
+        "object": "Rural Training and Research Center",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Federation_of_Southern_Cooperatives_Rural_Training_and_Research_Center",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "location",
+        "object": "Epes, Alabama",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Federation_of_Southern_Cooperatives_Rural_Training_and_Research_Center",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "purpose",
+        "object": "cooperative management and land retention",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Federation_of_Southern_Cooperatives_Rural_Training_and_Research_Center",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "land_purchased",
+        "object": "Panola Land Buying Association",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Federation_of_Southern_Cooperatives_Rural_Training_and_Research_Center",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "designated",
+        "object": "National Register of Historic Places",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/100009125",
+        "citationLabel": "National Park Service"
+      }
+    ],
+    "historicalContext": "The Rural Training and Research Center is part of the Federation of Southern Cooperatives, an organization formed in 1967 to support Black farming co-ops in the South. The center's establishment in 1971 reflects the broader struggle for land ownership and economic self-sufficiency among Black communities during the civil rights era."
+  }
+]

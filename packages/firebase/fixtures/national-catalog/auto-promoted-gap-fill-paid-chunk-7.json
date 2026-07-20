@@ -1,0 +1,204 @@
+[
+  {
+    "id": "gap_old_charleston_jail",
+    "kind": "place",
+    "displayName": "Old Charleston Jail",
+    "summary": "The Old Charleston Jail, located in Charleston, South Carolina, was a site of significant historical events, including the imprisonment of Denmark Vesey, a leader in the 1822 slave revolt. The jail's role in the broader context of slavery and resistance in the antebellum South underscores its importance in Black history.",
+    "eraBuckets": [
+      "1800s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "rebellion",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "rebellion",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Old Charleston Jail",
+      "Denmark Vesey",
+      "1822 slave revolt",
+      "Charleston, South Carolina",
+      "slavery"
+    ],
+    "jurisdictionLabel": "Charleston, South Carolina",
+    "locationPrecision": "institution",
+    "locationLabel": "Old Charleston Jail",
+    "lat": 32.77833333,
+    "lng": -79.93694444,
+    "claims": [
+      {
+        "predicate": "held",
+        "object": "Denmark Vesey",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Old_Charleston_Jail",
+        "citationLabel": "Old Charleston Jail"
+      },
+      {
+        "predicate": "imprisoned",
+        "object": "African Americans involved in the 1822 slave revolt",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Old_Charleston_Jail",
+        "citationLabel": "Old Charleston Jail"
+      },
+      {
+        "predicate": "location",
+        "object": "Charleston, South Carolina",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Old_Charleston_Jail",
+        "citationLabel": "Old Charleston Jail"
+      },
+      {
+        "predicate": "role",
+        "object": "site of the 1822 slave revolt",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Old_Charleston_Jail",
+        "citationLabel": "Old Charleston Jail"
+      }
+    ],
+    "historicalContext": "The Old Charleston Jail, operational from 1802 to 1939, was a key site in the antebellum South, housing individuals involved in resistance against slavery, including Denmark Vesey. Its role in the 1822 slave revolt and the subsequent increased restrictions on enslaved and free African Americans highlights its significance in the context of segregation, civil rights, and Black resistance."
+  },
+  {
+    "id": "gap_nassau",
+    "kind": "place",
+    "displayName": "Nassau",
+    "summary": "Nassau, capital of the Bahamas, became a destination for freedom seekers after the 1841 Creole rebellion, when enslaved people redirected the ship there and were granted freedom under British abolition policy. Its acceptance of liberated Africans after 1807 and post-Revolutionary War Loyalist migrations shaped its demographic and social structure.",
+    "eraBuckets": [
+      "1840s",
+      "1800s",
+      "1700s"
+    ],
+    "topicTags": [
+      "emancipation",
+      "enslavement",
+      "resistance",
+      "migration",
+      "freedom"
+    ],
+    "topicIds": [
+      "emancipation",
+      "enslavement",
+      "resistance",
+      "migration",
+      "freedom"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Nassau",
+      "Creole rebellion",
+      "British Bahamas",
+      "freedom seekers",
+      "liberated Africans"
+    ],
+    "jurisdictionLabel": "Nassau, Bahamas",
+    "locationPrecision": "city",
+    "locationLabel": "Capital city on New Providence Island",
+    "lat": 25.07805556,
+    "lng": -77.33861111,
+    "claims": [
+      {
+        "predicate": "was destination of ship redirected by self-emancipated enslaved people",
+        "object": "Creole (1841)",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Nassau%2C_Bahamas",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "granted freedom to enslaved people from American ships under British policy",
+        "object": "freed individuals from the Creole",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Nassau%2C_Bahamas",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "resettled liberated Africans after 1807",
+        "object": "Africans freed by Royal Navy from illegal slave ships",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Nassau%2C_Bahamas",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "After Britain abolished the transatlantic slave trade in 1807, it resettled thousands of Africans liberated from illegal slave ships in colonies like the Bahamas. Nassau, as a British port with abolitionist policy, became a refuge for enslaved people who rebelled aboard American vessels, including the Creole in 1841. This reflected broader imperial tensions over slavery and provided a destination for Black self-emancipation."
+  },
+  {
+    "id": "gap_reconnect_rondo",
+    "kind": "organization",
+    "displayName": "ReConnect Rondo",
+    "summary": "The ReConnect Rondo initiative aims to reunite the community split by the construction of Interstate 94, which displaced over 650 families and disrupted the cultural and economic life of the Rondo neighborhood in Saint Paul, Minnesota.",
+    "eraBuckets": [
+      "1950s",
+      "2000s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "reconstruction",
+      "community"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "reconstruction",
+      "community"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Rondo neighborhood",
+      "Interstate 94",
+      "displacement",
+      "ReConnect Rondo",
+      "Saint Paul"
+    ],
+    "jurisdictionLabel": "Saint Paul, Minnesota",
+    "locationPrecision": "neighborhood",
+    "locationLabel": "Rondo neighborhood",
+    "lat": 44.95138889,
+    "lng": -93.12638889,
+    "claims": [
+      {
+        "predicate": "was_displaced",
+        "object": "Rondo neighborhood",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Rondo_neighborhood",
+        "citationLabel": "Rondo neighborhood Wikipedia"
+      },
+      {
+        "predicate": "constructed",
+        "object": "Interstate 94",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Rondo_neighborhood",
+        "citationLabel": "Rondo neighborhood Wikipedia"
+      },
+      {
+        "predicate": "initiated",
+        "object": "ReConnect Rondo",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Rondo_neighborhood",
+        "citationLabel": "Rondo neighborhood Wikipedia"
+      },
+      {
+        "predicate": "displaced_families",
+        "object": "650 families",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Rondo_neighborhood",
+        "citationLabel": "Rondo neighborhood Wikipedia"
+      }
+    ],
+    "historicalContext": "The Rondo neighborhood was a significant cultural and residential center for the Black community in the Twin Cities until its destruction between 1956 and 1968 to make way for Interstate 94. This displacement exemplifies the impact of segregationist urban planning and highway construction on Black communities, which is a central theme in civil rights and urban history."
+  }
+]

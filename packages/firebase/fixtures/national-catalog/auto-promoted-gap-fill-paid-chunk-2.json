@@ -1,0 +1,808 @@
+[
+  {
+    "id": "gap_south_carolina_state_college",
+    "kind": "school",
+    "displayName": "South Carolina State College",
+    "summary": "South Carolina State College, established in 1896, was a historically Black land-grant university that played a significant role in the Civil Rights Movement, including its involvement in the Orangeburg massacre of 1968.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "hbcu",
+      "land-grant",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "hbcu",
+      "land-grant",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "South Carolina State College",
+      "Orangeburg massacre",
+      "land-grant university",
+      "civil rights",
+      "historically Black college"
+    ],
+    "jurisdictionLabel": "Orangeburg, South Carolina",
+    "locationPrecision": "campus",
+    "locationLabel": "South Carolina State University campus",
+    "lat": 33.49722222,
+    "lng": -80.85,
+    "claims": [
+      {
+        "predicate": "was established",
+        "object": "March 4, 1896",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/South_Carolina_State_University",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was a land-grant institution",
+        "object": "under the 1862 Land Grant Act",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/South_Carolina_State_University",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was involved in the Orangeburg massacre",
+        "object": "on February 8, 1968",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/South_Carolina_State_University",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was a historically Black college",
+        "object": "in South Carolina",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/South_Carolina_State_University",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was a member of the Thurgood Marshall College Fund",
+        "object": "as a historically Black land-grant university",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/South_Carolina_State_University",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "South Carolina State College was founded as a land-grant institution under the 1862 Land Grant Act, providing education to Black students during segregation. Its role in the Civil Rights Movement, including the Orangeburg massacre, highlights its significance in the fight against segregation and racial injustice."
+  },
+  {
+    "id": "gap_executive_order_11111",
+    "kind": "law",
+    "displayName": "Executive Order 11111",
+    "summary": "Executive Order 11111, issued by President John F. Kennedy, federalized the Alabama National Guard to enforce desegregation of the University of Alabama after Governor George Wallace tried to block students Vivian Malone and James Hood from registering.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "desegregation",
+      "education",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "desegregation",
+      "education",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Executive Order 11111",
+      "civil rights",
+      "desegregation",
+      "University of Alabama",
+      "George Wallace"
+    ],
+    "jurisdictionLabel": "Tuscaloosa, Alabama",
+    "locationPrecision": "institution",
+    "locationLabel": "Foster Auditorium",
+    "lat": 33.20811,
+    "lng": -87.544,
+    "claims": [
+      {
+        "predicate": "issued_by",
+        "object": "President John F. Kennedy",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Stand_in_the_Schoolhouse_Door",
+        "citationLabel": "Stand in the Schoolhouse Door"
+      },
+      {
+        "predicate": "federalized",
+        "object": "Alabama National Guard",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.archives.gov/federal-register/executive-orders/1963-kennedy.html",
+        "citationLabel": "Executive Orders Disposition Tables"
+      },
+      {
+        "predicate": "enforced",
+        "object": "desegregation of the University of Alabama",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Stand_in_the_Schoolhouse_Door",
+        "citationLabel": "Stand in the Schoolhouse Door"
+      },
+      {
+        "predicate": "response_to",
+        "object": "George Wallace's resistance to desegregation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Stand_in_the_Schoolhouse_Door",
+        "citationLabel": "Stand in the Schoolhouse Door"
+      }
+    ],
+    "historicalContext": "Executive Order 11111 was issued in 1963 as part of the broader civil rights movement, following the landmark Brown v. Board of Education decision. It was a direct response to Governor George Wallace's resistance to desegregation, reflecting the federal government's commitment to enforcing civil rights laws and ending segregation in public institutions."
+  },
+  {
+    "id": "gap_holt_street_baptist_church",
+    "kind": "institution",
+    "displayName": "Holt Street Baptist Church",
+    "summary": "Holt Street Baptist Church in Montgomery, Alabama, was a central location for the Montgomery Bus Boycott, serving as the site of a mass meeting where Rev. Martin Luther King Jr. addressed the community and helped organize the boycott.",
+    "eraBuckets": [
+      "1950s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "history",
+      "movement",
+      "jim-crow",
+      "segregation"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "history",
+      "movement",
+      "jim-crow",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Montgomery Bus Boycott",
+      "Martin Luther King Jr.",
+      "civil rights",
+      "Holt Street Baptist Church",
+      "mass meeting"
+    ],
+    "jurisdictionLabel": "Montgomery, Alabama",
+    "locationPrecision": "institution",
+    "locationLabel": "Holt Street Baptist Church",
+    "lat": 32.36472222,
+    "lng": -86.32027778,
+    "claims": [
+      {
+        "predicate": "served_as",
+        "object": "meeting_place",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Holt_Street_Baptist_Church",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "hosted",
+        "object": "mass_meeting",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Holt_Street_Baptist_Church",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "organized",
+        "object": "Montgomery Bus Boycott",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Holt_Street_Baptist_Church",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "located_at",
+        "object": "Montgomery, Alabama",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Holt_Street_Baptist_Church",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_a_key_location",
+        "object": "civil_rights_movement",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Holt_Street_Baptist_Church",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Holt Street Baptist Church was a key institution in Montgomery's Black community during the civil rights movement. It hosted a mass meeting that launched the Montgomery Bus Boycott, a pivotal event in the fight against segregation. The church's role in organizing and mobilizing the community underscores its significance in Black history."
+  },
+  {
+    "id": "gap_national_mall",
+    "kind": "place",
+    "displayName": "National Mall",
+    "summary": "The National Mall is a central landmark in Washington, D.C., home to the National Museum of African American History and Culture, and a site of significant civil rights and historical significance.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "history",
+      "memorial",
+      "national-mall",
+      "museum"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "history",
+      "memorial",
+      "national-mall",
+      "museum"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "National Mall",
+      "civil rights",
+      "history",
+      "museum",
+      "memorial"
+    ],
+    "jurisdictionLabel": "Washington, D.C., United States",
+    "locationPrecision": "institution",
+    "locationLabel": "National Mall",
+    "lat": 38.89,
+    "lng": -77.02361111,
+    "claims": [
+      {
+        "predicate": "located_at",
+        "object": "National Museum of African American History and Culture",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/National_Mall",
+        "citationLabel": "National Mall Wikipedia"
+      },
+      {
+        "predicate": "part_of",
+        "object": "National Park Service",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/National_Mall",
+        "citationLabel": "National Mall Wikipedia"
+      },
+      {
+        "predicate": "hosted",
+        "object": "civil rights events",
+        "confidenceLevel": "medium",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.nps.gov/nama/index.htm",
+        "citationLabel": "National Mall and Memorial Parks"
+      }
+    ],
+    "historicalContext": "The National Mall is a key site for commemorating American history, including civil rights milestones. It hosts the National Museum of African American History and Culture, which documents the history of Black Americans and their contributions to the nation."
+  },
+  {
+    "id": "gap_forsyth_county_georgia",
+    "kind": "place",
+    "displayName": "Forsyth County, Georgia",
+    "summary": "Forsyth County, Georgia, once known as a sundown county, drew national attention in the 1980s when civil rights organizers led large-scale marches to challenge racial exclusion. In 1987, thousands marched through the county with protection from law enforcement and the National Guard, marking a pivotal moment in efforts to confront its legacy of segregation.",
+    "eraBuckets": [
+      "1980s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "desegregation",
+      "direct-action",
+      "resistance"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "desegregation",
+      "direct-action",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "sundown county",
+      "civil rights march",
+      "segregation protests",
+      "National Guard",
+      "racial exclusion"
+    ],
+    "jurisdictionLabel": "Cumming, Georgia",
+    "locationPrecision": "county",
+    "locationLabel": "County seat of Forsyth County",
+    "lat": 34.22,
+    "lng": -84.13,
+    "claims": [
+      {
+        "predicate": "was the site of large civil rights demonstrations in the 1980s",
+        "object": "Forsyth County, Georgia",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Forsyth_County%2C_Georgia",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was described as a sundown county attracting national media attention",
+        "object": "Forsyth County, Georgia",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Forsyth_County%2C_Georgia",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "had segregation protested by thousands of marchers in 1987 with police and National Guard protection",
+        "object": "Forsyth County, Georgia",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Forsyth_County%2C_Georgia",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Forsyth County became emblematic of racial exclusion in the late 20th century, following a violent racial cleansing in 1912 that expelled its Black population. The 1987 marches were part of a broader strategy to reclaim public space and challenge de facto segregation in communities that remained racially homogeneous due to intimidation and discriminatory practices long after civil rights legislation."
+  },
+  {
+    "id": "gap_albany_state_college",
+    "kind": "school",
+    "displayName": "Albany State College",
+    "summary": "Albany State University, founded in 1903 as a historically Black institution, played a pivotal role in the Civil Rights Movement, notably through its involvement in the Albany Movement and the arrest of students like Blanton Hall and Bertha Gober in 1961.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "education",
+      "history",
+      "hbcu",
+      "movement"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "education",
+      "history",
+      "hbcu",
+      "movement"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Albany State University",
+      "Civil Rights Movement",
+      "Albany Movement",
+      "Blanton Hall",
+      "Bertha Gober"
+    ],
+    "jurisdictionLabel": "Albany, Georgia",
+    "locationPrecision": "campus",
+    "locationLabel": "Albany State University campus",
+    "lat": 31.569,
+    "lng": -84.142,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "Albany State University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Albany_State_University",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "role_in_civil_rights_movement",
+        "object": "Albany State University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Albany_State_University",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "arrest_of_students",
+        "object": "Albany State University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Albany_State_University",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "part_of_university_system_of_georgia",
+        "object": "Albany State University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Albany_State_University",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "member_of_thurgood_marshall_college_fund",
+        "object": "Albany State University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Albany_State_University",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Albany State University is a historically Black university in Georgia that has been central to civil rights activism, particularly through its role in the Albany Movement. The university's students and faculty were actively involved in the movement, which brought prominent civil rights leaders like Martin Luther King Jr. to the town and led to the arrests of over 1,000 Black protestors."
+  },
+  {
+    "id": "gap_mayersville_mississippi",
+    "kind": "place",
+    "displayName": "Mayersville, Mississippi",
+    "summary": "Mayersville, Mississippi, is a town in the Mississippi Delta with historical significance as a county seat and a center for cotton cultivation. It experienced racial tensions in the 1880s and was incorporated in 1976, with its first mayor leading the process.",
+    "eraBuckets": [
+      "1970s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "civil-rights",
+      "history",
+      "migration",
+      "segregation"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "civil-rights",
+      "history",
+      "migration",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Mayersville",
+      "Mississippi",
+      "Delta",
+      "cotton",
+      "racism"
+    ],
+    "jurisdictionLabel": "Mayersville, Mississippi",
+    "locationPrecision": "city",
+    "locationLabel": "County seat of Issaquena County",
+    "lat": 32.89638889,
+    "lng": -91.04666667,
+    "claims": [
+      {
+        "predicate": "was_founded",
+        "object": "Mayersville, Mississippi",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mayersville%2C_Mississippi",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_incorporated",
+        "object": "Mayersville, Mississippi",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mayersville%2C_Mississippi",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "had_racial_tension",
+        "object": "Mayersville, Mississippi",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mayersville%2C_Mississippi",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "had_first_mayor",
+        "object": "Mayersville, Mississippi",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mayersville%2C_Mississippi",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Mayersville's role as a county seat and its position in the Mississippi Delta, a region central to the antebellum cotton economy, highlights its economic and social importance. The town's racial tensions in the 1880s reflect broader patterns of racial conflict in the South during the post-Reconstruction era."
+  },
+  {
+    "id": "gap_voorhees_college",
+    "kind": "school",
+    "displayName": "Voorhees College",
+    "summary": "Voorhees College, founded in 1897 by Elizabeth Evelyn Wright, was a pioneering institution for African American education in South Carolina. It evolved through several name changes and played a significant role in the civil rights movement, including a student-led occupation in 1969.",
+    "eraBuckets": [
+      "1910s",
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "education",
+      "history",
+      "jim-crow"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "education",
+      "history",
+      "jim-crow"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Voorhees College",
+      "Elizabeth Evelyn Wright",
+      "student occupation",
+      "historic district",
+      "Black education"
+    ],
+    "jurisdictionLabel": "Denmark, South Carolina",
+    "locationPrecision": "district",
+    "locationLabel": "Voorhees College Historic District",
+    "lat": 33.30905833,
+    "lng": -81.12819722,
+    "claims": [
+      {
+        "predicate": "founded_by",
+        "object": "Elizabeth Evelyn Wright",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Voorhees_University",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "established_date",
+        "object": "April 14, 1897",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Voorhees_University",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "name_change",
+        "object": "Voorhees Industrial Institute for Colored Youths",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Voorhees_University",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "student_occupation",
+        "object": "1969",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Voorhees_University",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "historic_district",
+        "object": "Voorhees College Historic District",
+        "confidenceLevel": "high",
+        "citationSource": "nationalregister_sc_gov",
+        "citationHref": "http://www.nationalregister.sc.gov/bamberg/S10817705009/index.htm",
+        "citationLabel": "National Register of Historic Places"
+      }
+    ],
+    "historicalContext": "Voorhees College was established during the Jim Crow era, serving as a critical institution for African American education in the South. Its founding and evolution reflect broader struggles for educational access and civil rights, including its role in the 1969 student occupation, which highlighted tensions between student demands and institutional responses."
+  },
+  {
+    "id": "gap_chapel_hill_on_april_13_1947",
+    "kind": "event",
+    "displayName": "Chapel Hill on April 13, 1947",
+    "summary": "On April 13, 1947, four riders, including Bayard Rustin, were arrested in [[gap_chapel_hill|Chapel Hill]], North Carolina, for refusing to move to the back of a bus, highlighting resistance to segregation during the civil rights movement.",
+    "eraBuckets": [
+      "1940s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "anti-miscegenation"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "anti-miscegenation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Chapel Hill",
+      "bus segregation",
+      "Bayard Rustin",
+      "civil rights",
+      "arrest"
+    ],
+    "jurisdictionLabel": "Chapel Hill, North Carolina",
+    "locationPrecision": "city",
+    "locationLabel": "Chapel Hill, North Carolina",
+    "lat": 35.9465,
+    "lng": -79.0803,
+    "claims": [
+      {
+        "predicate": "arrested",
+        "object": "four riders",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chapel_Hill_High_School_(North_Carolina)",
+        "citationLabel": "Chapel Hill High School Wikipedia"
+      },
+      {
+        "predicate": "refused_to_move_to_the_back_of_the_bus",
+        "object": "four riders",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chapel_Hill_High_School_(North_Carolina)",
+        "citationLabel": "Chapel Hill High School Wikipedia"
+      },
+      {
+        "predicate": "included_Bayard_Rustin",
+        "object": "four riders",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chapel_Hill_High_School_(North_Carolina)",
+        "citationLabel": "Chapel Hill High School Wikipedia"
+      },
+      {
+        "predicate": "sentenced_to_chain_gang",
+        "object": "four riders",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chapel_Hill_High_School_(North_Carolina)",
+        "citationLabel": "Chapel Hill High School Wikipedia"
+      }
+    ],
+    "historicalContext": "This event occurred during the broader context of the civil rights movement in the United States, where segregation and discrimination were prevalent. The arrest of these riders was part of efforts to challenge discriminatory practices in public transportation, which were often enforced by Jim Crow laws."
+  },
+  {
+    "id": "gap_tougaloo_college",
+    "kind": "school",
+    "displayName": "Tougaloo College",
+    "summary": "Tougaloo College, founded in 1869, is a historically black college in Mississippi that played a significant role in the education of freed slaves and their descendants. It was established by New York-based Christian missionaries and is associated with the Tougaloo Nine, a group of civil rights activists.",
+    "eraBuckets": [
+      "1860s",
+      "1870s",
+      "1990s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "education",
+      "history",
+      "black-nationalism",
+      "segregation"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "education",
+      "history",
+      "black-nationalism",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Tougaloo College",
+      "historically black college",
+      "National Register of Historic Places",
+      "Tougaloo Nine",
+      "education of freed slaves"
+    ],
+    "jurisdictionLabel": "Tougaloo, Mississippi",
+    "locationPrecision": "campus",
+    "locationLabel": "Tougaloo College campus",
+    "lat": 32.40305556,
+    "lng": -90.16083333,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "1869",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Tougaloo_College",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "established_by",
+        "object": "New York\u2013based Christian missionaries",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Tougaloo_College",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "role",
+        "object": "education of freed slaves and their descendants",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Tougaloo_College",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "associated_with",
+        "object": "Tougaloo Nine",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Tougaloo_College",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "included_in",
+        "object": "National Register of Historic Places",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/98001109",
+        "citationLabel": "National Park Service"
+      }
+    ],
+    "historicalContext": "Tougaloo College was founded in 1869 by New York-based Christian missionaries to provide education for freed slaves and their descendants. It was part of the broader movement to establish historically black colleges during the Reconstruction era. The college's role in teacher training and its inclusion in the National Register of Historic Places highlight its significance in the history of education and civil rights."
+  },
+  {
+    "id": "gap_little_rock",
+    "kind": "event",
+    "displayName": "Little Rock",
+    "summary": "Little Rock, Arkansas, is known for its role in the 1957 desegregation of Little Rock Central High School, a pivotal event in the Civil Rights movement.",
+    "eraBuckets": [
+      "1950s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "desegregation",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "desegregation",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Little Rock",
+      "desegregation",
+      "Civil Rights",
+      "Arkansas",
+      "Central High School"
+    ],
+    "jurisdictionLabel": "Little Rock, Arkansas",
+    "locationPrecision": "city",
+    "locationLabel": "Little Rock, Arkansas",
+    "lat": 34.7444,
+    "lng": -92.2881,
+    "claims": [
+      {
+        "predicate": "was a site of",
+        "object": "1957 desegregation of Little Rock Central High School",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Little_Rock%2C_Arkansas",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is the capital of",
+        "object": "Arkansas",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Little_Rock%2C_Arkansas",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was founded",
+        "object": "June 1, 1821",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Little_Rock%2C_Arkansas",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is located in",
+        "object": "Pulaski County",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Little_Rock%2C_Arkansas",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "has a population of",
+        "object": "202,591 (2020 census)",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Little_Rock%2C_Arkansas",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Little Rock's significance lies in its role during the 1957 desegregation of Little Rock Central High School, a key event in the Civil Rights movement. This event highlighted the challenges of enforcing desegregation and the broader struggle for racial equality in the United States."
+  }
+]

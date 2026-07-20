@@ -1,0 +1,158 @@
+[
+  {
+    "id": "gap_super_bowl_xli",
+    "kind": "event",
+    "displayName": "Super Bowl XLI",
+    "summary": "Super Bowl XLI, played on February 4, 2007, marked a historic moment in Black history as Tony Dungy became the first Black head coach to win a Super Bowl, leading the Indianapolis Colts to a 29-17 victory over the Chicago Bears.",
+    "eraBuckets": [
+      "2000s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "sports",
+      "firsts",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "sports",
+      "firsts",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Super Bowl XLI",
+      "Tony Dungy",
+      "Indianapolis Colts",
+      "Chicago Bears",
+      "Black history"
+    ],
+    "jurisdictionLabel": "Miami Gardens, Florida",
+    "locationPrecision": "stadium",
+    "locationLabel": "Dolphin Stadium",
+    "lat": 25.95805556,
+    "lng": -80.23888889,
+    "claims": [
+      {
+        "predicate": "was_coached_by",
+        "object": "Tony Dungy",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Super_Bowl_XLI",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_first_black_head_coach_to_win_super_bowl",
+        "object": "Tony Dungy",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Super_Bowl_XLI",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_played_at",
+        "object": "Dolphin Stadium, Miami Gardens, Florida",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Super_Bowl_XLI",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "had_mvp",
+        "object": "Peyton Manning",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Super_Bowl_XLI",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_a_super_bowl",
+        "object": "Super Bowl XLI",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Super_Bowl_XLI",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Super Bowl XLI is significant in the context of Black history due to Tony Dungy's achievement as the first Black head coach to win a Super Bowl. This event highlights the progress and recognition of Black leadership in American sports, particularly in the NFL."
+  },
+  {
+    "id": "gap_briggs_v_elliott",
+    "kind": "case",
+    "displayName": "Briggs v. Elliott",
+    "summary": "Briggs v. Elliott (1952) was a pivotal case in the fight against school segregation, leading to the landmark Brown v. Board of Education decision. It highlighted the severe disparities in educational resources between Black and white students in South Carolina.",
+    "eraBuckets": [
+      "1950s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "education",
+      "school-desegregation",
+      "equal-protection"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "education",
+      "school-desegregation",
+      "equal-protection"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "school segregation",
+      "Brown v. Board of Education",
+      "Levi Pearson",
+      "Clarendon County",
+      "educational inequality"
+    ],
+    "jurisdictionLabel": "Clarendon County, South Carolina",
+    "locationPrecision": "district",
+    "locationLabel": "Clarendon County Schools",
+    "lat": 33.66,
+    "lng": -80.22,
+    "claims": [
+      {
+        "predicate": "was_part_of",
+        "object": "Brown v. Board of Education",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Briggs_v._Elliott",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "highlighted",
+        "object": "systemic_educational_disparities",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Briggs_v._Elliott",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "challenged",
+        "object": "school_segregation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Briggs_v._Elliott",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "led_to",
+        "object": "remand_for_further_proceedings",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Briggs_v._Elliott",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "involved",
+        "object": "Levi_Pearson",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Briggs_v._Elliott",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Briggs v. Elliott was part of the broader civil rights movement that challenged segregation in public schools. It directly contributed to the Supreme Court's 1954 ruling that racial segregation in schools was unconstitutional, marking a significant step in the struggle for educational equality."
+  }
+]
