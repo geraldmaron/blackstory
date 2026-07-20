@@ -18,10 +18,11 @@
  * Camera: inbound deep links (`lat`/`lng`/`zoom`, `state`, radius) and back/forward reconcile
  * the camera via `easeTo` (`reconcileCamera`, once on mount and on every `popstate`) — never a
  * raw default flight (ADR-017). Pan/zoom updates live camera + list bounds only; camera
- * position is not written back into the address bar. Selecting a pin flies briefly then opens
- * the preview card. Closing the card eases one geographic tier up (county → state → country)
- * from the pre-select camera, never a jump cut to full CONUS when the reader was already in a
- * tighter frame.
+ * position is not written back into the address bar. Shareable panel/filter URL updates use
+ * `history.replaceState` (not Next `router.replace`) so RSC does not re-supply `initial` and
+ * fight open/close. Selecting a pin flies briefly then opens the preview card. Closing the
+ * card eases one geographic tier up (county → state → country) from the pre-select camera,
+ * never a jump cut to full CONUS when the reader was already in a tighter frame.
  */
 import {
   useCallback,
@@ -32,7 +33,6 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
 } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Notice } from '@repo/ui';
 import { US_CONUS_BOUNDS, findUsStateByPostalCode } from '@repo/domain/map/geography';
 import type { CensusPopulationDecade } from '@repo/domain/map/county-population';
@@ -96,6 +96,7 @@ import {
   exploreResultsPanelClassName,
   exploreStageChromeAttrs,
   resolveExploreLeftTab,
+  shouldAcceptExploreServerViewState,
   type ExploreLeftTab,
 } from './explore-panel-chrome';
 import type { ExploreViewModel } from './explore-view-model';
@@ -266,8 +267,14 @@ const FACET_ROWS: readonly {
   { key: 'confidence', label: 'Confidence', field: 'confidence' },
 ];
 
+/** Shareable explore href without live camera (panels/filters/selection only). */
+function shareableExploreHref(viewState: ExploreViewState): string {
+  const { viewport: _camera, ...shareable } = viewState;
+  void _camera;
+  return buildExploreHref(shareable);
+}
+
 export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
-  const router = useRouter();
   const stage = useMapStage();
   const [view, setView] = useState(initial);
   const filterRegionRef = useRef<HTMLDivElement | null>(null);
@@ -283,6 +290,8 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   // may replay setState updater functions during render, so an updater must stay pure — the
   // handler needs the current view state OUTSIDE an updater to build the next URL.
   const viewStateRef = useRef(initial.viewState);
+  /** Last href we wrote with replaceState — ignores RSC/prop echoes of our own panel writes. */
+  const lastPushedHrefRef = useRef<string | null>(shareableExploreHref(initial.viewState));
   /** Live map camera — kept current via `viewport` subscription for close-camera bounce-back. */
   const liveViewportRef = useRef<ExploreViewport | undefined>(initial.viewState.viewport);
   /** Bounds used to scope the records list to what's geographically on the map. */
@@ -309,6 +318,17 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   } | null>(null);
 
   useEffect(() => {
+    const incomingHref = shareableExploreHref(initial.viewState);
+    // Soft-nav / RSC echoes of our own `history.replaceState` must not clobber open panels.
+    if (
+      !shouldAcceptExploreServerViewState({
+        incomingHref,
+        lastPushedHref: lastPushedHrefRef.current,
+      })
+    ) {
+      return;
+    }
+    lastPushedHrefRef.current = incomingHref;
     setView(initial);
     viewStateRef.current = initial.viewState;
     urlRadiusAppliedRef.current = null;
@@ -416,16 +436,15 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     return () => window.clearTimeout(timer);
   }, [fromHeroTransition]);
 
-  const pushViewState = useCallback(
-    (next: ExploreViewState) => {
-      // Shareable URL carries filters/selection/overlays — not the live camera.
-      // Inbound `?lat=&lng=&zoom=` deep links still parse for reconcileCamera / radius.
-      const { viewport: _camera, ...shareable } = next;
-      void _camera;
-      router.replace(buildExploreHref(shareable), { scroll: false });
-    },
-    [router],
-  );
+  const pushViewState = useCallback((next: ExploreViewState) => {
+    // Shareable URL carries filters/selection/overlays — not the live camera.
+    // Use history.replaceState (not router.replace): Next soft-navigation re-fetches RSC
+    // and re-supplies `initial`, which previously fought panel open/close (open → replace →
+    // setView(initial) thrash). Inbound `?lat=&lng=&zoom=` still parse for reconcile/radius.
+    const href = shareableExploreHref(next);
+    lastPushedHrefRef.current = href;
+    window.history.replaceState(window.history.state, '', href);
+  }, []);
 
   const filteredFeatures = useMemo(
     () => applyExploreFilters(view.allFeatures, view.viewState.filters, view.viewState.state),
@@ -657,13 +676,15 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
       const cleaned = radius ? { ...rest, radius } : rest;
       viewStateRef.current = cleaned;
       setView((current) => ({ ...current, viewState: cleaned }));
-      router.replace(buildExploreHref(cleaned), { scroll: false });
+      pushViewState(cleaned);
     }
+    // Mount-only restore: intentional empty deps (camera + one-shot URL cleanup).
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount once
   }, []);
 
   // Back/forward: the URL changes under us via `popstate`. Restore the full shareable view
-  // (filters/selection/toggles) and reconcile the camera — without calling `router.replace`
-  // (the address bar is already correct). Own `replace` calls never fire `popstate`.
+  // (filters/selection/toggles) and reconcile the camera — without rewriting the address bar
+  // (it is already correct). Own `history.replaceState` calls never fire `popstate`.
   useEffect(() => {
     function handlePopState() {
       const raw = Object.fromEntries(new URLSearchParams(window.location.search).entries());
@@ -673,6 +694,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
         ? edgeSlice.edges.find((edge) => edge.edgeId === next.edge)
         : undefined;
       const filtered = applyExploreFilters(view.allFeatures, next.filters, next.state);
+      lastPushedHrefRef.current = shareableExploreHref(next);
       setView((current) => {
         const { selectedEdge: _previousEdge, ...rest } = current;
         void _previousEdge;
@@ -789,6 +811,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
       if (!media.matches) return;
       const current = viewStateRef.current;
       const leftOpen = current.showFilters || current.showKey;
+      // Only collapse a competing panel — never auto-open or flip instruments.
       if (leftOpen && current.showResults) {
         commitViewState(mergeViewState(current, { showResults: false }));
       }

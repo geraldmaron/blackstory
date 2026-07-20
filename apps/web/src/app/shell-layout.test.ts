@@ -72,13 +72,22 @@ describe('explore map shell layout', () => {
   });
 });
 
-describe('on-map shell header treatment', () => {
-  it('restyles the bar with fixed ink tokens over map surfaces', () => {
+describe('shell header theme tokens', () => {
+  it('uses theme surface/ink tokens and does not force fixed-ink over map surfaces', () => {
     assert.match(
       uiShellHeaderCss,
-      /\.ds-shell:has\(\[data-surface='map'\]\)\s+\.ds-shell-header__inner\s*\{[^}]*background:\s*var\(--ds-fixed-charcoal\)/s,
+      /\.ds-shell-header__inner\s*\{[^}]*background:\s*var\(--ds-surface\)/s,
     );
-    assert.match(uiShellHeaderCss, /background:\s*var\(--ds-surface\)/);
+    assert.match(uiShellHeaderCss, /\.ds-shell-header__inner\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
+    // Regression: map routes must not freeze the navbar on charcoal / dark-kit artwork.
+    assert.doesNotMatch(
+      uiShellHeaderCss,
+      /\.ds-shell:has\(\[data-surface='map'\]\)\s+\.ds-shell-header__inner\s*\{[^}]*--ds-fixed-charcoal/s,
+    );
+    assert.doesNotMatch(
+      uiShellHeaderCss,
+      /\.ds-shell:has\(\[data-surface='map'\]\)[\s\S]*ds-shell-wordmark__img--theme-dark\s*\{[^}]*display:\s*block/s,
+    );
   });
 });
 

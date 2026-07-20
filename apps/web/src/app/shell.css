@@ -60,10 +60,9 @@
   height: 100%;
 }
 
-/* Explore keeps the shared primary nav. It is a map surface (`data-surface="map"`),
-   so the header already picks up the on-map ink treatment (dark lockup + full nav)
-   from `@repo/ui` shell-header.css — identical to the homepage hero and every other
-   route. Only the layout above is explore-specific (viewport-locked, footer omitted);
+/* Explore keeps the shared primary nav. Header chrome follows [data-theme] via
+   `@repo/ui` shell-header.css (same tokens as homepage and document routes).
+   Only the layout above is explore-specific (viewport-locked, footer omitted);
    the navigation chrome is never stripped. Header is a sibling of `.ds-shell-body`,
    so any explore-scoped rule must read from `.ds-shell:has(...)`, never
    `.ds-shell-body:has(...)` (that selector never matches the header). */

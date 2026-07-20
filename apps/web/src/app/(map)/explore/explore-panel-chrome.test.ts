@@ -9,6 +9,7 @@ import {
   exploreResultsPanelClassName,
   exploreStageChromeAttrs,
   resolveExploreLeftTab,
+  shouldAcceptExploreServerViewState,
 } from './explore-panel-chrome';
 
 test('instruments panel class reflects visible vs hidden state', () => {
@@ -103,5 +104,29 @@ test('resolveExploreLeftTab treats exclusive single-section open as one tab', ()
   assert.equal(
     resolveExploreLeftTab({ showFilters: false, showKey: true, preferredTab: 'filters' }),
     'key',
+  );
+});
+
+test('shouldAcceptExploreServerViewState ignores echo of the last client push', () => {
+  assert.equal(
+    shouldAcceptExploreServerViewState({
+      incomingHref: '/explore?panels=filters',
+      lastPushedHref: '/explore?panels=filters',
+    }),
+    false,
+  );
+  assert.equal(
+    shouldAcceptExploreServerViewState({
+      incomingHref: '/explore',
+      lastPushedHref: '/explore?panels=filters',
+    }),
+    true,
+  );
+  assert.equal(
+    shouldAcceptExploreServerViewState({
+      incomingHref: '/explore?panels=filters',
+      lastPushedHref: null,
+    }),
+    true,
   );
 });

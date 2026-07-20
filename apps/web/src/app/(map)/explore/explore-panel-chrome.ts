@@ -78,3 +78,15 @@ export function exploreNarrowExclusivePatch(options: {
   }
   return { showFilters: false, showKey: false };
 }
+
+/**
+ * Whether a server-supplied explore viewState should replace client chrome.
+ * When the incoming shareable href matches the last client `history.replaceState`
+ * write, ignore the echo so panel open/close cannot thrash.
+ */
+export function shouldAcceptExploreServerViewState(options: {
+  readonly incomingHref: string;
+  readonly lastPushedHref: string | null;
+}): boolean {
+  return options.lastPushedHref !== options.incomingHref;
+}
