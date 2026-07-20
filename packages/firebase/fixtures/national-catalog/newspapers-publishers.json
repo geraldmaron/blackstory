@@ -45,7 +45,9 @@
       "press",
       "civil-rights"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_ida_b_wells_001"
+    ],
     "keywords": []
   },
   {
@@ -91,7 +93,9 @@
       "press",
       "reconstruction"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_richmond_planet_001"
+    ],
     "keywords": []
   },
   {
@@ -285,7 +289,9 @@
       "publication",
       "press"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_kansas_city_sun_001"
+    ],
     "keywords": []
   },
   {
@@ -427,7 +433,9 @@
       "press",
       "reconstruction"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_louisiana_weekly_001"
+    ],
     "keywords": []
   },
   {
@@ -567,7 +575,9 @@
       "publication",
       "press"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_jackson_advocate_001"
+    ],
     "keywords": []
   },
   {
@@ -769,7 +779,9 @@
       "publication",
       "press"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_dallas_express_001"
+    ],
     "keywords": []
   }
 ]

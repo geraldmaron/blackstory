@@ -110,7 +110,10 @@
       "business",
       "community"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_big_bethel_ame_001",
+      "ent_martin_luther_king_jr_001"
+    ],
     "keywords": []
   },
   {
@@ -233,7 +236,9 @@
       "community",
       "arts"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_apollo_theater_001"
+    ],
     "keywords": []
   },
   {
@@ -280,7 +285,10 @@
       "business",
       "music"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_fort_concho_nhl_001",
+      "ent_ida_b_wells_001"
+    ],
     "keywords": []
   },
   {
@@ -334,7 +342,10 @@
       "business",
       "music"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_howard_theatre_dc_001",
+      "ent_howard_university_001"
+    ],
     "keywords": []
   },
   {
@@ -381,7 +392,9 @@
       "business",
       "community"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_tuskegee_university_001"
+    ],
     "keywords": []
   },
   {
@@ -428,7 +441,9 @@
       "business",
       "community"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_maggie_l_walker_001"
+    ],
     "keywords": []
   },
   {
@@ -482,7 +497,9 @@
       "community",
       "music"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_st_augustine_catholic_nola_001"
+    ],
     "keywords": []
   },
   {
@@ -581,7 +598,9 @@
       "district",
       "business"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_duke_ellington_001"
+    ],
     "keywords": []
   },
   {
@@ -628,7 +647,9 @@
       "business",
       "music"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_black_dispatch_001"
+    ],
     "keywords": []
   },
   {
@@ -673,7 +694,9 @@
       "town",
       "community"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_zora_neale_hurston_001"
+    ],
     "keywords": []
   },
   {

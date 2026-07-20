@@ -3,7 +3,7 @@
     "id": "ent_shiloh_rosenwald_school_001",
     "kind": "school",
     "displayName": "Shiloh Rosenwald School",
-    "summary": "NPS documents this as a Rosenwald Fund school building in Notasulga, Alabama. The site is in Notasulga, Macon County, Alabama. Documented by National Park Service (Tier 1 \u2014 federal).",
+    "summary": "NPS documents this as a Rosenwald Fund school building in Notasulga, Alabama. The site is in Notasulga, Macon County, Alabama. Documented by National Park Service (Tier 1 — federal).",
     "topicTags": [
       "education",
       "civil-rights"
@@ -39,7 +39,7 @@
     "id": "ent_ridgeley_rosenwald_school_001",
     "kind": "school",
     "displayName": "Ridgeley Rosenwald School",
-    "summary": "NPS documents Ridgeley as a Rosenwald school in Prince George's County, Maryland. The site is in Capitol Heights, Prince George's County, Maryland. Documented by National Park Service (Tier 1 \u2014 federal).",
+    "summary": "NPS documents Ridgeley as a Rosenwald school in Prince George's County, Maryland. The site is in Capitol Heights, Prince George's County, Maryland. Documented by National Park Service (Tier 1 — federal).",
     "topicTags": [
       "education",
       "civil-rights"
@@ -75,7 +75,7 @@
     "id": "ent_switchback_school_001",
     "kind": "school",
     "displayName": "Switchback School",
-    "summary": "Fisk's Rosenwald Fund Collection identifies Switchback School in Bath County, Virginia. The site is in Bath County, Virginia. Documented by Fisk University Rosenwald Fund Collection (Tier 2 \u2014 university archive). Do not republish Fisk images without permission.",
+    "summary": "Fisk's Rosenwald Fund Collection identifies Switchback School in Bath County, Virginia. The site is in Bath County, Virginia. Documented by Fisk University Rosenwald Fund Collection (Tier 2 — university archive). Do not republish Fisk images without permission.",
     "eraBuckets": [
       "1910s",
       "1920s",
@@ -113,20 +113,20 @@
       },
       {
         "predicate": "active_years",
-        "object": "documented in source records for 1917\u20131938",
+        "object": "documented in source records for 1917–1938",
         "confidenceLevel": "medium",
         "citationSource": "rosenwald.fisk.edu",
         "citationHref": "https://rosenwald.fisk.edu/s/rosenwald-fund-collection/item/54051",
         "citationLabel": "Fisk University Rosenwald Fund Collection"
       }
     ],
-    "historicalContext": "This school belongs to the network of nearly 5,000 Rosenwald Fund schools that Black communities across the segregated South built in partnership with the fund between 1912 and 1937 \u2014 raising their own money, land, and labor because public school systems refused to serve Black children equally. The buildings that survive anchor that self-taxation and community-institution story to specific ground."
+    "historicalContext": "This school belongs to the network of nearly 5,000 Rosenwald Fund schools that Black communities across the segregated South built in partnership with the fund between 1912 and 1937 — raising their own money, land, and labor because public school systems refused to serve Black children equally. The buildings that survive anchor that self-taxation and community-institution story to specific ground."
   },
   {
     "id": "ent_friendly_school_001",
     "kind": "school",
     "displayName": "Friendly School",
-    "summary": "Fisk's Rosenwald Fund Collection identifies Friendly School in Harrison County, Texas. The site is in Harrison County, Texas. Documented by Fisk University Rosenwald Fund Collection (Tier 2 \u2014 university archive).",
+    "summary": "Fisk's Rosenwald Fund Collection identifies Friendly School in Harrison County, Texas. The site is in Harrison County, Texas. Documented by Fisk University Rosenwald Fund Collection (Tier 2 — university archive).",
     "topicTags": [
       "education",
       "segregation",
@@ -137,7 +137,9 @@
       "segregation",
       "philanthropy"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_fisk_university_001"
+    ],
     "keywords": [
       "Rosenwald school",
       "Harrison County",
@@ -158,13 +160,13 @@
         "citationLabel": "Fisk University Rosenwald Fund Collection"
       }
     ],
-    "historicalContext": "This school belongs to the network of nearly 5,000 Rosenwald Fund schools that Black communities across the segregated South built in partnership with the fund between 1912 and 1937 \u2014 raising their own money, land, and labor because public school systems refused to serve Black children equally. The buildings that survive anchor that self-taxation and community-institution story to specific ground."
+    "historicalContext": "This school belongs to the network of nearly 5,000 Rosenwald Fund schools that Black communities across the segregated South built in partnership with the fund between 1912 and 1937 — raising their own money, land, and labor because public school systems refused to serve Black children equally. The buildings that survive anchor that self-taxation and community-institution story to specific ground."
   },
   {
     "id": "ent_liberty_hill_school_001",
     "kind": "school",
     "displayName": "Liberty Hill School",
-    "summary": "Fisk's Rosenwald Fund Collection identifies Liberty Hill School, also called Almont School or Liberty Hill District School. The site is in Bowie County, Texas. Documented by Fisk University Rosenwald Fund Collection (Tier 2 \u2014 university archive). Alternate names should be retained as aliases.",
+    "summary": "Fisk's Rosenwald Fund Collection identifies Liberty Hill School, also called Almont School or Liberty Hill District School. The site is in Bowie County, Texas. Documented by Fisk University Rosenwald Fund Collection (Tier 2 — university archive). Alternate names should be retained as aliases.",
     "eraBuckets": [
       "1910s",
       "1920s",
@@ -180,7 +182,9 @@
       "segregation",
       "philanthropy"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_fisk_university_001"
+    ],
     "keywords": [
       "Rosenwald school",
       "Bowie County",
@@ -202,20 +206,20 @@
       },
       {
         "predicate": "active_years",
-        "object": "documented in source records for 1917\u20131938",
+        "object": "documented in source records for 1917–1938",
         "confidenceLevel": "medium",
         "citationSource": "rosenwald.fisk.edu",
         "citationHref": "https://rosenwald.fisk.edu/s/rosenwald-fund-collection/item/54624",
         "citationLabel": "Fisk University Rosenwald Fund Collection"
       }
     ],
-    "historicalContext": "This school belongs to the network of nearly 5,000 Rosenwald Fund schools that Black communities across the segregated South built in partnership with the fund between 1912 and 1937 \u2014 raising their own money, land, and labor because public school systems refused to serve Black children equally. The buildings that survive anchor that self-taxation and community-institution story to specific ground."
+    "historicalContext": "This school belongs to the network of nearly 5,000 Rosenwald Fund schools that Black communities across the segregated South built in partnership with the fund between 1912 and 1937 — raising their own money, land, and labor because public school systems refused to serve Black children equally. The buildings that survive anchor that self-taxation and community-institution story to specific ground."
   },
   {
     "id": "ent_separate_district_no_23_school_001",
     "kind": "school",
     "displayName": "Separate District No. 23 School",
-    "summary": "Fisk's Rosenwald Fund Collection identifies Separate District No. 23 School in Garvin County, Oklahoma. The site is in Garvin County, Oklahoma. Documented by Fisk University Rosenwald Fund Collection (Tier 2 \u2014 university archive).",
+    "summary": "Fisk's Rosenwald Fund Collection identifies Separate District No. 23 School in Garvin County, Oklahoma. The site is in Garvin County, Oklahoma. Documented by Fisk University Rosenwald Fund Collection (Tier 2 — university archive).",
     "topicTags": [
       "education",
       "segregation",
@@ -226,7 +230,9 @@
       "segregation",
       "philanthropy"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_fisk_university_001"
+    ],
     "keywords": [
       "Rosenwald school",
       "Garvin County",
@@ -247,13 +253,13 @@
         "citationLabel": "Fisk University Rosenwald Fund Collection"
       }
     ],
-    "historicalContext": "This school belongs to the network of nearly 5,000 Rosenwald Fund schools that Black communities across the segregated South built in partnership with the fund between 1912 and 1937 \u2014 raising their own money, land, and labor because public school systems refused to serve Black children equally. The buildings that survive anchor that self-taxation and community-institution story to specific ground."
+    "historicalContext": "This school belongs to the network of nearly 5,000 Rosenwald Fund schools that Black communities across the segregated South built in partnership with the fund between 1912 and 1937 — raising their own money, land, and labor because public school systems refused to serve Black children equally. The buildings that survive anchor that self-taxation and community-institution story to specific ground."
   },
   {
     "id": "ent_county_training_school_buena_vista_school_001",
     "kind": "school",
     "displayName": "County Training School (Buena Vista School)",
-    "summary": "Fisk's Rosenwald Fund Collection identifies this Carroll County training school and records Buena Vista School as an alternate name. The site is in Buena Vista, Carroll County, Tennessee. Documented by Fisk University Rosenwald Fund Collection (Tier 2 \u2014 university archive).",
+    "summary": "Fisk's Rosenwald Fund Collection identifies this Carroll County training school and records Buena Vista School as an alternate name. The site is in Buena Vista, Carroll County, Tennessee. Documented by Fisk University Rosenwald Fund Collection (Tier 2 — university archive).",
     "topicTags": [
       "education",
       "segregation",
@@ -264,7 +270,9 @@
       "segregation",
       "philanthropy"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_fisk_university_001"
+    ],
     "keywords": [
       "Rosenwald school",
       "Carroll County",
@@ -285,13 +293,13 @@
         "citationLabel": "Fisk University Rosenwald Fund Collection"
       }
     ],
-    "historicalContext": "This school belongs to the network of nearly 5,000 Rosenwald Fund schools that Black communities across the segregated South built in partnership with the fund between 1912 and 1937 \u2014 raising their own money, land, and labor because public school systems refused to serve Black children equally. The buildings that survive anchor that self-taxation and community-institution story to specific ground."
+    "historicalContext": "This school belongs to the network of nearly 5,000 Rosenwald Fund schools that Black communities across the segregated South built in partnership with the fund between 1912 and 1937 — raising their own money, land, and labor because public school systems refused to serve Black children equally. The buildings that survive anchor that self-taxation and community-institution story to specific ground."
   },
   {
     "id": "ent_franklin_school_001",
     "kind": "school",
     "displayName": "Franklin School",
-    "summary": "Fisk's Rosenwald Fund Collection identifies Franklin School in St. Mary Parish and records Parish Training School as an alternate name. The site is in Franklin, St. Mary Parish, Louisiana. Documented by Fisk University Rosenwald Fund Collection (Tier 2 \u2014 university archive).",
+    "summary": "Fisk's Rosenwald Fund Collection identifies Franklin School in St. Mary Parish and records Parish Training School as an alternate name. The site is in Franklin, St. Mary Parish, Louisiana. Documented by Fisk University Rosenwald Fund Collection (Tier 2 — university archive).",
     "eraBuckets": [
       "1910s",
       "1920s",
@@ -307,7 +315,9 @@
       "segregation",
       "philanthropy"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_fisk_university_001"
+    ],
     "keywords": [
       "Rosenwald school",
       "St. Mary Parish",
@@ -329,20 +339,20 @@
       },
       {
         "predicate": "active_years",
-        "object": "documented in source records for 1917\u20131938",
+        "object": "documented in source records for 1917–1938",
         "confidenceLevel": "medium",
         "citationSource": "rosenwald.fisk.edu",
         "citationHref": "https://rosenwald.fisk.edu/s/rosenwald-fund-collection/item/59514",
         "citationLabel": "Fisk University Rosenwald Fund Collection"
       }
     ],
-    "historicalContext": "This school belongs to the network of nearly 5,000 Rosenwald Fund schools that Black communities across the segregated South built in partnership with the fund between 1912 and 1937 \u2014 raising their own money, land, and labor because public school systems refused to serve Black children equally. The buildings that survive anchor that self-taxation and community-institution story to specific ground."
+    "historicalContext": "This school belongs to the network of nearly 5,000 Rosenwald Fund schools that Black communities across the segregated South built in partnership with the fund between 1912 and 1937 — raising their own money, land, and labor because public school systems refused to serve Black children equally. The buildings that survive anchor that self-taxation and community-institution story to specific ground."
   },
   {
     "id": "ent_coffeeville_school_001",
     "kind": "school",
     "displayName": "Coffeeville School",
-    "summary": "Fisk's Rosenwald Fund Collection identifies Coffeeville School in Yalobusha County, Mississippi. The site is in Coffeeville, Yalobusha County, Mississippi. Documented by Fisk University Rosenwald Fund Collection (Tier 2 \u2014 university archive).",
+    "summary": "Fisk's Rosenwald Fund Collection identifies Coffeeville School in Yalobusha County, Mississippi. The site is in Coffeeville, Yalobusha County, Mississippi. Documented by Fisk University Rosenwald Fund Collection (Tier 2 — university archive).",
     "eraBuckets": [
       "1910s",
       "1920s",
@@ -358,7 +368,9 @@
       "segregation",
       "philanthropy"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_fisk_university_001"
+    ],
     "keywords": [
       "Rosenwald school",
       "Yalobusha County",
@@ -380,20 +392,20 @@
       },
       {
         "predicate": "active_years",
-        "object": "documented in source records for 1917\u20131938",
+        "object": "documented in source records for 1917–1938",
         "confidenceLevel": "medium",
         "citationSource": "rosenwald.fisk.edu",
         "citationHref": "https://rosenwald.fisk.edu/s/rosenwald-fund-collection/item/46845",
         "citationLabel": "Fisk University Rosenwald Fund Collection"
       }
     ],
-    "historicalContext": "This school belongs to the network of nearly 5,000 Rosenwald Fund schools that Black communities across the segregated South built in partnership with the fund between 1912 and 1937 \u2014 raising their own money, land, and labor because public school systems refused to serve Black children equally. The buildings that survive anchor that self-taxation and community-institution story to specific ground."
+    "historicalContext": "This school belongs to the network of nearly 5,000 Rosenwald Fund schools that Black communities across the segregated South built in partnership with the fund between 1912 and 1937 — raising their own money, land, and labor because public school systems refused to serve Black children equally. The buildings that survive anchor that self-taxation and community-institution story to specific ground."
   },
   {
     "id": "ent_isola_school_001",
     "kind": "school",
     "displayName": "Isola School",
-    "summary": "Fisk's Rosenwald Fund Collection identifies Isola School in Humphreys County, Mississippi. The site is in Isola, Humphreys County, Mississippi. Documented by Fisk University Rosenwald Fund Collection (Tier 2 \u2014 university archive).",
+    "summary": "Fisk's Rosenwald Fund Collection identifies Isola School in Humphreys County, Mississippi. The site is in Isola, Humphreys County, Mississippi. Documented by Fisk University Rosenwald Fund Collection (Tier 2 — university archive).",
     "eraBuckets": [
       "1910s",
       "1920s",
@@ -409,7 +421,9 @@
       "segregation",
       "philanthropy"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_fisk_university_001"
+    ],
     "keywords": [
       "Rosenwald school",
       "Humphreys County",
@@ -431,20 +445,20 @@
       },
       {
         "predicate": "active_years",
-        "object": "documented in source records for 1917\u20131938",
+        "object": "documented in source records for 1917–1938",
         "confidenceLevel": "medium",
         "citationSource": "rosenwald.fisk.edu",
         "citationHref": "https://rosenwald.fisk.edu/s/rosenwald-fund-collection/item/55000",
         "citationLabel": "Fisk University Rosenwald Fund Collection"
       }
     ],
-    "historicalContext": "This school belongs to the network of nearly 5,000 Rosenwald Fund schools that Black communities across the segregated South built in partnership with the fund between 1912 and 1937 \u2014 raising their own money, land, and labor because public school systems refused to serve Black children equally. The buildings that survive anchor that self-taxation and community-institution story to specific ground."
+    "historicalContext": "This school belongs to the network of nearly 5,000 Rosenwald Fund schools that Black communities across the segregated South built in partnership with the fund between 1912 and 1937 — raising their own money, land, and labor because public school systems refused to serve Black children equally. The buildings that survive anchor that self-taxation and community-institution story to specific ground."
   },
   {
     "id": "ent_buffalo_school_001",
     "kind": "school",
     "displayName": "Buffalo School",
-    "summary": "Fisk's Rosenwald Fund Collection identifies Buffalo School in Attala County, Mississippi. The site is in Attala County, Mississippi. Documented by Fisk University Rosenwald Fund Collection (Tier 2 \u2014 university archive).",
+    "summary": "Fisk's Rosenwald Fund Collection identifies Buffalo School in Attala County, Mississippi. The site is in Attala County, Mississippi. Documented by Fisk University Rosenwald Fund Collection (Tier 2 — university archive).",
     "eraBuckets": [
       "1910s",
       "1920s",
@@ -460,7 +474,9 @@
       "segregation",
       "philanthropy"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_fisk_university_001"
+    ],
     "keywords": [
       "Rosenwald school",
       "Attala County",
@@ -482,20 +498,20 @@
       },
       {
         "predicate": "active_years",
-        "object": "documented in source records for 1917\u20131938",
+        "object": "documented in source records for 1917–1938",
         "confidenceLevel": "medium",
         "citationSource": "rosenwald.fisk.edu",
         "citationHref": "https://rosenwald.fisk.edu/s/rosenwald-fund-collection/item/39433",
         "citationLabel": "Fisk University Rosenwald Fund Collection"
       }
     ],
-    "historicalContext": "This school belongs to the network of nearly 5,000 Rosenwald Fund schools that Black communities across the segregated South built in partnership with the fund between 1912 and 1937 \u2014 raising their own money, land, and labor because public school systems refused to serve Black children equally. The buildings that survive anchor that self-taxation and community-institution story to specific ground."
+    "historicalContext": "This school belongs to the network of nearly 5,000 Rosenwald Fund schools that Black communities across the segregated South built in partnership with the fund between 1912 and 1937 — raising their own money, land, and labor because public school systems refused to serve Black children equally. The buildings that survive anchor that self-taxation and community-institution story to specific ground."
   },
   {
     "id": "ent_henning_rosenwald_school_001",
     "kind": "school",
     "displayName": "Henning Rosenwald School",
-    "summary": "Fisk's Rosenwald Fund Collection identifies Henning Rosenwald School in Lauderdale County, Tennessee. The site is in Henning, Lauderdale County, Tennessee. Documented by Fisk University Rosenwald Fund Collection (Tier 2 \u2014 university archive).",
+    "summary": "Fisk's Rosenwald Fund Collection identifies Henning Rosenwald School in Lauderdale County, Tennessee. The site is in Henning, Lauderdale County, Tennessee. Documented by Fisk University Rosenwald Fund Collection (Tier 2 — university archive).",
     "eraBuckets": [
       "1910s",
       "1920s",
@@ -511,7 +527,9 @@
       "segregation",
       "philanthropy"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_fisk_university_001"
+    ],
     "keywords": [
       "Rosenwald school",
       "Lauderdale County",
@@ -533,20 +551,20 @@
       },
       {
         "predicate": "active_years",
-        "object": "documented in source records for 1917\u20131938",
+        "object": "documented in source records for 1917–1938",
         "confidenceLevel": "medium",
         "citationSource": "rosenwald.fisk.edu",
         "citationHref": "https://rosenwald.fisk.edu/s/rosenwald-fund-collection/item/57039",
         "citationLabel": "Fisk University Rosenwald Fund Collection"
       }
     ],
-    "historicalContext": "This school belongs to the network of nearly 5,000 Rosenwald Fund schools that Black communities across the segregated South built in partnership with the fund between 1912 and 1937 \u2014 raising their own money, land, and labor because public school systems refused to serve Black children equally. The buildings that survive anchor that self-taxation and community-institution story to specific ground."
+    "historicalContext": "This school belongs to the network of nearly 5,000 Rosenwald Fund schools that Black communities across the segregated South built in partnership with the fund between 1912 and 1937 — raising their own money, land, and labor because public school systems refused to serve Black children equally. The buildings that survive anchor that self-taxation and community-institution story to specific ground."
   },
   {
     "id": "ent_lincoln_university_of_missouri_001",
     "kind": "school",
     "displayName": "Lincoln University of Missouri",
-    "summary": "The U.S. Department of Education includes Lincoln University of Missouri on its accredited HBCU listing. The site is in Jefferson City, Cole County, Missouri. Documented by U.S. Department of Education \u2014 White House Initiative on HBCUs (Tier 1 \u2014 federal).",
+    "summary": "The U.S. Department of Education includes Lincoln University of Missouri on its accredited HBCU listing. The site is in Jefferson City, Cole County, Missouri. Documented by U.S. Department of Education — White House Initiative on HBCUs (Tier 1 — federal).",
     "topicTags": [
       "hbcu",
       "higher-education",
@@ -575,7 +593,7 @@
         "confidenceLevel": "high",
         "citationSource": "sites.ed.gov",
         "citationHref": "https://sites.ed.gov/whhbcu/one-hundred-and-five-historically-black-colleges-and-universities/",
-        "citationLabel": "U.S. Department of Education \u2014 White House Initiative on HBCUs"
+        "citationLabel": "U.S. Department of Education — White House Initiative on HBCUs"
       }
     ],
     "historicalContext": "Historically Black colleges and universities were founded when higher education excluded Black students; they trained the teachers, clergy, professionals, and organizers who built Black institutional life under segregation and led the civil-rights movement."
@@ -584,7 +602,7 @@
     "id": "ent_storer_college_historic_site_001",
     "kind": "school",
     "displayName": "Storer College Historic Site",
-    "summary": "NPS documents Storer College as a Freedmen's Bureau-era educational institution at Harpers Ferry. The site is in Harpers Ferry, Jefferson County, West Virginia. Documented by National Park Service (Tier 1 \u2014 federal).",
+    "summary": "NPS documents Storer College as a Freedmen's Bureau-era educational institution at Harpers Ferry. The site is in Harpers Ferry, Jefferson County, West Virginia. Documented by National Park Service (Tier 1 — federal).",
     "topicTags": [
       "education",
       "civil-rights"
@@ -620,7 +638,7 @@
     "id": "ent_penn_center_001",
     "kind": "school",
     "displayName": "Penn Center",
-    "summary": "NPS documents Penn School's Reconstruction-era origins and the site's later civil-rights significance. The site is in St. Helena Island, Beaufort County, South Carolina. Documented by National Park Service (Tier 1 \u2014 federal).",
+    "summary": "NPS documents Penn School's Reconstruction-era origins and the site's later civil-rights significance. The site is in St. Helena Island, Beaufort County, South Carolina. Documented by National Park Service (Tier 1 — federal).",
     "topicTags": [
       "education",
       "civil-rights"
@@ -656,7 +674,7 @@
     "id": "ent_clinton_high_school_001",
     "kind": "school",
     "displayName": "Clinton High School",
-    "summary": "The Tennessee Encyclopedia documents the Clinton desegregation crisis and the school's desegregation after Brown. The site is in Clinton, Anderson County, Tennessee. Documented by Tennessee Encyclopedia / Tennessee Historical Society (Tier 2 \u2014 state historical authority).",
+    "summary": "The Tennessee Encyclopedia documents the Clinton desegregation crisis and the school's desegregation after Brown. The site is in Clinton, Anderson County, Tennessee. Documented by Tennessee Encyclopedia / Tennessee Historical Society (Tier 2 — state historical authority).",
     "topicTags": [
       "education",
       "civil-rights"
@@ -692,7 +710,7 @@
     "id": "ent_scott_s_branch_high_school_001",
     "kind": "school",
     "displayName": "Scott's Branch High School",
-    "summary": "NPS documents Clarendon County schools, including Scott's Branch, in the Briggs v. Elliott litigation. The site is in Summerton, Clarendon County, South Carolina. Documented by National Park Service \u2014 Brown v. Board of Education (Tier 1 \u2014 federal).",
+    "summary": "NPS documents Clarendon County schools, including Scott's Branch, in the Briggs v. Elliott litigation. The site is in Summerton, Clarendon County, South Carolina. Documented by National Park Service — Brown v. Board of Education (Tier 1 — federal).",
     "topicTags": [
       "education",
       "civil-rights"
@@ -701,7 +719,9 @@
       "education",
       "civil-rights"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_brown_v_board_of_education_1954"
+    ],
     "keywords": [
       "school and civil-rights site",
       "Clarendon County",
@@ -719,7 +739,7 @@
         "confidenceLevel": "high",
         "citationSource": "nps.gov",
         "citationHref": "https://www.nps.gov/brvb/learn/historyculture/briggs.htm",
-        "citationLabel": "National Park Service \u2014 Brown v. Board of Education"
+        "citationLabel": "National Park Service — Brown v. Board of Education"
       }
     ],
     "historicalContext": "Black school sites document how education operated as both the target of segregation and the engine of resistance to it: communities built and defended these schools when public systems excluded their children, and many became organizing grounds for the legal fight that ended de jure school segregation."
@@ -728,7 +748,7 @@
     "id": "ent_mansfield_high_school_001",
     "kind": "school",
     "displayName": "Mansfield High School",
-    "summary": "The Texas State Historical Association documents the 1956 Mansfield school desegregation incident. The site is in Mansfield, Tarrant County, Texas. Documented by Texas State Historical Association Handbook (Tier 2 \u2014 state historical authority).",
+    "summary": "The Texas State Historical Association documents the 1956 Mansfield school desegregation incident. The site is in Mansfield, Tarrant County, Texas. Documented by Texas State Historical Association Handbook (Tier 2 — state historical authority).",
     "topicTags": [
       "education",
       "civil-rights"
@@ -737,7 +757,9 @@
       "education",
       "civil-rights"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_mansfield_school_desegregation_incident_001"
+    ],
     "keywords": [
       "school and civil-rights site",
       "Tarrant County",
@@ -764,7 +786,7 @@
     "id": "ent_paul_laurence_dunbar_high_school_historic_001",
     "kind": "school",
     "displayName": "Paul Laurence Dunbar High School (historic)",
-    "summary": "NPS documents Dunbar High School as a pioneering public high school for Black students. The site is in Washington, District of Columbia, District of Columbia. Documented by National Park Service \u2014 African American Heritage (Tier 1 \u2014 federal).",
+    "summary": "NPS documents Dunbar High School as a pioneering public high school for Black students. The site is in Washington, District of Columbia, District of Columbia. Documented by National Park Service — African American Heritage (Tier 1 — federal).",
     "topicTags": [
       "education",
       "civil-rights"
@@ -791,7 +813,7 @@
         "confidenceLevel": "high",
         "citationSource": "nps.gov",
         "citationHref": "https://www.nps.gov/subjects/africanamericanheritage/dunbar-high-school.htm",
-        "citationLabel": "National Park Service \u2014 African American Heritage"
+        "citationLabel": "National Park Service — African American Heritage"
       }
     ],
     "historicalContext": "Black school sites document how education operated as both the target of segregation and the engine of resistance to it: communities built and defended these schools when public systems excluded their children, and many became organizing grounds for the legal fight that ended de jure school segregation."
@@ -800,7 +822,7 @@
     "id": "ent_kingsley_plantation_001",
     "kind": "place",
     "displayName": "Kingsley Plantation",
-    "summary": "NPS preserves Kingsley Plantation and interprets the lives and labor of enslaved people at the site. The site is in Jacksonville / Fort George Island, Duval County, Florida. Documented by National Park Service \u2014 Timucuan Ecological & Historic Preserve (Tier 1 \u2014 federal). Coordinate is the NPS visitor/site location, not a private residence.",
+    "summary": "NPS preserves Kingsley Plantation and interprets the lives and labor of enslaved people at the site. The site is in Jacksonville / Fort George Island, Duval County, Florida. Documented by National Park Service — Timucuan Ecological & Historic Preserve (Tier 1 — federal). Coordinate is the NPS visitor/site location, not a private residence.",
     "topicTags": [
       "enslavement",
       "history",
@@ -829,16 +851,16 @@
         "confidenceLevel": "high",
         "citationSource": "nps.gov",
         "citationHref": "https://www.nps.gov/timu/planyourvisit/directions_kingsleyplantation.htm",
-        "citationLabel": "National Park Service \u2014 Timucuan Ecological & Historic Preserve"
+        "citationLabel": "National Park Service — Timucuan Ecological & Historic Preserve"
       }
     ],
-    "historicalContext": "Preserved plantation sites hold the documented record of enslaved people\u2019s lives, labor, and communities. Interpreting them as historic places \u2014 rather than romanticized estates \u2014 keeps the history of enslavement tied to specific ground, named people, and the institutions descendants built afterward."
+    "historicalContext": "Preserved plantation sites hold the documented record of enslaved people’s lives, labor, and communities. Interpreting them as historic places — rather than romanticized estates — keeps the history of enslavement tied to specific ground, named people, and the institutions descendants built afterward."
   },
   {
     "id": "ent_little_rock_school_desegregation_crisis_001",
     "kind": "event",
     "displayName": "Little Rock School Desegregation Crisis",
-    "summary": "The 1957 desegregation crisis centered on Little Rock Central High School and the Little Rock Nine. The event took place in Little Rock, Pulaski County, Arkansas. Documented by National Park Service (Tier 1 \u2014 federal). Model as an event related to the school place, not as a duplicate place.",
+    "summary": "The 1957 desegregation crisis centered on Little Rock Central High School and the Little Rock Nine. The event took place in Little Rock, Pulaski County, Arkansas. Documented by National Park Service (Tier 1 — federal). Model as an event related to the school place, not as a duplicate place.",
     "eraBuckets": [
       "1950s"
     ],
@@ -848,7 +870,9 @@
     "topicIds": [
       "civil-rights"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_little_rock_central_high_school_001"
+    ],
     "keywords": [
       "civil-rights event",
       "Pulaski County",
@@ -883,7 +907,7 @@
     "id": "ent_moton_high_school_student_strike_001",
     "kind": "event",
     "displayName": "Moton High School Student Strike",
-    "summary": "Students at Robert Russa Moton High School struck in 1951; the resulting case became one of the Brown v. Board companion cases. The event took place in Farmville, Prince Edward County, Virginia. Documented by National Park Service \u2014 Brown v. Board of Education (Tier 1 \u2014 federal).",
+    "summary": "Students at Robert Russa Moton High School struck in 1951; the resulting case became one of the Brown v. Board companion cases. The event took place in Farmville, Prince Edward County, Virginia. Documented by National Park Service — Brown v. Board of Education (Tier 1 — federal).",
     "eraBuckets": [
       "1950s"
     ],
@@ -893,7 +917,10 @@
     "topicIds": [
       "civil-rights"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_brown_v_board_of_education_1954",
+      "ent_moton_high_school_001"
+    ],
     "keywords": [
       "civil-rights and education event",
       "Prince Edward County",
@@ -911,7 +938,7 @@
         "confidenceLevel": "high",
         "citationSource": "nps.gov",
         "citationHref": "https://www.nps.gov/brvb/learn/historyculture/moton.htm",
-        "citationLabel": "National Park Service \u2014 Brown v. Board of Education"
+        "citationLabel": "National Park Service — Brown v. Board of Education"
       },
       {
         "predicate": "occurred_in",
@@ -919,7 +946,7 @@
         "confidenceLevel": "high",
         "citationSource": "nps.gov",
         "citationHref": "https://www.nps.gov/brvb/learn/historyculture/moton.htm",
-        "citationLabel": "National Park Service \u2014 Brown v. Board of Education"
+        "citationLabel": "National Park Service — Brown v. Board of Education"
       }
     ],
     "historicalContext": "This event is part of the documented struggle over segregation and equal citizenship; its sites and participants connect local organizing to the national legal and political changes that followed."
@@ -928,7 +955,7 @@
     "id": "ent_mansfield_school_desegregation_incident_001",
     "kind": "event",
     "displayName": "Mansfield School Desegregation Incident",
-    "summary": "The Texas State Historical Association documents the 1956 Mansfield school desegregation incident. The event took place in Mansfield, Tarrant County, Texas. Documented by Texas State Historical Association Handbook (Tier 2 \u2014 state historical authority).",
+    "summary": "The Texas State Historical Association documents the 1956 Mansfield school desegregation incident. The event took place in Mansfield, Tarrant County, Texas. Documented by Texas State Historical Association Handbook (Tier 2 — state historical authority).",
     "eraBuckets": [
       "1950s"
     ],
@@ -973,7 +1000,7 @@
     "id": "ent_harriet_tubman_001",
     "kind": "person",
     "displayName": "Harriet Tubman",
-    "summary": "NPS operates the Harriet Tubman Underground Railroad Visitor Center as a public orientation site for Tubman's life and Maryland landscape. Documented life dates: unknown\u20131913. The associated public historic site is in Church Creek, Dorchester County, Maryland. Documented by National Park Service \u2014 Harriet Tubman Underground Railroad NHP (Tier 1 \u2014 federal).",
+    "summary": "NPS operates the Harriet Tubman Underground Railroad Visitor Center as a public orientation site for Tubman's life and Maryland landscape. Documented life dates: unknown–1913. The associated public historic site is in Church Creek, Dorchester County, Maryland. Documented by National Park Service — Harriet Tubman Underground Railroad NHP (Tier 1 — federal).",
     "topicTags": [
       "civil-rights",
       "history"
@@ -1000,7 +1027,7 @@
         "confidenceLevel": "high",
         "citationSource": "nps.gov",
         "citationHref": "https://www.nps.gov/hatu/planyourvisit/directions.htm",
-        "citationLabel": "National Park Service \u2014 Harriet Tubman Underground Railroad NHP"
+        "citationLabel": "National Park Service — Harriet Tubman Underground Railroad NHP"
       }
     ],
     "historicalContext": "An individual whose documented life connects the histories of enslavement, emancipation, education, and civil rights preserved at public historic sites."
@@ -1009,7 +1036,7 @@
     "id": "ent_booker_t_washington_001",
     "kind": "person",
     "displayName": "Booker T. Washington",
-    "summary": "NPS preserves The Oaks, Washington's historic home on the Tuskegee campus. Documented life dates: 1856\u20131915. The associated public historic site is in Tuskegee, Macon County, Alabama. Documented by National Park Service \u2014 Tuskegee Institute NHS (Tier 1 \u2014 federal).",
+    "summary": "NPS preserves The Oaks, Washington's historic home on the Tuskegee campus. Documented life dates: 1856–1915. The associated public historic site is in Tuskegee, Macon County, Alabama. Documented by National Park Service — Tuskegee Institute NHS (Tier 1 — federal).",
     "eraBuckets": [
       "1850s",
       "1860s",
@@ -1045,15 +1072,15 @@
         "confidenceLevel": "high",
         "citationSource": "nps.gov",
         "citationHref": "https://www.nps.gov/planyourvisit/event-details.htm?id=B5675382-FD76-F8EB-201A788615B9F660",
-        "citationLabel": "National Park Service \u2014 Tuskegee Institute NHS"
+        "citationLabel": "National Park Service — Tuskegee Institute NHS"
       },
       {
         "predicate": "active_years",
-        "object": "documented in source records for 1856\u20131915",
+        "object": "documented in source records for 1856–1915",
         "confidenceLevel": "high",
         "citationSource": "nps.gov",
         "citationHref": "https://www.nps.gov/planyourvisit/event-details.htm?id=B5675382-FD76-F8EB-201A788615B9F660",
-        "citationLabel": "National Park Service \u2014 Tuskegee Institute NHS"
+        "citationLabel": "National Park Service — Tuskegee Institute NHS"
       }
     ],
     "historicalContext": "An individual whose documented life connects the histories of enslavement, emancipation, education, and civil rights preserved at public historic sites."

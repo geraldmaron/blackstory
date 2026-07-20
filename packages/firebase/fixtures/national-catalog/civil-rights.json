@@ -55,7 +55,10 @@
       "direct-action",
       "organizing"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_martin_luther_king_jr_001",
+      "ent_montgomery_improvement_association_001"
+    ],
     "keywords": []
   },
   {
@@ -112,7 +115,9 @@
       "public-transit",
       "commemoration"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_rosa_parks_museum_001"
+    ],
     "keywords": []
   },
   {
@@ -166,7 +171,11 @@
       "direct-action",
       "commemoration"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_hosea_williams_001",
+      "ent_john_lewis_001",
+      "ent_law_voting_rights_act_1965"
+    ],
     "keywords": []
   },
   {
@@ -225,7 +234,9 @@
       "direct-action",
       "organizing"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_law_voting_rights_act_1965"
+    ],
     "keywords": []
   },
   {
@@ -272,7 +283,10 @@
       "education",
       "federal-intervention"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_brown_v_board_of_education_1954",
+      "ent_daisy_bates_001"
+    ],
     "keywords": []
   },
   {
@@ -326,7 +340,9 @@
       "student-movement",
       "direct-action"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_nc_at_state_university_001"
+    ],
     "keywords": []
   },
   {
@@ -373,7 +389,11 @@
       "labor",
       "organizing"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_bayard_rustin_001",
+      "ent_law_civil_rights_act_1964",
+      "ent_martin_luther_king_jr_001"
+    ],
     "keywords": []
   },
   {
@@ -433,7 +453,12 @@
       "youth-organizing",
       "commemoration"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_birmingham_civil_rights_institute_001",
+      "ent_fred_shuttlesworth_001",
+      "ent_law_civil_rights_act_1964",
+      "ent_sixteenth_street_baptist_001"
+    ],
     "keywords": []
   },
   {
@@ -491,7 +516,11 @@
       "labor",
       "commemoration"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_martin_luther_king_jr_001",
+      "ent_memphis_sanitation_strike_1968_001",
+      "ent_national_civil_rights_museum_001"
+    ],
     "keywords": []
   },
   {
@@ -589,6 +618,8 @@
       "direct-action"
     ],
     "mentionedEntityIds": [
+      "ent_first_baptist_petersburg_001",
+      "ent_nashville_student_movement_001",
       "freedom-rides"
     ],
     "keywords": []
@@ -637,7 +668,9 @@
       "student-movement",
       "education"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_brown_v_board_of_education_1954"
+    ],
     "keywords": []
   },
   {
@@ -779,7 +812,10 @@
       "education",
       "organizing-schools"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_dorothy_cotton_001",
+      "ent_septima_clark_001"
+    ],
     "keywords": []
   },
   {
@@ -827,7 +863,10 @@
       "labor",
       "education"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_montgomery_bus_boycott_001",
+      "ent_septima_clark_001"
+    ],
     "keywords": []
   },
   {
@@ -884,7 +923,9 @@
       "movement-churches",
       "labor"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_martin_luther_king_jr_001"
+    ],
     "keywords": []
   },
   {
@@ -933,7 +974,10 @@
       "direct-action",
       "organizing"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_fred_shuttlesworth_001",
+      "ent_law_civil_rights_act_1964"
+    ],
     "keywords": []
   }
 ]

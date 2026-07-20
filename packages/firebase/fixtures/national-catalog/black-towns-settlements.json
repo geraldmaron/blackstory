@@ -44,7 +44,9 @@
       "self-governance",
       "community"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_law_freedmens_bureau_act_1865"
+    ],
     "keywords": [
       "freedom hill",
       "freedom colony",
@@ -326,7 +328,9 @@
       "land-ownership",
       "community"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_princeville_nc_001"
+    ],
     "keywords": [
       "freedmen's colony",
       "new bern",
@@ -721,7 +725,9 @@
       "education",
       "community"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_sipuel_v_board_of_regents_1948"
+    ],
     "keywords": [
       "all-black town",
       "pottawatomie county",

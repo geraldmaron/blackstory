@@ -90,7 +90,10 @@
       "hbcu",
       "liberal-arts"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_langston_hughes_001",
+      "ent_thurgood_marshall_001"
+    ],
     "keywords": []
   },
   {
@@ -136,7 +139,10 @@
       "hbcu",
       "religion"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_bethel_ame_indianapolis_001",
+      "ent_mother_emanuel_ame_001"
+    ],
     "keywords": []
   },
   {
@@ -192,7 +198,10 @@
       "law",
       "civil-rights"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_case_brown_v_board_of_education_1954",
+      "ent_law_freedmens_bureau_act_1865"
+    ],
     "keywords": []
   },
   {
@@ -288,7 +297,9 @@
       "religion",
       "leadership"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_martin_luther_king_jr_001"
+    ],
     "keywords": []
   },
   {
@@ -335,7 +346,9 @@
       "hbcu",
       "religion"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_reginald_lewis_museum_001"
+    ],
     "keywords": []
   },
   {
@@ -388,7 +401,11 @@
       "hbcu",
       "teaching"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_emancipation_oak_001",
+      "ent_law_emancipation_proclamation_1863",
+      "ent_tuskegee_university_001"
+    ],
     "keywords": []
   },
   {
@@ -572,7 +589,9 @@
       "hbcu",
       "land-grant"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_pbs_pinchback_001"
+    ],
     "keywords": []
   },
   {
@@ -674,7 +693,9 @@
       "agriculture",
       "science"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_george_washington_carver_001"
+    ],
     "keywords": []
   },
   {
@@ -776,7 +797,9 @@
       "land-grant",
       "civil-rights"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_greensboro_woolworth_sit_in_site_001"
+    ],
     "keywords": []
   },
   {
@@ -921,7 +944,9 @@
       "medicine",
       "civil-rights"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_sncc_founding_001"
+    ],
     "keywords": []
   },
   {
@@ -1263,7 +1288,9 @@
       "religion",
       "civil-rights"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_storer_college_historic_site_001"
+    ],
     "keywords": []
   },
   {
@@ -1359,7 +1386,9 @@
       "hbcu",
       "teaching"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_oberlin_wellington_rescue_001"
+    ],
     "keywords": []
   },
   {
@@ -1409,7 +1438,9 @@
       "land-grant",
       "teaching"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_wilberforce_university_001"
+    ],
     "keywords": []
   },
   {
@@ -1508,7 +1539,9 @@
       "agriculture",
       "teaching"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_tuskegee_university_001"
+    ],
     "keywords": []
   },
   {
@@ -1656,7 +1689,9 @@
       "religion",
       "agriculture"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_bethel_ame_indianapolis_001"
+    ],
     "keywords": []
   }
 ]

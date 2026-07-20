@@ -202,7 +202,9 @@
       "national-mall",
       "memory"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_marian_anderson_001"
+    ],
     "keywords": [
       "Marian Anderson",
       "Lincoln Memorial steps",

@@ -579,7 +579,9 @@
       "firsts",
       "hbcu"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_grambling_state_university_001"
+    ],
     "keywords": []
   },
   {
@@ -627,7 +629,10 @@
       "firsts",
       "hall-of-fame"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_negro_leagues_baseball_museum_001",
+      "ent_negro_national_league_001"
+    ],
     "keywords": []
   },
   {
@@ -773,7 +778,9 @@
       "firsts",
       "hall-of-fame"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_earl_lloyd_001"
+    ],
     "keywords": []
   },
   {
@@ -821,7 +828,9 @@
       "firsts",
       "hall-of-fame"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_chuck_cooper_001"
+    ],
     "keywords": []
   },
   {
@@ -1110,7 +1119,9 @@
       "civil-rights",
       "arts"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_marian_anderson_lincoln_memorial_concert_001"
+    ],
     "keywords": []
   },
   {
@@ -1390,7 +1401,9 @@
       "firsts",
       "arts"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_denzel_washington_001"
+    ],
     "keywords": []
   },
   {
@@ -1437,7 +1450,9 @@
       "firsts",
       "arts"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_howard_university_001"
+    ],
     "keywords": []
   },
   {
@@ -1625,7 +1640,9 @@
       "business",
       "firsts"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_motown_museum_001"
+    ],
     "keywords": []
   },
   {
@@ -1865,7 +1882,9 @@
       "opera",
       "firsts"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_alvin_ailey_001"
+    ],
     "keywords": []
   },
   {
@@ -2195,7 +2214,9 @@
       "arts",
       "firsts"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_motown_museum_001"
+    ],
     "keywords": []
   },
   {
@@ -2385,7 +2406,9 @@
       "harlem-renaissance",
       "firsts"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_alice_walker_001"
+    ],
     "keywords": []
   },
   {
@@ -2720,7 +2743,9 @@
       "civil-rights",
       "firsts"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_john_carlos_001"
+    ],
     "keywords": []
   },
   {
@@ -2768,7 +2793,9 @@
       "civil-rights",
       "firsts"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_tommie_smith_001"
+    ],
     "keywords": []
   },
   {
@@ -2860,7 +2887,9 @@
       "arts",
       "firsts"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_gwendolyn_brooks_001"
+    ],
     "keywords": []
   },
   {
@@ -2995,7 +3024,9 @@
       "arts",
       "firsts"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_halle_berry_001"
+    ],
     "keywords": []
   },
   {
@@ -3041,7 +3072,10 @@
       "arts",
       "firsts"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_halle_berry_001",
+      "ent_sidney_poitier_001"
+    ],
     "keywords": []
   },
   {
@@ -3088,7 +3122,9 @@
       "arts",
       "firsts"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_hattie_mcdaniel_001"
+    ],
     "keywords": []
   },
   {
@@ -3133,7 +3169,9 @@
       "arts",
       "firsts"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_motown_museum_001"
+    ],
     "keywords": []
   }
 ]

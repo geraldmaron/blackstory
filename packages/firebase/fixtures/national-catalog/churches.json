@@ -331,7 +331,9 @@
       "civil-rights",
       "harlem"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_adam_clayton_powell_001"
+    ],
     "keywords": []
   },
   {
@@ -438,7 +440,9 @@
       "civil-rights",
       "black-architects"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_law_ku_klux_klan_act_1871"
+    ],
     "keywords": []
   },
   {
@@ -494,7 +498,9 @@
       "civil-rights",
       "sweet-auburn"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_martin_luther_king_jr_001"
+    ],
     "keywords": []
   },
   {
@@ -550,6 +556,8 @@
       "civil-rights"
     ],
     "mentionedEntityIds": [
+      "ent_martin_luther_king_jr_001",
+      "ent_montgomery_bus_boycott_001",
       "montgomery-bus-boycott"
     ],
     "keywords": []
@@ -824,7 +832,9 @@
       "free-people-of-color",
       "treme"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_treme_001"
+    ],
     "keywords": []
   },
   {
@@ -1038,7 +1048,10 @@
       "community",
       "burial-ground"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_east_end_cemetery_richmond_001",
+      "ent_maggie_l_walker_001"
+    ],
     "keywords": []
   },
   {
@@ -1090,7 +1103,9 @@
       "community",
       "burial-ground"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_evergreen_cemetery_richmond_001"
+    ],
     "keywords": []
   },
   {
@@ -1389,7 +1404,9 @@
       "community",
       "architecture"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_tuskegee_university_001"
+    ],
     "keywords": []
   },
   {
@@ -1677,7 +1694,9 @@
       "community",
       "education"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_first_african_baptist_savannah_001"
+    ],
     "keywords": []
   },
   {
@@ -1727,7 +1746,10 @@
       "civil-rights",
       "education"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_martin_luther_king_jr_001",
+      "ent_morehouse_college_001"
+    ],
     "keywords": []
   }
 ]

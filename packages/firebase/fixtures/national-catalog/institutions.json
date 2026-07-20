@@ -49,7 +49,10 @@
       "civil-rights",
       "education"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_martin_luther_king_jr_001",
+      "ent_montgomery_bus_boycott_001"
+    ],
     "keywords": []
   },
   {
@@ -204,7 +207,9 @@
       "history",
       "culture"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_harriet_tubman_001"
+    ],
     "keywords": []
   },
   {
@@ -296,7 +301,9 @@
       "museum",
       "culture"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_berry_gordy_001"
+    ],
     "keywords": []
   },
   {
@@ -450,7 +457,13 @@
       "museum",
       "history"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_jackie_robinson_001",
+      "ent_josh_gibson_001",
+      "ent_negro_national_league_001",
+      "ent_rube_foster_001",
+      "ent_satchel_paige_001"
+    ],
     "keywords": []
   },
   {
@@ -504,7 +517,10 @@
       "museum",
       "history"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_lorraine_motel_001",
+      "ent_martin_luther_king_jr_001"
+    ],
     "keywords": []
   },
   {
@@ -563,7 +579,10 @@
       "museum",
       "education"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_kelly_ingram_park_001",
+      "ent_law_civil_rights_act_1964"
+    ],
     "keywords": []
   },
   {
@@ -608,7 +627,9 @@
       "history",
       "culture"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_mother_bethel_ame_001"
+    ],
     "keywords": []
   },
   {
@@ -701,7 +722,9 @@
       "history",
       "memory"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_german_coast_uprising_001"
+    ],
     "keywords": []
   },
   {
@@ -748,7 +771,9 @@
       "history",
       "abolition"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_levi_coffin_house_001"
+    ],
     "keywords": []
   },
   {
@@ -840,7 +865,11 @@
       "history",
       "culture"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_harriet_tubman_001",
+      "ent_reginald_f_lewis_001",
+      "ent_thurgood_marshall_001"
+    ],
     "keywords": []
   }
 ]

@@ -46,7 +46,9 @@
       "music",
       "culture"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_howard_university_001"
+    ],
     "keywords": []
   },
   {
@@ -339,7 +341,11 @@
       "music",
       "culture"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_billie_holiday_001",
+      "ent_douglass_theatre_macon_001",
+      "ent_u_street_corridor_001"
+    ],
     "keywords": []
   },
   {
@@ -437,7 +443,9 @@
       "music",
       "jazz"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_savoy_ballroom_chicago_001"
+    ],
     "keywords": []
   },
   {
@@ -532,7 +540,10 @@
       "music",
       "culture"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_duke_ellington_001",
+      "ent_louis_armstrong_001"
+    ],
     "keywords": []
   },
   {
@@ -579,7 +590,9 @@
       "jazz",
       "culture"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_louis_armstrong_001"
+    ],
     "keywords": []
   },
   {
@@ -625,7 +638,9 @@
       "music",
       "jazz"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_black_bottom_paradise_valley_001"
+    ],
     "keywords": []
   },
   {
@@ -672,7 +687,12 @@
       "music",
       "jazz"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_chicago_defender_001",
+      "ent_harold_washington_001",
+      "ent_louis_armstrong_001",
+      "ent_regal_theater_chicago_001"
+    ],
     "keywords": []
   },
   {
@@ -719,7 +739,10 @@
       "culture",
       "architecture"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_howard_theatre_dc_001",
+      "ent_u_street_corridor_001"
+    ],
     "keywords": []
   }
 ]

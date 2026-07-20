@@ -90,7 +90,9 @@
       "freedom",
       "community"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_harriet_tubman_001"
+    ],
     "keywords": []
   },
   {
@@ -137,7 +139,9 @@
       "abolition",
       "freedom"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_harriet_tubman_001"
+    ],
     "keywords": []
   },
   {
@@ -240,7 +244,11 @@
       "education",
       "emancipation"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_fort_monroe_001",
+      "ent_law_emancipation_proclamation_1863",
+      "ent_tuskegee_university_001"
+    ],
     "keywords": []
   },
   {
@@ -287,7 +295,10 @@
       "abolition",
       "invention"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_fort_concho_nhl_001",
+      "ent_john_rankin_house_001"
+    ],
     "keywords": []
   },
   {
@@ -391,7 +402,10 @@
       "organizing",
       "freedom"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_john_brown_harpers_ferry_001",
+      "ent_storer_college_historic_site_001"
+    ],
     "keywords": []
   },
   {
@@ -444,7 +458,9 @@
       "organizing",
       "freedom"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_ida_b_wells_001"
+    ],
     "keywords": []
   },
   {
@@ -496,7 +512,10 @@
       "business",
       "organizing"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_negro_leagues_baseball_museum_001",
+      "ent_rube_foster_001"
+    ],
     "keywords": []
   },
   {
@@ -548,7 +567,10 @@
       "aviation",
       "firsts"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_moton_high_school_001",
+      "ent_tuskegee_university_001"
+    ],
     "keywords": []
   },
   {
@@ -594,7 +616,9 @@
       "memorial",
       "civil-war"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_african_meeting_house_001"
+    ],
     "keywords": []
   },
   {
@@ -637,7 +661,9 @@
       "military",
       "firsts"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_colin_powell_001"
+    ],
     "keywords": []
   },
   {
@@ -683,7 +709,10 @@
       "organizing",
       "firsts"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_brotherhood_sleeping_car_porters_001",
+      "ent_core_founding_001"
+    ],
     "keywords": []
   },
   {
@@ -728,7 +757,9 @@
       "freedom",
       "military"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_law_emancipation_proclamation_1863"
+    ],
     "keywords": []
   },
   {

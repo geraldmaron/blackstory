@@ -40,7 +40,9 @@
       "resistance",
       "rebellion"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_fort_mose_001"
+    ],
     "keywords": []
   },
   {
@@ -308,7 +310,9 @@
       "rebellion",
       "organizing"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_denmark_vesey_001"
+    ],
     "keywords": []
   },
   {
@@ -354,7 +358,9 @@
       "organizing",
       "freedom"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_fort_concho_nhl_001"
+    ],
     "keywords": []
   },
   {
@@ -398,7 +404,9 @@
       "resistance",
       "rebellion"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_nat_turner_trial_site_001"
+    ],
     "keywords": []
   },
   {
@@ -752,7 +760,9 @@
       "underground-railroad",
       "freedom"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_fort_concho_nhl_001"
+    ],
     "keywords": []
   },
   {
@@ -890,7 +900,9 @@
       "underground-railroad",
       "abolition"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_fort_concho_nhl_001"
+    ],
     "keywords": []
   },
   {
@@ -937,7 +949,9 @@
       "freedom",
       "organizing"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_john_brown_harpers_ferry_001"
+    ],
     "keywords": []
   },
   {
@@ -980,7 +994,9 @@
       "underground-railroad",
       "freedom"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_harriet_tubman_001"
+    ],
     "keywords": []
   },
   {
@@ -1070,7 +1086,9 @@
       "resistance",
       "underground-railroad"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_law_fugitive_slave_act_1850"
+    ],
     "keywords": []
   },
   {
@@ -1113,7 +1131,10 @@
       "underground-railroad",
       "resistance"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_john_mercer_langston_001",
+      "ent_langston_ok_001"
+    ],
     "keywords": []
   },
   {
@@ -1159,7 +1180,10 @@
       "underground-railroad",
       "freedom"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_harriet_tubman_001",
+      "ent_william_still_001"
+    ],
     "keywords": []
   },
   {
@@ -1205,7 +1229,9 @@
       "underground-railroad",
       "freedom"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_john_parker_house_001"
+    ],
     "keywords": []
   },
   {
@@ -1252,7 +1278,10 @@
       "resistance",
       "abolition"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_law_fugitive_slave_act_1850",
+      "ent_mother_ame_zion_001"
+    ],
     "keywords": []
   },
   {
@@ -1431,7 +1460,9 @@
       "resistance",
       "freedom"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_george_washington_carver_001"
+    ],
     "keywords": []
   },
   {
@@ -1476,7 +1507,9 @@
       "underground-railroad",
       "organizing"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_harriet_tubman_001"
+    ],
     "keywords": []
   },
   {
@@ -1519,7 +1552,9 @@
       "resistance",
       "underground-railroad"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_law_fugitive_slave_act_1850"
+    ],
     "keywords": []
   },
   {
@@ -1570,7 +1605,9 @@
       "freedom",
       "organizing"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_louis_armstrong_001"
+    ],
     "keywords": []
   },
   {
@@ -1617,7 +1654,9 @@
       "organizing",
       "publication"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_robert_abbott_001"
+    ],
     "keywords": []
   },
   {
@@ -1802,7 +1841,11 @@
       "great-migration",
       "community"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_billie_holiday_001",
+      "ent_john_coltrane_001",
+      "ent_louis_armstrong_001"
+    ],
     "keywords": []
   },
   {
@@ -1899,7 +1942,10 @@
       "great-migration",
       "community"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_duke_ellington_001",
+      "ent_louis_armstrong_001"
+    ],
     "keywords": []
   },
   {
@@ -1991,7 +2037,10 @@
       "great-migration",
       "community"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_phillis_wheatley_001",
+      "ent_scott_joplin_001"
+    ],
     "keywords": []
   },
   {
@@ -2037,7 +2086,9 @@
       "great-migration",
       "community"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_billie_holiday_001"
+    ],
     "keywords": []
   },
   {
@@ -2179,7 +2230,9 @@
       "organizing",
       "journalism"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_chicago_defender_001"
+    ],
     "keywords": []
   },
   {
@@ -2391,7 +2444,10 @@
     "topicIds": [
       "great-migration"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_great_migration_001",
+      "ent_mfdp_dnc_challenge_001"
+    ],
     "keywords": []
   },
   {
@@ -2437,7 +2493,11 @@
       "organizing",
       "freedom"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_benjamin_pap_singleton_001",
+      "ent_law_ku_klux_klan_act_1871",
+      "ent_nicodemus_001"
+    ],
     "keywords": []
   },
   {
@@ -2528,7 +2588,9 @@
       "freedom",
       "underground-railroad"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_harriet_tubman_001"
+    ],
     "keywords": []
   },
   {
@@ -2661,7 +2723,11 @@
       "organizing",
       "great-migration"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_bayard_rustin_001",
+      "ent_brotherhood_sleeping_car_porters_001",
+      "ent_march_on_washington_1963_001"
+    ],
     "keywords": []
   },
   {
@@ -2709,7 +2775,10 @@
       "organizing",
       "publication"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_chicago_defender_001",
+      "ent_tuskegee_university_001"
+    ],
     "keywords": []
   },
   {
@@ -2758,7 +2827,9 @@
       "organizing",
       "journalism"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_law_ku_klux_klan_act_1871"
+    ],
     "keywords": []
   }
 ]
