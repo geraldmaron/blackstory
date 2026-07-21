@@ -43,5 +43,5 @@ Prefer storing the key in 1Password and injecting via `run-with-dev-secrets` rat
 
 ## Out of scope
 
-- Hosting Next.js on Supabase (use Vercel or Cloud Run to leave Firebase App Hosting)
+- **App Hosting stays on Firebase** (owner decision 2026-07-21) — do not migrate `apps/web` to Vercel/Cloud Run as part of storage or Postgres cutover
 - Deleting GCS / Firebase project

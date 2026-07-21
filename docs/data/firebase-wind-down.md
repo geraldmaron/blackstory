@@ -20,7 +20,8 @@ After Postgres cutover, **do not delete** production Firebase project `black-boo
 - [x] **App Hosting cutover (2026-07-21):** Secret Manager `web-database-url`, `admin-database-url`, `admin-supabase-anon-key`; root `apphosting.yaml` / `apphosting.staging.yaml` / `apphosting.admin.yaml` set postgres + supabase auth; staging backend Environment name=`staging`
 - [ ] Supabase advisors: **Leaked password protection** still WARN — enable in Dashboard (Management API PATCH returned 403 with available PAT)
 - [x] Scheduled Cloud Functions runtime retired; Corsair/systemd is the recurring scheduler
-- [ ] Public web reads and request-integrity controls still require a separate Firebase-free cutover before the project can be archived
+- [x] **App Hosting stays on Firebase** (owner decision 2026-07-21) — public web continues on App Hosting; not part of Supabase cutover
+- [ ] Public web request-integrity / remaining Firebase-client surfaces (distinct from App Hosting host choice)
 - [x] Mobile + api-public: Firebase App Check retired; direct API callers use `X-BlackStory-Client`; Postgres is the default read path (`PUBLIC_DATA_SOURCE=postgres`)
 
 ### Owner: enable leaked password protection (HaveIBeenPwned)
