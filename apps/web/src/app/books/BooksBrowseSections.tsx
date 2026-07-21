@@ -1,5 +1,5 @@
 /**
- * Books browse: dense filter + ledger rows with entity-tag state chips and inline Buy CTAs.
+ * Books browse: dense filter + sortable table with entity-tag state chips and inline Buy CTAs.
  */
 import React from 'react';
 import Link from 'next/link';
@@ -41,6 +41,12 @@ function BrowseRowActions({ item }: { readonly item: BooksBrowseItem }) {
       ))}
     </div>
   );
+}
+
+function sortIndicator(ariaSort: 'ascending' | 'descending' | 'none'): string {
+  if (ariaSort === 'ascending') return ' ↑';
+  if (ariaSort === 'descending') return ' ↓';
+  return '';
 }
 
 export function BooksBrowseSections({ view }: BooksBrowseSectionsProps) {
@@ -90,6 +96,15 @@ export function BooksBrowseSections({ view }: BooksBrowseSectionsProps) {
               options: view.authorOptions,
             },
           ]}
+          actions={
+            <>
+              <input type="hidden" name="sort" value={view.sort} />
+              <input type="hidden" name="dir" value={view.dir} />
+              <button type="submit" className="ds-button ds-button--primary">
+                Apply filters
+              </button>
+            </>
+          }
         />
 
         <p className="ds-sans ds-count-label ds-books-browse__count" id="books-results-heading">
@@ -108,31 +123,53 @@ export function BooksBrowseSections({ view }: BooksBrowseSectionsProps) {
             Try a broader keyword or reset the state and author filters.
           </EmptyState>
         ) : (
-          <ul className="ds-books-ledger" aria-labelledby="books-results-heading">
-            {view.items.map((item) => (
-              <li key={item.id} className="ds-books-row">
-                <div className="ds-books-row__main">
-                  <h3 className="ds-books-row__title">
-                    <Link href={`/books/${item.slug}`}>{item.title}</Link>
-                  </h3>
-                  <p className="ds-books-row__meta">
-                    <span>{item.authorNames}</span>
-                    <span aria-hidden="true"> · </span>
-                    <span className="ds-mono">{item.publishedDate}</span>
-                    <span aria-hidden="true"> · </span>
-                    <span className="ds-mono">
-                      {item.citationCount} citation{item.citationCount === 1 ? '' : 's'}
-                    </span>
-                    {item.states.length > 0 ? (
-                      <>
-                        <span aria-hidden="true"> · </span>
-                        <span className="ds-books-row__states" role="list" aria-label="States on challenge lists">
+          <div className="ds-books-table-wrap">
+            <table className="ds-books-table" aria-labelledby="books-results-heading">
+              <thead>
+                <tr>
+                  {view.sortColumns.map((column) => (
+                    <th key={column.key} scope="col" aria-sort={column.ariaSort}>
+                      <Link
+                        className="ds-books-table__sort"
+                        href={column.href}
+                        aria-label={
+                          column.ariaSort === 'none'
+                            ? `Sort by ${column.label}`
+                            : `Sort by ${column.label}, currently ${column.ariaSort}. Activate to reverse.`
+                        }
+                      >
+                        {column.label}
+                        <span aria-hidden="true">{sortIndicator(column.ariaSort)}</span>
+                      </Link>
+                    </th>
+                  ))}
+                  <th scope="col" className="ds-books-table__actions-col">
+                    <span className="ds-visually-hidden">Purchase</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {view.items.map((item) => (
+                  <tr key={item.id}>
+                    <th scope="row" className="ds-books-table__title">
+                      <Link href={`/books/${item.slug}`}>{item.title}</Link>
+                    </th>
+                    <td>{item.authorNames}</td>
+                    <td className="ds-mono">{item.publishedDate}</td>
+                    <td className="ds-mono">{item.citationCount}</td>
+                    <td>
+                      {item.states.length > 0 ? (
+                        <span
+                          className="ds-books-row__states"
+                          role="list"
+                          aria-label="States on challenge lists"
+                        >
                           {item.states.map((state, index) => (
                             <span key={state.code} role="listitem">
                               {index > 0 ? <span aria-hidden="true"> </span> : null}
                               <Link
                                 className="ds-books-row__state"
-                                href={`/books?state=${encodeURIComponent(state.code)}`}
+                                href={`/books?state=${encodeURIComponent(state.code)}&sort=${view.sort}&dir=${view.dir}`}
                                 title={state.name}
                               >
                                 <span className="ds-visually-hidden">{state.name} </span>
@@ -141,14 +178,18 @@ export function BooksBrowseSections({ view }: BooksBrowseSectionsProps) {
                             </span>
                           ))}
                         </span>
-                      </>
-                    ) : null}
-                  </p>
-                </div>
-                <BrowseRowActions item={item} />
-              </li>
-            ))}
-          </ul>
+                      ) : (
+                        <span className="ds-ink-muted">—</span>
+                      )}
+                    </td>
+                    <td className="ds-books-table__actions-col">
+                      <BrowseRowActions item={item} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </section>
 

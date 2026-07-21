@@ -76,6 +76,55 @@ test('buildBooksBrowseViewModel returns empty when nothing matches', () => {
   assert.equal(view.items.length, 0);
 });
 
+test('buildBooksBrowseViewModel defaults to title ascending', () => {
+  const view = buildBooksBrowseViewModel(SNAPSHOT, {});
+  assert.equal(view.sort, 'title');
+  assert.equal(view.dir, 'asc');
+  assert.ok(view.items.length >= 2);
+  const titles = view.items.map((item) => item.title);
+  const sorted = [...titles].sort((left, right) =>
+    left.localeCompare(right, undefined, { sensitivity: 'base' }),
+  );
+  assert.deepEqual(titles, sorted);
+  const titleCol = view.sortColumns.find((column) => column.key === 'title');
+  assert.equal(titleCol?.ariaSort, 'ascending');
+  assert.match(titleCol?.href ?? '', /dir=desc/);
+});
+
+test('buildBooksBrowseViewModel sorts by author descending', () => {
+  const view = buildBooksBrowseViewModel(SNAPSHOT, { sort: 'author', dir: 'desc' });
+  assert.equal(view.sort, 'author');
+  assert.equal(view.dir, 'desc');
+  const authors = view.items.map((item) => item.authorNames);
+  const sorted = [...authors].sort((left, right) =>
+    right.localeCompare(left, undefined, { sensitivity: 'base' }),
+  );
+  assert.deepEqual(authors, sorted);
+});
+
+test('buildBooksBrowseViewModel sorts by citation count', () => {
+  const view = buildBooksBrowseViewModel(SNAPSHOT, { sort: 'citations', dir: 'desc' });
+  for (let index = 1; index < view.items.length; index += 1) {
+    assert.ok(view.items[index - 1]!.citationCount >= view.items[index]!.citationCount);
+  }
+});
+
+test('sort column hrefs preserve active filters', () => {
+  const view = buildBooksBrowseViewModel(SNAPSHOT, {
+    q: 'eye',
+    state: 'FL',
+    author: 'Toni Morrison',
+    sort: 'year',
+    dir: 'asc',
+  });
+  const yearCol = view.sortColumns.find((column) => column.key === 'year');
+  assert.ok(yearCol);
+  assert.match(yearCol.href, /q=eye/);
+  assert.match(yearCol.href, /state=FL/);
+  assert.match(yearCol.href, /author=Toni(\+|%20)Morrison/);
+  assert.match(yearCol.href, /dir=desc/);
+});
+
 test('buildBooksDetailViewModel resolves a known slug', () => {
   const view = buildBooksDetailViewModel(SNAPSHOT, 'the-bluest-eye');
   assert.equal(view.kind, 'ok');
