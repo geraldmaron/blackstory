@@ -77,15 +77,17 @@ gains nothing because every parameter is re-validated server-side and there is n
 
 ## Data access
 
-Handlers depend on the `PublicDataAccess` port (`data-access.ts`). Two adapters ship:
+Handlers depend on the `PublicDataAccess` port (`data-access.ts`). Three adapters ship:
 
 - `createInMemoryPublicDataAccess` — real, fully tested; also usable as the ADR-004
   degraded/immutable-snapshot source. Used when `./live-policy.ts`'s gate is false (emulators,
-  missing break-glass, explicit `PUBLIC_DATA_SOURCE=fixtures|seed`, or `PUBLIC_READ_API_DISABLED`).
-- `createFirestorePublicDataAccess` — binds the port to injected `@repo/firebase` public-projection
-  readers + the domain projection→`EntityV1` mapper (same access pattern as
-  `apps/web/src/lib/public-data/firestore-readers.ts`). Selected at boot by
-  `createProductionHandlerDeps` (`./compose.ts`) when the live gate is true.
+  missing `DATABASE_URL`, explicit `PUBLIC_DATA_SOURCE=fixtures|seed`, or `PUBLIC_READ_API_DISABLED`).
+- `createPostgresDataAccessReaders` + `createFirestorePublicDataAccess` — **primary production path**:
+  reads Supabase Postgres `bb_public.*` (same queries as
+  `apps/web/src/lib/public-data/postgres-readers.ts`). Selected when
+  `PUBLIC_DATA_SOURCE=postgres` and `DATABASE_URL` (or `APP_DATABASE_URL`) are set.
+- `createFirestoreDataAccessReaders` + `createFirestorePublicDataAccess` — **legacy wind-down path**:
+  explicit `PUBLIC_DATA_SOURCE=firestore` only (never a silent production default).
 
 **Live wiring gap (honest):** timeline hydration — the projection has no timeline field (always
 `[]` until the release builder adds one).
@@ -108,8 +110,26 @@ index rows exist for the release, search honestly falls back to a bounded entity
 (CDN/GCS via `@repo/firebase`'s `fetchReleaseSearchIndexArtifact`, same object path as web) before
 the Firestore `publicSearchIndex` query — matching `apps/web`'s artifact-first order.
 
-## Local run against live Firebase (production project)
+## Local run against live Postgres (production SoR — preferred)
 
+Same env vocabulary as `apps/web`: `PUBLIC_DATA_SOURCE=postgres` plus a server-only
+`DATABASE_URL` / `APP_DATABASE_URL` (Supabase pooler or local PostGIS). Mobile clients never
+receive these values — they call this service over HTTPS only.
+
+```bash
+cd apps/api-public
+
+run-with-dev-secrets -- env \
+  PUBLIC_DATA_SOURCE=postgres \
+  DATABASE_URL='postgresql://…' \
+  DATABASE_SSL=1 \
+  APP_CHECK_MODE=monitor \
+  pnpm dev
+```
+
+## Local run against live Firebase (legacy — explicit opt-in)
+
+Requires `PUBLIC_DATA_SOURCE=firestore` in addition to the Firebase prerequisites below.
 Same convention as `apps/web` / `apps/admin`: Application Default Credentials (ADC), an explicit
 production break-glass flag, and optional `run-with-dev-secrets` for any `op://` references in
 `~/.env.1password` (never commit secrets; never print resolved values).
@@ -131,6 +151,7 @@ cd apps/api-public
 # Inject any 1Password-backed env refs (GOOGLE_APPLICATION_CREDENTIALS op://, etc.) without
 # writing secrets to disk. Confirm injection with `env | rg '^[A-Z_]+='` — never echo key values.
 run-with-dev-secrets -- env \
+  PUBLIC_DATA_SOURCE=firestore \
   BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1 \
   FIREBASE_PROJECT_ID=black-book-efaaf \
   GOOGLE_CLOUD_QUOTA_PROJECT=black-book-efaaf \

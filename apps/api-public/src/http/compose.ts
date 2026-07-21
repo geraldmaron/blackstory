@@ -5,9 +5,10 @@
  * its own `HandlerDeps` by hand (see `./server.test.ts`, `./handlers.test.ts`) so this module is
  * never imported by a test that wants to avoid touching real Firebase.
  *
- * Data-source selection: `./live-policy.ts`'s `shouldUsePublicFirestoreDataAccess` decides between
- * the live Firestore adapter (`./firestore-data-access.ts`) and an EMPTY in-memory adapter — never
- * a fixture/sample dataset masquerading as a real release in production. Every other dependency
+ * Data-source selection: `./live-policy.ts` prefers Postgres `bb_public` when
+ * `PUBLIC_DATA_SOURCE=postgres` + `DATABASE_URL`, then legacy Firestore when explicitly opted in,
+ * otherwise an EMPTY in-memory adapter — never a fixture/sample dataset masquerading as a real
+ * release in production. Every other dependency
  * (App Check guard, rate limiter, search guardrail) is real regardless of data source: none of them
  * depend on where entities come from.
  */
@@ -23,8 +24,12 @@ import { createPublicSearchGuard } from '../search-guardrails.js';
 import { createAppCheckAvailabilityProvider } from './app-check-availability.js';
 import { createFirestorePublicDataAccess, createInMemoryPublicDataAccess } from './data-access.js';
 import { createFirestoreDataAccessReaders } from './firestore-data-access.js';
+import { createPostgresDataAccessReaders } from './postgres-data-access.js';
 import type { HandlerDeps } from './handlers.js';
-import { shouldUsePublicFirestoreDataAccess } from './live-policy.js';
+import {
+  shouldUsePublicFirestoreDataAccess,
+  shouldUsePublicPostgresDataAccess,
+} from './live-policy.js';
 
 export type ComposeHandlerDepsOptions = {
   readonly environment?: EnvironmentLike;
@@ -46,9 +51,11 @@ export function createProductionHandlerDeps(options: ComposeHandlerDepsOptions =
       telemetry: options.circuitBreakerTelemetry ?? consoleCircuitBreakerTelemetry,
     });
 
-  const dataAccess = shouldUsePublicFirestoreDataAccess(environment)
-    ? createFirestorePublicDataAccess(createFirestoreDataAccessReaders({ environment }))
-    : createInMemoryPublicDataAccess({ entities: [] });
+  const dataAccess = shouldUsePublicPostgresDataAccess(environment)
+    ? createFirestorePublicDataAccess(createPostgresDataAccessReaders())
+    : shouldUsePublicFirestoreDataAccess(environment)
+      ? createFirestorePublicDataAccess(createFirestoreDataAccessReaders({ environment }))
+      : createInMemoryPublicDataAccess({ entities: [] });
 
   return {
     dataAccess,

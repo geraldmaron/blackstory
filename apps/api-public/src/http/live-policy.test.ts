@@ -1,88 +1,117 @@
 /**
- * `shouldUsePublicFirestoreDataAccess` gate tests — pure env-in/bool-out, no Firestore touched.
+ * `shouldUsePublicPostgresDataAccess` / `shouldUsePublicFirestoreDataAccess` gate tests.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { shouldUsePublicFirestoreDataAccess } from './live-policy.js';
+import {
+  shouldUsePublicFirestoreDataAccess,
+  shouldUsePublicPostgresDataAccess,
+} from './live-policy.js';
 
 const PRODUCTION_LOCAL = {
   FIREBASE_PROJECT_ID: 'black-book-efaaf',
-  BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION: '1',
+  APP_FIREBASE_ALLOW_PRODUCTION: '1',
 };
 
-test('defaults to false with no env at all', () => {
-  assert.equal(shouldUsePublicFirestoreDataAccess({}), false);
+const POSTGRES_PRODUCTION = {
+  PUBLIC_DATA_SOURCE: 'postgres',
+  DATABASE_URL: 'postgresql://user:pass@localhost:5432/blackbook',
+  NODE_ENV: 'production',
+};
+
+test('postgres: false with no env at all', () => {
+  assert.equal(shouldUsePublicPostgresDataAccess({}), false);
 });
 
-test('false when explicitly disabled even with production project + break-glass', () => {
+test('postgres: false when explicitly disabled', () => {
   assert.equal(
-    shouldUsePublicFirestoreDataAccess({ ...PRODUCTION_LOCAL, PUBLIC_READ_API_DISABLED: '1' }),
+    shouldUsePublicPostgresDataAccess({ ...POSTGRES_PRODUCTION, PUBLIC_READ_API_DISABLED: '1' }),
     false,
   );
 });
 
-test('false when caller forces fixtures/seed source', () => {
+test('postgres: false when caller forces fixtures/seed source', () => {
   assert.equal(
-    shouldUsePublicFirestoreDataAccess({ ...PRODUCTION_LOCAL, PUBLIC_DATA_SOURCE: 'fixtures' }),
+    shouldUsePublicPostgresDataAccess({ ...POSTGRES_PRODUCTION, PUBLIC_DATA_SOURCE: 'fixtures' }),
     false,
   );
   assert.equal(
-    shouldUsePublicFirestoreDataAccess({ ...PRODUCTION_LOCAL, PUBLIC_DATA_SOURCE: 'seed' }),
+    shouldUsePublicPostgresDataAccess({ ...POSTGRES_PRODUCTION, PUBLIC_DATA_SOURCE: 'seed' }),
     false,
   );
 });
 
-test('false when emulator signals are present, even with production project id', () => {
+test('postgres: false when emulator signals are present', () => {
   assert.equal(
-    shouldUsePublicFirestoreDataAccess({
-      ...PRODUCTION_LOCAL,
+    shouldUsePublicPostgresDataAccess({
+      ...POSTGRES_PRODUCTION,
       FIRESTORE_EMULATOR_HOST: '127.0.0.1:8080',
     }),
     false,
   );
 });
 
-test('false for a non-production project id without an explicit firestore override', () => {
+test('postgres: false without DATABASE_URL even when source is postgres', () => {
   assert.equal(
-    shouldUsePublicFirestoreDataAccess({
-      FIREBASE_PROJECT_ID: 'some-other-project',
-      BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION: '1',
-    }),
+    shouldUsePublicPostgresDataAccess({ PUBLIC_DATA_SOURCE: 'postgres', NODE_ENV: 'production' }),
     false,
   );
 });
 
-test('true for a non-production project id with an explicit PUBLIC_DATA_SOURCE=firestore override', () => {
+test('postgres: true for postgres source + DATABASE_URL in production', () => {
+  assert.equal(shouldUsePublicPostgresDataAccess(POSTGRES_PRODUCTION), true);
+});
+
+test('postgres: true with APP_DATABASE_URL alias', () => {
   assert.equal(
-    shouldUsePublicFirestoreDataAccess({
-      FIREBASE_PROJECT_ID: 'some-other-project',
-      BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION: '1',
-      PUBLIC_DATA_SOURCE: 'firestore',
+    shouldUsePublicPostgresDataAccess({
+      PUBLIC_DATA_SOURCE: 'postgres',
+      APP_DATABASE_URL: 'postgresql://user:pass@localhost:5432/blackbook',
+      NODE_ENV: 'production',
     }),
     true,
   );
 });
 
-test('false for production project id in a non-production NODE_ENV without break-glass', () => {
+test('postgres: false when PUBLIC_DATA_SOURCE unset even with DATABASE_URL (no silent default)', () => {
+  assert.equal(
+    shouldUsePublicPostgresDataAccess({
+      DATABASE_URL: 'postgresql://user:pass@localhost:5432/blackbook',
+      NODE_ENV: 'production',
+    }),
+    false,
+  );
+});
+
+test('firestore: false with no env at all', () => {
+  assert.equal(shouldUsePublicFirestoreDataAccess({}), false);
+});
+
+test('firestore: false for production project + NODE_ENV=production without explicit firestore source', () => {
   assert.equal(
     shouldUsePublicFirestoreDataAccess({
       FIREBASE_PROJECT_ID: 'black-book-efaaf',
+      NODE_ENV: 'production',
+    }),
+    false,
+  );
+});
+
+test('firestore: true for explicit firestore override + production project + break-glass local', () => {
+  assert.equal(
+    shouldUsePublicFirestoreDataAccess({
+      ...PRODUCTION_LOCAL,
+      PUBLIC_DATA_SOURCE: 'firestore',
       NODE_ENV: 'development',
     }),
-    false,
-  );
-});
-
-test('true for production project id + local dev + break-glass flag (documented local run command)', () => {
-  assert.equal(
-    shouldUsePublicFirestoreDataAccess({ ...PRODUCTION_LOCAL, NODE_ENV: 'development' }),
     true,
   );
 });
 
-test('true for production project id + NODE_ENV=production, no break-glass needed', () => {
+test('firestore: true for explicit firestore + NODE_ENV=production', () => {
   assert.equal(
     shouldUsePublicFirestoreDataAccess({
+      PUBLIC_DATA_SOURCE: 'firestore',
       FIREBASE_PROJECT_ID: 'black-book-efaaf',
       NODE_ENV: 'production',
     }),
@@ -90,12 +119,6 @@ test('true for production project id + NODE_ENV=production, no break-glass neede
   );
 });
 
-test('resolves project id from GOOGLE_CLOUD_PROJECT when FIREBASE_PROJECT_ID is unset', () => {
-  assert.equal(
-    shouldUsePublicFirestoreDataAccess({
-      GOOGLE_CLOUD_PROJECT: 'black-book-efaaf',
-      NODE_ENV: 'production',
-    }),
-    true,
-  );
+test('firestore: false when postgres source is selected', () => {
+  assert.equal(shouldUsePublicFirestoreDataAccess(POSTGRES_PRODUCTION), false);
 });

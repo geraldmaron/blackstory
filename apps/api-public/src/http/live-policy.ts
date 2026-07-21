@@ -1,15 +1,11 @@
 /**
- * Decides when `apps/api-public` should bind its `PublicDataAccess` port to live Firestore public
- * release projections instead of the injected in-memory adapter.
+ * Decides when `apps/api-public` binds `PublicDataAccess` to live Postgres `bb_public` reads,
+ * legacy Firestore projections, or the injected in-memory adapter.
  *
- * Deliberately mirrors `apps/web/src/lib/public-data/live-policy.ts`'s gate (same env var
- * vocabulary: `PUBLIC_READ_API_DISABLED`, `PUBLIC_DATA_SOURCE`, `FIREBASE_PROJECT_ID` /
- * `GOOGLE_CLOUD_PROJECT`, and `@repo/firebase`'s `PRODUCTION_BREAK_GLASS_ENV` break-glass flag) so
- * an operator learns ONE production/local convention across both surfaces rather than two. This
- * function is a pure pre-check — it never touches Firestore — so callers can cleanly choose the
- * fixture adapter instead of calling into `@repo/firebase`'s `getServerFirestore`, which would
- * otherwise throw via `assertFirebaseProjectAllowed` for the same "not production-safe" cases this
- * gate is designed to detect first.
+ * Mirrors `apps/web/src/lib/public-data/live-policy.ts` vocabulary (`PUBLIC_DATA_SOURCE`,
+ * `DATABASE_URL`, `PUBLIC_READ_API_DISABLED`) so operators configure web and api-public with one
+ * convention. Postgres is the production SoR path (ADR-020); Firestore requires an explicit
+ * `PUBLIC_DATA_SOURCE=firestore` opt-in during wind-down — never a silent production default.
  */
 import {
   hasEmulatorSignals,
@@ -18,18 +14,31 @@ import {
   type EnvironmentLike,
 } from '@repo/firebase';
 
+export type PublicDataSource = 'seed' | 'postgres' | 'firestore' | 'fixtures';
+
+export function resolvePublicDataSource(
+  environment: EnvironmentLike = process.env,
+): PublicDataSource | undefined {
+  const raw = environment.PUBLIC_DATA_SOURCE?.trim().toLowerCase();
+  if (raw === 'seed' || raw === 'postgres' || raw === 'firestore' || raw === 'fixtures') {
+    return raw;
+  }
+  return undefined;
+}
+
+export function isPostgresPublicDataSource(environment: EnvironmentLike = process.env): boolean {
+  return resolvePublicDataSource(environment) === 'postgres';
+}
+
+function hasPostgresConnection(environment: EnvironmentLike): boolean {
+  return Boolean(environment.DATABASE_URL?.trim() || environment.APP_DATABASE_URL?.trim());
+}
+
 /**
- * `true` only when every one of the following holds:
- * - The public read API is not explicitly disabled (`PUBLIC_READ_API_DISABLED`).
- * - The caller has not forced the fixture/in-memory source (`PUBLIC_DATA_SOURCE=fixtures|seed`).
- * - No Firebase emulator signal is present (emulator runs always use the injected/fixture data).
- * - The resolved Firebase project is the production project (`black-book-efaaf`), or the caller
- *   explicitly opts in via `PUBLIC_DATA_SOURCE=firestore`.
- * - Either `NODE_ENV`/`BLACK_BOOK_ENV` is `production`, or the explicit break-glass flag
- *   (`BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1`) is set — this is what makes a documented LOCAL run
- *   against live production Firestore possible (see `http/README.md`'s run command).
+ * Primary live path: explicit `PUBLIC_DATA_SOURCE=postgres` plus a server-only DB URL.
+ * Never inferred from Firebase project id alone.
  */
-export function shouldUsePublicFirestoreDataAccess(
+export function shouldUsePublicPostgresDataAccess(
   environment: EnvironmentLike = process.env,
 ): boolean {
   if (
@@ -42,6 +51,35 @@ export function shouldUsePublicFirestoreDataAccess(
     environment.PUBLIC_DATA_SOURCE === 'fixtures' ||
     environment.PUBLIC_DATA_SOURCE === 'seed'
   ) {
+    return false;
+  }
+  if (hasEmulatorSignals(environment)) {
+    return false;
+  }
+  return isPostgresPublicDataSource(environment) && hasPostgresConnection(environment);
+}
+
+/**
+ * Legacy Firestore path — explicit opt-in only (`PUBLIC_DATA_SOURCE=firestore`) plus the same
+ * production/break-glass gate used before the Postgres cutover. Not selected when unset.
+ */
+export function shouldUsePublicFirestoreDataAccess(
+  environment: EnvironmentLike = process.env,
+): boolean {
+  if (
+    environment.PUBLIC_READ_API_DISABLED === '1' ||
+    environment.PUBLIC_READ_API_DISABLED === 'true'
+  ) {
+    return false;
+  }
+  if (
+    environment.PUBLIC_DATA_SOURCE === 'fixtures' ||
+    environment.PUBLIC_DATA_SOURCE === 'seed' ||
+    environment.PUBLIC_DATA_SOURCE === 'postgres'
+  ) {
+    return false;
+  }
+  if (resolvePublicDataSource(environment) !== 'firestore') {
     return false;
   }
   if (hasEmulatorSignals(environment)) {
@@ -60,4 +98,12 @@ export function shouldUsePublicFirestoreDataAccess(
   }
 
   return true;
+}
+
+/** @deprecated Prefer `shouldUsePublicPostgresDataAccess` for new deployments. */
+export function shouldUsePublicLiveDataAccess(environment: EnvironmentLike = process.env): boolean {
+  return (
+    shouldUsePublicPostgresDataAccess(environment) ||
+    shouldUsePublicFirestoreDataAccess(environment)
+  );
 }
