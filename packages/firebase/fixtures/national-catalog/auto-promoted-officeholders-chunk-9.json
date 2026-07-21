@@ -397,6 +397,180 @@
     "historicalContext": "Lewis’s service occurred during Reconstruction, when constitutional amendments and federal oversight enabled formerly enslaved men to vote and hold office. His tenure reflects the brief expansion of Black political power in the South, which was later dismantled by segregation laws, voter suppression, and racial violence after federal troops withdrew in 1877."
   },
   {
+    "id": "recon_sheppard_mullens",
+    "kind": "person",
+    "displayName": "Sheppard Mullens",
+    "summary": "Sheppard Mullens served in the Texas House of Representatives and as a McLennan County commissioner during Reconstruction, part of a generation of Black officials elected after federal enforcement enabled Black male suffrage. His tenure reflects the brief expansion of political power for African Americans in the postwar South before Jim Crow restrictions.",
+    "eraBuckets": [
+      "1860s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "firsts",
+      "politics",
+      "government"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "firsts",
+      "politics",
+      "government"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Texas House of Representatives",
+      "McLennan County",
+      "constitutional convention",
+      "Black legislator"
+    ],
+    "jurisdictionLabel": "Waco, Texas",
+    "locationPrecision": "cemetery",
+    "locationLabel": "First Street Cemetery",
+    "lat": 29.76527778,
+    "lng": -95.38583333,
+    "claims": [
+      {
+        "predicate": "served_as",
+        "object": "delegate to the Texas Constitutional Convention of 1868",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Sheppard_Mullens",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served_in",
+        "object": "Texas House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Sheppard_Mullens",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "appointed_to",
+        "object": "McLennan County commissioner",
+        "confidenceLevel": "high",
+        "citationSource": "other",
+        "citationHref": "https://lrl.texas.gov/mobile/memberDisplay.cfm?memberID=4453",
+        "citationLabel": "https://lrl.texas.gov/mobile/memberDisplay.cfm?memberID=4453"
+      },
+      {
+        "predicate": "buried_at",
+        "object": "First Street Cemetery, Waco",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Sheppard_Mullens",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "married",
+        "object": "Sallie Downs",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Sheppard_Mullens",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "appointed_by",
+        "object": "Joseph J. Reynolds",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Sheppard_Mullens",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Mullens' appointments and election occurred under the 1867 Reconstruction Acts, which required Southern states to enfranchise Black men and ratify new constitutions. As a delegate to Texas' 1868 Constitutional Convention and later legislator, he participated in a transformative but short-lived era of biracial democracy enforced by federal authority."
+  },
+  {
+    "id": "recon_alonzo_sledge",
+    "kind": "person",
+    "displayName": "Alonzo Sledge",
+    "summary": "Alonzo Sledge served as a Republican member of the Texas House of Representatives from 1879 to 1881, representing Washington and Burleson counties during the Reconstruction era. As one of the African American legislators elected in the post-Civil War period, his service reflects the brief expansion of Black political power in the South before the rise of Jim Crow laws restricted it.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "self-governance"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "self-governance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Texas House of Representatives",
+      "Black legislator",
+      "Republican",
+      "1879"
+    ],
+    "jurisdictionLabel": "Chappell Hill, Texas",
+    "locationPrecision": "city",
+    "locationLabel": "Residence and political base of Alonzo Sledge",
+    "lat": 38.8898,
+    "lng": -77.0101,
+    "claims": [
+      {
+        "predicate": "served as member of",
+        "object": "Texas House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Alonzo_Sledge",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "represented",
+        "object": "Washington and Burleson counties, Texas",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Alonzo_Sledge",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served during",
+        "object": "1879–1881",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Alonzo_Sledge",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was political party",
+        "object": "Republican",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Alonzo_Sledge",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is commemorated by",
+        "object": "monument to 19th-century African American legislators in Texas",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Alonzo_Sledge",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was part of",
+        "object": "Reconstruction-era Black political leadership in Texas",
+        "confidenceLevel": "high",
+        "citationSource": "other",
+        "citationHref": "https://lrl.texas.gov/legeleaders/members/memberdisplay.cfm?memberID=4359",
+        "citationLabel": "https://lrl.texas.gov/legeleaders/members/memberdisplay.cfm?memberID=4359"
+      }
+    ],
+    "historicalContext": "During Reconstruction, newly enfranchised African American men in Texas and across the South gained access to political office, often as Republicans. Sledge’s election was part of this transformative moment, when Black legislators helped shape state policies despite facing increasing opposition and violence. His tenure ended as white Democrats regained control and began enacting laws to disenfranchise Black voters and exclude them from office."
+  },
+  {
     "id": "recon_henry_sneed",
     "kind": "person",
     "displayName": "Henry Sneed",

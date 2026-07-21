@@ -360,5 +360,89 @@
       }
     ],
     "historicalContext": "Hayne’s political and educational breakthroughs occurred during Reconstruction, when federal enforcement enabled Black suffrage and officeholding in the South. His enrollment at the University of South Carolina tested the 1868 state constitution’s integration mandate, directly challenging Jim Crow’s precursors. The university’s subsequent closure and resegregation in 1877 exemplify the violent rollback of Black civil rights after federal withdrawal."
+  },
+  {
+    "id": "recon_richard_theodore_greener",
+    "kind": "person",
+    "displayName": "Richard Theodore Greener",
+    "summary": "Richard Theodore Greener was the first Black graduate of Harvard College in 1870, later becoming a professor at the University of South Carolina during Reconstruction and dean of Howard Law School. He broke barriers as the first Black American diplomat to a white-majority country, serving in Vladivostok, Russia. His career spanned education, law, and international diplomacy during a…",
+    "eraBuckets": [
+      "1870s",
+      "1880s",
+      "1890s",
+      "1900s"
+    ],
+    "topicTags": [
+      "education",
+      "firsts",
+      "reconstruction",
+      "diplomacy",
+      "hbcu",
+      "civil-rights"
+    ],
+    "topicIds": [
+      "education",
+      "firsts",
+      "reconstruction",
+      "diplomacy",
+      "hbcu",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "first Black Harvard graduate",
+      "Howard Law dean",
+      "Black diplomat",
+      "University of South Carolina professor",
+      "Reconstruction-era scholar"
+    ],
+    "jurisdictionLabel": "Columbia, South Carolina",
+    "locationPrecision": "campus",
+    "locationLabel": "University of South Carolina campus",
+    "lat": 33.49722222,
+    "lng": -80.85,
+    "claims": [
+      {
+        "predicate": "was first Black graduate of",
+        "object": "Harvard College",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Richard_Theodore_Greener",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served as first Black professor at",
+        "object": "University of South Carolina",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Richard_Theodore_Greener",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was dean of",
+        "object": "Howard Law School",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Richard_Theodore_Greener",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was first Black American diplomat to a white-majority country",
+        "object": "Vladivostok, Russia",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Richard_Theodore_Greener",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was honored by",
+        "object": "101st Illinois General Assembly",
+        "confidenceLevel": "medium",
+        "citationSource": "other",
+        "citationHref": "https://ilga.gov/legislation/BillStatus.asp?GA=101&amp;DocTypeID=HR&amp;DocNum=638&amp;GAID=15&amp;SessionID=108&amp;LegID=122667",
+        "citationLabel": "https://ilga.gov/legislation/BillStatus.asp?GA=101&amp;DocTypeID=HR&amp;DocNum=638&amp;GAID=15&amp;SessionID=108&amp;LegID=122667"
+      }
+    ],
+    "historicalContext": "Greener’s achievements unfolded during Reconstruction, a period of expanded political and educational opportunities for African Americans. His appointments at the University of South Carolina and Howard University occurred amid efforts to integrate public institutions, while his diplomatic service challenged racial limits in federal appointments. His life reflects both the possibilities and constraints of Black advancement in the post-Civil War United States."
   }
 ]

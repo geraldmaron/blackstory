@@ -88,6 +88,102 @@
     "historicalContext": "The Holmes v. Ford case occurred during a period when Oregon Territory was officially free under the Northwest Ordinance, yet slavery persisted through informal arrangements. The ruling reinforced federal anti-slavery provisions in territories and reflected broader national tensions over slavery's expansion, contributing to the legal and moral resistance that preceded the Civil War."
   },
   {
+    "id": "west_oregon_black_exclusion_laws_q39086930",
+    "kind": "person",
+    "displayName": "Oregon black exclusion laws",
+    "summary": "Oregon's black exclusion laws, enacted between 1844 and 1857, barred African Americans from settling in the territory and later state, prescribing punishments including flogging. Though slavery was banned, free Black residents faced expulsion, and the 1857 constitution enshrined racial exclusion.",
+    "eraBuckets": [
+      "1840s",
+      "1850s",
+      "1860s",
+      "1920s"
+    ],
+    "topicTags": [
+      "segregation",
+      "black-codes",
+      "citizenship",
+      "land-ownership",
+      "migration",
+      "constitutional-law",
+      "firsts",
+      "resistance"
+    ],
+    "topicIds": [
+      "segregation",
+      "black-codes",
+      "citizenship",
+      "land-ownership",
+      "migration",
+      "constitutional-law",
+      "firsts",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "black exclusion laws",
+      "Oregon Constitution",
+      "racial ban",
+      "anti-black legislation",
+      "free state exclusion"
+    ],
+    "jurisdictionLabel": "Oregon",
+    "locationPrecision": "institution",
+    "locationLabel": "Oregon State Capitol",
+    "lat": 44.93847,
+    "lng": -123.03044,
+    "claims": [
+      {
+        "predicate": "enacted first black exclusion law",
+        "object": "1844",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Oregon_black_exclusion_laws",
+        "citationLabel": "Wikipedia - Oregon black exclusion laws"
+      },
+      {
+        "predicate": "authorized corporal punishment of Black settlers",
+        "object": "whipping with 20–39 stripes every six months",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Oregon_black_exclusion_laws",
+        "citationLabel": "Wikipedia - Oregon black exclusion laws"
+      },
+      {
+        "predicate": "included exclusion clause in state constitution",
+        "object": "1857 Oregon Constitution",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Oregon_black_exclusion_laws",
+        "citationLabel": "Wikipedia - Oregon black exclusion laws"
+      },
+      {
+        "predicate": "justified exclusion as preventing Black-Native alliances",
+        "object": "fear of Black people instigating Native American uprisings",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Oregon_black_exclusion_laws",
+        "citationLabel": "Wikipedia - Oregon black exclusion laws"
+      },
+      {
+        "predicate": "resulted in fewer than 50 Black residents in 1850",
+        "object": "1850 census data for Oregon",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Oregon_black_exclusion_laws",
+        "citationLabel": "Wikipedia - Oregon black exclusion laws"
+      },
+      {
+        "predicate": "repealed final exclusion law",
+        "object": "1926",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Oregon_black_exclusion_laws",
+        "citationLabel": "Wikipedia - Oregon black exclusion laws"
+      }
+    ],
+    "historicalContext": "These exclusion laws emerged in a settler society that rejected slavery but sought to exclude free Black people, reflecting a deliberate effort to construct a white-majority polity in the West. They were part of a national pattern of racial exclusion laws, yet Oregon was unique in embedding such a clause in its state constitution upon admission to the Union as a free state, demonstrating how anti-Blackness operated independently of slavery."
+  },
+  {
     "id": "west_black_panther_park_q139553357",
     "kind": "person",
     "displayName": "Black Panther Park",

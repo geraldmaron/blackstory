@@ -1,5 +1,92 @@
 [
   {
+    "id": "recon_ruben_b_white",
+    "kind": "person",
+    "displayName": "Ruben B. White",
+    "summary": "Ruben B. White served as a Republican state senator representing Pulaski and White counties in Arkansas during 1873–1874, part of a wave of Black political leadership during Reconstruction. He was a pastor and had mixed ancestry, continuing a family legacy of public service alongside his brother James T. White.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "grassroots-leadership"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "grassroots-leadership"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Arkansas Senate",
+      "Black legislator",
+      "Republican",
+      "Pulaski County"
+    ],
+    "jurisdictionLabel": "Arkansas State Capitol",
+    "locationPrecision": "institution",
+    "locationLabel": "Arkansas State Capitol",
+    "lat": 34.74666667,
+    "lng": -92.28916667,
+    "claims": [
+      {
+        "predicate": "served as",
+        "object": "Arkansas State Senator",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Ruben_B._White",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "represented",
+        "object": "Pulaski and White counties",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Ruben_B._White",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served during",
+        "object": "1873–1874",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Ruben_B._White",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was member of",
+        "object": "Republican Party",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Ruben_B._White",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was brother of",
+        "object": "James T. White",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Ruben_B._White",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was part of",
+        "object": "Reconstruction-era Black political leadership in Arkansas",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Ruben_B._White",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "During Reconstruction, newly enfranchised African Americans in Arkansas won seats in the state legislature, challenging white supremacist governance. White's election reflects federal enforcement of civil rights after the Civil War, before the rise of Jim Crow laws dismantled Black political power by the 1890s."
+  },
+  {
     "id": "recon_john_c_rollins",
     "kind": "person",
     "displayName": "John C. Rollins",

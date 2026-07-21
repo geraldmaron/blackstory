@@ -147,7 +147,7 @@
         "citationLabel": "Wikipedia: Henning, Tennessee"
       }
     ],
-    "historicalContext": "Lynchings like Gause\u2019s were tools of racial control in the post-Reconstruction South, often justified by accusations of crimes but rooted in white supremacy. Henning, located in a region with a history of racial violence, exemplifies how local communities enforced racial hierarchies through extralegal violence."
+    "historicalContext": "Lynchings like Gause’s were tools of racial control in the post-Reconstruction South, often justified by accusations of crimes but rooted in white supremacy. Henning, located in a region with a history of racial violence, exemplifies how local communities enforced racial hierarchies through extralegal violence."
   },
   {
     "id": "lynching_curtis_and_burley_garfield_brown_newbern_tennessee",
@@ -230,13 +230,13 @@
         "citationLabel": "Wikipedia - Newbern, Tennessee"
       }
     ],
-    "historicalContext": "Lynching was a tool of racial control during the Jim Crow era, used to enforce white supremacy and suppress Black autonomy. The public nature of the Brown brothers' lynching\u2014conducted in view of the town depot\u2014reflects the normalization of racial terror, while community efforts to stop it suggest contested local responses to such violence."
+    "historicalContext": "Lynching was a tool of racial control during the Jim Crow era, used to enforce white supremacy and suppress Black autonomy. The public nature of the Brown brothers' lynching—conducted in view of the town depot—reflects the normalization of racial terror, while community efforts to stop it suggest contested local responses to such violence."
   },
   {
     "id": "lynching_james_dillard_sullivan_indiana",
     "kind": "person",
     "displayName": "James Dillard",
-    "summary": "James Dillard, a young Black man from Indianapolis, was lynched by a mob near Oaktown, Indiana, on November 20, 1902, after being accused of assaulting two white women. Despite invocation of Indiana's 1899 anti-lynching law, local authorities failed to protect him, and the sheriff was later removed\u2014though reinstated after legal challenges\u2014highlighting systemic failures in upholding due process.",
+    "summary": "James Dillard, a young Black man from Indianapolis, was lynched by a mob near Oaktown, Indiana, on November 20, 1902, after being accused of assaulting two white women. Despite invocation of Indiana's 1899 anti-lynching law, local authorities failed to protect him, and the sheriff was later removed—though reinstated after legal challenges—highlighting systemic failures in upholding due process.",
     "eraBuckets": [
       "1900s"
     ],
@@ -315,7 +315,7 @@
         "citationLabel": "Wikipedia"
       }
     ],
-    "historicalContext": "The lynching occurred amid widespread racial terror in the U.S. and tested Indiana\u2019s 1899 anti-lynching law, which mandated militia intervention to protect prisoners. Governor Winfield Durbin\u2019s removal of Sheriff John S. Dudley after the lynching marked a rare enforcement attempt, but Dudley\u2019s reinstatement revealed the law\u2019s ineffectiveness in practice, reflecting broader national patterns of state complicity in racial violence."
+    "historicalContext": "The lynching occurred amid widespread racial terror in the U.S. and tested Indiana’s 1899 anti-lynching law, which mandated militia intervention to protect prisoners. Governor Winfield Durbin’s removal of Sheriff John S. Dudley after the lynching marked a rare enforcement attempt, but Dudley’s reinstatement revealed the law’s ineffectiveness in practice, reflecting broader national patterns of state complicity in racial violence."
   },
   {
     "id": "lynching_jennie_steers_rural_area_near_shreveport_louisiana",
@@ -398,7 +398,7 @@
         "citationLabel": "Wikipedia: Caddo Parish, Louisiana"
       }
     ],
-    "historicalContext": "Caddo Parish, like much of the post-Reconstruction South, experienced widespread racial violence aimed at maintaining white supremacy. Between 1877 and the early 20th century, 48 African Americans were lynched there\u2014second highest in Louisiana\u2014reflecting systemic use of terror to suppress Black communities and enforce racial hierarchies."
+    "historicalContext": "Caddo Parish, like much of the post-Reconstruction South, experienced widespread racial violence aimed at maintaining white supremacy. Between 1877 and the early 20th century, 48 African Americans were lynched there—second highest in Louisiana—reflecting systemic use of terror to suppress Black communities and enforce racial hierarchies."
   },
   {
     "id": "lynching_fred_coker_springfield_missouri",
@@ -707,56 +707,5 @@
       }
     ],
     "historicalContext": "Lynching was a tool of racial terror used to enforce white supremacy, particularly in Southern and border states like Arkansas. The failure to convict perpetrators, even amid official misconduct, illustrates the complicity of law enforcement and the judiciary in upholding racial hierarchies during the Jim Crow era."
-  },
-  {
-    "id": "lynching_slab_pitts_toyah_texas",
-    "kind": "person",
-    "displayName": "Slab Pitts",
-    "summary": "Slab Pitts was lynched on October 26, 1906, in Toyah, Texas, after being accused of living with a white woman. He was dragged to death and subsequently hanged, reflecting the violent enforcement of racial boundaries during the Jim Crow era in rural Texas.",
-    "eraBuckets": [
-      "1900s"
-    ],
-    "topicTags": [
-      "jim-crow",
-      "civil-rights",
-      "resistance"
-    ],
-    "topicIds": [
-      "jim-crow",
-      "civil-rights",
-      "resistance"
-    ],
-    "mentionedEntityIds": [],
-    "keywords": [
-      "lynching",
-      "Toyah Texas",
-      "Reeves County",
-      "racial terror",
-      "Jim Crow"
-    ],
-    "jurisdictionLabel": "Toyah, Texas",
-    "locationPrecision": "city",
-    "locationLabel": "Site of lynching",
-    "lat": 31.31333333,
-    "lng": -103.79305556,
-    "claims": [
-      {
-        "predicate": "was lynched",
-        "object": "on October 26, 1906, in Toyah, Texas, following an accusation of living with a white woman",
-        "confidenceLevel": "high",
-        "citationSource": "wikipedia_api",
-        "citationHref": "https://en.wikipedia.org/wiki/List_of_lynching_victims_in_the_United_States",
-        "citationLabel": "List of lynching victims in the United States (Wikipedia)"
-      },
-      {
-        "predicate": "died by racial violence",
-        "object": "after being dragged to death and hanged in Reeves County, Texas",
-        "confidenceLevel": "high",
-        "citationSource": "wikipedia_api",
-        "citationHref": "https://en.wikipedia.org/wiki/List_of_lynching_victims_in_the_United_States",
-        "citationLabel": "List of lynching victims in the United States (Wikipedia)"
-      }
-    ],
-    "historicalContext": "Pitts' lynching occurred during the Nadir of American race relations, a period marked by widespread anti-Black violence and the codification of racial segregation. Lynchings like his were acts of racial terror used to enforce white supremacy, particularly in response to perceived violations of racial and social boundaries, such as interracial relationships."
   }
 ]
