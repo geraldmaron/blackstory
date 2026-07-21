@@ -3,8 +3,8 @@
  * Stories / entity density — not a sparse reference wireframe.
  */
 import Link from 'next/link';
-import { bannedBookToSuggestCorpusItem } from '../../lib/banned-books/suggest-books';
-import { loadBannedBooksListing } from '../../lib/banned-books/public-source';
+import { bannedBookToSuggestCorpusItem } from '../../lib/banned-books/suggest-books.js';
+import { loadBannedBooksListing } from '../../lib/banned-books/public-source.js';
 import { buildBooksBrowseViewModel, type RawBooksBrowseParams } from './books-view-model';
 import { BooksBrowseSections } from './BooksBrowseSections';
 

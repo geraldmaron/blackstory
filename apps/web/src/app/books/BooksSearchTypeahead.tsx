@@ -8,11 +8,11 @@ import React, { useCallback } from 'react';
 import {
   suggestBannedBooks,
   type BannedBookSuggestCorpusItem,
-} from '../../lib/banned-books/suggest-books';
+} from '../../lib/banned-books/suggest-books.js';
 import {
   TypeaheadCombobox,
   type TypeaheadSuggestion,
-} from '../../components/typeahead/TypeaheadCombobox';
+} from '../../components/typeahead/TypeaheadCombobox.js';
 
 export type BooksSearchTypeaheadProps = {
   readonly defaultValue: string;

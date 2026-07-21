@@ -4,9 +4,9 @@
 import React from 'react';
 import Link from 'next/link';
 import { EmptyState } from '@repo/ui';
-import type { BannedBookSuggestCorpusItem } from '../../lib/banned-books/suggest-books';
-import type { BooksBrowseItem, BooksBrowseViewModel } from './books-view-model';
-import { BooksSearchTypeahead } from './BooksSearchTypeahead';
+import type { BannedBookSuggestCorpusItem } from '../../lib/banned-books/suggest-books.js';
+import type { BooksBrowseItem, BooksBrowseViewModel } from './books-view-model.js';
+import { BooksSearchTypeahead } from './BooksSearchTypeahead.js';
 import '../typeahead.css';
 import './books.css';
 

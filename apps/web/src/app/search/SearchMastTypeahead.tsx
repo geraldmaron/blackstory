@@ -6,11 +6,11 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import { getRequestIntegrityHeaders } from '../../lib/request-integrity/client';
+import { getRequestIntegrityHeaders } from '../../lib/request-integrity/client.js';
 import {
   TypeaheadCombobox,
   type TypeaheadSuggestion,
-} from '../../components/typeahead/TypeaheadCombobox';
+} from '../../components/typeahead/TypeaheadCombobox.js';
 
 type SuggestApiRow = {
   readonly id: string;

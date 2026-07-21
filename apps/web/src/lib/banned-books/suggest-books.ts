@@ -3,7 +3,7 @@
  * corpus (seed or materialized snapshot) — no network.
  */
 import type { BannedBookRecord } from '@repo/domain';
-import { typeaheadMatchTier } from '../typeahead/match';
+import { typeaheadMatchTier } from '../typeahead/match.js';
 
 export type BannedBookSuggestion = {
   readonly id: string;

@@ -158,19 +158,25 @@
 @media (max-width: 64rem) {
   .ds-map-surface:has(.ds-explore-stage) {
     --ds-explore-results-width: min(22.5rem, 92%);
+    /* Zoom stays bottom-right; restore chips stay bottom-left — never share a corner. */
+    --ds-explore-zoom-right: var(--ds-explore-edge);
   }
 
-  /* Records become a bottom sheet — park zoom above it, not beside a right rail. */
+  /* Records sheet open — lift zoom above the sheet. */
   .ds-map-surface:has(.ds-explore-stage[data-results='open']) {
-    --ds-explore-zoom-right: var(--ds-explore-edge);
     --ds-explore-zoom-bottom: calc(min(42vh, 22rem) + var(--ds-explore-edge) + var(--ds-space-2));
   }
 
-  .ds-map-surface:has(.ds-explore-stage[data-instruments='open']) {
-    --ds-explore-zoom-right: calc(
-      var(--ds-explore-edge) + var(--ds-explore-restore-chip-width) + var(--ds-space-2)
-    );
+  /* Records chip (and/or Filters/Key chips) visible — lift zoom above the dock row. */
+  .ds-map-surface:has(.ds-explore-stage[data-results='closed']) {
     --ds-explore-zoom-bottom: calc(2.75rem + var(--ds-explore-edge) + var(--ds-space-2));
+  }
+
+  /* Filters + Color key + Records can wrap to two rows when the chassis is closed. */
+  .ds-map-surface:has(.ds-explore-stage[data-instruments='closed'][data-results='closed']) {
+    --ds-explore-zoom-bottom: calc(
+      (2.75rem * 2) + var(--ds-space-2) + var(--ds-explore-edge) + var(--ds-space-2)
+    );
   }
 
   .ds-map-surface:has(.ds-explore-stage[data-instruments='open'][data-results='open']) {
@@ -1077,12 +1083,18 @@
 }
 
 @media (max-width: 64rem) {
-  .ds-explore-stage__instruments,
-  .ds-explore-stage__results {
-    max-height: min(42vh, 22rem);
+  /*
+   * Instruments stay top-left (not a bottom sheet) — use the vertical room down to the
+   * restore dock. Only the records rail becomes a short bottom sheet.
+   */
+  .ds-explore-stage__instruments {
+    max-height: calc(
+      100svh - var(--ds-island-clearance) - var(--ds-explore-edge) - 3.5rem - var(--ds-space-3)
+    );
   }
 
   .ds-explore-stage__results {
+    max-height: min(42vh, 22rem);
     top: auto;
     bottom: var(--ds-explore-edge);
     right: var(--ds-explore-edge);
@@ -1097,9 +1109,14 @@
     top: auto;
     bottom: var(--ds-explore-edge);
     left: var(--ds-explore-edge);
-    right: var(--ds-explore-edge);
-    max-width: none;
+    right: auto;
+    max-width: calc(100% - var(--ds-explore-edge) * 2 - 3.5rem);
     justify-content: flex-start;
+  }
+
+  /* Never send Records to the zoom corner (margin-left: auto is for desktop top-right). */
+  .ds-explore-stage__restore-dock .ds-explore-stage__panel-restore--results {
+    margin-left: 0;
   }
 
   /* Keep restore chips above an open records sheet. */
