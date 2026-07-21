@@ -388,8 +388,13 @@ async function loadLiveEntity(entityId: string): Promise<PublicEntityView | unde
     );
     const catalog = [entity, ...oneHopViews, ...twoHopViews];
     return hydrateEntityLearningLinks(entity, catalog);
-  } catch {
-    return hydrateEntityLearningLinks(entity, [...listPublicEntities(), entity]);
+  } catch (error) {
+    // Never mix Dunbar seed neighbors into a live entity — hydrate with the entity alone.
+    const message = error instanceof Error ? error.message : String(error);
+    console.warn(
+      `[public-data] neighbor batch failed for ${entityId}; hydrating without seed catalog: ${message}`,
+    );
+    return hydrateEntityLearningLinks(entity, [entity]);
   }
 }
 
@@ -408,7 +413,10 @@ async function loadLiveEntitiesByIdsThin(
   return projections.map((item) => mapProjectionToPublicEntityView(item as PublicProjectionInput));
 }
 
-/** Resolve one entity: live projection first, then bundled seed snapshot.  */
+/**
+ * Resolve one entity: live projection first. Seed snapshot only when not in postgres SoR
+ * mode (see `resolvePublicEntity`); postgres misses return not-found rather than Dunbar.
+ */
 export const resolvePublicEntityView = cache(async function resolvePublicEntityView(
   entityId: string,
 ): Promise<PublicReadResult<PublicEntityView>> {
