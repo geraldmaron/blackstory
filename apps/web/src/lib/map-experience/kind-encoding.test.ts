@@ -17,6 +17,7 @@ import {
   isKnownMapKind,
   kindEncodingFor,
   mapToneFromTopics,
+  resolveMapTone,
   type MapEntityGlyph,
   type MapKind,
 } from './kind-encoding';
@@ -120,6 +121,33 @@ test('mapToneFromTopics derives massacre, plantation, and epicenter tones', () =
   assert.equal(mapToneFromTopics(['plantation-economy']), 'plantation');
   assert.equal(mapToneFromTopics(['black-wall-street']), 'epicenter');
   assert.equal(mapToneFromTopics(['schools']), undefined);
+});
+
+test('resolveMapTone prefers topics then careful display-name cues', () => {
+  assert.equal(
+    resolveMapTone({ topicTags: ['education'], displayName: 'Orangeburg Massacre' }),
+    'massacre',
+  );
+  assert.equal(
+    resolveMapTone({ topicIds: ['museum'], displayName: 'Whitney Plantation' }),
+    'plantation',
+  );
+  assert.equal(
+    resolveMapTone({ topicTags: [], displayName: 'Greenwood District' }),
+    'epicenter',
+  );
+  assert.equal(
+    resolveMapTone({
+      topicTags: ['civil-rights'],
+      displayName: 'Billie Holiday',
+    }),
+    undefined,
+    'summary-like name cues must not invent tones from unrelated titles',
+  );
+  assert.equal(
+    resolveMapTone({ topicTags: ['plantation-economy'], displayName: 'Some Place' }),
+    'plantation',
+  );
 });
 
 test('displayEncodingFor prefers semantic tone shade while keeping kind glyph', () => {

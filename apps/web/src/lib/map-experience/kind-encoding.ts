@@ -124,8 +124,44 @@ export function mapToneFromTopics(topicTags: readonly string[]): MapSemanticTone
         tag.includes('epicenter') ||
         tag.includes('black-wall-street') ||
         tag.includes('black wall street') ||
-        tag.includes('wall street'),
+        tag.includes('bronzeville') ||
+        // "wall street" alone is too broad (NYC finance); require black-wall-street style tags.
+        tag.includes('greenwood-district'),
     )
+  ) {
+    return 'epicenter';
+  }
+  return undefined;
+}
+
+/** Inputs for tone resolution — topics first, then careful title cues (never summary prose). */
+export type MapToneSource = {
+  readonly topicTags?: readonly string[];
+  readonly topicIds?: readonly string[];
+  readonly displayName?: string;
+};
+
+/**
+ * Resolves the semantic tone the Color key teaches. Prefers controlled topic ids/tags;
+ * falls back to display-name word/phrase matches so titled massacres, plantations, and
+ * named epicenters paint and filter even when topic tags omit those substrings.
+ */
+export function resolveMapTone(source: MapToneSource): MapSemanticTone | undefined {
+  const fromTopics = mapToneFromTopics([
+    ...(source.topicTags ?? []),
+    ...(source.topicIds ?? []),
+  ]);
+  if (fromTopics) return fromTopics;
+
+  const name = (source.displayName ?? '').trim();
+  if (!name) return undefined;
+
+  if (/\b(massacre|pogrom|atrocity)\b/i.test(name)) return 'massacre';
+  if (/\bplantation\b/i.test(name)) return 'plantation';
+  if (
+    /\bblack\s+wall\s+street\b/i.test(name) ||
+    /\bgreenwood\s+district\b/i.test(name) ||
+    /\bbronzeville\b/i.test(name)
   ) {
     return 'epicenter';
   }

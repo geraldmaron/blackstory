@@ -37,6 +37,27 @@ test('feature shade/glyph match displayEncodingFor (same encoding KindBadge uses
   }
 });
 
+test('display-name cues set mapTone so Color-key tones paint and filter on titled records', () => {
+  const base = listPublicEntities()[0]!;
+  const plantationPlace: PublicEntityView = {
+    ...base,
+    id: 'ent_test_whitney_plantation',
+    kind: 'place',
+    displayName: 'Whitney Plantation',
+    topicTags: ['museum', 'enslavement'],
+  };
+  const source = buildExploreMapSource([plantationPlace], {
+    geoAnchorFor: (id) =>
+      id === plantationPlace.id
+        ? { lat: 30.0, lng: -90.6, geohash: 'djre', matchMethod: 'geocode_other' }
+        : geoAnchorFor(id),
+  });
+  assert.equal(source.featureCollection.features.length, 1);
+  assert.equal(source.featureCollection.features[0]!.properties.mapTone, 'plantation');
+  const expected = displayEncodingFor('place', 'plantation');
+  assert.equal(source.featureCollection.features[0]!.properties.shade, expected.shade);
+});
+
 test('an entity with no resolvable geo anchor is excluded from the map, not guessed at', () => {
   const entities = listPublicEntities();
   const source = buildExploreMapSource(entities, { geoAnchorFor: () => undefined });

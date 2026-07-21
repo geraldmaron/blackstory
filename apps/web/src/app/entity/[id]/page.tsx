@@ -122,7 +122,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
   const entityLinkCatalog = entityLinkCatalogFromNeighbors(entity);
   const continueLearning = entity.continueLearning ?? [];
   const exploreHref = buildExploreHref({
-    filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+    filters: { era: 'all', kind: 'all', tone: 'all', theme: 'all', status: 'all', confidence: 'all' },
     ...defaultExploreOverlayState(),
     selected: entity.id,
     ...(geoAnchor ? { viewport: { lat: geoAnchor.lat, lng: geoAnchor.lng, zoom: 11 } } : {}),

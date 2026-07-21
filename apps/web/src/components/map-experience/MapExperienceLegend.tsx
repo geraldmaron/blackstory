@@ -361,10 +361,11 @@ export function MapExperienceLegend(props: MapExperienceLegendProps = {}) {
               Historical tones
             </h3>
             <p className="ds-explore-legend__note">
-              When topic tags identify a massacre, plantation, or Black epicenter (for example
-              Tulsa&rsquo;s Greenwood / Black Wall Street), the marker shade follows that tone while
-              keeping the record&rsquo;s kind shape. Tones are vocabulary the map can paint; a tone
-              may be rare or absent in the current catalog until matching topics are present.
+              When topic tags or the record title identify a massacre, plantation, or Black
+              epicenter (for example Tulsa&rsquo;s Greenwood / Black Wall Street), the marker shade
+              follows that tone while keeping the record&rsquo;s kind shape. Use the Tone filter to
+              show only those records. A tone may be rare in the current catalog until matching
+              titles or topics are present.
             </p>
             <ul className="ds-explore-legend__kind-list">
               {SEMANTIC_TONE_ENTRIES.map(([tone, entry]) => (

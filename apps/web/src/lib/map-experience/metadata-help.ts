@@ -5,10 +5,19 @@
  */
 
 export type MetaFieldKey =
-  'kind' | 'era' | 'theme' | 'confidence' | 'evidence' | 'where' | 'status';
+  | 'kind'
+  | 'tone'
+  | 'era'
+  | 'theme'
+  | 'confidence'
+  | 'evidence'
+  | 'where'
+  | 'status';
 
 const FIELD_HELP: Readonly<Record<MetaFieldKey, string>> = {
   kind: 'What kind of record this is — person, place, school, event, institution, and related types.',
+  tone:
+    'Historical tone from the Color key — massacre or atrocity, plantation, or Black epicenter. Shade only; the kind shape stays the same.',
   era: 'The time period most associated with this record.',
   theme: 'A historical theme tag used to narrow the map (for example education or civil rights).',
   confidence:

@@ -25,7 +25,7 @@ test('exploreHrefForState normalizes postal code and includes state (camera from
   const parsed = parseExploreHref(href);
   assert.equal(parsed.state, 'TX');
   assert.equal(parsed.viewport, undefined);
-  assert.deepEqual(parsed.filters, { era: 'all', kind: 'all', theme: 'all', confidence: 'all' });
+  assert.deepEqual(parsed.filters, { era: 'all', kind: 'all', tone: 'all', theme: 'all', status: 'all', confidence: 'all' });
   assert.equal(parsed.showFilters, false);
   assert.equal(parsed.showResults, false);
   assert.equal(parsed.showKey, false);

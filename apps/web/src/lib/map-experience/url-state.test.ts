@@ -14,7 +14,7 @@ import {
 
 test('an empty query string parses to the "all" default filter state with no viewport/selection', () => {
   const parsed = parseExploreSearchParams({});
-  assert.deepEqual(parsed.filters, { era: 'all', kind: 'all', theme: 'all', confidence: 'all' });
+  assert.deepEqual(parsed.filters, { era: 'all', kind: 'all', tone: 'all', theme: 'all', status: 'all', confidence: 'all' });
   assert.equal(parsed.viewport, undefined);
   assert.equal(parsed.selected, undefined);
   assert.equal(parsed.layerMode, 'presence');
@@ -29,7 +29,7 @@ test('an empty query string parses to the "all" default filter state with no vie
 
 test('round-trips a full view state through build -> parse', () => {
   const state = {
-    filters: { era: '1970s', kind: 'school', theme: 'education', confidence: 'high' },
+    filters: { era: '1970s', kind: 'school', tone: 'all', theme: 'education', status: 'all', confidence: 'high' },
     viewport: { lat: 38.9072, lng: -77.0369, zoom: 11.5 },
     selected: 'ent_dunbar_school_001',
     state: 'DC',
@@ -70,7 +70,7 @@ test('round-trips a full view state through build -> parse', () => {
 
 test('shareable explore URLs without an intentional camera omit lat/lng/zoom', () => {
   const qs = buildExploreSearchParams({
-    filters: { era: '1970s', kind: 'all', theme: 'all', confidence: 'all' },
+    filters: { era: '1970s', kind: 'all', tone: 'all', theme: 'all', status: 'all', confidence: 'all' },
     layerMode: 'presence',
     group: false,
     lines: false,
@@ -87,7 +87,7 @@ test('shareable explore URLs without an intentional camera omit lat/lng/zoom', (
 
 test('default filter values are omitted from the query string (minimal shareable URL)', () => {
   const qs = buildExploreSearchParams({
-    filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+    filters: { era: 'all', kind: 'all', tone: 'all', theme: 'all', status: 'all', confidence: 'all' },
     layerMode: 'presence',
     group: false,
     lines: false,
@@ -101,7 +101,7 @@ test('default filter values are omitted from the query string (minimal shareable
 test('layerMode=off is emitted; presence (default) is omitted', () => {
   assert.equal(
     buildExploreSearchParams({
-      filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+      filters: { era: 'all', kind: 'all', tone: 'all', theme: 'all', status: 'all', confidence: 'all' },
       layerMode: 'off',
       group: false,
       lines: false,
@@ -113,7 +113,7 @@ test('layerMode=off is emitted; presence (default) is omitted', () => {
   );
   assert.equal(
     buildExploreSearchParams({
-      filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+      filters: { era: 'all', kind: 'all', tone: 'all', theme: 'all', status: 'all', confidence: 'all' },
       layerMode: 'presence',
       group: false,
       lines: false,
@@ -132,7 +132,7 @@ test('legacy density=1 migrates to presence on parse', () => {
 
 test('population modes round-trip decade params', () => {
   const share = {
-    filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+    filters: { era: 'all', kind: 'all', tone: 'all', theme: 'all', status: 'all', confidence: 'all' },
     layerMode: 'blackShare' as const,
     popGeo: 'county' as const,
     popDecade: '2010' as const,
@@ -150,7 +150,7 @@ test('population modes round-trip decade params', () => {
   );
 
   const change = {
-    filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+    filters: { era: 'all', kind: 'all', tone: 'all', theme: 'all', status: 'all', confidence: 'all' },
     layerMode: 'blackChange' as const,
     popGeo: 'county' as const,
     popFrom: '2000' as const,
@@ -187,7 +187,7 @@ test('state historical share coerces county geo and round-trips popGeo=state', (
   assert.equal(coerced.popDecade, '1870');
 
   const qs = buildExploreSearchParams({
-    filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+    filters: { era: 'all', kind: 'all', tone: 'all', theme: 'all', status: 'all', confidence: 'all' },
     layerMode: 'blackShare',
     popGeo: 'state',
     popDecade: '1870',
@@ -212,7 +212,7 @@ test('group=1 turns nearby-point grouping on; omitted group defaults off', () =>
 test('buildExploreSearchParams emits group=1 only when grouping is on', () => {
   assert.match(
     buildExploreSearchParams({
-      filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+      filters: { era: 'all', kind: 'all', tone: 'all', theme: 'all', status: 'all', confidence: 'all' },
       layerMode: 'presence',
       group: true,
       lines: false,
@@ -224,7 +224,7 @@ test('buildExploreSearchParams emits group=1 only when grouping is on', () => {
   );
   assert.equal(
     buildExploreSearchParams({
-      filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+      filters: { era: 'all', kind: 'all', tone: 'all', theme: 'all', status: 'all', confidence: 'all' },
       layerMode: 'presence',
       group: false,
       lines: false,
@@ -243,7 +243,7 @@ test('absent panel params default map-first (all chrome collapsed)', () => {
   assert.equal(parsed.showKey, false);
   assert.equal(
     buildExploreSearchParams({
-      filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+      filters: { era: 'all', kind: 'all', tone: 'all', theme: 'all', status: 'all', confidence: 'all' },
       layerMode: 'presence',
       group: false,
       lines: false,
@@ -257,7 +257,7 @@ test('absent panel params default map-first (all chrome collapsed)', () => {
 
 test('panels= opt-in opens listed chrome and round-trips', () => {
   const filtersOnly = {
-    filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+    filters: { era: 'all', kind: 'all', tone: 'all', theme: 'all', status: 'all', confidence: 'all' },
     layerMode: 'presence' as const,
     group: false,
     lines: false,
@@ -310,7 +310,7 @@ test('legacy hidePanels= still parses (start open, hide listed)', () => {
   assert.deepEqual(
     parseExploreSearchParams(Object.fromEntries(new URLSearchParams('hidePanels=results'))),
     {
-      filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+      filters: { era: 'all', kind: 'all', tone: 'all', theme: 'all', status: 'all', confidence: 'all' },
       layerMode: 'presence',
       group: false,
       lines: false,
@@ -371,7 +371,7 @@ test('nationalViewport centers the continental US resting frame', () => {
 
 test('round-trips radius and near place-search params', () => {
   const state = {
-    filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+    filters: { era: 'all', kind: 'all', tone: 'all', theme: 'all', status: 'all', confidence: 'all' },
     viewport: { lat: 26.7056, lng: -80.0364, zoom: 9.2 },
     radius: '10mi' as const,
     near: 'Palm Beach County, Florida',

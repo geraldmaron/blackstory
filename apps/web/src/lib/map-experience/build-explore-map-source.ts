@@ -23,7 +23,7 @@ import type { GeoPrecisionTier } from '@repo/domain/geography/display-radius';
 import type { PublicClaimView, PublicEntityView } from '../../data/public-seed';
 import { geoAnchorFor as defaultGeoAnchorFor, type EntityGeoAnchor } from './entity-geo';
 import { geoPrecisionTierForPublicPrecision, resolveDisplayRadiusMeters } from './geo-precision';
-import { displayEncodingFor, mapToneFromTopics } from './kind-encoding';
+import { displayEncodingFor, resolveMapTone } from './kind-encoding';
 
 export type ConfidenceTier = 'high' | 'medium' | 'low' | 'unrated';
 
@@ -203,7 +203,11 @@ function enrichFeature(feature: MapPointFeature, entity: PublicEntityView): Expl
       ? { statePostalCode: feature.properties.statePostalCode }
       : {}),
   });
-  const mapTone = mapToneFromTopics(entity.topicTags);
+  const mapTone = resolveMapTone({
+    topicTags: entity.topicTags,
+    ...(entity.topicIds !== undefined ? { topicIds: entity.topicIds } : {}),
+    displayName: entity.displayName,
+  });
   const encoding = displayEncodingFor(feature.properties.kind, mapTone);
 
   return {

@@ -37,6 +37,7 @@ test('off layer mode invites choosing a map data model', () => {
 test('states that color marks kind and historical tones, in words', () => {
   const html = renderToStaticMarkup(createElement(MapExperienceLegend));
   assert.match(html, /Color marks the kind of place or record/);
+  assert.match(html, /Tone filter/);
   assert.match(html, /Historical tones/);
 });
 

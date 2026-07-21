@@ -47,6 +47,14 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
                 options: view.facetOptions.kind,
               },
               {
+                id: 'explore-tone-njs',
+                name: 'tone',
+                label: 'Tone',
+                type: 'select',
+                defaultValue: view.viewState.filters.tone,
+                options: view.facetOptions.tone,
+              },
+              {
                 id: 'explore-era-njs',
                 name: 'era',
                 label: 'Era',
@@ -63,12 +71,28 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
                 options: view.facetOptions.theme,
               },
               {
+                id: 'explore-status-njs',
+                name: 'status',
+                label: 'Status',
+                type: 'select',
+                defaultValue: view.viewState.filters.status,
+                options: view.facetOptions.status,
+              },
+              {
                 id: 'explore-confidence-njs',
                 name: 'confidence',
                 label: 'Confidence',
                 type: 'select',
                 defaultValue: view.viewState.filters.confidence,
                 options: view.facetOptions.confidence,
+              },
+              {
+                id: 'explore-state-njs',
+                name: 'state',
+                label: 'Where',
+                type: 'select',
+                defaultValue: view.viewState.state ?? 'all',
+                options: view.facetOptions.state,
               },
             ]}
           />

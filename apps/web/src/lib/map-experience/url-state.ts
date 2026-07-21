@@ -223,7 +223,9 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
   const filters: ExploreFilterState = {
     era: cleanSelectParam(firstValue(raw.era)),
     kind: cleanSelectParam(firstValue(raw.kind)),
+    tone: cleanSelectParam(firstValue(raw.tone)),
     theme: cleanSelectParam(firstValue(raw.theme)),
+    status: cleanSelectParam(firstValue(raw.status)),
     confidence: cleanSelectParam(firstValue(raw.confidence)),
   };
 
@@ -316,8 +318,11 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   const params = new URLSearchParams();
   if (state.filters.era !== DEFAULT_EXPLORE_FILTERS.era) params.set('era', state.filters.era);
   if (state.filters.kind !== DEFAULT_EXPLORE_FILTERS.kind) params.set('kind', state.filters.kind);
+  if (state.filters.tone !== DEFAULT_EXPLORE_FILTERS.tone) params.set('tone', state.filters.tone);
   if (state.filters.theme !== DEFAULT_EXPLORE_FILTERS.theme)
     params.set('theme', state.filters.theme);
+  if (state.filters.status !== DEFAULT_EXPLORE_FILTERS.status)
+    params.set('status', state.filters.status);
   if (state.filters.confidence !== DEFAULT_EXPLORE_FILTERS.confidence) {
     params.set('confidence', state.filters.confidence);
   }

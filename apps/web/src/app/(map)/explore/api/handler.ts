@@ -1,9 +1,10 @@
 /**
  * Testable core of the `/explore/api` refine endpoint. Applies
  * `evaluateSearchQueryGuardrails` to the kind/era dimensions (the two filter fields that overlap
- * the allowlist), validates theme/confidence locally, then filters the bundled explore map
- * snapshot. The page itself is SSR-first this route is the progressive-enhancement seam that
- * proves App Check + guardrails on dynamic explore queries without requiring a full navigation.
+ * the search allowlist), validates theme/tone/status/confidence locally, then filters the bundled
+ * explore map snapshot. The page itself is SSR-first; this route is the progressive-enhancement
+ * seam that proves App Check + guardrails on dynamic explore queries without requiring a full
+ * navigation.
  */
 import { NextResponse } from 'next/server';
 import { evaluateSearchQueryGuardrails, type SearchQueryInput } from '@repo/security';
@@ -92,16 +93,20 @@ export function parseExploreFilterState(
 ): ExploreFilterState | { error: string } {
   const kind = cleanSelectParam(params.get('kind'));
   const era = cleanSelectParam(params.get('era'));
+  const toneRaw = cleanSelectParam(params.get('tone'));
   const themeRaw = cleanSelectParam(params.get('theme'));
+  const statusRaw = cleanSelectParam(params.get('status'));
   const confidenceRaw = cleanSelectParam(params.get('confidence'));
 
+  const tone = assertLocalFilterValue('tone', toneRaw);
   const theme = assertLocalFilterValue('theme', themeRaw);
+  const status = assertLocalFilterValue('status', statusRaw);
   const confidence = assertLocalFilterValue('confidence', confidenceRaw);
-  if (theme === null || confidence === null) {
+  if (tone === null || theme === null || status === null || confidence === null) {
     return { error: 'invalid_local_filter' };
   }
 
-  return { kind, era, theme, confidence };
+  return { kind, era, tone, theme, status, confidence };
 }
 
 export async function handleExploreRefineRequest(

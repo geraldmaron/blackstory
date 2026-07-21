@@ -74,7 +74,7 @@ function mapCtaForRelatedEntities(entities: readonly PublicEntityView[]): {
     const geoAnchor = resolveMapAnchor(entity);
     if (!geoAnchor) continue;
     const href = buildExploreHref({
-      filters: { era: 'all', kind: 'all', theme: 'all', confidence: 'all' },
+      filters: { era: 'all', kind: 'all', tone: 'all', theme: 'all', status: 'all', confidence: 'all' },
       ...defaultExploreOverlayState(),
       selected: entity.id,
       viewport: { lat: geoAnchor.lat, lng: geoAnchor.lng, zoom: 11 },

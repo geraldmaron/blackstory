@@ -273,16 +273,18 @@ function resolveNear(
   return {};
 }
 
-/** Facet render order matches how people actually narrow: what (kind) → when
- * (era) → about (theme) → how solid (confidence). One row each, auto-applying. */
+/** Facet render order matches how people narrow: what (kind/tone) → when (era) → about
+ * (theme) → lifecycle (status) → evidence strength (confidence) → where (state). */
 const FACET_ROWS: readonly {
   readonly key: keyof ExploreFilterState;
   readonly label: string;
-  readonly field: 'kind' | 'era' | 'theme' | 'confidence';
+  readonly field: 'kind' | 'tone' | 'era' | 'theme' | 'status' | 'confidence';
 }[] = [
   { key: 'kind', label: 'Kind', field: 'kind' },
+  { key: 'tone', label: 'Tone', field: 'tone' },
   { key: 'era', label: 'Era', field: 'era' },
   { key: 'theme', label: 'Theme', field: 'theme' },
+  { key: 'status', label: 'Status', field: 'status' },
   { key: 'confidence', label: 'Confidence', field: 'confidence' },
 ];
 
@@ -600,15 +602,30 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     commitViewState(
       mergeViewState(view.viewState, {
         filters: { ...DEFAULT_EXPLORE_FILTERS },
+        clearState: true,
       }),
     );
   }, [commitViewState, view.viewState]);
 
+  const handleStateFilterChange = useCallback(
+    (value: string) => {
+      if (value === 'all') {
+        commitViewState(mergeViewState(view.viewState, { clearState: true }));
+        return;
+      }
+      commitViewState(mergeViewState(view.viewState, { state: value }));
+    },
+    [commitViewState, view.viewState],
+  );
+
   const hasActiveFilters =
     view.viewState.filters.era !== DEFAULT_EXPLORE_FILTERS.era ||
     view.viewState.filters.kind !== DEFAULT_EXPLORE_FILTERS.kind ||
+    view.viewState.filters.tone !== DEFAULT_EXPLORE_FILTERS.tone ||
     view.viewState.filters.theme !== DEFAULT_EXPLORE_FILTERS.theme ||
-    view.viewState.filters.confidence !== DEFAULT_EXPLORE_FILTERS.confidence;
+    view.viewState.filters.status !== DEFAULT_EXPLORE_FILTERS.status ||
+    view.viewState.filters.confidence !== DEFAULT_EXPLORE_FILTERS.confidence ||
+    Boolean(view.viewState.state);
 
   // Deterministic reading order for the accessible list (chronological, undated
   // last). A finite place-search radius may scope the list; "All" and no place focus
@@ -1417,6 +1434,25 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
                 </select>
               </label>
             ))}
+            {view.facetOptions.state.length > 1 ? (
+              <label className="ds-pill-select ds-explore__facet" htmlFor="explore-state">
+                <MetaFieldLabel field="where" as="span" className="ds-pill-select__label">
+                  Where
+                </MetaFieldLabel>
+                <select
+                  className="ds-pill-select__control"
+                  id="explore-state"
+                  value={view.viewState.state ?? 'all'}
+                  onChange={(event) => handleStateFilterChange(event.currentTarget.value)}
+                >
+                  {view.facetOptions.state.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
             {hasActiveFilters ? (
               <button
                 type="button"

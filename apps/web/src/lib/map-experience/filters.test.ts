@@ -43,7 +43,7 @@ test('the default filter state (all "all") returns every feature unfiltered', ()
   assert.equal(applyExploreFilters(features, DEFAULT_EXPLORE_FILTERS).length, 2);
 });
 
-test('kind/era/theme/confidence filters are opt-in and compose with AND semantics', () => {
+test('kind/era/theme/tone/status/confidence filters are opt-in and compose with AND semantics', () => {
   const features = [
     feature({
       entityId: 'a',
@@ -51,6 +51,8 @@ test('kind/era/theme/confidence filters are opt-in and compose with AND semantic
       eraBuckets: ['1950s'],
       topicTags: ['education'],
       confidenceTier: 'high',
+      mapTone: 'plantation',
+      status: 'historic',
     }),
     feature({
       entityId: 'b',
@@ -58,6 +60,7 @@ test('kind/era/theme/confidence filters are opt-in and compose with AND semantic
       eraBuckets: ['1960s'],
       topicTags: ['freedmen'],
       confidenceTier: 'low',
+      status: 'active',
     }),
   ];
 
@@ -75,6 +78,24 @@ test('kind/era/theme/confidence filters are opt-in and compose with AND semantic
   assert.deepEqual(
     eraAndTheme.map((f) => f.properties.entityId),
     ['a'],
+  );
+
+  const toneOnly = applyExploreFilters(features, {
+    ...DEFAULT_EXPLORE_FILTERS,
+    tone: 'plantation',
+  });
+  assert.deepEqual(
+    toneOnly.map((f) => f.properties.entityId),
+    ['a'],
+  );
+
+  const statusOnly = applyExploreFilters(features, {
+    ...DEFAULT_EXPLORE_FILTERS,
+    status: 'active',
+  });
+  assert.deepEqual(
+    statusOnly.map((f) => f.properties.entityId),
+    ['b'],
   );
 
   const noMatch = applyExploreFilters(features, {
@@ -115,9 +136,17 @@ test('theme filter prefers topicIds over legacy topicTags (same as facet options
 
 test('facet options lead with an "All ___" option and count real occurrences', () => {
   const features = [
-    feature({ entityId: 'a', kind: 'place', eraBuckets: ['1950s'] }),
-    feature({ entityId: 'b', kind: 'place', eraBuckets: ['1950s', '1960s'] }),
-    feature({ entityId: 'c', kind: 'school', eraBuckets: ['1960s'] }),
+    feature({ entityId: 'a', kind: 'place', eraBuckets: ['1950s'], topicTags: ['hbcu'] }),
+    feature({
+      entityId: 'b',
+      kind: 'place',
+      eraBuckets: ['1950s', '1960s'],
+      mapTone: 'massacre',
+      status: 'historic',
+      statePostalCode: 'SC',
+      stateName: 'South Carolina',
+    }),
+    feature({ entityId: 'c', kind: 'school', eraBuckets: ['1960s'], status: 'active' }),
   ];
 
   const facets = buildExploreFacetOptions(features);
@@ -127,13 +156,26 @@ test('facet options lead with an "All ___" option and count real occurrences', (
     ['all', 'place', 'school'],
   );
   const placeOption = facets.kind.find((option) => option.value === 'place');
-  assert.match(placeOption!.label, /\(2\)/);
+  assert.match(placeOption!.label, /^Place \(2\)$/);
 
   // Era facet sorts chronologically, not alphabetically (1950s before 1960s).
   assert.deepEqual(
     facets.era.map((option) => option.value),
     ['all', '1950s', '1960s'],
   );
+
+  const themeHbcu = facets.theme.find((option) => option.value === 'hbcu');
+  assert.match(themeHbcu!.label, /HBCUs \(1\)/);
+
+  assert.deepEqual(
+    facets.tone.map((option) => option.value),
+    ['all', 'massacre'],
+  );
+  assert.match(facets.tone[1]!.label, /Massacre/);
+
+  assert.ok(facets.status.some((option) => option.value === 'active'));
+  assert.ok(facets.state.some((option) => option.value === 'SC'));
+  assert.match(facets.state.find((option) => option.value === 'SC')!.label, /South Carolina/);
 });
 
 test('sortFeaturesForList orders chronologically by earliest era, undated last, ties alphabetical', () => {
