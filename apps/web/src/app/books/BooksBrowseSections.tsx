@@ -3,12 +3,16 @@
  */
 import React from 'react';
 import Link from 'next/link';
-import { EmptyState, FilterBar } from '@repo/ui';
+import { EmptyState } from '@repo/ui';
+import type { BannedBookSuggestCorpusItem } from '../../lib/banned-books/suggest-books';
 import type { BooksBrowseItem, BooksBrowseViewModel } from './books-view-model';
+import { BooksSearchTypeahead } from './BooksSearchTypeahead';
+import '../typeahead.css';
 import './books.css';
 
 export type BooksBrowseSectionsProps = {
   readonly view: BooksBrowseViewModel;
+  readonly suggestCorpus: readonly BannedBookSuggestCorpusItem[];
 };
 
 function BrowseCardActions({ item }: { readonly item: BooksBrowseItem }) {
@@ -98,7 +102,7 @@ function BooksPagination({ view }: { readonly view: BooksBrowseViewModel }) {
   );
 }
 
-export function BooksBrowseSections({ view }: BooksBrowseSectionsProps) {
+export function BooksBrowseSections({ view, suggestCorpus }: BooksBrowseSectionsProps) {
   return (
     <div className="ds-books-browse">
       <section
@@ -114,47 +118,62 @@ export function BooksBrowseSections({ view }: BooksBrowseSectionsProps) {
           Challenged titles
         </h2>
 
-        <FilterBar
-          className="ds-books-browse__filter-bar"
+        <form
+          className="ds-filters ds-books-browse__filter-bar"
           method="get"
           action="/books"
-          legend="Filter challenged books"
-          fields={[
-            {
-              id: 'q',
-              name: 'q',
-              label: 'Search',
-              type: 'search',
-              placeholder: 'Title, author, or summary…',
-              defaultValue: view.q,
-            },
-            {
-              id: 'state',
-              name: 'state',
-              label: 'State',
-              type: 'select',
-              defaultValue: view.state,
-              options: view.stateOptions,
-            },
-            {
-              id: 'author',
-              name: 'author',
-              label: 'Author',
-              type: 'select',
-              defaultValue: view.author,
-              options: view.authorOptions,
-            },
-          ]}
-          actions={
-            <>
-              <input type="hidden" name="sort" value={view.sort} />
-              <input type="hidden" name="dir" value={view.dir} />
-              <button type="submit" className="ds-button ds-button--primary">
-                Apply filters
-              </button>
-            </>
-          }
-        />
+          role="search"
+        >
+          <fieldset className="ds-filters__fieldset">
+            <legend className="ds-filters__legend">Filter challenged books</legend>
+            <div className="ds-filters__fields">
+              <div className="ds-filters__field">
+                <BooksSearchTypeahead defaultValue={view.q} corpus={suggestCorpus} />
+              </div>
+              <div className="ds-filters__field">
+                <label className="ds-filters__label" htmlFor="state">
+                  State
+                </label>
+                <select
+                  className="ds-filters__control"
+                  id="state"
+                  name="state"
+                  defaultValue={view.state}
+                >
+                  {view.stateOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="ds-filters__field">
+                <label className="ds-filters__label" htmlFor="author">
+                  Author
+                </label>
+                <select
+                  className="ds-filters__control"
+                  id="author"
+                  name="author"
+                  defaultValue={view.author}
+                >
+                  {view.authorOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </fieldset>
+          <div className="ds-filters__actions">
+            <input type="hidden" name="sort" value={view.sort} />
+            <input type="hidden" name="dir" value={view.dir} />
+            <button type="submit" className="ds-button ds-button--primary">
+              Apply filters
+            </button>
+          </div>
+        </form>
 
         <div className="ds-books-browse__toolbar">
           <p className="ds-sans ds-count-label ds-books-browse__count" id="books-results-heading">

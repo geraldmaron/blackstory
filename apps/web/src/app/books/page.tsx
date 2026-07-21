@@ -3,6 +3,7 @@
  * Stories / entity density — not a sparse reference wireframe.
  */
 import Link from 'next/link';
+import { bannedBookToSuggestCorpusItem } from '../../lib/banned-books/suggest-books';
 import { loadBannedBooksListing } from '../../lib/banned-books/public-source';
 import { buildBooksBrowseViewModel, type RawBooksBrowseParams } from './books-view-model';
 import { BooksBrowseSections } from './BooksBrowseSections';
@@ -21,6 +22,7 @@ export default async function BooksBrowsePage({ searchParams }: BooksPageProps) 
   const params = await searchParams;
   const snapshot = await loadBannedBooksListing();
   const view = buildBooksBrowseViewModel(snapshot, params);
+  const suggestCorpus = snapshot.books.map(bannedBookToSuggestCorpusItem);
 
   return (
     <main className="ds-container ds-page ds-books-page" id="main">
@@ -36,7 +38,7 @@ export default async function BooksBrowsePage({ searchParams }: BooksPageProps) 
           Also find publications in Search
         </Link>
       </p>
-      <BooksBrowseSections view={view} />
+      <BooksBrowseSections view={view} suggestCorpus={suggestCorpus} />
     </main>
   );
 }

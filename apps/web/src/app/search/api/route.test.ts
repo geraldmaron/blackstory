@@ -178,3 +178,41 @@ test('cursor round-trip returns the next page, not the same page', async () => {
     'Dunbar school should appear in top pages',
   );
 });
+
+test('suggest mode returns typeahead recommendations without running search guardrails empty_query', async () => {
+  const deps = await buildDeps();
+  const response = await handleSearchRequest(searchRequest('?suggest=1&q=laurence'), deps);
+  assert.equal(response.status, 200);
+
+  const body = (await response.json()) as {
+    readonly suggestions: readonly {
+      readonly id: string;
+      readonly displayName: string;
+      readonly href: string;
+    }[];
+  };
+  assert.ok(Array.isArray(body.suggestions));
+  assert.ok(body.suggestions.length >= 1);
+  assert.ok(
+    body.suggestions.some((row) => row.id === SCHOOL_ID),
+    'expected Dunbar school among suggestions',
+  );
+  assert.ok(body.suggestions.every((row) => row.href.startsWith('/entity/')));
+});
+
+test('suggest mode returns empty list for short queries', async () => {
+  const deps = await buildDeps();
+  const response = await handleSearchRequest(searchRequest('?suggest=1&q=a'), deps);
+  assert.equal(response.status, 200);
+  const body = (await response.json()) as { readonly suggestions: unknown[] };
+  assert.deepEqual(body.suggestions, []);
+});
+
+test('suggest mode still rejects prohibited sql parameter', async () => {
+  const deps = await buildDeps();
+  const response = await handleSearchRequest(searchRequest('?suggest=1&q=harlem&sql=1'), deps);
+  assert.equal(response.status, 400);
+  const body = (await response.json()) as { error: string; reason: string };
+  assert.equal(body.error, 'invalid_search_query');
+  assert.equal(body.reason, 'sql_not_allowed');
+});

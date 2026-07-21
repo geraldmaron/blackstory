@@ -1,0 +1,79 @@
+/**
+ * Shared typeahead listbox styles for archive search and books catalog.
+ * Flat matte surfaces only — no shadows or glows (brand contract).
+ */
+
+.ds-typeahead {
+  position: relative;
+  display: grid;
+  gap: var(--ds-space-1);
+  min-width: 0;
+}
+
+.ds-typeahead--mast {
+  flex: 1 1 auto;
+  gap: 0;
+}
+
+.ds-typeahead--filter {
+  width: 100%;
+}
+
+.ds-typeahead__list {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1px;
+  max-height: min(18rem, 50vh);
+  overflow: auto;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-border);
+}
+
+.ds-typeahead__option {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ds-space-2);
+  width: 100%;
+  min-height: 2.75rem;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  border: 0;
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--ds-font-ui);
+  font-size: 0.875rem;
+}
+
+.ds-typeahead__option:hover,
+.ds-typeahead__option:focus-visible,
+.ds-typeahead__option--active {
+  background: var(--ds-canvas);
+  outline: 2px solid var(--ds-accent);
+  outline-offset: -2px;
+}
+
+.ds-typeahead__primary {
+  min-width: 0;
+}
+
+.ds-typeahead__secondary {
+  flex-shrink: 0;
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-search-page .ds-typeahead--mast .ds-typeahead__list {
+  top: calc(100% + var(--ds-space-2));
+}

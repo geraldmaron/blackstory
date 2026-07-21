@@ -18,7 +18,7 @@ import {
   evaluateSearchQueryGuardrails,
   type SearchQueryInput,
 } from '@repo/security';
-import type { PublicSearchIndexDoc } from '@repo/domain';
+import { buildSearchRecommendations, type PublicSearchIndexDoc } from '@repo/domain';
 import {
   readHybridFlagFromParams,
   readLaneKillSwitchParams,
@@ -138,6 +138,43 @@ export async function handleSearchRequest(
 
   try {
     const url = new URL(request.url);
+
+    // Typeahead: lightweight recommendations only — still behind integrity + rate limits,
+    // never runs the hybrid search pipeline or accepts prohibited query fields.
+    if (url.searchParams.get('suggest') === '1') {
+      const prohibited = ['sql', 'regex', 'pattern', 'orderBy', 'fields', 'select'] as const;
+      for (const key of prohibited) {
+        if (url.searchParams.has(key)) {
+          return jsonError(400, 'invalid_search_query', {
+            reason: `${key}_not_allowed`,
+            message: `Query parameter "${key}" is not allowed.`,
+          });
+        }
+      }
+      const q = (url.searchParams.get('q') ?? '').trim();
+      if (q.length < 2) {
+        return NextResponse.json({ suggestions: [] }, { status: 200 });
+      }
+      const suggestions = buildSearchRecommendations({
+        query: q,
+        index: deps.searchIndex,
+        limit: 8,
+        allowBrowse: false,
+      });
+      return NextResponse.json(
+        {
+          suggestions: suggestions.map((row) => ({
+            id: row.id,
+            kind: row.kind,
+            displayName: row.displayName,
+            ...(row.summary !== undefined ? { summary: row.summary } : {}),
+            href: `/entity/${row.id}`,
+          })),
+        },
+        { status: 200 },
+      );
+    }
+
     const input = parseSearchQuery(url.searchParams);
 
     const decision = evaluateSearchQueryGuardrails(input, {});

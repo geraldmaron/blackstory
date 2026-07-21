@@ -19,12 +19,14 @@ import Link from 'next/link';
 import { EmptyState, ResultList } from '@repo/ui';
 import { KindBadge, StatusMark } from '../../components/map-experience';
 import { getPublicSearchIndex } from '../../lib/public-data/source';
+import { SearchMastTypeahead } from './SearchMastTypeahead';
 import {
   buildSearchPageHref,
   buildSearchViewModel,
   type RawSearchParams,
 } from './search-view-model';
 import './search.css';
+import '../typeahead.css';
 
 export const metadata = {
   title: 'Search',
@@ -84,15 +86,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           the same submit as the keyword. */}
       <form className="ds-search-mast" method="get" action="/search" role="search">
         <div className="ds-search-mast__field">
-          <input
-            className="ds-search-mast__input"
-            type="search"
-            id="q"
-            name="q"
-            placeholder="A school, a church, a city…"
-            defaultValue={view.q}
-            aria-label="Search the archive"
-          />
+          <SearchMastTypeahead defaultValue={view.q} />
           <button className="ds-cta ds-cta--copper" type="submit">
             Search
           </button>
