@@ -1,7 +1,7 @@
 /**
  * Cloud Run Job entry for discovery campaign dispatch.
  * Reads DISCOVERY_* environment variables and delegates to dispatchDiscoveryCampaign.
- * Production should use the research@ service account and a Firestore-backed kill switch;
+ * Live production dispatch runs on Corsair systemd with Postgres ledger preflight;
  * discovery jobs produce private candidates only and must never publish.
  */
 import { dirname, join } from 'node:path';

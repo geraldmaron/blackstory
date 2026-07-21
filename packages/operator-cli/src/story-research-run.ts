@@ -18,6 +18,11 @@ import {
 } from '@repo/domain';
 import { createLlmProvider, type LlmProvider } from './llm-provider.js';
 import type { OperatorIdentity } from './identity.js';
+import type { SafeFetchDependencies } from '@repo/security/url-safety';
+import {
+  formatGatheredSourceSnippets,
+  gatherSourceSnippetsFromUrls,
+} from './research-source-gather.js';
 
 export type StoryTopicSeed = {
   readonly topicId: string;
@@ -44,6 +49,10 @@ export type StoryResearchRunInput = {
   readonly nowIso: string;
   readonly provider?: LlmProvider;
   readonly model?: string;
+  /** When true (default for non-mock providers), authority-lead URLs are safe-fetched for real text. */
+  readonly gatherRealSources?: boolean;
+  readonly fetchDependencies?: SafeFetchDependencies;
+  readonly gatherConcurrency?: number;
 };
 
 export type StoryResearchRunItem = {
@@ -239,6 +248,31 @@ function harvestAnchors(topic: StoryTopicSeed): NamedAnchor[] {
   return anchors;
 }
 
+/**
+ * Upgrades thin topic snippets by safe-fetching authority-lead URLs. Falls back
+ * to any pre-supplied `sourceSnippets` when fetch yields nothing.
+ */
+export async function gatherStoryTopicSourceSnippets(
+  topic: StoryTopicSeed,
+  options: {
+    readonly fetchDependencies?: SafeFetchDependencies;
+    readonly gatherConcurrency?: number;
+  } = {},
+): Promise<readonly string[]> {
+  const seedUrls = topic.authorityLeadHints ?? [];
+  if (seedUrls.length === 0) return topic.sourceSnippets ?? [];
+
+  const gathered = await gatherSourceSnippetsFromUrls(seedUrls, {
+    ...(options.fetchDependencies ? { dependencies: options.fetchDependencies } : {}),
+    ...(options.gatherConcurrency !== undefined
+      ? { concurrency: options.gatherConcurrency }
+      : {}),
+  });
+  const formatted = formatGatheredSourceSnippets(gathered);
+  if (formatted.length === 0) return topic.sourceSnippets ?? [];
+  return [...formatted, ...(topic.sourceSnippets ?? [])];
+}
+
 export async function runStoryResearch(
   input: StoryResearchRunInput,
 ): Promise<StoryResearchRunResult> {
@@ -248,6 +282,17 @@ export async function runStoryResearch(
   for (const topic of input.topics) {
     let parsed: ModelBriefJson;
     let rawModelContent: string | undefined;
+    const shouldGatherRealSources =
+      (input.gatherRealSources ?? provider.id !== 'mock') &&
+      (topic.authorityLeadHints?.length ?? 0) > 0;
+    const sourceSnippets = shouldGatherRealSources
+      ? await gatherStoryTopicSourceSnippets(topic, {
+          ...(input.fetchDependencies ? { fetchDependencies: input.fetchDependencies } : {}),
+          ...(input.gatherConcurrency !== undefined
+            ? { gatherConcurrency: input.gatherConcurrency }
+            : {}),
+        })
+      : (topic.sourceSnippets ?? []);
 
     if (provider.id === 'mock') {
       parsed = mockBriefFromTopic(topic);
@@ -271,7 +316,7 @@ export async function runStoryResearch(
               relatedEntityIds: topic.relatedEntityIds ?? [],
               relatedFactIds: topic.relatedFactIds ?? [],
               publishedClaimIds: (topic.publishedClaims ?? []).map((c) => c.id),
-              sourceSnippets: topic.sourceSnippets ?? [],
+              sourceSnippets,
             }),
           },
         ],

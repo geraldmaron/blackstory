@@ -13,7 +13,7 @@ import type {
   NationalPopulationTimelineRow,
   OpportunityAtlasCoverageSummary,
   StatePopulationChange,
-} from '@repo/firebase';
+} from '@repo/domain/statistics/public-data-summaries';
 import { AcsCoverageChart } from '../../components/data/AcsCoverageChart';
 import { BlackPopulationShareChart } from '../../components/data/BlackPopulationShareChart';
 import { DataStatStrip } from '../../components/data/DataStatStrip';

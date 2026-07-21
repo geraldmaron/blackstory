@@ -25,7 +25,6 @@ const nextConfig = {
     '@repo/schemas',
     '@repo/ui',
     '@repo/security',
-    '@repo/firebase',
     '@repo/observability',
   ],
   // App Hosting / Cloud Run need a self-contained server bundle for monorepo deploys.

@@ -88,6 +88,7 @@ export async function runWorkerPreflight(
     detail: databaseUrl ? 'configured' : 'DATABASE_URL or APP_DATABASE_URL is required',
   });
   checks.push(
+    exactEnvironmentCheck(environment, 'ops-data-source', 'OPS_DATA_SOURCE', 'postgres'),
     exactEnvironmentCheck(environment, 'profile-id', 'RESEARCH_PROFILE_ID', EXPECTED_PROFILE_ID),
     exactEnvironmentCheck(
       environment,

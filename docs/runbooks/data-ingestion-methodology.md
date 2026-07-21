@@ -86,9 +86,9 @@ Decision tree, in order:
    (19 entries) is API- or bulk-served. If one ever does, it gets its own adapter behind
    the same contract, not an ad-hoc script.
 
-Discovery-lane scrapers (`workers/research/` campaigns writing candidates to Firestore via
-dedup/quarantine gates) are for *finding* material. Dataset ingestion (this runbook) is for
-*carrying* published data faithfully. Don't mix the lanes: statistics never go through the
+Discovery-lane campaigns (`workers/research/`, Corsair systemd, operator-cli discovery commands)
+write **private candidates and ledger runs in Postgres** via quarantine gates — not Firestore.
+Dataset ingestion (this runbook) is for *carrying* published data faithfully. Don't mix the lanes: statistics never go through the
 candidate pipeline, and scraped candidates never skip corpus vetting.
 
 ## Researched-entity records (national catalog lane)

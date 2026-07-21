@@ -108,6 +108,11 @@
       "development": "./src/search/index.ts",
       "types": "./dist/search/index.d.ts",
       "import": "./dist/search/index.js"
+    },
+    "./statistics/public-data-summaries": {
+      "development": "./src/statistics/public-data-summaries.ts",
+      "types": "./dist/statistics/public-data-summaries.d.ts",
+      "import": "./dist/statistics/public-data-summaries.js"
     }
   },
   "files": [

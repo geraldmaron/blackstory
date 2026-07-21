@@ -1,17 +1,10 @@
 /**
  * Demographics read routing for public web surfaces (`/data`, homepage data pulse).
- * Postgres mode reads materialized census snapshots from `bb_public.materialized_snapshots`;
- * Firestore remains the default until `PUBLIC_DATA_SOURCE=postgres`.
+ * Reads materialized census snapshots from `bb_public.materialized_snapshots` when
+ * `PUBLIC_DATA_SOURCE=postgres`; otherwise returns empty/absent summaries.
  */
 import {
   computeStatePopulationChangesFromDecades,
-  getAcsCoverageSummary as getFirestoreAcsCoverageSummary,
-  getHateCrimeYearSummaries as getFirestoreHateCrimeYearSummaries,
-  getHateCrimeYearSummary as getFirestoreHateCrimeYearSummary,
-  getHistoricalStatePopulationCoverage as getFirestoreHistoricalStatePopulationCoverage,
-  getNationalPopulationTimelineSnapshot as getFirestoreNationalPopulationTimelineSnapshot,
-  getOpportunityAtlasCoverageSummary as getFirestoreOpportunityAtlasCoverageSummary,
-  getStatePopulationChanges as getFirestoreStatePopulationChanges,
   type AcsCoverageSummary,
   type CensusCountyDecadeDecade,
   type HateCrimeYearSummary,
@@ -20,9 +13,8 @@ import {
   type OpportunityAtlasCoverageSummary,
   type StatePopulationByDecade,
   type StatePopulationChange,
-} from '@repo/firebase';
+} from '@repo/domain/statistics/public-data-summaries';
 import { fetchMaterializedSnapshot } from '../public-data/public-readers';
-import { isPostgresPublicDataSource } from '../public-data/live-policy';
 
 type StatePopulationByDecadeSnapshot = {
   readonly rows: readonly StatePopulationByDecade[];
@@ -56,9 +48,6 @@ function isOpportunityCoverageSnapshot(value: unknown): value is OpportunityAtla
 }
 
 export async function getNationalPopulationTimelineSnapshot(): Promise<NationalPopulationTimelineSnapshot | null> {
-  if (!isPostgresPublicDataSource()) {
-    return getFirestoreNationalPopulationTimelineSnapshot();
-  }
   const payload = await fetchMaterializedSnapshot('nationalPopulationTimeline');
   return isTimelineSnapshot(payload) ? payload : null;
 }
@@ -67,9 +56,6 @@ export async function getStatePopulationChanges(
   fromDecade: CensusCountyDecadeDecade,
   toDecade: CensusCountyDecadeDecade,
 ): Promise<readonly StatePopulationChange[]> {
-  if (!isPostgresPublicDataSource()) {
-    return getFirestoreStatePopulationChanges(fromDecade, toDecade);
-  }
   const payload = await fetchMaterializedSnapshot('statePopulationByDecade');
   if (!isStatePopulationSnapshot(payload)) return [];
   return computeStatePopulationChangesFromDecades(payload.rows, fromDecade, toDecade);
@@ -78,9 +64,6 @@ export async function getStatePopulationChanges(
 export async function getHistoricalStatePopulationCoverage(): Promise<
   HistoricalStatePopulationCoverage | undefined
 > {
-  if (!isPostgresPublicDataSource()) {
-    return getFirestoreHistoricalStatePopulationCoverage();
-  }
   const payload = await fetchMaterializedSnapshot('historicalStatePopulationCoverage');
   if (!isHistoricalCoverageSnapshot(payload)) return undefined;
   const { generatedAt: _generatedAt, contentHash: _contentHash, ...coverage } = payload as HistoricalStatePopulationCoverage & {
@@ -93,9 +76,6 @@ export async function getHistoricalStatePopulationCoverage(): Promise<
 export async function getOpportunityAtlasCoverageSummary(): Promise<
   OpportunityAtlasCoverageSummary | undefined
 > {
-  if (!isPostgresPublicDataSource()) {
-    return getFirestoreOpportunityAtlasCoverageSummary();
-  }
   const payload = await fetchMaterializedSnapshot('opportunityAtlasCoverage');
   if (!isOpportunityCoverageSnapshot(payload)) return undefined;
   const { generatedAt: _generatedAt, contentHash: _contentHash, ...summary } = payload as OpportunityAtlasCoverageSummary & {
@@ -105,30 +85,21 @@ export async function getOpportunityAtlasCoverageSummary(): Promise<
   return summary;
 }
 
-/** TODO(postgres-cutover): aggregate `bb_reference.acs_*` instead of Firestore collection counts. */
+/** TODO(postgres-cutover): aggregate `bb_reference.acs_*` rollups. */
 export async function getAcsCoverageSummary(): Promise<AcsCoverageSummary | undefined> {
-  if (isPostgresPublicDataSource()) {
-    return undefined;
-  }
-  return getFirestoreAcsCoverageSummary();
+  return undefined;
 }
 
 /** TODO(postgres-cutover): read `bb_reference.hate_crime_county_years` rollups. */
-export async function getHateCrimeYearSummary(year: string): Promise<HateCrimeYearSummary | undefined> {
-  if (isPostgresPublicDataSource()) {
-    return undefined;
-  }
-  return getFirestoreHateCrimeYearSummary(year);
+export async function getHateCrimeYearSummary(_year: string): Promise<HateCrimeYearSummary | undefined> {
+  return undefined;
 }
 
 /** TODO(postgres-cutover): read `bb_reference.hate_crime_county_years` rollups. */
 export async function getHateCrimeYearSummaries(
-  years: readonly string[],
+  _years: readonly string[],
 ): Promise<readonly HateCrimeYearSummary[]> {
-  if (isPostgresPublicDataSource()) {
-    return [];
-  }
-  return getFirestoreHateCrimeYearSummaries(years);
+  return [];
 }
 
 export type {

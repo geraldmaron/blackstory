@@ -1,11 +1,9 @@
 /** Generate source-bound rewrite artifacts for human review; never publishes. */
-import { mkdirSync, writeFileSync } from 'node:fs';
-import { listSeedStoryProjections } from '../src/firestore/public-story-seed.ts';
-import { createLlmProvider } from '../../operator-cli/src/llm-provider.ts';
 import {
-  DEFAULT_STORY_REWRITE_MODELS,
-  rewriteStory,
-} from '../../operator-cli/src/story-rewrite.ts';
+  formatStoryRewriteLaneResult,
+  runStoryRewriteLane,
+  STORY_REWRITE_ARTIFACT_DIR,
+} from '../../operator-cli/src/story-rewrite-lane.ts';
 
 function arg(name: string): string | undefined {
   const index = process.argv.indexOf(name);
@@ -13,43 +11,36 @@ function arg(name: string): string | undefined {
 }
 
 const slug = arg('--slug');
-const output = arg('--output') ?? '.cache/story-rewrites';
-const requestedProvider = arg('--provider');
+const output = arg('--output') ?? STORY_REWRITE_ARTIFACT_DIR;
+const requestedProvider = arg('--provider') as
+  | 'mock'
+  | 'openrouter'
+  | 'ollama'
+  | 'hybrid'
+  | undefined;
 const requestedModels = arg('--models')
   ?.split(',')
   .map((value) => value.trim())
   .filter(Boolean);
-const providerName =
-  (requestedProvider as 'mock' | 'openrouter' | 'ollama' | 'hybrid' | undefined) ??
-  (process.env.EDITORIAL_LLM_PROVIDER as 'mock' | 'openrouter' | 'ollama' | 'hybrid' | undefined) ??
-  'openrouter';
 const model = arg('--model') ?? process.env.STORY_REWRITE_MODEL;
-const models =
-  requestedModels ??
-  process.env.STORY_REWRITE_MODELS?.split(',')
-    .map((value) => value.trim())
-    .filter(Boolean) ??
-  DEFAULT_STORY_REWRITE_MODELS;
-const stories = listSeedStoryProjections().filter((story) => !slug || story.slug === slug);
-if (stories.length === 0) throw new Error(`No seed story matched ${slug ?? '(all)'}`);
 
-const provider = createLlmProvider({
-  provider: providerName,
+const summary = await runStoryRewriteLane({
+  ...(slug !== undefined ? { slug } : {}),
+  output,
+  ...(requestedProvider !== undefined ? { provider: requestedProvider } : {}),
   ...(model !== undefined ? { model } : {}),
-  models,
+  ...(requestedModels !== undefined ? { models: requestedModels } : {}),
 });
-mkdirSync(output, { recursive: true });
-for (const story of stories) {
-  const result = await rewriteStory(story, { provider, model });
-  const path = `${output}/${story.slug}.json`;
-  writeFileSync(path, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
-  console.log(
-    JSON.stringify({
-      slug: result.slug,
-      modelId: result.modelId,
-      words: result.wordCount,
-      issues: result.validationIssues,
-      path,
-    }),
+
+if (!summary.liveGeneration) {
+  console.error(
+    'Using mock story rewrite provider (no OPENROUTER_API_KEY). ' +
+      'For live Kimi K2.5 rewrites: run-with-dev-secrets -- STORY_REWRITE_LLM_PROVIDER=openrouter ' +
+      'node --conditions development --import tsx packages/firebase/scripts/rewrite-seed-stories.ts',
   );
+}
+
+for (const result of summary.results) {
+  const path = `${summary.outputDir}/${result.slug}.json`;
+  console.log(formatStoryRewriteLaneResult(result, path));
 }

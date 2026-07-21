@@ -15,7 +15,6 @@ test('shouldUseLivePublicProjections is off by default in development', () => {
   assert.equal(
     shouldUseLivePublicProjections({
       NODE_ENV: 'development',
-      NEXT_PUBLIC_FIREBASE_PROJECT_ID: 'black-book-efaaf',
     }),
     false,
   );
@@ -25,7 +24,6 @@ test('shouldUseLivePublicProjections respects PUBLIC_READ_API_DISABLED', () => {
   assert.equal(
     shouldUseLivePublicProjections({
       NODE_ENV: 'production',
-      NEXT_PUBLIC_FIREBASE_PROJECT_ID: 'black-book-efaaf',
       PUBLIC_READ_API_DISABLED: '1',
     }),
     false,
@@ -36,7 +34,6 @@ test('shouldUseLivePublicProjections requires explicit postgres source plus DATA
   assert.equal(
     shouldUseLivePublicProjections({
       NODE_ENV: 'production',
-      NEXT_PUBLIC_FIREBASE_PROJECT_ID: 'black-book-efaaf',
       PUBLIC_READ_API_DISABLED: '0',
     }),
     false,

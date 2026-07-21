@@ -19,7 +19,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --conditions development --import tsx --test src/identity.test.ts src/audit.test.ts src/intake.test.ts src/bulk-import.test.ts src/commit.test.ts src/fetch.test.ts src/research-intake.test.ts src/discovery-run.test.ts src/discovery-survivor-intake.test.ts src/promotion-boundary.test.ts src/cli.test.ts src/edge-intake.test.ts src/editorial-run.test.ts src/editorial-catalog.test.ts src/story-research-run.test.ts src/story-rewrite.test.ts src/map-pool.test.ts src/llm-provider.test.ts src/worker-preflight.test.ts",
+    "test": "node --conditions development --import tsx --test src/identity.test.ts src/audit.test.ts src/intake.test.ts src/bulk-import.test.ts src/commit.test.ts src/fetch.test.ts src/research-intake.test.ts src/discovery-run.test.ts src/discovery-survivor-intake.test.ts src/promotion-boundary.test.ts src/cli.test.ts src/edge-intake.test.ts src/editorial-run.test.ts src/editorial-catalog.test.ts src/story-research-run.test.ts src/story-rewrite.test.ts src/story-rewrite-lane.test.ts src/map-pool.test.ts src/llm-provider.test.ts src/worker-preflight.test.ts src/ledger-parity.test.ts src/research-directive.test.ts src/research-source-gather.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {

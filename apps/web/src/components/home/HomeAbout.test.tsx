@@ -9,7 +9,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import type {
   NationalPopulationTimelineRow,
   NationalPopulationTimelineSnapshot,
-} from '@repo/firebase';
+} from '@repo/domain/statistics/public-data-summaries';
 import { HomeAbout } from './HomeAbout';
 import { HomeDataPulse } from './HomeDataPulse';
 import { HomeHowThisWorks } from './HomeHowThisWorks';

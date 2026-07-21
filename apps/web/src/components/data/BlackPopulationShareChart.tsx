@@ -5,7 +5,7 @@
  * across a definition change. Table alternative carries every value.
  */
 import React from 'react';
-import type { NationalPopulationTimelineRow } from '@repo/firebase';
+import type { NationalPopulationTimelineRow } from '@repo/domain/statistics/public-data-summaries';
 import { DataChartFrame } from './DataChartFrame';
 import {
   CHART_HEIGHT,

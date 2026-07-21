@@ -23,33 +23,8 @@ const MAP_TILE_SRC = ['https://demotiles.maplibre.org', 'https://tiles.openfreem
 /** Public entity/media objects (promoted Commons portraits, collage sources). */
 const PUBLIC_MEDIA_IMG_SRC = ['https://storage.googleapis.com'];
 
-/** Firebase App Check + reCAPTCHA Enterprise (consent-gated `/locate`, explore place search). */
-export const APP_CHECK_SCRIPT_SRC = [
-  'https://www.google.com/recaptcha/',
-  'https://www.gstatic.com/recaptcha/',
-];
-export const APP_CHECK_CONNECT_SRC = [
-  'https://www.google.com/recaptcha/',
-  'https://recaptchaenterprise.googleapis.com',
-  'https://content-firebaseappcheck.googleapis.com',
-  'https://firebaseappcheck.googleapis.com',
-  'https://www.googleapis.com',
-];
-export const APP_CHECK_FRAME_SRC = [
-  'https://www.google.com/recaptcha/',
-  'https://recaptcha.google.com/recaptcha/',
-];
-export const APP_CHECK_IMG_SRC = ['https://www.gstatic.com/recaptcha/'];
-
-const DEFAULT_IMG_SRC = [
-  "'self'",
-  'data:',
-  'blob:',
-  ...MAP_TILE_SRC,
-  ...PUBLIC_MEDIA_IMG_SRC,
-  ...APP_CHECK_IMG_SRC,
-];
-const DEFAULT_CONNECT_SRC = ["'self'", ...MAP_TILE_SRC, ...APP_CHECK_CONNECT_SRC];
+const DEFAULT_IMG_SRC = ["'self'", 'data:', 'blob:', ...MAP_TILE_SRC, ...PUBLIC_MEDIA_IMG_SRC];
+const DEFAULT_CONNECT_SRC = ["'self'", ...MAP_TILE_SRC];
 const DEFAULT_FONT_SRC = ["'self'", ...MAP_TILE_SRC];
 
 /** Build a semicolon-delimited CSP header value.  */
@@ -66,9 +41,7 @@ export function buildContentSecurityPolicy(options: CspBuildOptions = {}): strin
   // Next.js App Router ships RSC flight data in inline <script> tags without nonces.
   // Production must allow 'unsafe-inline' until a per-request nonce pipeline lands
   // (see tracker follow-up for nonce + strict-dynamic). Dev still needs 'unsafe-eval' for HMR.
-  const scriptSrc = isDev
-    ? ["'self'", "'unsafe-inline'", "'unsafe-eval'", ...APP_CHECK_SCRIPT_SRC]
-    : ["'self'", "'unsafe-inline'", ...APP_CHECK_SCRIPT_SRC];
+  const scriptSrc = isDev ? ["'self'", "'unsafe-inline'", "'unsafe-eval'"] : ["'self'", "'unsafe-inline'"];
   const workerSrc = ["'self'", 'blob:'];
   const resolvedConnectSrc = isDev ? [...connectSrc, 'ws:', 'wss:'] : connectSrc;
 
@@ -83,7 +56,7 @@ export function buildContentSecurityPolicy(options: CspBuildOptions = {}): strin
     'img-src': imgSrc,
     'font-src': DEFAULT_FONT_SRC,
     'connect-src': resolvedConnectSrc,
-    'frame-src': APP_CHECK_FRAME_SRC,
+    'frame-src': ["'none'"],
     'manifest-src': ["'self'"],
     'worker-src': workerSrc,
     'child-src': ["'self'", 'blob:'],

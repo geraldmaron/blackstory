@@ -1,9 +1,8 @@
 # research-node (Node discovery worker)
 
-Node-side packaging for scheduled discovery campaign dispatch. The worker is a thin Cloud Run
-Job entry that reads `DISCOVERY_*` environment variables and calls
-`dispatchDiscoveryCampaign` from `@repo/config` (or
-`packages/config/src/scheduled-jobs/discovery-dispatcher.ts` until the export lands).
+Node-side packaging for scheduled discovery campaign dispatch. The worker is a thin entry that
+reads `DISCOVERY_*` environment variables and calls `dispatchDiscoveryCampaign` from `@repo/config`
+(or `packages/config/src/scheduled-jobs/discovery-dispatcher.ts` until the export lands).
 
 Discovery jobs produce **private candidates only** and must **never publish**.
 
@@ -11,7 +10,8 @@ Discovery jobs produce **private candidates only** and must **never publish**.
 
 | Surface | Command |
 |---|---|
-| Cloud Run Job | `workers/research-node/src/main.ts` (Docker `CMD`) |
+| Corsair systemd / manual | `scripts/run-scheduled-searxng-discovery.sh` (preferred production path) |
+| Cloud Run Job (legacy packaging) | `workers/research-node/src/main.ts` (Docker `CMD`) |
 | GitHub Actions | `.github/workflows/discovery-campaigns.yml` |
 | Local / CI CLI | `node --conditions development --import tsx packages/config/src/scheduled-jobs/discovery-dispatcher-cli.ts --job <id> --mode fixture` |
 | Operator CLI (preferred once wired) | `node --conditions development --import tsx packages/operator-cli/src/bin.ts discovery-dispatch --job <id> --mode fixture` |
@@ -22,9 +22,11 @@ Run CLI commands from the **monorepo root** after `pnpm install --frozen-lockfil
 
 | Variable | Required | Default | Notes |
 |---|---|---|---|
+| `OPS_DATA_SOURCE` | yes (live) | — | Must be `postgres`; Firestore dispatch is retired |
+| `DATABASE_URL` | yes (live) | — | Scoped server-only URL |
 | `DISCOVERY_JOB_ID` | yes | — | Roster id, e.g. `community-obscurity-discovery` |
 | `DISCOVERY_MODE` | no | `fixture` | `fixture` or `live` |
-| `DISCOVERY_KILL_SWITCH` | no | `disengaged` | `engaged` skips dispatch; production should read Firestore |
+| `DISCOVERY_KILL_SWITCH` | no | `disengaged` | `engaged` skips dispatch; production reads `bb_ops.kill_switches` |
 | `DISCOVERY_JOB_RUN_ID` | no | — | Optional run correlation id |
 | `DISCOVERY_NOW_ISO` | no | — | Optional clock override for tests |
 
@@ -46,8 +48,9 @@ Workflow **Discovery campaigns** (`.github/workflows/discovery-campaigns.yml`):
 - **schedule** — Sundays 10:15 UTC, `community-obscurity-discovery` in **fixture** mode only
   (safe smoke; no live network).
 
-**Live production cadences** (hourly RSS, weekly federal/archive, daily web search, etc.) stay
-on **GCP Cloud Scheduler → Cloud Run Job**, not GitHub schedule triggers.
+**Live production cadences** (hourly RSS, weekly federal/archive, daily web search, etc.) run on
+**Corsair systemd** (`docs/runbooks/discovery-campaign-automation.md`), not Cloud Scheduler →
+Firestore. The retired Cloud Functions scheduler package is a tombstone only.
 
 ## Docker / Cloud Run Job
 
@@ -61,6 +64,8 @@ Run locally (requires `dispatchDiscoveryCampaign` to exist):
 
 ```bash
 docker run --rm \
+  -e OPS_DATA_SOURCE=postgres \
+  -e DATABASE_URL=postgresql://example.invalid/postgres \
   -e DISCOVERY_JOB_ID=community-obscurity-discovery \
   -e DISCOVERY_MODE=fixture \
   -e DISCOVERY_KILL_SWITCH=disengaged \
@@ -69,15 +74,17 @@ docker run --rm \
 
 Production checklist:
 
-- Run as the **research@** service account (Firestore + campaign budgets).
-- Resolve kill switches from **Firestore**, not the `DISCOVERY_KILL_SWITCH` env default.
-- Set `DISCOVERY_MODE=live` only on Scheduler-triggered production jobs.
+- Run `operator-cli preflight` before live dispatch; fail closed when ledger tables are missing.
+- Resolve kill switches from **`bb_ops.kill_switches`**, not Firestore.
+- Set `DISCOVERY_MODE=live` only on approved production hosts.
 - Never grant publication or public-write scopes to this worker.
 
 ## Local example
 
 ```bash
 pnpm install --frozen-lockfile
+OPS_DATA_SOURCE=postgres \
+DATABASE_URL=postgresql://example.invalid/postgres \
 DISCOVERY_JOB_ID=community-obscurity-discovery \
 DISCOVERY_MODE=fixture \
 DISCOVERY_KILL_SWITCH=disengaged \

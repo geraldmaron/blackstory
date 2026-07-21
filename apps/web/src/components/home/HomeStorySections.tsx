@@ -10,7 +10,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import type { NationalPopulationTimelineSnapshot } from '@repo/firebase';
+import type { NationalPopulationTimelineSnapshot } from '@repo/domain/statistics/public-data-summaries';
 import { isDisplayableJurisdictionLabel } from '../../lib/public-data/map-projection';
 import { KindBadge } from '../map-experience/KindBadge';
 import { HomeAbout, type HomeAboutProps } from './HomeAbout';

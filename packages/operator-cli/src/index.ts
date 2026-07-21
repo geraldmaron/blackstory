@@ -122,6 +122,18 @@ export {
   type StoryProjection,
   type PublicStorySection,
 } from './story-rewrite.js';
+export {
+  STORY_REWRITE_ARTIFACT_DIR,
+  buildMockStoryRewriteBody,
+  createMockStoryRewriteProvider,
+  formatStoryRewriteLaneResult,
+  hasOpenRouterCredentials,
+  resolveStoryRewriteProvider,
+  runStoryRewriteLane,
+  writeStoryRewriteArtifact,
+  type StoryRewriteLaneInput,
+  type StoryRewriteLaneSummary,
+} from './story-rewrite-lane.js';
 
 export { mapPool } from './map-pool.js';
 
@@ -131,6 +143,21 @@ export {
   type WorkerPreflightDependencies,
   type WorkerPreflightReport,
 } from './worker-preflight.js';
+
+export {
+  LEDGER_PARITY_CHECKLIST,
+  DEFAULT_PARITY_CYCLES,
+  parityChecklistMarkdown,
+  type ParityChecklistItem,
+  type ParityCycleRecord,
+  type ParityCycleStatus,
+} from './ledger-parity.js';
+
+export {
+  assertPostgresOpsDataSource,
+  editorialCatalogFromError,
+  POSTGRES_OPS_DATA_SOURCE_MESSAGE,
+} from './ops-data-source-gate.js';
 
 export {
   runEditorialJudge,
@@ -157,11 +184,48 @@ export { prepareEditorialPacketIntake } from './editorial-intake.js';
 
 export {
   runStoryResearch,
+  gatherStoryTopicSourceSnippets,
   type StoryTopicSeed,
   type StoryResearchRunInput,
   type StoryResearchRunResult,
   type StoryResearchRunItem,
 } from './story-research-run.js';
+
+export {
+  runResearchDirective,
+  defaultDirectiveGather,
+  createTargetedBriefHandlers,
+  createSundownTownCountyHandlers,
+  runSundownTownCountyBrief,
+  loadTougalooGeojsonFeatures,
+  filterSundownGeojsonFeatures,
+  parseSundownTownPageText,
+  TOUGALOO_GEOJSON_URL,
+  TOUGALOO_STATE_LIST_URL,
+  type ResearchDirectiveKind,
+  type ResearchDirectivePlan,
+  type ResearchDirectiveGatherResult,
+  type ResearchDirectiveContext,
+  type ResearchDirectiveHandlers,
+  type ResearchDirectiveRunResult,
+  type TargetedBriefSubject,
+  type TargetedBriefExtracted,
+  type TargetedBriefDecision,
+  type SundownTownCountyBrief,
+  type SundownTownCandidateStub,
+  type SundownTownCountyExtracted,
+  type SundownTownCountyDecision,
+} from './research-directive.js';
+
+export {
+  gatherSourceSnippet,
+  gatherSourceSnippetsFromUrls,
+  wrapPrefetchedSourceSnippet,
+  formatGatheredSourceSnippet,
+  formatGatheredSourceSnippets,
+  type GatheredSourceSnippet,
+  type GatherSourceSnippetsOptions,
+} from './research-source-gather.js';
 
 export { prepareStoryPacketIntake } from './story-intake.js';
 

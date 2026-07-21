@@ -3,7 +3,7 @@
  * vs all other reported bias categories. Framed as reporting composition, not danger heat.
  */
 import React from 'react';
-import type { HateCrimeYearSummary } from '@repo/firebase';
+import type { HateCrimeYearSummary } from '@repo/domain/statistics/public-data-summaries';
 import { DataChartFrame } from './DataChartFrame';
 import { formatChartCount } from './chart-utils';
 

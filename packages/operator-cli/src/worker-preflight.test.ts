@@ -4,6 +4,7 @@ import { runWorkerPreflight } from './worker-preflight.ts';
 
 const ENV = {
   DATABASE_URL: 'postgresql://example.invalid/postgres',
+  OPS_DATA_SOURCE: 'postgres',
   RESEARCH_PROFILE_ID: 'black-history',
   RESEARCH_PROFILE_VERSION: '1.0.0',
   RESEARCH_SCHEMA_VERSION: '1.0.0',
@@ -48,6 +49,59 @@ test('worker preflight fails closed for missing credentials and policy versions'
   });
   assert.equal(report.ok, false);
   assert.equal(report.checks.find((check) => check.name === 'postgres-credentials')?.ok, false);
+  assert.equal(report.checks.find((check) => check.name === 'ops-data-source')?.ok, false);
   assert.equal(report.checks.find((check) => check.name === 'profile-version')?.ok, false);
   assert.equal(report.checks.find((check) => check.name === 'openrouter-credentials')?.ok, false);
+});
+
+test('worker preflight fails closed when research ledger tables are missing', async () => {
+  const report = await runWorkerPreflight({
+    environment: ENV,
+    fetch: healthyFetch,
+    freeBytes: () => 10 * 1024 ** 3,
+    queryDatabase: async () => ({
+      frontierTasks: null,
+      researchRuns: 'bb_research.runs',
+    }),
+    now: () => new Date('2026-07-21T12:00:00.000Z'),
+  });
+  assert.equal(report.ok, false);
+  assert.equal(report.checks.find((check) => check.name === 'postgres-ledger')?.ok, false);
+  assert.match(
+    report.checks.find((check) => check.name === 'postgres-ledger')?.detail ?? '',
+    /migration is missing/u,
+  );
+});
+
+test('worker preflight fails closed when frontier_tasks exists but runs table is missing', async () => {
+  const report = await runWorkerPreflight({
+    environment: ENV,
+    fetch: healthyFetch,
+    freeBytes: () => 10 * 1024 ** 3,
+    queryDatabase: async () => ({
+      frontier_tasks: 'bb_research.frontier_tasks',
+      research_runs: null,
+    }),
+    now: () => new Date('2026-07-21T12:00:00.000Z'),
+  });
+  assert.equal(report.ok, false);
+  assert.equal(report.checks.find((check) => check.name === 'postgres-ledger')?.ok, false);
+});
+
+test('worker preflight fails closed when ledger probe throws', async () => {
+  const report = await runWorkerPreflight({
+    environment: ENV,
+    fetch: healthyFetch,
+    freeBytes: () => 10 * 1024 ** 3,
+    queryDatabase: async () => {
+      throw new Error('connection refused');
+    },
+    now: () => new Date('2026-07-21T12:00:00.000Z'),
+  });
+  assert.equal(report.ok, false);
+  assert.equal(report.checks.find((check) => check.name === 'postgres-ledger')?.ok, false);
+  assert.equal(
+    report.checks.find((check) => check.name === 'postgres-ledger')?.detail,
+    'connection or schema check failed',
+  );
 });

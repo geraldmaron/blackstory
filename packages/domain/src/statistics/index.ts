@@ -65,3 +65,5 @@ export type {
   NationalPopulationTimelineRow,
   NationalPopulationChange,
 } from './census-national-decade.js';
+
+export * from './public-data-summaries.js';

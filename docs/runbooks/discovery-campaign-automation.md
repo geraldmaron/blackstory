@@ -71,3 +71,10 @@ journalctl --user -u blackstory-overnight-enrichment.service -n 200 --no-pager
 
 Keep the timer stopped after any preflight failure. Do not restore a legacy backend selector to
 work around an unavailable Postgres ledger.
+
+## Ledger parity
+
+Overnight and SearXNG discovery runs share the same canonical ledger preflight. After each
+production-equivalent window, follow the parity checklist in
+[`overnight-hybrid-enrichment.md`](./overnight-hybrid-enrichment.md#ledger-parity-cycles-human-observation).
+Both cycles remain **PENDING** until a human marks them passed.

@@ -7,7 +7,7 @@
  * (vertical bars with unwrapped SVG labels overlapped at the default chart width).
  */
 import React from 'react';
-import type { OpportunityAtlasCoverageSummary } from '@repo/firebase';
+import type { OpportunityAtlasCoverageSummary } from '@repo/domain/statistics/public-data-summaries';
 import { DataChartFrame } from './DataChartFrame';
 import {
   CHART_HEIGHT,

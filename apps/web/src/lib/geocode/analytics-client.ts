@@ -6,8 +6,8 @@
  * `recordCoarseLocationAnalyticsEvent` is the ONLY sink this wires: it logs the event shape
  * (never a resolution, coordinate, address, or ZIP the `CoarseLocationAnalyticsEvent` type has
  * no field for any of them) to the console, the same "real sink is a future integration, this is
- * the structurally-safe interim" posture `../../app/submit/app-check-guard.ts`'s
- * `consoleTelemetry` already uses for App Check events. Wiring a real analytics backend (e.g.
+ * the structurally-safe interim" posture the request-integrity guard's
+ * `consoleTelemetry` already uses for integrity events. Wiring a real analytics backend (e.g.
  * BigQuery export, a metrics service) is out of this module's scope.
  */
 

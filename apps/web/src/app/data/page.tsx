@@ -6,7 +6,7 @@
  * components/data.
  */
 import { US_STATES } from '@repo/domain/map/geography';
-import { buildStateFipsNameMap } from '@repo/firebase';
+import { buildStateFipsNameMap } from '@repo/domain/statistics/public-data-summaries';
 import {
   getAcsCoverageSummary,
   getHateCrimeYearSummaries,

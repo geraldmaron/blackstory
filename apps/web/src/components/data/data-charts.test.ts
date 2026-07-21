@@ -10,7 +10,7 @@ import type {
   HateCrimeYearSummary,
   NationalPopulationTimelineRow,
   OpportunityAtlasCoverageSummary,
-} from '@repo/firebase';
+} from '@repo/domain/statistics/public-data-summaries';
 import { HateCrimeCompositionChart } from './HateCrimeCompositionChart';
 import { HateCrimeYearSeriesChart } from './HateCrimeYearSeriesChart';
 import {

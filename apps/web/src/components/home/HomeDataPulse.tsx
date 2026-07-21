@@ -5,7 +5,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import type { NationalPopulationTimelineSnapshot } from '@repo/firebase';
+import type { NationalPopulationTimelineSnapshot } from '@repo/domain/statistics/public-data-summaries';
 import { DataStatStrip } from '../data/DataStatStrip';
 import { PopulationByDecadeChart } from '../data/PopulationByDecadeChart';
 import { BlackPopulationShareChart } from '../data/BlackPopulationShareChart';

@@ -1,14 +1,8 @@
 """BB-084: schedulable entry points for the research worker.
 
-Cloud Scheduler -> Cloud Tasks -> Cloud Run Jobs dispatches into this worker (ADR-007) by
-calling one of these functions, keyed by the `targetWorker.function` string declared in the
-scheduled-job registry (packages/config/src/scheduled-jobs/roster.ts,
-'adapters.run_health.evaluate_run_health'). This module does not reimplement run-health
-evaluation — it generalizes the existing evaluate_run_health/should_quarantine_run/
-should_dead_letter_run functions (adapters/run_health.py) into the job-run-record shape
-(started/completed, duration, item counts, issues) the scheduling framework uses, mirroring
-packages/config/src/scheduled_jobs/jobs/source-drift-run-health.ts on the TypeScript side so the
-two languages report the same run shape.
+Historical Cloud Scheduler dispatch targeted Cloud Run Jobs (ADR-007). Scheduled discovery and
+overnight enrichment now run on Corsair/systemd against the Postgres research ledger; this module
+retains the source-drift run-health job shape for adapter evaluation only.
 """
 
 from __future__ import annotations

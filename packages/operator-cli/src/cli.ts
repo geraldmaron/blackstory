@@ -42,7 +42,7 @@ import { loadPendingEditorialItems } from './pending-list.js';
 import { runStoryResearch, type StoryTopicSeed } from './story-research-run.js';
 import { prepareStoryPacketIntake } from './story-intake.js';
 import { prepareEdgeIntake, type EdgeIntakeInput } from './edge-intake.js';
-import { createNodeSafeFetchDependencies } from './fetch.js';
+import { createNodeSafeFetchDependencies, runQuickAddFetch } from './fetch.js';
 import { OPERATOR_SOURCES, type OperatorIdentity, type OperatorSource } from './identity.js';
 import {
   prepareEvidenceAttachmentIntake,
@@ -55,6 +55,12 @@ import { censusSafeHttpClient } from './census-http.js';
 import { commitLocate, prepareLocate } from './locate.js';
 import { runResearchIntake } from './research-intake.js';
 import { runWorkerPreflight } from './worker-preflight.js';
+import {
+  loadTougalooGeojsonFeatures,
+  runSundownTownCountyBrief,
+  TOUGALOO_GEOJSON_URL,
+} from './research-directive.js';
+import { assertPostgresOpsDataSource, editorialCatalogFromError } from './ops-data-source-gate.js';
 
 export type CliDependencies = {
   readonly store?: AtomicStore;
@@ -318,6 +324,7 @@ async function finish(
 }
 
 async function createDefaultLiveStore(): Promise<AtomicStore> {
+  assertPostgresOpsDataSource(process.env);
   const { createLiveAtomicStoreFromEnv } = await import('@repo/data-access');
   return createLiveAtomicStoreFromEnv(process.env);
 }
@@ -744,6 +751,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
                 displayName: subject.title,
               }));
         if (catalogFrom === 'postgres') {
+          assertPostgresOpsDataSource(process.env);
           const postgresCatalog = await loadEditorialCatalogFromPostgres();
           catalogEntries =
             jsonCatalogEntries.length > 0
@@ -752,7 +760,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
                 ? postgresCatalog
                 : catalogEntries;
         } else if (catalogFrom !== undefined) {
-          throw new Error('--catalog-from must be "postgres" when set');
+          throw editorialCatalogFromError(catalogFrom);
         }
         const providerName = (optionalFlag(flags, '--provider') ?? 'mock') as
           'mock' | 'openrouter' | 'ollama' | 'hybrid';
@@ -898,6 +906,34 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         stdout(JSON.stringify(result, null, 2));
         return 0;
       }
+      case 'sundown-town-brief': {
+        const state = requireFlag(flags, '--state');
+        const county = optionalFlag(flags, '--county');
+        const limit = Number(optionalFlag(flags, '--limit') ?? '25');
+        const geojsonResult = await runQuickAddFetch(
+          TOUGALOO_GEOJSON_URL,
+          deps.fetchDependencies ?? createNodeSafeFetchDependencies(),
+        );
+        if (!geojsonResult.ok) {
+          throw new Error(`Could not fetch Tougaloo GeoJSON (${geojsonResult.reason})`);
+        }
+        const features = await loadTougalooGeojsonFeatures(async () =>
+          JSON.parse(geojsonResult.parser.extractedText),
+        );
+        const result = await runSundownTownCountyBrief(
+          {
+            state,
+            ...(county ? { county } : {}),
+            limit,
+          },
+          features,
+          {
+            dependencies: deps.fetchDependencies ?? createNodeSafeFetchDependencies(),
+          },
+        );
+        stdout(JSON.stringify(result, null, 2));
+        return 0;
+      }
       case 'locate': {
         const storedLat = optionalFlag(flags, '--stored-lat');
         const storedLng = optionalFlag(flags, '--stored-lng');
@@ -950,7 +986,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
       }
       default: {
         stderr(
-          'Usage: operator-cli <preflight|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|locate> [flags]',
+          'Usage: operator-cli <preflight|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|sundown-town-brief|locate> [flags]',
         );
         return command ? 1 : 0;
       }

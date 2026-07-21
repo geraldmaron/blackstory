@@ -3,7 +3,7 @@
  * labeled series (color is never the only signal).
  */
 import React from 'react';
-import type { AcsCoverageSummary } from '@repo/firebase';
+import type { AcsCoverageSummary } from '@repo/domain/statistics/public-data-summaries';
 import { DataChartFrame } from './DataChartFrame';
 import {
   CHART_HEIGHT,

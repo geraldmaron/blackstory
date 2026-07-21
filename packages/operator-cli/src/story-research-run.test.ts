@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { prepareStoryPacketIntake } from './story-intake.ts';
-import { runStoryResearch } from './story-research-run.ts';
+import { gatherStoryTopicSourceSnippets, runStoryResearch } from './story-research-run.ts';
 
 const NOW = '2026-07-18T12:00:00.000Z';
 const identity = {
@@ -118,4 +118,26 @@ test('prepareStoryPacketIntake stages story_packet without publish fields', () =
     assert.equal(Object.hasOwn(outcome, 'published'), false);
     assert.equal(Object.hasOwn(outcome, 'releaseId'), false);
   });
+});
+
+test('gatherStoryTopicSourceSnippets falls back to preloaded snippets when fetch is blocked', async () => {
+  const snippets = await gatherStoryTopicSourceSnippets(
+    {
+      topicId: 'topic-gather',
+      title: 'Gather test',
+      authorityLeadHints: ['https://www.nps.gov/subjects/alamo/index.htm'],
+      sourceSnippets: ['Preloaded archival excerpt about the Alamo mission with place-first context.'],
+    },
+    {
+      fetchDependencies: {
+        resolveHost: async () => [{ address: '127.0.0.1', family: 4 }],
+        transport: async () => {
+          throw new Error('blocked');
+        },
+      },
+    },
+  );
+
+  assert.equal(snippets.length, 1);
+  assert.match(snippets[0]!, /Preloaded archival/iu);
 });

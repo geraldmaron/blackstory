@@ -3,7 +3,7 @@
  * year. Each year stands alone; incidents are never summed across years.
  */
 import React from 'react';
-import type { HateCrimeYearSummary } from '@repo/firebase';
+import type { HateCrimeYearSummary } from '@repo/domain/statistics/public-data-summaries';
 import { DataChartFrame } from './DataChartFrame';
 import {
   CHART_HEIGHT,
