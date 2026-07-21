@@ -1,0 +1,11 @@
+{
+  "error": {
+    "code": "CLIENT_VERSION_UNSUPPORTED",
+    "message": "This app version is no longer supported. Please update to continue.",
+    "requestId": "req_example_version_floor",
+    "details": {
+      "minSupportedApiVersion": "v1",
+      "currentApiVersion": "v1"
+    }
+  }
+}

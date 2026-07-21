@@ -1,0 +1,8 @@
+{
+  "service": "api-public",
+  "surface": "api-public",
+  "networkPosture": "public-read",
+  "allowedOperations": ["read:search", "read:location"],
+  "status": "ok",
+  "env": "production"
+}

@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "No such resource.",
+    "requestId": "req_example_not_found"
+  }
+}

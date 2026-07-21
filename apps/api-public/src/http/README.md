@@ -197,3 +197,14 @@ backend trace, no flaky wall-clock timing; emulator HTTP layer in
 rejected at the data-access port).
 
 Read budgets and per-endpoint Firestore costs are documented in [`read-budget.md`](./read-budget.md).
+
+## Contract artifacts (MOB-004 evidence to close)
+
+| Artifact | Path |
+|----------|------|
+| OpenAPI v1 wire contract | [`../../openapi/public-v1.openapi.yaml`](../../openapi/public-v1.openapi.yaml) |
+| Redacted response examples | [`../../fixtures/redacted-response-examples/`](../../fixtures/redacted-response-examples/) |
+| Cloud Run deploy runbook | [`../../../docs/runbooks/api-public-cloud-run.md`](../../../docs/runbooks/api-public-cloud-run.md) |
+
+Examples are validated in CI by [`openapi-artifact.test.ts`](./openapi-artifact.test.ts) against
+the same `@repo/public-contracts` zod schemas handlers use at runtime.

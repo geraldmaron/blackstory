@@ -37,3 +37,25 @@ test('createProductionHandlerDeps wires client attestation guard in monitor mode
   assert.equal(missing.verified, false);
   assert.equal(verified.verified, true);
 });
+
+test('createProductionHandlerDeps selects Postgres adapter when PUBLIC_DATA_SOURCE=postgres', () => {
+  const deps = createProductionHandlerDeps({
+    environment: {
+      PUBLIC_DATA_SOURCE: 'postgres',
+      DATABASE_URL: 'postgresql://example.invalid/blackstory',
+      NODE_ENV: 'production',
+    },
+  });
+  assert.equal(typeof deps.dataAccess.getReleasePointer, 'function');
+  assert.equal(typeof deps.dataAccess.search, 'function');
+});
+
+test('createProductionHandlerDeps does not silently default to Firestore when PUBLIC_DATA_SOURCE unset', async () => {
+  const deps = createProductionHandlerDeps({
+    environment: {
+      NODE_ENV: 'production',
+      FIREBASE_PROJECT_ID: 'black-book-efaaf',
+    },
+  });
+  assert.equal(await deps.dataAccess.getReleasePointer(), undefined);
+});
