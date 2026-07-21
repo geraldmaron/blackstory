@@ -4,8 +4,8 @@
  *
  * Supabase URLs often include `sslmode=require`. Recent node-pg treats that as verify-full,
  * which fails on the platform CA chain unless we normalize to `uselibpqcompat=true` and
- * pass `rejectUnauthorized: false`. Without this, live reads throw and the UI silently
- * falls back to the 4-entity seed snapshot.
+ * pass `rejectUnauthorized: false`. Without this, live reads throw; postgres mode must not
+ * silently substitute the 4-entity Dunbar seed (map layout is also `force-dynamic`).
  */
 import pg from 'pg';
 

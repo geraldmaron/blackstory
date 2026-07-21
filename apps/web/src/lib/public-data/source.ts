@@ -415,7 +415,11 @@ export const resolvePublicEntityView = cache(async function resolvePublicEntityV
   return resolvePublicEntity(entityId, () => loadLiveEntity(entityId));
 });
 
-/** List entities from live release artifacts/cache, falling back to seed.  */
+/**
+ * List entities from live release artifacts/cache.
+ * Seed snapshot is only for explicit seed / read-disabled modes — never as a silent
+ * postgres fallback (that baked 4 Dunbar pins into the hero while explore stayed live).
+ */
 export const listPublicEntityViews = cache(async function listPublicEntityViews(): Promise<{
   readonly data: readonly PublicEntityView[];
   readonly source: PublicReadSource;
@@ -424,24 +428,31 @@ export const listPublicEntityViews = cache(async function listPublicEntityViews(
     return { data: listPublicEntities(), source: 'snapshot' };
   }
 
+  if (isPostgresPublicDataSource()) {
+    try {
+      const live = await loadLiveEntities();
+      if (live !== undefined) {
+        return { data: live, source: 'live' };
+      }
+      console.warn(
+        '[public-data] postgres live catalog unavailable; refusing seed fallback (empty catalog)',
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.warn(
+        `[public-data] postgres live catalog failed; refusing seed fallback (empty catalog): ${message}`,
+      );
+    }
+    return { data: [], source: 'none' };
+  }
+
   try {
     const live = await loadLiveEntities();
     if (live !== undefined) {
       return { data: live, source: 'live' };
     }
-  } catch (error) {
-    if (isPostgresPublicDataSource()) {
-      const message = error instanceof Error ? error.message : String(error);
-      console.warn(
-        `[public-data] postgres live catalog failed; falling back to ${listPublicEntities().length}-entity seed snapshot: ${message}`,
-      );
-    }
-  }
-
-  if (isPostgresPublicDataSource()) {
-    console.warn(
-      `[public-data] postgres live catalog unavailable; falling back to ${listPublicEntities().length}-entity seed snapshot`,
-    );
+  } catch {
+    // Non-postgres modes may fall through to the bundled seed snapshot.
   }
 
   return { data: listPublicEntities(), source: 'snapshot' };

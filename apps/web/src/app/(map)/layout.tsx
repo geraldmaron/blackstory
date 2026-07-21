@@ -9,11 +9,17 @@
  * camera all survive by construction. `data-surface="map"` marks the persistent canvas for
  * shell body clearance / page-field opt-out; the site header follows `[data-theme]` like
  * every other route (no map-only fixed-ink navbar override).
+ *
+ * Must stay dynamic: App Hosting mounts DATABASE_URL at RUNTIME only. A build-time static
+ * `/` (hero) would bake the 4-entity Dunbar seed into production while `/explore/api` still
+ * reads live Postgres — the exact split that made the homepage show 4 pins.
  */
 import type { ReactNode } from 'react';
 import { loadMapStageBase } from './shared-map-data';
 import { MapStageProvider } from './MapStage';
 import './map-surfaces.css';
+
+export const dynamic = 'force-dynamic';
 
 export default async function MapSurfaceLayout({ children }: { readonly children: ReactNode }) {
   const base = await loadMapStageBase();

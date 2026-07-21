@@ -81,6 +81,14 @@ test('shouldUseLivePublicProjections disables postgres mode without DATABASE_URL
   );
 });
 
+test('postgres mode must not prefer seed-style artifact caches (hero 4-pin regression)', () => {
+  // Build-time prerender without DATABASE_URL previously baked listPublicEntities() (4 Dunbar
+  // fixtures) into `/` while `/explore/api` stayed live. Artifact preference must stay off
+  // whenever PUBLIC_DATA_SOURCE=postgres so fixtures cannot shadow bb_public.
+  assert.equal(isPostgresPublicDataSource({ PUBLIC_DATA_SOURCE: 'postgres' }), true);
+  assert.equal(shouldPreferReleaseArtifacts({ PUBLIC_DATA_SOURCE: 'postgres' }), false);
+});
+
 test('mapProjectionToPublicEntityView renders claims carried by the projection itself', () => {
   const view = mapProjectionToPublicEntityView({
     id: 'ent_15th_st_church_001',
