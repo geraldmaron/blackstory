@@ -60,14 +60,35 @@ test('active state filter wins at state-scale even when pin is elsewhere', () =>
   assert.equal(target.zoom, ga!.zoom);
 });
 
-test('national-scale pre-select returns CONUS bounds', () => {
+test('below-state-scale pre-select restores the stashed viewport', () => {
+  const preSelect = { lat: 37.9, lng: -95.8, zoom: 4.29 };
   const target = resolveCloseCameraTarget({
-    preSelectViewport: { lat: 37.9, lng: -95.8, zoom: 4.29 },
+    preSelectViewport: preSelect,
     entityCenter: CHICAGO,
   });
-  assert.equal(target.preset, 'national');
-  if (target.preset !== 'national') return;
-  assert.deepEqual(target.bounds, US_CONUS_BOUNDS);
+  assert.equal(target.preset, 'locality');
+  if (target.preset !== 'locality') return;
+  assert.equal(target.center[0], preSelect.lng);
+  assert.equal(target.center[1], preSelect.lat);
+  assert.equal(target.zoom, preSelect.zoom);
+});
+
+test('below-state-scale pre-select without a pin still restores the stashed viewport', () => {
+  const preSelect = { lat: 37.9, lng: -95.8, zoom: 3.5 };
+  const target = resolveCloseCameraTarget({ preSelectViewport: preSelect });
+  assert.equal(target.preset, 'locality');
+  if (target.preset !== 'locality') return;
+  assert.equal(target.zoom, preSelect.zoom);
+});
+
+test('state-scale inference failure with a pin lands on county (not CONUS)', () => {
+  const target = resolveCloseCameraTarget({
+    preSelectViewport: { lat: 41.88, lng: -87.63, zoom: 6.0 },
+    entityCenter: [0, 0] as const,
+  });
+  assert.equal(target.preset, 'locality');
+  if (target.preset !== 'locality') return;
+  assert.equal(target.zoom, CAMERA_COUNTY_ZOOM);
 });
 
 test('missing pre-select with a pin defaults to county (not national)', () => {
@@ -90,4 +111,6 @@ test('state filter with no pin still returns that state frame', () => {
 test('no context at all falls back to national', () => {
   const target = resolveCloseCameraTarget({});
   assert.equal(target.preset, 'national');
+  if (target.preset !== 'national') return;
+  assert.deepEqual(target.bounds, US_CONUS_BOUNDS);
 });

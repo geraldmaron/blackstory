@@ -1,0 +1,30 @@
+/**
+ * Flat session navigation for NarrativeCard and entity detail chrome. Copper signals the
+ * active random toggle; no shadows, gradients, or ornamental motion.
+ */
+
+.ds-entity-session-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+.ds-entity-session-nav .ds-button--compact {
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+}
+
+.ds-entity-session-nav__random[aria-pressed='true'] {
+  border-color: var(--ds-accent);
+  color: var(--ds-accent-text, var(--ds-accent));
+}
+
+.ds-nc__session-nav {
+  padding-top: var(--ds-space-2);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-entity-page__session-nav {
+  margin-top: var(--ds-space-4);
+}

@@ -133,6 +133,10 @@ import {
   syncLayerPaintFromStyle,
   syncSingleLayerPaint,
 } from './map-plate-paint';
+import {
+  buildExploreSearchCenterMarkerElement,
+  type ExploreSearchCenterMarkerInput,
+} from '../../lib/map-experience/explore-search-marker';
 
 function readDocumentColorScheme(): MapColorScheme {
   if (typeof document === 'undefined') return 'dark';
@@ -752,6 +756,8 @@ export type MapStageDataPatchOptions = {
   readonly memorialComplete?: boolean;
 };
 
+export type { ExploreSearchCenterMarkerInput };
+
 export type MapStageHandle = {
   /** Patches source data + density/history-edge mode flags; rebuilds the style and reapplies
    * geography layers + entity markers. Pass `{ fade: true }` for decade-flow dual-buffer
@@ -778,6 +784,9 @@ export type MapStageHandle = {
     event: E,
     handler: (...args: MapStageEvents[E]) => void,
   ) => () => void;
+  /** Copper place pin at a geocoded search center — distinct from entity HTML markers. */
+  readonly setSearchCenterMarker: (marker: ExploreSearchCenterMarkerInput) => void;
+  readonly clearSearchCenterMarker: () => void;
 };
 
 const MapStageContext = createContext<MapStageHandle | null>(null);
@@ -849,6 +858,7 @@ export function MapStageProvider({
   const mapRef = useRef<MapLibreMap | null>(null);
   const maplibreglRef = useRef<MaplibreModule['default'] | null>(null);
   const markersRef = useRef<Marker[]>([]);
+  const searchCenterMarkerRef = useRef<Marker | null>(null);
   const stateLabelMarkersRef = useRef<
     Map<string, { readonly marker: Marker; readonly element: HTMLDivElement }>
   >(new Map());
@@ -1439,6 +1449,29 @@ export function MapStageProvider({
     [runFlyPreset],
   );
 
+  const clearSearchCenterMarker = useCallback(() => {
+    searchCenterMarkerRef.current?.remove();
+    searchCenterMarkerRef.current = null;
+  }, []);
+
+  const setSearchCenterMarker = useCallback(
+    (marker: ExploreSearchCenterMarkerInput) => {
+      const map = mapRef.current;
+      const maplibregl = maplibreglRef.current;
+      if (!map || !maplibregl) return;
+      clearSearchCenterMarker();
+      try {
+        const element = buildExploreSearchCenterMarkerElement(marker.label);
+        searchCenterMarkerRef.current = new maplibregl.Marker({ element, anchor: 'bottom' })
+          .setLngLat([marker.lng, marker.lat])
+          .addTo(map);
+      } catch (error) {
+        console.error('[MapStage] search center marker failed', error);
+      }
+    },
+    [clearSearchCenterMarker],
+  );
+
   /** Stable handle for one-shot map listeners (cluster expand) registered in the mount effect. */
   const runFlyPresetRef = useRef(runFlyPreset);
   runFlyPresetRef.current = runFlyPreset;
@@ -1715,6 +1748,7 @@ export function MapStageProvider({
       if (resizeTimer) clearTimeout(resizeTimer);
       resizeObserver?.disconnect();
       clearMarkers(markersRef.current);
+      clearSearchCenterMarker();
       for (const { marker } of stateLabelMarkersRef.current.values()) marker.remove();
       stateLabelMarkersRef.current.clear();
       mapRef.current?.remove();
@@ -1728,8 +1762,24 @@ export function MapStageProvider({
   }, []);
 
   const handle = useMemo<MapStageHandle>(
-    () => ({ patchData, applyViewState, flyPreset, subscribe, mapAvailable }),
-    [patchData, applyViewState, flyPreset, subscribe, mapAvailable],
+    () => ({
+      patchData,
+      applyViewState,
+      flyPreset,
+      subscribe,
+      mapAvailable,
+      setSearchCenterMarker,
+      clearSearchCenterMarker,
+    }),
+    [
+      patchData,
+      applyViewState,
+      flyPreset,
+      subscribe,
+      mapAvailable,
+      setSearchCenterMarker,
+      clearSearchCenterMarker,
+    ],
   );
 
   return (

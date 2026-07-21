@@ -45,6 +45,7 @@ import {
   whyAppearsEvidenceById,
 } from './adapters';
 import { deriveHistoricalFraming } from './entity-view-model';
+import { EntitySessionNavClient } from './entity-session-nav-client';
 
 type EntityPageProps = {
   readonly params: Promise<{ id: string }>;
@@ -127,6 +128,8 @@ export default async function EntityPage({ params }: EntityPageProps) {
     selected: entity.id,
     ...(geoAnchor ? { viewport: { lat: geoAnchor.lat, lng: geoAnchor.lng, zoom: 11 } } : {}),
   });
+  const { data: searchIndex } = await getPublicSearchIndex();
+  const orderedIds = searchIndex.map((doc) => doc.id);
 
   return (
     <main className="ds-container ds-page" id="main">
@@ -167,6 +170,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
             catalog={entityLinkCatalog}
           />
           <EntityTopicTags entity={entity} />
+          <EntitySessionNavClient currentId={entity.id} orderedIds={orderedIds} />
         </div>
       </header>
 

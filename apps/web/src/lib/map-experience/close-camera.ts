@@ -4,8 +4,11 @@
  * Hierarchy (one geographic tier up from the point framing — never a jump cut to full
  * CONUS when the reader was already in a tighter context):
  *   beyond county → county/locality framing on the pin
- *   state-scale / state filter → state frame
- *   multi-state / national → CONUS national bounds
+ *   state filter → that state's resting frame
+ *   state-scale pre-select → inferred state frame
+ *   below-state-scale pre-select → restore the stashed viewport exactly
+ *   pin / center without a usable pre-select → county framing on the pin
+ *   no center or context → CONUS national bounds
  *
  * Pure and maplibre-free so Node unit tests can lock the bounce-back contract.
  */
@@ -46,7 +49,8 @@ export type ResolveCloseCameraInput = {
  * Picks the close-camera landing from pre-select zoom + geographic context.
  */
 export function resolveCloseCameraTarget(input: ResolveCloseCameraInput): CloseCameraTarget {
-  const zoom = input.preSelectViewport?.zoom;
+  const preSelect = input.preSelectViewport;
+  const zoom = preSelect?.zoom;
   const center = resolveCenter(input);
 
   // 1. Beyond county → county framing on the pin (or pre-select center).
@@ -64,9 +68,13 @@ export function resolveCloseCameraTarget(input: ResolveCloseCameraInput): CloseC
     if (inferred) return inferred;
   }
 
-  // 4. Unknown pre-select but we have a pin (e.g. selected deep link without viewport) —
-  // prefer county over dumping onto full CONUS.
-  if (zoom === undefined && center) {
+  // 4. Below state-scale with a stashed viewport — restore exactly (no CONUS jump).
+  if (preSelect && isBelowStateScale(zoom)) {
+    return restoredViewportTarget(preSelect);
+  }
+
+  // 5. Pin / center without a usable pre-select — regional framing, not CONUS.
+  if (center) {
     return countyTarget(center);
   }
 
@@ -81,8 +89,20 @@ function isStateScale(zoom: number | undefined): boolean {
   return zoom !== undefined && zoom >= CLOSE_STATE_SCALE_ZOOM && zoom <= CLOSE_BEYOND_COUNTY_ZOOM;
 }
 
+function isBelowStateScale(zoom: number | undefined): boolean {
+  return zoom !== undefined && zoom < CLOSE_STATE_SCALE_ZOOM;
+}
+
 function countyTarget(center: readonly [lng: number, lat: number]): CloseCameraTarget {
   return { preset: 'locality', center, zoom: CAMERA_COUNTY_ZOOM };
+}
+
+function restoredViewportTarget(viewport: ExploreViewport): CloseCameraTarget {
+  return {
+    preset: 'locality',
+    center: [viewport.lng, viewport.lat],
+    zoom: viewport.zoom,
+  };
 }
 
 function stateTargetForPostal(postalCode: string | undefined): CloseCameraTarget | undefined {

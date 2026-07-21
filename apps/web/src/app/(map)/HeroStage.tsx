@@ -42,7 +42,12 @@ import {
   defaultExploreOverlayState,
   viewportForState,
   type ExploreViewport,
+  type ExploreViewportFrame,
 } from '../../lib/map-experience/url-state';
+import {
+  CLOSE_BEYOND_COUNTY_ZOOM,
+  resolveCloseCameraTarget,
+} from '../../lib/map-experience/close-camera';
 import { shouldFadeDecadePatch } from '../map/decade-layer-transition';
 import { HeroHeadlineMorph } from './HeroHeadlineMorph';
 import { useMapStage } from './MapStage';
@@ -179,16 +184,41 @@ export function HeroStage({
     [router],
   );
 
-  // Landing on `/` resets selection state and eases the camera back to the national
-  // frame (ADR-017: "the reverse transition eases back to the national preset as
-  // hero chrome returns"); the decade-flow effect below owns the data patches.
+  // Landing on `/` clears selection highlights. Only ease the camera when the reader
+  // is still at entity point zoom (e.g. navigated home before closing a record on
+  // explore) — regional/state/national frames from close-camera are preserved.
   useEffect(() => {
-    stageApiRef.current.applyViewState({
+    const api = stageApiRef.current;
+    api.applyViewState({
       selectedState: undefined,
       selectedEdge: undefined,
       selectedEntity: undefined,
     });
-    stageApiRef.current.flyPreset('national', { bounds: US_CONUS_BOUNDS }, { mode: 'ease' });
+
+    let viewport: ExploreViewportFrame | undefined;
+    const unsubscribe = api.subscribe('viewport', (frame) => {
+      viewport = frame;
+    });
+    unsubscribe();
+
+    if (!viewport || viewport.zoom <= CLOSE_BEYOND_COUNTY_ZOOM) {
+      return;
+    }
+
+    const target = resolveCloseCameraTarget({
+      preSelectViewport: { lat: viewport.lat, lng: viewport.lng, zoom: viewport.zoom },
+    });
+
+    if (target.preset === 'national') {
+      api.flyPreset('national', { bounds: target.bounds }, { mode: 'ease' });
+      return;
+    }
+
+    api.flyPreset(
+      target.preset,
+      { center: target.center, zoom: target.zoom },
+      { mode: 'ease' },
+    );
   }, []);
 
   const currentFrameDecade = decadeFrames[frameIndex]?.decade ?? '';

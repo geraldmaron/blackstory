@@ -380,6 +380,8 @@
   justify-self: start;
 }
 
+@import '../../../components/map-experience/entity-session-nav.css';
+
 .ds-explore__list-panel {
   display: grid;
   gap: var(--ds-space-3);

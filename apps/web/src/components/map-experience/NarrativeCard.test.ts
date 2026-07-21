@@ -79,6 +79,29 @@ test('renders the radius affordance as words, never as a bare number with no con
   assert.doesNotMatch(html, /±200 m/);
 });
 
+test('renders session navigation when sessionNav props are provided', () => {
+  const feature = requireFeature('ent_15th_st_church_001');
+  const html = renderToStaticMarkup(
+    createElement(NarrativeCard, {
+      feature,
+      sessionNav: {
+        canBack: true,
+        canNext: true,
+        randomEnabled: false,
+        onBack: () => {},
+        onNext: () => {},
+        onRandomToggle: () => {},
+      },
+    }),
+  );
+
+  assert.match(html, /aria-label="Record navigation"/);
+  assert.match(html, /ds-nc__session-nav/);
+  assert.match(html, />Back</);
+  assert.match(html, />Next</);
+  assert.match(html, /Random: off/);
+});
+
 test('never labels a coarsened point with a street-address-shaped string', () => {
   for (const entityId of [
     'ent_15th_st_church_001',

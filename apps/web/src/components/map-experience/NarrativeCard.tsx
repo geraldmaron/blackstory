@@ -19,17 +19,24 @@ import { ConfidenceMark } from './ConfidenceMark';
 import { KindBadge } from './KindBadge';
 import { StatusMark } from './StatusMark';
 import { MapsExternalLink } from './MapsExternalLink';
+import { EntitySessionNav, type EntitySessionNavProps } from './EntitySessionNav';
 
 // Defensive: apps/web SSR tests may classic-transform this package's TSX source (same note as
 // `@repo/ui`'s own components, e.g. MapExplorer.tsx).
 void React;
 
+export type NarrativeCardSessionNavProps = Omit<
+  EntitySessionNavProps,
+  'className'
+>;
+
 export type NarrativeCardProps = {
   readonly feature: ExploreMapFeature;
   readonly onClose?: () => void;
+  readonly sessionNav?: NarrativeCardSessionNavProps;
 };
 
-export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
+export function NarrativeCard({ feature, onClose, sessionNav }: NarrativeCardProps) {
   const { properties } = feature;
   const kindEncoding = displayEncodingFor(properties.kind, properties.mapTone);
   const era = eraFactLink(properties.eraBuckets);
@@ -182,6 +189,10 @@ export function NarrativeCard({ feature, onClose }: NarrativeCardProps) {
           feature.properties.radiusMeters,
         )}
       </p>
+
+      {sessionNav ? (
+        <EntitySessionNav {...sessionNav} className="ds-nc__session-nav" />
+      ) : null}
 
       <Link className="ds-cta ds-cta--copper ds-nc__action" href={properties.href} scroll={false}>
         Open full record

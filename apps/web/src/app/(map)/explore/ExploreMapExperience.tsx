@@ -54,6 +54,15 @@ import { SynchronizedResultList } from '../../../components/map-experience/Synch
 import { MetaFieldLabel } from '../../../components/map-experience/MetaFieldLabel';
 import { shouldMorphDecadeDataPatch } from '../../map/decade-layer-transition';
 import {
+  back as sessionBack,
+  canBack as sessionCanBack,
+  canPickNext,
+  createSessionStack,
+  pickNext,
+  push as sessionPush,
+  type SessionStack,
+} from '../../../lib/map-experience/entity-session-nav';
+import {
   CAMERA_POINT_ZOOM,
   prefersReducedMotion,
 } from '../../../lib/map-experience/camera-presets';
@@ -345,6 +354,9 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     readonly within: readonly ExploreNearbyFeature[];
     readonly closest: readonly ExploreNearbyFeature[];
   } | null>(null);
+  /** In-session Back stack for spotlight record navigation (not browser history). */
+  const [sessionStack, setSessionStack] = useState<SessionStack>(() => createSessionStack());
+  const [sessionRandomEnabled, setSessionRandomEnabled] = useState(false);
 
   useEffect(() => {
     const incomingHref = shareableExploreHref(initial.viewState);
@@ -392,6 +404,11 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
       radiusLabel: preset.statusLabel,
       within,
       closest,
+    });
+    stage.setSearchCenterMarker({
+      lng: center.lng,
+      lat: center.lat,
+      label: near ?? 'This place',
     });
   }, [
     stage,
@@ -922,10 +939,14 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   }, [commitViewState]);
 
   const handleSelect = useCallback(
-    (entityId: string) => {
+    (entityId: string, options?: { readonly skipSessionPush?: boolean }) => {
       // Stash the camera *before* the point flight so close can bounce one tier up
       // (county → state → country) instead of always dumping to CONUS / state filter.
       preSelectViewportRef.current = liveViewportRef.current ?? viewStateRef.current.viewport;
+      const previousId = viewStateRef.current.selected;
+      if (!options?.skipSessionPush && previousId && previousId !== entityId) {
+        setSessionStack((stack) => sessionPush(stack, previousId));
+      }
       const feature = view.allFeatures.find((item) => item.properties.entityId === entityId);
       if (feature && feature.geometry.type === 'Point') {
         const [lng, lat] = feature.geometry.coordinates;
@@ -960,7 +981,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
 
   const handleAddressResolved = useCallback(
     (payload: ExploreAddressResolvedPayload) => {
-      const { target, radiusMeters, radiusLabel, entityId } = payload;
+      const { target, radiusMeters, radiusLabel, radiusId, entityId } = payload;
       const prior = liveViewportRef.current ?? viewStateRef.current.viewport;
       prePlaceSearchViewportRef.current = prior;
       // Catalog picks also open a selected record — stash close-camera origin once.
@@ -1000,9 +1021,17 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
         });
       }
 
+      stage.setSearchCenterMarker({
+        lng: center.lng,
+        lat: center.lat,
+        label: target.label,
+      });
+
       commitViewState(
         mergeViewState(view.viewState, {
           viewport: target.viewport,
+          near: target.label,
+          ...(radiusId !== 'all' ? { radius: radiusId } : { clearRadius: true }),
           ...(entityId ? { selected: entityId } : { clearSelected: true }),
           clearEdge: true,
         }),
@@ -1015,6 +1044,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     const prior = prePlaceSearchViewportRef.current;
     prePlaceSearchViewportRef.current = undefined;
     setPlaceSearchFocus(null);
+    stage.clearSearchCenterMarker();
     urlRadiusAppliedRef.current = null;
     if (prior) {
       stage.flyPreset(
@@ -1056,6 +1086,67 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     }
     commitViewState(mergeViewState(view.viewState, { clearSelected: true }));
   }, [commitViewState, stage, view.allFeatures, view.viewState]);
+
+  const sessionOrderedIds = useMemo(() => {
+    const fromList = sortedListFeatures.map((feature) => feature.properties.entityId);
+    if (fromList.length > 1) {
+      return fromList;
+    }
+    return filteredFeatures.map((feature) => feature.properties.entityId);
+  }, [filteredFeatures, sortedListFeatures]);
+
+  const handleSessionBack = useCallback(() => {
+    const result = sessionBack(sessionStack);
+    if (!result) {
+      return;
+    }
+    setSessionStack(result.stack);
+    handleSelect(result.entityId, { skipSessionPush: true });
+  }, [handleSelect, sessionStack]);
+
+  const handleSessionNext = useCallback(() => {
+    const currentId = view.viewState.selected;
+    if (!currentId) {
+      return;
+    }
+    const nextId = pickNext({
+      random: sessionRandomEnabled,
+      currentId,
+      orderedIds: sessionOrderedIds,
+    });
+    if (!nextId) {
+      return;
+    }
+    setSessionStack((stack) => sessionPush(stack, currentId));
+    handleSelect(nextId, { skipSessionPush: true });
+  }, [handleSelect, sessionOrderedIds, sessionRandomEnabled, view.viewState.selected]);
+
+  const handleSessionRandomToggle = useCallback(() => {
+    setSessionRandomEnabled((previous) => !previous);
+  }, []);
+
+  const spotlightSessionNav = useMemo(() => {
+    const currentId = view.viewState.selected;
+    if (!currentId) {
+      return undefined;
+    }
+    return {
+      canBack: sessionCanBack(sessionStack),
+      canNext: canPickNext({ currentId, orderedIds: sessionOrderedIds }),
+      randomEnabled: sessionRandomEnabled,
+      onBack: handleSessionBack,
+      onNext: handleSessionNext,
+      onRandomToggle: handleSessionRandomToggle,
+    };
+  }, [
+    handleSessionBack,
+    handleSessionNext,
+    handleSessionRandomToggle,
+    sessionOrderedIds,
+    sessionRandomEnabled,
+    sessionStack,
+    view.viewState.selected,
+  ]);
 
   const handleLayerModeChange = useCallback(
     (layerMode: ExploreLayerMode) => {
@@ -1696,7 +1787,11 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
             {view.selectedEdge ? (
               <HistoryEdgePanel edge={view.selectedEdge} onClose={handleCloseEdge} />
             ) : selectedFeature ? (
-              <NarrativeCard feature={selectedFeature} onClose={handleClearSelected} />
+              <NarrativeCard
+                feature={selectedFeature}
+                onClose={handleClearSelected}
+                {...(spotlightSessionNav ? { sessionNav: spotlightSessionNav } : {})}
+              />
             ) : null}
           </div>
         </dialog>

@@ -710,9 +710,7 @@
   flex-direction: column;
   justify-content: flex-end;
   padding: 0 clamp(1rem, 5vw, 4rem) clamp(1rem, 3.5vh, 2.5rem);
-  /* Own the full hero hit-target so wheel/touch scroll the document — gaps
-     between chrome used to fall through to MapLibre and trap the page. */
-  pointer-events: auto;
+  /* Pass-through hit regions + interactive carve-outs live in map-surfaces.css. */
 }
 
 /* Legibility scrim: bottom fades to canvas so theme ink clears WCAG on top

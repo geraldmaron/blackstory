@@ -4,8 +4,9 @@
  * (`MapStage.tsx`'s sole canvas mount) is a fixed, full-viewport plate; `.ds-hero-stage` (base
  * panel styling lives in shell.css) and `.ds-explore-stage` each establish their own stacking
  * context above it so paint order never depends on DOM order vs. the canvas. On `/` the plate is
- * atmosphere-only (`pointer-events: none`) so document scroll owns the page; `/explore` restores
- * hit-testing. The MapLibre style plate follows light/dark via `colorScheme`; floating chrome uses
+ * interactive under hero chrome via pass-through hit regions (hero root `pointer-events: none`,
+ * CTAs/timeline `auto`); `/explore` keeps full hit-testing. The MapLibre style plate follows
+ * light/dark via `colorScheme`; floating chrome uses
  * theme-relative surface tokens so instruments stay readable in either mode while the canvas stays
  * perceptible beneath.
  */
@@ -23,10 +24,29 @@
   background: #080606;
 }
 
-/* Homepage: map is atmosphere only. Hit-testing off so vertical scroll reaches
-   About + footer instead of panning/zooming the canvas. Explore re-enables. */
+/* Homepage: pins and state shapes stay tappable under the hero. The hero root passes
+   empty regions through; CTAs and the timeline instrument re-enable hit-testing. */
 .ds-map-surface:has(.ds-hero-stage) .ds-map-stage {
+  pointer-events: auto;
+}
+
+.ds-hero-stage {
   pointer-events: none;
+}
+
+/* Non-interactive copy does not steal pin hits; CTAs and the timeline stay tappable. */
+.ds-hero-stage__kicker,
+.ds-hero-stage__headline,
+.ds-hero-stage__support,
+.ds-hero-stage__count {
+  pointer-events: none;
+}
+
+.ds-hero-stage__actions,
+.ds-hero-stage__actions *,
+.ds-hero-timeline,
+.ds-hero-timeline * {
+  pointer-events: auto;
 }
 
 /* Homepage map surface: footer sits outside `.ds-map-surface` but the plate is
@@ -104,8 +124,8 @@
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 29 29'%3E%3Cpath d='M8.5 14.5h12' stroke='%230a0a0a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
-/* Hero / non-explore: hide zoom on touch-scale (pinch carries it). Explore keeps
-   zoom visible and repositions it into a safe zone below. */
+/* Hero / non-explore: pinch-only on touch-scale — no +/- affordance to tap through.
+   Explore keeps zoom visible and repositions it into panel safe-zones below. */
 @media (max-width: 47.9375rem) {
   .ds-map-surface:not(:has(.ds-explore-stage)) .maplibregl-ctrl-top-right {
     display: none;
@@ -117,6 +137,7 @@
   --ds-explore-edge: var(--ds-space-4);
   /* % of the fixed containing block (viewport) — avoid 100vw scrollbar gutter. */
   --ds-explore-results-width: min(22.5rem, 92%);
+  --ds-explore-restore-chip-width: 6.5rem;
   --ds-explore-zoom-right: var(--ds-explore-edge);
   --ds-explore-zoom-bottom: var(--ds-explore-edge);
 }
@@ -144,6 +165,19 @@
     --ds-explore-zoom-right: var(--ds-explore-edge);
     --ds-explore-zoom-bottom: calc(min(42vh, 22rem) + var(--ds-explore-edge) + var(--ds-space-2));
   }
+
+  .ds-map-surface:has(.ds-explore-stage[data-instruments='open']) {
+    --ds-explore-zoom-right: calc(
+      var(--ds-explore-edge) + var(--ds-explore-restore-chip-width) + var(--ds-space-2)
+    );
+    --ds-explore-zoom-bottom: calc(2.75rem + var(--ds-explore-edge) + var(--ds-space-2));
+  }
+
+  .ds-map-surface:has(.ds-explore-stage[data-instruments='open'][data-results='open']) {
+    --ds-explore-zoom-bottom: calc(
+      min(42vh, 22rem) + 2.75rem + var(--ds-explore-edge) + var(--ds-space-3)
+    );
+  }
 }
 
 @media (max-width: 39.9375rem) {
@@ -155,6 +189,14 @@
 
   .ds-map-surface:has(.ds-explore-stage[data-results='open']) {
     --ds-explore-zoom-bottom: calc(min(42vh, 22rem) + var(--ds-explore-edge) + var(--ds-space-2));
+  }
+}
+
+/* Spotlight card as a bottom sheet must not cover zoom +/-. */
+@media (max-width: 64rem) {
+  .ds-map-surface:has(.ds-explore-stage__spotlight[open]) {
+    --ds-explore-zoom-right: var(--ds-explore-edge);
+    --ds-explore-zoom-bottom: calc(min(72svh, 36rem) + var(--ds-explore-edge) + var(--ds-space-2));
   }
 }
 
