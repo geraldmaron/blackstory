@@ -205,6 +205,7 @@
    `displayEncodingFor` hex carried on GeoJSON `properties.shade`. Fill opacity matches
    ENTITY_POINT_FILL_OPACITY in explore-style.ts (52%). */
 .ds-map-entity-marker {
+  position: relative;
   width: 1.125rem;
   height: 1.125rem;
   padding: 0;
@@ -212,6 +213,38 @@
   border-radius: 50%;
   background: color-mix(in srgb, var(--ds-map-entity-shade, #b86b2a) 52%, transparent);
   cursor: pointer;
+}
+
+/* Selected orientation ring — copper pulse; static when reduced-motion is preferred. */
+.ds-map-entity-marker--selected::after {
+  content: '';
+  position: absolute;
+  inset: -0.35rem;
+  border: 2px solid var(--ds-accent);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: ds-map-entity-selected-pulse 1.8s var(--ds-easing, ease-in-out) infinite;
+}
+
+@keyframes ds-map-entity-selected-pulse {
+  0%,
+  100% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+
+  55% {
+    opacity: 0.15;
+    transform: scale(1.55);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-map-entity-marker--selected::after {
+    animation: none;
+    opacity: 0.85;
+    transform: scale(1.2);
+  }
 }
 
 /* Place-search orientation pin — copper head + stem; not an entity hit target. */

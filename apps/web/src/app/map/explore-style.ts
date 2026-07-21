@@ -1120,6 +1120,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           'circle-radius': markerRadiusPlusExpression(6),
           'circle-color': 'rgba(0,0,0,0)',
           'circle-stroke-width': 2.5,
+          // Copper orientation ring (graphic accent) — MapStage pulses stroke opacity when selected.
           'circle-stroke-color': DIGNITY_PALETTE.point,
           'circle-stroke-opacity': 1,
           'circle-opacity': 1,

@@ -291,6 +291,7 @@ function syncCircularMarkers(
   features: ExploreMapFeatureCollection['features'],
   markers: Marker[],
   onSelect: (entityId: string) => void,
+  selectedEntityId: string | undefined,
 ): void {
   clearMarkers(markers);
 
@@ -314,7 +315,11 @@ function syncCircularMarkers(
 
     const el = document.createElement('button');
     el.type = 'button';
-    el.className = 'ds-map-entity-marker';
+    el.className =
+      selectedEntityId === entityId
+        ? 'ds-map-entity-marker ds-map-entity-marker--selected'
+        : 'ds-map-entity-marker';
+    el.dataset.entityId = entityId;
     el.setAttribute('aria-label', label);
     el.title = label;
     // Mirror the GL circle kind shade so the hit-target disc matches KindBadge / explore-point
@@ -343,6 +348,21 @@ function syncCircularMarkers(
       .setLngLat([lng, lat])
       .addTo(map);
     markers.push(marker);
+  }
+}
+
+/** Toggles the selected pulse class without rebuilding every marker. */
+function syncSelectedEntityMarkerClass(
+  markers: readonly Marker[],
+  selectedEntityId: string | undefined,
+): void {
+  for (const marker of markers) {
+    const el = marker.getElement();
+    const isSelected =
+      selectedEntityId !== undefined &&
+      selectedEntityId.length > 0 &&
+      el.dataset.entityId === selectedEntityId;
+    el.classList.toggle('ds-map-entity-marker--selected', isSelected);
   }
 }
 
@@ -859,6 +879,8 @@ export function MapStageProvider({
   const maplibreglRef = useRef<MaplibreModule['default'] | null>(null);
   const markersRef = useRef<Marker[]>([]);
   const searchCenterMarkerRef = useRef<Marker | null>(null);
+  /** Soft opacity pulse on the GL selected ring — cancelled when selection clears. */
+  const selectedPulseRafRef = useRef<number | null>(null);
   const stateLabelMarkersRef = useRef<
     Map<string, { readonly marker: Marker; readonly element: HTMLDivElement }>
   >(new Map());
@@ -929,6 +951,7 @@ export function MapStageProvider({
         configRef.current.featureCollection.features,
         markersRef.current,
         (entityId) => notify(listenersRef.current, 'select', entityId),
+        configRef.current.selectedEntity,
       );
     } catch (error) {
       console.error('[MapStage] marker sync failed', error);
@@ -959,6 +982,53 @@ export function MapStageProvider({
       entry.element.style.opacity = opacity;
     }
   }, []);
+
+  const stopSelectedEntityPulse = useCallback(() => {
+    if (selectedPulseRafRef.current !== null) {
+      cancelAnimationFrame(selectedPulseRafRef.current);
+      selectedPulseRafRef.current = null;
+    }
+    const map = mapRef.current;
+    if (map?.getLayer(EXPLORE_SELECTED_POINT_LAYER_ID)) {
+      map.setPaintProperty(EXPLORE_SELECTED_POINT_LAYER_ID, 'circle-stroke-opacity', 1);
+    }
+  }, []);
+
+  const startSelectedEntityPulse = useCallback(
+    (entityId: string) => {
+      stopSelectedEntityPulse();
+      const map = mapRef.current;
+      if (!map?.getLayer(EXPLORE_SELECTED_POINT_LAYER_ID)) return;
+      if (prefersReducedMotion()) {
+        map.setPaintProperty(EXPLORE_SELECTED_POINT_LAYER_ID, 'circle-stroke-opacity', 1);
+        return;
+      }
+
+      const startedAt = performance.now();
+      const tick = (now: number) => {
+        if (configRef.current.selectedEntity !== entityId || !mapRef.current) {
+          selectedPulseRafRef.current = null;
+          return;
+        }
+        const activeMap = mapRef.current;
+        if (!activeMap.getLayer(EXPLORE_SELECTED_POINT_LAYER_ID)) {
+          selectedPulseRafRef.current = null;
+          return;
+        }
+        // One soft breath every ~1.8s — opacity only, no glow/shadow paint.
+        const phase = ((now - startedAt) % 1800) / 1800;
+        const opacity = 0.28 + 0.72 * (0.5 - 0.5 * Math.cos(phase * Math.PI * 2));
+        activeMap.setPaintProperty(
+          EXPLORE_SELECTED_POINT_LAYER_ID,
+          'circle-stroke-opacity',
+          opacity,
+        );
+        selectedPulseRafRef.current = requestAnimationFrame(tick);
+      };
+      selectedPulseRafRef.current = requestAnimationFrame(tick);
+    },
+    [stopSelectedEntityPulse],
+  );
 
   const applyStyleAndData = useCallback(
     (options?: {
@@ -993,6 +1063,12 @@ export function MapStageProvider({
         setHistoryEdgesVisibility(map, configRef.current.historyEdgesEnabled);
         setSelectedEdgeFilter(map, configRef.current.selectedEdge);
         setSelectedEntityFilter(map, configRef.current.selectedEntity);
+        const selectedId = configRef.current.selectedEntity;
+        if (selectedId && selectedId.length > 0) {
+          startSelectedEntityPulse(selectedId);
+        } else {
+          stopSelectedEntityPulse();
+        }
         if (!options?.skipPrimaryDensityLoad) {
           void loadStatePolygonsWithDensity(
             map,
@@ -1014,7 +1090,7 @@ export function MapStageProvider({
         console.error('[MapStage] style/data apply failed', error);
       }
     },
-    [syncEntityMarkers],
+    [startSelectedEntityPulse, stopSelectedEntityPulse, syncEntityMarkers],
   );
 
   const syncPlatePaintToTheme = useCallback(
@@ -1355,13 +1431,19 @@ export function MapStageProvider({
         selectedEntity: patch.selectedEntity,
       };
       updateStateLabelSelection(patch.selectedState);
+      syncSelectedEntityMarkerClass(markersRef.current, patch.selectedEntity);
       const map = mapRef.current;
       if (!map || !map.isStyleLoaded()) return;
       setSelectedStateFilter(map, patch.selectedState);
       setSelectedEdgeFilter(map, patch.selectedEdge);
       setSelectedEntityFilter(map, patch.selectedEntity);
+      if (patch.selectedEntity && patch.selectedEntity.length > 0) {
+        startSelectedEntityPulse(patch.selectedEntity);
+      } else {
+        stopSelectedEntityPulse();
+      }
     },
-    [updateStateLabelSelection],
+    [startSelectedEntityPulse, stopSelectedEntityPulse, updateStateLabelSelection],
   );
 
   const runFlyPreset = useCallback(
@@ -1745,6 +1827,10 @@ export function MapStageProvider({
       mapStyleReadyRef.current = false;
       memorialDecadeApplyRef.current?.cancel();
       memorialDecadeApplyRef.current = null;
+      if (selectedPulseRafRef.current !== null) {
+        cancelAnimationFrame(selectedPulseRafRef.current);
+        selectedPulseRafRef.current = null;
+      }
       if (resizeTimer) clearTimeout(resizeTimer);
       resizeObserver?.disconnect();
       clearMarkers(markersRef.current);
