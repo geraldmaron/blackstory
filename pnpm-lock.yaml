@@ -232,9 +232,6 @@ importers:
       '@repo/domain':
         specifier: workspace:*
         version: link:../../packages/domain
-      '@repo/firebase':
-        specifier: workspace:*
-        version: link:../../packages/firebase
       '@repo/schemas':
         specifier: workspace:*
         version: link:../../packages/schemas
@@ -244,9 +241,6 @@ importers:
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      firebase:
-        specifier: ^11.10.0
-        version: 11.10.0
       maplibre-gl:
         specifier: ^5.24.0
         version: 5.24.0

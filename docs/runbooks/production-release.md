@@ -4,6 +4,11 @@
 validation, progressive release metadata, protected production approval, explicit App Hosting
 promote, post-deploy health checks, and rollback rehearsal.
 
+**Solo-dev hotfix loop (preferred for one-person prod bugs):** see
+[solo-dev-hotfix.md](./solo-dev-hotfix.md) — branch from `main`, tiny PR, preflight lockfile +
+`force-dynamic`, promote SHA staging→prod, smoke entity pages. Do **not** promote large
+divergent feature branches to fix web prod.
+
 **Repo acceptance:** Firestore migrate / surface deploy / rollback helpers stay **dry-run safe**.
 App Hosting **promote is live** (`promote-app-hosting.sh`) when Environment WIF vars are set;
 without WIF, run the same script locally with Firebase CLI auth. Automatic App Hosting rollouts
@@ -134,28 +139,35 @@ Jobs with `environment: production` pause for required reviewers configured in
 
 ## AC #4 — Migrations / rules sequencing before traffic
 
-Per ADR-011, **Firestore** is the system of record. Before App Hosting or API surfaces receive
-incompatible traffic:
+Per [ADR-020](../adr/ADR-020-supabase-postgres-system-of-record.md), **Supabase Postgres** is the
+product system of record (`bb_public.*`). **Firebase App Hosting** remains the web/admin runtime
+host, and **Firebase Storage / GCS** remains the blob store. Firestore is wind-down / rollback only
+([firebase-wind-down.md](../data/firebase-wind-down.md)) — not a live public-read backend.
 
-1. **Firestore security rules** (all named databases in `infra/firebase/firebase.json`)
-2. **Firestore indexes** (wait for index builds to complete)
-3. **Storage rules** (if changed)
-4. **App Hosting explicit promote** (pinned SHA)
-5. **Cloud Run surface deploys** (if API/admin changed)
+Before App Hosting or API surfaces receive incompatible traffic:
+
+1. **Postgres migrations / schema** applied to the target Supabase project (when schema changed)
+2. **Storage rules** (if blob ACL changed) — still under `infra/firebase/`
+3. **App Hosting explicit promote** (pinned SHA) — do not disable this path
+4. **Cloud Run / api-public deploy** with `PUBLIC_DATA_SOURCE=postgres` + `DATABASE_URL` (if API changed)
+5. **Firestore rules/indexes** only when touching rollback/legacy surfaces (optional during wind-down)
 
 **Human commands (after checkout of pinned SHA):**
 
 ```bash
-firebase deploy --only firestore:rules,firestore:indexes \
-  --project=black-book-efaaf --config=infra/firebase/firebase.json
+# Blob ACL (keep — Storage is still live)
 firebase deploy --only storage \
   --project=black-book-efaaf --config=infra/firebase/firebase.json
+
+# Web/admin host (keep — App Hosting is still live)
 bash infra/github/release-pipeline/promote-app-hosting.sh "$TESTED_SHA" production
+
+# Optional during wind-down only:
+# firebase deploy --only firestore:rules,firestore:indexes \
+#   --project=black-book-efaaf --config=infra/firebase/firebase.json
 ```
 
-CI runs `migrate-firestore-dry-run.sh` as a gate — it prints the same order without mutating cloud.
-
-Postgres / SQL-Connect migrations remain **parked** unless `vars.ENABLE_POSTGRES_CI=true`.
+CI may still run `migrate-firestore-dry-run.sh` as a historical gate; live public reads use Postgres.
 
 ---
 

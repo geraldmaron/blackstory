@@ -5,10 +5,17 @@
  * timeline, and unified connected records. Slim context rail: map, maturity, revision.
  * Sparse sections render the approved `RecordGapNotice` copy instead of a silent empty list.
  * Timeline is omitted entirely when no dated status or relationship timespans exist.
+ *
+ * Must stay dynamic: App Hosting mounts DATABASE_URL at RUNTIME only. Build-time static
+ * `/entity/[id]` for seed-cluster ids previously baked `seed-snapshot` while non-seed ids
+ * still read live Postgres (`rel_seed_001`) — the same class of split as the map hero.
  */
 
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+
+/** Runtime Postgres reads; never bake Dunbar seed at build without DATABASE_URL. */
+export const dynamic = 'force-dynamic';
 import { MapFrame, Timeline } from '@repo/ui';
 import { KindBadge, ConfidenceMark, MapsExternalLink } from '../../../components/map-experience';
 import { EntityLocationMapLazy } from '../../../components/entity/EntityLocationMapLazy';
