@@ -63,3 +63,24 @@ export type {
 } from './sql-connect/operations.js';
 /** @deprecated Parked SQL Connect helpers not the production path (ADR-011).  */
 export { SQL_CONNECT_SDK_STATUS, loadGeneratedAdminSdk } from './sql-connect/generated-stub.js';
+
+export {
+  __resetOpsPostgresPoolForTests,
+  commitWithAudit,
+  createLiveAtomicStoreFromEnv,
+  createPostgresAtomicStore,
+  getOpsPostgresPool,
+  isOpsPostgresDataSource,
+  ledgerPaths,
+  normalizePgConnectionString,
+  resolveOpsDataSource,
+  resolvePostgresConnectionString,
+} from './postgres/index.js';
+export type {
+  AtomicSnapshot,
+  AtomicStore,
+  AtomicTransaction,
+  CommitWithAuditInput,
+  CommitWithAuditResult,
+  StateMutation,
+} from './postgres/index.js';
