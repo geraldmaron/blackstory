@@ -14,9 +14,10 @@
  *   SUPABASE_STORAGE_COPY=1 SUPABASE_SERVICE_ROLE_KEY=… node scripts/copy-gcs-public-media-to-supabase.mjs
  */
 import { spawnSync } from 'node:child_process';
-import { createReadStream, mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { setTimeout as sleep } from 'node:timers/promises';
 
 const DEFAULT_GCS_BUCKET = 'black-book-efaaf-public-media';
 const DEFAULT_SUPABASE_URL = 'https://twykhihqkcldpreuovay.supabase.co';
@@ -115,30 +116,68 @@ function downloadGcsObject(gcsUri, destFile) {
 
 /**
  * @param {string} supabaseUrl
- * @param {string} serviceRoleKey
+ * @param {string} authKey
  * @param {string} objectPath
  * @param {string} localFile
  * @param {string} contentType
  */
-async function uploadToSupabase(supabaseUrl, serviceRoleKey, objectPath, localFile, contentType) {
+async function uploadToSupabase(supabaseUrl, authKey, objectPath, localFile, contentType) {
   const base = supabaseUrl.replace(/\/$/, '');
   const url = `${base}/storage/v1/object/${SUPABASE_BUCKET}/${objectPath}`;
-  const body = createReadStream(localFile);
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${serviceRoleKey}`,
-      apikey: serviceRoleKey,
-      'Content-Type': contentType,
-      'x-upsert': 'true',
-    },
-    // @ts-expect-error Node fetch accepts streams
-    body,
-    duplex: 'half',
-  });
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`Upload failed ${response.status} for ${objectPath}: ${text}`);
+  const body = readFileSync(localFile);
+  let lastError = /** @type {Error | null} */ (null);
+  for (let attempt = 1; attempt <= 5; attempt += 1) {
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${authKey}`,
+          apikey: authKey,
+          'Content-Type': contentType,
+          'x-upsert': 'true',
+          'Content-Length': String(body.byteLength),
+        },
+        body,
+      });
+      if (response.ok) return;
+      const text = await response.text();
+      // Already exists without upsert support — try PUT
+      if (response.status === 400 || response.status === 409) {
+        const put = await fetch(url, {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${authKey}`,
+            apikey: authKey,
+            'Content-Type': contentType,
+            'Content-Length': String(body.byteLength),
+          },
+          body,
+        });
+        if (put.ok) return;
+        lastError = new Error(`Upload failed ${put.status} for ${objectPath}: ${await put.text()}`);
+      } else {
+        lastError = new Error(`Upload failed ${response.status} for ${objectPath}: ${text}`);
+      }
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+    }
+    await sleep(250 * attempt * attempt);
+  }
+  throw lastError ?? new Error(`Upload failed for ${objectPath}`);
+}
+
+/**
+ * @param {string} supabaseUrl
+ * @param {string} objectPath
+ */
+async function alreadyPublic(supabaseUrl, objectPath) {
+  const base = supabaseUrl.replace(/\/$/, '');
+  const url = `${base}/storage/v1/object/public/${SUPABASE_BUCKET}/${objectPath}`;
+  try {
+    const response = await fetch(url, { method: 'HEAD' });
+    return response.ok;
+  } catch {
+    return false;
   }
 }
 
@@ -166,6 +205,8 @@ async function main() {
   const gcsBucket = process.env.GCS_PUBLIC_MEDIA_BUCKET || DEFAULT_GCS_BUCKET;
   const supabaseUrl = process.env.SUPABASE_URL || DEFAULT_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+  const anonKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+  const authKey = serviceRoleKey || anonKey;
 
   console.log('GCS → Supabase public-media copy');
   console.log(`Source: gs://${gcsBucket}/${options.prefix}`);
@@ -187,28 +228,34 @@ async function main() {
     return;
   }
 
-  if (!serviceRoleKey) {
-    throw new Error('SUPABASE_SERVICE_ROLE_KEY is required for live upload');
+  if (!authKey) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY or SUPABASE_ANON_KEY is required for live upload');
   }
 
   const workDir = mkdtempSync(path.join(tmpdir(), 'bb-media-copy-'));
   let ok = 0;
+  let skipped = 0;
   let failed = 0;
   try {
     for (const uri of objects) {
       const objectPath = objectPathFromGcsUri(uri, gcsBucket);
+      if (await alreadyPublic(supabaseUrl, objectPath)) {
+        skipped += 1;
+        ok += 1;
+        continue;
+      }
       const localFile = path.join(workDir, path.basename(objectPath) || 'blob');
       try {
         downloadGcsObject(uri, localFile);
         await uploadToSupabase(
           supabaseUrl,
-          serviceRoleKey,
+          authKey,
           objectPath,
           localFile,
           guessContentType(objectPath),
         );
         ok += 1;
-        if (ok % 25 === 0) console.log(`  uploaded ${ok}/${objects.length}`);
+        if (ok % 25 === 0) console.log(`  uploaded/skipped ${ok}/${objects.length}`);
       } catch (err) {
         failed += 1;
         console.error(`  FAIL ${objectPath}: ${err instanceof Error ? err.message : String(err)}`);
@@ -218,7 +265,7 @@ async function main() {
     rmSync(workDir, { recursive: true, force: true });
   }
 
-  console.log(`Done. ok=${ok} failed=${failed} total=${objects.length}`);
+  console.log(`Done. ok=${ok} skipped=${skipped} failed=${failed} total=${objects.length}`);
   console.log('GCS source was not modified.');
   if (failed > 0) process.exitCode = 1;
 }

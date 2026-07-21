@@ -5,7 +5,7 @@
 
 # Supabase Storage cutover
 
-**Status:** Buckets live; byte copy gated on service role  
+**Status:** Public-media copy complete (2026-07-21); raw-sources optional  
 **ADR:** [ADR-020](../adr/ADR-020-supabase-postgres-system-of-record.md) (amended)  
 **Buckets:** `public-media` (public), `raw-sources` (private)
 
@@ -17,20 +17,16 @@
 4. Web CSP allows both `storage.googleapis.com` and the project Supabase host
 5. Copy script: [`scripts/copy-gcs-public-media-to-supabase.mjs`](../../scripts/copy-gcs-public-media-to-supabase.mjs)
 
-## Live public-media copy (owner)
+## Public-media copy
+
+Completed 2026-07-21: GCS `black-book-efaaf-public-media/public/` mirrored into Supabase bucket `public-media` (same object keys). GCS left untouched for dual-serve/rollback.
+
+Re-run / repair (service role preferred; anon only with temporary upload policy):
 
 ```bash
-# Dry-run
-node scripts/copy-gcs-public-media-to-supabase.mjs
-
-# Live (~461 MiB, ~480 objects) — requires service_role; GCS untouched
-export SUPABASE_URL=https://twykhihqkcldpreuovay.supabase.co
-export SUPABASE_SERVICE_ROLE_KEY='…'   # Dashboard → Project Settings → API
-export SUPABASE_STORAGE_COPY=1
-node scripts/copy-gcs-public-media-to-supabase.mjs
+node scripts/copy-gcs-public-media-to-supabase.mjs   # dry-run
+SUPABASE_STORAGE_COPY=1 SUPABASE_SERVICE_ROLE_KEY=… node scripts/copy-gcs-public-media-to-supabase.mjs
 ```
-
-Prefer storing the key in 1Password and injecting via `run-with-dev-secrets` rather than shell history.
 
 ## After copy
 

@@ -10,7 +10,7 @@ After Postgres cutover, **do not delete** production Firebase project `black-boo
 - [x] Operator-cli / quick-add / evidence commits use the Postgres-only `createLiveAtomicStoreFromEnv`
 - [x] Discovery kill switches use `bb_ops.kill_switches`; the retired scheduler has no live fallback
 - [x] Blobs: Supabase Storage buckets `public-media` (public) + `raw-sources` (private) created; GCS remains dual-serve origin until copy + soak complete (see `docs/data/supabase-storage-cutover.md`)
-- [ ] Public-media byte copy GCS → Supabase (operator: `scripts/copy-gcs-public-media-to-supabase.mjs` with service role)
+- [x] Public-media byte copy GCS → Supabase (`public-media` bucket; GCS retained for dual-serve)
 - [ ] Raw-sources byte copy (phase 2)
 - [ ] Flip writers / collage hardcodes / new release media URLs after soak
 - [x] Pending schema: PostgREST published views + jurisdictions.location applied on `blackstory-app`
