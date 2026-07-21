@@ -70,7 +70,7 @@ describe('initializeObservability', () => {
     const connectivity = createManualConnectivity('online');
 
     const result = await initializeObservability(store, connectivity);
-    expect(result).toEqual({ initialized: false, observabilityEnabled: true });
+    expect(result).toEqual({ initialized: true, observabilityEnabled: true });
     expect(getObservabilityConfig().observabilityEnabled).toBe(true);
     expect(getActiveReportContext().degraded).toBe(false);
   });

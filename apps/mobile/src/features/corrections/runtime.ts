@@ -4,9 +4,7 @@
  * module loads — the same split bootstrap.ts uses for the security layer.
  *
  * Binds:
- *   - the submissions-surface base URL (ADR-021 §3; falls back to the api-public
- *     base until a distinct submissions host is configured),
- *   - the App Check token provider (`getAppCheckToken`),
+ *   - the submissions-surface base URL (ADR-021 §3),
  *   - the SecureStore-backed receipt store (lazy native backend),
  *   - NetInfo-backed connectivity (lazy native).
  *
@@ -14,7 +12,6 @@
  */
 import Constants from 'expo-constants';
 
-import { getAppCheckToken } from '@/security/app-check';
 import { createSecretStore, type SecretStore } from '@/data/secure-store';
 import { createNetInfoConnectivity } from '@/data/offline';
 import { CORRECTIONS_API_MAJOR } from './contract';
@@ -41,7 +38,6 @@ export async function createCorrectionClientDeps(): Promise<CorrectionClientDeps
     baseUrl: resolveSubmissionsBaseUrl(),
     clientVersion: Constants.expoConfig?.version ?? '0.0.0',
     apiMajor: CORRECTIONS_API_MAJOR,
-    getToken: (forceRefresh) => getAppCheckToken(forceRefresh),
     fetch: globalThis.fetch,
     secrets,
     connectivity,

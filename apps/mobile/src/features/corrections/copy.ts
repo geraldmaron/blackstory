@@ -43,11 +43,6 @@ export const RECEIPT_SAVE_INSTRUCTIONS =
 export const RATE_LIMITED_MESSAGE =
   'Too many attempts right now. Please wait a little while and try again.';
 
-/** App Check unavailable — fail CLOSED (threat-model corrections resolution;
- * requirement #2). The write is NOT sent unattested. */
-export const APP_CHECK_UNAVAILABLE_MESSAGE =
-  'We can’t verify this device right now, so we didn’t submit your correction. Please try again in a moment.';
-
 /** Client is offline. Corrections do NOT queue-and-retry silently
  * (ADR-022 §3 / threat-model corrections resolution; requirement #6/#7). */
 export const OFFLINE_MESSAGE =

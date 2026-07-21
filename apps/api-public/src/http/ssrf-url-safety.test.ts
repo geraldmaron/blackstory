@@ -7,7 +7,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { AppCheckDecision, AppCheckHeaders } from '@repo/firebase';
+import type { ClientAttestationHeaders } from '@repo/security';
 import type { EntityV1 } from '@repo/public-contracts/v1/entity';
 import { publicApiErrorEnvelopeSchema } from '@repo/public-contracts/errors';
 import { createPublicRateLimitGuard } from '../rate-limits.js';
@@ -51,15 +51,14 @@ const REJECTED_URLS = [
   'not a url',
 ] as const;
 
-function monitorAppCheck(): AppCheckDecision {
-  return { allowed: true, verified: true, mode: 'monitor', trustedService: false };
-}
-
 function makeDeps(dataAccess: PublicDataAccess): HandlerDeps {
   return {
     dataAccess,
-    appCheckGuard: async (_req: { headers: AppCheckHeaders }): Promise<AppCheckDecision> =>
-      monitorAppCheck(),
+    clientAttestationGuard: async ({ headers }: { headers: ClientAttestationHeaders }) => ({
+      allowed: true,
+      verified: Boolean((headers as Record<string, string | undefined>)['x-blackstory-client']),
+      mode: 'monitor',
+    }),
     rateLimitGuard: createPublicRateLimitGuard({ now: () => FIXED_NOW }),
     searchGuard: createPublicSearchGuard(),
   };
@@ -164,7 +163,7 @@ test('SSRF: handler never calls global fetch on search over URL-bearing entities
       {
         ...makeRequest('/v1/search'),
         query: new URLSearchParams('q=dunbar'),
-        headers: { 'x-firebase-appcheck': 'token' },
+        headers: { 'x-blackstory-client': 'mobile/1.0.0; api=1' },
       },
       deps,
     );
@@ -217,7 +216,7 @@ test('SSRF: bootstrap/entity/search handlers do not invoke fetch even when globa
       {
         ...makeRequest('/v1/search'),
         query: new URLSearchParams('q=dunbar'),
-        headers: { 'x-firebase-appcheck': 'token' },
+        headers: { 'x-blackstory-client': 'mobile/1.0.0; api=1' },
       },
       deps,
     );

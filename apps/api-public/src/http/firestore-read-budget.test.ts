@@ -7,6 +7,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { PublicEntityProjectionDoc, ReleaseSearchIndexArtifact } from '@repo/firebase';
+import type { ClientAttestationHeaders } from '@repo/security';
 import { DEFAULT_QUERY_GUARDRAIL_LIMITS } from '@repo/security';
 import { createPublicRateLimitGuard } from '../rate-limits.js';
 import { createPublicSearchGuard } from '../search-guardrails.js';
@@ -27,7 +28,7 @@ import type { ApiRequest } from './handlers.js';
 
 const RELEASE_ID = 'rel_budget_001';
 const MANIFEST_HASH = 'b'.repeat(64);
-const APP_CHECK = { 'x-firebase-appcheck': 'test-token' };
+const CLIENT_ATTESTATION = { 'x-blackstory-client': 'mobile/1.0.0; api=1' };
 
 const activeRelease = {
   releaseId: RELEASE_ID,
@@ -83,7 +84,7 @@ function makeRequest(path: string, query = ''): ApiRequest {
     method: 'GET',
     path,
     query: new URLSearchParams(query),
-    headers: Object.fromEntries(Object.entries(APP_CHECK).map(([k, v]) => [k.toLowerCase(), v])),
+    headers: Object.fromEntries(Object.entries(CLIENT_ATTESTATION).map(([k, v]) => [k.toLowerCase(), v])),
     requestId: 'req_read_budget',
   };
 }
@@ -101,7 +102,11 @@ function makeHandlerDeps(trace: ReturnType<typeof createEmptyFirestoreReadTrace>
   });
   return {
     dataAccess: createFirestorePublicDataAccess(readers),
-    appCheckGuard: async () => ({ allowed: true, verified: true, mode: 'monitor', trustedService: false }),
+    clientAttestationGuard: async ({ headers }: { headers: ClientAttestationHeaders }) => ({
+      allowed: true,
+      verified: Boolean((headers as Record<string, string | undefined>)['x-blackstory-client']),
+      mode: 'monitor',
+    }),
     rateLimitGuard: createPublicRateLimitGuard({ now: () => 1_800_000_000_000 }),
     searchGuard: createPublicSearchGuard(),
   };

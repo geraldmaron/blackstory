@@ -9,7 +9,6 @@ import {
   createRateLimitEvaluator,
   formatRateLimitResponse,
   releaseConcurrency,
-  type AppCheckAvailability,
   type EndpointClass,
   type QuotaDecision,
   type RateLimitStore,
@@ -26,13 +25,8 @@ export type PublicRateLimitRequest = {
   readonly deviceId?: string;
   readonly sessionId?: string;
   readonly appCheckVerified?: boolean;
+  readonly clientAttested?: boolean;
   readonly riskSignals?: readonly RiskSignal[];
-  /**
-   * Confirmed App Check service availability (repo-uqmm). Defaults to `'available'`. Supply
-   * `'outage'` ONLY from a systemic operator/circuit signal — never per unverified request — so
-   * unattested `expensive_read` (search) degrades to a bounded quota instead of a hard deny (T2).
-   */
-  readonly appCheckAvailability?: AppCheckAvailability;
 };
 
 export type PublicRateLimitGuardDecision = QuotaDecision & {
@@ -114,9 +108,7 @@ export function createPublicRateLimitGuard(options: PublicRateLimitGuardOptions 
         ...(request.appCheckVerified !== undefined
           ? { appCheckVerified: request.appCheckVerified }
           : {}),
-        ...(request.appCheckAvailability !== undefined
-          ? { appCheckAvailability: request.appCheckAvailability }
-          : {}),
+        ...(request.clientAttested !== undefined ? { clientAttested: request.clientAttested } : {}),
         ...(request.riskSignals ? { riskSignals: request.riskSignals } : {}),
       });
 

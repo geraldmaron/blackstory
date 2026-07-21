@@ -9,8 +9,7 @@
       "developmentClient": true,
       "channel": "development",
       "env": {
-        "APP_VARIANT": "development",
-        "APP_CHECK_ENFORCEMENT_MODE": "monitor"
+        "APP_VARIANT": "development"
       },
       "ios": {
         "resourceClass": "m-medium"
@@ -25,7 +24,6 @@
       "autoIncrement": true,
       "env": {
         "APP_VARIANT": "preview",
-        "APP_CHECK_ENFORCEMENT_MODE": "monitor",
         "API_BASE_URL": "https://api.blackbook.app"
       },
       "ios": {
@@ -41,7 +39,6 @@
       "autoIncrement": true,
       "env": {
         "APP_VARIANT": "production",
-        "APP_CHECK_ENFORCEMENT_MODE": "monitor",
         "API_BASE_URL": "https://api.blackbook.app"
       },
       "ios": {

@@ -17,6 +17,7 @@ After Postgres cutover, **do not delete** production Firebase project `black-boo
 - [ ] Supabase advisors: **Leaked password protection** still WARN — enable in Dashboard (Management API PATCH returned 403 with available PAT)
 - [x] Scheduled Cloud Functions runtime retired; Corsair/systemd is the recurring scheduler
 - [ ] Public web reads and request-integrity controls still require a separate Firebase-free cutover before the project can be archived
+- [x] Mobile + api-public: Firebase App Check retired; direct API callers use `X-BlackStory-Client`; Postgres is the default read path (`PUBLIC_DATA_SOURCE=postgres`)
 
 ### Owner: enable leaked password protection (HaveIBeenPwned)
 

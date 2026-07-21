@@ -1,7 +1,7 @@
 /**
  * React providers that bind the shared app runtime into the tree (repo-8b5h).
  *
- * On mount: App Check + observability bootstrap, one QueryClient with SQLite
+ * On mount: observability bootstrap, one QueryClient with SQLite
  * persistence, and a single bootstrap-sync against `/v1/bootstrap`. Features
  * read transport/cache/connectivity from AppRuntimeContext.
  */
@@ -15,7 +15,6 @@ import {
 } from 'react';
 
 import { mobileDehydrateOptions } from '@/data';
-import { bootstrapAppCheck } from '@/security';
 import { initializeObservability } from '@/observability';
 
 import { getAppRuntime, type AppRuntime } from './create-app-runtime';
@@ -52,7 +51,6 @@ export function AppProviders({ children, runtime: injected }: AppProvidersProps)
     let cancelled = false;
     void (async () => {
       try {
-        await bootstrapAppCheck();
         const next = await getAppRuntime();
         await initializeObservability(next.store, next.connectivity);
         await next.bootstrapSync.sync();

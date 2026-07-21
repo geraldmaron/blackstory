@@ -45,8 +45,8 @@ export const DEFAULT_PERFORMANCE_SAMPLE_RATE = 0.1;
  * Resolve the observability config from an arbitrary config value (e.g.
  * `Constants.expoConfig.extra`). Never throws: any malformed/missing input
  * resolves to the safe defaults above. Mirrors `resolveEnforcementMode`'s
- * "typo-safe, opt-in-required" pattern in `src/security/enforcement.ts`
- * (there: enforcement must be explicitly opted into; here: disabling
+ * "typo-safe, opt-in-required" pattern used elsewhere in mobile config
+ * (observability must be explicitly disabled; here: disabling
  * observability must be explicit — `false`, not any other falsy value, turns
  * it off).
  */

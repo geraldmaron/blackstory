@@ -10,29 +10,17 @@
  * that fails its contract is a server bug and becomes an `INTERNAL` error, never a malformed
  * payload on the wire.
  *
- * App Check posture (Threat model T1/T2; ADR-010 degraded-read doctrine):
- *   - App Check is an ABUSE SIGNAL, never an authorization gate for reads. A missing/forged token
- *     NEVER denies a read — it is recorded, feeds the rate limiter as the lowest-trust `anonymous`
- *     subject, and the same data is returned. This is the fail-OPEN requirement (T2): an App Check
- *     outage must not lock the public corpus.
- *   - `entity` and `bootstrap` are `static_read` — they fully fail open (unverified token → same
- *     data, only the rate bucket differs). `search` is an `expensive_read`: the shared rate-limiter
- *     (`DEFAULT_ENDPOINT_QUOTA_MATRIX`) REQUIRES a verified App Check token for anonymous callers
- *     and denies `app_check_required` (surfaced as 429) otherwise — the App Check GUARD still never
- *     hard-denies; the cost-tier quota policy does. `health` and `compatibility` do NOT invoke the
- *     guard.
- *   - App Check OUTAGE carve-out (repo-uqmm; resolved): the search hard-deny is the enumeration
- *     defense during NORMAL operation. During a *confirmed App Check service outage*, T2 requires
- *     fail-open. `@repo/security` now honors an explicit `appCheckAvailability='outage'` signal that
- *     relaxes the expensive-read hard-deny to a BOUNDED degraded quota (never free access). This
- *     handler samples that signal via the optional `HandlerDeps.appCheckAvailability` provider
- *     (defaults to `'available'`); wire it to a systemic operator/circuit signal, never a single
- *     caller's missing token. See `./README.md` for the per-endpoint table.
+ * Client attestation posture (Threat model T1/T2; ADR-010 / ADR-020):
+ *   - `X-BlackStory-Client` is an abuse-trust signal for direct API callers (mobile), not
+ *     authorization. A missing header NEVER hard-denies a read — it feeds rate limits as the
+ *     lowest-trust anonymous subject (fail-open for static reads; expensive reads need the header
+ *     or they hit `app_check_required` via quota policy).
+ *   - Replaces Firebase App Check after the Postgres cutover; web uses same-origin request
+ *     integrity on Next.js routes instead.
  */
-import type { AppCheckDecision, AppCheckHeaders } from '@repo/firebase';
+import type { ClientAttestationDecision, ClientAttestationHeaders } from '@repo/security';
 import {
   encodeSearchCursor,
-  type AppCheckAvailability,
   type CanonicalSearchQuery,
   type QueryGuardrailDecisionAllowed,
   type RateLimitSubject,
@@ -69,19 +57,11 @@ export type ApiRequest = {
 
 export type HandlerDeps = {
   readonly dataAccess: PublicDataAccess;
-  readonly appCheckGuard: (request: { readonly headers: AppCheckHeaders }) => Promise<AppCheckDecision>;
+  readonly clientAttestationGuard: (
+    request: { readonly headers: ClientAttestationHeaders },
+  ) => Promise<ClientAttestationDecision>;
   readonly rateLimitGuard: ReturnType<typeof createPublicRateLimitGuard>;
   readonly searchGuard: ReturnType<typeof createPublicSearchGuard>;
-  /**
-   * Confirmed App Check service availability, sampled per request (repo-uqmm). Optional; when
-   * omitted the rate limiter defaults to `'available'` (no behavior change). Wire this to a
-   * systemic outage signal — an operator kill-switch flag or an App Check verification circuit
-   * breaker — so that during a confirmed App Check outage, unattested `expensive_read` (search)
-   * degrades to a bounded rate-limited quota instead of a hard `app_check_required` deny
-   * (threat-model T2 / ADR-020 §3 fail-open). A single unverified request is NOT an outage, so
-   * this must never be derived from one caller's missing token.
-   */
-  readonly appCheckAvailability?: () => AppCheckAvailability;
 };
 
 const ENTITY_ID_PATTERN = /^[A-Za-z0-9_-]{1,200}$/;
@@ -182,7 +162,7 @@ export async function handleBootstrap(request: ApiRequest, deps: HandlerDeps): P
   if (floor) return floor;
 
   // App Check as a signal only — never denies (fail-open, T2).
-  await deps.appCheckGuard({ headers: request.headers as AppCheckHeaders });
+  await deps.clientAttestationGuard({ headers: request.headers });
 
   const pointer = await deps.dataAccess.getReleasePointer();
   if (!pointer) {
@@ -231,9 +211,9 @@ export async function handleEntity(
     });
   }
 
-  const appCheck = await deps.appCheckGuard({ headers: request.headers as AppCheckHeaders });
+  const attestation = await deps.clientAttestationGuard({ headers: request.headers });
 
-  const rateLimited = await runRateLimit(request, '/v1/entity/' + entityId, deps, appCheck);
+  const rateLimited = await runRateLimit(request, '/v1/entity/' + entityId, deps, attestation);
   if (rateLimited.limitResponse) return rateLimited.limitResponse;
 
   try {
@@ -280,9 +260,9 @@ export async function handleSearch(request: ApiRequest, deps: HandlerDeps): Prom
   const floor = enforceClientFloor(request);
   if (floor) return floor;
 
-  const appCheck = await deps.appCheckGuard({ headers: request.headers as AppCheckHeaders });
+  const attestation = await deps.clientAttestationGuard({ headers: request.headers });
 
-  const rateLimited = await runRateLimit(request, '/v1/search', deps, appCheck);
+  const rateLimited = await runRateLimit(request, '/v1/search', deps, attestation);
   if (rateLimited.limitResponse) return rateLimited.limitResponse;
 
   try {
@@ -384,21 +364,18 @@ function toSearchHttpQuery(query: URLSearchParams): PublicSearchHttpQuery {
 const RATE_LIMIT_SUBJECT: RateLimitSubject = 'anonymous';
 
 /** Runs the rate-limit guard and returns a denial response (if any) plus a `release` that frees the
- * concurrency slot. `appCheckVerified` feeds the evaluator (a missing token → lower trust → tighter
- * quota) WITHOUT ever hard-denying the read. */
+ * concurrency slot. `clientAttested` feeds the evaluator for expensive-read trust. */
 async function runRateLimit(
   request: ApiRequest,
   path: string,
   deps: HandlerDeps,
-  appCheck: AppCheckDecision,
+  attestation: ClientAttestationDecision,
 ): Promise<{ readonly limitResponse: ApiResponse | null; readonly release: () => void }> {
-  const appCheckAvailability = deps.appCheckAvailability?.();
   const decision = deps.rateLimitGuard.evaluate({
     method: 'GET',
     path,
     subject: RATE_LIMIT_SUBJECT,
-    appCheckVerified: appCheck.verified,
-    ...(appCheckAvailability !== undefined ? { appCheckAvailability } : {}),
+    clientAttested: attestation.verified,
     ...(request.clientIp ? { clientIp: request.clientIp } : {}),
   });
 

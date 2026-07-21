@@ -4,7 +4,7 @@
  */
 import assert from 'node:assert/strict';
 import { before, test } from 'node:test';
-import type { AppCheckDecision, AppCheckHeaders } from '@repo/firebase';
+import type { ClientAttestationHeaders } from '@repo/security';
 import { publicApiErrorEnvelopeSchema } from '@repo/public-contracts/errors';
 import { searchResponseV1Schema } from '@repo/public-contracts/v1/search';
 import { createFirebaseHarness, firebaseHarnessGate } from '@repo/testing';
@@ -32,7 +32,7 @@ import type { ApiRequest, HandlerDeps } from './handlers.js';
 
 const FIXED_NOW = 1_800_000_000_000;
 const REQUEST_ID = 'req_emulator_integration';
-const APP_CHECK = { 'x-firebase-appcheck': 'valid-token' };
+const CLIENT_ATTESTATION = { 'x-blackstory-client': 'mobile/1.0.0; api=1' };
 
 const harness = createFirebaseHarness(API_PUBLIC_EMULATOR_ENV);
 let skipReason: string | undefined;
@@ -60,11 +60,10 @@ function makeReaders() {
 function makeLiveDeps(): HandlerDeps {
   return {
     dataAccess: createFirestorePublicDataAccess(makeReaders()),
-    appCheckGuard: async (_req: { headers: AppCheckHeaders }): Promise<AppCheckDecision> => ({
+    clientAttestationGuard: async ({ headers }: { headers: ClientAttestationHeaders }) => ({
       allowed: true,
-      verified: true,
+      verified: Boolean((headers as Record<string, string | undefined>)['x-blackstory-client']),
       mode: 'monitor',
-      trustedService: false,
     }),
     rateLimitGuard: createPublicRateLimitGuard({ now: () => FIXED_NOW }),
     searchGuard: createPublicSearchGuard(),
@@ -76,7 +75,7 @@ function makeRequest(path: string, query = ''): ApiRequest {
     method: 'GET',
     path,
     query: new URLSearchParams(query),
-    headers: APP_CHECK,
+    headers: CLIENT_ATTESTATION,
     requestId: REQUEST_ID,
   };
 }

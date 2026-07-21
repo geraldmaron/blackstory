@@ -1,23 +1,15 @@
 /**
- * Crash / performance reporting — the ONLY sanctioned path from app code to
- * the crash SDK (MOB-018; privacy invariant 7).
+ * Crash / performance reporting — dev-console sink (MOB-018; privacy invariant 7).
  *
  * `reportError`, `addBreadcrumb`, `startPerfTrace`, and `reportPerf` are the
- * complete public surface. The rest of the app must NEVER import
- * `@react-native-firebase/crashlytics` / `@react-native-firebase/perf`
- * directly — that would bypass the redaction pipeline this module exists to
- * enforce. (`no-raw-sdk-imports.test.ts` greps the source tree for that.)
+ * complete public surface. Every context object passed in here is redacted
+ * through `src/security/log-redaction.ts` before it can be emitted, then
+ * size-capped so an unbounded payload never ships. In `__DEV__` only, redacted
+ * output goes to the console — no third-party crash SDK is linked.
  *
- * Every context object passed in here is redacted through
- * `src/security/log-redaction.ts` — the SAME utility MOB-010 built and
- * tested, not a reimplementation — before it can reach the native SDK, then
- * size-capped so an unbounded payload never ships. Every call is wrapped in
- * its own try/catch, and the whole exported function is wrapped again, so:
- *
- *   - a missing/misconfigured/throwing native SDK degrades silently (bead
- *     requirement 5: "graceful SDK failure" — the app must keep working);
- *   - a bug in THIS reporter's own code (the adversarial "crash inside the
- *     logger itself" case) can never propagate and crash the caller.
+ * Every call is wrapped in its own try/catch, and the whole exported function
+ * is wrapped again, so a bug in THIS reporter's own code can never propagate
+ * and crash the caller.
  *
  * Release/build metadata (bead requirement 3) is attached automatically via
  * `report-context.ts`'s `buildReportContext()` — callers never need to
@@ -31,13 +23,6 @@ import {
   shouldSamplePerfTrace,
   type ObservabilityConfig,
 } from './config';
-import {
-  loadNativeCrashlytics,
-  loadNativePerf,
-  type NativeCrashlyticsSurface,
-  type NativePerfSurface,
-  type NativePerfTrace,
-} from './native-bridge';
 import { reportContextToAttributes, type ReportContext } from './report-context';
 
 /** Any single breadcrumb/context payload larger than this (as redacted JSON
@@ -65,9 +50,6 @@ let activeConfig: ObservabilityConfig = {
   performanceSampleRate: DEFAULT_PERFORMANCE_SAMPLE_RATE,
 };
 
-let cachedCrashlytics: NativeCrashlyticsSurface | null | undefined;
-let cachedPerf: NativePerfSurface | null | undefined;
-
 /** Called once at bootstrap (see `bootstrap.ts`) whenever the resolved
  * report context changes (e.g. release stamp / connectivity update). */
 export function setActiveReportContext(context: ReportContext): void {
@@ -87,31 +69,6 @@ export function getObservabilityConfig(): ObservabilityConfig {
   return activeConfig;
 }
 
-export interface ReportDeps {
-  readonly getCrashlytics?: () => NativeCrashlyticsSurface | null;
-  readonly getPerf?: () => NativePerfSurface | null;
-}
-
-function resolveCrashlytics(deps?: ReportDeps): NativeCrashlyticsSurface | null {
-  if (deps?.getCrashlytics) {
-    return deps.getCrashlytics();
-  }
-  if (cachedCrashlytics === undefined) {
-    cachedCrashlytics = loadNativeCrashlytics();
-  }
-  return cachedCrashlytics;
-}
-
-function resolvePerf(deps?: ReportDeps): NativePerfSurface | null {
-  if (deps?.getPerf) {
-    return deps.getPerf();
-  }
-  if (cachedPerf === undefined) {
-    cachedPerf = loadNativePerf();
-  }
-  return cachedPerf;
-}
-
 /** Test-only seam: clear module state between tests. */
 export function __resetObservabilityForTests(): void {
   activeReportContext = UNSET_REPORT_CONTEXT;
@@ -119,8 +76,14 @@ export function __resetObservabilityForTests(): void {
     observabilityEnabled: DEFAULT_OBSERVABILITY_ENABLED,
     performanceSampleRate: DEFAULT_PERFORMANCE_SAMPLE_RATE,
   };
-  cachedCrashlytics = undefined;
-  cachedPerf = undefined;
+}
+
+function devLoggingEnabled(): boolean {
+  return (
+    activeConfig.observabilityEnabled &&
+    typeof __DEV__ !== 'undefined' &&
+    __DEV__
+  );
 }
 
 function truncateString(text: string, max: number): string {
@@ -150,8 +113,6 @@ export function redactAndCapContext(
   try {
     redacted = redactForLog(context);
   } catch {
-    // Even the redactor failing must not block reporting the underlying
-    // error — fall back to an empty, safe context.
     return { contextRedactionFailed: true };
   }
 
@@ -192,7 +153,7 @@ function safely(fn: () => void): void {
   try {
     fn();
   } catch {
-    // Never let a native SDK call's failure escape this module.
+    // Never let a logging call's failure escape this module.
   }
 }
 
@@ -200,7 +161,7 @@ async function safelyAsync(fn: () => Promise<void>): Promise<void> {
   try {
     await fn();
   } catch {
-    // Same contract as `safely`, for promise-returning native calls.
+    // Same contract as `safely`, for promise-returning work.
   }
 }
 
@@ -211,27 +172,15 @@ export interface ReportErrorOptions {
 }
 
 /**
- * Report an error/exception to the crash SDK. This function NEVER throws —
- * every failure mode (redaction failure, absent SDK, native SDK throwing,
- * even a bug in this function's own body) degrades to a no-op.
- *
- * `deps` is a test-only seam (mirrors `initializeAppCheckClient`'s
- * `loadNative` override in `src/security/app-check.ts`): production call
- * sites never pass it, so the real, module-cached, guarded loader is always
- * used in the app.
+ * Report an error/exception. This function NEVER throws — every failure mode
+ * degrades to a no-op. In `__DEV__`, emits a redacted console.error line.
  */
 export function reportError(
   error: unknown,
   options: ReportErrorOptions = {},
-  deps?: ReportDeps,
 ): void {
   try {
-    if (!activeConfig.observabilityEnabled) {
-      return;
-    }
-
-    const native = resolveCrashlytics(deps);
-    if (!native) {
+    if (!devLoggingEnabled()) {
       return;
     }
 
@@ -242,33 +191,24 @@ export function reportError(
       ...options.context,
     });
 
-    if (mergedContext) {
-      safely(() => {
-        void native.setAttributes(stringifyAttributeValues(mergedContext));
-      });
-    }
-    safely(() => native.recordError(normalizedError));
+    safely(() => {
+      console.error('[BlackStory:reportError]', normalizedError.message, mergedContext);
+    });
   } catch {
-    // Defensive outer guard (bead requirement: a crash INSIDE the reporter's
-    // own code must not crash the app further).
+    // Defensive outer guard.
   }
 }
 
 /**
- * Attach a lightweight breadcrumb (not a full error) to the crash timeline.
+ * Attach a lightweight breadcrumb (not a full error) to the dev timeline.
  * Same redaction + size-cap + never-throw contract as `reportError`.
  */
 export function addBreadcrumb(
   message: string,
   data?: Record<string, unknown>,
-  deps?: ReportDeps,
 ): void {
   try {
-    if (!activeConfig.observabilityEnabled) {
-      return;
-    }
-    const native = resolveCrashlytics(deps);
-    if (!native) {
+    if (!devLoggingEnabled()) {
       return;
     }
 
@@ -279,7 +219,9 @@ export function addBreadcrumb(
     const safeData = redactAndCapContext(data);
     const line = safeData ? `${safeMessage} ${JSON.stringify(safeData)}` : safeMessage;
 
-    safely(() => native.log(truncateString(line, MAX_BREADCRUMB_MESSAGE_LENGTH)));
+    safely(() => {
+      console.debug('[BlackStory:breadcrumb]', truncateString(line, MAX_BREADCRUMB_MESSAGE_LENGTH));
+    });
   } catch {
     // See reportError — never propagate.
   }
@@ -294,16 +236,6 @@ function redactSingleString(value: string): string {
   }
 }
 
-function stringifyAttributeValues(
-  record: Record<string, unknown>,
-): Record<string, string> {
-  const out: Record<string, string> = {};
-  for (const [key, value] of Object.entries(record)) {
-    out[key] = typeof value === 'string' ? value : JSON.stringify(value) ?? String(value);
-  }
-  return out;
-}
-
 export interface PerfTraceHandle {
   putAttribute(key: string, value: string): void;
   stop(): Promise<void>;
@@ -315,56 +247,48 @@ const NOOP_TRACE_HANDLE: PerfTraceHandle = {
 };
 
 function sanitizeTraceName(name: string): string {
-  // Trace names are identifiers, not free text, but cap length defensively —
-  // Crashlytics/Performance both reject overlong metric/trace names.
   return truncateString(redactSingleString(name), 100).replace(/[^\w.\-/ ]/g, '_');
 }
 
 /**
- * Start a sampled performance trace. Sampling (bead requirement 6) applies
- * BEFORE any native call — an unsampled trace never touches the SDK at all,
- * which is also how this stays a true no-op (not just a no-report) when
- * observability is disabled or the SDK is absent.
+ * Start a sampled performance trace. Sampling applies BEFORE any work — an
+ * unsampled trace is a true no-op. In `__DEV__`, sampled traces log start/stop
+ * to the console with redacted attributes.
  */
 export async function startPerfTrace(
   name: string,
   context?: Record<string, unknown>,
-  deps?: ReportDeps,
 ): Promise<PerfTraceHandle> {
   try {
-    if (!activeConfig.observabilityEnabled) {
+    if (!devLoggingEnabled()) {
       return NOOP_TRACE_HANDLE;
     }
     if (!shouldSamplePerfTrace(activeConfig.performanceSampleRate)) {
       return NOOP_TRACE_HANDLE;
     }
-    const native = resolvePerf(deps);
-    if (!native) {
-      return NOOP_TRACE_HANDLE;
-    }
 
-    let trace: NativePerfTrace;
-    try {
-      trace = native.newTrace(sanitizeTraceName(name));
-      await trace.start();
-    } catch {
-      return NOOP_TRACE_HANDLE;
-    }
-
+    const traceName = sanitizeTraceName(name);
     const safeContext = redactAndCapContext({
       ...reportContextToAttributes(activeReportContext),
       ...context,
     });
-    if (safeContext) {
-      for (const [key, value] of Object.entries(stringifyAttributeValues(safeContext))) {
-        safely(() => trace.putAttribute(key, truncateString(value, 100)));
-      }
-    }
+    const startedAt = Date.now();
+
+    safely(() => {
+      console.debug('[BlackStory:perf:start]', traceName, safeContext);
+    });
 
     return {
-      putAttribute: (key: string, value: string) =>
-        safely(() => trace.putAttribute(key, truncateString(value, 100))),
-      stop: () => safelyAsync(() => trace.stop()),
+      putAttribute: (key: string, value: string) => {
+        safely(() => {
+          console.debug('[BlackStory:perf:attr]', traceName, key, truncateString(value, 100));
+        });
+      },
+      stop: () =>
+        safelyAsync(async () => {
+          const durationMs = Date.now() - startedAt;
+          console.debug('[BlackStory:perf:stop]', traceName, { durationMs, ...(safeContext ?? {}) });
+        }),
     };
   } catch {
     return NOOP_TRACE_HANDLE;

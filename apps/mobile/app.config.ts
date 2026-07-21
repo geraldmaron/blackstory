@@ -1,5 +1,3 @@
-import { existsSync } from 'node:fs';
-
 import type { ExpoConfig } from 'expo/config';
 
 /**
@@ -32,8 +30,7 @@ const APP_VARIANT = (process.env.APP_VARIANT as AppVariant | undefined) ?? 'deve
 // sensitive — only its name, and for URLs/enums the offending token/protocol —
 // so a malformed input can't leak a credential into a build log. No production
 // credential is ever fabricated: unset optional inputs fall back to safe,
-// non-secret defaults, and the Firebase native config is a real file on disk
-// (or an EAS file secret), never invented here.
+// non-secret defaults.
 
 function failConfig(message: string): never {
   throw new Error(`[app.config] ${message}`);
@@ -79,53 +76,6 @@ function resolveSampleRate(raw: string | undefined): number {
   return value;
 }
 
-/**
- * Resolve the (client-advisory) App Check enforcement stage. Unset → `monitor`.
- * A typo is a hard error so a build can never silently mean something other
- * than the two valid stages; `enforce` must be opted into deliberately.
- */
-function resolveEnforcementModeEnv(raw: string | undefined): 'monitor' | 'enforce' {
-  const value = (raw ?? '').trim();
-  if (value === '' || value === 'monitor') {
-    return 'monitor';
-  }
-  if (value === 'enforce') {
-    return 'enforce';
-  }
-  return failConfig(`APP_CHECK_ENFORCEMENT_MODE must be "monitor" or "enforce" (got "${value}")`);
-}
-
-/**
- * Resolve the Firebase native config file paths from env. The files themselves
- * are NEVER committed (see .gitignore); their paths come from a gitignored
- * local file or an EAS file secret at build time. Both platforms must be
- * supplied together (a half-configured Firebase app is a misconfiguration),
- * and a supplied path must actually exist so `expo prebuild` fails here with a
- * clear message instead of deep inside a native plugin.
- */
-function resolveFirebaseConfigFiles(): {
-  readonly plist: string | undefined;
-  readonly json: string | undefined;
-  readonly present: boolean;
-} {
-  const plist = process.env.GOOGLE_SERVICES_INFO_PLIST?.trim() || undefined;
-  const json = process.env.GOOGLE_SERVICES_JSON?.trim() || undefined;
-  if (Boolean(plist) !== Boolean(json)) {
-    failConfig(
-      'GOOGLE_SERVICES_INFO_PLIST (iOS) and GOOGLE_SERVICES_JSON (Android) must be set together or not at all — exactly one was provided',
-    );
-  }
-  for (const [name, file] of [
-    ['GOOGLE_SERVICES_INFO_PLIST', plist],
-    ['GOOGLE_SERVICES_JSON', json],
-  ] as const) {
-    if (file && !existsSync(file)) {
-      failConfig(`${name} points to a file that does not exist: ${file}`);
-    }
-  }
-  return { plist, json, present: Boolean(plist && json) };
-}
-
 // Bundle / application identifiers per mobile-identity.md's proposed scheme.
 // These are *proposed* identifiers (dev/preview safe to reference; the bare
 // production id `app.blackbook.mobile` is referenced only, never submitted
@@ -151,32 +101,6 @@ const APP_NAMES: Record<AppVariant, string> = {
 const bundleIdentifier = BUNDLE_IDS[APP_VARIANT];
 const appName = APP_NAMES[APP_VARIANT];
 
-// --- App Check / Firebase native config (MOB-010) ----------------------------
-//
-// No real Firebase iOS/Android app is registered yet and NO
-// GoogleService-Info.plist / google-services.json is committed (a human
-// gate — see mobile-identity.md gates #1/#3 and README "Firebase config —
-// intentionally not committed"). The `@react-native-firebase/app` config
-// plugin THROWS at `expo prebuild` if it is enabled without a real config
-// file present, so the plugins are wired into a SLOT that activates only once
-// the file paths are supplied via env (set per-EAS-profile once the gate
-// clears). Until then, `expo prebuild` runs cleanly with App Check absent and
-// the client degrades gracefully (see src/security/app-check.ts). Do NOT
-// fabricate a placeholder credential file to "turn this on".
-const firebaseConfigFiles = resolveFirebaseConfigFiles();
-const GOOGLE_SERVICES_INFO_PLIST = firebaseConfigFiles.plist;
-const GOOGLE_SERVICES_JSON = firebaseConfigFiles.json;
-const firebaseConfigPresent = firebaseConfigFiles.present;
-
-// Public, non-secret Firebase project identifier (see
-// infra/firebase/registered-apps.json — apiKey/appId/projectId are Firebase
-// *identifiers* restricted by App Check + domain, not server secrets). Only the
-// project id is surfaced to JS via `extra.firebase` for diagnostics; the actual
-// native credential is the GoogleService file copied by the config plugin, not
-// this string. Overridable per-build via env; defaults to the registered
-// production project.
-const FIREBASE_PROJECT_ID = process.env.FIREBASE_PROJECT_ID?.trim() || 'black-book-efaaf';
-
 // --- API surface config (MOB-004 wire contract; MOB-016 corrections) --------
 //
 // The native reader talks to `apps/api-public` (and, once distinct, a
@@ -193,37 +117,14 @@ const SUBMISSIONS_BASE_URL = resolveHttpUrl(
   API_BASE_URL,
 );
 
-// --- Observability (crash/perf reporting) config (MOB-018) -----------------
-//
-// Firebase Crashlytics + Performance Monitoring reuse the SAME
-// `firebaseConfigPresent` gate as App Check above (both need the same
-// GoogleService-Info.plist / google-services.json — MOB-010's human gate,
-// not a new one). Until that gate clears, `expo prebuild` runs cleanly with
-// no crash/perf plugin added and the client degrades gracefully (see
-// src/observability/native-bridge.ts — same guarded-require pattern as
-// src/security/app-check.ts). Do NOT fabricate a placeholder credential file
-// to "turn this on".
+// --- Observability (dev-console crash/perf reporting) config (MOB-018) --------
 //
 // Kill switch + sampling (MOB-018 items 6/7): `observabilityEnabled`
 // defaults to true and is override-able per build without a code change;
 // `performanceSampleRate` bounds perf-trace volume (see
-// src/observability/README.md "Sampling & retention" for the rationale).
-// Crashlytics/Performance are free-tier / not billed per-event in Firebase's
-// pricing model (unlike Firestore reads or a paid map API), so unlike
-// `infra/gcp/cost-controls/cost-controls-matrix.json`'s metered-service
-// budgets, there is no spend ceiling to enforce here — this is a
-// volume/noise control plus a blunt off-switch, consistent with that same
-// budget-capped/kill-switch operating posture.
+// src/observability/README.md "Sampling & retention").
 const OBSERVABILITY_ENABLED = process.env.OBSERVABILITY_ENABLED === 'false' ? false : true;
 const PERFORMANCE_SAMPLE_RATE = resolveSampleRate(process.env.PERFORMANCE_SAMPLE_RATE);
-
-// App Check enforcement STAGE (MOB-010; ADR-020 §3 monitor→enforce rollout).
-// Deliberately defaults to `monitor` — never hardcode `enforce`. Promotion is
-// an explicit operational cutover (see src/security/README.md), overridable
-// per-build via APP_CHECK_ENFORCEMENT_MODE but never to `enforce` by default.
-const APP_CHECK_ENFORCEMENT_MODE = resolveEnforcementModeEnv(
-  process.env.APP_CHECK_ENFORCEMENT_MODE,
-);
 
 // --- EAS Update / OTA (MOB-019, repo-ovn7; ADR-023 §2/§7, threat-model T6) -----
 //
@@ -291,17 +192,6 @@ const config: ExpoConfig = {
     deploymentTarget: '16.4',
     bundleIdentifier,
     icon: './assets/expo.icon',
-    // MOB-010: the `@react-native-firebase/app` config plugin (added to
-    // `plugins` below, gated on `firebaseConfigPresent`) copies this file
-    // into the native project. Keyed by APP_VARIANT via the env var, which
-    // EAS sets per-profile to the correct dev/preview/prod plist once the
-    // Firebase apps are registered (mobile-identity.md gates #1/#3). No
-    // Firebase config file is committed by this bead; do not fabricate one —
-    // when the env var is unset (today) the plugin is not added and prebuild
-    // runs cleanly with App Check absent.
-    ...(GOOGLE_SERVICES_INFO_PLIST
-      ? { googleServicesFile: GOOGLE_SERVICES_INFO_PLIST }
-      : {}),
     //
     // Universal Links (MOB-008, mobile-identity.md's URL-scheme section, threat-model T4
     // "Universal-link domain binding"): declares this app as the handler for
@@ -325,11 +215,6 @@ const config: ExpoConfig = {
       monochromeImage: './assets/images/android-icon-monochrome.png',
     },
     predictiveBackGestureEnabled: false,
-    // MOB-010: `@react-native-firebase/app` plugin (gated on
-    // `firebaseConfigPresent` below) copies this google-services.json into the
-    // Android project, keyed by APP_VARIANT via the env var. Not committed
-    // here; the plugin is skipped entirely when the env var is unset (today).
-    ...(GOOGLE_SERVICES_JSON ? { googleServicesFile: GOOGLE_SERVICES_JSON } : {}),
     //
     // Android App Links (MOB-008), the Android analogue of iOS associatedDomains above:
     // autoVerify asks Android to verify this app against the real assetlinks.json served
@@ -383,47 +268,15 @@ const config: ExpoConfig = {
           minSdkVersion: 26,
         },
         ios: {
-          // MOB-010 / ADR-020 §"USE_FRAMEWORKS=static": React Native Firebase
-          // (App Check) REQUIRES static frameworks linkage, and the ADR-020
-          // spike proved `pod install` succeeds with `USE_FRAMEWORKS=static`.
-          // repo-umwk (ADR-024 "Deferred"/build gate) reconciles the SAME
-          // requirement for `@maplibre/maplibre-react-native`'s official
-          // config plugin (registered below) — its `withPodfilePostInstall`
-          // step assumes/works under static frameworks, so one shared
-          // `useFrameworks: 'static'` here satisfies both native deps rather
-          // than each plugin racing to set it. Carrying it forward here (the
-          // CNG source of truth) makes every `expo prebuild` emit
-          // `ios.useFrameworks=static` into Podfile.properties.json so the
-          // App Check pods and MapLibre pods both link correctly.
+          // ADR-024 / repo-umwk: `@maplibre/maplibre-react-native`'s config plugin
+          // requires static frameworks linkage on iOS. Carrying it here (the CNG
+          // source of truth) makes every `expo prebuild` emit
+          // `ios.useFrameworks=static` into Podfile.properties.json so MapLibre
+          // pods link correctly.
           useFrameworks: 'static',
         },
       },
     ],
-    // MOB-010: App Check attestation plugins (ADR-020 §3 — App Attest /
-    // DeviceCheck on iOS, Play Integrity on Android; NOT the web reCAPTCHA
-    // provider). Wired into a SLOT that activates only when real Firebase
-    // config files are supplied via env (`firebaseConfigPresent`). The
-    // `@react-native-firebase/app` plugin throws at prebuild without a real
-    // config file, so it is intentionally absent until the human gate clears.
-    // The App Check native module itself is autolinked from package.json
-    // regardless; these plugins only wire the AppDelegate init + config-file
-    // copy that need a registered Firebase app to be meaningful.
-    ...(firebaseConfigPresent
-      ? [
-          '@react-native-firebase/app',
-          '@react-native-firebase/app-check',
-          // MOB-018: Crashlytics + Performance Monitoring config plugins.
-          // Same gate as App Check above (`firebaseConfigPresent`) — both
-          // plugins need the same registered Firebase app + config file and
-          // would otherwise throw at prebuild. Not a new human gate; reuses
-          // MOB-010's. The native modules are autolinked from package.json
-          // regardless; these plugins wire the dSYM/mapping-file upload
-          // build phases (iOS Crashlytics) and Gradle plugin (Android) that
-          // need a registered Firebase app to be meaningful.
-          '@react-native-firebase/crashlytics',
-          '@react-native-firebase/perf',
-        ]
-      : []),
   ],
   experiments: {
     typedRoutes: true,
@@ -437,18 +290,6 @@ const config: ExpoConfig = {
     // (https required for production). Set per EAS profile via eas.json `env`.
     apiBaseUrl: API_BASE_URL,
     submissionsBaseUrl: SUBMISSIONS_BASE_URL,
-    // Public Firebase project identifier + a JS-visible "is a real Firebase app
-    // wired?" flag for diagnostics (does not import a native module). The real
-    // credential is the GoogleService file copied by the config plugin, not
-    // this object — see the App Check / Firebase section above.
-    firebase: {
-      projectId: FIREBASE_PROJECT_ID,
-      configPresent: firebaseConfigPresent,
-    },
-    // App Check enforcement stage read at runtime by src/security/bootstrap.ts
-    // (client-advisory only; server stays authoritative). Defaults to
-    // `monitor` — see the cutover runbook in src/security/README.md.
-    appCheckEnforcementMode: APP_CHECK_ENFORCEMENT_MODE,
     // MOB-018: observability kill switch + perf-trace sample rate, read at
     // runtime by src/observability/bootstrap.ts's `resolveObservabilityConfig`.
     // Defaults to enabled/10% — see src/observability/README.md.

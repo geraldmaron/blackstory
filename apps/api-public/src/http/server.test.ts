@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { once } from 'node:events';
 import type { AddressInfo } from 'node:net';
 import { test } from 'node:test';
-import type { AppCheckDecision, AppCheckHeaders } from '@repo/firebase';
+import type { ClientAttestationHeaders } from '@repo/security';
 import { createPublicRateLimitGuard } from '../rate-limits.js';
 import { createPublicSearchGuard } from '../search-guardrails.js';
 import { createInMemoryPublicDataAccess } from './data-access.js';
@@ -18,11 +18,10 @@ import { makeEntity, SAMPLE_POINTER } from './entity-fixture.js';
 function makeDeps(): HandlerDeps {
   return {
     dataAccess: createInMemoryPublicDataAccess({ pointer: SAMPLE_POINTER, entities: [makeEntity()] }),
-    appCheckGuard: async (_req: { headers: AppCheckHeaders }): Promise<AppCheckDecision> => ({
+    clientAttestationGuard: async ({ headers }: { headers: ClientAttestationHeaders }) => ({
       allowed: true,
-      verified: false,
+      verified: Boolean((headers as Record<string, string | undefined>)['x-blackstory-client']),
       mode: 'monitor',
-      trustedService: false,
     }),
     rateLimitGuard: createPublicRateLimitGuard({ now: () => 1_800_000_000_000 }),
     searchGuard: createPublicSearchGuard(),

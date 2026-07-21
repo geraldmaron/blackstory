@@ -19,7 +19,6 @@ import {
   CORRECTION_FORM_INTRO,
   CORRECTION_PRIVACY_NOTICE,
   PRIVACY_CONSENT_LABEL,
-  APP_CHECK_UNAVAILABLE_MESSAGE,
   GENERIC_SUBMIT_ERROR,
   OFFLINE_MESSAGE,
   RATE_LIMITED_MESSAGE,
@@ -95,9 +94,6 @@ export function CorrectionForm({ entityId, onSubmit, onAccepted }: CorrectionFor
           return;
         case 'offline':
           setBanner({ tone: 'warning', text: OFFLINE_MESSAGE });
-          return;
-        case 'app_check_unavailable':
-          setBanner({ tone: 'warning', text: APP_CHECK_UNAVAILABLE_MESSAGE });
           return;
         case 'rate_limited':
           setBanner({ tone: 'warning', text: RATE_LIMITED_MESSAGE });

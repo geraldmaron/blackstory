@@ -168,6 +168,18 @@ test('concurrency limit denies when in-flight cap reached', () => {
   assert.equal(third.allowed, true);
 });
 
+test('clientAttested satisfies expensive-read trust without App Check', () => {
+  const decision = evaluateQuota({
+    subject: 'anonymous',
+    endpointClass: 'search',
+    key: 'anon:search:client',
+    nowMs: 1_700_000_205_000,
+    appCheckVerified: false,
+    clientAttested: true,
+  });
+  assert.equal(decision.allowed, true);
+});
+
 test('missing App Check blocks anonymous expensive endpoints', () => {
   const decision = evaluateQuota({
     subject: 'anonymous',
@@ -180,6 +192,18 @@ test('missing App Check blocks anonymous expensive endpoints', () => {
   if (!decision.allowed) {
     assert.equal(decision.reason, 'app_check_required');
   }
+});
+
+test('mobile client attestation satisfies expensive-read trust without App Check', () => {
+  const decision = evaluateQuota({
+    subject: 'anonymous',
+    endpointClass: 'search',
+    key: 'anon:search:client-attested',
+    nowMs: 1_700_000_205_000,
+    appCheckVerified: false,
+    clientAttested: true,
+  });
+  assert.equal(decision.allowed, true);
 });
 
 test('explicit appCheckAvailability=available preserves the hard-deny (enumeration defense)', () => {

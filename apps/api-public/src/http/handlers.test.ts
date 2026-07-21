@@ -1,11 +1,11 @@
 /**
  * `/v1` handler acceptance + adversarial tests. Every 200 body is re-parsed against its
- * `@repo/public-contracts` schema; App Check fail-open and ID-enumeration indistinguishability are
- * asserted directly.
+ * `@repo/public-contracts` schema; client attestation fail-open and ID-enumeration
+ * indistinguishability are asserted directly.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { AppCheckDecision, AppCheckHeaders } from '@repo/firebase';
+import type { ClientAttestationDecision, ClientAttestationHeaders } from '@repo/security';
 import { bootstrapResponseV1Schema } from '@repo/public-contracts/v1/bootstrap';
 import { entityV1Schema } from '@repo/public-contracts/v1/entity';
 import { searchResponseV1Schema } from '@repo/public-contracts/v1/search';
@@ -19,8 +19,8 @@ import { makeEntity, SAMPLE_POINTER } from './entity-fixture.js';
 
 const FIXED_NOW = 1_800_000_000_000;
 
-function monitorAppCheck(verified: boolean): AppCheckDecision {
-  return { allowed: true, verified, mode: 'monitor', trustedService: false };
+function monitorAttestation(verified: boolean): ClientAttestationDecision {
+  return { allowed: true, verified, mode: 'monitor' };
 }
 
 function makeDeps(overrides: Partial<HandlerDeps> = {}): HandlerDeps {
@@ -30,9 +30,9 @@ function makeDeps(overrides: Partial<HandlerDeps> = {}): HandlerDeps {
       entities: [makeEntity()],
       unpublishedIds: ['ent_withdrawn_999'],
     }),
-    appCheckGuard: async ({ headers }: { headers: AppCheckHeaders }) => {
+    clientAttestationGuard: async ({ headers }: { headers: ClientAttestationHeaders }) => {
       const record = headers as Record<string, string | undefined>;
-      return monitorAppCheck(Boolean(record['x-firebase-appcheck']));
+      return monitorAttestation(Boolean(record['x-blackstory-client']));
     },
     rateLimitGuard: createPublicRateLimitGuard({ now: () => FIXED_NOW }),
     searchGuard: createPublicSearchGuard(),
@@ -132,18 +132,18 @@ test('ADVERSARIAL: malformed entity id is rejected 400 before any lookup', async
   assert.equal(publicApiErrorEnvelopeSchema.parse(res.body).error.code, 'INVALID_REQUEST');
 });
 
-// Search is an `expensive_read` in `DEFAULT_ENDPOINT_QUOTA_MATRIX`: anonymous callers MUST present
-// a verified App Check token or the rate-limiter denies `app_check_required` (ADR-010 gates
-// expensive reads). A real mobile client always attests, so these tests send a token.
-const APP_CHECK = { 'x-firebase-appcheck': 'valid-token' };
+// Search is an `expensive_read`: anonymous callers MUST present a verified client header or the
+// rate-limiter denies `app_check_required` (quota policy name retained for compatibility).
+const CLIENT_HEADER = { 'x-blackstory-client': 'mobile/1.0.0; api=1' };
 
 test('GET /v1/search returns a contract-valid, bounded response', async () => {
-  const res = await dispatch(makeRequest('/v1/search', { query: 'q=dunbar', headers: APP_CHECK }), makeDeps());
+  const res = await dispatch(
+    makeRequest('/v1/search', { query: 'q=dunbar', headers: CLIENT_HEADER }),
+    makeDeps(),
+  );
   assert.equal(res.status, 200);
   const parsed = searchResponseV1Schema.parse(res.body);
   assert.equal(parsed.results[0]?.id, 'ent_dunbar_school_001');
-  // No numeric relevance score is expressible on the result — proven by schema parse succeeding
-  // while the leak fields are absent.
   assert.ok(!('relevanceRankingScore' in (parsed.results[0] ?? {})));
 });
 
@@ -155,7 +155,7 @@ test('GET /v1/search mints an opaque nextCursor when more results exist', async 
     dataAccess: createInMemoryPublicDataAccess({ pointer: SAMPLE_POINTER, entities }),
   });
   const res = await dispatch(
-    makeRequest('/v1/search', { query: 'q=dunbar&pageSize=2', headers: APP_CHECK }),
+    makeRequest('/v1/search', { query: 'q=dunbar&pageSize=2', headers: CLIENT_HEADER }),
     deps,
   );
   const parsed = searchResponseV1Schema.parse(res.body);
@@ -165,7 +165,7 @@ test('GET /v1/search mints an opaque nextCursor when more results exist', async 
 
 test('ADVERSARIAL: SQL-injection-shaped query param is denied 400 by the shared guardrail', async () => {
   const res = await dispatch(
-    makeRequest('/v1/search', { query: 'q=dunbar&sql=DROP+TABLE+entities', headers: APP_CHECK }),
+    makeRequest('/v1/search', { query: 'q=dunbar&sql=DROP+TABLE+entities', headers: CLIENT_HEADER }),
     makeDeps(),
   );
   assert.equal(res.status, 400);
@@ -174,66 +174,28 @@ test('ADVERSARIAL: SQL-injection-shaped query param is denied 400 by the shared 
   assert.equal(envelope.error.details?.reason, 'sql_not_allowed');
 });
 
-test('search (expensive_read) requires App Check for anonymous callers → 429 without a token', async () => {
+test('search (expensive_read) requires client header for anonymous callers → 429 without it', async () => {
   const res = await dispatch(makeRequest('/v1/search', { query: 'q=dunbar' }), makeDeps());
   assert.equal(res.status, 429);
   assert.equal(publicApiErrorEnvelopeSchema.parse(res.body).error.code, 'RATE_LIMITED');
 });
 
-test('repo-uqmm: under a confirmed App Check OUTAGE, unattested search fails OPEN (200, bounded)', async () => {
-  // Same request as the 429 case above, but with a systemic outage signal wired in: T2 fail-open.
-  const deps = makeDeps({ appCheckAvailability: () => 'outage' });
-  const res = await dispatch(makeRequest('/v1/search', { query: 'q=dunbar' }), deps);
-  assert.equal(res.status, 200, 'search must degrade to a bounded read, not lock out, during an outage');
-  const parsed = searchResponseV1Schema.parse(res.body);
-  assert.equal(parsed.results[0]?.id, 'ent_dunbar_school_001');
-});
-
-test('repo-uqmm: default availability (no outage signal) keeps the search hard-deny (429)', async () => {
-  // Explicitly proving the carve-out is opt-in: without the outage provider, behavior is unchanged.
-  const deps = makeDeps({ appCheckAvailability: () => 'available' });
-  const res = await dispatch(makeRequest('/v1/search', { query: 'q=dunbar' }), deps);
-  assert.equal(res.status, 429);
-  assert.equal(publicApiErrorEnvelopeSchema.parse(res.body).error.code, 'RATE_LIMITED');
-});
-
-test('ADVERSARIAL: App Check omitted → read still served identically (fail-open, T2/invariant 6)', async () => {
+test('ADVERSARIAL: client header omitted → entity read still served (fail-open static read)', async () => {
   const deps = makeDeps();
-  const withToken = await dispatch(
+  const withHeader = await dispatch(
     makeRequest('/v1/entity/ent_dunbar_school_001', {
       requestId: 'req_same',
-      headers: { 'x-firebase-appcheck': 'valid-token' },
+      headers: CLIENT_HEADER,
     }),
     deps,
   );
-  const withoutToken = await dispatch(
+  const withoutHeader = await dispatch(
     makeRequest('/v1/entity/ent_dunbar_school_001', { requestId: 'req_same' }),
     deps,
   );
-  assert.equal(withToken.status, 200);
-  assert.equal(withoutToken.status, 200);
-  assert.equal(
-    JSON.stringify(withToken.body),
-    JSON.stringify(withoutToken.body),
-    'App Check state must not change the response body',
-  );
-});
-
-test('ADVERSARIAL: even an App-Check-DENY guard cannot block a read (attestation is not authorization)', async () => {
-  const denyGuard = async (): Promise<AppCheckDecision> => ({
-    allowed: false,
-    verified: false,
-    mode: 'enforce',
-    status: 401,
-    code: 'APP_CHECK_REQUIRED',
-    reason: 'missing_token',
-    trustedService: false,
-  });
-  const res = await dispatch(
-    makeRequest('/v1/entity/ent_dunbar_school_001'),
-    makeDeps({ appCheckGuard: denyGuard }),
-  );
-  assert.equal(res.status, 200, 'reads treat App Check as a signal, never a gate');
+  assert.equal(withHeader.status, 200);
+  assert.equal(withoutHeader.status, 200);
+  assert.equal(JSON.stringify(withHeader.body), JSON.stringify(withoutHeader.body));
 });
 
 test('version floor is enforced on entity/search/bootstrap, not only /v1/compatibility', async () => {

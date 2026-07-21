@@ -65,7 +65,6 @@ describe('A. no correction content or receipt reaches any console sink', () => {
     const deps: CorrectionClientDeps = {
       baseUrl: 'https://submissions.blackbook.app',
       clientVersion: '1.0.0',
-      getToken: async () => 'attestation-jwt',
       fetch: (async () =>
         makeResponse(202, { accepted: true, receiptCode: RECEIPT, statusHref: '/x' })) as unknown as typeof fetch,
       secrets: createSecretStore(fakeBackend()),

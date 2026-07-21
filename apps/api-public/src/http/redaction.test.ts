@@ -6,7 +6,6 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { AppCheckDecision, AppCheckHeaders } from '@repo/firebase';
 import type { EntityV1 } from '@repo/public-contracts/v1/entity';
 import { createPublicRateLimitGuard } from '../rate-limits.js';
 import { createPublicSearchGuard } from '../search-guardrails.js';
@@ -51,13 +50,12 @@ function leakyEntity(): EntityV1 {
 function makeDeps(entity: EntityV1): HandlerDeps {
   return {
     dataAccess: createInMemoryPublicDataAccess({ pointer: SAMPLE_POINTER, entities: [entity] }),
-    // verified:true so the expensive-read search path (which requires App Check for anonymous)
-    // is exercised — this test is about field redaction, not the App Check gate.
-    appCheckGuard: async (_req: { headers: AppCheckHeaders }): Promise<AppCheckDecision> => ({
+    // verified:true so the expensive-read search path (which requires client attestation for anonymous)
+    // is exercised — this test is about field redaction, not the attestation gate.
+    clientAttestationGuard: async () => ({
       allowed: true,
       verified: true,
       mode: 'monitor',
-      trustedService: false,
     }),
     rateLimitGuard: createPublicRateLimitGuard({ now: () => 1_800_000_000_000 }),
     searchGuard: createPublicSearchGuard(),

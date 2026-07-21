@@ -26,7 +26,6 @@ export {
   type CorrectionClientDeps,
   type SubmitResult,
   type StatusResult,
-  type TokenProvider,
 } from './client';
 export { createCorrectionClientDeps } from './runtime';
 export {

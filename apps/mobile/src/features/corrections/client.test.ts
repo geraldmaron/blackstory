@@ -1,6 +1,6 @@
 import { createManualConnectivity } from '@/data/offline';
 import { createSecretStore, SECRET_KEYS, type SecretBackend, type SecretStore } from '@/data/secure-store';
-import { APP_CHECK_HEADER } from '@/security/api-client';
+import { CLIENT_VERSION_HEADER } from '@/security/api-client';
 import {
   CORRECTION_STATUS_PATH,
   CORRECTION_SUBMIT_PATH,
@@ -68,7 +68,6 @@ function makeDeps(overrides: Partial<CorrectionClientDeps> = {}): {
   const deps: CorrectionClientDeps = {
     baseUrl: BASE,
     clientVersion: '1.2.3',
-    getToken: async () => 'attestation-jwt',
     fetch: fetchMock as unknown as typeof fetch,
     secrets,
     ...overrides,
@@ -76,55 +75,35 @@ function makeDeps(overrides: Partial<CorrectionClientDeps> = {}): {
   return { deps, calls, secrets, fetchMock };
 }
 
-describe('submitCorrection — App Check fail-CLOSED (MOB-016 #2)', () => {
-  it('does NOT send the write when no attestation token is available', async () => {
-    const { deps, fetchMock } = makeDeps({ getToken: async () => null });
-    const result = await submitCorrection(validForm, deps);
-    expect(result.status).toBe('app_check_unavailable');
-    expect(fetchMock).not.toHaveBeenCalled();
-  });
-
-  it('surfaces a server attestation rejection (403) as the same fail-closed affordance', async () => {
-    const { deps, fetchMock } = makeDeps();
-    fetchMock.mockResolvedValueOnce(makeResponse(403, { error: 'app_check_required' }));
-    expect((await submitCorrection(validForm, deps)).status).toBe('app_check_unavailable');
-  });
-});
-
 describe('submitCorrection — offline (no silent queue, MOB-016 #6)', () => {
-  it('refuses to submit while offline and never touches the network or token', async () => {
+  it('refuses to submit while offline and never touches the network', async () => {
     const connectivity = createManualConnectivity('offline');
-    const getToken = jest.fn(async () => 'attestation-jwt');
-    const { deps, fetchMock } = makeDeps({ connectivity, getToken });
+    const { deps, fetchMock } = makeDeps({ connectivity });
     expect((await submitCorrection(validForm, deps)).status).toBe('offline');
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(getToken).not.toHaveBeenCalled();
   });
 });
 
 describe('submitCorrection — happy path + receipt persistence (MOB-016 #3)', () => {
-  it('POSTs to the submit path with attestation + idempotency headers and content in the BODY (not URL)', async () => {
+  it('POSTs to the submit path with client header + idempotency headers and content in the BODY (not URL)', async () => {
     const { deps, calls } = makeDeps();
     const result = await submitCorrection(validForm, deps);
     expect(result).toMatchObject({ status: 'accepted', receiptCode: RECEIPT });
 
     const call = calls[0];
     expect(call.url).toBe(`${BASE}${CORRECTION_SUBMIT_PATH}`);
-    // No query string / no content in the URL.
     expect(call.url).not.toContain('?');
     expect(call.url).not.toContain('founding');
     expect(call.init.method).toBe('POST');
     const headers = call.init.headers as Record<string, string>;
-    expect(headers[APP_CHECK_HEADER]).toBe('attestation-jwt');
+    expect(headers[CLIENT_VERSION_HEADER]).toBe('mobile/1.2.3; api=1');
     expect(headers[IDEMPOTENCY_KEY_HEADER]).toMatch(/^bbcor-/);
-    expect(String(call.init.body)).toContain('founding'); // content rides the body
+    expect(String(call.init.body)).toContain('founding');
   });
 
   it('persists the receipt to SecureStore BEFORE resolving (survives kill-before-display)', async () => {
     const { deps, secrets } = makeDeps();
     await submitCorrection(validForm, deps);
-    // By the time submit resolves, the receipt is already stored — a UI that
-    // never rendered would still find it.
     expect(await secrets.get(SECRET_KEYS.correctionReceipt)).toBe(RECEIPT);
   });
 
@@ -140,6 +119,12 @@ describe('submitCorrection — happy path + receipt persistence (MOB-016 #3)', (
   it('treats a 202 without a well-formed receipt as an error (does not fabricate one)', async () => {
     const { deps, fetchMock } = makeDeps();
     fetchMock.mockResolvedValueOnce(makeResponse(202, { accepted: true, receiptCode: 'garbage' }));
+    expect((await submitCorrection(validForm, deps)).status).toBe('error');
+  });
+
+  it('maps a server attestation rejection (403) to a generic error', async () => {
+    const { deps, fetchMock } = makeDeps();
+    fetchMock.mockResolvedValueOnce(makeResponse(403, { error: 'client_not_allowed' }));
     expect((await submitCorrection(validForm, deps)).status).toBe('error');
   });
 });
@@ -201,6 +186,8 @@ describe('lookupCorrectionStatus — status lookup (MOB-016 #4)', () => {
     expect(calls[0].url).toBe(`${BASE}${CORRECTION_STATUS_PATH}`);
     expect(calls[0].url).not.toContain('receipt');
     expect(String(calls[0].init.body)).toContain(RECEIPT);
+    const headers = calls[0].init.headers as Record<string, string>;
+    expect(headers[CLIENT_VERSION_HEADER]).toBe('mobile/1.2.3; api=1');
   });
 
   it('returns a non-revealing not_found for an unknown code (no moderation-state leak)', async () => {

@@ -1,14 +1,12 @@
 /**
  * Production composition tests — verifies `createProductionHandlerDeps` selects the safe adapter
- * and wires App Check outage availability without touching live Firebase (no ADC/emulator).
+ * and wires client attestation + rate/search guards without touching live Firebase (no ADC/emulator).
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { createAppCheckCircuitBreaker } from '@repo/firebase';
-import { APP_CHECK_OUTAGE_OVERRIDE_ENV } from './app-check-availability.js';
 import { createProductionHandlerDeps } from './compose.js';
 
-/** Emulator-safe env so `createPublicApiAppCheckGuard` can boot without production break-glass. */
+/** Emulator-safe env so Firestore-backed reads can boot when the live gate is enabled. */
 const EMULATOR_ENV = {
   FIREBASE_EMULATOR_MODE: '1',
   FIREBASE_PROJECT_ID: 'demo-black-book',
@@ -24,28 +22,18 @@ test('createProductionHandlerDeps uses empty in-memory data when live gate is fa
 
 test('createProductionHandlerDeps wires real guards regardless of data source', () => {
   const deps = createProductionHandlerDeps({ environment: EMULATOR_ENV });
-  assert.equal(typeof deps.appCheckGuard, 'function');
+  assert.equal(typeof deps.clientAttestationGuard, 'function');
   assert.equal(typeof deps.rateLimitGuard.evaluate, 'function');
   assert.equal(typeof deps.searchGuard.evaluate, 'function');
 });
 
-test('createProductionHandlerDeps samples APP_CHECK_OUTAGE_OVERRIDE via appCheckAvailability', () => {
-  const environment: Record<string, string | undefined> = { ...EMULATOR_ENV };
-  const deps = createProductionHandlerDeps({ environment });
-  assert.equal(deps.appCheckAvailability?.(), 'available');
-  environment[APP_CHECK_OUTAGE_OVERRIDE_ENV] = 'outage';
-  assert.equal(deps.appCheckAvailability?.(), 'outage');
-});
-
-test('createProductionHandlerDeps wires shared circuit breaker into guard and availability', async () => {
-  const breaker = createAppCheckCircuitBreaker({
-    config: { failureThreshold: 1, windowMs: 60_000, recoveryTimeoutMs: 30_000, halfOpenSuccessThreshold: 1 },
+test('createProductionHandlerDeps wires client attestation guard in monitor mode', async () => {
+  const deps = createProductionHandlerDeps({ environment: { NODE_ENV: 'test' } });
+  const missing = await deps.clientAttestationGuard({ headers: {} });
+  const verified = await deps.clientAttestationGuard({
+    headers: { 'x-blackstory-client': 'mobile/1.0.0; api=1' },
   });
-  const deps = createProductionHandlerDeps({ environment: EMULATOR_ENV, circuitBreaker: breaker });
-
-  assert.equal(deps.appCheckAvailability?.(), 'available');
-  await deps.appCheckGuard({
-    headers: { 'x-firebase-appcheck': 'will-fail' },
-  });
-  assert.equal(deps.appCheckAvailability?.(), 'outage');
+  assert.equal(missing.allowed, true);
+  assert.equal(missing.verified, false);
+  assert.equal(verified.verified, true);
 });

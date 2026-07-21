@@ -1,7 +1,7 @@
 /**
  * Privacy-safe observability (MOB-018). Public surface — the rest of the app
- * imports from here, never from `native-bridge.ts` or an SDK package
- * directly (see `no-raw-sdk-imports.test.ts`).
+ * imports from here, never from a third-party SDK package directly (see
+ * `no-raw-sdk-imports.test.ts`).
  */
 export { reportError, addBreadcrumb, startPerfTrace, reportPerf } from './crash-reporter';
 export type { ReportErrorOptions, PerfTraceHandle } from './crash-reporter';

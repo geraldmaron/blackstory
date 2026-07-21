@@ -6,7 +6,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { AppCheckDecision, AppCheckHeaders } from '@repo/firebase';
+import type { ClientAttestationHeaders } from '@repo/security';
 import { publicApiErrorEnvelopeSchema } from '@repo/public-contracts/errors';
 import { createPublicRateLimitGuard } from '../rate-limits.js';
 import { createPublicSearchGuard } from '../search-guardrails.js';
@@ -45,11 +45,10 @@ function traceDataAccess(inner: PublicDataAccess): TracedAccess {
 function makeDeps(dataAccess: PublicDataAccess): HandlerDeps {
   return {
     dataAccess,
-    appCheckGuard: async (_req: { headers: AppCheckHeaders }): Promise<AppCheckDecision> => ({
+    clientAttestationGuard: async ({ headers }: { headers: ClientAttestationHeaders }) => ({
       allowed: true,
-      verified: false,
+      verified: Boolean((headers as Record<string, string | undefined>)['x-blackstory-client']),
       mode: 'monitor',
-      trustedService: false,
     }),
     rateLimitGuard: createPublicRateLimitGuard({ now: () => FIXED_NOW }),
     searchGuard: createPublicSearchGuard(),
