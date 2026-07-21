@@ -45,6 +45,7 @@ Formal decisions for BlackStory platform topology, data, deployment, and securit
 | [ADR-023](./ADR-023-mobile-state-cache-offline.md) | Mobile state, cache, and offline read policy | Proposed — independent red-team complete, awaiting owner acceptance |
 | [ADR-024](./ADR-024-mobile-build-release.md) | Mobile build, release, and OTA update policy | Proposed — independent red-team complete, awaiting owner acceptance |
 | [ADR-025](./ADR-025-mobile-map-data.md) | Mobile map data: self-hosted PMTiles, native range requests, attribution, kill-switch, failure strategy | Proposed — awaiting owner acceptance |
+| [ADR-026](./ADR-026-postgrest-published-read-surface.md) | PostgREST published-read surface (dual-surface with `api-public`; supersedes ADR-020 Data-API-only ban for published views) | Accepted |
 
 ## Security boundary set (do not expand)
 

@@ -1,0 +1,49 @@
+{
+  "head": {
+    "vars": ["item", "itemLabel", "nrhpId", "stateLabel"]
+  },
+  "results": {
+    "bindings": [
+      {
+        "item": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q5902766"
+        },
+        "itemLabel": {
+          "type": "literal",
+          "value": "16th Street Baptist Church",
+          "xml:lang": "en"
+        },
+        "nrhpId": {
+          "type": "literal",
+          "value": "80000696"
+        },
+        "stateLabel": {
+          "type": "literal",
+          "value": "Alabama",
+          "xml:lang": "en"
+        }
+      },
+      {
+        "item": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q49108"
+        },
+        "itemLabel": {
+          "type": "literal",
+          "value": "Edmund Pettus Bridge",
+          "xml:lang": "en"
+        },
+        "nrhpId": {
+          "type": "literal",
+          "value": "13000209"
+        },
+        "stateLabel": {
+          "type": "literal",
+          "value": "Alabama",
+          "xml:lang": "en"
+        }
+      }
+    ]
+  }
+}

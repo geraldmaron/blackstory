@@ -1,0 +1,33 @@
+{
+  "compiledAt": "2026-07-21T17:34:38.000Z",
+  "portfolioWaveBead": "repo-tt2u.8",
+  "rejectionNote": "Rejected as primary Wikidata harvest strategy: P172 (ethnic group) alone essentializes identity and bypasses place/authority anchors. Prefer person_place_occupation or place_nrhp_linked query packs. See docs/research/black-history-data-landscape-intake.md §3.2 and docs/research/wikidata-place-first-query-packs.md.",
+  "queryCount": 12,
+  "packs": [
+    {
+      "packId": "qp-wikidata-person-place-occupation",
+      "strategy": "person_place_occupation",
+      "queryCount": 9
+    },
+    {
+      "packId": "qp-wikidata-place-nrhp-linked",
+      "strategy": "place_nrhp_linked",
+      "queryCount": 3
+    }
+  ],
+  "sampleQueries": [
+    {
+      "packId": "qp-wikidata-person-place-occupation",
+      "strategy": "person_place_occupation",
+      "placeSeed": { "label": "Alabama", "wikidataId": "Q173" },
+      "occupationSeed": { "label": "civil rights activist", "wikidataId": "Q82955" },
+      "fixtureMode": true
+    },
+    {
+      "packId": "qp-wikidata-place-nrhp-linked",
+      "strategy": "place_nrhp_linked",
+      "placeSeed": { "label": "Alabama", "wikidataId": "Q173" },
+      "fixtureMode": true
+    }
+  ]
+}

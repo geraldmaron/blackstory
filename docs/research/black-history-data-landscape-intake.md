@@ -91,6 +91,8 @@ What still binds without an ADR:
 
 ## 5. Cost envelope (Supabase Pro × three projects)
 
+Full envelope (egress model, hard defaults, soft-shutdown citations): [`supabase-pro-cost-envelope.md`](./supabase-pro-cost-envelope.md).
+
 | Fact | Number |
 |---|---|
 | Pro org base | $25/mo |

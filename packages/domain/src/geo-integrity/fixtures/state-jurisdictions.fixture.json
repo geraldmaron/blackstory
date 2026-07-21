@@ -1,0 +1,84 @@
+{
+  "source": "geo-integrity-fixture",
+  "sourceVersion": "v1",
+  "jurisdictions": [
+    {
+      "id": "us-25",
+      "kind": "state",
+      "name": "Massachusetts",
+      "state_fips": "25",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "MA",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [-73.51, 41.24],
+              [-69.86, 41.24],
+              [-69.86, 42.89],
+              [-73.51, 42.89],
+              [-73.51, 41.24]
+            ]
+          ]
+        },
+        "source": "fixture",
+        "sourceVersion": "geo-integrity-v1"
+      }
+    },
+    {
+      "id": "us-36",
+      "kind": "state",
+      "name": "New York",
+      "state_fips": "36",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "NY",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [-79.76, 40.5],
+              [-71.85, 40.5],
+              [-71.85, 45.02],
+              [-79.76, 45.02],
+              [-79.76, 40.5]
+            ]
+          ]
+        },
+        "source": "fixture",
+        "sourceVersion": "geo-integrity-v1"
+      }
+    },
+    {
+      "id": "us-34",
+      "kind": "state",
+      "name": "New Jersey",
+      "state_fips": "34",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "NJ",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [-75.56, 38.93],
+              [-73.9, 38.93],
+              [-73.9, 40.7],
+              [-75.56, 40.7],
+              [-75.56, 38.93]
+            ]
+          ]
+        },
+        "source": "fixture",
+        "sourceVersion": "geo-integrity-v1"
+      }
+    }
+  ]
+}

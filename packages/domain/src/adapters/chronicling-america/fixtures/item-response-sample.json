@@ -1,0 +1,24 @@
+{
+  "item": {
+    "access_restricted": false,
+    "contributor": ["Library of Congress, Washington, DC"],
+    "date": "1905",
+    "description": [
+      "Weekly African American newspaper published in Chicago, Illinois; one of the most influential Black press titles of the twentieth century."
+    ],
+    "digitized": true,
+    "full_text": "BULK OCR TEXT MUST BE STRIPPED AT THE ADAPTER BOUNDARY",
+    "id": "https://www.loc.gov/item/sn83045462/",
+    "language": ["english"],
+    "location": ["illinois", "chicago"],
+    "location_state": ["Illinois"],
+    "lccn": "sn83045462",
+    "original_format": ["newspaper"],
+    "publication_place": "Chicago, Illinois",
+    "publication_title": "The Chicago defender.",
+    "subject": ["african americans", "newspapers"],
+    "title": "The Chicago defender.",
+    "type": ["newspaper"],
+    "url": "https://www.loc.gov/item/sn83045462/"
+  }
+}

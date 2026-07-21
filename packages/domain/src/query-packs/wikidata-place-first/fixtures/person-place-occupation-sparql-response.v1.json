@@ -1,0 +1,51 @@
+{
+  "head": {
+    "vars": ["person", "personLabel", "placeLabel", "occupationLabel"]
+  },
+  "results": {
+    "bindings": [
+      {
+        "person": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q41909"
+        },
+        "personLabel": {
+          "type": "literal",
+          "value": "Rosa Parks",
+          "xml:lang": "en"
+        },
+        "placeLabel": {
+          "type": "literal",
+          "value": "Tuskegee",
+          "xml:lang": "en"
+        },
+        "occupationLabel": {
+          "type": "literal",
+          "value": "civil rights activist",
+          "xml:lang": "en"
+        }
+      },
+      {
+        "person": {
+          "type": "uri",
+          "value": "http://www.wikidata.org/entity/Q8027"
+        },
+        "personLabel": {
+          "type": "literal",
+          "value": "Martin Luther King Jr.",
+          "xml:lang": "en"
+        },
+        "placeLabel": {
+          "type": "literal",
+          "value": "Atlanta",
+          "xml:lang": "en"
+        },
+        "occupationLabel": {
+          "type": "literal",
+          "value": "minister",
+          "xml:lang": "en"
+        }
+      }
+    ]
+  }
+}
