@@ -129,6 +129,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
     ...(geoAnchor ? { viewport: { lat: geoAnchor.lat, lng: geoAnchor.lng, zoom: 11 } } : {}),
   });
   const { data: searchIndex } = await getPublicSearchIndex();
+  // Full public catalog order for entity-page Next/Random (explore spotlight uses the live map list).
   const orderedIds = searchIndex.map((doc) => doc.id);
 
   return (

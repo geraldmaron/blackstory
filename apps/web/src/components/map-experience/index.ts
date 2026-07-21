@@ -9,6 +9,8 @@ export { GroupingToggle } from './GroupingToggle';
 export { KindBadge } from './KindBadge';
 export { MapExperienceLegend } from './MapExperienceLegend';
 export { NarrativeCard } from './NarrativeCard';
+export { EntitySessionNav } from './EntitySessionNav';
+export type { EntitySessionNavProps } from './EntitySessionNav';
 export { SynchronizedResultList } from './SynchronizedResultList';
 export { MapsExternalLink } from './MapsExternalLink';
 export type { MapsExternalLinkProps } from './MapsExternalLink';

@@ -57,11 +57,16 @@ import {
   back as sessionBack,
   canBack as sessionCanBack,
   canPickNext,
-  createSessionStack,
   pickNext,
   push as sessionPush,
   type SessionStack,
 } from '../../../lib/map-experience/entity-session-nav';
+import {
+  readEntitySessionRandomEnabled,
+  readEntitySessionStack,
+  writeEntitySessionRandomEnabled,
+  writeEntitySessionStack,
+} from '../../../lib/map-experience/entity-session-storage';
 import {
   CAMERA_POINT_ZOOM,
   prefersReducedMotion,
@@ -354,9 +359,15 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     readonly within: readonly ExploreNearbyFeature[];
     readonly closest: readonly ExploreNearbyFeature[];
   } | null>(null);
-  /** In-session Back stack for spotlight record navigation (not browser history). */
-  const [sessionStack, setSessionStack] = useState<SessionStack>(() => createSessionStack());
-  const [sessionRandomEnabled, setSessionRandomEnabled] = useState(false);
+  /**
+   * In-session Back stack + Random toggle for spotlight record navigation.
+   * Shared with entity detail via sessionStorage so Random / Back survive
+   * “Open full record” within the same tab.
+   */
+  const [sessionStack, setSessionStack] = useState<SessionStack>(() => readEntitySessionStack());
+  const [sessionRandomEnabled, setSessionRandomEnabled] = useState(() =>
+    readEntitySessionRandomEnabled(),
+  );
 
   useEffect(() => {
     const incomingHref = shareableExploreHref(initial.viewState);
@@ -945,7 +956,11 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
       preSelectViewportRef.current = liveViewportRef.current ?? viewStateRef.current.viewport;
       const previousId = viewStateRef.current.selected;
       if (!options?.skipSessionPush && previousId && previousId !== entityId) {
-        setSessionStack((stack) => sessionPush(stack, previousId));
+        setSessionStack((stack) => {
+          const next = sessionPush(stack, previousId);
+          writeEntitySessionStack(next);
+          return next;
+        });
       }
       const feature = view.allFeatures.find((item) => item.properties.entityId === entityId);
       if (feature && feature.geometry.type === 'Point') {
@@ -1087,6 +1102,8 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     commitViewState(mergeViewState(view.viewState, { clearSelected: true }));
   }, [commitViewState, stage, view.allFeatures, view.viewState]);
 
+  // Next / Random catalog: prefer the accessible list in view (or radius-scoped rows);
+  // fall back to the filtered map catalog when the list is too thin to advance.
   const sessionOrderedIds = useMemo(() => {
     const fromList = sortedListFeatures.map((feature) => feature.properties.entityId);
     if (fromList.length > 1) {
@@ -1101,6 +1118,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
       return;
     }
     setSessionStack(result.stack);
+    writeEntitySessionStack(result.stack);
     handleSelect(result.entityId, { skipSessionPush: true });
   }, [handleSelect, sessionStack]);
 
@@ -1117,12 +1135,18 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     if (!nextId) {
       return;
     }
-    setSessionStack((stack) => sessionPush(stack, currentId));
+    const nextStack = sessionPush(sessionStack, currentId);
+    setSessionStack(nextStack);
+    writeEntitySessionStack(nextStack);
     handleSelect(nextId, { skipSessionPush: true });
-  }, [handleSelect, sessionOrderedIds, sessionRandomEnabled, view.viewState.selected]);
+  }, [handleSelect, sessionOrderedIds, sessionRandomEnabled, sessionStack, view.viewState.selected]);
 
   const handleSessionRandomToggle = useCallback(() => {
-    setSessionRandomEnabled((previous) => !previous);
+    setSessionRandomEnabled((previous) => {
+      const next = !previous;
+      writeEntitySessionRandomEnabled(next);
+      return next;
+    });
   }, []);
 
   const spotlightSessionNav = useMemo(() => {

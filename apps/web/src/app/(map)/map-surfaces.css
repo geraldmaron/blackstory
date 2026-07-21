@@ -214,6 +214,31 @@
   cursor: pointer;
 }
 
+/* Place-search orientation pin — copper head + stem; not an entity hit target. */
+.ds-map-search-center-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 1.125rem;
+  pointer-events: none;
+}
+
+.ds-map-search-center-marker__head {
+  box-sizing: border-box;
+  width: 0.875rem;
+  height: 0.875rem;
+  border: 2px solid var(--ds-canvas);
+  border-radius: 50%;
+  background: var(--ds-accent);
+}
+
+.ds-map-search-center-marker__stem {
+  width: 2px;
+  height: 0.625rem;
+  margin-top: -1px;
+  background: var(--ds-accent);
+}
+
 /* Below-hero page content on a map surface. The canvas plate above is FIXED behind the whole
    viewport, and positioned elements (even z-index: 0) paint over static flow content — so a
    plain `<main>` under this route group would be swallowed by the ink plate the moment the

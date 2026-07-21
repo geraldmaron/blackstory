@@ -1,69 +1,42 @@
 /**
- * Client session navigation for entity detail pages. Persists the back stack and random
- * toggle in sessionStorage; navigates via Next router (not browser history for Back).
+ * Client session navigation for entity detail pages. Shares Back stack and Random
+ * toggle with explore spotlight via sessionStorage; navigates via Next router
+ * (not browser history for Back).
  */
 'use client';
 
 import { useCallback, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { EntitySessionNav } from '../../../components/map-experience/EntitySessionNav';
+import { EntitySessionNav } from '../../../components/map-experience';
 import '../../../components/map-experience/entity-session-nav.css';
 import {
   back,
   canBack,
   canPickNext,
-  createSessionStack,
   pickNext,
   push,
   type SessionStack,
 } from '../../../lib/map-experience/entity-session-nav';
-
-const STACK_STORAGE_KEY = 'blackstory.entity-session.stack';
-const RANDOM_STORAGE_KEY = 'blackstory.entity-session.random';
-
-function readStack(): SessionStack {
-  if (typeof sessionStorage === 'undefined') {
-    return createSessionStack();
-  }
-  try {
-    const raw = sessionStorage.getItem(STACK_STORAGE_KEY);
-    if (!raw) {
-      return createSessionStack();
-    }
-    const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed) || parsed.some((entry) => typeof entry !== 'string')) {
-      return createSessionStack();
-    }
-    return parsed;
-  } catch {
-    return createSessionStack();
-  }
-}
-
-function writeStack(stack: SessionStack): void {
-  sessionStorage.setItem(STACK_STORAGE_KEY, JSON.stringify(stack));
-}
-
-function readRandomEnabled(): boolean {
-  if (typeof sessionStorage === 'undefined') {
-    return false;
-  }
-  return sessionStorage.getItem(RANDOM_STORAGE_KEY) === '1';
-}
-
-function writeRandomEnabled(enabled: boolean): void {
-  sessionStorage.setItem(RANDOM_STORAGE_KEY, enabled ? '1' : '0');
-}
+import {
+  readEntitySessionRandomEnabled,
+  readEntitySessionStack,
+  writeEntitySessionRandomEnabled,
+  writeEntitySessionStack,
+} from '../../../lib/map-experience/entity-session-storage';
 
 export type EntitySessionNavClientProps = {
   readonly currentId: string;
+  /**
+   * Catalog for Next / Random. On the entity page this is the public search-index
+   * order (full catalog). Explore spotlight uses the live map list instead.
+   */
   readonly orderedIds: readonly string[];
 };
 
 export function EntitySessionNavClient({ currentId, orderedIds }: EntitySessionNavClientProps) {
   const router = useRouter();
-  const [stack, setStack] = useState<SessionStack>(() => readStack());
-  const [randomEnabled, setRandomEnabled] = useState(() => readRandomEnabled());
+  const [stack, setStack] = useState<SessionStack>(() => readEntitySessionStack());
+  const [randomEnabled, setRandomEnabled] = useState(() => readEntitySessionRandomEnabled());
 
   const canGoBack = canBack(stack);
   const canGoNext = useMemo(
@@ -77,7 +50,7 @@ export function EntitySessionNavClient({ currentId, orderedIds }: EntitySessionN
       return;
     }
     setStack(result.stack);
-    writeStack(result.stack);
+    writeEntitySessionStack(result.stack);
     router.push(`/entity/${result.entityId}`);
   }, [router, stack]);
 
@@ -88,14 +61,14 @@ export function EntitySessionNavClient({ currentId, orderedIds }: EntitySessionN
     }
     const nextStack = push(stack, currentId);
     setStack(nextStack);
-    writeStack(nextStack);
+    writeEntitySessionStack(nextStack);
     router.push(`/entity/${nextId}`);
   }, [currentId, orderedIds, randomEnabled, router, stack]);
 
   const handleRandomToggle = useCallback(() => {
     setRandomEnabled((previous) => {
       const next = !previous;
-      writeRandomEnabled(next);
+      writeEntitySessionRandomEnabled(next);
       return next;
     });
   }, []);

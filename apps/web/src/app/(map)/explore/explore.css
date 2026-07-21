@@ -2,6 +2,8 @@
  * Layout and presentation styles for map-first `/explore` experience. Uses the shared
  * BlackStory token vocabulary from `@black-book/ui/styles.css` no new colors introduced here.
  */
+@import '../../../components/map-experience/entity-session-nav.css';
+
 .ds-explore-page__body {
   margin-top: var(--ds-space-4);
 }
@@ -379,8 +381,6 @@
 .ds-nc__action {
   justify-self: start;
 }
-
-@import '../../../components/map-experience/entity-session-nav.css';
 
 .ds-explore__list-panel {
   display: grid;
