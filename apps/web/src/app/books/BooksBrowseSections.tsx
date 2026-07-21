@@ -1,5 +1,5 @@
 /**
- * Books browse: dense filter + sortable table with entity-tag state chips and inline Buy CTAs.
+ * Books browse: filters, sort toolbar, responsive summary cards, and pagination.
  */
 import React from 'react';
 import Link from 'next/link';
@@ -11,16 +11,16 @@ export type BooksBrowseSectionsProps = {
   readonly view: BooksBrowseViewModel;
 };
 
-function BrowseRowActions({ item }: { readonly item: BooksBrowseItem }) {
+function BrowseCardActions({ item }: { readonly item: BooksBrowseItem }) {
   if (item.purchaseLinks.length === 0) return null;
   const bookshop = item.purchaseLinks.find((link) => link.retailer === 'bookshop');
   const others = item.purchaseLinks.filter((link) => link.retailer !== 'bookshop');
 
   return (
-    <div className="ds-books-row__actions" aria-label={`Purchase options for ${item.title}`}>
+    <div className="ds-books-card__actions" aria-label={`Purchase options for ${item.title}`}>
       {bookshop ? (
         <a
-          className="ds-cta ds-cta--copper ds-books-row__buy"
+          className="ds-cta ds-cta--copper ds-books-card__buy"
           href={bookshop.href}
           rel="noopener noreferrer sponsored"
           target="_blank"
@@ -31,7 +31,7 @@ function BrowseRowActions({ item }: { readonly item: BooksBrowseItem }) {
       {others.map((link) => (
         <a
           key={link.href}
-          className="ds-cta ds-cta--quiet ds-books-row__buy"
+          className="ds-cta ds-cta--quiet ds-books-card__buy"
           href={link.href}
           rel="noopener noreferrer"
           target="_blank"
@@ -47,6 +47,55 @@ function sortIndicator(ariaSort: 'ascending' | 'descending' | 'none'): string {
   if (ariaSort === 'ascending') return ' ↑';
   if (ariaSort === 'descending') return ' ↓';
   return '';
+}
+
+function BooksPagination({ view }: { readonly view: BooksBrowseViewModel }) {
+  const { pagination } = view;
+  if (pagination.totalMatched === 0 || pagination.totalPages <= 1) return null;
+
+  return (
+    <nav className="ds-books-pager" aria-label="Books catalog pages">
+      <p className="ds-books-pager__status ds-sans ds-count-label">
+        Showing {pagination.rangeStart}–{pagination.rangeEnd} of {pagination.totalMatched}
+      </p>
+      <div className="ds-books-pager__controls">
+        {pagination.previousHref ? (
+          <Link className="ds-cta ds-cta--quiet" href={pagination.previousHref} rel="prev">
+            Previous
+          </Link>
+        ) : (
+          <span className="ds-cta ds-cta--quiet ds-books-pager__disabled" aria-disabled="true">
+            Previous
+          </span>
+        )}
+        <ul className="ds-books-pager__pages">
+          {pagination.pageHrefs.map((entry) => (
+            <li key={entry.page}>
+              {entry.current ? (
+                <span className="ds-books-pager__page ds-books-pager__page--current" aria-current="page">
+                  {entry.page}
+                </span>
+              ) : (
+                <Link className="ds-books-pager__page" href={entry.href}>
+                  <span className="ds-visually-hidden">Page </span>
+                  {entry.page}
+                </Link>
+              )}
+            </li>
+          ))}
+        </ul>
+        {pagination.nextHref ? (
+          <Link className="ds-cta ds-cta--quiet" href={pagination.nextHref} rel="next">
+            Next
+          </Link>
+        ) : (
+          <span className="ds-cta ds-cta--quiet ds-books-pager__disabled" aria-disabled="true">
+            Next
+          </span>
+        )}
+      </div>
+    </nav>
+  );
 }
 
 export function BooksBrowseSections({ view }: BooksBrowseSectionsProps) {
@@ -76,7 +125,7 @@ export function BooksBrowseSections({ view }: BooksBrowseSectionsProps) {
               name: 'q',
               label: 'Search',
               type: 'search',
-              placeholder: 'Title or author…',
+              placeholder: 'Title, author, or summary…',
               defaultValue: view.q,
             },
             {
@@ -107,9 +156,38 @@ export function BooksBrowseSections({ view }: BooksBrowseSectionsProps) {
           }
         />
 
-        <p className="ds-sans ds-count-label ds-books-browse__count" id="books-results-heading">
-          {view.totalMatched} title{view.totalMatched === 1 ? '' : 's'}
-        </p>
+        <div className="ds-books-browse__toolbar">
+          <p className="ds-sans ds-count-label ds-books-browse__count" id="books-results-heading">
+            {view.totalMatched} title{view.totalMatched === 1 ? '' : 's'}
+            {view.pagination.totalPages > 1
+              ? ` · page ${view.pagination.page} of ${view.pagination.totalPages}`
+              : null}
+          </p>
+          <div className="ds-books-sort" role="group" aria-label="Sort catalog">
+            <span className="ds-books-sort__label">Sort</span>
+            <ul className="ds-books-sort__list">
+              {view.sortOptions.map((option) => (
+                <li key={option.key}>
+                  <Link
+                    className={
+                      option.active ? 'ds-books-sort__link ds-books-sort__link--active' : 'ds-books-sort__link'
+                    }
+                    href={option.href}
+                    aria-current={option.active ? 'true' : undefined}
+                    aria-label={
+                      option.ariaSort === 'none'
+                        ? `Sort by ${option.label}`
+                        : `Sort by ${option.label}, currently ${option.ariaSort}. Activate to reverse.`
+                    }
+                  >
+                    {option.label}
+                    <span aria-hidden="true">{sortIndicator(option.ariaSort)}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
 
         {view.items.length === 0 ? (
           <EmptyState
@@ -123,74 +201,56 @@ export function BooksBrowseSections({ view }: BooksBrowseSectionsProps) {
             Try a broader keyword or reset the state and author filters.
           </EmptyState>
         ) : (
-          <div className="ds-books-table-wrap">
-            <table className="ds-books-table" aria-labelledby="books-results-heading">
-              <thead>
-                <tr>
-                  {view.sortColumns.map((column) => (
-                    <th key={column.key} scope="col" aria-sort={column.ariaSort}>
-                      <Link
-                        className="ds-books-table__sort"
-                        href={column.href}
-                        aria-label={
-                          column.ariaSort === 'none'
-                            ? `Sort by ${column.label}`
-                            : `Sort by ${column.label}, currently ${column.ariaSort}. Activate to reverse.`
-                        }
-                      >
-                        {column.label}
-                        <span aria-hidden="true">{sortIndicator(column.ariaSort)}</span>
-                      </Link>
-                    </th>
-                  ))}
-                  <th scope="col" className="ds-books-table__actions-col">
-                    <span className="ds-visually-hidden">Purchase</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {view.items.map((item) => (
-                  <tr key={item.id}>
-                    <th scope="row" className="ds-books-table__title">
+          <ul className="ds-books-grid" aria-labelledby="books-results-heading">
+            {view.items.map((item) => (
+              <li key={item.id} className="ds-books-card">
+                <article className="ds-books-card__body">
+                  <header className="ds-books-card__header">
+                    <h3 className="ds-books-card__title">
                       <Link href={`/books/${item.slug}`}>{item.title}</Link>
-                    </th>
-                    <td>{item.authorNames}</td>
-                    <td className="ds-mono">{item.publishedDate}</td>
-                    <td className="ds-mono">{item.citationCount}</td>
-                    <td>
-                      {item.states.length > 0 ? (
-                        <span
-                          className="ds-books-row__states"
-                          role="list"
-                          aria-label="States on challenge lists"
-                        >
-                          {item.states.map((state, index) => (
-                            <span key={state.code} role="listitem">
-                              {index > 0 ? <span aria-hidden="true"> </span> : null}
-                              <Link
-                                className="ds-books-row__state"
-                                href={`/books?state=${encodeURIComponent(state.code)}&sort=${view.sort}&dir=${view.dir}`}
-                                title={state.name}
-                              >
-                                <span className="ds-visually-hidden">{state.name} </span>
-                                {state.code}
-                              </Link>
-                            </span>
-                          ))}
-                        </span>
-                      ) : (
-                        <span className="ds-ink-muted">—</span>
-                      )}
-                    </td>
-                    <td className="ds-books-table__actions-col">
-                      <BrowseRowActions item={item} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </h3>
+                    <p className="ds-books-card__byline">
+                      <span>{item.authorNames}</span>
+                      <span aria-hidden="true"> · </span>
+                      <span className="ds-mono">{item.publishedDate}</span>
+                    </p>
+                  </header>
+                  <p className="ds-books-card__summary">{item.summary}</p>
+                  <div className="ds-books-card__meta">
+                    <p className="ds-books-card__citations ds-mono">
+                      {item.citationCount} citation{item.citationCount === 1 ? '' : 's'}
+                    </p>
+                    {item.states.length > 0 ? (
+                      <p className="ds-books-card__states" role="list" aria-label="States on challenge lists">
+                        {item.states.map((state, index) => (
+                          <span key={state.code} role="listitem">
+                            {index > 0 ? <span aria-hidden="true"> </span> : null}
+                            <Link
+                              className="ds-books-row__state"
+                              href={`/books?state=${encodeURIComponent(state.code)}&sort=${view.sort}&dir=${view.dir}`}
+                              title={state.name}
+                            >
+                              <span className="ds-visually-hidden">{state.name} </span>
+                              {state.code}
+                            </Link>
+                          </span>
+                        ))}
+                      </p>
+                    ) : null}
+                  </div>
+                  <footer className="ds-books-card__footer">
+                    <Link className="ds-cta ds-cta--quiet" href={`/books/${item.slug}`}>
+                      Details
+                    </Link>
+                    <BrowseCardActions item={item} />
+                  </footer>
+                </article>
+              </li>
+            ))}
+          </ul>
         )}
+
+        <BooksPagination view={view} />
       </section>
 
       <section className="ds-record-section" aria-labelledby="about-books-heading" id="about-books">

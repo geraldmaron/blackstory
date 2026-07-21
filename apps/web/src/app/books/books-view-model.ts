@@ -19,12 +19,16 @@ export const BOOKS_BROWSE_SORT_KEYS = [
   'states',
 ] as const satisfies readonly BooksBrowseSortKey[];
 
+/** Titles per browse page (card grid: 1 / 2 / 3 columns). */
+export const BOOKS_BROWSE_PAGE_SIZE = 12;
+
 export type RawBooksBrowseParams = {
   readonly q?: string;
   readonly state?: string;
   readonly author?: string;
   readonly sort?: string;
   readonly dir?: string;
+  readonly page?: string;
 };
 
 export type BooksBrowsePurchaseLink = {
@@ -39,16 +43,31 @@ export type BooksBrowseItem = {
   readonly title: string;
   readonly authorNames: string;
   readonly publishedDate: string;
+  /** Editorial summary from the curated record (`description`). */
+  readonly summary: string;
   readonly states: readonly BooksDetailState[];
   readonly citationCount: number;
   readonly purchaseLinks: readonly BooksBrowsePurchaseLink[];
 };
 
-export type BooksBrowseSortColumn = {
+export type BooksBrowseSortOption = {
   readonly key: BooksBrowseSortKey;
   readonly label: string;
+  readonly active: boolean;
   readonly ariaSort: 'ascending' | 'descending' | 'none';
   readonly href: string;
+};
+
+export type BooksBrowsePagination = {
+  readonly page: number;
+  readonly pageSize: number;
+  readonly totalPages: number;
+  readonly totalMatched: number;
+  readonly rangeStart: number;
+  readonly rangeEnd: number;
+  readonly previousHref: string | undefined;
+  readonly nextHref: string | undefined;
+  readonly pageHrefs: readonly { readonly page: number; readonly href: string; readonly current: boolean }[];
 };
 
 export type BooksBrowseViewModel = {
@@ -57,11 +76,13 @@ export type BooksBrowseViewModel = {
   readonly author: string;
   readonly sort: BooksBrowseSortKey;
   readonly dir: BooksBrowseSortDir;
+  readonly page: number;
   readonly items: readonly BooksBrowseItem[];
   readonly totalMatched: number;
   readonly stateOptions: readonly { readonly value: string; readonly label: string }[];
   readonly authorOptions: readonly { readonly value: string; readonly label: string }[];
-  readonly sortColumns: readonly BooksBrowseSortColumn[];
+  readonly sortOptions: readonly BooksBrowseSortOption[];
+  readonly pagination: BooksBrowsePagination;
 };
 
 export type BooksDetailState = {
@@ -95,6 +116,7 @@ function recordToBrowseItem(book: BannedBookRecord): BooksBrowseItem {
     title: book.title,
     authorNames: formatAuthorNames(book),
     publishedDate: book.publishedDate,
+    summary: book.description.trim(),
     states: bannedBookReportedStates(book).map((code) => ({
       code,
       name: STATE_NAME_BY_CODE.get(code) ?? code,
@@ -146,6 +168,13 @@ function parseSortDir(raw: string | undefined): BooksBrowseSortDir {
   return (raw ?? '').trim().toLowerCase() === 'desc' ? 'desc' : 'asc';
 }
 
+function parsePage(raw: string | undefined, totalPages: number): number {
+  const parsed = Number.parseInt((raw ?? '').trim(), 10);
+  if (!Number.isFinite(parsed) || parsed < 1) return 1;
+  if (totalPages < 1) return 1;
+  return Math.min(parsed, totalPages);
+}
+
 function compareBrowseItems(
   left: BooksBrowseItem,
   right: BooksBrowseItem,
@@ -166,12 +195,13 @@ function compareBrowseItems(
   }
 }
 
-function buildBrowseHref(params: {
+export function buildBooksBrowseHref(params: {
   readonly q: string;
   readonly state: string;
   readonly author: string;
   readonly sort: BooksBrowseSortKey;
   readonly dir: BooksBrowseSortDir;
+  readonly page?: number;
 }): string {
   const search = new URLSearchParams();
   if (params.q.trim()) search.set('q', params.q.trim());
@@ -179,17 +209,18 @@ function buildBrowseHref(params: {
   if (params.author !== 'all') search.set('author', params.author);
   if (params.sort !== 'title') search.set('sort', params.sort);
   if (params.dir !== 'asc') search.set('dir', params.dir);
+  if (params.page !== undefined && params.page > 1) search.set('page', String(params.page));
   const query = search.toString();
   return query ? `/books?${query}` : '/books';
 }
 
-function buildSortColumns(params: {
+function buildSortOptions(params: {
   readonly q: string;
   readonly state: string;
   readonly author: string;
   readonly sort: BooksBrowseSortKey;
   readonly dir: BooksBrowseSortDir;
-}): readonly BooksBrowseSortColumn[] {
+}): readonly BooksBrowseSortOption[] {
   const labels: Record<BooksBrowseSortKey, string> = {
     title: 'Title',
     author: 'Author',
@@ -204,16 +235,65 @@ function buildSortColumns(params: {
     return {
       key,
       label: labels[key],
+      active,
       ariaSort: active ? (params.dir === 'asc' ? 'ascending' : 'descending') : 'none',
-      href: buildBrowseHref({
+      href: buildBooksBrowseHref({
         q: params.q,
         state: params.state,
         author: params.author,
         sort: key,
         dir: active ? nextDir : 'asc',
+        page: 1,
       }),
     };
   });
+}
+
+function buildPagination(params: {
+  readonly q: string;
+  readonly state: string;
+  readonly author: string;
+  readonly sort: BooksBrowseSortKey;
+  readonly dir: BooksBrowseSortDir;
+  readonly page: number;
+  readonly pageSize: number;
+  readonly totalMatched: number;
+}): BooksBrowsePagination {
+  const totalPages = Math.max(1, Math.ceil(params.totalMatched / params.pageSize));
+  const page = Math.min(params.page, totalPages);
+  const rangeStart = params.totalMatched === 0 ? 0 : (page - 1) * params.pageSize + 1;
+  const rangeEnd = Math.min(page * params.pageSize, params.totalMatched);
+
+  const hrefFor = (target: number) =>
+    buildBooksBrowseHref({
+      q: params.q,
+      state: params.state,
+      author: params.author,
+      sort: params.sort,
+      dir: params.dir,
+      page: target,
+    });
+
+  const pageHrefs = Array.from({ length: totalPages }, (_, index) => {
+    const pageNumber = index + 1;
+    return {
+      page: pageNumber,
+      href: hrefFor(pageNumber),
+      current: pageNumber === page,
+    };
+  });
+
+  return {
+    page,
+    pageSize: params.pageSize,
+    totalPages,
+    totalMatched: params.totalMatched,
+    rangeStart,
+    rangeEnd,
+    previousHref: page > 1 ? hrefFor(page - 1) : undefined,
+    nextHref: page < totalPages ? hrefFor(page + 1) : undefined,
+    pageHrefs,
+  };
 }
 
 export function buildBooksBrowseViewModel(
@@ -225,6 +305,7 @@ export function buildBooksBrowseViewModel(
   const author = cleanSelectParam(raw.author);
   const sort = parseSortKey(raw.sort);
   const dir = parseSortDir(raw.dir);
+  const qRaw = raw.q ?? '';
 
   const filtered = snapshot.books.filter((book) => {
     if (state !== 'all' && !bannedBookReportedStates(book).includes(state)) {
@@ -237,22 +318,27 @@ export function buildBooksBrowseViewModel(
     }
 
     if (q) {
-      const haystack = `${book.title} ${formatAuthorNames(book)}`.toLowerCase();
+      const haystack = `${book.title} ${formatAuthorNames(book)} ${book.description}`.toLowerCase();
       if (!haystack.includes(q)) return false;
     }
 
     return true;
   });
 
-  const items = filtered.map(recordToBrowseItem).sort((left, right) => {
+  const sorted = filtered.map(recordToBrowseItem).sort((left, right) => {
     const primary = compareBrowseItems(left, right, sort);
     const ordered = dir === 'desc' ? -primary : primary;
     if (ordered !== 0) return ordered;
     return left.title.localeCompare(right.title, undefined, { sensitivity: 'base' });
   });
 
+  const totalMatched = sorted.length;
+  const totalPages = Math.max(1, Math.ceil(totalMatched / BOOKS_BROWSE_PAGE_SIZE));
+  const page = parsePage(raw.page, totalPages);
+  const start = (page - 1) * BOOKS_BROWSE_PAGE_SIZE;
+  const items = sorted.slice(start, start + BOOKS_BROWSE_PAGE_SIZE);
+
   const authorNames = snapshot.books.flatMap((book) => book.authors.map((entry) => entry.name));
-  const qRaw = raw.q ?? '';
 
   return {
     q: qRaw,
@@ -260,16 +346,27 @@ export function buildBooksBrowseViewModel(
     author,
     sort,
     dir,
+    page,
     items,
-    totalMatched: items.length,
+    totalMatched,
     stateOptions: buildStateFacetOptions(snapshot.books),
     authorOptions: buildFacetOptions(authorNames, 'All authors'),
-    sortColumns: buildSortColumns({
+    sortOptions: buildSortOptions({
       q: qRaw,
       state,
       author,
       sort,
       dir,
+    }),
+    pagination: buildPagination({
+      q: qRaw,
+      state,
+      author,
+      sort,
+      dir,
+      page,
+      pageSize: BOOKS_BROWSE_PAGE_SIZE,
+      totalMatched,
     }),
   };
 }

@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { getBannedBooksListingSnapshot } from '../../data/banned-books-seed';
 import {
+  BOOKS_BROWSE_PAGE_SIZE,
   buildBooksBrowseViewModel,
   buildBooksDetailViewModel,
 } from './books-view-model';
@@ -16,6 +17,7 @@ test('buildBooksBrowseViewModel returns all seed entries by default', () => {
   assert.equal(view.totalMatched, 58);
   assert.equal(view.state, 'all');
   assert.equal(view.author, 'all');
+  assert.equal(view.items.length, Math.min(BOOKS_BROWSE_PAGE_SIZE, view.totalMatched));
 });
 
 test('buildBooksBrowseViewModel filters by q on title', () => {
@@ -32,6 +34,13 @@ test('buildBooksBrowseViewModel filters by q on author', () => {
   }
 });
 
+test('buildBooksBrowseViewModel filters by q on summary text', () => {
+  const view = buildBooksBrowseViewModel(SNAPSHOT, { q: 'pecola' });
+  assert.equal(view.totalMatched, 1);
+  assert.equal(view.items[0]?.slug, 'the-bluest-eye');
+  assert.match(view.items[0]?.summary.toLowerCase() ?? '', /pecola/);
+});
+
 test('buildBooksBrowseViewModel filters by state', () => {
   const view = buildBooksBrowseViewModel(SNAPSHOT, { state: 'FL' });
   assert.ok(view.totalMatched >= 1);
@@ -45,6 +54,7 @@ test('browse and detail expose validated USPS state names for challenge lists', 
   const item = browse.items[0];
   assert.ok(item);
   assert.ok(item.states.length >= 1);
+  assert.ok(item.summary.length >= 40);
   for (const state of item.states) {
     assert.match(state.code, /^[A-Z]{2}$/);
     assert.ok(state.name.length > 2);
@@ -86,9 +96,9 @@ test('buildBooksBrowseViewModel defaults to title ascending', () => {
     left.localeCompare(right, undefined, { sensitivity: 'base' }),
   );
   assert.deepEqual(titles, sorted);
-  const titleCol = view.sortColumns.find((column) => column.key === 'title');
-  assert.equal(titleCol?.ariaSort, 'ascending');
-  assert.match(titleCol?.href ?? '', /dir=desc/);
+  const titleOpt = view.sortOptions.find((option) => option.key === 'title');
+  assert.equal(titleOpt?.ariaSort, 'ascending');
+  assert.match(titleOpt?.href ?? '', /dir=desc/);
 });
 
 test('buildBooksBrowseViewModel sorts by author descending', () => {
@@ -109,20 +119,44 @@ test('buildBooksBrowseViewModel sorts by citation count', () => {
   }
 });
 
-test('sort column hrefs preserve active filters', () => {
+test('sort option hrefs preserve active filters and reset page', () => {
   const view = buildBooksBrowseViewModel(SNAPSHOT, {
     q: 'eye',
     state: 'FL',
     author: 'Toni Morrison',
     sort: 'year',
     dir: 'asc',
+    page: '2',
   });
-  const yearCol = view.sortColumns.find((column) => column.key === 'year');
-  assert.ok(yearCol);
-  assert.match(yearCol.href, /q=eye/);
-  assert.match(yearCol.href, /state=FL/);
-  assert.match(yearCol.href, /author=Toni(\+|%20)Morrison/);
-  assert.match(yearCol.href, /dir=desc/);
+  const yearOpt = view.sortOptions.find((option) => option.key === 'year');
+  assert.ok(yearOpt);
+  assert.match(yearOpt.href, /q=eye/);
+  assert.match(yearOpt.href, /state=FL/);
+  assert.match(yearOpt.href, /author=Toni(\+|%20)Morrison/);
+  assert.match(yearOpt.href, /dir=desc/);
+  assert.doesNotMatch(yearOpt.href, /page=/);
+});
+
+test('buildBooksBrowseViewModel paginates results', () => {
+  const page1 = buildBooksBrowseViewModel(SNAPSHOT, {});
+  assert.equal(page1.page, 1);
+  assert.equal(page1.items.length, BOOKS_BROWSE_PAGE_SIZE);
+  assert.ok(page1.pagination.totalPages >= 2);
+  assert.equal(page1.pagination.previousHref, undefined);
+  assert.ok(page1.pagination.nextHref);
+
+  const page2 = buildBooksBrowseViewModel(SNAPSHOT, { page: '2' });
+  assert.equal(page2.page, 2);
+  assert.ok(page2.items.length >= 1);
+  assert.notEqual(page2.items[0]?.id, page1.items[0]?.id);
+  assert.ok(page2.pagination.previousHref);
+  assert.match(page2.pagination.previousHref ?? '', /\/books$/);
+});
+
+test('buildBooksBrowseViewModel clamps out-of-range pages', () => {
+  const view = buildBooksBrowseViewModel(SNAPSHOT, { page: '999' });
+  assert.equal(view.page, view.pagination.totalPages);
+  assert.equal(view.pagination.nextHref, undefined);
 });
 
 test('buildBooksDetailViewModel resolves a known slug', () => {
