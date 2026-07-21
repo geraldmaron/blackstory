@@ -371,6 +371,9 @@ importers:
         specifier: ^8.16.3
         version: 8.22.0
     devDependencies:
+      '@repo/security':
+        specifier: workspace:*
+        version: link:../security
       '@repo/typescript-config':
         specifier: workspace:^
         version: link:../typescript-config

@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "activeRelease": {
+    "releaseId": "rel_mob005_a",
+    "generatedAt": "2026-07-21T12:00:00.000Z",
+    "recordUpdatedAt": "2026-07-21T12:00:00.000Z"
+  },
+  "schemaRange": {
+    "min": 1,
+    "max": 1
+  },
+  "compatibility": {
+    "apiVersion": "v1",
+    "minSupportedApiVersion": "v1",
+    "deprecationWindowDays": 90,
+    "minSupportedAppBuild": 1000
+  },
+  "featureFlags": {
+    "search": true,
+    "map": true
+  },
+  "legalVersions": {
+    "privacyPolicy": "2026-07-01",
+    "termsOfService": "2026-07-01"
+  },
+  "artifactHashes": {
+    "bounded-points": {
+      "path": "public/releases/rel_mob005_a/map/bounded-points.json",
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "1a77a37ea053b7745b590d8ab5f7b6ee02d7fa1cdd27866257f811dbda8a12a5"
+      },
+      "byteLength": 320
+    },
+    "content-index": {
+      "path": "public/releases/rel_mob005_a/content/index.json",
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "13d3037d53d6a477436c2034e93f7f3a14d333a4b95138fcaeacd99b49c0be34"
+      },
+      "byteLength": 123
+    },
+    "entities-list": {
+      "path": "public/releases/rel_mob005_a/entities.json",
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "80083e1817b2d35a46760e5bfad6db1f4579d4e31992bf5aa15983ecefc87367"
+      },
+      "byteLength": 65
+    },
+    "map-county-aggregates": {
+      "path": "public/releases/rel_mob005_a/map/county-aggregates.json",
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "c196c7bff30ecc1625923f9efc388964a96331a673d8074c773058b2076f7fd6"
+      },
+      "byteLength": 145
+    },
+    "map-source": {
+      "path": "public/releases/rel_mob005_a/map/source.json",
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "c353cf2791b96f7846a5e0998b53693fd52526537cabc145627957e64d0b170e"
+      },
+      "byteLength": 1436
+    },
+    "map-state-aggregates": {
+      "path": "public/releases/rel_mob005_a/map/state-aggregates.json",
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "fd68315450816720cbc7c99996e99441f88729c2fd9c20223d506bf30a6e1427"
+      },
+      "byteLength": 267
+    },
+    "search-index": {
+      "path": "public/releases/rel_mob005_a/search-index.json",
+      "hash": {
+        "algorithm": "sha256",
+        "digest": "34e4a932d73b7a05902fc621b493398e0e9f2aec372cb44524091167d52e2414"
+      },
+      "byteLength": 59
+    }
+  },
+  "degradedMode": false,
+  "cacheDirectives": {
+    "bootstrapMaxAgeSeconds": 60,
+    "bootstrapStaleWhileRevalidateSeconds": 600,
+    "releaseArtifactImmutableMaxAgeSeconds": 31536000
+  },
+  "releaseStamp": "rel_mob005_a@18550410b0e7"
+}
