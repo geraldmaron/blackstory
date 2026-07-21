@@ -9,7 +9,7 @@
  */
 import React, { useDeferredValue, useId, useMemo, useState } from 'react';
 import { Button } from '@repo/ui';
-import { getExploreAppCheckHeaders } from '../../app/(map)/explore/app-check-client';
+import { getRequestIntegrityHeaders } from '../../lib/request-integrity/client';
 import { fetchLocateByAddress } from '../../lib/geocode/locate-client';
 import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-map-source';
 import {
@@ -57,6 +57,8 @@ type SearchStatus =
 const ERROR_MESSAGES = {
   fallback: 'No match for that place. Try a city and state, a ZIP, or pick a record below.',
   rate_limited: 'Too many location lookups. Wait a moment and try again.',
+  request_integrity_denied: 'This browser session could not be verified. Reload and try again.',
+  /** @deprecated alias — same copy as `request_integrity_denied`. */
   app_check_denied: 'This browser session could not be verified. Reload and try again.',
   invalid_query: 'That input could not be read as an address, city, or ZIP.',
   network_error: 'Location lookup is temporarily unreachable.',
@@ -126,7 +128,7 @@ export function ExploreAddressSearch({
     }
 
     setStatus({ kind: 'loading' });
-    const headers = await getExploreAppCheckHeaders();
+    const headers = await getRequestIntegrityHeaders();
     const result = await fetchLocateByAddress(trimmed, headers, { forCamera: true });
 
     if (result.kind === 'resolved') {
@@ -155,8 +157,8 @@ export function ExploreAddressSearch({
       setStatus({ kind: 'error', message: ERROR_MESSAGES.rate_limited });
       return;
     }
-    if (result.kind === 'app_check_denied') {
-      setStatus({ kind: 'error', message: ERROR_MESSAGES.app_check_denied });
+    if (result.kind === 'request_integrity_denied' || result.kind === 'app_check_denied') {
+      setStatus({ kind: 'error', message: ERROR_MESSAGES.request_integrity_denied });
       return;
     }
     if (result.kind === 'invalid_query') {

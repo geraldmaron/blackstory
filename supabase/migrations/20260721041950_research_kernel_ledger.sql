@@ -361,12 +361,17 @@ CREATE TABLE bb_canonical.relationship_qualifiers (
   UNIQUE (relationship_id, qualifier_type, property)
 );
 
+-- Allow the live public catalog vocabulary plus research-kernel typed predicates.
+-- A narrower CHECK would fail on existing production rows (cites, part_of, employed_by, …).
 ALTER TABLE bb_canonical.entity_relationships
   ADD CONSTRAINT entity_relationships_typed_predicate
   CHECK (relationship_type IN (
     'served_as', 'located_at', 'succeeded', 'challenged_law',
     'participated_in', 'funded_by', 'founded', 'member_of',
-    'published', 'occurred_at', 'related_to'
+    'published', 'occurred_at', 'related_to',
+    'attended', 'employed_by', 'depicts', 'cites', 'governed_by',
+    'part_of', 'successor_of', 'caused', 'enabled', 'influenced',
+    'overturned', 'commemorates', 'authored', 'other'
   ));
 
 -- ---------------------------------------------------------------------------

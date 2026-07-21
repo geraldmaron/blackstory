@@ -14,6 +14,7 @@ import {
 const ALL_REASONS: readonly ExploreDegradedReason[] = [
   'refine_network_error',
   'refine_rate_limited',
+  'refine_request_integrity_denied',
   'refine_app_check_denied',
   'refine_invalid_query',
   'map_canvas_unavailable',

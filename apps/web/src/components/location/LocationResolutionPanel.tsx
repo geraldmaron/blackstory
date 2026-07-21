@@ -25,7 +25,7 @@ export type LocationResolutionPanelProps = {
 
 const RATE_LIMIT_MESSAGE =
   'Too many location lookups in a row. Wait a moment and try again, or search by place name below.';
-const APP_CHECK_MESSAGE =
+const INTEGRITY_MESSAGE =
   'This browser session could not be verified. Reload the page, or search by place name below.';
 const NETWORK_ERROR_MESSAGE =
   'The location lookup service is temporarily unreachable. Search by place name below.';
@@ -71,8 +71,8 @@ export function LocationResolutionPanel({ result }: LocationResolutionPanelProps
   const message =
     result.kind === 'rate_limited'
       ? RATE_LIMIT_MESSAGE
-      : result.kind === 'app_check_denied'
-        ? APP_CHECK_MESSAGE
+      : result.kind === 'request_integrity_denied' || result.kind === 'app_check_denied'
+        ? INTEGRITY_MESSAGE
         : result.kind === 'invalid_query'
           ? INVALID_QUERY_MESSAGE
           : NETWORK_ERROR_MESSAGE;

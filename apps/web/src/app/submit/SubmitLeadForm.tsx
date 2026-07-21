@@ -9,7 +9,7 @@
  */
 import { useId, useState, type FormEvent } from 'react';
 import { Button, Notice } from '@repo/ui';
-import { getSubmitLeadAppCheckHeaders } from './app-check-client';
+import { getRequestIntegrityHeaders } from '../../lib/request-integrity/client';
 
 type SubmitState =
   | { readonly status: 'idle' }
@@ -50,10 +50,11 @@ export function SubmitLeadForm() {
 
     setState({ status: 'submitting' });
     try {
-      const appCheckHeaders = await getSubmitLeadAppCheckHeaders();
+      const integrityHeaders = await getRequestIntegrityHeaders();
       const response = await fetch('/submit/api', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...appCheckHeaders },
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json', ...integrityHeaders },
         body: JSON.stringify(payload),
       });
       const body: unknown = await response.json().catch(() => undefined);

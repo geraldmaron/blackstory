@@ -21,15 +21,14 @@ import {
   translateZipToPlace,
   type LocateCache,
 } from '../../../lib/geocode/pipeline';
-import type { LocateAppCheckGuard } from './app-check-guard';
+import type { LocateRequestIntegrityGuard } from './request-integrity-guard';
 import type { createLocateRateLimitGuard } from './rate-limit-guard';
 
 /**
- * Mirrors `@repo/firebase`'s `appCheckSatisfiesRateLimitGate` without a static
- * `@repo/firebase` import (that barrel pulls Admin SDK / top-level await and breaks
- * this CJS-rooted app's load path — see `./app-check-guard.ts`).
+ * Monitor allow-through must satisfy the quota gate (compat with @repo/security's
+ * `appCheckVerified` field name on rate-limit requests).
  */
-function appCheckSatisfiesRateLimitGate(decision: {
+function integritySatisfiesRateLimitGate(decision: {
   readonly verified: boolean;
   readonly mode: 'monitor' | 'enforce';
 }): boolean {
@@ -37,7 +36,7 @@ function appCheckSatisfiesRateLimitGate(decision: {
 }
 
 export type LocateRouteDependencies = {
-  readonly appCheckGuard: LocateAppCheckGuard;
+  readonly integrityGuard: LocateRequestIntegrityGuard;
   readonly rateLimitGuard: ReturnType<typeof createLocateRateLimitGuard>;
   readonly cache: LocateCache;
   /** Test-only injection seams production wiring (`./route.ts`) never overrides these; the
@@ -71,17 +70,17 @@ export async function handleLocateRequest(
 ): Promise<Response> {
   const clientIp = clientIpFrom(request);
 
-  const appCheckDecision = await deps.appCheckGuard({ headers: request.headers });
-  if (!appCheckDecision.allowed) {
-    return jsonError(appCheckDecision.status, 'app_check_required', {
-      reason: appCheckDecision.reason,
+  const integrityDecision = await deps.integrityGuard({ headers: request.headers });
+  if (!integrityDecision.allowed) {
+    return jsonError(integrityDecision.status, 'request_integrity_required', {
+      reason: integrityDecision.reason,
     });
   }
 
   const rateDecision = deps.rateLimitGuard.evaluate({
     subject: 'anonymous',
     ...(clientIp ? { clientIp } : {}),
-    appCheckVerified: appCheckSatisfiesRateLimitGate(appCheckDecision),
+    appCheckVerified: integritySatisfiesRateLimitGate(integrityDecision),
   });
   if (!rateDecision.allowed) {
     const response = deps.rateLimitGuard.formatDeniedResponse(rateDecision);

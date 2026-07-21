@@ -1,53 +1,49 @@
 /**
  * Integration tests for the public search route. These exercise the REAL route handler
- * end-to-end App Check guard, rate limiter, `evaluateSearchQueryGuardrails`, and
+ * end-to-end request-integrity guard, rate limiter, `evaluateSearchQueryGuardrails`, and
  * the `runPublicSearch` pipeline over the real seed snapshot index not any component in
  * isolation. That is the point: guardrail was unit-tested but had zero wired callers, so
  * these tests prove adversarial input is bounded by the guardrail through the actual HTTP route.
  *
  * Style follows `apps/web/src/app/submit/*.test.ts`: plain `node:test`, real objects, no mocking
- * framework. App Check is driven by injecting a fake accepting verifier (the same DI seam the
- * submit App Check guard test uses); the rate limiter runs on a deterministic fixed clock.
+ * framework. Request integrity is driven by injecting a real enforce-mode guard with matching
+ * cookie/header tokens; the rate limiter runs on a deterministic fixed clock.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { AppCheckVerifier } from '@repo/firebase';
+import { CSRF_COOKIE_NAME, CSRF_HEADER_NAME } from '../../../lib/web-security/csrf';
 import { getSnapshotSearchIndex } from '../../../lib/search/snapshot-search-index';
-import { createSearchAppCheckGuard } from './app-check-guard';
+import { createSearchRequestIntegrityGuard } from './request-integrity-guard';
 import { createSearchRateLimitGuard } from './rate-limit-guard';
 import { handleSearchRequest, type SearchRouteDependencies } from './handler';
 
 const SCHOOL_ID = 'ent_dunbar_school_001';
 const EVENT_ID = 'ent_dc_landmark_listing_1975';
-
-function acceptingVerifier(appId = 'test-app-id'): AppCheckVerifier {
-  return {
-    async verifyToken() {
-      return { appId };
-    },
-  };
-}
+const INTEGRITY_TOKEN = 'a'.repeat(64);
 
 /** Fresh dependency set per test a new rate-limit bucket so quotas never leak between tests.  */
 async function buildDeps(
   overrides: Partial<SearchRouteDependencies> = {},
 ): Promise<SearchRouteDependencies> {
-  const appCheckGuard = await createSearchAppCheckGuard({
+  const integrityGuard = createSearchRequestIntegrityGuard({
     mode: 'enforce',
-    verifier: acceptingVerifier(),
     telemetry: { record: () => {} },
   });
   return {
-    appCheckGuard,
+    integrityGuard,
     rateLimitGuard: createSearchRateLimitGuard({ now: () => 0 }),
     searchIndex: getSnapshotSearchIndex(),
     ...overrides,
   };
 }
 
-function searchRequest(query: string, opts: { appCheck?: boolean } = {}): Request {
+function searchRequest(query: string, opts: { integrity?: boolean } = {}): Request {
   const headers: Record<string, string> = {};
-  if (opts.appCheck !== false) headers['x-firebase-appcheck'] = 'a-real-looking-token';
+  if (opts.integrity !== false) {
+    headers.cookie = `${CSRF_COOKIE_NAME}=${INTEGRITY_TOKEN}`;
+    headers[CSRF_HEADER_NAME] = INTEGRITY_TOKEN;
+    headers['sec-fetch-site'] = 'same-origin';
+  }
   return new Request(`http://localhost/search/api${query}`, { headers });
 }
 
@@ -126,16 +122,16 @@ test('the era filter narrows results through the real route (AC5)', async () => 
   assert.equal(filtered.results[0]?.id, SCHOOL_ID, 'only the school overlaps the 1890s era bucket');
 });
 
-test('a missing App Check token is denied (401 app_check_required)', async () => {
+test('a missing request-integrity token is denied (401 request_integrity_required)', async () => {
   const deps = await buildDeps();
   const response = await handleSearchRequest(
-    searchRequest('?q=freedmen', { appCheck: false }),
+    searchRequest('?q=freedmen', { integrity: false }),
     deps,
   );
   assert.equal(response.status, 401);
 
   const body = (await response.json()) as { error: string; reason: string };
-  assert.equal(body.error, 'app_check_required');
+  assert.equal(body.error, 'request_integrity_required');
   assert.equal(body.reason, 'missing_token');
 });
 

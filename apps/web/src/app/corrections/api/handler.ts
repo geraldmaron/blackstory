@@ -21,11 +21,22 @@ import {
   type CorrectionSubmissionStore,
   type StoredCorrection,
 } from '../store';
-import type { CorrectionAppCheckGuard } from '../app-check-guard';
+import type { CorrectionRequestIntegrityGuard } from '../request-integrity-guard';
 import type { createCorrectionRateLimitGuard } from '../rate-limit-guard';
 
+/**
+ * Monitor allow-through must satisfy the quota gate (compat with @repo/security's
+ * `appCheckVerified` field name on rate-limit requests).
+ */
+function integritySatisfiesRateLimitGate(decision: {
+  readonly verified: boolean;
+  readonly mode: 'monitor' | 'enforce';
+}): boolean {
+  return decision.verified || decision.mode === 'monitor';
+}
+
 export type CorrectionRouteDependencies = {
-  readonly appCheckGuard: CorrectionAppCheckGuard;
+  readonly integrityGuard: CorrectionRequestIntegrityGuard;
   readonly rateLimitGuard: ReturnType<typeof createCorrectionRateLimitGuard>;
   readonly store: CorrectionSubmissionStore;
   readonly privacyPepper: string;
@@ -76,12 +87,12 @@ async function guardRequest(
   | { readonly allowed: false; readonly response: Response }
 > {
   const clientIp = clientIpFrom(request);
-  const appCheckDecision = await deps.appCheckGuard({ headers: request.headers });
-  if (!appCheckDecision.allowed) {
+  const integrityDecision = await deps.integrityGuard({ headers: request.headers });
+  if (!integrityDecision.allowed) {
     return {
       allowed: false,
-      response: jsonError(appCheckDecision.status, 'app_check_required', {
-        reason: appCheckDecision.reason,
+      response: jsonError(integrityDecision.status, 'request_integrity_required', {
+        reason: integrityDecision.reason,
       }),
     };
   }
@@ -89,9 +100,7 @@ async function guardRequest(
   const rateDecision = deps.rateLimitGuard.evaluate({
     subject: 'anonymous',
     ...(clientIp ? { clientIp } : {}),
-    // Monitor allow-through must satisfy the quota gate (see @repo/firebase
-    // `appCheckSatisfiesRateLimitGate`); otherwise missing App Check tokens become fake 429s.
-    appCheckVerified: appCheckDecision.verified || appCheckDecision.mode === 'monitor',
+    appCheckVerified: integritySatisfiesRateLimitGate(integrityDecision),
   });
   if (!rateDecision.allowed) {
     const response = deps.rateLimitGuard.formatDeniedResponse(rateDecision);
@@ -285,7 +294,6 @@ export async function handleCorrectionAbuseReportRequest(
 }
 
 let defaultStore: CorrectionSubmissionStore | undefined;
-let defaultAppCheckGuardPromise: Promise<CorrectionAppCheckGuard> | undefined;
 
 export function requirePrivacyPepper(): string {
   const pepper = process.env.SUBMISSION_PRIVACY_PEPPER;
@@ -304,13 +312,10 @@ export function getDefaultCorrectionStore(): CorrectionSubmissionStore {
 }
 
 export async function buildDefaultCorrectionRouteDependencies(): Promise<CorrectionRouteDependencies> {
-  if (!defaultAppCheckGuardPromise) {
-    const { createCorrectionAppCheckGuard } = await import('../app-check-guard');
-    defaultAppCheckGuardPromise = createCorrectionAppCheckGuard();
-  }
   const { createCorrectionRateLimitGuard } = await import('../rate-limit-guard');
+  const { createCorrectionRequestIntegrityGuard } = await import('../request-integrity-guard');
   return {
-    appCheckGuard: await defaultAppCheckGuardPromise,
+    integrityGuard: createCorrectionRequestIntegrityGuard(),
     rateLimitGuard: createCorrectionRateLimitGuard(),
     store: getDefaultCorrectionStore(),
     privacyPepper: requirePrivacyPepper(),

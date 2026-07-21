@@ -1,6 +1,6 @@
 /**
  * Integration tests for the public `/locate` geocode route. These exercise the REAL
- * route handler end-to-end App Check guard, `geocoding` rate limiter, address/ZIP/
+ * route handler end-to-end request-integrity guard, `geocoding` rate limiter, address/ZIP/
  * coordinate parsing, and the full geocode pipeline (`../../../lib/geocode/pipeline.ts`) with a
  * fake Census fetcher injected so no real network call is ever made (style follows
  * `../../search/api/route.test.ts`: plain `node:test`, real objects, no mocking framework).
@@ -11,21 +11,15 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { AppCheckVerifier } from '@repo/firebase';
 import type { CensusGeocodeMatch } from '@repo/domain';
 import { DEFAULT_ENDPOINT_QUOTA_MATRIX, resolveEndpointPolicy } from '@repo/security';
+import { CSRF_COOKIE_NAME, CSRF_HEADER_NAME } from '../../../lib/web-security/csrf';
 import { createLocateCache } from '../../../lib/geocode/pipeline';
-import { createLocateAppCheckGuard } from './app-check-guard';
+import { createLocateRequestIntegrityGuard } from './request-integrity-guard';
 import { createLocateRateLimitGuard } from './rate-limit-guard';
 import { handleLocateRequest, type LocateRouteDependencies } from './handler';
 
-function acceptingVerifier(appId = 'test-app-id'): AppCheckVerifier {
-  return {
-    async verifyToken() {
-      return { appId };
-    },
-  };
-}
+const INTEGRITY_TOKEN = 'a'.repeat(64);
 
 const DC_MATCH: CensusGeocodeMatch = {
   matchedAddress: '4600 SILVER HILL RD, WASHINGTON, DC, 20233',
@@ -65,22 +59,25 @@ function fakeCoordinatesFetcher(result: CensusGeocodeMatch | (() => CensusGeocod
 async function buildDeps(
   overrides: Partial<LocateRouteDependencies> = {},
 ): Promise<LocateRouteDependencies> {
-  const appCheckGuard = await createLocateAppCheckGuard({
+  const integrityGuard = createLocateRequestIntegrityGuard({
     mode: 'enforce',
-    verifier: acceptingVerifier(),
     telemetry: { record: () => {} },
   });
   return {
-    appCheckGuard,
+    integrityGuard,
     rateLimitGuard: createLocateRateLimitGuard({ now: () => 0 }),
     cache: createLocateCache(),
     ...overrides,
   };
 }
 
-function locateRequest(query: string, opts: { appCheck?: boolean } = {}): Request {
+function locateRequest(query: string, opts: { integrity?: boolean } = {}): Request {
   const headers: Record<string, string> = {};
-  if (opts.appCheck !== false) headers['x-firebase-appcheck'] = 'a-real-looking-token';
+  if (opts.integrity !== false) {
+    headers.cookie = `${CSRF_COOKIE_NAME}=${INTEGRITY_TOKEN}`;
+    headers[CSRF_HEADER_NAME] = INTEGRITY_TOKEN;
+    headers['sec-fetch-site'] = 'same-origin';
+  }
   return new Request(`http://localhost/locate/api${query}`, { headers });
 }
 
@@ -271,33 +268,32 @@ test('rejects out-of-range coordinates (400)', async () => {
   assert.equal(body.reason, 'coordinates_out_of_range');
 });
 
-test('a missing App Check token is denied (401 app_check_required)', async () => {
+test('a missing request integrity token is denied (401 request_integrity_required)', async () => {
   const deps = await buildDeps({ fetchAddressGeocode: fakeAddressFetcher([DC_MATCH]) });
   const response = await handleLocateRequest(
-    locateRequest('?address=4600+Silver+Hill+Rd', { appCheck: false }),
+    locateRequest('?address=4600+Silver+Hill+Rd', { integrity: false }),
     deps,
   );
   assert.equal(response.status, 401);
   const body = (await response.json()) as { error: string; reason: string };
-  assert.equal(body.error, 'app_check_required');
+  assert.equal(body.error, 'request_integrity_required');
   assert.equal(body.reason, 'missing_token');
 });
 
-test('monitor mode without an App Check token still geocodes (not a fake 429)', async () => {
-  // Local/dev defaults to APP_CHECK_MODE=monitor and often has no App Check site key, so the
-  // client sends no token. Monitor must allow the request through without the rate-limit layer
-  // re-enforcing App Check as rate_limit_exceeded.
-  const appCheckGuard = await createLocateAppCheckGuard({
+test('monitor mode without a request integrity token still geocodes (not a fake 429)', async () => {
+  // Local/dev defaults to REQUEST_INTEGRITY_MODE=monitor, so clients may omit tokens.
+  // Monitor must allow the request through without the rate-limit layer re-enforcing
+  // integrity as rate_limit_exceeded.
+  const integrityGuard = createLocateRequestIntegrityGuard({
     mode: 'monitor',
-    verifier: acceptingVerifier(),
     telemetry: { record: () => {} },
   });
   const deps = await buildDeps({
-    appCheckGuard,
+    integrityGuard,
     fetchAddressGeocode: fakeAddressFetcher([DC_MATCH]),
   });
   const response = await handleLocateRequest(
-    locateRequest('?address=4600+Silver+Hill+Rd', { appCheck: false }),
+    locateRequest('?address=4600+Silver+Hill+Rd', { integrity: false }),
     deps,
   );
   assert.equal(response.status, 200);

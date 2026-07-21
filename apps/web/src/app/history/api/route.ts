@@ -1,27 +1,22 @@
 /**
- * Public history refine endpoint. Node.js runtime (App Check Admin SDK). Thin entry
- * wiring production singletons; testable core lives in `./handler`.
+ * Public history refine endpoint. Node.js runtime. Thin entry wiring production singletons;
+ * testable core lives in `./handler`.
  */
-import { createHistoryAppCheckGuard, type HistoryAppCheckGuard } from './app-check-guard';
+import {
+  createHistoryRequestIntegrityGuard,
+  type HistoryRequestIntegrityGuard,
+} from './request-integrity-guard';
 import { createHistoryRateLimitGuard } from './rate-limit-guard';
 import { handleHistoryRefineRequest } from './handler';
 
 export const runtime = 'nodejs';
 
 const defaultRateLimitGuard = createHistoryRateLimitGuard();
-
-let defaultAppCheckGuardPromise: Promise<HistoryAppCheckGuard> | undefined;
-function getDefaultAppCheckGuard(): Promise<HistoryAppCheckGuard> {
-  if (!defaultAppCheckGuardPromise) {
-    defaultAppCheckGuardPromise = createHistoryAppCheckGuard();
-  }
-  return defaultAppCheckGuardPromise;
-}
+const defaultIntegrityGuard: HistoryRequestIntegrityGuard = createHistoryRequestIntegrityGuard();
 
 export async function GET(request: Request): Promise<Response> {
-  const appCheckGuard = await getDefaultAppCheckGuard();
   return handleHistoryRefineRequest(request, {
-    appCheckGuard,
+    integrityGuard: defaultIntegrityGuard,
     rateLimitGuard: defaultRateLimitGuard,
   });
 }

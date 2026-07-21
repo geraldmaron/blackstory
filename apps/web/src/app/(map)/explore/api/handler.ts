@@ -3,7 +3,7 @@
  * `evaluateSearchQueryGuardrails` to the kind/era dimensions (the two filter fields that overlap
  * the search allowlist), validates theme/tone/status/confidence locally, then filters the bundled
  * explore map snapshot. The page itself is SSR-first; this route is the progressive-enhancement
- * seam that proves App Check + guardrails on dynamic explore queries without requiring a full
+ * seam that proves request-integrity + guardrails on dynamic explore queries without requiring a full
  * navigation.
  */
 import { NextResponse } from 'next/server';
@@ -15,11 +15,22 @@ import {
 } from '../../../../lib/map-experience';
 import { buildExploreMapSource } from '../../../../lib/map-experience/build-explore-map-source';
 import { listPublicEntityViews } from '../../../../lib/public-data/source';
-import type { ExploreAppCheckGuard } from './app-check-guard';
+import type { ExploreRequestIntegrityGuard } from './request-integrity-guard';
 import type { createExploreRateLimitGuard } from './rate-limit-guard';
 
+/**
+ * Monitor allow-through must satisfy the quota gate (compat with @repo/security's
+ * `appCheckVerified` field name on rate-limit requests).
+ */
+function integritySatisfiesRateLimitGate(decision: {
+  readonly verified: boolean;
+  readonly mode: 'monitor' | 'enforce';
+}): boolean {
+  return decision.verified || decision.mode === 'monitor';
+}
+
 export type ExploreRouteDependencies = {
-  readonly appCheckGuard: ExploreAppCheckGuard;
+  readonly integrityGuard: ExploreRequestIntegrityGuard;
   readonly rateLimitGuard: ReturnType<typeof createExploreRateLimitGuard>;
 };
 
@@ -115,19 +126,17 @@ export async function handleExploreRefineRequest(
 ): Promise<Response> {
   const clientIp = clientIpFrom(request);
 
-  const appCheckDecision = await deps.appCheckGuard({ headers: request.headers });
-  if (!appCheckDecision.allowed) {
-    return jsonError(appCheckDecision.status, 'app_check_required', {
-      reason: appCheckDecision.reason,
+  const integrityDecision = await deps.integrityGuard({ headers: request.headers });
+  if (!integrityDecision.allowed) {
+    return jsonError(integrityDecision.status, 'request_integrity_required', {
+      reason: integrityDecision.reason,
     });
   }
 
   const rateDecision = deps.rateLimitGuard.evaluate({
     subject: 'anonymous',
     ...(clientIp ? { clientIp } : {}),
-    // Monitor allow-through must satisfy the quota gate (see @repo/firebase
-    // `appCheckSatisfiesRateLimitGate`); otherwise missing App Check tokens become fake 429s.
-    appCheckVerified: appCheckDecision.verified || appCheckDecision.mode === 'monitor',
+    appCheckVerified: integritySatisfiesRateLimitGate(integrityDecision),
   });
   if (!rateDecision.allowed) {
     const response = deps.rateLimitGuard.formatDeniedResponse(rateDecision);

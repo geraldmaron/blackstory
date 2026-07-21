@@ -51,12 +51,12 @@ test('maps a 200 ok:false response to kind:"fallback"', async () => {
   }
 });
 
-test('maps a 401 to kind:"app_check_denied"', async () => {
+test('maps a 401 to kind:"request_integrity_denied"', async () => {
   const original = globalThis.fetch;
-  globalThis.fetch = stubFetch(401, { error: 'app_check_required', reason: 'missing_token' });
+  globalThis.fetch = stubFetch(401, { error: 'request_integrity_required', reason: 'missing_token' });
   try {
     const result = await fetchLocateByAddress('123 Main St');
-    assert.equal(result.kind, 'app_check_denied');
+    assert.equal(result.kind, 'request_integrity_denied');
   } finally {
     globalThis.fetch = original;
   }
@@ -103,7 +103,7 @@ test('maps a thrown fetch (network failure) to kind:"network_error"', async () =
   }
 });
 
-test('sends the provided App Check headers on the outgoing request', async () => {
+test('sends the provided request-integrity headers on the outgoing request', async () => {
   const original = globalThis.fetch;
   let capturedHeaders: HeadersInit | undefined;
   globalThis.fetch = (async (_url: string, init?: RequestInit) => {
@@ -117,8 +117,8 @@ test('sends the provided App Check headers on the outgoing request', async () =>
     } as Response;
   }) as typeof fetch;
   try {
-    await fetchLocateByAddress('123 Main St', { 'X-Firebase-AppCheck': 'token-123' });
-    assert.deepEqual(capturedHeaders, { 'X-Firebase-AppCheck': 'token-123' });
+    await fetchLocateByAddress('123 Main St', { 'x-csrf-token': 'token-123' });
+    assert.deepEqual(capturedHeaders, { 'x-csrf-token': 'token-123' });
   } finally {
     globalThis.fetch = original;
   }

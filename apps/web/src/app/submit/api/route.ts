@@ -1,37 +1,21 @@
 /**
- * Public "submit a lead" intake endpoint. Node.js runtime (App Check's Admin SDK
- * verifier requires it — not the Edge runtime). Behind App Check + rate limits, writing
- * create-only into quarantine via the real `createQuarantinedSubmission`. Nothing here
- * writes a canonical record, opens a research case, or evaluates a promotion gate — a
- * quarantined lead only ever advances through consensus review
- * (`@repo/domain`'s `packages/domain/src/consensus-review/`), a separate, human-gated
- * step.
+ * Public "submit a lead" intake endpoint. Node.js runtime. Behind request-integrity
+ * + rate limits, writing create-only into quarantine via the real
+ * `createQuarantinedSubmission`. Nothing here writes a canonical record, opens a research
+ * case, or evaluates a promotion gate — a quarantined lead only ever advances through
+ * consensus review (`@repo/domain`'s `packages/domain/src/consensus-review/`), a separate,
+ * human-gated step.
  */
 import { NextResponse } from 'next/server';
 import { createHash } from 'node:crypto';
 import { createQuarantinedSubmission } from '@repo/security';
-import { createSubmitLeadAppCheckGuard } from '../app-check-guard';
+import { createSubmitLeadRequestIntegrityGuard } from '../request-integrity-guard';
 import { createSubmitLeadRateLimitGuard } from '../rate-limit-guard';
 import { validateLeadSubmission, type LeadSubmissionInput } from '../lead-intake';
 
 export const runtime = 'nodejs';
 
-// Module-level singletons: one in-memory store per server instance, matching the default
-// posture of `apps/api-submissions`'s guards. Production deployment behind a shared store is
-// an infra concern for whoever wires this route to a real Cloud Run/App Hosting instance
-// count, not a change to the rate-limit algorithm itself.
-// The App Check guard is created lazily (not at module load) because
-// `createSubmitLeadAppCheckGuard` dynamically imports `@repo/firebase`; see the
-// comment in `../app-check-guard.ts` for why. Caching the resulting promise still means only
-// one guard is ever constructed per server instance.
-let appCheckGuardPromise: ReturnType<typeof createSubmitLeadAppCheckGuard> | undefined;
-function getAppCheckGuard(): ReturnType<typeof createSubmitLeadAppCheckGuard> {
-  if (!appCheckGuardPromise) {
-    appCheckGuardPromise = createSubmitLeadAppCheckGuard();
-  }
-  return appCheckGuardPromise;
-}
-
+const requestIntegrityGuard = createSubmitLeadRequestIntegrityGuard();
 const rateLimitGuard = createSubmitLeadRateLimitGuard();
 
 function jsonError(status: number, error: string, extra?: Record<string, unknown>): Response {
@@ -68,20 +52,19 @@ export async function POST(request: Request): Promise<Response> {
     return jsonError(400, 'invalid_json');
   }
 
-  const appCheckGuard = await getAppCheckGuard();
-  const appCheckDecision = await appCheckGuard({ headers: request.headers });
-  if (!appCheckDecision.allowed) {
-    return jsonError(appCheckDecision.status, 'app_check_required', {
-      reason: appCheckDecision.reason,
+  const integrityDecision = await requestIntegrityGuard({ headers: request.headers });
+  if (!integrityDecision.allowed) {
+    return jsonError(integrityDecision.status, 'request_integrity_required', {
+      reason: integrityDecision.reason,
     });
   }
 
   const rateDecision = rateLimitGuard.evaluate({
     subject: 'anonymous',
     ...(clientIp ? { clientIp } : {}),
-    // Monitor allow-through must satisfy the quota gate (see @repo/firebase
-    // `appCheckSatisfiesRateLimitGate`); otherwise missing App Check tokens become fake 429s.
-    appCheckVerified: appCheckDecision.verified || appCheckDecision.mode === 'monitor',
+    // Monitor allow-through must satisfy the quota gate; otherwise missing integrity
+    // tokens become fake 429s. Field name remains appCheckVerified for @repo/security compat.
+    appCheckVerified: integrityDecision.verified || integrityDecision.mode === 'monitor',
   });
   if (!rateDecision.allowed) {
     const response = rateLimitGuard.formatDeniedResponse(rateDecision);

@@ -15,7 +15,7 @@
  * sink).
  */
 import React, { useId, useState } from 'react';
-import { getLocateAppCheckHeaders } from '../../app/locate/app-check-client';
+import { getRequestIntegrityHeaders } from '../../lib/request-integrity/client';
 import {
   fetchLocateByAddress,
   fetchLocateByCoordinates,
@@ -68,8 +68,8 @@ export function LocateExperience() {
 
   async function handleCoordinates(position: { readonly lat: number; readonly lng: number }) {
     setState({ status: 'loading' });
-    const appCheckHeaders = await getLocateAppCheckHeaders();
-    const result = await fetchLocateByCoordinates(position.lat, position.lng, appCheckHeaders, {
+    const integrityHeaders = await getRequestIntegrityHeaders();
+    const result = await fetchLocateByCoordinates(position.lat, position.lng, integrityHeaders, {
       forCamera: true,
     });
     recordOutcome('browser_location_used', result);
@@ -78,8 +78,8 @@ export function LocateExperience() {
 
   async function handleAddress(address: string) {
     setState({ status: 'loading' });
-    const appCheckHeaders = await getLocateAppCheckHeaders();
-    const result = await fetchLocateByAddress(address, appCheckHeaders, { forCamera: true });
+    const integrityHeaders = await getRequestIntegrityHeaders();
+    const result = await fetchLocateByAddress(address, integrityHeaders, { forCamera: true });
     recordOutcome('address_lookup', result);
     setState({ status: 'done', result });
   }

@@ -7,10 +7,10 @@
  * status codes and route-specific error bodies itself.
  *
  * App Check headers are passed in by the caller (`components/location/LocateExperience.tsx`,
- * sourced from `../../app/locate/app-check-client.ts`) rather than fetched by this module
+ * sourced from `../../lib/request-integrity/client.ts`) rather than fetched by this module
  * keeping this file free of any `app/` import mirrors how `apps/web/src/app/submit/SubmitLeadForm.tsx`
- * calls its own co-located `app-check-client.ts` directly rather than through a shared `lib/`
- * layer, and keeps this module usable from any future caller with a different App Check source.
+ * calls `getRequestIntegrityHeaders()` directly rather than through a shared `lib/`
+ * layer, and keeps this module usable from any future caller with a different integrity source.
  */
 
 export type LocateJurisdictionIds = {
@@ -51,19 +51,22 @@ export type LocateClientResult =
   | { readonly kind: 'resolved'; readonly resolution: LocateResolution; readonly cacheHit: boolean }
   | { readonly kind: 'fallback'; readonly fallback: LocateFallback }
   | { readonly kind: 'rate_limited'; readonly retryAfterSec?: number }
+  | { readonly kind: 'request_integrity_denied' }
+  /** @deprecated alias — use `request_integrity_denied`; kept for transitional callers. */
   | { readonly kind: 'app_check_denied' }
   | { readonly kind: 'invalid_query'; readonly reason: string }
   | { readonly kind: 'network_error' };
 
 async function callLocateApi(
   searchParams: URLSearchParams,
-  appCheckHeaders: Readonly<Record<string, string>>,
+  integrityHeaders: Readonly<Record<string, string>>,
 ): Promise<LocateClientResult> {
   let response: Response;
   try {
     response = await fetch(`/locate/api?${searchParams.toString()}`, {
       method: 'GET',
-      headers: appCheckHeaders,
+      credentials: 'same-origin',
+      headers: integrityHeaders,
     });
   } catch {
     return { kind: 'network_error' };
@@ -71,8 +74,8 @@ async function callLocateApi(
 
   const body: unknown = await response.json().catch(() => undefined);
 
-  if (response.status === 401) {
-    return { kind: 'app_check_denied' };
+  if (response.status === 401 || response.status === 403) {
+    return { kind: 'request_integrity_denied' };
   }
   if (response.status === 429) {
     const retryAfterSec =
@@ -116,12 +119,12 @@ export type FetchLocateByAddressOptions = {
 /** Forward geocode: free-text address, city/state, or ZIP.  */
 export function fetchLocateByAddress(
   address: string,
-  appCheckHeaders: Readonly<Record<string, string>> = {},
+  integrityHeaders: Readonly<Record<string, string>> = {},
   options: FetchLocateByAddressOptions = {},
 ): Promise<LocateClientResult> {
   const params = new URLSearchParams({ address });
   if (options.forCamera) params.set('camera', '1');
-  return callLocateApi(params, appCheckHeaders);
+  return callLocateApi(params, integrityHeaders);
 }
 
 export type FetchLocateByCoordinatesOptions = {
@@ -136,10 +139,10 @@ export type FetchLocateByCoordinatesOptions = {
 export function fetchLocateByCoordinates(
   lat: number,
   lng: number,
-  appCheckHeaders: Readonly<Record<string, string>> = {},
+  integrityHeaders: Readonly<Record<string, string>> = {},
   options: FetchLocateByCoordinatesOptions = {},
 ): Promise<LocateClientResult> {
   const params = new URLSearchParams({ lat: String(lat), lng: String(lng) });
   if (options.forCamera) params.set('camera', '1');
-  return callLocateApi(params, appCheckHeaders);
+  return callLocateApi(params, integrityHeaders);
 }

@@ -1,5 +1,5 @@
 /**
- * Integration tests for the `/history/api` refine route: App Check, rate limits,
+ * Integration tests for the `/history/api` refine route: request integrity, rate limits,
  * and guardrails over the bundled graph snapshot.
  */
 import assert from 'node:assert/strict';
@@ -11,12 +11,11 @@ test.beforeEach(() => {
   resetHistoryGraphReleaseArtifactForTests();
 });
 
-function allowAllAppCheck() {
+function allowAllIntegrity() {
   return {
     allowed: true as const,
     verified: false,
     mode: 'monitor' as const,
-    trustedService: false as const,
   };
 }
 
@@ -28,23 +27,21 @@ const noRisk = {
 };
 
 function createDeps(overrides?: {
-  readonly appCheckAllowed?: boolean;
+  readonly integrityAllowed?: boolean;
   readonly rateAllowed?: boolean;
 }) {
   const keys = new Set<string>();
   return {
-    appCheckGuard: async () =>
-      overrides?.appCheckAllowed === false
+    integrityGuard: async () =>
+      overrides?.integrityAllowed === false
         ? {
             allowed: false as const,
             verified: false as const,
             mode: 'enforce' as const,
             status: 401 as const,
-            code: 'APP_CHECK_REQUIRED' as const,
             reason: 'missing_token' as const,
-            trustedService: false as const,
           }
-        : allowAllAppCheck(),
+        : allowAllIntegrity(),
     rateLimitGuard: {
       evaluate: () =>
         overrides?.rateAllowed === false
@@ -109,14 +106,14 @@ test('denies prohibited guardrail keys', async () => {
   assert.equal(body.error, 'invalid_history_query');
 });
 
-test('requires App Check when guard denies', async () => {
+test('requires request integrity when guard denies', async () => {
   const response = await handleHistoryRefineRequest(
     request('?decade=1950s'),
-    createDeps({ appCheckAllowed: false }),
+    createDeps({ integrityAllowed: false }),
   );
   assert.equal(response.status, 401);
   const body = (await response.json()) as { error: string };
-  assert.equal(body.error, 'app_check_required');
+  assert.equal(body.error, 'request_integrity_required');
 });
 
 test('marks sparse decades in refine responses', async () => {

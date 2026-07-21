@@ -4,9 +4,9 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { AppCheckVerifier } from '@repo/firebase';
+import { CSRF_COOKIE_NAME, CSRF_HEADER_NAME } from '../../../lib/web-security/csrf';
 import { createSubmissionCampaignDetector } from '@repo/security';
-import { createCorrectionAppCheckGuard } from '../app-check-guard';
+import { createCorrectionRequestIntegrityGuard } from '../request-integrity-guard';
 import { createCorrectionRateLimitGuard } from '../rate-limit-guard';
 import { createCorrectionSubmissionStore } from '../store';
 import {
@@ -18,25 +18,17 @@ import {
 } from './handler';
 
 const PEPPER = 'route-test-pepper';
-
-function acceptingVerifier(appId = 'test-app-id'): AppCheckVerifier {
-  return {
-    async verifyToken() {
-      return { appId };
-    },
-  };
-}
+const INTEGRITY_TOKEN = 'a'.repeat(64);
 
 async function buildDeps(
   overrides: Partial<CorrectionRouteDependencies> = {},
 ): Promise<CorrectionRouteDependencies> {
-  const appCheckGuard = await createCorrectionAppCheckGuard({
+  const integrityGuard = createCorrectionRequestIntegrityGuard({
     mode: 'enforce',
-    verifier: acceptingVerifier(),
     telemetry: { record: () => {} },
   });
   return {
-    appCheckGuard,
+    integrityGuard,
     rateLimitGuard: createCorrectionRateLimitGuard({ now: () => 0 }),
     store: createCorrectionSubmissionStore(),
     privacyPepper: PEPPER,
@@ -54,7 +46,9 @@ function postJson(path: string, body: unknown, ip = '203.0.113.20'): Request {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
-      'x-firebase-appcheck': 'token',
+      cookie: `${CSRF_COOKIE_NAME}=${INTEGRITY_TOKEN}`,
+      [CSRF_HEADER_NAME]: INTEGRITY_TOKEN,
+      'sec-fetch-site': 'same-origin',
       'x-forwarded-for': ip,
     },
     body: JSON.stringify(body),

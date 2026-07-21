@@ -61,7 +61,7 @@ test('renders a rate-limited notice', () => {
 
 test('renders an app-check-denied notice', () => {
   const html = renderToStaticMarkup(
-    createElement(LocationResolutionPanel, { result: { kind: 'app_check_denied' } }),
+    createElement(LocationResolutionPanel, { result: { kind: 'request_integrity_denied' } }),
   );
   assert.match(html, /could not be verified/);
 });

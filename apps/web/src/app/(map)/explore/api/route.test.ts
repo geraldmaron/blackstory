@@ -1,40 +1,37 @@
 /**
- * Integration tests for the `/explore/api` refine route: App Check, rate limits,
+ * Integration tests for the `/explore/api` refine route: request integrity, rate limits,
  * and `evaluateSearchQueryGuardrails` bound dynamic explore filter queries.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { AppCheckVerifier } from '@repo/firebase';
-import { createExploreAppCheckGuard } from './app-check-guard';
+import { CSRF_COOKIE_NAME, CSRF_HEADER_NAME } from '../../../../lib/web-security/csrf';
+import { createExploreRequestIntegrityGuard } from './request-integrity-guard';
 import { createExploreRateLimitGuard } from './rate-limit-guard';
 import { handleExploreRefineRequest, type ExploreRouteDependencies } from './handler';
 
-function acceptingVerifier(appId = 'test-app-id'): AppCheckVerifier {
-  return {
-    async verifyToken() {
-      return { appId };
-    },
-  };
-}
+const INTEGRITY_TOKEN = 'a'.repeat(64);
 
 async function buildDeps(
   overrides: Partial<ExploreRouteDependencies> = {},
 ): Promise<ExploreRouteDependencies> {
-  const appCheckGuard = await createExploreAppCheckGuard({
+  const integrityGuard = createExploreRequestIntegrityGuard({
     mode: 'enforce',
-    verifier: acceptingVerifier(),
     telemetry: { record: () => {} },
   });
   return {
-    appCheckGuard,
+    integrityGuard,
     rateLimitGuard: createExploreRateLimitGuard({ now: () => 0 }),
     ...overrides,
   };
 }
 
-function exploreRequest(query: string, opts: { appCheck?: boolean } = {}): Request {
+function exploreRequest(query: string, opts: { integrity?: boolean } = {}): Request {
   const headers: Record<string, string> = {};
-  if (opts.appCheck !== false) headers['x-firebase-appcheck'] = 'a-real-looking-token';
+  if (opts.integrity !== false) {
+    headers.cookie = `${CSRF_COOKIE_NAME}=${INTEGRITY_TOKEN}`;
+    headers[CSRF_HEADER_NAME] = INTEGRITY_TOKEN;
+    headers['sec-fetch-site'] = 'same-origin';
+  }
   return new Request(`http://localhost/explore/api${query}`, { headers });
 }
 
@@ -68,8 +65,10 @@ test('rejects SQL injection through guardrails (sql_not_allowed)', async () => {
   assert.equal(body.reason, 'sql_not_allowed');
 });
 
-test('requires App Check when mode is enforce', async () => {
+test('requires request integrity when mode is enforce', async () => {
   const deps = await buildDeps();
-  const response = await handleExploreRefineRequest(exploreRequest('', { appCheck: false }), deps);
+  const response = await handleExploreRefineRequest(exploreRequest('', { integrity: false }), deps);
   assert.equal(response.status, 401);
+  const body = (await response.json()) as { error: string };
+  assert.equal(body.error, 'request_integrity_required');
 });
