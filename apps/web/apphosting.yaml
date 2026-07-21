@@ -45,6 +45,15 @@ env:
     value: '0'
     availability:
       - RUNTIME
+  - variable: PUBLIC_DATA_SOURCE
+    value: postgres
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: DATABASE_URL
+    secret: web-database-url
+    availability:
+      - RUNTIME
   - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
     value: black-book-efaaf
     availability:

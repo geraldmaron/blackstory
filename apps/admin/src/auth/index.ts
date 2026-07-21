@@ -12,11 +12,11 @@ export type {
   AdminPermission,
   AdminRequestHeaders,
   AuthorizedAdminRequest,
-  FirebaseAdminTokenVerifier,
+  AdminTokenVerifier,
   IapAssertionVerifier,
   PrivilegedAdminAction,
   ServerAdminAuthorizationOptions,
-  VerifiedFirebaseAdminIdentity,
+  VerifiedAdminIdentity,
   VerifiedIapPrincipal,
 } from './server-authorization';
 export { mutateAdminRoles } from './role-mutation';
@@ -25,10 +25,17 @@ export type {
   PrivilegedActionAuthorizer,
   StaffRole,
 } from './role-mutation';
+export { resolveAdminAuthMode, resolveClientAdminAuthMode, type AdminAuthMode } from './mode';
 export {
-  FirebaseSessionAuthorizationError,
-  createFirebaseSessionAuthorizer,
-  normalizeAdminEmail,
-} from './firebase-session-authorizer';
-export { resolveAdminAuthMode, type AdminAuthMode } from './mode';
+  SupabaseSessionAuthorizationError,
+  createSupabaseSessionAuthorizer,
+  readSupabaseRoleFromAppMetadata,
+  readSupabaseServerConfig,
+} from './supabase-session-authorizer';
+export type {
+  SupabaseSessionAuthorizedAdmin,
+  SupabaseUserVerifier,
+  VerifiedSupabaseAdminIdentity,
+} from './supabase-session-authorizer';
+export type { AdminSessionUser } from './session-user';
 export { authorizeAdminRequest, authErrorResponse, type ResolvedAdminCaller } from './request-auth';

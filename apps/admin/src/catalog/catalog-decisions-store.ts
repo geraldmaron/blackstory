@@ -2,21 +2,16 @@
  * Bulk admin decisions on published catalog entities (flag for retraction, needs review,
  * clear). Mirrors the research-case bulk-transition and story-packet bulk-review pattern:
  * this records an audited DECISION only — it never mutates the entity or a release directly.
- * The release builder (packages/domain/src/publication/release-builder.ts) reads the latest
- * decision per entity when building the next release; the existing signed-manifest
- * privileged-apply flow is what actually changes what's live.
+ * Writes only to Postgres (bb_ops.catalog_decisions).
  */
 import { randomUUID } from 'node:crypto';
 import { auditCategoryFor } from '@repo/domain';
+import { ledgerPaths } from '@repo/data-access';
+import { commitWithAuditPostgres } from '@/lib/postgres-commit';
 import {
-  commitWithAudit,
-  createAdminAtomicStore,
-  createServerFirebaseApp,
-  FIRESTORE_ROOT,
-  firestorePaths,
-  type AuditEventDoc,
-} from '@repo/firebase';
-import { getFirestore } from 'firebase-admin/firestore';
+  listCatalogDecisionsPostgres,
+  writeCatalogDecisionPostgres,
+} from '@/lib/postgres-catalog';
 
 export const CATALOG_BULK_DECISION_LIMIT = 50;
 
@@ -35,15 +30,6 @@ export type CatalogDecisionRecord = {
   readonly decidedByEmail: string;
   readonly decidedAt: string;
 };
-
-function getDb() {
-  const { app } = createServerFirebaseApp(process.env);
-  return getFirestore(app);
-}
-
-function getStore() {
-  return createAdminAtomicStore(getDb());
-}
 
 function auditActionFor(
   action: CatalogDecisionAction,
@@ -75,7 +61,7 @@ async function recordCatalogDecision(input: {
   readonly actorEmail: string;
 }): Promise<{ readonly record: CatalogDecisionRecord; readonly auditEventId: string }> {
   const now = new Date().toISOString();
-  const path = firestorePaths.catalogDecision(input.entityId);
+  const path = ledgerPaths.catalogDecision(input.entityId);
   const record: CatalogDecisionRecord = {
     entityId: input.entityId,
     action: input.action,
@@ -119,14 +105,13 @@ async function recordCatalogDecision(input: {
     idempotencyKey,
   };
 
-  const result = await commitWithAudit(getStore(), {
-    mutations: [
-      { operation: 'set', path, data: record as unknown as Readonly<Record<string, unknown>> },
-    ],
-    auditEvent: auditEvent as unknown as AuditEventDoc,
+  const result = await commitWithAuditPostgres({
+    auditEvent,
     outboxMessage,
+    applyState: async (client) => {
+      await writeCatalogDecisionPostgres(client, { record });
+    },
   });
-
   return { record, auditEventId: result.eventId };
 }
 
@@ -171,21 +156,5 @@ export async function listCatalogDecisions(
   entityIds: readonly string[],
 ): Promise<ReadonlyMap<string, CatalogDecisionRecord>> {
   if (entityIds.length === 0) return new Map();
-  const db = getDb();
-  const results = new Map<string, CatalogDecisionRecord>();
-
-  // Firestore `in` queries cap at 30 values; chunk the lookup.
-  const chunkSize = 30;
-  for (let i = 0; i < entityIds.length; i += chunkSize) {
-    const chunk = entityIds.slice(i, i + chunkSize);
-    const snap = await db
-      .collection(FIRESTORE_ROOT.catalogDecisions)
-      .where('entityId', 'in', chunk)
-      .get();
-    for (const doc of snap.docs) {
-      results.set(doc.id, doc.data() as CatalogDecisionRecord);
-    }
-  }
-
-  return results;
+  return listCatalogDecisionsPostgres(entityIds);
 }

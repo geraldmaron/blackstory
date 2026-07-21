@@ -1,11 +1,5 @@
-/**
- * Firestore Admin reads for discovery graylist entries parked below the relevance bar.
- * Collection path is `discoveryGraylist` (not part of FIRESTORE_ROOT constants).
- */
-import { createServerFirebaseApp } from '@repo/firebase';
-import { getFirestore } from 'firebase-admin/firestore';
-
-const DISCOVERY_GRAYLIST_COLLECTION = 'discoveryGraylist';
+/** Admin reads for Postgres discovery graylist entries parked below the relevance bar. */
+import { queryPostgres } from '@/lib/postgres-client';
 
 export type GraylistListItem = {
   readonly id: string;
@@ -19,74 +13,47 @@ export type GraylistListItem = {
   readonly adapterId?: string;
 };
 
-function getDb() {
-  const { app } = createServerFirebaseApp(process.env);
-  return getFirestore(app);
-}
-
-function readString(value: unknown): string | undefined {
-  return typeof value === 'string' && value.length > 0 ? value : undefined;
-}
-
-function toListItem(docId: string, data: Record<string, unknown>): GraylistListItem | null {
-  const candidateId = readString(data.candidateId);
-  const disposition = readString(data.disposition);
-  const status = readString(data.status);
-  const parkedAt = readString(data.parkedAt);
-  const updatedAt = readString(data.updatedAt);
-  const reason = readString(data.reason);
-  if (!candidateId || !disposition || !status || !parkedAt || !updatedAt || !reason) {
-    return null;
-  }
-  if (typeof data.compositeScore !== 'number') return null;
-
-  const adapterId = readString(data.adapterId);
-
-  return {
-    id: readString(data.id) ?? docId,
-    candidateId,
-    disposition,
-    status,
-    compositeScore: data.compositeScore,
-    parkedAt,
-    updatedAt,
-    reason,
-    ...(adapterId ? { adapterId } : {}),
-  };
+function toIso(value: Date | string): string {
+  return value instanceof Date ? value.toISOString() : value;
 }
 
 export async function listDiscoveryGraylist(limit = 100): Promise<readonly GraylistListItem[]> {
-  const db = getDb();
-  const cappedLimit = Math.min(200, Math.max(1, limit));
-
-  let snap;
-  try {
-    snap = await db
-      .collection(DISCOVERY_GRAYLIST_COLLECTION)
-      .orderBy('parkedAt', 'desc')
-      .limit(cappedLimit)
-      .get();
-  } catch (error) {
-    console.error('admin discoveryGraylist orderBy failed; falling back to plain limit', error);
-    snap = await db.collection(DISCOVERY_GRAYLIST_COLLECTION).limit(cappedLimit).get();
-  }
-
-  const items: GraylistListItem[] = [];
-  for (const doc of snap.docs) {
-    const parsed = toListItem(doc.id, doc.data() as Record<string, unknown>);
-    if (parsed) items.push(parsed);
-  }
-
-  return [...items].sort((a, b) => b.parkedAt.localeCompare(a.parkedAt));
+  const capped = Math.min(200, Math.max(1, limit));
+  const rows = await queryPostgres<{
+    readonly id: string;
+    readonly candidate_id: string;
+    readonly disposition: string;
+    readonly status: string;
+    readonly composite_score: number;
+    readonly parked_at: Date | string;
+    readonly updated_at: Date | string;
+    readonly reason: string;
+    readonly adapter_id: string | null;
+  }>(
+    `SELECT id, candidate_id, disposition, status, composite_score, parked_at, updated_at, reason, adapter_id
+     FROM bb_ops.discovery_graylist
+     ORDER BY parked_at DESC
+     LIMIT $1`,
+    [capped],
+  );
+  return rows.map((row) => ({
+    id: row.id,
+    candidateId: row.candidate_id,
+    disposition: row.disposition,
+    status: row.status,
+    compositeScore: row.composite_score,
+    parkedAt: toIso(row.parked_at),
+    updatedAt: toIso(row.updated_at),
+    reason: row.reason,
+    ...(row.adapter_id ? { adapterId: row.adapter_id } : {}),
+  }));
 }
 
-export async function tryListDiscoveryGraylist(
-  limit?: number,
-): Promise<readonly GraylistListItem[] | null> {
+export async function tryListDiscoveryGraylist(limit?: number): Promise<readonly GraylistListItem[] | null> {
   try {
     return await listDiscoveryGraylist(limit);
   } catch (error) {
-    console.error('admin discoveryGraylist list failed', error);
+    console.error('admin discovery graylist list failed', error);
     return null;
   }
 }

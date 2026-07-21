@@ -86,7 +86,7 @@ pnpm firebase:emulators
 pnpm firebase:test:rules
 ```
 
-**Data plane:** Live traffic still uses Cloud Firestore + Storage ([`infra/firebase/FIRESTORE_MODEL.md`](./infra/firebase/FIRESTORE_MODEL.md)). **Product SoR design target** is Supabase Postgres project `blackstory-app` ([ADR-020](./docs/adr/ADR-020-supabase-postgres-system-of-record.md), [`docs/data/postgres-schema.md`](./docs/data/postgres-schema.md), [`supabase/migrations/`](./supabase/migrations/)). Remote DDL is applied; ETL tooling lives in [`packages/migrate-firestore-postgres`](./packages/migrate-firestore-postgres/) (runbook in that package README). App traffic is **not** cut over yet — do not drop Firestore.
+**Data plane:** Product SoR is Supabase Postgres project `blackstory-app` ([ADR-020](./docs/adr/ADR-020-supabase-postgres-system-of-record.md), [`docs/data/postgres-schema.md`](./docs/data/postgres-schema.md), [`supabase/migrations/`](./supabase/migrations/)). Firestore→Postgres ETL: [`packages/migrate-firestore-postgres`](./packages/migrate-firestore-postgres/). **App Hosting (staging + production)** sets `PUBLIC_DATA_SOURCE=postgres` / `ADMIN_DATA_SOURCE=postgres` with Secret Manager `DATABASE_URL` (`web-database-url` / `admin-database-url`); admin uses `ADMIN_AUTH_MODE=supabase` + publishable anon key (`admin-supabase-anon-key`). See root `apphosting.yaml`, `apphosting.staging.yaml`, `apphosting.admin.yaml`. Blobs remain in GCS/Firebase Storage. Firestore remains for rollback until the owner completes the Firebase wind-down checklist in [`docs/data/firebase-wind-down.md`](./docs/data/firebase-wind-down.md) — do not delete the Firebase project without dual verification + export.
 BB-018 audit/outbox helpers atomically commit state + immutable audit + pending delivery with
 idempotency, bounded retry/dead-letter handling, and publication-history reconstruction.
 Bootstrap uses frozen pnpm and uv lockfiles. Local tests default to `NODE_ENV=development` and
@@ -177,7 +177,7 @@ node --conditions development --import tsx packages/operator-cli/src/bin.ts disc
 # Parallel: --concurrency N. Hybrid = OpenRouter free → Corsair/local Ollama failover.
 # OPERATOR_CLI_PRIVACY_PEPPER=dev node --conditions development --import tsx \
 #   packages/operator-cli/src/bin.ts enrichment-run --subjects /tmp/subjects.json \
-#   --provider hybrid --model openrouter/free --ollama-model qwen3:8b --concurrency 4 \
+#   --provider hybrid --model openai/gpt-oss-20b:free --ollama-model qwen3:8b --concurrency 4 \
 #   --operator-id "$USER" --session-id "sess-$(date +%s)" --identity-source cursor_session
 # Overnight on Corsair (systemd): docs/runbooks/overnight-hybrid-enrichment.md
 # Embedding backfill (needs GEMINI_API_KEY): packages/firebase/src/embeddings/backfill-cli.ts \

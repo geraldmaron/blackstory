@@ -1,5 +1,5 @@
 /**
- * Proves that administrator authorization is enforced on the server with IAP and Firebase
+ * Proves that administrator authorization is enforced on the server with edge and bearer
  * verification, revoked-token checking, privileged reauthentication, and server role mutation.
  */
 import assert from 'node:assert/strict';
@@ -12,7 +12,7 @@ import {
 } from './server-authorization';
 
 const VALID_HEADERS = {
-  authorization: 'Bearer firebase-id-token',
+  authorization: 'Bearer admin-id-token',
   'x-goog-iap-jwt-assertion': 'signed-iap-jwt',
 };
 
@@ -43,7 +43,7 @@ function fixture() {
     },
     {
       async verifyIdToken(idToken, checkRevoked) {
-        calls.push(`firebase:${idToken}:${checkRevoked}`);
+        calls.push(`token:${idToken}:${checkRevoked}`);
         return token;
       },
     },
@@ -53,11 +53,11 @@ function fixture() {
   return { authorizer, calls, token };
 }
 
-test('server authorization requires both IAP and Firebase credentials', async () => {
+test('server authorization requires both edge and administrator credentials', async () => {
   const { authorizer } = fixture();
 
   await assert.rejects(
-    authorizer.assertAuthenticated({ authorization: 'Bearer firebase-id-token' }),
+    authorizer.assertAuthenticated({ authorization: 'Bearer admin-id-token' }),
     (error: unknown) =>
       error instanceof ServerAdminAuthorizationError && error.code === 'IAP_ASSERTION_REQUIRED',
   );
@@ -66,7 +66,7 @@ test('server authorization requires both IAP and Firebase credentials', async ()
       'x-goog-iap-jwt-assertion': 'signed-iap-jwt',
     }),
     (error: unknown) =>
-      error instanceof ServerAdminAuthorizationError && error.code === 'FIREBASE_ID_TOKEN_REQUIRED',
+      error instanceof ServerAdminAuthorizationError && error.code === 'ADMIN_BEARER_TOKEN_REQUIRED',
   );
 });
 
@@ -77,11 +77,11 @@ test('server permission checks verify revoked status and matching layered identi
 
   assert.equal(identity.admin.uid, 'admin-1');
   assert.ok(calls.includes('iap:signed-iap-jwt'));
-  assert.ok(calls.includes('firebase:firebase-id-token:true'));
+  assert.ok(calls.includes('token:admin-id-token:true'));
   assert.ok(calls.includes('permission:admin-1:research:write'));
 });
 
-test('server authorization rejects different IAP and Firebase users', async () => {
+test('server authorization rejects different edge and administrator users', async () => {
   const policy: AdminAuthorizationPolicy = {
     assertAdminIdentity() {},
     assertAdminPermission() {},

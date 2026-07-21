@@ -10,11 +10,11 @@ const nextConfig = {
   output: 'standalone',
   transpilePackages: [
     '@repo/domain',
+    '@repo/data-access',
     '@repo/schemas',
     '@repo/ui',
     '@repo/operator-cli',
     '@repo/security',
-    '@repo/firebase',
   ],
   webpack: (config) => {
     config.resolve.extensionAlias = {

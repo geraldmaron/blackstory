@@ -1,5 +1,5 @@
 /**
- * Composes verified IAP and Firebase identities into server-side administrator authorization.
+ * Composes verified edge and bearer-token identities into server-side administrator authorization.
  * Browser route state is intentionally absent from this module and cannot grant access.
  */
 export type AdminRequestHeaders =
@@ -11,7 +11,7 @@ export type VerifiedIapPrincipal = {
   readonly email: string;
 };
 
-export type VerifiedFirebaseAdminIdentity = {
+export type VerifiedAdminIdentity = {
   readonly uid: string;
   readonly email?: string;
   readonly auth_time: number;
@@ -22,10 +22,6 @@ export type VerifiedFirebaseAdminIdentity = {
   readonly bb_role?: 'admin' | 'research' | 'publication' | 'security';
   readonly bb_roles?: readonly unknown[];
   readonly amr?: readonly string[];
-  readonly firebase?: {
-    readonly sign_in_provider?: string;
-    readonly sign_in_second_factor?: string;
-  };
   readonly [claim: string]: unknown;
 };
 
@@ -50,14 +46,14 @@ export type IapAssertionVerifier = {
   verifyAssertion(assertion: string): Promise<VerifiedIapPrincipal>;
 };
 
-export type FirebaseAdminTokenVerifier = {
-  verifyIdToken(idToken: string, checkRevoked: true): Promise<VerifiedFirebaseAdminIdentity>;
+export type AdminTokenVerifier = {
+  verifyIdToken(idToken: string, checkRevoked: true): Promise<VerifiedAdminIdentity>;
 };
 
 export type AdminAuthorizationPolicy = {
-  assertAdminIdentity(token: VerifiedFirebaseAdminIdentity): void;
-  assertAdminPermission(token: VerifiedFirebaseAdminIdentity, permission: AdminPermission): void;
-  assertRecentReauth(token: VerifiedFirebaseAdminIdentity, action: PrivilegedAdminAction): void;
+  assertAdminIdentity(token: VerifiedAdminIdentity): void;
+  assertAdminPermission(token: VerifiedAdminIdentity, permission: AdminPermission): void;
+  assertRecentReauth(token: VerifiedAdminIdentity, action: PrivilegedAdminAction): void;
 };
 
 export type ServerAdminAuthorizationOptions = {
@@ -66,13 +62,13 @@ export type ServerAdminAuthorizationOptions = {
 
 export type AuthorizedAdminRequest = {
   readonly iap: VerifiedIapPrincipal;
-  readonly admin: VerifiedFirebaseAdminIdentity;
+  readonly admin: VerifiedAdminIdentity;
 };
 
 export class ServerAdminAuthorizationError extends Error {
   readonly code:
     | 'IAP_ASSERTION_REQUIRED'
-    | 'FIREBASE_ID_TOKEN_REQUIRED'
+    | 'ADMIN_BEARER_TOKEN_REQUIRED'
     | 'ADMIN_IDENTITY_MISMATCH'
     | 'IAP_DOMAIN_DENIED';
 
@@ -107,13 +103,13 @@ function requireIapAssertion(headers: AdminRequestHeaders): string {
   return assertion;
 }
 
-function requireFirebaseIdToken(headers: AdminRequestHeaders): string {
+function requireAdminBearerToken(headers: AdminRequestHeaders): string {
   const authorization = readHeader(headers, AUTHORIZATION_HEADER);
   const match = /^Bearer ([^\s]+)$/i.exec(authorization ?? '');
   if (!match?.[1]) {
     throw new ServerAdminAuthorizationError(
-      'FIREBASE_ID_TOKEN_REQUIRED',
-      'A Firebase bearer ID token is required',
+      'ADMIN_BEARER_TOKEN_REQUIRED',
+      'An administrator bearer token is required',
     );
   }
   return match[1];
@@ -125,13 +121,13 @@ function normalizedEmail(email: string): string {
 
 function assertLayeredIdentity(
   iap: VerifiedIapPrincipal,
-  firebase: VerifiedFirebaseAdminIdentity,
+  admin: VerifiedAdminIdentity,
   options: ServerAdminAuthorizationOptions,
 ): void {
-  if (!firebase.email || normalizedEmail(iap.email) !== normalizedEmail(firebase.email)) {
+  if (!admin.email || normalizedEmail(iap.email) !== normalizedEmail(admin.email)) {
     throw new ServerAdminAuthorizationError(
       'ADMIN_IDENTITY_MISMATCH',
-      'IAP and Firebase administrator identities must match',
+      'Edge and administrator identities must match',
     );
   }
   if (options.expectedIapEmailDomain) {
@@ -147,16 +143,16 @@ function assertLayeredIdentity(
 
 export function createServerAdminAuthorizer(
   iapVerifier: IapAssertionVerifier,
-  firebaseVerifier: FirebaseAdminTokenVerifier,
+  tokenVerifier: AdminTokenVerifier,
   policy: AdminAuthorizationPolicy,
   options: ServerAdminAuthorizationOptions = {},
 ) {
   async function verifyLayers(headers: AdminRequestHeaders): Promise<AuthorizedAdminRequest> {
     const iapAssertion = requireIapAssertion(headers);
-    const firebaseIdToken = requireFirebaseIdToken(headers);
+    const adminToken = requireAdminBearerToken(headers);
     const [iap, admin] = await Promise.all([
       iapVerifier.verifyAssertion(iapAssertion),
-      firebaseVerifier.verifyIdToken(firebaseIdToken, true),
+      tokenVerifier.verifyIdToken(adminToken, true),
     ]);
     assertLayeredIdentity(iap, admin, options);
     return { iap, admin };

@@ -1,6 +1,6 @@
 /**
- * Firestore Admin reads/writes for research cases used by the management portal.
- * Mutations go through domain transition/assign + commitWithAudit — never public projections.
+ * Admin reads/writes for research cases used by the management portal.
+ * Uses Postgres bb_research exclusively. Mutations remain audited and never touch public projections.
  */
 import { randomUUID } from 'node:crypto';
 import {
@@ -13,15 +13,13 @@ import {
   type ResearchCaseState,
   type ReviewPriority,
 } from '@repo/domain';
+import { ledgerPaths } from '@repo/data-access';
+import { commitWithAuditPostgres } from '@/lib/postgres-commit';
 import {
-  commitWithAudit,
-  createAdminAtomicStore,
-  createServerFirebaseApp,
-  FIRESTORE_ROOT,
-  firestorePaths,
-  type AuditEventDoc,
-} from '@repo/firebase';
-import { getFirestore } from 'firebase-admin/firestore';
+  listCaseIdsPostgres,
+  loadResearchCaseDocument,
+  writeResearchCasePostgres,
+} from '@/lib/postgres-research-cases';
 import { checklistProgress, parseResearchCaseRecord } from './parse-research-case';
 import {
   EXCLUSION_REASON_CODES,
@@ -31,15 +29,6 @@ import {
   type AdminCaseTransitionRequest,
   INBOX_CASE_STATES,
 } from './research-case-types';
-
-function getDb() {
-  const { app } = createServerFirebaseApp(process.env);
-  return getFirestore(app);
-}
-
-function getStore() {
-  return createAdminAtomicStore(getDb());
-}
 
 function toListItem(record: ResearchCaseRecord, placeHint?: string): AdminCaseListItem {
   const progress = checklistProgress(record.checklist);
@@ -80,36 +69,25 @@ export async function listAdminResearchCases(options?: {
   readonly states?: readonly ResearchCaseState[];
   readonly limit?: number;
 }): Promise<readonly AdminCaseListItem[]> {
-  const db = getDb();
   const limit = Math.min(200, Math.max(1, options?.limit ?? 100));
   const states = options?.states ?? INBOX_CASE_STATES;
-  const collection = db.collection(FIRESTORE_ROOT.researchCases);
 
-  let snap;
-  if (states.length > 0 && states.length <= 10) {
-    snap = await collection
-      .where('state', 'in', [...states])
-      .limit(limit)
-      .get();
-  } else {
-    snap = await collection.limit(limit).get();
-  }
-
+  const caseIds = await listCaseIdsPostgres({ states, limit });
   const items: AdminCaseListItem[] = [];
-  for (const doc of snap.docs) {
-    const parsed = parseResearchCaseRecord(doc.id, doc.data() as Record<string, unknown>);
+  for (const caseId of caseIds) {
+    const doc = await loadResearchCaseDocument(caseId);
+    if (!doc) continue;
+    const parsed = parseResearchCaseRecord(caseId, doc);
     if (!parsed) continue;
-    if (states.length > 10 && !states.includes(parsed.record.state)) continue;
     items.push(toListItem(parsed.record, parsed.placeHint));
   }
   return [...items].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
 export async function getAdminResearchCaseDetail(id: string): Promise<AdminCaseDetail | null> {
-  const db = getDb();
-  const snap = await db.collection(FIRESTORE_ROOT.researchCases).doc(id).get();
-  if (!snap.exists) return null;
-  const parsed = parseResearchCaseRecord(snap.id, snap.data() as Record<string, unknown>);
+  const doc = await loadResearchCaseDocument(id);
+  if (!doc) return null;
+  const parsed = parseResearchCaseRecord(id, doc);
   if (!parsed) return null;
   return toDetail(parsed.record, parsed.placeHint);
 }
@@ -246,7 +224,7 @@ async function commitCaseUpdate(input: {
   readonly action: string;
 }): Promise<{ readonly detail: AdminCaseDetail; readonly auditEventId: string }> {
   const now = input.next.updatedAt;
-  const path = firestorePaths.researchCase(input.next.id);
+  const path = ledgerPaths.researchCase(input.next.id);
   const idempotencyKey = `research-case:${input.next.id}:${input.action}:${now}:${randomUUID()}`;
   const eventId = randomUUID();
   const auditEvent = {
@@ -293,16 +271,12 @@ async function commitCaseUpdate(input: {
     idempotencyKey,
   };
 
-  const result = await commitWithAudit(getStore(), {
-    mutations: [
-      {
-        operation: 'set',
-        path,
-        data: input.next as unknown as Readonly<Record<string, unknown>>,
-      },
-    ],
-    auditEvent: auditEvent as unknown as AuditEventDoc,
+  const result = await commitWithAuditPostgres({
+    auditEvent,
     outboxMessage,
+    applyState: async (client) => {
+      await writeResearchCasePostgres(client, input.next);
+    },
   });
 
   return {

@@ -11,8 +11,7 @@ import {
   runResearchIntake,
   type OperatorIntakeAccepted,
 } from '@repo/operator-cli';
-import { createAdminAtomicStore, createServerFirebaseApp } from '@repo/firebase';
-import { getFirestore } from 'firebase-admin/firestore';
+import { createLiveAtomicStoreFromEnv } from '@repo/data-access';
 import type { QuickAddFormState } from './form-state';
 
 function readOperatorIdentity(formData: FormData): { operatorId: string; sessionId: string } {
@@ -62,8 +61,7 @@ export async function submitQuickAdd(
     );
 
     if (shouldCommit && outcome.fetch.ok && outcome.intake && outcome.intake.accepted) {
-      const { app } = createServerFirebaseApp(process.env);
-      const store = createAdminAtomicStore(getFirestore(app));
+      const store = await createLiveAtomicStoreFromEnv(process.env);
       const commitResult = await commitOperatorIntake(
         store,
         outcome.intake as OperatorIntakeAccepted,

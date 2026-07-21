@@ -9,8 +9,7 @@ import {
   prepareEvidenceAttachmentIntake,
   type OperatorIntakeAccepted,
 } from '@repo/operator-cli';
-import { createAdminAtomicStore, createServerFirebaseApp } from '@repo/firebase';
-import { getFirestore } from 'firebase-admin/firestore';
+import { createLiveAtomicStoreFromEnv } from '@repo/data-access';
 
 export type EvidenceAttachState =
   | { readonly status: 'idle' }
@@ -79,8 +78,7 @@ export async function submitEvidenceAttach(
     }
 
     if (shouldCommit) {
-      const { app } = createServerFirebaseApp(process.env);
-      const store = createAdminAtomicStore(getFirestore(app));
+      const store = await createLiveAtomicStoreFromEnv(process.env);
       const commitResult = await commitOperatorIntake(store, outcome as OperatorIntakeAccepted);
       return {
         status: 'committed',

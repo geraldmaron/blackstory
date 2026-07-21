@@ -1,4 +1,4 @@
-# Firebase App Hosting config at the monorepo root.
+# Firebase App Hosting config at the monorepo root (public web defaults).
 #
 # Why root (not apps/web): App Hosting with rootDirectory=apps/web falls back to
 # npm and fails on pnpm `workspace:*` deps (EUNSUPPORTEDPROTOCOL). With root
@@ -8,6 +8,11 @@
 # apphosting:build copies `.next/static` + `public` into the standalone tree
 # (required for CSS/JS when using scripts.runCommand).
 # automatic App Hosting rollouts stay disabled (explicit CLI/Actions promote only).
+#
+# Data plane (ADR-020): PUBLIC_DATA_SOURCE=postgres + server-only DATABASE_URL
+# (Secret Manager web-database-url → db.twykhihqkcldpreuovay.supabase.co).
+# Staging overrides: apphosting.staging.yaml (backend Environment name: staging).
+# Admin backend: apphosting.admin.yaml.
 
 scripts:
   # Relative to repo root. Standalone emit from next.config output:'standalone'.
@@ -33,6 +38,15 @@ env:
     value: production
     availability:
       - BUILD
+      - RUNTIME
+  - variable: PUBLIC_DATA_SOURCE
+    value: postgres
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: DATABASE_URL
+    secret: web-database-url
+    availability:
       - RUNTIME
   - variable: PUBLIC_READ_API_DISABLED
     value: '0'

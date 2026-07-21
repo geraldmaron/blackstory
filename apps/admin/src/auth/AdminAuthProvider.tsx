@@ -1,5 +1,5 @@
 /**
- * Client auth context: signed-in Firebase Auth user, loading state, and helpers.
+ * Client auth context: signed-in administrator session, loading state, and helpers.
  */
 'use client';
 
@@ -12,17 +12,17 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import type { User } from 'firebase/auth';
 import {
   getAdminIdToken,
   signInAdminWithEmailPassword,
   signOutAdmin,
   subscribeAdminAuth,
-} from '../auth/client-auth';
+} from './client-auth';
+import type { AdminSessionUser } from './session-user';
 
 export type AdminAuthContextValue = {
   readonly ready: boolean;
-  readonly user: User | null;
+  readonly user: AdminSessionUser | null;
   readonly email: string | null;
   readonly signIn: (email: string, password: string) => Promise<void>;
   readonly signOut: () => Promise<void>;
@@ -33,7 +33,7 @@ const AdminAuthContext = createContext<AdminAuthContextValue | null>(null);
 
 export function AdminAuthProvider({ children }: { readonly children: ReactNode }) {
   const [ready, setReady] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AdminSessionUser | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -89,3 +89,5 @@ export function useAdminAuth(): AdminAuthContextValue {
   }
   return ctx;
 }
+
+export type { AdminSessionUser } from './session-user';

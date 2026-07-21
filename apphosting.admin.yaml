@@ -10,9 +10,10 @@
 #   matching ADR-005's surface-separation intent even without the full Cloud Run + IAP + separate
 #   GCP project ADR-012 design, which is deferred until an actual multi-operator team justifies it).
 #
-# Auth: ADMIN_AUTH_MODE=firebase (Firebase Auth email/password + custom claims). This is the
-# code's own documented solo-operator production mode (see apps/admin/src/auth/mode.ts,
-# apps/admin/.env.example) — not a stopgap hack.
+# Auth (ADR-020 cutover): ADMIN_AUTH_MODE=supabase + NEXT_PUBLIC_ADMIN_AUTH_MODE=supabase.
+# Operators provisioned in Supabase Auth (blackstory-app) with app_metadata.bb_role=admin.
+# Data plane: ADMIN_DATA_SOURCE=postgres + DATABASE_URL (Secret Manager admin-database-url).
+# Firebase Auth remains available as rollback via ADMIN_AUTH_MODE=firebase — do not delete Firebase.
 #
 # Build: no buildCommand override here (that disables the Next.js framework adapter, which
 # broke the buildpack's own pnpm-install phase for this backend). GOOGLE_BUILDABLE below points
@@ -48,8 +49,41 @@ env:
       - BUILD
       - RUNTIME
   - variable: ADMIN_AUTH_MODE
-    value: firebase
+    value: supabase
     availability:
+      - RUNTIME
+  - variable: NEXT_PUBLIC_ADMIN_AUTH_MODE
+    value: supabase
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: ADMIN_DATA_SOURCE
+    value: postgres
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: DATABASE_URL
+    secret: admin-database-url
+    availability:
+      - RUNTIME
+  - variable: SUPABASE_URL
+    value: https://twykhihqkcldpreuovay.supabase.co
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_SUPABASE_URL
+    value: https://twykhihqkcldpreuovay.supabase.co
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: SUPABASE_ANON_KEY
+    secret: admin-supabase-anon-key
+    availability:
+      - RUNTIME
+  - variable: NEXT_PUBLIC_SUPABASE_ANON_KEY
+    secret: admin-supabase-anon-key
+    availability:
+      - BUILD
       - RUNTIME
   - variable: NEXT_PUBLIC_SITE_URL
     value: https://blackstory.app
