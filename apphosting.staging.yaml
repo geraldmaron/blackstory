@@ -17,6 +17,11 @@ env:
     availability:
       - BUILD
       - RUNTIME
+  - variable: NEXT_PUBLIC_SITE_URL
+    value: https://black-book-web-staging--black-book-efaaf.us-central1.hosted.app
+    availability:
+      - BUILD
+      - RUNTIME
   - variable: NEXT_PUBLIC_FIREBASE_APP_CHECK_SITE_KEY
     secret: web-staging-app-check-site-key
     availability:

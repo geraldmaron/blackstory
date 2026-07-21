@@ -39,6 +39,11 @@ env:
     availability:
       - BUILD
       - RUNTIME
+  - variable: NEXT_PUBLIC_SITE_URL
+    value: https://blackstory.app
+    availability:
+      - BUILD
+      - RUNTIME
   - variable: PUBLIC_DATA_SOURCE
     value: postgres
     availability:
