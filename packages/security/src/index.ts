@@ -93,6 +93,22 @@ export type {
 } from './rate-limits.js';
 
 export {
+  CLIENT_VERSION_HEADER,
+  createClientAttestationGuard,
+  isClientAttested,
+  parseClientAttestationMode,
+  parseClientVersionHeader,
+} from './client-attestation.js';
+export type {
+  ClientAttestationDecision,
+  ClientAttestationHeaders,
+  ClientAttestationMode,
+  ClientAttestationReason,
+  ClientAttestationTelemetry,
+  ClientAttestationTelemetryEvent,
+} from './client-attestation.js';
+
+export {
   QUERY_GUARDRAIL_POLICY_VERSION,
   SEARCH_ENDPOINT_CLASS,
   searchSortKeys,

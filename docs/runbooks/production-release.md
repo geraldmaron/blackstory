@@ -4,6 +4,11 @@
 validation, progressive release metadata, protected production approval, explicit App Hosting
 promote, post-deploy health checks, and rollback rehearsal.
 
+**Solo-dev hotfix loop (preferred for one-person prod bugs):** see
+[solo-dev-hotfix.md](./solo-dev-hotfix.md) — branch from `main`, tiny PR, preflight lockfile +
+`force-dynamic`, promote SHA staging→prod, smoke entity pages. Do **not** promote large
+divergent feature branches to fix web prod.
+
 **Repo acceptance:** Firestore migrate / surface deploy / rollback helpers stay **dry-run safe**.
 App Hosting **promote is live** (`promote-app-hosting.sh`) when Environment WIF vars are set;
 without WIF, run the same script locally with Firebase CLI auth. Automatic App Hosting rollouts

@@ -155,6 +155,8 @@ export type RateLimitEvaluateInput = {
    * `anonymous` callers degrade to a bounded quota instead of a hard `app_check_required` deny.
    */
   readonly appCheckAvailability?: AppCheckAvailability;
+  /** Parseable `X-BlackStory-Client` header from a direct API caller (mobile). */
+  readonly clientAttested?: boolean;
 };
 
 export type TokenBucketState = {
@@ -567,6 +569,7 @@ export function evaluateQuota(
   const unattestedExpensiveAnon =
     input.subject === 'anonymous' &&
     !input.appCheckVerified &&
+    !input.clientAttested &&
     (policyRow.costTier === 'expensive_read' || policyRow.costTier === 'mutation');
 
   // Normal operation: unattested expensive/mutation reads are hard-denied (enumeration defense).
@@ -581,6 +584,7 @@ export function evaluateQuota(
   if (
     !outage &&
     input.appCheckVerified === false &&
+    input.clientAttested !== true &&
     input.riskSignals?.some((s) => s.kind === 'missing_app_check')
   ) {
     return deny('app_check_required', 30_000);
