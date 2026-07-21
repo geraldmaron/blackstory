@@ -79,6 +79,13 @@ test('degraded mode reads bundled release snapshots', () => {
   process.env.PUBLIC_READ_API_DISABLED = prior;
 });
 
+test('entity detail route stays force-dynamic so RUNTIME DATABASE_URL is used', () => {
+  // Regression: build-time GSP without DATABASE_URL baked seed-snapshot into
+  // /entity/ent_15th_st_church_001 while non-seed ids still read rel_seed_001.
+  const source = readFileSync(join(APP_ROOT, 'entity/[id]/page.tsx'), 'utf8');
+  assert.match(source, /export const dynamic = 'force-dynamic'/);
+});
+
 test('production error surface hides stacks and long messages', () => {
   const prior = process.env.NEXT_PUBLIC_APP_ENV;
   process.env.NEXT_PUBLIC_APP_ENV = 'production';
