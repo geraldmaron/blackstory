@@ -7,7 +7,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { sha256Json, type JsonValue, type Sha256Hash } from '@repo/domain';
+import { sha256Json, supabasePublicMediaUrl, type JsonValue, type Sha256Hash } from '@repo/domain';
 import { DEFAULT_PUBLIC_MEDIA_BUCKET } from './entity-media.js';
 
 export { DEFAULT_PUBLIC_MEDIA_BUCKET };
@@ -89,13 +89,12 @@ export function buildReleaseCatalogArtifacts(input: {
   };
 }
 
-/** HTTPS URL for a public-media object (CDN/GCS). */
+/** HTTPS URL for a public-media object (Supabase Storage public bucket). */
 export function publicMediaObjectUrl(
   objectPath: string,
-  options: { readonly bucket?: string } = {},
+  _options: { readonly bucket?: string } = {},
 ): string {
-  const bucket = options.bucket ?? DEFAULT_PUBLIC_MEDIA_BUCKET;
-  return `https://storage.googleapis.com/${bucket}/${objectPath.replace(/^\/+/, '')}`;
+  return supabasePublicMediaUrl(objectPath.replace(/^\/+/, ''));
 }
 
 /**

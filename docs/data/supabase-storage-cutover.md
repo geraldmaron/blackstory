@@ -32,10 +32,9 @@ SUPABASE_STORAGE_COPY=1 SUPABASE_SERVICE_ROLE_KEY=… node scripts/copy-gcs-publ
 
 1. Spot-check a public URL:
    `https://twykhihqkcldpreuovay.supabase.co/storage/v1/object/public/public-media/public/entities/<id>/primary.jpg`
-2. Soak with dual-serve (GCS URLs still valid in projections)
-3. New release / writer flip to Supabase URLs; update collage hardcodes when ready
-4. Optional phase 2: raw-sources → private bucket + rewrite `storage_object` refs
-5. Wind-down GCS only after export + dual verification ([firebase-wind-down.md](./firebase-wind-down.md))
+2. **Done (2026-07-21):** writers (`entityPrimaryImageObjectRef` / `publicMediaObjectUrl`) emit Supabase URLs; collage `sourceUrl`s + manifest updated; live `release_entities.primary_image.url` rewritten (76 rows)
+3. Optional: raw-sources stay on GCS (research archives; not required for public app)
+4. Wind-down GCS only after export + dual verification ([firebase-wind-down.md](./firebase-wind-down.md))
 
 ## Out of scope
 

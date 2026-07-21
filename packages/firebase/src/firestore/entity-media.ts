@@ -1,9 +1,16 @@
 /**
  * Public-media object path helpers for entity primary images.
- * Objects live under `gs://{bucket}/public/entities/{entityId}/…` and are
- * referenced from `PublicEntityProjectionDoc.primaryImage.objectPath` + `url`.
+ * Object keys live under `public/entities/{entityId}/…`. Bytes are dual-served:
+ * GCS (`black-book-efaaf-public-media`) for Admin SDK uploads / rollback, and
+ * Supabase Storage `public-media` for public HTTPS URLs (ADR-020 blob cutover).
  */
+import { supabasePublicMediaUrl } from '@repo/domain';
+
+/** GCS bucket used by Firebase Admin Storage uploads (rollback / dual-serve). */
 export const DEFAULT_PUBLIC_MEDIA_BUCKET = 'black-book-efaaf-public-media';
+
+/** Supabase Storage bucket id for public HTTPS delivery. */
+export const SUPABASE_PUBLIC_MEDIA_BUCKET = 'public-media';
 
 export type EntityPrimaryImageObjectRef = {
   readonly bucket: string;
@@ -18,16 +25,15 @@ export type EntityPrimaryImageObjectRef = {
 export function entityPrimaryImageObjectPath(entityId: string, filename = 'primary.png'): string {
   const safeId = entityId.trim();
   if (!safeId) {
-    throw new Error('entityId is required for primary image object path');
+    throw new Error('entityId is required for entity primary image object path');
   }
   const safeName = filename.replace(/^\/+/, '');
   return `public/entities/${safeId}/${safeName}`;
 }
 
 /**
- * Build GCS object ref + HTTPS URL for a promoted entity primary image.
- * Direct `storage.googleapis.com` URLs only work when the object (or bucket) is
- * publicly readable; production may front this with CDN instead.
+ * Build storage ref + public HTTPS URL for a promoted entity primary image.
+ * `bucket` remains the GCS upload target; `publicUrl` points at Supabase Storage.
  */
 export function entityPrimaryImageObjectRef(
   entityId: string,
@@ -41,6 +47,6 @@ export function entityPrimaryImageObjectRef(
   return {
     bucket,
     objectPath,
-    publicUrl: `https://storage.googleapis.com/${bucket}/${objectPath}`,
+    publicUrl: supabasePublicMediaUrl(objectPath),
   };
 }

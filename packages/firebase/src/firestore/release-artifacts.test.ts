@@ -51,10 +51,10 @@ test('writeReleaseCatalogArtifactsToDir mirrors GCS object keys on disk', () => 
   }
 });
 
-test('publicMediaObjectUrl builds the HTTPS GCS URL', () => {
+test('publicMediaObjectUrl builds the Supabase Storage HTTPS URL', () => {
   assert.equal(
     publicMediaObjectUrl('public/releases/rel_x/entities.json'),
-    'https://storage.googleapis.com/black-book-efaaf-public-media/public/releases/rel_x/entities.json',
+    'https://twykhihqkcldpreuovay.supabase.co/storage/v1/object/public/public-media/public/releases/rel_x/entities.json',
   );
 });
 
