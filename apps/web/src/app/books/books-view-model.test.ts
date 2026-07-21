@@ -56,6 +56,10 @@ test('browse and detail expose validated USPS state names for challenge lists', 
   assert.ok(detail.states.some((entry) => entry.code === 'FL' && entry.name === 'Florida'));
   assert.equal(detail.book.purchaseLinks[0]?.retailer, 'bookshop');
   assert.match(detail.book.purchaseLinks[0]?.href ?? '', /bookshop\.org\/a\/gerald69\//);
+
+  assert.ok(item.purchaseLinks.length >= 1);
+  assert.equal(item.purchaseLinks[0]?.retailer, 'bookshop');
+  assert.match(item.purchaseLinks[0]?.href ?? '', /bookshop\.org\/a\/gerald69\//);
 });
 
 test('buildBooksBrowseViewModel filters by author', () => {

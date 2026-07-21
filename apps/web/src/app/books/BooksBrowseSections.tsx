@@ -1,70 +1,66 @@
 /**
- * Books browse page sections: disclaimer, on-page nav, filters, and ledger results.
+ * Books browse: dense filter + ledger rows with entity-tag state chips and inline Buy CTAs.
  */
 import React from 'react';
 import Link from 'next/link';
 import { EmptyState, FilterBar } from '@repo/ui';
-import type { BooksBrowseViewModel } from './books-view-model';
+import type { BooksBrowseItem, BooksBrowseViewModel } from './books-view-model';
 import './books.css';
-
-const BROWSE_SECTIONS = [
-  { id: 'browse', label: 'Browse' },
-  { id: 'about-books', label: 'About this page' },
-] as const;
 
 export type BooksBrowseSectionsProps = {
   readonly view: BooksBrowseViewModel;
 };
 
+function BrowseRowActions({ item }: { readonly item: BooksBrowseItem }) {
+  if (item.purchaseLinks.length === 0) return null;
+  const bookshop = item.purchaseLinks.find((link) => link.retailer === 'bookshop');
+  const others = item.purchaseLinks.filter((link) => link.retailer !== 'bookshop');
+
+  return (
+    <div className="ds-books-row__actions" aria-label={`Purchase options for ${item.title}`}>
+      {bookshop ? (
+        <a
+          className="ds-cta ds-cta--copper ds-books-row__buy"
+          href={bookshop.href}
+          rel="noopener noreferrer sponsored"
+          target="_blank"
+        >
+          Buy
+        </a>
+      ) : null}
+      {others.map((link) => (
+        <a
+          key={link.href}
+          className="ds-cta ds-cta--quiet ds-books-row__buy"
+          href={link.href}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          {link.retailer === 'open-library' ? 'Open Library' : link.label}
+        </a>
+      ))}
+    </div>
+  );
+}
+
 export function BooksBrowseSections({ view }: BooksBrowseSectionsProps) {
   return (
-    <div className="ds-books">
-      <aside className="ds-books__disclaimer" aria-labelledby="books-disclaimer-heading">
-        <h2 className="ds-books__disclaimer-title" id="books-disclaimer-heading">
-          About reported challenges
-        </h2>
-        <p>
-          Entries document reported restrictions or removals from school and library contexts. Each
-          challenge is tied to a citation; status may change as districts review or restore access.
-          State codes reflect jurisdictions named in the cited public reports and national indexes —
-          not a claim that every title was removed in every district of that state. This listing is
-          curated and evidence-linked — not a complete national census of every challenge filed.
-        </p>
-      </aside>
-
-      <nav className="ds-books__nav" aria-labelledby="books-toc-title">
-        <p className="ds-books__nav-title" id="books-toc-title">
-          On this page
-        </p>
-        <ul className="ds-books__nav-list">
-          {BROWSE_SECTIONS.map((section) => (
-            <li key={section.id}>
-              <a className="ds-books__nav-link" href={`#${section.id}`}>
-                {section.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-
+    <div className="ds-books-browse">
       <section
-        className="ds-section ds-record-section ds-section--flush ds-books__filter-band"
+        className="ds-section ds-section--flush ds-books-browse__filters"
         aria-labelledby="books-browse-heading"
         id="browse"
       >
         <p className="ds-section__kicker">
           <span className="ds-kicker-index" aria-hidden="true" />
-          Reported challenges
+          Catalog
         </p>
         <h2 className="ds-section__title" id="books-browse-heading">
-          Browse the catalog
+          Challenged titles
         </h2>
-        <p className="ds-section__lede">
-          Filter by state or author, or search by title. Each entry links to citations and reported
-          challenge jurisdictions.
-        </p>
 
         <FilterBar
+          className="ds-books-browse__filter-bar"
           method="get"
           action="/books"
           legend="Filter challenged books"
@@ -96,7 +92,7 @@ export function BooksBrowseSections({ view }: BooksBrowseSectionsProps) {
           ]}
         />
 
-        <p className="ds-books__count" id="books-results-heading">
+        <p className="ds-sans ds-count-label ds-books-browse__count" id="books-results-heading">
           {view.totalMatched} title{view.totalMatched === 1 ? '' : 's'}
         </p>
 
@@ -112,69 +108,69 @@ export function BooksBrowseSections({ view }: BooksBrowseSectionsProps) {
             Try a broader keyword or reset the state and author filters.
           </EmptyState>
         ) : (
-          <ul className="ds-books__browse-ledger" aria-labelledby="books-results-heading">
+          <ul className="ds-books-ledger" aria-labelledby="books-results-heading">
             {view.items.map((item) => (
-              <li key={item.id} className="ds-books__browse-item">
-                <div className="ds-books__browse-head">
-                  <h3 className="ds-books__browse-title">
+              <li key={item.id} className="ds-books-row">
+                <div className="ds-books-row__main">
+                  <h3 className="ds-books-row__title">
                     <Link href={`/books/${item.slug}`}>{item.title}</Link>
                   </h3>
-                </div>
-                <p className="ds-books__browse-meta-line">
-                  <span>{item.authorNames}</span>
-                  <span aria-hidden="true"> · </span>
-                  <span className="ds-mono">{item.publishedDate}</span>
-                </p>
-                {item.states.length > 0 ? (
-                  <p className="ds-books__browse-states">
-                    <span className="ds-books__browse-states-label">Reported challenge lists:</span>{' '}
-                    <span className="ds-books__state-tags" role="list">
-                      {item.states.map((state) => (
-                        <span
-                          key={state.code}
-                          className="ds-books__state-tag"
-                          role="listitem"
-                          title={state.name}
-                        >
-                          <span className="ds-visually-hidden">{state.name} </span>
-                          <span aria-hidden="true">{state.code}</span>
-                        </span>
-                      ))}
+                  <p className="ds-books-row__meta">
+                    <span>{item.authorNames}</span>
+                    <span aria-hidden="true"> · </span>
+                    <span className="ds-mono">{item.publishedDate}</span>
+                    <span aria-hidden="true"> · </span>
+                    <span className="ds-mono">
+                      {item.citationCount} citation{item.citationCount === 1 ? '' : 's'}
                     </span>
+                    {item.states.length > 0 ? (
+                      <>
+                        <span aria-hidden="true"> · </span>
+                        <span className="ds-books-row__states" role="list" aria-label="States on challenge lists">
+                          {item.states.map((state, index) => (
+                            <span key={state.code} role="listitem">
+                              {index > 0 ? <span aria-hidden="true"> </span> : null}
+                              <Link
+                                className="ds-books-row__state"
+                                href={`/books?state=${encodeURIComponent(state.code)}`}
+                                title={state.name}
+                              >
+                                <span className="ds-visually-hidden">{state.name} </span>
+                                {state.code}
+                              </Link>
+                            </span>
+                          ))}
+                        </span>
+                      </>
+                    ) : null}
                   </p>
-                ) : null}
-                <p className="ds-books__browse-note">
-                  {item.citationCount} citation{item.citationCount === 1 ? '' : 's'}
-                </p>
+                </div>
+                <BrowseRowActions item={item} />
               </li>
             ))}
           </ul>
         )}
       </section>
 
-      <section
-        className="ds-section ds-record-section ds-books__next"
-        aria-labelledby="about-books-heading"
-        id="about-books"
-      >
+      <section className="ds-record-section" aria-labelledby="about-books-heading" id="about-books">
+        <p className="ds-section__kicker">
+          <span className="ds-kicker-index" aria-hidden="true" />
+          About
+        </p>
         <h2 className="ds-section__title" id="about-books-heading">
-          About this page
+          How to read this list
         </h2>
         <p className="ds-section__lede">
-          BlackStory surfaces challenged titles with public evidence — not to sensationalize
-          restrictions, but to show where access disputes intersect with Black history and related
-          reading. For archive publications beyond this reference list, use Search.
+          Entries document reported school and library restrictions with public citations. State
+          codes are validated USPS abbreviations from those reports — not a claim of statewide
+          removal. Bookshop.org links use BlackStory&apos;s affiliate referral to support independent
+          bookstores.
         </p>
-        <p className="ds-band__cta">
-          <Link className="ds-cta-link" href="/methodology">
+        <p className="ds-entity-aside__cta">
+          <Link className="ds-cta ds-cta--quiet" href="/methodology">
             Methodology
           </Link>
-          {' · '}
-          <Link className="ds-cta-link" href="/about">
-            About BlackStory
-          </Link>
-          {' · '}
-          <Link className="ds-cta-link" href="/search?kind=publication">
+          <Link className="ds-cta ds-cta--quiet" href="/search?kind=publication">
             Search publications
           </Link>
         </p>

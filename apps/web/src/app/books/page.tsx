@@ -1,5 +1,6 @@
 /**
- * Public challenged-books browse surface at `/books`.
+ * Public challenged-books browse surface at `/books`. Compact index chrome aligned with
+ * Stories / entity density — not a sparse reference wireframe.
  */
 import Link from 'next/link';
 import { loadBannedBooksListing } from '../../lib/banned-books/public-source';
@@ -12,9 +13,6 @@ export const metadata = {
     'Challenged and restricted titles relevant to Black history, with reported school and library challenges cited from public sources.',
 };
 
-const BOOKS_BROWSE_LEDE =
-  'Challenged & restricted books — a curated reference to titles with reported school or library restrictions, each linked to public challenge records and independent citations. Status may change; this is not a complete national census.';
-
 type BooksPageProps = {
   readonly searchParams: Promise<RawBooksBrowseParams>;
 };
@@ -25,12 +23,18 @@ export default async function BooksBrowsePage({ searchParams }: BooksPageProps) 
   const view = buildBooksBrowseViewModel(snapshot, params);
 
   return (
-    <main className="ds-container ds-page" id="main">
+    <main className="ds-container ds-page ds-books-page" id="main">
       <p className="ds-page__eyebrow">Reference</p>
       <h1 className="ds-page__title">Books</h1>
-      <p className="ds-page__lede">{BOOKS_BROWSE_LEDE}</p>
       <p className="ds-page__lede">
-        <Link href="/search?kind=publication">Also find publications in Search</Link>
+        Challenged and restricted titles tied to Black history and related reading — each with
+        cited challenge reports and a path to buy or look up the book. Not a complete national
+        census; status can change.
+      </p>
+      <p className="ds-books-page__crosslink">
+        <Link className="ds-cta-link" href="/search?kind=publication">
+          Also find publications in Search
+        </Link>
       </p>
       <BooksBrowseSections view={view} />
     </main>

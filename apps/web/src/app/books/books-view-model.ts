@@ -14,6 +14,12 @@ export type RawBooksBrowseParams = {
   readonly author?: string;
 };
 
+export type BooksBrowsePurchaseLink = {
+  readonly retailer: string;
+  readonly label: string;
+  readonly href: string;
+};
+
 export type BooksBrowseItem = {
   readonly id: string;
   readonly slug: string;
@@ -22,7 +28,7 @@ export type BooksBrowseItem = {
   readonly publishedDate: string;
   readonly states: readonly BooksDetailState[];
   readonly citationCount: number;
-  readonly purchaseLinkCount: number;
+  readonly purchaseLinks: readonly BooksBrowsePurchaseLink[];
 };
 
 export type BooksBrowseViewModel = {
@@ -71,7 +77,11 @@ function recordToBrowseItem(book: BannedBookRecord): BooksBrowseItem {
       name: STATE_NAME_BY_CODE.get(code) ?? code,
     })),
     citationCount: book.citations.length,
-    purchaseLinkCount: book.purchaseLinks.length,
+    purchaseLinks: book.purchaseLinks.map((link) => ({
+      retailer: link.retailer,
+      label: link.label,
+      href: link.href,
+    })),
   };
 }
 
