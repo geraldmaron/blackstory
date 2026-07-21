@@ -10,7 +10,7 @@
  */
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { getNationalPopulationTimelineSnapshot } from '@repo/firebase';
+import { getNationalPopulationTimelineSnapshot } from '../../lib/demographics/public-stats-source';
 import {
   parseStatePopulationIndexFile,
   type StatePopulationIndexFile,

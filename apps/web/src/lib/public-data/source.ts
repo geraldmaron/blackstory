@@ -12,7 +12,7 @@
  *
  * Cost knobs (env / App Hosting):
  * - `PUBLIC_READ_API_DISABLED=1` — snapshot-only (no live Firestore/artifact reads)
- * - `PUBLIC_DATA_SOURCE=seed|firestore` — force seed vs live (see `live-policy.ts`)
+ * - `PUBLIC_DATA_SOURCE=seed|firestore|postgres` — force seed vs live backend (see `live-policy.ts`)
  * - `APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL` — CDN/GCS base for entities.json / search-index.json
  * - `apps/web/apphosting*.yaml` `runConfig.minInstances` — primary idle App Hosting cost driver
  */
@@ -60,7 +60,7 @@ import {
   parseEntityProjection,
   parseSearchIndexDoc,
   shouldUseLivePublicProjections,
-} from './firestore-readers';
+} from './public-readers';
 import {
   createLiveCatalogMemoryCache,
   isOversizedLiveCatalogSentinel,

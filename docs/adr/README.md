@@ -11,7 +11,9 @@ Formal decisions for BlackStory platform topology, data, deployment, and securit
 - **Scaffold today** means the monorepo directories, packages, or local Docker compose already exist.
 - **Aspirational / target** means the decision is binding for upcoming beads. Firebase apps, Cloud
   Run, App Hosting backends, and production GitHub Actions are **not** fully provisioned or
-  verified yet (see `docs/ds-001/baseline-report.md` and D-013). **Cloud SQL is deferred** (ADR-011).
+  verified yet (see `docs/ds-001/baseline-report.md` and D-013). **Product SoR target is Supabase
+  Postgres** (ADR-020); Firestore remains live until cutover. Cloud SQL under `infra/database/`
+  stays non-path.
 - Do not infer working app or database deployments from the existing Firebase project/Hosting site.
 
 ## Index
@@ -28,7 +30,7 @@ Formal decisions for BlackStory platform topology, data, deployment, and securit
 | [ADR-008](./ADR-008-search-and-geocoding.md) | Search and geocoding | Accepted (amended by ADR-011) |
 | [ADR-009](./ADR-009-research-isolation.md) | Research isolation | Accepted |
 | [ADR-010](./ADR-010-security-and-abuse-assumptions.md) | Security and abuse assumptions | Accepted |
-| [ADR-011](./ADR-011-firestore-system-of-record.md) | Firestore as system of record (Cloud SQL deferred) | Accepted |
+| [ADR-011](./ADR-011-firestore-system-of-record.md) | Firestore as system of record (Cloud SQL deferred) | Superseded (SoR path) by ADR-020 |
 | [ADR-012](./ADR-012-production-environment-resplit.md) | Production environment re-split (multi-project isolation) | Accepted (supersedes D-013; not yet applied — see ) |
 | [ADR-013](./ADR-013-map-stack.md) | Map stack: MapLibre GL JS, PMTiles/MapTiler tile strategy, dark archive basemap | Accepted (demo-level integration; release-activation wiring pending — see ) |
 | [ADR-014](./ADR-014-vector-search.md) | Vector search: embedding pipeline and Firestore native KNN | Accepted (on-write/research-pipeline wiring pending — see ) |
@@ -37,6 +39,7 @@ Formal decisions for BlackStory platform topology, data, deployment, and securit
 | [ADR-017](./ADR-017-persistent-map-canvas.md) | Persistent map canvas | Accepted |
 | [ADR-018](./ADR-018-firebase-scheduled-functions-discovery.md) | Firebase scheduled Functions for discovery automation | Accepted (partially supersedes ADR-007 Jobs-only for capped discovery) |
 | [ADR-019](./ADR-019-acquisition-crawler-runtime.md) | Acquisition crawler runtime: TS adapters + Python Scrapy/Trafilatura | Accepted |
+| [ADR-020](./ADR-020-supabase-postgres-system-of-record.md) | Supabase Postgres as system of record (`blackstory-app`) | Accepted |
 
 ## Security boundary set (do not expand)
 

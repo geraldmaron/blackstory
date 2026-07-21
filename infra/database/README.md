@@ -1,13 +1,15 @@
-# Database infrastructure — DEFERRED / NOT PRODUCTION PATH
+# Database infrastructure — SUPERSEDED FOR PRODUCT SoR (ADR-020)
 
-> **ADR-011 / D-014 (2026-07-16):** Cloud SQL, PostGIS, and Firebase SQL Connect are
-> **not** the production system of record. Structured product data lives in **Firestore**;
-> blobs remain in Firebase Storage / GCS. Do **not** provision a paid Cloud SQL instance
-> for the current phase.
+> **ADR-020 (2026-07-20):** Product system-of-record design and DDL now target **Supabase
+> Postgres** project **`blackstory-app`** (`twykhihqkcldpreuovay`). See
+> `docs/adr/ADR-020-supabase-postgres-system-of-record.md`,
+> `docs/data/postgres-schema.md`, and `supabase/migrations/`.
 >
-> This directory preserves BB-012 local PostGIS role scaffolding and SQL Connect templates
-> for a possible later revisit (see ADR-011 migration triggers). Prefer
-> `infra/firebase/` + `@repo/firebase` for active work.
+> **Cloud SQL / PostGIS / Firebase SQL Connect** under this directory remain **parked /
+> non-production**. Do **not** provision a paid Cloud SQL instance for the current phase.
+>
+> Firestore on `black-book-efaaf` remains the **live** store until a separate cutover bead.
+> Prefer `supabase/` for new schema work; keep `infra/firebase/` until cutover completes.
 
 Historical BB-012 notes below remain accurate as a description of the parked artifacts.
 
@@ -22,10 +24,11 @@ Local PostGIS, role/grant foundation, pool budgets, Cloud SQL design, and Fireba
 
 | Path | Status |
 |------|--------|
-| Firestore model / rules | **Active** — `infra/firebase/`, `@repo/firebase` |
+| Supabase DDL / schema design | **Active design path** — `supabase/`, ADR-020 |
+| Firestore model / rules | **Live until cutover** — `infra/firebase/`, `@repo/firebase` |
 | Local PostGIS compose / init | Optional / deferred experiments |
 | SQL Connect templates | Parked; do not block beads or CI |
-| Cloud SQL instance | **Do not create** (cost gate + ADR-011) |
+| Cloud SQL instance | **Do not create** (cost gate; superseded by Supabase target) |
 
 ## Product naming (parked SQL Connect)
 

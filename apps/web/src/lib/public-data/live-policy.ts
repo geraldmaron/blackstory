@@ -9,6 +9,8 @@ import { GCP_PROJECT_ID_PROD } from '@repo/config/identity';
 const PRODUCTION_PROJECT_ID = GCP_PROJECT_ID_PROD;
 const PRODUCTION_BREAK_GLASS_ENV = 'APP_FIREBASE_ALLOW_PRODUCTION';
 
+export type PublicDataSource = 'seed' | 'firestore' | 'postgres';
+
 type EnvironmentLike = Readonly<Record<string, string | undefined>>;
 
 const LOCAL_HOST_PATTERN =
@@ -37,6 +39,22 @@ function hasEmulatorSignals(environment: EnvironmentLike): boolean {
   return false;
 }
 
+export function resolvePublicDataSource(env: EnvironmentLike = process.env): PublicDataSource | undefined {
+  const raw = env.PUBLIC_DATA_SOURCE?.trim().toLowerCase();
+  if (raw === 'seed' || raw === 'firestore' || raw === 'postgres') {
+    return raw;
+  }
+  return undefined;
+}
+
+export function isPostgresPublicDataSource(env: EnvironmentLike = process.env): boolean {
+  return resolvePublicDataSource(env) === 'postgres';
+}
+
+function hasPostgresConnection(env: EnvironmentLike): boolean {
+  return Boolean(env.DATABASE_URL?.trim() || env.APP_DATABASE_URL?.trim());
+}
+
 /** Whether this runtime should attempt live public projection reads.  */
 export function shouldUseLivePublicProjections(env: EnvironmentLike = process.env): boolean {
   if (env.PUBLIC_READ_API_DISABLED === '1' || env.PUBLIC_READ_API_DISABLED === 'true') {
@@ -47,6 +65,10 @@ export function shouldUseLivePublicProjections(env: EnvironmentLike = process.en
   }
   if (hasEmulatorSignals(env)) {
     return false;
+  }
+
+  if (isPostgresPublicDataSource(env)) {
+    return hasPostgresConnection(env);
   }
 
   const projectId =

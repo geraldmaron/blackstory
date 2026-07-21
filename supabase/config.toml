@@ -1,0 +1,31 @@
+# BlackStory Supabase project (ADR-020).
+# Target: blackstory-app (twykhihqkcldpreuovay), us-west-2.
+# Do not commit secrets. Use op:// / run-with-dev-secrets for CLI tokens.
+
+[project]
+id = "twykhihqkcldpreuovay"
+name = "blackstory-app"
+
+[api]
+enabled = true
+# Product tables live in bb_* schemas; expose only what grants allow.
+schemas = ["public", "bb_public", "bb_submissions"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+major_version = 15
+
+[db.migrations]
+schema_paths = []
+
+[db.seed]
+enabled = false
+
+[auth]
+enabled = true
+# Roles for RLS live in app_metadata.bb_role — never user_metadata.
+
+[studio]
+enabled = true

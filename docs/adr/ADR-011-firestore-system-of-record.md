@@ -1,11 +1,14 @@
 # ADR-011: Firestore as system of record (Cloud SQL deferred)
 
-- **Status:** Accepted
+- **Status:** Superseded (SoR path) by [ADR-020](./ADR-020-supabase-postgres-system-of-record.md)
 - **Date:** 2026-07-16
 - **Bead:**  (rescoped); overrides  production path
 - **Depends on:** ADR-004, ADR-005, ADR-009, ADR-010, D-013, D-014
 - **Supersedes (current phase):** ADR-002 and ADR-003 production intent
 - **Amends:** ADR-008 search/geo initial implementation path
+- **Superseded by:** ADR-020 (Supabase Postgres on `blackstory-app`) for the product SoR
+  target. Firestore remains the **live** store until cutover; this ADR documents the
+  Firestore phase.
 
 ## Scaffold vs target
 

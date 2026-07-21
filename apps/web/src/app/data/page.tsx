@@ -6,8 +6,8 @@
  * components/data.
  */
 import { US_STATES } from '@repo/domain/map/geography';
+import { buildStateFipsNameMap } from '@repo/firebase';
 import {
-  buildStateFipsNameMap,
   getAcsCoverageSummary,
   getHateCrimeYearSummaries,
   getHateCrimeYearSummary,
@@ -21,7 +21,7 @@ import {
   type NationalPopulationTimelineSnapshot,
   type OpportunityAtlasCoverageSummary,
   type StatePopulationChange,
-} from '@repo/firebase';
+} from '../../lib/demographics/public-stats-source';
 import { timelineChangeStripItems } from '../../components/data/population-change';
 import '../../components/data/data-charts.css';
 import { DataSections } from './DataSections';

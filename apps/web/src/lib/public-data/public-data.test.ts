@@ -4,7 +4,7 @@
 
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { shouldUseLivePublicProjections } from './live-policy';
+import { shouldUseLivePublicProjections, isPostgresPublicDataSource } from './live-policy';
 import {
   isDisplayableJurisdictionLabel,
   mapProjectionToPublicEntityView,
@@ -40,6 +40,28 @@ test('shouldUseLivePublicProjections enables production project reads', () => {
       PUBLIC_READ_API_DISABLED: '0',
     }),
     true,
+  );
+});
+
+test('shouldUseLivePublicProjections enables postgres mode when DATABASE_URL is set', () => {
+  assert.equal(
+    shouldUseLivePublicProjections({
+      NODE_ENV: 'development',
+      PUBLIC_DATA_SOURCE: 'postgres',
+      DATABASE_URL: 'postgresql://local:local@127.0.0.1:5432/blackbook',
+    }),
+    true,
+  );
+  assert.equal(isPostgresPublicDataSource({ PUBLIC_DATA_SOURCE: 'postgres' }), true);
+});
+
+test('shouldUseLivePublicProjections disables postgres mode without DATABASE_URL', () => {
+  assert.equal(
+    shouldUseLivePublicProjections({
+      NODE_ENV: 'development',
+      PUBLIC_DATA_SOURCE: 'postgres',
+    }),
+    false,
   );
 });
 

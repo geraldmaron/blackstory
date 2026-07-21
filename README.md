@@ -36,7 +36,7 @@ Pages setting: **Deploy from a branch** → `main` → `/docs`. Do not point Pag
 - Node.js 22+ (`nvm use` from `.nvmrc`)
 - [pnpm](https://pnpm.io/) 9.x
 - [uv](https://docs.astral.sh/uv/) (Python 3.12+)
-- Docker (optional only — local PostGIS is **deferred** / not required; ADR-011)
+- Docker (optional only — local PostGIS under `infra/database/` is parked; product SoR target is Supabase, ADR-020)
 
 ## Commands
 
@@ -69,7 +69,7 @@ pnpm build
 # Typecheck (run after `pnpm build` — API apps consume built package declarations)
 pnpm build && pnpm typecheck
 
-# Local PostGIS (deferred / optional — not production path; ADR-011)
+# Local PostGIS (parked under infra/database — not product SoR; ADR-020 → supabase/)
 pnpm db:up
 pnpm db:status
 pnpm db:init
@@ -86,7 +86,7 @@ pnpm firebase:emulators
 pnpm firebase:test:rules
 ```
 
-**Data plane (current phase):** Cloud Firestore + Storage. See [`infra/firebase/FIRESTORE_MODEL.md`](./infra/firebase/FIRESTORE_MODEL.md) and [ADR-011](./docs/adr/ADR-011-firestore-system-of-record.md). Do not provision Cloud SQL.
+**Data plane:** Live traffic still uses Cloud Firestore + Storage ([`infra/firebase/FIRESTORE_MODEL.md`](./infra/firebase/FIRESTORE_MODEL.md)). **Product SoR design target** is Supabase Postgres project `blackstory-app` ([ADR-020](./docs/adr/ADR-020-supabase-postgres-system-of-record.md), [`docs/data/postgres-schema.md`](./docs/data/postgres-schema.md), [`supabase/migrations/`](./supabase/migrations/)). Remote DDL is applied; ETL tooling lives in [`packages/migrate-firestore-postgres`](./packages/migrate-firestore-postgres/) (runbook in that package README). App traffic is **not** cut over yet — do not drop Firestore.
 BB-018 audit/outbox helpers atomically commit state + immutable audit + pending delivery with
 idempotency, bounded retry/dead-letter handling, and publication-history reconstruction.
 Bootstrap uses frozen pnpm and uv lockfiles. Local tests default to `NODE_ENV=development` and
