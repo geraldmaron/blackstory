@@ -2,7 +2,10 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { listSeedStoryProjections } from '../src/firestore/public-story-seed.ts';
 import { createLlmProvider } from '../../operator-cli/src/llm-provider.ts';
-import { DEFAULT_STORY_REWRITE_MODEL, rewriteStory } from '../../operator-cli/src/story-rewrite.ts';
+import {
+  DEFAULT_STORY_REWRITE_MODELS,
+  rewriteStory,
+} from '../../operator-cli/src/story-rewrite.ts';
 
 function arg(name: string): string | undefined {
   const index = process.argv.indexOf(name);
@@ -12,15 +15,29 @@ function arg(name: string): string | undefined {
 const slug = arg('--slug');
 const output = arg('--output') ?? '.cache/story-rewrites';
 const requestedProvider = arg('--provider');
+const requestedModels = arg('--models')
+  ?.split(',')
+  .map((value) => value.trim())
+  .filter(Boolean);
 const providerName =
   (requestedProvider as 'mock' | 'openrouter' | 'ollama' | 'hybrid' | undefined) ??
   (process.env.EDITORIAL_LLM_PROVIDER as 'mock' | 'openrouter' | 'ollama' | 'hybrid' | undefined) ??
   'openrouter';
-const model = arg('--model') ?? process.env.STORY_REWRITE_MODEL ?? DEFAULT_STORY_REWRITE_MODEL;
+const model = arg('--model') ?? process.env.STORY_REWRITE_MODEL;
+const models =
+  requestedModels ??
+  process.env.STORY_REWRITE_MODELS?.split(',')
+    .map((value) => value.trim())
+    .filter(Boolean) ??
+  DEFAULT_STORY_REWRITE_MODELS;
 const stories = listSeedStoryProjections().filter((story) => !slug || story.slug === slug);
 if (stories.length === 0) throw new Error(`No seed story matched ${slug ?? '(all)'}`);
 
-const provider = createLlmProvider({ provider: providerName, model });
+const provider = createLlmProvider({
+  provider: providerName,
+  ...(model !== undefined ? { model } : {}),
+  models,
+});
 mkdirSync(output, { recursive: true });
 for (const story of stories) {
   const result = await rewriteStory(story, { provider, model });

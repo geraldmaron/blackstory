@@ -7,6 +7,12 @@ import {
 import type { LlmProvider } from './llm-provider.js';
 
 export const DEFAULT_STORY_REWRITE_MODEL = 'moonshotai/kimi-k2.5';
+export const DEFAULT_STORY_REWRITE_MODELS = Object.freeze([
+  'moonshotai/kimi-k2.5',
+  'qwen/qwen3.5-122b-a10b',
+  'deepseek/deepseek-v3.2',
+  'mistralai/mistral-medium-3.1',
+]);
 export const STORY_REWRITE_MIN_WORDS = 900;
 
 export type StoryRewriteDraft = Pick<
@@ -117,7 +123,9 @@ export async function rewriteStory(
   input: { readonly provider: LlmProvider; readonly model?: string },
 ): Promise<StoryRewriteResult> {
   const completion = await input.provider.complete({
-    model: input.model ?? DEFAULT_STORY_REWRITE_MODEL,
+    // Empty lets OpenRouter rotate the configured quality roster. An explicit
+    // model remains a deliberate pin for reproducible experiments.
+    model: input.model ?? '',
     temperature: 0.45,
     maxTokens: 2400,
     messages: [

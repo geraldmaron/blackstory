@@ -41,6 +41,8 @@ export type CreateLlmProviderOptions = {
   readonly fetchImpl?: typeof fetch;
   /** Max attempts per provider before failing (or failing over for hybrid). */
   readonly maxAttempts?: number;
+  /** Optional OpenRouter roster; failures rotate through it in order. */
+  readonly models?: readonly string[];
 };
 
 const DEFAULT_OPENROUTER_MODEL = 'openrouter/free';
@@ -375,10 +377,12 @@ export function createHybridLlmProvider(options: {
   readonly baseUrl?: string;
   readonly fetchImpl?: typeof fetch;
   readonly maxAttempts?: number;
+  readonly models?: readonly string[];
 }): LlmProvider {
   const openrouter = createOpenRouterLlmProvider({
     ...(options.apiKey !== undefined ? { apiKey: options.apiKey } : {}),
     ...(options.model !== undefined ? { model: options.model } : {}),
+    ...(options.models !== undefined ? { models: options.models } : {}),
     ...(options.fetchImpl !== undefined ? { fetchImpl: options.fetchImpl } : {}),
     maxAttempts: options.maxAttempts ?? 2,
   });
@@ -436,6 +440,7 @@ export function createLlmProvider(options: CreateLlmProviderOptions = {}): LlmPr
       return createOpenRouterLlmProvider({
         ...(options.apiKey !== undefined ? { apiKey: options.apiKey } : {}),
         ...(options.model !== undefined ? { model: options.model } : {}),
+        ...(options.models !== undefined ? { models: options.models } : {}),
         ...(options.fetchImpl !== undefined ? { fetchImpl: options.fetchImpl } : {}),
         ...(options.maxAttempts !== undefined ? { maxAttempts: options.maxAttempts } : {}),
       });
@@ -454,6 +459,7 @@ export function createLlmProvider(options: CreateLlmProviderOptions = {}): LlmPr
       return createHybridLlmProvider({
         ...(options.apiKey !== undefined ? { apiKey: options.apiKey } : {}),
         ...(options.model !== undefined ? { model: options.model } : {}),
+        ...(options.models !== undefined ? { models: options.models } : {}),
         ...(options.ollamaModel !== undefined ? { ollamaModel: options.ollamaModel } : {}),
         ...(options.baseUrl !== undefined ? { baseUrl: options.baseUrl } : {}),
         ...(options.fetchImpl !== undefined ? { fetchImpl: options.fetchImpl } : {}),

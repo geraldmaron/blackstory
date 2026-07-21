@@ -113,6 +113,7 @@ export {
 } from './llm-provider.js';
 export {
   DEFAULT_STORY_REWRITE_MODEL,
+  DEFAULT_STORY_REWRITE_MODELS,
   STORY_REWRITE_MIN_WORDS,
   rewriteStory,
   validateStoryRewrite,
