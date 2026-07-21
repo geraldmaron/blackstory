@@ -20,7 +20,7 @@ test('roster job ids are unique', () => {
   assert.equal(new Set(ids).size, ids.length);
 });
 
-test('exactly thirteen real job bodies are registered (prior nine plus four discovery campaigns)', () => {
+test('exactly fourteen real job bodies are registered (prior thirteen plus banned-books refresh)', () => {
   const store = createDefaultScheduledJobRegistry();
   const real = listScheduledJobs(store, { rosterStatus: 'real' })
     .map((job) => job.id)
@@ -33,6 +33,7 @@ test('exactly thirteen real job bodies are registered (prior nine plus four disc
     'discovery-campaign-rss',
     'discovery-campaign-web-search',
     'discovery-campaign-wikimedia-federal',
+    'external-dataset-refresh-banned-books',
     'gold-corpus-regression',
     'legal-change-monitoring',
     'reddit-deletion-sync',

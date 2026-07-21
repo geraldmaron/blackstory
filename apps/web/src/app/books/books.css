@@ -1,0 +1,294 @@
+/**
+ * Books page body — compact reference surface with on-page nav, filter band, ledger browse rows,
+ * and section cards aligned with the law reference delivery model.
+ */
+
+.ds-books {
+  margin-top: var(--ds-space-6);
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.ds-books [id] {
+  scroll-margin-top: var(--ds-island-clearance);
+}
+
+.ds-books .ds-section {
+  padding-block: var(--ds-space-8);
+}
+
+/* —— Disclaimer —— */
+.ds-books__disclaimer {
+  margin: 0 0 var(--ds-space-4);
+  padding: var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+}
+
+.ds-books__disclaimer-title {
+  margin: 0 0 var(--ds-space-2);
+  font-family: var(--ds-font-display);
+  font-weight: 500;
+  font-size: 0.9375rem;
+  letter-spacing: -0.01em;
+}
+
+.ds-books__disclaimer p {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+/* —— On-page index —— */
+.ds-books__nav {
+  margin: 0;
+  padding: var(--ds-space-4) 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-books__nav-title {
+  margin: 0 0 var(--ds-space-3);
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ds-books__nav-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-books__nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: border-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-books__nav-link:hover,
+.ds-books__nav-link:focus-visible {
+  border-bottom-color: var(--ds-accent-graphic);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-books__nav-link {
+    transition: none;
+  }
+}
+
+/* —— Filter band —— */
+.ds-books__filter-band {
+  padding-top: var(--ds-space-6);
+}
+
+.ds-books__count {
+  margin: var(--ds-space-4) 0 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+}
+
+/* —— Browse ledger —— */
+.ds-books__browse-ledger {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin: var(--ds-space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-books__browse-item {
+  margin: 0;
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+  min-width: 0;
+}
+
+.ds-books__browse-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ds-space-2) var(--ds-space-3);
+}
+
+.ds-books__browse-title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-weight: 500;
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.ds-books__browse-title a {
+  color: var(--ds-ink);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: border-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-books__browse-title a:hover,
+.ds-books__browse-title a:focus-visible {
+  border-bottom-color: var(--ds-accent-graphic);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-books__browse-title a {
+    transition: none;
+  }
+}
+
+.ds-books__browse-meta-line {
+  margin: var(--ds-space-2) 0 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.ds-books__browse-states {
+  margin: var(--ds-space-2) 0 0;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.ds-books__state-tag {
+  display: inline;
+  margin-right: var(--ds-space-1);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.ds-books__browse-note {
+  margin: var(--ds-space-2) 0 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.75rem;
+}
+
+/* —— Detail sections —— */
+.ds-books__section-body {
+  margin: var(--ds-space-3) 0 0;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-editorial);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.ds-books__section-note {
+  margin: var(--ds-space-2) 0 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.ds-books__subheading {
+  margin: var(--ds-space-5) 0 0;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-display);
+  font-weight: 500;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+}
+
+.ds-books__browse-states-label {
+  color: var(--ds-ink-muted);
+}
+
+.ds-books__state-tags {
+  display: inline;
+}
+
+.ds-books__state-list,
+.ds-books__challenge-list,
+.ds-books__citation-list,
+.ds-books__purchase-list {
+  margin: var(--ds-space-3) 0 0;
+  padding-left: var(--ds-space-4);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.ds-books__state-list li + li,
+.ds-books__challenge-list li + li,
+.ds-books__citation-list li + li,
+.ds-books__purchase-list li + li {
+  margin-top: var(--ds-space-2);
+}
+
+.ds-books__state-name {
+  font-weight: 500;
+}
+
+.ds-books__citation-publisher {
+  color: var(--ds-ink-muted);
+}
+
+.ds-books__entity-link {
+  margin: var(--ds-space-3) 0 0;
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+}
+
+/* —— Provenance block —— */
+.ds-books__provenance-dl {
+  margin: var(--ds-space-3) 0 0;
+  display: grid;
+  gap: var(--ds-space-3);
+}
+
+.ds-books__provenance-row {
+  display: grid;
+  gap: var(--ds-space-1);
+}
+
+.ds-books__provenance-row dt {
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ds-books__provenance-row dd {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+/* —— Footer cross-links —— */
+.ds-books__next {
+  padding-block: var(--ds-space-8);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-books__next .ds-band__cta {
+  margin-top: var(--ds-space-4);
+}

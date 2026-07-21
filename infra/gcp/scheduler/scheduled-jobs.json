@@ -157,6 +157,22 @@
       "implementationOwnerBead": "BB-082"
     },
     {
+      "id": "external-dataset-refresh-banned-books",
+      "owner": "banned-books",
+      "cronExpression": "0 6 1 1,4,7,10 *",
+      "humanReadable": "quarterly, 1st 06:00 UTC (Jan/Apr/Jul/Oct)",
+      "budget": { "unit": "requests", "maxPerRun": 200 },
+      "timeoutSec": 1800,
+      "idempotencyKeyScheme": "job:{jobId}:{quarterStart}",
+      "killSwitchId": "source-adapter-external-dataset-refresh-banned-books",
+      "targetWorker": {
+        "package": "research",
+        "function": "dataset_refresh.refresh_banned_books_listing"
+      },
+      "publicEffect": "none",
+      "rosterStatus": "real"
+    },
+    {
       "id": "relevance-confidence-recalibration-report",
       "owner": "BB-081",
       "cronExpression": "0 5 1 * *",

@@ -267,6 +267,29 @@ export const DEFAULT_SCHEDULED_JOBS: readonly ScheduledJobDefinition[] = [
     implementationOwnerBead: 'historic-safety',
     consecutiveMissedRunThreshold: 1,
   },
+  {
+    id: 'external-dataset-refresh-banned-books',
+    owner: 'banned-books',
+    description:
+      'Quarterly banned-books listing refresh: re-validate purchase links on the curated catalog, rebuild listing snapshot proposals. Never auto-publishes entities.',
+    cadence: {
+      cronExpression: '0 6 1 1,4,7,10 *',
+      nominalIntervalMs: QUARTER_MS,
+      humanReadable: 'quarterly, 1st 06:00 UTC (Jan/Apr/Jul/Oct)',
+    },
+    budget: { unit: 'requests', maxPerRun: 200 },
+    timeoutSec: 1_800,
+    idempotencyKeyScheme: 'job:{jobId}:{quarterStart}',
+    killSwitchId: scheduledJobKillSwitchId('external-dataset-refresh-banned-books'),
+    targetWorker: {
+      package: 'research',
+      function: 'dataset_refresh.refresh_banned_books_listing',
+    },
+    environment: 'repo-internal',
+    publicEffect: 'none',
+    rosterStatus: 'real',
+    consecutiveMissedRunThreshold: 1,
+  },
 
   // --- REAL: relevance/confidence recalibration report. Wired to
   // @repo/domain's relevance-feedback module (decision-log extraction, per-dimension

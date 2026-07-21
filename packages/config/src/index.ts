@@ -11,6 +11,7 @@ export {
   GCP_PROJECT_ID_PROD,
   BRAND_ASSETS,
   MAKER,
+  BOOKSHOP_AFFILIATE_ID,
   brandLockup,
   brandSymbol,
   brandOpenGraph,

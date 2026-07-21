@@ -682,6 +682,25 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
       'Traffic-stop disparity research. Cite and store agency-level aggregates only after dignity ' +
       'review — never individual stops; never crime-heat map rendering.',
   },
+  {
+    id: 'pen-america-school-book-bans',
+    displayName: 'PEN America Index of School Book Bans',
+    custodian: 'PEN America',
+    homepageUrl: 'https://pen.org/book-bans/',
+    dataUrl: 'https://pen.org/book-bans/pen-america-book-ban-index-data/',
+    license: {
+      name: 'PEN America terms — rights review required before bulk redistribute',
+      verdict: 'attribution-required',
+      notes:
+        'Public index and reports may be cited by URL. Bulk CSV/spreadsheet ingest is DISABLED until human rights review clears redistribution for product use. Curated BlackStory listing cites public pages; does not mirror the full PEN dataset.',
+    },
+    vintage: '2024-2025 Index (and prior school-year indices)',
+    geographies: ['state'],
+    cadence: 'annual',
+    registryState: 'disabled',
+    notes:
+      'Primary research pointer for U.S. school book bans. Wire bulk refresh only after license gate. Quarterly job validates curated seed + purchase links only.',
+  },
 ] as const;
 
 export function getExternalDataSource(id: string): ExternalDataSource | undefined {

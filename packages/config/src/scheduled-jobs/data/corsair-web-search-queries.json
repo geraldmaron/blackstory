@@ -1,6 +1,6 @@
 {
   "schemaVersion": "corsair-web-search-queries.v1",
-  "updatedAt": "2026-07-19",
+  "updatedAt": "2026-07-21",
   "purpose": "Rotating SearXNG SERP queries for Corsair discovery. These are search-result leads only — not HTML body scrapes. Full crawl of blackwomenleadproject.org remains gated on source-policy audit (repo-tt2u.13).",
   "safeties": {
     "serpOnly": true,
@@ -28,7 +28,9 @@
     "patents.google.com",
     "reporter.nih.gov",
     "nces.ed.gov",
-    "npgallery.nps.gov"
+    "npgallery.nps.gov",
+    "pen.org",
+    "ala.org"
   ],
   "queries": [
     {
@@ -138,6 +140,30 @@
       "intent": "open_web",
       "theme": "institutions",
       "text": "African American mutual aid society OR fraternal lodge historic"
+    },
+    {
+      "id": "book-bans-pen",
+      "intent": "site_focus",
+      "theme": "book_challenges",
+      "text": "site:pen.org school book ban OR challenged book"
+    },
+    {
+      "id": "book-bans-ala",
+      "intent": "site_focus",
+      "theme": "book_challenges",
+      "text": "site:ala.org \"most challenged\" OR \"banned books\""
+    },
+    {
+      "id": "book-bans-black-authors",
+      "intent": "open_web",
+      "theme": "book_challenges",
+      "text": "African American OR \"Black authors\" book ban OR challenged school library"
+    },
+    {
+      "id": "book-bans-news",
+      "intent": "open_web",
+      "theme": "book_challenges",
+      "text": "site:npr.org OR site:apnews.com book ban school library"
     }
   ]
 }

@@ -71,7 +71,7 @@ describe('BB-084 scheduled-jobs Cloud Scheduler mirror', () => {
     ]);
   });
 
-  it('exactly nine jobs are marked real (prior five plus four unstubbed discovery campaigns)', () => {
+  it('exactly ten jobs are marked real (prior nine plus banned-books refresh)', () => {
     const config = readJson('scheduled-jobs.json');
     const real = config.jobs
       .filter((job) => job.rosterStatus === 'real')
@@ -84,6 +84,7 @@ describe('BB-084 scheduled-jobs Cloud Scheduler mirror', () => {
       'discovery-campaign-rss',
       'discovery-campaign-web-search',
       'discovery-campaign-wikimedia-federal',
+      'external-dataset-refresh-banned-books',
       'gold-corpus-regression',
       'restore-drill-quarterly',
       'source-drift-run-health-check',
