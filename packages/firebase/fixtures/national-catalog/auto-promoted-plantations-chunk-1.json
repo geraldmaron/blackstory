@@ -1,0 +1,1978 @@
+[
+  {
+    "id": "plantation_mulberry_grove_plantation_q6933811",
+    "kind": "place",
+    "displayName": "Mulberry Grove Plantation",
+    "summary": "Mulberry Grove Plantation in Chatham County, Georgia, was a rice and cotton plantation where Eli Whitney invented the cotton gin in the 1790s, a development that intensified the use of enslaved labor across the South. The site, once home to hundreds of enslaved people, is now marked by a bronze historical marker near Port Wentworth.",
+    "eraBuckets": [
+      "1790s",
+      "1850s",
+      "1860s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "invention",
+      "agriculture",
+      "firsts",
+      "economic-justice"
+    ],
+    "topicIds": [
+      "enslavement",
+      "invention",
+      "agriculture",
+      "firsts",
+      "economic-justice"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "cotton gin",
+      "Eli Whitney",
+      "enslaved labor",
+      "rice plantation",
+      "Chatham County"
+    ],
+    "jurisdictionLabel": "Port Wentworth, Georgia",
+    "locationPrecision": "site",
+    "locationLabel": "Site of Mulberry Grove Plantation",
+    "lat": 32.19,
+    "lng": -81.16,
+    "claims": [
+      {
+        "predicate": "was the location where Eli Whitney invented the cotton gin",
+        "object": "Eli Whitney invented the cotton gin at Mulberry Grove Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mulberry_Grove_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was a rice and cotton plantation dependent on enslaved labor",
+        "object": "Mulberry Grove operated as a plantation using enslaved labor for rice and cotton production",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mulberry_Grove_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was the birthplace of Christmas Moultrie, last child born into slavery there",
+        "object": "Christmas Moultrie was the last child born into slavery at Mulberry Grove Plantation",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mulberry_Grove_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is listed on the National Register of Historic Places for its association with invention and agriculture",
+        "object": "Mulberry Grove Site was added to the NRHP in 1975 under criteria related to invention and agriculture",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/75000575",
+        "citationLabel": "National Park Service"
+      }
+    ],
+    "historicalContext": "The invention of the cotton gin at Mulberry Grove dramatically increased the profitability of short-staple cotton, leading to the expansion of slavery into the Deep South. This technological innovation, while economically transformative, entrenched the system of racial enslavement and increased the forced migration of enslaved Black people through the domestic slave trade."
+  },
+  {
+    "id": "plantation_pebble_hill_plantation_q7158514",
+    "kind": "place",
+    "displayName": "Pebble Hill Plantation",
+    "summary": "Pebble Hill Plantation, established in the 1820s near Thomasville, Georgia, operated as a forced-labor estate growing cotton, tobacco, and rice. Enslaved people built and worked the land until emancipation. The current Colonial Revival mansion, built in 1936 after a fire, stands on land where this history unfolded, now interpreted through public programming.",
+    "eraBuckets": [
+      "1820s",
+      "1840s",
+      "1930s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "segregation",
+      "resistance",
+      "history"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "segregation",
+      "resistance",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "enslaved labor",
+      "cotton plantation",
+      "Thomasville Georgia",
+      "Ochlocknee Baptist Church",
+      "antebellum South"
+    ],
+    "jurisdictionLabel": "Thomasville, Georgia",
+    "locationPrecision": "address",
+    "locationLabel": "4 miles southwest of Thomasville, Georgia",
+    "lat": 30.78022,
+    "lng": -84.06386,
+    "claims": [
+      {
+        "predicate": "established in",
+        "object": "1820s",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Pebble_Hill_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "original owner",
+        "object": "Thomas Jefferson Johnson",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Pebble_Hill_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "used enslaved labor to grow",
+        "object": "cotton, tobacco, and rice",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Pebble_Hill_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "designed by",
+        "object": "John Wind",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Pebble_Hill_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "main house rebuilt in",
+        "object": "1936",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Pebble_Hill_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "founded by",
+        "object": "enslaved community",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Pebble_Hill_Plantation",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Pebble Hill Plantation was part of the antebellum plantation system that relied on enslaved labor to produce cash crops like cotton and rice, contributing to the regional economy structured by racial hierarchy and exploitation. Its post-Civil War transformation into a hunting estate reflects broader patterns of land retention and memorialization by white elites, while the persistence of institutions like Ochlocknee Missionary Baptist Church—founded by formerly enslaved people in 1848—demonstrates community resilience."
+  },
+  {
+    "id": "plantation_placentia_plantation_q119999509",
+    "kind": "place",
+    "displayName": "Placentia Plantation",
+    "summary": "Placentia Plantation, established in the 18th century near Savannah, Georgia, relied on enslaved Black labor for rice, cotton, and corn cultivation. A 2.5-acre 'colored cemetery' with unmarked graves from the plantation era lies partially beneath Savannah State University, where a memorial garden began construction in 2018 to honor those buried there.",
+    "eraBuckets": [
+      "1780s",
+      "1800s",
+      "1870s",
+      "1880s",
+      "1890s",
+      "2010s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "land-ownership",
+      "memory",
+      "resistance"
+    ],
+    "topicIds": [
+      "enslavement",
+      "land-ownership",
+      "memory",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Placentia Plantation",
+      "enslaved labor",
+      "colored cemetery",
+      "Savannah State University",
+      "memorial garden"
+    ],
+    "jurisdictionLabel": "Savannah, Georgia",
+    "locationPrecision": "site",
+    "locationLabel": "Former plantation land near Skidaway Road and Wilmington River",
+    "lat": 32.0268557,
+    "lng": -81.06099,
+    "claims": [
+      {
+        "predicate": "was_worked_by_enslaved_black_people_until_emancipation",
+        "object": "enslaved Black laborers",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Placentia_Plantation",
+        "citationLabel": "Wikipedia - Placentia Plantation"
+      },
+      {
+        "predicate": "contained_colored_cemetery_with_unmarked_graves",
+        "object": "2.5-acre burial site",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Placentia_Plantation",
+        "citationLabel": "Wikipedia - Placentia Plantation"
+      },
+      {
+        "predicate": "is_partially_under_savannah_state_university",
+        "object": "Savannah State University campus",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Placentia_Plantation",
+        "citationLabel": "Wikipedia - Placentia Plantation"
+      },
+      {
+        "predicate": "began_construction_of_memorial_garden_for_enslaved_burials",
+        "object": "2018",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Placentia_Plantation",
+        "citationLabel": "Wikipedia - Placentia Plantation"
+      },
+      {
+        "predicate": "cultivated_rice_cotton_and_corn_using_enslaved_labor",
+        "object": "John Postell Williamson in early 19th century",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Placentia_Plantation",
+        "citationLabel": "Wikipedia - Placentia Plantation"
+      }
+    ],
+    "historicalContext": "Plantations like Placentia were central to the antebellum Southern economy, built on the forced labor of enslaved Africans and African Americans. The presence of a segregated burial ground and recent memorialization efforts reflect both the legacy of racial hierarchy and contemporary attempts to reclaim and honor Black ancestral presence in the face of erasure."
+  },
+  {
+    "id": "plantation_richmond_oak_grove_plantation_q106880723",
+    "kind": "place",
+    "displayName": "Richmond Oak Grove Plantation",
+    "summary": "Richmond Oak Grove Plantation, located near Port Wentworth, Georgia, emerged from the consolidation of three 18th-century plantations and became a site of large-scale slavery after Georgia lifted its ban in 1749. Its owner, Patrick Mackay, was among the first to import hundreds of enslaved people, smuggling them across the Savannah River to evade authorities. The plantation produced rice, indigo…",
+    "eraBuckets": [
+      "1730s",
+      "1740s",
+      "1750s",
+      "1760s",
+      "1770s",
+      "1780s",
+      "1890s",
+      "1940s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "founding-era",
+      "land-ownership",
+      "jim-crow"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "founding-era",
+      "land-ownership",
+      "jim-crow"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "slavery in Georgia",
+      "Savannah River plantation",
+      "Patrick Mackay",
+      "Anthony Wayne",
+      "rice cultivation"
+    ],
+    "jurisdictionLabel": "Port Wentworth, Georgia",
+    "locationPrecision": "site",
+    "locationLabel": "Former plantation site on the Savannah River",
+    "lat": 31.96472222,
+    "lng": -81.07055556,
+    "claims": [
+      {
+        "predicate": "was established through the consolidation of Richmond and Kew, Morton Hall, and Oak Grove plantations",
+        "object": "Richmond Oak Grove Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Richmond_Oak_Grove_Plantation",
+        "citationLabel": "Wikipedia - Richmond Oak Grove Plantation"
+      },
+      {
+        "predicate": "used enslaved labor for agricultural production after 1749",
+        "object": "Richmond Oak Grove Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Richmond_Oak_Grove_Plantation",
+        "citationLabel": "Wikipedia - Richmond Oak Grove Plantation"
+      },
+      {
+        "predicate": "was owned by Patrick Mackay, who imported hundreds of enslaved Africans and smuggled them across the Savannah River",
+        "object": "Richmond Oak Grove Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Richmond_Oak_Grove_Plantation",
+        "citationLabel": "Wikipedia - Richmond Oak Grove Plantation"
+      },
+      {
+        "predicate": "produced rice, indigo, and silk using enslaved labor",
+        "object": "Richmond Oak Grove Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Richmond_Oak_Grove_Plantation",
+        "citationLabel": "Wikipedia - Richmond Oak Grove Plantation"
+      },
+      {
+        "predicate": "was awarded to General Anthony Wayne after confiscation from British loyalist Alexander Wright",
+        "object": "Richmond Oak Grove Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Richmond_Oak_Grove_Plantation",
+        "citationLabel": "Wikipedia - Richmond Oak Grove Plantation"
+      },
+      {
+        "predicate": "had documented slave quarters indicated by advertisements for runaway slaves by 1763",
+        "object": "Richmond Oak Grove Plantation",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Richmond_Oak_Grove_Plantation",
+        "citationLabel": "Wikipedia - Richmond Oak Grove Plantation"
+      }
+    ],
+    "historicalContext": "This plantation illustrates the institutionalization of slavery in Georgia after the 1749 reversal of the Trustees' ban, reflecting broader regional shifts toward racialized labor systems. Its development was enabled by cross-border slave trafficking between South Carolina and Georgia and depended on forced labor to exploit marshland for rice cultivation—a pattern common across the Lowcountry. The site’s later transfer to Revolutionary War general Anthony Wayne underscores how military service was rewarded with land built on enslaved labor."
+  },
+  {
+    "id": "plantation_smithonia_q7545552",
+    "kind": "place",
+    "displayName": "Smithonia",
+    "summary": "Smithonia, a plantation in Oglethorpe County, Georgia, expanded after 1866 under James Monroe Smith, who used convict leasing and debt slavery to exploit hundreds of African Americans, many formerly enslaved by him. The site exemplifies the post-emancipation shift from chattel slavery to coercive labor systems enforced by violence and state complicity.",
+    "eraBuckets": [
+      "1860s",
+      "1870s",
+      "1880s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "jim-crow",
+      "peonage",
+      "economic-justice",
+      "labor",
+      "criminal-justice",
+      "disparate-impact"
+    ],
+    "topicIds": [
+      "enslavement",
+      "jim-crow",
+      "peonage",
+      "economic-justice",
+      "labor",
+      "criminal-justice",
+      "disparate-impact"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "plantation",
+      "convict leasing",
+      "debt slavery",
+      "James Monroe Smith",
+      "Oglethorpe County"
+    ],
+    "jurisdictionLabel": "Comer, Georgia",
+    "locationPrecision": "site",
+    "locationLabel": "Historic plantation site near Comer, Oglethorpe County",
+    "lat": 34.00277778,
+    "lng": -83.17611111,
+    "claims": [
+      {
+        "predicate": "was built in",
+        "object": "1866",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Smithonia%2C_Georgia",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was founded and named by",
+        "object": "James Monroe Smith",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Smithonia%2C_Georgia",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "used convict and debt slaves for labor after the Civil War",
+        "object": "hundreds of African Americans, including formerly enslaved people and their descendants",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Smithonia%2C_Georgia",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was listed on the National Register of Historic Places",
+        "object": "June 21, 1984",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Smithonia%2C_Georgia",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "relied on deputy sheriffs and overseers to recapture and punish laborers who attempted to flee",
+        "object": "brutal punishments including whippings enforced by overseers and pursuit by dogs",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Smithonia%2C_Georgia",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "became the largest plantation in Georgia through the exploitation of forced labor",
+        "object": "post-Civil War expansion using convict and debt slavery",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Smithonia%2C_Georgia",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "After the Civil War, Georgia's Reconstruction government was overthrown through voter suppression and Klan violence, enabling planters like James Monroe Smith to exploit newly enacted convict leasing laws. Smith used this system to maintain a forced labor force, effectively continuing slavery under another name and reinforcing racial and economic subjugation in the rural South."
+  },
+  {
+    "id": "plantation_susina_plantation_q7649088",
+    "kind": "place",
+    "displayName": "Susina Plantation",
+    "summary": "Susina Plantation, originally Cedar Grove, was a large antebellum estate in Georgia where Harriet Blackshear oversaw 161 enslaved people by 1857 and produced 235 bales of cotton in 1860. The plantation exemplifies the scale of forced labor in the Deep South and later transitioned into a Northern industrialists' retreat after emancipation.",
+    "eraBuckets": [
+      "1840s",
+      "1850s",
+      "1860s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "land-ownership"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "land-ownership"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Susina Plantation",
+      "Cedar Grove",
+      "Harriet Blackshear",
+      "enslaved labor",
+      "cotton production"
+    ],
+    "jurisdictionLabel": "Beachton, Georgia",
+    "locationPrecision": "address",
+    "locationLabel": "West of Beachton on Meridian Road",
+    "lat": 30.7211,
+    "lng": -84.16846,
+    "claims": [
+      {
+        "predicate": "was known as",
+        "object": "Cedar Grove",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Susina_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was built in",
+        "object": "1841",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Susina_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was designed by architect",
+        "object": "John Wind",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Susina_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "had 161 enslaved people listed in probated will",
+        "object": "161",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Susina_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "produced 235 bales of cotton in 1860 through enslaved labor",
+        "object": "235 bales of cotton",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Susina_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is listed on the National Register of Historic Places",
+        "object": "NRHP reference No. 70000205",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/70000205",
+        "citationLabel": "NPS NRIS"
+      }
+    ],
+    "historicalContext": "Susina Plantation operated within the antebellum slave economy of Georgia, where large landholdings depended on the forced labor of enslaved Africans to produce cash crops like cotton and rice. Its history reflects the broader pattern of plantation consolidation, agricultural intensification, and postbellum transformation into elite leisure spaces after emancipation."
+  },
+  {
+    "id": "plantation_tarver_plantation_q38251686",
+    "kind": "place",
+    "displayName": "Tarver Plantation",
+    "summary": "Tarver Plantation, located in Baker County, Georgia, was established around 1850 by Henry Tarver, who enslaved 87 people on the 1,300-acre property. The plantation house, built in the Greek Revival style, is listed on the National Register of Historic Places for its historical and architectural significance.",
+    "eraBuckets": [
+      "1850s",
+      "1890s",
+      "1980s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "architecture",
+      "history",
+      "land-ownership"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "architecture",
+      "history",
+      "land-ownership"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "plantation",
+      "enslavement",
+      "Greek Revival",
+      "Baker County",
+      "National Register of Historic Places"
+    ],
+    "jurisdictionLabel": "Newton, Georgia",
+    "locationPrecision": "address",
+    "locationLabel": "Tarva Rd./Co. Rt. 122, north of Newton",
+    "lat": 31.424722,
+    "lng": -84.346667,
+    "claims": [
+      {
+        "predicate": "was built around",
+        "object": "c. 1850",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Tarver_Plantation",
+        "citationLabel": "Wikipedia - Tarver Plantation"
+      },
+      {
+        "predicate": "was owned by",
+        "object": "Henry Tarver",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Tarver_Plantation",
+        "citationLabel": "Wikipedia - Tarver Plantation"
+      },
+      {
+        "predicate": "enslaved 87 people in 1850",
+        "object": "87 enslaved individuals",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Tarver_Plantation",
+        "citationLabel": "Wikipedia - Tarver Plantation"
+      },
+      {
+        "predicate": "features Greek Revival architecture",
+        "object": "Greek Revival architectural style",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Tarver_Plantation",
+        "citationLabel": "Wikipedia - Tarver Plantation"
+      },
+      {
+        "predicate": "is listed on the National Register of Historic Places",
+        "object": "NRHP reference No. 89002037",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Tarver_Plantation",
+        "citationLabel": "Wikipedia - Tarver Plantation"
+      },
+      {
+        "predicate": "was added to the National Register of Historic Places",
+        "object": "November 27, 1989",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Tarver_Plantation",
+        "citationLabel": "Wikipedia - Tarver Plantation"
+      }
+    ],
+    "historicalContext": "Plantations like Tarver Plantation were central to the antebellum Southern economy, relying on the forced labor of enslaved Black people. The scale of enslavement—87 individuals in this case—reflects the systemic exploitation embedded in agricultural production and land ownership in the pre-Civil War South, particularly in Georgia's plantation belt."
+  },
+  {
+    "id": "plantation_teel_crawford_gaston_plantation_q107001923",
+    "kind": "place",
+    "displayName": "Teel–Crawford–Gaston Plantation",
+    "summary": "The Teel–Crawford–Gaston Plantation in Sumter County, Georgia, established c. 1836, was built and worked by enslaved African Americans. It includes a main house, outbuildings, farm fields, and an unmarked slave cemetery. The site reflects the transition from slavery to tenant farming and is recognized for its role in African American history.",
+    "eraBuckets": [
+      "1830s",
+      "1840s",
+      "1850s",
+      "1860s",
+      "1910s",
+      "1920s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "land-ownership",
+      "resistance",
+      "history"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "land-ownership",
+      "resistance",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "plantation",
+      "enslaved labor",
+      "slave cemetery",
+      "tenant farming",
+      "Greek Revival"
+    ],
+    "jurisdictionLabel": "Americus, Georgia",
+    "locationPrecision": "address",
+    "locationLabel": "2154 Georgia State Route 30 West",
+    "lat": 32.14444,
+    "lng": -84.39527,
+    "claims": [
+      {
+        "predicate": "was built using labor of enslaved African Americans",
+        "object": "Teel–Crawford–Gaston Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Teel%E2%80%93Crawford%E2%80%93Gaston_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "included a slave cemetery known through oral tradition",
+        "object": "Teel–Crawford–Gaston Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Teel%E2%80%93Crawford%E2%80%93Gaston_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is recognized for contribution to African American history",
+        "object": "Teel–Crawford–Gaston Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/04001188",
+        "citationLabel": "National Register of Historic Places"
+      },
+      {
+        "predicate": "transitioned from slave-based plantation to tenant farming after 1865",
+        "object": "Teel–Crawford–Gaston Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Teel%E2%80%93Crawford%E2%80%93Gaston_Plantation",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Plantations like Teel–Crawford–Gaston were central to the antebellum South's economy, built and operated through the forced labor of enslaved Black people. After emancipation, many such properties shifted to tenant farming and sharecropping systems that often perpetuated economic subjugation. The persistence of Black labor on this land through multiple regimes underscores its significance in understanding the continuity of racialized agricultural labor in the South."
+  },
+  {
+    "id": "plantation_bellfield_plantation_q106804794",
+    "kind": "place",
+    "displayName": "Bellfield Plantation",
+    "summary": "Bellfield Plantation, located in York County, Virginia, originated as a 1630 land grant to John West and became known as E.D. Plantation after Edward Digges acquired it in 1650. Using enslaved labor, it gained renown for producing high-quality tobacco. The site later passed through private ownership before the U.S. Navy acquired it in 1918, with portions eventually transferred to the National…",
+    "eraBuckets": [
+      "1630s",
+      "1650s",
+      "1700s",
+      "1800s",
+      "1910s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "land-ownership",
+      "history"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "land-ownership",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Bellfield Plantation",
+      "E.D. Plantation",
+      "York County Virginia",
+      "enslaved labor",
+      "tobacco production"
+    ],
+    "jurisdictionLabel": "York County, Virginia",
+    "locationPrecision": "site",
+    "locationLabel": "Former plantation site adjacent to the York River, near Colonial Parkway",
+    "lat": 37.27277778,
+    "lng": -76.57972222,
+    "claims": [
+      {
+        "predicate": "was established following a 1630 land grant to",
+        "object": "John West (governor)",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Bellfield_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was acquired by Edward Digges in",
+        "object": "1650",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Bellfield_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "used enslaved labor to produce luxury tobacco known as",
+        "object": "E.D. tobacco",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Bellfield_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was sold to the U.S. Navy in",
+        "object": "1918",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Bellfield_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "land was transferred to the National Park Service in the",
+        "object": "1930s",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Bellfield_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is associated with documented use of enslaved labor in tobacco agriculture during the 17th–19th centuries",
+        "object": "enslavement",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Bellfield_Plantation",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Bellfield Plantation exemplifies the colonial plantation economy in Virginia, rooted in land expropriation from Indigenous peoples and sustained by enslaved African labor. Its history reflects broader patterns of elite landholding, tobacco cultivation, and the transition of rural land into federal military and conservation use in the 20th century."
+  },
+  {
+    "id": "plantation_chatham_manor_q5087675",
+    "kind": "place",
+    "displayName": "Chatham Manor",
+    "summary": "Chatham Manor in Virginia was the site of a documented 1805 slave rebellion and a pivotal 1857 manumission case involving 93 enslaved people. The estate's history reflects broader struggles over freedom and racial control, later serving as a Union hospital during the Civil War. It is now part of a national military park.",
+    "eraBuckets": [
+      "1770s",
+      "1800s",
+      "1850s",
+      "1860s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "resistance",
+      "civil-war"
+    ],
+    "topicIds": [
+      "enslavement",
+      "resistance",
+      "civil-war"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Chatham Manor",
+      "slave rebellion",
+      "manumission",
+      "William Fitzhugh",
+      "Hannah Jones Coalter"
+    ],
+    "jurisdictionLabel": "Fredericksburg, Virginia",
+    "locationPrecision": "site",
+    "locationLabel": "Chatham Manor estate on the Rappahannock River",
+    "lat": 38.30883333,
+    "lng": -77.45536111,
+    "claims": [
+      {
+        "predicate": "was site of slave rebellion",
+        "object": "January 1805 uprising at Chatham Manor",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chatham_Manor",
+        "citationLabel": "Wikipedia: Chatham Manor"
+      },
+      {
+        "predicate": "involved in manumission legal struggle",
+        "object": "Hannah Jones Coalter's 1857 will freeing 93 enslaved people, contested after Dred Scott decision",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chatham_Manor",
+        "citationLabel": "Wikipedia: Chatham Manor"
+      },
+      {
+        "predicate": "constructed by enslaved labor",
+        "object": "main house built by enslaved workforce under William Fitzhugh",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chatham_Manor",
+        "citationLabel": "Wikipedia: Chatham Manor"
+      },
+      {
+        "predicate": "served as Union hospital",
+        "object": "used as major Union hospital during Civil War battles for Fredericksburg",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chatham_Manor",
+        "citationLabel": "Wikipedia: Chatham Manor"
+      },
+      {
+        "predicate": "owned by William Fitzhugh",
+        "object": "built and owned by William Fitzhugh starting in 1771",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chatham_Manor",
+        "citationLabel": "Wikipedia: Chatham Manor"
+      },
+      {
+        "predicate": "part of national park",
+        "object": "now part of Fredericksburg and Spotsylvania National Military Park",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chatham_Manor",
+        "citationLabel": "Wikipedia: Chatham Manor"
+      }
+    ],
+    "historicalContext": "Chatham Manor exemplifies the contradictions of early America: a symbol of elite power built by enslaved labor, it became a site of Black resistance and legal contest over freedom. The 1857 manumission attempt by Hannah Jones Coalter, blocked by Virginia's courts after Dred Scott, illustrates how state law actively suppressed Black autonomy even when enslavers sought to grant it."
+  },
+  {
+    "id": "plantation_leesylvania_q60749606",
+    "kind": "place",
+    "displayName": "Leesylvania",
+    "summary": "Leesylvania was an 18th-century plantation in Prince William County, Virginia, established by Henry Lee II around 1750. It relied on enslaved labor to cultivate tobacco and other crops, with records documenting a poisoning attempt by enslaved individuals in 1767. The site is tied to the Lee family, including Henry 'Light-Horse Harry' Lee and Charles Lee, and is now part of [[plantation_leesylvania_state_park_q6516491|Leesylvania State Park]].",
+    "eraBuckets": [
+      "1750s",
+      "1760s",
+      "1770s",
+      "1780s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "land-ownership",
+      "agriculture",
+      "history"
+    ],
+    "topicIds": [
+      "enslavement",
+      "land-ownership",
+      "agriculture",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Leesylvania",
+      "Henry Lee II",
+      "enslaved labor",
+      "tobacco plantation",
+      "Prince William County"
+    ],
+    "jurisdictionLabel": "Dumfries, Virginia",
+    "locationPrecision": "site",
+    "locationLabel": "Leesylvania State Park, along the Potomac River",
+    "lat": 38.5896077,
+    "lng": -77.2585091,
+    "claims": [
+      {
+        "predicate": "was founded around",
+        "object": "1750",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Leesylvania_(plantation)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was owned by",
+        "object": "Henry Lee II",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Leesylvania_(plantation)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "used enslaved labor",
+        "object": "55 enslaved people documented at owner's death in 1787",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Leesylvania_(plantation)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was site of",
+        "object": "an attempted poisoning of Lucy Grymes by enslaved individuals in 1767",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Leesylvania_(plantation)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "produced",
+        "object": "tobacco, corn, wheat, and dairy products",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Leesylvania_(plantation)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is located in",
+        "object": "Prince William County, Virginia",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/84003565",
+        "citationLabel": "NPS NRHP"
+      }
+    ],
+    "historicalContext": "Leesylvania exemplifies the plantation economy of colonial Virginia, where large landholdings operated through enslaved labor and produced cash crops like tobacco. Its history reflects broader patterns of land inheritance, political influence among planter elites, and the systemic exploitation of enslaved people, situating it within the structures of chattel slavery and agrarian capitalism in the American South."
+  },
+  {
+    "id": "plantation_leesylvania_state_park_q6516491",
+    "kind": "place",
+    "displayName": "Leesylvania State Park",
+    "summary": "Leesylvania State Park in Prince William County, Virginia, encompasses the site of a plantation where enslaved people labored under John Fairfax’s ownership in the 19th century. During the Civil War, a Confederate battery stationed here engaged Union naval forces on the Potomac River in 1861. The land was previously home to Henry Lee II, father of 'Light Horse Harry' Lee and grandfather of Robert…",
+    "eraBuckets": [
+      "1740s",
+      "1820s",
+      "1840s",
+      "1860s",
+      "1870s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "civil-war",
+      "military",
+      "resistance"
+    ],
+    "topicIds": [
+      "enslavement",
+      "civil-war",
+      "military",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "plantation",
+      "enslaved labor",
+      "Confederate battery",
+      "Lee family",
+      "Freestone Point"
+    ],
+    "jurisdictionLabel": "Dumfries, Virginia",
+    "locationPrecision": "park",
+    "locationLabel": "Leesylvania State Park",
+    "lat": 38.60777778,
+    "lng": -77.28083333,
+    "claims": [
+      {
+        "predicate": "was operated as a plantation using enslaved labor",
+        "object": "John Fairfax",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Leesylvania_State_Park",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "hosted a Confederate gun emplacement during the American Civil War",
+        "object": "Leesylvania State Park",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Leesylvania_State_Park",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "engaged naval vessels of the US Navy's Potomac Flotilla on September 25, 1861",
+        "object": "Freestone Point Confederate Battery",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Leesylvania_State_Park",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was the home of Henry Lee II, father of 'Light Horse Harry' Lee and grandfather of Robert E. Lee",
+        "object": "Leesylvania",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Leesylvania_State_Park",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is listed on the National Register of Historic Places as Leesylvania Archeological Site (44PW7)",
+        "object": "Leesylvania Archeological Site",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/84003565",
+        "citationLabel": "National Register of Historic Places"
+      },
+      {
+        "predicate": "contributed to the blockade of commercial shipping to Washington, D.C. during the first year of the Civil War",
+        "object": "Confederate Potomac batteries, including Leesylvania",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Leesylvania_State_Park",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Leesylvania reflects the entanglement of elite Virginia families, enslaved labor, and military strategy during the Civil War. Its use as a Confederate battery site underscores how plantations were not only economic engines of slavery but also strategic military positions, directly linking the landscape to the defense of a slaveholding society. The presence of the Leesylvania Archeological Site and burial grounds further ties the land to layered histories of Indigenous displacement, enslavement, and Civil War memory."
+  },
+  {
+    "id": "plantation_montpelier_q2469085",
+    "kind": "place",
+    "displayName": "Montpelier",
+    "summary": "Montpelier, the Virginia plantation of James Madison, encompasses 2,650 acres where over 100 enslaved people lived and labored. Archaeological discoveries and a 2017 exhibition, The Mere Distinction of Colour, document the lives of the enslaved community. Since 2022, descendants of those enslaved hold parity on the Montpelier Foundation’s board, marking a significant shift in stewardship and…",
+    "eraBuckets": [
+      "1760s",
+      "1790s",
+      "1800s",
+      "2010s",
+      "2020s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "civil-rights",
+      "desegregation",
+      "memory",
+      "reconstruction"
+    ],
+    "topicIds": [
+      "enslavement",
+      "civil-rights",
+      "desegregation",
+      "memory",
+      "reconstruction"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Montpelier",
+      "enslaved community",
+      "The Mere Distinction of Colour",
+      "Montpelier Descendants Committee",
+      "James Madison"
+    ],
+    "jurisdictionLabel": "Orange, Virginia",
+    "locationPrecision": "site",
+    "locationLabel": "Montpelier estate",
+    "lat": 38.21972222,
+    "lng": -78.16944444,
+    "claims": [
+      {
+        "predicate": "was site of",
+        "object": "enslavement",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Montpelier_(Orange%2C_Virginia)",
+        "citationLabel": "Wikipedia: Montpelier (Orange, Virginia)"
+      },
+      {
+        "predicate": "held",
+        "object": "over 100 enslaved people",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Montpelier_(Orange%2C_Virginia)",
+        "citationLabel": "Wikipedia: Montpelier (Orange, Virginia)"
+      },
+      {
+        "predicate": "revealed",
+        "object": "archaeological evidence of African-American life",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Montpelier_(Orange%2C_Virginia)",
+        "citationLabel": "Wikipedia: Montpelier (Orange, Virginia)"
+      },
+      {
+        "predicate": "opened",
+        "object": "The Mere Distinction of Colour slavery exhibition",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Montpelier_(Orange%2C_Virginia)",
+        "citationLabel": "Wikipedia: Montpelier (Orange, Virginia)"
+      },
+      {
+        "predicate": "achieved",
+        "object": "board parity with Montpelier Descendants Committee",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Montpelier_(Orange%2C_Virginia)",
+        "citationLabel": "Wikipedia: Montpelier (Orange, Virginia)"
+      },
+      {
+        "predicate": "was poisoned by",
+        "object": "three enslaved Africans",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Montpelier_(Orange%2C_Virginia)",
+        "citationLabel": "Wikipedia: Montpelier (Orange, Virginia)"
+      }
+    ],
+    "historicalContext": "Montpelier exemplifies the duality of American heritage: as a seat of Founding Era political power and a site of chattel slavery. Its 21st-century transformation—centered on acknowledging enslaved labor and including descendant voices—reflects broader national efforts to reconcile with systemic racism rooted in plantation economies and Jim Crow erasure."
+  },
+  {
+    "id": "plantation_oatlands_plantation_q7074493",
+    "kind": "place",
+    "displayName": "Oatlands Plantation",
+    "summary": "Oatlands Plantation in Leesburg, Virginia, established in 1798 by George Carter, relied on enslaved labor to operate its wheat farms, mills, and vineyards. By 1860, 133 enslaved people were held there, performing agricultural, domestic, and skilled trades. Now a historic house museum, it preserves the physical and social structures of a Virginia plantation economy.",
+    "eraBuckets": [
+      "1800s",
+      "1810s",
+      "1820s",
+      "1830s",
+      "1860s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "history",
+      "land-ownership"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "history",
+      "land-ownership"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "enslaved labor",
+      "Virginia plantation",
+      "George Carter",
+      "National Historic Landmark",
+      "antebellum agriculture"
+    ],
+    "jurisdictionLabel": "Leesburg, Virginia",
+    "locationPrecision": "site",
+    "locationLabel": "Oatlands Historic House and Gardens",
+    "lat": 39.04083333,
+    "lng": -77.61722222,
+    "claims": [
+      {
+        "predicate": "was established by",
+        "object": "George Carter",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Oatlands_Historic_House_%26_Gardens",
+        "citationLabel": "Wikipedia: Oatlands Historic House & Gardens"
+      },
+      {
+        "predicate": "began construction of mansion in",
+        "object": "1804",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Oatlands_Historic_House_%26_Gardens",
+        "citationLabel": "Wikipedia: Oatlands Historic House & Gardens"
+      },
+      {
+        "predicate": "used enslaved labor to sustain operations",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Oatlands_Historic_House_%26_Gardens",
+        "citationLabel": "Wikipedia: Oatlands Historic House & Gardens"
+      },
+      {
+        "predicate": "held 133 enslaved people by",
+        "object": "1860",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Oatlands_Historic_House_%26_Gardens",
+        "citationLabel": "Wikipedia: Oatlands Historic House & Gardens"
+      },
+      {
+        "predicate": "is listed on",
+        "object": "National Register of Historic Places",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Oatlands_Historic_House_%26_Gardens",
+        "citationLabel": "Wikipedia: Oatlands Historic House & Gardens"
+      },
+      {
+        "predicate": "is operated by",
+        "object": "National Trust for Historic Preservation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Oatlands_Historic_House_%26_Gardens",
+        "citationLabel": "Wikipedia: Oatlands Historic House & Gardens"
+      }
+    ],
+    "historicalContext": "Oatlands exemplifies the plantation system in the antebellum South, where enslaved labor was central to agricultural and economic production. Its expansion and operations were enabled by the intergenerational exploitation of enslaved people, reflecting broader patterns of chattel slavery in Virginia that underpinned wealth accumulation and land use in the region."
+  },
+  {
+    "id": "plantation_reynolds_homestead_q7319648",
+    "kind": "place",
+    "displayName": "Reynolds Homestead",
+    "summary": "Reynolds Homestead, a former plantation in Critz, Virginia, was built in 1850 and worked by enslaved labor until emancipation in 1863, when 88 people were freed. The birthplace of R.J. Reynolds, founder of the R.J. Reynolds Tobacco Company, the site includes both the family home and a documented slave cemetery. Now managed by Virginia Tech, it serves as a cultural and educational center.",
+    "eraBuckets": [
+      "1810s",
+      "1850s",
+      "1860s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "emancipation",
+      "history",
+      "memory"
+    ],
+    "topicIds": [
+      "enslavement",
+      "emancipation",
+      "history",
+      "memory"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reynolds Homestead",
+      "Critz Virginia",
+      "R.J. Reynolds",
+      "slave cemetery",
+      "plantation"
+    ],
+    "jurisdictionLabel": "Critz, Virginia",
+    "locationPrecision": "site",
+    "locationLabel": "Reynolds Homestead estate, north of Critz on VA 798",
+    "lat": 36.64416667,
+    "lng": -80.14861111,
+    "claims": [
+      {
+        "predicate": "was worked by enslaved people",
+        "object": "enslaved labor",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Reynolds_Homestead",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "liberated 88 people from enslavement",
+        "object": "88 people",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Reynolds_Homestead",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is the birthplace of",
+        "object": "R.J. Reynolds",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Reynolds_Homestead",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "includes a slave cemetery",
+        "object": "slave cemetery",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Reynolds_Homestead",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was designated a National Historic Landmark",
+        "object": "National Historic Landmark",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/71000987",
+        "citationLabel": "NPS"
+      }
+    ],
+    "historicalContext": "The Reynolds Homestead exemplifies the entanglement of Southern agriculture, slavery, and industrial capitalism. Enslaved labor supported the plantation economy that enabled R.J. Reynolds’ later tobacco empire, illustrating how postbellum wealth was often rooted in antebellum enslavement. Its preservation includes recognition of both the Reynolds family and the enslaved community, reflecting broader efforts to interpret plantation landscapes more fully."
+  },
+  {
+    "id": "plantation_edmund_ruffin_plantation_q5339801",
+    "kind": "place",
+    "displayName": "Edmund Ruffin Plantation",
+    "summary": "Marlbourne, the Edmund Ruffin Plantation in Hanover County, Virginia, was the home of a leading pro-slavery intellectual and secessionist who promoted soil science and fired on Fort Sumter in 1861. Buried on the grounds, Ruffin's legacy is tied to the defense of slavery and the Confederacy, making the site a significant artifact of the antebellum South's ideological foundations.",
+    "eraBuckets": [
+      "1840s",
+      "1850s",
+      "1860s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "civil-war"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "civil-war"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Edmund Ruffin",
+      "Marlbourne",
+      "Hanover County",
+      "Fort Sumter",
+      "soil science"
+    ],
+    "jurisdictionLabel": "Hanover County, Virginia",
+    "locationPrecision": "site",
+    "locationLabel": "Marlbourne plantation site",
+    "lat": 37.65420278,
+    "lng": -77.22247778,
+    "claims": [
+      {
+        "predicate": "was the residence of",
+        "object": "Edmund Ruffin",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Edmund_Ruffin_Plantation",
+        "citationLabel": "Edmund Ruffin Plantation - Wikipedia"
+      },
+      {
+        "predicate": "is the burial site of",
+        "object": "Edmund Ruffin",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Edmund_Ruffin_Plantation",
+        "citationLabel": "Edmund Ruffin Plantation - Wikipedia"
+      },
+      {
+        "predicate": "was associated with",
+        "object": "promotion of slavery through intellectual defense",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Edmund_Ruffin_Plantation",
+        "citationLabel": "Edmund Ruffin Plantation - Wikipedia"
+      },
+      {
+        "predicate": "was the site of",
+        "object": "agricultural experimentation involving enslaved labor",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Edmund_Ruffin_Plantation",
+        "citationLabel": "Edmund Ruffin Plantation - Wikipedia"
+      },
+      {
+        "predicate": "was owned by",
+        "object": "a leading secessionist who fired on Fort Sumter",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Edmund_Ruffin_Plantation",
+        "citationLabel": "Edmund Ruffin Plantation - Wikipedia"
+      },
+      {
+        "predicate": "is significant for",
+        "object": "its role in the intellectual justification of slavery in the antebellum South",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Edmund_Ruffin_Plantation",
+        "citationLabel": "Edmund Ruffin Plantation - Wikipedia"
+      }
+    ],
+    "historicalContext": "The plantation exemplifies how elite Southern intellectuals used agricultural reform to justify and sustain slavery, framing it as a moral and scientific enterprise. Ruffin's role in promoting secession and his symbolic act at Fort Sumter connect this site to broader national conflicts over enslavement and states' rights."
+  },
+  {
+    "id": "plantation_towlston_grange_q7829870",
+    "kind": "place",
+    "displayName": "Towlston Grange",
+    "summary": "Towlston Grange, an 18th-century plantation in Great Falls, Virginia, was owned by members of the Fairfax family and hosted George Washington. William Fairfax's 1757 will explicitly bequeathed enslaved people—including Pipero, Punch, Adam, and others—along with the land to his son Bryan, documenting its role in the system of enslavement.",
+    "eraBuckets": [
+      "1750s",
+      "1760s",
+      "1770s",
+      "1780s",
+      "1790s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "land-ownership",
+      "property-ownership",
+      "history",
+      "great-migration"
+    ],
+    "topicIds": [
+      "enslavement",
+      "land-ownership",
+      "property-ownership",
+      "history",
+      "great-migration"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Towlston Grange",
+      "Fairfax family",
+      "enslaved people Virginia",
+      "George Washington plantation",
+      "18th-century slavery"
+    ],
+    "jurisdictionLabel": "Great Falls, Virginia",
+    "locationPrecision": "address",
+    "locationLabel": "1213 Towlston Road",
+    "lat": 38.95638889,
+    "lng": -77.26055556,
+    "claims": [
+      {
+        "predicate": "was owned by William Fairfax",
+        "object": "William Fairfax",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Towlston_Grange",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was inherited by Bryan Fairfax",
+        "object": "Bryan Fairfax",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Towlston_Grange",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "included bequest of enslaved people in will",
+        "object": "Pipero, Punch, Adam, Old Sarah, Betty, Omah, Scipio, Sarah, Dolly, and Jack",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Towlston_Grange",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "hosted George and Martha Washington as godparents",
+        "object": "Ferdinando Fairfax baptism, March 4, 1767",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Towlston_Grange",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "had 18 enslaved people recorded in 1782",
+        "object": "1782 Virginia census",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Towlston_Grange",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Towlston Grange exemplifies the plantation economy of colonial Virginia, where elite families like the Fairfaxes accumulated wealth through enslaved labor. Its documented transfer of enslaved people by name in wills reflects the legal and familial mechanisms that sustained hereditary enslavement in the Chesapeake region."
+  },
+  {
+    "id": "plantation_arlington_antebellum_home_gardens_q4792278",
+    "kind": "place",
+    "displayName": "Arlington Antebellum Home & Gardens",
+    "summary": "Arlington Antebellum Home & Gardens in Birmingham, Alabama, built between 1845 and 1850 by enslaved laborers for Circuit Court Judge William S. Mudd, is one of the few surviving antebellum structures in the city. Now a museum, it interprets domestic life and architecture of the pre-Civil War South, including the central role of enslaved workers in constructing and maintaining such estates.",
+    "eraBuckets": [
+      "1840s",
+      "1850s",
+      "1860s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "architecture",
+      "civil-war",
+      "history"
+    ],
+    "topicIds": [
+      "enslavement",
+      "architecture",
+      "civil-war",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "antebellum home",
+      "enslaved labor",
+      "Greek Revival",
+      "Birmingham AL",
+      "National Register"
+    ],
+    "jurisdictionLabel": "Birmingham, AL",
+    "locationPrecision": "address",
+    "locationLabel": "331 Cotton Ave., SW, Birmingham, Alabama",
+    "lat": 33.49972222,
+    "lng": -86.83888889,
+    "claims": [
+      {
+        "predicate": "was constructed by",
+        "object": "enslaved laborers",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Arlington_Antebellum_Home_%26_Gardens",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was built between",
+        "object": "1845 and 1850",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Arlington_Antebellum_Home_%26_Gardens",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was owned by",
+        "object": "William S. Mudd",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Arlington_Antebellum_Home_%26_Gardens",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was used as",
+        "object": "a staging point for Union troops during Wilson's Raid in 1865",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Arlington_Antebellum_Home_%26_Gardens",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is listed on",
+        "object": "the National Register of Historic Places",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/70000103",
+        "citationLabel": "NRHP"
+      },
+      {
+        "predicate": "features",
+        "object": "antebellum-era Greek Revival architecture",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Arlington_Antebellum_Home_%26_Gardens",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Arlington reflects the expansion of slaveholding society into Alabama during the antebellum period, even in areas not dominated by plantation agriculture. Its construction by enslaved laborers for a prominent judge underscores the integration of slavery into legal and civic institutions. The site's later use by Union troops during Wilson's Raid connects it to military campaigns targeting Confederate infrastructure, including institutions like the University of Alabama that supported the war effort."
+  },
+  {
+    "id": "plantation_bass_perry_house_q30623840",
+    "kind": "place",
+    "displayName": "Bass-Perry House",
+    "summary": "The Bass-Perry House in Seale, Alabama, built between 1840 and 1844, was a cotton plantation dependent on the forced labor of enslaved people. Owned by Hartwell Bass, it reflects the antebellum plantation economy and remains listed on the National Register of Historic Places since 1976.",
+    "eraBuckets": [
+      "1840s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "history"
+    ],
+    "topicIds": [
+      "enslavement",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "enslaved labor",
+      "cotton plantation",
+      "Greek Revival",
+      "Seale Alabama",
+      "NRHP"
+    ],
+    "jurisdictionLabel": "Seale, Alabama",
+    "locationPrecision": "site",
+    "locationLabel": "Bass-Perry House site",
+    "lat": 32.34611111,
+    "lng": -85.1325,
+    "claims": [
+      {
+        "predicate": "was built between",
+        "object": "1840 and 1844",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Bass%E2%80%93Perry_House",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "used forced labor of enslaved people to grow",
+        "object": "cotton",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Bass%E2%80%93Perry_House",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was built for",
+        "object": "Hartwell Bass",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Bass%E2%80%93Perry_House",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is listed on",
+        "object": "National Register of Historic Places",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Bass%E2%80%93Perry_House",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was designed in architectural style",
+        "object": "Greek Revival",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Bass%E2%80%93Perry_House",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Plantations like the Bass-Perry House were central to the Southern economy in the 19th century, built on the exploitation of enslaved African Americans for cotton production. Their legacies are tied to the history of racial oppression, land ownership disparities, and the enduring impact of slavery on American society."
+  },
+  {
+    "id": "plantation_belvoir_q4884921",
+    "kind": "place",
+    "displayName": "Belvoir",
+    "summary": "[[plantation_belvoir_q816286|Belvoir]] was a colonial Virginia plantation established in the 1730s by William Fairfax on 2,200 acres in present-day Fort [[plantation_belvoir_q816286|Belvoir]], Virginia. Operated with the forced labor of enslaved people, it served as a seat of elite planter power and was linked to key figures in early American history, including George Washington, who surveyed the…",
+    "eraBuckets": [
+      "1730s",
+      "1740s",
+      "1750s",
+      "1770s",
+      "1780s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "land-ownership",
+      "history"
+    ],
+    "topicIds": [
+      "enslavement",
+      "land-ownership",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Belvoir plantation",
+      "William Fairfax",
+      "enslaved labor",
+      "Fort Belvoir",
+      "colonial Virginia"
+    ],
+    "jurisdictionLabel": "Fort Belvoir, Virginia",
+    "locationPrecision": "site",
+    "locationLabel": "Belvoir Mansion Ruins and the Fairfax Grave",
+    "lat": 38.6792,
+    "lng": -77.1293,
+    "claims": [
+      {
+        "predicate": "was operated using the forced labor of enslaved people",
+        "object": "enslaved people",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Belvoir_(plantation)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was the estate of William Fairfax",
+        "object": "William Fairfax",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Belvoir_(plantation)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was built in 1736 and completed in 1741",
+        "object": "1741",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Belvoir_(plantation)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is the site of documented enslaved labor in colonial Virginia",
+        "object": "enslaved labor",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Belvoir_(plantation)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was listed on the National Register of Historic Places in 1973",
+        "object": "1973",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Belvoir_(plantation)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "hosted George Washington, who surveyed land there in 1752",
+        "object": "George Washington",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Belvoir_(plantation)",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Belvoir exemplifies the plantation economy of colonial Virginia, where large estates relied on enslaved African labor to generate wealth and social status for elite families. Its operation reflects the entrenched systems of enslavement and land concentration that shaped the Chesapeake region’s development and sustained racial hierarchies through the antebellum period."
+  },
+  {
+    "id": "plantation_faunsdale_plantation_q5438235",
+    "kind": "place",
+    "displayName": "Faunsdale Plantation",
+    "summary": "Faunsdale Plantation in Marengo County, Alabama, was a large cotton plantation that enslaved up to 186 African Americans by 1864. Unusually detailed records document the enslaved population’s surnames and deaths from disease, while surviving slave cabins represent rare physical remnants of antebellum labor systems in the state.",
+    "eraBuckets": [
+      "1830s",
+      "1840s",
+      "1850s",
+      "1860s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "genealogy",
+      "resistance",
+      "memory",
+      "preservation"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "genealogy",
+      "resistance",
+      "memory",
+      "preservation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Faunsdale Plantation",
+      "enslaved families",
+      "slave cabins",
+      "Marengo County",
+      "Black Belt"
+    ],
+    "jurisdictionLabel": "Faunsdale, Alabama",
+    "locationPrecision": "site",
+    "locationLabel": "near Faunsdale, Alabama",
+    "lat": 32.43535,
+    "lng": -87.60257778,
+    "claims": [
+      {
+        "predicate": "enslaved up to 186 African Americans by 1864",
+        "object": "186",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Faunsdale_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "preserved slave cabins dating from 1860",
+        "object": "slave cabins",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Faunsdale_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "kept detailed records including surnames of enslaved people",
+        "object": "Barron, Brown, Francis, Harison, Iredell, Mutton, Nathan, Newbern, Paine, Parsons, Richmond, Washington, and Wills",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Faunsdale_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "recorded deaths of 14 enslaved people from infectious diseases by end of 1864",
+        "object": "typhoid fever, measles",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Faunsdale_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is listed on the National Register of Historic Places",
+        "object": "NRHP reference No. 93000602",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Faunsdale_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was developed using enslaved African American labor to clear land after Treaty of Fort St. Stephens (1816)",
+        "object": "enslaved labor for land development",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Faunsdale_Plantation",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Faunsdale Plantation exemplifies the expansion of plantation slavery into Alabama’s Black Belt after Native land cessions. Its reliance on enslaved labor to clear and cultivate land reflects broader patterns of racialized agricultural economies in the 19th-century South, sustained by intergenerational violence and systemic exploitation."
+  },
+  {
+    "id": "plantation_forks_of_cypress_q5469836",
+    "kind": "place",
+    "displayName": "Forks of Cypress",
+    "summary": "The Forks of Cypress was a slave-labor cotton plantation in Lauderdale County, Alabama, established in 1830 by James Jackson. It enslaved ancestors of writer Alex Haley and served as a setting in his book *Queen: The Story of an American Family*. Though the main house burned in 1966, the site remains state-owned with surviving structural remnants.",
+    "eraBuckets": [
+      "1830s",
+      "1840s",
+      "1860s",
+      "1960s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "genealogy",
+      "civil-war",
+      "black-architects"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "genealogy",
+      "civil-war",
+      "black-architects"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "slave-labor cotton farm",
+      "James Jackson",
+      "Alex Haley",
+      "Greek Revival architecture",
+      "Lauderdale County"
+    ],
+    "jurisdictionLabel": "Florence, Alabama",
+    "locationPrecision": "site",
+    "locationLabel": "Florence ; Jackson Rd., roughly 1.5 mi. NW of jct of Cox Creek Pkwy and Jackson Rd.",
+    "lat": 34.845,
+    "lng": -87.72555556,
+    "claims": [
+      {
+        "predicate": "was operated as a slave-labor cotton farm",
+        "object": "The Forks of Cypress",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/The_Forks_of_Cypress",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "enslaved ancestors of writer Alex Haley",
+        "object": "The Forks of Cypress",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/The_Forks_of_Cypress",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served as a setting in Alex Haley's book Queen: The Story of an American Family",
+        "object": "The Forks of Cypress",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/The_Forks_of_Cypress",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was designed by architect William Nichols",
+        "object": "The Forks of Cypress",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/The_Forks_of_Cypress",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was placed on the National Register of Historic Places",
+        "object": "The Forks of Cypress",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/The_Forks_of_Cypress",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was used as a base camp by Union forces during the American Civil War",
+        "object": "The Forks of Cypress",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/The_Forks_of_Cypress",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Plantations like The Forks of Cypress were central to the expansion of cotton cultivation in the Deep South during the early 19th century, enabled by the forced migration and labor of enslaved Black people. Its operation reflects the broader system of racial capitalism and land exploitation underpinned by state-sanctioned slavery in Alabama, a slave state admitted in 1819."
+  },
+  {
+    "id": "plantation_rocky_hill_castle_q7355807",
+    "kind": "place",
+    "displayName": "Rocky Hill Castle",
+    "summary": "Rocky Hill Castle was a plantation in Lawrence County, Alabama, established in the 1820s by James Edmonds Saunders, an enslaver and attorney. The main house, built between 1858 and 1861, included quarters for enslaved people and served as a Confederate hospital during the Civil War. The site reflects the architectural grandeur and human exploitation central to Alabama’s plantation economy.",
+    "eraBuckets": [
+      "1820s",
+      "1850s",
+      "1860s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "architecture",
+      "civil-war",
+      "segregation"
+    ],
+    "topicIds": [
+      "enslavement",
+      "architecture",
+      "civil-war",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "plantation",
+      "enslavement",
+      "Greek Revival",
+      "Confederate hospital",
+      "Lawrence County"
+    ],
+    "jurisdictionLabel": "Courtland, Alabama",
+    "locationPrecision": "site",
+    "locationLabel": "State Highway 20, Courtland, Lawrence County, AL",
+    "lat": 34.6834905,
+    "lng": -87.3643593,
+    "claims": [
+      {
+        "predicate": "was located in",
+        "object": "Courtland, Alabama",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Rocky_Hill_Castle",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was founded by",
+        "object": "James Edmonds Saunders",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Rocky_Hill_Castle",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was built between",
+        "object": "1858 and 1861",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Rocky_Hill_Castle",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was used as a Confederate hospital during the American Civil War",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Rocky_Hill_Castle",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "included housing for enslaved people",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Rocky_Hill_Castle",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was part of the plantation economy that relied on enslaved labor",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Rocky_Hill_Castle",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Plantations like Rocky Hill Castle were foundational to the antebellum Southern economy, relying on enslaved labor to produce cash crops. Their operation reinforced racial caste systems, and their legacies persist in regional memory and landscape. This site exemplifies how plantation architecture monumentalized white wealth while obscuring the forced labor that sustained it."
+  }
+]
