@@ -12,7 +12,7 @@ import {
 } from '@repo/domain';
 import { BOOKSHOP_AFFILIATE_ID } from '@repo/config/identity';
 
-export const BANNED_BOOKS_SEED_VERSION = '2026-07-21.4';
+export const BANNED_BOOKS_SEED_VERSION = '2026-07-21.5';
 
 function seedPurchaseLinks(isbn13: string) {
   return buildIsbnPurchaseLinks(isbn13, { bookshopAffiliateId: BOOKSHOP_AFFILIATE_ID });
@@ -965,6 +965,76 @@ const RAW_BOOKS: BannedBookRecord[] = [
     citations: [{ label: "PEN America Index of School Book Bans 2023–2024", href: "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/" }, { label: "CBS News — Florida Escambia County book ban lawsuit context", href: "https://www.cbsnews.com/news/florida-escambia-county-sued-book-ban-penguin-random-house/" }, { label: "PEN America v. Escambia County School District", href: "https://pen.org/pen-america-v-escambia-county/" }],
     purchaseLinks: seedPurchaseLinks('9781250170972'),
     provenance: provenance("PEN America Index of School Book Bans; PEN America v. Escambia County litigation", "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/", 'bb-book-children-of-blood-and-bone', "Children of Blood and Bone"),
+  },
+  {
+    id: 'bb-book-fallen-angels',
+    slug: 'fallen-angels',
+    title: "Fallen Angels",
+    authors: [{ name: "Walter Dean Myers", role: 'author' }],
+    identifiers: [{ system: 'isbn-13', value: '9780545055765' }],
+    description:
+      "Richie Perry, a Harlem teenager, lands in Vietnam after his college plans collapse. Myers documents combat's randomness, boredom between firefights, and the racial tensions inside a segregated-era military. Winner of the Coretta Scott King Award.",
+    publishedDate: '1988',
+    challenges: [{ state: 'CA', jurisdictionLabel: "Laton Unified School District", challengeYear: 1999, status: 'reported', citation: { label: "Timeline entry for 1999: Fallen Angels — ALA Intellectual Freedom Blog", href: "https://www.oif.ala.org/timeline-entry-for-1999-fallen-angels/", publisher: "American Library Association", publishedAt: "2012" } }, { state: 'MI', jurisdictionLabel: "Livonia Public Schools", challengeYear: 1999, status: 'reported', citation: { label: "Timeline entry for 1999: Fallen Angels — ALA Intellectual Freedom Blog", href: "https://www.oif.ala.org/timeline-entry-for-1999-fallen-angels/", publisher: "American Library Association", publishedAt: "2012" } }],
+    citations: [{ label: "Fallen Angels — ALA Top 100 Most Challenged Books lists", href: "https://www.ala.org/bbooks/frequentlychallengedbooks/top10", publisher: "American Library Association" }, { label: "Fallen Angels (Myers novel) — Wikipedia", href: "https://en.wikipedia.org/wiki/Fallen_Angels_(Myers_novel)", publisher: "Wikipedia" }, { label: "Fallen Angels — Open Library edition record", href: "https://openlibrary.org/books/OL35350623M/Fallen_angels", publisher: "Open Library" }],
+    purchaseLinks: seedPurchaseLinks('9780545055765'),
+    provenance: provenance("American Library Association Office for Intellectual Freedom", "https://www.oif.ala.org/timeline-entry-for-1999-fallen-angels/", 'bb-book-fallen-angels', "Fallen Angels"),
+  },
+  {
+    id: 'bb-book-hoops',
+    slug: 'hoops',
+    title: "Hoops",
+    authors: [{ name: "Walter Dean Myers", role: 'author' }],
+    identifiers: [{ system: 'isbn-13', value: '9780440938842' }],
+    description:
+      "Lonnie Jackson, a Harlem high-school basketball standout, navigates a city summer league where coaches, scouts, and gamblers press on his future. Myers writes the pressures on Black youth with the same documentary eye he brought to war and prison.",
+    publishedDate: '1981',
+    challenges: [{ state: 'IA', jurisdictionLabel: "Council Bluffs Community School District", challengeYear: 2009, status: 'reported', citation: { label: "'Hoops' Challenged — National Coalition Against Censorship", href: "https://ncac.org/news/blog/hoops-challenged", publisher: "National Coalition Against Censorship", publishedAt: "2009" } }],
+    citations: [{ label: "Hoops — ALA diverse-content challenged-books list", href: "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics", publisher: "American Library Association" }, { label: "Walter Dean Myers Talks Book-Banning — NCAC", href: "https://ncac.org/news/blog/walter-dean-myers-talks-book-banning-writing-for-troublemakers", publisher: "National Coalition Against Censorship" }, { label: "Hoops — Open Library edition record", href: "https://openlibrary.org/books/OL7523559M/Hoops", publisher: "Open Library" }],
+    purchaseLinks: seedPurchaseLinks('9780440938842'),
+    provenance: provenance("National Coalition Against Censorship", "https://ncac.org/news/blog/hoops-challenged", 'bb-book-hoops', "Hoops"),
+  },
+  {
+    id: 'bb-book-roll-of-thunder-hear-my-cry',
+    slug: 'roll-of-thunder-hear-my-cry',
+    title: "Roll of Thunder, Hear My Cry",
+    authors: [{ name: "Mildred D. Taylor", role: 'author' }],
+    identifiers: [{ system: 'isbn-13', value: '9780803774735' }],
+    description:
+      "Cassie Logan and her Mississippi family hold their land during the Depression as night riders, boycotts, and school segregation close in. Taylor drew on family stories; the novel won the 1977 Newbery Medal.",
+    publishedDate: '1976',
+    challenges: [{ state: 'FL', jurisdictionLabel: "Palm Beach County Public Schools", schoolYear: "2022-2023", challengeYear: 2022, status: 'reported', citation: { label: "Roll of Thunder, Hear My Cry — PEN America ban index summary", href: "https://www.banned-books.org/books/roll-of-thunder-hear-my-cry", publisher: "Banned Books", publishedAt: "2025" } }],
+    citations: [{ label: "Roll of Thunder, Hear My Cry — ALA Top 10 Most Challenged Books of 2023", href: "https://www.ala.org/bbooks/frequentlychallengedbooks/top10", publisher: "American Library Association", publishedAt: "2024" }, { label: "Banned Books Week 2013: Mildred Taylor — Ohioana Library", href: "https://www.ohioana.org/banned-books-week-2013-mildred-taylor/", publisher: "Ohioana Library Association", publishedAt: "2013" }, { label: "Roll of Thunder, Hear My Cry — Banned Books Week (Gonzaga University)", href: "https://researchguides.gonzaga.edu/BannedBooksWeek/RollOfThunderHearMyCry", publisher: "Gonzaga University Libraries" }],
+    purchaseLinks: seedPurchaseLinks('9780803774735'),
+    provenance: provenance("American Library Association Office for Intellectual Freedom", "https://www.ala.org/bbooks/frequentlychallengedbooks/top10", 'bb-book-roll-of-thunder-hear-my-cry', "Roll of Thunder, Hear My Cry"),
+  },
+  {
+    id: 'bb-book-in-love-and-trouble',
+    slug: 'in-love-and-trouble',
+    title: "In Love and Trouble: Stories of Black Women",
+    authors: [{ name: "Alice Walker", role: 'author' }],
+    identifiers: [{ system: 'isbn-13', value: '9780156028639' }],
+    description:
+      "Thirteen stories—including \"Roselily\" and \"Am I Blue?\"—trace rural and urban Black women's desire, grief, and resistance across the South. Walker published the collection three years before The Color Purple.",
+    publishedDate: '1973',
+    challenges: [{ state: 'CA', jurisdictionLabel: "California Learning Assessment System (statewide exam)", challengeYear: 1994, status: 'reported', citation: { label: "State Yanks Academic Test Question, Sparks Outcry — Los Angeles Times", href: "https://www.latimes.com/archives/la-xpm-1994-02-26-mn-27357-story.html", publisher: "Los Angeles Times", publishedAt: "1994-02-26" } }],
+    citations: [{ label: "Stories Deleted From Tests to Be Reinstated — Los Angeles Times", href: "https://www.latimes.com/archives/la-xpm-1994-03-12-mn-33016-story.html", publisher: "Los Angeles Times", publishedAt: "1994-03-12" }, { label: "Alice Walker: Writing What's Right — Guernica", href: "https://www.guernicamag.com/alice-walker-writing-whats-right/", publisher: "Guernica", publishedAt: "2012" }, { label: "In Love & Trouble — Open Library edition record", href: "https://openlibrary.org/books/OL5415759M/In_love_trouble", publisher: "Open Library" }],
+    purchaseLinks: seedPurchaseLinks('9780156028639'),
+    provenance: provenance("Los Angeles Times reporting on California state testing controversy", "https://www.latimes.com/archives/la-xpm-1994-02-26-mn-27357-story.html", 'bb-book-in-love-and-trouble', "In Love and Trouble: Stories of Black Women"),
+  },
+  {
+    id: 'bb-book-best-short-stories-by-black-writers',
+    slug: 'best-short-stories-by-black-writers',
+    title: "The Best Short Stories by Black Writers",
+    authors: [{ name: "Langston Hughes", role: 'author' }],
+    identifiers: [{ system: 'isbn-13', value: '9780316380317' }],
+    description:
+      "Hughes edited this landmark anthology—first published as The Best Short Stories by Negro Writers—collecting work from 1899 to 1967 by writers including Baldwin, Hurston, and Wright. It remains a syllabus touchstone for short-form Black literary history.",
+    publishedDate: '1967',
+    challenges: [{ state: 'NY', jurisdictionLabel: "Island Trees Union Free School District", challengeYear: 1975, status: 'reported', citation: { label: "Island Trees Union Free School District v. Pico (1982) — Encyclopedia.com", href: "https://www.encyclopedia.com/law/legal-and-political-magazines/island-trees-union-free-school-district-board-education-v-pico-1982", publisher: "Encyclopedia.com" } }],
+    citations: [{ label: "2025 Banned Books Read-Out — Midwest Writing Center (Pico case context)", href: "https://www.mwcqc.org/events/banned-books-read-out-2025/", publisher: "Midwest Writing Center", publishedAt: "2025" }, { label: "The Best Short Stories by Black Writers — Hachette Book Group catalog", href: "https://www.hachettebookgroup.com/titles/langston-hughes/the-best-short-stories-by-black-writers/9780316380317/", publisher: "Hachette Book Group" }, { label: "The Best Short Stories by Black Writers — Open Library edition record", href: "https://openlibrary.org/books/OL21268870M/The_Best_short_stories_by_black_writers", publisher: "Open Library" }],
+    purchaseLinks: seedPurchaseLinks('9780316380317'),
+    provenance: provenance("Board of Education v. Pico (1982) censorship record", "https://www.encyclopedia.com/law/legal-and-political-magazines/island-trees-union-free-school-district-board-education-v-pico-1982", 'bb-book-best-short-stories-by-black-writers', "The Best Short Stories by Black Writers"),
   },
 ];
 
