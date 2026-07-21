@@ -13,7 +13,7 @@ const SNAPSHOT = getBannedBooksListingSnapshot();
 
 test('buildBooksBrowseViewModel returns all seed entries by default', () => {
   const view = buildBooksBrowseViewModel(SNAPSHOT, {});
-  assert.equal(view.totalMatched, 10);
+  assert.equal(view.totalMatched, 40);
   assert.equal(view.state, 'all');
   assert.equal(view.author, 'all');
 });
@@ -64,7 +64,7 @@ test('browse and detail expose validated USPS state names for challenge lists', 
 
 test('buildBooksBrowseViewModel filters by author', () => {
   const view = buildBooksBrowseViewModel(SNAPSHOT, { author: 'Toni Morrison' });
-  assert.equal(view.totalMatched, 2);
+  assert.equal(view.totalMatched, 4);
   for (const item of view.items) {
     assert.equal(item.authorNames, 'Toni Morrison');
   }

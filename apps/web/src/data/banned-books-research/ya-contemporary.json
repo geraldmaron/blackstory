@@ -1,0 +1,299 @@
+[
+  {
+    "title": "Brown Girl Dreaming",
+    "slug": "brown-girl-dreaming",
+    "authors": [{ "name": "Jacqueline Woodson", "role": "author" }],
+    "isbn13": "9780399252518",
+    "publishedDate": "2014",
+    "description": "Woodson’s National Book Award–winning memoir in verse traces her childhood across Ohio, South Carolina, and Brooklyn amid the civil rights movement. PEN America documents school bans in Florida, Texas, Utah, and other states.",
+    "challenges": [
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        }
+      },
+      {
+        "state": "TX",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        }
+      },
+      {
+        "state": "UT",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "PEN America Index of School Book Bans 2022–2023",
+        "href": "https://pen.org/book-bans/2023-banned-book-list/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "PEN America Book Ban Index Data",
+        "href": "https://pen.org/book-bans/pen-america-book-ban-index-data/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "The number of book titles that people tried to ban rose by 65% last year",
+        "href": "https://www.npr.org/2024/03/14/1238647724/the-number-of-book-titles-that-people-tried-to-ban-rose-by-65-last-year",
+        "publisher": "NPR",
+        "publishedAt": "2024-03-14"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America",
+      "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/"
+    }
+  },
+  {
+    "title": "Dear Justyce",
+    "slug": "dear-justyce",
+    "authors": [{ "name": "Nic Stone", "role": "author" }],
+    "isbn13": "9781984824979",
+    "publishedDate": "2020",
+    "description": "Stone’s sequel shifts focus to Quan, a Black teenager awaiting trial who writes letters to his friend Justyce. PEN America documents bans in Florida and Texas school districts alongside other Nic Stone titles.",
+    "challenges": [
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Clay County School District",
+        "schoolYear": "2022-2023",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        }
+      },
+      {
+        "state": "TX",
+        "jurisdictionLabel": "Frisco Independent School District",
+        "schoolYear": "2022-2023",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "PEN America Index of School Book Bans 2022–2023",
+        "href": "https://pen.org/book-bans/2023-banned-book-list/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "Florida School District Slaps Warning Labels on Books",
+        "href": "https://pen.org/press-release/florida-school-district-slaps-stigmatizing-and-alarming-warning-labels-on-books-deemed-unsuitable-for-children/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "School book bans show no signs of slowing, PEN America finds",
+        "href": "https://www.npr.org/2023/09/21/1200725104/book-bans-school-pen-america",
+        "publisher": "NPR",
+        "publishedAt": "2023-09-21"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America",
+      "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/"
+    }
+  },
+  {
+    "title": "Out of Darkness",
+    "slug": "out-of-darkness",
+    "authors": [{ "name": "Ashley Hope Pérez", "role": "author" }],
+    "isbn13": "9781467742023",
+    "publishedDate": "2015",
+    "description": "Pérez’s novel follows a Mexican American girl and a Black boy in 1930s East Texas as community violence closes in on their relationship. PEN America records bans across Florida, Texas, Utah, and other states.",
+    "challenges": [
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Clay County School District",
+        "schoolYear": "2022-2023",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        }
+      },
+      {
+        "state": "TX",
+        "jurisdictionLabel": "Keller Independent School District",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        }
+      },
+      {
+        "state": "UT",
+        "jurisdictionLabel": "Alpine School District",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "PEN America Index of School Book Bans 2022–2023",
+        "href": "https://pen.org/book-bans/2023-banned-book-list/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "PEN America Book Ban Index Data",
+        "href": "https://pen.org/book-bans/pen-america-book-ban-index-data/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "School book bans show no signs of slowing, PEN America finds",
+        "href": "https://www.npr.org/2023/09/21/1200725104/book-bans-school-pen-america",
+        "publisher": "NPR",
+        "publishedAt": "2023-09-21"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America",
+      "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/"
+    }
+  },
+  {
+    "title": "All Because You Matter",
+    "slug": "all-because-you-matter",
+    "authors": [
+      { "name": "Tami Charles", "role": "author" },
+      { "name": "Bryan Collier", "role": "illustrator" }
+    ],
+    "isbn13": "9781338574855",
+    "publishedDate": "2020",
+    "description": "Charles and Collier’s picture book affirms Black children’s worth through lyrical address to a young reader. PEN America documents school bans in Florida, Missouri, and Texas alongside other race-centered titles.",
+    "challenges": [
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        }
+      },
+      {
+        "state": "MO",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        }
+      },
+      {
+        "state": "TX",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "PEN America Index of School Book Bans 2022–2023",
+        "href": "https://pen.org/book-bans/2023-banned-book-list/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "PEN America Book Ban Index Data",
+        "href": "https://pen.org/book-bans/pen-america-book-ban-index-data/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "School book bans show no signs of slowing, PEN America finds",
+        "href": "https://www.npr.org/2023/09/21/1200725104/book-bans-school-pen-america",
+        "publisher": "NPR",
+        "publishedAt": "2023-09-21"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America",
+      "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/"
+    }
+  },
+  {
+    "title": "Monday's Not Coming",
+    "slug": "mondays-not-coming",
+    "authors": [{ "name": "Tiffany D. Jackson", "role": "author" }],
+    "isbn13": "9780062422641",
+    "publishedDate": "2018",
+    "description": "Jackson’s thriller follows Claudia as she searches for her missing best friend Monday in a Washington, D.C., neighborhood where adults dismiss her concerns. PEN America documents bans in Pennsylvania, South Carolina, Utah, and North Carolina.",
+    "challenges": [
+      {
+        "state": "PA",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        }
+      },
+      {
+        "state": "SC",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        }
+      },
+      {
+        "state": "UT",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "PEN America Index of School Book Bans 2022–2023",
+        "href": "https://pen.org/book-bans/2023-banned-book-list/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "PEN America Book Bans hub",
+        "href": "https://pen.org/book-bans/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "The number of book titles that people tried to ban rose by 65% last year",
+        "href": "https://www.npr.org/2024/03/14/1238647724/the-number-of-book-titles-that-people-tried-to-ban-rose-by-65-last-year",
+        "publisher": "NPR",
+        "publishedAt": "2024-03-14"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America",
+      "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/"
+    }
+  }
+]

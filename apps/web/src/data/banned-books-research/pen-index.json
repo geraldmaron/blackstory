@@ -1,0 +1,866 @@
+[
+  {
+    "title": "All American Boys",
+    "slug": "all-american-boys",
+    "authors": [
+      { "name": "Jason Reynolds", "role": "author" },
+      { "name": "Brendan Kiely", "role": "author" }
+    ],
+    "isbn13": "9781481463348",
+    "publishedDate": "2015",
+    "description": "Dual-narrative YA novel about Rashad, a Black teen beaten by police, and Quinn, a white classmate who witnesses the assault. Frequently removed from school libraries for depictions of police brutality, profanity, and racial injustice.",
+    "challenges": [
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Clay County School District",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        }
+      },
+      {
+        "state": "TX",
+        "jurisdictionLabel": "Texarkana Independent School District",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "All American Boys censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/all-american-boys",
+          "publisher": "Banned Books"
+        }
+      },
+      {
+        "state": "MS",
+        "jurisdictionLabel": "Madison County Schools",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "All American Boys censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/all-american-boys",
+          "publisher": "Banned Books"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "PEN America Index of School Book Bans 2022–2023",
+        "href": "https://pen.org/book-bans/2023-banned-book-list/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "All American Boys censorship history",
+        "href": "https://www.banned-books.org/books/all-american-boys",
+        "publisher": "Banned Books"
+      },
+      {
+        "label": "School book bans show no signs of slowing, PEN America finds",
+        "href": "https://www.npr.org/2023/09/21/1200725104/book-bans-school-pen-america",
+        "publisher": "NPR",
+        "publishedAt": "2023-09-21"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans",
+      "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/"
+    }
+  },
+  {
+    "title": "Dear Martin",
+    "slug": "dear-martin",
+    "authors": [{ "name": "Nic Stone", "role": "author" }],
+    "isbn13": "9781101939529",
+    "publishedDate": "2017",
+    "description": "YA debut following Justyce McAllister, a Black honor student wrongfully arrested, who writes letters to Dr. Martin Luther King Jr. while navigating racism and police violence. Documented in dozens of PEN-indexed school removals since 2021.",
+    "challenges": [
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Clay County School District",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "Dear Martin — PEN America ban records",
+          "href": "https://bannedindex.org/books/4529",
+          "publisher": "Banned Index"
+        }
+      },
+      {
+        "state": "TX",
+        "jurisdictionLabel": "Frisco Independent School District",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "Dear Martin — PEN America ban records",
+          "href": "https://bannedindex.org/books/4529",
+          "publisher": "Banned Index"
+        }
+      },
+      {
+        "state": "SC",
+        "jurisdictionLabel": "School District of Pickens County",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "Dear Martin censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/dear-martin",
+          "publisher": "Banned Books"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Dear Martin — PEN America ban records",
+        "href": "https://bannedindex.org/books/4529",
+        "publisher": "Banned Index"
+      },
+      {
+        "label": "Dear Martin censorship history",
+        "href": "https://www.banned-books.org/books/dear-martin",
+        "publisher": "Banned Books"
+      },
+      {
+        "label": "Dear Martin by Nic Stone — publisher record",
+        "href": "https://www.penguinrandomhouse.com/books/534050/dear-martin-by-nic-stone/",
+        "publisher": "Penguin Random House"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans",
+      "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+    }
+  },
+  {
+    "title": "The Poet X",
+    "slug": "the-poet-x",
+    "authors": [{ "name": "Elizabeth Acevedo", "role": "author" }],
+    "isbn13": "9780062662804",
+    "publishedDate": "2018",
+    "description": "National Book Award–winning novel-in-verse about Xiomara, an Afro-Latina teen in Harlem who finds her voice through slam poetry while questioning faith, family, and identity. Among the most PEN-documented YA removals for race and religious themes.",
+    "challenges": [
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Clay County School District",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "The Poet X censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/the-poet-x",
+          "publisher": "Banned Books"
+        }
+      },
+      {
+        "state": "TX",
+        "jurisdictionLabel": "Frisco Independent School District",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "The Poet X censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/the-poet-x",
+          "publisher": "Banned Books"
+        }
+      },
+      {
+        "state": "SC",
+        "jurisdictionLabel": "Beaufort County School District",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "The Poet X censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/the-poet-x",
+          "publisher": "Banned Books"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "PEN America Index of School Book Bans 2022–2023",
+        "href": "https://pen.org/book-bans/2023-banned-book-list/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "The Poet X censorship history",
+        "href": "https://www.banned-books.org/books/the-poet-x",
+        "publisher": "Banned Books"
+      },
+      {
+        "label": "More Than 300 Book Titles Banned by Collier County, FL",
+        "href": "https://pen.org/press-release/more-than-300-book-titles-banned-by-collier-county-fl-including-literary-classics-by-aldous-huxley-ralph-ellison-and-joseph-heller/",
+        "publisher": "PEN America",
+        "publishedAt": "2023-11-06"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans",
+      "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/"
+    }
+  },
+  {
+    "title": "Push",
+    "slug": "push",
+    "authors": [{ "name": "Sapphire", "role": "author" }],
+    "isbn13": "9780679766759",
+    "publishedDate": "1996",
+    "description": "Novel about Precious Jones, a Harlem teenager surviving abuse and illiteracy until a radical teacher helps her reclaim her story. PEN documented a sharp rise in school removals during 2022–2023, especially in Florida, Utah, and Texas.",
+    "challenges": [
+      {
+        "state": "UT",
+        "jurisdictionLabel": "Alpine School District",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "Push censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/push",
+          "publisher": "Banned Books"
+        }
+      },
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Escambia County Public Schools",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "Push censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/push",
+          "publisher": "Banned Books"
+        }
+      },
+      {
+        "state": "TX",
+        "jurisdictionLabel": "Conroe Independent School District",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2023,
+        "status": "reported",
+        "citation": {
+          "label": "Spineless Shelves: Two Years of Book Banning",
+          "href": "https://pen.org/report/spineless-shelves/",
+          "publisher": "PEN America"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Spineless Shelves: Two Years of Book Banning",
+        "href": "https://pen.org/report/spineless-shelves/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "Push censorship history",
+        "href": "https://www.banned-books.org/books/push",
+        "publisher": "Banned Books"
+      },
+      {
+        "label": "Banned in the USA: The Mounting Pressure to Censor",
+        "href": "https://pen.org/report/book-bans-pressure-to-censor/",
+        "publisher": "PEN America",
+        "publishedAt": "2023-04"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans",
+      "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/"
+    }
+  },
+  {
+    "title": "Homegoing",
+    "slug": "homegoing",
+    "authors": [{ "name": "Yaa Gyasi", "role": "author" }],
+    "isbn13": "9781101947135",
+    "publishedDate": "2016",
+    "description": "Debut novel tracing two half-sisters and their descendants from 18th-century Ghana through slavery and the African diaspora to modern America. Widely taught and repeatedly removed from school libraries for racial and historical themes.",
+    "challenges": [
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Charlotte County Public Schools",
+        "schoolYear": "2023-2024",
+        "challengeYear": 2023,
+        "status": "reported",
+        "citation": {
+          "label": "Homegoing banned in Charlotte County Public Schools, FL",
+          "href": "https://bannedindex.org/bans/31714",
+          "publisher": "Banned Index"
+        }
+      },
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Seminole County Public Schools",
+        "schoolYear": "2023-2024",
+        "challengeYear": 2023,
+        "status": "reported",
+        "citation": {
+          "label": "Homegoing banned in Seminole County Public Schools, FL",
+          "href": "https://bannedindex.org/bans/31719",
+          "publisher": "Banned Index"
+        }
+      },
+      {
+        "state": "MO",
+        "jurisdictionLabel": "Wentzville School District",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "Homegoing censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/homegoing",
+          "publisher": "Banned Books"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Homegoing censorship history",
+        "href": "https://www.banned-books.org/books/homegoing",
+        "publisher": "Banned Books"
+      },
+      {
+        "label": "Homegoing banned in Charlotte County Public Schools, FL",
+        "href": "https://bannedindex.org/bans/31714",
+        "publisher": "Banned Index"
+      },
+      {
+        "label": "PEN America Index of School Book Bans 2023–2024",
+        "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
+        "publisher": "PEN America"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans",
+      "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+    }
+  },
+  {
+    "title": "Long Way Down",
+    "slug": "long-way-down",
+    "authors": [{ "name": "Jason Reynolds", "role": "author" }],
+    "isbn13": "9781481438261",
+    "publishedDate": "2017",
+    "description": "Verse novel in which Will, mourning his murdered brother, descends in an elevator and confronts ghosts of gun-violence cycles. PEN indexed removals in Florida and Wisconsin during the 2022–2024 school years.",
+    "challenges": [
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Clay County School District",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "Long Way Down censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/long-way-down",
+          "publisher": "Banned Books"
+        }
+      },
+      {
+        "state": "WI",
+        "jurisdictionLabel": "Elkhorn Area School District",
+        "schoolYear": "2023-2024",
+        "challengeYear": 2023,
+        "status": "reported",
+        "citation": {
+          "label": "Long Way Down censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/long-way-down",
+          "publisher": "Banned Books"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Long Way Down censorship history",
+        "href": "https://www.banned-books.org/books/long-way-down",
+        "publisher": "Banned Books"
+      },
+      {
+        "label": "PEN America Index of School Book Bans 2022–2023",
+        "href": "https://pen.org/book-bans/2023-banned-book-list/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "Long Way Down — publisher record",
+        "href": "https://www.simonandschuster.net/books/Long-Way-Down/Jason-Reynolds/9781481438261",
+        "publisher": "Simon & Schuster"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans",
+      "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/"
+    }
+  },
+  {
+    "title": "Ghost Boys",
+    "slug": "ghost-boys",
+    "authors": [{ "name": "Jewell Parker Rhodes", "role": "author" }],
+    "isbn13": "9780316262286",
+    "publishedDate": "2018",
+    "description": "Middle-grade novel about Jerome, a Black boy killed by police, who joins the ghosts of Emmett Till and other victims to witness the aftermath of his death. Removed from multiple districts for depictions of police violence and racism.",
+    "challenges": [
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Clay County School District",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "Ghost Boys censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/ghost-boys",
+          "publisher": "Banned Books"
+        }
+      },
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Seminole County Public Schools",
+        "schoolYear": "2023-2024",
+        "challengeYear": 2023,
+        "status": "reported",
+        "citation": {
+          "label": "Ghost Boys banned in Seminole County Public Schools, FL",
+          "href": "https://bannedindex.org/bans/36473",
+          "publisher": "Banned Index"
+        }
+      },
+      {
+        "state": "TN",
+        "jurisdictionLabel": "Hamilton County Schools",
+        "schoolYear": "2021-2022",
+        "challengeYear": 2021,
+        "status": "reported",
+        "citation": {
+          "label": "Ghost Boys censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/ghost-boys",
+          "publisher": "Banned Books"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Ghost Boys censorship history",
+        "href": "https://www.banned-books.org/books/ghost-boys",
+        "publisher": "Banned Books"
+      },
+      {
+        "label": "Ghost Boys banned in Seminole County Public Schools, FL",
+        "href": "https://bannedindex.org/bans/36473",
+        "publisher": "Banned Index"
+      },
+      {
+        "label": "Banned Books 2022 – Ghost Boys",
+        "href": "https://www.marshall.edu/library/bannedbooks/ghost-boys/",
+        "publisher": "Marshall University Libraries"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans",
+      "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+    }
+  },
+  {
+    "title": "All Boys Aren't Blue",
+    "slug": "all-boys-arent-blue",
+    "authors": [{ "name": "George M. Johnson", "role": "author" }],
+    "isbn13": "9780374312718",
+    "publishedDate": "2020",
+    "description": "Memoir-in-essays by a Black queer journalist on growing up in New Jersey and Virginia, covering identity, consent, family, and structural marginalization. Among the most frequently PEN-indexed removals of the 2021–2024 period.",
+    "challenges": [
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Escambia County Public Schools",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "All Boys Aren't Blue censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/all-boys-arent-blue",
+          "publisher": "Banned Books"
+        }
+      },
+      {
+        "state": "MO",
+        "jurisdictionLabel": "Wentzville School District",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "All Boys Aren't Blue censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/all-boys-arent-blue",
+          "publisher": "Banned Books"
+        }
+      },
+      {
+        "state": "UT",
+        "jurisdictionLabel": "Alpine School District",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "All Boys Aren't Blue censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/all-boys-arent-blue",
+          "publisher": "Banned Books"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "All Boys Aren't Blue censorship history",
+        "href": "https://www.banned-books.org/books/all-boys-arent-blue",
+        "publisher": "Banned Books"
+      },
+      {
+        "label": "PEN America v. Escambia County School District",
+        "href": "https://pen.org/pen-america-v-escambia-county/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "Banned in the USA: The Mounting Pressure to Censor",
+        "href": "https://pen.org/report/book-bans-pressure-to-censor/",
+        "publisher": "PEN America",
+        "publishedAt": "2023-04"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans",
+      "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/"
+    }
+  },
+  {
+    "title": "Monster",
+    "slug": "monster",
+    "authors": [{ "name": "Walter Dean Myers", "role": "author" }],
+    "isbn13": "9780064407311",
+    "publishedDate": "1999",
+    "description": "Printz Honor novel presented as a screenplay written by Steve Harmon, a Black teen on trial for murder, examining the juvenile justice system. Challenged for language, violence, and racial themes in multiple PEN-indexed districts.",
+    "challenges": [
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Collier County Public Schools",
+        "schoolYear": "2023-2024",
+        "challengeYear": 2023,
+        "status": "reported",
+        "citation": {
+          "label": "Monster censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/monster-walter-dean-myers",
+          "publisher": "Banned Books"
+        }
+      },
+      {
+        "state": "TN",
+        "jurisdictionLabel": "Hamilton County Schools",
+        "schoolYear": "2021-2022",
+        "challengeYear": 2021,
+        "status": "reported",
+        "citation": {
+          "label": "Monster censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/monster-walter-dean-myers",
+          "publisher": "Banned Books"
+        }
+      },
+      {
+        "state": "IA",
+        "jurisdictionLabel": "Indianola Community School District",
+        "schoolYear": "2023-2024",
+        "challengeYear": 2023,
+        "status": "reported",
+        "citation": {
+          "label": "Monster censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/monster-walter-dean-myers",
+          "publisher": "Banned Books"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Monster censorship history",
+        "href": "https://www.banned-books.org/books/monster-walter-dean-myers",
+        "publisher": "Banned Books"
+      },
+      {
+        "label": "Monster — Banned Books Week guide",
+        "href": "https://researchguides.gonzaga.edu/BannedBooksWeek/Monster",
+        "publisher": "Gonzaga University Libraries"
+      },
+      {
+        "label": "PEN America Index of School Book Bans 2023–2024",
+        "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
+        "publisher": "PEN America"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans",
+      "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+    }
+  },
+  {
+    "title": "Born a Crime",
+    "slug": "born-a-crime",
+    "authors": [{ "name": "Trevor Noah", "role": "author" }],
+    "isbn13": "9780399588174",
+    "publishedDate": "2016",
+    "description": "Memoir of Trevor Noah's childhood as a mixed-race child born illegally under apartheid in South Africa, told through vignettes about his mother, identity, and survival. PEN indexed school restrictions for racial and political content.",
+    "challenges": [
+      {
+        "state": "WI",
+        "jurisdictionLabel": "Elkhorn Area School District",
+        "schoolYear": "2023-2024",
+        "challengeYear": 2023,
+        "status": "reported",
+        "citation": {
+          "label": "Born a Crime censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/born-a-crime-stories-from-a-south-african-childhood",
+          "publisher": "Banned Books"
+        }
+      },
+      {
+        "state": "TN",
+        "jurisdictionLabel": "Wilson County Schools",
+        "schoolYear": "2024-2025",
+        "challengeYear": 2024,
+        "status": "reported",
+        "citation": {
+          "label": "Born a Crime censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/born-a-crime-stories-from-a-south-african-childhood",
+          "publisher": "Banned Books"
+        }
+      },
+      {
+        "state": "TX",
+        "jurisdictionLabel": "North East Independent School District",
+        "schoolYear": "2024-2025",
+        "challengeYear": 2024,
+        "status": "reported",
+        "citation": {
+          "label": "Born a Crime censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/born-a-crime-stories-from-a-south-african-childhood",
+          "publisher": "Banned Books"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Born a Crime censorship history",
+        "href": "https://www.banned-books.org/books/born-a-crime-stories-from-a-south-african-childhood",
+        "publisher": "Banned Books"
+      },
+      {
+        "label": "Banned in the USA: Beyond the Shelves",
+        "href": "https://pen.org/report/beyond-the-shelves/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "Read These Banned Books By Black Authors",
+        "href": "https://www.today.com/popculture/books/banned-books-black-authors-list-rcna193062",
+        "publisher": "TODAY",
+        "publishedAt": "2024-02"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans",
+      "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+    }
+  },
+  {
+    "title": "The 1619 Project: A New Origin Story",
+    "slug": "the-1619-project-a-new-origin-story",
+    "authors": [{ "name": "Nikole Hannah-Jones", "role": "author" }],
+    "isbn13": "9780593230572",
+    "publishedDate": "2021",
+    "description": "Expanded anthology reframing U.S. history through slavery and Black resistance, building on The New York Times Magazine's 1619 Project. Escambia County, Florida removed it from schools amid challenges to race-related instructional materials.",
+    "challenges": [
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Escambia County Public Schools",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "The 1619 Project censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/the-1619-project-a-new-origin-story",
+          "publisher": "Banned Books"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "The 1619 Project censorship history",
+        "href": "https://www.banned-books.org/books/the-1619-project-a-new-origin-story",
+        "publisher": "Banned Books"
+      },
+      {
+        "label": "PEN America v. Escambia County School District",
+        "href": "https://pen.org/pen-america-v-escambia-county/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "PEN America Index of School Book Bans 2022–2023",
+        "href": "https://pen.org/book-bans/2023-banned-book-list/",
+        "publisher": "PEN America"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans",
+      "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/"
+    }
+  },
+  {
+    "title": "Caste",
+    "slug": "caste",
+    "authors": [{ "name": "Isabel Wilkerson", "role": "author" }],
+    "isbn13": "9780593230251",
+    "publishedDate": "2020",
+    "description": "Nonfiction examining America's racial hierarchy through the lens of caste systems in the United States, India, and Nazi Germany. PEN indexed school restrictions in Texas and Georgia for racial and political content.",
+    "challenges": [
+      {
+        "state": "TX",
+        "jurisdictionLabel": "North East Independent School District",
+        "schoolYear": "2021-2022",
+        "challengeYear": 2021,
+        "status": "reported",
+        "citation": {
+          "label": "Caste censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/caste-the-origins-of-our-discontents",
+          "publisher": "Banned Books"
+        }
+      },
+      {
+        "state": "GA",
+        "jurisdictionLabel": "Cobb County School District",
+        "schoolYear": "2023-2024",
+        "challengeYear": 2023,
+        "status": "reported",
+        "citation": {
+          "label": "Caste censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/caste-the-origins-of-our-discontents",
+          "publisher": "Banned Books"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Caste censorship history",
+        "href": "https://www.banned-books.org/books/caste-the-origins-of-our-discontents",
+        "publisher": "Banned Books"
+      },
+      {
+        "label": "PEN America Index of School Book Bans 2023–2024",
+        "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "School book bans show no signs of slowing, PEN America finds",
+        "href": "https://www.npr.org/2023/09/21/1200725104/book-bans-school-pen-america",
+        "publisher": "NPR",
+        "publishedAt": "2023-09-21"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans",
+      "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+    }
+  },
+  {
+    "title": "Their Eyes Were Watching God",
+    "slug": "their-eyes-were-watching-god",
+    "authors": [{ "name": "Zora Neale Hurston", "role": "author" }],
+    "isbn13": "9780061120060",
+    "publishedDate": "1937",
+    "description": "Classic novel following Janie Crawford's journey through three marriages and self-discovery in the Jim Crow South. Removed from Collier County, Florida school libraries during the 2023–2024 wave of Florida removals.",
+    "challenges": [
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Collier County Public Schools",
+        "schoolYear": "2023-2024",
+        "challengeYear": 2023,
+        "status": "reported",
+        "citation": {
+          "label": "Their Eyes Were Watching God banned in Collier County Public Schools, FL",
+          "href": "https://bannedindex.org/bans/32748",
+          "publisher": "Banned Index"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Their Eyes Were Watching God banned in Collier County Public Schools, FL",
+        "href": "https://bannedindex.org/bans/32748",
+        "publisher": "Banned Index"
+      },
+      {
+        "label": "More Than 300 Book Titles Banned by Collier County, FL",
+        "href": "https://pen.org/press-release/more-than-300-book-titles-banned-by-collier-county-fl-including-literary-classics-by-aldous-huxley-ralph-ellison-and-joseph-heller/",
+        "publisher": "PEN America",
+        "publishedAt": "2023-11-06"
+      },
+      {
+        "label": "PEN America Index of School Book Bans 2023–2024",
+        "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
+        "publisher": "PEN America"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans",
+      "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+    }
+  },
+  {
+    "title": "The Nickel Boys",
+    "slug": "the-nickel-boys",
+    "authors": [{ "name": "Colson Whitehead", "role": "author" }],
+    "isbn13": "9780708899427",
+    "publishedDate": "2019",
+    "description": "Pulitzer Prize–winning novel about Elwood Curtis, sent to a brutal Florida reform school inspired by the real Dozier School. PEN indexed removals in Tennessee and Virginia for violence and racial themes.",
+    "challenges": [
+      {
+        "state": "TN",
+        "jurisdictionLabel": "Wilson County Schools",
+        "schoolYear": "2024-2025",
+        "challengeYear": 2024,
+        "status": "reported",
+        "citation": {
+          "label": "The Nickel Boys censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/the-nickel-boys",
+          "publisher": "Banned Books"
+        }
+      },
+      {
+        "state": "VA",
+        "jurisdictionLabel": "King George County Schools",
+        "schoolYear": "2024-2025",
+        "challengeYear": 2024,
+        "status": "reported",
+        "citation": {
+          "label": "The Nickel Boys censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/the-nickel-boys",
+          "publisher": "Banned Books"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "The Nickel Boys censorship history",
+        "href": "https://www.banned-books.org/books/the-nickel-boys",
+        "publisher": "Banned Books"
+      },
+      {
+        "label": "PEN America Index of School Book Bans 2024–2025",
+        "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2024-2025/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "Banned in the USA: Beyond the Shelves",
+        "href": "https://pen.org/report/beyond-the-shelves/",
+        "publisher": "PEN America"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans",
+      "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2024-2025/"
+    }
+  }
+]

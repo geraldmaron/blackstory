@@ -1,0 +1,478 @@
+[
+  {
+    "title": "Their Eyes Were Watching God",
+    "slug": "their-eyes-were-watching-god",
+    "authors": [{ "name": "Zora Neale Hurston", "role": "author" }],
+    "isbn13": "9780061120060",
+    "publishedDate": "1937",
+    "description": "Hurston’s Harlem Renaissance novel follows Janie Crawford through marriage, migration, and self-discovery in early twentieth-century Florida. ALA and PEN America records document repeated school challenges citing sexual content and racial themes.",
+    "challenges": [
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Collier County Public Schools",
+        "schoolYear": "2023-2024",
+        "challengeYear": 2023,
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        }
+      },
+      {
+        "state": "VA",
+        "jurisdictionLabel": "Stonewall Jackson High School",
+        "challengeYear": 1997,
+        "status": "reported",
+        "citation": {
+          "label": "ALA Banned and Challenged Classics",
+          "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
+          "publisher": "American Library Association"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "ALA Banned and Challenged Classics",
+        "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
+        "publisher": "American Library Association"
+      },
+      {
+        "label": "PEN America Index of School Book Bans 2022–2023",
+        "href": "https://pen.org/book-bans/2023-banned-book-list/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "Read These Banned Books By Black Authors",
+        "href": "https://www.today.com/popculture/books/banned-books-black-authors-list-rcna193062",
+        "publisher": "TODAY",
+        "publishedAt": "2024-02"
+      }
+    ],
+    "provenance": {
+      "source": "American Library Association",
+      "sourceUrl": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics"
+    }
+  },
+  {
+    "title": "Song of Solomon",
+    "slug": "song-of-solomon",
+    "authors": [{ "name": "Toni Morrison", "role": "author" }],
+    "isbn13": "9781400033423",
+    "publishedDate": "1977",
+    "description": "Morrison’s National Book Critics Circle winner traces Milkman Dead from Michigan to the South as he uncovers family history and flight’s legacy. ALA challenge records cite language, sexuality, and complaints that the novel is degrading to Black characters.",
+    "challenges": [
+      {
+        "state": "GA",
+        "jurisdictionLabel": "Richmond County School District",
+        "challengeYear": 1994,
+        "status": "reported",
+        "citation": {
+          "label": "ALA Banned and Challenged Classics",
+          "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
+          "publisher": "American Library Association"
+        }
+      },
+      {
+        "state": "FL",
+        "jurisdictionLabel": "St. Johns County Schools",
+        "challengeYear": 1995,
+        "status": "reported",
+        "citation": {
+          "label": "ALA Banned and Challenged Classics",
+          "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
+          "publisher": "American Library Association"
+        }
+      },
+      {
+        "state": "MD",
+        "jurisdictionLabel": "St. Mary's County schools",
+        "challengeYear": 1998,
+        "status": "reported",
+        "citation": {
+          "label": "ALA Banned and Challenged Classics",
+          "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
+          "publisher": "American Library Association"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "ALA Banned and Challenged Classics",
+        "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
+        "publisher": "American Library Association"
+      },
+      {
+        "label": "Most Challenged Books | Banned Books",
+        "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/top10",
+        "publisher": "American Library Association"
+      },
+      {
+        "label": "PEN America Book Bans hub",
+        "href": "https://pen.org/book-bans/",
+        "publisher": "PEN America"
+      }
+    ],
+    "provenance": {
+      "source": "American Library Association",
+      "sourceUrl": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics"
+    }
+  },
+  {
+    "title": "Go Tell It on the Mountain",
+    "slug": "go-tell-it-on-the-mountain",
+    "authors": [{ "name": "James Baldwin", "role": "author" }],
+    "isbn13": "9780345806543",
+    "publishedDate": "1953",
+    "description": "Baldwin’s semiautobiographical novel follows fourteen-year-old John Grimes through a day of spiritual crisis in 1930s Harlem. ALA records document challenges in New York and Virginia over profanity, sexual content, and treatment of women.",
+    "challenges": [
+      {
+        "state": "NY",
+        "jurisdictionLabel": "Hudson Falls schools",
+        "challengeYear": 1994,
+        "status": "reported",
+        "citation": {
+          "label": "ALA Banned and Challenged Classics",
+          "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
+          "publisher": "American Library Association"
+        }
+      },
+      {
+        "state": "VA",
+        "jurisdictionLabel": "Prince William County",
+        "challengeYear": 1988,
+        "status": "reported",
+        "citation": {
+          "label": "ALA Banned and Challenged Classics",
+          "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
+          "publisher": "American Library Association"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "ALA Banned and Challenged Classics",
+        "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
+        "publisher": "American Library Association"
+      },
+      {
+        "label": "Read These Banned Books By Black Authors",
+        "href": "https://www.today.com/popculture/books/banned-books-black-authors-list-rcna193062",
+        "publisher": "TODAY",
+        "publishedAt": "2024-02"
+      },
+      {
+        "label": "PEN America Book Bans hub",
+        "href": "https://pen.org/book-bans/",
+        "publisher": "PEN America"
+      }
+    ],
+    "provenance": {
+      "source": "American Library Association",
+      "sourceUrl": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics"
+    }
+  },
+  {
+    "title": "Black Boy",
+    "slug": "black-boy",
+    "authors": [{ "name": "Richard Wright", "role": "author" }],
+    "isbn13": "9780061130243",
+    "publishedDate": "1945",
+    "description": "Wright’s memoir of growing up in the Jim Crow South records hunger, violence, and the making of a writer. It appears on ALA frequently-challenged lists and PEN America’s school ban index for profanity, race themes, and suitability disputes.",
+    "challenges": [
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Brevard Public Schools",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        }
+      },
+      {
+        "state": "TX",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "ALA Banned and Challenged Classics",
+        "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
+        "publisher": "American Library Association"
+      },
+      {
+        "label": "PEN America Index of School Book Bans 2022–2023",
+        "href": "https://pen.org/book-bans/2023-banned-book-list/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "School book bans show no signs of slowing, PEN America finds",
+        "href": "https://www.npr.org/2023/09/21/1200725104/book-bans-school-pen-america",
+        "publisher": "NPR",
+        "publishedAt": "2023-09-21"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America",
+      "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/"
+    }
+  },
+  {
+    "title": "Sula",
+    "slug": "sula",
+    "authors": [{ "name": "Toni Morrison", "role": "author" }],
+    "isbn13": "9781400033430",
+    "publishedDate": "1973",
+    "description": "Morrison’s novel centers on the friendship between Sula Peace and Nel Wright in a Ohio Bottoms community shaped by migration and loss. PEN America and ALA records document school removals tied to sexuality, language, and moral objections.",
+    "challenges": [
+      {
+        "state": "MO",
+        "jurisdictionLabel": "Wentzville School District",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "PEN America Index of School Book Bans 2022–2023",
+        "href": "https://pen.org/book-bans/2023-banned-book-list/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "Most Challenged Books | Banned Books",
+        "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/top10",
+        "publisher": "American Library Association"
+      },
+      {
+        "label": "PEN America Book Bans hub",
+        "href": "https://pen.org/book-bans/",
+        "publisher": "PEN America"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America",
+      "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/"
+    }
+  },
+  {
+    "title": "Kindred",
+    "slug": "kindred",
+    "authors": [{ "name": "Octavia E. Butler", "role": "author" }],
+    "isbn13": "9780807083697",
+    "publishedDate": "1979",
+    "description": "Butler’s science-fiction novel sends Dana, a Black writer in 1970s California, repeatedly to a Maryland plantation where she must navigate slavery’s violence to survive. School ban records cite sexual content and discomfort with historical depiction.",
+    "challenges": [
+      {
+        "state": "MO",
+        "jurisdictionLabel": "Wentzville School District",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        }
+      },
+      {
+        "state": "TX",
+        "jurisdictionLabel": "Keller Independent School District",
+        "schoolYear": "2022-2023",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "PEN America Index of School Book Bans 2022–2023",
+        "href": "https://pen.org/book-bans/2023-banned-book-list/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "PEN America Book Ban Index Data",
+        "href": "https://pen.org/book-bans/pen-america-book-ban-index-data/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "School book bans show no signs of slowing, PEN America finds",
+        "href": "https://www.npr.org/2023/09/21/1200725104/book-bans-school-pen-america",
+        "publisher": "NPR",
+        "publishedAt": "2023-09-21"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America",
+      "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/"
+    }
+  },
+  {
+    "title": "Push",
+    "slug": "push",
+    "authors": [{ "name": "Sapphire", "role": "author" }],
+    "isbn13": "9780679766759",
+    "publishedDate": "1996",
+    "description": "Sapphire’s novel follows Claireece “Precious” Jones, a Harlem teenager navigating illiteracy, abuse, and pregnancy while finding voice in an alternative school. PEN America documents multiple Utah and Texas school district bans.",
+    "challenges": [
+      {
+        "state": "UT",
+        "jurisdictionLabel": "Alpine School District",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        }
+      },
+      {
+        "state": "TX",
+        "jurisdictionLabel": "Conroe Independent School District",
+        "schoolYear": "2022-2023",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "PEN America Index of School Book Bans 2022–2023",
+        "href": "https://pen.org/book-bans/2023-banned-book-list/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "PEN America Book Bans hub",
+        "href": "https://pen.org/book-bans/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "School book bans show no signs of slowing, PEN America finds",
+        "href": "https://www.npr.org/2023/09/21/1200725104/book-bans-school-pen-america",
+        "publisher": "NPR",
+        "publishedAt": "2023-09-21"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America",
+      "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/"
+    }
+  },
+  {
+    "title": "The Autobiography of Malcolm X",
+    "slug": "the-autobiography-of-malcolm-x",
+    "authors": [
+      { "name": "Malcolm X", "role": "author" },
+      { "name": "Alex Haley", "role": "author" }
+    ],
+    "isbn13": "9780345350688",
+    "publishedDate": "1965",
+    "description": "Malcolm X and Alex Haley recount Malcolm’s path from Omaha childhood through prison, Nation of Islam leadership, pilgrimage, and assassination. ALA frequently-challenged lists document objections to anti-white statements and Muslim themes in schools.",
+    "challenges": [
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "Most Challenged Books | Banned Books",
+          "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/top10",
+          "publisher": "American Library Association"
+        }
+      },
+      {
+        "state": "TN",
+        "status": "reported",
+        "citation": {
+          "label": "ALA Banned and Challenged Classics",
+          "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
+          "publisher": "American Library Association"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "ALA Banned and Challenged Classics",
+        "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
+        "publisher": "American Library Association"
+      },
+      {
+        "label": "Most Challenged Books | Banned Books",
+        "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/top10",
+        "publisher": "American Library Association"
+      },
+      {
+        "label": "Read These Banned Books By Black Authors",
+        "href": "https://www.today.com/popculture/books/banned-books-black-authors-list-rcna193062",
+        "publisher": "TODAY",
+        "publishedAt": "2024-02"
+      }
+    ],
+    "provenance": {
+      "source": "American Library Association",
+      "sourceUrl": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics"
+    }
+  },
+  {
+    "title": "The Fire Next Time",
+    "slug": "the-fire-next-time",
+    "authors": [{ "name": "James Baldwin", "role": "author" }],
+    "isbn13": "9780679744726",
+    "publishedDate": "1963",
+    "description": "Baldwin’s two essays—“My Dungeon Shook” and “Down at the Cross”—address race, religion, and the moral cost of segregation to the nation. School and library challenge records cite incendiary language and political content.",
+    "challenges": [
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Clay County School District",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "PEN America Index of School Book Bans 2022–2023",
+        "href": "https://pen.org/book-bans/2023-banned-book-list/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "Read These Banned Books By Black Authors",
+        "href": "https://www.today.com/popculture/books/banned-books-black-authors-list-rcna193062",
+        "publisher": "TODAY",
+        "publishedAt": "2024-02"
+      },
+      {
+        "label": "PEN America Book Bans hub",
+        "href": "https://pen.org/book-bans/",
+        "publisher": "PEN America"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America",
+      "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/"
+    }
+  }
+]

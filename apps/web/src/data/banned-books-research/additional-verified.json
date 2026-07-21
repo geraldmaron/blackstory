@@ -1,0 +1,314 @@
+[
+  {
+    "title": "The Underground Railroad",
+    "slug": "the-underground-railroad",
+    "authors": [{ "name": "Colson Whitehead", "role": "author" }],
+    "isbn13": "9780345804327",
+    "publishedDate": "2016",
+    "description": "Whitehead’s Pulitzer-winning novel reimagines the Underground Railroad as an actual rail network while following Cora’s escape from a Georgia plantation. Conroe ISD and other Texas districts removed it from classroom instruction alongside other race-centered titles.",
+    "challenges": [
+      {
+        "state": "TX",
+        "jurisdictionLabel": "Conroe Independent School District",
+        "schoolYear": "2023-2024",
+        "status": "reported",
+        "citation": {
+          "label": "Conroe ISD bans 19 books from classrooms",
+          "href": "https://www.houstonchronicle.com/neighborhood/conroe/article/conroe-isd-book-policy-ban-19520063.php",
+          "publisher": "Houston Chronicle"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Conroe ISD bans 19 books from classrooms",
+        "href": "https://www.houstonchronicle.com/neighborhood/conroe/article/conroe-isd-book-policy-ban-19520063.php",
+        "publisher": "Houston Chronicle"
+      },
+      {
+        "label": "Conroe ISD Trustees Won't Restore Books",
+        "href": "https://www.houstonpress.com/news/conroe-isd-trustees-wont-restore-books-in-a-policy-one-calls-racist-18369680/",
+        "publisher": "Houston Press"
+      },
+      {
+        "label": "PEN America Book Bans hub",
+        "href": "https://pen.org/book-bans/",
+        "publisher": "PEN America"
+      }
+    ],
+    "provenance": {
+      "source": "Houston Chronicle",
+      "sourceUrl": "https://www.houstonchronicle.com/neighborhood/conroe/article/conroe-isd-book-policy-ban-19520063.php"
+    }
+  },
+  {
+    "title": "The Nickel Boys",
+    "slug": "the-nickel-boys",
+    "authors": [{ "name": "Colson Whitehead", "role": "author" }],
+    "isbn13": "9780385537070",
+    "publishedDate": "2019",
+    "description": "Whitehead’s novel draws on the real Dozier School for Boys to follow Elwood Curtis and Turner through a brutal Florida reform school. Wilson County, Tennessee, included it among hundreds of titles removed from school libraries in 2024.",
+    "challenges": [
+      {
+        "state": "TN",
+        "jurisdictionLabel": "Wilson County Schools",
+        "schoolYear": "2024-2025",
+        "challengeYear": 2024,
+        "status": "reported",
+        "citation": {
+          "label": "Tennessee school district bans 390 books from libraries",
+          "href": "https://nashvillebanner.com/2024/10/25/wilson-county-bans-390-books/",
+          "publisher": "Nashville Banner",
+          "publishedAt": "2024-10-25"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Tennessee school district bans 390 books from libraries",
+        "href": "https://nashvillebanner.com/2024/10/25/wilson-county-bans-390-books/",
+        "publisher": "Nashville Banner",
+        "publishedAt": "2024-10-25"
+      },
+      {
+        "label": "Banned in the USA: Beyond the Shelves",
+        "href": "https://pen.org/report/beyond-the-shelves/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "PEN America Book Bans hub",
+        "href": "https://pen.org/book-bans/",
+        "publisher": "PEN America"
+      }
+    ],
+    "provenance": {
+      "source": "Nashville Banner",
+      "sourceUrl": "https://nashvillebanner.com/2024/10/25/wilson-county-bans-390-books/"
+    }
+  },
+  {
+    "title": "Born a Crime",
+    "slug": "born-a-crime-stories-from-a-south-african-childhood",
+    "authors": [{ "name": "Trevor Noah", "role": "author" }],
+    "isbn13": "9780399588174",
+    "publishedDate": "2016",
+    "description": "Noah’s memoir recounts growing up mixed-race in apartheid and post-apartheid South Africa, where his birth violated racial classification laws. PEN America notes the title among banned works, and Wilson County, Tennessee, removed it from high school libraries.",
+    "challenges": [
+      {
+        "state": "TN",
+        "jurisdictionLabel": "Wilson County Schools",
+        "schoolYear": "2024-2025",
+        "challengeYear": 2024,
+        "status": "reported",
+        "citation": {
+          "label": "Tennessee school district bans 390 books from libraries",
+          "href": "https://nashvillebanner.com/2024/10/25/wilson-county-bans-390-books/",
+          "publisher": "Nashville Banner",
+          "publishedAt": "2024-10-25"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Banned in the USA: Beyond the Shelves",
+        "href": "https://pen.org/report/beyond-the-shelves/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "Tennessee school district bans 390 books from libraries",
+        "href": "https://nashvillebanner.com/2024/10/25/wilson-county-bans-390-books/",
+        "publisher": "Nashville Banner",
+        "publishedAt": "2024-10-25"
+      },
+      {
+        "label": "PEN America Book Bans hub",
+        "href": "https://pen.org/book-bans/",
+        "publisher": "PEN America"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America",
+      "sourceUrl": "https://pen.org/report/beyond-the-shelves/"
+    }
+  },
+  {
+    "title": "Heavy",
+    "slug": "heavy-an-american-memoir",
+    "authors": [{ "name": "Kiese Laymon", "role": "author" }],
+    "isbn13": "9781501125669",
+    "publishedDate": "2018",
+    "description": "Laymon’s memoir addresses racism, body image, gambling, and his relationship with his mother in Mississippi. Wentzville, Missouri, school officials removed it from libraries alongside other works centered on Black life, prompting a federal class-action suit.",
+    "challenges": [
+      {
+        "state": "MO",
+        "jurisdictionLabel": "Wentzville R-IV School District",
+        "schoolYear": "2021-2022",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "Wentzville R-IV School District class action complaint",
+          "href": "https://www.aclu-mo.org/sites/default/files/field_documents/ck-w_v_wentzville_complaint.pdf",
+          "publisher": "ACLU of Missouri"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Wentzville R-IV School District class action complaint",
+        "href": "https://www.aclu-mo.org/sites/default/files/field_documents/ck-w_v_wentzville_complaint.pdf",
+        "publisher": "ACLU of Missouri"
+      },
+      {
+        "label": "PEN America Book Bans hub",
+        "href": "https://pen.org/book-bans/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "Read These Banned Books By Black Authors",
+        "href": "https://www.today.com/popculture/books/banned-books-black-authors-list-rcna193062",
+        "publisher": "TODAY",
+        "publishedAt": "2024-02"
+      }
+    ],
+    "provenance": {
+      "source": "ACLU of Missouri",
+      "sourceUrl": "https://www.aclu-mo.org/sites/default/files/field_documents/ck-w_v_wentzville_complaint.pdf"
+    }
+  },
+  {
+    "title": "Caste",
+    "slug": "caste-the-origins-of-our-discontents",
+    "authors": [{ "name": "Isabel Wilkerson", "role": "author" }],
+    "isbn13": "9780593230251",
+    "publishedDate": "2020",
+    "description": "Wilkerson compares American racism to caste systems in India and Nazi Germany, arguing that hierarchy—not only individual prejudice—shapes U.S. life. News and advocacy reports document Texas school and library challenges to the book’s classroom use.",
+    "challenges": [
+      {
+        "state": "TX",
+        "status": "reported",
+        "citation": {
+          "label": "Read These Banned Books By Black Authors",
+          "href": "https://www.today.com/popculture/books/banned-books-black-authors-list-rcna193062",
+          "publisher": "TODAY",
+          "publishedAt": "2024-02"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Read These Banned Books By Black Authors",
+        "href": "https://www.today.com/popculture/books/banned-books-black-authors-list-rcna193062",
+        "publisher": "TODAY",
+        "publishedAt": "2024-02"
+      },
+      {
+        "label": "PEN America Book Bans hub",
+        "href": "https://pen.org/book-bans/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "The Bills Igniting Book Bans",
+        "href": "https://pen.org/report/the-bills-igniting-book-bans/",
+        "publisher": "PEN America"
+      }
+    ],
+    "provenance": {
+      "source": "TODAY",
+      "sourceUrl": "https://www.today.com/popculture/books/banned-books-black-authors-list-rcna193062"
+    }
+  },
+  {
+    "title": "Hood Feminism",
+    "slug": "hood-feminism-notes-from-the-women-that-a-movement-forgot",
+    "authors": [{ "name": "Mikki Kendall", "role": "author" }],
+    "isbn13": "9781635572957",
+    "publishedDate": "2020",
+    "description": "Kendall’s essay collection argues mainstream feminism has failed poor women and women of color on issues from hunger to violence. ALA-tracked challenge reporting documents removals in Florida and Texas tied to race and gender content.",
+    "challenges": [
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "Read These Banned Books By Black Authors",
+          "href": "https://www.today.com/popculture/books/banned-books-black-authors-list-rcna193062",
+          "publisher": "TODAY",
+          "publishedAt": "2024-02"
+        }
+      },
+      {
+        "state": "TX",
+        "status": "reported",
+        "citation": {
+          "label": "Read These Banned Books By Black Authors",
+          "href": "https://www.today.com/popculture/books/banned-books-black-authors-list-rcna193062",
+          "publisher": "TODAY",
+          "publishedAt": "2024-02"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Read These Banned Books By Black Authors",
+        "href": "https://www.today.com/popculture/books/banned-books-black-authors-list-rcna193062",
+        "publisher": "TODAY",
+        "publishedAt": "2024-02"
+      },
+      {
+        "label": "Most Challenged Books | Banned Books",
+        "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/top10",
+        "publisher": "American Library Association"
+      },
+      {
+        "label": "PEN America Book Bans hub",
+        "href": "https://pen.org/book-bans/",
+        "publisher": "PEN America"
+      }
+    ],
+    "provenance": {
+      "source": "TODAY",
+      "sourceUrl": "https://www.today.com/popculture/books/banned-books-black-authors-list-rcna193062"
+    }
+  },
+  {
+    "title": "Salvage the Bones",
+    "slug": "salvage-the-bones",
+    "authors": [{ "name": "Jesmyn Ward", "role": "author" }],
+    "isbn13": "9781608196265",
+    "publishedDate": "2011",
+    "description": "Ward’s National Book Award winner follows a working-class Black family in Mississippi preparing for Hurricane Katrina. Conroe ISD removed it from classroom instruction under a policy trustees later described as disproportionately affecting race-centered texts.",
+    "challenges": [
+      {
+        "state": "TX",
+        "jurisdictionLabel": "Conroe Independent School District",
+        "schoolYear": "2023-2024",
+        "status": "reported",
+        "citation": {
+          "label": "Conroe ISD Trustees Won't Restore Books",
+          "href": "https://www.houstonpress.com/news/conroe-isd-trustees-wont-restore-books-in-a-policy-one-calls-racist-18369680/",
+          "publisher": "Houston Press"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Conroe ISD bans 19 books from classrooms",
+        "href": "https://www.houstonchronicle.com/neighborhood/conroe/article/conroe-isd-book-policy-ban-19520063.php",
+        "publisher": "Houston Chronicle"
+      },
+      {
+        "label": "Conroe ISD Trustees Won't Restore Books",
+        "href": "https://www.houstonpress.com/news/conroe-isd-trustees-wont-restore-books-in-a-policy-one-calls-racist-18369680/",
+        "publisher": "Houston Press"
+      },
+      {
+        "label": "PEN America Book Bans hub",
+        "href": "https://pen.org/book-bans/",
+        "publisher": "PEN America"
+      }
+    ],
+    "provenance": {
+      "source": "Houston Press",
+      "sourceUrl": "https://www.houstonpress.com/news/conroe-isd-trustees-wont-restore-books-in-a-policy-one-calls-racist-18369680/"
+    }
+  }
+]
