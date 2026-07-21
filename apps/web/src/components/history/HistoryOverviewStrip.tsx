@@ -77,10 +77,12 @@ export function HistoryOverviewStrip({
                   )}
                   aria-label={barLabel}
                 >
-                  <span
-                    className="ds-history-overview__density-bar-fill"
-                    style={{ height: `${heightPercent}%` }}
-                  />
+                  <span className="ds-history-overview__density-bar-track" aria-hidden="true">
+                    <span
+                      className="ds-history-overview__density-bar-fill"
+                      style={{ height: `${heightPercent}%` }}
+                    />
+                  </span>
                   <span className="ds-history-overview__density-bar-label">{entry.decade}</span>
                 </li>
               );

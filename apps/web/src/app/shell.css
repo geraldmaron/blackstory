@@ -520,6 +520,11 @@
   line-height: 1.2;
 }
 
+/* Keep multi-word brand phrases from mid-phrase wrapping. */
+.ds-phrase-nowrap {
+  white-space: nowrap;
+}
+
 .ds-section__lede {
   margin: var(--ds-space-5) 0 0;
   max-width: 46rem;
@@ -754,7 +759,9 @@
 
 .ds-hero-stage__headline {
   margin: var(--ds-space-4) 0 0;
-  max-width: 14ch;
+  /* Wide enough for the nowrap trailer ("happened here.") on its own line;
+     subject morph stays above so wrap never splits mid-phrase. */
+  max-width: min(100%, 16ch);
   color: var(--ds-ink);
   font-family: var(--ds-font-display);
   font-weight: 500;
@@ -852,7 +859,11 @@
   vertical-align: baseline;
 }
 
+/* Own line + nowrap: phrase stays intact; morph width changes never yank
+   "happened" onto the subject line or orphan "here." */
 .ds-hero-headline-morph__trailer {
+  display: block;
+  white-space: nowrap;
   color: inherit;
 }
 

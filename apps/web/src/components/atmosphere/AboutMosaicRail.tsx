@@ -52,7 +52,7 @@ export async function AboutMosaicMast({ children }: AboutMosaicMastProps) {
         className="ds-about-mast__plane"
       />
       <div className="ds-container ds-about-mast__inner">
-        {/* Opaque fixed-ink plate: WCAG pairs only — never translucent over mosaic tiles. */}
+        {/* Opaque theme plate: WCAG pairs only — never translucent over mosaic tiles. */}
         <div className="ds-about-mast__copy">
           {children}
           <p className="ds-about-mast__credit">

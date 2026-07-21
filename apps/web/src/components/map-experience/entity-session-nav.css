@@ -1,23 +1,46 @@
 /**
  * Flat session navigation for NarrativeCard and entity detail chrome. Copper signals the
- * active random toggle; no shadows, gradients, or ornamental motion.
+ * active random toggle as a border/text accent only — never a copper plate under body-size
+ * label text. Compact toolbar sizing stays ≥24px (WCAG 2.2 AA target size).
  */
 
 .ds-entity-session-nav {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--ds-space-2);
+  gap: var(--ds-space-1);
 }
 
-.ds-entity-session-nav .ds-button--compact {
+.ds-entity-session-nav .ds-entity-session-nav__control {
+  min-height: 2rem;
+  min-width: 2rem;
+  padding: 0.25rem var(--ds-space-3);
+  border-radius: var(--ds-radius-sm);
   font-family: var(--ds-font-sans);
-  font-size: 0.8125rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
 }
 
-.ds-entity-session-nav__random[aria-pressed='true'] {
+.ds-entity-session-nav .ds-entity-session-nav__random[aria-pressed='false'] {
+  background: transparent;
+  border-color: var(--ds-border-strong);
+  color: var(--ds-ink);
+}
+
+.ds-entity-session-nav .ds-entity-session-nav__random[aria-pressed='true'] {
+  background: var(--ds-surface-raised);
   border-color: var(--ds-accent);
-  color: var(--ds-accent-text, var(--ds-accent));
+  /* Theme tokens: light #8E4F2A / dark #D07A32 — never raw Copper Pin on fill. */
+  color: var(--ds-accent);
+}
+
+.ds-entity-session-nav .ds-entity-session-nav__random[aria-pressed='true']:hover:not(:disabled) {
+  background: var(--ds-surface-raised);
+  border-color: var(--ds-accent);
+  color: var(--ds-accent);
+  opacity: 0.92;
 }
 
 .ds-nc__session-nav {
@@ -26,5 +49,7 @@
 }
 
 .ds-entity-page__session-nav {
-  margin-top: var(--ds-space-4);
+  margin-top: var(--ds-space-6);
+  padding-top: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
 }

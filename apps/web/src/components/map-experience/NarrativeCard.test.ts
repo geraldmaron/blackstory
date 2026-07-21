@@ -102,6 +102,22 @@ test('renders session navigation when sessionNav props are provided', () => {
   assert.match(html, /Random: off/);
 });
 
+test('floats the close control on the card with an accessible label when onClose is set', () => {
+  const feature = requireFeature('ent_15th_st_church_001');
+  const html = renderToStaticMarkup(
+    createElement(NarrativeCard, {
+      feature,
+      onClose: () => {},
+    }),
+  );
+
+  assert.match(html, /class="ds-nc__close"/);
+  assert.match(html, /aria-label="Close Fifteenth Street Presbyterian Church card"/);
+  // Close is a sibling of kicker/top, not nested inside the kind row.
+  assert.match(html, /ds-nc__close[\s\S]*ds-nc__kicker/);
+  assert.doesNotMatch(html, /ds-nc__top[\s\S]*ds-nc__close/);
+});
+
 test('never labels a coarsened point with a street-address-shaped string', () => {
   for (const entityId of [
     'ent_15th_st_church_001',

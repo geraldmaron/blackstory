@@ -140,6 +140,12 @@ SQL create — see `docs/ds-001/`, `docs/adr/`, `docs/security/`, `docs/testing/
 `infra/firebase/`, `infra/gcp/` (incl. `wif/`), `infra/github/`, `infra/database/`.
 
 ```bash
+# Public web dig — prefer the launcher so PUBLIC_DATA_SOURCE + DATABASE_URL are coherent:
+pnpm dev:web
+# http://localhost:3048/  (PORT=3050 pnpm dev:web for an alternate port)
+# http://localhost:3048/explore  — live catalog needs postgres + DATABASE_URL (~1100 entities).
+# Plain `pnpm --filter @repo/web dev` without those env vars serves the 4-entity Dunbar seed.
+
 pnpm --filter @repo/web exec next dev --port 3048
 # or: pnpm --filter @repo/web dev
 # http://localhost:3048/

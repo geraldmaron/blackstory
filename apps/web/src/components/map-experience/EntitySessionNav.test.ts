@@ -29,6 +29,9 @@ test('renders labeled back, next, and random toggle with disabled and pressed st
   assert.match(html, /Random: on/);
   assert.match(html, />Back</);
   assert.match(html, />Next</);
+  // Random stays secondary when on — copper plate + copper label fails contrast.
+  assert.match(html, /ds-button--secondary[^"]*ds-entity-session-nav__random/);
+  assert.doesNotMatch(html, /ds-button--primary[^"]*ds-entity-session-nav__random/);
 });
 
 test('sequential next exposes list-oriented label when random is off', () => {

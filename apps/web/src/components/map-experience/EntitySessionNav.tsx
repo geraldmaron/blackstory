@@ -1,6 +1,7 @@
 /**
  * Accessible Back / Next controls with an intentional Random toggle for entity session
  * browsing. Presentational only — parents own stack state and navigation side effects.
+ * Random stays secondary + pressed styling so copper never fills body-size label text.
  */
 import React from 'react';
 import { Button } from '@repo/ui';
@@ -32,7 +33,7 @@ export function EntitySessionNav({
     <nav className={rootClass} aria-label="Record navigation">
       <Button
         type="button"
-        className="ds-button--compact"
+        className="ds-button--compact ds-entity-session-nav__control"
         variant="secondary"
         disabled={!canBack}
         aria-label="Back to previous record"
@@ -42,8 +43,8 @@ export function EntitySessionNav({
       </Button>
       <Button
         type="button"
-        className="ds-button--compact ds-entity-session-nav__random"
-        variant={randomEnabled ? 'primary' : 'secondary'}
+        className="ds-button--compact ds-entity-session-nav__control ds-entity-session-nav__random"
+        variant="secondary"
         aria-pressed={randomEnabled}
         aria-label={randomEnabled ? 'Random order: on' : 'Random order: off'}
         onClick={onRandomToggle}
@@ -52,7 +53,7 @@ export function EntitySessionNav({
       </Button>
       <Button
         type="button"
-        className="ds-button--compact"
+        className="ds-button--compact ds-entity-session-nav__control"
         variant="secondary"
         disabled={!canNext}
         aria-label={randomEnabled ? 'Next random record' : 'Next record in list'}

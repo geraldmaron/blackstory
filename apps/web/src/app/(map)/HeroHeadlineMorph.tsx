@@ -207,7 +207,6 @@ export function HeroHeadlineMorph() {
         </span>
       </span>
       <span className="ds-hero-headline-morph__trailer" aria-hidden="true">
-        {' '}
         happened <em>here</em>.
       </span>
     </h1>

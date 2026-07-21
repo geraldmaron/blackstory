@@ -70,7 +70,8 @@ export function HomeStorySections({
         <section className="ds-section" aria-labelledby="featured-heading">
           <p className="ds-section__kicker">From the archive</p>
           <h2 className="ds-section__title" id="featured-heading">
-            See what happened here.
+            See what{' '}
+            <span className="ds-phrase-nowrap">happened here</span>.
           </h2>
           <p className="ds-section__lede">
             Select a pin on the map above, or step into a full record here.

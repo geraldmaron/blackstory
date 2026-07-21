@@ -13,9 +13,6 @@
 
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-
-/** Runtime Postgres reads; never bake Dunbar seed at build without DATABASE_URL. */
-export const dynamic = 'force-dynamic';
 import { MapFrame, Timeline } from '@repo/ui';
 import { KindBadge, ConfidenceMark, MapsExternalLink } from '../../../components/map-experience';
 import { EntityLocationMapLazy } from '../../../components/entity/EntityLocationMapLazy';
@@ -53,6 +50,9 @@ import {
 } from './adapters';
 import { deriveHistoricalFraming } from './entity-view-model';
 import { EntitySessionNavClient } from './entity-session-nav-client';
+
+/** Runtime Postgres reads; never bake Dunbar seed at build without DATABASE_URL. */
+export const dynamic = 'force-dynamic';
 
 type EntityPageProps = {
   readonly params: Promise<{ id: string }>;
@@ -178,7 +178,6 @@ export default async function EntityPage({ params }: EntityPageProps) {
             catalog={entityLinkCatalog}
           />
           <EntityTopicTags entity={entity} />
-          <EntitySessionNavClient currentId={entity.id} orderedIds={orderedIds} />
         </div>
       </header>
 
@@ -374,6 +373,8 @@ export default async function EntityPage({ params }: EntityPageProps) {
                 </div>
               ) : null}
             </section>
+
+            <EntitySessionNavClient currentId={entity.id} orderedIds={orderedIds} />
           </div>
 
           <aside className="ds-entity-aside" aria-label="Record context">

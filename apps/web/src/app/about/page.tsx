@@ -1,7 +1,7 @@
 /**
  * About page — product thesis as a full-bleed living mosaic mast, then editorial
- * pillars, sparse beats, one ink band, and destination paths. Not a documentation
- * column: composition first, archive atmosphere as the visual lead.
+ * pillars, mission beats, one ink band, and destination paths. Composition-first:
+ * brand hero, one job per section, archive atmosphere as the visual lead.
  */
 
 import Link from 'next/link';
@@ -78,7 +78,7 @@ export default function AboutPage() {
           especially the history close to you. People. Places. Evidence. Context.
         </p>
         <p className="ds-about-mast__actions">
-          <Link className="ds-cta ds-cta--copper" href="/explore">
+          <Link className="ds-cta ds-cta--solid" href="/explore">
             Open the map
           </Link>
           <Link className="ds-cta ds-cta--quiet" href="/methodology">
@@ -113,10 +113,13 @@ export default function AboutPage() {
           </ul>
         </section>
 
-        <section className="ds-about__beats" aria-label="Why this exists">
+        <section className="ds-about__beats" aria-labelledby="about-beats-heading">
+          <h2 className="ds-visually-hidden" id="about-beats-heading">
+            Why this exists
+          </h2>
           <article className="ds-about__beat">
             <p className="ds-mono ds-about__beat-index">01</p>
-            <h2 className="ds-about__beat-title">History should not be erased</h2>
+            <h3 className="ds-about__beat-title">History should not be erased</h3>
             <p className="ds-about__beat-body">
               When sources disagree, both claims stay on the record. When a fact is corrected, the
               earlier wording remains visible. Withdrawals stay resolvable with a plain-language
@@ -126,7 +129,7 @@ export default function AboutPage() {
           </article>
           <article className="ds-about__beat">
             <p className="ds-mono ds-about__beat-index">02</p>
-            <h2 className="ds-about__beat-title">It should not be hard to find</h2>
+            <h3 className="ds-about__beat-title">It should not be hard to find</h3>
             <p className="ds-about__beat-body">
               Most people pass documented Black history without knowing it is there. Open the map,
               start with your state, search by name or place, or follow a decade of movement.
@@ -136,7 +139,7 @@ export default function AboutPage() {
           </article>
           <article className="ds-about__beat">
             <p className="ds-mono ds-about__beat-index">03</p>
-            <h2 className="ds-about__beat-title">Accessible because it is about you</h2>
+            <h3 className="ds-about__beat-title">Accessible because it is about you</h3>
             <p className="ds-about__beat-body">
               Not a remote museum shelf — history pinned to the places people live, teach, report
               from, and visit. Choose a state. Share your location if you want to. Read what
@@ -146,7 +149,7 @@ export default function AboutPage() {
         </section>
       </div>
 
-      <section className="ds-band ds-about__band" aria-labelledby="publish-heading">
+      <section className="ds-about__band" aria-labelledby="publish-heading">
         <div className="ds-container">
           <p className="ds-section__kicker">Publish bar</p>
           <h2 className="ds-section__title" id="publish-heading">
@@ -158,7 +161,7 @@ export default function AboutPage() {
             sharper location than the stored precision. The archive is incomplete by nature; gaps
             are stated plainly. Completeness is not claimed.
           </p>
-          <p className="ds-band__cta">
+          <p className="ds-about__band-cta">
             <Link className="ds-cta ds-cta--solid" href="/methodology">
               Read the methodology
             </Link>

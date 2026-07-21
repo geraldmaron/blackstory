@@ -196,7 +196,9 @@
 @media (max-width: 64rem) {
   .ds-map-surface:has(.ds-explore-stage__spotlight[open]) {
     --ds-explore-zoom-right: var(--ds-explore-edge);
-    --ds-explore-zoom-bottom: calc(min(72svh, 36rem) + var(--ds-explore-edge) + var(--ds-space-2));
+    --ds-explore-zoom-bottom: calc(
+      min(72svh, 36rem) + var(--ds-explore-edge) + var(--ds-space-3) + var(--ds-space-2)
+    );
   }
 }
 
@@ -1107,14 +1109,16 @@
 
   .ds-explore-stage__spotlight {
     place-items: end center;
-    padding: 0;
+    /* Modest horizontal gutter on narrow viewports — not edge-to-edge flush. */
+    padding-inline: var(--ds-explore-edge, var(--ds-space-3));
+    padding-block: 0 var(--ds-space-3);
   }
 
   .ds-explore-stage__spotlight-panel {
     width: 100%;
     max-width: none;
     max-height: min(72svh, 36rem);
-    border-radius: var(--ds-radius-lg) var(--ds-radius-lg) 0 0;
+    border-radius: var(--ds-radius-lg);
     border-left-width: var(--ds-border-width);
     border-top: 3px solid var(--ds-accent);
   }

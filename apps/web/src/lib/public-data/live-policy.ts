@@ -1,5 +1,11 @@
 /**
  * Policy for when the web app should attempt canonical Postgres public projection reads.
+ *
+ * Local dig footguns this module documents:
+ * - `PUBLIC_DATA_SOURCE` unset + no `DATABASE_URL` → Dunbar seed (4 entities); national dig
+ *   looks empty.
+ * - `PUBLIC_DATA_SOURCE=postgres` without `DATABASE_URL` → empty catalog (seed refused).
+ * Use `./scripts/dev-web.sh` (or set both vars) for the live ~1100-entity catalog.
  */
 
 export type PublicDataSource = 'seed' | 'postgres';
@@ -29,8 +35,17 @@ export function shouldPreferReleaseArtifacts(env: EnvironmentLike = process.env)
   return resolvePublicDataSource(env) !== 'postgres';
 }
 
-function hasPostgresConnection(env: EnvironmentLike): boolean {
+/** Server-only Postgres URL present (`DATABASE_URL` or `APP_DATABASE_URL`). */
+export function hasPostgresConnection(env: EnvironmentLike = process.env): boolean {
   return Boolean(env.DATABASE_URL?.trim() || env.APP_DATABASE_URL?.trim());
+}
+
+/**
+ * True when postgres SoR is selected but no connection string is configured — list/map/search
+ * will return an empty catalog (never the Dunbar seed).
+ */
+export function isPostgresPublicDataMisconfigured(env: EnvironmentLike = process.env): boolean {
+  return isPostgresPublicDataSource(env) && !hasPostgresConnection(env);
 }
 
 /** Whether this runtime should attempt live public projection reads.  */
