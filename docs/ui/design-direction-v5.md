@@ -30,10 +30,11 @@ Where anything below contradicts an earlier section of this document, **this sec
 - **The plate is an artifact, not a web map.** Ocean/unmapped world sits one step below Black
   Ink (`DIGNITY_PALETTE.ocean` #080606); the landmass rests in a warm Page Sand wash
   (`densityUnknownFill`/`densityDisabledFill`), state bounds are warm sand hairlines. A bottom
-  legibility scrim on the hero is a map-plate treatment, not page UI. Zoom envelope 3–10:
-  national to county, never street scale (dignity + honesty — an empty street grid reads
-  invasive and broken). The stock zoom control wears the island language and hides on touch
-  viewports.
+  legibility scrim on the hero is a map-plate treatment, not page UI. Zoom envelope **3–14**:
+  national floor to street-orientation ceiling (OpenFreeMap roads from ~z8 help readers visit
+  places). Cap stops short of address-invasive rooftop framing; marker honesty stays precision-
+  redacted, never implied by zoom alone. Stock zoom control wears the island language and hides
+  on touch viewports (hero); explore keeps it in a safe zone.
 - **The cockpit is brand-fixed.** `/explore`'s floating instruments stamp `data-theme="dark"`
   on the stage wrapper: ink-glass panels over the plate in BOTH reader themes. Reader
   light/dark preference styles document pages only.
@@ -59,9 +60,10 @@ vibes:
    never scrolls still leaves oriented.
 2. **One record anatomy, everywhere.** List row, search row, and entity page present
    the same order: kind slug → name → one-line story → labeled facts → tags → precision →
-   single action. Map pin / list activation opens the **entity page** (not a floating map
-   card). `?selected=` on `/explore` only orients the copper ring when returning from
-   “View on map.” Predictability is the accommodation — no surface invents its own order.
+   single action. Map pin / list activation opens a **preview narrative card** in the explore
+   spotlight (native dialog: focus trap, Escape, restore-focus); the copper CTA is the off-ramp
+   to the full entity page. `?selected=` is shareable preview state (e.g. return from
+   “View on map”). Predictability is the accommodation — no surface invents its own order.
 3. **Labels are literal.** Every fact carries a visible label (Era, Evidence, Confidence,
    Status) in a `dt/dd` pair. Never bare values glued together ("place1770s – 1850s" was the
    defect class), never meaning carried by position or color alone.
@@ -246,9 +248,10 @@ modifier names, one definition site each, zero visual divergence.
    only (dignity).
 4. *From the archive (Discover):* story rail — top-rule entries, mono KIND / STATE slug, Sora
    record name, serif one-line story. 3-up desktop, stacked mobile.
-5. *How this works (Trust):* single ink band (fixed charcoal, full-bleed, no radius): three
-   numbered points (what qualifies, how confidence works, what stays off the map) in serif +
-   one solid CTA to `/methodology`. Replaces v4's two separate standards/transparency sections.
+5. *How this works (Trust):* theme-aware section (follows light/dark reader theme — not a
+   fixed-charcoal ink band): compact research-pipeline sketch + three numbered points (what
+   qualifies, how confidence works, what stays off the map) in serif + one solid CTA to
+   `/methodology`. Replaces v4's two separate standards/transparency sections.
 
 **`/explore`** — instruments, not furniture. Filters: one compact top-left instrument, mono
 label + native selects, collapsed by default on mobile into a bottom sheet. Results: slim

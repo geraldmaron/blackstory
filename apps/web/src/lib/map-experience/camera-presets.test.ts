@@ -10,6 +10,8 @@ import {
   CAMERA_COUNTY_ZOOM,
   CAMERA_POINT_ZOOM,
   CAMERA_PRESETS,
+  MAP_MAX_ZOOM,
+  MAP_MIN_ZOOM,
   REDUCED_MOTION_CAMERA_PRESETS,
   cameraPresetFor,
   type CameraPresetName,
@@ -90,8 +92,15 @@ test('cameraPresetFor selects the reduced-motion table only when asked', () => {
   assert.equal(cameraPresetFor('state', true), REDUCED_MOTION_CAMERA_PRESETS.state);
 });
 
-test('the point preset lands at a coherent, positive zoom level', () => {
-  assert.ok(CAMERA_POINT_ZOOM > 0 && CAMERA_POINT_ZOOM < 22);
+test('map zoom envelope is national floor to street-orientation ceiling', () => {
+  assert.equal(MAP_MIN_ZOOM, 3);
+  assert.equal(MAP_MAX_ZOOM, 14);
+  assert.ok(MAP_MIN_ZOOM < MAP_MAX_ZOOM);
+});
+
+test('the point preset lands inside the map zoom envelope', () => {
+  assert.ok(CAMERA_POINT_ZOOM > MAP_MIN_ZOOM);
+  assert.ok(CAMERA_POINT_ZOOM <= MAP_MAX_ZOOM);
 });
 
 test('county zoom sits between state resting frame and point framing', () => {

@@ -102,6 +102,8 @@ import {
 } from '../../lib/map-experience/memorial-decade-fade';
 import {
   cameraPresetFor,
+  MAP_MAX_ZOOM,
+  MAP_MIN_ZOOM,
   prefersReducedMotion,
   type CameraPresetName,
 } from '../../lib/map-experience/camera-presets';
@@ -1437,6 +1439,10 @@ export function MapStageProvider({
     [runFlyPreset],
   );
 
+  /** Stable handle for one-shot map listeners (cluster expand) registered in the mount effect. */
+  const runFlyPresetRef = useRef(runFlyPreset);
+  runFlyPresetRef.current = runFlyPreset;
+
   const subscribe = useCallback(
     <E extends MapStageEventName>(
       event: E,
@@ -1483,8 +1489,8 @@ export function MapStageProvider({
           renderWorldCopies: false,
           // Street-level context is available (OpenFreeMap roads from z8); stop short of
           // address-level invasion — precision redaction still governs marker honesty.
-          minZoom: 3,
-          maxZoom: 14,
+          minZoom: MAP_MIN_ZOOM,
+          maxZoom: MAP_MAX_ZOOM,
           bounds: bounds as [number, number, number, number],
           fitBoundsOptions: { padding: 32 },
         });
@@ -1634,7 +1640,8 @@ export function MapStageProvider({
 
       // Cluster expansion (dignity-style.ts's EXPLORE_CLUSTER_CONFIG contract: "every cluster
       // decomposes to named entities within two interactions") — clicking a cluster circle
-      // eases down to the zoom where that cluster splits. Registered up-front even though the
+      // eases down to the zoom where that cluster splits, through the authored camera grammar
+      // (ADR-017: raw easeTo/flyTo defaults are banned). Registered up-front even though the
       // layer is added post-load: MapLibre's layer-scoped events resolve the layer at event
       // time, so a not-yet-added layer is simply never hit.
       activeMap.on('click', EXPLORE_CLUSTER_LAYER_ID, (event: MapLayerMouseEvent) => {
@@ -1645,10 +1652,14 @@ export function MapStageProvider({
         const [lng, lat] = feature.geometry.coordinates;
         void source
           .getClusterExpansionZoom(clusterId)
-          .then((zoom) => {
-            if (typeof lng === 'number' && typeof lat === 'number') {
-              activeMap.easeTo({ center: [lng, lat], zoom, essential: true });
-            }
+          .then((expansionZoom) => {
+            if (typeof lng !== 'number' || typeof lat !== 'number') return;
+            const zoom = Math.min(Math.max(expansionZoom, MAP_MIN_ZOOM), MAP_MAX_ZOOM);
+            runFlyPresetRef.current(
+              'locality',
+              { center: [lng, lat], zoom },
+              { mode: 'ease' },
+            );
           })
           .catch(() => {
             // Cluster may have dissolved between click and lookup (data patch mid-flight);

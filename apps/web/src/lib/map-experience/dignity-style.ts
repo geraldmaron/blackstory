@@ -10,7 +10,10 @@ import { brandPalette } from '@repo/ui';
 export const EXPLORE_CLUSTER_CONFIG = {
   /** Pixel radius for grouping nearby points — tighter than default so metro clouds collapse. */
   clusterRadius: 52,
-  /** Keep aggregates through state/locality; individuals emerge past this zoom. */
+  /**
+   * Keep aggregates through state/locality; individuals emerge past this zoom.
+   * Must stay below `MAP_MAX_ZOOM` so expansion flights remain inside the envelope.
+   */
   clusterMaxZoom: 12,
   clusterMinPoints: 2,
 } as const;

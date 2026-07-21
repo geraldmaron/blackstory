@@ -130,10 +130,18 @@ export function cameraPresetFor(name: CameraPresetName, reducedMotion: boolean):
   return reducedMotion ? REDUCED_MOTION_CAMERA_PRESETS[name] : CAMERA_PRESETS[name];
 }
 
+/**
+ * Explore / hero MapLibre zoom envelope (design-direction-v5 + street-orientation posture).
+ * National floor at 3; ceiling stops short of address-invasive rooftop framing while still
+ * allowing OpenFreeMap street context (~z8+) so readers can orient for a visit. Marker honesty
+ * stays governed by precision redaction, not by forbidding basemap streets.
+ */
+export const MAP_MIN_ZOOM = 3;
+export const MAP_MAX_ZOOM = 14;
+
 /** Zoom level `MapStage` lands a `point` flight at when arriving on a single entity — a
- * campus/neighborhood-scale framing close enough to read the pin's radius-affordance halo, never
- * a street-level zoom (never implies rooftop precision, and this module has no opinion on
- * any specific coordinate — only on how close the camera gets). */
+ * campus/neighborhood-scale framing close enough to read the pin's radius-affordance halo.
+ * Never implies rooftop precision; always ≤ `MAP_MAX_ZOOM`. */
 export const CAMERA_POINT_ZOOM = 13;
 
 /** County / locality resting zoom when a selected-record card closes from beyond-county

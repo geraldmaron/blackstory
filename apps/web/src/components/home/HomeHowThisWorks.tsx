@@ -1,10 +1,12 @@
 /**
- * Homepage fixed-ink “How this works” band — evidence-before-assertion copy,
- * compact research-pipeline sketch reused from /methodology, three trust
- * points, and a single methodology CTA.
+ * Homepage “How this works” section — evidence-before-assertion copy, compact
+ * research-pipeline sketch reused from /methodology, three trust points, and a
+ * single methodology CTA.
  *
- * Pipeline-sketch CSS is imported by `app/(map)/page.tsx` (and methodology)
- * so this module stays unit-testable under node/tsx without CSS loaders.
+ * Theme-aware (`ds-section` + ordinary `--ds-*` tokens): follows light and dark
+ * reader themes. Pipeline-sketch CSS is imported by `app/(map)/page.tsx` (and
+ * methodology) so this module stays unit-testable under node/tsx without CSS
+ * loaders.
  */
 
 import React from 'react';
@@ -31,7 +33,7 @@ const HOW_ITEMS = [
 
 export function HomeHowThisWorks() {
   return (
-    <section className="ds-band ds-home-how" aria-labelledby="how-heading">
+    <section className="ds-section ds-home-how" aria-labelledby="how-heading">
       <div className="ds-container">
         <header className="ds-home-how__intro">
           <p className="ds-section__kicker">How this works</p>
@@ -61,7 +63,7 @@ export function HomeHowThisWorks() {
           </ol>
         </div>
 
-        <p className="ds-band__cta ds-home-how__cta">
+        <p className="ds-home-how__cta">
           <Link className="ds-cta ds-cta--solid" href="/methodology">
             Read the methodology
           </Link>

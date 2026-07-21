@@ -53,6 +53,8 @@ describe('HomeHowThisWorks', () => {
     const html = renderToStaticMarkup(<HomeHowThisWorks />);
     assert.match(html, /How this works/);
     assert.match(html, /Evidence before assertion/);
+    assert.match(html, /ds-section ds-home-how/);
+    assert.doesNotMatch(html, /ds-band/);
     assert.match(html, /ds-home-how__compose/);
     assert.match(html, /ds-pipeline-sketch--compact/);
     assert.match(html, /Research pipeline — intake to publish gate/);

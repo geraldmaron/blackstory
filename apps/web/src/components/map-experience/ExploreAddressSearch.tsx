@@ -2,10 +2,12 @@
 
 /**
  * Lean place finder for `/explore`: one search field + radius chips (All / 5–50 mi).
- * Suggests matching catalog records from already-loaded map data, then falls back to
- * `/locate/api` (Census + city/state centroid) for camera framing. Parent owns ranking.
+ * Suggests matching catalog records from already-loaded map data (deferred ranking so
+ * typing stays responsive), then falls back to `/locate/api` (Census + city/state centroid)
+ * for camera framing. Parent owns ranking. Place lookups are U.S.-only and server-side —
+ * never a browser geocoder key.
  */
-import React, { useId, useMemo, useState } from 'react';
+import React, { useDeferredValue, useId, useMemo, useState } from 'react';
 import { Button } from '@repo/ui';
 import { getExploreAppCheckHeaders } from '../../app/(map)/explore/app-check-client';
 import { fetchLocateByAddress } from '../../lib/geocode/locate-client';
@@ -86,9 +88,10 @@ export function ExploreAddressSearch({
   const loading = status.kind === 'loading' || disabled;
   const radiusPreset = exploreRadiusPresetById(radiusId);
 
+  const recommendationsQuery = useDeferredValue(query);
   const recommendations = useMemo(
-    () => suggestCatalogRecords(query, catalogFeatures, 6),
-    [query, catalogFeatures],
+    () => suggestCatalogRecords(recommendationsQuery, catalogFeatures, 6),
+    [recommendationsQuery, catalogFeatures],
   );
 
   function emitResolved(target: ExploreAddressCameraTarget, entityId?: string) {
@@ -211,6 +214,10 @@ export function ExploreAddressSearch({
           {loading ? 'Looking up…' : 'Go'}
         </Button>
       </form>
+      <p className="ds-explore-place__privacy">
+        Place lookup uses the U.S. Census Geocoder on our servers — no third-party map keys in
+        this browser. Coarse framing only; living residences stay off the public map.
+      </p>
 
       {recommendations.length > 0 ? (
         <div className="ds-explore-place__recs">

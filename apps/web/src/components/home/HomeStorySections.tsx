@@ -2,7 +2,7 @@
  * The paper-canvas beats below the persistent map hero (design-direction-v5
  * §6.1): About (product thesis + quiet place orientation), From the data
  * (archive counts + `/data` census visualizations), Discover (story rail), and
- * one fixed-ink "How this works" band (methodology sketch + three points).
+ * How this works (theme-aware methodology sketch + three trust points).
  *
  * Chart and pipeline-sketch CSS are imported by `app/(map)/page.tsx` so this
  * module stays unit-testable under node/tsx without CSS loaders.

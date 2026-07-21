@@ -18,4 +18,5 @@ test('renders place field, All radius chip, and live status region', () => {
   assert.match(html, /5 mi/);
   assert.match(html, /role="status"/);
   assert.match(html, /aria-live="polite"/);
+  assert.match(html, /U\.S\. Census Geocoder/);
 });

@@ -175,3 +175,17 @@ describe('maker credit theme marks', () => {
     );
   });
 });
+
+describe('home how-this-works pipeline sketch', () => {
+  it('keeps theme tokens — no fixed-ink remapping on the homepage sketch', () => {
+    assert.match(shellCss, /\.ds-home-how__sketch\s+\.ds-pipeline-sketch\s*\{[^}]*margin:\s*0/s);
+    assert.doesNotMatch(
+      shellCss,
+      /\.ds-home-how__sketch\s+\.ds-pipeline-sketch\s*\{[^}]*--ds-fixed-/s,
+    );
+    assert.doesNotMatch(
+      shellCss,
+      /\.ds-home-how__sketch\s+\.ds-pipeline-sketch\s*\{[^}]*--ds-ink:\s*var\(--ds-fixed-/s,
+    );
+  });
+});

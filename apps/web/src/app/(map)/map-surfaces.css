@@ -435,6 +435,14 @@
   color: var(--ds-ink-muted);
 }
 
+.ds-explore-place__privacy {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  color: var(--ds-ink-subtle);
+}
+
 .ds-explore-place__recs {
   display: grid;
   gap: var(--ds-space-1);
@@ -782,15 +790,27 @@
   pointer-events: auto;
 }
 
-/* Centered (desktop) / bottom-sheet (mobile) narrative — copper marks the orientation moment. */
+/* Centered (desktop) / bottom-sheet (mobile) narrative — copper marks the orientation moment.
+   Native <dialog> for focus trap + Escape; transparent shell so the scrim + panel layout stays. */
 .ds-explore-stage__spotlight {
   position: fixed;
   inset: 0;
   z-index: 4;
   display: grid;
   place-items: center;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
   padding: var(--ds-space-4);
+  border: 0;
+  background: transparent;
   pointer-events: none;
+}
+
+.ds-explore-stage__spotlight::backdrop {
+  background: transparent;
 }
 
 .ds-explore-stage__spotlight-scrim {

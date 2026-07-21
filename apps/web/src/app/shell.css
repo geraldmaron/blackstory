@@ -1366,7 +1366,7 @@
   outline-offset: 2px;
 }
 
-/* —— Home “How this works” — ink band composition with methodology sketch —— */
+/* —— Home “How this works” — theme-aware section with methodology sketch —— */
 .ds-home-how__intro {
   max-width: 40rem;
 }
@@ -1379,7 +1379,7 @@
 }
 
 .ds-home-how__lede {
-  color: var(--ds-fixed-stone);
+  color: var(--ds-ink-muted);
 }
 
 .ds-home-how__compose {
@@ -1403,21 +1403,11 @@
 }
 
 /*
- * Paper plate inside the fixed-ink band so the hand-drawn sketch keeps
- * archive-paper contrast regardless of [data-theme].
+ * Sketch keeps ordinary --ds-* tokens so it flips with [data-theme] like
+ * /methodology — no fixed-ink remapping and no forced cream plate.
  */
 .ds-home-how__sketch .ds-pipeline-sketch {
-  --ds-surface: var(--ds-fixed-paper);
-  --ds-surface-raised: var(--ds-fixed-paper);
-  --ds-ink: var(--ds-fixed-ink);
-  --ds-ink-muted: color-mix(in srgb, var(--ds-fixed-ink) 58%, var(--ds-fixed-paper));
-  --ds-accent: var(--ds-fixed-accent);
-  --ds-accent-graphic: var(--ds-fixed-accent);
-  --ds-rule: color-mix(in srgb, var(--ds-fixed-ink) 16%, transparent);
   margin: 0;
-  background: var(--ds-fixed-paper);
-  color: var(--ds-fixed-ink);
-  border-color: color-mix(in srgb, var(--ds-fixed-paper) 22%, transparent);
 }
 
 .ds-home-how__sketch .ds-pipeline-sketch__svg {
@@ -1440,15 +1430,15 @@
   display: grid;
   gap: var(--ds-space-2);
   padding: var(--ds-space-4) 0;
-  border-top: var(--ds-border-width) solid var(--ds-fixed-rule);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
 }
 
 .ds-home-how__point:last-child {
-  border-bottom: var(--ds-border-width) solid var(--ds-fixed-rule);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
 }
 
 .ds-home-how__point-index {
-  color: var(--ds-fixed-accent);
+  color: var(--ds-accent);
   font-family: var(--ds-font-mono);
   font-size: 0.75rem;
   font-weight: 500;
@@ -1457,7 +1447,7 @@
 
 .ds-home-how__point-title {
   margin: 0;
-  color: var(--ds-fixed-paper);
+  color: var(--ds-ink);
   font-family: var(--ds-font-display);
   font-size: 1.125rem;
   font-weight: 600;
@@ -1467,7 +1457,7 @@
 
 .ds-home-how__point-body {
   margin: 0;
-  color: var(--ds-fixed-stone);
+  color: var(--ds-ink-muted);
   font-family: var(--ds-font-editorial);
   font-size: 1rem;
   line-height: 1.55;

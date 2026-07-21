@@ -299,7 +299,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   const stage = useMapStage();
   const [view, setView] = useState(initial);
   const filterRegionRef = useRef<HTMLDivElement | null>(null);
-  const spotlightRef = useRef<HTMLDivElement | null>(null);
+  const spotlightDialogRef = useRef<HTMLDialogElement | null>(null);
   // Agent B: latch hero→explore on first client render before any effect clears sessionStorage.
   const [fromHeroTransition] = useState(readHeroTransitionFlag);
   const [entering, setEntering] = useState(false);
@@ -329,6 +329,8 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   const urlRadiusAppliedRef = useRef<string | null>(null);
   /** Camera before the most recent point-selection flight (hierarchical close target). */
   const preSelectViewportRef = useRef<ExploreViewport | undefined>(initial.viewState.viewport);
+  /** Camera before the most recent place-search flight (cleared when place focus is dismissed). */
+  const prePlaceSearchViewportRef = useRef<ExploreViewport | undefined>(undefined);
   /** Preferred Filters | Color key tab when both URL sections are visible. */
   const [leftTabPreference, setLeftTabPreference] = useState<ExploreLeftTab | null>(null);
   /**
@@ -959,7 +961,12 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   const handleAddressResolved = useCallback(
     (payload: ExploreAddressResolvedPayload) => {
       const { target, radiusMeters, radiusLabel, entityId } = payload;
-      preSelectViewportRef.current = liveViewportRef.current ?? viewStateRef.current.viewport;
+      const prior = liveViewportRef.current ?? viewStateRef.current.viewport;
+      prePlaceSearchViewportRef.current = prior;
+      // Catalog picks also open a selected record — stash close-camera origin once.
+      if (entityId) {
+        preSelectViewportRef.current = prior;
+      }
       const center = { lat: target.viewport.lat, lng: target.viewport.lng };
 
       // Fly to the place — never lock the state filter (that collapsed the map to a handful
@@ -1005,10 +1012,19 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   );
 
   const handleClearPlaceSearch = useCallback(() => {
+    const prior = prePlaceSearchViewportRef.current;
+    prePlaceSearchViewportRef.current = undefined;
     setPlaceSearchFocus(null);
     urlRadiusAppliedRef.current = null;
+    if (prior) {
+      stage.flyPreset(
+        'locality',
+        { center: [prior.lng, prior.lat], zoom: prior.zoom },
+        { mode: 'ease' },
+      );
+    }
     commitViewState(mergeViewState(view.viewState, { clearRadius: true, clearNear: true }));
-  }, [commitViewState, view.viewState]);
+  }, [commitViewState, stage, view.viewState]);
 
   const handleClearState = useCallback(() => {
     stage.flyPreset('national', { bounds: US_CONUS_BOUNDS }, { mode: 'ease' });
@@ -1183,26 +1199,22 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     commitViewState(mergeViewState(view.viewState, { clearEdge: true }));
   }, [commitViewState, view.viewState]);
 
-  // Spotlight: focus the panel card; Escape dismisses preview or connection panel.
+  // Spotlight: native <dialog> for focus trap + restore-focus (same contract as @repo/ui Dialog).
   const spotlightOpen = Boolean(view.selectedEdge) || Boolean(selectedFeature);
   const dismissSpotlight = view.selectedEdge ? handleCloseEdge : handleClearSelected;
   useEffect(() => {
     if (!spotlightOpen) return undefined;
-
+    const node = spotlightDialogRef.current;
+    if (!node) return undefined;
+    if (!node.open) node.showModal();
     const frame = window.requestAnimationFrame(() => {
-      spotlightRef.current?.querySelector<HTMLElement>('article, [tabindex]')?.focus();
+      node.querySelector<HTMLElement>('article, button.ds-nc__close, [tabindex], button')?.focus();
     });
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key !== 'Escape') return;
-      event.preventDefault();
-      dismissSpotlight();
-    }
-    window.addEventListener('keydown', onKeyDown);
     return () => {
       window.cancelAnimationFrame(frame);
-      window.removeEventListener('keydown', onKeyDown);
+      if (node.open) node.close();
     };
-  }, [spotlightOpen, dismissSpotlight]);
+  }, [spotlightOpen]);
 
   const handleViewportChange = useCallback((frame: ExploreViewportFrame) => {
     const viewport: ExploreViewport = {
@@ -1665,26 +1677,29 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
       </div>
 
       {spotlightOpen ? (
-        <div className="ds-explore-stage__spotlight" ref={spotlightRef}>
+        <dialog
+          ref={spotlightDialogRef}
+          className="ds-explore-stage__spotlight"
+          aria-label={view.selectedEdge ? 'Selected connection' : 'Selected record'}
+          onCancel={(event) => {
+            event.preventDefault();
+            dismissSpotlight();
+          }}
+        >
           <button
             type="button"
             className="ds-explore-stage__spotlight-scrim"
             aria-label={view.selectedEdge ? 'Dismiss connection panel' : 'Dismiss record preview'}
             onClick={dismissSpotlight}
           />
-          <div
-            className="ds-explore-stage__spotlight-panel"
-            role="dialog"
-            aria-modal="true"
-            aria-label={view.selectedEdge ? 'Selected connection' : 'Selected record'}
-          >
+          <div className="ds-explore-stage__spotlight-panel">
             {view.selectedEdge ? (
               <HistoryEdgePanel edge={view.selectedEdge} onClose={handleCloseEdge} />
             ) : selectedFeature ? (
               <NarrativeCard feature={selectedFeature} onClose={handleClearSelected} />
             ) : null}
           </div>
-        </div>
+        </dialog>
       ) : null}
     </div>
   );
