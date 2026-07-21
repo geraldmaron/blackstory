@@ -1,0 +1,605 @@
+[
+  {
+    "id": "recon_hastings_gantt",
+    "kind": "person",
+    "displayName": "Hastings Gantt",
+    "summary": "Hastings Gantt, a formerly enslaved man, served in the South Carolina House of Representatives during Reconstruction (1870–1876, 1878–1884) representing Beaufort County. He donated land that became the Penn School, a cornerstone of African American education and later a meeting site for civil rights leaders including Dr. Martin Luther King Jr.",
+    "eraBuckets": [
+      "1870s",
+      "1880s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "education",
+      "land-ownership",
+      "politics",
+      "hbcu",
+      "self-determination"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "education",
+      "land-ownership",
+      "politics",
+      "hbcu",
+      "self-determination"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction politician",
+      "Penn School",
+      "Beaufort County",
+      "land donation",
+      "Black legislator"
+    ],
+    "jurisdictionLabel": "St. Helena Island, South Carolina",
+    "locationPrecision": "campus",
+    "locationLabel": "Penn Center campus",
+    "lat": 32.3883,
+    "lng": -80.5753,
+    "claims": [
+      {
+        "predicate": "served as representative in",
+        "object": "South Carolina House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Gantt_Cottage",
+        "citationLabel": "Gantt Cottage - Wikipedia"
+      },
+      {
+        "predicate": "represented",
+        "object": "Beaufort County, South Carolina",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Gantt_Cottage",
+        "citationLabel": "Gantt Cottage - Wikipedia"
+      },
+      {
+        "predicate": "donated land for",
+        "object": "Penn School",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Gantt_Cottage",
+        "citationLabel": "Gantt Cottage - Wikipedia"
+      },
+      {
+        "predicate": "was formerly enslaved",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Gantt_Cottage",
+        "citationLabel": "Gantt Cottage - Wikipedia"
+      },
+      {
+        "predicate": "is commemorated by",
+        "object": "Gantt Cottage at Penn Center",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Gantt_Cottage",
+        "citationLabel": "Gantt Cottage - Wikipedia"
+      },
+      {
+        "predicate": "contributed to",
+        "object": "Black education during Reconstruction",
+        "confidenceLevel": "medium",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/74001824",
+        "citationLabel": "National Register of Historic Places - Penn Center Historic District"
+      }
+    ],
+    "historicalContext": "Gantt’s political service and land donation occurred during Reconstruction, a period of Black political advancement in the South before the rise of Jim Crow. His support for Penn School—a rare institution dedicated to Black education on St. Helena Island—helped sustain Black autonomy and leadership development, later enabling its role in the 20th-century civil rights movement."
+  },
+  {
+    "id": "recon_eben_hayes",
+    "kind": "person",
+    "displayName": "Eben Hayes",
+    "summary": "Eben Hayes, a Black farmer and Methodist preacher, served in the South Carolina House of Representatives from 1868 to 1870 and again from 1872 to 1874, representing Marion County during Reconstruction. His election marked a significant moment in Black political empowerment following emancipation.",
+    "eraBuckets": [
+      "1860s",
+      "1870s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "government"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "government"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Marion County",
+      "South Carolina House of Representatives",
+      "Radical Republicans",
+      "Black officeholder"
+    ],
+    "jurisdictionLabel": "Marion, South Carolina",
+    "locationPrecision": "district",
+    "locationLabel": "Marion County",
+    "lat": 34.08,
+    "lng": -79.35,
+    "claims": [
+      {
+        "predicate": "served_in",
+        "object": "South Carolina House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Eben_Hayes",
+        "citationLabel": "Wikipedia: Eben Hayes"
+      },
+      {
+        "predicate": "elected_in",
+        "object": "1868",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Eben_Hayes",
+        "citationLabel": "Wikipedia: Eben Hayes"
+      },
+      {
+        "predicate": "elected_in",
+        "object": "1872",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Eben_Hayes",
+        "citationLabel": "Wikipedia: Eben Hayes"
+      },
+      {
+        "predicate": "member_of",
+        "object": "Republican Party",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Eben_Hayes",
+        "citationLabel": "Wikipedia: Eben Hayes"
+      },
+      {
+        "predicate": "affiliated_with",
+        "object": "Radical Republicans",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Eben_Hayes",
+        "citationLabel": "Wikipedia: Eben Hayes"
+      },
+      {
+        "predicate": "role_in",
+        "object": "Reconstruction-era Black political participation",
+        "confidenceLevel": "high",
+        "citationSource": "nmaahc.si.edu",
+        "citationHref": "https://nmaahc.si.edu/object/nmaahc_2008.9.29?destination=edan-search/collection_search%3Fedan_local%3D1%26edan_q%3Deben%252Bhayes",
+        "citationLabel": "NMAAHC: Radical Members of the South Carolina Legislature"
+      }
+    ],
+    "historicalContext": "Hayes's service in the state legislature occurred during Reconstruction, a period when newly enfranchised Black men won elected office across the South despite violent opposition. His role reflects the brief expansion of Black political power enabled by federal enforcement of the 14th and 15th Amendments before Jim Crow laws dismantled it."
+  },
+  {
+    "id": "recon_h_e_hayne",
+    "kind": "person",
+    "displayName": "H. E. Hayne",
+    "summary": "Henry E. Hayne, a free Black man born in Charleston, served as South Carolina’s Secretary of State (1872–1877) and was the first Black student at the University of South Carolina’s medical school in 1873. His enrollment helped integrate the university until Democrats closed it in 1877.",
+    "eraBuckets": [
+      "1860s",
+      "1870s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "desegregation",
+      "education",
+      "firsts",
+      "government",
+      "segregation",
+      "voting-rights",
+      "black-power"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "desegregation",
+      "education",
+      "firsts",
+      "government",
+      "segregation",
+      "voting-rights",
+      "black-power"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "first Black student USC",
+      "Secretary of State South Carolina",
+      "Reconstruction politician",
+      "33rd US Colored Infantry",
+      "1868 Constitutional Convention"
+    ],
+    "jurisdictionLabel": "Columbia, South Carolina",
+    "locationPrecision": "campus",
+    "locationLabel": "University of South Carolina campus",
+    "lat": 33.49722222,
+    "lng": -80.85,
+    "claims": [
+      {
+        "predicate": "served as Secretary of State of South Carolina",
+        "object": "1872–1877",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Henry_E._Hayne",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was the first Black student at the University of South Carolina medical school",
+        "object": "enrolled October 7, 1873",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/people/henry-hayne.htm",
+        "citationLabel": "National Park Service"
+      },
+      {
+        "predicate": "served as a delegate to the 1868 South Carolina Constitutional Convention",
+        "object": "Republican delegate from Marion County",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Henry_E._Hayne",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "enlisted in the 33rd United States Colored Infantry Regiment",
+        "object": "Union Army, 1862–1866",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Henry_E._Hayne",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "certified the 1876 South Carolina gubernatorial election",
+        "object": "under pressure from Red Shirts' violence",
+        "confidenceLevel": "medium",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/people/henry-hayne.htm",
+        "citationLabel": "National Park Service"
+      },
+      {
+        "predicate": "represented Marion County in the South Carolina Senate",
+        "object": "elected in 1870",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Henry_E._Hayne",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Hayne’s political and educational milestones occurred during Reconstruction, when Black men gained suffrage and held office under federal protection. His enrollment at the University of South Carolina tested new civil rights laws, but the state’s 1877 closure of the university and resegregation reflected the collapse of Reconstruction and rise of Jim Crow. His career exemplifies both the possibilities and fragility of Black political power in the postwar South."
+  },
+  {
+    "id": "recon_samuel_nuckles",
+    "kind": "person",
+    "displayName": "Samuel Nuckles",
+    "summary": "Samuel Nuckles, a formerly enslaved man, served in the South Carolina House of Representatives from 1868 to 1872, representing Union County during Reconstruction. He testified before a U.S. Senate committee about Ku Klux Klan intimidation aimed at suppressing Black voting, describing threats and violence during the 1870 election.",
+    "eraBuckets": [
+      "1860s",
+      "1870s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "voting-rights",
+      "enslavement",
+      "resistance",
+      "segregation"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "voting-rights",
+      "enslavement",
+      "resistance",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Ku Klux Klan",
+      "Black legislator",
+      "Union County",
+      "testimony"
+    ],
+    "jurisdictionLabel": "Pacolet, South Carolina",
+    "locationPrecision": "site",
+    "locationLabel": "Mulberry Chapel Methodist Church",
+    "lat": 34.93047222,
+    "lng": -81.65397222,
+    "claims": [
+      {
+        "predicate": "served as state representative",
+        "object": "South Carolina House of Representatives, Union County",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Samuel_Nuckles",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "testified before Joint Senate Committee on Conditions in the Late Insurrectionary States",
+        "object": "described KKK intimidation of Black voters in 1870 election",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Samuel_Nuckles",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was formerly enslaved",
+        "object": "born into slavery, later became legislator",
+        "confidenceLevel": "high",
+        "citationSource": "nationalregister.sc.gov",
+        "citationHref": "http://www.nationalregister.sc.gov/cherokee/S10817711024/S10817711024.pdf",
+        "citationLabel": "National Register of Historic Places nomination"
+      },
+      {
+        "predicate": "is buried at",
+        "object": "Mulberry Chapel Methodist Church",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Samuel_Nuckles",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "participated in",
+        "object": "1868 South Carolina Constitutional Convention",
+        "confidenceLevel": "high",
+        "citationSource": "nationalregister.sc.gov",
+        "citationHref": "http://www.nationalregister.sc.gov/cherokee/S10817711024/S10817711024.pdf",
+        "citationLabel": "National Register of Historic Places nomination"
+      }
+    ],
+    "historicalContext": "Nuckles’ political service and testimony illuminate the brief window of Black political participation during Reconstruction and the violent backlash from white supremacist groups like the Ku Klux Klan. His account before Congress underscores how terrorism was systematically used to undermine newly won Black suffrage rights in the South, particularly after the 1867 Reconstruction Acts enfranchised Black men."
+  },
+  {
+    "id": "recon_sancho_saunders",
+    "kind": "person",
+    "displayName": "Sancho Saunders",
+    "summary": "Sancho Saunders, born in 1805, was an African American Baptist minister and formerly enslaved man who served in the South Carolina House of Representatives from Chester County during the 1868–1870 Reconstruction-era legislature. His photograph appears in a Smithsonian-held montage of Radical Republican legislators, affirming his role in early Black political representation in the postbellum South.",
+    "eraBuckets": [
+      "1860s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "enslavement",
+      "firsts",
+      "self-governance"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "enslavement",
+      "firsts",
+      "self-governance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction legislator",
+      "formerly enslaved",
+      "Baptist minister",
+      "Chester County",
+      "Radical Republican"
+    ],
+    "jurisdictionLabel": "Chester, South Carolina",
+    "locationPrecision": "institution",
+    "locationLabel": "South Carolina State House (seat of legislature)",
+    "lat": 34.00027778,
+    "lng": -81.03305556,
+    "claims": [
+      {
+        "predicate": "served as member of",
+        "object": "South Carolina House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Sancho_Saunders",
+        "citationLabel": "Wikipedia: Sancho Saunders"
+      },
+      {
+        "predicate": "represented",
+        "object": "Chester County, South Carolina",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Sancho_Saunders",
+        "citationLabel": "Wikipedia: Sancho Saunders"
+      },
+      {
+        "predicate": "was participant in",
+        "object": "1868 South Carolina Constitutional Convention",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Sancho_Saunders",
+        "citationLabel": "Wikipedia: Sancho Saunders"
+      },
+      {
+        "predicate": "was formerly enslaved",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Sancho_Saunders",
+        "citationLabel": "Wikipedia: Sancho Saunders"
+      },
+      {
+        "predicate": "was African American Baptist minister",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Sancho_Saunders",
+        "citationLabel": "Wikipedia: Sancho Saunders"
+      },
+      {
+        "predicate": "photograph included in",
+        "object": "Radical Members of the South Carolina Legislature montage",
+        "confidenceLevel": "high",
+        "citationSource": "nmaahc.si.edu",
+        "citationHref": "https://nmaahc.si.edu/object/nmaahc_2008.9.29",
+        "citationLabel": "NMAAHC: Radical Members of the South Carolina Legislature"
+      }
+    ],
+    "historicalContext": "During Reconstruction, newly enfranchised Black men in South Carolina gained political power previously denied under slavery and Jim Crow. Men like Sancho Saunders, elected to the state legislature, participated in rewriting state laws and constitutions to expand civil rights, despite facing violent opposition and eventual rollback after federal troops withdrew. Their service represents a brief but significant window of Black self-governance in the American South."
+  },
+  {
+    "id": "recon_henry_l_shrewsbury",
+    "kind": "person",
+    "displayName": "Henry L. Shrewsbury",
+    "summary": "Henry L. Shrewsbury, a free man of color and teacher, represented Chesterfield County in the South Carolina House of Representatives from 1868 to 1870. He served as a delegate to the 1868 South Carolina Constitutional Convention and ran the Freedman’s Bureau office in Cheraw, contributing to Black political and educational advancement during Reconstruction.",
+    "eraBuckets": [
+      "1860s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "education"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "education"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "South Carolina House of Representatives",
+      "Freedman's Bureau",
+      "1868 Constitutional Convention",
+      "Black legislator"
+    ],
+    "jurisdictionLabel": "Cheraw, South Carolina",
+    "locationPrecision": "city",
+    "locationLabel": "Freedman’s Bureau office and political base",
+    "lat": 33.78333333,
+    "lng": -81.93333333,
+    "claims": [
+      {
+        "predicate": "represented",
+        "object": "Chesterfield County in the South Carolina House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Henry_L._Shrewsbury",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served_as_delegate_to",
+        "object": "1868 South Carolina Constitutional Convention",
+        "confidenceLevel": "high",
+        "citationSource": "nmaahc.si.edu",
+        "citationHref": "https://nmaahc.si.edu/object/nmaahc_2016.49.4",
+        "citationLabel": "NMAAHC"
+      },
+      {
+        "predicate": "ran",
+        "object": "Freedman Bureau office in Cheraw, South Carolina",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Henry_L._Shrewsbury",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_appointed",
+        "object": "election commissioner for Chesterfield County, South Carolina in October 1868",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Henry_L._Shrewsbury",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_described_as",
+        "object": "a free mulatto",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Henry_L._Shrewsbury",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "taught_at",
+        "object": "a school established by the American Missionary Association after the Civil War",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Henry_L._Shrewsbury",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Shrewsbury’s political career emerged during Reconstruction, when newly enfranchised Black men gained elected office across the South. His participation in the 1868 Constitutional Convention and local governance reflects the brief but transformative period of Black political empowerment before Jim Crow laws dismantled these gains."
+  },
+  {
+    "id": "recon_augustus_simkins",
+    "kind": "person",
+    "displayName": "Augustus Simkins",
+    "summary": "Augustus Simkins served in the South Carolina House of Representatives from Edgefield County between 1872 and 1876 during Reconstruction, a period when newly enfranchised Black men gained political office despite rising white supremacist violence aimed at undermining their participation.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "segregation"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Black legislator",
+      "South Carolina House",
+      "Edgefield County",
+      "Red Shirts"
+    ],
+    "jurisdictionLabel": "Edgefield, South Carolina",
+    "locationPrecision": "district",
+    "locationLabel": "Edgefield County government and legislative district",
+    "lat": 33.78,
+    "lng": -81.97,
+    "claims": [
+      {
+        "predicate": "served as member of",
+        "object": "South Carolina House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Edgefield_County%2C_South_Carolina",
+        "citationLabel": "Wikipedia - Edgefield County, South Carolina"
+      },
+      {
+        "predicate": "represented",
+        "object": "Edgefield County, South Carolina",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Edgefield_County%2C_South_Carolina",
+        "citationLabel": "Wikipedia - Edgefield County, South Carolina"
+      },
+      {
+        "predicate": "held office during",
+        "object": "Reconstruction era",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Edgefield_County%2C_South_Carolina",
+        "citationLabel": "Wikipedia - Edgefield County, South Carolina"
+      },
+      {
+        "predicate": "was part of political context involving",
+        "object": "Red Shirt paramilitary suppression of Black voting",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Edgefield_County%2C_South_Carolina",
+        "citationLabel": "Wikipedia - Edgefield County, South Carolina"
+      }
+    ],
+    "historicalContext": "Simkins' tenure occurred during Reconstruction, when constitutional amendments granted Black men citizenship and voting rights. In Edgefield County, Black political gains were met with organized white resistance, including Red Shirt paramilitary campaigns to suppress Black voting through intimidation and violence, culminating in events like the 1876 Hamburg Massacre."
+  }
+]
