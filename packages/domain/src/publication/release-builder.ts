@@ -29,6 +29,12 @@
  * own doc comment these may still be raw legacy-tag placeholder strings pending the related workstream's
  * real entity-resolution work, so treating them as fail-closed today would reject legitimate,
  * already-reviewed records for a gap this bead does not own.
+ *
+ * Opt-in geo-integrity (`evaluateReleaseGeoIntegrityGate`): when `ReleaseBuildContext` supplies
+ * `geoIntegrity.stateBoundaries` (or shorthand `stateBoundaries`), declared state vs coordinates
+ * is checked via `evaluateGeoIntegrityPublishGate` before artifacts are emitted. Omitted boundaries
+ * preserve backward-compatible fixture behavior. Mismatch fails closed; lat/lng/state are never
+ * auto-rewritten.
  */
 import {
   NOTABILITY_CRITERIA,
@@ -42,6 +48,13 @@ import { evaluateFactPublishGate } from '../facts/publish-gate.js';
 import type { FactCitation } from '../facts/citation.js';
 import { isValidTopicId } from '../taxonomy/topics.js';
 import { buildGeoPointFields, type GeoPointFields } from '../geography/geohash.js';
+import {
+  evaluateGeoIntegrityPublishGate,
+  type StateBoundaryIndex,
+} from '../geo-integrity/index.js';
+import { normalizeStateCode } from '../geo-integrity/containment.js';
+import type { GeoIntegrityAuditOptions } from '../geo-integrity/audit.js';
+import { US_STATES } from '../map/us-geography.js';
 import type { PublicRelatedEntry } from '../graph/adjacency.js';
 import type { RelationshipType, TemporalContext } from '../relationship.js';
 import { RELATIONSHIP_TYPES } from '../relationship.js';
@@ -75,6 +88,8 @@ export type ReleaseSourceEntity = {
   readonly mentionedEntityIds?: readonly string[];
   readonly keywords?: readonly string[];
   readonly jurisdictionLabel: string;
+  /** Explicit USPS postal code when known; wins over parsing `jurisdictionLabel`. */
+  readonly jurisdictionStateCode?: string;
   readonly locationPrecision: string;
   readonly locationLabel: string;
   readonly lat: number;
@@ -140,6 +155,16 @@ export type ReleaseBuildContext = {
     readonly action: 'flag_for_retraction' | 'needs_review' | 'clear_flag';
     readonly reason: string;
   };
+  /**
+   * Opt-in geo-integrity publish gate. When `stateBoundaries` is present (here or via shorthand
+   * `stateBoundaries` on this context), coordinates must lie inside the declared state's polygon.
+   */
+  readonly geoIntegrity?: {
+    readonly stateBoundaries: StateBoundaryIndex;
+    readonly toleranceDegrees?: number;
+  };
+  /** Shorthand for `geoIntegrity.stateBoundaries` when no other geo-integrity options are needed. */
+  readonly stateBoundaries?: StateBoundaryIndex;
 };
 
 export type ReleaseEntityProjectionFields = {
@@ -212,7 +237,11 @@ export type ReleaseSearchIndexFields = {
 };
 
 export type ReleaseBuildFailureReason =
-  'no_citations' | 'notability_basis_gate' | 'reference_resolution' | 'catalog_decision_retracted';
+  | 'no_citations'
+  | 'notability_basis_gate'
+  | 'reference_resolution'
+  | 'catalog_decision_retracted'
+  | 'geo_integrity_gate';
 
 export type ReleaseBuildResult =
   | {
@@ -460,6 +489,96 @@ export function resolveReleaseEntityReferences(
   return { ok: true };
 }
 
+const US_STATES_BY_NAME_LENGTH_DESC: readonly (typeof US_STATES)[number][] = [...US_STATES].sort(
+  (a, b) => b.name.length - a.name.length,
+);
+
+/**
+ * Resolves the declared USPS postal code for geo-integrity checks. Prefers an explicit
+ * `jurisdictionStateCode`; otherwise parses the trailing segment of `jurisdictionLabel`
+ * (2-letter code, D.C., or full state name). Returns an empty string when unresolvable.
+ */
+export function resolveReleaseEntityStateCode(
+  entry: Pick<ReleaseSourceEntity, 'jurisdictionLabel' | 'jurisdictionStateCode'>,
+): string {
+  if (entry.jurisdictionStateCode !== undefined) {
+    return normalizeStateCode(entry.jurisdictionStateCode);
+  }
+
+  const label = entry.jurisdictionLabel.trim();
+  if (label.length === 0) return '';
+
+  const trailing = (label.split(',').pop() ?? '').trim();
+  if (trailing.length === 0) return '';
+
+  if (/^[A-Za-z]{2}$/.test(trailing)) {
+    return normalizeStateCode(trailing);
+  }
+  if (/^D\.?\s*C\.?$/i.test(trailing)) {
+    return 'DC';
+  }
+
+  const trailingLower = trailing.toLowerCase();
+  for (const state of US_STATES_BY_NAME_LENGTH_DESC) {
+    if (trailingLower === state.name.toLowerCase()) {
+      return state.postalCode;
+    }
+  }
+
+  return '';
+}
+
+function resolveReleaseStateBoundaries(context: ReleaseBuildContext): StateBoundaryIndex | undefined {
+  return context.geoIntegrity?.stateBoundaries ?? context.stateBoundaries;
+}
+
+function resolveReleaseGeoIntegrityOptions(
+  context: ReleaseBuildContext,
+): GeoIntegrityAuditOptions | undefined {
+  const toleranceDegrees = context.geoIntegrity?.toleranceDegrees;
+  if (toleranceDegrees === undefined) return undefined;
+  return { toleranceDegrees };
+}
+
+export type ReleaseGeoIntegrityGateResult =
+  | { readonly ok: true }
+  | { readonly ok: false; readonly message: string };
+
+/**
+ * Pre-check for the release builder: when boundaries are supplied on context, verifies that
+ * `lat`/`lng` lie inside the entity's declared state. Uses `evaluateGeoIntegrityPublishGate`;
+ * never mutates coordinates or jurisdiction fields.
+ */
+export function evaluateReleaseGeoIntegrityGate(
+  entry: ReleaseSourceEntity,
+  context: ReleaseBuildContext,
+  lat: number,
+  lng: number,
+): ReleaseGeoIntegrityGateResult {
+  const boundaries = resolveReleaseStateBoundaries(context);
+  if (boundaries === undefined) return { ok: true };
+
+  const gateOptions = resolveReleaseGeoIntegrityOptions(context);
+  const gate = evaluateGeoIntegrityPublishGate(
+    [
+      {
+        id: entry.id,
+        stateCode: resolveReleaseEntityStateCode(entry),
+        lat,
+        lng,
+      },
+    ],
+    boundaries,
+    gateOptions ?? {},
+  );
+  if (gate.ok) return { ok: true };
+
+  return {
+    ok: false,
+    message: gate.failures.map((failure) => failure.message).join(' '),
+  };
+}
+
 function isRelationshipType(value: string): value is RelationshipType {
   return (RELATIONSHIP_TYPES as readonly string[]).includes(value);
 }
@@ -496,7 +615,9 @@ function resolveRelatedEntries(
  *  - the derived `notabilityBasis` fails `evaluateNotabilityGate` or contains a basis record with
  *    zero resolvable evidence, or
  *  - `resolveReleaseEntityReferences` rejects a dangling topic/evidence/jurisdiction/location
- *    reference.
+ *    reference, or
+ *  - opt-in `evaluateReleaseGeoIntegrityGate` rejects a declared-state vs coordinate mismatch
+ *    when `geoIntegrity.stateBoundaries` / `stateBoundaries` is supplied on context.
  * An out-of-range lat/lng throws (via `buildGeoPointFields`) rather than returning `{ok:false}`
  * this mirrors the pre-existing behavior callers already handle as a thrown, per-entity failure.
  */
@@ -547,6 +668,16 @@ export function buildReleaseEntityArtifacts(
   const geohashPrecision = context.geohashPrecision ?? 5;
   const lat = context.locationOverride?.lat ?? entry.lat;
   const lng = context.locationOverride?.lng ?? entry.lng;
+
+  const geoIntegrityGate = evaluateReleaseGeoIntegrityGate(entry, context, lat, lng);
+  if (!geoIntegrityGate.ok) {
+    return {
+      ok: false,
+      reason: 'geo_integrity_gate',
+      message: geoIntegrityGate.message,
+    };
+  }
+
   const locationPrecision = context.locationOverride?.precision ?? entry.locationPrecision;
   const locationLabel = context.locationOverride?.locationLabel ?? entry.locationLabel;
   const matchMethod = context.locationOverride?.matchMethod ?? 'manual_research';

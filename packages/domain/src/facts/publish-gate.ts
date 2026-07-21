@@ -8,6 +8,13 @@
  * `../publication/index.ts`'s release-build discipline, applied to the fact registry's own
  * record shape.
  *
+ * Capture-completeness ops bar: after structural completeness passes, web URL citations are
+ * mapped to `../capture-completeness/index.js`'s `CitationForCaptureCompleteness` and evaluated
+ * via `evaluateCaptureCompleteness` against `CAPTURE_COMPLETENESS_BAR_RATIO` (default 0.95).
+ * Offline-only facts vacuously pass — the evaluator excludes non-URL locations from the
+ * denominator. Per-record structural discipline (archivedUrl present) and corpus-level capture
+ * evidence (valid Wayback pointer or content hash) are intentionally separate axes.
+ *
  * Not wired live: the projection-build pipeline (`workers/publication/`, per ADR-007) is
  * the intended caller. Call `assertFactMayPublish` immediately before including a fact in a
  * release/projection build and do not proceed if it throws.
@@ -26,6 +33,10 @@
  * closed rather than silently skipping the check (see `derivation.ts` for why).
  */
 import {
+  evaluateCaptureCompleteness,
+  type CitationForCaptureCompleteness,
+} from '../capture-completeness/index.js';
+import {
   isSearchIndexableFactStatus,
   isPubliclyResolvableFactStatus,
   type FactStatus,
@@ -35,15 +46,43 @@ import {
   evaluateFactDerivationConsistency,
   type FactDerivationBackingClaim,
 } from './derivation.js';
+import { isWebFactCitation, type FactCitation } from './citation.js';
 
 export type FactPublishGateFailureReason =
-  'no_citations' | 'incomplete_citation' | 'not_a_publishable_status' | 'derivation_inconsistent';
+  | 'no_citations'
+  | 'incomplete_citation'
+  | 'not_a_publishable_status'
+  | 'derivation_inconsistent'
+  | 'capture_completeness_below_bar';
 
-/** Per-call options for the derivation-consistency sub-check; omit entirely (or leave
- * `backingClaims` unset) for a fact whose `derivedFromClaimIds` is empty. */
+/** Per-call options for derivation-consistency and capture-completeness sub-checks; omit
+ * `backingClaims` for a fact whose `derivedFromClaimIds` is empty. */
 export type FactPublishGateOptions = {
   readonly backingClaims?: readonly FactDerivationBackingClaim[];
+  readonly captureCompletenessBarRatio?: number;
 };
+
+function mapFactCitationForCaptureCompleteness(
+  citation: FactCitation,
+): CitationForCaptureCompleteness {
+  const citationId = citation.csl.id;
+  const location: CitationForCaptureCompleteness['location'] = isWebFactCitation(citation)
+    ? { kind: 'url', url: citation.csl.URL ?? citation.url! }
+    : {
+        kind: 'offline',
+        designation: {
+          kind: 'other',
+          description: citation.sourceNote ?? citation.csl.title ?? citation.csl.id,
+        },
+      };
+  const captureId = citation.documentId ?? citation.csl.id;
+  const capture: CitationForCaptureCompleteness['capture'] = {
+    captureId,
+    ...(citation.archivedUrl !== undefined ? { waybackCaptureUrl: citation.archivedUrl } : {}),
+    ...(citation.archivedAt !== undefined ? { waybackCapturedAt: citation.archivedAt } : {}),
+  };
+  return { citationId, location, capture };
+}
 
 export type FactPublishGateResult =
   | { readonly ok: true }
@@ -80,6 +119,28 @@ export function evaluateFactPublishGate(
       message:
         `FactRecord cannot reach status "${fact.status}": at least one citation is missing an ` +
         'archived-capture pointer (archivedUrl+archivedAt) or a retrieval date (accessedAt).',
+    };
+  }
+
+  const captureCompletenessOptions =
+    options.captureCompletenessBarRatio !== undefined
+      ? { barRatio: options.captureCompletenessBarRatio }
+      : {};
+  const captureCompleteness = evaluateCaptureCompleteness(
+    fact.citations.map(mapFactCitationForCaptureCompleteness),
+    captureCompletenessOptions,
+  );
+  if (!captureCompleteness.meetsBar) {
+    const missing =
+      captureCompleteness.missing.length > 0
+        ? captureCompleteness.missing.join(', ')
+        : 'none listed';
+    return {
+      ok: false,
+      reason: 'capture_completeness_below_bar',
+      message:
+        `FactRecord cannot reach status "${fact.status}": web citation capture completeness ` +
+        `ratio ${captureCompleteness.ratio} is below the ops bar (missing: ${missing}).`,
     };
   }
 

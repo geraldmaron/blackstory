@@ -1,7 +1,868 @@
 {
   "source": "geo-integrity-fixture",
-  "sourceVersion": "v1",
+  "sourceVersion": "v2-all-states-dc",
   "jurisdictions": [
+    {
+      "id": "us-01",
+      "kind": "state",
+      "name": "Alabama",
+      "state_fips": "01",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "AL",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -88.5,
+                30.1
+              ],
+              [
+                -84.9,
+                30.1
+              ],
+              [
+                -84.9,
+                35
+              ],
+              [
+                -88.5,
+                35
+              ],
+              [
+                -88.5,
+                30.1
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-02",
+      "kind": "state",
+      "name": "Alaska",
+      "state_fips": "02",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "AK",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -179.9,
+                51
+              ],
+              [
+                -129.9,
+                51
+              ],
+              [
+                -129.9,
+                71.5
+              ],
+              [
+                -179.9,
+                71.5
+              ],
+              [
+                -179.9,
+                51
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-04",
+      "kind": "state",
+      "name": "Arizona",
+      "state_fips": "04",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "AZ",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -114.9,
+                31.3
+              ],
+              [
+                -109,
+                31.3
+              ],
+              [
+                -109,
+                37
+              ],
+              [
+                -114.9,
+                37
+              ],
+              [
+                -114.9,
+                31.3
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-05",
+      "kind": "state",
+      "name": "Arkansas",
+      "state_fips": "05",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "AR",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -94.7,
+                33
+              ],
+              [
+                -89.6,
+                33
+              ],
+              [
+                -89.6,
+                36.5
+              ],
+              [
+                -94.7,
+                36.5
+              ],
+              [
+                -94.7,
+                33
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-06",
+      "kind": "state",
+      "name": "California",
+      "state_fips": "06",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "CA",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -124.5,
+                32.5
+              ],
+              [
+                -114.1,
+                32.5
+              ],
+              [
+                -114.1,
+                42
+              ],
+              [
+                -124.5,
+                42
+              ],
+              [
+                -124.5,
+                32.5
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-08",
+      "kind": "state",
+      "name": "Colorado",
+      "state_fips": "08",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "CO",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -109.1,
+                37
+              ],
+              [
+                -102,
+                37
+              ],
+              [
+                -102,
+                41
+              ],
+              [
+                -109.1,
+                41
+              ],
+              [
+                -109.1,
+                37
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-09",
+      "kind": "state",
+      "name": "Connecticut",
+      "state_fips": "09",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "CT",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -73.8,
+                40.95
+              ],
+              [
+                -71.75,
+                40.95
+              ],
+              [
+                -71.75,
+                42.05
+              ],
+              [
+                -73.8,
+                42.05
+              ],
+              [
+                -73.8,
+                40.95
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-10",
+      "kind": "state",
+      "name": "Delaware",
+      "state_fips": "10",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "DE",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -75.8,
+                38.4
+              ],
+              [
+                -75,
+                38.4
+              ],
+              [
+                -75,
+                39.85
+              ],
+              [
+                -75.8,
+                39.85
+              ],
+              [
+                -75.8,
+                38.4
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-11",
+      "kind": "state",
+      "name": "District of Columbia",
+      "state_fips": "11",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "DC",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -77.12,
+                38.79
+              ],
+              [
+                -76.9,
+                38.79
+              ],
+              [
+                -76.9,
+                39
+              ],
+              [
+                -77.12,
+                39
+              ],
+              [
+                -77.12,
+                38.79
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-12",
+      "kind": "state",
+      "name": "Florida",
+      "state_fips": "12",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "FL",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -87.65,
+                24.4
+              ],
+              [
+                -80,
+                24.4
+              ],
+              [
+                -80,
+                31
+              ],
+              [
+                -87.65,
+                31
+              ],
+              [
+                -87.65,
+                24.4
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-13",
+      "kind": "state",
+      "name": "Georgia",
+      "state_fips": "13",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "GA",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -85.7,
+                30.35
+              ],
+              [
+                -80.8,
+                30.35
+              ],
+              [
+                -80.8,
+                35
+              ],
+              [
+                -85.7,
+                35
+              ],
+              [
+                -85.7,
+                30.35
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-15",
+      "kind": "state",
+      "name": "Hawaii",
+      "state_fips": "15",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "HI",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -160.3,
+                18.9
+              ],
+              [
+                -154.8,
+                18.9
+              ],
+              [
+                -154.8,
+                22.3
+              ],
+              [
+                -160.3,
+                22.3
+              ],
+              [
+                -160.3,
+                18.9
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-16",
+      "kind": "state",
+      "name": "Idaho",
+      "state_fips": "16",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "ID",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -117.3,
+                41.99
+              ],
+              [
+                -111,
+                41.99
+              ],
+              [
+                -111,
+                49
+              ],
+              [
+                -117.3,
+                49
+              ],
+              [
+                -117.3,
+                41.99
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-17",
+      "kind": "state",
+      "name": "Illinois",
+      "state_fips": "17",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "IL",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -91.55,
+                36.97
+              ],
+              [
+                -87,
+                36.97
+              ],
+              [
+                -87,
+                42.51
+              ],
+              [
+                -91.55,
+                42.51
+              ],
+              [
+                -91.55,
+                36.97
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-18",
+      "kind": "state",
+      "name": "Indiana",
+      "state_fips": "18",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "IN",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -88.1,
+                37.77
+              ],
+              [
+                -84.78,
+                37.77
+              ],
+              [
+                -84.78,
+                41.76
+              ],
+              [
+                -88.1,
+                41.76
+              ],
+              [
+                -88.1,
+                37.77
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-19",
+      "kind": "state",
+      "name": "Iowa",
+      "state_fips": "19",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "IA",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -96.64,
+                40.37
+              ],
+              [
+                -90.14,
+                40.37
+              ],
+              [
+                -90.14,
+                43.5
+              ],
+              [
+                -96.64,
+                43.5
+              ],
+              [
+                -96.64,
+                40.37
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-20",
+      "kind": "state",
+      "name": "Kansas",
+      "state_fips": "20",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "KS",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -102.1,
+                36.99
+              ],
+              [
+                -94.6,
+                36.99
+              ],
+              [
+                -94.6,
+                40
+              ],
+              [
+                -102.1,
+                40
+              ],
+              [
+                -102.1,
+                36.99
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-21",
+      "kind": "state",
+      "name": "Kentucky",
+      "state_fips": "21",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "KY",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -89.6,
+                36.5
+              ],
+              [
+                -81.96,
+                36.5
+              ],
+              [
+                -81.96,
+                39.15
+              ],
+              [
+                -89.6,
+                39.15
+              ],
+              [
+                -89.6,
+                36.5
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-22",
+      "kind": "state",
+      "name": "Louisiana",
+      "state_fips": "22",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "LA",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -94.05,
+                28.9
+              ],
+              [
+                -88.75,
+                28.9
+              ],
+              [
+                -88.75,
+                33.02
+              ],
+              [
+                -94.05,
+                33.02
+              ],
+              [
+                -94.05,
+                28.9
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-23",
+      "kind": "state",
+      "name": "Maine",
+      "state_fips": "23",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "ME",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -71.1,
+                42.95
+              ],
+              [
+                -66.9,
+                42.95
+              ],
+              [
+                -66.9,
+                47.46
+              ],
+              [
+                -71.1,
+                47.46
+              ],
+              [
+                -71.1,
+                42.95
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-24",
+      "kind": "state",
+      "name": "Maryland",
+      "state_fips": "24",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "MD",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -79.49,
+                37.9
+              ],
+              [
+                -75.05,
+                37.9
+              ],
+              [
+                -75.05,
+                39.72
+              ],
+              [
+                -79.49,
+                39.72
+              ],
+              [
+                -79.49,
+                37.9
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
     {
       "id": "us-25",
       "kind": "state",
@@ -16,42 +877,359 @@
           "type": "Polygon",
           "coordinates": [
             [
-              [-73.51, 41.24],
-              [-69.86, 41.24],
-              [-69.86, 42.89],
-              [-73.51, 42.89],
-              [-73.51, 41.24]
+              [
+                -73.51,
+                41.24
+              ],
+              [
+                -69.86,
+                41.24
+              ],
+              [
+                -69.86,
+                42.89
+              ],
+              [
+                -73.51,
+                42.89
+              ],
+              [
+                -73.51,
+                41.24
+              ]
             ]
           ]
         },
-        "source": "fixture",
-        "sourceVersion": "geo-integrity-v1"
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
       }
     },
     {
-      "id": "us-36",
+      "id": "us-26",
       "kind": "state",
-      "name": "New York",
-      "state_fips": "36",
+      "name": "Michigan",
+      "state_fips": "26",
       "county_fips": null,
       "parent_id": "us",
       "geohash": null,
       "metadata": {
-        "postalCode": "NY",
+        "postalCode": "MI",
         "geometry": {
           "type": "Polygon",
           "coordinates": [
             [
-              [-79.76, 40.5],
-              [-71.85, 40.5],
-              [-71.85, 45.02],
-              [-79.76, 45.02],
-              [-79.76, 40.5]
+              [
+                -90.42,
+                41.7
+              ],
+              [
+                -82.12,
+                41.7
+              ],
+              [
+                -82.12,
+                48.31
+              ],
+              [
+                -90.42,
+                48.31
+              ],
+              [
+                -90.42,
+                41.7
+              ]
             ]
           ]
         },
-        "source": "fixture",
-        "sourceVersion": "geo-integrity-v1"
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-27",
+      "kind": "state",
+      "name": "Minnesota",
+      "state_fips": "27",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "MN",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -97.24,
+                43.5
+              ],
+              [
+                -89.49,
+                43.5
+              ],
+              [
+                -89.49,
+                49.38
+              ],
+              [
+                -97.24,
+                49.38
+              ],
+              [
+                -97.24,
+                43.5
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-28",
+      "kind": "state",
+      "name": "Mississippi",
+      "state_fips": "28",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "MS",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -91.66,
+                30.17
+              ],
+              [
+                -88.1,
+                30.17
+              ],
+              [
+                -88.1,
+                35
+              ],
+              [
+                -91.66,
+                35
+              ],
+              [
+                -91.66,
+                30.17
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-29",
+      "kind": "state",
+      "name": "Missouri",
+      "state_fips": "29",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "MO",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -95.77,
+                35.99
+              ],
+              [
+                -89.1,
+                35.99
+              ],
+              [
+                -89.1,
+                40.61
+              ],
+              [
+                -95.77,
+                40.61
+              ],
+              [
+                -95.77,
+                35.99
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-30",
+      "kind": "state",
+      "name": "Montana",
+      "state_fips": "30",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "MT",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -116.05,
+                44.36
+              ],
+              [
+                -104.04,
+                44.36
+              ],
+              [
+                -104.04,
+                49
+              ],
+              [
+                -116.05,
+                49
+              ],
+              [
+                -116.05,
+                44.36
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-31",
+      "kind": "state",
+      "name": "Nebraska",
+      "state_fips": "31",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "NE",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -104.05,
+                40
+              ],
+              [
+                -95.31,
+                40
+              ],
+              [
+                -95.31,
+                43
+              ],
+              [
+                -104.05,
+                43
+              ],
+              [
+                -104.05,
+                40
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-32",
+      "kind": "state",
+      "name": "Nevada",
+      "state_fips": "32",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "NV",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -120,
+                35
+              ],
+              [
+                -114.04,
+                35
+              ],
+              [
+                -114.04,
+                42
+              ],
+              [
+                -120,
+                42
+              ],
+              [
+                -120,
+                35
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-33",
+      "kind": "state",
+      "name": "New Hampshire",
+      "state_fips": "33",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "NH",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -72.56,
+                42.7
+              ],
+              [
+                -70.61,
+                42.7
+              ],
+              [
+                -70.61,
+                45.31
+              ],
+              [
+                -72.56,
+                45.31
+              ],
+              [
+                -72.56,
+                42.7
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
       }
     },
     {
@@ -68,16 +1246,851 @@
           "type": "Polygon",
           "coordinates": [
             [
-              [-75.56, 38.93],
-              [-73.9, 38.93],
-              [-73.9, 40.7],
-              [-75.56, 40.7],
-              [-75.56, 38.93]
+              [
+                -75.56,
+                38.93
+              ],
+              [
+                -73.9,
+                38.93
+              ],
+              [
+                -73.9,
+                41.36
+              ],
+              [
+                -75.56,
+                41.36
+              ],
+              [
+                -75.56,
+                38.93
+              ]
             ]
           ]
         },
-        "source": "fixture",
-        "sourceVersion": "geo-integrity-v1"
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-35",
+      "kind": "state",
+      "name": "New Mexico",
+      "state_fips": "35",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "NM",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -109.05,
+                31.33
+              ],
+              [
+                -103,
+                31.33
+              ],
+              [
+                -103,
+                37
+              ],
+              [
+                -109.05,
+                37
+              ],
+              [
+                -109.05,
+                31.33
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-36",
+      "kind": "state",
+      "name": "New York",
+      "state_fips": "36",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "NY",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -79.76,
+                40.5
+              ],
+              [
+                -71.85,
+                40.5
+              ],
+              [
+                -71.85,
+                45.02
+              ],
+              [
+                -79.76,
+                45.02
+              ],
+              [
+                -79.76,
+                40.5
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-37",
+      "kind": "state",
+      "name": "North Carolina",
+      "state_fips": "37",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "NC",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -84.32,
+                33.84
+              ],
+              [
+                -75.46,
+                33.84
+              ],
+              [
+                -75.46,
+                36.59
+              ],
+              [
+                -84.32,
+                36.59
+              ],
+              [
+                -84.32,
+                33.84
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-38",
+      "kind": "state",
+      "name": "North Dakota",
+      "state_fips": "38",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "ND",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -104.05,
+                45.94
+              ],
+              [
+                -96.55,
+                45.94
+              ],
+              [
+                -96.55,
+                49
+              ],
+              [
+                -104.05,
+                49
+              ],
+              [
+                -104.05,
+                45.94
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-39",
+      "kind": "state",
+      "name": "Ohio",
+      "state_fips": "39",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "OH",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -84.82,
+                38.4
+              ],
+              [
+                -80.52,
+                38.4
+              ],
+              [
+                -80.52,
+                41.98
+              ],
+              [
+                -84.82,
+                41.98
+              ],
+              [
+                -84.82,
+                38.4
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-40",
+      "kind": "state",
+      "name": "Oklahoma",
+      "state_fips": "40",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "OK",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -103,
+                33.62
+              ],
+              [
+                -94.43,
+                33.62
+              ],
+              [
+                -94.43,
+                37
+              ],
+              [
+                -103,
+                37
+              ],
+              [
+                -103,
+                33.62
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-41",
+      "kind": "state",
+      "name": "Oregon",
+      "state_fips": "41",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "OR",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -124.57,
+                41.99
+              ],
+              [
+                -116.46,
+                41.99
+              ],
+              [
+                -116.46,
+                46.29
+              ],
+              [
+                -124.57,
+                46.29
+              ],
+              [
+                -124.57,
+                41.99
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-42",
+      "kind": "state",
+      "name": "Pennsylvania",
+      "state_fips": "42",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "PA",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -80.52,
+                39.72
+              ],
+              [
+                -74.69,
+                39.72
+              ],
+              [
+                -74.69,
+                42.27
+              ],
+              [
+                -80.52,
+                42.27
+              ],
+              [
+                -80.52,
+                39.72
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-44",
+      "kind": "state",
+      "name": "Rhode Island",
+      "state_fips": "44",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "RI",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -71.86,
+                41.15
+              ],
+              [
+                -71.12,
+                41.15
+              ],
+              [
+                -71.12,
+                42.02
+              ],
+              [
+                -71.86,
+                42.02
+              ],
+              [
+                -71.86,
+                41.15
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-45",
+      "kind": "state",
+      "name": "South Carolina",
+      "state_fips": "45",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "SC",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -83.35,
+                32.03
+              ],
+              [
+                -78.49,
+                32.03
+              ],
+              [
+                -78.49,
+                35.22
+              ],
+              [
+                -83.35,
+                35.22
+              ],
+              [
+                -83.35,
+                32.03
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-46",
+      "kind": "state",
+      "name": "South Dakota",
+      "state_fips": "46",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "SD",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -104.06,
+                42.48
+              ],
+              [
+                -96.44,
+                42.48
+              ],
+              [
+                -96.44,
+                45.95
+              ],
+              [
+                -104.06,
+                45.95
+              ],
+              [
+                -104.06,
+                42.48
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-47",
+      "kind": "state",
+      "name": "Tennessee",
+      "state_fips": "47",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "TN",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -90.31,
+                34.98
+              ],
+              [
+                -81.65,
+                34.98
+              ],
+              [
+                -81.65,
+                36.68
+              ],
+              [
+                -90.31,
+                36.68
+              ],
+              [
+                -90.31,
+                34.98
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-48",
+      "kind": "state",
+      "name": "Texas",
+      "state_fips": "48",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "TX",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -106.65,
+                25.84
+              ],
+              [
+                -93.51,
+                25.84
+              ],
+              [
+                -93.51,
+                36.5
+              ],
+              [
+                -106.65,
+                36.5
+              ],
+              [
+                -106.65,
+                25.84
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-49",
+      "kind": "state",
+      "name": "Utah",
+      "state_fips": "49",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "UT",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -114.05,
+                36.99
+              ],
+              [
+                -109.04,
+                36.99
+              ],
+              [
+                -109.04,
+                42
+              ],
+              [
+                -114.05,
+                42
+              ],
+              [
+                -114.05,
+                36.99
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-50",
+      "kind": "state",
+      "name": "Vermont",
+      "state_fips": "50",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "VT",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -73.44,
+                42.73
+              ],
+              [
+                -71.46,
+                42.73
+              ],
+              [
+                -71.46,
+                45.02
+              ],
+              [
+                -73.44,
+                45.02
+              ],
+              [
+                -73.44,
+                42.73
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-51",
+      "kind": "state",
+      "name": "Virginia",
+      "state_fips": "51",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "VA",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -83.68,
+                36.54
+              ],
+              [
+                -75.24,
+                36.54
+              ],
+              [
+                -75.24,
+                39.47
+              ],
+              [
+                -83.68,
+                39.47
+              ],
+              [
+                -83.68,
+                36.54
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-53",
+      "kind": "state",
+      "name": "Washington",
+      "state_fips": "53",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "WA",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -124.79,
+                45.54
+              ],
+              [
+                -116.92,
+                45.54
+              ],
+              [
+                -116.92,
+                49
+              ],
+              [
+                -124.79,
+                49
+              ],
+              [
+                -124.79,
+                45.54
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-54",
+      "kind": "state",
+      "name": "West Virginia",
+      "state_fips": "54",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "WV",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -82.65,
+                37.2
+              ],
+              [
+                -77.72,
+                37.2
+              ],
+              [
+                -77.72,
+                40.64
+              ],
+              [
+                -82.65,
+                40.64
+              ],
+              [
+                -82.65,
+                37.2
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-55",
+      "kind": "state",
+      "name": "Wisconsin",
+      "state_fips": "55",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "WI",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -92.89,
+                42.49
+              ],
+              [
+                -86.8,
+                42.49
+              ],
+              [
+                -86.8,
+                47.08
+              ],
+              [
+                -92.89,
+                47.08
+              ],
+              [
+                -92.89,
+                42.49
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
+      }
+    },
+    {
+      "id": "us-56",
+      "kind": "state",
+      "name": "Wyoming",
+      "state_fips": "56",
+      "county_fips": null,
+      "parent_id": "us",
+      "geohash": null,
+      "metadata": {
+        "postalCode": "WY",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -111.06,
+                40.99
+              ],
+              [
+                -104.05,
+                40.99
+              ],
+              [
+                -104.05,
+                45.01
+              ],
+              [
+                -111.06,
+                45.01
+              ],
+              [
+                -111.06,
+                40.99
+              ]
+            ]
+          ]
+        },
+        "source": "us-geography-module-bbox",
+        "sourceVersion": "geo-integrity-v2-all-states"
       }
     }
   ]

@@ -29,11 +29,20 @@ Fixture polygons (MA, NY, NJ simplified rectangles) back unit tests:
 - Boston-ish MA point tagged `MA` → pass
 - Harlem-ish NY point tagged `NJ` → fail (inferred `NY`)
 
-## Loader script (dry-run only)
+The loader fixture (`state-jurisdictions.fixture.json`) covers all **51** jurisdictions (50 states + D.C.) with coarse bbox rectangles derived from `US_STATES` in `packages/domain/src/map/us-geography.ts`. Same simplified shape is mirrored in `scripts/fixtures/us-states-simplified.geojson` for optional GeoJSON inspection.
+
+## Loader script (validate / emit SQL only)
 
 ```bash
+# Default: validate fixture (51 rows, closed rings, unique FIPS/postal codes)
+node scripts/load-state-jurisdictions.mjs
 node scripts/load-state-jurisdictions.mjs --dry-run
-node scripts/load-state-jurisdictions.mjs --fixture packages/domain/src/geo-integrity/fixtures/state-jurisdictions.fixture.json
+
+# Emit operator-reviewed upsert SQL (stdout)
+node scripts/load-state-jurisdictions.mjs --emit-sql > jurisdictions-state-load.sql
+
+# Or write directly to a file
+node scripts/load-state-jurisdictions.mjs --emit-sql --output jurisdictions-state-load.sql
 ```
 
 The default fixture matches the conceptual shape of `bb_reference.jurisdictions` rows:
@@ -41,9 +50,27 @@ The default fixture matches the conceptual shape of `bb_reference.jurisdictions`
 - `id`: `us-{stateFips}` (ADR-016)
 - `kind`: `state`
 - `parent_id`: `us`
-- `metadata.geometry`: GeoJSON `Polygon` for future `ST_GeogFromGeoJSON`
+- `metadata.geometry`: GeoJSON `Polygon` (coarse bbox rectangle)
+- `metadata.postalCode`: USPS code (`MA`, `NY`, `DC`, …)
 
-`--apply` is **blocked** in this script. Operator applies to Supabase after human review; this bead does not live-write production.
+### Apply path (operator-only)
+
+1. Apply schema migration `supabase/migrations/20260721180100_jurisdictions_geography.sql` (adds `location geography(Polygon, 4326)` + GiST index).
+2. Review generated SQL from `--emit-sql`.
+3. Apply with `psql` against the intended database — **not** from this script:
+
+```bash
+psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f jurisdictions-state-load.sql
+```
+
+`--apply` is gated behind `LOAD_JURISDICTIONS_APPLY=1` and still **only emits SQL**; it never opens a Supabase/Postgres connection from agent or CI sessions:
+
+```bash
+LOAD_JURISDICTIONS_APPLY=1 node scripts/load-state-jurisdictions.mjs --apply --output jurisdictions-state-load.sql
+# then psql manually as above
+```
+
+Without `LOAD_JURISDICTIONS_APPLY=1`, `--apply` exits with code 2.
 
 ## Wiring (follow-up)
 
@@ -56,6 +83,7 @@ The default fixture matches the conceptual shape of `bb_reference.jurisdictions`
 ```bash
 node --conditions development --import tsx --test packages/domain/src/geo-integrity/geo-integrity.test.ts
 node scripts/load-state-jurisdictions.mjs --dry-run
+node scripts/load-state-jurisdictions.mjs --emit-sql | head
 ```
 
 ## Non-goals
