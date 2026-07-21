@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Scheduled web-search discovery against self-hosted SearXNG, then queue survivors
-# into private Firestore researchCases for admin approval (never publishes).
+# into private Postgres research cases for admin approval (never publishes).
 #
 # Rotates through packages/config/.../corsair-web-search-queries.json so Corsair
 # covers preferred authority/community hosts (including blackwomenleadproject.org)
@@ -23,6 +23,14 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
+
+ENV_FILE="${DISCOVERY_ENV_FILE:-${HOME}/.config/blackstory/enrichment.env}"
+if [[ -f "${ENV_FILE}" ]]; then
+  set -a
+  # shellcheck source=/dev/null
+  . "${ENV_FILE}"
+  set +a
+fi
 
 HARD_MAX_QUERIES_PER_RUN=12
 HARD_MAX_SURVIVORS=50
@@ -75,6 +83,18 @@ fi
 export DISCOVERY_KILL_SWITCH="${DISCOVERY_KILL_SWITCH:-disengaged}"
 export DISCOVERY_MODE="${DISCOVERY_MODE:-live}"
 export DISCOVERY_JOB_ID="${DISCOVERY_JOB_ID:-discovery-campaign-web-search}"
+export OPS_DATA_SOURCE=postgres
+export RESEARCH_PROFILE_ID="${RESEARCH_PROFILE_ID:-black-history}"
+export RESEARCH_PROFILE_VERSION="${RESEARCH_PROFILE_VERSION:-1.0.0}"
+export RESEARCH_SCHEMA_VERSION="${RESEARCH_SCHEMA_VERSION:-1.0.0}"
+export OLLAMA_BASE_URL="${OLLAMA_BASE_URL:-http://127.0.0.1:11434/v1}"
+export OLLAMA_MODEL="${OLLAMA_MODEL:-qwen3:8b}"
+export EDITORIAL_LLM_PROVIDER="${EDITORIAL_LLM_PROVIDER:-hybrid}"
+export BLACKSTORY_ROOT="${ROOT}"
+
+echo "Preflight: Postgres ledger, policy versions, SearXNG, Ollama, disk, and model credentials" >&2
+node --conditions development --import tsx \
+  "${ROOT}/packages/operator-cli/src/bin.ts" preflight
 
 # Fail-closed for live: storage terms must be explicitly confirmed.
 if [[ "${DISCOVERY_MODE}" == "live" ]]; then

@@ -119,9 +119,18 @@ export {
   validateStoryRewrite,
   type StoryRewriteDraft,
   type StoryRewriteResult,
+  type StoryProjection,
+  type PublicStorySection,
 } from './story-rewrite.js';
 
 export { mapPool } from './map-pool.js';
+
+export {
+  runWorkerPreflight,
+  type WorkerPreflightCheck,
+  type WorkerPreflightDependencies,
+  type WorkerPreflightReport,
+} from './worker-preflight.js';
 
 export {
   runEditorialJudge,
@@ -133,11 +142,12 @@ export {
 } from './editorial-run.js';
 
 export {
-  loadEditorialCatalogFromFirestore,
   mergeEditorialCatalogFromDocs,
-  mergeJsonCatalogOverFirestore,
+  mergeJsonCatalogOverCanonical,
   extractEmbeddingVector,
-} from './editorial-catalog-firestore.js';
+} from './editorial-catalog.js';
+
+export { loadEditorialCatalogFromPostgres } from './editorial-catalog-postgres.js';
 
 export { runEnrichmentJudge, type EnrichmentRunResult } from './enrichment-run.js';
 

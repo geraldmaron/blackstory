@@ -1,5 +1,5 @@
 /**
- * Minimal browser session identity shared by Firebase and Supabase admin auth paths.
+ * Minimal browser session identity for Supabase admin auth.
  */
 export type AdminSessionUser = {
   readonly uid: string;

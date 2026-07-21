@@ -1,5 +1,5 @@
 /**
- * Web-side checks that `/stories` data comes from the Firebase seed corpus,
+ * Web-side checks that `/stories` data comes from the storage-neutral seed corpus,
  * not an apps/web body catalog.
  */
 import assert from 'node:assert/strict';
@@ -7,9 +7,9 @@ import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
-import { getSeedStoryProjection, listSeedStoryProjections } from '@repo/firebase';
+import { getSeedStoryProjection, listSeedStoryProjections } from '@repo/domain';
 
-test('story corpus lives in @repo/firebase (exactly five stories)', () => {
+test('storage-neutral story corpus contains exactly five stories', () => {
   const stories = listSeedStoryProjections();
   assert.equal(stories.length, 5);
   for (const story of stories) {

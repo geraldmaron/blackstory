@@ -18,7 +18,7 @@ export type StoryReviewAction = 'approved' | 'rejected' | 'needs_evidence';
 export function storyReviewActionHelp(action: StoryReviewAction): string {
   switch (action) {
     case 'approved':
-      return 'Record that this packet is ready for seed handoff. Paste the handoff JSON into packages/firebase public story seed later. It does not publish automatically.';
+      return 'Record that this packet is ready for release assembly. Approval remains a private artifact and does not publish automatically.';
     case 'needs_evidence':
       return 'Send the packet back for stronger sources. Attach evidence on the evidence desk, then re-run story research when ready.';
     case 'rejected':

@@ -1,6 +1,6 @@
 /**
  * Provides the only application-facing role mutation flow: layered server authorization,
- * recent reauthentication, then a trusted Firebase Admin custom-claims operation.
+ * recent reauthentication, then a trusted Supabase app-metadata role operation.
  */
 import type {
   AdminRequestHeaders,

@@ -34,7 +34,7 @@ const PACKAGE_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const REPO_ROOT = join(PACKAGE_ROOT, '../..');
 const ROOT = join(PACKAGE_ROOT, 'fixtures');
 const CATALOG_DIR = join(ROOT, 'national-catalog');
-const CANDIDATES_DIR = join(ROOT, 'discovery-candidates');
+const CANDIDATES_DIR = process.env.DISCOVERY_CANDIDATES_DIR?.trim() || join(ROOT, 'discovery-candidates');
 /** Always under repo `.cache/` — independent of process cwd / pnpm filter cwd. */
 const CACHE_DIR = join(REPO_ROOT, '.cache/discovery');
 const REPORT_PATH = join(REPO_ROOT, '.cache/discovery-report.json');

@@ -16,7 +16,7 @@
  *
  * "Attach evidence" does not call `transitionResearchCase` or mutate a case's evidence
  * checklist directly: that stays behind `record_evidence` server gate
- * (`assertResearchCaseActionAuthorized`, packages/firebase/src/firestore/research-case.ts),
+ * (the scoped research-case authorization boundary),
  * which requires a `research:write` permission this proposer-only identity does not carry.
  * This function only queues the proposed evidence against the target case id.
  */
@@ -29,7 +29,7 @@ import {
   type RejectedSubmission,
   type SubmissionIntakeContext,
 } from '@repo/security';
-import { firestorePaths, type StateMutation } from '@repo/firebase';
+import { ledgerPaths, type StateMutation } from '@repo/data-access';
 import { buildOperatorAuditEvent, buildOperatorOutboxMessage } from './audit.js';
 import { operatorStamp, type OperatorIdentity, type OperatorStamp } from './identity.js';
 
@@ -141,7 +141,7 @@ export function prepareOperatorIntake(
   }
 
   const submissionId = result.record.id;
-  const submissionPath = firestorePaths.submissionInbox(submissionId);
+  const submissionPath = ledgerPaths.submissionInbox(submissionId);
   const mutations: StateMutation[] = [
     {
       operation: 'create',
@@ -174,7 +174,7 @@ export function prepareOperatorIntake(
     });
     mutations.push({
       operation: 'create',
-      path: firestorePaths.researchCase(caseId),
+      path: ledgerPaths.researchCase(caseId),
       data: researchCase as unknown as Readonly<Record<string, unknown>>,
     });
   }

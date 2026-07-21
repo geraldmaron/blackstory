@@ -344,7 +344,7 @@ const surfaces: readonly ConsoleSurface[] = [
         id: 'OPS-IAP',
         title: 'Layered administrator auth',
         status: 'Configured in repository',
-        detail: 'IAP assertion + revoked-token Firebase verification',
+        detail: 'Verified Supabase token + app-metadata role',
       },
       {
         id: 'OPS-QUEUE',

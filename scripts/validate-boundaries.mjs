@@ -7,8 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const WORKSPACE_ROOTS = ['apps', 'packages'];
-/** Root-level Firebase Functions package (ADR-018 discovery schedules). */
-const ROOT_DEPLOYABLES = ['functions'];
+const ROOT_DEPLOYABLES = [];
 const SOURCE_EXTENSIONS = ['.js', '.jsx', '.mjs', '.cjs', '.ts', '.tsx'];
 const IGNORED_DIRECTORIES = new Set(['.next', 'coverage', 'dist', 'node_modules']);
 const IMPORT_PATTERN =

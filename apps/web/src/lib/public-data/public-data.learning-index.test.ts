@@ -41,7 +41,7 @@ test('seed entities hydrate related neighbors and continue-learning where graph 
 test('school seed carries extended narrative; primary image comes from live projections', () => {
   const school = listPublicEntities().find((e) => e.id === 'ent_dunbar_school_001');
   assert.ok(school?.extendedNarrative);
-  // Offline seed stays text-only for media; `primaryImage` is served from Firestore
+  // Offline seed stays text-only for media; `primaryImage` is served from release projections
   // public entity projections (see map-projection / promote-entity-primary-image).
   assert.equal(school?.primaryImage, undefined);
 });

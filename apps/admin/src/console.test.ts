@@ -15,7 +15,7 @@ import {
 import type { ConsoleAction } from './console/model';
 
 const HEADERS = {
-  authorization: 'Bearer verified-firebase-token',
+  authorization: 'Bearer verified-supabase-token',
   'x-goog-iap-jwt-assertion': 'verified-iap-assertion',
 };
 

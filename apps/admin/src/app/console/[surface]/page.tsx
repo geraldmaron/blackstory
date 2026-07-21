@@ -1,6 +1,6 @@
 /**
  * Resolves each administration workspace. Candidate queue and research-cases
- * prefer live Firestore researchCases; other surfaces stay fixture-backed.
+ * prefer live Postgres research cases; other surfaces stay fixture-backed.
  */
 import { notFound } from 'next/navigation';
 import { ConsoleSurfacePage } from '../../../console/components';
@@ -32,7 +32,7 @@ async function resolveSurfaceWithData(
     return {
       surface: {
         ...surface,
-        description: `${surface.description} Firebase unavailable — showing sample fixtures.`,
+        description: `${surface.description} Postgres unavailable — showing sample fixtures.`,
       },
       dataSource: 'unavailable',
     };
@@ -42,7 +42,7 @@ async function resolveSurfaceWithData(
       surface: {
         ...surface,
         rows: [],
-        description: `${surface.description} No pending researchCases in candidate or relevance_review.`,
+        description: `${surface.description} No pending research cases in candidate or relevance review.`,
       },
       dataSource: 'live',
     };
@@ -51,7 +51,7 @@ async function resolveSurfaceWithData(
     surface: {
       ...surface,
       rows: liveRows,
-      description: `${surface.description} Live private researchCases — not published.`,
+      description: `${surface.description} Live private research cases — not published.`,
     },
     dataSource: 'live',
   };

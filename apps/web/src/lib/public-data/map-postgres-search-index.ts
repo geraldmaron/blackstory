@@ -1,9 +1,11 @@
 /**
- * Maps `bb_public.search_index` rows into Firestore-shaped search docs for existing parsers
- * and `mapFirestoreSearchIndexDoc` (denormalized columns + optional `facets` overflow).
+ * Maps `bb_public.search_index` rows into canonical public search projections.
+ *
+ * Migrated Supabase rows often leave `name` / `entity_id` null while `name_lower` and `id`
+ * carry the display string and entity id — recover those before Zod parse.
  */
-import type { PublicSearchIndexDoc as FirestorePublicSearchIndexDoc } from '@repo/firebase';
-import { parseSearchIndexDoc } from './firestore-readers';
+import type { PublicSearchProjectionDoc } from '@repo/schemas';
+import { parseSearchProjection } from './projection-contracts';
 
 type SearchIndexRow = {
   readonly id: string;
@@ -37,19 +39,55 @@ function toIso(value: unknown): string | undefined {
   return undefined;
 }
 
-export function mapPostgresSearchIndexRow(row: SearchIndexRow): FirestorePublicSearchIndexDoc | undefined {
+function isFullSearchIndexDoc(value: Record<string, unknown>): boolean {
+  return (
+    typeof value.displayName === 'string' &&
+    typeof value.nameLower === 'string' &&
+    typeof value.kind === 'string' &&
+    typeof value.recordMaturity === 'string' &&
+    (value.researchCoverage === 'minimal' ||
+      value.researchCoverage === 'partial' ||
+      value.researchCoverage === 'substantial')
+  );
+}
+
+/** Recover a display label when migrate left `name` null but populated `name_lower`. */
+function displayNameFromRow(
+  row: SearchIndexRow,
+  facets: Record<string, unknown>,
+): string | undefined {
+  if (typeof row.name === 'string' && row.name.length > 0) return row.name;
+  if (typeof facets.displayName === 'string' && facets.displayName.length > 0) {
+    return facets.displayName;
+  }
+  if (typeof row.name_lower === 'string' && row.name_lower.length > 0) {
+    return row.name_lower
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ');
+  }
+  return undefined;
+}
+
+export function mapPostgresSearchIndexRow(row: SearchIndexRow): PublicSearchProjectionDoc | undefined {
   const facets = asRecord(row.facets);
-  if (typeof facets.recordMaturity === 'string' && typeof facets.researchCoverage === 'string') {
-    return parseSearchIndexDoc(facets);
+  if (isFullSearchIndexDoc(facets)) {
+    return parseSearchProjection(facets);
   }
 
-  const displayName = row.name ?? facets.displayName;
-  if (typeof displayName !== 'string' || displayName.length === 0) return undefined;
+  const displayName = displayNameFromRow(row, facets);
+  if (displayName === undefined) return undefined;
   const nameLower =
     row.name_lower ??
     (typeof facets.nameLower === 'string' ? facets.nameLower : displayName.toLowerCase());
   const kind = row.kind ?? facets.kind;
   if (typeof kind !== 'string' || kind.length === 0) return undefined;
+
+  const entityId =
+    (typeof row.entity_id === 'string' && row.entity_id.length > 0 ? row.entity_id : undefined) ??
+    (typeof facets.entityId === 'string' && facets.entityId.length > 0 ? facets.entityId : undefined) ??
+    row.id;
 
   const doc: Record<string, unknown> = {
     id: row.id,
@@ -76,6 +114,7 @@ export function mapPostgresSearchIndexRow(row: SearchIndexRow): FirestorePublicS
         : 'minimal',
     relatedCount: row.related_count ?? (typeof facets.relatedCount === 'number' ? facets.relatedCount : 0),
     claimCount: row.claim_count ?? (typeof facets.claimCount === 'number' ? facets.claimCount : 0),
+    entityId,
     ...(typeof facets.summary === 'string' ? { summary: facets.summary } : {}),
     ...(typeof row.status === 'string'
       ? { status: row.status }
@@ -89,9 +128,8 @@ export function mapPostgresSearchIndexRow(row: SearchIndexRow): FirestorePublicS
       ? { sensitivityClass: facets.sensitivityClass }
       : {}),
     ...(typeof row.geohash === 'string' ? { geohash: row.geohash } : {}),
-    ...(typeof row.entity_id === 'string' ? { entityId: row.entity_id } : {}),
     ...(toIso(facets.createdAt) !== undefined ? { createdAt: toIso(facets.createdAt) } : {}),
   };
 
-  return parseSearchIndexDoc(doc);
+  return parseSearchProjection(doc);
 }

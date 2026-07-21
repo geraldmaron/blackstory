@@ -1,6 +1,6 @@
 /**
  * Lists pending editorial work from local discovery/obscurity JSON artifacts or a hand-built
- * subject file. Does not read Firestore yet — operators/agents pass paths from prior dry-runs.
+ * subject file. Does not read the canonical ledger yet — operators pass paths from prior dry-runs.
  */
 import { readFileSync } from 'node:fs';
 

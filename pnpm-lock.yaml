@@ -32,12 +32,12 @@ importers:
       '@repo/config':
         specifier: workspace:*
         version: link:../../packages/config
+      '@repo/data-access':
+        specifier: workspace:*
+        version: link:../../packages/data-access
       '@repo/domain':
         specifier: workspace:*
         version: link:../../packages/domain
-      '@repo/firebase':
-        specifier: workspace:*
-        version: link:../../packages/firebase
       '@repo/operator-cli':
         specifier: workspace:*
         version: link:../../packages/operator-cli
@@ -47,12 +47,6 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.110.7
         version: 2.110.7
-      firebase:
-        specifier: ^11.10.0
-        version: 11.10.0
-      firebase-admin:
-        specifier: ^14.2.0
-        version: 14.2.0
       next:
         specifier: ^16.2.10
         version: 16.2.10(@opentelemetry/api@1.9.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -241,6 +235,9 @@ importers:
       '@repo/firebase':
         specifier: workspace:*
         version: link:../../packages/firebase
+      '@repo/schemas':
+        specifier: workspace:*
+        version: link:../../packages/schemas
       '@repo/security':
         specifier: workspace:*
         version: link:../../packages/security

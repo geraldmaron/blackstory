@@ -4,7 +4,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { AtomicStore, AtomicTransaction } from '@repo/firebase';
+import type { AtomicStore, AtomicTransaction } from '@repo/data-access';
 import { commitOperatorIntake } from './commit.ts';
 import { prepareLeadIntake, type OperatorIntakeAccepted } from './intake.ts';
 

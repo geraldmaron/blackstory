@@ -1,15 +1,14 @@
 /**
  * Server-side Postgres readers for active-release public projections in `bb_public.*`.
- * Maps `projection` jsonb (and denormalized search columns) back to existing Firebase doc
- * shapes validated by `@repo/firebase` Zod schemas.
+ * Maps `projection` jsonb and denormalized search columns into storage-neutral public contracts.
  */
 import type {
   PublicActiveReleaseDoc,
   PublicEntityProjectionDoc,
-  PublicSearchIndexDoc as FirestorePublicSearchIndexDoc,
+  PublicSearchProjectionDoc,
   PublicStoryListItemDoc,
   PublicStoryProjectionDoc,
-} from '@repo/firebase';
+} from '@repo/schemas';
 import { mapPostgresSearchIndexRow } from './map-postgres-search-index';
 import {
   parseActiveRelease,
@@ -17,7 +16,7 @@ import {
   parseStoryListItem,
   parseStoryProjection,
   toStoryListItem,
-} from './firestore-readers';
+} from './projection-contracts';
 import { queryPostgres } from './postgres-client';
 
 /** Batch size for `entity_id = ANY($n::text[])` point reads. */
@@ -119,7 +118,7 @@ export async function fetchPublicEntityProjectionsByIds(
 
 export async function listPublicSearchIndexDocs(
   releaseId: string,
-): Promise<readonly FirestorePublicSearchIndexDoc[]> {
+): Promise<readonly PublicSearchProjectionDoc[]> {
   const rows = await queryPostgres<Parameters<typeof mapPostgresSearchIndexRow>[0]>(
     `SELECT id, release_id, entity_id, name, name_lower, aliases, topics, kind, status,
             geohash, related_count, claim_count, facets
@@ -128,7 +127,7 @@ export async function listPublicSearchIndexDocs(
      ORDER BY id`,
     [releaseId],
   );
-  const docs: FirestorePublicSearchIndexDoc[] = [];
+  const docs: PublicSearchProjectionDoc[] = [];
   for (const row of rows) {
     const parsed = mapPostgresSearchIndexRow(row);
     if (parsed) docs.push(parsed);

@@ -673,14 +673,10 @@ export default function StoryReviewPage() {
 
               {seedHandoff ? (
                 <div className="story-review__handoff">
-                  <h3 className="ds-section__title">Seed handoff</h3>
+                  <h3 className="ds-section__title">Approved artifact</h3>
                   <p className="ds-sans">
-                    Approval does not publish. Paste this JSON into{' '}
-                    <span className="ds-mono">
-                      packages/firebase/src/firestore/public-story-seed.ts
-                    </span>{' '}
-                    (then bootstrap/seed Firestore) when ready to ship. Releases handles public
-                    activation later.
+                    Approval does not publish. This validated JSON remains available for release
+                    assembly; activation still requires the Releases desk and an independent actor.
                   </p>
                   <pre className="ds-mono">{seedHandoff}</pre>
                 </div>
@@ -688,7 +684,7 @@ export default function StoryReviewPage() {
 
               {bulkResult && bulkResult.seedHandoffs.length > 1 ? (
                 <div className="story-review__handoff">
-                  <h3 className="ds-section__title">Bulk seed handoffs</h3>
+                  <h3 className="ds-section__title">Bulk approved artifacts</h3>
                   <pre className="ds-mono">{JSON.stringify(bulkResult.seedHandoffs, null, 2)}</pre>
                 </div>
               ) : null}

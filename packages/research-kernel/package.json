@@ -1,0 +1,40 @@
+{
+  "name": "@repo/research-kernel",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./schemas/research-kernel.v1.schema.json": "./schemas/research-kernel.v1.schema.json",
+    "./profiles/black-history.v1.json": "./profiles/black-history.v1.json"
+  },
+  "files": [
+    "dist",
+    "schemas",
+    "profiles",
+    "python/src"
+  ],
+  "scripts": {
+    "generate": "node scripts/generate-contracts.mjs",
+    "generate:check": "node scripts/generate-contracts.mjs --check",
+    "build": "pnpm run generate:check && tsc -p tsconfig.json",
+    "typecheck": "pnpm run generate:check && tsc -p tsconfig.json --noEmit",
+    "test": "pnpm run generate:check && node --conditions development --import tsx --test src/*.test.ts",
+    "lint": "echo 'lint: use root pnpm lint'"
+  },
+  "dependencies": {
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:^",
+    "@types/node": "^22.20.1",
+    "prettier": "^3.9.5",
+    "tsx": "^4.23.1",
+    "typescript": "^5.8.3"
+  }
+}

@@ -15,6 +15,11 @@ export type LlmCompletionRequest = {
   readonly model: string;
   readonly temperature?: number;
   readonly maxTokens?: number;
+  /** Provider-enforced JSON Schema. Structured tasks must supply this. */
+  readonly responseSchema?: {
+    readonly name: string;
+    readonly schema: Readonly<Record<string, unknown>>;
+  };
 };
 
 export type LlmCompletionResult = {
@@ -45,7 +50,7 @@ export type CreateLlmProviderOptions = {
   readonly models?: readonly string[];
 };
 
-const DEFAULT_OPENROUTER_MODEL = 'openrouter/free';
+const DEFAULT_OPENROUTER_MODEL = 'openai/gpt-oss-20b:free';
 const DEFAULT_OLLAMA_MODEL = 'qwen3:8b';
 const DEFAULT_MOCK_MODEL = 'mock-editorial-v1';
 
@@ -95,11 +100,6 @@ export function extractMessageContent(message: ChatMessagePayload | undefined): 
   if (content) return content;
   const reasoning = message?.reasoning?.trim() || message?.thinking?.trim();
   if (!reasoning) return '';
-  const jsonStart = reasoning.indexOf('{');
-  const jsonEnd = reasoning.lastIndexOf('}');
-  if (jsonStart >= 0 && jsonEnd > jsonStart) {
-    return reasoning.slice(jsonStart, jsonEnd + 1);
-  }
   return reasoning;
 }
 
@@ -129,9 +129,18 @@ async function completeOpenAiCompatible(
     headers['HTTP-Referer'] = 'https://blackstory.local';
     headers['X-Title'] = 'BlackStory editorial staging';
   }
-  // Free-tier models vary in response_format support (some reject json_object outright,
-  // e.g. tencent/hy3:free requires json_schema instead) — omit it rather than hardcode
-  // one shape, and rely on the system prompt + extractJsonObject's brace-scanning instead.
+  const responseFormat = request.responseSchema
+    ? {
+        response_format: {
+          type: 'json_schema',
+          json_schema: {
+            name: request.responseSchema.name,
+            strict: true,
+            schema: request.responseSchema.schema,
+          },
+        },
+      }
+    : {};
   const response = await fetchImpl(`${baseUrl.replace(/\/$/, '')}/chat/completions`, {
     method: 'POST',
     headers,
@@ -140,6 +149,7 @@ async function completeOpenAiCompatible(
       temperature: request.temperature ?? 0.2,
       max_tokens: request.maxTokens ?? 900,
       messages: request.messages,
+      ...responseFormat,
       ...extraBody,
     }),
   });
@@ -195,7 +205,7 @@ async function completeOllamaNative(
         num_predict: request.maxTokens ?? 900,
       },
       messages: request.messages,
-      format: 'json',
+      format: request.responseSchema?.schema ?? 'json',
     }),
   });
   if (!response.ok) {
@@ -351,23 +361,15 @@ function looksLikeJsonObject(content: string): boolean {
   const trimmed = content.trim();
   if (!trimmed.startsWith('{')) return false;
   try {
-    JSON.parse(trimmed);
-    return true;
+    const parsed: unknown = JSON.parse(trimmed);
+    return typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed);
   } catch {
-    const start = trimmed.indexOf('{');
-    const end = trimmed.lastIndexOf('}');
-    if (start < 0 || end <= start) return false;
-    try {
-      JSON.parse(trimmed.slice(start, end + 1));
-      return true;
-    } catch {
-      return false;
-    }
+    return false;
   }
 }
 
 /**
- * OpenRouter free router first; on retryable failure or non-JSON body, Ollama on Corsair/local.
+ * Explicit OpenRouter model roster first; on failure or invalid JSON, Ollama on Corsair/local.
  * Records `servedBy` so overnight reports show which lane answered.
  */
 export function createHybridLlmProvider(options: {

@@ -2,9 +2,7 @@
 # Target: blackstory-app (twykhihqkcldpreuovay), us-west-2.
 # Do not commit secrets. Use op:// / run-with-dev-secrets for CLI tokens.
 
-[project]
-id = "twykhihqkcldpreuovay"
-name = "blackstory-app"
+project_id = "twykhihqkcldpreuovay"
 
 [api]
 enabled = true

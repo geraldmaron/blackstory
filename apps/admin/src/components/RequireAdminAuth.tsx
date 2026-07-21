@@ -1,5 +1,5 @@
 /**
- * Client gate: requires a Firebase Auth session; otherwise redirects to /login.
+ * Client gate: requires a Supabase Auth session; otherwise redirects to /login.
  */
 'use client';
 

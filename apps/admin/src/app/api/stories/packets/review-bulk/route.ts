@@ -71,7 +71,7 @@ export async function POST(request: Request): Promise<Response> {
       results,
       seedHandoffs,
       published: false,
-      note: 'Bulk review records decisions only. Paste seed handoffs into packages/firebase public-story-seed.ts to ship.',
+      note: 'Bulk review records private decisions only. Release activation remains a separate independently authorized action.',
     });
   } catch (error) {
     return authErrorResponse(error);

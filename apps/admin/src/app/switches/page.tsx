@@ -73,7 +73,7 @@ export default function SwitchesPage() {
           </p>
           <p className="story-review__notice">
             Read-only mirror — no toggles here. A human platform administrator engages or disengages
-            switches in Firestore <span className="ds-mono">killSwitches/{'{id}'}</span> documents
+            switches in Postgres <span className="ds-mono">bb_ops.kill_switches</span> rows
             (IAP-protected ops path) with a durable reason; each change is recorded in{' '}
             <Link href="/audit">Audit</Link>. See{' '}
             <span className="ds-mono">infra/gcp/kill-switches/</span> for the matrix and runbooks.

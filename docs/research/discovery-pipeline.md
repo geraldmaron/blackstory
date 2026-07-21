@@ -121,7 +121,7 @@ quarantine packets — **never publishes**. Use `--concurrency N` for parallel s
 node --conditions development --import tsx packages/operator-cli/src/bin.ts pending-list --from /tmp/obscurity.json
 node --conditions development --import tsx packages/operator-cli/src/bin.ts enrichment-run \
   --subjects /tmp/subjects.json --provider hybrid \
-  --model openrouter/free --ollama-model qwen3:8b --concurrency 4 \
+  --model openai/gpt-oss-20b:free --ollama-model qwen3:8b --concurrency 4 \
   --catalog-from=firestore \
   --operator-id "$USER" --session-id "sess-$(date +%s)" --identity-source cursor_session
 ```

@@ -17,5 +17,13 @@
 #   Direct DATABASE_URL required for private bb_* writes (PostgREST only exposes
 #   public / bb_public / bb_submissions). Use op:// item id refs (colons in titles break op run).
 #
+# Browse data in Dashboard (Table Editor defaults to empty `public`):
+#   1. Open https://supabase.com/dashboard/project/twykhihqkcldpreuovay/editor
+#   2. Schema dropdown (top of left sidebar, usually shows "public") → pick bb_public
+#   3. Open release_entities / search_index (migrated map rows live here)
+#   Other product schemas: bb_research, bb_ops, bb_reference, bb_audit, bb_evidence,
+#   bb_canonical, bb_publication, bb_submissions. SQL Editor also works with
+#   fully-qualified names (e.g. SELECT count(*) FROM bb_public.release_entities).
+#
 # Do NOT apply migrations to remote without explicit approval.
 # Do NOT drop Firestore until cutover is approved.

@@ -4,8 +4,8 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { listSeedStoryProjections } from '@repo/firebase';
-import { listSnapshotStoryListItems, toStoryListItem } from './firestore-readers';
+import { listSeedStoryProjections } from '@repo/domain';
+import { listSnapshotStoryListItems, toStoryListItem } from './public-readers';
 import { listPublicStoryListItems } from './source';
 
 test('toStoryListItem omits body, relatedEntityIds, and sources', () => {

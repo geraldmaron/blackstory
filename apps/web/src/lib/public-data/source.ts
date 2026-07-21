@@ -1,18 +1,17 @@
 /**
- * Public data source selector: live release artifacts + Firestore with seed snapshot fallback.
- * Hydrates 1-hop related neighbor stubs and composes capped 2-hop continue-learning on entity
- * pages only. List/map/search/stories prefer ADR-004 catalog artifacts (when present) then
- * process-local TTL + size-gated `unstable_cache`. The `/stories` index caches field-masked
- * list items (no body). Story detail / about mosaic / similar card rails use a thin batched
- * point-get (`listPublicEntityViewsByIds`) — never the 2-hop learning graph.
- * Sitemap and entity `generateStaticParams` use `getPublicSearchIndex` (ids only), not the
- * full hydrated entity catalog.
- * Oversized live catalogs (>~1.8MB) stay in process memory only; Next's 2MB data-cache limit
- * must not receive the fat array (console warn + repeated origin fetches).
+ * Public data source selector: Postgres plus portable release artifacts and seed snapshot
+ * fallback. Hydrates 1-hop related neighbor stubs and composes capped 2-hop continue-learning on
+ * entity pages only. List/map/search/stories may use versioned release artifacts as a cache,
+ * while canonical live reads always come from `bb_public.*`.
+ * The `/stories` index caches field-masked list items (no body). Story detail / about mosaic /
+ * similar card rails use a thin batched point-get (`listPublicEntityViewsByIds`) — never the
+ * 2-hop learning graph. Sitemap and entity `generateStaticParams` use `getPublicSearchIndex`
+ * (ids only), not the full hydrated entity catalog. Oversized live catalogs (>~1.8MB) stay in
+ * process memory only; Next's 2MB data-cache limit must not receive the fat array.
  *
  * Cost knobs (env / App Hosting):
- * - `PUBLIC_READ_API_DISABLED=1` — snapshot-only (no live Firestore/artifact reads)
- * - `PUBLIC_DATA_SOURCE=seed|firestore|postgres` — force seed vs live backend (see `live-policy.ts`)
+ * - `PUBLIC_READ_API_DISABLED=1` — snapshot-only (no live Postgres/artifact reads)
+ * - `PUBLIC_DATA_SOURCE=seed|postgres` — force seed vs canonical live backend
  * - `APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL` — CDN/GCS base for entities.json / search-index.json
  * - `apps/web/apphosting*.yaml` `runConfig.minInstances` — primary idle App Hosting cost driver
  */
@@ -22,10 +21,9 @@ import { cache } from 'react';
 import type { PublicSearchIndexDoc } from '@repo/domain/search';
 import type {
   PublicEntityProjectionDoc,
-  PublicSearchIndexDoc as FirestoreSearchIndexDoc,
   PublicStoryListItemDoc,
   PublicStoryProjectionDoc,
-} from '@repo/firebase';
+} from '@repo/schemas';
 import {
   buildRelatedNeighborStubs,
   composeContinueLearningStubs,
@@ -61,6 +59,7 @@ import {
   parseSearchIndexDoc,
   shouldUseLivePublicProjections,
 } from './public-readers';
+import { isPostgresPublicDataSource, shouldPreferReleaseArtifacts } from './live-policy';
 import {
   createLiveCatalogMemoryCache,
   isOversizedLiveCatalogSentinel,
@@ -70,7 +69,7 @@ import {
   type LiveCatalogMemoryCache,
 } from './live-catalog-cache';
 import { mapProjectionToPublicEntityView, type PublicProjectionInput } from './map-projection';
-import { mapFirestoreSearchIndexDoc } from './map-search-index';
+import { mapPublicSearchProjection } from './map-search-index';
 import { collectOneHopNeighborIds, collectTwoHopNeighborIds } from './neighbor-ids';
 import {
   fetchReleaseEntitiesListArtifact,
@@ -215,18 +214,24 @@ function searchDocsFromArtifact(docs: readonly unknown[]): PublicSearchIndexDoc[
   const out: PublicSearchIndexDoc[] = [];
   for (const doc of docs) {
     const parsed = parseSearchIndexDoc(doc);
-    if (parsed) out.push(mapFirestoreSearchIndexDoc(parsed));
+    if (parsed) out.push(mapPublicSearchProjection(parsed));
   }
   return out;
 }
 
+/**
+ * A configured, version-matched `entities.json` is an optional release cache. Without an
+ * explicit artifact origin, this falls through to canonical Postgres reads.
+ */
 async function loadLiveEntitiesForRelease(
   releaseId: string,
 ): Promise<readonly PublicEntityView[] | undefined> {
-  const artifact = await fetchReleaseEntitiesListArtifact(releaseId);
-  if (artifact && artifact.entities.length > 0) {
-    const projections = projectionsFromArtifactEntities(artifact.entities);
-    if (projections.length > 0) return mapProjectionsToHydratedViews(projections);
+  if (shouldPreferReleaseArtifacts()) {
+    const artifact = await fetchReleaseEntitiesListArtifact(releaseId);
+    if (artifact && artifact.entities.length > 0) {
+      const projections = projectionsFromArtifactEntities(artifact.entities);
+      if (projections.length > 0) return mapProjectionsToHydratedViews(projections);
+    }
   }
 
   const projections = await listPublicEntityProjections(releaseId);
@@ -237,15 +242,17 @@ async function loadLiveEntitiesForRelease(
 async function loadLiveSearchIndexForRelease(
   releaseId: string,
 ): Promise<readonly PublicSearchIndexDoc[] | undefined> {
-  const artifact = await fetchReleaseSearchIndexArtifact(releaseId);
-  if (artifact && artifact.docs.length > 0) {
-    const mapped = searchDocsFromArtifact(artifact.docs);
-    if (mapped.length > 0) return mapped;
+  if (shouldPreferReleaseArtifacts()) {
+    const artifact = await fetchReleaseSearchIndexArtifact(releaseId);
+    if (artifact && artifact.docs.length > 0) {
+      const mapped = searchDocsFromArtifact(artifact.docs);
+      if (mapped.length > 0) return mapped;
+    }
   }
 
-  const firestoreDocs = await listPublicSearchIndexDocs(releaseId);
-  if (firestoreDocs.length > 0) {
-    return firestoreDocs.map((doc: FirestoreSearchIndexDoc) => mapFirestoreSearchIndexDoc(doc));
+  const projectionDocs = await listPublicSearchIndexDocs(releaseId);
+  if (projectionDocs.length > 0) {
+    return projectionDocs.map(mapPublicSearchProjection);
   }
   return undefined;
 }
@@ -422,15 +429,26 @@ export const listPublicEntityViews = cache(async function listPublicEntityViews(
     if (live !== undefined) {
       return { data: live, source: 'live' };
     }
-  } catch {
-    // fall through
+  } catch (error) {
+    if (isPostgresPublicDataSource()) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.warn(
+        `[public-data] postgres live catalog failed; falling back to ${listPublicEntities().length}-entity seed snapshot: ${message}`,
+      );
+    }
+  }
+
+  if (isPostgresPublicDataSource()) {
+    console.warn(
+      `[public-data] postgres live catalog unavailable; falling back to ${listPublicEntities().length}-entity seed snapshot`,
+    );
   }
 
   return { data: listPublicEntities(), source: 'snapshot' };
 });
 
 /**
- * Search index: prefer release search-index artifact, then Firestore `publicSearchIndex`,
+ * Search index: prefer a version-matched release artifact, then Postgres `bb_public.search_index`,
  * then bundled seed. Never rebuilds from a full entity projection scan when live index exists.
  */
 export const getPublicSearchIndex = cache(async function getPublicSearchIndex(): Promise<{
@@ -558,7 +576,7 @@ async function loadLiveStory(slug: string): Promise<PublicStoryView | undefined>
 }
 
 /**
- * Thin story list for `/stories` index cards. Live path uses field-masked Firestore reads
+ * Thin story list for `/stories` index cards. Live path reads Postgres release projections
  * + process TTL / `unstable_cache`; never pulls full `body[]` into the list cache.
  */
 export const listPublicStoryListItems = cache(async function listPublicStoryListItems(): Promise<{

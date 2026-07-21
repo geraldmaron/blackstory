@@ -1,5 +1,5 @@
 /**
- * Unit tests for Postgres search-index row mapping into Firestore-shaped docs.
+ * Unit tests for Postgres search-index row mapping into canonical projection docs.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -33,6 +33,28 @@ test('mapPostgresSearchIndexRow builds a valid doc from denormalized columns', (
   assert.equal(doc!.relatedCount, 2);
   assert.equal(doc!.claimCount, 3);
   assert.deepEqual(doc!.topicTags, ['civil-rights']);
+});
+
+test('mapPostgresSearchIndexRow recovers displayName from name_lower when name is null', () => {
+  const doc = mapPostgresSearchIndexRow({
+    id: 'ent_15th_st_church_001',
+    release_id: 'rel_seed_001',
+    entity_id: null,
+    name: null,
+    name_lower: 'fifteenth street presbyterian church',
+    aliases: [],
+    topics: [],
+    kind: 'place',
+    status: null,
+    geohash: null,
+    related_count: 1,
+    claim_count: 1,
+    facets: {},
+  });
+  assert.ok(doc);
+  assert.equal(doc!.displayName, 'Fifteenth Street Presbyterian Church');
+  assert.equal(doc!.nameLower, 'fifteenth street presbyterian church');
+  assert.equal(doc!.id, 'ent_15th_st_church_001');
 });
 
 test('mapPostgresSearchIndexRow prefers facets payload when it is a full doc', () => {

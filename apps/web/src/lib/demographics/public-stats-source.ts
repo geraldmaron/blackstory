@@ -18,11 +18,17 @@ import {
   type HistoricalStatePopulationCoverage,
   type NationalPopulationTimelineSnapshot,
   type OpportunityAtlasCoverageSummary,
+  type StatePopulationByDecade,
   type StatePopulationChange,
-  type StatePopulationByDecadeSnapshot,
 } from '@repo/firebase';
 import { fetchMaterializedSnapshot } from '../public-data/public-readers';
 import { isPostgresPublicDataSource } from '../public-data/live-policy';
+
+type StatePopulationByDecadeSnapshot = {
+  readonly rows: readonly StatePopulationByDecade[];
+  readonly generatedAt?: string;
+  readonly contentHash?: string;
+};
 
 function isTimelineSnapshot(value: unknown): value is NationalPopulationTimelineSnapshot {
   if (value === null || typeof value !== 'object') return false;

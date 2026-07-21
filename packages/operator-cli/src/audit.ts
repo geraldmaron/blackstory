@@ -1,8 +1,7 @@
 /**
  * Thin audit/outbox builders for operator proposals.
  *
- * These functions only *shape data* to the contract `commitWithAudit`
- * (packages/firebase/src/firestore/audit-outbox.ts) already enforces they do not
+ * These functions only *shape data* for the canonical `commitWithAudit` contract; they do not
  * reimplement audit, outbox, or idempotency semantics. The actual atomic write happens in
  * `./commit.ts`, which calls the real `commitWithAudit`.
  */

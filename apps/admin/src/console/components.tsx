@@ -81,7 +81,7 @@ export function ConsoleShell({ children }: { readonly children: ReactNode }) {
           </Link>
         </div>
         <p className="console-session" aria-label="Authentication status">
-          IAP + Firebase session required
+          Verified Supabase session required
         </p>
       </header>
       <ConsoleLegacyBanner />

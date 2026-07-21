@@ -52,8 +52,10 @@ Non-negotiable invariants from prior ADRs still bind: no anonymous canonical wri
 
 - New schema work lands under `supabase/` and `docs/data/postgres-schema.md`.
 - ADR-011 is historical for the Firestore phase; do not start new SoR features assuming Firestore permanence.
-- App rewire, ETL, and dual-run require follow-up beads after DDL review/apply.
-- CI may add optional Supabase migration checks later; do not block existing Firestore emulator CI until cutover.
+- **Cutover (2026-07-21):** Structured product data is migrated into `blackstory-app`. Public web supports `PUBLIC_DATA_SOURCE=postgres` (server-only `DATABASE_URL` / `APP_DATABASE_URL`; never `NEXT_PUBLIC_*`). Prefer GCS release artifacts when configured; blobs stay in Firebase Storage/GCS. Admin/ops write path and worker CLIs may still touch Firestore until follow-up store rewires complete — treat Postgres as SoR for migrated tables; do not dual-write new canonical truth to Firestore.
+- Auth: operators provisioned in Supabase Auth with `app_metadata.bb_role`; admin UI may still accept Firebase session until auth cutover bead closes. Public remains anon + RLS on `bb_public`.
+- Firebase wind-down is **owner console checklist** (`docs/data/firebase-wind-down.md`): stop app use, tighten rules, export, pause/archive — **never** irreversible project delete without dual verification.
+- CI may add optional Supabase migration checks later; do not block existing Firestore emulator CI until Firebase is fully retired.
 - Operators must be provisioned in Supabase Auth with `app_metadata.bb_role` before admin RLS paths work.
 
 ## Rollback

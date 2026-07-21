@@ -51,7 +51,7 @@ export default async function AdminHomePage() {
         <p className="admin-ops__env" aria-label="Runtime environment">
           <span>{env.appEnv}</span>
           <span aria-hidden="true"> · </span>
-          <span>{env.firebaseProjectId}</span>
+          <span>{env.dataSource}</span>
           <span aria-hidden="true"> · </span>
           <span>{env.authMode}</span>
           <span aria-hidden="true"> · </span>

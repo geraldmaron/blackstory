@@ -1,6 +1,11 @@
 /**
  * Server-only lazy Postgres pool for public structured-data reads (`bb_public.*`).
  * Uses `DATABASE_URL` or `APP_DATABASE_URL`; never accepts `NEXT_PUBLIC_*` credentials.
+ *
+ * Supabase URLs often include `sslmode=require`. Recent node-pg treats that as verify-full,
+ * which fails on the platform CA chain unless we normalize to `uselibpqcompat=true` and
+ * pass `rejectUnauthorized: false`. Without this, live reads throw and the UI silently
+ * falls back to the 4-entity seed snapshot.
  */
 import pg from 'pg';
 
@@ -27,6 +32,53 @@ export function resolvePostgresConnectionString(
   return url || undefined;
 }
 
+function wantsManagedSsl(
+  connectionString: string,
+  environment: Readonly<Record<string, string | undefined>>,
+): boolean {
+  return (
+    environment.DATABASE_SSL === '1' ||
+    environment.DATABASE_SSL === 'true' ||
+    /supabase\.(co|com)/i.test(connectionString)
+  );
+}
+
+/**
+ * Normalize managed Postgres URLs so node-pg does not treat `sslmode=require` as verify-full.
+ * Kept local to apps/web so the public render path never imports `@repo/data-access`.
+ */
+export function normalizePgConnectionString(
+  connectionString: string,
+  environment: Readonly<Record<string, string | undefined>> = process.env,
+): {
+  readonly connectionString: string;
+  readonly ssl?: { readonly rejectUnauthorized: false };
+} {
+  if (!wantsManagedSsl(connectionString, environment)) {
+    return { connectionString };
+  }
+
+  let normalized = connectionString;
+  try {
+    const url = new URL(connectionString);
+    url.searchParams.delete('sslmode');
+    url.searchParams.set('uselibpqcompat', 'true');
+    url.searchParams.set('sslmode', 'require');
+    normalized = url.toString();
+  } catch {
+    normalized = connectionString
+      .replace(/([?&])sslmode=[^&]*/g, '$1')
+      .replace(/[?&]$/, '');
+    const join = normalized.includes('?') ? '&' : '?';
+    normalized = `${normalized}${join}uselibpqcompat=true&sslmode=require`;
+  }
+
+  return {
+    connectionString: normalized,
+    ssl: { rejectUnauthorized: false },
+  };
+}
+
 export function getPostgresPool(
   environment: Readonly<Record<string, string | undefined>> = process.env,
 ): pg.Pool {
@@ -37,12 +89,11 @@ export function getPostgresPool(
   if (!pool) {
     const maxRaw = environment.DATABASE_POOL_MAX?.trim();
     const max = maxRaw ? Number(maxRaw) : 4;
+    const conn = normalizePgConnectionString(connectionString, environment);
     pool = new pg.Pool({
-      connectionString,
+      connectionString: conn.connectionString,
       max: Number.isInteger(max) && max > 0 ? max : 4,
-      ...(environment.DATABASE_SSL === '1' || environment.DATABASE_SSL === 'true'
-        ? { ssl: { rejectUnauthorized: false } }
-        : {}),
+      ...(conn.ssl ? { ssl: conn.ssl } : {}),
     });
   }
   return pool;

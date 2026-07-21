@@ -1,6 +1,6 @@
 /**
  * Postgres reads/writes for bb_research.cases and normalized history/checklist tables.
- * Reconstructs Firestore-shaped documents so parseResearchCaseRecord stays the write-path parser.
+ * Reconstructs serialized documents so parseResearchCaseRecord remains the shared parser.
  */
 import type pg from 'pg';
 import type { ResearchCaseRecord, ResearchCaseState } from '@repo/domain';
@@ -44,7 +44,10 @@ function toIso(value: Date | string): string {
   return value;
 }
 
-function readMetadataString(metadata: Record<string, unknown> | null, key: string): string | undefined {
+function readMetadataString(
+  metadata: Record<string, unknown> | null,
+  key: string,
+): string | undefined {
   if (!metadata) return undefined;
   const value = metadata[key];
   return typeof value === 'string' && value.length > 0 ? value : undefined;
@@ -90,7 +93,9 @@ export function buildResearchCaseDocument(
   };
 }
 
-export async function loadResearchCaseDocument(caseId: string): Promise<Record<string, unknown> | null> {
+export async function loadResearchCaseDocument(
+  caseId: string,
+): Promise<Record<string, unknown> | null> {
   const cases = await queryPostgres<CaseRow>(
     `SELECT id, state, candidate_id, title, relevance_assessment, assignment, publication,
             retraction, created_at, updated_at
@@ -150,7 +155,9 @@ export async function listCaseIdsPostgres(input: {
   return rows.filter((row) => allowed.has(row.state as ResearchCaseState)).map((row) => row.id);
 }
 
-function historyMetadataFromEvent(event: ResearchCaseRecord['history'][number]): Record<string, unknown> {
+function historyMetadataFromEvent(
+  event: ResearchCaseRecord['history'][number],
+): Record<string, unknown> {
   const metadata: Record<string, unknown> = {};
   if (event.mergedIntoCaseId) {
     metadata.mergedIntoCaseId = event.mergedIntoCaseId;
@@ -226,7 +233,9 @@ export async function writeResearchCasePostgres(
 
   const checklistKeys = record.checklist.items.map((item) => item.key);
   if (checklistKeys.length === 0) {
-    await client.query(`DELETE FROM bb_research.case_checklist_items WHERE case_id = $1`, [record.id]);
+    await client.query(`DELETE FROM bb_research.case_checklist_items WHERE case_id = $1`, [
+      record.id,
+    ]);
   } else {
     await client.query(
       `DELETE FROM bb_research.case_checklist_items

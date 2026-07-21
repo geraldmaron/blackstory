@@ -87,23 +87,46 @@ Rules:
 - Do not invent citations, market figures, or graphic violence as the opener.
 - Prefer needs_evidence when claims are thin.`;
 
+const STORY_RESEARCH_RESPONSE_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: [
+    'decision',
+    'rationale',
+    'confidence',
+    'thesisQuestion',
+    'conventionalStartLine',
+    'relocatedStartLine',
+    'title',
+    'dek',
+  ],
+  properties: {
+    decision: { enum: ['recommend', 'needs_evidence', 'reject'] },
+    rationale: { type: 'string' },
+    confidence: { type: 'number', minimum: 0, maximum: 1 },
+    thesisQuestion: { type: 'string' },
+    conventionalStartLine: { type: 'string' },
+    relocatedStartLine: { type: 'string' },
+    mechanismSummary: { type: 'string' },
+    winnerBuiltDocument: { type: 'string' },
+    winnerBuiltProves: { type: 'string' },
+    verificationRule: { type: 'string' },
+    title: { type: 'string' },
+    dek: { type: 'string' },
+  },
+} as const;
+
 function parseDecision(raw: string | undefined): StoryResearchDecision {
   if (raw === 'reject' || raw === 'needs_evidence' || raw === 'recommend') return raw;
   return 'needs_evidence';
 }
 
 function extractJsonObject(content: string): ModelBriefJson {
-  const trimmed = content.trim();
-  try {
-    return JSON.parse(trimmed) as ModelBriefJson;
-  } catch {
-    const start = trimmed.indexOf('{');
-    const end = trimmed.lastIndexOf('}');
-    if (start >= 0 && end > start) {
-      return JSON.parse(trimmed.slice(start, end + 1)) as ModelBriefJson;
-    }
-    throw new Error('Model response was not valid JSON');
+  const parsed: unknown = JSON.parse(content.trim());
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    throw new Error('Model response was not a JSON object');
   }
+  return parsed as ModelBriefJson;
 }
 
 function mockBriefFromTopic(topic: StoryTopicSeed): ModelBriefJson {
@@ -232,6 +255,10 @@ export async function runStoryResearch(
     } else {
       const completion = await provider.complete({
         model: input.model ?? 'mock-story-research-v1',
+        responseSchema: {
+          name: 'story_research_brief',
+          schema: STORY_RESEARCH_RESPONSE_SCHEMA,
+        },
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
           {

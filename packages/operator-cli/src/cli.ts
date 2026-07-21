@@ -13,7 +13,7 @@
  */
 import { appendFileSync, readFileSync, writeFileSync } from 'node:fs';
 import type { RelationshipRole, RelationshipType } from '@repo/domain';
-import type { AtomicStore } from '@repo/firebase';
+import type { AtomicStore } from '@repo/data-access';
 import type { SafeFetchDependencies } from '@repo/security/url-safety';
 import {
   parseLeadsFromText,
@@ -28,10 +28,8 @@ import { runBoundedDiscoveryCampaign } from './discovery-run.js';
 import { runCommunityObscurityOperatorCampaign } from './community-obscurity-run.js';
 import { runRssOperatorCampaign } from './rss-campaign-run.js';
 import { dispatchDiscoveryCampaign } from '@repo/config/scheduled-jobs';
-import {
-  loadEditorialCatalogFromFirestore,
-  mergeJsonCatalogOverFirestore,
-} from './editorial-catalog-firestore.js';
+import { mergeJsonCatalogOverCanonical } from './editorial-catalog.js';
+import { loadEditorialCatalogFromPostgres } from './editorial-catalog-postgres.js';
 import {
   runEditorialJudge,
   type EditorialCatalogEntity,
@@ -56,6 +54,7 @@ import {
 import { censusSafeHttpClient } from './census-http.js';
 import { commitLocate, prepareLocate } from './locate.js';
 import { runResearchIntake } from './research-intake.js';
+import { runWorkerPreflight } from './worker-preflight.js';
 
 export type CliDependencies = {
   readonly store?: AtomicStore;
@@ -67,7 +66,7 @@ export type CliDependencies = {
   readonly writeFile?: (path: string, contents: string) => void;
   /** Sync append used for streaming progress NDJSON (defaults to `appendFileSync`). */
   readonly appendFile?: (path: string, contents: string) => void;
-  /** Lazily builds a real Firestore-backed store when `--commit` is set and no `store` is injected. */
+  /** Lazily builds the Postgres store when `--commit` is set and no store is injected. */
   readonly createLiveStore?: () => Promise<AtomicStore>;
   /** Overrides the real DNS/HTTP dependencies `research-intake` passes to `runQuickAddFetch`. */
   readonly fetchDependencies?: SafeFetchDependencies;
@@ -143,7 +142,8 @@ function defaultModelForProvider(
     case 'hybrid':
       // Empty model when a rotation roster is configured — the provider picks per attempt.
       return (
-        process.env.OPENROUTER_MODEL ?? (process.env.OPENROUTER_MODELS ? '' : 'openrouter/free')
+        process.env.OPENROUTER_MODEL ??
+        (process.env.OPENROUTER_MODELS ? '' : 'openai/gpt-oss-20b:free')
       );
     case 'ollama':
       return ollamaModel ?? process.env.OLLAMA_MODEL ?? 'qwen3:8b';
@@ -318,10 +318,8 @@ async function finish(
 }
 
 async function createDefaultLiveStore(): Promise<AtomicStore> {
-  const { createServerFirebaseApp, createAdminAtomicStore } = await import('@repo/firebase');
-  const { getFirestore } = await import('firebase-admin/firestore');
-  const { app } = createServerFirebaseApp(process.env);
-  return createAdminAtomicStore(getFirestore(app));
+  const { createLiveAtomicStoreFromEnv } = await import('@repo/data-access');
+  return createLiveAtomicStoreFromEnv(process.env);
 }
 
 function inferFormat(path: string, flags: Flags): BulkImportFormat {
@@ -343,6 +341,11 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
   try {
     const flags = parseFlags(rest);
     switch (command) {
+      case 'preflight': {
+        const report = await runWorkerPreflight();
+        stdout(JSON.stringify(report, null, 2));
+        return report.ok ? 0 : 1;
+      }
       case 'submit-lead': {
         const sourceUrls = flags.repeated.get('--source-url');
         const title = optionalFlag(flags, '--title');
@@ -740,19 +743,16 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
                 id: subject.subjectId,
                 displayName: subject.title,
               }));
-        if (catalogFrom === 'firestore') {
-          const { createServerFirebaseApp } = await import('@repo/firebase');
-          const { getFirestore } = await import('firebase-admin/firestore');
-          const { app } = createServerFirebaseApp(process.env);
-          const firestoreCatalog = await loadEditorialCatalogFromFirestore(getFirestore(app));
+        if (catalogFrom === 'postgres') {
+          const postgresCatalog = await loadEditorialCatalogFromPostgres();
           catalogEntries =
             jsonCatalogEntries.length > 0
-              ? mergeJsonCatalogOverFirestore(firestoreCatalog, jsonCatalogEntries)
-              : firestoreCatalog.length > 0
-                ? firestoreCatalog
+              ? mergeJsonCatalogOverCanonical(postgresCatalog, jsonCatalogEntries)
+              : postgresCatalog.length > 0
+                ? postgresCatalog
                 : catalogEntries;
         } else if (catalogFrom !== undefined) {
-          throw new Error('--catalog-from must be "firestore" when set');
+          throw new Error('--catalog-from must be "postgres" when set');
         }
         const providerName = (optionalFlag(flags, '--provider') ?? 'mock') as
           'mock' | 'openrouter' | 'ollama' | 'hybrid';
@@ -950,7 +950,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
       }
       default: {
         stderr(
-          'Usage: operator-cli <submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|locate> [flags]',
+          'Usage: operator-cli <preflight|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|locate> [flags]',
         );
         return command ? 1 : 0;
       }

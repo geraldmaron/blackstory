@@ -19,15 +19,14 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --conditions development --import tsx --test src/identity.test.ts src/audit.test.ts src/intake.test.ts src/bulk-import.test.ts src/commit.test.ts src/fetch.test.ts src/research-intake.test.ts src/discovery-run.test.ts src/discovery-survivor-intake.test.ts src/promotion-boundary.test.ts src/cli.test.ts src/edge-intake.test.ts src/editorial-run.test.ts src/editorial-catalog-firestore.test.ts src/story-research-run.test.ts src/story-rewrite.test.ts src/map-pool.test.ts src/llm-provider.test.ts",
+    "test": "node --conditions development --import tsx --test src/identity.test.ts src/audit.test.ts src/intake.test.ts src/bulk-import.test.ts src/commit.test.ts src/fetch.test.ts src/research-intake.test.ts src/discovery-run.test.ts src/discovery-survivor-intake.test.ts src/promotion-boundary.test.ts src/cli.test.ts src/edge-intake.test.ts src/editorial-run.test.ts src/editorial-catalog.test.ts src/story-research-run.test.ts src/story-rewrite.test.ts src/map-pool.test.ts src/llm-provider.test.ts src/worker-preflight.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {
     "@repo/config": "workspace:*",
+    "@repo/data-access": "workspace:*",
     "@repo/domain": "workspace:*",
-    "@repo/firebase": "workspace:*",
-    "@repo/security": "workspace:*",
-    "firebase-admin": "^14.2.0"
+    "@repo/security": "workspace:*"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:^",

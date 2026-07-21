@@ -366,6 +366,100 @@ export const seedPublicSchoolEntity: PublicEntityProjectionDoc = {
   eraBuckets: ['1870s', '1890s', '1910s'],
 };
 
+// April 29, 1975 D.C. Inventory listing — same campus pin as the school (event occurred there).
+const landmarkListingPoint = {
+  ...mutableGeoPoint(38.9098, -77.0143, 5),
+  precision: 'campus' as const,
+  matchMethod: 'manual_research' as const,
+};
+
+// Dunbar Alumni Federation — city-level only; no documented street address.
+const alumniFederationPoint = {
+  ...mutableGeoPoint(38.9072, -77.0369, 5),
+  precision: 'city' as const,
+  matchMethod: 'manual_research' as const,
+};
+
+/** 1975 D.C. Inventory of Historic Sites listing for Dunbar High School (event). */
+export const seedPublicLandmarkListingEntity: PublicEntityProjectionDoc = {
+  id: 'ent_dc_landmark_listing_1975',
+  releaseId: 'rel_seed_001',
+  kind: 'event',
+  displayName: 'D.C. Inventory of Historic Sites Listing (1975)',
+  nameLower: 'd.c. inventory of historic sites listing (1975)',
+  summary:
+    'On April 29, 1975, Paul Laurence Dunbar High School was listed on the District of Columbia ' +
+    'Inventory of Historic Sites, formally recognizing its standing as the nation’s first ' +
+    'public high school for Black students.',
+  location: landmarkListingPoint,
+  claimIds: ['claim_landmark_listed_1975'],
+  jurisdictionLabel: 'Washington, D.C.',
+  locationLabel: 'Paul Laurence Dunbar High School campus (schematic)',
+  topicTags: ['landmark', 'preservation', 'history'],
+  historicalContext:
+    'Local historic-sites inventories across the country began formally recognizing Black ' +
+    'educational and civic landmarks in the 1970s, often decades after similar recognition for ' +
+    'other sites. This listing is one documented instance of that pattern for a Washington, D.C. ' +
+    'institution.',
+  researchCoverage: 'partial',
+  eraBuckets: ['1970s'],
+  related: [
+    {
+      id: 'ent_dunbar_school_001',
+      type: 'occurred_at',
+      direction: 'outgoing',
+      timespan: { validFrom: '1975' },
+    },
+    {
+      id: 'ent_dunbar_alumni_federation_001',
+      type: 'commemorates',
+      direction: 'incoming',
+      timespan: { validFrom: '2002' },
+    },
+  ],
+};
+
+/** Dunbar Alumni Federation (institution) — preserves school history; scholarships since 2002. */
+export const seedPublicAlumniFederationEntity: PublicEntityProjectionDoc = {
+  id: 'ent_dunbar_alumni_federation_001',
+  releaseId: 'rel_seed_001',
+  kind: 'institution',
+  displayName: 'Dunbar Alumni Federation',
+  nameLower: 'dunbar alumni federation',
+  summary:
+    'Organized in 2002 and tax-exempt as a 501(c)(3) nonprofit since July 2003, the Dunbar ' +
+    'Alumni Federation preserves Paul Laurence Dunbar High School’s history and provides ' +
+    'scholarship support to its students and alumni.',
+  location: alumniFederationPoint,
+  claimIds: ['claim_alumni_organized_2002', 'claim_alumni_tax_exempt_2003'],
+  status: 'active',
+  statusHistory: [
+    {
+      status: 'active',
+      validFrom: '2002',
+      datePrecision: 'year',
+      basisClaimIds: ['claim_alumni_organized_2002'],
+    },
+  ],
+  jurisdictionLabel: 'Washington, D.C.',
+  locationLabel: 'Washington, D.C. (city-level pin; no specific street address documented)',
+  topicTags: ['alumni', 'preservation', 'community'],
+  historicalContext:
+    'Alumni-led heritage organizations frequently form to document and sustain the legacy of ' +
+    'long-standing Black educational institutions, especially after a physical campus changes ' +
+    'significantly. This organization is one documented instance of that pattern.',
+  researchCoverage: 'partial',
+  eraBuckets: ['2000s'],
+  related: [
+    {
+      id: 'ent_dc_landmark_listing_1975',
+      type: 'commemorates',
+      direction: 'outgoing',
+      timespan: { validFrom: '2002' },
+    },
+  ],
+};
+
 const seedCaptureHash = hashUtf8('seed-nara-catalog-item-body-v1');
 
 export const seedSourceOrganization: SourceOrganizationDoc = {
@@ -749,6 +843,14 @@ export const firestoreSeedDocuments: readonly SeedDocument[] = [
     path: 'publicReleases/rel_seed_001/entities/ent_dunbar_school_001',
     data: seedPublicSchoolEntity,
   },
+  {
+    path: 'publicReleases/rel_seed_001/entities/ent_dc_landmark_listing_1975',
+    data: seedPublicLandmarkListingEntity,
+  },
+  {
+    path: 'publicReleases/rel_seed_001/entities/ent_dunbar_alumni_federation_001',
+    data: seedPublicAlumniFederationEntity,
+  },
   ...SEED_STORY_PROJECTIONS.map((storyDoc) => ({
     path: `publicReleases/rel_seed_001/stories/${storyDoc.slug}`,
     data: storyDoc as unknown as Record<string, unknown>,
@@ -787,6 +889,43 @@ export const firestoreSeedDocuments: readonly SeedDocument[] = [
       researchCoverage: 'partial',
       relatedCount: 2,
       claimCount: seedPublicSchoolEntity.claimIds.length,
+    },
+  },
+  {
+    path: 'publicSearchIndex/ent_dc_landmark_listing_1975',
+    data: {
+      id: 'ent_dc_landmark_listing_1975',
+      releaseId: 'rel_seed_001',
+      displayName: seedPublicLandmarkListingEntity.displayName,
+      nameLower: seedPublicLandmarkListingEntity.nameLower,
+      geohash: seedPublicLandmarkListingEntity.location?.geohash,
+      kind: seedPublicLandmarkListingEntity.kind,
+      summary: seedPublicLandmarkListingEntity.summary,
+      topicTags: seedPublicLandmarkListingEntity.topicTags,
+      eraBuckets: seedPublicLandmarkListingEntity.eraBuckets ?? [],
+      recordMaturity: 'minimum_record',
+      researchCoverage: 'partial',
+      relatedCount: seedPublicLandmarkListingEntity.related?.length ?? 0,
+      claimCount: seedPublicLandmarkListingEntity.claimIds.length,
+    },
+  },
+  {
+    path: 'publicSearchIndex/ent_dunbar_alumni_federation_001',
+    data: {
+      id: 'ent_dunbar_alumni_federation_001',
+      releaseId: 'rel_seed_001',
+      displayName: seedPublicAlumniFederationEntity.displayName,
+      nameLower: seedPublicAlumniFederationEntity.nameLower,
+      geohash: seedPublicAlumniFederationEntity.location?.geohash,
+      kind: seedPublicAlumniFederationEntity.kind,
+      summary: seedPublicAlumniFederationEntity.summary,
+      topicTags: seedPublicAlumniFederationEntity.topicTags,
+      eraBuckets: seedPublicAlumniFederationEntity.eraBuckets ?? [],
+      status: seedPublicAlumniFederationEntity.status,
+      recordMaturity: 'minimum_record',
+      researchCoverage: 'partial',
+      relatedCount: seedPublicAlumniFederationEntity.related?.length ?? 0,
+      claimCount: seedPublicAlumniFederationEntity.claimIds.length,
     },
   },
   {

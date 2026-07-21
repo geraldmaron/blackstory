@@ -5,18 +5,30 @@ import type { Firestore } from 'firebase-admin/firestore';
 import { countCollection, iterateCollection, iterateSubcollection } from './firestore-read.js';
 import {
   mapActiveRelease,
+  mapAcsCountyProfile,
+  mapAcsTractProfile,
   mapAuditEvent,
+  mapCanonicalEntityStub,
+  mapCensusCountyDecade,
   mapCensusNationalDecade,
   mapCensusStateDecade,
+  mapEntityEmbedding,
+  mapEntityRelationship,
   mapEvidenceSource,
+  mapHateCrimeCountyYear,
+  mapHolcArea,
   mapIdempotencyKey,
   mapKillSwitch,
   mapMaterializedSnapshot,
+  mapOpportunityAtlasTract,
   mapOutboxMessage,
   mapPolicyActive,
   mapPolicyVersion,
   mapPublicationRelease,
   mapReleaseEntity,
+  mapReleaseGraphAdjacency,
+  mapReleaseGraphAllTime,
+  mapReleaseGraphDecade,
   mapReleaseStory,
   mapResearchCase,
   mapRetrievalEvent,
@@ -25,6 +37,8 @@ import {
   mapSourceItem,
   mapStoryPacketReview,
   mapSubmission,
+  mapUcrAgency,
+  mapUcrStateParticipation,
 } from './mappers/index.js';
 import type { PgWriter } from './pg-writer.js';
 import type { CollectionMigrateResult } from './util.js';
@@ -49,6 +63,7 @@ async function flushUpsert(
   rows: Record<string, unknown>[],
   conflict: readonly string[],
   result: { written: number; errors: string[] },
+  upsertOptions?: Parameters<PgWriter['upsertRows']>[3],
 ): Promise<void> {
   if (options.mode === 'dry-run' || !options.writer || rows.length === 0) {
     if (options.mode === 'dry-run') result.written += rows.length;
@@ -56,7 +71,7 @@ async function flushUpsert(
     return;
   }
   try {
-    result.written += await options.writer.upsertRows(table, rows, conflict);
+    result.written += await options.writer.upsertRows(table, rows, conflict, upsertOptions);
   } catch (err) {
     result.errors.push(String(err instanceof Error ? err.message : err));
   }
@@ -491,6 +506,293 @@ export async function migrateStoryPacketReviews(
   return result;
 }
 
+export async function migratePublicReleaseGraph(
+  options: MigrateOptions,
+): Promise<CollectionMigrateResult> {
+  const result = {
+    ...emptyResult('publicReleases/graph*', 'bb_public.release_graph_*'),
+    errors: [] as string[],
+  };
+  const releaseRefs = await options.db.collection('publicReleases').listDocuments();
+  const adjacencyRows: Record<string, unknown>[] = [];
+  const decadeRows: Record<string, unknown>[] = [];
+  const allTimeRows: Record<string, unknown>[] = [];
+
+  for (const ref of releaseRefs) {
+    for await (const doc of iterateSubcollection(
+      options.db,
+      'publicReleases',
+      ref.id,
+      'graphAdjacency',
+    )) {
+      result.read += 1;
+      adjacencyRows.push(mapReleaseGraphAdjacency(ref.id, doc.id, doc.data));
+      if (adjacencyRows.length >= 100) {
+        await flushUpsert(
+          options,
+          'bb_public.release_graph_adjacency',
+          adjacencyRows,
+          ['release_id', 'entity_id'],
+          result,
+        );
+      }
+    }
+    for await (const doc of iterateSubcollection(
+      options.db,
+      'publicReleases',
+      ref.id,
+      'graphDecades',
+    )) {
+      result.read += 1;
+      const mapped = mapReleaseGraphDecade(ref.id, doc.id, doc.data);
+      if (!mapped) {
+        result.skipped += 1;
+        continue;
+      }
+      decadeRows.push(mapped);
+    }
+    const allTimeSnap = await options.db
+      .collection('publicReleases')
+      .doc(ref.id)
+      .collection('graph')
+      .doc('all-time')
+      .get();
+    if (allTimeSnap.exists) {
+      result.read += 1;
+      allTimeRows.push(
+        mapReleaseGraphAllTime(ref.id, (allTimeSnap.data() ?? {}) as Record<string, unknown>),
+      );
+    }
+  }
+
+  await flushUpsert(
+    options,
+    'bb_public.release_graph_adjacency',
+    adjacencyRows,
+    ['release_id', 'entity_id'],
+    result,
+  );
+  await flushUpsert(
+    options,
+    'bb_public.release_graph_decades',
+    decadeRows,
+    ['release_id', 'decade'],
+    result,
+  );
+  await flushUpsert(options, 'bb_public.release_graph_all_time', allTimeRows, ['release_id'], result);
+  return result;
+}
+
+async function ensureEntityStubs(
+  options: MigrateOptions,
+  stubs: Map<string, Record<string, unknown>>,
+  result: { written: number; errors: string[] },
+): Promise<void> {
+  const rows: Record<string, unknown>[] = [];
+  for (const [id, data] of stubs) {
+    rows.push(mapCanonicalEntityStub(id, data));
+    if (rows.length >= 100) {
+      await flushUpsert(options, 'bb_canonical.entities', rows, ['id'], result, {
+        doNothing: true,
+      });
+    }
+  }
+  await flushUpsert(options, 'bb_canonical.entities', rows, ['id'], result, { doNothing: true });
+}
+
+export async function migrateEntityRelationships(
+  options: MigrateOptions,
+): Promise<CollectionMigrateResult> {
+  const result = {
+    ...emptyResult('entityRelationships', 'bb_canonical.entity_relationships'),
+    errors: [] as string[],
+  };
+  const stubs = new Map<string, Record<string, unknown>>();
+  const rows: Record<string, unknown>[] = [];
+  for await (const doc of iterateCollection(options.db, 'entityRelationships')) {
+    result.read += 1;
+    const mapped = mapEntityRelationship(doc.id, doc.data);
+    if (!mapped) {
+      result.skipped += 1;
+      continue;
+    }
+    stubs.set(mapped.from_entity_id, {});
+    stubs.set(mapped.to_entity_id, {});
+    rows.push(mapped);
+    if (rows.length >= 100) {
+      await ensureEntityStubs(options, stubs, result);
+      stubs.clear();
+      await flushUpsert(options, 'bb_canonical.entity_relationships', rows, ['id'], result);
+    }
+  }
+  await ensureEntityStubs(options, stubs, result);
+  await flushUpsert(options, 'bb_canonical.entity_relationships', rows, ['id'], result);
+  return result;
+}
+
+export async function migrateEntityEmbeddings(
+  options: MigrateOptions,
+): Promise<CollectionMigrateResult> {
+  const result = {
+    ...emptyResult('entityEmbeddings', 'bb_canonical.entity_embeddings'),
+    errors: [] as string[],
+  };
+  const stubs = new Map<string, Record<string, unknown>>();
+  const rows: Record<string, unknown>[] = [];
+  for await (const doc of iterateCollection(options.db, 'entityEmbeddings')) {
+    result.read += 1;
+    const mapped = mapEntityEmbedding(doc.id, doc.data);
+    if (!mapped) {
+      result.skipped += 1;
+      continue;
+    }
+    stubs.set(mapped.entity_id, { kind: mapped.kind, displayName: mapped.entity_id });
+    rows.push(mapped);
+    if (rows.length >= 50) {
+      await ensureEntityStubs(options, stubs, result);
+      stubs.clear();
+      await flushUpsert(options, 'bb_canonical.entity_embeddings', rows, ['entity_id'], result, {
+        casts: { embedding: 'extensions.vector' },
+      });
+    }
+  }
+  await ensureEntityStubs(options, stubs, result);
+  await flushUpsert(options, 'bb_canonical.entity_embeddings', rows, ['entity_id'], result, {
+    casts: { embedding: 'extensions.vector' },
+  });
+  return result;
+}
+
+async function migrateProvenanceCollection(
+  options: MigrateOptions,
+  collection: string,
+  table: string,
+  conflict: readonly string[],
+  mapRow: (id: string, data: Record<string, unknown>) => Record<string, unknown> | null,
+  batchSize = 100,
+): Promise<CollectionMigrateResult> {
+  const result = { ...emptyResult(collection, table), errors: [] as string[] };
+  const rows: Record<string, unknown>[] = [];
+  let processed = 0;
+  for await (const doc of iterateCollection(options.db, collection)) {
+    result.read += 1;
+    const mapped = mapRow(doc.id, doc.data);
+    if (!mapped) {
+      result.skipped += 1;
+      continue;
+    }
+    rows.push(mapped);
+    if (rows.length >= batchSize) {
+      await flushUpsert(options, table, rows, conflict, result);
+      processed += batchSize;
+      if (processed % 5000 === 0) {
+        console.error(JSON.stringify({ progress: collection, read: result.read, written: result.written }));
+      }
+    }
+    if (options.limit !== undefined && result.read >= options.limit) break;
+  }
+  await flushUpsert(options, table, rows, conflict, result);
+  return result;
+}
+
+export async function migrateCensusCounty(
+  options: MigrateOptions,
+): Promise<CollectionMigrateResult> {
+  return migrateProvenanceCollection(
+    options,
+    'censusCountyDecades',
+    'bb_reference.census_county_decades',
+    ['id'],
+    (id, data) => mapCensusCountyDecade(id, data),
+  );
+}
+
+export async function migrateAcsCounty(
+  options: MigrateOptions,
+): Promise<CollectionMigrateResult> {
+  return migrateProvenanceCollection(
+    options,
+    'acsCountyProfiles',
+    'bb_reference.acs_county_profiles',
+    ['id'],
+    (id, data) => mapAcsCountyProfile(id, data),
+  );
+}
+
+export async function migrateAcsTracts(
+  options: MigrateOptions,
+): Promise<CollectionMigrateResult> {
+  return migrateProvenanceCollection(
+    options,
+    'acsTractProfiles',
+    'bb_reference.acs_tract_profiles',
+    ['id'],
+    (id, data) => mapAcsTractProfile(id, data),
+    50,
+  );
+}
+
+export async function migrateUcrAgencies(
+  options: MigrateOptions,
+): Promise<CollectionMigrateResult> {
+  return migrateProvenanceCollection(
+    options,
+    'ucrAgencies',
+    'bb_reference.ucr_agencies',
+    ['id'],
+    (id, data) => mapUcrAgency(id, data),
+  );
+}
+
+export async function migrateUcrStateParticipation(
+  options: MigrateOptions,
+): Promise<CollectionMigrateResult> {
+  return migrateProvenanceCollection(
+    options,
+    'ucrStateParticipation',
+    'bb_reference.ucr_state_participation',
+    ['id'],
+    (id, data) => mapUcrStateParticipation(id, data),
+  );
+}
+
+export async function migrateOpportunityAtlas(
+  options: MigrateOptions,
+): Promise<CollectionMigrateResult> {
+  return migrateProvenanceCollection(
+    options,
+    'opportunityAtlasTracts',
+    'bb_reference.opportunity_atlas_tracts',
+    ['id'],
+    (id, data) => mapOpportunityAtlasTract(id, data),
+    50,
+  );
+}
+
+export async function migrateHateCrime(
+  options: MigrateOptions,
+): Promise<CollectionMigrateResult> {
+  return migrateProvenanceCollection(
+    options,
+    'hateCrimeCountyYears',
+    'bb_reference.hate_crime_county_years',
+    ['id'],
+    (id, data) => mapHateCrimeCountyYear(id, data),
+  );
+}
+
+export async function migrateHolcAreas(
+  options: MigrateOptions,
+): Promise<CollectionMigrateResult> {
+  return migrateProvenanceCollection(
+    options,
+    'holcAreas',
+    'bb_reference.holc_areas',
+    ['id'],
+    (id, data) => mapHolcArea(id, data),
+  );
+}
+
 export const HIGH_VALUE_MIGRANTS: readonly {
   readonly name: string;
   readonly run: (options: MigrateOptions) => Promise<CollectionMigrateResult>;
@@ -509,12 +811,31 @@ export const HIGH_VALUE_MIGRANTS: readonly {
   { name: 'censusStateDecades', run: migrateCensusState },
   { name: 'publicSearchIndex', run: migratePublicSearchIndex },
   { name: 'publicReleases', run: migratePublicReleaseProjections },
+  { name: 'publicReleaseGraph', run: migratePublicReleaseGraph },
   { name: 'auditEvents', run: migrateAuditEvents },
   { name: 'outboxMessages', run: migrateOutbox },
   { name: 'idempotencyKeys', run: migrateIdempotencyKeys },
   { name: 'submissionInbox', run: migrateSubmissions },
   { name: 'adminStoryPacketReviews', run: migrateStoryPacketReviews },
 ];
+
+export const LARGE_MIGRANTS: readonly {
+  readonly name: string;
+  readonly run: (options: MigrateOptions) => Promise<CollectionMigrateResult>;
+}[] = [
+  { name: 'entityRelationships', run: migrateEntityRelationships },
+  { name: 'entityEmbeddings', run: migrateEntityEmbeddings },
+  { name: 'censusCountyDecades', run: migrateCensusCounty },
+  { name: 'acsCountyProfiles', run: migrateAcsCounty },
+  { name: 'acsTractProfiles', run: migrateAcsTracts },
+  { name: 'ucrAgencies', run: migrateUcrAgencies },
+  { name: 'ucrStateParticipation', run: migrateUcrStateParticipation },
+  { name: 'opportunityAtlasTracts', run: migrateOpportunityAtlas },
+  { name: 'hateCrimeCountyYears', run: migrateHateCrime },
+  { name: 'holcAreas', run: migrateHolcAreas },
+];
+
+export const ALL_MIGRANTS = [...HIGH_VALUE_MIGRANTS, ...LARGE_MIGRANTS] as const;
 
 export async function runCensus(db: Firestore): Promise<
   readonly { readonly name: string; readonly count: number }[]

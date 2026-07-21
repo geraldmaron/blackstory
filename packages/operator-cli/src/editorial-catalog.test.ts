@@ -1,13 +1,13 @@
 /**
- * Unit tests for Firestore editorial catalog merge helpers (no live network).
+ * Unit tests for canonical editorial catalog merge helpers (no live network).
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   extractEmbeddingVector,
   mergeEditorialCatalogFromDocs,
-  mergeJsonCatalogOverFirestore,
-} from './editorial-catalog-firestore.js';
+  mergeJsonCatalogOverCanonical,
+} from './editorial-catalog.js';
 
 test('extractEmbeddingVector accepts arrays and toArray()-shaped values', () => {
   assert.deepEqual(extractEmbeddingVector([0.1, 0.2]), [0.1, 0.2]);
@@ -34,10 +34,10 @@ test('mergeEditorialCatalogFromDocs joins vectors with search-index names', () =
   assert.equal(catalog[1]?.displayName, 'ent_b');
 });
 
-test('mergeJsonCatalogOverFirestore prefers JSON displayName and keeps Firestore vector', () => {
+test('mergeJsonCatalogOverCanonical prefers JSON displayName and keeps canonical vector', () => {
   const vector = Array.from({ length: 3 }, () => 1);
-  const merged = mergeJsonCatalogOverFirestore(
-    [{ id: 'ent_a', displayName: 'From Firestore', vector }],
+  const merged = mergeJsonCatalogOverCanonical(
+    [{ id: 'ent_a', displayName: 'From Postgres', vector }],
     [
       { id: 'ent_a', displayName: 'From JSON', aliases: ['A'] },
       { id: 'ent_b', displayName: 'Only JSON' },

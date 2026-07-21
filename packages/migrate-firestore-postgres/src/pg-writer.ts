@@ -4,12 +4,20 @@
 import pg from 'pg';
 import { toJsonValue } from './util.js';
 
+export type UpsertOptions = {
+  /** Per-column SQL cast suffixes, e.g. `{ embedding: 'vector' }` → `$n::vector`. */
+  readonly casts?: Readonly<Record<string, string>>;
+  /** When true, ON CONFLICT DO NOTHING (no update). */
+  readonly doNothing?: boolean;
+};
+
 export type PgWriter = {
   readonly query: (sql: string, params?: readonly unknown[]) => Promise<pg.QueryResult>;
   readonly upsertRows: (
     table: string,
     rows: readonly Record<string, unknown>[],
     conflictColumns: readonly string[],
+    options?: UpsertOptions,
   ) => Promise<number>;
   readonly end: () => Promise<void>;
 };
@@ -41,8 +49,43 @@ function prepareParam(value: unknown): { readonly value: unknown; readonly castJ
   return { value, castJson: false };
 }
 
+/** Normalize Supabase URLs so node-pg does not treat sslmode=require as verify-full. */
+export function normalizePgConnectionString(connectionString: string): {
+  readonly connectionString: string;
+  readonly ssl?: { readonly rejectUnauthorized: false };
+} {
+  const isSupabase =
+    /supabase\.(co|com)/i.test(connectionString) ||
+    process.env.DATABASE_SSL === '1' ||
+    process.env.DATABASE_SSL === 'true';
+  if (!isSupabase) return { connectionString };
+  let normalized = connectionString;
+  try {
+    const url = new URL(connectionString);
+    url.searchParams.delete('sslmode');
+    url.searchParams.set('uselibpqcompat', 'true');
+    url.searchParams.set('sslmode', 'require');
+    normalized = url.toString();
+  } catch {
+    normalized = connectionString
+      .replace(/([?&])sslmode=[^&]*/g, '$1')
+      .replace(/[?&]$/, '');
+    const join = normalized.includes('?') ? '&' : '?';
+    normalized = `${normalized}${join}uselibpqcompat=true&sslmode=require`;
+  }
+  return {
+    connectionString: normalized,
+    ssl: { rejectUnauthorized: false },
+  };
+}
+
 export function createPgWriter(connectionString: string): PgWriter {
-  const pool = new pg.Pool({ connectionString, max: 4 });
+  const conn = normalizePgConnectionString(connectionString);
+  const pool = new pg.Pool({
+    connectionString: conn.connectionString,
+    max: 4,
+    ...(conn.ssl ? { ssl: conn.ssl } : {}),
+  });
 
   async function query(sql: string, params: readonly unknown[] = []) {
     return pool.query(sql, [...params]);
@@ -52,6 +95,7 @@ export function createPgWriter(connectionString: string): PgWriter {
     table: string,
     rows: readonly Record<string, unknown>[],
     conflictColumns: readonly string[],
+    options: UpsertOptions = {},
   ): Promise<number> {
     if (rows.length === 0) return 0;
     const columns = Object.keys(rows[0] ?? {});
@@ -62,6 +106,7 @@ export function createPgWriter(connectionString: string): PgWriter {
       .filter((c) => !conflictColumns.includes(c))
       .map((c) => `${quoteIdent(c)} = EXCLUDED.${quoteIdent(c)}`)
       .join(', ');
+    const casts = options.casts ?? {};
 
     let written = 0;
     const batchSize = 50;
@@ -75,15 +120,23 @@ export function createPgWriter(connectionString: string): PgWriter {
         for (const col of columns) {
           const prepared = prepareParam(row[col]);
           values.push(prepared.value);
-          cells.push(prepared.castJson ? `$${param++}::jsonb` : `$${param++}`);
+          const cast = casts[col];
+          if (cast) {
+            cells.push(`$${param++}::${cast}`);
+          } else if (prepared.castJson) {
+            cells.push(`$${param++}::jsonb`);
+          } else {
+            cells.push(`$${param++}`);
+          }
         }
         placeholders.push(`(${cells.join(', ')})`);
       }
       const colList = columns.map(quoteIdent).join(', ');
-      const sql =
-        updateSet.length > 0
-          ? `INSERT INTO ${quoteIdent(table)} (${colList}) VALUES ${placeholders.join(', ')} ON CONFLICT (${conflict}) DO UPDATE SET ${updateSet}`
-          : `INSERT INTO ${quoteIdent(table)} (${colList}) VALUES ${placeholders.join(', ')} ON CONFLICT (${conflict}) DO NOTHING`;
+      const onConflict =
+        options.doNothing || updateSet.length === 0
+          ? `ON CONFLICT (${conflict}) DO NOTHING`
+          : `ON CONFLICT (${conflict}) DO UPDATE SET ${updateSet}`;
+      const sql = `INSERT INTO ${quoteIdent(table)} (${colList}) VALUES ${placeholders.join(', ')} ${onConflict}`;
       await query(sql, values);
       written += batch.length;
     }

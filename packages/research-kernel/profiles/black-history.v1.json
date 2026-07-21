@@ -1,0 +1,263 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "black-history",
+  "version": "1.0.0",
+  "name": "Black history research",
+  "scope": {
+    "geography": "United States",
+    "principles": [
+      "Place first; evidence visible; people with context",
+      "Evidence before assertion",
+      "No completeness overclaims",
+      "No crime-heat rendering or alarm color for violence-adjacent records"
+    ]
+  },
+  "vocabulary": {
+    "entityKinds": [
+      "person",
+      "place",
+      "organization",
+      "law",
+      "case",
+      "publication",
+      "event",
+      "movement",
+      "office",
+      "instrument"
+    ],
+    "relationshipPredicates": [
+      "served_as",
+      "located_at",
+      "succeeded",
+      "challenged_law",
+      "participated_in",
+      "funded_by",
+      "founded",
+      "member_of",
+      "published",
+      "occurred_at"
+    ],
+    "claimClasses": ["standard", "highImpact", "legal", "sensitive", "livingPerson"]
+  },
+  "sensitivityRules": [
+    "Treat unknown living status as living for privacy decisions",
+    "Never publish ordinary-person residential precision",
+    "Render locations no sharper than stored precision",
+    "A coarsened point must never be labeled as an exact address",
+    "Identify every depicted person by person, role, place, and year"
+  ],
+  "sourceFitness": [
+    {
+      "sourceClass": "official-enacted-text-or-opinion",
+      "claimClass": "legal-status",
+      "fitness": "authoritative",
+      "limitations": ["Does not establish social consequences without additional evidence"]
+    },
+    {
+      "sourceClass": "first-person-or-oral-history",
+      "claimClass": "lived-experience-or-local-memory",
+      "fitness": "strong",
+      "limitations": ["Identity, chronology, coordination, and copying require review"]
+    },
+    {
+      "sourceClass": "scholarly",
+      "claimClass": "historical-synthesis",
+      "fitness": "strong",
+      "limitations": [
+        "Capture cited primary evidence for consequential atomic claims where available"
+      ]
+    },
+    {
+      "sourceClass": "news-index-summary-or-search-result",
+      "claimClass": "historical-assertion",
+      "fitness": "leadOnly",
+      "limitations": ["Capture and assess the underlying evidence before acceptance"]
+    },
+    {
+      "sourceClass": "community-forum",
+      "claimClass": "alias-local-memory-or-lead",
+      "fitness": "conditional",
+      "limitations": [
+        "Evaluate authorship, chronology, coordination, copying, and shared upstream sources"
+      ]
+    }
+  ],
+  "queryPacks": {
+    "identity": [
+      "trusted identifier",
+      "dated alias",
+      "institutional succession",
+      "role-qualified name"
+    ],
+    "primaryEvidence": [
+      "archive collection",
+      "oral history",
+      "official record",
+      "contemporaneous publication"
+    ],
+    "legal": ["enacted text", "effective date", "amendment", "repeal", "official opinion"],
+    "contradiction": ["disputed", "correction", "retraction", "contrary evidence"],
+    "relationships": [
+      "served as",
+      "located at",
+      "succeeded",
+      "challenged law",
+      "participated in",
+      "funded by"
+    ]
+  },
+  "riskClasses": [
+    {
+      "id": "standard",
+      "description": "Ordinary historical research without elevated legal, privacy, or dignity risk",
+      "budgetClass": "standard",
+      "escalationTriggers": [
+        "identity conflict",
+        "material contradiction",
+        "buried consequential connection"
+      ]
+    },
+    {
+      "id": "high-impact-legal-sensitive",
+      "description": "Legal status, living-person, violence-adjacent, or otherwise consequential research",
+      "budgetClass": "highImpact",
+      "escalationTriggers": [
+        "living-person risk",
+        "legal status ambiguity",
+        "identity conflict",
+        "material contradiction",
+        "buried consequential connection"
+      ]
+    }
+  ],
+  "budgets": {
+    "standard": {
+      "queries": 40,
+      "candidateUrls": 100,
+      "fullCaptures": 30,
+      "relationshipHops": 3,
+      "durationMinutes": 60,
+      "paidModelUsd": 2
+    },
+    "highImpact": {
+      "queries": 100,
+      "candidateUrls": 250,
+      "fullCaptures": 75,
+      "relationshipHops": 4,
+      "durationMinutes": 240,
+      "paidModelUsd": 10
+    }
+  },
+  "modelPolicies": [
+    {
+      "mode": "deterministic",
+      "modelIds": [],
+      "authority": [
+        "fetch",
+        "parse",
+        "hash",
+        "ocr",
+        "normalize",
+        "deduplicate",
+        "exact-id-reconciliation",
+        "geocode",
+        "legal-version-comparison"
+      ],
+      "requiresBenchmark": false,
+      "mayApprove": false
+    },
+    {
+      "mode": "local-triage",
+      "modelIds": ["qwen3:8b"],
+      "authority": [
+        "query-suggestion",
+        "mention-extraction",
+        "rough-classification",
+        "lead-triage"
+      ],
+      "requiresBenchmark": true,
+      "mayApprove": false
+    },
+    {
+      "mode": "free-batch",
+      "modelIds": [
+        "openai/gpt-oss-20b:free",
+        "nvidia/nemotron-3-nano-30b-a3b:free",
+        "google/gemma-4-31b-it:free",
+        "nvidia/nemotron-3-super-120b-a12b:free"
+      ],
+      "authority": ["proposal-only-recall"],
+      "requiresBenchmark": true,
+      "mayApprove": false
+    },
+    {
+      "mode": "paid-research",
+      "modelIds": ["deepseek/deepseek-v3.2", "qwen/qwen3.5-122b-a10b"],
+      "authority": [
+        "structured-extraction",
+        "query-planning",
+        "entailment",
+        "contradiction-hunting",
+        "synthesis"
+      ],
+      "requiresBenchmark": true,
+      "mayApprove": false
+    },
+    {
+      "mode": "quality-prose",
+      "modelIds": [
+        "moonshotai/kimi-k2.5",
+        "qwen/qwen3.5-122b-a10b",
+        "deepseek/deepseek-v3.2",
+        "mistralai/mistral-medium-3.1"
+      ],
+      "authority": ["long-form-draft", "difficult-synthesis"],
+      "requiresBenchmark": true,
+      "mayApprove": false
+    },
+    {
+      "mode": "independent-review",
+      "modelIds": ["benchmarked-distinct-family"],
+      "authority": ["adversarial-verification", "separate-approval"],
+      "requiresBenchmark": true,
+      "mayApprove": true
+    },
+    {
+      "mode": "trusted-session",
+      "modelIds": ["identified-claude-session", "identified-codex-session"],
+      "authority": ["scoped-operator-action", "canonical-draft"],
+      "requiresBenchmark": false,
+      "mayApprove": false
+    }
+  ],
+  "retention": {
+    "acceptedProvenanceDays": null,
+    "searchCacheDays": 30,
+    "failedModelPayloadDays": 90,
+    "deadLetterDraftDays": 180,
+    "holdExemptions": ["case", "audit", "rights", "legal"]
+  },
+  "publication": {
+    "automaticPublicPromotion": false,
+    "requireDistinctActor": true,
+    "requireDistinctModelFamily": true,
+    "claimPrecisionLowerBound": 0.99,
+    "highImpactPrecisionLowerBound": 0.995,
+    "entityFalseMergeUpperBound": 0.001,
+    "confidenceEceMaximum": 0.03,
+    "unsupportedSentenceRateMaximum": 0.005
+  },
+  "stopping": {
+    "frontierScoreThreshold": 0.05,
+    "consecutiveTasksBelowThreshold": 3,
+    "requireMandatoryNeedsComplete": true,
+    "requireContradictionSearch": true,
+    "escalationTriggers": [
+      "identity conflict",
+      "material contradiction",
+      "living-person risk",
+      "legal status ambiguity",
+      "buried consequential connection"
+    ]
+  }
+}

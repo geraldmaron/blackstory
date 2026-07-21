@@ -1,5 +1,5 @@
 /**
- * Maps Firestore public entity projections onto the web `PublicEntityView` shape.
+ * Maps canonical public entity projections onto the web `PublicEntityView` shape.
  * Renders live projection data as-is without enrichment from bundled seed records.
  * When jurisdictionLabel is absent (bootstrap stubs), derives a state-level label from
  * public coordinates via `findUsStateForPoint` — never invents "Unknown" or seed text.
@@ -16,9 +16,7 @@ import { findUsStateForPoint } from '@repo/domain/map/geography';
 import { type PublicEntityView } from '../../data/public-seed';
 
 /**
- * Narrow projection shape used by the web mapper. Declared locally so apps/web
- * does not depend on potentially stale `@repo/firebase` dist `.d.ts` files
- * during typecheck (package exports prefer `types` → `dist`).
+ * Narrow projection shape used by the web mapper so rendering remains storage-independent.
  */
 export type PublicProjectionInput = {
   readonly id: string;

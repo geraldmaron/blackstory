@@ -1,10 +1,24 @@
-/** Source-bound long-form rewrite lane. Artifacts only; never publishes the seed corpus. */
-import {
-  publicStoryProjectionSchema,
-  type PublicStoryProjectionDoc,
-  type PublicStorySectionDoc,
-} from '@repo/firebase';
+/** Source-bound long-form rewrite lane. Artifacts only; never publishes the canonical corpus. */
 import type { LlmProvider } from './llm-provider.js';
+
+export type PublicStorySection = {
+  readonly heading?: string;
+  readonly paragraphs: readonly string[];
+};
+
+export type StoryProjection = {
+  readonly id: string;
+  readonly releaseId: string;
+  readonly slug: string;
+  readonly title: string;
+  readonly dek: string;
+  readonly publishedAt: string;
+  readonly eraLabel: string;
+  readonly placeLabel: string;
+  readonly body: readonly PublicStorySection[];
+  readonly relatedEntityIds: readonly string[];
+  readonly sources: readonly { readonly label: string; readonly url: string }[];
+};
 
 export const DEFAULT_STORY_REWRITE_MODEL = 'moonshotai/kimi-k2.5';
 export const DEFAULT_STORY_REWRITE_MODELS = Object.freeze([
@@ -16,7 +30,7 @@ export const DEFAULT_STORY_REWRITE_MODELS = Object.freeze([
 export const STORY_REWRITE_MIN_WORDS = 900;
 
 export type StoryRewriteDraft = Pick<
-  PublicStoryProjectionDoc,
+  StoryProjection,
   | 'slug'
   | 'title'
   | 'dek'
@@ -57,7 +71,33 @@ Editorial rules:
 - End with a concise verification/off-ramp paragraph that tells the reader what to check.
 - No markdown, bracket citations, preamble, or commentary outside the JSON object.`;
 
-function wordCount(sections: readonly PublicStorySectionDoc[]): number {
+const STORY_REWRITE_RESPONSE_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['body'],
+  properties: {
+    body: {
+      type: 'array',
+      minItems: 4,
+      maxItems: 6,
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['paragraphs'],
+        properties: {
+          heading: { type: 'string' },
+          paragraphs: {
+            type: 'array',
+            minItems: 1,
+            items: { type: 'string', minLength: 40 },
+          },
+        },
+      },
+    },
+  },
+} as const;
+
+function wordCount(sections: readonly PublicStorySection[]): number {
   return sections
     .flatMap((section) => section.paragraphs)
     .join(' ')
@@ -65,17 +105,12 @@ function wordCount(sections: readonly PublicStorySectionDoc[]): number {
     .filter(Boolean).length;
 }
 
-function parseBody(content: string): PublicStorySectionDoc[] {
-  const trimmed = content.trim();
-  let parsed: ModelResponse;
-  try {
-    parsed = JSON.parse(trimmed) as ModelResponse;
-  } catch {
-    const start = trimmed.indexOf('{');
-    const end = trimmed.lastIndexOf('}');
-    if (start < 0 || end <= start) throw new Error('Story rewrite was not valid JSON');
-    parsed = JSON.parse(trimmed.slice(start, end + 1)) as ModelResponse;
+function parseBody(content: string): PublicStorySection[] {
+  const candidate: unknown = JSON.parse(content.trim());
+  if (typeof candidate !== 'object' || candidate === null || Array.isArray(candidate)) {
+    throw new Error('Story rewrite response was not a JSON object');
   }
+  const parsed = candidate as ModelResponse;
   if (!Array.isArray(parsed.body)) throw new Error('Story rewrite JSON did not contain body[]');
   return parsed.body.map((section, index) => {
     if (!section || typeof section !== 'object') {
@@ -92,13 +127,13 @@ function parseBody(content: string): PublicStorySectionDoc[] {
       return paragraph.trim();
     });
     const heading = typeof candidate.heading === 'string' ? candidate.heading.trim() : undefined;
-    return { ...(heading ? { heading } : {}), paragraphs } satisfies PublicStorySectionDoc;
+    return { ...(heading ? { heading } : {}), paragraphs } satisfies PublicStorySection;
   });
 }
 
 export function validateStoryRewrite(
-  original: Pick<PublicStoryProjectionDoc, 'body'>,
-  draft: Pick<PublicStoryProjectionDoc, 'body'>,
+  original: Pick<StoryProjection, 'body'>,
+  draft: Pick<StoryProjection, 'body'>,
 ): readonly string[] {
   const count = wordCount(draft.body);
   const originalCount = wordCount(original.body);
@@ -119,7 +154,7 @@ export function validateStoryRewrite(
 }
 
 export async function rewriteStory(
-  story: PublicStoryProjectionDoc,
+  story: StoryProjection,
   input: { readonly provider: LlmProvider; readonly model?: string },
 ): Promise<StoryRewriteResult> {
   const completion = await input.provider.complete({
@@ -128,6 +163,7 @@ export async function rewriteStory(
     model: input.model ?? '',
     temperature: 0.45,
     maxTokens: 2400,
+    responseSchema: { name: 'story_rewrite', schema: STORY_REWRITE_RESPONSE_SCHEMA },
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },
       {
@@ -147,22 +183,6 @@ export async function rewriteStory(
     ],
   });
   const body = parseBody(completion.content);
-  const schemaResult = publicStoryProjectionSchema.safeParse({
-    id: story.id,
-    releaseId: story.releaseId,
-    slug: story.slug,
-    title: story.title,
-    dek: story.dek,
-    publishedAt: story.publishedAt,
-    eraLabel: story.eraLabel,
-    placeLabel: story.placeLabel,
-    body,
-    relatedEntityIds: story.relatedEntityIds,
-    sources: story.sources,
-  });
-  if (!schemaResult.success) {
-    throw new Error(`Story rewrite failed public schema validation: ${schemaResult.error.message}`);
-  }
   return {
     slug: story.slug,
     modelId: completion.modelId,

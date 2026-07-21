@@ -6,6 +6,7 @@ import { test } from 'node:test';
 import {
   createHybridLlmProvider,
   createOllamaLlmProvider,
+  createOpenRouterLlmProvider,
   extractMessageContent,
 } from './llm-provider.ts';
 import { runEditorialJudge } from './editorial-run.ts';
@@ -17,12 +18,9 @@ test('extractMessageContent prefers content over reasoning', () => {
   );
 });
 
-test('extractMessageContent pulls JSON from reasoning when content empty', () => {
+test('extractMessageContent preserves the complete reasoning payload when content is empty', () => {
   const reasoning = 'thinking… {"decision":"keep","rationale":"x"} trailing';
-  assert.equal(
-    extractMessageContent({ content: '', reasoning }),
-    '{"decision":"keep","rationale":"x"}',
-  );
+  assert.equal(extractMessageContent({ content: '', reasoning }), reasoning);
 });
 
 test('hybrid fails over to ollama when openrouter returns retryable error', async () => {
@@ -59,7 +57,7 @@ test('hybrid fails over to ollama when openrouter returns retryable error', asyn
     ollamaModel: 'qwen3:8b',
   });
   const result = await provider.complete({
-    model: 'openrouter/free',
+    model: 'openai/gpt-oss-20b:free',
     messages: [{ role: 'user', content: 'hi' }],
   });
   assert.equal(result.provider, 'hybrid');
@@ -91,6 +89,45 @@ test('ollama native provider uses /api/chat', async () => {
   });
   assert.equal(hitNative, true);
   assert.equal(result.content, '{"ok":true}');
+});
+
+test('openrouter receives provider-enforced JSON Schema for structured tasks', async () => {
+  let responseFormat: unknown;
+  const fetchImpl: typeof fetch = async (_input, init) => {
+    const body = JSON.parse(String(init?.body)) as { response_format?: unknown };
+    responseFormat = body.response_format;
+    return Response.json({
+      model: 'openai/gpt-oss-20b:free',
+      choices: [{ message: { role: 'assistant', content: '{"ok":true}' } }],
+    });
+  };
+  const provider = createOpenRouterLlmProvider({ apiKey: 'test-key', fetchImpl, maxAttempts: 1 });
+  await provider.complete({
+    model: 'openai/gpt-oss-20b:free',
+    messages: [{ role: 'user', content: 'x' }],
+    responseSchema: {
+      name: 'verification',
+      schema: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['ok'],
+        properties: { ok: { type: 'boolean' } },
+      },
+    },
+  });
+  assert.deepEqual(responseFormat, {
+    type: 'json_schema',
+    json_schema: {
+      name: 'verification',
+      strict: true,
+      schema: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['ok'],
+        properties: { ok: { type: 'boolean' } },
+      },
+    },
+  });
 });
 
 test('editorial concurrency isolates per-item failures', async () => {
@@ -169,7 +206,7 @@ test('hybrid fails over when openrouter returns non-JSON content', async () => {
     maxAttempts: 1,
   });
   const result = await provider.complete({
-    model: 'openrouter/free',
+    model: 'openai/gpt-oss-20b:free',
     messages: [{ role: 'user', content: 'hi' }],
   });
   assert.equal(result.servedBy, 'ollama');
@@ -193,7 +230,7 @@ test('openrouter rotates through the model roster on retryable failures', async 
   const provider = createOpenRouterLlmProvider({
     apiKey: 'test-key',
     models: [
-      'tencent/hy3:free',
+      'openai/gpt-oss-20b:free',
       'nvidia/nemotron-3-super-120b-a12b:free',
       'google/gemma-4-31b-it:free',
     ],
@@ -201,7 +238,7 @@ test('openrouter rotates through the model roster on retryable failures', async 
   });
   const result = await provider.complete({ model: '', messages: [{ role: 'user', content: 'x' }] });
   assert.deepEqual(attemptedModels, [
-    'tencent/hy3:free',
+    'openai/gpt-oss-20b:free',
     'nvidia/nemotron-3-super-120b-a12b:free',
     'google/gemma-4-31b-it:free',
   ]);
@@ -225,14 +262,14 @@ test('openrouter keeps a caller-pinned model pinned across retries', async () =>
   const { createOpenRouterLlmProvider } = await import('./llm-provider.ts');
   const provider = createOpenRouterLlmProvider({
     apiKey: 'test-key',
-    models: ['tencent/hy3:free', 'nvidia/nemotron-3-super-120b-a12b:free'],
+    models: ['openai/gpt-oss-20b:free', 'nvidia/nemotron-3-super-120b-a12b:free'],
     fetchImpl,
   });
   const result = await provider.complete({
-    model: 'openrouter/free',
+    model: 'openai/gpt-oss-20b:free',
     messages: [{ role: 'user', content: 'x' }],
   });
-  assert.deepEqual(attemptedModels, ['openrouter/free', 'openrouter/free']);
+  assert.deepEqual(attemptedModels, ['openai/gpt-oss-20b:free', 'openai/gpt-oss-20b:free']);
   assert.equal(result.attempts, 2);
 });
 
@@ -241,7 +278,7 @@ test('openrouter rotates to the next model even on a non-retryable error (e.g. 4
   const fetchImpl: typeof fetch = async (_input, init) => {
     const body = JSON.parse(String(init?.body)) as { model: string };
     attemptedModels.push(body.model);
-    if (body.model === 'tencent/hy3:free') {
+    if (body.model === 'openai/gpt-oss-20b:free') {
       return new Response('unsupported response_format', { status: 400 });
     }
     return Response.json({
@@ -252,10 +289,13 @@ test('openrouter rotates to the next model even on a non-retryable error (e.g. 4
   const { createOpenRouterLlmProvider } = await import('./llm-provider.ts');
   const provider = createOpenRouterLlmProvider({
     apiKey: 'test-key',
-    models: ['tencent/hy3:free', 'nvidia/nemotron-3-super-120b-a12b:free'],
+    models: ['openai/gpt-oss-20b:free', 'nvidia/nemotron-3-super-120b-a12b:free'],
     fetchImpl,
   });
   const result = await provider.complete({ model: '', messages: [{ role: 'user', content: 'x' }] });
-  assert.deepEqual(attemptedModels, ['tencent/hy3:free', 'nvidia/nemotron-3-super-120b-a12b:free']);
+  assert.deepEqual(attemptedModels, [
+    'openai/gpt-oss-20b:free',
+    'nvidia/nemotron-3-super-120b-a12b:free',
+  ]);
   assert.equal(result.modelId, 'nvidia/nemotron-3-super-120b-a12b:free');
 });

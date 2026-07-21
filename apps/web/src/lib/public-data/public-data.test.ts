@@ -4,7 +4,7 @@
 
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { shouldUseLivePublicProjections, isPostgresPublicDataSource } from './live-policy';
+import { shouldUseLivePublicProjections, isPostgresPublicDataSource, shouldPreferReleaseArtifacts } from './live-policy';
 import {
   isDisplayableJurisdictionLabel,
   mapProjectionToPublicEntityView,
@@ -32,11 +32,20 @@ test('shouldUseLivePublicProjections respects PUBLIC_READ_API_DISABLED', () => {
   );
 });
 
-test('shouldUseLivePublicProjections enables production project reads', () => {
+test('shouldUseLivePublicProjections requires explicit postgres source plus DATABASE_URL', () => {
   assert.equal(
     shouldUseLivePublicProjections({
       NODE_ENV: 'production',
       NEXT_PUBLIC_FIREBASE_PROJECT_ID: 'black-book-efaaf',
+      PUBLIC_READ_API_DISABLED: '0',
+    }),
+    false,
+  );
+  assert.equal(
+    shouldUseLivePublicProjections({
+      NODE_ENV: 'production',
+      PUBLIC_DATA_SOURCE: 'postgres',
+      DATABASE_URL: 'postgresql://local:local@127.0.0.1:5432/blackbook',
       PUBLIC_READ_API_DISABLED: '0',
     }),
     true,
@@ -53,6 +62,13 @@ test('shouldUseLivePublicProjections enables postgres mode when DATABASE_URL is 
     true,
   );
   assert.equal(isPostgresPublicDataSource({ PUBLIC_DATA_SOURCE: 'postgres' }), true);
+});
+
+test('postgres mode skips ADR-004 release artifacts so stale fixtures cannot shadow bb_public', () => {
+  // Regression: local rel_seed_001 entities.json is a 684-entity slice; Postgres has 1103+.
+  assert.equal(shouldPreferReleaseArtifacts({ PUBLIC_DATA_SOURCE: 'postgres' }), false);
+  assert.equal(shouldPreferReleaseArtifacts({ PUBLIC_DATA_SOURCE: 'seed' }), true);
+  assert.equal(shouldPreferReleaseArtifacts({}), true);
 });
 
 test('shouldUseLivePublicProjections disables postgres mode without DATABASE_URL', () => {

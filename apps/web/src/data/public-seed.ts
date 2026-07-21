@@ -1,11 +1,11 @@
 /**
  * Public-facing seed catalog for the web UI.
- * Mirrors safe fields from packages/firebase/fixtures/firestore-seed.ts for the
- * Fifteenth Street Presbyterian / Dunbar High School cluster — an offline snapshot
- * fallback and unit-test fixture. National-catalog entities (646+) live in Firestore
- * `publicReleases` / `publicSearchIndex` and are republished from
- * `packages/firebase/fixtures/national-catalog/` via `publish-national-catalog.ts`.
- * Prefer `PUBLIC_DATA_SOURCE=firestore` in production; this seed is not the national catalog.
+ * Offline snapshot fallback and unit-test fixture only — not the live national catalog.
+ * Live Explore/map/entity pages read `bb_public` when `PUBLIC_DATA_SOURCE=postgres`
+ * and the connection succeeds; this four-entity
+ * Dunbar cluster is used only for `PUBLIC_DATA_SOURCE=seed`, disabled public reads, or
+ * live-read failure. Prefer Postgres in local and production; never treat this
+ * module as the source of truth for published records.
  * Never includes residential addresses or unpublished high-impact claims.
  */
 import {
@@ -50,7 +50,7 @@ export type PublicTimelineEvent = GraphTimelineEntry;
 /**
  * Typed related-entity entry, mirroring `@repo/domain`'s `PublicRelatedEntry`
  * (packages/domain/src/graph/adjacency.ts) and
- * `packages/firebase/src/firestore/types.ts`'s `publicEntityProjectionSchema.related` — the same
+ * `@repo/schemas`'s `publicEntityProjectionSchema.related` — the same
  * shape derived from a release's graph adjacency doc. Hardcoded here rather than imported since
  * this file is a standalone web-app seed catalog predating projections (see the module
  * doc above), matching this file's existing convention of not importing @repo/domain types.
@@ -225,7 +225,7 @@ const INSTITUTION_STATUS = currentStatusFor('ent_dunbar_alumni_federation_001');
 const INSTITUTION_STATUS_HISTORY = statusHistoryFor('ent_dunbar_alumni_federation_001');
 
 /**
- * Seed entities aligned with firestore-seed public projections. One fixture per kind this
+ * Seed entities aligned with canonical public projections. One fixture per kind this
  * covers (place, school, event, institution) a small, connected graph (school located_at place;
  * event occurred_at school; institution commemorates event) so the graph-view builders in
  * `./entity-graph-seed.ts` have real edges to derive `related`/`timeline` from. Person fixtures are

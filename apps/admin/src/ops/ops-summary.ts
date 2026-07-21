@@ -1,5 +1,5 @@
 /**
- * Server-side operations dashboard helpers: queue counts from Admin SDK stores
+ * Server-side operations dashboard helpers: queue counts from Postgres stores
  * and non-secret environment posture for the admin home screen.
  */
 import { tryListAdminResearchCases } from '../cases/research-case-store';
@@ -18,7 +18,7 @@ export type OpsQueueSummary = {
 
 export type OpsEnvironment = {
   readonly appEnv: string;
-  readonly firebaseProjectId: string;
+  readonly dataSource: string;
   readonly authMode: string;
   readonly publicSiteOrigin: string | null;
   readonly productionBreakGlass: boolean;
@@ -92,10 +92,9 @@ async function loadStoryPacketQueueSummary(): Promise<
 export function loadOpsEnvironment(): OpsEnvironment {
   return {
     appEnv: process.env.NEXT_PUBLIC_APP_ENV ?? process.env.NODE_ENV ?? 'unknown',
-    firebaseProjectId:
-      process.env.FIREBASE_PROJECT_ID ?? process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? 'unknown',
-    authMode: process.env.ADMIN_AUTH_MODE ?? 'firebase',
+    dataSource: 'Supabase/Postgres',
+    authMode: 'supabase',
     publicSiteOrigin: adminPublicSiteOrigin(),
-    productionBreakGlass: process.env.APP_FIREBASE_ALLOW_PRODUCTION === '1',
+    productionBreakGlass: process.env.APP_RELEASE_ALLOW_PRODUCTION === '1',
   };
 }

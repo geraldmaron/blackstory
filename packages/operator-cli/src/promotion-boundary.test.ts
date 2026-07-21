@@ -4,26 +4,16 @@
  * promotion action never the same call, never the same identity, never something this
  * package's own surface can perform.
  *
- * This test does not reimplement the promotion gate or the research-case authorization gate.
- * It imports and exercises the real /032 code
- * (`evaluatePromotionGate`, packages/domain/src/promotion/controls.ts) and the real
- * server authorization gate (`assertResearchCaseActionAuthorized`,
- * packages/firebase/src/firestore/research-case.ts admin-auth.ts) directly.
+ * This test exercises the domain promotion gate and proves the operator package
+ * exposes no acceptance or publication operation.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { evaluatePromotionGate, type PromotionClaim, type PromotionEvidence } from '@repo/domain';
-import {
-  AdminAuthorizationError,
-  assertResearchCaseActionAuthorized,
-  executeAuthorizedResearchCaseAction,
-  type VerifiedAdminToken,
-} from '@repo/firebase';
 import * as operatorCli from './index.ts';
 import { prepareLeadIntake } from './intake.ts';
 
 const NOW = '2026-07-17T04:00:00.000Z';
-const NOW_EPOCH = Math.floor(Date.parse(NOW) / 1000);
 
 function evidence(id: string, lineageRootId: string): PromotionEvidence {
   return {
@@ -58,15 +48,6 @@ function wellSupportedClaim(proposerId: string): PromotionClaim {
   };
 }
 
-function adminToken(overrides: Partial<VerifiedAdminToken> = {}): VerifiedAdminToken {
-  return {
-    uid: 'operator-1',
-    auth_time: NOW_EPOCH,
-    amr: ['mfa'],
-    ...overrides,
-  };
-}
-
 test('the domain promotion gate refuses self-approval: same identity as proposer and approver', () => {
   const claim = wellSupportedClaim('operator-1');
   const result = evaluatePromotionGate({ claim, approverId: 'operator-1' });
@@ -79,53 +60,6 @@ test('the domain promotion gate approves the same claim once a distinct approver
   const result = evaluatePromotionGate({ claim, approverId: 'reviewer-2' });
   assert.equal(result.approved, true);
   assert.equal(result.reasons.length, 0);
-});
-
-test('the operator identity that proposed a lead has no permission to promote or publish anything', () => {
-  // The operator's proposer-only permission set is `research:write` (no publication role)
-  // exactly what packages/operator-cli stamps onto every proposal, and never more than that.
-  const proposerToken = adminToken({ bb_claims_version: 1, bb_roles: ['research'] });
-  assert.throws(
-    () => assertResearchCaseActionAuthorized(proposerToken, 'promote'),
-    /publication:publish/,
-  );
-  assert.throws(
-    () =>
-      executeAuthorizedResearchCaseAction(proposerToken, 'promote', () => {
-        throw new Error('must never run');
-      }),
-    (error: unknown) =>
-      error instanceof AdminAuthorizationError && error.code === 'ADMIN_PERMISSION_DENIED',
-  );
-});
-
-test('even a publication-permitted token cannot promote without a FRESH, separate authentication event', () => {
-  const stalePublicationToken = adminToken({
-    bb_claims_version: 1,
-    bb_roles: ['publication'],
-    auth_time: NOW_EPOCH - 3_600, // one hour old — well past the 10-minute reauth window
-  });
-  assert.throws(
-    () =>
-      executeAuthorizedResearchCaseAction(stalePublicationToken, 'promote', () => 'published', {
-        nowEpochSeconds: NOW_EPOCH,
-      }),
-    (error: unknown) =>
-      error instanceof AdminAuthorizationError && error.code === 'ADMIN_REAUTH_REQUIRED',
-  );
-
-  const freshPublicationToken = adminToken({
-    bb_claims_version: 1,
-    bb_roles: ['publication'],
-    auth_time: NOW_EPOCH,
-  });
-  const published = executeAuthorizedResearchCaseAction(
-    freshPublicationToken,
-    'promote',
-    () => 'published',
-    { nowEpochSeconds: NOW_EPOCH },
-  );
-  assert.equal(published, 'published');
 });
 
 test('a prepared operator intake outcome carries no approval, publication, or promotion field', () => {

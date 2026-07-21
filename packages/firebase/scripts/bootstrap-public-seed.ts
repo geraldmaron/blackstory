@@ -20,7 +20,9 @@ import {
   firestoreSeedDocuments,
   seedActiveRelease,
   seedPolicyActive,
+  seedPublicAlumniFederationEntity,
   seedPublicEntity,
+  seedPublicLandmarkListingEntity,
   seedPublicSchoolEntity,
 } from '../fixtures/firestore-seed.ts';
 import { SEED_STORY_PROJECTIONS } from '../src/firestore/public-story-seed.ts';
@@ -86,6 +88,14 @@ ensured.set('publicReleases/rel_seed_001/entities/ent_15th_st_church_001', {
 ensured.set('publicReleases/rel_seed_001/entities/ent_dunbar_school_001', {
   path: 'publicReleases/rel_seed_001/entities/ent_dunbar_school_001',
   data: preparePublicEntityProjectionForWrite(seedPublicSchoolEntity),
+});
+ensured.set('publicReleases/rel_seed_001/entities/ent_dc_landmark_listing_1975', {
+  path: 'publicReleases/rel_seed_001/entities/ent_dc_landmark_listing_1975',
+  data: preparePublicEntityProjectionForWrite(seedPublicLandmarkListingEntity),
+});
+ensured.set('publicReleases/rel_seed_001/entities/ent_dunbar_alumni_federation_001', {
+  path: 'publicReleases/rel_seed_001/entities/ent_dunbar_alumni_federation_001',
+  data: preparePublicEntityProjectionForWrite(seedPublicAlumniFederationEntity),
 });
 for (const storyDoc of SEED_STORY_PROJECTIONS) {
   ensured.set(`publicReleases/rel_seed_001/stories/${storyDoc.slug}`, {

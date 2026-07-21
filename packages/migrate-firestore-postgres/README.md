@@ -80,6 +80,32 @@ Research history/checklist rows are replaced per migrated case on apply.
 
 ## Deferred (large)
 
+Use `--large` or `--collection=` for:
+
 `acsTractProfiles`, `opportunityAtlasTracts`, `ucrAgencies`, `hateCrimeCountyYears`,
 `holcAreas`, `censusCountyDecades`, `acsCountyProfiles`, `ucrStateParticipation`,
-`entityEmbeddings`, `entityRelationships` — use `--collection=` after tooling is proven.
+`entityEmbeddings`, `entityRelationships`, `publicReleaseGraph`.
+
+```bash
+op run --env-file=./.env.migrate.local -- \
+  env APP_FIREBASE_ALLOW_PRODUCTION=1 FIREBASE_PROJECT_ID=black-book-efaaf \
+  GOOGLE_CLOUD_QUOTA_PROJECT=black-book-efaaf \
+  pnpm --filter @repo/migrate-firestore-postgres migrate -- --apply --large
+```
+
+Skip remigrating high-value collections that already match census unless re-sync is required.
+
+## Blobs
+
+Media and release JSON artifacts stay in GCS / Firebase Storage. Postgres stores metadata refs only.
+See `docs/data/firebase-wind-down.md` for owner console shutoff (no irreversible delete by agents).
+
+## Cutover (public reads)
+
+```bash
+PUBLIC_DATA_SOURCE=postgres
+DATABASE_URL=op://Private/<item-id>/…   # direct Postgres; never NEXT_PUBLIC_*
+# DATABASE_SSL=1  # optional; supabase hosts auto-enable ssl
+```
+
+Admin/ops stores and workers may still use Firestore until follow-up rewires; treat migrated `bb_*` tables as SoR.

@@ -1,6 +1,6 @@
 /**
  * Operator locate: entity id + address/place text → Census geocode → validated
- * EntityLocation draft (and optional Firestore commit via commitWithAudit).
+ * EntityLocation draft (and optional Postgres commit via commitWithAudit).
  * Thin caller over domain location-audit + census-geo; no LLM.
  */
 import {
@@ -15,12 +15,7 @@ import {
   type LocationCorrectionDecision,
   type SafeHttpClient,
 } from '@repo/domain';
-import {
-  commitWithAudit,
-  type AtomicStore,
-  type AuditEventDoc,
-  type CommitWithAuditResult,
-} from '@repo/firebase';
+import { commitWithAudit, type AtomicStore, type CommitWithAuditResult } from '@repo/data-access';
 import { buildOperatorAuditEvent, buildOperatorOutboxMessage } from './audit.js';
 import type { OperatorIdentity } from './identity.js';
 
@@ -216,7 +211,7 @@ export async function commitLocate(
         data: location as unknown as Readonly<Record<string, unknown>>,
       },
     ],
-    auditEvent: auditEvent as unknown as AuditEventDoc,
+    auditEvent,
     outboxMessage,
   });
 }

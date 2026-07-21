@@ -3,7 +3,7 @@
  * CLI/research-case pipeline (no parallel writer). Every proposal lands in the SAME quarantine
  * pipeline `./intake.ts`'s `prepareOperatorIntake` already uses (`createQuarantinedSubmission`,
  * `@repo/security`) and opens a draft research case exactly like `prepareLeadIntake` does.
- * This file adds ZERO new Firestore write paths; it only shapes an `OperatorSubmission`
+ * This file adds no canonical write paths; it only shapes an `OperatorSubmission`
  * describing the proposed edge and calls the existing exported `prepareOperatorIntake`. Nothing
  * here writes an `entityRelationships` document directly — that stays the reviewer-gated
  * promotion path's job (see `./intake.ts`'s module doc).

@@ -179,7 +179,7 @@ export default function CatalogPage() {
           <p className="ds-page__eyebrow">Canonical catalog</p>
           <h1 className="ds-page__title">Entities</h1>
           <p className="ds-page__lede">
-            Browse canonical entities in Firestore with kind, living status, and update timestamps.
+            Browse canonical entities in Postgres with kind, living status, and update timestamps.
             Select entities to record a bulk decision — this never publishes or edits an entity
             directly; the next release build reads these decisions, and the existing signed-manifest
             privileged-apply flow is still what makes anything live.

@@ -112,6 +112,68 @@ type ModelJson = {
 
 const TOPIC_ID_LIST = TOPIC_REGISTRY.map((topic) => topic.id).join(', ');
 
+const EDITORIAL_RESPONSE_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['decision', 'rationale', 'confidence', 'drafts'],
+  properties: {
+    decision: { enum: ['keep', 'reject', 'needs_evidence'] },
+    rationale: { type: 'string' },
+    confidence: { type: 'number', minimum: 0, maximum: 1 },
+    drafts: {
+      type: 'object',
+      additionalProperties: false,
+      required: [
+        'publicSummary',
+        'historicalContext',
+        'relatedEntityIds',
+        'proposedRelationshipNotes',
+        'claims',
+        'topicIds',
+        'eraBuckets',
+        'keywords',
+      ],
+      properties: {
+        publicSummary: { type: 'string' },
+        historicalContext: { type: 'string' },
+        identityLabel: { type: 'string' },
+        relevanceNote: { type: 'string' },
+        relatedEntityIds: { type: 'array', items: { type: 'string' } },
+        proposedRelationshipNotes: { type: 'string' },
+        claims: {
+          type: 'array',
+          items: {
+            type: 'object',
+            additionalProperties: false,
+            required: [
+              'predicate',
+              'object',
+              'confidenceLevel',
+              'citationSource',
+              'citationHref',
+              'citationLabel',
+            ],
+            properties: {
+              predicate: { type: 'string' },
+              object: { type: 'string' },
+              confidenceLevel: { enum: ['high', 'medium', 'low'] },
+              citationSource: { type: 'string' },
+              citationHref: { type: 'string' },
+              citationLabel: { type: 'string' },
+            },
+          },
+        },
+        topicIds: {
+          type: 'array',
+          items: { enum: TOPIC_REGISTRY.map((topic) => topic.id) },
+        },
+        eraBuckets: { type: 'array', items: { type: 'string' } },
+        keywords: { type: 'array', items: { type: 'string' } },
+      },
+    },
+  },
+} as const;
+
 const SYSTEM_PROMPT = `You are an editorial judge for BlackStory (History, pinned to place).
 Return ONLY JSON with keys: decision (keep|reject|needs_evidence), rationale, confidence (0-1),
 drafts: { publicSummary, historicalContext, identityLabel?, relevanceNote?, relatedEntityIds?,
@@ -158,17 +220,11 @@ function parseDecision(raw: string | undefined): EditorialDecision {
 }
 
 function extractJsonObject(content: string): ModelJson {
-  const trimmed = content.trim();
-  try {
-    return JSON.parse(trimmed) as ModelJson;
-  } catch {
-    const start = trimmed.indexOf('{');
-    const end = trimmed.lastIndexOf('}');
-    if (start >= 0 && end > start) {
-      return JSON.parse(trimmed.slice(start, end + 1)) as ModelJson;
-    }
-    throw new Error('Model response was not valid JSON');
+  const parsed: unknown = JSON.parse(content.trim());
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    throw new Error('Model response was not a JSON object');
   }
+  return parsed as ModelJson;
 }
 
 function ensureLinkedSummary(
@@ -212,6 +268,7 @@ async function judgeOneSubject(input: {
     };
     const completion = await provider.complete({
       model: input.model,
+      responseSchema: { name: 'editorial_judgment', schema: EDITORIAL_RESPONSE_SCHEMA },
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: JSON.stringify(userPayload) },

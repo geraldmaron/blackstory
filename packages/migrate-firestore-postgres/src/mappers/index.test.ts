@@ -4,15 +4,23 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import {
+  extractEmbeddingVector,
   mapActiveRelease,
+  mapAcsTractProfile,
   mapCensusNationalDecade,
+  mapEntityEmbedding,
+  mapEntityRelationship,
   mapEvidenceSource,
+  mapHateCrimeCountyYear,
   mapKillSwitch,
   mapPolicyActive,
   mapPublicationRelease,
+  mapReleaseGraphAdjacency,
+  mapReleaseGraphDecade,
   mapResearchCase,
   mapSourceCapture,
   mapSourceItem,
+  parseDecadeLabel,
 } from './index.js';
 
 describe('ops/public mappers', () => {
@@ -131,5 +139,66 @@ describe('reference mappers', () => {
     assert.equal(row.decade, 1790);
     assert.equal(row.source, 'us-census-historical-race-1790-1990');
     assert.equal((row.payload as { totalPopulation?: number }).totalPopulation, 3929214);
+  });
+
+  it('maps ACS tract + hate crime with provenance', () => {
+    const tract = mapAcsTractProfile('01001020100_2022', {
+      geoid11: '01001020100',
+      vintage: '2022',
+      estimates: { totalPopulation: 100 },
+      source: 'acs',
+      sourceUrl: 'https://api.census.gov',
+      retrievedAt: '2026-07-18T00:00:00.000Z',
+      contentHash: 'a'.repeat(64),
+    });
+    assert.equal(tract.geoid11, '01001020100');
+    assert.equal(tract.vintage, 2022);
+    const hate = mapHateCrimeCountyYear('36061_2020', {
+      fips5: '36061',
+      year: '2020',
+      incidents: 10,
+      source: 'ucr',
+      sourceUrl: 'https://example.test',
+      retrievedAt: '2026-07-18T00:00:00.000Z',
+      contentHash: 'b'.repeat(64),
+    });
+    assert.equal(hate.year, 2020);
+  });
+});
+
+describe('graph + embedding mappers', () => {
+  it('parses decade labels and maps adjacency', () => {
+    assert.equal(parseDecadeLabel('1960s'), 1960);
+    const adj = mapReleaseGraphAdjacency('rel_seed_001', 'ent-a', {
+      entityId: 'ent-a',
+      entries: [],
+    });
+    assert.equal(adj.release_id, 'rel_seed_001');
+    const decade = mapReleaseGraphDecade('rel_seed_001', '1960s', { decade: '1960s', nodes: [] });
+    assert.equal(decade?.decade, 1960);
+  });
+
+  it('maps relationships and embeddings', () => {
+    const rel = mapEntityRelationship('r1', {
+      fromEntityId: 'a',
+      toEntityId: 'b',
+      type: 'attended',
+      createdAt: '2026-07-16T18:00:00.000Z',
+      updatedAt: '2026-07-16T18:00:00.000Z',
+    });
+    assert.equal(rel?.from_entity_id, 'a');
+    const vector = Array.from({ length: 768 }, (_, i) => i / 768);
+    assert.equal(extractEmbeddingVector(vector)?.length, 768);
+    const emb = mapEntityEmbedding('ent-a', {
+      entityId: 'ent-a',
+      kind: 'person',
+      vector,
+      dims: 768,
+      model: 'test',
+      sourceTextHash: 'abc',
+      updatedAt: '2026-07-16T18:00:00.000Z',
+    });
+    assert.equal(emb?.entity_id, 'ent-a');
+    assert.ok(emb?.embedding.startsWith('['));
   });
 });

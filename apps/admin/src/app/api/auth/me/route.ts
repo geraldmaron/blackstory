@@ -1,5 +1,5 @@
 /**
- * API: return the current admin session from a verified Firebase ID token.
+ * API: return the current admin session from a verified Supabase access token.
  */
 import { authorizeAdminRequest, authErrorResponse } from '../../../../auth/request-auth';
 import { resolveAdminAuthMode } from '../../../../auth/mode';

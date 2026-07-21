@@ -1,5 +1,5 @@
 /**
- * Client login UI — email + password for Firebase Authentication operators.
+ * Client login UI — email + password for Supabase Auth operators.
  * After auth, operators land on the operations desk (`/`) unless `?next=` is a
  * safe same-origin path (e.g. the page that bounced them to login).
  * Shell navbar/footer come from the root AdminShellChrome.
@@ -54,8 +54,8 @@ export default function LoginClient() {
         </p>
         <p className="admin-login__meta">
           After sign-in you land on Home — pick Inbox for pending cases, or open the desk you need
-          from the nav. Use an administrator account provisioned in Firebase Authentication. There
-          is no public sign-up on this portal.
+          from the nav. Use an administrator account provisioned in Supabase Auth. There is no
+          public sign-up on this portal.
         </p>
 
         {error ? (

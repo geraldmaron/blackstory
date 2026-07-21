@@ -9,11 +9,13 @@ dependencies = [
   "black-book-research",
   "black-book-publication",
   "black-book-security-worker",
+  "research-kernel",
 ]
 
 [tool.uv.workspace]
 members = [
   "packages/constitution",
+  "packages/research-kernel/python",
   "workers/research",
   "workers/publication",
   "workers/security",
@@ -24,6 +26,7 @@ black-book-constitution = { workspace = true }
 black-book-research = { workspace = true }
 black-book-publication = { workspace = true }
 black-book-security-worker = { workspace = true }
+research-kernel = { workspace = true }
 
 [dependency-groups]
 dev = [
@@ -35,6 +38,7 @@ dev = [
 testpaths = ["packages/constitution", "workers"]
 pythonpath = [
   "packages/constitution/src",
+  "packages/research-kernel/python/src",
   "workers/research/src",
   "workers/publication/src",
   "workers/security/src",

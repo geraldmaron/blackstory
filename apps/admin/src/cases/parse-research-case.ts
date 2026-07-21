@@ -1,5 +1,5 @@
 /**
- * Coerces Firestore researchCases documents into domain ResearchCaseRecord shapes.
+ * Coerces serialized research-case records into domain ResearchCaseRecord shapes.
  * Intake docs may be sparse; defaults keep triage operable without inventing evidence.
  */
 import type {
@@ -153,7 +153,7 @@ function readPlaceHint(data: Record<string, unknown>): string | undefined {
 }
 
 /**
- * Parse a Firestore doc into a ResearchCaseRecord. Returns null when id/title cannot be recovered.
+ * Parse a stored record into a ResearchCaseRecord. Returns null when id/title cannot be recovered.
  */
 export function parseResearchCaseRecord(
   id: string,

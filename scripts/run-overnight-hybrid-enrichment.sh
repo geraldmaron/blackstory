@@ -82,7 +82,7 @@ if [[ -d "${HOME}/.local/bin" ]]; then
   export PATH="${HOME}/.local/bin:${PATH}"
 fi
 
-# Optional machine env (OpenRouter key, pepper, Firebase). Never commit this file.
+# Optional machine env (Postgres, OpenRouter key, pepper). Never commit this file.
 ENV_FILE="${ENRICHMENT_ENV_FILE:-${HOME}/.config/blackstory/enrichment.env}"
 if [[ -f "${ENV_FILE}" ]]; then
   set -a
@@ -104,9 +104,14 @@ export EDITORIAL_LLM_PROVIDER="${EDITORIAL_LLM_PROVIDER:-hybrid}"
 # Free-model rotation roster: on 429/5xx/empty the provider advances to the next
 # model instead of retrying one rate-limited router. Set OPENROUTER_MODEL to pin
 # a single model instead (an explicit pin wins over the roster).
-export OPENROUTER_MODELS="${OPENROUTER_MODELS:-tencent/hy3:free,nvidia/nemotron-3-super-120b-a12b:free,nvidia/nemotron-3-nano-30b-a3b:free,google/gemma-4-31b-it:free,openai/gpt-oss-20b:free}"
+export OPENROUTER_MODELS="${OPENROUTER_MODELS:-openai/gpt-oss-20b:free,nvidia/nemotron-3-nano-30b-a3b:free,google/gemma-4-31b-it:free,nvidia/nemotron-3-super-120b-a12b:free}"
 export OPENROUTER_MODEL="${OPENROUTER_MODEL:-}"
 export OLLAMA_MODEL="${OLLAMA_MODEL:-qwen3:8b}"
+export OPS_DATA_SOURCE=postgres
+export RESEARCH_PROFILE_ID="${RESEARCH_PROFILE_ID:-black-history}"
+export RESEARCH_PROFILE_VERSION="${RESEARCH_PROFILE_VERSION:-1.0.0}"
+export RESEARCH_SCHEMA_VERSION="${RESEARCH_SCHEMA_VERSION:-1.0.0}"
+export BLACKSTORY_ROOT="${ROOT}"
 
 # Discovery kill switch + storage terms for SearXNG child script.
 export DISCOVERY_KILL_SWITCH="${DISCOVERY_KILL_SWITCH:-disengaged}"
@@ -139,8 +144,10 @@ SESSION_ID="${ENRICHMENT_SESSION_ID:-sess_$(date -u +%Y%m%dT%H%M%SZ)}"
 PRIVACY_PEPPER="${OPERATOR_CLI_PRIVACY_PEPPER:-${ENRICHMENT_PRIVACY_PEPPER:-}}"
 
 LOG_DIR="${ROOT}/.cache/overnight-enrichment"
-CANDIDATES_DIR="${ROOT}/packages/firebase/fixtures/discovery-candidates"
+CANDIDATES_DIR="${ROOT}/.cache/discovery-candidates"
+export DISCOVERY_CANDIDATES_DIR="${CANDIDATES_DIR}"
 mkdir -p "$LOG_DIR"
+mkdir -p "$CANDIDATES_DIR"
 STAMP="$(date -u +%Y-%m-%dT%H-%M-%SZ)"
 LOG_FILE="${LOG_DIR}/run-${STAMP}.json"
 SUBJECTS_FILE="${LOG_DIR}/subjects-${STAMP}.json"
@@ -149,10 +156,9 @@ SUMMARY_FILE="${LOG_DIR}/summary-${STAMP}.json"
 echo "overnight hybrid start target=${TARGET_CANDIDATES} ollama=${OLLAMA_BASE_URL} provider=${EDITORIAL_LLM_PROVIDER} concurrency=${ENRICH_CONCURRENCY} commit_enrichment=${COMMIT_ENRICHMENT} kill_switch=${DISCOVERY_KILL_SWITCH}" >&2
 echo "safeties: searxng_queries<=${SEARXNG_QUERIES_PER_NIGHT} discovery_rounds<=${DISCOVERY_ROUNDS} no_html_crawl no_publish" >&2
 
-if [[ -z "${OPENROUTER_API_KEY:-}" && "${EDITORIAL_LLM_PROVIDER}" != "ollama" && "${EDITORIAL_LLM_PROVIDER}" != "mock" ]]; then
-  echo "OPENROUTER_API_KEY missing — set via enrichment.env or run-with-dev-secrets" >&2
-  exit 2
-fi
+echo "Preflight: Postgres ledger, policy versions, SearXNG, Ollama, disk, and model credentials" >&2
+node --conditions development --import tsx \
+  "${ROOT}/packages/operator-cli/src/bin.ts" preflight
 
 SEARXNG_SUMMARY="{}"
 if [[ "${SKIP_SEARXNG}" != "1" && "${SKIP_SEARXNG}" != "true" ]]; then

@@ -3,7 +3,7 @@
  *
  * Maps accepted/merged discovery candidates with a canonical URL into prepareLeadIntake
  * outcomes. Callers must pass accepted outcomes to commitOperatorIntake to persist —
- * this module never writes Firestore and never publishes.
+ * this module never writes canonical records and never publishes.
  */
 import {
   listCampaignSurvivors,

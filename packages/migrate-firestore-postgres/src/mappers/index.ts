@@ -700,3 +700,356 @@ export function mapStoryPacketReview(
     updated_at: toIsoTimestamp(data.updatedAt, now),
   }) as StoryPacketReviewRow;
 }
+
+/** Parse decade labels like `1960` / `1960s` into integer decade starts. */
+export function parseDecadeLabel(value: unknown, fallbackDocId?: string): number | undefined {
+  const raw = asString(value, fallbackDocId ?? '');
+  const match = raw.match(/(\d{4})/);
+  if (!match?.[1]) return undefined;
+  return Number(match[1]);
+}
+
+export type ReleaseGraphAdjacencyRow = {
+  readonly release_id: string;
+  readonly entity_id: string;
+  readonly adjacency: unknown;
+};
+
+export function mapReleaseGraphAdjacency(
+  releaseId: string,
+  docId: string,
+  data: Record<string, unknown>,
+): ReleaseGraphAdjacencyRow {
+  return {
+    release_id: releaseId,
+    entity_id: asString(data.entityId, docId),
+    adjacency: toJsonValue(data),
+  };
+}
+
+export type ReleaseGraphDecadeRow = {
+  readonly release_id: string;
+  readonly decade: number;
+  readonly payload: unknown;
+};
+
+export function mapReleaseGraphDecade(
+  releaseId: string,
+  docId: string,
+  data: Record<string, unknown>,
+): ReleaseGraphDecadeRow | null {
+  const decade = parseDecadeLabel(data.decade, docId);
+  if (decade === undefined) return null;
+  return {
+    release_id: releaseId,
+    decade,
+    payload: toJsonValue(data),
+  };
+}
+
+export type ReleaseGraphAllTimeRow = {
+  readonly release_id: string;
+  readonly payload: unknown;
+};
+
+export function mapReleaseGraphAllTime(
+  releaseId: string,
+  data: Record<string, unknown>,
+): ReleaseGraphAllTimeRow {
+  return {
+    release_id: releaseId,
+    payload: toJsonValue(data),
+  };
+}
+
+const ENTITY_KINDS = new Set([
+  'person',
+  'place',
+  'school',
+  'organization',
+  'institution',
+  'event',
+  'law',
+  'case',
+  'publication',
+  'artifact',
+  'movement',
+  'other',
+]);
+
+export function normalizeEntityKind(value: unknown): string {
+  const kind = asString(value, 'other').toLowerCase();
+  return ENTITY_KINDS.has(kind) ? kind : 'other';
+}
+
+export type CanonicalEntityStubRow = {
+  readonly id: string;
+  readonly kind: string;
+  readonly display_name: string;
+  readonly living_status: string;
+};
+
+/** Minimal entity row so embeddings/relationships can satisfy FKs during ETL. */
+export function mapCanonicalEntityStub(
+  entityId: string,
+  data: Record<string, unknown> = {},
+): CanonicalEntityStubRow {
+  return {
+    id: entityId,
+    kind: normalizeEntityKind(data.kind),
+    display_name: asString(data.displayName ?? data.name, entityId),
+    living_status: asString(data.livingStatus, 'unknown'),
+  };
+}
+
+export type EntityRelationshipRow = {
+  readonly id: string;
+  readonly from_entity_id: string;
+  readonly to_entity_id: string;
+  readonly relationship_type: string;
+  readonly role?: string;
+  readonly valid_from?: string;
+  readonly valid_to?: string;
+  readonly geographic?: unknown;
+  readonly workflow_status?: string;
+  readonly publication_status?: string;
+  readonly confidence?: unknown;
+  readonly created_at: string;
+  readonly updated_at: string;
+};
+
+export function mapEntityRelationship(
+  docId: string,
+  data: Record<string, unknown>,
+): EntityRelationshipRow | null {
+  const fromId = asString(data.fromEntityId);
+  const toId = asString(data.toEntityId);
+  if (!fromId || !toId || fromId === toId) return null;
+  const now = new Date().toISOString();
+  const temporal = asRecord(data.temporal);
+  const role = asStringOrUndefined(data.role);
+  const validFrom = asStringOrUndefined(temporal.validFrom ?? data.validFrom);
+  const validToRaw = temporal.validTo ?? data.validTo;
+  const validTo =
+    validToRaw === null || validToRaw === undefined
+      ? undefined
+      : asStringOrUndefined(validToRaw);
+  return omitUndefined({
+    id: asString(data.id, docId),
+    from_entity_id: fromId,
+    to_entity_id: toId,
+    relationship_type: asString(data.type, 'related'),
+    ...(role !== undefined ? { role } : {}),
+    ...(validFrom !== undefined ? { valid_from: validFrom } : {}),
+    ...(validTo !== undefined ? { valid_to: validTo } : {}),
+    ...(data.geographic !== undefined ? { geographic: toJsonValue(data.geographic) } : {}),
+    ...(asStringOrUndefined(data.workflowStatus)
+      ? { workflow_status: asString(data.workflowStatus) }
+      : {}),
+    ...(asStringOrUndefined(data.publicationStatus)
+      ? { publication_status: asString(data.publicationStatus) }
+      : {}),
+    ...(data.confidence !== undefined ? { confidence: toJsonValue(data.confidence) } : {}),
+    created_at: toIsoTimestamp(data.createdAt, now),
+    updated_at: toIsoTimestamp(data.updatedAt, now),
+  }) as EntityRelationshipRow;
+}
+
+/** Extract a float[768] from Firestore VectorValue / plain arrays. */
+export function extractEmbeddingVector(value: unknown): number[] | null {
+  if (Array.isArray(value) && value.length === 768 && value.every((n) => typeof n === 'number')) {
+    return value as number[];
+  }
+  if (value !== null && typeof value === 'object') {
+    const maybe = value as {
+      toArray?: () => number[];
+      _values?: number[];
+      values?: number[];
+    };
+    if (typeof maybe.toArray === 'function') {
+      try {
+        const arr = maybe.toArray();
+        if (Array.isArray(arr) && arr.length === 768) return arr;
+      } catch {
+        /* fall through */
+      }
+    }
+    const values = maybe._values ?? maybe.values;
+    if (Array.isArray(values) && values.length === 768) return values;
+  }
+  return null;
+}
+
+export type EntityEmbeddingRow = {
+  readonly entity_id: string;
+  readonly kind: string;
+  readonly state?: string;
+  readonly era_bucket?: string;
+  readonly embedding: string;
+  readonly dims: number;
+  readonly model: string;
+  readonly source_text_hash: string;
+  readonly updated_at: string;
+};
+
+export function mapEntityEmbedding(
+  docId: string,
+  data: Record<string, unknown>,
+): EntityEmbeddingRow | null {
+  const vector = extractEmbeddingVector(data.vector ?? data.embedding);
+  if (!vector) return null;
+  const now = new Date().toISOString();
+  const state = asStringOrUndefined(data.state);
+  const eraBucket = asStringOrUndefined(data.eraBucket);
+  return omitUndefined({
+    entity_id: asString(data.entityId, docId),
+    kind: normalizeEntityKind(data.kind),
+    ...(state !== undefined ? { state } : {}),
+    ...(eraBucket !== undefined ? { era_bucket: eraBucket } : {}),
+    embedding: `[${vector.join(',')}]`,
+    dims: asNumber(data.dims) ?? 768,
+    model: asString(data.model, 'unknown'),
+    source_text_hash: asString(data.sourceTextHash, 'unknown'),
+    updated_at: toIsoTimestamp(data.updatedAt, now),
+  }) as EntityEmbeddingRow;
+}
+
+function stripProvenanceKeys(data: Record<string, unknown>): Record<string, unknown> {
+  const {
+    id: _id,
+    source: _s,
+    sourceUrl: _su,
+    retrievedAt: _ra,
+    contentHash: _ch,
+    createdAt: _ca,
+    updatedAt: _ua,
+    datasetChecksum: _dc,
+    license: _lic,
+    ...rest
+  } = data;
+  return rest;
+}
+
+export function mapCensusCountyDecade(
+  docId: string,
+  data: Record<string, unknown>,
+): ProvenanceStatRow & { readonly fips5: string; readonly decade: number } {
+  const now = new Date().toISOString();
+  const decade = asNumber(data.decade) ?? parseDecadeLabel(docId) ?? 0;
+  const fips5 = asString(data.fips5, docId.split('_')[0] ?? docId);
+  return {
+    id: asString(data.id, docId),
+    fips5,
+    decade,
+    payload: stripProvenanceKeys(data),
+    ...provenanceFields(data, now),
+  };
+}
+
+export function mapAcsCountyProfile(
+  docId: string,
+  data: Record<string, unknown>,
+): ProvenanceStatRow & { readonly fips5: string; readonly vintage: number } {
+  const now = new Date().toISOString();
+  const vintage = asNumber(data.vintage) ?? Number(docId.split('_').at(-1) ?? 0);
+  return {
+    id: asString(data.id, docId),
+    fips5: asString(data.fips5, docId.split('_')[0] ?? docId),
+    vintage,
+    payload: stripProvenanceKeys(data),
+    ...provenanceFields(data, now),
+  };
+}
+
+export function mapAcsTractProfile(
+  docId: string,
+  data: Record<string, unknown>,
+): ProvenanceStatRow & { readonly geoid11: string; readonly vintage: number } {
+  const now = new Date().toISOString();
+  const vintage = asNumber(data.vintage) ?? Number(docId.split('_').at(-1) ?? 0);
+  return {
+    id: asString(data.id, docId),
+    geoid11: asString(data.geoid11, docId.split('_')[0] ?? docId),
+    vintage,
+    payload: stripProvenanceKeys(data),
+    ...provenanceFields(data, now),
+  };
+}
+
+export function mapUcrAgency(
+  docId: string,
+  data: Record<string, unknown>,
+): ProvenanceStatRow & { readonly ori: string; readonly county_fips?: string } {
+  const now = new Date().toISOString();
+  const countyFips = asStringOrUndefined(data.fips5 ?? data.countyFips);
+  return omitUndefined({
+    id: asString(data.id, docId),
+    ori: asString(data.ori, docId),
+    ...(countyFips !== undefined ? { county_fips: countyFips } : {}),
+    payload: stripProvenanceKeys(data),
+    ...provenanceFields(data, now),
+  }) as ProvenanceStatRow & { readonly ori: string; readonly county_fips?: string };
+}
+
+export function mapOpportunityAtlasTract(
+  docId: string,
+  data: Record<string, unknown>,
+): ProvenanceStatRow & { readonly geoid11: string } {
+  const now = new Date().toISOString();
+  return {
+    id: asString(data.id, docId),
+    geoid11: asString(data.geoid11, docId),
+    payload: stripProvenanceKeys(data),
+    ...provenanceFields(data, now),
+  };
+}
+
+export function mapHateCrimeCountyYear(
+  docId: string,
+  data: Record<string, unknown>,
+): ProvenanceStatRow & { readonly fips5: string; readonly year: number } {
+  const now = new Date().toISOString();
+  const year = asNumber(data.year) ?? Number(docId.split('_').at(-1) ?? 0);
+  return {
+    id: asString(data.id, docId),
+    fips5: asString(data.fips5, docId.split('_')[0] ?? docId),
+    year,
+    payload: stripProvenanceKeys(data),
+    ...provenanceFields(data, now),
+  };
+}
+
+export function mapUcrStateParticipation(
+  docId: string,
+  data: Record<string, unknown>,
+): ProvenanceStatRow & { readonly state: string; readonly year: number } {
+  const now = new Date().toISOString();
+  const year = asNumber(data.year) ?? Number(docId.split('_').at(-1) ?? 0);
+  return {
+    id: asString(data.id, docId),
+    state: asString(data.stateName ?? data.state, docId.split('_')[0] ?? docId),
+    year,
+    payload: stripProvenanceKeys(data),
+    ...provenanceFields(data, now),
+  };
+}
+
+export type HolcAreaRow = ProvenanceStatRow & {
+  readonly geometry?: unknown;
+};
+
+export function mapHolcArea(docId: string, data: Record<string, unknown>): HolcAreaRow {
+  const now = new Date().toISOString();
+  const geometry =
+    data.geometryRef !== undefined
+      ? toJsonValue(data.geometryRef)
+      : data.geometry !== undefined
+        ? toJsonValue(data.geometry)
+        : undefined;
+  return omitUndefined({
+    id: asString(data.id, docId),
+    payload: stripProvenanceKeys(data),
+    ...(geometry !== undefined ? { geometry } : {}),
+    ...provenanceFields(data, now),
+  }) as HolcAreaRow;
+}

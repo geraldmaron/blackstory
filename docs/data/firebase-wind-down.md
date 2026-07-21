@@ -6,16 +6,17 @@ After Postgres cutover, **do not delete** production Firebase project `black-boo
 
 - [x] Structured data migrated to Supabase `blackstory-app` (ETL package + apply runs)
 - [x] Public web can use `PUBLIC_DATA_SOURCE=postgres` + server-only `DATABASE_URL`
-- [x] Admin desks feature-flagged via `ADMIN_DATA_SOURCE` (defaults to postgres when `DATABASE_URL` / `APP_DATABASE_URL` is set)
-- [x] Operator-cli / quick-add / evidence commits use `createLiveAtomicStoreFromEnv` (Postgres AtomicStore when ops source is postgres)
-- [x] Discovery kill-switch resolver reads `bb_ops.kill_switches` in postgres mode (env override still wins)
+- [x] Admin desks use Postgres exclusively; legacy backend selection fails closed
+- [x] Operator-cli / quick-add / evidence commits use the Postgres-only `createLiveAtomicStoreFromEnv`
+- [x] Discovery kill switches use `bb_ops.kill_switches`; the retired scheduler has no live fallback
 - [x] Blobs intentionally remain in GCS / Firebase Storage (Postgres holds refs only)
 - [x] Supabase Auth admin mode: `ADMIN_AUTH_MODE=supabase` + `NEXT_PUBLIC_ADMIN_AUTH_MODE=supabase` with `app_metadata.bb_role`
 - [x] Supabase Auth admin user exists with `app_metadata.bb_role=admin`
 - [x] Data API schemas limited to `public`, `bb_public`, `bb_submissions` (`supabase/config.toml`)
 - [x] **App Hosting cutover (2026-07-21):** Secret Manager `web-database-url`, `admin-database-url`, `admin-supabase-anon-key`; root `apphosting.yaml` / `apphosting.staging.yaml` / `apphosting.admin.yaml` set postgres + supabase auth; staging backend Environment name=`staging`
 - [ ] Supabase advisors: **Leaked password protection** still WARN — enable in Dashboard (Management API PATCH returned 403 with available PAT)
-- [ ] Cloud Functions discovery ops postgres env (follow-up bead `repo-wehm`)
+- [x] Scheduled Cloud Functions runtime retired; Corsair/systemd is the recurring scheduler
+- [ ] Public web reads and request-integrity controls still require a separate Firebase-free cutover before the project can be archived
 
 ### Owner: enable leaked password protection (HaveIBeenPwned)
 
@@ -33,7 +34,7 @@ Requires Pro plan entitlement for HIBP. Docs: https://supabase.com/docs/guides/a
    - Confirm GCS public-media + private buckets are still needed (blobs stay)
    - Export Auth users if any remain on Firebase Auth
 2. **Verify app no longer requires Firestore for structured SoR**
-   - Production env: `PUBLIC_DATA_SOURCE=postgres`, `ADMIN_DATA_SOURCE=postgres`, working `DATABASE_URL`
+   - Production env: Postgres public/admin sources and working scoped database URLs
    - Admin auth: `ADMIN_AUTH_MODE=supabase` + provisioned operator with `app_metadata.bb_role=admin`
    - Smoke: home, entity page, search, `/data` demographics, admin research list/transition, quick-add commit
    - Confirm admin writes target Postgres (do not leave silent dual-truth)
@@ -48,15 +49,14 @@ Requires Pro plan entitlement for HIBP. Docs: https://supabase.com/docs/guides/a
    - Second person confirms export restore test
    - Then optionally delete Firestore database / retire project — **not** an agent action
 
-## Still Firestore-dependent (intentional / rollback)
+## Remaining legacy scope (not an approved runtime fallback)
 
-- Firebase Storage / GCS blobs
-- Optional `ADMIN_DATA_SOURCE=firestore` / `OPS_DATA_SOURCE=firestore` rollback flag
-- Optional `--catalog-from=firestore` for editorial soft-match
-- Legacy national-catalog / demographics load CLIs under `packages/firebase/scripts` (schedule cutover behind same AtomicStore)
-- Firebase Auth when `ADMIN_AUTH_MODE=firebase` (default for emulator)
+- GCS/blob objects pending an explicit storage decision
+- Firestore migration, export, and reconciliation utilities retained only for bounded history/data transfer
+- Public web readers and App Check paths awaiting their Firebase-free replacement
+- Legacy national-catalog/demographic utilities under `packages/firebase/scripts`; they are not scheduled runtime entry points
 
-## Rollback
+## Recovery
 
-- Flip `PUBLIC_DATA_SOURCE=firestore` / `ADMIN_DATA_SOURCE=firestore` + production break-glass if Postgres reads/writes fail
-- Firestore export + prior release artifacts remain the recovery path for structured data until owner retires Firebase
+- Do not flip admin/operator/scheduled workers back to Firestore. Restore Postgres from verified backups or pause the affected surface.
+- Firestore exports and prior release artifacts remain offline recovery evidence until the owner completes the archive window.

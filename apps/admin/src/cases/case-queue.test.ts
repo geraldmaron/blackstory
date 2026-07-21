@@ -119,7 +119,7 @@ test('CASE_TRIAGE_STEPS and actionHelp explain the decision workflow', () => {
   assert.match(missingDecisionReasonMessage('send_to_relevance'), /does not publish/i);
 });
 
-test('parseResearchCaseRecord coerces sparse Firestore docs', () => {
+test('parseResearchCaseRecord coerces sparse stored records', () => {
   const parsed = parseResearchCaseRecord('case-x', {
     title: 'Sparse',
     state: 'candidate',

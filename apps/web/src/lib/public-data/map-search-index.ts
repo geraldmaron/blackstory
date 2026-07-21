@@ -1,11 +1,11 @@
 /**
- * Maps Firestore / artifact search-index docs into `@repo/domain`'s `PublicSearchIndexDoc`
+ * Maps Postgres/artifact search-index projections into `@repo/domain`'s `PublicSearchIndexDoc`
  * so `runPublicSearch` can consume the written index without rebuilding from entity scans.
  */
 import type { NotabilityBasisRecord, PublicSearchIndexDoc } from '@repo/domain';
-import type { PublicSearchIndexDoc as FirestoreSearchIndexDoc } from '@repo/firebase';
+import type { PublicSearchProjectionDoc } from '@repo/schemas';
 
-export function mapFirestoreSearchIndexDoc(doc: FirestoreSearchIndexDoc): PublicSearchIndexDoc {
+export function mapPublicSearchProjection(doc: PublicSearchProjectionDoc): PublicSearchIndexDoc {
   const notabilityBasis: readonly NotabilityBasisRecord[] = doc.notabilityBasis.map((entry) => ({
     criterion: entry.criterion as NotabilityBasisRecord['criterion'],
     note: entry.note,
