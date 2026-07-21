@@ -111,6 +111,14 @@ export {
   type LlmProvider,
   type CreateLlmProviderOptions,
 } from './llm-provider.js';
+export {
+  DEFAULT_STORY_REWRITE_MODEL,
+  STORY_REWRITE_MIN_WORDS,
+  rewriteStory,
+  validateStoryRewrite,
+  type StoryRewriteDraft,
+  type StoryRewriteResult,
+} from './story-rewrite.js';
 
 export { mapPool } from './map-pool.js';
 
