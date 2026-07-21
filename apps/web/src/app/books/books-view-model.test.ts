@@ -13,7 +13,7 @@ const SNAPSHOT = getBannedBooksListingSnapshot();
 
 test('buildBooksBrowseViewModel returns all seed entries by default', () => {
   const view = buildBooksBrowseViewModel(SNAPSHOT, {});
-  assert.equal(view.totalMatched, 46);
+  assert.equal(view.totalMatched, 53);
   assert.equal(view.state, 'all');
   assert.equal(view.author, 'all');
 });
