@@ -107,6 +107,14 @@ test('isUsableLocationLabel rejects a scope-qualified generic label (the Alpha K
 test('isUsableLocationLabel accepts a genuine specific place name', () => {
   assert.equal(isUsableLocationLabel('Moton Field'), true);
   assert.equal(isUsableLocationLabel('South Carolina State House'), true);
+  assert.equal(isUsableLocationLabel('Columbia Park and Baker Bowl'), true);
+});
+
+test('isUsableLocationLabel rejects descriptive prose written in place of a real place name (the Louis Santop collision case)', () => {
+  // Reproduces the live incident: "Place of death and later life residence"
+  // was searched literally and matched an unrelated page in Washington state
+  // instead of falling back to Louis Santop's real Philadelphia jurisdiction.
+  assert.equal(isUsableLocationLabel('Place of death and later life residence'), false);
 });
 
 test('stripDescriptiveLocationClause drops a trailing descriptive clause (the Charles Henry Chapman collision case)', () => {

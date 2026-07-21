@@ -1,0 +1,311 @@
+[
+  {
+    "id": "negro_leagues_player_cool_papa_bell",
+    "kind": "person",
+    "displayName": "Cool Papa Bell",
+    "summary": "James 'Cool Papa' Bell (1903–1991), born in Starkville, Mississippi, was a center fielder and pitcher in the Negro Leagues from 1922 to 1946, renowned for his exceptional speed. He played for teams including the [[negro_leagues_team_st_louis_stars|St. Louis Stars]] and [[negro_leagues_team_homestead_grays|Homestead Grays]], was a two-time Negro World Series champion, and was inducted into the National Baseball Hall of Fame in 1974.",
+    "eraBuckets": [
+      "1920s",
+      "1930s",
+      "1940s"
+    ],
+    "topicTags": [
+      "sports",
+      "jim-crow",
+      "segregation",
+      "civil-rights",
+      "baseball"
+    ],
+    "topicIds": [
+      "sports",
+      "jim-crow",
+      "segregation",
+      "civil-rights",
+      "baseball"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Negro Leagues",
+      "baseball",
+      "Hall of Fame",
+      "speed",
+      "St. Louis Stars"
+    ],
+    "jurisdictionLabel": "Starkville, Mississippi",
+    "locationPrecision": "city",
+    "locationLabel": "birthplace",
+    "lat": 34.259971,
+    "lng": -88.679963,
+    "claims": [
+      {
+        "predicate": "played in the Negro Leagues from 1922 to 1946",
+        "object": "Negro Leagues career span",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Cool_Papa_Bell",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was inducted into the National Baseball Hall of Fame in 1974",
+        "object": "Hall of Fame induction",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Cool_Papa_Bell",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "played for the St. Louis Stars in the Negro National League",
+        "object": "team affiliation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Cool_Papa_Bell",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was considered one of the fastest players in baseball history",
+        "object": "athletic reputation",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.mshistorynow.mdah.ms.gov/issue/cool-papa-bell",
+        "citationLabel": "Mississippi History Now"
+      },
+      {
+        "predicate": "won two Negro World Series championships with the Homestead Grays",
+        "object": "championships won",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Cool_Papa_Bell",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is recognized as a key figure in the history of segregated Black baseball",
+        "object": "historical significance in segregation era",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.mshistorynow.mdah.ms.gov/issue/cool-papa-bell",
+        "citationLabel": "Mississippi History Now"
+      }
+    ],
+    "historicalContext": "Bell's career unfolded during the era of Jim Crow segregation, which excluded Black athletes from Major League Baseball. The Negro Leagues emerged as a vital institution of Black excellence and cultural resilience, providing a platform for elite competition and community pride in the face of systemic exclusion."
+  },
+  {
+    "id": "negro_leagues_player_willard_brown",
+    "kind": "person",
+    "displayName": "Willard Brown",
+    "summary": "Willard Brown, known as 'Home Run Brown,' was a star outfielder in the Negro Leagues and a 2006 Hall of Fame inductee. He broke barriers in 1947 as the first African American to hit a home run in the American League while playing for the St. Louis Browns, marking a pivotal moment in baseball's integration.",
+    "eraBuckets": [
+      "1930s",
+      "1940s",
+      "1950s"
+    ],
+    "topicTags": [
+      "baseball",
+      "civil-rights",
+      "desegregation",
+      "firsts",
+      "hbcu",
+      "sports"
+    ],
+    "topicIds": [
+      "baseball",
+      "civil-rights",
+      "desegregation",
+      "firsts",
+      "hbcu",
+      "sports"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Negro Leagues",
+      "Kansas City Monarchs",
+      "Hall of Fame",
+      "desegregation",
+      "home run"
+    ],
+    "jurisdictionLabel": "Houston, Texas",
+    "locationPrecision": "cemetery",
+    "locationLabel": "Houston National Cemetery",
+    "lat": 29.93083333,
+    "lng": -95.44388889,
+    "claims": [
+      {
+        "predicate": "played for",
+        "object": "Kansas City Monarchs",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Willard_Brown",
+        "citationLabel": "Wikipedia: Willard Brown"
+      },
+      {
+        "predicate": "was first African American to hit a home run in",
+        "object": "American League",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Willard_Brown",
+        "citationLabel": "Wikipedia: Willard Brown"
+      },
+      {
+        "predicate": "won",
+        "object": "Negro World Series",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Willard_Brown",
+        "citationLabel": "Wikipedia: Willard Brown"
+      },
+      {
+        "predicate": "inducted into",
+        "object": "National Baseball Hall of Fame",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Willard_Brown",
+        "citationLabel": "Wikipedia: Willard Brown"
+      },
+      {
+        "predicate": "served in",
+        "object": "U.S. Army",
+        "confidenceLevel": "medium",
+        "citationSource": "vlm.cem.va.gov",
+        "citationHref": "https://www.vlm.cem.va.gov/WILLARDBROWN/95BE1EE",
+        "citationLabel": "VA Memorial: Willard Brown"
+      }
+    ],
+    "historicalContext": "Brown's MLB debut came during the early phase of baseball's desegregation, just years after Jackie Robinson broke the color barrier. His performance in the Negro Leagues and brief MLB tenure highlight both the talent excluded by segregation and the challenges Black athletes faced in Major League integration."
+  },
+  {
+    "id": "negro_leagues_player_andy_cooper",
+    "kind": "person",
+    "displayName": "Andy Cooper",
+    "summary": "Andy Cooper, a Hall of Fame pitcher and manager, played a pivotal role in the Negro Leagues, notably with the [[negro_leagues_team_kansas_city_monarchs|Kansas City Monarchs]]. His career spanned from 1920 to 1941, and he was inducted into the National Baseball Hall of Fame in 2006.",
+    "eraBuckets": [
+      "1920s",
+      "1930s",
+      "1940s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "baseball",
+      "history",
+      "black-power"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "baseball",
+      "history",
+      "black-power"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Negro Leagues",
+      "baseball",
+      "Hall of Fame",
+      "Kansas City Monarchs",
+      "Andy Cooper"
+    ],
+    "jurisdictionLabel": "Waco, Texas",
+    "locationPrecision": "city",
+    "locationLabel": "Waco, Texas",
+    "lat": 31.5492,
+    "lng": -97.1472,
+    "claims": [
+      {
+        "predicate": "inducted_into",
+        "object": "National Baseball Hall of Fame",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Andy_Cooper",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "played_for",
+        "object": "Kansas City Monarchs",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Andy_Cooper",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "career_span",
+        "object": "1920–1941",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Andy_Cooper",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "position",
+        "object": "Pitcher",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Andy_Cooper",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "noted_for",
+        "object": "Changing the speed of his pitches",
+        "confidenceLevel": "medium",
+        "citationSource": "citation_trail",
+        "citationHref": "http://www.gpo.gov/fdsys/pkg/BILLS-109sres386ats/html/BILLS-109sres386ats.htm",
+        "citationLabel": "Congressional Resolution"
+      }
+    ],
+    "historicalContext": "Andy Cooper's career in the Negro Leagues occurred during the Jim Crow era, when racial segregation enforced the separation of Black and white athletes. His induction into the National Baseball Hall of Fame in 2006 marked a significant recognition of the contributions of Black players to American baseball history."
+  },
+  {
+    "id": "negro_leagues_team_cuban_giants",
+    "kind": "organization",
+    "displayName": "Cuban Giants",
+    "summary": "The Cuban Giants, formed in 1885 at Babylon, New York's Argyle Hotel, were the first fully salaried African-American professional baseball team. Though named to obscure their Black identity and initially presented as Cuban to ease acceptance, they became 'World Colored Champions' in 1888 and helped establish the model for future Negro league teams despite playing in segregated baseball's shadow.",
+    "eraBuckets": [
+      "1880s",
+      "1890s",
+      "1900s",
+      "1910s"
+    ],
+    "topicTags": [
+      "baseball",
+      "firsts",
+      "segregation",
+      "sports",
+      "black-power"
+    ],
+    "topicIds": [
+      "baseball",
+      "firsts",
+      "segregation",
+      "sports",
+      "black-power"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Cuban Giants",
+      "Negro Leagues",
+      "African-American baseball",
+      "barnstorming team",
+      "World Colored Champions"
+    ],
+    "jurisdictionLabel": "Babylon, New York",
+    "locationPrecision": "site",
+    "locationLabel": "Argyle Hotel, summer resort where team was formed",
+    "lat": 40.69444444,
+    "lng": -73.32944444,
+    "claims": [
+      {
+        "predicate": "was formed in 1885 at the Argyle Hotel in Babylon, New York",
+        "object": "1885",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Cuban_Giants",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "became the 'World Colored Champions' in 1888",
+        "object": "1888",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Cuban_Giants",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "In the post-Reconstruction era, as Jim Crow laws solidified racial segregation, Black athletes were excluded from white professional leagues. The Cuban Giants emerged within this context, using performance and rebranding to carve space in American sports, demonstrating both resilience and strategic adaptation to systemic racism in recreation and public life."
+  }
+]

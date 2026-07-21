@@ -220,6 +220,22 @@ function extractSearchDisambiguator(jurisdictionLabel: string): string {
   return US_STATES.find((state) => jurisdictionLabel.includes(state)) ?? 'United States';
 }
 
+// A handful of major US cities have a Wikipedia title that isn't the plain
+// "City, State" form Census/jurisdiction text normally uses — searching the
+// raw jurisdiction label for these produces an ambiguous or wrong hit (real
+// incident: "New York, NY" searched literally matched Rochester, NY instead
+// of New York City, since both are real "New York" places in New York state).
+const CITY_TITLE_OVERRIDES: Record<string, string> = {
+  'new york': 'New York City',
+};
+
+/** Normalizes a "City, State" jurisdiction label to its real Wikipedia title before searching. */
+function normalizeJurisdictionQuery(jurisdictionLabel: string): string {
+  const cityPart = jurisdictionLabel.split(',')[0]?.trim().toLowerCase();
+  const override = cityPart ? CITY_TITLE_OVERRIDES[cityPart] : undefined;
+  return override ?? jurisdictionLabel;
+}
+
 /**
  * `query` alone is tried as an exact title first (works for well-known, unambiguous
  * names). The search fallback appends `disambiguator` (the subject's own state,
@@ -275,6 +291,27 @@ const GENERIC_LOCATION_LABELS = new Set([
   'office', 'offices', 'institution', 'address', 'facility',
 ]);
 
+const LOCATION_STOP_WORDS = new Set(['of', 'the', 'and', 'at', 'in', 'a', 'an', 'for', 'later']);
+
+/**
+ * Real place names are Title Case in every significant word ("Forbes Field",
+ * "Columbia Park and Baker Bowl"). A judge-written descriptive sentence
+ * filling the same field reads like ordinary prose instead (real incident:
+ * Louis Santop's locationLabel was "Place of death and later life residence"
+ * — searching that literal phrase matched an unrelated page in Washington
+ * state instead of resolving to his real Philadelphia jurisdiction). Fewer
+ * than half the significant words being capitalized is a reliable signal
+ * this is prose, not a place name.
+ */
+function looksLikeDescriptiveProse(label: string): boolean {
+  const words = label.trim().split(/\s+/);
+  if (words.length < 3) return false;
+  const significant = words.slice(1).filter((w) => !LOCATION_STOP_WORDS.has(w.toLowerCase()));
+  if (significant.length === 0) return false;
+  const capitalized = significant.filter((w) => /^[A-Z]/u.test(w));
+  return capitalized.length / significant.length < 0.5;
+}
+
 export function isUsableLocationLabel(label: string): boolean {
   const normalized = label.trim().toLowerCase();
   if (normalized.length === 0 || GENERIC_LOCATION_LABELS.has(normalized)) return false;
@@ -287,6 +324,7 @@ export function isUsableLocationLabel(label: string): boolean {
   const words = normalized.split(/\s+/);
   const lastWord = words[words.length - 1];
   if (words.length <= 3 && lastWord && GENERIC_LOCATION_LABELS.has(lastWord)) return false;
+  if (looksLikeDescriptiveProse(label)) return false;
   return true;
 }
 
@@ -326,6 +364,13 @@ export async function resolveGovernmentCenterCoordinates(
   if (usableLocationLabel && usableLocationLabel !== jurisdictionLabel && SITE_PRECISIONS.has(locationPrecision)) {
     const bySite = await resolveViaSearchThenCoordinates(usableLocationLabel, disambiguator);
     if (bySite) return bySite;
+    // The specific site was too obscure to have its own Wikipedia article/
+    // coordinates (real incident: "Catholic Protectory Oval, Bronx", an 1880s
+    // sporting ground) — fall back to the surrounding jurisdiction instead of
+    // falling through to the generic final line below, which would just
+    // retry this exact same failed query again.
+    const byJurisdiction = await resolveViaSearchThenCoordinates(normalizeJurisdictionQuery(jurisdictionLabel), disambiguator);
+    if (byJurisdiction) return byJurisdiction;
   }
 
   if (locationPrecision === 'state') {
@@ -339,7 +384,7 @@ export async function resolveGovernmentCenterCoordinates(
     if (byCapitol) return byCapitol;
   }
 
-  return resolveViaSearchThenCoordinates(usableLocationLabel || jurisdictionLabel, disambiguator);
+  return resolveViaSearchThenCoordinates(usableLocationLabel || normalizeJurisdictionQuery(jurisdictionLabel), disambiguator);
 }
 
 async function findViaWikipediaApi(
