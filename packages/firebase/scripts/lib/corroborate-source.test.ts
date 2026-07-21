@@ -5,7 +5,13 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { isPlausibleMatch, looksLikeSettlementArticle, sharesNameToken } from './corroborate-source.ts';
+import {
+  isPlausibleMatch,
+  isUsableLocationLabel,
+  looksLikeSettlementArticle,
+  sharesNameToken,
+  stripDescriptiveLocationClause,
+} from './corroborate-source.ts';
 
 const GILMER_TEXAS_TEXT =
   'Gilmer is a city in and the county seat of Upshur County, Texas, United States. ' +
@@ -81,6 +87,41 @@ test('isPlausibleMatch still accepts a genuine match for a person subject', () =
     'and a recipient of the Medal of Honor for his actions in the Indian Wars.';
   const context = 'Documented Buffalo Soldier: Medal of Honor recipient for actions in the Indian Wars.';
   assert.equal(isPlausibleMatch('Clinton Greaves', context, greavesText, 'Clinton Greaves', 'person'), true);
+});
+
+test('isUsableLocationLabel rejects bare generic labels', () => {
+  assert.equal(isUsableLocationLabel('headquarters'), false);
+  assert.equal(isUsableLocationLabel('Site'), false);
+});
+
+test('isUsableLocationLabel rejects a scope-qualified generic label (the Alpha Kappa Alpha collision case)', () => {
+  // Reproduces the live incident: "International headquarters" is not in the
+  // exact generic-labels set, so it passed the old check and a literal search
+  // for that phrase matched an unrelated building instead of falling back to
+  // Alpha Kappa Alpha's real Chicago, Illinois jurisdiction.
+  assert.equal(isUsableLocationLabel('International headquarters'), false);
+  assert.equal(isUsableLocationLabel('National office'), false);
+  assert.equal(isUsableLocationLabel('Corporate campus'), false);
+});
+
+test('isUsableLocationLabel accepts a genuine specific place name', () => {
+  assert.equal(isUsableLocationLabel('Moton Field'), true);
+  assert.equal(isUsableLocationLabel('South Carolina State House'), true);
+});
+
+test('stripDescriptiveLocationClause drops a trailing descriptive clause (the Charles Henry Chapman collision case)', () => {
+  // Reproduces the live incident: "Cornell University, site of Alpha Phi Alpha
+  // founding" failed to resolve coordinates because the whole descriptive
+  // phrase was searched literally instead of just "Cornell University".
+  assert.equal(
+    stripDescriptiveLocationClause('Cornell University, site of Alpha Phi Alpha founding'),
+    'Cornell University',
+  );
+});
+
+test('stripDescriptiveLocationClause keeps a genuine "Place, State/City" qualifier intact', () => {
+  assert.equal(stripDescriptiveLocationClause('South Carolina State House, Columbia'), 'South Carolina State House, Columbia');
+  assert.equal(stripDescriptiveLocationClause('Gilmer, Texas'), 'Gilmer, Texas');
 });
 
 test('isPlausibleMatch does not apply the person-only gates to non-person subjects', () => {

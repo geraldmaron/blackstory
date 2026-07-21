@@ -275,8 +275,40 @@ const GENERIC_LOCATION_LABELS = new Set([
   'office', 'offices', 'institution', 'address', 'facility',
 ]);
 
-function isUsableLocationLabel(label: string): boolean {
-  return label.trim().length > 0 && !GENERIC_LOCATION_LABELS.has(label.trim().toLowerCase());
+export function isUsableLocationLabel(label: string): boolean {
+  const normalized = label.trim().toLowerCase();
+  if (normalized.length === 0 || GENERIC_LOCATION_LABELS.has(normalized)) return false;
+  // The judge often qualifies an otherwise-generic noun with a scope adjective
+  // ("International headquarters", "National office", "Corporate campus") —
+  // an exact-string check misses these, and searching the literal phrase can
+  // match an unrelated same-named page (real incident: Alpha Kappa Alpha's
+  // "International headquarters" resolved to an unrelated building instead of
+  // falling back to its real Chicago, Illinois jurisdiction).
+  const words = normalized.split(/\s+/);
+  const lastWord = words[words.length - 1];
+  if (words.length <= 3 && lastWord && GENERIC_LOCATION_LABELS.has(lastWord)) return false;
+  return true;
+}
+
+// Phrases that mark the clause after a comma as descriptive prose rather than
+// a geographic qualifier (a city/state name) — e.g. the judge writes "Cornell
+// University, site of Alpha Phi Alpha founding" instead of just "Cornell
+// University". Searching the full descriptive phrase misses the real page;
+// stripping the clause and searching just the place name resolves correctly.
+const DESCRIPTIVE_CLAUSE_MARKERS = [
+  'site of', 'home of', 'birthplace of', 'location of', 'headquarters of',
+  'founding of', 'founding site', 'where ', 'now part of',
+];
+
+/** Drops a trailing descriptive clause after a comma, keeping a real "City, State"-style qualifier intact. */
+export function stripDescriptiveLocationClause(label: string): string {
+  const commaIndex = label.indexOf(',');
+  if (commaIndex === -1) return label;
+  const after = label.slice(commaIndex + 1).trim().toLowerCase();
+  if (DESCRIPTIVE_CLAUSE_MARKERS.some((marker) => after.includes(marker))) {
+    return label.slice(0, commaIndex).trim();
+  }
+  return label;
 }
 
 export async function resolveGovernmentCenterCoordinates(
@@ -285,7 +317,9 @@ export async function resolveGovernmentCenterCoordinates(
   locationPrecision: string,
 ): Promise<{ lat: number; lng: number } | undefined> {
   const disambiguator = extractSearchDisambiguator(jurisdictionLabel);
-  const usableLocationLabel = isUsableLocationLabel(locationLabel) ? locationLabel : undefined;
+  const usableLocationLabel = isUsableLocationLabel(locationLabel)
+    ? stripDescriptiveLocationClause(locationLabel)
+    : undefined;
   const SITE_PRECISIONS = new Set([
     'institution', 'site', 'address', 'campus', 'building', 'stadium', 'airport', 'museum', 'district',
   ]);
