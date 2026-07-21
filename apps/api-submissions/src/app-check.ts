@@ -1,6 +1,8 @@
 /**
- * Creates the App Check verification boundary for every submissions request,
- * enabling Admin SDK replay consumption for this security-critical mutation path.
+ * Creates the App Check verification boundary for submissions requests.
+ *
+ * @deprecated Prefer `createSubmissionsApiClientAttestationGuard` — Firebase App Check
+ * retired for mobile corrections after ADR-020. Kept for rollback tooling only.
  */
 import {
   createAppCheckGuard,
@@ -27,6 +29,7 @@ const consoleTelemetry: AppCheckTelemetry = {
   },
 };
 
+/** @deprecated Use `createSubmissionsApiClientAttestationGuard`. */
 export function createSubmissionsApiAppCheckGuard(options: SubmissionsApiAppCheckOptions = {}) {
   const environment = options.environment ?? process.env;
   const mode = options.mode ?? parseAppCheckMode(environment.APP_CHECK_MODE);

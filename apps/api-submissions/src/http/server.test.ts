@@ -5,8 +5,7 @@ import assert from 'node:assert/strict';
 import { once } from 'node:events';
 import type { AddressInfo } from 'node:net';
 import { test } from 'node:test';
-import type { AppCheckVerifier } from '@repo/firebase';
-import { createSubmissionsApiAppCheckGuard } from '../app-check.ts';
+import { createSubmissionsApiClientAttestationGuard } from '../client-attestation.ts';
 import { createSubmissionsRateLimitGuard } from '../rate-limits.ts';
 import {
   createInMemorySubmissionQuarantineRepository,
@@ -18,23 +17,18 @@ import type { HandlerDeps } from './handlers.ts';
 import { createSubmissionsApiServer, parseJsonWithDepthLimit } from './server.ts';
 
 const PEPPER = 'server-test-pepper';
+const CLIENT_HEADER = 'mobile/1.0.0; api=1';
 
 function makeDeps(): HandlerDeps {
   const repository = createInMemorySubmissionQuarantineRepository();
-  const verifier: AppCheckVerifier = {
-    async verifyToken() {
-      return { appId: 'test-app' };
-    },
-  };
   return {
     quarantineService: createSubmissionQuarantineService({
       repository,
       privacyPepper: PEPPER,
       now: () => 0,
     }),
-    appCheckGuard: createSubmissionsApiAppCheckGuard({
-      environment: { APP_CHECK_MODE: 'enforce' },
-      verifier,
+    clientAttestationGuard: createSubmissionsApiClientAttestationGuard({
+      environment: { CLIENT_ATTESTATION_MODE: 'enforce', NODE_ENV: 'production' },
       telemetry: { record: () => {} },
     }),
     rateLimitGuard: createSubmissionsRateLimitGuard({ now: () => 0 }),
@@ -78,7 +72,7 @@ test('server accepts POST /v1/corrections over the wire', async () => {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
-        'x-firebase-appcheck': 'token',
+        'x-blackstory-client': CLIENT_HEADER,
       },
       body: JSON.stringify({
         targetType: 'entity',

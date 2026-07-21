@@ -8,9 +8,9 @@
  */
 import { createHash } from 'node:crypto';
 import { buildSurfaceHealth, parseNodeEnv } from '@repo/config';
-import type { AppCheckDecision, AppCheckHeaders } from '@repo/firebase';
+import type { ClientAttestationDecision } from '@repo/security';
 import { SURFACE_ID } from '../posture.js';
-import { createSubmissionsApiAppCheckGuard } from '../app-check.js';
+import { createSubmissionsApiClientAttestationGuard } from '../client-attestation.js';
 import { createSubmissionsRateLimitGuard } from '../rate-limits.js';
 import {
   createInMemorySubmissionQuarantineRepository,
@@ -38,7 +38,7 @@ export type ApiRequest = {
 
 export type HandlerDeps = {
   readonly quarantineService: ReturnType<typeof createSubmissionQuarantineService>;
-  readonly appCheckGuard: ReturnType<typeof createSubmissionsApiAppCheckGuard>;
+  readonly clientAttestationGuard: ReturnType<typeof createSubmissionsApiClientAttestationGuard>;
   readonly rateLimitGuard: ReturnType<typeof createSubmissionsRateLimitGuard>;
   readonly store: CorrectionReceiptStore;
   readonly idempotencyCache: IdempotencyCache;
@@ -75,12 +75,14 @@ async function guardSubmitRequest(
   | { readonly allowed: true; readonly clientIp?: string; readonly rateKey: string }
   | { readonly allowed: false; readonly response: ApiResponse }
 > {
-  const appCheckDecision: AppCheckDecision = await deps.appCheckGuard({ headers: request.headers as AppCheckHeaders });
-  if (!appCheckDecision.allowed) {
+  const attestation: ClientAttestationDecision = await deps.clientAttestationGuard({
+    headers: request.headers,
+  });
+  if (!attestation.allowed) {
     return {
       allowed: false,
-      response: jsonError(appCheckDecision.status, 'app_check_required', request.requestId, {
-        reason: appCheckDecision.reason,
+      response: jsonError(attestation.status, 'client_attestation_required', request.requestId, {
+        reason: attestation.reason,
       }),
     };
   }
@@ -90,7 +92,7 @@ async function guardSubmitRequest(
     path: request.path,
     subject: 'anonymous',
     ...(request.clientIp ? { clientIp: request.clientIp } : {}),
-    appCheckVerified: appCheckDecision.verified,
+    clientAttested: attestation.verified,
   });
   if (!rateDecision) {
     return {
@@ -154,7 +156,7 @@ export async function handleCorrectionSubmit(request: ApiRequest, deps: HandlerD
     const intake = deps.quarantineService.intake({
       payload: validation.payload,
       security: {
-        appCheckAllowed: true,
+        attestationAllowed: true,
         quotaAllowed: true,
         ...(guard.clientIp ? { networkToken: networkTokenFor(guard.clientIp, deps.privacyPepper) } : {}),
       },
@@ -164,8 +166,8 @@ export async function handleCorrectionSubmit(request: ApiRequest, deps: HandlerD
       if (intake.reason === 'validation_failed') {
         return jsonError(intake.status, 'validation_failed', request.requestId, { issues: intake.issues });
       }
-      if (intake.reason === 'app_check_denied') {
-        return jsonError(intake.status, 'app_check_required', request.requestId);
+      if (intake.reason === 'attestation_denied') {
+        return jsonError(intake.status, 'client_attestation_required', request.requestId);
       }
       if (intake.reason === 'quota_denied') {
         return jsonError(429, 'rate_limit_exceeded', request.requestId);
@@ -248,7 +250,9 @@ export function createDefaultHandlerDeps(overrides: Partial<HandlerDeps> = {}): 
   const privacyPepper = requirePrivacyPepper();
   return {
     quarantineService: createSubmissionQuarantineService({ repository, privacyPepper }),
-    appCheckGuard: createSubmissionsApiAppCheckGuard({ environment: { APP_CHECK_MODE: 'enforce' } }),
+    clientAttestationGuard: createSubmissionsApiClientAttestationGuard({
+      environment: { CLIENT_ATTESTATION_MODE: 'enforce', NODE_ENV: 'production' },
+    }),
     rateLimitGuard: createSubmissionsRateLimitGuard({ now: () => 0 }),
     store: createCorrectionReceiptStore(),
     idempotencyCache: createIdempotencyCache(),

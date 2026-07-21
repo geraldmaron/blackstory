@@ -1,11 +1,10 @@
 /**
- * Corrections HTTP handler tests — quarantine intake, App Check, rate limits, idempotency,
- * status lookup, and no canonical-write posture (MOB-016 / repo-zir9).
+ * Corrections HTTP handler tests — quarantine intake, client attestation, rate limits,
+ * idempotency, status lookup, and no canonical-write posture (MOB-016 / repo-zir9).
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { AppCheckVerifier } from '@repo/firebase';
-import { createSubmissionsApiAppCheckGuard } from '../app-check.ts';
+import { createSubmissionsApiClientAttestationGuard } from '../client-attestation.ts';
 import { createSubmissionsRateLimitGuard } from '../rate-limits.ts';
 import {
   createInMemorySubmissionQuarantineRepository,
@@ -25,6 +24,7 @@ import {
 import { dispatch } from './router.ts';
 
 const PEPPER = 'route-test-pepper';
+const CLIENT_HEADER = 'mobile/1.0.0; api=1';
 
 const VALID_CORRECTION = {
   targetType: 'entity',
@@ -35,19 +35,10 @@ const VALID_CORRECTION = {
   privacyConsent: true,
 } as const;
 
-function acceptingVerifier(appId = 'test-app-id'): AppCheckVerifier {
-  return {
-    async verifyToken() {
-      return { appId };
-    },
-  };
-}
-
-async function buildDeps(overrides: Partial<HandlerDeps> = {}): Promise<HandlerDeps> {
+function buildDeps(overrides: Partial<HandlerDeps> = {}): HandlerDeps {
   const repository = createInMemorySubmissionQuarantineRepository();
-  const appCheckGuard = createSubmissionsApiAppCheckGuard({
-    environment: { APP_CHECK_MODE: 'enforce' },
-    verifier: acceptingVerifier(),
+  const clientAttestationGuard = createSubmissionsApiClientAttestationGuard({
+    environment: { CLIENT_ATTESTATION_MODE: 'enforce', NODE_ENV: 'production' },
     telemetry: { record: () => {} },
   });
   return {
@@ -56,7 +47,7 @@ async function buildDeps(overrides: Partial<HandlerDeps> = {}): Promise<HandlerD
       privacyPepper: PEPPER,
       now: () => 0,
     }),
-    appCheckGuard,
+    clientAttestationGuard,
     rateLimitGuard: createSubmissionsRateLimitGuard({ now: () => 0 }),
     store: createCorrectionReceiptStore(),
     idempotencyCache: createIdempotencyCache(),
@@ -81,7 +72,10 @@ function makeRequest(
     path,
     query: new URLSearchParams(),
     headers: Object.fromEntries(
-      Object.entries(init.headers ?? { 'x-firebase-appcheck': 'token' }).map(([k, v]) => [k.toLowerCase(), v]),
+      Object.entries(init.headers ?? { 'x-blackstory-client': CLIENT_HEADER }).map(([k, v]) => [
+        k.toLowerCase(),
+        v,
+      ]),
     ),
     requestId: init.requestId ?? 'req_test_fixed',
     ...(init.clientIp ? { clientIp: init.clientIp } : {}),
@@ -90,7 +84,7 @@ function makeRequest(
 }
 
 test('accepts a correction into quarantine and returns a receipt code', async () => {
-  const deps = await buildDeps();
+  const deps = buildDeps();
   const response = await handleCorrectionSubmit(
     makeRequest(CORRECTION_SUBMIT_PATH, { body: VALID_CORRECTION, clientIp: '203.0.113.20' }),
     deps,
@@ -102,8 +96,8 @@ test('accepts a correction into quarantine and returns a receipt code', async ()
   assert.equal(body.statusHref, CORRECTION_STATUS_PATH);
 });
 
-test('rejects submit without App Check attestation', async () => {
-  const deps = await buildDeps();
+test('rejects submit without client attestation', async () => {
+  const deps = buildDeps();
   const response = await handleCorrectionSubmit(
     makeRequest(CORRECTION_SUBMIT_PATH, {
       body: VALID_CORRECTION,
@@ -113,11 +107,11 @@ test('rejects submit without App Check attestation', async () => {
     deps,
   );
   assert.equal(response.status, 401);
-  assert.equal((response.body as { error: string }).error, 'app_check_required');
+  assert.equal((response.body as { error: string }).error, 'client_attestation_required');
 });
 
 test('tight anonymous rate limits block correction floods', async () => {
-  const deps = await buildDeps();
+  const deps = buildDeps();
   const ip = '203.0.113.21';
   const first = await handleCorrectionSubmit(
     makeRequest(CORRECTION_SUBMIT_PATH, { body: VALID_CORRECTION, clientIp: ip }),
@@ -144,7 +138,7 @@ test('tight anonymous rate limits block correction floods', async () => {
 
 test('coordinated duplicate corrections stay quarantined without public brigading signals', async () => {
   const repository = createInMemorySubmissionQuarantineRepository();
-  const deps = await buildDeps({
+  const deps = buildDeps({
     quarantineService: createSubmissionQuarantineService({
       repository,
       privacyPepper: PEPPER,
@@ -185,7 +179,7 @@ test('coordinated duplicate corrections stay quarantined without public brigadin
 });
 
 test('status lookup requires an exact receipt code and cannot enumerate others', async () => {
-  const deps = await buildDeps();
+  const deps = buildDeps();
   const accepted = await handleCorrectionSubmit(
     makeRequest(CORRECTION_SUBMIT_PATH, { body: VALID_CORRECTION, clientIp: '203.0.113.23' }),
     deps,
@@ -206,13 +200,13 @@ test('status lookup requires an exact receipt code and cannot enumerate others',
 });
 
 test('idempotency header collapses retries to the same receipt without a second quarantine write', async () => {
-  const deps = await buildDeps();
+  const deps = buildDeps();
   const key = 'bbcor-deadbeef00112233';
   const first = await handleCorrectionSubmit(
     makeRequest(CORRECTION_SUBMIT_PATH, {
       body: VALID_CORRECTION,
       clientIp: '203.0.113.24',
-      headers: { 'x-firebase-appcheck': 'token', [IDEMPOTENCY_KEY_HEADER]: key },
+      headers: { 'x-blackstory-client': CLIENT_HEADER, [IDEMPOTENCY_KEY_HEADER]: key },
     }),
     deps,
   );
@@ -220,7 +214,7 @@ test('idempotency header collapses retries to the same receipt without a second 
     makeRequest(CORRECTION_SUBMIT_PATH, {
       body: VALID_CORRECTION,
       clientIp: '203.0.113.24',
-      headers: { 'x-firebase-appcheck': 'token', [IDEMPOTENCY_KEY_HEADER]: key },
+      headers: { 'x-blackstory-client': CLIENT_HEADER, [IDEMPOTENCY_KEY_HEADER]: key },
     }),
     deps,
   );
@@ -231,7 +225,7 @@ test('idempotency header collapses retries to the same receipt without a second 
 });
 
 test('router dispatches only the documented MOB-016 paths', async () => {
-  const deps = await buildDeps();
+  const deps = buildDeps();
   const health = await dispatch(
     makeRequest('/v1/health', { method: 'GET', body: undefined, headers: {} }),
     deps,
