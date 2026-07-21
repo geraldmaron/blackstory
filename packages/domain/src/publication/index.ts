@@ -156,6 +156,13 @@ export function publicEntitySnapshotPath(releaseId: string, entityId: string): s
 }
 
 export { publicReleaseEntitiesListPath, publicReleaseSearchIndexPath } from './release-paths.js';
+export {
+  supabasePublicMediaUrl,
+  gcsPublicMediaUrl,
+  resolvePublicMediaUrl,
+  PUBLIC_MEDIA_DEFAULTS,
+} from './public-media-urls.js';
+export type { PublicMediaUrlOptions } from './public-media-urls.js';
 
 function manifestToJson(manifest: ReleaseManifest): JsonValue {
   return {
