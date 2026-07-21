@@ -37,9 +37,11 @@ export const BRAND_ASSETS = {
     light: '/brand/symbol-light.png',
     dark: '/brand/symbol-dark.png',
   },
+  // Opaque 1200×630 composites (no alpha). `v=` busts scraper caches when the
+  // asset is regenerated — iMessage / Slack keep stale previews otherwise.
   openGraph: {
-    light: '/brand/open-graph-light-1200x630.png',
-    dark: '/brand/open-graph-dark-1200x630.png',
+    light: '/brand/open-graph-light-1200x630.png?v=20260721',
+    dark: '/brand/open-graph-dark-1200x630.png?v=20260721',
   },
   favicon: {
     light: {

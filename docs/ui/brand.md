@@ -143,3 +143,15 @@ labeled as an exact address.
 Lowercase-kebab file names everywhere, including docs and asset packs —
 no uppercase file names in new work. Public brand filenames are **role-based**
 (`lockup-dark.png`), not product-prefixed.
+
+## Open Graph / social banners
+
+Served copies: `apps/web/public/brand/open-graph-*-1200x630.png` (and the
+docs twin). Masters: `brand/social/*/BlackStory-social-banner-*-1200x630.png`.
+
+These must be **opaque** 1200×630 RGB PNGs — solid Black Ink (`#0A0A0A`) or
+Archive Paper (`#F4EFE5`) canvas with the approved transparent lockup
+composited on top. Do not ship transparent OG assets or grain overlays;
+iMessage and other scrapers flatten alpha poorly and will show RGB noise as
+static. When regenerating, bump the `?v=` query on `BRAND_ASSETS.openGraph`
+(and the docs layout twin) so cached previews refresh.

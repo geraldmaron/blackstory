@@ -12,3 +12,5 @@ Included
 Notes
 - This package preserves the approved BlackStory book-and-pin direction and does not intentionally alter the selected mark.
 - Transparent production assets are in logos/ and symbols/.
+
+- Regenerate opaque social banners with: python3 brand/scripts/regenerate-open-graph.py (requires Pillow)

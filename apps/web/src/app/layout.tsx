@@ -11,12 +11,15 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { Sora, Inter, Source_Serif_4, IBM_Plex_Mono } from 'next/font/google';
+import { brandOpenGraph } from '@repo/config';
 import { THEME_BOOTSTRAP_SCRIPT } from '@repo/ui';
 import '@repo/ui/styles.css';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import '../lib/fontawesome';
 import { SiteShell } from '../components/SiteShell';
 import './shell.css';
+
+const openGraphImage = brandOpenGraph('dark');
 
 const displayFace = Sora({
   subsets: ['latin'],
@@ -96,7 +99,7 @@ export const metadata: Metadata = {
       'Place-connected Black history research with published claims, provenance, and confidence.',
     images: [
       {
-        url: '/brand/open-graph-dark-1200x630.png',
+        url: openGraphImage,
         width: 1200,
         height: 630,
         alt: 'BlackStory — History, pinned to place.',
@@ -108,7 +111,7 @@ export const metadata: Metadata = {
     title: 'BlackStory',
     description:
       'Place-connected Black history research with published claims, provenance, and confidence.',
-    images: ['/brand/open-graph-dark-1200x630.png'],
+    images: [openGraphImage],
   },
 };
 

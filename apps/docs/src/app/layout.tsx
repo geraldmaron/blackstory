@@ -67,7 +67,8 @@ export const metadata: Metadata = {
     images: [
       {
         // Relative to metadataBase (already includes /blackstory) — do not withBasePath.
-        url: '/brand/open-graph-dark-1200x630.png',
+        // `v=` busts scraper caches when the opaque OG asset is regenerated.
+        url: '/brand/open-graph-dark-1200x630.png?v=20260721',
         width: 1200,
         height: 630,
       },
