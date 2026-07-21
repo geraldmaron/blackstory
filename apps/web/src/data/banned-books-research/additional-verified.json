@@ -1,143 +1,79 @@
 [
   {
-    "title": "The Underground Railroad",
-    "slug": "the-underground-railroad",
-    "authors": [{ "name": "Colson Whitehead", "role": "author" }],
-    "isbn13": "9780345804327",
-    "publishedDate": "2016",
-    "description": "Whitehead’s Pulitzer-winning novel reimagines the Underground Railroad as an actual rail network while following Cora’s escape from a Georgia plantation. Conroe ISD and other Texas districts removed it from classroom instruction alongside other race-centered titles.",
+    "title": "Caste: The Origins of Our Discontents",
+    "slug": "caste",
+    "authors": [{ "name": "Isabel Wilkerson", "role": "author" }],
+    "isbn13": "9780593230251",
+    "publishedDate": "2020",
+    "description": "Wilkerson compares American, Indian, and Nazi-era caste systems to explain how inherited hierarchy shapes race, class, and power. School and library removals cite political discomfort with its analysis of systemic racism and historical violence.",
     "challenges": [
       {
         "state": "TX",
-        "jurisdictionLabel": "Conroe Independent School District",
+        "jurisdictionLabel": "Llano County public libraries",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "Supreme Court declines to rule in Texas book banning case",
+          "href": "https://www.fox26houston.com/news/scotus-wont-rule-texas-librarys-book-banning-case",
+          "publisher": "FOX 26 Houston",
+          "publishedAt": "2025-01"
+        }
+      },
+      {
+        "state": "TX",
+        "jurisdictionLabel": "North East Independent School District",
+        "schoolYear": "2021-2022",
+        "challengeYear": 2021,
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2021–2022",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        }
+      },
+      {
+        "state": "GA",
+        "jurisdictionLabel": "Cobb County School District",
         "schoolYear": "2023-2024",
+        "challengeYear": 2023,
         "status": "reported",
         "citation": {
-          "label": "Conroe ISD bans 19 books from classrooms",
-          "href": "https://www.houstonchronicle.com/neighborhood/conroe/article/conroe-isd-book-policy-ban-19520063.php",
-          "publisher": "Houston Chronicle"
+          "label": "PEN America Index of School Book Bans 2023–2024",
+          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
+          "publisher": "PEN America"
         }
       }
     ],
     "citations": [
       {
-        "label": "Conroe ISD bans 19 books from classrooms",
-        "href": "https://www.houstonchronicle.com/neighborhood/conroe/article/conroe-isd-book-policy-ban-19520063.php",
-        "publisher": "Houston Chronicle"
+        "label": "Pentagon's attempt to ban books from base schools faces backlash from military families",
+        "href": "https://www.pbs.org/newshour/show/pentagons-attempt-to-ban-books-from-base-schools-faces-backlash-from-military-families",
+        "publisher": "PBS NewsHour"
       },
       {
-        "label": "Conroe ISD Trustees Won't Restore Books",
-        "href": "https://www.houstonpress.com/news/conroe-isd-trustees-wont-restore-books-in-a-policy-one-calls-racist-18369680/",
-        "publisher": "Houston Press"
-      },
-      {
-        "label": "PEN America Book Bans hub",
-        "href": "https://pen.org/book-bans/",
-        "publisher": "PEN America"
-      }
-    ],
-    "provenance": {
-      "source": "Houston Chronicle",
-      "sourceUrl": "https://www.houstonchronicle.com/neighborhood/conroe/article/conroe-isd-book-policy-ban-19520063.php"
-    }
-  },
-  {
-    "title": "The Nickel Boys",
-    "slug": "the-nickel-boys",
-    "authors": [{ "name": "Colson Whitehead", "role": "author" }],
-    "isbn13": "9780385537070",
-    "publishedDate": "2019",
-    "description": "Whitehead’s novel draws on the real Dozier School for Boys to follow Elwood Curtis and Turner through a brutal Florida reform school. Wilson County, Tennessee, included it among hundreds of titles removed from school libraries in 2024.",
-    "challenges": [
-      {
-        "state": "TN",
-        "jurisdictionLabel": "Wilson County Schools",
-        "schoolYear": "2024-2025",
-        "challengeYear": 2024,
-        "status": "reported",
-        "citation": {
-          "label": "Tennessee school district bans 390 books from libraries",
-          "href": "https://nashvillebanner.com/2024/10/25/wilson-county-bans-390-books/",
-          "publisher": "Nashville Banner",
-          "publishedAt": "2024-10-25"
-        }
-      }
-    ],
-    "citations": [
-      {
-        "label": "Tennessee school district bans 390 books from libraries",
-        "href": "https://nashvillebanner.com/2024/10/25/wilson-county-bans-390-books/",
-        "publisher": "Nashville Banner",
-        "publishedAt": "2024-10-25"
-      },
-      {
-        "label": "Banned in the USA: Beyond the Shelves",
-        "href": "https://pen.org/report/beyond-the-shelves/",
+        "label": "Banned Books List: Activism and Social Movements",
+        "href": "https://pen.org/banned-books-list-activism-and-social-movements/",
         "publisher": "PEN America"
       },
       {
-        "label": "PEN America Book Bans hub",
-        "href": "https://pen.org/book-bans/",
-        "publisher": "PEN America"
-      }
-    ],
-    "provenance": {
-      "source": "Nashville Banner",
-      "sourceUrl": "https://nashvillebanner.com/2024/10/25/wilson-county-bans-390-books/"
-    }
-  },
-  {
-    "title": "Born a Crime",
-    "slug": "born-a-crime-stories-from-a-south-african-childhood",
-    "authors": [{ "name": "Trevor Noah", "role": "author" }],
-    "isbn13": "9780399588174",
-    "publishedDate": "2016",
-    "description": "Noah’s memoir recounts growing up mixed-race in apartheid and post-apartheid South Africa, where his birth violated racial classification laws. PEN America notes the title among banned works, and Wilson County, Tennessee, removed it from high school libraries.",
-    "challenges": [
-      {
-        "state": "TN",
-        "jurisdictionLabel": "Wilson County Schools",
-        "schoolYear": "2024-2025",
-        "challengeYear": 2024,
-        "status": "reported",
-        "citation": {
-          "label": "Tennessee school district bans 390 books from libraries",
-          "href": "https://nashvillebanner.com/2024/10/25/wilson-county-bans-390-books/",
-          "publisher": "Nashville Banner",
-          "publishedAt": "2024-10-25"
-        }
-      }
-    ],
-    "citations": [
-      {
-        "label": "Banned in the USA: Beyond the Shelves",
-        "href": "https://pen.org/report/beyond-the-shelves/",
-        "publisher": "PEN America"
-      },
-      {
-        "label": "Tennessee school district bans 390 books from libraries",
-        "href": "https://nashvillebanner.com/2024/10/25/wilson-county-bans-390-books/",
-        "publisher": "Nashville Banner",
-        "publishedAt": "2024-10-25"
-      },
-      {
-        "label": "PEN America Book Bans hub",
-        "href": "https://pen.org/book-bans/",
-        "publisher": "PEN America"
+        "label": "Supreme Court declines to rule in Texas book banning case",
+        "href": "https://www.fox26houston.com/news/scotus-wont-rule-texas-librarys-book-banning-case",
+        "publisher": "FOX 26 Houston"
       }
     ],
     "provenance": {
       "source": "PEN America",
-      "sourceUrl": "https://pen.org/report/beyond-the-shelves/"
+      "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
     }
   },
   {
-    "title": "Heavy",
-    "slug": "heavy-an-american-memoir",
+    "title": "Heavy: An American Memoir",
+    "slug": "heavy",
     "authors": [{ "name": "Kiese Laymon", "role": "author" }],
     "isbn13": "9781501125669",
     "publishedDate": "2018",
-    "description": "Laymon’s memoir addresses racism, body image, gambling, and his relationship with his mother in Mississippi. Wentzville, Missouri, school officials removed it from libraries alongside other works centered on Black life, prompting a federal class-action suit.",
+    "description": "Laymon’s memoir traces body, family, and survival in Jackson, Mississippi, confronting sexual violence, gambling, and the weight of Black life in the South. Wentzville, Missouri, removed it from school libraries in 2022, prompting an ACLU lawsuit.",
     "challenges": [
       {
         "state": "MO",
@@ -146,127 +82,507 @@
         "challengeYear": 2022,
         "status": "reported",
         "citation": {
-          "label": "Wentzville R-IV School District class action complaint",
-          "href": "https://www.aclu-mo.org/sites/default/files/field_documents/ck-w_v_wentzville_complaint.pdf",
-          "publisher": "ACLU of Missouri"
+          "label": "ACLU-MO sues Wentzville School District over book bans",
+          "href": "https://www.aclu-mo.org/app/uploads/2025/11/aclu-mo-sues-wentzville-school-district-2202-02-15.pdf",
+          "publisher": "ACLU of Missouri",
+          "publishedAt": "2022-02"
+        }
+      },
+      {
+        "state": "MO",
+        "jurisdictionLabel": "Wentzville R-IV School District",
+        "schoolYear": "2021-2022",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "Banned Books 2022 – Heavy: An American Memoir",
+          "href": "https://www.marshall.edu/library/bannedbooks/heavy-an-american-memoir/",
+          "publisher": "Marshall University Libraries"
         }
       }
     ],
     "citations": [
       {
-        "label": "Wentzville R-IV School District class action complaint",
-        "href": "https://www.aclu-mo.org/sites/default/files/field_documents/ck-w_v_wentzville_complaint.pdf",
+        "label": "ACLU-MO sues Wentzville School District over book bans",
+        "href": "https://www.aclu-mo.org/app/uploads/2025/11/aclu-mo-sues-wentzville-school-district-2202-02-15.pdf",
         "publisher": "ACLU of Missouri"
+      },
+      {
+        "label": "Heavy: An American Memoir – Banned Books Week",
+        "href": "https://researchguides.gonzaga.edu/BannedBooksWeek/HeavyAnAmericanMemoir",
+        "publisher": "Gonzaga University Libraries"
       },
       {
         "label": "PEN America Book Bans hub",
         "href": "https://pen.org/book-bans/",
         "publisher": "PEN America"
-      },
-      {
-        "label": "Read These Banned Books By Black Authors",
-        "href": "https://www.today.com/popculture/books/banned-books-black-authors-list-rcna193062",
-        "publisher": "TODAY",
-        "publishedAt": "2024-02"
       }
     ],
     "provenance": {
       "source": "ACLU of Missouri",
-      "sourceUrl": "https://www.aclu-mo.org/sites/default/files/field_documents/ck-w_v_wentzville_complaint.pdf"
+      "sourceUrl": "https://www.aclu-mo.org/app/uploads/2025/11/aclu-mo-sues-wentzville-school-district-2202-02-15.pdf"
     }
   },
   {
-    "title": "Caste",
-    "slug": "caste-the-origins-of-our-discontents",
-    "authors": [{ "name": "Isabel Wilkerson", "role": "author" }],
-    "isbn13": "9780593230251",
-    "publishedDate": "2020",
-    "description": "Wilkerson compares American racism to caste systems in India and Nazi Germany, arguing that hierarchy—not only individual prejudice—shapes U.S. life. News and advocacy reports document Texas school and library challenges to the book’s classroom use.",
+    "title": "The Nickel Boys",
+    "slug": "the-nickel-boys",
+    "authors": [{ "name": "Colson Whitehead", "role": "author" }],
+    "isbn13": "9780385537077",
+    "publishedDate": "2019",
+    "description": "Whitehead’s Pulitzer-winning novel follows two Black teens sent to a brutal Florida reform school modeled on the Dozier School. Wilson County, Tennessee, removed it in 2024 among hundreds of titles restricted under the state’s age-appropriate materials law.",
     "challenges": [
       {
-        "state": "TX",
+        "state": "TN",
+        "jurisdictionLabel": "Wilson County Schools",
+        "schoolYear": "2024-2025",
+        "challengeYear": 2024,
         "status": "reported",
         "citation": {
-          "label": "Read These Banned Books By Black Authors",
-          "href": "https://www.today.com/popculture/books/banned-books-black-authors-list-rcna193062",
-          "publisher": "TODAY",
-          "publishedAt": "2024-02"
+          "label": "Tennessee school district bans 390 books from libraries",
+          "href": "https://nashvillebanner.com/2024/10/25/wilson-county-bans-390-books/",
+          "publisher": "Nashville Banner",
+          "publishedAt": "2024-10-25"
+        }
+      },
+      {
+        "state": "VA",
+        "jurisdictionLabel": "King George County Schools",
+        "schoolYear": "2024-2025",
+        "challengeYear": 2024,
+        "status": "reported",
+        "citation": {
+          "label": "The Nickel Boys – Banned Books",
+          "href": "https://www.banned-books.org/books/the-nickel-boys",
+          "publisher": "Banned Books"
+        }
+      },
+      {
+        "state": "TN",
+        "jurisdictionLabel": "Department of Defense Education Activity schools",
+        "schoolYear": "2024-2025",
+        "challengeYear": 2024,
+        "status": "reported",
+        "citation": {
+          "label": "13 “Woke” Books Banned in DOD Schools",
+          "href": "https://www.aclu.org/news/free-speech/13-woke-books-banned-in-dod-schools",
+          "publisher": "American Civil Liberties Union"
         }
       }
     ],
     "citations": [
       {
-        "label": "Read These Banned Books By Black Authors",
-        "href": "https://www.today.com/popculture/books/banned-books-black-authors-list-rcna193062",
-        "publisher": "TODAY",
-        "publishedAt": "2024-02"
+        "label": "Tennessee school district bans 390 books from libraries",
+        "href": "https://nashvillebanner.com/2024/10/25/wilson-county-bans-390-books/",
+        "publisher": "Nashville Banner",
+        "publishedAt": "2024-10-25"
       },
       {
-        "label": "PEN America Book Bans hub",
-        "href": "https://pen.org/book-bans/",
-        "publisher": "PEN America"
+        "label": "School District Pulls 425 Books From Its Libraries In Response To Tennessee’s Shitty Book Ban Law",
+        "href": "https://www.techdirt.com/2024/11/05/school-district-pulls-425-books-from-its-libraries-in-response-to-tennessees-shitty-book-ban-law/",
+        "publisher": "Techdirt",
+        "publishedAt": "2024-11-05"
       },
       {
-        "label": "The Bills Igniting Book Bans",
-        "href": "https://pen.org/report/the-bills-igniting-book-bans/",
-        "publisher": "PEN America"
+        "label": "13 “Woke” Books Banned in DOD Schools",
+        "href": "https://www.aclu.org/news/free-speech/13-woke-books-banned-in-dod-schools",
+        "publisher": "American Civil Liberties Union"
       }
     ],
     "provenance": {
-      "source": "TODAY",
-      "sourceUrl": "https://www.today.com/popculture/books/banned-books-black-authors-list-rcna193062"
+      "source": "Nashville Banner",
+      "sourceUrl": "https://nashvillebanner.com/2024/10/25/wilson-county-bans-390-books/"
     }
   },
   {
-    "title": "Hood Feminism",
-    "slug": "hood-feminism-notes-from-the-women-that-a-movement-forgot",
-    "authors": [{ "name": "Mikki Kendall", "role": "author" }],
-    "isbn13": "9781635572957",
-    "publishedDate": "2020",
-    "description": "Kendall’s essay collection argues mainstream feminism has failed poor women and women of color on issues from hunger to violence. ALA-tracked challenge reporting documents removals in Florida and Texas tied to race and gender content.",
+    "title": "Narrative of the Life of Frederick Douglass, an American Slave",
+    "slug": "narrative-of-the-life-of-frederick-douglass",
+    "authors": [{ "name": "Frederick Douglass", "role": "author" }],
+    "isbn13": "9780486284996",
+    "publishedDate": "1845",
+    "description": "Douglass’s first autobiography recounts enslavement, literacy, resistance, and escape in antebellum Maryland. Edmond, Oklahoma, struck it from anchor-text curricula after House Bill 1775, and an ACLU lawsuit cites the removal as race-related censorship.",
     "challenges": [
+      {
+        "state": "OK",
+        "jurisdictionLabel": "Edmond Public Schools",
+        "schoolYear": "2021-2022",
+        "challengeYear": 2021,
+        "status": "reported",
+        "citation": {
+          "label": "Lawsuit alleges book banning related to new Oklahoma law",
+          "href": "https://kfor.com/news/local/lawsuit-alleges-book-banning-related-to-new-oklahoma-law/",
+          "publisher": "KFOR",
+          "publishedAt": "2021-10"
+        }
+      },
+      {
+        "state": "OK",
+        "jurisdictionLabel": "Edmond Public Schools",
+        "schoolYear": "2021-2022",
+        "challengeYear": 2021,
+        "status": "reported",
+        "citation": {
+          "label": "Fearful of new laws, many teachers deterred from covering race-related topics",
+          "href": "https://www.pbs.org/newshour/education/fearful-of-new-laws-many-teachers-deterred-from-covering-race-related-topics",
+          "publisher": "PBS NewsHour",
+          "publishedAt": "2021-12-15"
+        }
+      },
+      {
+        "state": "OK",
+        "jurisdictionLabel": "Edmond School District",
+        "schoolYear": "2021-2022",
+        "challengeYear": 2021,
+        "status": "reported",
+        "citation": {
+          "label": "October's book bundle: Banned Books",
+          "href": "http://www.freebirdbooks.com/home/octobers-book-bundle-banned-books",
+          "publisher": "NYC Books Through Bars"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Lawsuit alleges book banning related to new Oklahoma law",
+        "href": "https://kfor.com/news/local/lawsuit-alleges-book-banning-related-to-new-oklahoma-law/",
+        "publisher": "KFOR"
+      },
+      {
+        "label": "Fearful of new laws, many teachers deterred from covering race-related topics",
+        "href": "https://www.pbs.org/newshour/education/fearful-of-new-laws-many-teachers-deterred-from-covering-race-related-topics",
+        "publisher": "PBS NewsHour"
+      },
+      {
+        "label": "Narrative of the Life of Frederick Douglass – Banned Books",
+        "href": "https://www.banned-books.org/books/narrative-of-the-life-of-frederick-douglass",
+        "publisher": "Banned Books"
+      }
+    ],
+    "provenance": {
+      "source": "KFOR",
+      "sourceUrl": "https://kfor.com/news/local/lawsuit-alleges-book-banning-related-to-new-oklahoma-law/"
+    }
+  },
+  {
+    "title": "Hood Feminism: Notes from the Women That a Movement Forgot",
+    "slug": "hood-feminism",
+    "authors": [{ "name": "Mikki Kendall", "role": "author" }],
+    "isbn13": "9780525560544",
+    "publishedDate": "2020",
+    "description": "Kendall’s essays argue mainstream feminism too often ignores hunger, violence, policing, and basic survival for Black and working-class women. Texas Representative Matt Krause named it among roughly 850 titles he asked districts to report in 2021.",
+    "challenges": [
+      {
+        "state": "TX",
+        "jurisdictionLabel": "Statewide inquiry to school districts",
+        "schoolYear": "2021-2022",
+        "challengeYear": 2021,
+        "status": "reported",
+        "citation": {
+          "label": "Texas lawmaker Matt Krause targets 850 books he says could make students uneasy",
+          "href": "https://www.npr.org/2021/10/28/1050013664/texas-lawmaker-matt-krause-launches-inquiry-into-850-books",
+          "publisher": "NPR",
+          "publishedAt": "2021-10-28"
+        }
+      },
+      {
+        "state": "TX",
+        "jurisdictionLabel": "Statewide inquiry to school districts",
+        "schoolYear": "2021-2022",
+        "challengeYear": 2021,
+        "status": "reported",
+        "citation": {
+          "label": "Black Authors Are Being Pulled From School Libraries Over Critical Race Theory Fears",
+          "href": "https://www.newsweek.com/black-authors-are-being-pulled-school-libraries-over-critical-race-theory-fears-1669403",
+          "publisher": "Newsweek",
+          "publishedAt": "2021-11-12"
+        }
+      },
       {
         "state": "FL",
+        "jurisdictionLabel": "Florida school district",
+        "schoolYear": "2023-2024",
+        "challengeYear": 2023,
         "status": "reported",
         "citation": {
-          "label": "Read These Banned Books By Black Authors",
-          "href": "https://www.today.com/popculture/books/banned-books-black-authors-list-rcna193062",
-          "publisher": "TODAY",
-          "publishedAt": "2024-02"
-        }
-      },
-      {
-        "state": "TX",
-        "status": "reported",
-        "citation": {
-          "label": "Read These Banned Books By Black Authors",
-          "href": "https://www.today.com/popculture/books/banned-books-black-authors-list-rcna193062",
-          "publisher": "TODAY",
-          "publishedAt": "2024-02"
+          "label": "ALA/NBC Banned Book Club to Discuss Hood Feminism",
+          "href": "https://ilovelibraries.org/article/ala-nbc-banned-book-club-to-discuss-hood-feminism/",
+          "publisher": "I Love Libraries",
+          "publishedAt": "2024-03"
         }
       }
     ],
     "citations": [
       {
-        "label": "Read These Banned Books By Black Authors",
-        "href": "https://www.today.com/popculture/books/banned-books-black-authors-list-rcna193062",
-        "publisher": "TODAY",
-        "publishedAt": "2024-02"
+        "label": "Texas lawmaker Matt Krause targets 850 books he says could make students uneasy",
+        "href": "https://www.npr.org/2021/10/28/1050013664/texas-lawmaker-matt-krause-launches-inquiry-into-850-books",
+        "publisher": "NPR",
+        "publishedAt": "2021-10-28"
       },
       {
-        "label": "Most Challenged Books | Banned Books",
-        "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/top10",
-        "publisher": "American Library Association"
+        "label": "Black Authors Are Being Pulled From School Libraries Over Critical Race Theory Fears",
+        "href": "https://www.newsweek.com/black-authors-are-being-pulled-school-libraries-over-critical-race-theory-fears-1669403",
+        "publisher": "Newsweek"
       },
       {
-        "label": "PEN America Book Bans hub",
-        "href": "https://pen.org/book-bans/",
-        "publisher": "PEN America"
+        "label": "ALA/NBC Banned Book Club to Discuss Hood Feminism",
+        "href": "https://ilovelibraries.org/article/ala-nbc-banned-book-club-to-discuss-hood-feminism/",
+        "publisher": "I Love Libraries"
       }
     ],
     "provenance": {
-      "source": "TODAY",
-      "sourceUrl": "https://www.today.com/popculture/books/banned-books-black-authors-list-rcna193062"
+      "source": "NPR",
+      "sourceUrl": "https://www.npr.org/2021/10/28/1050013664/texas-lawmaker-matt-krause-launches-inquiry-into-850-books"
+    }
+  },
+  {
+    "title": "So You Want to Talk About Race",
+    "slug": "so-you-want-to-talk-about-race",
+    "authors": [{ "name": "Ijeoma Oluo", "role": "author" }],
+    "isbn13": "9781580056779",
+    "publishedDate": "2018",
+    "description": "Oluo’s guide walks readers through privilege, police violence, intersectionality, and everyday conversations about racism. Central York, Pennsylvania, barred it from classroom use in 2021 along with other antiracist resources before student protests led to reinstatement.",
+    "challenges": [
+      {
+        "state": "PA",
+        "jurisdictionLabel": "Central York School District",
+        "schoolYear": "2021-2022",
+        "challengeYear": 2021,
+        "status": "rescinded",
+        "citation": {
+          "label": "Student Action Results in Decision by School Board to “Unfreeze” Anti-Racist Resources in Central York, PA",
+          "href": "https://www.oif.ala.org/student-action-results-in-decision-by-school-board-to-unfreeze-anti-racist-resources-in-central-york-pa/",
+          "publisher": "ALA Office for Intellectual Freedom",
+          "publishedAt": "2021-09"
+        }
+      },
+      {
+        "state": "PA",
+        "jurisdictionLabel": "Central York School District",
+        "schoolYear": "2021-2022",
+        "challengeYear": 2021,
+        "status": "reported",
+        "citation": {
+          "label": "Pennsylvania school district reverses ban on books by authors of colour",
+          "href": "https://www.theguardian.com/books/2021/sep/22/pennsylvania-school-district-reverses-ban-on-books-by-authors-of-colour",
+          "publisher": "The Guardian",
+          "publishedAt": "2021-09-22"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Student Action Results in Decision by School Board to “Unfreeze” Anti-Racist Resources in Central York, PA",
+        "href": "https://www.oif.ala.org/student-action-results-in-decision-by-school-board-to-unfreeze-anti-racist-resources-in-central-york-pa/",
+        "publisher": "ALA Office for Intellectual Freedom"
+      },
+      {
+        "label": "Pennsylvania school district reverses ban on books by authors of color after backlash from students",
+        "href": "https://www.seattletimes.com/nation-world/pennsylvania-school-district-reverses-ban-on-books-by-authors-of-color-after-backlash-from-students/",
+        "publisher": "The Seattle Times",
+        "publishedAt": "2021-09-21"
+      },
+      {
+        "label": "School District Maintains Ban of Antiracist Books Despite Student Protests",
+        "href": "https://bookriot.com/central-york-book-ban-update/",
+        "publisher": "Book Riot",
+        "publishedAt": "2021-09"
+      }
+    ],
+    "provenance": {
+      "source": "ALA Office for Intellectual Freedom",
+      "sourceUrl": "https://www.oif.ala.org/student-action-results-in-decision-by-school-board-to-unfreeze-anti-racist-resources-in-central-york-pa/"
+    }
+  },
+  {
+    "title": "An African American and Latinx History of the United States",
+    "slug": "an-african-american-and-latinx-history-of-the-united-states",
+    "authors": [{ "name": "Paul Ortiz", "role": "author" }],
+    "isbn13": "9780807013106",
+    "publishedDate": "2018",
+    "description": "Ortiz’s bottom-up history links Black and Latinx labor, migration, and resistance from Reconstruction through the twenty-first century. Central York, Pennsylvania, and Texas districts removed or restricted it during 2020–2021 antiracist curriculum fights.",
+    "challenges": [
+      {
+        "state": "PA",
+        "jurisdictionLabel": "Central York School District",
+        "schoolYear": "2020-2021",
+        "challengeYear": 2020,
+        "status": "rescinded",
+        "citation": {
+          "label": "Banned Books By Hispanic Authors – McLennan Community College",
+          "href": "https://mclennan.libguides.com/hhm2024/banned",
+          "publisher": "McLennan Community College Libraries"
+        }
+      },
+      {
+        "state": "TX",
+        "jurisdictionLabel": "North East Independent School District",
+        "schoolYear": "2021-2022",
+        "challengeYear": 2021,
+        "status": "reported",
+        "citation": {
+          "label": "An African American and Latinx History of the United States – Banned Books",
+          "href": "https://www.banned-books.org/books/an-african-american-and-latinx-history-of-the-united-states",
+          "publisher": "Banned Books"
+        }
+      },
+      {
+        "state": "TX",
+        "jurisdictionLabel": "Klein Independent School District",
+        "schoolYear": "2021-2022",
+        "challengeYear": 2021,
+        "status": "reported",
+        "citation": {
+          "label": "Texas lawmaker Matt Krause targets 850 books he says could make students uneasy",
+          "href": "https://www.npr.org/2021/10/28/1050013664/texas-lawmaker-matt-krause-launches-inquiry-into-850-books",
+          "publisher": "NPR",
+          "publishedAt": "2021-10-28"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Texas lawmaker Matt Krause targets 850 books he says could make students uneasy",
+        "href": "https://www.npr.org/2021/10/28/1050013664/texas-lawmaker-matt-krause-launches-inquiry-into-850-books",
+        "publisher": "NPR",
+        "publishedAt": "2021-10-28"
+      },
+      {
+        "label": "An African American and Latinx History of the United States – Banned Books",
+        "href": "https://www.banned-books.org/books/an-african-american-and-latinx-history-of-the-united-states",
+        "publisher": "Banned Books"
+      },
+      {
+        "label": "Banned Books By Hispanic Authors – McLennan Community College",
+        "href": "https://mclennan.libguides.com/hhm2024/banned",
+        "publisher": "McLennan Community College Libraries"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America",
+      "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/"
+    }
+  },
+  {
+    "title": "White Rage: The Unspoken Truth of Our Racial Divide",
+    "slug": "white-rage",
+    "authors": [{ "name": "Carol Anderson", "role": "author" }],
+    "isbn13": "9781632864130",
+    "publishedDate": "2016",
+    "description": "Anderson argues that policy backlash—not only individual prejudice—has repeatedly blocked Black political and economic progress from Reconstruction forward. PEN America records classroom bans, including Central York, Pennsylvania, in 2021.",
+    "challenges": [
+      {
+        "state": "PA",
+        "jurisdictionLabel": "Central York School District",
+        "schoolYear": "2021-2022",
+        "challengeYear": 2021,
+        "status": "reported",
+        "citation": {
+          "label": "PEN America's Index of School Book Bans",
+          "href": "https://docs.house.gov/meetings/GO/GO02/20220407/114616/HHRG-117-GO02-20220407-SD018.pdf",
+          "publisher": "PEN America",
+          "publishedAt": "2022-04"
+        }
+      },
+      {
+        "state": "PA",
+        "jurisdictionLabel": "Central York School District",
+        "schoolYear": "2021-2022",
+        "challengeYear": 2021,
+        "status": "rescinded",
+        "citation": {
+          "label": "Pennsylvania school district reverses ban on books by authors of colour",
+          "href": "https://www.theguardian.com/books/2021/sep/22/pennsylvania-school-district-reverses-ban-on-books-by-authors-of-colour",
+          "publisher": "The Guardian",
+          "publishedAt": "2021-09-22"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "PEN America's Index of School Book Bans",
+        "href": "https://docs.house.gov/meetings/GO/GO02/20220407/114616/HHRG-117-GO02-20220407-SD018.pdf",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "White Rage: The Unspoken Truth of Our Racial Divide – Banned Books",
+        "href": "https://www.banned-books.org/books/white-rage-the-unspoken-truth-of-our-racial-divide",
+        "publisher": "Banned Books"
+      },
+      {
+        "label": "Banned books by Carol Anderson — censorship history",
+        "href": "https://www.banned-books.org/authors/carol-anderson",
+        "publisher": "Banned Books"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America",
+      "sourceUrl": "https://docs.house.gov/meetings/GO/GO02/20220407/114616/HHRG-117-GO02-20220407-SD018.pdf"
+    }
+  },
+  {
+    "title": "Stamped from the Beginning: The Definitive History of Racist Ideas in America",
+    "slug": "stamped-from-the-beginning",
+    "authors": [{ "name": "Ibram X. Kendi", "role": "author" }],
+    "isbn13": "9781568584638",
+    "publishedDate": "2016",
+    "description": "Kendi’s National Book Award-winning history traces how racist ideas were built and spread through five American intellectual lives. It is distinct from the YA adaptation Stamped and appears on PEN America ban lists in Florida, Pennsylvania, and Texas.",
+    "challenges": [
+      {
+        "state": "TX",
+        "jurisdictionLabel": "Klein Independent School District",
+        "schoolYear": "2023-2024",
+        "challengeYear": 2023,
+        "status": "reported",
+        "citation": {
+          "label": "Stamped from the beginning Banned in Klein Independent School District, TX",
+          "href": "https://bannedindex.org/bans/33150",
+          "publisher": "Banned Index"
+        }
+      },
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Escambia County Public Schools",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "Stamped from the Beginning – Banned Books Week",
+          "href": "https://researchguides.gonzaga.edu/BannedBooksWeek/StampedFromTheBeginning",
+          "publisher": "Gonzaga University Libraries"
+        }
+      },
+      {
+        "state": "PA",
+        "jurisdictionLabel": "Central York School District",
+        "schoolYear": "2021-2022",
+        "challengeYear": 2021,
+        "status": "reported",
+        "citation": {
+          "label": "Stamped from the Beginning: The Definitive History of Racist Ideas in America – Banned Books",
+          "href": "https://www.banned-books.org/books/stamped-from-the-beginning-the-definitive-history-of-racist-ideas-in-america",
+          "publisher": "Banned Books"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Stamped from the Beginning – Banned Books Week",
+        "href": "https://researchguides.gonzaga.edu/BannedBooksWeek/StampedFromTheBeginning",
+        "publisher": "Gonzaga University Libraries"
+      },
+      {
+        "label": "Stamped from the beginning Banned in Klein Independent School District, TX",
+        "href": "https://bannedindex.org/bans/33150",
+        "publisher": "Banned Index"
+      },
+      {
+        "label": "Stamped from the Beginning: The Definitive History of Racist Ideas in America – Banned Books",
+        "href": "https://www.banned-books.org/books/stamped-from-the-beginning-the-definitive-history-of-racist-ideas-in-america",
+        "publisher": "Banned Books"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America",
+      "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
     }
   },
   {
@@ -275,40 +591,105 @@
     "authors": [{ "name": "Jesmyn Ward", "role": "author" }],
     "isbn13": "9781608196265",
     "publishedDate": "2011",
-    "description": "Ward’s National Book Award winner follows a working-class Black family in Mississippi preparing for Hurricane Katrina. Conroe ISD removed it from classroom instruction under a policy trustees later described as disproportionately affecting race-centered texts.",
+    "description": "Ward’s National Book Award novel follows a pregnant teenage girl and her siblings in coastal Mississippi as Hurricane Katrina approaches. Orange County, Florida, removed it from classroom collections in 2023 under HB 1069 sexual-content rules.",
     "challenges": [
       {
-        "state": "TX",
-        "jurisdictionLabel": "Conroe Independent School District",
+        "state": "FL",
+        "jurisdictionLabel": "Orange County Public Schools",
         "schoolYear": "2023-2024",
+        "challengeYear": 2023,
         "status": "reported",
         "citation": {
-          "label": "Conroe ISD Trustees Won't Restore Books",
-          "href": "https://www.houstonpress.com/news/conroe-isd-trustees-wont-restore-books-in-a-policy-one-calls-racist-18369680/",
-          "publisher": "Houston Press"
+          "label": "Nearly 700 books, including celebrity bestsellers, banned in Orange County, Florida",
+          "href": "https://pen.org/books-banned-orange-county-florida/",
+          "publisher": "PEN America",
+          "publishedAt": "2023-08"
         }
       }
     ],
     "citations": [
       {
-        "label": "Conroe ISD bans 19 books from classrooms",
-        "href": "https://www.houstonchronicle.com/neighborhood/conroe/article/conroe-isd-book-policy-ban-19520063.php",
-        "publisher": "Houston Chronicle"
-      },
-      {
-        "label": "Conroe ISD Trustees Won't Restore Books",
-        "href": "https://www.houstonpress.com/news/conroe-isd-trustees-wont-restore-books-in-a-policy-one-calls-racist-18369680/",
-        "publisher": "Houston Press"
-      },
-      {
-        "label": "PEN America Book Bans hub",
-        "href": "https://pen.org/book-bans/",
+        "label": "Nearly 700 books, including celebrity bestsellers, banned in Orange County, Florida",
+        "href": "https://pen.org/books-banned-orange-county-florida/",
         "publisher": "PEN America"
+      },
+      {
+        "label": "PEN America Index of School Book Bans 2023–2024",
+        "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
+        "publisher": "PEN America"
+      },
+      {
+        "label": "School book bans show no signs of slowing, PEN America finds",
+        "href": "https://www.npr.org/2023/09/21/1200725104/book-bans-school-pen-america",
+        "publisher": "NPR",
+        "publishedAt": "2023-09-21"
       }
     ],
     "provenance": {
-      "source": "Houston Press",
-      "sourceUrl": "https://www.houstonpress.com/news/conroe-isd-trustees-wont-restore-books-in-a-policy-one-calls-racist-18369680/"
+      "source": "PEN America",
+      "sourceUrl": "https://pen.org/books-banned-orange-county-florida/"
+    }
+  },
+  {
+    "title": "Critical Race Theory: An Introduction",
+    "slug": "critical-race-theory-an-introduction",
+    "authors": [
+      { "name": "Richard Delgado", "role": "author" },
+      { "name": "Jean Stefancic", "role": "contributor" }
+    ],
+    "isbn13": "9781479802760",
+    "publishedDate": "2017",
+    "description": "Delgado and Stefancic’s primer explains critical race theory’s origins, methods, and critiques of colorblind law. Tucson Unified School District removed it from Mexican American Studies classes in 2012 after Arizona banned ethnically divisive curriculum.",
+    "challenges": [
+      {
+        "state": "AZ",
+        "jurisdictionLabel": "Tucson Unified School District",
+        "schoolYear": "2011-2012",
+        "challengeYear": 2012,
+        "status": "reported",
+        "citation": {
+          "label": "Reflections on NYU Press book banned in Arizona",
+          "href": "https://nyupress.org/blog/2012/10/10/reflections-on-nyu-press-book-banned-in-arizona/",
+          "publisher": "NYU Press",
+          "publishedAt": "2012-10-10"
+        }
+      },
+      {
+        "state": "AZ",
+        "jurisdictionLabel": "Tucson Unified School District",
+        "schoolYear": "2011-2012",
+        "challengeYear": 2012,
+        "status": "reported",
+        "citation": {
+          "label": "Book Banning in Arizona",
+          "href": "https://academeblog.org/2012/01/24/book-banning-in-arizona/",
+          "publisher": "Academe Blog",
+          "publishedAt": "2012-01-24"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Reflections on NYU Press book banned in Arizona",
+        "href": "https://nyupress.org/blog/2012/10/10/reflections-on-nyu-press-book-banned-in-arizona/",
+        "publisher": "NYU Press",
+        "publishedAt": "2012-10-10"
+      },
+      {
+        "label": "Making the banned book list: Richard Delgado and Jean Stefancic",
+        "href": "https://www.fromthesquare.org/making-the-banned-book-list-richard-delgado-and-jean-stefancic/",
+        "publisher": "From the Square",
+        "publishedAt": "2012-02"
+      },
+      {
+        "label": "Book Banning in Arizona",
+        "href": "https://academeblog.org/2012/01/24/book-banning-in-arizona/",
+        "publisher": "Academe Blog"
+      }
+    ],
+    "provenance": {
+      "source": "NYU Press",
+      "sourceUrl": "https://nyupress.org/blog/2012/10/10/reflections-on-nyu-press-book-banned-in-arizona/"
     }
   }
 ]

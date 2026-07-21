@@ -12,7 +12,7 @@ import {
 } from '@repo/domain';
 import { BOOKSHOP_AFFILIATE_ID } from '@repo/config/identity';
 
-export const BANNED_BOOKS_SEED_VERSION = '2026-07-21.2';
+export const BANNED_BOOKS_SEED_VERSION = '2026-07-21.3';
 
 function seedPurchaseLinks(isbn13: string) {
   return buildIsbnPurchaseLinks(isbn13, { bookshopAffiliateId: BOOKSHOP_AFFILIATE_ID });
@@ -783,6 +783,90 @@ const RAW_BOOKS: BannedBookRecord[] = [
     citations: [PEN_INDEX_2023, PEN_BOOK_BANS, NPR_ALA_2024],
     purchaseLinks: seedPurchaseLinks('9780062422641'),
     provenance: provenance("PEN America", "https://pen.org/book-bans/2023-banned-book-list/", 'bb-book-mondays-not-coming', "Monday's Not Coming"),
+  },
+  {
+    id: 'bb-book-narrative-of-the-life-of-frederick-douglass',
+    slug: 'narrative-of-the-life-of-frederick-douglass',
+    title: "Narrative of the Life of Frederick Douglass, an American Slave",
+    authors: [{ name: "Frederick Douglass", role: 'author' }],
+    identifiers: [{ system: 'isbn-13', value: '9780486284996' }],
+    description:
+      "Douglass’s first autobiography recounts enslavement, literacy, resistance, and escape in antebellum Maryland. Edmond, Oklahoma, struck it from anchor-text curricula after House Bill 1775, and an ACLU lawsuit cites the removal as race-related censorship.",
+    publishedDate: '1845',
+    challenges: [{ state: 'OK', jurisdictionLabel: "Edmond Public Schools", schoolYear: "2021-2022", challengeYear: 2021, status: 'reported', citation: { label: "Lawsuit alleges book banning related to new Oklahoma law", href: "https://kfor.com/news/local/lawsuit-alleges-book-banning-related-to-new-oklahoma-law/", publisher: "KFOR", publishedAt: "2021-10" } }, { state: 'OK', jurisdictionLabel: "Edmond Public Schools", schoolYear: "2021-2022", challengeYear: 2021, status: 'reported', citation: { label: "Fearful of new laws, many teachers deterred from covering race-related topics", href: "https://www.pbs.org/newshour/education/fearful-of-new-laws-many-teachers-deterred-from-covering-race-related-topics", publisher: "PBS NewsHour", publishedAt: "2021-12-15" } }, { state: 'OK', jurisdictionLabel: "Edmond School District", schoolYear: "2021-2022", challengeYear: 2021, status: 'reported', citation: { label: "October's book bundle: Banned Books", href: "http://www.freebirdbooks.com/home/octobers-book-bundle-banned-books", publisher: "NYC Books Through Bars" } }],
+    citations: [{ label: "Lawsuit alleges book banning related to new Oklahoma law", href: "https://kfor.com/news/local/lawsuit-alleges-book-banning-related-to-new-oklahoma-law/", publisher: "KFOR" }, { label: "Fearful of new laws, many teachers deterred from covering race-related topics", href: "https://www.pbs.org/newshour/education/fearful-of-new-laws-many-teachers-deterred-from-covering-race-related-topics", publisher: "PBS NewsHour" }, { label: "Narrative of the Life of Frederick Douglass – Banned Books", href: "https://www.banned-books.org/books/narrative-of-the-life-of-frederick-douglass", publisher: "Banned Books" }],
+    purchaseLinks: seedPurchaseLinks('9780486284996'),
+    provenance: provenance("KFOR", "https://kfor.com/news/local/lawsuit-alleges-book-banning-related-to-new-oklahoma-law/", 'bb-book-narrative-of-the-life-of-frederick-douglass', "Narrative of the Life of Frederick Douglass, an American Slave"),
+  },
+  {
+    id: 'bb-book-so-you-want-to-talk-about-race',
+    slug: 'so-you-want-to-talk-about-race',
+    title: "So You Want to Talk About Race",
+    authors: [{ name: "Ijeoma Oluo", role: 'author' }],
+    identifiers: [{ system: 'isbn-13', value: '9781580056779' }],
+    description:
+      "Oluo’s guide walks readers through privilege, police violence, intersectionality, and everyday conversations about racism. Central York, Pennsylvania, barred it from classroom use in 2021 along with other antiracist resources before student protests led to reinstatement.",
+    publishedDate: '2018',
+    challenges: [{ state: 'PA', jurisdictionLabel: "Central York School District", schoolYear: "2021-2022", challengeYear: 2021, status: 'rescinded', citation: { label: "Student Action Results in Decision by School Board to “Unfreeze” Anti-Racist Resources in Central York, PA", href: "https://www.oif.ala.org/student-action-results-in-decision-by-school-board-to-unfreeze-anti-racist-resources-in-central-york-pa/", publisher: "ALA Office for Intellectual Freedom", publishedAt: "2021-09" } }, { state: 'PA', jurisdictionLabel: "Central York School District", schoolYear: "2021-2022", challengeYear: 2021, status: 'reported', citation: { label: "Pennsylvania school district reverses ban on books by authors of colour", href: "https://www.theguardian.com/books/2021/sep/22/pennsylvania-school-district-reverses-ban-on-books-by-authors-of-colour", publisher: "The Guardian", publishedAt: "2021-09-22" } }],
+    citations: [{ label: "Student Action Results in Decision by School Board to “Unfreeze” Anti-Racist Resources in Central York, PA", href: "https://www.oif.ala.org/student-action-results-in-decision-by-school-board-to-unfreeze-anti-racist-resources-in-central-york-pa/", publisher: "ALA Office for Intellectual Freedom" }, { label: "Pennsylvania school district reverses ban on books by authors of color after backlash from students", href: "https://www.seattletimes.com/nation-world/pennsylvania-school-district-reverses-ban-on-books-by-authors-of-color-after-backlash-from-students/", publisher: "The Seattle Times", publishedAt: "2021-09-21" }, { label: "School District Maintains Ban of Antiracist Books Despite Student Protests", href: "https://bookriot.com/central-york-book-ban-update/", publisher: "Book Riot", publishedAt: "2021-09" }],
+    purchaseLinks: seedPurchaseLinks('9781580056779'),
+    provenance: provenance("ALA Office for Intellectual Freedom", "https://www.oif.ala.org/student-action-results-in-decision-by-school-board-to-unfreeze-anti-racist-resources-in-central-york-pa/", 'bb-book-so-you-want-to-talk-about-race', "So You Want to Talk About Race"),
+  },
+  {
+    id: 'bb-book-an-african-american-and-latinx-history-of-the',
+    slug: 'an-african-american-and-latinx-history-of-the-united-states',
+    title: "An African American and Latinx History of the United States",
+    authors: [{ name: "Paul Ortiz", role: 'author' }],
+    identifiers: [{ system: 'isbn-13', value: '9780807013106' }],
+    description:
+      "Ortiz’s bottom-up history links Black and Latinx labor, migration, and resistance from Reconstruction through the twenty-first century. Central York, Pennsylvania, and Texas districts removed or restricted it during 2020–2021 antiracist curriculum fights.",
+    publishedDate: '2018',
+    challenges: [{ state: 'PA', jurisdictionLabel: "Central York School District", schoolYear: "2020-2021", challengeYear: 2020, status: 'rescinded', citation: { label: "Banned Books By Hispanic Authors – McLennan Community College", href: "https://mclennan.libguides.com/hhm2024/banned", publisher: "McLennan Community College Libraries" } }, { state: 'TX', jurisdictionLabel: "North East Independent School District", schoolYear: "2021-2022", challengeYear: 2021, status: 'reported', citation: { label: "An African American and Latinx History of the United States – Banned Books", href: "https://www.banned-books.org/books/an-african-american-and-latinx-history-of-the-united-states", publisher: "Banned Books" } }, { state: 'TX', jurisdictionLabel: "Klein Independent School District", schoolYear: "2021-2022", challengeYear: 2021, status: 'reported', citation: { label: "Texas lawmaker Matt Krause targets 850 books he says could make students uneasy", href: "https://www.npr.org/2021/10/28/1050013664/texas-lawmaker-matt-krause-launches-inquiry-into-850-books", publisher: "NPR", publishedAt: "2021-10-28" } }],
+    citations: [{ label: "Texas lawmaker Matt Krause targets 850 books he says could make students uneasy", href: "https://www.npr.org/2021/10/28/1050013664/texas-lawmaker-matt-krause-launches-inquiry-into-850-books", publisher: "NPR", publishedAt: "2021-10-28" }, { label: "An African American and Latinx History of the United States – Banned Books", href: "https://www.banned-books.org/books/an-african-american-and-latinx-history-of-the-united-states", publisher: "Banned Books" }, { label: "Banned Books By Hispanic Authors – McLennan Community College", href: "https://mclennan.libguides.com/hhm2024/banned", publisher: "McLennan Community College Libraries" }],
+    purchaseLinks: seedPurchaseLinks('9780807013106'),
+    provenance: provenance("PEN America", "https://pen.org/book-bans/2023-banned-book-list/", 'bb-book-an-african-american-and-latinx-history-of-the', "An African American and Latinx History of the United States"),
+  },
+  {
+    id: 'bb-book-white-rage',
+    slug: 'white-rage',
+    title: "White Rage: The Unspoken Truth of Our Racial Divide",
+    authors: [{ name: "Carol Anderson", role: 'author' }],
+    identifiers: [{ system: 'isbn-13', value: '9781632864130' }],
+    description:
+      "Anderson argues that policy backlash—not only individual prejudice—has repeatedly blocked Black political and economic progress from Reconstruction forward. PEN America records classroom bans, including Central York, Pennsylvania, in 2021.",
+    publishedDate: '2016',
+    challenges: [{ state: 'PA', jurisdictionLabel: "Central York School District", schoolYear: "2021-2022", challengeYear: 2021, status: 'reported', citation: { label: "PEN America's Index of School Book Bans", href: "https://docs.house.gov/meetings/GO/GO02/20220407/114616/HHRG-117-GO02-20220407-SD018.pdf", publisher: "PEN America", publishedAt: "2022-04" } }, { state: 'PA', jurisdictionLabel: "Central York School District", schoolYear: "2021-2022", challengeYear: 2021, status: 'rescinded', citation: { label: "Pennsylvania school district reverses ban on books by authors of colour", href: "https://www.theguardian.com/books/2021/sep/22/pennsylvania-school-district-reverses-ban-on-books-by-authors-of-colour", publisher: "The Guardian", publishedAt: "2021-09-22" } }],
+    citations: [{ label: "PEN America's Index of School Book Bans", href: "https://docs.house.gov/meetings/GO/GO02/20220407/114616/HHRG-117-GO02-20220407-SD018.pdf", publisher: "PEN America" }, { label: "White Rage: The Unspoken Truth of Our Racial Divide – Banned Books", href: "https://www.banned-books.org/books/white-rage-the-unspoken-truth-of-our-racial-divide", publisher: "Banned Books" }, { label: "Banned books by Carol Anderson — censorship history", href: "https://www.banned-books.org/authors/carol-anderson", publisher: "Banned Books" }],
+    purchaseLinks: seedPurchaseLinks('9781632864130'),
+    provenance: provenance("PEN America", "https://docs.house.gov/meetings/GO/GO02/20220407/114616/HHRG-117-GO02-20220407-SD018.pdf", 'bb-book-white-rage', "White Rage: The Unspoken Truth of Our Racial Divide"),
+  },
+  {
+    id: 'bb-book-stamped-from-the-beginning',
+    slug: 'stamped-from-the-beginning',
+    title: "Stamped from the Beginning: The Definitive History of Racist Ideas in America",
+    authors: [{ name: "Ibram X. Kendi", role: 'author' }],
+    identifiers: [{ system: 'isbn-13', value: '9781568584638' }],
+    description:
+      "Kendi’s National Book Award-winning history traces how racist ideas were built and spread through five American intellectual lives. It is distinct from the YA adaptation Stamped and appears on PEN America ban lists in Florida, Pennsylvania, and Texas.",
+    publishedDate: '2016',
+    challenges: [{ state: 'TX', jurisdictionLabel: "Klein Independent School District", schoolYear: "2023-2024", challengeYear: 2023, status: 'reported', citation: { label: "Stamped from the beginning Banned in Klein Independent School District, TX", href: "https://bannedindex.org/bans/33150", publisher: "Banned Index" } }, { state: 'FL', jurisdictionLabel: "Escambia County Public Schools", schoolYear: "2022-2023", challengeYear: 2022, status: 'reported', citation: { label: "Stamped from the Beginning – Banned Books Week", href: "https://researchguides.gonzaga.edu/BannedBooksWeek/StampedFromTheBeginning", publisher: "Gonzaga University Libraries" } }, { state: 'PA', jurisdictionLabel: "Central York School District", schoolYear: "2021-2022", challengeYear: 2021, status: 'reported', citation: { label: "Stamped from the Beginning: The Definitive History of Racist Ideas in America – Banned Books", href: "https://www.banned-books.org/books/stamped-from-the-beginning-the-definitive-history-of-racist-ideas-in-america", publisher: "Banned Books" } }],
+    citations: [{ label: "Stamped from the Beginning – Banned Books Week", href: "https://researchguides.gonzaga.edu/BannedBooksWeek/StampedFromTheBeginning", publisher: "Gonzaga University Libraries" }, { label: "Stamped from the beginning Banned in Klein Independent School District, TX", href: "https://bannedindex.org/bans/33150", publisher: "Banned Index" }, { label: "Stamped from the Beginning: The Definitive History of Racist Ideas in America – Banned Books", href: "https://www.banned-books.org/books/stamped-from-the-beginning-the-definitive-history-of-racist-ideas-in-america", publisher: "Banned Books" }],
+    purchaseLinks: seedPurchaseLinks('9781568584638'),
+    provenance: provenance("PEN America", "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/", 'bb-book-stamped-from-the-beginning', "Stamped from the Beginning: The Definitive History of Racist Ideas in America"),
+  },
+  {
+    id: 'bb-book-critical-race-theory-an-introduction',
+    slug: 'critical-race-theory-an-introduction',
+    title: "Critical Race Theory: An Introduction",
+    authors: [{ name: "Richard Delgado", role: 'author' }, { name: "Jean Stefancic", role: 'contributor' }],
+    identifiers: [{ system: 'isbn-13', value: '9781479802760' }],
+    description:
+      "Delgado and Stefancic’s primer explains critical race theory’s origins, methods, and critiques of colorblind law. Tucson Unified School District removed it from Mexican American Studies classes in 2012 after Arizona banned ethnically divisive curriculum.",
+    publishedDate: '2017',
+    challenges: [{ state: 'AZ', jurisdictionLabel: "Tucson Unified School District", schoolYear: "2011-2012", challengeYear: 2012, status: 'reported', citation: { label: "Reflections on NYU Press book banned in Arizona", href: "https://nyupress.org/blog/2012/10/10/reflections-on-nyu-press-book-banned-in-arizona/", publisher: "NYU Press", publishedAt: "2012-10-10" } }, { state: 'AZ', jurisdictionLabel: "Tucson Unified School District", schoolYear: "2011-2012", challengeYear: 2012, status: 'reported', citation: { label: "Book Banning in Arizona", href: "https://academeblog.org/2012/01/24/book-banning-in-arizona/", publisher: "Academe Blog", publishedAt: "2012-01-24" } }],
+    citations: [{ label: "Reflections on NYU Press book banned in Arizona", href: "https://nyupress.org/blog/2012/10/10/reflections-on-nyu-press-book-banned-in-arizona/", publisher: "NYU Press", publishedAt: "2012-10-10" }, { label: "Making the banned book list: Richard Delgado and Jean Stefancic", href: "https://www.fromthesquare.org/making-the-banned-book-list-richard-delgado-and-jean-stefancic/", publisher: "From the Square", publishedAt: "2012-02" }, { label: "Book Banning in Arizona", href: "https://academeblog.org/2012/01/24/book-banning-in-arizona/", publisher: "Academe Blog" }],
+    purchaseLinks: seedPurchaseLinks('9781479802760'),
+    provenance: provenance("NYU Press", "https://nyupress.org/blog/2012/10/10/reflections-on-nyu-press-book-banned-in-arizona/", 'bb-book-critical-race-theory-an-introduction', "Critical Race Theory: An Introduction"),
   },
 ];
 
