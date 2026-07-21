@@ -51,7 +51,7 @@ export function exploreWhereMapsLink(feature: ExploreMapFeature): ExploreWhereMa
     return undefined;
   }
 
-  const displayLabel = statePostalCode ?? label ?? 'this location';
+  const displayLabel = label ?? statePostalCode ?? 'this location';
   const placeLabel = label ?? displayLabel;
 
   return {

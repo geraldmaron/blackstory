@@ -613,6 +613,7 @@ export {
   US_BOUNDS,
   isWithinUsBounds,
   findUsStateForPoint,
+  findUsStateFromJurisdictionLabel,
   findUsStateByPostalCode,
   buildMapSource,
   aggregateDecadePresence,

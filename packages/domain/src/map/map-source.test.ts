@@ -131,6 +131,34 @@ test('everything-active population: every geo-anchored fixture with a valid prec
   }
 });
 
+test('buildMapSource prefers jurisdictionLabel over bbox state attribution', () => {
+  // Harlem coords sit inside NJ's coarse rectangle; label must win.
+  const harlem: MapSourceEntityInput = {
+    entityId: 'ent_movement_harlem_renaissance',
+    kind: 'movement',
+    displayName: 'Harlem Renaissance',
+    jurisdictionLabel: 'New York City, New York',
+    location: {
+      precision: 'city',
+      lat: 40.8116,
+      lng: -73.9465,
+      geohash: 'dr72j',
+      matchMethod: 'manual_research',
+    },
+  };
+  const result = buildMapSource({
+    releaseId: 'rel_test',
+    generatedAt: '2026-07-17T00:00:00.000Z',
+    entities: [harlem],
+    redactLocation: passthroughRedact,
+  });
+  const feature = result.featureCollection.features[0];
+  assert.equal(feature?.properties.statePostalCode, 'NY');
+  assert.equal(feature?.properties.stateName, 'New York');
+  assert.equal(result.stateAggregates.find((s) => s.statePostalCode === 'NY')?.count, 1);
+  assert.equal(result.stateAggregates.find((s) => s.statePostalCode === 'NJ'), undefined);
+});
+
 test('result is deterministic JSON-serializable output with schemaVersion 1', () => {
   const result = buildMapSource({
     releaseId: 'rel_20260717',

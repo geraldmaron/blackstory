@@ -10,6 +10,7 @@ export {
   US_CONUS_BOUNDS,
   isWithinUsBounds,
   findUsStateForPoint,
+  findUsStateFromJurisdictionLabel,
   findUsStateByPostalCode,
 } from './us-geography.js';
 export type { UsStateInfo } from './us-geography.js';

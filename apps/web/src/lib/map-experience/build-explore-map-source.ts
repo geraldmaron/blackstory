@@ -185,6 +185,10 @@ function toMapSourceInput(entity: PublicEntityView, anchor: EntityGeoAnchor): Ma
     // inert for them, but explicit rather than omitted so a future person-kind addition to this
     // table can't silently skip the living-person redaction path by relying on an unset default.
     livingStatus: 'unknown',
+    // Prefer curated jurisdiction over bbox state attribution (Manhattan must not become NJ).
+    ...(entity.jurisdictionLabel.trim().length > 0
+      ? { jurisdictionLabel: entity.jurisdictionLabel.trim() }
+      : {}),
     location: {
       precision: entity.locationPrecision,
       lat: anchor.lat,

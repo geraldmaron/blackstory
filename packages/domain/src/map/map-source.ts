@@ -25,7 +25,12 @@
  * map version the same way it restores the prior search-index version.
  */
 
-import { US_BOUNDS, findUsStateForPoint, isWithinUsBounds } from './us-geography.js';
+import {
+  US_BOUNDS,
+  findUsStateForPoint,
+  findUsStateFromJurisdictionLabel,
+  isWithinUsBounds,
+} from './us-geography.js';
 
 /** Raw (pre-redaction) location fields a caller may hold internally. */
 export type MapSourceRawLocation = {
@@ -54,6 +59,12 @@ export type MapSourceEntityInput = {
   readonly kind: string;
   readonly displayName: string;
   readonly livingStatus?: string;
+  /**
+   * Editorial jurisdiction label from the public projection (e.g. "Harlem, New York City,
+   * New York"). When present, state attribution prefers the label over bbox inference so
+   * dense coastal-metro overlaps (Manhattan inside NJ's rectangle) do not mislabel pins.
+   */
+  readonly jurisdictionLabel?: string;
   readonly location?: MapSourceRawLocation;
 };
 
@@ -198,7 +209,10 @@ export function buildMapSource(input: BuildMapSourceInput): MapSourceBuildResult
       continue;
     }
 
-    const state = findUsStateForPoint(redacted.lat, redacted.lng);
+    const stateFromLabel = entity.jurisdictionLabel
+      ? findUsStateFromJurisdictionLabel(entity.jurisdictionLabel)
+      : undefined;
+    const state = stateFromLabel ?? findUsStateForPoint(redacted.lat, redacted.lng);
 
     const properties: {
       entityId: string;

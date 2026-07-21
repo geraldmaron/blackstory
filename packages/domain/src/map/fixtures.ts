@@ -42,9 +42,8 @@ export const SCHOOL_DC_FIXTURE: MapSourceEntityInput = {
   },
 };
 
-// Queens coordinates are used deliberately (rather than Lower Manhattan) see
-// us-geography.test.ts "documented limitation": Manhattan's lng/lat also falls
-// inside New Jersey's approximate bounding box and would misattribute there.
+// Harlem / Manhattan pins are safe under findUsStateForPoint's NY/NJ Hudson carve-out;
+// Queens remains a clear NY-only bbox point for aggregate fixtures.
 export const PLACE_HARLEM_NY_FIXTURE: MapSourceEntityInput = {
   entityId: 'ent_fixture_place_harlem_ny',
   kind: 'place',

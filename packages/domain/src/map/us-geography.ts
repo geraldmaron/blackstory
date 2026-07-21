@@ -123,18 +123,80 @@ function pointInBbox(lat: number, lng: number, bbox: UsStateInfo['bbox']): boole
 }
 
 /**
+ * Approximate Hudson River divide for NJ/NY rectangular-bbox overlap.
+ * East of this longitude is Manhattan / Brooklyn / Queens / Bronx waterfront;
+ * west is NJ Hudson shore (Hoboken, Weehawken, …) plus Staten Island (handled
+ * separately). Not survey-grade — only a metro carve-out for the documented
+ * NJ-covers-Manhattan bbox failure (ADR-013).
+ */
+const HUDSON_DIVIDE_LNG = -74.02;
+
+/** Coarse Staten Island band (NY) that sits west of the Hudson divide. */
+function isLikelyStatenIsland(lat: number, lng: number): boolean {
+  return lat >= 40.48 && lat <= 40.66 && lng >= -74.27 && lng <= -74.05;
+}
+
+/**
+ * When NJ and NY rectangular bboxes both contain a point, prefer NY for
+ * east-of-Hudson + Staten Island. Without this carve-out, smallest-bbox-first
+ * attributes all of Manhattan (including Harlem) to New Jersey — unacceptable
+ * for user-visible state filters and presence aggregates.
+ */
+function resolveNjNyOverlap(
+  lat: number,
+  lng: number,
+  matches: readonly UsStateInfo[],
+): UsStateInfo | undefined {
+  const nj = matches.find((state) => state.postalCode === 'NJ');
+  const ny = matches.find((state) => state.postalCode === 'NY');
+  if (!nj || !ny) return undefined;
+  if (lng > HUDSON_DIVIDE_LNG) return ny;
+  if (isLikelyStatenIsland(lat, lng)) return ny;
+  return nj;
+}
+
+/**
  * Approximate state attribution for a public (already-coarsened) coordinate.
- * Bounding-box test only near-border points may resolve to a neighboring
- * state. Sufficient for national/state-zoom presence aggregates; not a
- * substitute for real polygon boundary data (see ADR-013 "known gaps").
+ * Bounding-box test only — near-border points may still resolve to a neighbor.
+ * Sufficient for national/state-zoom presence aggregates; not a substitute for
+ * real polygon boundary data (see ADR-013 "known gaps"). Prefer
+ * {@link findUsStateFromJurisdictionLabel} when an editorial jurisdiction label
+ * is available.
  */
 export function findUsStateForPoint(lat: number, lng: number): UsStateInfo | undefined {
-  for (const state of STATES_BY_AREA_ASC) {
-    if (pointInBbox(lat, lng, state.bbox)) {
-      return state;
-    }
+  const matches = STATES_BY_AREA_ASC.filter((state) => pointInBbox(lat, lng, state.bbox));
+  if (matches.length === 0) return undefined;
+  if (matches.length === 1) return matches[0];
+
+  const njNy = resolveNjNyOverlap(lat, lng, matches);
+  if (njNy) return njNy;
+
+  // Smallest-bbox-first so D.C. / RI / DE win over larger overlapping neighbors.
+  return matches[0];
+}
+
+/**
+ * Resolve a US state from an editorial jurisdiction label tail
+ * ("Harlem, New York City, New York" → New York; "Washington, D.C." → DC).
+ * Prefer this over {@link findUsStateForPoint} whenever the release projection
+ * carries a jurisdictionLabel — labels are curated; bbox attribution is not.
+ */
+export function findUsStateFromJurisdictionLabel(label: string): UsStateInfo | undefined {
+  const trimmed = label.trim();
+  if (!trimmed) return undefined;
+
+  const tail = trimmed.split(',').pop()?.trim() ?? '';
+  if (!tail) return undefined;
+
+  if (/^d\.?c\.?$/i.test(tail) || /district of columbia/i.test(tail)) {
+    return findUsStateByPostalCode('DC');
   }
-  return undefined;
+
+  const byPostal = findUsStateByPostalCode(tail);
+  if (byPostal) return byPostal;
+
+  const lower = tail.toLowerCase();
+  return US_STATES.find((state) => state.name.toLowerCase() === lower);
 }
 
 export function findUsStateByPostalCode(postalCode: string): UsStateInfo | undefined {

@@ -7,6 +7,7 @@ import {
   US_STATES,
   US_BOUNDS,
   findUsStateForPoint,
+  findUsStateFromJurisdictionLabel,
   findUsStateByPostalCode,
   isWithinUsBounds,
 } from './us-geography.js';
@@ -39,15 +40,35 @@ test('smaller states resolve ahead of larger overlapping neighbors', () => {
   assert.equal(dc?.postalCode, 'DC');
 });
 
-test('documented limitation: bbox approximation can misattribute dense coastal-metro borders', () => {
-  // Lower Manhattan's coordinates also fall inside New Jersey's rectangular
-  // bounding box (NJ's box extends across the Hudson to cover NYC's lng/lat),
-  // and NJ's smaller bbox area wins the smallest-first tie-break. This is a
-  // known, intentionally-tested gap (see ADR-013 "known gaps") real
-  // administrative attribution needs polygon boundary data this module does
-  // not vendor. Fixtures and demo data pick unambiguous points instead.
-  const result = findUsStateForPoint(40.7128, -74.006);
-  assert.equal(result?.postalCode, 'NJ');
+test('NY/NJ carve-out: Manhattan and Harlem resolve to NY, not NJ', () => {
+  // NJ's rectangular bbox overlaps Manhattan; without the Hudson carve-out,
+  // smallest-bbox-first would attribute Harlem / Lower Manhattan to New Jersey
+  // (historically tested as a known gap — now an unacceptable user-visible bug).
+  assert.equal(findUsStateForPoint(40.7128, -74.006)?.postalCode, 'NY'); // Lower Manhattan
+  assert.equal(findUsStateForPoint(40.8116, -73.9465)?.postalCode, 'NY'); // Harlem
+  assert.equal(findUsStateForPoint(40.758, -73.9855)?.postalCode, 'NY'); // Midtown
+  assert.equal(findUsStateForPoint(40.6782, -73.9442)?.postalCode, 'NY'); // Brooklyn
+});
+
+test('NY/NJ carve-out: Hoboken and Newark stay NJ; Staten Island is NY', () => {
+  assert.equal(findUsStateForPoint(40.745, -74.0325)?.postalCode, 'NJ'); // Hoboken
+  assert.equal(findUsStateForPoint(40.7357, -74.1724)?.postalCode, 'NJ'); // Newark
+  assert.equal(findUsStateForPoint(40.5795, -74.1502)?.postalCode, 'NY'); // Staten Island
+});
+
+test('findUsStateFromJurisdictionLabel prefers editorial label tails', () => {
+  assert.equal(
+    findUsStateFromJurisdictionLabel('New York City, New York')?.postalCode,
+    'NY',
+  );
+  assert.equal(
+    findUsStateFromJurisdictionLabel('Harlem, New York City, New York')?.postalCode,
+    'NY',
+  );
+  assert.equal(findUsStateFromJurisdictionLabel('Hoboken, New Jersey')?.postalCode, 'NJ');
+  assert.equal(findUsStateFromJurisdictionLabel('Washington, D.C.')?.postalCode, 'DC');
+  assert.equal(findUsStateFromJurisdictionLabel('Annapolis, MD')?.postalCode, 'MD');
+  assert.equal(findUsStateFromJurisdictionLabel(''), undefined);
 });
 
 test('findUsStateForPoint returns undefined outside any state bbox', () => {
