@@ -1,7 +1,7 @@
 /**
- * HUD CHAS Cook County Table 9 cost-burden-by-race ingest for Phase 1 observations
- * into bb_reference.statistical_observations. Uses curated county fixture (2017-2021 ACS
- * 5-year Table 9 county 050).
+ * HUD CHAS Cook County Table 20 cost-burden-by-race ingest for Phase 1 observations
+ * into bb_reference.statistical_observations. Uses curated Con Plan fixture (2016-2020 ACS
+ * 5-year Table 20 suburban Cook jurisdiction mapped to county 17031).
  *
  * Usage (repo root):
  *   # Dry-run (default)
@@ -18,9 +18,9 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   fetchPhase1ChasObservations,
+  HUD_CHAS_COOK_CON_PLAN_TABLE20_SOURCE_URL,
   HUD_CHAS_COOK_COST_BURDEN_FIXTURE_FILENAME,
-  HUD_CHAS_DATA_DOWNLOAD_URL,
-  HUD_CHAS_TABLE9_SOURCE_TABLE,
+  HUD_CHAS_TABLE20_SOURCE_TABLE,
   listPhase1ChasIndicators,
   type Phase1ChasObservationDraft,
 } from '@repo/domain';
@@ -123,7 +123,7 @@ async function applyObservations(
           JSON.stringify({
             raceEthnicitySlice: series.raceEthnicitySlice ?? null,
             methodologyNote:
-              'HUD CHAS Table 9 county cost burden >30% among race-alone NH householders; curated Cook 17031 fixture.',
+              'HUD CHAS Table 20 suburban Cook cost burden >30% among race-alone NH householders; curated Cook 17031 fixture.',
           }),
         ],
       );
@@ -160,8 +160,8 @@ async function applyObservations(
             totalHouseholds: obs.totalHouseholds,
             costBurdenGt30Households: obs.costBurdenGt30Households,
             methodologyNote: obs.methodologyNote,
-            tableSource: HUD_CHAS_DATA_DOWNLOAD_URL,
-            sourceTable: HUD_CHAS_TABLE9_SOURCE_TABLE,
+            tableSource: HUD_CHAS_COOK_CON_PLAN_TABLE20_SOURCE_URL,
+            sourceTable: HUD_CHAS_TABLE20_SOURCE_TABLE,
           }),
         ],
       );

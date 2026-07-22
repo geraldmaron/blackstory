@@ -1,5 +1,5 @@
 /**
- * Tests for Phase 1 HUD CHAS Cook County Table 9 cost-burden fixture parsing and mapping.
+ * Tests for Phase 1 HUD CHAS Cook County Table 20 cost-burden fixture parsing and mapping.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import {
   HUD_CHAS_COOK_COST_BURDEN_FIXTURE_FILENAME,
-  HUD_CHAS_TABLE9_COST_BURDEN_METHOD_NOTE,
+  HUD_CHAS_TABLE20_COST_BURDEN_METHOD_NOTE,
   PHASE1_HUD_CHAS_COOK_JURISDICTION_ID,
   PHASE1_HUD_CHAS_COST_BURDEN_BLACK_COUNTY_METRIC_ID,
   PHASE1_HUD_CHAS_COST_BURDEN_WHITE_COUNTY_METRIC_ID,
@@ -39,7 +39,7 @@ test('parseChasCookCostBurdenFixtureCsv loads Cook black and white rows', () => 
   assertChasCookThemeImpactRowsPresent(rows);
 });
 
-test('mapChasRowsToObservations computes Table 9 cost-burden shares', () => {
+test('mapChasRowsToObservations computes Table 20 cost-burden shares', () => {
   const { rows } = parseChasCookCostBurdenFixtureCsv(FIXTURE_CSV);
   const observations = mapChasRowsToObservations(rows, RETRIEVED_AT);
   assert.equal(observations.length, 2);
@@ -54,15 +54,15 @@ test('mapChasRowsToObservations computes Table 9 cost-burden shares', () => {
   assert.ok(white);
   assert.equal(black.jurisdictionId, PHASE1_HUD_CHAS_COOK_JURISDICTION_ID);
   assert.equal(black.referencePeriod, PHASE1_HUD_CHAS_REFERENCE_PERIOD);
-  assert.equal(black.estimate, 55.5);
-  assert.equal(white.estimate, 26.0);
-  assert.equal(black.totalHouseholds, 474_892);
-  assert.equal(black.costBurdenGt30Households, 263_512);
-  assert.equal(white.totalHouseholds, 630_152);
-  assert.equal(white.costBurdenGt30Households, 164_089);
-  assert.equal(black.methodologyNote, HUD_CHAS_TABLE9_COST_BURDEN_METHOD_NOTE);
+  assert.equal(black.estimate, 44.6);
+  assert.equal(white.estimate, 31.3);
+  assert.equal(black.totalHouseholds, 123_774);
+  assert.equal(black.costBurdenGt30Households, 55_152);
+  assert.equal(white.totalHouseholds, 368_132);
+  assert.equal(white.costBurdenGt30Households, 115_096);
+  assert.equal(black.methodologyNote, HUD_CHAS_TABLE20_COST_BURDEN_METHOD_NOTE);
   assert.equal(black.source, 'hud-chas');
-  assert.match(black.sourceUrl ?? '', /^https:\/\/www\.huduser\.gov\//);
+  assert.match(black.sourceUrl ?? '', /^https:\/\/www\.cookcountyil\.gov\//);
 });
 
 test('fetchPhase1ChasObservations loads default Cook fixture', () => {

@@ -7,8 +7,8 @@ import { sha256Json } from '../../publication/index.js';
 import type { Phase1IndicatorDefinition } from '../../statistics/phase1-indicator-catalog.js';
 import { PHASE1_CHAS_INDICATOR_DEFINITIONS } from '../../statistics/phase1-chas-indicator-catalog.js';
 import {
-  HUD_CHAS_DATA_DOWNLOAD_URL,
-  HUD_CHAS_TABLE9_COST_BURDEN_METHOD_NOTE,
+  HUD_CHAS_COOK_CON_PLAN_TABLE20_SOURCE_URL,
+  HUD_CHAS_TABLE20_COST_BURDEN_METHOD_NOTE,
   PHASE1_HUD_CHAS_BOUNDARY_VERSION,
   PHASE1_HUD_CHAS_COST_BURDEN_BLACK_COUNTY_METRIC_ID,
   PHASE1_HUD_CHAS_COST_BURDEN_WHITE_COUNTY_METRIC_ID,
@@ -159,13 +159,13 @@ function buildDraft(input: {
     totalHouseholds: input.row.totalHouseholds,
     costBurdenGt30Households: input.row.costBurdenGt30Households,
     chasTable: input.row.chasTable,
-    methodologyNote: HUD_CHAS_TABLE9_COST_BURDEN_METHOD_NOTE,
+    methodologyNote: HUD_CHAS_TABLE20_COST_BURDEN_METHOD_NOTE,
   };
   assertPublishedStatisticProvenance(draft);
   return draft;
 }
 
-/** Parses curated Cook CHAS Table 9 cost-burden fixture CSV into structured rows. */
+/** Parses curated Cook CHAS Table 20 cost-burden fixture CSV into structured rows. */
 export function parseChasCookCostBurdenFixtureCsv(csvText: string): {
   readonly rows: readonly ChasCookCostBurdenRow[];
   readonly rejected: readonly string[];
@@ -213,8 +213,8 @@ export function parseChasCookCostBurdenFixtureCsv(csvText: string): {
         raceSlice,
         totalHouseholds: parseCount(cells[3], 'total_households'),
         costBurdenGt30Households: parseCount(cells[4], 'cost_burden_gt30_households'),
-        chasTable: cells[5]?.trim() || 'Table9',
-        sourceUrl: cells[6]?.trim() || HUD_CHAS_DATA_DOWNLOAD_URL,
+        chasTable: cells[5]?.trim() || 'Table20',
+        sourceUrl: cells[6]?.trim() || HUD_CHAS_COOK_CON_PLAN_TABLE20_SOURCE_URL,
       });
     } catch (error) {
       rejected.push(error instanceof Error ? error.message : String(error));

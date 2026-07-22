@@ -1,12 +1,12 @@
 /**
- * Fixture-backed fetch for Phase 1 HUD CHAS Cook County Table 9 cost-burden observations.
+ * Fixture-backed fetch for Phase 1 HUD CHAS Cook County Table 20 cost-burden observations.
  */
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  HUD_CHAS_COOK_CON_PLAN_TABLE20_SOURCE_URL,
   HUD_CHAS_COOK_COST_BURDEN_FIXTURE_FILENAME,
-  HUD_CHAS_DATA_DOWNLOAD_URL,
   PHASE1_HUD_CHAS_REFERENCE_PERIOD,
 } from './constants.js';
 import {
@@ -68,7 +68,7 @@ export function fetchPhase1ChasObservations(options: FetchOptions = {}): Phase1C
     observations,
     rejected: parsed.rejected,
     referencePeriod: PHASE1_HUD_CHAS_REFERENCE_PERIOD,
-    sourceUrl: HUD_CHAS_DATA_DOWNLOAD_URL,
+    sourceUrl: HUD_CHAS_COOK_CON_PLAN_TABLE20_SOURCE_URL,
     fixturePath: loaded.path,
   };
 }

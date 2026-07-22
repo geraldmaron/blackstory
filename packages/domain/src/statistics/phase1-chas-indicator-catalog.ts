@@ -1,6 +1,6 @@
 /**
  * Phase 1 HUD CHAS county cost-burden-by-race metric definitions — merge into
- * phase1-indicator-catalog.ts (Table 9, Cook 17031 fixture spine).
+ * phase1-indicator-catalog.ts (Table 20 Con Plan, Cook 17031 fixture spine).
  */
 import type { Phase1IndicatorDefinition } from './phase1-indicator-catalog.js';
 import { asMetricId } from './types.js';
@@ -14,7 +14,7 @@ function series(
   };
 }
 
-/** HUD CHAS Table 9 county cost-burden metrics pending merge into PHASE1_INDICATOR_CATALOG. */
+/** HUD CHAS Table 20 suburban Cook cost-burden metrics for theme-impact Q3/Q4. */
 export const PHASE1_CHAS_INDICATOR_DEFINITIONS: readonly Phase1IndicatorDefinition[] = [
   series({
     metricId: 'hud-chas-cost-burden-black-county',
@@ -24,7 +24,7 @@ export const PHASE1_CHAS_INDICATOR_DEFINITIONS: readonly Phase1IndicatorDefiniti
       'occupied households (owners and renters); householder Black alone, not Hispanic or Latino',
     unit: 'percent',
     sourceDataset: 'HUD Comprehensive Housing Affordability Strategy (CHAS)',
-    sourceTable: 'Table9',
+    sourceTable: 'Table20',
     sourceVariable: 'cost_burden_gt30_households / total_households',
     geographyType: 'county',
     estimateType: 'percentage',
@@ -41,7 +41,7 @@ export const PHASE1_CHAS_INDICATOR_DEFINITIONS: readonly Phase1IndicatorDefiniti
       'occupied households (owners and renters); householder White alone, not Hispanic or Latino',
     unit: 'percent',
     sourceDataset: 'HUD Comprehensive Housing Affordability Strategy (CHAS)',
-    sourceTable: 'Table9',
+    sourceTable: 'Table20',
     sourceVariable: 'cost_burden_gt30_households / total_households',
     geographyType: 'county',
     estimateType: 'percentage',
