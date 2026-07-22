@@ -81,6 +81,14 @@ export type {
   Phase1IndicatorCatalogSummary,
 } from './phase1-indicator-catalog.js';
 
+export { PHASE1_USSC_INDICATOR_DEFINITIONS } from './phase1-ussc-indicator-catalog.js';
+export { PHASE1_DSL_RENEWING_INEQUALITY_INDICATOR_DEFINITIONS } from './phase1-dsl-renewing-inequality-indicator-catalog.js';
+export { PHASE1_NHGIS_INDICATOR_DEFINITIONS } from './phase1-nhgis-indicator-catalog.js';
+export {
+  PHASE1_EJI_TRI_INDICATOR_DEFINITIONS,
+  listPhase1EjiTriIndicators,
+} from './phase1-eji-tri-indicator-catalog.js';
+
 export {
   THEME_IMPACT_THEME_IDS,
   THEME_IMPACT_PRIORITIES,

@@ -13,6 +13,7 @@ export const PHASE1_INDICATOR_THEMES = [
   'justice',
   'education',
   'labor',
+  'environment',
 ] as const;
 
 export type Phase1IndicatorTheme = (typeof PHASE1_INDICATOR_THEMES)[number];
@@ -32,6 +33,11 @@ function series(
     metricId: asMetricId(partial.metricId),
   };
 }
+
+import { PHASE1_USSC_INDICATOR_DEFINITIONS } from './phase1-ussc-indicator-catalog.js';
+import { PHASE1_DSL_RENEWING_INEQUALITY_INDICATOR_DEFINITIONS } from './phase1-dsl-renewing-inequality-indicator-catalog.js';
+import { PHASE1_NHGIS_INDICATOR_DEFINITIONS } from './phase1-nhgis-indicator-catalog.js';
+import { PHASE1_EJI_TRI_INDICATOR_DEFINITIONS } from './phase1-eji-tri-indicator-catalog.js';
 
 /** Curated Phase 1 MVP metrics (~15). Expand only with registry + loader beads. */
 export const PHASE1_INDICATOR_CATALOG: readonly Phase1IndicatorDefinition[] = [
@@ -307,6 +313,10 @@ export const PHASE1_INDICATOR_CATALOG: readonly Phase1IndicatorDefinition[] = [
     externalDataSourceId: 'census-sipp-wealth',
     raceEthnicitySlice: 'black',
   }),
+  ...PHASE1_USSC_INDICATOR_DEFINITIONS,
+  ...PHASE1_DSL_RENEWING_INEQUALITY_INDICATOR_DEFINITIONS,
+  ...PHASE1_NHGIS_INDICATOR_DEFINITIONS,
+  ...PHASE1_EJI_TRI_INDICATOR_DEFINITIONS,
 ];
 
 export function getPhase1Indicator(metricId: string): Phase1IndicatorDefinition | undefined {

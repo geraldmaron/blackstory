@@ -1,0 +1,16 @@
+# Cook County IL (17031) decennial race population counts for NHGIS Phase 1 population-share ingest.
+# Black and White counts are Census decennial county tabulations aligned with NHGIS nominal race series.
+# Share is computed in the mapper as race_count / total_population × 100 (one decimal place).
+# Tenure / homeownership by race is deferred (see PHASE1_NHGIS_TENURE_DEFERRED_NOTE).
+# source_url: https://www.nhgis.org/citing-nhgis
+# 1970: U.S. Census 1970 Supplementary Report PC(1)-C1, Table 1 (Race of the Population by County)
+# 1980: U.S. Census 1980 STF 1 county race counts (Illinois county 031)
+# 1990: U.S. Census 1990 STF 1 NP1 county race counts (Illinois county 031)
+# 2000: U.S. Census 2000 SF 1 P005 county race counts (Illinois county 031)
+# 2010: U.S. Census 2010 SF 1 P005 county race counts (Illinois county 031)
+decade,county_fips,total_population,white_count,black_count,source_url
+1970,17031,5492369,4296718,1146074,https://www2.census.gov/prod2/decennial/documents/31679801n104-107.pdf
+1980,17031,5253655,3943779,1200055,https://www2.census.gov/census_1980/1980_stf1_datadict.txt
+1990,17031,5105067,3692508,1242067,https://www.nhgis.org/time-series-tables
+2000,17031,5376741,3742090,1341532,https://www.nhgis.org/time-series-tables
+2010,17031,5194675,3632306,1299369,https://www.nhgis.org/time-series-tables

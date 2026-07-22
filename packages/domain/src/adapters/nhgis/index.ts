@@ -26,6 +26,33 @@ export {
   type NhgisCountyRaceExtractRequest,
   type NhgisCountyRaceExtractResult,
 } from './types.js';
+export {
+  NHGIS_CITATION_URL,
+  NHGIS_COOK_RACE_POPULATION_SHARE_FIXTURE_FILENAME,
+  NHGIS_HOMEPAGE_URL,
+  NHGIS_TIME_SERIES_TABLES_URL,
+  PHASE1_NHGIS_BLACK_POPULATION_SHARE_COUNTY_METRIC_ID,
+  PHASE1_NHGIS_BOUNDARY_VERSION,
+  PHASE1_NHGIS_COOK_JURISDICTION_ID,
+  PHASE1_NHGIS_DATASET_VINTAGE,
+  PHASE1_NHGIS_DEFAULT_COUNTY_FIPS,
+  PHASE1_NHGIS_TENURE_DEFERRED_NOTE,
+  PHASE1_NHGIS_THEME_IMPACT_DECADES,
+  PHASE1_NHGIS_WHITE_POPULATION_SHARE_COUNTY_METRIC_ID,
+} from './constants.js';
+export {
+  assertNhgisThemeImpactDecadesPresent,
+  listPhase1NhgisIndicators,
+  mapNhgisRaceRowsToObservations,
+  parseNhgisCookRacePopulationShareFixtureCsv,
+  type NhgisCookRacePopulationShareRow,
+  type Phase1NhgisObservationDraft,
+} from './phase1-nhgis-mapper.js';
+export {
+  DEFAULT_FIXTURE_PATH as NHGIS_PHASE1_DEFAULT_FIXTURE_PATH,
+  fetchPhase1NhgisObservations,
+  type Phase1NhgisFetchResult,
+} from './fetch-phase1-nhgis.js';
 
 const IPUMS_API_BASE = 'https://api.ipums.org';
 const NHGIS_QUERY = 'collection=nhgis&version=2';
