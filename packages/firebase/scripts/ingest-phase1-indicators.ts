@@ -24,6 +24,31 @@ import {
 } from '@repo/domain';
 import pg from 'pg';
 
+function normalizePgConnectionString(connectionString: string): {
+  readonly connectionString: string;
+  readonly ssl?: { readonly rejectUnauthorized: false };
+} {
+  const isSupabase =
+    /supabase\.(co|com)/i.test(connectionString) ||
+    process.env.DATABASE_SSL === '1' ||
+    process.env.DATABASE_SSL === 'true';
+  if (!isSupabase) return { connectionString };
+  let normalized = connectionString;
+  try {
+    const url = new URL(connectionString);
+    url.searchParams.delete('sslmode');
+    url.searchParams.set('uselibpqcompat', 'true');
+    url.searchParams.set('sslmode', 'require');
+    normalized = url.toString();
+  } catch {
+    normalized = connectionString;
+  }
+  return {
+    connectionString: normalized,
+    ssl: { rejectUnauthorized: false },
+  };
+}
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DEFAULT_FIXTURE = join(
   __dirname,
@@ -113,7 +138,11 @@ function validateFixture(fixture: Phase1Fixture): void {
 }
 
 async function applyToPostgres(fixture: Phase1Fixture, databaseUrl: string): Promise<void> {
-  const pool = new pg.Pool({ connectionString: databaseUrl });
+  const conn = normalizePgConnectionString(databaseUrl);
+  const pool = new pg.Pool({
+    connectionString: conn.connectionString,
+    ...(conn.ssl ? { ssl: conn.ssl } : {}),
+  });
   const client = await pool.connect();
   try {
     await client.query('BEGIN');

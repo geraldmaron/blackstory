@@ -11,6 +11,31 @@
 import { US_STATES } from '@repo/domain';
 import pg from 'pg';
 
+function normalizePgConnectionString(connectionString: string): {
+  readonly connectionString: string;
+  readonly ssl?: { readonly rejectUnauthorized: false };
+} {
+  const isSupabase =
+    /supabase\.(co|com)/i.test(connectionString) ||
+    process.env.DATABASE_SSL === '1' ||
+    process.env.DATABASE_SSL === 'true';
+  if (!isSupabase) return { connectionString };
+  let normalized = connectionString;
+  try {
+    const url = new URL(connectionString);
+    url.searchParams.delete('sslmode');
+    url.searchParams.set('uselibpqcompat', 'true');
+    url.searchParams.set('sslmode', 'require');
+    normalized = url.toString();
+  } catch {
+    normalized = connectionString;
+  }
+  return {
+    connectionString: normalized,
+    ssl: { rejectUnauthorized: false },
+  };
+}
+
 type JurisdictionSeed = {
   readonly id: string;
   readonly kind: string;
@@ -57,7 +82,11 @@ async function main(): Promise<void> {
   const databaseUrl = process.env.DATABASE_URL?.trim() || process.env.APP_DATABASE_URL?.trim();
   if (!databaseUrl) throw new Error('DATABASE_URL required for apply mode');
 
-  const pool = new pg.Pool({ connectionString: databaseUrl });
+  const conn = normalizePgConnectionString(databaseUrl);
+  const pool = new pg.Pool({
+    connectionString: conn.connectionString,
+    ...(conn.ssl ? { ssl: conn.ssl } : {}),
+  });
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
