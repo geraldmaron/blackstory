@@ -1,7 +1,9 @@
 /**
  * CDC EJI + EPA TRI county environmental ingest for Phase 1 observations into
  * bb_reference.statistical_observations. Fixture-backed by default (Cook 17031 +
- * DuPage 17043 + Lake 17097); optional --live for source downloads.
+ * DuPage 17043 + Lake 17097); set PHASE1_EJI_TRI_ALL_IL_COUNTIES=1 for all 102 IL
+ * counties via eji-il-counties-full.csv / tri-il-counties-full.csv; optional --live
+ * for source downloads (CDC EJI via Zenodo fallback when state CSV 404s).
  *
  * Usage (repo root):
  *   # Dry-run (default)
@@ -29,6 +31,7 @@ import { fileURLToPath } from 'node:url';
 import {
   CDC_EJI_COUNTY_ROLLUP_METHOD_NOTE,
   CDC_EJI_DATA_DOWNLOAD_URL,
+  CDC_EJI_IL_FULL_FIXTURE_FILENAME,
   fetchPhase1EjiCountyObservations,
   listPhase1EjiIndicators,
   type Phase1EjiObservationDraft,
@@ -36,6 +39,7 @@ import {
 import {
   EPA_TRI_AGGREGATE_STRATEGY_NOTE,
   EPA_TRI_HOMEPAGE_URL,
+  EPA_TRI_IL_FULL_FIXTURE_FILENAME,
   fetchPhase1TriCountyObservations,
   listPhase1TriIndicators,
   type Phase1TriObservationDraft,
@@ -56,6 +60,16 @@ const DEFAULT_EJI_FIXTURE = join(
 const DEFAULT_TRI_FIXTURE = join(
   __dirname,
   '../fixtures/reference-indicators/tri-il-counties-sample.csv',
+);
+const FULL_EJI_FIXTURE = join(
+  __dirname,
+  '../fixtures/reference-indicators',
+  CDC_EJI_IL_FULL_FIXTURE_FILENAME,
+);
+const FULL_TRI_FIXTURE = join(
+  __dirname,
+  '../fixtures/reference-indicators',
+  EPA_TRI_IL_FULL_FIXTURE_FILENAME,
 );
 
 type Phase1EjiTriObservationDraft = Phase1EjiObservationDraft | Phase1TriObservationDraft;
@@ -241,13 +255,22 @@ async function applyObservations(
   return written;
 }
 
+function allIllinoisCounties(): boolean {
+  return process.env.PHASE1_EJI_TRI_ALL_IL_COUNTIES === '1';
+}
+
 async function main(): Promise<void> {
   const apply = process.env.INGEST_PHASE1_EJI_TRI_APPLY === '1' && process.env.DRY_RUN !== '1';
   const live = hasFlag('live');
-  const countyFips = parseCountyFips();
+  const expandedIl = allIllinoisCounties();
+  const countyFips = expandedIl ? undefined : parseCountyFips();
   const triYears = parseTriYears();
-  const ejiFixturePath = arg('eji-fixture-csv') ?? (live ? undefined : DEFAULT_EJI_FIXTURE);
-  const triFixturePath = arg('tri-fixture-csv') ?? (live ? undefined : DEFAULT_TRI_FIXTURE);
+  const ejiFixturePath =
+    arg('eji-fixture-csv') ??
+    (live ? undefined : expandedIl ? FULL_EJI_FIXTURE : DEFAULT_EJI_FIXTURE);
+  const triFixturePath =
+    arg('tri-fixture-csv') ??
+    (live ? undefined : expandedIl ? FULL_TRI_FIXTURE : DEFAULT_TRI_FIXTURE);
 
   if (ejiFixturePath && !existsSync(ejiFixturePath)) {
     throw new Error(`EJI fixture not found: ${ejiFixturePath}`);
@@ -258,6 +281,7 @@ async function main(): Promise<void> {
 
   const ejiResult = await fetchPhase1EjiCountyObservations({
     ...(countyFips ? { countyFips } : {}),
+    ...(expandedIl ? { allIllinoisCounties: true } : {}),
     ...(ejiFixturePath
       ? { fixtureCsvText: readFileSync(ejiFixturePath, 'utf8'), fixturePath: ejiFixturePath }
       : {}),
@@ -266,6 +290,7 @@ async function main(): Promise<void> {
 
   const triResult = await fetchPhase1TriCountyObservations({
     ...(countyFips ? { countyFips } : {}),
+    ...(expandedIl ? { allIllinoisCounties: true } : {}),
     ...(triYears ? { reportingYears: triYears } : {}),
     ...(triFixturePath
       ? { fixtureCsvText: readFileSync(triFixturePath, 'utf8'), fixturePath: triFixturePath }
@@ -292,6 +317,13 @@ async function main(): Promise<void> {
     ok: true,
     dryRun: !apply,
     mode: live ? 'live' : 'fixture',
+    expandedIllinois: expandedIl,
+    ejiFetchMode: ejiResult.mode,
+    triFetchMode: triResult.mode,
+    countyCoverageCount: {
+      eji: ejiResult.countyCoverageCount,
+      tri: triResult.countyCoverageCount,
+    },
     countyFips: ejiResult.countyFips,
     ejiReferencePeriod: ejiResult.referencePeriod,
     triReportingYears: triResult.reportingYears,
@@ -301,6 +333,8 @@ async function main(): Promise<void> {
     triRejected: triResult.rejected,
     ejiFixturePath: ejiResult.fixturePath ?? ejiFixturePath ?? null,
     triFixturePath: triResult.fixturePath ?? triFixturePath ?? null,
+    ejiCachePath: ejiResult.cachePath ?? null,
+    triCachePaths: triResult.cachePaths ?? null,
     ejiSourceUrl: CDC_EJI_DATA_DOWNLOAD_URL,
     triSourceUrl: EPA_TRI_HOMEPAGE_URL,
     ejiMethodologyNote: CDC_EJI_COUNTY_ROLLUP_METHOD_NOTE,
@@ -309,6 +343,8 @@ async function main(): Promise<void> {
       ejiEnvironmentalBurdenScore: cookEji?.estimate ?? null,
       ejiTractCount: cookEji && 'tractCount' in cookEji ? cookEji.tractCount : null,
       triFacilityCount2023: cookTri2023?.estimate ?? null,
+      priorPilotEji: 0.74,
+      priorPilotTri2023: 12,
     },
     indicatorSeriesRegistered: listPhase1EjiTriIndicators().length,
     ejiIndicators: listPhase1EjiIndicators().map((row) => row.metricId),

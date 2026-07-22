@@ -11,9 +11,16 @@ export const EPA_TRI_HOMEPAGE_URL =
 export const EPA_TRI_BASIC_DATA_URL =
   'https://www.epa.gov/toxics-release-inventory-tri-program/tri-basic-data-files-calendar-years-1987-present';
 
-/** Envirofacts TRI facility slice for Illinois (live optional). */
+/** Envirofacts TRI facility registry for Illinois (returns full IL slice). */
 export const EPA_TRI_IL_FACILITY_API_URL =
-  'https://data.epa.gov/efservice/tri_facility/state_abbr/IL/rows/0:99999/JSON';
+  'https://data.epa.gov/efservice/tri_facility/state_abbr/IL/1:99999/JSON';
+
+/** Envirofacts TRI reporting-form slice for Illinois by reporting year. */
+export const EPA_TRI_IL_REPORTING_FORM_API_URL_TEMPLATE =
+  'https://data.epa.gov/efservice/tri_reporting_form/state_abbr/IL/reporting_year/{year}/1:99999/JSON';
+
+export const EPA_TRI_IL_FACILITY_CACHE_FILENAME = 'tri-il-facilities.json';
+export const EPA_TRI_IL_REPORTING_CACHE_FILENAME_TEMPLATE = 'tri-il-reporting-{year}.json';
 
 export const PHASE1_TRI_FACILITY_COUNT_COUNTY_METRIC_ID = 'epa-tri-facility-count-county';
 
@@ -35,3 +42,6 @@ export const EPA_TRI_AGGREGATE_STRATEGY_NOTE =
   'reporting presence, not ambient toxicity, individual risk, or crime-style burden heat.';
 
 export const EPA_TRI_FIXTURE_FILENAME = 'tri-il-counties-sample.csv';
+
+/** Full Illinois county-year facility rows — generated from live Envirofacts rollup. */
+export const EPA_TRI_IL_FULL_FIXTURE_FILENAME = 'tri-il-counties-full.csv';

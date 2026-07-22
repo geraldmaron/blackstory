@@ -15,6 +15,16 @@ export const CDC_EJI_DATA_DOWNLOAD_URL =
 export const CDC_EJI_STATE_CSV_URL_TEMPLATE =
   'https://eji.cdc.gov/PHTools/EJI_Data_Download/EJI_{year}_IL.csv';
 
+/**
+ * Zenodo mirror of CDC EJI 2024 national tract CSV (~80 MB). Used when the CDC
+ * state CSV endpoint is unavailable; filtered to Illinois tracts before rollup.
+ */
+export const CDC_EJI_ZENODO_NATIONAL_CSV_URL =
+  'https://zenodo.org/records/14675861/files/EJI_2024_United_States.csv?download=1';
+
+export const CDC_EJI_NATIONAL_CACHE_FILENAME = 'eji-2024-united-states.csv';
+export const CDC_EJI_IL_TRACT_CACHE_FILENAME = 'eji-2024-il-tracts.csv';
+
 export const PHASE1_EJI_ENVIRONMENTAL_BURDEN_SCORE_COUNTY_METRIC_ID =
   'cdc-eji-environmental-burden-score-county';
 
@@ -43,3 +53,6 @@ export const CDC_EJI_COUNTY_ROLLUP_METHOD_NOTE =
   'context beside demographic share — not a hazard heat map or individual exposure estimate.';
 
 export const CDC_EJI_FIXTURE_FILENAME = 'eji-il-counties-sample.csv';
+
+/** Full Illinois tract fixture (all 102 counties) — generated from live/Zenodo rollup. */
+export const CDC_EJI_IL_FULL_FIXTURE_FILENAME = 'eji-il-counties-full.csv';
