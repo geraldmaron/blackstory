@@ -8,6 +8,8 @@ import {
   createOllamaLlmProvider,
   createOpenRouterLlmProvider,
   extractMessageContent,
+  openRouterModelExtraBody,
+  openRouterUsesJsonObjectMode,
 } from './llm-provider.ts';
 import { runEditorialJudge } from './editorial-run.ts';
 
@@ -89,6 +91,49 @@ test('ollama native provider uses /api/chat', async () => {
   });
   assert.equal(hitNative, true);
   assert.equal(result.content, '{"ok":true}');
+});
+
+test('openRouterUsesJsonObjectMode detects GLM ids', () => {
+  assert.equal(openRouterUsesJsonObjectMode('z-ai/glm-4.5-air'), true);
+  assert.equal(openRouterUsesJsonObjectMode('qwen/qwen3-32b'), false);
+});
+
+test('openRouterModelExtraBody disables thinking for qwen3', () => {
+  assert.deepEqual(openRouterModelExtraBody('qwen/qwen3-32b'), { enable_thinking: false });
+  assert.deepEqual(openRouterModelExtraBody('z-ai/glm-4.5-air'), {});
+});
+
+test('openrouter uses json_object for GLM structured tasks', async () => {
+  let responseFormat: unknown;
+  let extra: Record<string, unknown> = {};
+  const fetchImpl: typeof fetch = async (_input, init) => {
+    const body = JSON.parse(String(init?.body)) as {
+      response_format?: unknown;
+      enable_thinking?: boolean;
+    };
+    responseFormat = body.response_format;
+    extra = body;
+    return Response.json({
+      model: 'z-ai/glm-4.5-air',
+      choices: [{ message: { role: 'assistant', content: '{"ok":true}' } }],
+    });
+  };
+  const provider = createOpenRouterLlmProvider({ apiKey: 'test-key', fetchImpl, maxAttempts: 1 });
+  await provider.complete({
+    model: 'z-ai/glm-4.5-air',
+    messages: [{ role: 'user', content: 'x' }],
+    responseSchema: {
+      name: 'verification',
+      schema: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['ok'],
+        properties: { ok: { type: 'boolean' } },
+      },
+    },
+  });
+  assert.deepEqual(responseFormat, { type: 'json_object' });
+  assert.equal(extra.enable_thinking, undefined);
 });
 
 test('openrouter receives provider-enforced JSON Schema for structured tasks', async () => {

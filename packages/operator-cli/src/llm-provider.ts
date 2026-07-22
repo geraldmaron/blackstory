@@ -103,6 +103,41 @@ export function extractMessageContent(message: ChatMessagePayload | undefined): 
   return reasoning;
 }
 
+/** GLM routers on OpenRouter reject strict json_schema; use json_object instead. */
+export function openRouterUsesJsonObjectMode(model: string): boolean {
+  const id = model.toLowerCase();
+  return id.includes('glm-') || id.includes('/glm');
+}
+
+/** Qwen3 thinking models need thinking disabled so JSON lands in message.content. */
+export function openRouterModelExtraBody(model: string): Record<string, unknown> {
+  const id = model.toLowerCase();
+  if (/qwen\/qwen3/i.test(id) || /qwen3/i.test(id.split('/').pop() ?? '')) {
+    return { enable_thinking: false };
+  }
+  return {};
+}
+
+function resolveOpenRouterResponseFormat(
+  model: string,
+  responseSchema: LlmCompletionRequest['responseSchema'],
+): Record<string, unknown> {
+  if (!responseSchema) return {};
+  if (openRouterUsesJsonObjectMode(model)) {
+    return { response_format: { type: 'json_object' } };
+  }
+  return {
+    response_format: {
+      type: 'json_schema',
+      json_schema: {
+        name: responseSchema.name,
+        strict: true,
+        schema: responseSchema.schema,
+      },
+    },
+  };
+}
+
 function isRetryableStatus(status: number): boolean {
   return status === 408 || status === 429 || status >= 500;
 }
@@ -129,18 +164,23 @@ async function completeOpenAiCompatible(
     headers['HTTP-Referer'] = 'https://blackstory.local';
     headers['X-Title'] = 'BlackStory editorial staging';
   }
-  const responseFormat = request.responseSchema
-    ? {
-        response_format: {
-          type: 'json_schema',
-          json_schema: {
-            name: request.responseSchema.name,
-            strict: true,
-            schema: request.responseSchema.schema,
-          },
-        },
-      }
-    : {};
+  const responseFormat =
+    providerId === 'openrouter'
+      ? resolveOpenRouterResponseFormat(request.model, request.responseSchema)
+      : request.responseSchema
+        ? {
+            response_format: {
+              type: 'json_schema',
+              json_schema: {
+                name: request.responseSchema.name,
+                strict: true,
+                schema: request.responseSchema.schema,
+              },
+            },
+          }
+        : {};
+  const modelExtraBody =
+    providerId === 'openrouter' ? openRouterModelExtraBody(request.model) : {};
   const response = await fetchImpl(`${baseUrl.replace(/\/$/, '')}/chat/completions`, {
     method: 'POST',
     headers,
@@ -150,6 +190,7 @@ async function completeOpenAiCompatible(
       max_tokens: request.maxTokens ?? 900,
       messages: request.messages,
       ...responseFormat,
+      ...modelExtraBody,
       ...extraBody,
     }),
   });
