@@ -3,12 +3,12 @@
  */
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ThemeImpactPacketCard } from '../../../../components/theme-impact/ThemeImpactPacketCard';
-import { ThemeImpactStorytellingPanel } from '../../../../components/theme-impact/ThemeImpactStorytellingPanel';
-import { getThemeCatalogEntry } from '../../../../components/theme-impact/fixtures';
-import { resolveThemeImpactPacketView } from '../../../../lib/theme-impact/source';
-import { shouldShowThemeImpactStorytelling } from '../../../../lib/theme-impact/storytelling-series';
-import '../../../../components/theme-impact/theme-impact.css';
+import { ThemeImpactPacketCard } from '../../../../../components/theme-impact/ThemeImpactPacketCard';
+import { ThemeImpactStorytellingPanel } from '../../../../../components/theme-impact/ThemeImpactStorytellingPanel';
+import { getThemeCatalogEntry } from '../../../../../components/theme-impact/fixtures';
+import { resolveThemeImpactPacketView } from '../../../../../lib/theme-impact/source';
+import { shouldShowThemeImpactStorytelling } from '../../../../../lib/theme-impact/storytelling-series';
+import '../../../../../components/theme-impact/theme-impact.css';
 
 type ThemeQuestionPageProps = {
   readonly params: Promise<{ readonly themeId: string; readonly questionId: string }>;
