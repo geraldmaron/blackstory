@@ -39,7 +39,11 @@ export {
   buildAcsTractUrl,
   buildAcsVariablesUrl,
 } from './acs-url-builder.js';
-export { assertAcsVariableLabels, parseAcsResponse } from './acs-response-parser.js';
+export {
+  assertAcsVariableLabels,
+  loadAcsVariablesDictionary,
+  parseAcsResponse,
+} from './acs-response-parser.js';
 export {
   assertAcsVintageDictionary,
   fetchAcsCountyProfiles,

@@ -8,12 +8,51 @@
  * starter set (counts, medians in dollars) can be negative, so ANY negative value is treated
  * as a suppression marker: the field is omitted from `values` and recorded in `suppressed`.
  */
+import { buildAcsVariableUrl, buildAcsVariablesUrl } from './acs-url-builder.js';
+import type { FetchLike } from './fetch-county-populations.js';
 import { CensusVariableMismatchError } from './response-parser.js';
 import type { AcsProfileRow, AcsVintage } from './acs-types.js';
 
-type VariablesJson = {
+export type VariablesJson = {
   readonly variables?: Record<string, { readonly label?: string; readonly concept?: string }>;
 };
+
+type SingleVariableJson = {
+  readonly label?: string;
+  readonly concept?: string;
+};
+
+/** Bulk variables.json plus per-id fallback when Census omits MOE entries. */
+export async function loadAcsVariablesDictionary(
+  vintage: AcsVintage,
+  fetchImpl: FetchLike,
+): Promise<VariablesJson> {
+  const response = await fetchImpl(buildAcsVariablesUrl(vintage));
+  if (!response.ok) {
+    throw new Error(`${vintage.dataset}: variables.json fetch failed (${response.status})`);
+  }
+  const bulk = (await response.json()) as VariablesJson;
+  const variables: Record<string, { label?: string; concept?: string }> = {
+    ...(bulk.variables ?? {}),
+  };
+
+  for (const spec of vintage.variables) {
+    const entry = variables[spec.id];
+    const label = (entry?.label ?? '').replace(/!!/g, ' ');
+    if (label) continue;
+
+    const varResponse = await fetchImpl(buildAcsVariableUrl(vintage, spec.id));
+    if (!varResponse.ok) {
+      throw new Error(
+        `${vintage.dataset}: variable ${spec.id} metadata fetch failed (${varResponse.status})`,
+      );
+    }
+    const varJson = (await varResponse.json()) as SingleVariableJson;
+    variables[spec.id] = { label: varJson.label, concept: varJson.concept };
+  }
+
+  return { variables };
+}
 
 /** Asserts every expected variable id carries the expected label (and concept, when the
  * spec demands one) in the dataset's own dictionary. Fail closed on any mismatch. */

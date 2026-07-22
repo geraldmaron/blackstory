@@ -9,9 +9,13 @@
  * fan out (52 requests for states + DC + PR) with their own pacing/retry policy.
  */
 import type { FetchLike } from './fetch-county-populations.js';
-import { assertAcsVariableLabels, parseAcsResponse } from './acs-response-parser.js';
+import {
+  assertAcsVariableLabels,
+  loadAcsVariablesDictionary,
+  parseAcsResponse,
+} from './acs-response-parser.js';
 import type { AcsProfileRow, AcsVintage } from './acs-types.js';
-import { buildAcsCountyUrl, buildAcsTractUrl, buildAcsVariablesUrl } from './acs-url-builder.js';
+import { buildAcsCountyUrl, buildAcsTractUrl } from './acs-url-builder.js';
 
 export type AcsProfileFetchResult = {
   readonly vintage: AcsVintage;
@@ -22,14 +26,8 @@ export type AcsProfileFetchResult = {
 type FetchOptions = { readonly apiKey?: string; readonly fetchImpl?: FetchLike };
 
 async function assertVintageDictionary(vintage: AcsVintage, fetchImpl: FetchLike): Promise<void> {
-  const response = await fetchImpl(buildAcsVariablesUrl(vintage));
-  if (!response.ok) {
-    throw new Error(`${vintage.dataset}: variables.json fetch failed (${response.status})`);
-  }
-  assertAcsVariableLabels(
-    vintage,
-    (await response.json()) as Parameters<typeof assertAcsVariableLabels>[1],
-  );
+  const variablesJson = await loadAcsVariablesDictionary(vintage, fetchImpl);
+  assertAcsVariableLabels(vintage, variablesJson);
 }
 
 async function fetchParsed(

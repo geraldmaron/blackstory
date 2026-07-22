@@ -4,7 +4,7 @@
  */
 import { CENSUS_DATA_API_BASE_URL } from './url-builder.js';
 import type { FetchLike } from './fetch-county-populations.js';
-import { assertAcsVariableLabels } from './acs-response-parser.js';
+import { assertAcsVariableLabels, loadAcsVariablesDictionary } from './acs-response-parser.js';
 import type { AcsVintage } from './acs-types.js';
 import {
   mapPhase1AcsRowToObservations,
@@ -59,14 +59,8 @@ function buildStateUrl(vintage: AcsVintage, apiKey?: string): string {
 }
 
 async function assertVintageDictionary(vintage: AcsVintage, fetchImpl: FetchLike): Promise<void> {
-  const response = await fetchImpl(`${CENSUS_DATA_API_BASE_URL}/${vintage.dataset}/variables.json`);
-  if (!response.ok) {
-    throw new Error(`${vintage.dataset}: variables.json fetch failed (${response.status})`);
-  }
-  assertAcsVariableLabels(
-    vintage,
-    (await response.json()) as Parameters<typeof assertAcsVariableLabels>[1],
-  );
+  const variablesJson = await loadAcsVariablesDictionary(vintage, fetchImpl);
+  assertAcsVariableLabels(vintage, variablesJson);
 }
 
 async function fetchAndMap(
