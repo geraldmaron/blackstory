@@ -21,6 +21,18 @@ type JurisdictionSeed = {
   readonly parentId: string | null;
 };
 
+/** Territories outside product scope but needed for Census state-level ACS joins. */
+const ACS_STATE_TERRITORY_SEEDS: readonly JurisdictionSeed[] = [
+  {
+    id: 'state:72',
+    kind: 'state',
+    name: 'Puerto Rico',
+    stateFips: '72',
+    countyFips: null,
+    parentId: 'nation:US',
+  },
+];
+
 function buildStateSeeds(): readonly JurisdictionSeed[] {
   const nation: JurisdictionSeed = {
     id: 'nation:US',
@@ -38,7 +50,7 @@ function buildStateSeeds(): readonly JurisdictionSeed[] {
     countyFips: null,
     parentId: 'nation:US',
   }));
-  return [nation, ...states];
+  return [nation, ...states, ...ACS_STATE_TERRITORY_SEEDS];
 }
 
 async function main(): Promise<void> {

@@ -88,8 +88,25 @@ export const PHASE1_ACS5_2024_VINTAGE: AcsVintage = {
   sourceId: 'acs-census-api',
 } as const;
 
-/** Default bounded county pull: MD + GA (fixture jurisdictions). */
-export const PHASE1_ACS_DEFAULT_COUNTY_STATE_FIPS = ['13', '24'] as const;
+/**
+ * Default bounded county pull: top Black-population states plus MD/GA fixtures.
+ * AL, CA, FL, GA, IL, LA, MD, MS, NC, NY, SC, TX — 12 states (~800 counties).
+ * State unemployment (`acs-unemployment-black-state`) remains all states + territories.
+ */
+export const PHASE1_ACS_DEFAULT_COUNTY_STATE_FIPS = [
+  '01', // Alabama
+  '06', // California
+  '12', // Florida
+  '13', // Georgia
+  '17', // Illinois
+  '22', // Louisiana
+  '24', // Maryland
+  '28', // Mississippi
+  '36', // New York
+  '37', // North Carolina
+  '45', // South Carolina
+  '48', // Texas
+] as const;
 
 export function phase1AcsReferencePeriod(vintage: AcsVintage): string {
   const endYear = Number(vintage.vintage);

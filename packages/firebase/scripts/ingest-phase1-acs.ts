@@ -1,7 +1,8 @@
 /**
  * Live ACS ingest for Phase 1 context indicators into bb_reference.statistical_*.
  *
- * Bounded default: county metrics for MD (24) + GA (13); state unemployment for all states.
+ * Bounded default: county metrics for 12 high Black-population states (see
+ * PHASE1_ACS_DEFAULT_COUNTY_STATE_FIPS); state unemployment for all states + territories.
  * Requires jurisdictions already loaded (see docs/runbooks/load-reference-jurisdictions.md).
  *
  * Usage (repo root):
@@ -262,7 +263,8 @@ async function main(): Promise<void> {
       countyStates,
       countyRowsParsed: countyResult.rowsParsed,
       stateRowsParsed: stateResult.rowsParsed,
-      note: 'County pull bounded to PHASE1_ACS_COUNTY_STATES (default MD+GA). State unemployment is all states.',
+      note:
+        'County pull bounded to PHASE1_ACS_COUNTY_STATES (default: 12 high Black-population states). State unemployment is all states + territories.',
     },
     fetchedObservations: allObservations.length,
     observationsByMetric: Object.fromEntries([...byMetric.entries()].sort()),

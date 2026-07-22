@@ -59,6 +59,10 @@ Corsair overnight jobs continue to use `~/.config/blackstory/enrichment.env` (se
 `packages/firebase/scripts/ingest-phase1-acs.ts` reads `CENSUS_API_KEY` from env or `apps/web/.env.local`
 (see `.env.example`). It does **not** call 1Password itself — source the env file first.
 
+**County bound (default):** 12 high Black-population states — AL, CA, FL, GA, IL, LA, MD, MS, NC, NY, SC, TX
+(FIPS `01,06,12,13,17,22,24,28,36,37,45,48`). Override with `PHASE1_ACS_COUNTY_STATES`. State
+unemployment covers all states plus Puerto Rico (`state:72` in jurisdictions seed).
+
 ```bash
 set -a && source apps/web/.env.local && set +a
 export DATABASE_SSL=1
