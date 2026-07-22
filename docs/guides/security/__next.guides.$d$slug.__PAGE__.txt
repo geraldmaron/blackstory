@@ -1,20 +1,62 @@
 1:"$Sreact.fragment"
 3:I[90879,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"OutletBoundary"]
 4:"$Sreact.suspense"
-2:T424,<h1 id="security-posture"><a class="heading-anchor" href="#security-posture">Security posture</a></h1>
+2:T8de,<h1 id="security-posture"><a class="heading-anchor" href="#security-posture">Security posture</a></h1>
 <p>BlackStory assumes a hostile environment for public surfaces and contribution
-intake.</p>
+intake. The product promise depends on that assumption: a public page is only as
+trustworthy as the gates between research and release.</p>
 <h2 id="defaults"><a class="heading-anchor" href="#defaults">Defaults</a></h2>
 <ul>
 <li>Public clients never write canonical history.</li>
 <li>Submissions land in quarantine; compromise of intake must not equal publish.</li>
 <li>Research credentials cannot promote or deploy.</li>
+<li>Living residential addresses are never returned publicly; unknown living
+status is treated as living.</li>
 <li>Production identifiers fail closed in local tests (<code>pnpm test:preflight</code>).</li>
 <li>GitHub Actions stay read-only by default; third-party actions pin commit SHAs.</li>
+<li>External URLs are untrusted; public request paths do not synchronously fetch
+arbitrary remote content.</li>
 </ul>
+<h2 id="surfaces"><a class="heading-anchor" href="#surfaces">Surfaces</a></h2>
+<table>
+<thead>
+<tr>
+<th>Surface</th>
+<th>Trust posture</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>apps/web</code></td>
+<td>Public read of released projections</td>
+</tr>
+<tr>
+<td><code>apps/api-public</code></td>
+<td>Public read / search / location with abuse controls</td>
+</tr>
+<tr>
+<td><code>apps/api-submissions</code></td>
+<td>Untrusted intake into quarantine</td>
+</tr>
+<tr>
+<td><code>apps/admin</code></td>
+<td>Authenticated operators only</td>
+</tr>
+<tr>
+<td><code>apps/api-internal</code></td>
+<td>Private publication and control</td>
+</tr>
+<tr>
+<td>Workers / Functions</td>
+<td>Research and batch only; cannot publish</td>
+</tr>
+</tbody>
+</table>
 <h2 id="reporting"><a class="heading-anchor" href="#reporting">Reporting</a></h2>
 <p>See <a href="https://github.com/geraldmaron/blackstory/blob/main/SECURITY.md"><code>SECURITY.md</code></a>
 in the repository for private vulnerability reporting.</p>
-<p>Internal threat model and abuse corpus live under <code>docs/security/</code> for operators
-and agents — not republished here in full.</p>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"concepts"}]]}],["$","p",null,{"className":"doc-lede","children":"Hostile-environment defaults without dumping the internal threat corpus."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","security",".md"]}],"."," ",["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]]}]}]]}],null,["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"UW9vrt6hETcQnMoL0FLFN"}
+<p>Internal threat model and abuse corpus live under <code>docs/security/</code> for operators.
+They are not republished here in full on purpose: this page states the posture
+readers and contributors need, without turning the public docs site into a
+target map.</p>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"concepts"}]]}],["$","p",null,{"className":"doc-lede","children":"Hostile-environment defaults without dumping the internal threat corpus."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","security",".md"]}],"."," ",["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]]}]}]]}],null,["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"5F9NtFGTImuCFa5aVssbJ"}
 5:null

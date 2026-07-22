@@ -33,6 +33,11 @@ pnpm docs:publish
 ```
 apps/docs/
 ├── content/                 curated public guides (markdown)
+│   ├── about.md             why the project exists (human essay)
+│   ├── install.md           bootstrap
+│   ├── architecture.md      surfaces and boundaries
+│   ├── methodology.md       research posture
+│   └── …
 ├── public/brand/            lockup, symbol, favicons, open-graph
 ├── src/app/                 App Router pages + layout
 ├── src/components/          Shell, sidebar, search, theme

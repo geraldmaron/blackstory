@@ -1,12 +1,14 @@
-# ADR-021: Mobile stack — Expo React Native, MapLibre Native, App Check attestation, and SQLite offline cache
+# ADR-021: Mobile stack — Expo React Native, MapLibre Native, and SQLite offline cache
 
-- **Status:** **Accepted (with amendments)** — 2026-07-20 adversarial review; owner authorized decision-making after review + research (supersedes the prior "awaiting owner acceptance" gate)
-- **Date:** 2026-07-19 (accepted-with-amendments 2026-07-20)
-- **Deciders:** mobile-program-review (agent); accepted under explicit owner authorization to decide after adversarial review
-- **Bead:** MOB-002 (`black-book-mobile-002`); acceptance gate `repo-5os2`
-- **Supersedes:** none
-- **Depends on:** ADR-004, ADR-005, ADR-008, ADR-010, ADR-011, ADR-013
-- **Blocks:** MOB-003, MOB-006, MOB-010, MOB-011
+- **Status:** Accepted (amended 2026-07-22: App Check retired; attestation via client headers)
+- **Date:** 2026-07-19
+- **Amended:** 2026-07-20 adversarial review; 2026-07-22 attestation model
+- **Depends on:** ADR-004, ADR-005, ADR-008, ADR-010, ADR-013, ADR-020, ADR-022
+
+> **Amendment (2026-07-22):** React Native Firebase App Check is **not** a live dependency.
+> Mobile attestation uses `X-BlackStory-Client` (and related request-integrity controls) against
+> `apps/api-public`. Historical App Check / RN Firebase sections in the body are superseded for
+> production posture; Expo + MapLibre Native + SQLite decisions stand.
 
 ## Adversarial review disposition (2026-07-20)
 

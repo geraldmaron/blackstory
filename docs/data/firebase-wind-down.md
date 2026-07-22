@@ -19,11 +19,11 @@ After Postgres cutover, **do not delete** production Firebase project `black-boo
 - [x] Data API schemas limited to `public`, `bb_public`, `bb_submissions` (`supabase/config.toml`)
 - [x] **App Hosting cutover (2026-07-21):** Secret Manager `web-database-url`, `admin-database-url`, `admin-supabase-anon-key`; root `apphosting.yaml` / `apphosting.staging.yaml` / `apphosting.admin.yaml` set postgres + supabase auth; staging backend Environment name=`staging`
 - [ ] Supabase advisors: **Leaked password protection** still WARN — enable in Dashboard (Management API PATCH returned 403 with available PAT)
-- [x] Scheduled Cloud Functions runtime retired; Corsair/systemd is the recurring scheduler
-- [x] **App Hosting stays on Firebase** (owner decision 2026-07-21) — public web continues on App Hosting; not part of Supabase cutover
-- [ ] Public web request-integrity / remaining Firebase-client surfaces (distinct from App Hosting host choice)
+- [x] Scheduled Cloud Functions runtime retired; Corsair/systemd is the recurring scheduler (ADR-028)
+- [x] **Public web DNS on Vercel** (hard-cut 2026-07-22, ADR-027); App Hosting configs may remain as **idle rollback** until soak/wind-down — not the live public host
+- [ ] Public web request-integrity / remaining Firebase-client surfaces (distinct from hosting choice)
 - [x] Mobile + api-public: Firebase App Check retired; direct API callers use `X-BlackStory-Client`; Postgres is the default read path (`PUBLIC_DATA_SOURCE=postgres`)
-
+- [x] Structured SoR is Postgres (ADR-020); Firestore is export/rollback only — do not dual-write new canonical truth
 ### Owner: enable leaked password protection (HaveIBeenPwned)
 
 1. Open [Auth Providers → Email](https://supabase.com/dashboard/project/twykhihqkcldpreuovay/auth/providers?provider=Email) for project `twykhihqkcldpreuovay`

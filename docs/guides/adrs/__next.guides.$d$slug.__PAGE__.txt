@@ -1,7 +1,7 @@
 1:"$Sreact.fragment"
 3:I[90879,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"OutletBoundary"]
 4:"$Sreact.suspense"
-2:T416,<h1 id="architecture-decisions"><a class="heading-anchor" href="#architecture-decisions">Architecture decisions</a></h1>
+2:T6b3,<h1 id="architecture-decisions"><a class="heading-anchor" href="#architecture-decisions">Architecture decisions</a></h1>
 <p>Formal ADRs live in the repository at
 <a href="https://github.com/geraldmaron/blackstory/tree/main/docs/adr"><code>docs/adr/</code></a>.</p>
 <p>Selected topics:</p>
@@ -10,47 +10,73 @@
 <tr>
 <th>ADR</th>
 <th>Topic</th>
+<th>Status</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>001</td>
-<td>Firebase App Hosting vs Cloud Run</td>
+<td>Public web host versus Cloud Run services</td>
+<td>Accepted (Vercel for public web)</td>
 </tr>
 <tr>
 <td>004</td>
 <td>Public projection / immutable snapshots</td>
+<td>Accepted</td>
 </tr>
 <tr>
 <td>005</td>
 <td>Service surface separation</td>
-</tr>
-<tr>
-<td>006</td>
-<td>GitHub Actions deployment</td>
+<td>Accepted</td>
 </tr>
 <tr>
 <td>008</td>
-<td>Search and geocoding</td>
-</tr>
-<tr>
-<td>009</td>
-<td>Research isolation</td>
+<td>Search and geocoding (Postgres / PostGIS)</td>
+<td>Accepted</td>
 </tr>
 <tr>
 <td>010</td>
 <td>Security and abuse assumptions</td>
+<td>Accepted</td>
 </tr>
 <tr>
 <td>011</td>
 <td>Firestore as system of record</td>
+<td>Superseded by 020</td>
+</tr>
+<tr>
+<td>014</td>
+<td>Vector search (<code>pgvector</code>)</td>
+<td>Accepted</td>
 </tr>
 <tr>
 <td>018</td>
-<td>Firebase scheduled functions for discovery</td>
+<td>Firebase scheduled Functions for discovery</td>
+<td>Superseded by 028</td>
+</tr>
+<tr>
+<td>020</td>
+<td>Supabase Postgres as system of record</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td>026</td>
+<td>PostgREST published-read surface</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td>027</td>
+<td>Vercel for public web hosting</td>
+<td>Accepted (DNS cut complete)</td>
+</tr>
+<tr>
+<td>028</td>
+<td>Discovery schedule runtime (Corsair + Postgres)</td>
+<td>Accepted</td>
 </tr>
 </tbody>
 </table>
-<p>Scaffold vs target is noted in each record. Cloud resources are not applied from
-ADRs alone.</p>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"reference"}]]}],["$","p",null,{"className":"doc-lede","children":"Pointers into the ADR set that shapes the platform."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","adrs",".md"]}],"."," ",["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]]}]}]]}],null,["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"UW9vrt6hETcQnMoL0FLFN"}
+<p>Scaffold versus target is noted in each record. Filenames may still say “firebase” for link
+stability; titles and status lines are authoritative. Cloud resources are not applied from ADRs
+alone.</p>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"reference"}]]}],["$","p",null,{"className":"doc-lede","children":"Pointers into the ADR set that shapes the platform."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","adrs",".md"]}],"."," ",["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]]}]}]]}],null,["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"5F9NtFGTImuCFa5aVssbJ"}
 5:null

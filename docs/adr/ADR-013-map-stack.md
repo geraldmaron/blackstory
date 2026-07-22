@@ -2,9 +2,8 @@
 
 - **Status:** Accepted
 - **Date:** 2026-07-17
-- **Bead:**  (map data platform and tiles)
-- **Depends on:** ADR-004, ADR-008, ADR-010, ADR-011, , , ,
-- **Blocks (data platform for):**  (results list and national map experience)
+- **Depends on:** ADR-004, ADR-008, ADR-010, ADR-020
+- **Amended:** 2026-07-22 (geo SoR via ADR-020; basemap CDN not Firebase-required)
 
 ## Scaffold vs target
 
@@ -12,7 +11,7 @@
 |--------|--------------------|------------------------------|
 | Map library | MapLibre GL JS wired into a demo route (`apps/web/src/app/map`) | Same library, full national map experience |
 | Map source build | Pure, tested `buildMapSource` in `@repo/domain`, run once against fixtures by a script | Called by the release-activation pipeline on every publish (see "Release-coupled build" below) |
-| Basemap | Demo-stage: MapLibre background + line/circle layers only, no tile source, zero network requests | Self-hosted Protomaps PMTiles dark/desaturated style served from Firebase Hosting/CDN |
+| Basemap | Demo-stage: MapLibre background + line/circle layers only, no tile source, zero network requests | Self-hosted Protomaps PMTiles dark/desaturated style served from static CDN (Vercel, Firebase Hosting, or GCS+CDN) |
 | Data volume | 9 fixture entities, flat GeoJSON | Everything-active population; flat GeoJSON until volume demands vector tiles |
 | County boundaries | Not vendored; county aggregate only populates from upstream jurisdiction hints | Real polygon-based county attribution if/when justified |
 
@@ -23,7 +22,7 @@ The owner's brief for the 2026-07-17 course-correction review was explicit: "the
 Two adjacent ADRs already set doctrine this one must fit inside:
 
 - **ADR-008** (search and geocoding): bounded, static-first queries against released public projections; no separate search/query platform until measured need; U.S.-only scope (50 states + D.C.).
-- **ADR-011** (Firestore system of record): geohash + lat/lng on projection documents, no PostGIS; cost/efficiency-driven, stay inside the Firebase-native surface where possible.
+- **ADR-020** (Supabase Postgres SoR): geography and published projections live in Postgres/PostGIS; public clients never write canonical data.
 
 ## Decision
 
@@ -32,7 +31,7 @@ Two adjacent ADRs already set doctrine this one must fit inside:
 MapLibre GL JS (BSD-2-Clause) renders the map. Rationale:
 
 - **License and vendor independence.** BSD, no API key required to render, no runtime dependency on a single commercial vendor — consistent with this project's repeated preference (ADR-002→ADR-011, ADR-008) for avoiding vendor lock-in and fixed subscription cost before measured need.
-- **Self-host friendly.** Works directly against static tile archives (PMTiles) or any vector-tile source over plain HTTP — fits the "stay inside Firebase Hosting/CDN economics" pattern already established for the rest of the public surface.
+- **Self-host friendly.** Works directly against static tile archives (PMTiles) or any vector-tile source over plain HTTP — fits cost-controlled static CDN economics for the public surface.
 - **Fits the existing security posture.** Any future dynamic tile/query endpoint (not built in this pass — see "Out of scope" below) would sit behind the same App Check +  guardrail middleware every other `api-public` endpoint uses; MapLibre has no opinion about that and doesn't fight it.
 - **Real GeoJSON support.** Renders our GeoJSON `FeatureCollection` output directly as a `geojson` source — no format translation layer needed between `buildMapSource`'s output and the renderer.
 
@@ -40,9 +39,11 @@ Mapbox GL JS was not considered: it moved to a non-OSS license after the version
 
 ### 2. Tile strategy: self-hosted Protomaps PMTiles (preferred), managed MapTiler (fallback)
 
-**Preferred: self-hosted Protomaps PMTiles served from Firebase Hosting/CDN.**
+**Preferred: self-hosted Protomaps PMTiles served from a static CDN** (Vercel public assets,
+Firebase Hosting, or GCS behind CDN).
 
-PMTiles packages an entire vector tile archive as a single file that clients read via HTTP range requests — no tile server process required. That file can sit in Firebase Hosting (or a GCS bucket behind the same CDN this project already uses for public snapshots per ADR-004) exactly like any other static public asset.
+PMTiles packages an entire vector tile archive as a single file that clients read via HTTP range
+requests — no tile server process required. That file can sit beside other static public assets.
 
 | Cost driver | Self-hosted PMTiles | Managed MapTiler Cloud |
 |---|---|---|

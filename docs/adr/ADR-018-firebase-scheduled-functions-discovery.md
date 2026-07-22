@@ -1,10 +1,14 @@
 # ADR-018: Firebase scheduled Functions for discovery automation
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR-028](./ADR-028-discovery-schedule-runtime.md)
 - **Date:** 2026-07-18
-- **Bead:** `repo-lq0a` (decision); scaffold `repo-oy8t` (`functions/` / `@repo/functions-discovery`)
-- **Supersedes (partial):** ADR-007 decision §2 insofar as it required **Cloud Run Jobs as the only** execution plane for research campaigns
-- **Does not supersede:** ADR-001 (App Hosting = public web only), ADR-009 isolation invariants (research cannot publish; no research in public request paths), ADR-007 §7–8 (no sync untrusted fetch / no inline research on web/API)
+- **Supersedes (historical, partial):** ADR-007 Jobs-only reading for capped discovery
+- **Superseded by:** ADR-028 (Corsair systemd + Postgres discovery schedules)
+
+> **Archive note (2026-07-22):** Production discovery dispatch no longer runs on Firebase
+> scheduled Functions. The `functions/` / `@repo/functions-discovery` package is a **tombstone**
+> for reference and local experiments only. Do not deploy it as the live discovery plane.
+> See ADR-028. The body below records the historical Functions decision.
 
 ## Context
 

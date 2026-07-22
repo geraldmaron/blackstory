@@ -1,14 +1,16 @@
-# ADR-011: Firestore as system of record (Cloud SQL deferred)
+# ADR-011: Firestore as system of record (historical phase)
 
-- **Status:** Superseded (SoR path) by [ADR-020](./ADR-020-supabase-postgres-system-of-record.md)
+- **Status:** Superseded by [ADR-020](./ADR-020-supabase-postgres-system-of-record.md)
 - **Date:** 2026-07-16
-- **Bead:**  (rescoped); overrides  production path
-- **Depends on:** ADR-004, ADR-005, ADR-009, ADR-010, D-013, D-014
-- **Supersedes (current phase):** ADR-002 and ADR-003 production intent
-- **Amends:** ADR-008 search/geo initial implementation path
-- **Superseded by:** ADR-020 (Supabase Postgres on `blackstory-app`) for the product SoR
-  target. Firestore remains the **live** store until cutover; this ADR documents the
-  Firestore phase.
+- **Depends on:** ADR-004, ADR-005, ADR-009, ADR-010
+- **Supersedes (historical phase):** ADR-002 and ADR-003 production intent for Cloud SQL / SQL Connect
+- **Amended historically:** ADR-008 search/geo initial Firestore path (later amended again by ADR-020)
+
+> **Archive note (2026-07-22):** Structured product data cut over to Supabase Postgres
+> (ADR-020). Firestore is **not** the live product SoR. Retain this ADR as the record of the
+> Firestore phase. Firestore / Firebase project assets remain for **export and rollback** until
+> the owner completes `docs/data/firebase-wind-down.md`. Do not dual-write new canonical truth
+> to Firestore.
 
 ## Scaffold vs target
 

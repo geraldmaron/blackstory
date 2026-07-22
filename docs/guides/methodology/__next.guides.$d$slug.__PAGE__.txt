@@ -1,9 +1,10 @@
 1:"$Sreact.fragment"
-3:I[90879,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"OutletBoundary"]
-4:"$Sreact.suspense"
-2:T547,<h1 id="research-methodology"><a class="heading-anchor" href="#research-methodology">Research methodology</a></h1>
+5:I[90879,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"OutletBoundary"]
+6:"$Sreact.suspense"
+2:T1671,<h1 id="research-methodology"><a class="heading-anchor" href="#research-methodology">Research methodology</a></h1>
 <p>BlackStory pins history to place. A publishable record needs claims, evidence,
-provenance, and confidence — not assertion alone.</p>
+provenance, and confidence, not assertion alone.</p>
+<p>For the human case behind these rules, read <a href="./about.md">Why BlackStory</a>.</p>
 <h2 id="principles"><a class="heading-anchor" href="#principles">Principles</a></h2>
 <ol>
 <li><strong>Evidence before assertion.</strong> Public prose cites released evidence.</li>
@@ -15,10 +16,95 @@ only signal.</li>
 residential addresses.</li>
 <li><strong>Promotion gate.</strong> Research and LLM enrichment cannot publish. Human and
 policy gates promote released projections only.</li>
+<li><strong>Juxtaposition is not causation.</strong> Context indicators beside a law or place
+are published measurements for comparison, not automated proof of policy
+impact.</li>
 </ol>
 <h2 id="pipeline-high-level"><a class="heading-anchor" href="#pipeline-high-level">Pipeline (high level)</a></h2>
-<p>Discovery adapters produce candidates → quarantine / triage → research cases →
-claims and evidence → confidence lineage → promotion → public projection.</p>
+<pre><code>discovery adapters
+        ↓
+ quarantine / triage
+        ↓
+  research cases
+        ↓
+claims · evidence · confidence lineage
+        ↓
+   promotion gate
+        ↓
+ released public projection
+</code></pre>
 <p>Operating detail lives in the repository under <code>docs/research/</code> and
-<code>docs/methodology/</code>.</p>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"concepts"}]]}],["$","p",null,{"className":"doc-lede","children":"How claims, evidence, and confidence reach a publishable record."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","methodology",".md"]}],"."," ",["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]]}]}]]}],null,["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"UW9vrt6hETcQnMoL0FLFN"}
-5:null
+<code>docs/methodology/</code>.</p>
+<h2 id="landscape-entity-records-not-aggregator-pointers"><a class="heading-anchor" href="#landscape-entity-records-not-aggregator-pointers">Landscape: entity records, not aggregator pointers</a></h2>
+<p>Most Black history portals excel at <strong>discovery</strong>: one search across hundreds of
+institutions. They often link out to host sites rather than publishing <strong>entity
+records</strong> with map pins, citations, and archived captures. When a holding
+institution migrates its repository, those outbound links can break. Field
+review of <a href="https://umbrasearch.org/">Umbra Search</a> in <em>The American Archivist</em>
+(April 2026) documents that failure mode.</p>
+<p>BlackStory's primary unit is different: a <strong>place-indexed entity record</strong>
+(person, place, or event) with evidence you can still open when the origin site
+moves. Wayback URLs or content-addressed capture pointers, plus confidence
+grades and honest map precision.</p>
+<p>Specialized corpora such as <a href="https://enslaved.org/">Enslaved.org</a> serve slavery
+and freedom datasets at a scale and focus we do not replicate. Our lane is
+<strong>general Black history</strong> across topics and eras, curated and growing. Not
+complete. Not a substitute for domain-specific archives.</p>
+<h2 id="juxtaposition-not-causation"><a class="heading-anchor" href="#juxtaposition-not-causation">Juxtaposition, not causation</a></h2>
+<p>Users will ask what a law or policy <em>did</em> to Black communities in a place.
+Academic-grade answers require evidence. Automated pipelines that emit "Policy Z
+caused incarceration to rise X%" invent causation BlackStory must not publish.</p>
+<p>Allowed shapes:</p>
+<table>
+<thead>
+<tr>
+<th>Shape</th>
+<th>Allowed language</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Law / case entity with evidenced claims</td>
+<td>Enacted, overturned, challenged</td>
+</tr>
+<tr>
+<td>Place-time indicator</td>
+<td>In year Y, the published rate for Black residents in jurisdiction S was R (source…)</td>
+</tr>
+<tr>
+<td>Derived ratio / gap</td>
+<td>Black-White rate ratio was V in year Y, with formula and input ids</td>
+</tr>
+<tr>
+<td>Juxtaposition binding</td>
+<td>Shown beside these indicators for the same jurisdiction and era, for context, not as proof of effect</td>
+</tr>
+<tr>
+<td>Causal claim</td>
+<td>Only as a heritage claim with peer-reviewed or equivalent citation</td>
+</tr>
+</tbody>
+</table>
+<p>When a binding is shown, the product includes a fixed disclaimer: context
+indicators are published measurements from named custodians. Showing them with a
+law or place does not establish that the law caused the indicator values.</p>
+<h2 id="quality-before-breadth-claims"><a class="heading-anchor" href="#quality-before-breadth-claims">Quality before breadth claims</a></h2>
+<p>We do not claim to index all Black history. Absence on the map is not proof
+nothing happened. It may mean sources have not cleared the publish gate yet.</p>
+<p>URL-backed citations are expected to carry <strong>archived captures</strong> before they
+meet our public evidence standard. A capture completeness bar (95% of web
+citations in the active release) gates when we market a queryable developer read
+surface. That bar measures evidence readiness, not coverage of the field.</p>
+<p>A machine-queryable public API or MCP layer is a <strong>planned target</strong>, not a
+shipped product today. When it ships, it will expose published records only.</p>
+<h2 id="related-repository-docs"><a class="heading-anchor" href="#related-repository-docs">Related repository docs</a></h2>
+<ul>
+<li>Empty quadrant and aggregator contrast: <code>docs/methodology/empty-quadrant-and-aggregators.md</code></li>
+<li>Captures and Umbra detail: <code>docs/methodology/capture-and-aggregators.md</code></li>
+<li>Juxtaposition rules: <code>docs/methodology/juxtaposition-not-causation.md</code></li>
+<li>Capture completeness ops bar: <code>docs/research/capture-completeness-ops-bar.md</code></li>
+<li>Context indicator catalog: <code>docs/research/context-data-source-matrix.md</code></li>
+</ul>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"concepts"}]]}],["$","p",null,{"className":"doc-lede","children":"How claims, evidence, and confidence reach a publishable record."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],"$L3"]}],null,"$L4"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"5F9NtFGTImuCFa5aVssbJ"}
+3:["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","methodology",".md"]}],"."," ",["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]]}]}]
+4:["$","$L5",null,{"children":["$","$6",null,{"name":"Next.MetadataOutlet","children":"$@7"}]}]
+7:null

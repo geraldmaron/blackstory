@@ -1,10 +1,8 @@
 # ADR-024: Mobile build, distribution, OTA update, and release-rollback model
 
-- **Status:** **Accepted (with amendments)** — 2026-07-20 adversarial review; owner authorized decision-making after review + research
-- **Date:** 2026-07-19 (accepted-with-amendments 2026-07-20)
-- **Bead:** MOB-002 (architecture, threat model, contract boundary ADRs); acceptance gate `repo-5os2`
+- **Status:** Accepted (amended 2026-07-20)
+- **Date:** 2026-07-19
 - **Depends on:** ADR-004, ADR-006, ADR-022
-- **Blocks:** MOB-005, MOB-019, MOB-020, MOB-021
 
 ## Adversarial review disposition (2026-07-20)
 

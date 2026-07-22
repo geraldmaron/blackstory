@@ -1,10 +1,8 @@
 # ADR-007: Background workflow model
 
-- **Status:** Accepted
+- **Status:** Accepted (discovery schedules: [ADR-028](./ADR-028-discovery-schedule-runtime.md))
 - **Date:** 2026-07-16
-- **Bead:**
 - **Depends on:** ADR-005, ADR-009
-- **Implements toward:**  (outbox), research/publication/security worker beads
 
 ## Scaffold vs target
 
@@ -22,8 +20,10 @@ User requests must not synchronously fetch untrusted URLs, run research campaign
 
 1. **Cloud Tasks** for bounded asynchronous request-driven work (quarantine processing, deferred URL fetch, preview generation triggers, etc.).
 2. **Long-running / heavy batch** (multi-hour, high parallelism, custom containers) runs as **Cloud Run Jobs**.
-3. **Capped scheduled discovery** (and similar ≤30 minute research crons) may run as **Firebase Cloud Functions v2 `onSchedule` / secured HTTP** on the research identity — see **ADR-018** (partial supersession of the earlier “Jobs-only” reading of this clause).
-4. Worker code lives in the research / publication / security domains — not new worker microservices and **not** App Hosting.
+3. **Capped scheduled discovery** runs on the **Corsair systemd + Postgres** path in
+   production (ADR-028). ADR-018’s Firebase Functions schedule path is superseded and must
+   not be treated as live. Long batch still uses Cloud Run Jobs/Tasks when that path is applied.
+4. Worker code lives in the research / publication / security domains — not new worker microservices and **not** the public web host.
 5. Important state changes use an **append-only audit** trail and a **transactional outbox** so side effects are durable and replay-safe.
 6. Every queue and job has **rate, concurrency, duration, retry, and cost limits** (invariant 17; ).
 7. Handlers are **idempotent**; replays must not duplicate external effects.

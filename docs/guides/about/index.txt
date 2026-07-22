@@ -1,0 +1,105 @@
+1:"$Sreact.fragment"
+2:I[78467,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"DocsShell"]
+9:I[8141,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"default",1]
+:HL["/blackstory/_next/static/chunks/0eop-r156d_rk.css","style"]
+:HL["/blackstory/_next/static/media/234d9015b631dab9-s.p.33gca1im1ku45.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/blackstory/_next/static/media/23b7a97ae3b5c134-s.p.226pwps5o-gq_.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/blackstory/_next/static/media/68d403cf9f2c68c5-s.p.20at88_q9f_kt.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/blackstory/_next/static/media/99e609270109b47d-s.p.40sczeszzbjw1.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/blackstory/_next/static/media/c41ca59f1c34ba31-s.p.2y2uoi4t910qy.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/blackstory/_next/static/media/effe91970fc4db64-s.p.0oace-s_gkfks.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+0:{"P":null,"c":["","guides","about",""],"q":"","i":false,"f":[[["",{"children":["guides",{"children":[["slug","about","d",null],{"children":["__PAGE__",{}]}]}]},"$undefined","$undefined",16],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/blackstory/_next/static/chunks/0eop-r156d_rk.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/blackstory/_next/static/chunks/0e3scowebwodx.js","async":true,"nonce":"$undefined"}],["$","script","script-1",{"src":"/blackstory/_next/static/chunks/13re3aq9x3sif.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","className":"sora_f6a30ec3-module__KEGh6q__variable inter_8b43e30-module__-FgmxW__variable source_serif_4_f4ae2c77-module__A8GHDq__variable ibm_plex_mono_2bcb32c6-module__bm6A8W__variable","suppressHydrationWarning":true,"children":[["$","head",null,{"children":["$","script",null,{"dangerouslySetInnerHTML":{"__html":"(function(){try{var k=\"ds-theme\";var s=localStorage.getItem(k);var d=window.matchMedia('(prefers-color-scheme: dark)').matches;var t=(s==='light'||s==='dark')?s:(d?'dark':'light');document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();"}}]}],["$","body",null,{"children":["$","$L2",null,{"sections":[{"label":"Get started","links":[{"num":"01","title":"Why BlackStory","url":"/guides/about/"},{"num":"02","title":"Install and bootstrap","url":"/guides/install/"},{"num":"03","title":"Repository map","url":"/guides/repo-map/"}]},{"label":"Concepts","links":[{"num":"01","title":"Architecture","url":"/guides/architecture/"},{"num":"02","title":"Brand language","url":"/guides/brand/"},{"num":"03","title":"Research methodology","url":"/guides/methodology/"},{"num":"04","title":"Security posture","url":"/guides/security/"}]},{"label":"Reference","links":[{"num":"01","title":"Commands cheat sheet","url":"/guides/commands/"},{"num":"02","title":"Architecture decisions","url":"/guides/adrs/"}]}],"searchIndex":[{"slug":"about","url":"/guides/about/","title":"Why BlackStory","description":"The human case for a place-connected archive of Black history.","excerpt":"# Why BlackStory Black history is everywhere and somehow still easy to lose. A building gets renamed. A newspaper digitizes and reshuffles its URLs. A local story lives in a basement folder, a family scrapbook, or a grant-funded portal that"},{"slug":"architecture","url":"/guides/architecture/","title":"Architecture","description":"Surfaces, data plane, and non-negotiable boundaries.","excerpt":"# Architecture BlackStory is a place-connected Black history research platform. Public surfaces serve only released historical projections. Research, evidence, and promotion stay behind private APIs, workers, and admin tools. ## Surfaces ``"},{"slug":"commands","url":"/guides/commands/","title":"Commands cheat sheet","description":"Everyday pnpm and bootstrap commands for contributors.","excerpt":"# Commands cheat sheet ```bash pnpm bootstrap # reproducible JS + Python envs pnpm validate # boundaries, lint, governance pnpm format:check pnpm test:preflight # fail closed on production identifiers pnpm test # preflight + JS + Python pnp"},{"slug":"install","url":"/guides/install/","title":"Install and bootstrap","description":"Clone the monorepo and bring up a reproducible local environment.","excerpt":"# Install and bootstrap BlackStory is a TypeScript and Python monorepo. Local development does not require cloud credentials. If you want the product story first, start with [Why BlackStory](./about.md). ## Prerequisites - Node.js 22+ (`nvm"},{"slug":"adrs","url":"/guides/adrs/","title":"Architecture decisions","description":"Pointers into the ADR set that shapes the platform.","excerpt":"# Architecture decisions Formal ADRs live in the repository at [`docs/adr/`](https://github.com/geraldmaron/blackstory/tree/main/docs/adr). Selected topics: | ADR | Topic | Status | |-----|-------|--------| | 001 | Public web host versus Cl"},{"slug":"brand","url":"/guides/brand/","title":"Brand language","description":"Signature, palette, type, and map dignity rules for anything users see.","excerpt":"# Brand language **Product name:** BlackStory. **Core line:** History, pinned to place. **Support:** People. Places. Evidence. Context. Copy is specific over sweeping, evidence before assertion, pride without spectacle. Invite; do not lectu"},{"slug":"repo-map","url":"/guides/repo-map/","title":"Repository map","description":"Where apps, packages, workers, and infra live in the monorepo.","excerpt":"# Repository map BlackStory ships as one monorepo so public surfaces, private research tools, and shared libraries stay on the same contracts. | Path | Role | |------|------| | `apps/web` | Public Next.js app (Vercel; live at blackstory.app"},{"slug":"methodology","url":"/guides/methodology/","title":"Research methodology","description":"How claims, evidence, and confidence reach a publishable record.","excerpt":"# Research methodology BlackStory pins history to place. A publishable record needs claims, evidence, provenance, and confidence, not assertion alone. For the human case behind these rules, read [Why BlackStory](./about.md). ## Principles 1"},{"slug":"security","url":"/guides/security/","title":"Security posture","description":"Hostile-environment defaults without dumping the internal threat corpus.","excerpt":"# Security posture BlackStory assumes a hostile environment for public surfaces and contribution intake. The product promise depends on that assumption: a public page is only as trustworthy as the gates between research and release. ## Defa"}],"children":"$L3"}]}]]}]]}],{"children":["$L4",{"children":["$L5",{"children":["$L6",{},null,false,null]},null,false,"$@7"]},null,false,"$@7"]},null,false,null],"$L8",false]],"m":"$undefined","G":["$9",["$La"]],"S":true,"h":null,"s":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"5F9NtFGTImuCFa5aVssbJ"}
+b:I[27792,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"default"]
+c:I[27025,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"default"]
+d:I[36378,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],""]
+f:I[90879,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"OutletBoundary"]
+10:"$Sreact.suspense"
+13:I[90879,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"ViewportBoundary"]
+15:I[90879,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"MetadataBoundary"]
+3:["$","$Lb",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$Lc",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[["$","article",null,{"className":"prose","children":[["$","h1",null,{"children":"Page not found"}],["$","p",null,{"children":"That docs path is not in the curated public set."}],["$","p",null,{"children":["$","$Ld",null,{"href":"/","children":"Return home"}]}]]}],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]
+4:["$","$1","c",{"children":[null,["$","$Lb",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$Lc",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}]
+5:["$","$1","c",{"children":[null,["$","$Lb",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$Lc",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}]
+6:["$","$1","c",{"children":["$Le",null,["$","$Lf",null,{"children":["$","$10",null,{"name":"Next.MetadataOutlet","children":"$@11"}]}]]}]
+12:[]
+7:"$W12"
+8:["$","$1","h",{"children":[null,["$","$L13",null,{"children":"$L14"}],["$","div",null,{"hidden":true,"children":["$","$L15",null,{"children":["$","$10",null,{"name":"Next.Metadata","children":"$L16"}]}]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}]
+a:["$","link","0",{"rel":"stylesheet","href":"/blackstory/_next/static/chunks/0eop-r156d_rk.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]
+17:T1576,<h1 id="why-blackstory"><a class="heading-anchor" href="#why-blackstory">Why BlackStory</a></h1>
+<p>Black history is everywhere and somehow still easy to lose. A building gets renamed.
+A newspaper digitizes and reshuffles its URLs. A local story lives in a basement
+folder, a family scrapbook, or a grant-funded portal that stops getting updates.
+Search can find a title. It rarely leaves you with a durable record you can trust
+on a map.</p>
+<p>BlackStory exists for that gap.</p>
+<h2 id="the-feeling-we-are-building-toward"><a class="heading-anchor" href="#the-feeling-we-are-building-toward">The feeling we are building toward</a></h2>
+<p>Open the map. Find a place. See a person, a school, a movement, an event pinned
+with honest precision. Read a short claim. Follow the citation. Notice the
+confidence grade. Notice when the pin is a block or a locality, not a pretend
+street address. Leave knowing more than a headline, and knowing <em>how</em> we know it.</p>
+<p>The product line is simple on purpose:</p>
+<p><strong>History, pinned to place.</strong></p>
+<p><strong>People. Places. Evidence. Context.</strong></p>
+<p>That is not marketing garnish. It is the design brief. Place comes first.
+Evidence comes before assertion. Context sits beside records without pretending
+to be proof of cause. Pride without spectacle. Specific over sweeping. Invite,
+do not lecture.</p>
+<h2 id="what-most-portals-already-do-well"><a class="heading-anchor" href="#what-most-portals-already-do-well">What most portals already do well</a></h2>
+<p>Discovery portals are excellent at breadth. They help you search across many
+institutions and jump out to the host catalog. Specialized corpora such as
+<a href="https://enslaved.org/">Enslaved.org</a> publish deep, domain-focused linked data
+we do not try to replace.</p>
+<p>Those projects matter. BlackStory is not a rebuke of them.</p>
+<h2 id="the-empty-quadrant-we-are-aiming-at"><a class="heading-anchor" href="#the-empty-quadrant-we-are-aiming-at">The empty quadrant we are aiming at</a></h2>
+<p>We want <strong>entity records</strong>: a person, place, or event you can hold in the
+product. We want those records <strong>place-indexed</strong>, with map precision that tells
+the truth. We want <strong>general Black history</strong> across eras and topics, curated and
+growing, not a single corpus. And over time we want records that are
+<strong>machine-queryable</strong> with stable fields, once quality gates say we are ready.</p>
+<p>Most stacks occupy one or two of those axes. The overlap is thinner than it
+should be. Aggregators widen access and also inherit link rot. When a holding
+institution migrates its repository, outbound links can break while search
+results still look fine. Field review of <a href="https://umbrasearch.org/">Umbra Search</a>
+in <em>The American Archivist</em> (April 2026) documents that failure mode clearly.</p>
+<p>Our answer is not "aggregators are bad." It is evidence pinned to place, with
+archived capture pointers so a reader can still open the citation when the
+origin site moves.</p>
+<h2 id="what-we-refuse"><a class="heading-anchor" href="#what-we-refuse">What we refuse</a></h2>
+<ul>
+<li>Completeness theater. We do not claim to index all Black history. Absence on
+the map is not proof nothing happened. It may mean sources have not cleared
+the publish gate yet.</li>
+<li>Sensational framing. Violence-adjacent records do not become crime-heat maps
+or alarm-red spectacles.</li>
+<li>Fake precision. A coarsened point is never labeled as an exact address.</li>
+<li>Silent living-person risk. Unknown living status is treated as living. Public
+residential addresses stay out.</li>
+<li>Automated causation. Showing a law beside a demographic indicator is
+juxtaposition for context, not a machine claim that the law caused the
+number. Causal statements need separately evidenced claims.</li>
+<li>LLM publish paths. Models can help draft and enrich behind the gate. They
+cannot promote a public release.</li>
+</ul>
+<h2 id="how-trust-is-supposed-to-work"><a class="heading-anchor" href="#how-trust-is-supposed-to-work">How trust is supposed to work</a></h2>
+<p>A public page is not a research notebook. Readers see <strong>released projections</strong>:
+immutable, reviewed slices of what we are willing to stand behind. Research,
+quarantine, enrichment, and promotion stay private. Corrections land in intake,
+not on the live canon.</p>
+<p>Confidence stays visible. Color is never the only signal. Citations should carry
+archived captures before they meet our public evidence bar. That bar measures
+readiness of the evidence ledger, not coverage of the entire field.</p>
+<h2 id="where-we-are-today"><a class="heading-anchor" href="#where-we-are-today">Where we are today</a></h2>
+<p>The public product is live and growing. The catalog is on the order of thousands
+of place-indexed entities, not a finished national inventory. Capture coverage,
+developer query surfaces, and some cloud wiring are still catching up to the
+architecture. This docs site is the orientation layer. The repository is the
+source of truth.</p>
+<p>If you are here to contribute, start with <a href="./install.md">Install and bootstrap</a>
+and the <a href="./architecture.md">Architecture</a> guide. If you are here to understand
+the research posture, read <a href="./methodology.md">Research methodology</a> next.</p>
+<p>BlackStory is being built in the open, carefully, with the people and places
+the history belongs to kept in view.</p>e:["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"start"}]]}],["$","p",null,{"className":"doc-lede","children":"The human case for a place-connected archive of Black history."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$17"}}],"$L18"]}]
+18:["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","about",".md"]}],"."," ",["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]]}]}]
+14:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
+19:I[87752,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"IconMark"]
+11:null
+16:[["$","title","0",{"children":"Why BlackStory · BlackStory"}],["$","meta","1",{"name":"description","content":"The human case for a place-connected archive of Black history."}],["$","meta","2",{"property":"og:title","content":"BlackStory Docs"}],["$","meta","3",{"property":"og:description","content":"BlackStory docs: why the project exists, how place-connected records reach the public, and how to work in the monorepo."}],["$","meta","4",{"property":"og:site_name","content":"BlackStory"}],["$","meta","5",{"property":"og:image","content":"https://geraldmaron.github.io/blackstory/brand/open-graph-dark-1200x630.png?v=20260721"}],["$","meta","6",{"property":"og:image:width","content":"1200"}],["$","meta","7",{"property":"og:image:height","content":"630"}],["$","meta","8",{"name":"twitter:card","content":"summary_large_image"}],["$","meta","9",{"name":"twitter:title","content":"BlackStory Docs"}],["$","meta","10",{"name":"twitter:description","content":"BlackStory docs: why the project exists, how place-connected records reach the public, and how to work in the monorepo."}],["$","meta","11",{"name":"twitter:image","content":"https://geraldmaron.github.io/blackstory/brand/open-graph-dark-1200x630.png?v=20260721"}],["$","meta","12",{"name":"twitter:image:width","content":"1200"}],["$","meta","13",{"name":"twitter:image:height","content":"630"}],["$","link","14",{"rel":"icon","href":"/blackstory/brand/favicon-light-32.png","sizes":"32x32","type":"image/png"}],["$","link","15",{"rel":"icon","href":"/blackstory/brand/favicon-dark-32.png","sizes":"32x32","type":"image/png","media":"(prefers-color-scheme: dark)"}],["$","link","16",{"rel":"apple-touch-icon","href":"/blackstory/brand/apple-touch-icon-light-180.png","sizes":"180x180"}],["$","$L19","17",{}]]

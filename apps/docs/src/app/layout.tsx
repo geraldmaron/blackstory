@@ -44,8 +44,8 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_URL ?? `https://geraldmaron.github.io${basePath || '/blackstory'}`,
   ),
   title: {
-    default: `${PRODUCT_NAME} — Docs`,
-    template: `%s — ${PRODUCT_NAME}`,
+    default: `${PRODUCT_NAME} Docs`,
+    template: `%s · ${PRODUCT_NAME}`,
   },
   description: SITE_DESCRIPTION,
   icons: {
@@ -62,11 +62,11 @@ export const metadata: Metadata = {
   },
   openGraph: {
     siteName: PRODUCT_NAME,
-    title: `${PRODUCT_NAME} — Docs`,
+    title: `${PRODUCT_NAME} Docs`,
     description: SITE_DESCRIPTION,
     images: [
       {
-        // Relative to metadataBase (already includes /blackstory) — do not withBasePath.
+        // Relative to metadataBase (already includes /blackstory). Do not withBasePath.
         // `v=` busts scraper caches when the opaque OG asset is regenerated.
         url: '/brand/open-graph-dark-1200x630.png?v=20260721',
         width: 1200,

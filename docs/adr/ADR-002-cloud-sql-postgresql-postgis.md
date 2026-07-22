@@ -1,13 +1,12 @@
 # ADR-002: Cloud SQL PostgreSQL and PostGIS
 
-- **Status:** Superseded (current phase) by [ADR-011](./ADR-011-firestore-system-of-record.md) / [D-014](../../.cx/decisions/D-014-firestore-not-cloud-sql.md)
+- **Status:** Superseded by [ADR-011](./ADR-011-firestore-system-of-record.md), then by [ADR-020](./ADR-020-supabase-postgres-system-of-record.md)
 - **Date:** 2026-07-16
-- **Bead:**
 - **Depends on:** ADR-001 (runtime surfaces), ADR-004 (projections), ADR-009 (research isolation)
 
-> **Phase note (2026-07-16):** Cloud SQL / PostGIS is **not** the production system of record.
-> Artifacts under `infra/database/` are **parked** for a possible later revisit. Do not provision
-> paid Cloud SQL unless ADR-011 migration triggers are met.
+> **Archive note (2026-07-22):** Product Postgres lives on **Supabase** (`blackstory-app`),
+> not Cloud SQL. Artifacts under `infra/database/` remain **parked**. Do **not** provision
+> paid Cloud SQL. PostGIS/pgvector capabilities from this ADR’s intent land via ADR-020.
 
 ## Scaffold vs target
 

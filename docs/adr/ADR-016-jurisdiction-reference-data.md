@@ -2,9 +2,8 @@
 
 - **Status:** Accepted
 - **Date:** 2026-07-17
-- **Bead:**  (jurisdiction registry and geographic reference substrate)
-- **Depends on:** ADR-004, ADR-008, ADR-011, ADR-013, , ,
-- **Blocks (real jurisdiction refs for):** , , , , ,
+- **Depends on:** ADR-004, ADR-008, ADR-013, ADR-020
+- **Amended:** 2026-07-22 (depends-on SoR path)
 
 ## Problem
 

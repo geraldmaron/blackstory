@@ -1,10 +1,14 @@
 # ADR-022: Mobile data boundary — public contracts package, API v1 versioning, and the client/server line
 
-- **Status:** **Accepted (with amendments)** — 2026-07-20 adversarial review; owner authorized decision-making after review + research
-- **Date:** 2026-07-19 (accepted-with-amendments 2026-07-20)
-- **Bead:** MOB-002 (`black-book-mobile-002`); acceptance gate `repo-5os2`
-- **Depends on:** ADR-004, ADR-005, ADR-011
-- **Blocks:** MOB-003 (`packages/public-contracts`), MOB-004 (bounded public API v1 in `apps/api-public`)
+- **Status:** Accepted (amended 2026-07-22: SoR ADR-020; attestation via client headers)
+- **Date:** 2026-07-19
+- **Amended:** 2026-07-20 adversarial review; 2026-07-22
+- **Depends on:** ADR-004, ADR-005, ADR-020
+
+> **Amendment (2026-07-22):** Reads go through `apps/api-public` (and optionally PostgREST
+> published views for open developers per ADR-026). No client Firestore. Attestation is
+> `X-BlackStory-Client` / request-integrity, not Firebase App Check. Historical App Check
+> diagrams in the body are superseded for production posture.
 
 ## Adversarial review disposition (2026-07-20)
 

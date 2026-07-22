@@ -1,10 +1,8 @@
 # ADR-023: Mobile client state, local cache, and offline-read mode
 
-- **Status:** **Accepted (with a minor amendment)** — 2026-07-20 adversarial review; owner authorized decision-making after review + research
-- **Date:** 2026-07-19 (accepted-with-amendments 2026-07-20)
-- **Bead:** MOB-002 (`black-book-mobile-002`); acceptance gate `repo-5os2`
-- **Depends on:** ADR-004 (public projection / immutable snapshots), ADR-008 (bounded static-first search and geocoding), ADR-013 (map stack), ADR-021 (mobile stack), ADR-022 (mobile data boundary)
-- **Blocks:** MOB-009 (typed API client, SQLite cache, offline mode, migrations), MOB-012 (native Explore map, synchronized list, filters, narrative sheet)
+- **Status:** Accepted (amended 2026-07-20)
+- **Date:** 2026-07-19
+- **Depends on:** ADR-004, ADR-008, ADR-013, ADR-021, ADR-022
 
 ## Adversarial review disposition (2026-07-20)
 

@@ -1,13 +1,13 @@
 # ADR-003: Firebase SQL Connect usage boundaries
 
-- **Status:** Deferred / superseded (current phase) by [ADR-011](./ADR-011-firestore-system-of-record.md)
+- **Status:** Superseded by [ADR-020](./ADR-020-supabase-postgres-system-of-record.md)
 - **Date:** 2026-07-16
-- **Bead:**
 - **Depends on:** ADR-002, ADR-005
 
-> **Phase note (2026-07-16):** SQL Connect templates under `infra/database/sql-connect/` are
-> **parked**. TypeScript apps use Firestore Admin SDK / `@repo/firebase` for the production
-> data path. Revisit only if Cloud SQL is reconsidered under ADR-011 triggers.
+> **Archive note (2026-07-22):** SQL Connect is **permanently non-path**. Product data access
+> uses Supabase Postgres drivers, `@repo/data-access`, and PostgREST published views (ADR-026).
+> Templates under `infra/database/sql-connect/` stay parked historical artifacts. Do not revive
+> SQL Connect without a new ADR.
 
 ## Scaffold vs target
 

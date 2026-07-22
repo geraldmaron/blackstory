@@ -1,12 +1,13 @@
 # ADR-025: Mobile map data — self-hosted PMTiles, native range requests, attribution, and failure strategy
 
-- **Status:** **Accepted (with amendments)** — 2026-07-20 adversarial review; owner authorized decision-making after review + research
-- **Date:** 2026-07-19 (accepted-with-amendments 2026-07-20)
-- **Deciders:** mobile-program-review (agent); accepted under explicit owner authorization to decide after adversarial review
-- **Bead:** MOB-011 (`black-book-mobile-011`)
-- **Supersedes:** none
-- **Depends on:** ADR-004, ADR-008, ADR-010, ADR-011, ADR-013, ADR-021
-- **Blocks:** MOB-012 (native Explore map, synchronized list, narrative sheet)
+- **Status:** Accepted (amended 2026-07-22: CDN host not Firebase-required; no RN Firebase)
+- **Date:** 2026-07-19
+- **Amended:** 2026-07-20 adversarial review; 2026-07-22
+- **Depends on:** ADR-004, ADR-008, ADR-010, ADR-013, ADR-020, ADR-021
+
+> **Amendment (2026-07-22):** PMTiles may be served from any static CDN (Vercel, Firebase
+> Hosting, or GCS+CDN). RN Firebase is not required for MapLibre. Historical “Firebase CDN
+> required” / RN Firebase reconciliation language is superseded.
 
 ## Adversarial review disposition (2026-07-20)
 

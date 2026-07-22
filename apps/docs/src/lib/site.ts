@@ -9,7 +9,7 @@ export const TAGLINE = 'History, pinned to place.' as const;
 export const SUPPORT_LINE = 'People. Places. Evidence. Context.' as const;
 export const REPO_URL = 'https://github.com/geraldmaron/blackstory' as const;
 export const SITE_DESCRIPTION =
-  'Place-connected Black history research with published claims, provenance, and confidence.' as const;
+  'BlackStory docs: why the project exists, how place-connected records reach the public, and how to work in the monorepo.' as const;
 
 export const THEME_STORAGE_KEY = 'ds-theme' as const;
 

@@ -2,11 +2,8 @@
 
 - **Status:** Accepted
 - **Date:** 2026-07-17
-- **Bead:**
-- **Depends on:** ADR-011 (Firestore system of record)
-- **Implements toward:**  (FactRecord spec),  (legal landscape badges),
-  (editorial trust / methodology definitions),  (history graph substrate),
-  (vetted-corpus bulk intake),  (sensitivity presentation)
+- **Depends on:** ADR-020 (Supabase Postgres system of record)
+- **Amended:** 2026-07-22 (depends-on SoR path)
 
 ## Scaffold vs target
 

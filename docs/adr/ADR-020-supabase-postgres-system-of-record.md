@@ -1,22 +1,21 @@
 # ADR-020: Supabase Postgres as system of record
 
-- **Status:** Accepted (amended 2026-07-21 — Supabase Storage for product blobs)
+- **Status:** Accepted (amended 2026-07-21 Storage; reconciled 2026-07-22 cutover language)
 - **Date:** 2026-07-20
-- **Bead:** repo-ivh4; storage cutover epic repo-8pku
 - **Depends on:** ADR-004, ADR-005, ADR-009, ADR-010, ADR-015, ADR-016
 - **Supersedes (production SoR path):** ADR-011
 - **Amends:** ADR-002 / ADR-003 (Cloud SQL + SQL Connect remain non-path); ADR-008 / ADR-014 (geo/search/vectors land in Postgres)
-- **Does not supersede:** ADR-004 (immutable public projections), ADR-012 (multi-project ops topology for Firebase remains until cutover)
+- **Does not supersede:** ADR-004 (immutable public projections). ADR-012 (multi-project Firebase ops topology) remains a separate, not-yet-applied ops decision; Firebase wind-down may leave a single project until the owner checklist completes.
 
 ## Scaffold vs target
 
 | Aspect | Today (verified) | Target (this phase) |
 |--------|------------------|---------------------|
-| System of record | Cloud Firestore (`black-book-efaaf`) | Supabase Postgres project **`blackstory-app`** (`twykhihqkcldpreuovay`, `us-west-2`) |
-| Auth | Firebase Auth + custom claims | **Supabase Auth**; roles in `app_metadata.bb_role` only |
-| Blobs | Firebase Storage / GCS (legacy) | **Supabase Storage** for public-media (+ raw-sources phased); Postgres holds refs |
-| Schema docs / DDL | Parked Cloud SQL stubs under `infra/database/` | Versioned DDL under `supabase/migrations/` |
-| ETL / cutover | N/A | **Out of scope** for this ADR (follow-up) |
+| System of record | **Supabase Postgres** (`blackstory-app`) for migrated product tables | Same; expand schema under `supabase/migrations/` |
+| Auth | **Supabase Auth**; roles in `app_metadata.bb_role` (admin) | Same; Firebase Auth only as documented rollback |
+| Blobs | **Supabase Storage** primary for `public-media`; GCS dual-serve / rollback | Complete raw-sources + wind-down |
+| Schema docs / DDL | `supabase/migrations/`, `docs/data/postgres-schema.md` | Same |
+| Firestore | Export / rollback / utilities only | Owner wind-down checklist |
 
 ## Context
 
@@ -34,7 +33,7 @@ Non-negotiable invariants from prior ADRs still bind: no anonymous canonical wri
 6. **Natural text keys** are preserved for semantic document IDs (`us-06-001`, `{fips5}_{decade}`, etc.). UUIDs are used where the domain already used random IDs.
 7. **Geography / vectors** use PostGIS (`geography(Point,4326)`) and `pgvector` (`vector(768)`), retaining geohash text for transition compatibility.
 8. **Blobs** live in **Supabase Storage** for product public-media (and phased raw-sources). Postgres stores object refs / public URLs only. GCS / Firebase Storage remains a dual-serve rollback origin until the owner completes wind-down; agents never delete GCS objects as part of cutover.
-9. **Firestore remains live** until a separate cutover ADR/plan. This ADR authorizes schema design + DDL landing in-repo and (when explicitly approved) on `blackstory-app`. It does **not** authorize dual-write or production traffic cutover.
+9. **Structured cutover is done** for migrated product tables: treat Postgres as SoR; **do not dual-write** new canonical truth to Firestore. Firestore remains available for **export and rollback** until `docs/data/firebase-wind-down.md` completes. This ADR does **not** authorize irreversible Firebase project deletion.
 10. Parked Cloud SQL / SQL Connect under `infra/database/` stays non-production; banners point here.
 
 ## Rejected alternatives
@@ -62,6 +61,7 @@ Non-negotiable invariants from prior ADRs still bind: no anonymous canonical wri
 
 ## Rollback
 
-- DDL on empty `blackstory-app` can be dropped/reset if unused.
-- Production traffic remains on Firestore until cutover; rolling back this ADR means pausing further Supabase schema expansion, not undoing Firestore.
-- Never “fix” public truth by editing active projections — use ADR-004 release pointer semantics in Postgres as in Firestore.
+- Prefer ADR-004 release pointer rollback in Postgres over editing live projections.
+- Temporary `PUBLIC_DATA_SOURCE=firestore` (or equivalent) is an explicit opt-in during wind-down only, not a silent default.
+- Never delete the Firebase project without dual verification and completed export checklist.
+- DDL mistakes on `blackstory-app` use migrations and release discipline, not dual-write back to Firestore as a habit.

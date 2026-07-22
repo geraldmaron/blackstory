@@ -1,0 +1,80 @@
+1:"$Sreact.fragment"
+5:I[90879,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"OutletBoundary"]
+6:"$Sreact.suspense"
+2:T1576,<h1 id="why-blackstory"><a class="heading-anchor" href="#why-blackstory">Why BlackStory</a></h1>
+<p>Black history is everywhere and somehow still easy to lose. A building gets renamed.
+A newspaper digitizes and reshuffles its URLs. A local story lives in a basement
+folder, a family scrapbook, or a grant-funded portal that stops getting updates.
+Search can find a title. It rarely leaves you with a durable record you can trust
+on a map.</p>
+<p>BlackStory exists for that gap.</p>
+<h2 id="the-feeling-we-are-building-toward"><a class="heading-anchor" href="#the-feeling-we-are-building-toward">The feeling we are building toward</a></h2>
+<p>Open the map. Find a place. See a person, a school, a movement, an event pinned
+with honest precision. Read a short claim. Follow the citation. Notice the
+confidence grade. Notice when the pin is a block or a locality, not a pretend
+street address. Leave knowing more than a headline, and knowing <em>how</em> we know it.</p>
+<p>The product line is simple on purpose:</p>
+<p><strong>History, pinned to place.</strong></p>
+<p><strong>People. Places. Evidence. Context.</strong></p>
+<p>That is not marketing garnish. It is the design brief. Place comes first.
+Evidence comes before assertion. Context sits beside records without pretending
+to be proof of cause. Pride without spectacle. Specific over sweeping. Invite,
+do not lecture.</p>
+<h2 id="what-most-portals-already-do-well"><a class="heading-anchor" href="#what-most-portals-already-do-well">What most portals already do well</a></h2>
+<p>Discovery portals are excellent at breadth. They help you search across many
+institutions and jump out to the host catalog. Specialized corpora such as
+<a href="https://enslaved.org/">Enslaved.org</a> publish deep, domain-focused linked data
+we do not try to replace.</p>
+<p>Those projects matter. BlackStory is not a rebuke of them.</p>
+<h2 id="the-empty-quadrant-we-are-aiming-at"><a class="heading-anchor" href="#the-empty-quadrant-we-are-aiming-at">The empty quadrant we are aiming at</a></h2>
+<p>We want <strong>entity records</strong>: a person, place, or event you can hold in the
+product. We want those records <strong>place-indexed</strong>, with map precision that tells
+the truth. We want <strong>general Black history</strong> across eras and topics, curated and
+growing, not a single corpus. And over time we want records that are
+<strong>machine-queryable</strong> with stable fields, once quality gates say we are ready.</p>
+<p>Most stacks occupy one or two of those axes. The overlap is thinner than it
+should be. Aggregators widen access and also inherit link rot. When a holding
+institution migrates its repository, outbound links can break while search
+results still look fine. Field review of <a href="https://umbrasearch.org/">Umbra Search</a>
+in <em>The American Archivist</em> (April 2026) documents that failure mode clearly.</p>
+<p>Our answer is not "aggregators are bad." It is evidence pinned to place, with
+archived capture pointers so a reader can still open the citation when the
+origin site moves.</p>
+<h2 id="what-we-refuse"><a class="heading-anchor" href="#what-we-refuse">What we refuse</a></h2>
+<ul>
+<li>Completeness theater. We do not claim to index all Black history. Absence on
+the map is not proof nothing happened. It may mean sources have not cleared
+the publish gate yet.</li>
+<li>Sensational framing. Violence-adjacent records do not become crime-heat maps
+or alarm-red spectacles.</li>
+<li>Fake precision. A coarsened point is never labeled as an exact address.</li>
+<li>Silent living-person risk. Unknown living status is treated as living. Public
+residential addresses stay out.</li>
+<li>Automated causation. Showing a law beside a demographic indicator is
+juxtaposition for context, not a machine claim that the law caused the
+number. Causal statements need separately evidenced claims.</li>
+<li>LLM publish paths. Models can help draft and enrich behind the gate. They
+cannot promote a public release.</li>
+</ul>
+<h2 id="how-trust-is-supposed-to-work"><a class="heading-anchor" href="#how-trust-is-supposed-to-work">How trust is supposed to work</a></h2>
+<p>A public page is not a research notebook. Readers see <strong>released projections</strong>:
+immutable, reviewed slices of what we are willing to stand behind. Research,
+quarantine, enrichment, and promotion stay private. Corrections land in intake,
+not on the live canon.</p>
+<p>Confidence stays visible. Color is never the only signal. Citations should carry
+archived captures before they meet our public evidence bar. That bar measures
+readiness of the evidence ledger, not coverage of the entire field.</p>
+<h2 id="where-we-are-today"><a class="heading-anchor" href="#where-we-are-today">Where we are today</a></h2>
+<p>The public product is live and growing. The catalog is on the order of thousands
+of place-indexed entities, not a finished national inventory. Capture coverage,
+developer query surfaces, and some cloud wiring are still catching up to the
+architecture. This docs site is the orientation layer. The repository is the
+source of truth.</p>
+<p>If you are here to contribute, start with <a href="./install.md">Install and bootstrap</a>
+and the <a href="./architecture.md">Architecture</a> guide. If you are here to understand
+the research posture, read <a href="./methodology.md">Research methodology</a> next.</p>
+<p>BlackStory is being built in the open, carefully, with the people and places
+the history belongs to kept in view.</p>0:{"rsc":["$","$1","c",{"children":[["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"start"}]]}],["$","p",null,{"className":"doc-lede","children":"The human case for a place-connected archive of Black history."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$2"}}],"$L3"]}],null,"$L4"]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"5F9NtFGTImuCFa5aVssbJ"}
+3:["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","about",".md"]}],"."," ",["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]]}]}]
+4:["$","$L5",null,{"children":["$","$6",null,{"name":"Next.MetadataOutlet","children":"$@7"}]}]
+7:null

@@ -16,12 +16,16 @@ pnpm test               # preflight + JS + Python
 pnpm build
 pnpm build && pnpm typecheck
 
-pnpm --filter @repo/web build
+pnpm dev:web            # public web on :3048
 pnpm --filter @repo/docs dev
-DOCS_BASE_PATH=/blackstory pnpm --filter @repo/docs build
+pnpm docs:publish       # static export into repo docs/ for GitHub Pages
+
+pnpm --filter @repo/web build
+pnpm --filter @repo/admin build
+pnpm --filter @repo/api-public build
 
 pnpm firebase:emulators
 pnpm firebase:test:rules
 ```
 
-Full command list: repository root `README.md`.
+Full command list and project overview: repository root `README.md`.

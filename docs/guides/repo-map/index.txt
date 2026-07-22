@@ -8,7 +8,7 @@
 :HL["/blackstory/_next/static/media/99e609270109b47d-s.p.40sczeszzbjw1.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
 :HL["/blackstory/_next/static/media/c41ca59f1c34ba31-s.p.2y2uoi4t910qy.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
 :HL["/blackstory/_next/static/media/effe91970fc4db64-s.p.0oace-s_gkfks.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
-0:{"P":null,"c":["","guides","repo-map",""],"q":"","i":false,"f":[[["",{"children":["guides",{"children":[["slug","repo-map","d",null],{"children":["__PAGE__",{}]}]}]},"$undefined","$undefined",16],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/blackstory/_next/static/chunks/0eop-r156d_rk.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/blackstory/_next/static/chunks/0e3scowebwodx.js","async":true,"nonce":"$undefined"}],["$","script","script-1",{"src":"/blackstory/_next/static/chunks/13re3aq9x3sif.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","className":"sora_f6a30ec3-module__KEGh6q__variable inter_8b43e30-module__-FgmxW__variable source_serif_4_f4ae2c77-module__A8GHDq__variable ibm_plex_mono_2bcb32c6-module__bm6A8W__variable","suppressHydrationWarning":true,"children":[["$","head",null,{"children":["$","script",null,{"dangerouslySetInnerHTML":{"__html":"(function(){try{var k=\"ds-theme\";var s=localStorage.getItem(k);var d=window.matchMedia('(prefers-color-scheme: dark)').matches;var t=(s==='light'||s==='dark')?s:(d?'dark':'light');document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();"}}]}],["$","body",null,{"children":["$","$L2",null,{"sections":[{"label":"Get started","links":[{"num":"01","title":"Install and bootstrap","url":"/guides/install/"},{"num":"02","title":"Repository map","url":"/guides/repo-map/"}]},{"label":"Concepts","links":[{"num":"01","title":"Architecture","url":"/guides/architecture/"},{"num":"02","title":"Brand language","url":"/guides/brand/"},{"num":"03","title":"Research methodology","url":"/guides/methodology/"},{"num":"04","title":"Security posture","url":"/guides/security/"}]},{"label":"Reference","links":[{"num":"01","title":"Commands cheat sheet","url":"/guides/commands/"},{"num":"02","title":"Architecture decisions","url":"/guides/adrs/"}]}],"searchIndex":[{"slug":"architecture","url":"/guides/architecture/","title":"Architecture","description":"Surfaces, data plane, and non-negotiable boundaries.","excerpt":"# Architecture BlackStory is a place-connected Black history research platform. Public surfaces serve only released historical projections. Research, evidence, and promotion stay behind private APIs, workers, and admin tools. ## Surfaces ``"},{"slug":"commands","url":"/guides/commands/","title":"Commands cheat sheet","description":"Everyday pnpm and bootstrap commands for contributors.","excerpt":"# Commands cheat sheet ```bash pnpm bootstrap # reproducible JS + Python envs pnpm validate # boundaries, lint, governance pnpm format:check pnpm test:preflight # fail closed on production identifiers pnpm test # preflight + JS + Python pnp"},{"slug":"install","url":"/guides/install/","title":"Install and bootstrap","description":"Clone the monorepo and bring up a reproducible local environment.","excerpt":"# Install and bootstrap BlackStory is a TypeScript + Python monorepo. Local development does not require cloud credentials. ## Prerequisites - Node.js 22+ (`nvm use` from `.nvmrc`) - [pnpm](https://pnpm.io/) 9.x - [uv](https://docs.astral.s"},{"slug":"adrs","url":"/guides/adrs/","title":"Architecture decisions","description":"Pointers into the ADR set that shapes the platform.","excerpt":"# Architecture decisions Formal ADRs live in the repository at [`docs/adr/`](https://github.com/geraldmaron/blackstory/tree/main/docs/adr). Selected topics: | ADR | Topic | |-----|-------| | 001 | Firebase App Hosting vs Cloud Run | | 004 |"},{"slug":"brand","url":"/guides/brand/","title":"Brand language","description":"Signature, palette, type, and map dignity rules for anything users see.","excerpt":"# Brand language **Product name:** BlackStory. **Core line:** History, pinned to place. **Support:** People. Places. Evidence. Context. Copy is specific over sweeping, evidence before assertion, pride without spectacle. Invite; do not lectu"},{"slug":"repo-map","url":"/guides/repo-map/","title":"Repository map","description":"Where apps, packages, workers, and infra live in the monorepo.","excerpt":"# Repository map | Path | Role | |------|------| | `apps/web` | Public Next.js app (Firebase App Hosting) | | `apps/admin` | Private Next.js admin/research console | | `apps/api-public` | Public read/search/location API | | `apps/api-submis"},{"slug":"methodology","url":"/guides/methodology/","title":"Research methodology","description":"How claims, evidence, and confidence reach a publishable record.","excerpt":"# Research methodology BlackStory pins history to place. A publishable record needs claims, evidence, provenance, and confidence — not assertion alone. ## Principles 1. **Evidence before assertion.** Public prose cites released evidence. 2."},{"slug":"security","url":"/guides/security/","title":"Security posture","description":"Hostile-environment defaults without dumping the internal threat corpus.","excerpt":"# Security posture BlackStory assumes a hostile environment for public surfaces and contribution intake. ## Defaults - Public clients never write canonical history. - Submissions land in quarantine; compromise of intake must not equal publi"}],"children":"$L3"}]}]]}]]}],{"children":["$L4",{"children":["$L5",{"children":["$L6",{},null,false,null]},null,false,"$@7"]},null,false,"$@7"]},null,false,null],"$L8",false]],"m":"$undefined","G":["$9",["$La"]],"S":true,"h":null,"s":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"UW9vrt6hETcQnMoL0FLFN"}
+0:{"P":null,"c":["","guides","repo-map",""],"q":"","i":false,"f":[[["",{"children":["guides",{"children":[["slug","repo-map","d",null],{"children":["__PAGE__",{}]}]}]},"$undefined","$undefined",16],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/blackstory/_next/static/chunks/0eop-r156d_rk.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/blackstory/_next/static/chunks/0e3scowebwodx.js","async":true,"nonce":"$undefined"}],["$","script","script-1",{"src":"/blackstory/_next/static/chunks/13re3aq9x3sif.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","className":"sora_f6a30ec3-module__KEGh6q__variable inter_8b43e30-module__-FgmxW__variable source_serif_4_f4ae2c77-module__A8GHDq__variable ibm_plex_mono_2bcb32c6-module__bm6A8W__variable","suppressHydrationWarning":true,"children":[["$","head",null,{"children":["$","script",null,{"dangerouslySetInnerHTML":{"__html":"(function(){try{var k=\"ds-theme\";var s=localStorage.getItem(k);var d=window.matchMedia('(prefers-color-scheme: dark)').matches;var t=(s==='light'||s==='dark')?s:(d?'dark':'light');document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();"}}]}],["$","body",null,{"children":["$","$L2",null,{"sections":[{"label":"Get started","links":[{"num":"01","title":"Why BlackStory","url":"/guides/about/"},{"num":"02","title":"Install and bootstrap","url":"/guides/install/"},{"num":"03","title":"Repository map","url":"/guides/repo-map/"}]},{"label":"Concepts","links":[{"num":"01","title":"Architecture","url":"/guides/architecture/"},{"num":"02","title":"Brand language","url":"/guides/brand/"},{"num":"03","title":"Research methodology","url":"/guides/methodology/"},{"num":"04","title":"Security posture","url":"/guides/security/"}]},{"label":"Reference","links":[{"num":"01","title":"Commands cheat sheet","url":"/guides/commands/"},{"num":"02","title":"Architecture decisions","url":"/guides/adrs/"}]}],"searchIndex":[{"slug":"about","url":"/guides/about/","title":"Why BlackStory","description":"The human case for a place-connected archive of Black history.","excerpt":"# Why BlackStory Black history is everywhere and somehow still easy to lose. A building gets renamed. A newspaper digitizes and reshuffles its URLs. A local story lives in a basement folder, a family scrapbook, or a grant-funded portal that"},{"slug":"architecture","url":"/guides/architecture/","title":"Architecture","description":"Surfaces, data plane, and non-negotiable boundaries.","excerpt":"# Architecture BlackStory is a place-connected Black history research platform. Public surfaces serve only released historical projections. Research, evidence, and promotion stay behind private APIs, workers, and admin tools. ## Surfaces ``"},{"slug":"commands","url":"/guides/commands/","title":"Commands cheat sheet","description":"Everyday pnpm and bootstrap commands for contributors.","excerpt":"# Commands cheat sheet ```bash pnpm bootstrap # reproducible JS + Python envs pnpm validate # boundaries, lint, governance pnpm format:check pnpm test:preflight # fail closed on production identifiers pnpm test # preflight + JS + Python pnp"},{"slug":"install","url":"/guides/install/","title":"Install and bootstrap","description":"Clone the monorepo and bring up a reproducible local environment.","excerpt":"# Install and bootstrap BlackStory is a TypeScript and Python monorepo. Local development does not require cloud credentials. If you want the product story first, start with [Why BlackStory](./about.md). ## Prerequisites - Node.js 22+ (`nvm"},{"slug":"adrs","url":"/guides/adrs/","title":"Architecture decisions","description":"Pointers into the ADR set that shapes the platform.","excerpt":"# Architecture decisions Formal ADRs live in the repository at [`docs/adr/`](https://github.com/geraldmaron/blackstory/tree/main/docs/adr). Selected topics: | ADR | Topic | Status | |-----|-------|--------| | 001 | Public web host versus Cl"},{"slug":"brand","url":"/guides/brand/","title":"Brand language","description":"Signature, palette, type, and map dignity rules for anything users see.","excerpt":"# Brand language **Product name:** BlackStory. **Core line:** History, pinned to place. **Support:** People. Places. Evidence. Context. Copy is specific over sweeping, evidence before assertion, pride without spectacle. Invite; do not lectu"},{"slug":"repo-map","url":"/guides/repo-map/","title":"Repository map","description":"Where apps, packages, workers, and infra live in the monorepo.","excerpt":"# Repository map BlackStory ships as one monorepo so public surfaces, private research tools, and shared libraries stay on the same contracts. | Path | Role | |------|------| | `apps/web` | Public Next.js app (Vercel; live at blackstory.app"},{"slug":"methodology","url":"/guides/methodology/","title":"Research methodology","description":"How claims, evidence, and confidence reach a publishable record.","excerpt":"# Research methodology BlackStory pins history to place. A publishable record needs claims, evidence, provenance, and confidence, not assertion alone. For the human case behind these rules, read [Why BlackStory](./about.md). ## Principles 1"},{"slug":"security","url":"/guides/security/","title":"Security posture","description":"Hostile-environment defaults without dumping the internal threat corpus.","excerpt":"# Security posture BlackStory assumes a hostile environment for public surfaces and contribution intake. The product promise depends on that assumption: a public page is only as trustworthy as the gates between research and release. ## Defa"}],"children":"$L3"}]}]]}]]}],{"children":["$L4",{"children":["$L5",{"children":["$L6",{},null,false,null]},null,false,"$@7"]},null,false,"$@7"]},null,false,null],"$L8",false]],"m":"$undefined","G":["$9",["$La"]],"S":true,"h":null,"s":"$undefined","l":"$undefined","p":"$undefined","d":"$undefined","b":"5F9NtFGTImuCFa5aVssbJ"}
 b:I[27792,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"default"]
 c:I[27025,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"default"]
 d:I[36378,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],""]
@@ -24,7 +24,9 @@ f:I[90879,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next
 7:"$W12"
 8:["$","$1","h",{"children":[null,["$","$L13",null,{"children":"$L14"}],["$","div",null,{"hidden":true,"children":["$","$L15",null,{"children":["$","$10",null,{"name":"Next.Metadata","children":"$L16"}]}]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}]
 a:["$","link","0",{"rel":"stylesheet","href":"/blackstory/_next/static/chunks/0eop-r156d_rk.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]
-17:T53a,<h1 id="repository-map"><a class="heading-anchor" href="#repository-map">Repository map</a></h1>
+17:Tb1b,<h1 id="repository-map"><a class="heading-anchor" href="#repository-map">Repository map</a></h1>
+<p>BlackStory ships as one monorepo so public surfaces, private research tools, and
+shared libraries stay on the same contracts.</p>
 <table>
 <thead>
 <tr>
@@ -35,27 +37,31 @@ a:["$","link","0",{"rel":"stylesheet","href":"/blackstory/_next/static/chunks/0e
 <tbody>
 <tr>
 <td><code>apps/web</code></td>
-<td>Public Next.js app (Firebase App Hosting)</td>
+<td>Public Next.js app (Vercel; live at blackstory.app)</td>
 </tr>
 <tr>
 <td><code>apps/admin</code></td>
-<td>Private Next.js admin/research console</td>
+<td>Private Next.js admin and research console</td>
 </tr>
 <tr>
 <td><code>apps/api-public</code></td>
-<td>Public read/search/location API</td>
+<td>Public read, search, and location API</td>
 </tr>
 <tr>
 <td><code>apps/api-submissions</code></td>
-<td>Corrections / contribution intake API</td>
+<td>Corrections and contribution intake</td>
 </tr>
 <tr>
 <td><code>apps/api-internal</code></td>
-<td>Publication / internal control API</td>
+<td>Publication and internal control API</td>
 </tr>
 <tr>
 <td><code>apps/docs</code></td>
 <td>This GitHub Pages site (static export)</td>
+</tr>
+<tr>
+<td><code>apps/mobile</code></td>
+<td>Expo mobile app (isolated npm lockfile)</td>
 </tr>
 <tr>
 <td><code>workers/*</code></td>
@@ -66,18 +72,66 @@ a:["$","link","0",{"rel":"stylesheet","href":"/blackstory/_next/static/chunks/0e
 <td>Shared TypeScript libraries (<code>@repo/*</code>)</td>
 </tr>
 <tr>
+<td><code>supabase/</code></td>
+<td>Postgres migrations and Supabase project config</td>
+</tr>
+<tr>
+<td><code>functions/</code></td>
+<td>Firebase Functions schedules for discovery</td>
+</tr>
+<tr>
 <td><code>infra/*</code></td>
-<td>Firebase, GCP, GitHub, database scaffolding</td>
+<td>Firebase, GCP, GitHub, and database scaffolding</td>
 </tr>
 <tr>
 <td><code>docs/</code></td>
-<td>Operating docs, ADRs, and research notes</td>
+<td>Operating docs, ADRs, methodology, and runbooks</td>
+</tr>
+<tr>
+<td><code>brand/</code></td>
+<td>Brand masters (lockups, symbols, tokens, guide)</td>
 </tr>
 </tbody>
 </table>
-<p>Code package scope is brand-agnostic: npm packages stay <code>@repo/*</code>, design tokens
-<code>ds-*</code>, env break-glass <code>APP_*</code>. Product rename does not rewrite the monorepo.</p>e:["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"start"}]]}],["$","p",null,{"className":"doc-lede","children":"Where apps, packages, workers, and infra live in the monorepo."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$17"}}],["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","repo-map",".md"]}],"."," ",["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]]}]}]]}]
+<h2 id="stable-code-prefixes"><a class="heading-anchor" href="#stable-code-prefixes">Stable code prefixes</a></h2>
+<p>Package scope is brand-agnostic so a product rename does not rewrite the
+monorepo:</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Stable value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>npm packages</td>
+<td><code>@repo/*</code></td>
+</tr>
+<tr>
+<td>CSS / tokens</td>
+<td><code>ds-*</code> / <code>--ds-*</code></td>
+</tr>
+<tr>
+<td>Env break-glass</td>
+<td><code>APP_*</code></td>
+</tr>
+</tbody>
+</table>
+<p>User-visible strings and assets come from identity helpers and
+<code>apps/web/public/brand/</code> role-based paths.</p>
+<h2 id="where-the-depth-lives"><a class="heading-anchor" href="#where-the-depth-lives">Where the depth lives</a></h2>
+<p>This docs site is the orientation layer. Deeper operating notes stay in the
+repository:</p>
+<ul>
+<li>Architecture and ADRs: <code>docs/architecture.md</code>, <code>docs/adr/</code></li>
+<li>Methodology: <code>docs/methodology/</code></li>
+<li>Research pipeline: <code>docs/research/</code></li>
+<li>Security: <code>docs/security/</code></li>
+<li>Runbooks: <code>docs/runbooks/</code></li>
+</ul>e:["$","article",null,{"className":"prose","children":[["$","p",null,{"className":"hero-eyebrow","children":[["$","span",null,{"className":"pin","aria-hidden":true}],["$","span",null,{"children":"start"}]]}],["$","p",null,{"className":"doc-lede","children":"Where apps, packages, workers, and infra live in the monorepo."}],["$","div",null,{"dangerouslySetInnerHTML":{"__html":"$17"}}],["$","footer",null,{"className":"site-footer","children":["$","p",null,{"children":["Edit this page in the repo under ",["$","code",null,{"children":["apps/docs/content/","repo-map",".md"]}],"."," ","$L18"]}]}]]}]
+18:["$","a",null,{"href":"https://github.com/geraldmaron/blackstory","target":"_blank","rel":"noreferrer","children":["BlackStory"," on GitHub"]}]
 14:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
-18:I[87752,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"IconMark"]
+19:I[87752,["/blackstory/_next/static/chunks/0e3scowebwodx.js","/blackstory/_next/static/chunks/13re3aq9x3sif.js"],"IconMark"]
 11:null
-16:[["$","title","0",{"children":"Repository map — BlackStory"}],["$","meta","1",{"name":"description","content":"Where apps, packages, workers, and infra live in the monorepo."}],["$","meta","2",{"property":"og:title","content":"BlackStory — Docs"}],["$","meta","3",{"property":"og:description","content":"Place-connected Black history research with published claims, provenance, and confidence."}],["$","meta","4",{"property":"og:site_name","content":"BlackStory"}],["$","meta","5",{"property":"og:image","content":"https://geraldmaron.github.io/blackstory/brand/open-graph-dark-1200x630.png"}],["$","meta","6",{"property":"og:image:width","content":"1200"}],["$","meta","7",{"property":"og:image:height","content":"630"}],["$","meta","8",{"name":"twitter:card","content":"summary_large_image"}],["$","meta","9",{"name":"twitter:title","content":"BlackStory — Docs"}],["$","meta","10",{"name":"twitter:description","content":"Place-connected Black history research with published claims, provenance, and confidence."}],["$","meta","11",{"name":"twitter:image","content":"https://geraldmaron.github.io/blackstory/brand/open-graph-dark-1200x630.png"}],["$","meta","12",{"name":"twitter:image:width","content":"1200"}],["$","meta","13",{"name":"twitter:image:height","content":"630"}],["$","link","14",{"rel":"icon","href":"/blackstory/brand/favicon-light-32.png","sizes":"32x32","type":"image/png"}],["$","link","15",{"rel":"icon","href":"/blackstory/brand/favicon-dark-32.png","sizes":"32x32","type":"image/png","media":"(prefers-color-scheme: dark)"}],["$","link","16",{"rel":"apple-touch-icon","href":"/blackstory/brand/apple-touch-icon-light-180.png","sizes":"180x180"}],["$","$L18","17",{}]]
+16:[["$","title","0",{"children":"Repository map · BlackStory"}],["$","meta","1",{"name":"description","content":"Where apps, packages, workers, and infra live in the monorepo."}],["$","meta","2",{"property":"og:title","content":"BlackStory Docs"}],["$","meta","3",{"property":"og:description","content":"BlackStory docs: why the project exists, how place-connected records reach the public, and how to work in the monorepo."}],["$","meta","4",{"property":"og:site_name","content":"BlackStory"}],["$","meta","5",{"property":"og:image","content":"https://geraldmaron.github.io/blackstory/brand/open-graph-dark-1200x630.png?v=20260721"}],["$","meta","6",{"property":"og:image:width","content":"1200"}],["$","meta","7",{"property":"og:image:height","content":"630"}],["$","meta","8",{"name":"twitter:card","content":"summary_large_image"}],["$","meta","9",{"name":"twitter:title","content":"BlackStory Docs"}],["$","meta","10",{"name":"twitter:description","content":"BlackStory docs: why the project exists, how place-connected records reach the public, and how to work in the monorepo."}],["$","meta","11",{"name":"twitter:image","content":"https://geraldmaron.github.io/blackstory/brand/open-graph-dark-1200x630.png?v=20260721"}],["$","meta","12",{"name":"twitter:image:width","content":"1200"}],["$","meta","13",{"name":"twitter:image:height","content":"630"}],["$","link","14",{"rel":"icon","href":"/blackstory/brand/favicon-light-32.png","sizes":"32x32","type":"image/png"}],["$","link","15",{"rel":"icon","href":"/blackstory/brand/favicon-dark-32.png","sizes":"32x32","type":"image/png","media":"(prefers-color-scheme: dark)"}],["$","link","16",{"rel":"apple-touch-icon","href":"/blackstory/brand/apple-touch-icon-light-180.png","sizes":"180x180"}],["$","$L19","17",{}]]
