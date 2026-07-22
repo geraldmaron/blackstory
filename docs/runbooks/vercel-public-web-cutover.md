@@ -48,14 +48,63 @@ Set on the Vercel project (Preview + Production unless noted):
 | `REQUEST_INTEGRITY_MODE` | `enforce` |
 | `DATABASE_SSL` | `1` |
 | `DATABASE_URL` | Sensitive; **Supabase session pooler** (IPv4). Direct `db.<ref>.supabase.co` is IPv6-only and fails on Vercel (`ENOTFOUND`). For `blackstory-app` use `aws-1-us-west-2.pooler.supabase.com:5432` with user `postgres.<ref>`, `sslmode=require`, `uselibpqcompat=true`. Decode the DB password once if the source URL was already percent-encoded (passwords containing `%`/`@` break when double-encoded). |
-| `SENTRY_DSN` | Optional; add before hard cut if production error tracking is required |
+| `SENTRY_DSN` | Optional; App Hosting Secret Manager name `web-production-sentry-dsn` exists, but `apps/web` has no Sentry client wired yet — **omit on Vercel** until observability lands |
+| `SUBMISSION_PRIVACY_PEPPER` | Required for production `POST /submit` and corrections IP hashing; not needed for public catalog reads. **Owner action still open** (see below). |
+
+### Secrets checklist (names only)
+
+| Name | Preview | Production | Notes |
+|------|---------|------------|-------|
+| `DATABASE_URL` | required (sensitive) | required (sensitive) | Session pooler only |
+| `DATABASE_SSL` | required | required | `1` |
+| `PUBLIC_DATA_SOURCE` | required | required | `postgres` |
+| `PUBLIC_READ_API_DISABLED` | required | required | `0` for live reads |
+| `REQUEST_INTEGRITY_MODE` | required | required | `enforce` |
+| `NEXT_PUBLIC_APP_ENV` | required | required | `production` |
+| `NEXT_PUBLIC_SITE_URL` | required (preview URL) | required (`https://blackstory.app`) | Separate per target |
+| `SENTRY_DSN` | omit for now | omit for now | GCP SM `web-production-sentry-dsn` exists; not wired in `apps/web` |
+| `SUBMISSION_PRIVACY_PEPPER` | blocked until owner creates | blocked until owner creates | See owner action below |
+| `NEXT_PUBLIC_ADMIN_ORIGIN` | optional | optional | Footer admin link only |
+| `NEXT_PUBLIC_FIREBASE_*` | not required for Vercel public reads | not required | App Hosting legacy; public dig uses Postgres |
+
+### Owner action: `SUBMISSION_PRIVACY_PEPPER` (blocked 2026-07-22)
+
+Searched; **no reusable value found** (do not invent one in-agent):
+
+| Source | Result |
+|--------|--------|
+| `apps/web/.env.local` / `.env.example` | Key absent |
+| App Hosting `apphosting*.yaml` | Not referenced (unlike `SENTRY_DSN` / `DATABASE_URL`) |
+| GCP Secret Manager (`black-book-efaaf`) | No `*pepper*` / `*submission*` secret name |
+| 1Password | Item titled `BlackStory OPERATOR_CLI_PRIVACY_PEPPER` only — **different var** (`OPERATOR_CLI_PRIVACY_PEPPER` for operator-cli / admin). Do **not** copy into Vercel as `SUBMISSION_PRIVACY_PEPPER` unless the owner explicitly decides to share the same pepper |
+| Vercel project env | Not set (Preview or Production) |
+
+**Owner steps when submit/corrections must work on Vercel:**
+
+1. Generate a high-entropy pepper (e.g. `openssl rand -base64 32`) and store it in 1Password under a dedicated item (suggested title: `BlackStory SUBMISSION_PRIVACY_PEPPER`), field label matching the env name.
+2. Add as **sensitive** on Vercel Preview **and** Production (CLI example; value via env / stdin — never commit):
+
+```bash
+vercel env add SUBMISSION_PRIVACY_PEPPER preview --sensitive --yes --value "$SUBMISSION_PRIVACY_PEPPER"
+vercel env add SUBMISSION_PRIVACY_PEPPER production --sensitive --yes --value "$SUBMISSION_PRIVACY_PEPPER"
+vercel redeploy <preview-deployment-url>
+```
+
+3. Optionally mirror into GCP Secret Manager later if App Hosting rollback still needs submit; not required for Vercel-only public reads.
+4. Smoke: `POST /submit` and corrections in Preview with integrity enforce — confirm no `SUBMISSION_PRIVACY_PEPPER must be set in production` runtime error.
+
+Public catalog / Explore reads do **not** need this pepper; DNS cutover can proceed without it if mutations stay untested until after soak.
+
+After any env change, **redeploy** Preview/Production — existing deployments keep the prior env snapshot.
 
 Update without printing secrets:
 
 ```bash
-# example: rotate DATABASE_URL (stdin / --value; never commit)
-vercel env add DATABASE_URL production --sensitive --force --yes --value "$DATABASE_URL"
-vercel env add DATABASE_URL preview --sensitive --force --yes --value "$DATABASE_URL"
+# Preview: omit git branch to apply to all Preview branches (CLI may prompt otherwise)
+vercel env add DATABASE_URL preview --value "$DATABASE_URL" --yes
+vercel env add DATABASE_URL production --value "$DATABASE_URL" --yes
+# Or POST to Vercel API v10 with type=sensitive, target=["preview"|"production"]
+vercel redeploy <preview-deployment-url>
 ```
 
 ## Hard cut (explicit owner approval only)
