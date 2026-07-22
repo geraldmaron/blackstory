@@ -19,23 +19,10 @@ import {
   type ClaimEvidenceLink,
   type ConfidenceEngineResult,
 } from '@repo/domain';
-import { isTier1Host } from './tier1-sources.ts';
+import { isReputableSecondaryHost, isTier1Host } from './tier1-sources.ts';
 
 const GOVERNMENT_HOST_PATTERNS = [/\.gov$/iu, /\.mil$/iu, /(^|\.)si\.edu$/iu];
 const NEWS_HOST_HINTS = ['news', 'times', 'post', 'tribune', 'gazette', 'herald'];
-/** Curated heritage/education hosts mapped to reputable_secondary (below gov, above unknown). */
-const REPUTABLE_SECONDARY_HOST_SUFFIXES = [
-  'dcpreservation.org',
-  'hmdb.org',
-  'dclibrary.org',
-  'blackpast.org',
-] as const;
-
-function isReputableSecondaryHost(hostname: string): boolean {
-  return REPUTABLE_SECONDARY_HOST_SUFFIXES.some(
-    (suffix) => hostname === suffix || hostname.endsWith(`.${suffix}`),
-  );
-}
 
 /** Maps a source URL to the product constitution's sourceClassifications vocabulary. */
 export function classifySourceForConfidence(url: string): string {
@@ -56,7 +43,7 @@ export function classifySourceForConfidence(url: string): string {
   }
   if (hostname.includes('wikipedia.org') || hostname.includes('wikidata.org'))
     return 'reputable_secondary';
-  if (isReputableSecondaryHost(hostname)) return 'reputable_secondary';
+  if (isReputableSecondaryHost(url)) return 'reputable_secondary';
   if (NEWS_HOST_HINTS.some((hint) => hostname.includes(hint))) return 'news_reportage';
   return 'unknown';
 }

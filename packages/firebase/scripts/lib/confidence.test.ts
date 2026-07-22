@@ -47,6 +47,16 @@ test('dcpreservation + nps.gov clears standardPublish via corroboration', () => 
   assert.equal(result.independentLineageCount, 2);
 });
 
+test('dcpreservation + hmdb.org clears standardPublish via tier-2 corroboration', () => {
+  const result = computeClaimConfidence('claim-dc-hmdb', [
+    { url: DC_PRESERVATION, textContainsSubjectName: true },
+    { url: 'https://www.hmdb.org/m.asp?m=12345', textContainsSubjectName: true },
+  ]);
+  assert.ok(result.score >= 0.75);
+  assert.equal(result.passesPublishThreshold, true);
+  assert.equal(result.independentLineageCount, 2);
+});
+
 test('wikipedia-only stays below standardPublish', () => {
   const result = computeClaimConfidence('claim-wiki-only', [
     { url: WIKIPEDIA, textContainsSubjectName: true },
