@@ -161,3 +161,15 @@ Heritage-lane helper (wraps published entity + relationships).
 - Prefer PostgREST views over `bb_reference.statistical_*` with RLS (service/research roles) or a thin Next.js route used only by operator credentials.
 - Reuse `assertPublishedStatisticProvenance` before any public projection of observations.
 - Phase 1 fixture path: load from `packages/firebase/fixtures/reference-indicators/` via `ingest-phase1-indicators.ts` until live ACS/BJS loaders land.
+
+### Shipped implementation (Phase 1)
+
+| Surface | Location |
+|---------|----------|
+| MCP stdio server | `packages/operator-mcp` (`@repo/operator-mcp`) |
+| Runbook | [docs/runbooks/operator-mcp-indicators.md](../runbooks/operator-mcp-indicators.md) |
+| Tests | `packages/operator-mcp/src/tools/*.test.ts` (mock DB reader) |
+
+**Run:** `DATABASE_URL=… pnpm --filter @repo/operator-mcp start`
+
+Credentials: research/operator Postgres role via `DATABASE_URL` — never service-role in this MCP path.
