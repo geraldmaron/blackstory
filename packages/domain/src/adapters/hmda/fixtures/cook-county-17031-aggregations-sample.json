@@ -1,0 +1,107 @@
+{
+  "parameters": {
+    "years": "2022",
+    "counties": "17031",
+    "actions_taken": "1,2,3",
+    "races": "White,Black or African American"
+  },
+  "aggregations": [
+    {
+      "count": 12450,
+      "sum": 4.812e9,
+      "actions_taken": "1",
+      "races": "White",
+      "county": "17031",
+      "activity_year": "2022"
+    },
+    {
+      "count": 320,
+      "sum": 9.8e7,
+      "actions_taken": "2",
+      "races": "White",
+      "county": "17031",
+      "activity_year": "2022"
+    },
+    {
+      "count": 890,
+      "sum": 2.41e8,
+      "actions_taken": "3",
+      "races": "White",
+      "county": "17031",
+      "activity_year": "2022"
+    },
+    {
+      "count": 4820,
+      "sum": 1.205e9,
+      "actions_taken": "1",
+      "races": "Black or African American",
+      "county": "17031",
+      "activity_year": "2022"
+    },
+    {
+      "count": 145,
+      "sum": 3.2e7,
+      "actions_taken": "2",
+      "races": "Black or African American",
+      "county": "17031",
+      "activity_year": "2022"
+    },
+    {
+      "count": 610,
+      "sum": 1.54e8,
+      "actions_taken": "3",
+      "races": "Black or African American",
+      "county": "17031",
+      "activity_year": "2022"
+    },
+    {
+      "count": 11800,
+      "sum": 4.55e9,
+      "actions_taken": "1",
+      "races": "White",
+      "county": "17031",
+      "activity_year": "2023"
+    },
+    {
+      "count": 290,
+      "sum": 8.9e7,
+      "actions_taken": "2",
+      "races": "White",
+      "county": "17031",
+      "activity_year": "2023"
+    },
+    {
+      "count": 940,
+      "sum": 2.55e8,
+      "actions_taken": "3",
+      "races": "White",
+      "county": "17031",
+      "activity_year": "2023"
+    },
+    {
+      "count": 4510,
+      "sum": 1.12e9,
+      "actions_taken": "1",
+      "races": "Black or African American",
+      "county": "17031",
+      "activity_year": "2023"
+    },
+    {
+      "count": 130,
+      "sum": 2.9e7,
+      "actions_taken": "2",
+      "races": "Black or African American",
+      "county": "17031",
+      "activity_year": "2023"
+    },
+    {
+      "count": 580,
+      "sum": 1.46e8,
+      "actions_taken": "3",
+      "races": "Black or African American",
+      "county": "17031",
+      "activity_year": "2023"
+    }
+  ],
+  "servedFrom": "fixture"
+}
