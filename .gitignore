@@ -76,6 +76,7 @@ packages/data-access/generated/*/
 .mcp.json
 .github/prompts/
 .github/agents/
+.vercel/
 config.env
 embed.yaml
 plan.md

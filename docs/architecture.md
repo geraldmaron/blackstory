@@ -9,7 +9,7 @@ BlackStory is a place-connected Black history research platform. Public surfaces
 ## Target surfaces
 
 ```
-apps/web                 Public Next.js (Firebase App Hosting — target)
+apps/web                 Public Next.js (Vercel — ADR-027; App Hosting dual-run until DNS cut)
 apps/admin               Private Next.js admin/research (Cloud Run + IAP — target)
 apps/api-public          Public read/search/location API (Cloud Run — target)
 apps/api-submissions     Corrections / contribution intake (Cloud Run — target)
@@ -29,7 +29,7 @@ Do not add deployable microservices beyond this set. See [ADR-005](./adr/ADR-005
 
 - **Data:** **Cloud Firestore** system of record (ADR-011 / D-014); blobs in Firebase Storage / GCS. Local PostGIS + SQL Connect under `infra/database/` are **parked / not production**.
 - **App data access:** Firestore Admin SDK + security rules; `@repo/domain` entity/geography/provenance/claims models; `@repo/firebase` converters; `@repo/data-access` Firestore guards. SQL Connect deferred with Cloud SQL.
-- **Public web vs APIs:** App Hosting for `apps/web`; Cloud Run for APIs + admin — [ADR-001](./adr/ADR-001-firebase-app-hosting-vs-cloud-run.md)
+- **Public web vs APIs:** Vercel for `apps/web` (ADR-027; App Hosting dual-run until DNS cut); Cloud Run for APIs + admin — [ADR-001](./adr/ADR-001-firebase-app-hosting-vs-cloud-run.md) / [ADR-027](./adr/ADR-027-vercel-public-web-hosting.md)
 - **Auth / abuse:** Firebase Auth + App Check (reCAPTCHA Enterprise) — intent; assumptions in [ADR-010](./adr/ADR-010-security-and-abuse-assumptions.md)
 - **Ingress:** Cloud Armor / ALB / CDN — intent only
 - **Jobs:** Cloud Tasks + Cloud Run Jobs for long/heavy batch — [ADR-007](./adr/ADR-007-background-workflow-model.md); capped discovery schedules prefer Firebase Functions v2 `onSchedule` — [ADR-018](./adr/ADR-018-firebase-scheduled-functions-discovery.md)

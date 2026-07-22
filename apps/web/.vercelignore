@@ -1,0 +1,11 @@
+# Vercel Root Directory is apps/web — ignore heavy local artifacts on CLI upload.
+node_modules
+../../node_modules
+../../.pnpm-store
+.next
+../../.next
+*.tsbuildinfo
+coverage
+.tmp
+test-results
+**/*.map

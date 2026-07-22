@@ -11,7 +11,7 @@ Architecture decisions: [`docs/adr/`](./docs/adr/README.md).
 
 | Path | Role |
 |------|------|
-| `apps/web` | Public Next.js app (Firebase App Hosting) |
+| `apps/web` | Public Next.js app (Vercel target — ADR-027; App Hosting dual-run until DNS cut) |
 | `apps/admin` | Private Next.js admin/research console (Cloud Run + IAP) |
 | `apps/api-public` | Public read/search/location API |
 | `apps/api-submissions` | Corrections / contribution intake API |

@@ -20,10 +20,12 @@ BlackStory needs a public Next.js site that can degrade to released snapshots, p
 
 ## Decision
 
-1. **Public web (`apps/web`)** deploys on **Firebase App Hosting**.
+1. **Public web (`apps/web`)** production host target is **Vercel** (ADR-027). Firebase App Hosting remains the dual-run / rollback path until DNS hard cut.
 2. **Admin (`apps/admin`)** and all **API surfaces** (`api-public`, `api-submissions`, `api-internal`) deploy on **Cloud Run**.
-3. Automatic App Hosting rollouts are **disabled**; GitHub Actions triggers controlled rollouts (see ADR-006).
+3. Automatic App Hosting rollouts are **disabled**; GitHub Actions triggers controlled rollouts (see ADR-006). Vercel production promote stays explicit (ADR-027).
 4. Public page rendering does **not** open database connections or invoke models; it reads released projections/snapshots via the public API or static release artifacts (ADR-004).
+
+> **Amendment (2026-07-22):** Decision §1 public-web host superseded by [ADR-027](./ADR-027-vercel-public-web-hosting.md). Admin/API Cloud Run boundaries unchanged.
 
 ## Rejected alternatives
 
