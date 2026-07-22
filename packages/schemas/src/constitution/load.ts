@@ -1,17 +1,14 @@
 /**
  * Read-only loaders for the shared product constitution JSON and fixtures.
- * Policy values live only under packages/schemas/constitution/; this module
- * never exposes mutation or write APIs for public endpoints.
- *
- * Serverless note: Next/Vercel bundles this module into chunks where
- * `import.meta.url` no longer points at packages/schemas. Prefer resolving via
- * `@repo/schemas/package.json`, then cwd/monorepo fallbacks, then the source
- * layout relative to this file (App Hosting / local).
+ * Policy values are authored under packages/schemas/constitution/; a bundled copy
+ * lives at ./policy.v1.json so Next/Vercel serverless can load without fs ENOENT
+ * when import.meta.url no longer points at the package root.
  */
 import { existsSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import policyV1Document from './policy.v1.json' with { type: 'json' };
 import {
   constitutionFixtureSchema,
   productConstitutionSchema,
@@ -79,8 +76,8 @@ export function loadProductConstitution(): ProductConstitution {
   if (cachedPolicy) {
     return cachedPolicy;
   }
-  const policyPath = join(constitutionDir(), 'policy.v1.json');
-  const parsed = productConstitutionSchema.parse(readJsonFile(policyPath));
+  // Prefer the statically imported copy so serverless bundles never depend on fs.
+  const parsed = productConstitutionSchema.parse(policyV1Document);
   cachedPolicy = Object.freeze(structuredClone(parsed)) as ProductConstitution;
   return cachedPolicy;
 }

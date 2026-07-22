@@ -7,6 +7,7 @@ import { test } from 'node:test';
 import * as constitutionApi from './index.ts';
 import {
   CONSTITUTION_SCHEMA_PATH,
+  POLICY_V1_PATH,
   evaluateClaimConfidence,
   evaluateLivingStatus,
   evaluateProceduralLanguage,
@@ -29,6 +30,20 @@ test('loads versioned product constitution from shared JSON', () => {
       policy.claimConfidenceThresholds.standardPublish,
   );
 });
+
+test('bundled policy copy matches authored constitution JSON', () => {
+  const authored = JSON.parse(readFileSync(POLICY_V1_PATH, 'utf8')) as { policyVersion?: string };
+  const policy = loadProductConstitution();
+  assert.equal(policy.policyVersion, authored.policyVersion);
+  assert.deepEqual(
+    structuredClone(policy),
+    productConstitutionFromFile(),
+  );
+});
+
+function productConstitutionFromFile(): unknown {
+  return JSON.parse(readFileSync(POLICY_V1_PATH, 'utf8'));
+}
 
 test('JSON Schema artifact exists beside policy values', () => {
   const schema = JSON.parse(readFileSync(CONSTITUTION_SCHEMA_PATH, 'utf8')) as {

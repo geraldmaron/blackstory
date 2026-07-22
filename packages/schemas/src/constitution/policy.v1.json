@@ -1,0 +1,123 @@
+{
+  "policyVersion": "1.0.0",
+  "relevanceThresholds": {
+    "includeMinimum": 0.7,
+    "supportingContextMinimum": 0.4,
+    "excludeBelow": 0.4,
+    "weakSignalIndependentCeiling": 0.5
+  },
+  "claimConfidenceThresholds": {
+    "standardPublish": 0.75,
+    "highImpactPublish": 0.9,
+    "disputeSurface": 0.5
+  },
+  "legalStatusVocabulary": [
+    "alleged",
+    "charged",
+    "indicted",
+    "arraigned",
+    "convicted",
+    "acquitted",
+    "dismissed",
+    "settled_civil",
+    "ruled",
+    "enacted",
+    "repealed",
+    "unknown_procedural"
+  ],
+  "unsupportedProceduralLanguage": [
+    "guilty as charged",
+    "proven murderer",
+    "convicted criminal",
+    "definitely guilty",
+    "undeniably guilty",
+    "the criminal",
+    "the murderer"
+  ],
+  "recordMaturityStates": [
+    "candidate",
+    "relevance_review",
+    "relevance_confirmed",
+    "minimum_record",
+    "partial_enrichment",
+    "substantial_enrichment",
+    "published",
+    "excluded",
+    "retracted"
+  ],
+  "publicPrecisionRules": {
+    "allowedLevels": [
+      "none",
+      "country",
+      "state",
+      "county",
+      "city",
+      "neighborhood",
+      "institution",
+      "campus"
+    ],
+    "prohibitedLevels": ["street_address", "unit", "parcel", "exact_coordinates", "residence"],
+    "livingResidentialProhibited": true,
+    "reduceExactCoordinatesWhenNotNeeded": true
+  },
+  "sourceClassifications": [
+    "primary_archival",
+    "government_record",
+    "peer_reviewed",
+    "reputable_secondary",
+    "news_reportage",
+    "community_oral",
+    "self_published",
+    "unknown"
+  ],
+  "publicationRestrictions": {
+    "requireRightsStatus": true,
+    "requireAcceptedClaimAndEvidence": true,
+    "blockSelfApprovingSourceAlone": true,
+    "blockVolumeOnlyConfidence": true,
+    "blockSyndicatedCopiesAsIndependent": true,
+    "highImpactRequiresHigherThreshold": true,
+    "publicLanguageCannotExceedProceduralStatus": true
+  },
+  "livingPersonRules": {
+    "statuses": ["living", "deceased", "unknown"],
+    "treatUnknownAsLiving": true,
+    "neverStoreResidentialAsOrdinaryPersonLocation": true,
+    "neverReturnResidentialPublicly": true
+  },
+  "sensitivityRules": {
+    "classes": [
+      "none",
+      "living_residence",
+      "historical_residence",
+      "occupied_private_residence",
+      "sensitive_site",
+      "protected_relationship"
+    ],
+    "precisionReductionReasons": [
+      "prohibited_location_precision",
+      "living_residential_precision_prohibited",
+      "occupied_private_residence_reduced",
+      "exact_coordinates_reduced",
+      "sensitivity_class_reduced",
+      "unknown_precision_level",
+      "not_needed_for_public"
+    ],
+    "residentialPrecisionLevels": [
+      "residence",
+      "street_address",
+      "unit",
+      "parcel",
+      "exact_coordinates"
+    ],
+    "livingResidenceMaxPublicPrecision": "city",
+    "occupiedPrivateResidenceMaxPublicPrecision": "neighborhood",
+    "sensitiveSiteMaxPublicPrecision": "neighborhood",
+    "reduceOccupiedPrivateResidenceForDeceased": true
+  },
+  "ugcLivingPersonRules": {
+    "crossSourceProfileAggregationProhibited": true,
+    "elevatedClaimClass": "high_impact",
+    "deanonymizationProhibited": true
+  }
+}
