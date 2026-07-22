@@ -52,6 +52,41 @@ export function niceMax(value: number): number {
   return step * magnitude;
 }
 
+export function formatUsd(value: number): string {
+  return value.toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  });
+}
+
+export function formatPctValue(value: number): string {
+  return `${value.toFixed(1)}%`;
+}
+
+export function formatPer100k(value: number): string {
+  return `${value.toLocaleString('en-US')} per 100k`;
+}
+
+export function formatMonths(value: number): string {
+  return `${value.toLocaleString('en-US')} mo.`;
+}
+
+export function formatDataPageValue(value: number, unit: 'usd' | 'percent' | 'per_100k' | 'months'): string {
+  switch (unit) {
+    case 'usd':
+      return formatUsd(value);
+    case 'percent':
+      return formatPctValue(value);
+    case 'per_100k':
+      return formatPer100k(value);
+    case 'months':
+      return formatMonths(value);
+    default:
+      return formatChartCount(value);
+  }
+}
+
 /** Unique {label,url} pairs from decade rows — for multi-source chart footnotes. */
 export function sourcesFromDecadeRows(
   rows: readonly { readonly source: string; readonly sourceUrl: string }[],

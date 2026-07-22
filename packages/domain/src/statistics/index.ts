@@ -69,6 +69,23 @@ export type {
 export * from './public-data-summaries.js';
 
 export {
+  DATA_PAGE_INDICATOR_FIXTURE_BUNDLE,
+  mergeDataPageIndicatorBundle,
+  isDataPageIndicatorBundle,
+} from './data-page-series.js';
+export type {
+  DataPageSourceRef,
+  DataPageValueUnit,
+  DataPageRacePairPoint,
+  DataPageRacePairSeries,
+  DataPageGroupedBarSeriesDef,
+  DataPageGroupedBarPoint,
+  DataPageGroupedBarSeries,
+  DataPageIndicatorBundle,
+  DataPageObservationRow,
+} from './data-page-series.js';
+
+export {
   PHASE1_INDICATOR_THEMES,
   PHASE1_INDICATOR_CATALOG,
   getPhase1Indicator,
@@ -143,3 +160,20 @@ export type {
   ThemeImpactPacket,
   BuildThemeImpactPacketInput,
 } from './theme-impact-packet.js';
+export {
+  resolveThemeImpactPolicyEra,
+  resolveThemeImpactPolicyEras,
+} from './theme-impact-policy-eras.js';
+export type { ThemeImpactPolicyEraView } from './theme-impact-policy-eras.js';
+export {
+  formatThemeImpactEstimate,
+  parseThemeImpactPacketRow,
+  themeImpactPacketToView,
+} from './theme-impact-view.js';
+export type {
+  ThemeImpactArtifactView,
+  ThemeImpactDerivedView,
+  ThemeImpactObservationView,
+  ThemeImpactPacketView,
+  ThemeImpactProvenanceView,
+} from './theme-impact-view.js';
