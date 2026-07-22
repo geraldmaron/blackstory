@@ -1,0 +1,187 @@
+/**
+ * Privacy policy page body — compact trust surface below the page mast.
+ * On-page nav, inventory ledger rows, and rule strips mirror errata/methodology patterns.
+ */
+
+.ds-privacy {
+  margin-top: var(--ds-space-6);
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.ds-privacy [id] {
+  scroll-margin-top: var(--ds-island-clearance);
+}
+
+.ds-privacy .ds-section {
+  padding-block: var(--ds-space-8);
+}
+
+.ds-privacy .ds-section__lede {
+  margin-top: var(--ds-space-4);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.ds-privacy__nav {
+  margin: 0;
+  padding: var(--ds-space-4) 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-privacy__nav-title {
+  margin: 0 0 var(--ds-space-3);
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ds-privacy__nav-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-privacy__nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: border-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-privacy__nav-link:hover,
+.ds-privacy__nav-link:focus-visible {
+  border-bottom-color: var(--ds-accent-graphic);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-privacy__nav-link {
+    transition: none;
+  }
+}
+
+.ds-privacy__chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 0.2rem 0.55rem;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  line-height: 1.35;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.ds-privacy__ledger {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin-top: var(--ds-space-4);
+}
+
+.ds-privacy__ledger-item {
+  margin: 0;
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+  isolation: isolate;
+  min-width: 0;
+}
+
+.ds-privacy__ledger-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2) var(--ds-space-3);
+}
+
+.ds-privacy__ledger-summary {
+  margin: var(--ds-space-2) 0 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.ds-privacy__rule-strip {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin: var(--ds-space-4) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: ds-privacy-rule;
+}
+
+.ds-privacy__rule-row {
+  position: relative;
+  counter-increment: ds-privacy-rule;
+  margin: 0;
+  padding: var(--ds-space-3) var(--ds-space-4) var(--ds-space-3) var(--ds-space-10);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+  min-width: 0;
+}
+
+.ds-privacy__rule-row::before {
+  content: counter(ds-privacy-rule, decimal-leading-zero);
+  position: absolute;
+  left: var(--ds-space-4);
+  top: var(--ds-space-3);
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.ds-privacy__rule-text {
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.ds-privacy__follow {
+  margin: var(--ds-space-5) 0 0;
+  max-width: 46rem;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.ds-privacy__follow a {
+  color: var(--ds-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.ds-privacy__meta {
+  margin: var(--ds-space-4) 0 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}

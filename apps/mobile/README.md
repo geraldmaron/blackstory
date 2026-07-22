@@ -69,24 +69,19 @@ apps/mobile/package-lock.json` and never touch the root `pnpm-lock.yaml` — `pn
 --frozen-lockfile` in the root `validate` job is unaffected. `.github/dependabot.yml` has a
 matching `npm` entry scoped to `/apps/mobile` for its isolated lockfile.
 
-Known baseline gap (tracked, not silently masked — no `continue-on-error`): **Mobile
-Typecheck currently fails** against 7 pre-existing type errors in two test files
-(`src/features/entity/__tests__/EntityDetailScreen.accessibility.test.tsx` and
-`src/features/entity/__tests__/useEntityDetail.test.ts` — both call
-`@testing-library/react-native`'s async `render`/`renderHook`/`rerender` with a stale,
-pre-async type expectation). Jest itself is fully green (629/629) because `jest` transpiles
-via Babel and never type-checks. See the follow-up bead referenced in
-`black-book-mobile-019`'s notes before promoting this check to a required branch-protection
-status in `infra/github/rulesets/main-protection.json` (out of this bead's exclusive
-ownership — CODEOWNERS/ruleset changes are a separate integrator's call).
+**Verified baseline (2026-07-22, `feat/mobile-launch`):** Mobile Typecheck and Mobile Unit
+Tests are green locally and in CI shape — **646/646** Jest tests; `tsc` clean for both
+`tsconfig.json` and `tsconfig.tooling.json` once the gitignored `expo-env.d.ts` shim is
+present (same shim CI regenerates). Promoting these jobs to required branch-protection
+status in `infra/github/rulesets/main-protection.json` remains an integrator decision
+(outside this README's ownership).
 
-**Explicitly out of scope for `black-book-mobile-019` without paid EAS credentials or a
-physical/simulator device matrix** (filed as `repo-fsxq` prerequisites first, then a
-dedicated follow-up bead once those land): EAS build profiles wired into a workflow,
-Android/iOS native build jobs, Maestro E2E flows, on-device accessibility (VoiceOver/TalkBack)
-passes, and release/store-submission evidence. `apps/mobile/eas.json`'s `development` /
-`preview` / `production` profiles exist for local/manual `eas-build:*` npm scripts today;
-none of them run in GitHub Actions yet.
+**Still out of scope without paid EAS credentials or a physical/simulator device matrix**
+(blocked on `repo-fsxq` first): EAS build profiles wired into a GitHub Actions workflow,
+Android/iOS native build jobs, Maestro E2E flows, on-device accessibility
+(VoiceOver/TalkBack) passes, and release/store-submission evidence. `apps/mobile/eas.json`'s
+`development` / `preview` / `production` profiles exist for local/manual `eas-build:*` npm
+scripts today; none of them run in GitHub Actions yet.
 
 ## pnpm workspace resolution — verified NOT clean (real finding, not a guess)
 

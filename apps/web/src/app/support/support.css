@@ -1,0 +1,107 @@
+/**
+ * Support page body — compact orientation surface below the page mast.
+ * Path cards and contact placeholder mirror trust-page editorial patterns.
+ */
+
+.ds-support {
+  margin-top: var(--ds-space-6);
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.ds-support [id] {
+  scroll-margin-top: var(--ds-island-clearance);
+}
+
+.ds-support .ds-section {
+  padding-block: var(--ds-space-8);
+}
+
+.ds-support .ds-section__lede {
+  margin-top: var(--ds-space-4);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.ds-support__paths {
+  display: grid;
+  gap: var(--ds-space-2);
+  margin-top: var(--ds-space-4);
+}
+
+.ds-support__path {
+  margin: 0;
+  padding: var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+  min-width: 0;
+}
+
+.ds-support__path-link {
+  display: block;
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+.ds-support__path-link:hover .ds-support__path-label,
+.ds-support__path-link:focus-visible .ds-support__path-label {
+  color: var(--ds-accent);
+}
+
+.ds-support__path-label {
+  display: block;
+  font-family: var(--ds-font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.ds-support__path-detail {
+  display: block;
+  margin-top: var(--ds-space-2);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.ds-support__contact {
+  margin: var(--ds-space-4) 0 0;
+  padding: var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+}
+
+.ds-support__contact-label {
+  margin: 0;
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ds-support__contact-value {
+  margin: var(--ds-space-2) 0 0;
+  font-family: var(--ds-font-sans);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.ds-support__follow {
+  margin: var(--ds-space-5) 0 0;
+  max-width: 46rem;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.ds-support__follow a {
+  color: var(--ds-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
