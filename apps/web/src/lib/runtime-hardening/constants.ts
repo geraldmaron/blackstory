@@ -25,6 +25,8 @@ export const SEARCH_PAGE_PARAM_ALLOWLIST = [
   'dateFrom',
   'dateTo',
   'topic',
+  /** Page-local pagination for the SSR /search ledger (see search-view-model.ts). */
+  'offset',
 ] as const;
 
 export type SearchPageParam = (typeof SEARCH_PAGE_PARAM_ALLOWLIST)[number];
