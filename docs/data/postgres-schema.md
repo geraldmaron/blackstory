@@ -148,6 +148,7 @@ erDiagram
 | — | `bb_reference.statistical_observations` (typed estimates + provenance) |
 | — | `bb_reference.derived_measurements` (derived/modeled; not raw observations) |
 | — | `bb_reference.entity_context_bindings` (law/place ↔ indicator juxtaposition) |
+| — | `bb_reference.theme_impact_packets` (anon/authenticated SELECT published only; staff SELECT all) |
 
 ### Datapack stubs (fail-closed)
 

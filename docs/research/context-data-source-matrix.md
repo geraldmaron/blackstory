@@ -8,7 +8,7 @@
 
 **Purpose:** Ranked catalog of datasets that support place-time **context indicators** for research and MCP — incarceration, wealth proxies, housing, education, health, voting — without folding statistics into free-text heritage claims.
 
-**Companion docs:** [data-ingestion-methodology.md](../runbooks/data-ingestion-methodology.md), [juxtaposition-not-causation.md](../methodology/juxtaposition-not-causation.md), [external-data-sources.ts](../../packages/domain/src/external-data-sources.ts), [public-mcp-unlock-criteria.md](public-mcp-unlock-criteria.md).
+**Companion docs:** [data-ingestion-methodology.md](../runbooks/data-ingestion-methodology.md), [juxtaposition-not-causation.md](../methodology/juxtaposition-not-causation.md), [theme-impact-canonical-questions.md](./theme-impact-canonical-questions.md), [external-data-sources.ts](../../packages/domain/src/external-data-sources.ts), [public-mcp-unlock-criteria.md](public-mcp-unlock-criteria.md).
 
 **Lane rule:** Statistics → `bb_reference` / `StatisticalSeries` path. Entity corpora → launch-corpora / landscape candidates. Never mix.
 
