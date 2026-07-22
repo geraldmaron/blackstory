@@ -1,5 +1,7 @@
 /**
  * Edge middleware handler that strips unknown query params before SSR/cache.
+ * Preserves `_vercel_*` handshake params (see query-normalization) so Vercel
+ * Deployment Protection SSO cannot enter a strip↔re-auth redirect loop.
  */
 
 import { type NextRequest, NextResponse } from 'next/server';

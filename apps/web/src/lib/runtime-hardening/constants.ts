@@ -90,6 +90,16 @@ export const TRACKING_QUERY_KEYS = new Set([
   'igshid',
 ]);
 
+/**
+ * Platform handshake query keys that must survive edge normalization redirects.
+ * Vercel Deployment Protection / Authentication returns `_vercel_share` after SSO;
+ * stripping it 308s back to a bare URL and re-triggers SSO → ERR_TOO_MANY_REDIRECTS.
+ * Kept out of cache keys (see `normalizeQueryString`) — only redirect builders preserve them.
+ */
+export function isPlatformPassthroughQueryKey(key: string): boolean {
+  return key.toLowerCase().startsWith('_vercel_');
+}
+
 /** Upper bounds for serialized public responses (UTF-8 bytes).  */
 export const RESPONSE_SIZE_LIMITS = {
   html: 512 * 1024,

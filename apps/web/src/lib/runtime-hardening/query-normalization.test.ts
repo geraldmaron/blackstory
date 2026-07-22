@@ -188,3 +188,31 @@ test('buildNormalizedUrl issues canonical /explore URLs for revisit', () => {
   assert.equal(normalized.pathname, '/explore');
   assert.equal(normalized.search, '?state=VA&group=1&lines=1');
 });
+
+test('preserves _vercel_share on redirects so Vercel Authentication cannot loop', () => {
+  const withShare = new URL(
+    'https://blackstory-git-preview.vercel.app/search?q=obama&_vercel_share=share-token',
+  );
+  assert.equal(needsQueryNormalizationRedirect(withShare), false);
+  assert.equal(
+    buildNormalizedUrl(withShare).search,
+    '?q=obama&_vercel_share=share-token',
+  );
+
+  // Cache keys still ignore the share token.
+  assert.equal(normalizeQueryString('/search', withShare.searchParams), 'q=obama');
+
+  const dirty = new URL(
+    'https://blackstory-git-preview.vercel.app/search?utm_source=x&q=obama&_vercel_share=share-token',
+  );
+  assert.equal(needsQueryNormalizationRedirect(dirty), true);
+  const once = buildNormalizedUrl(dirty);
+  assert.equal(once.search, '?q=obama&_vercel_share=share-token');
+  assert.equal(needsQueryNormalizationRedirect(once), false);
+});
+
+test('preserves lone _vercel_share on / (Preview SSO return)', () => {
+  const home = new URL('https://blackstory-git-preview.vercel.app/?_vercel_share=share-token');
+  assert.equal(needsQueryNormalizationRedirect(home), false);
+  assert.equal(buildNormalizedUrl(home).search, '?_vercel_share=share-token');
+});

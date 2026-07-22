@@ -31,9 +31,14 @@
 2. Confirm:
    - Homepage renders (not empty seed-only dig)
    - `/explore` shows live catalog (~1k+ records when `PUBLIC_DATA_SOURCE=postgres`)
+   - `/search?q=obama` returns results (no browser `ERR_TOO_MANY_REDIRECTS`)
    - Security headers still present
    - No App Hosting-only assumptions in runtime logs
 3. Soak Preview for at least one owner review session.
+
+### Deployment Protection / Authentication
+
+If Vercel Authentication (or share-link protection) is on for Preview, SSO returns with `_vercel_share=…`. Edge query normalization **must preserve** `_vercel_*` handshake params on redirects (see `apps/web/src/lib/runtime-hardening/query-normalization.ts`). Stripping them 308s to a bare URL and re-triggers SSO → `ERR_TOO_MANY_REDIRECTS` (often described by users as “too many requests”). Share tokens stay out of CDN cache keys.
 
 ## Environment variables
 

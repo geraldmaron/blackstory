@@ -2,6 +2,8 @@
  * Query-string normalization for public routes.
  * Random tracking params must not alter cache keys or force regeneration.
  * Shareable map/history links are canonicalized so revisit/bookmark URLs stay stable.
+ * Vercel Authentication `_vercel_share` (and other `_vercel_*` keys) are preserved on
+ * redirects only — never in cache keys — to avoid Preview SSO redirect loops.
  */
 
 import { buildExploreSearchParams, parseExploreSearchParams } from '../map-experience/url-state';
@@ -12,6 +14,7 @@ import {
   SEARCH_PAGE_PARAM_ALLOWLIST,
   TRACKING_QUERY_KEYS,
   TRACKING_QUERY_PREFIXES,
+  isPlatformPassthroughQueryKey,
 } from './constants';
 
 export type QueryParamBag = Record<string, string | string[] | undefined>;
@@ -100,6 +103,33 @@ function normalizePathname(pathname: string): string {
   return pathname.endsWith('/') && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
 }
 
+/**
+ * Collect Vercel (and similar) platform handshake params to re-attach after
+ * allowlist normalization. Order is stable (sorted keys) so redirect checks stay idempotent.
+ */
+function platformPassthroughQueryString(searchParams: URLSearchParams): string {
+  const keys = [...new Set(searchParams.keys())]
+    .filter(isPlatformPassthroughQueryKey)
+    .sort((a, b) => a.localeCompare(b));
+  const out = new URLSearchParams();
+  for (const key of keys) {
+    for (const value of searchParams.getAll(key)) {
+      const trimmed = value.trim();
+      if (trimmed) out.append(key, trimmed);
+    }
+  }
+  return out.toString();
+}
+
+/** Merge allowlisted app query with preserved platform handshake params.  */
+function redirectQueryString(pathname: string, searchParams: URLSearchParams): string {
+  const appQs = normalizeQueryString(pathname, searchParams);
+  const platformQs = platformPassthroughQueryString(searchParams);
+  if (!appQs) return platformQs;
+  if (!platformQs) return appQs;
+  return `${appQs}&${platformQs}`;
+}
+
 /** Stable pathname + query string for redirect/cache comparisons.  */
 export function canonicalPathAndSearch(url: URL): string {
   const path = normalizePathname(url.pathname);
@@ -107,21 +137,25 @@ export function canonicalPathAndSearch(url: URL): string {
   return qs ? `${path}?${qs}` : path;
 }
 
-/** Canonical URL pathname + optional query for redirects and cache keys.  */
+/**
+ * Canonical URL for edge redirects: allowlisted app params + platform passthrough
+ * (`_vercel_share`, …). Cache keys still use `normalizeQueryString` alone so share
+ * tokens never enter CDN keys.
+ */
 export function buildNormalizedUrl(url: URL): URL {
   const normalized = new URL(url.toString());
   const path = normalizePathname(normalized.pathname);
   normalized.pathname = path;
-  const qs = normalizeQueryString(path, normalized.searchParams);
+  const qs = redirectQueryString(path, normalized.searchParams);
   normalized.search = qs ? `?${qs}` : '';
   return normalized;
 }
 
 /** True when the incoming URL carries params that should be stripped via redirect.  */
 export function needsQueryNormalizationRedirect(url: URL): boolean {
-  const canonical = canonicalPathAndSearch(url);
+  const normalized = buildNormalizedUrl(url);
   const raw = `${url.pathname}${url.search}`;
-  return canonical !== raw;
+  return `${normalized.pathname}${normalized.search}` !== raw;
 }
 
 /** Normalize App Router searchParams records for server components.  */
