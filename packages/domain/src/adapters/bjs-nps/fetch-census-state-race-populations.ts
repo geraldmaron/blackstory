@@ -6,6 +6,16 @@ import type { StateRacePopulation } from './phase1-bjs-nps-mapper.js';
 
 type PepRow = readonly [name: string, pop: string, ...rest: string[]];
 
+/** Vintage 2023 charv: White alone, not Hispanic or Latino. */
+const BJS_WHITE_ALONE_NH_POPGROUP = '451';
+/** Vintage 2023 charv: Black or African American alone, not Hispanic or Latino. */
+const BJS_BLACK_ALONE_NH_POPGROUP = '453';
+
+type PepFetchAttempt = {
+  readonly month: number;
+  readonly year: number;
+};
+
 function parsePepRows(payload: unknown): Map<string, number> {
   if (!Array.isArray(payload) || payload.length < 2) {
     throw new Error('Unexpected Census PEP response shape');
@@ -29,15 +39,17 @@ function parsePepRows(payload: unknown): Map<string, number> {
 
 function buildCharvUrl(input: {
   readonly datasetVintage: number;
+  readonly month: number;
   readonly estimateYear: number;
-  readonly popGroup: 'WA' | 'BA';
+  readonly popGroup: string;
   readonly apiKey: string;
 }): string {
   const params = new URLSearchParams({
     get: 'NAME,POP',
-    HISP: '2',
     POPGROUP: input.popGroup,
+    MONTH: String(input.month),
     YEAR: String(input.estimateYear),
+    UNIVERSE: 'R',
     for: 'state:*',
     key: input.apiKey,
   });
@@ -46,11 +58,110 @@ function buildCharvUrl(input: {
 
 /** BJS uses Census resident population for January 1 of the year after referencePeriod. */
 export function censusPepEstimateYearForBjsReferenceYear(referenceYear: number): number {
+  return referenceYear + 1;
+}
+
+/** PEP vintage aligned with the BJS NPS report reference year (e.g. Prisoners in 2023 → 2023). */
+export function censusPepDatasetVintageForBjsReferenceYear(referenceYear: number): number {
   return referenceYear;
 }
 
-export function censusPepDatasetVintageForBjsReferenceYear(referenceYear: number): number {
-  return referenceYear;
+export function censusPepFetchAttemptsForBjsReferenceYear(referenceYear: number): readonly PepFetchAttempt[] {
+  const januaryYear = censusPepEstimateYearForBjsReferenceYear(referenceYear);
+  return [
+    { month: 1, year: januaryYear },
+    { month: 7, year: referenceYear },
+  ];
+}
+
+async function readPepPayload(response: Response): Promise<unknown | undefined> {
+  if (response.status === 204 || response.status === 400 || response.status === 404) {
+    return undefined;
+  }
+  if (!response.ok) {
+    throw new Error(`Census PEP fetch failed (${response.status})`);
+  }
+  const text = await response.text();
+  if (!text.trim()) return undefined;
+  try {
+    return JSON.parse(text) as unknown;
+  } catch {
+    throw new Error('Census PEP response was not valid JSON');
+  }
+}
+
+async function fetchPopGroupByState(input: {
+  readonly datasetVintage: number;
+  readonly referenceYear: number;
+  readonly popGroup: string;
+  readonly apiKey: string;
+  readonly fetchImpl: FetchLike;
+  readonly raceLabel: string;
+}): Promise<Map<string, number>> {
+  const attempts = censusPepFetchAttemptsForBjsReferenceYear(input.referenceYear);
+  for (const attempt of attempts) {
+    const response = await input.fetchImpl(
+      buildCharvUrl({
+        datasetVintage: input.datasetVintage,
+        month: attempt.month,
+        estimateYear: attempt.year,
+        popGroup: input.popGroup,
+        apiKey: input.apiKey,
+      }),
+    );
+    const payload = await readPepPayload(response as Response);
+    if (payload === undefined) continue;
+    const parsed = parsePepRows(payload);
+    if (parsed.size > 0) return parsed;
+  }
+  throw new Error(
+    `Census PEP ${input.raceLabel} population unavailable for BJS reference year ${input.referenceYear}`,
+  );
+}
+
+async function fetchAcsStateRacePopulationsFallback(input: {
+  readonly referenceYear: number;
+  readonly apiKey: string;
+  readonly fetchImpl: FetchLike;
+}): Promise<Map<string, StateRacePopulation>> {
+  const params = new URLSearchParams({
+    get: 'NAME,B03002_005E,B03002_014E',
+    for: 'state:*',
+    key: input.apiKey,
+  });
+  const url = `https://api.census.gov/data/${input.referenceYear}/acs/acs5?${params.toString()}`;
+  const response = await input.fetchImpl(url);
+  if (!response.ok) {
+    throw new Error(`Census ACS fetch failed (${response.status})`);
+  }
+  const payload = await response.json();
+  if (!Array.isArray(payload) || payload.length < 2) {
+    throw new Error('Unexpected Census ACS response shape');
+  }
+  const [header, ...rows] = payload as [string[], ...PepRow[]];
+  const stateIdx = header.indexOf('state');
+  const whiteIdx = header.indexOf('B03002_005E');
+  const blackIdx = header.indexOf('B03002_014E');
+  if (stateIdx < 0 || whiteIdx < 0 || blackIdx < 0) {
+    throw new Error('Census ACS response missing state or B03002 race columns');
+  }
+  const merged = new Map<string, StateRacePopulation>();
+  for (const row of rows) {
+    const stateFips = row[stateIdx]?.padStart(2, '0');
+    const whitePopulation = Number(row[whiteIdx]);
+    const blackPopulation = Number(row[blackIdx]);
+    if (!stateFips || !Number.isFinite(whitePopulation) || !Number.isFinite(blackPopulation)) {
+      continue;
+    }
+    if (whitePopulation <= 0 || blackPopulation <= 0) continue;
+    merged.set(stateFips, { stateFips, whitePopulation, blackPopulation });
+  }
+  if (merged.size === 0) {
+    throw new Error(
+      `Census ACS state race populations empty for reference year ${input.referenceYear}`,
+    );
+  }
+  return merged;
 }
 
 export async function fetchCensusStateRacePopulations(input: {
@@ -59,44 +170,40 @@ export async function fetchCensusStateRacePopulations(input: {
   readonly fetchImpl?: FetchLike;
 }): Promise<Map<string, StateRacePopulation>> {
   const fetchImpl = input.fetchImpl ?? globalThis.fetch.bind(globalThis);
-  const estimateYear = censusPepEstimateYearForBjsReferenceYear(input.referenceYear);
   const datasetVintage = censusPepDatasetVintageForBjsReferenceYear(input.referenceYear);
 
-  const [whiteResponse, blackResponse] = await Promise.all([
-    fetchImpl(
-      buildCharvUrl({
+  try {
+    const [whiteByState, blackByState] = await Promise.all([
+      fetchPopGroupByState({
         datasetVintage,
-        estimateYear,
-        popGroup: 'WA',
+        referenceYear: input.referenceYear,
+        popGroup: BJS_WHITE_ALONE_NH_POPGROUP,
         apiKey: input.apiKey,
+        fetchImpl,
+        raceLabel: 'white',
       }),
-    ),
-    fetchImpl(
-      buildCharvUrl({
+      fetchPopGroupByState({
         datasetVintage,
-        estimateYear,
-        popGroup: 'BA',
+        referenceYear: input.referenceYear,
+        popGroup: BJS_BLACK_ALONE_NH_POPGROUP,
         apiKey: input.apiKey,
+        fetchImpl,
+        raceLabel: 'black',
       }),
-    ),
-  ]);
+    ]);
 
-  if (!whiteResponse.ok) {
-    throw new Error(`Census PEP white population fetch failed (${whiteResponse.status})`);
+    const merged = new Map<string, StateRacePopulation>();
+    for (const [stateFips, whitePopulation] of whiteByState) {
+      const blackPopulation = blackByState.get(stateFips);
+      if (blackPopulation === undefined) continue;
+      merged.set(stateFips, { stateFips, whitePopulation, blackPopulation });
+    }
+    return merged;
+  } catch {
+    return fetchAcsStateRacePopulationsFallback({
+      referenceYear: input.referenceYear,
+      apiKey: input.apiKey,
+      fetchImpl,
+    });
   }
-  if (!blackResponse.ok) {
-    throw new Error(`Census PEP black population fetch failed (${blackResponse.status})`);
-  }
-
-  const whiteByState = parsePepRows(await whiteResponse.json());
-  const blackByState = parsePepRows(await blackResponse.json());
-  const merged = new Map<string, StateRacePopulation>();
-
-  for (const [stateFips, whitePopulation] of whiteByState) {
-    const blackPopulation = blackByState.get(stateFips);
-    if (blackPopulation === undefined) continue;
-    merged.set(stateFips, { stateFips, whitePopulation, blackPopulation });
-  }
-
-  return merged;
 }
