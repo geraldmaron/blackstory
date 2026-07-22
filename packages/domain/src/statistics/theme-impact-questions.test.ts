@@ -35,6 +35,7 @@ test('Q3 resolves Phase 1 housing and wealth metrics', () => {
   assert.ok(series.some((row) => row.metricId === 'acs-homeownership-rate-black-county'));
   assert.ok(series.some((row) => row.metricId === 'nhgis-homeownership-rate-black-county'));
   assert.ok(series.some((row) => row.metricId === 'scf-median-wealth-black-nation'));
+  assert.ok(series.some((row) => row.metricId === 'hud-chas-cost-burden-black-county'));
 });
 
 test('summarizeThemeImpactCatalog and v1 allowlist are non-empty', () => {
@@ -43,4 +44,5 @@ test('summarizeThemeImpactCatalog and v1 allowlist are non-empty', () => {
   assert.equal(summary.p0Count, 6);
   assert.ok(summary.themes.includes('redlining'));
   assert.ok(THEME_IMPACT_V1_SOURCE_ALLOWLIST.includes('mapping-inequality-holc'));
+  assert.ok(THEME_IMPACT_V1_SOURCE_ALLOWLIST.includes('hud-chas'));
 });

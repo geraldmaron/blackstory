@@ -109,5 +109,6 @@ Priority: **P0** unblocks published packets; **P1** deepens eras; **P2** opens n
 - **NHGIS** Cook `17031` Black/White population shares **1970–2010** (10 obs) and tenure-by-race homeownership **1990–2010** (6 obs; Black **37.1%** / **42.0%** / **41.2%**, White **63.8%** / **66.7%** / **67.2%**).
 - **DSL Renewing Inequality** registered noncommercial; Chicago attributes fixture (5 pilot / 43 source projects); polygons cite/staff-gated — no commercial apply.
 - **CDC EJI + EPA TRI** IL county fixture rollups (7 obs; Cook EJI mean **0.74**, TRI **12** facilities in 2023).
+- **HUD CHAS** Cook `17031` Con Plan Table 20 cost-burden-by-race (**2** obs, CHAS 2016–2020; Black **44.6%**, White **31.3%** burden >30%; Suburban Cook jurisdiction).
 - **USSC Quick Facts** crack/powder average sentences + Black crack share (**26** FY obs, 2013–2023).
-- Theme-impact Q3/Q6/Q7/Q9 bindings updated; v1 source allowlist extended.
+- Theme-impact Q3/Q4/Q6/Q7/Q9 bindings updated; v1 source allowlist extended (`hud-chas`).

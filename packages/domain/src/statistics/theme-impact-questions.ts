@@ -97,6 +97,7 @@ export const THEME_IMPACT_V1_SOURCE_ALLOWLIST = [
   'dsl-renewing-inequality',
   'cdc-eji',
   'epa-tri',
+  'hud-chas',
   'primary-government-documents',
   'peer-reviewed-syntheses',
 ] as const;
@@ -162,6 +163,8 @@ export const THEME_IMPACT_QUESTIONS: readonly ThemeImpactQuestion[] = [
       { kind: 'phase1', metricId: 'sipp-median-wealth-black-nation' },
       { kind: 'phase1', metricId: 'eviction-filing-rate-county' },
       { kind: 'phase1', metricId: 'hmda-denial-rate-black-county' },
+      { kind: 'phase1', metricId: 'hud-chas-cost-burden-black-county' },
+      { kind: 'phase1', metricId: 'hud-chas-cost-burden-white-county' },
       { kind: 'derived', methodId: 'black_white_income_gap' },
       { kind: 'derived', methodId: 'era_delta' },
       { kind: 'derived', methodId: 'holc_d_vs_a_homeownership_delta' },
@@ -183,6 +186,8 @@ export const THEME_IMPACT_QUESTIONS: readonly ThemeImpactQuestion[] = [
       { kind: 'phase1', metricId: 'acs-black-population-share-county' },
       { kind: 'phase1', metricId: 'acs-ba-attainment-black-county' },
       { kind: 'phase1', metricId: 'eviction-filing-rate-county' },
+      { kind: 'phase1', metricId: 'hud-chas-cost-burden-black-county' },
+      { kind: 'phase1', metricId: 'hud-chas-cost-burden-white-county' },
       {
         kind: 'proposed',
         metricId: 'holc-grade-area-share-city',

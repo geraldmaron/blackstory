@@ -102,6 +102,7 @@ export * from './bjs-nps/index.js';
 export * from './vera-incarceration/index.js';
 export * from './eviction-lab/index.js';
 export * from './scf-wealth/index.js';
+export * from './hud-chas/index.js';
 export * from './hmda/index.js';
 export * from './ussc-quick-facts/index.js';
 export * from './dsl-renewing-inequality/index.js';

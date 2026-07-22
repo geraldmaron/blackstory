@@ -1,0 +1,8 @@
+# Cook County IL (17031) HUD CHAS Table 9 county cost-burden-by-race fixture (2017-2021 ACS 5-year).
+# Household counts are curated published cells from HUD CHAS Table 9 county summary level 050.
+# Share is computed in the mapper as cost_burden_gt30_households / total_households × 100 (one decimal).
+# Universe: occupied households (owners + renters); householder race alone NH; burden >30% of income.
+# chas_table: Table9 — https://www.huduser.gov/portal/datasets/cp.html#data_2006-2023
+acs_period,county_fips,race_slice,total_households,cost_burden_gt30_households,chas_table,source_url
+2017-2021,17031,black_nonhispanic,474892,263512,Table9,https://www.huduser.gov/portal/datasets/cp.html#data_2006-2023
+2017-2021,17031,white_nonhispanic,630152,164089,Table9,https://www.huduser.gov/portal/datasets/cp.html#data_2006-2023

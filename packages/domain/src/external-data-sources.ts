@@ -232,7 +232,9 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     geographies: ['tract', 'county', 'state'],
     cadence: 'annual',
     registryState: 'disabled',
-    notes: 'Housing cost burden, severe burden, overcrowding, tenure by income and race.',
+    notes:
+      'Housing cost burden, severe burden, overcrowding, tenure by income and race. ' +
+      'Phase 1 Cook 17031 fixture uses HUD CHAS Table 9 county (050) 2017-2021 race cost-burden cells.',
   },
   {
     id: 'crdc-school-civil-rights',

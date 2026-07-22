@@ -88,6 +88,9 @@ export {
   PHASE1_EJI_TRI_INDICATOR_DEFINITIONS,
   listPhase1EjiTriIndicators,
 } from './phase1-eji-tri-indicator-catalog.js';
+export {
+  PHASE1_CHAS_INDICATOR_DEFINITIONS,
+} from './phase1-chas-indicator-catalog.js';
 
 export {
   THEME_IMPACT_THEME_IDS,
