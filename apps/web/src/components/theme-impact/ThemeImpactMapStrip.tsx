@@ -5,7 +5,7 @@
 
 import Link from 'next/link';
 import React from 'react';
-import type { ThemeImpactPacketFixture } from './fixtures/types';
+import type { ThemeImpactPacketView } from '@repo/domain';
 import { collectPacketProvenance } from './ThemeImpactProvenanceList';
 import { REDLINING_PILOT_PACKET } from './ThemeImpactStoryEmbed';
 
@@ -13,7 +13,7 @@ const METHOD_STANCE_LABEL = 'Juxtaposition — not causation';
 const INDICATOR_LIMIT = 3;
 
 export type ThemeImpactMapStripProps = {
-  readonly packet?: ThemeImpactPacketFixture;
+  readonly packet?: ThemeImpactPacketView;
   readonly labelId?: string;
 };
 

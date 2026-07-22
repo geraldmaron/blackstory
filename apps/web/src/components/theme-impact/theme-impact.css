@@ -609,3 +609,122 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
+
+/* —— Storytelling: era timeline + metric series —— */
+.ds-theme-impact__live-badge {
+  margin: var(--ds-space-3) 0 0;
+  color: var(--ds-accent-text);
+  font-size: 0.75rem;
+}
+
+.ds-theme-impact__storytelling {
+  margin-top: var(--ds-space-6);
+  padding: var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+}
+
+.ds-theme-impact__era-timeline-list {
+  display: grid;
+  gap: var(--ds-space-3);
+  margin: var(--ds-space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-theme-impact__era-timeline-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--ds-space-3);
+  align-items: start;
+  padding: var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-canvas);
+}
+
+.ds-theme-impact__era-timeline-index {
+  color: var(--ds-accent-text);
+  font-size: 0.8125rem;
+}
+
+.ds-theme-impact__era-timeline-label {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.ds-theme-impact__era-timeline-span {
+  margin: var(--ds-space-1) 0 0;
+  color: var(--ds-ink-muted);
+  font-size: 0.75rem;
+}
+
+.ds-theme-impact__era-timeline-note {
+  margin: var(--ds-space-3) 0 0;
+  color: var(--ds-ink-muted);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.ds-theme-impact__metric-series-list {
+  display: grid;
+  gap: var(--ds-space-3);
+  margin: var(--ds-space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-theme-impact__metric-series-group {
+  padding: var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-theme-impact__metric-series-title {
+  margin: 0 0 var(--ds-space-2);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.ds-theme-impact__metric-series-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.ds-theme-impact__metric-series-table th,
+.ds-theme-impact__metric-series-table td {
+  padding: var(--ds-space-2);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  text-align: left;
+}
+
+.ds-theme-impact__metric-series-snapshot {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ds-space-2);
+}
+
+.ds-theme-impact__storytelling-gap-note {
+  margin: var(--ds-space-4) 0 0;
+  color: var(--ds-ink-muted);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.ds-theme-impact__question-link {
+  margin: var(--ds-space-2) 0 0;
+  font-size: 0.8125rem;
+}
+
+.ds-theme-impact__question-link a {
+  color: var(--ds-accent-text);
+  font-weight: 500;
+}

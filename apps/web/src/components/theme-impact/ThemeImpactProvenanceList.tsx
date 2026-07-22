@@ -58,16 +58,22 @@ export function ThemeImpactProvenanceList({
 export function collectPacketProvenance(input: {
   readonly observations: readonly { readonly provenance: ThemeImpactProvenance }[];
   readonly derived: readonly { readonly provenance: ThemeImpactProvenance }[];
-  readonly artifacts: readonly { readonly provenance: ThemeImpactProvenance }[];
+  readonly artifacts: readonly { readonly provenance?: ThemeImpactProvenance }[];
 }): readonly ThemeImpactProvenance[] {
   const seen = new Set<string>();
   const out: ThemeImpactProvenance[] = [];
 
-  for (const row of [...input.observations, ...input.derived, ...input.artifacts]) {
-    const key = row.provenance.content_hash;
-    if (seen.has(key)) continue;
+  const push = (provenance: ThemeImpactProvenance) => {
+    const key = provenance.content_hash;
+    if (seen.has(key)) return;
     seen.add(key);
-    out.push(row.provenance);
+    out.push(provenance);
+  };
+
+  for (const row of input.observations) push(row.provenance);
+  for (const row of input.derived) push(row.provenance);
+  for (const artifact of input.artifacts) {
+    if (artifact.provenance) push(artifact.provenance);
   }
 
   return out;

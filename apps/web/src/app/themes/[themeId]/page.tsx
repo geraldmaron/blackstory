@@ -1,5 +1,5 @@
 /**
- * Theme-impact detail page at `/themes/[themeId]` — canonical questions with fixture packets.
+ * Theme-impact detail page at `/themes/[themeId]` — live packets with fixture fallback.
  */
 
 import Link from 'next/link';
@@ -7,11 +7,13 @@ import { notFound } from 'next/navigation';
 import { ThemeImpactMapStrip } from '../../../components/theme-impact/ThemeImpactMapStrip';
 import { ThemeImpactPacketCard } from '../../../components/theme-impact/ThemeImpactPacketCard';
 import { ThemeImpactStoryEmbed } from '../../../components/theme-impact/ThemeImpactStoryEmbed';
+import { ThemeImpactStorytellingPanel } from '../../../components/theme-impact/ThemeImpactStorytellingPanel';
 import {
   getThemeCatalogEntry,
   listAvailableThemeIds,
-  listPacketsForTheme,
 } from '../../../components/theme-impact/fixtures';
+import { shouldShowThemeImpactStorytelling } from '../../../lib/theme-impact/storytelling-series';
+import { listThemeImpactPacketViews, resolveRedliningPilotPacketView } from '../../../lib/theme-impact/source';
 import '../../../components/theme-impact/theme-impact.css';
 
 type ThemeDetailPageProps = {
@@ -42,7 +44,12 @@ export default async function ThemeDetailPage({ params }: ThemeDetailPageProps) 
     notFound();
   }
 
-  const packets = listPacketsForTheme(themeId);
+  const { packets, source } = await listThemeImpactPacketViews(themeId);
+  const pilotPacket =
+    themeId === 'redlining' ? await resolveRedliningPilotPacketView() : undefined;
+  const storytellingPackets = packets.filter((packet) =>
+    shouldShowThemeImpactStorytelling(packet.questionId),
+  );
 
   return (
     <main className="ds-container ds-page" id="main">
@@ -60,9 +67,22 @@ export default async function ThemeDetailPage({ params }: ThemeDetailPageProps) 
             indicator is not proof of cause. See{' '}
             <Link href="/methodology">methodology</Link> for the full juxtaposition bar.
           </p>
+          {source !== 'fixture' ? (
+            <p className="ds-mono ds-theme-impact__live-badge">
+              Data source: {source === 'live' ? 'live warehouse' : 'live + fixture fallback'}
+            </p>
+          ) : null}
         </aside>
 
-        {themeId === 'redlining' ? (
+        {storytellingPackets.map((packet) => (
+          <ThemeImpactStorytellingPanel
+            key={packet.questionId}
+            packet={packet}
+            headingId={`theme-storytelling-${packet.questionId}`}
+          />
+        ))}
+
+        {themeId === 'redlining' && pilotPacket ? (
           <section
             className="ds-section ds-record-section ds-section--flush"
             aria-labelledby="theme-consumers-heading"
@@ -76,17 +96,17 @@ export default async function ThemeDetailPage({ params }: ThemeDetailPageProps) 
               Story embed and map strip
             </h2>
             <p className="ds-section__lede">
-              Both surfaces read the same Chicago redlining packet fixture — indicators, citations,
-              and juxtaposition method note — before full story and map wiring ships.
+              Both surfaces read the same Chicago redlining Q3 packet — indicators, citations, and
+              juxtaposition method note — from {pilotPacket.dataSource ?? 'fixture'} data.
             </p>
             <div className="ds-theme-impact__consumers">
               <div className="ds-theme-impact__consumer-block">
                 <p className="ds-theme-impact__consumer-label">Story embed</p>
-                <ThemeImpactStoryEmbed headingId="redlining-story-embed" />
+                <ThemeImpactStoryEmbed headingId="redlining-story-embed" packet={pilotPacket} />
               </div>
               <div className="ds-theme-impact__consumer-block">
                 <p className="ds-theme-impact__consumer-label">Map context strip</p>
-                <ThemeImpactMapStrip labelId="redlining-map-strip" />
+                <ThemeImpactMapStrip labelId="redlining-map-strip" packet={pilotPacket} />
               </div>
             </div>
           </section>
@@ -105,14 +125,19 @@ export default async function ThemeDetailPage({ params }: ThemeDetailPageProps) 
             {packets.length} question{packets.length === 1 ? '' : 's'} in scope
           </h2>
           <p className="ds-section__lede">
-            Fixture packets mirror the upcoming live shape — citations, provenance quartet, artifacts,
-            and explicit insufficient-evidence or modeled labels where applicable.
+            Packets compose warehouse observations, derived measurements, artifacts, and explicit
+            gap labels. Open a question for the full provenance quartet.
           </p>
 
           <ul className="ds-theme-impact__packets" aria-label={`${entry.title} question packets`}>
             {packets.map((packet) => (
               <li key={packet.questionId}>
                 <ThemeImpactPacketCard packet={packet} />
+                <p className="ds-theme-impact__question-link">
+                  <Link href={`/themes/${themeId}/questions/${packet.questionId}`}>
+                    Open question {packet.questionId}
+                  </Link>
+                </p>
               </li>
             ))}
           </ul>

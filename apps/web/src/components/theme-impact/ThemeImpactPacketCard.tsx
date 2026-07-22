@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { Card } from '@repo/ui';
-import type { ThemeImpactPacketFixture } from './fixtures/types';
+import type { ThemeImpactPacketView } from '@repo/domain';
 import { ThemeImpactGapBannerList } from './ThemeImpactGapBanner';
 import {
   ThemeImpactProvenanceList,
@@ -13,10 +13,10 @@ import {
 } from './ThemeImpactProvenanceList';
 
 export type ThemeImpactPacketCardProps = {
-  readonly packet: ThemeImpactPacketFixture;
+  readonly packet: ThemeImpactPacketView;
 };
 
-const METHOD_STANCE_LABEL: Readonly<Record<ThemeImpactPacketFixture['methodStance'], string>> = {
+const METHOD_STANCE_LABEL: Readonly<Record<ThemeImpactPacketView['methodStance'], string>> = {
   juxtaposition: 'Juxtaposition — not causation',
   gated_causal_claim: 'Gated causal claim',
 };

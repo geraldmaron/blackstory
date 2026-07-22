@@ -214,7 +214,7 @@ export const REDLINING_PACKET_FIXTURES: readonly ThemeImpactPacketFixture[] = [
     },
     methodStance: 'juxtaposition',
     methodNote:
-      'Indicators are shown beside policy eras for Cook County. Co-movement of homeownership, income, poverty, and attainment does not establish that redlining alone caused later gaps — crosswalk uncertainty, migration, and confounders remain explicit. HMDA lending aggregates and national wealth series are not yet loaded for this pilot.',
+      'Indicators are shown beside policy eras for Cook County. Co-movement of homeownership, income, poverty, and attainment does not establish that redlining alone caused later gaps — crosswalk uncertainty, migration, and confounders remain explicit. HMDA county denial rates (2022–2023) are loaded where warehouse ingest has run; decennial era deltas and national wealth series remain gap-labeled.',
     observationsSummary:
       'In Cook County (ACS 2020–2024), Black residents are 22.2% of the population; Black homeownership is 41.5%; Black median household income is $51,523 against $102,809 for White householders; Black poverty rate is 23.9%; bachelor\'s attainment among Black adults is 26.8%.',
     observations: [

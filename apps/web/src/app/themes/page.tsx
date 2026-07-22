@@ -1,5 +1,5 @@
 /**
- * Public theme-impact browse page at `/themes` — P0 themes with fixture packets,
+ * Public theme-impact browse page at `/themes` — P0 themes with live or fixture packets,
  * P1 themes labeled coming soon, and a link to methodology for juxtaposition rules.
  */
 

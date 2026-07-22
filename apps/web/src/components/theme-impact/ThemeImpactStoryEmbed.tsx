@@ -1,23 +1,23 @@
 /**
  * Theme-impact story embed — compact packet consumer for narrative surfaces.
- * Shares the Chicago redlining pilot fixture (Q3) with ThemeImpactMapStrip.
+ * Resolves live Q3 packet when Postgres is configured; falls back to fixtures.
  */
 
 import Link from 'next/link';
 import React from 'react';
+import type { ThemeImpactPacketView } from '@repo/domain';
 import { REDLINING_PACKET_FIXTURES } from './fixtures/packets/redlining';
-import type { ThemeImpactPacketFixture } from './fixtures/types';
 import { collectPacketProvenance } from './ThemeImpactProvenanceList';
 
-/** Shared Chicago pilot packet for story embed and map strip consumers. */
-export const REDLINING_PILOT_PACKET: ThemeImpactPacketFixture =
+/** Fixture fallback when live reads are unavailable at build time. */
+export const REDLINING_PILOT_PACKET: ThemeImpactPacketView =
   REDLINING_PACKET_FIXTURES.find((packet) => packet.questionId === 'Q3')!;
 
 const METHOD_STANCE_LABEL = 'Juxtaposition — not causation';
 const INDICATOR_LIMIT = 3;
 
 export type ThemeImpactStoryEmbedProps = {
-  readonly packet?: ThemeImpactPacketFixture;
+  readonly packet?: ThemeImpactPacketView;
   readonly headingId?: string;
   readonly citationsHeading?: string;
 };

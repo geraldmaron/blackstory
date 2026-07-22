@@ -72,11 +72,12 @@ export function ThemeBrowseSections() {
           Priority P0
         </p>
         <h2 className="ds-section__title" id="themes-p0-heading">
-          Themes with fixture packets
+          Themes with live packets
         </h2>
         <p className="ds-section__lede">
-          Redlining and drug policy &amp; the state ship first — each with canonical questions,
-          cited fixtures, and explicit gap labels while live data wiring continues.
+          Redlining and drug policy &amp; the state ship first — canonical questions with cited
+          warehouse packets when Postgres is configured, fixture fallback otherwise, and explicit
+          gap labels throughout.
         </p>
         <ul className="ds-theme-impact__catalog" aria-label="Priority P0 themes">
           {p0.map((entry) => (
