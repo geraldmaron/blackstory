@@ -5,17 +5,17 @@
  */
 import {
   computeStatePopulationChangesFromDecades,
-  summarizePhase1IndicatorCatalog,
   type AcsCoverageSummary,
   type CensusCountyDecadeDecade,
   type HateCrimeYearSummary,
   type HistoricalStatePopulationCoverage,
   type NationalPopulationTimelineSnapshot,
   type OpportunityAtlasCoverageSummary,
-  type Phase1IndicatorCoverageSummary,
   type StatePopulationByDecade,
   type StatePopulationChange,
 } from '@repo/domain';
+import { summarizePhase1IndicatorCatalog } from '@repo/domain/statistics/phase1-indicator-catalog';
+import type { Phase1IndicatorCoverageSummary } from '@repo/domain/statistics/public-data-summaries';
 import { fetchMaterializedSnapshot } from '../public-data/public-readers';
 
 type StatePopulationByDecadeSnapshot = {

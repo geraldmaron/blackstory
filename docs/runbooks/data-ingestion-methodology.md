@@ -9,7 +9,9 @@ Black Book. This runbook is the pattern; the census/ACS/Opportunity-Atlas/HOLC i
 1. **Register before you acquire.** Add an entry to
    `packages/domain/src/external-data-sources.ts`: direct data URL (never a marketing page),
    custodian, license verdict, vintage, geography, cadence, `registryState: 'disabled'`.
-   Recording a source is never approval to ingest it.
+   Recording a source is never approval to ingest it. For context-indicator themes (justice,
+   wealth, housing, …), also record the store/cite/proxy decision in
+   [`context-data-source-matrix.md`](../research/context-data-source-matrix.md).
 2. **Resolve rights first.** License verdict decides the lane:
    - `public-domain` / `attribution-required` → may ingest; attribution travels on every doc
      (`license` field).
@@ -133,5 +135,7 @@ Human-or-agent researched entities (the `fixtures/national-catalog/*.json` →
 | THE provenance zod fragments (compose, never restate) | `packages/firebase/src/firestore/statistic-provenance.ts` |
 | Catalog fixture QA gate (state-bbox + precision-decimals) | `packages/firebase/scripts/qa-catalog-fixtures.ts` |
 | Acquisition registry | `packages/domain/src/external-data-sources.ts` |
+| Context indicator matrix | [`docs/research/context-data-source-matrix.md`](../research/context-data-source-matrix.md) |
+| Phase 1 indicator catalog + ingest | `packages/domain/src/statistics/phase1-indicator-catalog.ts`, `packages/firebase/scripts/ingest-phase1-indicators.ts` |
 | Rights-restricted corpus vetting | `packages/domain/src/launch-corpora.ts` (HOLC entry) |
 | Dignity-lane sources | `packages/domain/src/historic-safety/source-registry.ts` |

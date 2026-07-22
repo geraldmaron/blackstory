@@ -2,6 +2,8 @@
 
 Contract-layer API for registering source adapters, approving policies, and gating research runs. Persistence is in-memory in this bead; Firestore wiring follows in a later bead.
 
+**Context indicators (statistics lane):** Pre-ingestion metadata for demographics/context datasets lives in [`external-data-sources.ts`](../../packages/domain/src/external-data-sources.ts) and the ranked theme matrix in [`context-data-source-matrix.md`](context-data-source-matrix.md) — not in `registerSource`.
+
 ## Domain API (`@repo/domain` → `adapters/`)
 
 Parent agent merges `packages/domain/src/adapters/index.ts` into the package barrel.
