@@ -7,6 +7,7 @@ import { createHash, sign as signBytes, verify as verifyBytes, type KeyLike } fr
 export * from './release-builder.js';
 export * from './mobile-bootstrap.js';
 export * from './release-activation.js';
+export * from './public-render.js';
 
 export const RELEASE_STATUSES = [
   'draft',

@@ -164,6 +164,19 @@ test('keeps claim prose in body text, not the Card title (quiet typography)', ()
   assert.match(html, /class="ds-evidence-claim__body">During spring and summer 1800/);
 });
 
+test('strips editorial wikilink markup from claim object prose', () => {
+  const html = renderToStaticMarkup(
+    createElement(EvidenceCard, {
+      card: buildEvidenceCard({
+        ...BASE_CLAIM,
+        object: 'The U.S. [[gap_supreme_court|Supreme Court]], established in 1789.',
+      }),
+    }),
+  );
+  assert.match(html, /The U\.S\. Supreme Court, established in 1789\./);
+  assert.doesNotMatch(html, /\[\[/);
+});
+
 test('renders revision history and a retraction notice when present', () => {
   const html = renderToStaticMarkup(
     createElement(EvidenceCard, {

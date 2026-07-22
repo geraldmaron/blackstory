@@ -9,6 +9,7 @@ import type { ReactNode } from 'react';
 import {
   linkifyProseAgainstCatalog,
   parseProseEntityLinks,
+  stripProseEntityLinks,
   type CatalogLinkTarget,
 } from '@repo/domain/editorial';
 import { EntityLink, humanizeEntityId } from './EntityLink';
@@ -33,6 +34,10 @@ function hasEntityMarkup(text: string): boolean {
   return text.includes('[[');
 }
 
+function plainTextSegment(text: string): ProseSegment {
+  return { kind: 'text', text: text.includes('[[') ? stripProseEntityLinks(text) : text };
+}
+
 function segmentsFromMarkup(
   text: string,
   skipEntityIds: readonly string[] | undefined,
@@ -44,7 +49,7 @@ function segmentsFromMarkup(
   for (const match of text.matchAll(pattern)) {
     const index = match.index ?? 0;
     if (index > cursor) {
-      segments.push({ kind: 'text', text: text.slice(cursor, index) });
+      segments.push(plainTextSegment(text.slice(cursor, index)));
     }
     const entityId = match[1]?.trim() ?? '';
     if (entityId) {
@@ -58,10 +63,10 @@ function segmentsFromMarkup(
     cursor = index + match[0].length;
   }
   if (cursor < text.length) {
-    segments.push({ kind: 'text', text: text.slice(cursor) });
+    segments.push(plainTextSegment(text.slice(cursor)));
   }
   void parseProseEntityLinks(text);
-  return segments.length > 0 ? segments : [{ kind: 'text', text }];
+  return segments.length > 0 ? segments : [plainTextSegment(text)];
 }
 
 function segmentsFromCatalog(
@@ -73,7 +78,7 @@ function segmentsFromCatalog(
     ...(skipEntityIds !== undefined ? { skipEntityIds } : {}),
   });
   if (linked.links.length === 0) {
-    return [{ kind: 'text', text }];
+    return [plainTextSegment(text)];
   }
   return segmentsFromMarkup(linked.text, skipEntityIds);
 }
@@ -89,7 +94,7 @@ function toSegments(
   if (catalog && catalog.length > 0) {
     return segmentsFromCatalog(text, catalog, skipEntityIds);
   }
-  return [{ kind: 'text', text }];
+  return [plainTextSegment(text)];
 }
 
 export function LinkedProse({
