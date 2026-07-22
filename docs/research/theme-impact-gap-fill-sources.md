@@ -102,4 +102,4 @@ Priority: **P0** unblocks published packets; **P1** deepens eras; **P2** opens n
 - [x] Ordered next ingest list  
 - [x] Research pass itself performed no live ingest  
 
-**Executed follow-on (2026-07-22, `feat/theme-impact-gap-ingest`):** BJS denominators fixed + rates re-applied; Vera IL multi-year; SCF 1989–2022; Eviction IL (incl. Cook); HMDA Cook fixture aggregates; Q6 packet published with corrected BJS rates. Live HMDA API still needs response-shape polish (fixture path works).
+**Executed follow-on (2026-07-22, `feat/theme-impact-gap-ingest`):** BJS denominators fixed + rates re-applied; Vera IL multi-year; SCF 1989–2022; Eviction IL (incl. Cook); HMDA Cook **live** 2018–2023 (18 observations after FFIEC response normalize); Q6 packet published with corrected BJS rates. Obsolete theme-impact/BJS stashes dropped; orphan scaffold tree removed.
