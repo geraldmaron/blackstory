@@ -320,6 +320,8 @@ test('createFirestoreDataAccessReaders search uses publicSearchIndex when rows e
       searchIndex: new Map([[sampleSearchIndexDoc.id, sampleSearchIndexDoc]]),
       entities: new Map([[sampleProjection.id, sampleProjection]]),
     }),
+    // Unit tests must not hit live public-media CDN (rel_seed_001 is published).
+    fetchSearchIndexArtifact: async () => undefined,
   });
   const page = await readers.readSearchPage(
     { q: 'seed', pageSize: 10, depth: 1, filters: [], geo: undefined, dateRange: undefined, sort: 'relevance', shape: 'search' },
@@ -341,6 +343,7 @@ test('createFirestoreDataAccessReaders search paginates index-backed results by 
         [secondSearchIndexDoc.id, secondSearchIndexDoc],
       ]),
     }),
+    fetchSearchIndexArtifact: async () => undefined,
   });
   const page1 = await readers.readSearchPage(
     { q: 'seed', pageSize: 1, depth: 1, filters: [], geo: undefined, dateRange: undefined, sort: 'relevance', shape: 'search' },
@@ -409,6 +412,7 @@ test('createFirestoreDataAccessReaders search falls back to bounded entity scan 
       trace,
       entities: new Map([[sampleProjection.id, sampleProjection]]),
     }),
+    fetchSearchIndexArtifact: async () => undefined,
   });
   const page = await readers.readSearchPage(
     { q: 'seed', pageSize: 10, depth: 1, filters: [], geo: undefined, dateRange: undefined, sort: 'relevance', shape: 'search' },

@@ -128,6 +128,16 @@ function buildEvidencePack() {
   };
 }
 
+function stripGzipSizes(
+  report: Readonly<Record<string, readonly { readonly kind: string; readonly byteLength: number; readonly gzipByteLength: number }[]>>,
+): Record<string, readonly { readonly kind: string; readonly byteLength: number }[]> {
+  const out: Record<string, { readonly kind: string; readonly byteLength: number }[]> = {};
+  for (const [releaseId, rows] of Object.entries(report)) {
+    out[releaseId] = rows.map(({ kind, byteLength }) => ({ kind, byteLength }));
+  }
+  return out;
+}
+
 test('MOB-005 evidence pack is deterministic and matches committed fixtures', () => {
   const pack = buildEvidencePack();
 
@@ -141,7 +151,17 @@ test('MOB-005 evidence pack is deterministic and matches committed fixtures', ()
 
   assert.deepEqual(pack.manifests.rel_mob005_a, readJson('manifests/rel_mob005_a.json'));
   assert.deepEqual(pack.manifests.rel_mob005_b, readJson('manifests/rel_mob005_b.json'));
-  assert.deepEqual(pack.sizeReport, readJson('size-report.json'));
+  // gzipByteLength varies across zlib/Node builds; assert stable uncompressed sizes only.
+  assert.deepEqual(
+    stripGzipSizes(pack.sizeReport),
+    stripGzipSizes(readJson('size-report.json')),
+  );
+  for (const rows of Object.values(pack.sizeReport)) {
+    for (const row of rows) {
+      assert.ok(row.gzipByteLength > 0);
+      assert.ok(row.gzipByteLength <= row.byteLength + 64);
+    }
+  }
   assert.deepEqual(pack.activationLog, readJson('activation-log.json'));
   assert.deepEqual(pack.failureInjection, readJson('failure-injection.json'));
 

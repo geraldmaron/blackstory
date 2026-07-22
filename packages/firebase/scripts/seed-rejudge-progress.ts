@@ -2,7 +2,7 @@
  * Seeds canonical rejudge-progress.ndjson + rejudge-status.md from prior pass artifacts.
  * Run once before or alongside rejudge-dc-keeps-one-by-one.ts.
  */
-import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -184,7 +184,7 @@ function main(): void {
   let errors = 0;
   let promoteEligible = 0;
 
-  for (const [index, id] of queue.entries()) {
+  for (const [_index, id] of queue.entries()) {
     const subject = subjects.get(id);
     const best = bestById.get(id);
     const runPkt = runById.get(id);

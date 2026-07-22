@@ -13,7 +13,7 @@
  * Optional:
  *   --write-list=<reason>   dump entity ids for one skip bucket (e.g. person_privacy_hold)
  */
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { getOpsPostgresPool } from '../../data-access/src/postgres/pool.js';
@@ -22,7 +22,6 @@ const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(scriptDir, '../../..');
 const reportDir = join(repoRoot, '.cache/ledger-audit');
 
-type CountRow = { readonly n: number };
 type KindRow = { readonly kind: string; readonly n: number };
 type WeedRow = { readonly skip_reason: string; readonly n: number };
 type EntityRow = { readonly id: string; readonly display_name: string; readonly kind: string };

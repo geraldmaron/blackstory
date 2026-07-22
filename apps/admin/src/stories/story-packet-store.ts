@@ -1,5 +1,5 @@
 /** Postgres access for staged story packets and review decisions. */
-import { storyPacketToSeedRecord, type StoryResearchPacket } from '@repo/domain';
+import type { StoryResearchPacket, storyPacketToSeedRecord } from '@repo/domain';
 import {
   getStoryPacketPostgres,
   listStoryPacketsPostgres,

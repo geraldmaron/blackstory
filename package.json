@@ -10,7 +10,7 @@
   "scripts": {
     "bootstrap": "./scripts/bootstrap.sh",
     "build": "pnpm run build:foundation && pnpm -r --filter './packages/**' --filter './apps/**' --filter @repo/functions-discovery --filter '!@repo/schemas' --filter '!@repo/data-access' --filter '!@repo/ui' --filter '!@repo/domain' --filter '!@repo/security' --filter '!@repo/observability' run build",
-    "build:foundation": "pnpm --filter @repo/schemas --filter @repo/data-access --filter @repo/ui run build && pnpm --filter @repo/domain run build && pnpm --filter @repo/security run build && pnpm --filter @repo/observability run build",
+    "build:foundation": "pnpm --filter @repo/schemas --filter @repo/ui run build && pnpm --filter @repo/domain run build && pnpm --filter @repo/data-access run build && pnpm --filter @repo/security run build && pnpm --filter @repo/observability run build",
     "apphosting:build": "node scripts/apphosting-build.mjs",
     "start": "node apps/web/.next/standalone/apps/web/server.js",
     "test": "pnpm test:preflight && pnpm -r --filter './packages/**' --filter './apps/**' --filter @repo/functions-discovery run --if-present test && uv run pytest",
@@ -26,7 +26,7 @@
     "test:e2e": "pnpm test:preflight && pnpm --filter @repo/testing test:e2e",
     "test:coverage": "pnpm test:preflight && pnpm --filter @repo/testing test:coverage",
     "typecheck": "pnpm -r --filter './packages/**' --filter './apps/**' --filter @repo/functions-discovery run --if-present typecheck",
-    "lint": "eslint apps packages functions scripts eslint.config.mjs --max-warnings 0",
+    "lint": "eslint apps packages functions scripts eslint.config.mjs --max-warnings 0 --ignore-pattern 'apps/mobile/**'",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "docs:dev": "pnpm --filter @repo/docs dev",

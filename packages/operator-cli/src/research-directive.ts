@@ -158,7 +158,7 @@ export function createTargetedBriefHandlers(): ResearchDirectiveHandlers<
       ...(subject.seedUrls ? { seedUrls: subject.seedUrls } : {}),
       ...(subject.searchQueries ? { searchQueries: subject.searchQueries } : {}),
     }),
-    extract: ({ plan, gathered }) => ({
+    extract: ({ plan: _plan, gathered }) => ({
       subjectCount: 1,
       snippetCount: gathered.formattedSnippets.length,
     }),
@@ -259,7 +259,7 @@ export function parseSundownTownPageText(text: string): {
 } {
   const normalized = text.replace(/\s+/gu, ' ').trim();
   const confidenceMatch = normalized.match(
-    /Sundown Town in the Past\?\s*[:\-]?\s*(Possible|Probable|Surely|Unlikely)/iu,
+    /Sundown Town in the Past\?\s*[:-]?\s*(Possible|Probable|Surely|Unlikely)/iu,
   );
   const confidenceLabel = confidenceMatch?.[1];
   const summary = normalized.slice(0, 600);

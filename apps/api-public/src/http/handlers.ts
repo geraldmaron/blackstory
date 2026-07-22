@@ -21,7 +21,6 @@
 import type { ClientAttestationDecision, ClientAttestationHeaders } from '@repo/security';
 import {
   encodeSearchCursor,
-  type CanonicalSearchQuery,
   type QueryGuardrailDecisionAllowed,
   type RateLimitSubject,
 } from '@repo/security';
@@ -38,8 +37,9 @@ import {
   MIN_SUPPORTED_API_VERSION,
 } from '@repo/public-contracts/version';
 import { health } from '../index.js';
-import { createPublicRateLimitGuard } from '../rate-limits.js';
-import { createPublicSearchGuard, type PublicSearchHttpQuery } from '../search-guardrails.js';
+import type { createPublicRateLimitGuard } from '../rate-limits.js';
+import type { createPublicSearchGuard} from '../search-guardrails.js';
+import { type PublicSearchHttpQuery } from '../search-guardrails.js';
 import type { PublicDataAccess } from './data-access.js';
 import { CACHE_CONTROL, errorResponse, jsonRead, type ApiResponse } from './responses.js';
 

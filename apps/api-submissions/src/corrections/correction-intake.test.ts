@@ -28,7 +28,7 @@ test('accepts a well-formed submission and shapes it into a quarantine Submissio
 });
 
 test('omits submitterContact when contact is absent', () => {
-  const { contact, ...rest } = VALID_INPUT;
+  const { contact: _contact, ...rest } = VALID_INPUT;
   const result = validateCorrectionSubmission(rest);
   assert.equal(result.valid, true);
   if (!result.valid) return;

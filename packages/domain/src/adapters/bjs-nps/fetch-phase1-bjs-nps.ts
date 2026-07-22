@@ -8,6 +8,7 @@ import {
   mapBjsNpsRowsToObservations,
   parseBjsNpsStat01Csv,
   type Phase1BjsNpsObservationDraft,
+  type StateRacePopulation,
 } from './phase1-bjs-nps-mapper.js';
 
 export type Phase1BjsNpsFetchResult = {
@@ -22,7 +23,7 @@ type FetchOptions = {
   readonly fetchImpl?: FetchLike;
   readonly stat01CsvText?: string;
   readonly censusApiKey?: string;
-  readonly populations?: Map<string, import('./phase1-bjs-nps-mapper.js').StateRacePopulation>;
+  readonly populations?: Map<string, StateRacePopulation>;
   readonly retrievedAt?: string;
 };
 

@@ -22,16 +22,16 @@ import {
   chroniclingAmericaKillSwitchId,
   createChroniclingAmericaAdapterContract,
   extractLccnFromLocUrl,
-  filterLargeExportPayload,
   normalizeChroniclingAmericaBatch,
   parseChroniclingAmericaFixtureBatch,
   parseChroniclingAmericaItemResponse,
   parseChroniclingAmericaKillSwitchId,
   parseChroniclingAmericaSearchFixture,
   parseChroniclingAmericaSearchResponse,
-  qualifiesForCandidateRetention,
   registerChroniclingAmericaSource,
 } from './index.js';
+import { filterLargeExportPayload } from './export-filter.js';
+import { qualifiesForCandidateRetention } from './retention.js';
 
 const FIXED_NOW = '2026-07-21T17:00:00.000Z';
 const FIXTURES_DIR = join(dirname(fileURLToPath(import.meta.url)), 'fixtures');

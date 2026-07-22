@@ -18,7 +18,7 @@
  *     --vera-csv=packages/firebase/fixtures/reference-indicators/vera-county-snippet.csv
  */
 import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   fetchPhase1VeraJailCountyObservations,

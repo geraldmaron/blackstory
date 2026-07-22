@@ -8,11 +8,11 @@ import {
 } from './constants.js';
 import { WIKIDATA_PLACE_FIRST_PACK_SPECS } from './packs.js';
 import { compileAllWikidataPlaceFirstQueries } from './sparql-compiler.js';
-import type { WikidataPlaceFirstDryRun } from './types.js';
+import type { WikidataPlaceFirstDryRun, WikidataPlaceFirstPackSpec } from './types.js';
 
 export type BuildWikidataPlaceFirstDryRunInput = {
   readonly compiledAt: string;
-  readonly packSpecs?: readonly import('./types.js').WikidataPlaceFirstPackSpec[];
+  readonly packSpecs?: readonly WikidataPlaceFirstPackSpec[];
 };
 
 /** Builds fixture-mode dry-run output for portfolio review and tests. */

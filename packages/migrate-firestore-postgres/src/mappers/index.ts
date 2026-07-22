@@ -400,12 +400,12 @@ export function mapCensusNationalDecade(
   const {
     id: _id,
     decade: _d,
-    source,
-    sourceUrl,
-    retrievedAt,
-    contentHash,
-    createdAt,
-    updatedAt,
+    source: _source,
+    sourceUrl: _sourceUrl,
+    retrievedAt: _retrievedAt,
+    contentHash: _contentHash,
+    createdAt: _createdAt,
+    updatedAt: _updatedAt,
     ...payload
   } = data;
   return {
@@ -428,12 +428,12 @@ export function mapCensusStateDecade(
     decade: _d,
     stateFips: _sf,
     state_fips: _sf2,
-    source,
-    sourceUrl,
-    retrievedAt,
-    contentHash,
-    createdAt,
-    updatedAt,
+    source: _source,
+    sourceUrl: _sourceUrl,
+    retrievedAt: _retrievedAt,
+    contentHash: _contentHash,
+    createdAt: _createdAt,
+    updatedAt: _updatedAt,
     ...payload
   } = data;
   return {

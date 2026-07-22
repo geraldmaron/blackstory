@@ -148,7 +148,7 @@ function evaluatePromoteEligible(
   return build.ok;
 }
 
-function ingestProgressNdjson(path: string, source: string, judgments: Judgment[], subjects: Map<string, SubjectMeta>): void {
+function ingestProgressNdjson(path: string, source: string, judgments: Judgment[], _subjects: Map<string, SubjectMeta>): void {
   if (!existsSync(path)) return;
   for (const line of readFileSync(path, 'utf8').split('\n')) {
     if (!line.trim()) continue;

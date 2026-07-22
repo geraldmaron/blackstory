@@ -17,6 +17,9 @@
       ],
       "@repo/public-contracts/v1/*": [
         "../../packages/public-contracts/src/v1/*"
+      ],
+      "zod": [
+        "./node_modules/zod"
       ]
     }
   },

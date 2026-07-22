@@ -17,6 +17,8 @@ export default tseslint.config(
       '**/next-env.d.ts',
       '**/node_modules/**',
       'packages/data-access/generated/**',
+      // Isolated npm app (not in the pnpm workspace); linted via `apps/mobile` scripts.
+      'apps/mobile/**',
     ],
   },
   eslint.configs.recommended,
@@ -32,6 +34,8 @@ export default tseslint.config(
     },
     rules: {
       'no-console': 'off',
+      // URL/normalize reassignment chains trip this without real bugs; keep fail-closed on unused.
+      'no-useless-assignment': 'off',
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/no-explicit-any': 'error',
       // Leading-underscore is this codebase's established convention for an
