@@ -21,6 +21,6 @@ export {
 } from './phase1-ussc-quick-facts-mapper.js';
 export {
   fetchPhase1UsscQuickFactsObservations,
-  DEFAULT_FIXTURE_PATH,
+  DEFAULT_FIXTURE_PATH as USSC_QUICK_FACTS_DEFAULT_FIXTURE_PATH,
   type Phase1UsscQuickFactsFetchResult,
 } from './fetch-phase1-ussc-quick-facts.js';

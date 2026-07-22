@@ -1,0 +1,17 @@
+# Extends upstream gitleaks rules; adds narrowly scoped allowlists for known false positives.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Beads JSONL export stores operational memory (env var names, public URLs), not credentials"
+paths = ['''\.beads/issues\.jsonl$''']
+
+[[allowlists]]
+description = "Theme-impact and Phase 1 source-family slugs ending in -api are catalog ids, not API keys"
+targetRules = ["generic-api-key"]
+regexTarget = "line"
+regexes = [
+  '''['"]acs-census-api['"]''',
+  '''NHGIS_API_KEY''',
+  '''signedurl\?key=''',
+]

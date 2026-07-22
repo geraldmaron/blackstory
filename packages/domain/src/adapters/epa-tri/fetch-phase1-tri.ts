@@ -150,7 +150,7 @@ export async function fetchPhase1TriCountyObservations(
   let rejected: string[] = [];
   let rows: TriFacilityRow[] = [];
   let fixturePath: string | undefined;
-  let cachePaths: string[] = [];
+  const cachePaths: string[] = [];
   let mode: Phase1TriFetchMode = 'fixture';
 
   if (live) {

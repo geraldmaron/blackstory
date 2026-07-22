@@ -21,6 +21,6 @@ export {
 } from './phase1-scf-wealth-mapper.js';
 export {
   fetchPhase1ScfWealthObservations,
-  DEFAULT_FIXTURE_PATH,
+  DEFAULT_FIXTURE_PATH as SCF_WEALTH_DEFAULT_FIXTURE_PATH,
   type Phase1ScfWealthFetchResult,
 } from './fetch-phase1-scf-wealth.js';

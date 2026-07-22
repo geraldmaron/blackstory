@@ -11,7 +11,6 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   CDC_EJI_IL_FULL_FIXTURE_FILENAME,
-  CDC_EJI_IL_TRACT_CACHE_FILENAME,
   fetchPhase1EjiCountyObservations,
 } from '../../domain/src/adapters/cdc-eji/index.js';
 import {
@@ -23,8 +22,6 @@ import {
   triFixtureCsvFromRows,
   triRowsFromReportingForms,
 } from '../../domain/src/adapters/epa-tri/live-tri-illinois.js';
-import { phase1EjiTriCachePath } from '../../domain/src/adapters/phase1-eji-tri-shared/cache-paths.js';
-
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURE_DIR = join(__dirname, '../fixtures/reference-indicators');
 

@@ -302,7 +302,7 @@ export const THEME_IMPACT_QUESTIONS: readonly ThemeImpactQuestion[] = [
   },
 ];
 
-const phase1Ids = new Set(PHASE1_INDICATOR_CATALOG.map((row) => row.metricId));
+const phase1Ids = new Set<string>(PHASE1_INDICATOR_CATALOG.map((row) => row.metricId));
 
 export function getThemeImpactQuestion(id: string): ThemeImpactQuestion | undefined {
   return THEME_IMPACT_QUESTIONS.find((row) => row.id === id);

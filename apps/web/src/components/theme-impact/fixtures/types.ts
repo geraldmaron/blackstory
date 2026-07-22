@@ -2,12 +2,7 @@
  * Local fixture types for theme-impact packets. Re-exports the domain view model
  * so pages can render live Postgres packets and fixtures with one shape.
  */
-import type {
-  ThemeImpactGapState,
-  ThemeImpactMethodStance,
-  ThemeImpactPacketView,
-  ThemeImpactProvenanceView,
-} from '@repo/domain';
+import type { ThemeImpactPacketView, ThemeImpactProvenanceView } from '@repo/domain';
 
 export type { ThemeImpactGapState, ThemeImpactMethodStance } from '@repo/domain';
 

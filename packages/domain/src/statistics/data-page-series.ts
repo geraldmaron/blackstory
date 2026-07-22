@@ -281,15 +281,16 @@ export function mergeDataPageIndicatorBundle(
   const scfBlack = observationByMetric(rows, 'scf-median-wealth-black-nation', 'nation:US');
   const scfWhite = observationByMetric(rows, 'scf-median-wealth-white-nation', 'nation:US');
   if (scfBlack && scfWhite) {
+    const ratioValue =
+      scfBlack.estimate > 0
+        ? Math.round((scfWhite.estimate / scfBlack.estimate) * 10) / 10
+        : undefined;
     wealth = {
       ...wealth,
       referencePeriod: scfBlack.referencePeriod,
       primary: { ...wealth.primary, value: scfBlack.estimate },
       comparison: { ...wealth.comparison, value: scfWhite.estimate },
-      ratioValue:
-        scfBlack.estimate > 0
-          ? Math.round((scfWhite.estimate / scfBlack.estimate) * 10) / 10
-          : wealth.ratioValue,
+      ...(ratioValue !== undefined ? { ratioValue } : {}),
       sources: mergeSources(wealth.sources, [
         sourceFromObservation(scfBlack),
         sourceFromObservation(scfWhite),
@@ -301,15 +302,16 @@ export function mergeDataPageIndicatorBundle(
   const bjsBlack = observationByMetric(rows, 'imprisonment-rate-black-state', 'state:24');
   const bjsWhite = observationByMetric(rows, 'imprisonment-rate-white-state', 'state:24');
   if (bjsBlack && bjsWhite) {
+    const ratioValue =
+      bjsWhite.estimate > 0
+        ? Math.round((bjsBlack.estimate / bjsWhite.estimate) * 10) / 10
+        : undefined;
     imprisonment = {
       ...imprisonment,
       referencePeriod: bjsBlack.referencePeriod,
       primary: { ...imprisonment.primary, value: bjsBlack.estimate },
       comparison: { ...imprisonment.comparison, value: bjsWhite.estimate },
-      ratioValue:
-        bjsWhite.estimate > 0
-          ? Math.round((bjsBlack.estimate / bjsWhite.estimate) * 10) / 10
-          : imprisonment.ratioValue,
+      ...(ratioValue !== undefined ? { ratioValue } : {}),
       sources: mergeSources(imprisonment.sources, [
         sourceFromObservation(bjsBlack),
         sourceFromObservation(bjsWhite),
