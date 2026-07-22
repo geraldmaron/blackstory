@@ -12,8 +12,8 @@ as active until an administrator verifies them.
 - Suppressions live only in `suppressions.json`. Each entry must satisfy
   `suppression.schema.json` and include a reason, accountable `team/handle`, and future
   expiration. Expired suppressions fail validation.
-- Security outputs are retained for 90 days in Actions and attached to the corresponding
-  release record before production promotion.
+- Security outputs are retained for 14 days in Actions (`SECURITY_ARTIFACT_RETENTION_DAYS`)
+  and attached to the corresponding release record before production promotion.
 - Production records the exact 40-character tested commit and immutable
   `sha256:<64 hex>` image digest. Cosign verification must bind that digest to the
   GitHub Actions OIDC issuer and the protected release workflow identity.
@@ -38,9 +38,9 @@ After the repository exists and an administrator has authenticated with `gh`:
 5. Create the protected `staging-security` environment. Add an isolated account named
    with prefix `ds-security-dast-`, store only its short-lived token as
    `STAGING_DAST_TOKEN`, restrict it to synthetic staging data, and deny production IAM.
-6. Configure artifact retention to at least 90 days. The release workflow must download
-   the security artifacts, attach them to the release, and write tested commit, image
-   digest, signature issuer/identity, and scan run IDs into deployment provenance.
+6. Configure artifact retention to match the workflow (14 days). The release workflow must
+   download the security artifacts, attach them to the release, and write tested commit,
+   image digest, signature issuer/identity, and scan run IDs into deployment provenance.
 7. Verify settings via the GitHub UI/API and run the workflow manually against staging.
    Never point DAST at production.
 
