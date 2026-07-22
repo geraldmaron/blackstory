@@ -13,9 +13,6 @@
 
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-
-/** Runtime Postgres reads; never bake Dunbar seed at build without DATABASE_URL. */
-export const dynamic = 'force-dynamic';
 import { MapFrame, Timeline } from '@repo/ui';
 import { KindBadge, ConfidenceMark, MapsExternalLink } from '../../../components/map-experience';
 import { EntityLocationMapLazy } from '../../../components/entity/EntityLocationMapLazy';
