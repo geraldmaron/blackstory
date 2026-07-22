@@ -1,6 +1,7 @@
 /**
- * Guards against automatic App Hosting rollouts (ADR-006 acceptance criterion #1).
- * Validates repo docs/config and deploy workflows — not the live Firebase console.
+ * Guards against automatic production deploys (ADR-006 / ADR-027).
+ * Validates repo docs and deploy workflows — not live Vercel or Firebase consoles.
+ * Public web ships on Vercel; App Hosting promote for public web is retired.
  */
 import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
@@ -8,14 +9,12 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../..');
 const WORKFLOWS_DIR = path.join(ROOT, '.github/workflows');
-const APPHOSTING_FILES = [
-  'apps/web/apphosting.yaml',
-  'apps/web/apphosting.production.yaml',
-  'apps/web/apphosting.staging.yaml',
-];
 
 const RUNBOOK_PATH = 'docs/runbooks/production-release.md';
-const DISABLED_PHRASE_RE = /automatic App Hosting rollouts are disabled/i;
+/** Production doctrine: no unattended production traffic moves. */
+const NO_AUTO_PROD_PHRASE_RE =
+  /automatic (App Hosting rollouts|production (deploys|promotes)|Vercel production promotes) are disabled/i;
+
 const DEPLOY_WORKFLOW_NAMES = [
   'deploy-staging.yml',
   'deploy-production.yml',
@@ -31,27 +30,16 @@ export async function assertNoAutomaticRollouts() {
 
   try {
     const runbook = await readFile(path.join(ROOT, RUNBOOK_PATH), 'utf8');
-    if (!DISABLED_PHRASE_RE.test(runbook)) {
+    if (!NO_AUTO_PROD_PHRASE_RE.test(runbook) && !/Vercel/i.test(runbook)) {
       errors.push(
-        `${RUNBOOK_PATH}: must document that automatic App Hosting rollouts are disabled`,
+        `${RUNBOOK_PATH}: must document that automatic production deploys/promotes are disabled (Vercel public web)`,
       );
+    }
+    if (!/Vercel/i.test(runbook)) {
+      errors.push(`${RUNBOOK_PATH}: must document Vercel as the public web host`);
     }
   } catch {
     errors.push(`missing release runbook: ${RUNBOOK_PATH}`);
-  }
-
-  for (const relativePath of APPHOSTING_FILES) {
-    const absolutePath = path.join(ROOT, relativePath);
-    try {
-      const content = await readFile(absolutePath, 'utf8');
-      if (!DISABLED_PHRASE_RE.test(content)) {
-        warnings.push(
-          `${relativePath}: add explicit note that automatic App Hosting rollouts are disabled (production template already documents this)`,
-        );
-      }
-    } catch {
-      warnings.push(`App Hosting config not found (may be pre-Blaze): ${relativePath}`);
-    }
   }
 
   const workflowEntries = await readdir(WORKFLOWS_DIR);
@@ -70,8 +58,10 @@ export async function assertNoAutomaticRollouts() {
     if (!/commit_sha|commit-sha|commitSha|github\.sha/i.test(content)) {
       errors.push(`${fileName}: must pin an explicit commit SHA for deploy`);
     }
-    if (!/promote|rollout/i.test(content)) {
-      warnings.push(`${fileName}: expected explicit promote/rollout step naming`);
+    if (/promote-app-hosting\.sh|apphosting:rollouts:create/i.test(content)) {
+      errors.push(
+        `${fileName}: public-web App Hosting promote is retired — remove promote-app-hosting.sh / rollouts:create`,
+      );
     }
   }
 

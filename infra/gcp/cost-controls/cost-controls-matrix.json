@@ -11,7 +11,7 @@
   "policyPackageRef": "packages/security/src/resource-controls.ts",
   "notes": [
     "Declarative stubs only — not applied to live GCP. Apply via Terraform or gcloud after review.",
-    "App Hosting maxInstances/concurrency authoritative values remain in apps/web/apphosting*.yaml (BB-022).",
+    "Public web (Vercel) soft planning maxInstances/concurrency live in packages/security resource-controls; admin App Hosting uses apphosting.admin.yaml.",
     "Endpoint rate quotas remain in packages/security/src/rate-limits.ts (BB-025).",
     "Public historical corpus is never auto-disabled unless an operator explicitly chooses hard-stop.",
     "Billing export configuration references Cloud Billing Budget API — no secrets in this repo."
@@ -19,14 +19,14 @@
   "services": [
     {
       "id": "web",
-      "runtime": "firebase-app-hosting",
+      "runtime": "vercel",
       "tier": "public_serving",
-      "minInstances": 1,
+      "minInstances": 0,
       "maxInstances": 6,
       "concurrency": 40,
       "cpu": 1,
       "memoryMiB": 384,
-      "bb022Ref": "apps/web/apphosting.production.yaml"
+      "bb022Ref": "docs/runbooks/vercel-public-web-cutover.md"
     },
     {
       "id": "api-public",
@@ -360,7 +360,8 @@
       "enforcedBy": [
         "packages/security/src/resource-controls.ts DEFAULT_SERVICE_SCALING_LIMITS",
         "infra/gcp/cost-controls/cost-controls-matrix.json services[].maxInstances",
-        "apps/web/apphosting*.yaml runConfig.maxInstances (BB-022)"
+        "docs/runbooks/vercel-public-web-cutover.md (public web)",
+        "apphosting.admin.yaml runConfig (admin interim)"
       ]
     },
     {

@@ -1,16 +1,15 @@
 <!--
   Operator runbook for cutting public apps/web from Firebase App Hosting to Vercel.
-  Hard-cut DNS flip completed 2026-07-22; App Hosting retained idle for rollback soak.
+  Hard-cut DNS flip completed 2026-07-22; soak closed; public web App Hosting retired in-repo.
 -->
 
 # Runbook: Vercel public-web cutover
 
-**Bead:** `repo-9wv7` (hard-cut; prep was `repo-gm3w`) — **closed 2026-07-22** after DNS GO  
 **ADR:** [ADR-027](../adr/ADR-027-vercel-public-web-hosting.md)  
 **Project:** Vercel `geraldmarons-projects/blackstory` (`prj_AJYcJozo2XqLfBXItGxHV5SQP06h`)  
 **Root Directory:** `apps/web`
 
-## Current state (2026-07-22 — DNS GO)
+## Current state (2026-07-22 — complete)
 
 | Item | Value |
 |------|--------|
@@ -20,7 +19,8 @@
 | Vercel domains | `blackstory.app` + `www.blackstory.app` attached; `misconfigured=false`; Production public |
 | Production DNS | **Vercel** — apex `A 76.76.21.21`; `www` `CNAME cname.vercel-dns.com` (DNS-only / grey cloud; Cloudflare NS retained) |
 | Live probe (post-flip) | `server: Vercel` (not App Hosting `envoy` / `via: google`); `/explore/api` `totalMatched=1338` `degraded=false`; `/history/api` `1340`; `/search?q=obama` 200 with Barack Obama; sample entity 200 |
-| Dual-run / rollback | **Keep App Hosting idle ≥48h** before wind-down; rollback = restore prior Cloudflare A to App Hosting IP if needed |
+| Soak | **Closed** — Vercel is sole public web host |
+| Owner wind-down | **Done 2026-07-22** — `black-book-web-production` and `black-book-web-staging` deleted; only `black-book-admin-production` remains |
 
 ### DNS records in effect (re-confirm via Vercel domain API before any future change)
 
@@ -32,6 +32,7 @@ Live Vercel recommendation at flip time (owner applied):
 | CNAME | `www` | `cname.vercel-dns.com` | DNS only |
 
 Older dual-A / project-hash CNAME targets may still resolve on Vercel’s edge but are **not** what Production is using now. Preserve MX/TXT. Optional agent unblock: Cloudflare Zone DNS Edit token as `CLOUDFLARE_API_TOKEN` in 1Password.
+
 ## Agent / MCP
 
 - Cursor MCP endpoint: `https://mcp.vercel.com` (server id `user-vercel` after OAuth)
@@ -80,7 +81,7 @@ Set on the Vercel project (Preview + Production unless noted):
 | `REQUEST_INTEGRITY_MODE` | `enforce` |
 | `DATABASE_SSL` | `1` |
 | `DATABASE_URL` | Sensitive; **Supabase session pooler** (IPv4). Direct `db.<ref>.supabase.co` is IPv6-only and fails on Vercel (`ENOTFOUND`). For `blackstory-app` use `aws-1-us-west-2.pooler.supabase.com:5432` with user `postgres.<ref>`, `sslmode=require`, `uselibpqcompat=true`. Decode the DB password once if the source URL was already percent-encoded (passwords containing `%`/`@` break when double-encoded). |
-| `SENTRY_DSN` | Optional; App Hosting Secret Manager name `web-production-sentry-dsn` exists, but `apps/web` has no Sentry client wired yet — **omit on Vercel** until observability lands |
+| `SENTRY_DSN` | Optional; not wired in `apps/web` yet — **omit on Vercel** until observability lands |
 | `SUBMISSION_PRIVACY_PEPPER` | Required for production `POST /submit` and corrections IP hashing; not needed for public catalog reads. **Set 2026-07-22** (see below). |
 
 ### Secrets checklist (names only)
@@ -94,10 +95,10 @@ Set on the Vercel project (Preview + Production unless noted):
 | `REQUEST_INTEGRITY_MODE` | required | required | `enforce` |
 | `NEXT_PUBLIC_APP_ENV` | required | required | `production` |
 | `NEXT_PUBLIC_SITE_URL` | required (preview URL) | required (`https://blackstory.app`) | Separate per target |
-| `SENTRY_DSN` | omit for now | omit for now | GCP SM `web-production-sentry-dsn` exists; not wired in `apps/web` |
+| `SENTRY_DSN` | omit for now | omit for now | Not wired in `apps/web` |
 | `SUBMISSION_PRIVACY_PEPPER` | set (sensitive) | set (sensitive) | 1Password + Vercel; never commit value |
 | `NEXT_PUBLIC_ADMIN_ORIGIN` | optional | optional | Footer admin link only |
-| `NEXT_PUBLIC_FIREBASE_*` | not required for Vercel public reads | not required | App Hosting legacy; public dig uses Postgres |
+| `NEXT_PUBLIC_FIREBASE_*` | not required for Vercel public reads | not required | Public dig uses Postgres |
 
 ### `SUBMISSION_PRIVACY_PEPPER` (set 2026-07-22)
 
@@ -108,9 +109,8 @@ Dedicated pepper is live for Vercel Preview and Production (sensitive). Value is
 | 1Password (Private vault) | Item `BlackStory submission privacy pepper` — fields `credential` / `SUBMISSION_PRIVACY_PEPPER` |
 | Vercel project env | Present Preview + Production as Encrypted/sensitive |
 | `OPERATOR_CLI_PRIVACY_PEPPER` | Separate 1Password item — **do not reuse** for submissions |
-| GCP Secret Manager | Not mirrored (optional if App Hosting rollback still needs submit) |
 
-After any env change, **redeploy** Preview/Production — existing deployments keep the prior env snapshot. Smoke submit/corrections on Preview when ready: confirm no `SUBMISSION_PRIVACY_PEPPER must be set in production` runtime error. Public catalog / Explore reads do not need this pepper; DNS cutover remains owner-gated separately.
+After any env change, **redeploy** Preview/Production — existing deployments keep the prior env snapshot. Smoke submit/corrections on Preview when ready: confirm no `SUBMISSION_PRIVACY_PEPPER must be set in production` runtime error. Public catalog / Explore reads do not need this pepper.
 
 Update without printing secrets:
 
@@ -126,17 +126,17 @@ vercel redeploy <preview-deployment-url>
 
 Owner flipped Cloudflare DNS to Vercel (apex A + www CNAME, DNS-only). Post-flip verification: Vercel `misconfigured=false`; catalog `/explore/api` `totalMatched=1338`; Obama search + sample entity OK.
 
-**Soak (now):** keep App Hosting backends + secrets idle **≥48h** before wind-down. Do not delete App Hosting configs during soak. After soak: document App Hosting wind-down; update README architecture table.
+**Soak closed:** Vercel is the sole public web host. Public web App Hosting configs are removed from the repo. Firebase backends `black-book-web-production` and `black-book-web-staging` were deleted 2026-07-22 (admin App Hosting remains).
 
 ## Rollback
 
-1. Repoint DNS to prior App Hosting / Firebase Hosting records.
-2. Re-enable App Hosting promote for the last known-good SHA.
+1. **Vercel promote/redeploy** the prior known-good Production deployment SHA (dashboard or `vercel promote <deployment-url>`).
+2. Do **not** repoint DNS to App Hosting — public web backends are wind-down targets, not rollback.
 3. Leave the Vercel project intact for log forensics.
 
 ## Do not
 
 - Host `apps/admin` on this Vercel project (IAP boundary — ADR-001 / ADR-005).
 - Enable unattended production deploys on every `main` push without amending ADR-006 / ADR-027.
-- Delete App Hosting configs or Secret Manager secrets during the soak window.
-- Put bead ids or secrets in user-facing copy.
+- Recreate public web App Hosting configs in-repo.
+- Put secrets in user-facing copy.

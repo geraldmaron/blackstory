@@ -1,7 +1,6 @@
 /**
- * Shared runtime hardening limits for public App Hosting.
- * Values are conservative defaults for cost and abuse resistance; staging/production
- * overrides live in apphosting*.yaml runConfig blocks.
+ * Shared runtime hardening limits for public web (Vercel).
+ * Soft planning defaults for cost and abuse resistance; live scaling is Vercel Fluid Compute.
  */
 
 /**
@@ -110,13 +109,12 @@ export const RESPONSE_SIZE_LIMITS = {
 export type ResponseSizeKind = keyof typeof RESPONSE_SIZE_LIMITS;
 
 /**
- * Post-deploy validation targets (documented in apphosting*.yaml).
- * Confirm with Cloud Run after backend creation:
- * gcloud run services describe BACKEND --region=REGION --format='yaml(spec.template.spec.containerConcurrency,spec.template.metadata.annotations)'
+ * Soft public-web planning targets (historical App Hosting caps; Vercel does not
+ * enforce these as instance YAML).
  */
 export const APP_HOSTING_RUN_LIMITS = {
   production: {
-    minInstances: 1,
+    minInstances: 0,
     maxInstances: 6,
     concurrency: 40,
     cpu: 1,
@@ -130,7 +128,7 @@ export const APP_HOSTING_RUN_LIMITS = {
     memoryMiB: 256,
   },
   base: {
-    minInstances: 1,
+    minInstances: 0,
     maxInstances: 6,
     concurrency: 40,
     cpu: 1,

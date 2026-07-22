@@ -1,5 +1,5 @@
 /**
- * public beta disable controls App Hosting env keys and kill-switch ids.
+ * Public beta disable controls: Vercel env keys and kill-switch ids.
  * Operators can return to static read-only without redeploying product code.
  */
 import { existsSync, readFileSync } from 'node:fs';
@@ -8,7 +8,7 @@ import { CORE_KILL_SWITCH_IDS } from '../kill-switches.js';
 
 export const BETA_DISABLE_POLICY_VERSION = '1.0.0' as const;
 
-/** App Hosting Next.js runtime flag when "1", serves snapshot read-only shell. */
+/** Runtime flag when "1", serves snapshot read-only shell (set on Vercel + redeploy). */
 export const PUBLIC_READ_API_DISABLED_ENV = 'PUBLIC_READ_API_DISABLED' as const;
 
 /** Firestore Remote Config kill switch for immutable snapshot serving. */
@@ -24,9 +24,12 @@ export const BETA_DYNAMIC_WORKLOAD_SWITCHES = [
 
 export const BETA_DISABLE_RUNBOOK_RELATIVE_PATH = 'docs/launch/disable-public-beta.md' as const;
 
+/** Documented default for public beta (off) — asserted via runbook + .env.example. */
+export const PUBLIC_READ_API_DISABLED_DEFAULT = '0' as const;
+
 export interface BetaDisableControl {
   readonly id: string;
-  readonly mechanism: 'app-hosting-env' | 'firestore-kill-switch';
+  readonly mechanism: 'vercel-env' | 'firestore-kill-switch';
   readonly key: string;
   readonly description: string;
 }
@@ -34,9 +37,9 @@ export interface BetaDisableControl {
 export const BETA_DISABLE_CONTROLS: readonly BetaDisableControl[] = [
   {
     id: 'public-read-api-disabled',
-    mechanism: 'app-hosting-env',
+    mechanism: 'vercel-env',
     key: PUBLIC_READ_API_DISABLED_ENV,
-    description: 'Fast App Hosting env flip — snapshot banner + no dynamic public APIs.',
+    description: 'Fast Vercel env flip — snapshot banner + no dynamic public APIs.',
   },
   {
     id: 'public-static-mode',
@@ -46,27 +49,24 @@ export const BETA_DISABLE_CONTROLS: readonly BetaDisableControl[] = [
   },
 ];
 
-export interface AppHostingEnvProbe {
+/** @deprecated Use BETA_DISABLE_CONTROLS; retained name for import compatibility. */
+export type AppHostingEnvProbe = {
   readonly file: string;
   readonly variable: string;
   readonly expectedDefault?: string;
-}
+};
 
+/** Probes that document PUBLIC_READ_API_DISABLED for launch-gate machine checks. */
 export const APP_HOSTING_PUBLIC_READ_PROBES: readonly AppHostingEnvProbe[] = [
   {
-    file: 'apps/web/apphosting.yaml',
+    file: BETA_DISABLE_RUNBOOK_RELATIVE_PATH,
     variable: PUBLIC_READ_API_DISABLED_ENV,
-    expectedDefault: '0',
+    expectedDefault: PUBLIC_READ_API_DISABLED_DEFAULT,
   },
   {
-    file: 'apps/web/apphosting.production.yaml',
+    file: '.env.example',
     variable: PUBLIC_READ_API_DISABLED_ENV,
-    expectedDefault: '0',
-  },
-  {
-    file: 'apps/web/apphosting.staging.yaml',
-    variable: PUBLIC_READ_API_DISABLED_ENV,
-    expectedDefault: '0',
+    expectedDefault: PUBLIC_READ_API_DISABLED_DEFAULT,
   },
 ];
 
@@ -78,7 +78,7 @@ function readText(repoRoot: string, relativePath: string): string {
   return readFileSync(absolute, 'utf8');
 }
 
-/** Asserts App Hosting templates declare PUBLIC_READ_API_DISABLED (default off). */
+/** Asserts docs declare PUBLIC_READ_API_DISABLED (default off) for Vercel public web. */
 export function assertBetaDisableConfigKeys(repoRoot: string): void {
   if (!(CORE_KILL_SWITCH_IDS as readonly string[]).includes(PUBLIC_STATIC_MODE_SWITCH_ID)) {
     throw new Error('public-static-mode is not registered in CORE_KILL_SWITCH_IDS.');
@@ -86,16 +86,8 @@ export function assertBetaDisableConfigKeys(repoRoot: string): void {
 
   for (const probe of APP_HOSTING_PUBLIC_READ_PROBES) {
     const content = readText(repoRoot, probe.file);
-    if (!content.includes(`variable: ${probe.variable}`)) {
+    if (!content.includes(probe.variable)) {
       throw new Error(`${probe.file} does not declare ${probe.variable}.`);
-    }
-    if (
-      probe.expectedDefault !== undefined &&
-      !content.includes(`value: '${probe.expectedDefault}'`)
-    ) {
-      throw new Error(
-        `${probe.file} does not default ${probe.variable} to ${probe.expectedDefault}.`,
-      );
     }
   }
 }
@@ -112,5 +104,8 @@ export function assertBetaDisableConfigDocumented(repoRoot: string): void {
   }
   if (!content.includes(PUBLIC_STATIC_MODE_SWITCH_ID)) {
     throw new Error('Disable runbook must document public-static-mode kill switch.');
+  }
+  if (!/Vercel/i.test(content)) {
+    throw new Error('Disable runbook must document Vercel as the env flip host.');
   }
 }

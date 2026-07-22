@@ -1,7 +1,7 @@
 # Cost and resource exhaustion controls
 
 **Status:** Policy matrix + evaluators in-repo; GCP billing budgets and live queue/job provisioning are follow-on work (, ).
-**Depends on:** [ App Hosting hardening](../apps/web/apphosting.yaml), [ ingress / Cloud Armor](./ingress-armor.md), [ rate limits](./rate-limits.md)
+**Depends on:** [admin App Hosting hardening](../../apphosting.admin.yaml), [Vercel public web (ADR-027)](../adr/ADR-027-vercel-public-web-hosting.md), [ ingress / Cloud Armor](./ingress-armor.md), [ rate limits](./rate-limits.md)
 **Threats:** [T-01](./threat-model.md#t-01-volumetric-and-application-layer-denial-of-service), [T-13](./threat-model.md#t-13-database-exhaustion-and-connection-starvation), [T-14](./threat-model.md#t-14-cloud-bill-exhaustion)
 
 ## Objective
@@ -12,7 +12,7 @@ Ensure a traffic spike, retry storm, or budget burn cannot scale every service w
 
 | Layer | Scope | Implementation |
 |-------|-------|----------------|
-| App Hosting / Cloud Run scaling | Per-service maxInstances, concurrency |  `apphosting*.yaml` + `DEFAULT_SERVICE_SCALING_LIMITS` |
+| App Hosting / Cloud Run scaling | Per-service maxInstances, concurrency | Admin `apphosting.admin.yaml` + `DEFAULT_SERVICE_SCALING_LIMITS`; public web caps on Vercel |
 | Cloud Tasks | Rate, concurrency, depth, retries | `DEFAULT_CLOUD_TASKS_POLICIES` |
 | Cloud Run Jobs | CPU, memory, duration, retries | `DEFAULT_CLOUD_RUN_JOB_POLICIES` |
 | Database | Connections, statement/lock timeouts | `DEFAULT_DATABASE_LIMITS` |
@@ -41,7 +41,7 @@ Ensure a traffic spike, retry storm, or budget burn cannot scale every service w
 
 ## References to other beads (not rewritten)
 
-- **:** Web `maxInstances=6`, `concurrency=40`, `minInstances=1` (idle cost; raise for cold-start SLOs) — validated via `BB022_APP_HOSTING_LIMITS` mirror
+- **:** Admin App Hosting `maxInstances=2`, `concurrency=20`, `minInstances=0` in `apphosting.admin.yaml` — validated via `BB022_APP_HOSTING_LIMITS` mirror
 - **:** Endpoint quotas — referenced via `BB025_POLICY_REF`; rate-limit math unchanged
 
 ## Retry policy

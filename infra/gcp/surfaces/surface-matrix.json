@@ -16,11 +16,10 @@
     {
       "id": "web",
       "appPath": "apps/web",
-      "runtime": "firebase-app-hosting",
+      "runtime": "vercel",
       "serviceAccountId": "web-runtime",
       "networkPosture": "public-cdn",
-      "appHostingBackend": "black-book-web-production",
-      "configFiles": ["apps/web/apphosting.yaml", "apps/web/apphosting.production.yaml"],
+      "configFiles": ["docs/runbooks/vercel-public-web-cutover.md"],
       "allowedOperations": ["read:public-projections", "read:search", "read:location"],
       "deniedOperations": [
         "write:canonical",
@@ -32,9 +31,9 @@
       "mustNotAcceptAuth": ["service-identity"],
       "deployPipeline": {
         "workflow": ".github/workflows/deploy-production.yml",
-        "job": "deploy-web-app-hosting",
-        "status": "stub",
-        "impersonates": "web-runtime@black-book-efaaf.iam.gserviceaccount.com"
+        "job": "record-vercel-production",
+        "status": "live",
+        "impersonates": "n/a-vercel"
       }
     },
     {

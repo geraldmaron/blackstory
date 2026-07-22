@@ -1,16 +1,16 @@
-# Public web surface contract ()
+# Public web surface contract
 
-This app is the **public UI** surface. It is deployed via Firebase App Hosting, not Cloud Run.
+This app is the **public UI** surface. It is deployed via **Vercel**, not Cloud Run or App Hosting.
 
 ## Binding
 
 | Item | Value |
 |------|-------|
 | Surface id | `web` |
-| Runtime | Firebase App Hosting |
-| Config | `apphosting.yaml`, `apphosting.production.yaml`, `apphosting.staging.yaml` |
-| Proposed backend | `the related workstream-production` |
-| Runtime SA | `web-runtime@black-book-efaaf.iam.gserviceaccount.com` |
+| Runtime | Vercel (project `blackstory`, Root Directory `apps/web`) |
+| Config | Vercel project env + `apps/web/next.config.*` |
+| Production URL | `https://blackstory.app` |
+| Runtime SA | N/A (Vercel serverless; DB via `DATABASE_URL` env) |
 | Network posture | Public CDN |
 
 ## Capabilities
@@ -33,10 +33,12 @@ Typed definitions: `packages/config/src/surfaces.ts` (`web` entry).
 
 `apps/admin` is a **separate Next.js deployable** on port 3001 locally. Do not add admin route
 handlers or research console pages to this app. Shared UI belongs in `packages/ui`; shared domain
-logic belongs in `packages/domain`.
+logic belongs in `packages/domain`. Admin interim host is App Hosting (`black-book-admin-production`);
+target is Cloud Run + IAP.
 
 ## References
 
 - [ADR-005](../../docs/adr/ADR-005-service-surface-separation.md)
+- [ADR-027](../../docs/adr/ADR-027-vercel-public-web-hosting.md)
 - [Service surfaces](../../docs/security/service-surfaces.md)
 - [Surface matrix](../../infra/gcp/surfaces/surface-matrix.json)

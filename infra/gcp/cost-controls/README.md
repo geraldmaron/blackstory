@@ -13,7 +13,7 @@ Declarative stubs for cost and resource exhaustion controls. **Not applied** to 
 
 | Bead | Owns |
 |------|------|
-| BB-022 | `apps/web/apphosting*.yaml` — App Hosting CPU/memory/concurrency/maxInstances |
+| BB-022 | `apphosting.admin.yaml` — admin App Hosting CPU/memory/concurrency/maxInstances; public web caps on Vercel |
 | BB-023 | `infra/gcp/armor/` — edge throttles and WAF |
 | BB-025 | `packages/security/src/rate-limits.ts` — endpoint quota matrix |
 

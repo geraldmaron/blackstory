@@ -253,7 +253,7 @@ export const BETA_LAUNCH_GATES: readonly LaunchGateDefinition[] = [
     title: 'Public beta disable / static read-only path documented',
     kind: 'machine',
     required: true,
-    description: 'Kill-switch keys and App Hosting env hooks exist; disable runbook is documented.',
+    description: 'Kill-switch keys and Vercel env hooks exist; disable runbook is documented.',
     evidence: [
       {
         type: 'doc',
@@ -265,8 +265,8 @@ export const BETA_LAUNCH_GATES: readonly LaunchGateDefinition[] = [
       },
       {
         type: 'file',
-        ref: 'apps/web/apphosting.production.yaml',
-        description: 'PUBLIC_READ_API_DISABLED runtime env.',
+        ref: '.env.example',
+        description: 'PUBLIC_READ_API_DISABLED documented for Vercel public web.',
       },
     ],
   },

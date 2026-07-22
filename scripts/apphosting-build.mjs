@@ -1,31 +1,27 @@
 #!/usr/bin/env node
 /**
- * App Hosting build entrypoint shared by every backend at this rootDirectory ("."). Branches on
- * GOOGLE_BUILDABLE so each backend's apphosting.<environment>.yaml can point at its own app
- * without needing its own top-level `apphosting:build` script name (App Hosting's Next.js
- * adapter always resolves that one script name at the repo root).
+ * App Hosting build entrypoint for the admin backend (`apphosting.admin.yaml`).
+ * Public web no longer uses App Hosting (Vercel — ADR-027). Branches on
+ * APPHOSTING_BUILD_TARGET so the Firebase Next.js adapter can resolve a single
+ * root `apphosting:build` script name.
  *
- * Each branch mirrors the pattern already proven for apps/web: build the target app's workspace
- * dependency chain, then copy `.next/static` + `public` into the standalone bundle (required for
- * CSS/JS when the backend's `scripts.runCommand` starts the standalone server directly).
+ * Builds the admin workspace dependency chain, then copies `.next/static` + `public`
+ * into the standalone bundle (required when `scripts.runCommand` starts the
+ * standalone server directly).
  */
 import { execSync } from 'node:child_process';
 import { cpSync, mkdirSync } from 'node:fs';
 
-// GOOGLE_BUILDABLE itself isn't forwarded into this script's environment (Firebase reserves it
-// for the framework adapter's own internal use), so each backend sets APPHOSTING_BUILD_TARGET
-// instead — a plain user env var — to the same directory value.
-const buildable = process.env.APPHOSTING_BUILD_TARGET ?? 'apps/web';
+const buildable = process.env.APPHOSTING_BUILD_TARGET ?? 'apps/admin';
 
 const APPS = {
-  'apps/web': { filter: '@repo/web' },
   'apps/admin': { filter: '@repo/admin' },
 };
 
 const app = APPS[buildable];
 if (!app) {
   throw new Error(
-    `Unknown GOOGLE_BUILDABLE "${buildable}" — add it to scripts/apphosting-build.mjs`,
+    `Unknown APPHOSTING_BUILD_TARGET "${buildable}" — public web App Hosting is retired; only apps/admin is supported.`,
   );
 }
 

@@ -11,7 +11,7 @@
 
 ## Principles
 
-1. **Public historical corpus stays online** — static release snapshots and App Hosting read path remain available unless an operator **explicitly** chooses full read-only mode (BB-035).
+1. **Public historical corpus stays online** — Vercel-served read path and static release snapshots remain available unless an operator **explicitly** chooses full read-only mode (BB-035).
 2. **Optional research stops first** — pause Cloud Tasks `research-campaign` and `url-evaluation` queues before throttling public APIs.
 3. **Fail closed** — when in doubt, deny new expensive work rather than allow unbounded spend.
 4. **No secrets in commands** — use authenticated `gcloud` session; never paste service-account JSON.
@@ -60,7 +60,9 @@ gcloud run services update black-book-api-public \
   --max-instances=4
 ```
 
-App Hosting web caps remain governed by `apps/web/apphosting*.yaml` (BB-022). Do not raise `maxInstances` during an incident.
+Admin App Hosting caps remain governed by `apphosting.admin.yaml` (BB-022). Public web scaling is
+on Vercel — do not raise Cloud Run or App Hosting ceilings for retired `black-book-web-*` backends
+during an incident.
 
 ### 5. Disable expensive features via kill switches (BB-035)
 
@@ -94,5 +96,5 @@ pnpm --filter @repo/security test
 ## Explicit non-actions
 
 - Do **not** delete release snapshots or public projections
-- Do **not** disable App Hosting web backend unless operator explicitly chooses full static mode
+- Do **not** disable Vercel Production or admin App Hosting unless operator explicitly chooses full static mode
 - Do **not** commit billing account IDs, budget API keys, or notification webhook URLs to the repo

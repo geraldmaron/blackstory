@@ -10,11 +10,7 @@ import { loadGoldCorpus, loadGoldPredictions } from '../gold-corpus/load.js';
 const PUBLIC_READ_API_DISABLED_ENV = 'PUBLIC_READ_API_DISABLED';
 const PUBLIC_STATIC_MODE_SWITCH_ID = 'public-static-mode';
 const BETA_DISABLE_RUNBOOK = 'docs/launch/disable-public-beta.md';
-const APP_HOSTING_FILES = [
-  'apps/web/apphosting.yaml',
-  'apps/web/apphosting.production.yaml',
-  'apps/web/apphosting.staging.yaml',
-] as const;
+const BETA_DISABLE_ENV_PROBES = [BETA_DISABLE_RUNBOOK, '.env.example'] as const;
 
 function pathExists(repoRoot: string, relativePath: string): boolean {
   return existsSync(join(repoRoot, relativePath));
@@ -142,12 +138,12 @@ export function checkBetaDisablePath(repoRoot: string): MachineCheckResult {
   if (!killSwitchSource.includes(`'${PUBLIC_STATIC_MODE_SWITCH_ID}'`)) {
     return { pass: false, message: 'public-static-mode is not registered in kill switches.' };
   }
-  for (const file of APP_HOSTING_FILES) {
+  for (const file of BETA_DISABLE_ENV_PROBES) {
     if (!pathExists(repoRoot, file)) {
-      return { pass: false, message: `Missing App Hosting config: ${file}` };
+      return { pass: false, message: `Missing beta-disable probe file: ${file}` };
     }
     const content = readFileSync(join(repoRoot, file), 'utf8');
-    if (!content.includes(`variable: ${PUBLIC_READ_API_DISABLED_ENV}`)) {
+    if (!content.includes(PUBLIC_READ_API_DISABLED_ENV)) {
       return { pass: false, message: `${file} does not declare ${PUBLIC_READ_API_DISABLED_ENV}.` };
     }
   }
@@ -157,11 +153,12 @@ export function checkBetaDisablePath(repoRoot: string): MachineCheckResult {
   const runbook = readFileSync(join(repoRoot, BETA_DISABLE_RUNBOOK), 'utf8');
   if (
     !runbook.includes(PUBLIC_READ_API_DISABLED_ENV) ||
-    !runbook.includes(PUBLIC_STATIC_MODE_SWITCH_ID)
+    !runbook.includes(PUBLIC_STATIC_MODE_SWITCH_ID) ||
+    !/Vercel/i.test(runbook)
   ) {
     return {
       pass: false,
-      message: 'Disable runbook must document env flag and static-mode switch.',
+      message: 'Disable runbook must document Vercel env flag and static-mode switch.',
     };
   }
   return { pass: true };

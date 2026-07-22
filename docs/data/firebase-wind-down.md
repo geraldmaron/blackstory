@@ -17,10 +17,12 @@ After Postgres cutover, **do not delete** production Firebase project `black-boo
 - [x] Supabase Auth admin mode: `ADMIN_AUTH_MODE=supabase` + `NEXT_PUBLIC_ADMIN_AUTH_MODE=supabase` with `app_metadata.bb_role`
 - [x] Supabase Auth admin user exists with `app_metadata.bb_role=admin`
 - [x] Data API schemas limited to `public`, `bb_public`, `bb_submissions` (`supabase/config.toml`)
-- [x] **App Hosting cutover (2026-07-21):** Secret Manager `web-database-url`, `admin-database-url`, `admin-supabase-anon-key`; root `apphosting.yaml` / `apphosting.staging.yaml` / `apphosting.admin.yaml` set postgres + supabase auth; staging backend Environment name=`staging`
+- [x] **App Hosting cutover (2026-07-21):** Secret Manager `admin-database-url`, `admin-supabase-anon-key`; `apphosting.admin.yaml` set postgres + supabase auth for admin backend
 - [ ] Supabase advisors: **Leaked password protection** still WARN — enable in Dashboard (Management API PATCH returned 403 with available PAT)
 - [x] Scheduled Cloud Functions runtime retired; Corsair/systemd is the recurring scheduler (ADR-028)
-- [x] **Public web DNS on Vercel** (hard-cut 2026-07-22, ADR-027); App Hosting configs may remain as **idle rollback** until soak/wind-down — not the live public host
+- [x] **Public web DNS on Vercel** (hard-cut 2026-07-22, ADR-027); public web App Hosting configs **retired in-repo** — Vercel is sole public host
+- [x] **Public web App Hosting backends deleted (2026-07-22):** `black-book-web-production` and `black-book-web-staging` removed from Firebase (admin remains)
+- [x] **Admin App Hosting still live** (`apphosting.admin.yaml`, backend `black-book-admin-production`) until Cloud Run + IAP cutover
 - [ ] Public web request-integrity / remaining Firebase-client surfaces (distinct from hosting choice)
 - [x] Mobile + api-public: Firebase App Check retired; direct API callers use `X-BlackStory-Client`; Postgres is the default read path (`PUBLIC_DATA_SOURCE=postgres`)
 - [x] Structured SoR is Postgres (ADR-020); Firestore is export/rollback only — do not dual-write new canonical truth

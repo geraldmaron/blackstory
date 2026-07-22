@@ -19,7 +19,7 @@
 | GCP/Firebase projects | `black-book-efaaf` (project number `332234323945`) is the only live project; Hosting site `black-book-efaaf.web.app` exists | `blackbook-prod` (= `black-book-efaaf`, retained — see ADR-012), `blackbook-staging` (new), `blackbook-internal` (new) |
 | Firebase Hosting | `black-book-efaaf.web.app` exists | App content/release state is outside this design |
 | Firebase apps | **BlackStory Web** `1:332234323945:web:17be349ebc9c029b3bfd78`; **BlackStory Admin** `1:332234323945:web:e1b31c78e32d95943bfd78` | Admin app re-registered under `blackbook-internal` Firebase Auth config at migration time |
-| App Hosting | Inventory/creation blocked — project not on Blaze; App Hosting API unavailable | `black-book-web-production` in `blackbook-prod`; `black-book-web-staging` in `blackbook-staging` as its own project (not a same-project namespace) |
+| App Hosting | Admin interim backend `black-book-admin-production` (`apphosting.admin.yaml`); public web App Hosting retired (ADR-027 / Vercel) | `black-book-admin-production` in `blackbook-prod`; owner deletes retired `black-book-web-*` backends |
 | Firestore | Not enabled | `(default)` DB in `blackbook-prod`/`blackbook-staging`; named databases `raw-ingest` and `curated` in `blackbook-internal` (ADR-012) |
 | Workload isolation | One live project, no split yet | Three-project split with one-way promotion IAM asymmetry (ADR-012) |
 
@@ -43,8 +43,9 @@ Source of truth:
   this bead; updating it is a human step in the migration runbook).
 - [`../../infra/firebase/.firebaserc.example`](../../infra/firebase/.firebaserc.example) — example
   aliases for the target three-project topology.
-- [`../../apps/web/apphosting.yaml`](../../apps/web/apphosting.yaml) — production App Hosting config;
-  sibling files are explicit templates.
+- [`../../apphosting.admin.yaml`](../../apphosting.admin.yaml) — live admin App Hosting config
+  (`black-book-admin-production`). Public web host is Vercel (ADR-027); retired `apps/web/apphosting*.yaml`
+  files are not in-repo.
 
 ## Target topology (ADR-012): three projects
 
@@ -285,11 +286,10 @@ Terraform is a plan scaffold only; do not apply it blindly to the live project.
    - Record only Firebase's non-secret public web configuration through the approved config path.
      Do not create iOS/Android apps until those clients exist.
 3. **Create App Hosting backends**
-   - Create `black-book-web-production` in `black-book-efaaf` for `apps/web`.
-   - Optionally create `black-book-web-staging` in the same project, with synthetic data and distinct
-     config/secret names; label it as non-isolated.
-   - Attach `web-runtime@black-book-efaaf.iam.gserviceaccount.com`; disable unreviewed automatic
-     production rollouts. Confirm the final App Hosting domain before documenting it.
+   - Create `black-book-admin-production` in `black-book-efaaf` for `apps/admin` (interim host;
+     config: root `apphosting.admin.yaml`). Disable unreviewed automatic production rollouts.
+   - **Do not** create `black-book-web-*` backends — public web is Vercel only (ADR-027).
+   - Attach `admin-runtime@black-book-efaaf.iam.gserviceaccount.com` (or the reviewed admin runtime SA).
 4. **Create service accounts**
    - Create the eleven identities listed above.
    - Disable service-account key creation where policy authority permits.

@@ -1,8 +1,7 @@
-# Black Book — staging deploy pipeline (BB-062).
-# Deploys only a pinned commit SHA via GitHub OIDC + WIF. Firestore rules/indexes migrate
-# sequencing stays dry-run until migrate scripts go live. App Hosting promote is LIVE
-# (promote-app-hosting.sh) and requires staging Environment WIF vars. Automatic App Hosting
-# rollouts stay disabled.
+# Staging deploy pipeline.
+# Public web ships on Vercel from the staging git branch (ADR-027). This workflow pins a
+# commit SHA, dry-runs Firestore migrate sequencing, records provenance, and optionally
+# smokes E2E_BASE_URL. It does not promote Firebase App Hosting.
 
 name: Deploy Staging
 
@@ -63,7 +62,7 @@ jobs:
 
       - name: Checkout policy files
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - name: Assert automatic rollouts disabled
+      - name: Assert automatic production deploys disabled
         run: node infra/github/release-pipeline/assert-no-auto-rollout.mjs
 
   checkout-pinned:
@@ -91,88 +90,26 @@ jobs:
       - name: Firestore rules and indexes sequencing (dry-run)
         run: bash infra/github/release-pipeline/migrate-firestore-dry-run.sh "${{ needs.gate.outputs.commit_sha }}"
 
-  oidc-auth:
-    name: OIDC Auth Staging
+  record-vercel-staging:
+    name: Record Vercel Staging Expectation
     needs: [gate, migrate-firestore]
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    environment: staging
-    permissions:
-      contents: read
-      id-token: write
+    timeout-minutes: 5
     steps:
       - name: Checkout exact commit
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           ref: ${{ needs.gate.outputs.commit_sha }}
-
-      - name: Authenticate to Google Cloud (OIDC)
-        if: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER != '' && vars.GCP_SERVICE_ACCOUNT != '' }}
-        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
-        with:
-          project_id: ${{ vars.GCP_PROJECT_ID || 'black-book-efaaf' }}
-          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
-          create_credentials_file: true
-          export_environment_variables: true
-
-      - name: Skip auth when WIF vars unset
-        if: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER == '' || vars.GCP_SERVICE_ACCOUNT == '' }}
+      - name: Public web staging is Vercel Preview from staging branch
         run: |
-          echo "GCP_WORKLOAD_IDENTITY_PROVIDER / GCP_SERVICE_ACCOUNT not set on Environment staging."
-          echo "Apply WIF (infra/github/scripts/apply-wif.sh) then set environment variables."
-
-  promote-app-hosting:
-    name: Promote App Hosting Staging
-    needs: [gate, oidc-auth]
-    runs-on: ubuntu-latest
-    # App Hosting builds commonly take 10–25m; keep headroom.
-    timeout-minutes: 45
-    environment: staging
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - name: Checkout exact commit
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          ref: ${{ needs.gate.outputs.commit_sha }}
-
-      - name: Authenticate to Google Cloud (OIDC)
-        id: auth
-        if: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER != '' && vars.GCP_SERVICE_ACCOUNT != '' }}
-        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
-        with:
-          project_id: ${{ vars.GCP_PROJECT_ID || 'black-book-efaaf' }}
-          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
-          create_credentials_file: true
-          export_environment_variables: true
-
-      - name: Require WIF for live promote
-        if: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER == '' || vars.GCP_SERVICE_ACCOUNT == '' }}
-        run: |
-          echo "::error::Live App Hosting promote requires Environment staging vars GCP_WORKLOAD_IDENTITY_PROVIDER and GCP_SERVICE_ACCOUNT."
-          echo "Apply WIF (infra/github/scripts/apply-wif.sh --apply), then set those vars."
-          echo "Until then, promote locally: bash infra/github/release-pipeline/promote-app-hosting.sh <sha> staging"
-          exit 1
-
-      - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with:
-          node-version-file: .nvmrc
-
-      - name: Install Firebase CLI
-        run: npm install -g firebase-tools@15.17.0
-
-      - name: Explicit App Hosting promote (live — auto rollouts stay disabled)
-        env:
-          FIREBASE_PROJECT_ID: ${{ vars.GCP_PROJECT_ID || 'black-book-efaaf' }}
-        run: bash infra/github/release-pipeline/promote-app-hosting.sh "${{ needs.gate.outputs.commit_sha }}" staging
+          SHA="${{ needs.gate.outputs.commit_sha }}"
+          echo "Public web staging: Vercel Preview for git ref staging @ ${SHA}"
+          echo "Alias: https://blackstory-git-staging-geraldmarons-projects.vercel.app"
+          echo "No Firebase App Hosting promote for public web (ADR-027)."
 
   provenance:
     name: Write Staging Provenance
-    needs: [gate, promote-app-hosting]
+    needs: [gate, record-vercel-staging]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -195,7 +132,7 @@ jobs:
           PROVENANCE_SERVER_URL: ${{ github.server_url }}
           PROVENANCE_WIF_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           PROVENANCE_SERVICE_ACCOUNT: ${{ vars.GCP_SERVICE_ACCOUNT || 'github-deploy-staging@black-book-efaaf.iam.gserviceaccount.com' }}
-          PROVENANCE_NOTES: BB-062 staging deploy — pinned SHA; live App Hosting promote via OIDC.
+          PROVENANCE_NOTES: Staging — pinned SHA; public web on Vercel Preview (no App Hosting promote).
         run: |
           node infra/github/release-pipeline/write-provenance.mjs
           node infra/github/release-pipeline/validate-provenance.mjs artifacts/deployment-provenance.json
@@ -208,7 +145,7 @@ jobs:
 
   e2e-smoke:
     name: E2E Smoke Staging
-    needs: [gate, promote-app-hosting]
+    needs: [gate, record-vercel-staging]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:

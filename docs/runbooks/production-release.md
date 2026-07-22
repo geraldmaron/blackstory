@@ -1,20 +1,22 @@
 # Runbook: Production release pipeline
 
 **Scope:** End-to-end release procedure for BlackStory — from merged PR through staging
-validation, progressive release metadata, protected production approval, explicit App Hosting
-promote, post-deploy health checks, and rollback rehearsal.
+validation, progressive release metadata, protected production approval, deploy to each surface,
+post-deploy health checks, and rollback rehearsal.
 
 **Solo-dev hotfix loop (preferred for one-person prod bugs):** see
 [solo-dev-hotfix.md](./solo-dev-hotfix.md) — branch from `main`, tiny PR, preflight lockfile +
-`force-dynamic`, promote SHA staging→prod, smoke entity pages. Do **not** promote large
+`force-dynamic`, Vercel Preview → Production promote, smoke entity pages. Do **not** promote large
 divergent feature branches to fix web prod.
 
 **Repo acceptance:** Firestore migrate / surface deploy / rollback helpers stay **dry-run safe**.
-App Hosting **promote is live** (`promote-app-hosting.sh`) when Environment WIF vars are set;
-without WIF, run the same script locally with Firebase CLI auth. Automatic App Hosting rollouts
-remain disabled.
+**Public web** deploys via **Vercel** git integration; Production promote is explicit (ADR-027).
+**Admin** interim host is App Hosting (`black-book-admin-production`, `apphosting.admin.yaml`);
+operators roll out with the Firebase CLI (`apphosting:rollouts:create`) after `firebase login`.
+Automatic App Hosting rollouts remain disabled. Deploy workflows do not promote App Hosting.
 
 **Architecture anchors:** [ADR-006](../adr/ADR-006-github-actions-deployment.md),
+[ADR-027](../adr/ADR-027-vercel-public-web-hosting.md),
 [ADR-011](../adr/ADR-011-firestore-system-of-record.md) (Firestore rules/indexes before traffic;
 Postgres migrations parked).
 
@@ -39,37 +41,49 @@ flowchart LR
 | Staging deploy | `.github/workflows/deploy-staging.yml` | Pinned `commit_sha`; optional `staging` branch push |
 | Release metadata | `.github/workflows/progressive-release.yml` | Changelog + provenance for tested SHA |
 | Production deploy | `.github/workflows/deploy-production.yml` | Protected `production` environment approval |
+| Public web | Vercel git deploy + explicit Production promote | ADR-027 |
 | Uptime canary | `.github/workflows/canary-uptime.yml` | Optional; reset baseline after verified deploy |
 
 ---
 
-## AC #1 — Automatic App Hosting rollouts are disabled
+## AC #1 — Automatic App Hosting rollouts are disabled (admin)
 
 Automatic App Hosting rollouts **must remain disabled** in the Firebase console and in any
-GitHub→Firebase integration. Production traffic moves only through explicit promote steps in
-`deploy-staging.yml` / `deploy-production.yml`.
+GitHub→Firebase integration. Admin production traffic moves only through explicit Firebase CLI
+rollouts at a pinned SHA. Public web Production traffic moves only through explicit **Vercel**
+promote at a pinned SHA (ADR-027).
 
-**Human steps (once Blaze + backends exist):**
+**Human steps (admin backend):**
 
-1. Open Firebase console → App Hosting → backend (`black-book-web-production`).
+1. Open Firebase console → App Hosting → backend (`black-book-admin-production`).
 2. Confirm **automatic rollouts** / GitHub auto-deploy hooks are **off**.
-3. Repeat for `black-book-web-staging` if used.
-4. Record evidence (screenshot or CLI output) in the release ticket.
+3. Record evidence (screenshot or CLI output) in the release ticket.
 
 **Repo enforcement:**
 
 - `node infra/github/release-pipeline/assert-no-auto-rollout.mjs` (also runs in deploy workflows)
-- `apps/web/apphosting.production.yaml` documents the policy
-- Deploy workflows use `promote-app-hosting.sh` (live OIDC promote) — never `on: push: branches: [main]`
+- `apphosting.admin.yaml` documents the policy
+- Deploy workflows record Vercel expectations and run gates — they do **not** call App Hosting
+  promote helpers; never `on: push: branches: [main]` for production deploy
+
+Public web App Hosting configs are retired; there is no `black-book-web-*` promote path.
 
 ---
 
 ## AC #2 — Deploy only the tested commit (pinned SHA)
 
-Never deploy `main` or `@latest`. Every deploy workflow requires a full 40-character git SHA that
-passed CI on that exact commit.
+Never deploy `main` or `@latest` for Cloud Run / admin App Hosting. Every deploy workflow requires a
+full 40-character git SHA that passed CI on that exact commit.
 
-**Staging:**
+**Public web (Vercel):**
+
+1. Merge PR to `main` — Vercel builds Preview automatically.
+2. Smoke Preview deployment.
+3. Explicit Production promote: Vercel dashboard → Promote to Production, or
+   `vercel promote <preview-deployment-url>`.
+4. Verify Production deployment SHA matches the tested commit.
+
+**Staging (admin / APIs):**
 
 ```bash
 gh workflow run deploy-staging.yml \
@@ -78,16 +92,21 @@ gh workflow run deploy-staging.yml \
 ```
 
 Requires GitHub Environment `staging` vars `GCP_WORKLOAD_IDENTITY_PROVIDER` and
-`GCP_SERVICE_ACCOUNT` (after `infra/github/scripts/apply-wif.sh --apply`). Until WIF is live,
-promote the same SHA locally:
+`GCP_SERVICE_ACCOUNT` (after `infra/github/scripts/apply-wif.sh --apply`). Public web staging is
+Vercel Preview from the `staging` branch — smoke Preview before any Production promote.
+
+When admin changed at the pinned SHA, roll out admin App Hosting locally (after `firebase login`):
 
 ```bash
-bash infra/github/release-pipeline/promote-app-hosting.sh "$(git rev-parse HEAD)" staging
+firebase apphosting:rollouts:create black-book-admin-production \
+  --project=black-book-efaaf \
+  --git-commit="$(git rev-parse HEAD)" \
+  --force
 ```
 
-Or push to the `staging` branch (uses `github.sha` from the push event).
+Or push to the `staging` branch (uses `github.sha` from the push event for workflow provenance).
 
-**Production:**
+**Production (admin / APIs):**
 
 ```bash
 TESTED_SHA="<40-char-sha-from-staging>"
@@ -101,10 +120,14 @@ gh workflow run deploy-production.yml \
   -f confirm=deploy
 ```
 
-Local promote (same script GHA runs) when Environment `production` WIF vars are not set yet:
+When admin changed, roll out admin App Hosting at the tested SHA (local Firebase CLI after
+`firebase login`):
 
 ```bash
-bash infra/github/release-pipeline/promote-app-hosting.sh "$TESTED_SHA" production
+firebase apphosting:rollouts:create black-book-admin-production \
+  --project=black-book-efaaf \
+  --git-commit="$TESTED_SHA" \
+  --force
 ```
 
 Download `deployment-provenance-<sha>` artifact and verify `git.commitSha` matches `TESTED_SHA`.
@@ -140,17 +163,19 @@ Jobs with `environment: production` pause for required reviewers configured in
 ## AC #4 — Migrations / rules sequencing before traffic
 
 Per [ADR-020](../adr/ADR-020-supabase-postgres-system-of-record.md), **Supabase Postgres** is the
-product system of record (`bb_public.*`). **Firebase App Hosting** remains the web/admin runtime
-host, and **Firebase Storage / GCS** remains the blob store. Firestore is wind-down / rollback only
-([firebase-wind-down.md](../data/firebase-wind-down.md)) — not a live public-read backend.
+product system of record (`bb_public.*`). **Admin** interim host is App Hosting
+(`black-book-admin-production`); **Firebase Storage / GCS** remains the blob store. Firestore is
+wind-down / rollback only ([firebase-wind-down.md](../data/firebase-wind-down.md)) — not a live
+public-read backend. **Public web** is Vercel (ADR-027).
 
-Before App Hosting or API surfaces receive incompatible traffic:
+Before admin App Hosting or API surfaces receive incompatible traffic:
 
 1. **Postgres migrations / schema** applied to the target Supabase project (when schema changed)
 2. **Storage rules** (if blob ACL changed) — still under `infra/firebase/`
-3. **App Hosting explicit promote** (pinned SHA) — do not disable this path
-4. **Cloud Run / api-public deploy** with `PUBLIC_DATA_SOURCE=postgres` + `DATABASE_URL` (if API changed)
-5. **Firestore rules/indexes** only when touching rollback/legacy surfaces (optional during wind-down)
+3. **Admin App Hosting explicit promote** (pinned SHA) — when admin changed
+4. **Vercel Production promote** (pinned SHA) — when public web changed
+5. **Cloud Run / api-public deploy** with `PUBLIC_DATA_SOURCE=postgres` + `DATABASE_URL` (if API changed)
+6. **Firestore rules/indexes** only when touching rollback/legacy surfaces (optional during wind-down)
 
 **Human commands (after checkout of pinned SHA):**
 
@@ -159,8 +184,14 @@ Before App Hosting or API surfaces receive incompatible traffic:
 firebase deploy --only storage \
   --project=black-book-efaaf --config=infra/firebase/firebase.json
 
-# Web/admin host (keep — App Hosting is still live)
-bash infra/github/release-pipeline/promote-app-hosting.sh "$TESTED_SHA" production
+# Admin host (App Hosting — admin only; apphosting.admin.yaml)
+firebase apphosting:rollouts:create black-book-admin-production \
+  --project=black-book-efaaf \
+  --git-commit="$TESTED_SHA" \
+  --force
+
+# Public web (Vercel — when web changed)
+vercel promote <tested-preview-deployment-url>
 
 # Optional during wind-down only:
 # firebase deploy --only firestore:rules,firestore:indexes \
@@ -188,8 +219,10 @@ node infra/github/release-pipeline/release-pipeline.test.mjs
 **Operator rollback (live):**
 
 1. Engage publication kill switch — see [incident-response.md](./incident-response.md)
-2. Re-run `deploy-production.yml` with `commit_sha=<prior-good-sha>`
-3. Promote prior App Hosting rollout for that SHA
+2. **Public web:** Vercel promote/redeploy prior known-good Production deployment SHA
+3. **Admin / APIs:** Re-run `deploy-production.yml` with `commit_sha=<prior-good-sha>` and roll
+   back admin App Hosting with `firebase apphosting:rollouts:create black-book-admin-production
+   --project=black-book-efaaf --git-commit=<prior-good-sha> --force`
 4. Repoint `publicMeta/activeRelease` if publication metadata changed — see
    [recovery-rollback-rehearsal.md](./recovery-rollback-rehearsal.md)
 5. Run `canary-uptime.yml` with `reset_baseline: true` after verification
@@ -247,7 +280,7 @@ See [production-cloud-apply-checklist.md](./production-cloud-apply-checklist.md)
 
 1. GitHub remote + rulesets + WIF (`infra/github/scripts/apply-wif.sh --apply`)
 2. Protected `production` environment
-3. Firebase Blaze + App Hosting backends with **automatic rollouts disabled**
+3. Firebase Blaze + admin App Hosting backend with **automatic rollouts disabled**
 4. Firestore named databases + rules deploy targets
 
 **Status:** DEFERRED — repo delivers workflow shape and dry-run scripts only.

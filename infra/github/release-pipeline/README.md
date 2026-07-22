@@ -3,10 +3,23 @@
 Scripts and schemas used by `.github/workflows/deploy-staging.yml`,
 `.github/workflows/deploy-production.yml`, and `.github/workflows/progressive-release.yml`.
 
-**App Hosting promote is live** via `promote-app-hosting.sh` when GitHub Environment WIF vars
-are set (`GCP_WORKLOAD_IDENTITY_PROVIDER`, `GCP_SERVICE_ACCOUNT`). Automatic App Hosting
-rollouts stay disabled — traffic only moves through that explicit promote (or the same script
-run locally with Firebase CLI auth).
+**Public web** deploys via **Vercel** git integration; Production promote is explicit (ADR-027).
+Deploy workflows record Vercel expectations, run migrate/health/smoke gates, and write provenance —
+they do **not** promote Firebase App Hosting.
+
+**Admin** interim host is App Hosting (`black-book-admin-production`, root `apphosting.admin.yaml`).
+Automatic App Hosting rollouts stay disabled — admin traffic moves only through explicit Firebase CLI
+rollouts at a pinned SHA:
+
+```bash
+firebase apphosting:rollouts:create black-book-admin-production \
+  --project=black-book-efaaf \
+  --git-commit=<sha> \
+  --force
+```
+
+(`promote-app-hosting.sh` / `promote-app-hosting-dry-run.sh` were removed; they only ever targeted
+retired public-web backends.)
 
 Firestore migrate / surface deploy / rollback helpers remain dry-run until separately promoted.
 WIF apply: `infra/github/scripts/apply-wif.sh` (see `docs/runbooks/production-release.md`).
@@ -22,10 +35,11 @@ WIF apply: `infra/github/scripts/apply-wif.sh` (see `docs/runbooks/production-re
 | `generate-changelog.mjs` | CLI: write `CHANGELOG.md` fragment for a SHA range |
 | `write-provenance.mjs` | CLI: emit provenance for staging/production |
 | `migrate-firestore-dry-run.sh` | Firestore rules/indexes sequencing (before traffic) |
-| `promote-app-hosting.sh` | Explicit App Hosting promote (live; `DRY_RUN=1` for print-only) |
-| `promote-app-hosting-dry-run.sh` | Thin wrapper: `DRY_RUN=1` → `promote-app-hosting.sh` |
 | `rollback-dry-run.sh` | Production rollback rehearsal (no writes) |
 | `health-check-dry-run.mjs` | Post-deploy health gate (dry-run or live URL) |
 | `release-pipeline.test.mjs` | Unit tests for helpers above |
 
 Schema source of truth remains `infra/github/release-metadata/deployment-provenance.schema.json`.
+
+Public web rollback: Vercel promote/redeploy prior Production deployment SHA — not App Hosting.
+Admin rollback: `firebase apphosting:rollouts:create black-book-admin-production` at prior good SHA.

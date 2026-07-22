@@ -21,7 +21,7 @@ test('beta disable controls inventory includes env and static-mode switch', () =
   assert.ok(keys.includes(PUBLIC_STATIC_MODE_SWITCH_ID));
 });
 
-test('App Hosting templates declare PUBLIC_READ_API_DISABLED default off', () => {
+test('Vercel disable docs declare PUBLIC_READ_API_DISABLED', () => {
   assert.doesNotThrow(() => assertBetaDisableConfigKeys(repoRoot));
 });
 

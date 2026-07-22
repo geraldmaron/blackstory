@@ -2,11 +2,11 @@
 
 **Goal:** Stop dynamic public beta quickly without redeploying product code. Immutable public corpus snapshots remain available.
 
-## Fast path (App Hosting env — ~minutes)
+## Fast path (Vercel env — ~minutes)
 
-1. Open Firebase console → App Hosting → backend (`black-book-web-production` or staging).
-2. Set runtime env **`PUBLIC_READ_API_DISABLED=1`** (see `apps/web/apphosting.production.yaml`).
-3. Promote/restart the backend so the env change applies.
+1. Open Vercel dashboard → project `blackstory` → Settings → Environment Variables.
+2. Set **`PUBLIC_READ_API_DISABLED=1`** on **Production** (and Preview if testing).
+3. **Redeploy** Production — existing deployments keep the prior env snapshot until redeployed.
 4. Verify: public pages show the degraded/snapshot banner (`apps/web/src/lib/runtime-hardening/degraded-mode.ts`).
 
 This disables dynamic public read APIs while static entity snapshots and trust copy remain served.
@@ -27,14 +27,15 @@ When `public-static-mode` is engaged, dynamic workloads are denied with reason `
 ## Rollback of disable
 
 1. Clear `PUBLIC_READ_API_DISABLED` (set to `0`) after threat is contained.
-2. Disengage `public-static-mode` and other switches in reverse containment order.
-3. Run post-enable health checks (`infra/github/release-pipeline/health-check-dry-run.mjs`).
+2. Redeploy Production on Vercel.
+3. Disengage `public-static-mode` and other switches in reverse containment order.
+4. Run post-enable health checks (`infra/github/release-pipeline/health-check-dry-run.mjs`).
 
 ## Config keys asserted at launch
 
 | Control | Key | Location |
 |---------|-----|----------|
-| App Hosting env | `PUBLIC_READ_API_DISABLED` | `apps/web/apphosting*.yaml` |
+| Vercel env | `PUBLIC_READ_API_DISABLED` | Vercel project env (Production) |
 | Kill switch | `public-static-mode` | `packages/config/src/kill-switches.ts` |
 
 Machine gate `beta-disable-path-ready` verifies these keys and this runbook exist before beta GO.

@@ -19,8 +19,7 @@ const nextConfig = {
   reactStrictMode: true,
   // Allow local verification via 127.0.0.1 as well as localhost.
   allowedDevOrigins: ['127.0.0.1', 'localhost'],
-  // App Hosting CI run typecheck as a separate gate; keep `next build` focused on
-  // emit so monorepo package-dist skew cannot block image publish.
+  // Keep `next build` focused on emit; typecheck stays a separate CI gate.
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -32,9 +31,7 @@ const nextConfig = {
     '@repo/security',
     '@repo/observability',
   ],
-  // App Hosting / Cloud Run need a self-contained server bundle for monorepo deploys.
-  // Vercel sets VERCEL=1 and serves the Next build directly — standalone breaks that path.
-  ...(process.env.VERCEL ? {} : { output: 'standalone' }),
+  // Vercel serves the Next build directly — do not emit `output: 'standalone'`.
   // Constitution JSON is read at runtime via fs (not import); include it in serverless traces.
   outputFileTracingRoot: monorepoRoot,
   outputFileTracingIncludes: {

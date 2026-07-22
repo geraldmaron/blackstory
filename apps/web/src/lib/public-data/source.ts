@@ -9,11 +9,11 @@
  * (ids only), not the full hydrated entity catalog. Oversized live catalogs (>~1.8MB) stay in
  * process memory only; Next's 2MB data-cache limit must not receive the fat array.
  *
- * Cost knobs (env / App Hosting):
+ * Cost knobs (env / Vercel):
  * - `PUBLIC_READ_API_DISABLED=1` — snapshot-only (no live Postgres/artifact reads)
  * - `PUBLIC_DATA_SOURCE=seed|postgres` — force seed vs canonical live backend
  * - `APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL` — CDN/GCS base for entities.json / search-index.json
- * - `apps/web/apphosting*.yaml` `runConfig.minInstances` — primary idle App Hosting cost driver
+ * - Vercel Fluid Compute / function concurrency — primary idle/active cost driver
  */
 
 import { unstable_cache } from 'next/cache';

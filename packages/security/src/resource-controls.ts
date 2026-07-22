@@ -3,8 +3,8 @@
  *
  * Deterministic policy matrix for bounded scaling, queue/job limits, database caps,
  * daily budgets, circuit breakers, and soft-shutdown ordering. Complements
- * App Hosting limits and endpoint quotas without duplicating their evaluators.
- * Fail closed when limits are exceeded or policy is unknown.
+ * public-web / Cloud Run / admin limits and endpoint quotas without duplicating
+ * their evaluators. Fail closed when limits are exceeded or policy is unknown.
  */
 
 import { RATE_LIMIT_POLICY_VERSION } from './rate-limits.js';
@@ -59,14 +59,14 @@ export type RetryPolicy = {
 
 export type ServiceScalingLimits = {
   readonly serviceId: ServiceId;
-  readonly runtime: 'firebase-app-hosting' | 'cloud-run';
+  readonly runtime: 'vercel' | 'firebase-app-hosting' | 'cloud-run';
   readonly tier: WorkloadTier;
   readonly minInstances: number;
   readonly maxInstances: number;
   readonly concurrency: number;
   readonly cpu: number;
   readonly memoryMiB: number;
-  /** Reference to apphosting*.yaml when applicable. */
+  /** Optional operator reference (Vercel project, App Hosting YAML, etc.). */
   readonly bb022Ref?: string;
 };
 
@@ -162,12 +162,13 @@ export type ResourceControlDecision =
   ResourceControlDecisionAllowed | ResourceControlDecisionDenied;
 
 /**
- * App Hosting caps mirrored here for cross-service validation only.
- * Authoritative values remain in apps/web/apphosting*.yaml (do not duplicate edits).
+ * Historical App Hosting web caps retained as soft planning numbers for Vercel
+ * public web (no instance YAML). Prefer Vercel dashboard / Fluid Compute limits.
+ * @deprecated Prefer BB022_WEB_RUNTIME_LIMITS.
  */
 export const BB022_APP_HOSTING_LIMITS = {
   production: {
-    minInstances: 1,
+    minInstances: 0,
     maxInstances: 6,
     concurrency: 40,
     cpu: 1,
@@ -182,18 +183,21 @@ export const BB022_APP_HOSTING_LIMITS = {
   },
 } as const;
 
-/** Conservative Cloud Run + App Hosting scaling matrix every service has a hard max. */
+/** Soft public-web planning caps (Vercel; not enforced by App Hosting YAML). */
+export const BB022_WEB_RUNTIME_LIMITS = BB022_APP_HOSTING_LIMITS;
+
+/** Conservative scaling matrix — every service has a hard max. */
 export const DEFAULT_SERVICE_SCALING_LIMITS: Record<ServiceId, ServiceScalingLimits> = {
   web: {
     serviceId: 'web',
-    runtime: 'firebase-app-hosting',
+    runtime: 'vercel',
     tier: 'public_serving',
-    minInstances: BB022_APP_HOSTING_LIMITS.production.minInstances,
-    maxInstances: BB022_APP_HOSTING_LIMITS.production.maxInstances,
-    concurrency: BB022_APP_HOSTING_LIMITS.production.concurrency,
-    cpu: BB022_APP_HOSTING_LIMITS.production.cpu,
-    memoryMiB: BB022_APP_HOSTING_LIMITS.production.memoryMiB,
-    bb022Ref: 'apps/web/apphosting.production.yaml',
+    minInstances: BB022_WEB_RUNTIME_LIMITS.production.minInstances,
+    maxInstances: BB022_WEB_RUNTIME_LIMITS.production.maxInstances,
+    concurrency: BB022_WEB_RUNTIME_LIMITS.production.concurrency,
+    cpu: BB022_WEB_RUNTIME_LIMITS.production.cpu,
+    memoryMiB: BB022_WEB_RUNTIME_LIMITS.production.memoryMiB,
+    bb022Ref: 'docs/runbooks/vercel-public-web-cutover.md',
   },
   'api-public': {
     serviceId: 'api-public',

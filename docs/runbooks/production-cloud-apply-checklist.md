@@ -332,9 +332,9 @@ gcloud recaptcha-enterprise keys create \
 #    Enterprise; no firebase-tools CLI subcommand for this step as of writing — console-only,
 #    matching infra/firebase/auth-and-app-check.md's documented sequence)
 
-# 3. Set the site key for the web runtime
-#    NEXT_PUBLIC_FIREBASE_APP_CHECK_SITE_KEY=<key> in apps/web/apphosting*.yaml (already wired to
-#    initializeAppCheckScaffold — see infra/firebase/auth-and-app-check.md)
+# 3. Set the site key for the public web runtime (Vercel project env for `apps/web`)
+#    NEXT_PUBLIC_FIREBASE_APP_CHECK_SITE_KEY=<key> — already wired to initializeAppCheckScaffold;
+#    see infra/firebase/auth-and-app-check.md
 
 # 4. Deploy both custom APIs with APP_CHECK_MODE=monitor first; watch app_check_verification metrics
 # 5. Once monitor metrics are healthy, flip APP_CHECK_MODE=enforce on both APIs (env var, redeploy)

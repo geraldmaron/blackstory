@@ -13,8 +13,8 @@ separation, not App Hosting as the live public target.
 | Aspect | Today (verified) | Target |
 |--------|------------------|--------|
 | `apps/web` | Next.js on **Vercel** (`blackstory.app`) | Vercel (ADR-027) |
-| App Hosting (`apps/web`) | Idle rollback / soak | Keep until owner retires |
-| `apps/admin` | Next.js; App Hosting or Cloud Run + IAP | Cloud Run + IAP preferred |
+| App Hosting (`apps/web`) | **Retired in-repo**; owner deletes `black-book-web-*` backends | None |
+| `apps/admin` | App Hosting (`black-book-admin-production`) until Cloud Run + IAP | Cloud Run + IAP |
 | `apps/api-*` | Cloud Run (or local) | Separate Cloud Run services |
 
 ## Context
@@ -25,13 +25,15 @@ Public web hosting and privileged API/admin runtimes are different trust domains
 
 ## Decision
 
-1. **Public web (`apps/web`)** production host is **Vercel** (ADR-027). Firebase App
-   Hosting remains an idle dual-run / rollback path until the owner retires it.
-2. **Admin (`apps/admin`)** and all **API surfaces** (`api-public`, `api-submissions`,
-   `api-internal`) deploy on **Cloud Run** (admin may temporarily use a separate App
-   Hosting backend; same trust isolation rules apply).
+1. **Public web (`apps/web`)** production host is **Vercel** (ADR-027). No App Hosting configs
+   or rollback path for public web remain in-repo.
+2. **Admin (`apps/admin`)** deploys on **App Hosting** (`apphosting.admin.yaml`, backend
+   `black-book-admin-production`) as an interim host until **Cloud Run + IAP** cutover. All
+   **API surfaces** (`api-public`, `api-submissions`, `api-internal`) deploy on **Cloud Run**.
+   Same trust isolation rules apply regardless of admin host.
 3. Automatic uncontrolled rollouts are **disabled**; GitHub Actions / explicit promote
-   control production traffic (ADR-006, ADR-027).
+   control production traffic for Cloud Run and admin App Hosting (ADR-006). Public web uses
+   Vercel explicit Production promote (ADR-027).
 4. Public page rendering does **not** open database connections or invoke models; it
    reads released projections/snapshots via the public API, PostgREST published views
    (ADR-026), or static release artifacts (ADR-004).
@@ -49,18 +51,20 @@ Public web hosting and privileged API/admin runtimes are different trust domains
 
 - Distinct deploy pipelines and service accounts for web vs APIs vs admin.
 - Public web can remain readable in degraded mode from release snapshots even when APIs throttle.
-- Operators may manage Vercel plus Cloud Run (and idle App Hosting during soak); complexity is intentional for isolation.
+- Operators manage Vercel (public web), Cloud Run (APIs), and interim App Hosting (admin only).
 
 ## Migration triggers
 
-- Retire App Hosting rollback only after soak and owner checklist in
-  `docs/data/firebase-wind-down.md` / Vercel cutover runbook.
-- Split or merge Cloud Run services only when a security boundary change is approved
-  (must still map to ADR-005 surfaces).
+- Owner deletes `black-book-web-*` App Hosting backends after confirming Vercel stability
+  (`docs/data/firebase-wind-down.md`).
+- Admin moves from App Hosting to Cloud Run + IAP when cutover is approved (must still map to
+  ADR-005 surfaces).
+- Split or merge Cloud Run services only when a security boundary change is approved.
 
 ## Rollback considerations
 
 - Keep `apps/web` buildable as a standard Next.js app so it can temporarily run on
-  Cloud Run or App Hosting if Vercel is unavailable.
+  Cloud Run if Vercel is unavailable.
 - Do not roll back by combining API and admin into the public web process; rollback is
   host change, not boundary collapse.
+- Public web rollback is Vercel promote/redeploy of a prior SHA (ADR-027), not App Hosting.

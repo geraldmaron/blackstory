@@ -12,7 +12,6 @@
     "build": "pnpm run build:foundation && pnpm -r --filter './packages/**' --filter './apps/**' --filter @repo/functions-discovery --filter '!@repo/schemas' --filter '!@repo/data-access' --filter '!@repo/ui' --filter '!@repo/domain' --filter '!@repo/security' --filter '!@repo/observability' run build",
     "build:foundation": "pnpm --filter @repo/schemas --filter @repo/ui run build && pnpm --filter @repo/domain run build && pnpm --filter @repo/data-access run build && pnpm --filter @repo/security run build && pnpm --filter @repo/observability run build",
     "apphosting:build": "node scripts/apphosting-build.mjs",
-    "start": "node apps/web/.next/standalone/apps/web/server.js",
     "test": "pnpm test:preflight && pnpm -r --filter './packages/**' --filter './apps/**' --filter @repo/functions-discovery run --if-present test && uv run pytest",
     "test:preflight": "node --import tsx scripts/test-preflight.mjs",
     "test:js": "pnpm test:preflight && pnpm -r --filter './packages/**' --filter './apps/**' --filter @repo/functions-discovery run --if-present test",

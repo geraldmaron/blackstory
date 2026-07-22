@@ -29,9 +29,13 @@ confirm the active account/project, inventory existing resources, and obtain hum
 before creating backends or changing production Auth providers.
 
 App Hosting backend inventory/creation is **blocked** until a human upgrades the project to Blaze
-and `firebaseapphosting.googleapis.com` can be enabled. Proposed backend names after billing
-approval: `black-book-web-production` and optional `black-book-web-staging` (same project;
-staging is not a security boundary).
+and `firebaseapphosting.googleapis.com` can be enabled.
+
+**Public web:** App Hosting configs retired in-repo (ADR-027). Owner deletes
+`black-book-web-production` and optional `black-book-web-staging` backends in console.
+
+**Admin (interim):** Live backend `black-book-admin-production` configured via root
+[`apphosting.admin.yaml`](../../apphosting.admin.yaml). Target host is Cloud Run + IAP.
 
 ## Data plane (ADR-011)
 
@@ -87,12 +91,11 @@ Minimal Firebase-facing IAM design: [`iam-minimal.md`](./iam-minimal.md). No key
 
 | File | Purpose |
 |------|---------|
-| [`../../apps/web/apphosting.yaml`](../../apps/web/apphosting.yaml) | Production base for proposed `black-book-web-production` |
-| [`../../apps/web/apphosting.production.yaml`](../../apps/web/apphosting.production.yaml) | Explicit production template |
-| [`../../apps/web/apphosting.staging.yaml`](../../apps/web/apphosting.staging.yaml) | Optional same-project staging template |
+| [`../../apphosting.admin.yaml`](../../apphosting.admin.yaml) | Live admin backend `black-book-admin-production` |
 
-Set the backend runtime identity at creation to
-`web-runtime@black-book-efaaf.iam.gserviceaccount.com`. YAML contains Secret Manager names only for
+Public web App Hosting configs (`apps/web/apphosting*.yaml`) were retired when Vercel became the
+sole public host (ADR-027). Set the admin backend runtime identity at creation to
+`admin-runtime@black-book-efaaf.iam.gserviceaccount.com`. YAML contains Secret Manager names only for
 server secrets; public Firebase client identifiers are plain env values.
 
 ## Backup and restore (BB-020)

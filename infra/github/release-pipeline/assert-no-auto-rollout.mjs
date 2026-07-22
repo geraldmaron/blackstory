@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * CLI: assert automatic App Hosting rollouts remain disabled (ADR-006 acceptance criterion #1).
+ * CLI: assert automatic production deploys remain disabled (ADR-006 / ADR-027).
  */
 import { assertNoAutomaticRollouts } from './lib/auto-rollout-guard.mjs';
 

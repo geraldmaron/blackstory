@@ -13,7 +13,8 @@ Formal decisions for BlackStory platform topology, data, deployment, and securit
 - **Product system of record** is **Supabase Postgres** on project `blackstory-app` (ADR-020).
   Firestore is a **historical phase** and rollback/export surface only (ADR-011 superseded;
   see `docs/data/firebase-wind-down.md`).
-- **Public web** is **Vercel** (ADR-027). Firebase App Hosting may remain as idle rollback.
+- **Public web** is **Vercel** only (ADR-027). Public web App Hosting configs are retired in-repo.
+- **Admin** interim host is **App Hosting** (`black-book-admin-production`) until Cloud Run + IAP.
 - Filenames keep historical names for link stability. Titles and status lines are authoritative.
 - Cite ADR numbers and capability names. Do not put internal tracker ids in ADR chrome.
 
@@ -26,7 +27,7 @@ Formal decisions for BlackStory platform topology, data, deployment, and securit
 | [ADR-003](./ADR-003-firebase-sql-connect-boundaries.md) | Firebase SQL Connect usage boundaries | Superseded by ADR-020 (SQL Connect permanently non-path) |
 | [ADR-004](./ADR-004-public-projection-immutable-snapshots.md) | Public projection and immutable publication snapshot model | Accepted |
 | [ADR-005](./ADR-005-service-surface-separation.md) | Public, submissions, internal, and admin service separation | Accepted |
-| [ADR-006](./ADR-006-github-actions-deployment.md) | GitHub Actions deployment model | Accepted |
+| [ADR-006](./ADR-006-github-actions-deployment.md) | GitHub Actions deployment model | Accepted (amended 2026-07-22) |
 | [ADR-007](./ADR-007-background-workflow-model.md) | Background workflow model | Accepted (discovery schedules: ADR-028) |
 | [ADR-008](./ADR-008-search-and-geocoding.md) | Search and geocoding | Accepted (amended by ADR-020) |
 | [ADR-009](./ADR-009-research-isolation.md) | Research isolation | Accepted |
@@ -47,7 +48,7 @@ Formal decisions for BlackStory platform topology, data, deployment, and securit
 | [ADR-024](./ADR-024-mobile-build-release.md) | Mobile build, release, and OTA update policy | Accepted |
 | [ADR-025](./ADR-025-mobile-map-data.md) | Mobile map data: self-hosted PMTiles, attribution, kill-switch | Accepted |
 | [ADR-026](./ADR-026-postgrest-published-read-surface.md) | PostgREST published-read surface (dual-surface with `api-public`) | Accepted |
-| [ADR-027](./ADR-027-vercel-public-web-hosting.md) | Vercel for public web hosting | Accepted (DNS hard-cut 2026-07-22) |
+| [ADR-027](./ADR-027-vercel-public-web-hosting.md) | Vercel for public web hosting | Accepted (amended 2026-07-22) |
 | [ADR-028](./ADR-028-discovery-schedule-runtime.md) | Discovery schedule runtime: Corsair systemd + Postgres | Accepted |
 
 ## Security boundary set (do not expand)
@@ -56,11 +57,11 @@ Deployable surfaces are limited to this set:
 
 | Surface | Runtime (live / target) | Repo path |
 |---------|-------------------------|-----------|
-| Public web | Vercel (ADR-027); App Hosting idle rollback | `apps/web` |
+| Public web | Vercel (ADR-027) | `apps/web` |
 | Public read/search/location API | Cloud Run | `apps/api-public` |
 | Submissions / corrections API | Cloud Run | `apps/api-submissions` |
 | Internal publication / promotion API | Private Cloud Run | `apps/api-internal` |
-| Admin / research console | Cloud Run + IAP (or App Hosting admin backend) | `apps/admin` |
+| Admin / research console | App Hosting interim (`black-book-admin-production`); target Cloud Run + IAP | `apps/admin` |
 | Research / discovery schedules | Corsair systemd + Postgres (ADR-028); long batch via Cloud Run Jobs/Tasks when applied (ADR-007) | `workers/research`, `functions/` (tombstone) |
 | Publication workers | Cloud Run Jobs / Tasks (target) | `workers/publication` |
 | Security workers | Cloud Run Jobs / Tasks (target) | `workers/security` |

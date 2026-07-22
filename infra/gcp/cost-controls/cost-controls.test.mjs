@@ -40,7 +40,8 @@ describe('BB-033 cost controls matrix', () => {
 
     const web = matrix.services.find((s) => s.id === 'web');
     assert.equal(web.maxInstances, 6);
-    assert.equal(web.bb022Ref, 'apps/web/apphosting.production.yaml');
+    assert.equal(web.runtime, 'vercel');
+    assert.equal(web.bb022Ref, 'docs/runbooks/vercel-public-web-cutover.md');
   });
 
   it('defines Cloud Tasks rate, concurrency, depth, and retry limits', () => {

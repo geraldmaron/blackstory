@@ -106,7 +106,7 @@
       ],
       "properties": {
         "id": { "type": "string" },
-        "runtime": { "type": "string", "enum": ["firebase-app-hosting", "cloud-run"] },
+        "runtime": { "type": "string", "enum": ["vercel", "firebase-app-hosting", "cloud-run"] },
         "tier": { "$ref": "#/definitions/workloadTier" },
         "minInstances": { "type": "integer", "minimum": 0 },
         "maxInstances": { "type": "integer", "minimum": 1, "maximum": 100 },

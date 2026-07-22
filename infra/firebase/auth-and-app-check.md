@@ -25,11 +25,10 @@ human provider choice and a successful metrics-only rollout.**
    - `localhost` (emulator / local Next)
    - `black-book-efaaf.firebaseapp.com`
    - `black-book-efaaf.web.app`
-   - App Hosting defaults when backends exist:
-     `black-book-web-staging--black-book-efaaf.us-central1.hosted.app`,
-     `black-book-web-production--black-book-efaaf.us-central1.hosted.app`
-   - Custom apex: `blackstory.app` (add `www.blackstory.app` separately if used)
-4. **Provider choice (human required before enabling):**
+   - Public web (Vercel): `blackstory.app` (add `www.blackstory.app` separately if used)
+   - Admin App Hosting interim backend domain when live (Firebase console → App Hosting →
+     `black-book-admin-production`)
+   - Do **not** add retired `black-book-web-*` `*.hosted.app` defaults — public web is Vercel only
 4. **Provider choice (human required before enabling):**
    - Recommended default for public beta: **no social providers** until a product decision.
    - Admin path: prefer Cloud IAP on Cloud Run; if Firebase Auth is used for admin UX, restrict to an allowlisted Google Workspace / Cloud Identity domain.
@@ -38,9 +37,11 @@ human provider choice and a successful metrics-only rollout.**
 
 ### Config artifacts in repo
 
-- Client identifiers: `registered-apps.json` + App Hosting `NEXT_PUBLIC_FIREBASE_*` values.
+- Client identifiers: `registered-apps.json` + runtime env (`NEXT_PUBLIC_FIREBASE_*` on Vercel for
+  public web; admin App Hosting env in `apphosting.admin.yaml`).
 - Runtime validation: `@repo/firebase` (`parseWebFirebaseEnv`, `parseAdminFirebaseEnv`, `parseServerFirebaseEnv`).
-- Secrets (session cookies, admin private keys, etc.): **Secret Manager names only** in `apps/web/apphosting*.yaml`. No JSON keys.
+- Secrets (session cookies, admin private keys, etc.): **Secret Manager names only** in
+  `apphosting.admin.yaml` and Vercel project env — no JSON keys.
 
 ## App Check client binding and server enforcement
 
@@ -50,9 +51,8 @@ human provider choice and a successful metrics-only rollout.**
 2. Create a reCAPTCHA Enterprise key bound to the public web origins.
 3. In Firebase App Check, register **Black Book Web** with the reCAPTCHA Enterprise provider.
 4. Optionally register **Black Book Admin** with a separate Debug / reCAPTCHA provider for non-production only; never share admin debug tokens in CI logs.
-5. Set `NEXT_PUBLIC_FIREBASE_APP_CHECK_SITE_KEY` for the web runtime. The web
-   client calls `initializeAppCheckScaffold`, binds the reCAPTCHA Enterprise
-   provider, and automatically refreshes tokens. Before each custom API request,
+5. Set `NEXT_PUBLIC_FIREBASE_APP_CHECK_SITE_KEY` for the public web runtime (Vercel project env).
+   The web client calls `initializeAppCheckScaffold`, binds the reCAPTCHA Enterprise provider, and automatically refreshes tokens. Before each custom API request,
    call `getAppCheckRequestHeaders` with the returned App Check instance and
    merge its `X-Firebase-AppCheck` header into the request. Firebase does not
    automatically attach App Check tokens to custom API calls.

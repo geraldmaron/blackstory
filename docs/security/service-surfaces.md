@@ -20,9 +20,8 @@ jobs remain human provisioning steps (see [`infra/gcp/surfaces/README.md`](../..
 
 ### Public web (`apps/web`)
 
-- **Hosting:** Firebase App Hosting (`apps/web/apphosting.yaml`)
+- **Hosting:** Vercel (project `blackstory`, Root Directory `apps/web`) — ADR-027
 - **Posture:** `public-cdn` — serves released public projections only
-- **SA:** `web-runtime@black-book-efaaf.iam.gserviceaccount.com`
 - **Contract:** [`apps/web/SURFACE.md`](../../apps/web/SURFACE.md)
 
 ### Public read API (`apps/api-public`)
@@ -48,7 +47,7 @@ jobs remain human provisioning steps (see [`infra/gcp/surfaces/README.md`](../..
 
 ### Admin console (`apps/admin`)
 
-- **Hosting:** Cloud Run behind IAP + app-level authorization
+- **Hosting:** App Hosting interim (`black-book-admin-production`, `apphosting.admin.yaml`); target Cloud Run + IAP
 - **Posture:** `iap-protected` — separate Next.js app from `apps/web`
 - **Invariant:** no imports from `apps/web` handlers (see `apps/admin/src/surface.test.ts`)
 - **SA:** `admin@black-book-efaaf.iam.gserviceaccount.com`

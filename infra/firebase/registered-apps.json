@@ -28,15 +28,17 @@
     "apiKey": "AIzaSyCS6qbiHo3KYAkMOhVbuORCwNa9PNbChFU"
   },
   "appHosting": {
-    "productionBackend": {
-      "proposedName": "black-book-web-production",
-      "status": "blocked_pending_blaze",
-      "runtimeServiceAccount": "web-runtime@black-book-efaaf.iam.gserviceaccount.com"
+    "adminBackend": {
+      "name": "black-book-admin-production",
+      "status": "live",
+      "note": "Interim admin host via apphosting.admin.yaml until Cloud Run + IAP.",
+      "runtimeServiceAccount": "admin-runtime@black-book-efaaf.iam.gserviceaccount.com"
     },
-    "stagingBackend": {
-      "proposedName": "black-book-web-staging",
-      "status": "blocked_pending_blaze",
-      "note": "Same production project; configuration namespace only, not a security boundary."
+    "webBackends": {
+      "status": "deleted",
+      "deletedAt": "2026-07-22",
+      "formerNames": ["black-book-web-production", "black-book-web-staging"],
+      "note": "Public web is Vercel only (ADR-027)."
     }
   }
 }
