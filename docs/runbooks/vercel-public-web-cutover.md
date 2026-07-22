@@ -49,7 +49,7 @@ Set on the Vercel project (Preview + Production unless noted):
 | `DATABASE_SSL` | `1` |
 | `DATABASE_URL` | Sensitive; **Supabase session pooler** (IPv4). Direct `db.<ref>.supabase.co` is IPv6-only and fails on Vercel (`ENOTFOUND`). For `blackstory-app` use `aws-1-us-west-2.pooler.supabase.com:5432` with user `postgres.<ref>`, `sslmode=require`, `uselibpqcompat=true`. Decode the DB password once if the source URL was already percent-encoded (passwords containing `%`/`@` break when double-encoded). |
 | `SENTRY_DSN` | Optional; App Hosting Secret Manager name `web-production-sentry-dsn` exists, but `apps/web` has no Sentry client wired yet — **omit on Vercel** until observability lands |
-| `SUBMISSION_PRIVACY_PEPPER` | Required for production `POST /submit` and corrections IP hashing; not needed for public catalog reads. **Owner action still open** (see below). |
+| `SUBMISSION_PRIVACY_PEPPER` | Required for production `POST /submit` and corrections IP hashing; not needed for public catalog reads. **Set 2026-07-22** (see below). |
 
 ### Secrets checklist (names only)
 
@@ -63,39 +63,22 @@ Set on the Vercel project (Preview + Production unless noted):
 | `NEXT_PUBLIC_APP_ENV` | required | required | `production` |
 | `NEXT_PUBLIC_SITE_URL` | required (preview URL) | required (`https://blackstory.app`) | Separate per target |
 | `SENTRY_DSN` | omit for now | omit for now | GCP SM `web-production-sentry-dsn` exists; not wired in `apps/web` |
-| `SUBMISSION_PRIVACY_PEPPER` | blocked until owner creates | blocked until owner creates | See owner action below |
+| `SUBMISSION_PRIVACY_PEPPER` | set (sensitive) | set (sensitive) | 1Password + Vercel; never commit value |
 | `NEXT_PUBLIC_ADMIN_ORIGIN` | optional | optional | Footer admin link only |
 | `NEXT_PUBLIC_FIREBASE_*` | not required for Vercel public reads | not required | App Hosting legacy; public dig uses Postgres |
 
-### Owner action: `SUBMISSION_PRIVACY_PEPPER` (blocked 2026-07-22)
+### `SUBMISSION_PRIVACY_PEPPER` (set 2026-07-22)
 
-Searched; **no reusable value found** (do not invent one in-agent):
+Dedicated pepper is live for Vercel Preview and Production (sensitive). Value is **not** in git.
 
-| Source | Result |
+| Source | Status |
 |--------|--------|
-| `apps/web/.env.local` / `.env.example` | Key absent |
-| App Hosting `apphosting*.yaml` | Not referenced (unlike `SENTRY_DSN` / `DATABASE_URL`) |
-| GCP Secret Manager (`black-book-efaaf`) | No `*pepper*` / `*submission*` secret name |
-| 1Password | Item titled `BlackStory OPERATOR_CLI_PRIVACY_PEPPER` only — **different var** (`OPERATOR_CLI_PRIVACY_PEPPER` for operator-cli / admin). Do **not** copy into Vercel as `SUBMISSION_PRIVACY_PEPPER` unless the owner explicitly decides to share the same pepper |
-| Vercel project env | Not set (Preview or Production) |
+| 1Password (Private vault) | Item `BlackStory submission privacy pepper` — fields `credential` / `SUBMISSION_PRIVACY_PEPPER` |
+| Vercel project env | Present Preview + Production as Encrypted/sensitive |
+| `OPERATOR_CLI_PRIVACY_PEPPER` | Separate 1Password item — **do not reuse** for submissions |
+| GCP Secret Manager | Not mirrored (optional if App Hosting rollback still needs submit) |
 
-**Owner steps when submit/corrections must work on Vercel:**
-
-1. Generate a high-entropy pepper (e.g. `openssl rand -base64 32`) and store it in 1Password under a dedicated item (suggested title: `BlackStory SUBMISSION_PRIVACY_PEPPER`), field label matching the env name.
-2. Add as **sensitive** on Vercel Preview **and** Production (CLI example; value via env / stdin — never commit):
-
-```bash
-vercel env add SUBMISSION_PRIVACY_PEPPER preview --sensitive --yes --value "$SUBMISSION_PRIVACY_PEPPER"
-vercel env add SUBMISSION_PRIVACY_PEPPER production --sensitive --yes --value "$SUBMISSION_PRIVACY_PEPPER"
-vercel redeploy <preview-deployment-url>
-```
-
-3. Optionally mirror into GCP Secret Manager later if App Hosting rollback still needs submit; not required for Vercel-only public reads.
-4. Smoke: `POST /submit` and corrections in Preview with integrity enforce — confirm no `SUBMISSION_PRIVACY_PEPPER must be set in production` runtime error.
-
-Public catalog / Explore reads do **not** need this pepper; DNS cutover can proceed without it if mutations stay untested until after soak.
-
-After any env change, **redeploy** Preview/Production — existing deployments keep the prior env snapshot.
+After any env change, **redeploy** Preview/Production — existing deployments keep the prior env snapshot. Smoke submit/corrections on Preview when ready: confirm no `SUBMISSION_PRIVACY_PEPPER must be set in production` runtime error. Public catalog / Explore reads do not need this pepper; DNS cutover remains owner-gated separately.
 
 Update without printing secrets:
 
