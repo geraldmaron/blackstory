@@ -11,6 +11,11 @@
  *  - `dc-sites`   "Black History Sites: Washington" (DC Office of Planning /
  *    Historic Preservation Office, CC BY 4.0), fetched from the backing ArcGIS
  *    FeatureServer referenced by the data.gov catalog entry.
+ *  - `hbcu`       U.S. ED / NCES IPEDS Institutional Characteristics (HD2024),
+ *    filtered to active HBCU-flagged institutions (~102). No API key — direct
+ *    zip download from NCES. Dedupes against researched entities in
+ *    `fixtures/national-catalog/hbcu.json`. Optional `--from-fixture` replays
+ *    `fixtures/bulk-sources/hbcu/ipeds-hd2024-hbcu-rows.csv`.
  *
  * Durability contract (matches `discover-candidates.ts`):
  *  - Live network sources are discovery inputs only.
@@ -31,9 +36,14 @@
  *     packages/firebase/scripts/import-bulk-source-programs.ts --lane=greenbook
  *   node --conditions development --import tsx \
  *     packages/firebase/scripts/import-bulk-source-programs.ts --lane=dc-sites
+ *   node --conditions development --import tsx \
+ *     packages/firebase/scripts/import-bulk-source-programs.ts --lane=hbcu
+ *   node --conditions development --import tsx \
+ *     packages/firebase/scripts/import-bulk-source-programs.ts --lane=hbcu --from-fixture
  */
+import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -65,11 +75,26 @@ const DC_SITES_FEATURESERVER =
   'https://services.arcgis.com/neT9SoYxizqTHZPH/arcgis/rest/services/AAHT_Source_Data/FeatureServer/0';
 const DC_SITES_CATALOG_URL = 'https://catalog.data.gov/dataset/black-history-sites-washington';
 
+/**
+ * IPEDS Institutional Characteristics (HD) table for 2024–25. The workbook's
+ * `us-ed-hbcu` lane cites the ED WHHBCU roster; IPEDS HD is the authoritative
+ * NCES feed with UNITID, HBCU flag, and campus coordinates (public domain).
+ */
+const IPEDS_HD2024_ZIP = 'https://nces.ed.gov/ipeds/datacenter/data/HD2024.zip';
+const IPEDS_HD2024_CSV = 'HD2024.csv';
+const HBCU_CATALOG_URL =
+  'https://sites.ed.gov/whhbcu/one-hundred-and-five-historically-black-colleges-and-universities/';
+const HBCU_FIXTURE_CSV = join(
+  PACKAGE_ROOT,
+  'fixtures/bulk-sources/hbcu/ipeds-hd2024-hbcu-rows.csv',
+);
+const HBCU_NATIONAL_CATALOG = join(PACKAGE_ROOT, 'fixtures/national-catalog/hbcu.json');
+
 const RESEARCH_LANE_NOTE =
   'research-lane-only: candidate attestation per workbook methodology; ' +
   'never publishable without source, identity, geo, rights, and privacy review';
 
-type Lane = 'greenbook' | 'dc-sites';
+type Lane = 'greenbook' | 'dc-sites' | 'hbcu';
 
 interface CandidateProvenance {
   readonly sourceId: string;
@@ -83,6 +108,7 @@ interface CandidateProvenance {
   readonly sourceCategory?: string;
   readonly geoPrecision?: string;
   readonly geocodedConfidence?: number;
+  readonly ncesInstitutionId?: string;
   readonly rights: string;
   readonly attribution?: string;
 }
@@ -555,16 +581,395 @@ async function runDcSitesLane(now: string): Promise<LaneResult> {
   };
 }
 
+// --- Lane: hbcu (NCES IPEDS HD2024) ----------------------------------------
+
+/** Minimal US state / district name → two-letter code for catalog dedupe keys. */
+export const US_JURISDICTION_TO_STATE: Readonly<Record<string, string>> = {
+  Alabama: 'AL',
+  Arkansas: 'AR',
+  Delaware: 'DE',
+  Florida: 'FL',
+  Georgia: 'GA',
+  Kentucky: 'KY',
+  Louisiana: 'LA',
+  Maryland: 'MD',
+  Mississippi: 'MS',
+  Missouri: 'MO',
+  'North Carolina': 'NC',
+  Ohio: 'OH',
+  Oklahoma: 'OK',
+  Pennsylvania: 'PA',
+  'South Carolina': 'SC',
+  Tennessee: 'TN',
+  Texas: 'TX',
+  Virginia: 'VA',
+  'District of Columbia': 'DC',
+  'Washington, D.C.': 'DC',
+  'D.C.': 'DC',
+  'U.S. Virgin Islands': 'VI',
+};
+
+/** Collapse institution names for dedupe (handles A&M, hyphens, punctuation). */
+export function normalizeInstitutionName(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/\band\b/g, '')
+    .replace(/-/g, ' ')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/** Canonical aliases where catalog display names differ from IPEDS INSTNM. */
+export const HBCU_NAME_ALIASES: Readonly<Record<string, string>> = {
+  'florida a m university': 'florida agricultural mechanical university',
+  'florida agricultural and mechanical university': 'florida agricultural mechanical university',
+  'le moyne owen college': 'lemoyne owen college',
+  'philander smith university': 'philander smith college',
+};
+
+export function canonicalInstitutionName(value: string): string {
+  const normalized = normalizeInstitutionName(value);
+  return HBCU_NAME_ALIASES[normalized] ?? normalized;
+}
+
+export interface IpedsHdRow {
+  readonly unitid: string;
+  readonly name: string;
+  readonly address: string;
+  readonly city: string;
+  readonly state: string;
+  readonly zip: string;
+  readonly webaddr: string;
+  readonly latitude: number;
+  readonly longitude: number;
+  readonly hbcu: boolean;
+  readonly cyactive: boolean;
+}
+
+export interface ResearchedHbcuKey {
+  readonly normName: string;
+  readonly state?: string;
+}
+
+/** RFC4180-style single-line CSV parse (IPEDS HD files are comma-quoted). */
+export function parseCsvLine(line: string): readonly string[] {
+  const out: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index] ?? '';
+    if (inQuotes) {
+      if (char === '"' && line[index + 1] === '"') {
+        current += '"';
+        index += 1;
+      } else if (char === '"') {
+        inQuotes = false;
+      } else {
+        current += char;
+      }
+    } else if (char === '"') {
+      inQuotes = true;
+    } else if (char === ',') {
+      out.push(current);
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  out.push(current);
+  return out;
+}
+
+export function parseIpedsHdCsv(text: string): readonly IpedsHdRow[] {
+  const normalized = text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
+  const lines = normalized.split(/\r?\n/).filter((line) => line.length > 0);
+  if (lines.length < 2) return [];
+  const header = parseCsvLine(lines[0] ?? '');
+  const index = Object.fromEntries(header.map((column, columnIndex) => [column, columnIndex]));
+  const required = ['UNITID', 'INSTNM', 'ADDR', 'CITY', 'STABBR', 'ZIP', 'WEBADDR', 'HBCU', 'CYACTIVE', 'LATITUDE', 'LONGITUD'];
+  for (const column of required) {
+    if (index[column] === undefined) {
+      throw new Error(`IPEDS HD CSV missing required column ${column}`);
+    }
+  }
+  const rows: IpedsHdRow[] = [];
+  for (let lineIndex = 1; lineIndex < lines.length; lineIndex += 1) {
+    const cols = parseCsvLine(lines[lineIndex] ?? '');
+    const latitude = Number(cols[index.LATITUDE!]);
+    const longitude = Number(cols[index.LONGITUD!]);
+    rows.push({
+      unitid: (cols[index.UNITID!] ?? '').trim(),
+      name: (cols[index.INSTNM!] ?? '').trim(),
+      address: (cols[index.ADDR!] ?? '').trim(),
+      city: (cols[index.CITY!] ?? '').trim(),
+      state: (cols[index.STABBR!] ?? '').trim().toUpperCase(),
+      zip: (cols[index.ZIP!] ?? '').trim(),
+      webaddr: (cols[index.WEBADDR!] ?? '').trim(),
+      latitude,
+      longitude,
+      hbcu: (cols[index.HBCU!] ?? '') === '1',
+      cyactive: (cols[index.CYACTIVE!] ?? '') === '1',
+    });
+  }
+  return rows;
+}
+
+export function filterActiveHbcuRows(rows: readonly IpedsHdRow[]): readonly IpedsHdRow[] {
+  return rows.filter((row) => row.hbcu && row.cyactive && row.unitid.length > 0 && row.name.length > 0);
+}
+
+export function stateFromJurisdictionLabel(label: string): string | undefined {
+  const tail = label.split(',').pop()?.trim();
+  if (tail === undefined || tail.length === 0) return undefined;
+  if (tail.length === 2) return tail.toUpperCase();
+  return US_JURISDICTION_TO_STATE[tail];
+}
+
+export function loadResearchedHbcuKeys(catalogPath: string = HBCU_NATIONAL_CATALOG): readonly ResearchedHbcuKey[] {
+  const raw = JSON.parse(readFileSync(catalogPath, 'utf8')) as readonly {
+    readonly displayName: string;
+    readonly jurisdictionLabel?: string;
+  }[];
+  return raw.map((entry) => ({
+    normName: canonicalInstitutionName(entry.displayName),
+    ...(entry.jurisdictionLabel
+      ? { state: stateFromJurisdictionLabel(entry.jurisdictionLabel) }
+      : {}),
+  }));
+}
+
+export function isResearchedHbcu(
+  row: Pick<IpedsHdRow, 'name' | 'state'>,
+  researched: readonly ResearchedHbcuKey[],
+): boolean {
+  const normName = canonicalInstitutionName(row.name);
+  return researched.some((key) => {
+    if (key.normName !== normName) return false;
+    if (key.state === undefined) return true;
+    return key.state === row.state;
+  });
+}
+
+export function projectHbcuCandidates(input: {
+  readonly rows: readonly IpedsHdRow[];
+  readonly researched: readonly ResearchedHbcuKey[];
+  readonly now: string;
+  readonly sourceUrl: string;
+}): { readonly candidates: readonly BulkCandidate[]; readonly dropped: readonly DroppedRow[] } {
+  const rights = 'Public domain in the U.S. per NCES/IPEDS; U.S. federal government work';
+  const candidates: BulkCandidate[] = [];
+  const dropped: DroppedRow[] = [];
+  const seenUnitIds = new Set<string>();
+
+  for (const row of input.rows) {
+    if (seenUnitIds.has(row.unitid)) {
+      dropped.push({ sourceItemId: row.unitid, reason: 'duplicate UNITID in source file' });
+      continue;
+    }
+    seenUnitIds.add(row.unitid);
+
+    if (isResearchedHbcu(row, input.researched)) {
+      dropped.push({
+        sourceItemId: row.unitid,
+        reason: 'already researched in national-catalog/hbcu.json',
+      });
+      continue;
+    }
+
+    if (!Number.isFinite(row.latitude) || !Number.isFinite(row.longitude)) {
+      dropped.push({ sourceItemId: row.unitid, reason: 'missing or invalid LATITUDE/LONGITUD' });
+      continue;
+    }
+
+    const placeText = [row.city, row.state].filter((part) => part.length > 0).join(', ');
+    const addressLine = [row.address, row.city, row.state, row.zip].filter((part) => part.length > 0).join(', ');
+    const summary =
+      `Historically Black college or university campus` +
+      `${addressLine.length > 0 ? ` at ${addressLine}` : placeText.length > 0 ? ` in ${placeText}` : ''}` +
+      `, listed on the U.S. Department of Education accredited HBCU roster ` +
+      `(NCES IPEDS UNITID ${row.unitid}).`;
+
+    const webaddr =
+      row.webaddr.length > 0
+        ? row.webaddr.startsWith('http')
+          ? row.webaddr
+          : `https://${row.webaddr.replace(/^\/+/, '')}`
+        : HBCU_CATALOG_URL;
+
+    candidates.push({
+      id: `us-ed-hbcu-${row.unitid}`,
+      kind: 'place',
+      displayName: row.name,
+      summary,
+      aliases: [],
+      canonicalUrl: webaddr,
+      lat: roundCoord(row.latitude),
+      lng: roundCoord(row.longitude),
+      discoveredAt: input.now,
+      researchLaneOnly: true,
+      provenance: {
+        sourceId: 'us-ed-hbcu',
+        sourceItemId: row.unitid,
+        sourceUrl: input.sourceUrl,
+        capturedAt: input.now,
+        ...(row.address.length > 0 ? { historicAddress: row.address } : {}),
+        ...(row.city.length > 0 ? { sourceCity: row.city } : {}),
+        ...(row.state.length > 0 ? { sourceState: row.state } : {}),
+        sourceCategory: 'hbcu-campus',
+        geoPrecision:
+          'NCES IPEDS campus coordinates; candidate-only pending geo review against authoritative campus GIS',
+        ncesInstitutionId: row.unitid,
+        rights,
+      },
+    });
+  }
+
+  return { candidates, dropped };
+}
+
+function writeHbcuFixtureCsv(rows: readonly IpedsHdRow[]): void {
+  const header =
+    'UNITID,INSTNM,ADDR,CITY,STABBR,ZIP,WEBADDR,HBCU,CYACTIVE,LATITUDE,LONGITUD';
+  const body = rows.map((row) =>
+    [
+      row.unitid,
+      `"${row.name.replace(/"/g, '""')}"`,
+      `"${row.address.replace(/"/g, '""')}"`,
+      `"${row.city.replace(/"/g, '""')}"`,
+      row.state,
+      row.zip,
+      row.webaddr,
+      row.hbcu ? '1' : '2',
+      row.cyactive ? '1' : '0',
+      String(row.latitude),
+      String(row.longitude),
+    ].join(','),
+  );
+  mkdirSync(dirname(HBCU_FIXTURE_CSV), { recursive: true });
+  writeFileSync(HBCU_FIXTURE_CSV, `${header}\n${body.join('\n')}\n`);
+}
+
+async function fetchIpedsHdCsv(lane: Lane): Promise<{
+  readonly text: string;
+  readonly capture: SourceCapture;
+}> {
+  const response = await fetch(IPEDS_HD2024_ZIP, { headers: { 'user-agent': USER_AGENT } });
+  if (!response.ok) {
+    throw new Error(`fetch failed ${response.status} ${response.statusText}: ${IPEDS_HD2024_ZIP}`);
+  }
+  const zipBytes = Buffer.from(await response.arrayBuffer());
+  const cacheLaneDir = join(CACHE_DIR, lane);
+  mkdirSync(cacheLaneDir, { recursive: true });
+  const cachedZip = join(cacheLaneDir, 'HD2024.zip');
+  writeFileSync(cachedZip, zipBytes);
+  const text = execFileSync('unzip', ['-p', cachedZip, IPEDS_HD2024_CSV], {
+    encoding: 'utf8',
+    maxBuffer: 64 * 1024 * 1024,
+  });
+  return {
+    text,
+    capture: {
+      url: IPEDS_HD2024_ZIP,
+      cachedAs: cachedZip.slice(REPO_ROOT.length + 1),
+      contentSha256: createHash('sha256').update(zipBytes).digest('hex'),
+      bytes: zipBytes.byteLength,
+    },
+  };
+}
+
+function loadHbcuSourceCsv(fromFixture: boolean): {
+  readonly text: string;
+  readonly capture: SourceCapture;
+  readonly sourceUrl: string;
+} {
+  if (fromFixture) {
+    if (!existsSync(HBCU_FIXTURE_CSV)) {
+      throw new Error(`missing HBCU fixture CSV: ${HBCU_FIXTURE_CSV}`);
+    }
+    const text = readFileSync(HBCU_FIXTURE_CSV, 'utf8');
+    const fixtureRel = HBCU_FIXTURE_CSV.slice(REPO_ROOT.length + 1);
+    return {
+      text,
+      sourceUrl: fixtureRel,
+      capture: {
+        url: fixtureRel,
+        cachedAs: fixtureRel,
+        contentSha256: createHash('sha256').update(text).digest('hex'),
+        bytes: Buffer.byteLength(text),
+      },
+    };
+  }
+  throw new Error('loadHbcuSourceCsv called without fromFixture; use fetchIpedsHdCsv for live fetch');
+}
+
+async function runHbcuLane(now: string, fromFixture: boolean): Promise<LaneResult> {
+  const rights = 'Public domain in the U.S. per NCES/IPEDS; U.S. federal government work';
+  const { text, capture, sourceUrl } = fromFixture
+    ? loadHbcuSourceCsv(true)
+    : {
+        ...(await fetchIpedsHdCsv('hbcu')),
+        sourceUrl: IPEDS_HD2024_ZIP,
+      };
+
+  const parsed = parseIpedsHdCsv(text);
+  const hbcuRows = filterActiveHbcuRows(parsed);
+  if (!fromFixture) {
+    writeHbcuFixtureCsv(hbcuRows);
+  }
+
+  const researched = loadResearchedHbcuKeys();
+  const { candidates, dropped } = projectHbcuCandidates({
+    rows: hbcuRows,
+    researched,
+    now,
+    sourceUrl,
+  });
+
+  return {
+    metadata: {
+      sourceProgramId: 'us-ed-hbcu',
+      sourceProgramName:
+        'U.S. Department of Education accredited HBCU roster (NCES IPEDS HD2024, HBCU=1)',
+      custodian: 'National Center for Education Statistics (NCES) / U.S. Department of Education',
+      license: rights,
+      canonicalUrl: HBCU_CATALOG_URL,
+      sourceCaptures: [capture],
+      methodologyNotes: [
+        RESEARCH_LANE_NOTE,
+        'Deterministic import: no LLM classification, geocoding, or text generation.',
+        `Live source: ${IPEDS_HD2024_ZIP} (${IPEDS_HD2024_CSV}, HBCU=1 and CYACTIVE=1).`,
+        'Roster verifies HBCU accreditation status only — not founding dates or historical claims.',
+        'Deduped against researched entities in fixtures/national-catalog/hbcu.json by canonical name and state.',
+        'NCES campus coordinates are candidate-only; enrich history from institutional archives and primary sources.',
+        fromFixture
+          ? `Replayed from git-durable fixture ${HBCU_FIXTURE_CSV.slice(REPO_ROOT.length + 1)}.`
+          : `Git-durable HBCU-row snapshot written to ${HBCU_FIXTURE_CSV.slice(REPO_ROOT.length + 1)} for offline replay (--from-fixture).`,
+      ],
+    },
+    rowsFetched: hbcuRows.length,
+    dropped,
+    candidates,
+  };
+}
+
 // --- Entry point -----------------------------------------------------------
 
 async function main(): Promise<void> {
   const lane = arg('lane');
-  if (lane !== 'greenbook' && lane !== 'dc-sites') {
-    console.error('Usage: import-bulk-source-programs.ts --lane=greenbook|dc-sites');
+  const fromFixture = process.argv.includes('--from-fixture');
+  if (lane !== 'greenbook' && lane !== 'dc-sites' && lane !== 'hbcu') {
+    console.error('Usage: import-bulk-source-programs.ts --lane=greenbook|dc-sites|hbcu [--from-fixture]');
     process.exit(2);
   }
   const now = new Date().toISOString();
-  const result = lane === 'greenbook' ? await runGreenbookLane(now) : await runDcSitesLane(now);
+  const result =
+    lane === 'greenbook'
+      ? await runGreenbookLane(now)
+      : lane === 'dc-sites'
+        ? await runDcSitesLane(now)
+        : await runHbcuLane(now, fromFixture);
 
   const ids = new Set(result.candidates.map((candidate) => candidate.id));
   if (ids.size !== result.candidates.length) {
@@ -601,7 +1006,9 @@ async function main(): Promise<void> {
   console.log(`Wrote ${outPath}`);
 }
 
-main().catch((error: unknown) => {
-  console.error(error);
-  process.exit(1);
-});
+if (process.argv.some((argument) => argument.startsWith('--lane='))) {
+  main().catch((error: unknown) => {
+    console.error(error);
+    process.exit(1);
+  });
+}

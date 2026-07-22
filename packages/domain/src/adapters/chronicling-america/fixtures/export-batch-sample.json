@@ -1,0 +1,20 @@
+[
+  {
+    "stableIdentifier": "ca:sn83045462:1922-12-26:ed-1:sp=22",
+    "title": "The Chicago Defender (Chicago, Ill.) 1922-12-26",
+    "canonicalUrl": "https://www.loc.gov/resource/sn83045462/1922-12-26/ed-1/?sp=22",
+    "classification": "primary_archival",
+    "lccn": "sn83045462",
+    "displayDate": "1922-12-26",
+    "publicationTitle": "The Chicago Defender",
+    "publicationPlace": "Chicago, Illinois",
+    "subjects": ["african americans", "newspapers"],
+    "location": ["illinois", "chicago"],
+    "full_text": "OCR bulk that must be stripped before persistence"
+  },
+  {
+    "stableIdentifier": "ca:reject-short",
+    "title": "X",
+    "classification": "primary_archival"
+  }
+]

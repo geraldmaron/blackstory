@@ -1,0 +1,23 @@
+{
+  "id": "BB-F-999999",
+  "predicate": "test_predicate",
+  "object": "Test object",
+  "confidenceScore": 0.6,
+  "confidenceLevel": "medium",
+  "citation": {
+    "source": "Test source",
+    "label": "Test label"
+  },
+  "sourceLineage": {
+    "independentLineageCount": 2,
+    "supportingEvidenceCount": 5,
+    "contradictingEvidenceCount": 1
+  },
+  "researchCoverage": {
+    "level": "partial",
+    "notes": "Internal researcher notes not for public display."
+  },
+  "relevanceNote": "Internal free-text rationale kept off the public claim shape.",
+  "connectionStrengthNote": "Internal free-text rationale kept off the public claim shape.",
+  "reviewerId": "usr_internal_7"
+}

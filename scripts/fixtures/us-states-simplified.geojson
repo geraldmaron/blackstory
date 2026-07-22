@@ -1,0 +1,1847 @@
+{
+  "type": "FeatureCollection",
+  "name": "us-states-simplified",
+  "properties": {
+    "source": "us-geography-module-bbox",
+    "sourceVersion": "geo-integrity-v2-all-states",
+    "note": "Coarse bounding-box rectangles for dry-run validation only; not survey-grade boundaries."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-01",
+        "name": "Alabama",
+        "state_fips": "01",
+        "postalCode": "AL"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -88.5,
+              30.1
+            ],
+            [
+              -84.9,
+              30.1
+            ],
+            [
+              -84.9,
+              35
+            ],
+            [
+              -88.5,
+              35
+            ],
+            [
+              -88.5,
+              30.1
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-02",
+        "name": "Alaska",
+        "state_fips": "02",
+        "postalCode": "AK"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -179.9,
+              51
+            ],
+            [
+              -129.9,
+              51
+            ],
+            [
+              -129.9,
+              71.5
+            ],
+            [
+              -179.9,
+              71.5
+            ],
+            [
+              -179.9,
+              51
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-04",
+        "name": "Arizona",
+        "state_fips": "04",
+        "postalCode": "AZ"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -114.9,
+              31.3
+            ],
+            [
+              -109,
+              31.3
+            ],
+            [
+              -109,
+              37
+            ],
+            [
+              -114.9,
+              37
+            ],
+            [
+              -114.9,
+              31.3
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-05",
+        "name": "Arkansas",
+        "state_fips": "05",
+        "postalCode": "AR"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -94.7,
+              33
+            ],
+            [
+              -89.6,
+              33
+            ],
+            [
+              -89.6,
+              36.5
+            ],
+            [
+              -94.7,
+              36.5
+            ],
+            [
+              -94.7,
+              33
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-06",
+        "name": "California",
+        "state_fips": "06",
+        "postalCode": "CA"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -124.5,
+              32.5
+            ],
+            [
+              -114.1,
+              32.5
+            ],
+            [
+              -114.1,
+              42
+            ],
+            [
+              -124.5,
+              42
+            ],
+            [
+              -124.5,
+              32.5
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-08",
+        "name": "Colorado",
+        "state_fips": "08",
+        "postalCode": "CO"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -109.1,
+              37
+            ],
+            [
+              -102,
+              37
+            ],
+            [
+              -102,
+              41
+            ],
+            [
+              -109.1,
+              41
+            ],
+            [
+              -109.1,
+              37
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-09",
+        "name": "Connecticut",
+        "state_fips": "09",
+        "postalCode": "CT"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.8,
+              40.95
+            ],
+            [
+              -71.75,
+              40.95
+            ],
+            [
+              -71.75,
+              42.05
+            ],
+            [
+              -73.8,
+              42.05
+            ],
+            [
+              -73.8,
+              40.95
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-10",
+        "name": "Delaware",
+        "state_fips": "10",
+        "postalCode": "DE"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -75.8,
+              38.4
+            ],
+            [
+              -75,
+              38.4
+            ],
+            [
+              -75,
+              39.85
+            ],
+            [
+              -75.8,
+              39.85
+            ],
+            [
+              -75.8,
+              38.4
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-11",
+        "name": "District of Columbia",
+        "state_fips": "11",
+        "postalCode": "DC"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -77.12,
+              38.79
+            ],
+            [
+              -76.9,
+              38.79
+            ],
+            [
+              -76.9,
+              39
+            ],
+            [
+              -77.12,
+              39
+            ],
+            [
+              -77.12,
+              38.79
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-12",
+        "name": "Florida",
+        "state_fips": "12",
+        "postalCode": "FL"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -87.65,
+              24.4
+            ],
+            [
+              -80,
+              24.4
+            ],
+            [
+              -80,
+              31
+            ],
+            [
+              -87.65,
+              31
+            ],
+            [
+              -87.65,
+              24.4
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-13",
+        "name": "Georgia",
+        "state_fips": "13",
+        "postalCode": "GA"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -85.7,
+              30.35
+            ],
+            [
+              -80.8,
+              30.35
+            ],
+            [
+              -80.8,
+              35
+            ],
+            [
+              -85.7,
+              35
+            ],
+            [
+              -85.7,
+              30.35
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-15",
+        "name": "Hawaii",
+        "state_fips": "15",
+        "postalCode": "HI"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -160.3,
+              18.9
+            ],
+            [
+              -154.8,
+              18.9
+            ],
+            [
+              -154.8,
+              22.3
+            ],
+            [
+              -160.3,
+              22.3
+            ],
+            [
+              -160.3,
+              18.9
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-16",
+        "name": "Idaho",
+        "state_fips": "16",
+        "postalCode": "ID"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -117.3,
+              41.99
+            ],
+            [
+              -111,
+              41.99
+            ],
+            [
+              -111,
+              49
+            ],
+            [
+              -117.3,
+              49
+            ],
+            [
+              -117.3,
+              41.99
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-17",
+        "name": "Illinois",
+        "state_fips": "17",
+        "postalCode": "IL"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -91.55,
+              36.97
+            ],
+            [
+              -87,
+              36.97
+            ],
+            [
+              -87,
+              42.51
+            ],
+            [
+              -91.55,
+              42.51
+            ],
+            [
+              -91.55,
+              36.97
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-18",
+        "name": "Indiana",
+        "state_fips": "18",
+        "postalCode": "IN"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -88.1,
+              37.77
+            ],
+            [
+              -84.78,
+              37.77
+            ],
+            [
+              -84.78,
+              41.76
+            ],
+            [
+              -88.1,
+              41.76
+            ],
+            [
+              -88.1,
+              37.77
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-19",
+        "name": "Iowa",
+        "state_fips": "19",
+        "postalCode": "IA"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -96.64,
+              40.37
+            ],
+            [
+              -90.14,
+              40.37
+            ],
+            [
+              -90.14,
+              43.5
+            ],
+            [
+              -96.64,
+              43.5
+            ],
+            [
+              -96.64,
+              40.37
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-20",
+        "name": "Kansas",
+        "state_fips": "20",
+        "postalCode": "KS"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -102.1,
+              36.99
+            ],
+            [
+              -94.6,
+              36.99
+            ],
+            [
+              -94.6,
+              40
+            ],
+            [
+              -102.1,
+              40
+            ],
+            [
+              -102.1,
+              36.99
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-21",
+        "name": "Kentucky",
+        "state_fips": "21",
+        "postalCode": "KY"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -89.6,
+              36.5
+            ],
+            [
+              -81.96,
+              36.5
+            ],
+            [
+              -81.96,
+              39.15
+            ],
+            [
+              -89.6,
+              39.15
+            ],
+            [
+              -89.6,
+              36.5
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-22",
+        "name": "Louisiana",
+        "state_fips": "22",
+        "postalCode": "LA"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -94.05,
+              28.9
+            ],
+            [
+              -88.75,
+              28.9
+            ],
+            [
+              -88.75,
+              33.02
+            ],
+            [
+              -94.05,
+              33.02
+            ],
+            [
+              -94.05,
+              28.9
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-23",
+        "name": "Maine",
+        "state_fips": "23",
+        "postalCode": "ME"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.1,
+              42.95
+            ],
+            [
+              -66.9,
+              42.95
+            ],
+            [
+              -66.9,
+              47.46
+            ],
+            [
+              -71.1,
+              47.46
+            ],
+            [
+              -71.1,
+              42.95
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-24",
+        "name": "Maryland",
+        "state_fips": "24",
+        "postalCode": "MD"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -79.49,
+              37.9
+            ],
+            [
+              -75.05,
+              37.9
+            ],
+            [
+              -75.05,
+              39.72
+            ],
+            [
+              -79.49,
+              39.72
+            ],
+            [
+              -79.49,
+              37.9
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-25",
+        "name": "Massachusetts",
+        "state_fips": "25",
+        "postalCode": "MA"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.51,
+              41.24
+            ],
+            [
+              -69.86,
+              41.24
+            ],
+            [
+              -69.86,
+              42.89
+            ],
+            [
+              -73.51,
+              42.89
+            ],
+            [
+              -73.51,
+              41.24
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-26",
+        "name": "Michigan",
+        "state_fips": "26",
+        "postalCode": "MI"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -90.42,
+              41.7
+            ],
+            [
+              -82.12,
+              41.7
+            ],
+            [
+              -82.12,
+              48.31
+            ],
+            [
+              -90.42,
+              48.31
+            ],
+            [
+              -90.42,
+              41.7
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-27",
+        "name": "Minnesota",
+        "state_fips": "27",
+        "postalCode": "MN"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -97.24,
+              43.5
+            ],
+            [
+              -89.49,
+              43.5
+            ],
+            [
+              -89.49,
+              49.38
+            ],
+            [
+              -97.24,
+              49.38
+            ],
+            [
+              -97.24,
+              43.5
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-28",
+        "name": "Mississippi",
+        "state_fips": "28",
+        "postalCode": "MS"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -91.66,
+              30.17
+            ],
+            [
+              -88.1,
+              30.17
+            ],
+            [
+              -88.1,
+              35
+            ],
+            [
+              -91.66,
+              35
+            ],
+            [
+              -91.66,
+              30.17
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-29",
+        "name": "Missouri",
+        "state_fips": "29",
+        "postalCode": "MO"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -95.77,
+              35.99
+            ],
+            [
+              -89.1,
+              35.99
+            ],
+            [
+              -89.1,
+              40.61
+            ],
+            [
+              -95.77,
+              40.61
+            ],
+            [
+              -95.77,
+              35.99
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-30",
+        "name": "Montana",
+        "state_fips": "30",
+        "postalCode": "MT"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -116.05,
+              44.36
+            ],
+            [
+              -104.04,
+              44.36
+            ],
+            [
+              -104.04,
+              49
+            ],
+            [
+              -116.05,
+              49
+            ],
+            [
+              -116.05,
+              44.36
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-31",
+        "name": "Nebraska",
+        "state_fips": "31",
+        "postalCode": "NE"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -104.05,
+              40
+            ],
+            [
+              -95.31,
+              40
+            ],
+            [
+              -95.31,
+              43
+            ],
+            [
+              -104.05,
+              43
+            ],
+            [
+              -104.05,
+              40
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-32",
+        "name": "Nevada",
+        "state_fips": "32",
+        "postalCode": "NV"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -120,
+              35
+            ],
+            [
+              -114.04,
+              35
+            ],
+            [
+              -114.04,
+              42
+            ],
+            [
+              -120,
+              42
+            ],
+            [
+              -120,
+              35
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-33",
+        "name": "New Hampshire",
+        "state_fips": "33",
+        "postalCode": "NH"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -72.56,
+              42.7
+            ],
+            [
+              -70.61,
+              42.7
+            ],
+            [
+              -70.61,
+              45.31
+            ],
+            [
+              -72.56,
+              45.31
+            ],
+            [
+              -72.56,
+              42.7
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-34",
+        "name": "New Jersey",
+        "state_fips": "34",
+        "postalCode": "NJ"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -75.56,
+              38.93
+            ],
+            [
+              -73.9,
+              38.93
+            ],
+            [
+              -73.9,
+              41.36
+            ],
+            [
+              -75.56,
+              41.36
+            ],
+            [
+              -75.56,
+              38.93
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-35",
+        "name": "New Mexico",
+        "state_fips": "35",
+        "postalCode": "NM"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -109.05,
+              31.33
+            ],
+            [
+              -103,
+              31.33
+            ],
+            [
+              -103,
+              37
+            ],
+            [
+              -109.05,
+              37
+            ],
+            [
+              -109.05,
+              31.33
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-36",
+        "name": "New York",
+        "state_fips": "36",
+        "postalCode": "NY"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -79.76,
+              40.5
+            ],
+            [
+              -71.85,
+              40.5
+            ],
+            [
+              -71.85,
+              45.02
+            ],
+            [
+              -79.76,
+              45.02
+            ],
+            [
+              -79.76,
+              40.5
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-37",
+        "name": "North Carolina",
+        "state_fips": "37",
+        "postalCode": "NC"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -84.32,
+              33.84
+            ],
+            [
+              -75.46,
+              33.84
+            ],
+            [
+              -75.46,
+              36.59
+            ],
+            [
+              -84.32,
+              36.59
+            ],
+            [
+              -84.32,
+              33.84
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-38",
+        "name": "North Dakota",
+        "state_fips": "38",
+        "postalCode": "ND"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -104.05,
+              45.94
+            ],
+            [
+              -96.55,
+              45.94
+            ],
+            [
+              -96.55,
+              49
+            ],
+            [
+              -104.05,
+              49
+            ],
+            [
+              -104.05,
+              45.94
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-39",
+        "name": "Ohio",
+        "state_fips": "39",
+        "postalCode": "OH"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -84.82,
+              38.4
+            ],
+            [
+              -80.52,
+              38.4
+            ],
+            [
+              -80.52,
+              41.98
+            ],
+            [
+              -84.82,
+              41.98
+            ],
+            [
+              -84.82,
+              38.4
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-40",
+        "name": "Oklahoma",
+        "state_fips": "40",
+        "postalCode": "OK"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -103,
+              33.62
+            ],
+            [
+              -94.43,
+              33.62
+            ],
+            [
+              -94.43,
+              37
+            ],
+            [
+              -103,
+              37
+            ],
+            [
+              -103,
+              33.62
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-41",
+        "name": "Oregon",
+        "state_fips": "41",
+        "postalCode": "OR"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -124.57,
+              41.99
+            ],
+            [
+              -116.46,
+              41.99
+            ],
+            [
+              -116.46,
+              46.29
+            ],
+            [
+              -124.57,
+              46.29
+            ],
+            [
+              -124.57,
+              41.99
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-42",
+        "name": "Pennsylvania",
+        "state_fips": "42",
+        "postalCode": "PA"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -80.52,
+              39.72
+            ],
+            [
+              -74.69,
+              39.72
+            ],
+            [
+              -74.69,
+              42.27
+            ],
+            [
+              -80.52,
+              42.27
+            ],
+            [
+              -80.52,
+              39.72
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-44",
+        "name": "Rhode Island",
+        "state_fips": "44",
+        "postalCode": "RI"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.86,
+              41.15
+            ],
+            [
+              -71.12,
+              41.15
+            ],
+            [
+              -71.12,
+              42.02
+            ],
+            [
+              -71.86,
+              42.02
+            ],
+            [
+              -71.86,
+              41.15
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-45",
+        "name": "South Carolina",
+        "state_fips": "45",
+        "postalCode": "SC"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -83.35,
+              32.03
+            ],
+            [
+              -78.49,
+              32.03
+            ],
+            [
+              -78.49,
+              35.22
+            ],
+            [
+              -83.35,
+              35.22
+            ],
+            [
+              -83.35,
+              32.03
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-46",
+        "name": "South Dakota",
+        "state_fips": "46",
+        "postalCode": "SD"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -104.06,
+              42.48
+            ],
+            [
+              -96.44,
+              42.48
+            ],
+            [
+              -96.44,
+              45.95
+            ],
+            [
+              -104.06,
+              45.95
+            ],
+            [
+              -104.06,
+              42.48
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-47",
+        "name": "Tennessee",
+        "state_fips": "47",
+        "postalCode": "TN"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -90.31,
+              34.98
+            ],
+            [
+              -81.65,
+              34.98
+            ],
+            [
+              -81.65,
+              36.68
+            ],
+            [
+              -90.31,
+              36.68
+            ],
+            [
+              -90.31,
+              34.98
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-48",
+        "name": "Texas",
+        "state_fips": "48",
+        "postalCode": "TX"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -106.65,
+              25.84
+            ],
+            [
+              -93.51,
+              25.84
+            ],
+            [
+              -93.51,
+              36.5
+            ],
+            [
+              -106.65,
+              36.5
+            ],
+            [
+              -106.65,
+              25.84
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-49",
+        "name": "Utah",
+        "state_fips": "49",
+        "postalCode": "UT"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -114.05,
+              36.99
+            ],
+            [
+              -109.04,
+              36.99
+            ],
+            [
+              -109.04,
+              42
+            ],
+            [
+              -114.05,
+              42
+            ],
+            [
+              -114.05,
+              36.99
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-50",
+        "name": "Vermont",
+        "state_fips": "50",
+        "postalCode": "VT"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.44,
+              42.73
+            ],
+            [
+              -71.46,
+              42.73
+            ],
+            [
+              -71.46,
+              45.02
+            ],
+            [
+              -73.44,
+              45.02
+            ],
+            [
+              -73.44,
+              42.73
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-51",
+        "name": "Virginia",
+        "state_fips": "51",
+        "postalCode": "VA"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -83.68,
+              36.54
+            ],
+            [
+              -75.24,
+              36.54
+            ],
+            [
+              -75.24,
+              39.47
+            ],
+            [
+              -83.68,
+              39.47
+            ],
+            [
+              -83.68,
+              36.54
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-53",
+        "name": "Washington",
+        "state_fips": "53",
+        "postalCode": "WA"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -124.79,
+              45.54
+            ],
+            [
+              -116.92,
+              45.54
+            ],
+            [
+              -116.92,
+              49
+            ],
+            [
+              -124.79,
+              49
+            ],
+            [
+              -124.79,
+              45.54
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-54",
+        "name": "West Virginia",
+        "state_fips": "54",
+        "postalCode": "WV"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -82.65,
+              37.2
+            ],
+            [
+              -77.72,
+              37.2
+            ],
+            [
+              -77.72,
+              40.64
+            ],
+            [
+              -82.65,
+              40.64
+            ],
+            [
+              -82.65,
+              37.2
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-55",
+        "name": "Wisconsin",
+        "state_fips": "55",
+        "postalCode": "WI"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -92.89,
+              42.49
+            ],
+            [
+              -86.8,
+              42.49
+            ],
+            [
+              -86.8,
+              47.08
+            ],
+            [
+              -92.89,
+              47.08
+            ],
+            [
+              -92.89,
+              42.49
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "us-56",
+        "name": "Wyoming",
+        "state_fips": "56",
+        "postalCode": "WY"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -111.06,
+              40.99
+            ],
+            [
+              -104.05,
+              40.99
+            ],
+            [
+              -104.05,
+              45.01
+            ],
+            [
+              -111.06,
+              45.01
+            ],
+            [
+              -111.06,
+              40.99
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

@@ -51,8 +51,11 @@ export type {
 export {
   RATE_LIMIT_POLICY_VERSION,
   DEFAULT_ENDPOINT_QUOTA_MATRIX,
+  OUTAGE_DEGRADED_QUOTA_FACTOR,
+  deriveOutageDegradedPolicy,
   endpointClasses,
   rateLimitSubjects,
+  appCheckAvailabilityStates,
   safeRetryAfter,
   formatRateLimitResponse,
   aggregateRiskScore,
@@ -70,6 +73,7 @@ export {
 export type {
   RateLimitSubject,
   EndpointClass,
+  AppCheckAvailability,
   RiskSignalKind,
   RiskSignal,
   QuotaDenialReason,
@@ -87,6 +91,22 @@ export type {
   RateLimitHttpResponse,
   DistributedRiskAggregation,
 } from './rate-limits.js';
+
+export {
+  CLIENT_VERSION_HEADER,
+  createClientAttestationGuard,
+  isClientAttested,
+  parseClientAttestationMode,
+  parseClientVersionHeader,
+} from './client-attestation.js';
+export type {
+  ClientAttestationDecision,
+  ClientAttestationHeaders,
+  ClientAttestationMode,
+  ClientAttestationReason,
+  ClientAttestationTelemetry,
+  ClientAttestationTelemetryEvent,
+} from './client-attestation.js';
 
 export {
   QUERY_GUARDRAIL_POLICY_VERSION,

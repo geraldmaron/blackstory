@@ -247,12 +247,16 @@
 .ds-about-mast {
   position: relative;
   isolation: isolate;
-  min-height: min(78vh, 40rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: min(82vh, 44rem);
   margin: 0;
   padding-block: var(--ds-space-16) var(--ds-space-12);
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  /* Mosaic atmosphere stays charcoal; the copy plate follows theme. */
   background: var(--ds-fixed-charcoal);
-  color: var(--ds-fixed-paper);
+  color: var(--ds-ink);
   overflow: hidden;
 }
 
@@ -263,7 +267,7 @@
 .ds-about-mast .ds-atmosphere__mosaic--living {
   /* Fill mode owns row sizing — do not stretch incomplete auto-rows. */
   grid-auto-rows: unset;
-  /* Even wash — legibility comes from the copy plate, not a side scrim. */
+  /* Even wash — legibility comes from the opaque theme plate, not a side scrim. */
   opacity: 0.28;
 }
 
@@ -275,48 +279,59 @@
 .ds-about-mast__inner {
   position: relative;
   z-index: 2;
+  width: 100%;
   /* Let mosaic tiles remain clickable beside the thesis plate. */
   pointer-events: none;
 }
 
 /*
- * Thesis sits on opaque fixed-ink (v5 a11y floor): paper / stone / copper-dark
- * pairs only — never translucent type over variable mosaic luminance.
+ * Thesis plate — opaque theme surface over mosaic (WCAG AA floor).
+ * Light: Surface / Black Ink / Stone; dark: Charcoal surface / paper ink.
+ * Width stays a composition block (~2/3 of the grid), not a skinny strip.
  */
 .ds-about-mast__copy {
-  max-width: 36rem;
+  width: min(100%, 56rem);
+  max-width: 56rem;
   /* Extra block-end room for wrapped mosaic credit + link underline/descenders. */
-  padding-block: var(--ds-space-6) var(--ds-space-8);
-  padding-inline: var(--ds-space-6);
-  background: var(--ds-fixed-ink);
-  color: var(--ds-fixed-paper);
+  padding-block: var(--ds-space-8) var(--ds-space-10);
+  padding-inline: clamp(var(--ds-space-5), 3vw, var(--ds-space-10));
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+  border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-md);
   pointer-events: auto;
   overflow: visible;
 }
 
 .ds-about-mast .ds-page__eyebrow {
-  color: var(--ds-fixed-accent);
+  color: var(--ds-accent);
 }
 
 .ds-about-mast .ds-page__eyebrow::before {
-  background: var(--ds-fixed-accent);
+  background: var(--ds-accent-graphic);
 }
 
 .ds-about-mast .ds-page__title {
-  color: var(--ds-fixed-paper);
-  margin-top: var(--ds-space-4);
-  font-size: clamp(2rem, 1.6rem + 2vw, 3rem);
+  color: var(--ds-ink);
+  margin-top: var(--ds-space-5);
+  font-weight: 600;
+  font-size: clamp(1.875rem, 1.45rem + 2vw, 3.25rem);
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .ds-about-mast .ds-page__title em {
-  color: var(--ds-fixed-accent);
+  color: var(--ds-accent);
 }
 
 .ds-about-mast .ds-page__lede {
-  /* Solid paper on ink — do not fade below AA against fixed-ink. */
-  color: var(--ds-fixed-paper);
-  max-width: 32rem;
+  color: var(--ds-ink-muted);
+  max-width: none;
+  margin-top: var(--ds-space-5);
+  font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
+  line-height: 1.6;
 }
 
 .ds-about-mast__actions {
@@ -327,29 +342,19 @@
   margin-top: var(--ds-space-8);
 }
 
-.ds-about-mast .ds-cta--quiet {
-  color: var(--ds-fixed-paper);
-  border-color: color-mix(in srgb, var(--ds-fixed-paper) 45%, transparent);
-}
-
-.ds-about-mast .ds-cta--quiet:hover,
-.ds-about-mast .ds-cta--quiet:focus-visible {
-  border-color: var(--ds-fixed-paper);
-  color: var(--ds-fixed-paper);
-}
-
 .ds-about-mast__credit {
   margin: var(--ds-space-8) 0 0;
+  padding-top: var(--ds-space-5);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
   font-family: var(--ds-font-mono);
   font-size: 0.6875rem;
   letter-spacing: 0.04em;
   line-height: 1.55;
-  /* Fixed stone on dark surfaces is the light stone token (AA on ink). */
-  color: var(--ds-fixed-stone);
+  color: var(--ds-ink-muted);
 }
 
 .ds-about-mast__credit a {
-  color: var(--ds-fixed-stone);
+  color: var(--ds-ink-muted);
   text-decoration: underline;
   text-decoration-skip-ink: auto;
   text-underline-offset: 0.15em;
@@ -357,29 +362,37 @@
 
 .ds-about-mast__credit a:hover,
 .ds-about-mast__credit a:focus-visible {
-  color: var(--ds-fixed-paper);
+  color: var(--ds-ink);
 }
 
 .ds-about-mast__credit a:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-fixed-accent);
+  outline: var(--ds-focus-width) solid var(--ds-accent-graphic);
   outline-offset: var(--ds-focus-offset);
   border-radius: var(--ds-radius-sm);
 }
 
 .ds-about__body {
-  padding-block: var(--ds-space-12) 0;
+  padding-block: var(--ds-space-16) 0;
+  display: grid;
+  gap: var(--ds-space-16);
 }
 
 .ds-about__pillars-intro {
-  max-width: 40rem;
+  max-width: 48rem;
   margin-bottom: var(--ds-space-10);
 }
 
 .ds-about__pillars-title {
   font-weight: 600;
-  font-size: clamp(1.5rem, 1.3rem + 1vw, 2.125rem);
-  letter-spacing: -0.03em;
-  line-height: 1.1;
+  font-size: clamp(1.625rem, 1.35rem + 1.1vw, 2.25rem);
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+}
+
+.ds-about__pillars .ds-section__lede {
+  max-width: 44rem;
+  margin-top: var(--ds-space-5);
+  font-size: clamp(1.05rem, 1rem + 0.2vw, 1.125rem);
 }
 
 .ds-about__pillar-list {
@@ -402,15 +415,20 @@
   display: grid;
   gap: var(--ds-space-3);
   align-content: start;
-  padding: var(--ds-space-6) var(--ds-space-6) var(--ds-space-6) 0;
+  padding: var(--ds-space-8) 0;
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
 }
 
 @media (min-width: 48rem) {
   .ds-about__pillar {
-    padding: var(--ds-space-6) var(--ds-space-6) var(--ds-space-8) 0;
+    /* Symmetric gutters so columns 02/03 never sit flush on the hairline. */
+    padding: var(--ds-space-8) var(--ds-space-8) var(--ds-space-10);
     border-bottom: 0;
     border-right: var(--ds-border-width) solid var(--ds-rule);
+  }
+
+  .ds-about__pillar:first-child {
+    padding-left: 0;
   }
 
   .ds-about__pillar:last-child {
@@ -432,7 +450,7 @@
   margin: 0;
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -442,83 +460,168 @@
   margin: 0;
   font-family: var(--ds-font-display);
   font-weight: 600;
-  font-size: clamp(1.125rem, 1.05rem + 0.4vw, 1.375rem);
-  letter-spacing: -0.02em;
-  line-height: 1.25;
+  font-size: clamp(1.1875rem, 1.1rem + 0.45vw, 1.5rem);
+  letter-spacing: -0.025em;
+  line-height: 1.2;
 }
 
 .ds-about__pillar-body {
   margin: 0;
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-editorial);
-  font-size: 0.9875rem;
+  font-size: 1.05rem;
   line-height: 1.6;
 }
 
+/* Mission beats — mono index rail + editorial column on wide viewports */
 .ds-about__beats {
-  margin-top: var(--ds-space-16);
   display: grid;
-  gap: var(--ds-space-12);
+  gap: 0;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
 }
 
 .ds-about__beat {
-  max-width: 40rem;
+  display: grid;
+  gap: var(--ds-space-4);
+  max-width: none;
+  padding-block: var(--ds-space-10);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+@media (min-width: 48rem) {
+  .ds-about__beat {
+    grid-template-columns: 5rem minmax(0, 1fr);
+    column-gap: var(--ds-space-10);
+    align-items: start;
+    padding-block: var(--ds-space-12);
+  }
 }
 
 .ds-about__beat-index {
   margin: 0;
   color: var(--ds-accent);
   font-size: 0.75rem;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
 }
 
 .ds-about__beat-title {
-  margin: var(--ds-space-3) 0 0;
+  margin: 0;
   font-family: var(--ds-font-display);
-  font-weight: 500;
-  font-size: clamp(1.5rem, 1.3rem + 1vw, 2rem);
-  letter-spacing: -0.03em;
-  line-height: 1.15;
+  font-weight: 600;
+  font-size: clamp(1.5rem, 1.3rem + 1vw, 2.125rem);
+  letter-spacing: -0.035em;
+  line-height: 1.12;
+  max-width: 36rem;
 }
 
 .ds-about__beat-body {
-  margin: var(--ds-space-5) 0 0;
+  margin: var(--ds-space-4) 0 0;
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-editorial);
-  font-size: clamp(1.05rem, 1rem + 0.2vw, 1.125rem);
+  font-size: clamp(1.0625rem, 1.02rem + 0.2vw, 1.1875rem);
   line-height: 1.65;
+  max-width: 48rem;
 }
 
+@media (min-width: 48rem) {
+  .ds-about__beat-title,
+  .ds-about__beat-body {
+    grid-column: 2;
+  }
+
+  .ds-about__beat-index {
+    grid-row: 1 / span 2;
+    padding-top: 0.35rem;
+  }
+}
+
+/*
+ * Publish bar — theme-following surface band (not a forever-dark island).
+ * Light: Surface on Archive Paper page; dark: Charcoal surface on ink canvas.
+ * Copper stays on the kicker only; CTAs use the shared themed .ds-cta recipe.
+ */
 .ds-about__band {
-  margin-top: var(--ds-space-16);
-  padding-block: var(--ds-space-12);
+  margin-top: 0;
+  padding-block: var(--ds-space-16);
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+  border-block: var(--ds-border-width) solid var(--ds-rule);
 }
 
-.ds-about__destinations {
-  margin-top: var(--ds-space-16);
+.ds-about__band .ds-section__kicker {
+  color: var(--ds-accent);
+}
+
+.ds-about__band .ds-section__kicker::before {
+  background: var(--ds-accent-graphic);
+}
+
+.ds-about__band .ds-section__title {
+  color: var(--ds-ink);
+  font-weight: 600;
+  font-size: clamp(1.5rem, 1.3rem + 1vw, 2.125rem);
+  letter-spacing: -0.035em;
+  max-width: 40rem;
+}
+
+.ds-about__band .ds-section__lede {
+  color: var(--ds-ink-muted);
+  max-width: 48rem;
+  font-size: clamp(1.05rem, 1rem + 0.2vw, 1.125rem);
+}
+
+.ds-about__band-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-4);
+  margin: var(--ds-space-8) 0 0;
+}
+
+.ds-about__destinations .ds-section__title {
+  font-weight: 600;
+  font-size: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+  letter-spacing: -0.03em;
 }
 
 .ds-about__dest-list {
   list-style: none;
-  margin: var(--ds-space-8) 0 0;
+  margin: var(--ds-space-10) 0 0;
   padding: 0;
+  display: grid;
+  gap: 0;
+  border-top: var(--ds-border-width-strong) solid var(--ds-ink);
+}
+
+@media (min-width: 48rem) {
+  .ds-about__dest-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .ds-about__dest {
-  border-top: var(--ds-border-width) solid var(--ds-rule);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
 }
 
-.ds-about__dest:last-child {
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+@media (min-width: 48rem) {
+  .ds-about__dest:nth-child(odd) {
+    padding-right: var(--ds-space-8);
+    border-right: var(--ds-border-width) solid var(--ds-rule);
+  }
+
+  .ds-about__dest:nth-child(even) {
+    padding-left: var(--ds-space-8);
+  }
 }
 
 .ds-about__dest-link {
   display: grid;
   gap: var(--ds-space-2);
-  padding-block: var(--ds-space-5);
+  padding-block: var(--ds-space-6);
   color: inherit;
   text-decoration: none;
   min-height: 44px;
+  transition: color var(--ds-duration-fast) var(--ds-easing);
 }
 
 .ds-about__dest-link:hover .ds-about__dest-label,
@@ -527,63 +630,94 @@
 }
 
 .ds-about__dest-link:focus-visible {
-  outline: 2px solid var(--ds-accent-graphic);
-  outline-offset: 2px;
+  outline: var(--ds-focus-width) solid var(--ds-accent-graphic);
+  outline-offset: var(--ds-focus-offset);
+  border-radius: var(--ds-radius-sm);
 }
 
 .ds-about__dest-label {
   font-family: var(--ds-font-display);
-  font-weight: 500;
-  font-size: 1.125rem;
+  font-weight: 600;
+  font-size: clamp(1.125rem, 1.05rem + 0.35vw, 1.3125rem);
   letter-spacing: -0.02em;
 }
 
 .ds-about__dest-detail {
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-editorial);
-  font-size: 0.9875rem;
+  font-size: 1.05rem;
   line-height: 1.55;
-  max-width: 40rem;
+  max-width: 36rem;
 }
 
 .ds-about__close {
-  margin-top: var(--ds-space-16);
-  padding-top: var(--ds-space-10);
-  border-top: var(--ds-border-width) solid var(--ds-rule);
-  max-width: 36rem;
+  padding-top: var(--ds-space-4);
+  max-width: 44rem;
 }
 
 .ds-about__close-title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-weight: 500;
-  font-size: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  font-size: clamp(1.375rem, 1.2rem + 0.7vw, 1.75rem);
+  letter-spacing: -0.03em;
+  line-height: 1.15;
 }
 
 .ds-about__close-body {
-  margin: var(--ds-space-4) 0 0;
+  margin: var(--ds-space-5) 0 0;
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-editorial);
-  font-size: 1.05rem;
+  font-size: clamp(1.05rem, 1rem + 0.2vw, 1.125rem);
   line-height: 1.65;
 }
 
+.ds-about__close .ds-about-mast__actions {
+  margin-top: var(--ds-space-8);
+}
+
 .ds-about__maker {
-  margin-top: var(--ds-space-10);
-  padding-top: var(--ds-space-6);
+  margin-top: 0;
+  padding-top: var(--ds-space-8);
   border-top: var(--ds-border-width) solid var(--ds-rule);
 }
 
 @media (max-width: 47.99rem) {
   .ds-about-mast {
-    min-height: min(70vh, 32rem);
+    min-height: min(72vh, 34rem);
+    padding-block: var(--ds-space-12) var(--ds-space-10);
+  }
+
+  /*
+   * Mobile: drop the desktop composition plate width and use the full container
+   * measure so the thesis is a readable block, not a chimney strip.
+   */
+  .ds-about-mast__inner.ds-container {
+    width: min(100% - (var(--ds-space-3) * 2), var(--ds-grid-max));
   }
 
   .ds-about-mast__copy {
+    width: 100%;
     max-width: none;
-    padding-block: var(--ds-space-5) var(--ds-space-6);
-    padding-inline: var(--ds-space-5);
+    padding-block: var(--ds-space-6) var(--ds-space-8);
+    padding-inline: var(--ds-space-4);
+  }
+
+  .ds-about-mast .ds-page__title {
+    font-size: clamp(1.75rem, 1.4rem + 3.5vw, 2.25rem);
+  }
+
+  .ds-about__body {
+    padding-block: var(--ds-space-12) 0;
+    gap: var(--ds-space-12);
+  }
+
+  .ds-about__beat {
+    padding-block: var(--ds-space-8);
+  }
+
+  .ds-about__beat-title {
+    margin-top: var(--ds-space-2);
   }
 }
 

@@ -74,6 +74,23 @@ export type {
   TrustedServiceIdentity,
   VerifiedAppCheckToken,
 } from './app-check-enforce.js';
+export {
+  DEFAULT_APP_CHECK_CIRCUIT_BREAKER_CONFIG,
+  advanceAppCheckCircuitBreaker,
+  appCheckCircuitBreakerAvailability,
+  createAppCheckCircuitBreaker,
+  recordAppCheckVerifierFailure,
+  recordAppCheckVerifierSuccess,
+} from './app-check-circuit-breaker.js';
+export type {
+  AppCheckCircuitBreaker,
+  AppCheckCircuitBreakerConfig,
+  AppCheckCircuitBreakerSnapshot,
+  AppCheckCircuitBreakerState,
+  AppCheckCircuitBreakerTelemetry,
+  AppCheckCircuitBreakerTelemetryEvent,
+  CreateAppCheckCircuitBreakerOptions,
+} from './app-check-circuit-breaker.js';
 
 export { createWebFirebaseClient } from './web-client.js';
 export type { WebFirebaseClient } from './web-client.js';
@@ -140,6 +157,7 @@ export {
   evidenceLineageSchema,
   publicationReleaseSchema,
   publicActiveReleaseSchema,
+  publicClaimProjectionSchema,
   publicEntityProjectionSchema,
   publicStorySectionSchema,
   publicStorySourceSchema,
@@ -189,6 +207,7 @@ export {
   publicReleaseSearchIndexPath,
   writeReleaseCatalogArtifactsToDir,
   uploadReleaseCatalogArtifacts,
+  fetchReleaseSearchIndexArtifact,
   submissionInboxConverter,
   auditEventConverter,
   outboxMessageConverter,
@@ -208,6 +227,9 @@ export {
   parseImmutablePublicationRelease,
   resolveActivePublicRelease,
   activatePublicationRelease,
+  createAdminFirestoreReleaseStore,
+  createFirestoreReleaseStore,
+  MOBILE_RELEASE_POINTER_PATH,
   promoteClaimToPublicationCandidate,
   RESEARCH_CASE_SERVER_ACTIONS,
   assertResearchCaseActionAuthorized,
@@ -358,6 +380,7 @@ export type {
   EvidenceLineageDoc,
   PublicationReleaseDoc,
   PublicActiveReleaseDoc,
+  PublicClaimProjectionDoc,
   PublicEntityProjectionDoc,
   PublicStorySectionDoc,
   PublicStorySourceDoc,
@@ -384,6 +407,8 @@ export type {
   ActivePublicReleasePointer,
   ActivateReleaseInput,
   ActivateReleaseResult,
+  FirestoreReleaseStore,
+  ReleaseStoreBackend,
   AcceptedPromotionDoc,
   PublicationCandidateDoc,
   PromoteClaimInput,

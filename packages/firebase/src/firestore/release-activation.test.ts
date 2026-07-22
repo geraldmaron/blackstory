@@ -18,7 +18,8 @@ type Operation =
       readonly path: string;
       readonly data: Record<string, unknown>;
     }
-  | { readonly kind: 'update'; readonly path: string; readonly data: Record<string, unknown> };
+  | { readonly kind: 'update'; readonly path: string; readonly data: Record<string, unknown> }
+  | { readonly kind: 'delete'; readonly path: string };
 
 class MemoryAtomicStore implements AtomicStore {
   private documents = new Map<string, Readonly<Record<string, unknown>>>();
@@ -51,11 +52,16 @@ class MemoryAtomicStore implements AtomicStore {
       set: (path, data) => operations.push({ kind: 'set', path, data: structuredClone(data) }),
       update: (path, data) =>
         operations.push({ kind: 'update', path, data: structuredClone(data) }),
+      delete: (path) => operations.push({ kind: 'delete', path }),
     };
 
     const result = await operation(transaction);
     const next = new Map(this.documents);
     for (const staged of operations) {
+      if (staged.kind === 'delete') {
+        next.delete(staged.path);
+        continue;
+      }
       if (staged.kind === 'create' && next.has(staged.path)) {
         throw new Error(`Document already exists: ${staged.path}`);
       }

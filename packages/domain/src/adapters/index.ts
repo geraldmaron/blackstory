@@ -103,3 +103,9 @@ export * from './nhgis/index.js';
 
 // Legal landscape adapters fixtures-first.
 export * from './legal/index.js';
+
+// NRHP Multiple Property Listings (AA curated-net) — fixtures-first, registered disabled.
+export * from './nrhp-mpl/index.js';
+
+// Chronicling America (LoC Black press / newspapers) — fixtures-first, registered disabled.
+export * from './chronicling-america/index.js';

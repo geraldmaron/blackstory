@@ -30,6 +30,34 @@ export function extractOutboundLinks(html: string, baseUrl: string): readonly st
   return [...links];
 }
 
+const INLINE_URL_PATTERN =
+  /https?:\/\/[^\s"'<>()[\]{}]+(?:\/[^\s"'<>()[\]{}]*)?/giu;
+const BARE_GOV_HOST_PATTERN =
+  /(?:[a-z0-9-]+\.)+(?:gov|mil)(?:\/[^\s"'<>()[\]{}]*)?/giu;
+
+function normalizeDiscoveredUrl(raw: string): string | undefined {
+  const trimmed = raw.replace(/[.,;:)]+$/u, '');
+  const candidate = trimmed.startsWith('http') ? trimmed : `https://${trimmed}`;
+  try {
+    const normalized = new URL(candidate).toString();
+    return normalized.startsWith('http') ? normalized : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Bare http(s) URLs in page text — heritage inventories often cite sources inline, not as links. */
+export function extractUrlsFromText(text: string): readonly string[] {
+  const urls = new Set<string>();
+  for (const pattern of [INLINE_URL_PATTERN, BARE_GOV_HOST_PATTERN]) {
+    for (const match of text.matchAll(pattern)) {
+      const normalized = normalizeDiscoveredUrl(match[0]!);
+      if (normalized) urls.add(normalized);
+    }
+  }
+  return [...urls];
+}
+
 /** Fetches `url`; returns both the raw HTML (for citation-trail extraction) and stripped text. */
 export async function fetchPage(url: string): Promise<FetchedPage | undefined> {
   const page = await safeFetchPage(url);

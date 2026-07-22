@@ -1,0 +1,34 @@
+{
+  "id": "ent_15th_st_church_001",
+  "kind": "institution",
+  "displayName": "Fifteenth Street Presbyterian Church",
+  "summary": "A Washington, D.C. congregation that hosted the founding class of a public high school in 1870.",
+  "topicTags": ["religion", "education"],
+  "jurisdictionLabel": "Washington, D.C.",
+  "locationPrecision": "institution",
+  "locationLabel": "Washington, D.C.",
+  "relevanceExplanation": "This record is served from the live public release projection. Supporting claims and evidence panels may still be sparse until the full publication pipeline lands.",
+  "historicalContext": "Live projection scaffolding — historical framing expands as curated release content is published.",
+  "recordMaturity": "projection_stub",
+  "researchCoverage": "minimal",
+  "claims": [
+    {
+      "id": "BB-F-000001",
+      "predicate": "hosted_founding_of",
+      "object": "Preparatory High School for Colored Youth",
+      "confidenceScore": 0.6,
+      "confidenceLevel": "medium",
+      "citation": {
+        "source": "Board of Trustees for Colored Schools minutes, 1870",
+        "label": "1870 board minutes"
+      }
+    }
+  ],
+  "timeline": [],
+  "revision": {
+    "releaseId": "release-bootstrap-window",
+    "generatedAt": "",
+    "recordUpdatedAt": ""
+  },
+  "relatedIds": ["ent_dunbar_school_001"]
+}

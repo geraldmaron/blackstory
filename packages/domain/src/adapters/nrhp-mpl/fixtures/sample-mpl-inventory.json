@@ -1,0 +1,45 @@
+[
+  {
+    "stableIdentifier": "nrhp-mpl:64500901",
+    "mplReference": "64500901",
+    "title": "Historic Resources of the Civil Rights Movement in Alabama, 1865-1970",
+    "canonicalUrl": "https://www.nps.gov/subjects/nationalregister/sample-mpl-64500901.htm",
+    "classification": "government_record",
+    "documentType": "multiple_property_documentation_form",
+    "theme": "civil_rights_movement",
+    "aaHeritageRelevance": "primary",
+    "thematicContext": "Places associated with voting rights, desegregation, and community organizing",
+    "coveragePeriod": "1865-1970",
+    "stateCodes": ["AL"],
+    "propertyCountEstimate": 42
+  },
+  {
+    "stableIdentifier": "nrhp-mpl:64500902",
+    "mplReference": "64500902",
+    "title": "Rosenwald Schools in Virginia, 1917-1932",
+    "canonicalUrl": "https://www.nps.gov/subjects/nationalregister/sample-mpl-64500902.htm",
+    "classification": "government_record",
+    "documentType": "multiple_property_documentation_form",
+    "theme": "rosenwald_schools",
+    "aaHeritageRelevance": "primary",
+    "thematicContext": "Public and private schools for African American students funded through the Rosenwald program",
+    "coveragePeriod": "1917-1932",
+    "stateCodes": ["VA"],
+    "propertyCountEstimate": 367
+  },
+  {
+    "stableIdentifier": "nrhp-mpl:64500903",
+    "mplReference": "64500903",
+    "title": "Historic African American Cemeteries of the South Carolina Lowcountry",
+    "canonicalUrl": "https://www.nps.gov/subjects/nationalregister/sample-mpl-64500903.htm",
+    "classification": "government_record",
+    "documentType": "multiple_property_documentation_form",
+    "theme": "african_american_cemeteries",
+    "aaHeritageRelevance": "significant",
+    "thematicContext": "Burial grounds documenting community continuity from Reconstruction through the 20th century",
+    "coveragePeriod": "1865-1965",
+    "stateCodes": ["SC"],
+    "propertyCountEstimate": 18,
+    "pdfText": "fixture-only forbidden key — must be stripped, never OCR-ingested"
+  }
+]

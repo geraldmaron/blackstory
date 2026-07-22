@@ -5,6 +5,8 @@
 import { createHash, sign as signBytes, verify as verifyBytes, type KeyLike } from 'node:crypto';
 
 export * from './release-builder.js';
+export * from './mobile-bootstrap.js';
+export * from './release-activation.js';
 
 export const RELEASE_STATUSES = [
   'draft',
@@ -154,6 +156,13 @@ export function publicEntitySnapshotPath(releaseId: string, entityId: string): s
 }
 
 export { publicReleaseEntitiesListPath, publicReleaseSearchIndexPath } from './release-paths.js';
+export {
+  supabasePublicMediaUrl,
+  gcsPublicMediaUrl,
+  resolvePublicMediaUrl,
+  PUBLIC_MEDIA_DEFAULTS,
+} from './public-media-urls.js';
+export type { PublicMediaUrlOptions } from './public-media-urls.js';
 
 function manifestToJson(manifest: ReleaseManifest): JsonValue {
   return {
@@ -320,3 +329,48 @@ export function createPublicEntitySnapshot<T extends JsonValue>(
     entity,
   });
 }
+
+export {
+  ReleaseActivationError,
+  activateRelease,
+  collectGarbage,
+  createInMemoryReleaseStore,
+  generateReleaseArtifacts,
+  rollbackTo,
+  sealArtifact,
+  validateGeneratedArtifacts,
+} from './release-activation.js';
+export type {
+  ActiveReleasePointer,
+  ActivationResult,
+  BoundedPointsBudget,
+  ContentIndexEntry,
+  GeneratedArtifact,
+  GeneratedRelease,
+  GenerateReleaseArtifactsInput,
+  GcOptions,
+  GcResult,
+  ReleaseArtifactKind,
+  ReleaseErrorCode,
+  ReleaseStore,
+  RollbackOptions,
+  StoredArtifact,
+  StoredRelease,
+} from './release-activation.js';
+export {
+  buildMobileBootstrapManifest,
+  bootstrapManifestToJson,
+} from './mobile-bootstrap.js';
+export type {
+  BuildMobileBootstrapManifestInput,
+  MobileArtifactHashRef,
+  MobileBootstrapManifest,
+} from './mobile-bootstrap.js';
+export {
+  publicReleaseBootstrapPath,
+  publicReleaseBoundedPointsPath,
+  publicReleaseContentIndexPath,
+  publicReleaseMapCountyAggregatesPath,
+  publicReleaseMapSourcePath,
+  publicReleaseMapStateAggregatesPath,
+} from './release-paths.js';

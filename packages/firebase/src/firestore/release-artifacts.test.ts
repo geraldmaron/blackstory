@@ -8,6 +8,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import {
   buildReleaseCatalogArtifacts,
+  fetchReleaseSearchIndexArtifact,
   publicMediaObjectUrl,
   writeReleaseCatalogArtifactsToDir,
 } from './release-artifacts.js';
@@ -50,9 +51,29 @@ test('writeReleaseCatalogArtifactsToDir mirrors GCS object keys on disk', () => 
   }
 });
 
-test('publicMediaObjectUrl builds the HTTPS GCS URL', () => {
+test('publicMediaObjectUrl builds the Supabase Storage HTTPS URL', () => {
   assert.equal(
     publicMediaObjectUrl('public/releases/rel_x/entities.json'),
-    'https://storage.googleapis.com/black-book-efaaf-public-media/public/releases/rel_x/entities.json',
+    'https://twykhihqkcldpreuovay.supabase.co/storage/v1/object/public/public-media/public/releases/rel_x/entities.json',
   );
+});
+
+test('fetchReleaseSearchIndexArtifact returns remote artifact when fetch succeeds', async () => {
+  const releaseId = 'rel_fetch_001';
+  const artifact = {
+    schemaVersion: 1 as const,
+    releaseId,
+    generatedAt: '2026-07-20T00:00:00.000Z',
+    docCount: 1,
+    docs: [{ id: 'ent_fetch_001', releaseId, displayName: 'Fetched' }],
+  };
+  const fetched = await fetchReleaseSearchIndexArtifact(releaseId, {
+    allowLocalFallback: false,
+    fetchImpl: async () =>
+      new Response(JSON.stringify(artifact), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      }),
+  });
+  assert.deepEqual(fetched, artifact);
 });

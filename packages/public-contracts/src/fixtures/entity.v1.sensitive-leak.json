@@ -1,0 +1,35 @@
+{
+  "id": "ent_leak_test_001",
+  "kind": "place",
+  "displayName": "Sensitive-leak fixture entity",
+  "summary": "Fixture carrying canonical/internal-only fields that must be stripped on parse.",
+  "topicTags": ["test"],
+  "jurisdictionLabel": "Test, TS",
+  "locationPrecision": "city",
+  "locationLabel": "Test, TS",
+  "relevanceExplanation": "Fixture only.",
+  "historicalContext": "Fixture only.",
+  "recordMaturity": "projection_stub",
+  "researchCoverage": "minimal",
+  "claims": [],
+  "timeline": [],
+  "revision": {
+    "releaseId": "release-fixture",
+    "generatedAt": "2026-07-19T00:00:00.000Z",
+    "recordUpdatedAt": "2026-07-19T00:00:00.000Z"
+  },
+  "notabilityScore": 87.3,
+  "relevanceRankingScore": 0.9123,
+  "preciseLocation": {
+    "streetAddress": "123 Confidential St",
+    "unit": "Apt 4",
+    "residentialGeohash": "dqcjqcxyz9"
+  },
+  "internalReviewNotes": "Flagged by moderator jane.doe@internal for second review.",
+  "sourceLineageInternal": {
+    "reviewerId": "usr_internal_42",
+    "moderationState": "pending_review",
+    "spamScore": 0.02
+  },
+  "draftOnly": true
+}

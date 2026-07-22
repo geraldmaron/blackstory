@@ -9,14 +9,20 @@ After Postgres cutover, **do not delete** production Firebase project `black-boo
 - [x] Admin desks use Postgres exclusively; legacy backend selection fails closed
 - [x] Operator-cli / quick-add / evidence commits use the Postgres-only `createLiveAtomicStoreFromEnv`
 - [x] Discovery kill switches use `bb_ops.kill_switches`; the retired scheduler has no live fallback
-- [x] Blobs intentionally remain in GCS / Firebase Storage (Postgres holds refs only)
+- [x] Blobs: Supabase Storage buckets `public-media` (public) + `raw-sources` (private) created; GCS remains dual-serve origin until copy + soak complete (see `docs/data/supabase-storage-cutover.md`)
+- [x] Public-media byte copy GCS → Supabase (`public-media` bucket; GCS retained for dual-serve)
+- [ ] Raw-sources byte copy (phase 2)
+- [x] Flip writers / collage hardcodes / release primary_image URLs to Supabase (GCS upload bucket retained for Admin SDK dual-serve)
+- [x] Pending schema: PostgREST published views + jurisdictions.location applied on `blackstory-app`
 - [x] Supabase Auth admin mode: `ADMIN_AUTH_MODE=supabase` + `NEXT_PUBLIC_ADMIN_AUTH_MODE=supabase` with `app_metadata.bb_role`
 - [x] Supabase Auth admin user exists with `app_metadata.bb_role=admin`
 - [x] Data API schemas limited to `public`, `bb_public`, `bb_submissions` (`supabase/config.toml`)
 - [x] **App Hosting cutover (2026-07-21):** Secret Manager `web-database-url`, `admin-database-url`, `admin-supabase-anon-key`; root `apphosting.yaml` / `apphosting.staging.yaml` / `apphosting.admin.yaml` set postgres + supabase auth; staging backend Environment name=`staging`
 - [ ] Supabase advisors: **Leaked password protection** still WARN — enable in Dashboard (Management API PATCH returned 403 with available PAT)
 - [x] Scheduled Cloud Functions runtime retired; Corsair/systemd is the recurring scheduler
-- [ ] Public web reads and request-integrity controls still require a separate Firebase-free cutover before the project can be archived
+- [x] **App Hosting stays on Firebase** (owner decision 2026-07-21) — public web continues on App Hosting; not part of Supabase cutover
+- [ ] Public web request-integrity / remaining Firebase-client surfaces (distinct from App Hosting host choice)
+- [x] Mobile + api-public: Firebase App Check retired; direct API callers use `X-BlackStory-Client`; Postgres is the default read path (`PUBLIC_DATA_SOURCE=postgres`)
 
 ### Owner: enable leaked password protection (HaveIBeenPwned)
 

@@ -24,6 +24,7 @@ export type AtomicTransaction = {
   create(path: string, data: Readonly<Record<string, unknown>>): void;
   set(path: string, data: Readonly<Record<string, unknown>>): void;
   update(path: string, data: Readonly<Record<string, unknown>>): void;
+  delete(path: string): void;
 };
 
 export type AtomicStore = {
@@ -120,6 +121,10 @@ export function createAdminAtomicStore(firestore: Firestore): AtomicStore {
           update(path, data) {
             assertDocumentPath(path);
             transaction.update(firestore.doc(path), data as DocumentData);
+          },
+          delete(path) {
+            assertDocumentPath(path);
+            transaction.delete(firestore.doc(path));
           },
         }),
       );

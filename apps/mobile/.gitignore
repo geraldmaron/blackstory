@@ -1,0 +1,56 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Firebase app config (App Check + Crashlytics/Perf, MOB-010/MOB-018) — real
+# credentials come from real Firebase app registrations (a human gate; see
+# docs/mobile/decisions/mobile-identity.md). Never commit the real files; wire
+# them per-environment via a config plugin (see app.config.ts) sourced from a
+# gitignored local path or an EAS file secret. See README "Firebase & EAS
+# secret wiring". These patterns match the files anywhere in the tree.
+GoogleService-Info.plist
+google-services.json
+# Local Firebase credential drop (referenced by GOOGLE_SERVICES_* env for local
+# dev — never committed). Keep real plist/json here on your machine only.
+secrets/
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files (never commit real values — see .env.example for the template)
+.env
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+example
+
+# generated native folders
+/ios
+/android

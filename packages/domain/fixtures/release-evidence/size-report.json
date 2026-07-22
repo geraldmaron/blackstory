@@ -1,0 +1,86 @@
+{
+  "rel_mob005_a": [
+    {
+      "kind": "bootstrap",
+      "byteLength": 2053,
+      "gzipByteLength": 877
+    },
+    {
+      "kind": "content-index",
+      "byteLength": 123,
+      "gzipByteLength": 117
+    },
+    {
+      "kind": "entities-list",
+      "byteLength": 65,
+      "gzipByteLength": 82
+    },
+    {
+      "kind": "bounded-points",
+      "byteLength": 320,
+      "gzipByteLength": 214
+    },
+    {
+      "kind": "map-county-aggregates",
+      "byteLength": 145,
+      "gzipByteLength": 128
+    },
+    {
+      "kind": "map-source",
+      "byteLength": 1436,
+      "gzipByteLength": 582
+    },
+    {
+      "kind": "map-state-aggregates",
+      "byteLength": 267,
+      "gzipByteLength": 156
+    },
+    {
+      "kind": "search-index",
+      "byteLength": 59,
+      "gzipByteLength": 78
+    }
+  ],
+  "rel_mob005_b": [
+    {
+      "kind": "bootstrap",
+      "byteLength": 2053,
+      "gzipByteLength": 876
+    },
+    {
+      "kind": "content-index",
+      "byteLength": 123,
+      "gzipByteLength": 117
+    },
+    {
+      "kind": "entities-list",
+      "byteLength": 65,
+      "gzipByteLength": 82
+    },
+    {
+      "kind": "bounded-points",
+      "byteLength": 320,
+      "gzipByteLength": 215
+    },
+    {
+      "kind": "map-county-aggregates",
+      "byteLength": 145,
+      "gzipByteLength": 128
+    },
+    {
+      "kind": "map-source",
+      "byteLength": 1436,
+      "gzipByteLength": 583
+    },
+    {
+      "kind": "map-state-aggregates",
+      "byteLength": 267,
+      "gzipByteLength": 156
+    },
+    {
+      "kind": "search-index",
+      "byteLength": 59,
+      "gzipByteLength": 78
+    }
+  ]
+}

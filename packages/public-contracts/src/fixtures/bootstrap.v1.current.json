@@ -1,0 +1,12 @@
+{
+  "apiVersion": "v1",
+  "minSupportedApiVersion": "v1",
+  "deprecationWindowDays": 90,
+  "activeRelease": {
+    "releaseId": "release-2026-07-19",
+    "generatedAt": "2026-07-19T00:00:00.000Z",
+    "recordUpdatedAt": "2026-07-19T00:00:00.000Z"
+  },
+  "searchIndexVersion": "release-2026-07-19",
+  "contentVersion": "release-2026-07-19"
+}

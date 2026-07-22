@@ -86,13 +86,17 @@ async function main(): Promise<void> {
       const corroboration = await findCorroboratingTier1Source(
         candidate.displayName ?? candidate.id,
         {
-          ...(originalPage ? { html: originalPage.html, url: candidate.canonicalUrl } : {}),
+          ...(originalPage
+            ? { html: originalPage.html, url: candidate.canonicalUrl, text: originalPage.text }
+            : candidate.canonicalUrl
+              ? { url: candidate.canonicalUrl }
+              : {}),
         },
       );
       if (corroboration) {
         corroborated += 1;
         snippets.push(
-          `INDEPENDENT TIER-1 SOURCE (via ${corroboration.method}) ${corroboration.url}\n${corroboration.text}`,
+          `INDEPENDENT CORROBORATING SOURCE (via ${corroboration.method}) ${corroboration.url}\n${corroboration.text}`,
         );
       }
       return {

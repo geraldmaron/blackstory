@@ -77,3 +77,5 @@ export {
   type QueryPackRegistryStore,
   type ListQueryPacksFilter,
 } from './registry.js';
+
+export * from './wikidata-place-first/index.js';

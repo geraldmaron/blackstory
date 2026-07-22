@@ -7,6 +7,7 @@ import {
   createFirebaseAppCheckVerifier,
   createServerFirebaseApp,
   parseAppCheckMode,
+  type AppCheckCircuitBreaker,
   type AppCheckGuardOptions,
   type AppCheckHeaders,
   type AppCheckTelemetry,
@@ -19,6 +20,7 @@ export type PublicApiAppCheckOptions = {
   readonly mode?: AppCheckGuardOptions['mode'];
   readonly verifier?: AppCheckVerifier;
   readonly telemetry?: AppCheckTelemetry;
+  readonly circuitBreaker?: AppCheckCircuitBreaker;
 };
 
 const consoleTelemetry: AppCheckTelemetry = {
@@ -38,6 +40,7 @@ export function createPublicApiAppCheckGuard(options: PublicApiAppCheckOptions =
     verifier,
     telemetry: options.telemetry ?? consoleTelemetry,
     replayProtection: false,
+    ...(options.circuitBreaker ? { circuitBreaker: options.circuitBreaker } : {}),
   });
   return (request: { readonly headers: AppCheckHeaders }) => guard({ headers: request.headers });
 }

@@ -1,0 +1,30 @@
+{
+  "id": "ent_dunbar_school_001",
+  "kind": "school",
+  "displayName": "Dunbar High School",
+  "summary": "The first public high school for Black students in the United States.",
+  "topicTags": ["education", "reconstruction"],
+  "jurisdictionLabel": "Washington, D.C.",
+  "locationPrecision": "city",
+  "locationLabel": "Washington, D.C.",
+  "relevanceExplanation": "Nationally significant in the history of Black public education.",
+  "historicalContext": "Founded 1870 during Reconstruction; a center of Black academic achievement.",
+  "recordMaturity": "published",
+  "researchCoverage": "substantial",
+  "eraBuckets": ["1870s", "1880s"],
+  "notabilityLabels": ["First of its kind"],
+  "sensitivityClass": "none",
+  "geoAnchor": {
+    "lat": 38.915,
+    "lng": -77.016,
+    "geohash": "dqcjq",
+    "matchMethod": "city_centroid"
+  },
+  "claims": [],
+  "timeline": [],
+  "revision": {
+    "releaseId": "rel_2026_07_19_001",
+    "generatedAt": "2026-07-19T00:00:00.000Z",
+    "recordUpdatedAt": "2026-07-19T00:00:00.000Z"
+  }
+}

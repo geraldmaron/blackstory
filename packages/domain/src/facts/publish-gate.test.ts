@@ -32,6 +32,67 @@ test('a published fact with an incomplete web citation fails closed', () => {
   if (!result.ok) assert.equal(result.reason, 'incomplete_citation');
 });
 
+test('a published fact whose web citations meet the capture-completeness bar passes', () => {
+  const fact = buildFixtureFact({
+    citations: [
+      buildFixtureCitation({
+        csl: {
+          id: 'csl-a',
+          type: 'webpage',
+          title: 'Primary chronology',
+          URL: 'https://example.gov/record-a',
+        },
+      }),
+      buildFixtureCitation({
+        csl: {
+          id: 'csl-b',
+          type: 'webpage',
+          title: 'Corroborating account',
+          URL: 'https://example.gov/record-b',
+        },
+      }),
+    ],
+  });
+  assert.deepEqual(evaluateFactPublishGate(fact), { ok: true });
+});
+
+test('a published fact whose web citations fall below the capture-completeness bar fails closed', () => {
+  const fact = buildFixtureFact({
+    citations: [
+      buildFixtureCitation(),
+      buildFixtureCitation({
+        csl: {
+          id: 'csl-missing-capture',
+          type: 'webpage',
+          title: 'Secondary source',
+          URL: 'https://example.gov/other-record',
+        },
+        archivedUrl: 'https://example.com/not-wayback',
+        archivedAt: '2026-01-01T00:00:00.000Z',
+        accessedAt: '2026-01-05T00:00:00.000Z',
+      }),
+    ],
+  });
+  const result = evaluateFactPublishGate(fact);
+  assert.equal(result.ok, false);
+  if (!result.ok) assert.equal(result.reason, 'capture_completeness_below_bar');
+});
+
+test('a published fact with only offline citations vacuously passes capture completeness', () => {
+  const fact = buildFixtureFact({
+    citations: [
+      buildFixtureCitation({
+        csl: { id: 'csl-offline', type: 'book', title: 'Archive volume' },
+        archivedUrl: undefined,
+        archivedAt: undefined,
+        accessedAt: '2026-01-05T00:00:00.000Z',
+        sourceNote: 'Florida State Archives, Series 1234',
+      }),
+    ],
+  });
+  assert.deepEqual(evaluateFactPublishGate(fact), { ok: true });
+});
+
 test('a draft fact with zero citations is exempt from the publish gate', () => {
   const fact = buildFixtureFact({ status: 'draft', citations: [] });
   assert.deepEqual(evaluateFactPublishGate(fact), { ok: true });

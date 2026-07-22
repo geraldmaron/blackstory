@@ -1,8 +1,8 @@
 # ADR-020: Supabase Postgres as system of record
 
-- **Status:** Accepted
+- **Status:** Accepted (amended 2026-07-21 — Supabase Storage for product blobs)
 - **Date:** 2026-07-20
-- **Bead:** repo-ivh4
+- **Bead:** repo-ivh4; storage cutover epic repo-8pku
 - **Depends on:** ADR-004, ADR-005, ADR-009, ADR-010, ADR-015, ADR-016
 - **Supersedes (production SoR path):** ADR-011
 - **Amends:** ADR-002 / ADR-003 (Cloud SQL + SQL Connect remain non-path); ADR-008 / ADR-014 (geo/search/vectors land in Postgres)
@@ -14,7 +14,7 @@
 |--------|------------------|---------------------|
 | System of record | Cloud Firestore (`black-book-efaaf`) | Supabase Postgres project **`blackstory-app`** (`twykhihqkcldpreuovay`, `us-west-2`) |
 | Auth | Firebase Auth + custom claims | **Supabase Auth**; roles in `app_metadata.bb_role` only |
-| Blobs | Firebase Storage / GCS | Unchanged for this phase (metadata refs in Postgres) |
+| Blobs | Firebase Storage / GCS (legacy) | **Supabase Storage** for public-media (+ raw-sources phased); Postgres holds refs |
 | Schema docs / DDL | Parked Cloud SQL stubs under `infra/database/` | Versioned DDL under `supabase/migrations/` |
 | ETL / cutover | N/A | **Out of scope** for this ADR (follow-up) |
 
@@ -33,7 +33,7 @@ Non-negotiable invariants from prior ADRs still bind: no anonymous canonical wri
 5. **Research cannot publish** — no grant or RLS path for `bb_role=research` to mutate `bb_public.active_release` or activate releases.
 6. **Natural text keys** are preserved for semantic document IDs (`us-06-001`, `{fips5}_{decade}`, etc.). UUIDs are used where the domain already used random IDs.
 7. **Geography / vectors** use PostGIS (`geography(Point,4326)`) and `pgvector` (`vector(768)`), retaining geohash text for transition compatibility.
-8. **Blobs** remain in Firebase Storage / GCS for this phase; Postgres stores object refs only.
+8. **Blobs** live in **Supabase Storage** for product public-media (and phased raw-sources). Postgres stores object refs / public URLs only. GCS / Firebase Storage remains a dual-serve rollback origin until the owner completes wind-down; agents never delete GCS objects as part of cutover.
 9. **Firestore remains live** until a separate cutover ADR/plan. This ADR authorizes schema design + DDL landing in-repo and (when explicitly approved) on `blackstory-app`. It does **not** authorize dual-write or production traffic cutover.
 10. Parked Cloud SQL / SQL Connect under `infra/database/` stays non-production; banners point here.
 
@@ -46,13 +46,15 @@ Non-negotiable invariants from prior ADRs still bind: no anonymous canonical wri
 | Dump tables into `public` schema | Over-exposes Data API surface; contradicts boundary model |
 | Authorize via `user_metadata` | User-editable; unsafe for RLS |
 | Force UUID PKs on all tables | Breaks semantic IDs and migration fidelity |
-| Move blobs into Supabase Storage now | Out of scope; increases cutover risk |
+| Keep blobs on GCS indefinitely | Rejected for Firebase wind-down; Supabase Storage is preferred for public-media with dual-serve cutover |
+| Big-bang delete of GCS during first copy | Unsafe; dual-serve + soak required |
 
 ## Consequences
 
 - New schema work lands under `supabase/` and `docs/data/postgres-schema.md`.
 - ADR-011 is historical for the Firestore phase; do not start new SoR features assuming Firestore permanence.
-- **Cutover (2026-07-21):** Structured product data is migrated into `blackstory-app`. Public web supports `PUBLIC_DATA_SOURCE=postgres` (server-only `DATABASE_URL` / `APP_DATABASE_URL`; never `NEXT_PUBLIC_*`). Prefer GCS release artifacts when configured; blobs stay in Firebase Storage/GCS. Admin/ops write path and worker CLIs may still touch Firestore until follow-up store rewires complete — treat Postgres as SoR for migrated tables; do not dual-write new canonical truth to Firestore.
+- **Cutover (2026-07-21):** Structured product data is migrated into `blackstory-app`. Public web supports `PUBLIC_DATA_SOURCE=postgres` (server-only `DATABASE_URL` / `APP_DATABASE_URL`; never `NEXT_PUBLIC_*`). Treat Postgres as SoR for migrated tables; do not dual-write new canonical truth to Firestore.
+- **Blob cutover (2026-07-21+):** Public-media objects move to Supabase Storage buckets (`public-media`, later `raw-sources`) with dual-serve against GCS until verified. Egress for Storage shares the Pro envelope with PostgREST — prefer CDN-cached public URLs; monitor Scenario C in `docs/research/supabase-pro-cost-envelope.md`. New writes target Supabase; GCS is not deleted by agents.
 - Auth: operators provisioned in Supabase Auth with `app_metadata.bb_role`; admin UI may still accept Firebase session until auth cutover bead closes. Public remains anon + RLS on `bb_public`.
 - Firebase wind-down is **owner console checklist** (`docs/data/firebase-wind-down.md`): stop app use, tighten rules, export, pause/archive — **never** irreversible project delete without dual verification.
 - CI may add optional Supabase migration checks later; do not block existing Firestore emulator CI until Firebase is fully retired.

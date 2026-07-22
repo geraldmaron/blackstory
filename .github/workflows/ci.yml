@@ -94,6 +94,58 @@ jobs:
       - name: Run app tests
         run: pnpm -r --filter './apps/**' run --if-present test
 
+  # apps/mobile is deliberately excluded from the root pnpm workspace
+  # (see pnpm-workspace.yaml `!apps/mobile` and apps/mobile/README.md) and manages its
+  # own npm-based dependency graph, so it cannot run through `pnpm -r --filter './apps/**'`
+  # above. These two jobs are its dedicated npm-based lane; `npm ci` here never touches the
+  # root pnpm-lock.yaml, so `pnpm install --frozen-lockfile` in `validate` above is unaffected.
+  mobile-typecheck:
+    name: Mobile Typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: apps/mobile/package-lock.json
+      - name: Install mobile dependencies (npm, isolated lockfile)
+        run: npm ci --no-audit --no-fund
+      - name: Generate expo-env.d.ts (gitignored Expo type-reference shim)
+        # Expo generates this file locally on first `expo start`/`expo prebuild`; it is
+        # intentionally gitignored (apps/mobile/.gitignore) so every clean checkout —
+        # including CI — must recreate it before `tsc` can resolve `expo/types`.
+        run: printf '/// <reference types="expo/types" />\n' > expo-env.d.ts
+      - name: Typecheck (app + test/tooling project)
+        run: npm run typecheck
+
+  mobile-unit-tests:
+    name: Mobile Unit Tests (Jest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: apps/mobile/package-lock.json
+      - name: Install mobile dependencies (npm, isolated lockfile)
+        run: npm ci --no-audit --no-fund
+      - name: Jest (jest-expo preset)
+        run: npm test -- --ci
+
   unit-py:
     name: Unit Tests (Python)
     runs-on: ubuntu-latest
@@ -215,7 +267,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y postgresql-client
       - name: Integration and migration harnesses
         run: |
-          pnpm --filter @black-book/testing exec node --import tsx --test \
+          pnpm --filter @repo/testing exec node --import tsx --test \
             src/harness/postgres.integration.test.ts \
             src/migration/migration.harness.test.ts
       - name: Apply DB foundation and role isolation checks
@@ -269,9 +321,9 @@ jobs:
           cat /tmp/firebase-emulators.log || true
           exit 1
       - name: Firebase emulator integration tests
-        run: pnpm --filter @black-book/testing exec node --import tsx --test src/harness/firebase.integration.test.ts
+        run: pnpm --filter @repo/testing exec node --import tsx --test src/harness/firebase.integration.test.ts
       - name: Firestore security rules (primary data path)
-        run: pnpm --filter @black-book/firebase test
+        run: pnpm --filter @repo/firebase test
       - name: Stop Firebase emulators
         if: always()
         run: |

@@ -4,9 +4,10 @@
  * map/list/search/history/sitemap once published to the public-media bucket (or a local
  * fixture directory for tests/dev).
  */
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { sha256Json, type JsonValue, type Sha256Hash } from '@repo/domain';
+import { fileURLToPath } from 'node:url';
+import { sha256Json, supabasePublicMediaUrl, type JsonValue, type Sha256Hash } from '@repo/domain';
 import { DEFAULT_PUBLIC_MEDIA_BUCKET } from './entity-media.js';
 
 export { DEFAULT_PUBLIC_MEDIA_BUCKET };
@@ -88,13 +89,12 @@ export function buildReleaseCatalogArtifacts(input: {
   };
 }
 
-/** HTTPS URL for a public-media object (CDN/GCS). */
+/** HTTPS URL for a public-media object (Supabase Storage public bucket). */
 export function publicMediaObjectUrl(
   objectPath: string,
-  options: { readonly bucket?: string } = {},
+  _options: { readonly bucket?: string } = {},
 ): string {
-  const bucket = options.bucket ?? DEFAULT_PUBLIC_MEDIA_BUCKET;
-  return `https://storage.googleapis.com/${bucket}/${objectPath.replace(/^\/+/, '')}`;
+  return supabasePublicMediaUrl(objectPath.replace(/^\/+/, ''));
 }
 
 /**
@@ -134,4 +134,82 @@ export async function uploadReleaseCatalogArtifacts(input: {
     Buffer.from(`${JSON.stringify(input.artifacts.searchIndex)}\n`, 'utf8'),
     jsonType,
   );
+}
+
+export type ArtifactFetchImpl = (
+  url: string,
+  init?: { readonly signal?: AbortSignal },
+) => Promise<Response>;
+
+export type FetchReleaseArtifactOptions = {
+  readonly fetchImpl?: ArtifactFetchImpl;
+  readonly env?: NodeJS.ProcessEnv;
+  readonly timeoutMs?: number;
+  readonly allowLocalFallback?: boolean;
+  readonly localArtifactsRoot?: string;
+};
+
+function artifactBaseUrl(env: NodeJS.ProcessEnv = process.env): string | undefined {
+  const configured = env.APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL?.trim();
+  if (configured && configured.length > 0) return configured.replace(/\/+$/, '');
+  return undefined;
+}
+
+function remoteArtifactUrl(objectPath: string, env: NodeJS.ProcessEnv = process.env): string {
+  const base = artifactBaseUrl(env);
+  if (base) return `${base}/${objectPath}`;
+  return publicMediaObjectUrl(objectPath);
+}
+
+function defaultLocalArtifactsRoot(): string {
+  return join(dirname(fileURLToPath(import.meta.url)), '../../fixtures/release-artifacts');
+}
+
+async function fetchJsonArtifact<T>(
+  objectPath: string,
+  options: FetchReleaseArtifactOptions = {},
+): Promise<T | undefined> {
+  const env = options.env ?? process.env;
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const timeoutMs = options.timeoutMs ?? 8_000;
+  const url = remoteArtifactUrl(objectPath, env);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetchImpl(url, { signal: controller.signal });
+    if (!response.ok) return undefined;
+    return (await response.json()) as T;
+  } catch {
+    return undefined;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function readLocalJsonArtifact<T>(objectPath: string, root: string): T | undefined {
+  try {
+    const raw = readFileSync(join(root, objectPath), 'utf8');
+    return JSON.parse(raw) as T;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Fetch the release search-index artifact (CDN/GCS HTTPS, optional local fixture fallback). */
+export async function fetchReleaseSearchIndexArtifact(
+  releaseId: string,
+  options: FetchReleaseArtifactOptions = {},
+): Promise<ReleaseSearchIndexArtifact | undefined> {
+  const objectPath = publicReleaseSearchIndexPath(releaseId);
+  const remote = await fetchJsonArtifact<ReleaseSearchIndexArtifact>(objectPath, options);
+  if (remote && remote.releaseId === releaseId && Array.isArray(remote.docs)) {
+    return remote;
+  }
+  if (options.allowLocalFallback === false) return undefined;
+  const localRoot = options.localArtifactsRoot ?? defaultLocalArtifactsRoot();
+  const local = readLocalJsonArtifact<ReleaseSearchIndexArtifact>(objectPath, localRoot);
+  if (local && local.releaseId === releaseId && Array.isArray(local.docs)) {
+    return local;
+  }
+  return undefined;
 }

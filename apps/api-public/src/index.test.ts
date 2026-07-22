@@ -4,8 +4,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { SurfaceCapabilityError, deniesCanonicalWrite, deniesPublication } from '@repo/config';
-import type { AppCheckTelemetryEvent } from '@repo/firebase';
-import { createPublicApiAppCheckGuard } from './app-check.ts';
+import type { ClientAttestationTelemetryEvent } from '@repo/security';
+import { createPublicApiClientAttestationGuard } from './client-attestation.ts';
 import { health } from './index.ts';
 import { guardMutationAttempt, guardReadOperation } from './posture.ts';
 
@@ -29,17 +29,11 @@ test('public API allows read operations only', () => {
   assert.doesNotThrow(() => guardReadOperation('read:location'));
 });
 
-test('public API App Check guard defaults to monitor mode without token consumption', async () => {
-  const events: AppCheckTelemetryEvent[] = [];
-  let consumeAppCheckToken = true;
-  const guard = createPublicApiAppCheckGuard({
-    environment: {},
-    verifier: {
-      async verifyToken(_token, options) {
-        consumeAppCheckToken = options.consumeAppCheckToken;
-        return { appId: 'web-app' };
-      },
-    },
+test('public API client attestation guard defaults to monitor mode without header', async () => {
+  const events: ClientAttestationTelemetryEvent[] = [];
+  const guard = createPublicApiClientAttestationGuard({
+    environment: { NODE_ENV: 'test' },
+    mode: 'monitor',
     telemetry: {
       record(event) {
         events.push(event);
@@ -48,11 +42,11 @@ test('public API App Check guard defaults to monitor mode without token consumpt
   });
 
   const missing = await guard({ headers: {} });
-  const verified = await guard({ headers: { 'x-firebase-appcheck': 'token' } });
+  const verified = await guard({ headers: { 'x-blackstory-client': 'mobile/1.0.0; api=1' } });
 
   assert.equal(missing.allowed, true);
   assert.equal(missing.verified, false);
   assert.equal(verified.verified, true);
-  assert.equal(consumeAppCheckToken, false);
   assert.equal(events[0]?.mode, 'monitor');
+  assert.equal(events[0]?.control, 'client_attestation');
 });

@@ -54,6 +54,9 @@ import {
 import { deriveHistoricalFraming } from './entity-view-model';
 import { EntitySessionNavClient } from './entity-session-nav-client';
 
+/** Runtime Postgres reads; never bake Dunbar seed at build without DATABASE_URL. */
+export const dynamic = 'force-dynamic';
+
 type EntityPageProps = {
   readonly params: Promise<{ id: string }>;
 };
@@ -178,7 +181,6 @@ export default async function EntityPage({ params }: EntityPageProps) {
             catalog={entityLinkCatalog}
           />
           <EntityTopicTags entity={entity} />
-          <EntitySessionNavClient currentId={entity.id} orderedIds={orderedIds} />
         </div>
       </header>
 
@@ -374,6 +376,8 @@ export default async function EntityPage({ params }: EntityPageProps) {
                 </div>
               ) : null}
             </section>
+
+            <EntitySessionNavClient currentId={entity.id} orderedIds={orderedIds} />
           </div>
 
           <aside className="ds-entity-aside" aria-label="Record context">

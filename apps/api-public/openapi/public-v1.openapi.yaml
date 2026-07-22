@@ -1,0 +1,388 @@
+# Bounded public read API v1 — wire contract artifact (MOB-004 evidence to close).
+# Source of truth for request/response shapes: `@repo/public-contracts` zod schemas.
+# This OpenAPI document is for operators, mobile/web consumers, and contract review — not a
+# generated runtime schema. Regenerate examples via `fixtures/redacted-response-examples/`.
+openapi: 3.1.0
+info:
+  title: BlackStory Public Read API
+  version: v1
+  description: |
+    Read-only public corpus surface for mobile and web clients (ADR-005, ADR-021).
+    All breaking shape changes ship under a new URL prefix (`/v2`, …). The version floor header
+    `X-BlackStory-Client: <platform>/<semver>; api=<major>` is a UX affordance, not authorization.
+  contact:
+    name: BlackStory engineering
+servers:
+  - url: https://api.blackstory.app
+    description: Production Cloud Run (Postgres SoR)
+  - url: http://127.0.0.1:8080
+    description: Local dev (`pnpm dev` in apps/api-public)
+tags:
+  - name: operational
+    description: Health and client-version posture (never cached)
+  - name: release
+    description: Release pointer and bootstrap metadata
+  - name: corpus
+    description: Published entity and search reads (CDN-cacheable)
+paths:
+  /v1/health:
+    get:
+      operationId: getHealth
+      tags: [operational]
+      summary: Surface posture and allowed operations
+      responses:
+        '200':
+          description: Live operational posture
+          headers:
+            Cache-Control:
+              schema: { type: string, example: 'no-store' }
+            X-Request-Id:
+              schema: { type: string }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SurfaceHealth'
+              examples:
+                ok:
+                  $ref: '#/components/examples/HealthOk'
+  /v1/compatibility:
+    get:
+      operationId: getCompatibility
+      tags: [operational]
+      summary: Evaluate declared client API major against the enforced floor
+      parameters:
+        - $ref: '#/components/parameters/XBlackStoryClient'
+      responses:
+        '200':
+          description: Client is at or above the enforced floor
+          headers:
+            Cache-Control:
+              schema: { type: string, example: 'no-store' }
+            Deprecation:
+              schema: { type: string, example: 'true' }
+              description: Present when supported but not on the current major (soft nudge)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompatibilityCheckV1'
+              examples:
+                supported:
+                  $ref: '#/components/examples/CompatibilitySupported'
+        '426':
+          $ref: '#/components/responses/ClientVersionUnsupported'
+  /v1/bootstrap:
+    get:
+      operationId: getBootstrap
+      tags: [release]
+      summary: Active release pointer and optional artifact versions
+      parameters:
+        - $ref: '#/components/parameters/XBlackStoryClient'
+        - $ref: '#/components/parameters/IfNoneMatch'
+      responses:
+        '200':
+          description: Current release pointer (short edge cache)
+          headers:
+            Cache-Control:
+              schema: { type: string, example: 'public, max-age=30, stale-while-revalidate=120' }
+            ETag:
+              schema: { type: string }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BootstrapResponseV1'
+              examples:
+                activeRelease:
+                  $ref: '#/components/examples/BootstrapActiveRelease'
+        '304':
+          description: Not modified — client cache is current
+        '426':
+          $ref: '#/components/responses/ClientVersionUnsupported'
+        '503':
+          $ref: '#/components/responses/UpstreamUnavailable'
+  /v1/entity/{id}:
+    get:
+      operationId: getEntity
+      tags: [corpus]
+      summary: One published entity from the active release
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[A-Za-z0-9_-]{1,200}$'
+        - $ref: '#/components/parameters/XBlackStoryClient'
+        - $ref: '#/components/parameters/IfNoneMatch'
+      responses:
+        '200':
+          description: Redacted public entity projection
+          headers:
+            Cache-Control:
+              schema: { type: string, example: 'public, max-age=60, stale-while-revalidate=300' }
+            ETag:
+              schema: { type: string }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntityV1'
+              examples:
+                school:
+                  $ref: '#/components/examples/EntitySchool'
+        '304':
+          description: Not modified
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '426':
+          $ref: '#/components/responses/ClientVersionUnsupported'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+  /v1/search:
+    get:
+      operationId: search
+      tags: [corpus]
+      summary: Bounded full-text search with facets
+      description: |
+        Expensive read — anonymous callers without `X-BlackStory-Client` may receive `429 RATE_LIMITED`
+        with code semantics tied to client attestation policy (ADR-020). Mobile clients always attest.
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema: { type: string, maxLength: 500 }
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [relevance, name_asc, name_desc, date_asc, date_desc, distance]
+        - name: cursor
+          in: query
+          schema: { type: string, maxLength: 2048 }
+        - $ref: '#/components/parameters/XBlackStoryClient'
+        - $ref: '#/components/parameters/IfNoneMatch'
+      responses:
+        '200':
+          description: Search results and facet counts (no numeric ranking scores)
+          headers:
+            Cache-Control:
+              schema: { type: string, example: 'public, max-age=60, stale-while-revalidate=300' }
+            ETag:
+              schema: { type: string }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponseV1'
+              examples:
+                dunbar:
+                  $ref: '#/components/examples/SearchDunbar'
+        '304':
+          description: Not modified
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '414':
+          description: Query string too long
+        '426':
+          $ref: '#/components/responses/ClientVersionUnsupported'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+components:
+  parameters:
+    XBlackStoryClient:
+      name: X-BlackStory-Client
+      in: header
+      required: false
+      schema:
+        type: string
+        maxLength: 120
+        example: 'mobile/1.0.0; api=1'
+      description: Platform build + API major — abuse-trust signal, not authorization
+    IfNoneMatch:
+      name: If-None-Match
+      in: header
+      required: false
+      schema:
+        type: string
+  responses:
+    NotFound:
+      description: Resource absent from active release (indistinguishable from unpublished)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PublicApiErrorEnvelope'
+          examples:
+            missing:
+              $ref: '#/components/examples/ErrorNotFound'
+    InvalidRequest:
+      description: Request failed contract validation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PublicApiErrorEnvelope'
+    RateLimited:
+      description: Rate limit or attestation-required quota exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PublicApiErrorEnvelope'
+          examples:
+            limited:
+              $ref: '#/components/examples/ErrorRateLimited'
+    ClientVersionUnsupported:
+      description: Declared API major is below the enforced floor
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PublicApiErrorEnvelope'
+          examples:
+            floor:
+              $ref: '#/components/examples/ErrorClientVersionUnsupported'
+    UpstreamUnavailable:
+      description: Release pointer or upstream read dependency unavailable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PublicApiErrorEnvelope'
+  schemas:
+    SurfaceHealth:
+      type: object
+      required: [service, surface, networkPosture, allowedOperations, status, env]
+      properties:
+        service: { type: string, example: api-public }
+        surface: { type: string, example: api-public }
+        networkPosture: { type: string, example: public-read }
+        allowedOperations:
+          type: array
+          items: { type: string }
+        status: { type: string, enum: [ok] }
+        env: { type: string, enum: [development, test, staging, production] }
+    CompatibilityCheckV1:
+      type: object
+      required:
+        [supported, currentApiVersion, minSupportedApiVersion, deprecationWindowDays, softDeprecated]
+      properties:
+        supported: { type: boolean }
+        currentApiVersion: { type: string, example: v1 }
+        minSupportedApiVersion: { type: string, example: v1 }
+        deprecationWindowDays: { type: integer, minimum: 0 }
+        softDeprecated: { type: boolean }
+    BootstrapResponseV1:
+      type: object
+      required: [apiVersion, minSupportedApiVersion, deprecationWindowDays, activeRelease]
+      properties:
+        apiVersion: { type: string, const: v1 }
+        minSupportedApiVersion: { type: string, const: v1 }
+        deprecationWindowDays: { type: integer }
+        activeRelease:
+          $ref: '#/components/schemas/RevisionMetadataV1'
+        searchIndexVersion: { type: string }
+        contentVersion: { type: string }
+    RevisionMetadataV1:
+      type: object
+      required: [releaseId, generatedAt, recordUpdatedAt]
+      properties:
+        releaseId: { type: string }
+        generatedAt: { type: string, format: date-time }
+        recordUpdatedAt: { type: string, format: date-time }
+    EntityV1:
+      type: object
+      description: |
+        Public entity projection — no raw scores, no residential coordinates, no internal review fields.
+        Full shape enforced by `@repo/public-contracts/v1/entity`.
+      additionalProperties: false
+    SearchResponseV1:
+      type: object
+      required: [results, facets, totalMatched, hasMore]
+      properties:
+        results:
+          type: array
+          maxItems: 100
+          items:
+            type: object
+            description: No numeric relevance or evidence counts on results
+        facets:
+          type: object
+        totalMatched: { type: integer, minimum: 0 }
+        hasMore: { type: boolean }
+        nextCursor: { type: string }
+    PublicApiErrorEnvelope:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum:
+                - NOT_FOUND
+                - INVALID_REQUEST
+                - RATE_LIMITED
+                - CLIENT_VERSION_UNSUPPORTED
+                - UPSTREAM_UNAVAILABLE
+                - INTERNAL
+            message: { type: string }
+            requestId: { type: string }
+            details:
+              type: object
+              additionalProperties:
+                oneOf:
+                  - { type: string }
+                  - { type: number }
+                  - { type: boolean }
+                  - { type: 'null' }
+  examples:
+    HealthOk:
+      value:
+        service: api-public
+        surface: api-public
+        networkPosture: public-read
+        allowedOperations:
+          - read:search
+          - read:location
+        status: ok
+        env: production
+    CompatibilitySupported:
+      value:
+        supported: true
+        currentApiVersion: v1
+        minSupportedApiVersion: v1
+        deprecationWindowDays: 180
+        softDeprecated: false
+    BootstrapActiveRelease:
+      value:
+        apiVersion: v1
+        minSupportedApiVersion: v1
+        deprecationWindowDays: 180
+        activeRelease:
+          releaseId: rel_2026_07_19_001
+          generatedAt: '2026-07-19T00:00:00.000Z'
+          recordUpdatedAt: '2026-07-19T00:00:00.000Z'
+        searchIndexVersion: idx_2026_07_19_001
+        contentVersion: content_2026_07_19_001
+    EntitySchool:
+      externalValue: ../fixtures/redacted-response-examples/entity-200.json
+    SearchDunbar:
+      externalValue: ../fixtures/redacted-response-examples/search-200.json
+    ErrorNotFound:
+      value:
+        error:
+          code: NOT_FOUND
+          message: No such resource.
+          requestId: req_example_not_found
+    ErrorRateLimited:
+      value:
+        error:
+          code: RATE_LIMITED
+          message: Too many requests. Try again later.
+          requestId: req_example_rate_limited
+    ErrorClientVersionUnsupported:
+      value:
+        error:
+          code: CLIENT_VERSION_UNSUPPORTED
+          message: This app version is no longer supported. Please update to continue.
+          requestId: req_example_version_floor
+          details:
+            minSupportedApiVersion: v1
+            currentApiVersion: v1

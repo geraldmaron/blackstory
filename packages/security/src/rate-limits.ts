@@ -4,6 +4,22 @@
  * Pure deterministic policy matrix + token-bucket evaluator with bounded in-memory
  * state. Layered controls: subject quotas, endpoint classes, rolling/daily windows,
  * concurrency caps, and distributed risk-signal aggregation. No external store dependency.
+ *
+ * App Check outage carve-out (repo-uqmm; ADR-020 §3, threat-model T2).
+ * App Check is attestation, never authorization: it only shapes abuse cost. During
+ * NORMAL operation an unattested `anonymous` caller is hard-denied `app_check_required`
+ * on `expensive_read`/`mutation` tiers — this is the enumeration/abuse defense and it
+ * stays, because relaxing it unconditionally would make expensive search free
+ * enumeration for any tokenless caller. The genuine gap T2 names is a *confirmed
+ * App Check service outage* (verifier/provider down), where even legitimate clients
+ * cannot attest and a hard-deny becomes a self-inflicted availability outage. The
+ * evaluator distinguishes the two via an explicit `appCheckAvailability` signal: only
+ * when it is `'outage'` does the hard-deny relax — and it relaxes to a BOUNDED DEGRADED
+ * quota (`deriveOutageDegradedPolicy`), never to free access. Static reads never hit the
+ * hard-deny and so fail open in every mode. `risk_score_exceeded` still fails closed on
+ * a genuine abuse spike even during an outage (abuse signal, not mere absence of a
+ * token). The outage signal is an operator/circuit input (see apps/api-public wiring);
+ * a single unverified request is NOT an outage.
  */
 
 /** Caller identity tier anonymous receives the smallest quota. */
@@ -70,12 +86,32 @@ export type QuotaDenialReason =
   | 'risk_score_exceeded'
   | 'app_check_required';
 
+/**
+ * App Check service availability, as seen by the server.
+ *
+ * `available` (default): normal operation — attestation is reachable, so an unattested
+ * expensive/mutation request from an `anonymous` caller is a policy choice by that caller
+ * and is hard-denied.
+ *
+ * `outage`: the App Check verifier/provider is confirmed unreachable (operator-set flag or
+ * a verification circuit breaker). Even honest clients cannot attest, so the hard-deny
+ * relaxes to a bounded degraded quota rather than locking the public corpus (T2 fail-open).
+ */
+export type AppCheckAvailability = 'available' | 'outage';
+
+export const appCheckAvailabilityStates = [
+  'available',
+  'outage',
+] as const satisfies readonly AppCheckAvailability[];
+
 export type QuotaDecisionAllowed = {
   readonly allowed: true;
   readonly remaining: number;
   readonly resetAtMs: number;
   readonly concurrencyRemaining: number;
   readonly policyVersion: string;
+  /** True when served under the App Check outage degraded-quota carve-out (observability/T2). */
+  readonly degraded?: boolean;
 };
 
 export type QuotaDecisionDenied = {
@@ -112,6 +148,15 @@ export type RateLimitEvaluateInput = {
   readonly consume?: boolean;
   readonly riskSignals?: readonly RiskSignal[];
   readonly appCheckVerified?: boolean;
+  /**
+   * Confirmed App Check service availability. Defaults to `'available'`. Set to `'outage'`
+   * ONLY on a systemic outage signal (operator flag / verification circuit breaker), never
+   * per single unverified request. Under `'outage'`, unattested expensive/mutation reads for
+   * `anonymous` callers degrade to a bounded quota instead of a hard `app_check_required` deny.
+   */
+  readonly appCheckAvailability?: AppCheckAvailability;
+  /** Parseable `X-BlackStory-Client` header from a direct API caller (mobile). */
+  readonly clientAttested?: boolean;
 };
 
 export type TokenBucketState = {
@@ -247,6 +292,36 @@ function policy(
   costTier: EndpointQuotaPolicy['costTier'],
 ): EndpointQuotaPolicy {
   return { capacity, refillPerSec, windowCap, windowMs, dailyCap, maxConcurrency, costTier };
+}
+
+/**
+ * Fraction of the normal quota an unattested expensive/mutation caller keeps during a
+ * confirmed App Check outage. Deliberately small (quarter) so degraded-mode access is
+ * clearly bounded — fail-open for availability must not become free enumeration. Every
+ * cap floors at 1 so the tier stays usable but minimal.
+ */
+export const OUTAGE_DEGRADED_QUOTA_FACTOR = 0.25 as const;
+
+/**
+ * Derive the bounded degraded quota applied to unattested `expensive_read`/`mutation`
+ * requests during a confirmed App Check outage. Shrinks burst/window/daily caps by
+ * `factor` (floored at 1) and clamps concurrency to a single in-flight request, so the
+ * outage carve-out is strictly stricter than the normal attested-anonymous quota and can
+ * never exceed it. Pure and deterministic.
+ */
+export function deriveOutageDegradedPolicy(
+  policyRow: EndpointQuotaPolicy,
+  factor: number = OUTAGE_DEGRADED_QUOTA_FACTOR,
+): EndpointQuotaPolicy {
+  const shrink = (value: number): number => Math.max(1, Math.floor(value * factor));
+  return {
+    ...policyRow,
+    capacity: shrink(policyRow.capacity),
+    refillPerSec: policyRow.refillPerSec * factor,
+    windowCap: shrink(policyRow.windowCap),
+    dailyCap: shrink(policyRow.dailyCap),
+    maxConcurrency: 1,
+  };
 }
 
 function startOfUtcDayMs(nowMs: number): number {
@@ -454,6 +529,7 @@ function allow(
   remaining: number,
   resetAtMs: number,
   concurrencyRemaining: number,
+  degraded = false,
 ): QuotaDecisionAllowed {
   return {
     allowed: true,
@@ -461,6 +537,7 @@ function allow(
     resetAtMs,
     concurrencyRemaining,
     policyVersion: RATE_LIMIT_POLICY_VERSION,
+    ...(degraded ? { degraded: true } : {}),
   };
 }
 
@@ -474,60 +551,77 @@ export function evaluateQuota(
   const store = options.store ?? createInMemoryRateLimitStore();
   const consume = input.consume ?? true;
   const riskThreshold = options.riskScoreThreshold ?? 12;
+  const outage = input.appCheckAvailability === 'outage';
 
+  // Endpoints with a zero base quota (e.g. anonymous admin tiers) always deny, regardless of
+  // attestation or outage — the outage carve-out only relaxes attestation, never a real cap.
   if (policyRow.capacity <= 0 || policyRow.dailyCap <= 0) {
     return deny('daily_cap_exceeded', policyRow.windowMs);
   }
 
+  // A genuine abuse spike fails closed even during an outage: this is an abuse SIGNAL crossing
+  // threshold, not the mere absence of a token (T2 "fail closed only on a specific abuse signal").
   const riskScore = aggregateRiskScore(input.riskSignals, nowMs);
   if (riskScore >= riskThreshold) {
     return deny('risk_score_exceeded', 60_000);
   }
 
-  if (
+  const unattestedExpensiveAnon =
     input.subject === 'anonymous' &&
     !input.appCheckVerified &&
-    (policyRow.costTier === 'expensive_read' || policyRow.costTier === 'mutation')
-  ) {
+    !input.clientAttested &&
+    (policyRow.costTier === 'expensive_read' || policyRow.costTier === 'mutation');
+
+  // Normal operation: unattested expensive/mutation reads are hard-denied (enumeration defense).
+  // Confirmed outage: skip the hard-deny and serve under a bounded degraded quota instead.
+  if (unattestedExpensiveAnon && !outage) {
     return deny('app_check_required', 30_000);
   }
 
+  // A widespread `missing_app_check` signal is expected during an outage; only treat it as a hard
+  // deny under normal operation. Under outage we rely on the risk-score threshold above + degraded
+  // quota below rather than denying every honest-but-unattested caller.
   if (
+    !outage &&
     input.appCheckVerified === false &&
+    input.clientAttested !== true &&
     input.riskSignals?.some((s) => s.kind === 'missing_app_check')
   ) {
     return deny('app_check_required', 30_000);
   }
 
+  const degraded = outage && unattestedExpensiveAnon;
+  const effectivePolicy = degraded ? deriveOutageDegradedPolicy(policyRow) : policyRow;
+
   let state = store.get(input.key, nowMs);
   if (!state) {
-    state = createInitialBucketState(policyRow, nowMs);
+    state = createInitialBucketState(effectivePolicy, nowMs);
   }
 
-  resetWindowsIfNeeded(state, policyRow, nowMs);
-  refillTokens(state, policyRow, nowMs);
+  resetWindowsIfNeeded(state, effectivePolicy, nowMs);
+  refillTokens(state, effectivePolicy, nowMs);
 
-  if (state.activeConcurrency >= policyRow.maxConcurrency) {
-    store.set(input.key, state, policyRow.windowMs + MS_PER_DAY, nowMs);
+  if (state.activeConcurrency >= effectivePolicy.maxConcurrency) {
+    store.set(input.key, state, effectivePolicy.windowMs + MS_PER_DAY, nowMs);
     return deny('concurrency_exceeded', 5_000);
   }
 
-  if (state.dailyCount >= policyRow.dailyCap) {
+  if (state.dailyCount >= effectivePolicy.dailyCap) {
     const retryAfterMs = state.dailyStartMs + MS_PER_DAY - nowMs;
-    store.set(input.key, state, policyRow.windowMs + MS_PER_DAY, nowMs);
+    store.set(input.key, state, effectivePolicy.windowMs + MS_PER_DAY, nowMs);
     return deny('daily_cap_exceeded', retryAfterMs);
   }
 
-  if (state.windowCount >= policyRow.windowCap) {
-    const retryAfterMs = state.windowStartMs + policyRow.windowMs - nowMs;
-    store.set(input.key, state, policyRow.windowMs + MS_PER_DAY, nowMs);
+  if (state.windowCount >= effectivePolicy.windowCap) {
+    const retryAfterMs = state.windowStartMs + effectivePolicy.windowMs - nowMs;
+    store.set(input.key, state, effectivePolicy.windowMs + MS_PER_DAY, nowMs);
     return deny('rolling_window_exceeded', retryAfterMs);
   }
 
   if (state.tokens < 1) {
     const tokensNeeded = 1 - state.tokens;
-    const retryAfterMs = Math.ceil((tokensNeeded / policyRow.refillPerSec) * 1000);
-    store.set(input.key, state, policyRow.windowMs + MS_PER_DAY, nowMs);
+    const retryAfterMs = Math.ceil((tokensNeeded / effectivePolicy.refillPerSec) * 1000);
+    store.set(input.key, state, effectivePolicy.windowMs + MS_PER_DAY, nowMs);
     return deny('token_bucket_exhausted', retryAfterMs);
   }
 
@@ -539,16 +633,17 @@ export function evaluateQuota(
   }
 
   const resetAtMs = Math.min(
-    state.windowStartMs + policyRow.windowMs,
+    state.windowStartMs + effectivePolicy.windowMs,
     state.dailyStartMs + MS_PER_DAY,
   );
 
-  store.set(input.key, state, policyRow.windowMs + MS_PER_DAY, nowMs);
+  store.set(input.key, state, effectivePolicy.windowMs + MS_PER_DAY, nowMs);
 
   return allow(
     Math.floor(state.tokens),
     resetAtMs,
-    Math.max(0, policyRow.maxConcurrency - state.activeConcurrency),
+    Math.max(0, effectivePolicy.maxConcurrency - state.activeConcurrency),
+    degraded,
   );
 }
 

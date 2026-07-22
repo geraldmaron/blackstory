@@ -38,6 +38,7 @@ test('CSP includes strict defaults and frame-ancestors none', () => {
   assert.match(csp, /worker-src 'self' blob:/);
   assert.match(csp, /demotiles\.maplibre\.org/);
   assert.match(csp, /storage\.googleapis\.com/);
+  assert.match(csp, /twykhihqkcldpreuovay\.supabase\.co/);
   assert.match(csp, /frame-src 'none'/);
 });
 

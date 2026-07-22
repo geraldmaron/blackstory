@@ -1,7 +1,8 @@
 /**
  * Presentational record anatomy card (kind → name → story → facts → CTA). Explore mounts this
  * in the spotlight shell as a preview-first selection; the copper CTA is the off-ramp to the
- * full entity page. Also used for SSR smoke tests and any other compact record surface.
+ * full entity page. Close control floats on the card surface (absolute) so it does not steal
+ * a layout row from kind/title. Also used for SSR smoke tests and any other compact record surface.
  */
 import React from 'react';
 import Link from 'next/link';
@@ -53,6 +54,24 @@ export function NarrativeCard({ feature, onClose, sessionNav }: NarrativeCardPro
       tabIndex={-1}
       data-entity-id={properties.entityId}
     >
+      {onClose ? (
+        <button
+          type="button"
+          className="ds-nc__close"
+          onClick={onClose}
+          aria-label={`Close ${properties.displayName} card`}
+        >
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M4 4l8 8M12 4l-8 8"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
+      ) : null}
+
       <p className="ds-nc__kicker">Selected record</p>
       <div className="ds-nc__top">
         <div className="ds-nc__kind-rule" style={{ borderColor: kindEncoding.shade }}>
@@ -67,23 +86,6 @@ export function NarrativeCard({ feature, onClose, sessionNav }: NarrativeCardPro
             />
           </Link>
         </div>
-        {onClose ? (
-          <button
-            type="button"
-            className="ds-nc__close"
-            onClick={onClose}
-            aria-label={`Close ${properties.displayName} card`}
-          >
-            <svg viewBox="0 0 16 16" aria-hidden="true">
-              <path
-                d="M4 4l8 8M12 4l-8 8"
-                stroke="currentColor"
-                strokeWidth="1.75"
-                strokeLinecap="round"
-              />
-            </svg>
-          </button>
-        ) : null}
       </div>
 
       <h3 className="ds-nc__title" id="ds-nc-title">
