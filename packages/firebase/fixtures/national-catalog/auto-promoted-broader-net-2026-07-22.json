@@ -1,0 +1,2069 @@
+[
+  {
+    "id": "disc_nat_turner_s_slave_rebellion_q6967898",
+    "kind": "other",
+    "displayName": "Nat Turner's slave rebellion",
+    "summary": "[[disc_nat_turner_q329730|Nat Turner]]'s 1831 slave rebellion in Southampton County, Virginia, was the deadliest in U.S. history, killing 55-65 White people before being suppressed. The uprising led to harsher laws restricting enslaved people's education and assembly, and resulted in the execution of 18 rebels, including Turner. Retaliatory violence killed up to 120 Black individuals.",
+    "eraBuckets": [
+      "1830s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "rebellion",
+      "segregation",
+      "civil-rights"
+    ],
+    "topicIds": [
+      "enslavement",
+      "rebellion",
+      "segregation",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Nat Turner",
+      "slave rebellion",
+      "Southampton County",
+      "Virginia",
+      "1831 rebellion"
+    ],
+    "jurisdictionLabel": "Southampton County, Virginia",
+    "locationPrecision": "county",
+    "locationLabel": "Southampton County",
+    "lat": 36.77,
+    "lng": -77.161,
+    "claims": [
+      {
+        "predicate": "took place in",
+        "object": "Southampton County, Virginia",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Nat_Turner's_Rebellion",
+        "citationLabel": "Wikipedia - Nat Turner's Rebellion"
+      },
+      {
+        "predicate": "led by",
+        "object": "Nat Turner",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Nat_Turner's_Rebellion",
+        "citationLabel": "Wikipedia - Nat Turner's Rebellion"
+      },
+      {
+        "predicate": "killed",
+        "object": "55-65 White men, women, and children",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Nat_Turner's_Rebellion",
+        "citationLabel": "Wikipedia - Nat Turner's Rebellion"
+      },
+      {
+        "predicate": "killed",
+        "object": "10-120 Black men, women, and children",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Nat_Turner's_Rebellion",
+        "citationLabel": "Wikipedia - Nat Turner's Rebellion"
+      },
+      {
+        "predicate": "suppressed by",
+        "object": "militias and mobs",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Nat_Turner's_Rebellion",
+        "citationLabel": "Wikipedia - Nat Turner's Rebellion"
+      },
+      {
+        "predicate": "resulted in execution of",
+        "object": "18 enslaved people",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Nat_Turner's_Rebellion",
+        "citationLabel": "Wikipedia - Nat Turner's Rebellion"
+      }
+    ],
+    "historicalContext": "Nat Turner's rebellion intensified Southern fears of slave insurrections, prompting stricter laws on enslaved education and assembly. The uprising highlighted the violent tensions of slavery and foreshadowed the Civil War. Its suppression and aftermath reflect the systemic brutality and racial control mechanisms of the antebellum South."
+  },
+  {
+    "id": "disc_gabriel_q1393002",
+    "kind": "other",
+    "displayName": "Gabriel",
+    "summary": "Gabriel (c. 1776-1800) was a literate enslaved blacksmith in Virginia who planned a 1800 rebellion to seize the state capital and demand freedom. The storm-delayed plot was discovered before execution, leading to 26 conspirators being hanged and new restrictive laws on enslaved people's education and assembly.",
+    "eraBuckets": [
+      "1790s"
+    ],
+    "topicTags": [
+      "rebellion",
+      "enslavement",
+      "civil-rights",
+      "law",
+      "education"
+    ],
+    "topicIds": [
+      "rebellion",
+      "enslavement",
+      "civil-rights",
+      "law",
+      "education"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "literacy",
+      "blacksmith",
+      "rebellion",
+      "Virginia",
+      "slavery laws"
+    ],
+    "jurisdictionLabel": "Richmond, Virginia",
+    "locationPrecision": "city",
+    "locationLabel": "Richmond",
+    "lat": 37.5407,
+    "lng": -77.436,
+    "claims": [
+      {
+        "predicate": "planned",
+        "object": "a planned slave rebellion in Richmond, Virginia, in 1800 that was discovered and suppressed",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Gabriel's_Rebellion",
+        "citationLabel": "Gabriel's Rebellion - Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "an enslaved blacksmith who was literate and trained as a carpenter",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Gabriel's_Rebellion",
+        "citationLabel": "Gabriel's Rebellion - Wikipedia"
+      },
+      {
+        "predicate": "caused",
+        "object": "a storm on August 30, 1800 that delayed the rebellion and led to its discovery",
+        "confidenceLevel": "high",
+        "citationSource": "lva.virginia.gov",
+        "citationHref": "https://www.lva.virginia.gov/exhibits/deathliberty/gabriel/index.htm",
+        "citationLabel": "Gabriel's Rebellion - Virginia Historical Society"
+      },
+      {
+        "predicate": "led to",
+        "object": "Virginia and other states passing laws restricting education, assembly, and hiring of enslaved people after the rebellion",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Gabriel's_Rebellion",
+        "citationLabel": "Gabriel's Rebellion - Wikipedia"
+      },
+      {
+        "predicate": "resulted in",
+        "object": "26 conspirators executed and several sold out of state after the rebellion",
+        "confidenceLevel": "high",
+        "citationSource": "lva.virginia.gov",
+        "citationHref": "https://www.lva.virginia.gov/exhibits/deathliberty/gabriel/index.htm",
+        "citationLabel": "Gabriel's Rebellion - Virginia Historical Society"
+      }
+    ],
+    "historicalContext": "Gabriel's Rebellion (1800) was a significant slave conspiracy in Virginia that influenced post-Revolutionary debates about liberty and control. The failed uprising prompted stricter laws on enslaved people's education and assembly, reflecting white fears of organized resistance. It also highlighted the radical potential of literacy and leadership among enslaved individuals."
+  },
+  {
+    "id": "disc_whitney_plantation_historic_district_q7996735",
+    "kind": "place",
+    "displayName": "Whitney Plantation Historic District",
+    "summary": "Whitney Plantation Historic District in Louisiana preserves the history of slavery and sugar cane production, founded by John Cummings in 2014. The 200-acre site includes memorials for over 100,000 enslaved people and French Creole architecture dating to 1790.",
+    "eraBuckets": [
+      "1790s",
+      "1990s",
+      "2020s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "museum",
+      "civil-war",
+      "architecture",
+      "history"
+    ],
+    "topicIds": [
+      "enslavement",
+      "museum",
+      "civil-war",
+      "architecture",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "slavery museum",
+      "Louisiana",
+      "John Cummings",
+      "River Road",
+      "National Register of Historic Places"
+    ],
+    "jurisdictionLabel": "St. John the Baptist Parish, Louisiana",
+    "locationPrecision": "site",
+    "locationLabel": "Whitney Plantation Historic District",
+    "lat": 30.03917,
+    "lng": -90.65056,
+    "claims": [
+      {
+        "predicate": "foundedBy",
+        "object": "John Cummings",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Whitney_Plantation_Historic_District",
+        "citationLabel": "Whitney Plantation Historic District Wikipedia"
+      },
+      {
+        "predicate": "addedToNRHP",
+        "object": "November 24, 1992",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Whitney_Plantation_Historic_District",
+        "citationLabel": "Whitney Plantation Historic District Wikipedia"
+      },
+      {
+        "predicate": "memorializes",
+        "object": "100,000 enslaved people in Louisiana",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Whitney_Plantation_Historic_District",
+        "citationLabel": "Whitney Plantation Historic District Wikipedia"
+      },
+      {
+        "predicate": "NPSApplicationWithdrawn",
+        "object": "February 2025",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Whitney_Plantation_Historic_District",
+        "citationLabel": "Whitney Plantation Historic District Wikipedia"
+      }
+    ],
+    "historicalContext": "This plantation museum directly addresses the legacy of enslavement in the antebellum South, contrasting with traditional plantation tourism. Its preservation efforts intersect with post-Civil War land ownership patterns and 20th-century civil rights-era educational initiatives, including oral histories collected during the Great Depression."
+  },
+  {
+    "id": "disc_destrehan_plantation_q3391526",
+    "kind": "place",
+    "displayName": "Destrehan Plantation",
+    "summary": "Destrehan Plantation (1787-1790) is a French Colonial-Greek Revival mansion in St. Charles Parish, Louisiana. It served as a major indigo and sugarcane plantation and was central to the 1811 German Coast Uprising trials. The oldest documented house in the lower Mississippi Valley, it reflects Louisiana's colonial and antebellum history.",
+    "eraBuckets": [
+      "1780s",
+      "1790s",
+      "1810s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "architecture",
+      "rebellion",
+      "resistance"
+    ],
+    "topicIds": [
+      "enslavement",
+      "architecture",
+      "rebellion",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Destrehan Plantation",
+      "French Colonial architecture",
+      "1811 German Coast Uprising",
+      "Jean-Noël Destréhan",
+      "sugarcane production"
+    ],
+    "jurisdictionLabel": "St. Charles Parish, Louisiana",
+    "locationPrecision": "site",
+    "locationLabel": "Destrehan Plantation",
+    "lat": 29.94543,
+    "lng": -90.36531,
+    "claims": [
+      {
+        "predicate": "constructed_by",
+        "object": "Charles Paquet",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Destrehan_Plantation",
+        "citationLabel": "Destrehan Plantation Wikipedia"
+      },
+      {
+        "predicate": "architectural_style",
+        "object": "French Colonial, Greek Revival",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Destrehan_Plantation",
+        "citationLabel": "Destrehan Plantation Wikipedia"
+      },
+      {
+        "predicate": "associated_with",
+        "object": "Jean-Noël Destréhan",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Destrehan_Plantation",
+        "citationLabel": "Destrehan Plantation Wikipedia"
+      },
+      {
+        "predicate": "role_in_event",
+        "object": "1811 German Coast Uprising trials",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Destrehan_Plantation",
+        "citationLabel": "Destrehan Plantation Wikipedia"
+      },
+      {
+        "predicate": "economic_activity",
+        "object": "indigo and sugarcane production",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Destrehan_Plantation",
+        "citationLabel": "Destrehan Plantation Wikipedia"
+      }
+    ],
+    "historicalContext": "The plantation's construction during Spanish rule and its role in the 1811 slave revolt trials highlight its significance in Louisiana's transition from colony to state. Its shift from indigo to sugarcane production mirrors broader economic changes in the antebellum South. The 1811 tribunal at the plantation underscores the region's complex legal systems under French and U.S. governance."
+  },
+  {
+    "id": "disc_laura_plantation_q6499319",
+    "kind": "place",
+    "displayName": "Laura Plantation",
+    "summary": "Laura Plantation is a restored 19th-century Creole plantation in Vacherie, Louisiana, notable for its four original slave cabins and inclusion on the National Register of Historic Places. The site preserves the legacy of sugarcane agriculture and enslaved labor in the region.",
+    "eraBuckets": [
+      "1800s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "architecture",
+      "national-capital",
+      "agriculture",
+      "national-mall"
+    ],
+    "topicIds": [
+      "enslavement",
+      "architecture",
+      "national-capital",
+      "agriculture",
+      "national-mall"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Creole plantation",
+      "slave cabins",
+      "National Register of Historic Places"
+    ],
+    "jurisdictionLabel": "St. James Parish, Louisiana",
+    "locationPrecision": "site",
+    "locationLabel": "Laura Plantation",
+    "lat": 30.0087,
+    "lng": -90.7253,
+    "claims": [
+      {
+        "predicate": "is",
+        "object": "restored historic Louisiana Creole plantation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Laura_Plantation",
+        "citationLabel": "Laura Plantation - Wikipedia"
+      },
+      {
+        "predicate": "constructed in",
+        "object": "1805",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Laura_Plantation",
+        "citationLabel": "Laura Plantation - Wikipedia"
+      },
+      {
+        "predicate": "features",
+        "object": "Creole architectural style",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Laura_Plantation",
+        "citationLabel": "Laura Plantation - Wikipedia"
+      },
+      {
+        "predicate": "includes",
+        "object": "four original slave cabins",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Laura_Plantation",
+        "citationLabel": "Laura Plantation - Wikipedia"
+      },
+      {
+        "predicate": "listed on",
+        "object": "National Register of Historic Places",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/92001842",
+        "citationLabel": "NPGallery - National Register of Historic Places"
+      },
+      {
+        "predicate": "located in",
+        "object": "St. James Parish, Louisiana",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Laura_Plantation",
+        "citationLabel": "Laura Plantation - Wikipedia"
+      }
+    ],
+    "historicalContext": "Laura Plantation, built in 1805 by Frenchman Guillaume Duparc, represents Creole architectural traditions and the legacy of slavery in Louisiana. Its four surviving slave cabins and pre-fabricated construction methods offer insight into 19th-century plantation life and the adaptation of European building techniques to the region. The site's inclusion on the Louisiana African American Heritage Trail highlights its role in preserving Black history."
+  },
+  {
+    "id": "disc_evergreen_plantation_q5417235",
+    "kind": "place",
+    "displayName": "Evergreen Plantation",
+    "summary": "Evergreen Plantation, built in 1790 and renovated in 1832, is a National Historic Landmark in St. John the Baptist Parish, Louisiana. This Greek Revival-style plantation operated as a sugarcane estate using enslaved labor until emancipation, later becoming a working sugar cane farm.",
+    "eraBuckets": [
+      "1790s",
+      "1830s",
+      "1990s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "architecture",
+      "national-capital",
+      "history"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "architecture",
+      "national-capital",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "sugarcane plantation",
+      "Greek Revival architecture",
+      "National Historic Landmark",
+      "enslaved labor",
+      "film location"
+    ],
+    "jurisdictionLabel": "St. John the Baptist Parish, Louisiana",
+    "locationPrecision": "site",
+    "locationLabel": "Evergreen Plantation",
+    "lat": 30.02722,
+    "lng": -90.64056,
+    "claims": [
+      {
+        "predicate": "constructed_in",
+        "object": "1790",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Evergreen_Plantation_(Wallace%2C_Louisiana)",
+        "citationLabel": "Evergreen Plantation Wikipedia"
+      },
+      {
+        "predicate": "architectural_style",
+        "object": "Greek Revival and Federal",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Evergreen_Plantation_(Wallace%2C_Louisiana)",
+        "citationLabel": "Evergreen Plantation Wikipedia"
+      },
+      {
+        "predicate": "designated_national_historic_landmark",
+        "object": "1992",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/91001386",
+        "citationLabel": "NPS NRIS Database"
+      },
+      {
+        "predicate": "restored_by",
+        "object": "Matilda Geddings Gray",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Evergreen_Plantation_(Wallace%2C_Louisiana)",
+        "citationLabel": "Evergreen Plantation Wikipedia"
+      },
+      {
+        "predicate": "used_for_sugarcane_production",
+        "object": "1790-1930",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Evergreen_Plantation_(Wallace%2C_Louisiana)",
+        "citationLabel": "Evergreen Plantation Wikipedia"
+      }
+    ],
+    "historicalContext": "Evergreen Plantation exemplifies antebellum plantation architecture and Louisiana's sugarcane economy, which relied on enslaved African American labor. Its preservation highlights post-Civil War economic adaptations and 20th-century restoration efforts by Black philanthropists like Matilda Geddings Gray, connecting to broader themes of heritage preservation and racial history in the American South."
+  },
+  {
+    "id": "disc_tuskegee_airmen_national_historic_site_q7856793",
+    "kind": "place",
+    "displayName": "Tuskegee Airmen National Historic Site",
+    "summary": "The Tuskegee Airmen National Historic Site in Alabama commemorates the training of African-American pilots during WWII, who overcame segregation to become one of the military's most respected fighter groups. Now operated by the National Park Service, it preserves their legacy and the site's role in military integration.",
+    "eraBuckets": [
+      "1940s"
+    ],
+    "topicTags": [
+      "air-force",
+      "civil-rights",
+      "military",
+      "segregation",
+      "history"
+    ],
+    "topicIds": [
+      "air-force",
+      "civil-rights",
+      "military",
+      "segregation",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Tuskegee Airmen",
+      "Moton Field",
+      "African-American pilots",
+      "National Park Service",
+      "World War II"
+    ],
+    "jurisdictionLabel": "Macon County, Alabama",
+    "locationPrecision": "site",
+    "locationLabel": "Tuskegee Airmen National Historic Site",
+    "lat": 32.45718,
+    "lng": -85.68036,
+    "claims": [
+      {
+        "predicate": "established_in",
+        "object": "1941",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Tuskegee_Airmen_National_Historic_Site",
+        "citationLabel": "Tuskegee Airmen National Historic Site"
+      },
+      {
+        "predicate": "named_after",
+        "object": "Robert Russa Moton",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/tuai/",
+        "citationLabel": "NPS official site"
+      },
+      {
+        "predicate": "primary_training_facility_for",
+        "object": "African-American pilots",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Tuskegee_Airmen_National_Historic_Site",
+        "citationLabel": "Tuskegee Airmen National Historic Site"
+      }
+    ],
+    "historicalContext": "This site represents a pivotal moment in U.S. military and civil rights history. The Tuskegee Airmen's success at Moton Field challenged segregation policies and demonstrated African-American capabilities in combat aviation, directly influencing postwar military integration efforts."
+  },
+  {
+    "id": "disc_golden_thirteen_q5579862",
+    "kind": "other",
+    "displayName": "Golden Thirteen",
+    "summary": "The Golden Thirteen were the first African American commissioned and warrant officers in the U.S. Navy, trained in 1944 amid WWII-era civil rights pressures. Despite systemic barriers, they overcame accelerated training and institutional skepticism to become officers, though only 13 of 16 graduates received commissions.",
+    "eraBuckets": [
+      "1940s"
+    ],
+    "topicTags": [
+      "military",
+      "civil-rights",
+      "navy",
+      "desegregation",
+      "firsts"
+    ],
+    "topicIds": [
+      "military",
+      "civil-rights",
+      "navy",
+      "desegregation",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Golden Thirteen",
+      "U.S. Navy desegregation",
+      "African American military officers"
+    ],
+    "jurisdictionLabel": "Lake County, Illinois",
+    "locationPrecision": "institution",
+    "locationLabel": "Naval Station Great Lakes",
+    "lat": 42.309,
+    "lng": -87.841,
+    "claims": [
+      {
+        "predicate": "trained_at",
+        "object": "Great Lakes Naval Training Station",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Golden_Thirteen",
+        "citationLabel": "Wikipedia entry"
+      },
+      {
+        "predicate": "commissioned_by",
+        "object": "U.S. Navy",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Golden_Thirteen",
+        "citationLabel": "Wikipedia entry"
+      },
+      {
+        "predicate": "occurred_in_year",
+        "object": "1944",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Golden_Thirteen",
+        "citationLabel": "Wikipedia entry"
+      },
+      {
+        "predicate": "contextualized_by",
+        "object": "Executive Order 8802",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Golden_Thirteen",
+        "citationLabel": "Wikipedia entry"
+      }
+    ],
+    "historicalContext": "The Golden Thirteen emerged during WWII as part of broader civil rights efforts to integrate the U.S. military. Their commissioning followed President Roosevelt’s 1941 Executive Order 8802 banning racial discrimination in defense industries, and preceded Truman’s 1948 desegregation of the armed forces. Their success challenged segregationist policies that had confined Black sailors to menial roles since 1919."
+  },
+  {
+    "id": "disc_tulsa_race_massacre_q1824714",
+    "kind": "event",
+    "displayName": "Tulsa Race Massacre",
+    "summary": "The 1921 Tulsa Race Massacre was a two-day white supremacist attack on the Greenwood District, a thriving Black community in Tulsa, Oklahoma. White mobs burned over 35 square blocks, killing up to 300 Black residents and leaving 10,000 homeless. The violence followed the arrest of Black World War I veteran Dick Rowland, sparking racial tensions that erupted into mass destruction.",
+    "eraBuckets": [
+      "1920s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "segregation",
+      "civil-rights",
+      "community",
+      "mass-mobilization"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "segregation",
+      "civil-rights",
+      "community",
+      "mass-mobilization"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Tulsa Race Massacre",
+      "Black Wall Street",
+      "Greenwood District",
+      "white supremacy",
+      "racial violence"
+    ],
+    "jurisdictionLabel": "Tulsa, Oklahoma",
+    "locationPrecision": "city",
+    "locationLabel": "Greenwood District",
+    "lat": 36.15972,
+    "lng": -95.98583,
+    "claims": [
+      {
+        "predicate": "occurred in",
+        "object": "Greenwood District, Tulsa, Oklahoma",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Tulsa_race_massacre",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "targeted",
+        "object": "Black residents and their property",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Tulsa_race_massacre",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "estimated deaths",
+        "object": "up to 300",
+        "confidenceLevel": "medium",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Tulsa_race_massacre",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "triggered by",
+        "object": "Dick Rowland's arrest",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Tulsa_race_massacre",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "imposed martial law",
+        "object": "Oklahoma National Guard",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Tulsa_race_massacre",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "destroyed",
+        "object": "35+ square blocks of Greenwood",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Tulsa_race_massacre",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The massacre targeted Greenwood, known as \"Black Wall Street,\" a self-sustaining Black economic hub in a segregated society. White Tulsans, influenced by racial stereotypes and economic competition, mobilized under the guise of law enforcement to destroy Black institutions. This event exemplifies Jim Crow-era racial violence and the systemic erasure of Black wealth in the early 20th century."
+  },
+  {
+    "id": "disc_1967_detroit_riot_q768155",
+    "kind": "event",
+    "displayName": "1967 Detroit riot",
+    "summary": "The 1967 Detroit riot (July 23-28) began with a police raid on an unlicensed bar and escalated into a five-day uprising marked by 43 deaths, 1,189 injuries, 7,231 arrests, and $40 million in damage. It was the deadliest U.S. civil disturbance since 1863 and part of the national '[[disc_long_hot_summer_of_1967_q17044485|Long Hot Summer of 1967]]' unrest.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "police-violence",
+      "segregation",
+      "great-migration",
+      "housing"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "police-violence",
+      "segregation",
+      "great-migration",
+      "housing"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Detroit race riots",
+      "police raid",
+      "Great Migration housing discrimination",
+      "redlining in Detroit",
+      "1967 civil unrest"
+    ],
+    "jurisdictionLabel": "Detroit, Michigan",
+    "locationPrecision": "city",
+    "locationLabel": "Detroit",
+    "lat": 42.37639,
+    "lng": -83.09944,
+    "claims": [
+      {
+        "predicate": "resulted in",
+        "object": "43 deaths, 1,189 injured, 7,231 arrests, $40 million in damage",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/1967_Detroit_riot",
+        "citationLabel": "1967 Detroit riot - Wikipedia"
+      },
+      {
+        "predicate": "caused by",
+        "object": "police raid of an unlicensed after-hours bar",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/1967_Detroit_riot",
+        "citationLabel": "1967 Detroit riot - Wikipedia"
+      },
+      {
+        "predicate": "part of",
+        "object": "Long Hot Summer of 1967",
+        "confidenceLevel": "medium",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/1967_Detroit_riot",
+        "citationLabel": "1967 Detroit riot - Wikipedia"
+      }
+    ],
+    "historicalContext": "The 1967 Detroit riot emerged from systemic racial segregation and housing discrimination in mid-20th century Detroit. Police militarization and restrictive covenants had confined Black residents to impoverished neighborhoods, while federal investments under the Great Society focused on areas where poverty was already concentrated. The event reflected broader civil rights-era tensions over policing, economic inequality, and racial justice in urban America."
+  },
+  {
+    "id": "disc_1967_tampa_riots_q107293067",
+    "kind": "event",
+    "displayName": "1967 Tampa riots",
+    "summary": "The 1967 Tampa riots erupted after a Black teenager was fatally shot by police, sparking four days of protests, looting, and $2 million in damages in Tampa’s Central Park neighborhood. The unrest occurred amid racial tensions and urban renewal displacements.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "right-to-counsel",
+      "law-enforcement",
+      "segregation"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "right-to-counsel",
+      "law-enforcement",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "race riots",
+      "urban renewal",
+      "police shooting",
+      "civil unrest",
+      "Central Park Tampa"
+    ],
+    "jurisdictionLabel": "Tampa, Florida",
+    "locationPrecision": "city",
+    "locationLabel": "Tampa",
+    "lat": 27.9506,
+    "lng": -82.4572,
+    "claims": [
+      {
+        "predicate": "triggered_by",
+        "object": "Fatal police shooting of Martin Chambers",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/1967_Tampa_riots",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "resulted_in",
+        "object": "1 death and over 100 arrests",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/1967_Tampa_riots",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "connected_to",
+        "object": "Urban renewal displacement of Black residents",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/1967_Tampa_riots",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "This riot was part of the \"Long Hot Summer of 1967,\" a wave of civil disturbances across the U.S. The Tampa riots followed decades of racial segregation and displacement of Black residents through urban renewal projects, reflecting systemic inequities in housing and law enforcement."
+  },
+  {
+    "id": "disc_harlem_riot_of_1935_q5658575",
+    "kind": "event",
+    "displayName": "Harlem Riot of 1935",
+    "summary": "The Harlem Riot of 1935, sparked by rumors of a black Puerto Rican teen being beaten by a store owner, became the first 'modern' race riot in Harlem, targeting white-owned properties with 3 deaths and $2 million in damage during the Great Depression.",
+    "eraBuckets": [
+      "1930s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "jim-crow",
+      "great-migration",
+      "economic-justice",
+      "harlem"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "jim-crow",
+      "great-migration",
+      "economic-justice",
+      "harlem"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Harlem Riot 1935",
+      "racial tensions",
+      "Great Depression",
+      "Kress store",
+      "Lino Rivera"
+    ],
+    "jurisdictionLabel": "New York, New York",
+    "locationPrecision": "city",
+    "locationLabel": "Harlem",
+    "lat": 40.8116,
+    "lng": -73.9465,
+    "claims": [
+      {
+        "predicate": "caused_by",
+        "object": "rumors of a black Puerto Rican teen being beaten by a Kress store employee",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Harlem_riot_of_1935",
+        "citationLabel": "Harlem riot of 1935"
+      },
+      {
+        "predicate": "location",
+        "object": "Harlem, New York City",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Harlem_riot_of_1935",
+        "citationLabel": "Harlem riot of 1935"
+      },
+      {
+        "predicate": "date",
+        "object": "March 19, 1935",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Harlem_riot_of_1935",
+        "citationLabel": "Harlem riot of 1935"
+      },
+      {
+        "predicate": "casualties",
+        "object": "3 deaths, hundreds injured",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Harlem_riot_of_1935",
+        "citationLabel": "Harlem riot of 1935"
+      },
+      {
+        "predicate": "economic_context",
+        "object": "Great Depression-era unemployment disparities",
+        "confidenceLevel": "medium",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Harlem_riot_of_1935",
+        "citationLabel": "Harlem riot of 1935"
+      }
+    ],
+    "historicalContext": "This riot occurred during the Great Depression, a period of severe economic hardship that disproportionately affected African American and Puerto Rican communities in Harlem. The incident highlighted racial tensions and systemic inequities in employment and policing, reflecting broader patterns of segregation and economic exclusion under Jim Crow-era conditions."
+  },
+  {
+    "id": "disc_ocoee_massacre_q17107953",
+    "kind": "event",
+    "displayName": "Ocoee massacre",
+    "summary": "In November 1920, white mobs attacked African American residents in Ocoee, Florida, killing 30–80 Black people and 2 white rioters. The massacre, linked to voter suppression efforts, left Ocoee effectively an all-white 'sundown town' by 1930.",
+    "eraBuckets": [
+      "1920s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "segregation",
+      "voting-rights",
+      "sweet-auburn",
+      "mass-mobilization"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "segregation",
+      "voting-rights",
+      "sweet-auburn",
+      "mass-mobilization"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Ocoee massacre",
+      "white mob attack",
+      "African-American disenfranchisement",
+      "sundown town",
+      "Jim Crow violence"
+    ],
+    "jurisdictionLabel": "Ocoee, Florida",
+    "locationPrecision": "city",
+    "locationLabel": "Ocoee",
+    "lat": 28.5933,
+    "lng": -81.5276,
+    "claims": [
+      {
+        "predicate": "occurred_in",
+        "object": "Ocoee, Florida",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Ocoee_massacre",
+        "citationLabel": "Ocoee massacre Wikipedia entry"
+      },
+      {
+        "predicate": "date",
+        "object": "November 2–3, 1920",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Ocoee_massacre",
+        "citationLabel": "Ocoee massacre Wikipedia entry"
+      },
+      {
+        "predicate": "casualties",
+        "object": "30–80 Black people and 2 white rioters",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Ocoee_massacre",
+        "citationLabel": "Ocoee massacre Wikipedia entry"
+      },
+      {
+        "predicate": "perpetrators",
+        "object": "White mobs",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Ocoee_massacre",
+        "citationLabel": "Ocoee massacre Wikipedia entry"
+      },
+      {
+        "predicate": "context",
+        "object": "Voter suppression and racial violence under Jim Crow",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Ocoee_massacre",
+        "citationLabel": "Ocoee massacre Wikipedia entry"
+      }
+    ],
+    "historicalContext": "The Ocoee massacre occurred during the Nadir of American race relations (1890–1940), a period marked by systemic racial violence and disenfranchisement. Florida's poll taxes and Jim Crow laws suppressed Black voting rights, while economic jealousy and false rumors fueled the attack. The massacre exemplifies how racial violence was weaponized to maintain white supremacy in the post-Reconstruction South."
+  },
+  {
+    "id": "disc_crispus_attucks_q288241",
+    "kind": "event",
+    "displayName": "Crispus Attucks",
+    "summary": "Crispus Attucks (c. 1723–1770) was an African American/Native American man killed in the Boston Massacre, later becoming an abolitionist icon. His status as a free person or escaped slave remains debated.",
+    "eraBuckets": [
+      "1770s"
+    ],
+    "topicTags": [
+      "bobsled",
+      "abolition",
+      "bobsled",
+      "civil-war",
+      "bobsled"
+    ],
+    "topicIds": [
+      "bobsled",
+      "abolition",
+      "bobsled",
+      "civil-war",
+      "bobsled"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Boston Massacre",
+      "African American",
+      "Native American",
+      "abolition",
+      "runaway slave"
+    ],
+    "jurisdictionLabel": "Boston, Massachusetts",
+    "locationPrecision": "city",
+    "locationLabel": "Boston Massacre site",
+    "lat": 42.3588,
+    "lng": -71.0578,
+    "claims": [
+      {
+        "predicate": "ethnicity",
+        "object": "African American and Native American",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Crispus_Attucks",
+        "citationLabel": "Crispus Attucks - Wikipedia"
+      },
+      {
+        "predicate": "role",
+        "object": "first victim of the Boston Massacre",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Crispus_Attucks",
+        "citationLabel": "Crispus Attucks - Wikipedia"
+      },
+      {
+        "predicate": "status",
+        "object": "runaway slave",
+        "confidenceLevel": "medium",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Crispus_Attucks",
+        "citationLabel": "Crispus Attucks - Wikipedia"
+      },
+      {
+        "predicate": "part_of",
+        "object": "American Revolution",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Crispus_Attucks",
+        "citationLabel": "Crispus Attucks - Wikipedia"
+      },
+      {
+        "predicate": "commemorates",
+        "object": "anti-slavery movement icon",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Crispus_Attucks",
+        "citationLabel": "Crispus Attucks - Wikipedia"
+      }
+    ],
+    "historicalContext": "Crispus Attucks's death in the Boston Massacre (1770) made him a symbolic figure in the American Revolution and 19th-century abolitionist movements. His mixed African-Wampanoag heritage and contested status as a free person or runaway slave highlight tensions over race, freedom, and identity in colonial America. The event's eyewitness accounts and later reinterpretations reflect evolving narratives about Black participation in U.S. history."
+  },
+  {
+    "id": "disc_callaway_plantation_q5021801",
+    "kind": "place",
+    "displayName": "Callaway Plantation",
+    "summary": "The Callaway Plantation, a Greek Revival-style house museum in Washington, Georgia, operated as a cotton plantation from 1785 to 1977. Added to the National Register of Historic Places in 1972, it preserves the legacy of enslaved African Americans and Reconstruction-era architecture.",
+    "eraBuckets": [
+      "1800s",
+      "1810s",
+      "1820s",
+      "1830s",
+      "1840s",
+      "1850s",
+      "1860s",
+      "1870s",
+      "1880s",
+      "1890s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "architecture",
+      "history",
+      "culture"
+    ],
+    "topicIds": [
+      "enslavement",
+      "architecture",
+      "history",
+      "culture"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Greek Revival architecture",
+      "enslaved African Americans",
+      "National Register of Historic Places",
+      "antebellum cotton plantation",
+      "Callaway family lineage"
+    ],
+    "jurisdictionLabel": "Wilkes County, Georgia",
+    "locationPrecision": "site",
+    "locationLabel": "Callaway Plantation",
+    "lat": 33.7756,
+    "lng": -82.81201,
+    "claims": [
+      {
+        "predicate": "Added to National Register of Historic Places",
+        "object": "April 11, 1972",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Callaway_Plantation",
+        "citationLabel": "Callaway Plantation Wikipedia"
+      },
+      {
+        "predicate": "Operated as cotton plantation with enslaved labor",
+        "object": "1785-1977",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Callaway_Plantation",
+        "citationLabel": "Callaway Plantation Wikipedia"
+      },
+      {
+        "predicate": "Greek Revival architectural style",
+        "object": "Reconstruction-era Georgia example",
+        "confidenceLevel": "medium",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Callaway_Plantation",
+        "citationLabel": "Callaway Plantation Wikipedia"
+      },
+      {
+        "predicate": "Owned by Callaway family",
+        "object": "1785-1977",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Callaway_Plantation",
+        "citationLabel": "Callaway Plantation Wikipedia"
+      }
+    ],
+    "historicalContext": "This plantation reflects Georgia's antebellum cotton economy and the systemic enslavement of Black laborers. Its Greek Revival architecture exemplifies post-Civil War rebuilding efforts, while the Callaway family's 190-year ownership highlights intergenerational landholding patterns in the South. The site's preservation as a museum contextualizes Black history within broader narratives of land ownership and cultural erasure."
+  },
+  {
+    "id": "disc_the_hermitage_q2376587",
+    "kind": "place",
+    "displayName": "The Hermitage",
+    "summary": "The Hermitage is a National Historic Landmark and museum in Tennessee, serving as Andrew Jackson's plantation home and final resting place. It reflects 19th-century enslavement practices and Greek Revival architecture.",
+    "eraBuckets": [
+      "1830s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "architecture",
+      "museum",
+      "national-capital",
+      "history"
+    ],
+    "topicIds": [
+      "enslavement",
+      "architecture",
+      "museum",
+      "national-capital",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Andrew Jackson plantation",
+      "National Historic Landmark",
+      "enslaved cotton plantation",
+      "Greek Revival mansion",
+      "Tennessee heritage site"
+    ],
+    "jurisdictionLabel": "Davidson County, Tennessee",
+    "locationPrecision": "site",
+    "locationLabel": "The Hermitage",
+    "lat": 36.215,
+    "lng": -86.61306,
+    "claims": [
+      {
+        "predicate": "owned_by",
+        "object": "Andrew Jackson",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/The_Hermitage_(Nashville%2C_Tennessee)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "enslaved_population",
+        "object": "110 individuals at Jackson's death",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/The_Hermitage_(Nashville%2C_Tennessee)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "architectural_style",
+        "object": "Greek Revival",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/The_Hermitage_(Nashville%2C_Tennessee)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "designated_national_historic_landmark",
+        "object": "1960",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/66000722",
+        "citationLabel": "NPS"
+      }
+    ],
+    "historicalContext": "The Hermitage, owned by President Andrew Jackson from 1804-1845, operated as a cotton plantation with over 100 enslaved individuals at its peak. Its Greek Revival mansion (1834) symbolizes post-Andrew Jackson era architectural trends and the legacy of enslavement in antebellum America."
+  },
+  {
+    "id": "disc_ormond_plantation_house_q7103448",
+    "kind": "place",
+    "displayName": "Ormond Plantation House",
+    "summary": "The Ormond Plantation House (1789) in Destrehan, Louisiana, is a French Colonial-style Creole plantation home built by sugar baron Pierre Trepagnier, a slave owner. Added to the National Register of Historic Places in 1990, it reflects 18th-century plantation architecture and the region's sugarcane industry.",
+    "eraBuckets": [
+      "1780s",
+      "1990s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "architecture",
+      "agriculture",
+      "black-codes",
+      "history"
+    ],
+    "topicIds": [
+      "enslavement",
+      "architecture",
+      "agriculture",
+      "black-codes",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "French Colonial architecture",
+      "sugarcane plantation",
+      "slaveholding history",
+      "Creole plantation style",
+      "NRHP-listed site"
+    ],
+    "jurisdictionLabel": "St. Charles Parish, Louisiana",
+    "locationPrecision": "site",
+    "locationLabel": "Ormond Plantation House",
+    "lat": 29.95417,
+    "lng": -90.38694,
+    "claims": [
+      {
+        "predicate": "built_by",
+        "object": "Pierre Trepagnier",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Ormond_Plantation_House",
+        "citationLabel": "Ormond Plantation House Wikipedia"
+      },
+      {
+        "predicate": "constructed_in",
+        "object": "1789",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Ormond_Plantation_House",
+        "citationLabel": "Ormond Plantation House Wikipedia"
+      },
+      {
+        "predicate": "architectural_style",
+        "object": "French Colonial, West Indies style",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Ormond_Plantation_House",
+        "citationLabel": "Ormond Plantation House Wikipedia"
+      },
+      {
+        "predicate": "added_to_NRHP",
+        "object": "1990",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Ormond_Plantation_House",
+        "citationLabel": "Ormond Plantation House Wikipedia"
+      },
+      {
+        "predicate": "associated_with",
+        "object": "enslavement of Black laborers",
+        "confidenceLevel": "medium",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Ormond_Plantation_House",
+        "citationLabel": "Ormond Plantation House Wikipedia"
+      }
+    ],
+    "historicalContext": "This plantation house exemplifies the French Colonial architectural style and the economic reliance on enslaved labor in pre-Civil War Louisiana. Its construction by Pierre Trepagnier, a documented slave owner, situates it within the broader context of plantation economies and the exploitation of Black labor in the antebellum South."
+  },
+  {
+    "id": "disc_st_joseph_plantation_q7589354",
+    "kind": "place",
+    "displayName": "St. Joseph Plantation",
+    "summary": "St. Joseph Plantation is a 1840 Greek Revival-style plantation house in Vacherie, Louisiana, listed on the National Register of Historic Places. It was owned by the Waguespack family and merged with Felicity Plantation in 1890.",
+    "eraBuckets": [
+      "1840s"
+    ],
+    "topicTags": [
+      "agriculture",
+      "architecture"
+    ],
+    "topicIds": [
+      "agriculture",
+      "architecture"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "St. Joseph Plantation",
+      "Greek Revival architecture"
+    ],
+    "jurisdictionLabel": "St. James Parish, Louisiana",
+    "locationPrecision": "site",
+    "locationLabel": "St. Joseph Plantation",
+    "lat": 30.00597,
+    "lng": -90.77225,
+    "claims": [
+      {
+        "predicate": "listed_in",
+        "object": "National Register of Historic Places",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/St._Joseph_Plantation",
+        "citationLabel": "St. Joseph Plantation Wikipedia"
+      },
+      {
+        "predicate": "architectural_style",
+        "object": "Greek Revival",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/05000987",
+        "citationLabel": "NPGallery St. Joseph Plantation"
+      },
+      {
+        "predicate": "constructed_in",
+        "object": "1840",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/St._Joseph_Plantation",
+        "citationLabel": "St. Joseph Plantation Wikipedia"
+      },
+      {
+        "predicate": "owned_by",
+        "object": "Joseph Waguespack",
+        "confidenceLevel": "medium",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/St._Joseph_Plantation",
+        "citationLabel": "St. Joseph Plantation Wikipedia"
+      },
+      {
+        "predicate": "merged_with",
+        "object": "Felicity Plantation",
+        "confidenceLevel": "medium",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/St._Joseph_Plantation",
+        "citationLabel": "St. Joseph Plantation Wikipedia"
+      }
+    ],
+    "historicalContext": "This plantation represents Louisiana's antebellum architectural heritage and post-Civil War economic consolidation. Its Greek Revival design reflects 19th-century building trends in the Mississippi River Valley, while its ownership history connects to regional agricultural enterprises."
+  },
+  {
+    "id": "disc_salisbury_plantation_q7404795",
+    "kind": "place",
+    "displayName": "Salisbury Plantation",
+    "summary": "Salisbury Plantation is an 18th-century Maryland estate with a 1725 brick structure and 19th-century additions, listed on the National Register of Historic Places since 1975.",
+    "eraBuckets": [
+      "1720s"
+    ],
+    "topicTags": [
+      "architecture",
+      "national-capital",
+      "history",
+      "land-ownership",
+      "preservation"
+    ],
+    "topicIds": [
+      "architecture",
+      "national-capital",
+      "history",
+      "land-ownership",
+      "preservation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Salisbury Plantation",
+      "Maryland historic sites",
+      "National Register of Historic Places",
+      "colonial architecture"
+    ],
+    "jurisdictionLabel": "Somerset County, Maryland",
+    "locationPrecision": "site",
+    "locationLabel": "Salisbury Plantation",
+    "lat": 38.0883,
+    "lng": -75.7369,
+    "claims": [
+      {
+        "predicate": "constructed",
+        "object": "1725",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Salisbury_Plantation_(Westover%2C_Maryland)",
+        "citationLabel": "Wikipedia entry"
+      },
+      {
+        "predicate": "listed_on_national_register",
+        "object": "June 20, 1975",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/75000919",
+        "citationLabel": "NPGallery asset"
+      },
+      {
+        "predicate": "location",
+        "object": "Clyde Ford Road, Westover, Maryland",
+        "confidenceLevel": "medium",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Salisbury_Plantation_(Westover%2C_Maryland)",
+        "citationLabel": "Wikipedia entry"
+      }
+    ],
+    "historicalContext": "This Somerset County plantation reflects colonial-era architecture and land use patterns in Maryland. Its preservation helps document regional building practices and the evolution of plantation economies in the Chesapeake region."
+  },
+  {
+    "id": "disc_pomfret_plantation_q7227305",
+    "kind": "place",
+    "displayName": "Pomfret Plantation",
+    "summary": "Pomfret Plantation is a historic Federal-style house in Maryland, built between 1810 and 1830, listed on the National Register of Historic Places in 1984. The Coulbourne family owned the property for nine generations until 1921.",
+    "eraBuckets": [
+      "1810s",
+      "1820s"
+    ],
+    "topicTags": [
+      "architecture",
+      "land-ownership"
+    ],
+    "topicIds": [
+      "architecture",
+      "land-ownership"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Federal-style architecture",
+      "Coulbourne family",
+      "National Register of Historic Places",
+      "Maryland plantation",
+      "19th-century land ownership"
+    ],
+    "jurisdictionLabel": "Somerset County, Maryland",
+    "locationPrecision": "site",
+    "locationLabel": "Pomfret Plantation",
+    "lat": 38.0419,
+    "lng": -75.8017,
+    "claims": [
+      {
+        "predicate": "constructed between",
+        "object": "1810 and 1830",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Pomfret_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "listed on National Register of Historic Places",
+        "object": "1984",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/84001874",
+        "citationLabel": "NPGallery"
+      },
+      {
+        "predicate": "owned by Coulbourne family",
+        "object": "1663-1921",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Pomfret_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "architectural style",
+        "object": "Federal",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/84001874",
+        "citationLabel": "NPGallery"
+      }
+    ],
+    "historicalContext": "Pomfret Plantation represents 19th-century Federal-style architecture in Maryland's Somerset County. Its nine-generation Coulbourne family ownership (1663-1921) reflects patterns of landholding continuity in the region. The 1984 NRHP listing preserves this architectural and familial legacy."
+  },
+  {
+    "id": "disc_1967_newark_riots_q4572764",
+    "kind": "other",
+    "displayName": "1967 Newark riots",
+    "summary": "The 1967 Newark riots, part of the [[disc_long_hot_summer_of_1967_q17044485|Long Hot Summer of 1967]], erupted after police brutality against an African American cab driver, resulting in 26 deaths, over 700 injuries, and significant property damage. The riots highlighted deep racial tensions and systemic issues in Newark, New Jersey, and were a pivotal moment in the civil rights movement.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "police-violence",
+      "segregation",
+      "community-organizing",
+      "rebellion"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "police-violence",
+      "segregation",
+      "community-organizing",
+      "rebellion"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "1967 Newark riots",
+      "police brutality",
+      "civil unrest",
+      "racial tensions",
+      "urban rebellion"
+    ],
+    "jurisdictionLabel": "Newark, New Jersey",
+    "locationPrecision": "city",
+    "locationLabel": "Newark",
+    "lat": 40.732,
+    "lng": -74.191,
+    "claims": [
+      {
+        "predicate": "caused by",
+        "object": "Beating of a black man by police",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/1967_Newark_riots",
+        "citationLabel": "1967 Newark riots - Wikipedia"
+      },
+      {
+        "predicate": "resulted in",
+        "object": "26 deaths and 727 injuries",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/1967_Newark_riots",
+        "citationLabel": "1967 Newark riots - Wikipedia"
+      },
+      {
+        "predicate": "part of",
+        "object": "Long Hot Summer of 1967",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/1967_Newark_riots",
+        "citationLabel": "1967 Newark riots - Wikipedia"
+      },
+      {
+        "predicate": "location",
+        "object": "Newark, New Jersey",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/1967_Newark_riots",
+        "citationLabel": "1967 Newark riots - Wikipedia"
+      },
+      {
+        "predicate": "resulted in",
+        "object": "National Guard occupation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/1967_Newark_riots",
+        "citationLabel": "1967 Newark riots - Wikipedia"
+      },
+      {
+        "predicate": "caused by",
+        "object": "Racial profiling and lack of opportunity",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/1967_Newark_riots",
+        "citationLabel": "1967 Newark riots - Wikipedia"
+      }
+    ],
+    "historicalContext": "The 1967 Newark riots were a flashpoint in the city's long-standing racial tensions, reflecting broader national issues of police brutality, systemic racism, and political disenfranchisement. The riots were part of a wave of civil unrest across the U.S., driven by frustration over economic inequality and lack of political representation for African Americans. The event underscored the need for civil rights reforms and highlighted the consequences of neglecting urban communities."
+  },
+  {
+    "id": "disc_nottoway_plantation_q7063764",
+    "kind": "other",
+    "displayName": "Nottoway Plantation",
+    "summary": "Nottoway Plantation, a Greek Revival and Italianate-style mansion built in 1859 near White Castle, Louisiana, was destroyed by fire in 2025. It was the second-largest antebellum plantation house in the U.S. and listed on the National Register of Historic Places since 1980.",
+    "eraBuckets": [
+      "1850s"
+    ],
+    "topicTags": [
+      "architecture",
+      "anti-miscegenation",
+      "enslavement",
+      "cemetery",
+      "community"
+    ],
+    "topicIds": [
+      "architecture",
+      "anti-miscegenation",
+      "enslavement",
+      "cemetery",
+      "community"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Greek Revival architecture",
+      "antebellum plantation",
+      "Louisiana plantation",
+      "National Register of Historic Places",
+      "enslavement-era architecture"
+    ],
+    "jurisdictionLabel": "Iberville Parish, Louisiana",
+    "locationPrecision": "site",
+    "locationLabel": "Nottoway Plantation",
+    "lat": 30.18556,
+    "lng": -91.16694,
+    "claims": [
+      {
+        "predicate": "Built in",
+        "object": "1859",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Nottoway_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "Architectural style",
+        "object": "Greek Revival and Italianate",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Nottoway_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "Destroyed by fire",
+        "object": "May 15, 2025",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Nottoway_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "Listed on National Register of Historic Places",
+        "object": "June 6, 1980",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/80001733",
+        "citationLabel": "NPGallery"
+      },
+      {
+        "predicate": "Architect",
+        "object": "Henry Howard",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Nottoway_Plantation",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Nottoway Plantation exemplifies antebellum plantation architecture in the Deep South. Its 1859 construction by architect Henry Howard reflects the wealth and social structures of pre-Civil War Louisiana. The site's inclusion in the National Register of Historic Places (1980) acknowledges its significance in architectural history and its role in the region's plantation economy, which relied on enslaved labor."
+  },
+  {
+    "id": "disc_frogmore_plantation_q28124929",
+    "kind": "other",
+    "displayName": "Frogmore Plantation",
+    "summary": "Frogmore Plantation, located near Ferriday in Concordia Parish, Louisiana, is a historic cotton plantation complex with ties to enslavement. Built in 1843 in Greek Revival style, it was added to the National Register of Historic Places in 1980. The site includes a cotton gin, slave cabins, and outbuildings.",
+    "eraBuckets": [
+      "1840s",
+      "1980s",
+      "2010s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "architecture",
+      "national-capital",
+      "history"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "architecture",
+      "national-capital",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Frogmore Plantation",
+      "Greek Revival",
+      "National Register of Historic Places",
+      "enslaved labor",
+      "cotton gin"
+    ],
+    "jurisdictionLabel": "Concordia Parish, Louisiana",
+    "locationPrecision": "site",
+    "locationLabel": "Frogmore Plantation",
+    "lat": 31.59444,
+    "lng": -91.67167,
+    "claims": [
+      {
+        "predicate": "built in",
+        "object": "1843",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Frogmore_Plantation",
+        "citationLabel": "Frogmore Plantation Wikipedia page"
+      },
+      {
+        "predicate": "architectural style",
+        "object": "Greek Revival",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Frogmore_Plantation",
+        "citationLabel": "Frogmore Plantation Wikipedia page"
+      },
+      {
+        "predicate": "added to National Register of Historic Places",
+        "object": "May 31, 1980",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Frogmore_Plantation",
+        "citationLabel": "Frogmore Plantation Wikipedia page"
+      },
+      {
+        "predicate": "location",
+        "object": "11656 US 84, about 7 miles (11 km) west of Ferriday, Louisiana",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Frogmore_Plantation",
+        "citationLabel": "Frogmore Plantation Wikipedia page"
+      },
+      {
+        "predicate": "includes",
+        "object": "cotton gin, slave cabins, and outbuildings",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Frogmore_Plantation",
+        "citationLabel": "Frogmore Plantation Wikipedia page"
+      },
+      {
+        "predicate": "destroyed in fire",
+        "object": "July 26, 2019",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Frogmore_Plantation",
+        "citationLabel": "Frogmore Plantation Wikipedia page"
+      }
+    ],
+    "historicalContext": "Frogmore Plantation reflects the antebellum plantation economy in Louisiana, which relied heavily on enslaved African American labor. Its Greek Revival architecture and inclusion in the National Register of Historic Places highlight its significance in regional and national architectural history. The plantation's role as a tourist attraction and educational center underscores its ongoing relevance in preserving and interpreting the history of slavery and cotton production in the American South."
+  },
+  {
+    "id": "disc_myrtles_plantation_q6948645",
+    "kind": "other",
+    "displayName": "Myrtles Plantation",
+    "summary": "The Myrtles Plantation, built in 1796 by General David Bradford in St. Francisville, Louisiana, is a 10-acre Creole cottage-style home with 22 rooms and a 125-foot veranda. Listed on the National Register of Historic Places since 1978, it operated as a plantation using enslaved labor and is reportedly haunted, appearing in television programs.",
+    "eraBuckets": [
+      "1790s",
+      "1970s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "architecture",
+      "preservation",
+      "anti-miscegenation",
+      "civil-war"
+    ],
+    "topicIds": [
+      "enslavement",
+      "architecture",
+      "preservation",
+      "anti-miscegenation",
+      "civil-war"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "antebellum plantation",
+      "Creole cottage architecture",
+      "enslaved labor history",
+      "haunted house legend",
+      "National Register site"
+    ],
+    "jurisdictionLabel": "West Feliciana Parish, Louisiana",
+    "locationPrecision": "site",
+    "locationLabel": "Myrtles Plantation",
+    "lat": 30.80306,
+    "lng": -91.3875,
+    "claims": [
+      {
+        "predicate": "built",
+        "object": "1796 by General David Bradford",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Myrtles_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "has architectural features",
+        "object": "22 rooms over two floors",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Myrtles_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "features",
+        "object": "Creole cottage style with 125-foot veranda",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Myrtles_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "has status",
+        "object": "listed on National Register of Historic Places (1978)",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Myrtles_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "associated with",
+        "object": "reportedly haunted and featured in television",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Myrtles_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "located in",
+        "object": "St. Francisville, Louisiana",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/78001439",
+        "citationLabel": "NPS Asset Detail"
+      }
+    ],
+    "historicalContext": "The Myrtles Plantation represents antebellum Louisiana's plantation economy, which relied on enslaved labor. Its preservation as a National Register site (1978) reflects efforts to document and protect the state's complex history of slavery and architecture. The Creole cottage style is characteristic of 19th-century Louisiana plantation homes."
+  },
+  {
+    "id": "disc_mcleod_plantation_q6802238",
+    "kind": "place",
+    "displayName": "McLeod Plantation",
+    "summary": "McLeod Plantation (built 1858) is a Charleston, SC Gullah heritage site preserving slave-era structures and Civil War history, including its use as a Freedmen's Bureau office and hospital for Black Union soldiers.",
+    "eraBuckets": [
+      "1850s",
+      "1860s",
+      "1970s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "civil-war",
+      "cemetery",
+      "cemetery",
+      "cemetery",
+      "cemetery",
+      "cemetery"
+    ],
+    "topicIds": [
+      "enslavement",
+      "civil-war",
+      "cemetery",
+      "cemetery",
+      "cemetery",
+      "cemetery",
+      "cemetery"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Gullah heritage site",
+      "Civil War hospital",
+      "Freedmen's Bureau offices",
+      "slave cabins preservation",
+      "Lowcountry Sea Islands history"
+    ],
+    "jurisdictionLabel": "Charleston County, South Carolina",
+    "locationPrecision": "site",
+    "locationLabel": "McLeod Plantation",
+    "lat": 32.76278,
+    "lng": -79.97236,
+    "claims": [
+      {
+        "predicate": "constructed_in_georgian_style",
+        "object": "1858",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/McLeod_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "contains_slave_cabins",
+        "object": "6 clapboard structures",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/McLeod_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "used_as_civil_war_hospital",
+        "object": "Confederate forces (1861-1865)",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/McLeod_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "occupied_by_freedmens_bureau",
+        "object": "1865-1868",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/McLeod_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "designated_national_register",
+        "object": "1974-08-13",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/74001831",
+        "citationLabel": "NPS National Register System"
+      }
+    ],
+    "historicalContext": "This 19th-century plantation reflects both antebellum slavery and postwar Black agency. Its 6 slave cabins and Civil War-era hospital role connect to broader patterns of forced labor, Confederate occupation, and Reconstruction-era federal efforts to support emancipated people. The site's 2015 public opening underscores ongoing preservation of African American cultural heritage."
+  },
+  {
+    "id": "disc_hampton_plantation_q5646268",
+    "kind": "other",
+    "displayName": "Hampton Plantation",
+    "summary": "Hampton Plantation, a 1735-built Georgian-style plantation house in South Carolina, features one of the U.S.'s earliest temple fronts in domestic architecture. Designated a National Historic Landmark in 1970, it reflects 18th-century elite land ownership and architectural innovation. The state acquired it in 1971 for preservation.",
+    "eraBuckets": [
+      "1730s",
+      "1970s"
+    ],
+    "topicTags": [
+      "architecture",
+      "history",
+      "national-mall",
+      "preservation",
+      "sweet-auburn"
+    ],
+    "topicIds": [
+      "architecture",
+      "history",
+      "national-mall",
+      "preservation",
+      "sweet-auburn"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Georgian architecture",
+      "plantation history",
+      "historic preservation",
+      "South Carolina landmarks",
+      "temple front design"
+    ],
+    "jurisdictionLabel": "Charleston County, South Carolina",
+    "locationPrecision": "site",
+    "locationLabel": "Hampton Plantation",
+    "lat": 33.19833,
+    "lng": -79.43778,
+    "claims": [
+      {
+        "predicate": "established_in",
+        "object": "1735",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Hampton_Plantation",
+        "citationLabel": "Hampton Plantation Wikipedia entry"
+      },
+      {
+        "predicate": "architectural_style",
+        "object": "Georgian",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Hampton_Plantation",
+        "citationLabel": "Hampton Plantation Wikipedia entry"
+      },
+      {
+        "predicate": "designated_national_historic_landmark",
+        "object": "1970",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/70000582",
+        "citationLabel": "NPS NRIS database"
+      },
+      {
+        "predicate": "temple_front_addition",
+        "object": "1790-91",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Hampton_Plantation",
+        "citationLabel": "Hampton Plantation Wikipedia entry"
+      },
+      {
+        "predicate": "acquired_by_state",
+        "object": "1971",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Hampton_Plantation",
+        "citationLabel": "Hampton Plantation Wikipedia entry"
+      }
+    ],
+    "historicalContext": "Hampton Plantation exemplifies 18th-century plantation architecture and land ownership in South Carolina. Its temple front (1790) influenced American domestic design, while its preservation as a state site (1971) highlights efforts to protect pre-Civil War architectural heritage. The Horry and Rutledge families' ownership ties it to regional economic and political history."
+  },
+  {
+    "id": "disc_magnolia_plantation_and_gardens_charleston_south_q11684456",
+    "kind": "place",
+    "displayName": "Magnolia Plantation and Gardens (Charleston, South Carolina)",
+    "summary": "Magnolia Plantation (Charleston, SC) is a 390-acre historic site established in 1679 by Thomas Drayton. It operated as a rice plantation using enslaved African laborers who developed Gullah culture. The Drayton family controlled it for 15 generations, with the estate later becoming a museum highlighting its role in slavery and Lowcountry heritage.",
+    "eraBuckets": [
+      "1670s",
+      "1840s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "governors",
+      "culture"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "governors",
+      "culture"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Gullah language",
+      "rice cultivation",
+      "enslaved labor",
+      "Drayton family",
+      "Lowcountry heritage"
+    ],
+    "jurisdictionLabel": "Charleston County, South Carolina",
+    "locationPrecision": "site",
+    "locationLabel": "Magnolia Plantation and Gardens",
+    "lat": 32.87641,
+    "lng": -80.0835,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "1679 by Thomas Drayton",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Magnolia_Plantation_and_Gardens_(Charleston%2C_South_Carolina)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "used enslaved labor from",
+        "object": "Barbados in 1670s",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Magnolia_Plantation_and_Gardens_(Charleston%2C_South_Carolina)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "developed rice cultivation system with",
+        "object": "African enslaved workers creating earthworks",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Magnolia_Plantation_and_Gardens_(Charleston%2C_South_Carolina)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "preserved Gullah language and culture",
+        "object": "through West African cultural retention",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Magnolia_Plantation_and_Gardens_(Charleston%2C_South_Carolina)",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "This plantation exemplifies 17th-19th century Southern agricultural economies reliant on enslaved labor. Its rice cultivation system required complex earthworks built by African workers from rice-growing regions. The site preserves both the material legacy of slavery and the cultural continuity of the Gullah people, who maintained West African traditions in the Lowcountry region."
+  }
+]
