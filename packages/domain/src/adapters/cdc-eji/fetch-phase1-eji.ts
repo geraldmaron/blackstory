@@ -3,7 +3,7 @@
  * Rolls tract RPL_EBM to county means. Live path caches Illinois tracts under `.cache/phase1-eji-tri/`
  * and falls back to the Zenodo national CSV when the CDC state endpoint is unavailable.
  */
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { FetchLike } from '../census-demographics/fetch-county-populations.js';
@@ -11,6 +11,11 @@ import {
   ensurePhase1EjiTriCacheDir,
   phase1EjiTriCachePath,
 } from '../phase1-eji-tri-shared/cache-paths.js';
+import {
+  readCacheTextIfPresent,
+  readOrFetchCacheText,
+  writeCacheTextExclusive,
+} from '../phase1-eji-tri-shared/cache-io.js';
 import { isIllinoisCountyFips } from '../phase1-eji-tri-shared/il-counties.js';
 import {
   CDC_EJI_DATA_DOWNLOAD_URL,
@@ -104,30 +109,34 @@ async function resolveLiveIllinoisTractCsv(
 ): Promise<{ readonly text: string; readonly mode: Phase1EjiFetchMode; readonly cachePath?: string }> {
   ensurePhase1EjiTriCacheDir();
   const ilCachePath = phase1EjiTriCachePath(CDC_EJI_IL_TRACT_CACHE_FILENAME);
-  if (existsSync(ilCachePath)) {
-    return { text: readFileSync(ilCachePath, 'utf8'), mode: 'cache', cachePath: ilCachePath };
+  const cachedIl = readCacheTextIfPresent(ilCachePath);
+  if (cachedIl !== null) {
+    return { text: cachedIl, mode: 'cache', cachePath: ilCachePath };
   }
 
   const cdcUrl = CDC_EJI_STATE_CSV_URL_TEMPLATE.replace('{year}', String(referenceYear));
   try {
     const cdcText = await fetchText(cdcUrl, fetchImpl);
-    writeFileSync(ilCachePath, cdcText, 'utf8');
-    return { text: cdcText, mode: 'live-cdc', cachePath: ilCachePath };
+    if (writeCacheTextExclusive(ilCachePath, cdcText)) {
+      return { text: cdcText, mode: 'live-cdc', cachePath: ilCachePath };
+    }
+    const rereadCdc = readCacheTextIfPresent(ilCachePath);
+    return { text: rereadCdc ?? cdcText, mode: 'cache', cachePath: ilCachePath };
   } catch {
     // CDC state CSV is often unavailable; fall back to Zenodo national mirror.
   }
 
   const nationalCachePath = phase1EjiTriCachePath(CDC_EJI_NATIONAL_CACHE_FILENAME);
-  const nationalText = existsSync(nationalCachePath)
-    ? readFileSync(nationalCachePath, 'utf8')
-    : await fetchText(CDC_EJI_ZENODO_NATIONAL_CSV_URL, fetchImpl).then((text) => {
-        writeFileSync(nationalCachePath, text, 'utf8');
-        return text;
-      });
+  const nationalText = await readOrFetchCacheText(nationalCachePath, () =>
+    fetchText(CDC_EJI_ZENODO_NATIONAL_CSV_URL, fetchImpl),
+  );
 
   const ilText = filterIlTractCsvText(nationalText);
-  writeFileSync(ilCachePath, ilText, 'utf8');
-  return { text: ilText, mode: 'live-zenodo', cachePath: ilCachePath };
+  if (writeCacheTextExclusive(ilCachePath, ilText)) {
+    return { text: ilText, mode: 'live-zenodo', cachePath: ilCachePath };
+  }
+  const rereadIl = readCacheTextIfPresent(ilCachePath);
+  return { text: rereadIl ?? ilText, mode: 'cache', cachePath: ilCachePath };
 }
 
 function resolveCountyFilter(

@@ -4,7 +4,7 @@
  * distinct facilities by county — never chemical release heat maps. Caches Envirofacts
  * JSON under `.cache/phase1-eji-tri/` when live.
  */
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { FetchLike } from '../census-demographics/fetch-county-populations.js';
@@ -12,6 +12,7 @@ import {
   ensurePhase1EjiTriCacheDir,
   phase1EjiTriCachePath,
 } from '../phase1-eji-tri-shared/cache-paths.js';
+import { readCacheJsonIfPresent, readOrFetchCacheJson } from '../phase1-eji-tri-shared/cache-io.js';
 import {
   EPA_TRI_FIXTURE_FILENAME,
   EPA_TRI_HOMEPAGE_URL,
@@ -112,12 +113,7 @@ async function loadCachedJson(
   url: string,
   fetchImpl: FetchLike,
 ): Promise<readonly Record<string, unknown>[]> {
-  if (existsSync(path)) {
-    return JSON.parse(readFileSync(path, 'utf8')) as readonly Record<string, unknown>[];
-  }
-  const payload = await fetchJson(url, fetchImpl);
-  writeFileSync(path, JSON.stringify(payload), 'utf8');
-  return payload;
+  return readOrFetchCacheJson(path, () => fetchJson(url, fetchImpl));
 }
 
 function reportingCachePath(year: number): string {
@@ -167,7 +163,7 @@ export async function fetchPhase1TriCountyObservations(
     let usedCacheOnly = true;
     for (const reportingYear of reportingYears) {
       const cachePath = reportingCachePath(reportingYear);
-      if (!existsSync(cachePath)) {
+      if (readCacheJsonIfPresent(cachePath) === null) {
         usedCacheOnly = false;
       }
       const reportingPayload = await loadCachedJson(

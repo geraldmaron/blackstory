@@ -119,5 +119,5 @@ test('fetchPhase1NhgisObservations loads race and tenure fixture envelopes', () 
   assert.deepEqual(result.decades, [...PHASE1_NHGIS_THEME_IMPACT_DECADES]);
   assert.deepEqual(result.tenureDecades, [...PHASE1_NHGIS_TENURE_HOMEOWNERSHIP_DECADES]);
   assert.equal(result.rejected.length, 0);
-  assert.match(result.sourceUrl, /^https:\/\/www\.nhgis\.org/);
+  assert.match(result.sourceUrl, /^https:\/\/www\.nhgis\.org\/$/);
 });
