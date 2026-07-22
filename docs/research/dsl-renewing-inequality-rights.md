@@ -35,7 +35,7 @@ Renewing Inequality — not a complete city polygon product.
 | **DSL vector derivatives** | Georeferenced project polygons (`ur_projects.geojson`) and compiled attributes | **CC BY-NC-SA 4.0** — attribution required; **noncommercial use only**; share-alike on derivatives |
 
 **Registry id:** `dsl-renewing-inequality`  
-**Registry state:** `disabled` (scaffold — parent bead merges registry entry)  
+**Registry state:** `disabled` (registered in `EXTERNAL_DATA_SOURCES`; adapter + Chicago attribute fixtures on `feat/theme-impact-gap-ingest`)  
 **License verdict:** `noncommercial` in `EXTERNAL_DATA_SOURCES`
 
 Registration is not approval to ingest or ship geometry on public surfaces. The registry entry
@@ -107,9 +107,26 @@ from `non_spatial_data.csv` — they do not authorize public polygon rendering.
 | Polygon observations on anon surfaces | **No** — fixtures use citation artifacts only |
 | Attribute CSV pilot adapter | Present under `adapters/dsl-renewing-inequality/` |
 | Public homepage link | Required in every artifact / citation footer |
-| Commercial reuse of DSL GeoJSON | Blocked pending separate rights review |
+| Commercial reuse of DSL GeoJSON | **Blocked** — see §6 human gate below |
 
-## 6. References
+## 6. Commercial surface decision checklist (human gate)
+
+Same closed lane as [HOLC](./holc-chicago-pilot-attribution.md) §5–§6. **Do not enable commercial polygon use** until every row below is checked by the product owner (and counsel when revenue-bearing surfaces are in scope). This checklist is not legal advice — it records the minimum human decisions before flipping posture.
+
+| # | Decision | Owner action | Pass criteria | Current posture (2026-07-22) |
+|---|----------|--------------|---------------|------------------------------|
+| 1 | **Surface inventory** | List every surface that would render DSL polygons or polygon-derived metrics (anon `/themes`, embeds, MCP, exports, paid tiers). | Written surface list attached to the rights-review bead. | Public surfaces are **cite-only** artifacts. |
+| 2 | **BlackStory commercial classification** | Record whether BlackStory (or the specific surface) is **noncommercial research/education** vs **revenue-bearing / commercial** under CC BY-NC-SA. | Explicit owner determination — same standard as `mapping-inequality-holc` and `slavevoyages-transatlantic`. | **Undetermined for commercial** — default deny polygons. |
+| 3 | **Layer split** | Confirm which layers are in scope: federal characteristics tables (PD) vs DSL vector derivatives (NC-SA). | PD tables may inform staff research; **NC GeoJSON and derivatives stay gated** unless cleared. | Attributes in staff fixtures; polygons not on anon surfaces. |
+| 4 | **Attribution contract** | Approve the required public string (§4) on every artifact, footer, and export. | Custodian, homepage URL, PD federal layer, and NC-SA posture all present. | Required string locked in §4. |
+| 5 | **Share-alike on derivatives** | If any cleared surface republishes edited polygons or tile sets, confirm SA obligations with counsel. | SA compliance plan documented before publish. | **N/A** — no public polygon republish. |
+| 6 | **Counsel / DSL contact (commercial only)** | If step 2 is revenue-bearing: written NC waiver or alternate PD source (e.g. federal reports only, no DSL GeoJSON). | Email or license amendment on file — **do not invent clearance**. | **Not started** — commercial polygons remain blocked. |
+| 7 | **Registry + adapter gate** | Separate ingestion bead: enable adapter only after steps 1–6 pass for the **target surface**. | `registryState` stays `disabled`; no `ur_projects.geojson` in public build steps until then. | Registry row exists; adapter disabled; cite-only public packets. |
+| 8 | **Dignity + map rules** | Map product review: no displacement choropleths, no alarm hues, no exact-footprint labels where polygons are incomplete (17/43 Chicago). | Map dignity checklist signed; uncertainty labels on every public artifact. | Incomplete polygon coverage documented in §3. |
+
+**Default until row 6 passes for commercial:** public and revenue-bearing surfaces use **homepage cite artifacts only** — no NC GeoJSON layers, no polygon-derived observations on anon routes, no tile republish.
+
+## 7. References
 
 - [Renewing Inequality — Urban Renewal and the American City](https://dsl.richmond.edu/panorama/renewal/)
 - [Renewing Inequality Data (GitHub)](https://github.com/americanpanorama/Renewing_Inequality_Data)

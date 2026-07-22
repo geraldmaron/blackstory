@@ -43,7 +43,7 @@ Priority: **P0** unblocks published packets; **P1** deepens eras; **P2** opens n
 | HMDA county lending | Q3 | **FFIEC/CFPB HMDA Data Browser API** (`hmda-loan-level`, aggregate-only) | [Data Browser API](https://ffiec.cfpb.gov/documentation/api/data-browser/); aggregations by `counties=` FIPS + race filters | Modern HMDA **~2018–present** (browser vintages); older snapshots via [data publication](https://ffiec.cfpb.gov/data-publication/) | **`aggregate` only** — never loan-level in public DB | Public (CFPB open data) | County denial / origination rates for Cook `17031`; metrics `hmda-denial-rate-black-county`, gap derived |
 | Eviction missing for Cook | Q3, Q4, Q7 | **Eviction Lab** (`eviction-lab`) | [get-the-data](https://evictionlab.org/get-the-data/) | **2000–2018** county (ETS 2020+ separate) | `store` + attribution | Attribution required | Extend ingest to **IL counties** (esp. Cook); current 821 rows do not include `county:17031` |
 | National wealth time series | Q3 national spine, Q6 context | **SCF historic tables** (`fed-survey-consumer-finances`) | [SCF index](https://www.federalreserve.gov/econres/scfindex.htm); [FEDS note accessible tables](https://www.federalreserve.gov/econres/notes/feds-notes/greater-wealth-greater-uncertainty-changes-in-racial-inequality-in-the-survey-of-consumer-finances-accessible-20231018.htm); chartbook 1989–2022 | Triennial **1989–2022** median/mean net worth by race (**nation only**) | `store` national series | Public domain federal | Load full SCF race medians (not just 2022); **never** invent county wealth |
-| Drug sentencing quantitative | Q5–Q6 | **USSC Quick Facts** (proposed registry id `ussc-quick-facts-drug`) | [Quick Facts](https://www.ussc.gov/research/quick-facts); crack/powder archives | Federal FY series (recent FY + archive back ~2013+) | `cite` → selective `store` of published table cells | Federal public | Artifact + indicator packets for crack/powder sentence lengths & demographics; juxtaposition with statutes |
+| Drug sentencing quantitative | Q5–Q6 | **USSC Quick Facts** (`ussc-quick-facts-drug`) | [Quick Facts](https://www.ussc.gov/research/quick-facts); crack/powder archives | Federal FY series (recent FY + archive back ~2013+) | `cite` → selective `store` of published table cells | Federal public | Artifact + indicator packets for crack/powder sentence lengths & demographics; juxtaposition with statutes |
 
 ### P1 — Historical depth (eras beyond ACS 2020–2024)
 
@@ -59,7 +59,7 @@ Priority: **P0** unblocks published packets; **P1** deepens eras; **P2** opens n
 
 | Gap | Questions | Recommended source | Access | Years / geo | Strategy | Rights | Fill action |
 |-----|-----------|--------------------|--------|-------------|----------|--------|-------------|
-| Urban renewal project geography | Q7 | **DSL Renewing Inequality** (proposed `dsl-renewing-inequality`) | [map](https://dsl.richmond.edu/panorama/renewal/); [GitHub data](https://github.com/americanpanorama/Renewing_Inequality_Data); federal characteristics reports 1955–1966 | Project attributes **1955–1966**; polygons incomplete by city | `gated→store` / cite | Same DSL family as HOLC — **rights review before commercial** | Register source; Chicago pilot polygons + displacement counts as artifacts/obs; pair with NHGIS demography |
+| Urban renewal project geography | Q7 | **DSL Renewing Inequality** (`dsl-renewing-inequality`) | [map](https://dsl.richmond.edu/panorama/renewal/); [GitHub data](https://github.com/americanpanorama/Renewing_Inequality_Data); federal characteristics reports 1955–1966 | Project attributes **1955–1966**; polygons incomplete by city | `gated→store` / cite | Same DSL family as HOLC — **rights review before commercial** | Registered; Chicago attribute fixture; polygons cite/staff-gated — [rights checklist](./dsl-renewing-inequality-rights.md) §6 |
 | Environmental burden | Q9 | **CDC EJI** (`cdc-eji`) + **EPA TRI** (`epa-tri`) + optional **Superfund NPL** (`epa-superfund-npl`) | [EJI download](https://www.atsdr.cdc.gov/placeandhealth/eji/eji-data-download.html); [TRI basic files](https://www.epa.gov/toxics-release-inventory-tri-program/tri-basic-data-files-calendar-years-1987-present) | EJI 2024 tract; TRI **1987–present** facility | `store` rollups | Public | Juxtapose burden metrics with `acs-black-population-share`; **no alarm-red crime-style heat** |
 | Mass incarceration state spine | Q8 | Same as Q6: fixed BJS rates + Vera + ASJ | see P0 | multi-decade state | `store` | Public | Dedicated Q8 packets once rates QA closes |
 | Contested drug-market FOIA | Q5 | National Archives / FOIA reading rooms + peer-reviewed historiography (not a single SoT) | Case-by-case | 1970s–1990s | `cite` + `uncertaintyLabel` | Varies | Continue contested placeholder; promote individual primary docs only after editorial + rights |
@@ -83,7 +83,7 @@ Priority: **P0** unblocks published packets; **P1** deepens eras; **P2** opens n
 4. **HMDA Data Browser county aggregates** for Cook → clears Chicago HMDA defer.
 5. **Eviction Lab IL/Cook extension** → Q3/Q4 housing-stress (national file exists; Cook not loaded yet).
 6. **NHGIS key + tenure/race time series** → fair-housing / CRA era ACS predecessors.
-7. **Register + rights-review DSL Renewing Inequality** → unlock Q7.
+7. **DSL Renewing Inequality rights review (commercial gate)** → Q7 polygons remain cite-only until [checklist](./dsl-renewing-inequality-rights.md) §6 passes; attributes fixture already registered.
 8. **CDC EJI + EPA TRI county rollups** → unlock Q9.
 9. **USSC Quick Facts** selective store → drug sentencing quantitative beside statutes.
 
@@ -91,8 +91,9 @@ Priority: **P0** unblocks published packets; **P1** deepens eras; **P2** opens n
 
 | Action | Detail |
 |--------|--------|
-| Add proposed | `ussc-quick-facts-drug`, `dsl-renewing-inequality` |
-| Matrix hygiene | §B still lists BJS/Vera/SCF/SIPP as “proposed” — they are **registered disabled**; update matrix |
+| ~~Add proposed~~ | ~~`ussc-quick-facts-drug`, `dsl-renewing-inequality`~~ — **done** in `external-data-sources.ts` |
+| Matrix hygiene | ~~§B still lists BJS/Vera/SCF/SIPP as “proposed”~~ — **done** (`docs/research/context-data-source-matrix.md` §A–§B, 2026-07-22) |
+| DSL commercial gate | Human checklist in [dsl-renewing-inequality-rights.md](./dsl-renewing-inequality-rights.md) §6 — polygons stay blocked on commercial surfaces |
 | Keep disabled until beads | All fills require explicit ingestion approval; this memo is not that approval |
 
 ## 7. Acceptance for this research bead
