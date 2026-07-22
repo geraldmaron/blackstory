@@ -5,19 +5,33 @@
 
 # Runbook: Vercel public-web cutover
 
-**Bead:** `repo-gm3w`  
+**Bead:** `repo-9wv7` (hard-cut; prep was `repo-gm3w`)  
 **ADR:** [ADR-027](../adr/ADR-027-vercel-public-web-hosting.md)  
 **Project:** Vercel `geraldmarons-projects/blackstory` (`prj_AJYcJozo2XqLfBXItGxHV5SQP06h`)  
 **Root Directory:** `apps/web`
 
-## Current state (pre-hard-cut)
+## Current state (2026-07-22)
 
 | Item | Value |
 |------|--------|
 | Preview / default alias | `https://blackstory-geraldmarons-projects.vercel.app` |
-| Git production branch | `main` (Git connected) |
-| Production DNS (`blackstory.app`) | **Still App Hosting — do not flip until checklist below** |
-| Dual-run | App Hosting `apphosting*.yaml` retained; Next uses `standalone` only when `VERCEL` is unset |
+| Git production branch | `main` at `bd1b1c08` (includes `5ea25768` `_vercel_*` preserve) |
+| Production deploy | `dpl_ERR5rbReMAdUkrA3uscmYQZ9BCN6` READY — `https://blackstory-krto16cjw-geraldmarons-projects.vercel.app` |
+| Vercel domains | `blackstory.app` + `www.blackstory.app` attached; `ssoProtection=preview` (Production public) |
+| Production DNS (`blackstory.app`) | **Still App Hosting** (`35.219.200.11`) — Cloudflare DNS flip blocked (no Zone DNS MCP tool; 1Password has Cloudflare login only, no API token) |
+| Dual-run / rollback | App Hosting backends + secrets retained idle for soak |
+
+### Owner DNS flip (Cloudflare → Vercel, DNS-only / grey cloud)
+
+Preserve MX/TXT. Replace apex A and add www CNAME:
+
+| Type | Name | Content | Proxy |
+|------|------|---------|-------|
+| A | `@` / `blackstory.app` | `216.198.79.1` | DNS only |
+| A | `@` / `blackstory.app` | `64.29.17.1` | DNS only |
+| CNAME | `www` | `357ea39b2fe724a4.vercel-dns-017.com` | DNS only |
+
+Optional unblock for agents: store a Cloudflare API token (Zone DNS Edit on `blackstory.app`) in 1Password as `CLOUDFLARE_API_TOKEN`.
 
 ## Agent / MCP
 
