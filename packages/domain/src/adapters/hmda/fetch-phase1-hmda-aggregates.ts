@@ -92,6 +92,34 @@ function filterPayloadByYear(
   };
 }
 
+/**
+ * Live FFIEC responses omit `years` and use `parameters.county` (singular) with no
+ * per-slice county/activity_year. Stamp request context before parsing.
+ */
+function normalizeHmdaAggregationPayloadForCountyYear(
+  payload: HmdaAggregationsResponse,
+  countyFips: string,
+  year: number,
+): HmdaAggregationsResponse {
+  const yearStr = String(year);
+  return {
+    ...payload,
+    parameters: {
+      ...(payload.parameters ?? {}),
+      years: yearStr,
+      year: yearStr,
+      counties: countyFips,
+      county: countyFips,
+    },
+    aggregations: payload.aggregations.map((slice) => ({
+      ...slice,
+      actions_taken: String(slice.actions_taken),
+      ...(slice.activity_year ? {} : { activity_year: yearStr }),
+      ...(slice.county ? {} : { county: countyFips }),
+    })),
+  };
+}
+
 export async function fetchPhase1HmdaCountyObservations(
   options: FetchOptions = {},
 ): Promise<Phase1HmdaFetchResult> {
@@ -123,14 +151,11 @@ export async function fetchPhase1HmdaCountyObservations(
     for (const year of years) {
       try {
         const payload = await fetchAggregationForYear(countyFips, year, fetchImpl);
-        const normalized: HmdaAggregationsResponse = {
-          ...payload,
-          parameters: {
-            ...(payload.parameters ?? {}),
-            years: String(year),
-            counties: countyFips,
-          },
-        };
+        const normalized = normalizeHmdaAggregationPayloadForCountyYear(
+          payload,
+          countyFips,
+          year,
+        );
         const parsed = parseHmdaCountyAggregationResponse(normalized, countyFips);
         rejected.push(...parsed.rejected);
         allRows.push(...parsed.rows);
@@ -154,6 +179,7 @@ export async function fetchPhase1HmdaCountyObservations(
 
 export {
   buildCountyAggregationsUrl,
+  normalizeHmdaAggregationPayloadForCountyYear,
   HMDA_DATA_BROWSER_AGGREGATIONS_API_URL,
   HMDA_COUNTY_AGGREGATIONS_URL_TEMPLATE,
 };

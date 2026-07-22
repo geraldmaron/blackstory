@@ -110,13 +110,24 @@ function inferReferenceYear(
 }
 
 function parseAggregationYear(parameters?: Record<string, string>): number | undefined {
-  const years = parameters?.years?.trim();
+  const yearsRaw = parameters?.years ?? parameters?.year;
+  const years = yearsRaw === undefined ? undefined : String(yearsRaw).trim();
   if (!years) return undefined;
   const first = years.split(',')[0]?.trim();
   if (first && /^\d{4}$/.test(first)) {
     return Number(first);
   }
   return undefined;
+}
+
+function resolveCountyFipsFromPayload(
+  payload: HmdaAggregationsResponse,
+  expectedCountyFips?: string,
+): string | undefined {
+  const fromParams =
+    payload.parameters?.counties?.split(',')[0]?.trim() ||
+    payload.parameters?.county?.trim();
+  return fromParams || expectedCountyFips;
 }
 
 function assertValidCountyFips(countyFips: string): void {
@@ -134,8 +145,7 @@ export function parseHmdaCountyAggregationResponse(
   readonly rejected: readonly string[];
 } {
   const fallbackYear = parseAggregationYear(payload.parameters);
-  const fallbackCounty =
-    payload.parameters?.counties?.split(',')[0]?.trim() || expectedCountyFips;
+  const fallbackCounty = resolveCountyFipsFromPayload(payload, expectedCountyFips);
   const grouped = new Map<string, RaceYearCounts>();
   const rejected: string[] = [];
 
@@ -170,7 +180,11 @@ export function parseHmdaCountyAggregationResponse(
       continue;
     }
 
-    if (!HMDA_DENIAL_RATE_ACTIONS_TAKEN.includes(slice.actions_taken as '1' | '2' | '3')) {
+    if (
+      !HMDA_DENIAL_RATE_ACTIONS_TAKEN.includes(
+        String(slice.actions_taken) as '1' | '2' | '3',
+      )
+    ) {
       rejected.push(
         `unsupported actions_taken=${JSON.stringify(slice.actions_taken)} for race=${slice.races}`,
       );
@@ -192,7 +206,8 @@ export function parseHmdaCountyAggregationResponse(
     };
 
     const applications = existing.applications + slice.count;
-    const denials = existing.denials + (slice.actions_taken === '3' ? slice.count : 0);
+    const denials =
+      existing.denials + (String(slice.actions_taken) === '3' ? slice.count : 0);
     grouped.set(key, {
       ...existing,
       applications,

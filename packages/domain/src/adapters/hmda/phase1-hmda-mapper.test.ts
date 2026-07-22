@@ -17,6 +17,7 @@ import {
   parseHmdaCountyAggregationResponse,
   type HmdaAggregationsResponse,
 } from './phase1-hmda-mapper.js';
+import { normalizeHmdaAggregationPayloadForCountyYear } from './fetch-phase1-hmda-aggregates.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURE_PATH = join(__dirname, 'fixtures/cook-county-17031-aggregations-sample.json');
@@ -78,4 +79,30 @@ test('mapHmdaCountyCountsToObservations emits black, white, and gap denial rates
   assert.equal(gap2022.raceEthnicitySlice, undefined);
 
   assert.equal(observations.filter((obs) => obs.referencePeriod === '2023').length, 3);
+});
+
+test('parseHmdaCountyAggregationResponse accepts live FFIEC shape (county singular, no slice year)', () => {
+  const liveShaped: HmdaAggregationsResponse = {
+    parameters: {
+      county: '17031',
+      actions_taken: '1,2,3',
+      races: 'White,Black or African American',
+    },
+    aggregations: [
+      { count: 100, actions_taken: '1', races: 'White' },
+      { count: 10, actions_taken: '3', races: 'White' },
+      { count: 50, actions_taken: '1', races: 'Black or African American' },
+      { count: 20, actions_taken: '3', races: 'Black or African American' },
+    ],
+  };
+
+  const normalized = normalizeHmdaAggregationPayloadForCountyYear(liveShaped, '17031', 2022);
+  const parsed = parseHmdaCountyAggregationResponse(normalized, '17031');
+  assert.equal(parsed.rejected.length, 0);
+  assert.equal(parsed.rows.length, 2);
+  const black = parsed.rows.find((row) => row.race === 'Black or African American');
+  assert.ok(black);
+  assert.equal(black.referenceYear, 2022);
+  assert.equal(black.applications, 70);
+  assert.equal(black.denials, 20);
 });

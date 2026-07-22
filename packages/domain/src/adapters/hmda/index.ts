@@ -27,5 +27,6 @@ export {
 export {
   buildCountyAggregationsUrl,
   fetchPhase1HmdaCountyObservations,
+  normalizeHmdaAggregationPayloadForCountyYear,
   type Phase1HmdaFetchResult,
 } from './fetch-phase1-hmda-aggregates.js';
