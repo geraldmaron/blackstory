@@ -57,4 +57,9 @@ Then load jurisdictions, then (optional) apply fixture:
 node --conditions development --import tsx packages/firebase/scripts/load-reference-jurisdictions.ts
 INGEST_PHASE1_INDICATORS_APPLY=1 DRY_RUN=0 DATABASE_URL=… \
   node --conditions development --import tsx packages/firebase/scripts/ingest-phase1-indicators.ts
+BUILD_PHASE1_COVERAGE_APPLY=1 DRY_RUN=0 DATABASE_URL=… \
+  node --conditions development --import tsx packages/firebase/scripts/build-phase1-indicator-coverage-snapshot.ts
 ```
+
+The coverage snapshot upserts `bb_public.materialized_snapshots` key `phase1IndicatorCoverage`
+(observation + series counts) so `/data` reads `sampleObservationCount` via a point-get.

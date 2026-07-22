@@ -23,6 +23,10 @@ import {
   summarizePhase1IndicatorCatalog,
 } from '@repo/domain';
 import pg from 'pg';
+import {
+  buildPhase1IndicatorCoverageSnapshot,
+  writePhase1IndicatorCoverageSnapshot,
+} from './build-phase1-indicator-coverage-snapshot.ts';
 
 function normalizePgConnectionString(connectionString: string): {
   readonly connectionString: string;
@@ -314,7 +318,26 @@ async function main(): Promise<void> {
     throw new Error('DATABASE_URL (or APP_DATABASE_URL) required for apply mode');
   }
   await applyToPostgres(fixture, databaseUrl);
-  console.log('Applied Phase 1 series, jurisdictions, observations, and bindings.');
+  const conn = normalizePgConnectionString(databaseUrl);
+  const pool = new pg.Pool(conn);
+  try {
+    const snapshot = await buildPhase1IndicatorCoverageSnapshot(pool);
+    const snapshotOutcome = await writePhase1IndicatorCoverageSnapshot(pool, snapshot);
+    console.log(
+      JSON.stringify(
+        {
+          applied: true,
+          snapshotOutcome,
+          sampleObservationCount: snapshot.sampleObservationCount,
+          seriesCount: snapshot.seriesCount,
+        },
+        null,
+        2,
+      ),
+    );
+  } finally {
+    await pool.end();
+  }
 }
 
 main().catch((error) => {
