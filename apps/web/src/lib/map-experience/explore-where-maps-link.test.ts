@@ -38,7 +38,7 @@ describe('exploreWhereMapsLink', () => {
         displayName: 'Test',
         oneLineStory: 'Test',
         precision: 'city',
-        geoPrecisionTier: 'city',
+        geoPrecisionTier: 'locality',
         eraBuckets: [],
         notabilityLabels: [],
         evidenceCount: 0,

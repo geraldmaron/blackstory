@@ -1318,7 +1318,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   // Spotlight: native <dialog> for focus trap + restore-focus (same contract as @repo/ui Dialog).
   const spotlightOpen = Boolean(view.selectedEdge) || Boolean(selectedFeature);
   const dismissSpotlight = view.selectedEdge ? handleCloseEdge : handleClearSelected;
-  const spotlightContentKey = view.selectedEdge?.id ?? view.viewState.selected ?? null;
+  const spotlightContentKey = view.selectedEdge?.edgeId ?? view.viewState.selected ?? null;
   useEffect(() => {
     if (!spotlightOpen) return undefined;
     const node = spotlightDialogRef.current;

@@ -128,10 +128,10 @@ export type FactRecord = {
    * non-empty array resolves to LIVE claims without checking they still exist  see
    * `./derivation.ts`.
    */
-  readonly derivedFromClaimIds: readonly string[];
+  readonly derivedFromClaimIds?: readonly string[];
   /** `EntityRelationship.id`s (`../relationship.ts`) this fact was derived from, if any. Same
-   * empty-is-valid convention as `derivedFromClaimIds`. */
-  readonly derivedFromRelationshipIds: readonly string[];
+   * empty-is-valid / omitted-is-valid convention as `derivedFromClaimIds`. */
+  readonly derivedFromRelationshipIds?: readonly string[];
   readonly provenance: FactProvenance;
   readonly status: FactStatus;
   readonly confidence: FactConfidenceGrade;
@@ -205,12 +205,12 @@ export function assertFactRecordStructurallyValid(fact: FactRecord): void {
     ...(fact.confidenceNote !== undefined ? { confidenceNote: fact.confidenceNote } : {}),
   });
 
-  for (const claimId of fact.derivedFromClaimIds) {
+  for (const claimId of fact.derivedFromClaimIds ?? []) {
     if (!isNonEmpty(claimId)) {
       throw new Error('FactRecord.derivedFromClaimIds[] entries must be non-empty when present');
     }
   }
-  for (const relationshipId of fact.derivedFromRelationshipIds) {
+  for (const relationshipId of fact.derivedFromRelationshipIds ?? []) {
     if (!isNonEmpty(relationshipId)) {
       throw new Error(
         'FactRecord.derivedFromRelationshipIds[] entries must be non-empty when present',

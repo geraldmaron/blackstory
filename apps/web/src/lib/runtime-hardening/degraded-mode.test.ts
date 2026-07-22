@@ -4,7 +4,7 @@
 
 import assert from 'node:assert/strict';
 import { afterEach, test } from 'node:test';
-import { resolvePublicEntity } from './degraded-mode.ts';
+import { resolvePublicEntity } from './degraded-mode.js';
 
 const ORIGINAL_ENV = { ...process.env };
 
