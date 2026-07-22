@@ -5,7 +5,12 @@
  * remapping under transpilePackages until Turbopack supports extensionAlias.
  */
 
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { securityHeadersForNextConfig } from './src/lib/web-security/next-config-headers.mjs';
+
+const appDir = path.dirname(fileURLToPath(import.meta.url));
+const monorepoRoot = path.join(appDir, '../..');
 
 const globalSecurityHeaders = securityHeadersForNextConfig();
 
@@ -30,6 +35,11 @@ const nextConfig = {
   // App Hosting / Cloud Run need a self-contained server bundle for monorepo deploys.
   // Vercel sets VERCEL=1 and serves the Next build directly — standalone breaks that path.
   ...(process.env.VERCEL ? {} : { output: 'standalone' }),
+  // Constitution JSON is read at runtime via fs (not import); include it in serverless traces.
+  outputFileTracingRoot: monorepoRoot,
+  outputFileTracingIncludes: {
+    '/*': ['./packages/schemas/constitution/**/*'],
+  },
   webpack: (config, { isServer }) => {
     // NodeNext packages emit `.js` specifiers that map to `.ts`/`.tsx` sources.
     config.resolve.extensionAlias = {

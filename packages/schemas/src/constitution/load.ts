@@ -2,8 +2,14 @@
  * Read-only loaders for the shared product constitution JSON and fixtures.
  * Policy values live only under packages/schemas/constitution/; this module
  * never exposes mutation or write APIs for public endpoints.
+ *
+ * Serverless note: Next/Vercel bundles this module into chunks where
+ * `import.meta.url` no longer points at packages/schemas. Prefer resolving via
+ * `@repo/schemas/package.json`, then cwd/monorepo fallbacks, then the source
+ * layout relative to this file (App Hosting / local).
  */
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -13,12 +19,32 @@ import {
   type ProductConstitution,
 } from './schema.js';
 
+const require = createRequire(import.meta.url);
+
 /** Prefer DISCOVERY_REPO_ROOT (Cloud Functions upload root) when the bundle inlines this module. */
 function resolveSchemasPackageRoot(): string {
   const deployRoot = process.env.DISCOVERY_REPO_ROOT?.trim();
   if (deployRoot !== undefined && deployRoot.length > 0) {
     return join(deployRoot, 'packages', 'schemas');
   }
+
+  try {
+    return dirname(require.resolve('@repo/schemas/package.json'));
+  } catch {
+    // Bundlers may erase the package entry; fall through.
+  }
+
+  const cwdCandidates = [
+    join(process.cwd(), 'packages', 'schemas'),
+    join(process.cwd(), '..', '..', 'packages', 'schemas'),
+    join(process.cwd(), '..', 'packages', 'schemas'),
+  ];
+  for (const candidate of cwdCandidates) {
+    if (existsSync(join(candidate, 'constitution', 'policy.v1.json'))) {
+      return candidate;
+    }
+  }
+
   return join(dirname(fileURLToPath(import.meta.url)), '../..');
 }
 

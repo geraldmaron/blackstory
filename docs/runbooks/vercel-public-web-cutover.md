@@ -47,7 +47,7 @@ Set on the Vercel project (Preview + Production unless noted):
 | `PUBLIC_READ_API_DISABLED` | `0` (or `1` to force degraded mode) |
 | `REQUEST_INTEGRITY_MODE` | `enforce` |
 | `DATABASE_SSL` | `1` |
-| `DATABASE_URL` | Sensitive; service-role / pooler URL from 1Password (`Supabase: blackstory-app`) |
+| `DATABASE_URL` | Sensitive; **Supabase session pooler** (IPv4). Direct `db.<ref>.supabase.co` is IPv6-only and fails on Vercel (`ENOTFOUND`). For `blackstory-app` use `aws-1-us-west-2.pooler.supabase.com:5432` with user `postgres.<ref>`, `sslmode=require`, `uselibpqcompat=true`. Decode the DB password once if the source URL was already percent-encoded (passwords containing `%`/`@` break when double-encoded). |
 | `SENTRY_DSN` | Optional; add before hard cut if production error tracking is required |
 
 Update without printing secrets:
