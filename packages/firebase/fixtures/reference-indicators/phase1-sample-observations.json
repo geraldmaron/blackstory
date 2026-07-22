@@ -157,17 +157,17 @@
       "notes": "Illustrative Fulton County GA share — re-pull via census API on live ingest."
     },
     {
-      "id": "obs:eviction-filing-rate-county:county:13121:2018",
+      "id": "obs:eviction-filing-rate-county:county:13121:2016",
       "metricId": "eviction-filing-rate-county",
       "jurisdictionId": "county:13121",
       "boundaryVersion": "county-2020",
-      "referencePeriod": "2018",
-      "datasetVintage": "Eviction Lab national map / analysis files",
-      "estimate": 8.4,
+      "referencePeriod": "2016",
+      "datasetVintage": "Eviction Lab county proprietary valid 2000–2018",
+      "estimate": 18.7,
       "source": "eviction-lab",
-      "sourceUrl": "https://evictionlab.org/get-the-data/",
+      "sourceUrl": "https://data-downloads.evictionlab.org/#data-for-analysis/",
       "retrievedAt": "2026-07-22T00:00:00.000Z",
-      "notes": "Illustrative filing-rate shape — replace from Eviction Lab download on live ingest; attribute Eviction Lab."
+      "notes": "Court-observed Fulton County GA filing rate — cite Eviction Lab (ODC-BY 1.0)."
     },
     {
       "id": "obs:vera-jail-population-rate-county:county:24031:2018",
