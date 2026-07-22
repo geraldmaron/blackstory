@@ -65,24 +65,36 @@ test('needsQueryNormalizationRedirect is idempotent for canonical /search URLs',
   const canonical = new URL('https://example.com/search?kind=place&q=school');
   assert.equal(needsQueryNormalizationRedirect(canonical), false);
 
-  let url = new URL('https://example.com/search?q=school&kind=place');
-  for (let hop = 0; hop < 5; hop += 1) {
-    if (!needsQueryNormalizationRedirect(url)) break;
-    url = buildNormalizedUrl(url);
-  }
-  assert.equal(url.pathname + url.search, '/search?kind=place&q=school');
-  assert.equal(needsQueryNormalizationRedirect(url), false);
+  // Reorder-only URLs must not redirect (Vercel/Next can emit a self-Location 308 loop).
+  const reordered = new URL('https://example.com/search?q=school&kind=place');
+  assert.equal(needsQueryNormalizationRedirect(reordered), false);
+  assert.equal(
+    buildNormalizedUrl(reordered).pathname + buildNormalizedUrl(reordered).search,
+    '/search?kind=place&q=school',
+  );
 });
 
-test('needsQueryNormalizationRedirect is idempotent for multi-param sort links', () => {
+test('needsQueryNormalizationRedirect ignores multi-param sort order', () => {
   const canonical = new URL('https://example.com/search?q=test&sort=relevance');
   assert.equal(needsQueryNormalizationRedirect(canonical), false);
 
-  const dirty = new URL('https://example.com/search?sort=relevance&q=test');
-  assert.equal(needsQueryNormalizationRedirect(dirty), true);
-  const once = buildNormalizedUrl(dirty);
-  assert.equal(once.search, '?q=test&sort=relevance');
-  assert.equal(needsQueryNormalizationRedirect(once), false);
+  const reordered = new URL('https://example.com/search?sort=relevance&q=test');
+  assert.equal(needsQueryNormalizationRedirect(reordered), false);
+  assert.equal(buildNormalizedUrl(reordered).search, '?q=test&sort=relevance');
+});
+
+test('search form query order does not redirect (prod ERR_TOO_MANY_REDIRECTS regression)', () => {
+  // HTML form field order is q → kind → status → era; alphabetical would be era/kind/q/status.
+  const formSubmit = new URL(
+    'https://blackstory.app/search?q=Obama&kind=all&status=all&era=all',
+  );
+  assert.equal(needsQueryNormalizationRedirect(formSubmit), false);
+  assert.equal(
+    needsQueryNormalizationRedirect(
+      new URL('https://blackstory.app/search?q=Obama&kind=place'),
+    ),
+    false,
+  );
 });
 
 test('needsQueryNormalizationRedirect strips trailing slash before comparing', () => {

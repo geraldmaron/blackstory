@@ -4,6 +4,10 @@
  * Shareable map/history links are canonicalized so revisit/bookmark URLs stay stable.
  * Vercel Authentication `_vercel_share` (and other `_vercel_*` keys) are preserved on
  * redirects only — never in cache keys — to avoid Preview SSO redirect loops.
+ *
+ * Redirect decisions ignore query-param *order*. Sorting is for cache-key stability only.
+ * Reorder-only 308s can emit a Location equal to the request on Vercel/Next middleware,
+ * which loops (`ERR_TOO_MANY_REDIRECTS`) — notably the /search form order q/kind/status/era.
  */
 
 import { buildExploreSearchParams, parseExploreSearchParams } from '../map-experience/url-state';
@@ -151,11 +155,29 @@ export function buildNormalizedUrl(url: URL): URL {
   return normalized;
 }
 
-/** True when the incoming URL carries params that should be stripped via redirect.  */
+/**
+ * Order-insensitive query fingerprint for redirect comparisons.
+ * Same keys/values in any order compare equal; used so we never 308 solely to re-sort.
+ */
+function stableSearchFingerprint(search: string): string {
+  const params = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
+  return [...params.entries()]
+    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+    .sort((a, b) => a.localeCompare(b))
+    .join('&');
+}
+
+/**
+ * True when the incoming URL needs a normalization redirect (strip tracking, drop
+ * unknown keys, canonicalize values/path). Param reorder alone is not a reason to redirect.
+ */
 export function needsQueryNormalizationRedirect(url: URL): boolean {
   const normalized = buildNormalizedUrl(url);
-  const raw = `${url.pathname}${url.search}`;
-  return `${normalized.pathname}${normalized.search}` !== raw;
+  // Compare the request pathname as-is so trailing-slash cleanup still 308s.
+  if (url.pathname !== normalized.pathname) {
+    return true;
+  }
+  return stableSearchFingerprint(url.search) !== stableSearchFingerprint(normalized.search);
 }
 
 /** Normalize App Router searchParams records for server components.  */

@@ -53,6 +53,8 @@ Older dual-A / project-hash CNAME targets may still resolve on Vercel’s edge b
 
 If Vercel Authentication (or share-link protection) is on for Preview, SSO returns with `_vercel_share=…`. Edge query normalization **must preserve** `_vercel_*` handshake params on redirects (see `apps/web/src/lib/runtime-hardening/query-normalization.ts`). Stripping them 308s to a bare URL and re-triggers SSO → `ERR_TOO_MANY_REDIRECTS` (often described by users as “too many requests”). Share tokens stay out of CDN cache keys.
 
+**Query-param order:** Do **not** 308 solely to alphabetize allowlisted keys. The `/search` GET form submits `q&kind&status&era`; a reorder-only Location can equal the request on Vercel/Next middleware and loop (`ERR_TOO_MANY_REDIRECTS`). Cache keys may still sort; redirects only when keys/values/path actually change (tracking strip, unknown keys, value canonicalization, trailing slash).
+
 **Evidence matrix (2026-07-22 probe, no secrets):**
 
 | Surface | Backend | Deployment Protection | `/search?q=obama` | `?_vercel_share=` behavior | Loop? |
