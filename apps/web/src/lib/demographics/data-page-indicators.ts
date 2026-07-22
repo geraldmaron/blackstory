@@ -62,9 +62,15 @@ async function fetchDataPageObservations(): Promise<readonly DataPageObservation
 }
 
 export async function getDataPageIndicatorBundle(): Promise<DataPageIndicatorBundle> {
-  const snapshot = await fetchMaterializedSnapshot('dataPageIndicatorSeries');
-  if (isDataPageIndicatorBundle(snapshot)) {
-    return snapshot;
+  if (resolvePostgresConnectionString()) {
+    try {
+      const snapshot = await fetchMaterializedSnapshot('dataPageIndicatorSeries');
+      if (isDataPageIndicatorBundle(snapshot)) {
+        return snapshot;
+      }
+    } catch {
+      // Fall through to live observation query or fixture bundle.
+    }
   }
 
   const observations = await fetchDataPageObservations();
