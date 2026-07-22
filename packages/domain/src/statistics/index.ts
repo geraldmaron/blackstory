@@ -67,3 +67,16 @@ export type {
 } from './census-national-decade.js';
 
 export * from './public-data-summaries.js';
+
+export {
+  PHASE1_INDICATOR_THEMES,
+  PHASE1_INDICATOR_CATALOG,
+  getPhase1Indicator,
+  listPhase1IndicatorsByTheme,
+  summarizePhase1IndicatorCatalog,
+} from './phase1-indicator-catalog.js';
+export type {
+  Phase1IndicatorTheme,
+  Phase1IndicatorDefinition,
+  Phase1IndicatorCatalogSummary,
+} from './phase1-indicator-catalog.js';

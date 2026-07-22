@@ -12,6 +12,7 @@ import type {
   HistoricalStatePopulationCoverage,
   NationalPopulationTimelineRow,
   OpportunityAtlasCoverageSummary,
+  Phase1IndicatorCoverageSummary,
   StatePopulationChange,
 } from '@repo/domain/statistics/public-data-summaries';
 import { AcsCoverageChart } from '../../components/data/AcsCoverageChart';
@@ -29,6 +30,7 @@ const PAGE_SECTIONS = [
   { id: 'orientation', label: 'Start here' },
   { id: 'population', label: 'Population' },
   { id: 'acs', label: 'Neighborhoods' },
+  { id: 'context-indicators', label: 'Context indicators' },
   { id: 'hate-crime', label: 'Hate crime' },
   { id: 'mobility', label: 'Opportunity' },
   { id: 'how-to-use', label: 'Next step' },
@@ -65,6 +67,7 @@ export type DataSectionsProps = {
   readonly stateNameByFips: Readonly<Record<string, string>>;
   readonly historicalStates: HistoricalStatePopulationCoverage | undefined;
   readonly acs: AcsCoverageSummary | undefined;
+  readonly phase1Indicators: Phase1IndicatorCoverageSummary | undefined;
   readonly hateCrime: HateCrimeYearSummary | undefined;
   readonly hateCrimeByYear: readonly HateCrimeYearSummary[];
   readonly latestHateCrimeYear: string;
@@ -93,6 +96,7 @@ export function DataSections({
   stateNameByFips,
   historicalStates,
   acs,
+  phase1Indicators,
   hateCrime,
   hateCrimeByYear,
   latestHateCrimeYear,
@@ -265,6 +269,59 @@ export function DataSections({
           ) : (
             <DataUnavailable topic="Neighborhood estimate coverage" />
           )}
+        </section>
+
+        <section
+          className="ds-section ds-record-section"
+          aria-labelledby="context-indicators-heading"
+          id="context-indicators"
+        >
+          <p className="ds-section__kicker">
+            <span className="ds-kicker-index" aria-hidden="true" />
+            Research context
+          </p>
+          <h2 className="ds-section__title" id="context-indicators-heading">
+            Curated indicator catalog
+          </h2>
+          <p className="ds-section__lede">
+            A short list of justice, wealth, housing, and education metrics we are wiring for
+            research and operator tools. Showing a metric beside a law or place is context — not
+            proof that the law caused the number. See methodology for the full rule.
+          </p>
+          {phase1Indicators ? (
+            <DataStatStrip
+              labelledBy="context-indicators-heading"
+              sources={[
+                {
+                  label: 'Context data source matrix',
+                  url: '/methodology',
+                },
+              ]}
+              items={[
+                {
+                  id: 'p1-metrics',
+                  value: formatCount(phase1Indicators.metricCount),
+                  label: 'Curated metrics defined',
+                  note: phase1Indicators.themes.join(', '),
+                },
+                {
+                  id: 'p1-obs',
+                  value: formatCount(phase1Indicators.sampleObservationCount),
+                  label: 'Sample observations loaded',
+                  note:
+                    phase1Indicators.sampleObservationCount === 0
+                      ? 'Catalog only until Postgres ingest runs'
+                      : 'From bb_reference statistical observations',
+                },
+              ]}
+            />
+          ) : (
+            <DataUnavailable topic="Context indicator catalog" />
+          )}
+          <p className="ds-sans ds-data-page__empty">
+            <Link href="/methodology">Juxtaposition is not causation</Link> — how we talk about
+            laws and indicators together.
+          </p>
         </section>
 
         <section
