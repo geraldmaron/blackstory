@@ -1,7 +1,7 @@
 /**
- * NHGIS Cook County race population-share ingest for Phase 1 observations into
- * bb_reference.statistical_observations. Uses curated decennial county race fixture
- * (1970–2010) — live NHGIS API extract for these decades deferred until registered.
+ * NHGIS Cook County race population-share and tenure homeownership ingest for Phase 1
+ * observations into bb_reference.statistical_observations. Uses curated decennial county
+ * fixtures (population 1970–2010; tenure-by-race homeownership 1990–2010).
  *
  * Usage (repo root):
  *   # Dry-run (default)
@@ -12,11 +12,6 @@
  *   DRY_RUN=0 INGEST_PHASE1_NHGIS_APPLY=1 DATABASE_URL=postgresql://... \
  *     node --conditions development --import tsx \
  *     packages/firebase/scripts/ingest-phase1-nhgis.ts
- *
- *   # Custom fixture CSV
- *   node --conditions development --import tsx \
- *     packages/firebase/scripts/ingest-phase1-nhgis.ts \
- *     --nhgis-fixture-csv=packages/firebase/fixtures/reference-indicators/nhgis-cook-county-17031-race-population-share-1970-2010.csv
  */
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -26,7 +21,7 @@ import {
   listPhase1NhgisIndicators,
   NHGIS_CITATION_URL,
   NHGIS_HOMEPAGE_URL,
-  PHASE1_NHGIS_TENURE_DEFERRED_NOTE,
+  PHASE1_NHGIS_ATTRIBUTION_NOTE,
   type Phase1NhgisObservationDraft,
 } from '@repo/domain';
 import pg from 'pg';
@@ -37,9 +32,13 @@ import {
 } from './build-phase1-indicator-coverage-snapshot.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const DEFAULT_FIXTURE = join(
+const DEFAULT_RACE_FIXTURE = join(
   __dirname,
   '../fixtures/reference-indicators/nhgis-cook-county-17031-race-population-share-1970-2010.csv',
+);
+const DEFAULT_TENURE_FIXTURE = join(
+  __dirname,
+  '../fixtures/reference-indicators/nhgis-cook-county-17031-tenure-homeownership-by-race-1990-2010.csv',
 );
 
 function arg(name: string): string | undefined {
@@ -127,15 +126,16 @@ async function applyObservations(
           JSON.stringify({
             raceEthnicitySlice: series.raceEthnicitySlice ?? null,
             methodologyNote:
-              'Decennial county race population share from curated NHGIS / Census counts; tenure deferred.',
-            tenureNote: PHASE1_NHGIS_TENURE_DEFERRED_NOTE,
+              'Decennial county race population share and tenure-by-race homeownership from curated NHGIS / Census fixtures.',
             nhgisAttribution: NHGIS_CITATION_URL,
+            attributionNote: PHASE1_NHGIS_ATTRIBUTION_NOTE,
           }),
         ],
       );
     }
 
     for (const obs of observations) {
+      const isTenureMetric = obs.metricId.includes('homeownership-rate');
       await client.query(
         `INSERT INTO bb_reference.statistical_observations
           (id, metric_id, jurisdiction_id, boundary_version, reference_period, dataset_vintage,
@@ -162,11 +162,15 @@ async function applyObservations(
           obs.retrievedAt,
           obs.contentHash,
           JSON.stringify({
-            totalPopulation: obs.totalPopulation ?? null,
-            raceCount: obs.raceCount ?? null,
-            shareFormula: 'race_count / total_population × 100',
+            ...(obs.totalPopulation !== undefined ? { totalPopulation: obs.totalPopulation } : {}),
+            ...(obs.raceCount !== undefined ? { raceCount: obs.raceCount } : {}),
+            ...(obs.ownerOccupied !== undefined ? { ownerOccupied: obs.ownerOccupied } : {}),
+            ...(obs.occupiedUnits !== undefined ? { occupiedUnits: obs.occupiedUnits } : {}),
+            shareFormula: isTenureMetric
+              ? 'owner_occupied_race / occupied_race × 100'
+              : 'race_count / total_population × 100',
             nhgisAttribution: NHGIS_CITATION_URL,
-            tenureDeferred: PHASE1_NHGIS_TENURE_DEFERRED_NOTE,
+            attributionNote: PHASE1_NHGIS_ATTRIBUTION_NOTE,
           }),
         ],
       );
@@ -186,15 +190,21 @@ async function applyObservations(
 
 async function main(): Promise<void> {
   const apply = process.env.INGEST_PHASE1_NHGIS_APPLY === '1' && process.env.DRY_RUN !== '1';
-  const fixturePath = arg('nhgis-fixture-csv') ?? DEFAULT_FIXTURE;
+  const raceFixturePath = arg('nhgis-fixture-csv') ?? DEFAULT_RACE_FIXTURE;
+  const tenureFixturePath = arg('nhgis-tenure-fixture-csv') ?? DEFAULT_TENURE_FIXTURE;
 
-  if (!existsSync(fixturePath)) {
-    throw new Error(`NHGIS race population-share fixture not found: ${fixturePath}`);
+  if (!existsSync(raceFixturePath)) {
+    throw new Error(`NHGIS race population-share fixture not found: ${raceFixturePath}`);
+  }
+  if (!existsSync(tenureFixturePath)) {
+    throw new Error(`NHGIS tenure homeownership fixture not found: ${tenureFixturePath}`);
   }
 
   const fetchResult = fetchPhase1NhgisObservations({
-    fixtureCsvText: readFileSync(fixturePath, 'utf8'),
-    fixturePath,
+    fixtureCsvText: readFileSync(raceFixturePath, 'utf8'),
+    fixturePath: raceFixturePath,
+    tenureFixtureCsvText: readFileSync(tenureFixturePath, 'utf8'),
+    tenureFixturePath,
   });
 
   const byMetric = new Map<string, number>();
@@ -206,14 +216,16 @@ async function main(): Promise<void> {
     ok: true,
     dryRun: !apply,
     decades: fetchResult.decades,
+    tenureDecades: fetchResult.tenureDecades,
     fetchedObservations: fetchResult.observations.length,
     observationsByMetric: Object.fromEntries([...byMetric.entries()].sort()),
     rejectedParseRows: fetchResult.rejected.length,
     fixturePath: fetchResult.fixturePath,
+    tenureFixturePath: fetchResult.tenureFixturePath,
     sourceUrl: fetchResult.sourceUrl,
     nhgisAttribution: NHGIS_CITATION_URL,
     nhgisHomepage: NHGIS_HOMEPAGE_URL,
-    tenureDeferred: PHASE1_NHGIS_TENURE_DEFERRED_NOTE,
+    attributionNote: PHASE1_NHGIS_ATTRIBUTION_NOTE,
   };
 
   if (!apply) {

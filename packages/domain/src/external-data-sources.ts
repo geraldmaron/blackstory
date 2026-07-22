@@ -485,7 +485,7 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     notes:
       'Historical decennial 1790–2020 county race counts for pre-2000 decades and boundary-stable ' +
       'Δ via NHGIS time-series tables + crosswalks. Phase 1 Cook `county:17031` population-share ' +
-      'fixture covers 1970–2010 (fair-housing/CRA spine); tenure-by-race deferred. Live extract ' +
+      'fixture covers 1970–2010 population share and 1990–2010 tenure-by-race homeownership for Cook `county:17031`. Live extract ' +
       'still requires NHGIS_API_KEY — see adapters/nhgis and demographics/comparability.ts.',
   },
   {

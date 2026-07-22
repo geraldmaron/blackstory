@@ -33,6 +33,7 @@ test('P0 covers redlining and drug_policy_state with timelines + indicators', ()
 test('Q3 resolves Phase 1 housing and wealth metrics', () => {
   const series = resolvePhase1BindingsForQuestion('Q3');
   assert.ok(series.some((row) => row.metricId === 'acs-homeownership-rate-black-county'));
+  assert.ok(series.some((row) => row.metricId === 'nhgis-homeownership-rate-black-county'));
   assert.ok(series.some((row) => row.metricId === 'scf-median-wealth-black-nation'));
 });
 

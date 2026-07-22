@@ -1,0 +1,11 @@
+# Cook County IL (17031) decennial occupied-housing tenure by race of householder for NHGIS Phase 1 homeownership-rate ingest.
+# Rate = owner_occupied_race / occupied_race × 100 (one decimal), aligned with ACS B25003B / B25003A householder-race universe.
+# 1990: Census 1990 STF1A Table H9 (Tenure by Race of Householder), Illinois STF1A county summary (SUMLEV 050).
+# 2000: Census 2000 SF1 H015A (White alone householder) + H015B (Black alone householder).
+# 2010: Census 2010 SF1 HCT1 owner + renter cells summed across Hispanic origin for White / Black householder race rows.
+# 1970/1980 omitted — county tenure-by-race not verified in-repo without additional STF crosswalk work.
+# source_url: https://www.nhgis.org/citing-nhgis
+decade,county_fips,owner_occupied_white,occupied_white,owner_occupied_black,occupied_black,source_url
+1990,17031,823412,1291546,161406,434573,https://www2.census.gov/census_1990/STF1A_ASCII/90STF1A-IL.ZIP
+2000,17031,825383,1238156,200213,476593,https://data.census.gov/table/DECENNIALSF12000.H015A?g=0500000US17031
+2010,17031,803670,1195280,195719,474502,https://data.census.gov/table/DECENNIALSF12010.HCT1?g=0500000US17031

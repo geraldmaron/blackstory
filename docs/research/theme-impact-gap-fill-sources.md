@@ -106,7 +106,7 @@ Priority: **P0** unblocks published packets; **P1** deepens eras; **P2** opens n
 **Executed follow-on (2026-07-22, `feat/theme-impact-gap-ingest`):** BJS denominators fixed + rates re-applied; Vera IL multi-year; SCF 1989–2022; Eviction IL (incl. Cook); HMDA Cook **live** 2018–2023 (18 observations after FFIEC response normalize); Q6 packet published with corrected BJS rates. Obsolete theme-impact/BJS stashes dropped; orphan scaffold tree removed.
 
 **P1/P2 gap-fill wave (same branch, 2026-07-22):**
-- **NHGIS** Cook `17031` Black/White population shares **1970–2010** (10 obs); tenure deferred.
+- **NHGIS** Cook `17031` Black/White population shares **1970–2010** (10 obs) and tenure-by-race homeownership **1990–2010** (6 obs; Black **37.1%** / **42.0%** / **41.2%**, White **63.8%** / **66.7%** / **67.2%**).
 - **DSL Renewing Inequality** registered noncommercial; Chicago attributes fixture (5 pilot / 43 source projects); polygons cite/staff-gated — no commercial apply.
 - **CDC EJI + EPA TRI** IL county fixture rollups (7 obs; Cook EJI mean **0.74**, TRI **12** facilities in 2023).
 - **USSC Quick Facts** crack/powder average sentences + Black crack share (**26** FY obs, 2013–2023).

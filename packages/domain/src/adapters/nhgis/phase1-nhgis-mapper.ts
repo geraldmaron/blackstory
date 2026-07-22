@@ -9,12 +9,16 @@ import { PHASE1_NHGIS_INDICATOR_DEFINITIONS } from '../../statistics/phase1-nhgi
 import {
   NHGIS_CITATION_URL,
   PHASE1_NHGIS_BLACK_POPULATION_SHARE_COUNTY_METRIC_ID,
+  PHASE1_NHGIS_BLACK_HOMEOWNERSHIP_RATE_COUNTY_METRIC_ID,
   PHASE1_NHGIS_BOUNDARY_VERSION,
   PHASE1_NHGIS_COOK_JURISDICTION_ID,
   PHASE1_NHGIS_DATASET_VINTAGE,
   PHASE1_NHGIS_DEFAULT_COUNTY_FIPS,
+  PHASE1_NHGIS_TENURE_DATASET_VINTAGE,
+  PHASE1_NHGIS_TENURE_HOMEOWNERSHIP_DECADES,
   PHASE1_NHGIS_THEME_IMPACT_DECADES,
   PHASE1_NHGIS_WHITE_POPULATION_SHARE_COUNTY_METRIC_ID,
+  PHASE1_NHGIS_WHITE_HOMEOWNERSHIP_RATE_COUNTY_METRIC_ID,
 } from './constants.js';
 
 export type Phase1NhgisObservationDraft = {
@@ -32,6 +36,8 @@ export type Phase1NhgisObservationDraft = {
   readonly contentHash: string;
   readonly totalPopulation?: number;
   readonly raceCount?: number;
+  readonly ownerOccupied?: number;
+  readonly occupiedUnits?: number;
 };
 
 export type NhgisCookRacePopulationShareRow = {
@@ -40,6 +46,16 @@ export type NhgisCookRacePopulationShareRow = {
   readonly totalPopulation: number;
   readonly whiteCount: number;
   readonly blackCount: number;
+  readonly sourceUrl: string;
+};
+
+export type NhgisCookTenureHomeownershipRow = {
+  readonly decade: number;
+  readonly countyFips: string;
+  readonly ownerOccupiedWhite: number;
+  readonly occupiedWhite: number;
+  readonly ownerOccupiedBlack: number;
+  readonly occupiedBlack: number;
   readonly sourceUrl: string;
 };
 
@@ -130,6 +146,16 @@ function populationSharePct(count: number, totalPopulation: number): number {
   return roundSharePct((count / totalPopulation) * 100);
 }
 
+function homeownershipRatePct(ownerOccupied: number, occupiedUnits: number): number {
+  if (occupiedUnits <= 0) {
+    throw new Error('occupied_units must be positive to derive homeownership rate');
+  }
+  if (ownerOccupied < 0 || ownerOccupied > occupiedUnits) {
+    throw new Error('owner_occupied must be between 0 and occupied_units inclusive');
+  }
+  return roundSharePct((ownerOccupied / occupiedUnits) * 100);
+}
+
 function buildDraft(input: {
   readonly metricId: string;
   readonly jurisdictionId: string;
@@ -138,8 +164,11 @@ function buildDraft(input: {
   readonly raceEthnicitySlice: string;
   readonly sourceUrl: string;
   readonly retrievedAt: string;
-  readonly totalPopulation: number;
-  readonly raceCount: number;
+  readonly datasetVintage: string;
+  readonly totalPopulation?: number;
+  readonly raceCount?: number;
+  readonly ownerOccupied?: number;
+  readonly occupiedUnits?: number;
 }): Phase1NhgisObservationDraft {
   const metric = metricById(input.metricId);
   const boundaryVersion = PHASE1_NHGIS_BOUNDARY_VERSION;
@@ -149,7 +178,7 @@ function buildDraft(input: {
     jurisdictionId: input.jurisdictionId,
     boundaryVersion,
     referencePeriod: input.referencePeriod,
-    datasetVintage: PHASE1_NHGIS_DATASET_VINTAGE,
+    datasetVintage: input.datasetVintage,
     estimate: input.estimate,
     raceEthnicitySlice: input.raceEthnicitySlice,
     source: metric.externalDataSourceId,
@@ -162,8 +191,10 @@ function buildDraft(input: {
       estimate: input.estimate,
       boundaryVersion,
     }),
-    totalPopulation: input.totalPopulation,
-    raceCount: input.raceCount,
+    ...(input.totalPopulation !== undefined ? { totalPopulation: input.totalPopulation } : {}),
+    ...(input.raceCount !== undefined ? { raceCount: input.raceCount } : {}),
+    ...(input.ownerOccupied !== undefined ? { ownerOccupied: input.ownerOccupied } : {}),
+    ...(input.occupiedUnits !== undefined ? { occupiedUnits: input.occupiedUnits } : {}),
   };
   assertPublishedStatisticProvenance({
     source: draft.source,
@@ -259,6 +290,7 @@ export function mapNhgisRaceRowsToObservations(
         raceEthnicitySlice: 'black',
         sourceUrl: row.sourceUrl,
         retrievedAt,
+        datasetVintage: PHASE1_NHGIS_DATASET_VINTAGE,
         totalPopulation: row.totalPopulation,
         raceCount: row.blackCount,
       }),
@@ -272,6 +304,7 @@ export function mapNhgisRaceRowsToObservations(
         raceEthnicitySlice: 'white',
         sourceUrl: row.sourceUrl,
         retrievedAt,
+        datasetVintage: PHASE1_NHGIS_DATASET_VINTAGE,
         totalPopulation: row.totalPopulation,
         raceCount: row.whiteCount,
       }),
@@ -279,6 +312,140 @@ export function mapNhgisRaceRowsToObservations(
   }
 
   return drafts;
+}
+
+export function parseNhgisCookTenureHomeownershipFixtureCsv(csvText: string): {
+  readonly rows: readonly NhgisCookTenureHomeownershipRow[];
+  readonly rejected: readonly string[];
+} {
+  const lines = csvText.split(/\r?\n/);
+  const headerIndex = lines.findIndex((line) =>
+    /^decade,county_fips,owner_occupied_white,occupied_white,owner_occupied_black,occupied_black/i.test(
+      line,
+    ),
+  );
+  if (headerIndex < 0) {
+    throw new Error(
+      'NHGIS tenure fixture CSV missing decade,county_fips,owner_occupied_white,occupied_white,owner_occupied_black,occupied_black header',
+    );
+  }
+
+  const rows: NhgisCookTenureHomeownershipRow[] = [];
+  const rejected: string[] = [];
+  let defaultSourceUrl = NHGIS_CITATION_URL;
+
+  for (const line of lines.slice(0, headerIndex)) {
+    const sourceMatch = line.match(/^#\s*source_url:\s*(\S+)/i);
+    if (sourceMatch?.[1]) {
+      defaultSourceUrl = sourceMatch[1]!.trim();
+    }
+  }
+
+  for (const line of lines.slice(headerIndex + 1)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+
+    const cells = splitCsvLine(trimmed);
+    const decade = parseDecade(cells[0]);
+    if (decade === undefined) {
+      rejected.push(`invalid decade: ${line}`);
+      continue;
+    }
+
+    const countyFips = cells[1]?.trim() ?? '';
+    if (!/^\d{5}$/.test(countyFips)) {
+      rejected.push(`invalid county_fips: ${line}`);
+      continue;
+    }
+
+    const sourceUrlRaw = cells[6]?.trim();
+    const sourceUrl =
+      sourceUrlRaw && /^https?:\/\//.test(sourceUrlRaw) ? sourceUrlRaw : defaultSourceUrl;
+
+    try {
+      const ownerOccupiedWhite = parseCount(cells[2], 'owner_occupied_white');
+      const occupiedWhite = parseCount(cells[3], 'occupied_white');
+      const ownerOccupiedBlack = parseCount(cells[4], 'owner_occupied_black');
+      const occupiedBlack = parseCount(cells[5], 'occupied_black');
+      if (ownerOccupiedWhite > occupiedWhite) {
+        throw new Error('owner_occupied_white exceeds occupied_white');
+      }
+      if (ownerOccupiedBlack > occupiedBlack) {
+        throw new Error('owner_occupied_black exceeds occupied_black');
+      }
+      rows.push({
+        decade,
+        countyFips,
+        ownerOccupiedWhite,
+        occupiedWhite,
+        ownerOccupiedBlack,
+        occupiedBlack,
+        sourceUrl,
+      });
+    } catch (error) {
+      rejected.push(error instanceof Error ? error.message : String(error));
+    }
+  }
+
+  rows.sort((a, b) => a.decade - b.decade);
+  return { rows, rejected };
+}
+
+export function mapNhgisTenureRowsToObservations(
+  rows: readonly NhgisCookTenureHomeownershipRow[],
+  retrievedAt: string,
+): readonly Phase1NhgisObservationDraft[] {
+  const drafts: Phase1NhgisObservationDraft[] = [];
+
+  for (const row of rows) {
+    const jurisdictionId = countyJurisdictionId(row.countyFips);
+    const referencePeriod = String(row.decade);
+    const blackRate = homeownershipRatePct(row.ownerOccupiedBlack, row.occupiedBlack);
+    const whiteRate = homeownershipRatePct(row.ownerOccupiedWhite, row.occupiedWhite);
+
+    drafts.push(
+      buildDraft({
+        metricId: PHASE1_NHGIS_BLACK_HOMEOWNERSHIP_RATE_COUNTY_METRIC_ID,
+        jurisdictionId,
+        referencePeriod,
+        estimate: blackRate,
+        raceEthnicitySlice: 'black',
+        sourceUrl: row.sourceUrl,
+        retrievedAt,
+        datasetVintage: PHASE1_NHGIS_TENURE_DATASET_VINTAGE,
+        ownerOccupied: row.ownerOccupiedBlack,
+        occupiedUnits: row.occupiedBlack,
+      }),
+    );
+    drafts.push(
+      buildDraft({
+        metricId: PHASE1_NHGIS_WHITE_HOMEOWNERSHIP_RATE_COUNTY_METRIC_ID,
+        jurisdictionId,
+        referencePeriod,
+        estimate: whiteRate,
+        raceEthnicitySlice: 'white',
+        sourceUrl: row.sourceUrl,
+        retrievedAt,
+        datasetVintage: PHASE1_NHGIS_TENURE_DATASET_VINTAGE,
+        ownerOccupied: row.ownerOccupiedWhite,
+        occupiedUnits: row.occupiedWhite,
+      }),
+    );
+  }
+
+  return drafts;
+}
+
+export function assertNhgisTenureHomeownershipDecadesPresent(
+  rows: readonly NhgisCookTenureHomeownershipRow[],
+): void {
+  const decades = new Set(rows.map((row) => row.decade));
+  const missing = PHASE1_NHGIS_TENURE_HOMEOWNERSHIP_DECADES.filter((decade) => !decades.has(decade));
+  if (missing.length > 0) {
+    throw new Error(
+      `NHGIS Cook tenure fixture missing required decades: ${missing.join(', ')} (county ${PHASE1_NHGIS_DEFAULT_COUNTY_FIPS})`,
+    );
+  }
 }
 
 export function listPhase1NhgisIndicators(): readonly Phase1IndicatorDefinition[] {
