@@ -46,3 +46,25 @@ export {
   fetchAcsTractProfiles,
   type AcsProfileFetchResult,
 } from './fetch-acs-profiles.js';
+export {
+  PHASE1_ACS5_VARIABLES,
+  PHASE1_ACS5_2024_VINTAGE,
+  PHASE1_ACS_DEFAULT_COUNTY_STATE_FIPS,
+  phase1AcsReferencePeriod,
+  phase1AcsDatasetVintageLabel,
+} from './phase1-acs-variables.js';
+export {
+  parsePhase1AcsResponse,
+  mapPhase1AcsRowToObservations,
+  acsProfileRowToPhase1Row,
+  listPhase1AcsIndicators,
+  type Phase1AcsGeography,
+  type Phase1AcsObservationDraft,
+} from './phase1-acs-mapper.js';
+export {
+  fetchPhase1AcsCountyObservations,
+  fetchPhase1AcsStateObservations,
+  buildCountyInStatesUrl,
+  buildStateUrl,
+  type Phase1AcsFetchResult,
+} from './fetch-phase1-acs.js';
