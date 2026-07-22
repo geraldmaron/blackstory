@@ -1,38 +1,37 @@
 <!--
   Operator runbook for cutting public apps/web from Firebase App Hosting to Vercel.
-  Prep-only until DNS flip is explicitly approved.
+  Hard-cut DNS flip completed 2026-07-22; App Hosting retained idle for rollback soak.
 -->
 
 # Runbook: Vercel public-web cutover
 
-**Bead:** `repo-9wv7` (hard-cut; prep was `repo-gm3w`)  
+**Bead:** `repo-9wv7` (hard-cut; prep was `repo-gm3w`) — **closed 2026-07-22** after DNS GO  
 **ADR:** [ADR-027](../adr/ADR-027-vercel-public-web-hosting.md)  
 **Project:** Vercel `geraldmarons-projects/blackstory` (`prj_AJYcJozo2XqLfBXItGxHV5SQP06h`)  
 **Root Directory:** `apps/web`
 
-## Current state (2026-07-22)
+## Current state (2026-07-22 — DNS GO)
 
 | Item | Value |
 |------|--------|
 | Preview / default alias | `https://blackstory-geraldmarons-projects.vercel.app` |
 | Git production branch | `main` at `bd1b1c08` (includes `5ea25768` `_vercel_*` preserve) |
-| Production deploy | `dpl_ERR5rbReMAdUkrA3uscmYQZ9BCN6` READY — `https://blackstory-krto16cjw-geraldmarons-projects.vercel.app` |
-| Vercel domains | `blackstory.app` + `www.blackstory.app` attached; `ssoProtection=preview` (Production public) |
-| Production DNS (`blackstory.app`) | **Still App Hosting** (`35.219.200.11`) — Cloudflare DNS flip blocked (no Zone DNS MCP tool; 1Password has Cloudflare login only, no API token) |
-| Dual-run / rollback | App Hosting backends + secrets retained idle for soak |
+| Production deploy | `dpl_ERR5rbReMAdUkrA3uscmYQZ9BCN6` READY |
+| Vercel domains | `blackstory.app` + `www.blackstory.app` attached; `misconfigured=false`; Production public |
+| Production DNS | **Vercel** — apex `A 76.76.21.21`; `www` `CNAME cname.vercel-dns.com` (DNS-only / grey cloud; Cloudflare NS retained) |
+| Live probe (post-flip) | `server: Vercel` (not App Hosting `envoy` / `via: google`); `/explore/api` `totalMatched=1338` `degraded=false`; `/history/api` `1340`; `/search?q=obama` 200 with Barack Obama; sample entity 200 |
+| Dual-run / rollback | **Keep App Hosting idle ≥48h** before wind-down; rollback = restore prior Cloudflare A to App Hosting IP if needed |
 
-### Owner DNS flip (Cloudflare → Vercel, DNS-only / grey cloud)
+### DNS records in effect (re-confirm via Vercel domain API before any future change)
 
-Preserve MX/TXT. Replace apex A and add www CNAME:
+Live Vercel recommendation at flip time (owner applied):
 
 | Type | Name | Content | Proxy |
 |------|------|---------|-------|
-| A | `@` / `blackstory.app` | `216.198.79.1` | DNS only |
-| A | `@` / `blackstory.app` | `64.29.17.1` | DNS only |
-| CNAME | `www` | `357ea39b2fe724a4.vercel-dns-017.com` | DNS only |
+| A | `@` / `blackstory.app` | `76.76.21.21` | DNS only |
+| CNAME | `www` | `cname.vercel-dns.com` | DNS only |
 
-Optional unblock for agents: store a Cloudflare API token (Zone DNS Edit on `blackstory.app`) in 1Password as `CLOUDFLARE_API_TOKEN`.
-
+Older dual-A / project-hash CNAME targets may still resolve on Vercel’s edge but are **not** what Production is using now. Preserve MX/TXT. Optional agent unblock: Cloudflare Zone DNS Edit token as `CLOUDFLARE_API_TOKEN` in 1Password.
 ## Agent / MCP
 
 - Cursor MCP endpoint: `https://mcp.vercel.com` (server id `user-vercel` after OAuth)
@@ -61,8 +60,8 @@ If Vercel Authentication (or share-link protection) is on for Preview, SSO retur
 | Preview branch alias `…-69ebd1-….vercel.app` | Vercel Preview (`5ea25768`+) | Auth on → SSO | **200** after share auth (Barack Obama) | Preserved by fix | **Fixed** (was SSO↔308 strip) |
 | Preview deployment `blackstory-le31w9fbq-…` | Same commit | Auth on | Same | Same | **Fixed** |
 | Vercel Production `blackstory-….vercel.app` / `blackstory-5x9edrjgc-…` | Vercel Production (`main` / `e1c1f415`) | **Off** (direct 200) | **200**, 1 result | Still **308 strips** share (fix not on `main`) | **No** (Auth off; strip is inert) |
-| `https://blackstory.app` | **App Hosting** (`server: envoy`, `via: google`) — not Vercel yet | N/A | **200**, 1 result | **308 strips** share | **No** |
-| `https://www.blackstory.app` | No DNS A/CNAME | N/A | curl fail | N/A | N/A |
+| `https://blackstory.app` | **Vercel Production** (`server: Vercel`) after DNS GO | Off | **200**, Barack Obama | Share strip inert (Auth off) | **No** |
+| `https://www.blackstory.app` | **Vercel** (`CNAME cname.vercel-dns.com`, `server: Vercel`) | Off | **200** (via public DNS; some local resolvers lag briefly) | N/A | **No** |
 
 Do **not** enable Production Deployment Protection until `isPlatformPassthroughQueryKey` is on the Production deployment. Cloudflare SSL was not in these chains (Vercel or Google/envoy only).
 
@@ -121,15 +120,11 @@ vercel env add DATABASE_URL production --value "$DATABASE_URL" --yes
 vercel redeploy <preview-deployment-url>
 ```
 
-## Hard cut (explicit owner approval only)
+## Hard cut (completed 2026-07-22)
 
-1. Freeze App Hosting production promotes (`deploy-production.yml` / promote scripts) for the cut window.
-2. Promote a known-good Vercel Preview → Production (`vercel promote <url>` or dashboard).
-3. Attach custom domains in Vercel: `blackstory.app` + `www` (or apex-only per DNS plan).
-4. Lower DNS TTLs ahead of time; switch records to Vercel’s targets.
-5. Verify production URL + Explore catalog + TLS.
-6. Keep App Hosting backend idle (do not delete) for rollback soak (suggested ≥48h).
-7. After soak: document App Hosting wind-down; update README architecture table.
+Owner flipped Cloudflare DNS to Vercel (apex A + www CNAME, DNS-only). Post-flip verification: Vercel `misconfigured=false`; catalog `/explore/api` `totalMatched=1338`; Obama search + sample entity OK.
+
+**Soak (now):** keep App Hosting backends + secrets idle **≥48h** before wind-down. Do not delete App Hosting configs during soak. After soak: document App Hosting wind-down; update README architecture table.
 
 ## Rollback
 
