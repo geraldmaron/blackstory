@@ -96,18 +96,32 @@ export function normalizeQueryString(
   return normalized.toString();
 }
 
+function normalizePathname(pathname: string): string {
+  return pathname.endsWith('/') && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
+}
+
+/** Stable pathname + query string for redirect/cache comparisons.  */
+export function canonicalPathAndSearch(url: URL): string {
+  const path = normalizePathname(url.pathname);
+  const qs = normalizeQueryString(path, url.searchParams);
+  return qs ? `${path}?${qs}` : path;
+}
+
 /** Canonical URL pathname + optional query for redirects and cache keys.  */
 export function buildNormalizedUrl(url: URL): URL {
   const normalized = new URL(url.toString());
-  const qs = normalizeQueryString(normalized.pathname, normalized.searchParams);
+  const path = normalizePathname(normalized.pathname);
+  normalized.pathname = path;
+  const qs = normalizeQueryString(path, normalized.searchParams);
   normalized.search = qs ? `?${qs}` : '';
   return normalized;
 }
 
 /** True when the incoming URL carries params that should be stripped via redirect.  */
 export function needsQueryNormalizationRedirect(url: URL): boolean {
-  const cleaned = buildNormalizedUrl(url);
-  return cleaned.pathname + cleaned.search !== url.pathname + url.search;
+  const canonical = canonicalPathAndSearch(url);
+  const raw = `${url.pathname}${url.search}`;
+  return canonical !== raw;
 }
 
 /** Normalize App Router searchParams records for server components.  */

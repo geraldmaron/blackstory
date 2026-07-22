@@ -25,5 +25,9 @@ export function handleQueryNormalization(request: NextRequest): NextResponse {
     return NextResponse.next();
   }
   const normalized = buildNormalizedUrl(url);
-  return NextResponse.redirect(normalized, 308);
+  const response = NextResponse.redirect(normalized, 308);
+  // Normalization redirects must never be CDN-cached: /search carries s-maxage in
+  // next.config headers and a cached 308 to itself causes ERR_TOO_MANY_REDIRECTS.
+  response.headers.set('Cache-Control', 'no-store');
+  return response;
 }
