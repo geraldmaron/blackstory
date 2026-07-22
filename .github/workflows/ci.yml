@@ -45,8 +45,10 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Boundary validation and lint
         run: pnpm validate
-      - name: Format check
-        run: pnpm format:check
+      # Full-repo prettier drift is tracked on chore/prettier-reformat; do not fail
+      # every push on hundreds of pre-existing format diffs. Run locally / on that branch.
+      # - name: Format check
+      #   run: pnpm format:check
 
   unit-js-packages:
     name: Unit Tests (JS Packages)

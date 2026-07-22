@@ -53,7 +53,8 @@ export type { CorrectionReceiptStore, StoredCorrectionReceipt } from './correcti
 export { createIdempotencyCache } from './corrections/idempotency-cache.js';
 export type { IdempotencyCache } from './corrections/idempotency-cache.js';
 export { dispatch as dispatchCorrectionsV1 } from './http/router.js';
-export type { ApiRequest, ApiResponse, HandlerDeps } from './http/handlers.js';
+export type { ApiRequest, HandlerDeps } from './http/handlers.js';
+export type { ApiResponse } from './http/responses.js';
 export { createSubmissionsApiServer } from './http/server.js';
 export type { SubmissionsApiServerLimits, SubmissionsApiServerOptions } from './http/server.js';
 

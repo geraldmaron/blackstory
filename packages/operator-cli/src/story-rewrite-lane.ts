@@ -90,7 +90,11 @@ export function buildMockStoryRewriteBody(story: StoryProjection): PublicStorySe
     `${story.sources.map((source) => source.label).join('; ')}. This mock artifact is for ` +
     'review workflow only; live Kimi K2.5 rewrites should replace it when OpenRouter credentials ' +
     'are available.';
-  sections[sections.length - 1]!.paragraphs.push(verification);
+  const last = sections[sections.length - 1]!;
+  sections[sections.length - 1] = {
+    ...(last.heading !== undefined ? { heading: last.heading } : {}),
+    paragraphs: [...last.paragraphs, verification],
+  };
   return sections;
 }
 
@@ -195,8 +199,30 @@ export async function runStoryRewriteLane(
   const { provider, liveGeneration } = resolveStoryRewriteProvider(input);
   const model = input.model ?? process.env.STORY_REWRITE_MODEL ?? DEFAULT_STORY_REWRITE_MODEL;
   const results: StoryRewriteResult[] = [];
-  for (const story of stories) {
-    const result = await rewriteStory(story, { provider, model: liveGeneration ? model : undefined });
+  for (const seed of stories) {
+    const story: StoryProjection = {
+      id: seed.id,
+      releaseId: seed.releaseId,
+      slug: seed.slug,
+      title: seed.title,
+      dek: seed.dek,
+      publishedAt: seed.publishedAt,
+      eraLabel: seed.eraLabel,
+      placeLabel: seed.placeLabel,
+      body: seed.body.map((section) => ({
+        paragraphs: [...section.paragraphs],
+        ...(section.heading !== undefined ? { heading: section.heading } : {}),
+      })),
+      relatedEntityIds: [...seed.relatedEntityIds],
+      sources: seed.sources.map((source) => ({
+        label: source.label,
+        url: source.url,
+      })),
+    };
+    const result = await rewriteStory(story, {
+      provider,
+      ...(liveGeneration ? { model } : {}),
+    });
     writeStoryRewriteArtifact(result, outputDir);
     results.push(result);
   }

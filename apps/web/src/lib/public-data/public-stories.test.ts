@@ -24,7 +24,6 @@ test('storage-neutral story corpus contains exactly five stories', () => {
 test('apps/web does not ship a parallel stories-seed module', () => {
   const here = dirname(fileURLToPath(import.meta.url));
   const legacySeed = join(here, '../../data/stories-seed.ts');
-  const legacyNational = join(here, '../../data/national-story-seed');
+  // Story bodies live in @repo/domain; facts still seed from national-story-seed/.
   assert.equal(existsSync(legacySeed), false);
-  assert.equal(existsSync(legacyNational), false);
 });
