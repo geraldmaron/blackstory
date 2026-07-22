@@ -14,12 +14,14 @@ import {
   getHistoricalStatePopulationCoverage,
   getNationalPopulationTimelineSnapshot,
   getOpportunityAtlasCoverageSummary,
+  getPhase1IndicatorCoverageSummary,
   getStatePopulationChanges,
   type AcsCoverageSummary,
   type HateCrimeYearSummary,
   type HistoricalStatePopulationCoverage,
   type NationalPopulationTimelineSnapshot,
   type OpportunityAtlasCoverageSummary,
+  type Phase1IndicatorCoverageSummary,
   type StatePopulationChange,
 } from '../../lib/demographics/public-stats-source';
 import { timelineChangeStripItems } from '../../components/data/population-change';
@@ -55,6 +57,7 @@ export default async function DataPage() {
     stateChanges2010to2020,
     historicalStateCoverage,
     acsCoverage,
+    phase1Indicators,
     hateCrimeYear,
     hateCrimeSeries,
     opportunityAtlasCoverage,
@@ -63,6 +66,7 @@ export default async function DataPage() {
     safe(getStatePopulationChanges('2010', '2020')),
     safe(getHistoricalStatePopulationCoverage()),
     safe(getAcsCoverageSummary()),
+    safe(getPhase1IndicatorCoverageSummary()),
     safe(getHateCrimeYearSummary(LATEST_HATE_CRIME_YEAR)),
     safe(getHateCrimeYearSummaries(HATE_CRIME_SERIES_YEARS)),
     safe(getOpportunityAtlasCoverageSummary()),
@@ -71,6 +75,7 @@ export default async function DataPage() {
   const hateCrime = hateCrimeYear as HateCrimeYearSummary | undefined;
   const hateCrimeByYear = (hateCrimeSeries ?? []) as readonly HateCrimeYearSummary[];
   const acs = acsCoverage as AcsCoverageSummary | undefined;
+  const phase1 = phase1Indicators as Phase1IndicatorCoverageSummary | undefined;
   const opportunity = opportunityAtlasCoverage as OpportunityAtlasCoverageSummary | undefined;
   const historicalStates = historicalStateCoverage as HistoricalStatePopulationCoverage | undefined;
   const timeline = (timelineSnapshot ?? undefined) as
@@ -112,6 +117,7 @@ export default async function DataPage() {
         stateNameByFips={STATE_NAME_BY_FIPS}
         historicalStates={historicalStates}
         acs={acs}
+        phase1Indicators={phase1}
         hateCrime={hateCrime}
         hateCrimeByYear={hateCrimeByYear}
         latestHateCrimeYear={LATEST_HATE_CRIME_YEAR}

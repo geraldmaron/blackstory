@@ -507,6 +507,181 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     registryState: 'disabled',
     notes: 'Fixed/mobile availability, technology, advertised speeds per location.',
   },
+  {
+    id: 'bjs-national-prisoner-statistics',
+    displayName: 'National Prisoner Statistics (NPS) — custody counts by jurisdiction and race',
+    custodian: 'U.S. Bureau of Justice Statistics (BJS) / ICPSR NACJD',
+    homepageUrl: 'https://bjs.ojp.gov/data-collection/nps',
+    dataUrl: 'https://www.icpsr.umich.edu/web/NACJD/studies/38871',
+    license: {
+      name: 'U.S. government work via ICPSR public-use files — public domain / ICPSR terms',
+      verdict: 'public-domain',
+      notes:
+        'Prefer BJS published tables and ICPSR public-use NPS files. Restricted microdata stays cite-only.',
+    },
+    vintage: 'NPS series through latest ICPSR release (e.g. 1978–2022 study 38871)',
+    geographies: ['state', 'nation'],
+    cadence: 'annual',
+    registryState: 'disabled',
+    notes:
+      'Canonical state/federal imprisonment enumeration. Store annual custody counts and rates by ' +
+      'race where BJS publishes them as StatisticalSeries — not person-level records. Phase 1 MVP ' +
+      'metric ids: imprisonment-rate-black-state, imprisonment-rate-white-state (see ' +
+      'phase1-indicator-catalog.ts).',
+  },
+  {
+    id: 'vera-incarceration-trends',
+    displayName: 'Vera Incarceration Trends — county and state jail/prison estimates',
+    custodian: 'Vera Institute of Justice',
+    homepageUrl: 'https://www.vera.org/projects/incarceration-trends',
+    dataUrl: 'https://github.com/vera-institute/incarceration-trends',
+    license: {
+      name: 'Vera data-use / GitHub terms — attribution required (verify per release README)',
+      verdict: 'attribution-required',
+    },
+    vintage: 'Incarceration Trends compiled releases (county/state time series)',
+    geographies: ['county', 'state'],
+    cadence: 'irregular',
+    registryState: 'disabled',
+    notes:
+      'Place-indexed incarceration trends for research context panels. Prefer Vera compiled ' +
+      'county/state rates over raw NCRP for Phase 1; keep method notes on every observation. ' +
+      'Not a substitute for BJS NPS as the federal enumeration SoT.',
+  },
+  {
+    id: 'bjs-annual-survey-of-jails',
+    displayName: 'Annual Survey of Jails / Jail Inmates (BJS)',
+    custodian: 'U.S. Bureau of Justice Statistics',
+    homepageUrl: 'https://bjs.ojp.gov/data-collection/asj',
+    dataUrl: 'https://bjs.ojp.gov/data/data-tables-and-data-files',
+    license: { name: 'U.S. government work — public domain', verdict: 'public-domain' },
+    vintage: 'ASJ / Jail Inmates latest annual tables',
+    geographies: ['state', 'facility'],
+    cadence: 'annual',
+    registryState: 'disabled',
+    notes:
+      'Local jail confinement distinct from state/federal prison. Store jurisdiction aggregates ' +
+      'only; facility-level stays research-closed until dignity review.',
+  },
+  {
+    id: 'bjs-ncrp-public-use',
+    displayName: 'National Corrections Reporting Program (NCRP) — public-use selected variables',
+    custodian: 'U.S. Bureau of Justice Statistics / ICPSR NACJD',
+    homepageUrl: 'https://bjs.ojp.gov/data-collection/ncrp',
+    dataUrl: 'https://www.icpsr.umich.edu/web/NACJD/studies/38492',
+    license: {
+      name: 'ICPSR public-use terms; restricted files require ResearchDataGov',
+      verdict: 'attribution-required',
+      notes: 'Do not ingest full person-level files into product SoR — cite/proxy or derive aggregates.',
+    },
+    vintage: 'NCRP public-use selected variables (ICPSR releases)',
+    geographies: ['state', 'facility'],
+    cadence: 'annual',
+    registryState: 'disabled',
+    notes:
+      'Person-level admissions/releases — too large for full SoR. Strategy: cite ICPSR DOI; store ' +
+      'only derived state×year×race tables if an ingestion bead produces them with provenance.',
+  },
+  {
+    id: 'fed-survey-consumer-finances',
+    displayName: 'Survey of Consumer Finances (SCF) — wealth by race of family',
+    custodian: 'Board of Governors of the Federal Reserve System',
+    homepageUrl: 'https://www.federalreserve.gov/econres/scfindex.htm',
+    dataUrl: 'https://www.federalreserve.gov/econres/scfindex.htm',
+    license: { name: 'U.S. government work — public domain', verdict: 'public-domain' },
+    vintage: 'Triennial SCF (latest public microdata + bulletin tables)',
+    geographies: ['nation'],
+    cadence: 'irregular',
+    registryState: 'disabled',
+    notes:
+      'Gold-standard national wealth gap by race. Store national median/mean net worth series only; ' +
+      'full microdata is cite/proxy. Never invent county wealth from SCF.',
+  },
+  {
+    id: 'census-sipp-wealth',
+    displayName: 'Survey of Income and Program Participation (SIPP) — household wealth',
+    custodian: 'U.S. Census Bureau',
+    homepageUrl: 'https://www.census.gov/programs-surveys/sipp.html',
+    dataUrl: 'https://www.census.gov/programs-surveys/sipp/data/datasets.html',
+    license: { name: 'U.S. government work — public domain', verdict: 'public-domain' },
+    vintage: 'SIPP public-use wealth briefs / panels (e.g. 2021–2023 wealth publications)',
+    geographies: ['nation'],
+    cadence: 'irregular',
+    registryState: 'disabled',
+    notes:
+      'Complements SCF for national Black–White wealth framing. Prefer published Census briefs for ' +
+      'Phase 1 national series; microdata cite-only.',
+  },
+  {
+    id: 'bls-laus-unemployment',
+    displayName: 'Local Area Unemployment Statistics (LAUS) / CPS unemployment',
+    custodian: 'U.S. Bureau of Labor Statistics',
+    homepageUrl: 'https://www.bls.gov/lau/',
+    dataUrl: 'https://www.bls.gov/lau/data.htm',
+    license: { name: 'U.S. government work — public domain', verdict: 'public-domain' },
+    vintage: 'LAUS monthly/annual; CPS race slices where published',
+    geographies: ['state', 'city'],
+    cadence: 'monthly',
+    registryState: 'disabled',
+    notes:
+      'Labor market context. Store state/metro series; race slices only where BLS publishes them — ' +
+      'do not impute race-specific LAUS at county.',
+  },
+  {
+    id: 'mit-election-lab',
+    displayName: 'MIT Election Data and Science Lab — election results and admin data',
+    custodian: 'MIT Election Data + Science Lab',
+    homepageUrl: 'https://electionlab.mit.edu/',
+    dataUrl: 'https://electionlab.mit.edu/data',
+    license: {
+      name: 'Academic / project terms — attribution required (verify per dataset)',
+      verdict: 'attribution-required',
+    },
+    vintage: 'Election Lab curated releases',
+    geographies: ['state', 'county'],
+    cadence: 'irregular',
+    registryState: 'disabled',
+    notes:
+      'Voting / election-administration context for franchise research. Selective store of ' +
+      'state/county indicators; not a voter file.',
+  },
+  {
+    id: 'voting-rights-lab-indicators',
+    displayName: 'Voting Rights Lab — state election policy / voting rights indicators',
+    custodian: 'Voting Rights Lab',
+    homepageUrl: 'https://votingrightslab.org/',
+    dataUrl: 'https://votingrightslab.org/',
+    license: {
+      name: 'NGO terms — verify before ingest; default attribution-required',
+      verdict: 'attribution-required',
+      notes: 'Confirm redistribution rights before any bulk load; cite portal when unverified for reuse.',
+    },
+    vintage: 'State policy tracker releases',
+    geographies: ['state'],
+    cadence: 'irregular',
+    registryState: 'disabled',
+    notes:
+      'Franchise and election-admin policy indicators for juxtaposition with law entities. Prefer ' +
+      'cite until redistribution terms are recorded on checksum acquisition.',
+  },
+  {
+    id: 'stanford-open-policing',
+    displayName: 'Stanford Open Policing Project — traffic stop aggregates',
+    custodian: 'Stanford Computational Policy Lab / Open Policing Project',
+    homepageUrl: 'https://openpolicing.stanford.edu/',
+    dataUrl: 'https://openpolicing.stanford.edu/data/',
+    license: {
+      name: 'Project terms — attribution; high sensitivity',
+      verdict: 'attribution-required',
+    },
+    vintage: 'Open Policing multi-agency releases',
+    geographies: ['city', 'facility'],
+    cadence: 'irregular',
+    registryState: 'disabled',
+    notes:
+      'Traffic-stop disparity research. Cite and store agency-level aggregates only after dignity ' +
+      'review — never individual stops; never crime-heat map rendering.',
+  },
 ] as const;
 
 export function getExternalDataSource(id: string): ExternalDataSource | undefined {

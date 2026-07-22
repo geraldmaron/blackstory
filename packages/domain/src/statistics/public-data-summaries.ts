@@ -58,6 +58,15 @@ export type AcsCoverageSummary = {
   readonly sourceUrl: string;
 };
 
+/** Coverage for Phase 1 curated context indicators (catalog + optional observation counts). */
+export type Phase1IndicatorCoverageSummary = {
+  readonly metricCount: number;
+  readonly themes: readonly string[];
+  readonly sampleObservationCount: number;
+  readonly source: string;
+  readonly sourceUrl: string;
+};
+
 export type HistoricalStatePopulationCoverage = {
   readonly rowCount: number;
   readonly stateCount: number;

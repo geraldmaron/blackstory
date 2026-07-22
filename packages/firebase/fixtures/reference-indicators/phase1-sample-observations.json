@@ -1,0 +1,196 @@
+{
+  "generatedAt": "2026-07-22T00:00:00.000Z",
+  "notes": "Phase 1 sample observations for schema + loader validation. Estimates transcribed from named public tables — not BlackStory judgments. Expand via ACS/BJS/Vera loaders before production map panels.",
+  "jurisdictions": [
+    {
+      "id": "nation:US",
+      "kind": "nation",
+      "name": "United States",
+      "stateFips": null,
+      "countyFips": null,
+      "parentId": null
+    },
+    {
+      "id": "state:24",
+      "kind": "state",
+      "name": "Maryland",
+      "stateFips": "24",
+      "countyFips": null,
+      "parentId": "nation:US"
+    },
+    {
+      "id": "state:13",
+      "kind": "state",
+      "name": "Georgia",
+      "stateFips": "13",
+      "countyFips": null,
+      "parentId": "nation:US"
+    },
+    {
+      "id": "county:24031",
+      "kind": "county",
+      "name": "Montgomery County",
+      "stateFips": "24",
+      "countyFips": "031",
+      "parentId": "state:24"
+    },
+    {
+      "id": "county:13121",
+      "kind": "county",
+      "name": "Fulton County",
+      "stateFips": "13",
+      "countyFips": "121",
+      "parentId": "state:13"
+    }
+  ],
+  "observations": [
+    {
+      "id": "obs:scf-median-wealth-black-nation:nation:US:2022",
+      "metricId": "scf-median-wealth-black-nation",
+      "jurisdictionId": "nation:US",
+      "boundaryVersion": "nation-2022",
+      "referencePeriod": "2022",
+      "datasetVintage": "SCF 2022",
+      "estimate": 44900,
+      "raceEthnicitySlice": "black",
+      "source": "fed-survey-consumer-finances",
+      "sourceUrl": "https://www.federalreserve.gov/econres/scfindex.htm",
+      "retrievedAt": "2026-07-22T00:00:00.000Z"
+    },
+    {
+      "id": "obs:scf-median-wealth-white-nation:nation:US:2022",
+      "metricId": "scf-median-wealth-white-nation",
+      "jurisdictionId": "nation:US",
+      "boundaryVersion": "nation-2022",
+      "referencePeriod": "2022",
+      "datasetVintage": "SCF 2022",
+      "estimate": 285000,
+      "raceEthnicitySlice": "white_nonhispanic",
+      "source": "fed-survey-consumer-finances",
+      "sourceUrl": "https://www.federalreserve.gov/econres/scfindex.htm",
+      "retrievedAt": "2026-07-22T00:00:00.000Z"
+    },
+    {
+      "id": "obs:sipp-median-wealth-black-nation:nation:US:2021",
+      "metricId": "sipp-median-wealth-black-nation",
+      "jurisdictionId": "nation:US",
+      "boundaryVersion": "nation-2021",
+      "referencePeriod": "2021",
+      "datasetVintage": "SIPP 2021 wealth (Census)",
+      "estimate": 24520,
+      "raceEthnicitySlice": "black",
+      "source": "census-sipp-wealth",
+      "sourceUrl": "https://www.census.gov/library/stories/2024/04/wealth-by-race.html",
+      "retrievedAt": "2026-07-22T00:00:00.000Z"
+    },
+    {
+      "id": "obs:imprisonment-rate-black-state:state:24:2022",
+      "metricId": "imprisonment-rate-black-state",
+      "jurisdictionId": "state:24",
+      "boundaryVersion": "state-2020",
+      "referencePeriod": "2022",
+      "datasetVintage": "BJS NPS 2022 (table transcription)",
+      "estimate": 912,
+      "raceEthnicitySlice": "black",
+      "source": "bjs-national-prisoner-statistics",
+      "sourceUrl": "https://bjs.ojp.gov/data-collection/nps",
+      "retrievedAt": "2026-07-22T00:00:00.000Z",
+      "notes": "Replace with exact BJS table cell on first live NPS ingest; fixture for pipeline validation."
+    },
+    {
+      "id": "obs:imprisonment-rate-white-state:state:24:2022",
+      "metricId": "imprisonment-rate-white-state",
+      "jurisdictionId": "state:24",
+      "boundaryVersion": "state-2020",
+      "referencePeriod": "2022",
+      "datasetVintage": "BJS NPS 2022 (table transcription)",
+      "estimate": 178,
+      "raceEthnicitySlice": "white",
+      "source": "bjs-national-prisoner-statistics",
+      "sourceUrl": "https://bjs.ojp.gov/data-collection/nps",
+      "retrievedAt": "2026-07-22T00:00:00.000Z",
+      "notes": "Replace with exact BJS table cell on first live NPS ingest; fixture for pipeline validation."
+    },
+    {
+      "id": "obs:acs-median-hh-income-black-county:county:24031:2018-2022",
+      "metricId": "acs-median-hh-income-black-county",
+      "jurisdictionId": "county:24031",
+      "boundaryVersion": "county-2020",
+      "referencePeriod": "2018-2022",
+      "datasetVintage": "ACS 2022 5-Year",
+      "estimate": 108421,
+      "marginOfError": 4120,
+      "raceEthnicitySlice": "black_alone",
+      "source": "acs-census-api",
+      "sourceUrl": "https://api.census.gov/data/2022/acs/acs5",
+      "retrievedAt": "2026-07-22T00:00:00.000Z",
+      "notes": "Illustrative ACS-shaped value for Montgomery County MD — re-pull via census API on live ingest."
+    },
+    {
+      "id": "obs:acs-median-hh-income-white-county:county:24031:2018-2022",
+      "metricId": "acs-median-hh-income-white-county",
+      "jurisdictionId": "county:24031",
+      "boundaryVersion": "county-2020",
+      "referencePeriod": "2018-2022",
+      "datasetVintage": "ACS 2022 5-Year",
+      "estimate": 151892,
+      "marginOfError": 2890,
+      "raceEthnicitySlice": "white_alone",
+      "source": "acs-census-api",
+      "sourceUrl": "https://api.census.gov/data/2022/acs/acs5",
+      "retrievedAt": "2026-07-22T00:00:00.000Z",
+      "notes": "Illustrative ACS-shaped value — re-pull via census API on live ingest."
+    },
+    {
+      "id": "obs:acs-black-population-share-county:county:13121:2018-2022",
+      "metricId": "acs-black-population-share-county",
+      "jurisdictionId": "county:13121",
+      "boundaryVersion": "county-2020",
+      "referencePeriod": "2018-2022",
+      "datasetVintage": "ACS 2022 5-Year",
+      "estimate": 44.2,
+      "marginOfError": 0.3,
+      "raceEthnicitySlice": "black_alone",
+      "source": "acs-census-api",
+      "sourceUrl": "https://api.census.gov/data/2022/acs/acs5",
+      "retrievedAt": "2026-07-22T00:00:00.000Z",
+      "notes": "Illustrative Fulton County GA share — re-pull via census API on live ingest."
+    },
+    {
+      "id": "obs:eviction-filing-rate-county:county:13121:2018",
+      "metricId": "eviction-filing-rate-county",
+      "jurisdictionId": "county:13121",
+      "boundaryVersion": "county-2020",
+      "referencePeriod": "2018",
+      "datasetVintage": "Eviction Lab national map / analysis files",
+      "estimate": 8.4,
+      "source": "eviction-lab",
+      "sourceUrl": "https://evictionlab.org/get-the-data/",
+      "retrievedAt": "2026-07-22T00:00:00.000Z",
+      "notes": "Illustrative filing-rate shape — replace from Eviction Lab download on live ingest; attribute Eviction Lab."
+    },
+    {
+      "id": "obs:vera-jail-population-rate-county:county:24031:2018",
+      "metricId": "vera-jail-population-rate-county",
+      "jurisdictionId": "county:24031",
+      "boundaryVersion": "county-2020",
+      "referencePeriod": "2018",
+      "datasetVintage": "Vera Incarceration Trends",
+      "estimate": 142,
+      "source": "vera-incarceration-trends",
+      "sourceUrl": "https://github.com/vera-institute/incarceration-trends",
+      "retrievedAt": "2026-07-22T00:00:00.000Z",
+      "notes": "Illustrative Vera county jail rate — replace from Vera CSV on live ingest."
+    }
+  ],
+  "bindings": [
+    {
+      "id": "bind:demo-criminal-justice-md-imprisonment",
+      "entityId": "topic:criminal-justice",
+      "metricId": "imprisonment-rate-black-state",
+      "purpose": "research",
+      "jurisdictionId": "state:24",
+      "notes": "Demo binding for MCP contract tests — not a causal claim about any single law."
+    }
+  ]
+}

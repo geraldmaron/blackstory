@@ -5,15 +5,17 @@
  */
 import {
   computeStatePopulationChangesFromDecades,
+  summarizePhase1IndicatorCatalog,
   type AcsCoverageSummary,
   type CensusCountyDecadeDecade,
   type HateCrimeYearSummary,
   type HistoricalStatePopulationCoverage,
   type NationalPopulationTimelineSnapshot,
   type OpportunityAtlasCoverageSummary,
+  type Phase1IndicatorCoverageSummary,
   type StatePopulationByDecade,
   type StatePopulationChange,
-} from '@repo/domain/statistics/public-data-summaries';
+} from '@repo/domain';
 import { fetchMaterializedSnapshot } from '../public-data/public-readers';
 
 type StatePopulationByDecadeSnapshot = {
@@ -90,6 +92,30 @@ export async function getAcsCoverageSummary(): Promise<AcsCoverageSummary | unde
   return undefined;
 }
 
+/**
+ * Phase 1 curated indicator catalog is always available from domain vocabulary.
+ * Observation counts come from a materialized snapshot when present.
+ */
+export async function getPhase1IndicatorCoverageSummary(): Promise<
+  Phase1IndicatorCoverageSummary | undefined
+> {
+  const catalog = summarizePhase1IndicatorCatalog();
+  const payload = await fetchMaterializedSnapshot('phase1IndicatorCoverage');
+  const sampleObservationCount =
+    payload !== null &&
+    typeof payload === 'object' &&
+    typeof (payload as { sampleObservationCount?: unknown }).sampleObservationCount === 'number'
+      ? (payload as { sampleObservationCount: number }).sampleObservationCount
+      : 0;
+  return {
+    metricCount: catalog.metricCount,
+    themes: [...catalog.themes],
+    sampleObservationCount,
+    source: 'phase1-indicator-catalog',
+    sourceUrl: '/methodology',
+  };
+}
+
 /** TODO(postgres-cutover): read `bb_reference.hate_crime_county_years` rollups. */
 export async function getHateCrimeYearSummary(_year: string): Promise<HateCrimeYearSummary | undefined> {
   return undefined;
@@ -108,5 +134,6 @@ export type {
   HistoricalStatePopulationCoverage,
   NationalPopulationTimelineSnapshot,
   OpportunityAtlasCoverageSummary,
+  Phase1IndicatorCoverageSummary,
   StatePopulationChange,
 };
