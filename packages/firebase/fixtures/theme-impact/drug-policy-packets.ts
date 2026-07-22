@@ -3,7 +3,65 @@
  * Q6 uses Vera jail rate (Cook), corrected BJS imprisonment rates (IL), and
  * national SCF wealth medians — juxtaposition only.
  */
-const NOW = '2026-07-22T21:00:00.000Z';
+const USSC_RETRIEVED = '2026-07-22T21:40:54.731Z';
+const USSC_SOURCE = 'ussc-quick-facts-drug';
+const USSC_URL = 'https://www.ussc.gov/research/quick-facts';
+
+const USSC_CRACK_2023 = {
+  observationId: 'obs:ussc-average-sentence-months-crack-nation:nation:US:2023',
+  metricId: 'ussc-average-sentence-months-crack-nation',
+  estimate: 60,
+  unit: 'months',
+  referencePeriod: '2023',
+  label: 'Federal average sentence — crack cocaine trafficking (FY2023)',
+  provenance: {
+    source: USSC_SOURCE,
+    sourceUrl:
+      'https://www.ussc.gov/sites/default/files/pdf/research-and-publications/quick-facts/Crack_Cocaine_FY23.pdf',
+    retrievedAt: USSC_RETRIEVED,
+    contentHash: '2c33b76557c8e97050106138bbf7306c6b623fce468ed238cab3be3560e422ed',
+    humanCitation:
+      'U.S. Sentencing Commission Quick Facts — federal crack cocaine trafficking average sentence, FY2023.',
+  },
+};
+
+const USSC_POWDER_2023 = {
+  observationId: 'obs:ussc-average-sentence-months-powder-nation:nation:US:2023',
+  metricId: 'ussc-average-sentence-months-powder-nation',
+  estimate: 68,
+  unit: 'months',
+  referencePeriod: '2023',
+  label: 'Federal average sentence — powder cocaine trafficking (FY2023)',
+  provenance: {
+    source: USSC_SOURCE,
+    sourceUrl:
+      'https://www.ussc.gov/sites/default/files/pdf/research-and-publications/quick-facts/Powder_Cocaine_FY23.pdf',
+    retrievedAt: USSC_RETRIEVED,
+    contentHash: 'd8d20debd719be2ad3c401810dae94f481763968e4b57844b9dd9329f57e7045',
+    humanCitation:
+      'U.S. Sentencing Commission Quick Facts — federal powder cocaine trafficking average sentence, FY2023.',
+  },
+};
+
+const USSC_BLACK_SHARE_2023 = {
+  observationId: 'obs:ussc-black-share-crack-offenders-nation:nation:US:2023',
+  metricId: 'ussc-black-share-crack-offenders-nation',
+  estimate: 78.9,
+  unit: 'percent',
+  referencePeriod: '2023',
+  label: 'Black share of federal crack cocaine offenders (FY2023)',
+  provenance: {
+    source: USSC_SOURCE,
+    sourceUrl:
+      'https://www.ussc.gov/sites/default/files/pdf/research-and-publications/quick-facts/Crack_Cocaine_FY23.pdf',
+    retrievedAt: USSC_RETRIEVED,
+    contentHash: '1bae98788c5fbaf66abcad6c41f64f42ea5d8d24fe4c1ec0ad72e16096f67dfd',
+    humanCitation:
+      'U.S. Sentencing Commission Quick Facts — race share among federal crack cocaine offenders, FY2023.',
+  },
+};
+
+const NOW = '2026-07-22T23:00:00.000Z';
 const METHOD =
   'Artifacts and indicators are juxtaposed for context. Juxtaposition is not causation. Contested investigative claims carry uncertainty labels.';
 
@@ -185,7 +243,16 @@ export const drugPolicyPilotPackets = [
     },
     method_stance: 'juxtaposition',
     method_note: METHOD,
-    observations: [VERA, BJS_BLACK, BJS_WHITE, SCF_BLACK, SCF_WHITE],
+    observations: [
+      VERA,
+      BJS_BLACK,
+      BJS_WHITE,
+      SCF_BLACK,
+      SCF_WHITE,
+      USSC_CRACK_2023,
+      USSC_POWDER_2023,
+      USSC_BLACK_SHARE_2023,
+    ],
     derived: [
       {
         derivedId: 'der_scf_wealth_gap_2022',
@@ -221,6 +288,25 @@ export const drugPolicyPilotPackets = [
           contentHash: 'sha256:derived-il-imprisonment-gap-2023',
           humanCitation:
             'Derived from BJS NPS Illinois Black (940) and White (129) imprisonment rates per 100,000, 2023.',
+        },
+      },
+      {
+        derivedId: 'der_ussc_crack_powder_sentence_gap_2023',
+        methodId: 'crack_powder_sentence_gap',
+        value: -8,
+        unit: 'months',
+        status: 'derived',
+        formula:
+          'ussc-average-sentence-months-crack-nation - ussc-average-sentence-months-powder-nation',
+        inputObservationIds: [USSC_CRACK_2023.observationId, USSC_POWDER_2023.observationId],
+        label: 'Federal crack minus powder average sentence gap (FY2023)',
+        provenance: {
+          source: USSC_SOURCE,
+          sourceUrl: USSC_URL,
+          retrievedAt: USSC_RETRIEVED,
+          contentHash: 'sha256:derived-ussc-crack-powder-gap-2023',
+          humanCitation:
+            'Derived from USSC Quick Facts FY2023 crack (60 mo.) and powder (68 mo.) average sentences.',
         },
       },
     ],

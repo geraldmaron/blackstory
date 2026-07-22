@@ -90,7 +90,61 @@ const OBS = {
   },
 } as const;
 
-const NOW = '2026-07-22T20:00:00.000Z';
+const HMDA_RETRIEVED = '2026-07-22T21:33:11.144Z';
+const HMDA_SOURCE = 'hmda-loan-level';
+const HMDA_URL = 'https://ffiec.cfpb.gov/data-browser/';
+const HMDA_HUMAN =
+  'FFIEC Home Mortgage Disclosure Act Data Browser county aggregations — Cook County, IL (derived_race denial rates).';
+
+const HMDA_BLACK_2023 = {
+  observationId: 'obs:hmda-denial-rate-black-county:county:17031:2023',
+  metricId: 'hmda-denial-rate-black-county',
+  estimate: 39,
+  unit: 'percent',
+  referencePeriod: '2023',
+  label: 'Mortgage application denial rate — Black applicants (Cook County)',
+  provenance: {
+    source: HMDA_SOURCE,
+    sourceUrl: HMDA_URL,
+    retrievedAt: HMDA_RETRIEVED,
+    contentHash: 'c91ea473e3a425895072b9205d78a7cfc7b80b2108eb1ef73f0fac06e2a1b9ef',
+    humanCitation: `${HMDA_HUMAN} Black applicants, 2023.`,
+  },
+};
+
+const HMDA_WHITE_2023 = {
+  observationId: 'obs:hmda-denial-rate-white-county:county:17031:2023',
+  metricId: 'hmda-denial-rate-white-county',
+  estimate: 22.1,
+  unit: 'percent',
+  referencePeriod: '2023',
+  label: 'Mortgage application denial rate — White applicants (Cook County)',
+  provenance: {
+    source: HMDA_SOURCE,
+    sourceUrl: HMDA_URL,
+    retrievedAt: HMDA_RETRIEVED,
+    contentHash: '6cb2871cfb1d92b73c756fbe8e52c1e49ddcad6abd73c53a3d80b3db0e1a6f31',
+    humanCitation: `${HMDA_HUMAN} White applicants, 2023.`,
+  },
+};
+
+const HMDA_GAP_2023 = {
+  observationId: 'obs:hmda-denial-rate-gap-black-white-county:county:17031:2023',
+  metricId: 'hmda-denial-rate-gap-black-white-county',
+  estimate: 16.9,
+  unit: 'percentage_points',
+  referencePeriod: '2023',
+  label: 'Black–White mortgage denial rate gap (Cook County)',
+  provenance: {
+    source: HMDA_SOURCE,
+    sourceUrl: HMDA_URL,
+    retrievedAt: HMDA_RETRIEVED,
+    contentHash: '43f27b1aa57f433f7d952c207974d583542a607d9a571a28eb2b010a14623ff6',
+    humanCitation: `${HMDA_HUMAN} Black minus White denial rate gap, 2023.`,
+  },
+};
+
+const NOW = '2026-07-22T23:00:00.000Z';
 
 export const chicagoRedliningPilotPackets = [
   {
@@ -208,6 +262,9 @@ export const chicagoRedliningPilotPackets = [
       OBS.poverty,
       OBS.blackShare,
       OBS.ba,
+      HMDA_BLACK_2023,
+      HMDA_WHITE_2023,
+      HMDA_GAP_2023,
     ],
     derived: [
       {
@@ -230,16 +287,8 @@ export const chicagoRedliningPilotPackets = [
         },
       },
     ],
-    artifacts: [
-      {
-        artifactId: 'art_hmda_gap',
-        artifactClass: 'scholarly_partner_table',
-        title: 'HMDA lending aggregates (not yet loaded for this pilot)',
-        citation: 'Home Mortgage Disclosure Act aggregates — gap until county denial rates are ingested.',
-        uncertaintyLabel: 'Series pending; see gap_states.',
-      },
-    ],
-    gap_states: ['insufficient_evidence'],
+    artifacts: [],
+    gap_states: [],
     status: 'published',
     created_at: NOW,
     updated_at: NOW,
