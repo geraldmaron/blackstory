@@ -48,7 +48,10 @@ export async function loadAcsVariablesDictionary(
       );
     }
     const varJson = (await varResponse.json()) as SingleVariableJson;
-    variables[spec.id] = { label: varJson.label, concept: varJson.concept };
+    variables[spec.id] = {
+      ...(varJson.label !== undefined ? { label: varJson.label } : {}),
+      ...(varJson.concept !== undefined ? { concept: varJson.concept } : {}),
+    };
   }
 
   return { variables };

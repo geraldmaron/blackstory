@@ -40,7 +40,8 @@ export type {
   NrhpMplCandidateRecord,
 } from './types.js';
 
-import { registerSource, type SourceRegistryEntry, type SourceRegistryStore } from '../registry.js';
+import { registerSource, type SourceRegistryStore } from '../registry.js';
+import type { SourceRegistryEntry } from '../types.js';
 import { createNrhpMplAdapterContract } from './contract.js';
 import {
   createNrhpMplEvidenceSource,

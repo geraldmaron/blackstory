@@ -12,6 +12,7 @@ export type FetchLike = (url: string) => Promise<{
   readonly ok: boolean;
   readonly status: number;
   readonly json: () => Promise<unknown>;
+  readonly text: () => Promise<string>;
 }>;
 
 export type CountyPopulationFetchResult = {

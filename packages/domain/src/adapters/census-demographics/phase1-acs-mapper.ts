@@ -246,8 +246,8 @@ export function mapPhase1AcsRowToObservations(
           vintage,
           retrievedAt,
           estimate: blackShare,
-          numerator: blackPopulation,
-          denominator: raceUniverse,
+          ...(blackPopulation !== undefined ? { numerator: blackPopulation } : {}),
+          ...(raceUniverse !== undefined ? { denominator: raceUniverse } : {}),
         }),
       );
     }
@@ -262,7 +262,9 @@ export function mapPhase1AcsRowToObservations(
           vintage,
           retrievedAt,
           estimate: roundUsd(medianBlack),
-          marginOfError: getValue(row, 'medianHouseholdIncomeBlackMoe'),
+          ...(getValue(row, 'medianHouseholdIncomeBlackMoe') !== undefined
+            ? { marginOfError: getValue(row, 'medianHouseholdIncomeBlackMoe')! }
+            : {}),
         }),
       );
     }
@@ -277,7 +279,9 @@ export function mapPhase1AcsRowToObservations(
           vintage,
           retrievedAt,
           estimate: roundUsd(medianWhite),
-          marginOfError: getValue(row, 'medianHouseholdIncomeWhiteMoe'),
+          ...(getValue(row, 'medianHouseholdIncomeWhiteMoe') !== undefined
+            ? { marginOfError: getValue(row, 'medianHouseholdIncomeWhiteMoe')! }
+            : {}),
         }),
       );
     }
@@ -299,8 +303,12 @@ export function mapPhase1AcsRowToObservations(
           vintage,
           retrievedAt,
           estimate: povertyRate,
-          numerator: getValue(row, 'povertyCount'),
-          denominator: getValue(row, 'povertyUniverse'),
+          ...(getValue(row, 'povertyCount') !== undefined
+            ? { numerator: getValue(row, 'povertyCount')! }
+            : {}),
+          ...(getValue(row, 'povertyUniverse') !== undefined
+            ? { denominator: getValue(row, 'povertyUniverse')! }
+            : {}),
         }),
       );
     }
@@ -322,8 +330,12 @@ export function mapPhase1AcsRowToObservations(
           vintage,
           retrievedAt,
           estimate: homeownershipRate,
-          numerator: getValue(row, 'ownerOccupiedBlack'),
-          denominator: getValue(row, 'tenureUniverseBlack'),
+          ...(getValue(row, 'ownerOccupiedBlack') !== undefined
+            ? { numerator: getValue(row, 'ownerOccupiedBlack')! }
+            : {}),
+          ...(getValue(row, 'tenureUniverseBlack') !== undefined
+            ? { denominator: getValue(row, 'tenureUniverseBlack')! }
+            : {}),
         }),
       );
     }
@@ -347,7 +359,7 @@ export function mapPhase1AcsRowToObservations(
           retrievedAt,
           estimate: baRate,
           numerator: baNumerator,
-          denominator: baDenominator,
+          ...(baDenominator !== undefined ? { denominator: baDenominator } : {}),
         }),
       );
     }

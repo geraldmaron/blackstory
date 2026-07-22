@@ -38,10 +38,6 @@ export {
   parseChroniclingAmericaKillSwitchId,
 } from './kill-switch.js';
 
-export { filterLargeExportPayload, type ExportFilterResult } from './export-filter.js';
-
-export { partitionByRetention, qualifiesForCandidateRetention } from './retention.js';
-
 export {
   buildChroniclingAmericaCanonicalUrl,
   buildChroniclingAmericaItemUrl,

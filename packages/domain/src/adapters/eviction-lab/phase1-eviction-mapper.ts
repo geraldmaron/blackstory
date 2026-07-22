@@ -228,6 +228,7 @@ export function parsePhase1EvictionCountyCsv(csvText: string): {
       continue;
     }
 
+    const filings = filingsIdx >= 0 ? parseNumber(cells[filingsIdx]) : undefined;
     rows.push({
       cofips,
       county: cells[countyIdx]?.trim() ?? '',
@@ -235,7 +236,7 @@ export function parsePhase1EvictionCountyCsv(csvText: string): {
       year,
       type,
       filingRate,
-      ...(filingsIdx >= 0 ? { filings: parseNumber(cells[filingsIdx]) } : {}),
+      ...(filings !== undefined ? { filings } : {}),
     });
   }
 
