@@ -61,6 +61,46 @@ test('buildNormalizedUrl issues canonical /search URLs', () => {
   assert.equal(normalized.search, '?kind=place&q=school');
 });
 
+test('needsQueryNormalizationRedirect is idempotent for canonical /search URLs', () => {
+  const canonical = new URL('https://example.com/search?kind=place&q=school');
+  assert.equal(needsQueryNormalizationRedirect(canonical), false);
+
+  let url = new URL('https://example.com/search?q=school&kind=place');
+  for (let hop = 0; hop < 5; hop += 1) {
+    if (!needsQueryNormalizationRedirect(url)) break;
+    url = buildNormalizedUrl(url);
+  }
+  assert.equal(url.pathname + url.search, '/search?kind=place&q=school');
+  assert.equal(needsQueryNormalizationRedirect(url), false);
+});
+
+test('needsQueryNormalizationRedirect is idempotent for multi-param sort links', () => {
+  const canonical = new URL('https://example.com/search?q=test&sort=relevance');
+  assert.equal(needsQueryNormalizationRedirect(canonical), false);
+
+  const dirty = new URL('https://example.com/search?sort=relevance&q=test');
+  assert.equal(needsQueryNormalizationRedirect(dirty), true);
+  const once = buildNormalizedUrl(dirty);
+  assert.equal(once.search, '?q=test&sort=relevance');
+  assert.equal(needsQueryNormalizationRedirect(once), false);
+});
+
+test('needsQueryNormalizationRedirect strips trailing slash before comparing', () => {
+  assert.equal(
+    needsQueryNormalizationRedirect(new URL('https://example.com/search/?q=school')),
+    true,
+  );
+  assert.equal(
+    needsQueryNormalizationRedirect(new URL('https://example.com/search?q=school')),
+    false,
+  );
+});
+
+test('normalizeQueryString keeps page offset on /search', () => {
+  const qs = normalizeQueryString('/search', { q: 'school', offset: '20' });
+  assert.equal(qs, 'offset=20&q=school');
+});
+
 test('normalizeSearchParamsRecord returns trimmed filter bag', () => {
   assert.deepEqual(
     normalizeSearchParamsRecord('/search', { q: '  dc  ', kind: 'place', junk: '1' }),
