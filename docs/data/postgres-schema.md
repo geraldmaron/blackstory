@@ -144,6 +144,10 @@ erDiagram
 | `hateCrimeCountyYears` | `bb_reference.hate_crime_county_years` (no anon SELECT) |
 | `ucrStateParticipation` | `bb_reference.ucr_state_participation` |
 | `holcAreas` | `bb_reference.holc_areas` |
+| — | `bb_reference.statistical_series` (metric definitions) |
+| — | `bb_reference.statistical_observations` (typed estimates + provenance) |
+| — | `bb_reference.derived_measurements` (derived/modeled; not raw observations) |
+| — | `bb_reference.entity_context_bindings` (law/place ↔ indicator juxtaposition) |
 
 ### Datapack stubs (fail-closed)
 

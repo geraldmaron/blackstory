@@ -21,6 +21,9 @@ provenance, and confidence — not assertion alone.
    residential addresses.
 5. **Promotion gate.** Research and LLM enrichment cannot publish. Human and
    policy gates promote released projections only.
+6. **Juxtaposition ≠ causation.** Context indicators beside a law or place are
+   published measurements for comparison — not automated proof of policy impact.
+   See `docs/methodology/juxtaposition-not-causation.md`.
 
 ## Pipeline (high level)
 
