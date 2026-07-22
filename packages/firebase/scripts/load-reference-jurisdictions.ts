@@ -1,6 +1,6 @@
 /**
- * Upsert US state (+ DC) jurisdiction rows into bb_reference.jurisdictions.
- * County TIGER load is a follow-up bead — see docs/runbooks/load-reference-jurisdictions.md.
+ * Upsert US state (+ DC) and nation jurisdiction rows into bb_reference.jurisdictions.
+ * County rows: packages/firebase/scripts/load-reference-counties.ts (Census Gazetteer).
  *
  * Usage:
  *   DRY_RUN=1 node --conditions development --import tsx \
@@ -10,31 +10,7 @@
  */
 import { US_STATES } from '@repo/domain';
 import pg from 'pg';
-
-function normalizePgConnectionString(connectionString: string): {
-  readonly connectionString: string;
-  readonly ssl?: { readonly rejectUnauthorized: false };
-} {
-  const isSupabase =
-    /supabase\.(co|com)/i.test(connectionString) ||
-    process.env.DATABASE_SSL === '1' ||
-    process.env.DATABASE_SSL === 'true';
-  if (!isSupabase) return { connectionString };
-  let normalized = connectionString;
-  try {
-    const url = new URL(connectionString);
-    url.searchParams.delete('sslmode');
-    url.searchParams.set('uselibpqcompat', 'true');
-    url.searchParams.set('sslmode', 'require');
-    normalized = url.toString();
-  } catch {
-    normalized = connectionString;
-  }
-  return {
-    connectionString: normalized,
-    ssl: { rejectUnauthorized: false },
-  };
-}
+import { normalizePgConnectionString } from './lib/pg-connection.js';
 
 type JurisdictionSeed = {
   readonly id: string;
