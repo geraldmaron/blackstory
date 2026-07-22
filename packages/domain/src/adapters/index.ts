@@ -98,6 +98,8 @@ export * from './common-crawl/index.js';
 // Census TIGER/Gazetteer source registry entry (jurisdiction reference data).
 export * from './census-geo/index.js';
 export * from './census-demographics/index.js';
+export * from './bjs-nps/index.js';
+export * from './vera-incarceration/index.js';
 export * from './eviction-lab/index.js';
 // IPUMS NHGIS historical county race adapter (parser + extract client + decade registry).
 export * from './nhgis/index.js';
