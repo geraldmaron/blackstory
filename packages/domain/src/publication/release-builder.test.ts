@@ -16,6 +16,7 @@ import {
   type ReleaseClaimProjection,
   type ReleaseSourceEntity,
 } from './release-builder.js';
+import { sanitizePublicProseText } from './public-render.js';
 
 const CONTEXT = { releaseId: 'release-2026-07-18', generatedAt: '2026-07-18T00:00:00.000Z' };
 
@@ -392,6 +393,38 @@ test('buildReleaseEntityArtifacts omits related and keeps relatedCount 0 when no
   if (!result.ok) return;
   assert.equal(result.projection.related, undefined);
   assert.equal(result.searchIndex.relatedCount, 0);
+});
+
+test('buildReleaseEntityArtifacts sanitizes prose links in search index and claim objects', () => {
+  const entry = baseEntry({
+    summary: 'The U.S. [[gap_supreme_court|Supreme Court]], established in 1789.',
+    claims: [
+      {
+        predicate: 'established',
+        object: 'The [[gap_supreme_court|Supreme Court]] began operations in 1789.',
+        confidenceLevel: 'high',
+        citationSource: 'Example Source',
+        citationLabel: 'Example Citation',
+      },
+    ],
+  });
+  const result = buildReleaseEntityArtifacts(entry, CONTEXT);
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+
+  assert.equal(
+    result.searchIndex.summary,
+    'The U.S. Supreme Court, established in 1789.',
+  );
+  assert.equal(
+    result.projection.summary,
+    'The U.S. [[gap_supreme_court|Supreme Court]], established in 1789.',
+  );
+  assert.equal(
+    result.projection.claims[0]?.object,
+    'The Supreme Court began operations in 1789.',
+  );
+  assert.equal(sanitizePublicProseText('[[gap_supreme_court|Supreme Court]]'), 'Supreme Court');
 });
 
 test('buildReleaseEntityArtifacts derives status when entry has no status field', () => {

@@ -62,3 +62,14 @@ test('LinkedProse skips self-links from skipEntityIds', () => {
   assert.doesNotMatch(html, /href="\/entity\/ent_dunbar_school_001"/);
   assert.match(html, /Dunbar High School/);
 });
+
+test('LinkedProse resolves gap-fill supreme court wikilink markup', () => {
+  const html = renderToStaticMarkup(
+    createElement(LinkedProse, {
+      text: 'The U.S. [[gap_supreme_court|Supreme Court]], established in 1789.',
+    }),
+  );
+  assert.match(html, /href="\/entity\/gap_supreme_court"/);
+  assert.match(html, /Supreme Court/);
+  assert.doesNotMatch(html, /\[\[/);
+});

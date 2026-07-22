@@ -3,6 +3,7 @@
  * fields stripped before anything is emitted to HTML head tags or link unfurlers.
  */
 import type { Metadata } from 'next';
+import { sanitizePublicProseText } from '@repo/domain';
 import {
   sanitizePreviewText,
   stripProtectedFields,
@@ -63,7 +64,7 @@ export function buildEntityPageMetadata(source: EntityMetadataSource): Metadata 
   const safe = stripProtectedFields(source);
   const title = sanitizePreviewText(safe.displayName, 'BlackStory record');
   const description = sanitizePreviewText(
-    safe.summary,
+    safe.summary !== undefined ? sanitizePublicProseText(safe.summary) : undefined,
     `Published ${safe.kind ?? 'record'} in the BlackStory public catalog.`,
   );
   const preview = buildPublicMetadataPreview({

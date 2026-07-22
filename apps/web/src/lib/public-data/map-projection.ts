@@ -7,6 +7,7 @@
 
 import {
   deriveCatalogEntityStatus,
+  sanitizePublicProseText,
   type EntityStatusValue,
   type NotabilityCriterion,
   type StatusHistoryEntry,
@@ -122,7 +123,7 @@ function mapClaims(claims: PublicProjectionInput['claims']): PublicEntityView['c
   return (claims ?? []).map((claim) => ({
     id: claim.id,
     predicate: claim.predicate,
-    object: claim.object,
+    object: sanitizePublicProseText(claim.object),
     confidenceScore: NOMINAL_CONFIDENCE_SCORE[claim.confidenceLevel],
     confidenceLevel: claim.confidenceLevel,
     citationSource: claim.citationSource,
@@ -180,7 +181,7 @@ function resolveStatusHistory(
     claims: claims.map((claim) => ({
       id: claim.id,
       predicate: claim.predicate,
-      object: claim.object,
+      object: sanitizePublicProseText(claim.object),
     })),
     ...(projection.status !== undefined ? { status: projection.status } : {}),
   });
@@ -334,7 +335,7 @@ export function mapProjectionToPublicEntityView(
       projection.historicalContext ??
       'Live projection scaffolding — historical framing expands as curated release content is published.',
     ...(projection.extendedNarrative !== undefined
-      ? { extendedNarrative: projection.extendedNarrative }
+      ? { extendedNarrative: sanitizePublicProseText(projection.extendedNarrative) }
       : {}),
     ...(primaryImage !== undefined ? { primaryImage } : {}),
     ...(geoAnchor !== undefined ? { geoAnchor } : {}),

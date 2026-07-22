@@ -12,6 +12,7 @@
  * render as polygon geometry, never as a point.
  */
 import { redactLocationForPublic } from '@repo/security/redaction';
+import { sanitizePublicProseText } from '@repo/domain';
 import {
   buildMapSource,
   type MapCountyAggregate,
@@ -232,7 +233,7 @@ function enrichFeature(feature: MapPointFeature, entity: PublicEntityView): Expl
       href: `/entity/${entity.id}`,
       kind: feature.properties.kind,
       displayName: feature.properties.displayName,
-      oneLineStory: entity.summary,
+      oneLineStory: sanitizePublicProseText(entity.summary),
       precision: feature.properties.precision,
       geoPrecisionTier: tier,
       ...(radius.ok ? { radiusMeters: radius.radiusMeters } : {}),
