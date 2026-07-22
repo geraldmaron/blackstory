@@ -86,7 +86,7 @@ pnpm firebase:emulators
 pnpm firebase:test:rules
 ```
 
-**Data plane:** Product SoR is Supabase Postgres project `blackstory-app` ([ADR-020](./docs/adr/ADR-020-supabase-postgres-system-of-record.md), [`docs/data/postgres-schema.md`](./docs/data/postgres-schema.md), [`supabase/migrations/`](./supabase/migrations/)). Firestore→Postgres ETL: [`packages/migrate-firestore-postgres`](./packages/migrate-firestore-postgres/). **App Hosting (staging + production)** sets `PUBLIC_DATA_SOURCE=postgres` / `ADMIN_DATA_SOURCE=postgres` with Secret Manager `DATABASE_URL` (`web-database-url` / `admin-database-url`); admin uses `ADMIN_AUTH_MODE=supabase` + publishable anon key (`admin-supabase-anon-key`). See root `apphosting.yaml`, `apphosting.staging.yaml`, `apphosting.admin.yaml`. With `PUBLIC_DATA_SOURCE=postgres`, the web app reads `bb_public.*` directly and does **not** prefer stale ADR-004 `entities.json` fixtures/CDN slices. Blobs remain in GCS/Firebase Storage. Firestore remains for rollback until the owner completes the Firebase wind-down checklist in [`docs/data/firebase-wind-down.md`](./docs/data/firebase-wind-down.md) — do not delete the Firebase project without dual verification + export.
+**Data plane:** Product SoR is Supabase Postgres project `blackstory-app` ([ADR-020](./docs/adr/ADR-020-supabase-postgres-system-of-record.md), [`docs/data/postgres-schema.md`](./docs/data/postgres-schema.md), [`supabase/migrations/`](./supabase/migrations/)). Context indicators (justice, wealth, housing) live in `bb_reference.statistical_*` — catalog in [`docs/research/context-data-source-matrix.md`](./docs/research/context-data-source-matrix.md); juxtaposition rules in [`docs/methodology/juxtaposition-not-causation.md`](./docs/methodology/juxtaposition-not-causation.md). Firestore→Postgres ETL: [`packages/migrate-firestore-postgres`](./packages/migrate-firestore-postgres/). **App Hosting (staging + production)** sets `PUBLIC_DATA_SOURCE=postgres` / `ADMIN_DATA_SOURCE=postgres` with Secret Manager `DATABASE_URL` (`web-database-url` / `admin-database-url`); admin uses `ADMIN_AUTH_MODE=supabase` + publishable anon key (`admin-supabase-anon-key`). See root `apphosting.yaml`, `apphosting.staging.yaml`, `apphosting.admin.yaml`. With `PUBLIC_DATA_SOURCE=postgres`, the web app reads `bb_public.*` directly and does **not** prefer stale ADR-004 `entities.json` fixtures/CDN slices. **Blobs:** Supabase Storage buckets `public-media` / `raw-sources` (cutover in progress — dual-serve with GCS; see [`docs/data/supabase-storage-cutover.md`](./docs/data/supabase-storage-cutover.md)). Firestore remains for rollback until the owner completes the Firebase wind-down checklist in [`docs/data/firebase-wind-down.md`](./docs/data/firebase-wind-down.md) — do not delete the Firebase project without dual verification + export.
 BB-018 audit/outbox helpers atomically commit state + immutable audit + pending delivery with
 idempotency, bounded retry/dead-letter handling, and publication-history reconstruction.
 Bootstrap uses frozen pnpm and uv lockfiles. Local tests default to `NODE_ENV=development` and
@@ -140,6 +140,12 @@ SQL create — see `docs/ds-001/`, `docs/adr/`, `docs/security/`, `docs/testing/
 `infra/firebase/`, `infra/gcp/` (incl. `wif/`), `infra/github/`, `infra/database/`.
 
 ```bash
+# Public web dig — prefer the launcher so PUBLIC_DATA_SOURCE + DATABASE_URL are coherent:
+pnpm dev:web
+# http://localhost:3048/  (PORT=3050 pnpm dev:web for an alternate port)
+# http://localhost:3048/explore  — live catalog needs postgres + DATABASE_URL (~1100 entities).
+# Plain `pnpm --filter @repo/web dev` without those env vars serves the 4-entity Dunbar seed.
+
 pnpm --filter @repo/web exec next dev --port 3048
 # or: pnpm --filter @repo/web dev
 # http://localhost:3048/

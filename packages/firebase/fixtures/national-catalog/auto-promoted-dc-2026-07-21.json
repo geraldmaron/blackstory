@@ -1,0 +1,884 @@
+[
+  {
+    "id": "dc-black-history-sites-b19",
+    "kind": "place",
+    "displayName": "Scurlock Studio (Site)",
+    "summary": "Scurlock Studio (900 U Street NW, Washington, DC) was a business site in 1911, documented in the DC Historic Preservation Office's 'Black History Sites: Washington' inventory.",
+    "eraBuckets": [
+      "1910s"
+    ],
+    "topicTags": [
+      "business",
+      "architecture",
+      "community",
+      "history",
+      "civil-rights"
+    ],
+    "topicIds": [
+      "business",
+      "architecture",
+      "community",
+      "history",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Scurlock Studio",
+      "U Street",
+      "Washington, DC",
+      "1911",
+      "African American business"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "site",
+    "locationLabel": "900 U Street NW, Washington, DC",
+    "lat": 38.91683,
+    "lng": -77.024222,
+    "claims": [
+      {
+        "predicate": "Scurlock Studio",
+        "object": "business site",
+        "confidenceLevel": "high",
+        "citationSource": "amhistory.si.edu",
+        "citationHref": "https://amhistory.si.edu/archives/scurlock/about_the_scurlocks/index.html",
+        "citationLabel": "Smithsonian Archives"
+      },
+      {
+        "predicate": "Scurlock Studio",
+        "object": "documented in DC Historic Preservation Office inventory",
+        "confidenceLevel": "high",
+        "citationSource": "amhistory.si.edu",
+        "citationHref": "https://amhistory.si.edu/archives/scurlock/about_the_scurlocks/index.html",
+        "citationLabel": "Smithsonian Archives"
+      }
+    ],
+    "historicalContext": "Scurlock Studio was a key business in the African American community, reflecting the economic and cultural vitality of the area during the early 20th century."
+  },
+  {
+    "id": "dc-black-history-sites-b20",
+    "kind": "place",
+    "displayName": "Washington Afro-American Newspaper Office Building",
+    "summary": "The Washington Afro-American Newspaper Office Building at 1612 14th Street NW in Washington, DC, was the site of a newspaper that played a crucial role in the African American community from 1892 to the present.",
+    "eraBuckets": [
+      "1890s"
+    ],
+    "topicTags": [
+      "black-power",
+      "civil-rights",
+      "journalism",
+      "education",
+      "history"
+    ],
+    "topicIds": [
+      "black-power",
+      "civil-rights",
+      "journalism",
+      "education",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Washington Afro-American Newspaper",
+      "14th Street NW",
+      "Baltimore Afro-American",
+      "John H. Murphy Sr."
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "site",
+    "locationLabel": "1612 14th Street NW, Washington, DC",
+    "lat": 38.91163,
+    "lng": -77.032348,
+    "claims": [
+      {
+        "predicate": "established",
+        "object": "1892",
+        "confidenceLevel": "high",
+        "citationSource": "msa.maryland.gov/megafile/msa/speccol/sc4900/sc4968/html/summary.html",
+        "citationHref": "https://msa.maryland.gov/megafile/msa/speccol/sc4900/sc4968/html/summary.html",
+        "citationLabel": "Maryland State Archives"
+      },
+      {
+        "predicate": "published",
+        "object": "African American newspapers",
+        "confidenceLevel": "high",
+        "citationSource": "msa.maryland.gov/megafile/msa/speccol/sc4900/sc4968/html/summary.html",
+        "citationHref": "https://msa.maryland.gov/megafile/msa/speccol/sc4900/sc4968/html/summary.html",
+        "citationLabel": "Maryland State Archives"
+      }
+    ],
+    "historicalContext": "The Afro-American newspaper was established in 1892 and became one of the largest African American newspapers in the United States, serving as a platform for political and social activism and providing news and employment opportunities for the community."
+  },
+  {
+    "id": "dc-black-history-sites-c2",
+    "kind": "place",
+    "displayName": "Benjamin Banneker Park",
+    "summary": "Benjamin Banneker Park in Washington, DC, named after the influential African American scientist, was redesigned in 2017 to enhance connectivity and accessibility, reflecting efforts to improve public spaces and recognize Black history.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "architecture",
+      "civil-rights",
+      "history",
+      "public-accommodations",
+      "public-safety"
+    ],
+    "topicIds": [
+      "architecture",
+      "civil-rights",
+      "history",
+      "public-accommodations",
+      "public-safety"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Benjamin Banneker Park",
+      "Dan Kiley",
+      "National Capital Planning Commission",
+      "public spaces",
+      "historical sites"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "site",
+    "locationLabel": "Benjamin Banneker Park, Washington, DC",
+    "lat": 38.881709,
+    "lng": -77.025982,
+    "claims": [
+      {
+        "predicate": "Benjamin Banneker Park",
+        "object": "was designed by Dan Kiley",
+        "confidenceLevel": "high",
+        "citationSource": "ncpc.gov",
+        "citationHref": "https://www.ncpc.gov/news/item/47/",
+        "citationLabel": "NCPC News Item"
+      },
+      {
+        "predicate": "Benjamin Banneker Park",
+        "object": "was named after Benjamin Banneker",
+        "confidenceLevel": "high",
+        "citationSource": "ncpc.gov",
+        "citationHref": "https://www.ncpc.gov/news/item/47/",
+        "citationLabel": "NCPC News Item"
+      },
+      {
+        "predicate": "Benjamin Banneker Park",
+        "object": "was determined eligible for listing in the National Register of Historic Places",
+        "confidenceLevel": "high",
+        "citationSource": "ncpc.gov",
+        "citationHref": "https://www.ncpc.gov/news/item/47/",
+        "citationLabel": "NCPC News Item"
+      }
+    ],
+    "historicalContext": "Benjamin Banneker Park, named after the renowned African American scientist who helped survey Washington's original boundaries, was redesigned in 2017 to improve connectivity and accessibility, reflecting broader efforts to enhance public spaces and recognize Black history in Washington, DC."
+  },
+  {
+    "id": "dc-black-history-sites-i13",
+    "kind": "place",
+    "displayName": "Black Fashion Museum",
+    "summary": "The Black Fashion Museum, established in Harlem in 1966 and relocated to Washington, D.C. in 1994, documented the contributions of African American designers and fashion makers. The museum's collection, now part of the Smithsonian, includes garments and accessories from notable designers like Ann Lowe and Elizabeth Keckley.",
+    "eraBuckets": [
+      "1960s",
+      "1970s",
+      "1980s",
+      "1990s"
+    ],
+    "topicTags": [
+      "founding-era",
+      "civil-rights",
+      "education",
+      "history",
+      "museum"
+    ],
+    "topicIds": [
+      "founding-era",
+      "civil-rights",
+      "education",
+      "history",
+      "museum"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Black Fashion Museum",
+      "Harlem",
+      "African American designers",
+      "fashion memorabilia",
+      "Smithsonian"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "institution",
+    "locationLabel": "2007 Vermont Avenue NW, Washington, DC",
+    "lat": 38.917461,
+    "lng": -77.024731,
+    "claims": [
+      {
+        "predicate": "The Black Fashion Museum operated from 1966 to 2007.",
+        "object": "1966-2007",
+        "confidenceLevel": "high",
+        "citationSource": "https://en.wikipedia.org/wiki/Black_Fashion_Museum",
+        "citationHref": "https://en.wikipedia.org/wiki/Black_Fashion_Museum",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "The museum's collection included garments and accessories from notable designers like Ann Lowe and Elizabeth Keckley.",
+        "object": "Ann Lowe, Elizabeth Keckley",
+        "confidenceLevel": "high",
+        "citationSource": "https://en.wikipedia.org/wiki/Black_Fashion_Museum",
+        "citationHref": "https://en.wikipedia.org/wiki/Black_Fashion_Museum",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The Black Fashion Museum operated from 1966 to 2007, providing a platform to highlight the historical contributions of African American designers and fashion makers. Its collection, which included garments and accessories from renowned designers, was eventually transferred to the Smithsonian's National Museum of African American History and Culture."
+  },
+  {
+    "id": "dc-black-history-sites-i25",
+    "kind": "place",
+    "displayName": "Eleventh Precinct Building",
+    "summary": "The Eleventh Precinct Building, located at 2301 Martin Luther King Jr Avenue SE in Washington, DC, was established in 1968 and is part of the DC Historic Preservation Office's 'Black History Sites: Washington' inventory.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "police-violence",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "police-violence",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Eleventh Precinct Building",
+      "Martin Luther King Jr Avenue",
+      "Washington, DC",
+      "Black History Sites"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "institution",
+    "locationLabel": "2301 Martin Luther King Jr Avenue SE, Washington, DC",
+    "lat": 38.863507,
+    "lng": -76.991296,
+    "claims": [
+      {
+        "predicate": "located_at",
+        "object": "2301 Martin Luther King Jr Avenue SE, Washington, DC",
+        "confidenceLevel": "high",
+        "citationSource": "catalog.data.gov",
+        "citationHref": "https://catalog.data.gov/dataset/black-history-sites-washington",
+        "citationLabel": "Black History Sites: Washington"
+      }
+    ],
+    "historicalContext": "The building is part of a larger collection of sites that highlight the social, cultural, and political movements that have shaped Washington, DC, particularly focusing on the contributions of African Americans."
+  },
+  {
+    "id": "dc-black-history-sites-i26",
+    "kind": "place",
+    "displayName": "Elks Columbia Lodge No. 85",
+    "summary": "Elks Columbia Lodge No. 85 is an institution site at 1844 3rd Street NW in Washington, DC, documented in the DC Historic Preservation Office's 'Black History Sites: Washington' inventory.",
+    "eraBuckets": [
+      "1920s"
+    ],
+    "topicTags": [
+      "architecture",
+      "black-architects",
+      "community",
+      "history",
+      "memorial"
+    ],
+    "topicIds": [
+      "architecture",
+      "black-architects",
+      "community",
+      "history",
+      "memorial"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Elks Columbia Lodge No. 85",
+      "Washington, DC",
+      "historic preservation"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "institution",
+    "locationLabel": "1844 3rd Street NW, Washington, DC",
+    "lat": 38.915106,
+    "lng": -77.015924,
+    "claims": [
+      {
+        "predicate": "located_at",
+        "object": "1844 3rd Street NW, Washington, DC",
+        "confidenceLevel": "high",
+        "citationSource": "catalog.data.gov",
+        "citationHref": "https://catalog.data.gov/dataset/black-history-sites-washington",
+        "citationLabel": "Black History Sites: Washington"
+      },
+      {
+        "predicate": "part_of",
+        "object": "DC Historic Preservation Office",
+        "confidenceLevel": "high",
+        "citationSource": "catalog.data.gov",
+        "citationHref": "https://catalog.data.gov/dataset/black-history-sites-washington",
+        "citationLabel": "Black History Sites: Washington"
+      }
+    ],
+    "historicalContext": "This site is part of a larger collection documenting African American history in Washington, DC, highlighting the presence and contributions of Black communities and institutions."
+  },
+  {
+    "id": "dc-black-history-sites-i56",
+    "kind": "place",
+    "displayName": "Macedonia Baptist Church",
+    "summary": "Macedonia Baptist Church is an important historical site at 2625 Stanton Road SE in Washington, DC, established in 1948. Documented in the DC Historic Preservation Office's 'Black History Sites: Washington' inventory.",
+    "eraBuckets": [
+      "1940s"
+    ],
+    "topicTags": [
+      "church",
+      "civil-rights",
+      "black-codes",
+      "black-power",
+      "civil-war"
+    ],
+    "topicIds": [
+      "church",
+      "civil-rights",
+      "black-codes",
+      "black-power",
+      "civil-war"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Macedonia Baptist Church",
+      "Washington, DC",
+      "1948",
+      "historic preservation",
+      "African American history"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "institution",
+    "locationLabel": "2625 Stanton Road SE, Washington, DC",
+    "lat": 38.858196,
+    "lng": -76.991936,
+    "claims": [
+      {
+        "predicate": "established",
+        "object": "1948",
+        "confidenceLevel": "high",
+        "citationSource": "catalog.data.gov",
+        "citationHref": "https://catalog.data.gov/dataset/black-history-sites-washington",
+        "citationLabel": "Black History Sites: Washington"
+      },
+      {
+        "predicate": "located_at",
+        "object": "2625 Stanton Road SE, Washington, DC",
+        "confidenceLevel": "high",
+        "citationSource": "catalog.data.gov",
+        "citationHref": "https://catalog.data.gov/dataset/black-history-sites-washington",
+        "citationLabel": "Black History Sites: Washington"
+      }
+    ],
+    "historicalContext": "Macedonia Baptist Church is part of a broader network of religious institutions that played a crucial role in the social and cultural life of African Americans in Washington, DC, particularly during the Civil Rights era."
+  },
+  {
+    "id": "dc-black-history-sites-i77",
+    "kind": "place",
+    "displayName": "Phillips School",
+    "summary": "Phillips School, located at 2735 Olive Street NW in Washington, DC, was established in 1890 to educate African American children in the Herring Hill neighborhood. It closed in 1930 due to declining enrollment and property values, eventually being converted into condominiums in 2002.",
+    "eraBuckets": [
+      "1890s",
+      "1930s"
+    ],
+    "topicTags": [
+      "education",
+      "civil-rights",
+      "architecture",
+      "community",
+      "civil-war"
+    ],
+    "topicIds": [
+      "education",
+      "civil-rights",
+      "architecture",
+      "community",
+      "civil-war"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Phillips School",
+      "Herring Hill",
+      "African American education",
+      "condominiums",
+      "Washington, DC"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "institution",
+    "locationLabel": "2735 Olive Street NW, Washington, DC",
+    "lat": 38.906661,
+    "lng": -77.056581,
+    "claims": [
+      {
+        "predicate": "built",
+        "object": "Phillips School",
+        "confidenceLevel": "high",
+        "citationSource": "https://www.nps.gov/places/phillips-school-georgetown.htm",
+        "citationHref": "https://www.nps.gov/places/phillips-school-georgetown.htm",
+        "citationLabel": "National Park Service"
+      },
+      {
+        "predicate": "established_to",
+        "object": "educate African American children",
+        "confidenceLevel": "high",
+        "citationSource": "https://www.nps.gov/places/phillips-school-georgetown.htm",
+        "citationHref": "https://www.nps.gov/places/phillips-school-georgetown.htm",
+        "citationLabel": "National Park Service"
+      },
+      {
+        "predicate": "closed",
+        "object": "Phillips School",
+        "confidenceLevel": "high",
+        "citationSource": "https://www.nps.gov/places/phillips-school-georgetown.htm",
+        "citationHref": "https://www.nps.gov/places/phillips-school-georgetown.htm",
+        "citationLabel": "National Park Service"
+      },
+      {
+        "predicate": "converted_to",
+        "object": "condominiums",
+        "confidenceLevel": "high",
+        "citationSource": "https://www.nps.gov/places/phillips-school-georgetown.htm",
+        "citationHref": "https://www.nps.gov/places/phillips-school-georgetown.htm",
+        "citationLabel": "National Park Service"
+      }
+    ],
+    "historicalContext": "Phillips School was part of a network of schools established to educate African American children in Washington, DC, during the late 19th and early 20th centuries. These schools were often established in response to the need for education in segregated communities and faced challenges such as declining enrollment and financial difficulties."
+  },
+  {
+    "id": "dc-black-history-sites-i91",
+    "kind": "place",
+    "displayName": "Smithsonian Anacostia Community Museum",
+    "summary": "The Smithsonian Anacostia Community Museum is located at 1901 Fort Place SE in Washington, DC, and is documented in the DC Historic Preservation Office's 'Black History Sites: Washington' inventory.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "architecture",
+      "museum",
+      "black-codes",
+      "civil-rights",
+      "history",
+      "public-accommodations"
+    ],
+    "topicIds": [
+      "architecture",
+      "museum",
+      "black-codes",
+      "civil-rights",
+      "history",
+      "public-accommodations"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Smithsonian Anacostia Community Museum",
+      "Washington, DC",
+      "black history sites",
+      "museum",
+      "historical preservation"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "institution",
+    "locationLabel": "1901 Fort Place SE, Washington, DC",
+    "lat": 38.856573,
+    "lng": -76.976843,
+    "claims": [
+      {
+        "predicate": "located_at",
+        "object": "Smithsonian Anacostia Community Museum",
+        "confidenceLevel": "high",
+        "citationSource": "anacostia.si.edu",
+        "citationHref": "https://anacostia.si.edu/",
+        "citationLabel": "Smithsonian Anacostia Community Museum"
+      }
+    ],
+    "historicalContext": "The Smithsonian Anacostia Community Museum is part of a network of black history sites in Washington, DC, which collectively document the rich cultural and historical contributions of African Americans in the region."
+  },
+  {
+    "id": "dc-black-history-sites-s19",
+    "kind": "place",
+    "displayName": "Union Burial Society of Georgetown Cemetery",
+    "summary": "The Union Burial Society of Georgetown Cemetery, established in 1868, is a significant site in Washington, DC, recognized by the DC Historic Preservation Office. It commemorates the early efforts to honor African American communities.",
+    "eraBuckets": [
+      "1860s"
+    ],
+    "topicTags": [
+      "burial-ground",
+      "memorial",
+      "history"
+    ],
+    "topicIds": [
+      "burial-ground",
+      "memorial",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Union Burial Society",
+      "Georgetown Cemetery",
+      "1868",
+      "Washington, DC",
+      "memorial site"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "site",
+    "locationLabel": "2616 Chain Bridge Road NW, Washington, DC",
+    "lat": 38.923597,
+    "lng": -77.098088,
+    "claims": [
+      {
+        "predicate": "established",
+        "object": "1868",
+        "confidenceLevel": "high",
+        "citationSource": "https://planning.dc.gov/sites/default/files/dc/sites/op/publication/attachments/Cemetery%2520Brochure%2520Final%2520opt%25202.pdf",
+        "citationHref": "https://planning.dc.gov/sites/default/files/dc/sites/op/publication/attachments/Cemetery%2520Brochure%2520Final%2520opt%25202.pdf",
+        "citationLabel": "DC Historic Preservation Office Brochure"
+      }
+    ],
+    "historicalContext": "This cemetery is part of a broader effort to memorialize and honor African American communities in Washington, DC, reflecting the post-Civil War period when such sites were established."
+  },
+  {
+    "id": "dc-black-history-sites-s5",
+    "kind": "place",
+    "displayName": "Center Market (Site)",
+    "summary": "Center Market, located at 701 Constitution Ave NW, operated from 1872 to 1931, serving as a central hub for commercial activity in Washington, DC. Designed by architect Adolph Cluss, it was the largest market hall in the country at the time.",
+    "eraBuckets": [
+      "1870s",
+      "1880s",
+      "1900s",
+      "1910s",
+      "1920s",
+      "1930s"
+    ],
+    "topicTags": [
+      "architecture",
+      "commerce-clause",
+      "commerce-clause",
+      "civil-rights",
+      "civil-war",
+      "eugenics"
+    ],
+    "topicIds": [
+      "architecture",
+      "commerce-clause",
+      "commerce-clause",
+      "civil-rights",
+      "civil-war",
+      "eugenics"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Center Market",
+      "Adolph Cluss",
+      "Washington Market Company",
+      "1872",
+      "1931"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "site",
+    "locationLabel": "701 Constitution Ave NW, Washington, DC",
+    "lat": 38.892226,
+    "lng": -77.022165,
+    "claims": [
+      {
+        "predicate": "Center Market",
+        "object": "was located at 701 Constitution Ave NW, Washington, DC",
+        "confidenceLevel": "high",
+        "citationSource": "https://en.wikipedia.org/wiki/Center_Market,_Washington,_D.C.",
+        "citationHref": "https://en.wikipedia.org/wiki/Center_Market,_Washington,_D.C.",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "Center Market",
+        "object": "was designed by architect Adolph Cluss",
+        "confidenceLevel": "high",
+        "citationSource": "https://en.wikipedia.org/wiki/Center_Market,_Washington,_D.C.",
+        "citationHref": "https://en.wikipedia.org/wiki/Center_Market,_Washington,_D.C.",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "Center Market",
+        "object": "operated from 1872 to 1931",
+        "confidenceLevel": "high",
+        "citationSource": "https://en.wikipedia.org/wiki/Center_Market,_Washington,_D.C.",
+        "citationHref": "https://en.wikipedia.org/wiki/Center_Market,_Washington,_D.C.",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "Center Market",
+        "object": "was the largest market hall in the country at the time",
+        "confidenceLevel": "high",
+        "citationSource": "https://prologue.blogs.archives.gov/2015/07/08/new-web-exhibit-on-center-market/",
+        "citationHref": "https://prologue.blogs.archives.gov/2015/07/08/new-web-exhibit-on-center-market/",
+        "citationLabel": "National Archives History Office"
+      }
+    ],
+    "historicalContext": "Center Market was a significant commercial and social center in Washington, DC, from 1872 to 1931. It was designed by architect Adolph Cluss and operated by the Washington Market Company. The market's demolition in 1931 to make way for the National Archives Building marked a shift in urban development and public space in the city."
+  },
+  {
+    "id": "dc-black-history-sites-s23",
+    "kind": "place",
+    "displayName": "Leonard A. Grimes Residence Site",
+    "summary": "Leonard A. Grimes, a free Black man from Virginia, became a conductor on the Underground Railroad, helping freedom seekers escape slavery. He later led the Twelfth Baptist Church in Boston, where he mobilized the Black community against the Fugitive Slave Law.",
+    "eraBuckets": [
+      "1830s",
+      "1840s",
+      "1850s"
+    ],
+    "topicTags": [
+      "abolition",
+      "underground-railroad",
+      "church",
+      "leadership"
+    ],
+    "topicIds": [
+      "abolition",
+      "underground-railroad",
+      "church",
+      "leadership"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Leonard A. Grimes",
+      "Underground Railroad",
+      "Twelfth Baptist Church",
+      "Fugitive Slave Law",
+      "Boston"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "site",
+    "locationLabel": "2201 H st NW, Washington, DC",
+    "lat": 38.899732,
+    "lng": -77.049052,
+    "claims": [
+      {
+        "predicate": "Leonard A. Grimes",
+        "object": "conducted the Underground Railroad",
+        "confidenceLevel": "high",
+        "citationSource": "https://www.nps.gov/people/leonard-grimes.htm",
+        "citationHref": "https://www.nps.gov/people/leonard-grimes.htm",
+        "citationLabel": "NPS Leonard Grimes Biography"
+      },
+      {
+        "predicate": "Leonard A. Grimes",
+        "object": "led the Twelfth Baptist Church in Boston",
+        "confidenceLevel": "high",
+        "citationSource": "https://www.nps.gov/people/leonard-grimes.htm",
+        "citationHref": "https://www.nps.gov/people/leonard-grimes.htm",
+        "citationLabel": "NPS Leonard Grimes Biography"
+      },
+      {
+        "predicate": "Leonard A. Grimes",
+        "object": "mobilized the Black community against the Fugitive Slave Law",
+        "confidenceLevel": "high",
+        "citationSource": "https://www.nps.gov/people/leonard-grimes.htm",
+        "citationHref": "https://www.nps.gov/people/leonard-grimes.htm",
+        "citationLabel": "NPS Leonard Grimes Biography"
+      }
+    ],
+    "historicalContext": "Reverend Leonard A. Grimes played a crucial role in the abolition movement, particularly through his work on the Underground Railroad and his involvement in the Twelfth Baptist Church, which became known as 'The Fugitive Slave Church.'"
+  },
+  {
+    "id": "dc-black-history-sites-c21",
+    "kind": "place",
+    "displayName": "Mary McLeod Bethune Memorial",
+    "summary": "The Mary McLeod Bethune Memorial is a commemorative site in Lincoln Park SE, Washington, DC, established in 1974. It honors Mary McLeod Bethune, a prominent educator and civil rights leader.",
+    "eraBuckets": [
+      "1970s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "education",
+      "memorial",
+      "black-power",
+      "civil-war"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "education",
+      "memorial",
+      "black-power",
+      "civil-war"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Mary McLeod Bethune",
+      "memorial",
+      "Washington, DC",
+      "civil rights",
+      "education"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "site",
+    "locationLabel": "Lincoln Park SE, Washington, DC",
+    "lat": 38.889822,
+    "lng": -76.989191,
+    "claims": [
+      {
+        "predicate": "commemorates",
+        "object": "Mary McLeod Bethune",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/places/000/mary-mcleod-bethune-memorial.html",
+        "citationLabel": "National Park Service"
+      }
+    ],
+    "historicalContext": "The memorial is part of the broader landscape of black history in Washington, DC, reflecting the city's role in the civil rights movement and the contributions of African American leaders."
+  },
+  {
+    "id": "dc-black-history-sites-c23",
+    "kind": "place",
+    "displayName": "Lafayette-Pointer Park",
+    "summary": "Lafayette-Pointer Park in Washington, DC, commemorates Captain George Pointer, who purchased his freedom in 1792 and later owned land where the park now stands. The park includes amenities like playgrounds and tennis courts, honoring Pointer's legacy.",
+    "eraBuckets": [
+      "1830s",
+      "1920s"
+    ],
+    "topicTags": [
+      "black-architects",
+      "architecture",
+      "black-power",
+      "civil-rights",
+      "history"
+    ],
+    "topicIds": [
+      "black-architects",
+      "architecture",
+      "black-power",
+      "civil-rights",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Captain George Pointer",
+      "Lafayette-Pointer Park",
+      "African-American landowners",
+      "Washington, DC",
+      "freedom"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "site",
+    "locationLabel": "5900 33rd St NW, Washington, DC",
+    "lat": 38.967615,
+    "lng": -77.066482,
+    "claims": [
+      {
+        "predicate": "Captain George Pointer",
+        "object": "purchased his freedom in 1792",
+        "confidenceLevel": "high",
+        "citationSource": "dpr.dc.gov",
+        "citationHref": "https://dpr.dc.gov/page/lafayette-pointer-recreation-center",
+        "citationLabel": "Lafayette-Pointer Recreation Center"
+      },
+      {
+        "predicate": "Captain George Pointer",
+        "object": "owned land where Lafayette-Pointer Park stands",
+        "confidenceLevel": "high",
+        "citationSource": "dpr.dc.gov",
+        "citationHref": "https://dpr.dc.gov/page/lafayette-pointer-recreation-center",
+        "citationLabel": "Lafayette-Pointer Recreation Center"
+      }
+    ],
+    "historicalContext": "Captain George Pointer, born into slavery in 1773, purchased his freedom at age 19 and became one of the early African-American landowners in Washington, DC. His family owned land from the 1830s until 1928, when their homes were taken by eminent domain to build Lafayette Elementary School and Lafayette Park."
+  },
+  {
+    "id": "dc-black-history-sites-c25",
+    "kind": "place",
+    "displayName": "National Museum of African American Histoyr and Culture",
+    "summary": "The National Museum of African American History and Culture, located at 1400 Constitution Avenue SW in Washington, DC, is a commemorative site recognized by the DC Historic Preservation Office.",
+    "eraBuckets": [
+      "2010s"
+    ],
+    "topicTags": [
+      "museum",
+      "history",
+      "architecture",
+      "education",
+      "cabinet"
+    ],
+    "topicIds": [
+      "museum",
+      "history",
+      "architecture",
+      "education",
+      "cabinet"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "National Museum of African American History and Culture",
+      "Washington, DC",
+      "Smithsonian Institution",
+      "African American History",
+      "Museum of African American History and Culture"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "site",
+    "locationLabel": "1400 Constitution Avenue SW, Washington, DC",
+    "lat": 38.890777,
+    "lng": -77.032628,
+    "claims": [
+      {
+        "predicate": "located_at",
+        "object": "1400 Constitution Avenue SW, Washington, DC",
+        "confidenceLevel": "high",
+        "citationSource": "https://www.si.edu/museums/african-american-museum",
+        "citationHref": "https://www.si.edu/museums/african-american-museum",
+        "citationLabel": "Smithsonian Institution"
+      }
+    ],
+    "historicalContext": "This museum is a significant commemorative site in Washington, DC, reflecting the broader context of African American history and culture within the city's landscape."
+  },
+  {
+    "id": "dc-black-history-sites-b23",
+    "kind": "place",
+    "displayName": "Lindsay's Jazz Club",
+    "summary": "Lindsay's Jazz Club, located at 1752 Swann Street NW in Washington, DC (1930-1950), was a significant business site during the early 20th century, contributing to the cultural landscape of African American history.",
+    "eraBuckets": [
+      "1930s",
+      "1940s",
+      "1950s"
+    ],
+    "topicTags": [
+      "black-codes",
+      "jazz",
+      "business",
+      "history"
+    ],
+    "topicIds": [
+      "black-codes",
+      "jazz",
+      "business",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Lindsay's Jazz Club",
+      "Swann Street",
+      "Washington, DC",
+      "jazz",
+      "business"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "site",
+    "locationLabel": "1752 Swann Street NW, Washington, DC",
+    "lat": 38.914737,
+    "lng": -77.040967,
+    "claims": [
+      {
+        "predicate": "located_at",
+        "object": "1752 Swann Street NW, Washington, DC",
+        "confidenceLevel": "high",
+        "citationSource": "catalog.data.gov",
+        "citationHref": "https://catalog.data.gov/dataset/black-history-sites-washington",
+        "citationLabel": "Black History Sites: Washington"
+      }
+    ],
+    "historicalContext": "Lindsay's Jazz Club was a notable business site in Washington, DC, during the early 20th century, reflecting the cultural and social movements of the time."
+  }
+]

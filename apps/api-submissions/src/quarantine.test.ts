@@ -19,32 +19,32 @@ const PAYLOAD = {
 } as const;
 
 const ALLOWED_SECURITY = {
-  appCheckAllowed: true,
+  attestationAllowed: true,
   quotaAllowed: true,
   submitterToken: 'subject-hash-a',
   networkToken: 'network-hash-a',
 } as const;
 
-test('requires App Check and quota guards before quarantine storage', () => {
+test('requires client attestation and quota guards before quarantine storage', () => {
   const repository = createInMemorySubmissionQuarantineRepository();
   const service = createSubmissionQuarantineService({
     repository,
     privacyPepper: 'test-only-pepper',
   });
 
-  const appCheckDenied = service.intake({
+  const attestationDenied = service.intake({
     payload: PAYLOAD,
-    security: { ...ALLOWED_SECURITY, appCheckAllowed: false },
+    security: { ...ALLOWED_SECURITY, attestationAllowed: false },
   });
   const quotaDenied = service.intake({
     payload: PAYLOAD,
     security: { ...ALLOWED_SECURITY, quotaAllowed: false },
   });
 
-  assert.deepEqual(appCheckDenied, {
+  assert.deepEqual(attestationDenied, {
     accepted: false,
     status: 403,
-    reason: 'app_check_denied',
+    reason: 'attestation_denied',
   });
   assert.deepEqual(quotaDenied, {
     accepted: false,

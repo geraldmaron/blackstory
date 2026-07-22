@@ -17,20 +17,34 @@ test('resolveSubmissionsEndpointClass maps intake and admin paths', () => {
   );
 });
 
-test('submissions guard requires App Check for anonymous corrections', () => {
+test('submissions guard requires attestation for anonymous corrections', () => {
   const guard = createSubmissionsRateLimitGuard({ now: () => 1_700_002_000_000 });
   const denied = guard.evaluate({
     method: 'POST',
     path: '/v1/corrections',
     subject: 'anonymous',
     clientIp: '203.0.113.99',
-    appCheckVerified: false,
+    clientAttested: false,
   });
   assert.ok(denied);
   assert.equal(denied.allowed, false);
   if (!denied.allowed) {
     assert.equal(denied.reason, 'app_check_required');
   }
+});
+
+test('submissions guard allows anonymous corrections when client-attested', () => {
+  const guard = createSubmissionsRateLimitGuard({ now: () => 1_700_002_025_000 });
+  const decision = guard.evaluate({
+    method: 'POST',
+    path: '/v1/corrections',
+    subject: 'anonymous',
+    clientIp: '203.0.113.100',
+    clientAttested: true,
+  });
+  assert.ok(decision);
+  assert.equal(decision.allowed, true);
+  guard.release(decision.key);
 });
 
 test('submissions guard allows authenticated corrections within quota', () => {
@@ -40,7 +54,7 @@ test('submissions guard allows authenticated corrections within quota', () => {
     path: '/v1/corrections',
     subject: 'authenticated',
     userId: 'user-corrector',
-    appCheckVerified: true,
+    clientAttested: true,
   });
   assert.ok(decision);
   assert.equal(decision.allowed, true);
@@ -54,7 +68,7 @@ test('submissions guard blocks anonymous admin exports', () => {
     path: '/v1/admin/exports',
     subject: 'anonymous',
     clientIp: '198.51.100.2',
-    appCheckVerified: true,
+    clientAttested: true,
   });
 
   assert.ok(decision);
@@ -72,7 +86,7 @@ test('submissions guard aggregates distributed risk on corrections flood', () =>
     path: '/v1/corrections',
     subject: 'authenticated',
     userId: 'brigade-user',
-    appCheckVerified: true,
+    clientAttested: true,
     riskSignals: [
       { kind: 'device_burst', weight: 3, observedAtMs: 1_700_002_199_000, dimension: 'd1' },
       { kind: 'session_burst', weight: 3, observedAtMs: 1_700_002_198_500, dimension: 's1' },

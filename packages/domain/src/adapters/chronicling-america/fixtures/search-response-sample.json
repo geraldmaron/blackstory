@@ -1,0 +1,43 @@
+{
+  "pagination": {
+    "current": 1,
+    "from": 1,
+    "last": 2,
+    "next": "https://www.loc.gov/collections/chronicling-america/?fo=json&sp=2&q=african+american+newspaper",
+    "perpage": 25,
+    "total": 42
+  },
+  "results": [
+    {
+      "access_restricted": false,
+      "aka": ["The Chicago Defender"],
+      "contributor": ["Library of Congress, Washington, DC"],
+      "date": "1922-12-26",
+      "description": [
+        "Weekly African American newspaper published in Chicago, Illinois."
+      ],
+      "digitized": true,
+      "full_text": "THIS WOULD BE OCR BULK TEXT AND MUST NEVER BE STORED IN SUPABASE",
+      "group": ["newspaper"],
+      "id": "https://www.loc.gov/resource/sn83045462/1922-12-26/ed-1/?sp=22",
+      "image_url": [
+        "https://tile.loc.gov/image-services/illustration-only.jpg"
+      ],
+      "index": 1,
+      "language": ["english"],
+      "location": ["illinois", "chicago"],
+      "location_state": ["Illinois"],
+      "original_format": ["newspaper"],
+      "publication_place": "Chicago, Illinois",
+      "publication_title": "The Chicago Defender",
+      "subject": ["african americans", "newspapers"],
+      "title": "The Chicago Defender (Chicago, Ill.) 1922-12-26",
+      "type": ["newspaper"],
+      "url": "https://www.loc.gov/resource/sn83045462/1922-12-26/ed-1/?sp=22"
+    },
+    {
+      "index": 2,
+      "title": "X"
+    }
+  ]
+}

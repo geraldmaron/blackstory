@@ -43,6 +43,11 @@ export function buildAcsVariablesUrl(vintage: AcsVintage): string {
   return `${CENSUS_DATA_API_BASE_URL}/${vintage.dataset}/variables.json`;
 }
 
+/** Single-variable metadata — bulk variables.json omits some MOE ids (2024 acs5). */
+export function buildAcsVariableUrl(vintage: AcsVintage, variableId: string): string {
+  return `${CENSUS_DATA_API_BASE_URL}/${vintage.dataset}/variables/${variableId}.json`;
+}
+
 /** Owning-body ACS landing page for provenance `sourceUrl` (never an API query URL). */
 export function buildAcsCountyProvenanceUrl(_vintage: AcsVintage): string {
   return ACS_PROGRAM_HOMEPAGE_URL;

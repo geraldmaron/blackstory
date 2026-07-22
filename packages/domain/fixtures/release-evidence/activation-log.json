@@ -1,0 +1,43 @@
+[
+  {
+    "step": "activate_a",
+    "result": {
+      "pointer": {
+        "activeReleaseId": "rel_mob005_a",
+        "releaseStamp": "rel_mob005_a@18550410b0e7",
+        "bootstrapPath": "public/releases/rel_mob005_a/bootstrap.json",
+        "activatedAt": "2026-07-21T12:00:00.000Z",
+        "pointerVersion": 1
+      },
+      "releaseStamp": "rel_mob005_a@18550410b0e7"
+    }
+  },
+  {
+    "step": "activate_b",
+    "result": {
+      "pointer": {
+        "activeReleaseId": "rel_mob005_b",
+        "previousReleaseId": "rel_mob005_a",
+        "releaseStamp": "rel_mob005_b@cfc60a373b37",
+        "bootstrapPath": "public/releases/rel_mob005_b/bootstrap.json",
+        "activatedAt": "2026-07-21T12:00:00.000Z",
+        "pointerVersion": 2
+      },
+      "releaseStamp": "rel_mob005_b@cfc60a373b37"
+    }
+  },
+  {
+    "step": "rollback_a",
+    "result": {
+      "pointer": {
+        "activeReleaseId": "rel_mob005_a",
+        "previousReleaseId": "rel_mob005_b",
+        "releaseStamp": "rel_mob005_a@18550410b0e7",
+        "bootstrapPath": "public/releases/rel_mob005_a/bootstrap.json",
+        "activatedAt": "2026-07-21T12:00:00.000Z",
+        "pointerVersion": 3
+      },
+      "releaseStamp": "rel_mob005_a@18550410b0e7"
+    }
+  }
+]

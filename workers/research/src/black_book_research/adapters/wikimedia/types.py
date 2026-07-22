@@ -1,4 +1,4 @@
-"""Wikimedia discovery adapter types mirroring @black-book/domain adapters/wikimedia (BB-045)."""
+"""Wikimedia discovery adapter types mirroring @repo/domain adapters/wikimedia (BB-045)."""
 
 from __future__ import annotations
 

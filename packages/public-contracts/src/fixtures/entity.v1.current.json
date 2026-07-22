@@ -1,0 +1,118 @@
+{
+  "id": "ent_dunbar_school_001",
+  "kind": "school",
+  "displayName": "Paul Laurence Dunbar High School",
+  "summary": "A historically Black public high school in Washington, D.C., tracing to an 1870 founding.",
+  "status": "active",
+  "statusHistory": [
+    {
+      "status": "active",
+      "validFrom": "1916-01-01",
+      "validTo": null,
+      "datePrecision": "year",
+      "basisClaimIds": ["BB-F-000003"]
+    }
+  ],
+  "eraBuckets": ["1870s", "1890s", "1910s"],
+  "notabilityLabels": ["A documented site tied to Black educational history."],
+  "notabilityBasis": [
+    {
+      "criterion": "documented_site",
+      "note": "Founded 1870 in a church basement; cited from primary board records.",
+      "evidenceIds": ["BB-F-000001", "BB-F-000002"]
+    }
+  ],
+  "sensitivityClass": "none",
+  "sensitivity": {
+    "class": "none",
+    "note": "No sensitive classification applies to this record.",
+    "basisClaimIds": []
+  },
+  "topicTags": ["education"],
+  "topicIds": ["education"],
+  "jurisdictionLabel": "Washington, D.C.",
+  "locationPrecision": "campus",
+  "locationLabel": "LeDroit Park, Washington, D.C.",
+  "relevanceExplanation": "Included as a documented site in the active public release; each accepted claim below cites its source.",
+  "historicalContext": "Part of the district's early public investment in Black secondary education.",
+  "extendedNarrative": "The school's name moved with it across three buildings and two prior names before 1916.",
+  "primaryImage": {
+    "url": "https://storage.googleapis.com/black-book-media/entities/ent_dunbar_school_001/primary.jpg",
+    "alt": "Paul Laurence Dunbar High School building, 1917.",
+    "credit": "Library of Congress",
+    "rightsStatus": "public_domain",
+    "width": 1600,
+    "height": 1200,
+    "objectPath": "entities/ent_dunbar_school_001/primary.jpg"
+  },
+  "recordMaturity": "partial_enrichment",
+  "researchCoverage": "partial",
+  "geoAnchor": {
+    "lat": 38.9172,
+    "lng": -77.0169,
+    "geohash": "dqcjqc",
+    "matchMethod": "release_projection"
+  },
+  "claims": [
+    {
+      "id": "BB-F-000003",
+      "predicate": "renamed_to",
+      "object": "Paul Laurence Dunbar High School",
+      "confidenceScore": 0.85,
+      "confidenceLevel": "high",
+      "citation": {
+        "source": "D.C. Board of Education annual report, 1916",
+        "label": "1916 annual report",
+        "href": "https://example.gov/dc-board-1916"
+      },
+      "independentLineageCount": 2,
+      "dispute": {
+        "hasDispute": false,
+        "primaryValue": "Paul Laurence Dunbar High School",
+        "alternates": []
+      },
+      "revisionHistory": [
+        {
+          "id": "rev_1",
+          "changedAt": "2026-01-15T00:00:00.000Z",
+          "changeKind": "created",
+          "summary": "Initial fact record created from primary source."
+        }
+      ]
+    }
+  ],
+  "timeline": [
+    {
+      "id": "ent_dunbar_school_001_status_0",
+      "atLabel": "1916",
+      "at": "1916-01-01T00:00:00.000Z",
+      "datePrecision": "year",
+      "title": "Status: Active",
+      "body": "In effect from 1916 onward. Basis: BB-F-000003."
+    }
+  ],
+  "revision": {
+    "releaseId": "release-2026-07-19",
+    "generatedAt": "2026-07-19T00:00:00.000Z",
+    "recordUpdatedAt": "2026-07-19T00:00:00.000Z"
+  },
+  "related": [
+    {
+      "id": "ent_15th_st_church_001",
+      "type": "founded_in",
+      "direction": "incoming",
+      "timespan": { "validFrom": "1870-01-01", "validTo": null }
+    }
+  ],
+  "relatedNeighbors": [
+    {
+      "id": "ent_15th_st_church_001",
+      "displayName": "Fifteenth Street Presbyterian Church",
+      "kind": "institution",
+      "summary": "Hosted the school's founding class in its basement in 1870.",
+      "relationType": "founded_in",
+      "direction": "incoming"
+    }
+  ],
+  "continueLearning": []
+}

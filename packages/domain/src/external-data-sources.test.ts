@@ -52,3 +52,28 @@ test('NHGIS county race entry is registered disabled pending API key', () => {
   assert.match(nhgis.dataUrl, /^https:\/\/api\.ipums\.org\//);
   assert.match(nhgis.notes, /NHGIS_API_KEY/);
 });
+
+test('justice and wealth Phase-0 registry additions stay disabled with https data URLs', () => {
+  const ids = [
+    'bjs-national-prisoner-statistics',
+    'vera-incarceration-trends',
+    'bjs-annual-survey-of-jails',
+    'bjs-ncrp-public-use',
+    'fed-survey-consumer-finances',
+    'census-sipp-wealth',
+    'bls-laus-unemployment',
+    'mit-election-lab',
+    'voting-rights-lab-indicators',
+    'stanford-open-policing',
+  ] as const;
+  for (const id of ids) {
+    const source = getExternalDataSource(id);
+    assert.ok(source, `${id} registered`);
+    assert.equal(source.registryState, 'disabled');
+    assert.ok(source.dataUrl.startsWith('https://'));
+  }
+  assert.equal(getExternalDataSource('fed-survey-consumer-finances')?.geographies[0], 'nation');
+  assert.ok(
+    getExternalDataSource('vera-incarceration-trends')?.geographies.includes('county'),
+  );
+});

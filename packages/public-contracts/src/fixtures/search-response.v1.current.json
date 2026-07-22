@@ -1,0 +1,27 @@
+{
+  "results": [
+    {
+      "id": "ent_dunbar_school_001",
+      "kind": "school",
+      "displayName": "Paul Laurence Dunbar High School",
+      "summary": "A historically Black public high school in Washington, D.C.",
+      "matchedOn": "displayName",
+      "matchedText": "Paul Laurence Dunbar High School",
+      "explanation": "Matched on entity name.",
+      "status": "active",
+      "eraBuckets": ["1870s", "1890s", "1910s"],
+      "notabilityLabels": ["A documented site tied to Black educational history."]
+    }
+  ],
+  "facets": {
+    "kind": { "school": 1 },
+    "status": { "active": 1 },
+    "era": { "1910s": 1 },
+    "theme": { "education": 1 },
+    "state": { "DC": 1 },
+    "recordMaturity": { "partial_enrichment": 1 },
+    "researchCoverage": { "partial": 1 }
+  },
+  "totalMatched": 1,
+  "hasMore": false
+}

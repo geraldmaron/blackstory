@@ -1,0 +1,23 @@
+{
+  "slug": "basement-to-m-street",
+  "title": "From a church basement to M Street",
+  "dek": "How the Preparatory High School for Colored Youth began under Fifteenth Street Presbyterian and became the school Washington would later call Dunbar.",
+  "publishedAt": "2026-07-17",
+  "eraLabel": "1870-1891",
+  "placeLabel": "Washington, D.C.",
+  "body": [
+    {
+      "paragraphs": [
+        "In 1870, William Syphax and the Board of Trustees for Colored Schools opened a public high school for Black students in the basement of Fifteenth Street Presbyterian Church."
+      ]
+    },
+    {
+      "heading": "A name that moved with the school",
+      "paragraphs": [
+        "By 1891 the school had outgrown the basement identity. Renamed M Street High School, it carried the same institutional thread."
+      ]
+    }
+  ],
+  "relatedEntityIds": ["ent_dunbar_school_001", "ent_15th_st_church_001"],
+  "relatedFactIds": ["BB-F-000001", "BB-F-000002"]
+}

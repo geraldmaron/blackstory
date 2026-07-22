@@ -54,8 +54,8 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Validate API abuse, infrastructure policy, suppressions, and release evidence
         run: |
-          pnpm --filter @black-book/testing test:security 2>&1 | tee security-contracts.log
-          pnpm --filter @black-book/testing exec node --import tsx --test \
+          pnpm --filter @repo/testing test:security 2>&1 | tee security-contracts.log
+          pnpm --filter @repo/testing exec node --import tsx --test \
             src/security-gates/security-gates.test.ts 2>&1 | tee -a security-contracts.log
           pnpm exec tsc --noEmit --strict --exactOptionalPropertyTypes \
             --target ES2022 --module NodeNext --moduleResolution NodeNext --skipLibCheck \

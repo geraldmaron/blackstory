@@ -220,11 +220,21 @@ function parseDecision(raw: string | undefined): EditorialDecision {
 }
 
 function extractJsonObject(content: string): ModelJson {
-  const parsed: unknown = JSON.parse(content.trim());
-  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
-    throw new Error('Model response was not a JSON object');
+  const trimmed = content.trim();
+  const candidates = [trimmed];
+  const braceMatch = /\{[\s\S]*\}/u.exec(trimmed);
+  if (braceMatch) candidates.push(braceMatch[0]);
+  for (const candidate of candidates) {
+    try {
+      const parsed: unknown = JSON.parse(candidate);
+      if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+        return parsed as ModelJson;
+      }
+    } catch {
+      // Try the next candidate (GLM/Qwen sometimes wrap JSON in prose).
+    }
   }
-  return parsed as ModelJson;
+  throw new Error('Model response did not contain a JSON object');
 }
 
 function ensureLinkedSummary(
@@ -268,6 +278,7 @@ async function judgeOneSubject(input: {
     };
     const completion = await provider.complete({
       model: input.model,
+      maxTokens: 2400,
       responseSchema: { name: 'editorial_judgment', schema: EDITORIAL_RESPONSE_SCHEMA },
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },

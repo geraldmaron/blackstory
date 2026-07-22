@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { FirebaseApp } from 'firebase/app';
 import { configureAppCheckDebugToken, initializeAppCheckScaffold } from './app-check.js';
+import { createAppCheckCircuitBreaker } from './app-check-circuit-breaker.js';
 import {
   appCheckSatisfiesRateLimitGate,
   createAppCheckGuard,
@@ -145,6 +146,29 @@ test('trusted service identities do not use browser App Check tokens', async () 
   assert.equal(decision.allowed, true);
   assert.equal(decision.trustedService, true);
   assert.equal(verifierCalled, false);
+});
+
+test('circuit breaker records verifier throws but not missing-token paths', async () => {
+  const breaker = createAppCheckCircuitBreaker({
+    config: { failureThreshold: 1, windowMs: 60_000, recoveryTimeoutMs: 30_000, halfOpenSuccessThreshold: 1 },
+  });
+  const invalidVerifier: AppCheckVerifier = {
+    async verifyToken() {
+      throw new Error('provider unavailable');
+    },
+  };
+  const guard = createAppCheckGuard({
+    mode: 'enforce',
+    verifier: invalidVerifier,
+    telemetry: telemetryCollector().telemetry,
+    circuitBreaker: breaker,
+  });
+
+  assert.equal(breaker.getAvailability(), 'available');
+  await guard({ headers: {} });
+  assert.equal(breaker.getAvailability(), 'available', 'missing token must not trip the breaker');
+  await guard({ headers: { 'x-firebase-appcheck': 'bad-token' } });
+  assert.equal(breaker.getAvailability(), 'outage');
 });
 
 test('verification failures never expose raw tokens to telemetry', async () => {

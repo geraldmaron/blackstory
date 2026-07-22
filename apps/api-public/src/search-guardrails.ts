@@ -25,6 +25,16 @@ export type PublicSearchHttpQuery = {
   readonly radiusM?: string;
   readonly dateFrom?: string;
   readonly dateTo?: string;
+  // Prohibited query shapes (SQL/regex/field-selection injection vectors). These are NOT dropped
+  // silently — they are forwarded into the guardrail so `assertNoProhibitedQueryFields` denies them
+  // with a precise reason (`sql_not_allowed`, …) rather than the request being treated as its safe
+  // base query. Mirrors `apps/web`'s search handler rationale.
+  readonly sql?: string;
+  readonly regex?: string;
+  readonly pattern?: string;
+  readonly orderBy?: string;
+  readonly fields?: string;
+  readonly select?: string;
 };
 
 export type PublicSearchGuardRequest = {
@@ -83,6 +93,13 @@ export function parsePublicSearchQuery(raw: PublicSearchHttpQuery): SearchQueryI
     ...(radiusM !== undefined ? { radiusM } : {}),
     ...(raw.dateFrom !== undefined ? { dateFrom: raw.dateFrom } : {}),
     ...(raw.dateTo !== undefined ? { dateTo: raw.dateTo } : {}),
+    // Prohibited keys forwarded (not stripped) so the guardrail denies them explicitly.
+    ...(raw.sql !== undefined ? { sql: raw.sql } : {}),
+    ...(raw.regex !== undefined ? { regex: raw.regex } : {}),
+    ...(raw.pattern !== undefined ? { pattern: raw.pattern } : {}),
+    ...(raw.orderBy !== undefined ? { orderBy: raw.orderBy } : {}),
+    ...(raw.fields !== undefined ? { fields: [raw.fields] } : {}),
+    ...(raw.select !== undefined ? { select: [raw.select] } : {}),
   };
 }
 

@@ -1,0 +1,14 @@
+{
+  "id": "ent_leak_test_001",
+  "kind": "place",
+  "displayName": "Sensitive-leak search result fixture",
+  "matchedOn": "displayName",
+  "matchedText": "Sensitive-leak search result fixture",
+  "explanation": "Matched on name.",
+  "eraBuckets": ["1900s"],
+  "notabilityLabels": ["Test label"],
+  "relatedCount": 42,
+  "claimCount": 17,
+  "relevanceScore": 0.987654,
+  "rankingSignal": 12.3
+}

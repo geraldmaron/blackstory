@@ -1,0 +1,28 @@
+{
+  "results": [
+    {
+      "id": "ent_dunbar_school_001",
+      "kind": "school",
+      "displayName": "Dunbar High School",
+      "summary": "The first public high school for Black students in the United States.",
+      "matchedOn": "displayName",
+      "matchedText": "Dunbar High School",
+      "explanation": "Name matches your query.",
+      "status": "published",
+      "eraBuckets": ["1870s", "1880s"],
+      "notabilityLabels": ["First of its kind"],
+      "sensitivityClass": "none"
+    }
+  ],
+  "facets": {
+    "kind": { "school": 1 },
+    "status": { "published": 1 },
+    "era": { "1870s": 1, "1880s": 1 },
+    "theme": { "education": 1 },
+    "state": { "DC": 1 },
+    "recordMaturity": { "published": 1 },
+    "researchCoverage": { "substantial": 1 }
+  },
+  "totalMatched": 1,
+  "hasMore": false
+}

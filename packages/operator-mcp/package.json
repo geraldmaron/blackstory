@@ -1,0 +1,39 @@
+{
+  "name": "@repo/operator-mcp",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "operator-mcp": "./dist/bin.js"
+  },
+  "exports": {
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --conditions development --import tsx --test src/tools/*.test.ts src/errors.test.ts",
+    "lint": "echo 'lint: use root pnpm lint'",
+    "start": "node --conditions development --import tsx src/bin.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@repo/domain": "workspace:*",
+    "pg": "^8.16.3",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:^",
+    "@types/node": "^26.1.1",
+    "@types/pg": "^8.15.4",
+    "tsx": "^4.23.1",
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "name": "@repo/public-contracts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Versioned public API v1 TypeScript types + zod schemas shared by apps/web (optional) and apps/mobile, per ADR-021. Zero server-only dependencies: no node:* built-ins, no firebase-admin, no @repo/domain or @repo/security at runtime.",
+  "exports": {
+    "./version": {
+      "development": "./src/version.ts",
+      "types": "./dist/version.d.ts",
+      "import": "./dist/version.js"
+    },
+    "./errors": {
+      "development": "./src/errors.ts",
+      "types": "./dist/errors.d.ts",
+      "import": "./dist/errors.js"
+    },
+    "./v1/pagination": {
+      "development": "./src/v1/pagination.ts",
+      "types": "./dist/v1/pagination.d.ts",
+      "import": "./dist/v1/pagination.js"
+    },
+    "./v1/citation": {
+      "development": "./src/v1/citation.ts",
+      "types": "./dist/v1/citation.d.ts",
+      "import": "./dist/v1/citation.js"
+    },
+    "./v1/claim": {
+      "development": "./src/v1/claim.ts",
+      "types": "./dist/v1/claim.d.ts",
+      "import": "./dist/v1/claim.js"
+    },
+    "./v1/timeline": {
+      "development": "./src/v1/timeline.ts",
+      "types": "./dist/v1/timeline.d.ts",
+      "import": "./dist/v1/timeline.js"
+    },
+    "./v1/revision": {
+      "development": "./src/v1/revision.ts",
+      "types": "./dist/v1/revision.d.ts",
+      "import": "./dist/v1/revision.js"
+    },
+    "./v1/media": {
+      "development": "./src/v1/media.ts",
+      "types": "./dist/v1/media.d.ts",
+      "import": "./dist/v1/media.js"
+    },
+    "./v1/related": {
+      "development": "./src/v1/related.ts",
+      "types": "./dist/v1/related.d.ts",
+      "import": "./dist/v1/related.js"
+    },
+    "./v1/entity": {
+      "development": "./src/v1/entity.ts",
+      "types": "./dist/v1/entity.d.ts",
+      "import": "./dist/v1/entity.js"
+    },
+    "./v1/map": {
+      "development": "./src/v1/map.ts",
+      "types": "./dist/v1/map.d.ts",
+      "import": "./dist/v1/map.js"
+    },
+    "./v1/search": {
+      "development": "./src/v1/search.ts",
+      "types": "./dist/v1/search.d.ts",
+      "import": "./dist/v1/search.js"
+    },
+    "./v1/bootstrap": {
+      "development": "./src/v1/bootstrap.ts",
+      "types": "./dist/v1/bootstrap.d.ts",
+      "import": "./dist/v1/bootstrap.js"
+    },
+    "./v1/content": {
+      "development": "./src/v1/content.ts",
+      "types": "./dist/v1/content.d.ts",
+      "import": "./dist/v1/content.js"
+    },
+    "./v1/corrections": {
+      "development": "./src/v1/corrections.ts",
+      "types": "./dist/v1/corrections.d.ts",
+      "import": "./dist/v1/corrections.js"
+    },
+    "./v1/compatibility": {
+      "development": "./src/v1/compatibility.ts",
+      "types": "./dist/v1/compatibility.d.ts",
+      "import": "./dist/v1/compatibility.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "check-boundary": "node scripts/check-boundary.mjs",
+    "test": "node scripts/check-boundary.mjs && node --conditions development --import tsx --test src/version.test.ts src/errors.test.ts src/v1/pagination.test.ts src/v1/citation.test.ts src/v1/claim.test.ts src/v1/timeline.test.ts src/v1/revision.test.ts src/v1/media.test.ts src/v1/related.test.ts src/v1/entity.test.ts src/v1/map.test.ts src/v1/search.test.ts src/v1/bootstrap.test.ts src/v1/content.test.ts src/v1/corrections.test.ts src/v1/compatibility.test.ts",
+    "lint": "echo 'lint: use root pnpm lint'"
+  },
+  "dependencies": {
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.1",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  }
+}

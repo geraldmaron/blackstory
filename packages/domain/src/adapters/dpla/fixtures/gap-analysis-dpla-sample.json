@@ -1,0 +1,148 @@
+[
+  {
+    "id": "dpla-ms-freedmen-1868",
+    "sourceResource": {
+      "title": ["Freedmen's Bureau labor contract, Yazoo County, Mississippi, 1868"],
+      "date": { "displayDate": "1868" },
+      "subject": [{ "name": "Reconstruction" }, { "name": "Mississippi" }, { "name": "Yazoo County" }]
+    },
+    "dataProvider": "Mississippi Department of Archives and History",
+    "spatial": { "state": "Mississippi" }
+  },
+  {
+    "id": "dpla-ms-church-1912",
+    "sourceResource": {
+      "title": ["Mount Olive Baptist Church ledger, Natchez, Mississippi"],
+      "date": { "displayDate": "1912" },
+      "subject": [{ "name": "Churches" }, { "name": "Natchez" }]
+    },
+    "dataProvider": "Mississippi Department of Archives and History",
+    "spatial": { "state": "Mississippi" }
+  },
+  {
+    "id": "dpla-ms-school-1935",
+    "sourceResource": {
+      "title": ["Rosenwald school photograph, Hattiesburg, Mississippi, 1935"],
+      "date": { "displayDate": "1935" },
+      "subject": [{ "name": "Schools" }, { "name": "Rosenwald schools" }]
+    },
+    "provider": { "name": "Mississippi Digital Library" },
+    "spatial": { "state": "MS" }
+  },
+  {
+    "id": "dpla-la-civilwar-1863",
+    "sourceResource": {
+      "title": ["Union occupation order affecting Black laborers, New Orleans, Louisiana, 1863"],
+      "date": { "displayDate": "1863" },
+      "subject": [{ "name": "Civil War" }, { "name": "New Orleans" }]
+    },
+    "dataProvider": "Louisiana State University Special Collections",
+    "spatial": { "state": "Louisiana" }
+  },
+  {
+    "id": "dpla-la-jazz-1927",
+    "sourceResource": {
+      "title": ["Storyville musician portrait, New Orleans, Louisiana, circa 1927"],
+      "date": { "displayDate": "1927" },
+      "subject": [{ "name": "Music" }, { "name": "Louisiana" }]
+    },
+    "dataProvider": "Louisiana Digital Library"
+  },
+  {
+    "id": "dpla-la-farm-1944",
+    "sourceResource": {
+      "title": ["Plantation wage ledger excerpt, Ascension Parish, Louisiana, 1944"],
+      "date": { "displayDate": "1944" }
+    },
+    "dataProvider": "Louisiana Digital Library",
+    "spatial": { "state": "Louisiana" }
+  },
+  {
+    "id": "dpla-sc-reconstruction-1870",
+    "sourceResource": {
+      "title": ["South Carolina Constitutional Convention delegate list, 1870"],
+      "date": { "displayDate": "1870" },
+      "subject": [{ "name": "Reconstruction" }, { "name": "South Carolina" }]
+    },
+    "dataProvider": "South Carolina Digital Library",
+    "spatial": { "state": "South Carolina" }
+  },
+  {
+    "id": "dpla-sc-church-1898",
+    "sourceResource": {
+      "title": ["Emanuel AME Church anniversary program, Charleston, South Carolina, 1898"],
+      "date": { "displayDate": "1898" }
+    },
+    "dataProvider": "College of Charleston Special Collections",
+    "spatial": { "state": "SC" }
+  },
+  {
+    "id": "dpla-ga-railroad-1905",
+    "sourceResource": {
+      "title": ["Pullman porter roster fragment, Atlanta, Georgia, 1905"],
+      "date": { "displayDate": "1905" },
+      "subject": [{ "name": "Labor" }, { "name": "Georgia" }]
+    },
+    "dataProvider": "Digital Library of Georgia",
+    "spatial": { "state": "Georgia" }
+  },
+  {
+    "id": "dpla-ga-civilrights-1962",
+    "sourceResource": {
+      "title": ["Albany Movement meeting minutes, Albany, Georgia, 1962"],
+      "date": { "displayDate": "1962" },
+      "subject": [{ "name": "Civil rights movement" }]
+    },
+    "dataProvider": "Digital Library of Georgia",
+    "spatial": { "state": "Georgia" }
+  },
+  {
+    "id": "dpla-al-rosenwald-1924",
+    "sourceResource": {
+      "title": ["Shiloh Rosenwald School class photograph, Notasulga, Alabama, 1924"],
+      "date": { "displayDate": "1924" },
+      "subject": [{ "name": "Schools" }, { "name": "Macon County" }]
+    },
+    "dataProvider": "Alabama Department of Archives and History",
+    "spatial": { "state": "Alabama" }
+  },
+  {
+    "id": "dpla-md-school-1931",
+    "sourceResource": {
+      "title": ["Ridgeley Rosenwald School dedication program, Prince George's County, Maryland, 1931"],
+      "date": { "displayDate": "1931" },
+      "subject": [{ "name": "Schools" }, { "name": "Maryland" }]
+    },
+    "dataProvider": "Maryland State Archives",
+    "spatial": { "state": "Maryland" }
+  },
+  {
+    "id": "dpla-va-school-1920",
+    "sourceResource": {
+      "title": ["Switchback School correspondence, Bath County, Virginia, 1920"],
+      "date": { "displayDate": "1920" },
+      "subject": [{ "name": "Rosenwald schools" }, { "name": "Virginia" }]
+    },
+    "dataProvider": "Library of Virginia",
+    "spatial": { "state": "Virginia" }
+  },
+  {
+    "id": "dpla-nc-newspaper-1895",
+    "sourceResource": {
+      "title": ["Charlotte Observer clipping on Black educators, North Carolina, 1895"],
+      "date": { "displayDate": "1895" }
+    },
+    "dataProvider": "North Carolina Digital Heritage Center",
+    "spatial": { "state": "North Carolina" }
+  },
+  {
+    "id": "dpla-tx-freedom-1866",
+    "sourceResource": {
+      "title": ["Juneteenth order copy, Galveston, Texas, 1865-1866"],
+      "date": { "displayDate": "1866" },
+      "subject": [{ "name": "Emancipation" }, { "name": "Texas" }]
+    },
+    "dataProvider": "Texas State Library and Archives Commission",
+    "spatial": { "state": "Texas" }
+  }
+]

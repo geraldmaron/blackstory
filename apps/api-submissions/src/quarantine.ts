@@ -1,6 +1,6 @@
 /**
  * Implements the submissions API's quarantine-only intake and moderation service.
- * App Check and quota decisions are required before untrusted content reaches storage.
+ * Client attestation and quota decisions are required before untrusted content reaches storage.
  */
 import { randomUUID } from 'node:crypto';
 import {
@@ -15,7 +15,8 @@ import {
 import { guardIntakeOperation, guardPublishAttempt } from './posture.js';
 
 export type SubmissionSecurityContext = {
-  readonly appCheckAllowed: boolean;
+  /** True when `X-BlackStory-Client` (or legacy App Check) attestation passed. */
+  readonly attestationAllowed: boolean;
   readonly quotaAllowed: boolean;
   readonly submitterToken?: string;
   readonly networkToken?: string;
@@ -78,7 +79,7 @@ export type QuarantineIntakeResponse =
       readonly accepted: false;
       readonly status: 400 | 403 | 429;
       readonly reason:
-        'app_check_denied' | 'quota_denied' | 'subject_blocked' | 'validation_failed';
+        'attestation_denied' | 'quota_denied' | 'subject_blocked' | 'validation_failed';
       readonly issues?: readonly { readonly field: string; readonly message: string }[];
     };
 
@@ -182,8 +183,8 @@ export function createSubmissionQuarantineService(options: SubmissionQuarantineS
 
   function intake(request: QuarantineIntakeRequest): QuarantineIntakeResponse {
     guardIntakeOperation('write:quarantine');
-    if (!request.security.appCheckAllowed) {
-      return { accepted: false, status: 403, reason: 'app_check_denied' };
+    if (!request.security.attestationAllowed) {
+      return { accepted: false, status: 403, reason: 'attestation_denied' };
     }
     if (!request.security.quotaAllowed) {
       return { accepted: false, status: 429, reason: 'quota_denied' };

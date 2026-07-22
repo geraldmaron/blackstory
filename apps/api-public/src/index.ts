@@ -5,6 +5,9 @@
 import { buildSurfaceHealth, parseNodeEnv } from '@repo/config';
 import { SURFACE_ID } from './posture.js';
 
+export { createPublicApiClientAttestationGuard } from './client-attestation.js';
+export type { PublicApiClientAttestationOptions } from './client-attestation.js';
+/** @deprecated Use `createPublicApiClientAttestationGuard` — Firebase App Check retired after ADR-020. */
 export { createPublicApiAppCheckGuard } from './app-check.js';
 export type { PublicApiAppCheckOptions } from './app-check.js';
 export { createPublicRateLimitGuard, resolvePublicEndpointClass } from './rate-limits.js';
@@ -50,6 +53,24 @@ export {
   evaluateVectorSearchKillSwitch,
 } from './vector-search-kill-switch.js';
 export { createFindNearestEndpoint } from './vector-search-endpoint.js';
+
+// --- Bounded public read API v1 (MOB-004) ---
+export { createPublicApiServer, DEFAULT_LIMITS, parseJsonWithDepthLimit, readBodyWithLimit } from './http/server.js';
+export type { PublicApiServerLimits, PublicApiServerOptions } from './http/server.js';
+export { dispatch as dispatchV1 } from './http/router.js';
+export type { ApiRequest, HandlerDeps } from './http/handlers.js';
+export {
+  createInMemoryPublicDataAccess,
+  createFirestorePublicDataAccess,
+  EMPTY_FACETS,
+} from './http/data-access.js';
+export type {
+  PublicDataAccess,
+  ReleasePointer,
+  SearchPage,
+  InMemoryPublicDataOptions,
+  FirestoreDataAccessReaders,
+} from './http/data-access.js';
 export type {
   FindNearestEndpoint,
   FindNearestEndpointOptions,

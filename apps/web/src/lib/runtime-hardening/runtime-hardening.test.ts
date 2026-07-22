@@ -2,7 +2,7 @@
  * Public render path and response limit tests.
  */
 import assert from 'node:assert/strict';
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import { APP_HOSTING_RUN_LIMITS, RESPONSE_SIZE_LIMITS } from './constants';
@@ -84,6 +84,71 @@ test('entity detail route stays force-dynamic so RUNTIME DATABASE_URL is used', 
   // /entity/ent_15th_st_church_001 while non-seed ids still read rel_seed_001.
   const source = readFileSync(join(APP_ROOT, 'entity/[id]/page.tsx'), 'utf8');
   assert.match(source, /export const dynamic = 'force-dynamic'/);
+});
+
+/**
+ * Next.js App Router: route segment config must come AFTER imports. Placing
+ * `export const dynamic` between import statements previously broke entity RSC.
+ */
+function assertForceDynamicAfterImports(source: string, label: string): void {
+  const lines = source.split(/\r?\n/);
+  let lastImportLine = -1;
+  let dynamicLine = -1;
+  let importAfterDynamic = false;
+  for (let i = 0; i < lines.length; i += 1) {
+    const trimmed = (lines[i] ?? '').trimStart();
+    const isImport =
+      /^import\s/.test(trimmed) || /^import["']/.test(trimmed) || /^import\{/.test(trimmed);
+    const isDynamic = /^export\s+const\s+dynamic\s*=/.test(trimmed);
+    if (isImport) {
+      lastImportLine = i;
+      if (dynamicLine >= 0) importAfterDynamic = true;
+    }
+    if (isDynamic) {
+      assert.equal(dynamicLine, -1, `${label}: duplicate export const dynamic`);
+      dynamicLine = i;
+    }
+  }
+  assert.notEqual(dynamicLine, -1, `${label}: missing export const dynamic`);
+  assert.match(lines[dynamicLine] ?? '', /force-dynamic/);
+  assert.equal(
+    dynamicLine > lastImportLine && !importAfterDynamic,
+    true,
+    `${label}: export const dynamic must come after all imports (dynamic@${dynamicLine + 1}, lastImport@${lastImportLine + 1})`,
+  );
+}
+
+test('map layout and entity page keep force-dynamic after all imports', () => {
+  assertForceDynamicAfterImports(
+    readFileSync(join(APP_ROOT, 'entity/[id]/page.tsx'), 'utf8'),
+    'entity/[id]/page.tsx',
+  );
+  assertForceDynamicAfterImports(
+    readFileSync(join(APP_ROOT, '(map)/layout.tsx'), 'utf8'),
+    '(map)/layout.tsx',
+  );
+});
+
+test('explore and homepage live only under (map) — no duplicate route segments', () => {
+  // Regression: apps/web/src/app/explore + (map)/explore both claimed /explore;
+  // stale app/page.tsx fought (map)/page.tsx for /. ADR-017: map group owns both.
+  const explorePages = collectAppRouteFiles(APP_ROOT).filter((file) =>
+    /(^|\/)explore\/page\.tsx$/.test(file.slice(APP_ROOT.length + 1).split('\\').join('/')),
+  );
+  assert.equal(explorePages.length, 1, `explore pages: ${explorePages.join(', ')}`);
+  assert.match(explorePages[0]!.replace(/\\/g, '/'), /\/\(map\)\/explore\/page\.tsx$/);
+
+  assert.equal(
+    existsSync(join(APP_ROOT, 'explore')),
+    false,
+    'stale apps/web/src/app/explore/ must not exist',
+  );
+  assert.equal(
+    existsSync(join(APP_ROOT, 'page.tsx')),
+    false,
+    'stale apps/web/src/app/page.tsx must not exist (homepage is (map)/page.tsx)',
+  );
+  assert.equal(existsSync(join(APP_ROOT, '(map)/page.tsx')), true);
 });
 
 test('production error surface hides stacks and long messages', () => {

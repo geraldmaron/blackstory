@@ -144,8 +144,14 @@
 /* —— Narrative card (v5.1 record anatomy) — in the explore spotlight this is the reading
    surface for a selected pin; kind → name → story → labeled facts → tags → precision → CTA. ——  */
 .ds-nc {
+  position: relative;
   display: grid;
   gap: var(--ds-space-4);
+}
+
+/* Reserve a safe column so the floating close never covers title / kicker text. */
+.ds-nc:has(.ds-nc__close) {
+  padding-inline-end: 2.75rem;
 }
 
 .ds-nc:focus {
@@ -170,7 +176,6 @@
 .ds-nc__top {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--ds-space-3);
 }
 
@@ -225,28 +230,40 @@
   font-size: inherit;
 }
 
-/* Close is a quiet instrument key, never a competing pill action. */
+/* Close floats on the card surface — matte plate, no glow; ≥24×24 CSS px hit target (WCAG 2.2). */
 .ds-nc__close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  flex: 0 0 auto;
+  width: 2.75rem;
+  height: 2.75rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
   padding: 0;
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-full);
-  background: transparent;
-  color: var(--ds-ink-muted);
+  background: var(--ds-surface-raised);
+  color: var(--ds-ink);
   cursor: pointer;
   transition:
     color var(--ds-duration-fast) var(--ds-easing),
-    border-color var(--ds-duration-fast) var(--ds-easing);
+    border-color var(--ds-duration-fast) var(--ds-easing),
+    background-color var(--ds-duration-fast) var(--ds-easing);
 }
 
 .ds-nc__close:hover {
   color: var(--ds-ink);
   border-color: var(--ds-border-strong);
+  background: var(--ds-surface);
+}
+
+.ds-nc__close:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
 }
 
 .ds-nc__close svg {

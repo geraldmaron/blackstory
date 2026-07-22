@@ -1,0 +1,12 @@
+{
+  "phase": "under_review",
+  "receiptCode": "BB-COR-ABCDEF0123456789",
+  "submittedAt": "2026-07-18T00:00:00.000Z",
+  "updatedAt": "2026-07-19T00:00:00.000Z",
+  "appealAvailable": false,
+  "classificationDispute": false,
+  "spamScore": 0.03,
+  "campaignId": "camp_internal_5",
+  "duplicateOfReceiptCode": "BB-COR-1111111111111111",
+  "moderatorNotes": "Internal-only moderation note."
+}

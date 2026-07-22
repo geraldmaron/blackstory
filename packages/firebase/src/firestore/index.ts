@@ -62,6 +62,7 @@ export {
   evidenceLineageSchema,
   publicationReleaseSchema,
   publicActiveReleaseSchema,
+  publicClaimProjectionSchema,
   publicEntityProjectionSchema,
   publicStorySectionSchema,
   publicStorySourceSchema,
@@ -118,6 +119,7 @@ export type {
   EvidenceLineageDoc,
   PublicationReleaseDoc,
   PublicActiveReleaseDoc,
+  PublicClaimProjectionDoc,
   PublicEntityProjectionDoc,
   PublicStorySectionDoc,
   PublicStorySourceDoc,
@@ -180,7 +182,10 @@ export {
   publicReleaseSearchIndexPath,
   writeReleaseCatalogArtifactsToDir,
   uploadReleaseCatalogArtifacts,
+  fetchReleaseSearchIndexArtifact,
+  type ArtifactFetchImpl,
   type BuiltReleaseCatalogArtifacts,
+  type FetchReleaseArtifactOptions,
   type ReleaseEntitiesListArtifact,
   type ReleaseSearchIndexArtifact,
 } from './release-artifacts.js';
@@ -217,6 +222,13 @@ export type {
   ActivateReleaseInput,
   ActivateReleaseResult,
 } from './release-activation.js';
+
+export {
+  MOBILE_RELEASE_POINTER_PATH,
+  createAdminFirestoreReleaseStore,
+  createFirestoreReleaseStore,
+} from './release-store.js';
+export type { FirestoreReleaseStore, ReleaseStoreBackend } from './release-store.js';
 
 export { promoteClaimToPublicationCandidate } from './promotion.js';
 export type {

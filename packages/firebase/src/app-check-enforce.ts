@@ -1,8 +1,10 @@
 /**
  * Verifies server-side Firebase App Check tokens with monitor/enforce rollout,
- * optional replay protection, and token-safe telemetry.
+ * optional replay protection, token-safe telemetry, and optional verifier-outage
+ * circuit-breaker hooks (repo-vdnm).
  */
 import type { App } from 'firebase-admin/app';
+import type { AppCheckCircuitBreaker } from './app-check-circuit-breaker.js';
 import { getAppCheck } from 'firebase-admin/app-check';
 
 export const APP_CHECK_HEADER = 'x-firebase-appcheck';
@@ -75,6 +77,8 @@ export type AppCheckGuardOptions = {
   readonly telemetry: AppCheckTelemetry;
   /** Use only for low-volume, security-critical, or expensive operations. */
   readonly replayProtection?: boolean;
+  /** Optional verifier-failure circuit breaker — records only provider throws, not missing tokens. */
+  readonly circuitBreaker?: AppCheckCircuitBreaker;
 };
 
 export function parseAppCheckMode(value: string | undefined): AppCheckMode {
@@ -205,6 +209,7 @@ export function createAppCheckGuard(
         return failureDecision(options.mode, 'replayed_token', replayProtection, options.telemetry);
       }
 
+      options.circuitBreaker?.recordVerifierSuccess();
       options.telemetry.record({
         event: 'app_check_verification',
         mode: options.mode,
@@ -219,6 +224,7 @@ export function createAppCheckGuard(
         trustedService: false,
       };
     } catch {
+      options.circuitBreaker?.recordVerifierFailure();
       return failureDecision(options.mode, 'invalid_token', replayProtection, options.telemetry);
     }
   };

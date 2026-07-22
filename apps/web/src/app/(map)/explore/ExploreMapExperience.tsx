@@ -314,6 +314,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   const [view, setView] = useState(initial);
   const filterRegionRef = useRef<HTMLDivElement | null>(null);
   const spotlightDialogRef = useRef<HTMLDialogElement | null>(null);
+  const spotlightPanelRef = useRef<HTMLDivElement | null>(null);
   // Agent B: latch hero→explore on first client render before any effect clears sessionStorage.
   const [fromHeroTransition] = useState(readHeroTransitionFlag);
   const [entering, setEntering] = useState(false);
@@ -1317,19 +1318,41 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   // Spotlight: native <dialog> for focus trap + restore-focus (same contract as @repo/ui Dialog).
   const spotlightOpen = Boolean(view.selectedEdge) || Boolean(selectedFeature);
   const dismissSpotlight = view.selectedEdge ? handleCloseEdge : handleClearSelected;
+  const spotlightContentKey = view.selectedEdge?.id ?? view.viewState.selected ?? null;
   useEffect(() => {
     if (!spotlightOpen) return undefined;
     const node = spotlightDialogRef.current;
     if (!node) return undefined;
     if (!node.open) node.showModal();
-    const frame = window.requestAnimationFrame(() => {
-      node.querySelector<HTMLElement>('article, button.ds-nc__close, [tabindex], button')?.focus();
-    });
     return () => {
-      window.cancelAnimationFrame(frame);
       if (node.open) node.close();
     };
   }, [spotlightOpen]);
+
+  // Open or swap records must land at the top of the panel (not mid-scroll from a prior Next).
+  // Smooth when motion is allowed; instant for prefers-reduced-motion — never a hard remount.
+  useEffect(() => {
+    if (!spotlightOpen || spotlightContentKey === null) return undefined;
+    const node = spotlightDialogRef.current;
+    if (!node) return undefined;
+    const frame = window.requestAnimationFrame(() => {
+      const panel = spotlightPanelRef.current;
+      if (panel && panel.scrollTop !== 0) {
+        panel.scrollTo({
+          top: 0,
+          behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+        });
+      }
+      const focusTarget =
+        node.querySelector<HTMLElement>('article.ds-nc') ??
+        node.querySelector<HTMLElement>('.ds-card') ??
+        node.querySelector<HTMLElement>('button.ds-nc__close, button.ds-history-edge-panel__close');
+      focusTarget?.focus({ preventScroll: true });
+    });
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
+  }, [spotlightOpen, spotlightContentKey]);
 
   const handleViewportChange = useCallback((frame: ExploreViewportFrame) => {
     const viewport: ExploreViewport = {
@@ -1807,7 +1830,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
             aria-label={view.selectedEdge ? 'Dismiss connection panel' : 'Dismiss record preview'}
             onClick={dismissSpotlight}
           />
-          <div className="ds-explore-stage__spotlight-panel">
+          <div ref={spotlightPanelRef} className="ds-explore-stage__spotlight-panel">
             {view.selectedEdge ? (
               <HistoryEdgePanel edge={view.selectedEdge} onClose={handleCloseEdge} />
             ) : selectedFeature ? (

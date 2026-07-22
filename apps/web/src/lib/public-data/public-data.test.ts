@@ -4,7 +4,12 @@
 
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { shouldUseLivePublicProjections, isPostgresPublicDataSource, shouldPreferReleaseArtifacts } from './live-policy';
+import {
+  shouldUseLivePublicProjections,
+  isPostgresPublicDataMisconfigured,
+  isPostgresPublicDataSource,
+  shouldPreferReleaseArtifacts,
+} from './live-policy';
 import {
   isDisplayableJurisdictionLabel,
   mapProjectionToPublicEntityView,
@@ -76,6 +81,23 @@ test('shouldUseLivePublicProjections disables postgres mode without DATABASE_URL
     }),
     false,
   );
+});
+
+test('postgres without DATABASE_URL is an explicit misconfig (empty catalog, not seed)', () => {
+  // Local dig footgun: PUBLIC_DATA_SOURCE=postgres in .env without DATABASE_URL → 0 entities.
+  assert.equal(
+    isPostgresPublicDataMisconfigured({ PUBLIC_DATA_SOURCE: 'postgres' }),
+    true,
+  );
+  assert.equal(
+    isPostgresPublicDataMisconfigured({
+      PUBLIC_DATA_SOURCE: 'postgres',
+      DATABASE_URL: 'postgresql://local:local@127.0.0.1:5432/blackbook',
+    }),
+    false,
+  );
+  assert.equal(isPostgresPublicDataMisconfigured({ PUBLIC_DATA_SOURCE: 'seed' }), false);
+  assert.equal(isPostgresPublicDataMisconfigured({}), false);
 });
 
 test('postgres mode must not prefer seed-style artifact caches (hero 4-pin regression)', () => {

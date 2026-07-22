@@ -59,7 +59,11 @@ import {
   parseSearchIndexDoc,
   shouldUseLivePublicProjections,
 } from './public-readers';
-import { isPostgresPublicDataSource, shouldPreferReleaseArtifacts } from './live-policy';
+import {
+  isPostgresPublicDataMisconfigured,
+  isPostgresPublicDataSource,
+  shouldPreferReleaseArtifacts,
+} from './live-policy';
 import {
   createLiveCatalogMemoryCache,
   isOversizedLiveCatalogSentinel,
@@ -437,6 +441,13 @@ export const listPublicEntityViews = cache(async function listPublicEntityViews(
   }
 
   if (isPostgresPublicDataSource()) {
+    if (isPostgresPublicDataMisconfigured()) {
+      console.error(
+        '[public-data] PUBLIC_DATA_SOURCE=postgres requires DATABASE_URL (or APP_DATABASE_URL). ' +
+          'Returning empty catalog (seed refused). Fix: ./scripts/dev-web.sh or apps/web/.env.local.',
+      );
+      return { data: [], source: 'none' };
+    }
     try {
       const live = await loadLiveEntities();
       if (live !== undefined) {
@@ -463,7 +474,15 @@ export const listPublicEntityViews = cache(async function listPublicEntityViews(
     // Non-postgres modes may fall through to the bundled seed snapshot.
   }
 
-  return { data: listPublicEntities(), source: 'snapshot' };
+  const snapshot = listPublicEntities();
+  if (process.env.NODE_ENV === 'development') {
+    console.warn(
+      `[public-data] Serving Dunbar seed snapshot (${snapshot.length} entities). ` +
+        'National dig looks empty without the live catalog — set PUBLIC_DATA_SOURCE=postgres ' +
+        'and DATABASE_URL, or run ./scripts/dev-web.sh.',
+    );
+  }
+  return { data: snapshot, source: 'snapshot' };
 });
 
 /**

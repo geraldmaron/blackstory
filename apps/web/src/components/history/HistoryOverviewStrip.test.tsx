@@ -32,6 +32,7 @@ test('HistoryOverviewStrip renders stats and decade density', () => {
   assert.doesNotMatch(html, /Kind composition/);
   assert.match(html, /Decade density/);
   assert.match(html, /1950s: 10 records/);
+  assert.match(html, /ds-history-overview__density-bar-track/);
   assert.match(html, /ds-history-overview__density-bar--active/);
 });
 

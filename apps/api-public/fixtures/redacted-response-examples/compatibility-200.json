@@ -1,0 +1,7 @@
+{
+  "supported": true,
+  "currentApiVersion": "v1",
+  "minSupportedApiVersion": "v1",
+  "deprecationWindowDays": 180,
+  "softDeprecated": false
+}

@@ -1,4 +1,4 @@
-"""Source adapter registry types mirroring @black-book/domain adapters (BB-037)."""
+"""Source adapter registry types mirroring @repo/domain adapters (BB-037)."""
 
 from __future__ import annotations
 

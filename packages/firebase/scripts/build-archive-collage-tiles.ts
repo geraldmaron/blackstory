@@ -3,7 +3,7 @@
  * apps/web/public/brand/collage/tiles for archive collage mosaics (story masts
  * and the about-page living mosaic).
  *
- * Prefers already-promoted GCS public-media objects from the Commons dry-run
+ * Prefers already-promoted Supabase public-media objects from the Commons dry-run
  * auto_propose set (we hold display rights via the promote path). Also regenerates
  * apps/web/src/components/atmosphere/tile-credits.ts from the written manifest.
  *
@@ -20,7 +20,8 @@ import { execFileSync } from 'node:child_process';
 
 const USER_AGENT =
   'BlackStoryCommonsEnrichment/1.0 (https://blackstory.app; collage-tiles; mailto:ops@blackstory.app)';
-const BUCKET = 'black-book-efaaf-public-media';
+const SUPABASE_PUBLIC_BASE =
+  'https://twykhihqkcldpreuovay.supabase.co/storage/v1/object/public/public-media';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const dryRunPath = join(scriptDir, '../fixtures/release-artifacts/commons-media-dry-run.json');
@@ -86,7 +87,7 @@ async function main(): Promise<void> {
     i += 1;
     const index = String(i).padStart(3, '0');
     const dest = join(outDir, `${index}.jpg`);
-    const url = `https://storage.googleapis.com/${BUCKET}/public/entities/${propose.entityId}/primary.jpg`;
+    const url = `${SUPABASE_PUBLIC_BASE}/public/entities/${propose.entityId}/primary.jpg`;
     if (existsSync(dest)) {
       manifest.push({ index, entityId: propose.entityId, url });
       console.log(`${index} ∃ ${propose.entityId}`);
@@ -158,7 +159,7 @@ export type AtmosphereTileCredit = {
   readonly entityId: string;
   /** Local static path served by the web app. */
   readonly path: string;
-  /** Original GCS URL recorded in the collage manifest (attribution / rebuild). */
+  /** Original public-media URL recorded in the collage manifest (attribution / rebuild). */
   readonly sourceUrl: string;
 };
 

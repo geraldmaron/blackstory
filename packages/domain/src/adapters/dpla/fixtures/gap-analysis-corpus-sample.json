@@ -1,0 +1,50 @@
+[
+  {
+    "id": "ent_shiloh_rosenwald_school_001",
+    "displayName": "Shiloh Rosenwald School",
+    "jurisdictionLabel": "Notasulga, Alabama",
+    "locationLabel": "Shiloh Rosenwald School, Notasulga, AL",
+    "keywords": ["school", "Macon County", "Alabama"],
+    "eraBuckets": ["1910s", "1920s", "1930s"]
+  },
+  {
+    "id": "ent_ridgeley_rosenwald_school_001",
+    "displayName": "Ridgeley Rosenwald School",
+    "jurisdictionLabel": "Capitol Heights, Maryland",
+    "locationLabel": "Ridgeley Rosenwald School, Capitol Heights, MD",
+    "keywords": ["school", "Prince George's County", "Maryland"],
+    "eraBuckets": ["1920s", "1930s"]
+  },
+  {
+    "id": "ent_switchback_school_001",
+    "displayName": "Switchback School",
+    "jurisdictionLabel": "Bath County, Virginia",
+    "locationLabel": "Bath County, Virginia",
+    "keywords": ["Rosenwald school", "Bath County", "Virginia"],
+    "eraBuckets": ["1910s", "1920s", "1930s"]
+  },
+  {
+    "id": "ent_charlotte_educators_001",
+    "displayName": "Charlotte Black educator network",
+    "jurisdictionLabel": "Charlotte, North Carolina",
+    "locationLabel": "Charlotte, North Carolina",
+    "keywords": ["education", "Charlotte", "North Carolina"],
+    "eraBuckets": ["1890s", "1900s"]
+  },
+  {
+    "id": "ent_albany_movement_001",
+    "displayName": "Albany Movement",
+    "jurisdictionLabel": "Albany, Georgia",
+    "locationLabel": "Albany, Georgia",
+    "keywords": ["civil rights", "Albany", "Georgia"],
+    "eraBuckets": ["1960s"]
+  },
+  {
+    "id": "ent_juneteenth_galveston_001",
+    "displayName": "Juneteenth order, Galveston",
+    "jurisdictionLabel": "Galveston, Texas",
+    "locationLabel": "Galveston, Texas",
+    "keywords": ["emancipation", "Galveston", "Texas"],
+    "eraBuckets": ["1860s"]
+  }
+]

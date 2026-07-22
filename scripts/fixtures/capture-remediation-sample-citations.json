@@ -1,0 +1,62 @@
+[
+  {
+    "citationId": "cite-captured-wayback",
+    "location": {
+      "kind": "url",
+      "url": "https://example.gov/record/1"
+    },
+    "capture": {
+      "captureId": "cap-captured-wayback",
+      "waybackCaptureUrl": "https://web.archive.org/web/20260101000000/https://example.gov/record/1",
+      "waybackCapturedAt": "2026-01-01T00:00:00.000Z"
+    }
+  },
+  {
+    "citationId": "cite-captured-hash",
+    "location": {
+      "kind": "url",
+      "url": "https://archives.example.gov/box/5"
+    },
+    "capture": {
+      "captureId": "cap-captured-hash",
+      "contentHash": {
+        "algorithm": "sha256",
+        "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    }
+  },
+  {
+    "citationId": "cite-missing-bare-id",
+    "location": {
+      "kind": "url",
+      "url": "https://example.org/article/needs-spn"
+    },
+    "capture": {
+      "captureId": "cap-missing-bare-id"
+    }
+  },
+  {
+    "citationId": "cite-missing-fake-wayback",
+    "location": {
+      "kind": "url",
+      "url": "https://news.example.com/story/2"
+    },
+    "capture": {
+      "captureId": "cap-missing-fake-wayback",
+      "waybackCaptureUrl": "https://example.com/not-wayback"
+    }
+  },
+  {
+    "citationId": "cite-offline-archive",
+    "location": {
+      "kind": "offline",
+      "designation": {
+        "kind": "physical_archive",
+        "description": "Florida State Archives, Series 1234, Box 5"
+      }
+    },
+    "capture": {
+      "captureId": "cap-offline"
+    }
+  }
+]

@@ -17,7 +17,7 @@
 #
 # Hosts:
 #   - Corsair (preferred): Ollama + SearXNG local; OpenRouter key in enrichment.env
-#   - Mac (dev): Tailscale Ollama URL + run-with-dev-secrets for OPENROUTER_API_KEY
+#   - Mac (dev): source apps/web/.env.local (see docs/research/agent-local-env.md); optional run-with-dev-secrets
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"

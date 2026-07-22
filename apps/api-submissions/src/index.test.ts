@@ -4,8 +4,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { SurfaceCapabilityError, deniesPublication } from '@repo/config';
-import type { AppCheckTelemetryEvent } from '@repo/firebase';
-import { createSubmissionsApiAppCheckGuard } from './app-check.ts';
 import { health } from './index.ts';
 import { guardIntakeOperation, guardPublishAttempt } from './posture.ts';
 
@@ -27,17 +25,11 @@ test('submissions allows quarantine intake only', () => {
   assert.throws(() => guardIntakeOperation('write:canonical'), SurfaceCapabilityError);
 });
 
-test('submissions App Check guard enforces replay protection when enabled', async () => {
-  const events: AppCheckTelemetryEvent[] = [];
-  let consumeAppCheckToken = false;
-  const guard = createSubmissionsApiAppCheckGuard({
-    environment: { APP_CHECK_MODE: 'enforce' },
-    verifier: {
-      async verifyToken(_token, options) {
-        consumeAppCheckToken = options.consumeAppCheckToken;
-        return { appId: 'web-app', alreadyConsumed: true };
-      },
-    },
+test('submissions client attestation guard denies missing header in enforce mode', async () => {
+  const { createSubmissionsApiClientAttestationGuard } = await import('./client-attestation.ts');
+  const events: Array<{ outcome: string }> = [];
+  const guard = createSubmissionsApiClientAttestationGuard({
+    environment: { CLIENT_ATTESTATION_MODE: 'enforce', NODE_ENV: 'production' },
     telemetry: {
       record(event) {
         events.push(event);
@@ -45,10 +37,9 @@ test('submissions App Check guard enforces replay protection when enabled', asyn
     },
   });
 
-  const decision = await guard({ headers: { 'x-firebase-appcheck': 'replayed' } });
+  const decision = await guard({ headers: {} });
 
-  assert.equal(consumeAppCheckToken, true);
   assert.equal(decision.allowed, false);
-  assert.equal(decision.reason, 'replayed_token');
-  assert.equal(events[0]?.outcome, 'rejected');
+  assert.equal(decision.verified, false);
+  assert.equal(events[0]?.outcome, 'denied');
 });

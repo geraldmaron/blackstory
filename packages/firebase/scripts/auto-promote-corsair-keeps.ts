@@ -46,6 +46,7 @@ import {
   type ReleaseSourceEntity,
 } from '@repo/domain';
 import { computeClaimConfidence, type SourceForConfidence } from './lib/confidence.ts';
+import { normalizeEnrichmentDrafts } from './lib/normalize-enrichment-drafts.ts';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(scriptDir, '../../..');
@@ -215,14 +216,18 @@ function main(): void {
       citationLabel: claim.citationLabel ?? claim.citationSource ?? 'Source',
     }));
 
+    const normalizedDrafts = normalizeEnrichmentDrafts(packet.drafts);
+
     const entry: ReleaseSourceEntity = {
       id: packet.subjectId,
       kind: subject.kind ?? 'place',
       displayName: title,
-      summary: packet.drafts.publicSummary ?? '',
-      ...(packet.drafts.eraBuckets ? { eraBuckets: packet.drafts.eraBuckets } : {}),
-      ...(packet.drafts.topicIds
-        ? { topicTags: packet.drafts.topicIds, topicIds: packet.drafts.topicIds }
+      summary: normalizedDrafts.publicSummary ?? '',
+      ...(normalizedDrafts.eraBuckets && normalizedDrafts.eraBuckets.length > 0
+        ? { eraBuckets: normalizedDrafts.eraBuckets }
+        : {}),
+      ...(normalizedDrafts.topicIds && normalizedDrafts.topicIds.length > 0
+        ? { topicTags: normalizedDrafts.topicIds, topicIds: normalizedDrafts.topicIds }
         : {}),
       mentionedEntityIds: [],
       ...(packet.drafts.keywords ? { keywords: packet.drafts.keywords } : {}),

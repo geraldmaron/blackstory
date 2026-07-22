@@ -1,27 +1,22 @@
 /**
  * Cross-reference step for the "gather" stage of the research pipeline: given
  * a subject with only one (often non-Tier-1) source, finds an independent
- * Tier-1 source about the SAME subject so a claim can build real multi-source
- * confidence (see lib/confidence.ts) instead of being stuck at whatever one
- * source happened to say.
+ * corroborating source about the SAME subject so a claim can build real
+ * multi-source confidence (see lib/confidence.ts) instead of being stuck at
+ * whatever one source happened to say.
  *
  * Mechanisms, tried in order:
- *  1. Wikipedia's own official Search API (`en.wikipedia.org/w/api.php`) —
- *     the SAME proven pattern discover-candidates.ts already uses for live
- *     discovery. Not rate-limited the way SearXNG's *scraped* "wikipedia
- *     engine" is: this hits Wikipedia's real API directly. Verified live
- *     while SearXNG's Wikipedia engine was itself suspended.
- *  2. Citation-trail: once we have ANY source page, it usually lists its own
- *     references/external links. Extract them and check for a Tier-1 hit —
- *     this is how research actually works (follow the source's own citations
- *     to primary material) and is more precise than a blind web search: the
- *     page itself is asserting these are where its facts came from. Doesn't
- *     touch SearXNG at all.
- *  3. SearXNG fallback: only when neither of the above found anything — the
- *     five free engines it proxies (Brave, DuckDuckGo, Google CSE, Startpage,
- *     Wikipedia-via-scrape) each enforce their own aggressive rate limits and
- *     go down together under real load; treat it as a last resort, not the
- *     primary path.
+ *  1. Citation-trail on the primary source page — outbound `<a href>` links and
+ *     inline http(s) URLs, filtered to Tier-1 hosts and rejecting same-lineage
+ *     links as the primary (historicsites.dcpreservation.org → nps.gov, etc.).
+ *  2. Wikipedia bridge → Tier-1 trail — Wikipedia's own Search API finds a
+ *     secondary article, then its outbound Tier-1 references become the
+ *     corroboration (Wikipedia itself is never returned as evidence).
+ *  3. SearXNG fallback — Tier-1-restricted web search aligned with isTier1Host
+ *     (.gov / .mil / si.edu plus preferred NPS/LoC/planning.dc.gov hosts).
+ *  4. Tier-2 citation-trail — curated reputable_secondary hosts when Tier-1
+ *     fails (dcpreservation.org, hmdb.org, dclibrary.org, blackpast.org).
+ *  5. Tier-2 SearXNG — same curated secondary hosts, different hostname only.
  *
  * All mechanisms fetch through fetch-page.ts's safe-fetch (SSRF-safe,
  * DNS-pinned) — every URL here is scraped from an untrusted page or search
@@ -29,13 +24,63 @@
  * corroboration was found there, never an error.
  */
 import { buildSearxngSearchUrl, parseSearxngSearchResponse } from '@repo/domain';
-import { extractOutboundLinks, fetchPage } from './fetch-page.ts';
-import { isTier1Host } from './tier1-sources.ts';
+import { collectTier1TrailLinks, collectTier2TrailLinks } from './citation-trail.ts';
+import { fetchPage } from './fetch-page.ts';
+import {
+  hostLineageKey,
+  isReputableSecondaryHost,
+  isTier1Host,
+  isWikipediaHost,
+  rankTier1Links,
+  REPUTABLE_SECONDARY_HOST_SUFFIXES,
+} from './tier1-sources.ts';
 
 const WIKIPEDIA_SEARCH_API = 'https://en.wikipedia.org/w/api.php';
 const WIKIPEDIA_USER_AGENT = 'BlackStory research pipeline (contact: geraldmarondagher@gmail.com)';
+const MAX_TRAIL_FETCHES = 5;
+
+/** Preferred federal/archive hosts — ranked first in citation-trail and search picks. */
+const PREFERRED_TIER1_SITES = [
+  'nps.gov',
+  'loc.gov',
+  'planning.dc.gov',
+  'archives.gov',
+  'si.edu',
+  'census.gov',
+] as const;
 
 type WikipediaSearchHit = { readonly title: string };
+
+export type CorroboratingSource = {
+  readonly url: string;
+  readonly title?: string;
+  readonly text: string;
+  readonly method:
+    | 'wikipedia_api'
+    | 'citation_trail'
+    | 'search'
+    | 'tier2_citation_trail'
+    | 'tier2_search';
+  /** Raw HTML, when available, so a caller can citation-trail-follow this source too. */
+  readonly html?: string;
+};
+
+/** Tier-1 SearXNG query — broad .gov/.mil/si.edu coverage plus preferred archive hosts. */
+export function buildTier1SearxngQuery(subjectName: string): string {
+  const siteClauses = [
+    ...PREFERRED_TIER1_SITES.map((site) => `site:${site}`),
+    'site:.gov',
+    'site:.mil',
+    'site:si.edu',
+  ];
+  return `"${subjectName}" (${siteClauses.join(' OR ')})`;
+}
+
+/** Tier-2 SearXNG query — curated reputable_secondary hosts only. */
+export function buildTier2SearxngQuery(subjectName: string): string {
+  const siteClauses = REPUTABLE_SECONDARY_HOST_SUFFIXES.map((site) => `site:${site}`);
+  return `"${subjectName}" (${siteClauses.join(' OR ')})`;
+}
 
 /** Wikipedia's own search API with retry/backoff — mirrors discover-candidates.ts's proven pattern. */
 async function searchWikipediaApi(
@@ -83,15 +128,6 @@ async function findViaWikipediaApi(subjectName: string): Promise<CorroboratingSo
   return { url, title: first.title, text: page.text, method: 'wikipedia_api', html: page.html };
 }
 
-export type CorroboratingSource = {
-  readonly url: string;
-  readonly title?: string;
-  readonly text: string;
-  readonly method: 'wikipedia_api' | 'citation_trail' | 'search';
-  /** Raw HTML, when available, so a caller can citation-trail-follow this source too. */
-  readonly html?: string;
-};
-
 /**
  * SearXNG's own local capacity isn't the constraint — its upstream engines
  * (Brave, DuckDuckGo, Google CSE, Startpage, Wikipedia) each enforce their
@@ -115,25 +151,103 @@ function throttledSearxngCall<T>(run: () => Promise<T>): Promise<T> {
   return result;
 }
 
-/** Checks a fetched page's own outbound links for a reachable Tier-1 hit. */
+async function fetchFirstReachableLink(
+  links: readonly string[],
+  method: CorroboratingSource['method'],
+): Promise<CorroboratingSource | undefined> {
+  for (const link of links.slice(0, MAX_TRAIL_FETCHES)) {
+    const page = await fetchPage(link);
+    if (page) return { url: link, text: page.text, method, html: page.html };
+  }
+  return undefined;
+}
+
+/** Checks a fetched page's outbound and inline links for a reachable Tier-1 hit. */
 async function findViaCitationTrail(
   html: string,
   baseUrl: string,
+  excludeUrls: readonly string[] = [],
+  text?: string,
 ): Promise<CorroboratingSource | undefined> {
-  const tier1Links = extractOutboundLinks(html, baseUrl).filter(isTier1Host);
-  for (const link of tier1Links.slice(0, 3)) {
-    const page = await fetchPage(link);
-    if (page) return { url: link, text: page.text, method: 'citation_trail' };
-  }
-  return undefined;
+  const tier1Links = collectTier1TrailLinks(html, baseUrl, { excludeUrls, ...(text ? { text } : {}) });
+  return fetchFirstReachableLink(tier1Links, 'citation_trail');
+}
+
+/** Tier-2 citation-trail on the primary page — curated secondary hosts only. */
+async function findViaTier2CitationTrail(
+  html: string,
+  baseUrl: string,
+  excludeUrls: readonly string[] = [],
+  text?: string,
+): Promise<CorroboratingSource | undefined> {
+  const tier2Links = collectTier2TrailLinks(html, baseUrl, { excludeUrls, ...(text ? { text } : {}) });
+  return fetchFirstReachableLink(tier2Links, 'tier2_citation_trail');
+}
+
+/**
+ * Uses Wikipedia as a secondary bridge only: find the article, follow its own
+ * Tier-1 outbound references, never return Wikipedia itself as corroboration.
+ */
+async function findViaWikipediaTier1Trail(
+  subjectName: string,
+  excludeUrls: readonly string[],
+): Promise<CorroboratingSource | undefined> {
+  const viaWikipedia = await findViaWikipediaApi(subjectName);
+  if (!viaWikipedia?.html) return undefined;
+  const tier1Links = collectTier1TrailLinks(viaWikipedia.html, viaWikipedia.url, {
+    excludeUrls: [...excludeUrls, viaWikipedia.url],
+    text: viaWikipedia.text,
+  });
+  const corroboration = await fetchFirstReachableLink(tier1Links, 'citation_trail');
+  if (!corroboration) return undefined;
+  if (hostLineageKey(corroboration.url) === hostLineageKey(viaWikipedia.url)) return undefined;
+  return corroboration;
+}
+
+type SearchHit = { readonly url: string; readonly title?: string };
+
+function excludeHostSet(excludeUrls: readonly string[]): Set<string> {
+  return new Set(
+    excludeUrls.map(hostLineageKey).filter((host): host is string => host !== undefined),
+  );
+}
+
+/** Picks the best-ranked independent Tier-1 search hit, preferring NPS/LoC/planning.dc.gov. */
+export function pickIndependentTier1SearchHit(
+  results: readonly SearchHit[],
+  excludeUrls: readonly string[] = [],
+): SearchHit | undefined {
+  const excludeHosts = excludeHostSet(excludeUrls);
+  const eligible = results.filter((result) => {
+    if (!isTier1Host(result.url)) return false;
+    const host = hostLineageKey(result.url);
+    return host !== undefined && !excludeHosts.has(host);
+  });
+  const rankedUrls = rankTier1Links(eligible.map((result) => result.url));
+  const bestUrl = rankedUrls[0];
+  if (!bestUrl) return undefined;
+  return eligible.find((result) => result.url === bestUrl) ?? { url: bestUrl };
+}
+
+/** Picks the first independent curated secondary hit; rejects Wikipedia and same-lineage hosts. */
+export function pickIndependentTier2SearchHit(
+  results: readonly SearchHit[],
+  excludeUrls: readonly string[] = [],
+): SearchHit | undefined {
+  const excludeHosts = excludeHostSet(excludeUrls);
+  return results.find((result) => {
+    if (isWikipediaHost(result.url)) return false;
+    if (!isReputableSecondaryHost(result.url)) return false;
+    const host = hostLineageKey(result.url);
+    return host !== undefined && !excludeHosts.has(host);
+  });
 }
 
 async function searchAndFetch(
   query: string,
   searxngBaseUrl: string,
-  pick: (
-    results: readonly { readonly url: string; readonly title?: string }[],
-  ) => { readonly url: string; readonly title?: string } | undefined,
+  pick: (results: readonly SearchHit[]) => SearchHit | undefined,
+  method: CorroboratingSource['method'],
 ): Promise<CorroboratingSource | undefined> {
   const hit = await throttledSearxngCall(async () => {
     try {
@@ -155,17 +269,33 @@ async function searchAndFetch(
     url: hit.url,
     ...(hit.title ? { title: hit.title } : {}),
     text: page.text,
-    method: 'search',
+    method,
   };
 }
 
-async function findViaSearch(
+async function findViaTier1Search(
   subjectName: string,
   searxngBaseUrl: string,
+  excludeUrls: readonly string[] = [],
 ): Promise<CorroboratingSource | undefined> {
-  const query = `"${subjectName}" (site:nps.gov OR site:loc.gov OR site:archives.gov OR site:si.edu OR site:census.gov)`;
-  return searchAndFetch(query, searxngBaseUrl, (results) =>
-    results.find((r) => isTier1Host(r.url)),
+  return searchAndFetch(
+    buildTier1SearxngQuery(subjectName),
+    searxngBaseUrl,
+    (results) => pickIndependentTier1SearchHit(results, excludeUrls),
+    'search',
+  );
+}
+
+async function findViaTier2Search(
+  subjectName: string,
+  searxngBaseUrl: string,
+  excludeUrls: readonly string[] = [],
+): Promise<CorroboratingSource | undefined> {
+  return searchAndFetch(
+    buildTier2SearxngQuery(subjectName),
+    searxngBaseUrl,
+    (results) => pickIndependentTier2SearchHit(results, excludeUrls),
+    'tier2_search',
   );
 }
 
@@ -186,25 +316,63 @@ export async function findAnySource(
   if (viaWikipedia) return viaWikipedia;
   const baseUrl = options.searxngBaseUrl ?? process.env.SEARXNG_BASE_URL;
   if (!baseUrl) return undefined;
-  return searchAndFetch(`"${subjectName}"`, baseUrl, (results) => results[0]);
+  return searchAndFetch(`"${subjectName}"`, baseUrl, (results) => results[0], 'search');
 }
 
 /**
- * Finds one independent Tier-1 source corroborating `subjectName`, preferring
- * the original source's own citation trail over a blind search. Returns
- * undefined on any failure — this is optional evidence-strengthening, never
- * a hard dependency of the pipeline it's called from.
+ * Finds one independent corroborating source for `subjectName`, preferring
+ * Tier-1 (citation trail → Wikipedia bridge → Tier-1 search) and falling back
+ * to curated Tier-2 secondary hosts when Tier-1 is unavailable. Returns
+ * undefined on any failure — optional evidence-strengthening, never a hard
+ * dependency of the pipeline it's called from.
  */
 export async function findCorroboratingTier1Source(
   subjectName: string,
-  originalSource: { readonly html?: string; readonly url?: string },
+  originalSource: { readonly html?: string; readonly url?: string; readonly text?: string },
   options: { readonly searxngBaseUrl?: string } = {},
 ): Promise<CorroboratingSource | undefined> {
+  const excludeUrls = originalSource.url ? [originalSource.url] : [];
+
   if (originalSource.html && originalSource.url) {
-    const viaCitation = await findViaCitationTrail(originalSource.html, originalSource.url);
-    if (viaCitation) return viaCitation;
+    const viaPrimaryTrail = await findViaCitationTrail(
+      originalSource.html,
+      originalSource.url,
+      excludeUrls,
+      originalSource.text,
+    );
+    if (viaPrimaryTrail) return viaPrimaryTrail;
   }
+
+  const viaWikipediaTrail = await findViaWikipediaTier1Trail(subjectName, excludeUrls);
+  if (viaWikipediaTrail) return viaWikipediaTrail;
+
   const baseUrl = options.searxngBaseUrl ?? process.env.SEARXNG_BASE_URL;
+
+  if (baseUrl) {
+    const viaTier1Search = await findViaTier1Search(subjectName, baseUrl, excludeUrls);
+    if (viaTier1Search) return viaTier1Search;
+  }
+
+  if (originalSource.html && originalSource.url) {
+    const viaTier2Trail = await findViaTier2CitationTrail(
+      originalSource.html,
+      originalSource.url,
+      excludeUrls,
+      originalSource.text,
+    );
+    if (viaTier2Trail) return viaTier2Trail;
+  }
+
   if (!baseUrl) return undefined;
-  return findViaSearch(subjectName, baseUrl);
+  return findViaTier2Search(subjectName, baseUrl, excludeUrls);
 }
+
+export { collectTier1TrailLinks, collectTier2TrailLinks } from './citation-trail.ts';
+export {
+  hostLineageKey,
+  isReputableSecondaryHost,
+  isSameLineageHost,
+  isTier1Host,
+  isWikipediaHost,
+  REPUTABLE_SECONDARY_HOST_SUFFIXES,
+} from './tier1-sources.ts';
