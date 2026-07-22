@@ -40,6 +40,18 @@
 
 If Vercel Authentication (or share-link protection) is on for Preview, SSO returns with `_vercel_share=…`. Edge query normalization **must preserve** `_vercel_*` handshake params on redirects (see `apps/web/src/lib/runtime-hardening/query-normalization.ts`). Stripping them 308s to a bare URL and re-triggers SSO → `ERR_TOO_MANY_REDIRECTS` (often described by users as “too many requests”). Share tokens stay out of CDN cache keys.
 
+**Evidence matrix (2026-07-22 probe, no secrets):**
+
+| Surface | Backend | Deployment Protection | `/search?q=obama` | `?_vercel_share=` behavior | Loop? |
+|--------|---------|----------------------|-------------------|----------------------------|-------|
+| Preview branch alias `…-69ebd1-….vercel.app` | Vercel Preview (`5ea25768`+) | Auth on → SSO | **200** after share auth (Barack Obama) | Preserved by fix | **Fixed** (was SSO↔308 strip) |
+| Preview deployment `blackstory-le31w9fbq-…` | Same commit | Auth on | Same | Same | **Fixed** |
+| Vercel Production `blackstory-….vercel.app` / `blackstory-5x9edrjgc-…` | Vercel Production (`main` / `e1c1f415`) | **Off** (direct 200) | **200**, 1 result | Still **308 strips** share (fix not on `main`) | **No** (Auth off; strip is inert) |
+| `https://blackstory.app` | **App Hosting** (`server: envoy`, `via: google`) — not Vercel yet | N/A | **200**, 1 result | **308 strips** share | **No** |
+| `https://www.blackstory.app` | No DNS A/CNAME | N/A | curl fail | N/A | N/A |
+
+Do **not** enable Production Deployment Protection until `isPlatformPassthroughQueryKey` is on the Production deployment. Cloudflare SSL was not in these chains (Vercel or Google/envoy only).
+
 ## Environment variables
 
 Set on the Vercel project (Preview + Production unless noted):
