@@ -60,7 +60,8 @@ Cites: ${subject.cites.join(', ') || 'None'}
 INSTRUCTIONS:
 1. ${backfillInstruction}
 2. Think step-by-step. Validate geographic coordinates and temporal timelines before asserting facts.
-3. Output the result in the exact JSON schema below.
+3. Extract at most 5 highly relevant claims to prevent response truncation.
+4. Output the result in the exact JSON schema below.
 
 {
   "reasoning": "Step-by-step logic validating your extractions and confidence scores",
