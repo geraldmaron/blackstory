@@ -215,8 +215,8 @@ Contact for review questions: Gerald Dagher, me@geralddagher.com.
 
 | Platform | Profile | Build ID / version | Distribution link | Date |
 |---|---|---|---|---|
-| iOS | `preview` | `7c6b1a68-8d11-4599-84fd-448e8ef0279e` (buildNumber 8) | https://expo.dev/accounts/gerald-maron/projects/blackstory/builds/7c6b1a68-8d11-4599-84fd-448e8ef0279e | 2026-07-22 — queued on EAS Free (ad hoc: iPhone + Mac) |
-| Android | `preview` | `6482d531-de5c-42cc-a6f9-1ff4aac9d2cf` (versionCode 2) | https://expo.dev/accounts/gerald-maron/projects/blackstory/builds/6482d531-de5c-42cc-a6f9-1ff4aac9d2cf | 2026-07-22 — queued on EAS Free |
+| iOS | `preview` | `420802a1-8376-4949-84ff-0368fff5129f` (buildNumber 10) | https://expo.dev/accounts/gerald-maron/projects/blackstory/builds/420802a1-8376-4949-84ff-0368fff5129f | 2026-07-22 — requeued after npm ci lock sync fix (ad hoc: iPhone + Mac); prior `7c6b1a68…` ERRORED Install dependencies |
+| Android | `preview` | `a7cf93ca-7fd5-4e58-ba52-cd9724af4364` (versionCode 3) | https://expo.dev/accounts/gerald-maron/projects/blackstory/builds/a7cf93ca-7fd5-4e58-ba52-cd9724af4364 | 2026-07-22 — requeued after npm ci lock sync fix; prior `6482d531…` ERRORED Install dependencies |
 
 ---
 
