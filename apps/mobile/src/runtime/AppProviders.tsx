@@ -16,8 +16,18 @@ import {
 
 import { mobileDehydrateOptions } from '@/data';
 import { initializeObservability } from '@/observability';
+import { resolveApiBaseUrl } from '@/security';
 
 import { getAppRuntime, type AppRuntime } from './create-app-runtime';
+
+function logDev(message: string, detail?: unknown): void {
+  if (typeof __DEV__ === 'undefined' || !__DEV__) return;
+  if (detail === undefined) {
+    console.info(`[blackstory] ${message}`);
+    return;
+  }
+  console.info(`[blackstory] ${message}`, detail);
+}
 
 const AppRuntimeContext = createContext<AppRuntime | null>(null);
 
@@ -53,10 +63,23 @@ export function AppProviders({ children, runtime: injected }: AppProvidersProps)
       try {
         const next = await getAppRuntime();
         await initializeObservability(next.store, next.connectivity);
-        await next.bootstrapSync.sync();
+        const syncResult = await next.bootstrapSync.sync();
+        logDev(`apiBaseUrl=${resolveApiBaseUrl()}`, { bootstrapSync: syncResult });
+        if (syncResult.status === 'offline') {
+          // Network unreachable / DNS failure / empty host — Search/Entity will
+          // also fail; Explore still shows DEMO_MAP_SOURCE fixtures by design.
+          console.warn(
+            `[blackstory] bootstrapSync offline (could not reach ${resolveApiBaseUrl()}/v1/bootstrap). ` +
+              'Explore map uses demo fixtures until a live map GeoJSON endpoint is wired. ' +
+              'For local Supabase reads: run apps/api-public with PUBLIC_DATA_SOURCE=postgres + DATABASE_URL, ' +
+              'set apps/mobile/.env.local API_BASE_URL to your LAN http://IP:8080, then restart Metro.',
+          );
+        }
         if (!cancelled) setRuntime(next);
-      } catch {
+      } catch (err) {
         // Degrade: keep rendering children without providers rather than crash the shell.
+        // Never swallow silently in Dev — otherwise "no Supabase data" looks like a map bug.
+        console.warn('[blackstory] AppProviders init failed; features run without shared runtime', err);
         if (!cancelled) setRuntime(null);
       }
     })();

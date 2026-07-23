@@ -110,6 +110,9 @@ export function ExploreView({
           <Text variant="bodySmall" colorRole="inkMuted">
             {matchCount === 1 ? '1 record' : `${matchCount} records`}
             {filters.kind || filters.era ? ' · filtered' : ''}
+            {typeof __DEV__ !== 'undefined' && __DEV__ && source === DEMO_MAP_SOURCE
+              ? ' · demo fixtures (not live API)'
+              : ''}
           </Text>
         </View>
         <View style={styles.headerActions}>

@@ -171,6 +171,54 @@ unaffected and is enforced via the `expo-build-properties` plugin
 (`android.minSdkVersion: 26`), confirmed present in the generated
 `android/gradle.properties` (`android.minSdkVersion=26`) after `expo prebuild`.
 
+## Public data path (why Dev may not “hit Supabase”)
+
+Mobile never talks to Supabase/Postgres directly (ADR-022). The only network
+origin is `extra.apiBaseUrl` → `apps/api-public` over HTTPS (or LAN HTTP in
+Dev). That service reads `bb_public.*` when
+`PUBLIC_DATA_SOURCE=postgres` + `DATABASE_URL` / `APP_DATABASE_URL` are set.
+
+| Surface | Data source today |
+|---|---|
+| **Explore** map + list | Bundled `DEMO_MAP_SOURCE` fixtures — **no API call**. Subtitle shows `demo fixtures (not live API)` in `__DEV__`. ADR-025’s live GeoJSON path is not wired; `api-public` has no map FeatureCollection route yet. |
+| **Learn** | Bundled `content-catalog.ts` (not `/v1/content`). |
+| **Search** / **entity** / cold-start **bootstrap** | HTTP to `API_BASE_URL` (`/v1/search`, `/v1/entity/:id`, `/v1/bootstrap`) with `X-BlackStory-Client`. SQLite is a release-coupled cache, not a fixture pack. |
+| **Web Explore** | Server-side Postgres in Next.js — unrelated to mobile’s API host. |
+
+**Defaults:** `app.config.ts` and preview/production `eas.json` bake
+`https://api.blackbook.app`. Development EAS profile leaves `API_BASE_URL`
+unset, so local `expo start` uses that same default. As of 2026-07-22 that
+host is **NXDOMAIN** and Cloud Run has no `black-book-api-public` service —
+bootstrap/search/entity fail with network errors (logged in Metro); Explore
+still shows a few demo pins (unrelated to MapLibre glyph/style issues).
+
+### Local Dev → live Supabase via api-public
+
+```bash
+# Terminal A — api-public on :8080 against Supabase
+cd apps/api-public
+run-with-dev-secrets -- env \
+  PUBLIC_DATA_SOURCE=postgres \
+  DATABASE_SSL=1 \
+  pnpm dev
+
+curl -sS -H 'X-BlackStory-Client: mobile/1.0.0; api=1' \
+  http://127.0.0.1:8080/v1/bootstrap | jq .
+curl -sS -H 'X-BlackStory-Client: mobile/1.0.0; api=1' \
+  'http://127.0.0.1:8080/v1/search?q=black&pageSize=5' | jq .
+# Expect a real activeRelease + non-empty results when bb_public is populated.
+
+# Terminal B — point BlackStory (Dev) at the API
+# apps/mobile/.env.local (simulator):
+#   API_BASE_URL=http://127.0.0.1:8080
+# physical device: use the Mac LAN IP, e.g. http://192.168.1.50:8080
+cd apps/mobile && npx expo start --dev-client --clear
+```
+
+Metro should log `[blackstory] apiBaseUrl=…` and
+`[blackstory] apiBaseUrl=… { bootstrapSync: … }`. An unreachable host logs
+`bootstrapSync offline` with the LAN-run hint. Tracker: `repo-tahv`.
+
 ## Client attestation & observability (MOB-010 / MOB-018)
 
 The app attests to `apps/api-public` and `apps/api-submissions` via the

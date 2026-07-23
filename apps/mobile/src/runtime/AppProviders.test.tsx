@@ -7,7 +7,7 @@ import { render, screen, waitFor } from '@testing-library/react-native';
 import { QueryClient } from '@tanstack/react-query';
 
 import { AppProviders, useAppRuntime } from './AppProviders';
-import type { AppRuntime } from './create-app-runtime';
+import { __resetAppRuntimeForTests, type AppRuntime } from './create-app-runtime';
 
 function Probe() {
   const runtime = useAppRuntime();
@@ -47,6 +47,10 @@ function makeFakeRuntime(): AppRuntime {
 }
 
 describe('AppProviders', () => {
+  afterEach(() => {
+    __resetAppRuntimeForTests(null);
+  });
+
   it('provides the injected runtime to children', async () => {
     const runtime = makeFakeRuntime();
     render(
@@ -57,5 +61,28 @@ describe('AppProviders', () => {
     await waitFor(() => {
       expect(screen.getByTestId('stamp').props.children).toBe('ready');
     });
+  });
+
+  it('logs and still mounts children when async init fails', async () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const failed = Promise.reject(new Error('sqlite open failed'));
+    // Prevent Jest unhandled-rejection noise; AppProviders still awaits the same rejection.
+    void failed.catch(() => {});
+    __resetAppRuntimeForTests(failed);
+
+    render(
+      <AppProviders>
+        <Text testID="shell">shell</Text>
+      </AppProviders>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('shell')).toBeTruthy();
+    });
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('AppProviders init failed'),
+      expect.any(Error),
+    );
+    warn.mockRestore();
   });
 });
