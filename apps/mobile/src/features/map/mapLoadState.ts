@@ -11,7 +11,11 @@
  * response, and offline cold start with no cached tiles yet.
  */
 
-export type MapFailureMode = 'provider-outage' | 'corrupt-tiles' | 'offline-cold-start';
+export type MapFailureMode =
+  | 'provider-outage'
+  | 'corrupt-tiles'
+  | 'offline-cold-start'
+  | 'map-canvas-unavailable';
 
 export type MapLoadState =
   | { readonly kind: 'loading' }
@@ -47,6 +51,12 @@ export const MAP_FAILURE_COPY: Record<MapFailureMode, MapFailureCopy> = {
     title: "You're offline",
     description:
       'The map needs a connection the first time it loads. Reconnect to see it — your other saved content is still available.',
+    retryable: true,
+  },
+  'map-canvas-unavailable': {
+    title: 'Map canvas could not start',
+    description:
+      'The map could not render on this device. Browse records in the list below while we recover.',
     retryable: true,
   },
 };

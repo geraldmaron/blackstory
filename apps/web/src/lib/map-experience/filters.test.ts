@@ -12,8 +12,10 @@ import {
   filterFeaturesInBounds,
   sortFeaturesForList,
 } from './filters';
+import { kindFamilyFor } from './kind-encoding';
 
 function feature(overrides: Partial<ExploreMapFeature['properties']>): ExploreMapFeature {
+  const kind = overrides.kind ?? 'place';
   return {
     type: 'Feature',
     id: overrides.entityId ?? 'ent_test',
@@ -21,7 +23,7 @@ function feature(overrides: Partial<ExploreMapFeature['properties']>): ExploreMa
     properties: {
       entityId: 'ent_test',
       href: '/entity/ent_test',
-      kind: 'place',
+      kind,
       displayName: 'Test Place',
       oneLineStory: 'A test one-line story.',
       precision: 'city',
@@ -33,6 +35,7 @@ function feature(overrides: Partial<ExploreMapFeature['properties']>): ExploreMa
       topicTags: ['education'],
       shade: '#C48A4A',
       glyph: 'circle',
+      kindFamily: kindFamilyFor(kind),
       ...overrides,
     },
   };
@@ -64,9 +67,18 @@ test('kind/era/theme/tone/status/confidence filters are opt-in and compose with 
     }),
   ];
 
-  const kindOnly = applyExploreFilters(features, { ...DEFAULT_EXPLORE_FILTERS, kind: 'school' });
+  const placesOnly = applyExploreFilters(features, { ...DEFAULT_EXPLORE_FILTERS, kind: 'places' });
   assert.deepEqual(
-    kindOnly.map((f) => f.properties.entityId),
+    placesOnly.map((f) => f.properties.entityId).sort(),
+    ['a', 'b'],
+  );
+
+  const legacyMicroKind = applyExploreFilters(features, {
+    ...DEFAULT_EXPLORE_FILTERS,
+    kind: 'school',
+  });
+  assert.deepEqual(
+    legacyMicroKind.map((f) => f.properties.entityId),
     ['b'],
   );
 
@@ -153,10 +165,10 @@ test('facet options lead with an "All ___" option and count real occurrences', (
   assert.equal(facets.kind[0]!.value, 'all');
   assert.deepEqual(
     facets.kind.map((option) => option.value),
-    ['all', 'place', 'school'],
+    ['all', 'places'],
   );
-  const placeOption = facets.kind.find((option) => option.value === 'place');
-  assert.match(placeOption!.label, /^Place \(2\)$/);
+  const placesOption = facets.kind.find((option) => option.value === 'places');
+  assert.match(placesOption!.label, /^Places \(3\)$/);
 
   // Era facet sorts chronologically, not alphabetically (1950s before 1960s).
   assert.deepEqual(

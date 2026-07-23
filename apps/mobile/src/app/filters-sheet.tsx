@@ -6,12 +6,15 @@
  * absolute URL or unenumerated path in `returnTo` is discarded and the sheet falls back to
  * `/explore`, it is never used to navigate anywhere unvalidated.
  *
- * Applies both `kind` and `era` via `parseFilterState`; Clear resets both.
+ * Applies the full Explore filter set via `parseFilterState`; Clear resets all facets.
  */
 import { router, useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
-import { type EntityKind, parseFilterState, parseReturnTo } from './_lib/route-params';
+import { type FilterState, filterStateToRouteParams, parseFilterState, parseReturnTo } from '@/lib/route-params';
+import { DEMO_MAP_SOURCE } from '@/features/map/demoMapSource';
+import { toExploreFeatures } from '@/features/explore/explore-feature';
+import { buildExploreFacetOptions } from '@/features/explore/explore-filter';
 import {
   ExploreFiltersPanel,
   filterStateFromPanel,
@@ -20,37 +23,39 @@ import {
 export default function FiltersSheet() {
   const rawParams = useLocalSearchParams();
   const initialFilters = parseFilterState(rawParams as Record<string, unknown>);
-  const [kind, setKind] = useState<EntityKind | undefined>(initialFilters.kind);
-  const [era, setEra] = useState<string | undefined>(initialFilters.era);
+  const [filters, setFilters] = useState<FilterState>(initialFilters);
+  const facetOptions = useMemo(
+    () => buildExploreFacetOptions(toExploreFeatures(DEMO_MAP_SOURCE)),
+    [],
+  );
 
   // Never trust `returnTo` directly — only a value that survives the safe-route allowlist is
   // used; anything else (an external URL, an unenumerated path) silently falls back to Explore.
   const safeReturnTo = parseReturnTo(rawParams.returnTo) ?? '/explore';
 
   function apply() {
-    const next = filterStateFromPanel(kind, era);
+    const next = filterStateFromPanel(filters);
+    const params = Object.fromEntries(
+      Object.entries(filterStateToRouteParams(next)).filter(([, value]) => value !== ''),
+    );
     router.navigate({
       pathname: safeReturnTo,
-      params: {
-        ...(next.kind ? { kind: next.kind } : {}),
-        ...(next.era ? { era: next.era } : {}),
-      },
+      params,
     } as never);
   }
 
   function clear() {
-    setKind(undefined);
-    setEra(undefined);
+    setFilters({});
   }
 
   return (
     <ExploreFiltersPanel
-      kind={kind}
-      era={era}
-      onKindChange={setKind}
-      onEraChange={setEra}
+      filters={filters}
+      facetOptions={facetOptions}
+      onFiltersChange={setFilters}
       onClear={clear}
       onApply={apply}
+      onOpenPlaceFind={() => router.push('/history')}
     />
   );
 }

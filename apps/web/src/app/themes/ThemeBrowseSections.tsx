@@ -1,5 +1,6 @@
 /**
- * Theme browse sections for the public /themes index — P0 live themes and P1 coming soon.
+ * Theme browse sections for the public /themes index. v6 edition Surface panels for
+ * method notice, P0 live themes, and P1 coming soon catalog rows.
  */
 
 import React from 'react';
@@ -9,37 +10,50 @@ import {
   listP1Themes,
   type ThemeImpactCatalogEntry,
 } from '../../components/theme-impact/fixtures';
+import { themesEditionPanelClassName } from './themes-panel-chrome';
 
-function ThemeCatalogRow({ entry }: { readonly entry: ThemeImpactCatalogEntry }) {
+function ThemeCatalogRow({
+  entry,
+  index,
+}: {
+  readonly entry: ThemeImpactCatalogEntry;
+  readonly index: number;
+}) {
   const priorityLabel = entry.priority === 'P0' ? 'Priority P0' : 'Priority P1';
   const statusLabel = entry.available ? 'Available now' : 'Coming soon';
+  const indexLabel = String(index + 1).padStart(2, '0');
 
   return (
     <li className="ds-theme-impact__catalog-item">
-      <div className="ds-theme-impact__catalog-head">
-        <h2 className="ds-theme-impact__catalog-title">
-          {entry.available ? (
-            <Link href={`/themes/${entry.id}`}>{entry.title}</Link>
-          ) : (
-            entry.title
-          )}
-        </h2>
-        <span
-          className={`ds-theme-impact__chip ${entry.available ? 'ds-theme-impact__chip--live' : 'ds-theme-impact__chip--soon'}`}
-          aria-label={`${priorityLabel}; ${statusLabel}`}
-        >
-          {entry.priority}
-          {!entry.available ? ' · coming soon' : ''}
-        </span>
+      <span className="ds-theme-impact__catalog-index" aria-hidden="true">
+        {indexLabel}
+      </span>
+      <div className="ds-theme-impact__catalog-body">
+        <div className="ds-theme-impact__catalog-head">
+          <h3 className="ds-theme-impact__catalog-title">
+            {entry.available ? (
+              <Link href={`/themes/${entry.id}`}>{entry.title}</Link>
+            ) : (
+              entry.title
+            )}
+          </h3>
+          <span
+            className={`ds-theme-impact__chip ${entry.available ? 'ds-theme-impact__chip--live' : 'ds-theme-impact__chip--soon'}`}
+            aria-label={`${priorityLabel}; ${statusLabel}`}
+          >
+            {entry.priority}
+            {!entry.available ? ' · coming soon' : ''}
+          </span>
+        </div>
+        <p className="ds-theme-impact__catalog-lede">{entry.lede}</p>
+        {entry.available ? (
+          <p className="ds-theme-impact__catalog-meta">
+            <Link className="ds-cta-link" href={`/themes/${entry.id}`}>
+              Open theme
+            </Link>
+          </p>
+        ) : null}
       </div>
-      <p className="ds-theme-impact__catalog-lede">{entry.lede}</p>
-      {entry.available ? (
-        <p className="ds-theme-impact__catalog-meta">
-          <Link className="ds-cta ds-cta--quiet" href={`/themes/${entry.id}`}>
-            Open theme
-          </Link>
-        </p>
-      ) : null}
     </li>
   );
 }
@@ -49,65 +63,77 @@ export function ThemeBrowseSections() {
   const p1 = listP1Themes();
 
   return (
-    <div className="ds-theme-impact">
-      <aside className="ds-theme-impact__notice" aria-labelledby="theme-method-heading">
-        <h2 className="ds-theme-impact__notice-title" id="theme-method-heading">
+    <>
+      <article
+        className={themesEditionPanelClassName('method')}
+        aria-labelledby="theme-method-heading"
+      >
+        <p className="ds-themes-edition__panel-title">Method</p>
+        <h2 className="ds-themes-edition__method-title" id="theme-method-heading">
           Juxtaposition, not causation
         </h2>
-        <p className="ds-theme-impact__notice-body">
+        <p className="ds-themes-edition__method-body">
           Theme packets place policy eras beside observations and artifacts. Co-movement is not
           treated as proof of cause. Read the{' '}
           <Link href="/methodology">methodology</Link> for confidence grades, gap labels, and when
           impact language is allowed.
         </p>
-      </aside>
+      </article>
 
-      <section
-        className="ds-section ds-record-section ds-section--flush"
+      <article
+        className={themesEditionPanelClassName('catalog')}
         aria-labelledby="themes-p0-heading"
         id="p0-themes"
       >
-        <p className="ds-section__kicker">
-          <span className="ds-kicker-index" aria-hidden="true" />
-          Priority P0
-        </p>
-        <h2 className="ds-section__title" id="themes-p0-heading">
-          Themes with live packets
-        </h2>
-        <p className="ds-section__lede">
-          Redlining and drug policy &amp; the state ship first: canonical questions with cited
-          warehouse packets when Postgres is configured, fixture fallback otherwise, and explicit
-          gap labels throughout.
-        </p>
+        <header className="ds-themes-edition__header">
+          <span className="ds-themes-edition__index" aria-hidden="true">
+            01
+          </span>
+          <div>
+            <p className="ds-themes-edition__kicker">Priority P0</p>
+            <h2 className="ds-themes-edition__title" id="themes-p0-heading">
+              Themes with live packets
+            </h2>
+            <p className="ds-themes-edition__lede">
+              Redlining and drug policy and the state ship first: canonical questions with cited
+              warehouse packets when Postgres is configured, fixture fallback otherwise, and explicit
+              gap labels throughout.
+            </p>
+          </div>
+        </header>
         <ul className="ds-theme-impact__catalog" aria-label="Priority P0 themes">
-          {p0.map((entry) => (
-            <ThemeCatalogRow key={entry.id} entry={entry} />
+          {p0.map((entry, index) => (
+            <ThemeCatalogRow key={entry.id} entry={entry} index={index} />
           ))}
         </ul>
-      </section>
+      </article>
 
-      <section
-        className="ds-section ds-record-section"
+      <article
+        className={themesEditionPanelClassName('soon')}
         aria-labelledby="themes-p1-heading"
         id="p1-themes"
       >
-        <p className="ds-section__kicker">
-          <span className="ds-kicker-index" aria-hidden="true" />
-          Priority P1
-        </p>
-        <h2 className="ds-section__title" id="themes-p1-heading">
-          Coming soon
-        </h2>
-        <p className="ds-section__lede">
-          These themes use the same packet shape. They stay labeled coming soon until ingestion and
-          editorial review catch up, not hidden, not overstated.
-        </p>
+        <header className="ds-themes-edition__header">
+          <span className="ds-themes-edition__index" aria-hidden="true">
+            02
+          </span>
+          <div>
+            <p className="ds-themes-edition__kicker">Priority P1</p>
+            <h2 className="ds-themes-edition__title" id="themes-p1-heading">
+              Coming soon
+            </h2>
+            <p className="ds-themes-edition__lede">
+              These themes use the same packet shape. They stay labeled coming soon until ingestion
+              and editorial review catch up, not hidden, not overstated.
+            </p>
+          </div>
+        </header>
         <ul className="ds-theme-impact__catalog" aria-label="Priority P1 themes coming soon">
-          {p1.map((entry) => (
-            <ThemeCatalogRow key={entry.id} entry={entry} />
+          {p1.map((entry, index) => (
+            <ThemeCatalogRow key={entry.id} entry={entry} index={index} />
           ))}
         </ul>
-      </section>
-    </div>
+      </article>
+    </>
   );
 }

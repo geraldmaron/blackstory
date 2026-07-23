@@ -11,7 +11,7 @@ test('buildPublicSitemapEntries includes static core journeys', () => {
     releaseGeneratedAt: '2026-07-17T00:00:00.000Z',
   });
   const urls = entries.map((entry) => entry.url);
-  assert.ok(urls.some((url) => url.endsWith('/search')));
+  assert.ok(urls.some((url) => url.endsWith('/history')));
   assert.ok(urls.some((url) => url.endsWith('/explore')));
   assert.ok(urls.some((url) => url.endsWith('/stories')));
   assert.ok(urls.some((url) => url.endsWith('/corrections')));

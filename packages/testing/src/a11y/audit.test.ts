@@ -19,7 +19,7 @@ test('auditHtmlFixture flags skipped heading levels', () => {
 test('auditHtmlFixture requires nav accessible names', () => {
   const result = auditHtmlFixture(`
     <main><h1>Search</h1></main>
-    <nav><a href="/search">Search</a></nav>
+    <nav><a href="/history">History</a></nav>
   `);
   assert.ok(result.issues.some((issue) => issue.code === 'nav-accessible-name'));
 });

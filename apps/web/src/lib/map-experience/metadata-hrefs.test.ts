@@ -65,9 +65,9 @@ test('exploreHrefForKind returns /explore when kind is empty', () => {
 });
 
 test('searchHrefForStatus emits /search links only for known non-all status tokens', () => {
-  assert.equal(searchHrefForStatus('active'), '/search?status=active');
-  assert.equal(searchHrefForStatus('in_force'), '/search?status=in_force');
-  assert.equal(searchHrefForStatus('historic'), '/search?status=historic');
+  assert.equal(searchHrefForStatus('active'), '/history?status=active');
+  assert.equal(searchHrefForStatus('in_force'), '/history?status=in_force');
+  assert.equal(searchHrefForStatus('historic'), '/history?status=historic');
 });
 
 test('searchHrefForStatus returns undefined for all, empty, or unknown values', () => {

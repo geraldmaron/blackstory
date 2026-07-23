@@ -10,12 +10,17 @@ import { DEFAULT_API_BASE_URL, resolveApiBaseUrl } from '@/security';
 import { Notice } from './Notice';
 import { space } from './tokens';
 
-export function ApiStatusBanner() {
+export type ApiStatusBannerProps = {
+  /** Tighter strip for tab browse surfaces (History, Stories). */
+  readonly compact?: boolean;
+};
+
+export function ApiStatusBanner({ compact = true }: ApiStatusBannerProps) {
+  const runtime = useAppRuntimeOptional();
+
   if (typeof __DEV__ === 'undefined' || !__DEV__) {
     return null;
   }
-
-  const runtime = useAppRuntimeOptional();
   const sync = runtime?.lastBootstrapSync;
   if (!sync || sync.status !== 'offline') {
     return null;
@@ -25,14 +30,15 @@ export function ApiStatusBanner() {
   const usingProdDefault = baseUrl === DEFAULT_API_BASE_URL;
 
   return (
-    <View style={styles.wrap} accessibilityRole="alert">
+    <View style={[compact ? styles.wrapCompact : styles.wrap, styles.wrapBase]}>
       <Notice
         tone="warning"
+        compact={compact}
         title="Live data unavailable"
         description={
           usingProdDefault
-            ? `Could not reach ${baseUrl}. Search, entity, and Explore map need a running api-public with PUBLIC_DATA_SOURCE=postgres. Copy apps/mobile/.env.example to .env.local, set API_BASE_URL to http://127.0.0.1:8080 (simulator) or your Mac LAN IP, restart Metro. In __DEV__, Explore falls back to bundled demo pins if GET /v1/map is unreachable.`
-            : `Could not reach ${baseUrl}/v1/bootstrap. Confirm api-public is running and reachable from this device, then restart Metro.`
+            ? `Cannot reach ${baseUrl} yet. Set API_BASE_URL in .env.local, start api-public, and restart Metro. Explore uses demo fixtures until then.`
+            : `Cannot reach ${baseUrl} yet. Start api-public, confirm API_BASE_URL, and restart Metro.`
         }
       />
     </View>
@@ -40,8 +46,13 @@ export function ApiStatusBanner() {
 }
 
 const styles = StyleSheet.create({
+  wrapBase: {
+    paddingHorizontal: 0,
+  },
   wrap: {
-    paddingHorizontal: space['3'],
+    paddingBottom: space['2'],
+  },
+  wrapCompact: {
     paddingBottom: space['2'],
   },
 });

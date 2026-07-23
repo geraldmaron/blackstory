@@ -15,10 +15,10 @@ import { radius, space, Text, themeColors, useThemeColors } from '@/ui';
 import { MAP_ATTRIBUTION_LINES } from './mapConfig';
 
 /**
- * Default bottom offset that clears the Explore peek snap (~18%) so the license
+ * Default bottom offset that clears the Explore peek snap (~22%) so the license
  * line sits on the map, not under the sheet or in a gap below it.
  */
-export const MAP_ATTRIBUTION_ABOVE_SHEET_BOTTOM: `${number}%` = '20%';
+export const MAP_ATTRIBUTION_ABOVE_SHEET_BOTTOM: `${number}%` = '22%';
 
 /** Stack below Explore sheet (z=2) and floating chrome (z=3). */
 export const MAP_ATTRIBUTION_Z_INDEX = 1;
@@ -71,7 +71,7 @@ export function MapAttribution({
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    left: space['2'],
+    left: space['4'],
     zIndex: MAP_ATTRIBUTION_Z_INDEX,
     elevation: MAP_ATTRIBUTION_Z_INDEX,
     paddingHorizontal: space['2'],

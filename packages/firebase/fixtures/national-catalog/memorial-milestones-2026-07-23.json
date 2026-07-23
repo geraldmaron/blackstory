@@ -1,0 +1,1279 @@
+[
+  {
+    "id": "ent_trayvon_martin_001",
+    "kind": "person",
+    "displayName": "Trayvon Martin",
+    "summary": "Trayvon Martin, a 17-year-old African-American teenager from Miami Gardens, was fatally shot by neighborhood-watch volunteer George Zimmerman on February 26, 2012, in The Retreat at Twin Lakes gated community in Sanford, Florida. The incident, captured by surveillance cameras, became a national controversy that catalyzed the Black Lives Matter movement.",
+    "eraBuckets": [
+      "2010s"
+    ],
+    "topicTags": [
+      "resistance",
+      "civil-rights"
+    ],
+    "jurisdictionLabel": "Sanford, Florida",
+    "locationPrecision": "neighborhood",
+    "locationLabel": "The Retreat at Twin Lakes, Sanford, Florida",
+    "lat": 28.793336998135,
+    "lng": -81.329361400836,
+    "claims": [
+      {
+        "predicate": "shot and killed",
+        "object": "Trayvon Martin",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Killing_of_Trayvon_Martin",
+        "citationLabel": "SOURCE https://en.wikipedia.org/wiki/Killing_of_Trayvon_Martin"
+      },
+      {
+        "predicate": "shot and killed",
+        "object": "Trayvon Martin",
+        "confidenceLevel": "high",
+        "citationSource": "britannica.com",
+        "citationHref": "https://www.britannica.com/event/shooting-of-Trayvon-Martin",
+        "citationLabel": "SOURCE https://www.britannica.com/event/shooting-of-Trayvon-Martin"
+      },
+      {
+        "predicate": "helped catalyze",
+        "object": "Black Lives Matter movement",
+        "confidenceLevel": "high",
+        "citationSource": "britannica.com",
+        "citationHref": "https://www.britannica.com/event/shooting-of-Trayvon-Martin",
+        "citationLabel": "SOURCE https://www.britannica.com/event/shooting-of-Trayvon-Martin"
+      },
+      {
+        "predicate": "occurred on",
+        "object": "February 26, 2012",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Killing_of_Trayvon_Martin",
+        "citationLabel": "SOURCE https://en.wikipedia.org/wiki/Killing_of_Trayvon_Martin"
+      },
+      {
+        "predicate": "occurred in",
+        "object": "The Retreat at Twin Lakes, Sanford, Florida",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Killing_of_Trayvon_Martin",
+        "citationLabel": "SOURCE https://en.wikipedia.org/wiki/Killing_of_Trayvon_Martin"
+      }
+    ],
+    "historicalContext": "This record anchors the specific location of the encounter, which is critical for understanding the racial dynamics and community tensions in Sanford, Florida, during the early 2010s. While the legal outcome (Zimmerman's acquittal) is a separate legal proceeding, the documented facts of the shooting itself serve as a primary case study for discussions on racial profiling and police violence.",
+    "sensitivityClass": "violence_associated",
+    "topicIds": [
+      "resistance",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [],
+    "related": []
+  },
+  {
+    "id": "ent_sean_bell_001",
+    "kind": "person",
+    "displayName": "Sean Bell",
+    "summary": "Sean Bell, 23, was killed by five plainclothes NYPD officers who fired 50 bullets at his silver Nissan Altima on November 25, 2006, in Jamaica, Queens. The shooting occurred after Bell and friends left a bachelor party at Club Kalua, a topless bar located at 143-08 94th Avenue. Bell was to be married the following day, and the incident resulted in the wounding of two other friends, Joseph.",
+    "eraBuckets": [
+      "2000s"
+    ],
+    "topicTags": [
+      "police-violence",
+      "civil-rights",
+      "community"
+    ],
+    "jurisdictionLabel": "New York, New York",
+    "locationPrecision": "institution",
+    "locationLabel": "Former Club Kalua site, 143-08 94th Avenue, Jamaica, Queens",
+    "lat": 40.698049035047,
+    "lng": -73.809669418729,
+    "claims": [
+      {
+        "predicate": "killed",
+        "object": "Sean Bell",
+        "confidenceLevel": "high",
+        "citationSource": "nytimes.com",
+        "citationHref": "https://www.nytimes.com/2006/11/27/nyregion/27shot.html",
+        "citationLabel": "Five plainclothes officers fired 50 bullets at a silver Nissan Altima, killing Sean Bell, 23..."
+      },
+      {
+        "predicate": "killed by",
+        "object": "five plainclothes officers",
+        "confidenceLevel": "high",
+        "citationSource": "nytimes.com",
+        "citationHref": "https://www.nytimes.com/2006/11/27/nyregion/27shot.html",
+        "citationLabel": "Five plainclothes officers fired 50 bullets at a silver Nissan Altima, killing Sean Bell, 23..."
+      },
+      {
+        "predicate": "fired 50 bullets at",
+        "object": "a silver Nissan Altima",
+        "confidenceLevel": "high",
+        "citationSource": "nytimes.com",
+        "citationHref": "https://www.nytimes.com/2006/11/27/nyregion/27shot.html",
+        "citationLabel": "Five plainclothes officers fired 50 bullets at a silver Nissan Altima..."
+      },
+      {
+        "predicate": "killed",
+        "object": "Sean Bell",
+        "confidenceLevel": "high",
+        "citationSource": "nytimes.com",
+        "citationHref": "https://www.nytimes.com/2006/12/11/nyregion/11shoot.html",
+        "citationLabel": "Sean Bell was killed when officers fired 50 bullets at a car..."
+      },
+      {
+        "predicate": "left a bachelor party at",
+        "object": "Club Kalua",
+        "confidenceLevel": "high",
+        "citationSource": "nytimes.com",
+        "citationHref": "https://www.nytimes.com/2006/12/11/nyregion/11shoot.html",
+        "citationLabel": "Sean Bell was killed when officers fired 50 bullets at a car after Bell and friends left a bachelor party at the club."
+      },
+      {
+        "predicate": "located at",
+        "object": "143-08 94th Avenue in Jamaica",
+        "confidenceLevel": "high",
+        "citationSource": "nytimes.com",
+        "citationHref": "https://www.nytimes.com/2006/12/11/nyregion/11shoot.html",
+        "citationLabel": "Club Kalua, a topless bar at 143-08 94th Avenue in Jamaica."
+      }
+    ],
+    "historicalContext": "This record documents a pivotal moment in the 2000s regarding police accountability and the use of force in New York City. The incident at Club Kalua, a specific venue in Jamaica, Queens, serves as a documented case study alongside other high-profile police shootings of the era, highlighting systemic issues in law enforcement interactions.",
+    "sensitivityClass": "violence_associated",
+    "topicIds": [
+      "police-violence",
+      "civil-rights",
+      "community"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [],
+    "related": []
+  },
+  {
+    "id": "ent_breonna_taylor_001",
+    "kind": "person",
+    "displayName": "Breonna Taylor",
+    "summary": "This record identifies the specific location of Breonna Taylor's death: Apartment 4 at 3003 Springfield Drive #4 in the St. Anthony Gardens complex in Louisville, Kentucky. Police entered the apartment at approximately 12:40 a.m. on March 13, 2020, pursuant to a drug-trafficking warrant. The address is confirmed through search warrant materials and grand-jury transcriptions, distinguishing it.",
+    "eraBuckets": [
+      "2020s"
+    ],
+    "topicTags": [
+      "police-violence",
+      "civil-rights"
+    ],
+    "jurisdictionLabel": "Louisville, Kentucky",
+    "locationPrecision": "institution",
+    "locationLabel": "St. Anthony Gardens, 3003 Springfield Drive #4, Louisville, Kentucky",
+    "lat": 38.147966694128,
+    "lng": -85.814305837087,
+    "claims": [
+      {
+        "predicate": "entered",
+        "object": "Apartment 4 at 3003 Springfield Drive",
+        "confidenceLevel": "high",
+        "citationSource": "whas11.com",
+        "citationHref": "https://www.whas11.com/article/news/investigations/breonna-taylor-case/no-knock-search-warrant-says-suspect-used-breonna-taylors-apartment-to-ship-drugs-prosecutor-recuses-himself-in-emts-case/417-111a40c4-418d-4b26-86a8-56337cffa569",
+        "citationLabel": "No-knock search warrant details"
+      },
+      {
+        "predicate": "occupied by",
+        "object": "Breonna Taylor and Kenneth Walker",
+        "confidenceLevel": "high",
+        "citationSource": "naacpldf.org",
+        "citationHref": "https://www.naacpldf.org/wp-content/uploads/Transcription-of-BT-Sept.-21-2.pdf",
+        "citationLabel": "Grand-jury transcription"
+      },
+      {
+        "predicate": "listed as",
+        "object": "St. Anthony Gardens, 3003 Springfield Drive #4",
+        "confidenceLevel": "high",
+        "citationSource": "whas11.com",
+        "citationHref": "https://www.whas11.com/article/news/investigations/breonna-taylor-case/no-knock-search-warrant-says-suspect-used-breonna-taylors-apartment-to-ship-drugs-prosecutor-recuses-himself-in-emts-case/417-111a40c4-418d-4b26-86a8-56337cffa569",
+        "citationLabel": "No-knock search warrant details"
+      }
+    ],
+    "historicalContext": "This location serves as the physical anchor for the Breonna Taylor case, illustrating the intersection of law enforcement operations, the 'no-knock' policy debate, and the policing of drug markets in Louisville. The specific apartment building and unit number are critical for understanding the spatial dynamics of the raid and the subsequent national reckoning regarding police accountability.",
+    "sensitivityClass": "violence_associated",
+    "topicIds": [
+      "police-violence",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [],
+    "related": []
+  },
+  {
+    "id": "ent_eric_garner_001",
+    "kind": "person",
+    "displayName": "Eric Garner",
+    "summary": "Eric Garner died on July 17, 2014, after a plainclothes NYPD officer placed him in a chokehold during an arrest at 202 Bay Street in Tompkinsville, Staten Island. Garner was allegedly caught selling untaxed cigarettes at the location. His recorded last words, 'I can't breathe,' became a national protest refrain and a lasting marker of police use-of-force accountability.",
+    "eraBuckets": [
+      "2010s"
+    ],
+    "topicTags": [
+      "police-violence",
+      "civil-rights"
+    ],
+    "jurisdictionLabel": "New York, New York",
+    "locationPrecision": "institution",
+    "locationLabel": "202 Bay Street, Tompkinsville, Staten Island",
+    "lat": 40.636922406365,
+    "lng": -74.076463862902,
+    "claims": [
+      {
+        "predicate": "died",
+        "object": "after a chokehold during an arrest",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Eric_Garner",
+        "citationLabel": "Eric Garner"
+      },
+      {
+        "predicate": "was approached by a plainclothes police officer",
+        "object": "in front of a beauty supply store",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Eric_Garner",
+        "citationLabel": "Eric Garner"
+      },
+      {
+        "predicate": "was allegedly caught selling",
+        "object": "untaxed cigarettes",
+        "confidenceLevel": "medium",
+        "citationSource": "cbsnews.com",
+        "citationHref": "https://www.cbsnews.com/newyork/news/police-man-dies-during-arrest-for-allegedly-selling-illegal-cigarettes-on-staten-island/",
+        "citationLabel": "Eric Garner"
+      },
+      {
+        "predicate": "recorded last words",
+        "object": "\"I can't breathe\"",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Eric_Garner",
+        "citationLabel": "Eric Garner"
+      }
+    ],
+    "historicalContext": "This record documents a pivotal moment in the history of police use-of-force and racial justice, occurring outside a beauty supply store in Staten Island. The incident, where Garner was arrested for allegedly selling untaxed cigarettes, led to the viral spread of his 'I can't breathe' statement and subsequent nationwide protests demanding accountability.",
+    "sensitivityClass": "violence_associated",
+    "topicIds": [
+      "police-violence",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [],
+    "related": []
+  },
+  {
+    "id": "ent_amadou_diallo_001",
+    "kind": "person",
+    "displayName": "Amadou Diallo",
+    "summary": "On February 4, 1999, Amadou Diallo, a 23-year-old Guinean immigrant, was shot 19 times by four NYPD officers at his building in the Bronx. Contemporary reporting confirms the officers fired 41 shots at an unarmed man in the vestibule of his apartment building, an event that became a pivotal case in late 1990s police accountability.",
+    "eraBuckets": [
+      "1990s"
+    ],
+    "topicTags": [
+      "police-violence",
+      "civil-rights",
+      "community"
+    ],
+    "jurisdictionLabel": "New York, New York",
+    "locationPrecision": "institution",
+    "locationLabel": "1157 Wheeler Avenue, Soundview, Bronx",
+    "lat": 40.827376900718,
+    "lng": -73.879922448739,
+    "claims": [
+      {
+        "predicate": "shot",
+        "object": "Amadou Diallo",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Killing_of_Amadou_Diallo",
+        "citationLabel": "Killing of Amadou Diallo"
+      },
+      {
+        "predicate": "fired",
+        "object": "41 shots",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Killing_of_Amadou_Diallo",
+        "citationLabel": "Killing of Amadou Diallo"
+      },
+      {
+        "predicate": "hit",
+        "object": "Amadou Diallo 19 times",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Killing_of_Amadou_Diallo",
+        "citationLabel": "Killing of Amadou Diallo"
+      },
+      {
+        "predicate": "killed",
+        "object": "Amadou Diallo",
+        "confidenceLevel": "high",
+        "citationSource": "nytimes.com",
+        "citationHref": "https://www.nytimes.com/1999/02/05/nyregion/officers-in-bronx-fire-41-shots-and-an-unarmed-man-is-killed.html",
+        "citationLabel": "Officers in Bronx fire 41 shots and an unarmed man is killed"
+      },
+      {
+        "predicate": "unarmed",
+        "object": "Amadou Diallo",
+        "confidenceLevel": "high",
+        "citationSource": "nytimes.com",
+        "citationHref": "https://www.nytimes.com/1999/02/05/nyregion/officers-in-bronx-fire-41-shots-and-an-unarmed-man-is-killed.html",
+        "citationLabel": "Officers in Bronx fire 41 shots and an unarmed man is killed"
+      }
+    ],
+    "historicalContext": "This record matters as a primary example of police use-of-force controversies in the late 1990s, occurring within the context of the NYPD's Street Crime Unit and the broader societal tensions surrounding racial profiling and unarmed fatalities in New York City.",
+    "sensitivityClass": "violence_associated",
+    "topicIds": [
+      "police-violence",
+      "civil-rights",
+      "community"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [],
+    "related": []
+  },
+  {
+    "id": "ent_jordan_neely_001",
+    "kind": "person",
+    "displayName": "Jordan Neely",
+    "summary": "Jordan Neely, 30, died on May 1, 2023, after being placed in a chokehold by a fellow passenger on a northbound F train. The incident occurred after Neely boarded at Second Avenue and the train stopped at the Broadway-Lafayette Street station in Manhattan. His death resulted from neck compression and sparked national debates regarding subway safety and the use of force against Black New Yorkers.",
+    "eraBuckets": [
+      "2020s"
+    ],
+    "topicTags": [
+      "resistance",
+      "civil-rights",
+      "community"
+    ],
+    "jurisdictionLabel": "New York, New York",
+    "locationPrecision": "site",
+    "locationLabel": "Broadway–Lafayette Street station (F train), Manhattan",
+    "lat": 40.725297,
+    "lng": -73.996204,
+    "claims": [
+      {
+        "predicate": "died",
+        "object": "Jordan Neely",
+        "confidenceLevel": "high",
+        "citationSource": "apnews.com",
+        "citationHref": "https://apnews.com/article/nyc-subway-death-headlock-c1b1383b3163f3f5d2c22a267bc52f41",
+        "citationLabel": "Jordan Neely died from compression of the neck after a chokehold by a fellow passenger on a New York City subway train."
+      },
+      {
+        "predicate": "boarded",
+        "object": "northbound F train",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Killing_of_Jordan_Neely",
+        "citationLabel": "Neely boarded a northbound F train at Second Avenue."
+      },
+      {
+        "predicate": "stopped at",
+        "object": "Broadway–Lafayette Street station",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Killing_of_Jordan_Neely",
+        "citationLabel": "The train stopped at Broadway–Lafayette Street station."
+      },
+      {
+        "predicate": "died",
+        "object": "Jordan Neely",
+        "confidenceLevel": "high",
+        "citationSource": "apnews.com",
+        "citationHref": "https://apnews.com/article/nyc-subway-death-headlock-c1b1383b3163f3f5d2c22a267bc52f41",
+        "citationLabel": "Jordan Neely, 30, died from compression of the neck after a chokehold by a fellow passenger on a New York City subway train."
+      }
+    ],
+    "historicalContext": "This record documents a specific instance of extrajudicial death in the New York City subway system, occurring shortly after the death of Eric Garner and amidst heightened scrutiny of police interactions with Black citizens. The location at Broadway-Lafayette Street serves as a critical public landmark where the initial altercation and subsequent emergency response unfolded, highlighting the intersection of public transit safety and civil rights.",
+    "sensitivityClass": "violence_associated",
+    "topicIds": [
+      "resistance",
+      "civil-rights",
+      "community"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [],
+    "related": []
+  },
+  {
+    "id": "ent_michael_griffith_001",
+    "kind": "person",
+    "displayName": "Michael Griffith",
+    "summary": "Michael Griffith, 23, was killed in Howard Beach, Queens, on December 20, 1986. After leaving New Park Pizzeria on Cross Bay Boulevard, he was chased by a white mob and fatally struck by a car while fleeing onto the Belt Parkway.",
+    "eraBuckets": [
+      "1980s"
+    ],
+    "topicTags": [
+      "resistance",
+      "civil-rights",
+      "community"
+    ],
+    "jurisdictionLabel": "New York, New York",
+    "locationPrecision": "neighborhood",
+    "locationLabel": "Cross Bay Boulevard near 157th Avenue / New Park Pizzeria, Howard Beach, Queens",
+    "lat": 40.662278546196,
+    "lng": -73.840839014838,
+    "claims": [
+      {
+        "predicate": "killed",
+        "object": "Michael Griffith",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Howard_Beach_racial_attack",
+        "citationLabel": "Howard Beach racial attack"
+      },
+      {
+        "predicate": "chased by",
+        "object": "white mob",
+        "confidenceLevel": "high",
+        "citationSource": "blackpast.org",
+        "citationHref": "https://blackpast.org/african-american-history/howard-beach-incident-1986/",
+        "citationLabel": "Howard Beach incident 1986"
+      },
+      {
+        "predicate": "struck by",
+        "object": "car",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Howard_Beach_racial_attack",
+        "citationLabel": "Howard Beach racial attack"
+      },
+      {
+        "predicate": "occurred on",
+        "object": "December 20, 1986",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Howard_Beach_racial_attack",
+        "citationLabel": "Howard Beach racial attack"
+      }
+    ],
+    "historicalContext": "This incident is a documented case of racial violence in 1980s New York City, occurring in the same geographic corridor as other high-profile racial killings. It serves as a specific example of the broader pattern of mob violence against Black men in the late 1980s, distinct from the 1990s Trayvon Martin case.",
+    "sensitivityClass": "violence_associated",
+    "topicIds": [
+      "resistance",
+      "civil-rights",
+      "community"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [],
+    "related": []
+  },
+  {
+    "id": "ent_emmett_till_001",
+    "kind": "person",
+    "displayName": "Emmett Till",
+    "summary": "Emmett Louis Till, a 14-year-old African American boy from Chicago, was abducted, tortured, and lynched in Mississippi in August 1955. His body was recovered near Graball Landing on the Tallahatchie River, an area now part of the Emmett Till and Mamie Till-Mobley National Monument. His murder became a catalyst for the modern civil rights movement, highlighted by his open-casket funeral and his.",
+    "eraBuckets": [
+      "1950s"
+    ],
+    "topicTags": [
+      "resistance",
+      "civil-rights"
+    ],
+    "jurisdictionLabel": "Glendora, Mississippi",
+    "locationPrecision": "site",
+    "locationLabel": "Graball Landing, Tallahatchie River, near Glendora, Mississippi",
+    "lat": 33.86056,
+    "lng": -90.27472,
+    "claims": [
+      {
+        "predicate": "was found",
+        "object": "near Graball Landing on the Tallahatchie River",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Emmett_Till",
+        "citationLabel": "Emmett Louis Till was a 14-year-old African American boy who was abducted, tortured, and lynched in Mississippi in August 1955. His murder became a catalyst for the civil rights movement."
+      },
+      {
+        "predicate": "was recovered",
+        "object": "near Graball Landing on the Tallahatchie River",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/places/graball-landing.htm",
+        "citationLabel": "Fourteen-year-old Emmett Till's body was found near Graball Landing on the Tallahatchie River following his lynching in 1955."
+      },
+      {
+        "predicate": "is part of",
+        "object": "Emmett Till and Mamie Till-Mobley National Monument",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/places/graball-landing.htm",
+        "citationLabel": "Graball Landing is located near Glendora, Mississippi, and is part of Emmett Till and Mamie Till-Mobley National Monument."
+      }
+    ],
+    "historicalContext": "This record anchors the location of the lynching victim's body within the National Park Service unit of Graball Landing, providing geographic context for the 1955 event that galvanized the civil rights movement. The entry connects the physical site of recovery to the broader historical narrative of racial violence and subsequent social change.",
+    "sensitivityClass": "violence_associated",
+    "topicIds": [
+      "resistance",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [
+      "gap_emmett_till_lynching"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "gap_emmett_till_lynching",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
+  },
+  {
+    "id": "ent_clementa_c_pinckney_001",
+    "kind": "person",
+    "displayName": "Clementa C. Pinckney",
+    "summary": "Clementa C. Pinckney was a pastor at Mother Emanuel AME Church in Charleston, South Carolina, and a state senator. On June 17, 2015, she was among nine African American members of the church who were killed during a white-supremacist attack at the church while attending a Bible study.",
+    "eraBuckets": [
+      "2010s"
+    ],
+    "topicTags": [
+      "resistance",
+      "civil-rights",
+      "church"
+    ],
+    "jurisdictionLabel": "Charleston, South Carolina",
+    "locationPrecision": "institution",
+    "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
+    "lat": 32.7875,
+    "lng": -79.93305556,
+    "claims": [
+      {
+        "predicate": "killed",
+        "object": "Clementa C. Pinckney",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "killed",
+        "object": "Clementa C. Pinckney",
+        "confidenceLevel": "high",
+        "citationSource": "ldhi.library.cofc.edu",
+        "citationHref": "https://ldhi.library.cofc.edu/exhibits/show/mother-emanuel-tribute/overview",
+        "citationLabel": "Mother Emanuel Tribute"
+      },
+      {
+        "predicate": "part_of",
+        "object": "Emanuel Nine",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "killed",
+        "object": "Clementa C. Pinckney",
+        "confidenceLevel": "high",
+        "citationSource": "ldhi.library.cofc.edu",
+        "citationHref": "https://ldhi.library.cofc.edu/exhibits/show/mother-emanuel-tribute/overview",
+        "citationLabel": "Mother Emanuel Tribute"
+      },
+      {
+        "predicate": "attended",
+        "object": "Bible study",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "killed",
+        "object": "Clementa C. Pinckney",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      }
+    ],
+    "historicalContext": "This record documents a specific victim of the June 17, 2015 Charleston church shooting, an event that resulted in the deaths of nine congregants during a Bible study at 110 Calhoun Street. The incident is historically significant as a targeted attack on a Black religious community and is often cited in discussions regarding racial violence and the Emanuel Nine.",
+    "sensitivityClass": "violence_associated",
+    "topicIds": [
+      "resistance",
+      "civil-rights",
+      "church"
+    ],
+    "mentionedEntityIds": [
+      "ent_mother_emanuel_ame_001",
+      "gap_june_17_2015_racist_attack_at_emanuel_ame"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_mother_emanuel_ame_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "gap_june_17_2015_racist_attack_at_emanuel_ame",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
+  },
+  {
+    "id": "ent_cynthia_graham_hurd_001",
+    "kind": "person",
+    "displayName": "Cynthia Graham Hurd",
+    "summary": "Cynthia Graham Hurd was a member of the Emanuel African Methodist Episcopal Church in Charleston, South Carolina, who was killed on June 17, 2015, during a Bible study. She is remembered as one of the nine victims, known collectively as the Emanuel Nine, who were murdered at the church located at 110 Calhoun Street.",
+    "eraBuckets": [
+      "2010s"
+    ],
+    "topicTags": [
+      "resistance",
+      "civil-rights",
+      "church"
+    ],
+    "jurisdictionLabel": "Charleston, South Carolina",
+    "locationPrecision": "institution",
+    "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
+    "lat": 32.7875,
+    "lng": -79.93305556,
+    "claims": [
+      {
+        "predicate": "killed",
+        "object": "during the white-supremacist massacre at Emanuel African Methodist Episcopal Church",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "killed",
+        "object": "on June 17, 2015",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "member_of",
+        "object": "Emanuel African Methodist Episcopal Church",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "part_of",
+        "object": "the Emanuel Nine",
+        "confidenceLevel": "high",
+        "citationSource": "ldhi.library.cofc.edu",
+        "citationHref": "https://ldhi.library.cofc.edu/exhibits/show/mother-emanuel-tribute/overview",
+        "citationLabel": "Mother Emanuel Tribute"
+      }
+    ],
+    "historicalContext": "This record documents the loss of life during the June 17, 2015, mass shooting at Emanuel AME Church, an event that highlighted racial violence and the vulnerability of Black congregants in the United States. The victims are commemorated as the 'Emanuel Nine,' representing a specific historical moment of tragedy and subsequent national mourning.",
+    "sensitivityClass": "violence_associated",
+    "topicIds": [
+      "resistance",
+      "civil-rights",
+      "church"
+    ],
+    "mentionedEntityIds": [
+      "ent_mother_emanuel_ame_001",
+      "gap_june_17_2015_racist_attack_at_emanuel_ame"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_mother_emanuel_ame_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "gap_june_17_2015_racist_attack_at_emanuel_ame",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
+  },
+  {
+    "id": "ent_susie_jackson_001",
+    "kind": "person",
+    "displayName": "Susie Jackson",
+    "summary": "Susie Jackson was an African American member of the Emanuel African Methodist Episcopal Church in Charleston, South Carolina. On June 17, 2015, she was among nine church members killed during a white-supremacist attack on the congregation while they were gathered for a Bible study at 110 Calhoun Street.",
+    "eraBuckets": [
+      "2010s"
+    ],
+    "topicTags": [
+      "resistance",
+      "civil-rights",
+      "church"
+    ],
+    "jurisdictionLabel": "Charleston, South Carolina",
+    "locationPrecision": "institution",
+    "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
+    "lat": 32.7875,
+    "lng": -79.93305556,
+    "claims": [
+      {
+        "predicate": "killed",
+        "object": "Susie Jackson",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "killed",
+        "object": "Susie Jackson",
+        "confidenceLevel": "high",
+        "citationSource": "ldhi.library.cofc.edu",
+        "citationHref": "https://ldhi.library.cofc.edu/exhibits/show/mother-emanuel-tribute/overview",
+        "citationLabel": "Mother Emanuel Tribute"
+      },
+      {
+        "predicate": "date",
+        "object": "June 17, 2015",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "location",
+        "object": "110 Calhoun Street",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "group",
+        "object": "Emanuel Nine",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      }
+    ],
+    "historicalContext": "This record documents one of the victims in the Charleston church shooting, an event that exposed deep racial divisions and the lethal consequences of white supremacy in the United States. The attack occurred at a specific location (110 Calhoun Street) during a routine religious gathering, highlighting the vulnerability of community spaces to targeted violence.",
+    "sensitivityClass": "violence_associated",
+    "topicIds": [
+      "resistance",
+      "civil-rights",
+      "church"
+    ],
+    "mentionedEntityIds": [
+      "ent_mother_emanuel_ame_001",
+      "gap_june_17_2015_racist_attack_at_emanuel_ame"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_mother_emanuel_ame_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "gap_june_17_2015_racist_attack_at_emanuel_ame",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
+  },
+  {
+    "id": "ent_ethel_lee_lance_001",
+    "kind": "person",
+    "displayName": "Ethel Lee Lance",
+    "summary": "Ethel Lee Lance was an African American member of the Emanuel African Methodist Episcopal Church in Charleston, South Carolina, who was among the nine victims killed during a white-supremacist attack on June 17, 2015. She participated in a Bible study at the church located at 110 Calhoun Street when the massacre occurred. Her name was released by local media on June 18, 2015, as part of the.",
+    "eraBuckets": [
+      "2010s"
+    ],
+    "topicTags": [
+      "resistance",
+      "civil-rights",
+      "church"
+    ],
+    "jurisdictionLabel": "Charleston, South Carolina",
+    "locationPrecision": "institution",
+    "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
+    "lat": 32.7875,
+    "lng": -79.93305556,
+    "claims": [
+      {
+        "predicate": "killed",
+        "object": "Ethel Lee Lance",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "killed",
+        "object": "Ethel Lee Lance",
+        "confidenceLevel": "high",
+        "citationSource": "ldhi.library.cofc.edu",
+        "citationHref": "https://ldhi.library.cofc.edu/exhibits/show/mother-emanuel-tribute/overview",
+        "citationLabel": "Mother Emanuel tribute"
+      },
+      {
+        "predicate": "participated_in",
+        "object": "Bible study",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "located_at",
+        "object": "110 Calhoun Street",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "killed_during",
+        "object": "white-supremacist massacre",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      }
+    ],
+    "historicalContext": "This record documents the loss of life during the Charleston Church Shooting, a pivotal event in the modern civil rights movement that highlighted racial violence and the vulnerability of religious communities. The attack occurred at a specific location (110 Calhoun Street) and involved a targeted group of nine individuals, making the identification of each victim crucial for historical accuracy and remembrance.",
+    "sensitivityClass": "violence_associated",
+    "topicIds": [
+      "resistance",
+      "civil-rights",
+      "church"
+    ],
+    "mentionedEntityIds": [
+      "ent_mother_emanuel_ame_001",
+      "gap_june_17_2015_racist_attack_at_emanuel_ame"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_mother_emanuel_ame_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "gap_june_17_2015_racist_attack_at_emanuel_ame",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
+  },
+  {
+    "id": "ent_depayne_middleton_doctor_001",
+    "kind": "person",
+    "displayName": "Depayne Middleton-Doctor",
+    "summary": "Depayne Middleton-Doctor was a pastor and administrator at Southern Wesleyan University who was among the nine African American members of Emanuel AME Church killed during the white-supremacist massacre at 110 Calhoun Street in Charleston, South Carolina, on June 17, 2015.",
+    "eraBuckets": [
+      "2010s"
+    ],
+    "topicTags": [
+      "resistance",
+      "civil-rights",
+      "church"
+    ],
+    "jurisdictionLabel": "Charleston, South Carolina",
+    "locationPrecision": "institution",
+    "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
+    "lat": 32.7875,
+    "lng": -79.93305556,
+    "claims": [
+      {
+        "predicate": "killed",
+        "object": "during the white-supremacist massacre at Emanuel African Methodist Episcopal Church",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "included",
+        "object": "Depayne Middleton-Doctor",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "killed",
+        "object": "on June 17, 2015",
+        "confidenceLevel": "high",
+        "citationSource": "ldhi.library.cofc.edu",
+        "citationHref": "https://ldhi.library.cofc.edu/exhibits/show/mother-emanuel-tribute/overview",
+        "citationLabel": "Mother Emanuel Tribute"
+      },
+      {
+        "predicate": "killed",
+        "object": "during a Bible study",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      }
+    ],
+    "historicalContext": "This record documents the loss of life during the Charleston church shooting, a pivotal event in the modern civil rights movement that highlighted the intersection of religious community and racial violence. The victims are collectively remembered as the Emanuel Nine, and their deaths occurred during a routine Bible study, underscoring the arbitrary nature of the attack.",
+    "sensitivityClass": "violence_associated",
+    "topicIds": [
+      "resistance",
+      "civil-rights",
+      "church"
+    ],
+    "mentionedEntityIds": [
+      "ent_mother_emanuel_ame_001",
+      "gap_june_17_2015_racist_attack_at_emanuel_ame"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_mother_emanuel_ame_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "gap_june_17_2015_racist_attack_at_emanuel_ame",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
+  },
+  {
+    "id": "ent_tywanza_sanders_001",
+    "kind": "person",
+    "displayName": "Tywanza Sanders",
+    "summary": "Tywanza Sanders was an African American Bible study member and graduate of Allen University who was among the nine victims killed during the white-supremacist massacre at the Emanuel African Methodist Episcopal Church in Charleston, South Carolina, on June 17, 2015.",
+    "eraBuckets": [
+      "2010s"
+    ],
+    "topicTags": [
+      "resistance",
+      "civil-rights",
+      "church"
+    ],
+    "jurisdictionLabel": "Charleston, South Carolina",
+    "locationPrecision": "institution",
+    "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
+    "lat": 32.7875,
+    "lng": -79.93305556,
+    "claims": [
+      {
+        "predicate": "killed",
+        "object": "Tywanza Sanders",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "killed",
+        "object": "Tywanza Sanders",
+        "confidenceLevel": "high",
+        "citationSource": "ldhi.library.cofc.edu",
+        "citationHref": "https://ldhi.library.cofc.edu/exhibits/show/mother-emanuel-tribute/overview",
+        "citationLabel": "Mother Emanuel Tribute"
+      },
+      {
+        "predicate": "killed",
+        "object": "Tywanza Sanders",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "killed",
+        "object": "Tywanza Sanders",
+        "confidenceLevel": "high",
+        "citationSource": "ldhi.library.cofc.edu",
+        "citationHref": "https://ldhi.library.cofc.edu/exhibits/show/mother-emanuel-tribute/overview",
+        "citationLabel": "Mother Emanuel Tribute"
+      },
+      {
+        "predicate": "killed",
+        "object": "Tywanza Sanders",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "killed",
+        "object": "Tywanza Sanders",
+        "confidenceLevel": "high",
+        "citationSource": "ldhi.library.cofc.edu",
+        "citationHref": "https://ldhi.library.cofc.edu/exhibits/show/mother-emanuel-tribute/overview",
+        "citationLabel": "Mother Emanuel Tribute"
+      }
+    ],
+    "historicalContext": "This record documents a specific victim of the June 2015 Charleston church shooting, an event that highlighted the intersection of religious community, racial violence, and the broader struggle against white supremacy in the United States.",
+    "sensitivityClass": "violence_associated",
+    "topicIds": [
+      "resistance",
+      "civil-rights",
+      "church"
+    ],
+    "mentionedEntityIds": [
+      "ent_mother_emanuel_ame_001",
+      "gap_june_17_2015_racist_attack_at_emanuel_ame"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_mother_emanuel_ame_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "gap_june_17_2015_racist_attack_at_emanuel_ame",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
+  },
+  {
+    "id": "ent_daniel_l_simmons_sr_001",
+    "kind": "person",
+    "displayName": "Daniel L. Simmons Sr.",
+    "summary": "Daniel L. Simmons Sr. was an African American pastor and member of the Emanuel African Methodist Episcopal Church in Charleston, South Carolina. On June 17, 2015, he was among nine victims killed during a white-supremacist attack at the church while attending a Bible study. He is remembered as one of the 'Emanuel Nine.'",
+    "eraBuckets": [
+      "2010s"
+    ],
+    "topicTags": [
+      "resistance",
+      "civil-rights",
+      "church"
+    ],
+    "jurisdictionLabel": "Charleston, South Carolina",
+    "locationPrecision": "institution",
+    "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
+    "lat": 32.7875,
+    "lng": -79.93305556,
+    "claims": [
+      {
+        "predicate": "killed",
+        "object": "Daniel L. Simmons Sr.",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "part of",
+        "object": "Emanuel Nine",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "killed",
+        "object": "Daniel L. Simmons Sr.",
+        "confidenceLevel": "high",
+        "citationSource": "ldhi.library.cofc.edu",
+        "citationHref": "https://ldhi.library.cofc.edu/exhibits/show/mother-emanuel-tribute/overview",
+        "citationLabel": "Mother Emanuel Tribute"
+      },
+      {
+        "predicate": "attending",
+        "object": "Bible study",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "killed",
+        "object": "Daniel L. Simmons Sr.",
+        "confidenceLevel": "high",
+        "citationSource": "ldhi.library.cofc.edu",
+        "citationHref": "https://ldhi.library.cofc.edu/exhibits/show/mother-emanuel-tribute/overview",
+        "citationLabel": "Mother Emanuel Tribute"
+      }
+    ],
+    "historicalContext": "This record documents the loss of life during the Charleston church shooting, a pivotal event in the modern civil rights movement that highlighted racial violence and the vulnerability of religious spaces. The victims, including Simmons, were targeted during a routine gathering, underscoring the specific nature of the hate crime.",
+    "sensitivityClass": "violence_associated",
+    "topicIds": [
+      "resistance",
+      "civil-rights",
+      "church"
+    ],
+    "mentionedEntityIds": [
+      "ent_mother_emanuel_ame_001",
+      "gap_june_17_2015_racist_attack_at_emanuel_ame"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_mother_emanuel_ame_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "gap_june_17_2015_racist_attack_at_emanuel_ame",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
+  },
+  {
+    "id": "ent_sharonda_coleman_singleton_001",
+    "kind": "person",
+    "displayName": "Sharonda Coleman-Singleton",
+    "summary": "Sharonda Coleman-Singleton was a pastor, speech therapist, and high-school track coach who was among the nine African American members of Emanuel African Methodist Episcopal Church killed during a Bible study on June 17, 2015, in Charleston, South Carolina. She is remembered as one of the Emanuel Nine.",
+    "eraBuckets": [
+      "2010s"
+    ],
+    "topicTags": [
+      "resistance",
+      "civil-rights",
+      "church"
+    ],
+    "jurisdictionLabel": "Charleston, South Carolina",
+    "locationPrecision": "institution",
+    "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
+    "lat": 32.7875,
+    "lng": -79.93305556,
+    "claims": [
+      {
+        "predicate": "killed",
+        "object": "Sharonda Coleman-Singleton",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "member of",
+        "object": "Emanuel African Methodist Episcopal Church",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "killed during",
+        "object": "Bible study",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "killed on",
+        "object": "June 17, 2015",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "listed as",
+        "object": "Emanuel Nine",
+        "confidenceLevel": "high",
+        "citationSource": "ldhi.library.cofc.edu",
+        "citationHref": "https://ldhi.library.cofc.edu/exhibits/show/mother-emanuel-tribute/overview",
+        "citationLabel": "Mother Emanuel Tribute"
+      }
+    ],
+    "historicalContext": "This record documents a specific victim of the June 17, 2015 Charleston church shooting, an event that highlighted the intersection of racial violence and religious spaces in the United States. The incident occurred at 110 Calhoun Street, where nine congregants were killed during a Bible study, marking a significant moment in the ongoing struggle against white supremacy.",
+    "sensitivityClass": "violence_associated",
+    "topicIds": [
+      "resistance",
+      "civil-rights",
+      "church"
+    ],
+    "mentionedEntityIds": [
+      "ent_mother_emanuel_ame_001",
+      "gap_june_17_2015_racist_attack_at_emanuel_ame"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_mother_emanuel_ame_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "gap_june_17_2015_racist_attack_at_emanuel_ame",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
+  },
+  {
+    "id": "ent_myra_thompson_001",
+    "kind": "person",
+    "displayName": "Myra Thompson",
+    "summary": "Myra Thompson was an African American Bible study teacher at Mother Emanuel AME Church in Charleston, South Carolina. She was among the nine victims killed during the white-supremacist mass shooting at the church on June 17, 2015. Her name was released by local media on June 18, 2015, as part of the memorialization of the Emanuel Nine.",
+    "eraBuckets": [
+      "2010s"
+    ],
+    "topicTags": [
+      "resistance",
+      "civil-rights",
+      "church"
+    ],
+    "jurisdictionLabel": "Charleston, South Carolina",
+    "locationPrecision": "institution",
+    "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
+    "lat": 32.7875,
+    "lng": -79.93305556,
+    "claims": [
+      {
+        "predicate": "killed",
+        "object": "during the June 17, 2015, white-supremacist massacre at Emanuel African Methodist Episcopal Church",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "was",
+        "object": "a Bible study teacher at Mother Emanuel",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charleston_church_shooting",
+        "citationLabel": "Charleston church shooting"
+      },
+      {
+        "predicate": "was",
+        "object": "one of the nine victims known as the Emanuel Nine",
+        "confidenceLevel": "high",
+        "citationSource": "ldhi.library.cofc.edu",
+        "citationHref": "https://ldhi.library.cofc.edu/exhibits/show/mother-emanuel-tribute/overview",
+        "citationLabel": "Mother Emanuel Tribute"
+      },
+      {
+        "predicate": "was",
+        "object": "released by local media on June 18, 2015",
+        "confidenceLevel": "high",
+        "citationSource": "ldhi.library.cofc.edu",
+        "citationHref": "https://ldhi.library.cofc.edu/exhibits/show/mother-emanuel-tribute/overview",
+        "citationLabel": "Mother Emanuel Tribute"
+      }
+    ],
+    "historicalContext": "This record documents a specific victim of the 2015 Charleston church shooting, an event that remains a critical case study in the history of white supremacist violence and the ongoing struggle for Black lives in America. The incident occurred at 110 Calhoun Street, a location central to the community's religious and social life, highlighting the targeted nature of the attack.",
+    "sensitivityClass": "violence_associated",
+    "topicIds": [
+      "resistance",
+      "civil-rights",
+      "church"
+    ],
+    "mentionedEntityIds": [
+      "ent_mother_emanuel_ame_001",
+      "gap_june_17_2015_racist_attack_at_emanuel_ame"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_mother_emanuel_ame_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "gap_june_17_2015_racist_attack_at_emanuel_ame",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
+  }
+]

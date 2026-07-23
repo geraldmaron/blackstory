@@ -22,7 +22,10 @@ export function useAnnounceOnMount(message: string, enabled = true): void {
   // never triggers a second, re-interrupting announcement — this is intentionally a "once per
   // mount" primitive, not a live-updating one.
   const messageRef = useRef(message);
-  messageRef.current = message;
+
+  useEffect(() => {
+    messageRef.current = message;
+  }, [message]);
 
   useEffect(() => {
     if (!enabled || announced.current || messageRef.current.trim().length === 0) return;

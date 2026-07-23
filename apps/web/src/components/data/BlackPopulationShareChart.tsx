@@ -64,16 +64,16 @@ export function BlackPopulationShareChart({ rows, sources }: BlackPopulationShar
 
   return (
     <DataChartFrame
-      title="Share of the U.S. that is Black, 1790–2020"
+      title="Share of the U.S. that is Black, 1790 to 2020"
       caption={
         'Black share of the total U.S. population in each census. The line breaks at 2000, when ' +
-        '“Black alone” and multiple-race answers began — a definition change, not a missing year.'
+        '“Black alone” and multiple-race answers began, a definition change, not a missing year.'
       }
       sources={sources}
       ariaLabel="Line chart of Black population share by census decade, 1790 to 2020"
       textAlternative={
         <table className="ds-data-chart__table">
-          <caption>Share of the U.S. that is Black, 1790–2020</caption>
+          <caption>Share of the U.S. that is Black, 1790 to 2020</caption>
           <thead>
             <tr>
               <th scope="col">Decade</th>

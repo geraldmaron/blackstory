@@ -1,14 +1,9 @@
 /**
- * Themed flat container. Web and logo art stay flat; mobile siblings may opt
- * into controlled lift via `useShadowStyle` / `getShadowStyle` from tokens.
- * Surface itself stays border-first and never applies shadows by default.
- *
- * Forwards its ref to the underlying `View` (MOB-017) so a caller can drive assistive-tech
- * focus onto a Surface directly — e.g. `useAccessibilityFocus`'s `ref` — without needing a
- * separate wrapper element just to be focusable.
+ * Themed flat container. Flat matte only — hairline border, no shadows.
+ * Prefer LiftedSurface for browse edition panels with standard padding slots.
  */
 import { forwardRef } from 'react';
-import { View, type ViewProps } from 'react-native';
+import { StyleSheet, View, type ViewProps } from 'react-native';
 import { radius, space, useThemeColors, type RadiusKey, type SpaceKey } from './tokens';
 
 export type SurfaceProps = ViewProps & {
@@ -16,7 +11,7 @@ export type SurfaceProps = ViewProps & {
   tone?: 'canvas' | 'surface' | 'surfaceRaised';
   radiusKey?: RadiusKey;
   paddingKey?: SpaceKey;
-  /** Draws a 1px hairline border in the theme's border color. */
+  /** Draws a hairline border in the theme's rule color. */
   bordered?: boolean;
 };
 
@@ -34,7 +29,7 @@ export const Surface = forwardRef<View, SurfaceProps>(function Surface(
           backgroundColor: theme[tone],
           borderRadius: radius[radiusKey],
           padding: paddingKey ? space[paddingKey] : undefined,
-          borderWidth: bordered ? 1 : 0,
+          borderWidth: bordered ? StyleSheet.hairlineWidth : 0,
           borderColor: bordered ? theme.border : undefined,
         },
         style,

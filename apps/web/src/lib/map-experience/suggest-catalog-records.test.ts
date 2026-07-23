@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { ExploreMapFeature } from './build-explore-map-source';
 import { suggestCatalogRecords } from './suggest-catalog-records';
+import { kindFamilyFor } from './kind-encoding';
 
 function feature(
   id: string,
@@ -32,6 +33,7 @@ function feature(
       topicTags: [],
       shade: '#B86B2A',
       glyph: 'place',
+      kindFamily: kindFamilyFor(kind),
     },
   };
 }

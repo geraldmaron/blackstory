@@ -1,5 +1,5 @@
 /**
- * Law detail page sections: on-page nav, explainer body, and provenance block.
+ * Law detail page sections: anatomy strip, explainer body, provenance, and depart links.
  */
 import React from 'react';
 import Link from 'next/link';
@@ -12,7 +12,8 @@ import {
   LegalStatusBadge,
   humanizeLegalKind,
 } from '../../components/legal';
-import './law.css';
+import { LawAnatomyStrip } from './LawAnatomyStrip';
+import { lawEditionPanelClassName } from './law-panel-chrome';
 
 const DETAIL_SECTIONS = [
   { id: 'what-it-says', label: 'What it says' },
@@ -29,21 +30,24 @@ export type LawDetailSectionsProps = {
 };
 
 export function LawDetailSections({ snapshot, explainer }: LawDetailSectionsProps) {
-  const statusBadge = <LegalStatusBadge status={snapshot.lawStatus} />;
-
   return (
-    <div className="ds-law">
-      <LegalDisclaimer />
+    <>
+      <article className={lawEditionPanelClassName('disclaimer')}>
+        <LegalDisclaimer />
+      </article>
 
       {explainer ? (
-        <nav className="ds-law__nav" aria-labelledby="law-detail-toc-title">
-          <p className="ds-law__nav-title" id="law-detail-toc-title">
+        <nav
+          className={`${lawEditionPanelClassName()} ds-law-edition__nav`}
+          aria-labelledby="law-detail-toc-title"
+        >
+          <p className="ds-law-edition__nav-title" id="law-detail-toc-title">
             On this page
           </p>
-          <ul className="ds-law__nav-list">
+          <ul className="ds-law-edition__nav-list">
             {DETAIL_SECTIONS.map((section) => (
               <li key={section.id}>
-                <a className="ds-law__nav-link" href={`#${section.id}`}>
+                <a className="ds-law-edition__nav-link" href={`#${section.id}`}>
                   {section.label}
                 </a>
               </li>
@@ -53,15 +57,21 @@ export function LawDetailSections({ snapshot, explainer }: LawDetailSectionsProp
       ) : null}
 
       {explainer ? (
-        <LegalExplainerSections
-          explainer={explainer}
-          citation={snapshot.citation.canonicalCitation}
-          statusBadge={statusBadge}
-        />
+        <article className={lawEditionPanelClassName('explainer')} aria-labelledby="explainer-heading">
+          <p className="ds-law-edition__panel-title">Explainer</p>
+          <h2 className="ds-law-edition__panel-heading" id="explainer-heading">
+            Plain-language sections
+          </h2>
+          <LegalExplainerSections
+            explainer={explainer}
+            citation={snapshot.citation.canonicalCitation}
+            statusBadge={<LegalStatusBadge status={snapshot.lawStatus} />}
+          />
+        </article>
       ) : (
-        <section className="ds-section ds-record-section" aria-labelledby="pending-explainer">
+        <article className={lawEditionPanelClassName('explainer')} aria-labelledby="pending-explainer">
           <Card>
-            <h2 className="ds-section__title" id="pending-explainer">
+            <h2 className="ds-law-edition__panel-heading" id="pending-explainer">
               Plain-language explainer pending
             </h2>
             <p style={{ margin: 'var(--ds-space-3) 0 0 0' }}>
@@ -75,53 +85,51 @@ export function LawDetailSections({ snapshot, explainer }: LawDetailSectionsProp
               </a>
             </p>
           </Card>
-        </section>
+        </article>
       )}
 
-      <section
-        className="ds-section ds-record-section"
+      <article
+        className={lawEditionPanelClassName('provenance')}
         aria-labelledby="provenance-heading"
         id="provenance"
       >
-        <p className="ds-section__kicker">
-          <span className="ds-kicker-index" aria-hidden="true" />
+        <p className="ds-law-edition__panel-title">Provenance</p>
+        <h2 className="ds-law-edition__panel-heading" id="provenance-heading">
+          Archived capture
+        </h2>
+        <p className="ds-law-edition__lede">
           {humanizeLegalKind(snapshot.kind)} ·{' '}
           <span className="ds-mono">{snapshot.jurisdictionId}</span>
         </p>
-        <h2 className="ds-section__title" id="provenance-heading">
-          Archived capture
-        </h2>
-        <article className="ds-law__section-card">
-          <dl className="ds-law__provenance-dl">
-            <div className="ds-law__provenance-row">
-              <dt>Retrieved</dt>
-              <dd>{snapshot.citation.archive.retrievedAt.split('T')[0]}</dd>
-            </div>
-            <div className="ds-law__provenance-row">
-              <dt>License</dt>
-              <dd>{snapshot.citation.licenseTag}</dd>
-            </div>
-            <div className="ds-law__provenance-row">
-              <dt>Archived copy</dt>
-              <dd>
-                <a
-                  href={snapshot.citation.archive.archivedCaptureUrl}
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  View archived capture
-                </a>
-              </dd>
-            </div>
-          </dl>
-        </article>
-      </section>
+        <dl className="ds-law__provenance-dl">
+          <div className="ds-law__provenance-row">
+            <dt>Retrieved</dt>
+            <dd>{snapshot.citation.archive.retrievedAt.split('T')[0]}</dd>
+          </div>
+          <div className="ds-law__provenance-row">
+            <dt>License</dt>
+            <dd>{snapshot.citation.licenseTag}</dd>
+          </div>
+          <div className="ds-law__provenance-row">
+            <dt>Archived copy</dt>
+            <dd>
+              <a
+                href={snapshot.citation.archive.archivedCaptureUrl}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                View archived capture
+              </a>
+            </dd>
+          </div>
+        </dl>
+      </article>
 
-      <section className="ds-section ds-law__next" aria-labelledby="law-detail-next">
-        <h2 className="ds-section__title" id="law-detail-next">
+      <article className={lawEditionPanelClassName('close')} aria-labelledby="law-detail-next">
+        <h2 className="ds-law-edition__panel-heading" id="law-detail-next">
           Keep going
         </h2>
-        <p className="ds-band__cta">
+        <p className="ds-law-edition__footer-links">
           <Link className="ds-cta-link" href="/law">
             All law entries
           </Link>
@@ -130,11 +138,42 @@ export function LawDetailSections({ snapshot, explainer }: LawDetailSectionsProp
             Methodology
           </Link>
           {' · '}
-          <Link className="ds-cta-link" href="/search">
+          <Link className="ds-cta-link" href="/history">
             Search the archive
           </Link>
         </p>
-      </section>
-    </div>
+      </article>
+    </>
+  );
+}
+
+export type LawDetailIntroProps = {
+  readonly snapshot: (typeof SEED_LEGAL_SNAPSHOTS)[number];
+};
+
+export function LawDetailIntro({ snapshot }: LawDetailIntroProps) {
+  return (
+    <article className={lawEditionPanelClassName('intro')}>
+      <header className="ds-law-edition__header">
+        <span className="ds-law-edition__index" aria-hidden="true">
+          00
+        </span>
+        <div>
+          <p className="ds-law-edition__kicker">Reference</p>
+          <h1 className="ds-law-edition__title">{snapshot.title}</h1>
+          <LawAnatomyStrip
+            kind={snapshot.kind}
+            lawStatus={snapshot.lawStatus}
+            jurisdictionId={snapshot.jurisdictionId}
+            citation={snapshot.citation.canonicalCitation}
+            topics={snapshot.topics}
+          />
+          <p className="ds-law-edition__credit">
+            Archive mosaic · symbolic atmosphere · decorative gutter tiles only.{' '}
+            <Link href="/stories/mosaic-credits">Mosaic credits</Link>
+          </p>
+        </div>
+      </header>
+    </article>
   );
 }

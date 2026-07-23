@@ -48,6 +48,11 @@ export function mapSourceV1ToFeatureCollection(source: MapSourceV1): MapFeatureC
       kind: feature.properties.kind,
       displayName: feature.properties.displayName,
       precision: feature.properties.precision,
+      shade: feature.properties.shade,
+      glyph: feature.properties.glyph,
+      evidenceCount: feature.properties.evidenceCount,
+      confidenceTier: feature.properties.confidenceTier,
+      ...(feature.properties.mapTone ? { mapTone: feature.properties.mapTone } : {}),
       ...(feature.properties.stateFips ? { stateFips: feature.properties.stateFips } : {}),
       ...(feature.properties.statePostalCode
         ? { statePostalCode: feature.properties.statePostalCode }
@@ -59,6 +64,13 @@ export function mapSourceV1ToFeatureCollection(source: MapSourceV1): MapFeatureC
       ...(feature.properties.oneLineStory
         ? { oneLineStory: feature.properties.oneLineStory }
         : {}),
+      ...(feature.properties.topicTags.length > 0
+        ? { topicTags: feature.properties.topicTags }
+        : {}),
+      ...(feature.properties.topicIds && feature.properties.topicIds.length > 0
+        ? { topicIds: feature.properties.topicIds }
+        : {}),
+      ...(feature.properties.status ? { status: feature.properties.status } : {}),
     },
   }));
   return { type: 'FeatureCollection', features };

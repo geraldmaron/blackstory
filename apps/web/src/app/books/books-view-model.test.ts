@@ -8,6 +8,7 @@ import {
   BOOKS_BROWSE_PAGE_SIZE,
   buildBooksBrowseViewModel,
   buildBooksDetailViewModel,
+  buildBooksRelatedItems,
 } from './books-view-model';
 
 const SNAPSHOT = getBannedBooksListingSnapshot();
@@ -171,4 +172,23 @@ test('buildBooksDetailViewModel resolves a known slug', () => {
 test('buildBooksDetailViewModel returns not_found for unknown slug', () => {
   const view = buildBooksDetailViewModel(SNAPSHOT, 'does-not-exist');
   assert.equal(view.kind, 'not_found');
+});
+
+test('buildBooksBrowseViewModel exposes cover ISBN and challenge counts on items', () => {
+  const view = buildBooksBrowseViewModel(SNAPSHOT, { q: 'bluest' });
+  const item = view.items[0];
+  assert.ok(item);
+  assert.equal(item.slug, 'the-bluest-eye');
+  assert.equal(item.coverIsbn, '9780307278449');
+  assert.ok(item.challengeCount >= 1);
+});
+
+test('buildBooksRelatedItems returns same-author titles excluding current', () => {
+  const detail = buildBooksDetailViewModel(SNAPSHOT, 'the-bluest-eye');
+  assert.equal(detail.kind, 'ok');
+  if (detail.kind !== 'ok') return;
+  const related = buildBooksRelatedItems(SNAPSHOT, detail.book);
+  assert.ok(related.length >= 1);
+  assert.ok(related.every((item) => item.slug !== 'the-bluest-eye'));
+  assert.ok(related.some((item) => item.authorNames.includes('Toni Morrison')));
 });

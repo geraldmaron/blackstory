@@ -25,3 +25,19 @@ export {
   type ExploreFiltersPanelProps,
   type ExploreEraOption,
 } from './ExploreFiltersPanel';
+export { MapColorKey, type MapColorKeyProps } from './MapColorKey';
+export { ExploreRecordsRail, type ExploreRecordsRailProps } from './ExploreRecordsRail';
+export {
+  ExploreInstrumentsPanel,
+  type ExploreInstrumentsPanelProps,
+  type ExploreInstrumentsTab,
+} from './ExploreInstrumentsPanel';
+export {
+  ExploreEditionSegmentTabs,
+  ExploreEditionKicker,
+  ExploreFacetRow,
+  ExplorePanelHeader,
+  ExploreRestoreChip,
+  ExploreInstrumentsFrame,
+} from './explore-edition-chrome';
+export { exploreRecordFacts } from './explore-preview-facts';

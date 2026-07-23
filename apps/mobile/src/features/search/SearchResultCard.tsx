@@ -1,10 +1,21 @@
 /**
- * Search result row (MOB-013). Allow-list props only — never relevance scores.
- * Ledger anatomy: KIND · status slug, Sora title, serif explanation, optional
- * Show on map secondary action.
+ * Search / history result row (MOB-013). v6 rip-list anatomy: title, summary, and
+ * label-over-value fact strip (Kind, Era, Status). Allow-list props only.
  */
 import { StyleSheet, View } from 'react-native';
-import { Button, LedgerRow, NavIcon, navIconForEntityKind, space } from '@/ui';
+import {
+  Button,
+  LedgerRow,
+  NavIcon,
+  navIconForEntityKind,
+  RecordFactStrip,
+  space,
+} from '@/ui';
+import {
+  recordEraLabel,
+  recordKindLabel,
+  recordStatusLabel,
+} from '../record-facts/record-facts';
 import type { SearchResultV1 } from './search-contracts';
 
 export interface SearchResultCardProps {
@@ -14,6 +25,7 @@ export interface SearchResultCardProps {
   readonly summary?: string;
   readonly explanation: string;
   readonly status?: string;
+  readonly eraBuckets?: readonly string[];
   /** Mono ledger index (01, 02…). */
   readonly indexLabel?: string;
   readonly onPress?: (id: string) => void;
@@ -34,15 +46,12 @@ export function toSearchResultCardProps(
     kind: result.kind,
     displayName: result.displayName,
     explanation: result.explanation,
+    eraBuckets: result.eraBuckets,
     ...(result.summary !== undefined ? { summary: result.summary } : {}),
     ...(result.status !== undefined ? { status: result.status } : {}),
     ...(handlers.onPress ? { onPress: handlers.onPress } : {}),
     ...(handlers.onShowOnMap ? { onShowOnMap: handlers.onShowOnMap } : {}),
   };
-}
-
-function humanize(value: string): string {
-  return value.charAt(0).toUpperCase() + value.slice(1).replace(/[_-]/g, ' ');
 }
 
 export function SearchResultCard({
@@ -52,44 +61,78 @@ export function SearchResultCard({
   summary,
   explanation,
   status,
+  eraBuckets,
   indexLabel,
   onPress,
   onShowOnMap,
 }: SearchResultCardProps) {
-  const metaParts = [humanize(kind).toUpperCase(), status ? humanize(status) : null].filter(Boolean);
-  const slug = metaParts.join(' · ');
   const body = summary?.trim() || explanation;
+  const kindLabel = recordKindLabel(kind);
+  const eraLabel = recordEraLabel({ eraBuckets: eraBuckets ?? [] });
+  const statusLabel = recordStatusLabel(status);
+
+  const facts = [
+    {
+      key: 'kind',
+      label: 'Kind',
+      value: kindLabel,
+      leading: <NavIcon name={navIconForEntityKind(kind)} size={16} />,
+    },
+    {
+      key: 'era',
+      label: 'Era',
+      value: eraLabel,
+    },
+    ...(statusLabel
+      ? [
+          {
+            key: 'status',
+            label: 'Status',
+            value: statusLabel,
+          },
+        ]
+      : []),
+  ];
+
+  const accessibilitySlug = [kindLabel, eraLabel, statusLabel].filter(Boolean).join(', ');
 
   return (
-    <LedgerRow
-      title={displayName}
-      slug={slug}
-      summary={body}
-      indexLabel={indexLabel}
-      leading={<NavIcon name={navIconForEntityKind(kind)} size={20} />}
-      showChevron={Boolean(onPress)}
-      onPress={onPress ? () => onPress(id) : undefined}
-      accessibilityLabel={`${displayName}. ${slug}. ${body}`}
-      secondaryAction={
-        onShowOnMap ? (
-          <View style={styles.secondary}>
-            <Button
-              label="Show on map"
-              variant="ghost"
-              density="compact"
-              accessibilityLabel={`Show ${displayName} on map`}
-              onPress={() => onShowOnMap(id, kind)}
-            />
+    <View>
+      <LedgerRow
+        title={displayName}
+        summary={body}
+        indexLabel={indexLabel}
+        showChevron={Boolean(onPress)}
+        onPress={onPress ? () => onPress(id) : undefined}
+        accessibilityLabel={`${displayName}. ${accessibilitySlug}. ${body}`}
+        showDivider={false}
+        secondaryAction={
+          <View style={styles.factsPane}>
+            <RecordFactStrip facts={facts} />
+            {onShowOnMap ? (
+              <View style={styles.secondary}>
+                <Button
+                  label="Show on map"
+                  variant="ghost"
+                  density="compact"
+                  accessibilityLabel={`Show ${displayName} on map`}
+                  onPress={() => onShowOnMap(id, kind)}
+                />
+              </View>
+            ) : null}
           </View>
-        ) : undefined
-      }
-    />
+        }
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  factsPane: {
+    gap: space['2'],
+    marginTop: space['1'],
+  },
   secondary: {
     alignItems: 'flex-start',
-    marginTop: space['1'],
   },
 });

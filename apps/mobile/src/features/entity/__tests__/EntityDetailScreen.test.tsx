@@ -14,6 +14,7 @@ import {
   fullEntityFixture,
   minimalEntityFixture,
 } from '../testFixtures';
+import { buildIntroMetaLine } from '../sections/IntroSection';
 
 function readyState(raw: Record<string, unknown>, degraded = false): EntityDetailState {
   const entity = normalizeEntity(raw)!;
@@ -32,15 +33,17 @@ describe('EntityDetailScreen — fixture matrix across every entity kind', () =>
     const { getByTestId, getByText } = await render(<EntityDetailScreen state={readyState(fullEntityFixture(kind))} />);
     expect(getByTestId('entity-detail-screen')).toBeTruthy();
     expect(getByText(`Full Fixture Record (${kind})`)).toBeTruthy();
+    expect(getByTestId('entity-intro-section')).toBeTruthy();
   });
 
   it.each(ALL_KINDS)('renders a MINIMAL fixture for kind=%s (every optional field absent) without crashing', async (kind) => {
-    const { getByTestId, getByText } = await render(<EntityDetailScreen state={readyState(minimalEntityFixture(kind))} />);
+    const { getByTestId, getByText, queryByText } = await render(
+      <EntityDetailScreen state={readyState(minimalEntityFixture(kind))} />,
+    );
     expect(getByTestId('entity-detail-screen')).toBeTruthy();
     expect(getByText(`Minimal Fixture Record (${kind})`)).toBeTruthy();
-    // No accepted claims / no dated history gaps must render, not crash.
     expect(getByText('No accepted claims yet')).toBeTruthy();
-    expect(getByText('No dated history yet')).toBeTruthy();
+    expect(queryByText('No dated history yet')).toBeNull();
   });
 });
 
@@ -142,16 +145,10 @@ describe('EntityDetailScreen — adversarial content cases', () => {
 
   it('renders a self-referencing (cyclic) related-neighbor list flatly, exactly once each, no recursion', async () => {
     const { getAllByText } = await render(<EntityDetailScreen state={readyState(entityWithSelfReferencingNeighbor())} />);
-    // The self-referencing neighbor's display name equals the entity's own display name; it
-    // must appear exactly twice total (once as the screen title, once as the one related row),
-    // never an unbounded/looping number of times.
     expect(getAllByText('Full Fixture Record (place)')).toHaveLength(2);
   });
 
   it('renders malicious HTML/Unicode text as inert literal text, never interpreted as markup', async () => {
-    // The fixture deliberately places the same malicious payload in THREE fields
-    // (displayName/summary/historicalContext), so more than one Text node legitimately matches —
-    // proving each of those independent render sites treats it as inert text, not fewer.
     const { getAllByText } = await render(<EntityDetailScreen state={readyState(entityWithMaliciousText())} />);
     const matches = getAllByText(/<script>alert\(1\)<\/script>/);
     expect(matches.length).toBeGreaterThanOrEqual(2);
@@ -169,32 +166,34 @@ describe('EntityDetailScreen — related-entity navigation', () => {
   });
 });
 
-describe('EntityDetailScreen — visit hand-off', () => {
-  it('renders Visit with Open in Maps and Back to map when geoAnchor is present', async () => {
+describe('EntityDetailScreen — maps hand-off', () => {
+  it('renders anatomy with Open in maps and View on national map when geoAnchor is present', async () => {
     const onBackToMap = jest.fn();
-    const { getByTestId, getByLabelText, getByText } = await render(
+    const { getByTestId, getAllByLabelText, getByLabelText, getByText } = await render(
       <EntityDetailScreen state={readyState(fullEntityFixture('place'))} onBackToMap={onBackToMap} />,
     );
-    expect(getByTestId('entity-visit-section')).toBeTruthy();
-    expect(getByText(/neighborhood precision/)).toBeTruthy();
-    expect(getByLabelText(/Open Historic Dunbar neighborhood in Maps/)).toBeTruthy();
-    fireEvent.press(getByLabelText(/Back to map with Full Fixture Record \(place\) selected/));
+    expect(getByTestId('entity-anatomy-section')).toBeTruthy();
+    expect(getByText(/Location precision: Neighborhood/)).toBeTruthy();
+    expect(getAllByLabelText(/Open Historic Dunbar neighborhood in Maps/).length).toBeGreaterThan(0);
+    fireEvent.press(getByLabelText(/View Full Fixture Record \(place\) on the national map/));
     expect(onBackToMap).toHaveBeenCalledWith('ent_place_full_001');
   });
 
-  it('omits Open in Maps when there is no public geoAnchor, but still offers Back to map', async () => {
+  it('omits Open in maps when there is no public geoAnchor, but still offers View on national map', async () => {
     const onBackToMap = jest.fn();
-    const { queryByLabelText, getByLabelText } = await render(
+    const { queryByLabelText, getByLabelText, getByText } = await render(
       <EntityDetailScreen state={readyState(minimalEntityFixture('place'))} onBackToMap={onBackToMap} />,
     );
+    expect(getByText('Place not pinned')).toBeTruthy();
     expect(queryByLabelText(/Open .* in Maps/)).toBeNull();
-    fireEvent.press(getByLabelText(/Back to map with Minimal Fixture Record \(place\) selected/));
+    fireEvent.press(getByLabelText(/View Minimal Fixture Record \(place\) on the national map/));
     expect(onBackToMap).toHaveBeenCalledWith('ent_place_minimal_001');
   });
 
-  it('shows KIND · PLACE · era on the mast meta line', async () => {
+  it('shows intro meta with kind, jurisdiction, and framing label', async () => {
+    const entity = normalizeEntity(fullEntityFixture('place'))!;
     const { getByText } = await render(<EntityDetailScreen state={readyState(fullEntityFixture('place'))} />);
-    expect(getByText('Place · Dunbar County, GA · Reconstruction')).toBeTruthy();
+    expect(getByText(buildIntroMetaLine(entity))).toBeTruthy();
   });
 });
 
@@ -216,5 +215,18 @@ describe('EntityDetailScreen — dense claims expand', () => {
       fireEvent.press(getByLabelText('Show 1 more claims'));
     });
     expect(getByText('Third claim body.')).toBeTruthy();
+  });
+});
+
+describe('EntityDetailScreen — v6 edition beats', () => {
+  it('renders numbered edition panels for intro, anatomy, and provenance', async () => {
+    const { getByTestId, getByText } = await render(
+      <EntityDetailScreen state={readyState(fullEntityFixture('place'))} />,
+    );
+    expect(getByTestId('entity-intro-section')).toBeTruthy();
+    expect(getByTestId('entity-anatomy-section')).toBeTruthy();
+    expect(getByTestId('entity-provenance-section')).toBeTruthy();
+    expect(getByText('RECORD')).toBeTruthy();
+    expect(getByText('Record maturity and revision')).toBeTruthy();
   });
 });

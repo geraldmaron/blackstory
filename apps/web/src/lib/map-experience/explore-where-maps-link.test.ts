@@ -7,6 +7,7 @@ import { listPublicEntities } from '../../data/public-seed';
 import { buildExploreMapSource } from './build-explore-map-source';
 import { exploreWhereMapsLink } from './explore-where-maps-link';
 import type { ExploreMapFeature } from './build-explore-map-source';
+import { kindFamilyFor } from './kind-encoding';
 
 describe('exploreWhereMapsLink', () => {
   it('prefers locationLabel over state postal code for the Where chip', () => {
@@ -46,6 +47,7 @@ describe('exploreWhereMapsLink', () => {
         topicTags: [],
         shade: 'copper',
         glyph: 'circle',
+        kindFamily: kindFamilyFor('movement'),
         statePostalCode: 'NY',
         stateName: 'New York',
       },

@@ -226,6 +226,18 @@ const config: ExpoConfig = {
     config: {
       usesNonExemptEncryption: false,
     },
+    // Dev/preview: allow http://127.0.0.1:8080 (simulator) and LAN api-public.
+    // Without this, iOS ATS blocks cleartext API traffic and bootstrap/map/search
+    // look like "no data" even when api-public is running locally.
+    ...(APP_VARIANT !== 'production'
+      ? {
+          infoPlist: {
+            NSAppTransportSecurity: {
+              NSAllowsLocalNetworking: true,
+            },
+          },
+        }
+      : {}),
     //
     // Universal Links (MOB-008): production-only. Omit the key entirely for
     // development/preview — an empty `associatedDomains: []` still makes Expo
@@ -245,6 +257,9 @@ const config: ExpoConfig = {
       monochromeImage: './assets/images/android-icon-monochrome.png',
     },
     predictiveBackGestureEnabled: false,
+    // Dev/preview: permit http API origins (127.0.0.1 / LAN api-public). Emulator
+    // uses http://10.0.2.2:8080 to reach the host machine's :8080.
+    ...(APP_VARIANT !== 'production' ? { usesCleartextTraffic: true } : {}),
     //
     // Android App Links (MOB-008), the Android analogue of iOS associatedDomains above:
     // autoVerify asks Android to verify this app against the real assetlinks.json served

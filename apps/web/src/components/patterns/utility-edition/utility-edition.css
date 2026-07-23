@@ -1,0 +1,135 @@
+/**
+ * Utility v6 edition scaffold: theme-aware Surface card stack for compact public
+ * pages (locate, submit, corrections, status, not-found). Atmosphere from
+ * edition-atmosphere.css.
+ */
+
+@import '../edition-atmosphere/edition-atmosphere.css';
+
+.ds-utility-edition {
+  position: relative;
+  min-height: 100%;
+}
+
+.ds-utility-edition [id] {
+  scroll-margin-top: var(--ds-island-clearance);
+}
+
+.ds-utility-edition__stack {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-5);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding-block: 0 var(--ds-space-16);
+}
+
+@media (max-width: 47.9375rem) {
+  .ds-utility-edition__stack {
+    gap: var(--ds-space-4);
+    padding-block: 0 var(--ds-space-12);
+  }
+}
+
+.ds-utility-edition__panel {
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface-raised);
+  padding: var(--ds-space-5);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.ds-utility-edition__panel--intro {
+  padding-bottom: calc(var(--ds-space-5) + var(--ds-space-2));
+}
+
+.ds-utility-edition__panel--status {
+  background: color-mix(in srgb, var(--ds-canvas) 88%, var(--ds-rule));
+}
+
+[data-theme='dark'] .ds-utility-edition__panel--status {
+  background: color-mix(in srgb, var(--ds-canvas) 72%, var(--ds-surface-raised));
+}
+
+.ds-utility-edition__header {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: clamp(1.5rem, 3vw, 2.75rem);
+  row-gap: var(--ds-space-3);
+  align-items: start;
+}
+
+.ds-utility-edition__panel--intro .ds-utility-edition__header {
+  padding-bottom: var(--ds-space-5);
+  margin-bottom: var(--ds-space-4);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-utility-edition__index {
+  min-width: 2.75ch;
+  padding-right: var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--ds-accent-graphic);
+  letter-spacing: -0.03em;
+}
+
+.ds-utility-edition__kicker {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+}
+
+.ds-utility-edition__title {
+  margin: var(--ds-space-2) 0 0;
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: clamp(1.375rem, 1.15rem + 0.8vw, 2rem);
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+  color: var(--ds-ink);
+}
+
+.ds-utility-edition__title em {
+  font-family: var(--ds-font-editorial);
+  font-style: italic;
+  color: var(--ds-accent);
+  font-weight: 400;
+}
+
+.ds-utility-edition__lede {
+  margin: var(--ds-space-3) 0 0;
+  max-width: 54ch;
+  font-family: var(--ds-font-editorial);
+  font-size: clamp(1rem, 0.98rem + 0.15vw, 1.0625rem);
+  line-height: 1.6;
+  color: var(--ds-ink-muted);
+}
+
+.ds-utility-edition__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-4);
+  min-width: 0;
+}
+
+.ds-utility-edition__body > :first-child {
+  margin-top: 0;
+}
+
+.ds-utility-edition a:focus-visible,
+.ds-utility-edition button:focus-visible {
+  outline: var(--ds-focus-ring-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-ring-offset);
+}

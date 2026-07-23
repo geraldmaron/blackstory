@@ -1,14 +1,14 @@
 /**
- * Story-shaped section index (`/learn/history`, `/learn/topics`, `/learn/myths`): compact ledger
- * list instead of generic ListRows — matches web `/stories` index density.
+ * Story-shaped section index (`/learn/history`, `/learn/topics`, `/learn/myths`): v6 Surface
+ * edition stack with indexed header and compact ledger rows with fact strips.
  */
 import { ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import {
+  EditionSurfacePanel,
+  EditionSurfaceStack,
   LiftedSurface,
   ScreenCanvas,
-  ScreenHeader,
-  SectionHeader,
   screenScrollInsets,
 } from '@/ui';
 import type { LearnMoreSectionRow } from './sections';
@@ -31,26 +31,36 @@ export function StorySectionIndexScreen({ section }: StorySectionIndexScreenProp
           paddingHorizontal: screenScrollInsets.paddingHorizontal,
           paddingTop: screenScrollInsets.paddingTop,
           paddingBottom: screenScrollInsets.paddingBottom,
-          gap: screenScrollInsets.gap,
         }}
       >
-        <ScreenHeader
-          kicker="Archive"
-          title={section.title}
-          dek={section.subtitle}
-          compact
-        />
-        <SectionHeader title="Stories" meta={countLabel} headingScale="bodyEmphasis" />
-        <LiftedSurface tone="surface" shadow="none">
-          {entries.map((entry, index) => (
-            <StoryCompactRow
-              key={entry.page.slug}
-              entry={entry}
-              onPress={() => router.push(storyHref(entry) as never)}
-              showDivider={index < entries.length - 1}
-            />
-          ))}
-        </LiftedSurface>
+        <EditionSurfaceStack>
+          <EditionSurfacePanel
+            index="00"
+            kicker="Archive"
+            title={section.title}
+            dek={section.subtitle}
+            compact
+          />
+
+          <EditionSurfacePanel
+            index="01"
+            kicker="Catalog"
+            title="Published stories"
+            panelMeta={countLabel}
+          >
+            <LiftedSurface tone="surfaceRaised" shadow="none">
+              {entries.map((entry, index) => (
+                <StoryCompactRow
+                  key={entry.page.slug}
+                  entry={entry}
+                  indexLabel={String(index + 1).padStart(2, '0')}
+                  onPress={() => router.push(storyHref(entry) as never)}
+                  showDivider={index < entries.length - 1}
+                />
+              ))}
+            </LiftedSurface>
+          </EditionSurfacePanel>
+        </EditionSurfaceStack>
       </ScrollView>
     </ScreenCanvas>
   );

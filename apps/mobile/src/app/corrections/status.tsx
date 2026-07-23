@@ -12,7 +12,6 @@
  * the lookup. It is pre-filled (best effort) from SecureStore, not from a URL.
  */
 import { useEffect, useMemo, useState } from 'react';
-import { View } from 'react-native';
 
 import {
   CorrectionStatusView,
@@ -22,6 +21,7 @@ import {
   type CorrectionClientDeps,
   type StatusResult,
 } from '@/features/corrections';
+import { UtilityScreenShell } from '@/ui';
 
 export default function CorrectionsStatusScreen() {
   const depsPromise = useMemo(() => createCorrectionClientDeps(), []);
@@ -49,8 +49,12 @@ export default function CorrectionsStatusScreen() {
   }
 
   return (
-    <View style={{ flex: 1 }}>
+    <UtilityScreenShell
+      kicker="Trust"
+      title="Correction status"
+      dek="Enter the receipt code you saved when you submitted a correction."
+    >
       <CorrectionStatusView initialCode={initialCode} onLookup={handleLookup} />
-    </View>
+    </UtilityScreenShell>
   );
 }

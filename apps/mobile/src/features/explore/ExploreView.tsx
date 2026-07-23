@@ -1,7 +1,7 @@
 /**
- * The flagship Explore experience (MOB-012): full-bleed native map + floating
- * instruments + bottom-sheet metrics dashboard (with secondary record list) and
- * entity preview on pin selection, composed on top of MOB-011's `MapScreen`.
+ * The flagship Explore experience (MOB-012): full-bleed native map + v6 floating
+ * instruments + records rail bottom sheet and entity preview on pin selection,
+ * composed on top of MOB-011's `MapScreen`.
  *
  * This component is deliberately ROUTER-FREE and side-effect-light: the Expo
  * Router route (`app/(tabs)/explore.tsx`) reads/validates params and supplies
@@ -11,16 +11,15 @@
  * the no-focus-theft architecture); this component only wires views to it.
  *
  * Failure posture (ADR-024 §7 / bead requirement): when the map is in an error
- * state, `MapScreen` renders the degraded `ErrorState` and the metrics sheet
+ * state, `MapScreen` renders the degraded `ErrorState` and the records rail
  * remains fully mounted and interactive — a failed map never strands the reader.
  */
-import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { ApiStatusBanner, ScreenCanvas } from '@/ui';
 import {
   MapAttribution,
   MapScreen,
-  MAP_ATTRIBUTION_ABOVE_SHEET_BOTTOM,
   type MapFeatureCollection,
   type MapLoadState,
 } from '@/features/map';
@@ -28,20 +27,22 @@ import { DEMO_MAP_SOURCE } from '@/features/map';
 import { EntityPreviewSheet } from '@/features/map/explore';
 import {
   ExploreBottomSheet,
+  EXPLORE_SHEET_FULL,
   EXPLORE_SHEET_HALF,
   EXPLORE_SHEET_PEEK,
+  EXPLORE_SHEET_PEEK_HEIGHT,
 } from '@/features/map/explore/ExploreBottomSheet';
 import { ExploreFloatingChrome } from '@/features/map/explore/ExploreFloatingChrome';
+import { ExploreInstrumentsPanel } from '@/features/map/explore/ExploreInstrumentsPanel';
+import { ExploreRecordsRail } from '@/features/map/explore/ExploreRecordsRail';
 import { ExploreListChrome } from '@/features/map/explore/explore-chrome';
-import type { FilterState } from '@/app/_lib/route-params';
+import type { FilterState } from '@/lib/route-params';
 import {
   exploreReducer,
   initialExploreState,
   visibleFeatures,
 } from './explore-controller';
 import { toExploreFeatures } from './explore-feature';
-import { countMatches } from './explore-filter';
-import { ExploreMetricsDashboard } from './metrics';
 import { parseRestoredSelection } from './selection';
 import { useReduceMotion } from './useReduceMotion';
 
@@ -54,17 +55,21 @@ export type ExploreViewProps = {
   readonly selectedParam?: unknown;
   /** Injected map load/failure state; defaults to ready. */
   readonly loadState?: MapLoadState;
+  /** True when bundled demo fixtures back the map (`__DEV__` fallback only). */
+  readonly usingDemo?: boolean;
   /** Retry callback for map-data / basemap failure states. */
   readonly onRetryMap?: () => void;
   /** Reduced-motion override (defaults to the OS setting). */
   readonly reduceMotion?: boolean;
   /** Navigate to the full entity route (MOB-014 owns its content). */
   readonly onOpenEntity: (entityId: string) => void;
-  /** Open the filter sheet modal. */
-  readonly onOpenFilters: () => void;
+  /** Optional — open filter modal (legacy fallback). */
+  readonly onOpenFilters?: () => void;
+  /** Optional — open color key modal (legacy fallback). */
+  readonly onOpenColorKey?: () => void;
   /** Optional — Agent C wires Search tab / route. */
   readonly onOpenSearch?: () => void;
-  /** Optional — notify the route when filter state should sync to the URL. */
+  /** Notify the route when filter state should sync to the URL. */
   readonly onFiltersChange?: (filters: FilterState) => void;
   /** Optional — notify the route when selection should sync to `selected`. */
   readonly onSelectionChange?: (entityId: string | null) => void;
@@ -75,12 +80,14 @@ export function ExploreView({
   filters = {},
   selectedParam,
   loadState = { kind: 'ready' },
+  usingDemo = false,
   onRetryMap,
   reduceMotion: reduceMotionProp,
   onOpenEntity,
-  onOpenFilters,
+  onOpenFilters: _onOpenFilters,
+  onOpenColorKey: _onOpenColorKey,
   onOpenSearch,
-  onFiltersChange: _onFiltersChange,
+  onFiltersChange,
   onSelectionChange,
 }: ExploreViewProps) {
   const osReduceMotion = useReduceMotion();
@@ -88,21 +95,18 @@ export function ExploreView({
 
   const allFeatures = useMemo(() => toExploreFeatures(source), [source]);
   const [state, dispatch] = useReducer(exploreReducer, filters, initialExploreState);
+  const [instrumentsOpen, setInstrumentsOpen] = useState(false);
+  const [recordsExpanded, setRecordsExpanded] = useState(false);
+  const [manualSnapIndex, setManualSnapIndex] = useState(EXPLORE_SHEET_PEEK);
 
-  // Keep the reducer's filters in sync with the (validated) route params. Changing
-  // filters is deterministic and updates the result count, but never moves the map.
   useEffect(() => {
     dispatch({ type: 'filtersChanged', filters });
   }, [filters]);
 
-  // Reconcile the selection whenever the population changes (release swap /
-  // withdrawal): a selection whose entity has disappeared is dropped gracefully.
   useEffect(() => {
     dispatch({ type: 'availableReconciled', available: allFeatures });
   }, [allFeatures]);
 
-  // Restore a shared/deep-linked selection safely on mount (and if the param or
-  // population changes): validated id + must still exist, else no selection.
   useEffect(() => {
     const restored = parseRestoredSelection(selectedParam, allFeatures);
     if (restored.selectedId) {
@@ -113,8 +117,6 @@ export function ExploreView({
     }
   }, [selectedParam, allFeatures]);
 
-  // Mirror selection to the route when Agent C supplies a callback. Skip the
-  // first paint so we do not clear a deep-linked `selected` before restore runs.
   const selectionNotifyReady = useRef(false);
   useEffect(() => {
     if (!selectionNotifyReady.current) {
@@ -125,31 +127,76 @@ export function ExploreView({
   }, [state.selectedId, onSelectionChange]);
 
   const listFeatures = useMemo(() => visibleFeatures(allFeatures, state), [allFeatures, state]);
-  const matchCount = useMemo(() => countMatches(allFeatures, filters), [allFeatures, filters]);
-  const metricsScopeLabel = state.viewport ? 'In view' : 'All records';
-  const [sheetSnapIndex, setSheetSnapIndex] = useState(EXPLORE_SHEET_PEEK);
-  // Attribution stays on the map at peek; hide at half/full so it never covers sheet content.
-  const attributionVisible = sheetSnapIndex <= EXPLORE_SHEET_PEEK;
+  const scopeLabel = state.viewport ? 'In view' : 'All records';
+  const sheetSnapIndex = state.selectedId
+    ? EXPLORE_SHEET_HALF
+    : recordsExpanded
+      ? EXPLORE_SHEET_FULL
+      : manualSnapIndex;
+  const attributionVisible = sheetSnapIndex <= EXPLORE_SHEET_PEEK && !instrumentsOpen;
 
   const selectedFeature = state.selectedId
     ? allFeatures.find((f) => f.entityId === state.selectedId) ?? null
     : null;
 
-  // Keep snap index aligned with AppBottomSheet's expanded prop (selection → half).
-  useEffect(() => {
-    setSheetSnapIndex(selectedFeature ? EXPLORE_SHEET_HALF : EXPLORE_SHEET_PEEK);
-  }, [selectedFeature]);
+  const selectedIndex = selectedFeature
+    ? listFeatures.findIndex((f) => f.entityId === selectedFeature.entityId)
+    : -1;
 
   const cameraCommand = state.cameraCommand
     ? { ...state.cameraCommand }
     : null;
 
   const showDemoHint =
-    typeof __DEV__ !== 'undefined' && __DEV__ && source === DEMO_MAP_SOURCE;
+    typeof __DEV__ !== 'undefined' &&
+    __DEV__ &&
+    (usingDemo || source === DEMO_MAP_SOURCE);
+
+  const handleToggleInstruments = useCallback(() => {
+    setInstrumentsOpen((open) => {
+      const next = !open;
+      if (next) {
+        setRecordsExpanded(false);
+        setManualSnapIndex(EXPLORE_SHEET_PEEK);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleToggleRecords = useCallback(() => {
+    setRecordsExpanded((expanded) => {
+      const next = !expanded;
+      if (next) {
+        setInstrumentsOpen(false);
+      } else {
+        setManualSnapIndex(EXPLORE_SHEET_PEEK);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleFiltersChange = useCallback(
+    (next: FilterState) => {
+      onFiltersChange?.(next);
+    },
+    [onFiltersChange],
+  );
+
+  const handleBrowsePrevious = useCallback(() => {
+    if (selectedIndex <= 0 || listFeatures.length === 0) return;
+    const prev = listFeatures[selectedIndex - 1]!;
+    dispatch({ type: 'entitySelected', entityId: prev.entityId, point: prev.coordinates });
+  }, [listFeatures, selectedIndex]);
+
+  const handleBrowseNext = useCallback(() => {
+    if (selectedIndex < 0 || selectedIndex >= listFeatures.length - 1) return;
+    const next = listFeatures[selectedIndex + 1]!;
+    dispatch({ type: 'entitySelected', entityId: next.entityId, point: next.coordinates });
+  }, [listFeatures, selectedIndex]);
 
   return (
     <ScreenCanvas edges={['top', 'left', 'right']}>
-      <ApiStatusBanner />
+      <ApiStatusBanner compact />
 
       <View style={styles.mapArea} testID="explore-map-area" pointerEvents="box-none">
         <MapScreen
@@ -164,48 +211,77 @@ export function ExploreView({
           onFeaturePress={(entityId) => {
             const feature = allFeatures.find((f) => f.entityId === entityId);
             if (feature) {
+              setInstrumentsOpen(false);
               dispatch({ type: 'entitySelected', entityId, point: feature.coordinates });
             }
           }}
         />
 
-        {/* Sibling of MapScreen so z-order is under sheet/chrome (not nested with MapLibre). */}
         <MapAttribution
-          bottom={MAP_ATTRIBUTION_ABOVE_SHEET_BOTTOM}
+          bottom={EXPLORE_SHEET_PEEK_HEIGHT}
           visible={attributionVisible}
         />
 
         <ExploreFloatingChrome
-          matchCount={matchCount}
+          visibleCount={listFeatures.length}
+          scopeLabel={scopeLabel}
           filters={filters}
           showDemoHint={showDemoHint}
-          onOpenFilters={onOpenFilters}
+          instrumentsOpen={instrumentsOpen}
+          recordsExpanded={recordsExpanded || sheetSnapIndex >= EXPLORE_SHEET_HALF}
+          onToggleInstruments={handleToggleInstruments}
+          onToggleRecords={handleToggleRecords}
           onOpenSearch={onOpenSearch}
           onNationalView={() => dispatch({ type: 'presetRequested', preset: 'national' })}
         />
 
+        {instrumentsOpen ? (
+          <View style={styles.instrumentsOverlay} pointerEvents="box-none">
+            <ExploreInstrumentsPanel
+              filters={filters}
+              features={allFeatures}
+              onFiltersChange={handleFiltersChange}
+              onHide={() => setInstrumentsOpen(false)}
+              onOpenPlaceFind={onOpenSearch}
+            />
+          </View>
+        ) : null}
+
         <ExploreBottomSheet
+          snapIndex={sheetSnapIndex}
           hasSelection={Boolean(selectedFeature)}
           reduceMotion={reduceMotion}
-          onSnapIndexChange={setSheetSnapIndex}
+          onSnapIndexChange={(index) => {
+            setManualSnapIndex(index);
+            if (index >= EXPLORE_SHEET_HALF) {
+              setRecordsExpanded(true);
+            }
+            if (index === EXPLORE_SHEET_PEEK && !selectedFeature) {
+              setRecordsExpanded(false);
+            }
+          }}
         >
           {selectedFeature ? (
             <EntityPreviewSheet
               feature={selectedFeature}
               onOpenEntity={onOpenEntity}
               onClose={() => dispatch({ type: 'entityDeselected' })}
+              onBrowsePrevious={handleBrowsePrevious}
+              onBrowseNext={handleBrowseNext}
+              browsePosition={
+                selectedIndex >= 0
+                  ? { index: selectedIndex, total: listFeatures.length }
+                  : undefined
+              }
             />
           ) : (
-            <ExploreListChrome testID="explore-metrics-area">
-              <ExploreMetricsDashboard
+            <ExploreListChrome testID="explore-records-area">
+              <ExploreRecordsRail
                 features={listFeatures}
-                nationalFeatures={state.viewport ? allFeatures : undefined}
-                scopeLabel={metricsScopeLabel}
                 selectedId={state.selectedId}
-                reduceMotion={reduceMotion}
-                onOpenSearch={onOpenSearch}
+                scopeLabel={scopeLabel}
                 onUserScroll={() => dispatch({ type: 'listScrolled' })}
-                onSelectFeature={(feature) =>
+                onSelect={(feature) =>
                   dispatch({
                     type: 'entitySelected',
                     entityId: feature.entityId,
@@ -223,4 +299,12 @@ export function ExploreView({
 
 const styles = StyleSheet.create({
   mapArea: { flex: 1, position: 'relative' },
+  instrumentsOverlay: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 52,
+    bottom: EXPLORE_SHEET_PEEK_HEIGHT,
+    zIndex: 4,
+  },
 });

@@ -24,6 +24,7 @@ import {
   aggregateDecadePresence,
   type StateAggregateCount,
 } from '@repo/domain/map/decade-presence';
+import { calendarDecadeStartYear } from '@repo/domain/era';
 import { US_STATES } from '@repo/domain/map/geography';
 import {
   buildStateBlackPopulationDensityLevels,
@@ -219,9 +220,10 @@ export function buildDecadeFlowFrames(
     ? undefined
     : buildActiveDensityByDecade(collection.features);
 
+  const maxDecadeStart = calendarDecadeStartYear();
   const frames: DecadeFlowFrame[] = [];
   // Newest first so autoplay and the rail both read new → old.
-  for (const start of [...decadeStarts].sort((a, b) => b - a)) {
+  for (const start of [...decadeStarts].filter((year) => year <= maxDecadeStart).sort((a, b) => b - a)) {
     const label = `${start}s`;
     const vintage = String(start);
     const cumulative = collection.features.filter((feature) => {

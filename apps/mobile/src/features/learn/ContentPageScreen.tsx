@@ -1,13 +1,19 @@
 /**
- * Full content-page screen body (MOB-015): wires `useContentPage` (real cache/connectivity) →
- * `normalizeContentPage` (allowlisted-schema defense) → `ContentRenderer` (presentation). Used by
- * both `/learn/[section]/index.tsx` (single-page sections) and `/learn/[section]/[slug].tsx`
- * (multi-page sections). Sets the stack `headerTitle` from the page title — never a route pattern.
+ * Full content-page screen body (MOB-015): v6 Surface edition stack with indexed intro panel
+ * and raised body panel. Wires `useContentPage` through `ContentRenderer`.
  */
 import { useNavigation } from 'expo-router';
 import { useLayoutEffect } from 'react';
 import { ScrollView } from 'react-native';
-import { EmptyState, ErrorState, ScreenCanvas, space } from '@/ui';
+import {
+  EditionSurfacePanel,
+  EditionSurfaceStack,
+  EmptyState,
+  ErrorState,
+  LiftedSurface,
+  ScreenCanvas,
+  screenScrollInsets,
+} from '@/ui';
 import { normalizeTypedContentPage } from './content-blocks';
 import type { CatalogSectionId } from './content-catalog';
 import { ContentRenderer } from './ContentRenderer';
@@ -18,14 +24,7 @@ import { useContentPage } from './useContentPage';
 export interface ContentPageScreenProps {
   readonly section: CatalogSectionId;
   readonly slug: string;
-  /**
-   * The most recently known bootstrap content-version, when available. `undefined` today (see
-   * `legal-version.ts`'s doc comment — no live endpoint exposes this to mobile yet); left as an
-   * explicit prop so wiring a real bootstrap-derived value later is a call-site change, not a
-   * screen rewrite.
-   */
   readonly currentContentVersion?: string;
-  /** Fallback stack title while loading / on error (e.g. "Story", "Methodology"). */
   readonly fallbackTitle?: string;
 }
 
@@ -63,11 +62,11 @@ export function ContentPageScreen({
   return (
     <ScreenCanvas edges={['left', 'right', 'bottom']}>
       <ScrollView
-        contentContainerStyle={
-          longform
-            ? { paddingHorizontal: space['5'], paddingVertical: space['6'], paddingBottom: space['12'] }
-            : { padding: space['4'] }
-        }
+        contentContainerStyle={{
+          paddingHorizontal: screenScrollInsets.paddingHorizontal,
+          paddingTop: screenScrollInsets.paddingTop,
+          paddingBottom: screenScrollInsets.paddingBottom,
+        }}
       >
         {state.status === 'loading' ? (
           <EmptyState title="Loading…" />
@@ -87,17 +86,38 @@ export function ContentPageScreen({
               return <ErrorState title="This page could not be displayed" />;
             }
             const versionStale = isContentVersionStale(state.value.contentVersion, currentContentVersion);
+            const facts = [
+              ...(page.eraLabel ? [{ key: 'era', label: 'Era', value: page.eraLabel }] : []),
+              ...(page.placeLabel ? [{ key: 'where', label: 'Where', value: page.placeLabel }] : []),
+            ];
+
             return (
-              <ContentRenderer
-                page={page}
-                blocks={blocks}
-                skippedSections={skippedSections}
-                sources={state.value.sources}
-                requiresCitation={state.value.requiresCitation}
-                presentation={longform ? 'longform' : 'document'}
-                cached={{ fetchedAt: state.fetchedAt, degraded: state.degraded }}
-                versionStale={versionStale}
-              />
+              <EditionSurfaceStack>
+                <EditionSurfacePanel
+                  index="00"
+                  kicker={longform ? 'Longform' : 'Document'}
+                  title={page.title}
+                  dek={page.dek}
+                  compact
+                />
+
+                <EditionSurfacePanel index="01" kicker="Body" title="Read">
+                  <LiftedSurface tone="surfaceRaised" shadow="none" paddingKey={longform ? '5' : '4'}>
+                    <ContentRenderer
+                      page={page}
+                      blocks={blocks}
+                      skippedSections={skippedSections}
+                      sources={state.value.sources}
+                      requiresCitation={state.value.requiresCitation}
+                      presentation={longform ? 'longform' : 'document'}
+                      cached={{ fetchedAt: state.fetchedAt, degraded: state.degraded }}
+                      versionStale={versionStale}
+                      headerFacts={facts}
+                      hideTitle
+                    />
+                  </LiftedSurface>
+                </EditionSurfacePanel>
+              </EditionSurfaceStack>
             );
           })()
         )}

@@ -5,8 +5,10 @@
 import React from 'react';
 import type { ThemeImpactPacketView } from '@repo/domain';
 import { groupThemeImpactMetricSeries } from '../../lib/theme-impact/storytelling-series';
+import { ThemeImpactEmptyNotice } from './ThemeImpactEmptyNotice';
 import { ThemeImpactGapBannerList } from './ThemeImpactGapBanner';
 import { ThemeImpactPolicyEraTimeline } from './ThemeImpactPolicyEraTimeline';
+import { THEME_IMPACT_MISSING_VALUE_LABEL } from './theme-impact-copy';
 
 export type ThemeImpactStorytellingPanelProps = {
   readonly packet: ThemeImpactPacketView;
@@ -27,11 +29,11 @@ export function ThemeImpactStorytellingPanel({
       aria-labelledby={headingId}
       data-question-id={packet.questionId}
     >
-      <h2 className="ds-section__title" id={headingId}>
-        Era context &amp; indicators
+      <h2 className="ds-theme-impact__storytelling-title" id={headingId}>
+        Era context and indicators
       </h2>
-      <p className="ds-section__lede">
-        Question {packet.questionId} — {packet.geography.label}. Live warehouse readings when
+      <p className="ds-theme-impact__storytelling-lede">
+        Question {packet.questionId} · {packet.geography.label}. Live warehouse readings when
         available; single-period snapshots and partial year coverage are labeled explicitly.
       </p>
 
@@ -48,11 +50,13 @@ export function ThemeImpactStorytellingPanel({
         </h3>
         <p className="ds-theme-impact__summary">
           {seriesGroups.length === 0
-            ? 'No statistical observations loaded for this packet yet.'
-            : `${seriesGroups.length} metric group${seriesGroups.length === 1 ? '' : 's'} — ${timeSeriesCount} with multiple reference periods, ${snapshotCount} snapshot${snapshotCount === 1 ? '' : 's'}.`}
+            ? null
+            : `${seriesGroups.length} metric group${seriesGroups.length === 1 ? '' : 's'} · ${timeSeriesCount} with multiple reference periods, ${snapshotCount} snapshot${snapshotCount === 1 ? '' : 's'}.`}
         </p>
 
-        {seriesGroups.length > 0 ? (
+        {seriesGroups.length === 0 ? (
+          <ThemeImpactEmptyNotice kind="indicators" />
+        ) : (
           <ul className="ds-theme-impact__metric-series-list">
             {seriesGroups.map((group) => (
               <li key={group.metricId} className="ds-theme-impact__metric-series-group">
@@ -80,7 +84,7 @@ export function ThemeImpactStorytellingPanel({
                 ) : (
                   <p className="ds-theme-impact__metric-series-snapshot">
                     <span className="ds-mono ds-theme-impact__metric-value">
-                      {group.points[0]?.value ?? '—'}
+                      {group.points[0]?.value ?? THEME_IMPACT_MISSING_VALUE_LABEL}
                     </span>
                     {group.points[0]?.referencePeriod ? (
                       <span className="ds-mono ds-theme-impact__metric-period">
@@ -96,7 +100,7 @@ export function ThemeImpactStorytellingPanel({
               </li>
             ))}
           </ul>
-        ) : null}
+        )}
       </section>
 
       {packet.derived.length > 0 ? (

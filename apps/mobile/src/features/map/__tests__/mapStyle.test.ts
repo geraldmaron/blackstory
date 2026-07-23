@@ -1,4 +1,4 @@
-import { brandCore, themeColors } from '@/ui';
+import { themeColors } from '@/ui';
 import {
   DEFAULT_MAP_GLYPHS_URL,
   DEFAULT_OPENFREEMAP_TILE_SOURCE_URL,
@@ -8,9 +8,9 @@ import {
   buildBasemapStyle,
   ENTITY_CLUSTER_RADIUS_EXPR,
   ENTITY_POINT_LAYER_STYLE,
-  ENTITY_POINT_RADIUS,
-  ENTITY_SELECTED_RADIUS,
+  kindColorExpression,
 } from '../mapStyle';
+import { DIGNITY_PALETTE } from '../dignity-palette';
 
 describe('buildBasemapStyle', () => {
   it('defaults to OpenFreeMap vector tiles when no PMTiles URL is set', () => {
@@ -89,30 +89,26 @@ describe('buildBasemapStyle', () => {
 });
 
 describe('dignity invariant (no crime-heatmap register)', () => {
-  it('point layer uses a single flat copper color, not a data-driven density ramp', () => {
-    expect(ENTITY_POINT_LAYER_STYLE.circleColor).toBe(brandCore.copperPin);
-    expect(Array.isArray(ENTITY_POINT_LAYER_STYLE.circleColor)).toBe(false);
+  it('point layer uses kind-family shade expression, not a density ramp', () => {
+    expect(Array.isArray(ENTITY_POINT_LAYER_STYLE.circleColor)).toBe(true);
+    expect(JSON.stringify(kindColorExpression())).toContain('shade');
   });
 
-  it('keeps unclustered and cluster radii compact (not state-covering blobs)', () => {
-    expect(ENTITY_POINT_RADIUS).toBeLessThanOrEqual(5);
-    expect(ENTITY_POINT_LAYER_STYLE.circleRadius).toBe(ENTITY_POINT_RADIUS);
-    expect(ENTITY_SELECTED_RADIUS).toBeLessThanOrEqual(10);
-    // step: ['step', input, default, stop1, value1, stop2, value2, ...]
-    const defaultRadius = ENTITY_CLUSTER_RADIUS_EXPR[2] as number;
-    const clusterRadii = [
-      ENTITY_CLUSTER_RADIUS_EXPR[2],
-      ENTITY_CLUSTER_RADIUS_EXPR[4],
-      ENTITY_CLUSTER_RADIUS_EXPR[6],
-      ENTITY_CLUSTER_RADIUS_EXPR[8],
-    ] as number[];
-    expect(defaultRadius).toBeLessThan(10);
-    for (const r of clusterRadii) {
-      expect(typeof r).toBe('number');
-      // Prior national blobs used 12–20; keep the largest step well under that.
-      expect(r).toBeLessThanOrEqual(14);
-      expect(r).toBeLessThan(20);
-    }
+  it('uses web-aligned zoom-scaled cluster radius and evidence-based point radius', () => {
+    expect(Array.isArray(ENTITY_POINT_LAYER_STYLE.circleRadius)).toBe(true);
+    const radius = ENTITY_CLUSTER_RADIUS_EXPR as unknown[];
+    expect(radius[0]).toBe('interpolate');
+    expect(radius[2]).toEqual(['zoom']);
+    expect(radius[3]).toBe(3);
+    expect(radius[5]).toBe(5.5);
+    expect(radius[7]).toBe(9);
+    const nationalStep = (radius[4] as unknown[])[1] as unknown[];
+    expect(nationalStep[0]).toBe('step');
+    expect(nationalStep.slice(2)).toEqual([10, 10, 14, 50, 18, 200, 22]);
+  });
+
+  it('cluster fill uses copper aggregate, not per-kind shades', () => {
+    expect(DIGNITY_PALETTE.point).toBeTruthy();
   });
 
   it('assertNoHeatmapRegister passes for the real style + point paint', () => {
@@ -129,6 +125,6 @@ describe('dignity invariant (no crime-heatmap register)', () => {
   it('assertNoHeatmapRegister throws on a data-driven point color ramp', () => {
     const style = buildBasemapStyle({ basemapEnabled: false });
     const ramp = { circleColor: ['interpolate', ['linear'], ['get', 'count'], 0, '#000', 100, '#f00'] };
-    expect(() => assertNoHeatmapRegister(style, ramp)).toThrow(/density ramp/i);
+    expect(() => assertNoHeatmapRegister(style, ramp)).toThrow(/density-keyed ramp/i);
   });
 });

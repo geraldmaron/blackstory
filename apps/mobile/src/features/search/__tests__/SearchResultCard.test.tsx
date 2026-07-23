@@ -33,7 +33,7 @@ describe('toSearchResultCardProps — allow-list mapping negative test (MOB-013 
     expect(props).not.toHaveProperty('rank');
     expect(props).not.toHaveProperty('claimCount');
     expect(props).not.toHaveProperty('score');
-    expect(Object.keys(props).sort()).toEqual(['displayName', 'explanation', 'id', 'kind'].sort());
+    expect(Object.keys(props).sort()).toEqual(['displayName', 'eraBuckets', 'explanation', 'id', 'kind'].sort());
   });
 
   it('is a fixed, exhaustive allow-list mapping -- never `{...result}`', () => {
@@ -50,7 +50,7 @@ describe('toSearchResultCardProps — allow-list mapping negative test (MOB-013 
     const onShowOnMap = jest.fn();
     const props = toSearchResultCardProps(baseResult(), { onPress, onShowOnMap });
     expect(Object.keys(props).sort()).toEqual(
-      ['displayName', 'explanation', 'id', 'kind', 'onPress', 'onShowOnMap'].sort(),
+      ['displayName', 'eraBuckets', 'explanation', 'id', 'kind', 'onPress', 'onShowOnMap'].sort(),
     );
     expect(props.onPress).toBe(onPress);
     expect(props.onShowOnMap).toBe(onShowOnMap);
@@ -89,6 +89,19 @@ describe('SearchResultCard — interaction', () => {
     const { getByLabelText } = await render(<SearchResultCard {...props} />);
     fireEvent.press(getByLabelText(/Harriet Tubman/));
     expect(onPress).toHaveBeenCalledWith('ent_42');
+  });
+
+  it('renders label-over-value era and kind facts', async () => {
+    const props = toSearchResultCardProps(
+      baseResult({ eraBuckets: ['1840s'], status: 'historic' }),
+    );
+    const { getByText } = await render(<SearchResultCard {...props} />);
+    expect(getByText('KIND')).toBeTruthy();
+    expect(getByText('Person')).toBeTruthy();
+    expect(getByText('ERA')).toBeTruthy();
+    expect(getByText('1840s')).toBeTruthy();
+    expect(getByText('STATUS')).toBeTruthy();
+    expect(getByText('Historic')).toBeTruthy();
   });
 
   it('calls onShowOnMap with id and kind from the secondary action without opening the record', async () => {

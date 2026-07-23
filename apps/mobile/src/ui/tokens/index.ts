@@ -3,8 +3,8 @@
  * This file is NOT generated — it is safe to edit. The generated/*.ts files
  * it re-exports are not (see their headers).
  *
- * Theme resolution is dark-first: when the OS color scheme is null or
- * unspecified, consumers resolve to the dark palette (see resolveThemeName).
+ * Theme resolution follows the web bootstrap: explicit OS light/dark when
+ * available; Archive Paper (light) when the scheme is null or unspecified.
  */
 import { useColorScheme, type ColorSchemeName } from 'react-native';
 import type { ViewStyle } from 'react-native';
@@ -32,13 +32,7 @@ import {
   type TypeScaleRole,
 } from './generated/typography.generated';
 import { logoConstraints } from './generated/logo.generated';
-import {
-  getGradient,
-  getShadowStyle,
-  type GradientDefinition,
-  type GradientName,
-  type ShadowLevel,
-} from './elevation';
+import { getShadowStyle, type ShadowLevel } from './elevation';
 
 export {
   brandCore,
@@ -53,12 +47,9 @@ export {
   fontFamilies,
   typeScale,
   logoConstraints,
-  getGradient,
   getShadowStyle,
 };
 export type {
-  GradientDefinition,
-  GradientName,
   ShadowLevel,
   ConfidenceLevel,
   StatusName,
@@ -71,26 +62,23 @@ export type {
 };
 
 /**
- * Resolves theme from an OS color scheme value. Dark-first: only an explicit
- * `'light'` scheme selects the light palette; null/undefined/dark → dark.
+ * Resolves theme from an OS color scheme value. Matches web bootstrap:
+ * explicit `light` / `dark` when set; Archive Paper (light) when null or
+ * unspecified — no v5 dark-cockpit default outside the map plate (ADR-013).
  */
 export function resolveThemeName(scheme: ColorSchemeName | null | undefined): ThemeName {
-  return scheme === 'light' ? 'light' : 'dark';
+  if (scheme === 'dark') return 'dark';
+  return 'light';
 }
 
-/** Resolves the active theme name from the system color scheme (dark-first default). */
+/** Resolves the active theme name from the system color scheme. */
 export function useThemeName(): ThemeName {
   return resolveThemeName(useColorScheme());
 }
 
-/** Shadow style for the active theme — spread onto any View that needs controlled lift. */
+/** Shadow style for the active theme — default to `none` (flat matte). */
 export function useShadowStyle(level: ShadowLevel): ViewStyle {
   return getShadowStyle(level, useThemeName());
-}
-
-/** Gradient preset for the active theme — consumed by `BrandLinearGradient` / `GradientPanel`. */
-export function useGradient(name: GradientName): GradientDefinition {
-  return getGradient(name, useThemeName());
 }
 
 /** Resolves the full semantic color-role palette for the active color scheme. */

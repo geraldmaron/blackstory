@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BlackStory Mobile Explore v7 — prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Sora:wght@600&family=Source+Serif+4:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+  <style>
+    /* BlackStory v6 mobile Explore — flat matte, copper navigational only */
+    :root {
+      --ink: #0A0A0A;
+      --charcoal: #161616;
+      --paper: #F4EFE5;
+      --surface: #FBF8F2;
+      --surface-raised: #FBF8F2;
+      --stone: #6D675F;
+      --rule: #D7D0C4;
+      --copper-text: #8E4F2A;
+      --copper-pin: #B86B2A;
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 28px;
+      --touch: 44px;
+      --edge-inset: 16px;
+      --font-display: 'Sora', system-ui, sans-serif;
+      --font-ui: 'Inter', system-ui, sans-serif;
+      --font-editorial: 'Source Serif 4', Georgia, serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+      /* Map plate — fixed dark archive (ADR-013) */
+      --map-canvas: #0A0A0A;
+      --map-water: #080606;
+      --map-street: rgba(244, 239, 229, 0.28);
+      --map-boundary: #34302C;
+      /* Kind shades */
+      --kind-person: #B86B2A;
+      --kind-place: #E09A55;
+      --kind-org: #9A5828;
+      --kind-event: #8E4F2A;
+      --kind-source: #356494;
+    }
+    [data-theme="dark"] {
+      --paper: #0A0A0A;
+      --surface: #161616;
+      --surface-raised: #1C1B18;
+      --ink: #F4EFE5;
+      --stone: #BDB5A9;
+      --rule: #34302C;
+      --copper-text: #D07A32;
+      --copper-pin: #D07A32;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-ui);
+      background: #1a1816;
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 48px;
+      gap: 24px;
+    }
+    h1.page-title {
+      font-family: var(--font-display);
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--paper);
+      text-align: center;
+    }
+    .proto-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      max-width: 900px;
+    }
+    .proto-controls button {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      min-height: var(--touch);
+      padding: 0 14px;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .proto-controls button[aria-pressed="true"] {
+      border-color: var(--copper-pin);
+      color: var(--copper-text);
+      background: var(--surface-raised);
+    }
+    .proto-controls button:focus-visible {
+      outline: 2px solid var(--copper-pin);
+      outline-offset: 2px;
+    }
+    .phone {
+      width: 390px;
+      height: 844px;
+      border: 1px solid var(--rule);
+      border-radius: 40px;
+      overflow: hidden;
+      position: relative;
+      background: var(--map-canvas);
+      flex-shrink: 0;
+    }
+    .status-bar {
+      height: 47px;
+      padding: 14px 24px 0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: rgba(244, 239, 229, 0.85);
+      position: relative;
+      z-index: 5;
+      pointer-events: none;
+    }
+    .map-layer {
+      position: absolute;
+      inset: 0;
+      background: var(--map-canvas);
+    }
+    .map-svg {
+      width: 100%;
+      height: 100%;
+    }
+    /* Pins: zoom-scaled radii at z≈5.5 (0.85× base). MIN 4 → ~3.4px visual + stroke */
+    .pin {
+      cursor: pointer;
+    }
+    .pin-halo { fill-opacity: 0.12; }
+    .pin-fill { fill-opacity: 0.52; }
+    .pin-selected-ring {
+      fill: none;
+      stroke: #F4EFE5;
+      stroke-width: 2;
+    }
+    .cluster {
+      fill: var(--copper-pin);
+      fill-opacity: 0.55;
+      stroke: #F4EFE5;
+      stroke-width: 2;
+    }
+    .cluster-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      fill: #F4EFE5;
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+    /* Minimal map mast — ghost controls over map; content inset from screen edge */
+    .mast-minimal {
+      position: absolute;
+      top: 50px;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 4px var(--edge-inset);
+      pointer-events: none;
+    }
+    .mast-minimal > * { pointer-events: auto; }
+    .count-inline {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: rgba(244, 239, 229, 0.72);
+      letter-spacing: 0.02em;
+    }
+    .count-inline strong {
+      color: #D07A32;
+      font-weight: 500;
+    }
+    .mast-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .ghost-btn {
+      width: 36px;
+      height: 36px;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: rgba(244, 239, 229, 0.08);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      color: rgba(244, 239, 229, 0.78);
+    }
+    .ghost-btn.active {
+      background: rgba(184, 107, 42, 0.28);
+      color: #F4EFE5;
+    }
+    .ghost-btn:focus-visible {
+      outline: 2px solid var(--copper-pin);
+      outline-offset: 2px;
+    }
+    .ghost-btn svg { width: 17px; height: 17px; }
+    /* Instruments — continuous surface field, top-anchored, no card frame */
+    .instruments {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 88px;
+      bottom: 28%;
+      z-index: 12;
+      background: var(--surface);
+      border-top: 1px solid var(--rule);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .instruments.open { display: flex; }
+    .panel-header {
+      padding: 10px var(--edge-inset) 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .panel-title {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--stone);
+      font-weight: 500;
+    }
+    .panel-sub { display: none; }
+    .hide-btn {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--copper-text);
+      background: none;
+      border: none;
+      cursor: pointer;
+      min-height: var(--touch);
+      padding: 0 4px;
+    }
+    .seg-tabs {
+      display: flex;
+      margin: 0 var(--edge-inset);
+      gap: 20px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .seg-tab {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      min-height: 36px;
+      padding: 0 2px 8px;
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      background: none;
+      color: var(--stone);
+      cursor: pointer;
+    }
+    .seg-tab.active {
+      color: var(--copper-text);
+      border-bottom-color: var(--copper-pin);
+    }
+    .panel-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 var(--edge-inset) 16px;
+    }
+    .kicker {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--copper-text);
+      margin: 8px 0 12px;
+    }
+    .facet {
+      border-top: 1px solid var(--rule);
+      padding: 12px 0;
+    }
+    .facet-label {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--stone);
+      margin-bottom: 8px;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .chip {
+      font-size: 0.8125rem;
+      min-height: 32px;
+      padding: 4px 10px;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    .chip.selected {
+      color: var(--copper-text);
+      border-bottom-color: var(--copper-pin);
+    }
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 36px;
+      font-size: 0.8125rem;
+    }
+    .glyph {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+    .section-title {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--copper-text);
+      margin: 16px 0 8px;
+    }
+    /* Bottom sheet */
+    .sheet {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 11;
+      background: var(--surface);
+      border-top: 1px solid var(--rule);
+      border-radius: 12px 12px 0 0;
+      display: flex;
+      flex-direction: column;
+      transition: height 0.25s ease;
+    }
+    .sheet.peek { height: 22%; }
+    .sheet.half { height: 42%; }
+    .sheet.full { height: 58%; }
+    .grabber {
+      width: 36px;
+      height: 4px;
+      background: var(--rule);
+      border-radius: 2px;
+      margin: 8px auto 4px;
+    }
+    .sheet-header {
+      display: flex;
+      justify-content: space-between;
+      padding: 2px var(--edge-inset) 8px;
+    }
+    .sheet-header span:first-child {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      color: var(--stone);
+    }
+    .sheet-header span:last-child {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      color: var(--copper-text);
+    }
+    .sheet-content {
+      flex: 1;
+      overflow-y: auto;
+    }
+    /* Records rail row */
+    .record-row {
+      padding: 12px var(--edge-inset);
+      border-bottom: 1px solid var(--rule);
+      border-left: 3px solid transparent;
+      cursor: pointer;
+    }
+    .record-row.selected {
+      border-left-color: var(--copper-pin);
+    }
+    .record-title {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+    .fact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 12px;
+    }
+    .fact-cell label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.5625rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--stone);
+      margin-bottom: 2px;
+    }
+    .fact-cell span {
+      font-size: 0.8125rem;
+    }
+    /* Preview card */
+    .preview {
+      padding: 8px var(--edge-inset) 16px;
+    }
+    .preview-frame {
+      border-left: 3px solid var(--copper-pin);
+      padding: 8px 16px 12px;
+    }
+    .preview-kicker {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      letter-spacing: 0.1em;
+      color: var(--copper-text);
+      margin-bottom: 8px;
+    }
+    .preview-kind {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      color: var(--stone);
+      letter-spacing: 0.06em;
+    }
+    .preview-name {
+      font-family: var(--font-display);
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin: 8px 0;
+      line-height: 1.25;
+    }
+    .preview-dek {
+      font-family: var(--font-editorial);
+      font-size: 0.9375rem;
+      line-height: 1.45;
+      margin-bottom: 12px;
+    }
+    .cta {
+      display: block;
+      width: 100%;
+      min-height: var(--touch);
+      margin-top: 12px;
+      border: 1px solid var(--copper-pin);
+      border-radius: var(--radius-sm);
+      background: var(--ink);
+      color: var(--paper);
+      font-family: var(--font-ui);
+      font-size: 0.9375rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    [data-theme="dark"] .cta {
+      background: var(--surface-raised);
+      color: var(--ink);
+    }
+    .browse-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0 8px;
+      margin-bottom: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      color: var(--stone);
+    }
+    .attribution {
+      position: absolute;
+      bottom: calc(22% + 8px);
+      left: var(--edge-inset);
+      font-family: var(--font-mono);
+      font-size: 0.5625rem;
+      color: rgba(244, 239, 229, 0.5);
+      z-index: 8;
+      transition: bottom 0.25s ease;
+    }
+    .attribution.hidden { opacity: 0; }
+    .sheet.half ~ .attribution, .sheet.full ~ .attribution { bottom: calc(42% + 8px); }
+    .tab-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 83px;
+      background: var(--surface);
+      border-top: 1px solid var(--rule);
+      display: flex;
+      padding-bottom: 20px;
+      z-index: 20;
+    }
+    .tab {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: 0.625rem;
+      color: var(--stone);
+    }
+    .tab.active { color: var(--copper-text); }
+    .tab svg { width: 22px; height: 22px; }
+    .notes {
+      max-width: 720px;
+      color: rgba(244, 239, 229, 0.75);
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+    .notes h2 {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      color: var(--paper);
+      margin: 16px 0 8px;
+    }
+    .notes ul { padding-left: 1.25rem; }
+    .notes li { margin-bottom: 6px; }
+    .state-hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <h1 class="page-title">BlackStory Mobile Explore v7</h1>
+
+  <div class="proto-controls" role="toolbar" aria-label="Prototype state">
+    <button type="button" data-state="idle" aria-pressed="true">Idle + rail peek</button>
+    <button type="button" data-state="selected" aria-pressed="false">Pin selected</button>
+    <button type="button" data-state="instruments" aria-pressed="false">Filters open</button>
+    <button type="button" data-state="colorkey" aria-pressed="false">Color key</button>
+    <button type="button" data-state="records-full" aria-pressed="false">Records expanded</button>
+    <button type="button" id="theme-toggle" aria-pressed="false">Panel theme: light</button>
+  </div>
+
+  <div class="phone" id="phone" data-theme="light">
+    <div class="status-bar"><span>9:41</span><span>●●●</span></div>
+
+    <div class="map-layer">
+      <svg class="map-svg" viewBox="0 0 390 844" aria-hidden="true">
+        <rect width="390" height="844" fill="#0A0A0A"/>
+        <!-- Abstract archive basemap -->
+        <path d="M0 420 Q120 380 200 400 T390 360 L390 844 L0 844 Z" fill="#080606"/>
+        <path d="M0 200 L390 180 L390 320 L0 340 Z" fill="#161616" fill-opacity="0.35"/>
+        <line x1="0" y1="280" x2="390" y2="270" stroke="rgba(244,239,229,0.28)" stroke-width="0.8"/>
+        <line x1="80" y1="0" x2="100" y2="844" stroke="rgba(244,239,229,0.18)" stroke-width="0.6"/>
+        <line x1="280" y1="0" x2="260" y2="844" stroke="rgba(244,239,229,0.18)" stroke-width="0.6"/>
+        <!-- Cluster z5.5 scaled: 14×0.85≈12 -->
+        <g class="pin" transform="translate(95, 320)">
+          <circle class="cluster" r="12" cx="0" cy="0"/>
+          <text class="cluster-label" y="1">24</text>
+        </g>
+        <!-- Person: r=3.4 + halo -->
+        <g class="pin" transform="translate(210, 260)">
+          <circle class="pin-halo" r="6.4" fill="#B86B2A" cx="0" cy="0"/>
+          <circle class="pin-fill" r="3.4" fill="#B86B2A" stroke="#F4EFE5" stroke-width="1.5" cx="0" cy="0"/>
+        </g>
+        <!-- Place -->
+        <g class="pin" transform="translate(160, 380)">
+          <circle class="pin-halo" r="6.4" fill="#E09A55" cx="0" cy="0"/>
+          <circle class="pin-fill" r="3.4" fill="#E09A55" stroke="#F4EFE5" stroke-width="1.5" cx="0" cy="0"/>
+        </g>
+        <!-- Event diamond -->
+        <g class="pin" transform="translate(300, 340)">
+          <circle class="pin-halo" r="7" fill="#8E4F2A" cx="0" cy="0"/>
+          <rect class="pin-fill" x="-4" y="-4" width="8" height="8" fill="#8E4F2A" stroke="#F4EFE5" stroke-width="1.5" transform="rotate(45)" transform-origin="0 0"/>
+        </g>
+        <!-- Selected org ring -->
+        <g class="pin selected-pin" transform="translate(240, 420)">
+          <circle class="pin-halo" r="7.5" fill="#9A5828" cx="0" cy="0"/>
+          <circle class="pin-fill" r="4" fill="none" stroke="#C9BA9A" stroke-width="2.5" cx="0" cy="0"/>
+          <circle class="pin-selected-ring" r="7" cx="0" cy="0"/>
+        </g>
+        <!-- Source square -->
+        <g class="pin" transform="translate(120, 480)">
+          <circle class="pin-halo" r="6.4" fill="#356494" cx="0" cy="0"/>
+          <rect class="pin-fill" x="-3.4" y="-3.4" width="6.8" height="6.8" rx="1" fill="#356494" stroke="#F4EFE5" stroke-width="2" cx="0" cy="0"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="mast-minimal">
+      <p class="count-inline"><strong>1,842</strong> records</p>
+      <div class="mast-actions">
+        <button type="button" class="ghost-btn" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3-3"/></svg></button>
+        <button type="button" class="ghost-btn" id="chip-instruments" aria-label="Map instruments"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg></button>
+        <button type="button" class="ghost-btn" id="chip-records" aria-label="Records rail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></button>
+        <button type="button" class="ghost-btn" aria-label="National view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M2 12h20M12 2a15 15 0 014 10 15 15 0 01-4 10 15 15 0 01-4-10 15 15 0 014-10z"/></svg></button>
+      </div>
+    </div>
+
+    <aside class="instruments" id="instruments" aria-label="Map instruments">
+      <header class="panel-header">
+        <div class="panel-title">Map instruments</div>
+        <button type="button" class="hide-btn" id="hide-instruments">Hide</button>
+      </header>
+      <div class="seg-tabs" role="tablist">
+        <button type="button" class="seg-tab active" data-tab="filters" role="tab" aria-selected="true">Filters</button>
+        <button type="button" class="seg-tab" data-tab="key" role="tab" aria-selected="false">Color key</button>
+      </div>
+      <div class="panel-body">
+        <div id="tab-filters">
+          <p class="kicker">Map instruments</p>
+          <div class="facet">
+            <div class="facet-label">Kind · People</div>
+            <div class="chips">
+              <span class="chip">Any kind</span>
+              <span class="chip selected">People</span>
+              <span class="chip">Places</span>
+              <span class="chip">Organizations</span>
+              <span class="chip">Events</span>
+              <span class="chip">Sources</span>
+            </div>
+          </div>
+          <div class="facet">
+            <div class="facet-label">Era · 1960s</div>
+            <div class="chips">
+              <span class="chip">Any decade</span>
+              <span class="chip">1860s</span>
+              <span class="chip selected">1960s</span>
+              <span class="chip">1970s</span>
+              <span class="chip">1980s</span>
+            </div>
+          </div>
+          <button type="button" class="hide-btn" style="margin-top:8px">Clear filters</button>
+        </div>
+        <div id="tab-key" class="state-hidden">
+          <p class="kicker">Color key</p>
+          <p style="font-size:0.8125rem;color:var(--stone);margin-bottom:12px">Shade shows kind family or historical tone. Shape and confidence glyphs are never color alone.</p>
+          <div class="section-title">Kind families</div>
+          <div class="legend-row"><svg class="glyph"><circle cx="7" cy="7" r="6" fill="#B86B2A" stroke="#F4EFE5" stroke-width="1.5"/></svg> People</div>
+          <div class="legend-row"><svg class="glyph"><circle cx="7" cy="7" r="6" fill="#E09A55" stroke="#F4EFE5" stroke-width="1.5"/></svg> Places</div>
+          <div class="legend-row"><svg class="glyph"><circle cx="7" cy="7" r="5" fill="none" stroke="#9A5828" stroke-width="2.5"/></svg> Organizations</div>
+          <div class="legend-row"><svg class="glyph"><rect x="2" y="2" width="10" height="10" fill="#8E4F2A" stroke="#F4EFE5" stroke-width="1.5" transform="rotate(45 7 7)"/></svg> Events</div>
+          <div class="legend-row"><svg class="glyph"><rect x="3" y="3" width="8" height="8" rx="1" fill="#356494" stroke="#F4EFE5" stroke-width="2"/></svg> Sources</div>
+          <div class="section-title">Record size (evidence)</div>
+          <div class="legend-row"><svg width="16" height="16"><circle cx="8" cy="8" r="3.4" fill="#E09A55"/></svg> 4px · low evidence</div>
+          <div class="legend-row"><svg width="20" height="20"><circle cx="10" cy="10" r="5.5" fill="#E09A55"/></svg> 7px · mid evidence</div>
+          <div class="legend-row"><svg width="28" height="28"><circle cx="14" cy="14" r="8.5" fill="#E09A55"/></svg> 11px · high evidence @ locality zoom</div>
+          <div class="section-title">Confidence</div>
+          <div class="legend-row"><span class="glyph" style="color:#2F6B3C;font-family:var(--font-mono)">●</span> High</div>
+          <div class="legend-row"><span class="glyph" style="color:#8B8A2E;font-family:var(--font-mono)">◐</span> Medium</div>
+          <div class="legend-row"><span class="glyph" style="color:#D07A32;font-family:var(--font-mono)">○</span> Low</div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="attribution" id="attribution">© OpenStreetMap · OpenFreeMap</div>
+
+    <section class="sheet peek" id="sheet" aria-label="Records">
+      <div class="grabber" aria-hidden="true"></div>
+      <header class="sheet-header">
+        <span>In view</span>
+        <span>12 records</span>
+      </header>
+      <div class="sheet-content">
+        <div id="rail-view">
+          <div class="record-row">
+            <div class="record-title">Harlem Renaissance cultural corridor</div>
+            <div class="fact-grid">
+              <div class="fact-cell"><label>Kind</label><span>Places</span></div>
+              <div class="fact-cell"><label>Era</label><span>1920s</span></div>
+              <div class="fact-cell"><label>Where</label><span>New York</span></div>
+              <div class="fact-cell"><label>Evidence</label><span>14 claims</span></div>
+            </div>
+          </div>
+          <div class="record-row selected">
+            <div class="record-title">Brown Chapel A.M.E. Church</div>
+            <div class="fact-grid">
+              <div class="fact-cell"><label>Kind</label><span>Organizations</span></div>
+              <div class="fact-cell"><label>Era</label><span>1960s</span></div>
+              <div class="fact-cell"><label>Where</label><span>Alabama</span></div>
+              <div class="fact-cell"><label>Confidence</label><span>High confidence</span></div>
+            </div>
+          </div>
+        </div>
+        <div id="preview-view" class="preview state-hidden">
+          <div class="preview-frame">
+            <div class="preview-kicker">SELECTED RECORD</div>
+            <div class="preview-kind">ORGANIZATIONS</div>
+            <div class="browse-row"><span>‹</span><span>2 of 12</span><span>›</span></div>
+            <h2 class="preview-name">Brown Chapel A.M.E. Church</h2>
+            <p class="preview-dek">Starting point for Selma to Montgomery marches; anchor for voting-rights organizing in Dallas County.</p>
+            <div class="fact-grid">
+              <div class="fact-cell"><label>Kind</label><span>Organizations</span></div>
+              <div class="fact-cell"><label>Era</label><span>1960s</span></div>
+              <div class="fact-cell"><label>Where</label><span>Alabama</span></div>
+              <div class="fact-cell"><label>Evidence</label><span>22 claims</span></div>
+            </div>
+            <button type="button" class="cta">Open full record</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <nav class="tab-bar" aria-label="Main">
+      <div class="tab active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Explore</div>
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg>History</div>
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19h16M6 4h12v12H6z"/></svg>Stories</div>
+      <div class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="6" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="18" r="2"/></svg>More</div>
+    </nav>
+  </div>
+
+  <div class="notes">
+    <h2>Design principles applied</h2>
+    <ul>
+      <li>Map dominates first glance: thin mast (count + ghost controls) over edge-to-edge plate, not a branded Surface slab.</li>
+      <li>16px horizontal edge inset on mast, instruments inner content, sheet/rail rows, and preview body (safe-area + gutter; RN uses <code>screenScrollInsets</code> / <code>space['4']</code> = 16dp).</li>
+      <li>Continuous Surface fields for instruments and sheet; sectioning via type, spacing, and rules — not stacked bordered cards.</li>
+      <li>Map stays 60%+ of viewport; sheets preserve a map sliver (Google Maps 2025, Apple Maps detents).</li>
+      <li>Pins at national zoom use ~0.85× radius so they do not blot counties; locality zoom allows up to 11px.</li>
+      <li>44px touch targets on chrome via hit padding; pin hit area can exceed visual radius.</li>
+      <li>Opaque Surface panels follow device theme; map plate stays fixed dark archive.</li>
+      <li>Copper only on active tab underline, selection rule, count accent, and one preview CTA (~10–15%).</li>
+      <li>Flat matte only: no shadows, glows, gradients, or blur on browse surfaces.</li>
+    </ul>
+    <h2>RN implementation target</h2>
+    <ul>
+      <li>Port web <code>markerRadiusExpression()</code> zoom scaling (done in this session).</li>
+      <li>Exclusive bottom sheet states: instruments OR records expanded OR preview half.</li>
+      <li>Extend FilterState with tone, theme, status, confidence, state (web parity).</li>
+    </ul>
+  </div>
+
+  <script>
+    const phone = document.getElementById('phone');
+    const sheet = document.getElementById('sheet');
+    const instruments = document.getElementById('instruments');
+    const railView = document.getElementById('rail-view');
+    const previewView = document.getElementById('preview-view');
+    const attribution = document.getElementById('attribution');
+    const chipInstruments = document.getElementById('chip-instruments');
+    const chipRecords = document.getElementById('chip-records');
+    const tabFilters = document.getElementById('tab-filters');
+    const tabKey = document.getElementById('tab-key');
+    const segTabs = document.querySelectorAll('.seg-tab');
+    const stateButtons = document.querySelectorAll('[data-state]');
+    const themeToggle = document.getElementById('theme-toggle');
+
+    function setState(state) {
+      stateButtons.forEach((btn) => {
+        btn.setAttribute('aria-pressed', btn.dataset.state === state ? 'true' : 'false');
+      });
+      instruments.classList.remove('open');
+      chipInstruments.classList.remove('active');
+      chipRecords.classList.remove('active');
+      tabFilters.classList.remove('state-hidden');
+      tabKey.classList.add('state-hidden');
+      segTabs.forEach((t) => {
+        t.classList.toggle('active', t.dataset.tab === 'filters');
+        t.setAttribute('aria-selected', t.dataset.tab === 'filters' ? 'true' : 'false');
+      });
+
+      sheet.className = 'sheet peek';
+      railView.classList.remove('state-hidden');
+      previewView.classList.add('state-hidden');
+      attribution.classList.remove('hidden');
+
+      if (state === 'idle') {
+        /* default */
+      } else if (state === 'selected') {
+        sheet.className = 'sheet half';
+        railView.classList.add('state-hidden');
+        previewView.classList.remove('state-hidden');
+        attribution.classList.add('hidden');
+      } else if (state === 'instruments') {
+        instruments.classList.add('open');
+        chipInstruments.classList.add('active');
+        attribution.classList.add('hidden');
+      } else if (state === 'colorkey') {
+        instruments.classList.add('open');
+        chipInstruments.classList.add('active');
+        tabFilters.classList.add('state-hidden');
+        tabKey.classList.remove('state-hidden');
+        segTabs.forEach((t) => {
+          t.classList.toggle('active', t.dataset.tab === 'key');
+          t.setAttribute('aria-selected', t.dataset.tab === 'key' ? 'true' : 'false');
+        });
+        attribution.classList.add('hidden');
+      } else if (state === 'records-full') {
+        sheet.className = 'sheet full';
+        chipRecords.classList.add('active');
+        attribution.classList.add('hidden');
+      }
+    }
+
+    stateButtons.forEach((btn) => {
+      btn.addEventListener('click', () => setState(btn.dataset.state));
+    });
+
+    segTabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const isKey = tab.dataset.tab === 'key';
+        tabFilters.classList.toggle('state-hidden', isKey);
+        tabKey.classList.toggle('state-hidden', !isKey);
+        segTabs.forEach((t) => {
+          t.classList.toggle('active', t === tab);
+          t.setAttribute('aria-selected', t === tab ? 'true' : 'false');
+        });
+      });
+    });
+
+    document.getElementById('hide-instruments').addEventListener('click', () => setState('idle'));
+
+    themeToggle.addEventListener('click', () => {
+      const dark = phone.getAttribute('data-theme') === 'dark';
+      phone.setAttribute('data-theme', dark ? 'light' : 'dark');
+      document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+      themeToggle.textContent = dark ? 'Panel theme: light' : 'Panel theme: dark';
+      themeToggle.setAttribute('aria-pressed', dark ? 'false' : 'true');
+    });
+  </script>
+</body>
+</html>

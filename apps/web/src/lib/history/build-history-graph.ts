@@ -3,8 +3,16 @@
  * Consumes pre-derived `DecadeGraphView` / `AllTimeGraphView` docs — no request-time traversal.
  */
 import type { EntityRelationship, GraphReleaseArtifact } from '@repo/domain';
+import {
+  buildInclusiveDecadeRange,
+  filterDecadesAtOrBeforeCurrent,
+  type DecadeReferenceDate,
+} from '@repo/domain/era';
+import { HISTORY_GRAPH_GENERATED_AT } from '../../data/history-graph-seed';
 import { listPublicEntities, type PublicEntityView } from '../../data/public-seed';
+import { resolveHistoryRelationships } from './resolve-history-relationships';
 import { resolveAllTimeStatusLabel, resolveDecadeStatusLabel } from './decade-status';
+import { entityEraFact, resolveEntityEraBuckets } from '../map-experience/entity-era-facts';
 import {
   applyHistoryKindFilter,
   buildHistoryKindFacetOptions,
@@ -19,6 +27,9 @@ export type HistoryNodeView = {
   readonly summary: string;
   readonly statusLabel: string;
   readonly statusKind: 'status' | 'event-window' | 'undated';
+  readonly eraLabel: string;
+  readonly eraBuckets: readonly string[];
+  readonly entityStatus?: string;
   readonly evidenceCount: number;
   /** Evidence-backed edges touching this node in the current graph slice. */
   readonly connectionCount: number;
@@ -107,6 +118,14 @@ function buildNodeView(
     mode === 'decade' && decade
       ? resolveDecadeStatusLabel(entity, decade)
       : resolveAllTimeStatusLabel(entity);
+  const eraInput = {
+    ...(entity.eraBuckets !== undefined ? { eraBuckets: entity.eraBuckets } : {}),
+    ...(entity.era !== undefined ? { era: entity.era } : {}),
+    ...(entity.eventWindow !== undefined ? { eventWindow: entity.eventWindow } : {}),
+    ...(entity.statusHistory !== undefined ? { statusHistory: entity.statusHistory } : {}),
+  };
+  const eraBuckets = resolveEntityEraBuckets(eraInput);
+  const era = entityEraFact({ ...eraInput, eraBuckets });
 
   return {
     entityId: entity.id,
@@ -115,6 +134,9 @@ function buildNodeView(
     summary: entity.summary,
     statusLabel: status.label,
     statusKind: status.kind,
+    eraLabel: era.label,
+    eraBuckets,
+    ...(entity.status !== undefined ? { entityStatus: entity.status } : {}),
     evidenceCount: entity.claims.length,
     connectionCount: 0,
     href: entityHref(entity.id),
@@ -148,16 +170,17 @@ export function resolveHistoryGraphSlice(
   };
 }
 
-export function decadeLabelsFromArtifact(artifact: GraphReleaseArtifact): readonly string[] {
+export function decadeLabelsFromArtifact(
+  artifact: GraphReleaseArtifact,
+  reference: DecadeReferenceDate = new Date(),
+): readonly string[] {
   if (artifact.decadeViews.length === 0) return [];
-  const decades = artifact.decadeViews.map((view) => view.decade);
-  const startYear = Number.parseInt(decades[0]!.slice(0, 4), 10);
-  const endYear = Number.parseInt(decades[decades.length - 1]!.slice(0, 4), 10);
-  const labels: string[] = [];
-  for (let year = startYear; year <= endYear; year += 10) {
-    labels.push(`${year}s`);
-  }
-  return labels;
+  const decades = filterDecadesAtOrBeforeCurrent(
+    artifact.decadeViews.map((view) => view.decade),
+    reference,
+  );
+  if (decades.length === 0) return [];
+  return buildInclusiveDecadeRange(decades[0]!, decades[decades.length - 1]!, reference);
 }
 
 export function buildHistoryNodes(
@@ -241,14 +264,16 @@ export function buildHistoryGraphContext(
 ) {
   const entitiesById = new Map(entities.map((entity) => [entity.id, entity]));
   const kinds = entities.map((entity) => entity.kind);
+  const relationships = resolveHistoryRelationships(entities, HISTORY_GRAPH_GENERATED_AT);
 
   return {
     entities,
     entitiesById,
+    relationships,
     facetOptions: {
       kind: buildHistoryKindFacetOptions(kinds),
     },
-    availableDecades: decadeLabelsFromArtifact(artifact),
+    availableDecades: decadeLabelsFromArtifact(artifact, artifact.generatedAt),
     releaseId: artifact.releaseId,
     contentHash: artifact.contentHash.digest,
   };

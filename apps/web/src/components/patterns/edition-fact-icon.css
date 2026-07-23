@@ -1,0 +1,49 @@
+/**
+ * Home edition entry-step and record fact label icons. Flat matte glyphs only;
+ * pairs with visible mono labels on entry rows and record anatomy panels.
+ *
+ * Record anatomy layout lives in `record-anatomy.css` (`RecordAnatomyPanel`).
+ */
+
+.ds-edition-fact-icon {
+  flex-shrink: 0;
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.ds-edition-fact-icon--entry {
+  color: var(--ds-accent-graphic);
+}
+
+.ds-edition-fact-icon--where,
+.ds-edition-fact-icon--era {
+  color: var(--ds-ink-muted);
+}
+
+.ds-edition-fact-icon--evidence-high {
+  color: #2f6b3c;
+}
+
+.ds-edition-fact-icon--evidence-medium {
+  color: #8b8a2e;
+}
+
+.ds-edition-fact-icon--evidence-low {
+  color: #d07a32;
+}
+
+.ds-edition-fact-icon--evidence-unrated {
+  color: var(--ds-ink-subtle);
+}
+
+[data-theme='dark'] .ds-edition-fact-icon--evidence-high {
+  color: #5cad73;
+}
+
+[data-theme='dark'] .ds-edition-fact-icon--evidence-medium {
+  color: #c4c04a;
+}
+
+[data-theme='dark'] .ds-edition-fact-icon--evidence-low {
+  color: #d07a32;
+}

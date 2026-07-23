@@ -9,8 +9,10 @@
  * unavailable live fetch, or when `forceDemo` is set (tests).
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useAppRuntimeOptional } from '@/runtime';
-import { DEMO_MAP_SOURCE, type MapFeatureCollection, type MapLoadState } from '@/features/map';
+import { useAppRuntimeOptional, useRefreshBootstrapSync } from '@/runtime';
+import { DEFAULT_API_BASE_URL, resolveApiBaseUrl } from '@/security';
+import { DEMO_MAP_SOURCE, type MapFeatureCollection } from '@/features/map/demoMapSource';
+import type { MapLoadState } from '@/features/map/mapLoadState';
 import {
   fetchMapSource,
   type MapSourceDeps,
@@ -33,7 +35,11 @@ export type UseExploreMapSourceOptions = {
 };
 
 function allowDemoFallback(): boolean {
-  return typeof __DEV__ !== 'undefined' && __DEV__;
+  if (typeof __DEV__ === 'undefined' || !__DEV__) return false;
+  // When dev explicitly points at a local api-public, surface failures honestly
+  // instead of silently substituting bundled fixtures.
+  if (resolveApiBaseUrl() !== DEFAULT_API_BASE_URL) return false;
+  return true;
 }
 
 function emptySource(): MapFeatureCollection {
@@ -89,23 +95,9 @@ export function useExploreMapSource(
   options: UseExploreMapSourceOptions = {},
 ): ExploreMapSourceState {
   const runtime = useAppRuntimeOptional();
+  const refreshBootstrapSync = useRefreshBootstrapSync();
   const forceDemo = options.forceDemo === true;
   const [tick, setTick] = useState(0);
-  const [state, setState] = useState<ExploreMapSourceState>(() =>
-    forceDemo
-      ? {
-          source: DEMO_MAP_SOURCE,
-          loadState: { kind: 'ready' },
-          usingDemo: true,
-          retry: () => undefined,
-        }
-      : {
-          source: emptySource(),
-          loadState: { kind: 'loading' },
-          usingDemo: false,
-          retry: () => undefined,
-        },
-  );
 
   const deps: MapSourceDeps | null = useMemo(() => {
     if (options.deps) return options.deps;
@@ -121,51 +113,62 @@ export function useExploreMapSource(
     setTick((n) => n + 1);
   }, []);
 
-  useEffect(() => {
+  const staticState = useMemo((): ExploreMapSourceState | null => {
     if (forceDemo) {
-      setState({
+      return {
         source: DEMO_MAP_SOURCE,
         loadState: { kind: 'ready' },
         usingDemo: true,
         retry,
-      });
-      return;
+      };
     }
-
     if (!deps) {
-      setState({
+      return {
         source: emptySource(),
         loadState: { kind: 'loading' },
         usingDemo: false,
         retry,
-      });
+      };
+    }
+    return null;
+  }, [forceDemo, deps, retry]);
+
+  const [fetchedState, setFetchedState] = useState<ExploreMapSourceState | null>(null);
+
+  useEffect(() => {
+    if (staticState) {
       return;
     }
 
     let cancelled = false;
-    setState((prev) => ({
-      ...prev,
-      loadState: prev.loadState.kind === 'ready' ? prev.loadState : { kind: 'loading' },
-      retry,
-    }));
 
     void (async () => {
-      const result = await fetchMapSource(deps);
+      setFetchedState((prev) => ({
+        source: prev?.source ?? emptySource(),
+        loadState: prev?.loadState.kind === 'ready' ? prev.loadState : { kind: 'loading' },
+        usingDemo: false,
+        retry,
+      }));
+
+      const result = await fetchMapSource(deps!);
       if (cancelled) return;
-      setState(toViewState(result, retry));
+      setFetchedState(toViewState(result, retry));
+      if (result.status === 'ready' && !result.fromCache) {
+        refreshBootstrapSync();
+      }
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [deps, forceDemo, retry, tick]);
+  }, [staticState, deps, retry, tick, refreshBootstrapSync]);
 
   // If runtime never arrives and we're past warm-up, allow demo fallback in __DEV__.
   useEffect(() => {
-    if (forceDemo || deps) return;
+    if (forceDemo || deps || staticState) return;
     const timer = setTimeout(() => {
-      setState((prev) => {
-        if (prev.loadState.kind !== 'loading') return prev;
+      setFetchedState((prev) => {
+        if (prev && prev.loadState.kind !== 'loading') return prev;
         if (allowDemoFallback()) {
           return {
             source: DEMO_MAP_SOURCE,
@@ -183,7 +186,15 @@ export function useExploreMapSource(
       });
     }, 2_500);
     return () => clearTimeout(timer);
-  }, [deps, forceDemo, retry]);
+  }, [deps, forceDemo, retry, staticState]);
 
-  return state;
+  return (
+    staticState ??
+    fetchedState ?? {
+      source: emptySource(),
+      loadState: { kind: 'loading' },
+      usingDemo: false,
+      retry,
+    }
+  );
 }

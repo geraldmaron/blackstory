@@ -16,6 +16,8 @@ export type HistoryFilterState = {
   readonly sort: HistorySort;
   /** `'all'` or a slug derived from `statusLabel` via {@link statusLabelToSlug}. */
   readonly status: string;
+  /** `'all'` or a decade bucket label (e.g. `1860s`). */
+  readonly era: string;
   /** `'all'` or a topic tag present on the record. */
   readonly topic: string;
   readonly connections: HistoryConnectionsFilter;
@@ -26,6 +28,7 @@ export const DEFAULT_HISTORY_FILTERS: HistoryFilterState = {
   q: '',
   sort: 'name',
   status: 'all',
+  era: 'all',
   topic: 'all',
   connections: 'all',
 };
@@ -103,6 +106,21 @@ export function buildHistoryStatusFacetOptions(
   return [{ value: 'all', label: 'All statuses' }, ...options];
 }
 
+export function buildHistoryEraFacetOptions(
+  nodes: readonly { readonly eraBuckets: readonly string[] }[],
+): readonly HistoryFacetOption[] {
+  const counts = new Map<string, number>();
+  for (const node of nodes) {
+    for (const bucket of node.eraBuckets) {
+      counts.set(bucket, (counts.get(bucket) ?? 0) + 1);
+    }
+  }
+  const options = [...counts.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([value, count]) => ({ value, label: value, count }));
+  return [{ value: 'all', label: 'All eras' }, ...options];
+}
+
 export function buildHistoryTopicFacetOptions(
   nodes: readonly { readonly topicTags: readonly string[] }[],
 ): readonly HistoryFacetOption[] {
@@ -140,6 +158,15 @@ export function applyHistoryStatusFilter<T extends { readonly statusLabel: strin
   if (status === 'all') return items;
   const needle = status.trim().toLowerCase();
   return items.filter((item) => statusLabelToSlug(item.statusLabel) === needle);
+}
+
+export function applyHistoryEraFilter<T extends { readonly eraBuckets: readonly string[] }>(
+  items: readonly T[],
+  era: string,
+): readonly T[] {
+  if (era === 'all') return items;
+  const needle = era.trim().toLowerCase();
+  return items.filter((item) => item.eraBuckets.some((bucket) => bucket.toLowerCase() === needle));
 }
 
 export function applyHistoryTopicFilter<T extends { readonly topicTags: readonly string[] }>(

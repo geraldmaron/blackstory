@@ -51,6 +51,9 @@ export function resolveDecadeStatusLabel(
   const history = entity.statusHistory as
     readonly StatusHistoryEntry<EntityStatusValue>[] | undefined;
   if (!history || history.length === 0) {
+    if (entity.status) {
+      return { kind: 'status', label: humanizeToken(entity.status), asOf: decadeRepresentativeYear(decade) };
+    }
     return { kind: 'undated', label: 'Status not yet published for this record' };
   }
 
@@ -78,5 +81,19 @@ export function resolveAllTimeStatusLabel(entity: PublicEntityView): DecadeStatu
   if (entity.status) {
     return { kind: 'status', label: humanizeToken(entity.status), asOf: 'present release' };
   }
+
+  const history = entity.statusHistory as
+    readonly StatusHistoryEntry<EntityStatusValue>[] | undefined;
+  if (history && history.length > 0) {
+    const latest = statusAsOf(history, '9999');
+    if (latest) {
+      return { kind: 'status', label: humanizeToken(latest), asOf: 'present release' };
+    }
+    const earliest = history.find((entry) => entry.status)?.status;
+    if (earliest) {
+      return { kind: 'status', label: humanizeToken(earliest), asOf: 'present release' };
+    }
+  }
+
   return { kind: 'undated', label: 'Status not yet published for this record' };
 }

@@ -12,7 +12,11 @@ import { SynchronizedResultList } from '../../../components/map-experience/Synch
 import { getSharedPublicEntities } from '../shared-map-data';
 import { ExploreMapExperience } from './ExploreMapExperience';
 import { buildExploreViewModel } from './explore-view-model';
+import '../../../components/patterns/browse-mode.css';
+import '../../../components/patterns/edition-fact-icon.css';
+import '../../../components/patterns/record-anatomy.css';
 import './explore.css';
+import './explore-edition.css';
 
 export const metadata = {
   title: 'Explore',

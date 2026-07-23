@@ -1,71 +1,68 @@
 /**
- * Shared elevation helpers for Explore map chrome. Consumes theme elevation
- * tokens (shadow + gradient color stops). Copper accent is a 2px hairline strip
- * from the final `copperAccentEdge` stop — not a full gradient wash.
+ * Shared chrome helpers for Explore map instruments. v7 explore uses a minimal map
+ * mast (ghost controls over the fixed dark plate) and continuous Surface fields
+ * for instruments/sheet bodies — not stacked bordered cards.
  *
- * ExploreListChrome is sheet-body chrome only (fill the bottom-sheet content
- * area). It is no longer a permanent flex sibling under the map.
- *
- * `getExploreCockpitColors` pins floating map instruments to brand-fixed dark
- * ink-glass in both reader themes (design-direction-v5 cockpit law).
+ * ExploreListChrome is sheet-body chrome only. Map plate stays dark-archive
+ * per ADR-013; floating controls use fixed map-overlay ink on the dark plate.
  */
 import type { ReactNode } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
-import { radius, themeColors, useGradient, useShadowStyle, useThemeColors, type ShadowLevel } from '@/ui';
+import { screenScrollInsets } from '@/ui/ScreenCanvas';
+import { brandCore } from '@/ui/tokens';
+import { useThemeColors } from '@/ui';
 
-/** Brand charcoal — explore cockpit glass base (flat matte, no reader-theme paper). */
-const BRAND_CHARCOAL = '#161616';
+const ACCENT_WIDTH = 3;
 
-const COCKPIT_GLASS_OPACITY = 0.92;
+/** Horizontal inset for Explore chrome and sheet bodies — matches tab screen gutters. */
+export const exploreContentInset = screenScrollInsets.paddingHorizontal;
 
-function hexToRgba(hex: string, alpha: number): string {
-  const normalized = hex.replace('#', '');
-  const r = parseInt(normalized.slice(0, 2), 16);
-  const g = parseInt(normalized.slice(2, 4), 16);
-  const b = parseInt(normalized.slice(4, 6), 16);
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
+/** Fixed ink on the dark archive map plate (ADR-013). */
+const MAP_INK = brandCore.archivePaper;
+const MAP_INK_MUTED = 'rgba(244, 239, 229, 0.68)';
+const MAP_GHOST_BG = 'rgba(244, 239, 229, 0.08)';
+const MAP_GHOST_ACTIVE = 'rgba(184, 107, 42, 0.28)';
+const MAP_ACCENT = '#D07A32';
 
-/** Fixed dark ink-glass palette for floating Explore instruments (both reader themes). */
-export function getExploreCockpitColors() {
-  const dark = themeColors.dark;
+export type ExploreChromeColors = ReturnType<typeof useExploreChromeColors>;
+
+/** Map-overlay + theme-aware Surface palette for Explore chrome. */
+export function useExploreChromeColors() {
+  const theme = useThemeColors();
   return {
-    surface: hexToRgba(BRAND_CHARCOAL, COCKPIT_GLASS_OPACITY),
-    surfaceRaised: hexToRgba(dark.surfaceRaised, COCKPIT_GLASS_OPACITY),
-    border: dark.border,
-    ink: dark.ink,
-    inkMuted: dark.inkMuted,
-    accent: dark.accent,
+    mapInk: MAP_INK,
+    mapInkMuted: MAP_INK_MUTED,
+    mapGhostBg: MAP_GHOST_BG,
+    mapGhostActive: MAP_GHOST_ACTIVE,
+    mapAccent: MAP_ACCENT,
+    surface: theme.surface,
+    surfaceRaised: theme.surfaceRaised,
+    border: theme.border,
+    ink: theme.ink,
+    inkMuted: theme.inkMuted,
+    accent: theme.accent,
   } as const;
 }
 
-export type ExploreCockpitColors = ReturnType<typeof getExploreCockpitColors>;
-
-const ACCENT_WIDTH = 2;
-
 export type ExploreChromeFrameProps = {
   readonly children: ReactNode;
-  readonly shadow?: ShadowLevel;
   readonly accentEdge?: boolean;
   readonly style?: StyleProp<ViewStyle>;
 };
 
-/** Wraps floating Explore panels with brand shadow and optional copper edge accent. */
+/** Wraps preview content with optional copper left rule — no card frame. */
 export function ExploreChromeFrame({
   children,
-  shadow = 'md',
   accentEdge = false,
   style,
 }: ExploreChromeFrameProps) {
-  const shadowStyle = useShadowStyle(shadow);
-  const copperEdge = useGradient('copperAccentEdge');
-  const accentColor = copperEdge.colors[copperEdge.colors.length - 1]!;
+  const theme = useThemeColors();
 
   return (
-    <View style={[shadowStyle, styles.frame, style]}>
+    <View style={[styles.frame, style]}>
       {accentEdge ? (
         <View
-          style={[styles.accentStrip, { backgroundColor: accentColor }]}
+          style={[styles.accentStrip, { backgroundColor: theme.accentGraphic }]}
           accessibilityElementsHidden
           importantForAccessibility="no-hide-descendants"
         />
@@ -101,8 +98,8 @@ export function ExploreListChrome({
 
 const styles = StyleSheet.create({
   frame: {
-    overflow: 'hidden',
-    borderRadius: radius.md,
+    position: 'relative',
+    paddingLeft: ACCENT_WIDTH + 12,
   },
   accentStrip: {
     position: 'absolute',

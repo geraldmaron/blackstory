@@ -29,9 +29,9 @@ test('SynchronizedResultList peer documents list-not-fallback contract in source
   assert.match(source, /aria-labelledby/);
 });
 
-test('search page uses ResultList with labelledBy heading', () => {
+test('search route redirects to unified history find-in-time surface', () => {
   const searchPage = join(repoRoot, 'apps/web/src/app/search/page.tsx');
   const source = readFileSync(searchPage, 'utf8');
-  assert.match(source, /ResultList/);
-  assert.match(source, /labelledBy="search-results-heading"/);
+  assert.match(source, /redirect\(mapSearchQueryToHistoryHref/);
+  assert.doesNotMatch(source, /SearchBrowseSections/);
 });

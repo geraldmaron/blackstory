@@ -28,7 +28,12 @@ describe('classifyMapError', () => {
   });
 
   it('every failure mode has non-empty, retryable copy', () => {
-    for (const mode of ['provider-outage', 'corrupt-tiles', 'offline-cold-start'] as const) {
+    for (const mode of [
+      'provider-outage',
+      'corrupt-tiles',
+      'offline-cold-start',
+      'map-canvas-unavailable',
+    ] as const) {
       expect(MAP_FAILURE_COPY[mode].title.length).toBeGreaterThan(0);
       expect(MAP_FAILURE_COPY[mode].description.length).toBeGreaterThan(0);
       expect(MAP_FAILURE_COPY[mode].retryable).toBe(true);

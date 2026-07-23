@@ -44,12 +44,12 @@ test('renders the manual-place-search fallback with its message and search link'
       available: true,
       reason: 'no_match',
       message: 'We could not match that address.',
-      searchHref: '/search',
+      searchHref: '/history',
     },
   };
   const html = renderToStaticMarkup(createElement(LocationResolutionPanel, { result }));
   assert.match(html, /We could not match that address\./);
-  assert.match(html, /href="\/search"/);
+  assert.match(html, /href="\/history"/);
 });
 
 test('renders a rate-limited notice', () => {

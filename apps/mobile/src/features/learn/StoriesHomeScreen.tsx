@@ -1,19 +1,18 @@
 /**
- * Stories-forward Learn tab home: featured story band, compact archive index, and secondary links
- * to History, Myths, and Methodology (not a flat dump of generic ListRows).
+ * Stories-forward Learn tab home: v6 Surface edition stack with indexed intro,
+ * featured story band, compact archive ledger, and secondary context links.
  */
-import { ScrollView, View } from 'react-native';
+import { ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import {
   ApiStatusBanner,
+  EditionSurfacePanel,
+  EditionSurfaceStack,
+  LedgerRow,
   LiftedSurface,
-  ListRow,
   NavIcon,
   ScreenCanvas,
-  ScreenHeader,
-  SectionHeader,
   screenScrollInsets,
-  space,
 } from '@/ui';
 import { LEARN_SECTIONS } from './sections';
 import { FeaturedStoryCard } from './FeaturedStoryCard';
@@ -44,59 +43,74 @@ export function StoriesHomeScreen() {
           paddingHorizontal: screenScrollInsets.paddingHorizontal,
           paddingTop: screenScrollInsets.paddingTop,
           paddingBottom: screenScrollInsets.paddingBottom,
-          gap: screenScrollInsets.gap,
         }}
       >
-        <ApiStatusBanner />
-        <ScreenHeader
-          kicker="Longform"
-          title="Stories"
-          dek="History pinned to place and era. Each piece links to the records it rests on, with sources you can open."
-        />
+        <ApiStatusBanner compact />
+        <EditionSurfaceStack>
+          <EditionSurfacePanel
+            index="00"
+            kicker="Longform"
+            title="History pinned to place"
+            dek="Each piece links to the records it rests on, with sources you can open. Era and geography stay visible in every entry."
+          />
 
-        {featured ? (
-          <FeaturedStoryCard entry={featured} onPress={() => router.push(storyHref(featured) as never)} />
-        ) : null}
+          {featured ? (
+            <EditionSurfacePanel index="01" kicker="Featured" title="Start here">
+              <FeaturedStoryCard entry={featured} onPress={() => router.push(storyHref(featured) as never)} />
+            </EditionSurfacePanel>
+          ) : null}
 
-        {archiveStories.length > 0 ? (
-          <View style={{ gap: space['2'] }} accessibilityRole="none">
-            <SectionHeader title="In the archive" meta={countLabel} headingScale="bodyEmphasis" />
-            <LiftedSurface tone="surface" shadow="none">
-              {archiveStories.map((entry, index) => (
-                <StoryCompactRow
-                  key={`${entry.section}-${entry.page.slug}`}
-                  entry={entry}
-                  onPress={() => router.push(storyHref(entry) as never)}
-                  showDivider={index < archiveStories.length - 1}
-                />
-              ))}
-            </LiftedSurface>
-          </View>
-        ) : null}
+          {archiveStories.length > 0 ? (
+            <EditionSurfacePanel
+              index={featured ? '02' : '01'}
+              kicker="Archive"
+              title="Published stories"
+              panelLabel="Catalog"
+              panelMeta={countLabel}
+            >
+              <LiftedSurface tone="surfaceRaised" shadow="none">
+                {archiveStories.map((entry, index) => (
+                  <StoryCompactRow
+                    key={`${entry.section}-${entry.page.slug}`}
+                    entry={entry}
+                    indexLabel={String(index + 1).padStart(2, '0')}
+                    onPress={() => router.push(storyHref(entry) as never)}
+                    showDivider={index < archiveStories.length - 1}
+                  />
+                ))}
+              </LiftedSurface>
+            </EditionSurfacePanel>
+          ) : null}
 
-        {secondarySections.length > 0 ? (
-          <View style={{ gap: space['2'] }}>
-            <SectionHeader title="More to read" meta="Context & method" headingScale="bodyEmphasis" />
-            <LiftedSurface tone="surface" shadow="none">
-              {secondarySections.map((section, index) => (
-                <ListRow
-                  key={section.routeId}
-                  density="compact"
-                  title={section.title}
-                  subtitle={section.subtitle}
-                  leading={
-                    <NavIcon
-                      name={SECONDARY_ICONS[section.routeId as keyof typeof SECONDARY_ICONS]}
-                    />
-                  }
-                  showChevron
-                  onPress={() => router.push(`/learn/${section.routeId}` as never)}
-                  showDivider={index < secondarySections.length - 1}
-                />
-              ))}
-            </LiftedSurface>
-          </View>
-        ) : null}
+          {secondarySections.length > 0 ? (
+            <EditionSurfacePanel
+              index={featured ? '03' : '02'}
+              kicker="Context"
+              title="More to read"
+              panelMeta="Context and method"
+            >
+              <LiftedSurface tone="surfaceRaised" shadow="none">
+                {secondarySections.map((section, index) => (
+                  <LedgerRow
+                    key={section.routeId}
+                    title={section.title}
+                    summary={section.subtitle}
+                    indexLabel={String(index + 1).padStart(2, '0')}
+                    leading={
+                      <NavIcon
+                        name={SECONDARY_ICONS[section.routeId as keyof typeof SECONDARY_ICONS]}
+                        size={20}
+                      />
+                    }
+                    showChevron
+                    onPress={() => router.push(`/learn/${section.routeId}` as never)}
+                    showDivider={index < secondarySections.length - 1}
+                  />
+                ))}
+              </LiftedSurface>
+            </EditionSurfacePanel>
+          ) : null}
+        </EditionSurfaceStack>
       </ScrollView>
     </ScreenCanvas>
   );

@@ -1,0 +1,78 @@
+/**
+ * Shared v6 edition atmosphere: paper grain + archive index grid in page gutters,
+ * plus optional scattered mosaic tiles (home, stories). Surface panels stay opaque.
+ */
+
+.ds-edition-atmosphere-canvas {
+  isolation: isolate;
+  --ds-edition-pattern-grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  --ds-edition-pattern-archive-grid: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 640'%3E%3Cpath d='M0 80 H640 M0 160 H640 M0 240 H640 M0 320 H640 M0 400 H640 M0 480 H640 M0 560 H640' stroke='%23D7D0C4' stroke-width='1' stroke-opacity='0.55'/%3E%3Cpath d='M80 0 V640 M160 0 V640 M240 0 V640 M320 0 V640 M400 0 V640 M480 0 V640 M560 0 V640' stroke='%23D7D0C4' stroke-width='1' stroke-opacity='0.38'/%3E%3Cpath d='M48 48 L96 48 L96 96 L48 96 Z' fill='none' stroke='%238E4F2A' stroke-width='1.2' stroke-opacity='0.16'/%3E%3Cpath d='M544 544 L592 544 L592 592 L544 592 Z' fill='none' stroke='%238E4F2A' stroke-width='1.2' stroke-opacity='0.14'/%3E%3Cpath d='M520 120 L560 120 L560 160' fill='none' stroke='%23D7D0C4' stroke-width='1' stroke-opacity='0.42'/%3E%3Cpath d='M120 520 L160 520 L160 560' fill='none' stroke='%23D7D0C4' stroke-width='1' stroke-opacity='0.42'/%3E%3C/svg%3E");
+  --ds-edition-pattern-archive-grid-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 640'%3E%3Cpath d='M0 80 H640 M0 160 H640 M0 240 H640 M0 320 H640 M0 400 H640 M0 480 H640 M0 560 H640' stroke='%236D675F' stroke-width='1' stroke-opacity='0.42'/%3E%3Cpath d='M80 0 V640 M160 0 V640 M240 0 V640 M320 0 V640 M400 0 V640 M480 0 V640 M560 0 V640' stroke='%236D675F' stroke-width='1' stroke-opacity='0.28'/%3E%3Cpath d='M48 48 L96 48 L96 96 L48 96 Z' fill='none' stroke='%23D07A32' stroke-width='1.2' stroke-opacity='0.14'/%3E%3Cpath d='M544 544 L592 544 L592 592 L544 592 Z' fill='none' stroke='%23D07A32' stroke-width='1.2' stroke-opacity='0.12'/%3E%3C/svg%3E");
+  --ds-edition-gutter-band: max(0px, calc((100vw - min(100% - (var(--ds-gutter) * 2), var(--ds-grid-max))) / 2));
+}
+
+.ds-edition-atmosphere-canvas::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-color: var(--ds-canvas);
+  background-image: var(--ds-edition-pattern-archive-grid), var(--ds-edition-pattern-grain);
+  background-size: 20rem 20rem, 256px 256px;
+  background-position: 0 0, 0 0;
+  background-repeat: repeat, repeat;
+  opacity: 0.92;
+}
+
+[data-theme='dark'] .ds-edition-atmosphere-canvas::before {
+  background-image: var(--ds-edition-pattern-archive-grid-dark), var(--ds-edition-pattern-grain);
+  opacity: 1;
+}
+
+.ds-edition-atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ds-edition-atmosphere__mosaic {
+  position: absolute;
+  inset: 0;
+}
+
+.ds-edition-atmosphere__tile {
+  position: absolute;
+  top: calc(var(--ds-edition-tile-y, 0.5) * 100%);
+  width: var(--ds-edition-tile-size, 4rem);
+  height: var(--ds-edition-tile-size, 4rem);
+  object-fit: cover;
+  transform: translate(-50%, -50%) rotate(var(--ds-edition-tile-rot, 0deg));
+  opacity: var(--ds-edition-tile-opacity, 0.08);
+  filter: grayscale(1) contrast(1.04);
+  border: var(--ds-border-width) solid color-mix(in srgb, var(--ds-rule) 55%, transparent);
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-edition-atmosphere__tile[data-side='left'] {
+  left: calc(var(--ds-edition-gutter-band, 0px) * var(--ds-edition-tile-x, 0.5));
+}
+
+.ds-edition-atmosphere__tile[data-side='right'] {
+  right: calc(var(--ds-edition-gutter-band, 0px) * var(--ds-edition-tile-x, 0.5));
+  left: auto;
+  transform: translate(50%, -50%) rotate(var(--ds-edition-tile-rot, 0deg));
+}
+
+[data-theme='dark'] .ds-edition-atmosphere__tile {
+  opacity: calc(var(--ds-edition-tile-opacity, 0.08) * 0.72);
+  border-color: color-mix(in srgb, var(--ds-rule) 35%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-edition-atmosphere__mosaic {
+    display: none;
+  }
+}

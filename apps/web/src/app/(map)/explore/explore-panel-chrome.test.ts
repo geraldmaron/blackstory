@@ -4,10 +4,16 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
+  EXPLORE_EDITION_STAGE_CLASS,
+  EXPLORE_EDITION_TAB_CLASS,
+  EXPLORE_EDITION_TABS_CLASS,
+  exploreEditionTabClassName,
+  exploreEditionTabsClassName,
   exploreInstrumentsPanelClassName,
   exploreNarrowExclusivePatch,
   exploreResultsPanelClassName,
   exploreStageChromeAttrs,
+  exploreStageRootClassName,
   resolveExploreLeftTab,
   shouldAcceptExploreServerViewState,
 } from './explore-panel-chrome';
@@ -143,4 +149,22 @@ test('shouldAcceptExploreServerViewState prefers live address bar over stale RSC
     }),
     true,
   );
+});
+
+test('v6 edition stage root class includes explore edition hook', () => {
+  assert.equal(
+    exploreStageRootClassName({ entering: false }),
+    `ds-explore-stage ${EXPLORE_EDITION_STAGE_CLASS}`,
+  );
+  assert.equal(
+    exploreStageRootClassName({ entering: true }),
+    `ds-explore-stage ${EXPLORE_EDITION_STAGE_CLASS} ds-explore-stage--entering`,
+  );
+});
+
+test('v6 edition tab class hooks stay stable for CSS contracts', () => {
+  assert.equal(exploreEditionTabsClassName(), EXPLORE_EDITION_TABS_CLASS);
+  assert.equal(exploreEditionTabClassName(), EXPLORE_EDITION_TAB_CLASS);
+  assert.equal(EXPLORE_EDITION_TABS_CLASS, 'ds-explore-edition__tabs');
+  assert.equal(EXPLORE_EDITION_TAB_CLASS, 'ds-explore-edition__tab');
 });

@@ -10,7 +10,7 @@ export const THEME_IMPACT_CATALOG: readonly ThemeImpactCatalogEntry[] = [
     title: 'Redlining',
     priority: 'P0',
     lede:
-      'Federal and local housing-credit grading, where HOLC maps were drawn, and what followed in formerly graded places — with citations, not causal shortcuts.',
+      'Federal and local housing-credit grading, where HOLC maps were drawn, and what followed in formerly graded places, with citations, not causal shortcuts.',
     available: true,
   },
   {
@@ -34,7 +34,7 @@ export const THEME_IMPACT_CATALOG: readonly ThemeImpactCatalogEntry[] = [
     title: 'Mass incarceration',
     priority: 'P1',
     lede:
-      'State-level imprisonment trends across modern justice eras — overlapping Phase 1 justice metrics, scheduled after P0 pilots.',
+      'State-level imprisonment trends across modern justice eras, overlapping Phase 1 justice metrics, scheduled after P0 pilots.',
     available: false,
   },
   {
@@ -42,7 +42,7 @@ export const THEME_IMPACT_CATALOG: readonly ThemeImpactCatalogEntry[] = [
     title: 'Environmental racism',
     priority: 'P1',
     lede:
-      'Environmental burden indicators beside Black population share — pending EPA/EJ source ingestion and rights review.',
+      'Environmental burden indicators beside Black population share, pending EPA/EJ source ingestion and rights review.',
     available: false,
   },
 ] as const;

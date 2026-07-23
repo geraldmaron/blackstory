@@ -36,11 +36,11 @@ export function BooksSearchTypeahead({ defaultValue, corpus }: BooksSearchTypeah
       id="q"
       name="q"
       label="Search"
-      labelClassName="ds-filters__label"
+      labelClassName="ds-pill-select__label"
       placeholder="Title, author, or summary…"
       defaultValue={defaultValue}
       className="ds-typeahead ds-typeahead--filter"
-      inputClassName="ds-filters__control"
+      inputClassName="ds-pill-select__control ds-books-edition__q"
       listLabel="Suggested titles"
       suggestLocal={suggestLocal}
     />

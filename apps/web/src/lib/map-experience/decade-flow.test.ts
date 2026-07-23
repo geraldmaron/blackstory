@@ -13,6 +13,7 @@ import type { StatePopulationIndex } from '@repo/domain/map/state-population';
 import type { ExploreMapFeature, ExploreMapFeatureCollection } from './build-explore-map-source';
 import type { HistoryEdgeLineCollection } from './build-history-edge-lines';
 import { buildDecadeFlowFrames, FINAL_FRAME_LABEL } from './decade-flow';
+import { kindFamilyFor } from './kind-encoding';
 
 function feature(
   id: string,
@@ -38,6 +39,7 @@ function feature(
       topicTags: [],
       shade: '#C48A4A',
       glyph: 'circle',
+      kindFamily: kindFamilyFor('place'),
       ...(state
         ? { stateFips: state.fips, statePostalCode: state.postal, stateName: state.name }
         : {}),

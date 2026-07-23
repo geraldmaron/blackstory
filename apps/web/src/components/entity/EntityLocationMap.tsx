@@ -14,6 +14,13 @@ import {
   buildEntityLocationMapStyle,
   zoomForLocationPrecision,
 } from '../../lib/map-experience/entity-location-map-style';
+import {
+  bindMapResizeLifecycle,
+  bindWebGlContextRecovery,
+  containerHasLayout,
+  isWebGlAvailable,
+  waitForContainerLayout,
+} from '../../lib/map-experience/map-libre-lifecycle';
 
 export type EntityLocationMapProps = {
   readonly lat: number;
@@ -44,12 +51,21 @@ export function EntityLocationMap({ lat, lng, label, precision, caption }: Entit
 
     let cancelled = false;
     let map: MapLibreMap | undefined;
+    let resizeLifecycle: ReturnType<typeof bindMapResizeLifecycle> | undefined;
+    let contextRecovery: ReturnType<typeof bindWebGlContextRecovery> | undefined;
 
     void (async () => {
       try {
+        await waitForContainerLayout(container);
+        if (cancelled || !container.isConnected || !containerHasLayout(container)) return;
+
+        if (!isWebGlAvailable()) {
+          throw new Error('WebGL unavailable');
+        }
+
         const maplibregl = (await import('maplibre-gl')).default;
         await import('maplibre-gl/dist/maplibre-gl.css');
-        if (cancelled || !container.isConnected) return;
+        if (cancelled || !container.isConnected || !containerHasLayout(container)) return;
 
         const colorScheme = readDocumentColorScheme();
         schemeRef.current = colorScheme;
@@ -67,11 +83,24 @@ export function EntityLocationMap({ lat, lng, label, precision, caption }: Entit
         mapRef.current = map;
         map.once('load', () => {
           if (cancelled) return;
+          contextRecovery = bindWebGlContextRecovery(
+            map!.getCanvas(),
+            () => {
+              if (!cancelled) setLoadState('unavailable');
+            },
+            () => {
+              if (!cancelled) map?.resize();
+            },
+          );
           map?.resize();
           setLoadState('ready');
         });
         map.on('error', () => {
           if (!cancelled) setLoadState('unavailable');
+        });
+
+        resizeLifecycle = bindMapResizeLifecycle(container, () => {
+          map?.resize();
         });
       } catch {
         if (!cancelled) setLoadState('unavailable');
@@ -80,6 +109,8 @@ export function EntityLocationMap({ lat, lng, label, precision, caption }: Entit
 
     return () => {
       cancelled = true;
+      resizeLifecycle?.disconnect();
+      contextRecovery?.disconnect();
       map?.remove();
       mapRef.current = null;
     };

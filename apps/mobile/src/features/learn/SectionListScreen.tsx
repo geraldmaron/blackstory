@@ -1,11 +1,16 @@
 /**
- * Shared "list of rows, tap to navigate" screen body (MOB-015 requirement #1). Used by the Learn
- * tab index, the More tab index, and `/learn/[section]/index.tsx`'s slug list for a multi-page
- * section — one presentational component instead of three near-duplicate screens.
+ * Shared list screen for legal/errata-style sections: v6 Surface edition stack with
+ * indexed intro and compact LedgerRow index inside a raised panel.
  */
-import { ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { ListRow, Text } from '@/ui';
+import { ScrollView, StyleSheet } from 'react-native';
+import {
+  EditionSurfacePanel,
+  EditionSurfaceStack,
+  LedgerRow,
+  LiftedSurface,
+  ScreenCanvas,
+  screenScrollInsets,
+} from '@/ui';
 
 export interface SectionListRow {
   readonly key: string;
@@ -17,31 +22,44 @@ export interface SectionListRow {
 export interface SectionListScreenProps {
   readonly title: string;
   readonly intro?: string;
+  readonly kicker?: string;
   readonly rows: readonly SectionListRow[];
 }
 
-export function SectionListScreen({ title, intro, rows }: SectionListScreenProps) {
+export function SectionListScreen({ title, intro, kicker = 'Archive', rows }: SectionListScreenProps) {
+  const countLabel = rows.length === 1 ? '1 page' : `${rows.length} pages`;
+
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
-      <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
-        <Text variant="title" isHeading>
-          {title}
-        </Text>
-        {intro ? (
-          <Text variant="body" colorRole="inkMuted">
-            {intro}
-          </Text>
-        ) : null}
-        {rows.map((row, index) => (
-          <ListRow
-            key={row.key}
-            title={row.title}
-            subtitle={row.subtitle}
-            onPress={row.onPress}
-            showDivider={index < rows.length - 1}
-          />
-        ))}
+    <ScreenCanvas>
+      <ScrollView contentContainerStyle={styles.content}>
+        <EditionSurfaceStack>
+          <EditionSurfacePanel index="00" kicker={kicker} title={title} dek={intro} compact />
+
+          <EditionSurfacePanel index="01" kicker="Index" title="Pages" panelMeta={countLabel}>
+            <LiftedSurface tone="surfaceRaised" shadow="none">
+              {rows.map((row, index) => (
+                <LedgerRow
+                  key={row.key}
+                  title={row.title}
+                  summary={row.subtitle}
+                  indexLabel={String(index + 1).padStart(2, '0')}
+                  onPress={row.onPress}
+                  showChevron
+                  showDivider={index < rows.length - 1}
+                />
+              ))}
+            </LiftedSurface>
+          </EditionSurfacePanel>
+        </EditionSurfaceStack>
       </ScrollView>
-    </SafeAreaView>
+    </ScreenCanvas>
   );
 }
+
+const styles = StyleSheet.create({
+  content: {
+    paddingHorizontal: screenScrollInsets.paddingHorizontal,
+    paddingTop: screenScrollInsets.paddingTop,
+    paddingBottom: screenScrollInsets.paddingBottom,
+  },
+});

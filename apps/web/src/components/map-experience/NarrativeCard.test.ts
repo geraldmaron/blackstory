@@ -26,16 +26,15 @@ test('renders name, era, one-line story, evidence count, confidence, and a link 
   assert.match(html, /ds-kind-badge/);
   assert.match(html, />Place</);
   assert.doesNotMatch(html, />place</);
+  assert.match(html, /ds-record-anatomy/);
+  assert.match(html, /ds-edition-fact-icon/);
+  assert.match(html, />Where</);
   assert.match(html, /ds-confidence-mark/);
-  assert.match(html, /data-labeled="true"/);
-  assert.match(html, /ds-confidence-mark__icon/);
   assert.match(html, /aria-label="High confidence/i);
   assert.match(html, /ds-status-mark/);
   assert.match(html, new RegExp(`href="${feature.properties.href}"`));
   assert.match(html, /Selected record/);
-  assert.match(html, /><dt>Where<\/dt>/);
   assert.match(html, /ds-nc__title-link/);
-  assert.match(html, /Open full record/);
 });
 
 test('links Where to external maps and other metadata to the right site views', () => {
@@ -46,6 +45,7 @@ test('links Where to external maps and other metadata to the right site views', 
   assert.equal(properties.statePostalCode, 'DC');
   assert.match(html, /href="https:\/\/www\.google\.com\/maps\/search\/\?api=1&amp;query=/);
   assert.match(html, /aria-label="Open [^"]+ in maps"/);
+  assert.match(html, /ds-record-anatomy__place-link/);
   assert.match(html, /rel="noopener noreferrer"/);
   assert.match(html, /target="_blank"/);
   assert.doesNotMatch(html, /href="[^"]*state=DC"/);
@@ -53,7 +53,7 @@ test('links Where to external maps and other metadata to the right site views', 
   assert.match(html, /href="\/entity\/ent_15th_st_church_001#accepted-claims"/);
   assert.match(html, /href="[^"]*kind=place"/);
   assert.match(html, /aria-label="Browse Place records"/);
-  assert.match(html, /href="\/search\?status=active"/);
+  assert.match(html, /href="\/history\?status=active"/);
 });
 
 test('Where still links to maps when postal code is absent but coordinates exist', () => {
@@ -75,31 +75,35 @@ test('renders the radius affordance as words, never as a bare number with no con
   const html = renderToStaticMarkup(createElement(NarrativeCard, { feature }));
   assert.match(html, /precision/);
   assert.match(html, /not an exact address/);
-  assert.match(html, /±660 ft/);
-  assert.doesNotMatch(html, /±200 m/);
+  assert.match(html, /ds-record-anatomy__precision/);
 });
 
-test('renders session navigation when sessionNav props are provided', () => {
+test('renders edition fact strip and browse controls when browseControls props are provided', () => {
   const feature = requireFeature('ent_15th_st_church_001');
   const html = renderToStaticMarkup(
     createElement(NarrativeCard, {
       feature,
-      sessionNav: {
-        canBack: true,
-        canNext: true,
-        randomEnabled: false,
-        onBack: () => {},
+      browseControls: {
+        total: 3,
+        index: 1,
+        mode: 'ordered',
+        onModeChange: () => {},
+        onPrevious: () => {},
         onNext: () => {},
-        onRandomToggle: () => {},
+        onGoTo: () => {},
+        itemIds: ['a', 'b', 'c'],
+        ariaLabel: 'Records in view',
       },
     }),
   );
 
-  assert.match(html, /aria-label="Record navigation"/);
-  assert.match(html, /ds-nc__session-nav/);
-  assert.match(html, />Back</);
-  assert.match(html, />Next</);
-  assert.match(html, /Random: off/);
+  assert.match(html, /ds-record-anatomy/);
+  assert.match(html, /ds-edition-fact-icon/);
+  assert.match(html, /Record at a glance/);
+  assert.match(html, /ds-record-browse/);
+  assert.match(html, /aria-roledescription="carousel controls"/);
+  assert.match(html, /Ordered/);
+  assert.match(html, /2 \/ 3/);
 });
 
 test('floats the close control on the card with an accessible label when onClose is set', () => {

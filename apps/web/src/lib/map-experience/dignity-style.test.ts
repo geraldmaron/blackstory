@@ -10,7 +10,13 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import { DENSITY_TIER_FILL, DIGNITY_PALETTE, POPULATION_SHARE_TIER_FILL, plateForScheme } from './dignity-style';
-import { KIND_ENCODING_ENTRIES, MAP_SEMANTIC_TONE_ENCODING } from './kind-encoding';
+import {
+  displayEncodingFor,
+  kindEncodingFor,
+  KIND_ENCODING_ENTRIES,
+  KIND_FAMILY_ENTRIES,
+  MAP_SEMANTIC_TONE_ENCODING,
+} from './kind-encoding';
 import { brandPalette } from '@repo/ui';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -116,18 +122,24 @@ test('no color in DIGNITY_PALETTE is red-hued except the allowlisted massacre to
   );
 });
 
-test('every kind shade is paired with a non-color glyph channel (WCAG 1.4.1)', () => {
+test('every micro-kind keeps a non-color glyph channel (WCAG 1.4.1)', () => {
   for (const [kind, entry] of KIND_ENCODING_ENTRIES) {
     assert.ok(
       typeof entry.glyph === 'string' && entry.glyph.length > 0,
       `kind "${kind}" must have a glyph`,
     );
   }
-  const signatures = KIND_ENCODING_ENTRIES.map(([, entry]) => `${entry.shade}::${entry.glyph}`);
-  assert.equal(
-    new Set(signatures).size,
-    signatures.length,
-    'no two kinds may share both shade and glyph',
+});
+
+test('kind families share shades but micro-kinds keep distinct glyphs where needed', () => {
+  const placeShade = KIND_FAMILY_ENTRIES.find(([family]) => family === 'places')?.[1].shade;
+  assert.ok(placeShade);
+  assert.equal(displayEncodingFor('place').shade, placeShade);
+  assert.equal(displayEncodingFor('school').shade, placeShade);
+  assert.notEqual(
+    kindEncodingFor('place').glyph,
+    kindEncodingFor('school').glyph,
+    'place vs school must differ on glyph even within Places family',
   );
 });
 
@@ -164,8 +176,8 @@ test('no status or skin framing in kind labels or legend prose', () => {
   );
   assert.match(
     renderedProse,
-    /kind of place or record/i,
-    'the legend must state that color encodes kind (and historical tones)',
+    /kind groups/i,
+    'the legend must state that color encodes kind groups (and historical tones)',
   );
 });
 

@@ -11,7 +11,7 @@ import {
   type NotabilityCriterion,
   type StatusHistoryEntry,
 } from '@repo/domain';
-import { isDatePrecision } from '@repo/domain/era';
+import { deriveEraBuckets, isDatePrecision } from '@repo/domain/era';
 import { findUsStateForPoint } from '@repo/domain/map/geography';
 import { type PublicEntityView } from '../../data/public-seed';
 
@@ -251,6 +251,30 @@ export function resolveJurisdictionLabel(projection: PublicProjectionInput): str
   return '';
 }
 
+function resolveProjectionEraBuckets(
+  projection: PublicProjectionInput,
+): readonly string[] | undefined {
+  if (projection.eraBuckets && projection.eraBuckets.length > 0) {
+    return projection.eraBuckets;
+  }
+  const history = projection.statusHistory ?? [];
+  const buckets = new Set<string>();
+  for (const entry of history) {
+    if (!entry.validFrom?.trim()) continue;
+    const precision =
+      entry.datePrecision && isDatePrecision(entry.datePrecision) ? entry.datePrecision : 'year';
+    for (const bucket of deriveEraBuckets({
+      validFrom: entry.validFrom,
+      ...(entry.validTo !== undefined ? { validTo: entry.validTo } : {}),
+      datePrecision: precision,
+    })) {
+      buckets.add(bucket);
+    }
+  }
+  if (buckets.size > 0) return [...buckets].sort((a, b) => a.localeCompare(b));
+  return undefined;
+}
+
 /**
  * Convert a public projection doc into a page-ready view.
  * Renders live projection data as-is without enrichment from bundled seed records.
@@ -266,6 +290,7 @@ export function mapProjectionToPublicEntityView(
   const geoAnchor = mapGeoAnchor(projection.location);
   const claims = mapClaims(projection.claims);
   const { status, statusHistory } = resolveStatusHistory(projection, claims);
+  const eraBuckets = resolveProjectionEraBuckets(projection);
 
   const lat = projection.location?.lat;
   const lng = projection.location?.lng;
@@ -283,10 +308,10 @@ export function mapProjectionToPublicEntityView(
     kind: projection.kind as PublicEntityView['kind'],
     displayName: projection.displayName,
     summary,
-    era: projection.eraBuckets?.[0] ?? 'unknown',
+    era: eraBuckets?.[0] ?? 'unknown',
     ...(status !== undefined ? { status } : {}),
     ...(statusHistory !== undefined ? { statusHistory } : {}),
-    ...(projection.eraBuckets !== undefined ? { eraBuckets: projection.eraBuckets } : {}),
+    ...(eraBuckets !== undefined ? { eraBuckets } : {}),
     notabilityLabels:
       projection.notabilityLabels && projection.notabilityLabels.length > 0
         ? projection.notabilityLabels

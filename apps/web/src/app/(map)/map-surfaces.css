@@ -6,9 +6,8 @@
  * context above it so paint order never depends on DOM order vs. the canvas. On `/` the plate is
  * interactive under hero chrome via pass-through hit regions (hero root `pointer-events: none`,
  * CTAs/timeline `auto`); `/explore` keeps full hit-testing. The MapLibre style plate follows
- * light/dark via `colorScheme`; floating chrome uses
- * theme-relative surface tokens so instruments stay readable in either mode while the canvas stays
- * perceptible beneath.
+ * light/dark via `colorScheme`; Explore v6 floating panels use opaque theme-aware Surface
+ * cards (same edition vocabulary as home) — no fixed-ink cockpit, no backdrop blur.
  */
 
 .ds-map-surface {
@@ -26,9 +25,9 @@
   --ds-map-attrib-left: var(--ds-space-3);
 }
 
-/* Homepage: pins and state shapes stay tappable under the hero. The hero root passes
-   empty regions through; CTAs and the timeline instrument re-enable hit-testing. */
-.ds-map-surface:has(.ds-hero-stage) .ds-map-stage {
+/* Homepage: pins and state shapes stay tappable under the hero when the live plate
+   is inset to the hero panel — see `.ds-map-stage--hero-inset`. */
+.ds-map-surface:has(.ds-hero-stage):not(:has(.ds-home-hero)) .ds-map-stage {
   pointer-events: auto;
 }
 
@@ -36,7 +35,7 @@
   pointer-events: none;
 }
 
-/* Non-interactive copy does not steal pin hits; CTAs and the timeline stay tappable. */
+/* Non-interactive copy does not steal pin hits; CTAs stay tappable on legacy cinema hero. */
 .ds-hero-stage__kicker,
 .ds-hero-stage__headline,
 .ds-hero-stage__support,
@@ -49,6 +48,65 @@
 .ds-hero-timeline,
 .ds-hero-timeline * {
   pointer-events: auto;
+}
+
+/* Home edition: single Surface panel — CTAs, scroll cue, and micro-facts re-enable hits;
+   the map column is a transparent pass-through to the inset MapStage plate. */
+.ds-home-hero__copy,
+.ds-home-hero__kicker,
+.ds-home-hero__headline,
+.ds-home-hero__lede,
+.ds-home-hero__micro-facts,
+.ds-home-hero__micro-fact,
+.ds-home-hero__map-caption {
+  pointer-events: none;
+}
+
+.ds-home-hero__map,
+.ds-home-hero__map-readout {
+  pointer-events: none;
+}
+
+.ds-home-hero__ctas,
+.ds-home-hero__ctas *,
+.ds-home-hero__scroll-cue,
+.ds-home-hero__scroll-cue * {
+  pointer-events: auto;
+}
+
+/*
+ * ADR-017: MapStage stays mounted for explore handoff. On `/` the fixed plate is sized and
+ * positioned to the hero map column (`hero-map-inset.ts`) so real archive pins render in-panel;
+ * geometry positioning replaces clip-path for cross-browser WebGL reliability. `/explore` clears
+ * the inset for full-bleed cockpit.
+ */
+.ds-map-surface:has(.ds-home-hero) .ds-map-stage {
+  visibility: visible;
+  pointer-events: auto;
+  height: 100dvh;
+  overflow: visible;
+  /* Baseline plate stays at 0; hero inset raises in the rule below so the map
+     canvas paints above `.ds-home` atmosphere (z-index 0) but below copy (z-index 2). */
+  z-index: 0;
+}
+
+.ds-map-surface:has(.ds-home-hero) .ds-map-stage--hero-inset {
+  z-index: 1;
+  overflow: hidden;
+  /* Viewport box from hero-map-inset.ts — no clip-path (Safari WebGL compositing). */
+}
+
+.ds-map-surface:has(.ds-home-hero:not(.ds-hero-stage--dissolving)) .maplibregl-ctrl-top-right {
+  display: none;
+}
+
+.ds-map-surface:has(.ds-home-hero:not(.ds-hero-stage--dissolving)) .maplibregl-ctrl-bottom-left {
+  /* Attribution stays inside the hero map readout. */
+  z-index: 2;
+}
+
+.ds-map-surface:has(.ds-home-hero) main {
+  background: transparent;
 }
 
 /* Homepage map surface: footer sits outside `.ds-map-surface` but the plate is
@@ -433,7 +491,7 @@
   transform: translateX(-50%);
 }
 
-/* Left instrument chassis — Filters + Color key share one surface via tabs. */
+/* Left instrument chassis — Filters + Color key share one theme-aware Surface card (v6). */
 .ds-explore-stage__instruments {
   position: fixed;
   top: calc(var(--ds-island-clearance) + var(--ds-space-2));
@@ -444,52 +502,13 @@
   gap: var(--ds-space-2);
   width: var(--ds-explore-instruments-width);
   max-height: calc(100svh - var(--ds-island-clearance) - var(--ds-space-8));
-  padding: var(--ds-space-3);
+  padding: var(--ds-explore-panel-padding, var(--ds-space-5));
   overflow-y: auto;
   scroll-padding-top: var(--ds-space-2);
-  border: var(--ds-border-width) solid var(--ds-border);
+  border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-md);
-  background: color-mix(in srgb, var(--ds-surface) 96%, transparent);
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
-}
-
-.ds-explore-stage__tabs {
-  display: flex;
-  flex: 1 1 auto;
-  min-width: 0;
-  gap: var(--ds-space-1);
-}
-
-.ds-explore-stage__tab {
-  flex: 1 1 0;
-  min-height: 2.75rem;
-  padding: 0 var(--ds-space-2);
-  border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-sm);
-  background: transparent;
-  color: var(--ds-ink-muted);
-  font-family: var(--ds-font-sans);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-.ds-explore-stage__tab[aria-selected='true'] {
-  border-color: var(--ds-accent);
-  color: var(--ds-accent);
-}
-
-.ds-explore-stage__tab:hover {
-  border-color: var(--ds-border-strong);
+  background: var(--ds-surface);
   color: var(--ds-ink);
-}
-
-.ds-explore-stage__tab:focus-visible {
-  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
-  outline-offset: var(--ds-focus-offset);
 }
 
 .ds-explore-stage__tabpanel {
@@ -584,15 +603,15 @@
 }
 
 .ds-explore-place__chip--selected {
-  background: var(--ds-fixed-ink);
-  border-color: var(--ds-fixed-ink);
-  color: var(--ds-fixed-paper);
+  background: var(--ds-surface-raised);
+  border-color: var(--ds-accent);
+  color: var(--ds-accent);
 }
 
 .ds-explore-place__chip--selected:hover,
 .ds-explore-place__chip--selected:focus-visible {
-  border-color: var(--ds-fixed-accent);
-  outline-color: var(--ds-fixed-accent);
+  border-color: var(--ds-accent-graphic);
+  outline-color: var(--ds-accent-graphic);
 }
 
 .ds-explore-place__status {
@@ -742,8 +761,8 @@
   min-height: 2.75rem;
   padding: 0 var(--ds-space-3);
   border-radius: var(--ds-radius-sm);
-  border-color: var(--ds-border);
-  background: transparent;
+  border-color: var(--ds-rule);
+  background: var(--ds-surface-raised);
   font-size: 0.8125rem;
   font-weight: 500;
 }
@@ -781,7 +800,8 @@
   gap: var(--ds-space-2);
   padding-bottom: var(--ds-space-2);
   margin-bottom: calc(-1 * var(--ds-space-2));
-  background: color-mix(in srgb, var(--ds-surface) 96%, transparent);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  background: var(--ds-surface);
 }
 
 .ds-explore-stage__panel-header .ds-explore-stage__panel-title,
@@ -859,14 +879,14 @@
   min-height: 2.75rem;
   min-width: 2.75rem;
   padding: 0 var(--ds-space-3);
-  border: var(--ds-border-width) solid var(--ds-border);
+  border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-md);
-  background: color-mix(in srgb, var(--ds-surface) 88%, transparent);
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  background: var(--ds-surface);
+  font-family: var(--ds-font-mono);
   font-size: 0.6875rem;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: 0.06em;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
@@ -936,14 +956,12 @@
   gap: var(--ds-space-3);
   width: var(--ds-explore-results-width);
   max-height: calc(100svh - var(--ds-island-clearance) - var(--ds-space-8));
-  padding: var(--ds-space-4) var(--ds-space-4) var(--ds-space-6);
+  padding: var(--ds-explore-panel-padding, var(--ds-space-5));
   overflow-y: auto;
   scroll-padding-top: var(--ds-space-2);
-  border: var(--ds-border-width) solid var(--ds-border);
+  border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-md);
-  background: color-mix(in srgb, var(--ds-surface) 96%, transparent);
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  background: var(--ds-surface);
   transition: opacity var(--ds-duration-fast) var(--ds-easing);
 }
 
@@ -987,7 +1005,7 @@
   margin: 0;
   padding: 0;
   border: 0;
-  background: color-mix(in srgb, var(--ds-fixed-ink) 42%, transparent);
+  background: color-mix(in srgb, var(--ds-canvas) 58%, transparent);
   cursor: pointer;
   pointer-events: auto;
 }

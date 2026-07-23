@@ -1,12 +1,9 @@
 /**
- * Homepage: the hero IS the shared `MapStage` canvas (mounted once by the `(map)` layout).
- * `HeroStage` renders the floating chrome over it; `HomeStorySections` owns the beats below
- * (design-direction-v5 §6.1): About, From the data (archive + `/data` census viz), the story
- * rail, and the "how this works" band.
+ * Homepage: single-panel hero + theme-aware edition beats (`HomeEdition`).
+ * `HeroStage` positions the live `MapStage` plate over the hero map column; `engage()` clears
+ * the inset for ADR-017 explore handoff (see `hero-map-inset.ts` + map-surfaces.css).
  *
- * Decade fills load from the static Census Black-population index (twps0056 + modern county
- * rollups); pins/edges stay archive overlays. National totals for the timeline readout come
- * from the same timeline snapshot used on `/data` when available.
+ * Decade fills seed the hidden plate's complete-archive state for explore transitions.
  */
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -15,11 +12,19 @@ import {
   parseStatePopulationIndexFile,
   type StatePopulationIndexFile,
 } from '@repo/domain/map/state-population';
-import { HomeStorySections } from '../../components/home/HomeStorySections';
+import { HomeEdition } from '../../components/home/HomeEdition';
+import { HomeAtmosphereMosaic } from '../../components/home/HomeAtmosphereMosaic';
+import { editionAtmosphereCanvasClassName } from '../../components/patterns/edition-atmosphere/edition-atmosphere-canvas';
 import type { StateStartEntry } from '../../components/home/StateStart';
 import '../../components/data/data-charts.css';
+import '../../components/home/home-edition.css';
+import '../../components/patterns/browse-mode.css';
+import '../../components/patterns/edition-fact-icon.css';
+import '../../components/patterns/record-anatomy.css';
 import '../../components/trust/research-pipeline-sketch.css';
 import { FEATURED_SEED_IDS } from '../../data/public-seed';
+import { buildHomeFeaturedCarouselSet } from '../../components/patterns/home-featured-set';
+import { initialBrowseIndex } from '../../components/patterns/browse-mode';
 import type { ExploreMapFeatureCollection } from '../../lib/map-experience/build-explore-map-source';
 import type { HistoryEdgeLineCollection } from '../../lib/map-experience/build-history-edge-lines';
 import { buildDecadeFlowFrames } from '../../lib/map-experience/decade-flow';
@@ -82,7 +87,7 @@ function eraSpanOf(collection: ExploreMapFeatureCollection): string | undefined 
     }
   }
   if (min === undefined || max === undefined) return undefined;
-  return min === max ? `${min}s` : `${min}s–${max}s`;
+  return min === max ? `${min}s` : `${min}s to ${max}s`;
 }
 
 export default async function HomePage() {
@@ -92,20 +97,16 @@ export default async function HomePage() {
     loadStatePopulationIndex(),
   ]);
 
-  // Feature the curated ids when the active release carries them; otherwise lead with whatever
-  // the release does hold, so the rail never goes empty just because curation lagged a release.
-  const curated = FEATURED_SEED_IDS.map((id) =>
-    base.entities.find((entity) => entity.id === id),
-  ).filter((entity): entity is NonNullable<typeof entity> => Boolean(entity));
-  const featured = curated.length > 0 ? curated : base.entities.slice(0, 3);
+  // Full active-release carousel: curated ids lead when present, then every other release entity.
+  const featured = buildHomeFeaturedCarouselSet(base.entities, FEATURED_SEED_IDS);
+  const featuredInitialIndex = initialBrowseIndex(featured.length);
 
   const states = tallyStates(base.featureCollection);
   const recordCount = base.featureCollection.features.length;
   const eraSpan = eraSpanOf(base.featureCollection);
 
-  // Decades in motion (v5 §6.1): per-decade edge lines from the history graph
-  // release + cumulative record reveal over the shared feature collection.
-  // State fills prefer the Census Black-population index when present.
+  // Decades in motion: per-decade edge lines from the history graph release + cumulative record
+  // reveal over the shared feature collection. State fills prefer the Census index when present.
   const { edgeLineCatalog } = buildEdgeLineCatalog();
   const edgesByDecade: Record<string, HistoryEdgeLineCollection> = {};
   for (const [decade, slice] of Object.entries(edgeLineCatalog.byDecade)) {
@@ -128,25 +129,26 @@ export default async function HomePage() {
   );
 
   return (
-    <>
+    <div className={`ds-home ${editionAtmosphereCanvasClassName()}`} data-home-edition="v6">
+      <HomeAtmosphereMosaic />
       <HeroStage
         featureCollection={base.featureCollection}
         jurisdictionAreaFeatures={base.jurisdictionAreaFeatures}
         featureCount={recordCount}
         stateCount={states.length}
         decadeFrames={decadeFrames}
+        {...(eraSpan !== undefined ? { eraSpan } : {})}
       />
 
-      <main id="main">
-        <HomeStorySections
-          featured={featured}
-          topStates={states.slice(0, TOP_STATE_LIMIT)}
-          recordCount={recordCount}
-          stateCount={states.length}
-          {...(eraSpan !== undefined ? { eraSpan } : {})}
-          {...(timeline ? { timeline } : {})}
-        />
-      </main>
-    </>
+      <HomeEdition
+        featured={featured}
+        featuredInitialIndex={featuredInitialIndex}
+        topStates={states.slice(0, TOP_STATE_LIMIT)}
+        recordCount={recordCount}
+        stateCount={states.length}
+        {...(eraSpan !== undefined ? { eraSpan } : {})}
+        {...(timeline ? { timeline } : {})}
+      />
+    </div>
   );
 }

@@ -1,13 +1,12 @@
 /**
- * Public "submit a lead" entry point. Covers channels with no compliant automated
- * API — Facebook Groups, Discord, closed forums, family papers, oral memory — by accepting a
- * human-submitted lead into the moderated quarantine queue. Nothing submitted here is
- * public. It only ever seeds research after independent-reviewer consensus
- * (`packages/domain/src/consensus-review/`) and the standard research pipeline —
- * see `../corrections/page.tsx` for the related correction-intake surface and
- * `docs/runbooks/moderator-wellbeing.md` for how the review queue is staffed.
+ * Public "submit a lead" entry point. v6 utility edition for moderated quarantine
+ * intake — nothing submitted here is public.
  */
 import { EmptyState, Notice } from '@repo/ui';
+import { UtilityEditionBodyPanel } from '../../components/patterns/utility-edition/UtilityEditionBodyPanel';
+import { UtilityEditionIntro } from '../../components/patterns/utility-edition/UtilityEditionIntro';
+import { UtilityEditionShell } from '../../components/patterns/utility-edition/UtilityEditionShell';
+import '../../components/patterns/utility-edition/utility-edition.css';
 import { SubmitLeadForm } from './SubmitLeadForm';
 
 export const metadata = {
@@ -18,16 +17,13 @@ export const metadata = {
 
 export default function SubmitLeadPage() {
   return (
-    <main className="ds-container ds-page" id="main">
-      <p className="ds-page__eyebrow">Contribute</p>
-      <h1 className="ds-page__title">Submit a lead</h1>
-      <p className="ds-page__lede">
-        Some of the most important sources for this history live where no compliant automated search
-        can reach — closed Facebook groups, Discord servers, private forums, family papers, oral
-        memory. If you know of one, tell us here.
-      </p>
-
-      <div className="ds-stack" style={{ marginTop: 'var(--ds-space-6)' }}>
+    <UtilityEditionShell mosaicSeed="submit-edition-v6" editionKey="submit">
+      <UtilityEditionIntro
+        kicker="Contribute"
+        title="Submit a lead"
+        lede="Some of the most important sources for this history live where no compliant automated search can reach — closed Facebook groups, Discord servers, private forums, family papers, oral memory. If you know of one, tell us here."
+      />
+      <UtilityEditionBodyPanel>
         <Notice tone="warning" title="This is not a public post">
           Leads submitted here are never published as-is. Every submission enters a moderated
           quarantine queue, is reviewed independently by multiple reviewers, and — only if reviewers
@@ -46,7 +42,7 @@ export default function SubmitLeadPage() {
           resolves it — disagreement is never silently averaged away. Only the standard research and
           promotion pipeline can ever make anything from this lane public.
         </EmptyState>
-      </div>
-    </main>
+      </UtilityEditionBodyPanel>
+    </UtilityEditionShell>
   );
 }

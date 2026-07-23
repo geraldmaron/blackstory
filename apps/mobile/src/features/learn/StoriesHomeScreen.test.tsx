@@ -26,21 +26,21 @@ describe('StoriesHomeScreen', () => {
     mockPush.mockClear();
   });
 
-  it('renders Stories title and brand lede', async () => {
+  it('renders History pinned to place title and brand lede', async () => {
     const { getByText } = await render(<StoriesHomeScreen />);
-    expect(getByText('Stories')).toBeTruthy();
-    expect(getByText(/History pinned to place and era/)).toBeTruthy();
+    expect(getByText('History pinned to place')).toBeTruthy();
+    expect(getByText(/Each piece links to the records it rests on/)).toBeTruthy();
   });
 
   it('shows a featured story band', async () => {
     const { getByText } = await render(<StoriesHomeScreen />);
-    expect(getByText('Featured')).toBeTruthy();
+    expect(getByText('Start here')).toBeTruthy();
     expect(getByText('Read story')).toBeTruthy();
   });
 
   it('lists archive stories below the featured band', async () => {
     const { getByText } = await render(<StoriesHomeScreen />);
-    expect(getByText('In the archive')).toBeTruthy();
+    expect(getByText('Published stories')).toBeTruthy();
   });
 
   it('navigates to a story when the featured card is pressed', async () => {

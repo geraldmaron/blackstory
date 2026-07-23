@@ -62,12 +62,12 @@ export function LayerModelControl({
       <fieldset className="ds-explore__layer-model-fieldset">
         <legend className="ds-sans">Map data model</legend>
         <div
-          className="ds-explore__layer-model-options"
+          className="ds-explore-edition__segment-strip ds-explore-edition__segment-strip--stack"
           role="radiogroup"
           aria-label="Map data model"
         >
           {LAYER_OPTIONS.map((option) => (
-            <label className="ds-explore__layer-model-option" key={option.value}>
+            <label className="ds-explore-edition__segment ds-explore__layer-model-option" key={option.value}>
               <input
                 type="radio"
                 name="explore-layer-mode"
@@ -85,11 +85,11 @@ export function LayerModelControl({
         <fieldset className="ds-explore__layer-model-fieldset">
           <legend className="ds-sans">Geography</legend>
           <div
-            className="ds-explore__layer-model-options"
+            className="ds-explore-edition__segment-strip"
             role="radiogroup"
             aria-label="Population geography"
           >
-            <label className="ds-explore__layer-model-option">
+            <label className="ds-explore-edition__segment ds-explore__layer-model-option">
               <input
                 type="radio"
                 name="explore-pop-geo"
@@ -97,9 +97,9 @@ export function LayerModelControl({
                 checked={resolvedGeo === 'state'}
                 onChange={() => onPopGeoChange('state')}
               />
-              <span>State (1790–2020)</span>
+              <span>State (1790 to 2020)</span>
             </label>
-            <label className="ds-explore__layer-model-option">
+            <label className="ds-explore-edition__segment ds-explore__layer-model-option">
               <input
                 type="radio"
                 name="explore-pop-geo"
@@ -107,12 +107,12 @@ export function LayerModelControl({
                 checked={resolvedGeo === 'county'}
                 onChange={() => onPopGeoChange('county')}
               />
-              <span>County (2000–2020)</span>
+              <span>County (2000 to 2020)</span>
             </label>
           </div>
           <p className="ds-sans ds-explore__settings-note">
             {resolvedGeo === 'state'
-              ? 'State fills use published Census state totals — county detail is not available before 2000.'
+              ? 'State fills use published Census state totals. County detail is not available before 2000.'
               : 'County choropleths use modern decennial FIPS vintages only.'}
           </p>
         </fieldset>

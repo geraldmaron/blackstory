@@ -1,41 +1,27 @@
 'use client';
 
 /**
- * Homepage hero chrome: cinema over the live plate. The persistent
- * `MapStage` canvas renders behind this (mounted once, at the `(map)` layout);
- * `HeroStage` renders the floating typography (subject morph via
- * `HeroHeadlineMorph`) and the TIMELINE INSTRUMENT — a full-width rail of
- * decade ticks that plays Census Black population fills decade by decade
- * (decade-flow.ts), with archive pins as documented-record overlays.
- *
- * Autoplay keeps every decennial tick; narrative beats (1790, 1860, 1870, 1910,
- * 1940, 1970, 2000, 2020, Today) dwell longer so the rewind stays watchable.
- * Scrubbing stays precise on the full rail.
- *
- * Decade frame changes morph pins / relationship lines via dual-buffer opacity
- * crossfade and lerp presence fill colors A→B per state via MapStage
- * `{ fade: true }` — geography never empties or snaps. Memorial plate names
- * stagger-fade with each decade frame (`memorialDecade` / `memorialComplete`
- * on the same patch) — not a bulk wipe.
- *
- * Engagement contract (ADR-017 "Transition contract"): state, background, entity
- * pin, and the copper CTA all fly the matching camera preset first, then funnel
- * through `engage()` — `router.push('/explore?…')` in the same tick; the flight
- * continues uninterrupted across the navigation because the stage never unmounts.
- * Entity pins land on `/explore?selected=…` so the reader stays inside the map
- * journey; the record page remains one click away from explore's list.
+ * Homepage hero: a single Surface panel (copy | live map readout) in the home edition
+ * flow. The persistent `MapStage` canvas stays mounted for ADR-017 explore handoff; on `/`
+ * it is positioned over the hero map column so real archive pins fill the readout beside the opaque copy
+ * column (see `hero-map-inset.ts` + map-surfaces.css). Engagement clears the inset, flies
+ * the live camera, then routes through `engage()` so the transition continues on `/explore`.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Notice } from '@repo/ui';
 import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
-import { CAMERA_POINT_ZOOM, prefersReducedMotion } from '../../lib/map-experience/camera-presets';
+import { CAMERA_POINT_ZOOM } from '../../lib/map-experience/camera-presets';
+import {
+  applyHeroMapInset,
+  clearHeroMapInset,
+} from '../../lib/map-experience/hero-map-inset';
 import type {
   ExploreMapFeatureCollection,
   JurisdictionAreaFeature,
 } from '../../lib/map-experience/build-explore-map-source';
-import { FINAL_FRAME_LABEL, type DecadeFlowFrame } from '../../lib/map-experience/decade-flow';
+import type { DecadeFlowFrame } from '../../lib/map-experience/decade-flow';
 import { DEFAULT_EXPLORE_FILTERS } from '../../lib/map-experience/filters';
 import {
   buildExploreHref,
@@ -52,50 +38,6 @@ import { shouldFadeDecadePatch } from '../map/decade-layer-transition';
 import { HeroHeadlineMorph } from './HeroHeadlineMorph';
 import { useMapStage } from './MapStage';
 
-/** Longer dwell on story beats so the national arc is readable. */
-const STORY_BEAT_DWELL_MS = 6400;
-/** Shorter dwell on intervening decades so the full rewind stays watchable. */
-const DEFAULT_DWELL_MS = 2800;
-
-/** Narrative beats that earn the longer autoplay dwell (plus Today). */
-const STORY_BEAT_YEARS = new Set([1790, 1860, 1870, 1910, 1940, 1970, 2000, 2020]);
-
-function dwellMsForFrame(frame: DecadeFlowFrame | undefined): number {
-  if (!frame) return DEFAULT_DWELL_MS;
-  if (frame.isComplete) return STORY_BEAT_DWELL_MS;
-  const year = Number.parseInt(frame.decade, 10);
-  if (Number.isFinite(year) && STORY_BEAT_YEARS.has(year)) return STORY_BEAT_DWELL_MS;
-  return DEFAULT_DWELL_MS;
-}
-
-function formatCount(value: number): string {
-  return new Intl.NumberFormat('en-US').format(value);
-}
-
-function timelineNoteForFrame(
-  frame: DecadeFlowFrame | undefined,
-  featureCount: number,
-  stateCount: number,
-): string {
-  if (!frame) {
-    return `${featureCount} records · ${stateCount} states`;
-  }
-
-  const recordsClause = frame.isComplete
-    ? `${formatCount(frame.cumulativeCount)} records · ${stateCount} states`
-    : `${formatCount(frame.cumulativeCount)} records documented through this decade`;
-
-  if (frame.densityMode === 'population' && frame.blackPopulationTotal !== undefined) {
-    const populationClause = `${formatCount(frame.blackPopulationTotal)} Black persons counted`;
-    const boundary = frame.opensDefinitionBoundary
-      ? ' · Black alone category begins this decade'
-      : '';
-    return `${populationClause} · ${recordsClause}${boundary}`;
-  }
-
-  return recordsClause;
-}
-
 export type HeroStageProps = {
   readonly featureCollection: ExploreMapFeatureCollection;
   readonly jurisdictionAreaFeatures: readonly JurisdictionAreaFeature[];
@@ -104,6 +46,8 @@ export type HeroStageProps = {
   readonly stateCount: number;
   /** Decades-in-motion frames (newest → oldest, closed by the full-archive frame). */
   readonly decadeFrames: readonly DecadeFlowFrame[];
+  /** e.g. "1820s–1970s"; omitted when the release carries no dated records. */
+  readonly eraSpan?: string | undefined;
 };
 
 const RESTING_HREF = buildExploreHref({
@@ -111,31 +55,60 @@ const RESTING_HREF = buildExploreHref({
   ...defaultExploreOverlayState(),
 });
 const TRANSITION_FLAG = 'ds-map-transition';
+const PLACE_SCROLL_TARGET = '#beat-a';
 
 function markTransition(): void {
   try {
     window.sessionStorage.setItem(TRANSITION_FLAG, '1');
   } catch {
-    // Storage unavailable (private browsing) — the flight and navigation still happen; only the
-    // post-landing focus handoff is best-effort.
+    // Storage unavailable — flight and navigation still happen.
   }
 }
 
-function PlayIcon() {
+function formatCount(value: number): string {
+  return new Intl.NumberFormat('en-US').format(value);
+}
+
+function KickerTickIcon() {
   return (
-    <svg viewBox="0 0 16 16" aria-hidden="true">
-      <path d="M4.5 2.5v11l9-5.5z" />
+    <svg className="ds-home-hero__kicker-tick" viewBox="0 0 20 12" fill="none" aria-hidden="true">
+      <path
+        d="M1 8 Q4 2, 8 6 T16 4"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <path
+        d="M14 3 L17 4 L16 7"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
     </svg>
   );
 }
 
-function PauseIcon() {
+function ScrollCueIcon() {
   return (
-    <svg viewBox="0 0 16 16" aria-hidden="true">
-      <rect x="3.5" y="2.5" width="3.2" height="11" rx="0.8" />
-      <rect x="9.3" y="2.5" width="3.2" height="11" rx="0.8" />
+    <svg viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <path
+        d="M3 5 L7 9 L11 5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
+}
+
+function completeFrameIndex(frames: readonly DecadeFlowFrame[]): number {
+  if (frames.length === 0) return 0;
+  const completeIndex = frames.findIndex((frame) => frame.isComplete);
+  return completeIndex >= 0 ? completeIndex : frames.length - 1;
 }
 
 export function HeroStage({
@@ -144,49 +117,27 @@ export function HeroStage({
   featureCount,
   stateCount,
   decadeFrames,
+  eraSpan,
 }: HeroStageProps) {
   const router = useRouter();
   const stage = useMapStage();
-  /** Stable API handle — MapStage’s context value identity churns; must not re-patch decades. */
   const stageApiRef = useRef(stage);
   stageApiRef.current = stage;
+  const heroPanelRef = useRef<HTMLElement | null>(null);
+  const mapColumnRef = useRef<HTMLDivElement | null>(null);
   const [dissolving, setDissolving] = useState(false);
-
-  // Decades in motion: rewind newest → oldest, then land on the complete archive.
-  // Reduced motion starts paused on the complete archive; play remains a
-  // deliberate, user-initiated choice there.
-  const [reducedMotion, setReducedMotion] = useState(false);
-  const [playing, setPlaying] = useState(false);
-  const [frameIndex, setFrameIndex] = useState(0);
-  /** First decade patch after mount (or frames reload) snaps; later advances fade. */
-  const isInitialDecadeApplyRef = useRef(true);
-
-  useEffect(() => {
-    const reduced = prefersReducedMotion();
-    setReducedMotion(reduced);
-    isInitialDecadeApplyRef.current = true;
-    if (reduced || decadeFrames.length <= 1) {
-      setFrameIndex(Math.max(0, decadeFrames.length - 1));
-      setPlaying(false);
-    } else {
-      setFrameIndex(0);
-      setPlaying(true);
-    }
-  }, [decadeFrames.length]);
+  const archiveFrameIndex = completeFrameIndex(decadeFrames);
 
   const engage = useCallback(
     (href: string) => {
       markTransition();
+      clearHeroMapInset();
       setDissolving(true);
-      setPlaying(false);
       router.push(href);
     },
     [router],
   );
 
-  // Landing on `/` clears selection highlights. Only ease the camera when the reader
-  // is still at entity point zoom (e.g. navigated home before closing a record on
-  // explore) — regional/state/national frames from close-camera are preserved.
   useEffect(() => {
     const api = stageApiRef.current;
     api.applyViewState({
@@ -194,6 +145,8 @@ export function HeroStage({
       selectedEdge: undefined,
       selectedEntity: undefined,
     });
+
+    api.flyPreset('national', { bounds: US_CONUS_BOUNDS }, { mode: 'ease' });
 
     let viewport: ExploreViewportFrame | undefined;
     const unsubscribe = api.subscribe('viewport', (frame) => {
@@ -221,19 +174,53 @@ export function HeroStage({
     );
   }, []);
 
-  const currentFrameDecade = decadeFrames[frameIndex]?.decade ?? '';
-  const currentFrameComplete = decadeFrames[frameIndex]?.isComplete ?? false;
+  useEffect(() => {
+    const panel = heroPanelRef.current;
+    const mapColumn = mapColumnRef.current;
+    const insetTarget = mapColumn ?? panel;
+    if (!insetTarget || !stage.mapAvailable) return undefined;
 
-  // Apply the current decade frame. Depend on frame identity only — never on `stage`
-  // object identity (that churned every MapStage render and re-snapped the map).
+    let raf = 0;
+    const sync = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        if (applyHeroMapInset(insetTarget)) {
+          stageApiRef.current.resize();
+        }
+      });
+    };
+
+    sync();
+    const observer = new ResizeObserver(sync);
+    observer.observe(insetTarget);
+    if (panel && panel !== insetTarget) {
+      observer.observe(panel);
+    }
+    window.addEventListener('scroll', sync, { passive: true });
+    window.addEventListener('resize', sync);
+    window.addEventListener('orientationchange', sync);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      observer.disconnect();
+      window.removeEventListener('scroll', sync);
+      window.removeEventListener('resize', sync);
+      window.removeEventListener('orientationchange', sync);
+      clearHeroMapInset();
+    };
+  }, [stage.mapAvailable]);
+
+  const archiveFrame = decadeFrames[archiveFrameIndex];
+  const archiveDecade = archiveFrame?.decade ?? '';
+  const archiveComplete = archiveFrame?.isComplete ?? false;
+
   useEffect(() => {
     const api = stageApiRef.current;
-    const frame = decadeFrames[frameIndex];
+    const frame = decadeFrames[archiveFrameIndex];
     const fade = shouldFadeDecadePatch({
-      reducedMotion,
-      isInitialApply: isInitialDecadeApplyRef.current,
+      reducedMotion: false,
+      isInitialApply: true,
     });
-    isInitialDecadeApplyRef.current = false;
 
     if (!frame) {
       api.patchData(
@@ -250,13 +237,11 @@ export function HeroStage({
       );
       return;
     }
+
     api.patchData(
       {
         featureCollection: frame.featureCollection,
         jurisdictionAreaFeatures,
-        // Keep presence paint encoding mounted for the whole rewind — empty density
-        // levels still join as unknown tiers; flipping layerMode off mid-flow forced a
-        // visible style refresh on the current buffer.
         layerMode: 'presence',
         densityLevels: frame.densityLevels,
         countyChoroplethLevels: [],
@@ -269,24 +254,13 @@ export function HeroStage({
       },
     );
   }, [
-    frameIndex,
-    currentFrameDecade,
-    currentFrameComplete,
-    reducedMotion,
+    archiveFrameIndex,
+    archiveDecade,
+    archiveComplete,
     decadeFrames,
     featureCollection,
     jurisdictionAreaFeatures,
   ]);
-
-  // Auto-advance while playing; dwell longer on narrative beats.
-  useEffect(() => {
-    if (!playing || dissolving || decadeFrames.length <= 1) return undefined;
-    const frame = decadeFrames[frameIndex];
-    const timer = window.setTimeout(() => {
-      setFrameIndex((index) => (index + 1) % decadeFrames.length);
-    }, dwellMsForFrame(frame));
-    return () => window.clearTimeout(timer);
-  }, [playing, dissolving, decadeFrames, frameIndex]);
 
   useEffect(() => {
     const unsubscribe = [
@@ -339,17 +313,24 @@ export function HeroStage({
     };
   }, [stage, featureCollection, engage, router]);
 
-  function handleCtaClick(event: React.MouseEvent<HTMLAnchorElement>) {
+  function handleExploreClick(event: React.MouseEvent<HTMLAnchorElement>) {
     event.preventDefault();
     stage.flyPreset('national', { bounds: US_CONUS_BOUNDS });
     engage(RESTING_HREF);
   }
 
-  const currentFrame = decadeFrames[frameIndex];
+  const stateLabel = `${stateCount} state${stateCount === 1 ? '' : 's'}`;
+  const eraFact = eraSpan ?? 'Eras vary';
 
   return (
     <section
-      className={dissolving ? 'ds-hero-stage ds-hero-stage--dissolving' : 'ds-hero-stage'}
+      ref={heroPanelRef}
+      className={
+        dissolving
+          ? 'ds-home-hero ds-hero-stage ds-hero-stage--dissolving'
+          : 'ds-home-hero ds-hero-stage'
+      }
+      data-hero-map-panel="true"
       aria-labelledby="hero-headline"
     >
       {!stage.mapAvailable ? (
@@ -358,89 +339,58 @@ export function HeroStage({
           as a list.
         </Notice>
       ) : null}
-      <p className="ds-hero-stage__kicker">Black population by decade · documented records</p>
-      <HeroHeadlineMorph />
-      <p className="ds-hero-stage__support">
-        Fills are census Black population counts. Pins are archive evidence: they are not the same
-        story. Empty states mean not yet in the census geography that decade, not zero people.
-      </p>
-      <div className="ds-hero-stage__actions">
-        <Link className="ds-cta ds-cta--copper" href="/locate">
-          Find what happened near you
-        </Link>
-        <a className="ds-cta ds-cta--ghost" href={RESTING_HREF} onClick={handleCtaClick}>
-          Explore the map
-        </a>
+
+      <div
+        ref={mapColumnRef}
+        className="ds-home-hero__map"
+        aria-label="Live archive coverage map"
+      >
+        <div className="ds-home-hero__map-readout">
+          <p className="ds-home-hero__map-caption">Live coverage · archive pins</p>
+        </div>
       </div>
 
-      {decadeFrames.length > 1 ? (
-        <div
-          className="ds-hero-timeline"
-          role="group"
-          aria-label="Decades in motion, newest to oldest"
-        >
-          <div className="ds-hero-timeline__head">
-            <div className="ds-hero-timeline__readout" aria-live="polite">
-              <p className="ds-hero-timeline__decade">
-                {currentFrame?.decade ?? FINAL_FRAME_LABEL}
-              </p>
-              <p className="ds-hero-timeline__note">
-                {timelineNoteForFrame(currentFrame, featureCount, stateCount)}
-              </p>
-            </div>
-            <button
-              type="button"
-              className="ds-hero-timeline__toggle"
-              aria-pressed={playing}
-              aria-label={
-                playing
-                  ? 'Pause the decade-by-decade animation'
-                  : 'Play the decade-by-decade animation'
-              }
-              onClick={() => {
-                if (!playing && reducedMotion) {
-                  // Under reduced motion, play is still a deliberate choice —
-                  // honor it, but never start it automatically.
-                  setFrameIndex(0);
-                }
-                setPlaying((current) => !current);
-              }}
-            >
-              {playing ? <PauseIcon /> : <PlayIcon />}
-            </button>
+      <div className="ds-home-hero__copy">
+        <p className="ds-home-hero__kicker">
+          <KickerTickIcon />
+          Place-connected archive
+        </p>
+        <HeroHeadlineMorph />
+        <p className="ds-home-hero__lede">
+          Every record ties to a place you can stand in. Start where you are, then follow the
+          evidence across time.
+        </p>
+        <div className="ds-home-hero__ctas">
+          <Link className="ds-cta ds-cta--copper" href="/locate">
+            Find what happened near you
+          </Link>
+          <a
+            className="ds-home-hero__cta-quiet"
+            href={RESTING_HREF}
+            onClick={handleExploreClick}
+          >
+            Explore the map
+          </a>
+        </div>
+        <a className="ds-home-hero__scroll-cue" href={PLACE_SCROLL_TARGET}>
+          Your place
+          <ScrollCueIcon />
+        </a>
+        <div className="ds-home-hero__micro-facts" aria-label="Archive at a glance">
+          <div className="ds-home-hero__micro-fact">
+            <span className="ds-home-hero__micro-fact-value">{formatCount(featureCount)}</span>
+            <span className="ds-home-hero__micro-fact-label">Records pinned</span>
           </div>
-          <div className="ds-hero-timeline__rail">
-            {decadeFrames.map((frame, index) => {
-              const state =
-                index === frameIndex ? 'is-current' : index < frameIndex ? 'is-passed' : '';
-              return (
-                <button
-                  key={frame.decade}
-                  type="button"
-                  className={state ? `ds-hero-timeline__tick ${state}` : 'ds-hero-timeline__tick'}
-                  aria-label={
-                    frame.isComplete
-                      ? 'Show the complete archive'
-                      : `Show the map through the ${frame.decade}`
-                  }
-                  aria-current={index === frameIndex ? 'true' : undefined}
-                  onClick={() => {
-                    setPlaying(false);
-                    setFrameIndex(index);
-                  }}
-                >
-                  <span className="ds-hero-timeline__tick-label">{frame.decade}</span>
-                </button>
-              );
-            })}
+          <div className="ds-home-hero__micro-fact">
+            <span className="ds-home-hero__micro-fact-value">{stateLabel}</span>
+            <span className="ds-home-hero__micro-fact-label">On the map</span>
+          </div>
+          <div className="ds-home-hero__micro-fact">
+            <span className="ds-home-hero__micro-fact-value">{eraFact}</span>
+            <span className="ds-home-hero__micro-fact-label">Eras spanned</span>
           </div>
         </div>
-      ) : (
-        <p className="ds-hero-stage__count">
-          {featureCount} record{featureCount === 1 ? '' : 's'} · {stateCount} state
-          {stateCount === 1 ? '' : 's'}
-        </p>
-      )}
+      </div>
     </section>
   );
 }

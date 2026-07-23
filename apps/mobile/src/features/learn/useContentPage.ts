@@ -51,9 +51,10 @@ export function useContentPage(section: CatalogSectionId, slug: string): UseCont
 
   useEffect(() => {
     let cancelled = false;
-    setState({ status: 'loading' });
 
-    (async () => {
+    void (async () => {
+      if (!cancelled) setState({ status: 'loading' });
+
       try {
         const { store, connectivity } = await getRuntimeHandles();
         const cache = createReleaseCache(store);

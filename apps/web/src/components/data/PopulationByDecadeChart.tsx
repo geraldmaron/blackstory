@@ -53,18 +53,18 @@ export function PopulationByDecadeChart({ rows, sources }: PopulationByDecadeCha
 
   return (
     <DataChartFrame
-      title="Black population by decade, 1790–2020"
+      title="Black population by decade, 1790 to 2020"
       caption={
-        'Enslaved and free counts are stacked for 1790–1860 (they add up to the Black total). ' +
+        'Enslaved and free counts are stacked for 1790 to 1860 (they add up to the Black total). ' +
         'From 1870 the Black total is a single bar. The dashed line marks the 2000 switch to ' +
-        '“Black alone” when people could mark more than one race — counts before and after are ' +
+        '“Black alone” when people could mark more than one race; counts before and after are ' +
         'not a perfect match. ‡ 1870 is a known Southern undercount.'
       }
       sources={sources}
       ariaLabel="Bar chart of Black population by census decade, 1790 to 2020"
       textAlternative={
         <table className="ds-data-chart__table">
-          <caption>Black population by decade, 1790–2020</caption>
+          <caption>Black population by decade, 1790 to 2020</caption>
           <thead>
             <tr>
               <th scope="col">Decade</th>
@@ -244,15 +244,15 @@ export function PopulationByDecadeChart({ rows, sources }: PopulationByDecadeCha
       <ul className="ds-data-chart__legend" aria-hidden="true">
         <li className="ds-data-chart__legend-item">
           <span className="ds-data-chart__legend-swatch" style={{ background: FILL_ENSLAVED }} />
-          Enslaved (1790–1860)
+          Enslaved (1790 to 1860)
         </li>
         <li className="ds-data-chart__legend-item">
           <span className="ds-data-chart__legend-swatch" style={{ background: FILL_FREE }} />
-          Free (1790–1860)
+          Free (1790 to 1860)
         </li>
         <li className="ds-data-chart__legend-item">
           <span className="ds-data-chart__legend-swatch" style={{ background: FILL_BLACK_TOTAL }} />
-          Black population (1870–2020)
+          Black population (1870 to 2020)
         </li>
       </ul>
     </DataChartFrame>

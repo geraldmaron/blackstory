@@ -13,18 +13,34 @@
  *  2. OpenFreeMap vector TileJSON (web Explore parity) — default
  *  3. Kill-switch / tests: dark canvas only, zero tile sources
  *
- * DIGNITY INVARIANT (ADR-024, mirroring ADR-013): the point layer uses a single
- * flat copper color and a fixed radius. It MUST NOT render historical-harm data
- * as a crime-heatmap register — no `heatmap` layer, and no data-driven color
- * ramp keyed on entity density/count. `assertNoHeatmapRegister` below encodes
- * that as a checkable invariant and is exercised by mapStyle.test.ts.
+ * Entity circles use v6 kind-family encoding (`entity-paint.ts`). DIGNITY INVARIANT:
+ * no `heatmap` layer and no density-keyed color ramps. `assertNoHeatmapRegister`
+ * is exercised by mapStyle.test.ts.
  */
-import { brandCore, themeColors } from '@/ui';
+import { themeColors } from '@/ui';
 import {
   DEFAULT_MAP_GLYPHS_URL,
   DEFAULT_OPENFREEMAP_TILE_SOURCE_URL,
   OSM_ATTRIBUTION,
 } from './mapConfig';
+import { clusterRadiusZoomExpression } from './dignity-palette';
+
+export {
+  ENTITY_POINT_LAYER_STYLE,
+  ENTITY_HALO_LAYER_STYLE,
+  ENTITY_EVENT_GLYPH_LAYER_STYLE,
+  ENTITY_SELECTED_LAYER_STYLE,
+  ENTITY_CLUSTER_LAYER_STYLE,
+  kindColorExpression,
+} from './entity-paint';
+export { MARKER_RADIUS_MIN as ENTITY_POINT_RADIUS_MIN, MARKER_RADIUS_MAX as ENTITY_POINT_RADIUS_MAX } from './marker-size';
+/** Cluster radius zoom-scaled step expression (web v6: 10/14/18/22 at z≥9). */
+export const ENTITY_CLUSTER_RADIUS_EXPR = clusterRadiusZoomExpression();
+
+/** @deprecated Use ENTITY_POINT_RADIUS_MIN — kept for legacy tests. */
+export const ENTITY_POINT_RADIUS = 4;
+/** @deprecated Selection ring uses data-driven radius in entity-paint. */
+export const ENTITY_SELECTED_RADIUS = 7;
 
 /** Minimal MapLibre style shape we build; passed to <Map mapStyle> as JSON. */
 export type MapStyleSpec = {
@@ -219,45 +235,24 @@ export function buildBasemapStyle({
   };
 }
 
-/**
- * Unclustered point radius (px). Kept deliberately small so a national view
- * stays scannable — clusters and points must not read as state-covering blobs.
- */
-export const ENTITY_POINT_RADIUS = 4;
-
-/** Selected highlight ring radius (px); slightly larger than the point fill. */
-export const ENTITY_SELECTED_RADIUS = 7;
-
-/**
- * Dignity-safe cluster bubble radii (MapLibre `step` on `point_count`).
- * Size — never color — conveys density; stops stay compact at national zoom.
- * Expression shape: `['step', input, default, stop1, value1, …]`.
- */
-export const ENTITY_CLUSTER_RADIUS_EXPR = [
-  'step',
-  ['get', 'point_count'],
-  7, // < 10
-  10,
-  9, // >= 10
-  25,
-  11, // >= 25
-  50,
-  13, // >= 50
-] as const;
-
-/** Paint for the entity point layer: flat copper, fixed radius, archive-paper stroke. */
-export const ENTITY_POINT_LAYER_STYLE = {
-  circleColor: brandCore.copperPin,
-  circleRadius: ENTITY_POINT_RADIUS,
-  circleStrokeColor: brandCore.archivePaper,
-  circleStrokeWidth: 1,
-  circleOpacity: 0.9,
-} as const;
+function isDensityKeyedColorRamp(color: unknown): boolean {
+  if (!Array.isArray(color)) return false;
+  const json = JSON.stringify(color);
+  if (json.includes('point_count') || json.includes('density') || json.includes('heatmap')) {
+    return true;
+  }
+  if (json.includes('shade') || json.includes('kindFamily') || json.includes('mapTone')) {
+    return false;
+  }
+  if (color[0] === 'interpolate' || color[0] === 'step') {
+    const input = JSON.stringify(color[2] ?? '');
+    if (/count|density|heatmap/.test(input)) return true;
+  }
+  return false;
+}
 
 /**
- * Dignity guard: proves a style + point paint carry no crime-heatmap register.
- * Rejects any `heatmap` layer and any data-driven (`interpolate`/`step` keyed on
- * a count/density expression) color ramp on points. Exercised by mapStyle.test.ts.
+ * Dignity guard: no heatmap layer and no density-keyed color ramps on entity points.
  */
 export function assertNoHeatmapRegister(style: MapStyleSpec, pointPaint: Record<string, unknown>): void {
   for (const layer of style.layers) {
@@ -265,8 +260,7 @@ export function assertNoHeatmapRegister(style: MapStyleSpec, pointPaint: Record<
       throw new Error('Dignity invariant violated: heatmap layer is forbidden on the archive map.');
     }
   }
-  const color = pointPaint.circleColor;
-  if (Array.isArray(color)) {
-    throw new Error('Dignity invariant violated: point color must be flat, not a data-driven density ramp.');
+  if (isDensityKeyedColorRamp(pointPaint.circleColor)) {
+    throw new Error('Dignity invariant violated: point color must not use a density-keyed ramp.');
   }
 }

@@ -20,7 +20,7 @@
  * `viewportChanged` leave `cameraCommand` undefined; only `entitySelected` /
  * `presetRequested` set it.
  */
-import type { FilterState } from '@/app/_lib/route-params';
+import type { FilterState } from '@/lib/route-params';
 import {
   cameraForPreset,
   isInBounds,
@@ -30,7 +30,7 @@ import {
   type LngLat,
 } from '@/features/map/mapCamera';
 import { reconcileSelection } from './selection';
-import { applyFilters } from './explore-filter';
+import { applyFilters, sameFilterState } from './explore-filter';
 import type { ExploreFeature } from './explore-feature';
 
 /** A camera command carries a monotonically increasing token so the view can
@@ -91,7 +91,7 @@ function withCamera(state: ExploreState, target: CameraTarget): ExploreState {
 
 /** Shallow equality on the (small, closed) filter shape. */
 function sameFilters(a: FilterState, b: FilterState): boolean {
-  return a.kind === b.kind && a.era === b.era;
+  return sameFilterState(a, b);
 }
 
 /** Shallow equality on a viewport bbox. */

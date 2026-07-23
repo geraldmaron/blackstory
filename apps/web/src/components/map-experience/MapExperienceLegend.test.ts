@@ -10,7 +10,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
 import { MapExperienceLegend, type MapExperienceLegendProps } from './MapExperienceLegend';
 import {
-  KIND_ENCODING_ENTRIES,
+  KIND_FAMILY_ENTRIES,
   SEMANTIC_TONE_ENTRIES,
 } from '../../lib/map-experience/kind-encoding';
 
@@ -34,22 +34,20 @@ test('off layer mode invites choosing a map data model', () => {
   assert.match(html, /Choose a model/);
 });
 
-test('states that color marks kind and historical tones, in words', () => {
+test('states that color marks kind groups and historical tones, in words', () => {
   const html = renderToStaticMarkup(createElement(MapExperienceLegend));
-  assert.match(html, /Color marks the kind of place or record/);
+  assert.match(html, /Kind groups/);
+  assert.match(html, /five kind groups/);
   assert.match(html, /Tone filter/);
   assert.match(html, /Historical tones/);
 });
 
-test('lists every kind with its label, glyph name, and map-disc echo', () => {
+test('lists every kind family with its label and micro-kind roll-up', () => {
   const html = renderToStaticMarkup(createElement(MapExperienceLegend));
-  for (const [, entry] of KIND_ENCODING_ENTRIES) {
+  for (const [, entry] of KIND_FAMILY_ENTRIES) {
     assert.match(html, new RegExp(entry.label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
-    assert.match(html, new RegExp(`\\(${entry.glyph} →`));
   }
-  assert.match(html, /thick-rim disc/);
-  assert.match(html, /orbit-ring disc/);
-  assert.match(html, /hollow disc/);
+  assert.match(html, /Record kind groups/);
 });
 
 test('lists every semantic tone as shade-only (never claims a tone-owned glyph)', () => {
@@ -62,10 +60,11 @@ test('lists every semantic tone as shade-only (never claims a tone-owned glyph)'
   assert.doesNotMatch(html, /Massacre \/ atrocity\s*\(diamond\)/);
 });
 
-test('explains the size scale as evidence depth, with confidence called out as separate', () => {
+test('explains the size scale as evidence depth, with cluster and confidence in the color key', () => {
   const html = renderToStaticMarkup(createElement(MapExperienceLegend));
-  assert.match(html, /more documented evidence/);
-  assert.match(html, /Confidence in that evidence is shown\s+separately/);
+  assert.match(html, /accepted claims/);
+  assert.match(html, /Cluster size/);
+  assert.match(html, /Evidence confidence/);
 });
 
 test('explains state labels and the copper selected-state convention in words', () => {
@@ -100,7 +99,7 @@ test('shows a visible color key for boundaries, kinds, and historical tones', ()
   assert.match(html, /State outline/);
   assert.match(html, /County line/);
   assert.match(html, /Selected state/);
-  assert.match(html, /Record kinds/);
+  assert.match(html, /Record kind groups/);
   assert.match(html, /Historical tones \(shade only/);
   assert.match(html, /ds-map-color-key/);
   assert.doesNotMatch(html, /Hide key/);
@@ -126,6 +125,14 @@ test('onHide renders an accessible Hide key control beside the Color key heading
   assert.match(html, /aria-label="Hide key"/);
   assert.match(html, />Hide key</);
   assert.match(html, /ds-explore-stage__panel-hide/);
+});
+
+test('color key lists cluster size steps and confidence tiers', () => {
+  const html = renderToStaticMarkup(createElement(MapExperienceLegend));
+  assert.match(html, /2–9 records/);
+  assert.match(html, /200\+ records/);
+  assert.match(html, /Evidence confidence/);
+  assert.match(html, /Unrated/);
 });
 
 test('embedded mode omits Color key heading/hide (chassis owns chrome)', () => {
@@ -162,7 +169,6 @@ test('kind and tone swatches are aria-hidden (the accessible content is the adja
   // Color key + Reading this map each list kinds and tones (2× each vocabulary).
   // Default layerMode is presence, which adds three presence-tier discs in the color key.
   const presenceTier = 3;
-  const expected =
-    KIND_ENCODING_ENTRIES.length * 2 + SEMANTIC_TONE_ENTRIES.length * 2 + presenceTier;
+  const expected = KIND_FAMILY_ENTRIES.length * 2 + SEMANTIC_TONE_ENTRIES.length * 2 + presenceTier;
   assert.equal(glyphSwatchCount, expected);
 });

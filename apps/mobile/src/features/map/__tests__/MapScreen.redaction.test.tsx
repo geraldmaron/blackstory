@@ -54,11 +54,18 @@ describe('MapScreen redaction regression', () => {
 
   it('renders the entity ONLY at the coarsened city-precision coordinate it was given', async () => {
     const serialized = await renderedSourceJson();
+    const parsed = JSON.parse(serialized) as typeof DEMO_MAP_SOURCE;
     // The coarsened value IS present (entity is not silently dropped)...
     expect(serialized).toContain('29.76');
     expect(serialized).toContain('-95.37');
-    // ...and it is the exact source data, unmodified by the render layer.
-    expect(serialized).toBe(JSON.stringify(DEMO_MAP_SOURCE));
+    // Coordinates are unchanged; v6 encoding fields are denormalized at render time.
+    for (const feature of DEMO_MAP_SOURCE.features) {
+      const rendered = parsed.features.find((f) => f.id === feature.id);
+      expect(rendered?.geometry.coordinates).toEqual(feature.geometry.coordinates);
+      expect(rendered?.properties.entityId).toBe(feature.properties.entityId);
+      expect(rendered?.properties.shade).toBeTruthy();
+      expect(rendered?.properties.kindFamily).toBeTruthy();
+    }
     const living = DEMO_MAP_SOURCE.features.find(
       (f) => f.id === 'ent_fixture_person_living_houston_tx',
     );

@@ -6,15 +6,14 @@ import type { ReactNode } from 'react';
 import { StyleSheet, type ViewStyle } from 'react-native';
 import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 
-import { space } from './tokens';
-import { useThemeColors } from './tokens';
+import { space, useThemeColors } from './tokens';
 
 /** Shared scroll content insets for tab screens — dense but breathable. */
 export const screenScrollInsets = {
   paddingHorizontal: space['4'],
-  paddingTop: space['3'],
+  paddingTop: space['2'],
   paddingBottom: space['12'],
-  gap: space['4'],
+  gap: space['3'],
 } as const;
 
 export type ScreenCanvasProps = {

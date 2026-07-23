@@ -3,6 +3,7 @@
  * filters, selected node, and optional selected edge. Pure parse/serialize so the SSR page and
  * client orchestrator read and write the same shape — copied URLs reproduce the same browse view.
  */
+import { isDecadeAtOrBeforeCurrent } from '@repo/domain/era';
 import {
   DEFAULT_HISTORY_FILTERS,
   parseHistoryConnectionsFilter,
@@ -41,7 +42,8 @@ const DECADE_PATTERN = /^\d{4}s$/;
 export function parseDecadeParam(raw: string | undefined): string | undefined {
   const trimmed = (raw ?? '').trim();
   if (!trimmed || trimmed === 'all') return undefined;
-  return DECADE_PATTERN.test(trimmed) ? trimmed : undefined;
+  if (!DECADE_PATTERN.test(trimmed)) return undefined;
+  return isDecadeAtOrBeforeCurrent(trimmed) ? trimmed : undefined;
 }
 
 export function parseHistorySearchParams(raw: RawHistorySearchParams): HistoryViewState {
@@ -50,6 +52,7 @@ export function parseHistorySearchParams(raw: RawHistorySearchParams): HistoryVi
   const q = (firstValue(raw.q) ?? '').trim();
   const sort = parseHistorySort(firstValue(raw.sort));
   const status = cleanSelectParam(firstValue(raw.status));
+  const era = cleanSelectParam(firstValue(raw.era));
   const topic = cleanSelectParam(firstValue(raw.topic));
   const connections = parseHistoryConnectionsFilter(firstValue(raw.connections));
   const selectedRaw = firstValue(raw.selected)?.trim();
@@ -58,7 +61,7 @@ export function parseHistorySearchParams(raw: RawHistorySearchParams): HistoryVi
   return {
     mode: decade ? 'decade' : 'all-time',
     ...(decade ? { decade } : {}),
-    filters: { kind, q, sort, status, topic, connections },
+    filters: { kind, q, sort, status, era, topic, connections },
     ...(selectedRaw ? { selected: selectedRaw } : {}),
     ...(edgeRaw ? { edge: edgeRaw } : {}),
   };
@@ -80,6 +83,9 @@ export function buildHistorySearchParams(state: HistoryViewState): string {
   }
   if (state.filters.status !== DEFAULT_HISTORY_FILTERS.status) {
     params.set('status', state.filters.status);
+  }
+  if (state.filters.era !== DEFAULT_HISTORY_FILTERS.era) {
+    params.set('era', state.filters.era);
   }
   if (state.filters.topic !== DEFAULT_HISTORY_FILTERS.topic) {
     params.set('topic', state.filters.topic);

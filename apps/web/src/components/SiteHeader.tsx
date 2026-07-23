@@ -46,9 +46,9 @@ export function SiteHeader() {
       overflowNav={absolutizeShellNav(overflow, null)}
       brandLockup={BRAND_ASSETS.lockup}
       brandSymbol={BRAND_ASSETS.symbol}
-      brandDisplay={isExplore ? 'symbol' : 'lockup'}
-      ctaVariant={isHome ? 'quiet' : 'copper'}
-      cta={{ href: '/locate', label: 'Near you' }}
+      brandDisplay={isHome || isExplore ? 'symbol' : 'lockup'}
+      ctaVariant="copper"
+      cta={{ href: '/locate', label: isHome ? 'Near You' : 'Near you' }}
       renderLink={NextShellLink}
     />
   );

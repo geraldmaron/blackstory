@@ -7,6 +7,7 @@ import {
   type BannedBooksListingSnapshot,
 } from '@repo/domain';
 import { US_STATES } from '@repo/domain/map/geography';
+import { coverIsbnForBook } from './books-cover';
 
 export type BooksBrowseSortKey = 'title' | 'author' | 'year' | 'citations' | 'states';
 export type BooksBrowseSortDir = 'asc' | 'desc';
@@ -47,6 +48,8 @@ export type BooksBrowseItem = {
   readonly summary: string;
   readonly states: readonly BooksDetailState[];
   readonly citationCount: number;
+  readonly challengeCount: number;
+  readonly coverIsbn: string | undefined;
   readonly purchaseLinks: readonly BooksBrowsePurchaseLink[];
 };
 
@@ -109,6 +112,12 @@ function formatAuthorNames(book: BannedBookRecord): string {
   return book.authors.map((author) => author.name).join(', ');
 }
 
+function activeChallengeCount(book: BannedBookRecord): number {
+  return book.challenges.filter(
+    (challenge) => challenge.status === 'reported' || challenge.status === 'unknown',
+  ).length;
+}
+
 function recordToBrowseItem(book: BannedBookRecord): BooksBrowseItem {
   return {
     id: book.id,
@@ -122,6 +131,8 @@ function recordToBrowseItem(book: BannedBookRecord): BooksBrowseItem {
       name: STATE_NAME_BY_CODE.get(code) ?? code,
     })),
     citationCount: book.citations.length,
+    challengeCount: activeChallengeCount(book),
+    coverIsbn: coverIsbnForBook(book),
     purchaseLinks: book.purchaseLinks.map((link) => ({
       retailer: link.retailer,
       label: link.label,
@@ -394,6 +405,34 @@ export function listBooksStaticParams(
   snapshot: BannedBooksListingSnapshot,
 ): readonly { readonly slug: string }[] {
   return snapshot.books.map((book) => ({ slug: book.slug }));
+}
+
+/** Related titles for detail depart panel: same author or overlapping challenge states. */
+export function buildBooksRelatedItems(
+  snapshot: BannedBooksListingSnapshot,
+  book: BannedBookRecord,
+  limit = 4,
+): readonly BooksBrowseItem[] {
+  const authorNames = new Set(book.authors.map((entry) => entry.name));
+  const stateCodes = new Set(bannedBookReportedStates(book));
+
+  const scored = snapshot.books
+    .filter((entry) => entry.slug !== book.slug)
+    .map((entry) => {
+      const entryAuthors = entry.authors.map((author) => author.name);
+      const sharedAuthor = entryAuthors.some((name) => authorNames.has(name));
+      const entryStates = bannedBookReportedStates(entry);
+      const sharedStates = entryStates.filter((code) => stateCodes.has(code)).length;
+      const score = (sharedAuthor ? 10 : 0) + sharedStates;
+      return { entry, score };
+    })
+    .filter(({ score }) => score > 0)
+    .sort((left, right) => {
+      if (right.score !== left.score) return right.score - left.score;
+      return left.entry.title.localeCompare(right.entry.title, undefined, { sensitivity: 'base' });
+    });
+
+  return scored.slice(0, limit).map(({ entry }) => recordToBrowseItem(entry));
 }
 
 export function stateLabel(code: string): string {

@@ -11,8 +11,8 @@ import {
   type DecadeBucketEntityInput,
   type GraphReleaseArtifact,
 } from '@repo/domain';
-import { SEED_ENTITY_RELATIONSHIPS } from './entity-graph-seed';
 import { listPublicEntities, type PublicEntityView } from './public-seed';
+import { resolveHistoryRelationships } from '../lib/history/resolve-history-relationships';
 
 export const HISTORY_GRAPH_RELEASE_ID = 'seed-snapshot';
 export const HISTORY_GRAPH_GENERATED_AT = '2026-07-17T00:00:00.000Z';
@@ -87,7 +87,7 @@ export function buildHistoryGraphReleaseArtifact(
     generatedAt: HISTORY_GRAPH_GENERATED_AT,
     entityIds: entities.map((entity) => entity.id),
     entities: decadeBucketInputs(entities),
-    relationships: [...SEED_ENTITY_RELATIONSHIPS],
+    relationships: [...resolveHistoryRelationships(entities, HISTORY_GRAPH_GENERATED_AT)],
   });
 }
 

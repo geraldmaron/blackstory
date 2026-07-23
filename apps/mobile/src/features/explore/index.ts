@@ -9,7 +9,7 @@ export {
   EntityPreviewSheet,
   type EntityPreviewSheetProps,
   type EntityPreviewPreviewFeature,
-} from './EntityPreviewSheet';
+} from '@/features/map/explore';
 export { useReduceMotion } from './useReduceMotion';
 export {
   useExploreMapSource,

@@ -7,6 +7,33 @@
 
 export type ExploreLeftTab = 'filters' | 'key';
 
+/** Root class on `/explore` stage — pairs with explore-edition.css tokens. */
+export const EXPLORE_EDITION_STAGE_CLASS = 'ds-explore-edition';
+
+/** Segmented tab list aligned with browse-mode toggle (v6 explore edition). */
+export const EXPLORE_EDITION_TABS_CLASS = 'ds-explore-edition__tabs';
+
+/** Individual instrument tab segment. */
+export const EXPLORE_EDITION_TAB_CLASS = 'ds-explore-edition__tab';
+
+export function exploreStageRootClassName(options: {
+  readonly entering: boolean;
+}): string {
+  const parts = ['ds-explore-stage', EXPLORE_EDITION_STAGE_CLASS];
+  if (options.entering) {
+    parts.push('ds-explore-stage--entering');
+  }
+  return parts.join(' ');
+}
+
+export function exploreEditionTabClassName(): string {
+  return EXPLORE_EDITION_TAB_CLASS;
+}
+
+export function exploreEditionTabsClassName(): string {
+  return EXPLORE_EDITION_TABS_CLASS;
+}
+
 export function exploreInstrumentsPanelClassName(options: { readonly visible: boolean }): string {
   return options.visible
     ? 'ds-explore-stage__instruments'

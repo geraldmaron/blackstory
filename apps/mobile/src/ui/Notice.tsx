@@ -24,9 +24,14 @@ export type NoticeProps = {
   tone: NoticeTone;
   title: string;
   description?: string;
+  /** Tighter padding and type for inline dev/status strips. */
+  compact?: boolean;
 };
 
-export const Notice = forwardRef<View, NoticeProps>(function Notice({ tone, title, description }, ref) {
+export const Notice = forwardRef<View, NoticeProps>(function Notice(
+  { tone, title, description, compact = false },
+  ref,
+) {
   const status = useStatusColors();
   const theme = useThemeColors();
   const palette =
@@ -43,13 +48,25 @@ export const Notice = forwardRef<View, NoticeProps>(function Notice({ tone, titl
       accessible
       accessibilityRole="alert"
       accessibilityLiveRegion={isUrgent ? 'assertive' : 'polite'}
-      style={[styles.base, { backgroundColor: palette.bg, borderColor: palette.border }]}
+      style={[
+        compact ? styles.compact : styles.base,
+        { backgroundColor: palette.bg, borderColor: palette.border },
+      ]}
     >
-      <Text variant="bodyEmphasis" style={{ color: palette.fg }}>
+      <Text
+        variant={compact ? 'bodySmall' : 'bodyEmphasis'}
+        style={[compact ? styles.compactTitle : undefined, { color: palette.fg }]}
+      >
         {title}
       </Text>
       {description ? (
-        <Text variant="bodySmall" style={{ color: palette.fg, marginTop: space['1'] }}>
+        <Text
+          variant={compact ? 'bodySmall' : 'caption'}
+          style={[
+            { color: palette.fg },
+            compact ? styles.compactDescription : styles.baseDescription,
+          ]}
+        >
           {description}
         </Text>
       ) : null}
@@ -62,5 +79,20 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
     borderWidth: 1,
     padding: space['4'],
+  },
+  compact: {
+    borderRadius: radius.sm,
+    borderWidth: 1,
+    paddingHorizontal: space['3'],
+    paddingVertical: space['3'],
+  },
+  compactTitle: {
+    fontWeight: '600',
+  },
+  baseDescription: {
+    marginTop: space['1'],
+  },
+  compactDescription: {
+    marginTop: space['2'],
   },
 });

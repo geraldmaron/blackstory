@@ -7,6 +7,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { cx } from '@repo/ui';
+import { iconWithFallback } from '../../lib/map-experience/icon-fallback';
 import { displayEncodingFor } from '../../lib/map-experience/kind-encoding';
 import { kindIconFor } from '../../lib/map-experience/kind-icons';
 
@@ -23,7 +24,7 @@ export type KindBadgeProps = {
 
 export function KindBadge({ kind, mapTone, className, density = 'default' }: KindBadgeProps) {
   const encoding = displayEncodingFor(kind, mapTone);
-  const icon = kindIconFor(kind, mapTone);
+  const icon = iconWithFallback(kindIconFor(kind, mapTone));
 
   return (
     <span

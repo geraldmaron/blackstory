@@ -8,7 +8,7 @@
  * and shows the correct degraded ErrorState per failure mode instead of throwing.
  * Real on-device tile rendering / memory traces are deferred (see ADR-024).
  */
-import { fireEvent, render } from '@testing-library/react-native';
+import { act, fireEvent, render } from '@testing-library/react-native';
 import { StyleSheet } from 'react-native';
 
 const mockFlyTo = jest.fn();
@@ -34,14 +34,20 @@ jest.mock('@maplibre/maplibre-react-native', () => {
       children,
       testID,
       mapStyle,
+      onDidFailLoadingMap,
     }: {
       children?: unknown;
       testID?: string;
       mapStyle?: string;
+      onDidFailLoadingMap?: () => void;
     }) =>
       React.createElement(
         View,
-        { testID: testID ?? 'maplibre-map', accessibilityLabel: mapStyle },
+        {
+          testID: testID ?? 'maplibre-map',
+          accessibilityLabel: mapStyle,
+          onDidFailLoadingMap,
+        },
         children as never,
       ),
     Camera,
@@ -74,7 +80,7 @@ import { MapScreen } from '../MapScreen';
 import { DEFAULT_MAP_GLYPHS_URL, MAP_LABEL_TEXT_FONT } from '../mapConfig';
 import { CLUSTER_CAMERA_ZOOM_STEP } from '../clusterCamera';
 import { MAP_MAX_ZOOM, MAP_MIN_ZOOM, PRESET_ZOOM, US_CAMERA_MAX_BOUNDS } from '../mapCamera';
-import { ENTITY_CLUSTER_RADIUS_EXPR, ENTITY_POINT_RADIUS } from '../mapStyle';
+import { ENTITY_CLUSTER_RADIUS_EXPR } from '../mapStyle';
 import { MAP_ATTRIBUTION_ABOVE_SHEET_BOTTOM } from '../MapAttribution';
 
 beforeEach(() => {
@@ -147,7 +153,7 @@ describe('MapScreen — ready state', () => {
     expect(camera.maxBounds).toEqual([...US_CAMERA_MAX_BOUNDS]);
   });
 
-  it('uses compact cluster radius steps (flat copper, size not heat)', async () => {
+  it('uses v6 cluster radius steps (copper aggregate, size not heat)', async () => {
     const { getAllByTestId } = await render(<MapScreen />);
     const layers = getAllByTestId('maplibre-layer');
     const cluster = layers.find((node) => {
@@ -163,7 +169,16 @@ describe('MapScreen — ready state', () => {
     };
     expect(style.circleRadius).toEqual([...ENTITY_CLUSTER_RADIUS_EXPR]);
     expect(style.circleColor).toBeTruthy();
-    expect(ENTITY_POINT_RADIUS).toBeLessThanOrEqual(5);
+  });
+
+  it('shows map-canvas-unavailable when onDidFailLoadingMap fires', async () => {
+    const { getByTestId, queryByTestId } = await render(<MapScreen />);
+    const map = getByTestId('maplibre-map');
+    await act(async () => {
+      map.props.onDidFailLoadingMap?.();
+    });
+    expect(getByTestId('map-error-state')).toBeTruthy();
+    expect(queryByTestId('maplibre-map')).toBeNull();
   });
 
   it('renders Protomaps attribution when a PMTiles URL is configured', async () => {

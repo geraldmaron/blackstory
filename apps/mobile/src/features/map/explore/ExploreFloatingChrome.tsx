@@ -1,77 +1,114 @@
 /**
- * Compact floating Explore instruments over the full-bleed map: count pill,
- * icon-led Search / Filters / US chips. Dense enough to leave the map canvas
- * readable under one-handed reach.
+ * v7 Explore floating chrome over the full-bleed map: minimal mast (compact count +
+ * ghost icon affordances). Map dominates first glance — no opaque Surface slab.
+ * Copper accent only on active filters and selected controls (~10–15% copper budget).
  */
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text, space, radius } from '@/ui';
-import type { FilterState } from '@/app/_lib/route-params';
-import { getExploreCockpitColors } from './explore-chrome';
+import type { FilterState } from '@/lib/route-params';
+import { hasActiveFilters } from '@/lib/route-params';
+import { exploreContentInset, useExploreChromeColors } from './explore-chrome';
 
 const MIN_TOUCH = 44;
-const ICON_SIZE = 18;
+const ICON_SIZE = 17;
+const GHOST_SIZE = 36;
 
 export type ExploreFloatingChromeProps = {
-  readonly matchCount: number;
+  /** Viewport-scoped visible count — same source as the records rail header. */
+  readonly visibleCount: number;
+  /** "In view" once the map reports a region; "All records" before that. */
+  readonly scopeLabel: string;
   readonly filters: FilterState;
   readonly showDemoHint?: boolean;
-  readonly onOpenFilters: () => void;
+  readonly instrumentsOpen?: boolean;
+  readonly recordsExpanded?: boolean;
+  readonly onToggleInstruments: () => void;
+  readonly onToggleRecords?: () => void;
   readonly onNationalView: () => void;
   readonly onOpenSearch?: () => void;
+  /** @deprecated Modal route fallback — prefer in-map instruments panel. */
+  readonly onOpenFilters?: () => void;
+  /** @deprecated Modal route fallback — prefer in-map instruments panel. */
+  readonly onOpenColorKey?: () => void;
 };
 
-function formatCount(count: number, filters: FilterState): string {
+function formatCountNumber(count: number, filters: FilterState): string {
   const base = count === 1 ? '1' : String(count);
-  return filters.kind || filters.era ? `${base} · filtered` : base;
+  return hasActiveFilters(filters) ? `${base} · filtered` : base;
 }
 
-function IconChip({
+function formatCountPhrase(count: number, filters: FilterState): string {
+  const base = count === 0 ? 'None' : count === 1 ? '1 record' : `${count} records`;
+  return hasActiveFilters(filters) ? `${base} · filtered` : base;
+}
+
+function scopeSuffix(scopeLabel: string, showDemoHint: boolean): string {
+  if (showDemoHint) return ' demo fixtures';
+  return scopeLabel === 'In view' ? ' records in view' : ' records';
+}
+
+function GhostIconButton({
   icon,
   accessibilityLabel,
   onPress,
   selected,
   testID,
-  cockpit,
+  chrome,
 }: {
   readonly icon: keyof typeof Ionicons.glyphMap;
   readonly accessibilityLabel: string;
   readonly onPress: () => void;
   readonly selected?: boolean;
   readonly testID?: string;
-  readonly cockpit: ReturnType<typeof getExploreCockpitColors>;
+  readonly chrome: ReturnType<typeof useExploreChromeColors>;
 }) {
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       accessibilityState={{ selected: Boolean(selected) }}
-      hitSlop={4}
+      hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
       onPress={onPress}
       testID={testID}
       style={({ pressed }) => [
-        styles.chip,
+        styles.ghostBtn,
         {
-          backgroundColor: selected || pressed ? cockpit.surfaceRaised : cockpit.surface,
-          borderColor: selected ? cockpit.accent : cockpit.border,
+          backgroundColor: selected
+            ? chrome.mapGhostActive
+            : pressed
+              ? 'rgba(244, 239, 229, 0.14)'
+              : chrome.mapGhostBg,
+          opacity: pressed ? 0.9 : 1,
         },
       ]}
     >
-      <Ionicons name={icon} size={ICON_SIZE} color={selected ? cockpit.accent : cockpit.inkMuted} />
+      <Ionicons
+        name={icon}
+        size={ICON_SIZE}
+        color={selected ? chrome.mapInk : chrome.mapInkMuted}
+      />
     </Pressable>
   );
 }
 
 export function ExploreFloatingChrome({
-  matchCount,
+  visibleCount,
+  scopeLabel,
   filters,
   showDemoHint = false,
-  onOpenFilters,
+  instrumentsOpen = false,
+  recordsExpanded = false,
+  onToggleInstruments,
+  onToggleRecords,
   onNationalView,
   onOpenSearch,
 }: ExploreFloatingChromeProps) {
-  const cockpit = getExploreCockpitColors();
+  const chrome = useExploreChromeColors();
   const filtersActive = Boolean(filters.kind || filters.era);
+  const countLabel = formatCountNumber(visibleCount, filters);
+  const countPhrase = formatCountPhrase(visibleCount, filters);
+  const suffix = scopeSuffix(scopeLabel, showDemoHint);
 
   return (
     <View
@@ -79,54 +116,60 @@ export function ExploreFloatingChrome({
       pointerEvents="box-none"
       testID="explore-floating-chrome"
     >
-      <View style={styles.row} pointerEvents="box-none">
-        <View
-          style={[
-            styles.countPill,
-            { backgroundColor: cockpit.surface, borderColor: cockpit.border },
-          ]}
+      <View style={styles.mastRow} pointerEvents="box-none">
+        <Text
+          variant="code"
+          numberOfLines={1}
+          style={[styles.countInline, { color: chrome.mapInkMuted }]}
           accessible
           accessibilityRole="text"
-          accessibilityLabel={
-            showDemoHint
-              ? `${formatCount(matchCount, filters)} records, demo fixtures`
-              : `${formatCount(matchCount, filters)} records`
-          }
+          accessibilityLabel={`${scopeLabel}, ${countPhrase}`}
+          testID="explore-mast-count"
         >
-          <Text variant="code" numberOfLines={1} style={{ color: cockpit.inkMuted }}>
-            {formatCount(matchCount, filters)}
+          <Text variant="code" style={{ color: chrome.mapAccent }}>
+            {countLabel}
           </Text>
-          {showDemoHint ? (
-            <Text variant="caption" numberOfLines={1} style={{ color: cockpit.inkMuted }}>
-              demo
-            </Text>
-          ) : null}
-        </View>
+          {suffix}
+        </Text>
 
         <View style={styles.actions}>
-          <IconChip
+          <GhostIconButton
             icon="search-outline"
             accessibilityLabel="Open search"
             onPress={() => onOpenSearch?.()}
             testID="explore-chip-search"
-            cockpit={cockpit}
+            chrome={chrome}
           />
-          <IconChip
+          <GhostIconButton
             icon="options-outline"
             accessibilityLabel={
-              filtersActive ? 'Filters, active. Open filter sheet' : 'Open filters'
+              instrumentsOpen
+                ? 'Hide map instruments'
+                : filtersActive
+                  ? 'Map instruments, filters active'
+                  : 'Open map instruments'
             }
-            onPress={onOpenFilters}
-            selected={filtersActive}
-            testID="explore-chip-filters"
-            cockpit={cockpit}
+            onPress={onToggleInstruments}
+            selected={instrumentsOpen || filtersActive}
+            testID="explore-chip-instruments"
+            chrome={chrome}
           />
-          <IconChip
+          <GhostIconButton
+            icon="list-outline"
+            accessibilityLabel={
+              recordsExpanded ? 'Collapse records rail' : 'Expand records rail'
+            }
+            onPress={() => onToggleRecords?.()}
+            selected={recordsExpanded}
+            testID="explore-chip-records"
+            chrome={chrome}
+          />
+          <GhostIconButton
             icon="globe-outline"
             accessibilityLabel="Reset to national view"
             onPress={onNationalView}
             testID="explore-chip-national"
-            cockpit={cockpit}
+            chrome={chrome}
           />
         </View>
       </View>
@@ -137,38 +180,34 @@ export function ExploreFloatingChrome({
 const styles = StyleSheet.create({
   overlay: {
     position: 'absolute',
-    top: space['2'],
-    left: space['2'],
-    right: space['2'],
+    top: space['1'],
+    left: 0,
+    right: 0,
     zIndex: 3,
+    paddingHorizontal: exploreContentInset,
   },
-  row: {
+  mastRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: space['2'],
-  },
-  countPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space['1'],
-    paddingHorizontal: space['2'],
-    paddingVertical: space['1'],
-    borderRadius: radius.sm,
-    borderWidth: 1,
     minHeight: MIN_TOUCH,
+  },
+  countInline: {
+    flex: 1,
+    fontSize: 12,
+    letterSpacing: 0.3,
   },
   actions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: space['1'],
+    gap: 4,
   },
-  chip: {
-    minHeight: MIN_TOUCH,
-    minWidth: MIN_TOUCH,
+  ghostBtn: {
+    width: GHOST_SIZE,
+    height: GHOST_SIZE,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: radius.sm,
-    borderWidth: 1,
   },
 });

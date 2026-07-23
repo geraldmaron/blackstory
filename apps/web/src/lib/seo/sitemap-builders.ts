@@ -21,7 +21,7 @@ const STATIC_PUBLIC_ROUTES: readonly {
   readonly priority: number;
 }[] = Object.freeze([
   { path: '/', changeFrequency: 'weekly', priority: 1 },
-  { path: '/search', changeFrequency: 'daily', priority: 0.9 },
+  { path: '/history', changeFrequency: 'daily', priority: 0.9 },
   { path: '/explore', changeFrequency: 'daily', priority: 0.9 },
   { path: '/locate', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/corrections', changeFrequency: 'monthly', priority: 0.6 },

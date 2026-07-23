@@ -21,8 +21,9 @@
  *   - "Table" semantics for related records: see `RelatedList.tsx`'s header comment.
  */
 import { View } from 'react-native';
-import { Link, Notice, Text, space, useThemeColors } from '@/ui';
+import { Link, Notice, RecordFactStrip, Text, space, useThemeColors } from '@/ui';
 import { resolveFontFamily } from '@/ui/fonts';
+import { plainRangeText } from '../record-facts/record-facts';
 import type { NormalizedBlock, NormalizedPage } from './content-blocks';
 import type { CitationV1 } from './content-types';
 import { sanitizeExternalHref } from './link-safety';
@@ -43,6 +44,9 @@ export interface ContentRendererProps {
   /** Legal/methodology version-mismatch affordance (MOB-015 requirement #4). */
   readonly versionStale?: boolean;
   readonly onViewCurrent?: () => void;
+  /** When true, title/dek/facts render in the parent edition panel instead. */
+  readonly hideTitle?: boolean;
+  readonly headerFacts?: readonly { readonly key: string; readonly label: string; readonly value: string }[];
 }
 
 function formatRelativeTime(fetchedAtMs: number, nowMs: number = Date.now()): string {
@@ -136,30 +140,47 @@ export function ContentRenderer({
   cached,
   versionStale,
   onViewCurrent,
+  hideTitle = false,
+  headerFacts,
 }: ContentRendererProps) {
   const theme = useThemeColors();
   const hasSources = Boolean(sources && sources.length > 0);
   const isLongform = presentation === 'longform';
   const showCacheNotice = cached && (!isLongform || cached.degraded);
+  const facts =
+    headerFacts ??
+    [
+      ...(page.eraLabel
+        ? [{ key: 'era', label: 'Era', value: plainRangeText(page.eraLabel) }]
+        : []),
+      ...(page.placeLabel ? [{ key: 'where', label: 'Where', value: page.placeLabel }] : []),
+    ];
 
   return (
     <View style={{ gap: isLongform ? space['2'] : 4, maxWidth: isLongform ? 672 : undefined }}>
-      <Text variant={isLongform ? 'display' : 'title'} isHeading>
-        {page.title}
-      </Text>
-      {page.dek ? (
-        <Text
-          variant={isLongform ? 'editorial' : 'bodyEmphasis'}
-          colorRole="inkMuted"
-          style={{ marginBottom: isLongform ? space['4'] : 8 }}
-        >
-          {page.dek}
-        </Text>
+      {!hideTitle ? (
+        <>
+          <Text variant={isLongform ? 'display' : 'title'} isHeading>
+            {page.title}
+          </Text>
+          {page.dek ? (
+            <Text
+              variant={isLongform ? 'editorial' : 'bodyEmphasis'}
+              colorRole="inkMuted"
+              style={{ marginBottom: isLongform ? space['4'] : 8 }}
+            >
+              {page.dek}
+            </Text>
+          ) : null}
+        </>
       ) : null}
-      {page.eraLabel || page.placeLabel ? (
-        <Text variant="code" colorRole="inkSubtle" style={{ marginBottom: isLongform ? space['6'] : 12 }}>
-          {[page.eraLabel, page.placeLabel].filter(Boolean).join(' · ')}
-        </Text>
+      {facts.length > 0 ? (
+        <RecordFactStrip
+          facts={facts.map((fact) => ({
+            ...fact,
+            value: fact.label === 'Era' ? plainRangeText(fact.value) : fact.value,
+          }))}
+        />
       ) : null}
 
       {showCacheNotice ? (

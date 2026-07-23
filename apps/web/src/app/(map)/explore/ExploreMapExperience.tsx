@@ -47,17 +47,17 @@ import { HistoryEdgePanel } from '../../../components/history/HistoryEdgePanel';
 import { ExploreAddressSearch } from '../../../components/map-experience/ExploreAddressSearch';
 import type { ExploreAddressResolvedPayload } from '../../../components/map-experience/ExploreAddressSearch';
 import { LayerModelControl } from '../../../components/map-experience/LayerModelControl';
-import { GroupingToggle } from '../../../components/map-experience/GroupingToggle';
 import { MapExperienceLegend } from '../../../components/map-experience/MapExperienceLegend';
 import { NarrativeCard } from '../../../components/map-experience/NarrativeCard';
+import {
+  pickRandomIndex,
+  stepIndex,
+  type BrowseMode,
+} from '../../../components/patterns/browse-mode';
 import { SynchronizedResultList } from '../../../components/map-experience/SynchronizedResultList';
 import { MetaFieldLabel } from '../../../components/map-experience/MetaFieldLabel';
 import { shouldMorphDecadeDataPatch } from '../../map/decade-layer-transition';
 import {
-  back as sessionBack,
-  canBack as sessionCanBack,
-  canPickNext,
-  pickNext,
   push as sessionPush,
   type SessionStack,
 } from '../../../lib/map-experience/entity-session-nav';
@@ -111,13 +111,17 @@ import {
   type ExploreFilterState,
 } from '../../../lib/map-experience/filters';
 import { useMapStage } from '../MapStage';
+import { clearHeroMapInset } from '../../../lib/map-experience/hero-map-inset';
 import { pickExploreEdgeSlice } from './explore-edge-catalog';
 import {
   EXPLORE_SINGLE_PANEL_MEDIA,
+  exploreEditionTabClassName,
+  exploreEditionTabsClassName,
   exploreInstrumentsPanelClassName,
   exploreNarrowExclusivePatch,
   exploreResultsPanelClassName,
   exploreStageChromeAttrs,
+  exploreStageRootClassName,
   resolveExploreLeftTab,
   shouldAcceptExploreServerViewState,
   type ExploreLeftTab,
@@ -311,6 +315,8 @@ function shareableExploreHref(viewState: ExploreViewState): string {
 
 export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   const stage = useMapStage();
+  const stageRef = useRef(stage);
+  stageRef.current = stage;
   const [view, setView] = useState(initial);
   const filterRegionRef = useRef<HTMLDivElement | null>(null);
   const spotlightDialogRef = useRef<HTMLDialogElement | null>(null);
@@ -793,6 +799,13 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     [stage, view.allFeatures],
   );
 
+  // Full-bleed plate: clear any home hero geometry on the shared MapStage (ADR-017).
+  useEffect(() => {
+    clearHeroMapInset();
+    stageRef.current.resize();
+    // Mount-only — Explore owns full-viewport geometry for the persistent canvas.
+  }, []);
+
   // Deep link entry: reconcile the camera against the URL exactly once on mount (`easeTo`, never
   // a cinematic arc — arriving at a URL is a restore, not a descent). Skip when latched from hero
   // — its in-flight camera descent must not be interrupted (Agent B / ADR-017).
@@ -1113,26 +1126,38 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     return filteredFeatures.map((feature) => feature.properties.entityId);
   }, [filteredFeatures, sortedListFeatures]);
 
-  const handleSessionBack = useCallback(() => {
-    const result = sessionBack(sessionStack);
-    if (!result) {
+  const handleSessionPrevious = useCallback(() => {
+    const currentId = view.viewState.selected;
+    if (!currentId || sessionOrderedIds.length <= 1) {
       return;
     }
-    setSessionStack(result.stack);
-    writeEntitySessionStack(result.stack);
-    handleSelect(result.entityId, { skipSessionPush: true });
-  }, [handleSelect, sessionStack]);
+    const currentIndex = sessionOrderedIds.indexOf(currentId);
+    const safeIndex = currentIndex >= 0 ? currentIndex : 0;
+    const mode: BrowseMode = sessionRandomEnabled ? 'random' : 'ordered';
+    const nextIndex =
+      mode === 'random'
+        ? pickRandomIndex({ current: safeIndex, total: sessionOrderedIds.length })
+        : stepIndex(safeIndex, -1, sessionOrderedIds.length);
+    const nextId = sessionOrderedIds[nextIndex];
+    if (!nextId) {
+      return;
+    }
+    handleSelect(nextId, { skipSessionPush: true });
+  }, [handleSelect, sessionOrderedIds, sessionRandomEnabled, view.viewState.selected]);
 
   const handleSessionNext = useCallback(() => {
     const currentId = view.viewState.selected;
-    if (!currentId) {
+    if (!currentId || sessionOrderedIds.length <= 1) {
       return;
     }
-    const nextId = pickNext({
-      random: sessionRandomEnabled,
-      currentId,
-      orderedIds: sessionOrderedIds,
-    });
+    const currentIndex = sessionOrderedIds.indexOf(currentId);
+    const safeIndex = currentIndex >= 0 ? currentIndex : 0;
+    const mode: BrowseMode = sessionRandomEnabled ? 'random' : 'ordered';
+    const nextIndex =
+      mode === 'random'
+        ? pickRandomIndex({ current: safeIndex, total: sessionOrderedIds.length })
+        : stepIndex(safeIndex, 1, sessionOrderedIds.length);
+    const nextId = sessionOrderedIds[nextIndex];
     if (!nextId) {
       return;
     }
@@ -1140,36 +1165,61 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     setSessionStack(nextStack);
     writeEntitySessionStack(nextStack);
     handleSelect(nextId, { skipSessionPush: true });
-  }, [handleSelect, sessionOrderedIds, sessionRandomEnabled, sessionStack, view.viewState.selected]);
-
-  const handleSessionRandomToggle = useCallback(() => {
-    setSessionRandomEnabled((previous) => {
-      const next = !previous;
-      writeEntitySessionRandomEnabled(next);
-      return next;
-    });
-  }, []);
-
-  const spotlightSessionNav = useMemo(() => {
-    const currentId = view.viewState.selected;
-    if (!currentId) {
-      return undefined;
-    }
-    return {
-      canBack: sessionCanBack(sessionStack),
-      canNext: canPickNext({ currentId, orderedIds: sessionOrderedIds }),
-      randomEnabled: sessionRandomEnabled,
-      onBack: handleSessionBack,
-      onNext: handleSessionNext,
-      onRandomToggle: handleSessionRandomToggle,
-    };
   }, [
-    handleSessionBack,
-    handleSessionNext,
-    handleSessionRandomToggle,
+    handleSelect,
     sessionOrderedIds,
     sessionRandomEnabled,
     sessionStack,
+    view.viewState.selected,
+  ]);
+
+  const handleSessionModeChange = useCallback((mode: BrowseMode) => {
+    const next = mode === 'random';
+    setSessionRandomEnabled(next);
+    writeEntitySessionRandomEnabled(next);
+  }, []);
+
+  const handleSessionGoTo = useCallback(
+    (index: number) => {
+      const nextId = sessionOrderedIds[index];
+      if (!nextId) {
+        return;
+      }
+      const currentId = view.viewState.selected;
+      if (currentId && currentId !== nextId) {
+        const nextStack = sessionPush(sessionStack, currentId);
+        setSessionStack(nextStack);
+        writeEntitySessionStack(nextStack);
+      }
+      handleSelect(nextId, { skipSessionPush: true });
+    },
+    [handleSelect, sessionOrderedIds, sessionStack, view.viewState.selected],
+  );
+
+  const spotlightBrowseControls = useMemo(() => {
+    const currentId = view.viewState.selected;
+    if (!currentId || sessionOrderedIds.length <= 1) {
+      return undefined;
+    }
+    const index = sessionOrderedIds.indexOf(currentId);
+    return {
+      total: sessionOrderedIds.length,
+      index: index >= 0 ? index : 0,
+      mode: (sessionRandomEnabled ? 'random' : 'ordered') as BrowseMode,
+      onModeChange: handleSessionModeChange,
+      onPrevious: handleSessionPrevious,
+      onNext: handleSessionNext,
+      onGoTo: handleSessionGoTo,
+      itemIds: sessionOrderedIds,
+      ariaLabel: 'Records in view',
+    };
+  }, [
+    handleSessionGoTo,
+    handleSessionModeChange,
+    handleSessionNext,
+    handleSessionPrevious,
+    sessionOrderedIds,
+    sessionRandomEnabled,
     view.viewState.selected,
   ]);
 
@@ -1426,7 +1476,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
   return (
     /* Instruments follow the site theme (light/dark) — map plate syncs via MapStage. */
     <div
-      className={entering ? 'ds-explore-stage ds-explore-stage--entering' : 'ds-explore-stage'}
+      className={exploreStageRootClassName({ entering })}
       data-map-journey={entering ? 'entering' : 'explore'}
       {...stageChrome}
     >
@@ -1447,7 +1497,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
       >
         <div className="ds-explore-stage__panel-header">
           <div
-            className="ds-explore-stage__tabs"
+            className={exploreEditionTabsClassName()}
             role="tablist"
             aria-label="Map instruments"
             onKeyDown={handleInstrumentsTabKeyDown}
@@ -1456,7 +1506,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
               type="button"
               role="tab"
               id="explore-tab-filters"
-              className="ds-explore-stage__tab"
+              className={exploreEditionTabClassName()}
               aria-selected={leftTab === 'filters'}
               aria-controls="explore-tabpanel-filters"
               tabIndex={leftTab === 'filters' ? 0 : -1}
@@ -1468,7 +1518,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
               type="button"
               role="tab"
               id="explore-tab-key"
-              className="ds-explore-stage__tab"
+              className={exploreEditionTabClassName()}
               aria-selected={leftTab === 'key'}
               aria-controls="explore-tabpanel-key"
               tabIndex={leftTab === 'key' ? 0 : -1}
@@ -1494,6 +1544,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
           aria-labelledby="explore-tab-filters"
           {...(leftTab === 'filters' ? {} : { hidden: true })}
         >
+          <p className="ds-explore-edition__kicker">Map instruments</p>
           <p
             className="ds-explore-stage__panel-title ds-visually-hidden"
             id="explore-facets-heading"
@@ -1632,7 +1683,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
             (view.viewState.popGeo ?? DEFAULT_POPULATION_GEO) === 'county' &&
             !countyPopulationIndex ? (
               <p className="ds-sans ds-explore__settings-note">
-                County population data is not loaded yet — choropleth tiers stay neutral until the
+                County population data is not loaded yet. Choropleth tiers stay neutral until the
                 static index is available.
               </p>
             ) : null}
@@ -1641,11 +1692,43 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
             (view.viewState.popGeo ?? DEFAULT_POPULATION_GEO) === 'state' &&
             !statePopulationIndex ? (
               <p className="ds-sans ds-explore__settings-note">
-                State population data is not loaded yet — state fills stay neutral until the static
+                State population data is not loaded yet. State fills stay neutral until the static
                 index is available.
               </p>
             ) : null}
-            <GroupingToggle enabled={view.viewState.group} onToggle={handleGroupToggle} />
+            <fieldset className="ds-explore-edition__segment-field">
+              <legend className="ds-explore-edition__segment-label">Group nearby</legend>
+              <div
+                className="ds-explore-edition__segment-strip"
+                role="group"
+                aria-label="Group nearby points"
+              >
+                <button
+                  type="button"
+                  className="ds-explore-edition__segment"
+                  aria-pressed={!view.viewState.group}
+                  onClick={() => {
+                    if (view.viewState.group) {
+                      handleGroupToggle();
+                    }
+                  }}
+                >
+                  Off
+                </button>
+                <button
+                  type="button"
+                  className="ds-explore-edition__segment"
+                  aria-pressed={view.viewState.group}
+                  onClick={() => {
+                    if (!view.viewState.group) {
+                      handleGroupToggle();
+                    }
+                  }}
+                >
+                  On
+                </button>
+              </div>
+            </fieldset>
             <details className="ds-explore-stage__disclosure" open={view.viewState.lines}>
               <summary className="ds-explore-stage__disclosure-summary">Map settings</summary>
               <div className="ds-explore__settings-body">
@@ -1668,29 +1751,34 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
                 {view.viewState.lines ? (
                   <fieldset className="ds-explore__settings-fieldset">
                     <legend className="ds-sans">Decade</legend>
-                    <div className="ds-explore__decade-row" role="tablist" aria-label="Line decade">
-                      <button
-                        type="button"
-                        role="tab"
-                        className="ds-button"
-                        aria-selected={!view.viewState.decade}
-                        onClick={() => handleDecadeSelect(undefined)}
-                      >
-                        All time
-                      </button>
-                      {view.availableDecades.map((decade) => (
-                        <button
-                          key={decade}
-                          type="button"
-                          role="tab"
-                          className="ds-button"
-                          aria-selected={view.viewState.decade === decade}
-                          onClick={() => handleDecadeSelect(decade)}
-                        >
-                          {decade}
-                        </button>
-                      ))}
-                    </div>
+                    <nav className="ds-explore-edition__decade-stepper" aria-label="Line decade">
+                      <ul className="ds-explore-edition__decade-list" role="tablist">
+                        <li role="presentation">
+                          <button
+                            type="button"
+                            role="tab"
+                            className="ds-explore-edition__decade-tab"
+                            aria-selected={!view.viewState.decade}
+                            onClick={() => handleDecadeSelect(undefined)}
+                          >
+                            All time
+                          </button>
+                        </li>
+                        {view.availableDecades.map((decade) => (
+                          <li key={decade} role="presentation">
+                            <button
+                              type="button"
+                              role="tab"
+                              className="ds-explore-edition__decade-tab"
+                              aria-selected={view.viewState.decade === decade}
+                              onClick={() => handleDecadeSelect(decade)}
+                            >
+                              {decade}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </nav>
                   </fieldset>
                 ) : null}
 
@@ -1837,7 +1925,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
               <NarrativeCard
                 feature={selectedFeature}
                 onClose={handleClearSelected}
-                {...(spotlightSessionNav ? { sessionNav: spotlightSessionNav } : {})}
+                {...(spotlightBrowseControls ? { browseControls: spotlightBrowseControls } : {})}
               />
             ) : null}
           </div>

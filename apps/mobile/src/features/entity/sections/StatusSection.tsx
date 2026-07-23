@@ -1,66 +1,73 @@
 /**
- * Status / event-window section — mirrors web's `EntityStatusPanel` behavior exactly: `event`
- * kind entities have no status of their own and render their `eventWindow` instead (with the
- * same explanatory note); every other kind renders current status + the full `statusHistory`,
- * or the shared `statusHistory` gap notice when neither is present.
+ * Beat 05: status / event-window panel — mirrors web `EntityStatusPanel`.
  */
 import { View } from 'react-native';
-import { EmptyState, Text, space } from '@/ui';
-import { EVENT_WINDOW_NOTE, RECORD_GAP_COPY, SECTION_HEADINGS } from '../copy';
+import { Text, space } from '@/ui';
+import { EntityEditionPanel } from '../EntityEditionPanel';
+import { RecordGapNotice } from '../RecordGapNotice';
+import { EVENT_WINDOW_NOTE, SECTION_HEADINGS } from '../copy';
 import { datePrecisionCaption, humanizeToken } from '../format';
 import type { Entity } from '../types';
-import { SectionHeading } from './SectionHeading';
+
+export type StatusSectionProps = {
+  readonly entity: Entity;
+  readonly index: string;
+};
 
 function formatEventWindowLabel(startAt: string | undefined, endAt: string | null | undefined): string {
   if (!startAt) return 'Undated';
   if (!endAt) return startAt;
-  return `${startAt} – ${endAt}`;
+  return `${startAt} to ${endAt}`;
 }
 
-export type StatusSectionProps = {
-  readonly entity: Entity;
-};
-
-export function StatusSection({ entity }: StatusSectionProps) {
-  if (entity.kind === 'event') {
-    const window = entity.eventWindow;
-    return (
-      <View style={{ gap: space['2'] }}>
-        <SectionHeading level={2}>{SECTION_HEADINGS.statusEvent}</SectionHeading>
-        <Text variant="body">
-          {formatEventWindowLabel(window?.startAt, window?.endAt)}
-          {window?.eventType ? ` · ${humanizeToken(window.eventType)}` : ''}
-        </Text>
-        {window ? (
-          <Text variant="caption" colorRole="inkMuted">
-            {datePrecisionCaption(window.datePrecision)}
-          </Text>
-        ) : null}
-        <Text variant="bodySmall" colorRole="inkMuted">
-          {EVENT_WINDOW_NOTE}
-        </Text>
-      </View>
-    );
-  }
-
-  const hasStatus = Boolean(entity.status) && (entity.statusHistory?.length ?? 0) > 0;
+export function StatusSection({ entity, index }: StatusSectionProps) {
+  const statusHeading =
+    entity.kind === 'event' ? SECTION_HEADINGS.statusEvent : SECTION_HEADINGS.statusRecord;
 
   return (
-    <View style={{ gap: space['2'] }}>
-      <SectionHeading level={2}>{SECTION_HEADINGS.statusRecord}</SectionHeading>
-      {!hasStatus ? (
-        <EmptyState title={RECORD_GAP_COPY.statusHistory.title} description={RECORD_GAP_COPY.statusHistory.body} />
-      ) : (
+    <EntityEditionPanel
+      index={index}
+      kicker="Status"
+      title={statusHeading}
+      testID="entity-status-section"
+    >
+      {entity.kind === 'event' ? (
+        <View style={{ gap: space['2'] }}>
+          {entity.eventWindow ? (
+            <>
+              <Text variant="body">
+                {formatEventWindowLabel(entity.eventWindow.startAt, entity.eventWindow.endAt)}
+                {entity.eventWindow.eventType ? ` · ${humanizeToken(entity.eventWindow.eventType)}` : ''}
+              </Text>
+              <Text variant="caption" colorRole="inkMuted">
+                {datePrecisionCaption(entity.eventWindow.datePrecision)}
+              </Text>
+            </>
+          ) : (
+            <RecordGapNotice kind="statusHistory" />
+          )}
+          <Text variant="bodySmall" colorRole="inkMuted">
+            {EVENT_WINDOW_NOTE}
+          </Text>
+        </View>
+      ) : (entity.statusHistory?.length ?? 0) > 0 ? (
         <View style={{ gap: space['2'] }}>
           <Text variant="bodyEmphasis">Current status: {humanizeToken(entity.status ?? '')}</Text>
-          {(entity.statusHistory ?? []).map((record, index) => (
-            <Text key={`${entity.id}_status_${index}`} variant="bodySmall" colorRole="inkMuted">
+          {(entity.statusHistory ?? []).map((record, recordIndex) => (
+            <Text
+              key={`${entity.id}_status_${recordIndex}`}
+              variant="bodySmall"
+              colorRole="inkMuted"
+            >
               {humanizeToken(record.status)} · {record.validFrom ?? 'undated'}
-              {record.validTo ? ` through ${record.validTo}` : ', ongoing'} ({datePrecisionCaption(record.datePrecision)})
+              {record.validTo ? ` through ${record.validTo}` : ', ongoing'} (
+              {datePrecisionCaption(record.datePrecision)})
             </Text>
           ))}
         </View>
+      ) : (
+        <RecordGapNotice kind="statusHistory" />
       )}
-    </View>
+    </EntityEditionPanel>
   );
 }

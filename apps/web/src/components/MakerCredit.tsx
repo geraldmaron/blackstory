@@ -1,7 +1,7 @@
 /**
  * Quiet maker attribution linking to geralddagher.com with the GD brand mark.
  * Footer and inline variants both swap light/dark marks with [data-theme]; footer
- * uses accent link styling on the canvas plate, inline uses muted ink on document surfaces.
+ * uses muted ink with copper accent on hover, inline uses the same on document surfaces.
  */
 
 import React from 'react';

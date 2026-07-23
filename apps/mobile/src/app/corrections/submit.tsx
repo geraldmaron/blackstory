@@ -22,11 +22,9 @@
  */
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { View } from 'react-native';
 
-import { parseEntityId, parseReturnTo } from '../_lib/route-params';
-import {
-  CorrectionForm,
+import { parseEntityId, parseReturnTo } from '@/lib/route-params';
+import { CorrectionForm,
   CorrectionReceipt,
   createCorrectionClientDeps,
   submitCorrection,
@@ -34,6 +32,7 @@ import {
   type CorrectionFormState,
   type SubmitResult,
 } from '@/features/corrections';
+import { UtilityScreenShell } from '@/ui';
 
 export default function CorrectionsSubmitSheet() {
   const params = useLocalSearchParams<{ entityId?: string | string[]; returnTo?: string | string[] }>();
@@ -54,21 +53,31 @@ export default function CorrectionsSubmitSheet() {
 
   if (receiptCode) {
     return (
-      <CorrectionReceipt
-        receiptCode={receiptCode}
-        onCheckStatus={() => router.replace('/corrections/status')}
-        onDone={() => router.replace(safeReturnTo as never)}
-      />
+      <UtilityScreenShell
+        kicker="Trust"
+        title="Correction received"
+        dek="Save your receipt code. We will review your submission."
+      >
+        <CorrectionReceipt
+          receiptCode={receiptCode}
+          onCheckStatus={() => router.replace('/corrections/status')}
+          onDone={() => router.replace(safeReturnTo as never)}
+        />
+      </UtilityScreenShell>
     );
   }
 
   return (
-    <View style={{ flex: 1 }}>
+    <UtilityScreenShell
+      kicker="Trust"
+      title="Submit a correction"
+      dek="Tell us what should change and link to evidence we can verify."
+    >
       <CorrectionForm
         entityId={entityId ?? undefined}
         onSubmit={handleSubmit}
         onAccepted={(code) => setReceiptCode(code)}
       />
-    </View>
+    </UtilityScreenShell>
   );
 }

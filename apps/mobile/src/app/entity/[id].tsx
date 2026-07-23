@@ -21,7 +21,7 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { Redirect, router, useLocalSearchParams, useNavigation } from 'expo-router';
 
-import { parseEntityId } from '../_lib/route-params';
+import { parseEntityId } from '@/lib/route-params';
 import {
   createRuntimeEntityDataDeps,
   EntityDetailScreen,

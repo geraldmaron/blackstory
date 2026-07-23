@@ -5,6 +5,9 @@
  * caller-supplied `selected`/`checked`/`expanded` — see `accessibilityState` prop, MOB-017) kept
  * in sync, and a minimum 44x44dp hit target (Apple HIG / Material guidance) via hitSlop when the
  * rendered box is smaller. Colors/radius/spacing/motion all come from generated tokens.
+ *
+ * Variants follow v6 copper discipline: primary = ink fill; accent = copper navigational CTA;
+ * secondary/ghost for supporting actions.
  */
 import { useState } from 'react';
 import {
@@ -62,9 +65,9 @@ export function Button({
 
   const palette = {
     primary: { bg: theme.ink, fg: theme.inverseInk, border: theme.ink },
-    secondary: { bg: theme.surfaceRaised, fg: theme.ink, border: theme.border },
+    secondary: { bg: theme.surface, fg: theme.ink, border: theme.border },
     ghost: { bg: 'transparent', fg: theme.accent, border: 'transparent' },
-    accent: { bg: theme.accent, fg: theme.inverseInk, border: theme.accent },
+    accent: { bg: theme.ink, fg: theme.inverseInk, border: theme.accentGraphic },
   }[variant];
 
   return (
@@ -85,6 +88,7 @@ export function Button({
           borderColor: palette.border,
           opacity: isDisabled ? 0.5 : pressed ? 0.85 : 1,
         },
+        variant === 'accent' ? styles.accentBorder : null,
       ]}
       {...rest}
     >
@@ -109,10 +113,13 @@ const styles = StyleSheet.create({
   base: {
     minHeight: MIN_TOUCH_TARGET,
     borderRadius: radius.sm,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     paddingHorizontal: space['4'],
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  accentBorder: {
+    borderWidth: 1,
   },
   content: {
     flexDirection: 'row',

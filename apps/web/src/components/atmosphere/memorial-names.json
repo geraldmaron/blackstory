@@ -3738,6 +3738,13 @@
     "context": "shot by deputy sheriff"
   },
   {
+    "name": "Malcolm X",
+    "year": 1965,
+    "category": "racial_terror",
+    "place": "New York, New York",
+    "context": "assassinated"
+  },
+  {
     "name": "Marshall Scott Jr.",
     "year": 1965,
     "category": "racial_terror",
@@ -4478,6 +4485,13 @@
     "category": "police_violence",
     "place": "Seattle, Washington",
     "context": "killed during police raid"
+  },
+  {
+    "name": "Michael Griffith",
+    "year": 1986,
+    "category": "racial_terror",
+    "place": "Howard Beach, New York",
+    "context": "killed after racial attack"
   },
   {
     "name": "Robert V. Logan",
@@ -6426,6 +6440,13 @@
     "context": "shot in car by police"
   },
   {
+    "name": "Trayvon Martin",
+    "year": 2012,
+    "category": "racial_terror",
+    "place": "Sanford, Florida",
+    "context": "killed by civilian"
+  },
+  {
     "name": "Troy Stewart",
     "year": 2012,
     "category": "police_violence",
@@ -7448,13 +7469,6 @@
     "context": "beaten by police officers"
   },
   {
-    "name": "JR Williams",
-    "year": 2013,
-    "category": "police_violence",
-    "place": "Phoenix, Arizona",
-    "context": "shot by police officers"
-  },
-  {
     "name": "Jabril Cheevers",
     "year": 2013,
     "category": "police_violence",
@@ -7756,6 +7770,13 @@
     "context": "died from police restraint"
   },
   {
+    "name": "JR Williams",
+    "year": 2013,
+    "category": "police_violence",
+    "place": "Phoenix, Arizona",
+    "context": "shot by police officers"
+  },
+  {
     "name": "Juan Markee Jones",
     "year": 2013,
     "category": "police_violence",
@@ -7931,13 +7952,6 @@
     "context": "shot by police officers"
   },
   {
-    "name": "LaVaughn Coleman",
-    "year": 2013,
-    "category": "police_violence",
-    "place": "Odenton, Maryland",
-    "context": "killed by law enforcement"
-  },
-  {
     "name": "Landon Nobles",
     "year": 2013,
     "category": "police_violence",
@@ -7971,6 +7985,13 @@
     "category": "police_violence",
     "place": "Woodbine, Georgia",
     "context": "shot by police officers"
+  },
+  {
+    "name": "LaVaughn Coleman",
+    "year": 2013,
+    "category": "police_violence",
+    "place": "Odenton, Maryland",
+    "context": "killed by law enforcement"
   },
   {
     "name": "Lawrence Hawkins",
@@ -9191,6 +9212,13 @@
     "context": "killed by law enforcement"
   },
   {
+    "name": "Clementa C. Pinckney",
+    "year": 2015,
+    "category": "racial_terror",
+    "place": "Charleston, South Carolina",
+    "context": "killed in Mother Emanuel church massacre"
+  },
+  {
     "name": "Clifford Butler Jr",
     "year": 2015,
     "category": "police_violence",
@@ -9226,11 +9254,25 @@
     "context": "killed by law enforcement"
   },
   {
+    "name": "Cynthia Graham Hurd",
+    "year": 2015,
+    "category": "racial_terror",
+    "place": "Charleston, South Carolina",
+    "context": "killed in Mother Emanuel church massacre"
+  },
+  {
     "name": "Dalton Branch",
     "year": 2015,
     "category": "police_violence",
     "place": "New York, New York",
     "context": "killed by law enforcement"
+  },
+  {
+    "name": "Daniel L. Simmons Sr.",
+    "year": 2015,
+    "category": "racial_terror",
+    "place": "Charleston, South Carolina",
+    "context": "killed in Mother Emanuel church massacre"
   },
   {
     "name": "Daniel Wolfe",
@@ -9324,6 +9366,13 @@
     "context": "shot by police; unarmed"
   },
   {
+    "name": "Depayne Middleton-Doctor",
+    "year": 2015,
+    "category": "racial_terror",
+    "place": "Charleston, South Carolina",
+    "context": "killed in Mother Emanuel church massacre"
+  },
+  {
     "name": "Derek Stokes",
     "year": 2015,
     "category": "police_violence",
@@ -9413,6 +9462,13 @@
     "category": "police_violence",
     "place": "Garland, Texas",
     "context": "killed by law enforcement"
+  },
+  {
+    "name": "Ethel Lee Lance",
+    "year": 2015,
+    "category": "racial_terror",
+    "place": "Charleston, South Carolina",
+    "context": "killed in Mother Emanuel church massacre"
   },
   {
     "name": "Eugene McSwain",
@@ -9856,6 +9912,13 @@
     "context": "killed by law enforcement"
   },
   {
+    "name": "Myra Thompson",
+    "year": 2015,
+    "category": "racial_terror",
+    "place": "Charleston, South Carolina",
+    "context": "killed in Mother Emanuel church massacre"
+  },
+  {
     "name": "Natasha McKenna",
     "year": 2015,
     "category": "police_violence",
@@ -10024,6 +10087,13 @@
     "context": "killed by law enforcement"
   },
   {
+    "name": "Sharonda Coleman-Singleton",
+    "year": 2015,
+    "category": "racial_terror",
+    "place": "Charleston, South Carolina",
+    "context": "killed in Mother Emanuel church massacre"
+  },
+  {
     "name": "Spencer McCain",
     "year": 2015,
     "category": "police_violence",
@@ -10036,6 +10106,13 @@
     "category": "police_violence",
     "place": "Fort Pierce, Florida",
     "context": "killed by law enforcement"
+  },
+  {
+    "name": "Susie Jackson",
+    "year": 2015,
+    "category": "racial_terror",
+    "place": "Charleston, South Carolina",
+    "context": "killed in Mother Emanuel church massacre"
   },
   {
     "name": "Terence Walker",
@@ -10155,6 +10232,13 @@
     "category": "police_violence",
     "place": "Kansas City, Missouri",
     "context": "killed by law enforcement"
+  },
+  {
+    "name": "Tywanza Sanders",
+    "year": 2015,
+    "category": "racial_terror",
+    "place": "Charleston, South Carolina",
+    "context": "killed in Mother Emanuel church massacre"
   },
   {
     "name": "Walter Scott",
@@ -11590,6 +11674,13 @@
     "category": "police_violence",
     "place": "Grand Rapids, Michigan",
     "context": "shot during traffic stop"
+  },
+  {
+    "name": "Jordan Neely",
+    "year": 2023,
+    "category": "racial_terror",
+    "place": "New York, New York",
+    "context": "killed by civilian on subway"
   },
   {
     "name": "Keenan Anderson",

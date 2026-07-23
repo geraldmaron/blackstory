@@ -24,6 +24,7 @@ import {
 } from '../../lib/map-experience/dignity-style';
 import {
   KIND_ENCODING_ENTRIES,
+  KIND_FAMILY_ENTRIES,
   DEFAULT_KIND_ENCODING,
   MAP_SEMANTIC_TONE_ENCODING,
 } from '../../lib/map-experience/kind-encoding';
@@ -340,14 +341,14 @@ function kindColorExpression(): ExpressionSpecification {
     tone,
     entry.shade,
   ]);
-  const kindCases = KIND_ENCODING_ENTRIES.flatMap(([kind, entry]) => [kind, entry.shade]);
+  const kindCases = KIND_FAMILY_ENTRIES.flatMap(([family, entry]) => [family, entry.shade]);
   return [
     'case',
     ['has', 'shade'],
     ['get', 'shade'],
     ['has', 'mapTone'],
     ['match', ['get', 'mapTone'], ...semanticCases, DEFAULT_KIND_ENCODING.shade],
-    ['match', ['get', 'kind'], ...kindCases, DEFAULT_KIND_ENCODING.shade],
+    ['match', ['coalesce', ['get', 'kindFamily'], ['get', 'kind']], ...kindCases, DEFAULT_KIND_ENCODING.shade],
   ] as unknown as ExpressionSpecification;
 }
 

@@ -15,7 +15,7 @@ import {
   plateForScheme,
 } from '../../lib/map-experience';
 import { brandPalette } from '@repo/ui';
-import { KIND_ENCODING_ENTRIES } from '../../lib/map-experience/kind-encoding';
+import { KIND_FAMILY_ENTRIES } from '../../lib/map-experience/kind-encoding';
 import {
   markerHaloRadiusExpression,
   markerRadiusExpression,
@@ -630,7 +630,7 @@ test('the point layer colors kinds and semantic tones from DIGNITY_PALETTE via s
   assert.deepEqual(colorExpr[1], ['has', 'shade']);
   assert.deepEqual(colorExpr[2], ['get', 'shade']);
   const colorOutputs = collectColorLeaves(colorExpr);
-  const expectedShades = KIND_ENCODING_ENTRIES.map(([, entry]) => entry.shade);
+  const expectedShades = KIND_FAMILY_ENTRIES.map(([, entry]) => entry.shade);
   for (const shade of expectedShades) {
     assert.ok(colorOutputs.includes(shade), `expected kind shade ${shade} in circle-color`);
   }

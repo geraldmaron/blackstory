@@ -4,8 +4,8 @@
  */
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { Text, useShadowStyle, useThemeColors, space } from '@/ui';
-import type { FilterState } from '@/app/_lib/route-params';
+import { Text, useThemeColors, space } from '@/ui';
+import type { FilterState } from '@/lib/route-params';
 
 const MIN_TOUCH = 44;
 const ICON_SIZE = 20;
@@ -73,14 +73,12 @@ export function ExploreToolbar({
   onNationalView,
 }: ExploreToolbarProps) {
   const theme = useThemeColors();
-  const toolbarShadow = useShadowStyle('sm');
   const filtersActive = Boolean(filters.kind || filters.era);
 
   return (
     <View
       style={[
         styles.bar,
-        toolbarShadow,
         { borderBottomColor: theme.border, backgroundColor: theme.canvas },
       ]}
       testID="explore-toolbar"

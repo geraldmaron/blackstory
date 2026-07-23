@@ -52,6 +52,81 @@ export function deriveDecadeLabel(year: number): string {
   return decadeLabel(year);
 }
 
+/** Wall-clock or ISO timestamp used to resolve the current calendar decade ceiling. */
+export type DecadeReferenceDate = Date | string;
+
+function toReferenceDate(reference: DecadeReferenceDate = new Date()): Date {
+  if (reference instanceof Date) return reference;
+  const parsed = new Date(reference);
+  if (!Number.isNaN(parsed.getTime())) return parsed;
+  const fallbackYear = yearOf(reference);
+  if (fallbackYear !== undefined) return new Date(Date.UTC(fallbackYear, 6, 1));
+  return new Date();
+}
+
+/** Start year of the calendar decade containing `reference` (e.g. mid-2026 → 2020). */
+export function calendarDecadeStartYear(reference: DecadeReferenceDate = new Date()): number {
+  return Math.floor(toReferenceDate(reference).getUTCFullYear() / 10) * 10;
+}
+
+/** Latest decade label that has already started per the calendar (e.g. mid-2026 → "2020s"). */
+export function maxDecadeInclusive(reference: DecadeReferenceDate = new Date()): string {
+  return deriveDecadeLabel(calendarDecadeStartYear(reference));
+}
+
+/** Parses a decade bucket label ("1870s") to its start year; undefined when not a decade label. */
+export function decadeStartYearFromLabel(label: string): number | undefined {
+  const match = /^(\d{4})s$/.exec(label.trim());
+  if (!match) return undefined;
+  const start = Number.parseInt(match[1]!, 10);
+  return Number.isFinite(start) ? start : undefined;
+}
+
+/** True when `decade` is a bucket label at or before the current calendar decade. */
+export function isDecadeAtOrBeforeCurrent(
+  decade: string,
+  reference: DecadeReferenceDate = new Date(),
+): boolean {
+  const start = decadeStartYearFromLabel(decade);
+  if (start === undefined) return false;
+  return start <= calendarDecadeStartYear(reference);
+}
+
+/** Drops decade labels after the current calendar decade — never surfaces 2030s+ in UI. */
+export function filterDecadesAtOrBeforeCurrent(
+  decades: readonly string[],
+  reference: DecadeReferenceDate = new Date(),
+): readonly string[] {
+  const maxStart = calendarDecadeStartYear(reference);
+  return decades.filter((decade) => {
+    const start = decadeStartYearFromLabel(decade);
+    return start !== undefined && start <= maxStart;
+  });
+}
+
+/**
+ * Inclusive decade labels from `fromDecade` through `toDecade`, filling every step on the axis,
+ * capped at the current calendar decade. Used by history/explore scrubbers so sparse artifact
+ * decades still render a continuous rail without inventing future stops.
+ */
+export function buildInclusiveDecadeRange(
+  fromDecade: string,
+  toDecade: string,
+  reference: DecadeReferenceDate = new Date(),
+): readonly string[] {
+  const fromStart = decadeStartYearFromLabel(fromDecade);
+  const toStart = decadeStartYearFromLabel(toDecade);
+  if (fromStart === undefined || toStart === undefined) return [];
+  const lo = Math.min(fromStart, toStart);
+  const hi = Math.min(Math.max(fromStart, toStart), calendarDecadeStartYear(reference));
+  if (lo > hi) return [];
+  const labels: string[] = [];
+  for (let year = lo; year <= hi; year += 10) {
+    labels.push(`${year}s`);
+  }
+  return labels;
+}
+
 /**
  * Maps an era span to every overlapping decade bucket, inclusive of both ends:
  * 1948-1972 => ["1940s", "1950s", "1960s", "1970s"]. A single-point span (validTo omitted or

@@ -15,6 +15,7 @@ import {
   matchesRadiusStatusMessage,
   placeOnlyStatusMessage,
 } from './explore-place-radius';
+import { kindFamilyFor } from './kind-encoding';
 
 function pointFeature(id: string, lng: number, lat: number, name = id): ExploreMapFeature {
   return {
@@ -36,6 +37,7 @@ function pointFeature(id: string, lng: number, lat: number, name = id): ExploreM
       topicTags: [],
       shade: '#C48A4A',
       glyph: 'circle',
+      kindFamily: kindFamilyFor('place'),
     },
   };
 }

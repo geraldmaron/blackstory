@@ -154,8 +154,19 @@ export type {
 // barrel export so packages/firebase/src/embeddings/text.ts can import the shared
 // `deriveEraBuckets` (replacing its local duplicate) and so have a
 // single vocabulary source to import from — see ADR-015.
-export { DATE_PRECISIONS, deriveDecadeLabel, deriveEraBuckets, isDatePrecision } from './era.js';
-export type { DatePrecision, EraSpan } from './era.js';
+export {
+  DATE_PRECISIONS,
+  buildInclusiveDecadeRange,
+  calendarDecadeStartYear,
+  deriveDecadeLabel,
+  deriveEraBuckets,
+  decadeStartYearFromLabel,
+  filterDecadesAtOrBeforeCurrent,
+  isDatePrecision,
+  isDecadeAtOrBeforeCurrent,
+  maxDecadeInclusive,
+} from './era.js';
+export type { DatePrecision, DecadeReferenceDate, EraSpan } from './era.js';
 
 export {
   CULTURAL_FIGURE_NOTABILITY_CALIBRATION,

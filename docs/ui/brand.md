@@ -51,6 +51,9 @@ Recorded so nobody “fixes” the codebase back to a retired rule:
    never type the wordmark next to a bare symbol in React.
 5. **Copper text.** Use `#8E4F2A` on light / `#D07A32` on dark
    (`--ds-copper-text`), not raw Copper Pin for body text on light canvas.
+6. **Home layout.** The `/` page layout pattern (beats, hero, footer) lives in
+   [`design-direction-v6-home.md`](./design-direction-v6-home.md); tokens and
+   palette rules in this file still govern home.
 
 ## The signature
 

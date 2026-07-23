@@ -83,12 +83,17 @@ const nextConfig = {
       },
       {
         source: '/facts',
-        destination: '/search',
+        destination: '/history',
         permanent: true,
       },
       {
         source: '/facts/:path*',
-        destination: '/search',
+        destination: '/history',
+        permanent: true,
+      },
+      {
+        source: '/search',
+        destination: '/history',
         permanent: true,
       },
       {
@@ -138,20 +143,11 @@ const nextConfig = {
         ],
       },
       {
-        source: '/search',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, s-maxage=60, stale-while-revalidate=300',
-          },
-        ],
-      },
-      {
         source: '/history',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, s-maxage=300, stale-while-revalidate=3600',
+            value: 'public, s-maxage=60, stale-while-revalidate=300',
           },
         ],
       },

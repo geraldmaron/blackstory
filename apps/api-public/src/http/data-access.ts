@@ -165,7 +165,7 @@ export function searchOverEntities(
 
 /**
  * Index-backed search via `@repo/domain`'s `runPublicSearch` (same pipeline as
- * `apps/web/src/app/search/search-view-model.ts`). Applies facet filters, facets, ranking, and
+ * `apps/web/src/app/search/api/handler.ts`). Applies facet filters, facets, ranking, and
  * depth-based pagination over persisted `publicSearchIndex` docs loaded by
  * `./firestore-data-access.ts`.
  */

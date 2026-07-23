@@ -16,20 +16,14 @@
  * restores it if the entity still exists in the active release — a withdrawn or
  * released-out entity falls back to no selection, never a crash (MOB-005/ADR-004).
  *
- * Filters stay on the `/filters-sheet` modal (kind + era) so in-map panel embedding
- * is optional; `onFiltersChange` remains on ExploreView for a future in-sheet panel.
+ * Filters apply in-map via the instruments panel (auto-sync URL params through
+ * `onFiltersChange`). Modal routes `/filters-sheet` and `/color-key-sheet` remain
+ * as deep-link fallbacks.
  */
 import { router, useLocalSearchParams } from 'expo-router';
 
-import { parseFilterState, type FilterState } from '../_lib/route-params';
+import { parseFilterState, filterStateToRouteParams } from '@/lib/route-params';
 import { ExploreView, useExploreMapSource } from '@/features/explore';
-
-function filterParamsFromState(filters: FilterState): Record<string, string> {
-  return {
-    ...(filters.kind ? { kind: filters.kind } : {}),
-    ...(filters.era ? { era: filters.era } : {}),
-  };
-}
 
 export default function ExploreScreen() {
   const rawParams = useLocalSearchParams();
@@ -40,33 +34,21 @@ export default function ExploreScreen() {
     <ExploreView
       source={mapSource.source}
       loadState={mapSource.loadState}
+      usingDemo={mapSource.usingDemo}
       onRetryMap={mapSource.retry}
       filters={filters}
       selectedParam={rawParams.selected}
-      onOpenFilters={() =>
-        router.push({
-          pathname: '/filters-sheet',
-          params: {
-            returnTo: '/explore',
-            ...filterParamsFromState(filters),
-          },
-        })
-      }
       onOpenEntity={(id) => router.push({ pathname: '/entity/[id]', params: { id } })}
-      onOpenSearch={() => router.push('/search')}
+      onOpenSearch={() => router.push('/history')}
       onSelectionChange={(entityId) => {
         if (entityId) {
           router.setParams({ selected: entityId });
         } else {
-          // Empty string clears the shareable selection param (expo-router).
           router.setParams({ selected: '' });
         }
       }}
       onFiltersChange={(next) => {
-        router.setParams({
-          kind: next.kind ?? '',
-          era: next.era ?? '',
-        });
+        router.setParams(filterStateToRouteParams(next));
       }}
     />
   );

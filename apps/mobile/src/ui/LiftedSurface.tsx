@@ -1,35 +1,33 @@
 /**
- * Compact elevated panel: optional soft shadow + optional gradient backdrop.
- * Does not alter default Surface — use for Search/More/entity focal modules only.
+ * Edition Surface panel — flat matte card with optional hairline border.
+ * Mobile counterpart of web `.ds-surface` / browse edition panels. No shadows,
+ * gradients, or elevation wash; siblings pass `shadow="none"` (the default).
  */
 import type { ReactNode } from 'react';
 import { StyleSheet, View, type ViewProps } from 'react-native';
 
-import { GradientBackdrop } from './GradientPanel';
 import {
   radius,
   space,
   useShadowStyle,
   useThemeColors,
-  type GradientName,
   type RadiusKey,
   type ShadowLevel,
   type SpaceKey,
 } from './tokens';
 
 export type LiftedSurfaceProps = Omit<ViewProps, 'style'> & {
-  /** Background role when no gradient is applied. */
+  /** Background role. Defaults to raised Surface on Archive Paper / Charcoal canvas. */
   tone?: 'canvas' | 'surface' | 'surfaceRaised';
   radiusKey?: RadiusKey;
   paddingKey?: SpaceKey;
   bordered?: boolean;
-  /** Soft brand shadow tier; defaults to `sm`. Pass `none` to opt out. */
+  /**
+   * Shadow tier — defaults to `none` (flat matte). Map floating chrome may pass
+   * `sm` per ADR-013; browse surfaces must leave the default.
+   */
   shadow?: ShadowLevel;
-  /** Optional gradient preset layered beneath content. */
-  gradient?: GradientName;
-  /** Style applied to the outer chrome (shadow, border, radius). */
   style?: ViewProps['style'];
-  /** Style applied to the inner content wrapper (gap, flex, etc.). */
   contentStyle?: ViewProps['style'];
   children?: ReactNode;
 };
@@ -39,8 +37,7 @@ export function LiftedSurface({
   radiusKey = 'md',
   paddingKey,
   bordered = true,
-  shadow = 'sm',
-  gradient,
+  shadow = 'none',
   style,
   contentStyle,
   children,
@@ -55,16 +52,15 @@ export function LiftedSurface({
         shadowStyle,
         {
           borderRadius: radius[radiusKey],
-          borderWidth: bordered ? 1 : 0,
+          borderWidth: bordered ? StyleSheet.hairlineWidth : 0,
           borderColor: bordered ? theme.border : undefined,
           overflow: 'hidden',
-          backgroundColor: gradient ? undefined : theme[tone],
+          backgroundColor: theme[tone],
         },
         style,
       ]}
       {...rest}
     >
-      {gradient ? <GradientBackdrop name={gradient} /> : null}
       <View
         style={[
           styles.content,

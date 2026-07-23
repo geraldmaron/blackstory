@@ -3,13 +3,12 @@
  * page — click/activate always navigates. Selection highlighting still mirrors
  * the graph when a node is open; graph visualization can select without blocking
  * list navigation to the full record.
- *
- * Uses Next.js `Link` for soft client transitions (no full document reload).
  */
 import React from 'react';
 import Link from 'next/link';
 import { cx } from '@repo/ui';
 import type { HistoryNodeView } from '../../lib/history/build-history-graph';
+import { HistoryRipRow } from './HistoryRipRow';
 
 void React;
 
@@ -40,23 +39,16 @@ export function HistoryResultList({
             className={cx(
               'ds-result-list__item',
               isSelected && 'ds-history-result-list__item--selected',
+              isSelected && 'ds-result-list__item--selected',
             )}
           >
             <Link
-              className="ds-result-list__link"
+              className="ds-history-result-list__row-link"
               href={node.href}
               aria-current={isSelected ? 'true' : undefined}
               data-entity-id={node.entityId}
             >
-              <h3 className="ds-result-list__title">{node.displayName}</h3>
-              <p className="ds-result-list__summary">{node.summary}</p>
-              <div className="ds-result-list__meta">
-                <span className="ds-mono">{node.kind}</span>
-                <span className="ds-sans">{node.statusLabel}</span>
-                <span className="ds-sans">
-                  {node.evidenceCount} claim{node.evidenceCount === 1 ? '' : 's'}
-                </span>
-              </div>
+              <HistoryRipRow node={node} isSelected={isSelected} />
             </Link>
           </li>
         );

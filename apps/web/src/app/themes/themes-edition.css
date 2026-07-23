@@ -1,0 +1,310 @@
+/**
+ * Themes v6 edition scaffold: theme-aware Surface card stack with home-aligned
+ * edition headers. Atmosphere (grain + gutter mosaic) from edition-atmosphere.css.
+ */
+
+@import '../../components/patterns/edition-atmosphere/edition-atmosphere.css';
+
+.ds-themes-edition {
+  position: relative;
+  min-height: 100%;
+}
+
+.ds-themes-edition__stack {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-5);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding-block: 0 var(--ds-space-16);
+}
+
+@media (max-width: 47.9375rem) {
+  .ds-themes-edition__stack {
+    gap: var(--ds-space-4);
+    padding-block: 0 var(--ds-space-12);
+  }
+}
+
+.ds-themes-edition__panel {
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface-raised);
+  padding: var(--ds-space-5);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.ds-themes-edition__panel--intro {
+  padding-bottom: calc(var(--ds-space-5) + var(--ds-space-2));
+}
+
+.ds-themes-edition__panel--method {
+  background: color-mix(in srgb, var(--ds-canvas) 88%, var(--ds-rule));
+}
+
+[data-theme='dark'] .ds-themes-edition__panel--method {
+  background: color-mix(in srgb, var(--ds-canvas) 72%, var(--ds-surface-raised));
+}
+
+.ds-themes-edition__panel--catalog,
+.ds-themes-edition__panel--soon,
+.ds-themes-edition__panel--packets,
+.ds-themes-edition__panel--packet {
+  display: grid;
+  gap: var(--ds-space-4);
+}
+
+.ds-themes-edition__header {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: clamp(1.5rem, 3vw, 2.75rem);
+  row-gap: var(--ds-space-3);
+  align-items: start;
+  padding-bottom: var(--ds-space-5);
+  margin-bottom: var(--ds-space-4);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-themes-edition__panel--intro:not(:has(+ .ds-themes-edition__panel)) .ds-themes-edition__header,
+.ds-themes-edition__panel--intro:last-child .ds-themes-edition__header {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.ds-themes-edition__index {
+  min-width: 2.75ch;
+  padding-right: var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--ds-accent-graphic);
+  letter-spacing: -0.03em;
+}
+
+.ds-themes-edition__kicker {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+}
+
+.ds-themes-edition__title {
+  margin: var(--ds-space-2) 0 0;
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: clamp(1.375rem, 1.15rem + 0.8vw, 2rem);
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+  color: var(--ds-ink);
+}
+
+.ds-themes-edition__title em {
+  font-family: var(--ds-font-editorial);
+  font-style: italic;
+  color: var(--ds-accent);
+  font-weight: 400;
+}
+
+.ds-themes-edition__lede {
+  margin: var(--ds-space-3) 0 0;
+  max-width: 54ch;
+  font-family: var(--ds-font-editorial);
+  font-size: clamp(1rem, 0.98rem + 0.15vw, 1.0625rem);
+  line-height: 1.6;
+  color: var(--ds-ink-muted);
+}
+
+.ds-themes-edition__meta-row {
+  margin: var(--ds-space-2) 0 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-themes-edition__crosslink {
+  margin: var(--ds-space-4) 0 0;
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+}
+
+.ds-themes-edition__credit {
+  margin: var(--ds-space-4) 0 0;
+  padding-top: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  line-height: 1.55;
+  color: var(--ds-ink-muted);
+}
+
+.ds-themes-edition__credit a {
+  color: var(--ds-ink-muted);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.ds-themes-edition__credit a:hover,
+.ds-themes-edition__credit a:focus-visible {
+  color: var(--ds-ink);
+}
+
+.ds-themes-edition__panel-title {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+}
+
+.ds-themes-edition__panel-heading {
+  margin: var(--ds-space-2) 0 0;
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: clamp(1.125rem, 1.05rem + 0.35vw, 1.375rem);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--ds-ink);
+}
+
+.ds-themes-edition__panel-lede {
+  margin: var(--ds-space-3) 0 0;
+  max-width: 54ch;
+  font-family: var(--ds-font-editorial);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--ds-ink-muted);
+}
+
+.ds-themes-edition__method-title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--ds-accent);
+}
+
+.ds-themes-edition__method-body {
+  margin: var(--ds-space-3) 0 0;
+  max-width: 62ch;
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--ds-ink);
+}
+
+.ds-themes-edition__method-body a {
+  color: var(--ds-accent);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.ds-themes-edition__live-badge {
+  margin: var(--ds-space-3) 0 0;
+  color: var(--ds-accent);
+  font-size: 0.75rem;
+}
+
+.ds-themes-edition__footer {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  color: var(--ds-ink-muted);
+}
+
+.ds-themes-edition__footer a {
+  color: var(--ds-accent);
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+}
+
+.ds-themes-edition__footer a:hover,
+.ds-themes-edition__footer a:focus-visible {
+  border-bottom-color: var(--ds-accent-graphic);
+}
+
+/* Theme-impact modules nested inside edition panels */
+.ds-themes-edition .ds-theme-impact {
+  margin-top: 0;
+  max-width: 100%;
+}
+
+.ds-themes-edition .ds-theme-impact__notice {
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.ds-themes-edition .ds-theme-impact__storytelling {
+  margin-top: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.ds-themes-edition .ds-theme-impact__packets {
+  margin-top: var(--ds-space-4);
+}
+
+.ds-themes-edition .ds-theme-impact__catalog {
+  margin-top: var(--ds-space-4);
+}
+
+.ds-themes-edition .ds-theme-impact__back {
+  display: none;
+}
+
+/* Compact density for nested theme-impact modules inside edition panels */
+.ds-themes-edition .ds-theme-impact__embed,
+.ds-themes-edition .ds-theme-impact__strip {
+  margin-top: 0;
+  padding: var(--ds-space-3);
+}
+
+.ds-themes-edition .ds-theme-impact__storytelling {
+  margin-top: 0;
+  padding: 0;
+}
+
+.ds-themes-edition .ds-theme-impact__method {
+  padding: var(--ds-space-3);
+}
+
+.ds-themes-edition .ds-theme-impact__empty {
+  margin-top: var(--ds-space-3);
+}
+
+.ds-themes-edition .ds-theme-impact__question-link a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding-block: var(--ds-space-2);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+}
+
+.ds-themes-edition .ds-theme-impact__question-link a:hover,
+.ds-themes-edition .ds-theme-impact__question-link a:focus-visible {
+  border-bottom-color: var(--ds-accent-graphic);
+}

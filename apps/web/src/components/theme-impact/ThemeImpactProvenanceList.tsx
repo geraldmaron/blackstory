@@ -9,17 +9,19 @@ import type { ThemeImpactProvenance } from './fixtures/types';
 export type ThemeImpactProvenanceListProps = {
   readonly items: readonly ThemeImpactProvenance[];
   readonly heading?: string;
+  readonly headingId?: string;
 };
 
 export function ThemeImpactProvenanceList({
   items,
   heading = 'Sources & provenance',
+  headingId = 'theme-impact-provenance-heading',
 }: ThemeImpactProvenanceListProps) {
   if (items.length === 0) return null;
 
   return (
-    <section className="ds-theme-impact__provenance" aria-labelledby="theme-impact-provenance-heading">
-      <h4 className="ds-theme-impact__provenance-heading" id="theme-impact-provenance-heading">
+    <section className="ds-theme-impact__provenance" aria-labelledby={headingId}>
+      <h4 className="ds-theme-impact__provenance-heading" id={headingId}>
         {heading}
       </h4>
       <ol className="ds-theme-impact__provenance-list">

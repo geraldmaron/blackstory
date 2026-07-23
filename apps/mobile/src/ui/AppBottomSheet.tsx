@@ -16,8 +16,10 @@ const HANDLE_MIN = 44;
 
 export type AppBottomSheetProps = {
   readonly children: ReactNode;
-  /** Snap toward half when true (e.g. selection preview). */
+  /** Snap toward half when true (e.g. selection preview). Ignored when `snapIndex` is set. */
   readonly expanded?: boolean;
+  /** Controlled snap index (0=peek, 1=half, 2=full). */
+  readonly snapIndex?: number;
   readonly reduceMotion?: boolean;
   /** Clears map attribution / safe areas under the sheet. */
   readonly bottomInset?: number;
@@ -31,6 +33,7 @@ export type AppBottomSheetProps = {
 export function AppBottomSheet({
   children,
   expanded = false,
+  snapIndex,
   reduceMotion = false,
   bottomInset = 0,
   snapPoints: snapPointsProp,
@@ -41,9 +44,10 @@ export function AppBottomSheet({
   const theme = useThemeColors();
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(
-    () => [...(snapPointsProp ?? ['18%', '42%', '88%'])],
+    () => [...(snapPointsProp ?? ['22%', '42%', '58%'])],
     [snapPointsProp],
   );
+  const targetIndex = snapIndex ?? (expanded ? SHEET_HALF : SHEET_PEEK);
 
   const handleComponent = useCallback(
     () => (
@@ -68,13 +72,13 @@ export function AppBottomSheet({
   );
 
   useEffect(() => {
-    sheetRef.current?.snapToIndex(expanded ? SHEET_HALF : SHEET_PEEK);
-  }, [expanded]);
+    sheetRef.current?.snapToIndex(targetIndex);
+  }, [targetIndex]);
 
   return (
     <BottomSheet
       ref={sheetRef}
-      index={expanded ? SHEET_HALF : SHEET_PEEK}
+      index={targetIndex}
       snapPoints={snapPoints}
       enableDynamicSizing={false}
       enablePanDownToClose={false}

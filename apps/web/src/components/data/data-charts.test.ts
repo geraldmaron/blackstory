@@ -98,9 +98,9 @@ test('PopulationByDecadeChart keeps enslaved, free, and post-1860 total as disti
   );
   // Legend must not conflate enslaved with Black total under one swatch.
   assert.doesNotMatch(html, /Enslaved \/ Black total/);
-  assert.match(html, /Enslaved \(1790–1860\)/);
-  assert.match(html, /Free \(1790–1860\)/);
-  assert.match(html, /Black population \(1870–2020\)/);
+  assert.match(html, /Enslaved \(1790 to 1860\)/);
+  assert.match(html, /Free \(1790 to 1860\)/);
+  assert.match(html, /Black population \(1870 to 2020\)/);
   // Copper (viz-2) is reserved for the enslaved segment; post-1860 totals use ink (viz-1).
   assert.match(html, /fill="var\(--ds-viz-2\)"/);
   assert.match(html, /fill="var\(--ds-viz-4\)"/);

@@ -11,7 +11,6 @@ export type ShellNavItem = {
 /** Always-visible top-level nav — sans caps; active route gets a copper underline. */
 export const PRIMARY_NAV: readonly ShellNavItem[] = [
   { href: '/explore', label: 'Explore' },
-  { href: '/search', label: 'Search' },
   { href: '/history', label: 'History' },
   { href: '/stories', label: 'Stories' },
   { href: '/about', label: 'About' },
@@ -40,7 +39,6 @@ export const FOOTER_NAV_COLUMNS: readonly FooterNavColumn[] = [
     title: 'Explore',
     items: [
       { href: '/explore', label: 'Explore' },
-      { href: '/search', label: 'Search' },
       { href: '/history', label: 'History' },
       { href: '/stories', label: 'Stories' },
       { href: '/themes', label: 'Themes' },

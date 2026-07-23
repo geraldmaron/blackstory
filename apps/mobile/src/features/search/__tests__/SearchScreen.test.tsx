@@ -61,7 +61,7 @@ describe('SearchScreen — deep-link round trip (MOB-013 item 7)', () => {
     await flushMicrotasks(10);
 
     expect(calls).toHaveLength(0);
-    expect(getByText('Browse by category')).toBeTruthy();
+    expect(getByText('By category')).toBeTruthy();
   });
 });
 
@@ -74,7 +74,8 @@ describe('SearchScreen — browse mode never enumerates (T3)', () => {
     const { getByText } = await render(<SearchScreen runtime={runtime} />);
     await flushMicrotasks(10);
 
-    expect(getByText('Search BlackStory')).toBeTruthy();
+    expect(getByText('Start searching')).toBeTruthy();
+    expect(getByText('Organizations')).toBeTruthy();
     expect(calls).toEqual([]);
   });
 });

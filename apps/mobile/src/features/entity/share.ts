@@ -9,7 +9,7 @@
  * `Share` API (no new dependency).
  */
 import { Share } from 'react-native';
-import { parseEntityId } from '@/app/_lib/route-params';
+import { parseEntityId } from '@/lib/route-params';
 
 export const CANONICAL_WEB_ORIGIN = 'https://blackbook.app';
 

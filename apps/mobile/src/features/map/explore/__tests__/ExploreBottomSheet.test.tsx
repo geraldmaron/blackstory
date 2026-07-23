@@ -1,6 +1,5 @@
 /**
- * Explore bottom sheet host: flush bottom inset so attribution overlays the map
- * above the peek instead of reserving a sandwich gap under the sheet.
+ * Explore bottom sheet host: v7 prototype detents and controlled snap wiring.
  */
 import { render } from '@testing-library/react-native';
 import { Text } from 'react-native';
@@ -26,31 +25,51 @@ jest.mock('../../../../ui/AppBottomSheet', () => {
 // eslint-disable-next-line import/first
 import {
   ExploreBottomSheet,
-  EXPLORE_SHEET_ATTRIBUTION_INSET,
+  EXPLORE_SHEET_BOTTOM_INSET,
+  EXPLORE_SHEET_HALF,
+  EXPLORE_SHEET_PEEK,
+  EXPLORE_SHEET_PEEK_HEIGHT,
+  EXPLORE_SHEET_SNAP_POINTS,
 } from '../ExploreBottomSheet';
 
 beforeEach(() => {
   mockBottomSheetProps.length = 0;
 });
 
-describe('ExploreBottomSheet — attribution inset', () => {
-  it('uses bottomInset 0 so the sheet does not leave a sandwich gap for attribution', async () => {
-    expect(EXPLORE_SHEET_ATTRIBUTION_INSET).toBe(0);
+describe('ExploreBottomSheet — v7 detents', () => {
+  it('uses prototype snap points 22% / 42% / 58%', async () => {
+    expect(EXPLORE_SHEET_SNAP_POINTS).toEqual(['22%', '42%', '58%']);
+    expect(EXPLORE_SHEET_PEEK_HEIGHT).toBe('22%');
+    expect(EXPLORE_SHEET_BOTTOM_INSET).toBe(0);
+  });
+
+  it('defaults to peek when idle and half when a record is selected', async () => {
     await render(
       <ExploreBottomSheet>
         <Text>In view</Text>
       </ExploreBottomSheet>,
     );
-    expect(mockBottomSheetProps[0]?.bottomInset).toBe(0);
-  });
+    expect(mockBottomSheetProps[0]?.snapIndex).toBe(EXPLORE_SHEET_PEEK);
 
-  it('forwards onSnapIndexChange to AppBottomSheet for attribution visibility', async () => {
-    const onSnapIndexChange = jest.fn();
+    mockBottomSheetProps.length = 0;
     await render(
-      <ExploreBottomSheet onSnapIndexChange={onSnapIndexChange}>
-        <Text>In view</Text>
+      <ExploreBottomSheet hasSelection>
+        <Text>Preview</Text>
       </ExploreBottomSheet>,
     );
+    expect(mockBottomSheetProps[0]?.snapIndex).toBe(EXPLORE_SHEET_HALF);
+  });
+
+  it('forwards controlled snapIndex and onSnapIndexChange', async () => {
+    const onSnapIndexChange = jest.fn();
+    await render(
+      <ExploreBottomSheet snapIndex={2} onSnapIndexChange={onSnapIndexChange}>
+        <Text>Browse</Text>
+      </ExploreBottomSheet>,
+    );
+    expect(mockBottomSheetProps[0]?.snapIndex).toBe(2);
+    expect(mockBottomSheetProps[0]?.snapPoints).toEqual(EXPLORE_SHEET_SNAP_POINTS);
+    expect(mockBottomSheetProps[0]?.bottomInset).toBe(0);
     expect(mockBottomSheetProps[0]?.onSnapIndexChange).toBe(onSnapIndexChange);
   });
 });

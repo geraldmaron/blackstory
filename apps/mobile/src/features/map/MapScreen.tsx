@@ -24,7 +24,7 @@
  * A JS test runner still cannot mount the native GL view, so tile rendering,
  * live clustering, and camera motion remain device/Maestro evidence (ADR-024).
  */
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View, type NativeSyntheticEvent } from 'react-native';
 import {
   Camera,
@@ -39,10 +39,15 @@ import { ErrorState, duration } from '@/ui';
 import { MapAttribution } from './MapAttribution';
 import {
   buildBasemapStyle,
+  ENTITY_CLUSTER_LAYER_STYLE,
   ENTITY_CLUSTER_RADIUS_EXPR,
+  ENTITY_EVENT_GLYPH_LAYER_STYLE,
+  ENTITY_HALO_LAYER_STYLE,
   ENTITY_POINT_LAYER_STYLE,
-  ENTITY_SELECTED_RADIUS,
+  ENTITY_SELECTED_LAYER_STYLE,
 } from './mapStyle';
+import { enrichMapFeatureCollection } from './enrich-map-features';
+import { DIGNITY_PALETTE } from './dignity-palette';
 import {
   MAP_BASEMAP_ENABLED,
   MAP_GLYPHS_URL,
@@ -50,7 +55,7 @@ import {
   MAP_PMTILES_URL,
   MAP_VECTOR_TILE_URL,
 } from './mapConfig';
-import { MAP_FAILURE_COPY, type MapLoadState } from './mapLoadState';
+import { MAP_FAILURE_COPY, type MapFailureMode, type MapLoadState } from './mapLoadState';
 import { DEMO_MAP_SOURCE, type MapFeatureCollection } from './demoMapSource';
 import {
   MAP_MAX_ZOOM,
@@ -67,6 +72,11 @@ import {
   isClusterFeatureProperties,
   zoomAfterClusterExpand,
 } from './clusterCamera';
+
+/** MapLibre RN Layer style typing is narrower than valid expression arrays. */
+function circleLayerStyle(style: Record<string, unknown>): Record<string, unknown> {
+  return style;
+}
 
 /** A one-shot camera instruction; `token` must strictly increase so each move fires once. */
 export type MapCameraCommand = CameraTarget & { readonly token: number };
@@ -114,6 +124,11 @@ export type MapScreenProps = {
    * host it as a sibling under the bottom sheet. Default true (MOB-011).
    */
   readonly showAttribution?: boolean;
+  /**
+   * When the native map fails to load (WebGL / style / tile engine), surfaces a
+   * degraded state. List/metrics chrome stays mounted in Explore (ADR-024 §7).
+   */
+  readonly onMapEngineFailure?: () => void;
 };
 
 function boundsFromEvent(event: NativeSyntheticEvent<ViewStateChangeEvent>): Bbox | null {
@@ -159,11 +174,15 @@ export function MapScreen({
   cameraCommand,
   reduceMotion = false,
   showAttribution = true,
+  onMapEngineFailure,
 }: MapScreenProps) {
   const cameraRef = useRef<CameraRef>(null);
   const sourceRef = useRef<GeoJSONSourceRef>(null);
   const appliedTokenRef = useRef<number | null>(null);
   const zoomRef = useRef(PRESET_ZOOM.national);
+  const [engineFailed, setEngineFailed] = useState(false);
+
+  const encodedSource = useMemo(() => enrichMapFeatureCollection(source), [source]);
 
   // Apply a one-shot camera command exactly once per token. Guarded so a mocked
   // (null-ref) map in tests and a missing command are both no-ops.
@@ -197,8 +216,13 @@ export function MapScreen({
     }
   }, [cameraCommand, reduceMotion]);
 
-  if (loadState.kind === 'error') {
-    const copy = MAP_FAILURE_COPY[loadState.mode];
+  if (engineFailed || loadState.kind === 'error') {
+    const mode: MapFailureMode = engineFailed
+      ? 'map-canvas-unavailable'
+      : loadState.kind === 'error'
+        ? loadState.mode
+        : 'map-canvas-unavailable';
+    const copy = MAP_FAILURE_COPY[mode];
     return (
       <View style={styles.errorContainer} testID="map-error-state">
         <ErrorState
@@ -298,6 +322,10 @@ export function MapScreen({
         logo={false}
         compass={false}
         onRegionDidChange={handleRegionDidChange}
+        onDidFailLoadingMap={() => {
+          setEngineFailed(true);
+          onMapEngineFailure?.();
+        }}
         testID="maplibre-map"
       >
         <Camera
@@ -315,26 +343,21 @@ export function MapScreen({
         <GeoJSONSource
           id="entities"
           ref={sourceRef}
-          data={source as unknown as GeoJSON.GeoJSON}
+          data={encodedSource as unknown as GeoJSON.GeoJSON}
           cluster={clustering}
           clusterRadius={50}
           clusterMaxZoom={MAP_MAX_ZOOM}
           onPress={handleSourcePress}
         >
           {clustering ? (
-            // Dignity-safe cluster bubble: flat Copper Pin color; count is conveyed
-            // by size steps and the text label — never a density-keyed color ramp.
             <Layer
               id="entity-clusters"
               type="circle"
               filter={['has', 'point_count']}
-              style={{
-                circleColor: ENTITY_POINT_LAYER_STYLE.circleColor,
-                circleOpacity: 0.85,
-                circleStrokeColor: ENTITY_POINT_LAYER_STYLE.circleStrokeColor,
-                circleStrokeWidth: 1,
+              style={circleLayerStyle({
+                ...ENTITY_CLUSTER_LAYER_STYLE,
                 circleRadius: [...ENTITY_CLUSTER_RADIUS_EXPR],
-              }}
+              })}
             />
           ) : null}
           {clustering ? (
@@ -344,30 +367,40 @@ export function MapScreen({
               filter={['has', 'point_count']}
               style={{
                 textField: ['get', 'point_count_abbreviated'],
-                // OpenFreeMap hosts Noto Sans — not MapLibre's default Open Sans.
                 textFont: [...MAP_LABEL_TEXT_FONT],
                 textSize: 11,
-                textColor: ENTITY_POINT_LAYER_STYLE.circleStrokeColor,
+                textColor: DIGNITY_PALETTE.clusterText,
               }}
             />
           ) : null}
           <Layer
+            id="entity-halo"
+            type="circle"
+            filter={clustering ? ['!', ['has', 'point_count']] : undefined}
+            style={circleLayerStyle(ENTITY_HALO_LAYER_STYLE as Record<string, unknown>)}
+          />
+          <Layer
             id="entity-points"
             type="circle"
             filter={clustering ? ['!', ['has', 'point_count']] : undefined}
-            style={ENTITY_POINT_LAYER_STYLE}
+            style={circleLayerStyle(ENTITY_POINT_LAYER_STYLE as Record<string, unknown>)}
+          />
+          <Layer
+            id="entity-event-glyph"
+            type="circle"
+            filter={
+              clustering
+                ? ['all', ['!', ['has', 'point_count']], ['==', ['get', 'kind'], 'event']]
+                : ['==', ['get', 'kind'], 'event']
+            }
+            style={circleLayerStyle(ENTITY_EVENT_GLYPH_LAYER_STYLE as Record<string, unknown>)}
           />
           {selectedEntityId ? (
             <Layer
               id="entity-selected"
               type="circle"
               filter={['==', ['get', 'entityId'], selectedEntityId]}
-              style={{
-                circleColor: 'transparent',
-                circleRadius: ENTITY_SELECTED_RADIUS,
-                circleStrokeColor: ENTITY_POINT_LAYER_STYLE.circleStrokeColor,
-                circleStrokeWidth: 2,
-              }}
+              style={circleLayerStyle(ENTITY_SELECTED_LAYER_STYLE as Record<string, unknown>)}
             />
           ) : null}
         </GeoJSONSource>

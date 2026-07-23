@@ -3,24 +3,58 @@
  * groups, dense chip radios (≥44px), and sticky Clear/Apply affordances.
  */
 import { fireEvent, render } from '@testing-library/react-native';
+import { buildExploreFacetOptions } from '@/features/explore/explore-filter';
+import { makeFeature } from '@/features/explore/__fixtures__/features';
 import {
   ExploreFiltersPanel,
   EXPLORE_ERA_OPTIONS,
   filterStateFromPanel,
+  type ExploreFiltersPanelProps,
 } from '../ExploreFiltersPanel';
+
+const TEST_FEATURES = [
+  makeFeature('a', [-77.04, 38.9], {
+    label: 'Alpha',
+    kind: 'place',
+    properties: {
+      eraBuckets: ['1950s'],
+      mapTone: 'plantation',
+      topicIds: ['education'],
+      status: 'historic',
+      confidenceTier: 'high',
+      statePostalCode: 'DC',
+    } as never,
+  }),
+  makeFeature('b', [-95.37, 29.76], {
+    label: 'Bravo',
+    kind: 'school',
+    properties: {
+      eraBuckets: ['1960s'],
+      confidenceTier: 'low',
+      status: 'active',
+      statePostalCode: 'TX',
+    } as never,
+  }),
+];
+
+const TEST_FACET_OPTIONS = buildExploreFacetOptions(TEST_FEATURES);
+
+function renderPanel(overrides: Partial<ExploreFiltersPanelProps> = {}) {
+  return render(
+    <ExploreFiltersPanel
+      filters={{}}
+      facetOptions={TEST_FACET_OPTIONS}
+      onFiltersChange={() => undefined}
+      onClear={() => undefined}
+      onApply={() => undefined}
+      {...overrides}
+    />,
+  );
+}
 
 describe('ExploreFiltersPanel — structure', () => {
   it('renders collapsible Kind and Era groups with sticky Apply / Clear', async () => {
-    const { getByTestId, getByText, getByLabelText } = await render(
-      <ExploreFiltersPanel
-        kind={undefined}
-        era={undefined}
-        onKindChange={() => undefined}
-        onEraChange={() => undefined}
-        onClear={() => undefined}
-        onApply={() => undefined}
-      />,
-    );
+    const { getByTestId, getByText, getByLabelText } = await renderPanel();
 
     expect(getByTestId('explore-filters-panel')).toBeTruthy();
     expect(getByTestId('filter-group-kind')).toBeTruthy();
@@ -32,76 +66,67 @@ describe('ExploreFiltersPanel — structure', () => {
     expect(getByLabelText('Era filters').props.accessibilityState?.expanded).toBe(true);
   });
 
-  it('collapses a group so chip radios unmount, then expands again', async () => {
-    const { getByLabelText, queryByLabelText } = await render(
-      <ExploreFiltersPanel
-        kind={undefined}
-        era={undefined}
-        onKindChange={() => undefined}
-        onEraChange={() => undefined}
-        onClear={() => undefined}
-        onApply={() => undefined}
-      />,
-    );
+  it('renders the History place-find handoff', async () => {
+    const { getByTestId, getByText } = await renderPanel({
+      onOpenPlaceFind: () => undefined,
+    });
+    expect(getByTestId('explore-place-find-handoff')).toBeTruthy();
+    expect(getByText('Open History search')).toBeTruthy();
+  });
 
-    expect(getByLabelText('Place')).toBeTruthy();
+  it('collapses a group so chip radios unmount, then expands again', async () => {
+    const { getByLabelText, queryByLabelText } = await renderPanel();
+
+    expect(getByLabelText('Places')).toBeTruthy();
     await fireEvent.press(getByLabelText('Kind filters'));
-    expect(queryByLabelText('Place')).toBeNull();
+    expect(queryByLabelText('Places')).toBeNull();
     await fireEvent.press(getByLabelText('Kind filters'));
-    expect(getByLabelText('Place')).toBeTruthy();
+    expect(getByLabelText('Places')).toBeTruthy();
   });
 
   it('exposes chips as radios with selected state and min 44px hit target', async () => {
-    const onKindChange = jest.fn();
-    const { getByLabelText } = await render(
-      <ExploreFiltersPanel
-        kind={undefined}
-        era={undefined}
-        onKindChange={onKindChange}
-        onEraChange={() => undefined}
-        onClear={() => undefined}
-        onApply={() => undefined}
-      />,
-    );
+    const onFiltersChange = jest.fn();
+    const { getByLabelText } = await renderPanel({ onFiltersChange });
 
-    const place = getByLabelText('Place');
-    expect(place.props.accessibilityRole).toBe('radio');
-    expect(place.props.accessibilityState?.selected).toBe(false);
-    // Pressable may expose style as a function; evaluate for the idle state.
-    const styleProp = place.props.style;
+    const places = getByLabelText('Places');
+    expect(places.props.accessibilityRole).toBe('radio');
+    expect(places.props.accessibilityState?.selected).toBe(false);
+    const styleProp = places.props.style;
     const resolved =
       typeof styleProp === 'function' ? styleProp({ pressed: false }) : styleProp;
     const flat = Array.isArray(resolved) ? Object.assign({}, ...resolved.filter(Boolean)) : resolved;
     expect(flat.minHeight).toBe(44);
     expect(flat.minWidth).toBe(44);
 
-    await fireEvent.press(place);
-    expect(onKindChange).toHaveBeenCalledWith('place');
+    await fireEvent.press(places);
+    expect(onFiltersChange).toHaveBeenCalledWith({ kind: 'places' });
   });
 
   it('offers decade-literal era chips including mid-century buckets', async () => {
-    const { getByLabelText } = await render(
-      <ExploreFiltersPanel
-        kind={undefined}
-        era={undefined}
-        onKindChange={() => undefined}
-        onEraChange={() => undefined}
-        onClear={() => undefined}
-        onApply={() => undefined}
-      />,
-    );
+    const { getByLabelText } = await renderPanel();
     for (const era of ['1860s', '1910s', '1950s', '1960s', '1970s'] as const) {
       expect(EXPLORE_ERA_OPTIONS).toContain(era);
       expect(getByLabelText(era)).toBeTruthy();
     }
   });
+
+  it('embedded mode renders web-order facet rows including tone and confidence', async () => {
+    const { getByTestId } = await renderPanel({ mode: 'embedded' });
+    expect(getByTestId('facet-tone')).toBeTruthy();
+    expect(getByTestId('facet-confidence')).toBeTruthy();
+    expect(getByTestId('facet-state')).toBeTruthy();
+  });
 });
 
 describe('filterStateFromPanel', () => {
   it('drops unset fields', () => {
-    expect(filterStateFromPanel(undefined, undefined)).toEqual({});
-    expect(filterStateFromPanel('place', undefined)).toEqual({ kind: 'place' });
-    expect(filterStateFromPanel(undefined, '1950s')).toEqual({ era: '1950s' });
-    expect(filterStateFromPanel('school', '1960s')).toEqual({ kind: 'school', era: '1960s' });
+    expect(filterStateFromPanel({})).toEqual({});
+    expect(filterStateFromPanel({ kind: 'place' })).toEqual({ kind: 'place' });
+    expect(filterStateFromPanel({ era: '1950s' })).toEqual({ era: '1950s' });
+    expect(filterStateFromPanel({ kind: 'school', era: '1960s', tone: 'plantation' })).toEqual({
+      kind: 'school',
+      era: '1960s',
+      tone: 'plantation',
+    });
   });
 });
