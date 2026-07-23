@@ -33,34 +33,18 @@ Re-litigating it requires a new ADR amendment, not a code change here.
 |---|---|---|
 | `expo-updates` installed | `package.json` / `package-lock.json` (`npx expo install expo-updates --npm`) | ADR-023 amendment #2: the package was entirely absent — there was no OTA mechanism to speak of, only a documented intent. |
 | `runtimeVersion: { policy: 'appVersion' }` | `app.config.ts` | ADR-023 §2's structural OTA/rebuild fence: a JS bundle only installs onto a binary whose runtime version matches, so an incompatible OTA is rejected client-side, not shipped-and-crashed. Declaring this costs nothing and does not depend on an EAS project existing. |
-| `updates.url` + `extra.eas.projectId`, gated on `EAS_PROJECT_ID` | `app.config.ts` | The update-server URL needs a real EAS project id, which does not exist yet (human gate below). Gated the same way `app.config.ts` already gates Firebase config (`firebaseConfigPresent`) — absent env var ⇒ the slot is omitted entirely, `expo-updates` reports `isEnabled === false`, and the app never attempts a network check. Flips on with **no code change** once the gate clears. |
+| `updates.url` + `extra.eas.projectId` (always) + `updates.enabled`/`checkAutomatically` by `APP_VARIANT` | `app.config.ts` | Project id defaults so local EAS CLI stays linked. **Development** sets `enabled: false` + `checkAutomatically: 'NEVER'` so Dev Client + Metro own the JS bundle (always-on updater previously fought Metro / codesigning → continuous refresh). Preview/production enable `ON_LOAD` against their channel. |
 | `channel` per build profile | `eas.json` (already present, unchanged) | `development`/`preview`/`production` build profiles already each declare a distinct `channel`, matching ADR-023 §1's "OTA can never cross an environment boundary" requirement. Verified correct as-is; nothing to fix. |
 | `resolveUpdatesPosture` / `loadNativeUpdates` / `checkForUpdate` / `fetchAndApplyUpdate` | `config.ts` / `native-bridge.ts` / `bootstrap.ts` | Client-side posture resolution + a defensive, never-throwing wrapper around `expo-updates`'s native surface, mirroring the guarded-`require` pattern `src/security/app-check.ts` and `src/observability/native-bridge.ts` already established. **Not wired into the app's entry point by this bead** — see "Not wired into app startup" below. |
 
-## Human gate — no EAS project exists yet
+## EAS project status
 
-Per `docs/mobile/decisions/mobile-identity.md`, the Expo/EAS organization is
-human gate #3 and has **not been provisioned**. Concretely, today:
-
-- `EAS_PROJECT_ID` is unset in every environment, so `app.config.ts`'s
-  `updates.url` / `extra.eas.projectId` slots are omitted and `expo-updates`
-  has no update server to poll. `Updates.isEnabled` is `false`.
-- There is no EAS organization to apply phishing-resistant MFA custody to yet,
-  and no publish token to scope.
-- `eas update:configure` has not been run for real (it would normally write
-  the `updates.url`/`runtimeVersion` fields this bead hand-wired instead, since
-  running it requires an authenticated `eas login` against a real
-  organization — out of scope for this sandbox).
-
-**When the gate clears** (owner provisions the Expo/EAS org, per MOB-001):
-
-1. Run `eas init` to create the real project and obtain its project id.
-2. Set `EAS_PROJECT_ID` (repo secret / CI env, never committed) — the
-   `app.config.ts` slots activate automatically, no further code change.
-3. Run `eas update:configure` to confirm the CLI agrees with the hand-wired
-   values (it should be a no-op diff if this bead's wiring is correct).
-4. Apply the MFA custody + CI token controls below before the first real
-   publish.
+Project `@gerald-maron/blackstory` (`51a35884-e6b5-43b6-b95b-c5a7460fa665`) is
+linked. `extra.eas.projectId` / `updates.url` are always present; OTA polling
+is **variant-gated** (off for development, on for preview/production). Remaining
+human gates: phishing-resistant MFA on the Expo account that owns
+`gerald-maron`, and a scoped CI publish token in 1Password before the first
+production `eas update` publish.
 
 ## MFA custody (threat-model T6 primary control on the free tier)
 
@@ -139,18 +123,15 @@ is another bead's exclusive file (same boundary `src/observability/bootstrap.ts`
 documents for its own `initializeObservability`). Two reasons this is safe to
 defer, not a functional gap today:
 
-1. **`expo-updates` checks automatically by default anyway.** Once
-   `updates.url` is populated (post-human-gate), `expo-updates`'s default
-   `checkAutomatically: 'ON_LOAD'` behavior checks for and downloads a new
-   update on every cold launch with **zero JS code required** — this module's
-   explicit `checkForUpdate`/`fetchAndApplyUpdate` are for an opt-in
-   "check now" affordance or a controlled apply-and-reload flow, not the
-   baseline mechanism.
-2. **There is nothing to check today.** With `EAS_PROJECT_ID` unset,
-   `Updates.isEnabled` is `false` and every function in `bootstrap.ts` resolves
-   to its documented disabled/no-op shape (see the tests) — wiring the call
-   into `AppProviders` today would be a no-op, so deferring it avoids touching
-   a file this bead does not own for zero behavioral gain.
+1. **`expo-updates` checks automatically on preview/production.** With
+   `updates.enabled: true` + `checkAutomatically: 'ON_LOAD'`, the native
+   module downloads a new update on cold launch with **zero JS code required** —
+   this module's explicit `checkForUpdate`/`fetchAndApplyUpdate` are for an
+   opt-in "check now" affordance or a controlled apply-and-reload flow.
+2. **Development is a deliberate no-op.** `APP_VARIANT=development` disables
+   the native updater, and `bootstrap.ts` also short-circuits in `__DEV__` so
+   a future composition-root call cannot reload over Metro. Wiring into
+   `AppProviders` remains deferred until a product UI needs "check now".
 
 ## Not implemented here (explicitly out of scope)
 

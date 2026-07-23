@@ -24,11 +24,11 @@ export const CODE_SIGNING_POSTURE = 'free-tier-accepted-risk' as const;
 
 export interface UpdatesPosture {
   /**
-   * Whether `expo-updates` has a configured update server to poll
-   * (`app.config.ts`'s `updates.url`, gated on `EAS_PROJECT_ID` — absent
-   * until the EAS-project human gate clears; see that file's comment and
-   * `README.md` "Human gate"). `false` today; flips to `true` automatically,
-   * with no code change, once the gate clears and a build embeds the URL.
+   * Whether the native updater is active for this binary. `app.config.ts`
+   * always embeds `updates.url` + `extra.eas.projectId` (EAS CLI / project
+   * link), but sets `updates.enabled: false` for APP_VARIANT=development so
+   * local Dev Client + Metro own the JS bundle. Preview/production enable
+   * ON_LOAD checks against the profile channel.
    */
   readonly enabled: boolean;
   /** `eas.json` build-profile channel this binary was published under, or `null` pre-gate. */

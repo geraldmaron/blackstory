@@ -135,8 +135,27 @@ const PERFORMANCE_SAMPLE_RATE = resolveSampleRate(process.env.PERFORMANCE_SAMPLE
 // EAS project `@gerald-maron/blackstory` (non-secret). Env override still
 // allowed for CI/forks. Defaulting here stops `eas device:*` / local CLI from
 // creating a duplicate project when APP_VARIANT env from eas.json is unset.
+//
+// OTA vs local Dev Client: `extra.eas.projectId` stays always-on for CLI, but
+// the native updater is DISABLED for APP_VARIANT=development. Always-on
+// `updates.url` + `EXUpdatesEnabled=true` + `checkAutomatically: ALWAYS` made
+// Expo codesigning / update checks fight Metro on BlackStory (Dev) and surface
+// as continuous refresh. Preview/production keep ON_LOAD against the channel.
 const DEFAULT_EAS_PROJECT_ID = '51a35884-e6b5-43b6-b95b-c5a7460fa665';
 const EAS_PROJECT_ID = (process.env.EAS_PROJECT_ID ?? '').trim() || DEFAULT_EAS_PROJECT_ID;
+const UPDATES_URL = `https://u.expo.dev/${EAS_PROJECT_ID}`;
+const updatesConfig: NonNullable<ExpoConfig['updates']> =
+  APP_VARIANT === 'development'
+    ? {
+        url: UPDATES_URL,
+        enabled: false,
+        checkAutomatically: 'NEVER',
+      }
+    : {
+        url: UPDATES_URL,
+        enabled: true,
+        checkAutomatically: 'ON_LOAD',
+      };
 
 const config: ExpoConfig = {
   name: appName,
@@ -161,9 +180,7 @@ const config: ExpoConfig = {
   runtimeVersion: {
     policy: 'appVersion',
   },
-  updates: {
-    url: `https://u.expo.dev/${EAS_PROJECT_ID}`,
-  },
+  updates: updatesConfig,
   // No `newArchEnabled` toggle: SDK 56 has fully removed the legacy
   // architecture, so New Architecture is the only supported mode and the
   // config field no longer exists (confirmed against

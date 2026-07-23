@@ -37,11 +37,17 @@ export type CheckForUpdateResult =
  * fail-open posture: absence of a signal is never treated as an error).
  */
 export async function checkForUpdate(): Promise<CheckForUpdateResult> {
+  // Never poll OTA while Metro / Fast Refresh owns the bundle. Native
+  // `updates.enabled: false` for APP_VARIANT=development is the primary
+  // fence; this JS gate is belt-and-suspenders for any caller wired later.
+  if (isDevRuntime()) {
+    return { checked: false, reason: 'OTA checks disabled in __DEV__' };
+  }
   const native = loadNativeUpdates();
   if (!native || !native.isEnabled) {
     return {
       checked: false,
-      reason: 'expo-updates disabled (no EAS project configured — see README "Human gate")',
+      reason: 'expo-updates disabled (development build or updater off — see app.config updates)',
     };
   }
   try {
@@ -66,6 +72,9 @@ export type ApplyUpdateResult =
  * OTA apply must never crash or hang the app already in the user's hands).
  */
 export async function fetchAndApplyUpdate(): Promise<ApplyUpdateResult> {
+  if (isDevRuntime()) {
+    return { applied: false, reason: 'OTA apply/reload disabled in __DEV__' };
+  }
   const native = loadNativeUpdates();
   if (!native || !native.isEnabled) {
     return { applied: false, reason: 'expo-updates disabled' };
@@ -80,6 +89,10 @@ export async function fetchAndApplyUpdate(): Promise<ApplyUpdateResult> {
   } catch (error) {
     return { applied: false, reason: describeError(error) };
   }
+}
+
+function isDevRuntime(): boolean {
+  return typeof __DEV__ !== 'undefined' && __DEV__;
 }
 
 function describeError(error: unknown): string {

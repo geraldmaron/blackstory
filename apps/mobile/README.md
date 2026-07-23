@@ -210,14 +210,15 @@ for the full template and `eas.json` for the committed non-secret per-profile
 ## EAS Update / OTA (MOB-019, repo-ovn7)
 
 `expo-updates` is installed and `runtimeVersion: { policy: 'appVersion' }` is
-wired in `app.config.ts` (ADR-023 §2's OTA/rebuild fence). `updates.url` /
-`extra.eas.projectId` are gated on `EAS_PROJECT_ID`, which is unset today — no
-Expo/EAS organization has been provisioned yet (`mobile-identity.md` human
-gate #3) — so `expo-updates` currently has no update server to poll and stays
-structurally inert until that gate clears. `eas.json`'s three build profiles
-already each declare a distinct `channel` (development/preview/production),
-satisfying ADR-023 §1's "OTA can never cross an environment boundary"
-requirement.
+wired in `app.config.ts` (ADR-023 §2's OTA/rebuild fence). `extra.eas.projectId`
+defaults to the provisioned project (`@gerald-maron/blackstory`) so local
+`eas device:*` / CLI stay linked. **OTA itself is off for
+`APP_VARIANT=development`** (`updates.enabled: false`,
+`checkAutomatically: 'NEVER'`) so BlackStory (Dev) + Metro own the JS bundle —
+leaving the updater on with a live `updates.url` previously fought Metro /
+Expo codesigning and looked like continuous refresh. Preview/production keep
+`updates.url` + `ON_LOAD` against their `eas.json` channels (ADR-023 §1:
+OTA never crosses an environment boundary).
 
 **Code-signing decision (ADR-023's 2026-07-20 adversarial-review amendment,
 threat-model T6):** EAS Update end-to-end code signing is a **paid EAS
@@ -228,7 +229,25 @@ custody of the EAS org, a scoped/revocable CI-only publish token, staged
 channel rollout, and immutable-update rollback. This is **accepted risk by
 design**, with code signing recorded as a cost-gated upgrade trigger, not a
 silent gap. See `src/updates/README.md` for the full decision record, the
-human-gate activation steps, and the OTA rollback runbook (ADR-023 §6).
+activation steps, and the OTA rollback runbook (ADR-023 §6).
+
+### If Dev Client keeps refreshing
+
+```bash
+# Stop Metro (Ctrl+C), then:
+rm -rf ~/.expo/codesigning/51a35884-e6b5-43b6-b95b-c5a7460fa665
+mkdir -p ~/.expo/codesigning/51a35884-e6b5-43b6-b95b-c5a7460fa665
+cd apps/mobile
+npx expo prebuild --platform ios   # regenerates Expo.plist with updates.enabled=false
+cd ios && pod install && cd ..
+npx expo start --dev-client --clear
+# In another terminal / Xcode: launch BlackStory (Dev), not Expo Go
+npx expo run:ios
+```
+
+In the simulator Dev Menu (⌘D): disable Fast Refresh only if a bad HMR loop
+persists after the cache clear. Never open this project in Expo Go (MapLibre
+native module is missing there).
 
 ## Package naming — a documented discrepancy, not a guess
 
