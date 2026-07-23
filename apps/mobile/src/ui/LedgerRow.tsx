@@ -7,9 +7,9 @@ import { Pressable, StyleSheet, View, type GestureResponderEvent } from 'react-n
 import { Ionicons } from '@expo/vector-icons';
 import { Text } from './Text';
 import { Divider } from './Divider';
-import { space, useThemeColors } from './tokens';
+import { MIN_TOUCH_TARGET, space, useThemeColors } from './tokens';
 
-const MIN_ROW_HEIGHT = 44;
+const MIN_ROW_HEIGHT = MIN_TOUCH_TARGET;
 
 export type LedgerRowProps = {
   readonly title: string;
@@ -88,9 +88,11 @@ export function LedgerRow({
           accessibilityRole="button"
           accessibilityLabel={label}
           onPress={onPress}
+          android_ripple={{ color: theme.border }}
           style={({ pressed }) => [
             styles.pressable,
-            { backgroundColor: pressed ? theme.surfaceRaised : 'transparent' },
+            // `canvas` (not `surfaceRaised`) — in the light theme surfaceRaised === surface.
+            { backgroundColor: pressed ? theme.canvas : 'transparent' },
           ]}
         >
           {content}

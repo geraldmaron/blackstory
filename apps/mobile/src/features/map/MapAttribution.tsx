@@ -9,16 +9,24 @@
  * Placement: overlays the map canvas only (lower-left, above Explore peek). Keep
  * z-index below the bottom sheet and floating chrome so expanded sheet content
  * fully covers this pill. Explore may hide it when the sheet is half/full.
+ * Prefer pixel `bottom` from `attributionBottomAbovePeekSheet` when the sheet
+ * uses tab-bar `bottomInset` — percentage-only placement overlaps the rail.
+ *
+ * Contrast: flat opaque Surface chip + theme `inkMuted` (WCAG AA on light and
+ * dark), never ghost rgba over live tiles.
  */
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
-import { radius, space, Text, themeColors, useThemeColors } from '@/ui';
-import { MAP_ATTRIBUTION_LINES } from './mapConfig';
+import { radius, space, Text, useThemeColors } from '@/ui';
+import {
+  MAP_ATTRIBUTION_LINES,
+  MAP_ATTRIBUTION_LINES_COMPACT,
+} from './mapConfig';
 
 /**
- * Default bottom offset that clears the Explore peek snap (~22%) so the license
- * line sits on the map, not under the sheet or in a gap below it.
+ * Default bottom offset when Explore is not hosting the map (standalone MapScreen).
+ * Explore passes a pixel bottom that clears the lifted peek sheet.
  */
-export const MAP_ATTRIBUTION_ABOVE_SHEET_BOTTOM: `${number}%` = '22%';
+export const MAP_ATTRIBUTION_ABOVE_SHEET_BOTTOM: `${number}%` = '18%';
 
 /** Stack below Explore sheet (z=2) and floating chrome (z=3). */
 export const MAP_ATTRIBUTION_Z_INDEX = 1;
@@ -32,15 +40,21 @@ export type MapAttributionProps = {
   readonly style?: StyleProp<ViewStyle>;
   /** When false, renders nothing (Explore hides at half/full sheet). */
   readonly visible?: boolean;
+  /**
+   * Tighter chip and shorter license line for full-bleed Explore — still a flat
+   * Surface plate with theme muted ink (not ghost typography over tiles).
+   */
+  readonly compact?: boolean;
 };
 
 export function MapAttribution({
   bottom = MAP_ATTRIBUTION_ABOVE_SHEET_BOTTOM,
   style,
   visible = true,
+  compact = false,
 }: MapAttributionProps = {}) {
   const theme = useThemeColors();
-  const labelColor = themeColors.dark.inkMuted;
+  const lines = compact ? MAP_ATTRIBUTION_LINES_COMPACT : MAP_ATTRIBUTION_LINES;
 
   if (!visible) return null;
 
@@ -52,17 +66,21 @@ export function MapAttribution({
       pointerEvents="box-none"
       style={[
         styles.container,
+        compact ? styles.containerCompact : null,
         {
           bottom,
-          backgroundColor: theme.overlay,
+          backgroundColor: theme.surface,
           borderRadius: radius.sm,
         },
         style,
       ]}
       testID="map-attribution"
     >
-      <Text variant="caption" style={{ color: labelColor }}>
-        {MAP_ATTRIBUTION_LINES.join(' · ')}
+      <Text
+        variant="code"
+        style={[styles.label, compact ? styles.labelCompact : null, { color: theme.inkMuted }]}
+      >
+        {lines.join(' · ')}
       </Text>
     </View>
   );
@@ -77,5 +95,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: space['2'],
     paddingVertical: space['1'],
     maxWidth: '72%',
+  },
+  containerCompact: {
+    paddingHorizontal: space['2'],
+    paddingVertical: space['1'],
+    maxWidth: '58%',
+  },
+  label: {
+    fontSize: 11,
+  },
+  labelCompact: {
+    fontSize: 10,
+    letterSpacing: 0.2,
   },
 });

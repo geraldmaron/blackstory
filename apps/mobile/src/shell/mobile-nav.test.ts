@@ -41,10 +41,11 @@ describe('MOBILE_MORE_SECTIONS', () => {
     ]);
   });
 
-  it('groups trust routes under Methodology, Corrections, and Errata', () => {
+  it('groups trust routes under Methodology, Memorial, Corrections, and Errata', () => {
     const trust = MOBILE_MORE_SECTIONS.find((section) => section.id === 'trust');
     expect(trust?.rows.map((row) => row.title)).toEqual([
       'Methodology',
+      'Memorial',
       'Corrections',
       'Errata',
     ]);

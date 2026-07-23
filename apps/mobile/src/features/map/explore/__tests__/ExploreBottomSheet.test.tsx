@@ -37,9 +37,9 @@ beforeEach(() => {
 });
 
 describe('ExploreBottomSheet — v7 detents', () => {
-  it('uses prototype snap points 22% / 42% / 58%', async () => {
-    expect(EXPLORE_SHEET_SNAP_POINTS).toEqual(['22%', '42%', '58%']);
-    expect(EXPLORE_SHEET_PEEK_HEIGHT).toBe('22%');
+  it('uses map-first snap points 16% / 32% / 48%', async () => {
+    expect(EXPLORE_SHEET_SNAP_POINTS).toEqual(['16%', '32%', '48%']);
+    expect(EXPLORE_SHEET_PEEK_HEIGHT).toBe('16%');
     expect(EXPLORE_SHEET_BOTTOM_INSET).toBe(0);
   });
 
@@ -71,5 +71,25 @@ describe('ExploreBottomSheet — v7 detents', () => {
     expect(mockBottomSheetProps[0]?.snapPoints).toEqual(EXPLORE_SHEET_SNAP_POINTS);
     expect(mockBottomSheetProps[0]?.bottomInset).toBe(0);
     expect(mockBottomSheetProps[0]?.onSnapIndexChange).toBe(onSnapIndexChange);
+  });
+
+  it('forwards scrollable preview mode and tab bar inset', async () => {
+    await render(
+      <ExploreBottomSheet scrollable bottomInset={83}>
+        <Text>Preview</Text>
+      </ExploreBottomSheet>,
+    );
+    expect(mockBottomSheetProps[0]?.scrollable).toBe(true);
+    expect(mockBottomSheetProps[0]?.bottomInset).toBe(83);
+  });
+
+  it('forwards sheetList rail mode for BottomSheetFlatList hosts', async () => {
+    await render(
+      <ExploreBottomSheet sheetList>
+        <Text>Rail</Text>
+      </ExploreBottomSheet>,
+    );
+    expect(mockBottomSheetProps[0]?.sheetList).toBe(true);
+    expect(mockBottomSheetProps[0]?.scrollable).toBe(false);
   });
 });

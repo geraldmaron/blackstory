@@ -37,6 +37,9 @@ export interface SearchScreenProps {
   readonly initialQuery?: string;
   readonly initialKind?: string;
   readonly runtime?: SearchRuntime;
+  /** Live map feature count for the active release (geo-anchored records). */
+  readonly pinnedRecordCount?: number;
+  readonly archiveScopeLabel?: string;
 }
 
 function formatRelativeTime(fetchedAt: number, now: number): string {
@@ -50,7 +53,13 @@ function formatRelativeTime(fetchedAt: number, now: number): string {
   return `${days} day${days === 1 ? '' : 's'} ago`;
 }
 
-export function SearchScreen({ initialQuery, initialKind, runtime }: SearchScreenProps) {
+export function SearchScreen({
+  initialQuery,
+  initialKind,
+  runtime,
+  pinnedRecordCount,
+  archiveScopeLabel = 'Active release',
+}: SearchScreenProps) {
   const theme = useThemeColors();
   const {
     draft,
@@ -154,6 +163,8 @@ export function SearchScreen({ initialQuery, initialKind, runtime }: SearchScree
             <BrowseModePanels
               draftLength={draftLength}
               recentSearches={recentSearches}
+              pinnedRecordCount={pinnedRecordCount}
+              archiveScopeLabel={archiveScopeLabel}
               onSelectRecent={selectRecentSearch}
               onRemoveRecent={removeRecentSearch}
               onClearRecent={clearRecentSearches}
@@ -276,21 +287,45 @@ function FilterChipsRow({
   );
 }
 
+function formatArchiveCount(count: number): string {
+  return count.toLocaleString('en-US');
+}
+
 function BrowseModePanels({
   draftLength,
   recentSearches,
+  pinnedRecordCount,
+  archiveScopeLabel,
   onSelectRecent,
   onRemoveRecent,
   onClearRecent,
 }: {
   draftLength: number;
   recentSearches: readonly { readonly term: string; readonly savedAt: number }[];
+  pinnedRecordCount?: number;
+  archiveScopeLabel: string;
   onSelectRecent: (term: string) => void;
   onRemoveRecent: (term: string) => void;
   onClearRecent: () => void;
 }) {
+  const archiveMeta =
+    pinnedRecordCount != null && pinnedRecordCount > 0
+      ? `${formatArchiveCount(pinnedRecordCount)} records pinned on the map`
+      : undefined;
+
   return (
     <>
+      {archiveMeta ? (
+        <EditionSurfacePanel
+          index="01"
+          kicker="Archive"
+          title="Scale"
+          panelMeta={`${archiveScopeLabel} · ${archiveMeta}`}
+          compact
+          dense
+        />
+      ) : null}
+
       <LiftedSurface tone="surface" shadow="none" paddingKey="2">
         <SectionHeader
           title="By category"

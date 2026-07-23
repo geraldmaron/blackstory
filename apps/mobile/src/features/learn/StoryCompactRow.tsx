@@ -25,7 +25,6 @@ export function StoryCompactRow({ entry, onPress, showDivider = true, indexLabel
   return (
     <LedgerRow
       title={page.title}
-      summary={page.dek}
       indexLabel={indexLabel}
       leading={<NavIcon name="story" size={20} />}
       showChevron
@@ -35,7 +34,7 @@ export function StoryCompactRow({ entry, onPress, showDivider = true, indexLabel
       secondaryAction={
         facts.length > 0 ? (
           <View style={{ marginTop: space['1'] }}>
-            <RecordFactStrip facts={facts} />
+            <RecordFactStrip facts={facts} valueVariant="bodySmall" />
           </View>
         ) : undefined
       }

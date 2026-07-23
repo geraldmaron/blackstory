@@ -7,16 +7,18 @@ import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text, space, radius } from '@/ui';
 import type { FilterState } from '@/lib/route-params';
-import { hasActiveFilters } from '@/lib/route-params';
 import { exploreContentInset, useExploreChromeColors } from './explore-chrome';
+import { formatExploreCountLabel } from './explore-count-label';
 
 const MIN_TOUCH = 44;
-const ICON_SIZE = 17;
-const GHOST_SIZE = 36;
+const ICON_SIZE = 18;
+const GHOST_SIZE = 44;
 
 export type ExploreFloatingChromeProps = {
-  /** Viewport-scoped visible count — same source as the records rail header. */
-  readonly visibleCount: number;
+  /** Viewport-scoped visible count — same source as the records rail list. */
+  readonly inViewCount: number;
+  /** Full loaded release total (geo-anchored features in the active source). */
+  readonly releaseCount: number;
   /** "In view" once the map reports a region; "All records" before that. */
   readonly scopeLabel: string;
   readonly filters: FilterState;
@@ -32,21 +34,6 @@ export type ExploreFloatingChromeProps = {
   /** @deprecated Modal route fallback — prefer in-map instruments panel. */
   readonly onOpenColorKey?: () => void;
 };
-
-function formatCountNumber(count: number, filters: FilterState): string {
-  const base = count === 1 ? '1' : String(count);
-  return hasActiveFilters(filters) ? `${base} · filtered` : base;
-}
-
-function formatCountPhrase(count: number, filters: FilterState): string {
-  const base = count === 0 ? 'None' : count === 1 ? '1 record' : `${count} records`;
-  return hasActiveFilters(filters) ? `${base} · filtered` : base;
-}
-
-function scopeSuffix(scopeLabel: string, showDemoHint: boolean): string {
-  if (showDemoHint) return ' demo fixtures';
-  return scopeLabel === 'In view' ? ' records in view' : ' records';
-}
 
 function GhostIconButton({
   icon,
@@ -68,7 +55,6 @@ function GhostIconButton({
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       accessibilityState={{ selected: Boolean(selected) }}
-      hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
       onPress={onPress}
       testID={testID}
       style={({ pressed }) => [
@@ -93,7 +79,8 @@ function GhostIconButton({
 }
 
 export function ExploreFloatingChrome({
-  visibleCount,
+  inViewCount,
+  releaseCount,
   scopeLabel,
   filters,
   showDemoHint = false,
@@ -106,9 +93,13 @@ export function ExploreFloatingChrome({
 }: ExploreFloatingChromeProps) {
   const chrome = useExploreChromeColors();
   const filtersActive = Boolean(filters.kind || filters.era);
-  const countLabel = formatCountNumber(visibleCount, filters);
-  const countPhrase = formatCountPhrase(visibleCount, filters);
-  const suffix = scopeSuffix(scopeLabel, showDemoHint);
+  const countLabel = formatExploreCountLabel({
+    inViewCount,
+    releaseCount,
+    scopeLabel,
+    filters,
+    showDemoHint,
+  });
 
   return (
     <View
@@ -123,13 +114,12 @@ export function ExploreFloatingChrome({
           style={[styles.countInline, { color: chrome.mapInkMuted }]}
           accessible
           accessibilityRole="text"
-          accessibilityLabel={`${scopeLabel}, ${countPhrase}`}
+          accessibilityLabel={countLabel.accessibilityLabel}
           testID="explore-mast-count"
         >
           <Text variant="code" style={{ color: chrome.mapAccent }}>
-            {countLabel}
+            {countLabel.inline}
           </Text>
-          {suffix}
         </Text>
 
         <View style={styles.actions}>

@@ -4,7 +4,7 @@
  * focus here on their own; `useAccessibilityFocus` must do it explicitly whenever a NEW
  * feature is selected.
  */
-import { render } from '@testing-library/react-native';
+import { fireEvent, render } from '@testing-library/react-native';
 import { AccessibilityInfo } from 'react-native';
 import { EntityPreviewSheet } from '../EntityPreviewSheet';
 import type { ExploreFeature } from '@/features/explore/explore-feature';
@@ -69,6 +69,7 @@ describe('EntityPreviewSheet — focus movement (MOB-017)', () => {
   });
 
   it('exposes an accessible summary label and close control for the selected feature', async () => {
+    const onOpenEntity = jest.fn();
     const { getByLabelText } = await render(
       <EntityPreviewSheet
         feature={{
@@ -78,7 +79,7 @@ describe('EntityPreviewSheet — focus movement (MOB-017)', () => {
             oneLineStory: 'A cornerstone of the district.',
           },
         }}
-        onOpenEntity={jest.fn()}
+        onOpenEntity={onOpenEntity}
         onClose={jest.fn()}
       />,
     );
@@ -86,5 +87,8 @@ describe('EntityPreviewSheet — focus movement (MOB-017)', () => {
     expect(getByLabelText(/Selected record: Bethel AME Church\./)).toBeTruthy();
     expect(getByLabelText('Close preview')).toBeTruthy();
     expect(getByLabelText('Open full record for Bethel AME Church')).toBeTruthy();
+
+    fireEvent.press(getByLabelText('Bethel AME Church'));
+    expect(onOpenEntity).toHaveBeenCalledWith('ent_a');
   });
 });

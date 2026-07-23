@@ -14,8 +14,12 @@
  */
 import { forwardRef } from 'react';
 import { StyleSheet, View } from 'react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
+
+import { useReduceMotion } from '@/features/explore/useReduceMotion';
+
 import { Text } from './Text';
-import { radius, space, useStatusColors, useThemeColors, type StatusName } from './tokens';
+import { duration, radius, space, useStatusColors, useThemeColors, type StatusName } from './tokens';
 import { useAnnounceOnMount } from './useAnnounceOnMount';
 
 export type NoticeTone = StatusName | 'info';
@@ -34,6 +38,7 @@ export const Notice = forwardRef<View, NoticeProps>(function Notice(
 ) {
   const status = useStatusColors();
   const theme = useThemeColors();
+  const reduceMotion = useReduceMotion();
   const palette =
     tone === 'info'
       ? { fg: theme.ink, bg: theme.surfaceRaised, border: theme.border }
@@ -43,8 +48,9 @@ export const Notice = forwardRef<View, NoticeProps>(function Notice(
   useAnnounceOnMount(`${title}${description ? `. ${description}` : ''}`);
 
   return (
-    <View
+    <Animated.View
       ref={ref}
+      entering={reduceMotion ? undefined : FadeIn.duration(duration.durationFast)}
       accessible
       accessibilityRole="alert"
       accessibilityLiveRegion={isUrgent ? 'assertive' : 'polite'}
@@ -70,7 +76,7 @@ export const Notice = forwardRef<View, NoticeProps>(function Notice(
           {description}
         </Text>
       ) : null}
-    </View>
+    </Animated.View>
   );
 });
 

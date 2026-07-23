@@ -4,7 +4,7 @@
  */
 import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Text } from './Text';
+import { Text, type TextRole } from './Text';
 import { space } from './tokens';
 
 export type EditionFactCellProps = {
@@ -12,9 +12,17 @@ export type EditionFactCellProps = {
   readonly value: string;
   readonly leading?: ReactNode;
   readonly valueNode?: ReactNode;
+  /** Browse surfaces use Inter; longform anatomy keeps editorial serif. */
+  readonly valueVariant?: TextRole;
 };
 
-export function EditionFactCell({ label, value, leading, valueNode }: EditionFactCellProps) {
+export function EditionFactCell({
+  label,
+  value,
+  leading,
+  valueNode,
+  valueVariant = 'editorial',
+}: EditionFactCellProps) {
   return (
     <View style={styles.cell} accessibilityRole="text">
       <View style={styles.labelRow}>
@@ -24,7 +32,7 @@ export function EditionFactCell({ label, value, leading, valueNode }: EditionFac
         </Text>
       </View>
       {valueNode ?? (
-        <Text variant="editorial" numberOfLines={2}>
+        <Text variant={valueVariant} numberOfLines={2}>
           {value}
         </Text>
       )}

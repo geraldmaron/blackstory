@@ -4,6 +4,7 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { EditionFactCell, type EditionFactCellProps } from './EditionFactCell';
+import { type TextRole } from './Text';
 import { space } from './tokens';
 
 export type RecordFactStripItem = Omit<EditionFactCellProps, 'valueNode'> & {
@@ -13,9 +14,10 @@ export type RecordFactStripItem = Omit<EditionFactCellProps, 'valueNode'> & {
 
 export type RecordFactStripProps = {
   readonly facts: readonly RecordFactStripItem[];
+  readonly valueVariant?: TextRole;
 };
 
-export function RecordFactStrip({ facts }: RecordFactStripProps) {
+export function RecordFactStrip({ facts, valueVariant }: RecordFactStripProps) {
   if (facts.length === 0) return null;
 
   return (
@@ -27,6 +29,7 @@ export function RecordFactStrip({ facts }: RecordFactStripProps) {
           value={fact.value}
           leading={fact.leading}
           valueNode={fact.valueNode}
+          valueVariant={fact.valueVariant ?? valueVariant}
         />
       ))}
     </View>

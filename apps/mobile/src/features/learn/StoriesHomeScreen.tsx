@@ -1,17 +1,17 @@
 /**
- * Stories-forward Learn tab home: v6 Surface edition stack with indexed intro,
- * featured story band, compact archive ledger, and secondary context links.
+ * Stories-forward Learn tab home: v6 dense masthead, featured story band, compact archive
+ * ledger, and secondary context links — continuous surfaces matching History browse density.
  */
-import { ScrollView } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import {
   ApiStatusBanner,
   EditionSurfacePanel,
   EditionSurfaceStack,
   LedgerRow,
-  LiftedSurface,
   NavIcon,
   ScreenCanvas,
+  ScreenHeader,
   screenScrollInsets,
 } from '@/ui';
 import { LEARN_SECTIONS } from './sections';
@@ -45,30 +45,32 @@ export function StoriesHomeScreen() {
           paddingBottom: screenScrollInsets.paddingBottom,
         }}
       >
-        <ApiStatusBanner compact />
-        <EditionSurfaceStack>
-          <EditionSurfacePanel
-            index="00"
+        <View style={styles.page}>
+          <ApiStatusBanner compact />
+          <ScreenHeader
             kicker="Longform"
             title="History pinned to place"
             dek="Each piece links to the records it rests on, with sources you can open. Era and geography stay visible in every entry."
+            compact
+            dense
           />
 
-          {featured ? (
-            <EditionSurfacePanel index="01" kicker="Featured" title="Start here">
-              <FeaturedStoryCard entry={featured} onPress={() => router.push(storyHref(featured) as never)} />
-            </EditionSurfacePanel>
-          ) : null}
+          <EditionSurfaceStack dense>
+            {featured ? (
+              <EditionSurfacePanel index="01" kicker="Featured" title="Start here" compact dense>
+                <FeaturedStoryCard entry={featured} onPress={() => router.push(storyHref(featured) as never)} />
+              </EditionSurfacePanel>
+            ) : null}
 
-          {archiveStories.length > 0 ? (
-            <EditionSurfacePanel
-              index={featured ? '02' : '01'}
-              kicker="Archive"
-              title="Published stories"
-              panelLabel="Catalog"
-              panelMeta={countLabel}
-            >
-              <LiftedSurface tone="surfaceRaised" shadow="none">
+            {archiveStories.length > 0 ? (
+              <EditionSurfacePanel
+                index={featured ? '02' : '01'}
+                kicker="Archive"
+                title="Published stories"
+                panelMeta={`Catalog · ${countLabel}`}
+                compact
+                dense
+              >
                 {archiveStories.map((entry, index) => (
                   <StoryCompactRow
                     key={`${entry.section}-${entry.page.slug}`}
@@ -78,18 +80,18 @@ export function StoriesHomeScreen() {
                     showDivider={index < archiveStories.length - 1}
                   />
                 ))}
-              </LiftedSurface>
-            </EditionSurfacePanel>
-          ) : null}
+              </EditionSurfacePanel>
+            ) : null}
 
-          {secondarySections.length > 0 ? (
-            <EditionSurfacePanel
-              index={featured ? '03' : '02'}
-              kicker="Context"
-              title="More to read"
-              panelMeta="Context and method"
-            >
-              <LiftedSurface tone="surfaceRaised" shadow="none">
+            {secondarySections.length > 0 ? (
+              <EditionSurfacePanel
+                index={featured ? '03' : '02'}
+                kicker="Context"
+                title="More to read"
+                panelMeta="Context and method"
+                compact
+                dense
+              >
                 {secondarySections.map((section, index) => (
                   <LedgerRow
                     key={section.routeId}
@@ -107,11 +109,17 @@ export function StoriesHomeScreen() {
                     showDivider={index < secondarySections.length - 1}
                   />
                 ))}
-              </LiftedSurface>
-            </EditionSurfacePanel>
-          ) : null}
-        </EditionSurfaceStack>
+              </EditionSurfacePanel>
+            ) : null}
+          </EditionSurfaceStack>
+        </View>
       </ScrollView>
     </ScreenCanvas>
   );
 }
+
+const styles = StyleSheet.create({
+  page: {
+    gap: screenScrollInsets.gap,
+  },
+});

@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: exploreContentInset,
   },
   segment: {
-    minHeight: 36,
+    minHeight: MIN_TOUCH,
     alignItems: 'center',
     justifyContent: 'center',
     borderBottomWidth: 2,

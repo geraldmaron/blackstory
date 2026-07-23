@@ -109,6 +109,13 @@ export const MOBILE_MORE_SECTIONS: readonly MobileMoreSection[] = [
         destination: { kind: 'native', route: '/learn/methodology' },
       },
       {
+        id: 'memorial',
+        title: 'Memorial',
+        subtitle: 'Names held in remembrance (opens web)',
+        icon: 'about',
+        destination: { kind: 'web', href: `${CANONICAL_WEB_ORIGIN}/memorial` },
+      },
+      {
         id: 'corrections',
         title: 'Corrections',
         subtitle: 'Report an error in a published record',

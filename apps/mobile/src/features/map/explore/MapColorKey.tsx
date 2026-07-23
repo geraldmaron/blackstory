@@ -25,9 +25,9 @@ const SIZE_SCALE_STEPS = [
 ] as const;
 
 const CLUSTER_SIZE_ROWS = [
-  ['2–9 records', CLUSTER_RADIUS_BY_COUNT[0]![1]],
-  ['10–49 records', CLUSTER_RADIUS_BY_COUNT[1]![1]],
-  ['50–199 records', CLUSTER_RADIUS_BY_COUNT[2]![1]],
+  ['2 to 9 records', CLUSTER_RADIUS_BY_COUNT[0]![1]],
+  ['10 to 49 records', CLUSTER_RADIUS_BY_COUNT[1]![1]],
+  ['50 to 199 records', CLUSTER_RADIUS_BY_COUNT[2]![1]],
   ['200+ records', CLUSTER_RADIUS_BY_COUNT[3]![1]],
 ] as const;
 

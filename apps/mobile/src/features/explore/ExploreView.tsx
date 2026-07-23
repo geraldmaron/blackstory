@@ -15,7 +15,8 @@
  * remains fully mounted and interactive — a failed map never strands the reader.
  */
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, type LayoutChangeEvent } from 'react-native';
+import { useEditionTabBarInset } from '@/shell/edition-chrome';
 import { ApiStatusBanner, ScreenCanvas } from '@/ui';
 import {
   MapAttribution,
@@ -30,12 +31,11 @@ import {
   EXPLORE_SHEET_FULL,
   EXPLORE_SHEET_HALF,
   EXPLORE_SHEET_PEEK,
-  EXPLORE_SHEET_PEEK_HEIGHT,
 } from '@/features/map/explore/ExploreBottomSheet';
 import { ExploreFloatingChrome } from '@/features/map/explore/ExploreFloatingChrome';
 import { ExploreInstrumentsPanel } from '@/features/map/explore/ExploreInstrumentsPanel';
 import { ExploreRecordsRail } from '@/features/map/explore/ExploreRecordsRail';
-import { ExploreListChrome } from '@/features/map/explore/explore-chrome';
+import { attributionBottomAbovePeekSheet } from '@/features/map/explore/explore-sheet-layout';
 import type { FilterState } from '@/lib/route-params';
 import {
   exploreReducer,
@@ -92,12 +92,44 @@ export function ExploreView({
 }: ExploreViewProps) {
   const osReduceMotion = useReduceMotion();
   const reduceMotion = reduceMotionProp ?? osReduceMotion;
+  const tabBarHeight = useEditionTabBarInset();
+  const [mapAreaHeight, setMapAreaHeight] = useState(0);
 
   const allFeatures = useMemo(() => toExploreFeatures(source), [source]);
   const [state, dispatch] = useReducer(exploreReducer, filters, initialExploreState);
   const [instrumentsOpen, setInstrumentsOpen] = useState(false);
   const [recordsExpanded, setRecordsExpanded] = useState(false);
   const [manualSnapIndex, setManualSnapIndex] = useState(EXPLORE_SHEET_PEEK);
+  const prevSelectedIdRef = useRef<string | null>(null);
+
+  const attributionBottom = useMemo(
+    () =>
+      attributionBottomAbovePeekSheet({
+        mapAreaHeight,
+        tabBarInset: tabBarHeight,
+      }),
+    [mapAreaHeight, tabBarHeight],
+  );
+
+  const handleMapAreaLayout = useCallback((event: LayoutChangeEvent) => {
+    setMapAreaHeight(event.nativeEvent.layout.height);
+  }, []);
+
+  useEffect(() => {
+    const prevSelectedId = prevSelectedIdRef.current;
+    const nextSelectedId = state.selectedId ?? null;
+    prevSelectedIdRef.current = nextSelectedId;
+
+    if (nextSelectedId && !prevSelectedId) {
+      setManualSnapIndex(EXPLORE_SHEET_HALF);
+      setRecordsExpanded(true);
+      return;
+    }
+    if (!nextSelectedId && prevSelectedId) {
+      setManualSnapIndex(EXPLORE_SHEET_PEEK);
+      setRecordsExpanded(false);
+    }
+  }, [state.selectedId]);
 
   useEffect(() => {
     dispatch({ type: 'filtersChanged', filters });
@@ -129,7 +161,7 @@ export function ExploreView({
   const listFeatures = useMemo(() => visibleFeatures(allFeatures, state), [allFeatures, state]);
   const scopeLabel = state.viewport ? 'In view' : 'All records';
   const sheetSnapIndex = state.selectedId
-    ? EXPLORE_SHEET_HALF
+    ? Math.max(manualSnapIndex, EXPLORE_SHEET_HALF)
     : recordsExpanded
       ? EXPLORE_SHEET_FULL
       : manualSnapIndex;
@@ -198,7 +230,12 @@ export function ExploreView({
     <ScreenCanvas edges={['top', 'left', 'right']}>
       <ApiStatusBanner compact />
 
-      <View style={styles.mapArea} testID="explore-map-area" pointerEvents="box-none">
+      <View
+        style={styles.mapArea}
+        testID="explore-map-area"
+        pointerEvents="box-none"
+        onLayout={handleMapAreaLayout}
+      >
         <MapScreen
           source={source}
           loadState={loadState}
@@ -218,12 +255,14 @@ export function ExploreView({
         />
 
         <MapAttribution
-          bottom={EXPLORE_SHEET_PEEK_HEIGHT}
+          bottom={attributionBottom}
           visible={attributionVisible}
+          compact
         />
 
         <ExploreFloatingChrome
-          visibleCount={listFeatures.length}
+          inViewCount={listFeatures.length}
+          releaseCount={allFeatures.length}
           scopeLabel={scopeLabel}
           filters={filters}
           showDemoHint={showDemoHint}
@@ -236,7 +275,10 @@ export function ExploreView({
         />
 
         {instrumentsOpen ? (
-          <View style={styles.instrumentsOverlay} pointerEvents="box-none">
+          <View
+            style={[styles.instrumentsOverlay, { bottom: attributionBottom }]}
+            pointerEvents="box-none"
+          >
             <ExploreInstrumentsPanel
               filters={filters}
               features={allFeatures}
@@ -251,6 +293,9 @@ export function ExploreView({
           snapIndex={sheetSnapIndex}
           hasSelection={Boolean(selectedFeature)}
           reduceMotion={reduceMotion}
+          bottomInset={tabBarHeight}
+          scrollable={Boolean(selectedFeature)}
+          sheetList={!selectedFeature}
           onSnapIndexChange={(index) => {
             setManualSnapIndex(index);
             if (index >= EXPLORE_SHEET_HALF) {
@@ -275,21 +320,21 @@ export function ExploreView({
               }
             />
           ) : (
-            <ExploreListChrome testID="explore-records-area">
-              <ExploreRecordsRail
-                features={listFeatures}
-                selectedId={state.selectedId}
-                scopeLabel={scopeLabel}
-                onUserScroll={() => dispatch({ type: 'listScrolled' })}
-                onSelect={(feature) =>
-                  dispatch({
-                    type: 'entitySelected',
-                    entityId: feature.entityId,
-                    point: feature.coordinates,
-                  })
-                }
-              />
-            </ExploreListChrome>
+            <ExploreRecordsRail
+              features={listFeatures}
+              selectedId={state.selectedId}
+              scopeLabel={scopeLabel}
+              releaseCount={allFeatures.length}
+              filters={filters}
+              onUserScroll={() => dispatch({ type: 'listScrolled' })}
+              onSelect={(feature) =>
+                dispatch({
+                  type: 'entitySelected',
+                  entityId: feature.entityId,
+                  point: feature.coordinates,
+                })
+              }
+            />
           )}
         </ExploreBottomSheet>
       </View>
@@ -304,7 +349,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     top: 52,
-    bottom: EXPLORE_SHEET_PEEK_HEIGHT,
     zIndex: 4,
   },
 });

@@ -1,9 +1,9 @@
 /**
- * Featured story band for the Stories tab home — v6 Surface card with label-over-value
- * era/place facts, title, dek, and copper read affordance.
+ * Featured story band for the Stories tab home — browse-density facts (Inter + mono),
+ * compact title/dek, and copper read affordance on a continuous panel surface.
  */
 import { Pressable, StyleSheet, View } from 'react-native';
-import { LiftedSurface, RecordFactStrip, Text, space } from '@/ui';
+import { RecordFactStrip, Text, space } from '@/ui';
 import { plainRangeText } from '../record-facts/record-facts';
 import type { LearnContentEntry } from './content-catalog';
 
@@ -26,30 +26,32 @@ export function FeaturedStoryCard({ entry, onPress }: FeaturedStoryCardProps) {
       accessibilityRole="button"
       accessibilityLabel={`Featured story: ${page.title}`}
       onPress={onPress}
-      style={({ pressed }) => [{ opacity: pressed ? 0.92 : 1 }]}
+      style={({ pressed }) => [styles.pressable, { opacity: pressed ? 0.92 : 1 }]}
     >
-      <LiftedSurface tone="surface" shadow="none" paddingKey="5">
-        <View style={styles.inner}>
-          {facts.length > 0 ? <RecordFactStrip facts={facts} /> : null}
-          <Text variant="title" isHeading>
-            {page.title}
+      <View style={styles.inner}>
+        {facts.length > 0 ? <RecordFactStrip facts={facts} valueVariant="bodySmall" /> : null}
+        <Text variant="bodyEmphasis" isHeading>
+          {page.title}
+        </Text>
+        {page.dek ? (
+          <Text variant="bodySmall" colorRole="inkMuted" numberOfLines={3}>
+            {page.dek}
           </Text>
-          {page.dek ? (
-            <Text variant="editorial" colorRole="inkMuted" numberOfLines={3}>
-              {page.dek}
-            </Text>
-          ) : null}
-          <Text variant="bodyEmphasis" colorRole="accent">
-            Read story
-          </Text>
-        </View>
-      </LiftedSurface>
+        ) : null}
+        <Text variant="bodyEmphasis" colorRole="accent">
+          Read story
+        </Text>
+      </View>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
+  pressable: {
+    minHeight: 44,
+    justifyContent: 'center',
+  },
   inner: {
-    gap: space['3'],
+    gap: space['2'],
   },
 });

@@ -123,6 +123,15 @@ export const MAP_ATTRIBUTION_LINES: readonly string[] = MAP_PMTILES_URL
   : [OSM_ATTRIBUTION, OPENFREEMAP_ATTRIBUTION, OPENMAPTILES_ATTRIBUTION];
 
 /**
+ * Shorter on-map credit for Explore chrome. OSM license line stays; OpenMapTiles
+ * remains in the accessibility label via `MAP_ATTRIBUTION_LINES` so the filled
+ * “OpenMapTiles” tag does not crowd the sheet handle.
+ */
+export const MAP_ATTRIBUTION_LINES_COMPACT: readonly string[] = MAP_PMTILES_URL
+  ? [OSM_ATTRIBUTION, PROTOMAPS_ATTRIBUTION]
+  : [OSM_ATTRIBUTION, OPENFREEMAP_ATTRIBUTION];
+
+/**
  * Migration threshold (ADR-024, mirroring ADR-013's ~2 MB budget): the per-point
  * data ships as a flat GeoJSON FeatureCollection until it crosses this budget,
  * at which point the per-point data moves to PMTiles/vector tiles rather than

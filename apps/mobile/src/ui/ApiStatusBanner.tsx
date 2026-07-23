@@ -2,13 +2,15 @@
  * Dev-only banner when bootstrap sync is offline — explains why Search/Entity lack live Postgres
  * data and how to point the dev client at a local api-public instance.
  */
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
 
+import { useReduceMotion } from '@/features/explore/useReduceMotion';
 import { useAppRuntimeOptional } from '@/runtime';
 import { DEFAULT_API_BASE_URL, resolveApiBaseUrl } from '@/security';
 
 import { Notice } from './Notice';
-import { space } from './tokens';
+import { duration, space } from './tokens';
 
 export type ApiStatusBannerProps = {
   /** Tighter strip for tab browse surfaces (History, Stories). */
@@ -17,6 +19,7 @@ export type ApiStatusBannerProps = {
 
 export function ApiStatusBanner({ compact = true }: ApiStatusBannerProps) {
   const runtime = useAppRuntimeOptional();
+  const reduceMotion = useReduceMotion();
 
   if (typeof __DEV__ === 'undefined' || !__DEV__) {
     return null;
@@ -28,20 +31,24 @@ export function ApiStatusBanner({ compact = true }: ApiStatusBannerProps) {
 
   const baseUrl = resolveApiBaseUrl();
   const usingProdDefault = baseUrl === DEFAULT_API_BASE_URL;
+  const waitingForLocalApi = !usingProdDefault;
 
   return (
-    <View style={[compact ? styles.wrapCompact : styles.wrap, styles.wrapBase]}>
+    <Animated.View
+      entering={reduceMotion ? undefined : FadeIn.duration(duration.durationFast)}
+      style={[compact ? styles.wrapCompact : styles.wrap, styles.wrapBase]}
+    >
       <Notice
         tone="warning"
         compact={compact}
-        title="Live data unavailable"
+        title={waitingForLocalApi ? 'Waiting for local API' : 'Live data unavailable'}
         description={
           usingProdDefault
-            ? `Cannot reach ${baseUrl} yet. Set API_BASE_URL in .env.local, start api-public, and restart Metro. Explore uses demo fixtures until then.`
-            : `Cannot reach ${baseUrl} yet. Start api-public, confirm API_BASE_URL, and restart Metro.`
+            ? `Cannot reach ${baseUrl} yet. Set API_BASE_URL in .env.local, then run pnpm dev:mobile from the repo root. Explore uses demo fixtures until then.`
+            : `Connecting to ${baseUrl}. Run pnpm dev:mobile from the repo root if the API is not starting, or wait a moment while api-public comes up.`
         }
       />
-    </View>
+    </Animated.View>
   );
 }
 
@@ -49,9 +56,11 @@ const styles = StyleSheet.create({
   wrapBase: {
     paddingHorizontal: 0,
   },
+  /** Default density — roomier stack spacing for non-browse hosts. */
   wrap: {
-    paddingBottom: space['2'],
+    paddingBottom: space['4'],
   },
+  /** Compact density — tighter strip under History / Stories / Search masts. */
   wrapCompact: {
     paddingBottom: space['2'],
   },

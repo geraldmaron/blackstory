@@ -62,6 +62,23 @@ export type {
 };
 
 /**
+ * Minimum interactive target size in dp (Apple HIG 44pt / Material 48dp floor).
+ * Single source of truth — do not re-declare `MIN_TOUCH` / `MIN_ROW_HEIGHT` locally.
+ */
+export const MIN_TOUCH_TARGET = 44;
+
+/**
+ * Shared stacking order for map-adjacent overlays. Keeps sheet/chrome/attribution
+ * layering decided in one place instead of scattered magic `zIndex` numbers.
+ */
+export const Z_LAYER = {
+  mapAttribution: 1,
+  sheet: 2,
+  mapChrome: 3,
+  overlay: 4,
+} as const;
+
+/**
  * Resolves theme from an OS color scheme value. Matches web bootstrap:
  * explicit `light` / `dark` when set; Archive Paper (light) when null or
  * unspecified — no v5 dark-cockpit default outside the map plate (ADR-013).

@@ -148,9 +148,17 @@ export function EntityPreviewSheet({
             </View>
           ) : null}
 
-          <Text variant="title" isHeading numberOfLines={2} style={styles.title}>
-            {feature.label}
-          </Text>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={feature.label}
+            accessibilityHint="Opens the full entity edition screen"
+            onPress={() => onOpenEntity(feature.entityId)}
+            style={({ pressed }) => [styles.titlePress, { opacity: pressed ? 0.85 : 1 }]}
+          >
+            <Text variant="bodyEmphasis" isHeading numberOfLines={2} style={styles.title}>
+              {feature.label}
+            </Text>
+          </Pressable>
 
           {dek ? (
             <Text variant="editorial" colorRole="ink" numberOfLines={4} style={styles.dek}>
@@ -214,6 +222,11 @@ const styles = StyleSheet.create({
     minHeight: MIN_TOUCH,
     minWidth: MIN_TOUCH,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  titlePress: {
+    alignSelf: 'stretch',
+    minHeight: MIN_TOUCH,
     justifyContent: 'center',
   },
   title: {

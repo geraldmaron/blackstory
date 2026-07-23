@@ -1,18 +1,28 @@
 /**
  * v6 Explore records rail — primary bottom-sheet browse surface with hairline rows,
  * copper left rule on selection, and EditionFactCell meta strips (web result list).
+ *
+ * Uses BottomSheetFlatList (not RN FlatList) so the list is the sheet's scroll
+ * owner: half/full browse avoids nested-scroll clipping and gesture fights with
+ * the gorhom sheet. Header rides as ListHeaderComponent.
  */
-import { useCallback } from 'react';
-import { FlatList, Pressable, StyleSheet, View, type ListRenderItemInfo } from 'react-native';
+import { useCallback, useMemo } from 'react';
+import { Pressable, StyleSheet, View, type ListRenderItemInfo } from 'react-native';
+import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
 import { EmptyState, RecordFactStrip, Text, space, useThemeColors } from '@/ui';
 import { exploreContentInset } from './explore-chrome';
 import type { ExploreFeature } from '@/features/explore/explore-feature';
+import type { FilterState } from '@/lib/route-params';
 import { exploreRecordFacts } from './explore-preview-facts';
+import { formatExploreCountLabel } from './explore-count-label';
 
 export type ExploreRecordsRailProps = {
   readonly features: readonly ExploreFeature[];
   readonly selectedId?: string;
   readonly scopeLabel?: string;
+  /** Full loaded release total for dual count copy when viewport-scoped. */
+  readonly releaseCount?: number;
+  readonly filters?: FilterState;
   readonly onSelect: (feature: ExploreFeature) => void;
   readonly onUserScroll?: () => void;
   readonly emptyTitle?: string;
@@ -20,22 +30,14 @@ export type ExploreRecordsRailProps = {
   readonly testID?: string;
 };
 
-function countLabel(count: number): string {
-  if (count === 0) return 'None';
-  if (count === 1) return '1 record';
-  return `${count} records`;
-}
-
 function RecordRow({
   feature,
   selected,
   onPress,
-  showDivider,
 }: {
   readonly feature: ExploreFeature;
   readonly selected: boolean;
   readonly onPress: () => void;
-  readonly showDivider: boolean;
 }) {
   const theme = useThemeColors();
   const facts = exploreRecordFacts(feature);
@@ -61,7 +63,6 @@ function RecordRow({
         {feature.label}
       </Text>
       <RecordFactStrip facts={facts} />
-      {showDivider ? null : null}
     </Pressable>
   );
 }
@@ -70,6 +71,8 @@ export function ExploreRecordsRail({
   features,
   selectedId,
   scopeLabel = 'In view',
+  releaseCount,
+  filters = {},
   onSelect,
   onUserScroll,
   emptyTitle = 'No records in view',
@@ -77,55 +80,69 @@ export function ExploreRecordsRail({
   testID = 'explore-records-rail',
 }: ExploreRecordsRailProps) {
   const theme = useThemeColors();
+  const headerCount = formatExploreCountLabel({
+    inViewCount: features.length,
+    releaseCount: releaseCount ?? features.length,
+    scopeLabel,
+    filters,
+  });
 
   const renderItem = useCallback(
-    ({ item, index }: ListRenderItemInfo<ExploreFeature>) => (
+    ({ item }: ListRenderItemInfo<ExploreFeature>) => (
       <RecordRow
         feature={item}
         selected={item.entityId === selectedId}
         onPress={() => onSelect(item)}
-        showDivider={index < features.length - 1}
       />
     ),
-    [features.length, onSelect, selectedId],
+    [onSelect, selectedId],
   );
 
-  return (
-    <View style={styles.root} testID={testID}>
+  const listHeader = useMemo(
+    () => (
       <View
         style={[styles.header, { borderBottomColor: theme.border }]}
         accessible
         accessibilityRole="header"
-        accessibilityLabel={`${scopeLabel}, ${countLabel(features.length)}`}
+        accessibilityLabel={headerCount.accessibilityLabel}
       >
         <Text variant="code" colorRole="inkMuted">
           {scopeLabel}
         </Text>
-        <Text variant="code" colorRole="accent">
-          {countLabel(features.length)}
+        <Text variant="code" colorRole="accent" numberOfLines={1} style={styles.headerCount}>
+          {headerCount.railInline}
         </Text>
       </View>
+    ),
+    [headerCount.accessibilityLabel, headerCount.railInline, scopeLabel, theme.border],
+  );
 
-      {features.length === 0 ? (
-        <View testID="explore-records-empty" style={styles.emptyWrap}>
-          <EmptyState title={emptyTitle} description={emptyDescription} />
-        </View>
-      ) : (
-        <FlatList
-          testID="explore-records-list"
-          accessibilityRole="list"
-          accessibilityLabel="Records visible on the map"
-          data={features}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-          onScrollBeginDrag={onUserScroll}
-          keyboardShouldPersistTaps="handled"
-          initialNumToRender={12}
-          windowSize={7}
-          removeClippedSubviews
-        />
-      )}
-    </View>
+  const listEmpty = useMemo(
+    () => (
+      <View testID="explore-records-empty" style={styles.emptyWrap}>
+        <EmptyState title={emptyTitle} description={emptyDescription} />
+      </View>
+    ),
+    [emptyDescription, emptyTitle],
+  );
+
+  return (
+    <BottomSheetFlatList
+      style={styles.root}
+      testID={testID}
+      accessibilityRole="list"
+      accessibilityLabel="Records visible on the map"
+      data={features}
+      keyExtractor={(item) => item.id}
+      renderItem={renderItem}
+      ListHeaderComponent={listHeader}
+      ListEmptyComponent={listEmpty}
+      onScrollBeginDrag={onUserScroll}
+      keyboardShouldPersistTaps="handled"
+      initialNumToRender={12}
+      windowSize={7}
+      removeClippedSubviews
+    />
   );
 }
 
@@ -137,19 +154,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: space['2'],
     paddingHorizontal: exploreContentInset,
     paddingVertical: space['2'],
     borderBottomWidth: StyleSheet.hairlineWidth,
+    minHeight: 44,
+  },
+  headerCount: {
+    flexShrink: 1,
+    textAlign: 'right',
   },
   emptyWrap: {
-    flex: 1,
+    flexGrow: 1,
+    minHeight: 120,
   },
   row: {
     borderLeftWidth: 3,
     borderBottomWidth: StyleSheet.hairlineWidth,
     paddingHorizontal: exploreContentInset,
-    paddingVertical: space['2'],
+    paddingVertical: space['3'],
     gap: space['2'],
+    minHeight: 44,
   },
   rowTitle: {
     flexShrink: 1,

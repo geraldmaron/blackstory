@@ -63,7 +63,7 @@ describe('featureAtAGlanceFacts', () => {
         },
       }),
     ).toEqual([
-      { label: 'Era', value: '1860s – 1920s' },
+      { label: 'Era', value: '1860s to 1920s' },
       { label: 'Precision', value: 'Neighborhood' },
     ]);
   });

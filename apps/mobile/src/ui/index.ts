@@ -18,7 +18,13 @@ export { Logo, logoClearSpaceDp, type LogoProps } from './Logo';
 export { LiftedSurface, type LiftedSurfaceProps } from './LiftedSurface';
 export { ListRow, type ListRowProps, type ListRowDensity } from './ListRow';
 export { SectionHeader, type SectionHeaderProps } from './SectionHeader';
-export { ScreenCanvas, screenScrollInsets, type ScreenCanvasProps } from './ScreenCanvas';
+export {
+  ScreenCanvas,
+  screenScrollInsets,
+  useScreenScrollInsets,
+  type ScreenCanvasProps,
+  type ScreenScrollInsets,
+} from './ScreenCanvas';
 export { ScreenHeader, type ScreenHeaderProps } from './ScreenHeader';
 export { EditionPanelHeader, type EditionPanelHeaderProps } from './EditionPanelHeader';
 export { BrowseScreenShell, type BrowseScreenShellProps } from './BrowseScreenShell';

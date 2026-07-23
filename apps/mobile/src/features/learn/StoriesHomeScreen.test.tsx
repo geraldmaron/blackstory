@@ -41,6 +41,7 @@ describe('StoriesHomeScreen', () => {
   it('lists archive stories below the featured band', async () => {
     const { getByText } = await render(<StoriesHomeScreen />);
     expect(getByText('Published stories')).toBeTruthy();
+    expect(getByText(/Catalog · \d+ stor/)).toBeTruthy();
   });
 
   it('navigates to a story when the featured card is pressed', async () => {

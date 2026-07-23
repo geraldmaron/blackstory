@@ -41,6 +41,7 @@ jest.mock('react-native-safe-area-context', () => {
     SafeAreaView: ({ children, style }: { children?: unknown; style?: unknown }) =>
       React.createElement(View, { style }, children as never),
     SafeAreaProvider: ({ children }: { children?: unknown }) => children,
+    useSafeAreaInsets: () => ({ top: 0, right: 0, bottom: 34, left: 0 }),
   };
 });
 
@@ -77,14 +78,49 @@ jest.mock('@gorhom/bottom-sheet', () => {
     testID?: string;
   }) => React.createElement(View, { testID }, children as never);
 
+  const BottomSheetFlatList = (props: {
+    testID?: string;
+    data?: unknown[];
+    renderItem?: (info: { item: unknown }) => unknown;
+    ListHeaderComponent?: unknown;
+    ListEmptyComponent?: unknown;
+    keyExtractor?: (item: unknown) => string;
+  }) => {
+    const header =
+      typeof props.ListHeaderComponent === 'function'
+        ? props.ListHeaderComponent()
+        : props.ListHeaderComponent;
+    const data = props.data ?? [];
+    const empty =
+      data.length === 0 && props.ListEmptyComponent
+        ? typeof props.ListEmptyComponent === 'function'
+          ? props.ListEmptyComponent()
+          : props.ListEmptyComponent
+        : null;
+    return React.createElement(
+      View,
+      { testID: props.testID },
+      header ?? null,
+      empty ?? null,
+      ...data.map((item, index) =>
+        props.renderItem
+          ? props.renderItem({ item })
+          : React.createElement(View, {
+              key: props.keyExtractor?.(item) ?? String(index),
+            }),
+      ),
+    );
+  };
+
   return {
     __esModule: true,
     default: BottomSheet,
     BottomSheetView: Passthrough,
     BottomSheetScrollView: Passthrough,
-    BottomSheetFlatList: Passthrough,
+    BottomSheetFlatList,
     BottomSheetHandle: () => null,
     BottomSheetBackdrop: () => null,
+    useBottomSheetTimingConfigs: (config: unknown) => config,
   };
 });
 
@@ -133,7 +169,6 @@ describe('ExploreView — records rail', () => {
       <ExploreView onOpenEntity={noop} reduceMotion />,
     );
     expect(getByTestId('explore-records-rail')).toBeTruthy();
-    expect(getByTestId('explore-records-list')).toBeTruthy();
     expect(getByTestId('explore-mast-count').props.accessibilityLabel).toBe('All records, 3 records');
     expect(getByTestId('map-attribution')).toBeTruthy();
   });
@@ -151,10 +186,12 @@ describe('ExploreView — records rail', () => {
   });
 
   it('reflects filters in the result count', async () => {
-    const { getByLabelText } = await render(
+    const { getByTestId } = await render(
       <ExploreView filters={{ kind: 'place' }} onOpenEntity={noop} reduceMotion />,
     );
-    expect(getByLabelText(/All records, 2 records · filtered/)).toBeTruthy();
+    expect(getByTestId('explore-mast-count').props.accessibilityLabel).toBe(
+      'All records, 2 records · filtered',
+    );
   });
 
   it('mast count matches the records rail header before viewport is reported', async () => {
@@ -253,7 +290,7 @@ describe('ExploreView — empty + adversarial', () => {
     const utils = await render(
       <ExploreView source={hostile} onOpenEntity={noop} reduceMotion />,
     );
-    expect(utils.getByTestId('explore-records-list')).toBeTruthy();
+    expect(utils.getByTestId('explore-records-rail')).toBeTruthy();
   });
 });
 
@@ -269,6 +306,12 @@ describe('ExploreView — repeated mount/unmount (leak check)', () => {
       .spyOn(AccessibilityInfo, 'addEventListener')
       .mockReturnValue({ remove } as never);
     jest.spyOn(AccessibilityInfo, 'isReduceMotionEnabled').mockResolvedValue(false);
+
+    // Passive effects still pending from earlier tests in this file flush during the
+    // cleanup above and land on the spy as unmatched adds. Reset so the balance below
+    // measures only the mount/unmount cycles it is actually about.
+    addSpy.mockClear();
+    remove.mockClear();
 
     const CYCLES = 25;
     for (let i = 0; i < CYCLES; i += 1) {

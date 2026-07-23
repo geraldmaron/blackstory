@@ -2,28 +2,40 @@
  * Gorhom bottom-sheet host for Explore: peek / half / full snaps over the
  * full-bleed map. Delegates to the shared AppBottomSheet primitive.
  *
- * Snap heights mirror the v7 HTML prototype (22% / 42% / 58% of the tab
- * content area). The sheet renders inside the Explore tab screen, so it sits
- * above the tab bar without a bottom inset; map attribution overlays the peek
- * sliver instead of reserving a gap under the sheet (ADR-025 §8).
+ * Detents are intentionally lower than the v7 HTML prototype (22/42/58): native
+ * Explore also lifts the sheet with tab-bar `bottomInset`, which ate the map.
+ * `bottomInset` still clears the edition tab bar.
  */
 import type { ReactNode } from 'react';
 import { AppBottomSheet } from '../../../ui/AppBottomSheet';
+import {
+  EXPLORE_SHEET_FULL_FRACTION,
+  EXPLORE_SHEET_HALF_FRACTION,
+  EXPLORE_SHEET_PEEK_FRACTION,
+} from './explore-sheet-layout';
 
 /** Snap indices: 0 = peek, 1 = half, 2 = full browse. */
 export const EXPLORE_SHEET_PEEK = 0;
 export const EXPLORE_SHEET_HALF = 1;
 export const EXPLORE_SHEET_FULL = 2;
 
-/** v7 prototype detents — peek rail, preview half, full browse. */
-export const EXPLORE_SHEET_SNAP_POINTS = ['22%', '42%', '58%'] as const;
+function pct(fraction: number): `${number}%` {
+  return `${Math.round(fraction * 100)}%`;
+}
+
+/** Peek rail, selection preview, full browse — map stays the majority surface. */
+export const EXPLORE_SHEET_SNAP_POINTS = [
+  pct(EXPLORE_SHEET_PEEK_FRACTION),
+  pct(EXPLORE_SHEET_HALF_FRACTION),
+  pct(EXPLORE_SHEET_FULL_FRACTION),
+] as const;
 
 /** Peek height as a percentage string (instruments panel + attribution clearance). */
-export const EXPLORE_SHEET_PEEK_HEIGHT: `${number}%` = '22%';
+export const EXPLORE_SHEET_PEEK_HEIGHT: `${number}%` = pct(EXPLORE_SHEET_PEEK_FRACTION);
 
 /**
- * Sheet bottom inset. Kept at 0 — Explore tab content already ends above the
- * tab bar; safe-area padding lives on the tab bar itself.
+ * Default sheet bottom inset when tab bar height is unavailable (tests).
+ * ExploreView passes the live tab bar height from React Navigation.
  */
 export const EXPLORE_SHEET_BOTTOM_INSET = 0;
 
@@ -37,6 +49,15 @@ export type ExploreBottomSheetProps = {
   readonly hasSelection?: boolean;
   readonly reduceMotion?: boolean;
   readonly testID?: string;
+  /** Lift sheet above the edition tab bar (from `useBottomTabBarHeight`). */
+  readonly bottomInset?: number;
+  /** Scrollable body for entity preview (facts + CTA below fold). */
+  readonly scrollable?: boolean;
+  /**
+   * Records-rail mode: child is a BottomSheetFlatList (no View/ScrollView wrap)
+   * so browse scrolling and sheet snap gestures stay in sync.
+   */
+  readonly sheetList?: boolean;
   /** Fired when the sheet settles on peek / half / full. */
   readonly onSnapIndexChange?: (index: number) => void;
 };
@@ -47,6 +68,9 @@ export function ExploreBottomSheet({
   hasSelection = false,
   reduceMotion = false,
   testID = 'explore-bottom-sheet',
+  bottomInset = EXPLORE_SHEET_BOTTOM_INSET,
+  scrollable = false,
+  sheetList = false,
   onSnapIndexChange,
 }: ExploreBottomSheetProps) {
   const resolvedIndex =
@@ -57,7 +81,9 @@ export function ExploreBottomSheet({
       snapIndex={resolvedIndex}
       snapPoints={EXPLORE_SHEET_SNAP_POINTS}
       reduceMotion={reduceMotion}
-      bottomInset={EXPLORE_SHEET_BOTTOM_INSET}
+      bottomInset={bottomInset}
+      scrollable={scrollable}
+      sheetList={sheetList}
       testID={testID}
       accessibilityLabel="Explore records sheet"
       onSnapIndexChange={onSnapIndexChange}

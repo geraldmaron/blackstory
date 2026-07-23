@@ -9,7 +9,6 @@
  * Variants follow v6 copper discipline: primary = ink fill; accent = copper navigational CTA;
  * secondary/ghost for supporting actions.
  */
-import { useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -18,9 +17,11 @@ import {
   View,
 } from 'react-native';
 import { Text } from './Text';
-import { radius, space, useThemeColors } from './tokens';
+import { MIN_TOUCH_TARGET, radius, space, useThemeColors } from './tokens';
 
-const MIN_TOUCH_TARGET = 44;
+/** Visual box height for `density="compact"` — the 44dp target is restored via hitSlop. */
+const COMPACT_BOX_HEIGHT = 32;
+const COMPACT_HIT_SLOP = { top: 6, bottom: 6, left: 8, right: 8 } as const;
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'accent';
 export type ButtonDensity = 'default' | 'compact';
@@ -60,14 +61,22 @@ export function Button({
   ...rest
 }: ButtonProps) {
   const theme = useThemeColors();
-  const [pressed, setPressed] = useState(false);
   const isDisabled = Boolean(disabled) || loading;
 
+  // `pressedBg` shifts the fill tone rather than dimming the whole button — a blanket
+  // opacity drop fades the border and label along with the fill, which reads as
+  // "disabled" instead of "pressed". Tones are token-only and visible in both themes
+  // (note surfaceRaised === surface in the light theme, so it cannot be used here).
   const palette = {
-    primary: { bg: theme.ink, fg: theme.inverseInk, border: theme.ink },
-    secondary: { bg: theme.surface, fg: theme.ink, border: theme.border },
-    ghost: { bg: 'transparent', fg: theme.accent, border: 'transparent' },
-    accent: { bg: theme.ink, fg: theme.inverseInk, border: theme.accentGraphic },
+    primary: { bg: theme.ink, pressedBg: theme.inkMuted, fg: theme.inverseInk, border: theme.ink },
+    secondary: { bg: theme.surface, pressedBg: theme.border, fg: theme.ink, border: theme.border },
+    ghost: { bg: 'transparent', pressedBg: theme.border, fg: theme.accent, border: 'transparent' },
+    accent: {
+      bg: theme.ink,
+      pressedBg: theme.inkMuted,
+      fg: theme.inverseInk,
+      border: theme.accentGraphic,
+    },
   }[variant];
 
   return (
@@ -76,17 +85,16 @@ export function Button({
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityState={{ disabled: isDisabled, busy: loading, ...accessibilityState }}
       disabled={isDisabled}
-      hitSlop={8}
-      onPressIn={() => setPressed(true)}
-      onPressOut={() => setPressed(false)}
+      hitSlop={density === 'compact' ? COMPACT_HIT_SLOP : 8}
+      android_ripple={{ color: palette.pressedBg }}
       onPress={onPress}
-      style={[
+      style={({ pressed }) => [
         styles.base,
         density === 'compact' ? styles.compact : null,
         {
-          backgroundColor: palette.bg,
+          backgroundColor: pressed && !isDisabled ? palette.pressedBg : palette.bg,
           borderColor: palette.border,
-          opacity: isDisabled ? 0.5 : pressed ? 0.85 : 1,
+          opacity: isDisabled ? 0.5 : 1,
         },
         variant === 'accent' ? styles.accentBorder : null,
       ]}
@@ -127,7 +135,7 @@ const styles = StyleSheet.create({
     gap: space['2'],
   },
   compact: {
-    minHeight: MIN_TOUCH_TARGET,
+    minHeight: COMPACT_BOX_HEIGHT,
     paddingHorizontal: space['3'],
     paddingVertical: space['1'],
   },

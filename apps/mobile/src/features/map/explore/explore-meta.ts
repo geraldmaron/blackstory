@@ -44,7 +44,7 @@ function eraLabel(properties: PreviewMetaFeature['properties']): string | null {
     .filter((bucket) => bucket.length > 0);
   if (buckets.length === 0) return null;
   if (buckets.length === 1) return buckets[0]!;
-  return `${buckets[0]!} – ${buckets[buckets.length - 1]!}`;
+  return `${buckets[0]!} to ${buckets[buckets.length - 1]!}`;
 }
 
 function precisionLabel(properties: PreviewMetaFeature['properties']): string | null {

@@ -197,13 +197,86 @@ api-public (LAN or deployed).
 
 ### Local Dev → live Supabase via api-public
 
-Terminal A — start `api-public` on `:8080`. From the repo root, build shared contracts
-once if this is a fresh clone (`pnpm install && pnpm --filter @repo/public-contracts build`).
+#### Path A — Prod-like local QA (**agent default**; no Metro)
 
-`DATABASE_URL` must already be in the shell: either in `~/.env.1password` (via
-`run-with-dev-secrets`) or in `apps/web/.env.local`. Do **not** put inline `#` comments on
-the same line as shell commands when pasting — zsh will wait for a closing quote
-(`cmdand cmdand quote>`).
+Store and preview builds ship an **embedded JS bundle** and never connect to a packager.
+**Agents:** run `pnpm mobile:ios:verify` before claiming mobile works. Do **not** use Metro `/status` on `127.0.0.1:8081` or open the Debug dev client expecting prod behavior.
+
+```bash
+pnpm mobile:ios:release      # build/install/launch Release on booted Simulator
+pnpm mobile:ios:verify       # agent gate: api-public + Release app; Metro NOT checked
+pnpm mobile:ios:launch       # relaunch installed Release app only
+```
+
+Requires `API_BASE_URL=http://127.0.0.1:8080` in `apps/mobile/.env.local` (Simulator).
+Rebuild `pnpm mobile:ios:release` after JS changes (no hot reload).
+
+#### Path B — Dev Client + Metro (hot reload only)
+
+The **Debug dev client** (`BlackStory (Dev)`) requires Metro. It persists the last packager URL
+in iOS UserDefaults (`expo.devlauncher.recentlyopenedapps`); `:8083` from an old session beats
+reload and causes the red screen even when agents verified `127.0.0.1:8081`. Only use this path
+when actively editing JS with hot reload:
+
+```bash
+pnpm dev:mobile
+pnpm dev:mobile:verify   # LAN host:8081 bundle smoke + stale client port check
+pnpm dev:mobile:start    # background Metro + auto-reset booted Simulator packager URL
+bash scripts/reset-ios-dev-client.sh   # repoint Simulator off dead :8082/:8083
+```
+
+**One command (Path B):** from the repo root or `apps/mobile`, the dev launcher ensures
+api-public on `:8080`, writes `.local/metro-endpoint.json`, starts Metro on `:8081` at your Mac
+LAN IP, and resets a booted iOS Simulator dev client when it still targets a stale sibling port:
+
+```bash
+pnpm dev:mobile
+# or: cd apps/mobile && pnpm dev
+```
+
+**Agent gate for Path B only** (do not use for prod-like QA):
+
+```bash
+pnpm dev:mobile:verify
+```
+
+Healthy (Path B) means: Metro on LAN `:8081`, entry bundle HTTP 200 on that LAN URL, and booted
+Simulator dev client not pinned to a stale sibling port. `/status` on `127.0.0.1` alone is not enough.
+
+Ensure api-public only (without Metro):
+
+```bash
+pnpm ensure-api-public
+```
+
+Ensure Metro only (Path B background):
+
+```bash
+pnpm ensure-metro
+```
+
+Probe Metro JSON (Path B contract):
+
+```bash
+node scripts/probe-metro.mjs
+```
+
+`pnpm start` inside `apps/mobile` also runs the ensure step first (`prestart`). Logs for a
+background api-public live in `.local/api-public.log`; background Metro logs in `.local/metro.log`.
+
+Physical device Path B: open `blackstory://expo-development-client/?url=http%3A%2F%2F<LAN-IP>%3A8081`
+or scan the QR from `pnpm dev:mobile`. Physical device Path A: install a Release/Preview EAS build.
+
+**One-time setup:** set `API_BASE_URL=http://127.0.0.1:8080` in `apps/mobile/.env.local`
+(iOS Simulator). Physical devices need the Mac LAN IP instead (see below).
+
+`DATABASE_URL` must be available for the launcher to start api-public: either in
+`apps/web/.env.local` or via `run-with-dev-secrets` (`~/.env.1password`).
+
+#### Manual api-public (fallback)
+
+From the repo root, build shared contracts once on a fresh clone
+(`pnpm install && pnpm --filter @repo/public-contracts build`).
 
 **Option 1 — `DATABASE_URL` in 1Password (`~/.env.1password`):**
 
@@ -225,7 +298,7 @@ set +a
 env PUBLIC_DATA_SOURCE=postgres DATABASE_SSL=1 pnpm dev
 ```
 
-Smoke (separate terminal):
+#### Smoke checks
 
 ```bash
 curl -sS 'http://127.0.0.1:8080/v1/health' | jq .
@@ -239,23 +312,23 @@ curl -sS -H 'X-BlackStory-Client: mobile/1.0.0; api=1' \
 # not ~791 (legacy four-kind filter).
 ```
 
-After changing `@repo/public-contracts` kinds, restart `api-public` so `/v1/map` picks up the rebuild:
+After changing `@repo/public-contracts` kinds, restart api-public so `/v1/map` picks up the rebuild:
 
 ```bash
-# stop the old :8080 process, then:
-cd apps/api-public
-set -a && source ../web/.env.local && set +a
-env PUBLIC_DATA_SOURCE=postgres DATABASE_SSL=1 pnpm dev
+pnpm ensure-api-public
 ```
 
-Terminal B — point BlackStory (Dev) at the API. Set `API_BASE_URL=http://127.0.0.1:8080`
-in `apps/mobile/.env.local` (simulator). On a physical device use the Mac LAN IP instead
-(for example `http://192.168.1.50:8080`).
+#### Port conflicts
 
-```bash
-cd apps/mobile
-npx expo start --dev-client --clear
-```
+`infra/firebase/firebase.json` assigns the Firestore emulator to `:8080`, same as api-public.
+The ensure script **refuses** to kill unknown processes. Stop `pnpm firebase:emulators` before
+mobile dev, or reconfigure the emulator port.
+
+#### Physical device
+
+Set `API_BASE_URL=http://<MAC_LAN_IP>:8080` in `apps/mobile/.env.local`. Start api-public on the
+Mac (via `pnpm ensure-api-public` or `pnpm dev:mobile`), then open BlackStory (Dev) on the device.
+The ensure script does not rewrite LAN URLs; it only auto-starts api-public on loopback.
 
 Metro should log `[blackstory] apiBaseUrl=…` and
 `[blackstory] apiBaseUrl=… { bootstrapSync: … }`. An unreachable host logs

@@ -3,16 +3,22 @@
  * Single source for v6 mobile shell tokens; tab and stack layouts consume these
  * hooks instead of Expo defaults with an ad-hoc tint.
  */
-import type { ReactNode } from 'react';
+import { useContext, type ReactNode } from 'react';
 import { Platform, StyleSheet } from 'react-native';
-import type { BottomTabNavigationOptions } from 'expo-router/build/react-navigation/bottom-tabs';
+import {
+  BottomTabBarHeightContext,
+  type BottomTabNavigationOptions,
+} from 'expo-router/build/react-navigation/bottom-tabs';
 import type { NativeStackNavigationOptions } from 'expo-router/build/react-navigation/native-stack';
+
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { NavIcon, type NavIconName } from '@/ui/NavIcon';
 import { resolveFontFamily } from '@/ui/fonts';
-import { useThemeColors } from '@/ui/tokens';
+import { typeScale, useThemeColors } from '@/ui/tokens';
 
-const TAB_LABEL_SIZE = 11;
+const TAB_LABEL_SIZE = typeScale.caption.size;
+const STACK_TITLE_SIZE = typeScale.bodyEmphasis.size;
 
 /** Bottom tab bar options — matte Surface plate, copper active, Inter labels. */
 export function useEditionTabBarOptions(): BottomTabNavigationOptions {
@@ -20,6 +26,7 @@ export function useEditionTabBarOptions(): BottomTabNavigationOptions {
 
   return {
     headerShown: false,
+    tabBarHideOnKeyboard: true,
     tabBarActiveTintColor: theme.accent,
     tabBarInactiveTintColor: theme.inkMuted,
     tabBarStyle: {
@@ -50,7 +57,7 @@ export function useEditionStackScreenOptions(): NativeStackNavigationOptions {
     headerTitleStyle: {
       color: theme.ink,
       fontFamily: resolveFontFamily('uiBody', '600'),
-      fontSize: 17,
+      fontSize: STACK_TITLE_SIZE,
     },
     contentStyle: { backgroundColor: theme.canvas },
   };
@@ -71,6 +78,27 @@ export type EditionTabIconRenderer = (props: {
   focused: boolean;
   size: number;
 }) => ReactNode;
+
+/**
+ * Fallback tab icon row height excluding safe area (Expo default) when the
+ * caller is outside a bottom-tab screen and `useBottomTabBarHeight` is unavailable.
+ */
+export const EDITION_TAB_BAR_BODY = 49;
+
+/**
+ * Bottom inset for sheets that must clear the edition tab bar.
+ * Prefers the measured height from `BottomTabBarHeightContext` (same source as
+ * `useBottomTabBarHeight`) when inside a tab screen; otherwise falls back to
+ * body height + safe-area bottom.
+ */
+export function useEditionTabBarInset(): number {
+  const insets = useSafeAreaInsets();
+  const measuredTabBarHeight = useContext(BottomTabBarHeightContext);
+  if (typeof measuredTabBarHeight === 'number') {
+    return measuredTabBarHeight;
+  }
+  return EDITION_TAB_BAR_BODY + insets.bottom;
+}
 
 /** Factory for Expo Router `tabBarIcon` slots. */
 export function editionTabIcon(name: NavIconName): EditionTabIconRenderer {
