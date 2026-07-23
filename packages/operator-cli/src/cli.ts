@@ -1103,7 +1103,7 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
           const bridgeClient: EnrichmentBridgeClient = {
             complete: async (prompt: string) => {
               const res = await provider.complete({
-                model: model ?? 'mock-enrichment',
+                model: model ?? '',
                 messages: [{ role: 'user', content: prompt }],
               });
               return res.content;
