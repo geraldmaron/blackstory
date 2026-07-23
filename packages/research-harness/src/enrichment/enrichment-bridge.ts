@@ -35,11 +35,21 @@ export interface AdjudicatedRelationship {
 
 /** Enriches a raw subject candidate using the LLM client. */
 export async function enrichSubjectCandidate(
-  subject: HarnessRawSubject,
+  subject: HarnessRawSubject & { existingEntityId?: string | null },
   client: EnrichmentBridgeClient,
+  theme: string,
+  metro: string,
 ): Promise<EnrichedCandidate> {
+  const isDuplicate = !!subject.existingEntityId;
+  const backfillInstruction = isDuplicate
+    ? `This candidate matches an existing canonical entity (${subject.existingEntityId}). Your primary goal is to EXTRACT AND BACKFILL missing biographical, geographical, or relationship claims from the provided text.`
+    : `This is a new entity candidate. Your goal is to extract its core facts, coordinates, and historical context.`;
+
   const prompt = `
-You are a historical research assistant. Enrich the following raw entity/place record.
+You are a domain-agnostic research assistant. Analyze the following raw entity/place record.
+Theme Context: ${theme}
+Metro Area: ${metro}
+
 Title: ${subject.title}
 Description: ${subject.description}
 Coordinates: ${subject.coordinates ? `${subject.coordinates.latitude}, ${subject.coordinates.longitude}` : 'Unknown'}
@@ -47,11 +57,16 @@ State: ${subject.state || 'Unknown'}
 County: ${subject.county || 'Unknown'}
 Cites: ${subject.cites.join(', ') || 'None'}
 
-Provide the response in the following JSON format:
+INSTRUCTIONS:
+1. ${backfillInstruction}
+2. Think step-by-step. Validate geographic coordinates and temporal timelines before asserting facts.
+3. Output the result in the exact JSON schema below.
+
 {
+  "reasoning": "Step-by-step logic validating your extractions and confidence scores",
   "title": "Normalized display name",
-  "publicSummary": "A concise 1-2 sentence description of the historical significance",
-  "historicalContext": "Paragraph placing this entity in the context of general Black history",
+  "publicSummary": "A concise 1-2 sentence description of its significance to the theme",
+  "historicalContext": "Paragraph placing this entity in the broader context of the theme (${theme})",
   "latitude": 0.0, // Float, optional
   "longitude": 0.0, // Float, optional
   "confidence": 0.0, // Float 0-1
@@ -93,9 +108,14 @@ Provide the response in the following JSON format:
 export async function adjudicateRelationship(
   overlap: SpatialTemporalOverlap,
   client: EnrichmentBridgeClient,
+  theme: string,
+  metro: string,
 ): Promise<AdjudicatedRelationship> {
   const prompt = `
-Analyze the potential historical relationship between these two co-occurring entities:
+You are a domain-agnostic research assistant. Analyze the potential relationship between these two co-occurring entities.
+Theme Context: ${theme}
+Metro Area: ${metro}
+
 Entity A:
 - Title: ${overlap.subjectA.title}
 - Description: ${overlap.subjectA.description}
@@ -104,15 +124,19 @@ Entity B:
 - Title: ${overlap.subjectB.title}
 - Description: ${overlap.subjectB.description}
 
-Shared Policy Eras: ${overlap.policyEras.join(', ')}
+Shared Temporal Windows: ${overlap.temporalWindows.join(', ')}
 Geographic Distance: ${overlap.distanceMeters ? `${overlap.distanceMeters} meters` : 'Nearby'}
 
-Decide if there is a direct historical connection (e.g. founder, benefactor, student, member, adjacent site) based on the relationship taxonomy.
-Provide the response in the following JSON format:
+INSTRUCTIONS:
+1. Think step-by-step. Validate the geographic and temporal alignment before asserting any relationship.
+2. Decide if there is a direct connection (e.g. founder, benefactor, student, member, adjacent site).
+3. Output the result in the exact JSON schema below.
+
 {
+  "reasoning": "Step-by-step logic validating the relationship based on geographic and temporal evidence",
   "relationType": "type from taxonomy (e.g., founder / member / associated_site / none)",
   "confidence": 0.0, // Float 0-1
-  "rationale": "Historical evidence and reasoning linking these two entities"
+  "rationale": "Concise historical evidence linking these two entities"
 }
   `.trim();
 

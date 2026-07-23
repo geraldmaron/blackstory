@@ -1,4 +1,4 @@
-export type ConnectorKind = 'nps_network_to_freedom' | 'dpla' | 'wikidata';
+export type ConnectorKind = 'nps_network_to_freedom' | 'dpla' | 'wikidata' | 'web_search';
 
 export interface HarnessRawSubject {
   readonly id: string;

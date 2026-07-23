@@ -6,7 +6,7 @@ import {
 } from './core/connector.js';
 import {
   findSpatialTemporalOverlaps,
-  resolvePolicyErasForYear,
+  resolveTemporalWindowsForYear,
   extractYearFromText,
 } from './core/adjacency.js';
 import {
@@ -63,7 +63,7 @@ test('Spatial-Temporal Adjacency Overlaps', () => {
       id: 'sub-2',
       connectorKind: 'nps_network_to_freedom' as const,
       title: 'Site B',
-      description: 'Established in 1950.',
+      description: 'Established in 1948.',
       coordinates: { latitude: 38.910, longitude: -77.018 },
       cites: [],
       rawRecord: {},
@@ -72,12 +72,12 @@ test('Spatial-Temporal Adjacency Overlaps', () => {
 
   const overlaps = findSpatialTemporalOverlaps(subjects, { maxDistanceMeters: 1000 });
   assert.strictEqual(overlaps.length, 1);
-  assert.strictEqual(overlaps[0].policyEras.includes('holc_fha'), true);
+  assert.strictEqual(overlaps[0].temporalWindows.includes('20th_century_early'), true);
   assert.ok(overlaps[0].distanceMeters! < 1000);
 });
 
-test('Policy Era Resolution & Year Extraction', () => {
-  assert.deepStrictEqual(resolvePolicyErasForYear(1940), ['holc_fha', 'pre_drug_war']);
+test('Temporal Window Resolution & Year Extraction', () => {
+  assert.deepStrictEqual(resolveTemporalWindowsForYear(1940), ['20th_century_early']);
   assert.strictEqual(extractYearFromText('Founded in 1867 in Baltimore'), 1867);
   assert.strictEqual(extractYearFromText('No date here'), undefined);
 });
@@ -85,7 +85,7 @@ test('Policy Era Resolution & Year Extraction', () => {
 test('LLM Enrichment Bridge Mock Calling', async () => {
   const mockClient: EnrichmentBridgeClient = {
     async complete(prompt) {
-      if (prompt.includes('potential historical relationship')) {
+      if (prompt.includes('potential relationship')) {
         return JSON.stringify({
           relationType: 'associated_site',
           confidence: 0.85,
@@ -114,7 +114,7 @@ test('LLM Enrichment Bridge Mock Calling', async () => {
     rawRecord: {},
   };
 
-  const enriched = await enrichSubjectCandidate(subject, mockClient);
+  const enriched = await enrichSubjectCandidate(subject, mockClient, 'housing', 'Chicago');
   assert.strictEqual(enriched.title, 'Mock Normalized Title');
   assert.strictEqual(enriched.confidence, 0.9);
 });

@@ -72,6 +72,11 @@ import {
   type AdjudicatedRelationship,
 } from '@repo/research-harness';
 import { assertPostgresOpsDataSource, editorialCatalogFromError } from './ops-data-source-gate.js';
+import {
+  buildBraveWebSearchUrl,
+  parseBraveSearchResponse,
+  type WebSearchRawResult,
+} from '@repo/domain';
 
 export type CliDependencies = {
   readonly store?: AtomicStore;
@@ -1011,6 +1016,40 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
           rawSubjects = [...rawSubjects, ...fetchDplaItems(mockDpla, { query })];
         }
 
+        if (connectorList.includes('web_search')) {
+          const searchQuery = `${theme} ${metro} historical sites`;
+          try {
+            const apiKey = process.env.BRAVE_SEARCH_API_KEY;
+            let rawResults: readonly WebSearchRawResult[];
+            if (apiKey) {
+              const res = await fetch(buildBraveWebSearchUrl({ query: searchQuery }), {
+                headers: { 'X-Subscription-Token': apiKey },
+              });
+              const json: unknown = await res.json();
+              rawResults = parseBraveSearchResponse(json).results;
+            } else {
+              rawResults = [
+                {
+                  title: 'Mock Discovery Site',
+                  description: `Mock finding for ${searchQuery}`,
+                  url: 'https://example.com/mock',
+                },
+              ];
+            }
+            const webSubjects: HarnessRawSubject[] = rawResults.slice(0, 5).map((result, index) => ({
+              id: `web-${index}`,
+              connectorKind: 'web_search',
+              title: result.title ?? 'Unknown Page',
+              description: result.description ?? '',
+              cites: [result.url],
+              rawRecord: { ...result },
+            }));
+            rawSubjects = [...rawSubjects, ...webSubjects];
+          } catch (err) {
+            stderr(`Warning: Web search failed: ${String(err)}\n`);
+          }
+        }
+
         // 2. Fetch existing catalog profiles from Postgres for deduplication check
         let existingProfiles: { name: string; entity_id: string }[] = [];
         try {
@@ -1038,7 +1077,7 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
           };
         });
 
-        const overlaps = findSpatialTemporalOverlaps(rawSubjects, { maxDistanceMeters: 10000 });
+        const overlaps = findSpatialTemporalOverlaps(deduplicatedSubjects, { maxDistanceMeters: 10000 });
 
         type EnrichmentFailure = { readonly id: string; readonly error: string };
         type RelationFailure = {
@@ -1071,9 +1110,9 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
             },
           };
 
-          for (const subject of rawSubjects) {
+          for (const subject of deduplicatedSubjects) {
             try {
-              const candidate = await enrichSubjectCandidate(subject, bridgeClient);
+              const candidate = await enrichSubjectCandidate(subject, bridgeClient, theme, metro);
               enrichedCandidates.push(candidate);
             } catch (err) {
               enrichedCandidates.push({ id: subject.id, error: String(err) });
@@ -1082,7 +1121,7 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
 
           for (const overlap of overlaps) {
             try {
-              const relation = await adjudicateRelationship(overlap, bridgeClient);
+              const relation = await adjudicateRelationship(overlap, bridgeClient, theme, metro);
               adjudicatedRelations.push(relation);
             } catch (err) {
               adjudicatedRelations.push({
@@ -1162,7 +1201,8 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
       }
       default: {
         stderr(
-          'Usage: operator-cli <preflight|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|sundown-town-brief|harness-run|locate> [flags]',
+          'Usage: operator-cli <preflight|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|sundown-town-brief|harness-run|locate> [flags]\n' +
+          'For harness-run: --theme <theme> --metro <metro> [--connectors dpla,nps_network_to_freedom,web_search] [--enrich] [--provider openrouter|ollama|mock]\n'
         );
         return command ? 1 : 0;
       }

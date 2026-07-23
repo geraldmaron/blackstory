@@ -6,7 +6,7 @@ export interface SpatialTemporalOverlap {
   readonly subjectB: HarnessRawSubject;
   readonly distanceMeters?: number | undefined;
   readonly sharedGeohashPrefix?: string | undefined;
-  readonly policyEras: readonly string[];
+  readonly temporalWindows: readonly string[];
 }
 
 export type PolicyEraConfig = {
@@ -15,19 +15,18 @@ export type PolicyEraConfig = {
   readonly endYear: number;
 };
 
-export const JUXTAPOSITION_ERAS: readonly PolicyEraConfig[] = [
-  { id: 'holc_fha', startYear: 1933, endYear: 1968 },
-  { id: 'fair_housing', startYear: 1968, endYear: 1985 },
-  { id: 'cra_contemporary', startYear: 1985, endYear: 2026 },
-  { id: 'pre_drug_war', startYear: 1800, endYear: 1970 },
-  { id: 'drug_war_escalation', startYear: 1971, endYear: 1985 },
-  { id: 'crack_cocaine_era', startYear: 1986, endYear: 2010 },
-  { id: 'sentencing_reform', startYear: 2010, endYear: 2026 },
+export const GENERIC_TEMPORAL_WINDOWS: readonly PolicyEraConfig[] = [
+  { id: '18th_century', startYear: 1700, endYear: 1799 },
+  { id: '19th_century_early', startYear: 1800, endYear: 1849 },
+  { id: '19th_century_late', startYear: 1850, endYear: 1899 },
+  { id: '20th_century_early', startYear: 1900, endYear: 1949 },
+  { id: '20th_century_late', startYear: 1950, endYear: 1999 },
+  { id: '21st_century_early', startYear: 2000, endYear: 2049 },
 ];
 
-/** Resolve policy eras for a given year. */
-export function resolvePolicyErasForYear(year: number): readonly string[] {
-  return JUXTAPOSITION_ERAS.filter((era) => year >= era.startYear && year <= era.endYear).map((era) => era.id);
+/** Resolve generic temporal windows for a given year. */
+export function resolveTemporalWindowsForYear(year: number): readonly string[] {
+  return GENERIC_TEMPORAL_WINDOWS.filter((era) => year >= era.startYear && year <= era.endYear).map((era) => era.id);
 }
 
 /** Parses a year from text description. */
@@ -49,13 +48,13 @@ export function findSpatialTemporalOverlaps(
     const a = subjects[i];
     if (!a) continue;
     const yearA = extractYearFromText(a.description) || extractYearFromText(a.title);
-    const erasA = yearA !== undefined ? resolvePolicyErasForYear(yearA) : [];
+    const erasA = yearA !== undefined ? resolveTemporalWindowsForYear(yearA) : [];
 
     for (let j = i + 1; j < subjects.length; j++) {
       const b = subjects[j];
       if (!b) continue;
       const yearB = extractYearFromText(b.description) || extractYearFromText(b.title);
-      const erasB = yearB !== undefined ? resolvePolicyErasForYear(yearB) : [];
+      const erasB = yearB !== undefined ? resolveTemporalWindowsForYear(yearB) : [];
 
       const sharedEras = erasA.filter((era) => erasB.includes(era));
       if (sharedEras.length === 0) continue;
@@ -83,7 +82,7 @@ export function findSpatialTemporalOverlaps(
             subjectB: b,
             distanceMeters: Math.round(distance),
             ...(sharedPrefix ? { sharedGeohashPrefix: sharedPrefix } : {}),
-            policyEras: sharedEras,
+            temporalWindows: sharedEras,
           });
         }
       }
