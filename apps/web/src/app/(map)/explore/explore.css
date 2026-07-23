@@ -357,7 +357,7 @@
 
 .ds-nc__fact-link,
 .ds-result-meta__link {
-  color: var(--ds-accent-text);
+  color: var(--ds-accent);
   text-decoration: underline;
   text-underline-offset: 0.12em;
 }
@@ -476,7 +476,7 @@
 .ds-explore__layer-model-option input {
   width: 1.125rem;
   height: 1.125rem;
-  accent-color: var(--ds-copper-text);
+  accent-color: var(--ds-accent);
 }
 
 .ds-explore__layer-model-range {

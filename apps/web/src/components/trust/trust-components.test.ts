@@ -113,7 +113,7 @@ test('ResearchPipelineSketch exposes a text alternative for the pipeline figure'
 test('ResearchPipelineSketch compact uses a condensed SVG and omits the stage legend', () => {
   const html = renderToStaticMarkup(createElement(ResearchPipelineSketch, { compact: true }));
   assert.match(html, /ds-pipeline-sketch--compact/);
-  assert.match(html, /Research pipeline — intake to publish gate/);
+  assert.match(html, /Research pipeline: intake to publish gate/);
   assert.match(html, /Local server/);
   assert.match(html, /Publish gate/);
   assert.match(html, /viewBox="0 0 720 268"/);

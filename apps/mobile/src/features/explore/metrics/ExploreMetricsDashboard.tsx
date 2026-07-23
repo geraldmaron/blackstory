@@ -190,7 +190,7 @@ export function ExploreMetricsDashboard({
         />
         <MetricStatRow
           value={
-            metrics.eraCoveragePercent != null ? `${metrics.eraCoveragePercent}%` : '—'
+            metrics.eraCoveragePercent != null ? `${metrics.eraCoveragePercent}%` : 'n/a'
           }
           label="Era-labeled"
           accessibilityLabel={
@@ -204,7 +204,7 @@ export function ExploreMetricsDashboard({
           value={
             honesty.cityOrCoarserPercent != null
               ? `${honesty.cityOrCoarserPercent}%`
-              : '—'
+              : 'n/a'
           }
           label="City+"
           accessibilityLabel={

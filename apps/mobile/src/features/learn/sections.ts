@@ -57,14 +57,14 @@ export const MORE_SECTIONS: readonly LearnMoreSectionRow[] = [
   {
     routeId: 'about',
     title: 'About',
-    subtitle: 'web: /about',
+    subtitle: 'Mission, scope, and how to reach us',
     catalogSection: 'about',
     directSlug: 'about',
   },
   {
     routeId: 'facts',
     title: 'Quick facts',
-    subtitle: 'web: /facts',
+    subtitle: 'Key figures and project scope at a glance',
     catalogSection: 'facts',
     directSlug: 'quick-facts',
   },
@@ -77,7 +77,7 @@ export const MORE_SECTIONS: readonly LearnMoreSectionRow[] = [
   {
     routeId: 'privacy',
     title: 'Privacy',
-    subtitle: 'What this app collects — and does not',
+    subtitle: 'What this app collects, and what it does not',
     catalogSection: 'legal',
     directSlug: 'privacy',
   },

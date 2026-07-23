@@ -5,10 +5,41 @@
  *
  * ExploreListChrome is sheet-body chrome only (fill the bottom-sheet content
  * area). It is no longer a permanent flex sibling under the map.
+ *
+ * `getExploreCockpitColors` pins floating map instruments to brand-fixed dark
+ * ink-glass in both reader themes (design-direction-v5 cockpit law).
  */
 import type { ReactNode } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
-import { radius, useGradient, useShadowStyle, useThemeColors, type ShadowLevel } from '@/ui';
+import { radius, themeColors, useGradient, useShadowStyle, useThemeColors, type ShadowLevel } from '@/ui';
+
+/** Brand charcoal — explore cockpit glass base (flat matte, no reader-theme paper). */
+const BRAND_CHARCOAL = '#161616';
+
+const COCKPIT_GLASS_OPACITY = 0.92;
+
+function hexToRgba(hex: string, alpha: number): string {
+  const normalized = hex.replace('#', '');
+  const r = parseInt(normalized.slice(0, 2), 16);
+  const g = parseInt(normalized.slice(2, 4), 16);
+  const b = parseInt(normalized.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+/** Fixed dark ink-glass palette for floating Explore instruments (both reader themes). */
+export function getExploreCockpitColors() {
+  const dark = themeColors.dark;
+  return {
+    surface: hexToRgba(BRAND_CHARCOAL, COCKPIT_GLASS_OPACITY),
+    surfaceRaised: hexToRgba(dark.surfaceRaised, COCKPIT_GLASS_OPACITY),
+    border: dark.border,
+    ink: dark.ink,
+    inkMuted: dark.inkMuted,
+    accent: dark.accent,
+  } as const;
+}
+
+export type ExploreCockpitColors = ReturnType<typeof getExploreCockpitColors>;
 
 const ACCENT_WIDTH = 2;
 

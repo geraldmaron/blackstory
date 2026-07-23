@@ -47,6 +47,10 @@ export type ShellHeaderProps = {
   readonly brandLockup: ShellBrandAssets;
   /** Light-canvas and dark-canvas symbol paths (official kit artwork). */
   readonly brandSymbol: ShellBrandAssets;
+  /** Lockup at brand minimum on document routes; symbol-only on map-heavy routes like `/explore`. */
+  readonly brandDisplay?: 'lockup' | 'symbol';
+  /** Copper is max one per composition — home demotes the shell CTA when the hero carries copper. */
+  readonly ctaVariant?: 'copper' | 'quiet';
   readonly cta?: ShellNavItem;
   /** Extra trailing tools (sign out, session email, etc.). Theme toggle always included. */
   readonly tools?: ReactNode;
@@ -107,6 +111,8 @@ export function ShellHeader({
   overflowNav,
   brandLockup,
   brandSymbol,
+  brandDisplay = 'lockup',
+  ctaVariant = 'copper',
   cta,
   tools,
   renderLink = DefaultLink,
@@ -152,12 +158,18 @@ export function ShellHeader({
   }, [menuOpen, isDesktop]);
 
   return (
-    <header ref={headerRef} className="ds-shell-header">
+    <header
+      ref={headerRef}
+      className={cx(
+        'ds-shell-header',
+        brandDisplay === 'symbol' && 'ds-shell-header--symbol-only',
+      )}
+    >
       <div className="ds-shell-header__inner">
         {renderLink({
           href: homeHref,
           className: 'ds-shell-wordmark',
-          'aria-label': 'BlackStory — home',
+          'aria-label': 'BlackStory · home',
           children: (
             <>
               <img
@@ -237,7 +249,10 @@ export function ShellHeader({
           {cta
             ? renderLink({
                 href: cta.href,
-                className: 'ds-shell-header__cta',
+                className: cx(
+                  'ds-shell-header__cta',
+                  ctaVariant === 'quiet' && 'ds-shell-header__cta--quiet',
+                ),
                 children: cta.label,
               })
             : null}

@@ -1616,6 +1616,7 @@ export function MapStageProvider({
           (window as unknown as Record<string, unknown>).__bpMapStage = map;
         }
         map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+        map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
         map.on('error', (event) => {
           console.error('[MapStage]', event.error);
         });

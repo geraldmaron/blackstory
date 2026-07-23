@@ -11,7 +11,7 @@
  * fully covers this pill. Explore may hide it when the sheet is half/full.
  */
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
-import { Text } from '@/ui';
+import { radius, space, Text, themeColors, useThemeColors } from '@/ui';
 import { MAP_ATTRIBUTION_LINES } from './mapConfig';
 
 /**
@@ -39,6 +39,9 @@ export function MapAttribution({
   style,
   visible = true,
 }: MapAttributionProps = {}) {
+  const theme = useThemeColors();
+  const labelColor = themeColors.dark.inkMuted;
+
   if (!visible) return null;
 
   return (
@@ -47,10 +50,18 @@ export function MapAttribution({
       accessibilityRole="text"
       accessibilityLabel={`Map data ${MAP_ATTRIBUTION_LINES.join(', ')}`}
       pointerEvents="box-none"
-      style={[styles.container, { bottom }, style]}
+      style={[
+        styles.container,
+        {
+          bottom,
+          backgroundColor: theme.overlay,
+          borderRadius: radius.sm,
+        },
+        style,
+      ]}
       testID="map-attribution"
     >
-      <Text variant="caption" colorRole="inkMuted" style={styles.text}>
+      <Text variant="caption" style={{ color: labelColor }}>
         {MAP_ATTRIBUTION_LINES.join(' · ')}
       </Text>
     </View>
@@ -60,17 +71,11 @@ export function MapAttribution({
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    left: 8,
+    left: space['2'],
     zIndex: MAP_ATTRIBUTION_Z_INDEX,
     elevation: MAP_ATTRIBUTION_Z_INDEX,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    // Compact pill over the map — not a full-width bar.
-    backgroundColor: 'rgba(17, 17, 17, 0.6)',
+    paddingHorizontal: space['2'],
+    paddingVertical: space['1'],
     maxWidth: '72%',
-  },
-  text: {
-    // Legible over the dark canvas; caption scale keeps it unobtrusive but present.
   },
 });

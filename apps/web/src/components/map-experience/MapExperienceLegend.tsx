@@ -210,7 +210,7 @@ function MapColorKey(props: {
         ))}
       </ul>
       <p className="ds-explore-legend__note">
-        Historical tones (shade only — shape stays with kind)
+        Historical tones (shade only; shape stays with kind)
       </p>
       <ul className="ds-explore-legend__kind-list">
         {SEMANTIC_TONE_ENTRIES.map(([tone, entry]) => (
@@ -277,7 +277,7 @@ function MapColorKey(props: {
         </>
       ) : null}
       <p className="ds-explore-legend__note">
-        Each map color pairs with a label or glyph — color is never the only signal. Markers on the
+        Each map color pairs with a label or glyph; color is never the only signal. Markers on the
         canvas are discs; square / diamond / ring names are rim and fill signatures, not literal
         MapLibre shapes.
       </p>
@@ -449,7 +449,7 @@ export function MapExperienceLegend(props: MapExperienceLegendProps = {}) {
                   <>Choose a model in the toolbar to shade geography beneath the pins.</>
                 ) : layerMode === 'presence' ? (
                   <>
-                    States are shaded by how many documented records they contain — presence of
+                    States are shaded by how many documented records they contain: presence of
                     evidence in this archive, not incidents, severity, or population counts.
                   </>
                 ) : layerMode === 'blackShare' ? (
@@ -461,7 +461,7 @@ export function MapExperienceLegend(props: MapExperienceLegendProps = {}) {
                 ) : (
                   <>
                     {popGeo === 'state' ? 'States' : 'Counties'} are shaded by change in Black
-                    share between the selected decades — copper tones mark gain, stone tones mark
+                    share between the selected decades; copper tones mark gain, stone tones mark
                     loss. Arrows in the tier list are a second signal; color is never the only cue.
                   </>
                 )}
@@ -471,7 +471,7 @@ export function MapExperienceLegend(props: MapExperienceLegendProps = {}) {
               <div>
                 <dt>Record presence shading</dt>
                 <dd>
-                  Darker copper means more documented records in a state — never more danger, never
+                  Darker copper means more documented records in a state, never more danger, never
                   a claim that a lighter state lacks history. See the color key above for the three
                   presence tiers.
                 </dd>

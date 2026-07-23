@@ -1,10 +1,19 @@
 :root {
-  --blackstory-ebonyInk: #111111;
-  --blackstory-archivePaper: #f7f3ee;
-  --blackstory-sand: #e7d9c3;
-  --blackstory-bronze: #b87333;
-  --blackstory-mahogany: #7a2e22;
-  --blackstory-copperPin: #d47a42;
+  --blackstory-blackInk: #0A0A0A;
+  --blackstory-charcoal: #161616;
+  --blackstory-archivePaper: #F4EFE5;
+  --blackstory-surface: #FBF8F2;
+  --blackstory-copperPin: #B86B2A;
+  --blackstory-copperTextLight: #8E4F2A;
+  --blackstory-copperTextDark: #D07A32;
+  --blackstory-pageSand: #D8A178;
+  --blackstory-stone: #6D675F;
+  --blackstory-rule: #D7D0C4;
+  /* Legacy v1.0 aliases (same canonical hexes; prefer role names above). */
+  --blackstory-ebonyInk: #0A0A0A;
+  --blackstory-sand: #D8A178;
+  --blackstory-bronze: #B86B2A;
+  --blackstory-mahogany: #8E4F2A;
   --blackstory-font-display: 'Sora', sans-serif;
   --blackstory-font-ui: 'Inter', sans-serif;
   --blackstory-font-editorial: 'Source Serif 4', serif;

@@ -57,7 +57,7 @@ describe('HomeHowThisWorks', () => {
     assert.doesNotMatch(html, /ds-band/);
     assert.match(html, /ds-home-how__compose/);
     assert.match(html, /ds-pipeline-sketch--compact/);
-    assert.match(html, /Research pipeline — intake to publish gate/);
+    assert.match(html, /Research pipeline: intake to publish gate/);
     assert.match(html, /viewBox="0 0 720 268"/);
     assert.match(html, /Local server/);
     assert.match(html, /Publish gate/);

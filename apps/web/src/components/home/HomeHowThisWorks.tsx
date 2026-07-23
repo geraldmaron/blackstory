@@ -42,7 +42,7 @@ export function HomeHowThisWorks() {
           </h2>
           <p className="ds-section__lede ds-home-how__lede">
             Discovery finds candidates. People verify. The publish gate decides what reaches the
-            public record — models never write it alone.
+            public record. Models never write it alone.
           </p>
         </header>
 

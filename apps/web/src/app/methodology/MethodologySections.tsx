@@ -67,15 +67,15 @@ const VERIFICATION_STEPS = [
 ] as const;
 
 const DIGNITY_RULES = [
-  'Public precision runs from country through campus or institution — never street addresses or exact residence coordinates for living people.',
+  'Public precision runs from country through campus or institution; never street addresses or exact residence coordinates for living people.',
   'Points render no sharper than stored public precision. A coarsened point is never labeled as an exact address.',
   'No red or alarm hues for violence-adjacent records; no crime-heat rendering. Color is never the only signal.',
   'Unknown living status is treated as living. Current residential addresses do not appear on public pages or hand-offs.',
-  'Hard history is documented where the sources support it, but presence — people, institutions, places across time — is the default lens, not a trauma-first feed.',
+  'Hard history is documented where the sources support it, but presence (people, institutions, places across time) is the default lens, not a trauma-first feed.',
 ] as const;
 
 const LIMITATION_RULES = [
-  'Coverage is uneven across places and eras. Absence on the map is not proof that nothing happened — it may mean sources have not cleared the publish gate yet.',
+  'Coverage is uneven across places and eras. Absence on the map is not proof that nothing happened; it may mean sources have not cleared the publish gate yet.',
   'Single-source facts are published only with an explicit confidence note explaining why.',
   'External statistics (census, ACS, voluntary reporting series) carry their own coverage limits; participation and suppression are part of the reading, not optional footnotes.',
   'Link rot and missing archives happen. Where a web source was captured, the capture travels with the citation; where it was not, the gap is visible.',
@@ -388,7 +388,7 @@ export function MethodologySections() {
             Check the evidence yourself
           </h2>
           <p className="ds-section__lede">
-            Historical records get challenged in predictable ways — out-of-context quotes,
+            Historical records get challenged in predictable ways: out-of-context quotes,
             impossible documentation demands, or attacks on the messenger instead of the evidence.
             Name the technique, then follow the citation chain.
           </p>
@@ -416,7 +416,7 @@ export function MethodologySections() {
           </h2>
           <p className="ds-section__lede">
             Precision in definitions lets a reader compare this archive to others without talking
-            past each other. Inclusion is never a popularity contest — every entity needs at least
+            past each other. Inclusion is never a popularity contest; every entity needs at least
             one documented notability basis.
           </p>
 
@@ -493,7 +493,7 @@ export function MethodologySections() {
               Confidence grades
             </h3>
             <p className="ds-methodology__policy-lede">
-              Confidence is never color alone — every grade carries a glyph, a text label, and a
+              Confidence is never color alone; every grade carries a glyph, a text label, and a
               published definition. Crime statistics never enter the composite confidence score.
             </p>
             <div className="ds-methodology__grade-grid">
@@ -512,7 +512,7 @@ export function MethodologySections() {
               Geographic precision &amp; map dignity
             </h3>
             <p className="ds-methodology__policy-lede">
-              Place is the product&apos;s organizing idea — and also where harm is easiest to cause.
+              Place is the product&apos;s organizing idea, and also where harm is easiest to cause.
               Public maps follow dignity rules that are load-bearing, not decorative.
             </p>
             <RuleStrip label="Map dignity rules" rules={DIGNITY_RULES} />
@@ -524,7 +524,7 @@ export function MethodologySections() {
             </h3>
             <p className="ds-methodology__policy-lede">
               An archive of sourced facts will contain errors. Every correction is logged publicly
-              and preserved in the record&apos;s history — nothing is silently edited.
+              and preserved in the record&apos;s history; nothing is silently edited.
             </p>
             <RuleStrip label="Known limitations" rules={LIMITATION_RULES} />
           </div>
@@ -541,7 +541,7 @@ export function MethodologySections() {
           How the archive stays current
         </h2>
         <p className="ds-section__lede">
-          Corrections, funding disclosures, editorial roles, and external alignment frameworks —
+          Corrections, funding disclosures, editorial roles, and external alignment frameworks:
           the operational layer behind the evidence bar.
         </p>
 
@@ -594,9 +594,9 @@ export function MethodologySections() {
               voice. Public bios link here as the team publishes them.
             </p>
             <ul className="ds-methodology__secondary-list">
-              <li>Editorial lead — methodology, corrections policy, and publish gate</li>
-              <li>Research lead — source verification and citation completeness</li>
-              <li>Platform lead — projection integrity and security posture</li>
+              <li>Editorial lead: methodology, corrections policy, and publish gate</li>
+              <li>Research lead: source verification and citation completeness</li>
+              <li>Platform lead: projection integrity and security posture</li>
             </ul>
           </article>
 

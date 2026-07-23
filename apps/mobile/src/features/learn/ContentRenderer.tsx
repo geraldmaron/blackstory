@@ -116,7 +116,7 @@ function SourcesList({ sources }: { readonly sources: readonly CitationV1[] }) {
             ) : (
               <Text variant="bodySmall" colorRole="inkMuted">
                 {source.label}
-                {source.withheldReason ? ` — ${source.withheldReason}` : ''}
+                {source.withheldReason ? ` · ${source.withheldReason}` : ''}
               </Text>
             )}
           </View>
@@ -196,7 +196,7 @@ export function ContentRenderer({
         <Notice
           tone="dispute"
           title="No cited sources"
-          description="This page has no attached sources — treat its claims as unverified until sources are added."
+          description="This page has no attached sources. Treat its claims as unverified until sources are added."
         />
       ) : null}
 

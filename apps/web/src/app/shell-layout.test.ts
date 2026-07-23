@@ -31,7 +31,7 @@ describe('shell sticky clearance', () => {
   it('clears the fixed header above the footer mast', () => {
     assert.match(
       shellCss,
-      /\.ds-shell-footer\s*\{[^}]*padding-top:\s*max\(var\(--ds-space-16\),\s*var\(--ds-island-clearance\)\)/s,
+      /\.ds-shell-footer\s*\{[^}]*padding-top:\s*max\(var\(--ds-space-10\),\s*var\(--ds-island-clearance\)\)/s,
     );
     assert.match(
       shellCss,
@@ -125,39 +125,28 @@ describe('horizontal overflow guards', () => {
 });
 
 describe('shell footer theme tokens', () => {
-  it('styles the mega footer with theme canvas/ink tokens, not fixed-ink palette', () => {
-    assert.match(shellCss, /\.ds-shell-footer\s*\{[^}]*background:\s*var\(--ds-canvas\)/s);
-    assert.match(shellCss, /\.ds-shell-footer\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
-    assert.match(shellCss, /\.ds-shell-footer__core\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
+  it('styles the mega footer as a fixed-ink sign-off band', () => {
+    assert.match(shellCss, /\.ds-shell-footer\s*\{[^}]*background:\s*var\(--ds-fixed-charcoal\)/s);
+    assert.match(shellCss, /\.ds-shell-footer\s*\{[^}]*color:\s*var\(--ds-fixed-paper\)/s);
+    assert.match(shellCss, /\.ds-shell-footer__core\s*\{[^}]*color:\s*var\(--ds-fixed-paper\)/s);
     assert.match(
       shellCss,
-      /\.ds-shell-footer__support\s*\{[^}]*color:\s*var\(--ds-ink-muted\)/s,
+      /\.ds-shell-footer__support\s*\{[^}]*color:\s*var\(--ds-fixed-stone\)/s,
     );
     assert.match(
       shellCss,
-      /\.ds-shell-footer__links a\s*\{[^}]*color:\s*var\(--ds-ink\)/s,
+      /\.ds-shell-footer__links a\s*\{[^}]*color:\s*var\(--ds-fixed-paper\)/s,
     );
     assert.match(
       shellCss,
-      /\.ds-shell-footer__links a:focus-visible\s*\{[^}]*outline:[^}]*var\(--ds-accent-graphic\)/s,
+      /\.ds-shell-footer__operator\s*\{[^}]*color:\s*var\(--ds-fixed-accent\)/s,
     );
-    assert.match(
-      shellCss,
-      /\.ds-shell-footer__operator\s*\{[^}]*color:\s*var\(--ds-accent\)/s,
-    );
-    assert.doesNotMatch(shellCss, /\.ds-shell-footer[^{]*\{[^}]*--ds-fixed-/s);
   });
 
-  it('swaps footer lockup artwork with [data-theme] like the shell header', () => {
-    assert.match(shellCss, /\.ds-shell-footer__wordmark--theme-light\s*\{[^}]*display:\s*block/s);
-    assert.match(
-      shellCss,
-      /\[data-theme='dark'\]\s+\.ds-shell-footer__wordmark--theme-light\s*\{[^}]*display:\s*none/s,
-    );
-    assert.match(
-      shellCss,
-      /\[data-theme='dark'\]\s+\.ds-shell-footer__wordmark--theme-dark\s*\{[^}]*display:\s*block/s,
-    );
+  it('always shows the dark-canvas lockup on the fixed-ink footer', () => {
+    assert.match(shellCss, /\.ds-shell-footer__wordmark--theme-light\s*\{[^}]*display:\s*none/s);
+    assert.match(shellCss, /\.ds-shell-footer__wordmark--theme-dark\s*\{[^}]*display:\s*block/s);
+    assert.match(shellCss, /\.ds-shell-footer__wordmark\s*\{[^}]*min-width:\s*10\.5rem/s);
   });
 });
 

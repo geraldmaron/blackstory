@@ -25,12 +25,12 @@ export const brandCore = {
 export const themeColors = {
   "light": {
     "canvas": "#F4EFE5",
-    "surface": "#F6F2EA",
-    "surfaceRaised": "#F8F5EE",
+    "surface": "#FBF8F2",
+    "surfaceRaised": "#FBF8F2",
     "ink": "#0A0A0A",
-    "inkMuted": "#5C5A57",
-    "inkSubtle": "#5C5A57",
-    "border": "#D8A178",
+    "inkMuted": "#6D675F",
+    "inkSubtle": "#6D675F",
+    "border": "#D7D0C4",
     "borderStrong": "#0A0A0A",
     "focusRing": "#0A0A0A",
     "focusRingOffset": "#F4EFE5",
@@ -39,24 +39,24 @@ export const themeColors = {
     "overlay": "rgba(10, 10, 10, 0.55)",
     "accent": "#8E4F2A",
     "accentGraphic": "#B86B2A",
-    "accentMuted": "#DCBA9A"
+    "accentMuted": "#D8A178"
   },
   "dark": {
     "canvas": "#0A0A0A",
-    "surface": "#1D1C1C",
-    "surfaceRaised": "#2B2A29",
+    "surface": "#161616",
+    "surfaceRaised": "#1C1B18",
     "ink": "#F4EFE5",
-    "inkMuted": "#A29F98",
-    "inkSubtle": "#A29F98",
-    "border": "#393836",
+    "inkMuted": "#BDB5A9",
+    "inkSubtle": "#BDB5A9",
+    "border": "#34302C",
     "borderStrong": "#F4EFE5",
     "focusRing": "#F4EFE5",
     "focusRingOffset": "#0A0A0A",
     "inverse": "#F4EFE5",
     "inverseInk": "#0A0A0A",
     "overlay": "rgba(0, 0, 0, 0.72)",
-    "accent": "#B86B2A",
-    "accentGraphic": "#B86B2A",
+    "accent": "#D07A32",
+    "accentGraphic": "#D07A32",
     "accentMuted": "#D8A178"
   }
 } as const;

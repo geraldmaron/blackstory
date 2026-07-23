@@ -6,12 +6,10 @@
  * source vs. emitting TS text) stay separable and independently testable.
  *
  * Color source of truth (Mobile Full-App redesign / AGENTS.md / docs/ui/brand.md):
- * `packages/ui/src/tokens/brand-palette.ts` — Black Ink #0A0A0A, Archive Paper
- * #F4EFE5, Copper Pin #B86B2A, Page Sand #D8A178, copper text #8E4F2A / #D07A32.
- *
- * `brand/tokens/colors.json` still ships older Brand Guide v1.0 hexes
- * (#111111 / #F7F3EE / #D47A42). Mobile no longer mirrors those for UI tokens;
- * typography still comes from `brand/tokens/typography.json` + brand.css.
+ * `brand/tokens/colors.json` aligned with `packages/ui/src/tokens/brand-palette.ts`.
+ * Theme derivation mirrors `packages/ui/src/tokens/colors.ts` (Stone, Rule, Surface,
+ * Charcoal, copper text #8E4F2A / #D07A32). Typography comes from
+ * `brand/tokens/typography.json` + brand.css.
  *
  * Typography: `brand/tokens/typography.json` says `uiBody: "Inter"` (no
  * "Display" suffix) and `display: "Sora SemiBold"`. An earlier commit
@@ -30,10 +28,25 @@
  */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { contrastRatio, ensureContrast, mix } from './color-math';
+import { contrastRatio, ensureContrast } from './color-math';
 
 const BRAND_TOKENS_DIR = join(__dirname, '..', '..', '..', '..', 'brand', 'tokens');
 
+/** Canonical palette keys from brand/tokens/colors.json (docs/ui/brand.md). */
+export type BrandPaletteColors = {
+  blackInk: string;
+  charcoal: string;
+  archivePaper: string;
+  surface: string;
+  copperPin: string;
+  copperTextLight: string;
+  copperTextDark: string;
+  pageSand: string;
+  stone: string;
+  rule: string;
+};
+
+/** Legacy generator output shape kept for mobile call sites (brandCore.*). */
 export type BrandCoreColors = {
   ebonyInk: string;
   archivePaper: string;
@@ -91,24 +104,28 @@ function readBrandCssVars(css: string): Record<string, string> {
   return vars;
 }
 
-/**
- * Canonical UI palette mirrored from packages/ui brand-palette (Pinned Page).
- * Field names keep the generator's BrandCoreColors shape for theme derivation.
- */
-export const CANONICAL_BRAND_CORE: BrandCoreColors = {
-  ebonyInk: '#0A0A0A',
-  archivePaper: '#F4EFE5',
-  sand: '#D8A178',
-  bronze: '#B86B2A',
-  mahogany: '#8E4F2A',
-  copperPin: '#B86B2A',
-};
+function paletteToBrandCore(palette: BrandPaletteColors): BrandCoreColors {
+  return {
+    ebonyInk: palette.blackInk,
+    archivePaper: palette.archivePaper,
+    sand: palette.pageSand,
+    bronze: palette.copperPin,
+    mahogany: palette.copperTextLight,
+    copperPin: palette.copperPin,
+  };
+}
 
 /**
- * Loads typography from brand/tokens and colors from the canonical
- * packages/ui / AGENTS.md palette (not the older brand/tokens/colors.json hexes).
+ * Loads typography from brand/tokens and the canonical palette from colors.json.
  */
-export function loadBrandCoreSource(): { colors: BrandCoreColors; typography: BrandTypographyFamilies } {
+export function loadBrandCoreSource(): {
+  colors: BrandCoreColors;
+  palette: BrandPaletteColors;
+  typography: BrandTypographyFamilies;
+} {
+  const palette = JSON.parse(
+    readFileSync(join(BRAND_TOKENS_DIR, 'colors.json'), 'utf8'),
+  ) as BrandPaletteColors;
   const typographyJson = JSON.parse(
     readFileSync(join(BRAND_TOKENS_DIR, 'typography.json'), 'utf8'),
   ) as { wordmark: string; display: string; uiBody: string; editorial: string; dataMono: string };
@@ -123,7 +140,8 @@ export function loadBrandCoreSource(): { colors: BrandCoreColors; typography: Br
   }
 
   return {
-    colors: CANONICAL_BRAND_CORE,
+    colors: paletteToBrandCore(palette),
+    palette,
     typography: {
       display: typographyJson.display,
       uiBody: typographyJson.uiBody,
@@ -163,69 +181,67 @@ function pickTextSafeAccent(canvas: string, candidates: Record<string, string>):
  * not see a different "high confidence" green on web vs. mobile).
  */
 export function buildBrandTokens(): BrandTokens {
-  const { colors, typography } = loadBrandCoreSource();
-  const { ebonyInk, archivePaper, sand, bronze, mahogany, copperPin } = colors;
+  const { colors, palette, typography } = loadBrandCoreSource();
+  const {
+    blackInk,
+    charcoal,
+    archivePaper,
+    surface,
+    copperPin,
+    copperTextLight,
+    copperTextDark,
+    pageSand,
+    stone,
+    rule,
+  } = palette;
 
-  const lightSurface = mix(archivePaper, '#FFFFFF', 0.2);
-  const lightSurfaceRaised = mix(archivePaper, '#FFFFFF', 0.35);
-  const lightInkMuted = mix(ebonyInk, archivePaper, 0.35);
-  const lightAccent = pickTextSafeAccent(archivePaper, { mahogany, bronze, copperPin });
-  const lightAccentMuted = mix(bronze, archivePaper, 0.6);
-  // The Brand Guide v1.0 Copper Pin swatch (#D47A42) itself only reaches
-  // ~2.85:1 against Archive Paper — below even the 3:1 non-text bar. That is
-  // fine for the logo (WCAG 1.4.11 exempts logos/brand marks), but this role
-  // is reused as a general graphic-only UI accent (icon fills, indicators),
-  // which is not exempt. Darken toward Ebony Ink, in small deterministic
-  // steps, until it clears 3:1 — keeps the same hue family, stays a
-  // recognizable "copper", and is honestly documented as a derived, not raw,
-  // brand value.
-  const lightAccentGraphic = ensureContrast(copperPin, archivePaper, MIN_GRAPHIC_CONTRAST, ebonyInk);
+  const lightAccent = pickTextSafeAccent(archivePaper, {
+    copperTextLight,
+    copperPin,
+  });
+  const lightAccentGraphic = ensureContrast(copperPin, archivePaper, MIN_GRAPHIC_CONTRAST, blackInk);
 
   const light: ThemeRole = {
     canvas: archivePaper,
-    surface: lightSurface,
-    surfaceRaised: lightSurfaceRaised,
-    ink: ebonyInk,
-    inkMuted: lightInkMuted,
-    inkSubtle: lightInkMuted,
-    border: sand,
-    borderStrong: ebonyInk,
-    focusRing: ebonyInk,
+    surface,
+    surfaceRaised: surface,
+    ink: blackInk,
+    inkMuted: stone,
+    inkSubtle: stone,
+    border: rule,
+    borderStrong: blackInk,
+    focusRing: blackInk,
     focusRingOffset: archivePaper,
-    inverse: ebonyInk,
+    inverse: blackInk,
     inverseInk: archivePaper,
     overlay: 'rgba(10, 10, 10, 0.55)',
     accent: lightAccent,
     accentGraphic: lightAccentGraphic,
-    accentMuted: lightAccentMuted,
+    accentMuted: pageSand,
   };
 
-  const darkSurface = mix(ebonyInk, archivePaper, 0.08);
-  const darkSurfaceRaised = mix(ebonyInk, archivePaper, 0.14);
-  const darkInkMuted = mix(archivePaper, ebonyInk, 0.35);
-  const darkBorder = mix(ebonyInk, archivePaper, 0.2);
-  // Lighten toward Archive Paper, if needed, until copperPin clears the 4.5:1
-  // text bar against the near-black dark canvas (bright colors on dark
-  // backgrounds usually pass as-is; this is a safety net, not an assumption).
-  const darkAccent = ensureContrast(copperPin, ebonyInk, MIN_TEXT_CONTRAST, archivePaper);
+  const darkAccent =
+    contrastRatio(copperTextDark, blackInk) >= MIN_TEXT_CONTRAST
+      ? copperTextDark
+      : ensureContrast(copperTextDark, blackInk, MIN_TEXT_CONTRAST, archivePaper);
 
   const dark: ThemeRole = {
-    canvas: ebonyInk,
-    surface: darkSurface,
-    surfaceRaised: darkSurfaceRaised,
+    canvas: blackInk,
+    surface: charcoal,
+    surfaceRaised: '#1C1B18',
     ink: archivePaper,
-    inkMuted: darkInkMuted,
-    inkSubtle: darkInkMuted,
-    border: darkBorder,
+    inkMuted: '#BDB5A9',
+    inkSubtle: '#BDB5A9',
+    border: '#34302C',
     borderStrong: archivePaper,
     focusRing: archivePaper,
-    focusRingOffset: ebonyInk,
+    focusRingOffset: blackInk,
     inverse: archivePaper,
-    inverseInk: ebonyInk,
+    inverseInk: blackInk,
     overlay: 'rgba(0, 0, 0, 0.72)',
     accent: darkAccent,
-    accentGraphic: copperPin,
-    accentMuted: sand,
+    accentGraphic: copperTextDark,
+    accentMuted: pageSand,
   };
 
   // Status/confidence hues verbatim from packages/ui/src/tokens/colors.ts

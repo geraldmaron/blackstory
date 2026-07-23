@@ -148,7 +148,7 @@ export function EntityPreviewSheet({
 
         <Button
           label="View full record"
-          variant="primary"
+          variant="accent"
           onPress={() => onOpenEntity(feature.entityId)}
           accessibilityLabel={`View full record for ${feature.label}`}
         />

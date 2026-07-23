@@ -43,7 +43,7 @@ export const DATA_INDICATOR_FIXTURE_BUNDLE: DataIndicatorBundle = {
     id: 'wealth-scf-median-nation',
     title: 'Median family net worth, Black vs White',
     caption:
-      'National median family net worth from the Survey of Consumer Finances. Wealth is measured at a point in time — not income — and reflects decades of policy and market context.',
+      'National median family net worth from the Survey of Consumer Finances. Wealth is measured at a point in time, not income, and reflects decades of policy and market context.',
     geographyLabel: 'United States',
     referencePeriod: '2022',
     primary: { label: 'Black families', value: 44_900, unit: 'usd' },
@@ -56,7 +56,7 @@ export const DATA_INDICATOR_FIXTURE_BUNDLE: DataIndicatorBundle = {
     id: 'justice-bjs-imprisonment-md',
     title: 'State imprisonment rate, Black vs White adults',
     caption:
-      'Maryland imprisonment rates under state or federal jurisdiction per 100,000 adult residents. Rates are context for policy eras — not proof that any single law caused the gap.',
+      'Maryland imprisonment rates under state or federal jurisdiction per 100,000 adult residents. Rates are context for policy eras, not proof that any single law caused the gap.',
     geographyLabel: 'Maryland',
     referencePeriod: '2022',
     primary: { label: 'Black adults', value: 912, unit: 'per_100k' },
@@ -87,7 +87,7 @@ export const DATA_INDICATOR_FIXTURE_BUNDLE: DataIndicatorBundle = {
     id: 'credit-hmda-denial-cook',
     title: 'Mortgage denial rate by applicant race, Cook County',
     caption:
-      'Share of home mortgage applications denied (HMDA actions taken 1–3) for derived-race Black and White applicants. County aggregates — not individual lending decisions.',
+      'Share of home mortgage applications denied (HMDA actions taken 1–3) for derived-race Black and White applicants. County aggregates, not individual lending decisions.',
     geographyLabel: 'Cook County, Illinois',
     unit: 'percent',
     series: [
@@ -122,7 +122,7 @@ export const DATA_INDICATOR_FIXTURE_BUNDLE: DataIndicatorBundle = {
     id: 'housing-chas-cost-burden-cook',
     title: 'Cost-burdened households, Black vs White',
     caption:
-      'Share of occupied households paying more than 30% of income on housing (HUD CHAS Table 20, suburban Cook jurisdiction in the Consolidated Plan). Place-specific affordability context — not a national average.',
+      'Share of occupied households paying more than 30% of income on housing (HUD CHAS Table 20, suburban Cook jurisdiction in the Consolidated Plan). Place-specific affordability context, not a national average.',
     geographyLabel: 'Suburban Cook County, Illinois',
     referencePeriod: '2016–2020 ACS',
     primary: { label: 'Black non-Hispanic householders', value: 44.6, unit: 'percent' },

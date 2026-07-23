@@ -73,7 +73,7 @@ export function Button({
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityState={{ disabled: isDisabled, busy: loading, ...accessibilityState }}
       disabled={isDisabled}
-      hitSlop={density === 'compact' ? 10 : 8}
+      hitSlop={8}
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}
       onPress={onPress}
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     gap: space['2'],
   },
   compact: {
-    minHeight: 36,
+    minHeight: MIN_TOUCH_TARGET,
     paddingHorizontal: space['3'],
     paddingVertical: space['1'],
   },

@@ -118,7 +118,7 @@ export function LawBrowseSections({ view }: LawBrowseSectionsProps) {
           About this page
         </h2>
         <p className="ds-section__lede">
-          BlackStory explains public laws and court decisions in plain language — not legal advice.
+          BlackStory explains public laws and court decisions in plain language, not legal advice.
           For guidance about your specific situation, consult a licensed attorney or qualified legal
           aid organization.
         </p>

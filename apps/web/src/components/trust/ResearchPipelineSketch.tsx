@@ -100,7 +100,7 @@ function CompactResearchPipelineFigure() {
       aria-describedby={descId}
     >
       <figcaption className="ds-pipeline-sketch__figcaption" id={titleId}>
-        Research pipeline — intake to publish gate
+        Research pipeline: intake to publish gate
       </figcaption>
       <p className="ds-visually-hidden" id={descId}>
         {PIPELINE_DESC}
@@ -278,7 +278,7 @@ export function ResearchPipelineSketch({ compact = false }: ResearchPipelineSket
   return (
     <figure className="ds-pipeline-sketch" aria-labelledby={titleId} aria-describedby={descId}>
       <figcaption className="ds-pipeline-sketch__figcaption" id={titleId}>
-        Research pipeline (sketch) — how fragments become a published record
+        Research pipeline (sketch): how fragments become a published record
       </figcaption>
       <p className="ds-visually-hidden" id={descId}>
         {PIPELINE_DESC}

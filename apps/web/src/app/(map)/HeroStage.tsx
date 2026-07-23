@@ -361,7 +361,7 @@ export function HeroStage({
       <p className="ds-hero-stage__kicker">Black population by decade · documented records</p>
       <HeroHeadlineMorph />
       <p className="ds-hero-stage__support">
-        Fills are census Black population counts. Pins are archive evidence — they are not the same
+        Fills are census Black population counts. Pins are archive evidence: they are not the same
         story. Empty states mean not yet in the census geography that decade, not zero people.
       </p>
       <div className="ds-hero-stage__actions">

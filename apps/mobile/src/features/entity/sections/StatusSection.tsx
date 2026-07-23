@@ -55,7 +55,7 @@ export function StatusSection({ entity }: StatusSectionProps) {
           <Text variant="bodyEmphasis">Current status: {humanizeToken(entity.status ?? '')}</Text>
           {(entity.statusHistory ?? []).map((record, index) => (
             <Text key={`${entity.id}_status_${index}`} variant="bodySmall" colorRole="inkMuted">
-              {humanizeToken(record.status)} — {record.validFrom ?? 'undated'}
+              {humanizeToken(record.status)} · {record.validFrom ?? 'undated'}
               {record.validTo ? ` through ${record.validTo}` : ', ongoing'} ({datePrecisionCaption(record.datePrecision)})
             </Text>
           ))}

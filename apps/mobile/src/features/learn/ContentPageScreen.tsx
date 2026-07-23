@@ -77,7 +77,7 @@ export function ContentPageScreen({
           <EmptyState title="Not found" description="This content is not available." />
         ) : state.status === 'offline-miss' ? (
           <ErrorState
-            title="Can't load — offline"
+            title="Can't load offline"
             description="This page hasn't been viewed yet, and there's no connection to fetch it now."
           />
         ) : (

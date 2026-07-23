@@ -198,7 +198,9 @@ export function SearchScreen({ initialQuery, initialKind, runtime }: SearchScree
                 testID="search-results-list"
                 data={cardData}
                 keyExtractor={(item) => item.id}
-                renderItem={({ item }) => <SearchResultCard {...item} />}
+                renderItem={({ item, index }) => (
+                  <SearchResultCard {...item} indexLabel={String(index + 1).padStart(2, '0')} />
+                )}
                 ListFooterComponent={
                   <SearchListFooter
                     hasMore={state.hasMore}
@@ -228,7 +230,7 @@ function FilterChipsRow({
       <Button
         label="All kinds"
         density="compact"
-        variant={filterKind === undefined ? 'accent' : 'secondary'}
+        variant={filterKind === undefined ? 'primary' : 'secondary'}
         accessibilityState={filterKind === undefined ? { selected: true } : undefined}
         onPress={() => onChangeFilterKind(undefined)}
       />
@@ -237,7 +239,7 @@ function FilterChipsRow({
           key={category.kind}
           label={category.label}
           density="compact"
-          variant={filterKind === category.kind ? 'accent' : 'secondary'}
+          variant={filterKind === category.kind ? 'primary' : 'secondary'}
           accessibilityState={filterKind === category.kind ? { selected: true } : undefined}
           onPress={() => onChangeFilterKind(category.kind)}
         />

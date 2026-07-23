@@ -50,7 +50,7 @@ export function HomeDataPulse({ recordCount, stateCount, eraSpan, timeline }: Ho
       </h2>
       <p className="ds-section__lede">
         Archive scale from the active release, beside national census figures that give population
-        context for the map — each figure carrying its source.
+        context for the map, each figure carrying its source.
       </p>
 
       <ul className="ds-data-strip" aria-label="Archive in numbers">

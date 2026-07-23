@@ -21,7 +21,7 @@ const PILLARS = [
   {
     kicker: 'Presence',
     title: 'Pinned to place',
-    body: 'People, schools, institutions, and events stay on the ground — not a trauma-first feed, and not a remote museum shelf.',
+    body: 'People, schools, institutions, and events stay on the ground, not a trauma-first feed, and not a remote museum shelf.',
   },
   {
     kicker: 'Evidence',
@@ -48,7 +48,7 @@ export function HomeAbout({ topStates, OrientControl = StateStart }: HomeAboutPr
         </h2>
         <p className="ds-section__lede ds-home-about__lede">
           BlackStory is a place-connected Black history research platform. Documented history stays
-          findable — especially the history close to you — with people, places, evidence, and context
+          findable, especially the history close to you, with people, places, evidence, and context
           traveling together.
         </p>
       </header>
@@ -81,7 +81,7 @@ export function HomeAbout({ topStates, OrientControl = StateStart }: HomeAboutPr
       <div className="ds-home-about__orient">
         <p className="ds-home-about__orient-kicker">Start with a place</p>
         <p className="ds-home-about__orient-lede">
-          Prefer a place you know? Pick a state — zero permission — or share your location only if
+          Prefer a place you know? Pick a state (zero permission) or share your location only if
           you choose.
         </p>
         <OrientControl topStates={topStates} />

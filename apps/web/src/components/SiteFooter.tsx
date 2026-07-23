@@ -1,7 +1,7 @@
 /**
- * Public site footer — theme-aware canvas plate closed by the kit lockup at
- * landmark scale (the page signs off with the brand, not a fine-print row).
- * Maker credit links to geralddagher.com with theme-swapped GD marks.
+ * Public site footer — fixed-ink band sign-off with paper copy and the kit lockup at
+ * landmark scale (the page closes with the brand, not a fine-print row).
+ * Maker credit links to geralddagher.com with dark-canvas GD marks.
  * Admin login lives in the shared island "More" menu for consistent traversal.
  */
 

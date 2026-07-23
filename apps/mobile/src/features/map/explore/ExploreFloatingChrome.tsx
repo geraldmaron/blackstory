@@ -5,10 +5,11 @@
  */
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { Text, useShadowStyle, useThemeColors, space, radius } from '@/ui';
+import { Text, space, radius } from '@/ui';
 import type { FilterState } from '@/app/_lib/route-params';
+import { getExploreCockpitColors } from './explore-chrome';
 
-const MIN_TOUCH = 40;
+const MIN_TOUCH = 44;
 const ICON_SIZE = 18;
 
 export type ExploreFloatingChromeProps = {
@@ -31,32 +32,32 @@ function IconChip({
   onPress,
   selected,
   testID,
+  cockpit,
 }: {
   readonly icon: keyof typeof Ionicons.glyphMap;
   readonly accessibilityLabel: string;
   readonly onPress: () => void;
   readonly selected?: boolean;
   readonly testID?: string;
+  readonly cockpit: ReturnType<typeof getExploreCockpitColors>;
 }) {
-  const theme = useThemeColors();
-
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       accessibilityState={{ selected: Boolean(selected) }}
-      hitSlop={6}
+      hitSlop={4}
       onPress={onPress}
       testID={testID}
       style={({ pressed }) => [
         styles.chip,
         {
-          backgroundColor: selected || pressed ? theme.surfaceRaised : theme.surface,
-          borderColor: selected ? theme.accent : theme.border,
+          backgroundColor: selected || pressed ? cockpit.surfaceRaised : cockpit.surface,
+          borderColor: selected ? cockpit.accent : cockpit.border,
         },
       ]}
     >
-      <Ionicons name={icon} size={ICON_SIZE} color={selected ? theme.accent : theme.inkMuted} />
+      <Ionicons name={icon} size={ICON_SIZE} color={selected ? cockpit.accent : cockpit.inkMuted} />
     </Pressable>
   );
 }
@@ -69,8 +70,7 @@ export function ExploreFloatingChrome({
   onNationalView,
   onOpenSearch,
 }: ExploreFloatingChromeProps) {
-  const theme = useThemeColors();
-  const chipShadow = useShadowStyle('sm');
+  const cockpit = getExploreCockpitColors();
   const filtersActive = Boolean(filters.kind || filters.era);
 
   return (
@@ -79,11 +79,11 @@ export function ExploreFloatingChrome({
       pointerEvents="box-none"
       testID="explore-floating-chrome"
     >
-      <View style={[styles.row, chipShadow]} pointerEvents="box-none">
+      <View style={styles.row} pointerEvents="box-none">
         <View
           style={[
             styles.countPill,
-            { backgroundColor: theme.surface, borderColor: theme.border },
+            { backgroundColor: cockpit.surface, borderColor: cockpit.border },
           ]}
           accessible
           accessibilityRole="text"
@@ -93,11 +93,11 @@ export function ExploreFloatingChrome({
               : `${formatCount(matchCount, filters)} records`
           }
         >
-          <Text variant="code" colorRole="inkMuted" numberOfLines={1}>
+          <Text variant="code" numberOfLines={1} style={{ color: cockpit.inkMuted }}>
             {formatCount(matchCount, filters)}
           </Text>
           {showDemoHint ? (
-            <Text variant="caption" colorRole="inkSubtle" numberOfLines={1}>
+            <Text variant="caption" numberOfLines={1} style={{ color: cockpit.inkMuted }}>
               demo
             </Text>
           ) : null}
@@ -109,6 +109,7 @@ export function ExploreFloatingChrome({
             accessibilityLabel="Open search"
             onPress={() => onOpenSearch?.()}
             testID="explore-chip-search"
+            cockpit={cockpit}
           />
           <IconChip
             icon="options-outline"
@@ -118,12 +119,14 @@ export function ExploreFloatingChrome({
             onPress={onOpenFilters}
             selected={filtersActive}
             testID="explore-chip-filters"
+            cockpit={cockpit}
           />
           <IconChip
             icon="globe-outline"
             accessibilityLabel="Reset to national view"
             onPress={onNationalView}
             testID="explore-chip-national"
+            cockpit={cockpit}
           />
         </View>
       </View>

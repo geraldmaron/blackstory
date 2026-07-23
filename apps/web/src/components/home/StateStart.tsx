@@ -97,7 +97,7 @@ export function StateStart({ topStates }: StateStartProps) {
       ) : null}
 
       <p className="ds-state-start__locate">
-        Standing somewhere with a story? <Link href="/locate">Use your location</Link> — read only
+        Standing somewhere with a story? <Link href="/locate">Use your location</Link>: read only
         with your permission, never stored.
       </p>
     </div>

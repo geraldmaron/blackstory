@@ -1,6 +1,6 @@
 /**
- * More tab index — sectioned ledger lists, one contribute CTA, honest
- * coming-soon Data row, and a web handoff for Banned books.
+ * More tab index — sectioned ledger lists, one contribute CTA, Data navigation,
+ * and a web handoff for Banned books.
  */
 import { Linking, ScrollView, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
@@ -20,9 +20,11 @@ import {
 import { MORE_SECTIONS } from '@/features/learn';
 import { CANONICAL_WEB_ORIGIN } from '@/features/entity/share';
 
-const OUT_OF_SCOPE_SECTIONS = [
-  { title: 'Data', subtitle: 'National rollups — coming soon', icon: 'data' as const },
-] as const;
+const DATA_SECTION = {
+  title: 'Data',
+  subtitle: 'National rollups and Phase 1 indicators',
+  icon: 'data' as const,
+} as const;
 
 const WEB_HANDOFF_SECTIONS = [
   {
@@ -130,19 +132,17 @@ export default function MoreScreen() {
         </View>
 
         <View style={styles.section}>
-          <SectionHeader title="Coming soon" meta="Data" headingScale="bodyEmphasis" />
+          <SectionHeader title="Data" meta="National rollups" headingScale="bodyEmphasis" />
           <LiftedSurface tone="surface" shadow="none">
-            {OUT_OF_SCOPE_SECTIONS.map((section, index) => (
-              <ListRow
-                key={section.title}
-                density="compact"
-                title={section.title}
-                subtitle={section.subtitle}
-                leading={<NavIcon name={section.icon} />}
-                interactive={false}
-                showDivider={index < OUT_OF_SCOPE_SECTIONS.length - 1}
-              />
-            ))}
+            <ListRow
+              density="compact"
+              title={DATA_SECTION.title}
+              subtitle={DATA_SECTION.subtitle}
+              leading={<NavIcon name={DATA_SECTION.icon} />}
+              showChevron
+              onPress={() => router.push('/data')}
+              showDivider={false}
+            />
           </LiftedSurface>
         </View>
       </ScrollView>

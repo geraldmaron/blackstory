@@ -30,19 +30,19 @@ const WEB_INVENTORY = [
     id: 'integrity',
     term: 'Request integrity',
     definition:
-      'Some interactive features (search refine, geocode lookup, corrections, and lead submission) use a same-origin request-integrity token paired with an HttpOnly cookie. This is CSRF and origin protection — not advertising, not cross-site tracking, and not Firebase App Check.',
+      'Some interactive features (search refine, geocode lookup, corrections, and lead submission) use a same-origin request-integrity token paired with an HttpOnly cookie. This is CSRF and origin protection, not advertising, not cross-site tracking, and not Firebase App Check.',
   },
   {
     id: 'location',
     term: 'Optional location lookup',
     definition:
-      'If you choose to share device location or enter an address or ZIP on the map or locate flows, that input is sent to the U.S. Census Bureau public geocoder to resolve state, county, and (when applicable) city. Exact coordinates and typed addresses are discarded after resolution — they are not kept as a search history.',
+      'If you choose to share device location or enter an address or ZIP on the map or locate flows, that input is sent to the U.S. Census Bureau public geocoder to resolve state, county, and (when applicable) city. Exact coordinates and typed addresses are discarded after resolution; they are not kept as a search history.',
   },
   {
     id: 'hosting',
     term: 'Standard hosting logs',
     definition:
-      'Like most websites, infrastructure may record IP address, user agent, request path, and timestamps in server logs for security and reliability. These logs are operational — not sold, not used for ad targeting, and not linked to an account because there is none.',
+      'Like most websites, infrastructure may record IP address, user agent, request path, and timestamps in server logs for security and reliability. These logs are operational, not sold, not used for ad targeting, and not linked to an account because there is none.',
   },
 ] as const;
 
@@ -74,7 +74,7 @@ const MOBILE_INVENTORY = [
 ] as const;
 
 const NOT_COLLECTED_RULES = [
-  'No user accounts at launch — on web or in the mobile app.',
+  'No user accounts at launch, on web or in the mobile app.',
   'No advertising SDKs, no ad identifiers (IDFA/GAID), and no App Tracking Transparency prompt because nothing tracks.',
   'No general analytics or attribution SDKs beyond privacy-safe, redacted developer diagnostics.',
   'No push notifications, social sign-in, contacts access, camera, microphone, or background location at mobile launch.',
@@ -136,7 +136,7 @@ export function PrivacySections() {
           <p className="ds-section__lede">
             This policy describes how BlackStory handles information on{' '}
             <span className="ds-phrase-nowrap">blackbook.app</span> and in the BlackStory native
-            reader for iOS and Android. It is an honest inventory — not a completeness claim about
+            reader for iOS and Android. It is an honest inventory, not a completeness claim about
             every future feature.
           </p>
           <p className="ds-privacy__follow">
@@ -184,7 +184,7 @@ export function PrivacySections() {
             What the native reader may process
           </h2>
           <p className="ds-section__lede">
-            At launch the mobile app is a reader for the same public projections — no accounts, no
+            At launch the mobile app is a reader for the same public projections: no accounts, no
             push, and no background location. The inventory below matches the mobile privacy review
             documented in the repository.
           </p>
@@ -229,7 +229,7 @@ export function PrivacySections() {
             Location is never required
           </h2>
           <p className="ds-section__lede">
-            On the website, location lookup starts only after you press a labeled control — the
+            On the website, location lookup starts only after you press a labeled control; the
             page never requests device location automatically. You can always browse by state,
             search by place name, or enter an address manually instead.
           </p>
@@ -273,7 +273,7 @@ export function PrivacySections() {
           </h2>
           <p className="ds-section__lede">
             When you file a correction, appeal, abuse report, or research lead, you choose what to
-            write. Submissions enter a restricted quarantine queue — they are never published as
+            write. Submissions enter a restricted quarantine queue; they are never published as
             submitted. Optional contact fields are for moderator follow-up only and are not shown
             publicly.
           </p>

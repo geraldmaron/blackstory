@@ -362,7 +362,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
                     Also connected
                   </h3>
                   <p className="ds-section__lede">
-                    Nearby records one step further in the published graph — keep learning without
+                    Nearby records one step further in the published graph: keep learning without
                     dead ends.
                   </p>
                   <EntityRelatedList
@@ -384,7 +384,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
                 lng={geoAnchor.lng}
                 label={entity.locationLabel}
                 precision={entity.locationPrecision}
-                caption="Public-precision street context (OpenStreetMap). Not survey-grade — use Open in maps for Google, Apple, or your default maps app."
+                caption="Public-precision street context (OpenStreetMap). Not survey-grade: use Open in maps for Google, Apple, or your default maps app."
               />
             ) : (
               <MapFrame

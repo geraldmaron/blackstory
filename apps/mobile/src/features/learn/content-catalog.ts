@@ -62,7 +62,7 @@ export const CONTENT_CATALOG: readonly LearnContentEntry[] = [
         {
           paragraphs: [
             'In 1870, William Syphax and the Board of Trustees for Colored Schools opened a public high school for Black students in the basement of Fifteenth Street Presbyterian Church. Forty-five students and one teacher, Emma J. Hutchins, made a beginning that the country had not yet normalized: a public secondary school for Black youth, funded as a public trust.',
-            'The church basement was not a metaphor. It was a room with a street address, a congregation above it, and a school day that had to share space with worship. The archive pins that founding to place first — a checkable coordinate in the capital’s educational geography.',
+            'The church basement was not a metaphor. It was a room with a street address, a congregation above it, and a school day that had to share space with worship. The archive pins that founding to place first: a checkable coordinate in the capital’s educational geography.',
           ],
         },
         {
@@ -80,7 +80,7 @@ export const CONTENT_CATALOG: readonly LearnContentEntry[] = [
     page: {
       slug: 'naming-dunbar-1916',
       title: 'Naming Dunbar in 1916',
-      dek: 'When M Street High School became Paul Laurence Dunbar High School, the rename marked a new building and a poet’s name — not the invention of the school itself.',
+      dek: 'When M Street High School became Paul Laurence Dunbar High School, the rename marked a new building and a poet’s name, not the invention of the school itself.',
       publishedAt: '2026-07-17',
       eraLabel: '1916',
       placeLabel: 'Washington, D.C.',
@@ -136,7 +136,7 @@ export const CONTENT_CATALOG: readonly LearnContentEntry[] = [
         {
           heading: 'What the record actually shows',
           paragraphs: [
-            'A rename tied to a new building in 1916 is often retold as an origin story. The archive keeps the earlier names — the Preparatory High School for Colored Youth, then M Street High School — on the public timeline precisely so this myth has a citable correction rather than a silent one.',
+            'A rename tied to a new building in 1916 is often retold as an origin story. The archive keeps the earlier names, the Preparatory High School for Colored Youth, then M Street High School, on the public timeline precisely so this myth has a citable correction rather than a silent one.',
           ],
         },
       ],
@@ -164,7 +164,7 @@ export const CONTENT_CATALOG: readonly LearnContentEntry[] = [
         {
           heading: 'Mission & scope',
           paragraphs: [
-            'BlackStory publishes released historical projections — place-connected Black history with provenance, confidence grades, and living-person protections. History should not be erased: corrections append, disagreements stay visible, and withdrawn records remain resolvable. History should not be hard to find: every public claim carries citations and a path back to sources.',
+            'BlackStory publishes released historical projections: place-connected Black history with provenance, confidence grades, and living-person protections. History should not be erased: corrections append, disagreements stay visible, and withdrawn records remain resolvable. History should not be hard to find: every public claim carries citations and a path back to sources.',
           ],
         },
         {
@@ -176,7 +176,7 @@ export const CONTENT_CATALOG: readonly LearnContentEntry[] = [
         {
           heading: 'Corrections',
           paragraphs: [
-            'Errors are fixed fully, quickly, and without defensiveness. Every change is timestamped, categorized, and preserved — nothing is silently edited. See Errata for the change log.',
+            'Errors are fixed fully, quickly, and without defensiveness. Every change is timestamped, categorized, and preserved. Nothing is silently edited. See Errata for the change log.',
           ],
         },
       ],
@@ -206,13 +206,13 @@ export const CONTENT_CATALOG: readonly LearnContentEntry[] = [
         {
           heading: 'It should not be hard to find',
           paragraphs: [
-            'Most people pass documented Black history without knowing it is there. BlackStory puts the record back on the ground: open the map, start with a state, search by name or place, or follow a decade of movement. Every published claim carries citations and confidence you can read in words and glyphs — never color alone.',
+            'Most people pass documented Black history without knowing it is there. BlackStory puts the record back on the ground: open the map, start with a state, search by name or place, or follow a decade of movement. Every published claim carries citations and confidence you can read in words and glyphs, never color alone.',
           ],
         },
         {
           heading: 'Accessible because it is about you',
           paragraphs: [
-            'This is not a remote museum shelf. It is history pinned to the places people live, teach, report from, and visit — with evidence attached, dignity rules enforced, and living people protected.',
+            'This is not a remote museum shelf. It is history pinned to the places people live, teach, report from, and visit, with evidence attached, dignity rules enforced, and living people protected.',
           ],
         },
       ],
@@ -235,7 +235,7 @@ export const CONTENT_CATALOG: readonly LearnContentEntry[] = [
       body: [
         {
           paragraphs: [
-            'Every fact on BlackStory carries its own citations and a status: published, corrected, superseded, or deprecated. This digest links to a handful of cited facts related to entries elsewhere in Learn — open a fact record for its full evidence and revision history.',
+            'Every fact on BlackStory carries its own citations and a status: published, corrected, superseded, or deprecated. This digest links to a handful of cited facts related to entries elsewhere in Learn. Open a fact record for its full evidence and revision history.',
           ],
         },
       ],
@@ -312,13 +312,13 @@ export const CONTENT_CATALOG: readonly LearnContentEntry[] = [
       relatedFactIds: [],
       body: [
         {
-          heading: '2026-07-15 · Correction — Dunbar founding year',
+          heading: '2026-07-15 · Correction · Dunbar founding year',
           paragraphs: [
             'Corrected a caption that implied the 1916 renaming was the school’s founding. The founding date (1870) and the two earlier names now appear on the same timeline.',
           ],
         },
         {
-          heading: '2026-06-02 · Update — Landmark listing added',
+          heading: '2026-06-02 · Update · Landmark listing added',
           paragraphs: [
             'Added the 1975 D.C. Inventory of Historic Sites listing as a distinct, dated event separate from the 2013 building.',
           ],

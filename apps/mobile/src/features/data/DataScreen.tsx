@@ -48,7 +48,7 @@ export function DataScreen() {
         <ScreenHeader
           kicker="Numbers"
           title="Data behind the archive"
-          dek="National Census context plus curated indicators — wealth, housing, credit, and justice. Every figure names its source. For county maps, open Explore."
+          dek="National Census context plus curated indicators: wealth, housing, credit, and justice. Every figure names its source. For county maps, open Explore."
         />
 
         <Notice
@@ -90,7 +90,7 @@ export function DataScreen() {
         <View style={styles.section}>
           <SectionHeader title="Wealth gap at a glance" meta="SCF" headingScale="bodyEmphasis" />
           <Text variant="body" colorRole="inkMuted" style={styles.lede}>
-            Median family net worth from the Federal Reserve's triennial survey — national
+            Median family net worth from the Federal Reserve's triennial survey, national
             juxtaposition used beside housing-credit eras, not proof of a single cause.
           </Text>
           <RacePairMetric series={indicators.wealthComparison} />
@@ -100,7 +100,7 @@ export function DataScreen() {
           <SectionHeader title="Housing, credit, and cost burden" meta="NHGIS · HMDA · CHAS" headingScale="bodyEmphasis" />
           <Text variant="body" colorRole="inkMuted" style={styles.lede}>
             Cook County is our Phase 1 place spine: decennial homeownership, mortgage denial rates,
-            and HUD CHAS cost burden — the same metrics bound to theme-impact questions.
+            and HUD CHAS cost burden, the same metrics bound to theme-impact questions.
           </Text>
           <GroupedSeriesMetric series={indicators.cookHomeownership} />
           <GroupedSeriesMetric series={indicators.hmdaDenialRates} />
@@ -110,7 +110,7 @@ export function DataScreen() {
         <View style={styles.section}>
           <SectionHeader title="Imprisonment and federal drug sentences" meta="BJS · USSC" headingScale="bodyEmphasis" />
           <Text variant="body" colorRole="inkMuted" style={styles.lede}>
-            State imprisonment rates and federal cocaine sentencing averages — context for drug
+            State imprisonment rates and federal cocaine sentencing averages, context for drug
             policy eras, not proof that any single law caused a number.
           </Text>
           <RacePairMetric series={indicators.imprisonmentComparison} />

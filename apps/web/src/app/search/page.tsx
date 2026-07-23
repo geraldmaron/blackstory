@@ -132,7 +132,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
         {view.results.length === 0 ? (
           <EmptyState
-            title="Nothing matched — yet"
+            title="Nothing matched, yet"
             action={
               <Link className="ds-cta ds-cta--ink" href="/search">
                 Clear filters

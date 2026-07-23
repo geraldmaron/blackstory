@@ -20,8 +20,10 @@
   inset: 0;
   z-index: 0;
   height: 100dvh;
-  /* Pre-style-load flash — dark ocean by default; light theme matches white plate. */
+  /* Pre-style-load flash — dark ocean by default; light theme matches Archive Paper. */
   background: #080606;
+  --ds-map-attrib-bottom: var(--ds-space-3);
+  --ds-map-attrib-left: var(--ds-space-3);
 }
 
 /* Homepage: pins and state shapes stay tappable under the hero. The hero root passes
@@ -58,7 +60,7 @@
 }
 
 [data-theme='light'] .ds-map-stage {
-  background: #ffffff;
+  background: #f4efe5;
 }
 
 /* MapLibre's own container (MapStage.tsx's `containerRef`) — never the plate above. MapLibre
@@ -97,6 +99,59 @@
 
 .ds-map-stage .maplibregl-ctrl-group button + button {
   border-top: var(--ds-border-width) solid var(--ds-border);
+}
+
+/* Compact OSM / OpenFreeMap attribution — bottom-left safe zone; flat matte island
+   matching zoom chrome. Links use theme ink on a raised surface for WCAG contrast. */
+.ds-map-stage .maplibregl-ctrl-bottom-left {
+  bottom: var(--ds-map-attrib-bottom);
+  left: var(--ds-map-attrib-left);
+  margin: 0;
+  z-index: 1;
+}
+
+.ds-map-stage .maplibregl-ctrl-attrib {
+  max-width: 16rem;
+  border-radius: var(--ds-radius-sm);
+  border: var(--ds-border-width) solid var(--ds-border);
+  background: color-mix(in srgb, var(--ds-surface) 92%, transparent);
+  box-shadow: none;
+  font-family: var(--ds-font-sans);
+  font-size: 0.625rem;
+  line-height: 1.35;
+  color: var(--ds-ink);
+}
+
+.ds-map-stage .maplibregl-ctrl-attrib.maplibregl-compact {
+  min-height: 1.75rem;
+  padding: 0;
+}
+
+.ds-map-stage .maplibregl-ctrl-attrib.maplibregl-compact .maplibregl-ctrl-attrib-button {
+  background: transparent;
+  color: var(--ds-ink-muted);
+}
+
+.ds-map-stage .maplibregl-ctrl-attrib.maplibregl-compact-show .maplibregl-ctrl-attrib-inner,
+.ds-map-stage .maplibregl-ctrl-attrib:not(.maplibregl-compact) .maplibregl-ctrl-attrib-inner {
+  padding: var(--ds-space-1) var(--ds-space-2);
+  color: var(--ds-ink);
+}
+
+.ds-map-stage .maplibregl-ctrl-attrib a {
+  color: var(--ds-ink);
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+.ds-map-stage .maplibregl-ctrl-attrib a:hover,
+.ds-map-stage .maplibregl-ctrl-attrib a:focus-visible {
+  color: var(--ds-accent);
+}
+
+.ds-map-stage .maplibregl-ctrl-attrib a:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
 }
 
 /* Recolor the +/− glyphs — paper on dark, ink on light. */
@@ -140,6 +195,8 @@
   --ds-explore-restore-chip-width: 6.5rem;
   --ds-explore-zoom-right: var(--ds-explore-edge);
   --ds-explore-zoom-bottom: var(--ds-explore-edge);
+  --ds-map-attrib-left: var(--ds-explore-edge);
+  --ds-map-attrib-bottom: var(--ds-explore-edge);
 }
 
 .ds-map-surface:has(.ds-explore-stage) .maplibregl-ctrl-top-right {
@@ -164,6 +221,7 @@
   .ds-map-surface:has(.ds-explore-stage[data-results='open']) {
     --ds-explore-zoom-right: var(--ds-explore-edge);
     --ds-explore-zoom-bottom: calc(min(42vh, 22rem) + var(--ds-explore-edge) + var(--ds-space-2));
+    --ds-map-attrib-bottom: calc(min(42vh, 22rem) + var(--ds-explore-edge) + var(--ds-space-2));
   }
 
   .ds-map-surface:has(.ds-explore-stage[data-instruments='open']) {
@@ -171,10 +229,14 @@
       var(--ds-explore-edge) + var(--ds-explore-restore-chip-width) + var(--ds-space-2)
     );
     --ds-explore-zoom-bottom: calc(2.75rem + var(--ds-explore-edge) + var(--ds-space-2));
+    --ds-map-attrib-bottom: calc(2.75rem + var(--ds-explore-edge) + var(--ds-space-2));
   }
 
   .ds-map-surface:has(.ds-explore-stage[data-instruments='open'][data-results='open']) {
     --ds-explore-zoom-bottom: calc(
+      min(42vh, 22rem) + 2.75rem + var(--ds-explore-edge) + var(--ds-space-3)
+    );
+    --ds-map-attrib-bottom: calc(
       min(42vh, 22rem) + 2.75rem + var(--ds-explore-edge) + var(--ds-space-3)
     );
   }
@@ -189,6 +251,7 @@
 
   .ds-map-surface:has(.ds-explore-stage[data-results='open']) {
     --ds-explore-zoom-bottom: calc(min(42vh, 22rem) + var(--ds-explore-edge) + var(--ds-space-2));
+    --ds-map-attrib-bottom: calc(min(42vh, 22rem) + var(--ds-explore-edge) + var(--ds-space-2));
   }
 }
 
@@ -197,6 +260,9 @@
   .ds-map-surface:has(.ds-explore-stage__spotlight[open]) {
     --ds-explore-zoom-right: var(--ds-explore-edge);
     --ds-explore-zoom-bottom: calc(
+      min(72svh, 36rem) + var(--ds-explore-edge) + var(--ds-space-3) + var(--ds-space-2)
+    );
+    --ds-map-attrib-bottom: calc(
       min(72svh, 36rem) + var(--ds-explore-edge) + var(--ds-space-3) + var(--ds-space-2)
     );
   }
@@ -475,7 +541,7 @@
   border-radius: var(--ds-radius-sm);
   background: var(--ds-surface);
   color: var(--ds-ink);
-  font-family: var(--ds-font-ui);
+  font-family: var(--ds-font-sans);
   font-size: 0.875rem;
 }
 
@@ -575,7 +641,7 @@
   color: var(--ds-ink);
   text-align: left;
   cursor: pointer;
-  font-family: var(--ds-font-ui);
+  font-family: var(--ds-font-sans);
   font-size: 0.875rem;
 }
 
@@ -650,7 +716,7 @@
 }
 
 .ds-explore-place-focus__closest-name {
-  font-family: var(--ds-font-ui);
+  font-family: var(--ds-font-sans);
   font-size: 0.8125rem;
   font-weight: 600;
 }

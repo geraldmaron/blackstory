@@ -17,7 +17,7 @@ import './explore.css';
 export const metadata = {
   title: 'Explore',
   description:
-    'Map-first national view of documented Black history — every geo-anchored record in the active release.',
+    'Map-first national view of documented Black history: every geo-anchored record in the active release.',
 };
 
 type ExplorePageProps = {

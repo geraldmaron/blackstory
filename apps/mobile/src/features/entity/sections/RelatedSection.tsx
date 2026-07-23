@@ -34,7 +34,7 @@ function NeighborRow({
     <ListRow
       density="compact"
       title={neighbor.displayName}
-      subtitle={`${humanizeToken(neighbor.kind)} · ${humanizeToken(neighbor.relationType)} — ${subtitle}`}
+      subtitle={`${humanizeToken(neighbor.kind)} · ${humanizeToken(neighbor.relationType)} · ${subtitle}`}
       leading={<NavIcon name={navIconForEntityKind(neighbor.kind)} size={20} />}
       showChevron
       onPress={onPress}
@@ -74,7 +74,7 @@ export function RelatedSection({ relatedNeighbors, continueLearning, onOpenEntit
         <View style={{ gap: space['2'] }}>
           <SectionHeading level={3}>{SECTION_HEADINGS.continueLearning}</SectionHeading>
           <Text variant="bodySmall" colorRole="inkMuted">
-            Nearby records one step further in the published graph — keep learning without dead ends.
+            Nearby records one step further in the published graph. Keep learning without dead ends.
           </Text>
           <LiftedSurface tone="surface" shadow="none">
             {continueLearning.map((neighbor, index) => (

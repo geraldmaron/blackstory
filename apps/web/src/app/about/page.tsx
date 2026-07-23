@@ -18,7 +18,7 @@ const PILLARS = [
   {
     kicker: 'Presence',
     title: 'Pinned to place',
-    body: 'People, schools, institutions, and events stay on the ground — not a trauma-first feed, and not a remote museum shelf.',
+    body: 'People, schools, institutions, and events stay on the ground, not a trauma-first feed, and not a remote museum shelf.',
   },
   {
     kicker: 'Evidence',
@@ -51,7 +51,7 @@ const DESTINATIONS = [
   {
     href: '/data',
     label: 'Data',
-    detail: 'National rollups from cited public statistics — census, ACS, related coverage.',
+    detail: 'National rollups from cited public statistics: census, ACS, related coverage.',
   },
   {
     href: '/law',
@@ -61,7 +61,7 @@ const DESTINATIONS = [
   {
     href: '/submit',
     label: 'Submit',
-    detail: 'Offer a lead for research consideration — not an instant public post.',
+    detail: 'Offer a lead for research consideration, not an instant public post.',
   },
 ] as const;
 
@@ -74,7 +74,7 @@ export default function AboutPage() {
           History, pinned to <em>place</em>.
         </h1>
         <p className="ds-page__lede">
-          A place-connected Black history research platform — so documented history stays findable,
+          A place-connected Black history research platform, so documented history stays findable,
           especially the history close to you. People. Places. Evidence. Context.
         </p>
         <p className="ds-about-mast__actions">
@@ -95,7 +95,7 @@ export default function AboutPage() {
               Presence. Evidence. Dignity.
             </h2>
             <p className="ds-section__lede">
-              Three commitments travel with every record — place first, receipts attached, and
+              Three commitments travel with every record: place first, receipts attached, and
               protections that are rules rather than tone.
             </p>
           </header>
@@ -123,7 +123,7 @@ export default function AboutPage() {
             <p className="ds-about__beat-body">
               When sources disagree, both claims stay on the record. When a fact is corrected, the
               earlier wording remains visible. Withdrawals stay resolvable with a plain-language
-              reason. Presence and proof travel together — scale on the map, receipts on every
+              reason. Presence and proof travel together: scale on the map, receipts on every
               record.
             </p>
           </article>
@@ -133,7 +133,7 @@ export default function AboutPage() {
             <p className="ds-about__beat-body">
               Most people pass documented Black history without knowing it is there. Open the map,
               start with your state, search by name or place, or follow a decade of movement.
-              Confidence stays readable in words and glyphs — never color alone — with a path to
+              Confidence stays readable in words and glyphs, never color alone, with a path to
               challenge what looks wrong.
             </p>
           </article>
@@ -141,7 +141,7 @@ export default function AboutPage() {
             <p className="ds-mono ds-about__beat-index">03</p>
             <h3 className="ds-about__beat-title">Accessible because it is about you</h3>
             <p className="ds-about__beat-body">
-              Not a remote museum shelf — history pinned to the places people live, teach, report
+              Not a remote museum shelf: history pinned to the places people live, teach, report
               from, and visit. Choose a state. Share your location if you want to. Read what
               happened around you with evidence attached and living people protected.
             </p>
@@ -153,7 +153,7 @@ export default function AboutPage() {
         <div className="ds-container">
           <p className="ds-section__kicker">Publish bar</p>
           <h2 className="ds-section__title" id="publish-heading">
-            Released projections only — with receipts
+            Released projections only, with receipts
           </h2>
           <p className="ds-section__lede">
             Public pages show records that passed citation completeness, provenance checks, and

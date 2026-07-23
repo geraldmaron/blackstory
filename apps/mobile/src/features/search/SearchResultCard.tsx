@@ -14,6 +14,8 @@ export interface SearchResultCardProps {
   readonly summary?: string;
   readonly explanation: string;
   readonly status?: string;
+  /** Mono ledger index (01, 02…). */
+  readonly indexLabel?: string;
   readonly onPress?: (id: string) => void;
   readonly onShowOnMap?: (id: string, kind: string) => void;
 }
@@ -50,6 +52,7 @@ export function SearchResultCard({
   summary,
   explanation,
   status,
+  indexLabel,
   onPress,
   onShowOnMap,
 }: SearchResultCardProps) {
@@ -62,6 +65,7 @@ export function SearchResultCard({
       title={displayName}
       slug={slug}
       summary={body}
+      indexLabel={indexLabel}
       leading={<NavIcon name={navIconForEntityKind(kind)} size={20} />}
       showChevron={Boolean(onPress)}
       onPress={onPress ? () => onPress(id) : undefined}

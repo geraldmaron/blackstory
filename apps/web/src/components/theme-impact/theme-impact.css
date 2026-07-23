@@ -22,7 +22,7 @@
 
 .ds-theme-impact__notice-title {
   margin: 0 0 var(--ds-space-2);
-  color: var(--ds-accent-text);
+  color: var(--ds-accent);
   font-family: var(--ds-font-display);
   font-size: 0.9375rem;
   font-weight: 600;
@@ -38,7 +38,7 @@
 }
 
 .ds-theme-impact__notice-body a {
-  color: var(--ds-accent-text);
+  color: var(--ds-accent);
   font-weight: 500;
   text-decoration: underline;
   text-underline-offset: 0.15em;
@@ -131,7 +131,7 @@
 
 .ds-theme-impact__chip--live {
   border-color: color-mix(in srgb, var(--ds-accent-graphic) 40%, var(--ds-border));
-  color: var(--ds-accent-text);
+  color: var(--ds-accent);
 }
 
 .ds-theme-impact__chip--soon {
@@ -207,7 +207,7 @@
 
 .ds-theme-impact__meta-grid dt {
   margin: 0 0 var(--ds-space-1);
-  color: var(--ds-accent-text);
+  color: var(--ds-accent);
   font-family: var(--ds-font-mono);
   font-size: 0.6875rem;
   font-weight: 500;
@@ -369,7 +369,7 @@
 }
 
 .ds-theme-impact__provenance-link a {
-  color: var(--ds-accent-text);
+  color: var(--ds-accent);
   font-weight: 500;
 }
 
@@ -397,7 +397,7 @@
 }
 
 .ds-theme-impact__back a {
-  color: var(--ds-accent-text);
+  color: var(--ds-accent);
   font-family: var(--ds-font-sans);
   font-size: 0.875rem;
   font-weight: 500;
@@ -479,7 +479,7 @@
 }
 
 .ds-theme-impact__citation-links a {
-  color: var(--ds-accent-text);
+  color: var(--ds-accent);
   font-family: var(--ds-font-serif, var(--ds-font-sans));
   font-size: 0.8125rem;
   font-weight: 500;
@@ -494,7 +494,7 @@
 
 .ds-theme-impact__embed-footer a,
 .ds-theme-impact__strip-theme-link a {
-  color: var(--ds-accent-text);
+  color: var(--ds-accent);
   font-family: var(--ds-font-sans);
   font-size: 0.875rem;
   font-weight: 500;
@@ -602,7 +602,7 @@
 
 .ds-theme-impact__consumer-label {
   margin: 0 0 var(--ds-space-2);
-  color: var(--ds-accent-text);
+  color: var(--ds-accent);
   font-family: var(--ds-font-mono);
   font-size: 0.6875rem;
   font-weight: 500;
@@ -613,7 +613,7 @@
 /* —— Storytelling: era timeline + metric series —— */
 .ds-theme-impact__live-badge {
   margin: var(--ds-space-3) 0 0;
-  color: var(--ds-accent-text);
+  color: var(--ds-accent);
   font-size: 0.75rem;
 }
 
@@ -645,7 +645,7 @@
 }
 
 .ds-theme-impact__era-timeline-index {
-  color: var(--ds-accent-text);
+  color: var(--ds-accent);
   font-size: 0.8125rem;
 }
 
@@ -725,6 +725,6 @@
 }
 
 .ds-theme-impact__question-link a {
-  color: var(--ds-accent-text);
+  color: var(--ds-accent);
   font-weight: 500;
 }

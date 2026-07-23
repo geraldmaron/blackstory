@@ -13,7 +13,7 @@ import { collectPacketProvenance } from './ThemeImpactProvenanceList';
 export const REDLINING_PILOT_PACKET: ThemeImpactPacketView =
   REDLINING_PACKET_FIXTURES.find((packet) => packet.questionId === 'Q3')!;
 
-const METHOD_STANCE_LABEL = 'Juxtaposition — not causation';
+const METHOD_STANCE_LABEL = 'Juxtaposition · not causation';
 const INDICATOR_LIMIT = 3;
 
 export type ThemeImpactStoryEmbedProps = {

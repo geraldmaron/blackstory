@@ -75,7 +75,7 @@ export function ThemeBrowseSections() {
           Themes with live packets
         </h2>
         <p className="ds-section__lede">
-          Redlining and drug policy &amp; the state ship first — canonical questions with cited
+          Redlining and drug policy &amp; the state ship first: canonical questions with cited
           warehouse packets when Postgres is configured, fixture fallback otherwise, and explicit
           gap labels throughout.
         </p>
@@ -100,7 +100,7 @@ export function ThemeBrowseSections() {
         </h2>
         <p className="ds-section__lede">
           These themes use the same packet shape. They stay labeled coming soon until ingestion and
-          editorial review catch up — not hidden, not overstated.
+          editorial review catch up, not hidden, not overstated.
         </p>
         <ul className="ds-theme-impact__catalog" aria-label="Priority P1 themes coming soon">
           {p1.map((entry) => (
