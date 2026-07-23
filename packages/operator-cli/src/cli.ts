@@ -97,6 +97,7 @@ const REPEATABLE_FLAGS = new Set(['--source-url', '--feed-xml', '--from']);
 const BOOLEAN_FLAGS = new Set([
   '--commit',
   '--continue-on-quarantine',
+  '--enrich',
   '--full',
   '--include-curated',
   '--omit-raw-model',
@@ -1002,7 +1003,7 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
           });
 
           const bridgeClient: EnrichmentBridgeClient = {
-            complete: async (prompt) => {
+            complete: async (prompt: string) => {
               const res = await provider.complete({
                 model: model ?? 'mock-enrichment',
                 messages: [{ role: 'user', content: prompt }],
@@ -1102,7 +1103,7 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
       }
       default: {
         stderr(
-          'Usage: operator-cli <preflight|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|sundown-town-brief|locate> [flags]',
+          'Usage: operator-cli <preflight|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|sundown-town-brief|harness-run|locate> [flags]',
         );
         return command ? 1 : 0;
       }

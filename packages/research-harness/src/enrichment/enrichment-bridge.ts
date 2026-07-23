@@ -14,14 +14,14 @@ export interface EnrichedCandidate {
   readonly title: string;
   readonly publicSummary: string;
   readonly historicalContext: string;
-  readonly coordinates?: { readonly latitude: number; readonly longitude: number };
+  readonly coordinates?: { readonly latitude: number; readonly longitude: number } | undefined;
   readonly confidence: number;
   readonly claims: readonly {
     readonly id: string;
     readonly predicate: string;
     readonly object: string;
     readonly confidence: number;
-    readonly citationUrl?: string;
+    readonly citationUrl?: string | undefined;
   }[];
 }
 
@@ -70,9 +70,12 @@ Provide the response in the following JSON format:
   const responseText = await client.complete(prompt, 'enriched-candidate.v1');
   const parsed = JSON.parse(responseText);
 
+  const parsedLat = parsed.latitude ? parseFloat(parsed.latitude) : undefined;
+  const parsedLng = parsed.longitude ? parseFloat(parsed.longitude) : undefined;
+
   const coords =
-    parsed.latitude !== undefined && parsed.longitude !== undefined
-      ? { latitude: parsed.latitude, longitude: parsed.longitude }
+    parsedLat !== undefined && parsedLng !== undefined && !isNaN(parsedLat) && !isNaN(parsedLng)
+      ? { latitude: parsedLat, longitude: parsedLng }
       : subject.coordinates;
 
   return {
@@ -80,7 +83,7 @@ Provide the response in the following JSON format:
     title: parsed.title || subject.title,
     publicSummary: parsed.publicSummary || '',
     historicalContext: parsed.historicalContext || '',
-    coordinates: coords,
+    ...(coords ? { coordinates: coords } : {}),
     confidence: parsed.confidence || 0.5,
     claims: parsed.claims || [],
   };

@@ -1,5 +1,3 @@
-import type { EvidenceSource } from '@repo/domain/src/provenance/source.js';
-
 export type ConnectorKind = 'nps_network_to_freedom' | 'dpla' | 'wikidata';
 
 export interface HarnessRawSubject {
@@ -7,10 +5,10 @@ export interface HarnessRawSubject {
   readonly connectorKind: ConnectorKind;
   readonly title: string;
   readonly description: string;
-  readonly coordinates?: { readonly latitude: number; readonly longitude: number };
-  readonly locationName?: string;
-  readonly county?: string;
-  readonly state?: string;
+  readonly coordinates?: { readonly latitude: number; readonly longitude: number } | undefined;
+  readonly locationName?: string | undefined;
+  readonly county?: string | undefined;
+  readonly state?: string | undefined;
   readonly cites: readonly string[];
   readonly rawRecord: Record<string, unknown>;
 }
@@ -22,23 +20,45 @@ export interface ConnectorFetchOptions {
   readonly county?: string;
 }
 
+/** Stateful CSV line splitter that respects quoted fields containing commas. */
+export function splitCsvLine(line: string): string[] {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === ',' && !inQuotes) {
+      result.push(current.trim());
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  result.push(current.trim());
+  return result;
+}
+
 /** Parses a simulated NPS Network to Freedom CSV record row. */
 export function parseNpsNetworkToFreedomRow(
   row: Record<string, string>,
 ): HarnessRawSubject {
   const latitude = row.latitude ? parseFloat(row.latitude) : undefined;
   const longitude = row.longitude ? parseFloat(row.longitude) : undefined;
-  const coords = latitude !== undefined && longitude !== undefined ? { latitude, longitude } : undefined;
+  const coords = latitude !== undefined && longitude !== undefined && !isNaN(latitude) && !isNaN(longitude)
+    ? { latitude, longitude }
+    : undefined;
 
   return {
     id: `nps-ntf:${row.id || row.name}`,
     connectorKind: 'nps_network_to_freedom',
     title: row.name || 'Untitled NTF Site',
     description: row.abstract || row.description || '',
-    coordinates: coords,
-    locationName: row.address || row.city || '',
-    county: row.county || '',
-    state: row.state || '',
+    ...(coords ? { coordinates: coords } : {}),
+    ...(row.address || row.city ? { locationName: row.address || row.city } : {}),
+    ...(row.county ? { county: row.county } : {}),
+    ...(row.state ? { state: row.state } : {}),
     cites: row.source_url ? [row.source_url] : [],
     rawRecord: row as unknown as Record<string, unknown>,
   };
@@ -49,18 +69,23 @@ export function fetchNpsNetworkToFreedom(
   csvData: string,
   options: ConnectorFetchOptions = {},
 ): readonly HarnessRawSubject[] {
-  // Simple CSV parser for testing / robust parsing of the structured dataset
   const lines = csvData.split('\n').map((line) => line.trim()).filter(Boolean);
   if (lines.length < 2) return [];
 
-  const headers = lines[0].split(',').map((h) => h.replace(/^"|"$/g, '').trim());
+  const firstLine = lines[0];
+  if (!firstLine) return [];
+  const headers = splitCsvLine(firstLine).map((h) => h.replace(/^"|"$/g, '').trim());
   const subjects: HarnessRawSubject[] = [];
 
   for (let i = 1; i < lines.length; i++) {
-    const values = lines[i].split(',').map((v) => v.replace(/^"|"$/g, '').trim());
+    const rawLine = lines[i];
+    if (rawLine === undefined) continue;
+    const values = splitCsvLine(rawLine).map((v) => v.replace(/^"|"$/g, '').trim());
     const row: Record<string, string> = {};
     headers.forEach((header, idx) => {
-      row[header] = values[idx] || '';
+      if (header) {
+        row[header] = values[idx] || '';
+      }
     });
 
     if (options.state && row.state?.toLowerCase() !== options.state.toLowerCase()) continue;
@@ -91,7 +116,7 @@ export function fetchDplaItems(
       const isShownAt = item.isShownAt ? [String(item.isShownAt)] : [];
       
       return {
-        id: `dpla:${item.id || item.ingestDate}`,
+        id: `dpla:${item.id || item.ingestDate || Math.random().toString()}`,
         connectorKind: 'dpla' as const,
         title: String(title),
         description: String(description),

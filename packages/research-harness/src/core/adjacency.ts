@@ -4,8 +4,8 @@ import type { HarnessRawSubject } from './connector.js';
 export interface SpatialTemporalOverlap {
   readonly subjectA: HarnessRawSubject;
   readonly subjectB: HarnessRawSubject;
-  readonly distanceMeters?: number;
-  readonly sharedGeohashPrefix?: string;
+  readonly distanceMeters?: number | undefined;
+  readonly sharedGeohashPrefix?: string | undefined;
   readonly policyEras: readonly string[];
 }
 
@@ -47,19 +47,19 @@ export function findSpatialTemporalOverlaps(
 
   for (let i = 0; i < subjects.length; i++) {
     const a = subjects[i];
+    if (!a) continue;
     const yearA = extractYearFromText(a.description) || extractYearFromText(a.title);
     const erasA = yearA !== undefined ? resolvePolicyErasForYear(yearA) : [];
 
     for (let j = i + 1; j < subjects.length; j++) {
       const b = subjects[j];
+      if (!b) continue;
       const yearB = extractYearFromText(b.description) || extractYearFromText(b.title);
       const erasB = yearB !== undefined ? resolvePolicyErasForYear(yearB) : [];
 
-      // Check temporal intersection
       const sharedEras = erasA.filter((era) => erasB.includes(era));
       if (sharedEras.length === 0) continue;
 
-      // Check spatial intersection if coordinates exist
       if (a.coordinates && b.coordinates) {
         const distance = haversineMeters(
           { lat: a.coordinates.latitude, lng: a.coordinates.longitude },
@@ -82,7 +82,7 @@ export function findSpatialTemporalOverlaps(
             subjectA: a,
             subjectB: b,
             distanceMeters: Math.round(distance),
-            sharedGeohashPrefix: sharedPrefix || undefined,
+            ...(sharedPrefix ? { sharedGeohashPrefix: sharedPrefix } : {}),
             policyEras: sharedEras,
           });
         }
