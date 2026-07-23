@@ -215,8 +215,8 @@ Contact for review questions: Gerald Dagher, me@geralddagher.com.
 
 | Platform | Profile | Build ID / version | Distribution link | Date |
 |---|---|---|---|---|
-| iOS | `preview` | `7af8927c-6488-480d-ad30-fa60106fe9ad` (buildNumber 11) | https://expo.dev/accounts/gerald-maron/projects/blackstory/builds/7af8927c-6488-480d-ad30-fa60106fe9ad | 2026-07-22 — requeued after Metro dist/post-install fix (ad hoc: iPhone + Mac) |
-| Android | `preview` | `860bef11-3bd7-46f2-a969-e7e953caf88f` (versionCode 4) | https://expo.dev/accounts/gerald-maron/projects/blackstory/builds/860bef11-3bd7-46f2-a969-e7e953caf88f | 2026-07-22 — requeued after Metro dist/post-install fix |
+| iOS | `preview` | `728149c9-7435-4d2f-bdc2-da9735e08910` (buildNumber 12) | https://expo.dev/accounts/gerald-maron/projects/blackstory/builds/728149c9-7435-4d2f-bdc2-da9735e08910 | 2026-07-22 — requeued after post-install zod resolve fix (ad hoc: iPhone + Mac) |
+| Android | `preview` | `0e68a339-d258-4625-bde6-1f5cafcb4f2e` (versionCode 5) | https://expo.dev/accounts/gerald-maron/projects/blackstory/builds/0e68a339-d258-4625-bde6-1f5cafcb4f2e | 2026-07-22 — requeued after post-install zod resolve fix |
 
 ---
 
