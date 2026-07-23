@@ -18,7 +18,10 @@ import {
   OpportunityAtlasCoverageChart,
 } from './OpportunityAtlasCoverageChart';
 import { PopulationByDecadeChart } from './PopulationByDecadeChart';
+import { RacePairComparisonChart } from './RacePairComparisonChart';
+import { GroupedBarIndicatorChart } from './GroupedBarIndicatorChart';
 import { StatePopulationShiftChart } from './StatePopulationShiftChart';
+import { DATA_PAGE_INDICATOR_FIXTURE_BUNDLE } from '@repo/domain/statistics/data-page-series';
 
 function timelineRow(
   partial: Partial<NationalPopulationTimelineRow> &
@@ -243,4 +246,39 @@ test('compactOutcomeFieldLabel shortens long Opportunity Atlas field names', () 
     compactOutcomeFieldLabel('Incarceration rate (pooled, parents p25)'),
     'Jail (pooled, p25)',
   );
+});
+
+test('RacePairComparisonChart renders wealth juxtaposition with theme link', () => {
+  const html = renderToStaticMarkup(
+    createElement(RacePairComparisonChart, {
+      series: DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.wealthComparison,
+    }),
+  );
+  assert.match(html, /Median family net worth/);
+  assert.match(html, /\$44,900/);
+  assert.match(html, /\$285,000/);
+  assert.match(html, /See this in Themes/);
+  assert.match(html, /\/themes\/redlining/);
+});
+
+test('GroupedBarIndicatorChart renders NHGIS homeownership decades', () => {
+  const html = renderToStaticMarkup(
+    createElement(GroupedBarIndicatorChart, {
+      series: DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.cookHomeownership,
+    }),
+  );
+  assert.match(html, /Homeownership by householder race/);
+  assert.match(html, /1990/);
+  assert.match(html, /2010/);
+  assert.match(html, /37\.1%/);
+  assert.match(html, /Black householder/);
+});
+
+test('GroupedBarIndicatorChart returns nothing when points are empty', () => {
+  const html = renderToStaticMarkup(
+    createElement(GroupedBarIndicatorChart, {
+      series: { ...DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.hmdaDenialRates, points: [] },
+    }),
+  );
+  assert.equal(html, '');
 });

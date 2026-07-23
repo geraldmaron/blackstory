@@ -119,16 +119,42 @@ async function fetchPopGroupByState(input: {
   );
 }
 
+/**
+ * ACS B03002 (Hispanic or Latino Origin by Race):
+ * - B03002_003E = White alone, not Hispanic or Latino
+ * - B03002_004E = Black or African American alone, not Hispanic or Latino
+ *
+ * Do NOT use B03002_005E (AIAN NH) or B03002_014E (Hispanic Black) — a prior bug
+ * used those codes and produced ~30k IL denominators → absurd 50k+/100k "rates".
+ */
+export const ACS_WHITE_ALONE_NH_VARIABLE = 'B03002_003E';
+export const ACS_BLACK_ALONE_NH_VARIABLE = 'B03002_004E';
+
+/** Reject denominators that cannot support plausible state imprisonment rates. */
+export function assertPlausibleStateRacePopulations(
+  populations: ReadonlyMap<string, StateRacePopulation>,
+): void {
+  for (const row of populations.values()) {
+    if (row.whitePopulation < 10_000 || row.blackPopulation < 1_000) {
+      throw new Error(
+        `Implausible ACS/PEP race denominators for state ${row.stateFips}: ` +
+          `white=${row.whitePopulation}, black=${row.blackPopulation}`,
+      );
+    }
+  }
+}
+
 async function fetchAcsStateRacePopulationsFallback(input: {
   readonly referenceYear: number;
   readonly apiKey: string;
   readonly fetchImpl: FetchLike;
 }): Promise<Map<string, StateRacePopulation>> {
   const params = new URLSearchParams({
-    get: 'NAME,B03002_005E,B03002_014E',
+    get: `NAME,${ACS_WHITE_ALONE_NH_VARIABLE},${ACS_BLACK_ALONE_NH_VARIABLE}`,
     for: 'state:*',
     key: input.apiKey,
   });
+  // ACS 5-year for calendar year Y is published as dataset Y; BJS 2023 → prefer 2023 ACS5.
   const url = `https://api.census.gov/data/${input.referenceYear}/acs/acs5?${params.toString()}`;
   const response = await input.fetchImpl(url);
   if (!response.ok) {
@@ -140,8 +166,8 @@ async function fetchAcsStateRacePopulationsFallback(input: {
   }
   const [header, ...rows] = payload as [string[], ...PepRow[]];
   const stateIdx = header.indexOf('state');
-  const whiteIdx = header.indexOf('B03002_005E');
-  const blackIdx = header.indexOf('B03002_014E');
+  const whiteIdx = header.indexOf(ACS_WHITE_ALONE_NH_VARIABLE);
+  const blackIdx = header.indexOf(ACS_BLACK_ALONE_NH_VARIABLE);
   if (stateIdx < 0 || whiteIdx < 0 || blackIdx < 0) {
     throw new Error('Census ACS response missing state or B03002 race columns');
   }
@@ -161,6 +187,7 @@ async function fetchAcsStateRacePopulationsFallback(input: {
       `Census ACS state race populations empty for reference year ${input.referenceYear}`,
     );
   }
+  assertPlausibleStateRacePopulations(merged);
   return merged;
 }
 
@@ -198,6 +225,7 @@ export async function fetchCensusStateRacePopulations(input: {
       if (blackPopulation === undefined) continue;
       merged.set(stateFips, { stateFips, whitePopulation, blackPopulation });
     }
+    assertPlausibleStateRacePopulations(merged);
     return merged;
   } catch {
     return fetchAcsStateRacePopulationsFallback({

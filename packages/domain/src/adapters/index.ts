@@ -101,6 +101,13 @@ export * from './census-demographics/index.js';
 export * from './bjs-nps/index.js';
 export * from './vera-incarceration/index.js';
 export * from './eviction-lab/index.js';
+export * from './scf-wealth/index.js';
+export * from './hud-chas/index.js';
+export * from './hmda/index.js';
+export * from './ussc-quick-facts/index.js';
+export * from './dsl-renewing-inequality/index.js';
+export * from './cdc-eji/index.js';
+export * from './epa-tri/index.js';
 // IPUMS NHGIS historical county race adapter (parser + extract client + decade registry).
 export * from './nhgis/index.js';
 

@@ -50,6 +50,7 @@ Formal decisions for BlackStory platform topology, data, deployment, and securit
 | [ADR-026](./ADR-026-postgrest-published-read-surface.md) | PostgREST published-read surface (dual-surface with `api-public`) | Accepted |
 | [ADR-027](./ADR-027-vercel-public-web-hosting.md) | Vercel for public web hosting | Accepted (amended 2026-07-22) |
 | [ADR-028](./ADR-028-discovery-schedule-runtime.md) | Discovery schedule runtime: Corsair systemd + Postgres | Accepted |
+| [ADR-029](./ADR-029-theme-impact-packets.md) | Theme impact packets: canonical question answers over shared stats/evidence | Accepted |
 
 ## Security boundary set (do not expand)
 

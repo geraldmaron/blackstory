@@ -237,3 +237,18 @@
 .ds-data-page .ds-citation__label {
   font-weight: 400;
 }
+
+.ds-data-page__theme-link {
+  color: var(--ds-accent-text, var(--ds-accent));
+  font-family: var(--ds-font-sans);
+  font-size: inherit;
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: var(--ds-accent-graphic);
+  text-underline-offset: 0.15em;
+}
+
+.ds-data-page__theme-link:hover,
+.ds-data-page__theme-link:focus-visible {
+  color: var(--ds-ink);
+}

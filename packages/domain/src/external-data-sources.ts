@@ -114,6 +114,31 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     notes: 'HOLC residential security grades A–D per neighborhood polygon, 1935–1940 surveys.',
   },
   {
+    id: 'dsl-renewing-inequality',
+    displayName: 'Renewing Inequality: urban renewal project attributes + polygons',
+    custodian: 'University of Richmond Digital Scholarship Lab',
+    homepageUrl: 'https://dsl.richmond.edu/panorama/renewal/',
+    dataUrl:
+      'https://raw.githubusercontent.com/americanpanorama/Renewing_Inequality_Data/master/Data/non_spatial_data.csv',
+    license: {
+      name: 'CC BY-NC-SA 4.0 (DSL vector derivatives); federal characteristics reports public domain',
+      verdict: 'noncommercial',
+      notes:
+        'Same DSL family as mapping-inequality-holc — vector GeoJSON and derived map products ' +
+        'require attribution and are noncommercial; rights review required before revenue-bearing ' +
+        'surface use. Chicago pilot parses 1955–1966 project attributes only; polygons gated.',
+    },
+    vintage: 'Federal urban renewal characteristics reports 1955–1966; partial city polygons',
+    geographies: ['city'],
+    cadence: 'irregular',
+    checksumSha256: '88fb5f3aa228bdd42af6dac537c9f8ac923b70dcdd519acc8dbde0ac8fda9fc5',
+    registryState: 'disabled',
+    notes:
+      'Chicago pilot: 43 projects with attributes in 1955–1966; 17 Chicago polygon features in ' +
+      'ur_projects.geojson (incomplete). Public surfaces cite-only until rights review clears ' +
+      'target surface.',
+  },
+  {
     id: 'fbi-ucr-hate-crime',
     displayName: 'FBI UCR Hate Crime Master File (1991–present)',
     custodian: 'FBI Criminal Justice Information Services (CJIS) Division / UCR Program',
@@ -207,7 +232,10 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     geographies: ['tract', 'county', 'state'],
     cadence: 'annual',
     registryState: 'disabled',
-    notes: 'Housing cost burden, severe burden, overcrowding, tenure by income and race.',
+    notes:
+      'Housing cost burden, severe burden, overcrowding, tenure by income and race. ' +
+      'Phase 1 Cook 17031 fixture uses Con Plan Table 20 (CHAS 2016–2020 suburban Cook) ' +
+      'race cost-burden cells mapped to county:17031; full HUD county 050 extract pending.',
   },
   {
     id: 'crdc-school-civil-rights',
@@ -459,9 +487,9 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     registryState: 'disabled',
     notes:
       'Historical decennial 1790–2020 county race counts for pre-2000 decades and boundary-stable ' +
-      'Δ via NHGIS time-series tables + crosswalks. Blocked on human NHGIS_API_KEY registration — ' +
-      'see packages/domain/src/adapters/nhgis/ scaffold and demographics/comparability.ts for ' +
-      'category comparability notes (do not invent harmonized totals).',
+      'Δ via NHGIS time-series tables + crosswalks. Phase 1 Cook `county:17031` population-share ' +
+      'fixture covers 1970–2010 population share and 1990–2010 tenure-by-race homeownership for Cook `county:17031`. Live extract ' +
+      'still requires NHGIS_API_KEY — see adapters/nhgis and demographics/comparability.ts.',
   },
   {
     id: 'slavevoyages-transatlantic',
@@ -581,6 +609,21 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     notes:
       'Person-level admissions/releases — too large for full SoR. Strategy: cite ICPSR DOI; store ' +
       'only derived state×year×race tables if an ingestion bead produces them with provenance.',
+  },
+  {
+    id: 'ussc-quick-facts-drug',
+    displayName: 'USSC Quick Facts — federal crack/powder drug sentencing',
+    custodian: 'United States Sentencing Commission',
+    homepageUrl: 'https://www.ussc.gov/research/quick-facts',
+    dataUrl: 'https://www.ussc.gov/research/quick-facts',
+    license: { name: 'U.S. government work — public domain', verdict: 'public-domain' },
+    vintage: 'USSC Quick Facts fiscal-year publications (crack/powder cocaine trafficking)',
+    geographies: ['nation'],
+    cadence: 'annual',
+    registryState: 'disabled',
+    notes:
+      'Selective store of published Quick Facts table cells (average sentence months, race shares). ' +
+      'Federal FY only — juxtaposition with statutes for drug-policy context. No microdata scrape.',
   },
   {
     id: 'fed-survey-consumer-finances',

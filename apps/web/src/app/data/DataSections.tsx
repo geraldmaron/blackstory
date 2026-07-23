@@ -1,27 +1,20 @@
 /**
- * Data page body: on-page TOC, orientation beats, numbered model sections
- * (census, ACS, hate crime, Opportunity Atlas), and Explore/methodology hand-offs.
- * Charts and citations stay in shared `components/data/*`; this file owns chrome
- * and reader-facing copy (plain language over modeling jargon).
+ * Data page body: on-page TOC, orientation beats, census population, Phase 1 indicator
+ * visualizations (wealth, housing, justice), and Themes / Explore hand-offs.
  */
 import Link from 'next/link';
-import { Notice } from '@repo/ui';
 import type {
-  AcsCoverageSummary,
-  HateCrimeYearSummary,
   HistoricalStatePopulationCoverage,
   NationalPopulationTimelineRow,
-  OpportunityAtlasCoverageSummary,
   Phase1IndicatorCoverageSummary,
   StatePopulationChange,
 } from '@repo/domain/statistics/public-data-summaries';
-import { AcsCoverageChart } from '../../components/data/AcsCoverageChart';
+import type { DataPageIndicatorBundle } from '@repo/domain/statistics/data-page-series';
 import { BlackPopulationShareChart } from '../../components/data/BlackPopulationShareChart';
 import { DataStatStrip } from '../../components/data/DataStatStrip';
-import { HateCrimeCompositionChart } from '../../components/data/HateCrimeCompositionChart';
-import { HateCrimeYearSeriesChart } from '../../components/data/HateCrimeYearSeriesChart';
-import { OpportunityAtlasCoverageChart } from '../../components/data/OpportunityAtlasCoverageChart';
+import { GroupedBarIndicatorChart } from '../../components/data/GroupedBarIndicatorChart';
 import { PopulationByDecadeChart } from '../../components/data/PopulationByDecadeChart';
+import { RacePairComparisonChart } from '../../components/data/RacePairComparisonChart';
 import { StatePopulationShift } from '../../components/data/StatePopulationShift';
 import type { DataSourceRef } from '../../components/data/SourceFootnote';
 import './data.css';
@@ -29,25 +22,25 @@ import './data.css';
 const PAGE_SECTIONS = [
   { id: 'orientation', label: 'Start here' },
   { id: 'population', label: 'Population' },
-  { id: 'acs', label: 'Neighborhoods' },
-  { id: 'context-indicators', label: 'Context indicators' },
-  { id: 'hate-crime', label: 'Hate crime' },
-  { id: 'mobility', label: 'Opportunity' },
+  { id: 'wealth', label: 'Wealth' },
+  { id: 'housing', label: 'Housing & credit' },
+  { id: 'justice', label: 'Justice' },
+  { id: 'themes', label: 'Themes' },
   { id: 'how-to-use', label: 'Next step' },
 ] as const;
 
 const ORIENTATION_BEATS = [
   {
     kicker: 'National first',
-    body: 'This page is the country-wide picture. County maps and local layers live on Explore.',
+    body: 'Census sections show the country-wide picture. Indicator charts zoom into published series we also use on Themes.',
   },
   {
     kicker: 'Sources visible',
-    body: 'Every figure links to where it came from. If a number is missing, we say so.',
+    body: 'Every figure links to where it came from. Fixture-backed charts say so until warehouse ingest replaces them.',
   },
   {
     kicker: 'Gaps are not silence',
-    body: 'Uneven reporting or incomplete coverage means the feed is incomplete, not that nothing happened.',
+    body: 'Uneven coverage means the feed is incomplete, not that nothing happened. Juxtaposition is not causation.',
   },
 ] as const;
 
@@ -66,12 +59,8 @@ export type DataSectionsProps = {
   readonly stateChanges: readonly StatePopulationChange[];
   readonly stateNameByFips: Readonly<Record<string, string>>;
   readonly historicalStates: HistoricalStatePopulationCoverage | undefined;
-  readonly acs: AcsCoverageSummary | undefined;
   readonly phase1Indicators: Phase1IndicatorCoverageSummary | undefined;
-  readonly hateCrime: HateCrimeYearSummary | undefined;
-  readonly hateCrimeByYear: readonly HateCrimeYearSummary[];
-  readonly latestHateCrimeYear: string;
-  readonly opportunity: OpportunityAtlasCoverageSummary | undefined;
+  readonly indicators: DataPageIndicatorBundle;
 };
 
 function formatCount(value: number): string {
@@ -95,13 +84,14 @@ export function DataSections({
   stateChanges,
   stateNameByFips,
   historicalStates,
-  acs,
   phase1Indicators,
-  hateCrime,
-  hateCrimeByYear,
-  latestHateCrimeYear,
-  opportunity,
+  indicators,
 }: DataSectionsProps) {
+  const servedFromNote =
+    indicators.servedFrom === 'fixture'
+      ? 'Charts below use verified Phase 1 fixtures until live warehouse rows replace them.'
+      : 'Charts below read from the reference indicator warehouse when available.';
+
   return (
     <div className="ds-data-page">
       <nav className="ds-data-page__nav" aria-labelledby="data-toc-title">
@@ -133,8 +123,9 @@ export function DataSections({
             How to read these numbers
           </h2>
           <p className="ds-section__lede">
-            Each section names who published the data, shows what we have loaded, and points to the
-            map when you need a place view instead of a national summary.
+            Census decades anchor the national story. Phase 1 indicators — ACS, NHGIS, HMDA, CHAS,
+            BJS, SCF, USSC, and more — show the same metrics we juxtapose on{' '}
+            <Link href="/themes">Themes</Link>. {servedFromNote}
           </p>
           <ul className="ds-data-page__beat-grid">
             {ORIENTATION_BEATS.map((beat) => (
@@ -159,10 +150,8 @@ export function DataSections({
             Black population over time
           </h2>
           <p className="ds-section__lede">
-            How many Black Americans the Census counted each decade from 1790 to 2020. Before the
-            Civil War, counts separate free and enslaved people. Later decades report one Black
-            total. Below that, you can see how the national count changed from one decade to the
-            next, and which states gained or lost the most between 2010 and 2020.
+            How many Black Americans the Census counted each decade from 1790 to 2020 — the spine for
+            national context before place-specific indicators.
           </p>
           {timelineRows.length > 0 ? (
             <>
@@ -177,11 +166,8 @@ export function DataSections({
                   </h3>
                   <DataStatStrip labelledBy="population-change-heading" items={changeStripItems} />
                   <p className="ds-sans ds-data-page__note">
-                    Race labels on the Census have changed. Early counts split free and enslaved
-                    people; later forms used different words for Black identity; and from 2000 the
-                    Census allows more than one race. Those shifts mean older and newer totals are
-                    not a perfect apples-to-apples line. The charts mark those boundaries instead of
-                    hiding them.
+                    Race labels on the Census have changed. The charts mark definition boundaries
+                    instead of hiding them.
                   </p>
                 </>
               ) : null}
@@ -230,70 +216,91 @@ export function DataSections({
           )}
         </section>
 
-        <section className="ds-section ds-record-section" aria-labelledby="acs-heading" id="acs">
+        <section className="ds-section ds-record-section" aria-labelledby="wealth-heading" id="wealth">
           <p className="ds-section__kicker">
             <span className="ds-kicker-index" aria-hidden="true" />
-            American Community Survey
+            Survey of Consumer Finances
           </p>
-          <h2 className="ds-section__title" id="acs-heading">
-            Where neighborhood estimates are available
+          <h2 className="ds-section__title" id="wealth-heading">
+            Wealth gap at a glance
           </h2>
           <p className="ds-section__lede">
-            The American Community Survey estimates income, housing, and education for counties and
-            neighborhoods. Here we show how much of the country is covered in our archive, not a
-            single national average of those estimates. Use Explore when you want the place view.
+            Median family net worth from the Federal Reserve&apos;s triennial survey — a national
+            juxtaposition used on the{' '}
+            <Link href="/themes/redlining">redlining theme</Link> when asking how housing-credit eras
+            relate to wealth.
           </p>
-          {acs ? (
-            <>
-              <div className="ds-data-section__viz">
-                <AcsCoverageChart coverage={acs} />
-              </div>
-              <DataStatStrip
-                labelledBy="acs-heading"
-                sources={[{ label: acs.source, url: acs.sourceUrl }]}
-                items={[
-                  {
-                    id: 'acs-counties',
-                    value: formatCount(acs.countyCount),
-                    label: 'Counties with estimates',
-                  },
-                  {
-                    id: 'acs-tracts',
-                    value: formatCount(acs.tractCount),
-                    label: 'Neighborhoods with estimates',
-                    note: `${acs.vintage} five-year survey`,
-                  },
-                ]}
-              />
-            </>
-          ) : (
-            <DataUnavailable topic="Neighborhood estimate coverage" />
-          )}
+          <div className="ds-data-section__viz">
+            <RacePairComparisonChart series={indicators.wealthComparison} />
+          </div>
         </section>
 
         <section
           className="ds-section ds-record-section"
-          aria-labelledby="context-indicators-heading"
-          id="context-indicators"
+          aria-labelledby="housing-heading"
+          id="housing"
         >
           <p className="ds-section__kicker">
             <span className="ds-kicker-index" aria-hidden="true" />
-            Research context
+            NHGIS · HMDA · CHAS
           </p>
-          <h2 className="ds-section__title" id="context-indicators-heading">
-            Curated indicator catalog
+          <h2 className="ds-section__title" id="housing-heading">
+            Housing, credit, and cost burden
           </h2>
           <p className="ds-section__lede">
-            A short list of justice, wealth, housing, and education metrics we are wiring for
-            research and operator tools. Showing a metric beside a law or place is context — not
-            proof that the law caused the number. See methodology for the full rule.
+            Cook County is our Phase 1 place spine: decennial homeownership (NHGIS), mortgage denial
+            rates (HMDA), and HUD CHAS cost burden from the Consolidated Plan — the same metrics
+            bound to theme-impact question Q3 and Q4.
+          </p>
+          <div className="ds-data-section__viz">
+            <GroupedBarIndicatorChart series={indicators.cookHomeownership} />
+            <GroupedBarIndicatorChart series={indicators.hmdaDenialRates} />
+            <RacePairComparisonChart series={indicators.costBurdenComparison} />
+          </div>
+        </section>
+
+        <section
+          className="ds-section ds-record-section"
+          aria-labelledby="justice-heading"
+          id="justice"
+        >
+          <p className="ds-section__kicker">
+            <span className="ds-kicker-index" aria-hidden="true" />
+            BJS · USSC
+          </p>
+          <h2 className="ds-section__title" id="justice-heading">
+            Imprisonment and federal drug sentences
+          </h2>
+          <p className="ds-section__lede">
+            State imprisonment rates (BJS) and federal cocaine sentencing averages (USSC Quick Facts)
+            — context for the{' '}
+            <Link href="/themes/drug_policy_state">drug policy &amp; the state theme</Link>, not proof
+            that any single law caused a number.
+          </p>
+          <div className="ds-data-section__viz">
+            <RacePairComparisonChart series={indicators.imprisonmentComparison} />
+            <GroupedBarIndicatorChart series={indicators.federalDrugSentences} />
+          </div>
+        </section>
+
+        <section className="ds-section ds-record-section" aria-labelledby="themes-heading" id="themes">
+          <p className="ds-section__kicker">
+            <span className="ds-kicker-index" aria-hidden="true" />
+            Theme-impact
+          </p>
+          <h2 className="ds-section__title" id="themes-heading">
+            Same metrics, full stories
+          </h2>
+          <p className="ds-section__lede">
+            Themes packages these indicators beside artifacts and policy eras. Data shows the
+            numbers; Themes shows how we juxtapose them without causal overclaim.
           </p>
           {phase1Indicators ? (
             <DataStatStrip
-              labelledBy="context-indicators-heading"
+              labelledBy="themes-heading"
               sources={[
                 {
-                  label: 'Context data source matrix',
+                  label: 'Phase 1 indicator catalog',
                   url: '/methodology',
                 },
               ]}
@@ -307,129 +314,26 @@ export function DataSections({
                 {
                   id: 'p1-obs',
                   value: formatCount(phase1Indicators.sampleObservationCount),
-                  label: 'Sample observations loaded',
+                  label: 'Warehouse observations loaded',
                   note:
                     phase1Indicators.sampleObservationCount === 0
-                      ? 'Catalog only until Postgres ingest runs'
-                      : 'From bb_reference statistical observations',
+                      ? 'Catalog + fixtures until ingest completes'
+                      : 'bb_reference statistical observations',
                 },
               ]}
             />
-          ) : (
-            <DataUnavailable topic="Context indicator catalog" />
-          )}
-          <p className="ds-sans ds-data-page__empty">
-            <Link href="/methodology">Juxtaposition is not causation</Link> — how we talk about
-            laws and indicators together.
+          ) : null}
+          <p className="ds-data-page__actions">
+            <Link className="ds-cta ds-cta--copper" href="/themes/redlining">
+              Redlining theme
+            </Link>
+            <Link className="ds-cta ds-cta--quiet" href="/themes/drug_policy_state">
+              Drug policy theme
+            </Link>
+            <Link className="ds-cta ds-cta--quiet" href="/methodology">
+              Juxtaposition rules
+            </Link>
           </p>
-        </section>
-
-        <section
-          className="ds-section ds-record-section"
-          aria-labelledby="hate-crime-heading"
-          id="hate-crime"
-        >
-          <p className="ds-section__kicker">
-            <span className="ds-kicker-index" aria-hidden="true" />
-            FBI
-          </p>
-          <h2 className="ds-section__title" id="hate-crime-heading">
-            Reported hate crimes
-          </h2>
-          <p className="ds-section__lede">
-            What participating police agencies reported to the FBI. Not every agency joins the
-            program, so an empty place can mean no report was filed, not that nothing happened.
-          </p>
-          <Notice
-            className="ds-data-page__callout"
-            tone="warning"
-            title="Reporting is voluntary"
-          >
-            Agencies choose whether to send hate crime reports. Always read the incident counts next
-            to the national participation rate below. That rate is the coverage context for every
-            figure in this section.
-          </Notice>
-          {hateCrime ? (
-            <>
-              {hateCrimeByYear.length > 1 ? (
-                <div className="ds-data-section__viz">
-                  <HateCrimeYearSeriesChart summaries={hateCrimeByYear} />
-                </div>
-              ) : null}
-              <div className="ds-data-section__viz">
-                <HateCrimeCompositionChart summary={hateCrime} />
-              </div>
-              <DataStatStrip
-                labelledBy="hate-crime-heading"
-                sources={[{ label: hateCrime.source, url: hateCrime.sourceUrl }]}
-                items={[
-                  {
-                    id: 'hc-incidents',
-                    value: formatCount(hateCrime.incidents),
-                    label: `Reports filed in ${latestHateCrimeYear}`,
-                  },
-                  {
-                    id: 'hc-anti-black',
-                    value: formatCount(hateCrime.antiBlackIncidents),
-                    label: 'Anti-Black bias reports',
-                  },
-                  ...(hateCrime.nationalParticipatingAgenciesPct !== undefined
-                    ? [
-                        {
-                          id: 'hc-participation',
-                          value: `${hateCrime.nationalParticipatingAgenciesPct}%`,
-                          label: 'Agencies that reported nationally',
-                          note: 'Read every count above next to this rate',
-                        },
-                      ]
-                    : []),
-                ]}
-              />
-            </>
-          ) : (
-            <DataUnavailable topic="Hate crime reporting figures" />
-          )}
-        </section>
-
-        <section
-          className="ds-section ds-record-section"
-          aria-labelledby="mobility-heading"
-          id="mobility"
-        >
-          <p className="ds-section__kicker">
-            <span className="ds-kicker-index" aria-hidden="true" />
-            Opportunity Atlas
-          </p>
-          <h2 className="ds-section__title" id="mobility-heading">
-            Opportunity by neighborhood
-          </h2>
-          <p className="ds-section__lede">
-            Research on how children from similar family incomes fare as adults, neighborhood by
-            neighborhood. We show which places are covered. We do not mash those neighborhood ranks
-            into one national average, because neighborhoods are different sizes and that average
-            would mislead.
-          </p>
-          {opportunity ? (
-            <>
-              <div className="ds-data-section__viz">
-                <OpportunityAtlasCoverageChart coverage={opportunity} />
-              </div>
-              <DataStatStrip
-                labelledBy="mobility-heading"
-                sources={[{ label: opportunity.source, url: opportunity.sourceUrl }]}
-                items={[
-                  {
-                    id: 'oa-tracts',
-                    value: formatCount(opportunity.tractCount),
-                    label: 'Neighborhoods covered',
-                    note: opportunity.license,
-                  },
-                ]}
-              />
-            </>
-          ) : (
-            <DataUnavailable topic="Opportunity Atlas coverage" />
-          )}
         </section>
 
         <section
@@ -446,8 +350,7 @@ export function DataSections({
           </h2>
           <p className="ds-section__lede">
             Open the map for county layers and local context. Methodology explains how we read
-            outside statistics next to archive records, including voluntary reporting and coverage
-            gaps.
+            outside statistics next to archive records.
           </p>
           <p className="ds-data-page__actions">
             <Link className="ds-cta ds-cta--copper" href="/explore">

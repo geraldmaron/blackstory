@@ -1,0 +1,18 @@
+{
+  "pilotScope": "metro:chicago-il",
+  "city": "chicago",
+  "state": "il",
+  "attributeYears": "1955-1966",
+  "totalChicagoProjectsInSource1955_1966": 43,
+  "pilotProjectIds": ["2457", "2461", "2466", "2473", "2474"],
+  "pilotProjectNames": {
+    "2457": "central englewood",
+    "2461": "englewood",
+    "2466": "hyde park-kenwood",
+    "2473": "michael reese hospital",
+    "2474": "near west side"
+  },
+  "fixtureRowCount": 129,
+  "sourceUrl": "https://github.com/americanpanorama/Renewing_Inequality_Data/blob/master/Data/non_spatial_data.csv",
+  "retrievedAt": "2026-07-22T00:00:00.000Z"
+}
