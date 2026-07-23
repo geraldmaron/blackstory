@@ -27,12 +27,46 @@ export const OSM_ATTRIBUTION = '© OpenStreetMap contributors';
 export const PROTOMAPS_ATTRIBUTION = 'Protomaps';
 export const MAP_ATTRIBUTION_LINES = [OSM_ATTRIBUTION, PROTOMAPS_ATTRIBUTION] as const;
 
+/**
+ * Default glyphs endpoint — same OpenFreeMap fonts CDN the web Explore map uses
+ * (`OPENFREEMAP_GLYPHS_URL` / `tiles.openfreemap.org/fonts`). Required whenever
+ * MapScreen mounts a symbol layer (cluster counts): without a style `glyphs`
+ * URL, MapLibre Native requests an empty URL and fails with NSURLError
+ * unsupported URL (−1002) for the default Open Sans stack.
+ *
+ * Pair with `MAP_LABEL_TEXT_FONT` (`Noto Sans Regular`) — OpenFreeMap serves
+ * that stack; it does not serve Open Sans.
+ */
+export const DEFAULT_MAP_GLYPHS_URL =
+  'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf';
+
+/** Font stack present on OpenFreeMap; must match glyph PBF filenames. */
+export const MAP_LABEL_TEXT_FONT = ['Noto Sans Regular'] as const;
+
 type MapExtra = {
   /** HTTPS URL of the self-hosted PMTiles archive on Firebase Hosting/CDN. */
   readonly pmtilesUrl?: string;
+  /**
+   * HTTPS MapLibre glyphs template (`…/{fontstack}/{range}.pbf`). Empty/invalid
+   * values are ignored so we never pass an empty string into style JSON.
+   */
+  readonly glyphsUrl?: string;
   /** Kill-switch: force-disable the basemap tile source (points-only, zero egress). */
   readonly basemapEnabled?: boolean;
 };
+
+/** Absolute http(s) URL, or null when missing/blank/non-http(s). */
+function sanitizeHttpUrl(raw: string | undefined): string | null {
+  const value = (raw ?? '').trim();
+  if (!value) return null;
+  try {
+    const parsed = new URL(value);
+    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return null;
+    return value;
+  } catch {
+    return null;
+  }
+}
 
 function readMapExtra(): MapExtra {
   const extra = Constants.expoConfig?.extra as { map?: MapExtra } | undefined;
@@ -47,8 +81,18 @@ const extra = readMapExtra();
  * geodata work deferred past the spike (ADR-024 "Known gaps"). With no URL the
  * map renders the demo dark canvas + entity points — never a third-party demo
  * basemap, and never any silent paid dependency.
+ *
+ * Empty-string `extra.map.pmtilesUrl` is treated as unset (never passed through
+ * as `pmtiles://` with a blank host — that also surfaces as unsupported URL).
  */
-export const MAP_PMTILES_URL: string | null = extra.pmtilesUrl ?? null;
+export const MAP_PMTILES_URL: string | null = sanitizeHttpUrl(extra.pmtilesUrl);
+
+/**
+ * Glyphs template for symbol layers. Defaults to OpenFreeMap; overridable via
+ * `extra.map.glyphsUrl` when a self-hosted font pack is ready. Never empty.
+ */
+export const MAP_GLYPHS_URL: string =
+  sanitizeHttpUrl(extra.glyphsUrl) ?? DEFAULT_MAP_GLYPHS_URL;
 
 /**
  * Whether to attach the basemap tile source. Defaults to "enabled iff we have a

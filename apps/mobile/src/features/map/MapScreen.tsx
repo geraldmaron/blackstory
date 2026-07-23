@@ -36,7 +36,12 @@ import {
 import { ErrorState, duration } from '@/ui';
 import { MapAttribution } from './MapAttribution';
 import { buildBasemapStyle, ENTITY_POINT_LAYER_STYLE } from './mapStyle';
-import { MAP_BASEMAP_ENABLED, MAP_PMTILES_URL } from './mapConfig';
+import {
+  MAP_BASEMAP_ENABLED,
+  MAP_GLYPHS_URL,
+  MAP_LABEL_TEXT_FONT,
+  MAP_PMTILES_URL,
+} from './mapConfig';
 import { MAP_FAILURE_COPY, type MapLoadState } from './mapLoadState';
 import { DEMO_MAP_SOURCE, type MapFeatureCollection } from './demoMapSource';
 import { MAP_MAX_ZOOM, US_BOUNDS, type Bbox, type CameraTarget, type LngLat } from './mapCamera';
@@ -51,6 +56,8 @@ export type MapScreenProps = {
   readonly loadState?: MapLoadState;
   /** PMTiles archive URL override (tests / staging). */
   readonly pmtilesUrl?: string | null;
+  /** Glyphs template override (tests / staging). */
+  readonly glyphsUrl?: string | null;
   /** Basemap kill-switch override (tests). */
   readonly basemapEnabled?: boolean;
   /** Retry callback surfaced by the degraded state. */
@@ -83,6 +90,7 @@ export function MapScreen({
   source = DEMO_MAP_SOURCE,
   loadState = { kind: 'ready' },
   pmtilesUrl = MAP_PMTILES_URL,
+  glyphsUrl = MAP_GLYPHS_URL,
   basemapEnabled = MAP_BASEMAP_ENABLED,
   onRetry,
   clustering = true,
@@ -140,7 +148,10 @@ export function MapScreen({
     );
   }
 
-  const style = buildBasemapStyle({ pmtilesUrl: basemapEnabled ? pmtilesUrl : null });
+  const style = buildBasemapStyle({
+    pmtilesUrl: basemapEnabled ? pmtilesUrl : null,
+    glyphsUrl,
+  });
 
   function handleSourcePress(event: NativeSyntheticEvent<{ features?: GeoJSON.Feature[] }>): void {
     const feature = event?.nativeEvent?.features?.[0];
@@ -209,6 +220,8 @@ export function MapScreen({
               filter={['has', 'point_count']}
               style={{
                 textField: ['get', 'point_count_abbreviated'],
+                // OpenFreeMap hosts Noto Sans — not MapLibre's default Open Sans.
+                textFont: [...MAP_LABEL_TEXT_FONT],
                 textSize: 12,
                 textColor: ENTITY_POINT_LAYER_STYLE.circleStrokeColor,
               }}

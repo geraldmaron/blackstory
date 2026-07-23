@@ -15,8 +15,20 @@ jest.mock('@maplibre/maplibre-react-native', () => {
   const React = require('react');
   const { View } = require('react-native');
   return {
-    Map: ({ children, testID }: { children?: unknown; testID?: string }) =>
-      React.createElement(View, { testID: testID ?? 'maplibre-map' }, children as never),
+    Map: ({
+      children,
+      testID,
+      mapStyle,
+    }: {
+      children?: unknown;
+      testID?: string;
+      mapStyle?: string;
+    }) =>
+      React.createElement(
+        View,
+        { testID: testID ?? 'maplibre-map', accessibilityLabel: mapStyle },
+        children as never,
+      ),
     Camera: () => React.createElement(View, { testID: 'maplibre-camera' }),
     GeoJSONSource: ({ children, data }: { children?: unknown; data?: unknown }) =>
       React.createElement(
@@ -31,6 +43,7 @@ jest.mock('@maplibre/maplibre-react-native', () => {
 
 // eslint-disable-next-line import/first
 import { MapScreen } from '../MapScreen';
+import { DEFAULT_MAP_GLYPHS_URL, MAP_LABEL_TEXT_FONT } from '../mapConfig';
 
 describe('MapScreen — ready state', () => {
   it('mounts the native map, a GeoJSON source, and visible attribution without crashing', async () => {
@@ -40,6 +53,31 @@ describe('MapScreen — ready state', () => {
     expect(getByTestId('maplibre-geojson-source')).toBeTruthy();
     // Attribution is a real, on-screen element (license obligation), not just doc.
     expect(getByTestId('map-attribution')).toBeTruthy();
+  });
+
+  it('passes a style JSON with HTTPS glyphs (never empty / scheme-less)', async () => {
+    const { getByTestId } = await render(<MapScreen />);
+    const styleJson = getByTestId('maplibre-map').props.accessibilityLabel as string;
+    const style = JSON.parse(styleJson) as { glyphs?: string };
+    expect(style.glyphs).toBe(DEFAULT_MAP_GLYPHS_URL);
+    expect(style.glyphs?.startsWith('https://')).toBe(true);
+  });
+
+  it('uses OpenFreeMap Noto Sans for cluster count labels (not default Open Sans)', async () => {
+    const { getAllByTestId } = await render(<MapScreen />);
+    const layers = getAllByTestId('maplibre-layer');
+    const clusterCount = layers.find((node) => {
+      const style = JSON.parse(node.props.accessibilityLabel as string) as {
+        textField?: unknown;
+        textFont?: string[];
+      };
+      return Boolean(style.textField);
+    });
+    expect(clusterCount).toBeTruthy();
+    const style = JSON.parse(clusterCount!.props.accessibilityLabel as string) as {
+      textFont?: string[];
+    };
+    expect(style.textFont).toEqual([...MAP_LABEL_TEXT_FONT]);
   });
 
   it('renders the OpenStreetMap + Protomaps attribution text', async () => {

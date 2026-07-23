@@ -15,6 +15,7 @@
  * that as a checkable invariant and is exercised by mapStyle.test.ts.
  */
 import { brandCore, themeColors } from '@/ui';
+import { DEFAULT_MAP_GLYPHS_URL } from './mapConfig';
 
 /** Minimal MapLibre style shape we build; passed to <Map mapStyle> as JSON. */
 export type MapStyleSpec = {
@@ -22,27 +23,51 @@ export type MapStyleSpec = {
   readonly name: string;
   readonly sources: Record<string, unknown>;
   readonly layers: readonly Record<string, unknown>[];
-  readonly glyphs?: string;
+  /**
+   * Absolute HTTPS glyphs template. Always set — MapScreen's cluster-count
+   * symbol layer requires it; omitting it yields empty-URL native failures.
+   */
+  readonly glyphs: string;
 };
 
 export type BuildBasemapStyleInput = {
   /** PMTiles archive URL (Firebase Hosting/CDN), or null for the demo canvas. */
   readonly pmtilesUrl: string | null;
-  /** Glyphs endpoint for label rendering; required only when a basemap is attached. */
+  /**
+   * Glyphs endpoint for label rendering. Defaults to OpenFreeMap fonts.
+   * Blank/null/undefined → DEFAULT_MAP_GLYPHS_URL (never omit or empty-string).
+   */
   readonly glyphsUrl?: string | null;
 };
 
 const DARK = themeColors.dark;
+
+/** Resolve a usable glyphs template; never returns empty. */
+function resolveGlyphsUrl(glyphsUrl: string | null | undefined): string {
+  const trimmed = (glyphsUrl ?? '').trim();
+  if (!trimmed) return DEFAULT_MAP_GLYPHS_URL;
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+      return DEFAULT_MAP_GLYPHS_URL;
+    }
+    return trimmed;
+  } catch {
+    return DEFAULT_MAP_GLYPHS_URL;
+  }
+}
 
 /**
  * Builds the basemap style. With a `pmtilesUrl` it attaches a vector source read
  * via MapLibre Native's `pmtiles://` protocol (HTTPS range requests, per
  * ADR-013/ADR-024) and draws land/water/admin lines in the dark theme's
  * low-contrast border tone. With no URL it returns the demo canvas: a single
- * dark background layer, zero network requests — the honest spike basemap
- * (ADR-024 "Known gaps"), never a third-party demo tile server.
+ * dark background layer and no tile sources — never a third-party demo tile
+ * server. Glyphs always attach over HTTPS (OpenFreeMap by default) so cluster
+ * count symbol layers do not request an empty URL on MapLibre Native.
  */
 export function buildBasemapStyle({ pmtilesUrl, glyphsUrl }: BuildBasemapStyleInput): MapStyleSpec {
+  const glyphs = resolveGlyphsUrl(glyphsUrl);
   const backgroundLayer = {
     id: 'background',
     type: 'background',
@@ -53,6 +78,7 @@ export function buildBasemapStyle({ pmtilesUrl, glyphsUrl }: BuildBasemapStyleIn
     return {
       version: 8,
       name: 'blackstory-dark-archive-demo',
+      glyphs,
       sources: {},
       layers: [backgroundLayer],
     };
@@ -61,7 +87,7 @@ export function buildBasemapStyle({ pmtilesUrl, glyphsUrl }: BuildBasemapStyleIn
   return {
     version: 8,
     name: 'blackstory-dark-archive',
-    ...(glyphsUrl ? { glyphs: glyphsUrl } : {}),
+    glyphs,
     sources: {
       basemap: {
         type: 'vector',
