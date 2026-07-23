@@ -46,6 +46,8 @@ export function BooksCoverArt({
 
   return (
     <figure className={rootClass}>
+      {/* Open Library remote covers need client onError fallback; next/image remote patterns are out of scope here. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         className="ds-books-edition__cover-img"
         src={openLibraryCoverUrl(isbn, size)}

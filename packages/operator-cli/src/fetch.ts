@@ -24,6 +24,7 @@ import {
   type SafeFetchDependencies,
   type SafeFetchOptions,
   type SafeFetchResult,
+  type MalwareIndicator,
 } from '@repo/security/url-safety';
 import type { SnapshotMode } from '@repo/domain';
 
@@ -76,9 +77,9 @@ export const nodePinnedTransport: PinnedTransport = (pinnedRequest) =>
 export async function parseTextOnlyHtml(
   content: Uint8Array,
   contentType: string,
-): Promise<{ safe: boolean; indicators: string[]; extractedText: string }> {
+): Promise<{ safe: boolean; indicators: MalwareIndicator[]; extractedText: string }> {
   const text = new TextDecoder('utf-8', { fatal: false }).decode(content);
-  const indicators: string[] = [];
+  const indicators: MalwareIndicator[] = [];
   if (text.includes('EICAR-STANDARD-ANTIVIRUS-TEST-FILE')) {
     indicators.push('eicar_test_signature');
   }
