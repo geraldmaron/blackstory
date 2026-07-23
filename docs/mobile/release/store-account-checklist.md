@@ -3,7 +3,7 @@
 - **Bead**: `repo-fsxq` (MOB-001 human gates)
 - **Blocks**: `black-book-mobile-020` (MOB-020), first real EAS preview submit, TestFlight/Play closed testing
 - **Source**: `docs/mobile/decisions/mobile-identity.md`
-- **Status**: **none complete** — verified 2026-07-22 in `feat/mobile-launch` worktree
+- **Status**: **none complete** for account enrollment — verified 2026-07-22; store-search research notes added 2026-07-22; Firebase §8 superseded for v1
 
 Owner-ordered checklist. Complete in sequence where noted; do not mark items done until evidence is recorded (account IDs, screenshots of console settings, or 1Password item links — never paste secrets into git).
 
@@ -79,10 +79,19 @@ Proposed identifiers (from `apps/mobile/app.config.ts` / MOB-001):
 
 ## 5. Trademark and store name collision
 
-- [ ] USPTO TESS search for **BlackStory** and **Black Story** (and close variants).
-- [ ] App Store search for name collisions on **BlackStory**.
-- [ ] Play Store search for name collisions on **BlackStory**.
-- [ ] Document outcome: proceed, rename subtitle only, or escalate to legal before creating store listings.
+- [ ] USPTO Trademark Search (tmsearch.uspto.gov — TESS retired) for **BlackStory** and **Black Story** (and close variants).
+- [x] App Store search for name collisions on **BlackStory** / **Black Stories** — agent pass 2026-07-22 (see notes below).
+- [x] Play Store search for name collisions on **BlackStory** / **Black Stories** — agent pass 2026-07-22 (see notes below).
+- [ ] Document owner outcome: proceed, rename subtitle only, or escalate to legal before creating store listings.
+
+**Agent research notes (2026-07-22 — not legal advice):**
+
+| Surface | Finding |
+|---|---|
+| Exact product mark | **BlackStory** (one word, medial capital) — no identical App Store / Play hit found in web search for a place-pinned history archive. |
+| Near collision | Multiple **“Black Stories”** (two words) party/riddle games on Play and App Store (e.g. STARSIRIUS / TechInnovate Labs / “Black Stories - Dark Puzzles”). Different category (games), different spelling/spacing, different meaning. |
+| USPTO | Automated fetch of tmsearch.uspto.gov blocked (407). **Owner must run Basic Search** for BLACKSTORY / BLACK STORY and save date + result summary in 1Password / bead notes. |
+| Risk posture | Proceeding with **BlackStory** + subtitle “History, pinned to place.” is plausible; keep subtitle factual so store search distinguishes from “Black Stories” games. Escalate to counsel if USPTO shows live conflicting marks in IC 9/41. |
 
 **Evidence**: search date + summary (links OK; no legal advice in repo).
 
@@ -123,29 +132,17 @@ Store listings require live HTTPS URLs on the production domain.
 
 ---
 
-## 8. Firebase iOS and Android apps + secrets in 1Password
+## 8. Signing / submit secrets in 1Password (Firebase App Check N/A)
 
-Production Firebase project (existing): `black-book-efaaf` (`infra/firebase/registered-apps.json` lists **web + admin only** — no mobile apps yet).
+**Superseded for v1 mobile client:** `apps/mobile` uses Postgres-backed `X-BlackStory-Client` attestation — **no** `@react-native-firebase/*`, **no** `GoogleService-Info.plist` / `google-services.json` in the native app (see `apps/mobile/README.md`, `apps/mobile/PRIVACY.md`). Do **not** block preview builds on Firebase mobile app registration.
 
-Per environment tier, register Firebase apps and store config files in 1Password (Developer vault):
+Still required for EAS Submit automation (store when ready):
 
-| Tier | Bundle / applicationId | Firebase apps to register | 1Password items (proposed names) |
-|---|---|---|---|
-| Development | `app.blackbook.mobile.dev` | iOS + Android (emulator/dev only; no prod Firebase in dev builds) | `BlackStory Mobile Firebase — Dev (iOS plist)`, `… Dev (Android json)` |
-| Preview | `app.blackbook.mobile.preview` | iOS + Android | `BlackStory Mobile Firebase — Preview (iOS plist)`, `… Preview (Android json)` |
-| Production | `app.blackbook.mobile` | iOS + Android | `BlackStory Mobile Firebase — Production (iOS plist)`, `… Production (Android json)` |
+- [ ] Apple Developer / App Store Connect API key (Issuer ID, Key ID, `.p8`) in 1Password
+- [ ] Google Play service account JSON (if using EAS Submit for Android)
+- [ ] EAS CI token (scoped, revocable)
 
-- [ ] In Firebase console (`black-book-efaaf`), register iOS apps for preview (+ production when gate clears).
-- [ ] Register Android apps for preview (+ production when gate clears).
-- [ ] Download `GoogleService-Info.plist` (iOS) and `google-services.json` (Android) per tier.
-- [ ] Store each file in 1Password; wire EAS secrets / build credentials per MOB-019 runbook (never commit plists/json to git).
-- [ ] Update `infra/firebase/registered-apps.json` with non-secret app metadata after registration (no secret keys in repo).
-
-**Also store in 1Password** (if not already present — confirmed absent 2026-07-20 inventory):
-
-- [ ] Apple Developer / App Store Connect API key (if using EAS Submit automation)
-- [ ] Google Play service account JSON (if using EAS Submit automation)
-- [ ] EAS CI token (scoped)
+Optional later: if a future bead reintroduces Firebase Crashlytics or App Check, register iOS/Android apps under `black-book-efaaf` then — not a MOB-020 gate today.
 
 ---
 
@@ -155,10 +152,10 @@ All must be true before `eas build --profile preview` is submitted to TestFlight
 
 - [ ] Items **1–3** complete (Apple, Google, Expo/EAS org + MFA custody recorded).
 - [ ] Item **4** availability confirmed for `app.blackbook.mobile.preview`.
-- [ ] Item **5** trademark/name collision reviewed (no blocking conflict).
+- [ ] Item **5** trademark/name collision reviewed (no blocking conflict) — store searches drafted; USPTO owner pass still open.
 - [ ] Item **6** `/support` and `/privacy` live on `blackbook.app` **or** explicit owner waiver documented (MOB-020 cannot complete store metadata without them).
 - [ ] Item **7** spend ceiling documented.
-- [ ] Item **8** preview-tier Firebase iOS/Android apps registered; plist/json in 1Password; EAS env wired for preview profile.
+- [ ] Item **8** ASC/Play/EAS submit secrets in 1Password **if** using automated submit (manual upload acceptable for first beta).
 
 ---
 
