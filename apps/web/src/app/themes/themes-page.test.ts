@@ -7,6 +7,10 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
+import {
+  listAvailableThemeIds,
+  listPacketsForTheme,
+} from '../../components/theme-impact/fixtures';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -57,4 +61,28 @@ test('themes method notice cites methodology without legacy notice chrome', () =
   assert.match(browseSource, /Juxtaposition, not causation/);
   assert.match(browseSource, /href="\/methodology"/);
   assert.doesNotMatch(browseSource, /ds-theme-impact__notice-title/);
+});
+
+test('all five adjudicated themes are available with researched packets', () => {
+  const themeIds = listAvailableThemeIds();
+  assert.deepEqual(themeIds, [
+    'redlining',
+    'drug_policy_state',
+    'urban_renewal',
+    'mass_incarceration',
+    'environmental_racism',
+  ]);
+  assert.equal(
+    themeIds.reduce((count, themeId) => count + listPacketsForTheme(themeId).length, 0),
+    9,
+  );
+  for (const themeId of themeIds) {
+    assert.ok(listPacketsForTheme(themeId).length > 0);
+  }
+});
+
+test('themes browse no longer describes available P1 themes as coming soon', () => {
+  assert.match(browseSource, /Extended evidence themes/);
+  assert.doesNotMatch(browseSource, />\s*Coming soon\s*</);
+  assert.doesNotMatch(browseSource, /P1 themes coming soon/);
 });

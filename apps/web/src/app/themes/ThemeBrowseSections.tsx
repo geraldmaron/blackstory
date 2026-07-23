@@ -1,6 +1,6 @@
 /**
  * Theme browse sections for the public /themes index. v6 edition Surface panels for
- * method notice, P0 live themes, and P1 coming soon catalog rows.
+ * method notice and researched P0 and P1 catalog rows.
  */
 
 import React from 'react';
@@ -95,9 +95,8 @@ export function ThemeBrowseSections() {
               Themes with live packets
             </h2>
             <p className="ds-themes-edition__lede">
-              Redlining and drug policy and the state ship first: canonical questions with cited
-              warehouse packets when Postgres is configured, fixture fallback otherwise, and explicit
-              gap labels throughout.
+              Redlining and drug policy packets connect primary records to measured outcomes while
+              keeping geography, time, and evidentiary limits visible.
             </p>
           </div>
         </header>
@@ -109,7 +108,7 @@ export function ThemeBrowseSections() {
       </article>
 
       <article
-        className={themesEditionPanelClassName('soon')}
+        className={themesEditionPanelClassName('catalog')}
         aria-labelledby="themes-p1-heading"
         id="p1-themes"
       >
@@ -120,15 +119,15 @@ export function ThemeBrowseSections() {
           <div>
             <p className="ds-themes-edition__kicker">Priority P1</p>
             <h2 className="ds-themes-edition__title" id="themes-p1-heading">
-              Coming soon
+              Extended evidence themes
             </h2>
             <p className="ds-themes-edition__lede">
-              These themes use the same packet shape. They stay labeled coming soon until ingestion
-              and editorial review catch up, not hidden, not overstated.
+              Urban renewal, mass incarceration, and unequal environmental burden use the same
+              cited packet structure. Mixed results and unavailable fields stay explicit.
             </p>
           </div>
         </header>
-        <ul className="ds-theme-impact__catalog" aria-label="Priority P1 themes coming soon">
+        <ul className="ds-theme-impact__catalog" aria-label="Priority P1 themes">
           {p1.map((entry, index) => (
             <ThemeCatalogRow key={entry.id} entry={entry} index={index} />
           ))}

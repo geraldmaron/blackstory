@@ -132,17 +132,6 @@ function derivedToView(row: ThemeImpactPacketDerived): ThemeImpactDerivedView {
 }
 
 function artifactToView(row: ThemeImpactPacketArtifact): ThemeImpactArtifactView {
-  const provenance =
-    row.sourceUrl !== undefined
-      ? {
-          source: row.artifactClass,
-          source_url: row.sourceUrl,
-          retrieved_at: row.dated ?? '',
-          content_hash: row.artifactId,
-          humanCitation: row.citation,
-        }
-      : undefined;
-
   return {
     id: row.artifactId,
     title: row.title,
@@ -150,7 +139,7 @@ function artifactToView(row: ThemeImpactPacketArtifact): ThemeImpactArtifactView
     ...(row.dated !== undefined ? { dateLabel: row.dated } : {}),
     summary: row.summary ?? row.citation,
     ...(row.uncertaintyLabel !== undefined ? { uncertaintyLabel: row.uncertaintyLabel } : {}),
-    ...(provenance !== undefined ? { provenance } : {}),
+    provenance: provenanceToView(row.provenance),
   };
 }
 

@@ -6,14 +6,14 @@
 import Link from 'next/link';
 import React from 'react';
 import type { ThemeImpactPacketView } from '@repo/domain';
-import { REDLINING_PACKET_FIXTURES } from './fixtures/packets/redlining';
+import { getPacketFixture } from './fixtures';
 import { collectPacketProvenance } from './ThemeImpactProvenanceList';
 import { ThemeImpactEmptyNotice } from './ThemeImpactEmptyNotice';
 import { THEME_IMPACT_METHOD_STANCE_COMPACT } from './theme-impact-copy';
 
 /** Fixture fallback when live reads are unavailable at build time. */
 export const REDLINING_PILOT_PACKET: ThemeImpactPacketView =
-  REDLINING_PACKET_FIXTURES.find((packet) => packet.questionId === 'Q3')!;
+  getPacketFixture('redlining', 'Q3')!;
 
 const METHOD_STANCE_LABEL = THEME_IMPACT_METHOD_STANCE_COMPACT;
 const INDICATOR_LIMIT = 3;

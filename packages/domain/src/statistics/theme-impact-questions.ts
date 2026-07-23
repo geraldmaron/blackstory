@@ -205,13 +205,12 @@ export const THEME_IMPACT_QUESTIONS: readonly ThemeImpactQuestion[] = [
     themeId: 'drug_policy_state',
     priority: 'P0',
     question:
-      'What documented government actions and artifacts describe state involvement in drug markets or drug-war enforcement affecting Black communities?',
+      'How did federal drug scheduling and sentencing statutes change, and what did those laws prescribe?',
     answerShape: 'artifact_timeline',
     policyEraFamily: 'drug_policy',
     metricBindings: [],
     artifactClasses: [
       'primary_government_document',
-      'investigative_foia_package',
       'peer_reviewed_synthesis',
       'scholarly_partner_table',
     ],
@@ -221,14 +220,13 @@ export const THEME_IMPACT_QUESTIONS: readonly ThemeImpactQuestion[] = [
     themeId: 'drug_policy_state',
     priority: 'P0',
     question:
-      'Across drug-policy eras, how did Black imprisonment / jail rates and related justice indicators change?',
+      'Across drug-policy eras, how did jail, imprisonment, and federal cocaine-sentencing indicators change?',
     answerShape: 'era_indicators',
     policyEraFamily: 'drug_policy',
     metricBindings: [
       { kind: 'phase1', metricId: 'imprisonment-rate-black-state' },
       { kind: 'phase1', metricId: 'imprisonment-rate-white-state' },
       { kind: 'phase1', metricId: 'vera-jail-population-rate-county' },
-      { kind: 'phase1', metricId: 'oa-incarceration-outcome-black-tract' },
       { kind: 'phase1', metricId: 'ussc-average-sentence-months-crack-nation' },
       { kind: 'phase1', metricId: 'ussc-average-sentence-months-powder-nation' },
       { kind: 'phase1', metricId: 'ussc-black-share-crack-offenders-nation' },
@@ -254,7 +252,6 @@ export const THEME_IMPACT_QUESTIONS: readonly ThemeImpactQuestion[] = [
       { kind: 'phase1', metricId: 'acs-homeownership-rate-black-county' },
       { kind: 'phase1', metricId: 'eviction-filing-rate-county' },
       { kind: 'phase1', metricId: 'ur-nonwhite-families-project' },
-      { kind: 'phase1', metricId: 'ur-total-families-project' },
       { kind: 'phase1', metricId: 'ur-dwelling-units-substandard-project' },
     ],
     artifactClasses: ['primary_government_document', 'peer_reviewed_synthesis'],
@@ -263,15 +260,14 @@ export const THEME_IMPACT_QUESTIONS: readonly ThemeImpactQuestion[] = [
     id: 'Q8',
     themeId: 'mass_incarceration',
     priority: 'P1',
-    question: 'How did Black adult imprisonment rates change by state across modern justice eras?',
+    question:
+      'How large are Black–White state imprisonment-rate disparities in the latest comparable data, and how much do they vary?',
     answerShape: 'era_indicators',
-    policyEraFamily: 'drug_policy',
+    policyEraFamily: 'none',
     metricBindings: [
       { kind: 'phase1', metricId: 'imprisonment-rate-black-state' },
       { kind: 'phase1', metricId: 'imprisonment-rate-white-state' },
-      { kind: 'phase1', metricId: 'vera-jail-population-rate-county' },
       { kind: 'derived', methodId: 'black_white_imprisonment_ratio' },
-      { kind: 'derived', methodId: 'era_delta' },
     ],
     artifactClasses: ['peer_reviewed_synthesis'],
   },
@@ -280,7 +276,7 @@ export const THEME_IMPACT_QUESTIONS: readonly ThemeImpactQuestion[] = [
     themeId: 'environmental_racism',
     priority: 'P1',
     question:
-      'How do environmental burden indicators concentrate relative to Black population share?',
+      'What do county indicators show, and fail to show, about environmental burden relative to Black population share?',
     answerShape: 'era_indicators',
     policyEraFamily: 'none',
     metricBindings: [
