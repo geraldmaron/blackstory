@@ -202,10 +202,21 @@ api-public (LAN or deployed).
 Store and preview builds ship an **embedded JS bundle** and never connect to a packager.
 **Agents:** run `pnpm mobile:ios:verify` before claiming mobile works. Do **not** use Metro `/status` on `127.0.0.1:8081` or open the Debug dev client expecting prod behavior.
 
+**Run from the repo root** (these scripts are not defined in `apps/mobile/package.json`):
+
 ```bash
+cd /path/to/blackstory   # monorepo root
 pnpm mobile:ios:release      # build/install/launch Release on booted Simulator
 pnpm mobile:ios:verify       # agent gate: api-public + Release app; Metro NOT checked
 pnpm mobile:ios:launch       # relaunch installed Release app only
+```
+
+From `apps/mobile`, invoke the same script directly:
+
+```bash
+bash ../../scripts/mobile-ios-release.sh              # release
+bash ../../scripts/mobile-ios-release.sh --verify-only
+bash ../../scripts/mobile-ios-release.sh --launch-only
 ```
 
 Requires `API_BASE_URL=http://127.0.0.1:8080` in `apps/mobile/.env.local` (Simulator).

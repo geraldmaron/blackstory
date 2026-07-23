@@ -1,7 +1,7 @@
 /**
- * Entity detail screen (MOB-014) — v6 edition Surface stack matching web
- * `design-direction-v6-entity.md`: intro, anatomy, trust off-ramp, narrative
- * beats, claims, timeline, connected records, provenance, and maps hand-off.
+ * Entity detail screen (MOB-014) — Ledger Line flat section stacks on canvas
+ * matching web `design-direction-v6-entity.md`: intro, anatomy, trust off-ramp,
+ * narrative beats, claims, timeline, connected records, provenance, maps hand-off.
  */
 import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { ErrorState, screenScrollInsets, space, useThemeColors } from '@/ui';

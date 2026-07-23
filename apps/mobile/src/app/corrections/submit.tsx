@@ -21,8 +21,8 @@
  * notice (see the corrections client). Reads/status lookups do not.
  */
 import { router, useLocalSearchParams } from 'expo-router';
-import { useMemo, useState } from 'react';
-import { KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
+import { useMemo, useRef, useState } from 'react';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
 
 import { parseEntityId, parseReturnTo } from '@/lib/route-params';
 import { CorrectionForm,
@@ -42,6 +42,7 @@ export default function CorrectionsSubmitSheet() {
 
   // The receipt is held only in local state — never in a route/URL param.
   const [receiptCode, setReceiptCode] = useState<string | null>(null);
+  const scrollRef = useRef<ScrollView>(null);
 
   // Lazily build the transport deps (App Check token provider, SecureStore,
   // connectivity). Held in a ref-like memo so the native backends load once.
@@ -60,7 +61,13 @@ export default function CorrectionsSubmitSheet() {
       >
         {/* Title left to the Notice inside CorrectionReceipt (which also carries the
             assistive-tech focus/announcement); the shell header stays distinct. */}
-        <UtilityScreenShell kicker="Trust" title="Correction submitted" edges={SHELL_EDGES}>
+        <UtilityScreenShell
+          ref={scrollRef}
+          kicker="Trust"
+          title="Correction submitted"
+          edges={SHELL_EDGES}
+          scrollProps={UTILITY_SCROLL_PROPS}
+        >
           <CorrectionReceipt
             receiptCode={receiptCode}
             onCheckStatus={() => router.replace('/corrections/status')}
@@ -77,13 +84,16 @@ export default function CorrectionsSubmitSheet() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <UtilityScreenShell
+        ref={scrollRef}
         kicker="Trust"
         title="Submit a correction"
         dek="Tell us what should change and link to evidence we can verify."
         edges={SHELL_EDGES}
+        scrollProps={UTILITY_SCROLL_PROPS}
       >
         <CorrectionForm
           entityId={entityId ?? undefined}
+          scrollRef={scrollRef}
           onSubmit={handleSubmit}
           onAccepted={(code) => setReceiptCode(code)}
         />
@@ -95,6 +105,11 @@ export default function CorrectionsSubmitSheet() {
 /** Header-bearing modal: the native header owns the top inset, so the canvas only
  * insets the sides and bottom (not a tab-screen top inset). */
 const SHELL_EDGES = ['left', 'right', 'bottom'] as const;
+
+const UTILITY_SCROLL_PROPS = {
+  keyboardShouldPersistTaps: 'handled' as const,
+  keyboardDismissMode: 'on-drag' as const,
+};
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },

@@ -111,9 +111,9 @@ test('researched catalog publishes exactly one packet for every substantive ques
   const questionIds = RESEARCHED_THEME_IMPACT_PACKETS.map((packet) => packet.questionId);
   assert.deepEqual(
     [...questionIds].sort(),
-    ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9'],
+    ['Q1', 'Q11', 'Q12', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9'],
   );
-  assert.equal(new Set(questionIds).size, 9);
+  assert.equal(new Set(questionIds).size, 11);
   for (const packet of RESEARCHED_THEME_IMPACT_PACKETS) {
     assert.doesNotThrow(() => assertThemeImpactPacketPublishable(packet));
   }
@@ -163,8 +163,17 @@ test('research adjudication challenges every public theme', () => {
     THEME_RESEARCH_ADJUDICATION.map((row) => row.themeId),
   );
   assert.deepEqual(adjudicatedThemeIds, packetThemeIds);
-  assert.equal(adjudicatedThemeIds.size, 5);
+  assert.equal(adjudicatedThemeIds.size, 7);
   assert.ok(
     THEME_RESEARCH_ADJUDICATION.every((row) => row.rationale.trim().length >= 80),
   );
+});
+
+test('redlining Q1 uses gated causal claim with named secondary claim ids', () => {
+  const q1 = RESEARCHED_THEME_IMPACT_PACKETS.find((packet) => packet.questionId === 'Q1');
+  assert.ok(q1);
+  assert.equal(q1.methodStance, 'gated_causal_claim');
+  assert.ok((q1.causalClaimIds ?? []).length >= 2);
+  assert.match(q1.methodNote, /Rothstein|Massey|Banaji/);
+  assert.match(q1.geography.label ?? '', /example/i);
 });

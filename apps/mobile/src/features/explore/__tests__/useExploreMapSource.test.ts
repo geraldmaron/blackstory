@@ -1,10 +1,13 @@
 /**
  * Unit tests for the Explore map source hook — live fetch, __DEV__ demo fallback, retry.
  */
-jest.mock('@/runtime', () => ({
-  useAppRuntimeOptional: jest.fn(() => null),
-  useRefreshBootstrapSync: jest.fn(() => jest.fn()),
-}));
+jest.mock('@/runtime', () => {
+  const refreshBootstrapSync = jest.fn();
+  return {
+    useAppRuntimeOptional: jest.fn(() => null),
+    useRefreshBootstrapSync: jest.fn(() => refreshBootstrapSync),
+  };
+});
 
 jest.mock('@/security', () => ({
   DEFAULT_API_BASE_URL: 'https://api.example.com',

@@ -122,8 +122,14 @@ describe('MapScreen — ready state', () => {
     expect(style.textFont).toEqual([...MAP_LABEL_TEXT_FONT]);
   });
 
-  it('renders OpenStreetMap + OpenFreeMap attribution by default', async () => {
-    const { getByText } = await render(<MapScreen />);
+  it('renders collapsed attribution that expands to OpenStreetMap + OpenFreeMap copy', async () => {
+    const { getByTestId, getByText, queryByText } = await render(<MapScreen />);
+    expect(queryByText(/OpenFreeMap/)).toBeNull();
+
+    await act(async () => {
+      fireEvent.press(getByTestId('map-attribution-toggle'));
+    });
+
     expect(getByText(/OpenStreetMap contributors/)).toBeTruthy();
     expect(getByText(/OpenFreeMap/)).toBeTruthy();
   });
@@ -182,12 +188,15 @@ describe('MapScreen — ready state', () => {
   });
 
   it('renders Protomaps attribution when a PMTiles URL is configured', async () => {
-    const { getByText } = await render(
+    const { getByTestId, getByText } = await render(
       <MapScreen pmtilesUrl="https://cdn.example/us.pmtiles" />,
     );
     // Attribution lines come from module-level MAP_ATTRIBUTION_LINES (OpenFreeMap
     // default). When only the style switches to PMTiles via prop, the chrome
     // still shows the configured attribution set — OSM must remain visible.
+    await act(async () => {
+      fireEvent.press(getByTestId('map-attribution-toggle'));
+    });
     expect(getByText(/OpenStreetMap contributors/)).toBeTruthy();
   });
 });

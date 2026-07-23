@@ -52,7 +52,7 @@ export function StatusSection({ entity, index }: StatusSectionProps) {
         </View>
       ) : (entity.statusHistory?.length ?? 0) > 0 ? (
         <View style={{ gap: space['2'] }}>
-          <Text variant="bodyEmphasis">Current status: {humanizeToken(entity.status ?? '')}</Text>
+          <Text variant="rowTitle">Current status: {humanizeToken(entity.status ?? '')}</Text>
           {(entity.statusHistory ?? []).map((record, recordIndex) => (
             <Text
               key={`${entity.id}_status_${recordIndex}`}

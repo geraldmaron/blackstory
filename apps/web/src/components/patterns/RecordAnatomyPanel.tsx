@@ -1,5 +1,5 @@
 /**
- * Shared record anatomy panel: compact map preview beside a soft 2×2 fact grid
+ * Shared record anatomy panel: compact map preview beside inline fact rows
  * (Kind / Where / Era / Evidence). Used on home featured records and Explore spotlight.
  */
 import React from 'react';
@@ -101,7 +101,7 @@ export function RecordAnatomyPanel({
         <PlaceSlot place={place} />
         <dl className="ds-record-anatomy__facts">
           {facts.map((fact) => (
-            <div key={fact.key} className="ds-record-anatomy__fact">
+            <div key={fact.key} className="ds-record-anatomy__fact ds-record-anatomy__fact--inline">
               <dt className="ds-record-anatomy__fact-label">
                 <EditionFactIcon
                   {...fact.icon}

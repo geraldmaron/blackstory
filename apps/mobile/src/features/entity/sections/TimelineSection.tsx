@@ -31,7 +31,7 @@ export function TimelineSection({ timeline, index }: TimelineSectionProps) {
             <Text variant="caption" colorRole="inkMuted">
               {event.atLabel} · {datePrecisionCaption(event.datePrecision)}
             </Text>
-            <Text variant="bodyEmphasis">{event.title}</Text>
+            <Text variant="rowTitle">{event.title}</Text>
             {event.body ? <Text variant="bodySmall">{event.body}</Text> : null}
           </View>
         ))}

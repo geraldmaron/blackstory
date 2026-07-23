@@ -30,7 +30,7 @@ describe('ScreenHeader', () => {
     expect(getByRole('header')).toBeTruthy();
   });
 
-  it('renders dense titles at subtitle scale with trailing actions', async () => {
+  it('renders dense titles at Ledger masthead scale with trailing actions', async () => {
     const { getByText, getByLabelText } = await render(
       <ScreenHeader
         kicker="Find in time"

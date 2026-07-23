@@ -2,12 +2,31 @@
  * SSR smoke tests for the shared record anatomy panel (map preview + fact grid).
  */
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
 import { RecordAnatomyPanel } from './RecordAnatomyPanel';
 
-test('renders soft fact grid without legacy column strip classes', () => {
+const here = dirname(fileURLToPath(import.meta.url));
+const recordAnatomyCss = readFileSync(join(here, 'record-anatomy.css'), 'utf8');
+
+test('record anatomy CSS keeps fact rows on one horizontal line', () => {
+  assert.match(recordAnatomyCss, /\.ds-record-anatomy__facts[\s\S]*?display:\s*grid/);
+  assert.match(
+    recordAnatomyCss,
+    /\.ds-record-anatomy__facts[\s\S]*?grid-template-columns:\s*max-content\s+minmax\(0,\s*1fr\)/,
+  );
+  assert.match(recordAnatomyCss, /\.ds-record-anatomy__fact[\s\S]*?display:\s*contents/);
+  assert.match(recordAnatomyCss, /\.ds-record-anatomy__fact-label[\s\S]*?white-space:\s*nowrap/);
+  assert.match(recordAnatomyCss, /\.ds-record-anatomy__fact-value[\s\S]*?min-width:\s*0/);
+  assert.doesNotMatch(recordAnatomyCss, /\.ds-record-anatomy__fact[\s\S]*?flex-flow:\s*row\s+wrap/);
+  assert.doesNotMatch(recordAnatomyCss, /\.ds-record-anatomy__fact-value[\s\S]*?flex:\s*1\s+1\s+12rem/);
+});
+
+test('renders inline fact rows without legacy column strip classes', () => {
   const html = renderToStaticMarkup(
     createElement(RecordAnatomyPanel, {
       facts: [
@@ -48,7 +67,9 @@ test('renders soft fact grid without legacy column strip classes', () => {
   );
 
   assert.match(html, /ds-record-anatomy/);
-  assert.match(html, /ds-record-anatomy__facts/);
+  assert.match(html, /ds-record-anatomy__fact--inline/);
+  assert.match(html, /ds-record-anatomy__fact-label/);
+  assert.match(html, /ds-record-anatomy__fact-value/);
   assert.match(html, /ds-edition-fact-icon--kind-muted/);
   assert.match(html, /ds-edition-fact-icon--evidence-high/);
   assert.match(html, /Record at a glance/);

@@ -10,7 +10,12 @@ import {
   MAP_SEMANTIC_TONE_ENCODING,
 } from './kind-encoding';
 import { DIGNITY_PALETTE } from './dignity-palette';
-import { markerRadiusExpression, markerRadiusPlusExpression, MARKER_HALO_OFFSET } from './marker-size';
+import {
+  markerRadiusExpression,
+  markerRadiusPlusExpression,
+  MARKER_HALO_OFFSET,
+  zoomScaledNumericExpression,
+} from './marker-size';
 
 type KindGlyphPaintSignature = {
   readonly opacity: number;
@@ -90,9 +95,13 @@ export function kindFillOpacityExpression(): readonly unknown[] {
 }
 
 export function kindStrokeWidthExpression(): readonly unknown[] {
-  return kindMatchExpression(
-    (entry) => glyphSignatureFor(entry.glyph).strokeWidth,
-    DEFAULT_GLYPH_PAINT_SIGNATURE.strokeWidth,
+  // Zoom-scale rims with the fill disc — fixed px strokes on nationally shrunk fills
+  // read as every entity lit/selected.
+  return zoomScaledNumericExpression(
+    kindMatchExpression(
+      (entry) => glyphSignatureFor(entry.glyph).strokeWidth,
+      DEFAULT_GLYPH_PAINT_SIGNATURE.strokeWidth,
+    ),
   );
 }
 
@@ -123,7 +132,7 @@ export const ENTITY_EVENT_GLYPH_LAYER_STYLE = {
   circleRadius: markerRadiusPlusExpression(4),
   circleOpacity: 0,
   circleStrokeColor: kindColorExpression(),
-  circleStrokeWidth: 1.5,
+  circleStrokeWidth: zoomScaledNumericExpression(1.5),
   circleStrokeOpacity: 0.9,
 } as const;
 
@@ -131,12 +140,12 @@ export const ENTITY_SELECTED_LAYER_STYLE = {
   circleColor: 'transparent',
   circleRadius: markerRadiusPlusExpression(3),
   circleStrokeColor: DIGNITY_PALETTE.selected,
-  circleStrokeWidth: 2,
+  circleStrokeWidth: zoomScaledNumericExpression(2),
 } as const;
 
 export const ENTITY_CLUSTER_LAYER_STYLE = {
   circleColor: DIGNITY_PALETTE.point,
   circleOpacity: ENTITY_CLUSTER_OPACITY,
   circleStrokeColor: DIGNITY_PALETTE.selected,
-  circleStrokeWidth: 2,
+  circleStrokeWidth: zoomScaledNumericExpression(2),
 } as const;

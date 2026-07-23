@@ -57,9 +57,9 @@ export function ListRow({
     <View style={styles.row}>
       {leading ? <View style={styles.leading}>{leading}</View> : null}
       <View style={styles.textColumn}>
-        <Text variant="bodyEmphasis">{title}</Text>
+        <Text variant="rowTitle">{title}</Text>
         {subtitle ? (
-          <Text variant="bodySmall" colorRole="inkMuted">
+          <Text variant="caption" colorRole="inkMuted">
             {subtitle}
           </Text>
         ) : null}
@@ -78,9 +78,8 @@ export function ListRow({
           android_ripple={{ color: theme.border }}
           style={({ pressed }) => [
             densityStyles,
-            // `canvas` (not `surfaceRaised`) — in the light theme surfaceRaised === surface,
-            // so a raised pressed fill is literally invisible.
-            { backgroundColor: pressed ? theme.canvas : 'transparent' },
+            // Press steps down the Archive Paper ladder (surface → surfacePressed).
+            { backgroundColor: pressed ? theme.surfacePressed : 'transparent' },
           ]}
         >
           {content}

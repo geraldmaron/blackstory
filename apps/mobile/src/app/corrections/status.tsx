@@ -59,6 +59,7 @@ export default function CorrectionsStatusScreen() {
         title="Correction status"
         dek="Enter the receipt code you saved when you submitted a correction."
         edges={SHELL_EDGES}
+        scrollProps={UTILITY_SCROLL_PROPS}
       >
         <CorrectionStatusView initialCode={initialCode} onLookup={handleLookup} />
       </UtilityScreenShell>
@@ -68,6 +69,11 @@ export default function CorrectionsStatusScreen() {
 
 /** Header-bearing stack screen: the native header owns the top inset. */
 const SHELL_EDGES = ['left', 'right', 'bottom'] as const;
+
+const UTILITY_SCROLL_PROPS = {
+  keyboardShouldPersistTaps: 'handled' as const,
+  keyboardDismissMode: 'on-drag' as const,
+};
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },

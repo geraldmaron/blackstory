@@ -28,20 +28,19 @@ export function FeaturedStoryCard({ entry, onPress }: FeaturedStoryCardProps) {
       accessibilityLabel={`Featured story: ${page.title}`}
       onPress={onPress}
       android_ripple={{ color: theme.border }}
-      // `canvas` (not opacity) — matches LedgerRow press feedback, visible on #FBF8F2.
-      style={({ pressed }) => [styles.pressable, { backgroundColor: pressed ? theme.canvas : 'transparent' }]}
+      style={({ pressed }) => [styles.pressable, { backgroundColor: pressed ? theme.surfacePressed : 'transparent' }]}
     >
       <View style={styles.inner}>
         {facts.length > 0 ? <RecordFactStrip facts={facts} valueVariant="bodySmall" /> : null}
-        <Text variant="bodyEmphasis" isHeading>
+        <Text variant="rowTitle" isHeading>
           {page.title}
         </Text>
         {page.dek ? (
-          <Text variant="bodySmall" colorRole="inkMuted" numberOfLines={3}>
+          <Text variant="caption" colorRole="inkMuted" numberOfLines={3}>
             {page.dek}
           </Text>
         ) : null}
-        <Text variant="bodyEmphasis" colorRole="accent">
+        <Text variant="caption" colorRole="accent">
           Read story
         </Text>
       </View>

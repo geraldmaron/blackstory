@@ -1,27 +1,27 @@
 /**
- * v6 edition panel header: mono index, copper kicker, Sora title, optional dek.
- * Mobile counterpart of web `ds-*-edition__header` blocks.
+ * Edition panel header: optional mono index, copper kicker, Ledger masthead title.
+ * Prefer ScreenHeader + LedgerSectionLabel on browse tabs (no indexed panels).
  */
 import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Text } from './Text';
+import { Text, type TextRole } from './Text';
 import { space, useThemeColors } from './tokens';
 
 export type EditionPanelHeaderProps = {
-  /** Panel index (00, 01…). Hidden when omitted. */
+  /** Panel index (00, 01…). Hidden when omitted. Omit on Ledger Line browse tabs. */
   readonly index?: string;
   readonly kicker?: string;
   readonly title: string;
   readonly dek?: string;
   readonly titleNode?: ReactNode;
   readonly compact?: boolean;
-  /** Browse density — subtitle-scale title (20px) instead of title (26px). */
+  /** Ledger Line density — 16 Inter Medium masthead (default). */
   readonly dense?: boolean;
   readonly trailing?: ReactNode;
 };
 
-function resolveTitleVariant(compact: boolean, dense: boolean): 'display' | 'title' | 'subtitle' {
-  if (dense) return 'subtitle';
+function resolveTitleVariant(compact: boolean, dense: boolean): TextRole {
+  if (dense) return 'masthead';
   if (compact) return 'title';
   return 'display';
 }

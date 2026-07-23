@@ -37,7 +37,7 @@ export function DevMenuHeaderButton() {
       style={({ pressed }) => [
         styles.btn,
         {
-          backgroundColor: pressed ? theme.canvas : theme.surface,
+          backgroundColor: pressed ? theme.surfacePressed : theme.surface,
           borderColor: theme.border,
         },
       ]}

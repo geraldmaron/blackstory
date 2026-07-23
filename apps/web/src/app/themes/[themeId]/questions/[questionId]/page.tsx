@@ -11,6 +11,7 @@ import {
 import { ThemeImpactPacketCard } from '../../../../../components/theme-impact/ThemeImpactPacketCard';
 import { ThemeImpactStorytellingPanel } from '../../../../../components/theme-impact/ThemeImpactStorytellingPanel';
 import { getThemeCatalogEntry } from '../../../../../components/theme-impact/fixtures';
+import { THEMES_PUBLIC_SURFACE_ENABLED } from '../../../../../lib/theme-impact/public-surface';
 import { resolveThemeImpactPacketView } from '../../../../../lib/theme-impact/source';
 import { shouldShowThemeImpactStorytelling } from '../../../../../lib/theme-impact/storytelling-series';
 import {
@@ -27,6 +28,9 @@ type ThemeQuestionPageProps = {
 };
 
 export async function generateMetadata({ params }: ThemeQuestionPageProps) {
+  if (!THEMES_PUBLIC_SURFACE_ENABLED) {
+    return { title: 'Question not found' };
+  }
   const { themeId, questionId } = await params;
   const entry = getThemeCatalogEntry(themeId);
   const packet = await resolveThemeImpactPacketView(themeId, questionId);
@@ -40,6 +44,10 @@ export async function generateMetadata({ params }: ThemeQuestionPageProps) {
 }
 
 export default async function ThemeQuestionPage({ params }: ThemeQuestionPageProps) {
+  if (!THEMES_PUBLIC_SURFACE_ENABLED) {
+    notFound();
+  }
+
   const { themeId, questionId } = await params;
   const entry = getThemeCatalogEntry(themeId);
   if (!entry?.available) {

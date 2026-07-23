@@ -60,13 +60,13 @@ Evidence tier colors mirror `ds-confidence-mark` in `shell.css`.
 ### Structure
 
 1. **Place column (left on wide):** compact MapLibre preview via `RecordPlacePreview` → `EntityLocationMap` + `buildEntityLocationMapStyle` (OpenFreeMap streets, copper pin, theme-aware). Uses real entity `lat`/`lng` when available; empty matte state when not pinned. When pinned, the preview is wrapped in `MapsExternalLink` (`.ds-record-anatomy__place-link`).
-2. **Fact grid (right on wide):** soft **2×2 grid** with spacing only — **no vertical column rules**. Stacks to one column under ~30rem.
+2. **Fact list (right on wide, below map on narrow):** vertical list of **inline fact rows** (label → value on one line). **No 2×2 label-over-value grids** inside anatomy panels (see [`patterns-record-anatomy.md`](./patterns-record-anatomy.md)).
 3. **Precision footer (full width):** mono caption from `radiusAffordanceLabel` when place data exists (map dignity: words-only, no overstated precision).
 
-Each fact cell:
+Each fact cell in anatomy panels (inline row):
 
-1. **Label row:** `EditionFactIcon` (kind uses `muted` for stone glyph) + uppercase mono field type (`Kind`, `Where`, …) in `.ds-record-anatomy__fact-label`.
-2. **Value row:** editorial serif string or copper underlined link in `.ds-record-anatomy__fact-value`. **Where** auto-links to external maps when `RecordAnatomyPlace` is present (handled inside `RecordAnatomyPanel`, not per-surface). Internal explore handoffs (`Show on map`, kind/era/evidence links) stay on their own routes.
+1. **Label (left):** `EditionFactIcon` (kind uses `muted` for stone glyph) + uppercase mono field type (`Kind`, `Where`, …) in `.ds-record-anatomy__fact-label`.
+2. **Value (right):** editorial serif string or copper underlined link in `.ds-record-anatomy__fact-value`, beside the label on the same row.
 
 Entry-step rows (Pin / Browse / Source) in beat 01 keep the side-by-side grid — only record anatomy panels use this pattern.
 

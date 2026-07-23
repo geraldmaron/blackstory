@@ -65,8 +65,7 @@ export function Button({
 
   // `pressedBg` shifts the fill tone rather than dimming the whole button — a blanket
   // opacity drop fades the border and label along with the fill, which reads as
-  // "disabled" instead of "pressed". Tones are token-only and visible in both themes
-  // (note surfaceRaised === surface in the light theme, so it cannot be used here).
+  // "disabled" instead of "pressed". Tones are token-only and visible in both themes.
   const palette = {
     primary: { bg: theme.ink, pressedBg: theme.inkMuted, fg: theme.inverseInk, border: theme.ink },
     secondary: { bg: theme.surface, pressedBg: theme.border, fg: theme.ink, border: theme.border },

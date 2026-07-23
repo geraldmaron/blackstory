@@ -190,6 +190,9 @@ export function parseThemeImpactPacketRow(row: {
   readonly derived: unknown;
   readonly artifacts: unknown;
   readonly gap_states: readonly string[];
+  readonly causal_claim_ids?: readonly string[] | null;
+  readonly entity_id?: string | null;
+  readonly binding_purpose?: 'map_panel' | 'story' | 'research' | 'mcp' | null;
   readonly status: string;
   readonly created_at: string | Date;
   readonly updated_at: string | Date;
@@ -197,6 +200,7 @@ export function parseThemeImpactPacketRow(row: {
   const geography = row.geography as ThemeImpactPacketGeography;
   const toIso = (value: string | Date) =>
     value instanceof Date ? value.toISOString() : value;
+  const causalClaimIds = row.causal_claim_ids?.filter((id) => id.trim()) ?? [];
 
   return {
     kind: 'theme.impact.packet.v1',
@@ -213,6 +217,15 @@ export function parseThemeImpactPacketRow(row: {
     derived: (row.derived as ThemeImpactPacket['derived']) ?? [],
     artifacts: (row.artifacts as ThemeImpactPacket['artifacts']) ?? [],
     gapStates: [...row.gap_states] as ThemeImpactPacket['gapStates'],
+    ...(causalClaimIds.length > 0 ? { causalClaimIds } : {}),
+    ...(row.entity_id && row.binding_purpose
+      ? {
+          entityBinding: {
+            entityId: row.entity_id,
+            purpose: row.binding_purpose,
+          },
+        }
+      : {}),
     status: row.status as ThemeImpactPacket['status'],
     createdAt: toIso(row.created_at),
     updatedAt: toIso(row.updated_at),

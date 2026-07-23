@@ -84,7 +84,7 @@ import {
   DECADE_LAYER_FADE_MS,
   isDecadeFadePaintChannel,
   runDecadeMorphAnimation,
-  setDecadeCrossfadeIdleOpacities,
+  restoreDecadeFadePaintFromStyle,
   setDecadeCrossfadeTransitions,
   type DecadeMorphAnimationHandle,
   type DensityColorMorphState,
@@ -1264,9 +1264,11 @@ export function MapStageProvider({
         await waitForGeoJsonSourceData(map, EXPLORE_ENTITIES_SOURCE_ID);
       }
       if (generation !== decadeFadeGenerationRef.current) return;
-        setHistoryEdgeData(map, cfg.historyEdgeCollection);
+      setHistoryEdgeData(map, cfg.historyEdgeCollection);
       if (generation !== decadeFadeGenerationRef.current) return;
-      setDecadeCrossfadeIdleOpacities(map);
+      // Restore kind expressions (not constant rest opacities) so idle pins never stay in a
+      // dual-buffer / uniform-lit paint state after decade morph.
+      restoreDecadeFadePaintFromStyle(map, cfg.style);
       clearIncomingDecadeBuffers(map);
       setHistoryEdgesVisibility(map, cfg.historyEdgesEnabled);
       syncEntityMarkers();
@@ -1379,6 +1381,13 @@ export function MapStageProvider({
           clearDensityMorphFeatureState(map, activeDensityMorphRef.current);
           activeDensityMorphRef.current = [];
         }
+        // Drop mid-morph dual-buffer pin paint/data before the snap apply — otherwise a
+        // cancelled dissolve can leave every entity in a partial-lit incoming stack.
+        if (map && mapStyleReadyRef.current) {
+          setDecadeCrossfadeTransitions(map, 0);
+          restoreDecadeFadePaintFromStyle(map, configRef.current.style);
+          clearIncomingDecadeBuffers(map);
+        }
         commitDataPatch(patch, recreate);
         applyMemorialForPatch(options);
         return;
@@ -1396,7 +1405,7 @@ export function MapStageProvider({
       commitDataPatch(patch, { configOnly: true });
       runDecadeMorph(map, generation, durationMs, options);
     },
-    [applyMemorialForPatch, commitDataPatch, runDecadeMorph],
+    [applyMemorialForPatch, clearIncomingDecadeBuffers, commitDataPatch, runDecadeMorph],
   );
 
   useEffect(() => {

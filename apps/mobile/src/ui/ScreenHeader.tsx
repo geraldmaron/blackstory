@@ -1,11 +1,11 @@
 /**
- * Compact tab-screen masthead: copper-tick mono kicker, Sora title, optional
- * muted dek. Keeps hierarchy dense across Search / Stories / More.
+ * Compact tab-screen masthead (Ledger Line): copper-tick mono kicker,
+ * 16 Inter Medium title, optional muted dek. Hierarchy from type, not cards.
  */
 import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { Text } from './Text';
+import { Text, type TextRole } from './Text';
 import { space, useThemeColors } from './tokens';
 
 export type ScreenHeaderProps = {
@@ -15,14 +15,14 @@ export type ScreenHeaderProps = {
   readonly dek?: string;
   /** Tighter vertical rhythm for map-led screens that share chrome with a toolbar. */
   readonly compact?: boolean;
-  /** iOS-familiar browse density — subtitle scale title instead of display/title. */
+  /** Ledger Line browse density — 16 Inter Medium masthead (default). */
   readonly dense?: boolean;
   /** Trailing control (dev menu, map link) aligned to the title row. */
   readonly trailing?: ReactNode;
 };
 
-function resolveTitleVariant(compact: boolean, dense: boolean): 'display' | 'title' | 'subtitle' {
-  if (dense) return 'subtitle';
+function resolveTitleVariant(compact: boolean, dense: boolean): TextRole {
+  if (dense) return 'masthead';
   if (compact) return 'title';
   return 'display';
 }

@@ -5,7 +5,6 @@
  * `./explore-view-model.test.ts`). Precomputes History edge line catalogs so the client can
  * toggle lines/decade without importing the graph release builder.
  */
-import { SEED_ENTITY_RELATIONSHIPS } from '../../../data/entity-graph-seed';
 import { getHistoryGraphReleaseArtifact } from '../../../data/history-graph-seed';
 import { listPublicEntities, type PublicEntityView } from '../../../data/public-seed';
 import {
@@ -59,13 +58,14 @@ export type ExploreViewModel = {
 function buildEdgeSlice(
   artifact: ReturnType<typeof getHistoryGraphReleaseArtifact>,
   entitiesById: ReturnType<typeof buildHistoryGraphContext>['entitiesById'],
+  relationships: ReturnType<typeof buildHistoryGraphContext>['relationships'],
   mode: 'all-time' | 'decade',
   decade?: string,
 ): ExploreEdgeLineSlice {
   const slice = resolveHistoryGraphSlice(artifact, mode, decade);
   const edges = buildHistoryEdges(
     slice,
-    SEED_ENTITY_RELATIONSHIPS,
+    relationships,
     entitiesById,
     new Set(slice.nodeIds),
   );
@@ -83,10 +83,21 @@ export function buildEdgeLineCatalog(): {
 } {
   const artifact = getHistoryGraphReleaseArtifact();
   const historyContext = buildHistoryGraphContext(artifact);
-  const allTime = buildEdgeSlice(artifact, historyContext.entitiesById, 'all-time');
+  const allTime = buildEdgeSlice(
+    artifact,
+    historyContext.entitiesById,
+    historyContext.relationships,
+    'all-time',
+  );
   const byDecade: Record<string, ExploreEdgeLineSlice> = {};
   for (const decade of historyContext.availableDecades) {
-    byDecade[decade] = buildEdgeSlice(artifact, historyContext.entitiesById, 'decade', decade);
+    byDecade[decade] = buildEdgeSlice(
+      artifact,
+      historyContext.entitiesById,
+      historyContext.relationships,
+      'decade',
+      decade,
+    );
   }
   return {
     edgeLineCatalog: { allTime, byDecade },

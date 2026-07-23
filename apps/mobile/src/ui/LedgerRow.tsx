@@ -1,6 +1,6 @@
 /**
  * Ledger index row for search / archive listings: optional mono index, KIND ·
- * PLACE slug, Sora title, serif one-liner. Hairline divider — not a card stack.
+ * PLACE slug, 13 Inter Medium title, serif one-liner. Hairline divider — not a card stack.
  */
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, View, type GestureResponderEvent } from 'react-native';
@@ -67,7 +67,7 @@ export function LedgerRow({
             {slug}
           </Text>
         ) : null}
-        <Text variant="bodyEmphasis" numberOfLines={2}>
+        <Text variant="rowTitle" numberOfLines={2}>
           {title}
         </Text>
         {summary ? (
@@ -91,8 +91,8 @@ export function LedgerRow({
           android_ripple={{ color: theme.border }}
           style={({ pressed }) => [
             styles.pressable,
-            // `canvas` (not `surfaceRaised`) — in the light theme surfaceRaised === surface.
-            { backgroundColor: pressed ? theme.canvas : 'transparent' },
+            // Press steps down the Archive Paper ladder (surface → surfacePressed).
+            { backgroundColor: pressed ? theme.surfacePressed : 'transparent' },
           ]}
         >
           {content}

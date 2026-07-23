@@ -104,6 +104,15 @@ Black and paper lead; copper points.
 | Stone (secondary text) | `#6D675F` |
 | Rule (hairlines) | `#D7D0C4` |
 
+**Semantic UI roles (mobile + web theme palettes):** `surfaceRaised` is a third
+surface step above `surface` on light (`#FDFBF8`, warm near-white mix) and above
+Charcoal on dark (`#1C1B18`). `surfacePressed` is the one-step-down fill for
+press feedback (light: Archive Paper; dark: Black Ink). `inkSubtle` is tertiary
+meta text, visually softer than Stone / muted ink while still clearing 4.5:1 on
+canvas (light: `#726C64`; dark: `#8B857D`). Generated in
+`apps/mobile/scripts/tokens/brand-source.ts`; web mirrors the same roles in
+`packages/ui/src/tokens/colors.ts` when aligned.
+
 Copper is a navigational signal (~10–15% of a composition): active locations,
 selected filters, primary actions, evidence markers. Dark theme is first-class.
 

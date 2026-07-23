@@ -1,11 +1,10 @@
 /**
- * v6 entity edition Surface panel: mono copper index, uppercase kicker, and
- * section title in a flat matte card — mobile counterpart of web
- * `ds-entity-edition__panel` + header rhythm.
+ * Ledger Line entity section stack: mono index · kicker section label, optional
+ * title, hairline rule — flat on canvas, not a nested Surface card shell.
  */
 import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { LiftedSurface, Text, space, useThemeColors } from '@/ui';
+import { Text, space, useThemeColors } from '@/ui';
 import { SectionHeading, type SectionHeadingLevel } from './sections/SectionHeading';
 
 export type EntityEditionPanelProps = {
@@ -16,6 +15,8 @@ export type EntityEditionPanelProps = {
   readonly headerExtra?: ReactNode;
   readonly children: ReactNode;
   readonly testID?: string;
+  /** When false, omit the section title (label-only beat). Default true. */
+  readonly showTitle?: boolean;
 };
 
 export function EntityEditionPanel({
@@ -26,37 +27,22 @@ export function EntityEditionPanel({
   headerExtra,
   children,
   testID,
+  showTitle = true,
 }: EntityEditionPanelProps) {
   const theme = useThemeColors();
+  const sectionLabel = `${index} · ${kicker}`;
 
   return (
-    <LiftedSurface
-      tone="surface"
-      shadow="none"
-      paddingKey="3"
-      testID={testID}
-      contentStyle={styles.panel}
-    >
+    <View testID={testID} style={styles.panel}>
       <View style={[styles.header, { borderBottomColor: theme.border }]}>
-        <Text
-          variant="code"
-          colorRole="inkSubtle"
-          style={styles.index}
-          accessibilityElementsHidden
-          importantForAccessibility="no-hide-descendants"
-        >
-          {index}
+        <Text variant="sectionLabel" colorRole="inkMuted" style={styles.label}>
+          {sectionLabel}
         </Text>
-        <View style={styles.headerBody}>
-          <Text variant="code" colorRole="accent" style={styles.kicker}>
-            {kicker.toUpperCase()}
-          </Text>
-          {headerExtra}
-          <SectionHeading level={titleLevel}>{title}</SectionHeading>
-        </View>
+        {headerExtra}
+        {showTitle ? <SectionHeading level={titleLevel}>{title}</SectionHeading> : null}
       </View>
       <View style={styles.body}>{children}</View>
-    </LiftedSurface>
+    </View>
   );
 }
 
@@ -65,22 +51,13 @@ const styles = StyleSheet.create({
     gap: space['3'],
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: space['4'],
+    gap: space['2'],
     paddingBottom: space['2'],
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
-  index: {
-    minWidth: 28,
-  },
-  headerBody: {
-    flex: 1,
-    gap: space['2'],
-    minWidth: 0,
-  },
-  kicker: {
-    letterSpacing: 1.2,
+  label: {
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   body: {
     gap: space['3'],

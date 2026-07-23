@@ -31,9 +31,15 @@ export { BrowseScreenShell, type BrowseScreenShellProps } from './BrowseScreenSh
 export { EditionSurfacePanel, type EditionSurfacePanelProps } from './EditionSurfacePanel';
 export { EditionSurfaceStack, type EditionSurfaceStackProps } from './EditionSurfaceStack';
 export { LedgerRow, type LedgerRowProps } from './LedgerRow';
+export { LedgerSectionLabel, type LedgerSectionLabelProps } from './LedgerSectionLabel';
 export { EditionFactCell, type EditionFactCellProps } from './EditionFactCell';
 export { RecordFactStrip, type RecordFactStripItem, type RecordFactStripProps } from './RecordFactStrip';
-export { UtilityScreenShell, type UtilityScreenShellProps } from './UtilityScreenShell';
+export {
+  UtilityScreenShell,
+  type UtilityScreenShellProps,
+  type UtilityScreenShellScrollProps,
+} from './UtilityScreenShell';
+export { CorrectionTextField, type CorrectionTextFieldProps } from './CorrectionTextField';
 export { NavIcon, navIconForEntityKind, type NavIconProps, type NavIconName } from './NavIcon';
 export { ApiStatusBanner, type ApiStatusBannerProps } from './ApiStatusBanner';
 export { DevMenuHeaderButton } from './DevMenuHeaderButton';

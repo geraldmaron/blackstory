@@ -1,18 +1,15 @@
 /**
- * Full content-page screen body (MOB-015): v6 Surface edition stack with indexed intro panel
- * and a single body panel hosting the article directly. Wires `useContentPage` through
- * `ContentRenderer`.
+ * Full content-page screen body (MOB-015): Ledger Line canvas masthead + flat
+ * article body (no indexed Surface stack, no nested card around prose).
  */
 import { useNavigation } from 'expo-router';
 import { useLayoutEffect } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import {
-  EditionSurfacePanel,
-  EditionSurfaceStack,
   EmptyState,
   ErrorState,
-  LiftedSurface,
   ScreenCanvas,
+  ScreenHeader,
   screenScrollInsets,
   space,
   useThemeColors,
@@ -95,6 +92,7 @@ export function ContentPageScreen({
           paddingHorizontal: screenScrollInsets.paddingHorizontal,
           paddingTop: screenScrollInsets.paddingTop,
           paddingBottom: screenScrollInsets.paddingBottom,
+          gap: space['3'],
         }}
       >
         {state.status === 'loading' ? (
@@ -121,32 +119,27 @@ export function ContentPageScreen({
             ];
 
             return (
-              <EditionSurfaceStack>
-                <EditionSurfacePanel
-                  index="00"
+              <>
+                <ScreenHeader
                   kicker={longform ? 'Longform' : 'Document'}
                   title={page.title}
                   dek={page.dek}
                   compact
+                  dense
                 />
-
-                {/* Body hosted directly on a single surface — no "01 / BODY / Read" header
-                    above the prose, and no nested surface squeezing the text measure. */}
-                <LiftedSurface tone="surface" shadow="none" paddingKey="3">
-                  <ContentRenderer
-                    page={page}
-                    blocks={blocks}
-                    skippedSections={skippedSections}
-                    sources={state.value.sources}
-                    requiresCitation={state.value.requiresCitation}
-                    presentation={longform ? 'longform' : 'document'}
-                    cached={{ fetchedAt: state.fetchedAt, degraded: state.degraded }}
-                    versionStale={versionStale}
-                    headerFacts={facts}
-                    hideTitle
-                  />
-                </LiftedSurface>
-              </EditionSurfaceStack>
+                <ContentRenderer
+                  page={page}
+                  blocks={blocks}
+                  skippedSections={skippedSections}
+                  sources={state.value.sources}
+                  requiresCitation={state.value.requiresCitation}
+                  presentation={longform ? 'longform' : 'document'}
+                  cached={{ fetchedAt: state.fetchedAt, degraded: state.degraded }}
+                  versionStale={versionStale}
+                  headerFacts={facts}
+                  hideTitle
+                />
+              </>
             );
           })()
         )}

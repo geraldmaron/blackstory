@@ -23,11 +23,12 @@ Shared kit: `@repo/ui` (`packages/ui`). Binding brand source: root `brand/`. Tok
 | **Footer** | [`patterns-site-footer.md`](./patterns-site-footer.md) | `SiteFooter.tsx`, `shell.css` `.ds-shell-footer*` | Reusable (Surface card sitewide) |
 | **Browse mode** | [`patterns-browse-mode.md`](./patterns-browse-mode.md) | [`patterns-registry.md`](./patterns-registry.md) | Reusable |
 | **Edition fact icon** | [`patterns-edition-fact-icon.md`](./patterns-edition-fact-icon.md) | [`patterns-registry.md`](./patterns-registry.md) | Reusable |
+| **Record anatomy layout** | [`patterns-record-anatomy.md`](./patterns-record-anatomy.md) | `RecordAnatomyPanel`, `record-anatomy.css`, mobile `AnatomySection` | Reusable |
 | **Map entity encoding** | [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) | `kind-encoding.ts`, `MapExperienceLegend.tsx`, `explore-style.ts` | Binding (Explore map) |
 | **Map canvas lifecycle** | [`patterns-map-canvas.md`](./patterns-map-canvas.md) | `map-libre-lifecycle.ts`, `MapStage.tsx`, `EntityLocationMap.tsx` | Binding (cross-browser WebGL) |
 | **Search redirect** | [`design-direction-v6-search.md`](./design-direction-v6-search.md) (superseded) | `app/search/page.tsx` | Redirect → `/history` |
 | **Entity** (`/entity/[id]`) | [`design-direction-v6-entity.md`](./design-direction-v6-entity.md) | `app/entity/[id]/*`, `components/entity/*`, `edition-atmosphere/*` | Binding (supersedes v5 entity mast + aside) |
-| **Mobile shell** (`@repo/mobile`) | [`design-direction-v6-mobile.md`](./design-direction-v6-mobile.md) | `apps/mobile/src/app/(tabs)/*`, `apps/mobile/src/shell/*` | Binding (tab IA + More menu aligned with web v6) |
+| **Mobile shell** (`@repo/mobile`) | [`design-direction-v6-mobile.md`](./design-direction-v6-mobile.md) | `apps/mobile/src/app/(tabs)/*`, `apps/mobile/src/shell/*`, `apps/mobile/src/ui/*` | Binding — **Ledger Line** polish (dense index, canvas + hairlines; see [`mobile-polish-mockups.html`](./mobile-polish-mockups.html)) |
 | **Voice & microcopy** | [`story.md`](./story.md) | All user-facing copy | Binding |
 | **Learning index entity** | [`learning-index-entity.md`](./learning-index-entity.md) | Entity detail / index cards | Contract |
 

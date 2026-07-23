@@ -3,6 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import type { Map as MapLibreMap, StyleSpecification } from 'maplibre-gl';
 import {
   buildDensityColorMorphStates,
   DECADE_CROSSFADE_IN_TARGETS,
@@ -15,6 +16,7 @@ import {
   isDecadeFadePaintChannel,
   lerpHexColor,
   paintTransitionKey,
+  restoreDecadeFadePaintFromStyle,
   shouldFadeDecadePatch,
   shouldMorphDecadeDataPatch,
 } from './decade-layer-transition';
@@ -23,6 +25,7 @@ import {
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
+  EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from './explore-layer-ids';
 
 test('decade morph duration is a slow ambient dissolve (~1.6s), not the 480ms UI token', () => {
@@ -188,4 +191,29 @@ test('easeInOutCubic is smooth and clamped', () => {
 test('paintTransitionKey builds MapLibre *-transition property names', () => {
   assert.equal(paintTransitionKey('fill-opacity'), 'fill-opacity-transition');
   assert.equal(paintTransitionKey('circle-opacity'), 'circle-opacity-transition');
+});
+
+test('restoreDecadeFadePaintFromStyle resets incoming to 0 and restores primary paint from style', () => {
+  const paints = new Map<string, unknown>();
+  const map = {
+    getLayer: (id: string) => (id.includes('explore') ? {} : undefined),
+    setPaintProperty: (layerId: string, paintKey: string, value: unknown) => {
+      paints.set(`${layerId}:${paintKey}`, value);
+    },
+  } as unknown as MapLibreMap;
+  const kindOpacity = ['match', ['get', 'kind'], 'place', 0.52, 'institution', 0.2, 0.52];
+  const style = {
+    layers: [
+      {
+        id: EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
+        type: 'circle',
+        paint: { 'circle-opacity': kindOpacity },
+      },
+    ],
+  } as unknown as StyleSpecification;
+
+  restoreDecadeFadePaintFromStyle(map, style);
+
+  assert.equal(paints.get(`${EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID}:circle-opacity`), 0);
+  assert.deepEqual(paints.get(`${EXPLORE_UNCLUSTERED_POINT_LAYER_ID}:circle-opacity`), kindOpacity);
 });

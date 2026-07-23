@@ -1,5 +1,5 @@
 /**
- * Upserts canonical researched Q1-Q9 packets into bb_reference.theme_impact_packets.
+ * Upserts canonical researched Q1–Q12 packets into bb_reference.theme_impact_packets.
  * Source of truth: packages/domain/src/statistics/researched-theme-impact-packets.ts
  *
  * Usage (repo root):
@@ -28,10 +28,10 @@ const UPSERT_SQL = `
 INSERT INTO bb_reference.theme_impact_packets (
   id, question_id, theme_id, title, summary, policy_eras, geography,
   method_stance, method_note, observations, derived, artifacts, gap_states,
-  entity_id, binding_purpose, status, created_at, updated_at
+  causal_claim_ids, entity_id, binding_purpose, status, created_at, updated_at
 ) VALUES (
   $1, $2, $3, $4, $5, $6::text[], $7::jsonb, $8, $9, $10::jsonb, $11::jsonb, $12::jsonb,
-  $13::text[], $14, $15, $16, $17::timestamptz, $18::timestamptz
+  $13::text[], $14::text[], $15, $16, $17, $18::timestamptz, $19::timestamptz
 )
 ON CONFLICT (id) DO UPDATE SET
   question_id = EXCLUDED.question_id,
@@ -46,6 +46,7 @@ ON CONFLICT (id) DO UPDATE SET
   derived = EXCLUDED.derived,
   artifacts = EXCLUDED.artifacts,
   gap_states = EXCLUDED.gap_states,
+  causal_claim_ids = EXCLUDED.causal_claim_ids,
   entity_id = EXCLUDED.entity_id,
   binding_purpose = EXCLUDED.binding_purpose,
   status = EXCLUDED.status,
@@ -226,6 +227,7 @@ async function applyPackets(
         JSON.stringify(packet.derived),
         JSON.stringify(packet.artifacts),
         [...packet.gapStates],
+        [...(packet.causalClaimIds ?? [])],
         packet.entityBinding?.entityId ?? null,
         packet.entityBinding?.purpose ?? null,
         packet.status,

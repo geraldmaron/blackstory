@@ -1,6 +1,6 @@
 /**
- * Beat 00 intro panel: editorial media, kind meta, title, lede, and topic tags.
- * Replaces v5 mast chrome with v6 edition Surface vocabulary.
+ * Beat 00 intro: editorial media, kind meta, 17 Inter Medium title, lede, and
+ * topic tags on canvas with a bottom hairline — Ledger Line, not a Surface card.
  */
 import { StyleSheet, View } from 'react-native';
 import { Image, Text, space, useThemeColors } from '@/ui';

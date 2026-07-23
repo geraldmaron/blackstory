@@ -41,6 +41,18 @@ export const typeScale = {
     "weight": "600",
     "family": "uiBody"
   },
+  "masthead": {
+    "size": 16,
+    "lineHeight": 22,
+    "weight": "500",
+    "family": "uiBody"
+  },
+  "entityTitle": {
+    "size": 17,
+    "lineHeight": 22,
+    "weight": "500",
+    "family": "uiBody"
+  },
   "body": {
     "size": 16,
     "lineHeight": 24,
@@ -51,6 +63,12 @@ export const typeScale = {
     "size": 16,
     "lineHeight": 24,
     "weight": "600",
+    "family": "uiBody"
+  },
+  "rowTitle": {
+    "size": 13,
+    "lineHeight": 18,
+    "weight": "500",
     "family": "uiBody"
   },
   "bodySmall": {
@@ -64,6 +82,12 @@ export const typeScale = {
     "lineHeight": 16,
     "weight": "500",
     "family": "uiBody"
+  },
+  "sectionLabel": {
+    "size": 11,
+    "lineHeight": 14,
+    "weight": "500",
+    "family": "dataMono"
   },
   "editorial": {
     "size": 17,

@@ -8,7 +8,7 @@
  * Falls back to bundled DEMO_MAP_SOURCE only in `__DEV__` after a failed or
  * unavailable live fetch, or when `forceDemo` is set (tests).
  */
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAppRuntimeOptional, useRefreshBootstrapSync } from '@/runtime';
 import { DEFAULT_API_BASE_URL, resolveApiBaseUrl } from '@/security';
 import { DEMO_MAP_SOURCE, type MapFeatureCollection } from '@/features/map/demoMapSource';
@@ -96,6 +96,8 @@ export function useExploreMapSource(
 ): ExploreMapSourceState {
   const runtime = useAppRuntimeOptional();
   const refreshBootstrapSync = useRefreshBootstrapSync();
+  const refreshBootstrapSyncRef = useRef(refreshBootstrapSync);
+  refreshBootstrapSyncRef.current = refreshBootstrapSync;
   const forceDemo = options.forceDemo === true;
   const [tick, setTick] = useState(0);
 
@@ -154,14 +156,14 @@ export function useExploreMapSource(
       if (cancelled) return;
       setFetchedState(toViewState(result, retry));
       if (result.status === 'ready' && !result.fromCache) {
-        refreshBootstrapSync();
+        refreshBootstrapSyncRef.current();
       }
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [staticState, deps, retry, tick, refreshBootstrapSync]);
+  }, [staticState, deps, retry, tick]);
 
   // If runtime never arrives and we're past warm-up, allow demo fallback in __DEV__.
   useEffect(() => {

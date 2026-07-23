@@ -67,13 +67,6 @@ export const MOBILE_MORE_SECTIONS: readonly MobileMoreSection[] = [
     meta: 'Catalog',
     rows: [
       {
-        id: 'themes',
-        title: 'Themes',
-        subtitle: 'Policy-impact packets (opens web)',
-        icon: 'themes',
-        destination: { kind: 'web', href: `${CANONICAL_WEB_ORIGIN}/themes` },
-      },
-      {
         id: 'data',
         title: 'Data',
         subtitle: 'National rollups and Phase 1 indicators',

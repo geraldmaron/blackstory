@@ -1,14 +1,17 @@
 /**
  * Public theme-impact browse page at `/themes`. v6 edition Surface stack with shared
  * gutter mosaic atmosphere; P0 live themes and P1 coming soon with method notice.
+ * Temporarily gated off the public site via THEMES_PUBLIC_SURFACE_ENABLED.
  */
 
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { ATMOSPHERE_ATTRIBUTION_HREF } from '../../components/atmosphere/tile-credits';
 import { EditionAtmosphereMosaic } from '../../components/patterns/edition-atmosphere/EditionAtmosphereMosaic';
 import {
   EDITION_MOSAIC_COUNT_BROWSE,
 } from '../../components/patterns/edition-atmosphere/edition-atmosphere-config';
+import { THEMES_PUBLIC_SURFACE_ENABLED } from '../../lib/theme-impact/public-surface';
 import { ThemeBrowseSections } from './ThemeBrowseSections';
 import {
   THEMES_EDITION_MOSAIC_SEED,
@@ -26,6 +29,10 @@ export const metadata = {
 };
 
 export default function ThemesBrowsePage() {
+  if (!THEMES_PUBLIC_SURFACE_ENABLED) {
+    notFound();
+  }
+
   return (
     <div className={themesEditionRootClassName()} data-themes-edition="v6">
       <EditionAtmosphereMosaic seedKey={THEMES_EDITION_MOSAIC_SEED} count={EDITION_MOSAIC_COUNT_BROWSE} />

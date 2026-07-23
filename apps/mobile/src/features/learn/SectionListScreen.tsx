@@ -1,13 +1,14 @@
 /**
- * Shared list screen for legal/errata-style sections: v6 Surface edition stack with
- * indexed intro and compact LedgerRow index inside a raised panel.
+ * Shared list screen for legal/errata-style sections (Ledger Line): canvas masthead
+ * + mono section label + compact LedgerRow index — no indexed Surface panels.
+ * Stack-pushed (not tab-root), so scroll bottom pad uses static screenScrollInsets.
  */
-import { ScrollView, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import {
-  EditionSurfacePanel,
-  EditionSurfaceStack,
   LedgerRow,
+  LedgerSectionLabel,
   ScreenCanvas,
+  ScreenHeader,
   screenScrollInsets,
 } from '@/ui';
 
@@ -31,23 +32,20 @@ export function SectionListScreen({ title, intro, kicker = 'Archive', rows }: Se
   return (
     <ScreenCanvas>
       <ScrollView contentContainerStyle={styles.content}>
-        <EditionSurfaceStack>
-          <EditionSurfacePanel index="00" kicker={kicker} title={title} dek={intro} compact />
-
-          <EditionSurfacePanel index="01" kicker="Index" title="Pages" panelMeta={countLabel}>
-            {rows.map((row, index) => (
-              <LedgerRow
-                key={row.key}
-                title={row.title}
-                summary={row.subtitle}
-                indexLabel={String(index + 1).padStart(2, '0')}
-                onPress={row.onPress}
-                showChevron
-                showDivider={index < rows.length - 1}
-              />
-            ))}
-          </EditionSurfacePanel>
-        </EditionSurfaceStack>
+        <ScreenHeader kicker={kicker} title={title} dek={intro} compact dense />
+        <View>
+          <LedgerSectionLabel meta={countLabel}>Pages</LedgerSectionLabel>
+          {rows.map((row, index) => (
+            <LedgerRow
+              key={row.key}
+              title={row.title}
+              summary={row.subtitle}
+              onPress={row.onPress}
+              showChevron
+              showDivider={index < rows.length - 1}
+            />
+          ))}
+        </View>
       </ScrollView>
     </ScreenCanvas>
   );
@@ -58,5 +56,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: screenScrollInsets.paddingHorizontal,
     paddingTop: screenScrollInsets.paddingTop,
     paddingBottom: screenScrollInsets.paddingBottom,
+    gap: screenScrollInsets.gap,
   },
 });

@@ -28,7 +28,7 @@
  */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { contrastRatio, ensureContrast } from './color-math';
+import { contrastRatio, ensureContrast, mix } from './color-math';
 
 const BRAND_TOKENS_DIR = join(__dirname, '..', '..', '..', '..', 'brand', 'tokens');
 
@@ -66,7 +66,10 @@ export type BrandTypographyFamilies = {
 export type ThemeRole = {
   canvas: string;
   surface: string;
+  /** Light: warm near-white above Surface; dark: warm lift above Charcoal (#1C1B18). */
   surfaceRaised: string;
+  /** One step down from Surface / surfaceRaised for press feedback (Archive Paper ladder). */
+  surfacePressed: string;
   ink: string;
   inkMuted: string;
   inkSubtle: string;
@@ -201,13 +204,22 @@ export function buildBrandTokens(): BrandTokens {
   });
   const lightAccentGraphic = ensureContrast(copperPin, archivePaper, MIN_GRAPHIC_CONTRAST, blackInk);
 
+  // Light surface ladder (Archive Paper → Surface → raised near-white). Surface is already
+  // lighter than canvas; "raised" continues upward via a warm white mix, not a duplicate of
+  // Surface. Press states step down to canvas (surfacePressed), never opacity fades.
+  const lightSurfaceRaised = mix(surface, '#FFFFFF', 0.45);
+  // inkSubtle: tertiary meta (mono indexes, panel kickers) — softer than Stone (lower contrast
+  // on canvas) while still clearing 4.5:1 for caption/code sizes. Distinct from inkMuted.
+  const lightInkSubtle = mix(stone, rule, 0.05);
+
   const light: ThemeRole = {
     canvas: archivePaper,
     surface,
-    surfaceRaised: surface,
+    surfaceRaised: lightSurfaceRaised,
+    surfacePressed: archivePaper,
     ink: blackInk,
     inkMuted: stone,
-    inkSubtle: stone,
+    inkSubtle: lightInkSubtle,
     border: rule,
     borderStrong: blackInk,
     focusRing: blackInk,
@@ -225,13 +237,18 @@ export function buildBrandTokens(): BrandTokens {
       ? copperTextDark
       : ensureContrast(copperTextDark, blackInk, MIN_TEXT_CONTRAST, archivePaper);
 
+  // Dark inkSubtle: recess inkMuted toward Charcoal for tertiary meta while keeping ≥4.5:1 on canvas.
+  const darkInkMuted = '#BDB5A9';
+  const darkInkSubtle = mix(darkInkMuted, charcoal, 0.3);
+
   const dark: ThemeRole = {
     canvas: blackInk,
     surface: charcoal,
     surfaceRaised: '#1C1B18',
+    surfacePressed: blackInk,
     ink: archivePaper,
-    inkMuted: '#BDB5A9',
-    inkSubtle: '#BDB5A9',
+    inkMuted: darkInkMuted,
+    inkSubtle: darkInkSubtle,
     border: '#34302C',
     borderStrong: archivePaper,
     focusRing: archivePaper,
@@ -282,7 +299,9 @@ function assertAccessible(tokens: BrandTokens): void {
     const textPairs: [string, string, string][] = [
       ['ink/canvas', theme.ink, theme.canvas],
       ['ink/surface', theme.ink, theme.surface],
+      ['ink/surfaceRaised', theme.ink, theme.surfaceRaised],
       ['inkMuted/canvas', theme.inkMuted, theme.canvas],
+      ['inkSubtle/canvas', theme.inkSubtle, theme.canvas],
       ['accent/canvas', theme.accent, theme.canvas],
       ['inverseInk/inverse', theme.inverseInk, theme.inverse],
     ];

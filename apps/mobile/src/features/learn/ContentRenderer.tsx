@@ -10,9 +10,9 @@
  * enforced at the type level here, not by a runtime `default:` case rendering raw content.
  *
  * Accessibility (requirement #7):
- *   - Heading hierarchy: page title is level 1 (`variant="title"`), section headings are level 2
- *     (`variant="subtitle"`) — both get `isHeading`/`accessibilityRole="header"` from the `Text`
- *     primitive (MOB-007).
+ *   - Heading hierarchy (Ledger Line): page title is level 1 (`entityTitle` / masthead),
+ *     section headings are level 2 (`rowTitle`) — both get `isHeading`/`accessibilityRole="header"`
+ *     from the `Text` primitive (MOB-007).
  *   - No `numberOfLines` / fixed heights anywhere here, so large Dynamic Type never clips body
  *     text (`Text`'s `allowFontScaling` stays on by default, per its own header comment).
  *   - RTL: no manual `left`/`right` positioning of text content; layout relies on RN's default
@@ -22,7 +22,6 @@
  */
 import { View } from 'react-native';
 import { Link, Notice, RecordFactStrip, Text, space, useThemeColors } from '@/ui';
-import { resolveFontFamily } from '@/ui/fonts';
 import { plainRangeText } from '../record-facts/record-facts';
 import type { NormalizedBlock, NormalizedPage } from './content-blocks';
 import type { CitationV1 } from './content-types';
@@ -68,23 +67,15 @@ function Block({
   readonly presentation: ContentPresentation;
 }) {
   if (block.kind === 'heading') {
-    if (presentation === 'longform') {
-      return (
-        <Text
-          variant="subtitle"
-          isHeading
-          style={{
-            marginTop: space['5'],
-            marginBottom: space['2'],
-            fontFamily: resolveFontFamily('display', '600'),
-          }}
-        >
-          {block.text}
-        </Text>
-      );
-    }
     return (
-      <Text variant="subtitle" isHeading style={{ marginTop: space['4'], marginBottom: space['1'] }}>
+      <Text
+        variant="rowTitle"
+        isHeading
+        style={{
+          marginTop: presentation === 'longform' ? space['5'] : space['4'],
+          marginBottom: presentation === 'longform' ? space['2'] : space['1'],
+        }}
+      >
         {block.text}
       </Text>
     );
@@ -106,7 +97,7 @@ function Block({
 function SourcesList({ sources }: { readonly sources: readonly CitationV1[] }) {
   return (
     <View style={{ marginTop: space['4'], gap: space['1'] }} accessible={false}>
-      <Text variant="subtitle" isHeading accessibilityRole="header">
+      <Text variant="sectionLabel" colorRole="inkMuted" isHeading accessibilityRole="header" style={{ letterSpacing: 1, textTransform: 'uppercase' }}>
         Sources
       </Text>
       {sources.map((source, index) => {
@@ -160,12 +151,12 @@ export function ContentRenderer({
     <View style={{ gap: isLongform ? space['2'] : space['1'], maxWidth: isLongform ? 672 : undefined }}>
       {!hideTitle ? (
         <>
-          <Text variant={isLongform ? 'display' : 'title'} isHeading>
+          <Text variant="entityTitle" isHeading>
             {page.title}
           </Text>
           {page.dek ? (
             <Text
-              variant={isLongform ? 'editorial' : 'bodyEmphasis'}
+              variant={isLongform ? 'editorial' : 'caption'}
               colorRole="inkMuted"
               style={{ marginBottom: isLongform ? space['4'] : space['2'] }}
             >

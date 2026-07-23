@@ -107,7 +107,7 @@ Framing label derives from status lifecycle (`deriveHistoricalFraming`), never h
 |---|---|
 | Index | `01` |
 | Kicker | `Anatomy` |
-| Body | `RecordAnatomyPanel` with `EditionFactIcon` on every fact label |
+| Body | `RecordAnatomyPanel` with inline Kind / Where / Era / Evidence rows (see [`patterns-record-anatomy.md`](./patterns-record-anatomy.md)) |
 | Facts | Kind · Where · Era · Evidence (same contract as home/explore) |
 | Place slot | `RecordPlacePreview` when geo exists; **Place not pinned** empty state when absent |
 | CTAs | Copper **Open in maps** (when href resolves) + quiet **View on national map** |
@@ -193,7 +193,7 @@ Each beat is a Surface panel with:
 | View-model | `entity-view-model.ts` |
 | Media fail-closed | `EntityMastMedia.tsx`, `EntityRecordMark.tsx` |
 | Map fail-closed | `EntityLocationMap.tsx`, `RecordPlacePreview.tsx` |
-| Patterns | `RecordAnatomyPanel`, `EditionFactIcon`, `EditionAtmosphereMosaic` |
+| Patterns | `RecordAnatomyPanel`, `EditionFactIcon`, `EditionAtmosphereMosaic`; layout [`patterns-record-anatomy.md`](./patterns-record-anatomy.md) |
 
 ---
 

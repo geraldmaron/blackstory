@@ -1,11 +1,10 @@
 /**
- * Compact section header for browse/settings/detail screens: optional mono meta line,
- * a display-scale title, and an optional trailing action. Keeps hierarchy scannable
- * without the vertical weight of a full screen title block.
+ * Compact section header for browse/settings/detail screens. Ledger Line default
+ * is mono uppercase sectionLabel; pass headingScale for denser row titles.
  */
 import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Text } from './Text';
+import { Text, type TextRole } from './Text';
 import { space } from './tokens';
 
 export type SectionHeaderProps = {
@@ -15,20 +14,32 @@ export type SectionHeaderProps = {
   meta?: string;
   /** Optional trailing control (link button, clear action, etc.). */
   action?: ReactNode;
-  /** Heading level for accessibility; defaults to subtitle scale. */
-  headingScale?: 'subtitle' | 'bodyEmphasis';
+  /** Type role for the title; Ledger Line defaults to sectionLabel. */
+  headingScale?: TextRole;
 };
 
-export function SectionHeader({ title, meta, action, headingScale = 'subtitle' }: SectionHeaderProps) {
+export function SectionHeader({
+  title,
+  meta,
+  action,
+  headingScale = 'sectionLabel',
+}: SectionHeaderProps) {
+  const isSectionLabel = headingScale === 'sectionLabel';
+
   return (
     <View style={styles.row} accessibilityRole="header">
       <View style={styles.textColumn}>
         {meta ? (
-          <Text variant="code" colorRole="inkMuted">
+          <Text variant="sectionLabel" colorRole="inkMuted" style={styles.meta}>
             {meta}
           </Text>
         ) : null}
-        <Text variant={headingScale} isHeading>
+        <Text
+          variant={headingScale}
+          isHeading
+          colorRole={isSectionLabel ? 'inkMuted' : 'ink'}
+          style={isSectionLabel ? styles.sectionTitle : undefined}
+        >
           {title}
         </Text>
       </View>
@@ -48,6 +59,14 @@ const styles = StyleSheet.create({
   textColumn: {
     flex: 1,
     gap: space['1'],
+  },
+  meta: {
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+  },
+  sectionTitle: {
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   action: {
     flexShrink: 0,

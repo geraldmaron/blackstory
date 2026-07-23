@@ -211,9 +211,8 @@ export type ExploreInstrumentsFrameProps = {
 };
 
 /**
- * Lifted plate for in-map instruments — top-anchored, but with a defined bottom
- * edge (radius + full hairline border + soft shadow) so content is never
- * guillotined mid-row the way a bare top-border-only frame used to do.
+ * Surface plate for in-map instruments — hairline Rule border, radius 8, flat
+ * matte (Ledger Line; no decorative shadow).
  */
 export function ExploreInstrumentsFrame({
   children,
@@ -223,8 +222,8 @@ export function ExploreInstrumentsFrame({
   return (
     <LiftedSurface
       tone="surface"
-      shadow="sm"
-      radiusKey="md"
+      shadow="none"
+      radiusKey="sm"
       bordered
       style={[styles.instrumentsFrame, style]}
       testID={testID}

@@ -78,6 +78,17 @@ function matchExpressionOutputs(expression: unknown): readonly unknown[] {
   return outputs;
 }
 
+/** Stroke widths are zoom-scaled: unwrap `interpolate` → `['*', match, scale]` at the first stop. */
+function strokeWidthMatchOutputs(expression: unknown): readonly unknown[] {
+  const arr = expression as unknown[];
+  if (arr[0] === 'match') return matchExpressionOutputs(expression);
+  assert.equal(arr[0], 'interpolate', 'expected zoom-scaled stroke width');
+  assert.deepEqual(arr[2], ['zoom']);
+  const firstScaled = arr[4] as unknown[];
+  assert.equal(firstScaled[0], '*');
+  return matchExpressionOutputs(firstScaled[1]);
+}
+
 function buildStyleFixture(
   layerMode: 'off' | 'presence' | 'blackShare' | 'blackChange',
   popGeo: 'state' | 'county' = 'county',
@@ -668,7 +679,7 @@ test("the point layer's fill/stroke signature (the non-color glyph channel) is n
   const style = buildStyleFixture('presence');
   const pointLayer = layerById(style, EXPLORE_UNCLUSTERED_POINT_LAYER_ID);
   const opacityOutputs = matchExpressionOutputs(pointLayer.paint?.['circle-opacity']);
-  const strokeWidthOutputs = matchExpressionOutputs(pointLayer.paint?.['circle-stroke-width']);
+  const strokeWidthOutputs = strokeWidthMatchOutputs(pointLayer.paint?.['circle-stroke-width']);
   // At least one kind (institution, the "ring" glyph) must differ from the others on both
   // opacity (mostly hollow) and stroke-width (thick) proof the glyph channel is real, not
   // decorative filler that happens to be identical everywhere.
@@ -680,6 +691,20 @@ test("the point layer's fill/stroke signature (the non-color glyph channel) is n
     new Set(strokeWidthOutputs).size > 1,
     'circle-stroke-width must differ across kinds (thin vs. thick rim)',
   );
+});
+
+test('point and cluster stroke widths are zoom-scaled so national rims do not outgrow fills', () => {
+  const style = buildStyleFixture('presence');
+  const pointStroke = layerById(style, EXPLORE_UNCLUSTERED_POINT_LAYER_ID).paint?.[
+    'circle-stroke-width'
+  ] as unknown[];
+  const clusterStroke = layerById(style, EXPLORE_CLUSTER_LAYER_ID).paint?.[
+    'circle-stroke-width'
+  ] as unknown[];
+  assert.equal(pointStroke[0], 'interpolate');
+  assert.deepEqual(pointStroke[2], ['zoom']);
+  assert.equal(clusterStroke[0], 'interpolate');
+  assert.deepEqual(clusterStroke[2], ['zoom']);
 });
 
 test('the institution "ring" glyph is mostly hollow with a thick Stone-sourced stroke', () => {

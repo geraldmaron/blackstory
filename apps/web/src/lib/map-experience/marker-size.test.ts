@@ -13,10 +13,15 @@ import {
   MARKER_RADIUS_MIN,
   confidenceSizeModifierExpression,
   markerHaloRadius,
+  markerHaloRadiusAtZoom,
   markerHaloRadiusExpression,
   markerRadius,
+  markerRadiusAtZoom,
   markerRadiusEvidenceExpression,
   markerRadiusExpression,
+  markerStrokeWidthAtZoom,
+  markerZoomScale,
+  zoomScaledNumericExpression,
 } from './marker-size';
 
 test('clamp floor: zero evidence at every confidence tier still returns the minimum radius', () => {
@@ -149,10 +154,38 @@ test('the interpolated expression curve tracks markerRadius() reasonably closely
   }
 });
 
-test('markerHaloRadiusExpression() offsets each zoom stop of the radius expression by the fixed halo offset', () => {
+test('markerHaloRadiusAtZoom scales the offset with zoom so national halos stay proportional', () => {
+  const evidence = 8;
+  const nationalHalo = markerHaloRadiusAtZoom(evidence, 'high', 3);
+  const nationalFill = markerRadiusAtZoom(evidence, 'high', 3);
+  const localityHalo = markerHaloRadiusAtZoom(evidence, 'high', 9);
+  const localityFill = markerRadiusAtZoom(evidence, 'high', 9);
+  // Halo excess over fill must shrink at national zoom (not stay a fixed +3px wash).
+  assert.ok(nationalHalo - nationalFill < MARKER_HALO_OFFSET);
+  assert.equal(
+    Number((nationalHalo - nationalFill).toFixed(6)),
+    Number((MARKER_HALO_OFFSET * markerZoomScale(3)).toFixed(6)),
+  );
+  assert.ok(localityHalo > nationalHalo);
+  assert.equal(
+    Number((localityHalo / localityFill).toFixed(4)),
+    Number((nationalHalo / nationalFill).toFixed(4)),
+  );
+});
+
+test('markerStrokeWidthAtZoom and zoomScaledNumericExpression share MARKER_ZOOM_SCALE_STOPS', () => {
+  assert.equal(markerStrokeWidthAtZoom(1.5, 3), 1.5 * markerZoomScale(3));
+  assert.equal(markerStrokeWidthAtZoom(4, 9), 4 * markerZoomScale(9));
+  const expr = zoomScaledNumericExpression(2) as unknown[];
+  assert.deepEqual(expr.slice(0, 3), ['interpolate', ['linear'], ['zoom']]);
+  assert.equal(expr[3], 3);
+  assert.equal(expr[4], 2 * markerZoomScale(3));
+});
+
+test('markerHaloRadiusExpression() scales (radius + offset) per zoom stop — never a fixed px wash', () => {
   // Both expressions are TOP-LEVEL zoom interpolates (the style spec rejects ['zoom'] nested
-  // inside arithmetic), so the halo relationship holds per stop output: radius stop `['*',
-  // data, scale]` pairs with halo stop `['+', ['*', data, scale], MARKER_HALO_OFFSET]`.
+  // inside arithmetic). Halo must multiply the offset by scale so national frames do not light
+  // every pin with an oversized rim.
   const radius = markerRadiusExpression() as unknown[];
   const halo = markerHaloRadiusExpression() as unknown[];
   assert.deepEqual(radius.slice(0, 3), ['interpolate', ['linear'], ['zoom']]);
@@ -160,6 +193,12 @@ test('markerHaloRadiusExpression() offsets each zoom stop of the radius expressi
   assert.equal(halo.length, radius.length);
   for (let i = 3; i < radius.length; i += 2) {
     assert.equal(halo[i], radius[i], `zoom stop ${i} differs`);
-    assert.deepEqual(halo[i + 1], ['+', radius[i + 1], MARKER_HALO_OFFSET], `output at stop ${i}`);
+    const radiusOut = radius[i + 1] as unknown[];
+    const scale = radiusOut[2];
+    assert.deepEqual(
+      halo[i + 1],
+      ['*', ['+', radiusOut[1], MARKER_HALO_OFFSET], scale],
+      `output at stop ${i}`,
+    );
   }
 });

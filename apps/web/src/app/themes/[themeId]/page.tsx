@@ -17,6 +17,7 @@ import {
   getThemeCatalogEntry,
   listAvailableThemeIds,
 } from '../../../components/theme-impact/fixtures';
+import { THEMES_PUBLIC_SURFACE_ENABLED } from '../../../lib/theme-impact/public-surface';
 import { shouldShowThemeImpactStorytelling } from '../../../lib/theme-impact/storytelling-series';
 import { listThemeImpactPacketViews, resolveRedliningPilotPacketView } from '../../../lib/theme-impact/source';
 import {
@@ -33,10 +34,14 @@ type ThemeDetailPageProps = {
 };
 
 export async function generateStaticParams() {
+  if (!THEMES_PUBLIC_SURFACE_ENABLED) return [];
   return listAvailableThemeIds().map((themeId) => ({ themeId }));
 }
 
 export async function generateMetadata({ params }: ThemeDetailPageProps) {
+  if (!THEMES_PUBLIC_SURFACE_ENABLED) {
+    return { title: 'Theme not found' };
+  }
   const { themeId } = await params;
   const entry = getThemeCatalogEntry(themeId);
   if (!entry?.available) {
@@ -49,6 +54,10 @@ export async function generateMetadata({ params }: ThemeDetailPageProps) {
 }
 
 export default async function ThemeDetailPage({ params }: ThemeDetailPageProps) {
+  if (!THEMES_PUBLIC_SURFACE_ENABLED) {
+    notFound();
+  }
+
   const { themeId } = await params;
   const entry = getThemeCatalogEntry(themeId);
 
@@ -62,6 +71,7 @@ export default async function ThemeDetailPage({ params }: ThemeDetailPageProps) 
   const storytellingPackets = packets.filter((packet) =>
     shouldShowThemeImpactStorytelling(packet.questionId),
   );
+  const hasGatedCausal = packets.some((packet) => packet.methodStance === 'gated_causal_claim');
   const packetCountLabel = `${packets.length} question${packets.length === 1 ? '' : 's'} in scope`;
 
   return (
@@ -88,12 +98,17 @@ export default async function ThemeDetailPage({ params }: ThemeDetailPageProps) 
           >
             <p className="ds-themes-edition__panel-title">Method</p>
             <h2 className="ds-themes-edition__method-title" id="theme-detail-method-heading">
-              Juxtaposition, not causation
+              {hasGatedCausal
+                ? 'Juxtaposition first, gated causation where named'
+                : 'Juxtaposition, not causation'}
             </h2>
             <p className="ds-themes-edition__method-body">
               Each packet below states its method stance and any gap labels. Policy timing beside an
-              indicator is not proof of cause. See{' '}
-              <Link href="/methodology">methodology</Link> for the full juxtaposition bar.
+              indicator is not proof of cause
+              {hasGatedCausal
+                ? ', unless a packet carries a gated causal claim with named secondary sources'
+                : ''}
+              . See <Link href="/methodology">methodology</Link> for the full juxtaposition bar.
             </p>
             {source !== 'fixture' ? (
               <p className="ds-mono ds-themes-edition__live-badge">

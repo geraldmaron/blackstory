@@ -17,6 +17,8 @@ export const THEME_IMPACT_THEME_IDS = [
   'urban_renewal',
   'mass_incarceration',
   'environmental_racism',
+  'school_segregation',
+  'voting_rights',
   'cross_cutting',
 ] as const;
 
@@ -98,6 +100,9 @@ export const THEME_IMPACT_V1_SOURCE_ALLOWLIST = [
   'cdc-eji',
   'epa-tri',
   'hud-chas',
+  'crdc-school-civil-rights',
+  'mit-election-lab',
+  'voting-rights-lab-indicators',
   'primary-government-documents',
   'peer-reviewed-syntheses',
 ] as const;
@@ -295,6 +300,54 @@ export const THEME_IMPACT_QUESTIONS: readonly ThemeImpactQuestion[] = [
     policyEraFamily: 'none',
     metricBindings: [],
     artifactClasses: [],
+  },
+  {
+    id: 'Q11',
+    themeId: 'school_segregation',
+    priority: 'P1',
+    question:
+      'How does residential segregation shape school opportunity and later educational attainment in an example metro?',
+    answerShape: 'era_indicators',
+    policyEraFamily: 'none',
+    metricBindings: [
+      { kind: 'phase1', metricId: 'acs-ba-attainment-black-county' },
+      { kind: 'phase1', metricId: 'acs-black-population-share-county' },
+      { kind: 'phase1', metricId: 'nhgis-black-population-share-county' },
+      {
+        kind: 'proposed',
+        metricId: 'crdc-discipline-rate-black-district',
+        sourceFamily: 'crdc-school-civil-rights',
+      },
+    ],
+    artifactClasses: [
+      'primary_government_document',
+      'peer_reviewed_synthesis',
+    ],
+  },
+  {
+    id: 'Q12',
+    themeId: 'voting_rights',
+    priority: 'P1',
+    question:
+      'How did franchise rules and federal enforcement change Black political access, and what remains measured only as a gap?',
+    answerShape: 'artifact_timeline',
+    policyEraFamily: 'none',
+    metricBindings: [
+      {
+        kind: 'proposed',
+        metricId: 'turnout-rate-black-state',
+        sourceFamily: 'mit-election-lab',
+      },
+      {
+        kind: 'proposed',
+        metricId: 'voting-rights-policy-index-state',
+        sourceFamily: 'voting-rights-lab-indicators',
+      },
+    ],
+    artifactClasses: [
+      'primary_government_document',
+      'peer_reviewed_synthesis',
+    ],
   },
 ];
 

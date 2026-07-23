@@ -24,7 +24,13 @@ export function RelatedEntityList({ entityIds }: { readonly entityIds: readonly 
   if (entityIds.length === 0) return null;
   return (
     <View accessible={false}>
-      <Text variant="subtitle" isHeading accessibilityRole="header">
+      <Text
+        variant="sectionLabel"
+        colorRole="inkMuted"
+        isHeading
+        accessibilityRole="header"
+        style={{ letterSpacing: 1, textTransform: 'uppercase' }}
+      >
         Related records ({entityIds.length})
       </Text>
       <FlatList
@@ -58,7 +64,13 @@ export function RelatedFactBadges({ factIds }: { readonly factIds: readonly stri
   if (factIds.length === 0) return null;
   return (
     <View accessible={false}>
-      <Text variant="subtitle" isHeading accessibilityRole="header">
+      <Text
+        variant="sectionLabel"
+        colorRole="inkMuted"
+        isHeading
+        accessibilityRole="header"
+        style={{ letterSpacing: 1, textTransform: 'uppercase' }}
+      >
         Cited facts ({factIds.length})
       </Text>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space['2'], marginTop: space['2'] }}>

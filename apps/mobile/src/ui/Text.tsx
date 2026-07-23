@@ -43,7 +43,7 @@ export function Text({
   const theme = useThemeColors();
   const scale = typeScale[variant];
   const family = resolveFontFamily(scale.family, scale.weight);
-  const headingRoles: TextRole[] = ['display', 'title', 'subtitle'];
+  const headingRoles: TextRole[] = ['display', 'title', 'subtitle', 'masthead', 'entityTitle'];
   const resolvedHeading = isHeading ?? headingRoles.includes(variant);
 
   return (

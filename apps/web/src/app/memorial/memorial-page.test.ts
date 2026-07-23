@@ -6,11 +6,11 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
-import { memorialNamesAlphabetical, MEMORIAL_NAMES } from '../../components/patterns/memorial-wall/memorial-names.ts';
+import { memorialNamesAlphabetical, MEMORIAL_NAMES } from '../../components/patterns/memorial-wall/memorial-names';
 import {
   memorialEditionPanelClassName,
   memorialEditionRootClassName,
-} from './memorial-panel-chrome.ts';
+} from './memorial-panel-chrome';
 
 const here = dirname(fileURLToPath(import.meta.url));
 

@@ -80,6 +80,20 @@ export function markerRadiusAtZoom(
   return markerRadius(evidenceCount, confidenceTier) * markerZoomScale(zoom);
 }
 
+/** Halo at zoom — `(radius + offset) × scale` so national frames do not grow a fixed wash. */
+export function markerHaloRadiusAtZoom(
+  evidenceCount: number,
+  confidenceTier: ConfidenceTierLike,
+  zoom: number,
+): number {
+  return markerHaloRadius(evidenceCount, confidenceTier) * markerZoomScale(zoom);
+}
+
+/** Stroke/rim width at zoom — same scale factor as the fill disc. */
+export function markerStrokeWidthAtZoom(baseWidth: number, zoom: number): number {
+  return baseWidth * markerZoomScale(zoom);
+}
+
 export const MARKER_RADIUS_EVIDENCE_STOPS: ReadonlyArray<
   readonly [evidenceCount: number, radius: number]
 > = [0, 1, 2, 4, 8, 16, 32, 64, 128, 256].map(
@@ -138,10 +152,21 @@ export function markerRadiusExpression(): readonly unknown[] {
 
 export function markerRadiusPlusExpression(offset: number): readonly unknown[] {
   return zoomScaledRadiusExpression((dataRadius, scale) => [
-    '+',
-    ['*', dataRadius, scale],
-    offset,
+    '*',
+    ['+', dataRadius, offset],
+    scale,
   ]);
+}
+
+/** Top-level zoom interpolate scaling a numeric paint expression/literal by zoom stops. */
+export function zoomScaledNumericExpression(
+  value: readonly unknown[] | number,
+): readonly unknown[] {
+  const stops = MARKER_ZOOM_SCALE_STOPS.flatMap(([zoom, scale]) => [
+    zoom,
+    typeof value === 'number' ? value * scale : (['*', value, scale] as const),
+  ]);
+  return ['interpolate', ['linear'], ['zoom'], ...stops] as const;
 }
 
 export function markerHaloRadiusExpression(): readonly unknown[] {

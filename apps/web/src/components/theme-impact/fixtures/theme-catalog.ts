@@ -7,10 +7,10 @@ import type { ThemeImpactCatalogEntry } from './types';
 export const THEME_IMPACT_CATALOG: readonly ThemeImpactCatalogEntry[] = [
   {
     id: 'redlining',
-    title: 'Redlining',
+    title: 'Housing segregation & redlining',
     priority: 'P0',
     lede:
-      'Federal appraisal and underwriting systems, Chicago HOLC evidence, and later housing and credit indicators, with disagreements and scale limits kept visible.',
+      'A human story of how violence, private covenants, and federal underwriting locked neighborhoods apart. Chicago and Cook County are the example metro for reading a national pattern, with later housing and credit indicators kept beside that history.',
     available: true,
   },
   {
@@ -43,6 +43,22 @@ export const THEME_IMPACT_CATALOG: readonly ThemeImpactCatalogEntry[] = [
     priority: 'P1',
     lede:
       'An Illinois county test using ACS, CDC EJI, and EPA TRI data, including the mixed results that challenge a simple facility-count story.',
+    available: true,
+  },
+  {
+    id: 'school_segregation',
+    title: 'School segregation & opportunity',
+    priority: 'P1',
+    lede:
+      'How residential segregation feeds school opportunity. Cook County attainment sits beside the desegregation record as an example reading, with district discipline series still gap-labeled.',
+    available: true,
+  },
+  {
+    id: 'voting_rights',
+    title: 'Voting rights & political exclusion',
+    priority: 'P1',
+    lede:
+      'Franchise rules from Reconstruction through the Voting Rights Act, told as a connected enforcement story. Turnout and state policy indexes remain cite-first until warehouse series load.',
     available: true,
   },
 ] as const;

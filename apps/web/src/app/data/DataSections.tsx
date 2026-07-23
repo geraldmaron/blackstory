@@ -1,6 +1,6 @@
 /**
  * Data page body: v6 Surface edition stack with census population, Phase 1 indicator
- * visualizations, theme hand-offs, and explore/methodology next steps.
+ * visualizations, coverage strip, and explore/methodology next steps.
  */
 import type { ReactNode } from 'react';
 import Link from 'next/link';
@@ -269,9 +269,7 @@ export function DataSections({
           lede={
             <>
               Median family net worth from the Federal Reserve&apos;s triennial survey: a national
-              juxtaposition used on the{' '}
-              <Link href="/themes/redlining">redlining theme</Link> when asking how housing-credit
-              eras relate to wealth.
+              juxtaposition used when asking how housing-credit eras relate to wealth.
             </>
           }
           headingId="wealth-heading"
@@ -312,9 +310,7 @@ export function DataSections({
           lede={
             <>
               State imprisonment rates (BJS) and federal cocaine sentencing averages (USSC Quick
-              Facts): context for the{' '}
-              <Link href="/themes/drug_policy_state">drug policy and the state theme</Link>, not
-              proof that any single law caused a number.
+              Facts): context for drug-policy eras, not proof that any single law caused a number.
             </>
           }
           headingId="justice-heading"
@@ -366,12 +362,6 @@ export function DataSections({
           />
         ) : null}
         <p className="ds-data-edition__actions">
-          <Link className="ds-cta ds-cta--quiet" href="/themes/redlining">
-            Redlining theme
-          </Link>
-          <Link className="ds-cta ds-cta--quiet" href="/themes/drug_policy_state">
-            Drug policy theme
-          </Link>
           <Link className="ds-cta ds-cta--quiet" href="/methodology">
             Juxtaposition rules
           </Link>

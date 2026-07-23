@@ -2,12 +2,16 @@
  * Marker radius + zoom scale parity with web `marker-size.ts`.
  */
 import {
+  MARKER_HALO_OFFSET,
   MARKER_RADIUS_MAX,
   MARKER_RADIUS_MIN,
   MARKER_ZOOM_SCALE_STOPS,
+  markerHaloRadiusAtZoom,
   markerRadius,
   markerRadiusAtZoom,
   markerRadiusExpression,
+  markerRadiusPlusExpression,
+  markerStrokeWidthAtZoom,
   markerZoomScale,
 } from '../marker-size';
 
@@ -44,5 +48,29 @@ describe('markerRadiusExpression', () => {
     const expr = markerRadiusExpression();
     expect(expr[0]).toBe('interpolate');
     expect(expr[2]).toEqual(['zoom']);
+  });
+});
+
+describe('national halo / stroke scale', () => {
+  it('scales halo offset with zoom so national pins are not rim-dominated', () => {
+    const fill = markerRadiusAtZoom(8, 'high', 3);
+    const halo = markerHaloRadiusAtZoom(8, 'high', 3);
+    expect(halo - fill).toBeCloseTo(MARKER_HALO_OFFSET * markerZoomScale(3));
+    expect(halo - fill).toBeLessThan(MARKER_HALO_OFFSET);
+  });
+
+  it('scales stroke width with the same zoom stops', () => {
+    expect(markerStrokeWidthAtZoom(1.5, 3)).toBeCloseTo(1.5 * markerZoomScale(3));
+  });
+
+  it('halo paint expression multiplies (radius + offset) by zoom scale', () => {
+    const expr = markerRadiusPlusExpression(MARKER_HALO_OFFSET);
+    expect(expr[0]).toBe('interpolate');
+    expect(expr[2]).toEqual(['zoom']);
+    const firstOut = expr[4] as unknown[];
+    expect(firstOut[0]).toBe('*');
+    expect(Array.isArray(firstOut[1])).toBe(true);
+    expect((firstOut[1] as unknown[])[0]).toBe('+');
+    expect((firstOut[1] as unknown[])[2]).toBe(MARKER_HALO_OFFSET);
   });
 });

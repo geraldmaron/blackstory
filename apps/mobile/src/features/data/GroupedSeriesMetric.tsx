@@ -4,7 +4,7 @@
  * rather than being buried in a muted, clip-prone summary string.
  */
 import { StyleSheet, View } from 'react-native';
-import { LedgerRow, Link, LiftedSurface, MIN_TOUCH_TARGET, Text, space } from '@/ui';
+import { LedgerRow, Link, MIN_TOUCH_TARGET, Text, space } from '@/ui';
 import { formatDataValue } from './format';
 import type { DataGroupedBarSeries } from './types';
 
@@ -25,16 +25,16 @@ export function GroupedSeriesMetric({ series }: GroupedSeriesMetricProps) {
 
   return (
     <View style={styles.block} accessibilityRole="summary">
-      <Text variant="bodyEmphasis" isHeading>
+      <Text variant="rowTitle" isHeading>
         {series.title}
       </Text>
-      <Text variant="code" colorRole="inkMuted">
+      <Text variant="sectionLabel" colorRole="inkMuted" style={styles.meta}>
         {series.geographyLabel}
       </Text>
-      <Text variant="body" colorRole="inkMuted">
+      <Text variant="caption" colorRole="inkMuted">
         {series.caption}
       </Text>
-      <LiftedSurface tone="surface" shadow="none">
+      <View>
         {rows.map((row, index) => (
           <LedgerRow
             key={row.key}
@@ -49,7 +49,7 @@ export function GroupedSeriesMetric({ series }: GroupedSeriesMetricProps) {
             showChevron={false}
           />
         ))}
-      </LiftedSurface>
+      </View>
       <View style={styles.sources}>
         {series.sources.map((source) => (
           <View key={source.url} style={styles.sourceItem}>
@@ -66,6 +66,10 @@ export function GroupedSeriesMetric({ series }: GroupedSeriesMetricProps) {
 const styles = StyleSheet.create({
   block: {
     gap: space['2'],
+  },
+  meta: {
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
   },
   value: {
     textAlign: 'right',

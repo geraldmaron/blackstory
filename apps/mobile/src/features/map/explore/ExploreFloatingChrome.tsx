@@ -70,6 +70,7 @@ function GhostIconButton({
             : pressed
               ? MAP_GHOST_PRESSED
               : chrome.mapGhostBg,
+          borderColor: chrome.border,
           opacity: pressed ? 0.9 : 1,
         },
       ]}
@@ -115,9 +116,17 @@ export function ExploreFloatingChrome({
       onLayout={onLayout}
     >
       <View style={styles.mastRow} pointerEvents="box-none">
-        <View style={[styles.countChip, { backgroundColor: chrome.surface }]}>
+        <View
+          style={[
+            styles.countChip,
+            {
+              backgroundColor: 'transparent',
+              borderColor: chrome.border,
+            },
+          ]}
+        >
           <Text
-            variant="code"
+            variant="caption"
             numberOfLines={1}
             style={[styles.countInline, { color: chrome.accent }]}
             accessible
@@ -195,9 +204,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: space['2'],
     paddingVertical: space['1'],
     borderRadius: radius.sm,
+    borderWidth: StyleSheet.hairlineWidth,
+    minHeight: MIN_TOUCH_TARGET,
+    justifyContent: 'center',
   },
   countInline: {
-    fontSize: 12,
     letterSpacing: 0.3,
   },
   actions: {
@@ -211,5 +222,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: radius.sm,
+    borderWidth: StyleSheet.hairlineWidth,
   },
 });

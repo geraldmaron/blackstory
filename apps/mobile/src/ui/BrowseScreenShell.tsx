@@ -1,12 +1,12 @@
 /**
- * Browse edition shell — ScreenCanvas + scroll insets + indexed ScreenHeader.
- * Use for tab-root browse surfaces (History, Stories home, More). Body content
- * sits below the header; wrap sections in LiftedSurface panels as needed.
+ * Browse edition shell (Ledger Line) — ScreenCanvas + live tab-bar scroll insets
+ * + compact ScreenHeader. Tab-root indexes sit on Archive Paper with hairline
+ * section labels; avoid nested LiftedSurface / indexed EditionSurfacePanel cards.
  */
 import type { ReactNode } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 
-import { ScreenCanvas, screenScrollInsets } from './ScreenCanvas';
+import { ScreenCanvas, useScreenScrollInsets } from './ScreenCanvas';
 import { ScreenHeader } from './ScreenHeader';
 
 export type BrowseScreenShellProps = {
@@ -26,9 +26,21 @@ export function BrowseScreenShell({
   dense = true,
   children,
 }: BrowseScreenShellProps) {
+  const insets = useScreenScrollInsets();
+
   return (
     <ScreenCanvas>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.content,
+          {
+            paddingHorizontal: insets.paddingHorizontal,
+            paddingTop: insets.paddingTop,
+            paddingBottom: insets.paddingBottom,
+            gap: insets.gap,
+          },
+        ]}
+      >
         <ScreenHeader kicker={kicker} title={title} dek={dek} compact={compact} dense={dense} />
         {children}
       </ScrollView>
@@ -38,9 +50,6 @@ export function BrowseScreenShell({
 
 const styles = StyleSheet.create({
   content: {
-    paddingHorizontal: screenScrollInsets.paddingHorizontal,
-    paddingTop: screenScrollInsets.paddingTop,
-    paddingBottom: screenScrollInsets.paddingBottom,
-    gap: screenScrollInsets.gap,
+    flexGrow: 1,
   },
 });

@@ -7,7 +7,7 @@
 export const DATA_INTRO = {
   kicker: 'Numbers',
   lede:
-    'National Census context plus curated indicators we use on Themes — wealth, housing, credit, justice. Every chart names its source.',
+    'National Census context plus curated indicators for wealth, housing, credit, and justice. Every chart names its source.',
 } as const;
 
 export const DATA_ORIENTATION_BEATS = [
@@ -30,7 +30,7 @@ export const DATA_SECTION_COPY = {
     index: '01',
     kicker: 'Orientation',
     title: 'How to read these numbers',
-    lede: 'Census decades anchor the national story; Phase 1 indicators show the metrics we juxtapose on Themes.',
+    lede: 'Census decades anchor the national story; Phase 1 indicators show curated metrics we place beside archive evidence.',
   },
   population: {
     index: '02',
@@ -42,7 +42,7 @@ export const DATA_SECTION_COPY = {
     index: '03',
     kicker: 'Survey of Consumer Finances',
     title: 'Wealth gap at a glance',
-    lede: 'Median family net worth from the Federal Reserve triennial survey — juxtaposition, not a single cause.',
+    lede: 'Median family net worth from the Federal Reserve triennial survey. Juxtaposition, not a single cause.',
   },
   housing: {
     index: '04',
@@ -54,13 +54,13 @@ export const DATA_SECTION_COPY = {
     index: '05',
     kicker: 'BJS · USSC',
     title: 'Imprisonment and federal drug sentences',
-    lede: 'State imprisonment rates and federal cocaine sentencing averages — context for drug-policy eras, not proof of cause.',
+    lede: 'State imprisonment rates and federal cocaine sentencing averages. Context for drug-policy eras, not proof of cause.',
   },
   themes: {
     index: '06',
-    kicker: 'Theme-impact',
-    title: 'Same metrics, full stories',
-    lede: 'Themes packages these indicators beside artifacts and policy eras, without causal overclaim.',
+    kicker: 'Phase 1',
+    title: 'Curated indicator coverage',
+    lede: 'These indicators sit beside artifacts and policy eras in research packets, without causal overclaim.',
   },
   next: {
     index: '07',

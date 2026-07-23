@@ -2,17 +2,30 @@
  * Record anatomy section: v6 edition panel, fact grid, place preview, maps hand-off.
  */
 import { fireEvent, render } from '@testing-library/react-native';
-import { AnatomySection } from '../sections/AnatomySection';
+import { AnatomySection, anatomyFactLabelColumnWidth, anatomyFactRowStyle } from '../sections/AnatomySection';
 import { normalizeEntity } from '../normalize';
 import { fullEntityFixture, minimalEntityFixture } from '../testFixtures';
 
 describe('AnatomySection', () => {
+  it('keeps each anatomy fact on one horizontal row', async () => {
+    expect(anatomyFactRowStyle.flexWrap).toBe('nowrap');
+    expect(anatomyFactRowStyle.flexDirection).toBe('row');
+    expect(anatomyFactLabelColumnWidth).toBeGreaterThan(0);
+
+    const entity = normalizeEntity(fullEntityFixture('place'))!;
+    const { getByTestId } = await render(<AnatomySection entity={entity} />);
+    for (const key of ['kind', 'where', 'era', 'evidence'] as const) {
+      expect(getByTestId(`entity-anatomy-fact-${key}`)).toBeTruthy();
+      expect(getByTestId(`entity-anatomy-fact-label-${key}`)).toBeTruthy();
+    }
+  });
+
   it('renders four labeled facts inside the anatomy edition panel', async () => {
     const entity = normalizeEntity(fullEntityFixture('place'))!;
     const { getByTestId, getByText } = await render(<AnatomySection entity={entity} />);
     expect(getByTestId('entity-anatomy-section')).toBeTruthy();
     expect(getByText('Record at a glance')).toBeTruthy();
-    expect(getByText('ANATOMY')).toBeTruthy();
+    expect(getByText(/01\s*·\s*Anatomy/i)).toBeTruthy();
     expect(getByText('Kind')).toBeTruthy();
     expect(getByText('Where')).toBeTruthy();
     expect(getByText('Era')).toBeTruthy();
@@ -28,6 +41,19 @@ describe('AnatomySection', () => {
     expect(getByTestId('record-place-empty')).toBeTruthy();
     expect(getByText('Place not pinned')).toBeTruthy();
     expect(getByText('Undated')).toBeTruthy();
+  });
+
+  it('renders long where values without line clamp', async () => {
+    const base = normalizeEntity(fullEntityFixture('place'))!;
+    const entity = {
+      ...base,
+      jurisdictionLabel:
+        'Carroll County, Tennessee (community-level; exact site pending geo review)',
+    };
+    const { getByText } = await render(<AnatomySection entity={entity} />);
+    expect(
+      getByText('Carroll County, Tennessee (community-level; exact site pending geo review)'),
+    ).toBeTruthy();
   });
 
   it('offers Open in maps and View on national map when geo exists', async () => {

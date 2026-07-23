@@ -1,13 +1,13 @@
 /**
- * Story-shaped section index (`/learn/history`, `/learn/topics`, `/learn/myths`): v6 Surface
- * edition stack with indexed header and compact ledger rows with fact strips.
+ * Story-shaped section index (`/learn/history`, `/learn/topics`, `/learn/myths`):
+ * Ledger Line canvas masthead + mono section label + compact story rows.
  */
-import { ScrollView } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { router } from 'expo-router';
 import {
-  EditionSurfacePanel,
-  EditionSurfaceStack,
+  LedgerSectionLabel,
   ScreenCanvas,
+  ScreenHeader,
   screenScrollInsets,
 } from '@/ui';
 import type { LearnMoreSectionRow } from './sections';
@@ -30,34 +30,28 @@ export function StorySectionIndexScreen({ section }: StorySectionIndexScreenProp
           paddingHorizontal: screenScrollInsets.paddingHorizontal,
           paddingTop: screenScrollInsets.paddingTop,
           paddingBottom: screenScrollInsets.paddingBottom,
+          gap: screenScrollInsets.gap,
         }}
       >
-        <EditionSurfaceStack>
-          <EditionSurfacePanel
-            index="00"
-            kicker="Archive"
-            title={section.title}
-            dek={section.subtitle}
-            compact
-          />
+        <ScreenHeader
+          kicker="Archive"
+          title={section.title}
+          dek={section.subtitle}
+          compact
+          dense
+        />
 
-          <EditionSurfacePanel
-            index="01"
-            kicker="Catalog"
-            title="Published stories"
-            panelMeta={countLabel}
-          >
-            {entries.map((entry, index) => (
-              <StoryCompactRow
-                key={entry.page.slug}
-                entry={entry}
-                indexLabel={String(index + 1).padStart(2, '0')}
-                onPress={() => router.push(storyHref(entry) as never)}
-                showDivider={index < entries.length - 1}
-              />
-            ))}
-          </EditionSurfacePanel>
-        </EditionSurfaceStack>
+        <View>
+          <LedgerSectionLabel meta={countLabel}>Published stories</LedgerSectionLabel>
+          {entries.map((entry, index) => (
+            <StoryCompactRow
+              key={entry.page.slug}
+              entry={entry}
+              onPress={() => router.push(storyHref(entry) as never)}
+              showDivider={index < entries.length - 1}
+            />
+          ))}
+        </View>
       </ScrollView>
     </ScreenCanvas>
   );

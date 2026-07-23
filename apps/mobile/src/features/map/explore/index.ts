@@ -4,7 +4,6 @@
  * Prefer direct file imports for `ExploreBottomSheet` / `ExploreFloatingChrome`
  * from ExploreView to keep Jest from loading gorhom via the map barrel.
  */
-export { ExploreToolbar, type ExploreToolbarProps } from './ExploreToolbar';
 export {
   EntityPreviewSheet,
   type EntityPreviewSheetProps,

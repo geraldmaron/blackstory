@@ -3,7 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { packMemorialNames } from './pack-memorial-names.ts';
+import { packMemorialNames } from './pack-memorial-names';
 
 test('packMemorialNames never overlaps placed labels', () => {
   const names = [

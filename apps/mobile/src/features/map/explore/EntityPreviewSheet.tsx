@@ -157,7 +157,7 @@ export function EntityPreviewSheet({
             onPress={() => onOpenEntity(feature.entityId)}
             style={({ pressed }) => [styles.titlePress, { opacity: pressed ? 0.85 : 1 }]}
           >
-            <Text variant="bodyEmphasis" isHeading numberOfLines={2} style={styles.title}>
+            <Text variant="rowTitle" isHeading numberOfLines={2} style={styles.title}>
               {feature.label}
             </Text>
           </Pressable>

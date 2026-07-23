@@ -2,7 +2,7 @@
  * Beat 08: connected records and optional continue-learning nested block.
  */
 import { View } from 'react-native';
-import { ListRow, LiftedSurface, NavIcon, navIconForEntityKind, Text, space } from '@/ui';
+import { ListRow, NavIcon, navIconForEntityKind, Text, space } from '@/ui';
 import { EntityEditionPanel } from '../EntityEditionPanel';
 import { RecordGapNotice } from '../RecordGapNotice';
 import { SECTION_HEADINGS } from '../copy';
@@ -57,7 +57,7 @@ export function RelatedSection({
       {relatedNeighbors.length === 0 ? (
         <RecordGapNotice kind="related" />
       ) : (
-        <LiftedSurface tone="surfaceRaised" shadow="none">
+        <View>
           {relatedNeighbors.map((neighbor, neighborIndex) => (
             <NeighborRow
               key={`${neighbor.id}_${neighbor.relationType}_${neighborIndex}`}
@@ -66,7 +66,7 @@ export function RelatedSection({
               showDivider={neighborIndex < relatedNeighbors.length - 1}
             />
           ))}
-        </LiftedSurface>
+        </View>
       )}
 
       {continueLearning.length > 0 ? (
@@ -75,7 +75,7 @@ export function RelatedSection({
           <Text variant="bodySmall" colorRole="inkMuted">
             Nearby records one step further in the published graph. Keep learning without dead ends.
           </Text>
-          <LiftedSurface tone="surfaceRaised" shadow="none">
+          <View>
             {continueLearning.map((neighbor, neighborIndex) => (
               <NeighborRow
                 key={`cl_${neighbor.id}_${neighbor.relationType}_${neighborIndex}`}
@@ -84,7 +84,7 @@ export function RelatedSection({
                 showDivider={neighborIndex < continueLearning.length - 1}
               />
             ))}
-          </LiftedSurface>
+          </View>
         </View>
       ) : null}
     </EntityEditionPanel>

@@ -122,8 +122,9 @@ export function ThemeBrowseSections() {
               Extended evidence themes
             </h2>
             <p className="ds-themes-edition__lede">
-              Urban renewal, mass incarceration, and unequal environmental burden use the same
-              cited packet structure. Mixed results and unavailable fields stay explicit.
+              Urban renewal, mass incarceration, environmental burden, school opportunity, and
+              voting rights use the same cited packet structure. Mixed results and unavailable
+              fields stay explicit. Chicago readings are examples of national patterns.
             </p>
           </div>
         </header>

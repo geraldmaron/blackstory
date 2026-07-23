@@ -27,6 +27,15 @@ test('themes index uses shared EditionAtmosphereMosaic and edition stack', () =>
   assert.doesNotMatch(pageSource, /ds-page__title/);
 });
 
+test('themes public routes are gated behind THEMES_PUBLIC_SURFACE_ENABLED', () => {
+  assert.match(pageSource, /THEMES_PUBLIC_SURFACE_ENABLED/);
+  assert.match(pageSource, /notFound\(\)/);
+  assert.match(detailSource, /THEMES_PUBLIC_SURFACE_ENABLED/);
+  assert.match(detailSource, /notFound\(\)/);
+  assert.match(questionSource, /THEMES_PUBLIC_SURFACE_ENABLED/);
+  assert.match(questionSource, /notFound\(\)/);
+});
+
 test('themes detail and question routes use per-theme mosaic seed', () => {
   for (const source of [detailSource, questionSource]) {
     assert.match(source, /EditionAtmosphereMosaic/);
@@ -63,7 +72,7 @@ test('themes method notice cites methodology without legacy notice chrome', () =
   assert.doesNotMatch(browseSource, /ds-theme-impact__notice-title/);
 });
 
-test('all five adjudicated themes are available with researched packets', () => {
+test('all adjudicated themes are available with researched packets', () => {
   const themeIds = listAvailableThemeIds();
   assert.deepEqual(themeIds, [
     'redlining',
@@ -71,10 +80,12 @@ test('all five adjudicated themes are available with researched packets', () => 
     'urban_renewal',
     'mass_incarceration',
     'environmental_racism',
+    'school_segregation',
+    'voting_rights',
   ]);
   assert.equal(
     themeIds.reduce((count, themeId) => count + listPacketsForTheme(themeId).length, 0),
-    9,
+    11,
   );
   for (const themeId of themeIds) {
     assert.ok(listPacketsForTheme(themeId).length > 0);

@@ -17,8 +17,8 @@ import {
 } from './theme-impact-packet.js';
 
 const PACKET_CREATED_AT = '2026-07-22T23:00:00.000Z';
-const PACKET_UPDATED_AT = '2026-07-23T20:35:57.301Z';
-const ARTIFACT_RETRIEVED_AT = '2026-07-23T20:35:57.301Z';
+const PACKET_UPDATED_AT = '2026-07-23T22:30:00.000Z';
+const ARTIFACT_RETRIEVED_AT = '2026-07-23T22:30:00.000Z';
 
 const COOK_COUNTY = 'county:17031';
 const NATION = 'nation:US';
@@ -67,6 +67,7 @@ type ArtifactInput = {
   readonly dated?: string;
   readonly summary?: string;
   readonly uncertaintyLabel?: string;
+  readonly claimId?: string;
 };
 
 function artifact(input: ArtifactInput): ThemeImpactPacketArtifact {
@@ -88,6 +89,7 @@ function artifact(input: ArtifactInput): ThemeImpactPacketArtifact {
     ...(input.uncertaintyLabel !== undefined
       ? { uncertaintyLabel: input.uncertaintyLabel }
       : {}),
+    ...(input.claimId !== undefined ? { claimId: input.claimId } : {}),
   };
 }
 
@@ -216,6 +218,19 @@ const ACS = {
     humanCitation:
       'U.S. Census Bureau, ACS 2020–2024 5-Year Estimates, poverty rate for the Black population, Cook County, Illinois.',
     label: 'Black poverty rate, Cook County',
+  }),
+  blackBaAttainment: observation({
+    metricId: 'acs-ba-attainment-black-county',
+    estimate: 26.8,
+    unit: 'percent',
+    referencePeriod: '2020-2024',
+    source: 'acs-census-api',
+    sourceUrl: ACS_URL,
+    retrievedAt: ACS_RETRIEVED,
+    contentHash: '935f92f822e6ba27e58effde24aa7b3d9ad5e39f33b6e29ea3b5a9235490b22b',
+    humanCitation:
+      'U.S. Census Bureau, ACS 2020–2024 5-Year Estimates, bachelor’s degree or higher among Black adults 25+, Cook County, Illinois.',
+    label: 'Black bachelor’s attainment, Cook County',
   }),
 } as const;
 
@@ -415,6 +430,46 @@ const REDLINING_ARTIFACTS = {
     dated: '2021',
     summary:
       'The boundary-design study reports later differences near C/D grade borders while explicitly limiting the inference to its design and geography.',
+  }),
+  banaji: artifact({
+    artifactId: 'art_banaji_fiske_massey_systemic_racism_2021',
+    artifactClass: 'peer_reviewed_synthesis',
+    title: 'Systemic racism: individuals and interactions, institutions and society',
+    citation:
+      'Mahzarin R. Banaji, Susan T. Fiske, and Douglas S. Massey, “Systemic racism: individuals and interactions, institutions and society,” Cognitive Research: Principles and Implications 6:82 (2021), doi:10.1186/s41235-021-00349-3.',
+    source: 'cognitive-research-principles-implications',
+    sourceUrl: 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8688641/',
+    contentHash: 'db34a82d62a0fe3e0a3e8451a9f6cb1e153a899693c2c185b79bf81b8b46e37f',
+    dated: '2021-12-20',
+    summary:
+      'Peer-reviewed tutorial treating residential segregation as the linchpin that transmits disadvantage into schools, wealth, health, and legal treatment. Chicago appears as a concrete case inside a national institutional history.',
+    claimId: 'claim_systemic_segregation_linchpin_banaji_fiske_massey_2021',
+  }),
+  chicago1919: artifact({
+    artifactId: 'art_chicago_race_riot_1919_ech',
+    artifactClass: 'peer_reviewed_synthesis',
+    title: 'Chicago Race Riot of 1919',
+    citation:
+      'Encyclopedia of Chicago, “Race Riots,” Chicago History Museum / Newberry Library; corroborated by BlackPast and the cataloged Eugene Williams memorial record.',
+    source: 'encyclopedia-of-chicago',
+    sourceUrl: 'https://encyclopedia.chicagohistory.org/pages/1749.html',
+    contentHash: 'b929eda18fd4db8147a65da29ec75c852912f079f45ea7216b64dfee025af8e7',
+    dated: '1919-07-27',
+    summary:
+      'The riot killed 38 people and left thousands of Black Chicagoans homeless after Great Migration arrivals reshaped the South Side housing market. Banaji/Fiske/Massey place this violence inside the private enforcement of the color line before federal redlining.',
+  }),
+  fairHousing: artifact({
+    artifactId: 'art_fair_housing_act_1968_doj',
+    artifactClass: 'primary_government_document',
+    title: 'Fair Housing Act of 1968',
+    citation:
+      'Civil Rights Act of 1968, Title VIII (Fair Housing Act), 42 U.S.C. §§ 3601 et seq.; U.S. Department of Justice overview.',
+    source: 'department-of-justice',
+    sourceUrl: 'https://www.justice.gov/crt/fair-housing-act-1',
+    contentHash: 'fa07ed8cfb835e172dfc8d21ad9629ed244652d73c207eae42a97dba8a9cb32e',
+    dated: '1968-04-11',
+    summary:
+      'Federal ban on race discrimination in the sale, rental, and financing of housing. Enforcement capacity and later lending gaps remain part of the era story.',
   }),
 } as const;
 
@@ -1019,37 +1074,51 @@ const ENVIRONMENTAL_ARTIFACTS = [
 ] as const;
 
 const METHOD_REDLINE =
-  'Historical artifacts and later indicators are connected by place and policy era. They are not treated as proof that one map or program alone caused every later disparity.';
+  'Chicago and Cook County are an example reading of a national housing-credit system. Historical artifacts and later indicators are connected by place and policy era. They are not treated as proof that one map or program alone caused every later disparity.';
+const METHOD_REDLINE_CAUSAL =
+  'Gated causal claim for the federal HOLC/FHA underwriting system enabling durable residential segregation. Named secondary consensus: Richard Rothstein, The Color of Law (2017); Douglas S. Massey and Nancy A. Denton, American Apartheid (1993); Banaji, Fiske, and Massey (2021). Chicago is the example metro for reading that national pattern. Contested map-only shortcuts remain outside this claim.';
 const METHOD_JUSTICE =
   'Statutes, jail trends, sentencing data, and imprisonment rates describe different systems and geographic scales. They are juxtaposed, not combined into a single causal estimate. State imprisonment rates divide BJS year-end prisoner counts by 2023 ACS 5-year non-Hispanic race estimates because the aligned PEP query returned no rows; treat the exact ratios as descriptive warehouse estimates, not BJS-published rates.';
 const METHOD_URBAN_RENEWAL =
   'Federal project records and county demographic series are read together for context. County trends cannot identify neighborhood-level displacement effects, and missing project fields remain unknown.';
 const METHOD_ENVIRONMENT =
   'This is an ecological, county-level descriptive comparison. EJI, TRI counts, and population share measure different constructs; none is an individual exposure or causal estimate.';
+const METHOD_SCHOOL =
+  'Cook County is an example metro for reading how residential segregation sits beside later attainment. School-finance and CRDC discipline series are not yet loaded; desegregation artifacts supply the policy timeline. Juxtaposition is not causation.';
+const METHOD_VOTING =
+  'Franchise artifacts tell a national enforcement story. Chicago appears as a northern-city example of Great Migration politics, not as a complete turnout series. MIT Election Lab and Voting Rights Lab indicators remain gap-labeled until ingest.';
 
 export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
   buildThemeImpactPacket({
     id: 'tip_chicago_redlining_q1',
     questionId: 'Q1',
     themeId: 'redlining',
-    title: 'Redlining was a system, not a single map',
+    title: 'How a color line became federal credit policy',
     summary:
-      'The evidence supports a connected account: private appraisal and lending discrimination predated HOLC; HOLC surveyors encoded race and neighborhood risk in maps and descriptions; FHA underwriting rules and restrictive-covenant practice reinforced segregation. Scholarship disagrees about how directly HOLC maps themselves controlled lending, so the packet does not make that shortcut.',
+      'Start with people under pressure: Great Migration arrivals on Chicago’s South Side met covenants, blockbusting, and the 1919 race riot before any HOLC map existed. Private real-estate rules then met New Deal credit. HOLC surveyors encoded race and neighborhood risk; FHA underwriting rewarded same-race occupancy and restrictive covenants. Banaji, Fiske, and Massey treat that federal underwriting system as part of a national segregation machine. Scholarship still disagrees about how directly HOLC maps alone steered every loan, so the gated claim here is about the wider HOLC/FHA system, not a map-only shortcut. Chicago is the example city for reading the pattern.',
     policyEras: ['holc_fha', 'fair_housing', 'cra_contemporary'],
     geography: {
       geographyType: 'nation',
       jurisdictionId: NATION,
       boundaryVersion: 'nation-2020',
-      label: 'United States, with Chicago evidence',
+      label: 'United States (Chicago example)',
     },
-    methodStance: 'juxtaposition',
-    methodNote: METHOD_REDLINE,
+    methodStance: 'gated_causal_claim',
+    methodNote: METHOD_REDLINE_CAUSAL,
     artifacts: [
+      REDLINING_ARTIFACTS.chicago1919,
       REDLINING_ARTIFACTS.nara,
       REDLINING_ARTIFACTS.fha,
+      REDLINING_ARTIFACTS.banaji,
       REDLINING_ARTIFACTS.hillier,
       REDLINING_ARTIFACTS.aaronson,
+      REDLINING_ARTIFACTS.fairHousing,
     ],
+    causalClaimIds: [
+      'claim_systemic_fha_holc_enabled_segregation_rothstein_2017',
+      'claim_systemic_segregation_linchpin_banaji_fiske_massey_2021',
+    ],
+    entityBinding: { entityId: 'ent_chicago_race_riot_1919_001', purpose: 'story' },
     status: 'published',
     createdAt: PACKET_CREATED_AT,
     updatedAt: PACKET_UPDATED_AT,
@@ -1060,12 +1129,12 @@ export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
     themeId: 'redlining',
     title: 'What the Chicago HOLC inventory can and cannot count',
     summary:
-      'A direct recount of the current source yields 703 Chicago features: 683 normalized A–D grades (A 49, B 160, C 327, D 147) plus 20 ungraded commercial or industrial features. The source’s area descriptions document racialized appraisal, but this inventory does not contain a defensible population-by-grade denominator. It therefore answers map coverage and grade counts, not the share of Black Chicagoans in each grade.',
+      'On the example city’s maps, a direct recount yields 703 Chicago features: 683 normalized A–D grades (A 49, B 160, C 327, D 147) plus 20 ungraded commercial or industrial features. Area descriptions document racialized appraisal in plain language. The inventory still cannot name how many Black Chicagoans lived inside each grade. That population-by-grade gap is why the story moves from maps to people carefully.',
     policyEras: ['holc_fha'],
     geography: {
       geographyType: 'city',
       boundaryVersion: 'mapping-inequality-holc-v1',
-      label: 'Chicago HOLC survey',
+      label: 'Chicago HOLC survey (example metro)',
     },
     methodStance: 'juxtaposition',
     methodNote: METHOD_REDLINE,
@@ -1073,6 +1142,7 @@ export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
       REDLINING_ARTIFACTS.mapping,
       REDLINING_ARTIFACTS.nara,
       REDLINING_ARTIFACTS.hillier,
+      REDLINING_ARTIFACTS.banaji,
     ],
     gapStates: ['insufficient_evidence'],
     status: 'published',
@@ -1083,15 +1153,15 @@ export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
     id: 'tip_chicago_redlining_q3',
     questionId: 'Q3',
     themeId: 'redlining',
-    title: 'Housing, credit, income, and wealth across later eras',
+    title: 'After the maps: housing, credit, income, and wealth',
     summary:
-      'Cook County’s Black homeownership rate rose from 37.1% in 1990 to 42.0% in 2000 and was 41.2% in 2010; the White rate remained about 25–27 percentage points higher. In 2023 HMDA aggregates show a 16.9-point Black–White denial-rate gap. HUD CHAS shows a 29.5-point cost-burden gap for 2017–2021. National SCF medians add wealth context, while remaining clearly labeled as national rather than Cook County data.',
+      'Follow the same example county forward. Cook County’s Black homeownership rate rose from 37.1% in 1990 to 42.0% in 2000 and was 41.2% in 2010; the White rate stayed about 25 to 27 points higher. In 2023 HMDA aggregates show a 16.9-point Black–White denial-rate gap. HUD CHAS shows a 29.5-point cost-burden gap for 2017–2021. National SCF medians add wealth context and stay labeled national, not Cook County. The numbers do not prove that one 1930s sheet caused each later gap; they show what families faced after the color line was built into credit.',
     policyEras: ['holc_fha', 'fair_housing', 'cra_contemporary'],
     geography: {
       geographyType: 'county',
       jurisdictionId: COOK_COUNTY,
       boundaryVersion: 'county-2020',
-      label: 'Cook County, Illinois, with national wealth context',
+      label: 'Cook County, Illinois (example), with national wealth context',
     },
     methodStance: 'juxtaposition',
     methodNote: METHOD_REDLINE,
@@ -1106,7 +1176,12 @@ export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
       ...scfObservations,
     ],
     derived: redliningDerived,
-    artifacts: [REDLINING_ARTIFACTS.hillier, REDLINING_ARTIFACTS.aaronson],
+    artifacts: [
+      REDLINING_ARTIFACTS.hillier,
+      REDLINING_ARTIFACTS.aaronson,
+      REDLINING_ARTIFACTS.banaji,
+      REDLINING_ARTIFACTS.fairHousing,
+    ],
     status: 'published',
     createdAt: PACKET_CREATED_AT,
     updatedAt: PACKET_UPDATED_AT,
@@ -1115,15 +1190,15 @@ export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
     id: 'tip_chicago_redlining_q4',
     questionId: 'Q4',
     themeId: 'redlining',
-    title: 'Bronzeville in a county-scale evidence frame',
+    title: 'Bronzeville: a neighborhood story inside a county frame',
     summary:
-      'Bronzeville is bound to the Chicago redlining place narrative, but the available statistical series resolve only to Cook County. They document the surrounding housing and credit context; they do not identify outcomes for the same people who lived inside a particular HOLC polygon. That tract- and household-level linkage remains an explicit evidence gap.',
+      'Bronzeville is where the example becomes a place people can name. The district is bound to this packet, and the surrounding Cook County series show homeownership, income, poverty, cost burden, and recent mortgage denials. Those series still resolve only to the county. They cannot identify the same households who lived inside a particular HOLC polygon. The human story is local; the measured spine is county-scale until tract linkage closes.',
     policyEras: ['holc_fha', 'fair_housing', 'cra_contemporary'],
     geography: {
       geographyType: 'county',
       jurisdictionId: COOK_COUNTY,
       boundaryVersion: 'county-2020',
-      label: 'Bronzeville place narrative, Cook County statistical context',
+      label: 'Bronzeville story, Cook County statistical context (example)',
     },
     methodStance: 'juxtaposition',
     methodNote: METHOD_REDLINE,
@@ -1132,6 +1207,7 @@ export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
       ACS.blackIncome,
       ACS.whiteIncome,
       ACS.blackPoverty,
+      ACS.blackBaAttainment,
       ...hmdaObservations.filter((row) => row.referencePeriod === '2023'),
       ...chas,
     ],
@@ -1144,6 +1220,8 @@ export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
       REDLINING_ARTIFACTS.mapping,
       REDLINING_ARTIFACTS.fha,
       REDLINING_ARTIFACTS.aaronson,
+      REDLINING_ARTIFACTS.banaji,
+      REDLINING_ARTIFACTS.chicago1919,
     ],
     gapStates: ['insufficient_evidence'],
     entityBinding: { entityId: 'ent_bronzeville_001', purpose: 'story' },
@@ -1311,6 +1389,111 @@ export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
     createdAt: PACKET_CREATED_AT,
     updatedAt: PACKET_UPDATED_AT,
   }),
+  buildThemeImpactPacket({
+    id: 'tip_school_segregation_q11_cook',
+    questionId: 'Q11',
+    themeId: 'school_segregation',
+    title: 'From segregated streets to school opportunity',
+    summary:
+      'Banaji, Fiske, and Massey argue that neighborhood segregation translates directly into school segregation and uneven school resources. In the Chicago example, Cook County’s Black population share moved from 20.9% in 1970 to 25.0% in 2010 and measured 22.2% in the 2020–2024 ACS, while 26.8% of Black adults 25+ held a bachelor’s degree or higher in that same ACS window. Brown v. Board and later desegregation rulings supply the legal timeline. District discipline and school-finance series are still gap-labeled, so the story links housing to attainment without inventing a classroom-level causal model.',
+    policyEras: ['desegregation_era', 'post_busing'],
+    geography: {
+      geographyType: 'county',
+      jurisdictionId: COOK_COUNTY,
+      boundaryVersion: 'county-2020',
+      label: 'Cook County, Illinois (example metro)',
+    },
+    methodStance: 'juxtaposition',
+    methodNote: METHOD_SCHOOL,
+    observations: [ACS.blackShare, ACS.blackBaAttainment, ...nhgisBlackShare],
+    artifacts: [
+      REDLINING_ARTIFACTS.banaji,
+      artifact({
+        artifactId: 'art_brown_v_board_oyez',
+        artifactClass: 'primary_government_document',
+        title: 'Brown v. Board of Education (1954)',
+        citation:
+          'Brown v. Board of Education of Topeka, 347 U.S. 483 (1954); Oyez case summary.',
+        source: 'oyez',
+        sourceUrl: 'https://www.oyez.org/cases/1940-1955/347us483',
+        contentHash: 'b726a019539a7cf861f3936f0be58a5d1e26b1075b6c6969aa9c6599608d68d3',
+        dated: '1954-05-17',
+        summary:
+          'Supreme Court holding that state-imposed segregation in public schools violates equal protection. Implementation fights continued for decades.',
+      }),
+      artifact({
+        artifactId: 'art_civil_rights_act_1964_nara',
+        artifactClass: 'primary_government_document',
+        title: 'Civil Rights Act of 1964',
+        citation:
+          'Civil Rights Act of 1964, Pub. L. 88-352; National Archives milestone overview.',
+        source: 'national-archives',
+        sourceUrl: 'https://www.archives.gov/milestone-documents/civil-rights-act',
+        contentHash: '60176b2f27aff4f779c2a0c93d6f580bd5dddff4f31af6c25c9a358d44c012cd',
+        dated: '1964-07-02',
+        summary:
+          'Title VI tied federal education funds to nondiscrimination, giving desegregation an enforcement lever beyond Brown alone.',
+      }),
+      REDLINING_ARTIFACTS.fairHousing,
+    ],
+    gapStates: ['insufficient_evidence'],
+    entityBinding: { entityId: 'ent_chicago_freedom_movement_001', purpose: 'story' },
+    status: 'published',
+    createdAt: PACKET_CREATED_AT,
+    updatedAt: PACKET_UPDATED_AT,
+  }),
+  buildThemeImpactPacket({
+    id: 'tip_voting_rights_q12_national',
+    questionId: 'Q12',
+    themeId: 'voting_rights',
+    title: 'The long fight to make the ballot count',
+    summary:
+      'Reconstruction promised the franchise; Jim Crow devices and violence took it back. The Fifteenth Amendment and the Voting Rights Act of 1965 are the primary legal spine. Banaji, Fiske, and Massey place that collapse and recovery inside the same systemic story as housing and schools. Chicago enters as a northern Great Migration city where Black voters reshaped local politics once the ballot was safer, not as a complete turnout dashboard. State turnout and voting-policy indexes stay gap-labeled until MIT Election Lab and Voting Rights Lab series load.',
+    policyEras: ['reconstruction_collapse', 'jim_crow_franchise', 'vra_enforcement'],
+    geography: {
+      geographyType: 'nation',
+      jurisdictionId: NATION,
+      boundaryVersion: 'nation-2020',
+      label: 'United States (Chicago as northern-city example)',
+    },
+    methodStance: 'juxtaposition',
+    methodNote: METHOD_VOTING,
+    artifacts: [
+      artifact({
+        artifactId: 'art_15th_amendment_nara',
+        artifactClass: 'primary_government_document',
+        title: 'Fifteenth Amendment (1870)',
+        citation:
+          'U.S. Constitution, Amendment XV; National Archives milestone overview.',
+        source: 'national-archives',
+        sourceUrl: 'https://www.archives.gov/milestone-documents/15th-amendment',
+        contentHash: '56bc1d4e31c4b47626fa39ffa1133fab51cbb866fc8dd968fa6a6ff8ce8dc6f7',
+        dated: '1870-02-03',
+        summary:
+          'Federal ban on denying the vote on account of race. Enforcement failed for decades after Reconstruction collapsed.',
+      }),
+      artifact({
+        artifactId: 'art_voting_rights_act_1965_nara',
+        artifactClass: 'primary_government_document',
+        title: 'Voting Rights Act of 1965',
+        citation:
+          'Voting Rights Act of 1965, Pub. L. 89-110; National Archives milestone overview.',
+        source: 'national-archives',
+        sourceUrl: 'https://www.archives.gov/milestone-documents/voting-rights-act',
+        contentHash: '3899b3ee9bd9515914dbb054279847209f2e43f5def2c728b66dcf7442c3220f',
+        dated: '1965-08-06',
+        summary:
+          'Federal oversight tools, including coverage and preclearance, aimed at jurisdictions with histories of discrimination. Later Court decisions narrowed those tools.',
+      }),
+      REDLINING_ARTIFACTS.banaji,
+      REDLINING_ARTIFACTS.chicago1919,
+    ],
+    gapStates: ['insufficient_evidence'],
+    entityBinding: { entityId: 'ent_law_voting_rights_act_1965', purpose: 'story' },
+    status: 'published',
+    createdAt: PACKET_CREATED_AT,
+    updatedAt: PACKET_UPDATED_AT,
+  }),
 ] as const;
 
 for (const packet of RESEARCHED_THEME_IMPACT_PACKETS) {
@@ -1330,9 +1513,10 @@ export function listResearchedThemeImpactPackets(
 export const THEME_RESEARCH_ADJUDICATION = [
   {
     themeId: 'redlining',
-    decision: 'retain',
+    decision: 'rename',
+    publicTitle: 'Housing segregation & redlining',
     rationale:
-      'Strong primary and scholarly evidence, but the public narrative must distinguish HOLC maps from the wider appraisal, FHA, and private-lending system.',
+      'Banaji/Fiske/Massey and Rothstein support a wider housing-segregation spine. Keep Chicago as an example metro, distinguish HOLC maps from the FHA/private system, and gate systemic causation to named secondaries.',
   },
   {
     themeId: 'drug_policy_state',
@@ -1359,5 +1543,19 @@ export const THEME_RESEARCH_ADJUDICATION = [
     publicTitle: 'Environmental justice & unequal burden',
     rationale:
       'The broader scholarly theme is well supported, but the Illinois county proxies produce mixed results and require a question-led, non-causal public title.',
+  },
+  {
+    themeId: 'school_segregation',
+    decision: 'retain',
+    publicTitle: 'School segregation & opportunity',
+    rationale:
+      'Massey’s segregation-to-schools linchpin and the Brown/CRA timeline support a first education packet; CRDC and school-finance metrics stay gap-labeled until ingest.',
+  },
+  {
+    themeId: 'voting_rights',
+    decision: 'retain',
+    publicTitle: 'Voting rights & political exclusion',
+    rationale:
+      'Primary franchise statutes and Banaji/Fiske/Massey’s Reconstruction framing support an artifact spine; turnout and policy indexes remain cite-first until warehouse series load.',
   },
 ] as const;

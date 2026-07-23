@@ -95,10 +95,14 @@ export function AnatomySection({ entity, onBackToMap }: AnatomySectionProps) {
           : {})}
       />
 
-      <View style={styles.factsGrid} accessibilityLabel="Record anatomy">
+      <View style={styles.factsList} accessibilityLabel="Record anatomy">
         {facts.map((fact) => (
-          <View key={fact.key} style={styles.factCell}>
-            <View style={styles.labelRow}>
+          <View
+            key={fact.key}
+            style={styles.factRow}
+            testID={`entity-anatomy-fact-${fact.key}`}
+          >
+            <View style={styles.labelCluster} testID={`entity-anatomy-fact-label-${fact.key}`}>
               <EditionFactIcon {...fact.icon} />
               <Text variant="caption" colorRole="inkSubtle" style={styles.labelText}>
                 {fact.label}
@@ -112,14 +116,18 @@ export function AnatomySection({ entity, onBackToMap }: AnatomySectionProps) {
                 onPress={() => {
                   void handleOpenInMaps();
                 }}
-                style={({ pressed }) => [styles.whereValue, pressed ? styles.wherePressed : null]}
+                style={({ pressed }) => [
+                  styles.factValue,
+                  styles.whereValue,
+                  pressed ? styles.wherePressed : null,
+                ]}
               >
-                <Text variant="editorial" colorRole="accent" numberOfLines={3}>
+                <Text variant="editorial" colorRole="accent">
                   {fact.value}
                 </Text>
               </Pressable>
             ) : (
-              <Text variant="editorial" colorRole="ink" numberOfLines={3}>
+              <Text variant="editorial" colorRole="ink" style={styles.factValue}>
                 {fact.value}
               </Text>
             )}
@@ -161,24 +169,43 @@ export function AnatomySection({ entity, onBackToMap }: AnatomySectionProps) {
   );
 }
 
+/** Exported for layout contract tests — inline icon + label + value on one row. */
+export const anatomyFactRowStyle = {
+  flexDirection: 'row',
+  flexWrap: 'nowrap',
+  alignItems: 'baseline',
+} as const;
+
+/** Fixed label column so values align vertically (matches web grid max-content column). */
+export const anatomyFactLabelColumnWidth = 92;
+
 const styles = StyleSheet.create({
-  factsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+  factsList: {
+    flexDirection: 'column',
+    gap: space['2'],
+    minWidth: 0,
+  },
+  factRow: {
+    ...anatomyFactRowStyle,
     gap: space['3'],
+    width: '100%',
+    minWidth: 0,
   },
-  factCell: {
-    gap: space['1'],
-    minWidth: 120,
-    flexGrow: 1,
-    flexBasis: '40%',
-  },
-  labelRow: {
+  labelCluster: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: space['1'],
+    flexShrink: 0,
+    width: anatomyFactLabelColumnWidth,
+    gap: space['2'],
+  },
+  factValue: {
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: 'auto',
+    minWidth: 0,
   },
   labelText: {
+    flexShrink: 0,
     letterSpacing: 0.6,
     textTransform: 'uppercase',
   },

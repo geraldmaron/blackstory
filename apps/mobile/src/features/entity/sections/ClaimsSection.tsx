@@ -1,7 +1,9 @@
 /**
  * Beat 06: accepted claims with expandable preview when dense.
+ * Ledger Line: flat claim stacks on canvas (no nested Surface shells).
  */
-import { LiftedSurface } from '@/ui';
+import { View } from 'react-native';
+import { Divider } from '@/ui';
 import { EntityEditionPanel } from '../EntityEditionPanel';
 import { RecordGapNotice } from '../RecordGapNotice';
 import { SECTION_HEADINGS } from '../copy';
@@ -19,10 +21,11 @@ export type ClaimsSectionProps = {
 };
 
 export function ClaimsSection({ claims, isOnline, index }: ClaimsSectionProps) {
-  const claimCards = claims.map((claim) => (
-    <LiftedSurface key={claim.id} tone="surfaceRaised" shadow="none" paddingKey="3">
+  const claimCards = claims.map((claim, claimIndex) => (
+    <View key={claim.id}>
       <ClaimCard claim={claim} isOnline={isOnline} />
-    </LiftedSurface>
+      {claimIndex < claims.length - 1 ? <Divider /> : null}
+    </View>
   ));
 
   return (

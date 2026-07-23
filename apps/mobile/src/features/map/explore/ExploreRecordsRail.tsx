@@ -59,7 +59,7 @@ const RecordRow = memo(function RecordRow({
         },
       ]}
     >
-      <Text variant="bodyEmphasis" numberOfLines={1} style={styles.rowTitle}>
+      <Text variant="rowTitle" numberOfLines={1} style={styles.rowTitle}>
         {feature.label}
       </Text>
       <RecordFactStrip facts={facts} />

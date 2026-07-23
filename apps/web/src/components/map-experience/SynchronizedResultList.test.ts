@@ -108,19 +108,19 @@ test('uses a uniform labeled meta layout with short confidence values', () => {
 
 test('empty Where uses plain Not placed copy (no em dash placeholder)', () => {
   const feature = requireFeature('ent_15th_st_church_001');
+  const {
+    statePostalCode: _statePostalCode,
+    stateName: _stateName,
+    locationLabel: _locationLabel,
+    ...locationStrippedProperties
+  } = feature.properties;
   const stripped = {
     ...feature,
     geometry: {
       type: 'Point' as const,
       coordinates: [Number.NaN, Number.NaN] as [number, number],
     },
-    properties: {
-      ...feature.properties,
-      statePostalCode: undefined,
-      stateName: undefined,
-      city: undefined,
-      locationLabel: undefined,
-    },
+    properties: locationStrippedProperties,
   };
   const html = renderToStaticMarkup(
     createElement(SynchronizedResultList, { features: [stripped] }),

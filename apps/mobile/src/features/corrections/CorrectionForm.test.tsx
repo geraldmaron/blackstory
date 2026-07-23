@@ -4,8 +4,9 @@
  * `Button` doesn't expose — see `CorrectionForm.tsx`), so their own 44pt floor is asserted
  * directly rather than assumed from `Button`'s existing coverage.
  */
-import { render } from '@testing-library/react-native';
-import { StyleSheet } from 'react-native';
+import { act, fireEvent, render } from '@testing-library/react-native';
+import { AccessibilityInfo, ScrollView, StyleSheet, View } from 'react-native';
+import { createRef } from 'react';
 import { CorrectionForm } from './CorrectionForm';
 
 function flatMinHeight(style: unknown): number | undefined {
@@ -44,5 +45,37 @@ describe('CorrectionForm — touch targets and control semantics (MOB-017)', () 
       expect(flatMinHeight(checkbox.props.style)).toBeGreaterThanOrEqual(44);
       expect(typeof checkbox.props.accessibilityState?.checked).toBe('boolean');
     }
+  });
+
+  it('scrolls to the first invalid field when a shell scroll ref is provided', async () => {
+    const announce = jest.spyOn(AccessibilityInfo, 'announceForAccessibility').mockImplementation(() => {});
+    const measureLayout = jest
+      .spyOn(View.prototype, 'measureLayout')
+      .mockImplementation((_relativeToNativeNode, onSuccess) => {
+        onSuccess(0, 120, 0, 0);
+      });
+    const scrollRef = createRef<ScrollView>();
+    const scrollTo = jest.fn();
+    scrollRef.current = {
+      scrollTo,
+      getInnerViewRef: () => scrollRef.current,
+    } as unknown as ScrollView;
+
+    const { getByRole } = await render(
+      <CorrectionForm scrollRef={scrollRef} onSubmit={jest.fn()} onAccepted={jest.fn()} />,
+    );
+
+    await act(async () => {
+      fireEvent.press(getByRole('button', { name: 'Submit correction' }));
+      await new Promise<void>((resolve) => {
+        requestAnimationFrame(() => resolve());
+      });
+    });
+
+    expect(announce).toHaveBeenCalled();
+    expect(scrollTo).toHaveBeenCalledWith({ y: expect.any(Number), animated: true });
+
+    measureLayout.mockRestore();
+    announce.mockRestore();
   });
 });

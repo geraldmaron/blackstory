@@ -34,7 +34,6 @@ describe('MOBILE_MORE_SECTIONS', () => {
   it('lists web overflow destinations in footer order', () => {
     const exploreMore = MOBILE_MORE_SECTIONS.find((section) => section.id === 'explore-more');
     expect(exploreMore?.rows.map((row) => row.title)).toEqual([
-      'Themes',
       'Data',
       'Law',
       'Banned books',

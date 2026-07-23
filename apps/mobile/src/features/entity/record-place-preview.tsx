@@ -32,13 +32,12 @@ export function RecordPlacePreview({ place, onOpenInMaps }: RecordPlacePreviewPr
   }
 
   const label = `Map preview for ${place.label} at public precision`;
-  // Background swap on press (surfaceRaised → canvas), matching the row/button primitives, instead
-  // of a bespoke opacity fade.
+  // Background swap on press (surfaceRaised → surfacePressed), matching row/button primitives.
   const renderFrame = (pressed: boolean) => (
     <View
       style={[
         styles.frame,
-        { borderColor: theme.border, backgroundColor: pressed ? theme.canvas : theme.surfaceRaised },
+        { borderColor: theme.border, backgroundColor: pressed ? theme.surfacePressed : theme.surfaceRaised },
       ]}
       accessibilityRole="image"
       accessibilityLabel={label}

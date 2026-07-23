@@ -47,14 +47,12 @@ export {
   type MapPointFeatureProperties,
 } from './demoMapSource';
 export {
-  ExploreToolbar,
   EntityPreviewSheet,
   featureMetaLine,
   featureKindSlug,
   featureAtAGlanceFacts,
 } from './explore';
 export type {
-  ExploreToolbarProps,
   EntityPreviewSheetProps,
   EntityPreviewPreviewFeature,
   AtAGlanceFact,

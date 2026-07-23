@@ -22,6 +22,9 @@ type ThemeImpactPacketRow = {
   readonly derived: unknown;
   readonly artifacts: unknown;
   readonly gap_states: readonly string[];
+  readonly causal_claim_ids: readonly string[] | null;
+  readonly entity_id: string | null;
+  readonly binding_purpose: 'map_panel' | 'story' | 'research' | 'mcp' | null;
   readonly status: string;
   readonly created_at: Date | string;
   readonly updated_at: Date | string;
@@ -41,6 +44,7 @@ export async function listPublishedThemeImpactPacketsByTheme(
   const rows = await queryPostgres<ThemeImpactPacketRow>(
     `SELECT id, question_id, theme_id, title, summary, policy_eras, geography,
             method_stance, method_note, observations, derived, artifacts, gap_states,
+            causal_claim_ids, entity_id, binding_purpose,
             status, created_at, updated_at
      FROM bb_reference.theme_impact_packets
      WHERE status = 'published' AND theme_id = $1
@@ -57,6 +61,7 @@ export async function fetchPublishedThemeImpactPacket(
   const rows = await queryPostgres<ThemeImpactPacketRow>(
     `SELECT id, question_id, theme_id, title, summary, policy_eras, geography,
             method_stance, method_note, observations, derived, artifacts, gap_states,
+            causal_claim_ids, entity_id, binding_purpose,
             status, created_at, updated_at
      FROM bb_reference.theme_impact_packets
      WHERE status = 'published' AND theme_id = $1 AND question_id = $2

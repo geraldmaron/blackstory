@@ -11,8 +11,7 @@
 import { useState } from 'react';
 import { View } from 'react-native';
 
-import { Button, Notice, Text, space } from '@/ui';
-import { CorrectionTextField } from './CorrectionTextField';
+import { Button, CorrectionTextField, Notice, Text, space } from '@/ui';
 import type { StatusResult } from './client';
 import {
   PUBLIC_STATUS_LABELS,

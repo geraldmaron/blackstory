@@ -9,13 +9,13 @@ export const DATA_PAGE_DESCRIPTION =
 export const DATA_INTRO = {
   kicker: 'Numbers',
   lede:
-    'National Census context plus curated indicators we use on Themes: wealth, housing, credit, and justice. Every chart names its source. For county maps, open Explore.',
+    'National Census context plus curated indicators for wealth, housing, credit, and justice. Every chart names its source. For county maps, open Explore.',
 } as const;
 
 export const DATA_ORIENTATION_BEATS = [
   {
     kicker: 'National first',
-    body: 'Census sections show the country-wide picture. Indicator charts zoom into published series we also use on Themes.',
+    body: 'Census sections show the country-wide picture. Indicator charts zoom into published series we also use in archival research.',
   },
   {
     kicker: 'Sources visible',
@@ -33,7 +33,7 @@ export const DATA_PAGE_SECTIONS = [
   { id: 'wealth', label: 'Wealth' },
   { id: 'housing', label: 'Housing and credit' },
   { id: 'justice', label: 'Justice' },
-  { id: 'themes', label: 'Themes' },
+  { id: 'themes', label: 'Coverage' },
   { id: 'next', label: 'Next step' },
 ] as const;
 
@@ -43,7 +43,7 @@ export const DATA_SECTION_COPY = {
     kicker: 'Orientation',
     title: 'How to read these numbers',
     lede:
-      'Census decades anchor the national story. Phase 1 indicators (ACS, NHGIS, HMDA, CHAS, BJS, SCF, USSC, and more) show the same metrics we juxtapose on Themes.',
+      'Census decades anchor the national story. Phase 1 indicators (ACS, NHGIS, HMDA, CHAS, BJS, SCF, USSC, and more) show curated metrics we place beside archive evidence.',
   },
   population: {
     index: '02',
@@ -57,28 +57,28 @@ export const DATA_SECTION_COPY = {
     kicker: 'Survey of Consumer Finances',
     title: 'Wealth gap at a glance',
     lede:
-      'Median family net worth from the Federal Reserve triennial survey: a national juxtaposition used on the redlining theme when asking how housing-credit eras relate to wealth.',
+      'Median family net worth from the Federal Reserve triennial survey: a national juxtaposition when asking how housing-credit eras relate to wealth.',
   },
   housing: {
     index: '04',
     kicker: 'NHGIS · HMDA · CHAS',
     title: 'Housing, credit, and cost burden',
     lede:
-      'Cook County is our Phase 1 place spine: decennial homeownership (NHGIS), mortgage denial rates (HMDA), and HUD CHAS cost burden from the Consolidated Plan. Same metrics bound to theme-impact questions Q3 and Q4.',
+      'Cook County is our Phase 1 place spine: decennial homeownership (NHGIS), mortgage denial rates (HMDA), and HUD CHAS cost burden from the Consolidated Plan.',
   },
   justice: {
     index: '05',
     kicker: 'BJS · USSC',
     title: 'Imprisonment and federal drug sentences',
     lede:
-      'State imprisonment rates (BJS) and federal cocaine sentencing averages (USSC Quick Facts): context for the drug policy and the state theme, not proof that any single law caused a number.',
+      'State imprisonment rates (BJS) and federal cocaine sentencing averages (USSC Quick Facts): context for drug-policy eras, not proof that any single law caused a number.',
   },
   themes: {
     index: '06',
-    kicker: 'Theme-impact',
-    title: 'Same metrics, full stories',
+    kicker: 'Phase 1',
+    title: 'Curated indicator coverage',
     lede:
-      'Themes packages these indicators beside artifacts and policy eras. Data shows the numbers; Themes shows how we juxtapose them without causal overclaim.',
+      'These indicators sit beside artifacts and policy eras in research packets. Data shows the numbers; Methodology explains how we juxtapose them without causal overclaim.',
   },
   next: {
     index: '07',

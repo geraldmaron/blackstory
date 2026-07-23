@@ -1,23 +1,16 @@
 /**
- * Shared text field for the corrections flow. A single styled `TextInput` so the
- * intake form and the status-lookup share one box treatment instead of each
- * re-declaring a bespoke `borderWidth: 1` style with no focus or invalid state.
+ * Shared text field primitive for form surfaces (corrections intake, status lookup).
+ * A single styled `TextInput` with focus/invalid border states and a stable 44pt tap target.
  *
  * - `minHeight: MIN_TOUCH_TARGET` so the tap target clears the 44pt floor.
- * - Focused border uses the copper `accent`; an invalid field uses the status
- *   error color, so a failed field never looks like ordinary chrome.
- * - Border WIDTH is held constant across states so focusing/invalidating never
- *   reflows the form (only the color changes).
- * - `ref` is forwarded so the form can build a focus chain across fields.
- *
- * NOTE (follow-up): this lives in the feature because `src/ui` was frozen for
- * this pass; it should later be promoted into `src/ui` as the canonical
- * text-field primitive (there is currently no shared `TextField` there).
+ * - Focused border uses the copper `accent`; an invalid field uses the status error color.
+ * - Border WIDTH is held constant across states so focusing/invalidating never reflows.
+ * - `ref` is forwarded so forms can build a focus chain across fields.
  */
 import { forwardRef, useState } from 'react';
 import { TextInput, type TextInputProps } from 'react-native';
 
-import { MIN_TOUCH_TARGET, radius, space, useStatusColors, useThemeColors } from '@/ui';
+import { MIN_TOUCH_TARGET, radius, space, useStatusColors, useThemeColors } from './tokens';
 
 export type CorrectionTextFieldProps = TextInputProps & {
   /** Renders the field with the status error border (a failed validation field). */
