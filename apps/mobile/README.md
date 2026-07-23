@@ -10,11 +10,10 @@
 — the brand-agnostic scope is `@repo/*`.
 
 Bare scaffold only (`black-book-mobile-006` / MOB-006): Expo + Expo Router + TypeScript
-strict + `expo-dev-client`, dev/preview/prod identity, EAS build profiles. **No UI, state,
-network, map, or Firebase libraries are installed yet** — those land in MOB-007+ per the
-[mobile app epic](../../docs/mobile/mobile-app-epic.md)'s non-goal for this bead. See
-`docs/adr/ADR-020-mobile-stack.md` for the framework/version-pinning rationale this scaffold
-follows.
+strict + `expo-dev-client`, dev/preview/prod identity, EAS build profiles. MapLibre Native,
+SQLite, and other native modules land via CNG plugins — always run a **dev client** build
+(`expo run:ios` / `expo run:android`), never Expo Go. See
+`docs/adr/ADR-020-mobile-stack.md` for the framework/version-pinning rationale.
 
 ## Version matrix (as actually installed — read from `package.json` / `node_modules`, not guessed)
 
@@ -38,10 +37,10 @@ pnpm install                 # installs everything EXCEPT apps/mobile (see below
 cd apps/mobile
 npm install                  # apps/mobile manages its own isolated node_modules (npm)
 
-# iOS
+# iOS — always use the custom native binary (dev client), never Expo Go
 npx expo prebuild --platform ios     # generates ios/ (gitignored, CNG — see ADR-020 SS6)
 cd ios && pod install && cd ..
-npx expo run:ios                     # builds + launches in the Simulator
+npx expo run:ios                     # builds + launches BlackStory (Dev) in the Simulator
 
 # Android
 npx expo prebuild --platform android # generates android/ (gitignored, CNG)
@@ -51,6 +50,35 @@ npx expo run:android                 # requires Android SDK + a working `java`
 `ios/` and `android/` are **not committed** (ADR-020 SS6): they are pure `expo prebuild`
 build output from `app.config.ts` + config plugins. Delete and regenerate them any time; a
 stale native directory is never a source of truth.
+
+### MapLibre / native modules — do not use Expo Go
+
+`@maplibre/maplibre-react-native` (and other custom native code) is **not** in Expo Go.
+Opening the Metro bundle in Expo Go surfaces:
+
+`TurboModuleRegistry.getEnforcing(...): 'MLRNCameraModule' could not be found`
+
+Config is already correct when present in this tree:
+
+- dependency `@maplibre/maplibre-react-native`
+- config plugin `@maplibre/maplibre-react-native` in `app.config.ts`
+- `expo-build-properties` → `ios.useFrameworks: 'static'` (MapLibre iOS linkage)
+- `expo-dev-client` so `expo start` targets the custom binary
+
+After any native-affecting change (MapLibre, `expo-dev-client`, plugins, Podfile), rebuild:
+
+```bash
+cd apps/mobile
+npx expo prebuild --platform ios --clean
+cd ios && pod install && cd ..
+npx expo run:ios
+# then, in a second terminal if you want Metro alone:
+npx expo start --dev-client
+```
+
+Launch **BlackStory (Dev)** (`app.blackbook.mobile.dev`) from the Simulator home screen or
+Xcode — not Expo Go. RN Firebase / App Check is not in this app; `USE_FRAMEWORKS=static`
+is only for MapLibre.
 
 ## CI (black-book-mobile-019)
 
