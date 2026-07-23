@@ -13,7 +13,6 @@ import {
   type ThemeImpactPacketArtifact,
   type ThemeImpactPacketDerived,
   type ThemeImpactPacketObservation,
-  type ThemeImpactProvenanceQuartet,
 } from './theme-impact-packet.js';
 
 const PACKET_CREATED_AT = '2026-07-22T23:00:00.000Z';

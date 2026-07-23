@@ -3,15 +3,17 @@
  * packets and fixture rows into display-ready strings with provenance quartet.
  */
 import { resolveThemeImpactPolicyEras } from './theme-impact-policy-eras.js';
-import type {
-  ThemeImpactGapState,
-  ThemeImpactMethodStance,
-  ThemeImpactPacket,
-  ThemeImpactPacketArtifact,
-  ThemeImpactPacketDerived,
-  ThemeImpactPacketGeography,
-  ThemeImpactPacketObservation,
-  ThemeImpactProvenanceQuartet,
+import {
+  THEME_IMPACT_BINDING_PURPOSES,
+  type ThemeImpactBindingPurpose,
+  type ThemeImpactGapState,
+  type ThemeImpactMethodStance,
+  type ThemeImpactPacket,
+  type ThemeImpactPacketArtifact,
+  type ThemeImpactPacketDerived,
+  type ThemeImpactPacketGeography,
+  type ThemeImpactPacketObservation,
+  type ThemeImpactProvenanceQuartet,
 } from './theme-impact-packet.js';
 import { getThemeImpactQuestion } from './theme-impact-questions.js';
 
@@ -201,6 +203,11 @@ export function parseThemeImpactPacketRow(row: {
   const toIso = (value: string | Date) =>
     value instanceof Date ? value.toISOString() : value;
   const causalClaimIds = row.causal_claim_ids?.filter((id) => id.trim()) ?? [];
+  const bindingPurpose = THEME_IMPACT_BINDING_PURPOSES.includes(
+    row.binding_purpose as ThemeImpactBindingPurpose,
+  )
+    ? (row.binding_purpose as ThemeImpactBindingPurpose)
+    : undefined;
 
   return {
     kind: 'theme.impact.packet.v1',
@@ -218,11 +225,11 @@ export function parseThemeImpactPacketRow(row: {
     artifacts: (row.artifacts as ThemeImpactPacket['artifacts']) ?? [],
     gapStates: [...row.gap_states] as ThemeImpactPacket['gapStates'],
     ...(causalClaimIds.length > 0 ? { causalClaimIds } : {}),
-    ...(row.entity_id && row.binding_purpose
+    ...(row.entity_id && bindingPurpose
       ? {
           entityBinding: {
             entityId: row.entity_id,
-            purpose: row.binding_purpose,
+            purpose: bindingPurpose,
           },
         }
       : {}),

@@ -26,13 +26,6 @@ const ALA_TOP10: BannedBookCitation = {
   publisher: 'American Library Association',
 };
 
-const ALA_2024_NEWS: BannedBookCitation = {
-  label: 'ALA Top 10 Most Challenged Books of 2024',
-  href: 'https://www.ala.org/news/2025/04/american-library-association-kicks-national-library-week-top-10-most-challenged-books',
-  publisher: 'American Library Association',
-  publishedAt: '2025-04',
-};
-
 const PEN_BOOK_BANS: BannedBookCitation = {
   label: 'PEN America Book Bans hub',
   href: 'https://pen.org/book-bans/',

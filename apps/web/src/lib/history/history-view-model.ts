@@ -14,7 +14,6 @@ import {
   buildHistoryNodes,
   resolveHistoryGraphSlice,
   withHistoryConnectionCounts,
-  type HistoryEdgeView,
   type HistoryNodeView,
 } from './build-history-graph';
 import {
@@ -28,14 +27,12 @@ import {
   buildHistoryTopicFacetOptions,
   sortHistoryNodes,
   trimHistoryEdgesToNodes,
-  type HistoryFacetOption,
   type HistoryFilterState,
 } from './filters';
 import { applyHistorySearchFilter } from './history-search';
-import { buildHistoryOverview, type HistoryOverview } from './overview';
+import { buildHistoryOverview } from './overview';
 import {
   parseHistorySearchParams,
-  type HistoryViewState,
   type RawHistorySearchParams,
 } from './url-state';
 import type { HistoryViewModel } from './history-view-model.types';

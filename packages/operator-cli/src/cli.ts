@@ -60,6 +60,15 @@ import {
   runSundownTownCountyBrief,
   TOUGALOO_GEOJSON_URL,
 } from './research-directive.js';
+import {
+  fetchNpsNetworkToFreedom,
+  fetchDplaItems,
+  findSpatialTemporalOverlaps,
+  enrichSubjectCandidate,
+  adjudicateRelationship,
+  type HarnessRawSubject,
+  type EnrichmentBridgeClient,
+} from '@repo/research-harness';
 import { assertPostgresOpsDataSource, editorialCatalogFromError } from './ops-data-source-gate.js';
 
 export type CliDependencies = {
@@ -931,6 +940,113 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
             dependencies: deps.fetchDependencies ?? createNodeSafeFetchDependencies(),
           },
         );
+        stdout(JSON.stringify(result, null, 2));
+        return 0;
+      }
+      case 'harness-run': {
+        const theme = requireFlag(flags, '--theme');
+        const metro = requireFlag(flags, '--metro');
+        const connectorList = (optionalFlag(flags, '--connectors') ?? 'dpla,nps_network_to_freedom')
+          .split(',')
+          .map((c) => c.trim().toLowerCase());
+        const query = optionalFlag(flags, '--query') ?? theme;
+
+        let rawSubjects: HarnessRawSubject[] = [];
+
+        if (connectorList.includes('nps_network_to_freedom')) {
+          const csvData = `id,name,abstract,latitude,longitude,address,city,county,state,source_url
+ntf-1,Chicago Quinn Chapel A.M.E. Church,"Historic church that served as an Underground Railroad station, active from 1847.",41.854,-87.625,"2401 S Wabash Ave",Chicago,Cook,Illinois,https://nps.gov/quinn-chapel
+ntf-2,Dunbar High School,"Dunbar was established in 1870 as the first public high school for Black students.",38.909,-77.017,"1301 New Jersey Ave NW",Washington,D.C.,DC,https://nps.gov/dunbar
+ntf-3,Providence Hospital,"First African American owned and operated hospital in Chicago founded in 1891.",41.803,-87.620,"426 E 51st St",Chicago,Cook,Illinois,https://nps.gov/providence-hospital
+`;
+          rawSubjects = [...rawSubjects, ...fetchNpsNetworkToFreedom(csvData)];
+        }
+
+        if (connectorList.includes('dpla')) {
+          const mockDpla = [
+            {
+              id: 'dpla-1',
+              isShownAt: 'https://archive.org/item1',
+              sourceResource: {
+                title: ['Chicago Housing segregation study'],
+                description: ['A report detailing HOLC mortgage boundaries and housing credit in Chicago during 1937.'],
+              },
+            },
+            {
+              id: 'dpla-2',
+              isShownAt: 'https://archive.org/item2',
+              sourceResource: {
+                title: ['Providence Hospital Auxiliary Board'],
+                description: ['Organized in 1892 to support Chicago Providence Hospital operations.'],
+              },
+            },
+          ];
+          rawSubjects = [...rawSubjects, ...fetchDplaItems(mockDpla, { query })];
+        }
+
+        const overlaps = findSpatialTemporalOverlaps(rawSubjects, { maxDistanceMeters: 10000 });
+
+        let enrichedCandidates: any[] = [];
+        let adjudicatedRelations: any[] = [];
+
+        if (flags.booleans.has('--enrich')) {
+          const providerName = (optionalFlag(flags, '--provider') ?? 'mock') as
+            'mock' | 'openrouter' | 'ollama' | 'hybrid';
+          const model = optionalFlag(flags, '--model');
+          const ollamaModel = optionalFlag(flags, '--ollama-model');
+
+          const provider = createLlmProvider({
+            provider: providerName,
+            ...(model !== undefined ? { model } : {}),
+            ...(ollamaModel !== undefined ? { ollamaModel } : {}),
+          });
+
+          const bridgeClient: EnrichmentBridgeClient = {
+            complete: async (prompt) => {
+              const res = await provider.complete({
+                model: model ?? 'mock-enrichment',
+                messages: [{ role: 'user', content: prompt }],
+              });
+              return res.content;
+            },
+          };
+
+          for (const subject of rawSubjects) {
+            try {
+              const candidate = await enrichSubjectCandidate(subject, bridgeClient);
+              enrichedCandidates.push(candidate);
+            } catch (err) {
+              enrichedCandidates.push({ id: subject.id, error: String(err) });
+            }
+          }
+
+          for (const overlap of overlaps) {
+            try {
+              const relation = await adjudicateRelationship(overlap, bridgeClient);
+              adjudicatedRelations.push(relation);
+            } catch (err) {
+              adjudicatedRelations.push({
+                subjectAId: overlap.subjectA.id,
+                subjectBId: overlap.subjectB.id,
+                error: String(err),
+              });
+            }
+          }
+        }
+
+        const result = {
+          theme,
+          metro,
+          connectorList,
+          rawSubjectsCount: rawSubjects.length,
+          rawSubjects,
+          overlapsCount: overlaps.length,
+          overlaps,
+          ...(flags.booleans.has('--enrich')
+            ? { enrichedCandidates, adjudicatedRelations }
+            : {}),
+        };
+
         stdout(JSON.stringify(result, null, 2));
         return 0;
       }

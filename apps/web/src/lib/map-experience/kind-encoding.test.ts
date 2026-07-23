@@ -25,7 +25,6 @@ import {
   resolveMapTone,
   type MapEntityGlyph,
   type MapKind,
-  type MapKindFamily,
 } from './kind-encoding';
 
 const DOMAIN_KINDS: readonly MapKind[] = [

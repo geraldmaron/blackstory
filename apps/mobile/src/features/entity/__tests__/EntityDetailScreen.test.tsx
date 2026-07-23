@@ -226,7 +226,7 @@ describe('EntityDetailScreen — v6 edition beats', () => {
     expect(getByTestId('entity-intro-section')).toBeTruthy();
     expect(getByTestId('entity-anatomy-section')).toBeTruthy();
     expect(getByTestId('entity-provenance-section')).toBeTruthy();
-    expect(getByText('RECORD')).toBeTruthy();
+    expect(getByText('00 · Record')).toBeTruthy();
     expect(getByText('Record maturity and revision')).toBeTruthy();
   });
 });

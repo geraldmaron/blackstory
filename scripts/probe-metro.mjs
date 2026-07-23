@@ -4,7 +4,6 @@
  * Verifies bundle HTTP 200 on the LAN/device host (not loopback-only) and fails when
  * a booted iOS Simulator dev client still targets a stale sibling port.
  */
-import { spawnSync } from 'node:child_process';
 import { parseArgs } from 'node:util';
 import {
   ENDPOINT_FILE,

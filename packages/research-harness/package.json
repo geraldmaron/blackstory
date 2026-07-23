@@ -1,0 +1,34 @@
+{
+  "name": "@repo/research-harness",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --conditions development --import tsx --test src/index.test.ts"
+  },
+  "dependencies": {
+    "@repo/domain": "workspace:*",
+    "@repo/schemas": "workspace:*",
+    "@repo/research-kernel": "workspace:*"
+  },
+  "devDependencies": {
+    "@repo/security": "workspace:*",
+    "@repo/testing": "workspace:*",
+    "@repo/typescript-config": "workspace:^",
+    "@types/node": "^22.20.1",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  }
+}

@@ -4,7 +4,7 @@
  * The dev launcher stores recently opened servers in UserDefaults under
  * expo.devlauncher.recentlyopenedapps; the newest entry wins on cold launch.
  */
-import { execSync, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -194,7 +194,7 @@ export function resetIosDevClientTarget(endpoint = resolveMetroEndpoint(), optio
     url: packagerUrl,
   };
   if (registry && typeof registry === 'object') {
-    for (const [url, entry] of Object.entries(registry)) {
+    for (const [url] of Object.entries(registry)) {
       const parsed = parsePackagerTarget(url);
       if (parsed?.targetPort === endpoint.contractPort && parsed.targetHost === endpoint.deviceHost) {
         continue;
