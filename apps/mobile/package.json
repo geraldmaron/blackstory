@@ -72,6 +72,6 @@
     "eas-build:development": "npx eas-cli build --profile development",
     "eas-build:preview": "npx eas-cli build --profile preview",
     "eas-build:production": "npx eas-cli build --profile production",
-    "eas-build-post-install": "npx tsc -p ../../packages/public-contracts/tsconfig.json"
+    "eas-build-post-install": "npm install --prefix ../../packages/public-contracts --omit=dev --no-package-lock --ignore-scripts && npx tsc -p ../../packages/public-contracts/tsconfig.json"
   }
 }
