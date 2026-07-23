@@ -216,7 +216,7 @@ Contact for review questions: Gerald Dagher, me@geralddagher.com.
 | Platform | Profile | Build ID / version | Distribution link | Date |
 |---|---|---|---|---|
 | iOS | `preview` | `[PLACEHOLDER]` | `[PLACEHOLDER TestFlight link]` | — |
-| Android | `preview` | `[PLACEHOLDER]` | `[PLACEHOLDER Play internal link]` | — |
+| Android | `preview` | `6482d531-de5c-42cc-a6f9-1ff4aac9d2cf` (versionCode 2) | https://expo.dev/accounts/gerald-maron/projects/blackstory/builds/6482d531-de5c-42cc-a6f9-1ff4aac9d2cf | 2026-07-22 — queued on EAS Free |
 
 ---
 
