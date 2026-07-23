@@ -190,17 +190,13 @@ const config: ExpoConfig = {
       usesNonExemptEncryption: false,
     },
     //
-    // Universal Links (MOB-008, mobile-identity.md's URL-scheme section, threat-model T4
-    // "Universal-link domain binding"): declares this app as the handler for
-    // https://blackbook.app/* links, verified by iOS against the real
-    // apple-app-site-association file served from that domain's /.well-known/ path. Only
-    // production points at the bare production domain; dev/preview builds never claim it
-    // (avoids a dev build racing production for the same verified domain on a shared test
-    // device). The AASA file itself is a local template only — see
-    // apps/mobile/public/.well-known/README.md for what's real vs. templated, and
-    // mobile-identity.md's open human gates (#1: Apple Team ID) for what's still missing
-    // before this can be verified/published for real.
-    associatedDomains: APP_VARIANT === 'production' ? ['applinks:blackbook.app'] : [],
+    // Universal Links (MOB-008): production-only. Omit the key entirely for
+    // development/preview — an empty `associatedDomains: []` still makes Expo
+    // emit the Associated Domains entitlement, which then fails Ad Hoc signing
+    // when EXPO_NO_CAPABILITY_SYNC=1 (profile lacks the capability).
+    ...(APP_VARIANT === 'production'
+      ? { associatedDomains: ['applinks:blackbook.app'] as const }
+      : {}),
   },
   android: {
     // Native minimum OS floor per ADR-020 SS7: Android 8.0 (API 26)+.
