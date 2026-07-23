@@ -215,8 +215,8 @@ Contact for review questions: Gerald Dagher, me@geralddagher.com.
 
 | Platform | Profile | Build ID / version | Distribution link | Date |
 |---|---|---|---|---|
-| iOS | `preview` | `420802a1-8376-4949-84ff-0368fff5129f` (buildNumber 10) | https://expo.dev/accounts/gerald-maron/projects/blackstory/builds/420802a1-8376-4949-84ff-0368fff5129f | 2026-07-22 — requeued after npm ci lock sync fix (ad hoc: iPhone + Mac); prior `7c6b1a68…` ERRORED Install dependencies |
-| Android | `preview` | `a7cf93ca-7fd5-4e58-ba52-cd9724af4364` (versionCode 3) | https://expo.dev/accounts/gerald-maron/projects/blackstory/builds/a7cf93ca-7fd5-4e58-ba52-cd9724af4364 | 2026-07-22 — requeued after npm ci lock sync fix; prior `6482d531…` ERRORED Install dependencies |
+| iOS | `preview` | `7af8927c-6488-480d-ad30-fa60106fe9ad` (buildNumber 11) | https://expo.dev/accounts/gerald-maron/projects/blackstory/builds/7af8927c-6488-480d-ad30-fa60106fe9ad | 2026-07-22 — requeued after Metro dist/post-install fix (ad hoc: iPhone + Mac) |
+| Android | `preview` | `860bef11-3bd7-46f2-a969-e7e953caf88f` (versionCode 4) | https://expo.dev/accounts/gerald-maron/projects/blackstory/builds/860bef11-3bd7-46f2-a969-e7e953caf88f | 2026-07-22 — requeued after Metro dist/post-install fix |
 
 ---
 
