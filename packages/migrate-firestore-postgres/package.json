@@ -16,8 +16,9 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --conditions development --import tsx --test src/mappers/*.test.ts src/util.test.ts",
+    "test": "node --conditions development --import tsx --test src/mappers/*.test.ts src/canonical-convergence.test.ts src/canonical-release-gate.test.ts src/util.test.ts",
     "census": "node --conditions development --import tsx src/cli/census.ts",
+    "backfill-canonical": "node --conditions development --import tsx src/cli/backfill-canonical.ts",
     "migrate": "node --conditions development --import tsx src/cli/migrate.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },

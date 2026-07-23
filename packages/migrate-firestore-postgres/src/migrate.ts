@@ -42,6 +42,7 @@ import {
 } from './mappers/index.js';
 import type { PgWriter } from './pg-writer.js';
 import type { CollectionMigrateResult } from './util.js';
+import { assertReleaseRowsDerivableFromCanonical } from './canonical-release-gate.js';
 
 export type MigrateMode = 'dry-run' | 'apply';
 
@@ -76,6 +77,33 @@ async function flushUpsert(
     result.errors.push(String(err instanceof Error ? err.message : err));
   }
   rows.length = 0;
+}
+
+async function flushCanonicalReleaseEntities(
+  options: MigrateOptions,
+  rows: Record<string, unknown>[],
+  result: { written: number; errors: string[] },
+): Promise<void> {
+  if (rows.length === 0) return;
+  if (options.mode === 'apply' && options.writer) {
+    try {
+      await assertReleaseRowsDerivableFromCanonical(
+        options.writer,
+        rows as unknown as Parameters<typeof assertReleaseRowsDerivableFromCanonical>[1],
+      );
+    } catch (error) {
+      result.errors.push(error instanceof Error ? error.message : String(error));
+      rows.length = 0;
+      return;
+    }
+  }
+  await flushUpsert(
+    options,
+    'bb_public.release_entities',
+    rows,
+    ['release_id', 'entity_id'],
+    result,
+  );
 }
 
 export async function migratePolicy(options: MigrateOptions): Promise<CollectionMigrateResult> {
@@ -391,28 +419,15 @@ export async function migratePublicReleaseProjections(
     for await (const doc of iterateSubcollection(options.db, 'publicReleases', ref.id, 'entities')) {
       result.read += 1;
       entityRows.push(mapReleaseEntity(ref.id, doc.id, doc.data));
-      if (entityRows.length >= 100) {
-        await flushUpsert(
-          options,
-          'bb_public.release_entities',
-          entityRows,
-          ['release_id', 'entity_id'],
-          result,
-        );
-      }
     }
     for await (const doc of iterateSubcollection(options.db, 'publicReleases', ref.id, 'stories')) {
       result.read += 1;
       storyRows.push(mapReleaseStory(ref.id, doc.id, doc.data));
     }
   }
-  await flushUpsert(
-    options,
-    'bb_public.release_entities',
-    entityRows,
-    ['release_id', 'entity_id'],
-    result,
-  );
+  // Validate the complete entity set before the first public write. A malformed or divergent row
+  // must not leave a partially accepted release merely because it appeared in a later batch.
+  await flushCanonicalReleaseEntities(options, entityRows, result);
   await flushUpsert(options, 'bb_public.release_stories', storyRows, ['release_id', 'slug'], result);
   return result;
 }
