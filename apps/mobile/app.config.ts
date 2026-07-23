@@ -193,6 +193,15 @@ const config: ExpoConfig = {
     bundleIdentifier,
     icon: './assets/expo.icon',
     //
+    // App Store export-compliance declaration. The app uses only exempt
+    // encryption (standard HTTPS/TLS via the OS), so declare no use of
+    // non-exempt encryption. Expo writes this into the generated Info.plist
+    // as `ITSAppUsesNonExemptEncryption = NO`, which lets App Store Connect
+    // skip the export-compliance questionnaire on every upload.
+    config: {
+      usesNonExemptEncryption: false,
+    },
+    //
     // Universal Links (MOB-008, mobile-identity.md's URL-scheme section, threat-model T4
     // "Universal-link domain binding"): declares this app as the handler for
     // https://blackbook.app/* links, verified by iOS against the real
