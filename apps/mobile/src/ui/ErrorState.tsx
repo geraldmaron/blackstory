@@ -11,7 +11,7 @@
 import { StyleSheet, View } from 'react-native';
 import { Button, type ButtonProps } from './Button';
 import { Text } from './Text';
-import { space, useStatusColors } from './tokens';
+import { radius, space, useStatusColors } from './tokens';
 import { useAnnounceOnMount } from './useAnnounceOnMount';
 
 export type ErrorStateProps = {
@@ -19,25 +19,33 @@ export type ErrorStateProps = {
   description?: string;
   /** e.g. "Try again" — omit for errors with no useful retry action. */
   retry?: { label: string; onPress: ButtonProps['onPress'] };
+  /**
+   * Inline density for use inside an already-padded panel: tighter padding and no
+   * decorative glyph. The full treatment is far too heavy nested in a Surface.
+   */
+  compact?: boolean;
 };
 
-export function ErrorState({ title, description, retry }: ErrorStateProps) {
+export function ErrorState({ title, description, retry, compact = false }: ErrorStateProps) {
   const status = useStatusColors();
 
   useAnnounceOnMount(`${title}${description ? `. ${description}` : ''}`);
 
   return (
+    // Deliberately NOT `accessible` — on iOS that collapses the subtree and makes the
+    // retry Button below unreachable by VoiceOver.
     <View
-      accessible
       accessibilityRole="alert"
       accessibilityLiveRegion="assertive"
-      style={styles.container}
+      style={[styles.container, compact ? styles.containerCompact : null]}
     >
-      <View
-        accessibilityElementsHidden
-        importantForAccessibility="no-hide-descendants"
-        style={[styles.glyph, { borderColor: status.error.border }]}
-      />
+      {compact ? null : (
+        <View
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+          style={[styles.glyph, { borderColor: status.error.border }]}
+        />
+      )}
       <Text variant="subtitle" style={styles.title}>
         {title}
       </Text>
@@ -61,11 +69,14 @@ const styles = StyleSheet.create({
     padding: space['8'],
     gap: space['2'],
   },
+  containerCompact: {
+    padding: space['4'],
+  },
   glyph: {
     width: 48,
     height: 48,
-    borderRadius: 24,
-    borderWidth: 2,
+    borderRadius: radius.full,
+    borderWidth: 1,
     marginBottom: space['2'],
   },
   title: {

@@ -11,7 +11,6 @@ export type ShellNavItem = {
 /** Always-visible top-level nav — sans caps; active route gets a copper underline. */
 export const PRIMARY_NAV: readonly ShellNavItem[] = [
   { href: '/explore', label: 'Explore' },
-  { href: '/search', label: 'Search' },
   { href: '/history', label: 'History' },
   { href: '/stories', label: 'Stories' },
   { href: '/about', label: 'About' },
@@ -19,9 +18,10 @@ export const PRIMARY_NAV: readonly ShellNavItem[] = [
 
 /** Overflow routes: desktop "More" disclosure + mobile drawer. */
 export const OVERFLOW_NAV: readonly ShellNavItem[] = [
-  { href: '/themes', label: 'Themes' },
   { href: '/data', label: 'Data' },
   { href: '/law', label: 'Law' },
+  { href: '/books', label: 'Banned books' },
+  { href: '/memorial', label: 'Memorial' },
   { href: '/methodology', label: 'Methodology' },
   { href: '/corrections', label: 'Corrections' },
   { href: '/errata', label: 'Errata' },
@@ -39,18 +39,18 @@ export const FOOTER_NAV_COLUMNS: readonly FooterNavColumn[] = [
     title: 'Explore',
     items: [
       { href: '/explore', label: 'Explore' },
-      { href: '/search', label: 'Search' },
       { href: '/history', label: 'History' },
       { href: '/stories', label: 'Stories' },
-      { href: '/themes', label: 'Themes' },
       { href: '/data', label: 'Data' },
       { href: '/law', label: 'Law' },
+      { href: '/books', label: 'Banned books' },
     ],
   },
   {
     title: 'Trust',
     items: [
       { href: '/methodology', label: 'Methodology' },
+      { href: '/memorial', label: 'Memorial' },
       { href: '/errata', label: 'Errata' },
       { href: '/corrections', label: 'Corrections' },
     ],

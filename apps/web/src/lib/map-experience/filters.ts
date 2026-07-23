@@ -1,6 +1,6 @@
 /**
  * Pure filter application + facet-option building for the map/list shared state. Mirrors
- * search-page facet convention (`apps/web/src/app/search/search-view-model.ts`) but
+ * history find-in-time facet convention (`apps/web/src/app/history/history-view-model.ts`) but
  * operates over `ExploreMapFeature` so the map canvas and the synchronized list can share one
  * filter/facet computation.
  *
@@ -12,7 +12,11 @@ import { findUsStateByPostalCode } from '@repo/domain/map/geography';
 import { getTopicLabel, isValidTopicId } from '@repo/domain/taxonomy/topics';
 import type { ExploreMapFeature } from './build-explore-map-source';
 import {
+  isKnownMapKind,
+  isKnownMapKindFamily,
   kindEncodingFor,
+  kindFamilyEncodingFor,
+  kindFamilyFor,
   MAP_SEMANTIC_TONE_ENCODING,
   type MapSemanticTone,
 } from './kind-encoding';
@@ -47,6 +51,18 @@ export const DEFAULT_EXPLORE_FILTERS: ExploreFilterState = {
   confidence: 'all',
 };
 
+function kindMatchesFilter(featureKind: string, filterKind: string): boolean {
+  if (filterKind === 'all') return true;
+  if (isKnownMapKindFamily(filterKind)) {
+    return kindFamilyFor(featureKind) === filterKind;
+  }
+  // Legacy share URLs may still carry a micro-kind slug.
+  if (isKnownMapKind(filterKind)) {
+    return featureKind === filterKind;
+  }
+  return featureKind === filterKind;
+}
+
 /**
  * Filters never hide an entity's era/status lifecycle by default — every kind/tone/era/theme/
  * status/confidence value is opt-IN via an explicit non-"all" filter value, so an unfiltered view
@@ -59,7 +75,7 @@ export function applyExploreFilters(
 ): readonly ExploreMapFeature[] {
   const stateFilter = statePostalCode?.trim().toUpperCase();
   return features.filter((feature) => {
-    if (filters.kind !== 'all' && feature.properties.kind !== filters.kind) return false;
+    if (!kindMatchesFilter(feature.properties.kind, filters.kind)) return false;
     if (filters.tone !== 'all' && feature.properties.mapTone !== filters.tone) return false;
     if (filters.era !== 'all' && !feature.properties.eraBuckets.includes(filters.era)) return false;
     // Theme facet options come from effectiveTopicIds (topicIds preferred); filter the same set.
@@ -116,6 +132,7 @@ const CONFIDENCE_LABELS: Readonly<Record<string, string>> = {
 function facetValueLabel(field: keyof ExploreFacetOptions, value: string): string {
   switch (field) {
     case 'kind':
+      if (isKnownMapKindFamily(value)) return kindFamilyEncodingFor(value).label;
       return kindEncodingFor(value).label;
     case 'tone': {
       const tone = value as MapSemanticTone;
@@ -190,7 +207,7 @@ export function buildExploreFacetOptions(
   return {
     kind: toOptions(
       'kind',
-      countBy(features, (feature) => [feature.properties.kind]),
+      countBy(features, (feature) => [kindFamilyFor(feature.properties.kind)]),
       'All kinds',
     ),
     tone: toOptions(

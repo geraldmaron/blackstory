@@ -13,14 +13,14 @@ export type CoreJourneyFixture = {
   readonly html: string;
 };
 
-/** Minimal accessible search results page shell. */
+/** Minimal accessible find-in-time (history) results page shell. */
 const SEARCH_FIXTURE = `
   <main id="main">
     <header>
-      <p>Index</p>
-      <h1>Search</h1>
+      <p>Find in time</p>
+      <h1>History</h1>
     </header>
-    <form method="get" action="/search">
+    <form method="get" action="/history">
       <fieldset>
         <legend>Filter records</legend>
         <label for="q">Search</label>
@@ -29,12 +29,12 @@ const SEARCH_FIXTURE = `
         <select id="kind" name="kind"><option value="">All</option></select>
       </fieldset>
     </form>
-    <p id="search-results-heading">3 results</p>
-    <ul aria-labelledby="search-results-heading">
+    <p id="history-results-heading">3 results</p>
+    <ul aria-labelledby="history-results-heading">
       <li><a href="/entity/ent_seed_place_001">Harlem Cultural Corridor</a></li>
     </ul>
-    <nav aria-label="Search results pages">
-      <a href="/search?offset=0">Previous page</a>
+    <nav aria-label="History results pages">
+      <a href="/history?offset=0">Previous page</a>
     </nav>
   </main>
 `;
@@ -106,7 +106,7 @@ const LOCATE_FIXTURE = `
       <input id="locate-address" name="address" type="search" autocomplete="street-address" />
     </form>
     <noscript>
-      <p>You can still <a href="/search">search records directly</a>.</p>
+      <p>You can still <a href="/history">search records directly</a>.</p>
     </noscript>
   </main>
 `;

@@ -1,6 +1,6 @@
 /**
  * Safe selection restoration for Explore (MOB-012), mirroring MOB-008's
- * `parseRestoredRoute` pattern (`app/_lib/route-params.ts`).
+ * `parseRestoredRoute` pattern (`lib/route-params.ts`).
  *
  * A selected entity is shareable/restorable via the `selected` query param (the
  * same mechanism a deep link uses), so on cold start the previously-selected
@@ -11,7 +11,7 @@
  * it never hands a stale id to the entity route or crashes. This is the Explore
  * analogue of ADR-004/MOB-005 release-stamp invalidation at the selection layer.
  */
-import { parseEntityId } from '@/app/_lib/route-params';
+import { parseEntityId } from '@/lib/route-params';
 import type { ExploreFeature } from './explore-feature';
 
 export type RestoredSelection = {

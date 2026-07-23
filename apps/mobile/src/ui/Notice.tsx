@@ -14,8 +14,12 @@
  */
 import { forwardRef } from 'react';
 import { StyleSheet, View } from 'react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
+
+import { useReduceMotion } from '@/features/explore/useReduceMotion';
+
 import { Text } from './Text';
-import { radius, space, useStatusColors, useThemeColors, type StatusName } from './tokens';
+import { duration, radius, space, useStatusColors, useThemeColors, type StatusName } from './tokens';
 import { useAnnounceOnMount } from './useAnnounceOnMount';
 
 export type NoticeTone = StatusName | 'info';
@@ -24,11 +28,17 @@ export type NoticeProps = {
   tone: NoticeTone;
   title: string;
   description?: string;
+  /** Tighter padding and type for inline dev/status strips. */
+  compact?: boolean;
 };
 
-export const Notice = forwardRef<View, NoticeProps>(function Notice({ tone, title, description }, ref) {
+export const Notice = forwardRef<View, NoticeProps>(function Notice(
+  { tone, title, description, compact = false },
+  ref,
+) {
   const status = useStatusColors();
   const theme = useThemeColors();
+  const reduceMotion = useReduceMotion();
   const palette =
     tone === 'info'
       ? { fg: theme.ink, bg: theme.surfaceRaised, border: theme.border }
@@ -38,22 +48,35 @@ export const Notice = forwardRef<View, NoticeProps>(function Notice({ tone, titl
   useAnnounceOnMount(`${title}${description ? `. ${description}` : ''}`);
 
   return (
-    <View
+    <Animated.View
       ref={ref}
+      entering={reduceMotion ? undefined : FadeIn.duration(duration.durationFast)}
       accessible
       accessibilityRole="alert"
       accessibilityLiveRegion={isUrgent ? 'assertive' : 'polite'}
-      style={[styles.base, { backgroundColor: palette.bg, borderColor: palette.border }]}
+      style={[
+        compact ? styles.compact : styles.base,
+        { backgroundColor: palette.bg, borderColor: palette.border },
+      ]}
     >
-      <Text variant="bodyEmphasis" style={{ color: palette.fg }}>
+      <Text
+        variant={compact ? 'bodySmall' : 'bodyEmphasis'}
+        style={[compact ? styles.compactTitle : undefined, { color: palette.fg }]}
+      >
         {title}
       </Text>
       {description ? (
-        <Text variant="bodySmall" style={{ color: palette.fg, marginTop: space['1'] }}>
+        <Text
+          variant={compact ? 'bodySmall' : 'caption'}
+          style={[
+            { color: palette.fg },
+            compact ? styles.compactDescription : styles.baseDescription,
+          ]}
+        >
           {description}
         </Text>
       ) : null}
-    </View>
+    </Animated.View>
   );
 });
 
@@ -62,5 +85,20 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
     borderWidth: 1,
     padding: space['4'],
+  },
+  compact: {
+    borderRadius: radius.sm,
+    borderWidth: 1,
+    paddingHorizontal: space['3'],
+    paddingVertical: space['3'],
+  },
+  compactTitle: {
+    fontWeight: '600',
+  },
+  baseDescription: {
+    marginTop: space['1'],
+  },
+  compactDescription: {
+    marginTop: space['2'],
   },
 });

@@ -212,7 +212,7 @@ test('a Puerto Rico match is out of the 50-states-+-D.C. scope and falls back to
   const body = (await response.json()) as LocateFailureBody;
   assert.equal(body.ok, false);
   assert.equal(body.fallback.available, true);
-  assert.equal(body.fallback.searchHref, '/search');
+  assert.equal(body.fallback.searchHref, '/history');
 });
 
 test('a no-match geocoder response falls back to manual place search (AC4)', async () => {

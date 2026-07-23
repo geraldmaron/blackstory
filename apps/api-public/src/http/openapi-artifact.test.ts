@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import { bootstrapResponseV1Schema } from '@repo/public-contracts/v1/bootstrap';
 import { entityV1Schema } from '@repo/public-contracts/v1/entity';
+import { mapSourceV1Schema } from '@repo/public-contracts/v1/map';
 import { searchResponseV1Schema } from '@repo/public-contracts/v1/search';
 import { publicApiErrorEnvelopeSchema } from '@repo/public-contracts/errors';
 
@@ -22,6 +23,7 @@ const ROUTER_PATHS = [
   '/v1/compatibility',
   '/v1/bootstrap',
   '/v1/search',
+  '/v1/map',
   '/v1/entity/{id}',
 ] as const;
 
@@ -85,6 +87,12 @@ test('redacted search example matches searchResponseV1Schema and omits ranking s
   assert.equal(parsed.success, true, parsed.success ? '' : JSON.stringify(parsed.error.issues));
   const result = (body as { results: Record<string, unknown>[] }).results[0];
   assertNoForbiddenKeys(result, FORBIDDEN_SEARCH_RESULT_KEYS, 'search result example');
+});
+
+test('redacted map example matches mapSourceV1Schema', () => {
+  const body = readJson('map-200.json');
+  const parsed = mapSourceV1Schema.safeParse(body);
+  assert.equal(parsed.success, true, parsed.success ? '' : JSON.stringify(parsed.error.issues));
 });
 
 test('error envelope examples match publicApiErrorEnvelopeSchema', () => {

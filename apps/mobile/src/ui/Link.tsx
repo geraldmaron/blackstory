@@ -6,9 +6,9 @@
  * both https:// and custom-scheme URLs); pass `onPress` to override with a
  * router-aware handler once MOB-008 lands.
  */
-import { Linking, Pressable, type PressableProps } from 'react-native';
+import { Linking, Pressable, StyleSheet, type PressableProps } from 'react-native';
 import { Text, type TextProps } from './Text';
-import { useThemeColors } from './tokens';
+import { radius, useThemeColors } from './tokens';
 
 export type LinkProps = Omit<PressableProps, 'children' | 'style' | 'onPress'> & {
   href: string;
@@ -39,6 +39,13 @@ export function Link({ href, children, onPress, textRole = 'body', accessibility
       accessibilityLabel={accessibilityLabel ?? children}
       hitSlop={8}
       onPress={handlePress}
+      android_ripple={{ color: theme.border }}
+      // Links had no press feedback at all. Tint only — no padding/alignment change —
+      // so adding this cannot reflow any existing caller's layout.
+      style={({ pressed }) => [
+        styles.pressable,
+        pressed ? { backgroundColor: theme.border } : null,
+      ]}
       {...rest}
     >
       <Text variant={textRole} style={{ color: theme.accent, textDecorationLine: 'underline' }}>
@@ -47,3 +54,9 @@ export function Link({ href, children, onPress, textRole = 'body', accessibility
     </Pressable>
   );
 }
+
+const styles = StyleSheet.create({
+  pressable: {
+    borderRadius: radius.sm,
+  },
+});

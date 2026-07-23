@@ -47,5 +47,6 @@ export {
   type SearchFacetCountsV1,
   type SearchRequestParams,
 } from './search-contracts';
-export { SearchResultCard, toSearchResultCardProps, type SearchResultCardProps } from './SearchResultCard';
+export { SearchResultCard, toSearchResultCardProps, type SearchResultCardProps, type SearchResultCardHandlers } from './SearchResultCard';
 export { BROWSE_CATEGORIES, type BrowseCategory } from './browse-categories';
+export { BrowseCategoryList, type BrowseCategoryListProps } from './BrowseCategoryList';

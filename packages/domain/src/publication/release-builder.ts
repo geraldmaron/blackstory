@@ -43,6 +43,7 @@ import {
   type NotabilityCriterion,
 } from '../entity-status.js';
 import { deriveCatalogEntityStatus } from '../derive-catalog-status.js';
+import { sanitizePublicProseText } from '../editorial/prose-links.js';
 import { evaluateNotabilityGate } from '../relevance/notability-gate.js';
 import { evaluateFactPublishGate } from '../facts/publish-gate.js';
 import type { FactCitation } from '../facts/citation.js';
@@ -266,7 +267,7 @@ function buildClaimProjections(entry: ReleaseSourceEntity): readonly ReleaseClai
   return (entry.claims ?? []).map((claim, index) => ({
     id: resolveReleaseClaimId(entry, claim, index),
     predicate: claim.predicate,
-    object: claim.object,
+    object: sanitizePublicProseText(claim.object),
     confidenceLevel: claim.confidenceLevel,
     citationSource: claim.citationSource,
     ...(claim.citationHref !== undefined ? { citationHref: claim.citationHref } : {}),
@@ -750,7 +751,7 @@ export function buildReleaseEntityArtifacts(
     displayName: entry.displayName,
     nameLower: entry.displayName.toLowerCase(),
     aliases: [],
-    summary: entry.summary,
+    summary: sanitizePublicProseText(entry.summary),
     topicTags: entry.topicTags ?? [],
     topicIds: entry.topicIds ?? [],
     mentionedEntityIds: entry.mentionedEntityIds ?? [],

@@ -1,5 +1,11 @@
 # blap design direction v5 — the atlas opens to your page
 
+> **Home layout supersession (2026-07-23):** The `/` surface layout is deferred to
+> [`design-direction-v6-home.md`](./design-direction-v6-home.md) (mockup v8.2+).
+> Brand tokens, typography, color law, dignity rules, and all non-home surfaces in
+> this document remain binding. Do not implement v5 §6 home beats or v5 ink footer
+> on `/` without explicit owner reversal.
+
 ## v5.1 revision — "the atlas instrument" (2026-07-18, session 3)
 
 Owner verdict on the first v5 pass: "it all looks the same … nothing to remember … I need a

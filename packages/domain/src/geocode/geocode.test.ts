@@ -114,10 +114,10 @@ test('reduceGeocodeCoordinatePrecision retains the coordinate only when explicit
   );
 });
 
-test('buildManualPlaceSearchFallback is always available and defaults to /search', () => {
+test('buildManualPlaceSearchFallback is always available and defaults to /history', () => {
   const fallback = buildManualPlaceSearchFallback('geocoder_unavailable');
   assert.equal(fallback.available, true);
-  assert.equal(fallback.searchHref, '/search');
+  assert.equal(fallback.searchHref, '/history');
   assert.match(fallback.message, /temporarily unavailable/);
 });
 

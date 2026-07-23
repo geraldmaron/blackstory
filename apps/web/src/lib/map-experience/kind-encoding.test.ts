@@ -11,11 +11,16 @@ import { DIGNITY_PALETTE } from './dignity-style';
 import {
   DEFAULT_KIND_ENCODING,
   KIND_ENCODING_ENTRIES,
+  KIND_FAMILY_ENTRIES,
   MAP_KIND_ENCODING,
+  MAP_KIND_FAMILY_ENCODING,
   MAP_SEMANTIC_TONE_ENCODING,
   displayEncodingFor,
   isKnownMapKind,
+  isKnownMapKindFamily,
   kindEncodingFor,
+  kindFamilyFor,
+  kindFamilyEncodingForKind,
   mapToneFromTopics,
   resolveMapTone,
   type MapEntityGlyph,
@@ -42,15 +47,12 @@ test('the encoding table covers the full domain kind vocabulary', () => {
 });
 
 test('every kind shade passes 3:1 non-text contrast against the ink basemap (except plantation charcoal)', () => {
-  for (const [kind, entry] of KIND_ENCODING_ENTRIES) {
-    if (kind === 'other' && entry.shade === DIGNITY_PALETTE.kindOther) {
-      // stone on ink is intentional secondary; still check
-    }
+  for (const [, entry] of KIND_FAMILY_ENTRIES) {
     if (entry.shade === DIGNITY_PALETTE.kindPlantation) continue;
     const ratio = contrastRatio(entry.shade, DIGNITY_PALETTE.background);
     assert.ok(
       ratio >= 3,
-      `kind "${kind}" shade ${entry.shade} contrast against basemap ${DIGNITY_PALETTE.background} is ${ratio.toFixed(2)}:1, must be >= 3:1`,
+      `family shade ${entry.shade} contrast against basemap ${DIGNITY_PALETTE.background} is ${ratio.toFixed(2)}:1, must be >= 3:1`,
     );
   }
   assert.equal(
@@ -60,24 +62,24 @@ test('every kind shade passes 3:1 non-text contrast against the ink basemap (exc
   );
 });
 
-test('no two kinds share both shade and glyph (color is never the sole signal)', () => {
+test('no two kind families share both shade and glyph (color is never the sole signal)', () => {
   const seen = new Set<string>();
-  for (const [kind, entry] of KIND_ENCODING_ENTRIES) {
+  for (const [family, entry] of KIND_FAMILY_ENTRIES) {
     const signature = `${entry.shade}::${entry.glyph}`;
     assert.ok(
       !seen.has(signature),
-      `kind "${kind}" duplicates another kind's shade+glyph signature`,
+      `family "${family}" duplicates another family's shade+glyph signature`,
     );
     seen.add(signature);
   }
 });
 
-test('every kind has a distinct shade', () => {
-  const shades = KIND_ENCODING_ENTRIES.map(([, entry]) => entry.shade);
+test('every kind family has a distinct shade', () => {
+  const shades = KIND_FAMILY_ENTRIES.map(([, entry]) => entry.shade);
   assert.equal(
     new Set(shades).size,
     shades.length,
-    'shades must be mutually distinct across kinds',
+    'family shades must be mutually distinct',
   );
 });
 
@@ -111,9 +113,31 @@ test('kindEncodingFor resolves known kinds directly and falls back for unknown k
   assert.deepEqual(kindEncodingFor(''), DEFAULT_KIND_ENCODING);
 });
 
-test('law is blue copper-family blue and person stays copper', () => {
-  assert.equal(MAP_KIND_ENCODING.law.shade, DIGNITY_PALETTE.kindLaw);
-  assert.equal(MAP_KIND_ENCODING.person.shade, DIGNITY_PALETTE.kindPerson);
+test('every micro-kind maps to a known kind family', () => {
+  for (const kind of DOMAIN_KINDS) {
+    const family = kindFamilyFor(kind);
+    assert.ok(isKnownMapKindFamily(family), `kind "${kind}" must map to a family`);
+    assert.ok(
+      MAP_KIND_FAMILY_ENCODING[family].kinds.includes(kind),
+      `kind "${kind}" must be listed on family "${family}"`,
+    );
+  }
+});
+
+test('displayEncodingFor uses family shade and micro-kind glyph when no tone is set', () => {
+  const school = displayEncodingFor('school');
+  assert.equal(school.shade, MAP_KIND_FAMILY_ENCODING.places.shade);
+  assert.equal(school.glyph, MAP_KIND_ENCODING.school.glyph);
+  assert.equal(school.label, MAP_KIND_ENCODING.school.label);
+
+  const law = displayEncodingFor('law');
+  assert.equal(law.shade, MAP_KIND_FAMILY_ENCODING.sources.shade);
+  assert.equal(law.glyph, MAP_KIND_ENCODING.law.glyph);
+});
+
+test('kindFamilyEncodingForKind resolves family metadata from micro-kind', () => {
+  assert.equal(kindFamilyEncodingForKind('movement').label, 'Organizations');
+  assert.equal(kindFamilyFor('case'), 'events');
 });
 
 test('mapToneFromTopics derives massacre, plantation, and epicenter tones', () => {
@@ -177,7 +201,7 @@ test('semantic tones are shade-only (no glyph channel of their own)', () => {
   }
 });
 
-test('kind shades are not red-hued (massacre is a semantic tone, not a kind)', () => {
+test('kind shades are not red-hued (massacre is a semantic tone, not a kind family)', () => {
   function hue(hex: string): number {
     const normalized = hex.replace('#', '');
     const r = Number.parseInt(normalized.slice(0, 2), 16) / 255;
@@ -194,9 +218,9 @@ test('kind shades are not red-hued (massacre is a semantic tone, not a kind)', (
     h *= 60;
     return h < 0 ? h + 360 : h;
   }
-  for (const [kind, entry] of KIND_ENCODING_ENTRIES) {
+  for (const [, entry] of KIND_FAMILY_ENTRIES) {
     const h = hue(entry.shade);
     const inRedBand = h < 15 || h > 345;
-    assert.ok(!inRedBand, `kind "${kind}" shade ${entry.shade} must not be red-hued`);
+    assert.ok(!inRedBand, `family shade ${entry.shade} must not be red-hued`);
   }
 });

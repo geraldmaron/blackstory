@@ -16,7 +16,7 @@ export const HISTORY_GAP_COPY: Readonly<Record<HistoryGapKind, HistoryGapCopy>> 
     title: 'Limited published coverage for this decade',
     body:
       'The active release does not yet include enough dated, accepted records to populate a ' +
-      'decade view here. That reflects the current state of research and publication — not an ' +
+      'decade view here. That reflects the current state of research and publication, not an ' +
       'absence of history in this period. Browse another decade or the all-time view to see ' +
       'what is published today.',
   },
@@ -36,8 +36,8 @@ export const HISTORY_GAP_COPY: Readonly<Record<HistoryGapKind, HistoryGapCopy>> 
 };
 
 export const HISTORY_DIGNITY_FRAMING =
-  'Presence and affirmation records appear alongside harm and policy records with equal visual weight — ' +
-  'this browse surface never uses violence heat styling or crime-density rendering.';
+  'Presence and affirmation records appear alongside harm and policy records with equal visual weight. ' +
+  'This browse surface never uses violence heat styling or crime-density rendering.';
 
 export const HISTORY_DECADE_FRAMING =
-  'Decade views show status as-of that decade from published status history — never present-day status backfilled.';
+  'Decade views show status as-of that decade from published status history, never present-day status backfilled.';

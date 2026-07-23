@@ -48,6 +48,14 @@ test('Nat Turner carries accurate state-execution context', () => {
   );
 });
 
+test('Trayvon Martin is present as a racial-terror milestone', () => {
+  const trayvon = MEMORIAL_NAMES.find((entry) => entry.name === 'Trayvon Martin');
+  assert.ok(trayvon);
+  assert.equal(trayvon!.category, 'racial_terror');
+  assert.equal(trayvon!.year, 2012);
+  assert.ok(trayvon!.place?.toLowerCase().includes('sanford'));
+});
+
 test('memorial name keys are unique by name+year', () => {
   const seen = new Set<string>();
   for (const entry of MEMORIAL_NAMES) {

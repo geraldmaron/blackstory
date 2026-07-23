@@ -22,12 +22,13 @@ import {
   POPULATION_CHANGE_TIER_FILL,
   POPULATION_CHANGE_TIER_GLYPH,
   POPULATION_SHARE_TIER_FILL,
+  CLUSTER_RADIUS_BY_COUNT,
   plateForScheme,
   type MapColorScheme,
 } from '../../lib/map-experience/dignity-style';
 import type { ExploreLayerMode, ExplorePopulationGeo } from '../../lib/map-experience/url-state';
 import {
-  KIND_ENCODING_ENTRIES,
+  KIND_FAMILY_ENTRIES,
   SEMANTIC_TONE_ENTRIES,
   type MapEntityGlyph,
 } from '../../lib/map-experience/kind-encoding';
@@ -57,19 +58,34 @@ const SIZE_SCALE_STEPS: readonly number[] = [
   MARKER_RADIUS_MAX,
 ];
 
+/** Cluster disc radii at locality zoom — mirrors `CLUSTER_RADIUS_BY_COUNT` in explore-style. */
+const CLUSTER_SIZE_ROWS = [
+  ['2 to 9 records', CLUSTER_RADIUS_BY_COUNT[0]![1]],
+  ['10 to 49 records', CLUSTER_RADIUS_BY_COUNT[1]![1]],
+  ['50 to 199 records', CLUSTER_RADIUS_BY_COUNT[2]![1]],
+  ['200+ records', CLUSTER_RADIUS_BY_COUNT[3]![1]],
+] as const;
+
+const CONFIDENCE_TIER_ROWS = [
+  ['high', 'High'],
+  ['medium', 'Medium'],
+  ['low', 'Low'],
+  ['unrated', 'Unrated'],
+] as const;
+
 const SHARE_TIER_ROWS = [
   ['trace', 'Under 2%'],
-  ['low', '2–10%'],
-  ['mid', '10–25%'],
-  ['high', '25–50%'],
+  ['low', '2 to 10%'],
+  ['mid', '10 to 25%'],
+  ['high', '25 to 50%'],
   ['majority', '50%+'],
 ] as const;
 
 const CHANGE_TIER_ROWS = [
   ['gainStrong', 'Gain ≥ 5 pp'],
-  ['gainModerate', 'Gain 1–5 pp'],
+  ['gainModerate', 'Gain 1 to 5 pp'],
   ['neutral', 'Within ±1 pp'],
-  ['lossModerate', 'Loss 1–5 pp'],
+  ['lossModerate', 'Loss 1 to 5 pp'],
   ['lossStrong', 'Loss ≥ 5 pp'],
 ] as const;
 
@@ -195,10 +211,10 @@ function MapColorKey(props: {
           <span>Selected state</span>
         </li>
       </ul>
-      <p className="ds-explore-legend__note">Record kinds</p>
+      <p className="ds-explore-legend__note">Record kind groups</p>
       <ul className="ds-explore-legend__kind-list">
-        {KIND_ENCODING_ENTRIES.map(([kind, entry]) => (
-          <li key={kind}>
+        {KIND_FAMILY_ENTRIES.map(([family, entry]) => (
+          <li key={family}>
             <LegendSwatch glyph={entry.glyph} shade={entry.shade} />
             <span>
               {entry.label}{' '}
@@ -210,7 +226,7 @@ function MapColorKey(props: {
         ))}
       </ul>
       <p className="ds-explore-legend__note">
-        Historical tones (shade only — shape stays with kind)
+        Historical tones (shade only; shape stays with kind)
       </p>
       <ul className="ds-explore-legend__kind-list">
         {SEMANTIC_TONE_ENTRIES.map(([tone, entry]) => (
@@ -276,10 +292,47 @@ function MapColorKey(props: {
           </ul>
         </>
       ) : null}
+      <p className="ds-explore-legend__note">Marker size (single records)</p>
+      <div className="ds-explore-legend__size-scale" aria-hidden="true">
+        {SIZE_SCALE_STEPS.map((diameter) => (
+          <span
+            key={diameter}
+            className="ds-explore-legend__size-dot"
+            style={{ width: diameter, height: diameter }}
+          />
+        ))}
+      </div>
       <p className="ds-explore-legend__note">
-        Each map color pairs with a label or glyph — color is never the only signal. Markers on the
-        canvas are discs; square / diamond / ring names are rim and fill signatures, not literal
-        MapLibre shapes.
+        Larger discs mean more accepted claims on that record ({MARKER_RADIUS_MIN} to {MARKER_RADIUS_MAX}px
+        at locality zoom). Confidence is separate below.
+      </p>
+      <p className="ds-explore-legend__note">Cluster size (Group nearby on)</p>
+      <ul className="ds-explore-legend__kind-list">
+        {CLUSTER_SIZE_ROWS.map(([label, radius]) => (
+          <li key={label}>
+            <span
+              className="ds-explore-legend__size-dot"
+              style={{ width: radius, height: radius }}
+              aria-hidden="true"
+            />
+            <span>{label}</span>
+          </li>
+        ))}
+      </ul>
+      <p className="ds-explore-legend__note">Evidence confidence (glyph + color)</p>
+      <ul className="ds-explore-legend__kind-list">
+        {CONFIDENCE_TIER_ROWS.map(([tier, label]) => (
+          <li key={tier}>
+            <span style={{ color: CONFIDENCE_TIER_COLOR[tier] }} aria-hidden="true">
+              {CONFIDENCE_TIER_GLYPH[tier]}{' '}
+            </span>
+            <span>{label}</span>
+          </li>
+        ))}
+      </ul>
+      <p className="ds-explore-legend__note">
+        Five kind-group colors pair with shape signatures; historical tones override shade only.
+        Color is never the only signal.
       </p>
     </div>
   );
@@ -331,24 +384,21 @@ export function MapExperienceLegend(props: MapExperienceLegendProps = {}) {
         <div className="ds-explore-legend__body">
           <section aria-labelledby="explore-legend-kind-heading">
             <h3 className="ds-explore-legend__subhead" id="explore-legend-kind-heading">
-              Kind
+              Kind groups
             </h3>
             <p className="ds-explore-legend__note">
-              Color marks the kind of place or record, and a few historical tones noted below
-              &mdash; it says nothing about the people connected to a place. Each kind also has a
-              named shape identity (circle, square, diamond, or ring). On the map those identities
-              paint as discs with matching rim or fill: thick rim for square kinds (school, law,
-              publication), an orbit ring for diamond kinds (event, case, movement), and a hollow
-              disc for ring kinds (organization, institution).
+              Color marks one of five kind groups on the map (People, Places, Organizations, Events,
+              Sources). Micro-kinds inside a group share that shade; shape still follows the
+              specific kind (circle, square, diamond, or ring rim signatures on the canvas).
             </p>
             <ul className="ds-explore-legend__kind-list">
-              {KIND_ENCODING_ENTRIES.map(([kind, entry]) => (
-                <li key={kind}>
+              {KIND_FAMILY_ENTRIES.map(([family, entry]) => (
+                <li key={family}>
                   <LegendSwatch glyph={entry.glyph} shade={entry.shade} />
                   <span className="ds-explore-legend__kind-label">
                     {entry.label}{' '}
                     <span className="ds-explore-legend__kind-glyph-name">
-                      ({entry.glyph} → {KIND_GLYPH_MAP_ECHO[entry.glyph]})
+                      ({entry.kinds.join(', ')})
                     </span>
                   </span>
                 </li>
@@ -394,9 +444,10 @@ export function MapExperienceLegend(props: MapExperienceLegendProps = {}) {
               ))}
             </div>
             <p className="ds-explore-legend__note">
-              A larger marker means more documented evidence on that record &mdash; small does not
-              mean less true, only less evidenced so far. Confidence in that evidence is shown
-              separately below, as a glyph and a green-to-orange color, never by size alone.
+              A larger marker means more accepted claims on that record &mdash; small does not mean
+              less true, only less evidenced so far. Cluster discs grow with the number of records
+              grouped at that zoom. Confidence is shown separately (glyph + green-to-orange color),
+              never by size alone.
             </p>
           </section>
 
@@ -449,7 +500,7 @@ export function MapExperienceLegend(props: MapExperienceLegendProps = {}) {
                   <>Choose a model in the toolbar to shade geography beneath the pins.</>
                 ) : layerMode === 'presence' ? (
                   <>
-                    States are shaded by how many documented records they contain — presence of
+                    States are shaded by how many documented records they contain: presence of
                     evidence in this archive, not incidents, severity, or population counts.
                   </>
                 ) : layerMode === 'blackShare' ? (
@@ -461,7 +512,7 @@ export function MapExperienceLegend(props: MapExperienceLegendProps = {}) {
                 ) : (
                   <>
                     {popGeo === 'state' ? 'States' : 'Counties'} are shaded by change in Black
-                    share between the selected decades — copper tones mark gain, stone tones mark
+                    share between the selected decades; copper tones mark gain, stone tones mark
                     loss. Arrows in the tier list are a second signal; color is never the only cue.
                   </>
                 )}
@@ -471,7 +522,7 @@ export function MapExperienceLegend(props: MapExperienceLegendProps = {}) {
               <div>
                 <dt>Record presence shading</dt>
                 <dd>
-                  Darker copper means more documented records in a state — never more danger, never
+                  Darker copper means more documented records in a state, never more danger, never
                   a claim that a lighter state lacks history. See the color key above for the three
                   presence tiers.
                 </dd>

@@ -5,6 +5,7 @@
 import Link from 'next/link';
 import React from 'react';
 import type { DataPageRacePairSeries } from '@repo/domain/statistics/data-page-series';
+import { THEMES_PUBLIC_SURFACE_ENABLED } from '../../lib/theme-impact/public-surface';
 import { DataChartFrame } from './DataChartFrame';
 import { formatDataPageValue } from './chart-utils';
 
@@ -16,7 +17,7 @@ const PRIMARY_FILL = 'var(--ds-viz-2)';
 const COMPARISON_FILL = 'var(--ds-viz-3)';
 
 function themeHref(themeId: string | undefined): string | undefined {
-  if (!themeId) return undefined;
+  if (!THEMES_PUBLIC_SURFACE_ENABLED || !themeId) return undefined;
   return `/themes/${themeId}`;
 }
 

@@ -70,10 +70,18 @@ export const TYPE_SCALE = {
   display: { size: 34, lineHeight: 40, weight: '600', family: 'display' as const },
   title: { size: 26, lineHeight: 32, weight: '600', family: 'display' as const },
   subtitle: { size: 20, lineHeight: 27, weight: '600', family: 'uiBody' as const },
+  /** Ledger Line tab masthead — 16 Inter Medium (docs/ui/design-direction-v6-mobile.md). */
+  masthead: { size: 16, lineHeight: 22, weight: '500', family: 'uiBody' as const },
+  /** Ledger Line entity title — 17 Inter Medium. */
+  entityTitle: { size: 17, lineHeight: 22, weight: '500', family: 'uiBody' as const },
   body: { size: 16, lineHeight: 24, weight: '400', family: 'uiBody' as const },
   bodyEmphasis: { size: 16, lineHeight: 24, weight: '600', family: 'uiBody' as const },
+  /** Ledger Line row title — 13 Inter Medium. */
+  rowTitle: { size: 13, lineHeight: 18, weight: '500', family: 'uiBody' as const },
   bodySmall: { size: 14, lineHeight: 20, weight: '400', family: 'uiBody' as const },
   caption: { size: 12, lineHeight: 16, weight: '500', family: 'uiBody' as const },
+  /** Ledger Line mono section label — 11 IBM Plex Mono, uppercase tracked in UI. */
+  sectionLabel: { size: 11, lineHeight: 14, weight: '500', family: 'dataMono' as const },
   editorial: { size: 17, lineHeight: 27, weight: '400', family: 'editorial' as const },
   code: { size: 13, lineHeight: 19, weight: '500', family: 'dataMono' as const },
 } as const;

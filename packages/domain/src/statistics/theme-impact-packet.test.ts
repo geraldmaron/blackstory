@@ -7,6 +7,10 @@ import {
   buildThemeImpactPacket,
   createRedliningQ3FixturePacket,
 } from './theme-impact-packet.js';
+import {
+  RESEARCHED_THEME_IMPACT_PACKETS,
+  THEME_RESEARCH_ADJUDICATION,
+} from './researched-theme-impact-packets.js';
 
 test('buildThemeImpactPacket defaults to juxtaposition and freezes arrays', () => {
   const packet = createRedliningQ3FixturePacket();
@@ -101,4 +105,75 @@ test('Q10 methodology packet may publish without metrics', () => {
     updatedAt: '2026-07-22T15:00:00.000Z',
   });
   assert.doesNotThrow(() => assertThemeImpactPacketPublishable(packet));
+});
+
+test('researched catalog publishes exactly one packet for every substantive question', () => {
+  const questionIds = RESEARCHED_THEME_IMPACT_PACKETS.map((packet) => packet.questionId);
+  assert.deepEqual(
+    [...questionIds].sort(),
+    ['Q1', 'Q11', 'Q12', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9'],
+  );
+  assert.equal(new Set(questionIds).size, 11);
+  for (const packet of RESEARCHED_THEME_IMPACT_PACKETS) {
+    assert.doesNotThrow(() => assertThemeImpactPacketPublishable(packet));
+  }
+});
+
+test('researched packet artifacts use content hashes rather than artifact ids or placeholders', () => {
+  const artifactIds = new Set(
+    RESEARCHED_THEME_IMPACT_PACKETS.flatMap((packet) =>
+      packet.artifacts.map((artifact) => artifact.artifactId),
+    ),
+  );
+  for (const packet of RESEARCHED_THEME_IMPACT_PACKETS) {
+    for (const artifact of packet.artifacts) {
+      assert.match(artifact.provenance.contentHash, /^[a-f0-9]{64}$/);
+      assert.ok(!artifactIds.has(artifact.provenance.contentHash));
+      assert.doesNotMatch(
+        `${artifact.artifactId} ${artifact.title} ${artifact.citation}`,
+        /placeholder|contested|intelligence-linked/i,
+      );
+    }
+  }
+});
+
+test('every researched theme exposes more than one artifact source lineage', () => {
+  const sourceLineagesByTheme = new Map<string, Set<string>>();
+  for (const packet of RESEARCHED_THEME_IMPACT_PACKETS) {
+    const sources = sourceLineagesByTheme.get(packet.themeId) ?? new Set<string>();
+    for (const artifact of packet.artifacts) {
+      sources.add(artifact.provenance.source);
+    }
+    sourceLineagesByTheme.set(packet.themeId, sources);
+  }
+
+  for (const [themeId, sources] of sourceLineagesByTheme) {
+    assert.ok(
+      sources.size >= 2,
+      `${themeId} requires at least two artifact source lineages; found ${[...sources].join(', ')}`,
+    );
+  }
+});
+
+test('research adjudication challenges every public theme', () => {
+  const packetThemeIds = new Set(
+    RESEARCHED_THEME_IMPACT_PACKETS.map((packet) => packet.themeId),
+  );
+  const adjudicatedThemeIds = new Set(
+    THEME_RESEARCH_ADJUDICATION.map((row) => row.themeId),
+  );
+  assert.deepEqual(adjudicatedThemeIds, packetThemeIds);
+  assert.equal(adjudicatedThemeIds.size, 7);
+  assert.ok(
+    THEME_RESEARCH_ADJUDICATION.every((row) => row.rationale.trim().length >= 80),
+  );
+});
+
+test('redlining Q1 uses gated causal claim with named secondary claim ids', () => {
+  const q1 = RESEARCHED_THEME_IMPACT_PACKETS.find((packet) => packet.questionId === 'Q1');
+  assert.ok(q1);
+  assert.equal(q1.methodStance, 'gated_causal_claim');
+  assert.ok((q1.causalClaimIds ?? []).length >= 2);
+  assert.match(q1.methodNote, /Rothstein|Massey|Banaji/);
+  assert.match(q1.geography.label ?? '', /example/i);
 });

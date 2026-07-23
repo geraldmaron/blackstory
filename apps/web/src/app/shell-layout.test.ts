@@ -28,11 +28,7 @@ describe('shell sticky clearance', () => {
     );
   });
 
-  it('clears the fixed header above the footer mast', () => {
-    assert.match(
-      shellCss,
-      /\.ds-shell-footer\s*\{[^}]*padding-top:\s*max\(var\(--ds-space-16\),\s*var\(--ds-island-clearance\)\)/s,
-    );
+  it('keeps scroll clearance under the sticky header when the footer is focused', () => {
     assert.match(
       shellCss,
       /\.ds-shell-footer\s*\{[^}]*scroll-margin-top:\s*var\(--ds-island-clearance\)/s,
@@ -122,41 +118,58 @@ describe('horizontal overflow guards', () => {
       /@media\s*\(max-width:\s*39\.9375rem\)\s*\{[^}]*--ds-explore-results-width:\s*auto/s,
     );
   });
+
+  it('explore v6 panels use opaque Surface fills without backdrop blur or fixed-ink cockpit', () => {
+    assert.match(
+      mapSurfacesCss,
+      /\.ds-explore-stage__instruments\s*\{[^}]*background:\s*var\(--ds-surface\)/s,
+    );
+    assert.match(
+      mapSurfacesCss,
+      /\.ds-explore-stage__results\s*\{[^}]*background:\s*var\(--ds-surface\)/s,
+    );
+    assert.doesNotMatch(mapSurfacesCss, /backdrop-filter/);
+    assert.doesNotMatch(
+      mapSurfacesCss,
+      /\.ds-explore-stage__instruments\s*\{[^}]*--ds-fixed-/s,
+    );
+  });
 });
 
 describe('shell footer theme tokens', () => {
-  it('styles the mega footer with theme canvas/ink tokens, not fixed-ink palette', () => {
-    assert.match(shellCss, /\.ds-shell-footer\s*\{[^}]*background:\s*var\(--ds-canvas\)/s);
-    assert.match(shellCss, /\.ds-shell-footer\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
-    assert.match(shellCss, /\.ds-shell-footer__core\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
+  it('styles the footer as a theme-aware Surface card', () => {
+    assert.match(shellCss, /\.ds-shell-footer__card\s*\{[^}]*background:\s*var\(--ds-surface\)/s);
+    assert.match(shellCss, /\.ds-shell-footer__card\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
     assert.match(
       shellCss,
-      /\.ds-shell-footer__support\s*\{[^}]*color:\s*var\(--ds-ink-muted\)/s,
+      /\.ds-shell-footer__card\s*\{[^}]*border:\s*var\(--ds-border-width\)\s*solid\s*var\(--ds-rule\)/s,
     );
     assert.match(
       shellCss,
-      /\.ds-shell-footer__links a\s*\{[^}]*color:\s*var\(--ds-ink\)/s,
+      /\.ds-shell-footer__column-title\s*\{[^}]*color:\s*var\(--ds-accent\)/s,
     );
     assert.match(
       shellCss,
-      /\.ds-shell-footer__links a:focus-visible\s*\{[^}]*outline:[^}]*var\(--ds-accent-graphic\)/s,
+      /\.ds-shell-footer__links a\s*\{[^}]*color:\s*var\(--ds-ink-muted\)/s,
     );
     assert.match(
       shellCss,
-      /\.ds-shell-footer__operator\s*\{[^}]*color:\s*var\(--ds-accent\)/s,
+      /\.ds-shell-footer__links a:hover\s*\{[^}]*color:\s*var\(--ds-accent\)/s,
     );
-    assert.doesNotMatch(shellCss, /\.ds-shell-footer[^{]*\{[^}]*--ds-fixed-/s);
+    assert.match(
+      shellCss,
+      /\.ds-shell-footer__operator\s*\{[^}]*color:\s*var\(--ds-ink-muted\)/s,
+    );
+    assert.doesNotMatch(
+      shellCss,
+      /\.ds-shell-footer\s*\{[^}]*background:\s*var\(--ds-fixed-charcoal\)/s,
+    );
   });
 
-  it('swaps footer lockup artwork with [data-theme] like the shell header', () => {
-    assert.match(shellCss, /\.ds-shell-footer__wordmark--theme-light\s*\{[^}]*display:\s*block/s);
+  it('aligns the home footer card with the edition stack width', () => {
     assert.match(
       shellCss,
-      /\[data-theme='dark'\]\s+\.ds-shell-footer__wordmark--theme-light\s*\{[^}]*display:\s*none/s,
-    );
-    assert.match(
-      shellCss,
-      /\[data-theme='dark'\]\s+\.ds-shell-footer__wordmark--theme-dark\s*\{[^}]*display:\s*block/s,
+      /\.ds-shell:has\(\.ds-home-hero\)\s+\.ds-shell-footer\s*\{[^}]*width:\s*min\(100%\s*-\s*\(var\(--ds-gutter\)\s*\*\s*2\),\s*var\(--ds-grid-max\)\)/s,
     );
   });
 });

@@ -110,7 +110,7 @@
 }
 
 [data-theme='light'] .ds-entity-location-map__frame {
-  background: #ffffff;
+  background: #f4efe5;
 }
 
 .ds-entity-location-map__frame[data-load-state='loading']::after {
@@ -244,7 +244,7 @@
 }
 
 .ds-why-appears__citations a {
-  color: var(--ds-copper-text);
+  color: var(--ds-accent);
   text-decoration: underline;
   text-underline-offset: 0.12em;
 }
@@ -343,7 +343,7 @@
 }
 
 .ds-at-a-glance__link {
-  color: var(--ds-copper-text);
+  color: var(--ds-accent);
   text-decoration: underline;
   text-underline-offset: 0.12em;
 }

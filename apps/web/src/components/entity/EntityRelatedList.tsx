@@ -6,6 +6,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { sanitizePublicProseText } from '@repo/domain/editorial';
 import type { PublicEntityView, RelatedNeighborView } from '../../data/public-seed';
 import { KindBadge } from '../map-experience';
 import { EntityLinkDiscoveryHint, humanizeEntityId } from './EntityLink';
@@ -48,7 +49,7 @@ function NeighborLink({ neighbor }: { readonly neighbor: RelatedNeighborView }) 
         <h3 className="ds-story-link__title">{neighbor.displayName}</h3>
         <p className="ds-story-link__summary">
           {neighbor.summary.trim().length > 0
-            ? neighbor.summary
+            ? sanitizePublicProseText(neighbor.summary)
             : `${humanizeToken(neighbor.relationType)} connection to this record.`}
         </p>
       </Link>

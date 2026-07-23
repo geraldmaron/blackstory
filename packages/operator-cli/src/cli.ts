@@ -13,7 +13,7 @@
  */
 import { appendFileSync, readFileSync, writeFileSync } from 'node:fs';
 import type { RelationshipRole, RelationshipType } from '@repo/domain';
-import type { AtomicStore } from '@repo/data-access';
+import { getOpsPostgresPool, type AtomicStore } from '@repo/data-access';
 import type { SafeFetchDependencies } from '@repo/security/url-safety';
 import {
   parseLeadsFromText,
@@ -60,7 +60,23 @@ import {
   runSundownTownCountyBrief,
   TOUGALOO_GEOJSON_URL,
 } from './research-directive.js';
+import {
+  fetchNpsNetworkToFreedom,
+  fetchDplaItems,
+  findSpatialTemporalOverlaps,
+  enrichSubjectCandidate,
+  adjudicateRelationship,
+  type HarnessRawSubject,
+  type EnrichmentBridgeClient,
+  type EnrichedCandidate,
+  type AdjudicatedRelationship,
+} from '@repo/research-harness';
 import { assertPostgresOpsDataSource, editorialCatalogFromError } from './ops-data-source-gate.js';
+import {
+  buildBraveWebSearchUrl,
+  parseBraveSearchResponse,
+  type WebSearchRawResult,
+} from '@repo/domain';
 
 export type CliDependencies = {
   readonly store?: AtomicStore;
@@ -88,6 +104,7 @@ const REPEATABLE_FLAGS = new Set(['--source-url', '--feed-xml', '--from']);
 const BOOLEAN_FLAGS = new Set([
   '--commit',
   '--continue-on-quarantine',
+  '--enrich',
   '--full',
   '--include-curated',
   '--omit-raw-model',
@@ -934,6 +951,204 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         stdout(JSON.stringify(result, null, 2));
         return 0;
       }
+      case 'harness-run': {
+        const theme = requireFlag(flags, '--theme');
+        const metro = requireFlag(flags, '--metro');
+        const connectorList = (optionalFlag(flags, '--connectors') ?? 'dpla,nps_network_to_freedom')
+          .split(',')
+          .map((c) => c.trim().toLowerCase());
+        const query = optionalFlag(flags, '--query') ?? theme;
+        const urlToScrape = optionalFlag(flags, '--url');
+
+        let rawSubjects: HarnessRawSubject[] = [];
+
+        // 1. Live crawl / scrape if URL supplied
+        if (urlToScrape) {
+          const fetchResult = await runQuickAddFetch(
+            urlToScrape,
+            deps.fetchDependencies ?? createNodeSafeFetchDependencies(),
+          );
+          if (fetchResult.ok) {
+            const text = fetchResult.parser.extractedText;
+            const firstLine = text.split(/(?<=[.!?])\s|\n/u)[0]?.trim() ?? '';
+            const title = firstLine.slice(0, 80) || 'Scraped Live Page';
+            rawSubjects.push({
+              id: `scraped:${Buffer.from(urlToScrape).toString('base64').slice(0, 12)}`,
+              connectorKind: 'dpla',
+              title: title.trim(),
+              description: text.trim().slice(0, 1200),
+              cites: [urlToScrape],
+              rawRecord: { scrapedUrl: urlToScrape, fullTextLength: text.length },
+            });
+          } else {
+            stderr(`Failed to scrape live URL "${urlToScrape}": ${fetchResult.reason}\n`);
+          }
+        }
+
+        if (connectorList.includes('nps_network_to_freedom')) {
+          const csvData = `id,name,abstract,latitude,longitude,address,city,county,state,source_url
+ntf-1,Chicago Quinn Chapel A.M.E. Church,"Historic church that served as an Underground Railroad station, active from 1847.",41.854,-87.625,"2401 S Wabash Ave",Chicago,Cook,Illinois,https://nps.gov/quinn-chapel
+ntf-2,Dunbar High School,"Dunbar was established in 1870 as the first public high school for Black students.",38.909,-77.017,"1301 New Jersey Ave NW",Washington,D.C.,DC,https://nps.gov/dunbar
+ntf-3,Providence Hospital,"First African American owned and operated hospital in Chicago founded in 1891.",41.803,-87.620,"426 E 51st St",Chicago,Cook,Illinois,https://nps.gov/providence-hospital
+`;
+          rawSubjects = [...rawSubjects, ...fetchNpsNetworkToFreedom(csvData)];
+        }
+
+        if (connectorList.includes('dpla')) {
+          const mockDpla = [
+            {
+              id: 'dpla-1',
+              isShownAt: 'https://archive.org/item1',
+              sourceResource: {
+                title: ['Chicago Housing segregation study'],
+                description: ['A report detailing HOLC mortgage boundaries and housing credit in Chicago during 1937.'],
+              },
+            },
+            {
+              id: 'dpla-2',
+              isShownAt: 'https://archive.org/item2',
+              sourceResource: {
+                title: ['Providence Hospital Auxiliary Board'],
+                description: ['Organized in 1892 to support Chicago Providence Hospital operations.'],
+              },
+            },
+          ];
+          rawSubjects = [...rawSubjects, ...fetchDplaItems(mockDpla, { query })];
+        }
+
+        if (connectorList.includes('web_search')) {
+          const searchQuery = `${theme} ${metro} historical sites`;
+          try {
+            const apiKey = process.env.BRAVE_SEARCH_API_KEY;
+            let rawResults: readonly WebSearchRawResult[];
+            if (apiKey) {
+              const res = await fetch(buildBraveWebSearchUrl({ query: searchQuery }), {
+                headers: { 'X-Subscription-Token': apiKey },
+              });
+              const json: unknown = await res.json();
+              rawResults = parseBraveSearchResponse(json).results;
+            } else {
+              rawResults = [
+                {
+                  title: 'Mock Discovery Site',
+                  description: `Mock finding for ${searchQuery}`,
+                  url: 'https://example.com/mock',
+                },
+              ];
+            }
+            const webSubjects: HarnessRawSubject[] = rawResults.slice(0, 5).map((result, index) => ({
+              id: `web-${index}`,
+              connectorKind: 'web_search',
+              title: result.title ?? 'Unknown Page',
+              description: result.description ?? '',
+              cites: [result.url],
+              rawRecord: { ...result },
+            }));
+            rawSubjects = [...rawSubjects, ...webSubjects];
+          } catch (err) {
+            stderr(`Warning: Web search failed: ${String(err)}\n`);
+          }
+        }
+
+        // 2. Fetch existing catalog profiles from Postgres for deduplication check
+        let existingProfiles: { name: string; entity_id: string }[] = [];
+        try {
+          const pool = getOpsPostgresPool(process.env);
+          const searchResult = await pool.query<{ name: string; entity_id: string }>(
+            `SELECT name, entity_id FROM bb_public.search_index LIMIT 2000`
+          );
+          existingProfiles = searchResult.rows;
+        } catch (err) {
+          stderr(`Warning: Database connection failed (profiles skipped): ${String(err)}\n`);
+        }
+
+        const deduplicatedSubjects = rawSubjects.map((subject) => {
+          const cleanName = subject.title.toLowerCase().trim();
+          const matched = existingProfiles.find(
+            (p) => {
+              const pName = p.name ? p.name.toLowerCase().trim() : '';
+              return pName === cleanName || pName.startsWith(cleanName) || cleanName.startsWith(pName);
+            }
+          );
+          return {
+            ...subject,
+            existingEntityId: matched ? matched.entity_id : null,
+            isDuplicate: !!matched,
+          };
+        });
+
+        const overlaps = findSpatialTemporalOverlaps(deduplicatedSubjects, { maxDistanceMeters: 10000 });
+
+        type EnrichmentFailure = { readonly id: string; readonly error: string };
+        type RelationFailure = {
+          readonly subjectAId: string;
+          readonly subjectBId: string;
+          readonly error: string;
+        };
+        const enrichedCandidates: Array<EnrichedCandidate | EnrichmentFailure> = [];
+        const adjudicatedRelations: Array<AdjudicatedRelationship | RelationFailure> = [];
+
+        if (flags.booleans.has('--enrich')) {
+          const providerName = (optionalFlag(flags, '--provider') ?? 'mock') as
+            'mock' | 'openrouter' | 'ollama' | 'hybrid';
+          const model = optionalFlag(flags, '--model');
+          const ollamaModel = optionalFlag(flags, '--ollama-model');
+
+          const provider = createLlmProvider({
+            provider: providerName,
+            ...(model !== undefined ? { model } : {}),
+            ...(ollamaModel !== undefined ? { ollamaModel } : {}),
+          });
+
+          const bridgeClient: EnrichmentBridgeClient = {
+            complete: async (prompt: string) => {
+              const res = await provider.complete({
+                model: model ?? 'mock-enrichment',
+                messages: [{ role: 'user', content: prompt }],
+              });
+              return res.content;
+            },
+          };
+
+          for (const subject of deduplicatedSubjects) {
+            try {
+              const candidate = await enrichSubjectCandidate(subject, bridgeClient, theme, metro);
+              enrichedCandidates.push(candidate);
+            } catch (err) {
+              enrichedCandidates.push({ id: subject.id, error: String(err) });
+            }
+          }
+
+          for (const overlap of overlaps) {
+            try {
+              const relation = await adjudicateRelationship(overlap, bridgeClient, theme, metro);
+              adjudicatedRelations.push(relation);
+            } catch (err) {
+              adjudicatedRelations.push({
+                subjectAId: overlap.subjectA.id,
+                subjectBId: overlap.subjectB.id,
+                error: String(err),
+              });
+            }
+          }
+        }
+
+        const result = {
+          theme,
+          metro,
+          connectorList,
+          rawSubjectsCount: deduplicatedSubjects.length,
+          rawSubjects: deduplicatedSubjects,
+          overlapsCount: overlaps.length,
+          overlaps,
+          ...(flags.booleans.has('--enrich')
+            ? { enrichedCandidates, adjudicatedRelations }
+            : {}),
+        };
+
+        stdout(JSON.stringify(result, null, 2));
+        return 0;
+      }
       case 'locate': {
         const storedLat = optionalFlag(flags, '--stored-lat');
         const storedLng = optionalFlag(flags, '--stored-lng');
@@ -986,7 +1201,8 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
       }
       default: {
         stderr(
-          'Usage: operator-cli <preflight|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|sundown-town-brief|locate> [flags]',
+          'Usage: operator-cli <preflight|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|sundown-town-brief|harness-run|locate> [flags]\n' +
+          'For harness-run: --theme <theme> --metro <metro> [--connectors dpla,nps_network_to_freedom,web_search] [--enrich] [--provider openrouter|ollama|mock]\n'
         );
         return command ? 1 : 0;
       }

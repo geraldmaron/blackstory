@@ -33,7 +33,7 @@ export function HistoryDidYouKnow({
         From the archive
       </h3>
       <p className="ds-mono ds-history-dyk__lede">
-        Evidence-backed framings — obscure where the record allows, never spectacle.
+        Evidence-backed framings: obscure where the record allows, never spectacle.
       </p>
       <ul className="ds-history-dyk__list">
         {selected.map((fact) => (

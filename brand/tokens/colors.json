@@ -1,8 +1,12 @@
 {
-  "ebonyInk": "#111111",
-  "archivePaper": "#F7F3EE",
-  "sand": "#E7D9C3",
-  "bronze": "#B87333",
-  "mahogany": "#7A2E22",
-  "copperPin": "#D47A42"
+  "blackInk": "#0A0A0A",
+  "charcoal": "#161616",
+  "archivePaper": "#F4EFE5",
+  "surface": "#FBF8F2",
+  "copperPin": "#B86B2A",
+  "copperTextLight": "#8E4F2A",
+  "copperTextDark": "#D07A32",
+  "pageSand": "#D8A178",
+  "stone": "#6D675F",
+  "rule": "#D7D0C4"
 }

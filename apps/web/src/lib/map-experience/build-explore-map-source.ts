@@ -12,6 +12,7 @@
  * render as polygon geometry, never as a point.
  */
 import { redactLocationForPublic } from '@repo/security/redaction';
+import { sanitizePublicProseText } from '@repo/domain/editorial';
 import {
   buildMapSource,
   type MapCountyAggregate,
@@ -22,8 +23,9 @@ import {
 import type { GeoPrecisionTier } from '@repo/domain/geography/display-radius';
 import type { PublicClaimView, PublicEntityView } from '../../data/public-seed';
 import { geoAnchorFor as defaultGeoAnchorFor, type EntityGeoAnchor } from './entity-geo';
+import { resolveEntityEraBuckets } from './entity-era-facts';
 import { geoPrecisionTierForPublicPrecision, resolveDisplayRadiusMeters } from './geo-precision';
-import { displayEncodingFor, resolveMapTone } from './kind-encoding';
+import { displayEncodingFor, kindFamilyFor, resolveMapTone } from './kind-encoding';
 
 export type ConfidenceTier = 'high' | 'medium' | 'low' | 'unrated';
 
@@ -68,6 +70,8 @@ export type ExploreMapFeatureProperties = {
   readonly shade: string;
   /** Denormalized glyph identity from `displayEncodingFor` (WCAG non-color channel). */
   readonly glyph: string;
+  /** Five-family bucket — same grouping as map shade and Kind filter facet. */
+  readonly kindFamily: string;
   readonly stateFips?: string;
   readonly statePostalCode?: string;
   readonly stateName?: string;
@@ -213,6 +217,12 @@ function enrichFeature(feature: MapPointFeature, entity: PublicEntityView): Expl
     displayName: entity.displayName,
   });
   const encoding = displayEncodingFor(feature.properties.kind, mapTone);
+  const eraBuckets = resolveEntityEraBuckets({
+    ...(entity.eraBuckets !== undefined ? { eraBuckets: entity.eraBuckets } : {}),
+    ...(entity.era !== undefined ? { era: entity.era } : {}),
+    ...(entity.eventWindow !== undefined ? { eventWindow: entity.eventWindow } : {}),
+    ...(entity.statusHistory !== undefined ? { statusHistory: entity.statusHistory } : {}),
+  });
 
   return {
     type: 'Feature',
@@ -223,11 +233,11 @@ function enrichFeature(feature: MapPointFeature, entity: PublicEntityView): Expl
       href: `/entity/${entity.id}`,
       kind: feature.properties.kind,
       displayName: feature.properties.displayName,
-      oneLineStory: entity.summary,
+      oneLineStory: sanitizePublicProseText(entity.summary),
       precision: feature.properties.precision,
       geoPrecisionTier: tier,
       ...(radius.ok ? { radiusMeters: radius.radiusMeters } : {}),
-      eraBuckets: entity.eraBuckets ?? [],
+      eraBuckets,
       ...(entity.status !== undefined ? { status: entity.status } : {}),
       notabilityLabels: entity.notabilityLabels ?? [],
       evidenceCount: entity.claims.length,
@@ -237,6 +247,7 @@ function enrichFeature(feature: MapPointFeature, entity: PublicEntityView): Expl
       ...(mapTone !== undefined ? { mapTone } : {}),
       shade: encoding.shade,
       glyph: encoding.glyph,
+      kindFamily: kindFamilyFor(feature.properties.kind),
       ...(feature.properties.stateFips ? { stateFips: feature.properties.stateFips } : {}),
       ...(feature.properties.statePostalCode
         ? { statePostalCode: feature.properties.statePostalCode }

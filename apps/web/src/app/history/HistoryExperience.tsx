@@ -28,7 +28,8 @@ import { buildHistoryHref, type HistoryViewState } from '../../lib/history/url-s
 import { HISTORY_DECADE_FRAMING, HISTORY_DIGNITY_FRAMING } from '../../lib/history/copy';
 import { HISTORY_DEGRADED_MODE_COPY } from '../../lib/history/snapshot-mode';
 import { kindEncodingFor } from '../../lib/map-experience/kind-encoding';
-import type { HistoryViewModel } from './history-view-model';
+import type { HistoryViewModel } from '../../lib/history/history-view-model.types';
+import { historyEditionPanelClassName } from './history-panel-chrome';
 
 export type HistoryExperienceProps = {
   readonly initial: HistoryViewModel;
@@ -98,6 +99,7 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
     (next: HistoryViewState) => {
       startTransition(() => {
         router.replace(buildHistoryHref(next), { scroll: false });
+        router.refresh();
       });
     },
     [router],
@@ -194,6 +196,14 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
     [applyFilters, view.facetOptions.status],
   );
 
+  const handleEraChange = useCallback(
+    (era: string) => {
+      const valid = view.facetOptions.era.some((option) => option.value === era);
+      applyFilters({ era: valid ? era : 'all' });
+    },
+    [applyFilters, view.facetOptions.era],
+  );
+
   const handleTopicChange = useCallback(
     (topic: string) => {
       const valid = view.facetOptions.topic.some((option) => option.value === topic);
@@ -238,16 +248,27 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
       kind: DEFAULT_HISTORY_FILTERS.kind,
       sort: DEFAULT_HISTORY_FILTERS.sort,
       status: DEFAULT_HISTORY_FILTERS.status,
+      era: DEFAULT_HISTORY_FILTERS.era,
       topic: DEFAULT_HISTORY_FILTERS.topic,
       connections: DEFAULT_HISTORY_FILTERS.connections,
     });
   }, [applyFilters]);
+
+  useEffect(() => {
+    const trimmed = queryDraft.trim();
+    if (trimmed === view.viewState.filters.q) return undefined;
+    const timer = window.setTimeout(() => {
+      applyFilters({ q: trimmed });
+    }, 400);
+    return () => window.clearTimeout(timer);
+  }, [applyFilters, queryDraft, view.viewState.filters.q]);
 
   const hasActiveFilters =
     view.viewState.filters.q.length > 0 ||
     view.viewState.filters.kind !== DEFAULT_HISTORY_FILTERS.kind ||
     view.viewState.filters.sort !== DEFAULT_HISTORY_FILTERS.sort ||
     view.viewState.filters.status !== DEFAULT_HISTORY_FILTERS.status ||
+    view.viewState.filters.era !== DEFAULT_HISTORY_FILTERS.era ||
     view.viewState.filters.topic !== DEFAULT_HISTORY_FILTERS.topic ||
     view.viewState.filters.connections !== DEFAULT_HISTORY_FILTERS.connections;
 
@@ -277,173 +298,206 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
         </Notice>
       ) : null}
 
-      <div className="ds-history__stepper-sticky">
-        <DecadeStepper
-          decades={view.availableDecades}
-          viewState={view.viewState}
-          onSelect={handleDecadeSelect}
-        />
-      </div>
-
-      <HistoryOverviewStrip
-        overview={view.overview}
-        {...(view.activeDecade ? { activeDecade: view.activeDecade } : {})}
-      />
-
-      <div className="ds-history__toolbar">
-        <form className="ds-history__search" onSubmit={handleQuerySubmit} role="search">
-          <label className="ds-history__search-label" htmlFor="history-q">
-            Search records
-          </label>
-          <input
-            className="ds-history__search-input"
-            id="history-q"
-            name="q"
-            type="search"
-            value={queryDraft}
-            onChange={(event) => setQueryDraft(event.currentTarget.value)}
-            placeholder="Search by name or summary"
-            autoComplete="off"
+      <article className={historyEditionPanelClassName('timeline')}>
+        <p className="ds-history-edition__panel-title">Timeline</p>
+        <div className="ds-history-edition__stepper-sticky">
+          <DecadeStepper
+            decades={view.availableDecades}
+            viewState={view.viewState}
+            onSelect={handleDecadeSelect}
           />
-          <button className="ds-button ds-button--secondary" type="submit">
-            Search
-          </button>
-        </form>
+        </div>
+        <HistoryOverviewStrip
+          overview={view.overview}
+          {...(view.activeDecade ? { activeDecade: view.activeDecade } : {})}
+        />
+      </article>
 
-        <fieldset className="ds-history-kind-chips" role="radiogroup" aria-label="Kind">
-          <legend className="ds-history-kind-chips__legend">Kind</legend>
-          {view.facetOptions.kind.map((option) => {
-            const isActive = view.viewState.filters.kind === option.value;
-            const encoding = option.value === 'all' ? undefined : kindEncodingFor(option.value);
-            return (
-              <button
-                key={option.value}
-                type="button"
-                className={cx(
-                  'ds-history-kind-chips__chip',
-                  isActive && 'ds-history-kind-chips__chip--active',
-                )}
-                role="radio"
-                aria-checked={isActive}
-                onClick={() => handleKindChange(option.value)}
+      <article className={historyEditionPanelClassName('instruments')}>
+        <p className="ds-history-edition__panel-title">Refine view</p>
+        <div className="ds-history__toolbar">
+          <form className="ds-history__search" onSubmit={handleQuerySubmit} role="search">
+            <label className="ds-history__search-label" htmlFor="history-q">
+              Search records
+            </label>
+            <input
+              className="ds-history__search-input"
+              id="history-q"
+              name="q"
+              type="search"
+              value={queryDraft}
+              onChange={(event) => setQueryDraft(event.currentTarget.value)}
+              placeholder="Search by name or summary"
+              autoComplete="off"
+            />
+            <button className="ds-button ds-button--secondary" type="submit">
+              Search
+            </button>
+          </form>
+
+          <fieldset className="ds-history-kind-chips" role="radiogroup" aria-label="Kind">
+            <legend className="ds-history-kind-chips__legend">Kind</legend>
+            {view.facetOptions.kind.map((option) => {
+              const isActive = view.viewState.filters.kind === option.value;
+              const encoding = option.value === 'all' ? undefined : kindEncodingFor(option.value);
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  className={cx(
+                    'ds-history-kind-chips__chip',
+                    isActive && 'ds-history-kind-chips__chip--active',
+                  )}
+                  role="radio"
+                  aria-checked={isActive}
+                  onClick={() => handleKindChange(option.value)}
+                >
+                  {encoding ? (
+                    <span
+                      className={cx(
+                        'ds-legend-glyph',
+                        `ds-legend-glyph--${encoding.glyph}`,
+                        'ds-history-kind-chips__glyph',
+                      )}
+                      style={
+                        encoding.glyph === 'ring'
+                          ? { borderColor: encoding.shade, background: 'transparent' }
+                          : { background: encoding.shade, borderColor: encoding.shade }
+                      }
+                      aria-hidden="true"
+                    />
+                  ) : null}
+                  {formatFacetOptionLabel(option)}
+                </button>
+              );
+            })}
+          </fieldset>
+
+          <div className="ds-history-edition__facets">
+            <div className="ds-history-edition__facet">
+              <label className="ds-history-edition__facet-label" htmlFor="history-status">
+                Status
+              </label>
+              <select
+                className="ds-pill-select__control"
+                id="history-status"
+                value={view.viewState.filters.status}
+                onChange={(event) => handleStatusChange(event.currentTarget.value)}
               >
-                {encoding ? (
-                  <span
-                    className={cx(
-                      'ds-legend-glyph',
-                      `ds-legend-glyph--${encoding.glyph}`,
-                      'ds-history-kind-chips__glyph',
-                    )}
-                    style={
-                      encoding.glyph === 'ring'
-                        ? { borderColor: encoding.shade, background: 'transparent' }
-                        : { background: encoding.shade, borderColor: encoding.shade }
-                    }
-                    aria-hidden="true"
-                  />
-                ) : null}
-                {formatFacetOptionLabel(option)}
-              </button>
-            );
-          })}
-        </fieldset>
+                {view.facetOptions.status.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {formatFacetOptionLabel(option)}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        <label className="ds-pill-select" htmlFor="history-status">
-          <span className="ds-pill-select__label">Status</span>
-          <select
-            className="ds-pill-select__control"
-            id="history-status"
-            value={view.viewState.filters.status}
-            onChange={(event) => handleStatusChange(event.currentTarget.value)}
-          >
-            {view.facetOptions.status.map((option) => (
-              <option key={option.value} value={option.value}>
-                {formatFacetOptionLabel(option)}
-              </option>
-            ))}
-          </select>
-        </label>
+            <div className="ds-history-edition__facet">
+              <label className="ds-history-edition__facet-label" htmlFor="history-era">
+                Era
+              </label>
+              <select
+                className="ds-pill-select__control"
+                id="history-era"
+                value={view.viewState.filters.era}
+                onChange={(event) => handleEraChange(event.currentTarget.value)}
+              >
+                {view.facetOptions.era.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {formatFacetOptionLabel(option)}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        <label className="ds-pill-select" htmlFor="history-topic">
-          <span className="ds-pill-select__label">Topic</span>
-          <select
-            className="ds-pill-select__control"
-            id="history-topic"
-            value={view.viewState.filters.topic}
-            onChange={(event) => handleTopicChange(event.currentTarget.value)}
-          >
-            {view.facetOptions.topic.map((option) => (
-              <option key={option.value} value={option.value}>
-                {formatFacetOptionLabel(option)}
-              </option>
-            ))}
-          </select>
-        </label>
+            <div className="ds-history-edition__facet">
+              <label className="ds-history-edition__facet-label" htmlFor="history-topic">
+                Topic
+              </label>
+              <select
+                className="ds-pill-select__control"
+                id="history-topic"
+                value={view.viewState.filters.topic}
+                onChange={(event) => handleTopicChange(event.currentTarget.value)}
+              >
+                {view.facetOptions.topic.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {formatFacetOptionLabel(option)}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        <label className="ds-pill-select" htmlFor="history-connections">
-          <span className="ds-pill-select__label">Connections</span>
-          <select
-            className="ds-pill-select__control"
-            id="history-connections"
-            value={view.viewState.filters.connections}
-            onChange={(event) => handleConnectionsChange(event.currentTarget.value)}
-          >
-            {HISTORY_CONNECTIONS_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
+            <div className="ds-history-edition__facet">
+              <label className="ds-history-edition__facet-label" htmlFor="history-connections">
+                Connections
+              </label>
+              <select
+                className="ds-pill-select__control"
+                id="history-connections"
+                value={view.viewState.filters.connections}
+                onChange={(event) => handleConnectionsChange(event.currentTarget.value)}
+              >
+                {HISTORY_CONNECTIONS_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        <label className="ds-pill-select" htmlFor="history-sort">
-          <span className="ds-pill-select__label">Sort</span>
-          <select
-            className="ds-pill-select__control"
-            id="history-sort"
-            value={view.viewState.filters.sort}
-            onChange={(event) => handleSortChange(event.currentTarget.value)}
-          >
-            {HISTORY_SORT_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
+            <div className="ds-history-edition__facet">
+              <label className="ds-history-edition__facet-label" htmlFor="history-sort">
+                Sort
+              </label>
+              <select
+                className="ds-pill-select__control"
+                id="history-sort"
+                value={view.viewState.filters.sort}
+                onChange={(event) => handleSortChange(event.currentTarget.value)}
+              >
+                {HISTORY_SORT_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
 
-        {hasActiveFilters ? (
-          <button
-            className="ds-button ds-button--secondary"
-            type="button"
-            onClick={handleClearFilters}
-          >
-            Clear
-          </button>
-        ) : null}
+          {hasActiveFilters ? (
+            <button
+              className="ds-button ds-button--secondary"
+              type="button"
+              onClick={handleClearFilters}
+            >
+              Clear filters
+            </button>
+          ) : null}
 
-        <p className="ds-sans ds-history__count">
-          {view.totalMatched} record{view.totalMatched === 1 ? '' : 's'} in view
-          {view.viewState.mode === 'decade' && view.activeDecade
-            ? ` · ${view.activeDecade}`
-            : ' · all time'}
-        </p>
+          <p className="ds-sans ds-history__count">
+            {view.totalMatched} record{view.totalMatched === 1 ? '' : 's'} in view
+            {view.viewState.mode === 'decade' && view.activeDecade
+              ? ` · ${view.activeDecade}`
+              : ' · all time'}
+          </p>
 
-        <p className="ds-history__release-meta" aria-label="Release metadata">
-          Release {view.releaseId}
-        </p>
-      </div>
+          <p className="ds-history__release-meta" aria-label="Release metadata">
+            Release {view.releaseId}
+          </p>
+        </div>
+      </article>
 
-      <div className="ds-history__layout">
-        <div className="ds-history-graph-panel">
-          <h2 className="ds-section__kicker" id="history-graph-heading">
-            Records &amp; connections
+      <div className="ds-history-edition__layout">
+        <article className={historyEditionPanelClassName('composition')}>
+          <h2 className="ds-history-edition__panel-title" id="history-graph-heading">
+            Composition &amp; connections
           </h2>
           <HistoryGraphPanel {...graphProps} activeKind={view.viewState.filters.kind} />
-        </div>
+        </article>
 
-        <div className="ds-history__list-panel">
-          <h2 className="ds-section__kicker" id="history-results-heading">
+        <article className={historyEditionPanelClassName('records')}>
+          <h2 className="ds-history-edition__panel-title" id="history-results-heading">
             Records in view
           </h2>
           {selectedNode ? (
@@ -455,13 +509,15 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
           ) : null}
           {selectedEdge ? <HistoryEdgePanel edge={selectedEdge} onClose={handleCloseEdge} /> : null}
           <HistoryResultList {...listProps} />
-        </div>
+        </article>
       </div>
 
-      <p className="ds-history__framing">{HISTORY_DIGNITY_FRAMING}</p>
-      {view.viewState.mode === 'decade' ? (
-        <p className="ds-history__framing">{HISTORY_DECADE_FRAMING}</p>
-      ) : null}
+      <div className="ds-history-edition__footnotes">
+        <p className="ds-history__framing">{HISTORY_DIGNITY_FRAMING}</p>
+        {view.viewState.mode === 'decade' ? (
+          <p className="ds-history__framing">{HISTORY_DECADE_FRAMING}</p>
+        ) : null}
+      </div>
 
       <span hidden data-history-degraded-hook="" onFocus={() => setDegradedReason(null)} />
     </div>

@@ -45,6 +45,38 @@ export const US_BOUNDS: readonly [number, number, number, number] = [-124.8, 24.
 
 export const US_BBOX: Bbox = { west: -124.8, south: 24.4, east: -66.9, north: 49.4 };
 
+/**
+ * Floor zoom so the camera cannot pull back to a free-world view that maxBounds
+ * alone (center-clamp) would still allow. Mirrors the national preset (~3.2).
+ */
+export const MAP_MIN_ZOOM = 3;
+
+/**
+ * Degrees of padding beyond `US_BOUNDS` for `Camera.maxBounds`. MapLibre clamps
+ * the *center* inside maxBounds; a small pad keeps CONUS framing usable without
+ * allowing free pan into distant ocean / Mexico.
+ */
+export const US_CAMERA_BOUNDS_PAD_DEG = 1.2;
+
+/**
+ * Expands a `[west, south, east, north]` envelope by `padDeg` on each side.
+ * Pure helper — never invents a coordinate that is not a padded corner of input.
+ */
+export function padBounds(
+  bounds: readonly [number, number, number, number],
+  padDeg: number,
+): readonly [number, number, number, number] {
+  const pad = Number.isFinite(padDeg) ? Math.max(0, padDeg) : 0;
+  const [west, south, east, north] = bounds;
+  return [west - pad, south - pad, east + pad, north + pad];
+}
+
+/** CONUS (+ slight pad) envelope passed to MapLibre `Camera.maxBounds`. */
+export const US_CAMERA_MAX_BOUNDS: readonly [number, number, number, number] = padBounds(
+  US_BOUNDS,
+  US_CAMERA_BOUNDS_PAD_DEG,
+);
+
 /** True when `lngLat` falls inside `bbox` (inclusive). US-only; antimeridian is not modeled. */
 export function isInBounds(lngLat: LngLat, bbox: Bbox): boolean {
   const [lng, lat] = lngLat;

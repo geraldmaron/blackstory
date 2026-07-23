@@ -12,7 +12,7 @@
  * the lookup. It is pre-filled (best effort) from SecureStore, not from a URL.
  */
 import { useEffect, useMemo, useState } from 'react';
-import { View } from 'react-native';
+import { KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 
 import {
   CorrectionStatusView,
@@ -22,6 +22,7 @@ import {
   type CorrectionClientDeps,
   type StatusResult,
 } from '@/features/corrections';
+import { UtilityScreenShell } from '@/ui';
 
 export default function CorrectionsStatusScreen() {
   const depsPromise = useMemo(() => createCorrectionClientDeps(), []);
@@ -49,8 +50,31 @@ export default function CorrectionsStatusScreen() {
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <CorrectionStatusView initialCode={initialCode} onLookup={handleLookup} />
-    </View>
+    <KeyboardAvoidingView
+      style={styles.flex}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <UtilityScreenShell
+        kicker="Trust"
+        title="Correction status"
+        dek="Enter the receipt code you saved when you submitted a correction."
+        edges={SHELL_EDGES}
+        scrollProps={UTILITY_SCROLL_PROPS}
+      >
+        <CorrectionStatusView initialCode={initialCode} onLookup={handleLookup} />
+      </UtilityScreenShell>
+    </KeyboardAvoidingView>
   );
 }
+
+/** Header-bearing stack screen: the native header owns the top inset. */
+const SHELL_EDGES = ['left', 'right', 'bottom'] as const;
+
+const UTILITY_SCROLL_PROPS = {
+  keyboardShouldPersistTaps: 'handled' as const,
+  keyboardDismissMode: 'on-drag' as const,
+};
+
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+});

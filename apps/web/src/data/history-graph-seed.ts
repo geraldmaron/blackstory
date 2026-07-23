@@ -11,8 +11,8 @@ import {
   type DecadeBucketEntityInput,
   type GraphReleaseArtifact,
 } from '@repo/domain';
-import { SEED_ENTITY_RELATIONSHIPS } from './entity-graph-seed';
 import { listPublicEntities, type PublicEntityView } from './public-seed';
+import { resolveHistoryRelationships } from '../lib/history/resolve-history-relationships';
 
 export const HISTORY_GRAPH_RELEASE_ID = 'seed-snapshot';
 export const HISTORY_GRAPH_GENERATED_AT = '2026-07-17T00:00:00.000Z';
@@ -78,16 +78,22 @@ function catalogCacheKey(entities: readonly PublicEntityView[]): string {
 
 const artifactCache = new Map<string, GraphReleaseArtifact>();
 
+export type HistoryGraphReleaseOptions = {
+  readonly releaseId?: string;
+  readonly generatedAt?: string;
+};
+
 /** Builds a graph release artifact from the injected public entity catalog. */
 export function buildHistoryGraphReleaseArtifact(
   entities: readonly PublicEntityView[],
+  options: HistoryGraphReleaseOptions = {},
 ): GraphReleaseArtifact {
   return buildGraphReleaseArtifact({
-    releaseId: HISTORY_GRAPH_RELEASE_ID,
-    generatedAt: HISTORY_GRAPH_GENERATED_AT,
+    releaseId: options.releaseId ?? HISTORY_GRAPH_RELEASE_ID,
+    generatedAt: options.generatedAt ?? HISTORY_GRAPH_GENERATED_AT,
     entityIds: entities.map((entity) => entity.id),
     entities: decadeBucketInputs(entities),
-    relationships: [...SEED_ENTITY_RELATIONSHIPS],
+    relationships: [...resolveHistoryRelationships(entities, HISTORY_GRAPH_GENERATED_AT)],
   });
 }
 
@@ -97,11 +103,13 @@ export function buildHistoryGraphReleaseArtifact(
  */
 export function getHistoryGraphReleaseArtifact(
   entities: readonly PublicEntityView[] = listPublicEntities(),
+  options: HistoryGraphReleaseOptions = {},
 ): GraphReleaseArtifact {
-  const cacheKey = catalogCacheKey(entities);
+  const releaseId = options.releaseId ?? HISTORY_GRAPH_RELEASE_ID;
+  const cacheKey = `${releaseId}\0${catalogCacheKey(entities)}`;
   const cached = artifactCache.get(cacheKey);
   if (cached) return cached;
-  const artifact = buildHistoryGraphReleaseArtifact(entities);
+  const artifact = buildHistoryGraphReleaseArtifact(entities, { ...options, releaseId });
   artifactCache.set(cacheKey, artifact);
   return artifact;
 }

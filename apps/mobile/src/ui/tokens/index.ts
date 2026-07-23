@@ -2,8 +2,12 @@
  * Hand-written barrel + theme resolution over the generated brand tokens.
  * This file is NOT generated — it is safe to edit. The generated/*.ts files
  * it re-exports are not (see their headers).
+ *
+ * Theme resolution follows the web bootstrap: explicit OS light/dark when
+ * available; Archive Paper (light) when the scheme is null or unspecified.
  */
-import { useColorScheme } from 'react-native';
+import { useColorScheme, type ColorSchemeName } from 'react-native';
+import type { ViewStyle } from 'react-native';
 import {
   brandCore,
   confidenceColors,
@@ -28,6 +32,7 @@ import {
   type TypeScaleRole,
 } from './generated/typography.generated';
 import { logoConstraints } from './generated/logo.generated';
+import { getShadowStyle, type ShadowLevel } from './elevation';
 
 export {
   brandCore,
@@ -42,8 +47,10 @@ export {
   fontFamilies,
   typeScale,
   logoConstraints,
+  getShadowStyle,
 };
 export type {
+  ShadowLevel,
   ConfidenceLevel,
   StatusName,
   ThemeName,
@@ -54,10 +61,41 @@ export type {
   TypeScaleRole,
 };
 
-/** Resolves the active theme's role palette from the system color scheme. Defaults to light. */
+/**
+ * Minimum interactive target size in dp (Apple HIG 44pt / Material 48dp floor).
+ * Single source of truth — do not re-declare `MIN_TOUCH` / `MIN_ROW_HEIGHT` locally.
+ */
+export const MIN_TOUCH_TARGET = 44;
+
+/**
+ * Shared stacking order for map-adjacent overlays. Keeps sheet/chrome/attribution
+ * layering decided in one place instead of scattered magic `zIndex` numbers.
+ */
+export const Z_LAYER = {
+  mapAttribution: 1,
+  sheet: 2,
+  mapChrome: 3,
+  overlay: 4,
+} as const;
+
+/**
+ * Resolves theme from an OS color scheme value. Matches web bootstrap:
+ * explicit `light` / `dark` when set; Archive Paper (light) when null or
+ * unspecified — no v5 dark-cockpit default outside the map plate (ADR-013).
+ */
+export function resolveThemeName(scheme: ColorSchemeName | null | undefined): ThemeName {
+  if (scheme === 'dark') return 'dark';
+  return 'light';
+}
+
+/** Resolves the active theme name from the system color scheme. */
 export function useThemeName(): ThemeName {
-  const scheme = useColorScheme();
-  return scheme === 'dark' ? 'dark' : 'light';
+  return resolveThemeName(useColorScheme());
+}
+
+/** Shadow style for the active theme — default to `none` (flat matte). */
+export function useShadowStyle(level: ShadowLevel): ViewStyle {
+  return getShadowStyle(level, useThemeName());
 }
 
 /** Resolves the full semantic color-role palette for the active color scheme. */

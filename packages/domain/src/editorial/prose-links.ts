@@ -40,6 +40,26 @@ export function stripProseEntityLinks(text: string): string {
   });
 }
 
+/**
+ * Public plain-text sanitizer for search cards, claims, metadata, and map copy.
+ * Prefer this (or `@repo/domain/editorial`) over the publication barrel so web
+ * surfaces never pull `node:crypto` via `publication/index`.
+ */
+export function sanitizePublicProseText(text: string): string {
+  if (!text.includes('[[')) {
+    return text;
+  }
+  return stripProseEntityLinks(text);
+}
+
+/** Sanitizes optional prose fields for plain-text public surfaces. */
+export function sanitizePublicProseField(text: string | undefined): string | undefined {
+  if (text === undefined) {
+    return undefined;
+  }
+  return sanitizePublicProseText(text);
+}
+
 /** Serializes one ref back to editorial markup. */
 export function serializeProseEntityLink(ref: ProseEntityRef): string {
   const entityId = ref.entityId.trim();

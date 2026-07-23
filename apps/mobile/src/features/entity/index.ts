@@ -12,4 +12,5 @@ export {
   type EntityFreshness,
 } from './dataClient';
 export { normalizeEntity } from './normalize';
+export { shareEntity, type ShareResult } from './share';
 export type { Entity } from './types';

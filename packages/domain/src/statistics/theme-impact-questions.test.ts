@@ -12,10 +12,10 @@ import {
   summarizeThemeImpactCatalog,
 } from './theme-impact-questions.js';
 
-test('theme-impact catalog has ten unique questions and valid Phase 1 bindings', () => {
+test('theme-impact catalog has twelve unique questions and valid Phase 1 bindings', () => {
   const ids = THEME_IMPACT_QUESTIONS.map((row) => row.id);
-  assert.equal(ids.length, 10);
-  assert.equal(new Set(ids).size, 10);
+  assert.equal(ids.length, 12);
+  assert.equal(new Set(ids).size, 12);
   assertThemeImpactPhase1BindingsValid();
 });
 
@@ -40,9 +40,11 @@ test('Q3 resolves Phase 1 housing and wealth metrics', () => {
 
 test('summarizeThemeImpactCatalog and v1 allowlist are non-empty', () => {
   const summary = summarizeThemeImpactCatalog();
-  assert.equal(summary.questionCount, 10);
+  assert.equal(summary.questionCount, 12);
   assert.equal(summary.p0Count, 6);
   assert.ok(summary.themes.includes('redlining'));
+  assert.ok(summary.themes.includes('school_segregation'));
+  assert.ok(summary.themes.includes('voting_rights'));
   assert.ok(THEME_IMPACT_V1_SOURCE_ALLOWLIST.includes('mapping-inequality-holc'));
   assert.ok(THEME_IMPACT_V1_SOURCE_ALLOWLIST.includes('hud-chas'));
 });

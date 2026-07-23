@@ -19,6 +19,16 @@ coverage/
 .turbo/
 .cache/
 
+# Downloaded GitHub Actions / security workflow artifacts (never commit)
+# Patterns match `gh run download` / artifact names like codeql-*-<sha>/
+/codeql-*/
+/dependency-review-*/
+/secret-scan-*/
+/sbom-*/
+/security-policy-api-*/
+/gitleaks-results.sarif/
+*.sarif
+
 # Env / secrets
 .env
 .env.*

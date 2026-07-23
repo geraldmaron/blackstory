@@ -138,6 +138,41 @@ paths:
           $ref: '#/components/responses/ClientVersionUnsupported'
         '429':
           $ref: '#/components/responses/RateLimited'
+  /v1/map:
+    get:
+      operationId: getMapSource
+      tags: [corpus]
+      summary: Release-coupled redacted map FeatureCollection
+      description: |
+        Flat GeoJSON point features for Explore (ADR-025). Coordinates are already
+        redacted public-precision anchors — never raw residential addresses.
+        Bounded to 20_000 features (`MapSourceV1`). Static read (`entityRetrieval` quota).
+      parameters:
+        - $ref: '#/components/parameters/XBlackStoryClient'
+        - $ref: '#/components/parameters/IfNoneMatch'
+      responses:
+        '200':
+          description: Redacted map source for the active release
+          headers:
+            Cache-Control:
+              schema: { type: string, example: 'public, max-age=60, stale-while-revalidate=300' }
+            ETag:
+              schema: { type: string }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MapSourceV1'
+              examples:
+                releaseMap:
+                  $ref: '#/components/examples/MapSourceActiveRelease'
+        '304':
+          description: Not modified
+        '426':
+          $ref: '#/components/responses/ClientVersionUnsupported'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/UpstreamUnavailable'
   /v1/search:
     get:
       operationId: search
@@ -305,6 +340,64 @@ components:
         totalMatched: { type: integer, minimum: 0 }
         hasMore: { type: boolean }
         nextCursor: { type: string }
+    MapSourceV1:
+      type: object
+      required: [releaseId, features]
+      description: Redacted Explore map FeatureCollection (ADR-025)
+      properties:
+        releaseId: { type: string }
+        features:
+          type: array
+          maxItems: 20000
+          items:
+            type: object
+            required: [type, id, geometry, properties]
+            properties:
+              type: { type: string, enum: [Feature] }
+              id: { type: string }
+              geometry:
+                type: object
+                required: [type, coordinates]
+                properties:
+                  type: { type: string, enum: [Point] }
+                  coordinates:
+                    type: array
+                    minItems: 2
+                    maxItems: 2
+                    items: { type: number }
+              properties:
+                type: object
+                required:
+                  - entityId
+                  - href
+                  - kind
+                  - displayName
+                  - oneLineStory
+                  - precision
+                  - geoPrecisionTier
+                  - eraBuckets
+                  - notabilityLabels
+                  - evidenceCount
+                  - confidenceTier
+                  - topicTags
+                  - shade
+                  - glyph
+                properties:
+                  entityId: { type: string }
+                  href: { type: string }
+                  kind: { type: string }
+                  displayName: { type: string }
+                  oneLineStory: { type: string }
+                  precision: { type: string }
+                  geoPrecisionTier:
+                    type: string
+                    enum: [exact, block, neighborhood, city, unknown]
+                  evidenceCount: { type: integer, minimum: 0 }
+                  confidenceTier:
+                    type: string
+                    enum: [high, medium, low, unrated]
+                  shade: { type: string }
+                  glyph: { type: string }
     PublicApiErrorEnvelope:
       type: object
       required: [error]
@@ -363,6 +456,8 @@ components:
         contentVersion: content_2026_07_19_001
     EntitySchool:
       externalValue: ../fixtures/redacted-response-examples/entity-200.json
+    MapSourceActiveRelease:
+      externalValue: ../fixtures/redacted-response-examples/map-200.json
     SearchDunbar:
       externalValue: ../fixtures/redacted-response-examples/search-200.json
     ErrorNotFound:

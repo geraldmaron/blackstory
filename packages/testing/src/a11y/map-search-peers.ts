@@ -5,10 +5,10 @@
 
 export const MAP_SEARCH_ACCESSIBLE_PEERS = Object.freeze([
   {
-    journey: 'search',
-    component: 'ResultList (@repo/ui)',
-    webPath: 'packages/ui/src/components/ResultList.tsx',
-    contract: 'Server-rendered result list with labelledBy for screen-reader parity',
+    journey: 'history',
+    component: 'HistoryResultList',
+    webPath: 'apps/web/src/components/history/HistoryResultList.tsx',
+    contract: 'Unified find-in-time result list with labelledBy for screen-reader parity',
   },
   {
     journey: 'explore',
@@ -26,6 +26,6 @@ export const MAP_SEARCH_ACCESSIBLE_PEERS = Object.freeze([
     journey: 'locate',
     component: 'ManualPlaceSearchForm + search fallback link',
     webPath: 'apps/web/src/components/location/ManualPlaceSearchForm.tsx',
-    contract: 'Manual address entry and /search deep link without geolocation',
+    contract: 'Manual address entry and /history deep link without geolocation',
   },
 ] as const);

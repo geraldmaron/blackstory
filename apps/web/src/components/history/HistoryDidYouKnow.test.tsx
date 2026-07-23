@@ -14,9 +14,11 @@ test('HISTORY_DID_YOU_KNOW_FACTS entries are sourced and non-empty', () => {
   for (const fact of HISTORY_DID_YOU_KNOW_FACTS) {
     assert.ok(fact.id.length > 0);
     assert.ok(fact.statement.length > 40, fact.id);
+    assert.doesNotMatch(fact.statement, /—/, fact.id);
     assert.ok(fact.sources.length >= 1, fact.id);
     for (const source of fact.sources) {
       assert.ok(source.label.length > 0, fact.id);
+      assert.doesNotMatch(source.label, /—/, `${fact.id} ${source.label}`);
       assert.match(source.url, /^https:\/\//, `${fact.id} ${source.label}`);
     }
   }
@@ -38,4 +40,5 @@ test('HistoryDidYouKnow renders statements and source footnotes', () => {
   assert.match(html, /From the archive/);
   assert.match(html, /Fort Mose/);
   assert.match(html, /floridastateparks\.org/);
+  assert.doesNotMatch(html, /—/);
 });

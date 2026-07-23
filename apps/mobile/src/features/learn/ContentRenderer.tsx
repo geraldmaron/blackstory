@@ -10,9 +10,9 @@
  * enforced at the type level here, not by a runtime `default:` case rendering raw content.
  *
  * Accessibility (requirement #7):
- *   - Heading hierarchy: page title is level 1 (`variant="title"`), section headings are level 2
- *     (`variant="subtitle"`) — both get `isHeading`/`accessibilityRole="header"` from the `Text`
- *     primitive (MOB-007).
+ *   - Heading hierarchy (Ledger Line): page title is level 1 (`entityTitle` / masthead),
+ *     section headings are level 2 (`rowTitle`) — both get `isHeading`/`accessibilityRole="header"`
+ *     from the `Text` primitive (MOB-007).
  *   - No `numberOfLines` / fixed heights anywhere here, so large Dynamic Type never clips body
  *     text (`Text`'s `allowFontScaling` stays on by default, per its own header comment).
  *   - RTL: no manual `left`/`right` positioning of text content; layout relies on RN's default
@@ -21,11 +21,14 @@
  *   - "Table" semantics for related records: see `RelatedList.tsx`'s header comment.
  */
 import { View } from 'react-native';
-import { Link, Notice, Text } from '@/ui';
+import { Link, Notice, RecordFactStrip, Text, space, useThemeColors } from '@/ui';
+import { plainRangeText } from '../record-facts/record-facts';
 import type { NormalizedBlock, NormalizedPage } from './content-blocks';
 import type { CitationV1 } from './content-types';
 import { sanitizeExternalHref } from './link-safety';
 import { RelatedEntityList, RelatedFactBadges } from './RelatedList';
+
+export type ContentPresentation = 'document' | 'longform';
 
 export interface ContentRendererProps {
   readonly page: NormalizedPage;
@@ -33,11 +36,16 @@ export interface ContentRendererProps {
   readonly skippedSections: number;
   readonly sources?: readonly CitationV1[];
   readonly requiresCitation?: boolean;
+  /** `longform` uses Source Serif body, generous measure, and calm chrome for narrative stories. */
+  readonly presentation?: ContentPresentation;
   /** Freshness affordance (ADR-022 §3 / MOB-015 requirement #8). */
   readonly cached?: { readonly fetchedAt: number; readonly degraded: boolean };
   /** Legal/methodology version-mismatch affordance (MOB-015 requirement #4). */
   readonly versionStale?: boolean;
   readonly onViewCurrent?: () => void;
+  /** When true, title/dek/facts render in the parent edition panel instead. */
+  readonly hideTitle?: boolean;
+  readonly headerFacts?: readonly { readonly key: string; readonly label: string; readonly value: string }[];
 }
 
 function formatRelativeTime(fetchedAtMs: number, nowMs: number = Date.now()): string {
@@ -51,16 +59,36 @@ function formatRelativeTime(fetchedAtMs: number, nowMs: number = Date.now()): st
   return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
 }
 
-function Block({ block }: { readonly block: NormalizedBlock }) {
+function Block({
+  block,
+  presentation,
+}: {
+  readonly block: NormalizedBlock;
+  readonly presentation: ContentPresentation;
+}) {
   if (block.kind === 'heading') {
     return (
-      <Text variant="subtitle" isHeading style={{ marginTop: 16, marginBottom: 4 }}>
+      <Text
+        variant="rowTitle"
+        isHeading
+        style={{
+          marginTop: presentation === 'longform' ? space['5'] : space['4'],
+          marginBottom: presentation === 'longform' ? space['2'] : space['1'],
+        }}
+      >
+        {block.text}
+      </Text>
+    );
+  }
+  if (presentation === 'longform') {
+    return (
+      <Text variant="editorial" style={{ marginBottom: space['4'] }}>
         {block.text}
       </Text>
     );
   }
   return (
-    <Text variant="body" style={{ marginBottom: 12 }}>
+    <Text variant="body" style={{ marginBottom: space['3'] }}>
       {block.text}
     </Text>
   );
@@ -68,14 +96,14 @@ function Block({ block }: { readonly block: NormalizedBlock }) {
 
 function SourcesList({ sources }: { readonly sources: readonly CitationV1[] }) {
   return (
-    <View style={{ marginTop: 16, gap: 4 }} accessible={false}>
-      <Text variant="subtitle" isHeading accessibilityRole="header">
+    <View style={{ marginTop: space['4'], gap: space['1'] }} accessible={false}>
+      <Text variant="sectionLabel" colorRole="inkMuted" isHeading accessibilityRole="header" style={{ letterSpacing: 1, textTransform: 'uppercase' }}>
         Sources
       </Text>
       {sources.map((source, index) => {
         const safeHref = source.href ? sanitizeExternalHref(source.href) : null;
         return (
-          <View key={`${source.source}-${index}`} style={{ marginTop: 4 }}>
+          <View key={`${source.source}-${index}`} style={{ marginTop: space['1'] }}>
             {safeHref ? (
               <Link href={safeHref} accessibilityLabel={`${source.label}, opens ${source.source}`}>
                 {source.label}
@@ -83,7 +111,7 @@ function SourcesList({ sources }: { readonly sources: readonly CitationV1[] }) {
             ) : (
               <Text variant="bodySmall" colorRole="inkMuted">
                 {source.label}
-                {source.withheldReason ? ` — ${source.withheldReason}` : ''}
+                {source.withheldReason ? ` · ${source.withheldReason}` : ''}
               </Text>
             )}
           </View>
@@ -99,29 +127,54 @@ export function ContentRenderer({
   skippedSections,
   sources,
   requiresCitation,
+  presentation = 'document',
   cached,
   versionStale,
   onViewCurrent,
+  hideTitle = false,
+  headerFacts,
 }: ContentRendererProps) {
+  const theme = useThemeColors();
   const hasSources = Boolean(sources && sources.length > 0);
+  const isLongform = presentation === 'longform';
+  const showCacheNotice = cached && (!isLongform || cached.degraded);
+  const facts =
+    headerFacts ??
+    [
+      ...(page.eraLabel
+        ? [{ key: 'era', label: 'Era', value: plainRangeText(page.eraLabel) }]
+        : []),
+      ...(page.placeLabel ? [{ key: 'where', label: 'Where', value: page.placeLabel }] : []),
+    ];
 
   return (
-    <View style={{ gap: 4 }}>
-      <Text variant="title" isHeading>
-        {page.title}
-      </Text>
-      {page.dek ? (
-        <Text variant="bodyEmphasis" colorRole="inkMuted" style={{ marginBottom: 8 }}>
-          {page.dek}
-        </Text>
+    <View style={{ gap: isLongform ? space['2'] : space['1'], maxWidth: isLongform ? 672 : undefined }}>
+      {!hideTitle ? (
+        <>
+          <Text variant="entityTitle" isHeading>
+            {page.title}
+          </Text>
+          {page.dek ? (
+            <Text
+              variant={isLongform ? 'editorial' : 'caption'}
+              colorRole="inkMuted"
+              style={{ marginBottom: isLongform ? space['4'] : space['2'] }}
+            >
+              {page.dek}
+            </Text>
+          ) : null}
+        </>
       ) : null}
-      {page.eraLabel || page.placeLabel ? (
-        <Text variant="bodySmall" colorRole="inkSubtle" style={{ marginBottom: 12 }}>
-          {[page.eraLabel, page.placeLabel].filter(Boolean).join(' · ')}
-        </Text>
+      {facts.length > 0 ? (
+        <RecordFactStrip
+          facts={facts.map((fact) => ({
+            ...fact,
+            value: fact.label === 'Era' ? plainRangeText(fact.value) : fact.value,
+          }))}
+        />
       ) : null}
 
-      {cached ? (
+      {showCacheNotice ? (
         <Notice
           tone="info"
           title={cached.degraded ? 'Showing cached copy (offline)' : 'Up to date'}
@@ -137,9 +190,9 @@ export function ContentRenderer({
         />
       ) : null}
 
-      <View style={{ marginTop: 8 }}>
+      <View style={{ marginTop: space['2'] }}>
         {blocks.map((block, index) => (
-          <Block key={index} block={block} />
+          <Block key={index} block={block} presentation={presentation} />
         ))}
       </View>
 
@@ -155,14 +208,31 @@ export function ContentRenderer({
         <Notice
           tone="dispute"
           title="No cited sources"
-          description="This page has no attached sources — treat its claims as unverified until sources are added."
+          description="This page has no attached sources. Treat its claims as unverified until sources are added."
         />
       ) : null}
 
       {hasSources ? <SourcesList sources={sources!} /> : null}
 
-      <RelatedEntityList entityIds={page.relatedEntityIds} />
-      <RelatedFactBadges factIds={page.relatedFactIds} />
+      {isLongform && (page.relatedEntityIds.length > 0 || page.relatedFactIds.length > 0) ? (
+        <View
+          style={{
+            marginTop: space['6'],
+            paddingTop: space['4'],
+            borderTopWidth: 1,
+            borderTopColor: theme.border,
+            gap: space['4'],
+          }}
+        >
+          <RelatedEntityList entityIds={page.relatedEntityIds} />
+          <RelatedFactBadges factIds={page.relatedFactIds} />
+        </View>
+      ) : (
+        <>
+          <RelatedEntityList entityIds={page.relatedEntityIds} />
+          <RelatedFactBadges factIds={page.relatedFactIds} />
+        </>
+      )}
 
       {versionStale && onViewCurrent ? (
         <Link href="#" onPress={onViewCurrent} accessibilityLabel="View current version">

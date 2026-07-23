@@ -1,14 +1,22 @@
 /**
  * Stories index: longform history narratives pinned to place and evidence.
  *
- * Loads thin list items from the public release story projection (field-masked
- * Firestore / Firebase seed) — title, dek, era, and place only. Full bodies
- * load on the article page. Index chrome is denser than the shared story-rail
- * used on home/entity (see stories.css under `.ds-stories-page`).
+ * v6 edition Surface stack with shared gutter mosaic atmosphere. Thin list items
+ * load from the public release story projection; full bodies load on article pages.
  */
 import Link from 'next/link';
+import { EditionAtmosphereMosaic } from '../../components/patterns/edition-atmosphere/EditionAtmosphereMosaic';
+import {
+  EDITION_MOSAIC_COUNT_BROWSE,
+} from '../../components/patterns/edition-atmosphere/edition-atmosphere-config';
 import { listPublicStoryListItems } from '../../lib/public-data/source';
-import './stories.css';
+import {
+  STORIES_EDITION_MOSAIC_SEED,
+  storiesEditionPanelClassName,
+  storiesEditionRootClassName,
+  storiesEditionStackClassName,
+} from './stories-panel-chrome';
+import './stories-edition.css';
 
 export const metadata = {
   title: 'Stories',
@@ -21,32 +29,58 @@ export default async function StoriesIndexPage() {
   const countLabel = stories.length === 1 ? '1 story' : `${stories.length} stories`;
 
   return (
-    <main className="ds-container ds-page ds-stories-page" id="main">
-      <p className="ds-page__eyebrow">Longform</p>
-      <h1 className="ds-page__title">Stories</h1>
-      <p className="ds-page__lede">
-        History pinned to place and era. Each piece links to the records it rests on, with sources
-        you can open.
-      </p>
+    <div className={storiesEditionRootClassName()} data-stories-edition="v6">
+      <EditionAtmosphereMosaic seedKey={STORIES_EDITION_MOSAIC_SEED} count={EDITION_MOSAIC_COUNT_BROWSE} />
+      <main className="ds-container ds-page" id="main">
+        <div className={storiesEditionStackClassName()}>
+          <article className={storiesEditionPanelClassName('intro')}>
+            <header className="ds-stories-edition__header">
+              <span className="ds-stories-edition__index" aria-hidden="true">
+                00
+              </span>
+              <div>
+                <p className="ds-stories-edition__kicker">Longform</p>
+                <h1 className="ds-stories-edition__title">
+                  History pinned to <em>place</em>.
+                </h1>
+                <p className="ds-stories-edition__lede">
+                  Each piece links to the records it rests on, with sources you can open. Era and
+                  geography stay visible in every entry.
+                </p>
+                <p className="ds-stories-edition__crosslink">
+                  <Link className="ds-cta-link" href="/books">
+                    Banned books catalog
+                  </Link>
+                </p>
+              </div>
+            </header>
+          </article>
 
-      <section className="ds-section ds-section--flush ds-stories-page__list" aria-label="Story list">
-        <p className="ds-sans ds-count-label ds-stories-page__count" id="stories-list-heading">
-          {countLabel}
-        </p>
-        <ul className="ds-story-rail" aria-labelledby="stories-list-heading">
-          {stories.map((story) => (
-            <li key={story.slug}>
-              <Link className="ds-story-link" href={`/stories/${story.slug}`}>
-                <span className="ds-story-link__meta">
-                  {story.eraLabel} · {story.placeLabel}
-                </span>
-                <h2 className="ds-story-link__title">{story.title}</h2>
-                <p className="ds-story-link__summary">{story.dek}</p>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
-    </main>
+          <article
+            className={storiesEditionPanelClassName('catalog')}
+            aria-labelledby="stories-list-heading"
+          >
+            <p className="ds-stories-edition__panel-title">Catalog</p>
+            <h2 className="ds-stories-edition__panel-heading" id="stories-list-heading">
+              Published stories
+            </h2>
+            <p className="ds-stories-edition__count">{countLabel}</p>
+            <ul className="ds-story-rail ds-story-rail--grid">
+              {stories.map((story) => (
+                <li key={story.slug}>
+                  <Link className="ds-story-link" href={`/stories/${story.slug}`}>
+                    <span className="ds-story-link__meta">
+                      {story.eraLabel} · {story.placeLabel}
+                    </span>
+                    <h3 className="ds-story-link__title">{story.title}</h3>
+                    <p className="ds-story-link__summary">{story.dek}</p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </article>
+        </div>
+      </main>
+    </div>
   );
 }

@@ -10,41 +10,116 @@ import type { ExploreMapFeature } from '../../lib/map-experience/build-explore-m
 import { displayEncodingFor } from '../../lib/map-experience/kind-encoding';
 import {
   entityEvidenceHref,
-  eraFactLink,
   exploreHrefForKind,
   searchHrefForStatus,
 } from '../../lib/map-experience/metadata-hrefs';
+import { entityEraFact } from '../../lib/map-experience/entity-era-facts';
 import { exploreWhereMapsLink } from '../../lib/map-experience/explore-where-maps-link';
 import { radiusAffordanceLabel } from '../../lib/map-experience/geo-precision';
+import {
+  RecordAnatomyPanel,
+  type RecordAnatomyFact,
+  type RecordAnatomyPlace,
+} from '../patterns/RecordAnatomyPanel';
+import {
+  RecordBrowseControls,
+  type RecordBrowseControlsProps,
+} from '../patterns/RecordBrowseControls';
 import { ConfidenceMark } from './ConfidenceMark';
 import { KindBadge } from './KindBadge';
 import { StatusMark } from './StatusMark';
-import { MapsExternalLink } from './MapsExternalLink';
-import { EntitySessionNav, type EntitySessionNavProps } from './EntitySessionNav';
 
 // Defensive: apps/web SSR tests may classic-transform this package's TSX source (same note as
 // `@repo/ui`'s own components, e.g. MapExplorer.tsx).
 void React;
 
-export type NarrativeCardSessionNavProps = Omit<
-  EntitySessionNavProps,
-  'className'
->;
+export type NarrativeCardBrowseControlsProps = Omit<RecordBrowseControlsProps, 'className'>;
 
 export type NarrativeCardProps = {
   readonly feature: ExploreMapFeature;
   readonly onClose?: () => void;
-  readonly sessionNav?: NarrativeCardSessionNavProps;
+  readonly browseControls?: NarrativeCardBrowseControlsProps;
 };
 
-export function NarrativeCard({ feature, onClose, sessionNav }: NarrativeCardProps) {
+export function NarrativeCard({ feature, onClose, browseControls }: NarrativeCardProps) {
   const { properties } = feature;
   const kindEncoding = displayEncodingFor(properties.kind, properties.mapTone);
-  const era = eraFactLink(properties.eraBuckets);
+  const era = entityEraFact({
+    eraBuckets: properties.eraBuckets,
+  });
   const whereMaps = exploreWhereMapsLink(feature);
+  const whereLabel = whereMaps?.label ?? 'Place withheld';
   const statusHref =
     properties.status !== undefined ? searchHrefForStatus(properties.status) : undefined;
   const evidenceLabel = `${properties.evidenceCount} accepted claim${properties.evidenceCount === 1 ? '' : 's'}`;
+  const [lng, lat] = feature.geometry.coordinates;
+  const mapPrecision = properties.precision as RecordAnatomyPlace['precision'];
+  const anatomyPlace: RecordAnatomyPlace = {
+    lat,
+    lng,
+    label: properties.displayName,
+    precision: mapPrecision,
+    precisionCaption: radiusAffordanceLabel(
+      properties.geoPrecisionTier,
+      properties.radiusMeters,
+    ),
+  };
+  const kindIcon =
+    properties.mapTone !== undefined
+      ? { variant: 'record-kind' as const, kind: properties.kind, mapTone: properties.mapTone }
+      : { variant: 'record-kind' as const, kind: properties.kind };
+  const anatomyFacts: readonly RecordAnatomyFact[] = [
+    {
+      key: 'kind',
+      label: 'Kind',
+      value: (
+        <Link
+          className="ds-record-anatomy__fact-link"
+          href={exploreHrefForKind(properties.kind)}
+          aria-label={`Browse ${kindEncoding.label} records`}
+        >
+          {kindEncoding.label}
+        </Link>
+      ),
+      icon: kindIcon,
+    },
+    {
+      key: 'where',
+      label: 'Where',
+      value: whereLabel,
+      icon: { variant: 'record-where' },
+    },
+    {
+      key: 'era',
+      label: 'Era',
+      value: era.href ? (
+        <Link
+          className="ds-record-anatomy__fact-link"
+          href={era.href}
+          aria-label={`Browse records from the ${era.label}`}
+        >
+          {era.label}
+        </Link>
+      ) : (
+        era.label
+      ),
+      icon: { variant: 'record-era' },
+    },
+    {
+      key: 'evidence',
+      label: 'Evidence',
+      value: (
+        <Link
+          className="ds-record-anatomy__fact-link"
+          href={entityEvidenceHref(properties.href)}
+          aria-label={`View ${evidenceLabel} on full record`}
+        >
+          {evidenceLabel}
+        </Link>
+      ),
+      icon: { variant: 'record-evidence', tier: properties.confidenceTier },
+    },
+  ];
 
   return (
     <article
@@ -73,6 +148,13 @@ export function NarrativeCard({ feature, onClose, sessionNav }: NarrativeCardPro
       ) : null}
 
       <p className="ds-nc__kicker">Selected record</p>
+
+      {browseControls ? (
+        <div className="ds-nc__browse-toolbar">
+          <RecordBrowseControls {...browseControls} />
+        </div>
+      ) : null}
+
       <div className="ds-nc__top">
         <div className="ds-nc__kind-rule" style={{ borderColor: kindEncoding.shade }}>
           <Link
@@ -97,52 +179,9 @@ export function NarrativeCard({ feature, onClose, sessionNav }: NarrativeCardPro
         {properties.oneLineStory}
       </p>
 
+      <RecordAnatomyPanel facts={anatomyFacts} place={anatomyPlace} />
+
       <dl className="ds-nc__facts">
-        <div className="ds-nc__fact">
-          <dt>Where</dt>
-          <dd className="ds-mono">
-            {whereMaps ? (
-              <MapsExternalLink
-                className="ds-nc__fact-link"
-                href={whereMaps.href}
-                placeLabel={whereMaps.placeLabel}
-                title={`Where: ${whereMaps.label}. Open in your maps app.`}
-              >
-                {whereMaps.label}
-              </MapsExternalLink>
-            ) : (
-              '—'
-            )}
-          </dd>
-        </div>
-        <div className="ds-nc__fact">
-          <dt>Era</dt>
-          <dd>
-            {era.href ? (
-              <Link
-                className="ds-nc__fact-link"
-                href={era.href}
-                aria-label={`Browse records from the ${era.label}`}
-              >
-                {era.label}
-              </Link>
-            ) : (
-              era.label
-            )}
-          </dd>
-        </div>
-        <div className="ds-nc__fact">
-          <dt>Evidence</dt>
-          <dd>
-            <Link
-              className="ds-nc__fact-link"
-              href={entityEvidenceHref(properties.href)}
-              aria-label={`View ${evidenceLabel} on full record`}
-            >
-              {evidenceLabel}
-            </Link>
-          </dd>
-        </div>
         <div className="ds-nc__fact">
           <dt>Confidence</dt>
           <dd>
@@ -165,7 +204,7 @@ export function NarrativeCard({ feature, onClose, sessionNav }: NarrativeCardPro
                 <StatusMark status={properties.status} labeled />
               )
             ) : (
-              '—'
+              'Not stated'
             )}
           </dd>
         </div>
@@ -177,23 +216,12 @@ export function NarrativeCard({ feature, onClose, sessionNav }: NarrativeCardPro
             <Link
               key={tag}
               className="ds-entity-tag"
-              href={`/search?topic=${encodeURIComponent(tag)}`}
+              href={`/history?topic=${encodeURIComponent(tag)}`}
             >
               {tag}
             </Link>
           ))}
         </p>
-      ) : null}
-
-      <p className="ds-nc__precision">
-        {radiusAffordanceLabel(
-          feature.properties.geoPrecisionTier,
-          feature.properties.radiusMeters,
-        )}
-      </p>
-
-      {sessionNav ? (
-        <EntitySessionNav {...sessionNav} className="ds-nc__session-nav" />
       ) : null}
 
       <Link className="ds-cta ds-cta--copper ds-nc__action" href={properties.href} scroll={false}>

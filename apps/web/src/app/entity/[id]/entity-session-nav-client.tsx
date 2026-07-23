@@ -75,7 +75,7 @@ export function EntitySessionNavClient({ currentId, orderedIds }: EntitySessionN
 
   return (
     <EntitySessionNav
-      className="ds-entity-page__session-nav"
+      className="ds-entity-edition__session-nav"
       canBack={canGoBack}
       canNext={canGoNext}
       randomEnabled={randomEnabled}

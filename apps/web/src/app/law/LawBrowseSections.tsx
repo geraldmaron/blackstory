@@ -1,96 +1,89 @@
 /**
- * Law browse page sections: disclaimer, on-page nav, filters, and ledger results.
+ * Law browse page sections: disclaimer, auto-apply facets, hairline ledger, and
+ * about panel inside the v6 edition Surface stack.
  */
 import React from 'react';
 import Link from 'next/link';
-import { EmptyState, FilterBar } from '@repo/ui';
+import { EmptyState } from '@repo/ui';
 import {
   LegalBrowseList,
   LegalDisclaimer,
 } from '../../components/legal';
+import { AutoSubmitSelect } from '../../components/forms/AutoSubmitSelect';
 import type { LawBrowseViewModel } from './law-view-model';
-import './law.css';
-
-const BROWSE_SECTIONS = [
-  { id: 'browse', label: 'Browse' },
-  { id: 'about-law', label: 'About this page' },
-] as const;
+import { lawEditionPanelClassName } from './law-panel-chrome';
 
 export type LawBrowseSectionsProps = {
   readonly view: LawBrowseViewModel;
 };
 
 export function LawBrowseSections({ view }: LawBrowseSectionsProps) {
+  const countLabel =
+    view.totalMatched === 1 ? '1 law entry' : `${view.totalMatched} law entries`;
+
   return (
-    <div className="ds-law">
-      <LegalDisclaimer />
+    <>
+      <article className={lawEditionPanelClassName('disclaimer')}>
+        <LegalDisclaimer />
+      </article>
 
-      <nav className="ds-law__nav" aria-labelledby="law-toc-title">
-        <p className="ds-law__nav-title" id="law-toc-title">
-          On this page
-        </p>
-        <ul className="ds-law__nav-list">
-          {BROWSE_SECTIONS.map((section) => (
-            <li key={section.id}>
-              <a className="ds-law__nav-link" href={`#${section.id}`}>
-                {section.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-
-      <section
-        className="ds-section ds-record-section ds-section--flush ds-law__filter-band"
+      <article
+        className={lawEditionPanelClassName('browse')}
         aria-labelledby="law-browse-heading"
         id="browse"
       >
-        <p className="ds-section__kicker">
-          <span className="ds-kicker-index" aria-hidden="true" />
-          Landmark statutes &amp; decisions
-        </p>
-        <h2 className="ds-section__title" id="law-browse-heading">
-          Browse the catalog
+        <p className="ds-law-edition__panel-title">Catalog</p>
+        <h2 className="ds-law-edition__panel-heading" id="law-browse-heading">
+          Browse landmark statutes and decisions
         </h2>
-        <p className="ds-section__lede">
+        <p className="ds-law-edition__lede">
           Filter by kind or topic, or search by title and citation. Each entry links to a
           plain-language explainer with official sources when editorial review is complete.
         </p>
 
-        <FilterBar
+        <form
+          className="ds-search-mast ds-law-edition__refine"
           method="get"
           action="/law"
-          legend="Filter law entries"
-          fields={[
-            {
-              id: 'q',
-              name: 'q',
-              label: 'Search',
-              type: 'search',
-              placeholder: 'Title, citation, topic…',
-              defaultValue: view.q,
-            },
-            {
-              id: 'kind',
-              name: 'kind',
-              label: 'Kind',
-              type: 'select',
-              defaultValue: view.kind,
-              options: view.kindOptions,
-            },
-            {
-              id: 'topic',
-              name: 'topic',
-              label: 'Topic',
-              type: 'select',
-              defaultValue: view.topic,
-              options: view.topicOptions,
-            },
-          ]}
-        />
+          role="search"
+        >
+          <div className="ds-search-mast__field">
+            <input
+              className="ds-search-mast__input"
+              type="search"
+              id="q"
+              name="q"
+              placeholder="Title, citation, topic…"
+              defaultValue={view.q}
+              aria-label="Search law entries"
+            />
+            <button className="ds-cta ds-cta--ink" type="submit">
+              Search
+            </button>
+          </div>
+          <div className="ds-search-mast__refine">
+            <AutoSubmitSelect
+              id="kind"
+              name="kind"
+              label="Kind"
+              defaultValue={view.kind}
+              options={view.kindOptions}
+            />
+            <AutoSubmitSelect
+              id="topic"
+              name="topic"
+              label="Topic"
+              defaultValue={view.topic}
+              options={view.topicOptions}
+            />
+            <Link className="ds-cta-link" href="/law">
+              Clear
+            </Link>
+          </div>
+        </form>
 
-        <p className="ds-law__count" id="law-results-heading">
-          {view.totalMatched} law entr{view.totalMatched === 1 ? 'y' : 'ies'}
+        <p className="ds-law-edition__count" id="law-results-heading">
+          {countLabel}
         </p>
 
         {view.items.length === 0 ? (
@@ -107,22 +100,23 @@ export function LawBrowseSections({ view }: LawBrowseSectionsProps) {
         ) : (
           <LegalBrowseList items={view.items} labelledBy="law-results-heading" />
         )}
-      </section>
+      </article>
 
-      <section
-        className="ds-section ds-record-section ds-law__next"
+      <article
+        className={lawEditionPanelClassName('about')}
         aria-labelledby="about-law-heading"
         id="about-law"
       >
-        <h2 className="ds-section__title" id="about-law-heading">
+        <p className="ds-law-edition__panel-title">About</p>
+        <h2 className="ds-law-edition__panel-heading" id="about-law-heading">
           About this page
         </h2>
-        <p className="ds-section__lede">
-          BlackStory explains public laws and court decisions in plain language — not legal advice.
+        <p className="ds-law-edition__lede">
+          BlackStory explains public laws and court decisions in plain language, not legal advice.
           For guidance about your specific situation, consult a licensed attorney or qualified legal
           aid organization.
         </p>
-        <p className="ds-band__cta">
+        <p className="ds-law-edition__footer-links">
           <Link className="ds-cta-link" href="/methodology">
             Methodology
           </Link>
@@ -131,11 +125,11 @@ export function LawBrowseSections({ view }: LawBrowseSectionsProps) {
             About BlackStory
           </Link>
           {' · '}
-          <Link className="ds-cta-link" href="/search">
+          <Link className="ds-cta-link" href="/history">
             Search the archive
           </Link>
         </p>
-      </section>
-    </div>
+      </article>
+    </>
   );
 }

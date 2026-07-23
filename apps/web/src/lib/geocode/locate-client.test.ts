@@ -41,7 +41,7 @@ test('maps a 200 ok:false response to kind:"fallback"', async () => {
   const original = globalThis.fetch;
   globalThis.fetch = stubFetch(200, {
     ok: false,
-    fallback: { available: true, reason: 'no_match', message: 'no match', searchHref: '/search' },
+    fallback: { available: true, reason: 'no_match', message: 'no match', searchHref: '/history' },
   });
   try {
     const result = await fetchLocateByCoordinates(38.846, -76.927);
@@ -112,7 +112,7 @@ test('sends the provided request-integrity headers on the outgoing request', asy
       status: 200,
       json: async () => ({
         ok: false,
-        fallback: { available: true, reason: 'no_match', message: 'x', searchHref: '/search' },
+        fallback: { available: true, reason: 'no_match', message: 'x', searchHref: '/history' },
       }),
     } as Response;
   }) as typeof fetch;
@@ -133,7 +133,7 @@ test('forCamera appends camera=1 on the address locate request URL', async () =>
       status: 200,
       json: async () => ({
         ok: false,
-        fallback: { available: true, reason: 'no_match', message: 'x', searchHref: '/search' },
+        fallback: { available: true, reason: 'no_match', message: 'x', searchHref: '/history' },
       }),
     } as Response;
   }) as typeof fetch;
@@ -156,7 +156,7 @@ test('forCamera appends camera=1 on coordinate locate request URL', async () => 
       status: 200,
       json: async () => ({
         ok: false,
-        fallback: { available: true, reason: 'no_match', message: 'x', searchHref: '/search' },
+        fallback: { available: true, reason: 'no_match', message: 'x', searchHref: '/history' },
       }),
     } as Response;
   }) as typeof fetch;

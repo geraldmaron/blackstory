@@ -1,7 +1,7 @@
 /**
  * Manual place-search fallback decision ("geocoder failure
  * provides manual place search"). Pure this module never itself calls the search feature; it
- * returns a decision the UI/route layer renders as a link into existing `/search` page
+ * returns a decision the UI/route layer renders as a link into `/history` find-in-time
  * (never a second, parallel place-search implementation already owns that).
  */
 import type { ManualPlaceSearchFallback, ManualPlaceSearchReason } from './types.js';
@@ -28,6 +28,6 @@ export function buildManualPlaceSearchFallback(
     available: true,
     reason,
     message: FALLBACK_MESSAGES[reason],
-    searchHref: options.searchHref ?? '/search',
+    searchHref: options.searchHref ?? '/history',
   };
 }

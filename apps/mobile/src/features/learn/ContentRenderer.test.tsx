@@ -78,6 +78,33 @@ describe('ContentRenderer', () => {
     expect(getByText('Up to date')).toBeTruthy();
   });
 
+  it('hides the fresh "up to date" notice in longform presentation', async () => {
+    const { queryByText } = await renderPage(BASE_PAGE, {
+      presentation: 'longform',
+      cached: { fetchedAt: Date.now(), degraded: false },
+    });
+    expect(queryByText('Up to date')).toBeNull();
+  });
+
+  it('still shows offline cache notice in longform presentation', async () => {
+    const { getByText } = await renderPage(BASE_PAGE, {
+      presentation: 'longform',
+      cached: { fetchedAt: Date.now() - 5000, degraded: true },
+    });
+    expect(getByText('Showing cached copy (offline)')).toBeTruthy();
+  });
+
+  it('uses the editorial type scale (17/27) for longform body text', async () => {
+    const { getByText } = await renderPage(BASE_PAGE, { presentation: 'longform' });
+    const paragraph = getByText('Body paragraph one.');
+    // The longform paragraph must inherit the shared `editorial` variant (17/27 Source Serif)
+    // rather than a one-off 18/30 override that drifts from the type scale.
+    const flattened = Object.assign({}, ...[paragraph.props.style].flat());
+    expect(flattened.fontSize).toBe(17);
+    expect(flattened.lineHeight).toBe(27);
+    expect(flattened.fontFamily).toBe('SourceSerif4-Regular');
+  });
+
   it('shows a stale-legal-version affordance and fires onViewCurrent when pressed', async () => {
     const onViewCurrent = jest.fn();
     const { getByText } = await renderPage(BASE_PAGE, { versionStale: true, onViewCurrent });
@@ -123,9 +150,21 @@ describe('ContentRenderer', () => {
     expect(getByText('Some content was skipped')).toBeTruthy();
   });
 
-  it('renders related entities and cited facts', async () => {
-    const { getByText } = await renderPage(BASE_PAGE);
-    expect(getByText('ent_a')).toBeTruthy();
+  it('renders related entities and cited facts with human labels, not raw entity ids', async () => {
+    const { getAllByText, getByText, queryByText } = await renderPage(BASE_PAGE);
+    expect(getAllByText('Archive record').length).toBeGreaterThanOrEqual(1);
+    expect(queryByText('ent_a')).toBeNull();
+    expect(queryByText('ent_b')).toBeNull();
     expect(getByText('BB-F-000001')).toBeTruthy();
+  });
+
+  it('labels known related entities with display name and kind · place', async () => {
+    const { getByText, queryByText } = await renderPage({
+      ...BASE_PAGE,
+      relatedEntityIds: ['ent_dunbar_school_001'],
+    });
+    expect(getByText('Paul Laurence Dunbar High School')).toBeTruthy();
+    expect(getByText('School · Washington, D.C.')).toBeTruthy();
+    expect(queryByText('ent_dunbar_school_001')).toBeNull();
   });
 });

@@ -13,6 +13,7 @@
 
 import React from 'react';
 import { Card, Citation, Confidence, Notice } from '@repo/ui';
+import { sanitizePublicProseText } from '@repo/domain/editorial';
 import { formatIsoDate, humanizeToken, type EvidenceClaimView } from '../../lib/evidence';
 
 export type EvidenceCardProps = {
@@ -29,7 +30,7 @@ export function EvidenceCard({ card }: EvidenceCardProps) {
 
   return (
     <Card id={card.id} title={predicateLabel} aria-describedby={citationId}>
-      <p className="ds-evidence-claim__body">{card.object}</p>
+      <p className="ds-evidence-claim__body">{sanitizePublicProseText(card.object)}</p>
 
       <div className="ds-row" style={{ marginBottom: 'var(--ds-space-3)', flexWrap: 'wrap' }}>
         <Confidence level={card.confidenceLevel} label={card.confidenceLabel} />

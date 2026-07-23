@@ -45,6 +45,7 @@ yarn-error.*
 # local env files (never commit real values — see .env.example for the template)
 .env
 .env*.local
+.env.op
 
 # typescript
 *.tsbuildinfo

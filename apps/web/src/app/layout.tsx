@@ -51,7 +51,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3048'),
   title: {
     default: 'BlackStory',
-    template: '%s — BlackStory',
+    template: '%s · BlackStory',
   },
   description:
     'Place-connected Black history research with published claims, provenance, and confidence.',
@@ -102,7 +102,7 @@ export const metadata: Metadata = {
         url: openGraphImage,
         width: 1200,
         height: 630,
-        alt: 'BlackStory — History, pinned to place.',
+        alt: 'BlackStory · History, pinned to place.',
       },
     ],
   },

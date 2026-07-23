@@ -6,23 +6,27 @@
 import React from 'react';
 import { Card } from '@repo/ui';
 import type { ThemeImpactPacketView } from '@repo/domain';
+import { ThemeImpactEmptyNotice } from './ThemeImpactEmptyNotice';
 import { ThemeImpactGapBannerList } from './ThemeImpactGapBanner';
 import {
   ThemeImpactProvenanceList,
   collectPacketProvenance,
 } from './ThemeImpactProvenanceList';
+import { THEME_IMPACT_METHOD_STANCE_LABEL } from './theme-impact-copy';
 
 export type ThemeImpactPacketCardProps = {
   readonly packet: ThemeImpactPacketView;
 };
 
 const METHOD_STANCE_LABEL: Readonly<Record<ThemeImpactPacketView['methodStance'], string>> = {
-  juxtaposition: 'Juxtaposition — not causation',
+  juxtaposition: THEME_IMPACT_METHOD_STANCE_LABEL,
   gated_causal_claim: 'Gated causal claim',
 };
 
 export function ThemeImpactPacketCard({ packet }: ThemeImpactPacketCardProps) {
   const provenance = collectPacketProvenance(packet);
+  const provenanceHeadingId = `${packet.questionId}-provenance-heading`;
+  const hasObservations = packet.observations.length > 0 || packet.derived.length > 0;
 
   return (
     <Card
@@ -51,16 +55,20 @@ export function ThemeImpactPacketCard({ packet }: ThemeImpactPacketCardProps) {
         <div>
           <dt>Policy eras</dt>
           <dd>
-            <ul className="ds-theme-impact__era-list">
-              {packet.policyEras.map((era) => (
-                <li key={era.id}>
-                  <span className="ds-theme-impact__era-label">{era.label}</span>
-                  {era.span ? (
-                    <span className="ds-mono ds-theme-impact__era-span"> ({era.span})</span>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
+            {packet.policyEras.length > 0 ? (
+              <ul className="ds-theme-impact__era-list">
+                {packet.policyEras.map((era) => (
+                  <li key={era.id}>
+                    <span className="ds-theme-impact__era-label">{era.label}</span>
+                    {era.span ? (
+                      <span className="ds-mono ds-theme-impact__era-span"> ({era.span})</span>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="ds-theme-impact__meta-empty">No policy eras attached yet.</p>
+            )}
           </dd>
         </div>
         <div>
@@ -120,6 +128,8 @@ export function ThemeImpactPacketCard({ packet }: ThemeImpactPacketCardProps) {
             </ul>
           </>
         ) : null}
+
+        {!hasObservations ? <ThemeImpactEmptyNotice kind="observations" /> : null}
       </section>
 
       {packet.artifacts.length > 0 ? (
@@ -150,7 +160,14 @@ export function ThemeImpactPacketCard({ packet }: ThemeImpactPacketCardProps) {
         </section>
       ) : null}
 
-      <ThemeImpactProvenanceList items={provenance} />
+      {provenance.length > 0 ? (
+        <ThemeImpactProvenanceList
+          items={provenance}
+          headingId={provenanceHeadingId}
+        />
+      ) : (
+        <ThemeImpactEmptyNotice kind="provenance" />
+      )}
     </Card>
   );
 }

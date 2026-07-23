@@ -37,8 +37,8 @@ export function ThemeImpactPolicyEraTimeline({
         ))}
       </ol>
       <p className="ds-theme-impact__era-timeline-note">
-        Eras provide historical context beside indicators — not proof that any single policy caused
-        later readings.
+        Eras provide historical context beside indicators. They are not proof that any single policy
+        caused later readings.
       </p>
     </section>
   );

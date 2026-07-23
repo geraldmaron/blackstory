@@ -1,24 +1,21 @@
 /**
- * Search result row (MOB-013 item 6).
- *
- * HARD GUARANTEE: this component's props never carry a raw relevance score, ranking number, or
- * evidence/connection COUNT. `packages/public-contracts/src/v1/search.ts`'s own header states
- * that guarantee at the contract level ("Nothing here exposes a raw relevance score, an evidence
- * count, or any other numeric ranking signal to end users"); `toSearchResultCardProps` below is
- * the mobile-side enforcement of the SAME guarantee at the UI boundary -- it is a field-by-field
- * ALLOW-LIST mapping (never `{...result}`), so a future field added to `SearchResultV1` cannot
- * silently reach this component's props without an explicit, reviewable change here.
- * `SearchResultCard.test.tsx`'s negative test asserts this holds even when a hostile/malformed
- * payload carries an extra numeric field.
- *
- * All user-supplied text (displayName/summary/explanation/status, which round-trip through a
- * public, editorially-reviewed but ultimately server-controlled pipeline) is rendered exclusively
- * through React Native `<Text>` children -- never through any HTML/WebView renderer and never
- * through `dangerouslySetInnerHTML` (which does not exist on RN `Text` at all). An
- * XSS/HTML/script-shaped string is therefore always inert display text, by construction, not by
- * a sanitization step that could be forgotten -- see the adversarial render test.
+ * Search / history result row (MOB-013). v6 rip-list anatomy: title, summary, and
+ * label-over-value fact strip (Kind, Era, Status). Allow-list props only.
  */
-import { ListRow, Text } from '@/ui';
+import { StyleSheet, View } from 'react-native';
+import {
+  Button,
+  LedgerRow,
+  NavIcon,
+  navIconForEntityKind,
+  RecordFactStrip,
+  space,
+} from '@/ui';
+import {
+  recordEraLabel,
+  recordKindLabel,
+  recordStatusLabel,
+} from '../record-facts/record-facts';
 import type { SearchResultV1 } from './search-contracts';
 
 export interface SearchResultCardProps {
@@ -28,48 +25,111 @@ export interface SearchResultCardProps {
   readonly summary?: string;
   readonly explanation: string;
   readonly status?: string;
+  readonly eraBuckets?: readonly string[];
+  /** Mono ledger index (01, 02…). */
+  readonly indexLabel?: string;
   readonly onPress?: (id: string) => void;
+  readonly onShowOnMap?: (id: string, kind: string) => void;
 }
 
-/** Explicit allow-list mapping -- the enforcement point described in the module header. */
+export type SearchResultCardHandlers = {
+  readonly onPress?: (id: string) => void;
+  readonly onShowOnMap?: (id: string, kind: string) => void;
+};
+
 export function toSearchResultCardProps(
   result: SearchResultV1,
-  onPress?: (id: string) => void,
+  handlers: SearchResultCardHandlers = {},
 ): SearchResultCardProps {
   return {
     id: result.id,
     kind: result.kind,
     displayName: result.displayName,
-    summary: result.summary,
     explanation: result.explanation,
-    status: result.status,
-    onPress,
+    eraBuckets: result.eraBuckets,
+    ...(result.summary !== undefined ? { summary: result.summary } : {}),
+    ...(result.status !== undefined ? { status: result.status } : {}),
+    ...(handlers.onPress ? { onPress: handlers.onPress } : {}),
+    ...(handlers.onShowOnMap ? { onShowOnMap: handlers.onShowOnMap } : {}),
   };
 }
 
-function humanize(value: string): string {
-  return value.charAt(0).toUpperCase() + value.slice(1).replace(/[_-]/g, ' ');
-}
+export function SearchResultCard({
+  id,
+  kind,
+  displayName,
+  summary,
+  explanation,
+  status,
+  eraBuckets,
+  indexLabel,
+  onPress,
+  onShowOnMap,
+}: SearchResultCardProps) {
+  const body = summary?.trim() || explanation;
+  const kindLabel = recordKindLabel(kind);
+  const eraLabel = recordEraLabel({ eraBuckets: eraBuckets ?? [] });
+  const statusLabel = recordStatusLabel(status);
 
-export function SearchResultCard({ id, kind, displayName, explanation, status, onPress }: SearchResultCardProps) {
+  const facts = [
+    {
+      key: 'kind',
+      label: 'Kind',
+      value: kindLabel,
+      leading: <NavIcon name={navIconForEntityKind(kind)} size={16} />,
+    },
+    {
+      key: 'era',
+      label: 'Era',
+      value: eraLabel,
+    },
+    ...(statusLabel
+      ? [
+          {
+            key: 'status',
+            label: 'Status',
+            value: statusLabel,
+          },
+        ]
+      : []),
+  ];
+
+  const accessibilitySlug = [kindLabel, eraLabel, statusLabel].filter(Boolean).join(', ');
+
   return (
-    <ListRow
-      title={displayName}
-      subtitle={explanation}
-      trailing={
-        <ListRowTrailing kind={kind} status={status} />
-      }
-      onPress={onPress ? () => onPress(id) : undefined}
-      accessibilityLabel={`${displayName}. ${humanize(kind)}${status ? `, ${humanize(status)}` : ''}. ${explanation}`}
-    />
+    <View>
+      <LedgerRow
+        title={displayName}
+        summary={body}
+        indexLabel={indexLabel}
+        showChevron={Boolean(onPress)}
+        onPress={onPress ? () => onPress(id) : undefined}
+        accessibilityLabel={`${displayName}. ${accessibilitySlug}. ${body}`}
+        showDivider={false}
+        secondaryAction={<RecordFactStrip facts={facts} />}
+      />
+      {onShowOnMap ? (
+        // Sibling of — never nested inside — the row Pressable: a control inside the row would be
+        // unreachable to VoiceOver (the row collapses to one a11y node) and pressing it would paint
+        // the whole row. Indented to line up with the row's text column.
+        <View style={styles.secondary}>
+          <Button
+            label="Show on map"
+            variant="ghost"
+            density="compact"
+            accessibilityLabel={`Show ${displayName} on map`}
+            onPress={() => onShowOnMap(id, kind)}
+          />
+        </View>
+      ) : null}
+    </View>
   );
 }
 
-function ListRowTrailing({ kind, status }: { kind: string; status?: string }) {
-  return (
-    <Text variant="caption" colorRole="inkMuted" style={{ textAlign: 'right' }}>
-      {humanize(kind)}
-      {status ? `\n${humanize(status)}` : ''}
-    </Text>
-  );
-}
+const styles = StyleSheet.create({
+  secondary: {
+    alignItems: 'flex-start',
+    paddingHorizontal: space['3'],
+    paddingBottom: space['2'],
+  },
+});

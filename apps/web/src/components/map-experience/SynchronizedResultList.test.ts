@@ -105,3 +105,25 @@ test('uses a uniform labeled meta layout with short confidence values', () => {
   assert.doesNotMatch(html, /ds-confidence-mark__text">[^<]*confidence/i);
   assert.match(html, /title="High confidence:/);
 });
+
+test('empty Where uses plain Not placed copy (no em dash placeholder)', () => {
+  const feature = requireFeature('ent_15th_st_church_001');
+  const {
+    statePostalCode: _statePostalCode,
+    stateName: _stateName,
+    locationLabel: _locationLabel,
+    ...locationStrippedProperties
+  } = feature.properties;
+  const stripped = {
+    ...feature,
+    geometry: {
+      type: 'Point' as const,
+      coordinates: [Number.NaN, Number.NaN] as [number, number],
+    },
+    properties: locationStrippedProperties,
+  };
+  const html = renderToStaticMarkup(
+    createElement(SynchronizedResultList, { features: [stripped] }),
+  );
+  assert.match(html, /<dd class="ds-mono">Not placed<\/dd>/);
+});

@@ -1,14 +1,18 @@
 {
-  "count": 1660,
-  "yearSpan": [1831, 2024],
+  "count": 1673,
+  "yearSpan": [
+    1831,
+    2024
+  ],
   "categories": {
     "police_violence": 1097,
-    "racial_terror": 562,
+    "racial_terror": 575,
     "state_execution": 1
   },
   "selectionPolicy": [
     "Police/state violence: Wikipedia unarmed African Americans killed by law enforcement; dual corroboration Guardian The Counted + Washington Post Fatal Force; curated historical cases.",
-    "Racial terror: SPLC Civil Rights Memorial / The Forgotten, NAACP/EJI-documented cases, Wikipedia lynching list rows marked African American.",
+    "Racial terror: SPLC Civil Rights Memorial / The Forgotten, NAACP/EJI-documented cases, Wikipedia lynching list rows marked African American, plus curated milestone civilian killings and racial terror massacres.",
+    "Milestone rule: civilian killings, assassinations, and massacres are included when they meaningfully served as a critical point in the Black story. Killer being a civilian does not exclude a name.",
     "Deduped by lowercase name + year. Context phrases are memorial labels, not legal findings.",
     "Nat Turner included as state_execution (executed after rebellion), not framed as a lynching victim."
   ],

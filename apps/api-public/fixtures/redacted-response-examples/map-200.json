@@ -1,0 +1,31 @@
+{
+  "releaseId": "rel_2026_07_19_001",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "ent_dunbar_school_001",
+      "geometry": { "type": "Point", "coordinates": [-77.0169, 38.9172] },
+      "properties": {
+        "entityId": "ent_dunbar_school_001",
+        "href": "/entity/ent_dunbar_school_001",
+        "kind": "school",
+        "displayName": "Paul Laurence Dunbar High School",
+        "oneLineStory": "Traces to an 1870 founding in a church basement.",
+        "precision": "campus",
+        "geoPrecisionTier": "neighborhood",
+        "eraBuckets": ["1870s", "1910s"],
+        "status": "active",
+        "notabilityLabels": ["A documented site tied to Black educational history."],
+        "evidenceCount": 1,
+        "confidenceTier": "high",
+        "topicTags": ["education"],
+        "topicIds": ["education"],
+        "shade": "#7A8B52",
+        "glyph": "square",
+        "stateFips": "11",
+        "statePostalCode": "DC",
+        "stateName": "District of Columbia"
+      }
+    }
+  ]
+}

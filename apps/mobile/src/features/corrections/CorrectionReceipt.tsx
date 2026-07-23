@@ -16,8 +16,9 @@
  * (the receipt code, save instructions, and next actions) instead of being stranded on a submit
  * button that no longer exists.
  */
+import * as Clipboard from 'expo-clipboard';
 import { useEffect } from 'react';
-import { Pressable, View } from 'react-native';
+import { AccessibilityInfo, Pressable, View } from 'react-native';
 
 import { Button, Notice, Text, radius, space, useAccessibilityFocus, useThemeColors } from '@/ui';
 import { RECEIPT_SAVE_INSTRUCTIONS } from './copy';
@@ -40,8 +41,13 @@ export function CorrectionReceipt({ receiptCode, onCheckStatus, onDone }: Correc
     focus();
   }, [focus]);
 
+  async function handleCopyCode() {
+    await Clipboard.setStringAsync(receiptCode);
+    AccessibilityInfo.announceForAccessibility('Receipt code copied');
+  }
+
   return (
-    <View style={{ padding: space['4'], gap: space['4'] }}>
+    <View style={{ gap: space['3'] }}>
       <Notice
         ref={noticeRef}
         tone="info"
@@ -52,17 +58,20 @@ export function CorrectionReceipt({ receiptCode, onCheckStatus, onDone }: Correc
       <View style={{ gap: space['1'] }}>
         <Text variant="bodyEmphasis">Your receipt code</Text>
         <Pressable
-          accessibilityRole="text"
-          accessibilityLabel={`Receipt code ${receiptCode}`}
+          accessibilityRole="button"
+          accessibilityLabel={`Copy receipt code ${receiptCode}`}
+          accessibilityHint="Copies the receipt code to the clipboard"
+          onPress={handleCopyCode}
           style={{
             borderWidth: 1,
             borderColor: theme.border,
             borderRadius: radius.sm,
             padding: space['3'],
             backgroundColor: theme.surfaceRaised,
+            minHeight: 44,
+            justifyContent: 'center',
           }}
         >
-          {/* Inert: RN <Text> never interprets markup. */}
           <Text variant="code" selectable>
             {receiptCode}
           </Text>
@@ -70,10 +79,13 @@ export function CorrectionReceipt({ receiptCode, onCheckStatus, onDone }: Correc
         <Text variant="bodySmall" colorRole="inkMuted">
           {RECEIPT_SAVE_INSTRUCTIONS}
         </Text>
+        <Text variant="bodySmall" colorRole="inkMuted">
+          Tap the code to copy it.
+        </Text>
       </View>
 
-      <Button label="Check status with this code" variant="secondary" onPress={onCheckStatus} />
       <Button label="Done" variant="primary" onPress={onDone} />
+      <Button label="Check status with this code" variant="secondary" onPress={onCheckStatus} />
     </View>
   );
 }

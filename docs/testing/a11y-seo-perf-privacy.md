@@ -17,7 +17,7 @@ Parent wiring: merge `release-gates` into `scripts/run-testing-layer.mjs` (add `
 
 Automated HTML fixtures in `packages/testing/src/a11y/journey-fixtures.ts` mirror:
 
-- **Search** (`/search`) — form labels, results list, pagination nav
+- **History** (`/history`, legacy `/search` redirects here) — form labels, results list, pagination nav
 - **Explore** (`/explore`) — synchronized accessible list peer beside map region
 - **Entity** (`/entity/[id]`) — section landmarks and h1/h2 order
 - **Locate** (`/locate`) — privacy notice, labeled inputs, no-JS search fallback
@@ -32,10 +32,10 @@ Documented peers (`packages/testing/src/a11y/map-search-peers.test.ts`):
 
 | Journey | Peer | Contract |
 |---------|------|----------|
-| Search | `ResultList` (`@repo/ui`) | Server-rendered list with `labelledBy` |
+| History | `HistoryResultList` | Server-rendered find-in-time list with `labelledBy` |
 | Explore | `SynchronizedResultList` | Full list peer — not a map fallback; `aria-current` for selection |
 | Explore | `explore/page.tsx` noscript `FilterBar` | Native GET filters without JavaScript |
-| Locate | `ManualPlaceSearchForm` + `/search` link | Manual entry without geolocation |
+| Locate | `ManualPlaceSearchForm` + `/history` link | Manual entry without geolocation |
 
 Do not edit explore/map-experience components in  — read-only ownership.
 

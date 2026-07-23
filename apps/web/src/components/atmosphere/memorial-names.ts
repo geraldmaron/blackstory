@@ -21,6 +21,7 @@ export const MEMORIAL_NAMES = memorialNamesJson as readonly MemorialNameEntry[];
 /** Names the product owner asked to keep visible in the wall set. */
 export const MEMORIAL_NAMES_REQUIRED = [
   'Emmett Till',
+  'Trayvon Martin',
   'Breonna Taylor',
   'Eric Garner',
   'Amadou Diallo',

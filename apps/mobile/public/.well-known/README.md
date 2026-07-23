@@ -13,7 +13,7 @@ don't exist yet.
   (an `autoVerify` `https://blackbook.app` filter) — these are structurally correct Expo config
   that will generate the right native entitlements/manifest entries via `expo prebuild`, gated to
   the `production` build variant only.
-- The route allowlist and per-parameter validation in `../../src/app/_lib/route-params.ts`, which
+- The route allowlist and per-parameter validation in `../../src/lib/route-params.ts`, which
   is what actually decides what an incoming link is allowed to do once the OS hands it to the app.
   This is real, tested code, independent of whether the domain files below are ever published.
 

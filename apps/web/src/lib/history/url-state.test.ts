@@ -3,7 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { buildHistoryHref, parseHistorySearchParams } from './url-state';
+import { buildHistoryHref, parseDecadeParam, parseHistorySearchParams } from './url-state';
 
 test('defaults to all-time mode with no query params', () => {
   const state = parseHistorySearchParams({});
@@ -60,6 +60,14 @@ test('omits default status, topic, and connections from href', () => {
 
 test('rejects malformed decade labels', () => {
   const state = parseHistorySearchParams({ decade: 'nineteen-fifties' });
+  assert.equal(state.mode, 'all-time');
+  assert.equal(state.decade, undefined);
+});
+
+test('rejects future decade labels that have not started yet', () => {
+  assert.equal(parseDecadeParam('2030s'), undefined);
+  assert.equal(parseDecadeParam('2050s'), undefined);
+  const state = parseHistorySearchParams({ decade: '2030s' });
   assert.equal(state.mode, 'all-time');
   assert.equal(state.decade, undefined);
 });

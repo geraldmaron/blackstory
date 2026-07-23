@@ -18,6 +18,9 @@
       "@repo/public-contracts/v1/*": [
         "../../packages/public-contracts/src/v1/*"
       ],
+      "@repo/domain/era": [
+        "../../packages/domain/src/era.ts"
+      ],
       "zod": [
         "./node_modules/zod"
       ]

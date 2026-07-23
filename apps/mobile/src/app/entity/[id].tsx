@@ -18,19 +18,27 @@
  * a NEW instance of this same route (`router.push`), never an inline expansion — the withdrawn/
  * not-found state is exercised identically whichever way this route is entered.
  */
-import { useEffect, useState } from 'react';
-import { Redirect, router, useLocalSearchParams } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useEffect, useLayoutEffect, useState } from 'react';
+import { Redirect, router, useLocalSearchParams, useNavigation } from 'expo-router';
 
-import { parseEntityId } from '../_lib/route-params';
+import { parseEntityId } from '@/lib/route-params';
 import {
   createRuntimeEntityDataDeps,
   EntityDetailScreen,
+  shareEntity,
   useEntityDetail,
   type EntityDataDeps,
 } from '@/features/entity';
+import { Button, ScreenCanvas } from '@/ui';
+
+function compactHeaderTitle(title: string): string {
+  const trimmed = title.trim();
+  if (trimmed.length <= 36) return trimmed;
+  return `${trimmed.slice(0, 33).trimEnd()}…`;
+}
 
 export default function EntityDetailRoute() {
+  const navigation = useNavigation();
   const { id } = useLocalSearchParams<{ id?: string | string[] }>();
   const entityId = parseEntityId(id);
 
@@ -53,6 +61,39 @@ export default function EntityDetailRoute() {
   }, []);
 
   const { state, retry } = useEntityDetail(entityId, deps);
+  const [shareBusy, setShareBusy] = useState(false);
+  const readyEntity = deps && state.kind === 'ready' ? state.result.entity : undefined;
+  const headerTitle = readyEntity ? compactHeaderTitle(readyEntity.displayName) : 'Record';
+
+  useLayoutEffect(() => {
+    // Share lives in the stack header (a persistent affordance), not as an orphan full-width
+    // button stranded after ~9 screens of content.
+    const headerRight = readyEntity
+      ? () => (
+          <Button
+            label="Share"
+            variant="ghost"
+            density="compact"
+            loading={shareBusy}
+            accessibilityLabel={`Share ${readyEntity.displayName}`}
+            onPress={() => {
+              setShareBusy(true);
+              void shareEntity(readyEntity.id, readyEntity.displayName).finally(() =>
+                setShareBusy(false),
+              );
+            }}
+          />
+        )
+      : undefined;
+    navigation.setOptions({
+      title: headerTitle,
+      headerTitle,
+      headerBackTitle: 'Back',
+      headerLargeTitle: false,
+      headerBackButtonDisplayMode: 'minimal',
+      headerRight,
+    });
+  }, [navigation, headerTitle, readyEntity, shareBusy]);
 
   if (!entityId) {
     // Unknown/malformed/unsafe id — safe-default fallback, never a raw render of the input.
@@ -60,13 +101,16 @@ export default function EntityDetailRoute() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['left', 'right', 'bottom']}>
+    <ScreenCanvas edges={['left', 'right', 'bottom']}>
       <EntityDetailScreen
         state={deps ? state : { kind: 'loading' }}
         onRetry={retry}
         onBackToExplore={() => router.replace('/explore')}
+        onBackToMap={(selectedId) =>
+          router.replace({ pathname: '/explore', params: { selected: selectedId } })
+        }
         onOpenEntity={(neighborId) => router.push(`/entity/${neighborId}`)}
       />
-    </SafeAreaView>
+    </ScreenCanvas>
   );
 }

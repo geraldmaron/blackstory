@@ -17,6 +17,8 @@ const sampleNode: HistoryNodeView = {
   summary: 'Fixture school summary.',
   statusLabel: 'Historic',
   statusKind: 'status',
+  eraLabel: '1870s',
+  eraBuckets: ['1870s'],
   evidenceCount: 2,
   connectionCount: 1,
   href: '/entity/ent_dunbar_school_001',

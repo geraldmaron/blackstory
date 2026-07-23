@@ -36,6 +36,20 @@ cp -rf source dest          # NOT: cp -r source dest
 - `apt-get` - use `-y` flag
 - `brew` - use `HOMEBREW_NO_AUTO_UPDATE=1` env var
 
+## Mobile local QA (agents)
+
+**Default for mobile smoke / "app works locally": Path A (prod-like).** Production never uses Metro; do not open the Debug dev client and expect prod behavior.
+
+| Goal | Command | Pass signal |
+|---|---|---|
+| Agent gate (mobile ready) | `pnpm mobile:ios:verify` | api-public live + Release app on booted Simulator; **Metro not required** |
+| Launch / rebuild embedded bundle | `pnpm mobile:ios:release` | Release install; relaunch without packager URL |
+| Relaunch only | `pnpm mobile:ios:launch` | App runs from embedded bundle |
+
+**Path B (hot reload only):** `pnpm dev:mobile` / `pnpm dev:mobile:verify` when actively editing JS. Never claim mobile healthy from `127.0.0.1:8081` `/status` alone while the iOS dev client may still target another LAN port (`:8082`, `:8083`). Path B verify must pass LAN bundle smoke + simulator packager alignment.
+
+See `apps/mobile/README.md` for setup (`API_BASE_URL=http://127.0.0.1:8080` in `apps/mobile/.env.local`).
+
 ## Brand Language
 
 The binding source is the root `brand/` directory (masters, 4-page guide, token files — see
@@ -102,6 +116,47 @@ sharper than stored precision and a coarsened point is never labeled as an exact
 
 **File naming.** Lowercase-kebab file names everywhere, including docs and asset packs —
 no uppercase file names in new work.
+
+## UI Design Patterns
+
+**Index:** [`docs/ui/README.md`](docs/ui/README.md) — living pattern catalog and adoption checklists.  
+**Component registry:** [`docs/ui/patterns-registry.md`](docs/ui/patterns-registry.md) — reusable modules under `apps/web/src/components/patterns/`.
+
+### Binding docs (read before UI edits)
+
+| Doc | Scope |
+|---|---|
+| [`docs/ui/brand.md`](docs/ui/brand.md) | Palette, type, mark, copper discipline, supersessions |
+| [`docs/ui/design-direction-v6-home.md`](docs/ui/design-direction-v6-home.md) | `/` layout beats, hero, footer-on-home |
+| [`docs/ui/design-direction-v6-explore.md`](docs/ui/design-direction-v6-explore.md) | `/explore` layout, Surface instruments, records rail |
+| [`docs/ui/design-direction-v6-history.md`](docs/ui/design-direction-v6-history.md) | `/history` unified find-in-time (search merged), decade scrubber, rip list, facets |
+| [`docs/ui/design-direction-v6-about.md`](docs/ui/design-direction-v6-about.md) | `/about` product thesis, Surface stack, shared gutter mosaic |
+| [`docs/ui/design-direction-v6-memorial.md`](docs/ui/design-direction-v6-memorial.md) | `/memorial` names-only memorial wall + full alphabetical list |
+| [`docs/ui/design-direction-v6-stories.md`](docs/ui/design-direction-v6-stories.md) | `/stories` longform edition, gutter mosaic, Surface stack |
+| [`docs/ui/design-direction-v6-methodology.md`](docs/ui/design-direction-v6-methodology.md) | `/methodology` transparency receipt, evidence pipeline, Surface stack |
+| [`docs/ui/design-direction-v6-books.md`](docs/ui/design-direction-v6-books.md) | `/books` challenged-titles edition, catalog rail, gutter mosaic |
+| [`docs/ui/design-direction-v6-data.md`](docs/ui/design-direction-v6-data.md) | `/data` Census + indicators edition, gutter mosaic, chart panels |
+| [`docs/ui/design-direction-v6-themes.md`](docs/ui/design-direction-v6-themes.md) | `/themes` impact browse, packet detail, shared gutter mosaic |
+| [`docs/ui/design-direction-v6-entity.md`](docs/ui/design-direction-v6-entity.md) | `/entity/[id]` record edition, anatomy panel, safe fail states |
+| [`docs/ui/design-direction-v6-mobile.md`](docs/ui/design-direction-v6-mobile.md) | `@repo/mobile` tab bar, More menu, shell chrome, theme tokens |
+| [`docs/ui/design-direction-v5.md`](docs/ui/design-direction-v5.md) | Non-home surfaces, shell chrome, fixed-ink footer (non-home) |
+| [`docs/ui/patterns-*.md`](docs/ui/) | Reusable site patterns (browse mode, edition fact icon, …) |
+| [`docs/ui/story.md`](docs/ui/story.md) | Voice, microcopy, narrative arc |
+
+Kit implementation: `@repo/ui` (`packages/ui`). Where a pattern doc and the kit disagree on tokens, **the kit wins**; where layout/behavior is specified, **the pattern doc wins**.
+
+### Rules for agents shipping UI
+
+1. **Never invent one-off visual language.** Extend an existing pattern component or update/create the matching `docs/ui/patterns-*.md` in the **same PR/change** as the code.
+2. **Check both themes** (`data-theme` light + dark) before calling UI done. Dark is first-class, not an afterthought.
+3. **Copper discipline:** ~10–15% of composition; navigational signal only (active filters, primary CTA, evidence markers). Raw Copper Pin never carries body-size text on light canvas.
+4. **Flat matte only:** no bevels, shadows, glows, gradients, 3D, or ornamental motion.
+5. **Contrast:** WCAG 2.2 AA minimum; verify focus rings and `:focus-visible` on new controls.
+6. **Copy:** no em dashes in user-facing strings on touched surfaces.
+7. **Map dignity:** no alarm hues for violence-adjacent records; confidence never color-alone; points never sharper than stored precision.
+8. **File naming:** lowercase-kebab for new docs, CSS, and components.
+
+When adding a reusable control, prefer `apps/web/src/components/patterns/` + a pattern doc + a row in `patterns-registry.md`. Surface-specific layout stays in route folders (`app/`, `components/home/`, etc.) but must cite its binding direction doc.
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:ca08a54f -->
 ## Beads Issue Tracker

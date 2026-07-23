@@ -6,6 +6,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { statusAsOf } from '@repo/domain';
+import { maxDecadeInclusive } from '@repo/domain';
 import { resetHistoryGraphReleaseArtifactForTests } from '../../data/history-graph-seed';
 import { getPublicEntity, listPublicEntities } from '../../data/public-seed';
 import { buildHistoryViewModel } from './history-view-model';
@@ -57,6 +58,14 @@ test('all-time view includes an injected undated entity with undated status labe
   assert.ok(node);
   assert.equal(node!.statusKind, 'undated');
   assert.equal(node!.statusLabel, 'Status not yet published for this record');
+});
+
+test('all-time nodes carry resolved era labels from eraBuckets', () => {
+  const view = buildHistoryViewModel({});
+  const school = view.nodes.find((node) => node.entityId === 'ent_dunbar_school_001');
+  assert.ok(school);
+  assert.ok(school!.eraBuckets.includes('1870s'));
+  assert.match(school!.eraLabel, /1870s/);
 });
 
 test('decade view derives node membership from decade artifacts', () => {
@@ -201,6 +210,15 @@ test('overview reflects filtered nodes and visible edges', () => {
   assert.ok(all.overview.decadeDensity.every((entry) => entry.decade.endsWith('s')));
 });
 
+test('overview decade density never lists decades after the current calendar decade', () => {
+  const view = buildHistoryViewModel({});
+  const ceiling = maxDecadeInclusive('2026-07-23');
+  assert.equal(view.availableDecades.at(-1), ceiling);
+  assert.ok(view.overview.decadeDensity.every((entry) => entry.decade <= ceiling));
+  assert.ok(!view.availableDecades.includes('2030s'));
+  assert.ok(!view.overview.decadeDensity.some((entry) => entry.decade === '2030s'));
+});
+
 test('overview kind counts follow active filters', () => {
   const places = buildHistoryViewModel({ kind: 'place' });
   assert.ok(places.overview.kindCounts.every((entry) => entry.kind === 'place'));
@@ -208,6 +226,24 @@ test('overview kind counts follow active filters', () => {
     places.overview.kindCounts.reduce((sum, entry) => sum + entry.count, 0),
     places.overview.totalRecords,
   );
+});
+
+test('overview decade density follows active filters', () => {
+  const all = buildHistoryViewModel({});
+  const places = buildHistoryViewModel({ kind: 'place' });
+  const allNonZero = all.overview.decadeDensity.reduce((sum, entry) => sum + entry.count, 0);
+  const placesNonZero = places.overview.decadeDensity.reduce((sum, entry) => sum + entry.count, 0);
+  assert.ok(allNonZero > placesNonZero);
+  assert.ok(
+    places.overview.decadeDensity.every(
+      (entry) => entry.count <= (all.overview.decadeDensity.find((row) => row.decade === entry.decade)?.count ?? entry.count),
+    ),
+  );
+});
+
+test('uses live release id when provided', () => {
+  const view = buildHistoryViewModel({}, listPublicEntities(), { releaseId: 'rel_live_001' });
+  assert.equal(view.releaseId, 'rel_live_001');
 });
 
 test('parses shareable URL with status, topic, and connections', () => {

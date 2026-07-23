@@ -73,14 +73,25 @@ or flip `PUBLIC_READ_API_DISABLED=1` if upstream Postgres is unhealthy.
 
 ## Local smoke
 
+**Option 1 — `DATABASE_URL` in 1Password:**
+
 ```bash
 cd apps/api-public
-run-with-dev-secrets -- env \
+run-with-dev-secrets env \
   PUBLIC_DATA_SOURCE=postgres \
-  DATABASE_URL='postgresql://…' \
   DATABASE_SSL=1 \
   CLIENT_ATTESTATION_MODE=monitor \
   pnpm dev
+```
+
+**Option 2 — `DATABASE_URL` in `apps/web/.env.local`:**
+
+```bash
+cd apps/api-public
+set -a
+source ../web/.env.local
+set +a
+env PUBLIC_DATA_SOURCE=postgres DATABASE_SSL=1 CLIENT_ATTESTATION_MODE=monitor pnpm dev
 ```
 
 ```bash

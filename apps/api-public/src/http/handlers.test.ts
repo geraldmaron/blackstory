@@ -8,6 +8,7 @@ import { test } from 'node:test';
 import type { ClientAttestationDecision, ClientAttestationHeaders } from '@repo/security';
 import { bootstrapResponseV1Schema } from '@repo/public-contracts/v1/bootstrap';
 import { entityV1Schema } from '@repo/public-contracts/v1/entity';
+import { mapSourceV1Schema } from '@repo/public-contracts/v1/map';
 import { searchResponseV1Schema } from '@repo/public-contracts/v1/search';
 import { publicApiErrorEnvelopeSchema } from '@repo/public-contracts/errors';
 import { createPublicRateLimitGuard } from '../rate-limits.js';
@@ -105,6 +106,41 @@ test('GET /v1/entity/:id returns a contract-valid entity', async () => {
   assert.equal(res.status, 200);
   const parsed = entityV1Schema.parse(res.body);
   assert.equal(parsed.id, 'ent_dunbar_school_001');
+});
+
+test('GET /v1/map returns MapSourceV1 for geo-anchored entities', async () => {
+  const deps = makeDeps({
+    dataAccess: createInMemoryPublicDataAccess({
+      pointer: SAMPLE_POINTER,
+      entities: [
+        makeEntity({
+          id: 'ent_with_geo',
+          geoAnchor: {
+            lat: 38.9072,
+            lng: -77.0369,
+            geohash: 'dqcjq',
+            matchMethod: 'fixture',
+          },
+        }),
+        makeEntity({ id: 'ent_no_geo' }),
+      ],
+    }),
+  });
+  const res = await dispatch(makeRequest('/v1/map'), deps);
+  assert.equal(res.status, 200);
+  const parsed = mapSourceV1Schema.parse(res.body);
+  assert.equal(parsed.releaseId, 'rel_2026_07_19_001');
+  assert.equal(parsed.features.length, 1);
+  assert.equal(parsed.features[0]!.properties.entityId, 'ent_with_geo');
+});
+
+test('GET /v1/map without active release is UPSTREAM_UNAVAILABLE', async () => {
+  const deps = makeDeps({
+    dataAccess: createInMemoryPublicDataAccess({ entities: [] }),
+  });
+  const res = await dispatch(makeRequest('/v1/map'), deps);
+  assert.equal(res.status, 503);
+  assert.equal(publicApiErrorEnvelopeSchema.parse(res.body).error.code, 'UPSTREAM_UNAVAILABLE');
 });
 
 test('ADVERSARIAL: unpublished and nonexistent ids return byte-identical 404s (no enumeration signal)', async () => {

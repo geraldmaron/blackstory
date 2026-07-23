@@ -44,7 +44,7 @@ export function HistoryOverviewStrip({
           <dd className="ds-history-overview__stat-value">{overview.totalRecords}</dd>
         </div>
         <div className="ds-history-overview__stat">
-          <dt className="ds-history-overview__stat-label">Connections in view</dt>
+          <dt className="ds-history-overview__stat-label">Published connections</dt>
           <dd className="ds-history-overview__stat-value">{overview.totalConnections}</dd>
         </div>
       </dl>

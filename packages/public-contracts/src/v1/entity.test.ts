@@ -44,9 +44,15 @@ test('drops canonical/internal-only fields on parse (sensitive-field negative sn
   }
 });
 
+test('accepts full ontology kinds including person (parity with web Explore / schemas)', () => {
+  const fixture = loadFixture<Record<string, unknown>>('entity.v1.legacy.json');
+  const parsed = entityV1Schema.parse({ ...fixture, kind: 'person' });
+  assert.equal(parsed.kind, 'person');
+});
+
 test('rejects an unknown entity kind (adversarial: unknown enum value)', () => {
   const fixture = loadFixture<Record<string, unknown>>('entity.v1.legacy.json');
-  assert.throws(() => entityV1Schema.parse({ ...fixture, kind: 'person' }));
+  assert.throws(() => entityV1Schema.parse({ ...fixture, kind: 'spaceship' }));
 });
 
 test('rejects an out-of-range geoAnchor coordinate (adversarial: invalid location)', () => {

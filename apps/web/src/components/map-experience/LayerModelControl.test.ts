@@ -25,7 +25,7 @@ test('exposes a radiogroup labelled Map data model', () => {
   assert.match(html, /aria-label="Map data model"/);
   assert.match(html, /Black population share/);
   assert.match(html, /Geography/);
-  assert.match(html, /State \(1790–2020\)/);
+  assert.match(html, /State \(1790 to 2020\)/);
   assert.match(html, /Census decade/);
   assert.match(html, /1870/);
 });

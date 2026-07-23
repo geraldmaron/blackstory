@@ -86,6 +86,13 @@ export const MAKER = {
   },
 } as const;
 
+/**
+ * Bookshop.org affiliate / referral id used in `/books` purchase links
+ * (`https://bookshop.org/a/{id}/{isbn13}`). Confirm in the Bookshop affiliate
+ * dashboard that this matches the numeric or vanity id assigned to the account.
+ */
+export const BOOKSHOP_AFFILIATE_ID = 'gerald69' as const;
+
 export function makerMark(theme: BrandTheme): string {
   return MAKER.mark[theme];
 }

@@ -24,6 +24,7 @@ import {
 } from '../../lib/map-experience/dignity-style';
 import {
   KIND_ENCODING_ENTRIES,
+  KIND_FAMILY_ENTRIES,
   DEFAULT_KIND_ENCODING,
   MAP_SEMANTIC_TONE_ENCODING,
 } from '../../lib/map-experience/kind-encoding';
@@ -31,6 +32,7 @@ import {
   markerHaloRadiusExpression,
   markerRadiusExpression,
   markerRadiusPlusExpression,
+  zoomScaledNumericExpression,
 } from '../../lib/map-experience/marker-size';
 import type {
   ExploreMapFeatureCollection,
@@ -340,14 +342,14 @@ function kindColorExpression(): ExpressionSpecification {
     tone,
     entry.shade,
   ]);
-  const kindCases = KIND_ENCODING_ENTRIES.flatMap(([kind, entry]) => [kind, entry.shade]);
+  const kindCases = KIND_FAMILY_ENTRIES.flatMap(([family, entry]) => [family, entry.shade]);
   return [
     'case',
     ['has', 'shade'],
     ['get', 'shade'],
     ['has', 'mapTone'],
     ['match', ['get', 'mapTone'], ...semanticCases, DEFAULT_KIND_ENCODING.shade],
-    ['match', ['get', 'kind'], ...kindCases, DEFAULT_KIND_ENCODING.shade],
+    ['match', ['coalesce', ['get', 'kindFamily'], ['get', 'kind']], ...kindCases, DEFAULT_KIND_ENCODING.shade],
   ] as unknown as ExpressionSpecification;
 }
 
@@ -359,9 +361,13 @@ function kindFillOpacityExpression(): ExpressionSpecification {
 }
 
 function kindStrokeWidthExpression(): ExpressionSpecification {
-  return kindMatchExpression(
-    (entry) => glyphSignatureFor(entry.glyph).strokeWidth,
-    DEFAULT_GLYPH_PAINT_SIGNATURE.strokeWidth,
+  // Zoom-scale rims with the fill disc — a fixed 1.5–4px stroke on a nationally shrunk
+  // ~1–2px fill reads as every entity lit/selected (bright plate.selected wash).
+  return zoomScaledNumericExpression(
+    kindMatchExpression(
+      (entry) => glyphSignatureFor(entry.glyph).strokeWidth,
+      DEFAULT_GLYPH_PAINT_SIGNATURE.strokeWidth,
+    ),
   );
 }
 
@@ -918,7 +924,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           'circle-radius': markerRadiusPlusExpression(4),
           'circle-color': kindColorExpression(),
           'circle-opacity': 0,
-          'circle-stroke-width': 1.5,
+          'circle-stroke-width': zoomScaledNumericExpression(1.5),
           'circle-stroke-color': kindColorExpression(),
           'circle-stroke-opacity': 0.9,
         },
@@ -982,7 +988,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           ],
           'circle-color': DIGNITY_PALETTE.point,
           'circle-opacity': ENTITY_CLUSTER_OPACITY,
-          'circle-stroke-width': 2,
+          'circle-stroke-width': zoomScaledNumericExpression(2),
           'circle-stroke-color': plate.selected,
         },
       },
@@ -1033,7 +1039,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           'circle-radius': markerRadiusPlusExpression(4),
           'circle-color': kindColorExpression(),
           'circle-opacity': 0,
-          'circle-stroke-width': 1.5,
+          'circle-stroke-width': zoomScaledNumericExpression(1.5),
           'circle-stroke-color': kindColorExpression(),
           'circle-stroke-opacity': 0,
         },
@@ -1095,7 +1101,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           ],
           'circle-color': DIGNITY_PALETTE.point,
           'circle-opacity': 0,
-          'circle-stroke-width': 2,
+          'circle-stroke-width': zoomScaledNumericExpression(2),
           'circle-stroke-color': plate.selected,
         },
       },
@@ -1119,7 +1125,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         paint: {
           'circle-radius': markerRadiusPlusExpression(6),
           'circle-color': 'rgba(0,0,0,0)',
-          'circle-stroke-width': 2.5,
+          'circle-stroke-width': zoomScaledNumericExpression(2.5),
           // Copper orientation ring (graphic accent) — MapStage pulses stroke opacity when selected.
           'circle-stroke-color': DIGNITY_PALETTE.point,
           'circle-stroke-opacity': 1,

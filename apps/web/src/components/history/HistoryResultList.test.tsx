@@ -18,6 +18,9 @@ const sampleNode = {
   summary: 'Fixture school summary.',
   statusLabel: 'Historic',
   statusKind: 'status' as const,
+  eraLabel: '1870s to 1910s',
+  eraBuckets: ['1870s', '1910s'],
+  entityStatus: 'historic',
   evidenceCount: 2,
   connectionCount: 1,
   href: '/entity/ent_dunbar_school_001',
@@ -32,6 +35,8 @@ test('DecadeStepper renders tablist with all-time and decade tabs', () => {
     />,
   );
   assert.match(html, /role="tablist"/);
+  assert.match(html, /ds-explore-edition__decade-stepper/);
+  assert.match(html, /ds-explore-edition__decade-tab/);
   assert.match(html, /All time/);
   assert.match(html, /1950s/);
   assert.match(html, /aria-selected="true"/);
@@ -46,5 +51,16 @@ test('HistoryResultList renders entity links', () => {
     />,
   );
   assert.match(html, /href="\/entity\/ent_dunbar_school_001"/);
+  assert.match(html, /1870s to 1910s/);
+  assert.match(html, /ds-history-edition__rip-fact-label/);
   assert.match(html, /aria-current="true"/);
+  assert.match(html, /ds-history-result-list__item--selected/);
+  assert.match(html, /ds-history-result-list__row-link/);
+  assert.equal(
+    (html.match(/href="\/entity\/ent_dunbar_school_001"/g) ?? []).length,
+    1,
+    'entity href appears once per row (no nested anchors)',
+  );
+  assert.doesNotMatch(html, /ds-history-edition__rip-link/);
+  assert.doesNotMatch(html, /—/);
 });

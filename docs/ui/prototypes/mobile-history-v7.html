@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BlackStory Mobile History v7 — density notes</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 42rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
+    h1 { font-size: 1.125rem; }
+    ul { padding-left: 1.25rem; }
+    code { font-size: 0.875em; }
+  </style>
+</head>
+<body>
+  <h1>Mobile History v7 — polish constraints</h1>
+  <p>Binding: <code>design-direction-v6-mobile.md</code>, <code>design-direction-v6-history.md</code>, Explore v7 lessons in <code>mobile-explore-v7.html</code>.</p>
+  <ul>
+    <li>16dp horizontal edge inset (<code>screenScrollInsets.paddingHorizontal</code> / <code>space['4']</code>).</li>
+    <li>Masthead at <code>subtitle</code> scale (20px Sora) in dense browse mode — not <code>display</code> (34px).</li>
+    <li>Category browse uses full-width ledger rows — never a two-up grid that mid-word wraps long kind labels.</li>
+    <li>Continuous Surface: sectioning via <code>SectionHeader</code> + hairline dividers — not stacked bordered cards inside cards.</li>
+    <li>Dev gear / options control lives in the masthead trailing slot (<code>DevMenuHeaderButton</code>), not floating over the intro panel.</li>
+    <li><code>ApiStatusBanner</code> stays useful in <code>__DEV__</code> but uses compact padding and smaller type.</li>
+    <li>44dp touch targets preserved via row <code>minHeight</code> and ghost button size.</li>
+  </ul>
+</body>
+</html>

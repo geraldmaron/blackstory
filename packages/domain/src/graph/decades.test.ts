@@ -189,6 +189,32 @@ test('buildAllTimeView includes entityIds that never appear in any decade bucket
 
 // Sanity: confirms this test exercises the real currentStatus derivation (never
 // reimplemented locally) so the "still active" premise above is grounded in the real function.
+test('buildDecadeViews excludes decades after the stillActiveCutoff calendar decade', () => {
+  const entities = [
+    {
+      entityId: 'ent-future-span',
+      activeSpans: [{ validFrom: '2020', validTo: '2055', datePrecision: 'year' as const }],
+    },
+  ];
+  const views = buildDecadeViews({ entities, relationships: [] }, { stillActiveCutoff: '2026-07-17' });
+  assert.deepEqual(
+    views.map((view) => view.decade),
+    ['2020s'],
+  );
+  assert.ok(!views.some((view) => view.decade === '2030s'));
+});
+
+test('deriveActiveDecadeBuckets drops future decades even when validTo extends beyond the cutoff decade', () => {
+  const buckets = deriveActiveDecadeBuckets(
+    {
+      entityId: 'ent-future-span',
+      activeSpans: [{ validFrom: '2020', validTo: '2055', datePrecision: 'year' }],
+    },
+    { stillActiveCutoff: '2026-07-17' },
+  );
+  assert.deepEqual(buckets, ['2020s']);
+});
+
 test('sanity: currentStatus derives "active" from the same open-ended record used above', () => {
   const statusHistory: readonly StatusHistoryEntry<EntityStatusValue>[] = [
     {

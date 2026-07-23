@@ -186,7 +186,7 @@ export function HeroHeadlineMorph() {
   const prefixMs = phase.transitionMs > 0 ? phase.transitionMs : 700;
 
   return (
-    <h1 className="ds-hero-stage__headline" id="hero-headline" aria-label={phase.accessibleLabel}>
+    <h1 className="ds-home-hero__headline" id="hero-headline" aria-label={phase.accessibleLabel}>
       <span
         className="ds-hero-headline-morph"
         aria-hidden="true"

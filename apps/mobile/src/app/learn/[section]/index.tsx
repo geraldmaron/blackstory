@@ -12,23 +12,46 @@
  * mirroring `entity/[id].tsx`'s "never crash on hostile input, always fall back to a safe
  * default" convention (MOB-008 threat-model T4).
  */
-import { Redirect, router, useLocalSearchParams } from 'expo-router';
+import { Redirect, router, useLocalSearchParams, useNavigation } from 'expo-router';
+import { useLayoutEffect } from 'react';
 
-import { ContentPageScreen, SectionListScreen, listCatalogEntries, parseSectionParam } from '@/features/learn';
+import { ContentPageScreen, SectionListScreen, StorySectionIndexScreen, isLongformSection, listCatalogEntries, parseSectionParam } from '@/features/learn';
 
 export default function LearnSectionIndexScreen() {
+  const navigation = useNavigation();
   const { section } = useLocalSearchParams<{ section?: string | string[] }>();
   const row = parseSectionParam(section);
+
+  useLayoutEffect(() => {
+    if (!row) return;
+    navigation.setOptions({
+      title: row.title,
+      headerTitle: row.title,
+      headerBackTitle: 'Stories',
+      headerLargeTitle: false,
+      headerBackButtonDisplayMode: 'minimal',
+    });
+  }, [navigation, row]);
 
   if (!row) {
     return <Redirect href="/explore" />;
   }
 
   if (row.directSlug) {
-    return <ContentPageScreen section={row.catalogSection} slug={row.directSlug} />;
+    return (
+      <ContentPageScreen
+        section={row.catalogSection}
+        slug={row.directSlug}
+        fallbackTitle={row.title}
+      />
+    );
   }
 
   const entries = listCatalogEntries(row.catalogSection);
+
+  if (isLongformSection(row.catalogSection)) {
+    return <StorySectionIndexScreen section={row} />;
+  }
 
   return (
     <SectionListScreen

@@ -30,6 +30,7 @@ Every dependency (data access, App Check guard, rate limiter, search guard) is *
 | `GET /v1/compatibility` | Client-version floor check (ADR-021 §2) | `CompatibilityCheckV1` | no | none | `no-store` |
 | `GET /v1/bootstrap` | Active release + version floor | `bootstrapResponseV1Schema` | signal (fail-open) | none | `max-age=30, swr=120` |
 | `GET /v1/entity/:id` | One published entity | `entityV1Schema` | signal (fail-open, `static_read`) | `entityRetrieval` | `max-age=60, swr=300` |
+| `GET /v1/map` | Release-coupled redacted Explore GeoJSON | `mapSourceV1Schema` | signal (fail-open, `static_read`) | `entityRetrieval` | `max-age=60, swr=300` |
 | `GET /v1/search` | Bounded search | `searchResponseV1Schema` | REQUIRED (`expensive_read`) | `search` | `max-age=60, swr=300` |
 
 Every `200` body is validated against its `@repo/public-contracts` zod schema before it is written.
@@ -116,16 +117,35 @@ Same env vocabulary as `apps/web`: `PUBLIC_DATA_SOURCE=postgres` plus a server-o
 `DATABASE_URL` / `APP_DATABASE_URL` (Supabase pooler or local PostGIS). Mobile clients never
 receive these values — they call this service over HTTPS only.
 
+`run-with-dev-secrets` is a thin wrapper around `op run --env-file ~/.env.1password -- "$@"` —
+**do not** insert another `--` before your command (that makes `--` the executable).
+
+**Option 1 — `DATABASE_URL` in 1Password (`~/.env.1password`):**
+
 ```bash
 cd apps/api-public
-
-run-with-dev-secrets -- env \
+run-with-dev-secrets env \
   PUBLIC_DATA_SOURCE=postgres \
-  DATABASE_URL='postgresql://…' \
   DATABASE_SSL=1 \
   APP_CHECK_MODE=monitor \
   pnpm dev
 ```
+
+**Option 2 — `DATABASE_URL` in `apps/web/.env.local`:**
+
+Paste each line separately. Do not append `#` comments on the same line as a command — zsh
+will wait for a closing quote (`cmdand cmdand quote>`).
+
+```bash
+cd apps/api-public
+set -a
+source ../web/.env.local
+set +a
+env PUBLIC_DATA_SOURCE=postgres DATABASE_SSL=1 APP_CHECK_MODE=monitor pnpm dev
+```
+
+Fresh clone: from the repo root run `pnpm install && pnpm --filter @repo/public-contracts build`
+before `pnpm dev` so `@repo/public-contracts` resolves.
 
 ## Local run against live Firebase (legacy — explicit opt-in)
 
@@ -150,7 +170,7 @@ cd apps/api-public
 
 # Inject any 1Password-backed env refs (GOOGLE_APPLICATION_CREDENTIALS op://, etc.) without
 # writing secrets to disk. Confirm injection with `env | rg '^[A-Z_]+='` — never echo key values.
-run-with-dev-secrets -- env \
+run-with-dev-secrets env \
   PUBLIC_DATA_SOURCE=firestore \
   BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1 \
   FIREBASE_PROJECT_ID=black-book-efaaf \

@@ -63,6 +63,11 @@ export interface PublicDataAccess {
    * boundary.
    */
   getEntity(releaseId: string, entityId: string): Promise<EntityV1 | undefined>;
+  /**
+   * All published entities for a release (map FeatureCollection input). Bounded upstream by
+   * adapter scan ceilings; callers must still validate the map payload against MapSourceV1.
+   */
+  listEntities(releaseId: string): Promise<readonly EntityV1[]>;
   /** A bounded search page over the active release for an already-validated canonical query. */
   search(canonical: CanonicalSearchQuery, options: { readonly releaseId: string }): Promise<SearchPage>;
 }
@@ -117,6 +122,10 @@ export function createInMemoryPublicDataAccess(options: InMemoryPublicDataOption
       return byId.get(entityId);
     },
 
+    async listEntities(_releaseId) {
+      return [...byId.values()];
+    },
+
     async search(canonical) {
       return searchOverEntities([...byId.values()], canonical);
     },
@@ -156,7 +165,7 @@ export function searchOverEntities(
 
 /**
  * Index-backed search via `@repo/domain`'s `runPublicSearch` (same pipeline as
- * `apps/web/src/app/search/search-view-model.ts`). Applies facet filters, facets, ranking, and
+ * `apps/web/src/app/search/api/handler.ts`). Applies facet filters, facets, ranking, and
  * depth-based pagination over persisted `publicSearchIndex` docs loaded by
  * `./firestore-data-access.ts`.
  */
@@ -237,6 +246,8 @@ export type FirestoreDataAccessReaders = {
   readonly readReleasePointer: () => Promise<ReleasePointer | undefined>;
   /** MUST already collapse unpublished/nonexistent to `undefined` (T3). */
   readonly readEntity: (releaseId: string, entityId: string) => Promise<EntityV1 | undefined>;
+  /** All published entities for map FeatureCollection construction. */
+  readonly readEntities: (releaseId: string) => Promise<readonly EntityV1[]>;
   readonly readSearchPage: (
     canonical: CanonicalSearchQuery,
     options: { readonly releaseId: string },
@@ -253,6 +264,10 @@ export function createFirestorePublicDataAccess(readers: FirestoreDataAccessRead
       // Re-validate at the boundary: even a live projection reader's output is parsed before it can
       // leave this module, so an accidental internal field can never reach a client.
       return entity ? entityV1Schema.parse(entity) : undefined;
+    },
+    async listEntities(releaseId) {
+      const entities = await readers.readEntities(releaseId);
+      return entities.map((entity) => entityV1Schema.parse(entity));
     },
     async search(canonical, options) {
       return readers.readSearchPage(canonical, options);

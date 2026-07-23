@@ -91,7 +91,7 @@ export function searchHrefForStatus(status: string): string | undefined {
 
   const params = new URLSearchParams();
   params.set('status', trimmed);
-  return `/search?${params.toString()}`;
+  return `/history?${params.toString()}`;
 }
 
 /**

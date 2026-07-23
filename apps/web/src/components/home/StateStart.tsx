@@ -1,18 +1,13 @@
 'use client';
 
 /**
- * Zero-permission place orientation: a native state select covering all 51
- * states/D.C., editorial coverage shortcuts for deepest coverage, and a quiet
- * /locate hand-off. Lives under the homepage About beat.
- *
- * Navigation is router.push (continuous-experience contract): the persistent
- * map canvas survives the transition and flies to the state's camera preset
- * when /explore reads the ?state= param.
+ * Zero-permission place orientation for beat 01: dense state select, Near You secondary,
+ * deepest-coverage strip, and quiet locate hand-off.
  */
 
-import { useState, type SyntheticEvent } from 'react';
-import Link from 'next/link';
+import React from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { US_STATES } from '@repo/domain/map/geography';
 import { DEFAULT_EXPLORE_FILTERS } from '../../lib/map-experience/filters';
 import { buildExploreHref, defaultExploreOverlayState } from '../../lib/map-experience/url-state';
@@ -38,68 +33,61 @@ function exploreHrefForState(postalCode: string): string {
 
 export function StateStart({ topStates }: StateStartProps) {
   const router = useRouter();
-  const [selected, setSelected] = useState('');
-
-  function handleSubmit(event: SyntheticEvent<HTMLFormElement, SubmitEvent>) {
-    event.preventDefault();
-    if (selected) {
-      router.push(exploreHrefForState(selected));
-    }
-  }
 
   return (
-    <div className="ds-state-start">
-      <form className="ds-state-start__form" onSubmit={handleSubmit}>
-        <label className="ds-visually-hidden" htmlFor="state-start-select">
-          Your state
-        </label>
-        <select
-          id="state-start-select"
-          className="ds-state-start__select"
-          value={selected}
-          onChange={(event) => setSelected(event.target.value)}
-        >
-          <option value="">Choose your state…</option>
-          {US_STATES.map((state) => (
-            <option key={state.postalCode} value={state.postalCode}>
-              {state.name}
-            </option>
-          ))}
-        </select>
-        <button
-          className="ds-button ds-button--secondary ds-state-start__submit"
-          type="submit"
-          disabled={!selected}
-        >
-          See its records
-        </button>
-      </form>
+    <div className="ds-home-edition__place-controls-col">
+      <div className="ds-home-edition__panel ds-home-edition__place-intro">
+        <div className="ds-home-edition__place-row">
+          <label className="ds-visually-hidden" htmlFor="home-state-select">
+            State
+          </label>
+          <select
+            id="home-state-select"
+            className="ds-home-edition__place-select"
+            defaultValue=""
+            onChange={(event) => {
+              const postalCode = event.currentTarget.value;
+              if (postalCode) {
+                router.push(exploreHrefForState(postalCode));
+              }
+            }}
+          >
+            <option value="">Choose your state…</option>
+            {US_STATES.map((state) => (
+              <option key={state.postalCode} value={state.postalCode}>
+                {state.name}
+              </option>
+            ))}
+          </select>
+          <Link className="ds-cta ds-cta--ghost ds-home-edition__place-near" href="/locate">
+            Near You
+          </Link>
+        </div>
+        <p className="ds-home-edition__place-locate">
+          Or <Link href="/locate">locate me on the map</Link> to see records within a radius of
+          where you stand.
+        </p>
+      </div>
 
       {topStates.length > 0 ? (
-        <div className="ds-state-start__coverage">
-          <p className="ds-state-start__coverage-label" id="state-start-coverage-label">
-            Deepest coverage
+        <div className="ds-home-edition__presence-strip">
+          <p className="ds-home-edition__presence-label" id="home-presence-label">
+            Deepest coverage in this release
           </p>
-          <ul
-            className="ds-state-start__chips"
-            aria-labelledby="state-start-coverage-label"
-          >
+          <ul className="ds-home-edition__presence-list" aria-labelledby="home-presence-label">
             {topStates.map((state) => (
               <li key={state.postalCode}>
-                <Link className="ds-state-chip" href={exploreHrefForState(state.postalCode)}>
-                  <span className="ds-state-chip__name">{state.name}</span>
-                  <span className="ds-state-chip__count">{state.count}</span>
+                <Link className="ds-home-edition__presence-link" href={exploreHrefForState(state.postalCode)}>
+                  <span className="ds-home-edition__presence-name">{state.name}</span>
+                  <span className="ds-home-edition__presence-count">
+                    {state.count} rec
+                  </span>
                 </Link>
               </li>
             ))}
           </ul>
         </div>
       ) : null}
-
-      <p className="ds-state-start__locate">
-        Standing somewhere with a story? <Link href="/locate">Use your location</Link> — read only
-        with your permission, never stored.
-      </p>
     </div>
   );
 }

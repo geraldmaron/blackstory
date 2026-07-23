@@ -15,6 +15,8 @@ const sampleNode: HistoryNodeView = {
   summary: 'A landmark public school in Washington, D.C.',
   statusLabel: 'Operating',
   statusKind: 'status',
+  eraLabel: '1870s',
+  eraBuckets: ['1870s'],
   evidenceCount: 3,
   connectionCount: 2,
   href: '/entity/ent_dunbar_school_001',

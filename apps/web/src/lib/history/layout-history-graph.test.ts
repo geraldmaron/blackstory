@@ -12,7 +12,7 @@ import {
   layoutHistoryGraph,
   resolveHistoryGraphMode,
 } from './layout-history-graph';
-import { kindEncodingFor } from '../map-experience/kind-encoding';
+import { displayEncodingFor, kindEncodingFor } from '../map-experience/kind-encoding';
 
 function makeNode(
   entityId: string,
@@ -27,6 +27,8 @@ function makeNode(
     summary: `${displayName} summary`,
     statusLabel: 'Historic',
     statusKind: 'status',
+    eraLabel: '1950s',
+    eraBuckets: ['1950s'],
     evidenceCount: 1,
     connectionCount,
     href: `/entity/${entityId}`,
@@ -145,7 +147,7 @@ test('layoutHistoryGraph uses record mode for small filtered sets', () => {
   assert.deepEqual(first.layoutNodes, second.layoutNodes);
   const school = first.layoutNodes.find((node) => node.kind === 'school');
   assert.ok(school);
-  assert.equal(school.shade, kindEncodingFor('school').shade);
+  assert.equal(school.shade, displayEncodingFor('school').shade);
   assert.equal(school.glyph, 'square');
 });
 

@@ -1,10 +1,8 @@
 /**
- * Themed image primitive wrapping expo-image. `alt` is required (not
- * optional) so every call site is forced to provide an accessible
- * description. When `source` is absent, or the network image fails to load,
- * this renders `EntityMark` (a geometric, non-figurative placeholder) rather
- * than a broken-image glyph or any generated avatar/portrait — the program's
- * explicit non-goal is no decorative anonymous-portrait/avatar system.
+ * Themed image primitive wrapping expo-image. `alt` is required so every call
+ * site provides an accessible description. When `source` is absent or the
+ * network image fails, this fills the frame with `EntityMark` (geometric,
+ * non-figurative) — never a broken-image glyph or generated portrait.
  */
 import { useState } from 'react';
 import { Image as ExpoImage, type ImageSource } from 'expo-image';
@@ -21,21 +19,39 @@ export type ImageProps = {
   fallback: Omit<EntityMarkProps, 'entityName'> & { entityName?: string };
 };
 
-export function Image({ source, alt, aspectRatio = 4 / 3, borderRadiusKey = 'sm', fallback }: ImageProps) {
+export function Image({
+  source,
+  alt,
+  aspectRatio = 4 / 3,
+  borderRadiusKey = 'sm',
+  fallback,
+}: ImageProps) {
   const theme = useThemeColors();
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
-  const hasSource = source !== null && source !== undefined;
+  const hasSource = source !== null && source !== undefined && source !== '';
 
   const containerStyle = [
     styles.container,
-    { aspectRatio, backgroundColor: theme.surfaceRaised, borderRadius: radius[borderRadiusKey] },
+    {
+      aspectRatio,
+      backgroundColor: theme.surfaceRaised,
+      borderRadius: radius[borderRadiusKey],
+      borderColor: theme.border,
+      borderWidth: StyleSheet.hairlineWidth,
+    },
   ];
 
   if (!hasSource || failed) {
     return (
-      <View style={containerStyle}>
-        <EntityMark entityName={fallback.entityName ?? alt} {...fallback} />
+      <View style={containerStyle} testID="image-fallback">
+        <EntityMark
+          entityName={fallback.entityName ?? alt}
+          shape={fallback.shape}
+          kindLabel={fallback.kindLabel}
+          reason={fallback.reason ?? 'absent'}
+          fill
+        />
       </View>
     );
   }

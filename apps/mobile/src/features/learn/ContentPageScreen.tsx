@@ -1,45 +1,109 @@
 /**
- * Full content-page screen body (MOB-015): wires `useContentPage` (real cache/connectivity) →
- * `normalizeContentPage` (allowlisted-schema defense) → `ContentRenderer` (presentation). Used by
- * both `/learn/[section]/index.tsx` (single-page sections) and `/learn/[section]/[slug].tsx`
- * (multi-page sections).
+ * Full content-page screen body (MOB-015): Ledger Line canvas masthead + flat
+ * article body (no indexed Surface stack, no nested card around prose).
  */
-import { ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { EmptyState, ErrorState } from '@/ui';
+import { useNavigation } from 'expo-router';
+import { useLayoutEffect } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import {
+  EmptyState,
+  ErrorState,
+  ScreenCanvas,
+  ScreenHeader,
+  screenScrollInsets,
+  space,
+  useThemeColors,
+} from '@/ui';
 import { normalizeTypedContentPage } from './content-blocks';
 import type { CatalogSectionId } from './content-catalog';
 import { ContentRenderer } from './ContentRenderer';
 import { isContentVersionStale } from './legal-version';
+import { isLongformSection } from './story-index';
 import { useContentPage } from './useContentPage';
 
 export interface ContentPageScreenProps {
   readonly section: CatalogSectionId;
   readonly slug: string;
-  /**
-   * The most recently known bootstrap content-version, when available. `undefined` today (see
-   * `legal-version.ts`'s doc comment — no live endpoint exposes this to mobile yet); left as an
-   * explicit prop so wiring a real bootstrap-derived value later is a call-site change, not a
-   * screen rewrite.
-   */
   readonly currentContentVersion?: string;
+  readonly fallbackTitle?: string;
 }
 
-export function ContentPageScreen({ section, slug, currentContentVersion }: ContentPageScreenProps) {
+/** Title/3-paragraph skeleton shown while the page loads — a shape hint, not a spinner glyph. */
+function ContentPageSkeleton() {
+  const theme = useThemeColors();
+  const bar = (widthPct: number, height: number, extra?: object) => (
+    <View
+      style={[
+        styles.skeletonBar,
+        { backgroundColor: theme.surfaceRaised, borderColor: theme.border, width: `${widthPct}%`, height },
+        extra,
+      ]}
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+    />
+  );
+  return (
+    <View accessibilityLabel="Loading story" accessibilityRole="progressbar">
+      <View style={styles.skeletonTitleBlock}>
+        {bar(80, 24)}
+        {bar(55, 24)}
+      </View>
+      {[0, 1, 2].map((paragraph) => (
+        <View key={paragraph} style={styles.skeletonParagraph}>
+          {bar(100, 14)}
+          {bar(96, 14)}
+          {bar(88, 14)}
+          {bar(paragraph === 2 ? 40 : 70, 14)}
+        </View>
+      ))}
+    </View>
+  );
+}
+
+export function ContentPageScreen({
+  section,
+  slug,
+  currentContentVersion,
+  fallbackTitle = 'Story',
+}: ContentPageScreenProps) {
+  const navigation = useNavigation();
   const state = useContentPage(section, slug);
+  const longform = isLongformSection(section);
+
+  const resolvedTitle =
+    state.status === 'ok'
+      ? normalizeTypedContentPage(state.value.page).page?.title ?? fallbackTitle
+      : fallbackTitle;
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: resolvedTitle,
+      headerTitle: resolvedTitle,
+      headerBackTitle: 'Stories',
+      headerLargeTitle: false,
+      headerBackButtonDisplayMode: 'minimal',
+    });
+  }, [navigation, resolvedTitle]);
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['left', 'right', 'bottom']}>
-      <ScrollView contentContainerStyle={{ padding: 16 }}>
+    <ScreenCanvas edges={['left', 'right', 'bottom']}>
+      <ScrollView
+        contentContainerStyle={{
+          paddingHorizontal: screenScrollInsets.paddingHorizontal,
+          paddingTop: screenScrollInsets.paddingTop,
+          paddingBottom: screenScrollInsets.paddingBottom,
+          gap: space['3'],
+        }}
+      >
         {state.status === 'loading' ? (
-          <EmptyState title="Loading…" />
+          <ContentPageSkeleton />
         ) : state.status === 'error' ? (
           <ErrorState title="Something went wrong" description="This page could not be loaded." />
         ) : state.status === 'not-found' ? (
           <EmptyState title="Not found" description="This content is not available." />
         ) : state.status === 'offline-miss' ? (
           <ErrorState
-            title="Can't load — offline"
+            title="Can't load offline"
             description="This page hasn't been viewed yet, and there's no connection to fetch it now."
           />
         ) : (
@@ -49,20 +113,52 @@ export function ContentPageScreen({ section, slug, currentContentVersion }: Cont
               return <ErrorState title="This page could not be displayed" />;
             }
             const versionStale = isContentVersionStale(state.value.contentVersion, currentContentVersion);
+            const facts = [
+              ...(page.eraLabel ? [{ key: 'era', label: 'Era', value: page.eraLabel }] : []),
+              ...(page.placeLabel ? [{ key: 'where', label: 'Where', value: page.placeLabel }] : []),
+            ];
+
             return (
-              <ContentRenderer
-                page={page}
-                blocks={blocks}
-                skippedSections={skippedSections}
-                sources={state.value.sources}
-                requiresCitation={state.value.requiresCitation}
-                cached={{ fetchedAt: state.fetchedAt, degraded: state.degraded }}
-                versionStale={versionStale}
-              />
+              <>
+                <ScreenHeader
+                  kicker={longform ? 'Longform' : 'Document'}
+                  title={page.title}
+                  dek={page.dek}
+                  compact
+                  dense
+                />
+                <ContentRenderer
+                  page={page}
+                  blocks={blocks}
+                  skippedSections={skippedSections}
+                  sources={state.value.sources}
+                  requiresCitation={state.value.requiresCitation}
+                  presentation={longform ? 'longform' : 'document'}
+                  cached={{ fetchedAt: state.fetchedAt, degraded: state.degraded }}
+                  versionStale={versionStale}
+                  headerFacts={facts}
+                  hideTitle
+                />
+              </>
             );
           })()
         )}
       </ScrollView>
-    </SafeAreaView>
+    </ScreenCanvas>
   );
 }
+
+const styles = StyleSheet.create({
+  skeletonTitleBlock: {
+    gap: space['2'],
+    marginBottom: space['6'],
+  },
+  skeletonParagraph: {
+    gap: space['2'],
+    marginBottom: space['5'],
+  },
+  skeletonBar: {
+    borderRadius: space['1'],
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+});

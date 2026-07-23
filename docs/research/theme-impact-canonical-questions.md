@@ -31,11 +31,15 @@
 
 | Priority | Theme id | Notes |
 |----------|----------|-------|
-| P0 | `redlining` | Origins, geography, outcomes, place narrative |
+| P0 | `redlining` | Housing segregation spine; Chicago example; origins, geography, outcomes, place narrative |
 | P0 | `drug_policy_state` | Artifact timelines **and** quantitative impact |
 | P1 | `urban_renewal` | Same system later |
 | P1 | `mass_incarceration` | Overlaps justice Phase 1 metrics |
 | P1 | `environmental_racism` | EPA/EJ family when opened |
+| P1 | `school_segregation` | Segregation → school opportunity (Cook example); CRDC gap-labeled |
+| P1 | `voting_rights` | Franchise artifacts; turnout/policy indexes cite-first |
+
+**Spine note:** Banaji, Fiske & Massey (2021) PMC8688641 informs the housing → schools → voting chain. See [theme-impact-pmc8688641-chicago-spine.md](./theme-impact-pmc8688641-chicago-spine.md).
 
 ## 3. Policy eras (product time axis)
 
@@ -76,8 +80,10 @@ Each question is **answerable** as a product packet: narrative + observations/de
 | `Q8` | `mass_incarceration` | How did Black adult imprisonment rates change by state across modern justice eras? | P1 — largely Phase 1 justice metrics |
 | `Q9` | `environmental_racism` | How do environmental burden indicators concentrate relative to Black population share? | P1 — EJ/TRI/EJI beside demography |
 | `Q10` | cross-cutting | When is “impact” language allowed in the product? | Methodology gate (not a dataset) |
+| `Q11` | `school_segregation` | How does residential segregation shape school opportunity and later attainment in an example metro? | P1 — Cook ACS + desegregation artifacts |
+| `Q12` | `voting_rights` | How did franchise rules and federal enforcement change Black political access? | P1 — artifact timeline; turnout gap-labeled |
 
-**v1 implement focus:** `Q1`–`Q6` + `Q10`. Keep `Q7`–`Q9` as system-capacity proofs (same packet shape).
+**v1 implement focus:** `Q1`–`Q6` + `Q10`–`Q12`. Keep `Q7`–`Q9` as system-capacity proofs (same packet shape).
 
 ## 5. Metric catalog (v1)
 

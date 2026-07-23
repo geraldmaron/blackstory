@@ -126,32 +126,62 @@ const SUBMISSIONS_BASE_URL = resolveHttpUrl(
 const OBSERVABILITY_ENABLED = process.env.OBSERVABILITY_ENABLED === 'false' ? false : true;
 const PERFORMANCE_SAMPLE_RATE = resolveSampleRate(process.env.PERFORMANCE_SAMPLE_RATE);
 
+// --- Explore basemap (ADR-025) ------------------------------------------------
+//
+// Defaults match web Explore (OpenFreeMap). Optional self-hosted PMTiles via
+// MAP_PMTILES_URL. Kill-switch MAP_BASEMAP_ENABLED=false → points-only canvas.
+function optionalHttpUrl(raw: string | undefined): string | undefined {
+  const value = (raw ?? '').trim();
+  if (!value) return undefined;
+  try {
+    const parsed = new URL(value);
+    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return undefined;
+    return value;
+  } catch {
+    return undefined;
+  }
+}
+const MAP_PMTILES_URL = optionalHttpUrl(process.env.MAP_PMTILES_URL);
+const MAP_VECTOR_TILE_URL = optionalHttpUrl(process.env.MAP_VECTOR_TILE_URL);
+const MAP_GLYPHS_URL_CONFIG = optionalHttpUrl(process.env.MAP_GLYPHS_URL);
+const MAP_BASEMAP_ENABLED_CONFIG = process.env.MAP_BASEMAP_ENABLED !== 'false';
+
 // --- EAS Update / OTA (MOB-019, repo-ovn7; ADR-023 §2/§7, threat-model T6) -----
 //
-// `expo-updates` is installed (this bead's fix for ADR-023's amendment #2 — it
-// was previously entirely absent). It stays STRUCTURALLY INERT until a real EAS
-// project is provisioned (mobile-identity.md human gate #3 — no Expo/EAS
-// organization exists yet): `updates.url` / `extra.eas.projectId` are gated on
-// `EAS_PROJECT_ID`, following the same guarded-slot pattern as the Firebase
-// config above. With no `updates.url`, `expo-updates` reports `Updates.isEnabled
-// === false` and never attempts a network check — safe-by-default, not a
-// silent no-op someone has to notice. Once `eas init`/`eas update:configure`
-// runs for a real project, set `EAS_PROJECT_ID` per build profile in `eas.json`
-// (or CI env) and this slot activates with no code change.
+// `expo-updates` is installed. Project id defaults to the provisioned EAS
+// project `@gerald-maron/blackstory` (DEFAULT_EAS_PROJECT_ID below). Override
+// with env `EAS_PROJECT_ID` only for forks/CI. eas.json also sets it per build
+// profile.
+// EAS project `@gerald-maron/blackstory` (non-secret). Env override still
+// allowed for CI/forks. Defaulting here stops `eas device:*` / local CLI from
+// creating a duplicate project when APP_VARIANT env from eas.json is unset.
 //
-// `runtimeVersion: { policy: 'appVersion' }` is NOT gated — it is the
-// structural boundary (ADR-023 §2) that rejects an incompatible OTA bundle
-// client-side rather than shipping a crash, and costs nothing to declare ahead
-// of the EAS project existing.
-const EAS_PROJECT_ID = process.env.EAS_PROJECT_ID;
+// OTA vs local Dev Client: `extra.eas.projectId` stays always-on for CLI, but
+// the native updater is DISABLED for APP_VARIANT=development. Always-on
+// `updates.url` + `EXUpdatesEnabled=true` + `checkAutomatically: ALWAYS` made
+// Expo codesigning / update checks fight Metro on BlackStory (Dev) and surface
+// as continuous refresh. Preview/production keep ON_LOAD against the channel.
+const DEFAULT_EAS_PROJECT_ID = '51a35884-e6b5-43b6-b95b-c5a7460fa665';
+const EAS_PROJECT_ID = (process.env.EAS_PROJECT_ID ?? '').trim() || DEFAULT_EAS_PROJECT_ID;
+const UPDATES_URL = `https://u.expo.dev/${EAS_PROJECT_ID}`;
+const updatesConfig: NonNullable<ExpoConfig['updates']> =
+  APP_VARIANT === 'development'
+    ? {
+        url: UPDATES_URL,
+        enabled: false,
+        checkAutomatically: 'NEVER',
+      }
+    : {
+        url: UPDATES_URL,
+        enabled: true,
+        checkAutomatically: 'ON_LOAD',
+      };
 
 const config: ExpoConfig = {
   name: appName,
-  // EAS project slug placeholder — no Expo/EAS organization has been
-  // provisioned yet (mobile-identity.md human gate #3). This slug becomes
-  // meaningful only once a real EAS project is linked (`eas init`); it
-  // creates no store or EAS resource by itself.
-  slug: 'blackstory-mobile',
+  // EAS project slug — must match the Expo project linked by EAS_PROJECT_ID
+  // (`blackstory` on account gerald-maron).
+  slug: 'blackstory',
   version: '1.0.0',
   orientation: 'portrait',
   // Custom URL scheme fallback per mobile-identity.md: `blackstory://`,
@@ -170,12 +200,7 @@ const config: ExpoConfig = {
   runtimeVersion: {
     policy: 'appVersion',
   },
-  // Gated on `EAS_PROJECT_ID` — see the comment above `EAS_PROJECT_ID`. Absent
-  // today (no EAS project provisioned), so `expo-updates` has no update server
-  // to poll and stays inert.
-  ...(EAS_PROJECT_ID
-    ? { updates: { url: `https://u.expo.dev/${EAS_PROJECT_ID}` } }
-    : {}),
+  updates: updatesConfig,
   // No `newArchEnabled` toggle: SDK 56 has fully removed the legacy
   // architecture, so New Architecture is the only supported mode and the
   // config field no longer exists (confirmed against
@@ -193,17 +218,34 @@ const config: ExpoConfig = {
     bundleIdentifier,
     icon: './assets/expo.icon',
     //
-    // Universal Links (MOB-008, mobile-identity.md's URL-scheme section, threat-model T4
-    // "Universal-link domain binding"): declares this app as the handler for
-    // https://blackbook.app/* links, verified by iOS against the real
-    // apple-app-site-association file served from that domain's /.well-known/ path. Only
-    // production points at the bare production domain; dev/preview builds never claim it
-    // (avoids a dev build racing production for the same verified domain on a shared test
-    // device). The AASA file itself is a local template only — see
-    // apps/mobile/public/.well-known/README.md for what's real vs. templated, and
-    // mobile-identity.md's open human gates (#1: Apple Team ID) for what's still missing
-    // before this can be verified/published for real.
-    associatedDomains: APP_VARIANT === 'production' ? ['applinks:blackbook.app'] : [],
+    // App Store export-compliance declaration. The app uses only exempt
+    // encryption (standard HTTPS/TLS via the OS), so declare no use of
+    // non-exempt encryption. Expo writes this into the generated Info.plist
+    // as `ITSAppUsesNonExemptEncryption = NO`, which lets App Store Connect
+    // skip the export-compliance questionnaire on every upload.
+    config: {
+      usesNonExemptEncryption: false,
+    },
+    // Dev/preview: allow http://127.0.0.1:8080 (simulator) and LAN api-public.
+    // Without this, iOS ATS blocks cleartext API traffic and bootstrap/map/search
+    // look like "no data" even when api-public is running locally.
+    ...(APP_VARIANT !== 'production'
+      ? {
+          infoPlist: {
+            NSAppTransportSecurity: {
+              NSAllowsLocalNetworking: true,
+            },
+          },
+        }
+      : {}),
+    //
+    // Universal Links (MOB-008): production-only. Omit the key entirely for
+    // development/preview — an empty `associatedDomains: []` still makes Expo
+    // emit the Associated Domains entitlement, which then fails Ad Hoc signing
+    // when EXPO_NO_CAPABILITY_SYNC=1 (profile lacks the capability).
+    ...(APP_VARIANT === 'production'
+      ? { associatedDomains: ['applinks:blackbook.app'] as const }
+      : {}),
   },
   android: {
     // Native minimum OS floor per ADR-020 SS7: Android 8.0 (API 26)+.
@@ -215,6 +257,9 @@ const config: ExpoConfig = {
       monochromeImage: './assets/images/android-icon-monochrome.png',
     },
     predictiveBackGestureEnabled: false,
+    // Dev/preview: permit http API origins (127.0.0.1 / LAN api-public). Emulator
+    // uses http://10.0.2.2:8080 to reach the host machine's :8080.
+    ...(APP_VARIANT !== 'production' ? { usesCleartextTraffic: true } : {}),
     //
     // Android App Links (MOB-008), the Android analogue of iOS associatedDomains above:
     // autoVerify asks Android to verify this app against the real assetlinks.json served
@@ -240,6 +285,11 @@ const config: ExpoConfig = {
   },
   plugins: [
     'expo-router',
+    // Custom development client (NOT Expo Go). Required so `expo start` /
+    // press `i` targets BlackStory (Dev) with MapLibre + other native
+    // modules linked. Without this, Metro can open Expo Go, which lacks
+    // `MLRNCameraModule` and crashes Explore on import.
+    'expo-dev-client',
     [
       'expo-splash-screen',
       {
@@ -295,13 +345,18 @@ const config: ExpoConfig = {
     // Defaults to enabled/10% — see src/observability/README.md.
     observabilityEnabled: OBSERVABILITY_ENABLED,
     performanceSampleRate: PERFORMANCE_SAMPLE_RATE,
-    // `eas.projectId` (required by `expo-updates` to resolve its update
-    // server) is gated on `EAS_PROJECT_ID` — see the comment above that
-    // constant. No EAS organization/project is provisioned yet
-    // (mobile-identity.md human gate #3); do not hand-write a fake project id
-    // here. `eas init` / `eas update:configure` populate the real value once
-    // that gate clears.
-    ...(EAS_PROJECT_ID ? { eas: { projectId: EAS_PROJECT_ID } } : {}),
+    // `eas.projectId` — defaults to `@gerald-maron/blackstory` (see
+    // DEFAULT_EAS_PROJECT_ID). Required so local `eas device:*` / CLI do not
+    // create a duplicate Expo project under another account slug.
+    eas: { projectId: EAS_PROJECT_ID },
+    // Explore basemap (ADR-025): OpenFreeMap by default (web parity). Optional
+    // self-hosted PMTiles via MAP_PMTILES_URL. Kill-switch: MAP_BASEMAP_ENABLED=false.
+    map: {
+      ...(MAP_PMTILES_URL ? { pmtilesUrl: MAP_PMTILES_URL } : {}),
+      ...(MAP_VECTOR_TILE_URL ? { vectorTileUrl: MAP_VECTOR_TILE_URL } : {}),
+      ...(MAP_GLYPHS_URL_CONFIG ? { glyphsUrl: MAP_GLYPHS_URL_CONFIG } : {}),
+      basemapEnabled: MAP_BASEMAP_ENABLED_CONFIG,
+    },
   },
 };
 

@@ -14,50 +14,52 @@
  */
 
 export const brandCore = {
-  "ebonyInk": "#111111",
-  "archivePaper": "#F7F3EE",
-  "sand": "#E7D9C3",
-  "bronze": "#B87333",
-  "mahogany": "#7A2E22",
-  "copperPin": "#D47A42"
+  "ebonyInk": "#0A0A0A",
+  "archivePaper": "#F4EFE5",
+  "sand": "#D8A178",
+  "bronze": "#B86B2A",
+  "mahogany": "#8E4F2A",
+  "copperPin": "#B86B2A"
 } as const;
 
 export const themeColors = {
   "light": {
-    "canvas": "#F7F3EE",
-    "surface": "#F9F5F1",
-    "surfaceRaised": "#FAF7F4",
-    "ink": "#111111",
-    "inkMuted": "#62605E",
-    "inkSubtle": "#62605E",
-    "border": "#E7D9C3",
-    "borderStrong": "#111111",
-    "focusRing": "#111111",
-    "focusRingOffset": "#F7F3EE",
-    "inverse": "#111111",
-    "inverseInk": "#F7F3EE",
-    "overlay": "rgba(17, 17, 17, 0.55)",
-    "accent": "#7A2E22",
-    "accentGraphic": "#CC7640",
-    "accentMuted": "#DEC0A3"
+    "canvas": "#F4EFE5",
+    "surface": "#FBF8F2",
+    "surfaceRaised": "#FDFBF8",
+    "surfacePressed": "#F4EFE5",
+    "ink": "#0A0A0A",
+    "inkMuted": "#6D675F",
+    "inkSubtle": "#726C64",
+    "border": "#D7D0C4",
+    "borderStrong": "#0A0A0A",
+    "focusRing": "#0A0A0A",
+    "focusRingOffset": "#F4EFE5",
+    "inverse": "#0A0A0A",
+    "inverseInk": "#F4EFE5",
+    "overlay": "rgba(10, 10, 10, 0.55)",
+    "accent": "#8E4F2A",
+    "accentGraphic": "#B86B2A",
+    "accentMuted": "#D8A178"
   },
   "dark": {
-    "canvas": "#111111",
-    "surface": "#232323",
-    "surfaceRaised": "#313130",
-    "ink": "#F7F3EE",
-    "inkMuted": "#A7A4A1",
-    "inkSubtle": "#A7A4A1",
-    "border": "#3F3E3D",
-    "borderStrong": "#F7F3EE",
-    "focusRing": "#F7F3EE",
-    "focusRingOffset": "#111111",
-    "inverse": "#F7F3EE",
-    "inverseInk": "#111111",
+    "canvas": "#0A0A0A",
+    "surface": "#161616",
+    "surfaceRaised": "#1C1B18",
+    "surfacePressed": "#0A0A0A",
+    "ink": "#F4EFE5",
+    "inkMuted": "#BDB5A9",
+    "inkSubtle": "#8B857D",
+    "border": "#34302C",
+    "borderStrong": "#F4EFE5",
+    "focusRing": "#F4EFE5",
+    "focusRingOffset": "#0A0A0A",
+    "inverse": "#F4EFE5",
+    "inverseInk": "#0A0A0A",
     "overlay": "rgba(0, 0, 0, 0.72)",
-    "accent": "#D47A42",
-    "accentGraphic": "#D47A42",
-    "accentMuted": "#E7D9C3"
+    "accent": "#D07A32",
+    "accentGraphic": "#D07A32",
+    "accentMuted": "#D8A178"
   }
 } as const;
 

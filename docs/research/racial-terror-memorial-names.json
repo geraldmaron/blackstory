@@ -3156,6 +3156,12 @@
     "context": "racial terror killing"
   },
   {
+    "name": "Malcolm X",
+    "year": 1965,
+    "place": "New York, New York",
+    "context": "assassinated"
+  },
+  {
     "name": "Marshall Scott Jr.",
     "year": 1965,
     "place": "New Orleans, Louisiana",
@@ -3342,6 +3348,12 @@
     "context": "racial terror lynching"
   },
   {
+    "name": "Michael Griffith",
+    "year": 1986,
+    "place": "Howard Beach, New York",
+    "context": "killed after racial attack"
+  },
+  {
     "name": "Kerrick Majors",
     "year": 1987,
     "place": "Nashville, Tennessee",
@@ -3372,9 +3384,75 @@
     "context": "racial terror lynching"
   },
   {
+    "name": "Trayvon Martin",
+    "year": 2012,
+    "place": "Sanford, Florida",
+    "context": "killed by civilian"
+  },
+  {
+    "name": "Clementa C. Pinckney",
+    "year": 2015,
+    "place": "Charleston, South Carolina",
+    "context": "killed in Mother Emanuel church massacre"
+  },
+  {
+    "name": "Cynthia Graham Hurd",
+    "year": 2015,
+    "place": "Charleston, South Carolina",
+    "context": "killed in Mother Emanuel church massacre"
+  },
+  {
+    "name": "Daniel L. Simmons Sr.",
+    "year": 2015,
+    "place": "Charleston, South Carolina",
+    "context": "killed in Mother Emanuel church massacre"
+  },
+  {
+    "name": "Depayne Middleton-Doctor",
+    "year": 2015,
+    "place": "Charleston, South Carolina",
+    "context": "killed in Mother Emanuel church massacre"
+  },
+  {
+    "name": "Ethel Lee Lance",
+    "year": 2015,
+    "place": "Charleston, South Carolina",
+    "context": "killed in Mother Emanuel church massacre"
+  },
+  {
+    "name": "Myra Thompson",
+    "year": 2015,
+    "place": "Charleston, South Carolina",
+    "context": "killed in Mother Emanuel church massacre"
+  },
+  {
+    "name": "Sharonda Coleman-Singleton",
+    "year": 2015,
+    "place": "Charleston, South Carolina",
+    "context": "killed in Mother Emanuel church massacre"
+  },
+  {
+    "name": "Susie Jackson",
+    "year": 2015,
+    "place": "Charleston, South Carolina",
+    "context": "killed in Mother Emanuel church massacre"
+  },
+  {
+    "name": "Tywanza Sanders",
+    "year": 2015,
+    "place": "Charleston, South Carolina",
+    "context": "killed in Mother Emanuel church massacre"
+  },
+  {
     "name": "Ahmaud Arbery",
     "year": 2020,
     "place": "Satilla Shores, Georgia",
     "context": "racial terror killing"
+  },
+  {
+    "name": "Jordan Neely",
+    "year": 2023,
+    "place": "New York, New York",
+    "context": "killed by civilian on subway"
   }
 ]

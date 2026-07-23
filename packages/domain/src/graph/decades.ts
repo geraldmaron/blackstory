@@ -11,7 +11,12 @@
  * same "caller resolves, this module composes" discipline `../graph/containment.ts` follows for
  * jurisdiction data.
  */
-import { deriveEraBuckets, type EraSpan } from '../era.js';
+import {
+  calendarDecadeStartYear,
+  deriveEraBuckets,
+  decadeStartYearFromLabel,
+  type EraSpan,
+} from '../era.js';
 import type { EntityRelationship } from '../relationship.js';
 
 export type DecadeBucketEntityInput = {
@@ -39,6 +44,13 @@ export type DeriveActiveDecadeBucketsOptions = {
   readonly stillActiveCutoff?: string;
 };
 
+function maxPublishedDecadeStartYear(options: DeriveActiveDecadeBucketsOptions): number {
+  if (options.stillActiveCutoff !== undefined) {
+    return calendarDecadeStartYear(options.stillActiveCutoff);
+  }
+  return calendarDecadeStartYear(new Date());
+}
+
 /**
  * Derives every decade bucket an entity's active spans overlap. An entity founded in the
  * 1950s with an open-ended (still-active) status-history record and `stillActiveCutoff: "2026"`
@@ -48,6 +60,7 @@ export function deriveActiveDecadeBuckets(
   input: DecadeBucketEntityInput,
   options: DeriveActiveDecadeBucketsOptions = {},
 ): readonly string[] {
+  const maxDecadeStart = maxPublishedDecadeStartYear(options);
   const buckets = new Set<string>();
   for (const span of input.activeSpans) {
     const stillOpen = span.validTo === undefined || span.validTo === null;
@@ -55,7 +68,11 @@ export function deriveActiveDecadeBuckets(
       stillOpen && options.stillActiveCutoff !== undefined
         ? { ...span, validTo: options.stillActiveCutoff }
         : span;
-    for (const bucket of deriveEraBuckets(resolvedSpan)) buckets.add(bucket);
+    for (const bucket of deriveEraBuckets(resolvedSpan)) {
+      const start = decadeStartYearFromLabel(bucket);
+      if (start === undefined || start > maxDecadeStart) continue;
+      buckets.add(bucket);
+    }
   }
   return [...buckets].sort();
 }
@@ -104,7 +121,13 @@ export function buildDecadeViews(
     }
   }
 
-  const decades = [...decadeToNodes.keys()].sort();
+  const maxDecadeStart = maxPublishedDecadeStartYear(options);
+  const decades = [...decadeToNodes.keys()]
+    .filter((decade) => {
+      const start = decadeStartYearFromLabel(decade);
+      return start !== undefined && start <= maxDecadeStart;
+    })
+    .sort();
   return decades.map((decade) => {
     const nodeIds = new Set(decadeToNodes.get(decade) ?? []);
     const edgeIds = new Set<string>();

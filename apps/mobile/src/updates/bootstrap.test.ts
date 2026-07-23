@@ -29,6 +29,15 @@ describe('checkForUpdate', () => {
       expect(result.reason.length).toBeGreaterThan(0);
     }
   });
+
+  it('no-ops in __DEV__ so Metro owns the bundle (no OTA poll/reload)', async () => {
+    // Jest runs with __DEV__ === true under jest-expo.
+    const result = await checkForUpdate();
+    expect(result).toEqual({
+      checked: false,
+      reason: 'OTA checks disabled in __DEV__',
+    });
+  });
 });
 
 describe('fetchAndApplyUpdate', () => {
@@ -38,5 +47,13 @@ describe('fetchAndApplyUpdate', () => {
     if (!result.applied) {
       expect(typeof result.reason).toBe('string');
     }
+  });
+
+  it('refuses reloadAsync in __DEV__', async () => {
+    const result = await fetchAndApplyUpdate();
+    expect(result).toEqual({
+      applied: false,
+      reason: 'OTA apply/reload disabled in __DEV__',
+    });
   });
 });

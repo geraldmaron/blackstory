@@ -10,6 +10,11 @@
 import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { cx } from '@repo/ui';
+import {
+  HISTORY_DECADE_LIST_CLASS,
+  HISTORY_DECADE_STEPPER_CLASS,
+  HISTORY_DECADE_TAB_CLASS,
+} from '../../app/history/history-panel-chrome';
 import { buildHistoryHref, type HistoryViewState } from '../../lib/history/url-state';
 
 void React;
@@ -43,15 +48,15 @@ export function DecadeStepper({ decades, viewState, className, onSelect }: Decad
   }, [activeDecade, viewState.mode]);
 
   return (
-    <nav className={cx('ds-history-stepper', className)} aria-label="Browse by decade">
-      <ul className="ds-history-stepper__list" role="tablist" ref={listRef}>
+    <nav
+      className={cx(HISTORY_DECADE_STEPPER_CLASS, className)}
+      aria-label="Browse by decade"
+    >
+      <ul className={HISTORY_DECADE_LIST_CLASS} role="tablist" ref={listRef}>
         <li role="presentation">
           <Link
             role="tab"
-            className={cx(
-              'ds-history-stepper__tab',
-              viewState.mode === 'all-time' && 'ds-history-stepper__tab--active',
-            )}
+            className={HISTORY_DECADE_TAB_CLASS}
             href={stepHref(viewState)}
             scroll={false}
             aria-selected={viewState.mode === 'all-time'}
@@ -71,10 +76,7 @@ export function DecadeStepper({ decades, viewState, className, onSelect }: Decad
           <li key={decade} role="presentation">
             <Link
               role="tab"
-              className={cx(
-                'ds-history-stepper__tab',
-                activeDecade === decade && 'ds-history-stepper__tab--active',
-              )}
+              className={HISTORY_DECADE_TAB_CLASS}
               href={stepHref(viewState, decade)}
               scroll={false}
               aria-selected={activeDecade === decade}

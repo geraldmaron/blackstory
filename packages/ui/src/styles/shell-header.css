@@ -6,7 +6,7 @@
 :root {
   --ds-island-offset: env(safe-area-inset-top, 0px);
   /* Fallback until ShellHeader measures the live bar (ResizeObserver). */
-  --ds-island-height: 4.5rem;
+  --ds-island-height: 3.5rem;
   --ds-island-gap: var(--ds-space-3);
   --ds-island-clearance: calc(
     var(--ds-island-offset) + var(--ds-island-height) + var(--ds-island-gap)
@@ -37,7 +37,7 @@ html {
   width: 100%;
   max-width: none;
   min-height: var(--ds-island-height);
-  padding: 0.625rem var(--ds-gutter);
+  padding: 0.25rem var(--ds-gutter);
   border: 0;
   border-bottom: var(--ds-border-width) solid var(--ds-border);
   border-radius: 0;
@@ -119,6 +119,31 @@ html {
   .ds-shell-wordmark__img--lockup {
     width: 13rem;
   }
+}
+
+/* Map routes (`/explore`): symbol-only at every width to protect map center. */
+.ds-shell-header--symbol-only .ds-shell-wordmark__img--lockup {
+  display: none !important;
+}
+
+.ds-shell-header--symbol-only .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-light {
+  display: block;
+}
+
+.ds-shell-header--symbol-only .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-dark {
+  display: none;
+}
+
+[data-theme='dark']
+  .ds-shell-header--symbol-only
+  .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-light {
+  display: none;
+}
+
+[data-theme='dark']
+  .ds-shell-header--symbol-only
+  .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-dark {
+  display: block;
 }
 
 .ds-shell-nav__list {
@@ -218,6 +243,7 @@ html {
     min-height: 2.75rem;
     padding: 0 var(--ds-space-4);
     border-radius: var(--ds-radius-md);
+    border: var(--ds-border-width) solid transparent;
     background: var(--ds-accent-graphic);
     color: var(--ds-fixed-ink);
     font-family: var(--ds-font-sans);
@@ -226,11 +252,26 @@ html {
     letter-spacing: 0.08em;
     text-transform: uppercase;
     text-decoration: none;
-    transition: opacity var(--ds-duration-fast) var(--ds-easing);
+    transition:
+      opacity var(--ds-duration-fast) var(--ds-easing),
+      background-color var(--ds-duration-fast) var(--ds-easing),
+      border-color var(--ds-duration-fast) var(--ds-easing);
   }
 
   .ds-shell-header__cta:hover {
     opacity: 0.88;
+  }
+
+  .ds-shell-header__cta--quiet {
+    background: transparent;
+    border-color: var(--ds-border-strong);
+    color: var(--ds-ink);
+    opacity: 1;
+  }
+
+  .ds-shell-header__cta--quiet:hover {
+    background: color-mix(in srgb, var(--ds-ink) 6%, transparent);
+    opacity: 1;
   }
 }
 

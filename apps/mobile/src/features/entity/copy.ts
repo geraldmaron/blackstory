@@ -30,7 +30,7 @@ export const RECORD_GAP_COPY: Readonly<Record<RecordGapKind, RecordGapCopy>> = {
     title: 'No accepted claims yet',
     body:
       'No claims have cleared the evidence bar for this record yet. This reflects the current ' +
-      'state of research, not an absence of history — coverage deepens as research continues.',
+      'state of research, not an absence of history. Coverage deepens as research continues.',
   },
   related: {
     title: 'No linked records yet',
@@ -73,13 +73,14 @@ export const SECTION_HEADINGS = {
   timeline: 'Timeline',
   related: 'Connected records',
   continueLearning: 'Also connected',
+  visit: 'Visit',
   revision: 'Revision',
   maturity: 'Record maturity',
   media: 'Primary image',
 } as const;
 
 export const EVENT_WINDOW_NOTE =
-  'Events carry no active/historic status of their own — a when-span is authoritative instead.';
+  'Events carry no active/historic status of their own. A when-span is authoritative instead.';
 
 /** Shared 404 copy — deliberately identical whether the id never existed or was withdrawn
  * (threat-model T3: the server's `/v1/entity/:id` returns one indistinguishable NOT_FOUND for
@@ -87,7 +88,7 @@ export const EVENT_WINDOW_NOTE =
 export const NOT_PUBLIC_COPY = {
   title: 'This record is not currently public',
   body:
-    'This entry is not part of the current published edition — it may have been withdrawn, ' +
+    'This entry is not part of the current published edition. It may have been withdrawn, ' +
     'is under review, or the link may be out of date. Other BlackStory records are unaffected.',
   action: 'Back to Explore',
 };

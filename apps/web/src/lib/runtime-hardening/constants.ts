@@ -24,7 +24,7 @@ export const SEARCH_PAGE_PARAM_ALLOWLIST = [
   'dateFrom',
   'dateTo',
   'topic',
-  /** Page-local pagination for the SSR /search ledger (see search-view-model.ts). */
+  /** Page-local pagination for legacy /search redirects and /history ledger. */
   'offset',
 ] as const;
 
@@ -67,6 +67,11 @@ export const HISTORY_PAGE_PARAM_ALLOWLIST = [
   'kind',
   'q',
   'sort',
+  'status',
+  'era',
+  'topic',
+  'connections',
+  'offset',
   'selected',
   'edge',
 ] as const;

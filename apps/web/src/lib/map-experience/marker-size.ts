@@ -132,6 +132,24 @@ export function markerRadiusAtZoom(
 }
 
 /**
+ * Halo radius at a camera zoom — `(markerRadius + HALO_OFFSET) × zoomScale`.
+ * The offset must scale with zoom; a fixed +N px ring at national frame outgrows the
+ * shrunk fill and reads as every pin "lit" / selected.
+ */
+export function markerHaloRadiusAtZoom(
+  evidenceCount: number,
+  confidenceTier: ConfidenceTierLike,
+  zoom: number,
+): number {
+  return markerHaloRadius(evidenceCount, confidenceTier) * markerZoomScale(zoom);
+}
+
+/** Stroke/rim width at a camera zoom — same county-proportionate scale as the fill disc. */
+export function markerStrokeWidthAtZoom(baseWidth: number, zoom: number): number {
+  return baseWidth * markerZoomScale(zoom);
+}
+
+/**
  * Representative evidence-count sample points (doublings, plus 0), each paired with the
  * pre-modifier `evidenceBaseRadius()` value at that count. `markerRadiusEvidenceExpression()`
  * below builds a MapLibre `interpolate` expression directly from this array flattened this
@@ -210,10 +228,30 @@ export function markerRadiusExpression(): ExpressionSpecification {
   return zoomScaledRadiusExpression((dataRadius, scale) => ['*', dataRadius, scale]);
 }
 
-/** `markerRadiusExpression()` plus a fixed pixel offset (halo ring, event glyph ring), built as
- * its own top-level zoom interpolate for the same spec restriction documented above. */
+/** `markerRadiusExpression()` plus a pixel offset (halo ring, event glyph ring), built as
+ * its own top-level zoom interpolate for the same spec restriction documented above.
+ * Offset is multiplied by the zoom scale so national frames do not grow a fixed px wash
+ * around every shrunk disc (that read as a mass lit/refresh state). */
 export function markerRadiusPlusExpression(offset: number): ExpressionSpecification {
-  return zoomScaledRadiusExpression((dataRadius, scale) => ['+', ['*', dataRadius, scale], offset]);
+  return zoomScaledRadiusExpression((dataRadius, scale) => [
+    '*',
+    ['+', dataRadius, offset],
+    scale,
+  ]);
+}
+
+/**
+ * Top-level zoom interpolate that scales a numeric paint expression (or literal) by
+ * `MARKER_ZOOM_SCALE_STOPS` — used for circle-stroke-width so rims shrink with fills.
+ */
+export function zoomScaledNumericExpression(
+  value: ExpressionSpecification | number,
+): ExpressionSpecification {
+  const stops = MARKER_ZOOM_SCALE_STOPS.flatMap(([zoom, scale]) => [
+    zoom,
+    typeof value === 'number' ? value * scale : (['*', value, scale] as unknown[]),
+  ]);
+  return ['interpolate', ['linear'], ['zoom'], ...stops] as ExpressionSpecification;
 }
 
 /** `markerRadiusExpression()` plus the fixed halo offset, for use as the halo layer's

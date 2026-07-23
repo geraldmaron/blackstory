@@ -9,9 +9,9 @@
  * body of the lookup — it is never placed in the app's route/URL (invariant 7).
  */
 import { useState } from 'react';
-import { TextInput, View } from 'react-native';
+import { View } from 'react-native';
 
-import { Button, Notice, Text, radius, space, useThemeColors } from '@/ui';
+import { Button, CorrectionTextField, Notice, Text, space } from '@/ui';
 import type { StatusResult } from './client';
 import {
   PUBLIC_STATUS_LABELS,
@@ -29,51 +29,49 @@ export type CorrectionStatusViewProps = {
 };
 
 export function CorrectionStatusView({ initialCode, onLookup }: CorrectionStatusViewProps) {
-  const theme = useThemeColors();
   const [code, setCode] = useState(initialCode ?? '');
   const [result, setResult] = useState<StatusResult | null>(null);
   const [busy, setBusy] = useState(false);
 
+  const trimmed = code.trim();
+  const looksValid = RECEIPT_CODE_PATTERN.test(trimmed);
+
   async function handleLookup() {
+    // Keep the button live even before the code matches the expected shape, and
+    // surface the "check the code" guidance on press instead of silently doing
+    // nothing (the first tap used to only dismiss the keyboard).
+    if (!looksValid) {
+      setResult({ status: 'invalid_code' });
+      return;
+    }
     setBusy(true);
     try {
-      setResult(await onLookup(code));
+      setResult(await onLookup(trimmed));
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <View style={{ padding: space['4'], gap: space['4'] }}>
-      <Text variant="bodySmall" colorRole="inkMuted">
-        Enter the receipt code you saved when you submitted a correction.
-      </Text>
-
-      <TextInput
+    <View style={{ gap: space['3'] }}>
+      <CorrectionTextField
         value={code}
         onChangeText={setCode}
         placeholder="BB-COR-…"
-        placeholderTextColor={theme.inkMuted}
         autoCapitalize="characters"
         autoCorrect={false}
+        autoComplete="off"
         maxLength={64}
+        returnKeyType="done"
+        onSubmitEditing={handleLookup}
         accessibilityLabel="Correction receipt code"
-        style={{
-          borderWidth: 1,
-          borderColor: theme.border,
-          borderRadius: radius.sm,
-          padding: space['3'],
-          color: theme.ink,
-        }}
+        invalid={result?.status === 'invalid_code'}
       />
+      <Text variant="bodySmall" colorRole="inkMuted">
+        Codes look like BB-COR-XXXXXXXXXXXXXXXX.
+      </Text>
 
-      <Button
-        label="Check status"
-        variant="primary"
-        loading={busy}
-        disabled={!RECEIPT_CODE_PATTERN.test(code.trim())}
-        onPress={handleLookup}
-      />
+      <Button label="Check status" variant="primary" loading={busy} onPress={handleLookup} />
 
       {result ? <StatusOutcome result={result} /> : null}
     </View>

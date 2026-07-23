@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
-import ErrorBoundary from './error';
+import { UtilityEditionErrorView as ErrorBoundary } from '../components/patterns/utility-edition/UtilityEditionErrorView';
 
 test('Error boundary renders a digest reference in production, never the raw message', () => {
   const prior = process.env.NEXT_PUBLIC_APP_ENV;

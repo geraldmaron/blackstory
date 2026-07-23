@@ -1,8 +1,13 @@
 /**
- * correction status page keyed by receipt code. Server-rendered lookup with no
- * moderation-sensitive fields and no enumeration of other submissions.
+ * correction status page keyed by receipt code. v6 utility edition; server-rendered
+ * lookup with no moderation-sensitive fields and no enumeration of other submissions.
  */
+import Link from 'next/link';
 import { EmptyState, Notice } from '@repo/ui';
+import { UtilityEditionBodyPanel } from '../../../../components/patterns/utility-edition/UtilityEditionBodyPanel';
+import { UtilityEditionIntro } from '../../../../components/patterns/utility-edition/UtilityEditionIntro';
+import { UtilityEditionShell } from '../../../../components/patterns/utility-edition/UtilityEditionShell';
+import '../../../../components/patterns/utility-edition/utility-edition.css';
 import {
   buildDefaultCorrectionRouteDependencies,
   lookupPublicStatusByReceipt,
@@ -27,37 +32,42 @@ export default async function CorrectionStatusPage({ params }: PageProps) {
 
   if (!status) {
     return (
-      <main className="ds-container ds-page" id="main">
-        <h1 className="ds-page__title">Correction status</h1>
-        <Notice tone="error" title="Receipt not found">
-          We could not find a correction with that receipt code. Check the code and try again —
-          there is no way to browse other submissions.
-        </Notice>
-        <EmptyState
-          title="Need to submit a correction?"
-          action={
-            <a className="ds-button ds-button--secondary" href="/corrections">
-              Go to corrections
-            </a>
-          }
-        >
-          Start from the corrections page if you do not yet have a receipt code.
-        </EmptyState>
-      </main>
+      <UtilityEditionShell mosaicSeed="correction-status-edition-v6" editionKey="correction-status">
+        <UtilityEditionIntro
+          kicker="Trust"
+          title="Correction status"
+          variant="status"
+        />
+        <UtilityEditionBodyPanel>
+          <Notice tone="error" title="Receipt not found">
+            We could not find a correction with that receipt code. Check the code and try again —
+            there is no way to browse other submissions.
+          </Notice>
+          <EmptyState
+            title="Need to submit a correction?"
+            action={
+              <Link className="ds-button ds-button--secondary" href="/corrections">
+                Go to corrections
+              </Link>
+            }
+          >
+            Start from the corrections page if you do not yet have a receipt code.
+          </EmptyState>
+        </UtilityEditionBodyPanel>
+      </UtilityEditionShell>
     );
   }
 
   return (
-    <main className="ds-container ds-page" id="main">
-      <p className="ds-page__eyebrow">Trust</p>
-      <h1 className="ds-page__title">Correction status</h1>
-      <p className="ds-page__lede">
-        This page shows only what you need to track your submission. Moderation details stay
-        restricted.
-      </p>
-      <div style={{ marginTop: 'var(--ds-space-6)' }}>
+    <UtilityEditionShell mosaicSeed="correction-status-edition-v6" editionKey="correction-status">
+      <UtilityEditionIntro
+        kicker="Trust"
+        title="Correction status"
+        lede="This page shows only what you need to track your submission. Moderation details stay restricted."
+      />
+      <UtilityEditionBodyPanel>
         <CorrectionStatusPanel status={status} />
-      </div>
-    </main>
+      </UtilityEditionBodyPanel>
+    </UtilityEditionShell>
   );
 }

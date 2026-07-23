@@ -8,8 +8,10 @@ import React from 'react';
 import type { ThemeImpactPacketView } from '@repo/domain';
 import { collectPacketProvenance } from './ThemeImpactProvenanceList';
 import { REDLINING_PILOT_PACKET } from './ThemeImpactStoryEmbed';
+import { ThemeImpactEmptyNotice } from './ThemeImpactEmptyNotice';
+import { THEME_IMPACT_METHOD_STANCE_LABEL } from './theme-impact-copy';
 
-const METHOD_STANCE_LABEL = 'Juxtaposition — not causation';
+const METHOD_STANCE_LABEL = THEME_IMPACT_METHOD_STANCE_LABEL;
 const INDICATOR_LIMIT = 3;
 
 export type ThemeImpactMapStripProps = {
@@ -65,7 +67,9 @@ export function ThemeImpactMapStrip({
               ))}
             </dl>
           </section>
-        ) : null}
+        ) : (
+          <ThemeImpactEmptyNotice kind="indicators" />
+        )}
 
         <p className="ds-theme-impact__strip-theme-link">
           <Link href="/themes/redlining">Theme packets</Link>
@@ -91,7 +95,9 @@ export function ThemeImpactMapStrip({
             ))}
           </ul>
         </section>
-      ) : null}
+      ) : (
+        <ThemeImpactEmptyNotice kind="provenance" />
+      )}
     </aside>
   );
 }

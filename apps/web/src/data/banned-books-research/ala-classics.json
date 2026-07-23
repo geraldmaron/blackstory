@@ -1,0 +1,727 @@
+[
+  {
+    "title": "Go Tell It on the Mountain",
+    "slug": "go-tell-it-on-the-mountain",
+    "authors": [{ "name": "James Baldwin", "role": "author" }],
+    "isbn13": "9780345806543",
+    "publishedDate": "1953",
+    "description": "Baldwin's first novel follows fourteen-year-old John Grimes through a single day in 1930s Harlem, tracing family memory across generations shaped by migration, storefront faith, and Jim Crow constraint. A Radcliffe Top 100 classic on ALA's frequently challenged list.",
+    "challenges": [
+      {
+        "state": "VA",
+        "jurisdictionLabel": "Prince William County Public Schools",
+        "challengeYear": 1988,
+        "status": "reported",
+        "citation": {
+          "label": "ALA Radcliffe Top 100 challenged classics — Go Tell It on the Mountain",
+          "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
+          "publisher": "American Library Association",
+          "publishedAt": "2024"
+        }
+      },
+      {
+        "state": "NY",
+        "jurisdictionLabel": "Hudson Falls Central School District",
+        "challengeYear": 1994,
+        "status": "reported",
+        "citation": {
+          "label": "ALA Radcliffe Top 100 challenged classics — Go Tell It on the Mountain",
+          "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
+          "publisher": "American Library Association",
+          "publishedAt": "2024"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Go Tell It on the Mountain — Banned Books Week (Gonzaga University)",
+        "href": "https://researchguides.gonzaga.edu/BannedBooksWeek/GoTellItOnTheMountain",
+        "publisher": "Gonzaga University Libraries"
+      },
+      {
+        "label": "Authors Guild Banned Books Club — Go Tell It on the Mountain",
+        "href": "https://authorsguild.org/news/banned-books-club-relaunch-celebrating-james-baldwin-centennial/",
+        "publisher": "The Authors Guild",
+        "publishedAt": "2024"
+      },
+      {
+        "label": "Go Tell It on the Mountain — Open Library edition record",
+        "href": "https://openlibrary.org/books/OL27305250M/Go_Tell_It_on_the_Mountain_(Vintage_International)",
+        "publisher": "Open Library"
+      }
+    ],
+    "provenance": {
+      "source": "American Library Association Office for Intellectual Freedom",
+      "sourceUrl": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics"
+    }
+  },
+  {
+    "title": "The Fire Next Time",
+    "slug": "the-fire-next-time",
+    "authors": [{ "name": "James Baldwin", "role": "author" }],
+    "isbn13": "9780679744726",
+    "publishedDate": "1963",
+    "description": "Two linked essays—letters on the centennial of Emancipation—examine Harlem childhood, Christian and Nation of Islam politics, and the everyday cost of American racism. Baldwin wrote for a nation still debating civil rights in real time.",
+    "challenges": [
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Clay County School District",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "On the Anniversary of James Baldwin's 'The Fire Next Time' — Bucks County Beacon",
+          "href": "https://buckscountybeacon.com/2023/07/on-the-anniversary-of-james-baldwins-the-fire-next-time/",
+          "publisher": "Bucks County Beacon",
+          "publishedAt": "2023"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "The Fire Next Time — Banned Books Week (Gonzaga University)",
+        "href": "https://researchguides.gonzaga.edu/BannedBooksWeek/TheFireNextTime",
+        "publisher": "Gonzaga University Libraries"
+      },
+      {
+        "label": "The Fire Next Time — Wikipedia (Clay County removal note)",
+        "href": "https://en.wikipedia.org/wiki/The_Fire_Next_Time",
+        "publisher": "Wikipedia"
+      },
+      {
+        "label": "The Fire Next Time — Open Library edition record",
+        "href": "https://openlibrary.org/books/OL1743367M/The_fire_next_time",
+        "publisher": "Open Library"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans (via Banned Books reference)",
+      "sourceUrl": "https://www.banned-books.org/books/the-fire-next-time"
+    }
+  },
+  {
+    "title": "Their Eyes Were Watching God",
+    "slug": "their-eyes-were-watching-god",
+    "authors": [{ "name": "Zora Neale Hurston", "role": "author" }],
+    "isbn13": "9780060838676",
+    "publishedDate": "1937",
+    "description": "Janie Crawford's search for voice unfolds across three marriages and a Florida hurricane, rendered in Hurston's vernacular prose. Recovered by Black women scholars in the 1970s, the novel is now a staple of American literature curricula.",
+    "challenges": [
+      {
+        "state": "VA",
+        "jurisdictionLabel": "Stonewall Jackson High School, Brentsville",
+        "challengeYear": 1997,
+        "status": "reported",
+        "citation": {
+          "label": "ALA Radcliffe Top 100 challenged classics — Their Eyes Were Watching God",
+          "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
+          "publisher": "American Library Association",
+          "publishedAt": "2024"
+        }
+      },
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Collier County Public Schools",
+        "schoolYear": "2023-2024",
+        "challengeYear": 2023,
+        "status": "reported",
+        "citation": {
+          "label": "Their Eyes Were Watching God — PEN America ban index summary",
+          "href": "https://www.banned-books.org/books/their-eyes-were-watching-god",
+          "publisher": "Banned Books",
+          "publishedAt": "2025"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Their Eyes Were Watching God — Banned Books Week (Gonzaga University)",
+        "href": "https://researchguides.gonzaga.edu/BannedBooksWeek/TheirEyesWereWatchingGod",
+        "publisher": "Gonzaga University Libraries"
+      },
+      {
+        "label": "Their Eyes Were Watching God — Open Library edition record",
+        "href": "https://openlibrary.org/books/OL28338232M/Their_Eyes_Were_Watching_God",
+        "publisher": "Open Library"
+      },
+      {
+        "label": "Most Challenged Books — ALA Office for Intellectual Freedom",
+        "href": "https://www.ala.org/bbooks/frequentlychallengedbooks/top10",
+        "publisher": "American Library Association"
+      }
+    ],
+    "provenance": {
+      "source": "American Library Association Office for Intellectual Freedom",
+      "sourceUrl": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics"
+    }
+  },
+  {
+    "title": "Black Boy",
+    "slug": "black-boy",
+    "authors": [{ "name": "Richard Wright", "role": "author" }],
+    "isbn13": "9780061130243",
+    "publishedDate": "1945",
+    "description": "Wright's memoir records hunger, family violence, and everyday terror in the Jim Crow South, then his migration to Chicago and turn toward writing. The book documents how segregation structured childhood itself—not as abstraction, but as lived constraint.",
+    "challenges": [
+      {
+        "state": "NY",
+        "jurisdictionLabel": "Island Trees Union Free School District",
+        "challengeYear": 1976,
+        "status": "reported",
+        "citation": {
+          "label": "Black Boy — Island Trees v. Pico censorship history",
+          "href": "https://www.banned-books.org/books/black-boy",
+          "publisher": "Banned Books"
+        }
+      },
+      {
+        "state": "MI",
+        "jurisdictionLabel": "Howell High School, Livingston County",
+        "challengeYear": 2007,
+        "status": "reported",
+        "citation": {
+          "label": "Black Boy — Howell High School challenge record",
+          "href": "https://www.banned-books.org/books/black-boy",
+          "publisher": "Banned Books"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Top 10 Banned Books that Changed the Face of Black History — NCAC",
+        "href": "https://ncac.org/news/blog/top-10-banned-books-that-changed-the-face-of-black-history",
+        "publisher": "National Coalition Against Censorship"
+      },
+      {
+        "label": "Black Boy — Open Library edition record",
+        "href": "https://openlibrary.org/books/OL22860546M/Black_boy",
+        "publisher": "Open Library"
+      },
+      {
+        "label": "Island Trees Union Free School District v. Pico (1982) — Encyclopedia.com",
+        "href": "https://www.encyclopedia.com/law/legal-and-political-magazines/island-trees-union-free-school-district-board-education-v-pico-1982",
+        "publisher": "Encyclopedia.com"
+      }
+    ],
+    "provenance": {
+      "source": "American Library Association diverse-content challenged-books list",
+      "sourceUrl": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics"
+    }
+  },
+  {
+    "title": "Song of Solomon",
+    "slug": "song-of-solomon",
+    "authors": [{ "name": "Toni Morrison", "role": "author" }],
+    "isbn13": "9781400033423",
+    "publishedDate": "1977",
+    "description": "Milkman Dead's search for family inheritance moves from Michigan to Pennsylvania and Virginia, blending folktale, flight legends, and the afterlife of slavery's property logic. Morrison's third novel won the National Book Critics Circle Award.",
+    "challenges": [
+      {
+        "state": "GA",
+        "jurisdictionLabel": "Richmond County School District",
+        "challengeYear": 1994,
+        "status": "reported",
+        "citation": {
+          "label": "ALA Radcliffe Top 100 challenged classics — Song of Solomon",
+          "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
+          "publisher": "American Library Association",
+          "publishedAt": "2024"
+        }
+      },
+      {
+        "state": "OH",
+        "jurisdictionLabel": "Columbus City Schools",
+        "challengeYear": 1993,
+        "status": "reported",
+        "citation": {
+          "label": "Song of Solomon — Banned Library challenge timeline",
+          "href": "https://www.bannedlibrary.com/podcast/2018/6/5/song-of-solomon-by-toni-morrison",
+          "publisher": "Banned Library"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Why Toni Morrison Books Are Frequent Targets of Book Bans — TIME",
+        "href": "https://time.com/6143127/toni-morrison-book-bans/",
+        "publisher": "TIME",
+        "publishedAt": "2022"
+      },
+      {
+        "label": "Song of Solomon — Banned Books Week (Gonzaga University)",
+        "href": "https://researchguides.gonzaga.edu/BannedBooksWeek/SongOfSolomon",
+        "publisher": "Gonzaga University Libraries"
+      },
+      {
+        "label": "Song of Solomon — Open Library edition record",
+        "href": "https://openlibrary.org/books/OL24607789M/Song_of_Solomon",
+        "publisher": "Open Library"
+      }
+    ],
+    "provenance": {
+      "source": "American Library Association Office for Intellectual Freedom",
+      "sourceUrl": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics"
+    }
+  },
+  {
+    "title": "Sula",
+    "slug": "sula",
+    "authors": [{ "name": "Toni Morrison", "role": "author" }],
+    "isbn13": "9781400033430",
+    "publishedDate": "1973",
+    "description": "In a Black Ohio hillside community called the Bottom, Sula Peace and Nel Wright's lifelong bond fractures under grief, desire, and town judgment. Morrison's second novel tracks how a community defines and punishes difference.",
+    "challenges": [
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Collier County Public Schools",
+        "schoolYear": "2023-2024",
+        "challengeYear": 2023,
+        "status": "reported",
+        "citation": {
+          "label": "Sula — PEN America school ban index summary",
+          "href": "https://www.banned-books.org/books/sula",
+          "publisher": "Banned Books",
+          "publishedAt": "2025"
+        }
+      },
+      {
+        "state": "IA",
+        "jurisdictionLabel": "Grundy Center Community School District",
+        "schoolYear": "2024-2025",
+        "challengeYear": 2024,
+        "status": "reported",
+        "citation": {
+          "label": "Sula — PEN America school ban index summary",
+          "href": "https://www.banned-books.org/books/sula",
+          "publisher": "Banned Books",
+          "publishedAt": "2025"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Why Toni Morrison Books Are Frequent Targets of Book Bans — TIME",
+        "href": "https://time.com/6143127/toni-morrison-book-bans/",
+        "publisher": "TIME",
+        "publishedAt": "2022"
+      },
+      {
+        "label": "Sula — Penguin Random House catalog record",
+        "href": "https://www.penguinrandomhouse.com/books/117659/sula-by-toni-morrison-with-a-new-introduction-by-jesmyn-ward/",
+        "publisher": "Penguin Random House"
+      },
+      {
+        "label": "Sula — Open Library edition record",
+        "href": "https://openlibrary.org/books/OL5415472M/Sula.",
+        "publisher": "Open Library"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans",
+      "sourceUrl": "https://www.banned-books.org/books/sula"
+    }
+  },
+  {
+    "title": "Fallen Angels",
+    "slug": "fallen-angels",
+    "authors": [{ "name": "Walter Dean Myers", "role": "author" }],
+    "isbn13": "9780545055765",
+    "publishedDate": "1988",
+    "description": "Richie Perry, a Harlem teenager, lands in Vietnam after his college plans collapse. Myers documents combat's randomness, boredom between firefights, and the racial tensions inside a segregated-era military. Winner of the Coretta Scott King Award.",
+    "challenges": [
+      {
+        "state": "CA",
+        "jurisdictionLabel": "Laton Unified School District",
+        "challengeYear": 1999,
+        "status": "reported",
+        "citation": {
+          "label": "Timeline entry for 1999: Fallen Angels — ALA Intellectual Freedom Blog",
+          "href": "https://www.oif.ala.org/timeline-entry-for-1999-fallen-angels/",
+          "publisher": "American Library Association",
+          "publishedAt": "2012"
+        }
+      },
+      {
+        "state": "MI",
+        "jurisdictionLabel": "Livonia Public Schools",
+        "challengeYear": 1999,
+        "status": "reported",
+        "citation": {
+          "label": "Timeline entry for 1999: Fallen Angels — ALA Intellectual Freedom Blog",
+          "href": "https://www.oif.ala.org/timeline-entry-for-1999-fallen-angels/",
+          "publisher": "American Library Association",
+          "publishedAt": "2012"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Fallen Angels — ALA Top 100 Most Challenged Books lists",
+        "href": "https://www.ala.org/bbooks/frequentlychallengedbooks/top10",
+        "publisher": "American Library Association"
+      },
+      {
+        "label": "Fallen Angels (Myers novel) — Wikipedia",
+        "href": "https://en.wikipedia.org/wiki/Fallen_Angels_(Myers_novel)",
+        "publisher": "Wikipedia"
+      },
+      {
+        "label": "Fallen Angels — Open Library edition record",
+        "href": "https://openlibrary.org/books/OL35350623M/Fallen_angels",
+        "publisher": "Open Library"
+      }
+    ],
+    "provenance": {
+      "source": "American Library Association Office for Intellectual Freedom",
+      "sourceUrl": "https://www.oif.ala.org/timeline-entry-for-1999-fallen-angels/"
+    }
+  },
+  {
+    "title": "Hoops",
+    "slug": "hoops",
+    "authors": [{ "name": "Walter Dean Myers", "role": "author" }],
+    "isbn13": "9780440938842",
+    "publishedDate": "1981",
+    "description": "Lonnie Jackson, a Harlem high-school basketball standout, navigates a city summer league where coaches, scouts, and gamblers press on his future. Myers writes the pressures on Black youth with the same documentary eye he brought to war and prison.",
+    "challenges": [
+      {
+        "state": "IA",
+        "jurisdictionLabel": "Council Bluffs Community School District",
+        "challengeYear": 2009,
+        "status": "reported",
+        "citation": {
+          "label": "'Hoops' Challenged — National Coalition Against Censorship",
+          "href": "https://ncac.org/news/blog/hoops-challenged",
+          "publisher": "National Coalition Against Censorship",
+          "publishedAt": "2009"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Hoops — ALA diverse-content challenged-books list",
+        "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
+        "publisher": "American Library Association"
+      },
+      {
+        "label": "Walter Dean Myers Talks Book-Banning — NCAC",
+        "href": "https://ncac.org/news/blog/walter-dean-myers-talks-book-banning-writing-for-troublemakers",
+        "publisher": "National Coalition Against Censorship"
+      },
+      {
+        "label": "Hoops — Open Library edition record",
+        "href": "https://openlibrary.org/books/OL7523559M/Hoops",
+        "publisher": "Open Library"
+      }
+    ],
+    "provenance": {
+      "source": "National Coalition Against Censorship",
+      "sourceUrl": "https://ncac.org/news/blog/hoops-challenged"
+    }
+  },
+  {
+    "title": "Monster",
+    "slug": "monster",
+    "authors": [{ "name": "Walter Dean Myers", "role": "author" }],
+    "isbn13": "9780064407311",
+    "publishedDate": "1999",
+    "description": "Sixteen-year-old Steve Harmon records his felony murder trial as a screenplay from a Manhattan detention cell, questioning how the state sees young Black men. Myers won the Michael L. Printz Award and a Coretta Scott King honor for the novel.",
+    "challenges": [
+      {
+        "state": "MA",
+        "jurisdictionLabel": "Gates Middle School, Scituate",
+        "challengeYear": 2019,
+        "status": "reported",
+        "citation": {
+          "label": "Banned Books 2021 — Monster (Marshall University Libraries)",
+          "href": "https://www.marshall.edu/library/bannedbooks/monster/",
+          "publisher": "Marshall University Libraries",
+          "publishedAt": "2021"
+        }
+      },
+      {
+        "state": "TN",
+        "jurisdictionLabel": "Signal Mountain Middle-High School, Hamilton County",
+        "challengeYear": 2021,
+        "status": "reported",
+        "citation": {
+          "label": "Banned Books 2021 — Monster (Marshall University Libraries)",
+          "href": "https://www.marshall.edu/library/bannedbooks/monster/",
+          "publisher": "Marshall University Libraries",
+          "publishedAt": "2021"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Challenged Book: Monster — NCAC Censorpedia",
+        "href": "https://wiki.ncac.org/Challenged_Book:_Monster",
+        "publisher": "National Coalition Against Censorship"
+      },
+      {
+        "label": "Monster — ALA diverse-content challenged-books list",
+        "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
+        "publisher": "American Library Association"
+      },
+      {
+        "label": "Monster — Open Library edition record",
+        "href": "https://openlibrary.org/books/OL9246545M/Monster",
+        "publisher": "Open Library"
+      }
+    ],
+    "provenance": {
+      "source": "Marshall University Libraries Banned Books documentation",
+      "sourceUrl": "https://www.marshall.edu/library/bannedbooks/monster/"
+    }
+  },
+  {
+    "title": "Kindred",
+    "slug": "kindred",
+    "authors": [{ "name": "Octavia E. Butler", "role": "author" }],
+    "isbn13": "9780807083697",
+    "publishedDate": "1979",
+    "description": "Eda, a Black writer in 1970s California, is pulled backward to a Maryland plantation whenever her white ancestor's life is in danger. Butler uses speculative fiction to make slavery's violence immediate rather than distant textbook history.",
+    "challenges": [
+      {
+        "state": "MO",
+        "jurisdictionLabel": "Wentzville School District",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "Kindred — PEN America school ban index summary",
+          "href": "https://www.banned-books.org/books/kindred-a-graphic-novel-adaptation",
+          "publisher": "Banned Books",
+          "publishedAt": "2025"
+        }
+      },
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Orange County Public Schools",
+        "schoolYear": "2023-2024",
+        "challengeYear": 2023,
+        "status": "reported",
+        "citation": {
+          "label": "Kindred — PEN America school ban index summary",
+          "href": "https://www.banned-books.org/books/kindred-a-graphic-novel-adaptation",
+          "publisher": "Banned Books",
+          "publishedAt": "2025"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "10 censored books to add to your reading list — MSU Denver RED",
+        "href": "https://red.msudenver.edu/2023/10-censored-books-to-add-to-your-reading-list/",
+        "publisher": "Metropolitan State University of Denver",
+        "publishedAt": "2023"
+      },
+      {
+        "label": "Kindred — Open Library edition record",
+        "href": "https://openlibrary.org/books/OL24284992M/Kindred",
+        "publisher": "Open Library"
+      },
+      {
+        "label": "Kindred — ALA diverse-content challenged-books context",
+        "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
+        "publisher": "American Library Association"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans",
+      "sourceUrl": "https://www.banned-books.org/books/kindred-a-graphic-novel-adaptation"
+    }
+  },
+  {
+    "title": "The Autobiography of Malcolm X",
+    "slug": "the-autobiography-of-malcolm-x",
+    "authors": [
+      { "name": "Malcolm X", "role": "author" },
+      { "name": "Alex Haley", "role": "author" }
+    ],
+    "isbn13": "9780345350688",
+    "publishedDate": "1965",
+    "description": "Dictated to Alex Haley before Malcolm X's assassination, the memoir traces Lansing childhood, Boston and Harlem street life, prison conversion, Nation of Islam leadership, and the break toward independent Black politics.",
+    "challenges": [
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Duval County Public Schools (Jacksonville)",
+        "challengeYear": 1993,
+        "status": "reported",
+        "citation": {
+          "label": "The Autobiography of Malcolm X — Duval County school challenge record",
+          "href": "https://www.banned-books.org/books/the-autobiography-of-malcolm-x",
+          "publisher": "Banned Books"
+        }
+      },
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Escambia County Public Schools",
+        "schoolYear": "2023-2024",
+        "challengeYear": 2023,
+        "status": "reported",
+        "citation": {
+          "label": "The Autobiography of Malcolm X — school ban index summary",
+          "href": "https://www.banned-books.org/books/the-autobiography-of-malcolm-x",
+          "publisher": "Banned Books",
+          "publishedAt": "2025"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "The Autobiography of Malcolm X — Banned Books Week (Gonzaga University)",
+        "href": "https://researchguides.gonzaga.edu/BannedBooksWeek/TheAutobiographyOfMalcolmX",
+        "publisher": "Gonzaga University Libraries"
+      },
+      {
+        "label": "The Autobiography of Malcolm X — ALA diverse-content challenged-books list",
+        "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
+        "publisher": "American Library Association"
+      },
+      {
+        "label": "The Autobiography of Malcolm X — Open Library edition record",
+        "href": "https://openlibrary.org/books/OL16700520M/The_autobiography_of_Malcolm_X",
+        "publisher": "Open Library"
+      }
+    ],
+    "provenance": {
+      "source": "American Library Association Office for Intellectual Freedom",
+      "sourceUrl": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics"
+    }
+  },
+  {
+    "title": "Roll of Thunder, Hear My Cry",
+    "slug": "roll-of-thunder-hear-my-cry",
+    "authors": [{ "name": "Mildred D. Taylor", "role": "author" }],
+    "isbn13": "9780803774735",
+    "publishedDate": "1976",
+    "description": "Cassie Logan and her Mississippi family hold their land during the Depression as night riders, boycotts, and school segregation close in. Taylor drew on family stories; the novel won the 1977 Newbery Medal.",
+    "challenges": [
+      {
+        "state": "FL",
+        "jurisdictionLabel": "Palm Beach County Public Schools",
+        "schoolYear": "2022-2023",
+        "challengeYear": 2022,
+        "status": "reported",
+        "citation": {
+          "label": "Roll of Thunder, Hear My Cry — PEN America ban index summary",
+          "href": "https://www.banned-books.org/books/roll-of-thunder-hear-my-cry",
+          "publisher": "Banned Books",
+          "publishedAt": "2025"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Roll of Thunder, Hear My Cry — ALA Top 10 Most Challenged Books of 2023",
+        "href": "https://www.ala.org/bbooks/frequentlychallengedbooks/top10",
+        "publisher": "American Library Association",
+        "publishedAt": "2024"
+      },
+      {
+        "label": "Banned Books Week 2013: Mildred Taylor — Ohioana Library",
+        "href": "https://www.ohioana.org/banned-books-week-2013-mildred-taylor/",
+        "publisher": "Ohioana Library Association",
+        "publishedAt": "2013"
+      },
+      {
+        "label": "Roll of Thunder, Hear My Cry — Banned Books Week (Gonzaga University)",
+        "href": "https://researchguides.gonzaga.edu/BannedBooksWeek/RollOfThunderHearMyCry",
+        "publisher": "Gonzaga University Libraries"
+      }
+    ],
+    "provenance": {
+      "source": "American Library Association Office for Intellectual Freedom",
+      "sourceUrl": "https://www.ala.org/bbooks/frequentlychallengedbooks/top10"
+    }
+  },
+  {
+    "title": "In Love and Trouble: Stories of Black Women",
+    "slug": "in-love-and-trouble",
+    "authors": [{ "name": "Alice Walker", "role": "author" }],
+    "isbn13": "9780156028639",
+    "publishedDate": "1973",
+    "description": "Thirteen stories—including \"Roselily\" and \"Am I Blue?\"—trace rural and urban Black women's desire, grief, and resistance across the South. Walker published the collection three years before The Color Purple.",
+    "challenges": [
+      {
+        "state": "CA",
+        "jurisdictionLabel": "California Learning Assessment System (statewide exam)",
+        "challengeYear": 1994,
+        "status": "reported",
+        "citation": {
+          "label": "State Yanks Academic Test Question, Sparks Outcry — Los Angeles Times",
+          "href": "https://www.latimes.com/archives/la-xpm-1994-02-26-mn-27357-story.html",
+          "publisher": "Los Angeles Times",
+          "publishedAt": "1994-02-26"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "Stories Deleted From Tests to Be Reinstated — Los Angeles Times",
+        "href": "https://www.latimes.com/archives/la-xpm-1994-03-12-mn-33016-story.html",
+        "publisher": "Los Angeles Times",
+        "publishedAt": "1994-03-12"
+      },
+      {
+        "label": "Alice Walker: Writing What's Right — Guernica",
+        "href": "https://www.guernicamag.com/alice-walker-writing-whats-right/",
+        "publisher": "Guernica",
+        "publishedAt": "2012"
+      },
+      {
+        "label": "In Love & Trouble — Open Library edition record",
+        "href": "https://openlibrary.org/books/OL5415759M/In_love_trouble",
+        "publisher": "Open Library"
+      }
+    ],
+    "provenance": {
+      "source": "Los Angeles Times reporting on California state testing controversy",
+      "sourceUrl": "https://www.latimes.com/archives/la-xpm-1994-02-26-mn-27357-story.html"
+    }
+  },
+  {
+    "title": "The Best Short Stories by Black Writers",
+    "slug": "best-short-stories-by-black-writers",
+    "authors": [{ "name": "Langston Hughes", "role": "author" }],
+    "isbn13": "9780316380317",
+    "publishedDate": "1967",
+    "description": "Hughes edited this landmark anthology—first published as The Best Short Stories by Negro Writers—collecting work from 1899 to 1967 by writers including Baldwin, Hurston, and Wright. It remains a syllabus touchstone for short-form Black literary history.",
+    "challenges": [
+      {
+        "state": "NY",
+        "jurisdictionLabel": "Island Trees Union Free School District",
+        "challengeYear": 1975,
+        "status": "reported",
+        "citation": {
+          "label": "Island Trees Union Free School District v. Pico (1982) — Encyclopedia.com",
+          "href": "https://www.encyclopedia.com/law/legal-and-political-magazines/island-trees-union-free-school-district-board-education-v-pico-1982",
+          "publisher": "Encyclopedia.com"
+        }
+      }
+    ],
+    "citations": [
+      {
+        "label": "2025 Banned Books Read-Out — Midwest Writing Center (Pico case context)",
+        "href": "https://www.mwcqc.org/events/banned-books-read-out-2025/",
+        "publisher": "Midwest Writing Center",
+        "publishedAt": "2025"
+      },
+      {
+        "label": "The Best Short Stories by Black Writers — Hachette Book Group catalog",
+        "href": "https://www.hachettebookgroup.com/titles/langston-hughes/the-best-short-stories-by-black-writers/9780316380317/",
+        "publisher": "Hachette Book Group"
+      },
+      {
+        "label": "The Best Short Stories by Black Writers — Open Library edition record",
+        "href": "https://openlibrary.org/books/OL21268870M/The_Best_short_stories_by_black_writers",
+        "publisher": "Open Library"
+      }
+    ],
+    "provenance": {
+      "source": "Board of Education v. Pico (1982) censorship record",
+      "sourceUrl": "https://www.encyclopedia.com/law/legal-and-political-magazines/island-trees-union-free-school-district-board-education-v-pico-1982"
+    }
+  }
+]

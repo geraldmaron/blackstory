@@ -115,7 +115,7 @@ export function CorrectionForm() {
     return (
       <Notice tone="warning" title="Correction received">
         <p>
-          Thank you — save your receipt code <code>{state.receiptCode}</code>. It is the only way to
+          Thank you. Save your receipt code <code>{state.receiptCode}</code>. It is the only way to
           check status; we cannot look it up without it.
         </p>
         <p style={{ marginTop: 'var(--ds-space-3)' }}>
@@ -269,7 +269,7 @@ export function CorrectionForm() {
 
       <div className="ds-stack" style={{ gap: 'var(--ds-space-2)' }}>
         <label className="ds-filters__label" htmlFor={contactId}>
-          Contact (optional — moderators only, never shown publicly)
+          Contact (optional, moderators only, never shown publicly)
         </label>
         <input className="ds-filters__control" id={contactId} name="contact" type="text" />
       </div>

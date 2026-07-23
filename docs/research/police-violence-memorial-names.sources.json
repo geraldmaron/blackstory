@@ -3,22 +3,22 @@
   "selection_policy": [
     "Include Wikipedia cited list of unarmed African Americans killed by law enforcement (primary bulk source).",
     "Include curated high-profile / historical police or state-violence cases corroborated across major news and memorial discourse.",
-    "Include names appearing in BOTH The Guardian The Counted (Black, 2015\u201316) AND Washington Post Fatal Force (Black), for dual open-dataset corroboration.",
-    "Exclude lynching, civilian killings, terrorist massacres, and non-police assassinations even if common on some Say Their Names lists.",
+    "Include names appearing in BOTH The Guardian The Counted (Black, 2015–16) AND Washington Post Fatal Force (Black), for dual open-dataset corroboration.",
+    "This police-violence file excludes lynching, civilian killings, terrorist massacres, and non-police assassinations. Those cases may still belong on the memorial wall under racial_terror when they are milestones in the Black story.",
     "Context phrases are brief memorial labels, not legal verdicts."
   ],
   "primary_sources": [
     {
-      "name": "Wikipedia \u2014 List of unarmed African Americans killed by law enforcement officers in the United States",
+      "name": "Wikipedia — List of unarmed African Americans killed by law enforcement officers in the United States",
       "url": "https://en.wikipedia.org/wiki/List_of_unarmed_African_Americans_killed_by_law_enforcement_officers_in_the_United_States"
     },
     {
-      "name": "The Guardian \u2014 The Counted (2015\u20132016)",
+      "name": "The Guardian — The Counted (2015–2016)",
       "url": "https://www.theguardian.com/us-news/series/counted-us-police-killings",
       "data": "https://github.com/flother/thecounted"
     },
     {
-      "name": "Washington Post \u2014 Fatal Force (2015\u20132024)",
+      "name": "Washington Post — Fatal Force (2015–2024)",
       "url": "https://www.washingtonpost.com/graphics/investigations/police-shootings-database/",
       "data": "https://github.com/washingtonpost/data-police-shootings"
     },
@@ -53,27 +53,27 @@
   "intentionally_excluded_examples": [
     {
       "name": "Emmett Till",
-      "reason": "Lynched by civilians, not police"
+      "reason": "Not police; included on memorial wall as racial_terror"
     },
     {
       "name": "Trayvon Martin",
-      "reason": "Killed by civilian"
+      "reason": "Civilian killer; included on memorial wall as racial_terror milestone"
     },
     {
       "name": "Ahmaud Arbery",
-      "reason": "Killed by civilians"
+      "reason": "Civilian killers; included on memorial wall as racial_terror"
     },
     {
       "name": "Jordan Neely",
-      "reason": "Killed by civilian on subway"
+      "reason": "Civilian killer; included on memorial wall as racial_terror milestone"
     },
     {
-      "name": "Charleston church victims",
-      "reason": "Terrorist massacre, not police"
+      "name": "Charleston church victims (Emanuel Nine)",
+      "reason": "Racial terror massacre; included on memorial wall as racial_terror"
     },
     {
       "name": "Martin Luther King Jr. / Malcolm X / Medgar Evers",
-      "reason": "Assassinations not by police as primary actor"
+      "reason": "Assassinations not by police as primary actor; included on memorial wall as racial_terror when present"
     }
   ],
   "counts_by_decade": {

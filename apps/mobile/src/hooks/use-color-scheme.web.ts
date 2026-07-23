@@ -21,5 +21,6 @@ export function useColorScheme() {
     return colorScheme;
   }
 
-  return 'light';
+  // Dark-first default while static HTML hydrates (matches resolveThemeName).
+  return 'dark';
 }

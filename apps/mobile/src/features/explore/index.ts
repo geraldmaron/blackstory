@@ -1,12 +1,27 @@
 /**
- * Native Explore experience (MOB-012): the map + synchronized list + filters +
- * entity preview built on MOB-011's map feature. The Explore route imports
+ * Native Explore experience (MOB-012): map edition chrome, filters, and entity
+ * preview built on MOB-011's map feature. The Explore route imports
  * `ExploreView`; everything else is the pure, individually-tested core.
  */
 export { ExploreView, type ExploreViewProps } from './ExploreView';
-export { ExploreList, type ExploreListProps } from './ExploreList';
-export { EntityPreviewSheet, type EntityPreviewSheetProps } from './EntityPreviewSheet';
+export {
+  EntityPreviewSheet,
+  type EntityPreviewSheetProps,
+  type EntityPreviewPreviewFeature,
+} from '@/features/map/explore';
 export { useReduceMotion } from './useReduceMotion';
+export {
+  useExploreMapSource,
+  type ExploreMapSourceState,
+  type UseExploreMapSourceOptions,
+} from './useExploreMapSource';
+export {
+  fetchMapSource,
+  mapSourceV1ToFeatureCollection,
+  MAP_PATH,
+  type MapSourceDeps,
+  type MapSourceFetchResult,
+} from './map-source-client';
 
 export {
   exploreReducer,

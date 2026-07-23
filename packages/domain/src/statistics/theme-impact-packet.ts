@@ -64,6 +64,7 @@ export type ThemeImpactPacketArtifact = {
   readonly artifactClass: string;
   readonly title: string;
   readonly citation: string;
+  readonly provenance: ThemeImpactProvenanceQuartet;
   readonly dated?: string;
   readonly summary?: string;
   readonly uncertaintyLabel?: string;
@@ -165,6 +166,7 @@ function freezeArtifact(row: ThemeImpactPacketArtifact): ThemeImpactPacketArtifa
     artifactClass: row.artifactClass,
     title: row.title,
     citation: row.citation,
+    provenance: freezeProvenance(row.provenance),
     ...(row.dated !== undefined ? { dated: row.dated } : {}),
     ...(row.summary !== undefined ? { summary: row.summary } : {}),
     ...(row.uncertaintyLabel !== undefined ? { uncertaintyLabel: row.uncertaintyLabel } : {}),
@@ -258,6 +260,9 @@ export function assertThemeImpactPacketPublishable(packet: ThemeImpactPacket): v
       throw new Error(`derived[${index}] requires inputObservationIds`);
     }
   });
+  packet.artifacts.forEach((row, index) => {
+    provenanceComplete(row.provenance, `artifacts[${index}].provenance`);
+  });
 
   if (packet.methodStance === 'gated_causal_claim') {
     const fromArtifacts = packet.artifacts.some((a) => Boolean(a.claimId?.trim()));
@@ -333,6 +338,14 @@ export function createRedliningQ3FixturePacket(
         artifactClass: 'cartographic_grade_map',
         title: 'HOLC residential security map (fixture citation)',
         citation: 'Mapping Inequality / HOLC (fixture — rights review before commercial surface).',
+        provenance: {
+          source: 'mapping-inequality-holc',
+          sourceUrl: 'https://dsl.richmond.edu/panorama/redlining/',
+          retrievedAt: '2026-07-22T12:00:00.000Z',
+          contentHash: 'sha256:fixture-holc-note',
+          humanCitation:
+            'Mapping Inequality / HOLC residential security map (test fixture).',
+        },
         dated: '1937',
         uncertaintyLabel: 'Grade polygons are historical; modern boundaries differ.',
       },

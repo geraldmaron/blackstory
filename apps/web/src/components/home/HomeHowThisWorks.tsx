@@ -1,22 +1,16 @@
 /**
- * Homepage “How this works” section — evidence-before-assertion copy, compact
- * research-pipeline sketch reused from /methodology, three trust points, and a
- * single methodology CTA.
- *
- * Theme-aware (`ds-section` + ordinary `--ds-*` tokens): follows light and dark
- * reader themes. Pipeline-sketch CSS is imported by `app/(map)/page.tsx` (and
- * methodology) so this module stays unit-testable under node/tsx without CSS
- * loaders.
+ * Homepage beat 04: evidence-before-assertion methodology weight with pipeline sketch,
+ * publish rules, dignity line, and methodology CTA.
  */
 
 import React from 'react';
 import Link from 'next/link';
 import { ResearchPipelineSketch } from '../trust/ResearchPipelineSketch';
+import { HomeEditionHeader } from './HomeEditionHeader';
 
 void React;
 
-/** v5 §6.5 — three concise points, evidence before assertion. */
-const HOW_ITEMS = [
+const PUBLISH_RULES = [
   {
     title: 'Every record is documented',
     body: 'People, places, schools, and events carry accepted claims, citations, and confidence you can read yourself.',
@@ -33,42 +27,45 @@ const HOW_ITEMS = [
 
 export function HomeHowThisWorks() {
   return (
-    <section className="ds-section ds-home-how" aria-labelledby="how-heading">
-      <div className="ds-container">
-        <header className="ds-home-how__intro">
-          <p className="ds-section__kicker">How this works</p>
-          <h2 className="ds-section__title ds-home-how__title" id="how-heading">
-            Evidence before assertion.
-          </h2>
-          <p className="ds-section__lede ds-home-how__lede">
-            Discovery finds candidates. People verify. The publish gate decides what reaches the
-            public record — models never write it alone.
-          </p>
-        </header>
+    <section className="ds-home-edition__beat" id="beat-d" aria-labelledby="home-method-heading">
+      <HomeEditionHeader
+        index="04"
+        kicker="Evidence before assertion"
+        title="How records reach the map."
+        lede="Discovery finds candidates. People verify. The publish gate decides what reaches the public record. Models never write it alone."
+        id="home-method-heading"
+      />
 
-        <div className="ds-home-how__compose">
-          <div className="ds-home-how__sketch">
-            <ResearchPipelineSketch compact />
-          </div>
-          <ol className="ds-home-how__points">
-            {HOW_ITEMS.map((item, index) => (
-              <li key={item.title} className="ds-home-how__point">
-                <span className="ds-home-how__point-index" aria-hidden="true">
-                  {String(index + 1).padStart(2, '0')}
-                </span>
-                <h3 className="ds-home-how__point-title">{item.title}</h3>
-                <p className="ds-home-how__point-body">{item.body}</p>
-              </li>
-            ))}
-          </ol>
+      <div className="ds-home-edition__method-compose">
+        <div className="ds-home-edition__pipeline-wrap">
+          <ResearchPipelineSketch compact />
         </div>
-
-        <p className="ds-home-how__cta">
-          <Link className="ds-cta ds-cta--solid" href="/methodology">
-            Read the methodology
-          </Link>
-        </p>
+        <ol className="ds-home-edition__publish-rules">
+          {PUBLISH_RULES.map((item, index) => (
+            <li key={item.title}>
+              <span className="ds-home-edition__publish-num" aria-hidden="true">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <div>
+                <p className="ds-home-edition__publish-title">{item.title}</p>
+                <p className="ds-home-edition__publish-desc">{item.body}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
       </div>
+
+      <p className="ds-home-edition__dignity-line">
+        <strong>Dignity</strong>
+        People are named with role and context. No anonymous decoration, no alarm framing, no
+        crime-heat rendering on the map.
+      </p>
+
+      <p className="ds-home-edition__beat-cta">
+        <Link className="ds-cta ds-cta--copper" href="/methodology">
+          Read the methodology
+        </Link>
+      </p>
     </section>
   );
 }

@@ -5,6 +5,7 @@
 import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { Notice } from '@repo/ui';
+import { UtilityEditionBodyPanel } from '../../components/patterns/utility-edition/UtilityEditionBodyPanel';
 import { CorrectionForm } from './CorrectionForm';
 import { CORRECTION_PRIVACY_NOTICE } from './copy';
 import './corrections.css';
@@ -60,7 +61,8 @@ function RuleStrip({
 
 export function CorrectionsSections() {
   return (
-    <div className="ds-corrections">
+    <UtilityEditionBodyPanel className="ds-corrections">
+      <div className="ds-corrections__inner">
       <nav className="ds-corrections__nav" aria-labelledby="corrections-toc-title">
         <p className="ds-corrections__nav-title" id="corrections-toc-title">
           On this page
@@ -169,6 +171,7 @@ export function CorrectionsSections() {
           </Link>
         </p>
       </section>
-    </div>
+      </div>
+    </UtilityEditionBodyPanel>
   );
 }

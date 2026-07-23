@@ -7,11 +7,14 @@
  */
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, View, type GestureResponderEvent } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Text } from './Text';
 import { Divider } from './Divider';
-import { space, useThemeColors } from './tokens';
+import { MIN_TOUCH_TARGET, space, useThemeColors } from './tokens';
 
-const MIN_ROW_HEIGHT = 44;
+const MIN_ROW_HEIGHT = MIN_TOUCH_TARGET;
+
+export type ListRowDensity = 'default' | 'compact';
 
 export type ListRowProps = {
   title: string;
@@ -23,6 +26,10 @@ export type ListRowProps = {
   interactive?: boolean;
   accessibilityLabel?: string;
   showDivider?: boolean;
+  /** Tighter vertical rhythm for dense browse/settings lists. */
+  density?: ListRowDensity;
+  /** Renders a standard forward chevron for navigation rows (Ionicons, not unicode triangles). */
+  showChevron?: boolean;
 };
 
 export function ListRow({
@@ -34,22 +41,30 @@ export function ListRow({
   interactive = Boolean(onPress),
   accessibilityLabel,
   showDivider = true,
+  density = 'default',
+  showChevron = false,
 }: ListRowProps) {
   const theme = useThemeColors();
   const label = accessibilityLabel ?? (subtitle ? `${title}, ${subtitle}` : title);
+  const densityStyles = density === 'compact' ? styles.compactPressable : styles.pressable;
+  const trailingContent =
+    trailing ??
+    (showChevron && interactive ? (
+      <Ionicons name="chevron-forward" size={18} color={theme.inkMuted} accessibilityElementsHidden />
+    ) : null);
 
   const content = (
     <View style={styles.row}>
       {leading ? <View style={styles.leading}>{leading}</View> : null}
       <View style={styles.textColumn}>
-        <Text variant="bodyEmphasis">{title}</Text>
+        <Text variant="rowTitle">{title}</Text>
         {subtitle ? (
-          <Text variant="bodySmall" colorRole="inkMuted">
+          <Text variant="caption" colorRole="inkMuted">
             {subtitle}
           </Text>
         ) : null}
       </View>
-      {trailing ? <View style={styles.trailing}>{trailing}</View> : null}
+      {trailingContent ? <View style={styles.trailing}>{trailingContent}</View> : null}
     </View>
   );
 
@@ -60,15 +75,17 @@ export function ListRow({
           accessibilityRole="button"
           accessibilityLabel={label}
           onPress={onPress}
+          android_ripple={{ color: theme.border }}
           style={({ pressed }) => [
-            styles.pressable,
-            { backgroundColor: pressed ? theme.surfaceRaised : 'transparent' },
+            densityStyles,
+            // Press steps down the Archive Paper ladder (surface → surfacePressed).
+            { backgroundColor: pressed ? theme.surfacePressed : 'transparent' },
           ]}
         >
           {content}
         </Pressable>
       ) : (
-        <View accessibilityLabel={label} style={styles.pressable}>
+        <View accessibilityLabel={label} style={densityStyles}>
           {content}
         </View>
       )}
@@ -83,6 +100,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: space['4'],
     paddingVertical: space['2'],
+  },
+  compactPressable: {
+    minHeight: MIN_ROW_HEIGHT,
+    justifyContent: 'center',
+    paddingHorizontal: space['3'],
+    paddingVertical: space['1'],
   },
   row: {
     flexDirection: 'row',

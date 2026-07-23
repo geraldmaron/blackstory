@@ -10,11 +10,10 @@
 — the brand-agnostic scope is `@repo/*`.
 
 Bare scaffold only (`black-book-mobile-006` / MOB-006): Expo + Expo Router + TypeScript
-strict + `expo-dev-client`, dev/preview/prod identity, EAS build profiles. **No UI, state,
-network, map, or Firebase libraries are installed yet** — those land in MOB-007+ per the
-[mobile app epic](../../docs/mobile/mobile-app-epic.md)'s non-goal for this bead. See
-`docs/adr/ADR-020-mobile-stack.md` for the framework/version-pinning rationale this scaffold
-follows.
+strict + `expo-dev-client`, dev/preview/prod identity, EAS build profiles. MapLibre Native,
+SQLite, and other native modules land via CNG plugins — always run a **dev client** build
+(`expo run:ios` / `expo run:android`), never Expo Go. See
+`docs/adr/ADR-020-mobile-stack.md` for the framework/version-pinning rationale.
 
 ## Version matrix (as actually installed — read from `package.json` / `node_modules`, not guessed)
 
@@ -37,11 +36,12 @@ pnpm install                 # installs everything EXCEPT apps/mobile (see below
 
 cd apps/mobile
 npm install                  # apps/mobile manages its own isolated node_modules (npm)
+npx expo install @expo/vector-icons
 
-# iOS
+# iOS — always use the custom native binary (dev client), never Expo Go
 npx expo prebuild --platform ios     # generates ios/ (gitignored, CNG — see ADR-020 SS6)
 cd ios && pod install && cd ..
-npx expo run:ios                     # builds + launches in the Simulator
+npx expo run:ios                     # builds + launches BlackStory (Dev) in the Simulator
 
 # Android
 npx expo prebuild --platform android # generates android/ (gitignored, CNG)
@@ -51,6 +51,35 @@ npx expo run:android                 # requires Android SDK + a working `java`
 `ios/` and `android/` are **not committed** (ADR-020 SS6): they are pure `expo prebuild`
 build output from `app.config.ts` + config plugins. Delete and regenerate them any time; a
 stale native directory is never a source of truth.
+
+### MapLibre / native modules — do not use Expo Go
+
+`@maplibre/maplibre-react-native` (and other custom native code) is **not** in Expo Go.
+Opening the Metro bundle in Expo Go surfaces:
+
+`TurboModuleRegistry.getEnforcing(...): 'MLRNCameraModule' could not be found`
+
+Config is already correct when present in this tree:
+
+- dependency `@maplibre/maplibre-react-native`
+- config plugin `@maplibre/maplibre-react-native` in `app.config.ts`
+- `expo-build-properties` → `ios.useFrameworks: 'static'` (MapLibre iOS linkage)
+- `expo-dev-client` so `expo start` targets the custom binary
+
+After any native-affecting change (MapLibre, `expo-dev-client`, plugins, Podfile), rebuild:
+
+```bash
+cd apps/mobile
+npx expo prebuild --platform ios --clean
+cd ios && pod install && cd ..
+npx expo run:ios
+# then, in a second terminal if you want Metro alone:
+npx expo start --dev-client
+```
+
+Launch **BlackStory (Dev)** (`app.blackbook.mobile.dev`) from the Simulator home screen or
+Xcode — not Expo Go. RN Firebase / App Check is not in this app; `USE_FRAMEWORKS=static`
+is only for MapLibre.
 
 ## CI (black-book-mobile-019)
 
@@ -69,24 +98,19 @@ apps/mobile/package-lock.json` and never touch the root `pnpm-lock.yaml` — `pn
 --frozen-lockfile` in the root `validate` job is unaffected. `.github/dependabot.yml` has a
 matching `npm` entry scoped to `/apps/mobile` for its isolated lockfile.
 
-Known baseline gap (tracked, not silently masked — no `continue-on-error`): **Mobile
-Typecheck currently fails** against 7 pre-existing type errors in two test files
-(`src/features/entity/__tests__/EntityDetailScreen.accessibility.test.tsx` and
-`src/features/entity/__tests__/useEntityDetail.test.ts` — both call
-`@testing-library/react-native`'s async `render`/`renderHook`/`rerender` with a stale,
-pre-async type expectation). Jest itself is fully green (629/629) because `jest` transpiles
-via Babel and never type-checks. See the follow-up bead referenced in
-`black-book-mobile-019`'s notes before promoting this check to a required branch-protection
-status in `infra/github/rulesets/main-protection.json` (out of this bead's exclusive
-ownership — CODEOWNERS/ruleset changes are a separate integrator's call).
+**Verified baseline (2026-07-22, `feat/mobile-launch`):** Mobile Typecheck and Mobile Unit
+Tests are green locally and in CI shape — **646/646** Jest tests; `tsc` clean for both
+`tsconfig.json` and `tsconfig.tooling.json` once the gitignored `expo-env.d.ts` shim is
+present (same shim CI regenerates). Promoting these jobs to required branch-protection
+status in `infra/github/rulesets/main-protection.json` remains an integrator decision
+(outside this README's ownership).
 
-**Explicitly out of scope for `black-book-mobile-019` without paid EAS credentials or a
-physical/simulator device matrix** (filed as `repo-fsxq` prerequisites first, then a
-dedicated follow-up bead once those land): EAS build profiles wired into a workflow,
-Android/iOS native build jobs, Maestro E2E flows, on-device accessibility (VoiceOver/TalkBack)
-passes, and release/store-submission evidence. `apps/mobile/eas.json`'s `development` /
-`preview` / `production` profiles exist for local/manual `eas-build:*` npm scripts today;
-none of them run in GitHub Actions yet.
+**Still out of scope without paid EAS credentials or a physical/simulator device matrix**
+(blocked on `repo-fsxq` first): EAS build profiles wired into a GitHub Actions workflow,
+Android/iOS native build jobs, Maestro E2E flows, on-device accessibility
+(VoiceOver/TalkBack) passes, and release/store-submission evidence. `apps/mobile/eas.json`'s
+`development` / `preview` / `production` profiles exist for local/manual `eas-build:*` npm
+scripts today; none of them run in GitHub Actions yet.
 
 ## pnpm workspace resolution — verified NOT clean (real finding, not a guess)
 
@@ -148,6 +172,179 @@ unaffected and is enforced via the `expo-build-properties` plugin
 (`android.minSdkVersion: 26`), confirmed present in the generated
 `android/gradle.properties` (`android.minSdkVersion=26`) after `expo prebuild`.
 
+## Public data path (why Dev may not “hit Supabase”)
+
+Mobile never talks to Supabase/Postgres directly (ADR-022). The only network
+origin is `extra.apiBaseUrl` → `apps/api-public` over HTTPS (or LAN HTTP in
+Dev). That service reads `bb_public.*` when
+`PUBLIC_DATA_SOURCE=postgres` + `DATABASE_URL` / `APP_DATABASE_URL` are set.
+
+| Surface | Data source today |
+|---|---|
+| **Explore** map + metrics | Live `GET /v1/map` (`MapSourceV1`) via `API_BASE_URL` when api-public is reachable. Sheet defaults to kind/place/era/precision metrics from the FeatureCollection; pin selection opens entity preview; record list is secondary. Bundled `DEMO_MAP_SOURCE` is a `__DEV__` fallback only (subtitle shows `demo fixtures`). Basemap defaults to **OpenFreeMap** (same as web); optional `MAP_PMTILES_URL` for self-hosted Protomaps; `MAP_BASEMAP_ENABLED=false` for points-only. |
+| **Stories** (Learn tab) | Bundled `content-catalog.ts` longform (web `/stories`, `/history`, `/myths`) — not `/v1/content`. |
+| **Data** (`/data`, from More) | Bundled Phase 1 indicator fixture snapshot matching web `/data` fixtures; Census national timeline is an honest empty state until a public API ships. |
+| **Search** / **entity** / cold-start **bootstrap** | HTTP to `API_BASE_URL` (`/v1/search`, `/v1/entity/:id`, `/v1/bootstrap`) with `X-BlackStory-Client`. SQLite is a release-coupled cache, not a fixture pack. |
+| **Web Explore** | Server-side Postgres in Next.js — unrelated to mobile’s API host. |
+
+**Defaults:** `app.config.ts` and preview/production `eas.json` bake
+`https://api.blackbook.app`. Development EAS profile leaves `API_BASE_URL`
+unset, so local `expo start` uses that same default. As of 2026-07-22 that
+host is **NXDOMAIN** and Cloud Run has no `black-book-api-public` service —
+bootstrap/search/entity/map fail with network errors (logged in Metro); Explore
+falls back to demo pins in `__DEV__` until you point `API_BASE_URL` at a live
+api-public (LAN or deployed).
+
+### Local Dev → live Supabase via api-public
+
+#### Path A — Prod-like local QA (**agent default**; no Metro)
+
+Store and preview builds ship an **embedded JS bundle** and never connect to a packager.
+**Agents:** run `pnpm mobile:ios:verify` before claiming mobile works. Do **not** use Metro `/status` on `127.0.0.1:8081` or open the Debug dev client expecting prod behavior.
+
+**Run from the repo root** (these scripts are not defined in `apps/mobile/package.json`):
+
+```bash
+cd /path/to/blackstory   # monorepo root
+pnpm mobile:ios:release      # build/install/launch Release on booted Simulator
+pnpm mobile:ios:verify       # agent gate: api-public + Release app; Metro NOT checked
+pnpm mobile:ios:launch       # relaunch installed Release app only
+```
+
+From `apps/mobile`, invoke the same script directly:
+
+```bash
+bash ../../scripts/mobile-ios-release.sh              # release
+bash ../../scripts/mobile-ios-release.sh --verify-only
+bash ../../scripts/mobile-ios-release.sh --launch-only
+```
+
+Requires `API_BASE_URL=http://127.0.0.1:8080` in `apps/mobile/.env.local` (Simulator).
+Rebuild `pnpm mobile:ios:release` after JS changes (no hot reload).
+
+#### Path B — Dev Client + Metro (hot reload only)
+
+The **Debug dev client** (`BlackStory (Dev)`) requires Metro. It persists the last packager URL
+in iOS UserDefaults (`expo.devlauncher.recentlyopenedapps`); `:8083` from an old session beats
+reload and causes the red screen even when agents verified `127.0.0.1:8081`. Only use this path
+when actively editing JS with hot reload:
+
+```bash
+pnpm dev:mobile
+pnpm dev:mobile:verify   # LAN host:8081 bundle smoke + stale client port check
+pnpm dev:mobile:start    # background Metro + auto-reset booted Simulator packager URL
+bash scripts/reset-ios-dev-client.sh   # repoint Simulator off dead :8082/:8083
+```
+
+**One command (Path B):** from the repo root or `apps/mobile`, the dev launcher ensures
+api-public on `:8080`, writes `.local/metro-endpoint.json`, starts Metro on `:8081` at your Mac
+LAN IP, and resets a booted iOS Simulator dev client when it still targets a stale sibling port:
+
+```bash
+pnpm dev:mobile
+# or: cd apps/mobile && pnpm dev
+```
+
+**Agent gate for Path B only** (do not use for prod-like QA):
+
+```bash
+pnpm dev:mobile:verify
+```
+
+Healthy (Path B) means: Metro on LAN `:8081`, entry bundle HTTP 200 on that LAN URL, and booted
+Simulator dev client not pinned to a stale sibling port. `/status` on `127.0.0.1` alone is not enough.
+
+Ensure api-public only (without Metro):
+
+```bash
+pnpm ensure-api-public
+```
+
+Ensure Metro only (Path B background):
+
+```bash
+pnpm ensure-metro
+```
+
+Probe Metro JSON (Path B contract):
+
+```bash
+node scripts/probe-metro.mjs
+```
+
+`pnpm start` inside `apps/mobile` also runs the ensure step first (`prestart`). Logs for a
+background api-public live in `.local/api-public.log`; background Metro logs in `.local/metro.log`.
+
+Physical device Path B: open `blackstory://expo-development-client/?url=http%3A%2F%2F<LAN-IP>%3A8081`
+or scan the QR from `pnpm dev:mobile`. Physical device Path A: install a Release/Preview EAS build.
+
+**One-time setup:** set `API_BASE_URL=http://127.0.0.1:8080` in `apps/mobile/.env.local`
+(iOS Simulator). Physical devices need the Mac LAN IP instead (see below).
+
+`DATABASE_URL` must be available for the launcher to start api-public: either in
+`apps/web/.env.local` or via `run-with-dev-secrets` (`~/.env.1password`).
+
+#### Manual api-public (fallback)
+
+From the repo root, build shared contracts once on a fresh clone
+(`pnpm install && pnpm --filter @repo/public-contracts build`).
+
+**Option 1 — `DATABASE_URL` in 1Password (`~/.env.1password`):**
+
+```bash
+cd apps/api-public
+run-with-dev-secrets env \
+  PUBLIC_DATA_SOURCE=postgres \
+  DATABASE_SSL=1 \
+  pnpm dev
+```
+
+**Option 2 — `DATABASE_URL` in `apps/web/.env.local`:**
+
+```bash
+cd apps/api-public
+set -a
+source ../web/.env.local
+set +a
+env PUBLIC_DATA_SOURCE=postgres DATABASE_SSL=1 pnpm dev
+```
+
+#### Smoke checks
+
+```bash
+curl -sS 'http://127.0.0.1:8080/v1/health' | jq .
+curl -sS -H 'X-BlackStory-Client: mobile/1.0.0; api=1' \
+  http://127.0.0.1:8080/v1/bootstrap | jq .
+curl -sS -H 'X-BlackStory-Client: mobile/1.0.0; api=1' \
+  'http://127.0.0.1:8080/v1/search?q=black&pageSize=5' | jq .
+curl -sS -H 'X-BlackStory-Client: mobile/1.0.0; api=1' \
+  http://127.0.0.1:8080/v1/map | jq '{releaseId, featureCount:(.features|length)}'
+# Expect ~1366 geo-anchored features for the live release (full ontology kinds),
+# not ~791 (legacy four-kind filter).
+```
+
+After changing `@repo/public-contracts` kinds, restart api-public so `/v1/map` picks up the rebuild:
+
+```bash
+pnpm ensure-api-public
+```
+
+#### Port conflicts
+
+`infra/firebase/firebase.json` assigns the Firestore emulator to `:8080`, same as api-public.
+The ensure script **refuses** to kill unknown processes. Stop `pnpm firebase:emulators` before
+mobile dev, or reconfigure the emulator port.
+
+#### Physical device
+
+Set `API_BASE_URL=http://<MAC_LAN_IP>:8080` in `apps/mobile/.env.local`. Start api-public on the
+Mac (via `pnpm ensure-api-public` or `pnpm dev:mobile`), then open BlackStory (Dev) on the device.
+The ensure script does not rewrite LAN URLs; it only auto-starts api-public on loopback.
+
+Metro should log `[blackstory] apiBaseUrl=…` and
+`[blackstory] apiBaseUrl=… { bootstrapSync: … }`. An unreachable host logs
+`bootstrapSync offline` with the LAN-run hint. Tracker: `repo-tahv`.
+
 ## Client attestation & observability (MOB-010 / MOB-018)
 
 The app attests to `apps/api-public` and `apps/api-submissions` via the
@@ -187,14 +384,15 @@ for the full template and `eas.json` for the committed non-secret per-profile
 ## EAS Update / OTA (MOB-019, repo-ovn7)
 
 `expo-updates` is installed and `runtimeVersion: { policy: 'appVersion' }` is
-wired in `app.config.ts` (ADR-023 §2's OTA/rebuild fence). `updates.url` /
-`extra.eas.projectId` are gated on `EAS_PROJECT_ID`, which is unset today — no
-Expo/EAS organization has been provisioned yet (`mobile-identity.md` human
-gate #3) — so `expo-updates` currently has no update server to poll and stays
-structurally inert until that gate clears. `eas.json`'s three build profiles
-already each declare a distinct `channel` (development/preview/production),
-satisfying ADR-023 §1's "OTA can never cross an environment boundary"
-requirement.
+wired in `app.config.ts` (ADR-023 §2's OTA/rebuild fence). `extra.eas.projectId`
+defaults to the provisioned project (`@gerald-maron/blackstory`) so local
+`eas device:*` / CLI stay linked. **OTA itself is off for
+`APP_VARIANT=development`** (`updates.enabled: false`,
+`checkAutomatically: 'NEVER'`) so BlackStory (Dev) + Metro own the JS bundle —
+leaving the updater on with a live `updates.url` previously fought Metro /
+Expo codesigning and looked like continuous refresh. Preview/production keep
+`updates.url` + `ON_LOAD` against their `eas.json` channels (ADR-023 §1:
+OTA never crosses an environment boundary).
 
 **Code-signing decision (ADR-023's 2026-07-20 adversarial-review amendment,
 threat-model T6):** EAS Update end-to-end code signing is a **paid EAS
@@ -205,7 +403,25 @@ custody of the EAS org, a scoped/revocable CI-only publish token, staged
 channel rollout, and immutable-update rollback. This is **accepted risk by
 design**, with code signing recorded as a cost-gated upgrade trigger, not a
 silent gap. See `src/updates/README.md` for the full decision record, the
-human-gate activation steps, and the OTA rollback runbook (ADR-023 §6).
+activation steps, and the OTA rollback runbook (ADR-023 §6).
+
+### If Dev Client keeps refreshing
+
+```bash
+# Stop Metro (Ctrl+C), then:
+rm -rf ~/.expo/codesigning/51a35884-e6b5-43b6-b95b-c5a7460fa665
+mkdir -p ~/.expo/codesigning/51a35884-e6b5-43b6-b95b-c5a7460fa665
+cd apps/mobile
+npx expo prebuild --platform ios   # regenerates Expo.plist with updates.enabled=false
+cd ios && pod install && cd ..
+npx expo start --dev-client --clear
+# In another terminal / Xcode: launch BlackStory (Dev), not Expo Go
+npx expo run:ios
+```
+
+In the simulator Dev Menu (⌘D): disable Fast Refresh only if a bad HMR loop
+persists after the cache clear. Never open this project in Expo Go (MapLibre
+native module is missing there).
 
 ## Package naming — a documented discrepancy, not a guess
 

@@ -7,6 +7,7 @@ import { createPublicRateLimitGuard, resolvePublicEndpointClass } from './rate-l
 
 test('resolvePublicEndpointClass maps read paths to endpoint classes', () => {
   assert.equal(resolvePublicEndpointClass('/v1/search', 'GET'), 'search');
+  assert.equal(resolvePublicEndpointClass('/v1/map', 'GET'), 'entityRetrieval');
   assert.equal(resolvePublicEndpointClass('/v1/locations/geocode', 'GET'), 'geocoding');
   assert.equal(resolvePublicEndpointClass('/v1/locations/nearby', 'GET'), 'nearbyDiscovery');
   assert.equal(resolvePublicEndpointClass('/v1/entities/abc-123', 'GET'), 'entityRetrieval');

@@ -5,6 +5,7 @@
 import Link from 'next/link';
 import React from 'react';
 import type { DataPageGroupedBarSeries } from '@repo/domain/statistics/data-page-series';
+import { THEMES_PUBLIC_SURFACE_ENABLED } from '../../lib/theme-impact/public-surface';
 import { DataChartFrame } from './DataChartFrame';
 import { formatDataPageValue, niceMax, scaleLinear } from './chart-utils';
 
@@ -17,7 +18,7 @@ const HEIGHT = 300;
 const MARGIN = { top: 20, right: 16, bottom: 56, left: 72 } as const;
 
 function themeHref(themeId: string | undefined): string | undefined {
-  if (!themeId) return undefined;
+  if (!THEMES_PUBLIC_SURFACE_ENABLED || !themeId) return undefined;
   return `/themes/${themeId}`;
 }
 

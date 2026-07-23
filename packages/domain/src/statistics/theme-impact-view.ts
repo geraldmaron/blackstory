@@ -3,15 +3,17 @@
  * packets and fixture rows into display-ready strings with provenance quartet.
  */
 import { resolveThemeImpactPolicyEras } from './theme-impact-policy-eras.js';
-import type {
-  ThemeImpactGapState,
-  ThemeImpactMethodStance,
-  ThemeImpactPacket,
-  ThemeImpactPacketArtifact,
-  ThemeImpactPacketDerived,
-  ThemeImpactPacketGeography,
-  ThemeImpactPacketObservation,
-  ThemeImpactProvenanceQuartet,
+import {
+  THEME_IMPACT_BINDING_PURPOSES,
+  type ThemeImpactBindingPurpose,
+  type ThemeImpactGapState,
+  type ThemeImpactMethodStance,
+  type ThemeImpactPacket,
+  type ThemeImpactPacketArtifact,
+  type ThemeImpactPacketDerived,
+  type ThemeImpactPacketGeography,
+  type ThemeImpactPacketObservation,
+  type ThemeImpactProvenanceQuartet,
 } from './theme-impact-packet.js';
 import { getThemeImpactQuestion } from './theme-impact-questions.js';
 
@@ -132,17 +134,6 @@ function derivedToView(row: ThemeImpactPacketDerived): ThemeImpactDerivedView {
 }
 
 function artifactToView(row: ThemeImpactPacketArtifact): ThemeImpactArtifactView {
-  const provenance =
-    row.sourceUrl !== undefined
-      ? {
-          source: row.artifactClass,
-          source_url: row.sourceUrl,
-          retrieved_at: row.dated ?? '',
-          content_hash: row.artifactId,
-          humanCitation: row.citation,
-        }
-      : undefined;
-
   return {
     id: row.artifactId,
     title: row.title,
@@ -150,7 +141,7 @@ function artifactToView(row: ThemeImpactPacketArtifact): ThemeImpactArtifactView
     ...(row.dated !== undefined ? { dateLabel: row.dated } : {}),
     summary: row.summary ?? row.citation,
     ...(row.uncertaintyLabel !== undefined ? { uncertaintyLabel: row.uncertaintyLabel } : {}),
-    ...(provenance !== undefined ? { provenance } : {}),
+    provenance: provenanceToView(row.provenance),
   };
 }
 
@@ -201,6 +192,9 @@ export function parseThemeImpactPacketRow(row: {
   readonly derived: unknown;
   readonly artifacts: unknown;
   readonly gap_states: readonly string[];
+  readonly causal_claim_ids?: readonly string[] | null;
+  readonly entity_id?: string | null;
+  readonly binding_purpose?: 'map_panel' | 'story' | 'research' | 'mcp' | null;
   readonly status: string;
   readonly created_at: string | Date;
   readonly updated_at: string | Date;
@@ -208,6 +202,12 @@ export function parseThemeImpactPacketRow(row: {
   const geography = row.geography as ThemeImpactPacketGeography;
   const toIso = (value: string | Date) =>
     value instanceof Date ? value.toISOString() : value;
+  const causalClaimIds = row.causal_claim_ids?.filter((id) => id.trim()) ?? [];
+  const bindingPurpose = THEME_IMPACT_BINDING_PURPOSES.includes(
+    row.binding_purpose as ThemeImpactBindingPurpose,
+  )
+    ? (row.binding_purpose as ThemeImpactBindingPurpose)
+    : undefined;
 
   return {
     kind: 'theme.impact.packet.v1',
@@ -224,6 +224,15 @@ export function parseThemeImpactPacketRow(row: {
     derived: (row.derived as ThemeImpactPacket['derived']) ?? [],
     artifacts: (row.artifacts as ThemeImpactPacket['artifacts']) ?? [],
     gapStates: [...row.gap_states] as ThemeImpactPacket['gapStates'],
+    ...(causalClaimIds.length > 0 ? { causalClaimIds } : {}),
+    ...(row.entity_id && bindingPurpose
+      ? {
+          entityBinding: {
+            entityId: row.entity_id,
+            purpose: bindingPurpose,
+          },
+        }
+      : {}),
     status: row.status as ThemeImpactPacket['status'],
     createdAt: toIso(row.created_at),
     updatedAt: toIso(row.updated_at),

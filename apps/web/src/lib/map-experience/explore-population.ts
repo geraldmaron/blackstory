@@ -84,13 +84,13 @@ export function populationDecadeComparabilityNote(decade: string): string | unde
   const meta = getPopulationDecadeMeta(decade);
   if (!meta) return undefined;
   if (meta.hasFreeEnslavedSplit) {
-    return '1790–1860: Black totals combine free and enslaved counts — not comparable to post-emancipation share tiers alone.';
+    return '1790–1860: Black totals combine free and enslaved counts; not comparable to post-emancipation share tiers alone.';
   }
   if (meta.southernUndercountCaveat) {
-    return '1870: documented Southern undercount — treat shares as lower bounds, not exact.';
+    return '1870: documented Southern undercount; treat shares as lower bounds, not exact.';
   }
   if (meta.opensDefinitionBoundary) {
-    return '2000: opens the “Black alone” category — not directly comparable to pre-2000 race definitions.';
+    return '2000: opens the “Black alone” category; not directly comparable to pre-2000 race definitions.';
   }
   return undefined;
 }
@@ -101,7 +101,7 @@ export function populationChangeComparabilityNote(
   toDecade: string,
 ): string | undefined {
   if (changeCrossesDefinitionBoundary(fromDecade, toDecade)) {
-    return 'Change across 2000 crosses a measurement-regime boundary — treat as indicative, not a clean comparison.';
+    return 'Change across 2000 crosses a measurement-regime boundary; treat as indicative, not a clean comparison.';
   }
   return undefined;
 }

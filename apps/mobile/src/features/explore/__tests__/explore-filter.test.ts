@@ -1,8 +1,8 @@
 /**
- * Deterministic filter tests (MOB-012). "Deterministic" = same inputs, same
+ * Deterministic filter tests (MOB-012 / Explore v7 Phase C). "Deterministic" = same inputs, same
  * ordered output and same count, every time.
  */
-import { applyFilters, countMatches, matchesFilters } from '../explore-filter';
+import { applyFilters, buildExploreFacetOptions, countMatches, matchesFilters } from '../explore-filter';
 import { makeFeature, SEPARATED } from '../__fixtures__/features';
 
 describe('applyFilters — determinism + stable order', () => {
@@ -20,10 +20,59 @@ describe('applyFilters — determinism + stable order', () => {
 
   it('filters by era membership when features carry eras', () => {
     const features = [
-      makeFeature('x', [-80, 35], { label: 'X', properties: { eraBuckets: ['1950'] } as never }),
-      makeFeature('y', [-81, 36], { label: 'Y', properties: { eraBuckets: ['1900'] } as never }),
+      makeFeature('x', [-80, 35], { label: 'X', properties: { eraBuckets: ['1950s'] } as never }),
+      makeFeature('y', [-81, 36], { label: 'Y', properties: { eraBuckets: ['1900s'] } as never }),
     ];
-    expect(applyFilters(features, { era: '1950' }).map((f) => f.id)).toEqual(['x']);
+    expect(applyFilters(features, { era: '1950s' }).map((f) => f.id)).toEqual(['x']);
+  });
+});
+
+describe('applyFilters — kind families', () => {
+  it('filters by kind family slug', () => {
+    expect(applyFilters(SEPARATED, { kind: 'places' }).map((f) => f.id)).toEqual(['a', 'b', 'c']);
+    expect(applyFilters(SEPARATED, { kind: 'place' }).map((f) => f.id)).toEqual(['a', 'c']);
+  });
+});
+
+describe('applyFilters — web parity facets', () => {
+  const features = [
+    makeFeature('a', [-77, 38], {
+      label: 'Alpha',
+      kind: 'place',
+      properties: {
+        eraBuckets: ['1950s'],
+        mapTone: 'plantation',
+        topicIds: ['education'],
+        status: 'historic',
+        confidenceTier: 'high',
+        statePostalCode: 'DC',
+      } as never,
+    }),
+    makeFeature('b', [-95, 29], {
+      label: 'Bravo',
+      kind: 'school',
+      properties: {
+        eraBuckets: ['1960s'],
+        confidenceTier: 'low',
+        status: 'active',
+        statePostalCode: 'TX',
+      } as never,
+    }),
+  ];
+
+  it('filters by tone, theme, status, confidence, and state in web order', () => {
+    expect(applyFilters(features, { tone: 'plantation' }).map((f) => f.id)).toEqual(['a']);
+    expect(applyFilters(features, { theme: 'education' }).map((f) => f.id)).toEqual(['a']);
+    expect(applyFilters(features, { status: 'active' }).map((f) => f.id)).toEqual(['b']);
+    expect(applyFilters(features, { confidence: 'high' }).map((f) => f.id)).toEqual(['a']);
+    expect(applyFilters(features, { state: 'TX' }).map((f) => f.id)).toEqual(['b']);
+  });
+
+  it('builds facet options from the current feature set', () => {
+    const facets = buildExploreFacetOptions(features);
+    expect(facets.tone.some((option) => option.value === 'plantation')).toBe(true);
+    expect(facets.theme.some((option) => option.value === 'education')).toBe(true);
+    expect(facets.state.some((option) => option.value === 'DC')).toBe(true);
   });
 });
 

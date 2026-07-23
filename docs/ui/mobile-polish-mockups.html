@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BlackStory mobile — polish approaches</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&family=Sora:wght@500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0A0A0A;
+      --paper: #F4EFE5;
+      --surface: #FBF8F2;
+      --raised: #FDFBF8;
+      --stone: #6D675F;
+      --rule: #D7D0C4;
+      --copper-text: #8E4F2A;
+      --copper: #B86B2A;
+      --charcoal: #161616;
+      --map: #1A1814;
+      --r-sm: 8px;
+      --r-md: 16px;
+      --r-lg: 28px;
+      --page: #E8E2D6;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: Inter, system-ui, sans-serif;
+      font-weight: 400;
+      background: var(--page);
+      color: var(--ink);
+      line-height: 1.4;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px 20px 72px;
+    }
+
+    .hero {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 16px;
+      max-width: 640px;
+    }
+    .hero .eyebrow {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--copper-text);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      margin: 0;
+      font-family: Inter, system-ui, sans-serif;
+      font-size: 17px;
+      font-weight: 500;
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+    }
+    .hero p {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--stone);
+      max-width: 62ch;
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 14px 0 16px;
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 12px;
+    }
+    .tabs button {
+      appearance: none;
+      border: 1px solid var(--rule);
+      background: var(--surface);
+      color: var(--ink);
+      border-radius: var(--r-sm);
+      padding: 6px 10px;
+      font: 500 12px/1.2 Inter, sans-serif;
+      cursor: pointer;
+      min-height: 34px;
+    }
+    .tabs button[aria-selected="true"] {
+      border-color: var(--ink);
+      background: var(--ink);
+      color: var(--paper);
+    }
+    .tabs button:focus-visible {
+      outline: 2px solid var(--copper);
+      outline-offset: 2px;
+    }
+
+    .approach-meta {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1.2fr 1fr;
+      margin-bottom: 16px;
+      align-items: start;
+    }
+    @media (max-width: 860px) {
+      .approach-meta { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: var(--r-md);
+      padding: 12px 14px;
+    }
+    .card h2 {
+      margin: 0 0 4px;
+      font-family: Inter, system-ui, sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 1.25;
+    }
+    .card .thesis {
+      margin: 0 0 8px;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--stone);
+    }
+    .scale {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    @media (max-width: 720px) {
+      .scale { grid-template-columns: repeat(2, 1fr); }
+    }
+    .scale li {
+      border: 1px solid var(--rule);
+      border-radius: var(--r-sm);
+      padding: 6px 7px;
+      background: var(--paper);
+    }
+    .scale .label {
+      display: block;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 9px;
+      font-weight: 400;
+      color: var(--stone);
+      margin-bottom: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .scale .val {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .bullets {
+      margin: 0;
+      padding-left: 16px;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink);
+    }
+    .bullets li { margin: 3px 0; }
+    .bullets strong { font-weight: 500; }
+    .bullets .muted { color: var(--stone); }
+
+    .phones {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    @media (max-width: 1100px) {
+      .phones { grid-template-columns: repeat(2, minmax(220px, 1fr)); }
+    }
+    @media (max-width: 560px) {
+      .phones { grid-template-columns: 1fr; }
+    }
+
+    .phone-wrap {
+      display: grid;
+      gap: 6px;
+    }
+    .phone-label {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 10px;
+      font-weight: 400;
+      color: var(--stone);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .phone {
+      width: 100%;
+      max-width: 300px;
+      aspect-ratio: 9 / 19.2;
+      border: 1px solid var(--ink);
+      border-radius: 28px;
+      background: var(--paper);
+      overflow: hidden;
+      position: relative;
+      box-shadow: none;
+      margin: 0 auto;
+    }
+    .phone-notch {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 86px;
+      height: 18px;
+      background: var(--ink);
+      border-radius: 12px;
+      z-index: 5;
+    }
+    .status {
+      height: 34px;
+      padding: 12px 14px 0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--ink);
+      position: relative;
+      z-index: 2;
+    }
+    .status.map-status { color: var(--paper); }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      padding-top: 34px;
+      padding-bottom: 52px;
+    }
+
+    .tabbar {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 52px;
+      background: var(--surface);
+      border-top: 1px solid var(--rule);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 5px 4px 8px;
+      z-index: 4;
+    }
+    .tab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-size: 9px;
+      font-weight: 400;
+      color: var(--stone);
+    }
+    .tab.active { color: var(--copper-text); font-weight: 500; }
+    .tab .ico {
+      width: 16px;
+      height: 16px;
+      border: 1px solid currentColor;
+      border-radius: 3px;
+    }
+
+    .mast {
+      padding: 4px 14px 6px;
+    }
+    .kicker {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 9px;
+      font-weight: 400;
+      color: var(--copper-text);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    .kicker::before {
+      content: "";
+      width: 5px;
+      height: 5px;
+      background: var(--copper);
+      border-radius: 1px;
+      flex: 0 0 auto;
+    }
+    .mast-title {
+      margin: 0;
+      font-family: Inter, system-ui, sans-serif;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+    .mast-dek {
+      margin: 2px 0 0;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--stone);
+      line-height: 1.3;
+    }
+
+    .scroll {
+      flex: 1;
+      overflow: hidden;
+      padding: 0 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 6px;
+      align-items: start;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .row-title {
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.25;
+      margin: 0;
+    }
+    .row-meta {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--stone);
+      margin: 1px 0 0;
+      line-height: 1.3;
+    }
+    .row-slug {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 9px;
+      font-weight: 400;
+      color: var(--stone);
+    }
+    .facts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 10px;
+      margin-top: 3px;
+    }
+    .fact {
+      min-width: 52px;
+    }
+    .fact .l {
+      display: block;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 9px;
+      font-weight: 400;
+      color: var(--stone);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .fact .v {
+      display: block;
+      font-family: Inter, system-ui, sans-serif;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink);
+      line-height: 1.2;
+    }
+
+    .search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--rule);
+      background: var(--surface);
+      border-radius: var(--r-sm);
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--stone);
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .chip {
+      border: 1px solid var(--rule);
+      border-radius: var(--r-sm);
+      padding: 3px 7px;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink);
+      background: var(--surface);
+    }
+    .chip.on {
+      border-color: var(--copper);
+      color: var(--copper-text);
+      font-weight: 500;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: var(--r-md);
+      padding: 8px 10px;
+    }
+    .panel-head {
+      display: flex;
+      gap: 6px;
+      align-items: baseline;
+      margin-bottom: 4px;
+    }
+    .panel-idx {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 9px;
+      font-weight: 400;
+      color: var(--stone);
+    }
+    .panel-title {
+      margin: 0;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .section-label {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 10px;
+      font-weight: 400;
+      color: var(--stone);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin: 2px 0 0;
+    }
+
+    /* Explore */
+    .map-screen {
+      background: var(--map);
+      color: var(--paper);
+    }
+    .map-fake {
+      position: absolute;
+      inset: 34px 0 52px;
+      background:
+        radial-gradient(circle at 35% 42%, #2a261f 0 2px, transparent 3px),
+        radial-gradient(circle at 58% 55%, #2a261f 0 2px, transparent 3px),
+        radial-gradient(circle at 48% 38%, var(--copper) 0 3px, transparent 4px),
+        radial-gradient(circle at 62% 48%, #2a261f 0 2px, transparent 3px),
+        linear-gradient(180deg, #141210 0%, #1c1914 55%, #12100d 100%);
+    }
+    .map-chrome {
+      position: absolute;
+      top: 40px;
+      left: 12px;
+      right: 12px;
+      z-index: 3;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .ghost-row {
+      display: flex;
+      gap: 5px;
+    }
+    .ghost {
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--rule);
+      border-radius: var(--r-sm);
+      background: transparent;
+    }
+    .count-pill {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 10px;
+      font-weight: 400;
+      padding: 5px 7px;
+      border-radius: 999px;
+      border: 1px solid var(--rule);
+      color: var(--paper);
+    }
+    .sheet {
+      position: absolute;
+      left: 0; right: 0; bottom: 52px;
+      height: 34%;
+      background: var(--surface);
+      border-top: 1px solid var(--rule);
+      border-radius: var(--r-lg) var(--r-lg) 0 0;
+      padding: 6px 12px 8px;
+      z-index: 3;
+      color: var(--ink);
+    }
+    .sheet-handle {
+      width: 32px;
+      height: 3px;
+      background: var(--rule);
+      border-radius: 2px;
+      margin: 0 auto 6px;
+    }
+    .sheet h3 {
+      margin: 0 0 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    /* Entity */
+    .stack-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 3px 12px 5px;
+      font-size: 12px;
+      font-weight: 500;
+      border-bottom: 1px solid var(--rule);
+      background: var(--paper);
+    }
+    .stack-header .back { color: var(--copper-text); font-weight: 500; }
+    .entity-title {
+      margin: 0;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      line-height: 1.25;
+    }
+    .entity-lede {
+      margin: 3px 0 0;
+      font-family: "Source Serif 4", Georgia, serif;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink);
+      line-height: 1.4;
+    }
+    .copper-rule {
+      border-left: 2px solid var(--copper);
+      padding-left: 8px;
+      margin-top: 6px;
+    }
+
+    /* Approach-specific: compact modern scales */
+    [data-approach="ledger"] .mast-title { font-family: Inter, sans-serif; font-size: 16px; font-weight: 500; }
+    [data-approach="ledger"] .entity-title { font-family: Inter, sans-serif; font-size: 17px; font-weight: 500; }
+    [data-approach="ledger"] .row-title { font-size: 13px; font-weight: 500; }
+    [data-approach="ledger"] .count-pill {
+      background: transparent;
+      border-color: rgba(215, 208, 196, 0.55);
+      color: var(--paper);
+    }
+    [data-approach="ledger"] .ghost {
+      background: rgba(251, 248, 242, 0.08);
+      border-color: rgba(215, 208, 196, 0.45);
+    }
+    [data-approach="ledger"] .browse-panel { display: none; }
+    [data-approach="ledger"] .ledger-only { display: block; }
+    [data-approach="ledger"] .plate-only,
+    [data-approach="ledger"] .receipt-only { display: none; }
+
+    [data-approach="plate"] .mast-title { font-family: Inter, sans-serif; font-size: 17px; font-weight: 500; }
+    [data-approach="plate"] .entity-title { font-family: Inter, sans-serif; font-size: 18px; font-weight: 500; }
+    [data-approach="plate"] .row-title { font-size: 13px; font-weight: 500; }
+    [data-approach="plate"] .count-pill {
+      background: var(--surface);
+      color: var(--ink);
+      border-color: var(--rule);
+      border-radius: var(--r-sm);
+    }
+    [data-approach="plate"] .ghost {
+      background: var(--surface);
+      border-color: var(--rule);
+    }
+    [data-approach="plate"] .scroll-plate {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: var(--r-lg) var(--r-lg) 0 0;
+      padding: 8px 10px;
+      flex: 1;
+      overflow: hidden;
+    }
+    [data-approach="plate"] .ledger-only,
+    [data-approach="plate"] .receipt-only { display: none; }
+    [data-approach="plate"] .plate-only { display: block; }
+    [data-approach="plate"] .browse-panel { display: none; }
+
+    [data-approach="receipt"] .mast-title { font-family: Inter, sans-serif; font-size: 16px; font-weight: 500; }
+    [data-approach="receipt"] .entity-title {
+      font-family: "Source Serif 4", Georgia, serif;
+      font-size: 17px;
+      font-weight: 400;
+    }
+    [data-approach="receipt"] .row-title { font-size: 13px; font-weight: 500; }
+    [data-approach="receipt"] .count-pill {
+      border: 0;
+      padding: 5px 0;
+      background: transparent;
+      color: var(--paper);
+    }
+    [data-approach="receipt"] .ghost {
+      background: transparent;
+      border-color: rgba(215, 208, 196, 0.5);
+    }
+    [data-approach="receipt"] .ledger-only,
+    [data-approach="receipt"] .plate-only { display: none; }
+    [data-approach="receipt"] .receipt-only { display: block; }
+    [data-approach="receipt"] .browse-panel { display: none; }
+
+    .panel[hidden], .hidden { display: none !important; }
+
+    .footer-note {
+      margin-top: 22px;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--stone);
+      max-width: 70ch;
+    }
+    .footer-note code {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      color: var(--ink);
+    }
+
+    .approach { display: none; }
+    .approach.is-active { display: block; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="eyebrow">Mobile polish · design options</div>
+      <h1>Three modern, compact approaches</h1>
+      <p>
+        Flat matte, Archive Paper, copper as signal only. Type stays medium-weight
+        and small (mastheads 16–17, entity 17–18, rows 13). Differences are surface
+        nesting and how much edition chrome stays on browse tabs.
+      </p>
+    </header>
+
+    <div class="tabs" role="tablist" aria-label="Polish approaches">
+      <button type="button" role="tab" id="tab-ledger" aria-controls="approach-ledger" aria-selected="true" data-target="ledger">1 · Ledger Line</button>
+      <button type="button" role="tab" id="tab-plate" aria-controls="approach-plate" aria-selected="false" data-target="plate">2 · Single Plate</button>
+      <button type="button" role="tab" id="tab-receipt" aria-controls="approach-receipt" aria-selected="false" data-target="receipt">3 · Reading Receipt</button>
+    </div>
+
+    <!-- APPROACH 1 -->
+    <section class="approach is-active" id="approach-ledger" data-approach="ledger" role="tabpanel" aria-labelledby="tab-ledger">
+      <div class="approach-meta">
+        <div class="card">
+          <h2>Ledger Line</h2>
+          <p class="thesis">Dense index first. Hierarchy from type and hairlines, not stacked cards.</p>
+          <ul class="scale" aria-label="Type scale">
+            <li><span class="label">Masthead</span><span class="val">16 Inter</span></li>
+            <li><span class="label">Entity</span><span class="val">17 Inter</span></li>
+            <li><span class="label">Section</span><span class="val">10 Mono</span></li>
+            <li><span class="label">Row</span><span class="val">13 Inter</span></li>
+            <li><span class="label">Caption</span><span class="val">11 Inter</span></li>
+          </ul>
+        </div>
+        <div class="card">
+          <ul class="bullets">
+            <li><strong>Fix:</strong> kill card-in-card on History; drop indexed panels on browse tabs; outline count chip on map.</li>
+            <li><strong>Keep:</strong> kickers, LedgerRow density, entity fact strips, copper active tab.</li>
+            <li class="muted"><strong>Best if</strong> you want the fastest cleanup and maximum content above the fold.</li>
+            <li class="muted"><strong>Tradeoff:</strong> less “edition object” feel on tabs; closer to a native list app.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phones">
+        <div class="phone-wrap">
+          <div class="phone-label">Explore</div>
+          <div class="phone map-screen">
+            <div class="phone-notch"></div>
+            <div class="status map-status"><span>9:41</span><span>●●●</span></div>
+            <div class="map-fake" aria-hidden="true"></div>
+            <div class="map-chrome">
+              <div class="count-pill">1,373 pinned</div>
+              <div class="ghost-row" aria-hidden="true">
+                <div class="ghost"></div><div class="ghost"></div><div class="ghost"></div>
+              </div>
+            </div>
+            <div class="sheet">
+              <div class="sheet-handle"></div>
+              <h3>Records in view</h3>
+              <div class="row">
+                <div>
+                  <p class="row-title">Rosewood Massacre</p>
+                  <p class="row-meta">Levy County, FL · 1923</p>
+                </div>
+                <span class="row-slug">place</span>
+              </div>
+              <div class="row">
+                <div>
+                  <p class="row-title">Ocoee Election Day</p>
+                  <p class="row-meta">Orange County, FL · 1920</p>
+                </div>
+                <span class="row-slug">event</span>
+              </div>
+            </div>
+            <nav class="tabbar" aria-label="Tabs">
+              <div class="tab active"><div class="ico"></div>Explore</div>
+              <div class="tab"><div class="ico"></div>History</div>
+              <div class="tab"><div class="ico"></div>Stories</div>
+              <div class="tab"><div class="ico"></div>More</div>
+            </nav>
+          </div>
+        </div>
+
+        <div class="phone-wrap">
+          <div class="phone-label">History</div>
+          <div class="phone">
+            <div class="phone-notch"></div>
+            <div class="screen">
+              <div class="status"><span>9:41</span><span>●●●</span></div>
+              <header class="mast">
+                <div class="kicker">Find in time</div>
+                <h2 class="mast-title">History</h2>
+                <p class="mast-dek">Search records by place, era, and kind.</p>
+              </header>
+              <div class="scroll">
+                <div class="search">Search places, people, years…</div>
+                <div class="chips">
+                  <span class="chip on">All</span>
+                  <span class="chip">Person</span>
+                  <span class="chip">Place</span>
+                  <span class="chip">Event</span>
+                </div>
+                <p class="section-label">Results</p>
+                <div class="row">
+                  <div>
+                    <p class="row-title">Rosewood Massacre</p>
+                    <p class="row-meta">Violence against a Florida town, 1923.</p>
+                    <div class="facts">
+                      <div class="fact"><span class="l">Kind</span><span class="v">Event</span></div>
+                      <div class="fact"><span class="l">Era</span><span class="v">1920s</span></div>
+                      <div class="fact"><span class="l">Status</span><span class="v">Published</span></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div>
+                    <p class="row-title">Black Wall Street</p>
+                    <p class="row-meta">Greenwood district, Tulsa.</p>
+                  </div>
+                </div>
+              </div>
+              <nav class="tabbar" aria-label="Tabs">
+                <div class="tab"><div class="ico"></div>Explore</div>
+                <div class="tab active"><div class="ico"></div>History</div>
+                <div class="tab"><div class="ico"></div>Stories</div>
+                <div class="tab"><div class="ico"></div>More</div>
+              </nav>
+            </div>
+          </div>
+        </div>
+
+        <div class="phone-wrap">
+          <div class="phone-label">More</div>
+          <div class="phone">
+            <div class="phone-notch"></div>
+            <div class="screen">
+              <div class="status"><span>9:41</span><span>●●●</span></div>
+              <header class="mast">
+                <div class="kicker">BlackStory</div>
+                <h2 class="mast-title">More</h2>
+                <p class="mast-dek">About, trust, and contribute.</p>
+              </header>
+              <div class="scroll">
+                <p class="section-label">Trust</p>
+                <div class="row"><div><p class="row-title">Methodology</p><p class="row-meta">How records are built</p></div></div>
+                <div class="row"><div><p class="row-title">Memorial</p><p class="row-meta">Names wall on the web</p></div></div>
+                <div class="row"><div><p class="row-title">Corrections</p><p class="row-meta">Submit a fix</p></div></div>
+                <p class="section-label">Contribute</p>
+                <div class="row"><div><p class="row-title">Suggest a source</p><p class="row-meta">Evidence first</p></div></div>
+              </div>
+              <nav class="tabbar" aria-label="Tabs">
+                <div class="tab"><div class="ico"></div>Explore</div>
+                <div class="tab"><div class="ico"></div>History</div>
+                <div class="tab"><div class="ico"></div>Stories</div>
+                <div class="tab active"><div class="ico"></div>More</div>
+              </nav>
+            </div>
+          </div>
+        </div>
+
+        <div class="phone-wrap">
+          <div class="phone-label">Entity</div>
+          <div class="phone">
+            <div class="phone-notch"></div>
+            <div class="screen">
+              <div class="status"><span>9:41</span><span>●●●</span></div>
+              <div class="stack-header"><span class="back">Back</span><span>Share</span></div>
+              <div class="scroll" style="padding-top:8px">
+                <p class="section-label">00 · Intro</p>
+                <h2 class="entity-title">Rosewood Massacre</h2>
+                <p class="entity-lede">A week of racial violence destroyed a Black town in Levy County, Florida, in January 1923.</p>
+                <div class="facts" style="margin-top:8px">
+                  <div class="fact"><span class="l">Kind</span><span class="v">Event</span></div>
+                  <div class="fact"><span class="l">Era</span><span class="v">1920s</span></div>
+                  <div class="fact"><span class="l">Place</span><span class="v">Levy Co., FL</span></div>
+                </div>
+                <p class="section-label" style="margin-top:10px">01 · Anatomy</p>
+                <div class="row"><div><p class="row-title">Where</p><p class="row-meta">Pinned to county precision</p></div></div>
+                <div class="row"><div><p class="row-title">When</p><p class="row-meta">1923-01-01 to 1923-01-07</p></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- APPROACH 2 -->
+    <section class="approach" id="approach-plate" data-approach="plate" role="tabpanel" aria-labelledby="tab-plate" hidden>
+      <div class="approach-meta">
+        <div class="card">
+          <h2>Single Plate</h2>
+          <p class="thesis">One Surface plate per screen. Everything else is canvas ledger underneath.</p>
+          <ul class="scale" aria-label="Type scale">
+            <li><span class="label">Masthead</span><span class="val">17 Inter</span></li>
+            <li><span class="label">Entity</span><span class="val">18 Inter</span></li>
+            <li><span class="label">Section</span><span class="val">10 Mono</span></li>
+            <li><span class="label">Row</span><span class="val">13 Inter</span></li>
+            <li><span class="label">Caption</span><span class="val">11 Inter</span></li>
+          </ul>
+        </div>
+        <div class="card">
+          <ul class="bullets">
+            <li><strong>Fix:</strong> formalize BrowseScreenShell as masthead + one plate; no nested History cards; More is one plate with rules.</li>
+            <li><strong>Keep:</strong> indexed beats on entity only; Surface instruments on Explore; edition identity.</li>
+            <li class="muted"><strong>Best if</strong> you want the app to still feel like a bound edition, not a settings list.</li>
+            <li class="muted"><strong>Tradeoff:</strong> slightly more vertical chrome than Ledger Line.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phones">
+        <div class="phone-wrap">
+          <div class="phone-label">Explore</div>
+          <div class="phone map-screen">
+            <div class="phone-notch"></div>
+            <div class="status map-status"><span>9:41</span><span>●●●</span></div>
+            <div class="map-fake" aria-hidden="true"></div>
+            <div class="map-chrome">
+              <div class="count-pill"><span style="color:var(--copper-text)">·</span> 1,373</div>
+              <div class="ghost-row" aria-hidden="true">
+                <div class="ghost"></div><div class="ghost"></div><div class="ghost"></div>
+              </div>
+            </div>
+            <div class="sheet">
+              <div class="sheet-handle"></div>
+              <h3>Records in view</h3>
+              <div class="row">
+                <div>
+                  <p class="row-title">Rosewood Massacre</p>
+                  <p class="row-meta">Levy County, FL · 1923</p>
+                </div>
+              </div>
+              <div class="row">
+                <div>
+                  <p class="row-title">Ocoee Election Day</p>
+                  <p class="row-meta">Orange County, FL · 1920</p>
+                </div>
+              </div>
+            </div>
+            <nav class="tabbar" aria-label="Tabs">
+              <div class="tab active"><div class="ico"></div>Explore</div>
+              <div class="tab"><div class="ico"></div>History</div>
+              <div class="tab"><div class="ico"></div>Stories</div>
+              <div class="tab"><div class="ico"></div>More</div>
+            </nav>
+          </div>
+        </div>
+
+        <div class="phone-wrap">
+          <div class="phone-label">History</div>
+          <div class="phone">
+            <div class="phone-notch"></div>
+            <div class="screen">
+              <div class="status"><span>9:41</span><span>●●●</span></div>
+              <header class="mast">
+                <div class="kicker">Find in time</div>
+                <h2 class="mast-title">History</h2>
+                <p class="mast-dek">One plate holds search, filters, and results.</p>
+              </header>
+              <div class="scroll" style="padding:0 10px">
+                <div class="scroll-plate">
+                  <div class="search">Search places, people, years…</div>
+                  <div class="chips" style="margin-top:8px">
+                    <span class="chip on">All</span>
+                    <span class="chip">Person</span>
+                    <span class="chip">Place</span>
+                  </div>
+                  <div class="row" style="margin-top:6px">
+                    <div>
+                      <p class="row-title">Rosewood Massacre</p>
+                      <p class="row-meta">Levy County, FL · 1923</p>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div>
+                      <p class="row-title">Black Wall Street</p>
+                      <p class="row-meta">Greenwood, Tulsa · 1921</p>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div>
+                      <p class="row-title">Ocoee Election Day</p>
+                      <p class="row-meta">Orange County, FL · 1920</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <nav class="tabbar" aria-label="Tabs">
+                <div class="tab"><div class="ico"></div>Explore</div>
+                <div class="tab active"><div class="ico"></div>History</div>
+                <div class="tab"><div class="ico"></div>Stories</div>
+                <div class="tab"><div class="ico"></div>More</div>
+              </nav>
+            </div>
+          </div>
+        </div>
+
+        <div class="phone-wrap">
+          <div class="phone-label">More</div>
+          <div class="phone">
+            <div class="phone-notch"></div>
+            <div class="screen">
+              <div class="status"><span>9:41</span><span>●●●</span></div>
+              <header class="mast">
+                <div class="kicker">BlackStory</div>
+                <h2 class="mast-title">More</h2>
+              </header>
+              <div class="scroll" style="padding:0 10px">
+                <div class="scroll-plate">
+                  <p class="section-label">Trust</p>
+                  <div class="row"><div><p class="row-title">Methodology</p><p class="row-meta">How records are built</p></div></div>
+                  <div class="row"><div><p class="row-title">Memorial</p><p class="row-meta">Names wall on the web</p></div></div>
+                  <div class="row"><div><p class="row-title">Corrections</p><p class="row-meta">Submit a fix</p></div></div>
+                  <p class="section-label">Contribute</p>
+                  <div class="row"><div><p class="row-title">Suggest a source</p><p class="row-meta">Evidence first</p></div></div>
+                </div>
+              </div>
+              <nav class="tabbar" aria-label="Tabs">
+                <div class="tab"><div class="ico"></div>Explore</div>
+                <div class="tab"><div class="ico"></div>History</div>
+                <div class="tab"><div class="ico"></div>Stories</div>
+                <div class="tab active"><div class="ico"></div>More</div>
+              </nav>
+            </div>
+          </div>
+        </div>
+
+        <div class="phone-wrap">
+          <div class="phone-label">Entity</div>
+          <div class="phone">
+            <div class="phone-notch"></div>
+            <div class="screen">
+              <div class="status"><span>9:41</span><span>●●●</span></div>
+              <div class="stack-header"><span class="back">Back</span><span>Share</span></div>
+              <div class="scroll" style="padding-top:8px; gap:10px">
+                <div class="panel">
+                  <div class="panel-head"><span class="panel-idx">00</span><h3 class="panel-title">Intro</h3></div>
+                  <h2 class="entity-title">Rosewood Massacre</h2>
+                  <p class="entity-lede">A week of racial violence destroyed a Black town in Levy County, Florida, in January 1923.</p>
+                </div>
+                <div class="panel">
+                  <div class="panel-head"><span class="panel-idx">01</span><h3 class="panel-title">Anatomy</h3></div>
+                  <div class="facts">
+                    <div class="fact"><span class="l">Kind</span><span class="v">Event</span></div>
+                    <div class="fact"><span class="l">Era</span><span class="v">1920s</span></div>
+                    <div class="fact"><span class="l">Place</span><span class="v">Levy Co., FL</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- APPROACH 3 -->
+    <section class="approach" id="approach-receipt" data-approach="receipt" role="tabpanel" aria-labelledby="tab-receipt" hidden>
+      <div class="approach-meta">
+        <div class="card">
+          <h2>Reading Receipt</h2>
+          <p class="thesis">Tabs stay UI-compact in Inter; entity opens into restrained serif reading mode.</p>
+          <ul class="scale" aria-label="Type scale">
+            <li><span class="label">Masthead</span><span class="val">16 Inter</span></li>
+            <li><span class="label">Entity</span><span class="val">17 Serif</span></li>
+            <li><span class="label">Section</span><span class="val">10 Mono</span></li>
+            <li><span class="label">Row</span><span class="val">13 Inter</span></li>
+            <li><span class="label">Caption</span><span class="val">11 Inter</span></li>
+          </ul>
+        </div>
+        <div class="card">
+          <ul class="bullets">
+            <li><strong>Fix:</strong> no Sora on tab roots; entity title serif at 22 (no 26px jump); ghost map count with no filled chip; copper left-rule beats.</li>
+            <li><strong>Keep:</strong> anatomy facts, UtilityScreenShell for corrections, compact LedgerRow.</li>
+            <li class="muted"><strong>Best if</strong> entity reading quality matters most and tabs should feel native-UI quiet.</li>
+            <li class="muted"><strong>Tradeoff:</strong> weaker Sora display presence on daily browse.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phones">
+        <div class="phone-wrap">
+          <div class="phone-label">Explore</div>
+          <div class="phone map-screen">
+            <div class="phone-notch"></div>
+            <div class="status map-status"><span>9:41</span><span>●●●</span></div>
+            <div class="map-fake" aria-hidden="true"></div>
+            <div class="map-chrome">
+              <div class="count-pill"><span style="color:var(--copper)">·</span> 1,373 records</div>
+              <div class="ghost-row" aria-hidden="true">
+                <div class="ghost"></div><div class="ghost"></div><div class="ghost"></div>
+              </div>
+            </div>
+            <div class="sheet">
+              <div class="sheet-handle"></div>
+              <h3>Records in view</h3>
+              <div class="row">
+                <div>
+                  <p class="row-title">Rosewood Massacre</p>
+                  <p class="row-meta">Levy County, FL · 1923</p>
+                </div>
+              </div>
+              <div class="row">
+                <div>
+                  <p class="row-title">Ocoee Election Day</p>
+                  <p class="row-meta">Orange County, FL · 1920</p>
+                </div>
+              </div>
+            </div>
+            <nav class="tabbar" aria-label="Tabs">
+              <div class="tab active"><div class="ico"></div>Explore</div>
+              <div class="tab"><div class="ico"></div>History</div>
+              <div class="tab"><div class="ico"></div>Stories</div>
+              <div class="tab"><div class="ico"></div>More</div>
+            </nav>
+          </div>
+        </div>
+
+        <div class="phone-wrap">
+          <div class="phone-label">History</div>
+          <div class="phone">
+            <div class="phone-notch"></div>
+            <div class="screen">
+              <div class="status"><span>9:41</span><span>●●●</span></div>
+              <header class="mast">
+                <div class="kicker">Find in time</div>
+                <h2 class="mast-title">History</h2>
+                <p class="mast-dek">Quiet UI index. No stacked surfaces.</p>
+              </header>
+              <div class="scroll">
+                <div class="search">Search places, people, years…</div>
+                <div class="chips">
+                  <span class="chip on">All</span>
+                  <span class="chip">Person</span>
+                  <span class="chip">Place</span>
+                </div>
+                <div class="row">
+                  <div>
+                    <p class="row-title">Rosewood Massacre</p>
+                    <p class="row-meta">Violence against a Florida town, 1923.</p>
+                  </div>
+                </div>
+                <div class="row">
+                  <div>
+                    <p class="row-title">Black Wall Street</p>
+                    <p class="row-meta">Greenwood district, Tulsa.</p>
+                  </div>
+                </div>
+              </div>
+              <nav class="tabbar" aria-label="Tabs">
+                <div class="tab"><div class="ico"></div>Explore</div>
+                <div class="tab active"><div class="ico"></div>History</div>
+                <div class="tab"><div class="ico"></div>Stories</div>
+                <div class="tab"><div class="ico"></div>More</div>
+              </nav>
+            </div>
+          </div>
+        </div>
+
+        <div class="phone-wrap">
+          <div class="phone-label">More</div>
+          <div class="phone">
+            <div class="phone-notch"></div>
+            <div class="screen">
+              <div class="status"><span>9:41</span><span>●●●</span></div>
+              <header class="mast">
+                <div class="kicker">BlackStory</div>
+                <h2 class="mast-title">More</h2>
+              </header>
+              <div class="scroll">
+                <p class="section-label">Trust</p>
+                <div class="row"><div><p class="row-title">Methodology</p><p class="row-meta">How records are built</p></div></div>
+                <div class="row"><div><p class="row-title">Memorial</p><p class="row-meta">Names wall on the web</p></div></div>
+                <div class="row"><div><p class="row-title">Corrections</p><p class="row-meta">Submit a fix</p></div></div>
+              </div>
+              <nav class="tabbar" aria-label="Tabs">
+                <div class="tab"><div class="ico"></div>Explore</div>
+                <div class="tab"><div class="ico"></div>History</div>
+                <div class="tab"><div class="ico"></div>Stories</div>
+                <div class="tab active"><div class="ico"></div>More</div>
+              </nav>
+            </div>
+          </div>
+        </div>
+
+        <div class="phone-wrap">
+          <div class="phone-label">Entity</div>
+          <div class="phone">
+            <div class="phone-notch"></div>
+            <div class="screen">
+              <div class="status"><span>9:41</span><span>●●●</span></div>
+              <div class="stack-header"><span class="back">Back</span><span>Share</span></div>
+              <div class="scroll" style="padding-top:8px">
+                <div class="panel" style="border-radius:28px">
+                  <h2 class="entity-title">Rosewood Massacre</h2>
+                  <p class="entity-lede">A week of racial violence destroyed a Black town in Levy County, Florida, in January 1923.</p>
+                </div>
+                <div class="copper-rule">
+                  <p class="section-label">Anatomy</p>
+                  <div class="facts" style="margin-top:6px">
+                    <div class="fact"><span class="l">Kind</span><span class="v">Event</span></div>
+                    <div class="fact"><span class="l">Era</span><span class="v">1920s</span></div>
+                    <div class="fact"><span class="l">Place</span><span class="v">Levy Co., FL</span></div>
+                  </div>
+                </div>
+                <div class="copper-rule">
+                  <p class="section-label">How to read</p>
+                  <p class="row-meta" style="margin-top:4px">Evidence before assertion. Place precision is honest to the record.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <p class="footer-note">
+      Open this file in a browser:
+      <code>docs/ui/mobile-polish-mockups.html</code>.
+      Shared polish: <code>BrowseScreenShell</code> + live tab insets, flatten History nesting,
+      medium-weight type (entity ≤18), ghost Explore count, one masthead on More.
+      Pick an approach and I will implement it in the app.
+    </p>
+  </div>
+
+  <script>
+    const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+    const panels = Array.from(document.querySelectorAll('[role="tabpanel"]'));
+
+    function select(target) {
+      tabs.forEach((tab) => {
+        const on = tab.dataset.target === target;
+        tab.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      panels.forEach((panel) => {
+        const on = panel.id === `approach-${target}`;
+        panel.classList.toggle('is-active', on);
+        panel.hidden = !on;
+      });
+    }
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => select(tab.dataset.target));
+    });
+  </script>
+</body>
+</html>

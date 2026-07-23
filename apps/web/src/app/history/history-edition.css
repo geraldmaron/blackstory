@@ -1,0 +1,334 @@
+/**
+ * History v6 edition scaffold: theme-aware Surface card stack aligned with home/explore
+ * edition vocabulary. Decade scrubber classes live in explore-edition.css (imported on route).
+ */
+
+.ds-history-edition {
+  --ds-history-panel-padding: var(--ds-space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-5);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 47.9375rem) {
+  .ds-history-edition {
+    --ds-history-panel-padding: var(--ds-space-4);
+    gap: var(--ds-space-4);
+  }
+}
+
+.ds-history-edition__panel {
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface-raised);
+  padding: var(--ds-history-panel-padding);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.ds-history-edition__panel--intro {
+  padding-bottom: calc(var(--ds-history-panel-padding) + var(--ds-space-2));
+}
+
+.ds-history-edition__panel--timeline {
+  display: grid;
+  gap: var(--ds-space-4);
+}
+
+.ds-history-edition__panel--instruments {
+  display: grid;
+  gap: var(--ds-space-4);
+}
+
+.ds-history-edition__panel--composition,
+.ds-history-edition__panel--records {
+  display: grid;
+  gap: var(--ds-space-3);
+  align-content: start;
+}
+
+.ds-history-edition__header {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: clamp(1.5rem, 3vw, 2.75rem);
+  row-gap: var(--ds-space-3);
+  align-items: start;
+  padding-bottom: var(--ds-space-5);
+  margin-bottom: var(--ds-space-4);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-history-edition__index {
+  min-width: 2.75ch;
+  padding-right: var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--ds-accent-graphic);
+  letter-spacing: -0.03em;
+}
+
+.ds-history-edition__kicker {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+}
+
+.ds-history-edition__title {
+  margin: var(--ds-space-2) 0 0;
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.625rem);
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  color: var(--ds-ink);
+}
+
+.ds-history-edition__title em {
+  font-family: var(--ds-font-editorial);
+  font-style: italic;
+  color: var(--ds-accent);
+  font-weight: 400;
+}
+
+.ds-history-edition__lede {
+  margin: var(--ds-space-3) 0 0;
+  max-width: 54ch;
+  font-family: var(--ds-font-editorial);
+  font-size: 1.0625rem;
+  color: var(--ds-ink-muted);
+  line-height: 1.6;
+}
+
+.ds-history-edition__framing {
+  margin: var(--ds-space-3) 0 0;
+  max-width: 62ch;
+  color: var(--ds-ink-subtle);
+  font-family: var(--ds-font-sans);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.ds-history-edition__panel-title {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-history-edition__stepper-sticky {
+  position: sticky;
+  top: var(--ds-island-clearance);
+  z-index: 2;
+  padding-bottom: var(--ds-space-2);
+  background: var(--ds-surface-raised);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.ds-history-edition__layout {
+  display: grid;
+  gap: var(--ds-space-5);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+@media (min-width: 56rem) {
+  .ds-history-edition__layout {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .ds-history-edition__panel--records {
+    position: sticky;
+    top: calc(var(--ds-island-clearance) + 3rem);
+    max-height: calc(100vh - var(--ds-island-clearance) - 3rem);
+    overflow-y: auto;
+  }
+}
+
+/* Facet rows — explore compact register */
+.ds-history-edition__facets {
+  display: grid;
+  gap: var(--ds-space-1);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.ds-history-edition__facet {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+.ds-history-edition__facet-label {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+/* Records list: explore rail selection register (row-link host, not nested title link) */
+.ds-history-edition__panel--records .ds-history-result-list__row-link {
+  display: block;
+  padding: var(--ds-space-3) 0 var(--ds-space-3) var(--ds-space-2);
+  border-left: 3px solid transparent;
+  margin-left: calc(-1 * var(--ds-space-2));
+  padding-left: calc(var(--ds-space-2) - 3px);
+  border-radius: var(--ds-radius-sm);
+  color: inherit;
+  text-decoration: none;
+}
+
+.ds-history-edition__panel--records .ds-history-result-list__row-link:hover {
+  background: color-mix(in srgb, var(--ds-ink) 4%, transparent);
+}
+
+.ds-history-edition__panel--records .ds-history-result-list__row-link:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+.ds-history-edition__panel--records
+  .ds-history-result-list__item--selected
+  .ds-history-result-list__row-link {
+  border-left-color: var(--ds-accent);
+  background: color-mix(in srgb, var(--ds-accent) 7%, transparent);
+  color: var(--ds-ink);
+}
+
+.ds-history-edition__panel--records
+  .ds-history-result-list__item--selected
+  .ds-history-edition__rip-title {
+  color: var(--ds-ink);
+  font-weight: 600;
+}
+
+/* Narrative preview — copper left rule (explore spotlight register) */
+.ds-history-edition__panel--records .ds-history-narrative-card {
+  border-left: 3px solid var(--ds-accent-graphic);
+  padding-left: var(--ds-space-4);
+}
+
+.ds-history-edition__footnotes {
+  display: grid;
+  gap: var(--ds-space-2);
+  padding: 0 var(--ds-space-1);
+}
+
+a.ds-explore-edition__decade-tab {
+  text-decoration: none;
+}
+
+/* Rip list rows: compact record cards (merged search register) */
+.ds-history-result-list__row-link:hover .ds-history-edition__rip-title,
+.ds-history-result-list__row-link:focus-visible .ds-history-edition__rip-title {
+  color: var(--ds-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+.ds-history-edition__rip-row {
+  display: grid;
+  gap: var(--ds-space-2);
+  /* Vertical padding lives on the outer row-link so the copper rule spans the full hit target */
+  padding: 0;
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-history-result-list__item:first-child .ds-history-edition__rip-row {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.ds-history-edition__rip-title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+.ds-history-edition__rip-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ds-history-edition__rip-link:hover,
+.ds-history-edition__rip-link:focus-visible {
+  color: var(--ds-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+.ds-history-edition__rip-summary {
+  margin: 0;
+  max-width: 42rem;
+  font-family: var(--ds-font-editorial);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--ds-ink-muted);
+}
+
+.ds-history-edition__rip-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+  gap: var(--ds-space-2) var(--ds-space-3);
+  margin: 0;
+}
+
+.ds-history-edition__rip-fact {
+  display: grid;
+  gap: var(--ds-space-1);
+  margin: 0;
+}
+
+.ds-history-edition__rip-fact-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-history-edition__rip-fact-value {
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: var(--ds-ink);
+}
+
+.ds-history-edition__rip-fact-link {
+  color: var(--ds-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}

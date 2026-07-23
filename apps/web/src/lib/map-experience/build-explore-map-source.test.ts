@@ -10,7 +10,7 @@ import { test } from 'node:test';
 import { listPublicEntities, type PublicEntityView } from '../../data/public-seed';
 import { buildExploreMapSource, buildJurisdictionAreaFeatures } from './build-explore-map-source';
 import { geoAnchorFor } from './entity-geo';
-import { displayEncodingFor } from './kind-encoding';
+import { displayEncodingFor, kindFamilyFor } from './kind-encoding';
 
 test('every active-release entity with a resolvable anchor becomes a linked, enriched feature', () => {
   const entities = listPublicEntities();
@@ -27,13 +27,14 @@ test('every active-release entity with a resolvable anchor becomes a linked, enr
   }
 });
 
-test('feature shade/glyph match displayEncodingFor (same encoding KindBadge uses)', () => {
+test('feature shade/glyph/kindFamily match displayEncodingFor and kindFamilyFor', () => {
   const entities = listPublicEntities();
   const source = buildExploreMapSource(entities);
   for (const feature of source.featureCollection.features) {
     const expected = displayEncodingFor(feature.properties.kind, feature.properties.mapTone);
     assert.equal(feature.properties.shade, expected.shade);
     assert.equal(feature.properties.glyph, expected.glyph);
+    assert.equal(feature.properties.kindFamily, kindFamilyFor(feature.properties.kind));
   }
 });
 

@@ -1,56 +1,67 @@
 /**
- * "Why this appears" (relevance), "Historical context", and "Further reading" (extended
- * narrative) — mirrors `apps/web/src/app/entity/[id]/page.tsx`'s section order and headings.
- * Every text field renders through `@/ui`'s `Text`, which (like all RN `Text`) never interprets
- * HTML/markup in its children — a malicious `<script>`/Unicode-direction-override payload in
- * `relevanceExplanation`/`historicalContext`/`extendedNarrative` renders as inert literal text
- * by construction, not by any escaping this module has to perform itself.
+ * Beats 02–04: relevance, historical context, and optional further reading.
  */
 import { View } from 'react-native';
-import { EmptyState, Text, space } from '@/ui';
-import { RECORD_GAP_COPY, SECTION_HEADINGS } from '../copy';
+import { Text, space } from '@/ui';
+import { EntityEditionPanel } from '../EntityEditionPanel';
+import { RecordGapNotice } from '../RecordGapNotice';
+import { SECTION_HEADINGS } from '../copy';
 import { MAX_EXTENDED_NARRATIVE_CHARS } from '../types';
 import type { Entity } from '../types';
-import { SectionHeading } from './SectionHeading';
+import type { EntityBeatIndices } from '../entity-beat-indices';
 
 export type NarrativeSectionsProps = {
   readonly entity: Entity;
+  readonly beats: Pick<EntityBeatIndices, 'relevance' | 'context' | 'reading'>;
 };
 
-export function NarrativeSections({ entity }: NarrativeSectionsProps) {
+export function NarrativeSections({ entity, beats }: NarrativeSectionsProps) {
   const narrative = entity.extendedNarrative;
-  const narrativeTruncated = narrative !== undefined && narrative.length >= MAX_EXTENDED_NARRATIVE_CHARS;
+  const narrativeTruncated =
+    narrative !== undefined && narrative.length >= MAX_EXTENDED_NARRATIVE_CHARS;
 
   return (
-    <View style={{ gap: space['6'] }}>
-      <View style={{ gap: space['2'] }}>
-        <SectionHeading level={2}>{SECTION_HEADINGS.relevance}</SectionHeading>
+    <View style={{ gap: space['5'] }}>
+      <EntityEditionPanel
+        index={beats.relevance}
+        kicker="Relevance"
+        title={SECTION_HEADINGS.relevance}
+        testID="entity-relevance-section"
+      >
         {entity.relevanceExplanation.trim().length > 0 ? (
-          <Text variant="body">{entity.relevanceExplanation}</Text>
+          <Text variant="editorial">{entity.relevanceExplanation}</Text>
         ) : (
-          <EmptyState title={RECORD_GAP_COPY.relevance.title} description={RECORD_GAP_COPY.relevance.body} />
+          <RecordGapNotice kind="relevance" />
         )}
-      </View>
+      </EntityEditionPanel>
 
-      <View style={{ gap: space['2'] }}>
-        <SectionHeading level={2}>{SECTION_HEADINGS.context}</SectionHeading>
+      <EntityEditionPanel
+        index={beats.context}
+        kicker="Context"
+        title={SECTION_HEADINGS.context}
+        testID="entity-context-section"
+      >
         {entity.historicalContext.trim().length > 0 ? (
-          <Text variant="body">{entity.historicalContext}</Text>
+          <Text variant="editorial">{entity.historicalContext}</Text>
         ) : (
-          <EmptyState title={RECORD_GAP_COPY.context.title} description={RECORD_GAP_COPY.context.body} />
+          <RecordGapNotice kind="context" />
         )}
-      </View>
+      </EntityEditionPanel>
 
-      {narrative ? (
-        <View style={{ gap: space['2'] }}>
-          <SectionHeading level={2}>{SECTION_HEADINGS.furtherReading}</SectionHeading>
-          <Text variant="body">{narrative}</Text>
+      {narrative && beats.reading ? (
+        <EntityEditionPanel
+          index={beats.reading}
+          kicker="Reading"
+          title={SECTION_HEADINGS.furtherReading}
+          testID="entity-reading-section"
+        >
+          <Text variant="editorial">{narrative}</Text>
           {narrativeTruncated ? (
             <Text variant="caption" colorRole="inkMuted">
               This passage has been shortened for display.
             </Text>
           ) : null}
-        </View>
+        </EntityEditionPanel>
       ) : null}
     </View>
   );

@@ -1,16 +1,18 @@
 /**
  * Longform story article page at `/stories/{slug}`.
  *
- * Atmosphere mast, editorial serif body, required Sources footnote, related
- * entity off-ramps, and a copper map CTA when a related entity has a geo anchor.
- * Story bodies load from the public release projection (Firestore / Firebase seed),
- * not an apps/web corpus. Emits schema.org Article JSON-LD only, never ClaimReview.
+ * v6 edition Surface stack with shared gutter mosaic atmosphere. Editorial serif
+ * body, required Sources footnote, related entity off-ramps, and a copper map CTA
+ * when a related entity has a geo anchor. Story bodies load from the public release
+ * projection. Emits schema.org Article JSON-LD only, never ClaimReview.
  */
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { assertNeverClaimReview } from '@repo/domain';
-import { AtmospherePlane } from '../../../components/atmosphere/AtmospherePlane';
-import { selectAtmospherePlane } from '../../../components/atmosphere/select-atmosphere-plane';
+import { EditionAtmosphereMosaic } from '../../../components/patterns/edition-atmosphere/EditionAtmosphereMosaic';
+import {
+  EDITION_MOSAIC_COUNT_DETAIL,
+} from '../../../components/patterns/edition-atmosphere/edition-atmosphere-config';
 import { renderStoryTitle } from '../../../components/atmosphere/story-title';
 import { SourceFootnote } from '../../../components/data/SourceFootnote';
 import type { PublicEntityView } from '../../../data/public-seed';
@@ -25,7 +27,13 @@ import {
   buildExploreHref,
   defaultExploreOverlayState,
 } from '../../../lib/map-experience/url-state';
-import './../stories.css';
+import {
+  STORIES_EDITION_MOSAIC_SEED,
+  storiesEditionPanelClassName,
+  storiesEditionRootClassName,
+  storiesEditionStackClassName,
+} from '../stories-panel-chrome';
+import '../stories-edition.css';
 
 type StoryPageProps = {
   readonly params: Promise<{ readonly slug: string }>;
@@ -90,94 +98,114 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
   const story = storyResult.data;
   if (!story) notFound();
 
-  // Thin batched point-get — never the entity-page 1-hop/2-hop learning graph.
   const { data: relatedEntities } = await listPublicEntityViewsByIds(story.relatedEntityIds);
-
-  const atmosphere = selectAtmospherePlane({
-    seedKey: story.slug,
-    relatedEntityIds: story.relatedEntityIds,
-  });
   const mapCta = mapCtaForRelatedEntities(relatedEntities);
   const jsonLd = buildStoryArticleJsonLd(story);
 
   return (
-    <main className="ds-page" id="main">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+    <div className={storiesEditionRootClassName()} data-stories-edition="v6">
+      <EditionAtmosphereMosaic seedKey={`${STORIES_EDITION_MOSAIC_SEED}:${story.slug}`} count={EDITION_MOSAIC_COUNT_DETAIL} />
+      <main className="ds-container ds-page" id="main">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
 
-      <header className="ds-story-mast">
-        <AtmospherePlane selection={atmosphere} className="ds-story-mast__plane" />
-        <div className="ds-container ds-story-mast__inner">
-          <p className="ds-page__eyebrow">
-            Story · <span className="ds-mono">{story.eraLabel}</span> · {story.placeLabel}
-          </p>
-          <h1 className="ds-page__title">{renderStoryTitle(story.slug, story.title)}</h1>
-          <p className="ds-page__lede">{story.dek}</p>
-          <p className="ds-mono ds-story-mast__meta">Published {story.publishedAt}</p>
-          {mapCta ? (
-            <p className="ds-story-mast__actions">
-              <Link className="ds-cta ds-cta--copper" href={mapCta.href}>
-                {mapCta.label}
-              </Link>
-            </p>
-          ) : null}
-          <p className="ds-story-mast__credit">
-            Archive mosaic · symbolic atmosphere, not a photograph of this story.{' '}
-            <Link href={atmosphere.attributionHref}>Mosaic credits</Link>
-          </p>
-        </div>
-      </header>
-
-      <article className="ds-container ds-story-article">
-        {relatedEntities.length > 0 ? (
-          <section className="ds-section ds-section--flush" aria-labelledby="story-entities-heading">
-            <p className="ds-section__kicker">Records</p>
-            <h2 className="ds-section__title" id="story-entities-heading">
-              Related entities
-            </h2>
-            <ul className="ds-story-rail">
-              {relatedEntities.map((entity) => (
-                <li key={entity.id}>
-                  <Link className="ds-story-link" href={`/entity/${entity.id}`} prefetch>
-                    <span className="ds-story-link__meta">{entity.kind}</span>
-                    <h3 className="ds-story-link__title">{entity.displayName}</h3>
-                    <p className="ds-story-link__summary">{entity.summary}</p>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
-
-        <div className="ds-story-article__body ds-prose">
-          {story.body.map((section, index) => (
-            <section key={section.heading ?? `section-${index}`}>
-              {section.heading ? <h2 className="ds-section__title">{section.heading}</h2> : null}
-              {section.paragraphs.map((paragraph) => (
-                <p key={paragraph.slice(0, 48)} className="ds-story-article__p">
-                  {paragraph}
+        <div className={storiesEditionStackClassName()}>
+          <article className={storiesEditionPanelClassName('intro')}>
+            <header className="ds-stories-edition__header">
+              <span className="ds-stories-edition__index" aria-hidden="true">
+                00
+              </span>
+              <div>
+                <p className="ds-stories-edition__kicker">Story</p>
+                <p className="ds-stories-edition__meta-row">
+                  <span className="ds-mono">{story.eraLabel}</span> · {story.placeLabel}
                 </p>
+                <h1 className="ds-stories-edition__title">
+                  {renderStoryTitle(story.slug, story.title)}
+                </h1>
+                <p className="ds-stories-edition__lede">{story.dek}</p>
+                <p className="ds-stories-edition__meta">Published {story.publishedAt}</p>
+                {mapCta ? (
+                  <p className="ds-stories-edition__actions">
+                    <Link className="ds-cta ds-cta--copper" href={mapCta.href}>
+                      {mapCta.label}
+                    </Link>
+                  </p>
+                ) : null}
+                <p className="ds-stories-edition__credit">
+                  Archive mosaic · symbolic atmosphere, not a photograph of this story.{' '}
+                  <Link href="/stories/mosaic-credits">Mosaic credits</Link>
+                </p>
+              </div>
+            </header>
+          </article>
+
+          <article className={storiesEditionPanelClassName('body')}>
+            <p className="ds-stories-edition__panel-title">Article</p>
+            <div className="ds-stories-edition__body ds-prose">
+              {story.body.map((section, index) => (
+                <section
+                  key={section.heading ?? `section-${index}`}
+                  className="ds-stories-edition__section"
+                >
+                  {section.heading ? (
+                    <h2 className="ds-stories-edition__section-title">{section.heading}</h2>
+                  ) : null}
+                  {section.paragraphs.map((paragraph) => (
+                    <p key={paragraph.slice(0, 48)} className="ds-stories-edition__p">
+                      {paragraph}
+                    </p>
+                  ))}
+                </section>
               ))}
-            </section>
-          ))}
+            </div>
+          </article>
+
+          {relatedEntities.length > 0 ? (
+            <article
+              className={storiesEditionPanelClassName('records')}
+              aria-labelledby="story-entities-heading"
+            >
+              <p className="ds-stories-edition__panel-title">Records</p>
+              <h2 className="ds-stories-edition__panel-heading" id="story-entities-heading">
+                Related entities
+              </h2>
+              <ul className="ds-story-rail">
+                {relatedEntities.map((entity) => (
+                  <li key={entity.id}>
+                    <Link className="ds-story-link" href={`/entity/${entity.id}`} prefetch>
+                      <span className="ds-story-link__meta">{entity.kind}</span>
+                      <h3 className="ds-story-link__title">{entity.displayName}</h3>
+                      <p className="ds-story-link__summary">{entity.summary}</p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </article>
+          ) : null}
+
+          <article
+            className={storiesEditionPanelClassName('sources')}
+            aria-labelledby="story-sources-heading"
+          >
+            <p className="ds-stories-edition__panel-title">Evidence</p>
+            <h2 className="ds-stories-edition__panel-heading" id="story-sources-heading">
+              Sources
+            </h2>
+            <div className="ds-stories-edition__sources">
+              <SourceFootnote sources={story.sources} density="group" />
+            </div>
+          </article>
+
+          <p className="ds-stories-edition__footer">
+            <Link href="/stories">All stories</Link>
+            {' · '}
+            <Link href="/stories/mosaic-credits">Archive mosaic credits</Link>
+          </p>
         </div>
-
-        <section className="ds-section ds-story-article__sources" aria-labelledby="story-sources-heading">
-          <p className="ds-section__kicker">Evidence</p>
-          <h2 className="ds-section__title" id="story-sources-heading">
-            Sources
-          </h2>
-          <SourceFootnote sources={story.sources} density="group" />
-        </section>
-
-        <p className="ds-sans ds-story-article__footer">
-          <Link href="/stories">All stories</Link>
-          {' · '}
-          <Link href="/stories/mosaic-credits">Archive mosaic credits</Link>
-        </p>
-      </article>
-    </main>
+      </main>
+    </div>
   );
 }

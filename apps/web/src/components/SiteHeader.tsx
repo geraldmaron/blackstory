@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { BRAND_ASSETS, OVERFLOW_NAV, PRIMARY_NAV, absolutizeShellNav } from '@repo/config';
 import { ShellHeader, type ShellHeaderLinkProps } from '@repo/ui';
+import { isExploreMapShell } from './explore-map-shell';
 import { webAdminHref } from '../lib/sibling-origins';
 
 function NextShellLink({ href, className, children, ...rest }: ShellHeaderLinkProps) {
@@ -34,6 +35,9 @@ export function SiteHeader() {
     ...(adminLogin ? [{ href: adminLogin, label: 'Admin login' } as const] : []),
   ];
 
+  const isHome = pathname === '/';
+  const isExplore = isExploreMapShell(pathname);
+
   return (
     <ShellHeader
       pathname={pathname}
@@ -42,7 +46,9 @@ export function SiteHeader() {
       overflowNav={absolutizeShellNav(overflow, null)}
       brandLockup={BRAND_ASSETS.lockup}
       brandSymbol={BRAND_ASSETS.symbol}
-      cta={{ href: '/locate', label: 'Near you' }}
+      brandDisplay={isExplore ? 'symbol' : 'lockup'}
+      ctaVariant={isHome ? 'quiet' : 'copper'}
+      cta={{ href: '/locate', label: isHome ? 'Near You' : 'Near you' }}
       renderLink={NextShellLink}
     />
   );

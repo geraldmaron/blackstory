@@ -1,0 +1,1033 @@
+[
+  {
+    "title": "All American Boys",
+    "slug": "all-american-boys",
+    "authors": [
+      {
+        "name": "Jason Reynolds",
+        "role": "author"
+      },
+      {
+        "name": "Brendan Kiely",
+        "role": "author"
+      }
+    ],
+    "isbn13": "9781481463348",
+    "publishedDate": "2015",
+    "description": "Alternating chapters follow Rashad, a Black teen beaten by a police officer after being mistaken for a shoplifter, and Quinn, a white classmate who witnesses the assault. The novel examines police violence, loyalty, and protest in a contemporary American high school.",
+    "challenges": [
+      {
+        "state": "TX",
+        "status": "reported",
+        "citation": {
+          "label": "ALA Top 10 Most Challenged Books of 2023 — All American Boys",
+          "href": "https://www.ala.org/bbooks/frequentlychallengedbooks/top10"
+        },
+        "jurisdictionLabel": "Katy Independent School District",
+        "challengeYear": 2021
+      },
+      {
+        "state": "TX",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2021–2022",
+          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2021-2022/"
+        },
+        "jurisdictionLabel": "North East Independent School District",
+        "challengeYear": 2021
+      },
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "Marshall University Libraries — All American Boys challenge records",
+          "href": "https://www.marshall.edu/library/bannedbooks/the-absolutely-true-diary-of-a-part-time-indian/"
+        },
+        "jurisdictionLabel": "Clay County School District",
+        "challengeYear": 2023
+      },
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "Yes, It's A Book Ban — All American Boys challenge summary",
+          "href": "https://yesitsabookban.com/books/all-american-boys-2/"
+        },
+        "jurisdictionLabel": "Charlotte County Public Schools",
+        "challengeYear": 2023
+      }
+    ],
+    "citations": [
+      {
+        "label": "ALA Top 10 Most Challenged Books of 2023 — All American Boys",
+        "href": "https://www.ala.org/bbooks/frequentlychallengedbooks/top10"
+      },
+      {
+        "label": "PEN America Index of School Book Bans 2021–2022",
+        "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2021-2022/"
+      },
+      {
+        "label": "Marshall University Libraries — All American Boys challenge records",
+        "href": "https://www.marshall.edu/library/bannedbooks/the-absolutely-true-diary-of-a-part-time-indian/"
+      },
+      {
+        "label": "Yes, It's A Book Ban — All American Boys challenge summary",
+        "href": "https://yesitsabookban.com/books/all-american-boys-2/"
+      }
+    ],
+    "provenance": {
+      "source": "ALA Office for Intellectual Freedom; PEN America Index of School Book Bans",
+      "sourceUrl": "https://www.ala.org/bbooks/frequentlychallengedbooks/top10"
+    }
+  },
+  {
+    "title": "Dear Martin",
+    "slug": "dear-martin",
+    "authors": [
+      {
+        "name": "Nic Stone",
+        "role": "author"
+      }
+    ],
+    "isbn13": "9781101939499",
+    "publishedDate": "2017",
+    "description": "Justyce McAllister, a Black honor student, writes letters to Martin Luther King Jr. after a police encounter and the shooting of his best friend. The novel explores racial profiling, code-switching, and campus activism at a predominantly white prep school.",
+    "challenges": [
+      {
+        "state": "TX",
+        "status": "reported",
+        "citation": {
+          "label": "Boston Public Library — Dear Martin challenge reasons",
+          "href": "https://www.bpl.org/blogs/post/banned-books-blog-april-2024/"
+        },
+        "jurisdictionLabel": "North East Independent School District",
+        "challengeYear": 2024
+      },
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "Marshall University Libraries — Dear Martin banned/challenged records",
+          "href": "https://www.marshall.edu/library/bannedbooks/dear-martin/"
+        },
+        "jurisdictionLabel": "Clay County School District",
+        "challengeYear": 2023
+      },
+      {
+        "state": "SC",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2023–2024",
+          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+        },
+        "jurisdictionLabel": "School District of Pickens County",
+        "challengeYear": 2021
+      },
+      {
+        "state": "MO",
+        "status": "reported",
+        "citation": {
+          "label": "Substack — Pickens County, SC restriction of Dear Martin",
+          "href": "https://otherduties.substack.com/p/banned-book-5-dear-martin"
+        },
+        "jurisdictionLabel": "Rockwood School District",
+        "challengeYear": 2021
+      }
+    ],
+    "citations": [
+      {
+        "label": "Boston Public Library — Dear Martin challenge reasons",
+        "href": "https://www.bpl.org/blogs/post/banned-books-blog-april-2024/"
+      },
+      {
+        "label": "Marshall University Libraries — Dear Martin banned/challenged records",
+        "href": "https://www.marshall.edu/library/bannedbooks/dear-martin/"
+      },
+      {
+        "label": "PEN America Index of School Book Bans 2023–2024",
+        "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+      },
+      {
+        "label": "Substack — Pickens County, SC restriction of Dear Martin",
+        "href": "https://otherduties.substack.com/p/banned-book-5-dear-martin"
+      }
+    ],
+    "provenance": {
+      "source": "Marshall University Libraries Banned Books project; PEN America Index",
+      "sourceUrl": "https://www.marshall.edu/library/bannedbooks/dear-martin/"
+    }
+  },
+  {
+    "title": "The Poet X",
+    "slug": "the-poet-x",
+    "authors": [
+      {
+        "name": "Elizabeth Acevedo",
+        "role": "author"
+      }
+    ],
+    "isbn13": "9780062662804",
+    "publishedDate": "2018",
+    "description": "A novel in verse about Xiomara Batista, a Dominican American teen in Harlem who discovers slam poetry while navigating faith, family expectations, and her developing body. Winner of the National Book Award for Young People's Literature.",
+    "challenges": [
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "American Federation of Teachers — Elizabeth Acevedo on The Poet X challenges",
+          "href": "https://www.aft.org/news/award-winning-author-elizabeth-acevedo-banning-books-not-about-protecting-kids"
+        },
+        "jurisdictionLabel": "Clay County School District",
+        "challengeYear": 2023
+      },
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "ALA Office for Intellectual Freedom — The Poet X challenges",
+          "href": "https://www.oif.ala.org/happy-birthday-elizabeth-acevedo/"
+        },
+        "jurisdictionLabel": "Indian River County School District",
+        "challengeYear": 2024
+      },
+      {
+        "state": "VA",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2022-2023/"
+        },
+        "jurisdictionLabel": "New Kent County Public Schools",
+        "challengeYear": 2021
+      },
+      {
+        "state": "TX",
+        "status": "reported",
+        "citation": {
+          "label": "Refinery29 — school bans of Acevedo titles including The Poet X",
+          "href": "https://www.refinery29.com/en-us/2021/12/10758842/book-bans-schools-authors-color-children-suffer"
+        },
+        "jurisdictionLabel": "Abilene Independent School District",
+        "challengeYear": 2025
+      }
+    ],
+    "citations": [
+      {
+        "label": "American Federation of Teachers — Elizabeth Acevedo on The Poet X challenges",
+        "href": "https://www.aft.org/news/award-winning-author-elizabeth-acevedo-banning-books-not-about-protecting-kids"
+      },
+      {
+        "label": "ALA Office for Intellectual Freedom — The Poet X challenges",
+        "href": "https://www.oif.ala.org/happy-birthday-elizabeth-acevedo/"
+      },
+      {
+        "label": "PEN America Index of School Book Bans 2022–2023",
+        "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2022-2023/"
+      },
+      {
+        "label": "Refinery29 — school bans of Acevedo titles including The Poet X",
+        "href": "https://www.refinery29.com/en-us/2021/12/10758842/book-bans-schools-authors-color-children-suffer"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans; ALA Office for Intellectual Freedom",
+      "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2022-2023/"
+    }
+  },
+  {
+    "title": "Long Way Down",
+    "slug": "long-way-down",
+    "authors": [
+      {
+        "name": "Jason Reynolds",
+        "role": "author"
+      }
+    ],
+    "isbn13": "9781481438254",
+    "publishedDate": "2017",
+    "description": "A novel in verse following fifteen-year-old Will as he rides an elevator down toward revenge for his brother's gun-violence death. On each floor he encounters figures from his past who force him to reconsider the street code he was taught.",
+    "challenges": [
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2022-2023/"
+        },
+        "jurisdictionLabel": "Clay County School District",
+        "challengeYear": 2022
+      },
+      {
+        "state": "WI",
+        "status": "reported",
+        "citation": {
+          "label": "National Coalition Against Censorship — Jason Reynolds challenged titles",
+          "href": "https://ncac.org/news/jason-reynolds-banned-books-week-2021"
+        },
+        "jurisdictionLabel": "Elkhorn Area School District",
+        "challengeYear": 2023
+      },
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "JMRL blog — Long Way Down challenge context",
+          "href": "https://blog.jmrl.org/2025/02/27/another-thing-about-the-rules/"
+        },
+        "jurisdictionLabel": "School District of Manatee County",
+        "challengeYear": 2024
+      }
+    ],
+    "citations": [
+      {
+        "label": "PEN America Index of School Book Bans 2022–2023",
+        "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2022-2023/"
+      },
+      {
+        "label": "National Coalition Against Censorship — Jason Reynolds challenged titles",
+        "href": "https://ncac.org/news/jason-reynolds-banned-books-week-2021"
+      },
+      {
+        "label": "JMRL blog — Long Way Down challenge context",
+        "href": "https://blog.jmrl.org/2025/02/27/another-thing-about-the-rules/"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans",
+      "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2022-2023/"
+    }
+  },
+  {
+    "title": "Ghost Boys",
+    "slug": "ghost-boys",
+    "authors": [
+      {
+        "name": "Jewell Parker Rhodes",
+        "role": "author"
+      }
+    ],
+    "isbn13": "9780316262286",
+    "publishedDate": "2018",
+    "description": "Twelve-year-old Jerome is shot by a police officer who mistakes his toy gun for a real weapon. As a ghost, he observes the impact on his family and connects with the spirits of other Black boys killed by police, including Emmett Till.",
+    "challenges": [
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "AP News — Florida school halts Ghost Boys after police union complaint",
+          "href": "https://apnews.com/article/ca-state-wire-florida-race-and-ethnicity-entertainment-adba743b9ce7bbe6335b6717ca402412"
+        },
+        "jurisdictionLabel": "Martin County School District",
+        "challengeYear": 2023
+      },
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "CNN — Ghost Boys controversy in Broward County, Florida",
+          "href": "https://www.cnn.com/2021/05/11/us/ghost-boys-florida-police-broward-county-trnd"
+        },
+        "jurisdictionLabel": "Broward County Public Schools",
+        "challengeYear": 2021
+      },
+      {
+        "state": "PA",
+        "status": "reported",
+        "citation": {
+          "label": "Marshall University Libraries — Ghost Boys banned/challenged records",
+          "href": "https://www.marshall.edu/library/bannedbooks/ghost-boys/"
+        },
+        "jurisdictionLabel": "Central York School District",
+        "challengeYear": 2020
+      },
+      {
+        "state": "NE",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2022-2023/"
+        },
+        "jurisdictionLabel": "Wauneta-Pallisade Public Schools",
+        "challengeYear": 2022
+      }
+    ],
+    "citations": [
+      {
+        "label": "AP News — Florida school halts Ghost Boys after police union complaint",
+        "href": "https://apnews.com/article/ca-state-wire-florida-race-and-ethnicity-entertainment-adba743b9ce7bbe6335b6717ca402412"
+      },
+      {
+        "label": "CNN — Ghost Boys controversy in Broward County, Florida",
+        "href": "https://www.cnn.com/2021/05/11/us/ghost-boys-florida-police-broward-county-trnd"
+      },
+      {
+        "label": "Marshall University Libraries — Ghost Boys banned/challenged records",
+        "href": "https://www.marshall.edu/library/bannedbooks/ghost-boys/"
+      },
+      {
+        "label": "PEN America Index of School Book Bans 2022–2023",
+        "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2022-2023/"
+      }
+    ],
+    "provenance": {
+      "source": "Marshall University Libraries Banned Books project; AP News",
+      "sourceUrl": "https://www.marshall.edu/library/bannedbooks/ghost-boys/"
+    }
+  },
+  {
+    "title": "Monster",
+    "slug": "monster",
+    "authors": [
+      {
+        "name": "Walter Dean Myers",
+        "role": "author"
+      }
+    ],
+    "isbn13": "9780064407311",
+    "publishedDate": "1999",
+    "description": "Sixteen-year-old Steve Harmon, a Black aspiring filmmaker, records his trial for felony murder in a screenplay-format journal. The novel examines the criminal justice system, peer pressure, and how a teenager sees himself when others call him a monster.",
+    "challenges": [
+      {
+        "state": "MA",
+        "status": "reported",
+        "citation": {
+          "label": "ALA Frequently Challenged Books 2010–2019 — Monster",
+          "href": "https://www.ala.org/bbooks/frequentlychallengedbooks/decade2019"
+        },
+        "jurisdictionLabel": "Scituate Public Schools — Gates Middle School",
+        "challengeYear": 2019
+      },
+      {
+        "state": "TN",
+        "status": "reported",
+        "citation": {
+          "label": "Britannica ProCon — ALA tracked challenges including Monster",
+          "href": "https://www.britannica.com/procon/book-bans-debate"
+        },
+        "jurisdictionLabel": "Signal Mountain Middle-High School",
+        "challengeYear": 2021
+      }
+    ],
+    "citations": [
+      {
+        "label": "ALA Frequently Challenged Books 2010–2019 — Monster",
+        "href": "https://www.ala.org/bbooks/frequentlychallengedbooks/decade2019"
+      },
+      {
+        "label": "Britannica ProCon — ALA tracked challenges including Monster",
+        "href": "https://www.britannica.com/procon/book-bans-debate"
+      },
+      {
+        "label": "Banned Books — Monster challenge history",
+        "href": "https://www.banned-books.org/books/monster-walter-dean-myers"
+      }
+    ],
+    "provenance": {
+      "source": "American Library Association Frequently Challenged Books lists",
+      "sourceUrl": "https://www.ala.org/bbooks/frequentlychallengedbooks/decade2019"
+    }
+  },
+  {
+    "title": "Brown Girl Dreaming",
+    "slug": "brown-girl-dreaming",
+    "authors": [
+      {
+        "name": "Jacqueline Woodson",
+        "role": "author"
+      }
+    ],
+    "isbn13": "9780399252518",
+    "publishedDate": "2014",
+    "description": "A memoir in verse tracing Woodson's childhood split between South Carolina and Brooklyn during the 1960s and 1970s. It documents Jim Crow, the Great Migration, family faith, and the author's discovery of writing amid the Civil Rights era.",
+    "challenges": [
+      {
+        "state": "TN",
+        "status": "reported",
+        "citation": {
+          "label": "Literary Hub — Jacqueline Woodson on book bans in Florida and Texas",
+          "href": "https://lithub.com/jacqueline-woodson-on-navigating-book-bans-and-staying-resilient-in-2025/"
+        },
+        "jurisdictionLabel": "Monroe County Schools",
+        "challengeYear": 2025
+      }
+    ],
+    "citations": [
+      {
+        "label": "Literary Hub — Jacqueline Woodson on book bans in Florida and Texas",
+        "href": "https://lithub.com/jacqueline-woodson-on-navigating-book-bans-and-staying-resilient-in-2025/"
+      },
+      {
+        "label": "AASL Knowledge Quest — Brown Girl Dreaming challenged as CRT",
+        "href": "https://knowledgequest.aasl.org/stepping-onto-a-soapbox-part-two-challenges/"
+      },
+      {
+        "label": "Today.com — Brown Girl Dreaming among banned Black-authored titles",
+        "href": "https://www.today.com/popculture/books/banned-books-black-authors-list-rcna193062"
+      },
+      {
+        "label": "Monroe County Schools, TN — book removal records",
+        "href": "https://bannedindex.org/jurisdictions/monroe-county-schools-tn"
+      }
+    ],
+    "provenance": {
+      "source": "Jacqueline Woodson public statements; Monroe County Schools removal records",
+      "sourceUrl": "https://bannedindex.org/jurisdictions/monroe-county-schools-tn"
+    }
+  },
+  {
+    "title": "On the Come Up",
+    "slug": "on-the-come-up",
+    "authors": [
+      {
+        "name": "Angie Thomas",
+        "role": "author"
+      }
+    ],
+    "isbn13": "9780062498564",
+    "publishedDate": "2019",
+    "description": "Sixteen-year-old Bri Jackson, an aspiring rapper in Garden Heights, fights to make a name for herself while her family faces eviction and her school labels her a troublemaker. A Printz Honor novel about poverty, art, and Black girl ambition.",
+    "challenges": [
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2023–2024",
+          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+        },
+        "jurisdictionLabel": "St. Johns County School District",
+        "challengeYear": 2023
+      },
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "Refinery29 — On the Come Up banned in Texas and Pennsylvania",
+          "href": "https://www.refinery29.com/en-us/2021/12/10758842/book-bans-schools-authors-color-children-suffer"
+        },
+        "jurisdictionLabel": "Lee County Schools",
+        "challengeYear": 2024
+      },
+      {
+        "state": "PA",
+        "status": "reported",
+        "citation": {
+          "label": "Texas Library Association — SB 13 implementation context",
+          "href": "https://txla.org/advocacy/sb-13-school-library-acquisition-reconsideration-collection-development/sb-13-implementation/"
+        },
+        "jurisdictionLabel": "Central York School District",
+        "challengeYear": 2021
+      },
+      {
+        "state": "TX",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2023–2024",
+          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+        },
+        "jurisdictionLabel": "New Braunfels Independent School District",
+        "challengeYear": 2026
+      }
+    ],
+    "citations": [
+      {
+        "label": "PEN America Index of School Book Bans 2023–2024",
+        "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+      },
+      {
+        "label": "Refinery29 — On the Come Up banned in Texas and Pennsylvania",
+        "href": "https://www.refinery29.com/en-us/2021/12/10758842/book-bans-schools-authors-color-children-suffer"
+      },
+      {
+        "label": "Texas Library Association — SB 13 implementation context",
+        "href": "https://txla.org/advocacy/sb-13-school-library-acquisition-reconsideration-collection-development/sb-13-implementation/"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans",
+      "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+    }
+  },
+  {
+    "title": "Black Boy Joy",
+    "slug": "black-boy-joy",
+    "authors": [
+      {
+        "name": "Kwame Mbalia",
+        "role": "editor"
+      }
+    ],
+    "isbn13": "9780593379936",
+    "publishedDate": "2021",
+    "description": "An anthology of seventeen stories, comics, and poems by Black authors celebrating Black boyhood — from first-day outfits and skateboarding to finding voice through hip-hop. Contributors include Jason Reynolds, Jerry Craft, and Varian Johnson.",
+    "challenges": [
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023 (PDF)",
+          "href": "https://thisbookisbanned.com/wp-content/uploads/2024/10/PEN-Americas-Index-of-School-Book-Bans-July-1-2022-June-30-2023-Sorted-by-State-District.pdf"
+        },
+        "jurisdictionLabel": "Clay County School District",
+        "challengeYear": 2023
+      },
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "Book Riot — Black Boy Joy among 2023 school bans",
+          "href": "https://bookriot.com/they-may-not-be-the-most-targeted-but-theyre-still-banned/"
+        },
+        "jurisdictionLabel": "Escambia County Public Schools",
+        "challengeYear": 2023
+      },
+      {
+        "state": "TX",
+        "status": "reported",
+        "citation": {
+          "label": "Your Conroe News — Conroe ISD review of Black Boy Joy",
+          "href": "https://www.yourconroenews.com/neighborhood/moco/news/article/conroe-isd-book-policy-defines-sexually-explicit-18491478.php"
+        },
+        "jurisdictionLabel": "Conroe Independent School District",
+        "challengeYear": 2023
+      }
+    ],
+    "citations": [
+      {
+        "label": "PEN America Index of School Book Bans 2022–2023 (PDF)",
+        "href": "https://thisbookisbanned.com/wp-content/uploads/2024/10/PEN-Americas-Index-of-School-Book-Bans-July-1-2022-June-30-2023-Sorted-by-State-District.pdf"
+      },
+      {
+        "label": "Book Riot — Black Boy Joy among 2023 school bans",
+        "href": "https://bookriot.com/they-may-not-be-the-most-targeted-but-theyre-still-banned/"
+      },
+      {
+        "label": "Your Conroe News — Conroe ISD review of Black Boy Joy",
+        "href": "https://www.yourconroenews.com/neighborhood/moco/news/article/conroe-isd-book-policy-defines-sexually-explicit-18491478.php"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans 2022–2023",
+      "sourceUrl": "https://thisbookisbanned.com/wp-content/uploads/2024/10/PEN-Americas-Index-of-School-Book-Bans-July-1-2022-June-30-2023-Sorted-by-State-District.pdf"
+    }
+  },
+  {
+    "title": "Felix Ever After",
+    "slug": "felix-ever-after",
+    "authors": [
+      {
+        "name": "Kacen Callender",
+        "role": "author"
+      }
+    ],
+    "isbn13": "9780062820259",
+    "publishedDate": "2020",
+    "description": "Felix Love, a Black transgender teen in Brooklyn, navigates identity, first love, and revenge after a classmate posts his deadname. A Stonewall Award-winning YA novel about self-discovery at a summer arts program.",
+    "challenges": [
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2023–2024",
+          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+        },
+        "jurisdictionLabel": "Hernando County School District",
+        "challengeYear": 2024
+      },
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "Chalkbeat Tennessee — Wilson County library book purge list",
+          "href": "https://www.chalkbeat.org/tennessee/2024/11/16/tennessee-school-districts-share-wilson-county-library-book-ban-list/"
+        },
+        "jurisdictionLabel": "Volusia County School District",
+        "challengeYear": 2024
+      },
+      {
+        "state": "TN",
+        "status": "reported",
+        "citation": {
+          "label": "Nashville Banner — Wilson County bans include Felix Ever After",
+          "href": "https://nashvillebanner.com/2024/10/25/wilson-county-bans-390-books/"
+        },
+        "jurisdictionLabel": "Wilson County Schools",
+        "challengeYear": 2024
+      }
+    ],
+    "citations": [
+      {
+        "label": "PEN America Index of School Book Bans 2023–2024",
+        "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+      },
+      {
+        "label": "Chalkbeat Tennessee — Wilson County library book purge list",
+        "href": "https://www.chalkbeat.org/tennessee/2024/11/16/tennessee-school-districts-share-wilson-county-library-book-ban-list/"
+      },
+      {
+        "label": "Nashville Banner — Wilson County bans include Felix Ever After",
+        "href": "https://nashvillebanner.com/2024/10/25/wilson-county-bans-390-books/"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans; Florida Department of Education reports",
+      "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+    }
+  },
+  {
+    "title": "Clap When You Land",
+    "slug": "clap-when-you-land",
+    "authors": [
+      {
+        "name": "Elizabeth Acevedo",
+        "role": "author"
+      }
+    ],
+    "isbn13": "9780062882769",
+    "publishedDate": "2020",
+    "description": "Two half-sisters — Yahaira in New York and Camino in the Dominican Republic — learn of each other when their father dies in a plane crash. A novel in verse about grief, family secrets, and sisterhood across diaspora.",
+    "challenges": [
+      {
+        "state": "PA",
+        "status": "reported",
+        "citation": {
+          "label": "ALA Office for Intellectual Freedom — Clap When You Land temporary ban",
+          "href": "https://www.oif.ala.org/happy-birthday-elizabeth-acevedo/"
+        },
+        "jurisdictionLabel": "Central York School District",
+        "challengeYear": 2021
+      },
+      {
+        "state": "UT",
+        "status": "reported",
+        "citation": {
+          "label": "Refinery29 — Clap When You Land banned in York, Pennsylvania",
+          "href": "https://www.refinery29.com/en-us/2021/12/10758842/book-bans-schools-authors-color-children-suffer"
+        },
+        "jurisdictionLabel": "Nebo School District",
+        "challengeYear": 2022
+      },
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2023–2024",
+          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+        },
+        "jurisdictionLabel": "Collier County Public Schools",
+        "challengeYear": 2024
+      },
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "Banned Books — Clap When You Land challenge records",
+          "href": "https://www.banned-books.org/books/clap-when-you-land"
+        },
+        "jurisdictionLabel": "Escambia County Public Schools",
+        "challengeYear": 2023
+      }
+    ],
+    "citations": [
+      {
+        "label": "ALA Office for Intellectual Freedom — Clap When You Land temporary ban",
+        "href": "https://www.oif.ala.org/happy-birthday-elizabeth-acevedo/"
+      },
+      {
+        "label": "Refinery29 — Clap When You Land banned in York, Pennsylvania",
+        "href": "https://www.refinery29.com/en-us/2021/12/10758842/book-bans-schools-authors-color-children-suffer"
+      },
+      {
+        "label": "PEN America Index of School Book Bans 2023–2024",
+        "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+      },
+      {
+        "label": "Banned Books — Clap When You Land challenge records",
+        "href": "https://www.banned-books.org/books/clap-when-you-land"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans; ALA Office for Intellectual Freedom",
+      "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+    }
+  },
+  {
+    "title": "Monday's Not Coming",
+    "slug": "mondays-not-coming",
+    "authors": [
+      {
+        "name": "Tiffany D. Jackson",
+        "role": "author"
+      }
+    ],
+    "isbn13": "9780062422675",
+    "publishedDate": "2018",
+    "description": "When Monday Charles disappears from their Washington, D.C. neighborhood, only her best friend Claudia notices. Claudia's search exposes how a missing Black girl can vanish without institutional urgency — a thriller rooted in real cases.",
+    "challenges": [
+      {
+        "state": "TN",
+        "status": "reported",
+        "citation": {
+          "label": "Gonzaga University Banned Books Week — Monday's Not Coming",
+          "href": "https://researchguides.gonzaga.edu/BannedBooksWeek/MondaysNotComing"
+        },
+        "jurisdictionLabel": "Wilson County Schools",
+        "challengeYear": 2024
+      },
+      {
+        "state": "IA",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2022-2023/"
+        },
+        "jurisdictionLabel": "Mason City Community School District",
+        "challengeYear": 2023
+      },
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "Chalkbeat Tennessee — Wilson County library book purge list",
+          "href": "https://www.chalkbeat.org/tennessee/2024/11/16/tennessee-school-districts-share-wilson-county-library-book-ban-list/"
+        },
+        "jurisdictionLabel": "Clay County School District",
+        "challengeYear": 2023
+      },
+      {
+        "state": "UT",
+        "status": "reported",
+        "citation": {
+          "label": "The Tennessean — Wilson County removes 425 titles under HB 843",
+          "href": "https://www.tennessean.com/story/news/local/wilson/2024/10/24/book-bans-tennessee-wilson-county-schools/75820332007/"
+        },
+        "jurisdictionLabel": "Canyons School District",
+        "challengeYear": 2021
+      }
+    ],
+    "citations": [
+      {
+        "label": "Gonzaga University Banned Books Week — Monday's Not Coming",
+        "href": "https://researchguides.gonzaga.edu/BannedBooksWeek/MondaysNotComing"
+      },
+      {
+        "label": "PEN America Index of School Book Bans 2022–2023",
+        "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2022-2023/"
+      },
+      {
+        "label": "Chalkbeat Tennessee — Wilson County library book purge list",
+        "href": "https://www.chalkbeat.org/tennessee/2024/11/16/tennessee-school-districts-share-wilson-county-library-book-ban-list/"
+      },
+      {
+        "label": "The Tennessean — Wilson County removes 425 titles under HB 843",
+        "href": "https://www.tennessean.com/story/news/local/wilson/2024/10/24/book-bans-tennessee-wilson-county-schools/75820332007/"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans",
+      "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2022-2023/"
+    }
+  },
+  {
+    "title": "Tyler Johnson Was Here",
+    "slug": "tyler-johnson-was-here",
+    "authors": [
+      {
+        "name": "Jay Coles",
+        "role": "author"
+      }
+    ],
+    "isbn13": "9780316472180",
+    "publishedDate": "2018",
+    "description": "After police kill his twin brother Tyler at a party, Marvin Johnson searches for answers while mourning a sibling who becomes a hashtag. A debut novel about police violence, grief, and what justice means for a college-bound Black teen.",
+    "challenges": [
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2023–2024",
+          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+        },
+        "jurisdictionLabel": "Clay County School District",
+        "challengeYear": 2024
+      },
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "ClickOrlando — Florida school book removal reporting",
+          "href": "https://www.clickorlando.com/news/florida/2025/12/03/these-books-have-now-been-banned-in-florida-schools/"
+        },
+        "jurisdictionLabel": "Union County School District",
+        "challengeYear": 2025
+      },
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "Publishers Weekly — Tyler Johnson Was Here review",
+          "href": "https://www.publishersweekly.com/9780316440776"
+        },
+        "jurisdictionLabel": "Escambia County Public Schools",
+        "challengeYear": 2024
+      }
+    ],
+    "citations": [
+      {
+        "label": "PEN America Index of School Book Bans 2023–2024",
+        "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+      },
+      {
+        "label": "ClickOrlando — Florida school book removal reporting",
+        "href": "https://www.clickorlando.com/news/florida/2025/12/03/these-books-have-now-been-banned-in-florida-schools/"
+      },
+      {
+        "label": "Publishers Weekly — Tyler Johnson Was Here review",
+        "href": "https://www.publishersweekly.com/9780316440776"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans; Florida Department of Education annual reports",
+      "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+    }
+  },
+  {
+    "title": "The 57 Bus",
+    "slug": "the-57-bus",
+    "authors": [
+      {
+        "name": "Dashka Slater",
+        "role": "author"
+      }
+    ],
+    "isbn13": "9780374303235",
+    "publishedDate": "2017",
+    "description": "Nonfiction account of an Oakland hate-crime case: Sasha, an agender white teen, was set on fire on a city bus by Richard, a Black sixteen-year-old. Slater examines gender identity, juvenile justice, and restorative approaches to harm.",
+    "challenges": [
+      {
+        "state": "TN",
+        "status": "reported",
+        "citation": {
+          "label": "Knox News — Knox County Schools pulls 48 books including The 57 Bus",
+          "href": "https://www.knoxnews.com/story/news/education/2024/12/05/knox-county-schools-pulls-48-books-in-accordance-with-tennessee-law/76770330007/"
+        },
+        "jurisdictionLabel": "Knox County Schools",
+        "challengeYear": 2024
+      },
+      {
+        "state": "TX",
+        "status": "reported",
+        "citation": {
+          "label": "Knox News — The 57 Bus author on school book ban",
+          "href": "https://www.knoxnews.com/story/news/education/2025/01/21/the-57-bus-author-dashka-slater-school-book-ban-i-never-get-used-to-it/77048486007/"
+        },
+        "jurisdictionLabel": "Katy Independent School District",
+        "challengeYear": 2022
+      },
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2023–2024",
+          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+        },
+        "jurisdictionLabel": "School District of Manatee County",
+        "challengeYear": 2022
+      },
+      {
+        "state": "IA",
+        "status": "reported",
+        "citation": {
+          "label": "Artists at Risk Connection — Dashka Slater on nationwide bans",
+          "href": "https://artistsatriskconnection.org/artist-voice/dashka-slater/"
+        },
+        "jurisdictionLabel": "Shenandoah Community School District",
+        "challengeYear": 2024
+      }
+    ],
+    "citations": [
+      {
+        "label": "Knox News — Knox County Schools pulls 48 books including The 57 Bus",
+        "href": "https://www.knoxnews.com/story/news/education/2024/12/05/knox-county-schools-pulls-48-books-in-accordance-with-tennessee-law/76770330007/"
+      },
+      {
+        "label": "Knox News — The 57 Bus author on school book ban",
+        "href": "https://www.knoxnews.com/story/news/education/2025/01/21/the-57-bus-author-dashka-slater-school-book-ban-i-never-get-used-to-it/77048486007/"
+      },
+      {
+        "label": "PEN America Index of School Book Bans 2023–2024",
+        "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+      },
+      {
+        "label": "Artists at Risk Connection — Dashka Slater on nationwide bans",
+        "href": "https://artistsatriskconnection.org/artist-voice/dashka-slater/"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans; Knox News reporting",
+      "sourceUrl": "https://www.knoxnews.com/story/news/education/2024/12/05/knox-county-schools-pulls-48-books-in-accordance-with-tennessee-law/76770330007/"
+    }
+  },
+  {
+    "title": "Children of Blood and Bone",
+    "slug": "children-of-blood-and-bone",
+    "authors": [
+      {
+        "name": "Tomi Adeyemi",
+        "role": "author"
+      }
+    ],
+    "isbn13": "9781250170972",
+    "publishedDate": "2018",
+    "description": "In the West African–inspired kingdom of Orïsha, Zélie fights to restore magic after a tyrant suppresses maji people. Adeyemi has said the fantasy trilogy responds to police violence against unarmed Black Americans and systemic oppression.",
+    "challenges": [
+      {
+        "state": "FL",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America Index of School Book Bans 2023–2024",
+          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+        },
+        "jurisdictionLabel": "Escambia County Public Schools",
+        "challengeYear": 2023
+      },
+      {
+        "state": "TX",
+        "status": "reported",
+        "citation": {
+          "label": "CBS News — Florida Escambia County book ban lawsuit context",
+          "href": "https://www.cbsnews.com/news/florida-escambia-county-sued-book-ban-penguin-random-house/"
+        },
+        "jurisdictionLabel": "Katy Independent School District",
+        "challengeYear": 2022
+      },
+      {
+        "state": "TN",
+        "status": "reported",
+        "citation": {
+          "label": "PEN America v. Escambia County School District",
+          "href": "https://pen.org/pen-america-v-escambia-county/"
+        },
+        "jurisdictionLabel": "Monroe County Schools",
+        "challengeYear": 2025
+      }
+    ],
+    "citations": [
+      {
+        "label": "PEN America Index of School Book Bans 2023–2024",
+        "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+      },
+      {
+        "label": "CBS News — Florida Escambia County book ban lawsuit context",
+        "href": "https://www.cbsnews.com/news/florida-escambia-county-sued-book-ban-penguin-random-house/"
+      },
+      {
+        "label": "PEN America v. Escambia County School District",
+        "href": "https://pen.org/pen-america-v-escambia-county/"
+      }
+    ],
+    "provenance": {
+      "source": "PEN America Index of School Book Bans; PEN America v. Escambia County litigation",
+      "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+    }
+  }
+]

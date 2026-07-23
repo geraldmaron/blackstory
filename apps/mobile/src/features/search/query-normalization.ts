@@ -4,7 +4,7 @@
  * Vendored/mirrors packages/security/src/query-guardrails.ts's normalizeSearchText and
  * DEFAULT_QUERY_GUARDRAIL_LIMITS -- apps/mobile cannot import @repo/security (own isolated
  * npm lockfile, not in the pnpm workspace graph; see the INTEGRATION GAP note in
- * apps/mobile/src/data/contracts.ts and apps/mobile/src/app/_lib/route-params.ts for the
+ * apps/mobile/src/data/contracts.ts and apps/mobile/src/lib/route-params.ts for the
  * same rationale applied elsewhere in this app). The constants below are kept numerically
  * identical to the server's so the client never sends a shape the server guardrail would reject
  * for a reason the client could have caught first, and the client's own "browse vs query"
@@ -13,7 +13,7 @@
  *
  * WHY 2 CHARACTERS: packages/security/src/query-guardrails.ts's
  * DEFAULT_QUERY_GUARDRAIL_LIMITS.minQueryLength is 2. The web search page does not enforce a
- * client-side minimum itself (apps/web/src/app/search/search-view-model.ts passes an empty
+ * client-side minimum itself (apps/web/src/app/history/history-view-model.ts passes an empty
  * string straight through and lets the server guardrail decide), but the guardrail's own
  * documented floor is real and specific, so the mobile client adopts the SAME number rather than
  * a fresh "reasonable default" -- one query threshold, stated once, matching the API contract.

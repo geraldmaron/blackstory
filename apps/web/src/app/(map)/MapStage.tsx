@@ -84,13 +84,18 @@ import {
   DECADE_LAYER_FADE_MS,
   isDecadeFadePaintChannel,
   runDecadeMorphAnimation,
-  setDecadeCrossfadeIdleOpacities,
+  restoreDecadeFadePaintFromStyle,
   setDecadeCrossfadeTransitions,
   type DecadeMorphAnimationHandle,
   type DensityColorMorphState,
 } from '../map/decade-layer-transition';
 import type { MapColorScheme } from '../../lib/map-experience/dignity-style';
 import { EXPLORE_CLUSTER_CONFIG } from '../../lib/map-experience/dignity-style';
+import {
+  bindMapResizeLifecycle,
+  bindWebGlContextRecovery,
+  isWebGlAvailable,
+} from '../../lib/map-experience/map-libre-lifecycle';
 import type {
   ExploreMapFeatureCollection,
   JurisdictionAreaFeature,
@@ -807,6 +812,8 @@ export type MapStageHandle = {
   /** Copper place pin at a geocoded search center — distinct from entity HTML markers. */
   readonly setSearchCenterMarker: (marker: ExploreSearchCenterMarkerInput) => void;
   readonly clearSearchCenterMarker: () => void;
+  /** Re-read container layout after external geometry changes (hero inset, panel open). */
+  readonly resize: () => void;
 };
 
 const MapStageContext = createContext<MapStageHandle | null>(null);
@@ -1257,9 +1264,11 @@ export function MapStageProvider({
         await waitForGeoJsonSourceData(map, EXPLORE_ENTITIES_SOURCE_ID);
       }
       if (generation !== decadeFadeGenerationRef.current) return;
-        setHistoryEdgeData(map, cfg.historyEdgeCollection);
+      setHistoryEdgeData(map, cfg.historyEdgeCollection);
       if (generation !== decadeFadeGenerationRef.current) return;
-      setDecadeCrossfadeIdleOpacities(map);
+      // Restore kind expressions (not constant rest opacities) so idle pins never stay in a
+      // dual-buffer / uniform-lit paint state after decade morph.
+      restoreDecadeFadePaintFromStyle(map, cfg.style);
       clearIncomingDecadeBuffers(map);
       setHistoryEdgesVisibility(map, cfg.historyEdgesEnabled);
       syncEntityMarkers();
@@ -1372,6 +1381,13 @@ export function MapStageProvider({
           clearDensityMorphFeatureState(map, activeDensityMorphRef.current);
           activeDensityMorphRef.current = [];
         }
+        // Drop mid-morph dual-buffer pin paint/data before the snap apply — otherwise a
+        // cancelled dissolve can leave every entity in a partial-lit incoming stack.
+        if (map && mapStyleReadyRef.current) {
+          setDecadeCrossfadeTransitions(map, 0);
+          restoreDecadeFadePaintFromStyle(map, configRef.current.style);
+          clearIncomingDecadeBuffers(map);
+        }
         commitDataPatch(patch, recreate);
         applyMemorialForPatch(options);
         return;
@@ -1389,7 +1405,7 @@ export function MapStageProvider({
       commitDataPatch(patch, { configOnly: true });
       runDecadeMorph(map, generation, durationMs, options);
     },
-    [applyMemorialForPatch, commitDataPatch, runDecadeMorph],
+    [applyMemorialForPatch, clearIncomingDecadeBuffers, commitDataPatch, runDecadeMorph],
   );
 
   useEffect(() => {
@@ -1536,6 +1552,14 @@ export function MapStageProvider({
     searchCenterMarkerRef.current = null;
   }, []);
 
+  const resize = useCallback(() => {
+    try {
+      mapRef.current?.resize();
+    } catch (error) {
+      console.error('[MapStage] resize failed', error);
+    }
+  }, []);
+
   const setSearchCenterMarker = useCallback(
     (marker: ExploreSearchCenterMarkerInput) => {
       const map = mapRef.current;
@@ -1585,11 +1609,15 @@ export function MapStageProvider({
     const container = containerRef.current;
     let cancelled = false;
     let resizeTimer: ReturnType<typeof setTimeout> | undefined;
-    let resizeObserver: ResizeObserver | undefined;
+    let resizeLifecycle: ReturnType<typeof bindMapResizeLifecycle> | undefined;
+    let contextRecovery: ReturnType<typeof bindWebGlContextRecovery> | undefined;
 
     void (async () => {
       let map: MapLibreMap | undefined;
       try {
+        if (!isWebGlAvailable()) {
+          throw new Error('WebGL unavailable');
+        }
         const maplibregl = (await import('maplibre-gl')).default;
         maplibreglRef.current = maplibregl;
         if (cancelled || !container.isConnected) return;
@@ -1616,6 +1644,7 @@ export function MapStageProvider({
           (window as unknown as Record<string, unknown>).__bpMapStage = map;
         }
         map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+        map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
         map.on('error', (event) => {
           console.error('[MapStage]', event.error);
         });
@@ -1703,6 +1732,16 @@ export function MapStageProvider({
       activeMap.once('load', () => {
         mapStyleReadyRef.current = true;
         applyStyleAndData();
+        const canvas = activeMap.getCanvas();
+        contextRecovery = bindWebGlContextRecovery(
+          canvas,
+          () => {
+            if (!cancelled) markMapUnavailable();
+          },
+          () => {
+            if (!cancelled) activeMap.resize();
+          },
+        );
         if (activeMap.getLayer(EXPLORE_STATE_DENSITY_LAYER_ID)) {
           activeMap.on('click', EXPLORE_STATE_DENSITY_LAYER_ID, handleStateClick);
           activeMap.on('mouseenter', EXPLORE_STATE_DENSITY_LAYER_ID, () => {
@@ -1807,10 +1846,9 @@ export function MapStageProvider({
         activeMap.getCanvas().style.cursor = '';
       });
 
-      resizeObserver = new ResizeObserver(() => {
+      resizeLifecycle = bindMapResizeLifecycle(container, () => {
         activeMap.resize();
       });
-      resizeObserver.observe(container);
       resizeTimer = setTimeout(() => {
         syncEntityMarkers();
         activeMap.resize();
@@ -1832,7 +1870,8 @@ export function MapStageProvider({
         selectedPulseRafRef.current = null;
       }
       if (resizeTimer) clearTimeout(resizeTimer);
-      resizeObserver?.disconnect();
+      resizeLifecycle?.disconnect();
+      contextRecovery?.disconnect();
       clearMarkers(markersRef.current);
       clearSearchCenterMarker();
       for (const { marker } of stateLabelMarkersRef.current.values()) marker.remove();
@@ -1856,6 +1895,7 @@ export function MapStageProvider({
       mapAvailable,
       setSearchCenterMarker,
       clearSearchCenterMarker,
+      resize,
     }),
     [
       patchData,
@@ -1865,6 +1905,7 @@ export function MapStageProvider({
       mapAvailable,
       setSearchCenterMarker,
       clearSearchCenterMarker,
+      resize,
     ],
   );
 

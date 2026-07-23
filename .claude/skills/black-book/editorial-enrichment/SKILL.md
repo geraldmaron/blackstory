@@ -12,7 +12,7 @@ release activation are out of scope for this skill.
 
 ```bash
 # OpenRouter (1Password via run-with-dev-secrets)
-run-with-dev-secrets -- env | rg OPENROUTER
+run-with-dev-secrets env | rg OPENROUTER
 
 # Or local / Corsair Ollama (no key)
 export EDITORIAL_LLM_PROVIDER=ollama

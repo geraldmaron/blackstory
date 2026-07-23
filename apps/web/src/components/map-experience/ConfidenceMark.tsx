@@ -13,6 +13,7 @@ import {
   confidenceIconFor,
   type ConfidenceTierKey,
 } from '../../lib/map-experience/confidence-icons';
+import { iconWithFallback } from '../../lib/map-experience/icon-fallback';
 import { confidenceHelp } from '../../lib/map-experience/metadata-help';
 
 void React;
@@ -53,7 +54,7 @@ export function confidenceLabel(tier: ConfidenceTierLabel, labeled = false): str
 
 export function ConfidenceMark({ tier, className, labeled = false }: ConfidenceMarkProps) {
   const tierKey = confidenceTierKey(tier);
-  const icon = confidenceIconFor(tierKey);
+  const icon = iconWithFallback(confidenceIconFor(tierKey));
   const text = confidenceLabel(tier, labeled);
   const help = confidenceHelp(tierKey);
   const aria = labeled ? `${confidenceShortLabel(tier)} confidence. ${help}` : `${text}. ${help}`;

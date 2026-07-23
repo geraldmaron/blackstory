@@ -1,37 +1,44 @@
 /**
- * Chronological claim/revision timeline. Each entry shows the server-provided `atLabel`
- * VERBATIM as the primary date text (never reformatted/reparsed from `at`, which would risk
- * implying more precision than `datePrecision` states) plus an explicit precision caption —
- * the concrete mechanism behind "never fabricate precision beyond what the data states."
+ * Beat 07: chronological timeline — omitted when no dated spans exist (v6 entity edition).
  */
 import { View } from 'react-native';
-import { EmptyState, Text, space } from '@/ui';
-import { RECORD_GAP_COPY, SECTION_HEADINGS } from '../copy';
+import { Text, space } from '@/ui';
+import { EntityEditionPanel } from '../EntityEditionPanel';
+import { SECTION_HEADINGS } from '../copy';
 import { datePrecisionCaption } from '../format';
 import type { TimelineEvent } from '../types';
-import { SectionHeading } from './SectionHeading';
 
 export type TimelineSectionProps = {
   readonly timeline: readonly TimelineEvent[];
+  readonly index: string;
 };
 
-export function TimelineSection({ timeline }: TimelineSectionProps) {
+export function TimelineSection({ timeline, index }: TimelineSectionProps) {
+  if (timeline.length === 0) {
+    return null;
+  }
+
   return (
-    <View style={{ gap: space['3'] }}>
-      <SectionHeading level={2}>{SECTION_HEADINGS.timeline}</SectionHeading>
-      {timeline.length === 0 ? (
-        <EmptyState title={RECORD_GAP_COPY.timeline.title} description={RECORD_GAP_COPY.timeline.body} />
-      ) : (
-        timeline.map((event) => (
+    <EntityEditionPanel
+      index={index}
+      kicker="Chronology"
+      title={SECTION_HEADINGS.timeline}
+      testID="entity-timeline-section"
+    >
+      <View style={{ gap: space['3'] }}>
+        {timeline.map((event) => (
           <View key={event.id} style={{ gap: space['1'] }}>
             <Text variant="caption" colorRole="inkMuted">
               {event.atLabel} · {datePrecisionCaption(event.datePrecision)}
             </Text>
-            <Text variant="bodyEmphasis">{event.title}</Text>
+            <Text variant="rowTitle">{event.title}</Text>
             {event.body ? <Text variant="bodySmall">{event.body}</Text> : null}
           </View>
-        ))
-      )}
-    </View>
+        ))}
+      </View>
+      <Text variant="caption" colorRole="inkMuted">
+        Dated status changes and relationship timespans published for this record.
+      </Text>
+    </EntityEditionPanel>
   );
 }

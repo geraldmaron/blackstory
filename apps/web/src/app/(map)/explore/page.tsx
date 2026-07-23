@@ -12,12 +12,16 @@ import { SynchronizedResultList } from '../../../components/map-experience/Synch
 import { getSharedPublicEntities } from '../shared-map-data';
 import { ExploreMapExperience } from './ExploreMapExperience';
 import { buildExploreViewModel } from './explore-view-model';
+import '../../../components/patterns/browse-mode.css';
+import '../../../components/patterns/edition-fact-icon.css';
+import '../../../components/patterns/record-anatomy.css';
 import './explore.css';
+import './explore-edition.css';
 
 export const metadata = {
   title: 'Explore',
   description:
-    'Map-first national view of documented Black history — every geo-anchored record in the active release.',
+    'Map-first national view of documented Black history: every geo-anchored record in the active release.',
 };
 
 type ExplorePageProps = {
@@ -97,7 +101,8 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
             ]}
           />
           <p className="ds-sans ds-explore__results-count" id="explore-results-heading-njs">
-            {view.totalMatched} documented record{view.totalMatched === 1 ? '' : 's'} in view
+            {view.totalMatched} documented record{view.totalMatched === 1 ? '' : 's'} matching
+            filters · oldest first
           </p>
           <SynchronizedResultList
             features={view.filteredFeatures}

@@ -6,7 +6,7 @@
  * them here because apps/mobile must not import apps/web or any server-side
  * package (ADR-021 §4 — HTTP-only, types-only-from-`@repo/public-contracts`,
  * and apps/mobile is not yet wired into the pnpm workspace, per
- * src/app/_lib/route-params.ts's dependency note). The server re-validates the
+ * src/lib/route-params.ts's dependency note). The server re-validates the
  * category/target against its own authoritative copy on intake, so a client
  * that drifts out of sync fails validation server-side rather than smuggling an
  * unknown category through — this list is a UX affordance, not a trust boundary.

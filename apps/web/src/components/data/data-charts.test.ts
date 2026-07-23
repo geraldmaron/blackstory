@@ -98,9 +98,9 @@ test('PopulationByDecadeChart keeps enslaved, free, and post-1860 total as disti
   );
   // Legend must not conflate enslaved with Black total under one swatch.
   assert.doesNotMatch(html, /Enslaved \/ Black total/);
-  assert.match(html, /Enslaved \(1790–1860\)/);
-  assert.match(html, /Free \(1790–1860\)/);
-  assert.match(html, /Black population \(1870–2020\)/);
+  assert.match(html, /Enslaved \(1790 to 1860\)/);
+  assert.match(html, /Free \(1790 to 1860\)/);
+  assert.match(html, /Black population \(1870 to 2020\)/);
   // Copper (viz-2) is reserved for the enslaved segment; post-1860 totals use ink (viz-1).
   assert.match(html, /fill="var\(--ds-viz-2\)"/);
   assert.match(html, /fill="var\(--ds-viz-4\)"/);
@@ -248,7 +248,7 @@ test('compactOutcomeFieldLabel shortens long Opportunity Atlas field names', () 
   );
 });
 
-test('RacePairComparisonChart renders wealth juxtaposition with theme link', () => {
+test('RacePairComparisonChart renders wealth juxtaposition without public Themes link while gated', () => {
   const html = renderToStaticMarkup(
     createElement(RacePairComparisonChart, {
       series: DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.wealthComparison,
@@ -257,8 +257,8 @@ test('RacePairComparisonChart renders wealth juxtaposition with theme link', () 
   assert.match(html, /Median family net worth/);
   assert.match(html, /\$44,900/);
   assert.match(html, /\$285,000/);
-  assert.match(html, /See this in Themes/);
-  assert.match(html, /\/themes\/redlining/);
+  assert.doesNotMatch(html, /See this in Themes/);
+  assert.doesNotMatch(html, /\/themes\/redlining/);
 });
 
 test('GroupedBarIndicatorChart renders NHGIS homeownership decades', () => {

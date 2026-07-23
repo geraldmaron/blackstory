@@ -1,93 +1,74 @@
 /**
- * Homepage About beat — product thesis and three editorial pillars, with quiet
- * paths into the map, the full /about page, and zero-permission state orientation.
+ * Homepage beat 01: Your Place — dense state select, coverage strip, and entry micro-facts.
  */
 
 import React from 'react';
-import Link from 'next/link';
-import { MakerCredit } from '../MakerCredit';
+import { EditionFactIcon } from '../patterns/EditionFactIcon';
+import type { EntryStepKey } from '../patterns/edition-fact-icon';
+import { HomeEditionHeader } from './HomeEditionHeader';
 import { StateStart, type StateStartEntry, type StateStartProps } from './StateStart';
 
 void React;
 
+const ENTRY_FACTS: ReadonlyArray<{
+  readonly label: string;
+  readonly step: EntryStepKey;
+  readonly value: string;
+}> = [
+  {
+    label: 'Pin',
+    step: 'pin',
+    value:
+      'Every public record anchors to a mappable place. Precision is shown, never overstated.',
+  },
+  {
+    label: 'Browse',
+    step: 'browse',
+    value:
+      'State and corridor views group records by where they happened, not by abstract theme alone.',
+  },
+  {
+    label: 'Source',
+    step: 'source',
+    value:
+      'Each entry carries citations and a confidence grade you can read before you trust the claim.',
+  },
+];
+
 export type HomeAboutProps = {
-  /** States with pinned records, ordered by record count descending (top slice). */
   readonly topStates: readonly StateStartEntry[];
-  /** Override for tests — defaults to the live StateStart client control. */
   readonly OrientControl?: React.ComponentType<StateStartProps>;
 };
 
-const PILLARS = [
-  {
-    kicker: 'Presence',
-    title: 'Pinned to place',
-    body: 'People, schools, institutions, and events stay on the ground — not a trauma-first feed, and not a remote museum shelf.',
-  },
-  {
-    kicker: 'Evidence',
-    title: 'Receipts on every claim',
-    body: 'Accepted claims carry citations and confidence you can read. When sources disagree, both stay visible.',
-  },
-  {
-    kicker: 'Dignity',
-    title: 'Rules, not tone',
-    body: 'Street-level residences stay off the public map. Living people stay protected. Presence is never framed as deficit.',
-  },
-] as const;
-
 export function HomeAbout({ topStates, OrientControl = StateStart }: HomeAboutProps) {
+  const Control = OrientControl;
+
   return (
-    <section
-      className="ds-section ds-section--flush ds-home-about"
-      aria-labelledby="home-about-heading"
-    >
-      <header className="ds-home-about__intro">
-        <p className="ds-section__kicker">About</p>
-        <h2 className="ds-section__title ds-home-about__title" id="home-about-heading">
-          History, pinned to <em>place</em>.
-        </h2>
-        <p className="ds-section__lede ds-home-about__lede">
-          BlackStory is a place-connected Black history research platform. Documented history stays
-          findable — especially the history close to you — with people, places, evidence, and context
-          traveling together.
-        </p>
-      </header>
+    <section className="ds-home-edition__beat" id="beat-a" aria-labelledby="home-place-heading">
+      <HomeEditionHeader
+        index="01"
+        kicker="Your place"
+        title="Enter through geography."
+        lede="Choose a state, use your location, or open a deep-coverage corridor. Every path lands on a place-first browse, not a category wall."
+        id="home-place-heading"
+      />
 
-      <ul className="ds-home-about__pillars" aria-label="What the archive stands on">
-        {PILLARS.map((pillar, index) => (
-          <li key={pillar.kicker} className="ds-home-about__pillar">
-            <p className="ds-home-about__pillar-index" aria-hidden="true">
-              {String(index + 1).padStart(2, '0')}
-            </p>
-            <p className="ds-home-about__pillar-kicker">{pillar.kicker}</p>
-            <h3 className="ds-home-about__pillar-title">{pillar.title}</h3>
-            <p className="ds-home-about__pillar-body">{pillar.body}</p>
-          </li>
-        ))}
-      </ul>
+      <div className="ds-home-edition__place-entry">
+        <Control topStates={topStates} />
 
-      <p className="ds-home-about__actions">
-        <Link className="ds-cta ds-cta--copper" href="/explore">
-          Explore the map
-        </Link>
-        <Link className="ds-cta ds-cta--quiet" href="/about">
-          Read the full story
-        </Link>
-        <Link className="ds-cta ds-cta--quiet" href="/methodology">
-          Methodology
-        </Link>
-      </p>
-
-      <div className="ds-home-about__orient">
-        <p className="ds-home-about__orient-kicker">Start with a place</p>
-        <p className="ds-home-about__orient-lede">
-          Prefer a place you know? Pick a state — zero permission — or share your location only if
-          you choose.
-        </p>
-        <OrientControl topStates={topStates} />
+        <aside className="ds-home-edition__entry-facts" aria-label="How place entry works">
+          <p className="ds-home-edition__entry-facts-heading">How entry works</p>
+          {ENTRY_FACTS.map((fact) => (
+            <div key={fact.label} className="ds-home-edition__entry-fact">
+              <span className="ds-home-edition__entry-fact-label">
+                <EditionFactIcon variant="entry" step={fact.step} />
+                <span>{fact.label}</span>
+              </span>
+              <p className="ds-home-edition__entry-fact-value">{fact.value}</p>
+            </div>
+          ))}
+        </aside>
       </div>
-
-      <MakerCredit variant="inline" className="ds-home-about__maker" />
     </section>
   );
 }

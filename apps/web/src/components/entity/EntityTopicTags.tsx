@@ -1,5 +1,5 @@
 /**
- * Learning-index topic / era / notability chips linking into search and explore filters.
+ * Learning-index topic / era / notability chips linking into history and explore filters.
  */
 import React from 'react';
 import Link from 'next/link';
@@ -14,7 +14,7 @@ export type EntityTopicTagsProps = {
 
 function chipHref(kind: 'theme' | 'era', value: string): string {
   if (kind === 'theme') {
-    return `/search?topic=${encodeURIComponent(value)}`;
+    return `/history?topic=${encodeURIComponent(value)}`;
   }
   return exploreHrefForEra(value);
 }

@@ -16,4 +16,8 @@ export {
   isSensitiveKey,
   REDACTED,
 } from './log-redaction';
-export { createDefaultApiClient } from './bootstrap';
+export {
+  createDefaultApiClient,
+  resolveApiBaseUrl,
+  DEFAULT_API_BASE_URL,
+} from './bootstrap';

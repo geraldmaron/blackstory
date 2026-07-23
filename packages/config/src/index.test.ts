@@ -12,6 +12,7 @@ import {
   GCP_PROJECT_ID_PROD,
   BRAND_ASSETS,
   MAKER,
+  BOOKSHOP_AFFILIATE_ID,
 } from './index.ts';
 
 test('parseNodeEnv defaults to development', () => {
@@ -35,6 +36,7 @@ test('identity constants keep product name separate from code prefixes', () => {
   assert.equal(MAKER.url, 'https://geralddagher.com');
   assert.equal(MAKER.mark.light, '/maker/gd-mark-light.png');
   assert.equal(MAKER.mark.dark, '/maker/gd-mark-dark.png');
+  assert.equal(BOOKSHOP_AFFILIATE_ID, 'gerald69');
 });
 
 test('local runtime environment does not require production variables', () => {

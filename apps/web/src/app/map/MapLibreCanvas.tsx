@@ -11,13 +11,20 @@
  */
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import maplibregl, {
   type LayerSpecification,
   type SourceSpecification,
   type StyleSpecification,
 } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import {
+  bindMapResizeLifecycle,
+  bindWebGlContextRecovery,
+  containerHasLayout,
+  isWebGlAvailable,
+  waitForContainerLayout,
+} from '../../lib/map-experience/map-libre-lifecycle';
 
 export type MapLibreCanvasProps = {
   readonly style: StyleSpecification;
@@ -27,54 +34,99 @@ export type MapLibreCanvasProps = {
 export function MapLibreCanvas({ style, bounds }: MapLibreCanvasProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
+  const [unavailable, setUnavailable] = useState(false);
 
   useEffect(() => {
-    if (!containerRef.current || mapRef.current) {
+    const container = containerRef.current;
+    if (!container || mapRef.current) {
       return;
     }
-    const cloned = JSON.parse(JSON.stringify(style)) as StyleSpecification;
-    const map = new maplibregl.Map({
-      container: containerRef.current,
-      style: {
-        version: 8,
-        sources: {},
-        layers: [
-          {
-            id: 'background',
-            type: 'background',
-            paint: { 'background-color': '#0A0A0A' },
-          },
-        ],
-      },
-      bounds: bounds as maplibregl.LngLatBoundsLike,
-      fitBoundsOptions: { padding: 24 },
-      attributionControl: false,
-    });
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
-    map.once('load', () => {
-      for (const [id, source] of Object.entries(cloned.sources ?? {})) {
-        if (!map.getSource(id)) map.addSource(id, source as SourceSpecification);
-      }
-      for (const layer of cloned.layers ?? []) {
-        if (layer.type === 'symbol') continue;
-        if (layer.id === 'background') {
-          const color = (layer as { paint?: { 'background-color'?: string } }).paint?.[
-            'background-color'
-          ];
-          if (color) map.setPaintProperty('background', 'background-color', color);
-          continue;
+
+    let cancelled = false;
+    let map: maplibregl.Map | undefined;
+    let resizeLifecycle: ReturnType<typeof bindMapResizeLifecycle> | undefined;
+    let contextRecovery: ReturnType<typeof bindWebGlContextRecovery> | undefined;
+
+    void (async () => {
+      try {
+        await waitForContainerLayout(container);
+        if (cancelled || !container.isConnected || !containerHasLayout(container)) return;
+        if (!isWebGlAvailable()) {
+          throw new Error('WebGL unavailable');
         }
-        if (!map.getLayer(layer.id)) map.addLayer(layer as LayerSpecification);
+
+        const cloned = JSON.parse(JSON.stringify(style)) as StyleSpecification;
+        map = new maplibregl.Map({
+          container,
+          style: {
+            version: 8,
+            sources: {},
+            layers: [
+              {
+                id: 'background',
+                type: 'background',
+                paint: { 'background-color': '#0A0A0A' },
+              },
+            ],
+          },
+          bounds: bounds as maplibregl.LngLatBoundsLike,
+          fitBoundsOptions: { padding: 24 },
+          attributionControl: false,
+        });
+        map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+        map.once('load', () => {
+          if (cancelled || !map) return;
+          for (const [id, source] of Object.entries(cloned.sources ?? {})) {
+            if (!map.getSource(id)) map.addSource(id, source as SourceSpecification);
+          }
+          for (const layer of cloned.layers ?? []) {
+            if (layer.type === 'symbol') continue;
+            if (layer.id === 'background') {
+              const color = (layer as { paint?: { 'background-color'?: string } }).paint?.[
+                'background-color'
+              ];
+              if (color) map.setPaintProperty('background', 'background-color', color);
+              continue;
+            }
+            if (!map.getLayer(layer.id)) map.addLayer(layer as LayerSpecification);
+          }
+          contextRecovery = bindWebGlContextRecovery(
+            map.getCanvas(),
+            () => {
+              if (!cancelled) setUnavailable(true);
+            },
+            () => {
+              if (!cancelled) map?.resize();
+            },
+          );
+          map.resize();
+        });
+        mapRef.current = map;
+        resizeLifecycle = bindMapResizeLifecycle(container, () => {
+          map?.resize();
+        });
+      } catch {
+        if (!cancelled) setUnavailable(true);
       }
-      map.resize();
-    });
-    mapRef.current = map;
+    })();
 
     return () => {
-      map.remove();
+      cancelled = true;
+      resizeLifecycle?.disconnect();
+      contextRecovery?.disconnect();
+      map?.remove();
       mapRef.current = null;
     };
-  }, []);
+  }, [bounds, style]);
 
-  return <div ref={containerRef} style={{ width: '100%', height: '100%' }} />;
+  return (
+    <>
+      <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
+      {unavailable ? (
+        <p role="status" className="ds-sans">
+          Map preview could not load in this browser.
+        </p>
+      ) : null}
+    </>
+  );
 }

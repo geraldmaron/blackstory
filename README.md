@@ -68,6 +68,17 @@ pnpm dev:web
 # http://localhost:3048/
 # http://localhost:3048/explore   # live catalog needs postgres + DATABASE_URL
 # Without those env vars you get the small Dunbar seed catalog
+
+# Mobile — prod-like local QA (embedded bundle, no Metro; **agent default**)
+pnpm mobile:ios:release      # build/install/launch Release on booted Simulator
+pnpm mobile:ios:verify       # **agent gate** — api-public + Release app; Metro NOT checked
+pnpm mobile:ios:launch       # relaunch installed Release app only
+
+# Mobile — hot reload dev client (Metro required; Path B only when editing JS)
+pnpm dev:mobile
+pnpm dev:mobile:verify       # LAN :8081 bundle + stale packager port check (NOT the agent default)
+# Needs apps/mobile/.env.local with API_BASE_URL=http://127.0.0.1:8080 (simulator)
+# See apps/mobile/README.md for physical-device LAN setup and stale-port recovery
 ```
 
 ## Common commands

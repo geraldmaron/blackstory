@@ -24,6 +24,7 @@ import {
   type SafeFetchDependencies,
   type SafeFetchOptions,
   type SafeFetchResult,
+  type SafeParserResult,
 } from '@repo/security/url-safety';
 import type { SnapshotMode } from '@repo/domain';
 
@@ -72,6 +73,38 @@ export const nodePinnedTransport: PinnedTransport = (pinnedRequest) =>
     clientRequest.end();
   });
 
+/** Text-only parser that strips scripts/styles and checks universal malware signatures without active content blocks. */
+export async function parseTextOnlyHtml(
+  content: Uint8Array,
+  contentType: string,
+): Promise<SafeParserResult> {
+  const text = new TextDecoder('utf-8', { fatal: false }).decode(content);
+  const indicators: SafeParserResult['indicators'][number][] = [];
+  if (text.includes('EICAR-STANDARD-ANTIVIRUS-TEST-FILE')) {
+    indicators.push('eicar_test_signature');
+  }
+  const prefix = content.subarray(0, 4);
+  if (
+    (prefix[0] === 0x4d && prefix[1] === 0x5a) || // MZ header
+    (prefix[0] === 0x7f && prefix[1] === 0x45 && prefix[2] === 0x4c && prefix[3] === 0x46) // ELF header
+  ) {
+    indicators.push('executable_magic');
+  }
+  const extractedText = contentType.includes('html')
+    ? text
+        .replace(/<(?:script|style)\b[^>]*>[\s\S]*?<\/(?:script|style)>/giu, ' ')
+        .replace(/<[^>]+>/gu, ' ')
+        .replace(/\s+/gu, ' ')
+        .trim()
+    : text.replace(/\s+/gu, ' ').trim();
+
+  return {
+    safe: indicators.length === 0,
+    indicators,
+    extractedText: extractedText.slice(0, 100_000),
+  };
+}
+
 /** Builds real, network-capable safe-fetch dependencies; override any part for tests. */
 export function createNodeSafeFetchDependencies(
   overrides: Partial<SafeFetchDependencies> = {},
@@ -79,7 +112,7 @@ export function createNodeSafeFetchDependencies(
   return {
     resolveHost: overrides.resolveHost ?? nodeResolveHost,
     transport: overrides.transport ?? nodePinnedTransport,
-    ...(overrides.parser ? { parser: overrides.parser } : {}),
+    parser: overrides.parser ?? parseTextOnlyHtml,
     ...(overrides.now ? { now: overrides.now } : {}),
   };
 }

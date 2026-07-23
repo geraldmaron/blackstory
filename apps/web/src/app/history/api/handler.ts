@@ -7,7 +7,6 @@
 import { NextResponse } from 'next/server';
 import { evaluateSearchQueryGuardrails, type SearchQueryInput } from '@repo/security';
 import { getHistoryGraphReleaseArtifact } from '../../../data/history-graph-seed';
-import { SEED_ENTITY_RELATIONSHIPS } from '../../../data/entity-graph-seed';
 import {
   buildHistoryEdges,
   buildHistoryGraphContext,
@@ -97,6 +96,7 @@ export function parseHistoryFilterState(
     q: (params.get('q') ?? '').trim(),
     sort: parseHistorySort(params.get('sort') ?? undefined),
     status: cleanSelectParam(params.get('status')),
+    era: cleanSelectParam(params.get('era')),
     topic: cleanSelectParam(params.get('topic')),
     connections: parseHistoryConnectionsFilter(params.get('connections') ?? undefined),
   };
@@ -153,7 +153,7 @@ export async function handleHistoryRefineRequest(
     const visibleNodeIds = new Set(nodes.map((node) => node.entityId));
     const edges = buildHistoryEdges(
       slice,
-      SEED_ENTITY_RELATIONSHIPS,
+      context.relationships,
       context.entitiesById,
       visibleNodeIds,
     );

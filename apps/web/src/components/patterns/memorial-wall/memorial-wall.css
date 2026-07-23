@@ -1,0 +1,68 @@
+/**
+ * Memorial wall atmosphere: full-canvas handwritten names, flat matte, no photos.
+ * Decorative layer only. Pair with memorial edition Surface stack above.
+ */
+
+.ds-memorial-wall {
+  position: absolute;
+  inset: 0 0 auto 0;
+  width: 100%;
+  min-height: 100%;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background-color: var(--ds-canvas);
+}
+
+.ds-memorial-wall__measurer {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  visibility: hidden;
+  white-space: nowrap;
+  line-height: 1.1;
+  pointer-events: none;
+}
+
+.ds-memorial-wall__name {
+  position: absolute;
+  font-family: var(--memorial-font, var(--ds-font-hand-caveat), cursive);
+  font-size: var(--memorial-size, 1.15rem);
+  line-height: 1.1;
+  color: color-mix(in srgb, var(--ds-ink-muted) 86%, var(--ds-ink));
+  white-space: nowrap;
+  transform: translate(-50%, -50%) rotate(var(--memorial-rot, 0deg));
+  opacity: 0;
+  animation: ds-memorial-name-cycle var(--memorial-cycle, 20s) ease-in-out infinite;
+  animation-delay: var(--memorial-delay, 0s);
+}
+
+[data-theme='dark'] .ds-memorial-wall__name {
+  color: color-mix(in srgb, var(--ds-ink-muted) 90%, var(--ds-ink));
+}
+
+@keyframes ds-memorial-name-cycle {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  6% {
+    opacity: 0;
+  }
+  14% {
+    opacity: var(--memorial-peak, 0.48);
+  }
+  28% {
+    opacity: var(--memorial-peak, 0.48);
+  }
+  38% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-memorial-wall__name {
+    animation: none;
+    opacity: 0.28;
+  }
+}

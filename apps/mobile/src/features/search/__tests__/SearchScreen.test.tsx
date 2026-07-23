@@ -8,7 +8,7 @@
  * happens outside a React-tracked event, so the assertion must poll/re-check, not assume a single
  * flush already landed.
  */
-import { render, waitFor } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import { TransportError } from '@/data';
 import { SearchScreen } from '../SearchScreen';
 import { buildRuntime, fakeReleaseCache, flushMicrotasks, makeControllableTransport, page } from '../test-support';
@@ -16,6 +16,22 @@ import { buildRuntime, fakeReleaseCache, flushMicrotasks, makeControllableTransp
 jest.mock('expo-router', () => ({
   router: { push: jest.fn(), setParams: jest.fn() },
 }));
+
+// SearchScreen now measures its bottom inset from the live tab bar via `useScreenScrollInsets()`
+// → `useSafeAreaInsets()`, which throws without a provider. Supply a minimal safe-area context
+// (zero insets) so the screen renders under test exactly as it would inside `<SafeAreaProvider>`.
+jest.mock('react-native-safe-area-context', () => {
+  /* eslint-disable @typescript-eslint/no-require-imports */
+  const React = require('react');
+  const { View } = require('react-native');
+  return {
+    SafeAreaView: ({ children, style }: { children?: unknown; style?: unknown }) =>
+      React.createElement(View, { style }, children as never),
+    SafeAreaProvider: ({ children }: { children?: unknown }) => children,
+    SafeAreaInsetsContext: React.createContext(null),
+    useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+  };
+});
 
 // eslint-disable-next-line import/first
 import { router } from 'expo-router';
@@ -61,7 +77,7 @@ describe('SearchScreen — deep-link round trip (MOB-013 item 7)', () => {
     await flushMicrotasks(10);
 
     expect(calls).toHaveLength(0);
-    expect(getByText('Browse by category')).toBeTruthy();
+    expect(getByText('By category')).toBeTruthy();
   });
 });
 
@@ -74,7 +90,8 @@ describe('SearchScreen — browse mode never enumerates (T3)', () => {
     const { getByText } = await render(<SearchScreen runtime={runtime} />);
     await flushMicrotasks(10);
 
-    expect(getByText('Search BlackStory')).toBeTruthy();
+    expect(getByText('Start searching')).toBeTruthy();
+    expect(getByText('Organizations')).toBeTruthy();
     expect(calls).toEqual([]);
   });
 });
@@ -90,6 +107,24 @@ describe('SearchScreen — result rendering', () => {
     resolveNext(page());
 
     await waitFor(() => expect(getByText('Harriet Tubman')).toBeTruthy());
+  });
+
+  it('wires Show on map to Explore with selected id and kind', async () => {
+    const { transport, resolveNext } = makeControllableTransport({ cooperative: true });
+    const releaseCache = fakeReleaseCache('r1');
+    const { runtime } = buildRuntime(transport, releaseCache);
+
+    const { getByLabelText } = await render(<SearchScreen initialQuery="tubman" runtime={runtime} />);
+    await flushMicrotasks(10);
+    resolveNext(page());
+
+    await waitFor(() => expect(getByLabelText('Show Harriet Tubman on map')).toBeTruthy());
+    fireEvent.press(getByLabelText('Show Harriet Tubman on map'));
+
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/explore',
+      params: { selected: 'ent_1', kind: 'person' },
+    });
   });
 });
 

@@ -1,14 +1,18 @@
 /**
- * Kind + semantic-tone encoding for the explore map. Every kind pairs a shade
- * with a glyph so color is never the only signal (WCAG 1.4.1). Semantic tones
- * (massacre / plantation / epicenter) are derived from topic tags and override
- * kind shade at paint time while keeping the kind glyph — tones are shade-only,
- * never a second shape channel.
+ * Kind + kind-family + semantic-tone encoding for the explore map.
  *
- * Glyph identities (`circle` / `square` / `diamond` / `ring`) are the encoding
- * vocabulary. MapLibre circle layers cannot draw true squares/diamonds; the
- * canvas echoes them via rim/fill signatures (thick rim, orbit ring, hollow
- * ring). The legend may show CSS shapes as the named vocabulary mnemonic.
+ * **Map color (primary):** five kind families share one shade each (People, Places,
+ * Organizations, Events, Sources). Micro-kinds still exist in data and badges; paint
+ * uses the family shade so the canvas and Color key stay aligned.
+ *
+ * **Shape (secondary):** each micro-kind keeps a glyph (`circle` / `square` / `diamond`
+ * / `ring`) so color is never the only signal (WCAG 1.4.1). MapLibre circle layers echo
+ * glyphs via rim/fill signatures; the legend shows CSS shapes as the vocabulary mnemonic.
+ *
+ * **Historical tones:** massacre / plantation / epicenter override family shade at paint
+ * time while preserving the micro-kind glyph — tones are shade-only, never a shape channel.
+ *
+ * Binding doc: `docs/ui/patterns-map-entity-encoding.md`.
  */
 import { DIGNITY_PALETTE } from './dignity-style';
 
@@ -43,6 +47,14 @@ export type MapKind =
 
 export type MapSemanticTone = 'massacre' | 'plantation' | 'epicenter';
 
+/** Higher-level map + filter grouping — five families, one shade each on the canvas. */
+export type MapKindFamily = 'people' | 'places' | 'organizations' | 'events' | 'sources';
+
+export type KindFamilyEncodingEntry = KindEncodingEntry & {
+  /** Micro-kinds rolled into this family (for filter + legend prose). */
+  readonly kinds: readonly MapKind[];
+};
+
 export const MAP_KIND_ENCODING: Readonly<Record<MapKind, KindEncodingEntry>> = {
   person: { shade: DIGNITY_PALETTE.kindPerson, glyph: 'circle', label: 'Person' },
   place: { shade: DIGNITY_PALETTE.kindPlace, glyph: 'circle', label: 'Place' },
@@ -72,7 +84,57 @@ export const DEFAULT_KIND_ENCODING: KindEncodingEntry = {
   label: 'Record',
 };
 
+const KIND_TO_FAMILY: Readonly<Record<MapKind, MapKindFamily>> = {
+  person: 'people',
+  place: 'places',
+  school: 'places',
+  organization: 'organizations',
+  institution: 'organizations',
+  movement: 'organizations',
+  event: 'events',
+  case: 'events',
+  law: 'sources',
+  publication: 'sources',
+  artifact: 'sources',
+  other: 'sources',
+};
+
+export const MAP_KIND_FAMILY_ENCODING: Readonly<Record<MapKindFamily, KindFamilyEncodingEntry>> =
+  {
+    people: {
+      shade: DIGNITY_PALETTE.kindPerson,
+      glyph: 'circle',
+      label: 'People',
+      kinds: ['person'],
+    },
+    places: {
+      shade: DIGNITY_PALETTE.kindPlace,
+      glyph: 'circle',
+      label: 'Places',
+      kinds: ['place', 'school'],
+    },
+    organizations: {
+      shade: DIGNITY_PALETTE.kindOrganization,
+      glyph: 'ring',
+      label: 'Organizations',
+      kinds: ['organization', 'institution', 'movement'],
+    },
+    events: {
+      shade: DIGNITY_PALETTE.kindEvent,
+      glyph: 'diamond',
+      label: 'Events',
+      kinds: ['event', 'case'],
+    },
+    sources: {
+      shade: DIGNITY_PALETTE.kindLaw,
+      glyph: 'square',
+      label: 'Sources',
+      kinds: ['law', 'publication', 'artifact', 'other'],
+    },
+  };
+
 const KNOWN_KINDS = Object.keys(MAP_KIND_ENCODING) as readonly MapKind[];
+const KNOWN_KIND_FAMILIES = Object.keys(MAP_KIND_FAMILY_ENCODING) as readonly MapKindFamily[];
 
 export function isKnownMapKind(kind: string): kind is MapKind {
   return (KNOWN_KINDS as readonly string[]).includes(kind);
@@ -82,6 +144,24 @@ export function kindEncodingFor(kind: string): KindEncodingEntry {
   return isKnownMapKind(kind) ? MAP_KIND_ENCODING[kind] : DEFAULT_KIND_ENCODING;
 }
 
+export function isKnownMapKindFamily(value: string): value is MapKindFamily {
+  return (KNOWN_KIND_FAMILIES as readonly string[]).includes(value);
+}
+
+/** Resolve the five-family bucket used for map shade and the Kind filter facet. */
+export function kindFamilyFor(kind: string): MapKindFamily {
+  if (isKnownMapKind(kind)) return KIND_TO_FAMILY[kind];
+  return 'sources';
+}
+
+export function kindFamilyEncodingFor(family: MapKindFamily): KindFamilyEncodingEntry {
+  return MAP_KIND_FAMILY_ENCODING[family];
+}
+
+export function kindFamilyEncodingForKind(kind: string): KindFamilyEncodingEntry {
+  return kindFamilyEncodingFor(kindFamilyFor(kind));
+}
+
 export function semanticToneEncodingFor(tone: string): SemanticToneEncodingEntry | undefined {
   if (tone === 'massacre' || tone === 'plantation' || tone === 'epicenter') {
     return MAP_SEMANTIC_TONE_ENCODING[tone];
@@ -89,14 +169,19 @@ export function semanticToneEncodingFor(tone: string): SemanticToneEncodingEntry
   return undefined;
 }
 
-/** Resolve display encoding: semantic tone wins over kind when present. */
+/** Resolve display encoding: semantic tone wins over family shade; glyph stays micro-kind. */
 export function displayEncodingFor(kind: string, mapTone?: string): KindEncodingEntry {
+  const kindEntry = kindEncodingFor(kind);
   const semantic = mapTone ? semanticToneEncodingFor(mapTone) : undefined;
   if (semantic) {
-    // Tone wins on shade + label; glyph always stays with the record's kind.
-    return { shade: semantic.shade, glyph: kindEncodingFor(kind).glyph, label: semantic.label };
+    return { shade: semantic.shade, glyph: kindEntry.glyph, label: semantic.label };
   }
-  return kindEncodingFor(kind);
+  const family = kindFamilyEncodingForKind(kind);
+  return {
+    shade: family.shade,
+    glyph: kindEntry.glyph,
+    label: kindEntry.label,
+  };
 }
 
 /**
@@ -171,6 +256,10 @@ export function resolveMapTone(source: MapToneSource): MapSemanticTone | undefin
 export const KIND_ENCODING_ENTRIES: ReadonlyArray<
   readonly [kind: MapKind, entry: KindEncodingEntry]
 > = KNOWN_KINDS.map((kind) => [kind, MAP_KIND_ENCODING[kind]] as const);
+
+export const KIND_FAMILY_ENTRIES: ReadonlyArray<
+  readonly [family: MapKindFamily, entry: KindFamilyEncodingEntry]
+> = KNOWN_KIND_FAMILIES.map((family) => [family, MAP_KIND_FAMILY_ENCODING[family]] as const);
 
 export const SEMANTIC_TONE_ENTRIES: ReadonlyArray<
   readonly [tone: MapSemanticTone, entry: SemanticToneEncodingEntry]

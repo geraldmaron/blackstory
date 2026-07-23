@@ -113,7 +113,7 @@ export function HateCrimeCompositionChart({ summary }: HateCrimeCompositionChart
             className="ds-data-chart__legend-swatch"
             style={{ background: 'var(--ds-accent-graphic)' }}
           />
-          Anti-Black or African American bias — {formatChartCount(summary.antiBlackIncidents)} (
+          Anti-Black or African American bias: {formatChartCount(summary.antiBlackIncidents)} (
           {pct(summary.antiBlackIncidents, total)})
         </li>
         <li className="ds-data-chart__legend-item">
@@ -121,12 +121,12 @@ export function HateCrimeCompositionChart({ summary }: HateCrimeCompositionChart
             className="ds-data-chart__legend-swatch"
             style={{ background: 'var(--ds-accent-muted)' }}
           />
-          Other reported bias categories — {formatChartCount(otherIncidents)} (
+          Other reported bias categories: {formatChartCount(otherIncidents)} (
           {pct(otherIncidents, total)})
         </li>
         {summary.nationalParticipatingAgenciesPct !== undefined ? (
           <li className="ds-data-chart__legend-item">
-            Agencies participating nationally — {summary.nationalParticipatingAgenciesPct}%
+            Agencies participating nationally: {summary.nationalParticipatingAgenciesPct}%
           </li>
         ) : null}
       </ul>

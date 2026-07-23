@@ -9,13 +9,8 @@
       "developmentClient": true,
       "channel": "development",
       "env": {
-        "APP_VARIANT": "development"
-      },
-      "ios": {
-        "resourceClass": "m-medium"
-      },
-      "android": {
-        "resourceClass": "medium"
+        "APP_VARIANT": "development",
+        "EAS_PROJECT_ID": "51a35884-e6b5-43b6-b95b-c5a7460fa665"
       }
     },
     "preview": {
@@ -24,13 +19,8 @@
       "autoIncrement": true,
       "env": {
         "APP_VARIANT": "preview",
-        "API_BASE_URL": "https://api.blackbook.app"
-      },
-      "ios": {
-        "resourceClass": "m-medium"
-      },
-      "android": {
-        "resourceClass": "medium"
+        "API_BASE_URL": "https://api.blackbook.app",
+        "EAS_PROJECT_ID": "51a35884-e6b5-43b6-b95b-c5a7460fa665"
       }
     },
     "production": {
@@ -39,17 +29,16 @@
       "autoIncrement": true,
       "env": {
         "APP_VARIANT": "production",
-        "API_BASE_URL": "https://api.blackbook.app"
-      },
-      "ios": {
-        "resourceClass": "m-medium"
-      },
-      "android": {
-        "resourceClass": "medium"
+        "API_BASE_URL": "https://api.blackbook.app",
+        "EAS_PROJECT_ID": "51a35884-e6b5-43b6-b95b-c5a7460fa665"
       }
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "appleTeamId": "4Q2XU7D33G"
+      }
+    }
   }
 }

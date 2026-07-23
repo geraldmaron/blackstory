@@ -7,7 +7,7 @@
  * (`fixtures.ts`), which is exactly what a release build persists and what
  * `apps/api-public` serves to the client. apps/mobile has no pnpm-workspace
  * symlink to `packages/*` (it manages its own npm lockfile — see
- * src/app/_lib/route-params.ts), so the redacted values are transcribed here
+ * src/lib/route-params.ts), so the redacted values are transcribed here
  * rather than imported, with the raw pre-redaction coordinates recorded only as
  * NEGATIVE CONTROLS below so the redaction regression test can prove they never
  * reach the rendered layer.
@@ -25,6 +25,21 @@ export type MapPointFeatureProperties = {
   readonly stateFips?: string;
   readonly statePostalCode?: string;
   readonly stateName?: string;
+  /** Present on live MapSourceV1 features; optional on demo fixtures. */
+  readonly eraBuckets?: readonly string[];
+  /** Present on live MapSourceV1 features; optional on demo fixtures. */
+  readonly oneLineStory?: string;
+  /** v6 map encoding — denormalized on live MapSourceV1; enriched for demo fixtures. */
+  readonly shade?: string;
+  readonly glyph?: string;
+  readonly kindFamily?: string;
+  readonly mapTone?: string;
+  readonly evidenceCount?: number;
+  readonly confidenceTier?: string;
+  readonly topicTags?: readonly string[];
+  readonly topicIds?: readonly string[];
+  /** Derived lifecycle status on live MapSourceV1 features. */
+  readonly status?: string;
 };
 
 export type MapPointFeature = {

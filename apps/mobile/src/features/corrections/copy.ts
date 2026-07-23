@@ -24,7 +24,7 @@ export const CORRECTION_FORM_INTRO =
   'Challenge a published record, suggest missing evidence, or report a precision issue. Nothing you submit here changes the public record until it passes independent review.';
 
 export const CONTACT_CONSENT_LABEL =
-  'A moderator may contact me about this correction using the details above. (Optional — leave the contact field blank to stay anonymous.)';
+  'A moderator may contact me about this correction using the details above. (Optional. Leave the contact field blank to stay anonymous.)';
 
 export const PRIVACY_CONSENT_LABEL =
   'I have read the privacy notice and understand corrections are reviewed, not auto-published.';
@@ -36,7 +36,7 @@ export const PUBLIC_STATUS_LABELS: Readonly<Record<PublicCorrectionPhase, string
 };
 
 export const RECEIPT_SAVE_INSTRUCTIONS =
-  'Save this code somewhere safe. It is the only way to check the status of your correction later — we cannot look it up for you and we never show it again.';
+  'Save this code somewhere safe. It is the only way to check the status of your correction later. We cannot look it up for you and we never show it again.';
 
 /** Shown for 429 on submit OR status lookup. Reveals nothing about moderation
  * state or whether a receipt exists — just "wait and retry". */
@@ -46,7 +46,7 @@ export const RATE_LIMITED_MESSAGE =
 /** Client is offline. Corrections do NOT queue-and-retry silently
  * (ADR-022 §3 / threat-model corrections resolution; requirement #6/#7). */
 export const OFFLINE_MESSAGE =
-  'You’re offline. Corrections need a connection to submit — try again once you’re back online.';
+  'You’re offline. Corrections need a connection to submit. Try again once you’re back online.';
 
 export const GENERIC_SUBMIT_ERROR =
   'Something went wrong submitting your correction. Please try again.';

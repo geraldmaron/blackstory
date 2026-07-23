@@ -18,6 +18,7 @@ import {
   createSqlitePersister,
   createSupersedingRunner,
   createTransport,
+  type SyncResult,
   type BootstrapSynchronizer,
   type CacheStore,
   type Connectivity,
@@ -36,6 +37,8 @@ export interface AppRuntime {
   readonly connectivity: Connectivity;
   /** Shared superseding runner for cancel-on-new-request search/fetch paths. */
   readonly run: <T>(fn: (signal: AbortSignal) => Promise<T>) => Promise<T>;
+  /** Last bootstrap sync outcome — drives dev connectivity banner and offline UX. */
+  readonly lastBootstrapSync: SyncResult | null;
 }
 
 let memoized: Promise<AppRuntime> | null = null;
@@ -62,6 +65,7 @@ async function buildAppRuntime(): Promise<AppRuntime> {
     bootstrapSync,
     connectivity,
     run,
+    lastBootstrapSync: null,
   };
 }
 

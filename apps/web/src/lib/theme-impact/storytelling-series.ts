@@ -1,6 +1,6 @@
 /**
  * Builds multi-metric series groups from theme-impact packet observations for
- * era storytelling panels (Q3 redlining, Q6 drug policy).
+ * era storytelling panels (Q3 redlining, Q6 drug policy, Q11 school segregation).
  */
 import type { ThemeImpactObservationView } from '@repo/domain';
 
@@ -50,7 +50,7 @@ export function groupThemeImpactMetricSeries(
 }
 
 /** Question ids that receive the era timeline + multi-metric storytelling panel. */
-export const THEME_IMPACT_STORYTELLING_QUESTION_IDS = new Set(['Q3', 'Q6']);
+export const THEME_IMPACT_STORYTELLING_QUESTION_IDS = new Set(['Q3', 'Q6', 'Q11']);
 
 export function shouldShowThemeImpactStorytelling(questionId: string): boolean {
   return THEME_IMPACT_STORYTELLING_QUESTION_IDS.has(questionId);

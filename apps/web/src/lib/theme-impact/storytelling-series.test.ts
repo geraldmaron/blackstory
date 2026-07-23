@@ -60,8 +60,9 @@ test('groupThemeImpactMetricSeries marks multi-period metrics as time series', (
   assert.ok(acs && !acs.isTimeSeries);
 });
 
-test('shouldShowThemeImpactStorytelling gates Q3 and Q6', () => {
+test('shouldShowThemeImpactStorytelling gates Q3, Q6, and Q11', () => {
   assert.equal(shouldShowThemeImpactStorytelling('Q3'), true);
   assert.equal(shouldShowThemeImpactStorytelling('Q6'), true);
+  assert.equal(shouldShowThemeImpactStorytelling('Q11'), true);
   assert.equal(shouldShowThemeImpactStorytelling('Q1'), false);
 });

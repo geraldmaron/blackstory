@@ -9,20 +9,25 @@
     "@expo-google-fonts/sora": "^0.4.2",
     "@expo-google-fonts/source-serif-4": "^0.4.1",
     "@expo/ui": "~56.0.22",
+    "@expo/vector-icons": "^15.0.2",
+    "@gorhom/bottom-sheet": "^5.2.14",
     "@maplibre/maplibre-react-native": "^11.3.6",
     "@react-native-community/netinfo": "~12.0.1",
+    "@repo/domain": "file:../../packages/domain",
     "@repo/public-contracts": "file:../../packages/public-contracts",
     "@tanstack/react-query": "^5.101.2",
     "@tanstack/react-query-persist-client": "^5.101.2",
     "expo": "56.0.16",
     "expo-build-properties": "~56.0.23",
+    "expo-clipboard": "~56.0.0",
     "expo-constants": "~56.0.21",
+    "expo-dev-client": "~56.0.23",
     "expo-device": "~56.0.4",
     "expo-font": "~56.0.7",
     "expo-glass-effect": "~56.0.4",
     "expo-image": "~56.0.11",
+    "expo-linear-gradient": "~56.0.4",
     "expo-linking": "~56.0.15",
-    "expo-modules-core": "~56.0.21",
     "expo-router": "~56.2.15",
     "expo-secure-store": "~56.0.4",
     "expo-splash-screen": "~56.0.13",
@@ -57,7 +62,12 @@
     "typescript": "~6.0.3"
   },
   "scripts": {
+    "prestart": "bash ../../scripts/ensure-api-public.sh",
     "start": "expo start",
+    "dev": "../../scripts/dev-mobile.sh",
+    "ensure-api": "../../scripts/ensure-api-public.sh",
+    "ensure-metro": "../../scripts/ensure-metro.sh",
+    "probe-metro": "node ../../scripts/probe-metro.mjs",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
@@ -72,6 +82,7 @@
     "bundle-size": "node --import tsx scripts/report-bundle-size.ts",
     "eas-build:development": "npx eas-cli build --profile development",
     "eas-build:preview": "npx eas-cli build --profile preview",
-    "eas-build:production": "npx eas-cli build --profile production"
+    "eas-build:production": "npx eas-cli build --profile production",
+    "eas-build-post-install": "npm install --prefix ../../packages/public-contracts --omit=dev --no-package-lock --ignore-scripts && npx tsc -p ../../packages/public-contracts/tsconfig.json && npm install --prefix ../../packages/domain --omit=dev --no-package-lock --ignore-scripts && npx tsc -p ../../packages/domain/tsconfig.json"
   }
 }

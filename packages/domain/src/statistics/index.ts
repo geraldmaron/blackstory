@@ -177,3 +177,8 @@ export type {
   ThemeImpactPacketView,
   ThemeImpactProvenanceView,
 } from './theme-impact-view.js';
+export {
+  RESEARCHED_THEME_IMPACT_PACKETS,
+  THEME_RESEARCH_ADJUDICATION,
+  listResearchedThemeImpactPackets,
+} from './researched-theme-impact-packets.js';
