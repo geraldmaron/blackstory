@@ -128,27 +128,20 @@ const PERFORMANCE_SAMPLE_RATE = resolveSampleRate(process.env.PERFORMANCE_SAMPLE
 
 // --- EAS Update / OTA (MOB-019, repo-ovn7; ADR-023 §2/§7, threat-model T6) -----
 //
-// `expo-updates` is installed (this bead's fix for ADR-023's amendment #2 — it
-// was previously entirely absent). It stays STRUCTURALLY INERT until a real EAS
-// project is provisioned (mobile-identity.md human gate #3 — no Expo/EAS
-// organization exists yet): `updates.url` / `extra.eas.projectId` are gated on
-// `EAS_PROJECT_ID`, following the same guarded-slot pattern as the Firebase
-// config above. With no `updates.url`, `expo-updates` reports `Updates.isEnabled
-// === false` and never attempts a network check — safe-by-default, not a
-// silent no-op someone has to notice. Once `eas init`/`eas update:configure`
-// runs for a real project, set `EAS_PROJECT_ID` per build profile in `eas.json`
-// (or CI env) and this slot activates with no code change.
-//
-// `runtimeVersion: { policy: 'appVersion' }` is NOT gated — it is the
-// structural boundary (ADR-023 §2) that rejects an incompatible OTA bundle
-// client-side rather than shipping a crash, and costs nothing to declare ahead
-// of the EAS project existing.
-const EAS_PROJECT_ID = process.env.EAS_PROJECT_ID;
+// `expo-updates` is installed. Project id defaults to the provisioned EAS
+// project `@gerald-maron/blackstory` (DEFAULT_EAS_PROJECT_ID below). Override
+// with env `EAS_PROJECT_ID` only for forks/CI. eas.json also sets it per build
+// profile.
+// EAS project `@gerald-maron/blackstory` (non-secret). Env override still
+// allowed for CI/forks. Defaulting here stops `eas device:*` / local CLI from
+// creating a duplicate project when APP_VARIANT env from eas.json is unset.
+const DEFAULT_EAS_PROJECT_ID = '51a35884-e6b5-43b6-b95b-c5a7460fa665';
+const EAS_PROJECT_ID = (process.env.EAS_PROJECT_ID ?? '').trim() || DEFAULT_EAS_PROJECT_ID;
 
 const config: ExpoConfig = {
   name: appName,
   // EAS project slug — must match the Expo project linked by EAS_PROJECT_ID
-  // (`blackstory` on account geraldmaron, id 51a35884-e6b5-43b6-b95b-c5a7460fa665).
+  // (`blackstory` on account gerald-maron).
   slug: 'blackstory',
   version: '1.0.0',
   orientation: 'portrait',
@@ -168,12 +161,9 @@ const config: ExpoConfig = {
   runtimeVersion: {
     policy: 'appVersion',
   },
-  // Gated on `EAS_PROJECT_ID` — see the comment above `EAS_PROJECT_ID`. Absent
-  // today (no EAS project provisioned), so `expo-updates` has no update server
-  // to poll and stays inert.
-  ...(EAS_PROJECT_ID
-    ? { updates: { url: `https://u.expo.dev/${EAS_PROJECT_ID}` } }
-    : {}),
+  updates: {
+    url: `https://u.expo.dev/${EAS_PROJECT_ID}`,
+  },
   // No `newArchEnabled` toggle: SDK 56 has fully removed the legacy
   // architecture, so New Architecture is the only supported mode and the
   // config field no longer exists (confirmed against
@@ -302,13 +292,10 @@ const config: ExpoConfig = {
     // Defaults to enabled/10% — see src/observability/README.md.
     observabilityEnabled: OBSERVABILITY_ENABLED,
     performanceSampleRate: PERFORMANCE_SAMPLE_RATE,
-    // `eas.projectId` (required by `expo-updates` to resolve its update
-    // server) is gated on `EAS_PROJECT_ID` — see the comment above that
-    // constant. No EAS organization/project is provisioned yet
-    // (mobile-identity.md human gate #3); do not hand-write a fake project id
-    // here. `eas init` / `eas update:configure` populate the real value once
-    // that gate clears.
-    ...(EAS_PROJECT_ID ? { eas: { projectId: EAS_PROJECT_ID } } : {}),
+    // `eas.projectId` — defaults to `@gerald-maron/blackstory` (see
+    // DEFAULT_EAS_PROJECT_ID). Required so local `eas device:*` / CLI do not
+    // create a duplicate Expo project under another account slug.
+    eas: { projectId: EAS_PROJECT_ID },
   },
 };
 

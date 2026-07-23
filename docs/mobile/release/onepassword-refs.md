@@ -33,9 +33,26 @@ op run --env-file apps/mobile/.env.op -- printenv APPLE_TEAM_ID EAS_PROJECT_ID
 
 Do **not** paste into chat. Open the inventory item for full steps:
 
-1. **BlackStory — App Store Connect API (EAS)** — Issuer ID, Key ID, `.p8` document  
+1. **BlackStory — App Store Connect API (EAS)** — `327akqjbtowf6wetajuxz5mjya`
+   - Key ID: `CQU9B28PK4`
+   - Issuer ID: `27834fd4-29f7-4b3f-b084-46c0e92c25f0`
+   - Team ID: `4Q2XU7D33G`
+   - `.p8` document: **BlackStory — ASC AuthKey_CQU9B28PK4.p8** (`4mgyv4y2sp7rhebtdhv4sshaqa`) — restore verified 2026-07-22
+   - iOS internal/ad-hoc builds need ≥1 device via `eas device:create`, then:
+     ```bash
+     cd apps/mobile
+     KEY=$(mktemp /tmp/AuthKey.XXXXXX.p8)
+     op document get 4mgyv4y2sp7rhebtdhv4sshaqa --vault geralddagher-development --force --output "$KEY"
+     EXPO_ASC_API_KEY_PATH="$KEY" \
+     EXPO_ASC_KEY_ID=CQU9B28PK4 \
+     EXPO_ASC_ISSUER_ID=27834fd4-29f7-4b3f-b084-46c0e92c25f0 \
+     EXPO_APPLE_TEAM_ID=4Q2XU7D33G \
+     EXPO_APPLE_TEAM_TYPE=INDIVIDUAL \
+     npx eas build --platform ios --profile preview --no-wait
+     rm -f "$KEY"
+     ```
 2. **BlackStory — EAS token** — expo.dev access token  
-3. Firebase plist/json **documents** (titles listed in the Firebase pointers item)
+3. Firebase plist/json **documents** (titles listed in the Firebase pointers item) — N/A for v1 attestation client
 
 ## Owner: fill PENDING now
 
