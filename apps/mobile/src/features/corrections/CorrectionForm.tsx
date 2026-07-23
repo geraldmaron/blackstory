@@ -3,20 +3,25 @@
  * a required HTTPS evidence URL, optional contact with an AFFIRMATIVE (never
  * pre-checked) contact-consent step, and the required privacy-notice consent.
  *
+ * The form root is a plain `View` — the surrounding `UtilityScreenShell` owns the
+ * single scroll container, so there is no nested scroller inside the shell's own
+ * clipped, already-scrolling Surface (MOB-017).
+ *
  * All field state is in-memory only for the lifetime of the modal — it is
  * deliberately NOT persisted across app restarts (MOB-016 #6: no encrypted
  * draft feature; the simplest safe choice is no on-disk draft, so correction
  * content never touches the general cache). Nothing here is passed through the
  * router / a URL param (invariant 7).
  */
-import { useState } from 'react';
-import { Pressable, ScrollView, TextInput, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { AccessibilityInfo, Pressable, TextInput, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
-import { Button, Notice, Text, radius, space, useThemeColors } from '@/ui';
+import { Button, Notice, Text, radius, space, useStatusColors, useThemeColors } from '@/ui';
+import { CorrectionTextField } from './CorrectionTextField';
 import type { SubmitResult } from './client';
 import {
   CONTACT_CONSENT_LABEL,
-  CORRECTION_FORM_INTRO,
   CORRECTION_PRIVACY_NOTICE,
   PRIVACY_CONSENT_LABEL,
   GENERIC_SUBMIT_ERROR,
@@ -46,6 +51,9 @@ import {
  * floor directly rather than silently falling short of it (MOB-017). */
 const MIN_TOUCH_TARGET = 44;
 
+/** Glyph size (dp) for the checkbox tick — sized off the token scale, not font fallback. */
+const CHECKBOX_GLYPH = 22;
+
 export type CorrectionFormProps = {
   /** Optional record context — pre-fills the target id (validated upstream). */
   readonly entityId?: string | undefined;
@@ -59,8 +67,12 @@ function issueFor(issues: readonly CorrectionFieldIssue[], field: string): strin
   return issues.find((issue) => issue.field === field)?.message;
 }
 
+function announceFirstIssue(issues: readonly CorrectionFieldIssue[]) {
+  const first = issues[0];
+  if (first) AccessibilityInfo.announceForAccessibility(first.message);
+}
+
 export function CorrectionForm({ entityId, onSubmit, onAccepted }: CorrectionFormProps) {
-  const theme = useThemeColors();
   const [state, setState] = useState<CorrectionFormState>({
     ...EMPTY_CORRECTION_FORM,
     targetRecordId: entityId ?? '',
@@ -70,8 +82,16 @@ export function CorrectionForm({ entityId, onSubmit, onAccepted }: CorrectionFor
   const [banner, setBanner] = useState<{ tone: 'error' | 'warning'; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
 
+  // Focus chain: record id → URL → contact.
+  const urlRef = useRef<TextInput>(null);
+  const contactRef = useRef<TextInput>(null);
+
   function patch(next: Partial<CorrectionFormState>) {
     setState((prev) => ({ ...prev, ...next }));
+    // Clear any validation error on a field the user is actively correcting, so a
+    // fixed field stops reading as invalid instead of staying red until re-submit.
+    const patched = Object.keys(next);
+    setIssues((prev) => prev.filter((issue) => !patched.includes(issue.field)));
   }
 
   async function handleSubmit() {
@@ -79,6 +99,7 @@ export function CorrectionForm({ entityId, onSubmit, onAccepted }: CorrectionFor
     const local = validateCorrectionForm(state);
     if (!local.valid) {
       setIssues(local.issues);
+      announceFirstIssue(local.issues);
       return;
     }
     setIssues([]);
@@ -91,6 +112,7 @@ export function CorrectionForm({ entityId, onSubmit, onAccepted }: CorrectionFor
           return;
         case 'invalid':
           setIssues(result.issues);
+          announceFirstIssue(result.issues);
           return;
         case 'offline':
           setBanner({ tone: 'warning', text: OFFLINE_MESSAGE });
@@ -106,26 +128,8 @@ export function CorrectionForm({ entityId, onSubmit, onAccepted }: CorrectionFor
     }
   }
 
-  const inputStyle = {
-    borderWidth: 1,
-    borderColor: theme.border,
-    borderRadius: radius.sm,
-    padding: space['3'],
-    color: theme.ink,
-  } as const;
-
   return (
-    <ScrollView contentContainerStyle={{ padding: space['4'], gap: space['4'] }} keyboardShouldPersistTaps="handled">
-      <Text variant="code" colorRole="accent" style={{ letterSpacing: 1 }}>
-        CORRECTIONS
-      </Text>
-      <Text variant="title" isHeading>
-        Submit a correction
-      </Text>
-      <Text variant="bodySmall" colorRole="inkMuted">
-        {CORRECTION_FORM_INTRO}
-      </Text>
-
+    <View style={{ gap: space['3'] }}>
       <Notice tone="info" title={CORRECTION_PRIVACY_NOTICE.title} description={CORRECTION_PRIVACY_NOTICE.body} />
 
       <Field label="What are you correcting?" error={issueFor(issues, 'targetType')}>
@@ -147,59 +151,69 @@ export function CorrectionForm({ entityId, onSubmit, onAccepted }: CorrectionFor
       </Field>
 
       <Field label="Record identifier" error={issueFor(issues, 'targetRecordId')}>
-        <TextInput
+        <CorrectionTextField
           value={state.targetRecordId}
           onChangeText={(t) => patch({ targetRecordId: t })}
           placeholder="e.g. ent_caam_los_angeles_001"
-          placeholderTextColor={theme.inkMuted}
           autoCapitalize="none"
           autoCorrect={false}
+          autoComplete="off"
           maxLength={MAX_TARGET_ID_LENGTH}
+          returnKeyType="next"
+          onSubmitEditing={() => urlRef.current?.focus()}
           accessibilityLabel="Record identifier"
-          style={inputStyle}
+          invalid={Boolean(issueFor(issues, 'targetRecordId'))}
         />
       </Field>
 
       <Field label="Describe the correction" error={issueFor(issues, 'statement')}>
-        <TextInput
+        <CorrectionTextField
           value={state.statement}
           onChangeText={(t) => patch({ statement: t })}
           placeholder="What is wrong, and what should it say?"
-          placeholderTextColor={theme.inkMuted}
           multiline
           numberOfLines={6}
           maxLength={MAX_FIELD_LENGTH}
           accessibilityLabel="Correction details"
-          style={[inputStyle, { minHeight: 140, textAlignVertical: 'top' }]}
+          invalid={Boolean(issueFor(issues, 'statement'))}
+          style={{ minHeight: 140 }}
         />
       </Field>
 
       <Field label="Supporting HTTPS source URL" error={issueFor(issues, 'sourceUrl')}>
-        <TextInput
+        <CorrectionTextField
+          ref={urlRef}
           value={state.sourceUrl}
           onChangeText={(t) => patch({ sourceUrl: t })}
           placeholder="https://…"
-          placeholderTextColor={theme.inkMuted}
           autoCapitalize="none"
           autoCorrect={false}
           keyboardType="url"
+          textContentType="URL"
+          autoComplete="url"
           maxLength={MAX_SOURCE_URL_LENGTH}
+          returnKeyType="next"
+          onSubmitEditing={() => contactRef.current?.focus()}
           accessibilityLabel="Supporting HTTPS source URL"
-          style={inputStyle}
+          invalid={Boolean(issueFor(issues, 'sourceUrl'))}
         />
       </Field>
 
       <Field label="Contact (optional)" error={issueFor(issues, 'contact')}>
-        <TextInput
+        <CorrectionTextField
+          ref={contactRef}
           value={state.contact}
           onChangeText={(t) => patch({ contact: t })}
           placeholder="Email or handle, only if you want a reply"
-          placeholderTextColor={theme.inkMuted}
           autoCapitalize="none"
           autoCorrect={false}
+          keyboardType="email-address"
+          textContentType="emailAddress"
+          autoComplete="email"
           maxLength={MAX_CONTACT_LENGTH}
+          returnKeyType="done"
           accessibilityLabel="Contact details (optional)"
-          style={inputStyle}
+          invalid={Boolean(issueFor(issues, 'contact'))}
         />
       </Field>
 
@@ -220,7 +234,7 @@ export function CorrectionForm({ entityId, onSubmit, onAccepted }: CorrectionFor
       {banner ? <Notice tone={banner.tone} title="Not submitted" description={banner.text} /> : null}
 
       <Button label="Submit correction" variant="primary" loading={busy} onPress={handleSubmit} />
-    </ScrollView>
+    </View>
   );
 }
 
@@ -233,12 +247,17 @@ function Field({
   readonly error?: string | undefined;
   readonly children: React.ReactNode;
 }) {
+  const status = useStatusColors();
   return (
     <View style={{ gap: space['1'] }}>
       <Text variant="bodyEmphasis">{label}</Text>
       {children}
       {error ? (
-        <Text variant="bodySmall" colorRole="accent" accessibilityLiveRegion="polite">
+        <Text
+          variant="bodySmall"
+          style={{ color: status.error.fg }}
+          accessibilityLiveRegion="polite"
+        >
           {error}
         </Text>
       ) : null}
@@ -301,6 +320,7 @@ function Checkbox({
   readonly error?: string | undefined;
 }) {
   const theme = useThemeColors();
+  const status = useStatusColors();
   return (
     <View style={{ gap: space['1'] }}>
       <Pressable
@@ -317,8 +337,8 @@ function Checkbox({
       >
         <View
           style={{
-            width: 22,
-            height: 22,
+            width: CHECKBOX_GLYPH,
+            height: CHECKBOX_GLYPH,
             borderRadius: radius.sm,
             borderWidth: 1,
             borderColor: checked ? theme.accent : theme.border,
@@ -328,9 +348,12 @@ function Checkbox({
           }}
         >
           {checked ? (
-            <Text variant="bodySmall" style={{ color: theme.inverseInk }}>
-              ✓
-            </Text>
+            <Ionicons
+              name="checkmark"
+              size={CHECKBOX_GLYPH - space['2']}
+              color={theme.inverseInk}
+              accessibilityElementsHidden
+            />
           ) : null}
         </View>
         <Text variant="bodySmall" style={{ flex: 1 }}>
@@ -338,7 +361,11 @@ function Checkbox({
         </Text>
       </Pressable>
       {error ? (
-        <Text variant="bodySmall" colorRole="accent" accessibilityLiveRegion="polite">
+        <Text
+          variant="bodySmall"
+          style={{ color: status.error.fg }}
+          accessibilityLiveRegion="polite"
+        >
           {error}
         </Text>
       ) : null}

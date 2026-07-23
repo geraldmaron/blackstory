@@ -108,9 +108,11 @@ export function AnatomySection({ entity, onBackToMap }: AnatomySectionProps) {
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel={`Where: ${fact.value}. Open in Maps at public precision.`}
+                hitSlop={8}
                 onPress={() => {
                   void handleOpenInMaps();
                 }}
+                style={({ pressed }) => [styles.whereValue, pressed ? styles.wherePressed : null]}
               >
                 <Text variant="editorial" colorRole="accent" numberOfLines={3}>
                   {fact.value}
@@ -179,6 +181,13 @@ const styles = StyleSheet.create({
   labelText: {
     letterSpacing: 0.6,
     textTransform: 'uppercase',
+  },
+  whereValue: {
+    minHeight: 44,
+    justifyContent: 'center',
+  },
+  wherePressed: {
+    opacity: 0.6,
   },
   actions: {
     flexDirection: 'row',

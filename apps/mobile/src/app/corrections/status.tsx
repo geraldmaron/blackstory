@@ -12,6 +12,7 @@
  * the lookup. It is pre-filled (best effort) from SecureStore, not from a URL.
  */
 import { useEffect, useMemo, useState } from 'react';
+import { KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 
 import {
   CorrectionStatusView,
@@ -49,12 +50,25 @@ export default function CorrectionsStatusScreen() {
   }
 
   return (
-    <UtilityScreenShell
-      kicker="Trust"
-      title="Correction status"
-      dek="Enter the receipt code you saved when you submitted a correction."
+    <KeyboardAvoidingView
+      style={styles.flex}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <CorrectionStatusView initialCode={initialCode} onLookup={handleLookup} />
-    </UtilityScreenShell>
+      <UtilityScreenShell
+        kicker="Trust"
+        title="Correction status"
+        dek="Enter the receipt code you saved when you submitted a correction."
+        edges={SHELL_EDGES}
+      >
+        <CorrectionStatusView initialCode={initialCode} onLookup={handleLookup} />
+      </UtilityScreenShell>
+    </KeyboardAvoidingView>
   );
 }
+
+/** Header-bearing stack screen: the native header owns the top inset. */
+const SHELL_EDGES = ['left', 'right', 'bottom'] as const;
+
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+});

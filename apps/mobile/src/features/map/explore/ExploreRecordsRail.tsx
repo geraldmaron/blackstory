@@ -6,10 +6,10 @@
  * owner: half/full browse avoids nested-scroll clipping and gesture fights with
  * the gorhom sheet. Header rides as ListHeaderComponent.
  */
-import { useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { Pressable, StyleSheet, View, type ListRenderItemInfo } from 'react-native';
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
-import { EmptyState, RecordFactStrip, Text, space, useThemeColors } from '@/ui';
+import { EmptyState, RecordFactStrip, Text, space, useThemeColors, MIN_TOUCH_TARGET } from '@/ui';
 import { exploreContentInset } from './explore-chrome';
 import type { ExploreFeature } from '@/features/explore/explore-feature';
 import type { FilterState } from '@/lib/route-params';
@@ -30,14 +30,14 @@ export type ExploreRecordsRailProps = {
   readonly testID?: string;
 };
 
-function RecordRow({
+const RecordRow = memo(function RecordRow({
   feature,
   selected,
-  onPress,
+  onSelect,
 }: {
   readonly feature: ExploreFeature;
   readonly selected: boolean;
-  readonly onPress: () => void;
+  readonly onSelect: (feature: ExploreFeature) => void;
 }) {
   const theme = useThemeColors();
   const facts = exploreRecordFacts(feature);
@@ -49,7 +49,7 @@ function RecordRow({
       accessibilityLabel={`${feature.label}. ${facts.map((f) => `${f.label}: ${f.value}`).join('. ')}${
         selected ? '. Selected' : ''
       }`}
-      onPress={onPress}
+      onPress={() => onSelect(feature)}
       style={({ pressed }) => [
         styles.row,
         {
@@ -59,13 +59,13 @@ function RecordRow({
         },
       ]}
     >
-      <Text variant="bodyEmphasis" numberOfLines={2} style={styles.rowTitle}>
+      <Text variant="bodyEmphasis" numberOfLines={1} style={styles.rowTitle}>
         {feature.label}
       </Text>
       <RecordFactStrip facts={facts} />
     </Pressable>
   );
-}
+});
 
 export function ExploreRecordsRail({
   features,
@@ -92,7 +92,7 @@ export function ExploreRecordsRail({
       <RecordRow
         feature={item}
         selected={item.entityId === selectedId}
-        onPress={() => onSelect(item)}
+        onSelect={onSelect}
       />
     ),
     [onSelect, selectedId],
@@ -106,15 +106,17 @@ export function ExploreRecordsRail({
         accessibilityRole="header"
         accessibilityLabel={headerCount.accessibilityLabel}
       >
+        {/*
+          The record count lives in the always-visible floating mast; repeating
+          it here at peek was redundant. The header now carries just the scope
+          label visually, while the a11y label keeps the count for screen readers.
+        */}
         <Text variant="code" colorRole="inkMuted">
           {scopeLabel}
         </Text>
-        <Text variant="code" colorRole="accent" numberOfLines={1} style={styles.headerCount}>
-          {headerCount.railInline}
-        </Text>
       </View>
     ),
-    [headerCount.accessibilityLabel, headerCount.railInline, scopeLabel, theme.border],
+    [headerCount.accessibilityLabel, scopeLabel, theme.border],
   );
 
   const listEmpty = useMemo(
@@ -141,7 +143,6 @@ export function ExploreRecordsRail({
       keyboardShouldPersistTaps="handled"
       initialNumToRender={12}
       windowSize={7}
-      removeClippedSubviews
     />
   );
 }
@@ -158,11 +159,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: exploreContentInset,
     paddingVertical: space['2'],
     borderBottomWidth: StyleSheet.hairlineWidth,
-    minHeight: 44,
-  },
-  headerCount: {
-    flexShrink: 1,
-    textAlign: 'right',
+    minHeight: MIN_TOUCH_TARGET,
   },
   emptyWrap: {
     flexGrow: 1,
@@ -172,9 +169,9 @@ const styles = StyleSheet.create({
     borderLeftWidth: 3,
     borderBottomWidth: StyleSheet.hairlineWidth,
     paddingHorizontal: exploreContentInset,
-    paddingVertical: space['3'],
-    gap: space['2'],
-    minHeight: 44,
+    paddingVertical: space['2'],
+    gap: space['1'],
+    minHeight: MIN_TOUCH_TARGET,
   },
   rowTitle: {
     flexShrink: 1,

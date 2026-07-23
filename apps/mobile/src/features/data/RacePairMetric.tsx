@@ -1,9 +1,11 @@
 /**
- * Race-pair metric block: two values + optional ratio, sources as links.
- * Accessible text juxtaposition — no color-only encoding.
+ * Race-pair metric block: two values + optional ratio, values rendered as
+ * right-aligned mono in the trailing slot (not the muted summary), sources as
+ * links with a full touch target. Accessible text juxtaposition — no color-only
+ * encoding.
  */
 import { StyleSheet, View } from 'react-native';
-import { LedgerRow, Link, LiftedSurface, Text, space } from '@/ui';
+import { LedgerRow, Link, LiftedSurface, MIN_TOUCH_TARGET, Text, space } from '@/ui';
 import { formatDataValue } from './format';
 import type { DataRacePairSeries } from './types';
 
@@ -12,6 +14,8 @@ export type RacePairMetricProps = {
 };
 
 export function RacePairMetric({ series }: RacePairMetricProps) {
+  const hasRatio = Boolean(series.ratioLabel && series.ratioValue !== undefined);
+
   return (
     <View style={styles.block} accessibilityRole="summary">
       <Text variant="bodyEmphasis" isHeading>
@@ -26,20 +30,32 @@ export function RacePairMetric({ series }: RacePairMetricProps) {
       <LiftedSurface tone="surface" shadow="none">
         <LedgerRow
           title={series.primary.label}
-          summary={formatDataValue(series.primary.value, series.primary.unit)}
+          trailing={
+            <Text variant="code" style={styles.value}>
+              {formatDataValue(series.primary.value, series.primary.unit)}
+            </Text>
+          }
           showDivider
           showChevron={false}
         />
         <LedgerRow
           title={series.comparison.label}
-          summary={formatDataValue(series.comparison.value, series.comparison.unit)}
-          showDivider={Boolean(series.ratioLabel && series.ratioValue !== undefined)}
+          trailing={
+            <Text variant="code" style={styles.value}>
+              {formatDataValue(series.comparison.value, series.comparison.unit)}
+            </Text>
+          }
+          showDivider={hasRatio}
           showChevron={false}
         />
-        {series.ratioLabel && series.ratioValue !== undefined ? (
+        {hasRatio ? (
           <LedgerRow
-            title={series.ratioLabel}
-            summary={String(series.ratioValue)}
+            title={series.ratioLabel as string}
+            trailing={
+              <Text variant="code" style={styles.value}>
+                {String(series.ratioValue)}
+              </Text>
+            }
             showDivider={false}
             showChevron={false}
           />
@@ -47,9 +63,11 @@ export function RacePairMetric({ series }: RacePairMetricProps) {
       </LiftedSurface>
       <View style={styles.sources}>
         {series.sources.map((source) => (
-          <Link key={source.url} href={source.url} textRole="code">
-            {source.label}
-          </Link>
+          <View key={source.url} style={styles.sourceItem}>
+            <Link href={source.url} textRole="code">
+              {source.label}
+            </Link>
+          </View>
         ))}
       </View>
     </View>
@@ -60,7 +78,14 @@ const styles = StyleSheet.create({
   block: {
     gap: space['2'],
   },
+  value: {
+    textAlign: 'right',
+  },
   sources: {
-    gap: space['1'],
+    gap: space['2'],
+  },
+  sourceItem: {
+    minHeight: MIN_TOUCH_TARGET,
+    justifyContent: 'center',
   },
 });

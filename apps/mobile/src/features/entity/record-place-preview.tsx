@@ -3,7 +3,7 @@
  * embedded MapLibre) with honest empty state when geo is absent.
  */
 import { Pressable, StyleSheet, View } from 'react-native';
-import { Text, space, useThemeColors } from '@/ui';
+import { radius, Text, space, useThemeColors } from '@/ui';
 import type { RecordAnatomyPlace } from './entity-anatomy-facts';
 
 export type RecordPlacePreviewProps = {
@@ -32,9 +32,14 @@ export function RecordPlacePreview({ place, onOpenInMaps }: RecordPlacePreviewPr
   }
 
   const label = `Map preview for ${place.label} at public precision`;
-  const frame = (
+  // Background swap on press (surfaceRaised → canvas), matching the row/button primitives, instead
+  // of a bespoke opacity fade.
+  const renderFrame = (pressed: boolean) => (
     <View
-      style={[styles.frame, { borderColor: theme.border, backgroundColor: theme.surfaceRaised }]}
+      style={[
+        styles.frame,
+        { borderColor: theme.border, backgroundColor: pressed ? theme.canvas : theme.surfaceRaised },
+      ]}
       accessibilityRole="image"
       accessibilityLabel={label}
       testID="record-place-preview"
@@ -53,20 +58,19 @@ export function RecordPlacePreview({ place, onOpenInMaps }: RecordPlacePreviewPr
         accessibilityRole="button"
         accessibilityLabel={`Open ${place.label} in Maps at public precision`}
         onPress={onOpenInMaps}
-        style={({ pressed }) => (pressed ? styles.pressed : undefined)}
       >
-        {frame}
+        {({ pressed }) => renderFrame(pressed)}
       </Pressable>
     );
   }
 
-  return frame;
+  return renderFrame(false);
 }
 
 const styles = StyleSheet.create({
   frame: {
     minHeight: PREVIEW_HEIGHT,
-    borderRadius: 16,
+    borderRadius: radius.md,
     borderWidth: StyleSheet.hairlineWidth,
     alignItems: 'center',
     justifyContent: 'center',
@@ -75,9 +79,6 @@ const styles = StyleSheet.create({
   },
   empty: {
     justifyContent: 'center',
-  },
-  pressed: {
-    opacity: 0.92,
   },
   pinHead: {
     width: 12,

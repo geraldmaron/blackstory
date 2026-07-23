@@ -74,7 +74,7 @@ function Block({
           variant="subtitle"
           isHeading
           style={{
-            marginTop: space['6'],
+            marginTop: space['5'],
             marginBottom: space['2'],
             fontFamily: resolveFontFamily('display', '600'),
           }}
@@ -84,20 +84,20 @@ function Block({
       );
     }
     return (
-      <Text variant="subtitle" isHeading style={{ marginTop: 16, marginBottom: 4 }}>
+      <Text variant="subtitle" isHeading style={{ marginTop: space['4'], marginBottom: space['1'] }}>
         {block.text}
       </Text>
     );
   }
   if (presentation === 'longform') {
     return (
-      <Text variant="editorial" style={{ marginBottom: space['5'], fontSize: 18, lineHeight: 30 }}>
+      <Text variant="editorial" style={{ marginBottom: space['4'] }}>
         {block.text}
       </Text>
     );
   }
   return (
-    <Text variant="body" style={{ marginBottom: 12 }}>
+    <Text variant="body" style={{ marginBottom: space['3'] }}>
       {block.text}
     </Text>
   );
@@ -105,14 +105,14 @@ function Block({
 
 function SourcesList({ sources }: { readonly sources: readonly CitationV1[] }) {
   return (
-    <View style={{ marginTop: 16, gap: 4 }} accessible={false}>
+    <View style={{ marginTop: space['4'], gap: space['1'] }} accessible={false}>
       <Text variant="subtitle" isHeading accessibilityRole="header">
         Sources
       </Text>
       {sources.map((source, index) => {
         const safeHref = source.href ? sanitizeExternalHref(source.href) : null;
         return (
-          <View key={`${source.source}-${index}`} style={{ marginTop: 4 }}>
+          <View key={`${source.source}-${index}`} style={{ marginTop: space['1'] }}>
             {safeHref ? (
               <Link href={safeHref} accessibilityLabel={`${source.label}, opens ${source.source}`}>
                 {source.label}
@@ -157,7 +157,7 @@ export function ContentRenderer({
     ];
 
   return (
-    <View style={{ gap: isLongform ? space['2'] : 4, maxWidth: isLongform ? 672 : undefined }}>
+    <View style={{ gap: isLongform ? space['2'] : space['1'], maxWidth: isLongform ? 672 : undefined }}>
       {!hideTitle ? (
         <>
           <Text variant={isLongform ? 'display' : 'title'} isHeading>
@@ -167,7 +167,7 @@ export function ContentRenderer({
             <Text
               variant={isLongform ? 'editorial' : 'bodyEmphasis'}
               colorRole="inkMuted"
-              style={{ marginBottom: isLongform ? space['4'] : 8 }}
+              style={{ marginBottom: isLongform ? space['4'] : space['2'] }}
             >
               {page.dek}
             </Text>
@@ -199,7 +199,7 @@ export function ContentRenderer({
         />
       ) : null}
 
-      <View style={{ marginTop: isLongform ? space['2'] : 8 }}>
+      <View style={{ marginTop: space['2'] }}>
         {blocks.map((block, index) => (
           <Block key={index} block={block} presentation={presentation} />
         ))}
@@ -226,8 +226,8 @@ export function ContentRenderer({
       {isLongform && (page.relatedEntityIds.length > 0 || page.relatedFactIds.length > 0) ? (
         <View
           style={{
-            marginTop: space['8'],
-            paddingTop: space['6'],
+            marginTop: space['6'],
+            paddingTop: space['4'],
             borderTopWidth: 1,
             borderTopColor: theme.border,
             gap: space['4'],

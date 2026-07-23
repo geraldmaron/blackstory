@@ -36,7 +36,9 @@ describe('ExploreFloatingChrome — mast count scope', () => {
     );
     const mast = getByTestId('explore-mast-count');
     expect(mast.props.accessibilityLabel).toBe('In view, 712 in view, 1,365 in release');
-    expect(mast).toHaveTextContent('712 in view · 1,365 in release');
+    // The mast chip uses the compact rail copy (no second "in view") so the
+    // honest "in release" total is never the part that gets truncated.
+    expect(mast).toHaveTextContent('712 · 1,365 in release');
   });
 
   it('reflects active filters without changing scope semantics', async () => {
@@ -52,7 +54,7 @@ describe('ExploreFloatingChrome — mast count scope', () => {
     );
     const mast = getByTestId('explore-mast-count');
     expect(mast.props.accessibilityLabel).toBe('In view, 2 in view · filtered, 1,365 in release');
-    expect(mast).toHaveTextContent('2 · filtered in view · 1,365 in release');
+    expect(mast).toHaveTextContent('2 · filtered · 1,365 in release');
   });
 
   it('toggles instruments from the ghost control', async () => {

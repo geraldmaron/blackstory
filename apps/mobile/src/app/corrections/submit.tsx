@@ -22,6 +22,7 @@
  */
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
+import { KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
 
 import { parseEntityId, parseReturnTo } from '@/lib/route-params';
 import { CorrectionForm,
@@ -53,31 +54,48 @@ export default function CorrectionsSubmitSheet() {
 
   if (receiptCode) {
     return (
-      <UtilityScreenShell
-        kicker="Trust"
-        title="Correction received"
-        dek="Save your receipt code. We will review your submission."
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <CorrectionReceipt
-          receiptCode={receiptCode}
-          onCheckStatus={() => router.replace('/corrections/status')}
-          onDone={() => router.replace(safeReturnTo as never)}
-        />
-      </UtilityScreenShell>
+        {/* Title left to the Notice inside CorrectionReceipt (which also carries the
+            assistive-tech focus/announcement); the shell header stays distinct. */}
+        <UtilityScreenShell kicker="Trust" title="Correction submitted" edges={SHELL_EDGES}>
+          <CorrectionReceipt
+            receiptCode={receiptCode}
+            onCheckStatus={() => router.replace('/corrections/status')}
+            onDone={() => router.replace(safeReturnTo as never)}
+          />
+        </UtilityScreenShell>
+      </KeyboardAvoidingView>
     );
   }
 
   return (
-    <UtilityScreenShell
-      kicker="Trust"
-      title="Submit a correction"
-      dek="Tell us what should change and link to evidence we can verify."
+    <KeyboardAvoidingView
+      style={styles.flex}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <CorrectionForm
-        entityId={entityId ?? undefined}
-        onSubmit={handleSubmit}
-        onAccepted={(code) => setReceiptCode(code)}
-      />
-    </UtilityScreenShell>
+      <UtilityScreenShell
+        kicker="Trust"
+        title="Submit a correction"
+        dek="Tell us what should change and link to evidence we can verify."
+        edges={SHELL_EDGES}
+      >
+        <CorrectionForm
+          entityId={entityId ?? undefined}
+          onSubmit={handleSubmit}
+          onAccepted={(code) => setReceiptCode(code)}
+        />
+      </UtilityScreenShell>
+    </KeyboardAvoidingView>
   );
 }
+
+/** Header-bearing modal: the native header owns the top inset, so the canvas only
+ * insets the sides and bottom (not a tab-screen top inset). */
+const SHELL_EDGES = ['left', 'right', 'bottom'] as const;
+
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+});

@@ -4,6 +4,7 @@
  */
 import { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
+import { space } from '@/ui';
 import type { FilterState } from '@/lib/route-params';
 import type { ExploreFeature } from '@/features/explore/explore-feature';
 import { buildExploreFacetOptions } from '@/features/explore/explore-filter';
@@ -92,12 +93,12 @@ const styles = StyleSheet.create({
     flex: 0,
   },
   tabBar: {
-    paddingVertical: 8,
+    paddingVertical: space['2'],
   },
   filtersBody: {
     paddingHorizontal: exploreContentInset,
-    paddingBottom: 16,
-    gap: 8,
+    paddingBottom: space['4'],
+    gap: space['2'],
   },
   keyBody: {
     flex: 1,

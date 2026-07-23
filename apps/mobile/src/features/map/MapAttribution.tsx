@@ -15,8 +15,9 @@
  * Contrast: flat opaque Surface chip + theme `inkMuted` (WCAG AA on light and
  * dark), never ghost rgba over live tiles.
  */
-import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
-import { radius, space, Text, useThemeColors } from '@/ui';
+import { StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { duration, radius, space, Text, useThemeColors } from '@/ui';
 import {
   MAP_ATTRIBUTION_LINES,
   MAP_ATTRIBUTION_LINES_COMPACT,
@@ -40,6 +41,8 @@ export type MapAttributionProps = {
   readonly style?: StyleProp<ViewStyle>;
   /** When false, renders nothing (Explore hides at half/full sheet). */
   readonly visible?: boolean;
+  /** Skip the fade in/out when the reader has Reduce Motion enabled. */
+  readonly reduceMotion?: boolean;
   /**
    * Tighter chip and shorter license line for full-bleed Explore — still a flat
    * Surface plate with theme muted ink (not ghost typography over tiles).
@@ -51,6 +54,7 @@ export function MapAttribution({
   bottom = MAP_ATTRIBUTION_ABOVE_SHEET_BOTTOM,
   style,
   visible = true,
+  reduceMotion = false,
   compact = false,
 }: MapAttributionProps = {}) {
   const theme = useThemeColors();
@@ -59,11 +63,13 @@ export function MapAttribution({
   if (!visible) return null;
 
   return (
-    <View
+    <Animated.View
       accessible
       accessibilityRole="text"
       accessibilityLabel={`Map data ${MAP_ATTRIBUTION_LINES.join(', ')}`}
       pointerEvents="box-none"
+      entering={reduceMotion ? undefined : FadeIn.duration(duration.durationFast)}
+      exiting={reduceMotion ? undefined : FadeOut.duration(duration.durationFast)}
       style={[
         styles.container,
         compact ? styles.containerCompact : null,
@@ -82,7 +88,7 @@ export function MapAttribution({
       >
         {lines.join(' · ')}
       </Text>
-    </View>
+    </Animated.View>
   );
 }
 

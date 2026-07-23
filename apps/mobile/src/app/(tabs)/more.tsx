@@ -2,14 +2,14 @@
  * More tab index — v6 Surface edition stack with indexed section panels and compact
  * LedgerRow links driven by `MOBILE_MORE_SECTIONS`.
  */
-import { Linking, ScrollView, StyleSheet } from 'react-native';
+import { Linking, ScrollView, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 
 import {
+  EditionPanelHeader,
   EditionSurfacePanel,
   EditionSurfaceStack,
   LedgerRow,
-  LiftedSurface,
   NavIcon,
   ScreenCanvas,
   screenScrollInsets,
@@ -28,15 +28,16 @@ export default function MoreScreen() {
   return (
     <ScreenCanvas>
       <ScrollView contentContainerStyle={styles.content}>
-        <EditionSurfaceStack>
-          <EditionSurfacePanel
-            index="00"
-            kicker="BlackStory"
-            title="More"
-            dek="About the project, extended catalog, and ways to contribute."
-            compact
-          />
+        {/* Bare header, not a bordered panel — a whole card spent on just the
+            screen title pushed the first actionable row ~110pt down. */}
+        <EditionPanelHeader
+          index="00"
+          kicker="BlackStory"
+          title="More"
+          dek="About the project, extended catalog, and ways to contribute."
+        />
 
+        <EditionSurfaceStack>
           {MOBILE_MORE_SECTIONS.map((section, sectionIndex) => (
             <EditionSurfacePanel
               key={section.id}
@@ -44,20 +45,21 @@ export default function MoreScreen() {
               kicker={section.meta ?? 'Browse'}
               title={section.title}
             >
-              <LiftedSurface tone="surfaceRaised" shadow="none">
+              {/* No inner LiftedSurface — the panel is already a bordered surface,
+                  so a nested one only added a second concentric border. */}
+              <View>
                 {section.rows.map((row, index) => (
                   <LedgerRow
                     key={row.id}
                     title={row.title}
                     summary={row.subtitle}
-                    indexLabel={String(index + 1).padStart(2, '0')}
                     leading={<NavIcon name={row.icon} size={20} />}
                     showChevron
                     onPress={() => openMoreRow(row)}
                     showDivider={index < section.rows.length - 1}
                   />
                 ))}
-              </LiftedSurface>
+              </View>
             </EditionSurfacePanel>
           ))}
         </EditionSurfaceStack>
@@ -71,5 +73,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: screenScrollInsets.paddingHorizontal,
     paddingTop: screenScrollInsets.paddingTop,
     paddingBottom: screenScrollInsets.paddingBottom,
+    gap: screenScrollInsets.gap,
   },
 });

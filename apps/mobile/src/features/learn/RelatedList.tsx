@@ -15,7 +15,7 @@
  */
 import { router } from 'expo-router';
 import { FlatList, View } from 'react-native';
-import { ListRow, Surface, Text } from '@/ui';
+import { ListRow, Surface, Text, space } from '@/ui';
 import { relatedEntitySubtitle, resolveRelatedEntityLabel } from './related-entity-labels';
 
 const RENDER_WINDOW = 20;
@@ -34,7 +34,6 @@ export function RelatedEntityList({ entityIds }: { readonly entityIds: readonly 
         initialNumToRender={RENDER_WINDOW}
         maxToRenderPerBatch={RENDER_WINDOW}
         windowSize={3}
-        removeClippedSubviews
         renderItem={({ item, index }) => {
           const label = resolveRelatedEntityLabel(item);
           const subtitle = relatedEntitySubtitle(label);
@@ -62,7 +61,7 @@ export function RelatedFactBadges({ factIds }: { readonly factIds: readonly stri
       <Text variant="subtitle" isHeading accessibilityRole="header">
         Cited facts ({factIds.length})
       </Text>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space['2'], marginTop: space['2'] }}>
         {factIds.slice(0, RENDER_WINDOW).map((id) => (
           <Surface key={id} bordered paddingKey="2" radiusKey="full">
             <Text variant="caption">{id}</Text>

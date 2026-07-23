@@ -85,9 +85,17 @@ export function useSearch(options: UseSearchOptions = {}): UseSearchResult {
   useEffect(() => {
     if (!runtime) return;
     if (!controllerRef.current) {
-      controllerRef.current = createSearchController(runtime, (next) => {
-        if (mountedRef.current) setState(next);
-      });
+      controllerRef.current = createSearchController(
+        runtime,
+        (next) => {
+          if (mountedRef.current) setState(next);
+        },
+        (list) => {
+          // A successful query just recorded its term; reflect the refreshed list immediately so
+          // the recent-searches strip is current even after the user clears the field.
+          if (mountedRef.current) setRecentSearches(list);
+        },
+      );
     }
     controllerRef.current.setQuery(debouncedQuery, filterKind);
   }, [runtime, debouncedQuery, filterKind]);

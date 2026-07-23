@@ -1,9 +1,10 @@
 /**
- * Grouped-series metric block: period rows with labeled values (accessible stand-in
- * for web's grouped bar charts — numbers always visible as text).
+ * Grouped-series metric block: one row per (period × group) with the value in the
+ * trailing slot as right-aligned mono, so figures read as the primary element
+ * rather than being buried in a muted, clip-prone summary string.
  */
 import { StyleSheet, View } from 'react-native';
-import { LedgerRow, Link, LiftedSurface, Text, space } from '@/ui';
+import { LedgerRow, Link, LiftedSurface, MIN_TOUCH_TARGET, Text, space } from '@/ui';
 import { formatDataValue } from './format';
 import type { DataGroupedBarSeries } from './types';
 
@@ -12,6 +13,16 @@ export type GroupedSeriesMetricProps = {
 };
 
 export function GroupedSeriesMetric({ series }: GroupedSeriesMetricProps) {
+  const rows = series.points.flatMap((point) =>
+    series.series
+      .map((def) => {
+        const raw = point.values[def.id];
+        if (typeof raw !== 'number') return null;
+        return { key: `${point.period}-${def.id}`, period: point.period, label: def.label, raw };
+      })
+      .filter((row): row is NonNullable<typeof row> => row !== null),
+  );
+
   return (
     <View style={styles.block} accessibilityRole="summary">
       <Text variant="bodyEmphasis" isHeading>
@@ -24,32 +35,28 @@ export function GroupedSeriesMetric({ series }: GroupedSeriesMetricProps) {
         {series.caption}
       </Text>
       <LiftedSurface tone="surface" shadow="none">
-        {series.points.map((point, index) => {
-          const summary = series.series
-            .map((def) => {
-              const raw = point.values[def.id];
-              if (typeof raw !== 'number') return null;
-              return `${def.label}: ${formatDataValue(raw, series.unit)}`;
-            })
-            .filter((part): part is string => part !== null)
-            .join(' · ');
-
-          return (
-            <LedgerRow
-              key={point.period}
-              title={point.period}
-              summary={summary}
-              showDivider={index < series.points.length - 1}
-              showChevron={false}
-            />
-          );
-        })}
+        {rows.map((row, index) => (
+          <LedgerRow
+            key={row.key}
+            slug={row.label}
+            title={row.period}
+            trailing={
+              <Text variant="code" style={styles.value}>
+                {formatDataValue(row.raw, series.unit)}
+              </Text>
+            }
+            showDivider={index < rows.length - 1}
+            showChevron={false}
+          />
+        ))}
       </LiftedSurface>
       <View style={styles.sources}>
         {series.sources.map((source) => (
-          <Link key={source.url} href={source.url} textRole="code">
-            {source.label}
-          </Link>
+          <View key={source.url} style={styles.sourceItem}>
+            <Link href={source.url} textRole="code">
+              {source.label}
+            </Link>
+          </View>
         ))}
       </View>
     </View>
@@ -60,7 +67,14 @@ const styles = StyleSheet.create({
   block: {
     gap: space['2'],
   },
+  value: {
+    textAlign: 'right',
+  },
   sources: {
-    gap: space['1'],
+    gap: space['2'],
+  },
+  sourceItem: {
+    minHeight: MIN_TOUCH_TARGET,
+    justifyContent: 'center',
   },
 });

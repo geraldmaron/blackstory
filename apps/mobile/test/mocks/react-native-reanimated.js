@@ -87,6 +87,10 @@ module.exports = {
   ReduceMotion: { System: 'system', Always: 'always', Never: 'never' },
   FadeIn: animationBuilderProxy,
   FadeOut: animationBuilderProxy,
+  FadeInDown: animationBuilderProxy,
+  FadeOutUp: animationBuilderProxy,
+  FadeInUp: animationBuilderProxy,
+  FadeOutDown: animationBuilderProxy,
   LinearTransition: animationBuilderProxy,
   Layout: animationBuilderProxy,
 };

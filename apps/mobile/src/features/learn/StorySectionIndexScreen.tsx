@@ -7,7 +7,6 @@ import { router } from 'expo-router';
 import {
   EditionSurfacePanel,
   EditionSurfaceStack,
-  LiftedSurface,
   ScreenCanvas,
   screenScrollInsets,
 } from '@/ui';
@@ -48,17 +47,15 @@ export function StorySectionIndexScreen({ section }: StorySectionIndexScreenProp
             title="Published stories"
             panelMeta={countLabel}
           >
-            <LiftedSurface tone="surfaceRaised" shadow="none">
-              {entries.map((entry, index) => (
-                <StoryCompactRow
-                  key={entry.page.slug}
-                  entry={entry}
-                  indexLabel={String(index + 1).padStart(2, '0')}
-                  onPress={() => router.push(storyHref(entry) as never)}
-                  showDivider={index < entries.length - 1}
-                />
-              ))}
-            </LiftedSurface>
+            {entries.map((entry, index) => (
+              <StoryCompactRow
+                key={entry.page.slug}
+                entry={entry}
+                indexLabel={String(index + 1).padStart(2, '0')}
+                onPress={() => router.push(storyHref(entry) as never)}
+                showDivider={index < entries.length - 1}
+              />
+            ))}
           </EditionSurfacePanel>
         </EditionSurfaceStack>
       </ScrollView>

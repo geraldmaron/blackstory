@@ -1,8 +1,9 @@
 /**
- * StoriesHomeScreen tests: featured band, archive index, and secondary section links.
+ * StoriesHomeScreen tests: featured band, archive index, and secondary context links.
  */
 import { fireEvent, render } from '@testing-library/react-native';
 import { StoriesHomeScreen } from './StoriesHomeScreen';
+import { listStoryEntries } from './story-index';
 
 const mockPush = jest.fn();
 
@@ -18,6 +19,7 @@ jest.mock('react-native-safe-area-context', () => {
     SafeAreaView: ({ children, style }: { children?: unknown; style?: unknown }) =>
       React.createElement(View, { style }, children as never),
     SafeAreaProvider: ({ children }: { children?: unknown }) => children,
+    useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
   };
 });
 
@@ -41,7 +43,15 @@ describe('StoriesHomeScreen', () => {
   it('lists archive stories below the featured band', async () => {
     const { getByText } = await render(<StoriesHomeScreen />);
     expect(getByText('Published stories')).toBeTruthy();
-    expect(getByText(/Catalog · \d+ stor/)).toBeTruthy();
+  });
+
+  it('counts the whole catalog, not just the rows below the featured band', async () => {
+    const total = listStoryEntries().length;
+    const { getByText } = await render(<StoriesHomeScreen />);
+    // Featured is one of these stories, so the count must include it (regression: it used to
+    // advertise "3 stories" for a 4-story catalog by counting only the archive rows).
+    expect(total).toBeGreaterThan(1);
+    expect(getByText(`${total} stories`)).toBeTruthy();
   });
 
   it('navigates to a story when the featured card is pressed', async () => {
@@ -50,11 +60,14 @@ describe('StoriesHomeScreen', () => {
     expect(mockPush).toHaveBeenCalledWith(expect.stringMatching(/^\/learn\//));
   });
 
-  it('exposes secondary More to read links for History and Myths', async () => {
-    const { getByText } = await render(<StoriesHomeScreen />);
+  it('lists only non-longform sections under More to read (no dup of longform stories)', async () => {
+    const { getByText, queryByText } = await render(<StoriesHomeScreen />);
     expect(getByText('More to read')).toBeTruthy();
-    expect(getByText('History')).toBeTruthy();
-    expect(getByText('Myths')).toBeTruthy();
+    // Methodology is not longform, so it belongs here.
     expect(getByText('Methodology')).toBeTruthy();
+    // History and Myths are longform: they already appear in the archive index above, so they
+    // must NOT be repeated as section links here.
+    expect(queryByText('History')).toBeNull();
+    expect(queryByText('Myths')).toBeNull();
   });
 });

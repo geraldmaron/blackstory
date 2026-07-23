@@ -4,15 +4,18 @@
  * Copper accent only on active filters and selected controls (~10–15% copper budget).
  */
 import { Ionicons } from '@expo/vector-icons';
-import { Pressable, StyleSheet, View } from 'react-native';
-import { Text, space, radius } from '@/ui';
+import { Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
+import { Text, space, radius, MIN_TOUCH_TARGET, Z_LAYER } from '@/ui';
 import type { FilterState } from '@/lib/route-params';
-import { exploreContentInset, useExploreChromeColors } from './explore-chrome';
+import {
+  exploreContentInset,
+  useExploreChromeColors,
+  MAP_GHOST_PRESSED,
+} from './explore-chrome';
 import { formatExploreCountLabel } from './explore-count-label';
 
-const MIN_TOUCH = 44;
 const ICON_SIZE = 18;
-const GHOST_SIZE = 44;
+const GHOST_SIZE = MIN_TOUCH_TARGET;
 
 export type ExploreFloatingChromeProps = {
   /** Viewport-scoped visible count — same source as the records rail list. */
@@ -29,6 +32,8 @@ export type ExploreFloatingChromeProps = {
   readonly onToggleRecords?: () => void;
   readonly onNationalView: () => void;
   readonly onOpenSearch?: () => void;
+  /** Reports the mast's laid-out height so the host can offset overlays below it. */
+  readonly onLayout?: (event: LayoutChangeEvent) => void;
   /** @deprecated Modal route fallback — prefer in-map instruments panel. */
   readonly onOpenFilters?: () => void;
   /** @deprecated Modal route fallback — prefer in-map instruments panel. */
@@ -63,7 +68,7 @@ function GhostIconButton({
           backgroundColor: selected
             ? chrome.mapGhostActive
             : pressed
-              ? 'rgba(244, 239, 229, 0.14)'
+              ? MAP_GHOST_PRESSED
               : chrome.mapGhostBg,
           opacity: pressed ? 0.9 : 1,
         },
@@ -90,6 +95,7 @@ export function ExploreFloatingChrome({
   onToggleRecords,
   onNationalView,
   onOpenSearch,
+  onLayout,
 }: ExploreFloatingChromeProps) {
   const chrome = useExploreChromeColors();
   const filtersActive = Boolean(filters.kind || filters.era);
@@ -106,21 +112,22 @@ export function ExploreFloatingChrome({
       style={styles.overlay}
       pointerEvents="box-none"
       testID="explore-floating-chrome"
+      onLayout={onLayout}
     >
       <View style={styles.mastRow} pointerEvents="box-none">
-        <Text
-          variant="code"
-          numberOfLines={1}
-          style={[styles.countInline, { color: chrome.mapInkMuted }]}
-          accessible
-          accessibilityRole="text"
-          accessibilityLabel={countLabel.accessibilityLabel}
-          testID="explore-mast-count"
-        >
-          <Text variant="code" style={{ color: chrome.mapAccent }}>
-            {countLabel.inline}
+        <View style={[styles.countChip, { backgroundColor: chrome.surface }]}>
+          <Text
+            variant="code"
+            numberOfLines={1}
+            style={[styles.countInline, { color: chrome.accent }]}
+            accessible
+            accessibilityRole="text"
+            accessibilityLabel={countLabel.accessibilityLabel}
+            testID="explore-mast-count"
+          >
+            {countLabel.railInline}
           </Text>
-        </Text>
+        </View>
 
         <View style={styles.actions}>
           <GhostIconButton
@@ -173,7 +180,7 @@ const styles = StyleSheet.create({
     top: space['1'],
     left: 0,
     right: 0,
-    zIndex: 3,
+    zIndex: Z_LAYER.overlay,
     paddingHorizontal: exploreContentInset,
   },
   mastRow: {
@@ -181,10 +188,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: space['2'],
-    minHeight: MIN_TOUCH,
+    minHeight: MIN_TOUCH_TARGET,
+  },
+  countChip: {
+    flexShrink: 1,
+    paddingHorizontal: space['2'],
+    paddingVertical: space['1'],
+    borderRadius: radius.sm,
   },
   countInline: {
-    flex: 1,
     fontSize: 12,
     letterSpacing: 0.3,
   },

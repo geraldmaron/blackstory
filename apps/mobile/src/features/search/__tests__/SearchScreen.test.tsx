@@ -17,6 +17,22 @@ jest.mock('expo-router', () => ({
   router: { push: jest.fn(), setParams: jest.fn() },
 }));
 
+// SearchScreen now measures its bottom inset from the live tab bar via `useScreenScrollInsets()`
+// → `useSafeAreaInsets()`, which throws without a provider. Supply a minimal safe-area context
+// (zero insets) so the screen renders under test exactly as it would inside `<SafeAreaProvider>`.
+jest.mock('react-native-safe-area-context', () => {
+  /* eslint-disable @typescript-eslint/no-require-imports */
+  const React = require('react');
+  const { View } = require('react-native');
+  return {
+    SafeAreaView: ({ children, style }: { children?: unknown; style?: unknown }) =>
+      React.createElement(View, { style }, children as never),
+    SafeAreaProvider: ({ children }: { children?: unknown }) => children,
+    SafeAreaInsetsContext: React.createContext(null),
+    useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+  };
+});
+
 // eslint-disable-next-line import/first
 import { router } from 'expo-router';
 

@@ -2,7 +2,7 @@
  * Stories-forward Learn tab home: v6 dense masthead, featured story band, compact archive
  * ledger, and secondary context links — continuous surfaces matching History browse density.
  */
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { router } from 'expo-router';
 import {
   ApiStatusBanner,
@@ -12,14 +12,12 @@ import {
   NavIcon,
   ScreenCanvas,
   ScreenHeader,
-  screenScrollInsets,
+  useScreenScrollInsets,
 } from '@/ui';
 import { LEARN_SECTIONS } from './sections';
 import { FeaturedStoryCard } from './FeaturedStoryCard';
 import { StoryCompactRow } from './StoryCompactRow';
-import { listStoryEntries, pickFeaturedStory, storyHref } from './story-index';
-
-const SECONDARY_ROUTE_IDS = new Set(['history', 'myths', 'methodology']);
+import { isLongformSection, listStoryEntries, pickFeaturedStory, storyHref } from './story-index';
 
 const SECONDARY_ICONS = {
   history: 'history',
@@ -28,24 +26,31 @@ const SECONDARY_ICONS = {
 } as const;
 
 export function StoriesHomeScreen() {
+  const insets = useScreenScrollInsets();
   const allStories = listStoryEntries();
   const featured = pickFeaturedStory(allStories);
   const archiveStories = featured
     ? allStories.filter((entry) => entry.page.slug !== featured.page.slug)
     : allStories;
-  const secondarySections = LEARN_SECTIONS.filter((section) => SECONDARY_ROUTE_IDS.has(section.routeId));
-  const countLabel = archiveStories.length === 1 ? '1 story' : `${archiveStories.length} stories`;
+  // The archive index (above) already lists every longform story, so the Context panel only
+  // carries sections that would NOT already appear there — methodology and other non-longform
+  // sections. This stops History/Myths from being listed as both individual stories and links.
+  const secondarySections = LEARN_SECTIONS.filter(
+    (section) => !isLongformSection(section.catalogSection),
+  );
+  // Count the whole catalog (featured included), not just the rows below the featured band.
+  const countLabel = allStories.length === 1 ? '1 story' : `${allStories.length} stories`;
 
   return (
-    <ScreenCanvas>
+    <ScreenCanvas edges={['top', 'left', 'right', 'bottom']}>
       <ScrollView
         contentContainerStyle={{
-          paddingHorizontal: screenScrollInsets.paddingHorizontal,
-          paddingTop: screenScrollInsets.paddingTop,
-          paddingBottom: screenScrollInsets.paddingBottom,
+          paddingHorizontal: insets.paddingHorizontal,
+          paddingTop: insets.paddingTop,
+          paddingBottom: insets.paddingBottom,
         }}
       >
-        <View style={styles.page}>
+        <View style={{ gap: insets.gap }}>
           <ApiStatusBanner compact />
           <ScreenHeader
             kicker="Longform"
@@ -57,7 +62,7 @@ export function StoriesHomeScreen() {
 
           <EditionSurfaceStack dense>
             {featured ? (
-              <EditionSurfacePanel index="01" kicker="Featured" title="Start here" compact dense>
+              <EditionSurfacePanel index="01" title="Start here" compact dense>
                 <FeaturedStoryCard entry={featured} onPress={() => router.push(storyHref(featured) as never)} />
               </EditionSurfacePanel>
             ) : null}
@@ -65,9 +70,8 @@ export function StoriesHomeScreen() {
             {archiveStories.length > 0 ? (
               <EditionSurfacePanel
                 index={featured ? '02' : '01'}
-                kicker="Archive"
                 title="Published stories"
-                panelMeta={`Catalog · ${countLabel}`}
+                panelMeta={countLabel}
                 compact
                 dense
               >
@@ -86,9 +90,7 @@ export function StoriesHomeScreen() {
             {secondarySections.length > 0 ? (
               <EditionSurfacePanel
                 index={featured ? '03' : '02'}
-                kicker="Context"
                 title="More to read"
-                panelMeta="Context and method"
                 compact
                 dense
               >
@@ -117,9 +119,3 @@ export function StoriesHomeScreen() {
     </ScreenCanvas>
   );
 }
-
-const styles = StyleSheet.create({
-  page: {
-    gap: screenScrollInsets.gap,
-  },
-});

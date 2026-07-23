@@ -26,7 +26,7 @@ import {
   isKnownMapKindFamily,
   kindEncodingFor,
 } from '@/features/map/kind-encoding';
-import { Button, Text, space, useThemeColors } from '@/ui';
+import { Button, Text, space, radius, useThemeColors, MIN_TOUCH_TARGET } from '@/ui';
 import { ExploreFacetRow } from './explore-edition-chrome';
 
 /** Decade buckets offered in the filter UI (parseEraParam-compatible literals). */
@@ -86,7 +86,9 @@ const KIND_LABELS: Record<KindFamily, string> = {
   sources: kindFamilyEncodingFor('sources').label,
 };
 
-const MIN_TOUCH = 44;
+const MIN_TOUCH = MIN_TOUCH_TARGET;
+/** Ghost chips are 32pt tall; +6 top/bottom lifts the touch target to 44pt. */
+const GHOST_CHIP_HIT_SLOP = { top: 6, bottom: 6, left: 4, right: 4 };
 
 /** Curated decade chips for embedded facet row (full list remains in modal mode). */
 export const EXPLORE_ERA_QUICK_OPTIONS = [
@@ -134,7 +136,7 @@ function FilterChip({
       accessibilityLabel={label}
       accessibilityState={{ selected }}
       onPress={onPress}
-      hitSlop={4}
+      hitSlop={ghost ? GHOST_CHIP_HIT_SLOP : 4}
       style={({ pressed }) => [
         ghost ? styles.ghostChip : styles.chip,
         ghost
@@ -594,7 +596,7 @@ const styles = StyleSheet.create({
   },
   group: {
     borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 8,
+    borderRadius: radius.sm,
     overflow: 'hidden',
   },
   groupHeader: {
@@ -622,7 +624,7 @@ const styles = StyleSheet.create({
     minWidth: MIN_TOUCH,
     paddingHorizontal: space['3'],
     paddingVertical: space['2'],
-    borderRadius: 8,
+    borderRadius: radius.sm,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',

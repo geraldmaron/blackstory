@@ -73,8 +73,8 @@ describe('ExploreRecordsRail', () => {
     expect(getByLabelText(/Howard Theatre/)).toBeTruthy();
   });
 
-  it('shows dual release copy in the header when viewport-scoped', async () => {
-    const { getByLabelText, getByText } = await render(
+  it('keeps the dual release count in the header a11y label but not as visible duplicate text', async () => {
+    const { getByLabelText, getByText, queryByText } = await render(
       <ExploreRecordsRail
         features={[feature('ent_a', 'Howard Theatre')]}
         scopeLabel="In view"
@@ -82,9 +82,11 @@ describe('ExploreRecordsRail', () => {
         onSelect={() => undefined}
       />,
     );
+    // Screen readers still hear the full count on the header…
     expect(getByLabelText('In view, 1 in view, 1,365 in release')).toBeTruthy();
-    // Rail keeps scope on the left; count omits a second "in view".
-    expect(getByText('1 · 1,365 in release')).toBeTruthy();
+    // …but the visible number lives only in the floating mast now (no duplicate).
+    expect(getByText('In view')).toBeTruthy();
+    expect(queryByText('1 · 1,365 in release')).toBeNull();
   });
 
   it('calls onSelect when a row is pressed', async () => {

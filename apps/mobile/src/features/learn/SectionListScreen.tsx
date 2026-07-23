@@ -7,7 +7,6 @@ import {
   EditionSurfacePanel,
   EditionSurfaceStack,
   LedgerRow,
-  LiftedSurface,
   ScreenCanvas,
   screenScrollInsets,
 } from '@/ui';
@@ -36,19 +35,17 @@ export function SectionListScreen({ title, intro, kicker = 'Archive', rows }: Se
           <EditionSurfacePanel index="00" kicker={kicker} title={title} dek={intro} compact />
 
           <EditionSurfacePanel index="01" kicker="Index" title="Pages" panelMeta={countLabel}>
-            <LiftedSurface tone="surfaceRaised" shadow="none">
-              {rows.map((row, index) => (
-                <LedgerRow
-                  key={row.key}
-                  title={row.title}
-                  summary={row.subtitle}
-                  indexLabel={String(index + 1).padStart(2, '0')}
-                  onPress={row.onPress}
-                  showChevron
-                  showDivider={index < rows.length - 1}
-                />
-              ))}
-            </LiftedSurface>
+            {rows.map((row, index) => (
+              <LedgerRow
+                key={row.key}
+                title={row.title}
+                summary={row.subtitle}
+                indexLabel={String(index + 1).padStart(2, '0')}
+                onPress={row.onPress}
+                showChevron
+                showDivider={index < rows.length - 1}
+              />
+            ))}
           </EditionSurfacePanel>
         </EditionSurfaceStack>
       </ScrollView>

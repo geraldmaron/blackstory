@@ -34,6 +34,7 @@
 import { TransportError, type ReleaseCache } from '@/data';
 import { getSearchMode } from './query-normalization';
 import type { SearchRuntime } from './search-runtime';
+import type { RecentSearchEntry } from './recent-searches';
 import {
   DEFAULT_SEARCH_PAGE_SIZE,
   RankingSignalLeakError,
@@ -226,6 +227,9 @@ async function fetchPage(
 export function createSearchController(
   runtime: SearchRuntime,
   onChange: (state: SearchControllerState) => void,
+  /** Invoked with the refreshed recent-searches list after a successful query records its term,
+   * so the UI can reflect the just-searched term without waiting for a remount. */
+  onRecentSearchesChanged?: (list: readonly RecentSearchEntry[]) => void,
 ): SearchController {
   let state: SearchControllerState = { kind: 'browse' };
   let generation = 0;
@@ -267,8 +271,14 @@ export function createSearchController(
         loadingMore: false,
       });
       // Record the term only on a real, successful, non-empty result -- never on every keystroke,
-      // never on an error/offline outcome.
-      void runtime.recentSearches.add(query).catch(() => {});
+      // never on an error/offline outcome. Reflect the refreshed list back so the UI updates the
+      // recent-searches strip immediately (no remount required).
+      void runtime.recentSearches
+        .add(query)
+        .then((list) => {
+          if (!disposed) onRecentSearchesChanged?.(list);
+        })
+        .catch(() => {});
     } catch (err) {
       if (!isCurrent(gen)) return;
       if (isSupersededAbort(err)) return; // intentional supersession, not a user-facing failure

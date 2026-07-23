@@ -9,7 +9,7 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { screenScrollInsets } from '@/ui/ScreenCanvas';
-import { brandCore } from '@/ui/tokens';
+import { brandCore, themeColors } from '@/ui/tokens';
 import { useThemeColors } from '@/ui';
 
 const ACCENT_WIDTH = 3;
@@ -17,12 +17,30 @@ const ACCENT_WIDTH = 3;
 /** Horizontal inset for Explore chrome and sheet bodies — matches tab screen gutters. */
 export const exploreContentInset = screenScrollInsets.paddingHorizontal;
 
-/** Fixed ink on the dark archive map plate (ADR-013). */
+/**
+ * Small hex → `rgba()` helper so ghost fills read as "brand token at alpha"
+ * instead of hand-copied rgba triples that silently drift from the palette.
+ */
+export function withAlpha(hex: string, alpha: number): string {
+  const normalized = hex.replace('#', '');
+  const r = parseInt(normalized.slice(0, 2), 16);
+  const g = parseInt(normalized.slice(2, 4), 16);
+  const b = parseInt(normalized.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+/**
+ * Fixed ink on the dark archive map plate (ADR-013). The plate stays on the
+ * dark register regardless of device theme, so these are token references at
+ * fixed alpha — Archive Paper for ink, the dark accent-graphic for copper.
+ */
 const MAP_INK = brandCore.archivePaper;
-const MAP_INK_MUTED = 'rgba(244, 239, 229, 0.68)';
-const MAP_GHOST_BG = 'rgba(244, 239, 229, 0.08)';
-const MAP_GHOST_ACTIVE = 'rgba(184, 107, 42, 0.28)';
-const MAP_ACCENT = '#D07A32';
+const MAP_INK_MUTED = withAlpha(brandCore.archivePaper, 0.68);
+const MAP_GHOST_BG = withAlpha(brandCore.archivePaper, 0.08);
+const MAP_ACCENT = themeColors.dark.accentGraphic;
+const MAP_GHOST_ACTIVE = withAlpha(MAP_ACCENT, 0.28);
+/** Pressed feedback fill for ghost controls on the dark plate. */
+export const MAP_GHOST_PRESSED = withAlpha(brandCore.archivePaper, 0.14);
 
 export type ExploreChromeColors = ReturnType<typeof useExploreChromeColors>;
 

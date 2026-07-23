@@ -3,19 +3,15 @@
  * (`learn/[section]/[slug]`) or group names (`(tabs)`) in chrome.
  */
 import { Stack } from 'expo-router';
-
-const compactHeader = {
-  headerLargeTitle: false,
-  headerShadowVisible: false,
-  headerBackButtonDisplayMode: 'minimal' as const,
-  headerTitleStyle: { fontSize: 17 },
-};
+import { useEditionStackScreenOptions } from '@/shell/edition-chrome';
 
 export default function LearnStackLayout() {
+  const editionStackScreenOptions = useEditionStackScreenOptions();
+
   return (
     <Stack
       screenOptions={{
-        ...compactHeader,
+        ...editionStackScreenOptions,
         headerBackTitle: 'Stories',
         title: 'Stories',
       }}

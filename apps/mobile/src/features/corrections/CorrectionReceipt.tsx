@@ -17,7 +17,7 @@
  * button that no longer exists.
  */
 import { useEffect } from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 
 import { Button, Notice, Text, radius, space, useAccessibilityFocus, useThemeColors } from '@/ui';
 import { RECEIPT_SAVE_INSTRUCTIONS } from './copy';
@@ -41,7 +41,7 @@ export function CorrectionReceipt({ receiptCode, onCheckStatus, onDone }: Correc
   }, [focus]);
 
   return (
-    <View style={{ padding: space['4'], gap: space['4'] }}>
+    <View style={{ gap: space['3'] }}>
       <Notice
         ref={noticeRef}
         tone="info"
@@ -51,7 +51,11 @@ export function CorrectionReceipt({ receiptCode, onCheckStatus, onDone }: Correc
 
       <View style={{ gap: space['1'] }}>
         <Text variant="bodyEmphasis">Your receipt code</Text>
-        <Pressable
+        {/* A non-interactive box (no `onPress`), so it does not look tappable. The
+            code is `selectable` for manual long-press copy; a one-tap copy button
+            is not offered because `expo-clipboard` is not a project dependency.
+            Inert: RN <Text> never interprets markup. */}
+        <View
           accessibilityRole="text"
           accessibilityLabel={`Receipt code ${receiptCode}`}
           style={{
@@ -62,18 +66,17 @@ export function CorrectionReceipt({ receiptCode, onCheckStatus, onDone }: Correc
             backgroundColor: theme.surfaceRaised,
           }}
         >
-          {/* Inert: RN <Text> never interprets markup. */}
           <Text variant="code" selectable>
             {receiptCode}
           </Text>
-        </Pressable>
+        </View>
         <Text variant="bodySmall" colorRole="inkMuted">
           {RECEIPT_SAVE_INSTRUCTIONS}
         </Text>
       </View>
 
-      <Button label="Check status with this code" variant="secondary" onPress={onCheckStatus} />
       <Button label="Done" variant="primary" onPress={onDone} />
+      <Button label="Check status with this code" variant="secondary" onPress={onCheckStatus} />
     </View>
   );
 }

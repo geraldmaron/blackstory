@@ -39,8 +39,9 @@ export function EntityEditionPanel({
     >
       <View style={[styles.header, { borderBottomColor: theme.border }]}>
         <Text
-          variant="title"
-          style={[styles.index, { color: theme.accentGraphic }]}
+          variant="code"
+          colorRole="inkSubtle"
+          style={styles.index}
           accessibilityElementsHidden
           importantForAccessibility="no-hide-descendants"
         >
@@ -61,18 +62,17 @@ export function EntityEditionPanel({
 
 const styles = StyleSheet.create({
   panel: {
-    gap: space['4'],
+    gap: space['3'],
   },
   header: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: space['4'],
-    paddingBottom: space['4'],
+    paddingBottom: space['2'],
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   index: {
     minWidth: 28,
-    letterSpacing: -0.5,
   },
   headerBody: {
     flex: 1,

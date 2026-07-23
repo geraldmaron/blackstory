@@ -1,8 +1,7 @@
 /**
- * Compact story index row — v6 ledger density with label-over-value era/place facts.
+ * Compact story index row — v6 ledger density with a one-line mono era · place slug.
  */
-import { View } from 'react-native';
-import { LedgerRow, NavIcon, RecordFactStrip, space } from '@/ui';
+import { LedgerRow, NavIcon } from '@/ui';
 import { plainRangeText } from '../record-facts/record-facts';
 import type { LearnContentEntry } from './content-catalog';
 
@@ -15,29 +14,20 @@ export interface StoryCompactRowProps {
 
 export function StoryCompactRow({ entry, onPress, showDivider = true, indexLabel }: StoryCompactRowProps) {
   const { page } = entry;
-  const facts = [
-    ...(page.eraLabel
-      ? [{ key: 'era', label: 'Era', value: plainRangeText(page.eraLabel) }]
-      : []),
-    ...(page.placeLabel ? [{ key: 'where', label: 'Where', value: page.placeLabel }] : []),
-  ];
+  const era = page.eraLabel ? plainRangeText(page.eraLabel) : '';
+  const place = page.placeLabel ?? '';
+  const slug = [era, place].filter(Boolean).join(' · ');
 
   return (
     <LedgerRow
       title={page.title}
+      slug={slug || undefined}
       indexLabel={indexLabel}
       leading={<NavIcon name="story" size={20} />}
       showChevron
       showDivider={showDivider}
       onPress={onPress}
-      accessibilityLabel={`${page.title}${page.eraLabel ? `, ${plainRangeText(page.eraLabel)}` : ''}`}
-      secondaryAction={
-        facts.length > 0 ? (
-          <View style={{ marginTop: space['1'] }}>
-            <RecordFactStrip facts={facts} valueVariant="bodySmall" />
-          </View>
-        ) : undefined
-      }
+      accessibilityLabel={`${page.title}${era ? `, ${era}` : ''}`}
     />
   );
 }

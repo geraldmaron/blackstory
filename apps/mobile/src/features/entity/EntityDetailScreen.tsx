@@ -3,9 +3,8 @@
  * `design-direction-v6-entity.md`: intro, anatomy, trust off-ramp, narrative
  * beats, claims, timeline, connected records, provenance, and maps hand-off.
  */
-import { useState } from 'react';
 import { ActivityIndicator, ScrollView, View } from 'react-native';
-import { Button, ErrorState, screenScrollInsets, space, useThemeColors } from '@/ui';
+import { ErrorState, screenScrollInsets, space, useThemeColors } from '@/ui';
 import type { EntityDetailState } from './useEntityDetail';
 import { entityBeatIndices } from './entity-beat-indices';
 import { GENERIC_ERROR_COPY, OFFLINE_NO_CACHE_COPY } from './copy';
@@ -21,7 +20,6 @@ import { RelatedSection } from './sections/RelatedSection';
 import { SensitivityBanner } from './sections/SensitivityBanner';
 import { StatusSection } from './sections/StatusSection';
 import { TimelineSection } from './sections/TimelineSection';
-import { shareEntity } from './share';
 
 export type EntityDetailScreenProps = {
   readonly state: EntityDetailState;
@@ -43,13 +41,18 @@ export function EntityDetailScreen({
   onMethodologyPress,
 }: EntityDetailScreenProps) {
   const theme = useThemeColors();
-  const [shareBusy, setShareBusy] = useState(false);
   const canvasStyle = { flex: 1, backgroundColor: theme.canvas };
+  // Every non-scrolling state (loading + the three terminal states) centers its single element so
+  // they no longer visibly jump between top-left and center as the screen transitions.
+  const centeredStateStyle = [
+    canvasStyle,
+    { alignItems: 'center' as const, justifyContent: 'center' as const, padding: space['8'] },
+  ];
 
   if (state.kind === 'loading') {
     return (
       <View
-        style={[canvasStyle, { alignItems: 'center', justifyContent: 'center', padding: space['8'] }]}
+        style={centeredStateStyle}
         accessible
         accessibilityRole="progressbar"
         accessibilityLabel="Loading record"
@@ -62,7 +65,7 @@ export function EntityDetailScreen({
 
   if (state.kind === 'not-found') {
     return (
-      <View style={canvasStyle} testID="entity-not-found-state">
+      <View style={centeredStateStyle} testID="entity-not-found-state">
         <NotPublicState onBackToExplore={onBackToExplore} />
       </View>
     );
@@ -70,7 +73,7 @@ export function EntityDetailScreen({
 
   if (state.kind === 'offline-no-cache') {
     return (
-      <View style={canvasStyle} testID="entity-offline-no-cache-state">
+      <View style={centeredStateStyle} testID="entity-offline-no-cache-state">
         <ErrorState
           title={OFFLINE_NO_CACHE_COPY.title}
           description={OFFLINE_NO_CACHE_COPY.description}
@@ -82,7 +85,7 @@ export function EntityDetailScreen({
 
   if (state.kind === 'error') {
     return (
-      <View style={canvasStyle} testID="entity-error-state">
+      <View style={centeredStateStyle} testID="entity-error-state">
         <ErrorState
           title={GENERIC_ERROR_COPY.title}
           description={state.message || GENERIC_ERROR_COPY.description}
@@ -95,15 +98,6 @@ export function EntityDetailScreen({
   const { entity, freshness } = state.result;
   const beats = entityBeatIndices(entity);
 
-  const handleShare = async () => {
-    setShareBusy(true);
-    try {
-      await shareEntity(entity.id, entity.displayName);
-    } finally {
-      setShareBusy(false);
-    }
-  };
-
   return (
     <ScrollView
       testID="entity-detail-screen"
@@ -112,10 +106,18 @@ export function EntityDetailScreen({
         paddingHorizontal: screenScrollInsets.paddingHorizontal,
         paddingTop: screenScrollInsets.paddingTop,
         paddingBottom: screenScrollInsets.paddingBottom,
-        gap: space['5'],
+        gap: space['4'],
       }}
     >
-      {freshness.degraded ? <OfflineBanner fetchedAt={freshness.fetchedAt} /> : null}
+      {freshness.degraded || entity.sensitivity ? (
+        // Both trust banners lead the record together (differentiated tones), so the sensitivity
+        // context frames the content it precedes instead of surfacing a screen-and-a-half later
+        // as an apparent duplicate of the staleness banner.
+        <View style={{ gap: space['2'] }}>
+          {freshness.degraded ? <OfflineBanner fetchedAt={freshness.fetchedAt} /> : null}
+          {entity.sensitivity ? <SensitivityBanner sensitivity={entity.sensitivity} /> : null}
+        </View>
+      ) : null}
 
       <IntroSection entity={entity} />
 
@@ -125,8 +127,6 @@ export function EntityDetailScreen({
       />
 
       <HowToReadThisRecord {...(onMethodologyPress ? { onMethodologyPress } : {})} />
-
-      {entity.sensitivity ? <SensitivityBanner sensitivity={entity.sensitivity} /> : null}
 
       <NarrativeSections entity={entity} beats={beats} />
       <StatusSection entity={entity} index={beats.status} />
@@ -141,8 +141,6 @@ export function EntityDetailScreen({
         {...(onOpenEntity ? { onOpenEntity } : {})}
       />
       <ProvenanceSection entity={entity} index={beats.provenance} />
-
-      <Button label="Share" variant="secondary" loading={shareBusy} onPress={() => void handleShare()} />
     </ScrollView>
   );
 }

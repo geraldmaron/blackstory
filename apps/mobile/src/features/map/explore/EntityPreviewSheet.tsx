@@ -14,6 +14,8 @@ import {
   useAccessibilityFocus,
   useThemeColors,
   space,
+  radius,
+  MIN_TOUCH_TARGET,
 } from '@/ui';
 import { ExploreChromeFrame, exploreContentInset } from './explore-chrome';
 import { exploreRecordFacts } from './explore-preview-facts';
@@ -40,7 +42,7 @@ export type EntityPreviewSheetProps = {
   readonly style?: StyleProp<ViewStyle>;
 };
 
-const MIN_TOUCH = 44;
+const MIN_TOUCH = MIN_TOUCH_TARGET;
 
 export function EntityPreviewSheet({
   feature,
@@ -240,6 +242,6 @@ const styles = StyleSheet.create({
     minWidth: MIN_TOUCH,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 8,
+    borderRadius: radius.sm,
   },
 });

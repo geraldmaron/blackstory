@@ -94,12 +94,15 @@ describe('ContentRenderer', () => {
     expect(getByText('Showing cached copy (offline)')).toBeTruthy();
   });
 
-  it('uses editorial body text in longform presentation', async () => {
+  it('uses the editorial type scale (17/27) for longform body text', async () => {
     const { getByText } = await renderPage(BASE_PAGE, { presentation: 'longform' });
     const paragraph = getByText('Body paragraph one.');
-    expect(paragraph.props.style).toEqual(
-      expect.arrayContaining([expect.objectContaining({ fontSize: 18, lineHeight: 30 })]),
-    );
+    // The longform paragraph must inherit the shared `editorial` variant (17/27 Source Serif)
+    // rather than a one-off 18/30 override that drifts from the type scale.
+    const flattened = Object.assign({}, ...[paragraph.props.style].flat());
+    expect(flattened.fontSize).toBe(17);
+    expect(flattened.lineHeight).toBe(27);
+    expect(flattened.fontFamily).toBe('SourceSerif4-Regular');
   });
 
   it('shows a stale-legal-version affordance and fires onViewCurrent when pressed', async () => {

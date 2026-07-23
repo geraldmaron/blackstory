@@ -25,10 +25,11 @@ import { parseEntityId } from '@/lib/route-params';
 import {
   createRuntimeEntityDataDeps,
   EntityDetailScreen,
+  shareEntity,
   useEntityDetail,
   type EntityDataDeps,
 } from '@/features/entity';
-import { ScreenCanvas } from '@/ui';
+import { Button, ScreenCanvas } from '@/ui';
 
 function compactHeaderTitle(title: string): string {
   const trimmed = title.trim();
@@ -60,20 +61,39 @@ export default function EntityDetailRoute() {
   }, []);
 
   const { state, retry } = useEntityDetail(entityId, deps);
-  const headerTitle =
-    deps && state.kind === 'ready'
-      ? compactHeaderTitle(state.result.entity.displayName)
-      : 'Record';
+  const [shareBusy, setShareBusy] = useState(false);
+  const readyEntity = deps && state.kind === 'ready' ? state.result.entity : undefined;
+  const headerTitle = readyEntity ? compactHeaderTitle(readyEntity.displayName) : 'Record';
 
   useLayoutEffect(() => {
+    // Share lives in the stack header (a persistent affordance), not as an orphan full-width
+    // button stranded after ~9 screens of content.
+    const headerRight = readyEntity
+      ? () => (
+          <Button
+            label="Share"
+            variant="ghost"
+            density="compact"
+            loading={shareBusy}
+            accessibilityLabel={`Share ${readyEntity.displayName}`}
+            onPress={() => {
+              setShareBusy(true);
+              void shareEntity(readyEntity.id, readyEntity.displayName).finally(() =>
+                setShareBusy(false),
+              );
+            }}
+          />
+        )
+      : undefined;
     navigation.setOptions({
       title: headerTitle,
       headerTitle,
       headerBackTitle: 'Back',
       headerLargeTitle: false,
       headerBackButtonDisplayMode: 'minimal',
+      headerRight,
     });
-  }, [navigation, headerTitle]);
+  }, [navigation, headerTitle, readyEntity, shareBusy]);
 
   if (!entityId) {
     // Unknown/malformed/unsafe id — safe-default fallback, never a raw render of the input.

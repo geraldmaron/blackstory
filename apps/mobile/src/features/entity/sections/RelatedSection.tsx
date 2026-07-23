@@ -7,6 +7,7 @@ import { EntityEditionPanel } from '../EntityEditionPanel';
 import { RecordGapNotice } from '../RecordGapNotice';
 import { SECTION_HEADINGS } from '../copy';
 import { humanizeToken } from '../format';
+import { SectionHeading } from './SectionHeading';
 import type { RelatedNeighbor } from '../types';
 
 function NeighborRow({
@@ -18,15 +19,13 @@ function NeighborRow({
   readonly onPress?: () => void;
   readonly showDivider?: boolean;
 }) {
-  const subtitle =
-    neighbor.summary.trim().length > 0
-      ? neighbor.summary
-      : `${humanizeToken(neighbor.relationType)} connection to this record.`;
   return (
     <ListRow
       density="compact"
       title={neighbor.displayName}
-      subtitle={`${humanizeToken(neighbor.kind)} · ${humanizeToken(neighbor.relationType)} · ${subtitle}`}
+      // Kind · relation only — the full summary is often a paragraph, which blows out the row on
+      // one unbounded line. The record it links to carries the summary.
+      subtitle={`${humanizeToken(neighbor.kind)} · ${humanizeToken(neighbor.relationType)}`}
       leading={<NavIcon name={navIconForEntityKind(neighbor.kind)} size={20} />}
       showChevron
       onPress={onPress}
@@ -72,9 +71,7 @@ export function RelatedSection({
 
       {continueLearning.length > 0 ? (
         <View style={{ gap: space['2'] }}>
-          <Text variant="bodyEmphasis" isHeading testID="heading-level-3">
-            {SECTION_HEADINGS.continueLearning}
-          </Text>
+          <SectionHeading level={3}>{SECTION_HEADINGS.continueLearning}</SectionHeading>
           <Text variant="bodySmall" colorRole="inkMuted">
             Nearby records one step further in the published graph. Keep learning without dead ends.
           </Text>

@@ -2,7 +2,9 @@
  * Sensitivity context banner. `entity.sensitivity` is one of the fields `entity.ts`'s own
  * header comment says must be "Kept VISIBLE" — this is additive context, never a suppression
  * of the record, matching web's `EntitySensitivityBanner`/`SensitivityContextBanner` intent.
- * Renders through `@/ui`'s `Notice` (tone="warning") rather than a bespoke banner component.
+ * Renders through `@/ui`'s `Notice`. Tone is "info" (neutral additive context) — deliberately
+ * DISTINCT from the amber "warning" staleness/offline banner it now sits beside, so a
+ * degraded + sensitive record does not read as two identical warnings.
  */
 import { Notice } from '@/ui';
 import { humanizeToken } from '../format';
@@ -15,7 +17,7 @@ export type SensitivityBannerProps = {
 export function SensitivityBanner({ sensitivity }: SensitivityBannerProps) {
   return (
     <Notice
-      tone="warning"
+      tone="info"
       title={`Context: ${humanizeToken(sensitivity.class)}`}
       description={sensitivity.note}
     />

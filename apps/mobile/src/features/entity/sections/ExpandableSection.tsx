@@ -8,8 +8,34 @@
  * the preview is reliable under React's children flattening.
  */
 import { useState, type ReactNode } from 'react';
-import { View } from 'react-native';
-import { Button, space } from '@/ui';
+import { LayoutAnimation, Platform, UIManager, View } from 'react-native';
+import { Button, duration, space } from '@/ui';
+import { useReduceMotion } from '@/features/explore/useReduceMotion';
+
+// Android opts out of LayoutAnimation by default; enable it once at module load. iOS ignores this.
+if (
+  Platform.OS === 'android' &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
+// A gentle ease-out grow/shrink so inserting several claim cards does not snap the scroll spine.
+const EXPAND_LAYOUT_ANIMATION = {
+  duration: duration.durationBase,
+  update: {
+    type: LayoutAnimation.Types.easeInEaseOut,
+    property: LayoutAnimation.Properties.opacity,
+  },
+  create: {
+    type: LayoutAnimation.Types.easeInEaseOut,
+    property: LayoutAnimation.Properties.opacity,
+  },
+  delete: {
+    type: LayoutAnimation.Types.easeInEaseOut,
+    property: LayoutAnimation.Properties.opacity,
+  },
+};
 
 export type ExpandableSectionProps = {
   readonly previewCount: number;
@@ -20,12 +46,18 @@ export type ExpandableSectionProps = {
 
 export function ExpandableSection({ previewCount, items, itemLabel }: ExpandableSectionProps) {
   const [expanded, setExpanded] = useState(false);
+  const reduceMotion = useReduceMotion();
   const totalCount = items.length;
   const needsToggle = totalCount > previewCount;
   const visible = needsToggle && !expanded ? items.slice(0, previewCount) : items;
   const hiddenCount = Math.max(0, totalCount - previewCount);
 
   function handleToggle() {
+    // Animate the height change so the inserted/removed cards ease in instead of snapping the
+    // scroll position — unless the user has asked for reduced motion.
+    if (!reduceMotion) {
+      LayoutAnimation.configureNext(EXPAND_LAYOUT_ANIMATION);
+    }
     setExpanded(!expanded);
   }
 

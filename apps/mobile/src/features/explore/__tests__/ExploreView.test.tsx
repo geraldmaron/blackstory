@@ -48,22 +48,47 @@ jest.mock('react-native-safe-area-context', () => {
 jest.mock('@gorhom/bottom-sheet', () => {
   /* eslint-disable @typescript-eslint/no-require-imports */
   const React = require('react');
-  const { View } = require('react-native');
+  const { View, Pressable, Text } = require('react-native');
 
   const BottomSheet = React.forwardRef(
     (
       {
         children,
         handleComponent,
+        index,
+        onChange,
       }: {
         children?: unknown;
         handleComponent?: () => unknown;
+        index?: number;
+        onChange?: (index: number) => void;
       },
       _ref: unknown,
     ) =>
       React.createElement(
         View,
         { testID: 'explore-bottom-sheet-host' },
+        // Surface the controlled index so tests can assert what the derived
+        // value settled on after a simulated gesture (no snap-back).
+        React.createElement(
+          Text,
+          { testID: 'sheet-controlled-index' },
+          String(index),
+        ),
+        // Simulated drag-settle triggers — fire the sheet's onChange the way the
+        // gorhom sheet would when the user lifts their finger on a detent.
+        React.createElement(Pressable, {
+          testID: 'sheet-settle-peek',
+          onPress: () => onChange?.(0),
+        }),
+        React.createElement(Pressable, {
+          testID: 'sheet-settle-half',
+          onPress: () => onChange?.(1),
+        }),
+        React.createElement(Pressable, {
+          testID: 'sheet-settle-full',
+          onPress: () => onChange?.(2),
+        }),
         handleComponent ? handleComponent() : null,
         children as never,
       ),
@@ -128,6 +153,9 @@ jest.mock('react-native-reanimated', () => {
   /* eslint-disable @typescript-eslint/no-require-imports */
   const React = require('react');
   const { View } = require('react-native');
+  const fadeBuilder: Record<string, (...args: unknown[]) => unknown> = {};
+  fadeBuilder.duration = () => fadeBuilder;
+  fadeBuilder.delay = () => fadeBuilder;
   return {
     __esModule: true,
     default: {
@@ -145,8 +173,11 @@ jest.mock('react-native-reanimated', () => {
     runOnJS: (fn: unknown) => fn,
     runOnUI: (fn: unknown) => fn,
     ReduceMotion: { System: 'system', Always: 'always', Never: 'never' },
-    FadeIn: {},
-    FadeOut: {},
+    // Entering/exiting builders are chainable no-ops (`.duration(...)` returns self).
+    FadeIn: fadeBuilder,
+    FadeOut: fadeBuilder,
+    FadeInDown: fadeBuilder,
+    FadeOutUp: fadeBuilder,
   };
 });
 
@@ -202,6 +233,52 @@ describe('ExploreView — records rail', () => {
     const railHeader = within(getByTestId('explore-records-rail')).getByRole('header');
     expect(mast.props.accessibilityLabel).toBe('All records, 3 records');
     expect(railHeader.props.accessibilityLabel).toBe(mast.props.accessibilityLabel);
+  });
+
+  it('keeps the sheet where the gesture left it — no snap-back when dragged full → half', async () => {
+    const { getByTestId } = await render(
+      <ExploreView onOpenEntity={noop} reduceMotion />,
+    );
+    // Expand the rail to full browse from the mast control.
+    await act(async () => {
+      fireEvent.press(getByTestId('explore-chip-records'));
+    });
+    expect(getByTestId('sheet-controlled-index')).toHaveTextContent('2');
+
+    // Simulate the user dragging the sheet down to the half detent. The old bug
+    // recomputed the derived index back to full and yanked the sheet up; the
+    // gesture must now be authoritative.
+    await act(async () => {
+      fireEvent.press(getByTestId('sheet-settle-half'));
+    });
+    expect(getByTestId('sheet-controlled-index')).toHaveTextContent('1');
+
+    // And it stays lowerable all the way to peek.
+    await act(async () => {
+      fireEvent.press(getByTestId('sheet-settle-peek'));
+    });
+    expect(getByTestId('sheet-controlled-index')).toHaveTextContent('0');
+  });
+
+  it('dragging a selection preview below half dismisses the selection instead of snapping back', async () => {
+    const { getByTestId, queryByTestId, findByTestId } = await render(
+      <ExploreView
+        selectedParam="ent_fixture_place_dc"
+        onOpenEntity={noop}
+        reduceMotion
+      />,
+    );
+    expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
+    // A selection floors the sheet at half.
+    expect(getByTestId('sheet-controlled-index')).toHaveTextContent('1');
+
+    await act(async () => {
+      fireEvent.press(getByTestId('sheet-settle-peek'));
+    });
+    // The half floor releases because the selection is cleared — the sheet lands
+    // on peek and does not spring back to half under the finger.
+    expect(getByTestId('sheet-controlled-index')).toHaveTextContent('0');
+    expect(queryByTestId('entity-preview-sheet')).toBeNull();
   });
 
   it('opens the in-map instruments panel from floating chrome', async () => {

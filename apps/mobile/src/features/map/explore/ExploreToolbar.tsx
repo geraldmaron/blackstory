@@ -4,10 +4,10 @@
  */
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { Text, useThemeColors, space } from '@/ui';
+import { Text, useThemeColors, space, MIN_TOUCH_TARGET } from '@/ui';
 import type { FilterState } from '@/lib/route-params';
 
-const MIN_TOUCH = 44;
+const MIN_TOUCH = MIN_TOUCH_TARGET;
 const ICON_SIZE = 20;
 
 export type ExploreToolbarProps = {

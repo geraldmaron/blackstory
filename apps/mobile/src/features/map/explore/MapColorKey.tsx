@@ -105,6 +105,7 @@ export type MapColorKeyProps = {
 };
 
 export function MapColorKey({ testID = 'map-color-key', embedded = false }: MapColorKeyProps) {
+  const theme = useThemeColors();
   return (
     <ScrollView
       contentContainerStyle={[styles.content, embedded ? styles.contentEmbedded : undefined]}
@@ -142,6 +143,7 @@ export function MapColorKey({ testID = 'map-color-key', embedded = false }: MapC
                 height: radius * 2,
                 borderRadius: radius,
                 backgroundColor: DIGNITY_PALETTE.kindPlace,
+                borderColor: theme.border,
               },
             ]}
           />
@@ -159,6 +161,7 @@ export function MapColorKey({ testID = 'map-color-key', embedded = false }: MapC
                 height: (radius as number) * 2,
                 borderRadius: radius as number,
                 backgroundColor: DIGNITY_PALETTE.point,
+                borderColor: theme.border,
               },
             ]}
           />
@@ -203,8 +206,8 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: space['3'],
-    minHeight: 36,
+    gap: space['2'],
+    minHeight: 28,
   },
   glyph: {
     marginRight: space['1'],
@@ -216,6 +219,5 @@ const styles = StyleSheet.create({
   },
   sizeDisc: {
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: 'rgba(244, 239, 229, 0.35)',
   },
 });

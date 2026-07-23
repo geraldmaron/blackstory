@@ -106,33 +106,30 @@ export function SearchResultCard({
         onPress={onPress ? () => onPress(id) : undefined}
         accessibilityLabel={`${displayName}. ${accessibilitySlug}. ${body}`}
         showDivider={false}
-        secondaryAction={
-          <View style={styles.factsPane}>
-            <RecordFactStrip facts={facts} />
-            {onShowOnMap ? (
-              <View style={styles.secondary}>
-                <Button
-                  label="Show on map"
-                  variant="ghost"
-                  density="compact"
-                  accessibilityLabel={`Show ${displayName} on map`}
-                  onPress={() => onShowOnMap(id, kind)}
-                />
-              </View>
-            ) : null}
-          </View>
-        }
+        secondaryAction={<RecordFactStrip facts={facts} />}
       />
+      {onShowOnMap ? (
+        // Sibling of — never nested inside — the row Pressable: a control inside the row would be
+        // unreachable to VoiceOver (the row collapses to one a11y node) and pressing it would paint
+        // the whole row. Indented to line up with the row's text column.
+        <View style={styles.secondary}>
+          <Button
+            label="Show on map"
+            variant="ghost"
+            density="compact"
+            accessibilityLabel={`Show ${displayName} on map`}
+            onPress={() => onShowOnMap(id, kind)}
+          />
+        </View>
+      ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  factsPane: {
-    gap: space['2'],
-    marginTop: space['1'],
-  },
   secondary: {
     alignItems: 'flex-start',
+    paddingHorizontal: space['3'],
+    paddingBottom: space['2'],
   },
 });

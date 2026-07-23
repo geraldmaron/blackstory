@@ -1,10 +1,11 @@
 /**
  * Full content-page screen body (MOB-015): v6 Surface edition stack with indexed intro panel
- * and raised body panel. Wires `useContentPage` through `ContentRenderer`.
+ * and a single body panel hosting the article directly. Wires `useContentPage` through
+ * `ContentRenderer`.
  */
 import { useNavigation } from 'expo-router';
 import { useLayoutEffect } from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import {
   EditionSurfacePanel,
   EditionSurfaceStack,
@@ -13,6 +14,8 @@ import {
   LiftedSurface,
   ScreenCanvas,
   screenScrollInsets,
+  space,
+  useThemeColors,
 } from '@/ui';
 import { normalizeTypedContentPage } from './content-blocks';
 import type { CatalogSectionId } from './content-catalog';
@@ -28,10 +31,36 @@ export interface ContentPageScreenProps {
   readonly fallbackTitle?: string;
 }
 
-function compactHeaderTitle(title: string): string {
-  const trimmed = title.trim();
-  if (trimmed.length <= 36) return trimmed;
-  return `${trimmed.slice(0, 33).trimEnd()}…`;
+/** Title/3-paragraph skeleton shown while the page loads — a shape hint, not a spinner glyph. */
+function ContentPageSkeleton() {
+  const theme = useThemeColors();
+  const bar = (widthPct: number, height: number, extra?: object) => (
+    <View
+      style={[
+        styles.skeletonBar,
+        { backgroundColor: theme.surfaceRaised, borderColor: theme.border, width: `${widthPct}%`, height },
+        extra,
+      ]}
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+    />
+  );
+  return (
+    <View accessibilityLabel="Loading story" accessibilityRole="progressbar">
+      <View style={styles.skeletonTitleBlock}>
+        {bar(80, 24)}
+        {bar(55, 24)}
+      </View>
+      {[0, 1, 2].map((paragraph) => (
+        <View key={paragraph} style={styles.skeletonParagraph}>
+          {bar(100, 14)}
+          {bar(96, 14)}
+          {bar(88, 14)}
+          {bar(paragraph === 2 ? 40 : 70, 14)}
+        </View>
+      ))}
+    </View>
+  );
 }
 
 export function ContentPageScreen({
@@ -46,7 +75,7 @@ export function ContentPageScreen({
 
   const resolvedTitle =
     state.status === 'ok'
-      ? compactHeaderTitle(normalizeTypedContentPage(state.value.page).page?.title ?? fallbackTitle)
+      ? normalizeTypedContentPage(state.value.page).page?.title ?? fallbackTitle
       : fallbackTitle;
 
   useLayoutEffect(() => {
@@ -69,7 +98,7 @@ export function ContentPageScreen({
         }}
       >
         {state.status === 'loading' ? (
-          <EmptyState title="Loading…" />
+          <ContentPageSkeleton />
         ) : state.status === 'error' ? (
           <ErrorState title="Something went wrong" description="This page could not be loaded." />
         ) : state.status === 'not-found' ? (
@@ -101,22 +130,22 @@ export function ContentPageScreen({
                   compact
                 />
 
-                <EditionSurfacePanel index="01" kicker="Body" title="Read">
-                  <LiftedSurface tone="surfaceRaised" shadow="none" paddingKey={longform ? '5' : '4'}>
-                    <ContentRenderer
-                      page={page}
-                      blocks={blocks}
-                      skippedSections={skippedSections}
-                      sources={state.value.sources}
-                      requiresCitation={state.value.requiresCitation}
-                      presentation={longform ? 'longform' : 'document'}
-                      cached={{ fetchedAt: state.fetchedAt, degraded: state.degraded }}
-                      versionStale={versionStale}
-                      headerFacts={facts}
-                      hideTitle
-                    />
-                  </LiftedSurface>
-                </EditionSurfacePanel>
+                {/* Body hosted directly on a single surface — no "01 / BODY / Read" header
+                    above the prose, and no nested surface squeezing the text measure. */}
+                <LiftedSurface tone="surface" shadow="none" paddingKey="3">
+                  <ContentRenderer
+                    page={page}
+                    blocks={blocks}
+                    skippedSections={skippedSections}
+                    sources={state.value.sources}
+                    requiresCitation={state.value.requiresCitation}
+                    presentation={longform ? 'longform' : 'document'}
+                    cached={{ fetchedAt: state.fetchedAt, degraded: state.degraded }}
+                    versionStale={versionStale}
+                    headerFacts={facts}
+                    hideTitle
+                  />
+                </LiftedSurface>
               </EditionSurfaceStack>
             );
           })()
@@ -125,3 +154,18 @@ export function ContentPageScreen({
     </ScreenCanvas>
   );
 }
+
+const styles = StyleSheet.create({
+  skeletonTitleBlock: {
+    gap: space['2'],
+    marginBottom: space['6'],
+  },
+  skeletonParagraph: {
+    gap: space['2'],
+    marginBottom: space['5'],
+  },
+  skeletonBar: {
+    borderRadius: space['1'],
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+});

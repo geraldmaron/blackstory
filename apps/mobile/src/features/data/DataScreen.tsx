@@ -36,7 +36,9 @@ export function DataScreen() {
       : 'Charts below read from the reference indicator warehouse when available.';
 
   return (
-    <ScreenCanvas>
+    // `/data` is a stack screen with a visible native header, so the canvas insets
+    // only the sides and bottom — the header already owns the top inset.
+    <ScreenCanvas edges={['left', 'right', 'bottom']}>
       <ScrollView contentContainerStyle={styles.content}>
         <EditionSurfaceStack>
           <EditionSurfacePanel
@@ -50,7 +52,7 @@ export function DataScreen() {
             index={DATA_SECTION_COPY.orientation.index}
             kicker={DATA_SECTION_COPY.orientation.kicker}
             title={DATA_SECTION_COPY.orientation.title}
-            dek={`${DATA_SECTION_COPY.orientation.lede} ${servedFromNote}`}
+            dek={DATA_SECTION_COPY.orientation.lede}
           >
             <Notice
               tone="info"
@@ -78,12 +80,16 @@ export function DataScreen() {
             dek={DATA_SECTION_COPY.population.lede}
           >
             <EmptyState
+              compact
               title="Census timeline not on this release yet"
-              description="The national decade-by-decade population series ships on the website when the warehouse snapshot is available. Open Explore for place layers, or check back after the next update."
-              action={{
-                label: 'Open Explore',
-                onPress: () => router.push('/explore'),
-              }}
+              description="The national decade-by-decade series ships on the web when the warehouse snapshot is ready. Open Explore for place layers meanwhile."
+            />
+            <Button
+              label="Open Explore"
+              variant="secondary"
+              density="compact"
+              onPress={() => router.push('/explore')}
+              accessibilityHint="Opens the Explore map tab"
             />
           </EditionSurfacePanel>
 

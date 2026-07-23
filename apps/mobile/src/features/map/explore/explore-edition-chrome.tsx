@@ -4,10 +4,10 @@
  */
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
-import { Text, space, radius, useThemeColors } from '@/ui';
+import { LiftedSurface, Text, space, radius, useThemeColors, MIN_TOUCH_TARGET } from '@/ui';
 import { exploreContentInset } from './explore-chrome';
 
-const MIN_TOUCH = 44;
+const MIN_TOUCH = MIN_TOUCH_TARGET;
 
 export type ExploreEditionTab = {
   readonly id: string;
@@ -210,25 +210,27 @@ export type ExploreInstrumentsFrameProps = {
   readonly testID?: string;
 };
 
-/** Continuous Surface field for in-map instruments — top-anchored, no card frame. */
+/**
+ * Lifted plate for in-map instruments — top-anchored, but with a defined bottom
+ * edge (radius + full hairline border + soft shadow) so content is never
+ * guillotined mid-row the way a bare top-border-only frame used to do.
+ */
 export function ExploreInstrumentsFrame({
   children,
   style,
   testID = 'explore-instruments-frame',
 }: ExploreInstrumentsFrameProps) {
-  const theme = useThemeColors();
-
   return (
-    <View
-      style={[
-        styles.instrumentsFrame,
-        { backgroundColor: theme.surface, borderTopColor: theme.border },
-        style,
-      ]}
+    <LiftedSurface
+      tone="surface"
+      shadow="sm"
+      radiusKey="md"
+      bordered
+      style={[styles.instrumentsFrame, style]}
       testID={testID}
     >
       {children}
-    </View>
+    </LiftedSurface>
   );
 }
 
@@ -298,8 +300,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   instrumentsFrame: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    overflow: 'hidden',
     maxHeight: '55%',
   },
 });

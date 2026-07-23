@@ -16,8 +16,9 @@
  */
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { StyleSheet, View, type LayoutChangeEvent } from 'react-native';
+import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated';
 import { useEditionTabBarInset } from '@/shell/edition-chrome';
-import { ApiStatusBanner, ScreenCanvas } from '@/ui';
+import { ApiStatusBanner, ScreenCanvas, Z_LAYER, space } from '@/ui';
 import {
   MapAttribution,
   MapScreen,
@@ -98,8 +99,12 @@ export function ExploreView({
   const allFeatures = useMemo(() => toExploreFeatures(source), [source]);
   const [state, dispatch] = useReducer(exploreReducer, filters, initialExploreState);
   const [instrumentsOpen, setInstrumentsOpen] = useState(false);
-  const [recordsExpanded, setRecordsExpanded] = useState(false);
-  const [manualSnapIndex, setManualSnapIndex] = useState(EXPLORE_SHEET_PEEK);
+  // Single controlled source of truth for the sheet snap (the gesture is
+  // authoritative — see `onSnapIndexChange`). A separate `recordsExpanded`
+  // boolean used to disagree with the gesture and yank the sheet back to full
+  // when the user dragged it to half; that derived-vs-gesture conflict is gone.
+  const [snapIndex, setSnapIndex] = useState(EXPLORE_SHEET_PEEK);
+  const [chromeHeight, setChromeHeight] = useState(0);
   const prevSelectedIdRef = useRef<string | null>(null);
 
   const attributionBottom = useMemo(
@@ -115,19 +120,21 @@ export function ExploreView({
     setMapAreaHeight(event.nativeEvent.layout.height);
   }, []);
 
+  const handleChromeLayout = useCallback((event: LayoutChangeEvent) => {
+    setChromeHeight(event.nativeEvent.layout.height);
+  }, []);
+
   useEffect(() => {
     const prevSelectedId = prevSelectedIdRef.current;
     const nextSelectedId = state.selectedId ?? null;
     prevSelectedIdRef.current = nextSelectedId;
 
     if (nextSelectedId && !prevSelectedId) {
-      setManualSnapIndex(EXPLORE_SHEET_HALF);
-      setRecordsExpanded(true);
+      setSnapIndex(EXPLORE_SHEET_HALF);
       return;
     }
     if (!nextSelectedId && prevSelectedId) {
-      setManualSnapIndex(EXPLORE_SHEET_PEEK);
-      setRecordsExpanded(false);
+      setSnapIndex(EXPLORE_SHEET_PEEK);
     }
   }, [state.selectedId]);
 
@@ -160,12 +167,20 @@ export function ExploreView({
 
   const listFeatures = useMemo(() => visibleFeatures(allFeatures, state), [allFeatures, state]);
   const scopeLabel = state.viewport ? 'In view' : 'All records';
+  // A selection floors the sheet at half; otherwise the gesture-controlled
+  // `snapIndex` IS the sheet position. There is no separate boolean that can
+  // recompute a different index and fight the drag.
   const sheetSnapIndex = state.selectedId
-    ? Math.max(manualSnapIndex, EXPLORE_SHEET_HALF)
-    : recordsExpanded
-      ? EXPLORE_SHEET_FULL
-      : manualSnapIndex;
-  const attributionVisible = sheetSnapIndex <= EXPLORE_SHEET_PEEK && !instrumentsOpen;
+    ? Math.max(snapIndex, EXPLORE_SHEET_HALF)
+    : snapIndex;
+  const recordsExpanded = sheetSnapIndex >= EXPLORE_SHEET_HALF;
+  // Attribution and floating chrome are meaningless without a live basemap and
+  // must not overlay MapScreen's error/loading state (the pill lands on the
+  // retry button). Gate both on the map being live; the sheet always stays.
+  const mapLive = loadState.kind === 'ready';
+  const attributionVisible =
+    mapLive && sheetSnapIndex <= EXPLORE_SHEET_PEEK && !instrumentsOpen;
+  const instrumentsTop = space['1'] + chromeHeight + space['2'];
 
   const selectedFeature = state.selectedId
     ? allFeatures.find((f) => f.entityId === state.selectedId) ?? null
@@ -188,24 +203,25 @@ export function ExploreView({
     setInstrumentsOpen((open) => {
       const next = !open;
       if (next) {
-        setRecordsExpanded(false);
-        setManualSnapIndex(EXPLORE_SHEET_PEEK);
+        setSnapIndex(EXPLORE_SHEET_PEEK);
       }
       return next;
     });
   }, []);
 
   const handleToggleRecords = useCallback(() => {
-    setRecordsExpanded((expanded) => {
-      const next = !expanded;
-      if (next) {
-        setInstrumentsOpen(false);
-      } else {
-        setManualSnapIndex(EXPLORE_SHEET_PEEK);
+    if (recordsExpanded) {
+      // Lower the rail. A selection floors the sheet at half, so clear it too —
+      // otherwise the derived floor would immediately re-raise the sheet.
+      if (state.selectedId) {
+        dispatch({ type: 'entityDeselected' });
       }
-      return next;
-    });
-  }, []);
+      setSnapIndex(EXPLORE_SHEET_PEEK);
+    } else {
+      setInstrumentsOpen(false);
+      setSnapIndex(EXPLORE_SHEET_FULL);
+    }
+  }, [recordsExpanded, state.selectedId]);
 
   const handleFiltersChange = useCallback(
     (next: FilterState) => {
@@ -257,27 +273,36 @@ export function ExploreView({
         <MapAttribution
           bottom={attributionBottom}
           visible={attributionVisible}
+          reduceMotion={reduceMotion}
           compact
         />
 
-        <ExploreFloatingChrome
-          inViewCount={listFeatures.length}
-          releaseCount={allFeatures.length}
-          scopeLabel={scopeLabel}
-          filters={filters}
-          showDemoHint={showDemoHint}
-          instrumentsOpen={instrumentsOpen}
-          recordsExpanded={recordsExpanded || sheetSnapIndex >= EXPLORE_SHEET_HALF}
-          onToggleInstruments={handleToggleInstruments}
-          onToggleRecords={handleToggleRecords}
-          onOpenSearch={onOpenSearch}
-          onNationalView={() => dispatch({ type: 'presetRequested', preset: 'national' })}
-        />
+        {mapLive ? (
+          <ExploreFloatingChrome
+            inViewCount={listFeatures.length}
+            releaseCount={allFeatures.length}
+            scopeLabel={scopeLabel}
+            filters={filters}
+            showDemoHint={showDemoHint}
+            instrumentsOpen={instrumentsOpen}
+            recordsExpanded={recordsExpanded}
+            onLayout={handleChromeLayout}
+            onToggleInstruments={handleToggleInstruments}
+            onToggleRecords={handleToggleRecords}
+            onOpenSearch={onOpenSearch}
+            onNationalView={() => dispatch({ type: 'presetRequested', preset: 'national' })}
+          />
+        ) : null}
 
-        {instrumentsOpen ? (
-          <View
-            style={[styles.instrumentsOverlay, { bottom: attributionBottom }]}
+        {mapLive && instrumentsOpen ? (
+          <Animated.View
+            style={[
+              styles.instrumentsOverlay,
+              { top: instrumentsTop, bottom: attributionBottom },
+            ]}
             pointerEvents="box-none"
+            entering={reduceMotion ? undefined : FadeInDown.duration(160)}
+            exiting={reduceMotion ? undefined : FadeOutUp.duration(160)}
           >
             <ExploreInstrumentsPanel
               filters={filters}
@@ -286,7 +311,7 @@ export function ExploreView({
               onHide={() => setInstrumentsOpen(false)}
               onOpenPlaceFind={onOpenSearch}
             />
-          </View>
+          </Animated.View>
         ) : null}
 
         <ExploreBottomSheet
@@ -297,12 +322,12 @@ export function ExploreView({
           scrollable={Boolean(selectedFeature)}
           sheetList={!selectedFeature}
           onSnapIndexChange={(index) => {
-            setManualSnapIndex(index);
-            if (index >= EXPLORE_SHEET_HALF) {
-              setRecordsExpanded(true);
-            }
-            if (index === EXPLORE_SHEET_PEEK && !selectedFeature) {
-              setRecordsExpanded(false);
+            // Gesture is authoritative: the controlled index always equals where
+            // the user left the sheet. If a selection is lowered below half, drop
+            // the selection so the half floor releases (no snap-back yank).
+            setSnapIndex(index);
+            if (index < EXPLORE_SHEET_HALF && state.selectedId) {
+              dispatch({ type: 'entityDeselected' });
             }
           }}
         >
@@ -348,7 +373,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    top: 52,
-    zIndex: 4,
+    // `top` is set inline from the measured chrome height so the panel never
+    // covers the mast (including the control that dismisses it). The mast sits
+    // above at Z_LAYER.overlay so chrome always wins if Dynamic Type grows it.
+    zIndex: Z_LAYER.mapChrome,
   },
 });

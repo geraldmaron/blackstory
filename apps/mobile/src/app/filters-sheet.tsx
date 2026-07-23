@@ -12,6 +12,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 
 import { type FilterState, filterStateToRouteParams, parseFilterState, parseReturnTo } from '@/lib/route-params';
+import { ScreenCanvas } from '@/ui';
 import { DEMO_MAP_SOURCE } from '@/features/map/demoMapSource';
 import { toExploreFeatures } from '@/features/explore/explore-feature';
 import { buildExploreFacetOptions } from '@/features/explore/explore-filter';
@@ -49,13 +50,15 @@ export default function FiltersSheet() {
   }
 
   return (
-    <ExploreFiltersPanel
-      filters={filters}
-      facetOptions={facetOptions}
-      onFiltersChange={setFilters}
-      onClear={clear}
-      onApply={apply}
-      onOpenPlaceFind={() => router.push('/history')}
-    />
+    <ScreenCanvas edges={['bottom', 'left', 'right']}>
+      <ExploreFiltersPanel
+        filters={filters}
+        facetOptions={facetOptions}
+        onFiltersChange={setFilters}
+        onClear={clear}
+        onApply={apply}
+        onOpenPlaceFind={() => router.push('/history')}
+      />
+    </ScreenCanvas>
   );
 }
