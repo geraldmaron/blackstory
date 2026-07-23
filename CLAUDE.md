@@ -50,6 +50,16 @@ bd close <id>         # Complete work
 <!-- END BEADS INTEGRATION -->
 
 
+## Mobile local QA (agents)
+
+**Default:** `pnpm mobile:ios:verify` (Path A, prod-like). Checks api-public + Release app on Simulator; **does not** use Metro.
+
+- Launch/rebuild: `pnpm mobile:ios:release`
+- Hot reload only: `pnpm dev:mobile` (Path B)
+- Never claim mobile healthy from `127.0.0.1:8081` alone if the dev client may target another port
+
+Details: `AGENTS.md` and `apps/mobile/README.md`.
+
 ## Build & Test
 
 _Add your build and test commands here_

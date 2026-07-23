@@ -92,10 +92,17 @@ describe('HomeHowThisWorks beat 04', () => {
 describe('HomeDataPulse beat 03', () => {
   it('renders archive strip and data hand-off when census rows are absent', () => {
     const html = renderToStaticMarkup(
-      <HomeDataPulse recordCount={104} stateCount={24} eraSpan="1820s–1970s" />,
+      <HomeDataPulse
+        publishedRecordCount={1367}
+        pinnedRecordCount={1365}
+        stateCount={24}
+        eraSpan="1820s–1970s"
+      />,
     );
     assert.match(html, /What the numbers show/);
-    assert.match(html, /104/);
+    assert.match(html, /1,367/);
+    assert.match(html, /Published records/);
+    assert.match(html, /1,365/);
     assert.match(html, /Records pinned/);
     assert.match(html, /1820s to 1970s/);
     assert.match(html, /href="\/data"/);
@@ -145,7 +152,7 @@ describe('HomeDataPulse beat 03', () => {
     };
 
     const html = renderToStaticMarkup(
-      <HomeDataPulse recordCount={104} stateCount={24} timeline={timeline} />,
+      <HomeDataPulse publishedRecordCount={104} pinnedRecordCount={102} stateCount={24} timeline={timeline} />,
     );
     assert.match(html, /Black population by decade/);
     assert.match(html, /Share of the U\.S\. that is Black/);
@@ -206,7 +213,8 @@ describe('HomeEdition orchestrator', () => {
       <HomeEdition
         featured={SAMPLE_FEATURED}
         topStates={[]}
-        recordCount={12}
+        publishedRecordCount={1367}
+        pinnedRecordCount={1365}
         stateCount={4}
         OrientControl={OrientStub}
       />,

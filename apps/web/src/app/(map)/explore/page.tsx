@@ -101,7 +101,8 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
             ]}
           />
           <p className="ds-sans ds-explore__results-count" id="explore-results-heading-njs">
-            {view.totalMatched} documented record{view.totalMatched === 1 ? '' : 's'} in view
+            {view.totalMatched} documented record{view.totalMatched === 1 ? '' : 's'} matching
+            filters · oldest first
           </p>
           <SynchronizedResultList
             features={view.filteredFeatures}

@@ -83,11 +83,23 @@ describe('home hero panel structure', () => {
       mapSurfacesCss,
       /\.ds-map-surface:has\(\.ds-home-hero\)\s+\.ds-map-stage--hero-inset\s*\{[^}]*overflow:\s*hidden/s,
     );
+    assert.match(
+      mapSurfacesCss,
+      /\.ds-map-surface:has\(\.ds-home-hero\)\s+\.ds-map-stage--hero-inset\s*\{[^}]*border-radius:/s,
+    );
     assert.match(shellCss, /\.ds-home-hero__copy\s*\{[^}]*z-index:\s*2/s);
     assert.match(shellCss, /\.ds-home-hero__map\s*\{[^}]*pointer-events:\s*none/s);
     assert.match(
       homeEditionCss,
-      /\.ds-map-surface:has\(\.ds-home-hero\)\s+\.ds-home\s*\{[^}]*isolation:\s*auto/s,
+      /\.ds-map-surface:has\(\.ds-home-hero\)\s+\.ds-home\s*\{[^}]*background:\s*var\(--ds-canvas\)/s,
+    );
+    assert.match(
+      homeEditionCss,
+      /\.ds-home-edition\s*\{[^}]*background:\s*var\(--ds-canvas\)/s,
+    );
+    assert.doesNotMatch(
+      mapSurfacesCss,
+      /\.ds-map-surface:has\(\.ds-home-hero\)\s+main\s*\{[^}]*background:\s*transparent/s,
     );
   });
 
@@ -111,7 +123,11 @@ describe('home shell-on-home', () => {
       shellCss,
       /\.ds-shell:has\(\.ds-home-hero\)\s+\.ds-shell-header__inner\s*\{[^}]*border-radius:\s*var\(--ds-radius-md\)/s,
     );
-    assert.match(shellCss, /\.ds-shell:has\(\.ds-home-hero\)\s+\.ds-shell-wordmark::after/);
+    assert.doesNotMatch(shellCss, /\.ds-shell:has\(\.ds-home-hero\)\s+\.ds-shell-wordmark::after/);
+    assert.match(
+      shellCss,
+      /\.ds-shell:has\(\.ds-home-hero\)\s+\.ds-shell-wordmark__img--lockup/s,
+    );
   });
 });
 
@@ -123,5 +139,7 @@ describe('home edition atmosphere', () => {
     assert.match(editionAtmosphereCss, /--ds-edition-pattern-grain/);
     assert.match(editionAtmosphereCss, /--ds-edition-pattern-archive-grid/);
     assert.match(editionAtmosphereCss, /\.ds-edition-atmosphere__mosaic/);
+    assert.match(editionAtmosphereCss, /\.ds-edition-atmosphere__polaroid/);
+    assert.doesNotMatch(editionAtmosphereCss, /box-shadow/);
   });
 });

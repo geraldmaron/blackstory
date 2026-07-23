@@ -5,6 +5,9 @@
  */
 import { notFound } from 'next/navigation';
 import { EditionAtmosphereMosaic } from '../../../components/patterns/edition-atmosphere/EditionAtmosphereMosaic';
+import {
+  EDITION_MOSAIC_COUNT_DETAIL,
+} from '../../../components/patterns/edition-atmosphere/edition-atmosphere-config';
 import { buildLawDetailViewModel, listLawStaticParams } from '../law-view-model';
 import { LawDetailIntro, LawDetailSections } from '../LawDetailSections';
 import {
@@ -45,7 +48,7 @@ export default async function LawDetailPage({ params }: LawDetailPageProps) {
 
   return (
     <div className={lawEditionRootClassName()} data-law-edition="v6">
-      <EditionAtmosphereMosaic seedKey={`${LAW_EDITION_MOSAIC_SEED}:${slug}`} count={12} />
+      <EditionAtmosphereMosaic seedKey={`${LAW_EDITION_MOSAIC_SEED}:${slug}`} count={EDITION_MOSAIC_COUNT_DETAIL} />
       <main className="ds-container ds-page" id="main">
         <div className={lawEditionStackClassName()}>
           <LawDetailIntro snapshot={snapshot} />

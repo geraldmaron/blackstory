@@ -1,7 +1,7 @@
 /**
  * Overview statistics for the `/history` browse surface. Aggregates matched record counts,
  * visible connection totals, kind composition from the filtered node set, and decade density
- * from the graph release artifact (pre-filter slice membership).
+ * derived from those same filtered nodes so overview stats stay aligned with "Records in view".
  */
 import type { GraphReleaseArtifact } from '@repo/domain';
 import { filterDecadesAtOrBeforeCurrent, buildInclusiveDecadeRange, type DecadeReferenceDate } from '@repo/domain/era';
@@ -41,13 +41,16 @@ export function buildHistoryOverview(
           publishedDecades[publishedDecades.length - 1]!,
           reference,
         );
-  const decadeDensity = decadeAxis.map((decade) => {
-    const view = artifact.decadeViews.find((entry) => entry.decade === decade);
-    return {
-      decade,
-      count: view?.nodeIds.length ?? 0,
-    };
-  });
+  const decadeCounts = new Map<string, number>();
+  for (const node of nodes) {
+    for (const decade of node.eraBuckets) {
+      decadeCounts.set(decade, (decadeCounts.get(decade) ?? 0) + 1);
+    }
+  }
+  const decadeDensity = decadeAxis.map((decade) => ({
+    decade,
+    count: decadeCounts.get(decade) ?? 0,
+  }));
 
   return {
     totalRecords: nodes.length,

@@ -130,7 +130,7 @@
 
 .ds-history-edition__stepper-sticky {
   position: sticky;
-  top: var(--ds-space-3);
+  top: var(--ds-island-clearance);
   z-index: 2;
   padding-bottom: var(--ds-space-2);
   background: var(--ds-surface-raised);
@@ -155,8 +155,8 @@
 
   .ds-history-edition__panel--records {
     position: sticky;
-    top: calc(var(--ds-space-3) + 3rem);
-    max-height: calc(100vh - 6rem);
+    top: calc(var(--ds-island-clearance) + 3rem);
+    max-height: calc(100vh - var(--ds-island-clearance) - 3rem);
     overflow-y: auto;
   }
 }
@@ -187,29 +187,38 @@
   color: var(--ds-ink-muted);
 }
 
-/* Records list — explore rail selection register */
-.ds-history-edition__panel--records .ds-result-list__link {
-  display: grid;
-  gap: var(--ds-space-1);
+/* Records list: explore rail selection register (row-link host, not nested title link) */
+.ds-history-edition__panel--records .ds-history-result-list__row-link {
+  display: block;
   padding: var(--ds-space-3) 0 var(--ds-space-3) var(--ds-space-2);
   border-left: 3px solid transparent;
   margin-left: calc(-1 * var(--ds-space-2));
   padding-left: calc(var(--ds-space-2) - 3px);
+  border-radius: var(--ds-radius-sm);
+  color: inherit;
+  text-decoration: none;
 }
 
-.ds-history-edition__panel--records .ds-result-list__link:hover {
+.ds-history-edition__panel--records .ds-history-result-list__row-link:hover {
   background: color-mix(in srgb, var(--ds-ink) 4%, transparent);
 }
 
-.ds-history-edition__panel--records .ds-history-result-list__item--selected .ds-result-list__link,
-.ds-history-edition__panel--records .ds-result-list__item--selected .ds-result-list__link {
+.ds-history-edition__panel--records .ds-history-result-list__row-link:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+.ds-history-edition__panel--records
+  .ds-history-result-list__item--selected
+  .ds-history-result-list__row-link {
   border-left-color: var(--ds-accent);
   background: color-mix(in srgb, var(--ds-accent) 7%, transparent);
   color: var(--ds-ink);
 }
 
-.ds-history-edition__panel--records .ds-history-result-list__item--selected .ds-result-list__title,
-.ds-history-edition__panel--records .ds-result-list__item--selected .ds-result-list__title {
+.ds-history-edition__panel--records
+  .ds-history-result-list__item--selected
+  .ds-history-edition__rip-title {
   color: var(--ds-ink);
   font-weight: 600;
 }
@@ -230,17 +239,20 @@ a.ds-explore-edition__decade-tab {
   text-decoration: none;
 }
 
-/* Rip list rows — compact record cards (merged search register) */
-.ds-history-result-list__row-link {
-  display: block;
-  color: inherit;
-  text-decoration: none;
+/* Rip list rows: compact record cards (merged search register) */
+.ds-history-result-list__row-link:hover .ds-history-edition__rip-title,
+.ds-history-result-list__row-link:focus-visible .ds-history-edition__rip-title {
+  color: var(--ds-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
 }
 
 .ds-history-edition__rip-row {
   display: grid;
   gap: var(--ds-space-2);
-  padding: var(--ds-space-3) 0;
+  /* Vertical padding lives on the outer row-link so the copper rule spans the full hit target */
+  padding: 0;
   border-top: var(--ds-border-width) solid var(--ds-rule);
 }
 

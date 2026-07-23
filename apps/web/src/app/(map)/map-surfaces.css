@@ -93,7 +93,14 @@
 .ds-map-surface:has(.ds-home-hero) .ds-map-stage--hero-inset {
   z-index: 1;
   overflow: hidden;
+  border-radius: 0 var(--ds-radius-md) var(--ds-radius-md) 0;
   /* Viewport box from hero-map-inset.ts — no clip-path (Safari WebGL compositing). */
+}
+
+@media (max-width: 47.9375rem) {
+  .ds-map-surface:has(.ds-home-hero) .ds-map-stage--hero-inset {
+    border-radius: 0 0 var(--ds-radius-md) var(--ds-radius-md);
+  }
 }
 
 .ds-map-surface:has(.ds-home-hero:not(.ds-hero-stage--dissolving)) .maplibregl-ctrl-top-right {
@@ -103,10 +110,6 @@
 .ds-map-surface:has(.ds-home-hero:not(.ds-hero-stage--dissolving)) .maplibregl-ctrl-bottom-left {
   /* Attribution stays inside the hero map readout. */
   z-index: 2;
-}
-
-.ds-map-surface:has(.ds-home-hero) main {
-  background: transparent;
 }
 
 /* Homepage map surface: footer sits outside `.ds-map-surface` but the plate is
@@ -582,7 +585,7 @@
 }
 
 .ds-explore-place__chip {
-  min-height: 2.25rem;
+  min-height: 2.75rem;
   padding: 0 var(--ds-space-3);
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-sm);
@@ -798,9 +801,13 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--ds-space-2);
-  padding-bottom: var(--ds-space-2);
+  /* Bleed into panel padding so scroll content cannot peek beside the sticky bar. */
+  margin-inline: calc(-1 * var(--ds-explore-panel-padding, var(--ds-space-5)));
   margin-bottom: calc(-1 * var(--ds-space-2));
+  padding: 0 var(--ds-explore-panel-padding, var(--ds-space-5)) var(--ds-space-2);
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  border-top-left-radius: calc(var(--ds-radius-md) - var(--ds-border-width));
+  border-top-right-radius: calc(var(--ds-radius-md) - var(--ds-border-width));
   background: var(--ds-surface);
 }
 
@@ -965,15 +972,11 @@
   transition: opacity var(--ds-duration-fast) var(--ds-easing);
 }
 
-/* When a record is open, quiet the list rail so the spotlight owns attention.
-   Keep the panel header interactive so Hide records still works. */
-.ds-explore-stage__results--dimmed {
+/* When a record is open, quiet the LIST only so the spotlight owns attention.
+   Header (count + Hide records) stays full-opacity Surface chrome for WCAG AA. */
+.ds-explore-stage__results--dimmed .ds-explore-stage__results-list {
   opacity: 0.42;
   pointer-events: none;
-}
-
-.ds-explore-stage__results--dimmed .ds-explore-stage__panel-header {
-  pointer-events: auto;
 }
 
 /* Centered (desktop) / bottom-sheet (mobile) narrative — copper marks the orientation moment.
@@ -1170,10 +1173,6 @@
     top: auto;
     bottom: var(--ds-explore-edge);
     right: var(--ds-explore-edge);
-  }
-
-  .ds-explore-stage__results--dimmed {
-    opacity: 0;
   }
 
   .ds-explore-stage[data-instruments='open'] .ds-explore-stage__restore-dock,

@@ -18,14 +18,45 @@ function mapStageEl(): HTMLElement | null {
   return document.querySelector<HTMLElement>(MAP_STAGE_SELECTOR);
 }
 
-/** Viewport-fixed box matching a hero map column rect. */
-export function heroMapStageGeometryForRect(rect: DOMRect): HeroMapStageGeometry | null {
+export type ViewportBounds = {
+  readonly width: number;
+  readonly height: number;
+};
+
+const DEFAULT_VIEWPORT: ViewportBounds = {
+  width: typeof window !== 'undefined' ? window.innerWidth : 4096,
+  height: typeof window !== 'undefined' ? window.innerHeight : 4096,
+};
+
+/** Minimum visible share of the hero map column before the inset hides (avoids orphan slivers). */
+export const HERO_MAP_INSET_MIN_VISIBLE_RATIO = 0.2;
+
+/** Viewport-fixed box matching the visible hero map column intersection. Returns null when off-screen. */
+export function heroMapStageGeometryForRect(
+  rect: DOMRect,
+  viewport: ViewportBounds = DEFAULT_VIEWPORT,
+): HeroMapStageGeometry | null {
   if (rect.width <= 0 || rect.height <= 0) return null;
+  if (rect.bottom <= 0 || rect.top >= viewport.height) return null;
+  if (rect.right <= 0 || rect.left >= viewport.width) return null;
+
+  const visibleTop = Math.max(0, rect.top);
+  const visibleLeft = Math.max(0, rect.left);
+  const visibleBottom = Math.min(viewport.height, rect.bottom);
+  const visibleRight = Math.min(viewport.width, rect.right);
+  const width = visibleRight - visibleLeft;
+  const height = visibleBottom - visibleTop;
+
+  if (width <= 0 || height <= 0) return null;
+
+  const visibleRatio = (width * height) / (rect.width * rect.height);
+  if (visibleRatio < HERO_MAP_INSET_MIN_VISIBLE_RATIO) return null;
+
   return {
-    top: Math.max(0, rect.top),
-    left: Math.max(0, rect.left),
-    width: rect.width,
-    height: rect.height,
+    top: visibleTop,
+    left: visibleLeft,
+    width,
+    height,
   };
 }
 
@@ -52,8 +83,13 @@ export function applyHeroMapInset(panel: HTMLElement): boolean {
   const stage = mapStageEl();
   if (!stage) return false;
   const geometry = heroMapStageGeometryForRect(panel.getBoundingClientRect());
-  if (!geometry) return false;
+  if (!geometry) {
+    stage.classList.remove(HERO_MAP_INSET_CLASS);
+    stage.style.visibility = 'hidden';
+    return false;
+  }
   stage.classList.add(HERO_MAP_INSET_CLASS);
+  stage.style.visibility = 'visible';
   stage.style.removeProperty('clip-path');
   stage.style.top = `${geometry.top}px`;
   stage.style.left = `${geometry.left}px`;
@@ -69,6 +105,7 @@ export function clearHeroMapInset(): void {
   const stage = mapStageEl();
   if (!stage) return;
   stage.classList.remove(HERO_MAP_INSET_CLASS);
+  stage.style.removeProperty('visibility');
   stage.style.removeProperty('clip-path');
   stage.style.removeProperty('top');
   stage.style.removeProperty('left');

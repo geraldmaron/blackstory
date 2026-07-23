@@ -234,9 +234,16 @@
 
 .ds-stories-edition .ds-story-link {
   gap: var(--ds-space-2);
+  min-height: 2.75rem;
   padding: var(--ds-space-4) 0;
   border-top-width: var(--ds-border-width);
   border-top-color: var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-stories-edition .ds-story-link:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
 }
 
 .ds-stories-edition .ds-story-link__meta {

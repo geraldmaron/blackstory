@@ -158,7 +158,7 @@ function relevanceEvidenceForEntity(entity: PublicEntityView): readonly Relevanc
   return citedClaims(entity).map((claim) => ({
     kind: 'source' as const,
     summary: claim.citationSource,
-    detail: `${claim.citationLabel}: ${claim.predicate.replaceAll('_', ' ')} — ${claim.object}`,
+    detail: `${claim.citationLabel}: ${claim.predicate.replaceAll('_', ' ')}. ${claim.object}`,
   }));
 }
 

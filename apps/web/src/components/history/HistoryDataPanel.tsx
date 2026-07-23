@@ -116,7 +116,7 @@ export function HistoryDataPanel({
             } · ${connectedNodes} linked`
           : `${nodes.length} record${nodes.length === 1 ? '' : 's'} across ${kindRows.length} kind${
               kindRows.length === 1 ? '' : 's'
-            } — select a kind to filter the list.`}
+            }. Select a kind to filter the list.`}
       </p>
 
       <div className="ds-history-data__kinds">

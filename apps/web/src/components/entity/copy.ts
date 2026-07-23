@@ -19,7 +19,7 @@ export const RECORD_GAP_COPY: Readonly<Record<RecordGapKind, RecordGapCopy>> = {
     title: 'No accepted claims yet',
     body:
       'No claims have cleared the evidence bar for this record yet. This reflects the current ' +
-      'state of research, not an absence of history — coverage deepens as research continues.',
+      'state of research, not an absence of history. Coverage deepens as research continues.',
   },
   related: {
     title: 'No linked records yet',

@@ -6,6 +6,9 @@ import Link from 'next/link';
 import { ATMOSPHERE_TILE_CREDITS } from '../../../components/atmosphere';
 import { EditionAtmosphereMosaic } from '../../../components/patterns/edition-atmosphere/EditionAtmosphereMosaic';
 import {
+  EDITION_MOSAIC_COUNT_DETAIL,
+} from '../../../components/patterns/edition-atmosphere/edition-atmosphere-config';
+import {
   STORIES_EDITION_MOSAIC_SEED,
   storiesEditionPanelClassName,
   storiesEditionRootClassName,
@@ -22,7 +25,7 @@ export const metadata = {
 export default function MosaicCreditsPage() {
   return (
     <div className={storiesEditionRootClassName()} data-stories-edition="v6">
-      <EditionAtmosphereMosaic seedKey={`${STORIES_EDITION_MOSAIC_SEED}:credits`} count={12} />
+      <EditionAtmosphereMosaic seedKey={`${STORIES_EDITION_MOSAIC_SEED}:credits`} count={EDITION_MOSAIC_COUNT_DETAIL} />
       <main className="ds-container ds-page" id="main">
         <div className={storiesEditionStackClassName()}>
           <article className={storiesEditionPanelClassName('intro')}>

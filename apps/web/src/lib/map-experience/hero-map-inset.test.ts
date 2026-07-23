@@ -7,6 +7,7 @@ import { dirname, join } from 'node:path';
 import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import {
+  HERO_MAP_INSET_MIN_VISIBLE_RATIO,
   heroMapStageGeometryForRect,
   insetClipPathForRect,
 } from './hero-map-inset';
@@ -44,6 +45,49 @@ describe('hero-map-inset', () => {
       }),
       null,
     );
+  });
+
+  it('returns null when the hero column is fully off-screen', () => {
+    assert.equal(
+      heroMapStageGeometryForRect(
+        { ...SAMPLE_RECT, top: -500, bottom: -200 } as DOMRect,
+        { width: 1320, height: 840 },
+      ),
+      null,
+    );
+    assert.equal(
+      heroMapStageGeometryForRect(
+        { ...SAMPLE_RECT, top: 900, bottom: 1200 } as DOMRect,
+        { width: 1320, height: 840 },
+      ),
+      null,
+    );
+  });
+
+  it('clamps geometry to the viewport-visible hero column intersection', () => {
+    assert.deepEqual(
+      heroMapStageGeometryForRect(
+        { ...SAMPLE_RECT, top: -40, bottom: 260 } as DOMRect,
+        { width: 1320, height: 840 },
+      ),
+      {
+        top: 0,
+        left: 640,
+        width: 340,
+        height: 260,
+      },
+    );
+  });
+
+  it('hides the inset when the hero column is mostly off-screen', () => {
+    assert.equal(
+      heroMapStageGeometryForRect(
+        { ...SAMPLE_RECT, top: -280, bottom: 20 } as DOMRect,
+        { width: 1320, height: 840 },
+      ),
+      null,
+    );
+    assert.ok(HERO_MAP_INSET_MIN_VISIBLE_RATIO > 0);
   });
 
   it('applyHeroMapInset removes clip-path (Safari WebGL regression guard)', () => {

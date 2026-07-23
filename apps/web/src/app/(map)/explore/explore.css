@@ -123,7 +123,12 @@
   min-height: min(70svh, 36rem);
   height: 100%;
   border: var(--ds-border-width) solid var(--ds-border);
-  background: var(--ds-fixed-ink);
+  /* Match MapStage pre-style flash — theme-aware plate, not fixed-ink cockpit. */
+  background: #080606;
+}
+
+[data-theme='light'] .ds-explore-map__canvas {
+  background: #f4efe5;
 }
 
 @media (min-width: 56rem) {
@@ -422,7 +427,8 @@
 
 .ds-explore__facet {
   display: grid;
-  grid-template-columns: 5rem minmax(0, 1fr);
+  /* Wide enough for "Confidence" at mono + tracking without clipping. */
+  grid-template-columns: minmax(5.75rem, max-content) minmax(0, 1fr);
   align-items: center;
   gap: var(--ds-space-2);
 }
@@ -506,9 +512,12 @@
   font-family: var(--ds-font-mono);
   font-size: 0.6875rem;
   font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  /* Sentence case: place-focus lines include proper nouns that must not force-uppercase. */
+  text-transform: none;
   color: var(--ds-ink-muted);
+  overflow-wrap: anywhere;
+  line-height: 1.4;
 }
 
 .ds-explore-result-list {

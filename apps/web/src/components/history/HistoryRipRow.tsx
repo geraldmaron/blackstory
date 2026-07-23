@@ -14,9 +14,15 @@ void React;
 export type HistoryRipRowProps = {
   readonly node: HistoryNodeView;
   readonly isSelected?: boolean;
+  /** When true, the row is wrapped by an outer entity link — omit inner anchors. */
+  readonly embeddedInRowLink?: boolean;
 };
 
-export function HistoryRipRow({ node, isSelected = false }: HistoryRipRowProps) {
+export function HistoryRipRow({
+  node,
+  isSelected = false,
+  embeddedInRowLink = false,
+}: HistoryRipRowProps) {
   const kindLabel = searchKindLabelFor(node.kind);
   const kindHref = exploreHrefForKind(node.kind);
   const statusHref =
@@ -26,12 +32,16 @@ export function HistoryRipRow({ node, isSelected = false }: HistoryRipRowProps) 
     <article
       className="ds-history-edition__rip-row"
       data-entity-id={node.entityId}
-      aria-current={isSelected ? 'true' : undefined}
+      {...(!embeddedInRowLink && isSelected ? { 'aria-current': 'true' as const } : {})}
     >
       <h3 className="ds-history-edition__rip-title">
-        <Link className="ds-history-edition__rip-link" href={node.href}>
-          {node.displayName}
-        </Link>
+        {embeddedInRowLink ? (
+          node.displayName
+        ) : (
+          <Link className="ds-history-edition__rip-link" href={node.href}>
+            {node.displayName}
+          </Link>
+        )}
       </h3>
       {node.summary ? <p className="ds-history-edition__rip-summary">{node.summary}</p> : null}
       <dl className="ds-history-edition__rip-facts">
@@ -41,9 +51,13 @@ export function HistoryRipRow({ node, isSelected = false }: HistoryRipRowProps) 
             Kind
           </dt>
           <dd className="ds-history-edition__rip-fact-value">
-            <Link className="ds-history-edition__rip-fact-link" href={kindHref}>
-              {kindLabel}
-            </Link>
+            {embeddedInRowLink ? (
+              kindLabel
+            ) : (
+              <Link className="ds-history-edition__rip-fact-link" href={kindHref}>
+                {kindLabel}
+              </Link>
+            )}
           </dd>
         </div>
         <div className="ds-history-edition__rip-fact">
@@ -57,7 +71,7 @@ export function HistoryRipRow({ node, isSelected = false }: HistoryRipRowProps) 
           <div className="ds-history-edition__rip-fact">
             <dt className="ds-history-edition__rip-fact-label">Status</dt>
             <dd className="ds-history-edition__rip-fact-value">
-              {node.entityStatus && statusHref ? (
+              {node.entityStatus && statusHref && !embeddedInRowLink ? (
                 <Link className="ds-history-edition__rip-fact-link" href={statusHref}>
                   <StatusMark status={node.entityStatus} labeled />
                 </Link>

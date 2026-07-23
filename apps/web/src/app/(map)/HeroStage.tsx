@@ -69,6 +69,11 @@ function formatCount(value: number): string {
   return new Intl.NumberFormat('en-US').format(value);
 }
 
+function displayEraSpan(eraSpan: string | undefined): string {
+  if (!eraSpan) return 'Eras vary';
+  return eraSpan.replace(/\u2013|\u2014/g, ' to ');
+}
+
 function KickerTickIcon() {
   return (
     <svg className="ds-home-hero__kicker-tick" viewBox="0 0 20 12" fill="none" aria-hidden="true">
@@ -320,7 +325,7 @@ export function HeroStage({
   }
 
   const stateLabel = `${stateCount} state${stateCount === 1 ? '' : 's'}`;
-  const eraFact = eraSpan ?? 'Eras vary';
+  const eraFact = displayEraSpan(eraSpan);
 
   return (
     <section

@@ -17,6 +17,9 @@ import {
 import { getDataPageIndicatorBundle } from '../../lib/demographics/data-page-indicators';
 import { timelineChangeStripItems } from '../../components/data/population-change';
 import { EditionAtmosphereMosaic } from '../../components/patterns/edition-atmosphere/EditionAtmosphereMosaic';
+import {
+  EDITION_MOSAIC_COUNT_BROWSE,
+} from '../../components/patterns/edition-atmosphere/edition-atmosphere-config';
 import '../../components/data/data-charts.css';
 import { DATA_PAGE_DESCRIPTION } from './data-copy';
 import {
@@ -85,7 +88,7 @@ export default async function DataPage() {
 
   return (
     <div className={dataEditionRootClassName()} data-data-edition="v6">
-      <EditionAtmosphereMosaic seedKey={DATA_EDITION_MOSAIC_SEED} count={16} />
+      <EditionAtmosphereMosaic seedKey={DATA_EDITION_MOSAIC_SEED} count={EDITION_MOSAIC_COUNT_BROWSE} />
       <main className="ds-container ds-page" id="main">
         <DataSections
           timelineRows={timelineRows}

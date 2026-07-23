@@ -508,6 +508,11 @@
   text-underline-offset: 0.18em;
 }
 
+.ds-books-edition__rip-link:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
 .ds-books-edition__rip-summary {
   margin: 0;
   max-width: 42rem;

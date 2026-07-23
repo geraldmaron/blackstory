@@ -122,6 +122,7 @@ import {
   exploreResultsPanelClassName,
   exploreStageChromeAttrs,
   exploreStageRootClassName,
+  formatExploreResultsCountLine,
   resolveExploreLeftTab,
   shouldAcceptExploreServerViewState,
   type ExploreLeftTab,
@@ -1864,31 +1865,23 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
         {...(resultsVisible ? {} : { hidden: true })}
       >
         <div className="ds-explore-stage__panel-header">
-          {/* The count labels the list it sits above — oldest records first. */}
+          {/* The count labels the list it sits above: oldest records first. */}
           <p className="ds-sans ds-explore__results-count" id="explore-results-heading">
-            {placeSearchFocus &&
-            placeSearchFocus.radiusMeters !== null &&
-            placeSearchFocus.within.length === 0
-              ? `No documented records within ${placeSearchFocus.radiusLabel} of ${placeSearchFocus.placeLabel}`
-              : placeSearchFocus && placeSearchFocus.radiusMeters !== null
-                ? `${sortedListFeatures.length} documented record${
-                    sortedListFeatures.length === 1 ? '' : 's'
-                  } within ${placeSearchFocus.radiusLabel} of ${placeSearchFocus.placeLabel}`
-                : `${sortedListFeatures.length} documented record${
-                    sortedListFeatures.length === 1 ? '' : 's'
-                  }${selectedStateName ? ` in ${selectedStateName}` : ' in view'}`}
-            {view.viewState.lines
-              ? ` · ${view.edgeLineCollection.features.length} connection${
-                  view.edgeLineCollection.features.length === 1 ? '' : 's'
-                }`
-              : ''}
-            {!(
-              placeSearchFocus &&
-              placeSearchFocus.radiusMeters !== null &&
-              placeSearchFocus.within.length === 0
-            )
-              ? ' · oldest first'
-              : ''}
+            {formatExploreResultsCountLine({
+              listCount: sortedListFeatures.length,
+              releaseCount: view.allFeatures.length,
+              connectionCount: view.edgeLineCollection.features.length,
+              showConnections: Boolean(view.viewState.lines),
+              selectedStateName,
+              placeFocus:
+                placeSearchFocus && placeSearchFocus.radiusMeters !== null
+                  ? {
+                      radiusLabel: placeSearchFocus.radiusLabel,
+                      placeLabel: placeSearchFocus.placeLabel,
+                      empty: placeSearchFocus.within.length === 0,
+                    }
+                  : null,
+            })}
           </p>
           <button
             type="button"
@@ -1899,7 +1892,13 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
             Hide records
           </button>
         </div>
-        <SynchronizedResultList {...listProps} />
+        {/* Dim + inert the list peer only; header stays interactive for Hide. */}
+        <div
+          className="ds-explore-stage__results-list"
+          {...(resultsDimmed ? { inert: true } : {})}
+        >
+          <SynchronizedResultList {...listProps} />
+        </div>
       </div>
 
       {spotlightOpen ? (

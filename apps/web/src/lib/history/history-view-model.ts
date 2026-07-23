@@ -54,12 +54,20 @@ function buildSliceNodesWithCounts(
   return withHistoryConnectionCounts(nodes, edges);
 }
 
+export type BuildHistoryViewModelOptions = {
+  /** Active public release id when live projections are wired; defaults to seed snapshot. */
+  readonly releaseId?: string;
+};
+
 export function buildHistoryViewModel(
   raw: RawHistorySearchParams,
   entities: readonly PublicEntityView[] = listPublicEntities(),
+  options: BuildHistoryViewModelOptions = {},
 ): HistoryViewModel {
   const viewState = parseHistorySearchParams(raw);
-  const artifact = getHistoryGraphReleaseArtifact(entities);
+  const artifact = getHistoryGraphReleaseArtifact(entities, {
+    ...(options.releaseId ? { releaseId: options.releaseId } : {}),
+  });
   const context = buildHistoryGraphContext(artifact, entities);
   const slice = resolveHistoryGraphSlice(artifact, viewState.mode, viewState.decade);
 

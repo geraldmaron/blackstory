@@ -735,19 +735,10 @@
   border-bottom: var(--ds-border-width) solid var(--ds-border);
 }
 
-.ds-shell:has(.ds-home-hero) .ds-shell-wordmark::after {
-  content: 'BlackStory';
-  margin-left: 0.625rem;
-  font-family: var(--ds-font-display);
-  font-weight: 600;
-  font-size: 1.125rem;
-  letter-spacing: -0.02em;
-  color: var(--ds-ink);
-}
-
-@media (max-width: 47.9375rem) {
-  .ds-shell:has(.ds-home-hero) .ds-shell-wordmark::after {
-    font-size: 1rem;
+@media (min-width: 48rem) {
+  .ds-shell:has(.ds-home-hero) .ds-shell-wordmark__img--lockup {
+    width: auto;
+    height: 2.25rem;
   }
 }
 
@@ -760,6 +751,7 @@
   flex-direction: column;
   gap: var(--ds-space-5);
   padding-block: 0 var(--ds-space-6);
+  background: var(--ds-canvas);
   --ds-home-panel-padding: var(--ds-space-8);
   --ds-home-panel-padding-compact: var(--ds-space-6);
 }
@@ -797,7 +789,8 @@
   z-index: 0;
   display: flex;
   flex-direction: column;
-  min-height: clamp(14rem, min(42vh, 24rem), 28rem);
+  min-height: 100%;
+  align-self: stretch;
   background: transparent;
   /* Transparent window — hits pass through to the repositioned MapStage plate. */
   pointer-events: none;
@@ -978,7 +971,7 @@
 .ds-home-hero__micro-fact-label {
   display: block;
   font-family: var(--ds-font-mono);
-  font-size: 0.5625rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ds-ink-muted);
@@ -1951,7 +1944,7 @@
 
 @media (min-width: 48rem) {
   .ds-data-strip {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: var(--ds-space-8);
   }
 }

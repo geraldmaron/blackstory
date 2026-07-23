@@ -2,7 +2,7 @@
  * Pure class-name / data-attribute helpers for Explore panel chrome: the left instrument
  * chassis (Filters | Color key tabs), the records rail/sheet, and stage data hooks that keep
  * MapLibre zoom clear of open panels. Keeps ExploreMapExperience JSX readable and gives tests
- * a stable contract for CSS and a11y.
+ * a stable contract for CSS and a11y. Also formats the records-rail count line.
  */
 
 export type ExploreLeftTab = 'filters' | 'key';
@@ -134,4 +134,65 @@ export function shouldAcceptExploreServerViewState(options: {
     return false;
   }
   return true;
+}
+
+export type ExploreResultsCountLineInput = {
+  readonly listCount: number;
+  readonly releaseCount: number;
+  readonly connectionCount: number;
+  readonly showConnections: boolean;
+  readonly selectedStateName: string | null | undefined;
+  readonly placeFocus: null | {
+    readonly radiusLabel: string;
+    readonly placeLabel: string;
+    /** True when a radius is set and zero records match. */
+    readonly empty: boolean;
+  };
+};
+
+function recordWord(count: number): string {
+  return count === 1 ? 'record' : 'records';
+}
+
+/**
+ * Mono count line for the records rail header: in-view (or place radius) scope,
+ * optional release total when the camera list is a subset, connections, sort hint.
+ */
+export function formatExploreResultsCountLine(input: ExploreResultsCountLineInput): string {
+  const { placeFocus } = input;
+
+  if (placeFocus?.empty) {
+    return `No documented records within ${placeFocus.radiusLabel} of ${placeFocus.placeLabel}`;
+  }
+
+  let primary: string;
+  if (placeFocus) {
+    primary = `${input.listCount} documented ${recordWord(input.listCount)} within ${placeFocus.radiusLabel} of ${placeFocus.placeLabel}`;
+  } else if (input.selectedStateName) {
+    primary = `${input.listCount} documented ${recordWord(input.listCount)} in ${input.selectedStateName}`;
+  } else {
+    primary = `${input.listCount} documented ${recordWord(input.listCount)} in view`;
+  }
+
+  const parts = [primary];
+
+  if (
+    !placeFocus &&
+    !input.selectedStateName &&
+    input.releaseCount > 0 &&
+    input.releaseCount !== input.listCount
+  ) {
+    parts.push(
+      `${input.releaseCount.toLocaleString('en-US')} in release`,
+    );
+  }
+
+  if (input.showConnections) {
+    parts.push(
+      `${input.connectionCount} connection${input.connectionCount === 1 ? '' : 's'}`,
+    );
+  }
+
+  parts.push('oldest first');
+  return parts.join(' · ');
 }

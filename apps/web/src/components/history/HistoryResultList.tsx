@@ -48,7 +48,7 @@ export function HistoryResultList({
               aria-current={isSelected ? 'true' : undefined}
               data-entity-id={node.entityId}
             >
-              <HistoryRipRow node={node} isSelected={isSelected} />
+              <HistoryRipRow node={node} isSelected={isSelected} embeddedInRowLink />
             </Link>
           </li>
         );

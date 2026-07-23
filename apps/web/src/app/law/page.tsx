@@ -7,6 +7,9 @@
 import Link from 'next/link';
 import { ATMOSPHERE_ATTRIBUTION_HREF } from '../../components/atmosphere/tile-credits';
 import { EditionAtmosphereMosaic } from '../../components/patterns/edition-atmosphere/EditionAtmosphereMosaic';
+import {
+  EDITION_MOSAIC_COUNT_BROWSE,
+} from '../../components/patterns/edition-atmosphere/edition-atmosphere-config';
 import { LAW_EDITION_BROWSE_LEDE } from './law-copy';
 import { buildLawBrowseViewModel, type RawLawBrowseParams } from './law-view-model';
 import { LawBrowseSections } from './LawBrowseSections';
@@ -34,7 +37,7 @@ export default async function LawBrowsePage({ searchParams }: LawPageProps) {
 
   return (
     <div className={lawEditionRootClassName()} data-law-edition="v6">
-      <EditionAtmosphereMosaic seedKey={LAW_EDITION_MOSAIC_SEED} count={16} />
+      <EditionAtmosphereMosaic seedKey={LAW_EDITION_MOSAIC_SEED} count={EDITION_MOSAIC_COUNT_BROWSE} />
       <main className="ds-container ds-page" id="main">
         <div className={lawEditionStackClassName()}>
           <article className={lawEditionPanelClassName('intro')}>

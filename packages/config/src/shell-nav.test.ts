@@ -34,6 +34,6 @@ test('footer IA groups Law under Explore, not Trust', () => {
   );
   assert.deepEqual(
     trust.items.map((item) => item.href),
-    ['/methodology', '/errata', '/corrections'],
+    ['/methodology', '/memorial', '/errata', '/corrections'],
   );
 });

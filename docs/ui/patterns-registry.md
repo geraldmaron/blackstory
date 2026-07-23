@@ -6,7 +6,8 @@ Reusable UI modules under `apps/web/src/components/patterns/`. Each row links to
 |---|---|---|---|
 | Browse mode | [`patterns-browse-mode.md`](./patterns-browse-mode.md) | `browse-mode.ts`, `BrowseModeToggle.tsx`, `RecordBrowseControls.tsx`, `browse-mode.css` | `BrowseMode`, `stepIndex`, `pickRandomIndex`, `formatBrowsePosition`, `initialBrowseIndex`, `browseModeLabel`, `BrowseModeToggle`, `RecordBrowseControls` |
 | Edition fact icon + record anatomy | [`patterns-edition-fact-icon.md`](./patterns-edition-fact-icon.md) | `edition-fact-icon.ts`, `EditionFactIcon.tsx`, `edition-fact-icon.css`, `RecordAnatomyPanel.tsx`, `RecordPlacePreview.tsx`, `record-anatomy.css` | `EditionFactIcon`, `RecordAnatomyPanel`, `RecordPlacePreview`, icon helpers |
-| Edition atmosphere (gutter mosaic) | [`design-direction-v6-home.md`](./design-direction-v6-home.md) §2, [`design-direction-v6-stories.md`](./design-direction-v6-stories.md) §2 | `edition-atmosphere/*` | `EditionAtmosphereMosaic`, `computeScatteredMosaicLayout`, `editionAtmosphereCanvasClassName` |
+| Edition atmosphere (gutter mosaic) | [`design-direction-v6-home.md`](./design-direction-v6-home.md) §2, [`design-direction-v6-stories.md`](./design-direction-v6-stories.md) §2 | `edition-atmosphere/*` | `EditionAtmosphereMosaic`, `computeScatteredMosaicLayout`, `editionAtmosphereCanvasClassName`, `edition-atmosphere-config` |
+| Memorial wall | [`design-direction-v6-memorial.md`](./design-direction-v6-memorial.md) | `memorial-wall/*` | `MemorialWallAtmosphere`, `packMemorialNames`, `MEMORIAL_NAMES` |
 | Utility edition (compact pages) | [`patterns-utility-edition.md`](./patterns-utility-edition.md) | `utility-edition/*` | `UtilityEditionShell`, `UtilityEditionIntro`, `UtilityEditionBodyPanel`, chrome helpers |
 | Map entity encoding | [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) | `kind-encoding.ts`, `marker-size.ts`, `explore-style.ts`, `MapExperienceLegend.tsx` | `kindFamilyFor`, `KIND_FAMILY_ENTRIES`, `displayEncodingFor`, legend Color key |
 | Map canvas lifecycle | [`patterns-map-canvas.md`](./patterns-map-canvas.md) | `map-libre-lifecycle.ts`, `hero-map-inset.ts`, `MapStage.tsx`, `EntityLocationMap.tsx` | `bindMapResizeLifecycle`, `waitForContainerLayout`, `isWebGlAvailable` |
@@ -39,6 +40,10 @@ import '@/components/patterns/record-anatomy.css';
 import { EditionAtmosphereMosaic } from '@/components/patterns/edition-atmosphere/EditionAtmosphereMosaic';
 import { editionAtmosphereCanvasClassName } from '@/components/patterns/edition-atmosphere/edition-atmosphere-canvas';
 import '@/components/patterns/edition-atmosphere/edition-atmosphere.css';
+
+// Memorial wall — names-only full-canvas atmosphere (import CSS via MemorialWallAtmosphere)
+import { MemorialWallAtmosphere } from '@/components/patterns/memorial-wall/MemorialWallAtmosphere';
+import { MEMORIAL_NAMES } from '@/components/patterns/memorial-wall/memorial-names';
 
 // Utility edition — compact v6 pages (import CSS via UtilityEditionShell)
 import { UtilityEditionShell } from '@/components/patterns/utility-edition/UtilityEditionShell';

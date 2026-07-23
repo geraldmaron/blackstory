@@ -22,6 +22,7 @@ export const OVERFLOW_NAV: readonly ShellNavItem[] = [
   { href: '/data', label: 'Data' },
   { href: '/law', label: 'Law' },
   { href: '/books', label: 'Banned books' },
+  { href: '/memorial', label: 'Memorial' },
   { href: '/methodology', label: 'Methodology' },
   { href: '/corrections', label: 'Corrections' },
   { href: '/errata', label: 'Errata' },
@@ -51,6 +52,7 @@ export const FOOTER_NAV_COLUMNS: readonly FooterNavColumn[] = [
     title: 'Trust',
     items: [
       { href: '/methodology', label: 'Methodology' },
+      { href: '/memorial', label: 'Memorial' },
       { href: '/errata', label: 'Errata' },
       { href: '/corrections', label: 'Corrections' },
     ],

@@ -6,6 +6,9 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { EditionAtmosphereMosaic } from '../../../components/patterns/edition-atmosphere/EditionAtmosphereMosaic';
+import {
+  EDITION_MOSAIC_COUNT_DETAIL,
+} from '../../../components/patterns/edition-atmosphere/edition-atmosphere-config';
 import { RecordAnatomyPanel } from '../../../components/patterns/RecordAnatomyPanel';
 import type { RecordAnatomyFact } from '../../../components/patterns/RecordAnatomyPanel';
 import {
@@ -127,7 +130,7 @@ export default async function BooksDetailPage({ params }: BooksDetailPageProps) 
 
   return (
     <div className={booksEditionRootClassName()} data-books-edition="v6">
-      <EditionAtmosphereMosaic seedKey={`${BOOKS_EDITION_MOSAIC_SEED}:${slug}`} count={12} />
+      <EditionAtmosphereMosaic seedKey={`${BOOKS_EDITION_MOSAIC_SEED}:${slug}`} count={EDITION_MOSAIC_COUNT_DETAIL} />
       <main className="ds-container ds-page" id="main">
         <div className={booksEditionStackClassName()}>
           <article className={booksEditionPanelClassName('intro')}>

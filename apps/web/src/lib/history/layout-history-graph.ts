@@ -205,7 +205,7 @@ function layoutAggregate(
     layoutNodes: withDegrees,
     layoutEdges,
     modeNotice:
-      'Kinds in this view — select a kind to filter the list, or open a record to focus its connections.',
+      'Kinds in this view. Select a kind to filter the list, or open a record to focus its connections.',
   };
 }
 

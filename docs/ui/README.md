@@ -12,6 +12,7 @@ Shared kit: `@repo/ui` (`packages/ui`). Binding brand source: root `brand/`. Tok
 | **Explore** (`/explore`) | [`design-direction-v6-explore.md`](./design-direction-v6-explore.md) | `app/(map)/explore/*`, map-surfaces.css | Binding (supersedes v5 explore cockpit) |
 | **History** (`/history`) | [`design-direction-v6-history.md`](./design-direction-v6-history.md) | `app/history/*`, `components/history/*` | Binding — unified find-in-time (search merged) |
 | **About** (`/about`) | [`design-direction-v6-about.md`](./design-direction-v6-about.md) | `app/about/*`, `edition-atmosphere` pattern | Binding (supersedes v5 about mast) |
+| **Memorial** (`/memorial`) | [`design-direction-v6-memorial.md`](./design-direction-v6-memorial.md) | `app/memorial/*`, `patterns/memorial-wall/*` | Binding (names-only wall + full list) |
 | **Stories** (`/stories`) | [`design-direction-v6-stories.md`](./design-direction-v6-stories.md) | `app/stories/*`, `edition-atmosphere/*` | Binding (supersedes v5 story mast) |
 | **Methodology** (`/methodology`) | [`design-direction-v6-methodology.md`](./design-direction-v6-methodology.md) | `app/methodology/*`, `edition-atmosphere/*` | Binding (supersedes v5 page mast) |
 | **Books** (`/books`) | [`design-direction-v6-books.md`](./design-direction-v6-books.md) | `app/books/*`, `edition-atmosphere/*` | Binding (supersedes v5 books browse + entity detail) |

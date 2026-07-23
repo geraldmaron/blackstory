@@ -12,6 +12,9 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { EditionAtmosphereMosaic } from '../../../components/patterns/edition-atmosphere/EditionAtmosphereMosaic';
 import {
+  EDITION_MOSAIC_COUNT_DETAIL,
+} from '../../../components/patterns/edition-atmosphere/edition-atmosphere-config';
+import {
   RecordAnatomyPanel,
   type RecordAnatomyFact,
 } from '../../../components/patterns/RecordAnatomyPanel';
@@ -206,7 +209,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
 
   return (
     <div className={entityEditionRootClassName()} data-entity-edition="v6">
-      <EditionAtmosphereMosaic seedKey={entityEditionMosaicSeedFor(entity.id)} count={12} />
+      <EditionAtmosphereMosaic seedKey={entityEditionMosaicSeedFor(entity.id)} count={EDITION_MOSAIC_COUNT_DETAIL} />
       <main className="ds-container ds-page" id="main">
         <div className={entityEditionStackClassName()}>
           <article className={entityEditionPanelClassName('intro')}>

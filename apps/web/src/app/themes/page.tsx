@@ -6,6 +6,9 @@
 import Link from 'next/link';
 import { ATMOSPHERE_ATTRIBUTION_HREF } from '../../components/atmosphere/tile-credits';
 import { EditionAtmosphereMosaic } from '../../components/patterns/edition-atmosphere/EditionAtmosphereMosaic';
+import {
+  EDITION_MOSAIC_COUNT_BROWSE,
+} from '../../components/patterns/edition-atmosphere/edition-atmosphere-config';
 import { ThemeBrowseSections } from './ThemeBrowseSections';
 import {
   THEMES_EDITION_MOSAIC_SEED,
@@ -19,13 +22,13 @@ import '../../components/theme-impact/theme-impact.css';
 export const metadata = {
   title: 'Themes',
   description:
-    'Standalone theme-impact browse for redlining and drug policy and the state: canonical questions with cited fixtures, gap labels, and juxtaposition-not-causation method notes.',
+    'Evidence-led theme articles on redlining, drug policy, urban renewal, mass incarceration, and unequal environmental burden.',
 };
 
 export default function ThemesBrowsePage() {
   return (
     <div className={themesEditionRootClassName()} data-themes-edition="v6">
-      <EditionAtmosphereMosaic seedKey={THEMES_EDITION_MOSAIC_SEED} count={16} />
+      <EditionAtmosphereMosaic seedKey={THEMES_EDITION_MOSAIC_SEED} count={EDITION_MOSAIC_COUNT_BROWSE} />
       <main className="ds-container ds-page" id="main">
         <div className={themesEditionStackClassName()}>
           <article className={themesEditionPanelClassName('intro')}>

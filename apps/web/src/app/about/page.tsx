@@ -9,6 +9,9 @@ import { MakerCredit } from '../../components/MakerCredit';
 import { ATMOSPHERE_ATTRIBUTION_HREF } from '../../components/atmosphere/tile-credits';
 import { EditionAtmosphereMosaic } from '../../components/patterns/edition-atmosphere/EditionAtmosphereMosaic';
 import {
+  EDITION_MOSAIC_COUNT_BROWSE,
+} from '../../components/patterns/edition-atmosphere/edition-atmosphere-config';
+import {
   ABOUT_DESTINATIONS,
   ABOUT_MISSION_BEATS,
   ABOUT_PILLARS,
@@ -30,7 +33,7 @@ export const metadata = {
 export default function AboutPage() {
   return (
     <div className={aboutEditionRootClassName()} data-about-edition="v6">
-      <EditionAtmosphereMosaic seedKey={ABOUT_EDITION_MOSAIC_SEED} count={16} />
+      <EditionAtmosphereMosaic seedKey={ABOUT_EDITION_MOSAIC_SEED} count={EDITION_MOSAIC_COUNT_BROWSE} />
       <main className="ds-container ds-page" id="main">
         <div className={aboutEditionStackClassName()}>
           <article className={aboutEditionPanelClassName('intro')}>

@@ -15,9 +15,9 @@ export type MetaFieldKey =
   | 'status';
 
 const FIELD_HELP: Readonly<Record<MetaFieldKey, string>> = {
-  kind: 'What kind of record this is — person, place, school, event, institution, and related types.',
+  kind: 'What kind of record this is: person, place, school, event, institution, and related types.',
   tone:
-    'Historical tone from the Color key — massacre or atrocity, plantation, or Black epicenter. Shade only; the kind shape stays the same.',
+    'Historical tone from the Color key: massacre or atrocity, plantation, or Black epicenter. Shade only; the kind shape stays the same.',
   era: 'The time period most associated with this record.',
   theme: 'A historical theme tag used to narrow the map (for example education or civil rights).',
   confidence:
@@ -25,7 +25,7 @@ const FIELD_HELP: Readonly<Record<MetaFieldKey, string>> = {
   evidence: 'How many accepted, cited claims sit on the full record.',
   where: 'The U.S. state where this record is pinned on the map.',
   status:
-    'Lifecycle of the subject — whether it is still active, historic, living, deceased, or a legal status.',
+    'Lifecycle of the subject: whether it is still active, historic, living, deceased, or a legal status.',
 };
 
 const CONFIDENCE_HELP: Readonly<Record<string, string>> = {

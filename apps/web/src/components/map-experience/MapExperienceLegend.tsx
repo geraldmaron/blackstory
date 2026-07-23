@@ -60,9 +60,9 @@ const SIZE_SCALE_STEPS: readonly number[] = [
 
 /** Cluster disc radii at locality zoom — mirrors `CLUSTER_RADIUS_BY_COUNT` in explore-style. */
 const CLUSTER_SIZE_ROWS = [
-  ['2–9 records', CLUSTER_RADIUS_BY_COUNT[0]![1]],
-  ['10–49 records', CLUSTER_RADIUS_BY_COUNT[1]![1]],
-  ['50–199 records', CLUSTER_RADIUS_BY_COUNT[2]![1]],
+  ['2 to 9 records', CLUSTER_RADIUS_BY_COUNT[0]![1]],
+  ['10 to 49 records', CLUSTER_RADIUS_BY_COUNT[1]![1]],
+  ['50 to 199 records', CLUSTER_RADIUS_BY_COUNT[2]![1]],
   ['200+ records', CLUSTER_RADIUS_BY_COUNT[3]![1]],
 ] as const;
 
@@ -75,17 +75,17 @@ const CONFIDENCE_TIER_ROWS = [
 
 const SHARE_TIER_ROWS = [
   ['trace', 'Under 2%'],
-  ['low', '2–10%'],
-  ['mid', '10–25%'],
-  ['high', '25–50%'],
+  ['low', '2 to 10%'],
+  ['mid', '10 to 25%'],
+  ['high', '25 to 50%'],
   ['majority', '50%+'],
 ] as const;
 
 const CHANGE_TIER_ROWS = [
   ['gainStrong', 'Gain ≥ 5 pp'],
-  ['gainModerate', 'Gain 1–5 pp'],
+  ['gainModerate', 'Gain 1 to 5 pp'],
   ['neutral', 'Within ±1 pp'],
-  ['lossModerate', 'Loss 1–5 pp'],
+  ['lossModerate', 'Loss 1 to 5 pp'],
   ['lossStrong', 'Loss ≥ 5 pp'],
 ] as const;
 
@@ -303,7 +303,7 @@ function MapColorKey(props: {
         ))}
       </div>
       <p className="ds-explore-legend__note">
-        Larger discs mean more accepted claims on that record ({MARKER_RADIUS_MIN}–{MARKER_RADIUS_MAX}px
+        Larger discs mean more accepted claims on that record ({MARKER_RADIUS_MIN} to {MARKER_RADIUS_MAX}px
         at locality zoom). Confidence is separate below.
       </p>
       <p className="ds-explore-legend__note">Cluster size (Group nearby on)</p>

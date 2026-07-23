@@ -228,6 +228,24 @@ test('overview kind counts follow active filters', () => {
   );
 });
 
+test('overview decade density follows active filters', () => {
+  const all = buildHistoryViewModel({});
+  const places = buildHistoryViewModel({ kind: 'place' });
+  const allNonZero = all.overview.decadeDensity.reduce((sum, entry) => sum + entry.count, 0);
+  const placesNonZero = places.overview.decadeDensity.reduce((sum, entry) => sum + entry.count, 0);
+  assert.ok(allNonZero > placesNonZero);
+  assert.ok(
+    places.overview.decadeDensity.every(
+      (entry) => entry.count <= (all.overview.decadeDensity.find((row) => row.decade === entry.decade)?.count ?? entry.count),
+    ),
+  );
+});
+
+test('uses live release id when provided', () => {
+  const view = buildHistoryViewModel({}, listPublicEntities(), { releaseId: 'rel_live_001' });
+  assert.equal(view.releaseId, 'rel_live_001');
+});
+
 test('parses shareable URL with status, topic, and connections', () => {
   const view = buildHistoryViewModel({
     decade: '1870s',

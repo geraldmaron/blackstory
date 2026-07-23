@@ -102,7 +102,8 @@ export default async function HomePage() {
   const featuredInitialIndex = initialBrowseIndex(featured.length);
 
   const states = tallyStates(base.featureCollection);
-  const recordCount = base.featureCollection.features.length;
+  const pinnedRecordCount = base.featureCollection.features.length;
+  const publishedRecordCount = base.entities.length;
   const eraSpan = eraSpanOf(base.featureCollection);
 
   // Decades in motion: per-decade edge lines from the history graph release + cumulative record
@@ -134,7 +135,7 @@ export default async function HomePage() {
       <HeroStage
         featureCollection={base.featureCollection}
         jurisdictionAreaFeatures={base.jurisdictionAreaFeatures}
-        featureCount={recordCount}
+        featureCount={pinnedRecordCount}
         stateCount={states.length}
         decadeFrames={decadeFrames}
         {...(eraSpan !== undefined ? { eraSpan } : {})}
@@ -144,7 +145,8 @@ export default async function HomePage() {
         featured={featured}
         featuredInitialIndex={featuredInitialIndex}
         topStates={states.slice(0, TOP_STATE_LIMIT)}
-        recordCount={recordCount}
+        publishedRecordCount={publishedRecordCount}
+        pinnedRecordCount={pinnedRecordCount}
         stateCount={states.length}
         {...(eraSpan !== undefined ? { eraSpan } : {})}
         {...(timeline ? { timeline } : {})}

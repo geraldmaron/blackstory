@@ -36,6 +36,20 @@ cp -rf source dest          # NOT: cp -r source dest
 - `apt-get` - use `-y` flag
 - `brew` - use `HOMEBREW_NO_AUTO_UPDATE=1` env var
 
+## Mobile local QA (agents)
+
+**Default for mobile smoke / "app works locally": Path A (prod-like).** Production never uses Metro; do not open the Debug dev client and expect prod behavior.
+
+| Goal | Command | Pass signal |
+|---|---|---|
+| Agent gate (mobile ready) | `pnpm mobile:ios:verify` | api-public live + Release app on booted Simulator; **Metro not required** |
+| Launch / rebuild embedded bundle | `pnpm mobile:ios:release` | Release install; relaunch without packager URL |
+| Relaunch only | `pnpm mobile:ios:launch` | App runs from embedded bundle |
+
+**Path B (hot reload only):** `pnpm dev:mobile` / `pnpm dev:mobile:verify` when actively editing JS. Never claim mobile healthy from `127.0.0.1:8081` `/status` alone while the iOS dev client may still target another LAN port (`:8082`, `:8083`). Path B verify must pass LAN bundle smoke + simulator packager alignment.
+
+See `apps/mobile/README.md` for setup (`API_BASE_URL=http://127.0.0.1:8080` in `apps/mobile/.env.local`).
+
 ## Brand Language
 
 The binding source is the root `brand/` directory (masters, 4-page guide, token files — see
@@ -117,6 +131,7 @@ no uppercase file names in new work.
 | [`docs/ui/design-direction-v6-explore.md`](docs/ui/design-direction-v6-explore.md) | `/explore` layout, Surface instruments, records rail |
 | [`docs/ui/design-direction-v6-history.md`](docs/ui/design-direction-v6-history.md) | `/history` unified find-in-time (search merged), decade scrubber, rip list, facets |
 | [`docs/ui/design-direction-v6-about.md`](docs/ui/design-direction-v6-about.md) | `/about` product thesis, Surface stack, shared gutter mosaic |
+| [`docs/ui/design-direction-v6-memorial.md`](docs/ui/design-direction-v6-memorial.md) | `/memorial` names-only memorial wall + full alphabetical list |
 | [`docs/ui/design-direction-v6-stories.md`](docs/ui/design-direction-v6-stories.md) | `/stories` longform edition, gutter mosaic, Surface stack |
 | [`docs/ui/design-direction-v6-methodology.md`](docs/ui/design-direction-v6-methodology.md) | `/methodology` transparency receipt, evidence pipeline, Surface stack |
 | [`docs/ui/design-direction-v6-books.md`](docs/ui/design-direction-v6-books.md) | `/books` challenged-titles edition, catalog rail, gutter mosaic |

@@ -129,7 +129,7 @@ test('onHide renders an accessible Hide key control beside the Color key heading
 
 test('color key lists cluster size steps and confidence tiers', () => {
   const html = renderToStaticMarkup(createElement(MapExperienceLegend));
-  assert.match(html, /2–9 records/);
+  assert.match(html, /2 to 9 records/);
   assert.match(html, /200\+ records/);
   assert.match(html, /Evidence confidence/);
   assert.match(html, /Unrated/);

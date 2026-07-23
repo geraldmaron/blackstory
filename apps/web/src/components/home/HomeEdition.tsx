@@ -25,7 +25,10 @@ export type HomeEditionProps = {
   readonly featured: readonly HomeFeaturedEntity[];
   readonly featuredInitialIndex?: number;
   readonly topStates: readonly StateStartEntry[];
-  readonly recordCount: number;
+  /** Full published entity catalog count for the active release. */
+  readonly publishedRecordCount: number;
+  /** Geo-anchored map feature count (may be lower when records lack a public pin). */
+  readonly pinnedRecordCount: number;
   readonly stateCount: number;
   readonly eraSpan?: string | undefined;
   readonly timeline?: NationalPopulationTimelineSnapshot | undefined;
@@ -36,7 +39,8 @@ export function HomeEdition({
   featured,
   featuredInitialIndex,
   topStates,
-  recordCount,
+  publishedRecordCount,
+  pinnedRecordCount,
   stateCount,
   eraSpan,
   timeline,
@@ -53,7 +57,8 @@ export function HomeEdition({
         {...(featuredInitialIndex !== undefined ? { initialIndex: featuredInitialIndex } : {})}
       />
       <HomeDataPulse
-        recordCount={recordCount}
+        publishedRecordCount={publishedRecordCount}
+        pinnedRecordCount={pinnedRecordCount}
         stateCount={stateCount}
         {...(eraSpan !== undefined ? { eraSpan } : {})}
         {...(timeline !== undefined ? { timeline } : {})}

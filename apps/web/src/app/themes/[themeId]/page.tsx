@@ -6,6 +6,9 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { EditionAtmosphereMosaic } from '../../../components/patterns/edition-atmosphere/EditionAtmosphereMosaic';
+import {
+  EDITION_MOSAIC_COUNT_DETAIL,
+} from '../../../components/patterns/edition-atmosphere/edition-atmosphere-config';
 import { ThemeImpactMapStrip } from '../../../components/theme-impact/ThemeImpactMapStrip';
 import { ThemeImpactPacketCard } from '../../../components/theme-impact/ThemeImpactPacketCard';
 import { ThemeImpactStoryEmbed } from '../../../components/theme-impact/ThemeImpactStoryEmbed';
@@ -63,7 +66,7 @@ export default async function ThemeDetailPage({ params }: ThemeDetailPageProps) 
 
   return (
     <div className={themesEditionRootClassName()} data-themes-edition="v6">
-      <EditionAtmosphereMosaic seedKey={themesEditionMosaicSeedForTheme(themeId)} count={12} />
+      <EditionAtmosphereMosaic seedKey={themesEditionMosaicSeedForTheme(themeId)} count={EDITION_MOSAIC_COUNT_DETAIL} />
       <main className="ds-container ds-page" id="main">
         <div className={themesEditionStackClassName()}>
           <article className={themesEditionPanelClassName('intro')}>

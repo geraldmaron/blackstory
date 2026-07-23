@@ -26,6 +26,7 @@ const STATIC_PUBLIC_ROUTES: readonly {
   { path: '/locate', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/corrections', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/about', changeFrequency: 'monthly', priority: 0.5 },
+  { path: '/memorial', changeFrequency: 'monthly', priority: 0.5 },
   { path: '/methodology', changeFrequency: 'monthly', priority: 0.5 },
   { path: '/errata', changeFrequency: 'weekly', priority: 0.6 },
   { path: '/law', changeFrequency: 'weekly', priority: 0.7 },

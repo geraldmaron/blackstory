@@ -14,6 +14,7 @@ import {
   exploreResultsPanelClassName,
   exploreStageChromeAttrs,
   exploreStageRootClassName,
+  formatExploreResultsCountLine,
   resolveExploreLeftTab,
   shouldAcceptExploreServerViewState,
 } from './explore-panel-chrome';
@@ -167,4 +168,44 @@ test('v6 edition tab class hooks stay stable for CSS contracts', () => {
   assert.equal(exploreEditionTabClassName(), EXPLORE_EDITION_TAB_CLASS);
   assert.equal(EXPLORE_EDITION_TABS_CLASS, 'ds-explore-edition__tabs');
   assert.equal(EXPLORE_EDITION_TAB_CLASS, 'ds-explore-edition__tab');
+});
+
+test('formatExploreResultsCountLine covers view, release dual, and place-empty cases', () => {
+  assert.equal(
+    formatExploreResultsCountLine({
+      listCount: 12,
+      releaseCount: 12,
+      connectionCount: 0,
+      showConnections: false,
+      selectedStateName: null,
+      placeFocus: null,
+    }),
+    '12 documented records in view · oldest first',
+  );
+  assert.equal(
+    formatExploreResultsCountLine({
+      listCount: 712,
+      releaseCount: 1365,
+      connectionCount: 3,
+      showConnections: true,
+      selectedStateName: null,
+      placeFocus: null,
+    }),
+    '712 documented records in view · 1,365 in release · 3 connections · oldest first',
+  );
+  assert.equal(
+    formatExploreResultsCountLine({
+      listCount: 0,
+      releaseCount: 1365,
+      connectionCount: 0,
+      showConnections: false,
+      selectedStateName: null,
+      placeFocus: {
+        radiusLabel: '25 mi',
+        placeLabel: 'Howard University',
+        empty: true,
+      },
+    }),
+    'No documented records within 25 mi of Howard University',
+  );
 });

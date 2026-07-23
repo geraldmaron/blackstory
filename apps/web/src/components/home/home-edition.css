@@ -18,15 +18,12 @@
   }
 }
 
-/* Opaque beats over transparent main — map motif reads in inter-card gutters. */
-.ds-map-surface:has(.ds-home) main,
-.ds-map-surface:has(.ds-home-hero) main {
-  background: transparent;
-}
-
-/* Hero map inset: let copy column and edition beats participate in map-surface
-   stacking above the clipped plate — not trapped under `.ds-home` isolation. */
+/* Home edition stack: opaque canvas column over the fixed map plate — card gaps
+   show Archive Paper, not live map tiles (v6 home canvas law). Hero map inset: let
+   copy column and edition beats participate in map-surface stacking above the
+   clipped plate — not trapped under `.ds-home` isolation. */
 .ds-map-surface:has(.ds-home-hero) .ds-home {
+  background: var(--ds-canvas);
   z-index: auto;
   isolation: auto;
 }
@@ -39,6 +36,7 @@
   gap: var(--ds-space-5);
   width: 100%;
   padding-block: 0 var(--ds-space-16);
+  background: var(--ds-canvas);
 }
 
 /* v6: no fixed-ink bands on home — beats stay theme-aware throughout. */
@@ -540,7 +538,7 @@
 /* Beat 03: data band */
 .ds-home-edition__beat .ds-data-strip {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: var(--ds-space-5);
   margin: 0 0 var(--ds-space-7);
   padding: 0;

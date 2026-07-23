@@ -118,7 +118,7 @@ function ResultRowMeta({ feature }: ResultRowMetaProps) {
               {whereMaps.label}
             </MapsExternalLink>
           ) : (
-            '—'
+            'Not placed'
           )}
         </dd>
       </div>

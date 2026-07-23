@@ -107,7 +107,7 @@ export function timelineChangeStripItems(
         : []),
       ...(pct ? [`Black population ${pct}`] : []),
       ...(change.crossesDefinitionBoundary
-        ? ['2000 definition change (“Black alone”) — not directly comparable']
+        ? ['2000 definition change (“Black alone”); not directly comparable']
         : []),
     ];
     return {

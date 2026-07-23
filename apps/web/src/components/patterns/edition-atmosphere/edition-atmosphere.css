@@ -43,32 +43,55 @@
   inset: 0;
 }
 
-.ds-edition-atmosphere__tile {
+/* Flat matte polaroid frames — archive paper border, no shadow or glow. */
+.ds-edition-atmosphere__polaroid {
   position: absolute;
   top: calc(var(--ds-edition-tile-y, 0.5) * 100%);
-  width: var(--ds-edition-tile-size, 4rem);
-  height: var(--ds-edition-tile-size, 4rem);
-  object-fit: cover;
-  transform: translate(-50%, -50%) rotate(var(--ds-edition-tile-rot, 0deg));
-  opacity: var(--ds-edition-tile-opacity, 0.08);
-  filter: grayscale(1) contrast(1.04);
-  border: var(--ds-border-width) solid color-mix(in srgb, var(--ds-rule) 55%, transparent);
+  width: var(--ds-edition-tile-width, 4rem);
+  height: var(--ds-edition-tile-height, 4.8rem);
+  margin: 0;
+  padding: 0.3rem 0.3rem 0.72rem;
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid color-mix(in srgb, var(--ds-rule) 72%, transparent);
   border-radius: var(--ds-radius-sm);
+  transform: translate(-50%, -50%) rotate(var(--ds-edition-tile-rot, 0deg));
+  opacity: var(--ds-edition-tile-opacity, 0.22);
+  overflow: hidden;
 }
 
-.ds-edition-atmosphere__tile[data-side='left'] {
+.ds-edition-atmosphere__polaroid-photo {
+  display: block;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  object-fit: cover;
+  object-position: var(--ds-edition-tile-object-position, center);
+  filter: grayscale(0.82) contrast(1.03);
+  border-radius: calc(var(--ds-radius-sm) - 2px);
+}
+
+.ds-edition-atmosphere__polaroid[data-side='left'] {
   left: calc(var(--ds-edition-gutter-band, 0px) * var(--ds-edition-tile-x, 0.5));
 }
 
-.ds-edition-atmosphere__tile[data-side='right'] {
+.ds-edition-atmosphere__polaroid[data-side='right'] {
   right: calc(var(--ds-edition-gutter-band, 0px) * var(--ds-edition-tile-x, 0.5));
   left: auto;
   transform: translate(50%, -50%) rotate(var(--ds-edition-tile-rot, 0deg));
 }
 
-[data-theme='dark'] .ds-edition-atmosphere__tile {
-  opacity: calc(var(--ds-edition-tile-opacity, 0.08) * 0.72);
-  border-color: color-mix(in srgb, var(--ds-rule) 35%, transparent);
+[data-theme='dark'] .ds-edition-atmosphere__polaroid {
+  background: color-mix(in srgb, var(--ds-surface) 90%, var(--ds-canvas));
+  opacity: calc(var(--ds-edition-tile-opacity, 0.22) * 0.72);
+  border-color: color-mix(in srgb, var(--ds-rule) 42%, transparent);
+}
+
+[data-theme='dark'] .ds-edition-atmosphere__polaroid-photo {
+  filter: grayscale(0.88) contrast(1.02);
 }
 
 @media (prefers-reduced-motion: reduce) {

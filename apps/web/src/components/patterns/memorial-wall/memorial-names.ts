@@ -1,0 +1,80 @@
+/**
+ * Curated memorial name roll for the /memorial edition wall and readable list.
+ * Incomplete by design. Production curation should keep expanding this set with care.
+ */
+
+export const MEMORIAL_HANDWRITING_FONT_VARS = [
+  'var(--ds-font-hand-caveat)',
+  'var(--ds-font-hand-patrick)',
+  'var(--ds-font-hand-shadows)',
+  'var(--ds-font-hand-indie)',
+  'var(--ds-font-hand-architects)',
+  'var(--ds-font-hand-homemade)',
+] as const;
+
+/** Full memorial name list (unique). Display list is alphabetical; wall placement is packed randomly. */
+export const MEMORIAL_NAMES: readonly string[] = Object.freeze([
+  'Addie Mae Collins',
+  'Ahmaud Arbery',
+  'Alton Sterling',
+  'Amadou Diallo',
+  'Andrew Goodman',
+  'Andrew Joseph III',
+  'Antwon Rose II',
+  'Atatiana Jefferson',
+  'Aura Rosser',
+  'Botham Jean',
+  'Breonna Taylor',
+  'Carole Robertson',
+  'Clementa Pinckney',
+  'Cynthia Hurd',
+  'Cynthia Wesley',
+  'Daniel Simmons',
+  'Daunte Wright',
+  'Denise McNair',
+  'Depayne Middleton Doctor',
+  'Elijah McClain',
+  'Emmett Till',
+  'Eric Garner',
+  'Ethel Lance',
+  'Fred Hampton',
+  'Freddie Gray',
+  'George Floyd',
+  'James Chaney',
+  'Jimmie Lee Jackson',
+  'Jonathan Ferrell',
+  'Jordan Davis',
+  'Jordan Edwards',
+  "Ma'Khia Bryant",
+  'Manuel Ellis',
+  'Medgar Evers',
+  'Michael Brown',
+  'Michael Schwerner',
+  'Myra Thompson',
+  'Oscar Grant',
+  'Philando Castile',
+  'Rayshard Brooks',
+  'Rekia Boyd',
+  'Renisha McBride',
+  'Rodney King',
+  'Samuel DuBose',
+  'Sandra Bland',
+  'Sean Bell',
+  'Sharonda Coleman Singleton',
+  'Stephon Clark',
+  'Susie Jackson',
+  'Tamir Rice',
+  'Terence Crutcher',
+  'Trayvon Martin',
+  'Tyre Nichols',
+  'Tywanza Sanders',
+  'Viola Liuzzo',
+  'Walter Scott',
+  'Keith Scott',
+  'Korryn Gaines',
+  'Laquan McDonald',
+]);
+
+export function memorialNamesAlphabetical(): readonly string[] {
+  return [...MEMORIAL_NAMES].sort((a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' }));
+}

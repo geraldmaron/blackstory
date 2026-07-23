@@ -12,7 +12,10 @@ import { HomeEditionHeader } from './HomeEditionHeader';
 void React;
 
 export type HomeDataPulseProps = {
-  readonly recordCount: number;
+  /** Published records in the active release catalog. */
+  readonly publishedRecordCount: number;
+  /** Records with a geo-anchored public map pin in this release. */
+  readonly pinnedRecordCount: number;
   readonly stateCount: number;
   readonly eraSpan?: string | undefined;
   readonly timeline?: NationalPopulationTimelineSnapshot | undefined;
@@ -23,7 +26,13 @@ function displayEraSpan(eraSpan: string | undefined): string | undefined {
   return eraSpan.replace(/\u2013|\u2014/g, ' to ');
 }
 
-export function HomeDataPulse({ recordCount, stateCount, eraSpan, timeline }: HomeDataPulseProps) {
+export function HomeDataPulse({
+  publishedRecordCount,
+  pinnedRecordCount,
+  stateCount,
+  eraSpan,
+  timeline,
+}: HomeDataPulseProps) {
   const rows = timeline?.rows ?? [];
   const hasPopulation = rows.length > 0;
   const chartSources = (timeline?.sources ?? []).map((source) => ({
@@ -48,7 +57,13 @@ export function HomeDataPulse({ recordCount, stateCount, eraSpan, timeline }: Ho
 
       <ul className="ds-data-strip" aria-label="Archive in numbers">
         <li className="ds-data-strip__item">
-          <span className="ds-data-strip__value">{recordCount.toLocaleString('en-US')}</span>
+          <span className="ds-data-strip__value">
+            {publishedRecordCount.toLocaleString('en-US')}
+          </span>
+          <span className="ds-data-strip__label">Published records</span>
+        </li>
+        <li className="ds-data-strip__item">
+          <span className="ds-data-strip__value">{pinnedRecordCount.toLocaleString('en-US')}</span>
           <span className="ds-data-strip__label">Records pinned</span>
         </li>
         <li className="ds-data-strip__item">

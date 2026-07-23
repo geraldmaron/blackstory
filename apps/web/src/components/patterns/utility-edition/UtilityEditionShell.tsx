@@ -4,6 +4,7 @@
  * status, not-found).
  */
 import React, { type ReactNode } from 'react';
+import { EDITION_MOSAIC_COUNT_DETAIL } from '../edition-atmosphere/edition-atmosphere-config';
 import { EditionAtmosphereMosaic } from '../edition-atmosphere/EditionAtmosphereMosaic';
 import {
   utilityEditionRootClassName,
@@ -23,7 +24,7 @@ export type UtilityEditionShellProps = {
 
 export function UtilityEditionShell({
   mosaicSeed,
-  mosaicCount = 12,
+  mosaicCount = EDITION_MOSAIC_COUNT_DETAIL,
   editionKey,
   children,
   busy = false,

@@ -13,7 +13,7 @@ import {
 } from '../../components/history';
 import { HISTORY_DECADE_FRAMING, HISTORY_DIGNITY_FRAMING } from '../../lib/history/copy';
 import type { HistoryFacetOption } from '../../lib/history/filters';
-import { listPublicEntityViews } from '../../lib/public-data/source';
+import { listPublicEntityViews, getPublicActiveReleaseMeta } from '../../lib/public-data/source';
 import { HistoryExperience } from './HistoryExperience';
 import { buildHistoryViewModel } from './history-view-model';
 import {
@@ -45,8 +45,13 @@ type HistoryPageProps = {
 
 export default async function HistoryPage({ searchParams }: HistoryPageProps) {
   const params = await searchParams;
-  const { data: entities } = await listPublicEntityViews();
-  const view = buildHistoryViewModel(params, entities);
+  const [{ data: entities }, releaseMeta] = await Promise.all([
+    listPublicEntityViews(),
+    getPublicActiveReleaseMeta(),
+  ]);
+  const view = buildHistoryViewModel(params, entities, {
+    ...(releaseMeta?.releaseId ? { releaseId: releaseMeta.releaseId } : {}),
+  });
 
   return (
     <main className="ds-container ds-page" id="main">

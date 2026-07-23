@@ -54,4 +54,13 @@ test('HistoryResultList renders entity links', () => {
   assert.match(html, /1870s to 1910s/);
   assert.match(html, /ds-history-edition__rip-fact-label/);
   assert.match(html, /aria-current="true"/);
+  assert.match(html, /ds-history-result-list__item--selected/);
+  assert.match(html, /ds-history-result-list__row-link/);
+  assert.equal(
+    (html.match(/href="\/entity\/ent_dunbar_school_001"/g) ?? []).length,
+    1,
+    'entity href appears once per row (no nested anchors)',
+  );
+  assert.doesNotMatch(html, /ds-history-edition__rip-link/);
+  assert.doesNotMatch(html, /—/);
 });
