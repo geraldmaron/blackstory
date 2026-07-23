@@ -55,20 +55,20 @@ function dualCountInline(input: ExploreCountLabelInput): string {
   return `${inView} · ${inRelease}`;
 }
 
+function singleCountRailPhrase(count: number, filters: FilterState): string {
+  const isFiltered = hasActiveFilters(filters);
+  if (count === 0) return isFiltered ? 'None filtered' : 'None';
+  if (count === 1) return isFiltered ? '1 filtered' : '1 pinned';
+  return isFiltered
+    ? `${formatLocaleCount(count)} filtered`
+    : `${formatLocaleCount(count)} pinned`;
+}
+
 /** Dual copy without repeating "in view" when scopeLabel already carries that word. */
 function dualCountRailInline(input: ExploreCountLabelInput): string {
-  const filtered = filteredSuffix(input.filters);
-  const inView =
-    input.inViewCount === 0
-      ? `None${filtered}`
-      : input.inViewCount === 1
-        ? `1${filtered}`
-        : `${formatLocaleCount(input.inViewCount)}${filtered}`;
-  const inRelease =
-    input.releaseCount === 1
-      ? '1 in release'
-      : `${formatLocaleCount(input.releaseCount)} in release`;
-  return `${inView} · ${inRelease}`;
+  const inView = formatLocaleCount(input.inViewCount);
+  const inRelease = formatLocaleCount(input.releaseCount);
+  return `${inView} / ${inRelease}`;
 }
 
 function demoSuffix(showDemoHint: boolean | undefined): string {
@@ -83,9 +83,10 @@ export function formatExploreCountLabel(input: ExploreCountLabelInput): ExploreC
 
   if (!useDual) {
     const phrase = singleCountPhrase(input.inViewCount, input.filters);
+    const railPhrase = singleCountRailPhrase(input.inViewCount, input.filters);
     return {
       inline: `${phrase}${demo}`,
-      railInline: `${phrase}${demo}`,
+      railInline: `${railPhrase}${demo}`,
       accessibilityLabel: `${input.scopeLabel}, ${phrase}`,
     };
   }
