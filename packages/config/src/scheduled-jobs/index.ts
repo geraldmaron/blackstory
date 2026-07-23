@@ -175,6 +175,16 @@ export {
 } from './jobs/discovery-campaign-web-search.js';
 
 export {
+  BANNED_BOOKS_REFRESH_JOB_ID,
+  runBannedBooksRefreshJob,
+  type BannedBooksCheckUrl,
+  type BannedBooksUrlCheckResult,
+  type BannedBooksRefreshJobInput,
+  type BannedBooksRefreshJobResult,
+  type BannedBooksValidationError,
+} from './jobs/banned-books-refresh.js';
+
+export {
   DISCOVERY_DISPATCHER_VERSION,
   DISCOVERY_CAMPAIGN_JOB_IDS,
   dispatchDiscoveryCampaign,

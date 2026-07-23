@@ -1,7 +1,8 @@
 /**
- * Focus-movement checks for `EntityPreviewSheet` (MOB-017). The sheet mounts OVER the map on the
- * same screen — not a route push — so neither VoiceOver nor TalkBack move focus here on their
- * own; `useAccessibilityFocus` must do it explicitly whenever a NEW feature is selected.
+ * Focus-movement checks for `EntityPreviewSheet` (MOB-017). The preview is sheet *content*
+ * hosted on the Explore screen — not a route push — so neither VoiceOver nor TalkBack move
+ * focus here on their own; `useAccessibilityFocus` must do it explicitly whenever a NEW
+ * feature is selected.
  */
 import { render } from '@testing-library/react-native';
 import { AccessibilityInfo } from 'react-native';

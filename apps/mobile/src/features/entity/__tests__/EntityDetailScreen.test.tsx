@@ -1,4 +1,4 @@
-import { fireEvent, render } from '@testing-library/react-native';
+import { act, fireEvent, render } from '@testing-library/react-native';
 import { EntityDetailScreen } from '../EntityDetailScreen';
 import { normalizeEntity } from '../normalize';
 import type { EntityDetailState } from '../useEntityDetail';
@@ -166,5 +166,55 @@ describe('EntityDetailScreen — related-entity navigation', () => {
     );
     fireEvent.press(getByText('Neighbor ent_neighbor_1'));
     expect(onOpenEntity).toHaveBeenCalledWith('ent_neighbor_1');
+  });
+});
+
+describe('EntityDetailScreen — visit hand-off', () => {
+  it('renders Visit with Open in Maps and Back to map when geoAnchor is present', async () => {
+    const onBackToMap = jest.fn();
+    const { getByTestId, getByLabelText, getByText } = await render(
+      <EntityDetailScreen state={readyState(fullEntityFixture('place'))} onBackToMap={onBackToMap} />,
+    );
+    expect(getByTestId('entity-visit-section')).toBeTruthy();
+    expect(getByText(/neighborhood precision/)).toBeTruthy();
+    expect(getByLabelText(/Open Historic Dunbar neighborhood in Maps/)).toBeTruthy();
+    fireEvent.press(getByLabelText(/Back to map with Full Fixture Record \(place\) selected/));
+    expect(onBackToMap).toHaveBeenCalledWith('ent_place_full_001');
+  });
+
+  it('omits Open in Maps when there is no public geoAnchor, but still offers Back to map', async () => {
+    const onBackToMap = jest.fn();
+    const { queryByLabelText, getByLabelText } = await render(
+      <EntityDetailScreen state={readyState(minimalEntityFixture('place'))} onBackToMap={onBackToMap} />,
+    );
+    expect(queryByLabelText(/Open .* in Maps/)).toBeNull();
+    fireEvent.press(getByLabelText(/Back to map with Minimal Fixture Record \(place\) selected/));
+    expect(onBackToMap).toHaveBeenCalledWith('ent_place_minimal_001');
+  });
+
+  it('shows KIND · PLACE · era on the mast meta line', async () => {
+    const { getByText } = await render(<EntityDetailScreen state={readyState(fullEntityFixture('place'))} />);
+    expect(getByText('Place · Dunbar County, GA · Reconstruction')).toBeTruthy();
+  });
+});
+
+describe('EntityDetailScreen — dense claims expand', () => {
+  it('collapses claims beyond the preview count behind an expand control', async () => {
+    const base = fullEntityFixture('place');
+    const claims = [
+      { ...(claimWithNoCitation() as Record<string, unknown>), id: 'claim_dense_1', object: 'First claim body.' },
+      { ...(claimWithNoCitation() as Record<string, unknown>), id: 'claim_dense_2', object: 'Second claim body.' },
+      { ...(claimWithNoCitation() as Record<string, unknown>), id: 'claim_dense_3', object: 'Third claim body.' },
+    ];
+    const { getByLabelText, getByText, queryByText } = await render(
+      <EntityDetailScreen state={readyState({ ...base, claims })} />,
+    );
+    expect(getByText('First claim body.')).toBeTruthy();
+    expect(getByText('Second claim body.')).toBeTruthy();
+    expect(queryByText('Third claim body.')).toBeNull();
+    await act(async () => {
+      fireEvent.press(getByLabelText('Show 1 more claims'));
+    });
+    expect(getByText('Third claim body.')).toBeTruthy();
   });
 });

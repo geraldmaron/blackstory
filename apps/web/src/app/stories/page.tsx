@@ -28,6 +28,11 @@ export default async function StoriesIndexPage() {
         History pinned to place and era. Each piece links to the records it rests on, with sources
         you can open.
       </p>
+      <p className="ds-stories-page__crosslink">
+        <Link className="ds-cta-link" href="/books">
+          Banned books catalog
+        </Link>
+      </p>
 
       <section className="ds-section ds-section--flush ds-stories-page__list" aria-label="Story list">
         <p className="ds-sans ds-count-label ds-stories-page__count" id="stories-list-heading">

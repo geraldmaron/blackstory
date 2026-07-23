@@ -31,7 +31,7 @@ export function ApiStatusBanner() {
         title="Live data unavailable"
         description={
           usingProdDefault
-            ? `Could not reach ${baseUrl}. Search and entity records need a running api-public with PUBLIC_DATA_SOURCE=postgres. Copy apps/mobile/.env.example to .env.local, set API_BASE_URL to http://127.0.0.1:8080 (simulator) or your Mac LAN IP, restart Metro. Explore map still uses bundled demo fixtures until a live GeoJSON route ships.`
+            ? `Could not reach ${baseUrl}. Search, entity, and Explore map need a running api-public with PUBLIC_DATA_SOURCE=postgres. Copy apps/mobile/.env.example to .env.local, set API_BASE_URL to http://127.0.0.1:8080 (simulator) or your Mac LAN IP, restart Metro. In __DEV__, Explore falls back to bundled demo pins if GET /v1/map is unreachable.`
             : `Could not reach ${baseUrl}/v1/bootstrap. Confirm api-public is running and reachable from this device, then restart Metro.`
         }
       />

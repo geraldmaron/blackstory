@@ -126,6 +126,26 @@ const SUBMISSIONS_BASE_URL = resolveHttpUrl(
 const OBSERVABILITY_ENABLED = process.env.OBSERVABILITY_ENABLED === 'false' ? false : true;
 const PERFORMANCE_SAMPLE_RATE = resolveSampleRate(process.env.PERFORMANCE_SAMPLE_RATE);
 
+// --- Explore basemap (ADR-025) ------------------------------------------------
+//
+// Defaults match web Explore (OpenFreeMap). Optional self-hosted PMTiles via
+// MAP_PMTILES_URL. Kill-switch MAP_BASEMAP_ENABLED=false → points-only canvas.
+function optionalHttpUrl(raw: string | undefined): string | undefined {
+  const value = (raw ?? '').trim();
+  if (!value) return undefined;
+  try {
+    const parsed = new URL(value);
+    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return undefined;
+    return value;
+  } catch {
+    return undefined;
+  }
+}
+const MAP_PMTILES_URL = optionalHttpUrl(process.env.MAP_PMTILES_URL);
+const MAP_VECTOR_TILE_URL = optionalHttpUrl(process.env.MAP_VECTOR_TILE_URL);
+const MAP_GLYPHS_URL_CONFIG = optionalHttpUrl(process.env.MAP_GLYPHS_URL);
+const MAP_BASEMAP_ENABLED_CONFIG = process.env.MAP_BASEMAP_ENABLED !== 'false';
+
 // --- EAS Update / OTA (MOB-019, repo-ovn7; ADR-023 §2/§7, threat-model T6) -----
 //
 // `expo-updates` is installed. Project id defaults to the provisioned EAS
@@ -314,6 +334,14 @@ const config: ExpoConfig = {
     // DEFAULT_EAS_PROJECT_ID). Required so local `eas device:*` / CLI do not
     // create a duplicate Expo project under another account slug.
     eas: { projectId: EAS_PROJECT_ID },
+    // Explore basemap (ADR-025): OpenFreeMap by default (web parity). Optional
+    // self-hosted PMTiles via MAP_PMTILES_URL. Kill-switch: MAP_BASEMAP_ENABLED=false.
+    map: {
+      ...(MAP_PMTILES_URL ? { pmtilesUrl: MAP_PMTILES_URL } : {}),
+      ...(MAP_VECTOR_TILE_URL ? { vectorTileUrl: MAP_VECTOR_TILE_URL } : {}),
+      ...(MAP_GLYPHS_URL_CONFIG ? { glyphsUrl: MAP_GLYPHS_URL_CONFIG } : {}),
+      basemapEnabled: MAP_BASEMAP_ENABLED_CONFIG,
+    },
   },
 };
 

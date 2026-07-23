@@ -16,6 +16,7 @@ test('buildPublicSitemapEntries includes static core journeys', () => {
   assert.ok(urls.some((url) => url.endsWith('/stories')));
   assert.ok(urls.some((url) => url.endsWith('/corrections')));
   assert.ok(urls.some((url) => url.endsWith('/law')));
+  assert.ok(urls.some((url) => url.endsWith('/books')));
 });
 
 test('buildPublicSitemapEntries adds entity pages from the active release catalog', () => {

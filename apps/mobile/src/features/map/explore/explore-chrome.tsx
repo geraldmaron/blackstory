@@ -2,6 +2,9 @@
  * Shared elevation helpers for Explore map chrome. Consumes theme elevation
  * tokens (shadow + gradient color stops). Copper accent is a 2px hairline strip
  * from the final `copperAccentEdge` stop — not a full gradient wash.
+ *
+ * ExploreListChrome is sheet-body chrome only (fill the bottom-sheet content
+ * area). It is no longer a permanent flex sibling under the map.
  */
 import type { ReactNode } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
@@ -47,19 +50,17 @@ export type ExploreListChromeProps = {
   readonly testID?: string;
 };
 
-/** Raised list panel under the map — hairline top + sm brand shadow. */
-export function ExploreListChrome({ children, style, testID = 'explore-list-chrome' }: ExploreListChromeProps) {
+/** Sheet-body chrome — fills the bottom-sheet content area (metrics or list). */
+export function ExploreListChrome({
+  children,
+  style,
+  testID = 'explore-list-chrome',
+}: ExploreListChromeProps) {
   const theme = useThemeColors();
-  const listShadow = useShadowStyle('sm');
 
   return (
     <View
-      style={[
-        listShadow,
-        styles.listChrome,
-        { borderTopColor: theme.border, backgroundColor: theme.surface },
-        style,
-      ]}
+      style={[styles.listChrome, { backgroundColor: theme.surface }, style]}
       testID={testID}
     >
       {children}
@@ -82,6 +83,5 @@ const styles = StyleSheet.create({
   },
   listChrome: {
     flex: 1,
-    borderTopWidth: 1,
   },
 });

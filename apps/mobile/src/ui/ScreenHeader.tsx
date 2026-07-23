@@ -1,11 +1,11 @@
 /**
- * Compact tab-screen masthead: optional copper kicker, Sora title, optional muted dek.
- * Keeps hierarchy dense and consistent across Explore-adjacent tabs without full-bleed title blocks.
+ * Compact tab-screen masthead: copper-tick mono kicker, Sora title, optional
+ * muted dek. Keeps hierarchy dense across Search / Stories / More.
  */
 import { StyleSheet, View } from 'react-native';
 
 import { Text } from './Text';
-import { space } from './tokens';
+import { space, useThemeColors } from './tokens';
 
 export type ScreenHeaderProps = {
   /** Small copper navigational label above the title (e.g. "Longform", "Records"). */
@@ -17,12 +17,21 @@ export type ScreenHeaderProps = {
 };
 
 export function ScreenHeader({ kicker, title, dek, compact = false }: ScreenHeaderProps) {
+  const theme = useThemeColors();
+
   return (
     <View style={[styles.block, compact ? styles.compact : undefined]} accessibilityRole="header">
       {kicker ? (
-        <Text variant="caption" colorRole="accent">
-          {kicker}
-        </Text>
+        <View style={styles.kickerRow}>
+          <View
+            style={[styles.tick, { backgroundColor: theme.accentGraphic }]}
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+          />
+          <Text variant="code" colorRole="accent" numberOfLines={1} style={styles.kicker}>
+            {kicker}
+          </Text>
+        </View>
       ) : null}
       <Text variant={compact ? 'title' : 'display'} isHeading>
         {title}
@@ -42,5 +51,19 @@ const styles = StyleSheet.create({
   },
   compact: {
     gap: space['1'],
+  },
+  kickerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space['2'],
+  },
+  tick: {
+    width: 3,
+    height: 12,
+    borderRadius: 1,
+  },
+  kicker: {
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
 });

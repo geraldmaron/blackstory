@@ -2,7 +2,9 @@
  * Root Expo Router layout (MOB-008 / repo-8b5h).
  *
  * Route tree:
- *   (tabs)/                 four primary tabs (Explore, Search, Learn, More), headerShown:false
+ *   (tabs)/                 four primary tabs (Explore, Search, Stories, More), headerShown:false
+ *   data                    stack push — national Data (web `/data`), from More
+ *   learn/*                 nested Stories/content stack
  *   entity/[id]             stack push over the tabs, reachable from any tab
  *   filters-sheet           modal presentation (Explore filter sheet)
  *   corrections/submit      modal presentation (correction-submission sheet stub)
@@ -19,11 +21,14 @@
  *
  * Composition root (repo-8b5h): AppProviders owns QueryClient + PersistQueryClientProvider,
  * bootstrap-sync on launch, App Check init, and observability wiring so features share one
- * data-layer runtime instead of independent singletons.
+ * data-layer runtime instead of independent singletons. GestureHandlerRootView wraps the
+ * tree so Explore's @gorhom/bottom-sheet gestures receive a gesture root.
  */
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { StyleSheet } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { AppProviders } from '@/runtime';
 import { useBrandFonts } from '@/ui';
@@ -46,19 +51,56 @@ export default function RootLayout() {
   }
 
   return (
-    <AppProviders>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="entity/[id]" options={{ title: 'Record', headerShown: true }} />
-        <Stack.Screen
-          name="filters-sheet"
-          options={{ presentation: 'modal', title: 'Filters', headerShown: true }}
-        />
-        <Stack.Screen
-          name="corrections/submit"
-          options={{ presentation: 'modal', title: 'Submit a correction', headerShown: true }}
-        />
-      </Stack>
-    </AppProviders>
+    <GestureHandlerRootView style={styles.root}>
+      <AppProviders>
+        <Stack
+          screenOptions={{
+            headerLargeTitle: false,
+            headerShadowVisible: false,
+            headerBackButtonDisplayMode: 'minimal',
+            headerTitleStyle: { fontSize: 17 },
+          }}
+        >
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="data"
+            options={{
+              title: 'Data',
+              headerBackTitle: 'More',
+              headerShown: true,
+            }}
+          />
+          <Stack.Screen
+            name="learn"
+            options={{ headerShown: false, title: 'Stories' }}
+          />
+          <Stack.Screen
+            name="entity/[id]"
+            options={{
+              title: 'Record',
+              headerBackTitle: 'Back',
+              headerShown: true,
+            }}
+          />
+          <Stack.Screen
+            name="filters-sheet"
+            options={{ presentation: 'modal', title: 'Filters', headerShown: true }}
+          />
+          <Stack.Screen
+            name="corrections/submit"
+            options={{ presentation: 'modal', title: 'Submit a correction', headerShown: true }}
+          />
+          <Stack.Screen
+            name="corrections/status"
+            options={{ title: 'Correction status', headerBackTitle: 'Back', headerShown: true }}
+          />
+        </Stack>
+      </AppProviders>
+    </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  root: { flex: 1 },
+});
+

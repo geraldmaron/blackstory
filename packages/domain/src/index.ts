@@ -599,6 +599,7 @@ export type {
 
 export * from './adapters/index.js';
 export * from './external-data-sources.js';
+export * from './banned-books/index.js';
 export * from './public-numeric-policy.js';
 export * from './publication/index.js';
 export * from './datapacks/index.js';

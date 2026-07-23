@@ -3,11 +3,12 @@
  *
  * A JS runner cannot mount the native GL map, so `@maplibre/maplibre-react-native`
  * is mocked with plain Views (same approach as MOB-011's MapScreen tests). What
- * these prove is the interaction architecture: the list renders and is
- * interactive, filters reflect in the count, a row opens the preview sheet with a
- * working entity link, the list stays usable when the MAP is in an error state,
- * the empty state renders, a pathological label does not crash rendering, and
- * rapid mount/unmount cleans up its subscriptions (leak check).
+ * these prove is the interaction architecture: the metrics dashboard renders from
+ * real feature properties, filters reflect in the count, expanding the secondary
+ * list opens a row → preview sheet with a working entity link, the sheet stays
+ * usable when the MAP is in an error state, the empty state renders, a
+ * pathological label does not crash rendering, and rapid mount/unmount cleans up
+ * its subscriptions (leak check).
  */
 import { AccessibilityInfo } from 'react-native';
 import { act, cleanup, fireEvent, render } from '@testing-library/react-native';
@@ -44,12 +45,90 @@ jest.mock('react-native-safe-area-context', () => {
   };
 });
 
+jest.mock('@gorhom/bottom-sheet', () => {
+  /* eslint-disable @typescript-eslint/no-require-imports */
+  const React = require('react');
+  const { View } = require('react-native');
+
+  const BottomSheet = React.forwardRef(
+    (
+      {
+        children,
+        handleComponent,
+      }: {
+        children?: unknown;
+        handleComponent?: () => unknown;
+      },
+      _ref: unknown,
+    ) =>
+      React.createElement(
+        View,
+        { testID: 'explore-bottom-sheet-host' },
+        handleComponent ? handleComponent() : null,
+        children as never,
+      ),
+  );
+  BottomSheet.displayName = 'BottomSheet';
+
+  const Passthrough = ({
+    children,
+    testID,
+  }: {
+    children?: unknown;
+    testID?: string;
+  }) => React.createElement(View, { testID }, children as never);
+
+  return {
+    __esModule: true,
+    default: BottomSheet,
+    BottomSheetView: Passthrough,
+    BottomSheetScrollView: Passthrough,
+    BottomSheetFlatList: Passthrough,
+    BottomSheetHandle: () => null,
+    BottomSheetBackdrop: () => null,
+  };
+});
+
+jest.mock('react-native-reanimated', () => {
+  /* eslint-disable @typescript-eslint/no-require-imports */
+  const React = require('react');
+  const { View } = require('react-native');
+  return {
+    __esModule: true,
+    default: {
+      View,
+      createAnimatedComponent: (c: unknown) => c,
+      call: () => {},
+    },
+    View,
+    Easing: { linear: (t: number) => t, bezier: () => (t: number) => t },
+    useSharedValue: (v: unknown) => ({ value: v }),
+    useAnimatedStyle: () => ({}),
+    useDerivedValue: (fn: () => unknown) => ({ value: fn() }),
+    withTiming: (v: unknown) => v,
+    withSpring: (v: unknown) => v,
+    runOnJS: (fn: unknown) => fn,
+    runOnUI: (fn: unknown) => fn,
+    ReduceMotion: { System: 'system', Always: 'always', Never: 'never' },
+    FadeIn: {},
+    FadeOut: {},
+  };
+});
+
 // eslint-disable-next-line import/first
 import { ExploreView } from '../ExploreView';
 // eslint-disable-next-line import/first
 import { DEMO_MAP_SOURCE, type MapFeatureCollection } from '@/features/map';
 
 const noop = () => {};
+
+async function expandSecondaryList(
+  utils: Awaited<ReturnType<typeof render>>,
+): Promise<void> {
+  await act(async () => {
+    fireEvent.press(utils.getByTestId('explore-metrics-list-toggle'));
+  });
+}
 
 // Flush any pending async (e.g. the reduce-motion `isReduceMotionEnabled` promise)
 // after each test so one test's deferred work cannot bleed into the next and skew
@@ -60,42 +139,64 @@ afterEach(async () => {
   });
 });
 
-describe('ExploreView — synchronized list', () => {
-  it('renders a list row for each redacted feature and is interactive', async () => {
-    const { getByLabelText } = await render(
+describe('ExploreView — metrics dashboard', () => {
+  it('renders metrics for redacted features instead of a primary list', async () => {
+    const { getByTestId, queryByTestId, getByLabelText } = await render(
       <ExploreView onOpenEntity={noop} onOpenFilters={noop} reduceMotion />,
     );
-    expect(getByLabelText(/Seed Historical Place/)).toBeTruthy();
-    expect(getByLabelText(/Seed Living Person/)).toBeTruthy();
+    expect(getByTestId('explore-metrics-dashboard')).toBeTruthy();
+    expect(getByTestId('explore-metrics-by-kind')).toBeTruthy();
+    expect(getByTestId('explore-metrics-by-state')).toBeTruthy();
+    expect(getByTestId('explore-metrics-by-precision')).toBeTruthy();
+    expect(getByTestId('explore-metric-total')).toBeTruthy();
+    expect(getByLabelText(/^Place: 2 records$/)).toBeTruthy();
+    expect(getByLabelText(/^Person: 1 record$/)).toBeTruthy();
+    // List is secondary — collapsed by default.
+    expect(queryByTestId('explore-list')).toBeNull();
   });
 
-  it('reflects filters in the result count and the list', async () => {
-    const { getByText, queryByLabelText } = await render(
+  it('reflects filters in the result count and metrics buckets', async () => {
+    const { getByLabelText, queryByLabelText, queryByTestId } = await render(
       <ExploreView filters={{ kind: 'place' }} onOpenEntity={noop} onOpenFilters={noop} reduceMotion />,
     );
-    expect(getByText(/2 records · filtered/)).toBeTruthy();
-    // The person record is filtered out of the list.
-    expect(queryByLabelText(/Seed Living Person/)).toBeNull();
+    expect(getByLabelText(/2 · filtered records/)).toBeTruthy();
+    expect(getByLabelText(/^2 records all records$/)).toBeTruthy();
+    expect(getByLabelText(/^Place: 2 records$/)).toBeTruthy();
+    expect(queryByLabelText(/^Person: 1 record$/)).toBeNull();
+    expect(queryByTestId('explore-list')).toBeNull();
   });
 });
 
 describe('ExploreView — entity preview sheet', () => {
-  it('opens the preview sheet on row press and links to the full entity route', async () => {
+  it('opens the preview sheet from the secondary list and links to the full entity route', async () => {
     const onOpenEntity = jest.fn();
-    const { getByLabelText, findByTestId, findByLabelText } = await render(
+    const utils = await render(
       <ExploreView onOpenEntity={onOpenEntity} onOpenFilters={noop} reduceMotion />,
     );
-    fireEvent.press(getByLabelText(/Seed Historical Place/));
-    expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
-    fireEvent.press(await findByLabelText(/View full record for/));
+    await expandSecondaryList(utils);
+    fireEvent.press(utils.getByLabelText(/Seed Historical Place/));
+    expect(await utils.findByTestId('entity-preview-sheet')).toBeTruthy();
+    fireEvent.press(await utils.findByLabelText(/View full record for/));
     expect(onOpenEntity).toHaveBeenCalledWith('ent_fixture_place_dc');
+  });
+
+  it('opens the preview sheet when a deep-linked selection is restored', async () => {
+    const { findByTestId } = await render(
+      <ExploreView
+        selectedParam="ent_fixture_place_dc"
+        onOpenEntity={noop}
+        onOpenFilters={noop}
+        reduceMotion
+      />,
+    );
+    expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
   });
 });
 
-describe('ExploreView — failed map leaves the list usable', () => {
-  it('renders the degraded map error state AND an interactive list', async () => {
+describe('ExploreView — failed map leaves metrics usable', () => {
+  it('renders the degraded map error state AND interactive metrics with secondary list', async () => {
     const onOpenEntity = jest.fn();
-    const { getByTestId, queryByTestId, getByLabelText, findByLabelText } = await render(
+    const utils = await render(
       <ExploreView
         loadState={{ kind: 'error', mode: 'provider-outage' }}
         onOpenEntity={onOpenEntity}
@@ -103,11 +204,12 @@ describe('ExploreView — failed map leaves the list usable', () => {
         reduceMotion
       />,
     );
-    expect(getByTestId('map-error-state')).toBeTruthy();
-    expect(queryByTestId('maplibre-map')).toBeNull();
-    // The list still works: select a record and open it.
-    fireEvent.press(getByLabelText(/Seed Historical Place/));
-    fireEvent.press(await findByLabelText(/View full record for/));
+    expect(utils.getByTestId('map-error-state')).toBeTruthy();
+    expect(utils.queryByTestId('maplibre-map')).toBeNull();
+    expect(utils.getByTestId('explore-metrics-dashboard')).toBeTruthy();
+    await expandSecondaryList(utils);
+    fireEvent.press(utils.getByLabelText(/Seed Historical Place/));
+    fireEvent.press(await utils.findByLabelText(/View full record for/));
     expect(onOpenEntity).toHaveBeenCalled();
   });
 });
@@ -115,15 +217,15 @@ describe('ExploreView — failed map leaves the list usable', () => {
 describe('ExploreView — empty + adversarial', () => {
   const empty: MapFeatureCollection = { type: 'FeatureCollection', features: [] };
 
-  it('shows the empty state and a zero count when nothing matches', async () => {
-    const { getByTestId, getByText } = await render(
+  it('shows the empty metrics state and a zero count when nothing matches', async () => {
+    const { getByTestId, getByLabelText } = await render(
       <ExploreView source={empty} onOpenEntity={noop} onOpenFilters={noop} reduceMotion />,
     );
-    expect(getByTestId('explore-list-empty')).toBeTruthy();
-    expect(getByText(/0 records/)).toBeTruthy();
+    expect(getByTestId('explore-metrics-empty')).toBeTruthy();
+    expect(getByLabelText(/0 records/)).toBeTruthy();
   });
 
-  it('renders a pathological oversized label without crashing or overflowing', async () => {
+  it('renders a pathological oversized label without crashing when the list is expanded', async () => {
     const hostile: MapFeatureCollection = {
       type: 'FeatureCollection',
       features: [
@@ -140,10 +242,12 @@ describe('ExploreView — empty + adversarial', () => {
         },
       ],
     };
-    const { getByTestId } = await render(
+    const utils = await render(
       <ExploreView source={hostile} onOpenEntity={noop} onOpenFilters={noop} reduceMotion />,
     );
-    expect(getByTestId('explore-list')).toBeTruthy();
+    expect(utils.getByTestId('explore-metrics-dashboard')).toBeTruthy();
+    await expandSecondaryList(utils);
+    expect(utils.getByTestId('explore-list')).toBeTruthy();
   });
 });
 

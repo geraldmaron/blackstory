@@ -3,7 +3,10 @@
  */
 import {
   MAP_MAX_ZOOM,
+  MAP_MIN_ZOOM,
   US_BOUNDS,
+  US_CAMERA_BOUNDS_PAD_DEG,
+  US_CAMERA_MAX_BOUNDS,
   boundsForCoordinates,
   cameraForPreset,
   cameraMotion,
@@ -13,6 +16,7 @@ import {
   coarsenTo,
   isInBounds,
   isNoMorePreciseThan,
+  padBounds,
   type LngLat,
 } from '../mapCamera';
 
@@ -42,6 +46,27 @@ describe('boundsForCoordinates', () => {
     expect(e).toBe(-77.04);
     expect(s).toBe(29.76);
     expect(n).toBe(38.9);
+  });
+});
+
+describe('padBounds / US_CAMERA_MAX_BOUNDS', () => {
+  it('pads each edge by the requested degrees', () => {
+    expect(padBounds([-100, 30, -80, 40], 2)).toEqual([-102, 28, -78, 42]);
+  });
+
+  it('treats non-finite pad as zero', () => {
+    expect(padBounds(US_BOUNDS, Number.NaN)).toEqual(US_BOUNDS);
+  });
+
+  it('derives CONUS maxBounds from US_BOUNDS with a small pad (not free-world)', () => {
+    expect(US_CAMERA_MAX_BOUNDS).toEqual(padBounds(US_BOUNDS, US_CAMERA_BOUNDS_PAD_DEG));
+    expect(US_CAMERA_MAX_BOUNDS[0]).toBeLessThan(US_BOUNDS[0]);
+    expect(US_CAMERA_MAX_BOUNDS[2]).toBeGreaterThan(US_BOUNDS[2]);
+    // Still a continental envelope — never global.
+    expect(US_CAMERA_MAX_BOUNDS[0]).toBeGreaterThan(-140);
+    expect(US_CAMERA_MAX_BOUNDS[2]).toBeLessThan(-50);
+    expect(MAP_MIN_ZOOM).toBeGreaterThanOrEqual(3);
+    expect(MAP_MIN_ZOOM).toBeLessThanOrEqual(MAP_MAX_ZOOM);
   });
 });
 

@@ -16,6 +16,12 @@
   line-height: 1.55;
 }
 
+.ds-stories-page__crosslink {
+  margin: var(--ds-space-3) 0 0;
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+}
+
 .ds-stories-page__list {
   margin-top: var(--ds-space-6);
   padding-top: 0;

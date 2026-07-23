@@ -35,6 +35,10 @@ function traceDataAccess(inner: PublicDataAccess): TracedAccess {
       trace.push(`getEntity:${entityId}`);
       return inner.getEntity(releaseId, entityId);
     },
+    async listEntities(releaseId) {
+      trace.push(`listEntities:${releaseId}`);
+      return inner.listEntities(releaseId);
+    },
     async search(canonical, options) {
       trace.push(`search:q=${canonical.q}`);
       return inner.search(canonical, options);

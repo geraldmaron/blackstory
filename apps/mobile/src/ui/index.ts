@@ -22,6 +22,7 @@ export { ListRow, type ListRowProps, type ListRowDensity } from './ListRow';
 export { SectionHeader, type SectionHeaderProps } from './SectionHeader';
 export { ScreenCanvas, screenScrollInsets, type ScreenCanvasProps } from './ScreenCanvas';
 export { ScreenHeader, type ScreenHeaderProps } from './ScreenHeader';
+export { LedgerRow, type LedgerRowProps } from './LedgerRow';
 export { NavIcon, navIconForEntityKind, type NavIconProps, type NavIconName } from './NavIcon';
 export { ApiStatusBanner } from './ApiStatusBanner';
 export { useAccessibilityFocus } from './useAccessibilityFocus';

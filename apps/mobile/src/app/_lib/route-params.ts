@@ -45,7 +45,20 @@ export const MAX_ERA_LENGTH = 20;
  * Mirrors packages/public-contracts/src/v1/entity.ts's `ENTITY_KINDS`. Kept as a manually
  * synced literal list rather than an import — see the dependency note above.
  */
-export const ENTITY_KINDS = ['place', 'school', 'event', 'institution'] as const;
+export const ENTITY_KINDS = [
+  'person',
+  'place',
+  'school',
+  'organization',
+  'institution',
+  'event',
+  'law',
+  'case',
+  'publication',
+  'artifact',
+  'movement',
+  'other',
+] as const;
 export type EntityKind = (typeof ENTITY_KINDS)[number];
 
 function isEntityKind(value: string): value is EntityKind {
@@ -243,14 +256,14 @@ export function parseFilterState(raw: Record<string, unknown> | undefined | null
 // Safe-route allowlist (open-redirect / unknown-route defense)
 // ---------------------------------------------------------------------------
 
-/** The only static (parameter-free) tab roots a deep link is allowed to resolve to. */
-const ALLOWED_STATIC_ROUTES = ['/explore', '/search', '/learn', '/more'] as const;
+/** The only static (parameter-free) roots a deep link is allowed to resolve to. */
+const ALLOWED_STATIC_ROUTES = ['/explore', '/search', '/learn', '/more', '/data'] as const;
 
 export type SafeInternalPath = (typeof ALLOWED_STATIC_ROUTES)[number] | `/entity/${string}`;
 
 /**
  * Returns true only for a small, explicit allowlist of internal app routes: the four tab roots,
- * or `/entity/<validated-id>`. Used anywhere a link/param carries a "navigate to" target that
+ * `/data`, or `/entity/<validated-id>`. Used anywhere a link/param carries a "navigate to" target that
  * isn't itself the current screen's own route — e.g. a `returnTo` param on a modal sheet — so
  * that value can never be used to open an external URL (an "open redirect") or an unknown/
  * unenumerated route. This is the concrete implementation of T4's "route allowlist, not string

@@ -5,26 +5,13 @@
  * formatting over its output so the two concerns (reading + validating brand
  * source vs. emitting TS text) stay separable and independently testable.
  *
- * MOB-007 evidence note (read this before changing hex values):
+ * Color source of truth (Mobile Full-App redesign / AGENTS.md / docs/ui/brand.md):
+ * `packages/ui/src/tokens/brand-palette.ts` — Black Ink #0A0A0A, Archive Paper
+ * #F4EFE5, Copper Pin #B86B2A, Page Sand #D8A178, copper text #8E4F2A / #D07A32.
  *
- * `brand/tokens/colors.json` + `brand/guide/pdf/BlackStory-Brand-Guide.pdf`
- * (confirmed visually via brand/guide/pages/02-color-and-typography.png,
- * "BLACKSTORY BRAND GUIDE VERSION 1.0") is the current, versioned, approved
- * core palette: Ebony Ink #111111, Archive Paper #F7F3EE, Sand #E7D9C3,
- * Bronze #B87333, Mahogany #7A2E22, Copper Pin #D47A42.
- *
- * This does NOT match the palette actually shipping today in
- * packages/ui/src/tokens/brand-palette.ts (Black Ink #0A0A0A, Archive Paper
- * #F4EFE5, Copper Pin #B86B2A, Page Sand #D8A178, "Pinned Page" identity).
- * `git log` shows the BlackStory rebrand commit (616b9a9) replaced logo/
- * lockup assets and copy but never touched packages/ui's color tokens —
- * apps/web is running a palette that predates the current, versioned Brand
- * Guide it ships alongside. That is a real drift, but it is a `packages/ui`
- * problem for the web owner to reconcile, not something this mobile-only
- * bead (whose explicit source of truth is `brand/tokens`, not `packages/ui`)
- * should silently inherit. Mobile therefore derives its palette from the
- * current Brand Guide v1.0 values in `brand/tokens`, not from the stale web
- * tokens. Flagged here in case a future pass reconciles the two.
+ * `brand/tokens/colors.json` still ships older Brand Guide v1.0 hexes
+ * (#111111 / #F7F3EE / #D47A42). Mobile no longer mirrors those for UI tokens;
+ * typography still comes from `brand/tokens/typography.json` + brand.css.
  *
  * Typography: `brand/tokens/typography.json` says `uiBody: "Inter"` (no
  * "Display" suffix) and `display: "Sora SemiBold"`. An earlier commit
@@ -105,39 +92,27 @@ function readBrandCssVars(css: string): Record<string, string> {
 }
 
 /**
- * Loads brand/tokens/{colors,typography}.json and cross-checks them against
- * brand/tokens/brand.css. The three files ship together in the same brand
- * kit drop and are expected to agree; if a future kit update edits one file
- * but not the others, this throws instead of silently generating from a
- * stale/mismatched value.
+ * Canonical UI palette mirrored from packages/ui brand-palette (Pinned Page).
+ * Field names keep the generator's BrandCoreColors shape for theme derivation.
+ */
+export const CANONICAL_BRAND_CORE: BrandCoreColors = {
+  ebonyInk: '#0A0A0A',
+  archivePaper: '#F4EFE5',
+  sand: '#D8A178',
+  bronze: '#B86B2A',
+  mahogany: '#8E4F2A',
+  copperPin: '#B86B2A',
+};
+
+/**
+ * Loads typography from brand/tokens and colors from the canonical
+ * packages/ui / AGENTS.md palette (not the older brand/tokens/colors.json hexes).
  */
 export function loadBrandCoreSource(): { colors: BrandCoreColors; typography: BrandTypographyFamilies } {
-  const colorsJson = JSON.parse(
-    readFileSync(join(BRAND_TOKENS_DIR, 'colors.json'), 'utf8'),
-  ) as BrandCoreColors;
   const typographyJson = JSON.parse(
     readFileSync(join(BRAND_TOKENS_DIR, 'typography.json'), 'utf8'),
   ) as { wordmark: string; display: string; uiBody: string; editorial: string; dataMono: string };
   const cssVars = readBrandCssVars(readFileSync(join(BRAND_TOKENS_DIR, 'brand.css'), 'utf8'));
-
-  const cssColorChecks: [keyof BrandCoreColors, string][] = [
-    ['ebonyInk', 'blackstory-ebonyInk'],
-    ['archivePaper', 'blackstory-archivePaper'],
-    ['sand', 'blackstory-sand'],
-    ['bronze', 'blackstory-bronze'],
-    ['mahogany', 'blackstory-mahogany'],
-    ['copperPin', 'blackstory-copperPin'],
-  ];
-  for (const [jsonKey, cssVar] of cssColorChecks) {
-    const cssValue = cssVars[cssVar];
-    if (!cssValue || cssValue.toUpperCase() !== colorsJson[jsonKey].toUpperCase()) {
-      throw new Error(
-        `generate-brand-tokens: brand/tokens/colors.json.${jsonKey} (${colorsJson[jsonKey]}) ` +
-          `disagrees with brand/tokens/brand.css --${cssVar} (${cssValue ?? 'missing'}). ` +
-          `The brand kit's own files have drifted from each other — fix the brand/ source before regenerating.`,
-      );
-    }
-  }
 
   const cssFontUi = cssVars['blackstory-font-ui'];
   if (!cssFontUi || !cssFontUi.includes(typographyJson.uiBody)) {
@@ -148,7 +123,7 @@ export function loadBrandCoreSource(): { colors: BrandCoreColors; typography: Br
   }
 
   return {
-    colors: colorsJson,
+    colors: CANONICAL_BRAND_CORE,
     typography: {
       display: typographyJson.display,
       uiBody: typographyJson.uiBody,
@@ -219,7 +194,7 @@ export function buildBrandTokens(): BrandTokens {
     focusRingOffset: archivePaper,
     inverse: ebonyInk,
     inverseInk: archivePaper,
-    overlay: 'rgba(17, 17, 17, 0.55)',
+    overlay: 'rgba(10, 10, 10, 0.55)',
     accent: lightAccent,
     accentGraphic: lightAccentGraphic,
     accentMuted: lightAccentMuted,

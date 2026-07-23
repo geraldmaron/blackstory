@@ -24,6 +24,7 @@ export {
   pickFeaturedStory,
   storyHref,
 } from './story-index';
+export { relatedEntitySubtitle, resolveRelatedEntityLabel, type RelatedEntityLabel } from './related-entity-labels';
 export { ContentPageScreen } from './ContentPageScreen';
 export { ContentRenderer, type ContentPresentation } from './ContentRenderer';
 export { normalizeContentPage, normalizeTypedContentPage, type NormalizedBlock } from './content-blocks';

@@ -25,6 +25,10 @@ export type MapPointFeatureProperties = {
   readonly stateFips?: string;
   readonly statePostalCode?: string;
   readonly stateName?: string;
+  /** Present on live MapSourceV1 features; optional on demo fixtures. */
+  readonly eraBuckets?: readonly string[];
+  /** Present on live MapSourceV1 features; optional on demo fixtures. */
+  readonly oneLineStory?: string;
 };
 
 export type MapPointFeature = {

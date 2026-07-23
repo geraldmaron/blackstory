@@ -10,10 +10,13 @@
  * at parse time (`MAX_RELATED_IDS`), and `FlatList` itself only mounts a small window of rows
  * regardless of array length — so a huge id list (the "huge table" adversarial case) renders a
  * fixed amount of work per frame rather than hanging on a synchronous full-list layout pass.
+ *
+ * Row titles are always human labels (display name + kind/place) — never raw `ent_*` ids.
  */
 import { router } from 'expo-router';
 import { FlatList, View } from 'react-native';
 import { ListRow, Surface, Text } from '@/ui';
+import { relatedEntitySubtitle, resolveRelatedEntityLabel } from './related-entity-labels';
 
 const RENDER_WINDOW = 20;
 
@@ -32,14 +35,19 @@ export function RelatedEntityList({ entityIds }: { readonly entityIds: readonly 
         maxToRenderPerBatch={RENDER_WINDOW}
         windowSize={3}
         removeClippedSubviews
-        renderItem={({ item, index }) => (
-          <ListRow
-            title={item}
-            subtitle="View record"
-            onPress={() => router.push(`/entity/${item}` as never)}
-            showDivider={index < entityIds.length - 1}
-          />
-        )}
+        renderItem={({ item, index }) => {
+          const label = resolveRelatedEntityLabel(item);
+          const subtitle = relatedEntitySubtitle(label);
+          return (
+            <ListRow
+              title={label.displayName}
+              subtitle={subtitle.length > 0 ? subtitle : 'View record'}
+              onPress={() => router.push(`/entity/${item}` as never)}
+              showDivider={index < entityIds.length - 1}
+              accessibilityLabel={`${label.displayName}. ${subtitle || 'Archive record'}`}
+            />
+          );
+        }}
       />
     </View>
   );

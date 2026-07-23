@@ -14,6 +14,7 @@
 export type MapFailureMode = 'provider-outage' | 'corrupt-tiles' | 'offline-cold-start';
 
 export type MapLoadState =
+  | { readonly kind: 'loading' }
   | { readonly kind: 'ready' }
   | { readonly kind: 'error'; readonly mode: MapFailureMode };
 

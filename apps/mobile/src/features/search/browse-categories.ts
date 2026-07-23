@@ -12,10 +12,18 @@ export interface BrowseCategory {
 }
 
 const LABELS: Record<EntityKind, string> = {
+  person: 'People',
   place: 'Places',
   school: 'Schools',
-  event: 'Events',
+  organization: 'Organizations',
   institution: 'Institutions',
+  event: 'Events',
+  law: 'Laws',
+  case: 'Cases',
+  publication: 'Publications',
+  artifact: 'Artifacts',
+  movement: 'Movements',
+  other: 'Other',
 };
 
 export const BROWSE_CATEGORIES: readonly BrowseCategory[] = ENTITY_KINDS.map((kind) => ({

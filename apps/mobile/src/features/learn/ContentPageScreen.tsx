@@ -2,8 +2,10 @@
  * Full content-page screen body (MOB-015): wires `useContentPage` (real cache/connectivity) →
  * `normalizeContentPage` (allowlisted-schema defense) → `ContentRenderer` (presentation). Used by
  * both `/learn/[section]/index.tsx` (single-page sections) and `/learn/[section]/[slug].tsx`
- * (multi-page sections).
+ * (multi-page sections). Sets the stack `headerTitle` from the page title — never a route pattern.
  */
+import { useNavigation } from 'expo-router';
+import { useLayoutEffect } from 'react';
 import { ScrollView } from 'react-native';
 import { EmptyState, ErrorState, ScreenCanvas, space } from '@/ui';
 import { normalizeTypedContentPage } from './content-blocks';
@@ -23,14 +25,43 @@ export interface ContentPageScreenProps {
    * screen rewrite.
    */
   readonly currentContentVersion?: string;
+  /** Fallback stack title while loading / on error (e.g. "Story", "Methodology"). */
+  readonly fallbackTitle?: string;
 }
 
-export function ContentPageScreen({ section, slug, currentContentVersion }: ContentPageScreenProps) {
+function compactHeaderTitle(title: string): string {
+  const trimmed = title.trim();
+  if (trimmed.length <= 36) return trimmed;
+  return `${trimmed.slice(0, 33).trimEnd()}…`;
+}
+
+export function ContentPageScreen({
+  section,
+  slug,
+  currentContentVersion,
+  fallbackTitle = 'Story',
+}: ContentPageScreenProps) {
+  const navigation = useNavigation();
   const state = useContentPage(section, slug);
   const longform = isLongformSection(section);
 
+  const resolvedTitle =
+    state.status === 'ok'
+      ? compactHeaderTitle(normalizeTypedContentPage(state.value.page).page?.title ?? fallbackTitle)
+      : fallbackTitle;
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: resolvedTitle,
+      headerTitle: resolvedTitle,
+      headerBackTitle: 'Stories',
+      headerLargeTitle: false,
+      headerBackButtonDisplayMode: 'minimal',
+    });
+  }, [navigation, resolvedTitle]);
+
   return (
-    <ScreenCanvas edges={longform ? ['left', 'right', 'bottom'] : ['left', 'right', 'bottom']}>
+    <ScreenCanvas edges={['left', 'right', 'bottom']}>
       <ScrollView
         contentContainerStyle={
           longform

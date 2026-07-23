@@ -18,8 +18,8 @@
  * a NEW instance of this same route (`router.push`), never an inline expansion — the withdrawn/
  * not-found state is exercised identically whichever way this route is entered.
  */
-import { useEffect, useState } from 'react';
-import { Redirect, router, useLocalSearchParams } from 'expo-router';
+import { useEffect, useLayoutEffect, useState } from 'react';
+import { Redirect, router, useLocalSearchParams, useNavigation } from 'expo-router';
 
 import { parseEntityId } from '../_lib/route-params';
 import {
@@ -30,7 +30,14 @@ import {
 } from '@/features/entity';
 import { ScreenCanvas } from '@/ui';
 
+function compactHeaderTitle(title: string): string {
+  const trimmed = title.trim();
+  if (trimmed.length <= 36) return trimmed;
+  return `${trimmed.slice(0, 33).trimEnd()}…`;
+}
+
 export default function EntityDetailRoute() {
+  const navigation = useNavigation();
   const { id } = useLocalSearchParams<{ id?: string | string[] }>();
   const entityId = parseEntityId(id);
 
@@ -53,6 +60,20 @@ export default function EntityDetailRoute() {
   }, []);
 
   const { state, retry } = useEntityDetail(entityId, deps);
+  const headerTitle =
+    deps && state.kind === 'ready'
+      ? compactHeaderTitle(state.result.entity.displayName)
+      : 'Record';
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: headerTitle,
+      headerTitle,
+      headerBackTitle: 'Back',
+      headerLargeTitle: false,
+      headerBackButtonDisplayMode: 'minimal',
+    });
+  }, [navigation, headerTitle]);
 
   if (!entityId) {
     // Unknown/malformed/unsafe id — safe-default fallback, never a raw render of the input.
@@ -65,6 +86,9 @@ export default function EntityDetailRoute() {
         state={deps ? state : { kind: 'loading' }}
         onRetry={retry}
         onBackToExplore={() => router.replace('/explore')}
+        onBackToMap={(selectedId) =>
+          router.replace({ pathname: '/explore', params: { selected: selectedId } })
+        }
         onOpenEntity={(neighborId) => router.push(`/entity/${neighborId}`)}
       />
     </ScreenCanvas>

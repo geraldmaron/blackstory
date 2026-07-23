@@ -77,3 +77,13 @@ test('justice and wealth Phase-0 registry additions stay disabled with https dat
     getExternalDataSource('vera-incarceration-trends')?.geographies.includes('county'),
   );
 });
+
+test('PEN America school book bans entry stays disabled pending license gate', () => {
+  const pen = getExternalDataSource('pen-america-school-book-bans');
+  assert.ok(pen);
+  assert.equal(pen.registryState, 'disabled');
+  assert.equal(pen.license.verdict, 'attribution-required');
+  assert.deepEqual([...pen.geographies], ['state']);
+  assert.match(pen.dataUrl, /^https:\/\/pen\.org\//);
+  assert.match(pen.notes, /license gate/i);
+});

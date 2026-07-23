@@ -41,7 +41,7 @@ export function StorySectionIndexScreen({ section }: StorySectionIndexScreenProp
           compact
         />
         <SectionHeader title="Stories" meta={countLabel} headingScale="bodyEmphasis" />
-        <LiftedSurface gradient="panelAtmosphere" shadow="sm">
+        <LiftedSurface tone="surface" shadow="none">
           {entries.map((entry, index) => (
             <StoryCompactRow
               key={entry.page.slug}

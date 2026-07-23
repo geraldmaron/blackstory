@@ -23,7 +23,7 @@ export function NarrativeSections({ entity }: NarrativeSectionsProps) {
 
   return (
     <View style={{ gap: space['3'] }}>
-      <LiftedSurface gradient="panelAtmosphere" shadow="sm" paddingKey="3" contentStyle={{ gap: space['2'] }}>
+      <LiftedSurface tone="surface" shadow="none" paddingKey="3" contentStyle={{ gap: space['2'] }}>
         <SectionHeading level={2}>{SECTION_HEADINGS.relevance}</SectionHeading>
         {entity.relevanceExplanation.trim().length > 0 ? (
           <Text variant="body">{entity.relevanceExplanation}</Text>
@@ -32,7 +32,7 @@ export function NarrativeSections({ entity }: NarrativeSectionsProps) {
         )}
       </LiftedSurface>
 
-      <LiftedSurface gradient="panelAtmosphere" shadow="sm" paddingKey="3" contentStyle={{ gap: space['2'] }}>
+      <LiftedSurface tone="surface" shadow="none" paddingKey="3" contentStyle={{ gap: space['2'] }}>
         <SectionHeading level={2}>{SECTION_HEADINGS.context}</SectionHeading>
         {entity.historicalContext.trim().length > 0 ? (
           <Text variant="editorial">{entity.historicalContext}</Text>
@@ -42,7 +42,7 @@ export function NarrativeSections({ entity }: NarrativeSectionsProps) {
       </LiftedSurface>
 
       {narrative ? (
-        <LiftedSurface gradient="canvasDepth" shadow="sm" paddingKey="3" contentStyle={{ gap: space['2'] }}>
+        <LiftedSurface tone="surface" shadow="none" paddingKey="3" contentStyle={{ gap: space['2'] }}>
           <SectionHeading level={2}>{SECTION_HEADINGS.furtherReading}</SectionHeading>
           <Text variant="editorial">{narrative}</Text>
           {narrativeTruncated ? (

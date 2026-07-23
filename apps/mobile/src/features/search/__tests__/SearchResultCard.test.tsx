@@ -33,7 +33,7 @@ describe('toSearchResultCardProps — allow-list mapping negative test (MOB-013 
     expect(props).not.toHaveProperty('rank');
     expect(props).not.toHaveProperty('claimCount');
     expect(props).not.toHaveProperty('score');
-    expect(Object.keys(props).sort()).toEqual(['displayName', 'explanation', 'id', 'kind', 'onPress', 'status', 'summary'].sort());
+    expect(Object.keys(props).sort()).toEqual(['displayName', 'explanation', 'id', 'kind'].sort());
   });
 
   it('is a fixed, exhaustive allow-list mapping -- never `{...result}`', () => {
@@ -43,6 +43,17 @@ describe('toSearchResultCardProps — allow-list mapping negative test (MOB-013 
     // @ts-expect-error -- SearchResultCardProps has no `relevanceScore` field, by design.
     const _leak: number = props.relevanceScore;
     void _leak;
+  });
+
+  it('only attaches handlers explicitly passed in the handlers bag', () => {
+    const onPress = jest.fn();
+    const onShowOnMap = jest.fn();
+    const props = toSearchResultCardProps(baseResult(), { onPress, onShowOnMap });
+    expect(Object.keys(props).sort()).toEqual(
+      ['displayName', 'explanation', 'id', 'kind', 'onPress', 'onShowOnMap'].sort(),
+    );
+    expect(props.onPress).toBe(onPress);
+    expect(props.onShowOnMap).toBe(onShowOnMap);
   });
 });
 
@@ -74,9 +85,22 @@ describe('SearchResultCard — adversarial rendering (MOB-013 item 8: malicious 
 describe('SearchResultCard — interaction', () => {
   it('calls onPress with the result id when pressed', async () => {
     const onPress = jest.fn();
-    const props = toSearchResultCardProps(baseResult({ id: 'ent_42' }), onPress);
-    const { getByRole } = await render(<SearchResultCard {...props} />);
-    fireEvent.press(getByRole('button'));
+    const props = toSearchResultCardProps(baseResult({ id: 'ent_42' }), { onPress });
+    const { getByLabelText } = await render(<SearchResultCard {...props} />);
+    fireEvent.press(getByLabelText(/Harriet Tubman/));
     expect(onPress).toHaveBeenCalledWith('ent_42');
+  });
+
+  it('calls onShowOnMap with id and kind from the secondary action without opening the record', async () => {
+    const onPress = jest.fn();
+    const onShowOnMap = jest.fn();
+    const props = toSearchResultCardProps(baseResult({ id: 'ent_42', kind: 'person' }), {
+      onPress,
+      onShowOnMap,
+    });
+    const { getByLabelText } = await render(<SearchResultCard {...props} />);
+    fireEvent.press(getByLabelText('Show Harriet Tubman on map'));
+    expect(onShowOnMap).toHaveBeenCalledWith('ent_42', 'person');
+    expect(onPress).not.toHaveBeenCalled();
   });
 });

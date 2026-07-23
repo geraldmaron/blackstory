@@ -1,13 +1,9 @@
 /**
- * More tab index (MOB-015 — fills in the MOB-008 stub for the content rows; "Corrections" was
- * already wired by MOB-008/MOB-016 and is left untouched). About, Quick facts, Legal, Privacy,
- * and Errata now navigate into `/learn/[section]` (this bead's ownership covers Learn AND More
- * content paths — see `src/features/learn/sections.ts`). "Data" (web: `/data`, national rollups
- * built on cited public statistics) is NOT one of this bead's content areas and stays a
- * non-interactive placeholder pending its own bead.
+ * More tab index — sectioned ledger lists, one contribute CTA, honest
+ * coming-soon Data row, and a web handoff for Banned books.
  */
+import { Linking, ScrollView, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
-import { ScrollView, StyleSheet, View } from 'react-native';
 
 import {
   Button,
@@ -22,8 +18,20 @@ import {
   space,
 } from '@/ui';
 import { MORE_SECTIONS } from '@/features/learn';
+import { CANONICAL_WEB_ORIGIN } from '@/features/entity/share';
 
-const OUT_OF_SCOPE_SECTIONS = [{ title: 'Data', subtitle: 'National rollups — coming soon', icon: 'data' as const }] as const;
+const OUT_OF_SCOPE_SECTIONS = [
+  { title: 'Data', subtitle: 'National rollups — coming soon', icon: 'data' as const },
+] as const;
+
+const WEB_HANDOFF_SECTIONS = [
+  {
+    title: 'Banned books',
+    subtitle: 'Challenged titles with cited reports (opens web)',
+    icon: 'books' as const,
+    href: `${CANONICAL_WEB_ORIGIN}/books`,
+  },
+] as const;
 
 const ABOUT_SECTION_IDS = new Set(['about', 'facts']);
 const LEGAL_SECTION_IDS = new Set(['legal', 'privacy', 'errata']);
@@ -52,7 +60,7 @@ export default function MoreScreen() {
 
         <View style={styles.section}>
           <SectionHeader title="Contribute" meta="Community" headingScale="bodyEmphasis" />
-          <LiftedSurface gradient="copperAccentEdge" shadow="md" paddingKey="4">
+          <LiftedSurface tone="surface" shadow="none" paddingKey="3">
             <View style={styles.contributeRow}>
               <NavIcon name="corrections" size={24} />
               <Button
@@ -67,7 +75,7 @@ export default function MoreScreen() {
 
         <View style={styles.section}>
           <SectionHeader title="About BlackStory" meta="Overview" headingScale="bodyEmphasis" />
-          <LiftedSurface gradient="panelAtmosphere" shadow="sm">
+          <LiftedSurface tone="surface" shadow="none">
             {aboutRows.map((section, index) => (
               <ListRow
                 key={section.routeId}
@@ -85,7 +93,7 @@ export default function MoreScreen() {
 
         <View style={styles.section}>
           <SectionHeader title="Reference" meta="Legal & errata" headingScale="bodyEmphasis" />
-          <LiftedSurface gradient="panelAtmosphere" shadow="sm">
+          <LiftedSurface tone="surface" shadow="none">
             {legalRows.map((section, index) => (
               <ListRow
                 key={section.routeId}
@@ -102,8 +110,28 @@ export default function MoreScreen() {
         </View>
 
         <View style={styles.section}>
+          <SectionHeader title="On the web" meta="Full catalog" headingScale="bodyEmphasis" />
+          <LiftedSurface tone="surface" shadow="none">
+            {WEB_HANDOFF_SECTIONS.map((section, index) => (
+              <ListRow
+                key={section.title}
+                density="compact"
+                title={section.title}
+                subtitle={section.subtitle}
+                leading={<NavIcon name={section.icon} />}
+                showChevron
+                onPress={() => {
+                  void Linking.openURL(section.href);
+                }}
+                showDivider={index < WEB_HANDOFF_SECTIONS.length - 1}
+              />
+            ))}
+          </LiftedSurface>
+        </View>
+
+        <View style={styles.section}>
           <SectionHeader title="Coming soon" meta="Data" headingScale="bodyEmphasis" />
-          <LiftedSurface shadow="sm" tone="surface">
+          <LiftedSurface tone="surface" shadow="none">
             {OUT_OF_SCOPE_SECTIONS.map((section, index) => (
               <ListRow
                 key={section.title}

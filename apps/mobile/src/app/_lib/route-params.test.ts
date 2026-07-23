@@ -156,11 +156,12 @@ describe('parseFilterState', () => {
 });
 
 describe('isSafeInternalPath / parseReturnTo (open-redirect defense)', () => {
-  it('accepts the four tab roots', () => {
+  it('accepts the four tab roots and Data', () => {
     expect(isSafeInternalPath('/explore')).toBe(true);
     expect(isSafeInternalPath('/search')).toBe(true);
     expect(isSafeInternalPath('/learn')).toBe(true);
     expect(isSafeInternalPath('/more')).toBe(true);
+    expect(isSafeInternalPath('/data')).toBe(true);
   });
 
   it('accepts an entity route with a valid id and rejects one with an invalid id', () => {

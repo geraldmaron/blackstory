@@ -8,16 +8,17 @@
  * SQLite/NetInfo/App Check per case — those are covered separately by
  * `dataClient.test.ts`/`useEntityDetail.test.ts` with injected fakes.
  *
- * Section order mirrors `apps/web/src/app/entity/[id]/page.tsx`: mast media → sensitivity
+ * Section order: mast media → visit hand-off (above the fold on mobile) → sensitivity
  * (additive, never suppressive) → relevance/context/further-reading → status/event-window →
- * accepted claims → timeline → connected records / continue learning → revision + maturity →
- * share.
+ * accepted claims (expandable when dense) → timeline → connected records / continue learning →
+ * revision + maturity → share.
  */
 import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { ErrorState, Text, screenScrollInsets, space, useThemeColors } from '@/ui';
 import type { EntityDetailState } from './useEntityDetail';
 import { GENERIC_ERROR_COPY, OFFLINE_NO_CACHE_COPY } from './copy';
 import { ClaimsSection } from './sections/ClaimsSection';
+import { AtAGlanceSection } from './sections/AtAGlanceSection';
 import { MastMedia } from './sections/MastMedia';
 import { NarrativeSections } from './sections/NarrativeSections';
 import { NotPublicState } from './sections/NotPublicState';
@@ -28,6 +29,7 @@ import { SensitivityBanner } from './sections/SensitivityBanner';
 import { ShareButton } from './sections/ShareButton';
 import { StatusSection } from './sections/StatusSection';
 import { TimelineSection } from './sections/TimelineSection';
+import { VisitSection } from './sections/VisitSection';
 import { humanizeToken } from './format';
 
 export type EntityDetailScreenProps = {
@@ -36,7 +38,10 @@ export type EntityDetailScreenProps = {
    * callers that don't care about this adversarial edge case get normal link behavior. */
   readonly isOnline?: boolean;
   readonly onRetry?: () => void;
+  /** Not-found / withdrawn fallback — Explore without a selection. */
   readonly onBackToExplore?: () => void;
+  /** Visit "Back to map" — Explore with this entity selected (`?selected=`). */
+  readonly onBackToMap?: (entityId: string) => void;
   readonly onOpenEntity?: (entityId: string) => void;
 };
 
@@ -45,6 +50,7 @@ export function EntityDetailScreen({
   isOnline = true,
   onRetry,
   onBackToExplore,
+  onBackToMap,
   onOpenEntity,
 }: EntityDetailScreenProps) {
   const theme = useThemeColors();
@@ -112,6 +118,13 @@ export function EntityDetailScreen({
       {freshness.degraded ? <OfflineBanner fetchedAt={freshness.fetchedAt} /> : null}
 
       <MastMedia entity={entity} />
+
+      <AtAGlanceSection entity={entity} />
+
+      <VisitSection
+        entity={entity}
+        {...(onBackToMap ? { onBackToMap: () => onBackToMap(entity.id) } : {})}
+      />
 
       {entity.topicTags.length > 0 ? (
         <Text variant="caption" colorRole="inkMuted">

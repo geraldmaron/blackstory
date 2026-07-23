@@ -1,24 +1,28 @@
 /**
- * The flagship Explore experience (MOB-012): native map + synchronized list +
- * filters + entity preview, composed on top of MOB-011's `MapScreen`.
+ * The flagship Explore experience (MOB-012): full-bleed native map + floating
+ * instruments + bottom-sheet metrics dashboard (with secondary record list) and
+ * entity preview on pin selection, composed on top of MOB-011's `MapScreen`.
  *
  * This component is deliberately ROUTER-FREE and side-effect-light: the Expo
  * Router route (`app/(tabs)/explore.tsx`) reads/validates params and supplies
  * `filters`, `selectedParam`, and the navigation callbacks, so the whole Explore
  * experience is unit-testable with RNTL without mounting the router. All shared
- * map/list state flows through `exploreReducer` (see explore-controller.ts for the
- * no-focus-theft architecture); this component only wires views to it.
+ * map/sheet state flows through `exploreReducer` (see explore-controller.ts for
+ * the no-focus-theft architecture); this component only wires views to it.
  *
  * Failure posture (ADR-024 §7 / bead requirement): when the map is in an error
- * state, `MapScreen` renders the degraded `ErrorState` and the list/search remain
- * fully mounted and interactive below it — a failed map never strands the reader.
+ * state, `MapScreen` renders the degraded `ErrorState` and the metrics sheet
+ * remains fully mounted and interactive — a failed map never strands the reader.
  */
-import { useEffect, useMemo, useReducer } from 'react';
+import { useEffect, useMemo, useReducer, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { ApiStatusBanner, ScreenCanvas } from '@/ui';
 import { MapScreen, type MapFeatureCollection, type MapLoadState } from '@/features/map';
 import { DEMO_MAP_SOURCE } from '@/features/map';
-import { EntityPreviewSheet, ExploreListChrome, ExploreToolbar } from '@/features/map/explore';
+import { EntityPreviewSheet } from '@/features/map/explore';
+import { ExploreBottomSheet } from '@/features/map/explore/ExploreBottomSheet';
+import { ExploreFloatingChrome } from '@/features/map/explore/ExploreFloatingChrome';
+import { ExploreListChrome } from '@/features/map/explore/explore-chrome';
 import type { FilterState } from '@/app/_lib/route-params';
 import {
   exploreReducer,
@@ -27,8 +31,8 @@ import {
 } from './explore-controller';
 import { toExploreFeatures } from './explore-feature';
 import { countMatches } from './explore-filter';
+import { ExploreMetricsDashboard } from './metrics';
 import { parseRestoredSelection } from './selection';
-import { ExploreList } from './ExploreList';
 import { useReduceMotion } from './useReduceMotion';
 
 export type ExploreViewProps = {
@@ -40,12 +44,20 @@ export type ExploreViewProps = {
   readonly selectedParam?: unknown;
   /** Injected map load/failure state; defaults to ready. */
   readonly loadState?: MapLoadState;
+  /** Retry callback for map-data / basemap failure states. */
+  readonly onRetryMap?: () => void;
   /** Reduced-motion override (defaults to the OS setting). */
   readonly reduceMotion?: boolean;
   /** Navigate to the full entity route (MOB-014 owns its content). */
   readonly onOpenEntity: (entityId: string) => void;
   /** Open the filter sheet modal. */
   readonly onOpenFilters: () => void;
+  /** Optional — Agent C wires Search tab / route. */
+  readonly onOpenSearch?: () => void;
+  /** Optional — notify the route when filter state should sync to the URL. */
+  readonly onFiltersChange?: (filters: FilterState) => void;
+  /** Optional — notify the route when selection should sync to `selected`. */
+  readonly onSelectionChange?: (entityId: string | null) => void;
 };
 
 export function ExploreView({
@@ -53,9 +65,13 @@ export function ExploreView({
   filters = {},
   selectedParam,
   loadState = { kind: 'ready' },
+  onRetryMap,
   reduceMotion: reduceMotionProp,
   onOpenEntity,
   onOpenFilters,
+  onOpenSearch,
+  onFiltersChange: _onFiltersChange,
+  onSelectionChange,
 }: ExploreViewProps) {
   const osReduceMotion = useReduceMotion();
   const reduceMotion = reduceMotionProp ?? osReduceMotion;
@@ -87,8 +103,20 @@ export function ExploreView({
     }
   }, [selectedParam, allFeatures]);
 
+  // Mirror selection to the route when Agent C supplies a callback. Skip the
+  // first paint so we do not clear a deep-linked `selected` before restore runs.
+  const selectionNotifyReady = useRef(false);
+  useEffect(() => {
+    if (!selectionNotifyReady.current) {
+      selectionNotifyReady.current = true;
+      return;
+    }
+    onSelectionChange?.(state.selectedId ?? null);
+  }, [state.selectedId, onSelectionChange]);
+
   const listFeatures = useMemo(() => visibleFeatures(allFeatures, state), [allFeatures, state]);
   const matchCount = useMemo(() => countMatches(allFeatures, filters), [allFeatures, filters]);
+  const metricsScopeLabel = state.viewport ? 'In view' : 'All records';
 
   const selectedFeature = state.selectedId
     ? allFeatures.find((f) => f.entityId === state.selectedId) ?? null
@@ -98,23 +126,18 @@ export function ExploreView({
     ? { ...state.cameraCommand }
     : null;
 
+  const showDemoHint =
+    typeof __DEV__ !== 'undefined' && __DEV__ && source === DEMO_MAP_SOURCE;
+
   return (
     <ScreenCanvas edges={['top', 'left', 'right']}>
       <ApiStatusBanner />
-      <ExploreToolbar
-        matchCount={matchCount}
-        filters={filters}
-        showDemoHint={
-          typeof __DEV__ !== 'undefined' && __DEV__ && source === DEMO_MAP_SOURCE
-        }
-        onOpenFilters={onOpenFilters}
-        onNationalView={() => dispatch({ type: 'presetRequested', preset: 'national' })}
-      />
 
       <View style={styles.mapArea} testID="explore-map-area">
         <MapScreen
           source={source}
           loadState={loadState}
+          onRetry={onRetryMap}
           reduceMotion={reduceMotion}
           selectedEntityId={state.selectedId}
           cameraCommand={cameraCommand}
@@ -126,23 +149,44 @@ export function ExploreView({
             }
           }}
         />
-        <EntityPreviewSheet
-          feature={selectedFeature}
-          onOpenEntity={onOpenEntity}
-          onClose={() => dispatch({ type: 'entityDeselected' })}
-        />
-      </View>
 
-      <ExploreListChrome testID="explore-list-area">
-        <ExploreList
-          features={listFeatures}
-          selectedId={state.selectedId}
-          onUserScroll={() => dispatch({ type: 'listScrolled' })}
-          onSelect={(feature) =>
-            dispatch({ type: 'entitySelected', entityId: feature.entityId, point: feature.coordinates })
-          }
+        <ExploreFloatingChrome
+          matchCount={matchCount}
+          filters={filters}
+          showDemoHint={showDemoHint}
+          onOpenFilters={onOpenFilters}
+          onOpenSearch={onOpenSearch}
+          onNationalView={() => dispatch({ type: 'presetRequested', preset: 'national' })}
         />
-      </ExploreListChrome>
+
+        <ExploreBottomSheet hasSelection={Boolean(selectedFeature)} reduceMotion={reduceMotion}>
+          {selectedFeature ? (
+            <EntityPreviewSheet
+              feature={selectedFeature}
+              onOpenEntity={onOpenEntity}
+              onClose={() => dispatch({ type: 'entityDeselected' })}
+            />
+          ) : (
+            <ExploreListChrome testID="explore-metrics-area">
+              <ExploreMetricsDashboard
+                features={listFeatures}
+                scopeLabel={metricsScopeLabel}
+                selectedId={state.selectedId}
+                reduceMotion={reduceMotion}
+                onOpenSearch={onOpenSearch}
+                onUserScroll={() => dispatch({ type: 'listScrolled' })}
+                onSelectFeature={(feature) =>
+                  dispatch({
+                    type: 'entitySelected',
+                    entityId: feature.entityId,
+                    point: feature.coordinates,
+                  })
+                }
+              />
+            </ExploreListChrome>
+          )}
+        </ExploreBottomSheet>
+      </View>
     </ScreenCanvas>
   );
 }

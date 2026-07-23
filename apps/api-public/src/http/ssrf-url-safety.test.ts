@@ -188,6 +188,9 @@ test('SSRF: bypassing port validation yields INTERNAL — malicious href never r
         ],
       } as unknown as EntityV1;
     },
+    async listEntities() {
+      return [];
+    },
     async search() {
       return { results: [], facets: {}, totalMatched: 0, hasMore: false };
     },

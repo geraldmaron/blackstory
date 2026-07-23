@@ -15,7 +15,9 @@
  *    an instant jump (duration 0).
  *  - Viewport reporting (`onRegionDidChange` -> `onViewportChange`) so the
  *    synchronized list can follow the map WITHOUT the map following the list.
- *  - Feature/cluster press -> `onFeaturePress(entityId)` for the preview sheet.
+ *  - Feature press -> `onFeaturePress(entityId)` for leaf points; cluster bubble
+ *    press expands the camera (~2 zoom levels, clamped to MAP_MAX_ZOOM) or
+ *    delegates to optional `onClusterPress`.
  *
  * Rendering, attribution, and the three degraded failure states are unchanged
  * from MOB-011 (see the failure block below and MapAttribution / mapLoadState).
@@ -35,19 +37,45 @@ import {
 } from '@maplibre/maplibre-react-native';
 import { ErrorState, duration } from '@/ui';
 import { MapAttribution } from './MapAttribution';
-import { buildBasemapStyle, ENTITY_POINT_LAYER_STYLE } from './mapStyle';
+import {
+  buildBasemapStyle,
+  ENTITY_CLUSTER_RADIUS_EXPR,
+  ENTITY_POINT_LAYER_STYLE,
+  ENTITY_SELECTED_RADIUS,
+} from './mapStyle';
 import {
   MAP_BASEMAP_ENABLED,
   MAP_GLYPHS_URL,
   MAP_LABEL_TEXT_FONT,
   MAP_PMTILES_URL,
+  MAP_VECTOR_TILE_URL,
 } from './mapConfig';
 import { MAP_FAILURE_COPY, type MapLoadState } from './mapLoadState';
 import { DEMO_MAP_SOURCE, type MapFeatureCollection } from './demoMapSource';
-import { MAP_MAX_ZOOM, US_BOUNDS, type Bbox, type CameraTarget, type LngLat } from './mapCamera';
+import {
+  MAP_MAX_ZOOM,
+  MAP_MIN_ZOOM,
+  PRESET_ZOOM,
+  US_BOUNDS,
+  US_CAMERA_MAX_BOUNDS,
+  type Bbox,
+  type CameraTarget,
+  type LngLat,
+} from './mapCamera';
+import {
+  clusterCenterFromFeature,
+  isClusterFeatureProperties,
+  zoomAfterClusterExpand,
+} from './clusterCamera';
 
 /** A one-shot camera instruction; `token` must strictly increase so each move fires once. */
 export type MapCameraCommand = CameraTarget & { readonly token: number };
+
+export type MapClusterPressInfo = {
+  readonly center: LngLat;
+  readonly currentZoom: number;
+  readonly pointCount?: number;
+};
 
 export type MapScreenProps = {
   /** Redacted, release-coupled GeoJSON from apps/api-public. */
@@ -56,6 +84,8 @@ export type MapScreenProps = {
   readonly loadState?: MapLoadState;
   /** PMTiles archive URL override (tests / staging). */
   readonly pmtilesUrl?: string | null;
+  /** OpenFreeMap / vector TileJSON override (tests / staging). */
+  readonly vectorTileUrl?: string | null;
   /** Glyphs template override (tests / staging). */
   readonly glyphsUrl?: string | null;
   /** Basemap kill-switch override (tests). */
@@ -68,6 +98,11 @@ export type MapScreenProps = {
   readonly onViewportChange?: (bbox: Bbox) => void;
   /** Fired when a point (or a resolved cluster leaf) is pressed. */
   readonly onFeaturePress?: (entityId: string) => void;
+  /**
+   * Optional override for cluster-bubble presses. When omitted, MapScreen expands
+   * the camera toward the cluster (~2 zoom levels, clamped to MAP_MAX_ZOOM).
+   */
+  readonly onClusterPress?: (info: MapClusterPressInfo) => void;
   /** Entity id to visually highlight on the map. */
   readonly selectedEntityId?: string;
   /** One-shot camera move; applied once per new `token`. */
@@ -86,16 +121,35 @@ function boundsFromEvent(event: NativeSyntheticEvent<ViewStateChangeEvent>): Bbo
   return { west, south, east, north };
 }
 
+function lngLatFromPress(
+  event: NativeSyntheticEvent<{ lngLat?: unknown; features?: GeoJSON.Feature[] }>,
+  feature: GeoJSON.Feature,
+): LngLat | null {
+  const fromFeature = clusterCenterFromFeature(feature);
+  if (fromFeature) return fromFeature;
+  const lngLat = event?.nativeEvent?.lngLat;
+  if (Array.isArray(lngLat) && lngLat.length >= 2) {
+    const lng = lngLat[0];
+    const lat = lngLat[1];
+    if (typeof lng === 'number' && typeof lat === 'number' && Number.isFinite(lng) && Number.isFinite(lat)) {
+      return [lng, lat];
+    }
+  }
+  return null;
+}
+
 export function MapScreen({
   source = DEMO_MAP_SOURCE,
   loadState = { kind: 'ready' },
   pmtilesUrl = MAP_PMTILES_URL,
+  vectorTileUrl = MAP_VECTOR_TILE_URL,
   glyphsUrl = MAP_GLYPHS_URL,
   basemapEnabled = MAP_BASEMAP_ENABLED,
   onRetry,
   clustering = true,
   onViewportChange,
   onFeaturePress,
+  onClusterPress,
   selectedEntityId,
   cameraCommand,
   reduceMotion = false,
@@ -103,6 +157,7 @@ export function MapScreen({
   const cameraRef = useRef<CameraRef>(null);
   const sourceRef = useRef<GeoJSONSourceRef>(null);
   const appliedTokenRef = useRef<number | null>(null);
+  const zoomRef = useRef(PRESET_ZOOM.national);
 
   // Apply a one-shot camera command exactly once per token. Guarded so a mocked
   // (null-ref) map in tests and a missing command are both no-ops.
@@ -126,6 +181,7 @@ export function MapScreen({
           zoom: command.zoom,
           duration: animationDuration,
         });
+        zoomRef.current = command.zoom;
       } else {
         const [w, s, e, n] = command.bounds;
         camera.fitBounds?.([w, s, e, n], { duration: animationDuration });
@@ -148,20 +204,83 @@ export function MapScreen({
     );
   }
 
+  if (loadState.kind === 'loading') {
+    return (
+      <View style={styles.errorContainer} testID="map-loading-state">
+        <ErrorState
+          title="Loading the map"
+          description="Fetching the latest release-coupled places. The list will fill in as soon as they arrive."
+        />
+      </View>
+    );
+  }
+
   const style = buildBasemapStyle({
-    pmtilesUrl: basemapEnabled ? pmtilesUrl : null,
+    basemapEnabled,
+    pmtilesUrl,
+    vectorTileUrl,
     glyphsUrl,
   });
 
-  function handleSourcePress(event: NativeSyntheticEvent<{ features?: GeoJSON.Feature[] }>): void {
+  function expandTowardCluster(center: LngLat): void {
+    const camera = cameraRef.current;
+    if (!camera) return;
+    const nextZoom = zoomAfterClusterExpand(zoomRef.current);
+    const animationDuration = reduceMotion ? duration.durationInstant : duration.durationFast;
+    try {
+      camera.flyTo?.({
+        center: [center[0], center[1]],
+        zoom: nextZoom,
+        duration: animationDuration,
+      });
+      zoomRef.current = nextZoom;
+    } catch {
+      /* camera not ready; ignore — next interaction can retry */
+    }
+  }
+
+  function handleSourcePress(
+    event: NativeSyntheticEvent<{
+      features?: GeoJSON.Feature[];
+      lngLat?: unknown;
+    }>,
+  ): void {
     const feature = event?.nativeEvent?.features?.[0];
     if (!feature) return;
     const props = (feature.properties ?? {}) as Record<string, unknown>;
-    // A cluster leaf press resolves to an entity id; a cluster bubble press is
-    // handled natively (expansion zoom) — the pure two-interaction model lives in
-    // features/explore/clustering.ts and drives the accessible list alternative.
+
+    if (isClusterFeatureProperties(props)) {
+      const center = lngLatFromPress(event, feature);
+      if (!center) return;
+      const pointCount =
+        typeof props.point_count === 'number' && Number.isFinite(props.point_count)
+          ? props.point_count
+          : undefined;
+      if (onClusterPress) {
+        onClusterPress({
+          center,
+          currentZoom: zoomRef.current,
+          ...(pointCount !== undefined ? { pointCount } : {}),
+        });
+        return;
+      }
+      expandTowardCluster(center);
+      return;
+    }
+
     const entityId = props.entityId;
     if (typeof entityId === 'string' && onFeaturePress) onFeaturePress(entityId);
+  }
+
+  function handleRegionDidChange(event: NativeSyntheticEvent<ViewStateChangeEvent>): void {
+    const zoom = event?.nativeEvent?.zoom;
+    if (typeof zoom === 'number' && Number.isFinite(zoom)) {
+      zoomRef.current = zoom;
+    }
+    if (onViewportChange) {
+      const bbox = boundsFromEvent(event);
+      if (bbox) onViewportChange(bbox);
+    }
   }
 
   return (
@@ -172,20 +291,20 @@ export function MapScreen({
         attribution={false}
         logo={false}
         compass={false}
-        onRegionDidChange={
-          onViewportChange
-            ? (event) => {
-                const bbox = boundsFromEvent(event);
-                if (bbox) onViewportChange(bbox);
-              }
-            : undefined
-        }
+        onRegionDidChange={handleRegionDidChange}
         testID="maplibre-map"
       >
         <Camera
           ref={cameraRef}
           initialViewState={{ bounds: [US_BOUNDS[0], US_BOUNDS[1], US_BOUNDS[2], US_BOUNDS[3]] }}
+          minZoom={MAP_MIN_ZOOM}
           maxZoom={MAP_MAX_ZOOM}
+          maxBounds={[
+            US_CAMERA_MAX_BOUNDS[0],
+            US_CAMERA_MAX_BOUNDS[1],
+            US_CAMERA_MAX_BOUNDS[2],
+            US_CAMERA_MAX_BOUNDS[3],
+          ]}
         />
         <GeoJSONSource
           id="entities"
@@ -208,17 +327,7 @@ export function MapScreen({
                 circleOpacity: 0.85,
                 circleStrokeColor: ENTITY_POINT_LAYER_STYLE.circleStrokeColor,
                 circleStrokeWidth: 1,
-                circleRadius: [
-                  'step',
-                  ['get', 'point_count'],
-                  12,
-                  10,
-                  14,
-                  25,
-                  17,
-                  50,
-                  20,
-                ],
+                circleRadius: [...ENTITY_CLUSTER_RADIUS_EXPR],
               }}
             />
           ) : null}
@@ -231,7 +340,7 @@ export function MapScreen({
                 textField: ['get', 'point_count_abbreviated'],
                 // OpenFreeMap hosts Noto Sans — not MapLibre's default Open Sans.
                 textFont: [...MAP_LABEL_TEXT_FONT],
-                textSize: 12,
+                textSize: 11,
                 textColor: ENTITY_POINT_LAYER_STYLE.circleStrokeColor,
               }}
             />
@@ -249,9 +358,9 @@ export function MapScreen({
               filter={['==', ['get', 'entityId'], selectedEntityId]}
               style={{
                 circleColor: 'transparent',
-                circleRadius: 10,
+                circleRadius: ENTITY_SELECTED_RADIUS,
                 circleStrokeColor: ENTITY_POINT_LAYER_STYLE.circleStrokeColor,
-                circleStrokeWidth: 2.5,
+                circleStrokeWidth: 2,
               }}
             />
           ) : null}
@@ -267,5 +376,5 @@ const styles = StyleSheet.create({
   errorContainer: { flex: 1, justifyContent: 'center' },
 });
 
-export { MAP_MAX_ZOOM, US_BOUNDS };
+export { MAP_MAX_ZOOM, MAP_MIN_ZOOM, US_BOUNDS, US_CAMERA_MAX_BOUNDS };
 export type { Bbox, CameraTarget, LngLat };

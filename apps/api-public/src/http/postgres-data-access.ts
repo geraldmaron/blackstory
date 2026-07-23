@@ -88,6 +88,16 @@ export function createPostgresDataAccessReaders(
       return mapProjectionToEntityV1(projection);
     },
 
+    async readEntities(releaseId): Promise<readonly EntityV1[]> {
+      const projections = await listPublicEntityProjections(releaseId, runQuery);
+      const entities: EntityV1[] = [];
+      for (const projection of projections) {
+        const mapped = mapProjectionToEntityV1(projection);
+        if (mapped) entities.push(entityV1Schema.parse(mapped));
+      }
+      return entities;
+    },
+
     async readSearchPage(
       canonical: CanonicalSearchQuery,
       searchOptions: { readonly releaseId: string },

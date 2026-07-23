@@ -24,7 +24,20 @@
 // Enums (mirrored verbatim from public-contracts)
 // ---------------------------------------------------------------------------
 
-export const ENTITY_KINDS = ['place', 'school', 'event', 'institution'] as const;
+export const ENTITY_KINDS = [
+  'person',
+  'place',
+  'school',
+  'organization',
+  'institution',
+  'event',
+  'law',
+  'case',
+  'publication',
+  'artifact',
+  'movement',
+  'other',
+] as const;
 export type EntityKind = (typeof ENTITY_KINDS)[number];
 
 export const LOCATION_PRECISIONS = ['city', 'neighborhood', 'campus', 'institution'] as const;

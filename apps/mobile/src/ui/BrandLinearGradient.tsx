@@ -1,11 +1,20 @@
 /**
- * Shared expo-linear-gradient host for brand elevation presets. All gradient rendering
- * in the mobile shell should flow through this component (or GradientPanel / GradientBackdrop)
- * so stop data from `useGradient` / `getGradient` stays consistent on iOS, Android, and web.
+ * Shared brand elevation gradient host. Prefer this (or GradientPanel) over raw
+ * expo-linear-gradient so stop data stays consistent. When the native
+ * LinearGradient view is missing (Expo Go / stale native binary), falls back to
+ * a flat matte fill from the first gradient stop so screens never crash with
+ * "Unimplemented component: ViewManagerAdapter_ExpoLinearGradient".
  */
 import { LinearGradient, type LinearGradientProps } from 'expo-linear-gradient';
 import type { ReactNode } from 'react';
-import { StyleSheet, type ColorValue, type StyleProp, type ViewStyle } from 'react-native';
+import {
+  Platform,
+  StyleSheet,
+  View,
+  type ColorValue,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
 
 import type { GradientDefinition } from './tokens';
 
@@ -23,7 +32,24 @@ function asGradientLocations(locations: readonly number[]): LinearGradientProps[
   return locations as [number, number, ...number[]];
 }
 
+/** Native LinearGradient is unreliable outside a rebuilt Expo dev client. */
+function canUseNativeGradient(): boolean {
+  // Web uses CSS under the hood and is fine.
+  if (Platform.OS === 'web') return true;
+  // Prefer matte fill on native until the binary ships the view manager —
+  // crash overlay is worse than losing a subtle elevation wash.
+  return false;
+}
+
 export function BrandLinearGradient({ gradient, style, children }: BrandLinearGradientProps) {
+  const fill = gradient.colors[0] ?? '#F4EFE5';
+
+  if (!canUseNativeGradient()) {
+    return (
+      <View style={[StyleSheet.absoluteFill, { backgroundColor: fill }, style]}>{children}</View>
+    );
+  }
+
   return (
     <LinearGradient
       colors={asGradientColors(gradient.colors)}

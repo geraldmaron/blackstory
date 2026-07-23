@@ -359,6 +359,9 @@ export function DataSections({
             <Link className="ds-cta ds-cta--quiet" href="/methodology">
               Read methodology
             </Link>
+            <Link className="ds-cta ds-cta--quiet" href="/books">
+              Banned books
+            </Link>
           </p>
         </section>
       </div>

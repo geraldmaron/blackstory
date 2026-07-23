@@ -43,6 +43,7 @@ export type PublicRateLimitGuardOptions = {
 
 const PUBLIC_PATH_PATTERNS: ReadonlyArray<{ pattern: RegExp; endpointClass: EndpointClass }> = [
   { pattern: /^\/v1\/search(?:\/|$)/i, endpointClass: 'search' },
+  { pattern: /^\/v1\/map(?:\/|$)/i, endpointClass: 'entityRetrieval' },
   { pattern: /^\/v1\/locations\/geocode(?:\/|$)/i, endpointClass: 'geocoding' },
   { pattern: /^\/v1\/locations\/nearby(?:\/|$)/i, endpointClass: 'nearbyDiscovery' },
   { pattern: /^\/v1\/entities\/[^/]+\/sources(?:\/|$)/i, endpointClass: 'sourceInspection' },

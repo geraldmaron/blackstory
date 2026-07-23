@@ -1,17 +1,7 @@
 /**
  * Flat, non-figurative placeholder for an entity without a rights-cleared
- * `primaryImage`. Mirrors the web convention (apps/web/src/components/entity/
- * EntityRecordMark.tsx): a geometric mark keyed to entity kind — never a
- * portrait, silhouette-of-a-person, or generated avatar. This is a deliberate
- * program non-goal (no skin-tone classification, no decorative anonymous
- * portrait/avatar system) — do not add a face/head/body shape to any variant
- * here, on mobile or otherwise.
- *
- * Built from plain Views (rectangles/circles), not react-native-svg — SDK 56
- * config plugins/native rebuild for a new native module were out of scope
- * for this pass, and these three shapes are simple enough to approximate
- * geometrically without a path-drawing library. If a future bead needs
- * closer parity with the web SVG paths, introduce react-native-svg then.
+ * `primaryImage`. Geometric mark keyed to entity kind — never a portrait or
+ * generated avatar. Built from plain Views (no SVG).
  */
 import { StyleSheet, View } from 'react-native';
 import { Text } from './Text';
@@ -25,6 +15,8 @@ export type EntityMarkProps = {
   shape?: EntityMarkShape;
   kindLabel?: string;
   reason?: EntityMarkReason;
+  /** When true, fill the parent frame (image mast fallback) instead of a fixed card. */
+  fill?: boolean;
 };
 
 const REASON_CAPTION: Record<EntityMarkReason, string> = {
@@ -33,7 +25,13 @@ const REASON_CAPTION: Record<EntityMarkReason, string> = {
   redacted: 'Image withheld',
 };
 
-export function EntityMark({ entityName, shape = 'book', kindLabel, reason = 'absent' }: EntityMarkProps) {
+export function EntityMark({
+  entityName,
+  shape = 'book',
+  kindLabel,
+  reason = 'absent',
+  fill = false,
+}: EntityMarkProps) {
   const theme = useThemeColors();
   const caption = REASON_CAPTION[reason];
   const accessibleName = kindLabel
@@ -41,17 +39,26 @@ export function EntityMark({ entityName, shape = 'book', kindLabel, reason = 'ab
     : `${entityName}. ${caption}.`;
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        fill ? styles.fillContainer : undefined,
+        fill ? { backgroundColor: theme.surfaceRaised } : undefined,
+      ]}
+    >
       <View
         accessible
         accessibilityRole="image"
         accessibilityLabel={accessibleName}
-        style={[styles.frame, { backgroundColor: theme.surfaceRaised, borderColor: theme.border }]}
+        style={[
+          fill ? styles.fillFrame : styles.frame,
+          { backgroundColor: theme.surface, borderColor: theme.border },
+        ]}
       >
         <ShapeGraphic shape={shape} accentColor={theme.accentGraphic} inkColor={theme.ink} />
       </View>
       <Text variant="caption" colorRole="inkSubtle" style={styles.caption}>
-        {caption}
+        {kindLabel ? `${kindLabel} · ${caption}` : caption}
       </Text>
     </View>
   );
@@ -82,7 +89,6 @@ function ShapeGraphic({
       </View>
     );
   }
-  // book (default)
   return (
     <View style={styles.shapeWrap} accessibilityElementsHidden importantForAccessibility="no">
       <View style={[styles.bookCover, { backgroundColor: inkColor }]} />
@@ -96,6 +102,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: space['1'],
   },
+  fillContainer: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    justifyContent: 'center',
+    padding: space['3'],
+  },
   frame: {
     width: 96,
     height: 112,
@@ -105,15 +120,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     overflow: 'hidden',
   },
-  shapeWrap: {
+  fillFrame: {
+    width: 96,
+    height: 112,
+    borderRadius: radius.sm,
+    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
   },
   caption: {
     textAlign: 'center',
   },
-  // "book": a rounded cover with a colored spine accent, echoing the brand's
-  // book-and-pin motif at a purely geometric, non-figurative level.
+  shapeWrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   bookCover: {
     width: 56,
     height: 72,
@@ -127,8 +149,6 @@ const styles = StyleSheet.create({
     height: 72,
     borderRadius: 2,
   },
-  // "pin": circle head + rotated-square point, the standard geometric
-  // map-pin construction (no path/svg needed).
   pinHead: {
     width: 56,
     height: 56,
@@ -149,7 +169,6 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
   },
-  // "arch": a doorway/archway silhouette via large top corner radii.
   arch: {
     width: 56,
     height: 76,

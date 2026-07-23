@@ -18,7 +18,7 @@
     "prebuild": "node ./scripts/sync-policy-json.mjs",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "node --conditions development --import tsx --test src/constitution.test.ts",
+    "test": "node --conditions development --import tsx --test src/constitution.test.ts src/banned-books.test.ts",
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {

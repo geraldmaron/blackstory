@@ -1,22 +1,25 @@
 /**
- * Compact entity preview panel anchored over the Explore map. One dense card:
- * Sora title, mono place/year meta, 1–2 line dek, single primary CTA. Clears
- * map attribution (ADR-024 §8) and drives assistive-tech focus on selection
- * (MOB-017).
+ * Explore entity preview as sheet content (NarrativeCard anatomy): copper-tick
+ * kind slug, Sora name, serif dek (up to 4 lines), labeled at-a-glance facts,
+ * and a single primary CTA. Hosted by a parent bottom sheet. Drives
+ * assistive-tech focus on selection change (MOB-017).
  */
 import { useEffect } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
   Button,
-  LiftedSurface,
   Text,
   useAccessibilityFocus,
   useThemeColors,
   space,
 } from '@/ui';
-import { featureMetaLine, type PreviewMetaFeature } from './explore-meta';
-import { ExploreChromeFrame } from './explore-chrome';
+import {
+  featureAtAGlanceFacts,
+  featureKindSlug,
+  featureMetaLine,
+  type PreviewMetaFeature,
+} from './explore-meta';
 
 export type EntityPreviewPreviewFeature = PreviewMetaFeature & {
   readonly entityId: string;
@@ -30,11 +33,18 @@ export type EntityPreviewSheetProps = {
   readonly feature: EntityPreviewPreviewFeature | null;
   readonly onOpenEntity: (entityId: string) => void;
   readonly onClose: () => void;
+  readonly style?: StyleProp<ViewStyle>;
 };
 
 const MIN_TOUCH = 44;
+const TICK_WIDTH = 3;
 
-export function EntityPreviewSheet({ feature, onOpenEntity, onClose }: EntityPreviewSheetProps) {
+export function EntityPreviewSheet({
+  feature,
+  onOpenEntity,
+  onClose,
+  style,
+}: EntityPreviewSheetProps) {
   const theme = useThemeColors();
   const { ref: sheetRef, focus } = useAccessibilityFocus();
 
@@ -44,103 +54,157 @@ export function EntityPreviewSheet({ feature, onOpenEntity, onClose }: EntityPre
 
   if (!feature) return null;
 
+  const kindSlug = featureKindSlug(feature.kind);
   const meta = featureMetaLine(feature);
   const dek = feature.properties.oneLineStory?.trim();
+  const facts = featureAtAGlanceFacts(feature);
+  const factsSummary = [`Kind: ${kindSlug}`, ...facts.map((fact) => `${fact.label}: ${fact.value}`)].join(
+    '. ',
+  );
 
   return (
     <View
-      style={styles.anchor}
-      pointerEvents="box-none"
+      style={[styles.root, style]}
       testID="entity-preview-sheet"
       accessibilityViewIsModal
       importantForAccessibility="yes"
     >
-      <ExploreChromeFrame shadow="md" accentEdge style={styles.sheetFrame}>
-        <View
-          ref={sheetRef}
-          accessible
-          accessibilityRole="summary"
-          accessibilityLabel={`Preview: ${feature.label}. ${meta}${dek ? `. ${dek}` : ''}`}
-          accessibilityHint="Swipe through controls to open the full record or close this preview."
-        >
-          <LiftedSurface
-            gradient="surfaceLift"
-            shadow="none"
-            paddingKey="3"
-            style={[styles.sheet, { borderColor: theme.border }]}
-            contentStyle={styles.sheetInner}
-          >
-            <View style={styles.topRow}>
-              <View style={styles.titleBlock}>
-                <Text variant="subtitle" isHeading numberOfLines={2} style={styles.title}>
-                  {feature.label}
-                </Text>
-                <Text variant="code" colorRole="inkMuted" numberOfLines={1}>
-                  {meta}
-                </Text>
-              </View>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Close preview"
-                accessibilityHint="Returns focus to the map without opening the full record"
-                hitSlop={8}
-                onPress={onClose}
-                style={({ pressed }) => [
-                  styles.close,
-                  { backgroundColor: pressed ? theme.surfaceRaised : 'transparent' },
-                ]}
-              >
-                <Ionicons name="close" size={20} color={theme.inkMuted} />
-              </Pressable>
-            </View>
-
-            {dek ? (
-              <Text variant="bodySmall" colorRole="inkMuted" numberOfLines={2} style={styles.dek}>
-                {dek}
-              </Text>
-            ) : null}
-
-            <Button
-              label="View full record"
-              variant="primary"
-              onPress={() => onOpenEntity(feature.entityId)}
-              accessibilityLabel={`View full record for ${feature.label}`}
+      <View
+        ref={sheetRef}
+        accessible
+        accessibilityRole="summary"
+        accessibilityLabel={`Preview: ${feature.label}. ${kindSlug}. ${factsSummary}${
+          dek ? `. ${dek}` : ''
+        }`}
+        accessibilityHint="Swipe through controls to open the full record or close this preview."
+        style={styles.card}
+      >
+        <View style={styles.topRow}>
+          <View style={styles.kindBlock}>
+            <View
+              style={[styles.copperTick, { backgroundColor: theme.accentGraphic }]}
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
             />
-          </LiftedSurface>
+            <Text variant="code" colorRole="inkMuted" numberOfLines={1} style={styles.kindSlug}>
+              {kindSlug}
+            </Text>
+          </View>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Close preview"
+            accessibilityHint="Returns focus to the map without opening the full record"
+            hitSlop={8}
+            onPress={onClose}
+            style={({ pressed }) => [
+              styles.close,
+              { backgroundColor: pressed ? theme.surfaceRaised : 'transparent' },
+            ]}
+          >
+            <Ionicons name="close" size={20} color={theme.inkMuted} />
+          </Pressable>
         </View>
-      </ExploreChromeFrame>
+
+        <Text variant="title" isHeading numberOfLines={2} style={styles.title}>
+          {feature.label}
+        </Text>
+
+        {dek ? (
+          <Text variant="editorial" colorRole="ink" numberOfLines={4} style={styles.dek}>
+            {dek}
+          </Text>
+        ) : (
+          <Text variant="bodySmall" colorRole="inkMuted" numberOfLines={3}>
+            {meta
+              ? `${meta}. Open the full record for claims, timeline, and connected places.`
+              : 'Open the full record for claims, timeline, and connected places.'}
+          </Text>
+        )}
+
+        <View
+          style={[styles.factsStrip, { borderTopColor: theme.border }]}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        >
+          <View style={styles.fact}>
+            <Text variant="caption" colorRole="inkSubtle">
+              Kind
+            </Text>
+            <Text variant="code" colorRole="ink" numberOfLines={2}>
+              {kindSlug}
+            </Text>
+          </View>
+          {facts.map((fact) => (
+            <View key={fact.label} style={styles.fact}>
+              <Text variant="caption" colorRole="inkSubtle">
+                {fact.label}
+              </Text>
+              <Text variant="code" colorRole="ink" numberOfLines={2}>
+                {fact.value}
+              </Text>
+            </View>
+          ))}
+        </View>
+
+        <Button
+          label="View full record"
+          variant="primary"
+          onPress={() => onOpenEntity(feature.entityId)}
+          accessibilityLabel={`View full record for ${feature.label}`}
+        />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  anchor: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
+  root: {
+    width: '100%',
   },
-  sheetFrame: {
-    marginHorizontal: space['2'],
-    marginBottom: 40,
-  },
-  sheet: {
+  card: {
     gap: space['2'],
-  },
-  sheetInner: {
-    gap: space['2'],
+    paddingHorizontal: space['3'],
+    paddingTop: space['1'],
+    paddingBottom: space['3'],
   },
   topRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     gap: space['2'],
   },
-  titleBlock: {
+  kindBlock: {
     flex: 1,
-    gap: space['1'],
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space['2'],
+  },
+  copperTick: {
+    width: TICK_WIDTH,
+    height: 14,
+    borderRadius: 1,
+  },
+  kindSlug: {
+    letterSpacing: 1.2,
+    flexShrink: 1,
   },
   title: {
     flexShrink: 1,
+  },
+  dek: {
+    marginTop: -space['1'],
+  },
+  factsStrip: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: space['3'],
+    paddingTop: space['2'],
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
+  fact: {
+    gap: 2,
+    minWidth: 72,
+    flexGrow: 1,
+    flexBasis: '28%',
   },
   close: {
     minHeight: MIN_TOUCH,
@@ -148,8 +212,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 8,
-  },
-  dek: {
-    marginTop: -space['1'],
   },
 });

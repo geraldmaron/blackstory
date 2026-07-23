@@ -3,6 +3,7 @@
  * P1 themes labeled coming soon, and a link to methodology for juxtaposition rules.
  */
 
+import Link from 'next/link';
 import { ThemeBrowseSections } from './ThemeBrowseSections';
 import '../../components/theme-impact/theme-impact.css';
 
@@ -20,6 +21,11 @@ export default function ThemesBrowsePage() {
       <p className="ds-page__lede">
         Policy eras, geography, and evidence packets for major through-lines in the archive.
         Figures sit beside artifacts — juxtaposed, not collapsed into causal claims.
+      </p>
+      <p>
+        <Link className="ds-cta-link" href="/books">
+          Related: banned books catalog
+        </Link>
       </p>
       <ThemeBrowseSections />
     </main>

@@ -81,7 +81,7 @@ export function AppProviders({ children, runtime: injected }: AppProvidersProps)
         if (syncResult.status === 'offline') {
           console.warn(
             `[blackstory] bootstrapSync offline (could not reach ${resolveApiBaseUrl()}/v1/bootstrap). ` +
-              'Explore map uses demo fixtures until a live map GeoJSON endpoint is wired. ' +
+              'Explore will try GET /v1/map and fall back to demo fixtures in __DEV__ if unreachable. ' +
               'For local Supabase reads: run apps/api-public with PUBLIC_DATA_SOURCE=postgres + DATABASE_URL, ' +
               'set apps/mobile/.env.local API_BASE_URL to your LAN http://IP:8080, then restart Metro.',
           );

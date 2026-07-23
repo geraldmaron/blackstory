@@ -147,9 +147,21 @@ describe('ContentRenderer', () => {
     expect(getByText('Some content was skipped')).toBeTruthy();
   });
 
-  it('renders related entities and cited facts', async () => {
-    const { getByText } = await renderPage(BASE_PAGE);
-    expect(getByText('ent_a')).toBeTruthy();
+  it('renders related entities and cited facts with human labels, not raw entity ids', async () => {
+    const { getAllByText, getByText, queryByText } = await renderPage(BASE_PAGE);
+    expect(getAllByText('Archive record').length).toBeGreaterThanOrEqual(1);
+    expect(queryByText('ent_a')).toBeNull();
+    expect(queryByText('ent_b')).toBeNull();
     expect(getByText('BB-F-000001')).toBeTruthy();
+  });
+
+  it('labels known related entities with display name and kind · place', async () => {
+    const { getByText, queryByText } = await renderPage({
+      ...BASE_PAGE,
+      relatedEntityIds: ['ent_dunbar_school_001'],
+    });
+    expect(getByText('Paul Laurence Dunbar High School')).toBeTruthy();
+    expect(getByText('School · Washington, D.C.')).toBeTruthy();
+    expect(queryByText('ent_dunbar_school_001')).toBeNull();
   });
 });

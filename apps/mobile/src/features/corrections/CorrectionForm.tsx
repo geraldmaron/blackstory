@@ -116,6 +116,12 @@ export function CorrectionForm({ entityId, onSubmit, onAccepted }: CorrectionFor
 
   return (
     <ScrollView contentContainerStyle={{ padding: space['4'], gap: space['4'] }} keyboardShouldPersistTaps="handled">
+      <Text variant="code" colorRole="accent" style={{ letterSpacing: 1 }}>
+        CORRECTIONS
+      </Text>
+      <Text variant="title" isHeading>
+        Submit a correction
+      </Text>
       <Text variant="bodySmall" colorRole="inkMuted">
         {CORRECTION_FORM_INTRO}
       </Text>

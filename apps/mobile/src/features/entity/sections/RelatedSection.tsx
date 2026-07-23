@@ -57,7 +57,7 @@ export function RelatedSection({ relatedNeighbors, continueLearning, onOpenEntit
         {relatedNeighbors.length === 0 ? (
           <EmptyState title={RECORD_GAP_COPY.related.title} description={RECORD_GAP_COPY.related.body} />
         ) : (
-          <LiftedSurface gradient="panelAtmosphere" shadow="sm">
+          <LiftedSurface tone="surface" shadow="none">
             {relatedNeighbors.map((neighbor, index) => (
               <NeighborRow
                 key={`${neighbor.id}_${neighbor.relationType}_${index}`}
@@ -76,7 +76,7 @@ export function RelatedSection({ relatedNeighbors, continueLearning, onOpenEntit
           <Text variant="bodySmall" colorRole="inkMuted">
             Nearby records one step further in the published graph — keep learning without dead ends.
           </Text>
-          <LiftedSurface gradient="panelAtmosphere" shadow="sm">
+          <LiftedSurface tone="surface" shadow="none">
             {continueLearning.map((neighbor, index) => (
               <NeighborRow
                 key={`cl_${neighbor.id}_${neighbor.relationType}_${index}`}

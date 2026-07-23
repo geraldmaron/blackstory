@@ -30,6 +30,7 @@ Every dependency (data access, App Check guard, rate limiter, search guard) is *
 | `GET /v1/compatibility` | Client-version floor check (ADR-021 §2) | `CompatibilityCheckV1` | no | none | `no-store` |
 | `GET /v1/bootstrap` | Active release + version floor | `bootstrapResponseV1Schema` | signal (fail-open) | none | `max-age=30, swr=120` |
 | `GET /v1/entity/:id` | One published entity | `entityV1Schema` | signal (fail-open, `static_read`) | `entityRetrieval` | `max-age=60, swr=300` |
+| `GET /v1/map` | Release-coupled redacted Explore GeoJSON | `mapSourceV1Schema` | signal (fail-open, `static_read`) | `entityRetrieval` | `max-age=60, swr=300` |
 | `GET /v1/search` | Bounded search | `searchResponseV1Schema` | REQUIRED (`expensive_read`) | `search` | `max-age=60, swr=300` |
 
 Every `200` body is validated against its `@repo/public-contracts` zod schema before it is written.

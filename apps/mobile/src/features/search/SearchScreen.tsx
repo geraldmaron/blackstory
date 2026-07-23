@@ -86,8 +86,25 @@ export function SearchScreen({ initialQuery, initialKind, runtime }: SearchScree
     router.push(`/entity/${safeId}`);
   }
 
+  function handleShowOnMap(id: string, kind: string) {
+    const safeId = parseEntityId(id);
+    if (!safeId) return;
+    router.push({
+      pathname: '/explore',
+      params: {
+        selected: safeId,
+        ...(kind.trim().length > 0 ? { kind } : {}),
+      },
+    });
+  }
+
   const cardData = useMemo(
-    () => (state.kind === 'results' ? state.results.map((r: SearchResultV1) => toSearchResultCardProps(r, handlePressResult)) : []),
+    () =>
+      state.kind === 'results'
+        ? state.results.map((r: SearchResultV1) =>
+            toSearchResultCardProps(r, { onPress: handlePressResult, onShowOnMap: handleShowOnMap }),
+          )
+        : [],
     [state],
   );
 
@@ -102,7 +119,7 @@ export function SearchScreen({ initialQuery, initialKind, runtime }: SearchScree
           compact
         />
 
-        <LiftedSurface gradient="surfaceLift" paddingKey="3" style={styles.searchField}>
+        <LiftedSurface tone="surface" shadow="none" paddingKey="3" style={styles.searchField}>
           <View style={styles.searchRow}>
             <Ionicons name="search-outline" size={20} color={theme.inkMuted} accessibilityElementsHidden />
             <TextInput
@@ -141,19 +158,19 @@ export function SearchScreen({ initialQuery, initialKind, runtime }: SearchScree
 
         {state.kind === 'empty' ? (
           <EmptyState
-            title="No results"
+            title="No matching records"
             description={
               state.degraded
-                ? 'No saved results match this search while offline.'
-                : 'Try a different name, place, or event.'
+                ? 'No saved results match this search while offline. Reconnect, or open Explore to browse the map.'
+                : 'Try a different spelling, clear a filter, or browse the map for places nearby.'
             }
           />
         ) : null}
 
         {state.kind === 'error' ? (
           <ErrorState
-            title="Search failed"
-            description={state.message}
+            title="Search could not finish"
+            description={state.message || 'Something went wrong. Try again, or open Explore to browse by place.'}
             retry={{ label: 'Try again', onPress: retry }}
           />
         ) : null}
@@ -176,7 +193,7 @@ export function SearchScreen({ initialQuery, initialKind, runtime }: SearchScree
               />
             ) : null}
             <SectionHeader title="Results" meta={`${cardData.length} shown`} headingScale="bodyEmphasis" />
-            <LiftedSurface gradient="panelAtmosphere" shadow="sm" style={styles.resultsList}>
+            <LiftedSurface tone="surface" shadow="none" style={styles.resultsList}>
               <FlatList
                 testID="search-results-list"
                 data={cardData}
@@ -263,7 +280,7 @@ function BrowseModeView({
               onPress={() => router.push({ pathname: '/explore', params: { kind: category.kind } })}
               style={({ pressed }) => [{ flex: 1, minWidth: '46%', opacity: pressed ? 0.85 : 1 }]}
             >
-              <LiftedSurface gradient="canvasDepth" shadow="sm" paddingKey="3" style={{ minHeight: 44, justifyContent: 'center' }}>
+              <LiftedSurface tone="surface" shadow="none" paddingKey="3" style={{ minHeight: 44, justifyContent: 'center' }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: space['2'] }}>
                   <NavIcon name={navIconForEntityKind(category.kind)} size={20} />
                   <View style={{ flex: 1, gap: space['1'] }}>
@@ -286,7 +303,7 @@ function BrowseModeView({
             title="Recent searches"
             action={<Button label="Clear all" variant="ghost" density="compact" onPress={onClearRecent} />}
           />
-          <LiftedSurface gradient="panelAtmosphere" shadow="sm">
+          <LiftedSurface tone="surface" shadow="none">
             {recentSearches.map((entry, index) => (
               <ListRow
                 key={entry.term}

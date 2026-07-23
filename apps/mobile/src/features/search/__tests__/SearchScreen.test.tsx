@@ -8,7 +8,7 @@
  * happens outside a React-tracked event, so the assertion must poll/re-check, not assume a single
  * flush already landed.
  */
-import { render, waitFor } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import { TransportError } from '@/data';
 import { SearchScreen } from '../SearchScreen';
 import { buildRuntime, fakeReleaseCache, flushMicrotasks, makeControllableTransport, page } from '../test-support';
@@ -90,6 +90,24 @@ describe('SearchScreen — result rendering', () => {
     resolveNext(page());
 
     await waitFor(() => expect(getByText('Harriet Tubman')).toBeTruthy());
+  });
+
+  it('wires Show on map to Explore with selected id and kind', async () => {
+    const { transport, resolveNext } = makeControllableTransport({ cooperative: true });
+    const releaseCache = fakeReleaseCache('r1');
+    const { runtime } = buildRuntime(transport, releaseCache);
+
+    const { getByLabelText } = await render(<SearchScreen initialQuery="tubman" runtime={runtime} />);
+    await flushMicrotasks(10);
+    resolveNext(page());
+
+    await waitFor(() => expect(getByLabelText('Show Harriet Tubman on map')).toBeTruthy());
+    fireEvent.press(getByLabelText('Show Harriet Tubman on map'));
+
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/explore',
+      params: { selected: 'ent_1', kind: 'person' },
+    });
   });
 });
 

@@ -250,9 +250,29 @@ test('mapProjectionToEntityV1 maps inline claims and release metadata when prese
   assert.equal(entityV1Schema.safeParse(mapped).success, true);
 });
 
-test('mapProjectionToEntityV1 returns undefined for an unsupported kind (T3 indistinguishability)', () => {
+test('mapProjectionToEntityV1 maps person (and other full-ontology kinds) for Explore parity', () => {
   const mapped = mapProjectionToEntityV1({ ...sampleProjection, kind: 'person' as 'place' });
+  assert.equal(mapped?.kind, 'person');
+  assert.equal(mapped?.id, sampleProjection.id);
+});
+
+test('mapProjectionToEntityV1 returns undefined for an unsupported kind (T3 indistinguishability)', () => {
+  const mapped = mapProjectionToEntityV1({ ...sampleProjection, kind: 'spaceship' as 'place' });
   assert.equal(mapped, undefined);
+});
+
+test('mapProjectionToEntityV1 defaults matchMethod when location omits it', () => {
+  const mapped = mapProjectionToEntityV1({
+    ...sampleProjection,
+    location: {
+      lat: 38.9,
+      lng: -77.0,
+      geohash: 'dqcjq',
+      precision: 'city',
+    },
+  });
+  assert.equal(mapped?.geoAnchor?.matchMethod, 'release_projection');
+  assert.equal(mapped?.geoAnchor?.lat, 38.9);
 });
 
 test('mapSearchIndexDoc maps Firestore search-index docs for runPublicSearch', () => {

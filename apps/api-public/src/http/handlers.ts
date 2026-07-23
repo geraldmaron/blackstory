@@ -26,6 +26,7 @@ import {
 } from '@repo/security';
 import { bootstrapResponseV1Schema } from '@repo/public-contracts/v1/bootstrap';
 import { entityV1Schema } from '@repo/public-contracts/v1/entity';
+import { mapSourceV1Schema } from '@repo/public-contracts/v1/map';
 import {
   searchResponseV1Schema,
   type SearchResponseV1,
@@ -40,6 +41,7 @@ import { health } from '../index.js';
 import type { createPublicRateLimitGuard } from '../rate-limits.js';
 import type { createPublicSearchGuard} from '../search-guardrails.js';
 import { type PublicSearchHttpQuery } from '../search-guardrails.js';
+import { buildMapSourceV1 } from './build-map-source-v1.js';
 import type { PublicDataAccess } from './data-access.js';
 import { CACHE_CONTROL, errorResponse, jsonRead, type ApiResponse } from './responses.js';
 
@@ -250,6 +252,48 @@ function notFoundEntity(request: ApiRequest): ApiResponse {
   return errorResponse('NOT_FOUND', 'No such entity in the active release.', {
     requestId: request.requestId,
   });
+}
+
+// ---------------------------------------------------------------------------
+// GET /v1/map
+// ---------------------------------------------------------------------------
+
+/** Release-coupled redacted GeoJSON FeatureCollection for Explore (ADR-025 / MapSourceV1). */
+export async function handleMap(request: ApiRequest, deps: HandlerDeps): Promise<ApiResponse> {
+  const floor = enforceClientFloor(request);
+  if (floor) return floor;
+
+  const attestation = await deps.clientAttestationGuard({ headers: request.headers });
+
+  const rateLimited = await runRateLimit(request, '/v1/map', deps, attestation);
+  if (rateLimited.limitResponse) return rateLimited.limitResponse;
+
+  try {
+    const pointer = await deps.dataAccess.getReleasePointer();
+    if (!pointer) {
+      return errorResponse('UPSTREAM_UNAVAILABLE', 'No active release is available yet.', {
+        requestId: request.requestId,
+      });
+    }
+
+    const releaseId = pointer.activeRelease.releaseId;
+    const entities = await deps.dataAccess.listEntities(releaseId);
+    const body = buildMapSourceV1(releaseId, entities, {
+      generatedAt: pointer.activeRelease.generatedAt,
+    });
+
+    const parsed = mapSourceV1Schema.safeParse(body);
+    if (!parsed.success) {
+      return internalContractError(request);
+    }
+    return jsonRead(parsed.data, {
+      requestId: request.requestId,
+      cacheControl: CACHE_CONTROL.releasedRead,
+      ifNoneMatch: request.headers['if-none-match'],
+    });
+  } finally {
+    rateLimited.release();
+  }
 }
 
 // ---------------------------------------------------------------------------

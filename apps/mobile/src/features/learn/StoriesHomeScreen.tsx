@@ -61,7 +61,7 @@ export function StoriesHomeScreen() {
         {archiveStories.length > 0 ? (
           <View style={{ gap: space['2'] }} accessibilityRole="none">
             <SectionHeader title="In the archive" meta={countLabel} headingScale="bodyEmphasis" />
-            <LiftedSurface gradient="panelAtmosphere" shadow="sm">
+            <LiftedSurface tone="surface" shadow="none">
               {archiveStories.map((entry, index) => (
                 <StoryCompactRow
                   key={`${entry.section}-${entry.page.slug}`}
@@ -77,7 +77,7 @@ export function StoriesHomeScreen() {
         {secondarySections.length > 0 ? (
           <View style={{ gap: space['2'] }}>
             <SectionHeader title="More to read" meta="Context & method" headingScale="bodyEmphasis" />
-            <LiftedSurface gradient="panelAtmosphere" shadow="sm">
+            <LiftedSurface tone="surface" shadow="none">
               {secondarySections.map((section, index) => (
                 <ListRow
                   key={section.routeId}

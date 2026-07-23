@@ -22,6 +22,7 @@ export type NavIconName =
   | 'methodology'
   | 'corrections'
   | 'data'
+  | 'books'
   | 'story'
   | 'place'
   | 'school'
@@ -45,6 +46,7 @@ const OUTLINE: Record<NavIconName, IonName> = {
   methodology: 'flask-outline',
   corrections: 'chatbox-ellipses-outline',
   data: 'bar-chart-outline',
+  books: 'library-outline',
   story: 'newspaper-outline',
   place: 'location-outline',
   school: 'school-outline',

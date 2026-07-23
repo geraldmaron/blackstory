@@ -1,0 +1,366 @@
+/**
+ * Books surfaces — responsive browse cards + light mast tweaks. Detail reuses entity chrome
+ * (mast, at-a-glance, entity-layout, aside, record sections) from shell + entity-page.css.
+ */
+
+.ds-books-page {
+  max-width: 100%;
+}
+
+.ds-books-page [id] {
+  scroll-margin-top: var(--ds-island-clearance);
+}
+
+.ds-books-page__crosslink {
+  margin: var(--ds-space-3) 0 0;
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+}
+
+/* Identity-only mast (no media column) still gets the strong entity rule. */
+.ds-books-mast {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.ds-books-mast .ds-entity-tags {
+  margin-top: var(--ds-space-4);
+}
+
+/* —— Browse —— */
+.ds-books-browse {
+  margin-top: var(--ds-space-6);
+  counter-reset: ds-rec;
+}
+
+.ds-books-browse__filters {
+  padding-top: 0;
+}
+
+.ds-books-browse__filter-bar {
+  margin-top: var(--ds-space-4);
+}
+
+.ds-books-browse__toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-3);
+  margin: var(--ds-space-5) 0 var(--ds-space-4);
+}
+
+.ds-books-browse__count {
+  margin: 0;
+}
+
+.ds-books-sort {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2) var(--ds-space-3);
+}
+
+.ds-books-sort__label {
+  font-family: var(--ds-font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-books-sort__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-books-sort__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  text-decoration: none;
+  background: var(--ds-surface, var(--ds-canvas));
+}
+
+.ds-books-sort__link:hover,
+.ds-books-sort__link:focus-visible {
+  border-color: var(--ds-accent-graphic);
+  color: var(--ds-copper-text);
+}
+
+.ds-books-sort__link--active {
+  border-color: var(--ds-accent-graphic);
+  color: var(--ds-copper-text);
+  font-weight: 600;
+}
+
+.ds-books-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--ds-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-books-card {
+  margin: 0;
+  min-width: 0;
+}
+
+.ds-books-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-3);
+  height: 100%;
+  padding: var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface, var(--ds-canvas));
+}
+
+.ds-books-card__header {
+  display: grid;
+  gap: var(--ds-space-1);
+}
+
+.ds-books-card__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: 1.125rem;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.ds-books-card__title a {
+  color: var(--ds-ink);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: border-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-books-card__title a:hover,
+.ds-books-card__title a:focus-visible {
+  border-bottom-color: var(--ds-accent-graphic);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-books-card__title a {
+    transition: none;
+  }
+}
+
+.ds-books-card__byline {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.ds-books-card__summary {
+  margin: 0;
+  flex: 1 1 auto;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-serif, var(--ds-font-sans));
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.ds-books-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2) var(--ds-space-3);
+  align-items: baseline;
+}
+
+.ds-books-card__citations {
+  margin: 0;
+  color: var(--ds-ink-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+}
+
+.ds-books-card__states {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.ds-books-card__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-2);
+  margin-top: auto;
+  padding-top: var(--ds-space-2);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-books-card__actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+.ds-books-card__buy.ds-cta {
+  padding-inline: var(--ds-space-4);
+  font-size: 0.6875rem;
+}
+
+.ds-books-row__state {
+  color: var(--ds-ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--ds-rule);
+}
+
+.ds-books-row__state:hover,
+.ds-books-row__state:focus-visible {
+  border-bottom-color: var(--ds-accent-graphic);
+  color: var(--ds-copper-text);
+}
+
+/* —— Pagination —— */
+.ds-books-pager {
+  display: grid;
+  gap: var(--ds-space-3);
+  margin-top: var(--ds-space-5);
+  padding-top: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-books-pager__status {
+  margin: 0;
+}
+
+.ds-books-pager__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+}
+
+.ds-books-pager__pages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-books-pager__page {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0 var(--ds-space-2);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-mono);
+  font-size: 0.8125rem;
+  text-decoration: none;
+}
+
+.ds-books-pager__page:hover,
+.ds-books-pager__page:focus-visible {
+  border-color: var(--ds-accent-graphic);
+  color: var(--ds-copper-text);
+}
+
+.ds-books-pager__page--current {
+  border-color: var(--ds-accent-graphic);
+  color: var(--ds-copper-text);
+  font-weight: 600;
+}
+
+.ds-books-pager__disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+@media (min-width: 40rem) {
+  .ds-books-browse__toolbar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .ds-books-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .ds-books-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* —— Evidence lists (citation / jurisdiction) —— */
+.ds-books-evidence-list {
+  display: grid;
+  gap: 0;
+  margin: var(--ds-space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-books-evidence-item {
+  margin: 0;
+  padding: var(--ds-space-3) 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-books-evidence-item:last-child {
+  border-bottom: none;
+}
+
+.ds-books-evidence-item__lead {
+  margin: 0 0 var(--ds-space-1);
+  font-family: var(--ds-font-sans);
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--ds-ink);
+}
+
+.ds-books-evidence-item__scope {
+  color: var(--ds-ink-muted);
+}
+
+.ds-books-evidence-item__cite {
+  color: var(--ds-copper-text);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  line-height: 1.4;
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+.ds-books-evidence-item__meta {
+  margin: var(--ds-space-1) 0 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+}
+
+.ds-books-browse__filters,
+.ds-books-browse > .ds-record-section {
+  counter-increment: ds-rec;
+}

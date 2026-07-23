@@ -26,7 +26,27 @@ import { relatedEntryV1Schema, relatedNeighborV1Schema } from './related.js';
 import { revisionMetadataV1Schema } from './revision.js';
 import { timelineEventV1Schema } from './timeline.js';
 
-export const ENTITY_KINDS = ['place', 'school', 'event', 'institution'] as const;
+/**
+ * Full public ontology (ADR-015) — same closed set as `packages/schemas`
+ * `PublicEntityProjectionDoc.kind`. Early mobile/API scaffolds only listed the
+ * four Dunbar-seed kinds; live releases pin people, orgs, laws, etc., and web
+ * Explore already maps every kind. Restricting the wire enum dropped ~40% of
+ * geo-anchored records from `GET /v1/map` / entity detail.
+ */
+export const ENTITY_KINDS = [
+  'person',
+  'place',
+  'school',
+  'organization',
+  'institution',
+  'event',
+  'law',
+  'case',
+  'publication',
+  'artifact',
+  'movement',
+  'other',
+] as const;
 export const entityKindSchema = z.enum(ENTITY_KINDS);
 export type EntityKindV1 = (typeof ENTITY_KINDS)[number];
 

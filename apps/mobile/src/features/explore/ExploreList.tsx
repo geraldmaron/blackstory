@@ -1,6 +1,6 @@
 /**
- * The synchronized result list (MOB-012) — and the accessible, non-visual
- * alternative to the map.
+ * The synchronized result list (MOB-012) — accessible alternative to the map,
+ * kept secondary under the metrics dashboard (expandable “Show records”).
  *
  * This is a real, interactive list of exactly what the map viewport currently
  * shows (VoiceOver/TalkBack users get "an actual list of what's visible", not a
@@ -12,6 +12,7 @@
  * Uses FlatList for virtualization so a large viewport population does not mount
  * thousands of rows at once (the 100k-point stress is device/Maestro evidence,
  * but the list is windowed here so it does not itself become the bottleneck).
+ * Sheet-embedding chrome: compact "In view" header + count above the list/empty.
  */
 import { useCallback } from 'react';
 import { FlatList, StyleSheet, View, type ListRenderItemInfo } from 'react-native';
@@ -27,6 +28,12 @@ export type ExploreListProps = {
   readonly emptyTitle?: string;
   readonly emptyDescription?: string;
 };
+
+function countLabel(count: number): string {
+  if (count === 0) return 'None';
+  if (count === 1) return '1 record';
+  return `${count} records`;
+}
 
 export function ExploreList({
   features,
@@ -66,37 +73,41 @@ export function ExploreList({
     [features.length, onSelect, selectedId, theme.accent, theme.surfaceRaised],
   );
 
-  if (features.length === 0) {
-    return (
-      <View testID="explore-list-empty" style={{ flex: 1 }}>
-        <EmptyState title={emptyTitle} description={emptyDescription} />
-      </View>
-    );
-  }
-
   return (
     <View style={styles.listRoot}>
-      <View style={[styles.listHeader, { borderBottomColor: theme.border }]}>
+      <View
+        style={[styles.listHeader, { borderBottomColor: theme.border }]}
+        accessible
+        accessibilityRole="header"
+        accessibilityLabel={`In view, ${countLabel(features.length)}`}
+      >
         <Text variant="code" colorRole="inkMuted">
           In view
         </Text>
         <Text variant="code" colorRole="accent">
-          {features.length === 1 ? '1 record' : `${features.length} records`}
+          {countLabel(features.length)}
         </Text>
       </View>
-      <FlatList
-        testID="explore-list"
-        accessibilityRole="list"
-        accessibilityLabel="Records visible on the map"
-        data={features}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        onScrollBeginDrag={onUserScroll}
-        keyboardShouldPersistTaps="handled"
-        initialNumToRender={12}
-        windowSize={7}
-        removeClippedSubviews
-      />
+
+      {features.length === 0 ? (
+        <View testID="explore-list-empty" style={styles.emptyWrap}>
+          <EmptyState title={emptyTitle} description={emptyDescription} />
+        </View>
+      ) : (
+        <FlatList
+          testID="explore-list"
+          accessibilityRole="list"
+          accessibilityLabel="Records visible on the map"
+          data={features}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+          onScrollBeginDrag={onUserScroll}
+          keyboardShouldPersistTaps="handled"
+          initialNumToRender={12}
+          windowSize={7}
+          removeClippedSubviews
+        />
+      )}
     </View>
   );
 }
@@ -111,7 +122,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: space['3'],
     paddingVertical: space['2'],
-    borderBottomWidth: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  emptyWrap: {
+    flex: 1,
   },
   rowWrap: {
     borderLeftWidth: 3,

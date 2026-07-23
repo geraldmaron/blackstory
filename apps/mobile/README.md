@@ -181,8 +181,9 @@ Dev). That service reads `bb_public.*` when
 
 | Surface | Data source today |
 |---|---|
-| **Explore** map + list | Bundled `DEMO_MAP_SOURCE` fixtures — **no API call**. Subtitle shows `demo fixtures (not live API)` in `__DEV__`. ADR-025’s live GeoJSON path is not wired; `api-public` has no map FeatureCollection route yet. |
-| **Learn** | Bundled `content-catalog.ts` (not `/v1/content`). |
+| **Explore** map + metrics | Live `GET /v1/map` (`MapSourceV1`) via `API_BASE_URL` when api-public is reachable. Sheet defaults to kind/place/era/precision metrics from the FeatureCollection; pin selection opens entity preview; record list is secondary. Bundled `DEMO_MAP_SOURCE` is a `__DEV__` fallback only (subtitle shows `demo fixtures`). Basemap defaults to **OpenFreeMap** (same as web); optional `MAP_PMTILES_URL` for self-hosted Protomaps; `MAP_BASEMAP_ENABLED=false` for points-only. |
+| **Stories** (Learn tab) | Bundled `content-catalog.ts` longform (web `/stories`, `/history`, `/myths`) — not `/v1/content`. |
+| **Data** (`/data`, from More) | Bundled Phase 1 indicator fixture snapshot matching web `/data` fixtures; Census national timeline is an honest empty state until a public API ships. |
 | **Search** / **entity** / cold-start **bootstrap** | HTTP to `API_BASE_URL` (`/v1/search`, `/v1/entity/:id`, `/v1/bootstrap`) with `X-BlackStory-Client`. SQLite is a release-coupled cache, not a fixture pack. |
 | **Web Explore** | Server-side Postgres in Next.js — unrelated to mobile’s API host. |
 
@@ -190,8 +191,9 @@ Dev). That service reads `bb_public.*` when
 `https://api.blackbook.app`. Development EAS profile leaves `API_BASE_URL`
 unset, so local `expo start` uses that same default. As of 2026-07-22 that
 host is **NXDOMAIN** and Cloud Run has no `black-book-api-public` service —
-bootstrap/search/entity fail with network errors (logged in Metro); Explore
-still shows a few demo pins (unrelated to MapLibre glyph/style issues).
+bootstrap/search/entity/map fail with network errors (logged in Metro); Explore
+falls back to demo pins in `__DEV__` until you point `API_BASE_URL` at a live
+api-public (LAN or deployed).
 
 ### Local Dev → live Supabase via api-public
 
@@ -231,6 +233,19 @@ curl -sS -H 'X-BlackStory-Client: mobile/1.0.0; api=1' \
   http://127.0.0.1:8080/v1/bootstrap | jq .
 curl -sS -H 'X-BlackStory-Client: mobile/1.0.0; api=1' \
   'http://127.0.0.1:8080/v1/search?q=black&pageSize=5' | jq .
+curl -sS -H 'X-BlackStory-Client: mobile/1.0.0; api=1' \
+  http://127.0.0.1:8080/v1/map | jq '{releaseId, featureCount:(.features|length)}'
+# Expect ~1366 geo-anchored features for the live release (full ontology kinds),
+# not ~791 (legacy four-kind filter).
+```
+
+After changing `@repo/public-contracts` kinds, restart `api-public` so `/v1/map` picks up the rebuild:
+
+```bash
+# stop the old :8080 process, then:
+cd apps/api-public
+set -a && source ../web/.env.local && set +a
+env PUBLIC_DATA_SOURCE=postgres DATABASE_SSL=1 pnpm dev
 ```
 
 Terminal B — point BlackStory (Dev) at the API. Set `API_BASE_URL=http://127.0.0.1:8080`

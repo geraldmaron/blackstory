@@ -14,10 +14,9 @@
  *
  * Mapping a `PublicEntityProjectionDoc` onto the public-contracts `EntityV1` DTO is lossy by
  * design, honestly:
- * - `kind` is narrower on `EntityV1` (`place|school|event|institution`, ADR-021 §3 — no
- *   precise living-person geography in this v1 surface) than the canonical entity kind space.
- *   A projection whose `kind` falls outside that set maps to `undefined`, which — same as an
- *   unpublished or nonexistent id — the handler cannot distinguish from a 404 (T3).
+ * - `kind` must be in the full public ontology (`ENTITY_KINDS` / ADR-015). A projection whose
+ *   `kind` falls outside that set maps to `undefined`, which — same as an unpublished or
+ *   nonexistent id — the handler cannot distinguish from a 404 (T3).
  * - Inline `claims` on the projection map through when present; bootstrap-window stubs that carry
  *   only `claimIds` still emit `claims: []`. No per-claim Firestore reads are added here.
  * - `timeline` is not carried on the projection — always `[]` until a release-builder field
@@ -97,6 +96,10 @@ export type CreateFirestoreDataAccessReadersOptions = {
   ) => Promise<ReleaseSearchIndexArtifact | undefined>;
 };
 
+/** Bounds entity-collection reads for map FeatureCollection construction (MapSourceV1 caps at
+ * 20k features). Higher than the search safety-net scan so Explore can see the full release. */
+export const MAX_LIVE_MAP_SCAN = 20_000;
+
 /** Bounds entity-collection fallback reads when no `publicSearchIndex` rows exist for the active
  * release (MOB-004 safety net — not the primary search path). Index-backed search uses the
  * release-scoped composite query documented in `apps/web`'s `listPublicSearchIndexDocs`. */
@@ -175,13 +178,15 @@ export function mapProjectionToEntityV1(projection: PublicEntityProjectionDoc): 
 
   const location = projection.location;
   const claims = mapClaims(projection.claims);
+  // Match web `mapGeoAnchor`: location with lat/lng is enough; default matchMethod
+  // when the projection omitted it (optional on the storage schema).
   const geoAnchor =
-    location && location.matchMethod
+    location && typeof location.lat === 'number' && typeof location.lng === 'number'
       ? {
           lat: location.lat,
           lng: location.lng,
           geohash: location.geohash,
-          matchMethod: location.matchMethod,
+          matchMethod: location.matchMethod ?? 'release_projection',
         }
       : undefined;
 
@@ -372,9 +377,17 @@ async function loadFallbackEntitySearchPool(
   firestore: FirestoreClientLike,
   releaseId: string,
 ): Promise<readonly EntityV1[]> {
+  return loadPublishedEntities(firestore, releaseId, MAX_LIVE_SEARCH_SCAN);
+}
+
+async function loadPublishedEntities(
+  firestore: FirestoreClientLike,
+  releaseId: string,
+  limit: number,
+): Promise<readonly EntityV1[]> {
   const snapshot = await firestore
     .collection(`${FIRESTORE_ROOT.publicReleases}/${releaseId}/entities`)
-    .limit(MAX_LIVE_SEARCH_SCAN)
+    .limit(limit)
     .get();
 
   const entities: EntityV1[] = [];
@@ -415,6 +428,10 @@ export function createFirestoreDataAccessReaders(
       const parsed = publicEntityProjectionSchema.safeParse(snap.data());
       if (!parsed.success) return undefined;
       return mapProjectionToEntityV1(parsed.data);
+    },
+
+    async readEntities(releaseId): Promise<readonly EntityV1[]> {
+      return loadPublishedEntities(firestore, releaseId, MAX_LIVE_MAP_SCAN);
     },
 
     async readSearchPage(
