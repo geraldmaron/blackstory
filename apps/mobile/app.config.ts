@@ -147,11 +147,9 @@ const EAS_PROJECT_ID = process.env.EAS_PROJECT_ID;
 
 const config: ExpoConfig = {
   name: appName,
-  // EAS project slug placeholder — no Expo/EAS organization has been
-  // provisioned yet (mobile-identity.md human gate #3). This slug becomes
-  // meaningful only once a real EAS project is linked (`eas init`); it
-  // creates no store or EAS resource by itself.
-  slug: 'blackstory-mobile',
+  // EAS project slug — must match the Expo project linked by EAS_PROJECT_ID
+  // (`blackstory` on account geraldmaron, id 51a35884-e6b5-43b6-b95b-c5a7460fa665).
+  slug: 'blackstory',
   version: '1.0.0',
   orientation: 'portrait',
   // Custom URL scheme fallback per mobile-identity.md: `blackstory://`,

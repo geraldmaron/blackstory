@@ -43,5 +43,10 @@ In 1Password → vault **geralddagher-development**:
 
 1. Open **BlackStory — Apple Developer (Team ID + custody)**  
    Set: Team ID `4Q2XU7D33G`, account type Individual, legal entity Gerald Dagher, support `me@geralddagher.com`.
-2. Open **BlackStory — EAS (project metadata)** after `eas init`  
-   Fill org slug + project ID; monthly spend ceiling **10**; alert email `me@geralddagher.com`. Stay on Expo Free plan.
+2. Open **BlackStory — EAS (project metadata)**  
+   Set now:
+   - Expo org slug: `gerald-maron` (project `@gerald-maron/blackstory`)
+   - EAS project ID: `51a35884-e6b5-43b6-b95b-c5a7460fa665`
+   - Monthly spend ceiling USD: `10`
+   - Billing alert recipient: `me@geralddagher.com`
+   - eas login done on Mac: `yes` (CLI user `geraldmaron`)

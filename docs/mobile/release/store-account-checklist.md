@@ -49,15 +49,18 @@ Owner-ordered checklist. Complete in sequence where noted; do not mark items don
 
 ## 3. Expo / EAS organization
 
-- [ ] Create Expo account / organization at [expo.dev](https://expo.dev).
-- [ ] Link billing; set usage alerts aligned with owner spend ceiling (#7).
-- [ ] Enable **phishing-resistant MFA** on the Expo org owner account.
-- [ ] Run `eas init` in `apps/mobile` to link project; set `EAS_PROJECT_ID` in EAS profile env (activates `expo-updates` URL in `app.config.ts`).
+- [x] Create Expo account / organization at [expo.dev](https://expo.dev).
+  - **Owner 2026-07-22:** Expo user `geraldmaron` also owns account **`gerald-maron`**; EAS project lives at **`@gerald-maron/blackstory`**.
+- [ ] Link billing; set usage alerts aligned with owner spend ceiling (#7) — stay Free; alert `me@geralddagher.com` if/when a card is ever attached.
+- [ ] Enable **phishing-resistant MFA** on the Expo account that owns `gerald-maron`.
+- [x] Run `eas init` in `apps/mobile` to link project; set `EAS_PROJECT_ID`.
+  - **Project:** `@gerald-maron/blackstory` · ID `51a35884-e6b5-43b6-b95b-c5a7460fa665`
+  - Wired in `eas.json` env (all profiles) + `.env.example`; `app.config.ts` slug set to `blackstory`.
 - [ ] Store **EAS access token** (CI-scoped, revocable) in 1Password — not in repo.
 
-**Current repo state**: `eas.json` profiles exist (`development`, `preview`, `production`); `EAS_PROJECT_ID` is unset; no Expo org provisioned.
+**Current repo state**: EAS project linked; Free-plan ceiling $10.
 
-**Evidence**: Expo org slug, project ID, billing alert screenshot.
+**Evidence**: `eas project:info` → fullName `@gerald-maron/blackstory`, ID above.
 
 ---
 
