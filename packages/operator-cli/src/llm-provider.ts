@@ -187,7 +187,7 @@ async function completeOpenAiCompatible(
     body: JSON.stringify({
       model: request.model,
       temperature: request.temperature ?? 0.2,
-      max_tokens: request.maxTokens ?? 900,
+      max_tokens: request.maxTokens ?? 4000,
       messages: request.messages,
       ...responseFormat,
       ...modelExtraBody,
