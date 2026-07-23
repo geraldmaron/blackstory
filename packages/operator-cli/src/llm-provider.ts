@@ -50,13 +50,7 @@ export type CreateLlmProviderOptions = {
   readonly models?: readonly string[];
 };
 
-const DEFAULT_OPENROUTER_MODEL = 'qwen/qwen-2.5-72b-instruct';
-const DEFAULT_OPENROUTER_ROSTER: readonly string[] = [
-  'qwen/qwen-2.5-72b-instruct',
-  'z-ai/glm-4.7-flash',
-  'meta-llama/llama-3.1-8b-instruct',
-  'qwen/qwen-2.5-7b-instruct',
-];
+const DEFAULT_OPENROUTER_MODEL = 'openai/gpt-oss-20b:free';
 const DEFAULT_OLLAMA_MODEL = 'qwen3:8b';
 const DEFAULT_MOCK_MODEL = 'mock-editorial-v1';
 
@@ -193,7 +187,7 @@ async function completeOpenAiCompatible(
     body: JSON.stringify({
       model: request.model,
       temperature: request.temperature ?? 0.2,
-      max_tokens: request.maxTokens ?? 900,
+      max_tokens: request.maxTokens ?? 4000,
       messages: request.messages,
       ...responseFormat,
       ...modelExtraBody,
@@ -321,9 +315,7 @@ export function resolveOpenRouterModels(options: {
     .map((model) => model.trim())
     .filter(Boolean);
   if (fromEnv && fromEnv.length > 0) return fromEnv;
-  const single = options.model ?? process.env.OPENROUTER_MODEL;
-  if (single) return [single];
-  return DEFAULT_OPENROUTER_ROSTER;
+  return [options.model ?? process.env.OPENROUTER_MODEL ?? DEFAULT_OPENROUTER_MODEL];
 }
 
 export function createOpenRouterLlmProvider(options: {

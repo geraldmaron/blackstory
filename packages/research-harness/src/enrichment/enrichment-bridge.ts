@@ -83,7 +83,13 @@ INSTRUCTIONS:
   `.trim();
 
   const responseText = await client.complete(prompt, 'enriched-candidate.v1');
-  const parsed = JSON.parse(cleanJsonResponse(responseText));
+  let parsed: any;
+  try {
+    parsed = JSON.parse(cleanJsonResponse(responseText));
+  } catch (e) {
+    console.error('Failed to parse JSON response:', responseText);
+    throw e;
+  }
 
   const parsedLat = parsed.latitude ? parseFloat(parsed.latitude) : undefined;
   const parsedLng = parsed.longitude ? parseFloat(parsed.longitude) : undefined;
@@ -157,5 +163,7 @@ function cleanJsonResponse(text: string): string {
   if (cleaned.startsWith('```')) {
     cleaned = cleaned.replace(/^```[a-z]*\s*/iu, '').replace(/```$/u, '');
   }
+  // Strip JS-style comments (avoid stripping URLs with http:// or https://)
+  cleaned = cleaned.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, '$1');
   return cleaned.trim();
 }
