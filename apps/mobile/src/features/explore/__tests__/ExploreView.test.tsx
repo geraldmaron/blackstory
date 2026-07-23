@@ -149,10 +149,26 @@ describe('ExploreView — metrics dashboard', () => {
     expect(getByTestId('explore-metrics-by-state')).toBeTruthy();
     expect(getByTestId('explore-metrics-by-precision')).toBeTruthy();
     expect(getByTestId('explore-metric-total')).toBeTruthy();
-    expect(getByLabelText(/^Place: 2 records$/)).toBeTruthy();
-    expect(getByLabelText(/^Person: 1 record$/)).toBeTruthy();
+    expect(getByTestId('explore-metric-precision-honesty')).toBeTruthy();
+    expect(getByLabelText(/^Place: 2 records, 67%$/)).toBeTruthy();
+    expect(getByLabelText(/^Person: 1 record, 33%$/)).toBeTruthy();
+    // Attribution hosted outside MapScreen at peek so sheet can cover it.
+    expect(getByTestId('map-attribution')).toBeTruthy();
     // List is secondary — collapsed by default.
     expect(queryByTestId('explore-list')).toBeNull();
+  });
+
+  it('hides map attribution when a selection expands the sheet', async () => {
+    const { queryByTestId, findByTestId } = await render(
+      <ExploreView
+        selectedParam="ent_fixture_place_dc"
+        onOpenEntity={noop}
+        onOpenFilters={noop}
+        reduceMotion
+      />,
+    );
+    expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
+    expect(queryByTestId('map-attribution')).toBeNull();
   });
 
   it('reflects filters in the result count and metrics buckets', async () => {
@@ -161,8 +177,8 @@ describe('ExploreView — metrics dashboard', () => {
     );
     expect(getByLabelText(/2 · filtered records/)).toBeTruthy();
     expect(getByLabelText(/^2 records all records$/)).toBeTruthy();
-    expect(getByLabelText(/^Place: 2 records$/)).toBeTruthy();
-    expect(queryByLabelText(/^Person: 1 record$/)).toBeNull();
+    expect(getByLabelText(/^Place: 2 records, 100%$/)).toBeTruthy();
+    expect(queryByLabelText(/^Person: 1 record/)).toBeNull();
     expect(queryByTestId('explore-list')).toBeNull();
   });
 });

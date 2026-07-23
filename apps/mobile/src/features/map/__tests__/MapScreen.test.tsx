@@ -127,6 +127,12 @@ describe('MapScreen — ready state', () => {
     const attribution = getByTestId('map-attribution');
     const flat = StyleSheet.flatten(attribution.props.style);
     expect(flat.bottom).toBe(MAP_ATTRIBUTION_ABOVE_SHEET_BOTTOM);
+    expect(attribution.props.pointerEvents).toBe('box-none');
+  });
+
+  it('omits in-map attribution when showAttribution is false (Explore hosts it)', async () => {
+    const { queryByTestId } = await render(<MapScreen showAttribution={false} />);
+    expect(queryByTestId('map-attribution')).toBeNull();
   });
 
   it('clamps the camera to CONUS maxBounds with a national minZoom floor', async () => {

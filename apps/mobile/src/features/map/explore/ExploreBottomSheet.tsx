@@ -5,6 +5,7 @@
  * Attribution is an overlay on the map above the peek (see MapAttribution), not
  * a reserved gap under the sheet — `bottomInset` stays 0 so the "In view" list
  * is never squeezed by a sandwich bar between sheet and tab bar (ADR-025 §8).
+ * Sheet z-index stays above attribution so expanded content covers the pill.
  */
 import type { ReactNode } from 'react';
 import { AppBottomSheet } from '../../../ui/AppBottomSheet';
@@ -25,6 +26,8 @@ export type ExploreBottomSheetProps = {
   readonly hasSelection?: boolean;
   readonly reduceMotion?: boolean;
   readonly testID?: string;
+  /** Fired when the sheet settles on peek / half / full. */
+  readonly onSnapIndexChange?: (index: number) => void;
 };
 
 export function ExploreBottomSheet({
@@ -32,6 +35,7 @@ export function ExploreBottomSheet({
   hasSelection = false,
   reduceMotion = false,
   testID = 'explore-bottom-sheet',
+  onSnapIndexChange,
 }: ExploreBottomSheetProps) {
   return (
     <AppBottomSheet
@@ -40,6 +44,7 @@ export function ExploreBottomSheet({
       bottomInset={EXPLORE_SHEET_ATTRIBUTION_INSET}
       testID={testID}
       accessibilityLabel="Explore metrics sheet"
+      onSnapIndexChange={onSnapIndexChange}
     >
       {children}
     </AppBottomSheet>

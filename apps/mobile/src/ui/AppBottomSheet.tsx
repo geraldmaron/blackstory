@@ -24,6 +24,8 @@ export type AppBottomSheetProps = {
   readonly snapPoints?: readonly string[];
   readonly testID?: string;
   readonly accessibilityLabel?: string;
+  /** Fired when the sheet settles on a snap index (0=peek, 1=half, 2=full). */
+  readonly onSnapIndexChange?: (index: number) => void;
 };
 
 export function AppBottomSheet({
@@ -34,6 +36,7 @@ export function AppBottomSheet({
   snapPoints: snapPointsProp,
   testID = 'app-bottom-sheet',
   accessibilityLabel = 'Bottom sheet',
+  onSnapIndexChange,
 }: AppBottomSheetProps) {
   const theme = useThemeColors();
   const sheetRef = useRef<BottomSheet>(null);
@@ -57,6 +60,13 @@ export function AppBottomSheet({
     [theme.border],
   );
 
+  const handleChange = useCallback(
+    (index: number) => {
+      onSnapIndexChange?.(index);
+    },
+    [onSnapIndexChange],
+  );
+
   useEffect(() => {
     sheetRef.current?.snapToIndex(expanded ? SHEET_HALF : SHEET_PEEK);
   }, [expanded]);
@@ -72,6 +82,7 @@ export function AppBottomSheet({
       bottomInset={bottomInset}
       handleComponent={handleComponent}
       animateOnMount={!reduceMotion}
+      onChange={handleChange}
       backgroundStyle={[
         styles.background,
         { backgroundColor: theme.surface, borderColor: theme.border },
@@ -89,7 +100,9 @@ export function AppBottomSheet({
 
 const styles = StyleSheet.create({
   sheet: {
+    // Above map attribution (z=1); below Explore floating chrome (z=3).
     zIndex: 2,
+    elevation: 2,
   },
   background: {
     borderTopLeftRadius: radius.lg,

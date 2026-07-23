@@ -7,6 +7,7 @@ export { MapScreen, type MapScreenProps } from './MapScreen';
 export {
   MapAttribution,
   MAP_ATTRIBUTION_ABOVE_SHEET_BOTTOM,
+  MAP_ATTRIBUTION_Z_INDEX,
   type MapAttributionProps,
 } from './MapAttribution';
 export {

@@ -43,4 +43,14 @@ describe('ExploreBottomSheet — attribution inset', () => {
     );
     expect(mockBottomSheetProps[0]?.bottomInset).toBe(0);
   });
+
+  it('forwards onSnapIndexChange to AppBottomSheet for attribution visibility', async () => {
+    const onSnapIndexChange = jest.fn();
+    await render(
+      <ExploreBottomSheet onSnapIndexChange={onSnapIndexChange}>
+        <Text>In view</Text>
+      </ExploreBottomSheet>,
+    );
+    expect(mockBottomSheetProps[0]?.onSnapIndexChange).toBe(onSnapIndexChange);
+  });
 });

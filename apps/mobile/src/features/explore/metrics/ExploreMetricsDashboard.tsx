@@ -2,6 +2,9 @@
  * Default Explore bottom-sheet content: metrics and compact visualizations for
  * the visible / filtered FeatureCollection. Entity list stays secondary
  * (expandable). Pin selection still swaps this for EntityPreviewSheet upstream.
+ *
+ * Aggregates kind mix %, top places, precision honesty, era coverage, and
+ * optional viewport-vs-national comparison from properties already on features.
  */
 import { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
@@ -26,6 +29,11 @@ import { MetricStatRow } from './MetricStatRow';
 
 export type ExploreMetricsDashboardProps = {
   readonly features: readonly ExploreFeature[];
+  /**
+   * Full filtered release set when `features` is viewport-clipped, enabling
+   * in-view vs national comparison. Omit when the scope is already national.
+   */
+  readonly nationalFeatures?: readonly ExploreFeature[];
   /** e.g. "In view" when viewport-clipped, "All records" before first region. */
   readonly scopeLabel: string;
   readonly selectedId?: string;
@@ -51,10 +59,12 @@ function BucketSection({
   title,
   buckets,
   testID,
+  emphasizeLeading = false,
 }: {
   readonly title: string;
   readonly buckets: readonly MetricBucket[];
   readonly testID: string;
+  readonly emphasizeLeading?: boolean;
 }) {
   if (buckets.length === 0) return null;
   const max = maxCount(buckets);
@@ -65,12 +75,14 @@ function BucketSection({
         {title}
       </Text>
       <View style={styles.bars}>
-        {buckets.map((bucket) => (
+        {buckets.map((bucket, index) => (
           <MetricBarRow
             key={bucket.key}
             label={bucket.label}
             count={bucket.count}
             maxCount={max}
+            percent={bucket.percent}
+            emphasize={emphasizeLeading && index === 0}
             testID={`${testID}-${bucket.key}`}
           />
         ))}
@@ -81,6 +93,7 @@ function BucketSection({
 
 export function ExploreMetricsDashboard({
   features,
+  nationalFeatures,
   scopeLabel,
   selectedId,
   onSelectFeature,
@@ -90,7 +103,10 @@ export function ExploreMetricsDashboard({
 }: ExploreMetricsDashboardProps) {
   const theme = useThemeColors();
   const [listExpanded, setListExpanded] = useState(false);
-  const metrics = useMemo(() => aggregateExploreMetrics(features), [features]);
+  const metrics = useMemo(
+    () => aggregateExploreMetrics(features, { nationalFeatures }),
+    [features, nationalFeatures],
+  );
   const summary = useMemo(
     () => metricsAccessibilitySummary(metrics, scopeLabel),
     [metrics, scopeLabel],
@@ -120,6 +136,9 @@ export function ExploreMetricsDashboard({
     );
   }
 
+  const honesty = metrics.precisionHonesty;
+  const comparison = metrics.comparison;
+
   return (
     <ScrollView
       style={styles.root}
@@ -138,6 +157,19 @@ export function ExploreMetricsDashboard({
           title={metrics.total === 1 ? '1 record' : `${metrics.total} records`}
           headingScale="bodyEmphasis"
         />
+        {comparison ? (
+          <Text
+            variant="caption"
+            colorRole="inkMuted"
+            testID="explore-metrics-comparison"
+            accessibilityLabel={`${comparison.shareOfNationalPercent}% of ${comparison.nationalTotal} records nationally`}
+          >
+            {comparison.shareOfNationalPercent}% of {comparison.nationalTotal} nationally
+            {comparison.geographySharePercent != null
+              ? ` · ${metrics.geographyCoverage} of ${comparison.nationalGeography} places`
+              : ''}
+          </Text>
+        ) : null}
       </View>
 
       <View
@@ -157,28 +189,70 @@ export function ExploreMetricsDashboard({
           testID="explore-metric-geography"
         />
         <MetricStatRow
-          value={String(metrics.byKind.length)}
-          label="Kinds"
-          accessibilityLabel={`${metrics.byKind.length === 1 ? '1 kind' : `${metrics.byKind.length} kinds`} represented`}
-          testID="explore-metric-kinds"
+          value={
+            metrics.eraCoveragePercent != null ? `${metrics.eraCoveragePercent}%` : '—'
+          }
+          label="Era-labeled"
+          accessibilityLabel={
+            metrics.eraCoveragePercent != null
+              ? `${metrics.eraCoveragePercent}% of records have era labels`
+              : 'No era coverage'
+          }
+          testID="explore-metric-era-labeled"
         />
         <MetricStatRow
-          value={String(metrics.withEraLabeled)}
-          label="Era-labeled"
-          accessibilityLabel={`${metrics.withEraLabeled === 1 ? '1 record' : `${metrics.withEraLabeled} records`} with era labels`}
+          value={
+            honesty.cityOrCoarserPercent != null
+              ? `${honesty.cityOrCoarserPercent}%`
+              : '—'
+          }
+          label="City+"
+          accessibilityLabel={
+            honesty.cityOrCoarserPercent != null
+              ? `${honesty.cityOrCoarserPercent}% of records at city or coarser precision`
+              : 'No precision labels'
+          }
           showEdge={false}
-          testID="explore-metric-era-labeled"
+          testID="explore-metric-precision-honesty"
         />
       </View>
 
-      <BucketSection title="By kind" buckets={metrics.byKind} testID="explore-metrics-by-kind" />
-      <BucketSection title="By place" buckets={metrics.byState} testID="explore-metrics-by-state" />
+      <BucketSection
+        title="Kind mix"
+        buckets={metrics.byKind}
+        testID="explore-metrics-by-kind"
+        emphasizeLeading
+      />
+      <BucketSection
+        title="Top places"
+        buckets={metrics.byState}
+        testID="explore-metrics-by-state"
+      />
       <BucketSection title="By era" buckets={metrics.byEra} testID="explore-metrics-by-era" />
       <BucketSection
         title="Location precision"
         buckets={metrics.byPrecision}
         testID="explore-metrics-by-precision"
       />
+
+      {honesty.labeled > 0 ? (
+        <View
+          style={[styles.honestyNote, { borderColor: theme.border }]}
+          testID="explore-metrics-precision-note"
+          accessible
+          accessibilityRole="text"
+          accessibilityLabel={`${honesty.cityOrCoarser} city or coarser, ${honesty.sharperThanCity} sharper than city, of ${honesty.labeled} labeled`}
+        >
+          <Text variant="code" colorRole="inkMuted">
+            Precision honesty
+          </Text>
+          <Text variant="caption" colorRole="inkMuted">
+            {honesty.cityOrCoarser} city or coarser · {honesty.sharperThanCity} sharper than
+            city (of {honesty.labeled} labeled). Points never claim a sharper pin than stored
+            precision.
+          </Text>
+        </View>
+      ) : null}
 
       <View style={[styles.listSection, { borderTopColor: theme.border }]}>
         <Button
@@ -231,6 +305,7 @@ const styles = StyleSheet.create({
   },
   summaryBlock: {
     paddingTop: space['1'],
+    gap: space['1'],
   },
   statStrip: {
     flexDirection: 'row',
@@ -243,6 +318,13 @@ const styles = StyleSheet.create({
   },
   bars: {
     gap: space['2'],
+  },
+  honestyNote: {
+    gap: space['1'],
+    paddingVertical: space['2'],
+    paddingHorizontal: space['2'],
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: radius.sm,
   },
   listSection: {
     borderTopWidth: StyleSheet.hairlineWidth,

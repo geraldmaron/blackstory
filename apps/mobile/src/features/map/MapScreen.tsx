@@ -109,6 +109,11 @@ export type MapScreenProps = {
   readonly cameraCommand?: MapCameraCommand | null;
   /** Collapse camera animation to an instant jump (OS reduce-motion). */
   readonly reduceMotion?: boolean;
+  /**
+   * When false, skips the in-map attribution pill so a parent (Explore) can
+   * host it as a sibling under the bottom sheet. Default true (MOB-011).
+   */
+  readonly showAttribution?: boolean;
 };
 
 function boundsFromEvent(event: NativeSyntheticEvent<ViewStateChangeEvent>): Bbox | null {
@@ -153,6 +158,7 @@ export function MapScreen({
   selectedEntityId,
   cameraCommand,
   reduceMotion = false,
+  showAttribution = true,
 }: MapScreenProps) {
   const cameraRef = useRef<CameraRef>(null);
   const sourceRef = useRef<GeoJSONSourceRef>(null);
@@ -366,7 +372,7 @@ export function MapScreen({
           ) : null}
         </GeoJSONSource>
       </Map>
-      <MapAttribution />
+      {showAttribution ? <MapAttribution /> : null}
     </View>
   );
 }

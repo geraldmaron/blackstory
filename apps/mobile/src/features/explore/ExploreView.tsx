@@ -14,13 +14,23 @@
  * state, `MapScreen` renders the degraded `ErrorState` and the metrics sheet
  * remains fully mounted and interactive — a failed map never strands the reader.
  */
-import { useEffect, useMemo, useReducer, useRef } from 'react';
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { ApiStatusBanner, ScreenCanvas } from '@/ui';
-import { MapScreen, type MapFeatureCollection, type MapLoadState } from '@/features/map';
+import {
+  MapAttribution,
+  MapScreen,
+  MAP_ATTRIBUTION_ABOVE_SHEET_BOTTOM,
+  type MapFeatureCollection,
+  type MapLoadState,
+} from '@/features/map';
 import { DEMO_MAP_SOURCE } from '@/features/map';
 import { EntityPreviewSheet } from '@/features/map/explore';
-import { ExploreBottomSheet } from '@/features/map/explore/ExploreBottomSheet';
+import {
+  ExploreBottomSheet,
+  EXPLORE_SHEET_HALF,
+  EXPLORE_SHEET_PEEK,
+} from '@/features/map/explore/ExploreBottomSheet';
 import { ExploreFloatingChrome } from '@/features/map/explore/ExploreFloatingChrome';
 import { ExploreListChrome } from '@/features/map/explore/explore-chrome';
 import type { FilterState } from '@/app/_lib/route-params';
@@ -117,10 +127,18 @@ export function ExploreView({
   const listFeatures = useMemo(() => visibleFeatures(allFeatures, state), [allFeatures, state]);
   const matchCount = useMemo(() => countMatches(allFeatures, filters), [allFeatures, filters]);
   const metricsScopeLabel = state.viewport ? 'In view' : 'All records';
+  const [sheetSnapIndex, setSheetSnapIndex] = useState(EXPLORE_SHEET_PEEK);
+  // Attribution stays on the map at peek; hide at half/full so it never covers sheet content.
+  const attributionVisible = sheetSnapIndex <= EXPLORE_SHEET_PEEK;
 
   const selectedFeature = state.selectedId
     ? allFeatures.find((f) => f.entityId === state.selectedId) ?? null
     : null;
+
+  // Keep snap index aligned with AppBottomSheet's expanded prop (selection → half).
+  useEffect(() => {
+    setSheetSnapIndex(selectedFeature ? EXPLORE_SHEET_HALF : EXPLORE_SHEET_PEEK);
+  }, [selectedFeature]);
 
   const cameraCommand = state.cameraCommand
     ? { ...state.cameraCommand }
@@ -133,7 +151,7 @@ export function ExploreView({
     <ScreenCanvas edges={['top', 'left', 'right']}>
       <ApiStatusBanner />
 
-      <View style={styles.mapArea} testID="explore-map-area">
+      <View style={styles.mapArea} testID="explore-map-area" pointerEvents="box-none">
         <MapScreen
           source={source}
           loadState={loadState}
@@ -141,6 +159,7 @@ export function ExploreView({
           reduceMotion={reduceMotion}
           selectedEntityId={state.selectedId}
           cameraCommand={cameraCommand}
+          showAttribution={false}
           onViewportChange={(bbox) => dispatch({ type: 'viewportChanged', bbox })}
           onFeaturePress={(entityId) => {
             const feature = allFeatures.find((f) => f.entityId === entityId);
@@ -148,6 +167,12 @@ export function ExploreView({
               dispatch({ type: 'entitySelected', entityId, point: feature.coordinates });
             }
           }}
+        />
+
+        {/* Sibling of MapScreen so z-order is under sheet/chrome (not nested with MapLibre). */}
+        <MapAttribution
+          bottom={MAP_ATTRIBUTION_ABOVE_SHEET_BOTTOM}
+          visible={attributionVisible}
         />
 
         <ExploreFloatingChrome
@@ -159,7 +184,11 @@ export function ExploreView({
           onNationalView={() => dispatch({ type: 'presetRequested', preset: 'national' })}
         />
 
-        <ExploreBottomSheet hasSelection={Boolean(selectedFeature)} reduceMotion={reduceMotion}>
+        <ExploreBottomSheet
+          hasSelection={Boolean(selectedFeature)}
+          reduceMotion={reduceMotion}
+          onSnapIndexChange={setSheetSnapIndex}
+        >
           {selectedFeature ? (
             <EntityPreviewSheet
               feature={selectedFeature}
@@ -170,6 +199,7 @@ export function ExploreView({
             <ExploreListChrome testID="explore-metrics-area">
               <ExploreMetricsDashboard
                 features={listFeatures}
+                nationalFeatures={state.viewport ? allFeatures : undefined}
                 scopeLabel={metricsScopeLabel}
                 selectedId={state.selectedId}
                 reduceMotion={reduceMotion}
