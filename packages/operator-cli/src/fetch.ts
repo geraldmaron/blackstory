@@ -76,16 +76,16 @@ export const nodePinnedTransport: PinnedTransport = (pinnedRequest) =>
 export async function parseTextOnlyHtml(
   content: Uint8Array,
   contentType: string,
-): Promise<{ safe: boolean; indicators: any[]; extractedText: string }> {
+): Promise<{ safe: boolean; indicators: string[]; extractedText: string }> {
   const text = new TextDecoder('utf-8', { fatal: false }).decode(content);
-  const indicators: any[] = [];
+  const indicators: string[] = [];
   if (text.includes('EICAR-STANDARD-ANTIVIRUS-TEST-FILE')) {
     indicators.push('eicar_test_signature');
   }
   const prefix = content.subarray(0, 4);
   if (
-    prefix[0] === 0x4d && prefix[1] === 0x5a || // MZ header
-    prefix[0] === 0x7f && prefix[1] === 0x45 && prefix[2] === 0x4c && prefix[3] === 0x46 // ELF header
+    (prefix[0] === 0x4d && prefix[1] === 0x5a) || // MZ header
+    (prefix[0] === 0x7f && prefix[1] === 0x45 && prefix[2] === 0x4c && prefix[3] === 0x46) // ELF header
   ) {
     indicators.push('executable_magic');
   }

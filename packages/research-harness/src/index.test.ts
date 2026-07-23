@@ -11,7 +11,6 @@ import {
 } from './core/adjacency.js';
 import {
   enrichSubjectCandidate,
-  adjudicateRelationship,
   type EnrichmentBridgeClient,
 } from './enrichment/enrichment-bridge.js';
 

@@ -68,6 +68,8 @@ import {
   adjudicateRelationship,
   type HarnessRawSubject,
   type EnrichmentBridgeClient,
+  type EnrichedCandidate,
+  type AdjudicatedRelationship,
 } from '@repo/research-harness';
 import { assertPostgresOpsDataSource, editorialCatalogFromError } from './ops-data-source-gate.js';
 
@@ -1038,8 +1040,14 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
 
         const overlaps = findSpatialTemporalOverlaps(rawSubjects, { maxDistanceMeters: 10000 });
 
-        let enrichedCandidates: any[] = [];
-        let adjudicatedRelations: any[] = [];
+        type EnrichmentFailure = { readonly id: string; readonly error: string };
+        type RelationFailure = {
+          readonly subjectAId: string;
+          readonly subjectBId: string;
+          readonly error: string;
+        };
+        const enrichedCandidates: Array<EnrichedCandidate | EnrichmentFailure> = [];
+        const adjudicatedRelations: Array<AdjudicatedRelationship | RelationFailure> = [];
 
         if (flags.booleans.has('--enrich')) {
           const providerName = (optionalFlag(flags, '--provider') ?? 'mock') as
