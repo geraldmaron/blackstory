@@ -12,7 +12,7 @@
  * render as polygon geometry, never as a point.
  */
 import { redactLocationForPublic } from '@repo/security/redaction';
-import { sanitizePublicProseText } from '@repo/domain';
+import { sanitizePublicProseText } from '@repo/domain/editorial';
 import {
   buildMapSource,
   type MapCountyAggregate,

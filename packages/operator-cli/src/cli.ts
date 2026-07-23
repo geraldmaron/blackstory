@@ -13,7 +13,7 @@
  */
 import { appendFileSync, readFileSync, writeFileSync } from 'node:fs';
 import type { RelationshipRole, RelationshipType } from '@repo/domain';
-import type { AtomicStore } from '@repo/data-access';
+import { getOpsPostgresPool, type AtomicStore } from '@repo/data-access';
 import type { SafeFetchDependencies } from '@repo/security/url-safety';
 import {
   parseLeadsFromText,
@@ -951,8 +951,32 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
           .split(',')
           .map((c) => c.trim().toLowerCase());
         const query = optionalFlag(flags, '--query') ?? theme;
+        const urlToScrape = optionalFlag(flags, '--url');
 
         let rawSubjects: HarnessRawSubject[] = [];
+
+        // 1. Live crawl / scrape if URL supplied
+        if (urlToScrape) {
+          const fetchResult = await runQuickAddFetch(
+            urlToScrape,
+            deps.fetchDependencies ?? createNodeSafeFetchDependencies(),
+          );
+          if (fetchResult.ok) {
+            const text = fetchResult.parser.extractedText;
+            const firstLine = text.split(/(?<=[.!?])\s|\n/u)[0]?.trim() ?? '';
+            const title = firstLine.slice(0, 80) || 'Scraped Live Page';
+            rawSubjects.push({
+              id: `scraped:${Buffer.from(urlToScrape).toString('base64').slice(0, 12)}`,
+              connectorKind: 'dpla',
+              title: title.trim(),
+              description: text.trim().slice(0, 1200),
+              cites: [urlToScrape],
+              rawRecord: { scrapedUrl: urlToScrape, fullTextLength: text.length },
+            });
+          } else {
+            stderr(`Failed to scrape live URL "${urlToScrape}": ${fetchResult.reason}\n`);
+          }
+        }
 
         if (connectorList.includes('nps_network_to_freedom')) {
           const csvData = `id,name,abstract,latitude,longitude,address,city,county,state,source_url
@@ -984,6 +1008,33 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
           ];
           rawSubjects = [...rawSubjects, ...fetchDplaItems(mockDpla, { query })];
         }
+
+        // 2. Fetch existing catalog profiles from Postgres for deduplication check
+        let existingProfiles: { name: string; entity_id: string }[] = [];
+        try {
+          const pool = getOpsPostgresPool(process.env);
+          const searchResult = await pool.query<{ name: string; entity_id: string }>(
+            `SELECT name, entity_id FROM bb_public.search_index LIMIT 2000`
+          );
+          existingProfiles = searchResult.rows;
+        } catch (err) {
+          stderr(`Warning: Database connection failed (profiles skipped): ${String(err)}\n`);
+        }
+
+        const deduplicatedSubjects = rawSubjects.map((subject) => {
+          const cleanName = subject.title.toLowerCase().trim();
+          const matched = existingProfiles.find(
+            (p) => {
+              const pName = p.name ? p.name.toLowerCase().trim() : '';
+              return pName === cleanName || pName.startsWith(cleanName) || cleanName.startsWith(pName);
+            }
+          );
+          return {
+            ...subject,
+            existingEntityId: matched ? matched.entity_id : null,
+            isDuplicate: !!matched,
+          };
+        });
 
         const overlaps = findSpatialTemporalOverlaps(rawSubjects, { maxDistanceMeters: 10000 });
 
@@ -1039,8 +1090,8 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
           theme,
           metro,
           connectorList,
-          rawSubjectsCount: rawSubjects.length,
-          rawSubjects,
+          rawSubjectsCount: deduplicatedSubjects.length,
+          rawSubjects: deduplicatedSubjects,
           overlapsCount: overlaps.length,
           overlaps,
           ...(flags.booleans.has('--enrich')

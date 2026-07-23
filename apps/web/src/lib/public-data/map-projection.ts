@@ -7,11 +7,11 @@
 
 import {
   deriveCatalogEntityStatus,
-  sanitizePublicProseText,
   type EntityStatusValue,
   type NotabilityCriterion,
   type StatusHistoryEntry,
 } from '@repo/domain';
+import { sanitizePublicProseText } from '@repo/domain/editorial';
 import { deriveEraBuckets, isDatePrecision } from '@repo/domain/era';
 import { findUsStateForPoint } from '@repo/domain/map/geography';
 import { type PublicEntityView } from '../../data/public-seed';

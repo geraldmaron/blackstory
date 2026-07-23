@@ -13,7 +13,7 @@
 
 import React from 'react';
 import { Card, Citation, Confidence, Notice } from '@repo/ui';
-import { sanitizePublicProseText } from '@repo/domain';
+import { sanitizePublicProseText } from '@repo/domain/editorial';
 import { formatIsoDate, humanizeToken, type EvidenceClaimView } from '../../lib/evidence';
 
 export type EvidenceCardProps = {

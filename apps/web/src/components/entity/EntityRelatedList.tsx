@@ -6,7 +6,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { sanitizePublicProseText } from '@repo/domain';
+import { sanitizePublicProseText } from '@repo/domain/editorial';
 import type { PublicEntityView, RelatedNeighborView } from '../../data/public-seed';
 import { KindBadge } from '../map-experience';
 import { EntityLinkDiscoveryHint, humanizeEntityId } from './EntityLink';

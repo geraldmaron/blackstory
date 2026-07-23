@@ -3,7 +3,7 @@
  * so `runPublicSearch` can consume the written index without rebuilding from entity scans.
  */
 import type { NotabilityBasisRecord, PublicSearchIndexDoc } from '@repo/domain';
-import { sanitizePublicProseText } from '@repo/domain';
+import { sanitizePublicProseText } from '@repo/domain/editorial';
 import type { PublicSearchProjectionDoc } from '@repo/schemas';
 
 export function mapPublicSearchProjection(doc: PublicSearchProjectionDoc): PublicSearchIndexDoc {

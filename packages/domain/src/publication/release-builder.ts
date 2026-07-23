@@ -43,7 +43,7 @@ import {
   type NotabilityCriterion,
 } from '../entity-status.js';
 import { deriveCatalogEntityStatus } from '../derive-catalog-status.js';
-import { sanitizePublicProseText } from './public-render.js';
+import { sanitizePublicProseText } from '../editorial/prose-links.js';
 import { evaluateNotabilityGate } from '../relevance/notability-gate.js';
 import { evaluateFactPublishGate } from '../facts/publish-gate.js';
 import type { FactCitation } from '../facts/citation.js';

@@ -3,7 +3,7 @@
  * fields stripped before anything is emitted to HTML head tags or link unfurlers.
  */
 import type { Metadata } from 'next';
-import { sanitizePublicProseText } from '@repo/domain';
+import { sanitizePublicProseText } from '@repo/domain/editorial';
 import {
   sanitizePreviewText,
   stripProtectedFields,
