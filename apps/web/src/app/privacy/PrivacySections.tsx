@@ -140,8 +140,8 @@ export function PrivacySections() {
             every future feature.
           </p>
           <p className="ds-privacy__follow">
-            Data controller: <strong>[Legal entity — owner]</strong>. The legal entity that signs
-            store developer agreements must match the name published here before public app store
+            Data controller: <strong>Gerald Dagher</strong> (individual). The name on Apple and
+            Google developer agreements must match the name published here before public app store
             submission.
           </p>
           <p className="ds-privacy__meta">Last updated: July 2026</p>
@@ -300,7 +300,7 @@ export function PrivacySections() {
           <p className="ds-section__lede">
             Material changes to this policy will be posted on this page with an updated date. For
             product questions or privacy requests, contact{' '}
-            <strong>[Support contact — owner to set]</strong> or use the{' '}
+            <a href="mailto:me@geralddagher.com">me@geralddagher.com</a> or use the{' '}
             <Link href="/support">support page</Link>.
           </p>
         </section>

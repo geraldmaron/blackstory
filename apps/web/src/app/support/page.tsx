@@ -85,12 +85,12 @@ export default function SupportPage() {
           </h2>
           <p className="ds-section__lede">
             For issues that do not fit the corrections form — account of operation questions, privacy
-            requests, or accessibility barriers — use the contact below once the owner publishes it.
+            requests, or accessibility barriers — email the contact below.
           </p>
           <div className="ds-support__contact">
             <p className="ds-support__contact-label">Support contact</p>
             <p className="ds-support__contact-value">
-              <strong>[Support contact — owner to set]</strong>
+              <a href="mailto:me@geralddagher.com">me@geralddagher.com</a>
             </p>
           </div>
           <p className="ds-support__follow">

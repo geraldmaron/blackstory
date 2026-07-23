@@ -12,18 +12,20 @@ Owner-ordered checklist. Complete in sequence where noted; do not mark items don
 ## Before you start
 
 - [ ] Read `docs/mobile/decisions/mobile-identity.md` (proposed bundle IDs, URLs, custody rules).
-- [ ] Confirm monthly spend ceiling with project budget posture (free-tier-first; kill-switch if EAS usage spikes).
-- [ ] Decide **individual vs organization** Apple/Google developer accounts (org may require D-U-N-S; budget 1–2+ weeks).
+- [x] Confirm monthly spend ceiling with project budget posture (free-tier-first; kill-switch if EAS usage spikes).
+  - **Owner 2026-07-22:** EAS ≤ **$10/mo** beyond Supabase; stay on Expo **Free** plan (15 iOS + 15 Android builds/mo). Do not subscribe Starter ($19) without raising the ceiling. Alert recipient: `me@geralddagher.com`.
+- [x] Decide **individual vs organization** Apple/Google developer accounts (org may require D-U-N-S; budget 1–2+ weeks).
+  - **Owner 2026-07-22:** **individual** for both.
 
 ---
 
 ## 1. Apple Developer Program
 
 - [ ] Enroll at [developer.apple.com/programs](https://developer.apple.com/programs/) under the legal entity that will sign store agreements.
+  - **Owner 2026-07-22:** individual; legal name **Gerald Dagher**; Team ID **`4Q2XU7D33G`** confirmed (already in `eas.json` + AASA).
 - [ ] Enable **phishing-resistant MFA** (hardware security key or platform passkey) on the Apple ID that owns the account.
 - [ ] Record custody: primary owner, recovery contact, and where account recovery codes live (1Password item — not in repo).
-- [ ] If **organization** account: complete D-U-N-S verification before expecting TestFlight uploads.
-- [ ] Note **Team ID** (needed later for `apple-app-site-association` / universal links — MOB-008/MOB-020).
+- [x] Note **Team ID** (needed later for `apple-app-site-association` / universal links — MOB-008/MOB-020) — `4Q2XU7D33G`.
 
 **Evidence to attach** (bead note or secure vault reference): enrolled entity name, Team ID, enrollment date.
 
@@ -108,8 +110,8 @@ Store listings require live HTTPS URLs on the production domain.
 
 - [x] Engineering: `/support` and `/privacy` routes exist in `apps/web` (bead `repo-tbpa`).
 - [ ] Deploy `feat/mobile-launch` (or merge) so both URLs return **200** on `blackbook.app`.
-- [ ] Replace `[Legal entity — owner]` / `[Support contact — owner to set]` placeholders with the Apple/Google legal entity and a real contact (#1–2).
-- [ ] Privacy policy **data controller** name must match the legal entity on Apple/Google agreements (#1–2).
+- [x] Replace legal-entity / support-contact placeholders — **Gerald Dagher** / `me@geralddagher.com` (2026-07-22).
+- [x] Privacy policy **data controller** name matches individual Apple/Google agreements (Gerald Dagher).
 - [ ] Verify both URLs return **200** on production (link crawler / manual check) before MOB-020 store metadata entry.
 
 **Do not** point store listings at `/methodology` or other editorial routes as a privacy-policy substitute unless counsel approves.
@@ -125,8 +127,9 @@ Store listings require live HTTPS URLs on the production domain.
 | EAS Build / Submit | Usage or subscription tier | Set monthly $ ceiling + Expo billing alert |
 
 - [ ] Document approved **monthly EAS spend ceiling** and who receives alerts.
-- [ ] Document **annual Apple renewal** owner.
-- [ ] Align with ADR-023 free-tier posture (OTA code signing is a paid upgrade — accepted risk until budget allows).
+  - **Ceiling:** $10 USD/mo beyond Supabase. **Plan:** Expo Free only. **Alerts:** `me@geralddagher.com`.
+- [ ] Document **annual Apple renewal** owner — Gerald Dagher (individual).
+- [x] Align with ADR-023 free-tier posture (OTA code signing is a paid upgrade — accepted risk until budget allows).
 
 **Evidence**: written ceiling amount + alert recipient (bead note).
 

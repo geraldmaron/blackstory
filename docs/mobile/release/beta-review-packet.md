@@ -37,7 +37,7 @@ Packet for TestFlight, Google Play closed/internal testing, and eventual store r
 | Support URL | `https://blackbook.app/support` | **In repo** on this branch; production still redirects to `/lander` (verified 2026-07-22) |
 | Privacy policy URL | `https://blackbook.app/privacy` | **In repo** on this branch; production still redirects to `/lander` (verified 2026-07-22) |
 | Marketing URL (optional) | `https://blackbook.app` | Live (web app; currently lander-gated) |
-| Contact email (store-facing) | `[OWNER — e.g. support@blackbook.app]` |
+| Contact email (store-facing) | `me@geralddagher.com` |
 
 **Blocker**: MOB-020 cannot pass link validation until `/support` and `/privacy` return real HTML 200 on production **and** `[Legal entity — owner]` / `[Support contact — owner to set]` placeholders are replaced.
 
@@ -206,7 +206,7 @@ Special instructions:
 - Support: https://blackbook.app/support (must be live before submit).
 - Privacy: https://blackbook.app/privacy (must be live before submit).
 
-Contact for review questions: [OWNER name, email, phone].
+Contact for review questions: Gerald Dagher, me@geralddagher.com.
 ```
 
 ---

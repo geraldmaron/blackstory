@@ -42,6 +42,6 @@ Do **not** paste into chat. Open the inventory item for full steps:
 In 1Password → vault **geralddagher-development**:
 
 1. Open **BlackStory — Apple Developer (Team ID + custody)**  
-   Replace every `PENDING` (Team ID, Individual/Org, legal entity, ASC preview app, bundle ID, trademark).
+   Set: Team ID `4Q2XU7D33G`, account type Individual, legal entity Gerald Dagher, support `me@geralddagher.com`.
 2. Open **BlackStory — EAS (project metadata)** after `eas init`  
-   Fill org slug + project ID + spend ceiling.
+   Fill org slug + project ID; monthly spend ceiling **10**; alert email `me@geralddagher.com`. Stay on Expo Free plan.
