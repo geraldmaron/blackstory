@@ -43,6 +43,7 @@ function makeFakeRuntime(): AppRuntime {
       subscribe: () => () => {},
     },
     run: async (fn) => fn(new AbortController().signal),
+    lastBootstrapSync: null,
   };
 }
 
@@ -81,7 +82,7 @@ describe('AppProviders', () => {
     });
     expect(warn).toHaveBeenCalledWith(
       expect.stringContaining('AppProviders init failed'),
-      expect.any(Error),
+      expect.anything(),
     );
     warn.mockRestore();
   });

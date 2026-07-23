@@ -5,8 +5,8 @@
  * follows) using MOB-007's existing `Image`/`EntityMark`/`Text` primitives — no new visual
  * primitive is introduced.
  */
-import { View } from 'react-native';
-import { Image, Text, space } from '@/ui';
+import { StyleSheet, View } from 'react-native';
+import { Image, LiftedSurface, Text, space } from '@/ui';
 import type { EntityMarkShape } from '@/ui';
 import { humanizeToken } from '../format';
 import type { Entity, EntityKind } from '../types';
@@ -29,9 +29,10 @@ export type MastMediaProps = {
 export function MastMedia({ entity }: MastMediaProps) {
   const shape = shapeForKind(entity.kind);
   const kindLabel = humanizeToken(entity.kind);
+  const metaLine = [kindLabel, entity.jurisdictionLabel].filter(Boolean).join(' · ');
 
   return (
-    <View style={{ gap: space['2'] }}>
+    <View style={styles.container}>
       <Image
         source={entity.primaryImage?.url}
         alt={entity.primaryImage?.alt ?? entity.displayName}
@@ -43,12 +44,26 @@ export function MastMedia({ entity }: MastMediaProps) {
           {entity.primaryImage.credit}
         </Text>
       ) : null}
-      <Text variant="caption" colorRole="inkMuted">
-        {kindLabel}
-        {entity.jurisdictionLabel ? ` · ${entity.jurisdictionLabel}` : ''}
-      </Text>
-      <SectionHeading level={1}>{entity.displayName}</SectionHeading>
-      {entity.summary ? <Text variant="body">{entity.summary}</Text> : null}
+      <LiftedSurface gradient="surfaceLift" shadow="md" paddingKey="3" contentStyle={styles.identityBlock}>
+        <Text variant="code" colorRole="inkMuted">
+          {metaLine}
+        </Text>
+        <SectionHeading level={1}>{entity.displayName}</SectionHeading>
+        {entity.summary ? (
+          <Text variant="bodySmall" colorRole="inkMuted">
+            {entity.summary}
+          </Text>
+        ) : null}
+      </LiftedSurface>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    gap: space['2'],
+  },
+  identityBlock: {
+    gap: space['2'],
+  },
+});

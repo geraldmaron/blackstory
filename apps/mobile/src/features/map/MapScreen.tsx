@@ -197,9 +197,8 @@ export function MapScreen({
           onPress={handleSourcePress}
         >
           {clustering ? (
-            // Dignity-safe cluster bubble: a single flat Copper Pin color at a
-            // fixed radius — never a density-keyed color ramp or heatmap. Count is
-            // conveyed by the separate text label, not by color or a size ramp.
+            // Dignity-safe cluster bubble: flat Copper Pin color; count is conveyed
+            // by size steps and the text label — never a density-keyed color ramp.
             <Layer
               id="entity-clusters"
               type="circle"
@@ -209,7 +208,17 @@ export function MapScreen({
                 circleOpacity: 0.85,
                 circleStrokeColor: ENTITY_POINT_LAYER_STYLE.circleStrokeColor,
                 circleStrokeWidth: 1,
-                circleRadius: 14,
+                circleRadius: [
+                  'step',
+                  ['get', 'point_count'],
+                  12,
+                  10,
+                  14,
+                  25,
+                  17,
+                  50,
+                  20,
+                ],
               }}
             />
           ) : null}

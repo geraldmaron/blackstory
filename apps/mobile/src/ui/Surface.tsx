@@ -1,7 +1,7 @@
 /**
- * Themed flat container. The brand system is flat by design (elevation is
- * "none" everywhere, matching the web design system — hairline borders carry
- * separation, not shadows); Surface never grows a shadow prop.
+ * Themed flat container. Web and logo art stay flat; mobile siblings may opt
+ * into controlled lift via `useShadowStyle` / `getShadowStyle` from tokens.
+ * Surface itself stays border-first and never applies shadows by default.
  *
  * Forwards its ref to the underlying `View` (MOB-017) so a caller can drive assistive-tech
  * focus onto a Surface directly — e.g. `useAccessibilityFocus`'s `ref` — without needing a

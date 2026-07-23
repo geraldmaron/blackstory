@@ -78,6 +78,30 @@ describe('ContentRenderer', () => {
     expect(getByText('Up to date')).toBeTruthy();
   });
 
+  it('hides the fresh "up to date" notice in longform presentation', async () => {
+    const { queryByText } = await renderPage(BASE_PAGE, {
+      presentation: 'longform',
+      cached: { fetchedAt: Date.now(), degraded: false },
+    });
+    expect(queryByText('Up to date')).toBeNull();
+  });
+
+  it('still shows offline cache notice in longform presentation', async () => {
+    const { getByText } = await renderPage(BASE_PAGE, {
+      presentation: 'longform',
+      cached: { fetchedAt: Date.now() - 5000, degraded: true },
+    });
+    expect(getByText('Showing cached copy (offline)')).toBeTruthy();
+  });
+
+  it('uses editorial body text in longform presentation', async () => {
+    const { getByText } = await renderPage(BASE_PAGE, { presentation: 'longform' });
+    const paragraph = getByText('Body paragraph one.');
+    expect(paragraph.props.style).toEqual(
+      expect.arrayContaining([expect.objectContaining({ fontSize: 18, lineHeight: 30 })]),
+    );
+  });
+
   it('shows a stale-legal-version affordance and fires onViewCurrent when pressed', async () => {
     const onViewCurrent = jest.fn();
     const { getByText } = await renderPage(BASE_PAGE, { versionStale: true, onViewCurrent });

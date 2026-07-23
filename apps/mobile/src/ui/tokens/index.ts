@@ -2,8 +2,12 @@
  * Hand-written barrel + theme resolution over the generated brand tokens.
  * This file is NOT generated — it is safe to edit. The generated/*.ts files
  * it re-exports are not (see their headers).
+ *
+ * Theme resolution is dark-first: when the OS color scheme is null or
+ * unspecified, consumers resolve to the dark palette (see resolveThemeName).
  */
-import { useColorScheme } from 'react-native';
+import { useColorScheme, type ColorSchemeName } from 'react-native';
+import type { ViewStyle } from 'react-native';
 import {
   brandCore,
   confidenceColors,
@@ -28,6 +32,13 @@ import {
   type TypeScaleRole,
 } from './generated/typography.generated';
 import { logoConstraints } from './generated/logo.generated';
+import {
+  getGradient,
+  getShadowStyle,
+  type GradientDefinition,
+  type GradientName,
+  type ShadowLevel,
+} from './elevation';
 
 export {
   brandCore,
@@ -42,8 +53,13 @@ export {
   fontFamilies,
   typeScale,
   logoConstraints,
+  getGradient,
+  getShadowStyle,
 };
 export type {
+  GradientDefinition,
+  GradientName,
+  ShadowLevel,
   ConfidenceLevel,
   StatusName,
   ThemeName,
@@ -54,10 +70,27 @@ export type {
   TypeScaleRole,
 };
 
-/** Resolves the active theme's role palette from the system color scheme. Defaults to light. */
+/**
+ * Resolves theme from an OS color scheme value. Dark-first: only an explicit
+ * `'light'` scheme selects the light palette; null/undefined/dark → dark.
+ */
+export function resolveThemeName(scheme: ColorSchemeName | null | undefined): ThemeName {
+  return scheme === 'light' ? 'light' : 'dark';
+}
+
+/** Resolves the active theme name from the system color scheme (dark-first default). */
 export function useThemeName(): ThemeName {
-  const scheme = useColorScheme();
-  return scheme === 'dark' ? 'dark' : 'light';
+  return resolveThemeName(useColorScheme());
+}
+
+/** Shadow style for the active theme — spread onto any View that needs controlled lift. */
+export function useShadowStyle(level: ShadowLevel): ViewStyle {
+  return getShadowStyle(level, useThemeName());
+}
+
+/** Gradient preset for the active theme — consumed by `BrandLinearGradient` / `GradientPanel`. */
+export function useGradient(name: GradientName): GradientDefinition {
+  return getGradient(name, useThemeName());
 }
 
 /** Resolves the full semantic color-role palette for the active color scheme. */

@@ -13,20 +13,32 @@
  * push), never an inline expansion of this list.
  */
 import { View } from 'react-native';
-import { EmptyState, ListRow, Text, space } from '@/ui';
+import { EmptyState, ListRow, LiftedSurface, NavIcon, navIconForEntityKind, Text, space } from '@/ui';
 import { RECORD_GAP_COPY, SECTION_HEADINGS } from '../copy';
 import { humanizeToken } from '../format';
 import type { RelatedNeighbor } from '../types';
 import { SectionHeading } from './SectionHeading';
 
-function NeighborRow({ neighbor, onPress }: { readonly neighbor: RelatedNeighbor; readonly onPress?: () => void }) {
+function NeighborRow({
+  neighbor,
+  onPress,
+  showDivider = true,
+}: {
+  readonly neighbor: RelatedNeighbor;
+  readonly onPress?: () => void;
+  readonly showDivider?: boolean;
+}) {
   const subtitle =
     neighbor.summary.trim().length > 0 ? neighbor.summary : `${humanizeToken(neighbor.relationType)} connection to this record.`;
   return (
     <ListRow
+      density="compact"
       title={neighbor.displayName}
       subtitle={`${humanizeToken(neighbor.kind)} · ${humanizeToken(neighbor.relationType)} — ${subtitle}`}
+      leading={<NavIcon name={navIconForEntityKind(neighbor.kind)} size={20} />}
+      showChevron
       onPress={onPress}
+      showDivider={showDivider}
     />
   );
 }
@@ -45,15 +57,16 @@ export function RelatedSection({ relatedNeighbors, continueLearning, onOpenEntit
         {relatedNeighbors.length === 0 ? (
           <EmptyState title={RECORD_GAP_COPY.related.title} description={RECORD_GAP_COPY.related.body} />
         ) : (
-          <View>
+          <LiftedSurface gradient="panelAtmosphere" shadow="sm">
             {relatedNeighbors.map((neighbor, index) => (
               <NeighborRow
                 key={`${neighbor.id}_${neighbor.relationType}_${index}`}
                 neighbor={neighbor}
                 onPress={onOpenEntity ? () => onOpenEntity(neighbor.id) : undefined}
+                showDivider={index < relatedNeighbors.length - 1}
               />
             ))}
-          </View>
+          </LiftedSurface>
         )}
       </View>
 
@@ -63,15 +76,16 @@ export function RelatedSection({ relatedNeighbors, continueLearning, onOpenEntit
           <Text variant="bodySmall" colorRole="inkMuted">
             Nearby records one step further in the published graph — keep learning without dead ends.
           </Text>
-          <View>
+          <LiftedSurface gradient="panelAtmosphere" shadow="sm">
             {continueLearning.map((neighbor, index) => (
               <NeighborRow
                 key={`cl_${neighbor.id}_${neighbor.relationType}_${index}`}
                 neighbor={neighbor}
                 onPress={onOpenEntity ? () => onOpenEntity(neighbor.id) : undefined}
+                showDivider={index < continueLearning.length - 1}
               />
             ))}
-          </View>
+          </LiftedSurface>
         </View>
       ) : null}
     </View>

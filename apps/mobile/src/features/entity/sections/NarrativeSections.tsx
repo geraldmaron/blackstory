@@ -7,7 +7,7 @@
  * by construction, not by any escaping this module has to perform itself.
  */
 import { View } from 'react-native';
-import { EmptyState, Text, space } from '@/ui';
+import { EmptyState, LiftedSurface, Text, space } from '@/ui';
 import { RECORD_GAP_COPY, SECTION_HEADINGS } from '../copy';
 import { MAX_EXTENDED_NARRATIVE_CHARS } from '../types';
 import type { Entity } from '../types';
@@ -22,35 +22,35 @@ export function NarrativeSections({ entity }: NarrativeSectionsProps) {
   const narrativeTruncated = narrative !== undefined && narrative.length >= MAX_EXTENDED_NARRATIVE_CHARS;
 
   return (
-    <View style={{ gap: space['6'] }}>
-      <View style={{ gap: space['2'] }}>
+    <View style={{ gap: space['3'] }}>
+      <LiftedSurface gradient="panelAtmosphere" shadow="sm" paddingKey="3" contentStyle={{ gap: space['2'] }}>
         <SectionHeading level={2}>{SECTION_HEADINGS.relevance}</SectionHeading>
         {entity.relevanceExplanation.trim().length > 0 ? (
           <Text variant="body">{entity.relevanceExplanation}</Text>
         ) : (
           <EmptyState title={RECORD_GAP_COPY.relevance.title} description={RECORD_GAP_COPY.relevance.body} />
         )}
-      </View>
+      </LiftedSurface>
 
-      <View style={{ gap: space['2'] }}>
+      <LiftedSurface gradient="panelAtmosphere" shadow="sm" paddingKey="3" contentStyle={{ gap: space['2'] }}>
         <SectionHeading level={2}>{SECTION_HEADINGS.context}</SectionHeading>
         {entity.historicalContext.trim().length > 0 ? (
-          <Text variant="body">{entity.historicalContext}</Text>
+          <Text variant="editorial">{entity.historicalContext}</Text>
         ) : (
           <EmptyState title={RECORD_GAP_COPY.context.title} description={RECORD_GAP_COPY.context.body} />
         )}
-      </View>
+      </LiftedSurface>
 
       {narrative ? (
-        <View style={{ gap: space['2'] }}>
+        <LiftedSurface gradient="canvasDepth" shadow="sm" paddingKey="3" contentStyle={{ gap: space['2'] }}>
           <SectionHeading level={2}>{SECTION_HEADINGS.furtherReading}</SectionHeading>
-          <Text variant="body">{narrative}</Text>
+          <Text variant="editorial">{narrative}</Text>
           {narrativeTruncated ? (
             <Text variant="caption" colorRole="inkMuted">
               This passage has been shortened for display.
             </Text>
           ) : null}
-        </View>
+        </LiftedSurface>
       ) : null}
     </View>
   );

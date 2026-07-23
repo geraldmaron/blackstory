@@ -5,12 +5,12 @@
  * (multi-page sections).
  */
 import { ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { EmptyState, ErrorState } from '@/ui';
+import { EmptyState, ErrorState, ScreenCanvas, space } from '@/ui';
 import { normalizeTypedContentPage } from './content-blocks';
 import type { CatalogSectionId } from './content-catalog';
 import { ContentRenderer } from './ContentRenderer';
 import { isContentVersionStale } from './legal-version';
+import { isLongformSection } from './story-index';
 import { useContentPage } from './useContentPage';
 
 export interface ContentPageScreenProps {
@@ -27,10 +27,17 @@ export interface ContentPageScreenProps {
 
 export function ContentPageScreen({ section, slug, currentContentVersion }: ContentPageScreenProps) {
   const state = useContentPage(section, slug);
+  const longform = isLongformSection(section);
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['left', 'right', 'bottom']}>
-      <ScrollView contentContainerStyle={{ padding: 16 }}>
+    <ScreenCanvas edges={longform ? ['left', 'right', 'bottom'] : ['left', 'right', 'bottom']}>
+      <ScrollView
+        contentContainerStyle={
+          longform
+            ? { paddingHorizontal: space['5'], paddingVertical: space['6'], paddingBottom: space['12'] }
+            : { padding: space['4'] }
+        }
+      >
         {state.status === 'loading' ? (
           <EmptyState title="Loading…" />
         ) : state.status === 'error' ? (
@@ -56,6 +63,7 @@ export function ContentPageScreen({ section, slug, currentContentVersion }: Cont
                 skippedSections={skippedSections}
                 sources={state.value.sources}
                 requiresCitation={state.value.requiresCitation}
+                presentation={longform ? 'longform' : 'document'}
                 cached={{ fetchedAt: state.fetchedAt, degraded: state.degraded }}
                 versionStale={versionStale}
               />
@@ -63,6 +71,6 @@ export function ContentPageScreen({ section, slug, currentContentVersion }: Cont
           })()
         )}
       </ScrollView>
-    </SafeAreaView>
+    </ScreenCanvas>
   );
 }

@@ -14,11 +14,19 @@
  * "home" screen web has no equivalent of.
  */
 import { Tabs } from 'expo-router';
+import { Platform, type ColorValue } from 'react-native';
 
-import { useThemeColors } from '@/ui';
+import { NavIcon, type NavIconName, useShadowStyle, useThemeColors } from '@/ui';
+
+function tabIcon(name: NavIconName) {
+  return ({ size, focused }: { color: ColorValue; size: number; focused: boolean }) => (
+    <NavIcon name={name} size={size} selected={focused} />
+  );
+}
 
 export default function TabLayout() {
   const theme = useThemeColors();
+  const tabShadow = useShadowStyle('sm');
 
   return (
     <Tabs
@@ -26,14 +34,36 @@ export default function TabLayout() {
         headerShown: false,
         tabBarActiveTintColor: theme.accent,
         tabBarInactiveTintColor: theme.inkMuted,
-        tabBarStyle: { backgroundColor: theme.surface, borderTopColor: theme.border },
+        tabBarStyle: {
+          backgroundColor: theme.surface,
+          borderTopColor: theme.border,
+          borderTopWidth: 1,
+          ...tabShadow,
+          ...(Platform.OS === 'android' ? { elevation: tabShadow.elevation ?? 2 } : {}),
+        },
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '500',
+        },
       }}
     >
       <Tabs.Screen name="index" options={{ href: null }} />
-      <Tabs.Screen name="explore" options={{ title: 'Explore' }} />
-      <Tabs.Screen name="search" options={{ title: 'Search' }} />
-      <Tabs.Screen name="learn" options={{ title: 'Learn' }} />
-      <Tabs.Screen name="more" options={{ title: 'More' }} />
+      <Tabs.Screen
+        name="explore"
+        options={{ title: 'Explore', tabBarIcon: tabIcon('explore') }}
+      />
+      <Tabs.Screen
+        name="search"
+        options={{ title: 'Search', tabBarIcon: tabIcon('search') }}
+      />
+      <Tabs.Screen
+        name="learn"
+        options={{ title: 'Stories', tabBarIcon: tabIcon('stories') }}
+      />
+      <Tabs.Screen
+        name="more"
+        options={{ title: 'More', tabBarIcon: tabIcon('more') }}
+      />
     </Tabs>
   );
 }

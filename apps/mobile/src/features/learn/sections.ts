@@ -34,8 +34,8 @@ export const LEARN_SECTIONS: readonly LearnMoreSectionRow[] = [
   },
   {
     routeId: 'topics',
-    title: 'Topics',
-    subtitle: 'Long-form narrative features (web: /topics → /stories)',
+    title: 'Stories',
+    subtitle: 'Long-form narratives pinned to place and evidence (web: /stories)',
     catalogSection: 'topics',
   },
   {

@@ -19,7 +19,8 @@ import { radius, space, useThemeColors } from './tokens';
 
 const MIN_TOUCH_TARGET = 44;
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'accent';
+export type ButtonDensity = 'default' | 'compact';
 
 export type ButtonProps = Omit<PressableProps, 'children' | 'style' | 'accessibilityState'> & {
   /** Visible label. Also becomes the default accessibilityLabel. */
@@ -40,6 +41,8 @@ export type ButtonProps = Omit<PressableProps, 'children' | 'style' | 'accessibi
     NonNullable<PressableProps['accessibilityState']>,
     'selected' | 'checked' | 'expanded'
   >;
+  /** Tighter padding for filter chips and inline actions. */
+  density?: ButtonDensity;
 };
 
 export function Button({
@@ -50,6 +53,7 @@ export function Button({
   accessibilityLabel,
   accessibilityState,
   onPress,
+  density = 'default',
   ...rest
 }: ButtonProps) {
   const theme = useThemeColors();
@@ -60,6 +64,7 @@ export function Button({
     primary: { bg: theme.ink, fg: theme.inverseInk, border: theme.ink },
     secondary: { bg: theme.surfaceRaised, fg: theme.ink, border: theme.border },
     ghost: { bg: 'transparent', fg: theme.accent, border: 'transparent' },
+    accent: { bg: theme.accent, fg: theme.inverseInk, border: theme.accent },
   }[variant];
 
   return (
@@ -68,12 +73,13 @@ export function Button({
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityState={{ disabled: isDisabled, busy: loading, ...accessibilityState }}
       disabled={isDisabled}
-      hitSlop={8}
+      hitSlop={density === 'compact' ? 10 : 8}
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}
       onPress={onPress}
       style={[
         styles.base,
+        density === 'compact' ? styles.compact : null,
         {
           backgroundColor: palette.bg,
           borderColor: palette.border,
@@ -91,7 +97,7 @@ export function Button({
             importantForAccessibility="no-hide-descendants"
           />
         ) : null}
-        <Text variant="bodyEmphasis" style={{ color: palette.fg }}>
+        <Text variant={density === 'compact' ? 'bodySmall' : 'bodyEmphasis'} style={{ color: palette.fg }}>
           {label}
         </Text>
       </View>
@@ -112,5 +118,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: space['2'],
+  },
+  compact: {
+    minHeight: 36,
+    paddingHorizontal: space['3'],
+    paddingVertical: space['1'],
   },
 });

@@ -7,47 +7,134 @@
  * non-interactive placeholder pending its own bead.
  */
 import { router } from 'expo-router';
-import { ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
-import { ListRow, Text } from '@/ui';
+import {
+  Button,
+  LiftedSurface,
+  ListRow,
+  NavIcon,
+  type NavIconName,
+  ScreenCanvas,
+  ScreenHeader,
+  SectionHeader,
+  screenScrollInsets,
+  space,
+} from '@/ui';
 import { MORE_SECTIONS } from '@/features/learn';
 
-const OUT_OF_SCOPE_SECTIONS = [{ title: 'Data', subtitle: 'web: /data' }] as const;
+const OUT_OF_SCOPE_SECTIONS = [{ title: 'Data', subtitle: 'National rollups — coming soon', icon: 'data' as const }] as const;
+
+const ABOUT_SECTION_IDS = new Set(['about', 'facts']);
+const LEGAL_SECTION_IDS = new Set(['legal', 'privacy', 'errata']);
+
+const SECTION_ICONS: Record<string, NavIconName> = {
+  about: 'about',
+  facts: 'facts',
+  legal: 'legal',
+  privacy: 'privacy',
+  errata: 'errata',
+};
 
 export default function MoreScreen() {
-  return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
-      <ScrollView contentContainerStyle={{ padding: 16, gap: 12 }}>
-        <Text variant="title" isHeading>
-          More
-        </Text>
+  const aboutRows = MORE_SECTIONS.filter((s) => ABOUT_SECTION_IDS.has(s.routeId));
+  const legalRows = MORE_SECTIONS.filter((s) => LEGAL_SECTION_IDS.has(s.routeId));
 
-        <ListRow
-          title="Submit a correction"
-          subtitle="Opens the correction sheet (web: /submit)"
-          onPress={() => router.push('/corrections/submit')}
+  return (
+    <ScreenCanvas>
+      <ScrollView contentContainerStyle={styles.content}>
+        <ScreenHeader
+          kicker="BlackStory"
+          title="More"
+          dek="About the project, legal reference, and ways to contribute."
+          compact
         />
 
-        {MORE_SECTIONS.map((section) => (
-          <ListRow
-            key={section.routeId}
-            title={section.title}
-            subtitle={section.subtitle}
-            onPress={() => router.push(`/learn/${section.routeId}` as never)}
-          />
-        ))}
+        <View style={styles.section}>
+          <SectionHeader title="Contribute" meta="Community" headingScale="bodyEmphasis" />
+          <LiftedSurface gradient="copperAccentEdge" shadow="md" paddingKey="4">
+            <View style={styles.contributeRow}>
+              <NavIcon name="corrections" size={24} />
+              <Button
+                label="Submit a correction"
+                variant="accent"
+                onPress={() => router.push('/corrections/submit')}
+                accessibilityHint="Opens the correction submission form"
+              />
+            </View>
+          </LiftedSurface>
+        </View>
 
-        {OUT_OF_SCOPE_SECTIONS.map((section, index) => (
-          <ListRow
-            key={section.title}
-            title={section.title}
-            subtitle={section.subtitle}
-            interactive={false}
-            showDivider={index < OUT_OF_SCOPE_SECTIONS.length - 1}
-          />
-        ))}
+        <View style={styles.section}>
+          <SectionHeader title="About BlackStory" meta="Overview" headingScale="bodyEmphasis" />
+          <LiftedSurface gradient="panelAtmosphere" shadow="sm">
+            {aboutRows.map((section, index) => (
+              <ListRow
+                key={section.routeId}
+                density="compact"
+                title={section.title}
+                subtitle={section.subtitle}
+                leading={<NavIcon name={SECTION_ICONS[section.routeId] ?? 'about'} />}
+                showChevron
+                onPress={() => router.push(`/learn/${section.routeId}` as never)}
+                showDivider={index < aboutRows.length - 1}
+              />
+            ))}
+          </LiftedSurface>
+        </View>
+
+        <View style={styles.section}>
+          <SectionHeader title="Reference" meta="Legal & errata" headingScale="bodyEmphasis" />
+          <LiftedSurface gradient="panelAtmosphere" shadow="sm">
+            {legalRows.map((section, index) => (
+              <ListRow
+                key={section.routeId}
+                density="compact"
+                title={section.title}
+                subtitle={section.subtitle}
+                leading={<NavIcon name={SECTION_ICONS[section.routeId] ?? 'legal'} />}
+                showChevron
+                onPress={() => router.push(`/learn/${section.routeId}` as never)}
+                showDivider={index < legalRows.length - 1}
+              />
+            ))}
+          </LiftedSurface>
+        </View>
+
+        <View style={styles.section}>
+          <SectionHeader title="Coming soon" meta="Data" headingScale="bodyEmphasis" />
+          <LiftedSurface shadow="sm" tone="surface">
+            {OUT_OF_SCOPE_SECTIONS.map((section, index) => (
+              <ListRow
+                key={section.title}
+                density="compact"
+                title={section.title}
+                subtitle={section.subtitle}
+                leading={<NavIcon name={section.icon} />}
+                interactive={false}
+                showDivider={index < OUT_OF_SCOPE_SECTIONS.length - 1}
+              />
+            ))}
+          </LiftedSurface>
+        </View>
       </ScrollView>
-    </SafeAreaView>
+    </ScreenCanvas>
   );
 }
+
+const styles = StyleSheet.create({
+  content: {
+    paddingHorizontal: screenScrollInsets.paddingHorizontal,
+    paddingTop: screenScrollInsets.paddingTop,
+    paddingBottom: screenScrollInsets.paddingBottom,
+    gap: screenScrollInsets.gap,
+  },
+  section: {
+    gap: space['2'],
+  },
+  contributeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space['3'],
+  },
+});

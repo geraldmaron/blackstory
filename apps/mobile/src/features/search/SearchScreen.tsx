@@ -9,11 +9,28 @@
  * machine these are driven from.
  */
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, TextInput, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Button, EmptyState, ErrorState, ListRow, Notice, Text, useThemeColors } from '@/ui';
+import {
+  ApiStatusBanner,
+  Button,
+  EmptyState,
+  ErrorState,
+  LiftedSurface,
+  ListRow,
+  NavIcon,
+  navIconForEntityKind,
+  Notice,
+  ScreenCanvas,
+  ScreenHeader,
+  SectionHeader,
+  Text,
+  screenScrollInsets,
+  space,
+  useThemeColors,
+} from '@/ui';
 import { parseEntityId } from '../../app/_lib/route-params';
 import { useSearch } from './useSearch';
 import { MAX_RAW_INPUT_LENGTH, MIN_QUERY_LENGTH } from './query-normalization';
@@ -56,24 +73,16 @@ export function SearchScreen({ initialQuery, initialKind, runtime }: SearchScree
     clearRecentSearches,
   } = useSearch({ initialQuery, initialKind, runtime });
 
-  // Deep-link round trip: once the controller settles on a real query (any non-browse state
-  // carries `query`), reflect it back into the route's own `q`/`kind` params so the current
-  // search is shareable/restorable, without thrashing the URL on every keystroke (this only fires
-  // after the debounce settles into a controller state change, not per keystroke).
   useEffect(() => {
     if (state.kind === 'browse') return;
     router.setParams({ q: state.query, ...(state.filterKind ? { kind: state.filterKind } : {}) });
   }, [state]);
 
-  // `Date.now()` must never be called during render (React purity rule). `useState`'s lazy
-  // initializer is the sanctioned exception -- it runs exactly once, at mount, which is enough
-  // for an honest (if not second-by-second live) "last updated" label: the authoritative value
-  // is always `state.freshness.fetchedAt` itself, this is only the "ago" wording relative to it.
   const [now] = useState(() => Date.now());
 
   function handlePressResult(id: string) {
     const safeId = parseEntityId(id);
-    if (!safeId) return; // malformed id from an unexpected response shape -- no-op, never navigate raw.
+    if (!safeId) return;
     router.push(`/entity/${safeId}`);
   }
 
@@ -83,29 +92,32 @@ export function SearchScreen({ initialQuery, initialKind, runtime }: SearchScree
   );
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
-      <View style={{ padding: 16, gap: 12, flex: 1 }}>
-        <Text variant="title" isHeading>
-          Search
-        </Text>
-        <TextInput
-          value={draft}
-          onChangeText={setDraft}
-          returnKeyType="search"
-          placeholder="Search names, places, events..."
-          placeholderTextColor={theme.inkMuted}
-          accessibilityLabel="Search"
-          maxLength={MAX_RAW_INPUT_LENGTH}
-          autoCorrect={false}
-          style={{
-            borderWidth: 1,
-            borderColor: theme.border,
-            borderRadius: 8,
-            paddingHorizontal: 12,
-            paddingVertical: 10,
-            color: theme.ink,
-          }}
+    <ScreenCanvas>
+      <View style={styles.container}>
+        <ApiStatusBanner />
+        <ScreenHeader
+          kicker="Records"
+          title="Search"
+          dek="Names, places, and events across the archive."
+          compact
         />
+
+        <LiftedSurface gradient="surfaceLift" paddingKey="3" style={styles.searchField}>
+          <View style={styles.searchRow}>
+            <Ionicons name="search-outline" size={20} color={theme.inkMuted} accessibilityElementsHidden />
+            <TextInput
+              value={draft}
+              onChangeText={setDraft}
+              returnKeyType="search"
+              placeholder="Search names, places, events..."
+              placeholderTextColor={theme.inkMuted}
+              accessibilityLabel="Search"
+              maxLength={MAX_RAW_INPUT_LENGTH}
+              autoCorrect={false}
+              style={[styles.input, { color: theme.ink, flex: 1 }]}
+            />
+          </View>
+        </LiftedSurface>
 
         {state.kind !== 'browse' ? (
           <FilterChipsRow filterKind={filterKind} onChangeFilterKind={setFilterKind} />
@@ -122,7 +134,7 @@ export function SearchScreen({ initialQuery, initialKind, runtime }: SearchScree
         ) : null}
 
         {state.kind === 'loading' ? (
-          <View style={{ paddingVertical: 24, alignItems: 'center' }}>
+          <View style={styles.centered}>
             <ActivityIndicator accessibilityLabel="Searching" />
           </View>
         ) : null}
@@ -155,7 +167,7 @@ export function SearchScreen({ initialQuery, initialKind, runtime }: SearchScree
         ) : null}
 
         {state.kind === 'results' ? (
-          <View style={{ flex: 1, gap: 8 }}>
+          <View style={styles.resultsPane}>
             {state.freshness.degraded ? (
               <Notice
                 tone="info"
@@ -163,24 +175,27 @@ export function SearchScreen({ initialQuery, initialKind, runtime }: SearchScree
                 description={`Last updated ${formatRelativeTime(state.freshness.fetchedAt, now)} -- you're offline or the server is unreachable. This is not a live search.`}
               />
             ) : null}
-            <FlatList
-              testID="search-results-list"
-              data={cardData}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => <SearchResultCard {...item} />}
-              ListFooterComponent={
-                <SearchListFooter
-                  hasMore={state.hasMore}
-                  loadingMore={state.loadingMore}
-                  loadMoreError={state.loadMoreError}
-                  onLoadMore={loadMore}
-                />
-              }
-            />
+            <SectionHeader title="Results" meta={`${cardData.length} shown`} headingScale="bodyEmphasis" />
+            <LiftedSurface gradient="panelAtmosphere" shadow="sm" style={styles.resultsList}>
+              <FlatList
+                testID="search-results-list"
+                data={cardData}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => <SearchResultCard {...item} />}
+                ListFooterComponent={
+                  <SearchListFooter
+                    hasMore={state.hasMore}
+                    loadingMore={state.loadingMore}
+                    loadMoreError={state.loadMoreError}
+                    onLoadMore={loadMore}
+                  />
+                }
+              />
+            </LiftedSurface>
           </View>
         ) : null}
       </View>
-    </SafeAreaView>
+    </ScreenCanvas>
   );
 }
 
@@ -192,17 +207,21 @@ function FilterChipsRow({
   onChangeFilterKind: (kind: string | undefined) => void;
 }) {
   return (
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+    <View style={styles.chipRow}>
       <Button
         label="All kinds"
-        variant={filterKind === undefined ? 'primary' : 'secondary'}
+        density="compact"
+        variant={filterKind === undefined ? 'accent' : 'secondary'}
+        accessibilityState={filterKind === undefined ? { selected: true } : undefined}
         onPress={() => onChangeFilterKind(undefined)}
       />
       {BROWSE_CATEGORIES.map((category) => (
         <Button
           key={category.kind}
           label={category.label}
-          variant={filterKind === category.kind ? 'primary' : 'secondary'}
+          density="compact"
+          variant={filterKind === category.kind ? 'accent' : 'secondary'}
+          accessibilityState={filterKind === category.kind ? { selected: true } : undefined}
           onPress={() => onChangeFilterKind(category.kind)}
         />
       ))}
@@ -223,47 +242,73 @@ function BrowseModeView({
   onRemoveRecent: (term: string) => void;
   onClearRecent: () => void;
 }) {
+  const theme = useThemeColors();
+
   return (
-    <View style={{ gap: 16 }}>
+    <View style={styles.browsePane}>
       {draftLength > 0 && draftLength < MIN_QUERY_LENGTH ? (
         <Text variant="bodySmall" colorRole="inkMuted">
           Keep typing to search ({MIN_QUERY_LENGTH}+ characters).
         </Text>
       ) : null}
 
-      <View style={{ gap: 8 }}>
-        <Text variant="subtitle" isHeading>
-          Browse by category
-        </Text>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+      <View style={styles.browseSection}>
+        <SectionHeader title="Browse by category" meta="Explore map" />
+        <View style={styles.categoryGrid}>
           {BROWSE_CATEGORIES.map((category) => (
-            <Button
+            <Pressable
               key={category.kind}
-              label={category.label}
-              variant="secondary"
+              accessibilityRole="button"
+              accessibilityLabel={`Browse ${category.label} on the map`}
               onPress={() => router.push({ pathname: '/explore', params: { kind: category.kind } })}
-            />
+              style={({ pressed }) => [{ flex: 1, minWidth: '46%', opacity: pressed ? 0.85 : 1 }]}
+            >
+              <LiftedSurface gradient="canvasDepth" shadow="sm" paddingKey="3" style={{ minHeight: 44, justifyContent: 'center' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: space['2'] }}>
+                  <NavIcon name={navIconForEntityKind(category.kind)} size={20} />
+                  <View style={{ flex: 1, gap: space['1'] }}>
+                    <Text variant="bodyEmphasis">{category.label}</Text>
+                    <Text variant="code" colorRole="inkMuted">
+                      {category.kind}
+                    </Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={16} color={theme.inkMuted} accessibilityElementsHidden />
+                </View>
+              </LiftedSurface>
+            </Pressable>
           ))}
         </View>
       </View>
 
       {recentSearches.length > 0 ? (
-        <View style={{ gap: 4 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text variant="subtitle" isHeading>
-              Recent searches
-            </Text>
-            <Button label="Clear all" variant="ghost" onPress={onClearRecent} />
-          </View>
-          {recentSearches.map((entry) => (
-            <ListRow
-              key={entry.term}
-              title={entry.term}
-              onPress={() => onSelectRecent(entry.term)}
-              trailing={<Button label="Remove" variant="ghost" onPress={() => onRemoveRecent(entry.term)} />}
-              accessibilityLabel={`Search again for ${entry.term}`}
-            />
-          ))}
+        <View style={styles.browseSection}>
+          <SectionHeader
+            title="Recent searches"
+            action={<Button label="Clear all" variant="ghost" density="compact" onPress={onClearRecent} />}
+          />
+          <LiftedSurface gradient="panelAtmosphere" shadow="sm">
+            {recentSearches.map((entry, index) => (
+              <ListRow
+                key={entry.term}
+                density="compact"
+                title={entry.term}
+                leading={<NavIcon name="search" size={20} />}
+                showChevron
+                onPress={() => onSelectRecent(entry.term)}
+                trailing={
+                  <Button
+                    label="Remove"
+                    variant="ghost"
+                    density="compact"
+                    onPress={() => onRemoveRecent(entry.term)}
+                    accessibilityLabel={`Remove ${entry.term} from recent searches`}
+                  />
+                }
+                accessibilityLabel={`Search again for ${entry.term}`}
+                showDivider={index < recentSearches.length - 1}
+              />
+            ))}
+          </LiftedSurface>
         </View>
       ) : (
         <EmptyState title="Search BlackStory" description="Type a name, place, or event to search." />
@@ -285,27 +330,78 @@ function SearchListFooter({
 }) {
   if (loadingMore) {
     return (
-      <View style={{ paddingVertical: 16, alignItems: 'center' }}>
+      <View style={styles.centered}>
         <ActivityIndicator accessibilityLabel="Loading more results" />
       </View>
     );
   }
   if (loadMoreError) {
     return (
-      <View style={{ paddingVertical: 16, alignItems: 'center', gap: 8 }}>
+      <View style={[styles.centered, { gap: space['2'] }]}>
         <Text variant="bodySmall" colorRole="inkMuted">
           {loadMoreError}
         </Text>
-        <Button label="Try again" variant="secondary" onPress={onLoadMore} />
+        <Button label="Try again" variant="secondary" density="compact" onPress={onLoadMore} />
       </View>
     );
   }
   if (hasMore) {
     return (
-      <View style={{ paddingVertical: 16, alignItems: 'center' }}>
-        <Button label="Load more" variant="secondary" onPress={onLoadMore} />
+      <View style={styles.centered}>
+        <Button label="Load more" variant="secondary" density="compact" onPress={onLoadMore} />
       </View>
     );
   }
   return null;
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingHorizontal: screenScrollInsets.paddingHorizontal,
+    paddingTop: screenScrollInsets.paddingTop,
+    gap: screenScrollInsets.gap,
+  },
+  searchField: {
+    minHeight: 44,
+    justifyContent: 'center',
+  },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space['2'],
+  },
+  input: {
+    fontSize: 16,
+    lineHeight: 22,
+    padding: 0,
+  },
+  chipRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: space['2'],
+  },
+  browsePane: {
+    gap: space['4'],
+  },
+  browseSection: {
+    gap: space['2'],
+  },
+  categoryGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: space['2'],
+  },
+  resultsPane: {
+    flex: 1,
+    gap: space['2'],
+  },
+  resultsList: {
+    flex: 1,
+    overflow: 'hidden',
+  },
+  centered: {
+    paddingVertical: space['4'],
+    alignItems: 'center',
+  },
+});

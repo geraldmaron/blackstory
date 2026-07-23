@@ -66,4 +66,24 @@ describe('EntityPreviewSheet — focus movement (MOB-017)', () => {
     );
     expect(sendEvent).toHaveBeenCalledTimes(2);
   });
+
+  it('exposes an accessible summary label and close control for the selected feature', async () => {
+    const { getByLabelText } = await render(
+      <EntityPreviewSheet
+        feature={{
+          ...feature('ent_a', 'Bethel AME Church'),
+          properties: {
+            ...feature('ent_a', 'Bethel AME Church').properties,
+            oneLineStory: 'A cornerstone of the district.',
+          },
+        }}
+        onOpenEntity={jest.fn()}
+        onClose={jest.fn()}
+      />,
+    );
+
+    expect(getByLabelText(/Preview: Bethel AME Church\./)).toBeTruthy();
+    expect(getByLabelText('Close preview')).toBeTruthy();
+    expect(getByLabelText('View full record for Bethel AME Church')).toBeTruthy();
+  });
 });

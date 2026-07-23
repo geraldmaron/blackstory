@@ -15,10 +15,10 @@
  */
 import { useEffect, useMemo, useReducer } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Button, Text, useThemeColors } from '@/ui';
+import { ApiStatusBanner, ScreenCanvas } from '@/ui';
 import { MapScreen, type MapFeatureCollection, type MapLoadState } from '@/features/map';
 import { DEMO_MAP_SOURCE } from '@/features/map';
+import { EntityPreviewSheet, ExploreListChrome, ExploreToolbar } from '@/features/map/explore';
 import type { FilterState } from '@/app/_lib/route-params';
 import {
   exploreReducer,
@@ -29,7 +29,6 @@ import { toExploreFeatures } from './explore-feature';
 import { countMatches } from './explore-filter';
 import { parseRestoredSelection } from './selection';
 import { ExploreList } from './ExploreList';
-import { EntityPreviewSheet } from './EntityPreviewSheet';
 import { useReduceMotion } from './useReduceMotion';
 
 export type ExploreViewProps = {
@@ -58,7 +57,6 @@ export function ExploreView({
   onOpenEntity,
   onOpenFilters,
 }: ExploreViewProps) {
-  const theme = useThemeColors();
   const osReduceMotion = useReduceMotion();
   const reduceMotion = reduceMotionProp ?? osReduceMotion;
 
@@ -101,30 +99,17 @@ export function ExploreView({
     : null;
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
-      <View style={[styles.header, { borderBottomColor: theme.border }]}>
-        <View style={styles.headerText}>
-          <Text variant="title" isHeading>
-            Explore
-          </Text>
-          <Text variant="bodySmall" colorRole="inkMuted">
-            {matchCount === 1 ? '1 record' : `${matchCount} records`}
-            {filters.kind || filters.era ? ' · filtered' : ''}
-            {typeof __DEV__ !== 'undefined' && __DEV__ && source === DEMO_MAP_SOURCE
-              ? ' · demo fixtures (not live API)'
-              : ''}
-          </Text>
-        </View>
-        <View style={styles.headerActions}>
-          <Button
-            label="National view"
-            variant="ghost"
-            onPress={() => dispatch({ type: 'presetRequested', preset: 'national' })}
-            accessibilityLabel="Reset to national view"
-          />
-          <Button label="Filters" variant="secondary" onPress={onOpenFilters} />
-        </View>
-      </View>
+    <ScreenCanvas edges={['top', 'left', 'right']}>
+      <ApiStatusBanner />
+      <ExploreToolbar
+        matchCount={matchCount}
+        filters={filters}
+        showDemoHint={
+          typeof __DEV__ !== 'undefined' && __DEV__ && source === DEMO_MAP_SOURCE
+        }
+        onOpenFilters={onOpenFilters}
+        onNationalView={() => dispatch({ type: 'presetRequested', preset: 'national' })}
+      />
 
       <View style={styles.mapArea} testID="explore-map-area">
         <MapScreen
@@ -148,7 +133,7 @@ export function ExploreView({
         />
       </View>
 
-      <View style={styles.listArea} testID="explore-list-area">
+      <ExploreListChrome testID="explore-list-area">
         <ExploreList
           features={listFeatures}
           selectedId={state.selectedId}
@@ -157,24 +142,11 @@ export function ExploreView({
             dispatch({ type: 'entitySelected', entityId: feature.entityId, point: feature.coordinates })
           }
         />
-      </View>
-    </SafeAreaView>
+      </ExploreListChrome>
+    </ScreenCanvas>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1 },
-  header: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 12,
-  },
-  headerText: { flex: 1 },
-  headerActions: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  mapArea: { flex: 1.4, position: 'relative' },
-  listArea: { flex: 1 },
+  mapArea: { flex: 1, position: 'relative' },
 });

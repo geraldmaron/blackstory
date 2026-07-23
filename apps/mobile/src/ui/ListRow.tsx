@@ -7,11 +7,14 @@
  */
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, View, type GestureResponderEvent } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Text } from './Text';
 import { Divider } from './Divider';
 import { space, useThemeColors } from './tokens';
 
 const MIN_ROW_HEIGHT = 44;
+
+export type ListRowDensity = 'default' | 'compact';
 
 export type ListRowProps = {
   title: string;
@@ -23,6 +26,10 @@ export type ListRowProps = {
   interactive?: boolean;
   accessibilityLabel?: string;
   showDivider?: boolean;
+  /** Tighter vertical rhythm for dense browse/settings lists. */
+  density?: ListRowDensity;
+  /** Renders a standard forward chevron for navigation rows (Ionicons, not unicode triangles). */
+  showChevron?: boolean;
 };
 
 export function ListRow({
@@ -34,9 +41,17 @@ export function ListRow({
   interactive = Boolean(onPress),
   accessibilityLabel,
   showDivider = true,
+  density = 'default',
+  showChevron = false,
 }: ListRowProps) {
   const theme = useThemeColors();
   const label = accessibilityLabel ?? (subtitle ? `${title}, ${subtitle}` : title);
+  const densityStyles = density === 'compact' ? styles.compactPressable : styles.pressable;
+  const trailingContent =
+    trailing ??
+    (showChevron && interactive ? (
+      <Ionicons name="chevron-forward" size={18} color={theme.inkMuted} accessibilityElementsHidden />
+    ) : null);
 
   const content = (
     <View style={styles.row}>
@@ -49,7 +64,7 @@ export function ListRow({
           </Text>
         ) : null}
       </View>
-      {trailing ? <View style={styles.trailing}>{trailing}</View> : null}
+      {trailingContent ? <View style={styles.trailing}>{trailingContent}</View> : null}
     </View>
   );
 
@@ -61,14 +76,14 @@ export function ListRow({
           accessibilityLabel={label}
           onPress={onPress}
           style={({ pressed }) => [
-            styles.pressable,
+            densityStyles,
             { backgroundColor: pressed ? theme.surfaceRaised : 'transparent' },
           ]}
         >
           {content}
         </Pressable>
       ) : (
-        <View accessibilityLabel={label} style={styles.pressable}>
+        <View accessibilityLabel={label} style={densityStyles}>
           {content}
         </View>
       )}
@@ -83,6 +98,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: space['4'],
     paddingVertical: space['2'],
+  },
+  compactPressable: {
+    minHeight: MIN_ROW_HEIGHT,
+    justifyContent: 'center',
+    paddingHorizontal: space['3'],
+    paddingVertical: space['1'],
   },
   row: {
     flexDirection: 'row',

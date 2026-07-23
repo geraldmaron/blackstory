@@ -30,6 +30,8 @@ export {
   type MapPointFeature,
   type MapPointFeatureProperties,
 } from './demoMapSource';
+export { ExploreToolbar, EntityPreviewSheet, featureMetaLine } from './explore';
+export type { ExploreToolbarProps, EntityPreviewSheetProps } from './explore';
 export {
   MAP_MAX_ZOOM,
   US_BOUNDS,

@@ -21,11 +21,14 @@
  *   - "Table" semantics for related records: see `RelatedList.tsx`'s header comment.
  */
 import { View } from 'react-native';
-import { Link, Notice, Text } from '@/ui';
+import { Link, Notice, Text, space, useThemeColors } from '@/ui';
+import { resolveFontFamily } from '@/ui/fonts';
 import type { NormalizedBlock, NormalizedPage } from './content-blocks';
 import type { CitationV1 } from './content-types';
 import { sanitizeExternalHref } from './link-safety';
 import { RelatedEntityList, RelatedFactBadges } from './RelatedList';
+
+export type ContentPresentation = 'document' | 'longform';
 
 export interface ContentRendererProps {
   readonly page: NormalizedPage;
@@ -33,6 +36,8 @@ export interface ContentRendererProps {
   readonly skippedSections: number;
   readonly sources?: readonly CitationV1[];
   readonly requiresCitation?: boolean;
+  /** `longform` uses Source Serif body, generous measure, and calm chrome for narrative stories. */
+  readonly presentation?: ContentPresentation;
   /** Freshness affordance (ADR-022 §3 / MOB-015 requirement #8). */
   readonly cached?: { readonly fetchedAt: number; readonly degraded: boolean };
   /** Legal/methodology version-mismatch affordance (MOB-015 requirement #4). */
@@ -51,10 +56,38 @@ function formatRelativeTime(fetchedAtMs: number, nowMs: number = Date.now()): st
   return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
 }
 
-function Block({ block }: { readonly block: NormalizedBlock }) {
+function Block({
+  block,
+  presentation,
+}: {
+  readonly block: NormalizedBlock;
+  readonly presentation: ContentPresentation;
+}) {
   if (block.kind === 'heading') {
+    if (presentation === 'longform') {
+      return (
+        <Text
+          variant="subtitle"
+          isHeading
+          style={{
+            marginTop: space['6'],
+            marginBottom: space['2'],
+            fontFamily: resolveFontFamily('display', '600'),
+          }}
+        >
+          {block.text}
+        </Text>
+      );
+    }
     return (
       <Text variant="subtitle" isHeading style={{ marginTop: 16, marginBottom: 4 }}>
+        {block.text}
+      </Text>
+    );
+  }
+  if (presentation === 'longform') {
+    return (
+      <Text variant="editorial" style={{ marginBottom: space['5'], fontSize: 18, lineHeight: 30 }}>
         {block.text}
       </Text>
     );
@@ -99,29 +132,37 @@ export function ContentRenderer({
   skippedSections,
   sources,
   requiresCitation,
+  presentation = 'document',
   cached,
   versionStale,
   onViewCurrent,
 }: ContentRendererProps) {
+  const theme = useThemeColors();
   const hasSources = Boolean(sources && sources.length > 0);
+  const isLongform = presentation === 'longform';
+  const showCacheNotice = cached && (!isLongform || cached.degraded);
 
   return (
-    <View style={{ gap: 4 }}>
-      <Text variant="title" isHeading>
+    <View style={{ gap: isLongform ? space['2'] : 4, maxWidth: isLongform ? 672 : undefined }}>
+      <Text variant={isLongform ? 'display' : 'title'} isHeading>
         {page.title}
       </Text>
       {page.dek ? (
-        <Text variant="bodyEmphasis" colorRole="inkMuted" style={{ marginBottom: 8 }}>
+        <Text
+          variant={isLongform ? 'editorial' : 'bodyEmphasis'}
+          colorRole="inkMuted"
+          style={{ marginBottom: isLongform ? space['4'] : 8 }}
+        >
           {page.dek}
         </Text>
       ) : null}
       {page.eraLabel || page.placeLabel ? (
-        <Text variant="bodySmall" colorRole="inkSubtle" style={{ marginBottom: 12 }}>
+        <Text variant="code" colorRole="inkSubtle" style={{ marginBottom: isLongform ? space['6'] : 12 }}>
           {[page.eraLabel, page.placeLabel].filter(Boolean).join(' · ')}
         </Text>
       ) : null}
 
-      {cached ? (
+      {showCacheNotice ? (
         <Notice
           tone="info"
           title={cached.degraded ? 'Showing cached copy (offline)' : 'Up to date'}
@@ -137,9 +178,9 @@ export function ContentRenderer({
         />
       ) : null}
 
-      <View style={{ marginTop: 8 }}>
+      <View style={{ marginTop: isLongform ? space['2'] : 8 }}>
         {blocks.map((block, index) => (
-          <Block key={index} block={block} />
+          <Block key={index} block={block} presentation={presentation} />
         ))}
       </View>
 
@@ -161,8 +202,25 @@ export function ContentRenderer({
 
       {hasSources ? <SourcesList sources={sources!} /> : null}
 
-      <RelatedEntityList entityIds={page.relatedEntityIds} />
-      <RelatedFactBadges factIds={page.relatedFactIds} />
+      {isLongform && (page.relatedEntityIds.length > 0 || page.relatedFactIds.length > 0) ? (
+        <View
+          style={{
+            marginTop: space['8'],
+            paddingTop: space['6'],
+            borderTopWidth: 1,
+            borderTopColor: theme.border,
+            gap: space['4'],
+          }}
+        >
+          <RelatedEntityList entityIds={page.relatedEntityIds} />
+          <RelatedFactBadges factIds={page.relatedFactIds} />
+        </View>
+      ) : (
+        <>
+          <RelatedEntityList entityIds={page.relatedEntityIds} />
+          <RelatedFactBadges factIds={page.relatedFactIds} />
+        </>
+      )}
 
       {versionStale && onViewCurrent ? (
         <Link href="#" onPress={onViewCurrent} accessibilityLabel="View current version">

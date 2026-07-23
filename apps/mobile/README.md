@@ -36,6 +36,7 @@ pnpm install                 # installs everything EXCEPT apps/mobile (see below
 
 cd apps/mobile
 npm install                  # apps/mobile manages its own isolated node_modules (npm)
+npx expo install @expo/vector-icons
 
 # iOS — always use the custom native binary (dev client), never Expo Go
 npx expo prebuild --platform ios     # generates ios/ (gitignored, CNG — see ADR-020 SS6)
@@ -194,25 +195,51 @@ still shows a few demo pins (unrelated to MapLibre glyph/style issues).
 
 ### Local Dev → live Supabase via api-public
 
+Terminal A — start `api-public` on `:8080`. From the repo root, build shared contracts
+once if this is a fresh clone (`pnpm install && pnpm --filter @repo/public-contracts build`).
+
+`DATABASE_URL` must already be in the shell: either in `~/.env.1password` (via
+`run-with-dev-secrets`) or in `apps/web/.env.local`. Do **not** put inline `#` comments on
+the same line as shell commands when pasting — zsh will wait for a closing quote
+(`cmdand cmdand quote>`).
+
+**Option 1 — `DATABASE_URL` in 1Password (`~/.env.1password`):**
+
 ```bash
-# Terminal A — api-public on :8080 against Supabase
 cd apps/api-public
-run-with-dev-secrets -- env \
+run-with-dev-secrets env \
   PUBLIC_DATA_SOURCE=postgres \
   DATABASE_SSL=1 \
   pnpm dev
+```
 
+**Option 2 — `DATABASE_URL` in `apps/web/.env.local`:**
+
+```bash
+cd apps/api-public
+set -a
+source ../web/.env.local
+set +a
+env PUBLIC_DATA_SOURCE=postgres DATABASE_SSL=1 pnpm dev
+```
+
+Smoke (separate terminal):
+
+```bash
+curl -sS 'http://127.0.0.1:8080/v1/health' | jq .
 curl -sS -H 'X-BlackStory-Client: mobile/1.0.0; api=1' \
   http://127.0.0.1:8080/v1/bootstrap | jq .
 curl -sS -H 'X-BlackStory-Client: mobile/1.0.0; api=1' \
   'http://127.0.0.1:8080/v1/search?q=black&pageSize=5' | jq .
-# Expect a real activeRelease + non-empty results when bb_public is populated.
+```
 
-# Terminal B — point BlackStory (Dev) at the API
-# apps/mobile/.env.local (simulator):
-#   API_BASE_URL=http://127.0.0.1:8080
-# physical device: use the Mac LAN IP, e.g. http://192.168.1.50:8080
-cd apps/mobile && npx expo start --dev-client --clear
+Terminal B — point BlackStory (Dev) at the API. Set `API_BASE_URL=http://127.0.0.1:8080`
+in `apps/mobile/.env.local` (simulator). On a physical device use the Mac LAN IP instead
+(for example `http://192.168.1.50:8080`).
+
+```bash
+cd apps/mobile
+npx expo start --dev-client --clear
 ```
 
 Metro should log `[blackstory] apiBaseUrl=…` and

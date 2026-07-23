@@ -14,7 +14,7 @@
  */
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
 
-import { ContentPageScreen, SectionListScreen, listCatalogEntries, parseSectionParam } from '@/features/learn';
+import { ContentPageScreen, SectionListScreen, StorySectionIndexScreen, isLongformSection, listCatalogEntries, parseSectionParam } from '@/features/learn';
 
 export default function LearnSectionIndexScreen() {
   const { section } = useLocalSearchParams<{ section?: string | string[] }>();
@@ -29,6 +29,10 @@ export default function LearnSectionIndexScreen() {
   }
 
   const entries = listCatalogEntries(row.catalogSection);
+
+  if (isLongformSection(row.catalogSection)) {
+    return <StorySectionIndexScreen section={row} />;
+  }
 
   return (
     <SectionListScreen

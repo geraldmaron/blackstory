@@ -62,12 +62,23 @@ export function AppProviders({ children, runtime: injected }: AppProvidersProps)
     void (async () => {
       try {
         const next = await getAppRuntime();
-        await initializeObservability(next.store, next.connectivity);
-        const syncResult = await next.bootstrapSync.sync();
+        try {
+          await initializeObservability(next.store, next.connectivity);
+        } catch (obsErr) {
+          console.warn('[blackstory] observability init failed (non-fatal)', obsErr);
+        }
+
+        let syncResult = next.lastBootstrapSync;
+        try {
+          syncResult = await next.bootstrapSync.sync();
+        } catch {
+          syncResult = { status: 'offline', stamp: undefined };
+        }
+
+        const runtimeWithSync = { ...next, lastBootstrapSync: syncResult };
         logDev(`apiBaseUrl=${resolveApiBaseUrl()}`, { bootstrapSync: syncResult });
+
         if (syncResult.status === 'offline') {
-          // Network unreachable / DNS failure / empty host — Search/Entity will
-          // also fail; Explore still shows DEMO_MAP_SOURCE fixtures by design.
           console.warn(
             `[blackstory] bootstrapSync offline (could not reach ${resolveApiBaseUrl()}/v1/bootstrap). ` +
               'Explore map uses demo fixtures until a live map GeoJSON endpoint is wired. ' +
@@ -75,12 +86,18 @@ export function AppProviders({ children, runtime: injected }: AppProvidersProps)
               'set apps/mobile/.env.local API_BASE_URL to your LAN http://IP:8080, then restart Metro.',
           );
         }
-        if (!cancelled) setRuntime(next);
+        if (!cancelled) setRuntime(runtimeWithSync);
       } catch (err) {
-        // Degrade: keep rendering children without providers rather than crash the shell.
-        // Never swallow silently in Dev — otherwise "no Supabase data" looks like a map bug.
-        console.warn('[blackstory] AppProviders init failed; features run without shared runtime', err);
-        if (!cancelled) setRuntime(null);
+        console.warn('[blackstory] AppProviders init failed; attempting degraded runtime', err);
+        try {
+          const fallback = await getAppRuntime();
+          if (!cancelled) {
+            setRuntime({ ...fallback, lastBootstrapSync: { status: 'offline', stamp: undefined } });
+          }
+        } catch (fallbackErr) {
+          console.warn('[blackstory] runtime unavailable; features run without shared providers', fallbackErr);
+          if (!cancelled) setRuntime(null);
+        }
       }
     })();
     return () => {

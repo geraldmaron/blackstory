@@ -14,8 +14,8 @@
  * but the list is windowed here so it does not itself become the bottleneck).
  */
 import { useCallback } from 'react';
-import { FlatList, type ListRenderItemInfo, View } from 'react-native';
-import { EmptyState, ListRow } from '@/ui';
+import { FlatList, StyleSheet, View, type ListRenderItemInfo } from 'react-native';
+import { EmptyState, ListRow, NavIcon, navIconForEntityKind, Text, space, useThemeColors } from '@/ui';
 import { featureSubtitle, type ExploreFeature } from './explore-feature';
 
 export type ExploreListProps = {
@@ -36,19 +36,34 @@ export function ExploreList({
   emptyTitle = 'No records in view',
   emptyDescription = 'Pan or zoom the map, or clear a filter, to see records here.',
 }: ExploreListProps) {
+  const theme = useThemeColors();
+
   const renderItem = useCallback(
-    ({ item, index }: ListRenderItemInfo<ExploreFeature>) => (
-      <ListRow
-        title={item.label}
-        subtitle={featureSubtitle(item)}
-        showDivider={index < features.length - 1}
-        onPress={() => onSelect(item)}
-        accessibilityLabel={`${item.label}. ${featureSubtitle(item)}${
-          item.entityId === selectedId ? '. Selected' : ''
-        }`}
-      />
-    ),
-    [features.length, onSelect, selectedId],
+    ({ item, index }: ListRenderItemInfo<ExploreFeature>) => {
+      const isSelected = item.entityId === selectedId;
+      return (
+        <View
+          style={[
+            styles.rowWrap,
+            isSelected ? { borderLeftColor: theme.accent, backgroundColor: theme.surfaceRaised } : undefined,
+          ]}
+        >
+          <ListRow
+            density="compact"
+            title={item.label}
+            subtitle={featureSubtitle(item)}
+            leading={<NavIcon name={navIconForEntityKind(item.kind)} size={20} selected={isSelected} />}
+            showChevron
+            showDivider={index < features.length - 1}
+            onPress={() => onSelect(item)}
+            accessibilityLabel={`${item.label}. ${featureSubtitle(item)}${
+              isSelected ? '. Selected' : ''
+            }`}
+          />
+        </View>
+      );
+    },
+    [features.length, onSelect, selectedId, theme.accent, theme.surfaceRaised],
   );
 
   if (features.length === 0) {
@@ -60,19 +75,46 @@ export function ExploreList({
   }
 
   return (
-    <FlatList
-      testID="explore-list"
-      accessibilityRole="list"
-      accessibilityLabel="Records visible on the map"
-      data={features}
-      keyExtractor={(item) => item.id}
-      renderItem={renderItem}
-      // Scroll is user-owned; report it but never translate it into a camera move.
-      onScrollBeginDrag={onUserScroll}
-      keyboardShouldPersistTaps="handled"
-      initialNumToRender={12}
-      windowSize={7}
-      removeClippedSubviews
-    />
+    <View style={styles.listRoot}>
+      <View style={[styles.listHeader, { borderBottomColor: theme.border }]}>
+        <Text variant="code" colorRole="inkMuted">
+          In view
+        </Text>
+        <Text variant="code" colorRole="accent">
+          {features.length === 1 ? '1 record' : `${features.length} records`}
+        </Text>
+      </View>
+      <FlatList
+        testID="explore-list"
+        accessibilityRole="list"
+        accessibilityLabel="Records visible on the map"
+        data={features}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        onScrollBeginDrag={onUserScroll}
+        keyboardShouldPersistTaps="handled"
+        initialNumToRender={12}
+        windowSize={7}
+        removeClippedSubviews
+      />
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  listRoot: {
+    flex: 1,
+  },
+  listHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: space['3'],
+    paddingVertical: space['2'],
+    borderBottomWidth: 1,
+  },
+  rowWrap: {
+    borderLeftWidth: 3,
+    borderLeftColor: 'transparent',
+  },
+});

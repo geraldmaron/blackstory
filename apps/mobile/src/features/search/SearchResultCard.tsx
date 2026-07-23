@@ -18,7 +18,8 @@
  * XSS/HTML/script-shaped string is therefore always inert display text, by construction, not by
  * a sanitization step that could be forgotten -- see the adversarial render test.
  */
-import { ListRow, Text } from '@/ui';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Divider, NavIcon, navIconForEntityKind, Text, space, useThemeColors } from '@/ui';
 import type { SearchResultV1 } from './search-contracts';
 
 export interface SearchResultCardProps {
@@ -51,25 +52,53 @@ function humanize(value: string): string {
   return value.charAt(0).toUpperCase() + value.slice(1).replace(/[_-]/g, ' ');
 }
 
+const MIN_ROW_HEIGHT = 44;
+
 export function SearchResultCard({ id, kind, displayName, explanation, status, onPress }: SearchResultCardProps) {
+  const theme = useThemeColors();
+  const metaParts = [humanize(kind), status ? humanize(status) : null].filter(Boolean);
+  const metaLine = metaParts.join(' · ');
+  const label = `${displayName}. ${metaLine}. ${explanation}`;
+
   return (
-    <ListRow
-      title={displayName}
-      subtitle={explanation}
-      trailing={
-        <ListRowTrailing kind={kind} status={status} />
-      }
-      onPress={onPress ? () => onPress(id) : undefined}
-      accessibilityLabel={`${displayName}. ${humanize(kind)}${status ? `, ${humanize(status)}` : ''}. ${explanation}`}
-    />
+    <View>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={label}
+        onPress={onPress ? () => onPress(id) : undefined}
+        disabled={!onPress}
+        style={({ pressed }) => [
+          styles.row,
+          { backgroundColor: pressed && onPress ? theme.surfaceRaised : 'transparent' },
+        ]}
+      >
+        <NavIcon name={navIconForEntityKind(kind)} size={20} />
+        <View style={styles.textColumn}>
+          <Text variant="bodyEmphasis">{displayName}</Text>
+          <Text variant="code" colorRole="inkMuted">
+            {metaLine}
+          </Text>
+          <Text variant="bodySmall" colorRole="inkMuted" numberOfLines={2}>
+            {explanation}
+          </Text>
+        </View>
+      </Pressable>
+      <Divider />
+    </View>
   );
 }
 
-function ListRowTrailing({ kind, status }: { kind: string; status?: string }) {
-  return (
-    <Text variant="caption" colorRole="inkMuted" style={{ textAlign: 'right' }}>
-      {humanize(kind)}
-      {status ? `\n${humanize(status)}` : ''}
-    </Text>
-  );
-}
+const styles = StyleSheet.create({
+  row: {
+    minHeight: MIN_ROW_HEIGHT,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: space['3'],
+    paddingVertical: space['2'],
+    gap: space['2'],
+  },
+  textColumn: {
+    flex: 1,
+    gap: space['1'],
+  },
+});

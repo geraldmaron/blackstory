@@ -20,7 +20,6 @@
  */
 import { useEffect, useState } from 'react';
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { parseEntityId } from '../_lib/route-params';
 import {
@@ -29,6 +28,7 @@ import {
   useEntityDetail,
   type EntityDataDeps,
 } from '@/features/entity';
+import { ScreenCanvas } from '@/ui';
 
 export default function EntityDetailRoute() {
   const { id } = useLocalSearchParams<{ id?: string | string[] }>();
@@ -60,13 +60,13 @@ export default function EntityDetailRoute() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['left', 'right', 'bottom']}>
+    <ScreenCanvas edges={['left', 'right', 'bottom']}>
       <EntityDetailScreen
         state={deps ? state : { kind: 'loading' }}
         onRetry={retry}
         onBackToExplore={() => router.replace('/explore')}
         onOpenEntity={(neighborId) => router.push(`/entity/${neighborId}`)}
       />
-    </SafeAreaView>
+    </ScreenCanvas>
   );
 }

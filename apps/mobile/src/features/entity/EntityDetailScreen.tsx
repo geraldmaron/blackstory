@@ -14,7 +14,7 @@
  * share.
  */
 import { ActivityIndicator, ScrollView, View } from 'react-native';
-import { ErrorState, Text, space } from '@/ui';
+import { ErrorState, Text, screenScrollInsets, space, useThemeColors } from '@/ui';
 import type { EntityDetailState } from './useEntityDetail';
 import { GENERIC_ERROR_COPY, OFFLINE_NO_CACHE_COPY } from './copy';
 import { ClaimsSection } from './sections/ClaimsSection';
@@ -47,10 +47,13 @@ export function EntityDetailScreen({
   onBackToExplore,
   onOpenEntity,
 }: EntityDetailScreenProps) {
+  const theme = useThemeColors();
+  const canvasStyle = { flex: 1, backgroundColor: theme.canvas };
+
   if (state.kind === 'loading') {
     return (
       <View
-        style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: space['8'] }}
+        style={[canvasStyle, { alignItems: 'center', justifyContent: 'center', padding: space['8'] }]}
         accessible
         accessibilityRole="progressbar"
         accessibilityLabel="Loading record"
@@ -63,7 +66,7 @@ export function EntityDetailScreen({
 
   if (state.kind === 'not-found') {
     return (
-      <View testID="entity-not-found-state">
+      <View style={canvasStyle} testID="entity-not-found-state">
         <NotPublicState onBackToExplore={onBackToExplore} />
       </View>
     );
@@ -71,7 +74,7 @@ export function EntityDetailScreen({
 
   if (state.kind === 'offline-no-cache') {
     return (
-      <View testID="entity-offline-no-cache-state">
+      <View style={canvasStyle} testID="entity-offline-no-cache-state">
         <ErrorState
           title={OFFLINE_NO_CACHE_COPY.title}
           description={OFFLINE_NO_CACHE_COPY.description}
@@ -83,7 +86,7 @@ export function EntityDetailScreen({
 
   if (state.kind === 'error') {
     return (
-      <View testID="entity-error-state">
+      <View style={canvasStyle} testID="entity-error-state">
         <ErrorState
           title={GENERIC_ERROR_COPY.title}
           description={state.message || GENERIC_ERROR_COPY.description}
@@ -98,7 +101,13 @@ export function EntityDetailScreen({
   return (
     <ScrollView
       testID="entity-detail-screen"
-      contentContainerStyle={{ padding: space['4'], gap: space['6'] }}
+      style={canvasStyle}
+      contentContainerStyle={{
+        paddingHorizontal: screenScrollInsets.paddingHorizontal,
+        paddingTop: screenScrollInsets.paddingTop,
+        paddingBottom: screenScrollInsets.paddingBottom,
+        gap: screenScrollInsets.gap,
+      }}
     >
       {freshness.degraded ? <OfflineBanner fetchedAt={freshness.fetchedAt} /> : null}
 
