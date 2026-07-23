@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
   actions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: space['2'],
   },
   ghostBtn: {
     width: GHOST_SIZE,
