@@ -83,8 +83,10 @@ is only for MapLibre.
 
 ## CI (black-book-mobile-019)
 
-`.github/workflows/ci.yml` runs two dedicated npm-based jobs on every PR/push to `main`,
-alongside the root pnpm-based jobs (which cannot see `apps/mobile` — see below):
+`.github/workflows/ci.yml` runs two dedicated npm-based jobs when a PR/push touches
+`apps/mobile/**`, `packages/public-contracts/**`, or `brand/` (mobile token source),
+alongside the root pnpm-based jobs (which cannot see `apps/mobile` — see below).
+Unrelated monorepo changes skip these jobs:
 
 - **Mobile Typecheck**: `npm ci` (isolated `apps/mobile/package-lock.json`), regenerates the
   gitignored `expo-env.d.ts` type-reference shim (Expo normally writes this on first

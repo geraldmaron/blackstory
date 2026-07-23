@@ -1,6 +1,9 @@
 # BB-036 security scanning, abuse contracts, staging-only DAST, and release evidence.
 # High/critical findings and scanner failures are production-blocking by policy.
 # All external actions are pinned to immutable commits; DAST never targets production.
+#
+# Efficiency: Dependabot PRs keep dependency-review + secret-scan; skip CodeQL/SBOM/policy
+# install lane. Path gating skips heavy scanners on docs/brand-only changes. Retention 14d.
 
 name: Security
 
@@ -31,27 +34,37 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  SECURITY_ARTIFACT_RETENTION_DAYS: '90'
+  SECURITY_ARTIFACT_RETENTION_DAYS: '14'
 
 jobs:
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      security_code: ${{ steps.detect.outputs.security_code }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+      - name: Detect path changes
+        id: detect
+        uses: ./.github/actions/detect-changes
+
   policy-api-security:
     name: Security / Policy and API Security
+    needs: changes
+    if: >
+      github.actor != 'dependabot[bot]' &&
+      (github.event_name == 'workflow_dispatch' || needs.changes.outputs.security_code == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - name: Setup pnpm
-        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
-        with:
-          version: 9.12.3
-      - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Setup Node and pnpm
+        uses: ./.github/actions/setup-node-pnpm
       - name: Validate API abuse, infrastructure policy, suppressions, and release evidence
         run: |
           pnpm --filter @repo/testing test:security 2>&1 | tee security-contracts.log
@@ -72,10 +85,17 @@ jobs:
             infra/github/security-gates/policy.json
             infra/github/security-gates/suppressions.json
           if-no-files-found: error
-          retention-days: 90
+          retention-days: ${{ fromJSON(env.SECURITY_ARTIFACT_RETENTION_DAYS) }}
 
   codeql:
     name: Security / CodeQL (${{ matrix.language }})
+    needs: changes
+    # Keep on push/main + non-Dependabot code PRs; skip docs-only and Dependabot noise.
+    if: >
+      github.actor != 'dependabot[bot]' &&
+      (github.event_name == 'workflow_dispatch' ||
+       github.event_name == 'push' ||
+       needs.changes.outputs.security_code == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 25
     permissions:
@@ -106,7 +126,7 @@ jobs:
           name: codeql-${{ matrix.language }}-${{ github.sha }}
           path: codeql-results
           if-no-files-found: warn
-          retention-days: 90
+          retention-days: ${{ fromJSON(env.SECURITY_ARTIFACT_RETENTION_DAYS) }}
 
   dependency-review:
     name: Security / Dependency Review
@@ -136,7 +156,7 @@ jobs:
           name: dependency-review-${{ github.sha }}
           path: dependency-review-evidence.json
           if-no-files-found: error
-          retention-days: 90
+          retention-days: ${{ fromJSON(env.SECURITY_ARTIFACT_RETENTION_DAYS) }}
 
   secret-scan:
     name: Security / Secret Scan
@@ -170,10 +190,16 @@ jobs:
             results.sarif
             secret-scan-evidence.json
           if-no-files-found: error
-          retention-days: 90
+          retention-days: ${{ fromJSON(env.SECURITY_ARTIFACT_RETENTION_DAYS) }}
 
   sbom:
     name: Security / SBOM
+    needs: changes
+    if: >
+      github.actor != 'dependabot[bot]' &&
+      (github.event_name == 'workflow_dispatch' ||
+       github.event_name == 'push' ||
+       needs.changes.outputs.security_code == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -194,7 +220,7 @@ jobs:
           name: sbom-${{ github.sha }}
           path: sbom.spdx.json
           if-no-files-found: error
-          retention-days: 90
+          retention-days: ${{ fromJSON(env.SECURITY_ARTIFACT_RETENTION_DAYS) }}
 
   # Evidence-only on push/PR: Dependency Review (PRs) + CodeQL + gitleaks already gate.
   # Full blocking FS+misconfig scans were failing CI on intentional Terraform/Dockerfile
@@ -227,7 +253,7 @@ jobs:
           name: trivy-filesystem-${{ github.sha }}
           path: trivy-filesystem.sarif
           if-no-files-found: warn
-          retention-days: 90
+          retention-days: ${{ fromJSON(env.SECURITY_ARTIFACT_RETENTION_DAYS) }}
 
   image-signature:
     name: Security / Image and Signature
@@ -276,7 +302,7 @@ jobs:
             trivy-image.sarif
             cosign-verification.json
           if-no-files-found: warn
-          retention-days: 90
+          retention-days: ${{ fromJSON(env.SECURITY_ARTIFACT_RETENTION_DAYS) }}
 
   dast-staging:
     name: Security / DAST Staging
