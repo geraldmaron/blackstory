@@ -69,6 +69,23 @@ export type {
 export * from './public-data-summaries.js';
 
 export {
+  DATA_PAGE_INDICATOR_FIXTURE_BUNDLE,
+  mergeDataPageIndicatorBundle,
+  isDataPageIndicatorBundle,
+} from './data-page-series.js';
+export type {
+  DataPageSourceRef,
+  DataPageValueUnit,
+  DataPageRacePairPoint,
+  DataPageRacePairSeries,
+  DataPageGroupedBarSeriesDef,
+  DataPageGroupedBarPoint,
+  DataPageGroupedBarSeries,
+  DataPageIndicatorBundle,
+  DataPageObservationRow,
+} from './data-page-series.js';
+
+export {
   PHASE1_INDICATOR_THEMES,
   PHASE1_INDICATOR_CATALOG,
   getPhase1Indicator,
@@ -80,3 +97,83 @@ export type {
   Phase1IndicatorDefinition,
   Phase1IndicatorCatalogSummary,
 } from './phase1-indicator-catalog.js';
+
+export { PHASE1_USSC_INDICATOR_DEFINITIONS } from './phase1-ussc-indicator-catalog.js';
+export { PHASE1_DSL_RENEWING_INEQUALITY_INDICATOR_DEFINITIONS } from './phase1-dsl-renewing-inequality-indicator-catalog.js';
+export { PHASE1_NHGIS_INDICATOR_DEFINITIONS } from './phase1-nhgis-indicator-catalog.js';
+export {
+  PHASE1_EJI_TRI_INDICATOR_DEFINITIONS,
+  listPhase1EjiTriIndicators,
+} from './phase1-eji-tri-indicator-catalog.js';
+export {
+  PHASE1_CHAS_INDICATOR_DEFINITIONS,
+} from './phase1-chas-indicator-catalog.js';
+
+export {
+  THEME_IMPACT_THEME_IDS,
+  THEME_IMPACT_PRIORITIES,
+  REDLINING_POLICY_ERAS,
+  DRUG_POLICY_ERAS,
+  THEME_IMPACT_V1_SOURCE_ALLOWLIST,
+  THEME_IMPACT_QUESTIONS,
+  getThemeImpactQuestion,
+  listThemeImpactQuestionsByTheme,
+  listThemeImpactQuestionsByPriority,
+  resolvePhase1BindingsForQuestion,
+  assertThemeImpactPhase1BindingsValid,
+  summarizeThemeImpactCatalog,
+} from './theme-impact-questions.js';
+export type {
+  ThemeImpactThemeId,
+  ThemeImpactPriority,
+  RedliningPolicyEra,
+  DrugPolicyEra,
+  ThemeImpactAnswerShape,
+  ThemeImpactMetricBinding,
+  ThemeImpactArtifactClass,
+  ThemeImpactQuestion,
+  ThemeImpactV1SourceId,
+  ThemeImpactCatalogSummary,
+} from './theme-impact-questions.js';
+
+export {
+  THEME_IMPACT_PACKET_KIND,
+  THEME_IMPACT_METHOD_STANCES,
+  THEME_IMPACT_PACKET_STATUSES,
+  THEME_IMPACT_GAP_STATES,
+  THEME_IMPACT_BINDING_PURPOSES,
+  buildThemeImpactPacket,
+  assertThemeImpactPacketPublishable,
+  createRedliningQ3FixturePacket,
+} from './theme-impact-packet.js';
+export type {
+  ThemeImpactMethodStance,
+  ThemeImpactPacketStatus,
+  ThemeImpactGapState,
+  ThemeImpactBindingPurpose,
+  ThemeImpactProvenanceQuartet,
+  ThemeImpactPacketGeography,
+  ThemeImpactPacketObservation,
+  ThemeImpactPacketDerived,
+  ThemeImpactPacketArtifact,
+  ThemeImpactEntityBinding,
+  ThemeImpactPacket,
+  BuildThemeImpactPacketInput,
+} from './theme-impact-packet.js';
+export {
+  resolveThemeImpactPolicyEra,
+  resolveThemeImpactPolicyEras,
+} from './theme-impact-policy-eras.js';
+export type { ThemeImpactPolicyEraView } from './theme-impact-policy-eras.js';
+export {
+  formatThemeImpactEstimate,
+  parseThemeImpactPacketRow,
+  themeImpactPacketToView,
+} from './theme-impact-view.js';
+export type {
+  ThemeImpactArtifactView,
+  ThemeImpactDerivedView,
+  ThemeImpactObservationView,
+  ThemeImpactPacketView,
+  ThemeImpactProvenanceView,
+} from './theme-impact-view.js';

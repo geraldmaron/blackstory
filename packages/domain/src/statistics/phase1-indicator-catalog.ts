@@ -13,6 +13,7 @@ export const PHASE1_INDICATOR_THEMES = [
   'justice',
   'education',
   'labor',
+  'environment',
 ] as const;
 
 export type Phase1IndicatorTheme = (typeof PHASE1_INDICATOR_THEMES)[number];
@@ -32,6 +33,12 @@ function series(
     metricId: asMetricId(partial.metricId),
   };
 }
+
+import { PHASE1_USSC_INDICATOR_DEFINITIONS } from './phase1-ussc-indicator-catalog.js';
+import { PHASE1_DSL_RENEWING_INEQUALITY_INDICATOR_DEFINITIONS } from './phase1-dsl-renewing-inequality-indicator-catalog.js';
+import { PHASE1_NHGIS_INDICATOR_DEFINITIONS } from './phase1-nhgis-indicator-catalog.js';
+import { PHASE1_EJI_TRI_INDICATOR_DEFINITIONS } from './phase1-eji-tri-indicator-catalog.js';
+import { PHASE1_CHAS_INDICATOR_DEFINITIONS } from './phase1-chas-indicator-catalog.js';
 
 /** Curated Phase 1 MVP metrics (~15). Expand only with registry + loader beads. */
 export const PHASE1_INDICATOR_CATALOG: readonly Phase1IndicatorDefinition[] = [
@@ -185,6 +192,53 @@ export const PHASE1_INDICATOR_CATALOG: readonly Phase1IndicatorDefinition[] = [
     externalDataSourceId: 'eviction-lab',
   }),
   series({
+    metricId: 'hmda-denial-rate-black-county',
+    metricDefinition:
+      'Mortgage application denial rate for Black or African American applicants (HMDA county aggregate)',
+    universe: 'home mortgage applications (actions taken 1–3)',
+    unit: 'percent',
+    sourceDataset: 'FFIEC HMDA Data Browser',
+    sourceTable: 'aggregations',
+    sourceVariable: 'derived_race denial rate',
+    geographyType: 'county',
+    estimateType: 'percentage',
+    periodType: 'annual',
+    theme: 'wealth',
+    externalDataSourceId: 'hmda-loan-level',
+    raceEthnicitySlice: 'black',
+  }),
+  series({
+    metricId: 'hmda-denial-rate-white-county',
+    metricDefinition:
+      'Mortgage application denial rate for White applicants (HMDA county aggregate)',
+    universe: 'home mortgage applications (actions taken 1–3)',
+    unit: 'percent',
+    sourceDataset: 'FFIEC HMDA Data Browser',
+    sourceTable: 'aggregations',
+    sourceVariable: 'derived_race denial rate',
+    geographyType: 'county',
+    estimateType: 'percentage',
+    periodType: 'annual',
+    theme: 'wealth',
+    externalDataSourceId: 'hmda-loan-level',
+    raceEthnicitySlice: 'white',
+  }),
+  series({
+    metricId: 'hmda-denial-rate-gap-black-white-county',
+    metricDefinition:
+      'Black minus White mortgage application denial rate gap (percentage points, HMDA county aggregate)',
+    universe: 'home mortgage applications (actions taken 1–3)',
+    unit: 'percentage_points',
+    sourceDataset: 'FFIEC HMDA Data Browser',
+    sourceTable: 'aggregations',
+    sourceVariable: 'derived denial rate gap',
+    geographyType: 'county',
+    estimateType: 'percentage',
+    periodType: 'annual',
+    theme: 'wealth',
+    externalDataSourceId: 'hmda-loan-level',
+  }),
+  series({
     metricId: 'scf-median-wealth-black-nation',
     metricDefinition: 'Median family net worth for Black families (SCF)',
     universe: 'families',
@@ -260,6 +314,11 @@ export const PHASE1_INDICATOR_CATALOG: readonly Phase1IndicatorDefinition[] = [
     externalDataSourceId: 'census-sipp-wealth',
     raceEthnicitySlice: 'black',
   }),
+  ...PHASE1_USSC_INDICATOR_DEFINITIONS,
+  ...PHASE1_DSL_RENEWING_INEQUALITY_INDICATOR_DEFINITIONS,
+  ...PHASE1_NHGIS_INDICATOR_DEFINITIONS,
+  ...PHASE1_EJI_TRI_INDICATOR_DEFINITIONS,
+  ...PHASE1_CHAS_INDICATOR_DEFINITIONS,
 ];
 
 export function getPhase1Indicator(metricId: string): Phase1IndicatorDefinition | undefined {

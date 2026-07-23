@@ -19,6 +19,7 @@ export const PRIMARY_NAV: readonly ShellNavItem[] = [
 
 /** Overflow routes: desktop "More" disclosure + mobile drawer. */
 export const OVERFLOW_NAV: readonly ShellNavItem[] = [
+  { href: '/themes', label: 'Themes' },
   { href: '/data', label: 'Data' },
   { href: '/law', label: 'Law' },
   { href: '/methodology', label: 'Methodology' },
@@ -41,6 +42,7 @@ export const FOOTER_NAV_COLUMNS: readonly FooterNavColumn[] = [
       { href: '/search', label: 'Search' },
       { href: '/history', label: 'History' },
       { href: '/stories', label: 'Stories' },
+      { href: '/themes', label: 'Themes' },
       { href: '/data', label: 'Data' },
       { href: '/law', label: 'Law' },
     ],

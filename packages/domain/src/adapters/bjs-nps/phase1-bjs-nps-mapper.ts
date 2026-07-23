@@ -187,9 +187,19 @@ export function parseBjsNpsStat01Csv(csvText: string): {
   return { rows, referenceYear, rejected };
 }
 
+/** BJS national Black imprisonment rates are typically ~500–2500 per 100k; hard-cap rejects bad denominators. */
+const MAX_PLAUSIBLE_IMPRISONMENT_RATE_PER_100K = 5_000;
+
 function imprisonmentRate(prisoners: number, population: number): number | undefined {
   if (population <= 0) return undefined;
-  return roundRate((prisoners / population) * 100_000);
+  const rate = roundRate((prisoners / population) * 100_000);
+  if (rate > MAX_PLAUSIBLE_IMPRISONMENT_RATE_PER_100K) {
+    throw new Error(
+      `Implausible imprisonment rate ${rate} per 100k ` +
+        `(prisoners=${prisoners}, population=${population}). Check race denominators.`,
+    );
+  }
+  return rate;
 }
 
 function buildDraft(input: {

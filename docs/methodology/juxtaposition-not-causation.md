@@ -7,7 +7,7 @@
 
 **Status:** Binding product methodology  
 **Date:** 2026-07-21  
-**Related:** [context-data-source-matrix.md](../research/context-data-source-matrix.md), [confidence-lineage.md](../research/confidence-lineage.md), constitution `policy.v1.json`, `bb_reference.entity_context_bindings`
+**Related:** [context-data-source-matrix.md](../research/context-data-source-matrix.md), [confidence-lineage.md](../research/confidence-lineage.md), [ADR-029](../adr/ADR-029-theme-impact-packets.md) (theme impact packets), constitution `policy.v1.json`, `bb_reference.entity_context_bindings`
 
 ## Problem
 

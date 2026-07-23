@@ -1,29 +1,20 @@
 /**
- * Data page: national Census, neighborhood, hate crime, and Opportunity Atlas
- * figures behind the archive, each with source citations (public-numeric-policy
- * category 3). County map layers live on Explore; HOLC (Mapping Inequality) is
- * deliberately absent (CC BY-NC-SA). Chrome lives in DataSections; charts in
- * components/data.
+ * Data page: national Census population plus Phase 1 / theme-impact indicator visualizations
+ * (wealth, housing, justice). Charts wire to warehouse observations or verified fixtures.
  */
 import { US_STATES } from '@repo/domain/map/geography';
 import { buildStateFipsNameMap } from '@repo/domain/statistics/public-data-summaries';
 import {
-  getAcsCoverageSummary,
-  getHateCrimeYearSummaries,
-  getHateCrimeYearSummary,
   getHistoricalStatePopulationCoverage,
   getNationalPopulationTimelineSnapshot,
-  getOpportunityAtlasCoverageSummary,
   getPhase1IndicatorCoverageSummary,
   getStatePopulationChanges,
-  type AcsCoverageSummary,
-  type HateCrimeYearSummary,
   type HistoricalStatePopulationCoverage,
   type NationalPopulationTimelineSnapshot,
-  type OpportunityAtlasCoverageSummary,
   type Phase1IndicatorCoverageSummary,
   type StatePopulationChange,
 } from '../../lib/demographics/public-stats-source';
+import { getDataPageIndicatorBundle } from '../../lib/demographics/data-page-indicators';
 import { timelineChangeStripItems } from '../../components/data/population-change';
 import '../../components/data/data-charts.css';
 import { DataSections } from './DataSections';
@@ -31,14 +22,8 @@ import { DataSections } from './DataSections';
 export const metadata = {
   title: 'Data',
   description:
-    'National Census, neighborhood, hate crime, and opportunity figures behind the BlackStory archive, each with sources you can open.',
+    'National Census population and Phase 1 indicator charts — wealth, housing, credit, and justice figures behind the BlackStory archive, each with sources you can open.',
 };
-
-/** Most recent data year with a complete annual FBI UCR release at time of writing. */
-const LATEST_HATE_CRIME_YEAR = '2024';
-
-/** Years shown on the multi-year reporting metrics chart — each year fetched separately. */
-const HATE_CRIME_SERIES_YEARS = ['2010', '2015', '2020', '2021', '2022', '2023', '2024'] as const;
 
 async function safe<T>(promise: Promise<T | undefined | null>): Promise<T | undefined> {
   try {
@@ -56,31 +41,19 @@ export default async function DataPage() {
     timelineSnapshot,
     stateChanges2010to2020,
     historicalStateCoverage,
-    acsCoverage,
     phase1Indicators,
-    hateCrimeYear,
-    hateCrimeSeries,
-    opportunityAtlasCoverage,
+    indicators,
   ] = await Promise.all([
     safe(getNationalPopulationTimelineSnapshot()),
     safe(getStatePopulationChanges('2010', '2020')),
     safe(getHistoricalStatePopulationCoverage()),
-    safe(getAcsCoverageSummary()),
     safe(getPhase1IndicatorCoverageSummary()),
-    safe(getHateCrimeYearSummary(LATEST_HATE_CRIME_YEAR)),
-    safe(getHateCrimeYearSummaries(HATE_CRIME_SERIES_YEARS)),
-    safe(getOpportunityAtlasCoverageSummary()),
+    safe(getDataPageIndicatorBundle()),
   ]);
 
-  const hateCrime = hateCrimeYear as HateCrimeYearSummary | undefined;
-  const hateCrimeByYear = (hateCrimeSeries ?? []) as readonly HateCrimeYearSummary[];
-  const acs = acsCoverage as AcsCoverageSummary | undefined;
   const phase1 = phase1Indicators as Phase1IndicatorCoverageSummary | undefined;
-  const opportunity = opportunityAtlasCoverage as OpportunityAtlasCoverageSummary | undefined;
   const historicalStates = historicalStateCoverage as HistoricalStatePopulationCoverage | undefined;
-  const timeline = (timelineSnapshot ?? undefined) as
-    | NationalPopulationTimelineSnapshot
-    | undefined;
+  const timeline = (timelineSnapshot ?? undefined) as NationalPopulationTimelineSnapshot | undefined;
   const timelineRows = timeline?.rows ?? [];
   const stateChanges = (stateChanges2010to2020 ?? []) as readonly StatePopulationChange[];
   const chartSources = (timeline?.sources ?? []).map((source) => ({
@@ -100,13 +73,17 @@ export default async function DataPage() {
     ? timelineChangeStripItems(timeline.changes, primarySource, 3)
     : [];
 
+  if (!indicators) {
+    throw new Error('Data page indicator bundle unavailable');
+  }
+
   return (
     <main className="ds-container ds-page" id="main">
       <p className="ds-page__eyebrow">Numbers</p>
       <h1 className="ds-page__title">Data behind the archive</h1>
       <p className="ds-page__lede">
-        National figures that give context to the places and people in BlackStory. Every chart
-        names its source. For county maps and local layers, open Explore.
+        National Census context plus curated indicators we use on Themes — wealth, housing, credit,
+        and justice. Every chart names its source. For county maps, open Explore.
       </p>
 
       <DataSections
@@ -116,12 +93,8 @@ export default async function DataPage() {
         stateChanges={stateChanges}
         stateNameByFips={STATE_NAME_BY_FIPS}
         historicalStates={historicalStates}
-        acs={acs}
         phase1Indicators={phase1}
-        hateCrime={hateCrime}
-        hateCrimeByYear={hateCrimeByYear}
-        latestHateCrimeYear={LATEST_HATE_CRIME_YEAR}
-        opportunity={opportunity}
+        indicators={indicators}
       />
     </main>
   );

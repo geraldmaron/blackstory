@@ -1,0 +1,20 @@
+# Median family net worth by race — Survey of Consumer Finances triennial surveys.
+# Values in 2022 inflation-adjusted U.S. dollars (full USD, not thousands).
+# Black: Black or African American non-Hispanic families.
+# White: White non-Hispanic families.
+# Source: Federal Reserve FEDS Note accessible data (Figure 2, top panel) and
+#   SCF 2022 bulletin Table 2; checked against scfindex.htm summary extract (Nov 2023).
+# source_url: https://www.federalreserve.gov/econres/notes/feds-notes/greater-wealth-greater-uncertainty-changes-in-racial-inequality-in-the-survey-of-consumer-finances-accessible-20231018.htm
+year,black_median_usd,white_median_usd
+1989,9200,164030
+1992,20510,144420
+1995,21130,148330
+1998,28260,174750
+2001,32450,205530
+2004,32090,221470
+2007,30140,245110
+2010,21800,178280
+2013,16780,180680
+2016,21090,210940
+2019,27970,218140
+2022,44900,285000
