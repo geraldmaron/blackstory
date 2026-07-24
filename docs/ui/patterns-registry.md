@@ -11,6 +11,7 @@ Reusable UI modules under `apps/web/src/components/patterns/`. Each row links to
 | Utility edition (compact pages) | [`patterns-utility-edition.md`](./patterns-utility-edition.md) | `utility-edition/*` | `UtilityEditionShell`, `UtilityEditionIntro`, `UtilityEditionBodyPanel`, chrome helpers |
 | Map entity encoding | [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) | `kind-encoding.ts`, `marker-size.ts`, `explore-style.ts`, `MapExperienceLegend.tsx` | `kindFamilyFor`, `KIND_FAMILY_ENTRIES`, `displayEncodingFor`, legend Color key |
 | Map canvas lifecycle | [`patterns-map-canvas.md`](./patterns-map-canvas.md) | `map-libre-lifecycle.ts`, `hero-map-inset.ts`, `MapStage.tsx`, `EntityLocationMap.tsx` | `bindMapResizeLifecycle`, `waitForContainerLayout`, `isWebGlAvailable` |
+| Cinematic map backdrop | [`patterns-cinematic-map.md`](./patterns-cinematic-map.md) | `cinematic-map/*` (`CinematicMapProvider.tsx`, `useCinematicMap.ts`, `ExploreMapControl.tsx`, `CinematicScrim.tsx`, `MapIntroBeat.tsx`, `cinematic-map.css`) | `CinematicMapProvider`, `useCinematicMap`, `ExploreMapControl`, `CinematicScrim`, `MapIntroBeat` |
 | Home featured set | (home v6) [`design-direction-v6-home.md`](./design-direction-v6-home.md) § beat 02 | `home-featured-set.ts` | `toHomeFeaturedEntity`, `buildHomeFeaturedCarouselSet` |
 
 ## Import paths
@@ -52,6 +53,13 @@ import { UtilityEditionBodyPanel } from '@/components/patterns/utility-edition/U
 
 // Home carousel set builder
 import { buildHomeFeaturedCarouselSet } from '@/components/patterns/home-featured-set';
+
+// Cinematic map backdrop — locked-until-invited map behind content (import CSS once on the route)
+import { CinematicMapProvider, useCinematicMap } from '@/components/patterns/cinematic-map/CinematicMapProvider';
+import { ExploreMapControl } from '@/components/patterns/cinematic-map/ExploreMapControl';
+import { CinematicScrim } from '@/components/patterns/cinematic-map/CinematicScrim';
+import { MapIntroBeat } from '@/components/patterns/cinematic-map/MapIntroBeat';
+import '@/components/patterns/cinematic-map/cinematic-map.css';
 ```
 
 Relative imports from `apps/web/src` use the paths above without the `@/` alias where the app does not configure it; prefer the same folder layout as existing call sites (`components/patterns/...`).
@@ -74,6 +82,8 @@ Relative imports from `apps/web/src` use the paths above without the `@/` alias 
 | `/explore` `NarrativeCard` | `RecordAnatomyPanel`, `RecordBrowseControls` browse toolbar |
 | `/explore` shell | Footer omitted by design (`design-direction-v6-explore.md` §3); other routes use [`patterns-site-footer.md`](./patterns-site-footer.md) |
 | `/locate`, `/submit`, `/corrections`, status, 404, error | `UtilityEditionShell`, `UtilityEditionIntro`, `UtilityEditionBodyPanel` |
+
+Planned adopters — **Cinematic map backdrop** (`patterns-cinematic-map.md`): `/` home + mobile Explore tab first (reference implementations), then `/explore`, `/history`, `/entity/[id]` place context. Rest → Engaged everywhere; Rest → Invite → Engaged only on landing/narrative surfaces.
 
 Planned adopters (same modules, no new chrome): `/errata`, `/support`, `/privacy` (`repo-49wc`). Entity detail session nav keeps `EntitySessionNav` (explicit back stack); see browse-mode doc.
 
