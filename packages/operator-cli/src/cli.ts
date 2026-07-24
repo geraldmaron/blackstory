@@ -55,6 +55,7 @@ import { censusSafeHttpClient } from './census-http.js';
 import { commitLocate, prepareLocate } from './locate.js';
 import { runResearchIntake } from './research-intake.js';
 import { runWorkerPreflight } from './worker-preflight.js';
+import { loadLaneModelSpend, formatLaneSpendReport } from './model-invocation-log.js';
 import {
   loadTougalooGeojsonFeatures,
   runSundownTownCountyBrief,
@@ -369,6 +370,19 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         const report = await runWorkerPreflight();
         stdout(JSON.stringify(report, null, 2));
         return report.ok ? 0 : 1;
+      }
+      case 'model-report': {
+        const sinceFlag = optionalFlag(flags, '--since');
+        const since = sinceFlag ? new Date(sinceFlag) : undefined;
+        if (since && Number.isNaN(since.getTime())) {
+          stderr(`--since is not a valid date: ${sinceFlag}\n`);
+          return 1;
+        }
+        const asJson = flags.booleans.has('--json');
+        const pool = getOpsPostgresPool(process.env);
+        const rows = await loadLaneModelSpend(pool, { ...(since ? { since } : {}) });
+        stdout(asJson ? JSON.stringify(rows, null, 2) : `${formatLaneSpendReport(rows)}\n`);
+        return 0;
       }
       case 'submit-lead': {
         const sourceUrls = flags.repeated.get('--source-url');
@@ -1201,7 +1215,8 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
       }
       default: {
         stderr(
-          'Usage: operator-cli <preflight|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|sundown-town-brief|harness-run|locate> [flags]\n' +
+          'Usage: operator-cli <preflight|model-report|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|sundown-town-brief|harness-run|locate> [flags]\n' +
+          'For model-report: [--since <ISO date>] [--json]\n' +
           'For harness-run: --theme <theme> --metro <metro> [--connectors dpla,nps_network_to_freedom,web_search] [--enrich] [--provider openrouter|ollama|mock]\n'
         );
         return command ? 1 : 0;

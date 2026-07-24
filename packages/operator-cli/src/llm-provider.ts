@@ -22,6 +22,11 @@ export type LlmCompletionRequest = {
   };
 };
 
+export type LlmTokenUsage = {
+  readonly promptTokens: number;
+  readonly completionTokens: number;
+};
+
 export type LlmCompletionResult = {
   readonly content: string;
   readonly provider: string;
@@ -29,6 +34,8 @@ export type LlmCompletionResult = {
   /** When hybrid failover occurred, names the provider that actually answered. */
   readonly servedBy?: string;
   readonly attempts?: number;
+  /** OpenAI-compatible `usage` block, when the endpoint returned one (model-routing cost logging). */
+  readonly usage?: LlmTokenUsage;
 };
 
 export type LlmProvider = {
@@ -222,6 +229,7 @@ async function completeOpenAiCompatible(
   const json = (await response.json()) as {
     choices?: Array<{ message?: ChatMessagePayload }>;
     model?: string;
+    usage?: { prompt_tokens?: number; completion_tokens?: number };
   };
   const content = extractMessageContent(json.choices?.[0]?.message);
   if (!content) {
@@ -231,10 +239,16 @@ async function completeOpenAiCompatible(
     err.retryable = true;
     throw err;
   }
+  const usage =
+    typeof json.usage?.prompt_tokens === 'number' &&
+    typeof json.usage?.completion_tokens === 'number'
+      ? { promptTokens: json.usage.prompt_tokens, completionTokens: json.usage.completion_tokens }
+      : undefined;
   return {
     content,
     provider: providerId,
     modelId: typeof json.model === 'string' && json.model ? json.model : request.model,
+    ...(usage ? { usage } : {}),
   };
 }
 

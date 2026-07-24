@@ -13,7 +13,10 @@
  *
  * Match strategies, in precedence order:
  *  1. Direct id hit — the token IS already a canonical entity id present in the set.
- *  2. Explicit override map (`MENTION_OVERRIDES`) — a small, hand-verified table for tokens that
+ *  2. Explicit override map (`MENTION_OVERRIDES`, loaded at runtime from
+ *     `./data/mention-overrides.json` — repo-xez5.10 moved it out of source so curation edits
+ *     don't require a code deploy; see that file for provenance) — a small, hand-verified table
+ *     for tokens that
  *     are unambiguous to a human researcher but not safely disambiguable by the automated
  *     strategies below (either because the normalized name doesn't literally match the token, or
  *     because the acronym is shared by more than one entity in the catalog). Checked before the
@@ -27,6 +30,9 @@
  *     "Southern Christian Leadership Conference (SCLC)") whose lowercased acronym matches the
  *     token, AND exactly one entity in the set carries that acronym.
  */
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 export type MentionResolvableEntity = {
   readonly id: string;
@@ -34,34 +40,29 @@ export type MentionResolvableEntity = {
   readonly aliases?: readonly string[];
 };
 
+const MENTION_OVERRIDES_PATH = join(
+  dirname(fileURLToPath(import.meta.url)),
+  'data',
+  'mention-overrides.json',
+);
+
+type MentionOverridesFile = {
+  readonly overrides: readonly { readonly token: string; readonly entityId: string }[];
+};
+
+function loadMentionOverrides(): ReadonlyMap<string, string> {
+  const parsed = JSON.parse(readFileSync(MENTION_OVERRIDES_PATH, 'utf8')) as MentionOverridesFile;
+  return new Map(parsed.overrides.map((entry) => [entry.token, entry.entityId]));
+}
+
 /**
  * Hand-verified overrides for tokens seen in the national-catalog fixtures today that the
- * automated strategies cannot safely resolve alone:
- *  - the five organization acronyms below each collide with that org's own "Founding" event
- *    entity (also carrying "(ACRONYM)" in its displayName), so the acronym-in-parentheses
- *    strategy alone is ambiguous between the org and the founding event; the override always
- *    prefers the organization.
- *  - `civil-rights-act-1866` / `freedom-summer` / `selma` are slugs whose normalized form does
- *    not literally equal the target entity's displayName (extra words like "of" or a longer,
- *    more specific title), but each has exactly one unambiguous referent in the catalog.
- *
- * Deliberately NOT included: `mfdp` (no standalone Mississippi Freedom Democratic Party
- * *organization* entity exists — only `ent_mfdp_dnc_challenge_001`, a specific 1964 DNC-challenge
- * *event* — mapping the bare organization mention to that one event would overclaim), and
- * `freedom-rides` / `little-rock-nine` (no matching event entity exists in the catalog at all,
- * only e.g. `ent_freedom_rides_museum_001`, a distinct memorial-site entity). These remain
- * unresolved rather than guessed; add an override once/if a real target entity is added.
+ * automated strategies cannot safely resolve alone. Loaded at runtime from
+ * `./data/mention-overrides.json` (repo-xez5.10) — see that file for per-entry provenance/notes
+ * and the deliberately-excluded tokens (`mfdp`, `freedom-rides`, `little-rock-nine`) that stay
+ * unresolved rather than guessed.
  */
-export const MENTION_OVERRIDES: ReadonlyMap<string, string> = new Map([
-  ['naacp', 'ent_naacp_org_001'],
-  ['sclc', 'ent_sclc_org_001'],
-  ['sncc', 'ent_sncc_org_001'],
-  ['core', 'ent_core_org_001'],
-  ['cofo', 'ent_cofo_001'],
-  ['civil-rights-act-1866', 'ent_law_civil_rights_act_1866'],
-  ['freedom-summer', 'ent_freedom_summer_mount_zion_001'],
-  ['selma', 'ent_selma_to_montgomery_marches_001'],
-]);
+export const MENTION_OVERRIDES: ReadonlyMap<string, string> = loadMentionOverrides();
 
 function normalizeName(value: string): string {
   return value

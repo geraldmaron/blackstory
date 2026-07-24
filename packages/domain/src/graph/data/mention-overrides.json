@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "mention-overrides.v1",
+  "updatedAt": "2026-07-24",
+  "provenance": "Hand-verified by a human researcher; not derived from any automated resolution pass. Moved out of packages/domain/src/graph/mention-resolver.ts (repo-xez5.10) so curation edits don't require a code deploy — see that file's module doc comment for the resolution algorithm these entries feed into.",
+  "purpose": "Explicit overrides for mentionedEntityIds tokens that automated resolution strategies in mention-resolver.ts cannot safely disambiguate alone (see notes per entry).",
+  "overrides": [
+    {
+      "token": "naacp",
+      "entityId": "ent_naacp_org_001",
+      "note": "Acronym collides with the org's own Founding event entity; override prefers the organization."
+    },
+    {
+      "token": "sclc",
+      "entityId": "ent_sclc_org_001",
+      "note": "Acronym collides with the org's own Founding event entity; override prefers the organization."
+    },
+    {
+      "token": "sncc",
+      "entityId": "ent_sncc_org_001",
+      "note": "Acronym collides with the org's own Founding event entity; override prefers the organization."
+    },
+    {
+      "token": "core",
+      "entityId": "ent_core_org_001",
+      "note": "Acronym collides with the org's own Founding event entity; override prefers the organization."
+    },
+    {
+      "token": "cofo",
+      "entityId": "ent_cofo_001",
+      "note": "Acronym collides with the org's own Founding event entity; override prefers the organization."
+    },
+    {
+      "token": "civil-rights-act-1866",
+      "entityId": "ent_law_civil_rights_act_1866",
+      "note": "Normalized token does not literally equal the target's displayName, but referent is unambiguous."
+    },
+    {
+      "token": "freedom-summer",
+      "entityId": "ent_freedom_summer_mount_zion_001",
+      "note": "Normalized token does not literally equal the target's displayName, but referent is unambiguous."
+    },
+    {
+      "token": "selma",
+      "entityId": "ent_selma_to_montgomery_marches_001",
+      "note": "Normalized token does not literally equal the target's displayName, but referent is unambiguous."
+    }
+  ],
+  "deliberatelyExcluded": [
+    {
+      "token": "mfdp",
+      "reason": "No standalone Mississippi Freedom Democratic Party organization entity exists, only ent_mfdp_dnc_challenge_001 (a specific 1964 DNC-challenge event) — mapping the bare org mention to that one event would overclaim."
+    },
+    {
+      "token": "freedom-rides",
+      "reason": "No matching event entity exists in the catalog, only ent_freedom_rides_museum_001, a distinct memorial-site entity."
+    },
+    {
+      "token": "little-rock-nine",
+      "reason": "No matching event entity exists in the catalog at all."
+    }
+  ]
+}
