@@ -13,3 +13,7 @@ export type {
   ReviewFlag,
   ReviewFlagKind,
 } from './review-signal.js';
+
+// Cross-reference entity resolution (multi-source stitcher): finds persons in ≥2 sources but not
+// in catalog; aggregation of independent source references clears the confidence-floor bottleneck.
+export * from './cross-reference-stitcher.js';

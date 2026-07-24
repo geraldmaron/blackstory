@@ -119,3 +119,10 @@ export * from './nrhp-mpl/index.js';
 
 // Chronicling America (LoC Black press / newspapers) — fixtures-first, registered disabled.
 export * from './chronicling-america/index.js';
+
+// Research-discovery methodology adapters (registered DISABLED): county/state archival finding
+// aids, Black press newspapers, oral history collections, HBCU special collections.
+export * from './finding-aid/index.js';
+export * from './black-press/index.js';
+export * from './oral-history/index.js';
+export * from './hbcu-collections/index.js';

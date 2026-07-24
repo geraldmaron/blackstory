@@ -1,0 +1,97 @@
+{
+  "schemaVersion": "oral-history-collections.v1",
+  "notes": "Real U.S. oral-history collections for the Oral History Pipeline methodology. URLs are public institution portals/collection pages. Machine endpoints (APIs, OAI-PMH, transcript access) must be confirmed per institution (HUMAN STEP) before enabling, and a live adapter MUST use @repo/security safe-fetch. HBCU-held collections (e.g. Fisk University Special Collections oral histories, Texas Southern, Tuskegee) are priority expansion targets once their public machine endpoints are confirmed. classification=community_oral is deliberate: first-person testimony is a low-authority tier that can inform research but never publish alone.",
+  "sources": [
+    {
+      "id": "loc-crhp",
+      "registryEntryId": "reg_oral_history_loc_crhp",
+      "sourceId": "src_oral_history_loc_crhp",
+      "organizationId": "org_loc_afc",
+      "displayName": "Library of Congress — Civil Rights History Project (American Folklife Center)",
+      "institution": "Library of Congress, American Folklife Center (with the Smithsonian NMAAHC)",
+      "homepageUrl": "https://www.loc.gov/research-centers/american-folklife-center/",
+      "sourceClass": "first-person-or-oral-history",
+      "classification": "community_oral",
+      "collections": [
+        {
+          "sourceId": "src_oral_history_loc_crhp",
+          "collectionId": "loc-crhp",
+          "title": "Civil Rights History Project",
+          "institution": "Library of Congress, American Folklife Center / NMAAHC",
+          "collectionUrl": "https://www.loc.gov/collections/civil-rights-history-project/",
+          "coveragePeriod": "2010/2015",
+          "notes": "Video oral histories with civil rights movement participants, mandated by the Civil Rights History Project Act of 2009; interviews name local organizers, churches, schools, and neighborhoods."
+        }
+      ],
+      "notes": "Congressionally mandated joint LOC/NMAAHC collection; item pages and many transcripts are public on loc.gov."
+    },
+    {
+      "id": "storycorps",
+      "registryEntryId": "reg_oral_history_storycorps",
+      "sourceId": "src_oral_history_storycorps",
+      "organizationId": "org_storycorps",
+      "displayName": "StoryCorps Archive (incl. the Griot Initiative)",
+      "institution": "StoryCorps (recordings archived at the Library of Congress American Folklife Center)",
+      "homepageUrl": "https://storycorps.org/",
+      "sourceClass": "first-person-or-oral-history",
+      "classification": "community_oral",
+      "collections": [
+        {
+          "sourceId": "src_oral_history_storycorps",
+          "collectionId": "storycorps-archive",
+          "title": "StoryCorps Online Archive",
+          "institution": "StoryCorps",
+          "collectionUrl": "https://archive.storycorps.org/",
+          "notes": "Participant-published interview pages. The Griot Initiative (launched 2007) specifically collects African American voices; access terms and per-interview permissions must be confirmed before any live harvest (HUMAN STEP)."
+        }
+      ],
+      "notes": "Community-contributed first-person recordings; the richest everyday-life lane and also the one requiring the most per-item rights care."
+    },
+    {
+      "id": "unc-sohp",
+      "registryEntryId": "reg_oral_history_unc_sohp",
+      "sourceId": "src_oral_history_unc_sohp",
+      "organizationId": "org_unc_sohp",
+      "displayName": "UNC Southern Oral History Program",
+      "institution": "University of North Carolina at Chapel Hill, Southern Oral History Program / Wilson Library",
+      "homepageUrl": "https://sohp.org/",
+      "sourceClass": "first-person-or-oral-history",
+      "classification": "community_oral",
+      "collections": [
+        {
+          "sourceId": "src_oral_history_unc_sohp",
+          "collectionId": "unc-sohp-04007",
+          "title": "Southern Oral History Program Collection (#4007)",
+          "institution": "UNC Chapel Hill, Louis Round Wilson Special Collections Library",
+          "collectionUrl": "https://finding-aids.lib.unc.edu/04007/",
+          "coveragePeriod": "1973/",
+          "notes": "Thousands of interviews on Southern life including civil rights, Black communities, mill towns, and rural counties; finding aid and many digitized transcripts are public."
+        }
+      ],
+      "notes": "Program site sohp.org; collection finding aid at finding-aids.lib.unc.edu/04007/."
+    },
+    {
+      "id": "duke-behind-the-veil",
+      "registryEntryId": "reg_oral_history_duke_btv",
+      "sourceId": "src_oral_history_duke_btv",
+      "organizationId": "org_duke_franklin_center",
+      "displayName": "Behind the Veil: Documenting African-American Life in the Jim Crow South",
+      "institution": "Duke University, John Hope Franklin Research Center, David M. Rubenstein Library",
+      "homepageUrl": "https://repository.duke.edu/dc/behindtheveil",
+      "sourceClass": "first-person-or-oral-history",
+      "classification": "community_oral",
+      "collections": [
+        {
+          "sourceId": "src_oral_history_duke_btv",
+          "collectionId": "duke-btv",
+          "title": "Behind the Veil oral histories",
+          "institution": "Duke University Libraries Digital Repository",
+          "collectionUrl": "https://repository.duke.edu/dc/behindtheveil",
+          "coveragePeriod": "1990/1995",
+          "notes": "~1,200 interviews with Black Southerners about everyday life under Jim Crow — teachers, farmers, midwives, church leaders — recorded 1990s about the 1890s-1950s."
+        }
+      ],
+      "notes": "One of the largest single oral-history collections of Jim Crow-era lived experience; digitized audio in the Duke Digital Repository."
+    }
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "schemaVersion": "community-holder-registry.v1",
+  "description": "Priority-county community knowledge holder registry for Community Knowledge Holder Partnership campaigns. Entries are role-based institution TYPES only — never named individuals. Real outreach contacts live in private operator tooling, never in the repo. Every holder carries a low-authority source classification (community_oral / self_published): submissions can inform research but can never publish alone.",
+  "counties": [
+    {
+      "countyName": "Dallas County",
+      "stateCode": "AL",
+      "fipsCode": "01047",
+      "priorityRationale": "Dense documented civil-rights and Reconstruction-era place history with thin digitized local coverage relative to national narratives.",
+      "holders": [
+        {
+          "holderType": "county_historical_society",
+          "displayLabel": "County Historical Society",
+          "classification": "self_published",
+          "intakeNotes": "Newsletters, cemetery surveys, and vertical files naming local figures and places; strongest on source citations for the sourceCitation field."
+        },
+        {
+          "holderType": "local_naacp_chapter",
+          "displayLabel": "Local NAACP Chapter",
+          "classification": "community_oral",
+          "intakeNotes": "Branch meeting minutes, membership rolls where shareable, and organizer oral histories; strong on role/place/year triples."
+        },
+        {
+          "holderType": "black_church_archive",
+          "displayLabel": "Black Church Archive",
+          "classification": "community_oral",
+          "intakeNotes": "Minute books, funeral programs, homecoming booklets, and cornerstone records tying people to a standing or former church site."
+        },
+        {
+          "holderType": "public_library_local_history",
+          "displayLabel": "Public Library Local History Room",
+          "classification": "self_published",
+          "intakeNotes": "Clipping files and locally published county histories; useful for corroborating citations submitted by other holders."
+        }
+      ]
+    },
+    {
+      "countyName": "Hinds County",
+      "stateCode": "MS",
+      "fipsCode": "28049",
+      "priorityRationale": "Major movement geography where neighborhood- and congregation-level knowledge is underrepresented in digitized archives.",
+      "holders": [
+        {
+          "holderType": "black_church_archive",
+          "displayLabel": "Black Church Archive",
+          "classification": "community_oral",
+          "intakeNotes": "Congregation anniversaries and program booklets naming deacons, choir leaders, and founding families with dates."
+        },
+        {
+          "holderType": "local_naacp_chapter",
+          "displayLabel": "Local NAACP Chapter",
+          "classification": "community_oral",
+          "intakeNotes": "Chapter histories and oral accounts of local organizers and meeting places."
+        },
+        {
+          "holderType": "community_elder_circle",
+          "displayLabel": "Community Elder Oral History Circle",
+          "classification": "community_oral",
+          "intakeNotes": "Recorded oral histories; submissions should carry an oralHistoryRef with recording or transcript identifiers, never private contact details."
+        },
+        {
+          "holderType": "funeral_home_records",
+          "displayLabel": "Black-Owned Funeral Home Records",
+          "classification": "self_published",
+          "intakeNotes": "Funeral programs and ledgers anchoring names to dates and burial places; handle living-family details with care — never submit living persons' addresses."
+        }
+      ]
+    },
+    {
+      "countyName": "Macon County",
+      "stateCode": "AL",
+      "fipsCode": "01087",
+      "priorityRationale": "HBCU-anchored county where faculty research and campus-adjacent community memory can surface people absent from federal archives.",
+      "holders": [
+        {
+          "holderType": "hbcu_faculty",
+          "displayLabel": "HBCU Faculty (History / Archives Department)",
+          "classification": "self_published",
+          "intakeNotes": "Working papers, student theses, and departmental collections; strongest citation quality among community holders but still corroboration-required."
+        },
+        {
+          "holderType": "county_historical_society",
+          "displayLabel": "County Historical Society",
+          "classification": "self_published",
+          "intakeNotes": "Marker files and county chronologies naming local institutions and proprietors."
+        },
+        {
+          "holderType": "black_church_archive",
+          "displayLabel": "Black Church Archive",
+          "classification": "community_oral",
+          "intakeNotes": "Congregation records connecting families to church schools and burial grounds."
+        },
+        {
+          "holderType": "black_greek_letter_chapter",
+          "displayLabel": "Black Greek-Letter Organization Chapter Archive",
+          "classification": "community_oral",
+          "intakeNotes": "Chapter scrapbooks and anniversary programs documenting campus and town figures by role and year."
+        }
+      ]
+    }
+  ]
+}

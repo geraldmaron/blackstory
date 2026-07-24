@@ -220,3 +220,13 @@ export {
   type PartitionByRelevanceInput,
   type PartitionByRelevanceResult,
 } from './campaign-runner.js';
+
+// Research-discovery methodology campaigns (nooks-and-crannies surface): county archive ladder,
+// Black press, geographic gap scanner, network traversal, temporal gap audit, oral history, HBCU.
+export * from './county-archive-campaign.js';
+export * from './black-press-campaign.js';
+export * from './geographic-gap-scanner.js';
+export * from './network-traversal.js';
+export * from './temporal-gap-audit.js';
+export * from './oral-history-campaign.js';
+export * from './hbcu-campaign.js';

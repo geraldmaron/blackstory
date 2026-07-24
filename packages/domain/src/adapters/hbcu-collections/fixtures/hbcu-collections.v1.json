@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "hbcu-collections-seed.v1",
+  "description": "Seeded HBCU special collections for the HBCU Special Collections Discovery methodology. All URLs are real public portals verified reachable at seed time (2026-07-24); never fabricate URLs. dplaContributorMatch values are provider/contributor display-name matcher fragments for the DPLA hub lane, not URLs.",
+  "sources": [
+    {
+      "id": "howard-msrc",
+      "registryEntryId": "reg_hbcu_howard_msrc",
+      "sourceId": "src_hbcu_howard_msrc",
+      "organizationId": "org_howard_university",
+      "institution": "howard",
+      "displayName": "Howard University Moorland-Spingarn Research Center",
+      "state": "US-DC",
+      "collectionUrl": "https://msrc.howard.edu/",
+      "findingAidBaseUrl": "https://dh.howard.edu/",
+      "lane": "ead-finding-aid",
+      "dplaContributorMatch": "Howard University",
+      "notes": "One of the largest repositories of documentation on the global Black experience; finding aids surface via Digital Howard (dh.howard.edu)."
+    },
+    {
+      "id": "fisk-franklin-library",
+      "registryEntryId": "reg_hbcu_fisk_franklin",
+      "sourceId": "src_hbcu_fisk_franklin",
+      "organizationId": "org_fisk_university",
+      "institution": "fisk",
+      "displayName": "Fisk University John Hope and Aurelia E. Franklin Library Special Collections",
+      "state": "US-TN",
+      "collectionUrl": "https://www.fisk.edu/academics/john-hope-and-aurelia-e-franklin-library/",
+      "lane": "dpla-hub",
+      "dplaContributorMatch": "Fisk University",
+      "notes": "Holdings include the Julius Rosenwald Fund archives and W.E.B. Du Bois materials; Tennessee materials aggregate through DPLA's Tennessee hub."
+    },
+    {
+      "id": "tuskegee-archives",
+      "registryEntryId": "reg_hbcu_tuskegee_archives",
+      "sourceId": "src_hbcu_tuskegee_archives",
+      "organizationId": "org_tuskegee_university",
+      "institution": "tuskegee",
+      "displayName": "Tuskegee University Archives",
+      "state": "US-AL",
+      "collectionUrl": "https://www.tuskegee.edu/libraries/library_services/archives.html",
+      "lane": "ead-finding-aid",
+      "dplaContributorMatch": "Tuskegee University",
+      "notes": "University archives at Tuskegee University Libraries, including institutional records and the historical lynching documentation tradition begun under Monroe Work."
+    },
+    {
+      "id": "hampton-archives",
+      "registryEntryId": "reg_hbcu_hampton_archives",
+      "sourceId": "src_hbcu_hampton_archives",
+      "organizationId": "org_hampton_university",
+      "institution": "hampton",
+      "displayName": "Hampton University Archives",
+      "state": "US-VA",
+      "collectionUrl": "https://hamptonu.edu/archives/",
+      "lane": "ead-finding-aid",
+      "dplaContributorMatch": "Hampton University",
+      "notes": "University archives documenting Hampton Normal and Agricultural Institute's history; museum collections at hamptonu.edu/museum/."
+    },
+    {
+      "id": "hbcu-library-alliance-digital",
+      "registryEntryId": "reg_hbcu_alliance_digital",
+      "sourceId": "src_hbcu_alliance_digital",
+      "organizationId": "org_hbcu_library_alliance",
+      "institution": "hbcu-library-alliance",
+      "displayName": "HBCU Library Alliance Digital Collection (AUC Woodruff Library)",
+      "state": "US-GA",
+      "collectionUrl": "https://hbcudigitallibrary.auctr.edu/",
+      "lane": "dpla-hub",
+      "dplaContributorMatch": "HBCU Library Alliance",
+      "notes": "Cross-institution digital collection hosted by the Atlanta University Center Robert W. Woodruff Library; useful fallback lane for member institutions without standalone finding-aid portals (includes Spelman College materials)."
+    }
+  ]
+}

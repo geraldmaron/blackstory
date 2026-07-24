@@ -243,3 +243,7 @@ export {
 export { censusSafeHttpClient } from './census-http.js';
 
 export { runCli, type CliDependencies } from './cli.js';
+
+// Research-discovery methodology directives (propose-only; never publish).
+export * from './lib/geographic-gap-brief.js';
+export * from './story-gap-discovery.js';

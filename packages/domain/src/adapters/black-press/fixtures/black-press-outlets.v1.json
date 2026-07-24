@@ -1,0 +1,109 @@
+{
+  "schemaVersion": "black-press-outlets.v1",
+  "generatedAt": "2026-07-24T00:00:00.000Z",
+  "notes": [
+    "Seed roster of digitized Black newspapers for black-press discovery (leads only).",
+    "All archive URLs are real collection/index entry points — none fabricated.",
+    "Google News Archive nids were read from the live https://news.google.com/newspapers index; ProQuest Black Newspaper Collection page verified live.",
+    "Access varies: several full runs remain under copyright behind library subscriptions. Rights default is 'unknown' and full-text republication is prohibited (see adapters/black-press contract).",
+    "Chronicling America (https://chroniclingamerica.loc.gov/) additionally hosts many public-domain Black press titles and is the general open directory for pre-1929 runs."
+  ],
+  "directories": [
+    {
+      "kind": "google-news-archive",
+      "url": "https://news.google.com/newspapers",
+      "access": "open",
+      "notes": "Google News Archive browse index (lists 'The Afro American', 'The Afro American Ledger', 'Baltimore Afro-American', and other scanned titles)."
+    },
+    {
+      "kind": "chronicling-america",
+      "url": "https://chroniclingamerica.loc.gov/",
+      "access": "open",
+      "notes": "Library of Congress Chronicling America home — open directory and page scans for many historic Black newspapers. First-class adapter exists (chronicling-america-v1); listed here as a directory, not an outlet archive claim."
+    }
+  ],
+  "outlets": [
+    {
+      "id": "outlet_chicago_defender",
+      "title": "The Chicago Defender",
+      "place": "Chicago, IL",
+      "foundedYear": 1905,
+      "archives": [
+        {
+          "kind": "proquest-black-newspapers",
+          "url": "https://about.proquest.com/en/products-services/histnews-bn/",
+          "access": "subscription",
+          "notes": "ProQuest Historical Newspapers: Black Newspaper Collection (digitized run; library subscription required)."
+        }
+      ]
+    },
+    {
+      "id": "outlet_pittsburgh_courier",
+      "title": "The Pittsburgh Courier",
+      "place": "Pittsburgh, PA",
+      "foundedYear": 1907,
+      "archives": [
+        {
+          "kind": "proquest-black-newspapers",
+          "url": "https://about.proquest.com/en/products-services/histnews-bn/",
+          "access": "subscription",
+          "notes": "ProQuest Historical Newspapers: Black Newspaper Collection (digitized run; library subscription required)."
+        }
+      ]
+    },
+    {
+      "id": "outlet_baltimore_afro_american",
+      "title": "The Baltimore Afro-American",
+      "place": "Baltimore, MD",
+      "foundedYear": 1892,
+      "archives": [
+        {
+          "kind": "google-news-archive",
+          "url": "https://news.google.com/newspapers?nid=UBnQDr5gPskC",
+          "access": "open",
+          "notes": "Google News Archive: 'The Afro American' — 3,623 scanned issues, Jan 4, 1902 – Dec 26, 1992 (nid read from the live newspapers index)."
+        },
+        {
+          "kind": "google-news-archive",
+          "url": "https://news.google.com/newspapers?nid=ztWeZN2wRXQC",
+          "access": "open",
+          "notes": "Google News Archive: 'The Afro American Ledger' — early run of the AFRO family of papers (nid read from the live newspapers index)."
+        }
+      ]
+    },
+    {
+      "id": "outlet_new_york_amsterdam_news",
+      "title": "The New York Amsterdam News",
+      "place": "New York, NY",
+      "foundedYear": 1909,
+      "archives": [
+        {
+          "kind": "proquest-black-newspapers",
+          "url": "https://about.proquest.com/en/products-services/histnews-bn/",
+          "access": "subscription",
+          "notes": "ProQuest Historical Newspapers: Black Newspaper Collection (digitized run; library subscription required)."
+        },
+        {
+          "kind": "institutional",
+          "url": "https://www.nypl.org/locations/schomburg",
+          "access": "onsite",
+          "notes": "NYPL Schomburg Center for Research in Black Culture — institutional holdings and research access."
+        }
+      ]
+    },
+    {
+      "id": "outlet_atlanta_daily_world",
+      "title": "The Atlanta Daily World",
+      "place": "Atlanta, GA",
+      "foundedYear": 1928,
+      "archives": [
+        {
+          "kind": "proquest-black-newspapers",
+          "url": "https://about.proquest.com/en/products-services/histnews-bn/",
+          "access": "subscription",
+          "notes": "ProQuest Historical Newspapers: Black Newspaper Collection (digitized run; library subscription required)."
+        }
+      ]
+    }
+  ]
+}

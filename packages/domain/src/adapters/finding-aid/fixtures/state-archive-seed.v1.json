@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "state-archive-seed.v1",
+  "notes": "Real U.S. state historical-society / department-of-archives finding-aid sources for the County Archive Ladder methodology. URLs are public institution portals. OAI-PMH endpoints are only listed where the institution publicly documents one; otherwise protocol is ead-xml against the finding-aid portal and a live adapter must confirm the machine endpoint (HUMAN STEP) before enabling.",
+  "sources": [
+    {
+      "id": "adah",
+      "registryEntryId": "reg_finding_aid_adah",
+      "sourceId": "src_finding_aid_adah",
+      "organizationId": "org_adah",
+      "displayName": "Alabama Department of Archives and History",
+      "state": "US-AL",
+      "findingAidBaseUrl": "https://digital.archives.alabama.gov/",
+      "protocol": "ead-xml",
+      "sourceClass": "scholarly",
+      "classification": "primary_archival",
+      "notes": "State archive in Montgomery; digital collections and finding aids at digital.archives.alabama.gov; main site archives.alabama.gov."
+    },
+    {
+      "id": "georgia-archives",
+      "registryEntryId": "reg_finding_aid_georgia",
+      "sourceId": "src_finding_aid_georgia",
+      "organizationId": "org_georgia_archives",
+      "displayName": "Georgia Archives (University System of Georgia)",
+      "state": "US-GA",
+      "findingAidBaseUrl": "https://vault.georgiaarchives.org/",
+      "protocol": "ead-xml",
+      "sourceClass": "scholarly",
+      "classification": "primary_archival",
+      "notes": "Georgia Archives in Morrow; Virtual Vault digital collections at vault.georgiaarchives.org; main site georgiaarchives.org."
+    },
+    {
+      "id": "mdah",
+      "registryEntryId": "reg_finding_aid_mdah",
+      "sourceId": "src_finding_aid_mdah",
+      "organizationId": "org_mdah",
+      "displayName": "Mississippi Department of Archives and History",
+      "state": "US-MS",
+      "findingAidBaseUrl": "https://da.mdah.ms.gov/",
+      "protocol": "ead-xml",
+      "sourceClass": "scholarly",
+      "classification": "primary_archival",
+      "notes": "State archive in Jackson; digital archives at da.mdah.ms.gov; main site mdah.ms.gov."
+    },
+    {
+      "id": "scdah",
+      "registryEntryId": "reg_finding_aid_scdah",
+      "sourceId": "src_finding_aid_scdah",
+      "organizationId": "org_scdah",
+      "displayName": "South Carolina Department of Archives and History",
+      "state": "US-SC",
+      "findingAidBaseUrl": "https://scdah.sc.gov/",
+      "protocol": "ead-xml",
+      "sourceClass": "scholarly",
+      "classification": "primary_archival",
+      "notes": "State archive in Columbia; online records index and finding aids via scdah.sc.gov."
+    },
+    {
+      "id": "nc-state-archives",
+      "registryEntryId": "reg_finding_aid_ncsa",
+      "sourceId": "src_finding_aid_ncsa",
+      "organizationId": "org_nc_state_archives",
+      "displayName": "State Archives of North Carolina",
+      "state": "US-NC",
+      "findingAidBaseUrl": "https://archives.ncdcr.gov/",
+      "protocol": "ead-xml",
+      "sourceClass": "scholarly",
+      "classification": "primary_archival",
+      "notes": "State archive in Raleigh (NC Dept. of Natural and Cultural Resources); finding aids and MARS catalog via archives.ncdcr.gov."
+    }
+  ]
+}

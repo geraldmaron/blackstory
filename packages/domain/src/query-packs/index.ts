@@ -79,3 +79,4 @@ export {
 } from './registry.js';
 
 export * from './wikidata-place-first/index.js';
+export * from './temporal-era/index.js';
