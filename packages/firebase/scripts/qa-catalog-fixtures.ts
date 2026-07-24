@@ -10,15 +10,27 @@
  *  - every claim carries a real-looking https citationHref + non-blank source/label
  *  - confidenceLevel vocabulary; no numeric score-like fields anywhere
  *
+ * Also reports (WARNING by default, see "Connectivity budget" below) entities that come out of
+ * `extractCatalogRelationships` — the same extraction `publish-national-catalog.ts` uses, which
+ * as of WS6 also wires forward resolvable `mentionedEntityIds` (see
+ * `packages/domain/src/graph/mention-resolver.ts`) — with ZERO relationships: an entity nobody
+ * links to and that links to nobody is a graph dead end, worth flagging even though it isn't a
+ * fixture-shape violation the way the checks above are.
+ *
  * Usage:
  *   node --conditions development --import tsx packages/firebase/scripts/qa-catalog-fixtures.ts \
  *     [--dir=packages/firebase/fixtures/national-catalog] [--candidate-dir=/path/to/new-files]
  * Exit 0 = clean; exit 1 = violations printed.
+ *
+ * Connectivity budget (isolated-entity check):
+ *   Warns by default and does not affect the exit code. Set QA_STRICT_ISOLATED=1 (or pass
+ *   --strict-isolated) to fail the gate (non-zero exit) when any isolated entity is found —
+ *   opt-in so this never breaks the existing publish flow for pre-existing isolated entities.
  */
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { US_STATES } from '@repo/domain';
+import { US_STATES, extractCatalogRelationships, type CatalogEntityForRelationships } from '@repo/domain';
 
 const DEFAULT_DIR = join(dirname(fileURLToPath(import.meta.url)), '../fixtures/national-catalog');
 
@@ -46,6 +58,8 @@ type Entry = {
   claims?: Claim[];
   historicalContext?: string;
   sensitivityClass?: string;
+  related?: CatalogEntityForRelationships['related'];
+  mentionedEntityIds?: readonly string[];
 };
 
 const KINDS = new Set([
@@ -87,6 +101,9 @@ const problems: string[] = [];
 const seenIds = new Map<string, string>();
 const seenNames = new Map<string, string>();
 let total = 0;
+// Accumulated across every dir/file, for the connectivity-budget check below — it needs the FULL
+// entity set so a relationship whose two endpoints live in different fixture files still resolves.
+const allEntries: Entry[] = [];
 
 for (const dir of dirs) {
   for (const file of readdirSync(dir)
@@ -108,6 +125,7 @@ for (const dir of dirs) {
 
     entries.forEach((entry, index) => {
       total += 1;
+      allEntries.push(entry);
       const tag = `${file}[${index}] ${entry.id ?? entry.displayName ?? '?'}`;
       const flag = (msg: string) => problems.push(`${tag}: ${msg}`);
 
@@ -198,9 +216,50 @@ for (const dir of dirs) {
 }
 
 console.log(`Checked ${total} entries across ${dirs.length} dir(s).`);
+
+// ---------------------------------------------------------------------------
+// Connectivity budget: flag publishable entities extractCatalogRelationships resolves to ZERO
+// relationships (isolated). WARNING by default (never affects exit code) so this never breaks
+// the existing publish flow; opt into a hard gate with QA_STRICT_ISOLATED=1 / --strict-isolated.
+// ---------------------------------------------------------------------------
+const strictIsolated = process.env.QA_STRICT_ISOLATED === '1' || process.argv.includes('--strict-isolated');
+const publishableEntries = allEntries.filter(
+  (entry): entry is Entry & { id: string } => typeof entry.id === 'string' && entry.id.length > 0,
+);
+const { relationships: connectivityRelationships } = extractCatalogRelationships(
+  publishableEntries as unknown as readonly CatalogEntityForRelationships[],
+  { generatedAt: new Date(0).toISOString() },
+);
+const degreeById = new Map<string, number>();
+for (const rel of connectivityRelationships) {
+  degreeById.set(rel.fromEntityId, (degreeById.get(rel.fromEntityId) ?? 0) + 1);
+  degreeById.set(rel.toEntityId, (degreeById.get(rel.toEntityId) ?? 0) + 1);
+}
+const isolatedEntries = publishableEntries.filter((entry) => (degreeById.get(entry.id) ?? 0) === 0);
+
+if (isolatedEntries.length > 0) {
+  const pct = ((isolatedEntries.length / publishableEntries.length) * 100).toFixed(1);
+  console.warn(
+    `\n⚠ ${isolatedEntries.length}/${publishableEntries.length} entit(ies) (${pct}%) have zero ` +
+      'relationships (no explicit related[] edge and no resolvable mentionedEntityIds match):',
+  );
+  for (const entry of isolatedEntries.slice(0, 10)) {
+    console.warn(`  - ${entry.id} ${entry.displayName ? `(${entry.displayName})` : ''}`.trimEnd());
+  }
+  if (isolatedEntries.length > 10) console.warn(`  ... and ${isolatedEntries.length - 10} more`);
+  if (strictIsolated) {
+    console.error('\nQA_STRICT_ISOLATED=1: failing due to isolated entities (see above).');
+  }
+} else {
+  console.log('Connectivity budget: 0 isolated entities.');
+}
+
 if (problems.length > 0) {
   console.error(`\n${problems.length} problem(s):`);
   for (const problem of problems) console.error(`  ✘ ${problem}`);
+  process.exit(1);
+}
+if (strictIsolated && isolatedEntries.length > 0) {
   process.exit(1);
 }
 console.log('QA clean.');

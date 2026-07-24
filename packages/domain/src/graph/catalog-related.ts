@@ -2,6 +2,17 @@
  * Converts national-catalog inline `related` shortcuts into canonical
  * `EntityRelationship` records and projects relationships back to public
  * adjacency entries for release materialization.
+ *
+ * Also wires forward each entity's `mentionedEntityIds` (WS6 — see `./mention-resolver.ts`'s
+ * header comment for why those tokens are a mixed bag of already-canonical ids, bare acronyms,
+ * and event slugs). A resolved mention becomes a minimal `related_to` edge only — it is
+ * deliberately NOT typed any more specifically than that. Specific edge typing (e.g. `member_of`,
+ * `attended`, `participated_in`) is the candidate/proposal pipeline's job
+ * (`./relationship-candidates.ts` + `packages/firebase/scripts/generate-relationship-candidates.ts`
+ * stage 2), which has the context to assign a real type per `docs/relationship-taxonomy.md` and
+ * route through human review before publication. This extraction path publishes directly
+ * (`workflowStatus: 'accepted'`), so it only ever emits the one edge type that's true by
+ * construction: "these two entities are documented as related."
  */
 import { resolveReleaseClaimId, type ReleaseSourceClaim } from '../publication/release-builder.js';
 import type { EntityRelationship, RelationshipType, TemporalContext } from '../relationship.js';
@@ -11,6 +22,7 @@ import {
   toPublicRelatedEntries,
   type PublicRelatedEntry,
 } from './adjacency.js';
+import { buildMentionResolverIndex, resolveMentionToken } from './mention-resolver.js';
 
 export type CatalogRelatedEntry = {
   readonly id: string;
@@ -21,8 +33,13 @@ export type CatalogRelatedEntry = {
 
 export type CatalogEntityForRelationships = {
   readonly id: string;
+  readonly displayName?: string;
+  readonly aliases?: readonly string[];
   readonly claims?: readonly ReleaseSourceClaim[];
   readonly related?: readonly CatalogRelatedEntry[];
+  /** Slug/acronym/already-canonical-id tokens naming other entities this entity's catalog prose
+   * mentions — see this module's header comment and `./mention-resolver.ts`. */
+  readonly mentionedEntityIds?: readonly string[];
 };
 
 export type ExtractCatalogRelationshipsOptions = {
@@ -48,6 +65,14 @@ function isRelationshipType(value: string): value is RelationshipType {
 function dedupKey(entityA: string, entityB: string, type: RelationshipType): string {
   const [left, right] = entityA < entityB ? [entityA, entityB] : [entityB, entityA];
   return `${left}|${right}|${type}`;
+}
+
+/** Same pairing as `dedupKey` but WITHOUT the relationship type — used to detect that two
+ * endpoints already have SOME explicit `related[]` edge between them (of any type), so a
+ * resolved-mention `related_to` edge never duplicates an already-authored, more specific edge. */
+function unorderedPairKey(entityA: string, entityB: string): string {
+  const [left, right] = entityA < entityB ? [entityA, entityB] : [entityB, entityA];
+  return `${left}|${right}`;
 }
 
 function relationshipId(fromEntityId: string, type: RelationshipType, toEntityId: string): string {
@@ -133,6 +158,36 @@ export function extractCatalogRelationships(
           ...(entry.timespan ? { timespan: entry.timespan } : {}),
         });
       }
+    }
+  }
+
+  // Pairs already expressed by an explicit `related[]` edge (of ANY type) — computed from the
+  // explicit pass above, BEFORE any mention-derived edges are added, so a mention never shadows
+  // or duplicates a specific already-authored edge (e.g. `founded`) with a generic `related_to`.
+  const explicitPairKeys = new Set<string>();
+  for (const canonical of canonicalByKey.values()) {
+    explicitPairKeys.add(
+      unorderedPairKey(canonical.endpoints.fromEntityId, canonical.endpoints.toEntityId),
+    );
+  }
+
+  // Additive, backward-compatible wiring of `mentionedEntityIds` (WS6 — see this module's header
+  // comment). Entities that carry no `mentionedEntityIds` behave exactly as before this pass.
+  const mentionIndex = buildMentionResolverIndex(entities);
+  for (const entity of sortedEntities) {
+    for (const token of entity.mentionedEntityIds ?? []) {
+      const resolvedId = resolveMentionToken(token, mentionIndex);
+      if (!resolvedId) continue; // unresolved mention: never guessed, silently skipped.
+      if (resolvedId === entity.id) continue; // self-loop.
+      if (!entityById.has(resolvedId)) continue; // defensive: resolver already restricts to this set.
+      if (explicitPairKeys.has(unorderedPairKey(entity.id, resolvedId))) continue; // already an edge.
+
+      const key = dedupKey(entity.id, resolvedId, 'related_to');
+      if (canonicalByKey.has(key)) continue; // another mention already produced this same edge.
+
+      canonicalByKey.set(key, {
+        endpoints: { fromEntityId: entity.id, toEntityId: resolvedId },
+      });
     }
   }
 
