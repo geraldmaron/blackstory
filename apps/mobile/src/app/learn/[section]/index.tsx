@@ -3,8 +3,9 @@
  * known registry (`src/features/learn/sections.ts`) — never a raw dispatch on the incoming
  * string. Two shapes, depending on the section:
  *
- *   - Single-page section (`directSlug` set, e.g. Methodology, About, Privacy, Errata, Quick
+ *   - Single-page section (`directSlug` set, e.g. Methodology, Privacy, Errata, Quick
  *     facts): renders that page directly here — no extra "pick a page" hop.
+ *   - About (`routeId === 'about'`): dedicated storytelling `AboutScreen` (web about parity).
  *   - Multi-page section (History, Topics, Myths, Legal): lists its catalog entries as rows that
  *     push `/learn/[section]/[slug]`.
  *
@@ -15,6 +16,7 @@
 import { Redirect, router, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useLayoutEffect } from 'react';
 
+import { AboutScreen } from '@/features/about';
 import {
   ContentPageScreen,
   SectionListScreen,
@@ -53,6 +55,10 @@ export default function LearnSectionIndexScreen() {
 
   if (!row) {
     return <Redirect href="/explore" />;
+  }
+
+  if (row.routeId === 'about') {
+    return <AboutScreen />;
   }
 
   if (row.directSlug) {

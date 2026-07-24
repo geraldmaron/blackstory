@@ -26,6 +26,7 @@ export type NavIconName =
   | 'themes'
   | 'lawRef'
   | 'submit'
+  | 'memorial'
   | 'story'
   | 'place'
   | 'school'
@@ -61,6 +62,7 @@ const OUTLINE: Record<NavIconName, IonName> = {
   themes: 'layers-outline',
   lawRef: 'scale-outline',
   submit: 'send-outline',
+  memorial: 'flower-outline',
   story: 'newspaper-outline',
   place: 'location-outline',
   school: 'school-outline',

@@ -39,7 +39,7 @@ describe('ExploreInstrumentsPanel', () => {
 
   it('auto-applies kind filter changes', async () => {
     const onFiltersChange = jest.fn();
-    const { getByLabelText } = await render(
+    const { getByLabelText, queryByText } = await render(
       <ExploreInstrumentsPanel
         filters={{}}
         features={SEPARATED}
@@ -47,6 +47,7 @@ describe('ExploreInstrumentsPanel', () => {
         onHide={() => undefined}
       />,
     );
+    expect(queryByText('Apply')).toBeNull();
     fireEvent.press(getByLabelText('Places'));
     expect(onFiltersChange).toHaveBeenCalledWith({ kind: 'places' });
   });

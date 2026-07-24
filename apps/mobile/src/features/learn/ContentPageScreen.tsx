@@ -6,6 +6,7 @@ import { useNavigation } from 'expo-router';
 import { useLayoutEffect } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import {
+  EditionBrandHeader,
   EmptyState,
   ErrorState,
   ScreenCanvas,
@@ -120,13 +121,23 @@ export function ContentPageScreen({
 
             return (
               <>
-                <ScreenHeader
-                  kicker={longform ? 'Longform' : 'Document'}
-                  title={page.title}
-                  dek={page.dek}
-                  compact
-                  dense
-                />
+                {longform ? (
+                  <EditionBrandHeader
+                    kicker="Longform"
+                    title={page.title}
+                    dek={page.dek}
+                    compact
+                    dense
+                  />
+                ) : (
+                  <ScreenHeader
+                    kicker="Document"
+                    title={page.title}
+                    dek={page.dek}
+                    compact
+                    dense
+                  />
+                )}
                 <ContentRenderer
                   page={page}
                   blocks={blocks}

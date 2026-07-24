@@ -5,9 +5,6 @@
  */
 import type { NavIconName } from '@/ui/NavIcon';
 
-/** Keep in sync with `src/features/entity/share.ts` — duplicated here to avoid a route-params cycle. */
-const CANONICAL_WEB_ORIGIN = 'https://blackbook.app';
-
 export type MobileTabId = 'explore' | 'history' | 'stories' | 'more';
 
 export type MobileTabDefinition = {
@@ -76,16 +73,23 @@ export const MOBILE_MORE_SECTIONS: readonly MobileMoreSection[] = [
       {
         id: 'law',
         title: 'Law',
-        subtitle: 'Plain-language law reference (opens web)',
+        subtitle: 'Plain-language law reference',
         icon: 'lawRef',
-        destination: { kind: 'web', href: `${CANONICAL_WEB_ORIGIN}/law` },
+        destination: { kind: 'native', route: '/law' },
       },
       {
         id: 'books',
         title: 'Banned books',
-        subtitle: 'Challenged titles with cited reports (opens web)',
+        subtitle: 'Challenged titles with cited reports',
         icon: 'books',
-        destination: { kind: 'web', href: `${CANONICAL_WEB_ORIGIN}/books` },
+        destination: { kind: 'native', route: '/books' },
+      },
+      {
+        id: 'themes',
+        title: 'Themes',
+        subtitle: 'Policy-impact packets with cited evidence',
+        icon: 'themes',
+        destination: { kind: 'native', route: '/themes' },
       },
     ],
   },
@@ -104,9 +108,9 @@ export const MOBILE_MORE_SECTIONS: readonly MobileMoreSection[] = [
       {
         id: 'memorial',
         title: 'Memorial',
-        subtitle: 'Names held in remembrance (opens web)',
-        icon: 'about',
-        destination: { kind: 'web', href: `${CANONICAL_WEB_ORIGIN}/memorial` },
+        subtitle: 'Names held in remembrance',
+        icon: 'memorial',
+        destination: { kind: 'native', route: '/memorial' },
       },
       {
         id: 'corrections',
@@ -132,9 +136,9 @@ export const MOBILE_MORE_SECTIONS: readonly MobileMoreSection[] = [
       {
         id: 'submit',
         title: 'Submit',
-        subtitle: 'Share a lead or source (opens web)',
+        subtitle: 'Corrections on device; leads via moderated form',
         icon: 'submit',
-        destination: { kind: 'web', href: `${CANONICAL_WEB_ORIGIN}/submit` },
+        destination: { kind: 'native', route: '/submit' },
       },
     ],
   },

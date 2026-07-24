@@ -7,14 +7,9 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ATMOSPHERE_ATTRIBUTION_HREF } from '../../components/atmosphere/tile-credits';
-import { EditionAtmosphereMosaic } from '../../components/patterns/edition-atmosphere/EditionAtmosphereMosaic';
-import {
-  EDITION_MOSAIC_COUNT_BROWSE,
-} from '../../components/patterns/edition-atmosphere/edition-atmosphere-config';
 import { THEMES_PUBLIC_SURFACE_ENABLED } from '../../lib/theme-impact/public-surface';
 import { ThemeBrowseSections } from './ThemeBrowseSections';
 import {
-  THEMES_EDITION_MOSAIC_SEED,
   themesEditionPanelClassName,
   themesEditionRootClassName,
   themesEditionStackClassName,
@@ -35,7 +30,6 @@ export default function ThemesBrowsePage() {
 
   return (
     <div className={themesEditionRootClassName()} data-themes-edition="v6">
-      <EditionAtmosphereMosaic seedKey={THEMES_EDITION_MOSAIC_SEED} count={EDITION_MOSAIC_COUNT_BROWSE} />
       <main className="ds-container ds-page" id="main">
         <div className={themesEditionStackClassName()}>
           <article className={themesEditionPanelClassName('intro')}>
@@ -59,7 +53,7 @@ export default function ThemesBrowsePage() {
                   </Link>
                 </p>
                 <p className="ds-themes-edition__credit">
-                  Archive mosaic · symbolic atmosphere · decorative gutter tiles only.{' '}
+                  Archive texture · symbolic atmosphere. {' '}
                   <Link href={ATMOSPHERE_ATTRIBUTION_HREF}>Mosaic credits</Link>
                 </p>
               </div>

@@ -150,8 +150,12 @@ export function themeImpactPacketToView(
   packet: ThemeImpactPacket,
   options?: { readonly dataSource?: 'live' | 'fixture' },
 ): ThemeImpactPacketView {
+  // Prefer researched finding titles (EPI chartbook pattern) over canonical
+  // question prompts for public arc and packet headlines.
   const question =
-    getThemeImpactQuestion(packet.questionId)?.question ?? packet.title;
+    packet.title.trim() ||
+    getThemeImpactQuestion(packet.questionId)?.question ||
+    packet.questionId;
 
   return {
     ...(options?.dataSource !== undefined ? { dataSource: options.dataSource } : {}),

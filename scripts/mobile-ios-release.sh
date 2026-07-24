@@ -41,14 +41,25 @@ MOBILE_DIR="$ROOT/apps/mobile"
 ENV_LOCAL="$MOBILE_DIR/.env.local"
 
 load_mobile_env() {
-  export APP_VARIANT="${APP_VARIANT:-development}"
+  # Caller-provided APP_VARIANT wins over .env.local so preview/production
+  # Release smokes can force identity without editing the local env file.
+  local requested="${APP_VARIANT:-}"
   if [[ -f "$ENV_LOCAL" ]]; then
     set -a
     # shellcheck disable=SC1090
     source "$ENV_LOCAL"
     set +a
   fi
-  export APP_VARIANT
+  if [[ -n "$requested" ]]; then
+    export APP_VARIANT="$requested"
+  else
+    export APP_VARIANT="${APP_VARIANT:-development}"
+  fi
+  case "$APP_VARIANT" in
+    preview) IOS_BUNDLE_ID="app.blackbook.mobile.preview" ;;
+    production) IOS_BUNDLE_ID="app.blackbook.mobile" ;;
+    *) IOS_BUNDLE_ID="app.blackbook.mobile.dev" ;;
+  esac
 }
 
 booted_simulator_udid() {
@@ -91,10 +102,11 @@ launch_release_app() {
 
 case "$MODE" in
   verify)
+    load_mobile_env
     echo "mobile-ios-release: verify-only (api-public + Release app; no Metro)…"
     "$ROOT/scripts/ensure-api-public.sh" --check
     release_app_installed
-    echo "mobile-ios-release: verify ok — Release app installed; Metro not required"
+    echo "mobile-ios-release: verify ok — ${IOS_BUNDLE_ID} installed; Metro not required"
     exit 0
     ;;
   launch)

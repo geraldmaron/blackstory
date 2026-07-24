@@ -1,8 +1,10 @@
 /**
  * Entity detail screen (MOB-014) — Ledger Line flat section stacks on canvas
  * matching web `design-direction-v6-entity.md`: intro, anatomy, trust off-ramp,
- * narrative beats, claims, timeline, connected records, provenance, maps hand-off.
+ * narrative beats, claims, timeline, connected records, provenance, maps hand-off,
+ * and optional session navigation footer.
  */
+import type { ReactNode } from 'react';
 import { ActivityIndicator, ScrollView, View } from 'react-native';
 import { ErrorState, screenScrollInsets, space, useThemeColors } from '@/ui';
 import type { EntityDetailState } from './useEntityDetail';
@@ -29,6 +31,8 @@ export type EntityDetailScreenProps = {
   readonly onBackToMap?: (entityId: string) => void;
   readonly onOpenEntity?: (entityId: string) => void;
   readonly onMethodologyPress?: () => void;
+  /** Optional session Previous / Next / Random footer (web EntitySessionNav parity). */
+  readonly sessionNav?: ReactNode;
 };
 
 export function EntityDetailScreen({
@@ -39,6 +43,7 @@ export function EntityDetailScreen({
   onBackToMap,
   onOpenEntity,
   onMethodologyPress,
+  sessionNav,
 }: EntityDetailScreenProps) {
   const theme = useThemeColors();
   const canvasStyle = { flex: 1, backgroundColor: theme.canvas };
@@ -141,6 +146,7 @@ export function EntityDetailScreen({
         {...(onOpenEntity ? { onOpenEntity } : {})}
       />
       <ProvenanceSection entity={entity} index={beats.provenance} />
+      {sessionNav ?? null}
     </ScrollView>
   );
 }

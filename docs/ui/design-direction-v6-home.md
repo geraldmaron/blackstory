@@ -39,7 +39,7 @@ reader theme toggle (light and dark). Do not hide or disable the theme control o
 | Copper | Text `#8E4F2A`, graphic `#B86B2A` | Text `#D07A32`, graphic `#D07A32` |
 | Reader theme toggle | **Active on `/`** — home is not a light-only exception |
 
-**Atmosphere, not wallpaper:** page gutters carry fixed pseudo-element texture (paper grain + quiet archive index grid / corner brackets on Rule and copper hairlines). Home does **not** mount a scattered gutter mosaic — that collage register stays on other edition routes (`EditionAtmosphereMosaic`). Center content Surface cards stay opaque (WCAG floor); the home column itself is transparent so atmosphere can show through the hero copy scrim. No crumpled continental silhouettes, no competing fake map under the live hero readout, no sepia stock.
+**Atmosphere, not wallpaper:** page gutters may carry fixed paper grain + quiet archive index grid. Home does **not** mount scattered gutter mosaic tiles (`EditionAtmosphereMosaic`). Center content Surface cards stay opaque (WCAG floor). No crumpled continental silhouettes, no competing fake map under the live hero readout, no sepia stock.
 
 The hero map inside beat 0 is a **Surface-contained live readout**: the persistent MapLibre plate (`MapStage`) is **positioned** to the **full hero panel** (viewport-fixed box from `hero-map-inset.ts`, not `clip-path`) so basemap + archive pins render under the copy column as well as the map readout — never a decorative sketch, never full-bleed wallpaper under the whole page. The copy column sits over a **light matte scrim** (`.ds-home-hero::before`: ~38% canvas mix + soft grain only; ~48% on dark — no archive-grid wash on the scrim, which read as an opaque plate over ocean) with a transparent copy layer on top so map tiles remain visible under the words while ink stays WCAG AA. Opaque fills on `.ds-home` / home `main` are punched transparent so the inset can stack correctly. National framing uses asymmetric padding (`heroNationalCameraPadding`: left ≈ 22% of copy width on desktop; top ≈ 35% of copy height when stacked) so western states/pins sit under the headline while CONUS still reads primarily in the map-readout band. Bounds flights apply padding only in `cameraForBounds` (not again on `easeTo`) to avoid double-shifting.
 
@@ -58,7 +58,7 @@ The hero map inside beat 0 is a **Surface-contained live readout**: the persiste
 │  [ Beat 05 — Atlas rewind ]                                    │
 │  [ Footer — Surface card, three job columns ]                  │
 └────────────────────────────────────────────────────────────────┘
-     ↑ archive texture (grain + grid) in outer gutters; no home mosaic ↑
+     ↑ archive grain/grid texture; no scattered mosaic tiles ↑
 ```
 
 **Rhythm tokens (mockup anchors, map to `--ds-space-*` in implementation):**
@@ -120,7 +120,8 @@ The hero is **one Surface card** containing copy and map. It is **not** a full-v
 - Caption: mono uppercase, centered — e.g. "Live coverage · archive pins" (middle dot separator, not em dash).
 - Frame: fills column height (`min-height` ~`min(48vh, 28rem)` desktop; ~14rem mobile).
 - Content: **live MapLibre plate** positioned to the **full hero panel** (`hero-map-inset.ts`) with real archive entity pins — clipped to the rounded panel so the map appears cut off by the hero frame / copy scrim, not a separate right-only window.
-- Map column is a transparent pass-through (`pointer-events: none`); MapStage plate receives pin/state hits in the readout band (copy column blocks hits for legibility).
+- Map column is a transparent pass-through (`pointer-events: none`); MapStage plate receives pin/state hits in the readout band.
+- **Copy column owns hits** (`pointer-events: auto`, `touch-action: pan-y`) so mobile swipe scrolls the page, not the map under the words. Never set copy (or its text stack) to `pointer-events: none` while the live plate sits underneath — that is the “map steals scroll until you hit a CTA” failure mode.
 - Camera: after inset apply, national `fitBounds` uses `heroNationalCameraPadding` (left ≈ 22% copy width on desktop; top ≈ 35% copy height when stacked) so western states sit under the words while CONUS framing stays mostly in the map readout. Bounds padding is applied once in `cameraForBounds` only.
 - `engage()` clears the hero geometry before routing to `/explore` (ADR-017 handoff).
 

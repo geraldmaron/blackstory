@@ -47,7 +47,7 @@ export type ShellHeaderProps = {
   readonly brandLockup: ShellBrandAssets;
   /** Light-canvas and dark-canvas symbol paths (official kit artwork). */
   readonly brandSymbol: ShellBrandAssets;
-  /** Lockup at brand minimum on document routes; symbol-only on map-heavy routes like `/explore`. */
+  /** Official lockup by default; symbol-only when a surface opts in (e.g. tight chrome). Theme pairs swap via `[data-theme]`. */
   readonly brandDisplay?: 'lockup' | 'symbol';
   /** Copper is max one per composition — home demotes the shell CTA when the hero carries copper. */
   readonly ctaVariant?: 'copper' | 'quiet';

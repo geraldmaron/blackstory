@@ -43,7 +43,8 @@
   gap: var(--ds-space-5);
   width: 100%;
   padding-block: 0 var(--ds-space-16);
-  background: var(--ds-canvas);
+  /* Transparent so fixed grain/grid + gutter mosaic remain the page background. */
+  background: transparent;
 }
 
 /* v6: no fixed-ink bands on home — beats stay theme-aware throughout. */

@@ -10,18 +10,29 @@ import {
   HISTORY_DECADE_LIST_CLASS,
   HISTORY_DECADE_STEPPER_CLASS,
   HISTORY_DECADE_TAB_CLASS,
+  HISTORY_EDITION_MOSAIC_SEED,
   HISTORY_EDITION_PANEL_CLASS,
   HISTORY_EDITION_ROOT_CLASS,
   historyEditionPanelClassName,
   historyEditionRootClassName,
+  historyEditionStackClassName,
 } from './history-panel-chrome';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const historyEditionCss = readFileSync(join(here, 'history-edition.css'), 'utf8');
+const historyPageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
 
-test('history edition root class matches CSS scaffold', () => {
-  assert.equal(historyEditionRootClassName(), HISTORY_EDITION_ROOT_CLASS);
+test('history edition root class pairs with atmosphere canvas', () => {
+  assert.match(historyEditionRootClassName(), new RegExp(`^${HISTORY_EDITION_ROOT_CLASS}\\b`));
+  assert.match(historyEditionRootClassName(), /ds-edition-atmosphere-canvas/);
   assert.equal(HISTORY_EDITION_ROOT_CLASS, 'ds-history-edition');
+  assert.equal(HISTORY_EDITION_MOSAIC_SEED, 'history-edition-v6');
+  assert.equal(historyEditionStackClassName(), 'ds-history-edition__stack');
+});
+
+test('history page does not mount gutter mosaic tiles', () => {
+  assert.doesNotMatch(historyPageSource, /EditionAtmosphereMosaic/);
+  assert.doesNotMatch(historyPageSource, /HISTORY_EDITION_MOSAIC_SEED/);
 });
 
 test('history edition panel class includes beat variant modifiers', () => {

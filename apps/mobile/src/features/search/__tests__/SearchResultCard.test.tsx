@@ -91,17 +91,14 @@ describe('SearchResultCard — interaction', () => {
     expect(onPress).toHaveBeenCalledWith('ent_42');
   });
 
-  it('renders label-over-value era and kind facts', async () => {
+  it('renders kind · era slug and values without a fact-grid wall', async () => {
     const props = toSearchResultCardProps(
       baseResult({ eraBuckets: ['1840s'], status: 'historic' }),
     );
-    const { getByText } = await render(<SearchResultCard {...props} />);
-    expect(getByText('KIND')).toBeTruthy();
-    expect(getByText('Person')).toBeTruthy();
-    expect(getByText('ERA')).toBeTruthy();
-    expect(getByText('1840s')).toBeTruthy();
-    expect(getByText('STATUS')).toBeTruthy();
-    expect(getByText('Historic')).toBeTruthy();
+    const { getByText, queryByText } = await render(<SearchResultCard {...props} />);
+    expect(getByText('Person · 1840s · Historic')).toBeTruthy();
+    expect(queryByText('KIND')).toBeNull();
+    expect(queryByText('ERA')).toBeNull();
   });
 
   it('calls onShowOnMap with id and kind from the secondary action without opening the record', async () => {

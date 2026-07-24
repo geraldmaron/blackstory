@@ -25,6 +25,7 @@ Theme-impact map strips are metadata panels, not MapLibre mounts.
 | WebGL blocked or unavailable | `isWebGlAvailable()` preflight; fail-closed UI with `role="status"` |
 | WebGL context loss (mobile Safari, GPU pressure) | `webglcontextlost` → degraded notice; `webglcontextrestored` → `resize()` |
 | Opaque overlay blocking paint | Hero/explore chrome: `pointer-events: none` on pass-through regions; CTAs `auto` |
+| Map under copy steals mobile scroll | Home `.ds-home-hero__copy` stays `pointer-events: auto` + `touch-action: pan-y` (never `none` over the live plate). Map readout column stays pass-through. Explore: stage root `none`, Surface panels `auto` + `touch-action: pan-y` + `overscroll-behavior: contain` |
 | MapLibre container on fixed plate | Inner `.ds-map-stage__canvas` only — never mount on `.ds-map-stage` itself |
 
 ## Fail-state copy
@@ -41,7 +42,7 @@ External maps links remain when geo resolves.
 
 - `hero-map-inset.test.ts` — geometry math, no live `clip-path` on apply
 - `map-libre-lifecycle.test.ts` — shared hooks wired in MapStage / EntityLocationMap / HeroStage
-- `hero-stage.test.ts` — inset + `resize()` + `orientationchange`
+- `hero-stage.test.ts` — inset + `resize()` + `orientationchange`; **map-under-copy scroll ownership** (copy `pointer-events: auto` / map readout `none`; explore stage pass-through + panel `touch-action: pan-y`)
 - `entity-page.test.ts` — `role="status"` fallback copy
 
 ## Related docs

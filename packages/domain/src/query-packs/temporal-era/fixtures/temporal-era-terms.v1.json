@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "temporal-era-terms.v1",
+  "notes": "Decade-keyed historical term classes for Temporal Gap Discovery era packs. Terms flagged researchOnlyOffensive are period record-language retained for internal archival queries only (toResearchQueryTerms) and are never emitted through public interfaces (toPublicSafeTerms strips them).",
+  "eras": [
+    {
+      "id": "era-reconstruction-freedmen",
+      "label": "Emancipation & Reconstruction (1860s–1870s)",
+      "decadeStart": "1860",
+      "decadeEnd": "1870",
+      "terms": [
+        { "text": "freedmen", "termClass": "historical" },
+        { "text": "freedpeople", "termClass": "historical" },
+        { "text": "Freedmen's Bureau", "termClass": "historical" },
+        { "text": "emancipation", "termClass": "historical" }
+      ]
+    },
+    {
+      "id": "era-colored-designation",
+      "label": "\"Colored\" record-language era (1880s–1940s)",
+      "decadeStart": "1880",
+      "decadeEnd": "1940",
+      "terms": [
+        { "text": "Colored", "termClass": "historical", "researchOnlyOffensive": true },
+        { "text": "colored school", "termClass": "historical", "researchOnlyOffensive": true },
+        { "text": "colored cemetery", "termClass": "historical", "researchOnlyOffensive": true }
+      ]
+    },
+    {
+      "id": "era-negro-designation",
+      "label": "\"Negro\" record-language era (1930s–1960s)",
+      "decadeStart": "1930",
+      "decadeEnd": "1960",
+      "terms": [
+        { "text": "Negro", "termClass": "historical", "researchOnlyOffensive": true },
+        { "text": "Negro league", "termClass": "historical", "researchOnlyOffensive": true },
+        { "text": "Negro school", "termClass": "historical", "researchOnlyOffensive": true }
+      ]
+    }
+  ]
+}

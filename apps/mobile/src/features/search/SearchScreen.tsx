@@ -25,7 +25,7 @@ import { EmptyState } from '@/ui/EmptyState';
 import { ErrorState } from '@/ui/ErrorState';
 import { LedgerSectionLabel } from '@/ui/LedgerSectionLabel';
 import { ListRow } from '@/ui/ListRow';
-import { NavIcon } from '@/ui/NavIcon';
+import { NavIcon, navIconForEntityKind, type NavIconName } from '@/ui/NavIcon';
 import { Notice } from '@/ui/Notice';
 import { ScreenCanvas } from '@/ui/ScreenCanvas';
 import { ScreenHeader } from '@/ui/ScreenHeader';
@@ -152,7 +152,7 @@ export function SearchScreen({
         <ScreenHeader
           kicker="Find in time"
           title="History"
-          dek="Search names, places, and events. Filter by kind, then open a record or show it on the map."
+          dek="Names, places, and events. Filter by kind, then open a pin or show it on the map."
           compact
           dense
           trailing={typeof __DEV__ !== 'undefined' && __DEV__ ? <DevMenuHeaderButton /> : undefined}
@@ -200,7 +200,7 @@ export function SearchScreen({
 
         {!showBrowse ? (
           <View>
-            <LedgerSectionLabel>Kind</LedgerSectionLabel>
+            <LedgerSectionLabel>Filter by kind</LedgerSectionLabel>
             <FilterChipsRow filterKind={filterKind} onChangeFilterKind={setFilterKind} />
           </View>
         ) : null}
@@ -270,12 +270,8 @@ export function SearchScreen({
               />
             ) : null}
             <View style={styles.resultsList}>
-              {cardData.map((item, index) => (
-                <SearchResultCard
-                  key={item.id}
-                  {...item}
-                  indexLabel={String(index + 1).padStart(2, '0')}
-                />
+              {cardData.map((item) => (
+                <SearchResultCard key={item.id} {...item} />
               ))}
               <SearchListFooter
                 hasMore={state.hasMore}
@@ -298,26 +294,75 @@ function FilterChipsRow({
   filterKind: string | undefined;
   onChangeFilterKind: (kind: string | undefined) => void;
 }) {
+  const theme = useThemeColors();
+
   return (
-    <View style={styles.chipRow}>
-      <Button
-        label="All kinds"
-        density="compact"
-        variant={filterKind === undefined ? 'primary' : 'secondary'}
-        accessibilityState={filterKind === undefined ? { selected: true } : undefined}
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.chipRow}
+      keyboardShouldPersistTaps="handled"
+    >
+      <KindFilterChip
+        label="All"
+        selected={filterKind === undefined}
         onPress={() => onChangeFilterKind(undefined)}
+        theme={theme}
       />
       {BROWSE_CATEGORIES.map((category) => (
-        <Button
+        <KindFilterChip
           key={category.kind}
           label={category.label}
-          density="compact"
-          variant={filterKind === category.kind ? 'primary' : 'secondary'}
-          accessibilityState={filterKind === category.kind ? { selected: true } : undefined}
+          iconName={navIconForEntityKind(category.kind)}
+          selected={filterKind === category.kind}
           onPress={() => onChangeFilterKind(category.kind)}
+          theme={theme}
         />
       ))}
-    </View>
+    </ScrollView>
+  );
+}
+
+function KindFilterChip({
+  label,
+  iconName,
+  selected,
+  onPress,
+  theme,
+}: {
+  readonly label: string;
+  readonly iconName?: NavIconName;
+  readonly selected: boolean;
+  readonly onPress: () => void;
+  readonly theme: ReturnType<typeof useThemeColors>;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ selected }}
+      accessibilityLabel={selected ? `${label}, selected` : label}
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.chip,
+        {
+          borderColor: selected ? theme.accent : theme.border,
+          backgroundColor: selected
+            ? theme.surfaceRaised
+            : pressed
+              ? theme.surfacePressed
+              : theme.surface,
+        },
+      ]}
+    >
+      {iconName ? <NavIcon name={iconName} size={16} selected={selected} /> : null}
+      <Text
+        variant="caption"
+        style={{ color: selected ? theme.accent : theme.ink }}
+        numberOfLines={1}
+      >
+        {label}
+      </Text>
+    </Pressable>
   );
 }
 
@@ -464,9 +509,11 @@ const styles = StyleSheet.create({
     gap: space['2'],
   },
   input: {
-    fontSize: typeScale.body.size,
-    lineHeight: typeScale.body.lineHeight,
+    fontSize: typeScale.caption.size,
+    lineHeight: typeScale.caption.lineHeight,
+    fontWeight: '500',
     padding: 0,
+    minHeight: 28,
   },
   clearButton: {
     width: MIN_TOUCH_TARGET,
@@ -478,8 +525,19 @@ const styles = StyleSheet.create({
   },
   chipRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    alignItems: 'center',
     gap: space['2'],
+    paddingVertical: space['1'],
+  },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    minHeight: 36,
+    paddingHorizontal: space['2'],
+    paddingVertical: space['1'],
+    borderRadius: radius.sm,
+    borderWidth: StyleSheet.hairlineWidth,
   },
   hint: {
     marginBottom: space['1'],

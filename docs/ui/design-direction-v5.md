@@ -15,8 +15,8 @@ Where anything below contradicts an earlier section of this document, **this sec
 - **The shell bar.** Navigation is a full-width theme-aware bar (`.ds-shell-header__inner`),
   fixed to the top edge, using `--ds-surface` / `--ds-ink` / `--ds-border` so it follows
   light and dark. Official lockup artwork swaps with `[data-theme]` (light/dark kit pairs);
-  lockup renders at brand minimum (≥168px digital), symbol-only below 48rem and on
-  `/explore`. Active nav uses a copper underline — not a paper pill. The copper CTA is
+  lockup renders at brand minimum (≥168px digital), symbol-only below 48rem.
+  Active nav uses a copper underline — not a paper pill. The copper CTA is
   NEAR YOU. Mobile: symbol + MENU; drawer is a bottom sheet outside the bar with a
   tap-away scrim.
 - **Pill action language.** `.ds-cta` and `.ds-button` share one pill recipe
@@ -365,6 +365,6 @@ The binding logo source is the root `brand/` kit: a **standalone book-and-pin sy
 B)** beside a **lowercase `blap` wordmark**, used exactly as provided (light/dark transparent
 lockups + symbol-only variants + app icons; PNG artwork). The v3-era "the symbol is the first
 B / never type the second B" rules are retired — see the supersession note atop
-`docs/ui/brand.md`. Header uses the theme-paired lockup (symbol-only below 48rem and on
-`/explore`); footer uses the dark lockup on the fixed-ink band; app icons serve as
+`docs/ui/brand.md`. Header uses the theme-paired lockup on every route (symbol-only below
+48rem); footer uses the dark lockup on the fixed-ink band; app icons serve as
 browser/apple icons.

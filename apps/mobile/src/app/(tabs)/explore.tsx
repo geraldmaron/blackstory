@@ -16,9 +16,9 @@
  * restores it if the entity still exists in the active release — a withdrawn or
  * released-out entity falls back to no selection, never a crash (MOB-005/ADR-004).
  *
- * Filters apply in-map via the instruments panel (auto-sync URL params through
- * `onFiltersChange`). Modal routes `/filters-sheet` and `/color-key-sheet` remain
- * as deep-link fallbacks.
+ * Filters apply in-map via the instruments panel (live chip apply + URL sync
+ * through `onFiltersChange`). Modal route `/filters-sheet` is a deep-link
+ * fallback that also live-applies; `/color-key-sheet` remains for the key.
  */
 import { router, useLocalSearchParams } from 'expo-router';
 

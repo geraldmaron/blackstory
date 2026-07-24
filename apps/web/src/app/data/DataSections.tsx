@@ -138,7 +138,7 @@ export function DataSections({
           </Link>
         </p>
         <p className="ds-data-edition__credit">
-          Archive mosaic · symbolic atmosphere · decorative gutter tiles only.{' '}
+          Archive texture · symbolic atmosphere. {' '}
           <Link href={ATMOSPHERE_ATTRIBUTION_HREF}>Mosaic credits</Link>
         </p>
       </article>

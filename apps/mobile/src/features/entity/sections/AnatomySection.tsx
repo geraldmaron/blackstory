@@ -11,7 +11,7 @@ import {
   buildEntityAnatomyPlace,
   type RecordAnatomyPlace,
 } from '../entity-anatomy-facts';
-import { openMapsAtPublicAnchor } from '../maps-handoff';
+import { openExternalMaps } from '../maps-handoff';
 import type { Entity } from '../types';
 import { EditionFactIcon, type EditionFactIconProps } from '../edition-fact-icon';
 import { RecordPlacePreview } from '../record-place-preview';
@@ -71,7 +71,11 @@ export function AnatomySection({ entity, onBackToMap }: AnatomySectionProps) {
       return;
     }
     setMapsError(undefined);
-    const result = await openMapsAtPublicAnchor(anchor.lat, anchor.lng);
+    const result = await openExternalMaps({
+      lat: anchor.lat,
+      lng: anchor.lng,
+      ...(entity.displayName ? { label: entity.displayName } : {}),
+    });
     if (result !== 'opened') {
       setMapsError('Could not open Maps. Try again, or use View on national map inside BlackStory.');
     }

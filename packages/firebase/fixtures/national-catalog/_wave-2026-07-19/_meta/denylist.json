@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-07-19T06:04:33.059Z",
-  "count": 515,
+  "count": 518,
   "ids": [
     "ent_aamp_philadelphia_001",
     "ent_abyssinian_baptist_001",
@@ -516,7 +516,10 @@
     "ent_wyatt_tee_walker_001",
     "ent_wyomia_tyus_001",
     "ent_xavier_university_louisiana_001",
-    "ent_zora_neale_hurston_001"
+    "ent_zora_neale_hurston_001",
+    "ent_law_home_owners_loan_act_1933",
+    "ent_law_national_housing_act_1934",
+    "ent_law_community_reinvestment_act_1977"
   ],
   "displayNames": [
     "1811 German Coast Uprising",
@@ -1033,7 +1036,10 @@
     "Wyatt Tee Walker",
     "Wyomia Tyus",
     "Xavier University of Louisiana",
-    "Zora Neale Hurston"
+    "Zora Neale Hurston",
+    "Home Owners' Loan Act of 1933",
+    "National Housing Act of 1934",
+    "Community Reinvestment Act of 1977"
   ],
   "displayNamesLower": [
     "1811 german coast uprising",
@@ -1550,6 +1556,9 @@
     "wyatt tee walker",
     "wyomia tyus",
     "xavier university of louisiana",
-    "zora neale hurston"
+    "zora neale hurston",
+    "home owners' loan act of 1933",
+    "national housing act of 1934",
+    "community reinvestment act of 1977"
   ]
 }

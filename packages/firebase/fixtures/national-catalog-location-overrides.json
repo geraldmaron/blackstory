@@ -2210,6 +2210,39 @@
       "contentHash": "5a0af07d39913a8117e1d92bbb51e5a4a7e10ec1d1374628ca8a2bd166298a82",
       "retrievedAt": "2026-07-18T23:31:21.846Z",
       "notes": "Retained manual pin; Wikidata Q184478 (\"University of California\") 94728m away — precision held at campus"
+    },
+    "ent_law_home_owners_loan_act_1933": {
+      "lat": 38.8977,
+      "lng": -77.0365,
+      "precision": "institution",
+      "matchMethod": "geocode_other",
+      "source": "wikidata_p625",
+      "wikidataId": "Q35525",
+      "contentHash": "24204fb282fc98f86f51560f7f598f5858ae301fb2400688b9f6b8fca5e632f4",
+      "retrievedAt": "2026-07-24T05:40:00.000Z",
+      "notes": "White House signing locus; same pattern as other federal statutes in this override file"
+    },
+    "ent_law_national_housing_act_1934": {
+      "lat": 38.8977,
+      "lng": -77.0365,
+      "precision": "institution",
+      "matchMethod": "geocode_other",
+      "source": "wikidata_p625",
+      "wikidataId": "Q35525",
+      "contentHash": "24204fb282fc98f86f51560f7f598f5858ae301fb2400688b9f6b8fca5e632f4",
+      "retrievedAt": "2026-07-24T05:40:00.000Z",
+      "notes": "White House signing locus; same pattern as other federal statutes in this override file"
+    },
+    "ent_law_community_reinvestment_act_1977": {
+      "lat": 38.8977,
+      "lng": -77.0365,
+      "precision": "institution",
+      "matchMethod": "geocode_other",
+      "source": "wikidata_p625",
+      "wikidataId": "Q35525",
+      "contentHash": "24204fb282fc98f86f51560f7f598f5858ae301fb2400688b9f6b8fca5e632f4",
+      "retrievedAt": "2026-07-24T05:40:00.000Z",
+      "notes": "White House signing locus; same pattern as other federal statutes in this override file"
     }
   }
 }

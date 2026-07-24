@@ -36,17 +36,17 @@ beforeEach(() => {
   mockBottomSheetProps.length = 0;
 });
 
-describe('ExploreBottomSheet — v7 detents', () => {
-  it('uses map-first snap points 16% / 32% / 48%', async () => {
-    expect(EXPLORE_SHEET_SNAP_POINTS).toEqual(['16%', '32%', '48%']);
-    expect(EXPLORE_SHEET_PEEK_HEIGHT).toBe('16%');
+describe('ExploreBottomSheet — Pin Pulse detents', () => {
+  it('uses map-first snap points 11% / 34% / 52%', async () => {
+    expect(EXPLORE_SHEET_SNAP_POINTS).toEqual(['11%', '34%', '52%']);
+    expect(EXPLORE_SHEET_PEEK_HEIGHT).toBe('11%');
     expect(EXPLORE_SHEET_BOTTOM_INSET).toBe(0);
   });
 
   it('defaults to peek when idle and half when a record is selected', async () => {
     await render(
       <ExploreBottomSheet>
-        <Text>In view</Text>
+        <Text>Nearby</Text>
       </ExploreBottomSheet>,
     );
     expect(mockBottomSheetProps[0]?.snapIndex).toBe(EXPLORE_SHEET_PEEK);

@@ -32,9 +32,23 @@ describe('DataScreen', () => {
     expect(getByText(/National Census context plus curated indicators/)).toBeTruthy();
   });
 
-  it('shows honest Census degraded empty state', async () => {
+  it('shows honest Census degraded empty state with model frame', async () => {
     const { getByText } = await render(<DataScreen />);
     expect(getByText('Census timeline not on this release yet')).toBeTruthy();
+    expect(getByText('Decade axis')).toBeTruthy();
+  });
+
+  it('renders coverage pulse and juxtaposition callout', async () => {
+    const { getByText } = await render(<DataScreen />);
+    expect(getByText('Population')).toBeTruthy();
+    expect(getByText('Deferred')).toBeTruthy();
+    expect(getByText('Juxtaposition')).toBeTruthy();
+  });
+
+  it('renders fixture wealth values in proportion bars', async () => {
+    const { getByText } = await render(<DataScreen />);
+    expect(getByText('$44,900')).toBeTruthy();
+    expect(getByText('$285,000')).toBeTruthy();
   });
 
   it('renders fixture wealth and housing metric titles', async () => {

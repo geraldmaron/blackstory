@@ -89,6 +89,7 @@ export const THEME_IMPACT_V1_SOURCE_ALLOWLIST = [
   'mapping-inequality-holc',
   'acs-census-api',
   'us-census-historical-race-1790-1990',
+  'us-census-cps',
   'hmda-loan-level',
   'bjs-national-prisoner-statistics',
   'vera-incarceration-trends',
@@ -333,6 +334,26 @@ export const THEME_IMPACT_QUESTIONS: readonly ThemeImpactQuestion[] = [
     answerShape: 'artifact_timeline',
     policyEraFamily: 'none',
     metricBindings: [
+      {
+        kind: 'proposed',
+        metricId: 'cps-a1-turnout-black-nation',
+        sourceFamily: 'us-census-cps',
+      },
+      {
+        kind: 'proposed',
+        metricId: 'cps-a1-turnout-white-nation',
+        sourceFamily: 'us-census-cps',
+      },
+      {
+        kind: 'proposed',
+        metricId: 'cps-a1-turnout-hispanic-nation',
+        sourceFamily: 'us-census-cps',
+      },
+      {
+        kind: 'proposed',
+        metricId: 'cps-a1-turnout-asian-nation',
+        sourceFamily: 'us-census-cps',
+      },
       {
         kind: 'proposed',
         metricId: 'turnout-rate-black-state',

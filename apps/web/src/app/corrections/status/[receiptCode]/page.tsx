@@ -32,7 +32,7 @@ export default async function CorrectionStatusPage({ params }: PageProps) {
 
   if (!status) {
     return (
-      <UtilityEditionShell mosaicSeed="correction-status-edition-v6" editionKey="correction-status">
+      <UtilityEditionShell editionKey="correction-status">
         <UtilityEditionIntro
           kicker="Trust"
           title="Correction status"
@@ -59,7 +59,7 @@ export default async function CorrectionStatusPage({ params }: PageProps) {
   }
 
   return (
-    <UtilityEditionShell mosaicSeed="correction-status-edition-v6" editionKey="correction-status">
+    <UtilityEditionShell editionKey="correction-status">
       <UtilityEditionIntro
         kicker="Trust"
         title="Correction status"

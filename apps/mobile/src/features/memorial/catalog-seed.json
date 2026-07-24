@@ -1,0 +1,274 @@
+{
+  "version": "memorial-seed-2026-07-24",
+  "generatedAt": "2026-07-24T04:38:25.600Z",
+  "incompleteByDesign": true,
+  "names": [
+    {
+      "name": "Addie Mae Collins"
+    },
+    {
+      "name": "Ahmaud Arbery"
+    },
+    {
+      "name": "Alton Sterling"
+    },
+    {
+      "name": "Amadou Diallo",
+      "entityId": "ent_amadou_diallo_001",
+      "locationLabel": "1157 Wheeler Avenue, Soundview, Bronx",
+      "placeLabel": "New York, New York",
+      "lat": 40.827376900718,
+      "lng": -73.879922448739,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "Andrew Goodman"
+    },
+    {
+      "name": "Andrew Joseph III"
+    },
+    {
+      "name": "Antwon Rose II"
+    },
+    {
+      "name": "Atatiana Jefferson"
+    },
+    {
+      "name": "Aura Rosser"
+    },
+    {
+      "name": "Botham Jean"
+    },
+    {
+      "name": "Breonna Taylor",
+      "entityId": "ent_breonna_taylor_001",
+      "locationLabel": "St. Anthony Gardens, 3003 Springfield Drive #4, Louisville, Kentucky",
+      "placeLabel": "Louisville, Kentucky",
+      "lat": 38.147966694128,
+      "lng": -85.814305837087,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "Carole Robertson"
+    },
+    {
+      "name": "Clementa Pinckney",
+      "entityId": "ent_clementa_c_pinckney_001",
+      "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
+      "placeLabel": "Charleston, South Carolina",
+      "lat": 32.7875,
+      "lng": -79.93305556,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "Cynthia Hurd",
+      "entityId": "ent_cynthia_graham_hurd_001",
+      "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
+      "placeLabel": "Charleston, South Carolina",
+      "lat": 32.7875,
+      "lng": -79.93305556,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "Cynthia Wesley"
+    },
+    {
+      "name": "Daniel Simmons",
+      "entityId": "ent_daniel_l_simmons_sr_001",
+      "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
+      "placeLabel": "Charleston, South Carolina",
+      "lat": 32.7875,
+      "lng": -79.93305556,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "Daunte Wright"
+    },
+    {
+      "name": "Denise McNair"
+    },
+    {
+      "name": "Depayne Middleton Doctor",
+      "entityId": "ent_depayne_middleton_doctor_001",
+      "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
+      "placeLabel": "Charleston, South Carolina",
+      "lat": 32.7875,
+      "lng": -79.93305556,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "Elijah McClain"
+    },
+    {
+      "name": "Emmett Till",
+      "entityId": "ent_emmett_till_001",
+      "locationLabel": "Graball Landing, Tallahatchie River, near Glendora, Mississippi",
+      "placeLabel": "Glendora, Mississippi",
+      "lat": 33.86056,
+      "lng": -90.27472,
+      "locationPrecision": "site"
+    },
+    {
+      "name": "Eric Garner",
+      "entityId": "ent_eric_garner_001",
+      "locationLabel": "202 Bay Street, Tompkinsville, Staten Island",
+      "placeLabel": "New York, New York",
+      "lat": 40.636922406365,
+      "lng": -74.076463862902,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "Ethel Lance",
+      "entityId": "ent_ethel_lee_lance_001",
+      "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
+      "placeLabel": "Charleston, South Carolina",
+      "lat": 32.7875,
+      "lng": -79.93305556,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "Fred Hampton"
+    },
+    {
+      "name": "Freddie Gray"
+    },
+    {
+      "name": "George Floyd"
+    },
+    {
+      "name": "James Chaney"
+    },
+    {
+      "name": "Jimmie Lee Jackson"
+    },
+    {
+      "name": "Jonathan Ferrell"
+    },
+    {
+      "name": "Jordan Davis"
+    },
+    {
+      "name": "Jordan Edwards"
+    },
+    {
+      "name": "Keith Scott"
+    },
+    {
+      "name": "Korryn Gaines"
+    },
+    {
+      "name": "Laquan McDonald"
+    },
+    {
+      "name": "Ma'Khia Bryant"
+    },
+    {
+      "name": "Manuel Ellis"
+    },
+    {
+      "name": "Medgar Evers"
+    },
+    {
+      "name": "Michael Brown"
+    },
+    {
+      "name": "Michael Schwerner"
+    },
+    {
+      "name": "Myra Thompson",
+      "entityId": "ent_myra_thompson_001",
+      "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
+      "placeLabel": "Charleston, South Carolina",
+      "lat": 32.7875,
+      "lng": -79.93305556,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "Oscar Grant"
+    },
+    {
+      "name": "Philando Castile"
+    },
+    {
+      "name": "Rayshard Brooks"
+    },
+    {
+      "name": "Rekia Boyd"
+    },
+    {
+      "name": "Renisha McBride"
+    },
+    {
+      "name": "Rodney King"
+    },
+    {
+      "name": "Samuel DuBose"
+    },
+    {
+      "name": "Sandra Bland"
+    },
+    {
+      "name": "Sean Bell",
+      "entityId": "ent_sean_bell_001",
+      "locationLabel": "Former Club Kalua site, 143-08 94th Avenue, Jamaica, Queens",
+      "placeLabel": "New York, New York",
+      "lat": 40.698049035047,
+      "lng": -73.809669418729,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "Sharonda Coleman Singleton",
+      "entityId": "ent_sharonda_coleman_singleton_001",
+      "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
+      "placeLabel": "Charleston, South Carolina",
+      "lat": 32.7875,
+      "lng": -79.93305556,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "Stephon Clark"
+    },
+    {
+      "name": "Susie Jackson",
+      "entityId": "ent_susie_jackson_001",
+      "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
+      "placeLabel": "Charleston, South Carolina",
+      "lat": 32.7875,
+      "lng": -79.93305556,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "Tamir Rice"
+    },
+    {
+      "name": "Terence Crutcher"
+    },
+    {
+      "name": "Trayvon Martin",
+      "entityId": "ent_trayvon_martin_001",
+      "locationLabel": "The Retreat at Twin Lakes, Sanford, Florida",
+      "placeLabel": "Sanford, Florida",
+      "lat": 28.793336998135,
+      "lng": -81.329361400836,
+      "locationPrecision": "neighborhood"
+    },
+    {
+      "name": "Tyre Nichols"
+    },
+    {
+      "name": "Tywanza Sanders",
+      "entityId": "ent_tywanza_sanders_001",
+      "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
+      "placeLabel": "Charleston, South Carolina",
+      "lat": 32.7875,
+      "lng": -79.93305556,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "Viola Liuzzo"
+    },
+    {
+      "name": "Walter Scott"
+    }
+  ]
+}

@@ -12,19 +12,26 @@ import { act, fireEvent, render } from '@testing-library/react-native';
 import { StyleSheet } from 'react-native';
 
 const mockFlyTo = jest.fn();
+const mockEaseTo = jest.fn();
+const mockFitBounds = jest.fn();
 
 jest.mock('@maplibre/maplibre-react-native', () => {
   /* eslint-disable @typescript-eslint/no-require-imports */
   const React = require('react');
   const { View } = require('react-native');
   const Camera = React.forwardRef((props: Record<string, unknown>, ref: unknown) => {
-    React.useImperativeHandle(ref, () => ({ flyTo: mockFlyTo, fitBounds: jest.fn() }));
+    React.useImperativeHandle(ref, () => ({
+      flyTo: mockFlyTo,
+      easeTo: mockEaseTo,
+      fitBounds: mockFitBounds,
+    }));
     return React.createElement(View, {
       testID: 'maplibre-camera',
       accessibilityLabel: JSON.stringify({
         minZoom: props.minZoom,
         maxZoom: props.maxZoom,
         maxBounds: props.maxBounds,
+        initialViewState: props.initialViewState,
       }),
     });
   });
@@ -79,12 +86,21 @@ jest.mock('@maplibre/maplibre-react-native', () => {
 import { MapScreen } from '../MapScreen';
 import { DEFAULT_MAP_GLYPHS_URL, MAP_LABEL_TEXT_FONT } from '../mapConfig';
 import { CLUSTER_CAMERA_ZOOM_STEP } from '../clusterCamera';
-import { MAP_MAX_ZOOM, MAP_MIN_ZOOM, PRESET_ZOOM, US_CAMERA_MAX_BOUNDS } from '../mapCamera';
+import {
+  EXPLORE_MAP_VIEW_PADDING,
+  MAP_MAX_ZOOM,
+  MAP_MIN_ZOOM,
+  PRESET_ZOOM,
+  US_CAMERA_MAX_BOUNDS,
+} from '../mapCamera';
 import { ENTITY_CLUSTER_RADIUS_EXPR } from '../mapStyle';
+import { DIGNITY_PALETTE } from '../dignity-palette';
 import { MAP_ATTRIBUTION_ABOVE_SHEET_BOTTOM } from '../MapAttribution';
 
 beforeEach(() => {
   mockFlyTo.mockClear();
+  mockEaseTo.mockClear();
+  mockFitBounds.mockClear();
 });
 
 describe('MapScreen — ready state', () => {
@@ -153,10 +169,47 @@ describe('MapScreen — ready state', () => {
       minZoom?: number;
       maxZoom?: number;
       maxBounds?: number[];
+      initialViewState?: { padding?: Record<string, number> };
     };
     expect(camera.minZoom).toBe(MAP_MIN_ZOOM);
     expect(camera.maxZoom).toBe(MAP_MAX_ZOOM);
     expect(camera.maxBounds).toEqual([...US_CAMERA_MAX_BOUNDS]);
+    expect(camera.initialViewState?.padding).toEqual({ ...EXPLORE_MAP_VIEW_PADDING });
+  });
+
+  it('renders copper + paper selection rings when selectedEntityId is set', async () => {
+    const { getAllByTestId } = await render(<MapScreen selectedEntityId="ent_selected" />);
+    const layers = getAllByTestId('maplibre-layer');
+    const strokes = layers
+      .map((node) => JSON.parse(node.props.accessibilityLabel as string) as { circleStrokeColor?: string })
+      .map((style) => style.circleStrokeColor)
+      .filter((color): color is string => typeof color === 'string');
+    expect(strokes).toContain(DIGNITY_PALETTE.selectedAccent);
+    expect(strokes).toContain(DIGNITY_PALETTE.selected);
+  });
+
+  it('eases the camera to a selection command with Explore view padding', async () => {
+    const { rerender } = await render(<MapScreen />);
+    await act(async () => {
+      rerender(
+        <MapScreen
+          cameraCommand={{
+            kind: 'center',
+            center: [-77.04, 38.9],
+            zoom: MAP_MAX_ZOOM,
+            token: 1,
+          }}
+        />,
+      );
+    });
+    expect(mockEaseTo).toHaveBeenCalledWith(
+      expect.objectContaining({
+        center: [-77.04, 38.9],
+        zoom: MAP_MAX_ZOOM,
+        padding: { ...EXPLORE_MAP_VIEW_PADDING },
+      }),
+    );
+    expect(mockFlyTo).not.toHaveBeenCalled();
   });
 
   it('uses v6 cluster radius steps (copper aggregate, size not heat)', async () => {

@@ -1,12 +1,13 @@
 /**
- * Filter sheet — a modal route (`presentation: 'modal'`, set in `_layout.tsx`) opened from the
- * Explore tab's "Filters" button. Demonstrates typed + validated filter-state params and a safe
- * `returnTo` handoff: the optional `returnTo` query param is only ever honored if it passes
- * `isSafeInternalPath`/`parseReturnTo` (the app's open-redirect defense, threat-model T4) — an
- * absolute URL or unenumerated path in `returnTo` is discarded and the sheet falls back to
- * `/explore`, it is never used to navigate anywhere unvalidated.
+ * Filter sheet — a modal route (`presentation: 'modal'`, set in `_layout.tsx`) opened as a
+ * deep-link fallback for Explore filters. Demonstrates typed + validated filter-state params
+ * and a safe `returnTo` handoff: the optional `returnTo` query param is only ever honored if
+ * it passes `isSafeInternalPath`/`parseReturnTo` (the app's open-redirect defense, threat-model
+ * T4) — an absolute URL or unenumerated path in `returnTo` is discarded and the sheet falls
+ * back to `/explore`, it is never used to navigate anywhere unvalidated.
  *
- * Applies the full Explore filter set via `parseFilterState`; Clear resets all facets.
+ * Facet chips apply live to Explore URL params (selected = active). Done only dismisses;
+ * Clear resets facets and syncs immediately. Primary Explore UX is the in-map instruments panel.
  */
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -40,19 +41,27 @@ export default function FiltersSheet() {
     accessibilityHint: 'Closes filters when there is no previous screen',
   });
 
-  function apply() {
-    const next = filterStateFromPanel(filters);
-    const params = Object.fromEntries(
-      Object.entries(filterStateToRouteParams(next)).filter(([, value]) => value !== ''),
-    );
+  function syncLive(next: FilterState) {
+    const committed = filterStateFromPanel(next);
+    setFilters(committed);
+    // Live-apply to Explore under the modal (shareable URL). Done only dismisses.
     router.navigate({
       pathname: safeReturnTo,
-      params,
+      params: filterStateToRouteParams(committed),
     } as never);
   }
 
   function clear() {
-    setFilters({});
+    syncLive({});
+  }
+
+  function done() {
+    // Ensure Explore has the latest selection, then leave the sheet.
+    const committed = filterStateFromPanel(filters);
+    router.navigate({
+      pathname: safeReturnTo,
+      params: filterStateToRouteParams(committed),
+    } as never);
   }
 
   return (
@@ -60,10 +69,11 @@ export default function FiltersSheet() {
       <ExploreFiltersPanel
         filters={filters}
         facetOptions={facetOptions}
-        onFiltersChange={setFilters}
+        onFiltersChange={syncLive}
         onClear={clear}
-        onApply={apply}
+        onDone={done}
         onOpenPlaceFind={() => router.push('/history')}
+        description="Narrow the map and list by kind family and decade. Changes apply right away."
       />
     </ScreenCanvas>
   );

@@ -342,7 +342,7 @@ export function MethodologySections() {
               </Link>
             </p>
             <p className="ds-methodology-edition__credit">
-              Archive mosaic · symbolic atmosphere · decorative gutter tiles only.{' '}
+              Archive texture · symbolic atmosphere. {' '}
               <Link href={ATMOSPHERE_ATTRIBUTION_HREF}>Mosaic credits</Link>
             </p>
           </div>

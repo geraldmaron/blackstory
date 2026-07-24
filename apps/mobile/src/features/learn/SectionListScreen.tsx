@@ -27,7 +27,7 @@ export interface SectionListScreenProps {
   readonly rows: readonly SectionListRow[];
 }
 
-export function SectionListScreen({ title, intro, kicker = 'Archive', rows }: SectionListScreenProps) {
+export function SectionListScreen({ title, intro, kicker = 'Stories', rows }: SectionListScreenProps) {
   const countLabel = rows.length === 1 ? '1 page' : `${rows.length} pages`;
 
   return (

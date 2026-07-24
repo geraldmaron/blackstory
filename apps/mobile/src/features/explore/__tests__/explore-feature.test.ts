@@ -9,7 +9,9 @@ import {
   sanitizeLabel,
   toExploreFeatures,
   toExploreFeature,
+  toMapFeatureCollection,
 } from '../explore-feature';
+import { applyFilters } from '../explore-filter';
 
 describe('sanitizeLabel', () => {
   it('returns a non-empty fallback for non-strings and empty input', () => {
@@ -55,6 +57,21 @@ describe('toExploreFeature — coordinate passthrough (no de-redaction)', () => 
       const src = DEMO_MAP_SOURCE.features[i].geometry.coordinates;
       expect(String(projected[i].coordinates[0])).toBe(String(src[0]));
       expect(String(projected[i].coordinates[1])).toBe(String(src[1]));
+    }
+  });
+});
+
+describe('toMapFeatureCollection — filtered pin source', () => {
+  it('round-trips explore features into a map collection without altering coordinates', () => {
+    const explore = toExploreFeatures(DEMO_MAP_SOURCE);
+    const filtered = applyFilters(explore, { kind: 'place' });
+    const collection = toMapFeatureCollection(filtered);
+    expect(collection.type).toBe('FeatureCollection');
+    expect(collection.features.length).toBe(filtered.length);
+    expect(collection.features.length).toBeLessThan(DEMO_MAP_SOURCE.features.length);
+    for (let i = 0; i < filtered.length; i += 1) {
+      expect(collection.features[i].geometry.coordinates).toEqual(filtered[i].coordinates);
+      expect(collection.features[i].properties.entityId).toBe(filtered[i].entityId);
     }
   });
 });

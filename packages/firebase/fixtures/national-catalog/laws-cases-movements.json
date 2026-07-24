@@ -401,6 +401,132 @@
     "related": []
   },
   {
+    "id": "ent_law_home_owners_loan_act_1933",
+    "kind": "law",
+    "displayName": "Home Owners' Loan Act of 1933",
+    "summary": "Signed June 13, 1933, this New Deal statute created the Home Owners' Loan Corporation to refinance distressed mortgages and, through the Corporation's later residential security maps, left a federal paper trail of neighborhood risk grades that often named race as a credit factor.",
+    "eraBuckets": [
+      "1930s"
+    ],
+    "topicTags": [
+      "law",
+      "housing",
+      "new-deal",
+      "redlining"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "institution",
+    "locationLabel": "White House, Washington, D.C.",
+    "lat": 38.8977,
+    "lng": -77.0365,
+    "claims": [
+      {
+        "predicate": "signed_on",
+        "object": "June 13, 1933, as Public Law 73-43, 48 Stat. 128, creating the Home Owners' Loan Corporation under the Federal Home Loan Bank Board",
+        "confidenceLevel": "high",
+        "citationSource": "govinfo.gov",
+        "citationHref": "https://www.govinfo.gov/content/pkg/COMPS-2991/pdf/COMPS-2991.pdf",
+        "citationLabel": "GovInfo compiled statute: Home Owners' Loan Act"
+      },
+      {
+        "predicate": "created",
+        "object": "the Home Owners' Loan Corporation, which refinanced more than a million mortgages and produced city Residential Security Maps whose area descriptions frequently treated Black occupancy as a risk factor",
+        "confidenceLevel": "high",
+        "citationSource": "archives.gov",
+        "citationHref": "https://www.archives.gov/research/guide-fed-records/groups/195.html",
+        "citationLabel": "National Archives: Records of the Federal Home Loan Bank Board (Record Group 195)"
+      }
+    ],
+    "historicalContext": "The Act answered Depression-era foreclosures with federal refinance capacity. The Corporation's mapping program, preserved in NARA Record Group 195 and digitized by Mapping Inequality, later became a core documentary spine for scholarship on federal redlining, even as historians debate how directly those sheets steered private lenders.",
+    "topicIds": [
+      "law",
+      "housing",
+      "new-deal",
+      "redlining"
+    ],
+    "mentionedEntityIds": [
+      "ent_law_national_housing_act_1934",
+      "ent_law_fair_housing_act_1968",
+      "ent_bronzeville_001"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_law_national_housing_act_1934",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_law_fair_housing_act_1968",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
+  },
+  {
+    "id": "ent_law_national_housing_act_1934",
+    "kind": "law",
+    "displayName": "National Housing Act of 1934",
+    "summary": "Enacted June 27, 1934, this statute created the Federal Housing Administration to insure private mortgages and, through underwriting manuals that favored same-race occupancy and restrictive covenants, helped turn segregated neighborhoods into a national credit preference.",
+    "eraBuckets": [
+      "1930s"
+    ],
+    "topicTags": [
+      "law",
+      "housing",
+      "new-deal",
+      "redlining"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "institution",
+    "locationLabel": "White House, Washington, D.C.",
+    "lat": 38.8977,
+    "lng": -77.0365,
+    "claims": [
+      {
+        "predicate": "signed_on",
+        "object": "June 27, 1934, as Public Law 73-479, creating the Federal Housing Administration and a federal system of mortgage insurance",
+        "confidenceLevel": "high",
+        "citationSource": "govinfo.gov",
+        "citationHref": "https://www.govinfo.gov/content/pkg/COMPS-9515/pdf/COMPS-9515.pdf",
+        "citationLabel": "GovInfo compiled statute: National Housing Act"
+      },
+      {
+        "predicate": "underwriting_practice",
+        "object": "Federal Housing Administration Underwriting Manual editions of the late 1930s instructed appraisers to treat racial occupancy change and the absence of restrictive covenants as risks to mortgage security",
+        "confidenceLevel": "high",
+        "citationSource": "fraser.stlouisfed.org",
+        "citationHref": "https://fraser.stlouisfed.org/title/underwriting-manual-3563",
+        "citationLabel": "FRASER: Federal Housing Administration Underwriting Manual"
+      }
+    ],
+    "historicalContext": "Together with Home Owners' Loan Corporation mapping, Federal Housing Administration insurance became the federal machinery scholars cite when arguing that residential segregation was not only private custom but national credit policy. The Color of Law and American Apartheid treat that underwriting system as a linchpin of durable Black-White housing separation.",
+    "topicIds": [
+      "law",
+      "housing",
+      "new-deal",
+      "redlining"
+    ],
+    "mentionedEntityIds": [
+      "ent_law_home_owners_loan_act_1933",
+      "ent_law_fair_housing_act_1968",
+      "ent_law_community_reinvestment_act_1977"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_law_home_owners_loan_act_1933",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_law_fair_housing_act_1968",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
+  },
+  {
     "id": "ent_law_fair_housing_act_1968",
     "kind": "law",
     "displayName": "Fair Housing Act of 1968",
@@ -447,12 +573,89 @@
     "mentionedEntityIds": [
       "ent_case_jones_v_alfred_h_mayer_1968",
       "ent_law_civil_rights_act_1866",
-      "ent_martin_luther_king_jr_001"
+      "ent_martin_luther_king_jr_001",
+      "ent_law_home_owners_loan_act_1933",
+      "ent_law_national_housing_act_1934",
+      "ent_law_community_reinvestment_act_1977",
+      "ent_bronzeville_001"
     ],
     "keywords": [],
     "related": [
       {
         "id": "ent_law_civil_rights_act_1866",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_law_community_reinvestment_act_1977",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_law_national_housing_act_1934",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
+  },
+  {
+    "id": "ent_law_community_reinvestment_act_1977",
+    "kind": "law",
+    "displayName": "Community Reinvestment Act of 1977",
+    "summary": "Signed October 12, 1977, this statute directed federal bank regulators to encourage depository institutions to meet the credit needs of the communities they serve, including low- and moderate-income neighborhoods, after decades of documented lending withdrawal from urban Black districts.",
+    "eraBuckets": [
+      "1970s"
+    ],
+    "topicTags": [
+      "law",
+      "housing",
+      "banking",
+      "fair-housing"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "institution",
+    "locationLabel": "White House, Washington, D.C.",
+    "lat": 38.8977,
+    "lng": -77.0365,
+    "claims": [
+      {
+        "predicate": "signed_on",
+        "object": "October 12, 1977, as Title VIII of the Housing and Community Development Act of 1977, Public Law 95-128",
+        "confidenceLevel": "high",
+        "citationSource": "congress.gov",
+        "citationHref": "https://www.congress.gov/bill/95th-congress/house-bill/6655",
+        "citationLabel": "Congress.gov: Housing and Community Development Act of 1977"
+      },
+      {
+        "predicate": "requires",
+        "object": "federal banking agencies to assess how well insured depository institutions help meet the credit needs of their entire communities, including low- and moderate-income neighborhoods, consistent with safe and sound operation",
+        "confidenceLevel": "high",
+        "citationSource": "ffiec.gov",
+        "citationHref": "https://www.ffiec.gov/cra/",
+        "citationLabel": "FFIEC: Community Reinvestment Act"
+      }
+    ],
+    "historicalContext": "Congress passed the Act after civil-rights litigation and journalism documented redlining and capital flight from city neighborhoods. It sits beside the Fair Housing Act on the enforcement timeline: one statute targets discrimination in housing markets; the other pressures banks to reinvest where they take deposits. Contemporary HMDA disparity readings remain juxtaposition evidence, not automatic proof of Act success or failure.",
+    "topicIds": [
+      "law",
+      "housing",
+      "banking",
+      "fair-housing"
+    ],
+    "mentionedEntityIds": [
+      "ent_law_fair_housing_act_1968",
+      "ent_law_national_housing_act_1934",
+      "ent_law_home_owners_loan_act_1933"
+    ],
+    "keywords": [],
+    "related": [
+      {
+        "id": "ent_law_fair_housing_act_1968",
+        "type": "related_to",
+        "direction": "outgoing"
+      },
+      {
+        "id": "ent_law_national_housing_act_1934",
         "type": "related_to",
         "direction": "outgoing"
       }

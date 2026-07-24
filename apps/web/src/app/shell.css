@@ -857,6 +857,7 @@
   background: transparent;
   color: var(--ds-ink);
   border-right: var(--ds-border-width) solid var(--ds-border);
+  /* Owns document scroll over the full-panel map; map-surfaces.css must keep this auto. */
   pointer-events: auto;
 }
 

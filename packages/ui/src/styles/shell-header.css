@@ -121,7 +121,7 @@ html {
   }
 }
 
-/* Map routes (`/explore`): symbol-only at every width to protect map center. */
+/* Opt-in symbol-only chrome (not used by public web routes; lockup is the site default). */
 .ds-shell-header--symbol-only .ds-shell-wordmark__img--lockup {
   display: none !important;
 }

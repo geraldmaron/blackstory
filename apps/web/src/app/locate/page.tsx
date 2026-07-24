@@ -19,7 +19,7 @@ export const metadata = {
 
 export default function LocatePage() {
   return (
-    <UtilityEditionShell mosaicSeed="locate-edition-v6" editionKey="locate">
+    <UtilityEditionShell editionKey="locate">
       <UtilityEditionIntro
         kicker="Discover"
         title="Find your jurisdiction"

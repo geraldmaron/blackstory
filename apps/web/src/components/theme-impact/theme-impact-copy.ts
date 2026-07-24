@@ -17,9 +17,9 @@ export const THEME_IMPACT_GAP_COPY: Readonly<
 > = {
   insufficient_evidence: {
     tone: 'warning',
-    title: 'Insufficient evidence',
+    title: 'Coverage still partial',
     body:
-      'This packet does not yet meet the citation or coverage bar for a full answer. What appears is labeled; gaps stay visible rather than filled with inference.',
+      'Some year spans or series for this beat are not loaded yet. The reading is written through those seams with source labels; what appears stays labeled.',
   },
   modeled: {
     tone: 'dispute',

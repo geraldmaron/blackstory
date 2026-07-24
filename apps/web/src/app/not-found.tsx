@@ -12,7 +12,7 @@ import '../components/patterns/utility-edition/utility-edition.css';
 
 export default function NotFound() {
   return (
-    <UtilityEditionShell mosaicSeed="not-found-edition-v6" editionKey="not-found">
+    <UtilityEditionShell editionKey="not-found">
       <UtilityEditionIntro
         index="404"
         kicker="Missing route"

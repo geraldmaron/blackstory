@@ -19,9 +19,9 @@ const mediaSource = readFileSync(
   'utf8',
 );
 
-test('entity page uses shared EditionAtmosphereMosaic and edition stack', () => {
-  assert.match(pageSource, /EditionAtmosphereMosaic/);
-  assert.match(pageSource, /entityEditionMosaicSeedFor/);
+test('entity page does not mount EditionAtmosphereMosaic and edition stack', () => {
+  assert.doesNotMatch(pageSource, /EditionAtmosphereMosaic/);
+  assert.doesNotMatch(pageSource, /entityEditionMosaicSeedFor/);
   assert.match(pageSource, /entityEditionRootClassName/);
   assert.match(pageSource, /data-entity-edition="v6"/);
   assert.doesNotMatch(pageSource, /ds-entity-mast/);

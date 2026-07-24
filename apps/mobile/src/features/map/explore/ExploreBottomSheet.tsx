@@ -2,9 +2,8 @@
  * Gorhom bottom-sheet host for Explore: peek / half / full snaps over the
  * full-bleed map. Delegates to the shared AppBottomSheet primitive.
  *
- * Detents are intentionally lower than the v7 HTML prototype (22/42/58): native
- * Explore also lifts the sheet with tab-bar `bottomInset`, which ate the map.
- * `bottomInset` still clears the edition tab bar.
+ * Pin Pulse detents (11/34/52): map owns first glance; native Explore also lifts
+ * the sheet with tab-bar `bottomInset`. `bottomInset` still clears the edition tab bar.
  */
 import type { ReactNode } from 'react';
 import { AppBottomSheet } from '../../../ui/AppBottomSheet';

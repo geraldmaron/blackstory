@@ -1,15 +1,16 @@
 /**
- * Explore entity preview as sheet content (NarrativeCard anatomy): copper accent
- * rule, Sora name, serif dek, RecordFactStrip anatomy, browse controls, and a
- * single primary CTA. Hosted by a parent bottom sheet. Drives assistive-tech
- * focus on selection change (MOB-017).
+ * Explore entity preview (Pin Pulse story card): kind glyph, clear title hierarchy,
+ * story line, icon meta chips (where / era / evidence / confidence), linked theme
+ * hooks, and Open place. Hosted by the Explore sheet. Drives assistive-tech focus
+ * on selection change (MOB-017).
  */
 import { useEffect } from 'react';
 import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
   Button,
-  RecordFactStrip,
+  NavIcon,
+  navIconForEntityKind,
   Text,
   useAccessibilityFocus,
   useThemeColors,
@@ -19,16 +20,25 @@ import {
 } from '@/ui';
 import { ExploreChromeFrame, exploreContentInset } from './explore-chrome';
 import { exploreRecordFacts } from './explore-preview-facts';
-import { featureKindSlug, featureMetaLine, type PreviewMetaFeature } from './explore-meta';
+import { exploreStoryMeta } from './explore-story-meta';
+import { featureMetaLine, type PreviewMetaFeature } from './explore-meta';
+import { kindFamilyEncodingFor, isKnownMapKindFamily } from '@/features/map/kind-encoding';
+import { recordKindLabel } from '@/features/record-facts/record-facts';
+import { openExternalMaps } from '@/features/entity/maps-handoff';
 
 export type EntityPreviewPreviewFeature = PreviewMetaFeature & {
   readonly entityId: string;
   readonly label: string;
+  /** Redacted [lng, lat] from the map source when available for external maps hand-off. */
+  readonly coordinates?: readonly [number, number];
   readonly properties: PreviewMetaFeature['properties'] & {
     readonly oneLineStory?: string;
     readonly evidenceCount?: number;
     readonly confidenceTier?: string;
     readonly kindFamily?: string;
+    readonly topicTags?: readonly string[];
+    readonly topicIds?: readonly string[];
+    readonly status?: string;
   };
 };
 
@@ -43,6 +53,33 @@ export type EntityPreviewSheetProps = {
 };
 
 const MIN_TOUCH = MIN_TOUCH_TARGET;
+
+function kindDisplayLabel(feature: EntityPreviewPreviewFeature): string {
+  const family = feature.properties.kindFamily;
+  if (typeof family === 'string' && isKnownMapKindFamily(family)) {
+    return kindFamilyEncodingFor(family).label;
+  }
+  return recordKindLabel(feature.kind);
+}
+
+function MetaChip({
+  icon,
+  label,
+  color,
+}: {
+  readonly icon: keyof typeof Ionicons.glyphMap;
+  readonly label: string;
+  readonly color: string;
+}) {
+  return (
+    <View style={styles.metaChip} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+      <Ionicons name={icon} size={14} color={color} />
+      <Text variant="caption" colorRole="inkMuted" numberOfLines={1} style={styles.metaChipLabel}>
+        {label}
+      </Text>
+    </View>
+  );
+}
 
 export function EntityPreviewSheet({
   feature,
@@ -62,11 +99,13 @@ export function EntityPreviewSheet({
 
   if (!feature) return null;
 
-  const kindSlug = featureKindSlug(feature.kind);
-  const meta = featureMetaLine(feature);
-  const dek = feature.properties.oneLineStory?.trim();
-  const facts = exploreRecordFacts(feature);
-  const factsSummary = [`Kind: ${kindSlug}`, ...facts.map((fact) => `${fact.label}: ${fact.value}`)].join(
+  const selected = feature;
+  const kindLabel = kindDisplayLabel(selected);
+  const meta = featureMetaLine(selected);
+  const dek = selected.properties.oneLineStory?.trim();
+  const storyMeta = exploreStoryMeta(selected);
+  const facts = exploreRecordFacts(selected);
+  const factsSummary = [`Kind: ${kindLabel}`, ...facts.map((fact) => `${fact.label}: ${fact.value}`)].join(
     '. ',
   );
   const canBrowse =
@@ -74,6 +113,26 @@ export function EntityPreviewSheet({
     browsePosition.total > 1 &&
     onBrowsePrevious !== undefined &&
     onBrowseNext !== undefined;
+  const mapCoords = selected.coordinates;
+  const hasPublicCoords =
+    Array.isArray(mapCoords) &&
+    mapCoords.length === 2 &&
+    Number.isFinite(mapCoords[0]) &&
+    Number.isFinite(mapCoords[1]);
+  const hasMetaChips = Boolean(
+    storyMeta.where || storyMeta.era || storyMeta.evidence || storyMeta.confidence || storyMeta.status,
+  );
+  const linkedThemes = storyMeta.themes;
+
+  async function handleOpenInMaps() {
+    if (!hasPublicCoords || !mapCoords) return;
+    const [lng, lat] = mapCoords;
+    await openExternalMaps({
+      lat,
+      lng,
+      label: selected.label,
+    });
+  }
 
   return (
     <View
@@ -87,26 +146,54 @@ export function EntityPreviewSheet({
           ref={sheetRef}
           accessible
           accessibilityRole="summary"
-          accessibilityLabel={`Selected record: ${feature.label}. ${kindSlug}. ${factsSummary}${
+          accessibilityLabel={`Pinned place: ${feature.label}. ${kindLabel}. ${factsSummary}${
             dek ? `. ${dek}` : ''
           }`}
-          accessibilityHint="Swipe through controls to open the full record or close this preview."
+          accessibilityHint="Swipe through controls to open the full place or close this preview."
           style={styles.card}
         >
-          <Text variant="code" colorRole="accent" style={styles.kicker}>
-            SELECTED RECORD
-          </Text>
-
-          <View style={styles.topRow}>
-            <View style={styles.kindBlock}>
-              <Text variant="code" colorRole="inkMuted" numberOfLines={1} style={styles.kindSlug}>
-                {kindSlug}
+          <View style={styles.headerRow}>
+            <View style={[styles.kindGlyph, { borderColor: theme.border, backgroundColor: theme.surfaceRaised }]}>
+              <NavIcon name={navIconForEntityKind(feature.kind)} size={20} selected />
+            </View>
+            <View style={styles.headerText}>
+              <Text variant="code" colorRole="accent" numberOfLines={1} style={styles.kicker}>
+                Pinned here
+              </Text>
+              <Text variant="caption" colorRole="inkMuted" numberOfLines={1}>
+                {kindLabel}
+                {storyMeta.status ? ` · ${storyMeta.status}` : ''}
               </Text>
             </View>
+            {canBrowse ? (
+              <View style={styles.browseCluster}>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Previous place nearby"
+                  onPress={onBrowsePrevious}
+                  hitSlop={8}
+                  style={({ pressed }) => [styles.browseButton, { opacity: pressed ? 0.75 : 1 }]}
+                >
+                  <Ionicons name="chevron-back" size={18} color={theme.accent} />
+                </Pressable>
+                <Text variant="code" colorRole="inkMuted">
+                  {browsePosition.index + 1}/{browsePosition.total}
+                </Text>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Next place nearby"
+                  onPress={onBrowseNext}
+                  hitSlop={8}
+                  style={({ pressed }) => [styles.browseButton, { opacity: pressed ? 0.75 : 1 }]}
+                >
+                  <Ionicons name="chevron-forward" size={18} color={theme.accent} />
+                </Pressable>
+              </View>
+            ) : null}
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Close preview"
-              accessibilityHint="Returns focus to the map without opening the full record"
+              accessibilityHint="Returns focus to the map without opening the place"
               hitSlop={8}
               onPress={onClose}
               style={({ pressed }) => [
@@ -118,38 +205,6 @@ export function EntityPreviewSheet({
             </Pressable>
           </View>
 
-          {canBrowse ? (
-            <View style={styles.browseRow}>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Previous record in view"
-                onPress={onBrowsePrevious}
-                hitSlop={8}
-                style={({ pressed }) => [
-                  styles.browseButton,
-                  { opacity: pressed ? 0.75 : 1 },
-                ]}
-              >
-                <Ionicons name="chevron-back" size={18} color={theme.accent} />
-              </Pressable>
-              <Text variant="code" colorRole="inkMuted">
-                {browsePosition.index + 1} of {browsePosition.total}
-              </Text>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Next record in view"
-                onPress={onBrowseNext}
-                hitSlop={8}
-                style={({ pressed }) => [
-                  styles.browseButton,
-                  { opacity: pressed ? 0.75 : 1 },
-                ]}
-              >
-                <Ionicons name="chevron-forward" size={18} color={theme.accent} />
-              </Pressable>
-            </View>
-          ) : null}
-
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={feature.label}
@@ -157,31 +212,69 @@ export function EntityPreviewSheet({
             onPress={() => onOpenEntity(feature.entityId)}
             style={({ pressed }) => [styles.titlePress, { opacity: pressed ? 0.85 : 1 }]}
           >
-            <Text variant="rowTitle" isHeading numberOfLines={2} style={styles.title}>
+            <Text variant="entityTitle" isHeading numberOfLines={2} style={styles.title}>
               {feature.label}
             </Text>
           </Pressable>
 
           {dek ? (
-            <Text variant="editorial" colorRole="ink" numberOfLines={4} style={styles.dek}>
+            <Text variant="editorial" colorRole="ink" numberOfLines={3} style={styles.dek}>
               {dek}
             </Text>
           ) : (
-            <Text variant="bodySmall" colorRole="inkMuted" numberOfLines={3}>
+            <Text variant="caption" colorRole="inkMuted" numberOfLines={2}>
               {meta
-                ? `${meta}. Open the full record for claims, timeline, and connected places.`
-                : 'Open the full record for claims, timeline, and connected places.'}
+                ? `${meta}. Open for claims, timeline, and connected pins.`
+                : 'Open for claims, timeline, and connected pins.'}
             </Text>
           )}
 
-          <RecordFactStrip facts={facts} />
+          {hasMetaChips ? (
+            <View style={styles.metaRow} accessibilityRole="text" accessibilityLabel={factsSummary}>
+              {storyMeta.where ? (
+                <MetaChip icon="location-outline" label={storyMeta.where} color={theme.inkMuted} />
+              ) : null}
+              {storyMeta.era ? (
+                <MetaChip icon="time-outline" label={storyMeta.era} color={theme.inkMuted} />
+              ) : null}
+              {storyMeta.evidence ? (
+                <MetaChip icon="document-text-outline" label={storyMeta.evidence} color={theme.inkMuted} />
+              ) : null}
+              {storyMeta.confidence ? (
+                <MetaChip icon="shield-checkmark-outline" label={storyMeta.confidence} color={theme.inkMuted} />
+              ) : null}
+            </View>
+          ) : null}
+
+          {linkedThemes && linkedThemes.length > 0 ? (
+            <View style={styles.linkedRow} testID="entity-preview-linked">
+              <Text variant="code" colorRole="inkMuted" style={styles.linkedKicker}>
+                Linked
+              </Text>
+              <Text variant="caption" colorRole="ink" numberOfLines={1} style={styles.linkedThemes}>
+                {linkedThemes.join(' · ')}
+              </Text>
+            </View>
+          ) : null}
 
           <Button
-            label="Open full record"
+            label="Open place"
             variant="accent"
             onPress={() => onOpenEntity(feature.entityId)}
-            accessibilityLabel={`Open full record for ${feature.label}`}
+            accessibilityLabel={`Open place for ${feature.label}`}
           />
+          {hasPublicCoords ? (
+            <Button
+              label="Open in maps"
+              variant="secondary"
+              density="compact"
+              onPress={() => {
+                void handleOpenInMaps();
+              }}
+              accessibilityLabel={`Open ${feature.label} in Maps at public precision`}
+              accessibilityHint="Opens Apple Maps or Google Maps with this place"
+            />
+          ) : null}
         </View>
       </ExploreChromeFrame>
     </View>
@@ -197,32 +290,37 @@ const styles = StyleSheet.create({
   card: {
     gap: space['2'],
     paddingTop: space['1'],
-    paddingBottom: space['3'],
+    paddingBottom: space['2'],
   },
-  kicker: {
-    letterSpacing: 1,
-  },
-  topRow: {
+  headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: space['2'],
   },
-  kindBlock: {
+  kindGlyph: {
+    width: 36,
+    height: 36,
+    borderRadius: radius.sm,
+    borderWidth: StyleSheet.hairlineWidth,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerText: {
     flex: 1,
+    gap: 2,
+    minWidth: 0,
   },
-  kindSlug: {
-    letterSpacing: 1.2,
-    flexShrink: 1,
+  kicker: {
+    letterSpacing: 0.6,
   },
-  browseRow: {
+  browseCluster: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: space['1'],
+    gap: space['1'],
   },
   browseButton: {
     minHeight: MIN_TOUCH,
-    minWidth: MIN_TOUCH,
+    minWidth: 32,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -236,6 +334,35 @@ const styles = StyleSheet.create({
   },
   dek: {
     marginTop: -space['1'],
+  },
+  metaRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: space['2'],
+    alignItems: 'center',
+  },
+  metaChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    maxWidth: '100%',
+  },
+  metaChipLabel: {
+    flexShrink: 1,
+  },
+  linkedRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: space['2'],
+    flexWrap: 'wrap',
+  },
+  linkedKicker: {
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+    fontSize: 10,
+  },
+  linkedThemes: {
+    flexShrink: 1,
   },
   close: {
     minHeight: MIN_TOUCH,

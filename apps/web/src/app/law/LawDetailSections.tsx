@@ -169,7 +169,7 @@ export function LawDetailIntro({ snapshot }: LawDetailIntroProps) {
             topics={snapshot.topics}
           />
           <p className="ds-law-edition__credit">
-            Archive mosaic · symbolic atmosphere · decorative gutter tiles only.{' '}
+            Archive texture · symbolic atmosphere. {' '}
             <Link href="/stories/mosaic-credits">Mosaic credits</Link>
           </p>
         </div>

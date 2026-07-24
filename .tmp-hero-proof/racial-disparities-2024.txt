@@ -1,0 +1,2200 @@
+Advancing anti-racist economic research and policy
+
+Racial and ethnic disparities in
+the United States
+An interactive chartbook
+Report • June 15, 2022
+
+
+
+
+                         • Washington, DC   View this report at epi.org/270707
+Updated November 2024
+
+This interactive chartbook provides a statistical snapshot of race and ethnicity in the
+United States, depicting racial/ethnic disparities observed through
+
+  • Population demographics
+  • Civic engagement
+  • Labor market outcomes
+  • Income, poverty, and wealth
+  • Health
+
+The chartbook also highlights some notable intersections of gender with race and
+ethnicity, including educational attainment, labor force participation, life expectancy, and
+maternal mortality. The findings are bracing, as they show how much more work we need
+to do to address longstanding and persistent racial inequities.
+
+Most charts include data for five racial/ethnic groups in each of the charts—white, Black,
+Hispanic, Asian American and Pacific Islander (AAPI), and American Indian and Alaska
+Native (AIAN). In the charts and text, “Americans” refers to all U.S. residents, regardless of
+citizenship status.
+
+
+     Data for AAPI and AIAN populations have not always been available from the
+     federal government sources used. Starting in November 2024 this data is
+     included in selected charts identified with a yellow box.
+
+
+Researchers seeking disaggregated data and statistics for AAPI and AIAN groups are
+encouraged to look at sources cited in the companion essays in the Anti-Racist Economic
+Research and Policy Guide: AAPI Data and the Center for Indian Country Development at
+the Federal Reserve Bank of Minneapolis.
+
+As our efforts illustrate, collecting and maintaining data sources that are representative of
+the entire U.S. population is an essential first step toward overcoming the invisibility,
+neglect, and lack of understanding experienced by many communities of color. Future
+work on this project will involve identifying comparable data from alternative sources that
+fill in as much of the missing information in the chartbook as possible.
+
+The interactive version of the chartbook can be accessed at https://www.epi.org/anti-
+racist-policy-research/disparities-chartbook. For additional notes and source
+information, see the “Chart notes and sources” section at the end of this publication.
+
+
+
+Population demographics
+
+
+                                                                                                 1
+1
+
+    The U.S. has become more racially and
+    ethnically diverse over the last two
+    decades
+    Share of U.S. population by race and ethnicity, 2000,
+    2010, and 2020
+
+
+      2020                         57.8%                        12.1%       18.7%        6.1%
+
+
+
+      2010                           63.7%                          12.2%        16.3%     4.8%
+
+
+
+      2000                              69.1%                            12.1%      12.5% 3.7%
+
+
+
+                      White      Black           Hispanic       AAPI          AIAN
+                      Some other race           Two or more races
+
+
+    Notes: AAPI refers to Asian American and Pacific Islander, AIAN refers to American Indian and
+    Alaskan Native. Race and ethnicity categories are mutually exclusive (i.e., white non-Hispanic,
+    Black non-Hispanic, AAPI non-Hispanic, AIAN non-Hispanic, and Hispanic any race).
+    Sources: Economic Policy Institute analysis of U.S. Census Bureau Decennial Census Summary
+    File 2, Table DP1, for 2000, and Decennial Census Redistricting Data, Table P2, for 2010 and
+    2020.
+
+
+    Each decennial Census since 2000 has revealed a more racially and ethnically
+    diverse U.S. population. While the share of people who identify as Black (about
+    12%) or American Indian and Alaskan Native (0.7%) has remained constant, the
+    non-Hispanic white share of the population has declined from 69.1% in 2000 to
+    57.8% in 2020. On the other hand, a growing share of U.S. residents identify as
+    Hispanic (increasing from 12.5% in 2000 to 18.7% in 2020) or Asian American
+    and Pacific Islander (increasing from 3.7% in 2000 to 6.1% in 2020). These
+    changing population demographics reflect different trends in birth, mortality,
+    and immigration rates across groups. Since 2000, there have also been signifi-
+    cant changes in how people identify racially. Notably, a growing share of peo-
+    ple identify as being of two or more races (this would include people who, for
+
+
+
+
+                                                                                                      2
+example, identify as Black and AAPI, but would not include people who identify
+as Black and Hispanic, as they are identifying Black alone as their race and His-
+panic as their ethnicity). Also, a growing but still small share of people identify
+as being of a race other than those explicitly defined by the Office of Manage-
+ment and Budget (OMB).
+
+As Trevon Logan notes in his essay, it is the OMB that issues regulations re-
+garding the classifications of race and ethnicity by federal agencies, includ-
+ing the U.S. Census Bureau, which conducts the major household and busi-
+ness surveys used by researchers. There are six permitted race categories
+and two ethnicity classifications, Hispanic and non-Hispanic. As such, every-
+one is a member of both a race and ethnicity. For more on the current clas-
+sifications, see Logan’s essay.
+
+
+
+
+                                                                                      3
+2
+
+    While U.S. residents are overwhelmingly
+    citizens, Asian American/Pacific
+    Islander and Hispanic citizens are more
+    likely to be first-generation immigrants
+    Share of U.S. population by race/ethnicity and
+    nativity, 2023
+
+
+         White
+                                                     96.0%
+
+
+         Black
+                                                  89.1%
+
+
+      Hispanic
+                                         67.0%                           12.7%        20.2%
+
+
+         AIAN
+                                               81.7%                                     12.3%
+
+
+          AAPI
+                              37.5%                          38.8%                   23.7%
+
+
+
+                       Born a citizen        Naturalized citizen        Noncitizen
+
+
+    Notes: AIAN refers to American Indian and Alaska Native. AAPI refers to Asian American and
+    Pacific Islander. All race categories are single race and do not distinguish Hispanic ethnicity
+    from non-Hispanic ethnicity, except for white, which is exclusive of Hispanic ethnicity (i.e.,
+    non-Hispanic white alone, Black alone, AIAN alone, and AAPI alone). Hispanic can be of any
+    race.
+    Sources: Economic Policy Institute analysis of U.S. Census Bureau 2023 American Community
+    Survey 1-Year Estimates Detailed Tables B05003H, B05003B, B05003D, B05003I, B05003E,
+    and B05003C.
+
+
+    Across all racial and ethnic groups, an overwhelming majority of people in the
+    United States are U.S. citizens, according to data from the Current Population
+    Survey. However, nativity shares vary across racial groups. White persons
+
+
+
+
+                                                                                                      4
+(96.0%), American Indian and Alaskan Native (AIAN) persons (81.7%), and Black
+persons (89.1%) are most likely to have been born citizens (born in the United
+States or to United States citizens abroad), compared with over half of the His-
+panic population (67.0%) and more than one-fourth (37.5%) of the Asian Ameri-
+can and Pacific Islander (AAPI) population.
+
+Immigration status also varies widely. AAPI residents are most likely to be immi-
+grants: more than one-fourth (38.8%) were not born U.S. citizens but became
+U.S. citizens (i.e., are naturalized U.S. citizens), while another 23.7% are not citi-
+zens. Hispanic residents are next most likely to be immigrants: 12.7% are natu-
+ralized citizens and 20.2% are not citizens. These statistics highlight only a frac-
+tion of the diversity represented within and across different racial and ethnic
+groups. As several essays in the Advancing Anti-Racist Economic Research
+and Policy guide explain, analyses that use categories or group descriptions
+that are too broadly defined can lead to inaccurate conclusions.
+
+
+
+
+                                                                                         5
+3
+
+    The uneven geographic distribution of
+    racial and ethnic populations highlights
+    the influence of state and local policy on
+    racial inequality
+    Share of state population by race and ethnicity,
+    2020
+      White       Black       Hispanic      AAPI          AIAN     Other     Two or more
+
+
+
+                                                                                           Maine
+
+
+                                                                                    Vt.    N.H.
+
+
+     Wash.    Idaho   Mont.     N.D.     Minn.     Ill.    Wis.    Mich.   N.Y.    R.I.    Mass.
+
+
+     Ore.     Nev.    Wyo.      S.D.     Iowa    Ind.      Ohio     Pa.    N.J.   Conn.
+
+
+     Calif.   Utah    Colo.    Neb.      Mo.       Ky.     W.Va.    Va.    Md.     Del.
+
+
+              Ariz.   N.M.      Kan.     Ark.    Tenn.     N.C.    S.C.    D.C.
+
+
+                               Okla.      La.    Miss.     Ala.    Ga.
+
+
+    Alaska Hawaii              Texas                                       Fla.
+
+
+
+
+    21.6                                 90.2
+
+    Notes: AAPI refers to Asian American and Pacific Islander. AIAN refers to American Indian and
+    Alaskan Native. The “Two or more” category captures the share of people who identify as
+    being of two or more races, and persons in this category are not included in the single race
+    categories.
+    Source: Economic Policy Institute analysis of U.S. Census Bureau Decennial Census
+    Redistricting Data, Table P1.
+
+
+
+
+                                                                                                    6
+The U.S. Census Bureau projects that Black, Hispanic, AAPI, and other people
+who do not identify as white will collectively account for over half of the popu-
+lation of the United States by 2044. In California, Hawaii, Maryland, Nevada,
+New Mexico, Texas, and the District of Columbia, the white population is al-
+ready in the minority, and in Arizona, Florida, Georgia, New Jersey, and New
+York, white persons make up just over half of the population. This interactive
+map shows areas of population density for each race or ethnic group (click on
+a race or ethnic group) along with the racial and ethnic distribution of each
+state’s population (click on a state). It shows that Southern states and the Dis-
+trict of Columbia have the largest shares of residents who are Black, with the
+highest shares in the District of Columbia (40.9%), Mississippi (36.4%), and
+Louisiana (31.2%). Southwestern and Western states are home to a large per-
+centage of Latinos, with the highest shares in New Mexico (47.7%), Texas
+(39.3%), and California (39.4%). AAPI residents, including Native Hawaiians, pre-
+dictably account for nearly half (46.8%) of the population of Hawaii but are also
+a significant share of the population in California (15.5%) as well as New Jersey
+and Washington state (10.2% each). Also, as the group’s name would indicate,
+American Indian and Alaska Native residents account for the highest share of
+the population in Alaska (14.8%), followed by New Mexico (8.9%), South Dakota
+(8.4%), and Oklahoma (7.9%). White Americans account for the largest majority
+of the population in several Northeastern states (90.2% in Maine, 89.1% in Ver-
+mont, and 87.2% in New Hampshire) and West Virginia (89.1%).
+
+The patterns illustrated in the map trace each group’s unique history of settle-
+ment, immigration, and migration in this country. But they also help to make a
+point about the important role that state and local policies play in either improv-
+ing or worsening racial disparities in the United States. As just one example,
+EPI research shows that Southern states, which have a high density of Black
+residents, are more likely than states in other regions to use preemption laws
+to stop local governments from setting strong labor standards, such as raising
+the minimum wage and guaranteeing paid sick leave.
+
+For more on preemption laws in the South, see Hunter Blair et al., Preempt-
+ing Progress: State Interference in Local Policymaking Prevents People of
+Color, Women, and Low-Income Workers from Making Ends Meet in the
+South, Economic Policy Institute, September 2020.
+
+
+
+
+                                                                                      7
+4
+
+    Current population demographics by
+    race/ethnicity and age support
+    projections that people of color will
+    become the collective majority by 2045
+    Share of U.S. population within given age ranges, by
+    race and ethnicity, 2023
+
+
+         White        18.0%         8.1%             37.1%                14.2%           22.5%
+
+
+         Black          24.8%              9.9%              40.9%                11.5%      12.9%
+
+
+      Hispanic              29.4%            11.4%                41.6%                   9.1% 8.6%
+
+
+         AIAN
+                          28.2%             10.6%              39.9%                10.3%     11.1%
+
+
+          AAPI
+                       20.5%         8.7%                 45.7%                   11.0%     14.0%
+
+
+
+                 Under 18           18–24         25–54        55–64          65 and older
+
+
+    Notes: AIAN refers to American Indian and Alaska Native. AAPI refers to Asian American and
+    Pacific Islander. All race categories are single race and do not distinguish Hispanic ethnicity
+    from non-Hispanic ethnicity, except for white, which is exclusive of Hispanic ethnicity (i.e.,
+    non-Hispanic white alone, Black alone, AIAN alone, and AIAN alone). Hispanic can be of any
+    race.
+    Source: Economic Policy Institute analysis of U.S. Census Bureau's 2023 Population Estimates
+    by Age, Sex, Race and Hispanic Origin, Table NC-EST2023-ASR6H.
+
+
+    The changing racial and ethnic makeup of the U.S. population is foretold in the
+    age distribution of different racial and ethnic groups. In 2023, almost a third
+    (29.4%) of people who identified as Hispanic were under the age of 18, as were
+    about a quarter of those who identified as Black (24.8%), American Indian and
+    Alaska Native (AIAN) (28.2%) and a fifth within those who identified as Asian
+
+
+
+
+                                                                                                      8
+American and Pacific Islander (20.5%). A smaller share of the white population
+(18.0%) belonged to this younger age cohort while over a third of white resi-
+dents were near or at retirement age (age 55 or older)—a much larger share
+than for other racial and ethnic groups. As the current population ages, the old-
+er population will remain predominantly non-Hispanic white while Black, His-
+panic, AAPI, and AIAN persons will be a growing share of the younger popula-
+tion. This racial and ethnic generation gap will require balancing the interests
+of a younger, less wealthy, more racially and ethnically diverse population with
+those of an older, wealthier, predominantly white population. However, these
+generations are linked in important ways. Older workers and retirees have a
+stake in worker, economic, and racial justice for those younger workers who in
+the years ahead will be a growing share of workers driving the national econo-
+my and providing many of the services the aging population relies on. Census
+population projections from 2018 (the latest available) indicate that in 2045,
+non-Hispanic white persons will account for less than half (49.7%) of the U.S.
+population (see U.S. Census Bureau, 2017 National Population Projections Ta-
+bles, Table 4).
+
+
+
+
+                                                                                    9
+5
+
+    Men’s educational attainment is highly
+    stratified by race and ethnicity, with
+    American Indian and Alaska Native,
+    Hispanic, and Black men most likely to
+    be “working class”
+    Share of men aged 25 and older within given level
+    of educational attainment, by race and ethnicity,
+    2023
+
+
+         White
+                  6.1%        26.9%             19.3%               32.6%                15.0%
+
+
+         Black
+                    12.6%             34.7%                 22.2%             22.1%        8.4%
+
+
+      Hispanic
+                           28.3%                29.5%             16.9%          19.1%      6.2%
+
+
+         AIAN            24.6%                 33.8%                20.1%          16.8%    4.8%
+
+
+          AAPI
+                   10.5%     14.1%     11.2%             35.4%                    28.7%
+
+
+
+             Less than high school         High school        Some college            College
+             Advanced degree
+
+
+    Notes: AIAN refers to American Indian and Alaskan Native. AAPI refers to Asian American and
+    Pacific Islander. All race categories are single race and do not distinguish Hispanic ethnicity
+    from non-Hispanic ethnicity, except for white, which is exclusive of Hispanic ethnicity (i.e.,
+    non-Hispanic white alone, Black alone, AIAN alone, and AAPI alone). Hispanic can be of any
+    race.
+    Sources: Economic Policy Institute analysis of U.S. Census Bureau 2023 American Community
+    Survey 1-Year Estimates Detailed Tables B15002H, B15002B, B15002I, B15002D, B15002C, and
+    B15002E.
+
+
+    The term working class has been used to describe working-age adults who
+    have less than a bachelor’s degree. Based on their high shares without a bach-
+
+
+
+
+                                                                                                      10
+elor’s degree or more education, American Indian and Alaska Native (AIAN)
+(78.5%), Hispanic (74.7%), and Black (69.5%) men are more likely to be consid-
+ered working class (under this definition) than are white (52.3%) or Asian Ameri-
+can and Pacific Islander (AAPI) (35.8%) men. Even among the groups of men
+most likely to be considered working class, there is still a wide range of educa-
+tional attainment that includes everything from less than a high school diploma
+to some college. The some college category includes attendance at a four-year
+or two-year institution, but no degree; it also includes completion of a two-year
+associate or technical degree. The groups with the highest shares of people
+with less than a high school education are Hispanic men (28.3%) and AIAN men
+(24.6%) and 57.8% of Hispanic men and over half of AIAN men (58.4%) have no
+education beyond high school. While about half (47.3%) of Black men also have
+no education beyond high school, Black men are more likely than either His-
+panic or AIAN men to have a bachelor’s or advanced degree, but still much
+less likely to have that level of education than either white or AAPI men. AAPI
+men lead all other racial groups in the share (64.1%) who have a bachelor’s or
+advanced degree. These patterns of educational attainment are shaped by
+multiple factors, including differences in immigration policies applied to Asian
+versus Latin American countries, as well as the legacy of racial discrimination
+and oppression that severely limited educational opportunities for generations
+of Black and Native Americans.
+
+
+
+
+                                                                                    11
+6
+
+    Most women have more than a high
+    school education, but Latinas and AIAN
+    women lag behind other groups in
+    attaining higher education
+    Share of women aged 25 and older within given
+    level of educational attainment, by race and
+    ethnicity, 2023
+
+
+         White
+                            24.5%             19.2%                34.6%                16.6%
+
+
+         Black
+                   10.1%          27.6%               23.0%             26.9%            12.5%
+
+
+      Hispanic
+                        24.8%                26.8%            17.5%           23.1%        7.9%
+
+
+         AIAN          19.5%              28.2%               23.1%           22.4%
+
+
+          AAPI
+                    12.5%      14.7%      10.5%            38.5%                   23.8%
+
+
+
+             Less than high school          High school        Some college           College
+             Advanced degree
+
+
+    Notes: AIAN refers to American Indian and Alaskan Native. AAPI refers to Asian American and
+    Pacific Islander. All race categories are single race and do not distinguish Hispanic ethnicity
+    from non-Hispanic ethnicity, except for white, which is exclusive of Hispanic ethnicity (i.e.,
+    non-Hispanic white alone, Black alone, AIAN alone, AAPI alone). Hispanic can be of any race.
+    Shares may not add up to 100 due to rounding.
+    Sources: Economic Policy Institute analysis of U.S. Census Bureau 2023 American Community
+    Survey 1-Year Estimates Detailed Tables B15002H, B15002B, B15002I, B15002D, B15002C, and
+    B15002E.
+
+
+    In 2023, across most racial and ethnic groups, at least half of women aged 25
+    or older had some education beyond a high school diploma. Latinas were the
+    exception—only 48.5% had some level of education beyond high school and
+
+
+
+
+                                                                                                      12
+24.8% had less than a high school education, a much higher percentage than
+any other group of women (1.3 to nearly 5 times as much). Those women least
+likely to have a bachelor’s or advanced degree were American Indian and
+Alaskan Native (AIAN) women (29.2%) and Latinas (31%). Asian American and
+Pacific Islander (AAPI) and white women had the highest levels of educational
+attainment with 62.3% of AAPI women and 51.2% of white women having at
+least a bachelor’s degree, followed by 39.4% of Black women. As with men,
+these patterns of educational attainment are shaped by multiple factors, includ-
+ing differences in immigration policies applied to Asian versus Latin American
+countries, as well as the legacy of racial discrimination and oppression that se-
+verely limited educational opportunities for generations of Black and Native
+Americans. But compared with male educational attainment by race and ethnic-
+ity women tend to have higher levels of educational attainment (see Chart 5).
+
+
+
+
+                                                                                    13
+7
+
+    While the Black and AIAN
+    imprisonment rate has decreased, Black
+    and AIAN people are still five times as
+    likely as white people to be imprisoned
+    Imprisonment rates per 100,000 U.S. residents by
+    race and ethnicity, 2012–2022
+
+       1,866
+
+
+
+       1,277
+                                                                                               1,196
+        939                                                                                    1,042
+
+
+                                                                                               603
+        296
+        132                                                                                    229
+                                                                                               88
+       2012             2014             2016             2018            2020             2022
+
+                      Black         AIAN         Hispanic         White         AAPI
+
+
+    Notes: AIAN refers to American Indian and Alaska Native. AAPI refers to Asian American and
+    Pacific Islander. Race and ethnicity categories are mutually exclusive (i.e., white non-Hispanic,
+    Black non-Hispanic, AIAN non-Hispanic, AAPI, non-Hispanic, and Hispanic any race).
+    Source: Economic Policy Institute compilation of Bureau of Justice Statistics Federal Justice
+    Statistics, 2023, Table 6.
+
+
+
+
+    In response to the demand for criminal justice reform and a shift away from the
+    “tough on crime” politics of the 1980s and 1990s, imprisonment rates for Black,
+    American Indian and Alaska Native (AIAN), Hispanic people have fallen over
+    the last decade. But Black, AIAN, and Hispanic people are still much more likely
+    to be incarcerated than white people, whose imprisonment rate has stagnated
+    over the past decade. Over 1,000 out of every 100,000 U.S. residents who are
+    Black or American Indian and Alaska Native (AIAN) were imprisoned in 2023,
+    followed by 603 out of 100,000 Latino U.S. residents, 229 out of 100,000 white
+
+
+
+
+                                                                                                        14
+U.S. residents, and 88 out of 100,000 Asian American and Pacific Islander U.S.
+residents. Thus, the approximately 1.8 million people held in U.S. prisons at the
+end of 2022 —an often-forgotten segment of the U.S. population—are dispro-
+portionately Black, AIAN, Hispanic, and other people of color.
+
+Data on the size of the overall incarcerated population come from the “Cor-
+rectional Populations in the United States, 2022—Statistical Tables” pub-
+lished by the U.S. Department of Justice in May 2024.
+
+
+
+
+                                                                                    15
+8
+
+    Black and AIAN men have an
+    exceptionally high imprisonment rate
+    Imprisonment rates per 100,000 U.S residents, by
+    race/ethnicity and gender, 2022
+
+         White women
+                              40
+
+         Black women            64
+
+      Hispanic women          49
+
+         AIAN women
+                                     173
+
+          AAPI women
+                            5
+
+
+
+            White men                      337
+
+            Black men                                                                        1,826
+
+         Hispanic men
+                                                        794
+
+             AIAN men
+                                                                               1,443
+
+             AAPI men
+                                   141
+
+
+    Notes: AIAN refers to American Indian and Alaska Native. AAPI refers to Asian American and
+    Pacific Islander. Race and ethnicity categories are mutually exclusive (i.e., white non-Hispanic,
+    Black non-Hispanic, AIAN non-Hispanic, AAPI non-Hispanic, and Hispanic any race).
+    Source: Economic Policy Institute compilation of Bureau of Justice Statistics Federal Justice
+    Statistics, 2019, Table 13.
+
+
+    This chart makes two facts very clear: That imprisonment in the United States is
+    not only a gendered issue—with men being much more likely to be impris-
+    oned—but also an issue of racialized gender, with Black and American Indian
+    and Alaska Native (AIAN) men being far and away the most highly imprisoned
+    group. Among women, AIAN residents had the highest imprisonment rate (173
+
+
+
+
+                                                                                                        16
+per 100,000), followed by Black residents who had an imprisonment rate (64
+per 100,000) in 2022. AIAN women were almost three times as likely to be im-
+prisoned as Black women, around four times as likely to be imprisoned as
+White and Hispanic women, and 34 times as likely to be imprisoned as AAPI
+women. Among men, Black residents had the highest imprisonment rate (1,826
+per 100,000), followed by AIAN men (1,443 per 100,000). Black men were more
+than twice as likely to be imprisoned as Hispanic men, more than five times as
+likely to be imprisoned as white men, and almost 13 times as likely to be impris-
+oned as AAPI men. AIAN men were almost twice as likely to be imprisoned as
+Hispanic men, more than four times as likely to be imprisoned as white men,
+and more than ten times as likely to be imprisoned as AAPI men.
+
+
+
+
+                                                                                    17
+Civic engagement
+
+
+
+
+                   18
+9
+
+    Consistently higher turnout among
+    white voters was challenged by historic
+    Black voter turnout in 2012 and, to a
+    lesser extent by historic Hispanic and
+    Asian voter turnout in 2020
+    Voter turnout in presidential election years by race
+    and ethnicity, select years 1992 to 2020
+
+      75
+
+
+
+
+     50
+
+
+
+
+     25
+
+
+
+
+       0
+              1992       1996       2000      2004      2008       2012         2016    2020
+
+                            White          Black       Hispanic         Asian
+
+
+    Notes: Race and ethnicity categories are mutually exclusive (i.e., white non-Hispanic, Black
+    non-Hispanic, Asian non-Hispanic, and Hispanic any race).
+    Source: Economic Policy Institute analysis of U.S. Census Bureau Historical Reported Voting
+    Rates data, Table A-1.
+
+
+    The right to vote is the most powerful right of U.S. citizenship—and widespread
+    voter participation is essential to a functional democracy. Yet many U.S. citizens
+    ages 18 and older do not vote. Data on voter participation during presidential
+    election years since 1992 reveal that turnout varies significantly by race and
+    ethnicity and changes over time. Since 1992, voter turnout has typically been
+    highest among white voters—ranging from 60.7% to 70.9%—although Black vot-
+    er turnout saw a huge increase in 2008 and 2012 during the election and re-
+    election of the nation’s first Black president, Barack Obama. In fact, 2012 was
+
+
+
+
+                                                                                                   19
+the only election in which Black voter turnout (66.2%) exceeded white voter
+turnout (64.1%). Hispanic and Asian voter turnout was less than 50% in all presi-
+dential election years between 1996 and 2016, until both groups had the
+largest turnout in decades in 2020 (53.7% and 59.7% respectively). While one’s
+personal decision to participate in an election can be influenced by any num-
+ber of factors—including enthusiasm about a particular candidate or confi-
+dence in the democratic process—rampant forms of voter suppression in some
+states undoubtedly contribute to these disparities as well.
+
+For more on the impact of state laws that limit access to voter registration,
+revoke the right to vote for returning (formerly incarcerated) citizens, or oth-
+erwise make it more difficult for certain populations to cast a ballot, see
+“State Voting Laws,” Brennan Center for Justice, accessed May 5, 2022;
+ “State Voting Rights Tracker,” Voting Rights Lab, accessed May 5, 2022.
+
+
+
+
+                                                                                    20
+10
+
+     Amid dramatic decline in union
+     membership since the 1970s, Black
+     workers have held onto the highest rate
+     of union membership for decades
+     Union membership rates, by race and ethnicity,
+     1973–2023
+
+      40%
+
+
+        30
+
+
+        20
+
+
+                                                                                             11.9%
+        10                                                                                   10.1%
+                                                                                             9.0%
+                                                                                             8.3%
+
+
+         0
+                         1980           1990           2000           2010          2020
+
+                             White        Black        Hispanic        AAPI
+
+
+     Notes: AAPI refers to Asian American and Pacific Islander. Race and ethnicity categories are
+     mutually exclusive (i.e., white non-Hispanic, Black non-Hispanic, AAPI non-Hispanic, and
+     Hispanic any race). 1982 data on union membership is the average of 1981 and 1983, as there
+     were no union status questions in the 1982 CPS.
+     Source: Economic Policy Institute analysis of Current Population Survey data from EPI
+     Microdata Extracts, Version 1.0.57 (2024); https://microdata.epi.org.
+
+
+     Like the constitutional right to vote in civil society, union membership gives
+     workers a voice—in this case, a voice at work. But as the chart shows, since
+     1973, union membership has declined for all racial and ethnic groups. Union
+     membership is an important metric of the state of the American worker given
+     the role that labor unions play in giving workers a stronger, collective voice to
+     advocate for higher pay, better benefits, and training and promotional opportu-
+     nities, as well as protections against discrimination and harassment. In a union-
+     ized workforce, for example, collective bargaining results in labor contracts that
+
+
+
+
+                                                                                                     21
+help to create greater transparency through clearly defined policies and pay
+structures. These contracts help reduce the potential for pay discrimination by
+limiting an employer’s discretion in paying different wages to comparably quali-
+fied individuals doing the same job and by providing workers with critical pro-
+tections and direct recourse against other forms of exploitation or mistreat-
+ment. The benefits of union membership are a likely contributor to the higher
+union membership rate of Black workers, given their long history of unequal
+treatment relative to other groups of workers. Between 1973 and 1980, Hispan-
+ic workers also had higher rates of union membership than white workers.
+While the subsequent across the board decrease in union membership has
+brought union membership rates by race and ethnicity closer together, in 2023,
+Black workers were still more likely to be union members (11.9%) compared
+with white workers (10.1%), Hispanic workers (9.0%), and Asian American and
+Pacific Islander workers (8.3%).
+
+Still, the labor movement, like any other U.S. institution, is not immune to
+racism. Unions must continue to become more diverse, inclusive, and dynamic
+as they serve the vital role of leveling the playing field for all workers.
+
+For more on the benefits and protections conferred by union membership,
+see Celine McNicholas et al., Why Unions Are Good for Workers—Especially
+in a Crisis Like COVID-19, Economic Policy Institute, August 2020 and Va-
+lerie Wilson, “The Costs of Racial and Ethnic Labor Market Discrimination
+and Solutions That Can Contribute to Closing Employment and Wage Gaps,”
+testimony before the U.S. House of Representatives Select Committee on
+Economic Disparity and Fairness in Growth, January 20, 2022.
+
+
+
+
+                                                                                   22
+Labor market
+
+
+
+
+               23
+11
+
+     Black women have maintained the
+     highest labor force participation rate
+     amid post-1970 rise in women’s labor
+     force participation overall
+     Labor force participation rate for women by race and
+     ethnicity, 1973–2023
+
+          70%
+
+
+            60                                                                              61.0%
+                                                                                            58.7%
+                                                                                            58.1%
+                                                                                            56.5%
+                                                                                            54.9%
+            50
+
+
+            40
+
+
+            30
+                             1980          1990         2000           2010         2020
+
+                        White         Black        Hispanic        AIAN        Asian
+
+
+     Notes: AIAN refers to American Indian and Alaska Native. Race/ethnicity categories are not
+     mutually exclusive; white, Black, and Asian data do not exclude Hispanic workers of each race.
+     Shaded areas denote recessions. AIAN data are 3-year pooled averages to account for sample
+     size restrictions. Please see Appendix Table 1 for 1-year estimates.
+     Sources: Economic Policy Institute analysis of U.S. Bureau of Labor Statistics Current
+     Population Survey, Labor Force Participation Rate for Women by Race and Ethnicity data series
+     LNU01300005, LNU01300008, LNU01300011, LNU01335335, and LNU01332342.
+
+
+     The labor force participation rate is an important indicator of economic well-be-
+     ing. It shows the number of people in the labor force—people who are em-
+     ployed or unemployed but looking for work—as a share of the number of civil-
+     ian, noninstitutionalized people ages 16 and older. Across racial and ethnic
+     groups, women’s labor force participation rose significantly from the 1970s
+     through the 1990s for a number a reasons: increased access to higher educa-
+     tion, and the introduction and widespread availability of the birth control pill, to
+
+
+
+
+                                                                                                      24
+name a few. After leveling off during most of the first decade of the 2000s, la-
+bor force participation by women declined during or after the Great Recession
+of 2007–2009. And it declined again during the 2020 COVID-19 pandemic and
+recession as the burden of job losses and care responsibilities disproportion-
+ately impacted women. In 2023, Black women had the highest labor force par-
+ticipation rate at 61.0%, followed by Hispanic (58.7%), Asian (58.1%), white
+(56.5%), and American Indian and Alaska Native women (55.6%). While Latinas
+have historically had the lowest rates of labor force participation among
+women, their labor force participation rate had been climbing steadily in the
+four years leading up to the COVID-19 pandemic. Historically, Black women
+have had stronger labor force attachments than other groups of women. This is
+part of the legacy of being forced to work as enslaved people, but the necessi-
+ty of work has continued for Black women who are often co-breadwinners if
+not sole earners for their households.
+
+For more on the rise of women’s labor force participation from the 1970s
+see Elisabeth Jacobs and Kate Bahn “Women’s History Month: U.S. women’s
+labor force participation”, Washington Center for Equitable Growth, March
+22, 2019.
+
+
+
+
+                                                                                   25
+12
+
+     Hispanic men have maintained the
+     highest labor force participation rate
+     even as labor force participation of all
+     men has declined since the 1970s
+     Men’s labor force participation rate by race and
+     ethnicity, 1973–2023
+
+      90%
+
+
+
+
+        80
+
+                                                                                             75.1%
+                                                                                             72.8%
+        70
+                                                                                             68.2%
+                                                                                             65.6%
+                                                                                             64.9%
+
+        60
+                          1980          1990           2000           2010            2020
+
+                      White         Black        Hispanic        AIAN         Asian
+
+
+     Notes: AIAN refers to American Indian and Alaska Native. Race/ethnicity categories are not
+     mutually exclusive; white, Black, and Asian data do not exclude Hispanic workers of each race.
+     Shaded areas denote recessions. AIAN data are 3-year pooled averages to account for sample
+     size restrictions. Please see Appendix Table 1 for 1-year estimates.
+     Sources: Economic Policy Institute analysis of U.S. Bureau of Labor Statistics Current
+     Population Survey, Labor Force Participation Rate for Men by Race and Ethnicity data series
+     LNU01300004, LNU01300007, LNU01300010, LNU01335294, and LNU01332301.
+
+
+     Across all racial and ethnic groups, men’s labor force participation rates have
+     declined significantly since the 1970s, with the sharpest decline occurring dur-
+     ing and since the Great Recession of 2007–2009. While this trend in part re-
+     flects an aging population with a growing share of retirees, researchers have
+     suggested that labor force participation has fallen among prime-age men (ages
+     25–54) due to a rise in serious health conditions that are a barrier to work, the
+     emerging opioid crisis, or technological changes that encourage younger men
+
+
+
+
+                                                                                                      26
+(under age 30) to allocate less time to work and more time to leisure activities
+like playing video games. Unlike with Black women, who have the highest la-
+bor force participation rate among women, Black men in 2023 had the lower
+labor force participation rates than white and Asian men (65.6%). And unlike
+with Hispanic women, who have historically had the lowest labor force partici-
+pation rates among women, Hispanic men have had the highest labor force
+participation rate, which reached 75.1% in 2023. The ranking of men’s labor
+force participation rates by race and ethnicity has remained constant over the
+last three decades.
+
+For more on the likely reasons for declining male labor force participation
+see Alan Krueger, Where Have All the Workers Gone? An Inquiry into the
+Decline of the U.S. Labor Force Participation Rate, Brookings Papers on
+Economic Activity, September 2017; and Mark Aguiar et al., “Leisure Luxu-
+ries and the Labor Supply of Young Men,” National Bureau of Economic Re-
+search Working Paper 23552, June 2017.
+
+
+
+
+                                                                                   27
+13
+
+     Black and AIAN unemployment is
+     consistently higher than unemployment
+     of all other racial and ethnic groups
+     Annual unemployment rate by race and ethnicity,
+     1979–2023
+
+      25%
+
+
+        20
+
+
+         15
+
+
+         10
+
+                                                                                             6.6%
+         5                                                                                   5.5%
+                                                                                             4.6%
+                                                                                             3.3%
+                                                                                             3.0%
+         0
+                 1980             1990            2000              2010              2020
+
+                        White       Black        Hispanic        AIAN         Asian
+
+
+     Notes: AIAN refers to American Indian and Alaska Native. Shaded areas denote recessions.
+     Race and ethnicity categories are not mutually exclusive; white, Black, AIAN, and Asian data do
+     not exclude Hispanic workers of each race.
+     Sources: Economic Policy Institute analysis of U.S. Bureau of Labor Statistics Current
+     Population Survey, Annual Unemployed Rate by Race and Ethnicity data series LNU04000003,
+     LNU04000006, LNU04000009, LNU04035243, and LNU04032183.
+
+
+     Relative rates of unemployment by race and ethnicity have been remarkably
+     consistent over time. Typically, the annual unemployment rates of American In-
+     dian and Alaska Native (AIAN), Black, and Hispanic workers are significantly
+     higher than those of white workers. The difference between Asian and white
+     unemployment rates is smaller, and the size of the gap fluctuates, as does
+     which group has the lower unemployment rate. In 2023, this pattern held, with
+     an unemployment rate of 6.6% for AIAN workers, 5.5% for Black workers, fol-
+     lowed by 4.6% for Hispanic workers, 3.3% for white workers, and 3.0% for Asian
+     workers. While 2023 saw historical low rates for Black unemployment, one of
+
+
+
+
+                                                                                                       28
+the most enduring features of the U.S. labor market is the roughly 2-to-1 ratio of
+the Black and white unemployment rates.
+
+
+
+
+                                                                                     29
+14
+
+     Higher education typically lowers a
+     worker’s chances of being unemployed
+     but does not eliminate racial and ethnic
+     disparities in unemployment rates
+     Unemployment rate by race/ethnicity and
+     educational attainment, 2023
+
+      Less than high school
+
+
+                 High school
+
+
+               Some college
+
+
+                      College
+
+
+          Advanced degree
+
+
+
+                              White        Black         Hispanic        AAPI
+
+
+     Notes: AAPI refers to Asian American and Pacific Islander. Race and ethnicity categories are
+     mutually exclusive (i.e., white non-Hispanic, Black non-Hispanic, AAPI non-Hispanic, and
+     Hispanic any race).
+     Source: Economic Policy Institute analysis of Current Population Survey basic monthly
+     microdata from EPI Microdata Extracts, Version 1.0.57 (2024); https://microdata.epi.org.
+
+
+     A breakdown of unemployment rates by race, ethnicity, and education level
+     shows the limits of educational attainment as a factor in addressing inequitable
+     economic outcomes. As the chart shows, racial and ethnic disparities in unem-
+     ployment rates exist at every level of educational attainment. And Black work-
+     ers have the highest rates of unemployment among all groups without a col-
+     lege degree. In fact, even at historically low rates of unemployment in 2023,
+     only the most highly educated Black workers approached anything near unem-
+     ployment rate parity with their white counterparts. The figure also shows that
+
+
+
+
+                                                                                                    30
+while education can contribute to better outcomes—unemployment rates are
+lower for all groups at higher levels of education—education alone does not
+necessarily create equal outcomes. Reading this chart alongside Chart 13 sug-
+gests that differences in the average unemployment rates of racial and ethnic
+groups can only be partially explained by relative differences in education, skill,
+experience or local labor market conditions—discrimination remains an undeni-
+able factor.
+
+
+
+
+                                                                                      31
+15
+
+     Black, Hispanic, and AIAN workers earn
+     lower wages and have smaller gender
+     wage disparities than their white and
+     AAPI counterparts
+     Median wages by race/ethnicity and gender, 2023
+
+
+          White                                                      $24.00
+                                                                              $28.83
+
+
+          Black                                             $20.00
+                                                              $21.00
+
+
+       Hispanic                                         $18.27
+                                                             $20.70
+
+
+          AIAN                                            $19.13
+                                                                   $22.51
+
+
+           AAPI                                                             $26.92
+                                                                                       $33.75
+
+
+                                            Women           Men
+
+
+     Notes: AIAN refers to American Indian and Alaska Native. AAPI refers to Asian American and
+     Pacific Islander. Race and ethnicity categories are mutually exclusive (i.e., white non-Hispanic,
+     Black non-Hispanic, AAPI non-Hispanic, and Hispanic any race). Wages for AIAN women and
+     men are estimated using pooled years 2019–2023 to address sample size restrictions. Wages
+     are in 2023 dollars.
+     Source: Economic Policy Institute analysis of Current Population Survey basic monthly
+     microdata from EPI Microdata Extracts, Version 1.0.57 (2024); https://microdata.epi.org.
+
+
+     There are sharp differences in the wages earned by typical workers of different
+     racial groups in the United States. Asian American and Pacific Islander (AAPI)
+     and white workers are paid the highest wages at the median, while Black, His-
+     panic, and American Indian and Alaska Native (AIAN) workers are paid signifi-
+     cantly less. The gender differences are also greater among AAPI and white
+     workers than among Black, Hispanic and AIAN workers. While AAPI and white
+
+
+
+
+                                                                                                         32
+men far out-earn AAPI and white women, Black and Hispanic men and women
+have much more similar median wages.
+
+
+
+
+                                                                          33
+16
+
+     Even after controlling for education and
+     other factors known to affect earnings,
+     women—particularly Black and
+     Hispanic women—are paid far less than
+     white men
+     Regression-adjusted hourly wage gaps for women
+     relative to non-Hispanic white men, by race and
+     ethnicity, 2023
+
+          White women
+                                                   75.4%                            24.6% gap
+
+
+          Black women
+                                                67.6%                            32.4% gap
+
+
+       Hispanic women
+                                                67.8%                            32.2% gap
+
+
+           AAPI women
+                                                   75.9%                            24.1% gap
+
+
+     Notes: The hourly wage gap is how much less women make than comparable non-Hispanic
+     white men with the same level of education and experience and in the same geographic
+     location). AAPI refers to Asian American and Pacific Islander. Race and ethnicity categories are
+     mutually exclusive (i.e., white non-Hispanic, Black non-Hispanic, AAPI non-Hispanic, and
+     Hispanic any race).
+     Source: Economic Policy Institute analysis of Current Population Survey basic monthly
+     microdata from EPI Microdata Extracts, Version 1.0.57 (2024), https://microdata.epi.org.
+
+
+     Women of all racial and ethnic groups in the U.S. have a significant pay penalty
+     by virtue of their gender, even when we account for several factors that could
+     reasonably influence a worker’s productivity or wage rate, including education,
+     age (a measure of potential experience) and geographic area (a measure of lo-
+     cal labor market conditions). Black and Hispanic women face an additional pay
+     penalty by virtue of their race or ethnicity. The chart depicts these wage gaps,
+     presented as how much less women make than non-Hispanic white men. The
+     fact that Black and Hispanic women earn about one-third less than white men
+
+
+
+
+                                                                                                        34
+on average when calculating regression-adjusted wage gaps mean, then, that
+the pay penalty is not a result of differences in formal education between those
+groups of women and white men. One partial explanation for these wage dis-
+parities is occupational segregation, by which women of color are more highly
+concentrated in occupations with low pay, even relative to their education lev-
+el. However, women of all races and ethnicities also often earn less than men
+in the same occupation (not shown in the chart), an indication of potential pay
+discrimination.
+
+For more on occupational segregation and on gender pay gaps by occupa-
+tion, see Jessica Schieder and Elise Gould, Women’s Work” and the Gender
+Pay Gap: How Discrimination, Societal Norms, and Other Forces Affect
+Women’s Occupational Choices—and Their Pay, Economic Policy Institute,
+July 2016; Emily Carew and Valerie Wilson, “Latina Equal Pay Day: Latina
+Workers Remain Greatly Underpaid, Including in Front-Line Occupations,”
+Working Economics Blog, Economic Policy Institute, October 20, 2021; Va-
+lerie Wilson, “Black Women Face a Persistent Pay Gap, Including in Essen-
+tial Occupations During the Pandemic,” Working Economics Blog, Economic
+Policy Institute, August 2, 2021.
+
+
+
+
+                                                                                   35
+Income, poverty, and wealth
+
+
+
+
+                              36
+17
+
+     Racial and ethnic disparities in median
+     household income have been largely
+     persistent across time
+     Inflation-adjusted median household income (2023
+     dollars), by race and ethnicity, 1972–2023
+
+      $125,000
+                                                                                           $112,800
+       100,000
+                                                                                           $89,050
+
+        75,000
+                                                                                           $65,540
+                                                                                           $56,490
+                                                                                           $56,467
+        50,000
+
+
+        25,000
+                               1980                      2000                       2020
+
+                       White          Black       Hispanic        AIAN         Asian
+
+
+     Note: AIAN refers to American Indian and Alaska Native. All race categories are single race
+     and do not distinguish Hispanic ethnicity from non-Hispanic ethnicity, except for white, which is
+     exclusive of Hispanic ethnicity (i.e., non-Hispanic white alone, Black alone, AIAN alone, and
+     Asian alone). Hispanic can be of any race. AIAN data are 3-year pooled averages to account for
+     sample size restrictions. Please see Appendix Table 1 for 1-year estimates.
+     Source: Economic Policy Institute analysis of U.S. Census Bureau Current Population Survey,
+     Income and Poverty in the United States 2023 data, Table A-2.
+
+
+     In the United States, households of different racial and ethnic backgrounds
+     bring in significantly different amounts of income and have done so for
+     decades. At the median, Black, Hispanic, and American Indian and Alaska Na-
+     tive (AIAN) households earn the least on an annual basis, while Asian and white
+     households earn the most. It is notable, though, that in 2023, Black households
+     had the highest household income on record and experienced the largest in-
+     crease in income between 2020 and 2023. Significant gaps in employment op-
+     portunities (shown in Chart 13) and lower wage levels (shown in Chart 15) trans-
+     late into lower incomes among Black, Latino, and AIAN households. Household
+
+
+
+
+                                                                                                         37
+income is also a function of the number of earners in a household. Though not
+shown here, past EPI research found that in the pre-pandemic economy, about
+a third of Black nonelderly households (where the head of household is age
+18–64) had two or more earners, compared with nearly half of white and His-
+panic nonelderly households. This racial disparity in the number of household
+earners is not just a function of how many working-age adults live in the house-
+hold, or family structure, but is another measurable consequence of the persis-
+tent 2-to-1 ratio between the Black and white unemployment rates (shown in
+Chart 13). As income inequality in the United States has increased in general
+over the past 50 years, disparities between the least and most well-off groups
+have continued to persist and, in some cases, have grown.
+
+For more on earners per household by race, see Elise Gould and Valerie
+Wilson, Black Workers Face Two of the Most Lethal Preexisting Conditions
+for Coronavirus—Racism and Economic Inequality, Economic Policy Insti-
+tute, June 2020. For more on increasing income inequality, see Elise Gould,
+“Decades of Rising Economic Inequality in the U.S.,” testimony before the
+House of Representatives Ways and Means Committee, Washington, D.C.,
+March 27, 2019.
+
+
+
+
+                                                                                   38
+18
+
+     Black, AIAN, and Hispanic households
+     are more likely to have the lowest annual
+     incomes—under $25,000 per year in
+     2023
+     Share of households within given income range by
+     race and ethnicity, 2023
+
+
+          White
+                     11.9%       15.9%                 27.2%           17.6%       10.1%      13.4%
+
+
+          Black
+                         23.7%                 21.1%              29.2%             11.9%
+
+
+       Hispanic
+                       16.0%           21.0%                   31.0%              14.7%
+
+
+          AIAN
+                        20.2%             21.4%                   31.3%              11.0%
+
+
+          Asian
+                    10.4%      12.2%       21.4%               18.6%      12.4%            23.1%
+
+
+
+                Under $25,000     $25,000–$49,999      $50,000–$99,999
+                $100,000–$149,999     $150,000–$199,999     $200,000 and over
+
+
+     Note: AIAN refers to American Indian and Alaska Native. All race categories are single race
+     and do not distinguish Hispanic ethnicity from non-Hispanic ethnicity, except for white, which is
+     exclusive of Hispanic ethnicity (i.e., non-Hispanic white alone, Black alone, AIAN alone, and
+     Asian alone). Hispanic can be of any race.
+     Source: Economic Policy Institute analysis of U.S. Census Bureau Current Population Survey,
+     Income and Poverty in the United States 2023 data, Table A-2.
+
+
+     This chart extends beyond the data on median or midpoint of household in-
+     come shown in Chart 17 to provide a more detailed look at where different
+     groups fall across the entire household income distribution. In 2023, 23.7% of
+     Black households, 20.2% of American Indian and Alaska Native households,
+     16% of Hispanic households had annual incomes under $25,000, compared
+
+
+
+
+                                                                                                         39
+with just 11.9% of white households and 10.4% of Asian households. This
+$25,000 figure is well below the 2023 official poverty threshold for a family of
+two adults and two children ($30,900). Conversely, 23.1% of Asian households
+and 13.4% of white households had annual incomes at or above $200,000—the
+highest income category—compared with only about 6%-7% of Black, AIAN,
+and Hispanic households.
+
+Poverty threshold data can be found in the U.S. Census Bureau’s Poverty in
+the United States: 2023 data tables, published September 10, 2024
+
+
+
+
+                                                                                   40
+19
+
+     Persistently elevated AIAN, Black, and
+     Hispanic child poverty rates have
+     thwarted progress reducing overall child
+     poverty in the U.S.
+     Child poverty rates, by race and ethnicity,
+     1974–2023
+
+      60%
+
+
+
+
+        40
+
+                                                                                              31.8%
+                                                                                              25.0%
+                                                                                              22.5%
+        20                                                                                    15.3%
+                                                                                              11.6%
+                                                                                              8.7%
+
+          0
+                         1980           1990           2000            2010           2020
+
+                  All       White        Black         Hispanic        AIAN         Asian
+
+
+     Notes: AIAN refers to American Indian and Alaska Native. All race categories are single race
+     and do not distinguish Hispanic ethnicity from non-Hispanic ethnicity, except for white, which is
+     exclusive of Hispanic ethnicity (i.e., non-Hispanic white alone, Black alone, AIAN alone, and
+     Asian alone). Hispanic can be of any race. AIAN data are 3-year pooled averages to account for
+     sample size restrictions. Please see Appendix Table 1 for 1-year estimates.
+     Source: Economic Policy Institute analysis of U.S. Census Bureau Current Population Survey
+     Poverty in the United States, Table A-3.
+
+
+     A cruel and unfortunate reality of structural racism in the U.S. economy is that
+     even in the “best” of economic times, Black, American Indian, and Alaska Na-
+     tive (AIAN), and Hispanic children experience much higher rates of poverty
+     than white children. In 2023—a year characterized by record low unemploy-
+     ment and the highest (inflation-adjusted) median household incomes in 20
+     years—28.8% of AIAN children, 25.0% of Black children and 22.5% of Hispanic
+     children lived below the official poverty threshold, compared with just 8.7% of
+
+
+
+
+                                                                                                         41
+non-Hispanic white children and 11.6% of Asian children. While child poverty
+has fallen significantly for Black, Hispanic, and Asian American children over
+the past 40 years, Black and Hispanic child poverty rates remained over 20% in
+2023. Additionally, in 2023, AIAN children had the highest rates of child pover-
+ty at almost 30 percent (28.8%). This large and persistent disparity in child
+poverty combined with the fact that Black and Hispanic children have become
+an increasing share of the underage 18 population over time (see Chart 1 and
+Chart 4) has resulted in very little change in the overall child poverty rate since
+1974. Given the long-term effects of exposure to poverty in childhood, address-
+ing these persistent disparities must play a role in our approach toward build-
+ing equity and moving the needle on child poverty.
+
+For more on the long-term effects of exposure to poverty in childhood, see
+Kerris Cooper and Kitty Stewart, “Does Money Affect Children’s Outcomes?
+An Update,” CASEpapers (203), The London School of Economics and Politi-
+cal Science, July 2017; Randall Akee et al., “Parents’ Incomes and Children’s
+Outcomes: A Quasi-Experiment,” American Economic Journal: Applied Eco-
+nomics, January 2010.
+
+
+
+
+                                                                                      42
+20
+
+ Poverty rates are higher among AIAN,
+ Black and Hispanic working-age adults
+ Poverty rates for age 18–64, by race and ethnicity,
+ 1974–2023
+
+     30%
+
+
+
+                                                                                           20.9%
+      20
+
+                                                                                           14.5%
+                                                                                           13.8%
+                                                                                           10.0%
+      10
+                                                                                           7.9%
+                                                                                           7.6%
+
+
+       0
+                     1980           1990           2000            2010           2020
+
+              All       White         Black        Hispanic         AIAN         Asian
+
+
+ Notes: AIAN refers to American Indian and Alaska Native. All race categories are single race
+ and do not distinguish Hispanic ethnicity from non-Hispanic ethnicity, except for white, which is
+ exclusive of Hispanic ethnicity (i.e., non-Hispanic white alone, Black alone, AIAN alone, and
+ Asian alone).Hispanic can be of any race. AIAN data are 3-year pooled averages to account for
+ sample size restrictions. Please see Appendix Table 1 for 1-year estimates.
+ Source: Economic Policy Institute analysis of U.S. Census Bureau Current Population Survey
+ Poverty in the United States, Table A-3.
+
+
+ While poverty across the working-age population (ages 18 to 64) is lower than
+ that for children (see Chart 19), disparities by race and ethnicity follow a similar
+ trend, with American Indian and Alaska Native (AIAN), Black and Hispanic
+ adults more likely to be impoverished than white and Asian adults. Poverty is a
+ measure of economic deprivation, and among working-age adults in particular,
+ reflects disparities in unemployment, wages, and income. Life circumstances,
+ such as severe disability and major illness—which can also limit earned income
+ or quickly deplete any available savings—also contribute to poverty for this age
+ group. The racially coded misrepresentation of poverty as some kind of moral
+ or cultural pathology has hindered the political will needed to sustain and
+
+
+
+
+                                                                                                     43
+strengthen vital income supports that have proven effective in fighting pover-
+ty.
+
+For more on the misrepresentation of poverty as a cultural pathology see
+William “Sandy” Darity Jr., “Revisiting the Debate on Race and Culture: The
+New (Incorrect) Harvard/Washington Consensus.” Du Bois Review: Social
+Science Research on Race 8, no. 2, 467–476. For more on the vital income
+supports that would lessen poverty see Asha Banerjee and Ben Zipperer,
+“Social Insurance Programs Cushioned the Blow of the COVID-19 Pandemic
+in 2020,” Working Economics Blog, Economic Policy Institute, September 14,
+2021.
+
+
+
+
+                                                                                 44
+21
+
+     There are large racial disparities in
+     poverty at older ages (65 and
+     older)—likely reflecting differences in
+     retirement preparedness and/or lifetime
+     income disparities
+     Poverty rates for people ages 65 and older, by race
+     and ethnicity, 1974–2023
+
+      40%
+
+
+        30
+
+
+        20                                                                                     19.9%
+                                                                                               17.8%
+                                                                                               17.3%
+
+         10                                                                                    11.0%
+                                                                                               9.7%
+                                                                                               7.2%
+
+         0
+                         1980           1990           2000            2010           2020
+
+                  All       White         Black        Hispanic         AIAN         Asian
+
+
+     Notes: AIAN refers to American Indian and Alaska Native. All race categories are single race
+     and do not distinguish Hispanic ethnicity from non-Hispanic ethnicity, except for white, which is
+     exclusive of Hispanic ethnicity (i.e., non-Hispanic white alone, Black alone, AIAN alone, and
+     Asian alone).Hispanic can be of any race. AIAN data are 3-year pooled averages to account for
+     sample size restrictions. Please see Appendix Table 1 for 1-year estimates.
+     Source: Economic Policy Institute analysis of U.S. Census Bureau Current Population Survey
+     Poverty in the United States, Table A-3.
+
+
+     The poverty seen among older Americans in the chart is most likely the result
+     of a lifetime of low earnings and a lack of retirement preparedness. While re-
+     search shows that Social Security plays a critical role in keeping poverty rates
+     among older Americans lower than they otherwise would have been (not de-
+     picted in the chart), older Black, Hispanic, and American Indian and Alaska Na-
+     tive (AIAN) adults still have relatively high poverty rates. Older Asian Americans
+
+
+
+
+                                                                                                         45
+are also more likely to live in poverty than older white Americans. Additionally,
+older Asian Americans have higher poverty rates than younger Asian Ameri-
+cans (see Chart 19 and Chart 20). This is likely due to a larger share of older
+Asian Americans having worked comparatively few years in the United States,
+or in jobs where they were unable to accumulate the necessary years for Social
+Security eligibility, leaving them less able to take advantage of work-based so-
+cial safety net programs like Social Security.
+
+For more on the causes of poverty among older Americans and the capacity
+of Social Security to lift older Americans—particularly women and people of
+color—out of poverty, see Kathleen Romig, Social Security Lifts More People
+Above the Poverty Line Than Any Other Program, Center on Budget and
+Policy priorities, April 2022. For more on the economic condition of the old-
+er Asian American population, see Victoria Tran, “Asian American Seniors
+Are Often Left Out of the National Conversation on Poverty,” Urban Wire
+(Urban Institute blog), May 31, 2017.
+
+
+
+
+                                                                                    46
+22
+
+ Racial wealth disparities are stark and
+ persistent, reflecting a history of
+ exploitation and exclusion
+ Median family net worth by race and ethnicity,
+ selected years from 1989 to 2022
+
+     $600,000
+
+
+
+
+      400,000
+
+
+
+
+      200,000
+
+
+
+
+           0
+                1989 1992 1995 1998 2001 2004 2007 2010 2013 2016 2019 2022
+
+                         White         Black        Hispanic         Asian
+
+
+ Notes: Race and ethnicity categories are mutually exclusive (i.e., white non-Hispanic, Black
+ non-Hispanic, Asian non-Hispanic and Hispanic any race).
+ Source: Economic Policy Institute analysis of Survey of Consumer Finances data from the
+ Federal Reserve Board.
+
+
+ The chart shows sharp racial and ethnic disparities in net worth observed
+ across time in the United States. Though not shown in the chart, these dispari-
+ ties reflect the differences in lived economic experiences between white,
+ Black, Hispanic, and Asian families. Wealth can be accumulated both within
+ and across generations, such that a high net worth can result from the benefit
+ of prime earning years with 1) relatively few employment disruptions, 2) access
+ to wealth-building savings and investment vehicles, 3) relatively few serious
+ negative health shocks, and 4) well-timed wealth transfers from parents and
+ grandparents. The typical white household has many times the wealth of the
+ typical Black or Hispanic household due to 1) their privileged position in the
+ American labor market, which grants them access to more consistent and high-
+
+
+
+
+                                                                                                47
+er-quality employment opportunities, 2) their more limited exposure to the
+health risks brought on by poorer living conditions and discrimination, and 3)
+their history of access to wealth-building opportunities from which other groups
+have been excluded.
+
+In 2022, the Survey of Consumer Finances reported household wealth data for
+the Asian American population for the first time. Asian household wealth far
+outstrips that of other households in 2022, though this statistic should be
+couched with appropriate context: Asian Americans are an incredibly diverse
+group with varying economic circumstances related to, among other things, im-
+migration history and country of origin; moreover, the SCF oversamples house-
+holds that are likely to be wealthy. Further disaggregation of wealth data by im-
+migration history could be useful in illuminating wealth disparities within the
+Asian American population.
+
+For more on the systemic barriers to Black wealth building see Natasha
+Hicks, Fenaba Addo, Anne Price, and William Darity Jr., Still Running Up the
+Down Escalator: How Narratives Shape Our Understanding of Racial
+Wealth Inequality, The Samuel Dubois Cook Center on Social Equity, 2021.
+For more on the barriers to Hispanic wealth building see Dedrick Asante-
+Muhammad, Alexandra Perez, and Jamie Buell, “Racial Wealth Snapshot:
+Latino Americans.” National Community Reinvestment Coalition, September
+17, 2021.
+
+
+
+
+                                                                                    48
+Health
+
+
+
+
+         49
+23
+
+ Racial disparities in life expectancy
+ reflect the cumulative disadvantage of
+ living as a minority in the United States
+ Women’s and men’s life expectancy at birth, by race
+ and ethnicity, 2021
+
+
+       White                                                                   79.5 years
+                                                                            74.0
+
+
+       Black                                                                75.0
+                                                                     67.6
+
+
+     Hispanic                                                                      81.1
+                                                                            74.6
+
+
+        AIAN                                                            69.2
+                                                                 62.2
+
+
+       Asian                                                                          85.2
+                                                                                   81.2
+
+
+                                        Women           Men
+
+
+ Notes: AIAN refers to American Indian and Alaska Native. Race and ethnicity categories are
+ mutually exclusive (i.e., white non-Hispanic, Black non-Hispanic, Asian non-Hispanic, AIAN
+ non-Hispanic, and Hispanic any race).
+ Source: Economic Policy Institute compilation of data from the National Vital Statistics Reports,
+ United States Life Tables, 2021, Table A.
+
+
+ Racial disparities in life expectancy have been documented as far back as sta-
+ tistics on life expectancy have been recorded in the U.S, with clear and persis-
+ tent distinctions between privileged groups and disadvantaged groups. That is,
+ rather than groups shifting in their ranking of life expectancy randomly across
+ time, there are distinct patterns in which groups live longer lives than others. In
+ general, Black and AIAN women and men live much shorter lives than white
+ and Asian women and men.
+
+
+
+
+                                                                                                     50
+In 2021, Asian American women and men had the longest life expectancies, at
+85.2 years and 81.2 years respectively. AIAN women and men had the lowest
+life expectancies, at 69.2 years and 62.2 years respectively. This massive gap
+in life expectancy approaching two decades can be attributed to several fac-
+tors, many of which are structural and rooted in economic disparity. In recent
+years, life expectancy gains have disproportionately gone to those in the high-
+est income categories, who are disproportionately white and Asian (see Chart
+18). Alongside the history of white supremacy and anti-Black racism in the Unit-
+ed States, these economic roots of also help to explain persistent the persis-
+tent Black-white gap in life expectancy. That Black-white gap has fluctuated
+somewhat over the past decade, shrinking due to the impact of opioid-related
+“deaths of despair” on lowering white life expectancy, and reopening as
+COVID-19 related mortality disproportionately impacted Black and brown com-
+munities.
+
+Hispanic women and men tend to live longer than white women and men,
+though that life expectancy advantage has been shown to diminish with subse-
+quent generations of U.S.-born Latinos. This suggests that there may be some-
+thing uniquely deleterious about living as a minority in the United States.
+
+For more on gaps in life expectancy, effects of the opioid crisis, and Hispan-
+ic life expectancy see Congressional Research Service, The Growing Gap in
+Life Expectancy by Income: Recent Evidence and Implications for the Social
+Security Retirement Age, CRS Report R44846, July 6, 2021; Helena Hansen
+and Julie Netherland, “Is the Prescription Opioid Epidemic a White Prob-
+lem?” American Journal of Public Health 106, no. 12 (December 2016),
+2127–2129 (doi: 10.2105/AJPH.2016.303483); Osea Giuntella, “The Hispanic
+Health Paradox: New Evidence from Longitudinal Data on Second and
+Third-Generation Birth Outcomes,” SSM – Population Health, vol. 2 (Decem-
+ber 2016), 84–89 (doi.org/10.1016/j.ssmph.2016.02.013).
+
+
+
+
+                                                                                   51
+24
+
+ The Affordable Care Act significantly
+ reduced uninsured rates across racial
+ and ethnic groups, but disparities
+ remain
+ Uninsured rates by race and ethnicity, 2010–2023
+
+
+     30%
+
+
+
+      20
+                                                                                          18.3%
+                                                                                          16.6%
+
+
+      10
+                                                                                          8.5%
+                                                                                          5.5%
+                                                                                          5.1%
+
+       0
+           2010                          2015                        2020
+
+                   White         Black          Hispanic      AIAN          AAPI
+
+
+ Notes: AIAN refers to American Indian and Alaska Native. AAPI refers to Asian American and
+ Pacific Islander. Race and ethnicity categories are mutually exclusive (i.e., white non-Hispanic,
+ Black non-Hispanic, Asian non-Hispanic, AIAN non-Hispanic, and Hispanic any race). Data for
+ 2020 are not available as a result of disruptions to data collection stemming from the COVID-19
+ pandemic.
+ Source: Economic Policy Institute analysis of U.S. Census Bureau Current Population Survey
+ Annual Social and Economic Supplement, Health Insurance Historical Tables, Table HIC-9_ACS.
+
+
+ The Affordable Care Act (the ACA or “Obamacare”) expanded health insurance
+ coverage to middle- and low-income Americans, which disproportionately ben-
+ efited those groups with the least access—Hispanic Americans and American
+ Indians and Alaska Natives (AIAN), and to a lesser extent Black Americans. De-
+ spite the marked improvement in health insurance coverage rates since the im-
+ plementation of ACA, disparities between groups remain stark, with Hispanic
+ and AIAN uninsured rates double Black rates, and approaching four times as
+ high as the uninsured rates of white and Asian American and Pacific Islanders
+ (AAPI). Early diagnosis and treatment are essential to minimizing the severity of
+
+
+
+
+                                                                                                     52
+chronic illnesses, and regular health care is important for promoting better
+overall health. The lack of health insurance often results in a choice to delay re-
+ceiving health care until one’s condition is critical, contributing to racial dispari-
+ties in health outcomes and life expectancy.
+
+For more on how the ACA expanded health coverage, particularly to certain
+groups, see Samantha Artiga, Latoya Hill, Kendal Orgera, and Anthony Dam-
+ico. “Health Coverage by Race and Ethnicity, 2010–2019,” Kaiser Family
+Foundation, July 16, 2021; Jesse Cross-Call, Medicaid Expansion Has
+Helped Narrow Racial Disparities in Health Coverage and Access to Care,
+Center on Budget and Policy Priorities, October 2020.
+
+
+
+
+                                                                                         53
+25
+
+ Black mothers are far more likely to die
+ from pregnancy-related causes than are
+ white and Hispanic mothers
+ Pregnancy-related deaths per 100,000 live births by
+ race and ethnicity, 2022
+
+
+                                  49.5
+
+
+
+
+            19.0
+                                                         16.9
+                                                                                13.2
+
+
+
+
+           White                  Black                Hispanic                Asian
+
+ Notes: Race and ethnicity categories are mutually exclusive (i.e., white non-Hispanic, Black
+ non-Hispanic, Asian, non-Hispanic, and Hispanic any race).
+ Source: Economic Policy Institute analysis of National Center for Health Statistics Maternal
+ Mortality Rates, 2024 Table 1.
+
+
+ Maternal mortality rates are a stark indicator of racial disparities in public health
+ in the United States. Black women are over twice as likely to die from a preg-
+ nancy-related cause as white women, almost three times as likely as Hispanic
+ women, and almost four times as likely as Asian women. Although not shown in
+ the chart, these racial disparities persist regardless of a woman’s social or eco-
+ nomic status. Health status and differential access to quality prenatal care play
+ a major role in maintaining these disparities, as does structural racism more
+ generally. To adequately address these disparities in maternal health out-
+ comes, we must confront racism and bias in the U.S. health care system and
+ the implications for how health care providers and personnel communicate
+ with and treat patients.
+
+
+
+
+                                                                                                54
+For more on the causes and solutions to Black maternal mortality, see
+“Working Together to Reduce Black Maternal Mortality,” Centers for Disease
+Control and Prevention, April 6, 2022.
+
+
+
+
+                                                                             55
+26
+
+ Disparities in COVID-19 hospitalization
+ rates follow familiar racial patterns
+ Cumulative rate of COVID-19-associated
+ hospitalizations per 100,000, all and by race and
+ ethnicity, October 2022–September 2024
+
+     750
+
+                                                                                        611
+                                                                                        491
+     500                                                                                474
+                                                                                        442
+
+                                                                                        287
+     250                                                                                277
+
+
+
+
+      0
+                    Jan 2023        Jul 2023          Jan 2024             Jul 2024
+
+
+              All        White        Black        Hispanic         AAPI         AIAN
+
+
+ Note: AAPI refers to Asian American and Pacific Islander. AIAN refers to American Indian and
+ Alaskan Native. Race and ethnicity categories are mutually exclusive (i.e., white non-Hispanic,
+ Black non-Hispanic, AAPI non-Hispanic, AIAN non-Hispanic, and Hispanic any race).
+ Source: Economic Policy Institute analysis of “Rates of COVID-19-Associated Hospitalization”
+ data from the Center for Disease Control and Prevention COVID-NET, accessed September
+ 2024.
+
+
+ While COVID-19 has affected populations across the world, in the United States
+ the burden of the disease has not been distributed equally. When examining
+ lab-confirmed COVID-19 hospitalization rates (per 100,000) since the start of
+ the pandemic in March 2020, American Indians and Alaska Natives, Black
+ Americans, and Hispanic Americans are and have been the worst off since its
+ earliest months, while white and Asian Americans and Pacific Islanders have
+ experienced relatively less severe outcomes. The known severity of COVID-19
+ hospitalization suggests that these disparities themselves will and likely are al-
+ ready having economic consequences, from short-term loss of the ability to
+ work, to long-term labor market disruptions from the need to care for a close
+
+
+
+
+                                                                                                   56
+relative affected by COVID-19 or the effects of “long-COVID.”
+
+
+
+
+                                                                57
+Ap-
+pen-
+   AIAN population 1-year estimates and 3-year
+dixrolling averages, select charts
+                                                           Chart 17.
+                                                      Inflation-adjusted
+          Chart 11. Women’s      Chart 12. Men’s      median household                                                      C
+            Labor Force           Labor Force           income (2022          Chart 19. Child      Chart 20. Poverty
+          Participation Rate    Participation Rate          dollars)           poverty rate       rates for age 18–64      a
+                      3-year                3-year                3-year                3-year                   3-year
+           1-year     rolling    1-year     rolling    1-year     rolling    1-year     rolling    1-year        rolling    1
+   Year   estimate   average    estimate   average    estimate   average    estimate   average    estimate      average    es
+
+   1987                                               $41,430                36.6%                 24.8%                    2
+
+   1988                                               $38,500                39.5%                 24.9%                    2
+
+   1989                                               $38,760    $39,563     31.8%      36.0%      19.0%         22.9%      2
+
+   1990                                               $48,990    $42,083     37.4%      36.2%      23.5%         22.5%      2
+
+   1991                                               $49,390    $45,713     43.5%      37.6%      24.1%         22.2%      2
+
+   1992                                               $45,430    $47,937     37.8%      39.6%      25.0%         24.2%      2
+
+   1993                                               $47,550    $47,457     33.5%      38.3%      19.6%         22.9%
+
+   1994                                               $50,320    $47,767     36.9%      36.1%      22.2%         22.3%      1
+
+   1995                                               $40,530    $46,133     42.0%      37.5%      24.6%         22.1%      2
+
+   1996                                               $43,260    $44,703     42.2%      40.4%      24.9%         23.9%      2
+
+   1997                                               $50,480    $44,757     36.4%      40.2%      20.7%         23.4%
+
+   1998                                               $55,520    $49,753     35.5%      38.0%      16.7%         20.8%
+
+   1999                                               $52,070    $52,690     38.9%      36.9%      22.4%         19.9%      2
+
+   2000    57.5%                 71.7%                $52,240    $53,277     28.2%      34.2%      20.2%         19.8%      2
+
+   2001    58.5%                 72.5%                $52,320    $52,210     29.6%      32.2%      18.0%         20.2%
+
+   2002    57.5%      57.8%      73.2%      72.5%     $52,720    $52,427     32.8%      30.2%      19.3%         19.2%      2
+
+   2003    58.0%      58.0%      71.0%      72.2%     $50,890    $51,977     30.0%      30.8%      20.9%         19.4%
+
+   2004    57.1%      57.5%      70.9%      71.7%     $48,770    $50,793     30.2%      31.0%      23.7%         21.3%
+
+   2005    57.2%      57.4%      70.0%      70.6%     $50,730    $50,130     32.5%      30.9%      25.1%         23.2%      1
+
+   2006    57.9%      57.4%      68.6%      69.8%     $46,870    $48,790     38.8%      33.8%      25.2%         24.7%      2
+
+   2007    57.0%      57.4%      69.9%      69.5%     $50,530    $49,377     26.2%      32.5%      22.6%         24.3%      2
+
+   2008    57.6%      57.5%      70.2%      69.6%     $48,220    $48,540     37.0%      34.0%      23.1%         23.6%      1
+
+   2009    54.2%      56.3%      64.1%      68.1%     $47,360    $48,703     35.1%      32.8%      24.4%         23.4%      2
+
+
+
+
+                                                                                                           58
+                                                                   Chart 17.
+                                                              Inflation-adjusted
+           Chart 11. Women’s          Chart 12. Men’s         median household                                                            C
+             Labor Force               Labor Force              income (2022             Chart 19. Child         Chart 20. Poverty
+           Participation Rate        Participation Rate             dollars)              poverty rate          rates for age 18–64      a
+                        3-year                    3-year                   3-year                   3-year                     3-year
+            1-year      rolling      1-year       rolling     1-year       rolling     1-year       rolling      1-year        rolling    1
+ Year      estimate    average      estimate     average     estimate     average     estimate     average      estimate      average    es
+
+ 2010       51.8%        54.5%       64.0%        66.1%      $43,360      $46,313       39.1%           37.1%    25.0%         24.2%      1
+
+ 2011       53.2%        53.1%       65.2%        64.4%      $42,850      $44,523       38.2%           37.5%    25.7%         25.0%      1
+
+ 2012       52.6%        52.5%       66.4%        65.2%      $44,310      $43,507       45.1%       40.8%        30.5%         27.1%
+
+ 2013       53.3%        53.0%       65.3%        65.6%      $44,520      $43,893       32.9%           38.7%    25.5%         27.2%      2
+
+ 2014       54.7%        53.5%       67.2%        66.3%      $52,100      $46,977       35.3%           37.8%    23.3%         26.4%      1
+
+ 2015       55.5%        54.5%       65.9%        66.1%      $50,160      $48,927       30.8%           33.0%    20.3%         23.0%      1
+
+ 2016       55.4%        55.2%       67.2%        66.8%      $51,900      $51,387       25.5%       30.5%        20.4%         21.3%      2
+
+ 2017       54.8%        55.2%       65.8%        66.3%      $48,720      $50,260       27.9%           28.1%    19.2%         20.0%
+
+ 2018       55.6%        55.3%       63.7%        65.6%      $52,510      $51,043       28.2%           27.2%    20.0%         19.9%
+
+ 2019       56.7%        55.7%        65.1%       64.9%      $58,380      $53,203       21.5%       25.9%        16.1%         18.4%      2
+
+ 2020       53.6%        55.3%       65.3%        64.7%       $57,170     $56,020       25.4%       25.0%        18.4%         18.2%      1
+
+ 2021       55.0%        55.1%       66.2%        65.5%      $57,220      $57,590       29.6%       25.5%        22.6%         19.0%
+
+ 2022       54.2%        54.3%       65.5%        65.7%      $54,910      $56,433       37.1%           30.7%    21.7%         20.9%      1
+
+ 2023       55.6%        54.9%       63.0%        64.9%      $57,270      $56,467       28.8%           31.8%    18.3%         20.9%      1
+
+Note: Please refer to the individual charts for details on race/ethnicity notation, age restrictions,
+and sources.
+
+
+
+
+                                                                                                                         59
+Additional chart notes and sources
+Chart 1 sources: Economic Policy Institute analysis of U.S. Census Bureau Decennial
+Census Summary File 2, “Table DP1. Profile of General Demographic Characteristics:
+2000” for Not Hispanic or Latino and for Hispanic or Latino; Decennial Census
+Redistricting Data, “Table P2. Hispanic or Latino, and Not Hispanic or Latino by Race” for
+2010 and for 2020. Accessed February 2022.
+
+Chart 2 sources: Economic Policy Institute analysis of U.S. Census Bureau. 2022. 2019
+American Community Survey 1-Year Estimates Detailed Tables B05003H. Sex by Age by
+Nativity and Citizenship Status (White Alone, Not Hispanic or Latino); B05003B. Sex by
+Age by Nativity and Citizenship Status (Black or African American Alone); B05003D. Sex
+by Age by Nativity and Citizenship Status (Asian Alone); B05003E. Sex by Age by Nativity
+and Citizenship Status (Native Hawaiian and Other Pacific Islander Alone); B05003C. Sex
+by Age by Nativity and Citizenship Status (American Indian and Alaska Native Alone);
+B05003I. Sex by Age by Nativity and Citizenship Status (Hispanic or Latino). Accessed
+February 2022. Note that Asian and Native Hawaiian/Pacific Islander data were combined
+to furnish data for the AAPI category.
+
+Chart 3 source: Economic Policy Institute analysis of U.S. Census Bureau Decennial
+Census Redistricting Data, “Table P1. Race.” Accessed March 2022.
+
+Chart 4 source: Economic Policy Institute analysis of U.S. Census Bureau, “Annual
+Estimates of the Resident Population by Sex, Age, Race, and Hispanic Origin for the United
+States: April 1, 2010 to July 1, 2019” (Excel table NC-EST2019-ASR6H) from 2019 Population
+Estimates by Age, Sex, Race and Hispanic Origin, June 25, 2020.
+
+Chart 5 sources: Economic Policy Institute analysis of U.S. Census Bureau. 2022. 2019
+American Community Survey 1-Year Estimates Detailed Tables B15002H Sex by
+Educational Attainment for the Population 25 Years and Over (White Alone, Not Hispanic
+or Latino); B15002B Sex by Educational Attainment for the Population 25 Years and Over
+(Black of African American Alone); B15002I Sex by Educational Attainment for the
+Population 25 Years and Over (Hispanic or Latino); B15002D Sex by Educational
+Attainment for the Population 25 Years and Over (Asian Alone); B15002E Sex by
+Educational Attainment for the Population 25 Years and Over (Native Hawaiian and Other
+Pacific Islander Alone); B15002C Sex by Educational Attainment for the Population 25
+Years and Over (American Indian and Alaska Native Alone). Note that Asian and Native
+Hawaiian/Pacific Islander data were combined to furnish data for the AAPI category.
+Accessed February 2022.
+
+Chart 6 sources: Economic Policy Institute analysis of U.S. Census Bureau. 2022. 2019
+American Community Survey 1-Year Estimates Detailed Tables B15002H Sex by
+Educational Attainment for the Population 25 Years and Over (White Alone, Not Hispanic
+or Latino); B15002B Sex by Educational Attainment for the Population 25 Years and Over
+(Black of African American Alone); B15002I Sex by Educational Attainment for the
+
+
+
+
+                                                                                             60
+Population 25 Years and Over (Hispanic or Latino); B15002D Sex by Educational
+Attainment for the Population 25 Years and Over (Asian Alone); B15002E Sex by
+Educational Attainment for the Population 25 Years and Over (Native Hawaiian and Other
+Pacific Islander Alone); B15002C Sex by Educational Attainment for the Population 25
+Years and Over (American Indian and Alaska Native Alone). Note that Asian and Native
+Hawaiian/Pacific Islander data were combined to furnish data for the AAPI category.
+Accessed February 2022.
+
+Chart 7 source: Economic Policy Institute analysis of U.S Department of Justice, Bureau of
+Justice Statistics, “Table 6. Imprisonment Rates of U.S. Adults, Based on Sentenced
+Prisoners Under the Jurisdiction of State or Federal Correctional Authorities, By
+Jurisdiction, Sex, Race or Ethnicity, 2009–2019” (downloadable data table) from Federal
+Justice Statistics, 2019, October 2021. Accessed January 28, 2022.
+
+Chart 8 source: Economic Policy Institute analysis of U.S Department of Justice, Bureau of
+Justice Statistics, “Table 6. Imprisonment Rates of U.S. Adults, Based on Sentenced
+Prisoners Under the Jurisdiction of State or Federal Correctional Authorities, By
+Jurisdiction, Sex, Race or Ethnicity, 2009–2019” (downloadable data table) from Federal
+Justice Statistics, 2019, October 2021. Accessed January 28, 2022.
+
+Chart 9 source: Economic Policy Institute analysis of U.S. Census Bureau Current
+Population Survey data, “Table A-1. Reported Voting and Registration by Race, Hispanic
+Origin, Sex and Age Groups: November 1964 to 2020” [downloadable Excel file] from
+Historical Reported Voting Rates. Last revised October 26, 2021.
+
+Chart 10 source: Economic Policy Institute analysis of Current Population Survey May,
+1973–1981, and Current Population Survey Outgoing Rotation Group, 1983–2021, public
+data series from EPI Microdata Extracts, Version 1.0.29 (2022); https://microdata.epi.org.
+
+Chart 11 notes and sources: Race and ethnicity categories are not mutually exclusive;
+white, Black, and Asian data do not exclude Hispanic workers of each race. Shaded areas
+denote recessions. The labor force participation rate shows the number of people in the
+labor force—people who are employed or unemployed but looking for work—as a share of
+the number of civilian, noninstitutionalized people ages 16 and older.
+
+Economic Policy Institute analysis of U.S. Bureau of Labor Statistics Current Population
+Survey (Household Survey), Labor Force Participation Rate for Women by Race and
+Ethnicity series LNU01300005, LNU01300008, LNU01300011, and LNU01332342.
+Accessible via Series Report Data Retrieval Tool and https://download.bls.gov/pub/
+time.series/ln/. Accessed February 2022.
+
+Chart 12 notes and sources: Race and ethnicity categories are not mutually exclusive;
+white, Black, and Asian data do not exclude Hispanic workers of each race. Shaded areas
+denote recessions. The labor force participation rate shows the number of people in the
+labor force—people who are employed or unemployed but looking for work—as a share of
+the number of civilian, noninstitutionalized people ages 16 and older.
+
+Economic Policy Institute analysis of U.S. Bureau of Labor Statistics Current Population
+
+
+
+                                                                                             61
+Survey (Household Survey), Labor Force Participation for Men by Race and Ethnicity data
+series LNU01300004, LNU01300007, LNU01300010, and LNU01332301. Accessible via
+Series Report Data Retrieval Tool and https://download.bls.gov/pub/time.series/ln/.
+Accessed February 2022.
+
+Chart 13 sources: Economic Policy Institute analysis of U.S. Bureau of Labor Statistics
+Current Population Survey (Household Survey), Annual Unemployed Rate by Race and
+Ethnicity data series LNU04000003, LNU04000006, LNU04000009, and LNU04032183.
+Accessible via Series Report Data Retrieval Tool and https://download.bls.gov/pub/
+time.series/ln/. Accessed February 2022.
+
+Chart 16 notes: The hourly wage gap is how much less women make than comparable
+non-Hispanic white men with the same level of education and experience and in the same
+geographic location). AAPI refers to Asian American and Pacific Islander. Race/ethnicity
+categories are mutually exclusive (i.e., white non-Hispanic, Black non-Hispanic, AAPI non-
+Hispanic, and Hispanic any race). The regression-based gap is based on average wages
+and controls for gender, race and ethnicity, education, age, and geographic division. The
+log of the hourly wage is the dependent variable.
+
+Chart 17 notes and source: All race categories are single race and do not distinguish
+Hispanic ethnicity from non-Hispanic ethnicity, except for white, which is exclusive of
+Hispanic ethnicity (i.e., non-Hispanic white alone, Black alone, and Asian alone). Hispanic
+can be of any race. Due to a redesign of the income questions in the Current Population
+Survey—Annual Social and Economic Supplement (CPS ASEC) in 2013 and an update to
+the CPS ASEC processing system in 2017, the U.S. Census Bureau reported two estimates
+of income in each of those years. The 2013 and 2017 income values in this graph are an
+average of the two estimates reported in each year.
+
+Economic Policy Institute analysis of U.S. Census Bureau, Current Population
+Survey–Annual Social and Economic Supplements 1968 to 2021. “Table A-2. Households
+by Total Money Income, Race, and Hispanic Origin of Householder: 1967 to 2020” (Excel
+table) from Income and Poverty in the United States: 2020, September 2021.
+
+Chart 18 source: Economic Policy Institute analysis of U.S. Census Bureau, Current
+Population Survey–Annual Social and Economic Supplements 1968 to 2021. “Table A-2.
+Households by Total Money Income, Race, and Hispanic Origin of Householder: 1967 to
+2020” (Excel table) from Income and Poverty in the United States: 2020, September 2021.
+
+Chart 19 source: Economic Policy Institute analysis of U.S. Census Bureau Current
+Population Survey–Annual Social and Economic Supplements 1960 to 2021. “Table 3.
+Poverty Status of People, by Age, Race, and Hispanic Origin” (Excel table) from Historical
+Poverty Tables: People and Families–1959 to 2020, last revised October 8, 2021.
+
+Chart 20 source: Economic Policy Institute analysis of U.S. Census Bureau Current
+Population Survey–Annual Social and Economic Supplements 1960 to 2021. “Table 3.
+Poverty Status of People, by Age, Race, and Hispanic Origin” (Excel table) from Historical
+Poverty Tables: People and Families–1959 to 2020, last revised October 8, 2021.
+
+
+
+
+                                                                                              62
+Chart 21 source: Economic Policy Institute analysis of U.S. Census Bureau Current
+Population Survey–Annual Social and Economic Supplements 1960 to 2021. “Table 3.
+Poverty Status of People, by Age, Race, and Hispanic Origin” (Excel table) from Historical
+Poverty Tables: People and Families–1959 to 2020, last revised October 8, 2021.
+
+Chart 22 source: Economic Policy Institute analysis of Federal Reserve Board, “Net Worth
+by Race or Ethnicity” (online table) from the Survey of Consumer Finances, 1989–2019;
+Last updated November 4, 2021.
+
+Chart 23 source: Economic Policy Institute analysis of National Center for Health Statistics
+(Centers for Disease Control and Prevention), “Table 004. Life Expectancy at Birth, at Age
+65, and at Age 75, by Sex, Race, and Hispanic Origin: United States, Selected Years
+1900–2018” from Health, United States, 2019—Data Finder; page last reviewed March 2,
+2021.
+
+Chart 24 source: Economic Policy Institute analysis of U.S. Census Bureau, American
+Community Surveys 2008 to 2019. “Table HIC-9_ACS. Population Without Health
+Insurance Coverage by Race and Hispanic Origin: 2008 to 2019” in Health Insurance
+Coverage in the United States: 2019, September 15, 2020.
+
+Chart 25 source: Economic Policy Institute analysis of Donna L. Hoyert, Maternal Mortality
+Rates in the United States, 2019, “Table 1. Number of Maternal Deaths and Maternal
+Mortality Rates, by Race and Hispanic Origin and Age: United States, 2018 and 2019,”
+National Center for Health Statistics (Centers for Disease Control and Prevention), March
+2021. DOI: https://doi.org/10.15620/cdc:103855.
+
+
+
+
+                                                                                               63
+

@@ -11,7 +11,7 @@ describe('attributionBottomAbovePeekSheet', () => {
     const mapAreaHeight = 700;
     const tabBarInset = 83;
     const bottom = attributionBottomAbovePeekSheet({ mapAreaHeight, tabBarInset });
-    // gorhom resolves the '16%' peek snap against the FULL container height, so
+    // gorhom resolves the peek % snap against the FULL container height, so
     // the sheet top is tabBarInset + mapAreaHeight * peekFraction (inset NOT
     // subtracted before the fraction). The pill must clear that top by the gap.
     const sheetTop = tabBarInset + mapAreaHeight * EXPLORE_SHEET_PEEK_FRACTION;

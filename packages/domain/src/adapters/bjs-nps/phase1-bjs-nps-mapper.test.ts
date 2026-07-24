@@ -25,13 +25,20 @@ const SAMPLE_CSV = readFileSync(
 );
 const RETRIEVED_AT = '2026-07-22T00:00:00.000Z';
 
-test('parseBjsNpsStat01Csv extracts Maryland 2023 race counts', () => {
-  const { rows, referenceYear } = parseBjsNpsStat01Csv(SAMPLE_CSV);
-  assert.equal(referenceYear, 2023);
-  const md = rows.find((row) => row.stateFips === '24');
-  assert.ok(md);
-  assert.equal(md?.blackPrisoners, 11_651);
-  assert.equal(md?.whitePrisoners, 3_476);
+test('parseBjsNpsStat01Csv reads Prisoners in 2020 Appendix table 2 state counts', () => {
+  const csv = readFileSync(
+    join(
+      __dirname,
+      '../../../../firebase/fixtures/reference-indicators/bjs-nps-p20stat02-full.csv',
+    ),
+    'utf8',
+  );
+  const { rows, referenceYear } = parseBjsNpsStat01Csv(csv);
+  assert.equal(referenceYear, 2020);
+  const il = rows.find((row) => row.stateFips === '17');
+  assert.ok(il);
+  assert.equal(il?.blackPrisoners, 15_866);
+  assert.equal(il?.whitePrisoners, 9_271);
 });
 
 test('mapBjsNpsRowsToObservations computes Maryland imprisonment rates', () => {

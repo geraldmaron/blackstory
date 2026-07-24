@@ -97,3 +97,9 @@ plan.md
 .dolt/
 *.db
 .beads-credential-key
+
+# Construct — generated adapters, launcher, and runtime state.
+# Machine-specific, recreated by `construct sync`; never source (ADR-0027).
+.construct/
+.claude/
+inbox/

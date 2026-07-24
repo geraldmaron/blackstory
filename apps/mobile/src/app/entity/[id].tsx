@@ -25,8 +25,10 @@ import { parseEntityId } from '@/lib/route-params';
 import {
   createRuntimeEntityDataDeps,
   EntityDetailScreen,
+  EntitySessionNavHost,
   shareEntity,
   useEntityDetail,
+  useOrderedEntityIds,
   type EntityDataDeps,
 } from '@/features/entity';
 import { useEditionStackBack } from '@/shell/use-edition-stack-back';
@@ -70,6 +72,7 @@ export default function EntityDetailRoute() {
   const [shareBusy, setShareBusy] = useState(false);
   const readyEntity = deps && state.kind === 'ready' ? state.result.entity : undefined;
   const headerTitle = readyEntity ? compactHeaderTitle(readyEntity.displayName) : 'Record';
+  const orderedIds = useOrderedEntityIds(entityId ?? '', deps, readyEntity);
 
   useLayoutEffect(() => {
     // Share lives in the stack header (a persistent affordance), not as an orphan full-width
@@ -116,6 +119,11 @@ export default function EntityDetailRoute() {
           router.replace({ pathname: '/explore', params: { selected: selectedId } })
         }
         onOpenEntity={(neighborId) => router.push(`/entity/${neighborId}`)}
+        sessionNav={
+          entityId && readyEntity ? (
+            <EntitySessionNavHost currentId={entityId} orderedIds={orderedIds} />
+          ) : null
+        }
       />
     </ScreenCanvas>
   );

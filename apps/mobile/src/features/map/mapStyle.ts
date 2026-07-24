@@ -21,15 +21,17 @@ import { themeColors } from '@/ui';
 import {
   DEFAULT_MAP_GLYPHS_URL,
   DEFAULT_OPENFREEMAP_TILE_SOURCE_URL,
+  MAP_LABEL_TEXT_FONT,
   OSM_ATTRIBUTION,
 } from './mapConfig';
-import { clusterRadiusZoomExpression } from './dignity-palette';
+import { clusterRadiusZoomExpression, DIGNITY_PALETTE } from './dignity-palette';
 
 export {
   ENTITY_POINT_LAYER_STYLE,
   ENTITY_HALO_LAYER_STYLE,
   ENTITY_EVENT_GLYPH_LAYER_STYLE,
   ENTITY_SELECTED_LAYER_STYLE,
+  ENTITY_SELECTED_INNER_LAYER_STYLE,
   ENTITY_CLUSTER_LAYER_STYLE,
   kindColorExpression,
 } from './entity-paint';
@@ -106,16 +108,22 @@ function resolveVectorTileUrl(vectorTileUrl: string | null | undefined): string 
   }
 }
 
+/**
+ * Land plate as background. OpenMapTiles / OpenFreeMap do not ship a full-land
+ * polygon; water polygons punch ocean through this plate. Using canvas/ocean for
+ * both made California read as void at national zoom.
+ */
 const backgroundLayer = {
   id: 'background',
   type: 'background',
-  paint: { 'background-color': DARK.canvas },
+  paint: { 'background-color': DIGNITY_PALETTE.land },
 };
 
 /**
- * Shared dark-archive fill/line layers for OpenMapTiles-compatible sources
+ * Shared dark-archive fill/line/label layers for OpenMapTiles-compatible sources
  * (OpenFreeMap). Source-layer ids: `water`, `landcover`, `boundary`,
- * `transportation` — NOT Protomaps' `boundaries`.
+ * `transportation`, `transportation_name`, `place` — NOT Protomaps' `boundaries`.
+ * Labels use flat matte halos (ADR-013 plate exception), never glow/shadow kitsch.
  */
 function openMapTilesArchiveLayers(sourceId: string): readonly Record<string, unknown>[] {
   return [
@@ -125,22 +133,89 @@ function openMapTilesArchiveLayers(sourceId: string): readonly Record<string, un
       type: 'fill',
       source: sourceId,
       'source-layer': 'landcover',
-      paint: { 'fill-color': DARK.surface, 'fill-opacity': 0.35 },
+      paint: {
+        'fill-color': DARK.surfaceRaised,
+        'fill-opacity': 0.28,
+      },
     },
     {
       id: 'water',
       type: 'fill',
       source: sourceId,
       'source-layer': 'water',
-      paint: { 'fill-color': '#080606' },
+      paint: { 'fill-color': DIGNITY_PALETTE.ocean },
+    },
+    {
+      // Polygon outlines from the water layer — Pacific / Great Lakes edge without a
+      // separate coastline source. Sand stroke is orientation only (flat matte).
+      id: 'coastline',
+      type: 'line',
+      source: sourceId,
+      'source-layer': 'water',
+      paint: {
+        'line-color': DIGNITY_PALETTE.coastline,
+        'line-width': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          2,
+          0.7,
+          4,
+          1.05,
+          7,
+          1.35,
+        ],
+        'line-opacity': 0.9,
+      },
     },
     {
       id: 'admin-boundaries',
       type: 'line',
       source: sourceId,
       'source-layer': 'boundary',
-      filter: ['<=', ['get', 'admin_level'], 4],
-      paint: { 'line-color': DARK.border, 'line-width': 0.6, 'line-opacity': 0.7 },
+      filter: [
+        'all',
+        ['<=', ['get', 'admin_level'], 4],
+        ['!=', ['get', 'maritime'], 1],
+      ],
+      paint: {
+        'line-color': DIGNITY_PALETTE.pointHalo,
+        'line-width': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          3,
+          0.55,
+          6,
+          0.9,
+          9,
+          1.15,
+        ],
+        'line-opacity': 0.78,
+      },
+    },
+    {
+      id: 'streets-casing',
+      type: 'line',
+      source: sourceId,
+      'source-layer': 'transportation',
+      minzoom: 8,
+      filter: ['all', ['!=', ['get', 'class'], 'ferry'], ['!=', ['get', 'brunnel'], 'tunnel']],
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
+      paint: {
+        'line-color': DIGNITY_PALETTE.streetCasing,
+        'line-width': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          8,
+          1.2,
+          11,
+          2.4,
+          12,
+          3.2,
+        ],
+      },
     },
     {
       id: 'streets',
@@ -149,15 +224,127 @@ function openMapTilesArchiveLayers(sourceId: string): readonly Record<string, un
       'source-layer': 'transportation',
       minzoom: 8,
       filter: ['all', ['!=', ['get', 'class'], 'ferry'], ['!=', ['get', 'brunnel'], 'tunnel']],
+      layout: { 'line-cap': 'round', 'line-join': 'round' },
       paint: {
-        'line-color': 'rgba(244, 239, 229, 0.28)',
-        'line-width': 0.8,
+        'line-color': DIGNITY_PALETTE.street,
+        'line-width': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          8,
+          0.6,
+          11,
+          1.2,
+          12,
+          1.8,
+        ],
+      },
+    },
+    {
+      id: 'place-state',
+      type: 'symbol',
+      source: sourceId,
+      'source-layer': 'place',
+      maxzoom: 7,
+      filter: ['==', ['get', 'class'], 'state'],
+      layout: {
+        'text-field': ['coalesce', ['get', 'name:en'], ['get', 'name']],
+        'text-font': [...MAP_LABEL_TEXT_FONT],
+        'text-size': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          2,
+          11,
+          4,
+          12,
+          6,
+          12,
+        ],
+        'text-transform': 'uppercase',
+        'text-letter-spacing': 0.06,
+        'text-max-width': 8,
+        'text-padding': 2,
+        // Keep CONUS state names (incl. California) at national framing; do not
+        // yield to optional collision drops near west-coast clusters.
+        'text-allow-overlap': false,
+        'text-optional': false,
+        'symbol-sort-key': ['coalesce', ['get', 'rank'], 99],
+      },
+      paint: {
+        'text-color': DIGNITY_PALETTE.placeLabel,
+        'text-halo-color': DIGNITY_PALETTE.placeLabelHalo,
+        'text-halo-width': 1.15,
+        'text-opacity': 0.9,
+      },
+    },
+    {
+      id: 'place-city',
+      type: 'symbol',
+      source: sourceId,
+      'source-layer': 'place',
+      minzoom: 5,
+      maxzoom: 12,
+      filter: ['in', ['get', 'class'], ['literal', ['city', 'town']]],
+      layout: {
+        'text-field': ['coalesce', ['get', 'name:en'], ['get', 'name']],
+        'text-font': [...MAP_LABEL_TEXT_FONT],
+        'text-size': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          5,
+          10,
+          9,
+          12,
+          12,
+          13,
+        ],
+        'text-max-width': 8,
+        'text-allow-overlap': false,
+        'text-optional': true,
+      },
+      paint: {
+        'text-color': DIGNITY_PALETTE.placeLabel,
+        'text-halo-color': DIGNITY_PALETTE.placeLabelHalo,
+        'text-halo-width': 1,
+        'text-opacity': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          5,
+          0.45,
+          7,
+          0.7,
+          10,
+          0.85,
+        ],
+      },
+    },
+    {
+      id: 'street-label',
+      type: 'symbol',
+      source: sourceId,
+      'source-layer': 'transportation_name',
+      minzoom: 11,
+      layout: {
+        'text-field': ['coalesce', ['get', 'name:en'], ['get', 'name']],
+        'text-font': [...MAP_LABEL_TEXT_FONT],
+        'text-size': 11,
+        'symbol-placement': 'line',
+        'text-max-angle': 30,
+        'text-optional': true,
+      },
+      paint: {
+        'text-color': DIGNITY_PALETTE.streetLabel,
+        'text-halo-color': DIGNITY_PALETTE.placeLabelHalo,
+        'text-halo-width': 1,
       },
     },
   ];
 }
 
-/** Protomaps PMTiles archive layers (land/water/admin). */
+/** Protomaps PMTiles archive layers (land/water/admin) — leaner than OpenFreeMap. */
 function pmtilesArchiveLayers(sourceId: string): readonly Record<string, unknown>[] {
   return [
     backgroundLayer,
@@ -166,14 +353,29 @@ function pmtilesArchiveLayers(sourceId: string): readonly Record<string, unknown
       type: 'fill',
       source: sourceId,
       'source-layer': 'water',
-      paint: { 'fill-color': DARK.surface },
+      paint: { 'fill-color': DIGNITY_PALETTE.ocean },
+    },
+    {
+      id: 'coastline',
+      type: 'line',
+      source: sourceId,
+      'source-layer': 'water',
+      paint: {
+        'line-color': DIGNITY_PALETTE.coastline,
+        'line-width': 0.9,
+        'line-opacity': 0.9,
+      },
     },
     {
       id: 'admin-boundaries',
       type: 'line',
       source: sourceId,
       'source-layer': 'boundaries',
-      paint: { 'line-color': DARK.border, 'line-width': 0.5 },
+      paint: {
+        'line-color': DIGNITY_PALETTE.pointHalo,
+        'line-width': 0.7,
+        'line-opacity': 0.75,
+      },
     },
   ];
 }

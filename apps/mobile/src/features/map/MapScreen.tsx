@@ -44,6 +44,7 @@ import {
   ENTITY_EVENT_GLYPH_LAYER_STYLE,
   ENTITY_HALO_LAYER_STYLE,
   ENTITY_POINT_LAYER_STYLE,
+  ENTITY_SELECTED_INNER_LAYER_STYLE,
   ENTITY_SELECTED_LAYER_STYLE,
 } from './mapStyle';
 import { enrichMapFeatureCollection } from './enrich-map-features';
@@ -58,6 +59,7 @@ import {
 import { MAP_FAILURE_COPY, type MapFailureMode, type MapLoadState } from './mapLoadState';
 import { DEMO_MAP_SOURCE, type MapFeatureCollection } from './demoMapSource';
 import {
+  EXPLORE_MAP_VIEW_PADDING,
   MAP_MAX_ZOOM,
   MAP_MIN_ZOOM,
   PRESET_ZOOM,
@@ -201,15 +203,20 @@ export function MapScreen({
 
     try {
       if (command.kind === 'center') {
-        camera.flyTo?.({
+        // easeTo reads as a deliberate selection frame; flyTo stays for cluster expand.
+        camera.easeTo?.({
           center: [command.center[0], command.center[1]],
           zoom: command.zoom,
           duration: animationDuration,
+          padding: { ...EXPLORE_MAP_VIEW_PADDING },
         });
         zoomRef.current = command.zoom;
       } else {
         const [w, s, e, n] = command.bounds;
-        camera.fitBounds?.([w, s, e, n], { duration: animationDuration });
+        camera.fitBounds?.([w, s, e, n], {
+          duration: animationDuration,
+          padding: { ...EXPLORE_MAP_VIEW_PADDING },
+        });
       }
     } catch {
       /* camera not ready yet; the next command (new token) will apply */
@@ -330,7 +337,10 @@ export function MapScreen({
       >
         <Camera
           ref={cameraRef}
-          initialViewState={{ bounds: [US_BOUNDS[0], US_BOUNDS[1], US_BOUNDS[2], US_BOUNDS[3]] }}
+          initialViewState={{
+            bounds: [US_BOUNDS[0], US_BOUNDS[1], US_BOUNDS[2], US_BOUNDS[3]],
+            padding: { ...EXPLORE_MAP_VIEW_PADDING },
+          }}
           minZoom={MAP_MIN_ZOOM}
           maxZoom={MAP_MAX_ZOOM}
           maxBounds={[
@@ -368,8 +378,22 @@ export function MapScreen({
               style={{
                 textField: ['get', 'point_count_abbreviated'],
                 textFont: [...MAP_LABEL_TEXT_FONT],
-                textSize: 11,
+                textSize: [
+                  'interpolate',
+                  ['linear'],
+                  ['zoom'],
+                  3,
+                  10,
+                  6,
+                  11,
+                  9,
+                  12,
+                ],
                 textColor: DIGNITY_PALETTE.clusterText,
+                // Counts sit on copper discs; must not suppress basemap state labels
+                // (California near west-coast clusters at national framing).
+                textAllowOverlap: true,
+                textIgnorePlacement: true,
               }}
             />
           ) : null}
@@ -396,12 +420,22 @@ export function MapScreen({
             style={circleLayerStyle(ENTITY_EVENT_GLYPH_LAYER_STYLE as Record<string, unknown>)}
           />
           {selectedEntityId ? (
-            <Layer
-              id="entity-selected"
-              type="circle"
-              filter={['==', ['get', 'entityId'], selectedEntityId]}
-              style={circleLayerStyle(ENTITY_SELECTED_LAYER_STYLE as Record<string, unknown>)}
-            />
+            <>
+              <Layer
+                id="entity-selected-inner"
+                type="circle"
+                filter={['==', ['get', 'entityId'], selectedEntityId]}
+                style={circleLayerStyle(
+                  ENTITY_SELECTED_INNER_LAYER_STYLE as Record<string, unknown>,
+                )}
+              />
+              <Layer
+                id="entity-selected"
+                type="circle"
+                filter={['==', ['get', 'entityId'], selectedEntityId]}
+                style={circleLayerStyle(ENTITY_SELECTED_LAYER_STYLE as Record<string, unknown>)}
+              />
+            </>
           ) : null}
         </GeoJSONSource>
       </Map>
@@ -415,5 +449,5 @@ const styles = StyleSheet.create({
   errorContainer: { flex: 1, justifyContent: 'center' },
 });
 
-export { MAP_MAX_ZOOM, MAP_MIN_ZOOM, US_BOUNDS, US_CAMERA_MAX_BOUNDS };
+export { EXPLORE_MAP_VIEW_PADDING, MAP_MAX_ZOOM, MAP_MIN_ZOOM, US_BOUNDS, US_CAMERA_MAX_BOUNDS };
 export type { Bbox, CameraTarget, LngLat };

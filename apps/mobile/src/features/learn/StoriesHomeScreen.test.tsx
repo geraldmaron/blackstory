@@ -11,6 +11,14 @@ jest.mock('expo-router', () => ({
   router: { push: (...args: unknown[]) => mockPush(...args) },
 }));
 
+jest.mock('expo-image', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return {
+    Image: () => React.createElement(View, { testID: 'expo-image' }),
+  };
+});
+
 jest.mock('react-native-safe-area-context', () => {
   /* eslint-disable @typescript-eslint/no-require-imports */
   const React = require('react');
@@ -29,9 +37,11 @@ describe('StoriesHomeScreen', () => {
   });
 
   it('renders History pinned to place title and brand lede', async () => {
-    const { getByText } = await render(<StoriesHomeScreen />);
+    const { getByText, getByTestId, getByLabelText } = await render(<StoriesHomeScreen />);
     expect(getByText('History pinned to place')).toBeTruthy();
-    expect(getByText(/Each piece links to the records it rests on/)).toBeTruthy();
+    expect(getByText(/Short pieces with sources you can open/)).toBeTruthy();
+    expect(getByTestId('edition-brand-header')).toBeTruthy();
+    expect(getByLabelText('BlackStory')).toBeTruthy();
   });
 
   it('shows a featured story band', async () => {

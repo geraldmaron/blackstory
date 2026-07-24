@@ -59,6 +59,12 @@ export const BRAND_ASSETS = {
     light: '/brand/apple-touch-icon-light-180.png',
     dark: '/brand/apple-touch-icon-dark-180.png',
   },
+  /** Opaque home-screen / install icons (Archive Paper canvas; see manifest.webmanifest). */
+  installIcon: {
+    192: '/brand/icon-192.png',
+    512: '/brand/icon-512.png',
+    maskable512: '/brand/icon-maskable-512.png',
+  },
 } as const;
 
 export function brandLockup(theme: BrandTheme): string {

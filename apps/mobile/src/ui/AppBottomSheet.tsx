@@ -66,7 +66,7 @@ export function AppBottomSheet({
 }: AppBottomSheetProps) {
   const theme = useThemeColors();
   const snapPoints = useMemo(
-    () => [...(snapPointsProp ?? ['16%', '32%', '48%'])],
+    () => [...(snapPointsProp ?? ['11%', '34%', '52%'])],
     [snapPointsProp],
   );
   const targetIndex = snapIndex ?? (expanded ? SHEET_HALF : SHEET_PEEK);
@@ -110,9 +110,9 @@ export function AppBottomSheet({
     [theme.overlay],
   );
 
-  // Reduce-motion collapses the snap animation instead of disabling snapping.
+  // Pin Pulse: snappy detent travel; reduce-motion collapses to instant.
   const animationConfigs = useBottomSheetTimingConfigs({
-    duration: reduceMotion ? duration.durationInstant : duration.durationBase,
+    duration: reduceMotion ? duration.durationInstant : duration.durationFast,
   });
 
   // NOTE: snapping is driven purely by the controlled `index` prop below. An
@@ -179,15 +179,16 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
   },
   handleWrap: {
+    // Visual grip is compact; minHeight keeps the ≥44dp touch target for Pin Pulse peek.
     minHeight: HANDLE_MIN,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: 8,
-    paddingBottom: 8,
+    paddingTop: 4,
+    paddingBottom: 4,
   },
   handlePill: {
-    width: 40,
-    height: 4,
+    width: 36,
+    height: 3,
     borderRadius: 2,
   },
   content: {

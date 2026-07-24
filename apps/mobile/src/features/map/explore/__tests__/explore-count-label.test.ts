@@ -1,7 +1,11 @@
 /**
  * Unit tests for Explore dual count copy (viewport vs release total).
  */
-import { formatExploreCountLabel } from '../explore-count-label';
+import {
+  EXPLORE_SCOPE_ALL_PINNED,
+  EXPLORE_SCOPE_NEARBY,
+  formatExploreCountLabel,
+} from '../explore-count-label';
 
 describe('formatExploreCountLabel', () => {
   it('uses a single count before the map reports a viewport', () => {
@@ -9,13 +13,13 @@ describe('formatExploreCountLabel', () => {
       formatExploreCountLabel({
         inViewCount: 3,
         releaseCount: 3,
-        scopeLabel: 'All records',
+        scopeLabel: EXPLORE_SCOPE_ALL_PINNED,
         filters: {},
       }),
     ).toEqual({
-      inline: '3 records',
+      inline: '3 pinned',
       railInline: '3 pinned',
-      accessibilityLabel: 'All records, 3 records',
+      accessibilityLabel: 'All pinned, 3 pinned',
     });
   });
 
@@ -24,13 +28,13 @@ describe('formatExploreCountLabel', () => {
       formatExploreCountLabel({
         inViewCount: 712,
         releaseCount: 1365,
-        scopeLabel: 'In view',
+        scopeLabel: EXPLORE_SCOPE_NEARBY,
         filters: {},
       }),
     ).toEqual({
-      inline: '712 in view · 1,365 in release',
+      inline: '712 nearby · 1,365 in release',
       railInline: '712 / 1,365',
-      accessibilityLabel: 'In view, 712 in view, 1,365 in release',
+      accessibilityLabel: 'Nearby, 712 nearby, 1,365 in release',
     });
   });
 
@@ -39,26 +43,26 @@ describe('formatExploreCountLabel', () => {
       formatExploreCountLabel({
         inViewCount: 2,
         releaseCount: 2,
-        scopeLabel: 'All records',
+        scopeLabel: EXPLORE_SCOPE_ALL_PINNED,
         filters: { kind: 'place' },
       }),
     ).toEqual({
-      inline: '2 records · filtered',
+      inline: '2 pinned · filtered',
       railInline: '2 filtered',
-      accessibilityLabel: 'All records, 2 records · filtered',
+      accessibilityLabel: 'All pinned, 2 pinned · filtered',
     });
 
     expect(
       formatExploreCountLabel({
         inViewCount: 712,
         releaseCount: 1365,
-        scopeLabel: 'In view',
+        scopeLabel: EXPLORE_SCOPE_NEARBY,
         filters: { kind: 'place' },
       }),
     ).toEqual({
-      inline: '712 · filtered in view · 1,365 in release',
+      inline: '712 · filtered nearby · 1,365 in release',
       railInline: '712 / 1,365',
-      accessibilityLabel: 'In view, 712 in view · filtered, 1,365 in release',
+      accessibilityLabel: 'Nearby, 712 nearby · filtered, 1,365 in release',
     });
   });
 
@@ -67,10 +71,10 @@ describe('formatExploreCountLabel', () => {
       formatExploreCountLabel({
         inViewCount: 3,
         releaseCount: 3,
-        scopeLabel: 'All records',
+        scopeLabel: EXPLORE_SCOPE_ALL_PINNED,
         filters: {},
         showDemoHint: true,
       }).inline,
-    ).toBe('3 records demo fixtures');
+    ).toBe('3 pinned demo fixtures');
   });
 });

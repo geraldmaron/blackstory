@@ -20,10 +20,13 @@ export const CONFIDENCE_SIZE_MODIFIER: Readonly<
   unrated: 0.8,
 };
 
-/** Zoom-keyed scale — shrinks at national frame, identity at state, presence at locality. */
+/**
+ * Zoom-keyed scale — shrinks at national frame, presence at state/locality.
+ * National floor stays above dust-speck (~0.55) so CONUS still reads as a plate of pins.
+ */
 export const MARKER_ZOOM_SCALE_STOPS: ReadonlyArray<readonly [zoom: number, scale: number]> = [
-  [3, 0.4],
-  [5.5, 0.85],
+  [3, 0.55],
+  [5.5, 0.9],
   [9, 1.15],
   [12, 1.25],
 ];

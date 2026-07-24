@@ -5,6 +5,25 @@
  * from ExploreView to keep Jest from loading gorhom via the map barrel.
  */
 export {
+  formatExploreCountLabel,
+  EXPLORE_SCOPE_NEARBY,
+  EXPLORE_SCOPE_ALL_PINNED,
+  type ExploreCountLabel,
+  type ExploreCountLabelInput,
+} from './explore-count-label';
+export {
+  shouldShowSparseViewportCoach,
+  SPARSE_VIEWPORT_COACH_COPY,
+  type SparseViewportCoachInput,
+} from './sparse-viewport-coach';
+export { exploreStoryMeta, type ExploreStoryMeta } from './explore-story-meta';
+export {
+  activeFilterChips,
+  activeFilterCount,
+  clearFilterKey,
+  type ActiveFilterChip,
+} from './active-filter-chips';
+export {
   EntityPreviewSheet,
   type EntityPreviewSheetProps,
   type EntityPreviewPreviewFeature,

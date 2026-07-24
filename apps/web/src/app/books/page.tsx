@@ -4,10 +4,6 @@
  */
 import Link from 'next/link';
 import { ATMOSPHERE_ATTRIBUTION_HREF } from '../../components/atmosphere/tile-credits';
-import { EditionAtmosphereMosaic } from '../../components/patterns/edition-atmosphere/EditionAtmosphereMosaic';
-import {
-  EDITION_MOSAIC_COUNT_BROWSE,
-} from '../../components/patterns/edition-atmosphere/edition-atmosphere-config';
 import { bannedBookToSuggestCorpusItem } from '../../lib/banned-books/suggest-books.js';
 import { loadBannedBooksListing } from '../../lib/banned-books/public-source.js';
 import { buildBooksBrowseViewModel, type RawBooksBrowseParams } from './books-view-model';
@@ -15,7 +11,6 @@ import { BooksBrowseSections } from './BooksBrowseSections';
 import { BooksCatalogPulse } from './BooksCatalogPulse';
 import { BOOKS_INTRO, BOOKS_PAGE_DESCRIPTION } from './books-copy';
 import {
-  BOOKS_EDITION_MOSAIC_SEED,
   booksEditionPanelClassName,
   booksEditionRootClassName,
   booksEditionStackClassName,
@@ -39,7 +34,6 @@ export default async function BooksBrowsePage({ searchParams }: BooksPageProps) 
 
   return (
     <div className={booksEditionRootClassName()} data-books-edition="v6">
-      <EditionAtmosphereMosaic seedKey={BOOKS_EDITION_MOSAIC_SEED} count={EDITION_MOSAIC_COUNT_BROWSE} />
       <main className="ds-container ds-page" id="main">
         <div className={booksEditionStackClassName()}>
           <article className={booksEditionPanelClassName('intro')}>
@@ -68,7 +62,7 @@ export default async function BooksBrowsePage({ searchParams }: BooksPageProps) 
                   </Link>
                 </p>
                 <p className="ds-books-edition__credit">
-                  Archive mosaic · symbolic atmosphere · decorative gutter tiles only.{' '}
+                  Archive texture · symbolic atmosphere. {' '}
                   <Link href={ATMOSPHERE_ATTRIBUTION_HREF}>Mosaic credits</Link>
                 </p>
               </div>

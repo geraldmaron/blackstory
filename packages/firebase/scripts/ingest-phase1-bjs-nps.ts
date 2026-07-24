@@ -14,13 +14,16 @@
  *     node --conditions development --import tsx \
  *     packages/firebase/scripts/ingest-phase1-bjs-nps.ts
  *
- *   # Offline stat01 CSV (skip zip download)
+ *   # Offline stat01/stat02 CSV (skip zip download); works for p23stat01, p22stat01, p20stat02
  *   node --conditions development --import tsx \
  *     packages/firebase/scripts/ingest-phase1-bjs-nps.ts \
- *     --bjs-stat-csv=packages/firebase/fixtures/reference-indicators/bjs-nps-p23stat01-snippet.csv
+ *     --bjs-stat-csv=packages/firebase/fixtures/reference-indicators/bjs-nps-p20stat02-full.csv
+ *
+ * Multi-year warehouse rates: run once per year CSV (p20stat02 → 2020, p22stat01 → 2022,
+ * p23stat01 → 2023). Prefer a fixed ACS denominator vintage across years and keep labels
+ * distinct from BJS-published national Table 6 rates.
  */
-import { createWriteStream, existsSync, readFileSync } from 'node:fs';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { createWriteStream, existsSync, readFileSync } from 'node:fs';import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { execFileSync } from 'node:child_process';

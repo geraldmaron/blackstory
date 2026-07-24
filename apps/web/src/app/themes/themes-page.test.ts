@@ -19,9 +19,9 @@ const browseSource = readFileSync(join(here, 'ThemeBrowseSections.tsx'), 'utf8')
 const detailSource = readFileSync(join(here, '[themeId]', 'page.tsx'), 'utf8');
 const questionSource = readFileSync(join(here, '[themeId]', 'questions', '[questionId]', 'page.tsx'), 'utf8');
 
-test('themes index uses shared EditionAtmosphereMosaic and edition stack', () => {
-  assert.match(pageSource, /EditionAtmosphereMosaic/);
-  assert.match(pageSource, /THEMES_EDITION_MOSAIC_SEED/);
+test('themes index does not mount EditionAtmosphereMosaic and edition stack', () => {
+  assert.doesNotMatch(pageSource, /EditionAtmosphereMosaic/);
+  assert.doesNotMatch(pageSource, /THEMES_EDITION_MOSAIC_SEED/);
   assert.match(pageSource, /themesEditionRootClassName/);
   assert.match(pageSource, /data-themes-edition="v6"/);
   assert.doesNotMatch(pageSource, /ds-page__title/);
@@ -38,8 +38,8 @@ test('themes public routes are gated behind THEMES_PUBLIC_SURFACE_ENABLED', () =
 
 test('themes detail and question routes use per-theme mosaic seed', () => {
   for (const source of [detailSource, questionSource]) {
-    assert.match(source, /EditionAtmosphereMosaic/);
-    assert.match(source, /themesEditionMosaicSeedForTheme/);
+    assert.doesNotMatch(source, /EditionAtmosphereMosaic/);
+    assert.doesNotMatch(source, /themesEditionMosaicSeedForTheme/);
     assert.match(source, /themesEditionStackClassName/);
   }
 });

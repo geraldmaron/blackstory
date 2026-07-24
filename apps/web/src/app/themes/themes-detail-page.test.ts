@@ -1,6 +1,6 @@
 /**
- * Themes v6 detail and question route wiring: beat order, safe-fail components,
- * and UI chrome copy without em dashes.
+ * Themes v6 detail and question route wiring: continuous arc first, instruments
+ * beside, packets secondary; UI chrome copy without em dashes.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -19,13 +19,16 @@ function panelBeatIndex(source: string, variant: string): number {
   return index;
 }
 
-test('theme detail DOM order: intro, method, packets, footer', () => {
+test('theme detail DOM order: intro, method, arc, packets, footer', () => {
   const intro = panelBeatIndex(detailSource, 'intro');
   const method = panelBeatIndex(detailSource, 'method');
+  const arc = panelBeatIndex(detailSource, 'arc');
   const packets = panelBeatIndex(detailSource, 'packets');
 
   assert.ok(intro < method, 'intro must precede method panel');
-  assert.ok(method < packets, 'method must precede packets panel');
+  assert.ok(method < arc, 'method must precede continuous arc');
+  assert.ok(arc < packets, 'arc must precede packets / verify panel');
+  assert.match(detailSource, /ThemeImpactArcReading/);
   assert.match(detailSource, /ThemeImpactPacketCard/);
   assert.match(detailSource, /ThemeImpactStorytellingPanel/);
 });
@@ -42,7 +45,7 @@ test('theme question DOM order: intro, optional storytelling, packet, footer', (
 test('theme detail and question routes use v6 edition root and per-theme mosaic', () => {
   for (const source of [detailSource, questionSource]) {
     assert.match(source, /data-themes-edition="v6"/);
-    assert.match(source, /themesEditionMosaicSeedForTheme/);
+    assert.doesNotMatch(source, /themesEditionMosaicSeedForTheme/);
     assert.doesNotMatch(source, /ds-page__title/);
   }
 });

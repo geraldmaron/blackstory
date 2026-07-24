@@ -15,18 +15,18 @@ const browseSectionsSource = readFileSync(join(here, 'BooksBrowseSections.tsx'),
 const ripRowSource = readFileSync(join(here, 'BooksRipRow.tsx'), 'utf8');
 const copySource = readFileSync(join(here, 'books-copy.ts'), 'utf8');
 
-test('books browse page uses shared EditionAtmosphereMosaic and catalog pulse', () => {
-  assert.match(browseSource, /EditionAtmosphereMosaic/);
-  assert.match(browseSource, /BOOKS_EDITION_MOSAIC_SEED/);
+test('books browse page does not mount EditionAtmosphereMosaic and catalog pulse', () => {
+  assert.doesNotMatch(browseSource, /EditionAtmosphereMosaic/);
+  assert.doesNotMatch(browseSource, /BOOKS_EDITION_MOSAIC_SEED/);
   assert.match(browseSource, /booksEditionRootClassName/);
   assert.match(browseSource, /BooksCatalogPulse/);
   assert.match(browseSource, /data-books-edition="v6"/);
   assert.doesNotMatch(browseSource, /ds-books-page/);
 });
 
-test('books detail page uses per-slug mosaic seed, anatomy strip, and cover art', () => {
-  assert.match(detailSource, /EditionAtmosphereMosaic/);
-  assert.match(detailSource, /\$\{BOOKS_EDITION_MOSAIC_SEED\}:\$\{slug\}/);
+test('books detail page uses anatomy strip and cover art without gutter mosaic', () => {
+  assert.doesNotMatch(detailSource, /EditionAtmosphereMosaic/);
+  assert.doesNotMatch(detailSource, /BOOKS_EDITION_MOSAIC_SEED/);
   assert.match(detailSource, /BooksAnatomyStrip/);
   assert.match(detailSource, /BooksCoverArt/);
   assert.match(detailSource, /buildBooksRelatedItems/);

@@ -40,23 +40,51 @@ export type Bbox = {
  */
 export const MAP_MAX_ZOOM = 12;
 
-/** Continental-US default camera bounds `[west, south, east, north]`. */
-export const US_BOUNDS: readonly [number, number, number, number] = [-124.8, 24.4, -66.9, 49.4];
+/**
+ * Continental-US default camera bounds `[west, south, east, north]`.
+ * Aligned with `@repo/domain` `US_CONUS_BOUNDS` so mainland California (west coast
+ * past Cape Mendocino ~-124.4) is inside the national frame with Pacific margin —
+ * not flush to a tight -124.8 west edge that portrait padding then clips.
+ */
+export const US_BOUNDS: readonly [number, number, number, number] = [-125.2, 24.2, -66.5, 49.5];
 
-export const US_BBOX: Bbox = { west: -124.8, south: 24.4, east: -66.9, north: 49.4 };
+export const US_BBOX: Bbox = { west: -125.2, south: 24.2, east: -66.5, north: 49.5 };
 
 /**
- * Floor zoom so the camera cannot pull back to a free-world view that maxBounds
- * alone (center-clamp) would still allow. Mirrors the national preset (~3.2).
+ * Mainland west-coast longitude that national framing must keep clear of the
+ * padded viewport edge (Cape Mendocino / north CA coast). Used by tests and
+ * framing helpers — not a privacy coordinate (state-scale only).
  */
-export const MAP_MIN_ZOOM = 3;
+export const WEST_COAST_CLEARANCE_LNG = -124.45;
+
+/**
+ * View padding so CONUS / selection framing clears Pin Pulse chrome (top) and the
+ * peek sheet (bottom). Keep left/right modest: on a portrait phone every extra
+ * horizontal inset raises the zoom needed to show full CONUS and clips California.
+ * MapLibre `ViewPadding` uses top/right/bottom/left points.
+ */
+export const EXPLORE_MAP_VIEW_PADDING = {
+  top: 72,
+  right: 16,
+  bottom: 118,
+  left: 16,
+} as const;
+
+/**
+ * Floor zoom for Explore. Portrait phones need ~z2 to fit CONUS east–west inside
+ * the clear band between mast and peek sheet; a floor of 3 (desktop national
+ * resting zoom) is what clipped California. Still high enough that maxBounds
+ * keeps the plate from reading as a free-world globe.
+ */
+export const MAP_MIN_ZOOM = 2;
 
 /**
  * Degrees of padding beyond `US_BOUNDS` for `Camera.maxBounds`. MapLibre clamps
- * the *center* inside maxBounds; a small pad keeps CONUS framing usable without
- * allowing free pan into distant ocean / Mexico.
+ * the *center* inside maxBounds; on a portrait canvas a tight pad + latitude cap
+ * blocks the zoom-out needed for full CONUS (same pitfall web MapStage documents).
+ * A wider pad still rejects distant ocean / Mexico pans without clipping CA.
  */
-export const US_CAMERA_BOUNDS_PAD_DEG = 1.2;
+export const US_CAMERA_BOUNDS_PAD_DEG = 4;
 
 /**
  * Expands a `[west, south, east, north]` envelope by `padDeg` on each side.
@@ -71,11 +99,38 @@ export function padBounds(
   return [west - pad, south - pad, east + pad, north + pad];
 }
 
-/** CONUS (+ slight pad) envelope passed to MapLibre `Camera.maxBounds`. */
+/** CONUS (+ pad) envelope passed to MapLibre `Camera.maxBounds`. */
 export const US_CAMERA_MAX_BOUNDS: readonly [number, number, number, number] = padBounds(
   US_BOUNDS,
   US_CAMERA_BOUNDS_PAD_DEG,
 );
+
+/**
+ * Approximate MapLibre zoom needed to show `lngSpanDeg` across `viewportWidthPx`
+ * (world width at z0 = 512 CSS px). Pure geometry helper for national framing
+ * tests — does not invent coordinates.
+ */
+export function minZoomToFrameLngSpan(lngSpanDeg: number, viewportWidthPx: number): number {
+  if (!(lngSpanDeg > 0) || !(viewportWidthPx > 0)) return MAP_MAX_ZOOM;
+  return Math.log2((viewportWidthPx * 360) / (512 * lngSpanDeg));
+}
+
+/** Longitude span of a `[west, south, east, north]` envelope. */
+export function boundsLngSpan(bounds: readonly [number, number, number, number]): number {
+  return bounds[2] - bounds[0];
+}
+
+/**
+ * True when national bounds keep the west coast inland of the west edge by at
+ * least `marginDeg` (Pacific buffer so chrome/padding cannot shave California).
+ */
+export function nationalBoundsClearWestCoast(
+  bounds: readonly [number, number, number, number] = US_BOUNDS,
+  westCoastLng: number = WEST_COAST_CLEARANCE_LNG,
+  marginDeg = 0.5,
+): boolean {
+  return bounds[0] <= westCoastLng - marginDeg;
+}
 
 /** True when `lngLat` falls inside `bbox` (inclusive). US-only; antimeridian is not modeled. */
 export function isInBounds(lngLat: LngLat, bbox: Bbox): boolean {
@@ -122,6 +177,7 @@ export type CameraPreset = 'national' | 'state' | 'locality' | 'point';
  * and it still only frames a city/neighborhood-precision dot.
  */
 export const PRESET_ZOOM: Record<CameraPreset, number> = {
+  /** Fallback center-zoom only; national framing prefers `US_BOUNDS` fit. */
   national: 3.2,
   state: 6,
   locality: 9,

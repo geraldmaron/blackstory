@@ -1,14 +1,14 @@
 /**
- * Mobile Data screen — Ledger Line: canvas masthead + mono section labels +
- * flat metric stacks. One Surface plate max is not required here; indicators
- * sit on Archive Paper with hairline rhythm.
+ * Mobile Data screen — Ledger Line national modeling room: coverage pulse,
+ * Census model frame, proportion bars, sparklines, and Phase 1 indicator stacks.
  */
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import {
   Button,
-  EmptyState,
+  LedgerRow,
   LedgerSectionLabel,
+  NavIcon,
   Notice,
   RecordFactStrip,
   ScreenCanvas,
@@ -17,6 +17,8 @@ import {
   screenScrollInsets,
   space,
 } from '@/ui';
+import { CensusModelFrame } from './CensusModelFrame';
+import { CoveragePulse } from './CoveragePulse';
 import {
   DATA_INTRO,
   DATA_ORIENTATION_BEATS,
@@ -25,7 +27,16 @@ import {
 import { formatCount } from './format';
 import { getDataPageModel } from './indicator-snapshot';
 import { GroupedSeriesMetric } from './GroupedSeriesMetric';
+import { MethodCallout } from './MethodCallout';
 import { RacePairMetric } from './RacePairMetric';
+
+const COVERAGE_ITEMS = [
+  { id: 'population', label: 'Population', status: 'deferred' as const },
+  { id: 'wealth', label: 'Wealth', status: 'fixture' as const },
+  { id: 'housing', label: 'Housing', status: 'fixture' as const },
+  { id: 'justice', label: 'Justice', status: 'fixture' as const },
+  { id: 'themes', label: 'Themes', status: 'catalog' as const },
+];
 
 export function DataScreen() {
   const model = getDataPageModel();
@@ -58,6 +69,7 @@ export function DataScreen() {
             title="Figures use verified Phase 1 fixtures"
             description={servedFromNote}
           />
+          <CoveragePulse items={COVERAGE_ITEMS} />
           <View style={styles.beats}>
             {DATA_ORIENTATION_BEATS.map((beat) => (
               <View key={beat.kicker} style={styles.beat}>
@@ -70,6 +82,19 @@ export function DataScreen() {
               </View>
             ))}
           </View>
+          <MethodCallout
+            label="Juxtaposition"
+            body="Indicators sit beside archive evidence. Gaps mean the feed is incomplete, not that nothing happened. Comparison is not causation."
+          />
+          <View style={{ alignItems: 'flex-start' }}>
+            <Button
+              label="Juxtaposition rules"
+              variant="ghost"
+              density="compact"
+              onPress={() => router.push('/learn/methodology' as never)}
+              accessibilityHint="Opens methodology"
+            />
+          </View>
         </View>
 
         <View style={styles.section}>
@@ -77,11 +102,7 @@ export function DataScreen() {
           <Text variant="caption" colorRole="inkMuted">
             {DATA_SECTION_COPY.population.lede}
           </Text>
-          <EmptyState
-            compact
-            title="Census timeline not on this release yet"
-            description="The national decade-by-decade series ships on the web when the warehouse snapshot is ready. Open Explore for place layers meanwhile."
-          />
+          <CensusModelFrame />
           <View style={{ alignItems: 'flex-start' }}>
             <Button
               label="Open Explore"
@@ -152,6 +173,19 @@ export function DataScreen() {
               },
             ]}
           />
+          <MethodCallout
+            label="Themes hand-off"
+            body="Phase 1 indicators also appear inside research packets. Open Themes for redlining, drug policy, and related packets without causal overclaim."
+          />
+          <View style={{ alignItems: 'flex-start' }}>
+            <Button
+              label="Open Themes"
+              variant="ghost"
+              density="compact"
+              onPress={() => router.push('/themes' as never)}
+              accessibilityHint="Opens Themes browse"
+            />
+          </View>
         </View>
 
         <View style={styles.section}>
@@ -160,17 +194,32 @@ export function DataScreen() {
             {DATA_SECTION_COPY.next.lede}
           </Text>
           <View style={styles.actions}>
-            <Button
-              label="Explore the map"
-              variant="accent"
+            <LedgerRow
+              title="Explore the map"
+              summary="Open pins and place records nearby"
+              leading={<NavIcon name="explore" size={20} />}
+              showChevron
               onPress={() => router.push('/explore')}
-              accessibilityHint="Opens the Explore map tab"
+              accessibilityLabel="Explore the map"
+              showDivider
             />
-            <Button
-              label="Read methodology"
-              variant="secondary"
+            <LedgerRow
+              title="Read methodology"
+              summary="How records are researched and verified"
+              leading={<NavIcon name="methodology" size={20} />}
+              showChevron
               onPress={() => router.push('/learn/methodology' as never)}
-              accessibilityHint="Opens methodology"
+              accessibilityLabel="Read methodology"
+              showDivider
+            />
+            <LedgerRow
+              title="Banned books"
+              summary="Challenged titles with cited reports"
+              leading={<NavIcon name="books" size={20} />}
+              showChevron
+              onPress={() => router.push('/books' as never)}
+              accessibilityLabel="Banned books"
+              showDivider={false}
             />
           </View>
         </View>

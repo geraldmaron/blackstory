@@ -1,0 +1,22 @@
+# Census CPS Historical Reported Voting Rates, Table A-1.
+# Citizen voting rates (%) for presidential years by race/ethnicity.
+# White = White non-Hispanic citizen population; Black/Asian/Hispanic = citizen population.
+# Source xlsx: https://www2.census.gov/programs-surveys/cps/tables/time-series/voting-historical-time-series/a1.xlsx
+# Fetched 2026-07-24; SHA-256 of xlsx: b38d248dfa9e13e41fed0dce1fe3255068bbfc57a379b317f43e709221541d70
+# Table title covers November 1964 to 2020 (2024 not published in this file).
+year,white_non_hispanic_citizen_pct,black_citizen_pct,asian_citizen_pct,hispanic_citizen_pct
+2020,70.9,62.6,59.7,53.7
+2016,65.3,59.4,49.0,47.6
+2012,64.1,66.2,47.3,48.0
+2008,66.1,64.7,47.6,49.9
+2004,67.2,60.0,44.2,47.2
+2000,61.8,56.8,43.3,45.1
+1996,60.7,53.0,45.0,44.0
+1992,70.2,59.2,53.9,51.6
+1988,64.2,55.0,,48.0
+1984,66.4,60.6,,50.0
+1980,66.2,53.9,,46.0
+1976,,,,
+1972,,,,
+1968,,,,
+1964,,,,

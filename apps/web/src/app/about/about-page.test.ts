@@ -12,9 +12,9 @@ const here = dirname(fileURLToPath(import.meta.url));
 const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
 const copySource = readFileSync(join(here, 'about-copy.ts'), 'utf8');
 
-test('about page uses shared EditionAtmosphereMosaic instead of legacy mast', () => {
-  assert.match(pageSource, /EditionAtmosphereMosaic/);
-  assert.match(pageSource, /ABOUT_EDITION_MOSAIC_SEED/);
+test('about page does not mount EditionAtmosphereMosaic instead of legacy mast', () => {
+  assert.doesNotMatch(pageSource, /EditionAtmosphereMosaic/);
+  assert.doesNotMatch(pageSource, /ABOUT_EDITION_MOSAIC_SEED/);
   assert.doesNotMatch(pageSource, /AboutMosaicMast/);
   assert.doesNotMatch(pageSource, /LivingAtmosphereMosaic/);
 });

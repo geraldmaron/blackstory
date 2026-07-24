@@ -50,11 +50,11 @@ export type CreateLlmProviderOptions = {
   readonly models?: readonly string[];
 };
 
+/** Paid-research lane (matches black-history profile). Free overnight uses OPENROUTER_MODELS. */
 const DEFAULT_OPENROUTER_ROSTER: readonly string[] = [
-  'qwen/qwen-2.5-72b-instruct',
-  'z-ai/glm-4.7-flash',
-  'meta-llama/llama-3.1-8b-instruct',
-  'qwen/qwen-2.5-7b-instruct',
+  'deepseek/deepseek-r1-0528',
+  'deepseek/deepseek-v3.2',
+  'qwen/qwen3.5-122b-a10b',
 ];
 const DEFAULT_OLLAMA_MODEL = 'qwen3:8b';
 const DEFAULT_MOCK_MODEL = 'mock-editorial-v1';

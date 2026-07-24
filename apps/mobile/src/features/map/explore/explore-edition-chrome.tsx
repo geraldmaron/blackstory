@@ -4,10 +4,16 @@
  */
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { LiftedSurface, Text, space, radius, useThemeColors, MIN_TOUCH_TARGET } from '@/ui';
 import { exploreContentInset } from './explore-chrome';
 
 const MIN_TOUCH = MIN_TOUCH_TARGET;
+
+const TAB_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
+  filters: 'options-outline',
+  key: 'color-palette-outline',
+};
 
 export type ExploreEditionTab = {
   readonly id: string;
@@ -41,6 +47,7 @@ export function ExploreEditionSegmentTabs({
     >
       {tabs.map((tab) => {
         const selected = tab.id === activeId;
+        const icon = TAB_ICONS[tab.id];
         return (
           <Pressable
             key={tab.id}
@@ -56,6 +63,15 @@ export function ExploreEditionSegmentTabs({
               },
             ]}
           >
+            {icon ? (
+              <Ionicons
+                name={icon}
+                size={14}
+                color={selected ? theme.accent : theme.inkMuted}
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+              />
+            ) : null}
             <Text
               variant="code"
               style={{
@@ -133,12 +149,23 @@ export function ExplorePanelHeader({
   hideLabel = 'Hide panel',
   testID = 'explore-panel-header',
 }: ExplorePanelHeaderProps) {
+  const theme = useThemeColors();
+
   return (
     <View style={styles.panelHeader} testID={testID}>
       <View style={styles.panelHeaderText}>
-        <Text variant="code" colorRole="inkMuted" style={styles.panelTitle}>
-          {title.toUpperCase()}
-        </Text>
+        <View style={styles.panelTitleRow}>
+          <Ionicons
+            name="options-outline"
+            size={14}
+            color={theme.inkMuted}
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+          />
+          <Text variant="code" colorRole="inkMuted" style={styles.panelTitle}>
+            {title.toUpperCase()}
+          </Text>
+        </View>
         {subtitle ? (
           <Text variant="caption" colorRole="inkMuted" numberOfLines={1}>
             {subtitle}
@@ -156,9 +183,7 @@ export function ExplorePanelHeader({
             { opacity: pressed ? 0.75 : 1 },
           ]}
         >
-          <Text variant="bodySmall" colorRole="accent">
-            Hide
-          </Text>
+          <Ionicons name="close" size={18} color={theme.accent} />
         </Pressable>
       ) : null}
     </View>
@@ -242,8 +267,10 @@ const styles = StyleSheet.create({
   },
   segment: {
     minHeight: MIN_TOUCH,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: space['1'],
     borderBottomWidth: 2,
     paddingHorizontal: space['1'],
     paddingBottom: space['1'],
@@ -280,6 +307,11 @@ const styles = StyleSheet.create({
   panelHeaderText: {
     flex: 1,
     gap: 2,
+  },
+  panelTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space['1'],
   },
   panelTitle: {
     letterSpacing: 0.8,

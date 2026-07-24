@@ -1,11 +1,11 @@
 /**
- * Grouped-series metric block: one row per (period × group) with the value in the
- * trailing slot as right-aligned mono, so figures read as the primary element
- * rather than being buried in a muted, clip-prone summary string.
+ * Grouped-series metric: sparkline strip plus period × group text rows with
+ * trailing mono values. Flat matte; copper only on the primary series bars.
  */
 import { StyleSheet, View } from 'react-native';
 import { LedgerRow, Link, MIN_TOUCH_TARGET, Text, space } from '@/ui';
 import { formatDataValue } from './format';
+import { SparklineStrip } from './SparklineStrip';
 import type { DataGroupedBarSeries } from './types';
 
 export type GroupedSeriesMetricProps = {
@@ -34,6 +34,7 @@ export function GroupedSeriesMetric({ series }: GroupedSeriesMetricProps) {
       <Text variant="caption" colorRole="inkMuted">
         {series.caption}
       </Text>
+      <SparklineStrip series={series} />
       <View>
         {rows.map((row, index) => (
           <LedgerRow

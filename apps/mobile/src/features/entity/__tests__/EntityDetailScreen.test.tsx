@@ -1,4 +1,5 @@
 import { act, fireEvent, render } from '@testing-library/react-native';
+import { Text, View } from 'react-native';
 import { EntityDetailScreen } from '../EntityDetailScreen';
 import { normalizeEntity } from '../normalize';
 import type { EntityDetailState } from '../useEntityDetail';
@@ -15,6 +16,14 @@ import {
   minimalEntityFixture,
 } from '../testFixtures';
 import { buildIntroMetaLine } from '../sections/IntroSection';
+
+jest.mock('expo-image', () => {
+  const React = require('react');
+  const { View: RNView } = require('react-native');
+  return {
+    Image: () => React.createElement(RNView, { testID: 'expo-image' }),
+  };
+});
 
 function readyState(raw: Record<string, unknown>, degraded = false): EntityDetailState {
   const entity = normalizeEntity(raw)!;
@@ -164,6 +173,17 @@ describe('EntityDetailScreen — related-entity navigation', () => {
     fireEvent.press(getByText('Neighbor ent_neighbor_1'));
     expect(onOpenEntity).toHaveBeenCalledWith('ent_neighbor_1');
   });
+
+  it('renders an optional session nav footer when provided', async () => {
+    const { getByTestId, getByText } = await render(
+      <EntityDetailScreen
+        state={readyState(fullEntityFixture('place'))}
+        sessionNav={<View testID="session-nav-slot"><Text>Previous</Text></View>}
+      />,
+    );
+    expect(getByTestId('session-nav-slot')).toBeTruthy();
+    expect(getByText('Previous')).toBeTruthy();
+  });
 });
 
 describe('EntityDetailScreen — maps hand-off', () => {
@@ -223,6 +243,7 @@ describe('EntityDetailScreen — v6 edition beats', () => {
     const { getByTestId, getByText } = await render(
       <EntityDetailScreen state={readyState(fullEntityFixture('place'))} />,
     );
+    expect(getByTestId('entity-intro-brand')).toBeTruthy();
     expect(getByTestId('entity-intro-section')).toBeTruthy();
     expect(getByTestId('entity-anatomy-section')).toBeTruthy();
     expect(getByTestId('entity-provenance-section')).toBeTruthy();

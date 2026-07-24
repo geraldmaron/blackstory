@@ -37,7 +37,31 @@ describe('MOBILE_MORE_SECTIONS', () => {
       'Data',
       'Law',
       'Banned books',
+      'Themes',
     ]);
+  });
+
+  it('routes Banned books to the native catalog', () => {
+    const books = MOBILE_MORE_SECTIONS.flatMap((section) => section.rows).find(
+      (row) => row.id === 'books',
+    );
+    expect(books?.destination).toEqual({ kind: 'native', route: '/books' });
+    expect(books?.subtitle).not.toMatch(/opens web/i);
+  });
+
+  it('routes Themes to the native catalog', () => {
+    const themes = MOBILE_MORE_SECTIONS.flatMap((section) => section.rows).find(
+      (row) => row.id === 'themes',
+    );
+    expect(themes?.destination).toEqual({ kind: 'native', route: '/themes' });
+  });
+
+  it('routes Submit to the native contribute shell', () => {
+    const submit = MOBILE_MORE_SECTIONS.flatMap((section) => section.rows).find(
+      (row) => row.id === 'submit',
+    );
+    expect(submit?.destination).toEqual({ kind: 'native', route: '/submit' });
+    expect(submit?.subtitle).not.toMatch(/opens web/i);
   });
 
   it('groups trust routes under Methodology, Memorial, Corrections, and Errata', () => {

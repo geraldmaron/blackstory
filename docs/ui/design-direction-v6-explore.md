@@ -36,6 +36,8 @@ Chrome is **opaque Surface**, theme-aware, flat matte. The map stays visible bet
 
 **Banned on explore (carried from brand + v6 home):** shadows, gradients, glows, bevels, `backdrop-filter` blur, fixed-ink panel stamps (`--ds-fixed-*`) on instrument/results/restore surfaces.
 
+**Gesture contract:** `.ds-explore-stage` is `pointer-events: none` so map gaps stay pannable; instruments, records, notice, and spotlight panels re-enable hits with `touch-action: pan-y` and `overscroll-behavior: contain` so sheet/rail scroll does not leak into MapLibre drag. See [`patterns-map-canvas.md`](./patterns-map-canvas.md).
+
 **Cross-browser:** Explore clears hero inset on mount and calls `MapStage.resize()` for full-bleed geometry. The persistent plate uses shared lifecycle hooks (`orientationchange`, `visibilitychange`, `ResizeObserver`) and degrades to the accessible list when WebGL fails. See [`patterns-map-canvas.md`](./patterns-map-canvas.md).
 
 ---

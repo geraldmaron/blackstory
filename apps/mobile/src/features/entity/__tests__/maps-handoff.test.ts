@@ -2,7 +2,7 @@
  * Unit tests for public-precision maps hand-off URIs and open ordering.
  */
 import { Linking, Platform } from 'react-native';
-import { buildMapsHandoffUris, openMapsAtPublicAnchor } from '../maps-handoff';
+import { buildMapsHandoffUris, openExternalMaps, openMapsAtPublicAnchor } from '../maps-handoff';
 
 describe('buildMapsHandoffUris', () => {
   it('returns geo first, then platform fallbacks, using the exact public coords', () => {
@@ -30,6 +30,58 @@ describe('buildMapsHandoffUris', () => {
       Object.defineProperty(Platform, 'OS', { configurable: true, value: original });
     }
   });
+
+  it('includes an optional label in Apple and Google query strings', () => {
+    const original = Platform.OS;
+    Object.defineProperty(Platform, 'OS', { configurable: true, value: 'ios' });
+    try {
+      const uris = buildMapsHandoffUris(33.749, -84.388, 'Bethel AME');
+      expect(uris[0]).toContain('q=');
+      expect(uris[1]).toContain('maps.apple.com');
+      expect(uris[1]).toContain(encodeURIComponent('Bethel AME'));
+      expect(uris[2]).toContain('google.com/maps');
+      expect(uris[2]).toContain(encodeURIComponent('Bethel AME'));
+    } finally {
+      Object.defineProperty(Platform, 'OS', { configurable: true, value: original });
+    }
+  });
+});
+
+describe('openExternalMaps', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+    jest.restoreAllMocks();
+  });
+
+  it('opens the first successful URI and stops', async () => {
+    const spy = jest.spyOn(Linking, 'openURL').mockResolvedValueOnce(true as never);
+    const result = await openExternalMaps({ lat: 33.749, lng: -84.388, label: 'Atlanta' });
+    expect(result).toBe('opened');
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('falls through to the next URI when geo: rejects', async () => {
+    const spy = jest
+      .spyOn(Linking, 'openURL')
+      .mockRejectedValueOnce(new Error('no geo handler'))
+      .mockResolvedValueOnce(true as never);
+    const result = await openExternalMaps({ lat: 33.749, lng: -84.388 });
+    expect(result).toBe('opened');
+    expect(spy).toHaveBeenCalledTimes(2);
+  });
+
+  it('returns unavailable for non-finite coords without calling Linking', async () => {
+    const spy = jest.spyOn(Linking, 'openURL').mockResolvedValue(true as never);
+    const result = await openExternalMaps({ lat: Number.NaN, lng: -84.388 });
+    expect(result).toBe('unavailable');
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it('returns failed when every candidate rejects', async () => {
+    jest.spyOn(Linking, 'openURL').mockRejectedValue(new Error('no handler'));
+    const result = await openExternalMaps({ lat: 33.749, lng: -84.388 });
+    expect(result).toBe('failed');
+  });
 });
 
 describe('openMapsAtPublicAnchor', () => {
@@ -38,34 +90,10 @@ describe('openMapsAtPublicAnchor', () => {
     jest.restoreAllMocks();
   });
 
-  it('opens the first successful URI and stops', async () => {
+  it('delegates to openExternalMaps', async () => {
     const spy = jest.spyOn(Linking, 'openURL').mockResolvedValueOnce(true as never);
     const result = await openMapsAtPublicAnchor(33.749, -84.388);
     expect(result).toBe('opened');
     expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy).toHaveBeenCalledWith('geo:33.749,-84.388');
-  });
-
-  it('falls through to the next URI when geo: rejects', async () => {
-    const spy = jest
-      .spyOn(Linking, 'openURL')
-      .mockRejectedValueOnce(new Error('no geo handler'))
-      .mockResolvedValueOnce(true as never);
-    const result = await openMapsAtPublicAnchor(33.749, -84.388);
-    expect(result).toBe('opened');
-    expect(spy).toHaveBeenCalledTimes(2);
-  });
-
-  it('returns unavailable for non-finite coords without calling Linking', async () => {
-    const spy = jest.spyOn(Linking, 'openURL').mockResolvedValue(true as never);
-    const result = await openMapsAtPublicAnchor(Number.NaN, -84.388);
-    expect(result).toBe('unavailable');
-    expect(spy).not.toHaveBeenCalled();
-  });
-
-  it('returns failed when every candidate rejects', async () => {
-    jest.spyOn(Linking, 'openURL').mockRejectedValue(new Error('no handler'));
-    const result = await openMapsAtPublicAnchor(33.749, -84.388);
-    expect(result).toBe('failed');
   });
 });

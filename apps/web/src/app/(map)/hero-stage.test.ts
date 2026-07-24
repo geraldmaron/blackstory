@@ -123,9 +123,52 @@ describe('home hero panel structure', () => {
     );
     assert.match(
       homeEditionCss,
-      /\.ds-home-edition\s*\{[^}]*background:\s*var\(--ds-canvas\)/s,
+      /\.ds-home-edition\s*\{[^}]*background:\s*transparent/s,
     );
     assert.match(shellCss, /\.ds-home\s*\{[^}]*background:\s*transparent/s);
+  });
+
+  it('gives copy column scroll ownership so the map under copy cannot steal swipe', () => {
+    // map-surfaces.css loads after shell.css — copy must stay `auto` here (not `none`).
+    assert.match(
+      mapSurfacesCss,
+      /\.ds-home-hero__copy\s*\{[^}]*pointer-events:\s*auto/s,
+    );
+    assert.match(mapSurfacesCss, /\.ds-home-hero__copy\s*\{[^}]*touch-action:\s*pan-y/s);
+    assert.match(
+      mapSurfacesCss,
+      /\.ds-home-hero__map[\s\S]*?\.ds-home-hero__map-readout[\s\S]*?\.ds-home-hero__map-caption\s*\{[^}]*pointer-events:\s*none/s,
+    );
+    // Regression: never list the copy column in a shared `pointer-events: none` group.
+    assert.doesNotMatch(
+      mapSurfacesCss,
+      /\.ds-home-hero__copy\s*,[\s\S]*?\{[^}]*pointer-events:\s*none/,
+    );
+    assert.match(shellCss, /\.ds-home-hero__copy\s*\{[^}]*pointer-events:\s*auto/s);
+  });
+
+  it('lets explore stage gaps hit the map while Surface panels own vertical scroll', () => {
+    assert.match(mapSurfacesCss, /\.ds-explore-stage\s*\{[^}]*pointer-events:\s*none/s);
+    assert.match(
+      mapSurfacesCss,
+      /\.ds-explore-stage__instruments\s*\{[^}]*pointer-events:\s*auto/s,
+    );
+    assert.match(
+      mapSurfacesCss,
+      /\.ds-explore-stage__instruments\s*\{[^}]*touch-action:\s*pan-y/s,
+    );
+    assert.match(
+      mapSurfacesCss,
+      /\.ds-explore-stage__results\s*\{[^}]*pointer-events:\s*auto/s,
+    );
+    assert.match(
+      mapSurfacesCss,
+      /\.ds-explore-stage__results\s*\{[^}]*touch-action:\s*pan-y/s,
+    );
+    assert.match(
+      mapSurfacesCss,
+      /\.ds-explore-stage__results\s*\{[^}]*overscroll-behavior:\s*contain/s,
+    );
   });
 
   it('documents ADR-017 live map inset on home', () => {
@@ -157,15 +200,15 @@ describe('home shell-on-home', () => {
 });
 
 describe('home edition atmosphere', () => {
-  it('uses shared grain + archive grid canvas without mounting a home gutter mosaic', () => {
+  it('uses shared grain + archive grid canvas without gutter mosaic tiles', () => {
     const homePageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
     assert.doesNotMatch(homeEditionCss, /pattern-crumple/);
     assert.doesNotMatch(editionAtmosphereCss, /pattern-crumple/);
     assert.match(homeEditionCss, /@import\s+['"]\.\.\/patterns\/edition-atmosphere\/edition-atmosphere\.css/);
     assert.match(editionAtmosphereCss, /--ds-edition-pattern-grain/);
     assert.match(editionAtmosphereCss, /--ds-edition-pattern-archive-grid/);
-    assert.doesNotMatch(homePageSource, /HomeAtmosphereMosaic/);
     assert.doesNotMatch(homePageSource, /EditionAtmosphereMosaic/);
+    assert.doesNotMatch(homePageSource, /HomeAtmosphereMosaic/);
     assert.doesNotMatch(editionAtmosphereCss, /box-shadow/);
   });
 });

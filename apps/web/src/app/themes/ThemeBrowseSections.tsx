@@ -95,8 +95,8 @@ export function ThemeBrowseSections() {
               Themes with live packets
             </h2>
             <p className="ds-themes-edition__lede">
-              Redlining and drug policy packets connect primary records to measured outcomes while
-              keeping geography, time, and evidentiary limits visible.
+              Live packets connect primary records to measured outcomes. Geography, time, and
+              evidentiary limits stay visible without turning the page into a metric dump.
             </p>
           </div>
         </header>

@@ -74,9 +74,8 @@ export function ExploreInstrumentsPanel({
             mode="embedded"
             onFiltersChange={onFiltersChange}
             onClear={() => onFiltersChange({})}
-            onApply={() => undefined}
             onOpenPlaceFind={onOpenPlaceFind}
-            description="Narrow the map and records rail. Changes apply immediately."
+            description="Tap a kind or decade. Changes apply right away."
           />
         </ScrollView>
       ) : (

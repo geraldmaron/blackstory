@@ -4,7 +4,7 @@
 > (book-and-pin symbol + wordmark, light/dark transparent lockups and symbols,
 > app icons, 4-page guide, token files). Served copies use **role-based** paths
 > under `apps/web/public/brand/` (`lockup-*.png`, `symbol-*.png`,
-> `open-graph-*-1200x630.png`, favicons, apple-touch). Call sites must use
+> `open-graph-*-1200x630.png`, favicons, apple-touch, install icons). Call sites must use
 > those role names (or `@repo/config` `BRAND_ASSETS` helpers), never
 > product-prefixed filenames.
 
@@ -167,3 +167,16 @@ composited on top. Do not ship transparent OG assets or grain overlays;
 iMessage and other scrapers flatten alpha poorly and will show RGB noise as
 static. When regenerating, bump the `?v=` query on `BRAND_ASSETS.openGraph`
 (and the docs layout twin) so cached previews refresh.
+
+## Add to Home Screen / install icons
+
+Opaque PNGs for the web app manifest and Android install UI:
+
+| Role path | Source |
+|---|---|
+| `icon-192.png` / `icon-512.png` | `brand/app-icons/light/*-512.png` flattened on Archive Paper |
+| `icon-maskable-512.png` | Same mark, ~80% content safe-zone on Archive Paper |
+
+Manifest: `apps/web/public/manifest.webmanifest`. Owner how-to and iOS limits:
+[`docs/notes/add-to-home-screen.md`](../notes/add-to-home-screen.md). No service
+worker is shipped; installability is online-first only.

@@ -61,15 +61,16 @@ function feature(entityId: string, label: string): ExploreFeature {
 }
 
 describe('ExploreRecordsRail', () => {
-  it('renders scope header and hairline rows with fact strips', async () => {
-    const { getByLabelText, getByTestId } = await render(
+  it('renders peek invite and hairline rows with fact strips', async () => {
+    const { getByLabelText, getByTestId, getByText } = await render(
       <ExploreRecordsRail
         features={[feature('ent_a', 'Howard Theatre')]}
         onSelect={() => undefined}
       />,
     );
     expect(getByTestId('explore-records-rail')).toBeTruthy();
-    expect(getByLabelText(/In view, 1 record/)).toBeTruthy();
+    expect(getByText('Pull up for places')).toBeTruthy();
+    expect(getByLabelText(/Nearby, 1 pinned/)).toBeTruthy();
     expect(getByLabelText(/Howard Theatre/)).toBeTruthy();
   });
 
@@ -77,15 +78,15 @@ describe('ExploreRecordsRail', () => {
     const { getByLabelText, getByText, queryByText } = await render(
       <ExploreRecordsRail
         features={[feature('ent_a', 'Howard Theatre')]}
-        scopeLabel="In view"
+        scopeLabel="Nearby"
         releaseCount={1365}
         onSelect={() => undefined}
       />,
     );
     // Screen readers still hear the full count on the header…
-    expect(getByLabelText('In view, 1 in view, 1,365 in release')).toBeTruthy();
-    // …but the visible number lives only in the floating mast now (no duplicate).
-    expect(getByText('In view')).toBeTruthy();
+    expect(getByLabelText('Nearby, 1 nearby, 1,365 in release')).toBeTruthy();
+    // …but the visible invite is place-forward (count lives in the floating mast).
+    expect(getByText('Pull up for places')).toBeTruthy();
     expect(queryByText('1 · 1,365 in release')).toBeNull();
   });
 
@@ -102,9 +103,10 @@ describe('ExploreRecordsRail', () => {
   });
 
   it('shows empty state when no features match', async () => {
-    const { getByTestId } = await render(
+    const { getByTestId, getByText } = await render(
       <ExploreRecordsRail features={[]} onSelect={() => undefined} />,
     );
     expect(getByTestId('explore-records-empty')).toBeTruthy();
+    expect(getByText('No places nearby')).toBeTruthy();
   });
 });

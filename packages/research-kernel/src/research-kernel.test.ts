@@ -58,6 +58,14 @@ test('the Black history profile is canonical, bounded, and deny-by-default', () 
   const modelIds = blackHistoryProfile.modelPolicies.flatMap((policy) => policy.modelIds);
   assert.equal(modelIds.includes('tencent/hy3:free'), false);
   assert.equal(modelIds.includes('openrouter/free'), false);
+  assert.equal(modelIds.includes('anthropic/claude-opus-4.8'), false);
+  assert.equal(modelIds.includes('anthropic/claude-sonnet-4.6'), false);
+  const paidResearch = blackHistoryProfile.modelPolicies.find((p) => p.mode === 'paid-research');
+  assert.deepEqual(paidResearch?.modelIds, [
+    'deepseek/deepseek-r1-0528',
+    'deepseek/deepseek-v3.2',
+    'qwen/qwen3.5-122b-a10b',
+  ]);
   assert.throws(
     () => assertModelAdmitted(blackHistoryProfile, 'free-batch', 'openrouter/free', true),
     /not admitted/,

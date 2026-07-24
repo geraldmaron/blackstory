@@ -175,5 +175,86 @@ test('redlining Q1 uses gated causal claim with named secondary claim ids', () =
   assert.equal(q1.methodStance, 'gated_causal_claim');
   assert.ok((q1.causalClaimIds ?? []).length >= 2);
   assert.match(q1.methodNote, /Rothstein|Massey|Banaji/);
-  assert.match(q1.geography.label ?? '', /example/i);
+  assert.match(q1.geography.label ?? '', /example|United States|Chicago/i);
+});
+
+test('redlining arc summaries expand agency names and link entity cards', () => {
+  const [q1, q3, q4] = (['Q1', 'Q3', 'Q4'] as const).map((id) =>
+    RESEARCHED_THEME_IMPACT_PACKETS.find((packet) => packet.questionId === id),
+  );
+  assert.ok(q1 && q3 && q4);
+  assert.match(q1.summary, /Home Owners' Loan Corporation/);
+  assert.match(q1.summary, /Federal Housing Administration/);
+  assert.match(q1.summary, /\[\[ent_chicago_race_riot_1919_001\|/);
+  assert.match(q1.summary, /\[\[ent_law_home_owners_loan_act_1933\|/);
+  assert.match(q1.summary, /\[\[ent_law_national_housing_act_1934\|/);
+  assert.match(q3.summary, /\[\[ent_law_fair_housing_act_1968\|/);
+  assert.match(q3.summary, /\[\[ent_law_community_reinvestment_act_1977\|/);
+  assert.match(q3.summary, /2018 and 2023/);
+  assert.match(q4.summary, /\[\[ent_bronzeville_001\|/);
+  for (const packet of [q1, q3, q4]) {
+    assert.doesNotMatch(packet.summary, /\u2014/);
+  }
+});
+
+test('Census CPS A-1 and BJS Table 6 primary series back voting and national imprisonment', () => {
+  const voting = RESEARCHED_THEME_IMPACT_PACKETS.find((packet) => packet.questionId === 'Q12');
+  const mass = RESEARCHED_THEME_IMPACT_PACKETS.find((packet) => packet.questionId === 'Q8');
+  assert.ok(voting);
+  assert.ok(mass);
+
+  const black2012 = voting.observations.find(
+    (row) =>
+      row.metricId === 'cps-a1-turnout-black-nation' && row.referencePeriod === '2012',
+  );
+  assert.equal(black2012?.estimate, 66.2);
+  assert.equal(black2012?.provenance.source, 'us-census-cps');
+  assert.match(black2012?.provenance.contentHash ?? '', /^[a-f0-9]{64}$/);
+  assert.equal(
+    voting.observations.filter((row) => row.metricId.startsWith('cps-a1-turnout-')).length,
+    32,
+  );
+  assert.ok(
+    voting.artifacts.some(
+      (artifact) => artifact.artifactId === 'art_census_cps_a1_voting_historical',
+    ),
+  );
+
+  const blackImp2022 = mass.observations.find(
+    (row) =>
+      row.metricId === 'bjs-imprisonment-rate-black-nation' &&
+      row.referencePeriod === '2022',
+  );
+  assert.equal(blackImp2022?.estimate, 1196);
+  assert.equal(blackImp2022?.provenance.source, 'bjs-national-prisoner-statistics');
+  assert.ok(
+    mass.observations.some(
+      (row) =>
+        row.metricId === 'imprisonment-rate-black-state' &&
+        row.referencePeriod === '2020' &&
+        row.observationId.includes('state:17') &&
+        row.estimate === 922,
+    ),
+  );
+  assert.ok(
+    mass.observations.some(
+      (row) =>
+        row.metricId === 'imprisonment-rate-black-state' &&
+        row.referencePeriod === '2022' &&
+        row.observationId.includes('state:17'),
+    ),
+  );
+  assert.match(mass.summary, /Table 6/);
+  assert.match(mass.summary, /warehouse/);
+  assert.match(mass.methodNote, /never silently merged|not merged|labeled apart|two labeled/i);
+  assert.ok(
+    mass.artifacts.some(
+      (artifact) => artifact.artifactId === 'art_bjs_prisoners_2023_table6_adult_rates',
+    ),
+  );
+  assert.ok(
+    mass.artifacts.some(
+      (artifact) => artifact.artifactId === 'art_bjs_prisoners_2020_tables_zip',
+    ),
+  );
 });

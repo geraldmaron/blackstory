@@ -1,14 +1,11 @@
 /**
- * Theme-impact detail page at `/themes/[themeId]`. v6 edition Surface stack with shared
- * gutter mosaic, live packets, and fixture fallback.
+ * Theme-impact detail page at `/themes/[themeId]`. Continuous human arc first;
+ * instruments beside; packet provenance secondary for hard readers.
  */
 
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { EditionAtmosphereMosaic } from '../../../components/patterns/edition-atmosphere/EditionAtmosphereMosaic';
-import {
-  EDITION_MOSAIC_COUNT_DETAIL,
-} from '../../../components/patterns/edition-atmosphere/edition-atmosphere-config';
+import { ThemeImpactArcReading } from '../../../components/theme-impact/ThemeImpactArcReading';
 import { ThemeImpactMapStrip } from '../../../components/theme-impact/ThemeImpactMapStrip';
 import { ThemeImpactPacketCard } from '../../../components/theme-impact/ThemeImpactPacketCard';
 import { ThemeImpactStoryEmbed } from '../../../components/theme-impact/ThemeImpactStoryEmbed';
@@ -21,7 +18,6 @@ import { THEMES_PUBLIC_SURFACE_ENABLED } from '../../../lib/theme-impact/public-
 import { shouldShowThemeImpactStorytelling } from '../../../lib/theme-impact/storytelling-series';
 import { listThemeImpactPacketViews, resolveRedliningPilotPacketView } from '../../../lib/theme-impact/source';
 import {
-  themesEditionMosaicSeedForTheme,
   themesEditionPanelClassName,
   themesEditionRootClassName,
   themesEditionStackClassName,
@@ -72,11 +68,9 @@ export default async function ThemeDetailPage({ params }: ThemeDetailPageProps) 
     shouldShowThemeImpactStorytelling(packet.questionId),
   );
   const hasGatedCausal = packets.some((packet) => packet.methodStance === 'gated_causal_claim');
-  const packetCountLabel = `${packets.length} question${packets.length === 1 ? '' : 's'} in scope`;
 
   return (
     <div className={themesEditionRootClassName()} data-themes-edition="v6">
-      <EditionAtmosphereMosaic seedKey={themesEditionMosaicSeedForTheme(themeId)} count={EDITION_MOSAIC_COUNT_DETAIL} />
       <main className="ds-container ds-page" id="main">
         <div className={themesEditionStackClassName()}>
           <article className={themesEditionPanelClassName('intro')}>
@@ -99,22 +93,50 @@ export default async function ThemeDetailPage({ params }: ThemeDetailPageProps) 
             <p className="ds-themes-edition__panel-title">Method</p>
             <h2 className="ds-themes-edition__method-title" id="theme-detail-method-heading">
               {hasGatedCausal
-                ? 'Juxtaposition first, gated causation where named'
-                : 'Juxtaposition, not causation'}
+                ? 'Walk the journey; gate causation where secondaries require it'
+                : 'Walk the journey; causation is not assumed'}
             </h2>
             <p className="ds-themes-edition__method-body">
-              Each packet below states its method stance and any gap labels. Policy timing beside an
-              indicator is not proof of cause
+              Each beat places you in a named scene before opening instruments. Co-movement is not
+              proof of cause
               {hasGatedCausal
-                ? ', unless a packet carries a gated causal claim with named secondary sources'
+                ? ', unless a beat carries a gated causal claim with named secondary sources'
                 : ''}
-              . See <Link href="/methodology">methodology</Link> for the full juxtaposition bar.
+              . See <Link href="/methodology">methodology</Link> for confidence grades and when
+              impact language is allowed.
             </p>
             {source !== 'fixture' ? (
               <p className="ds-mono ds-themes-edition__live-badge">
                 Data source: {source === 'live' ? 'live warehouse' : 'live + fixture fallback'}
               </p>
             ) : null}
+          </article>
+
+          <article
+            className={themesEditionPanelClassName('arc')}
+            aria-labelledby="theme-arc-heading"
+            id="arc"
+          >
+            <header className="ds-themes-edition__header">
+              <span className="ds-themes-edition__index" aria-hidden="true">
+                01
+              </span>
+              <div>
+                <p className="ds-themes-edition__kicker">Reading</p>
+                <h2 className="ds-themes-edition__title" id="theme-arc-heading">
+                  The journey
+                </h2>
+                <p className="ds-themes-edition__lede">
+                  Scene by scene through policy, practice, lived place, and measurement. Ink-sketch
+                  visuals pace each beat; instruments sit beside the prose.
+                </p>
+              </div>
+            </header>
+            <ThemeImpactArcReading
+              themeId={themeId}
+              packets={packets}
+              headingId="theme-arc-reading"
+            />
           </article>
 
           {storytellingPackets.map((packet) => (
@@ -124,7 +146,7 @@ export default async function ThemeDetailPage({ params }: ThemeDetailPageProps) 
               aria-labelledby={`theme-storytelling-${packet.questionId}`}
             >
               <p className="ds-themes-edition__panel-title">
-                Storytelling · Q{packet.questionId}
+                Instrument detail · beat {packet.questionId}
               </p>
               <ThemeImpactStorytellingPanel
                 packet={packet}
@@ -141,7 +163,7 @@ export default async function ThemeDetailPage({ params }: ThemeDetailPageProps) 
             >
               <header className="ds-themes-edition__header">
                 <span className="ds-themes-edition__index" aria-hidden="true">
-                  {storytellingPackets.length > 0 ? '02' : '01'}
+                  02
                 </span>
                 <div>
                   <p className="ds-themes-edition__kicker">Pilot consumers</p>
@@ -149,8 +171,8 @@ export default async function ThemeDetailPage({ params }: ThemeDetailPageProps) 
                     Story embed and map strip
                   </h2>
                   <p className="ds-themes-edition__lede">
-                    Both surfaces read the same Chicago redlining Q3 packet (indicators, citations,
-                    and juxtaposition method note) from {pilotPacket.dataSource ?? 'fixture'} data.
+                    Both surfaces read the same housing Q3 packet (indicators, citations, and
+                    juxtaposition method note) from {pilotPacket.dataSource ?? 'fixture'} data.
                   </p>
                 </div>
               </header>
@@ -174,33 +196,27 @@ export default async function ThemeDetailPage({ params }: ThemeDetailPageProps) 
           >
             <header className="ds-themes-edition__header">
               <span className="ds-themes-edition__index" aria-hidden="true">
-                {themeId === 'redlining' && pilotPacket
-                  ? storytellingPackets.length > 0
-                    ? '03'
-                    : '02'
-                  : storytellingPackets.length > 0
-                    ? '02'
-                    : '01'}
+                {themeId === 'redlining' && pilotPacket ? '03' : '02'}
               </span>
               <div>
-                <p className="ds-themes-edition__kicker">Canonical questions</p>
+                <p className="ds-themes-edition__kicker">Verify</p>
                 <h2 className="ds-themes-edition__title" id="theme-packets-heading">
-                  {packetCountLabel}
+                  Instruments and sources
                 </h2>
                 <p className="ds-themes-edition__lede">
-                  Packets compose warehouse observations, derived measurements, artifacts, and
-                  explicit gap labels. Open a question for the full provenance quartet.
+                  Full packets for hard readers: observations, derived measurements, artifacts, and
+                  provenance. Secondary to the arc above.
                 </p>
               </div>
             </header>
 
-            <ul className="ds-theme-impact__packets" aria-label={`${entry.title} question packets`}>
+            <ul className="ds-theme-impact__packets" aria-label={`${entry.title} source packets`}>
               {packets.map((packet) => (
                 <li key={packet.questionId}>
                   <ThemeImpactPacketCard packet={packet} />
                   <p className="ds-theme-impact__question-link">
                     <Link href={`/themes/${themeId}/questions/${packet.questionId}`}>
-                      Open question {packet.questionId}
+                      Open beat {packet.questionId} sources
                     </Link>
                   </p>
                 </li>

@@ -1,0 +1,419 @@
+{
+  "version": "legal-seed-2026-07-17",
+  "generatedAt": "2026-07-24T04:38:25.540Z",
+  "entries": [
+    {
+      "id": "legal-cra-1964",
+      "slug": "civil-rights-act-1964",
+      "title": "Civil Rights Act of 1964",
+      "kind": "federal-statute",
+      "lawStatus": "amended",
+      "jurisdictionId": "us",
+      "topics": [
+        "employment",
+        "education",
+        "housing"
+      ],
+      "citation": "Pub. L. 88-352, 78 Stat. 241",
+      "sourceUrl": "https://api.congress.gov/v3/law/88/pub/352",
+      "officialUrl": "https://api.congress.gov/v3/law/88/pub/352",
+      "archivedCaptureUrl": "https://web.archive.org/web/20260717000000/https://api.congress.gov/v3/law/88/pub/352",
+      "retrievedAt": "2026-07-17T00:00:00.000Z",
+      "licenseTag": "public-domain",
+      "factId": "BB-F-000010",
+      "canonicalEntityId": "ent_seed_law_cra_1964",
+      "explainer": {
+        "whatItSays": "The Civil Rights Act of 1964 (Pub. L. 88-352) bans discrimination based on race, color, religion, sex, or national origin in public accommodations and employment.",
+        "whatItMeans": [
+          "Title II opened hotels, restaurants, and theaters to all customers regardless of race.",
+          "Title VII created the Equal Employment Opportunity Commission to investigate workplace discrimination.",
+          "Title VI tied federal funding to non-discrimination — schools and agencies could lose money if they discriminated."
+        ],
+        "whyItMatters": [
+          "Before 1964, \"Whites Only\" signs were legal in much of the South. Black travelers could be turned away from motels and diners.",
+          "The Act gave federal courts a direct tool to strike down segregation laws that states had kept for decades."
+        ],
+        "rightsToday": [
+          {
+            "label": "File an employment discrimination charge (EEOC)",
+            "agencyUrl": "https://www.eeoc.gov/filing-charge-discrimination"
+          },
+          {
+            "label": "Report housing discrimination (HUD)",
+            "agencyUrl": "https://www.hud.gov/program_offices/fair_housing_equal_opp/online-complaint"
+          }
+        ],
+        "primarySources": [
+          {
+            "label": "Congress.gov — Pub. L. 88-352",
+            "url": "https://api.congress.gov/v3/law/88/pub/352",
+            "licenseTag": "public-domain"
+          }
+        ],
+        "reviewedAt": "2026-07-10",
+        "termOfArtLinks": [
+          {
+            "term": "public accommodation",
+            "wexUrl": "https://www.law.cornell.edu/wex/public_accommodation"
+          }
+        ]
+      }
+    },
+    {
+      "id": "legal-vra-1965",
+      "slug": "voting-rights-act-1965",
+      "title": "Voting Rights Act of 1965",
+      "kind": "federal-statute",
+      "lawStatus": "amended",
+      "jurisdictionId": "us",
+      "topics": [
+        "voting",
+        "constitutional"
+      ],
+      "citation": "Pub. L. 89-110, 79 Stat. 437",
+      "sourceUrl": "https://api.congress.gov/v3/law/89/pub/110",
+      "officialUrl": "https://api.congress.gov/v3/law/89/pub/110",
+      "archivedCaptureUrl": "https://web.archive.org/web/20260717000000/https://api.congress.gov/v3/law/89/pub/110",
+      "retrievedAt": "2026-07-17T00:00:00.000Z",
+      "licenseTag": "public-domain",
+      "factId": "BB-F-000011",
+      "canonicalEntityId": "ent_seed_law_vra_1965",
+      "explainer": {
+        "whatItSays": "The Voting Rights Act of 1965 (Pub. L. 89-110) outlawed literacy tests and required federal oversight of election changes in places with a history of voting discrimination.",
+        "whatItMeans": [
+          "Section 2 bans any voting practice that denies or limits the right to vote based on race.",
+          "Section 5 (preclearance) required covered jurisdictions to get federal approval before changing election rules — until Shelby County v. Holder (2013).",
+          "Section 203 requires bilingual election materials in areas with large language-minority populations."
+        ],
+        "whyItMatters": [
+          "Literacy tests were used for decades to block Black voters who had been denied equal education.",
+          "The Act is widely credited with dramatically increasing Black voter registration in the Deep South."
+        ],
+        "rightsToday": [
+          {
+            "label": "Report a voting rights violation (DOJ Civil Rights Division)",
+            "agencyUrl": "https://civilrights.justice.gov/"
+          },
+          {
+            "label": "Find your election office (USA.gov)",
+            "agencyUrl": "https://www.usa.gov/election-office"
+          }
+        ],
+        "primarySources": [
+          {
+            "label": "Congress.gov — Pub. L. 89-110",
+            "url": "https://api.congress.gov/v3/law/89/pub/110",
+            "licenseTag": "public-domain"
+          }
+        ],
+        "reviewedAt": "2026-07-10",
+        "termOfArtLinks": [
+          {
+            "term": "preclearance",
+            "wexUrl": "https://www.law.cornell.edu/wex/preclearance"
+          }
+        ]
+      }
+    },
+    {
+      "id": "legal-fha-1968",
+      "slug": "fair-housing-act-1968",
+      "title": "Fair Housing Act of 1968",
+      "kind": "federal-statute",
+      "lawStatus": "in_force",
+      "jurisdictionId": "us",
+      "topics": [
+        "housing"
+      ],
+      "citation": "Pub. L. 90-284, Title VIII",
+      "sourceUrl": "https://www.hud.gov/program_offices/fair_housing_equal_opp/fair_housing_act_overview",
+      "officialUrl": "https://www.hud.gov/program_offices/fair_housing_equal_opp/fair_housing_act_overview",
+      "archivedCaptureUrl": "https://web.archive.org/web/20260717000000/https://www.hud.gov/program_offices/fair_housing_equal_opp/fair_housing_act_overview",
+      "retrievedAt": "2026-07-17T00:00:00.000Z",
+      "licenseTag": "public-domain",
+      "factId": "BB-F-000012",
+      "canonicalEntityId": "ent_seed_law_fha_1968"
+    },
+    {
+      "id": "legal-1983",
+      "slug": "42-usc-1983",
+      "title": "42 U.S.C. § 1983 — Civil action for deprivation of rights",
+      "kind": "federal-statute",
+      "lawStatus": "in_force",
+      "jurisdictionId": "us",
+      "topics": [
+        "policing",
+        "employment"
+      ],
+      "citation": "42 U.S.C. § 1983",
+      "sourceUrl": "https://www.ecfr.gov/current/title-42/chapter-21/subchapter-I/part-1983",
+      "officialUrl": "https://www.ecfr.gov/current/title-42/chapter-21/subchapter-I/part-1983",
+      "archivedCaptureUrl": "https://web.archive.org/web/20260717000000/https://www.ecfr.gov/current/title-42/chapter-21/subchapter-I/part-1983",
+      "retrievedAt": "2026-07-17T00:00:00.000Z",
+      "licenseTag": "public-domain",
+      "factId": "BB-F-000013",
+      "canonicalEntityId": "ent_seed_law_1983",
+      "explainer": {
+        "whatItSays": "42 U.S.C. § 1983 lets people sue state and local officials who violate their federal constitutional or statutory rights while acting under \"color of law.\"",
+        "whatItMeans": [
+          "You can seek money damages and court orders against officials who violate your rights.",
+          "The official must be acting in their government role — not as a private citizen.",
+          "Qualified immunity may limit suits against individual officers in some circumstances."
+        ],
+        "whyItMatters": [
+          "Section 1983 is the main federal tool for holding police and government officials accountable for civil-rights violations.",
+          "It was originally part of the Ku Klux Klan Act of 1871 to protect freedmen from state violence."
+        ],
+        "rightsToday": [
+          {
+            "label": "Report police misconduct (DOJ)",
+            "agencyUrl": "https://civilrights.justice.gov/"
+          },
+          {
+            "label": "Find a legal aid office (LSC)",
+            "agencyUrl": "https://www.lsc.gov/about-lsc/what-legal-aid/get-legal-help"
+          }
+        ],
+        "primarySources": [
+          {
+            "label": "eCFR — 42 U.S.C. § 1983",
+            "url": "https://www.ecfr.gov/current/title-42/chapter-21/subchapter-I/part-1983",
+            "licenseTag": "public-domain"
+          }
+        ],
+        "reviewedAt": "2026-07-10",
+        "termOfArtLinks": [
+          {
+            "term": "color of law",
+            "wexUrl": "https://www.law.cornell.edu/wex/color_of_law"
+          }
+        ]
+      }
+    },
+    {
+      "id": "legal-brown-1954",
+      "slug": "brown-v-board-of-education",
+      "title": "Brown v. Board of Education",
+      "kind": "landmark-case",
+      "lawStatus": "in_force",
+      "jurisdictionId": "us",
+      "topics": [
+        "education",
+        "constitutional"
+      ],
+      "citation": "347 U.S. 483 (1954)",
+      "sourceUrl": "https://www.courtlistener.com/opinion/108713/brown-v-board-of-education/",
+      "officialUrl": "https://www.courtlistener.com/opinion/108713/brown-v-board-of-education/",
+      "archivedCaptureUrl": "https://web.archive.org/web/20260717000000/https://www.courtlistener.com/opinion/108713/brown-v-board-of-education/",
+      "retrievedAt": "2026-07-17T00:00:00.000Z",
+      "licenseTag": "public-domain",
+      "factId": "BB-F-000014",
+      "canonicalEntityId": "ent_seed_law_brown_1954",
+      "explainer": {
+        "whatItSays": "Brown v. Board of Education, 347 U.S. 483 (1954), held that racial segregation in public schools violates the Equal Protection Clause of the Fourteenth Amendment.",
+        "whatItMeans": [
+          "The Court overturned Plessy v. Ferguson's \"separate but equal\" rule for public schools.",
+          "Chief Justice Warren wrote for a unanimous Court that separate schools are \"inherently unequal.\"",
+          "The decision did not set a deadline for desegregation — Brown II (1955) called for it \"with all deliberate speed.\""
+        ],
+        "whyItMatters": [
+          "School segregation was the legal backbone of Jim Crow. Brown opened the door to the modern civil-rights movement.",
+          "Many districts resisted for years; federal troops were sent to Little Rock Central High School in 1957."
+        ],
+        "rightsToday": [
+          {
+            "label": "File an education civil-rights complaint (DOJ)",
+            "agencyUrl": "https://civilrights.justice.gov/"
+          },
+          {
+            "label": "File a school discrimination complaint (OCR)",
+            "agencyUrl": "https://www2.ed.gov/about/offices/list/ocr/complaintintro.html"
+          }
+        ],
+        "primarySources": [
+          {
+            "label": "CourtListener — Brown v. Board",
+            "url": "https://www.courtlistener.com/opinion/108713/brown-v-board-of-education/",
+            "licenseTag": "public-domain"
+          },
+          {
+            "label": "Oyez case summary (link + attributed quote only)",
+            "url": "https://www.oyez.org/cases/1940-1955/347us483",
+            "licenseTag": "link-only"
+          }
+        ],
+        "reviewedAt": "2026-07-10",
+        "termOfArtLinks": [
+          {
+            "term": "Equal Protection Clause",
+            "wexUrl": "https://www.law.cornell.edu/wex/equal_protection"
+          }
+        ]
+      }
+    },
+    {
+      "id": "legal-shelby-2013",
+      "slug": "shelby-county-v-holder",
+      "title": "Shelby County v. Holder",
+      "kind": "landmark-case",
+      "lawStatus": "in_force",
+      "jurisdictionId": "us",
+      "topics": [
+        "voting",
+        "constitutional"
+      ],
+      "citation": "570 U.S. 529 (2013)",
+      "sourceUrl": "https://www.courtlistener.com/opinion/813086/shelby-county-v-holder/",
+      "officialUrl": "https://www.courtlistener.com/opinion/813086/shelby-county-v-holder/",
+      "archivedCaptureUrl": "https://web.archive.org/web/20260717000000/https://www.courtlistener.com/opinion/813086/shelby-county-v-holder/",
+      "retrievedAt": "2026-07-17T00:00:00.000Z",
+      "licenseTag": "public-domain",
+      "factId": "BB-F-000015",
+      "canonicalEntityId": "ent_seed_law_shelby_2013",
+      "explainer": {
+        "whatItSays": "Shelby County v. Holder, 570 U.S. 529 (2013), struck down the Voting Rights Act's coverage formula that determined which states needed federal preclearance for election changes.",
+        "whatItMeans": [
+          "The Court said the 1965 coverage formula was outdated and violated state sovereignty.",
+          "Section 2 still bans discriminatory voting practices nationwide, but preclearance no longer applies automatically.",
+          "Congress has not passed a new coverage formula since the decision."
+        ],
+        "whyItMatters": [
+          "States that had been under preclearance quickly passed new voting laws after Shelby County.",
+          "Civil-rights groups argue the decision removed a key guardrail against voter suppression."
+        ],
+        "rightsToday": [
+          {
+            "label": "Report a voting rights violation (DOJ)",
+            "agencyUrl": "https://civilrights.justice.gov/"
+          }
+        ],
+        "primarySources": [
+          {
+            "label": "CourtListener — Shelby County",
+            "url": "https://www.courtlistener.com/opinion/813086/shelby-county-v-holder/",
+            "licenseTag": "public-domain"
+          }
+        ],
+        "reviewedAt": "2026-07-10"
+      }
+    },
+    {
+      "id": "legal-13th-amendment",
+      "slug": "thirteenth-amendment",
+      "title": "Thirteenth Amendment",
+      "kind": "federal-statute",
+      "lawStatus": "in_force",
+      "jurisdictionId": "us",
+      "topics": [
+        "constitutional",
+        "criminal-justice"
+      ],
+      "citation": "U.S. Const. amend. XIII",
+      "sourceUrl": "https://www.archives.gov/milestone-documents/13th-amendment",
+      "officialUrl": "https://www.archives.gov/milestone-documents/13th-amendment",
+      "archivedCaptureUrl": "https://web.archive.org/web/20260717000000/https://www.archives.gov/milestone-documents/13th-amendment",
+      "retrievedAt": "2026-07-17T00:00:00.000Z",
+      "licenseTag": "public-domain",
+      "factId": "BB-F-000016",
+      "canonicalEntityId": "ent_seed_law_13th"
+    },
+    {
+      "id": "legal-14th-amendment",
+      "slug": "fourteenth-amendment",
+      "title": "Fourteenth Amendment",
+      "kind": "federal-statute",
+      "lawStatus": "in_force",
+      "jurisdictionId": "us",
+      "topics": [
+        "constitutional",
+        "policing"
+      ],
+      "citation": "U.S. Const. amend. XIV",
+      "sourceUrl": "https://www.archives.gov/milestone-documents/14th-amendment",
+      "officialUrl": "https://www.archives.gov/milestone-documents/14th-amendment",
+      "archivedCaptureUrl": "https://web.archive.org/web/20260717000000/https://www.archives.gov/milestone-documents/14th-amendment",
+      "retrievedAt": "2026-07-17T00:00:00.000Z",
+      "licenseTag": "public-domain",
+      "factId": "BB-F-000017",
+      "canonicalEntityId": "ent_seed_law_14th"
+    },
+    {
+      "id": "legal-15th-amendment",
+      "slug": "fifteenth-amendment",
+      "title": "Fifteenth Amendment",
+      "kind": "federal-statute",
+      "lawStatus": "in_force",
+      "jurisdictionId": "us",
+      "topics": [
+        "voting",
+        "constitutional"
+      ],
+      "citation": "U.S. Const. amend. XV",
+      "sourceUrl": "https://www.archives.gov/milestone-documents/15th-amendment",
+      "officialUrl": "https://www.archives.gov/milestone-documents/15th-amendment",
+      "archivedCaptureUrl": "https://web.archive.org/web/20260717000000/https://www.archives.gov/milestone-documents/15th-amendment",
+      "retrievedAt": "2026-07-17T00:00:00.000Z",
+      "licenseTag": "public-domain",
+      "factId": "BB-F-000018",
+      "canonicalEntityId": "ent_seed_law_15th"
+    },
+    {
+      "id": "legal-title-vii-regs",
+      "slug": "title-vii-cfr-part-1604",
+      "title": "EEOC Title VII Regulations — Sex Discrimination",
+      "kind": "federal-regulation",
+      "lawStatus": "in_force",
+      "jurisdictionId": "us",
+      "topics": [
+        "employment"
+      ],
+      "citation": "29 CFR Part 1604",
+      "sourceUrl": "https://www.ecfr.gov/current/title-29/subtitle-B/chapter-XIV/part-1604",
+      "officialUrl": "https://www.ecfr.gov/current/title-29/subtitle-B/chapter-XIV/part-1604",
+      "archivedCaptureUrl": "https://web.archive.org/web/20260717000000/https://www.ecfr.gov/current/title-29/subtitle-B/chapter-XIV/part-1604",
+      "retrievedAt": "2026-07-17T00:00:00.000Z",
+      "licenseTag": "public-domain",
+      "factId": "BB-F-000019",
+      "canonicalEntityId": "ent_seed_law_title_vii_regs"
+    },
+    {
+      "id": "legal-ga-sb202",
+      "slug": "georgia-sb202-2021",
+      "title": "Georgia Election Integrity Act of 2021 (SB 202)",
+      "kind": "state-statute",
+      "lawStatus": "in_force",
+      "jurisdictionId": "us-13",
+      "topics": [
+        "voting"
+      ],
+      "citation": "Ga. Code Ann. § 21-2 (2021 SB 202)",
+      "sourceUrl": "https://www.legis.ga.gov/legislation/59827",
+      "officialUrl": "https://www.legis.ga.gov/legislation/59827",
+      "archivedCaptureUrl": "https://web.archive.org/web/20260717000000/https://www.legis.ga.gov/legislation/59827",
+      "retrievedAt": "2026-07-17T00:00:00.000Z",
+      "licenseTag": "link-only",
+      "factId": "BB-F-000020",
+      "canonicalEntityId": "ent_seed_law_ga_sb202"
+    },
+    {
+      "id": "legal-sffa-2023",
+      "slug": "students-for-fair-admissions-v-harvard",
+      "title": "Students for Fair Admissions v. Harvard",
+      "kind": "landmark-case",
+      "lawStatus": "in_force",
+      "jurisdictionId": "us",
+      "topics": [
+        "education",
+        "constitutional"
+      ],
+      "citation": "600 U.S. 181 (2023)",
+      "sourceUrl": "https://www.supremecourt.gov/opinions/22pdf/20-1199_hgdj.pdf",
+      "officialUrl": "https://www.supremecourt.gov/opinions/22pdf/20-1199_hgdj.pdf",
+      "archivedCaptureUrl": "https://web.archive.org/web/20260717000000/https://www.supremecourt.gov/opinions/22pdf/20-1199_hgdj.pdf",
+      "retrievedAt": "2026-07-17T00:00:00.000Z",
+      "licenseTag": "public-domain",
+      "factId": "BB-F-000021",
+      "canonicalEntityId": "ent_seed_law_sffa_2023"
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 /**
  * Root layout for the public BlackStory web application.
  * Loads display + editorial + sans + mono fonts, design-system stylesheet, and app shell.
+ * Also wires Add to Home Screen metadata (manifest + Apple web app) without a service worker.
  *
  * Type system per the BlackStory brand kit (brand/tokens/typography.json, binding): Sora
  * SemiBold for headlines/titles/key statements, Inter for UI and body, Source Serif 4 for
@@ -8,10 +9,10 @@
  * Inter-Display display register when the kit landed (2026-07-18) — the wordmark art is
  * unaffected (the lockup ships as provided, never retyped).
  */
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import { Sora, Inter, Source_Serif_4, IBM_Plex_Mono } from 'next/font/google';
-import { brandOpenGraph } from '@repo/config';
+import { brandOpenGraph, PRODUCT_NAME } from '@repo/config';
 import { THEME_BOOTSTRAP_SCRIPT } from '@repo/ui';
 import '@repo/ui/styles.css';
 import '@fortawesome/fontawesome-svg-core/styles.css';
@@ -19,7 +20,25 @@ import '../lib/fontawesome';
 import { SiteShell } from '../components/SiteShell';
 import './shell.css';
 
+/** Archive Paper — light canvas / default splash + theme-color. */
+const ARCHIVE_PAPER = '#F4EFE5';
+/** Black Ink — dark canvas / dark theme-color. */
+const BLACK_INK = '#0A0A0A';
+
 const openGraphImage = brandOpenGraph('dark');
+
+/**
+ * Theme colors for browser chrome and installed home-screen shell.
+ * Light/dark follow prefers-color-scheme; site theme toggle is separate.
+ */
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: ARCHIVE_PAPER },
+    { media: '(prefers-color-scheme: dark)', color: BLACK_INK },
+  ],
+  width: 'device-width',
+  initialScale: 1,
+};
 
 const displayFace = Sora({
   subsets: ['latin'],
@@ -49,15 +68,26 @@ const mono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3048'),
+  applicationName: PRODUCT_NAME,
   title: {
-    default: 'BlackStory',
-    template: '%s · BlackStory',
+    default: PRODUCT_NAME,
+    template: `%s · ${PRODUCT_NAME}`,
   },
   description:
     'Place-connected Black history research with published claims, provenance, and confidence.',
+  // Installability + standalone chrome (no service worker; online-first).
+  manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    capable: true,
+    title: PRODUCT_NAME,
+    // Opaque status bar using the page background (Archive Paper / Black Ink via theme).
+    statusBarStyle: 'default',
+  },
+  formatDetection: {
+    telephone: false,
+  },
   icons: {
-    // Properly-sized renders from the new brand/ kit — see brand.md's source
-    // map for how each was generated from the master symbol/lockup art.
+    // Properly-sized renders from the brand/ kit — see brand.md.
     // `/favicon.ico` covers legacy browser requests that ignore <link rel="icon">.
     icon: [
       { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' },
@@ -82,6 +112,8 @@ export const metadata: Metadata = {
         type: 'image/png',
         media: '(prefers-color-scheme: dark)',
       },
+      { url: '/brand/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/brand/icon-512.png', sizes: '512x512', type: 'image/png' },
     ],
     apple: [
       { url: '/brand/apple-touch-icon-light-180.png', sizes: '180x180' },
@@ -93,8 +125,8 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    siteName: 'BlackStory',
-    title: 'BlackStory',
+    siteName: PRODUCT_NAME,
+    title: PRODUCT_NAME,
     description:
       'Place-connected Black history research with published claims, provenance, and confidence.',
     images: [
@@ -108,7 +140,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'BlackStory',
+    title: PRODUCT_NAME,
     description:
       'Place-connected Black history research with published claims, provenance, and confidence.',
     images: [openGraphImage],

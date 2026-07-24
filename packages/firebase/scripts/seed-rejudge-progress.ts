@@ -248,14 +248,18 @@ Updated: ${new Date().toISOString()}
 
 ## Models used in prior passes
 
-1. \`z-ai/glm-4.5-air\` (pass1-glm) — JSON unreliable on many items
+1. \`z-ai/glm-4.5-air\` (pass1-glm) — JSON unreliable; **do not use as primary**
 2. \`qwen/qwen3-32b\` (pass2-qwen3) — primary recovery pass (97 keeps)
 3. \`qwen/qwen3.5-122b-a10b\` (pass3) — stalled at 2/100; resumed one-by-one
+
+## Current multi-pass policy
+
+- Primary: \`qwen/qwen3-32b\` → \`qwen/qwen3.5-122b-a10b\` → \`deepseek/deepseek-r1-0528\`
+- Avoid GLM and Qwen2.5 line as primary/retry
 
 ## What's next
 
 - Continue **one-by-one** (\`concurrency 1\`) for remaining queue ids
-- GLM first → qwen3-32b retry → qwen2.5-72b fallback on JSON fail
 - Append each result to \`rejudge-progress.ndjson\`
 - **Promote waves of 5** when auto-promote bar clears
 

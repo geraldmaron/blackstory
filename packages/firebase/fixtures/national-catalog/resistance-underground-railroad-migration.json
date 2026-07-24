@@ -2483,7 +2483,10 @@
       "1910s"
     ],
     "topicTags": [
-      "great-migration"
+      "great-migration",
+      "housing",
+      "violence",
+      "redlining"
     ],
     "jurisdictionLabel": "Chicago, Illinois",
     "locationPrecision": "campus",
@@ -2513,9 +2516,19 @@
     "topicIds": [
       "great-migration"
     ],
-    "mentionedEntityIds": [],
+    "mentionedEntityIds": [
+      "ent_bronzeville_001",
+      "ent_law_home_owners_loan_act_1933",
+      "ent_law_national_housing_act_1934"
+    ],
     "keywords": [],
-    "related": []
+    "related": [
+      {
+        "id": "ent_bronzeville_001",
+        "type": "related_to",
+        "direction": "outgoing"
+      }
+    ]
   },
   {
     "id": "ent_elaine_massacre_001",

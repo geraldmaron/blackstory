@@ -1,24 +1,29 @@
 /**
  * Shared Explore count copy for the floating mast and records rail — viewport-scoped
- * list size plus the full loaded release total so readers never confuse ~700 in view
- * with ~1,365 geo-anchored records in the active release.
+ * list size plus the full loaded release total so readers never confuse nearby pins
+ * with the full geo-anchored release. Pin Pulse voice: pinned / nearby, not catalog.
  */
 import type { FilterState } from '@/lib/route-params';
 import { hasActiveFilters } from '@/lib/route-params';
 
+/** Scope once the map reports a camera region. */
+export const EXPLORE_SCOPE_NEARBY = 'Nearby';
+/** Scope before the first viewport report (full loaded release). */
+export const EXPLORE_SCOPE_ALL_PINNED = 'All pinned';
+
 export type ExploreCountLabelInput = {
   readonly inViewCount: number;
   readonly releaseCount: number;
-  /** "In view" once the map reports a region; "All records" before that. */
+  /** "Nearby" once the map reports a region; "All pinned" before that. */
   readonly scopeLabel: string;
   readonly filters: FilterState;
   readonly showDemoHint?: boolean;
 };
 
 export type ExploreCountLabel = {
-  /** Full mast line (includes "in view" when dual). */
+  /** Full mast line (includes "nearby" when dual). */
   readonly inline: string;
-  /** Compact line beside a separate scopeLabel (avoids "In view / 712 in view"). */
+  /** Compact line beside a separate scopeLabel (avoids repeating scope words). */
   readonly railInline: string;
   readonly accessibilityLabel: string;
 };
@@ -34,25 +39,25 @@ function filteredSuffix(filters: FilterState): string {
 function singleCountPhrase(count: number, filters: FilterState): string {
   const filtered = filteredSuffix(filters);
   if (count === 0) return filtered ? `None${filtered}` : 'None';
-  if (count === 1) return filtered ? `1 record${filtered}` : '1 record';
+  if (count === 1) return filtered ? `1 pinned${filtered}` : '1 pinned';
   return filtered
-    ? `${formatLocaleCount(count)} records${filtered}`
-    : `${formatLocaleCount(count)} records`;
+    ? `${formatLocaleCount(count)} pinned${filtered}`
+    : `${formatLocaleCount(count)} pinned`;
 }
 
 function dualCountInline(input: ExploreCountLabelInput): string {
   const filtered = filteredSuffix(input.filters);
-  const inView =
+  const nearby =
     input.inViewCount === 0
-      ? `None${filtered} in view`
+      ? `None${filtered} nearby`
       : input.inViewCount === 1
-        ? `1${filtered} in view`
-        : `${formatLocaleCount(input.inViewCount)}${filtered} in view`;
+        ? `1${filtered} nearby`
+        : `${formatLocaleCount(input.inViewCount)}${filtered} nearby`;
   const inRelease =
     input.releaseCount === 1
       ? '1 in release'
       : `${formatLocaleCount(input.releaseCount)} in release`;
-  return `${inView} · ${inRelease}`;
+  return `${nearby} · ${inRelease}`;
 }
 
 function singleCountRailPhrase(count: number, filters: FilterState): string {
@@ -64,7 +69,7 @@ function singleCountRailPhrase(count: number, filters: FilterState): string {
     : `${formatLocaleCount(count)} pinned`;
 }
 
-/** Dual copy without repeating "in view" when scopeLabel already carries that word. */
+/** Dual copy without repeating "nearby" when scopeLabel already carries that word. */
 function dualCountRailInline(input: ExploreCountLabelInput): string {
   const inView = formatLocaleCount(input.inViewCount);
   const inRelease = formatLocaleCount(input.releaseCount);
@@ -79,7 +84,7 @@ function demoSuffix(showDemoHint: boolean | undefined): string {
 export function formatExploreCountLabel(input: ExploreCountLabelInput): ExploreCountLabel {
   const demo = demoSuffix(input.showDemoHint);
   const useDual =
-    input.scopeLabel === 'In view' && input.releaseCount !== input.inViewCount;
+    input.scopeLabel === EXPLORE_SCOPE_NEARBY && input.releaseCount !== input.inViewCount;
 
   if (!useDual) {
     const phrase = singleCountPhrase(input.inViewCount, input.filters);
@@ -94,17 +99,17 @@ export function formatExploreCountLabel(input: ExploreCountLabelInput): ExploreC
   const inline = `${dualCountInline(input)}${demo}`;
   const railInline = `${dualCountRailInline(input)}${demo}`;
   const filtered = filteredSuffix(input.filters);
-  const inViewA11y =
+  const nearbyA11y =
     input.inViewCount === 0
-      ? `None in view${filtered}`
+      ? `None nearby${filtered}`
       : input.inViewCount === 1
-        ? `1 in view${filtered}`
-        : `${formatLocaleCount(input.inViewCount)} in view${filtered}`;
+        ? `1 nearby${filtered}`
+        : `${formatLocaleCount(input.inViewCount)} nearby${filtered}`;
   const releasePhrase =
     input.releaseCount === 1 ? '1 in release' : `${formatLocaleCount(input.releaseCount)} in release`;
   return {
     inline,
     railInline,
-    accessibilityLabel: `${input.scopeLabel}, ${inViewA11y}, ${releasePhrase}`,
+    accessibilityLabel: `${input.scopeLabel}, ${nearbyA11y}, ${releasePhrase}`,
   };
 }

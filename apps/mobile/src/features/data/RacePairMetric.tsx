@@ -1,12 +1,10 @@
 /**
- * Race-pair metric block: two values + optional ratio, values rendered as
- * right-aligned mono in the trailing slot (not the muted summary), sources as
- * links with a full touch target. Accessible text juxtaposition — no color-only
- * encoding.
+ * Race-pair metric block: proportion bars + mono values + sources.
+ * Accessible text juxtaposition — copper marks the primary series only.
  */
 import { StyleSheet, View } from 'react-native';
-import { LedgerRow, Link, MIN_TOUCH_TARGET, Text, space } from '@/ui';
-import { formatDataValue } from './format';
+import { Link, MIN_TOUCH_TARGET, Text, space } from '@/ui';
+import { ProportionBar } from './ProportionBar';
 import type { DataRacePairSeries } from './types';
 
 export type RacePairMetricProps = {
@@ -27,40 +25,30 @@ export function RacePairMetric({ series }: RacePairMetricProps) {
       <Text variant="caption" colorRole="inkMuted">
         {series.caption}
       </Text>
-      <View>
-        <LedgerRow
-          title={series.primary.label}
-          trailing={
-            <Text variant="code" style={styles.value}>
-              {formatDataValue(series.primary.value, series.primary.unit)}
-            </Text>
-          }
-          showDivider
-          showChevron={false}
-        />
-        <LedgerRow
-          title={series.comparison.label}
-          trailing={
-            <Text variant="code" style={styles.value}>
-              {formatDataValue(series.comparison.value, series.comparison.unit)}
-            </Text>
-          }
-          showDivider={hasRatio}
-          showChevron={false}
-        />
-        {hasRatio ? (
-          <LedgerRow
-            title={series.ratioLabel as string}
-            trailing={
-              <Text variant="code" style={styles.value}>
-                {String(series.ratioValue)}
-              </Text>
-            }
-            showDivider={false}
-            showChevron={false}
-          />
-        ) : null}
-      </View>
+      <ProportionBar
+        accessibilityLabel={`${series.title} for ${series.geographyLabel}`}
+        rows={[
+          {
+            label: series.primary.label,
+            value: series.primary.value,
+            unit: series.primary.unit,
+            accent: true,
+          },
+          {
+            label: series.comparison.label,
+            value: series.comparison.value,
+            unit: series.comparison.unit,
+          },
+        ]}
+      />
+      {hasRatio ? (
+        <View style={styles.ratioRow}>
+          <Text variant="caption" colorRole="inkMuted">
+            {series.ratioLabel}
+          </Text>
+          <Text variant="code">{String(series.ratioValue)}</Text>
+        </View>
+      ) : null}
       <View style={styles.sources}>
         {series.sources.map((source) => (
           <View key={source.url} style={styles.sourceItem}>
@@ -82,8 +70,11 @@ const styles = StyleSheet.create({
     letterSpacing: 0.4,
     textTransform: 'uppercase',
   },
-  value: {
-    textAlign: 'right',
+  ratioRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    gap: space['2'],
   },
   sources: {
     gap: space['2'],

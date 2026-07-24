@@ -53,6 +53,7 @@
 
 .ds-themes-edition__panel--catalog,
 .ds-themes-edition__panel--soon,
+.ds-themes-edition__panel--arc,
 .ds-themes-edition__panel--packets,
 .ds-themes-edition__panel--packet {
   display: grid;

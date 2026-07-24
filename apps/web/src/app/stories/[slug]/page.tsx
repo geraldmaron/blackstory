@@ -9,10 +9,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { assertNeverClaimReview } from '@repo/domain';
-import { EditionAtmosphereMosaic } from '../../../components/patterns/edition-atmosphere/EditionAtmosphereMosaic';
-import {
-  EDITION_MOSAIC_COUNT_DETAIL,
-} from '../../../components/patterns/edition-atmosphere/edition-atmosphere-config';
 import { renderStoryTitle } from '../../../components/atmosphere/story-title';
 import { SourceFootnote } from '../../../components/data/SourceFootnote';
 import type { PublicEntityView } from '../../../data/public-seed';
@@ -28,7 +24,6 @@ import {
   defaultExploreOverlayState,
 } from '../../../lib/map-experience/url-state';
 import {
-  STORIES_EDITION_MOSAIC_SEED,
   storiesEditionPanelClassName,
   storiesEditionRootClassName,
   storiesEditionStackClassName,
@@ -104,7 +99,6 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
 
   return (
     <div className={storiesEditionRootClassName()} data-stories-edition="v6">
-      <EditionAtmosphereMosaic seedKey={`${STORIES_EDITION_MOSAIC_SEED}:${story.slug}`} count={EDITION_MOSAIC_COUNT_DETAIL} />
       <main className="ds-container ds-page" id="main">
         <script
           type="application/ld+json"
@@ -135,7 +129,7 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
                   </p>
                 ) : null}
                 <p className="ds-stories-edition__credit">
-                  Archive mosaic · symbolic atmosphere, not a photograph of this story.{' '}
+                  Archive texture · symbolic atmosphere, not a photograph of this story. {' '}
                   <Link href="/stories/mosaic-credits">Mosaic credits</Link>
                 </p>
               </div>

@@ -1,6 +1,7 @@
 /**
  * Structure + a11y tests for the Explore filters panel: collapsible Kind/Era
- * groups, dense chip radios (≥44px), and sticky Clear/Apply affordances.
+ * groups, dense chip radios (≥44px), and sticky Clear/Done affordances.
+ * Facet chips apply immediately — there is no Apply confirm step.
  */
 import { fireEvent, render } from '@testing-library/react-native';
 import { buildExploreFacetOptions } from '@/features/explore/explore-filter';
@@ -46,21 +47,22 @@ function renderPanel(overrides: Partial<ExploreFiltersPanelProps> = {}) {
       facetOptions={TEST_FACET_OPTIONS}
       onFiltersChange={() => undefined}
       onClear={() => undefined}
-      onApply={() => undefined}
+      onDone={() => undefined}
       {...overrides}
     />,
   );
 }
 
 describe('ExploreFiltersPanel — structure', () => {
-  it('renders collapsible Kind and Era groups with sticky Apply / Clear', async () => {
-    const { getByTestId, getByText, getByLabelText } = await renderPanel();
+  it('renders collapsible Kind and Era groups with sticky Clear / Done (no Apply)', async () => {
+    const { getByTestId, getByText, getByLabelText, queryByText } = await renderPanel();
 
     expect(getByTestId('explore-filters-panel')).toBeTruthy();
     expect(getByTestId('filter-group-kind')).toBeTruthy();
     expect(getByTestId('filter-group-era')).toBeTruthy();
     expect(getByTestId('explore-filters-actions')).toBeTruthy();
-    expect(getByText('Apply')).toBeTruthy();
+    expect(queryByText('Apply')).toBeNull();
+    expect(getByText('Done')).toBeTruthy();
     expect(getByText('Clear')).toBeTruthy();
     expect(getByLabelText('Kind filters').props.accessibilityState?.expanded).toBe(true);
     expect(getByLabelText('Era filters').props.accessibilityState?.expanded).toBe(true);
@@ -111,10 +113,27 @@ describe('ExploreFiltersPanel — structure', () => {
   });
 
   it('embedded mode renders web-order facet rows including tone and confidence', async () => {
-    const { getByTestId } = await renderPanel({ mode: 'embedded' });
+    const { getByTestId, queryByText } = await renderPanel({ mode: 'embedded' });
     expect(getByTestId('facet-tone')).toBeTruthy();
     expect(getByTestId('facet-confidence')).toBeTruthy();
     expect(getByTestId('facet-state')).toBeTruthy();
+    expect(queryByText('Apply')).toBeNull();
+    expect(queryByText('Done')).toBeNull();
+  });
+
+  it('embedded mode shows an active-filters strip with clear-all when filters are on', async () => {
+    const onClear = jest.fn();
+    const onFiltersChange = jest.fn();
+    const { getByTestId, getByLabelText } = await renderPanel({
+      mode: 'embedded',
+      filters: { kind: 'places', era: '1950s' },
+      onClear,
+      onFiltersChange,
+    });
+    expect(getByTestId('explore-active-filters')).toBeTruthy();
+    expect(getByLabelText(/Active filters:/)).toBeTruthy();
+    await fireEvent.press(getByLabelText('Clear all filters'));
+    expect(onClear).toHaveBeenCalledTimes(1);
   });
 });
 

@@ -4,7 +4,8 @@
  * This is the single checked-in packet source used by Postgres publication and
  * web fallback rendering. Observation values are verified snapshots of
  * bb_reference.statistical_observations. Artifact hashes are SHA-256 digests of
- * bytes fetched directly from the cited source on 2026-07-23.
+ * bytes fetched directly from the cited source (CPS A-1 and BJS NPS refreshes
+ * on 2026-07-24; earlier rows retain their fetch-day hashes).
  */
 import { sha256Json } from '../publication/index.js';
 import {
@@ -16,8 +17,8 @@ import {
 } from './theme-impact-packet.js';
 
 const PACKET_CREATED_AT = '2026-07-22T23:00:00.000Z';
-const PACKET_UPDATED_AT = '2026-07-23T22:30:00.000Z';
-const ARTIFACT_RETRIEVED_AT = '2026-07-23T22:30:00.000Z';
+const PACKET_UPDATED_AT = '2026-07-24T09:45:00.000Z';
+const ARTIFACT_RETRIEVED_AT = '2026-07-24T09:45:00.000Z';
 
 const COOK_COUNTY = 'county:17031';
 const NATION = 'nation:US';
@@ -129,6 +130,38 @@ function derived(input: {
   };
 }
 
+/** EPI chartbook figures: synthesis hashes, not warehouse primary fetches. */
+function epiObservation(input: {
+  readonly metricId: string;
+  readonly estimate: number;
+  readonly unit: string;
+  readonly referencePeriod: string;
+  readonly humanCitation: string;
+  readonly label: string;
+  readonly sourceUrl?: string;
+}): ThemeImpactPacketObservation {
+  const contentHash = sha256Json({
+    source: 'epi-racial-disparities-chartbook',
+    metricId: input.metricId,
+    referencePeriod: input.referencePeriod,
+    estimate: input.estimate,
+    unit: input.unit,
+  }).digest;
+  return observation({
+    metricId: input.metricId,
+    estimate: input.estimate,
+    unit: input.unit,
+    referencePeriod: input.referencePeriod,
+    source: 'epi-racial-disparities-chartbook',
+    sourceUrl: input.sourceUrl ?? EPI_CHARTBOOK_URL,
+    retrievedAt: EPI_RETRIEVED,
+    contentHash,
+    humanCitation: input.humanCitation,
+    label: input.label,
+    jurisdictionId: NATION,
+  });
+}
+
 const ACS_RETRIEVED = '2026-07-22T03:05:50.014Z';
 const ACS_URL = 'https://www.census.gov/programs-surveys/acs';
 const NHGIS_RETRIEVED = '2026-07-22T21:58:00.998Z';
@@ -143,7 +176,20 @@ const SCF_ARTICLE_URL =
 const VERA_RETRIEVED = '2026-07-22T21:03:52.625Z';
 const VERA_URL = 'https://www.vera.org/projects/incarceration-trends';
 const BJS_RETRIEVED = '2026-07-22T21:01:45.256Z';
+const BJS_GAP_RETRIEVED = '2026-07-24T05:02:00.000Z';
 const BJS_URL = 'https://bjs.ojp.gov/data-collection/national-prisoner-statistics-nps';
+const BJS_P23_TABLES_ZIP_URL = 'https://bjs.ojp.gov/document/p23st.zip';
+const BJS_P22_TABLES_ZIP_URL = 'https://bjs.ojp.gov/document/p22st_rev.zip';
+const BJS_P20_TABLES_ZIP_URL = 'https://bjs.ojp.gov/content/pub/sheets/p20st.zip';
+const BJS_P23_PDF_URL = 'https://bjs.ojp.gov/document/p23st.pdf';
+const BJS_TABLE6_CONTENT_HASH =
+  'e9fa9629871269869ed396bab6d79cef9eb4ae7d9be6bd71f9643e1d00a6808b';
+const BJS_P22_STAT01_CONTENT_HASH =
+  '22cd1d9a8a256f752a07e115d56b913dd99554219cad0ee4ce686a48e6c0a4cf';
+const BJS_P20_STAT02_CONTENT_HASH =
+  '7683bf95bd36bfdc983297814143ad70850b8bf48f96a6a5abea132b91d3283b';
+const BJS_P20_ZIP_CONTENT_HASH =
+  'e172bcb106f77d6503ac8721cf85b0980881d6c2a5cc348adedd5f14015fa134';
 const CENSUS_STATE_RACE_DENOMINATOR_URL =
   'https://api.census.gov/data/2023/acs/acs5?get=NAME%2CB03002_003E%2CB03002_004E&for=state%3A%2A';
 const USSC_RETRIEVED = '2026-07-22T21:40:54.731Z';
@@ -151,6 +197,18 @@ const EJI_RETRIEVED = '2026-07-22T22:44:24.642Z';
 const EJI_URL = 'https://www.atsdr.cdc.gov/placeandhealth/eji/eji-data-download.html';
 const TRI_RETRIEVED = '2026-07-22T22:44:24.649Z';
 const TRI_URL = 'https://www.epa.gov/toxics-release-inventory-tri-program';
+const EPI_RETRIEVED = '2026-07-24T04:44:00.000Z';
+const EPI_CHARTBOOK_URL =
+  'https://www.epi.org/anti-racist-policy-research/disparities-chartbook';
+/** SHA-256 of the local text extract of EPI report epi.org/270707 (updated Nov 2024). */
+const EPI_EXTRACT_CONTENT_HASH =
+  '2d1cc9513cb8f759c65739cee47fc99a230f225ba56c71b2b1d83d8b4414e5f6';
+const CPS_A1_RETRIEVED = '2026-07-24T05:02:00.000Z';
+const CPS_A1_URL =
+  'https://www2.census.gov/programs-surveys/cps/tables/time-series/voting-historical-time-series/a1.xlsx';
+/** SHA-256 of Census CPS Historical Reported Voting Rates Table A-1 xlsx (fetched 2026-07-24). */
+const CPS_A1_CONTENT_HASH =
+  'b38d248dfa9e13e41fed0dce1fe3255068bbfc57a379b317f43e709221541d70';
 
 const ACS = {
   blackShare: observation({
@@ -566,30 +624,55 @@ const veraObservations = VERA.map(([period, estimate, contentHash]) =>
 );
 
 const stateJusticeRows = [
-  ['17', 'Illinois', 'black', 940, '61a6f6b849e482d6f1caa2652e20fe28fbb7ec957e07e3d39a6afe69c1e29645'],
-  ['17', 'Illinois', 'white', 129, '1c5f408297c1fca13e9658833723bc9104e0586ffbcb7a561b51e1f2aa2c9406'],
-  ['28', 'Mississippi', 'black', 1095, 'df36cc357d710916558ab49ed2daeafb8ca6174d55a647124629b5513cf4b595'],
-  ['28', 'Mississippi', 'white', 446, '5ec771576eaafb1e4e846d0d6055ccd27728b3952edf9ce74f26d5b4e77dd68c'],
-  ['34', 'New Jersey', 'black', 619, '7b6a80c5110f15668199758eb89ca257289509a870e104cfabd0d1c44857f95a'],
-  ['34', 'New Jersey', 'white', 46, 'ac43fdb05d934232dc92f032b5f1deffcb798ff50b440d72ace4ce60bd457178'],
-  ['55', 'Wisconsin', 'black', 2153, '3437f5960a537fabcc1ac388a5c37608cf6888e39394bf5bfeec25442215bc10'],
-  ['55', 'Wisconsin', 'white', 158, 'be88744207e306f02bde443655407270fc6fc9981cf2ef7b41dda6a75ca137b9'],
+  // 2020 warehouse rates (BJS p20stat02 counts / same 2023 ACS 5-year race denominators)
+  ['17', 'Illinois', 'black', 922, '2020', '8bb583e423a655be0b3776d63a91e8f5ec8c19e9ba327a47cd78e9933323bff2'],
+  ['17', 'Illinois', 'white', 124, '2020', 'f3e6cfbb2705543bfb3272296516d66af52c57e4c0a5cf066159ef8955a358e6'],
+  ['28', 'Mississippi', 'black', 1010, '2020', '515ae4895d60d368970a3247d6ddf554c08061a998c79f8876c7d8f503ce44fd'],
+  ['28', 'Mississippi', 'white', 388, '2020', 'bf963da1bfa26100d02081bb3c88942eea43beeff6f7cd312bb1711b2aaa9505'],
+  ['34', 'New Jersey', 'black', 682, '2020', '4742a6e40c481e78cc7ccacab42a7ca640eb7ecdb3b54910a9b6a2e0b79408b0'],
+  ['34', 'New Jersey', 'white', 54, '2020', '7e43b3b444fe7e5b65ff71eebadd974e04ba8d86403da677542eee4e57e66a0a'],
+  ['55', 'Wisconsin', 'black', 2412, '2020', '437be4ff5ab6d294d90c8f1b34fad8dfb5215be65ffaf854bc1961a5810e6a39'],
+  ['55', 'Wisconsin', 'white', 190, '2020', 'b21c48e5a3474d4cf8e1cea2aba404de4114777a0d6d606618d463efef9f474b'],
+  // 2022 warehouse rates (BJS p22stat01 counts / same 2023 ACS 5-year denominators)
+  ['17', 'Illinois', 'black', 929, '2022', '9cd9b4abb183e15182bcd84fe46aeff6c2ea343385cf56c2b9b3a1401ef53bb6'],
+  ['17', 'Illinois', 'white', 130, '2022', 'b87ed0554e7529a2282f6b3d6af385f7b79d2ece66e184f2a6da0c99fdb567ac'],
+  ['28', 'Mississippi', 'black', 1076, '2022', '0543e87beea2f5882ff46d7e21cc50cba8339445b3f484322f866969818a3672'],
+  ['28', 'Mississippi', 'white', 476, '2022', 'a329b0ad9047d8c94e8135aeb803d61bf7fae732d8d31bf3ec09b51575032f1e'],
+  ['34', 'New Jersey', 'black', 679, '2022', '7ac61df812a84a5ff569a4ce6caad03d932fec5f8939a0c5a9a88f55d9d50255'],
+  ['34', 'New Jersey', 'white', 60, '2022', 'f26d18ac76b008857622beab9e59d34ff0488ac7944b1e09139f41564534dc01'],
+  ['55', 'Wisconsin', 'black', 2347, '2022', 'f2f9827a6cca07be7c2ca79454daa7b9706c39eb9ffacd19515de5ff4f9157fc'],
+  ['55', 'Wisconsin', 'white', 196, '2022', 'b1a36aa03cf6a3b7ffffce2e21816030493e405dc653de376fee714080700b9b'],
+  // 2023 warehouse rates (BJS p23stat01 counts / 2023 ACS 5-year race denominators)
+  ['17', 'Illinois', 'black', 940, '2023', '61a6f6b849e482d6f1caa2652e20fe28fbb7ec957e07e3d39a6afe69c1e29645'],
+  ['17', 'Illinois', 'white', 129, '2023', '1c5f408297c1fca13e9658833723bc9104e0586ffbcb7a561b51e1f2aa2c9406'],
+  ['28', 'Mississippi', 'black', 1095, '2023', 'df36cc357d710916558ab49ed2daeafb8ca6174d55a647124629b5513cf4b595'],
+  ['28', 'Mississippi', 'white', 446, '2023', '5ec771576eaafb1e4e846d0d6055ccd27728b3952edf9ce74f26d5b4e77dd68c'],
+  ['34', 'New Jersey', 'black', 619, '2023', '7b6a80c5110f15668199758eb89ca257289509a870e104cfabd0d1c44857f95a'],
+  ['34', 'New Jersey', 'white', 46, '2023', 'ac43fdb05d934232dc92f032b5f1deffcb798ff50b440d72ace4ce60bd457178'],
+  ['55', 'Wisconsin', 'black', 2153, '2023', '3437f5960a537fabcc1ac388a5c37608cf6888e39394bf5bfeec25442215bc10'],
+  ['55', 'Wisconsin', 'white', 158, '2023', 'be88744207e306f02bde443655407270fc6fc9981cf2ef7b41dda6a75ca137b9'],
 ] as const;
 
 const stateJusticeObservations = stateJusticeRows.map(
-  ([fips, state, race, estimate, contentHash]) =>
+  ([fips, state, race, estimate, period, contentHash]) =>
     observation({
       metricId: `imprisonment-rate-${race}-state`,
       jurisdictionId: `state:${fips}`,
       estimate,
       unit: 'per_100k',
-      referencePeriod: '2023',
+      referencePeriod: period,
       source: 'bjs-national-prisoner-statistics',
       sourceUrl: BJS_URL,
-      retrievedAt: BJS_RETRIEVED,
+      retrievedAt: period === '2023' ? BJS_RETRIEVED : BJS_GAP_RETRIEVED,
       contentHash,
-      humanCitation: `Bureau of Justice Statistics National Prisoner Statistics Appendix table 1 counts with 2023 ACS 5-year race denominator, ${state} ${race === 'black' ? 'Black' : 'White non-Hispanic'} adult imprisonment rate, 2023.`,
-      label: `${state} ${race === 'black' ? 'Black' : 'White'} imprisonment rate`,
+      humanCitation: `Bureau of Justice Statistics National Prisoner Statistics ${
+        period === '2020'
+          ? 'Appendix table 2 counts (Prisoners in 2020)'
+          : period === '2022'
+            ? 'Appendix table 1 counts (Prisoners in 2022)'
+            : 'Appendix table 1 counts (Prisoners in 2023)'
+      } with 2023 ACS 5-year race denominator, ${state} ${race === 'black' ? 'Black' : 'White non-Hispanic'} adult imprisonment rate, ${period}.`,
+      label: `${state} ${race === 'black' ? 'Black' : 'White'} imprisonment rate (warehouse ACS denominator)`,
     }),
 );
 
@@ -714,12 +797,26 @@ const q6Derived = [
     unit: 'ratio',
     formula: 'Illinois Black imprisonment rate divided by Illinois White imprisonment rate',
     inputObservationIds: stateJusticeObservations
-      .filter((row) => row.observationId.includes('state:17'))
+      .filter((row) => row.observationId.includes('state:17:2023'))
       .map((row) => row.observationId),
-    label: 'Illinois Black-to-White imprisonment-rate ratio',
+    label: 'Illinois Black-to-White imprisonment-rate ratio, 2023',
     sourceUrl: BJS_URL,
     humanCitation:
-      'Derived from BJS NPS Appendix table 1 prisoner counts and 2023 ACS 5-year race denominators for Illinois.',
+      'Derived from BJS NPS Appendix table 1 prisoner counts and 2023 ACS 5-year race denominators for Illinois, 2023.',
+  }),
+  derived({
+    derivedId: 'der_il_black_white_imprisonment_ratio_2022',
+    methodId: 'black_white_imprisonment_ratio',
+    value: 7.15,
+    unit: 'ratio',
+    formula: 'Illinois Black imprisonment rate divided by Illinois White imprisonment rate',
+    inputObservationIds: stateJusticeObservations
+      .filter((row) => row.observationId.includes('state:17:2022'))
+      .map((row) => row.observationId),
+    label: 'Illinois Black-to-White imprisonment-rate ratio, 2022',
+    sourceUrl: BJS_URL,
+    humanCitation:
+      'Derived from BJS NPS Appendix table 1 prisoner counts (Prisoners in 2022) and 2023 ACS 5-year race denominators for Illinois, 2022.',
   }),
   derived({
     derivedId: 'der_cook_jail_rate_change_1970_2000',
@@ -784,25 +881,27 @@ const stateCohortObservationIds = STATE_FIPS.flatMap((fips) => [
 ]);
 
 const q8Derived = [
-  ...(['17', '28', '34', '55'] as const).map((fips) => {
-    const pair = stateJusticeObservations.filter((row) =>
-      row.observationId.includes(`state:${fips}:`),
-    );
-    const black = pair.find((row) => row.metricId === 'imprisonment-rate-black-state')!;
-    const white = pair.find((row) => row.metricId === 'imprisonment-rate-white-state')!;
-    const state = stateJusticeRows.find((row) => row[0] === fips)![1];
-    return derived({
-      derivedId: `der_state_${fips}_black_white_imprisonment_ratio_2023`,
-      methodId: 'black_white_imprisonment_ratio',
-      value: Number((black.estimate / white.estimate).toFixed(2)),
-      unit: 'ratio',
-      formula: 'Black imprisonment rate divided by White imprisonment rate',
-      inputObservationIds: pair.map((row) => row.observationId),
-      label: `${state} Black-to-White imprisonment-rate ratio`,
-      sourceUrl: BJS_URL,
-      humanCitation: `Derived from BJS NPS Appendix table 1 prisoner counts and 2023 ACS 5-year race denominators, ${state}.`,
-    });
-  }),
+  ...(['17', '28', '34', '55'] as const).flatMap((fips) =>
+    (['2020', '2022', '2023'] as const).map((period) => {
+      const pair = stateJusticeObservations.filter((row) =>
+        row.observationId.includes(`state:${fips}:${period}`),
+      );
+      const black = pair.find((row) => row.metricId === 'imprisonment-rate-black-state')!;
+      const white = pair.find((row) => row.metricId === 'imprisonment-rate-white-state')!;
+      const state = stateJusticeRows.find((row) => row[0] === fips)![1];
+      return derived({
+        derivedId: `der_state_${fips}_black_white_imprisonment_ratio_${period}`,
+        methodId: 'black_white_imprisonment_ratio',
+        value: Number((black.estimate / white.estimate).toFixed(2)),
+        unit: 'ratio',
+        formula: 'Black imprisonment rate divided by White imprisonment rate',
+        inputObservationIds: pair.map((row) => row.observationId),
+        label: `${state} Black-to-White imprisonment-rate ratio, ${period} (warehouse)`,
+        sourceUrl: BJS_URL,
+        humanCitation: `Derived from BJS NPS appendix prisoner counts and 2023 ACS 5-year race denominators, ${state}, ${period}.`,
+      });
+    }),
+  ),
   derived({
     derivedId: 'der_state_imprisonment_ratio_median_2023',
     methodId: 'cohort_median_black_white_imprisonment_ratio',
@@ -1072,29 +1171,261 @@ const ENVIRONMENTAL_ARTIFACTS = [
   }),
 ] as const;
 
+const EPI_CHARTBOOK_ARTIFACT = artifact({
+  artifactId: 'art_epi_racial_disparities_chartbook_2024',
+  artifactClass: 'peer_reviewed_synthesis',
+  title: 'Racial and ethnic disparities in the United States: an interactive chartbook',
+  citation:
+    'Economic Policy Institute, “Racial and ethnic disparities in the United States: An interactive chartbook,” report epi.org/270707 (June 15, 2022; updated November 2024).',
+  source: 'economic-policy-institute',
+  sourceUrl: EPI_CHARTBOOK_URL,
+  contentHash: EPI_EXTRACT_CONTENT_HASH,
+  dated: '2024-11',
+  summary:
+    'Peer-reviewed synthesis that places Census, BJS, CPS, ACS, and SCF primary series in one national chartbook. BlackStory treats EPI figures as synthesis pointing at those primaries, not as a substitute for warehouse ingest.',
+  uncertaintyLabel:
+    'Chart endpoints and published narrative figures only. Prefer the cited federal primary tables (CPS A-1; BJS Prisoners Table 6) for year-by-year instruments.',
+});
+
+const CPS_A1_ARTIFACT = artifact({
+  artifactId: 'art_census_cps_a1_voting_historical',
+  artifactClass: 'primary_government_document',
+  title: 'CPS Historical Reported Voting Rates, Table A-1',
+  citation:
+    'U.S. Census Bureau, Current Population Survey, Historical Reported Voting Rates, Table A-1: Reported Voting and Registration by Race, Hispanic Origin, Sex, and Age Groups, November 1964 to 2020.',
+  source: 'us-census-cps',
+  sourceUrl: CPS_A1_URL,
+  contentHash: CPS_A1_CONTENT_HASH,
+  dated: '1964-2020',
+  summary:
+    'Primary national turnout series by race and Hispanic origin. BlackStory uses citizen-population rates for presidential years. The published workbook ends at 2020; 2024 is not in this file.',
+});
+
+const BJS_TABLE6_ARTIFACT = artifact({
+  artifactId: 'art_bjs_prisoners_2023_table6_adult_rates',
+  artifactClass: 'primary_government_document',
+  title: 'Prisoners in 2023, Table 6: adult imprisonment rates by race',
+  citation:
+    'Derek Mueller and Rich Kluckow, Prisoners in 2023: Statistical Tables, Bureau of Justice Statistics, Table 6 (adult U.S. residents; NCJ 310197).',
+  source: 'bureau-of-justice-statistics',
+  sourceUrl: BJS_P23_TABLES_ZIP_URL,
+  contentHash: BJS_TABLE6_CONTENT_HASH,
+  dated: '2013-2023',
+  summary:
+    'BJS-published national adult imprisonment rates per 100,000 by race and Hispanic origin. Distinct from warehouse state rates that divide Appendix table 1 counts by ACS denominators.',
+});
+
+/** BJS Prisoners in 2023 Table 6 adult rates (primary). 2022 Black/White/Hispanic match EPI Chart 7. */
+const BJS_NATIONAL_ADULT_RATES = [
+  // year, black, white, hispanic, blackHash, whiteHash, hispanicHash
+  [2013, 1818, 295, 935, '37caa9a8e4cc1c7e871b3701124d247ae262222d896c573da770340224806fbb', 'cb5a2de335079a4a91c4c06d1ea57f567bc9324b6a47e6503173ae86be68ef14', '0d8cb40edfb67c8b2367d2cf0e85f9abffa7de65751c1c27c2fea0f511af1ab2'],
+  [2014, 1749, 290, 903, '4138dee7ea3e820c54bbadcef4b6f492c22a248b0fbf39cbedc474a5f6d8e1e0', '3d060b2d486c19cf4d57241077566048208630fd76d9edf4ac688255deeeb538', '94b6fef341fb21c5fc73c2fac5bb037b8fe3d31f44c5455291e652218376bbd0'],
+  [2015, 1659, 281, 871, 'e948d931faa83262e3594ad986994778951bd4c64b4a0fe77a86effc0bd74ea6', '0b3c3c05145b559f05c978f29b8991200ec01b864b6ebbf5b06f03b6a5399bdc', 'c6f86996de9c7eea41c977582104b5852080a318bb81762eccc8bffeb7e2b09a'],
+  [2016, 1599, 275, 866, 'a8f05db34cdf9c262735dfda52eb86a762b9e3bfb39d90c03cc07220c4e4a41b', '43133f1a16d73c3efd998d3430763a4fa83e458f4d280977fa952e02de8d8f6e', '954cd78073bb5972b31524293f5986ac8d982f3cb160d2ff676068a2fb6253f0'],
+  [2017, 1543, 272, 837, '2d48e847ebe406c7c36b73185619ca56db31f145b2e8664ae921c316499cc0c0', '5c9edcb273d54a9ba96354da648f2eb48b201469ed580d5c3ef4b97d3b656775', '79eeb1ce466f836172ee5597656b682541ce877b89bdf0ebc06f23a449724fac'],
+  [2018, 1488, 268, 804, '77eab1a0e4559e5f8c280a5a574cbe6cdae6948571683aa3ec67b7f2ee2655d3', '9f75deb7429e8b44734bf3bb90a3a60ddfed11bc965a2b1d89d75aadeb18dc02', 'a2360940a31544ce644904e75573bea8e487f61c0471a7c43439a60afa0ee5fa'],
+  [2019, 1436, 263, 763, '123b913b67e6008ba9ea0f9b9c08f74201f09ee92d1a39e44d768ac58abe17b9', 'a36e9b06055152b959d3e4e676b29dffac5a43b8fd3a182ff5b54781c37ca617', 'edc37f44a998a449820a31c56d179442e80444db92769d78c66991e61c0283de'],
+  [2020, 1238, 224, 641, 'a30ab89f78dc58899eec2ad19aef158b74290afbb4a6f337a0347d2ca68673ce', '42fca7dade873aa7327710e1a132d2b500a85d07008e5dc8521cb1fb23edf7a2', '11d1b560445adf6bb0b33808f7e2c03b7deccd649465ed829f02fb8ca32c7870'],
+  [2021, 1186, 222, 619, '6d7528da06f1a37d8393e9446ec915fcdbb88fd0227be9c86f63e1c38ddd010e', 'a8074fc571d67b9f8ecad0f84d432d614af1d99c50f1593a478c07845585e197', 'a2e8d9996924a6b7f463c0b1f9ea3554c386b8aa0d4454fe2fd11313b0c4328b'],
+  [2022, 1196, 229, 603, 'd1a644461612c6bf3d7a2b550d1ba923644bba06f9afc130bc001dd6ecb7f8ac', '0f37ff3d59b4f20495d5ab6063d44dcc77b50a75eab00912f7b82f4cdde508cf', 'c372edf13c416203874d831d49b5eff2ece086ee21703e37bfdecc083f5a8431'],
+  [2023, 1218, 231, 606, '0308a7af54fa221f222823d91bcbc1ca334588ee193feec8f29aab2450882312', '2d8dc393d493150263bb6f78047d9414e4b60f82e83e36ade684562595fa6151', '3cbf449fa985ea8f23b560a2548650a4018758cba51bb4471c0295fa1f8b3f2f'],
+] as const;
+
+const bjsImprisonmentNational = BJS_NATIONAL_ADULT_RATES.flatMap(
+  ([year, black, white, hispanic, blackHash, whiteHash, hispanicHash]) => {
+    const period = String(year);
+    return [
+      observation({
+        metricId: 'bjs-imprisonment-rate-black-nation',
+        estimate: black,
+        unit: 'per_100k',
+        referencePeriod: period,
+        source: 'bjs-national-prisoner-statistics',
+        sourceUrl: BJS_P23_TABLES_ZIP_URL,
+        retrievedAt: BJS_GAP_RETRIEVED,
+        contentHash: blackHash,
+        humanCitation: `Bureau of Justice Statistics, Prisoners in 2023 Statistical Tables, Table 6: Black adult imprisonment rate per 100,000 adult U.S. residents, ${year}.`,
+        label: 'Black imprisonment rate, United States (BJS-published)',
+        jurisdictionId: NATION,
+      }),
+      observation({
+        metricId: 'bjs-imprisonment-rate-white-nation',
+        estimate: white,
+        unit: 'per_100k',
+        referencePeriod: period,
+        source: 'bjs-national-prisoner-statistics',
+        sourceUrl: BJS_P23_TABLES_ZIP_URL,
+        retrievedAt: BJS_GAP_RETRIEVED,
+        contentHash: whiteHash,
+        humanCitation: `Bureau of Justice Statistics, Prisoners in 2023 Statistical Tables, Table 6: White non-Hispanic adult imprisonment rate per 100,000 adult U.S. residents, ${year}.`,
+        label: 'White imprisonment rate, United States (BJS-published)',
+        jurisdictionId: NATION,
+      }),
+      observation({
+        metricId: 'bjs-imprisonment-rate-hispanic-nation',
+        estimate: hispanic,
+        unit: 'per_100k',
+        referencePeriod: period,
+        source: 'bjs-national-prisoner-statistics',
+        sourceUrl: BJS_P23_TABLES_ZIP_URL,
+        retrievedAt: BJS_GAP_RETRIEVED,
+        contentHash: hispanicHash,
+        humanCitation: `Bureau of Justice Statistics, Prisoners in 2023 Statistical Tables, Table 6: Hispanic adult imprisonment rate per 100,000 adult U.S. residents, ${year}.`,
+        label: 'Hispanic imprisonment rate, United States (BJS-published)',
+        jurisdictionId: NATION,
+      }),
+    ];
+  },
+);
+
+/** Census CPS A-1 citizen turnout (%), presidential years 1992–2020. White = White non-Hispanic. */
+const CPS_A1_PRESIDENTIAL = [
+  // year, black, whiteNH, hispanic, asian, hashes...
+  [1992, 59.2, 70.2, 51.6, 53.9, '02d0a95778c805979949f4ac83f245f6e0d88069a826b47926584476a28ffabe', '04d18675fdf06cbfe803166e13aacef42f4e738f1e39b6bb6c070e0da4c85c52', 'e306d56e190f2dd941caa71646f14360488b5370774f5c07f85246d89778902b', 'e64d4827428ee547c72e578725c6ef5818e521407801bcc96d2b742bde79fa2c'],
+  [1996, 53.0, 60.7, 44.0, 45.0, 'f09f4020ca34bece79815e6cbc127289fdff754eb996c8e11966aa6cb2a9d690', '3b2b01c5c66290df07e412d0035d8e373a2d5260af51206d84704cd2e218a202', '406b15ba969452f37ba9a7e8f9c82de4f9219b6cf8eaf06f24fafc91e4e48703', 'f5b9562ac636c0185a5b3868a81bef1c827d294a0127cdda513a2a66b206897c'],
+  [2000, 56.8, 61.8, 45.1, 43.3, 'c103b1b7a726cc2d038710174c8568b4356c789272f98648e5efd2eff8fa6731', 'fcb19abc1b56f288dedcadd75b319eef6919a61bf820ba7902cf07b9d4c1fd73', 'fdd76d20de2693067834556e018f5efe9f6746cb7d1b2b0186e76a0a1945cb23', '65cac39941cd5f8504a48d67f995018e003f270e9a296dbbc20c0a19de460508'],
+  [2004, 60.0, 67.2, 47.2, 44.2, '7dbc2d3bd14bb7d8c759f7e1cbb7e1da42379201b565825093746d8c449e574e', '339b0e3546637124927cfe2caadea910e71add5b841eefe8ba0107dc43797c80', '1168b62873a6a485ffa1a82c0d939b567645c69a36bee6b7e07c9ae711bda292', '8598432504327e79a07de142e95399e5717237938a7e1ecd323faa1a59aea9e3'],
+  [2008, 64.7, 66.1, 49.9, 47.6, '1bbc31be07477a0e787b040f3d3ae5504eb3a1a273213737e037aa72d4aea523', '37a9a53305fb00b9b685acc25fcfb91007611e1d7aa9b1a27a4957d463389cea', '25037e99457a615a4add2ad4e72bedd70bbe830cfa2538adffded7f0ba36d415', 'a2fcbbb6c9a5b1533149775333d6b8655e25899980e154841871665908338dc4'],
+  [2012, 66.2, 64.1, 48.0, 47.3, 'cfd38664b30a2ff9a092eb0ff81ddca648ac59ea50ddfb4a171ac2fd5da6cae4', '2b94cbe3461cdad3b0333f70d49558b7974382f737a8cb32d8870191c5071c14', '3614a04b6a5524d3482686dd608818ff2c3211d75d408bada8a6764cd8e452cf', '429cda4496eaa3dcbc9434a4cdc3edd6c9ecff8ac722294ca874c56ecb3d683d'],
+  [2016, 59.4, 65.3, 47.6, 49.0, 'd84f56503748479609de3fe64ba7fb3d37d1e138f160539512c01d9cc990b522', 'd071d16f9c91dee5b4d31ca485cc9edb3540314effd0540c9cd8bd3d4ae83ecb', '88fefb7b2cf525e3c0a88c994be00686b3cc9bbf3b29b435f0f9bbe3e513b574', 'b2d63e71d4ace94562c6cf24fa35f5d4729b9e08917c2b4e45385f9d6ba94dd9'],
+  [2020, 62.6, 70.9, 53.7, 59.7, '76dafb0261024085bc19c94e8977fa4f0ab4732a2f53fc73edd50b532d6a66ca', 'e082174da004a7bc77f4b17f8801328a8de506d8653e19f828501be6062b7268', '9b591376ee91b70826661884394d65667d585c8fe717463a89fc6de09cbce3a3', 'f22e78b03290407f72d75cb9ac8dcdf315efb83b813cbada5d74417dc2b56f9e'],
+] as const;
+
+const cpsTurnoutNational = CPS_A1_PRESIDENTIAL.flatMap(
+  ([year, black, white, hispanic, asian, blackHash, whiteHash, hispanicHash, asianHash]) => {
+    const period = String(year);
+    const raceRows = [
+      ['black', black, blackHash, 'Black', 'Black'],
+      ['white', white, whiteHash, 'White non-Hispanic', 'White non-Hispanic'],
+      ['hispanic', hispanic, hispanicHash, 'Hispanic', 'Hispanic'],
+      ['asian', asian, asianHash, 'Asian', 'Asian'],
+    ] as const;
+    return raceRows.map(([race, estimate, contentHash, citeLabel, labelPrefix]) =>
+      observation({
+        metricId: `cps-a1-turnout-${race}-nation`,
+        estimate,
+        unit: 'percent',
+        referencePeriod: period,
+        source: 'us-census-cps',
+        sourceUrl: CPS_A1_URL,
+        retrievedAt: CPS_A1_RETRIEVED,
+        contentHash,
+        humanCitation: `U.S. Census Bureau, CPS Historical Reported Voting Rates, Table A-1: ${citeLabel} citizen voter turnout, ${year} presidential election.`,
+        label: `${labelPrefix} voter turnout, United States`,
+        jurisdictionId: NATION,
+      }),
+    );
+  },
+);
+
+const epiEducationNational = [
+  epiObservation({
+    metricId: 'acs-ba-plus-share-black-men-nation',
+    estimate: 30.5,
+    unit: 'percent',
+    referencePeriod: '2023',
+    humanCitation:
+      'EPI Racial Disparities Chartbook Chart 5 (ACS 2023): bachelor’s or advanced degree share among Black men aged 25+, United States (college 22.1% + advanced 8.4%).',
+    label: 'Black men with bachelor’s or higher, United States',
+  }),
+  epiObservation({
+    metricId: 'acs-ba-plus-share-white-men-nation',
+    estimate: 47.6,
+    unit: 'percent',
+    referencePeriod: '2023',
+    humanCitation:
+      'EPI Racial Disparities Chartbook Chart 5 (ACS 2023): bachelor’s or advanced degree share among White men aged 25+, United States (college 32.6% + advanced 15.0%).',
+    label: 'White men with bachelor’s or higher, United States',
+  }),
+] as const;
+
+const bjsBlack2013 = bjsImprisonmentNational.find(
+  (row) =>
+    row.metricId === 'bjs-imprisonment-rate-black-nation' && row.referencePeriod === '2013',
+)!;
+const bjsWhite2013 = bjsImprisonmentNational.find(
+  (row) =>
+    row.metricId === 'bjs-imprisonment-rate-white-nation' && row.referencePeriod === '2013',
+)!;
+const bjsBlack2022 = bjsImprisonmentNational.find(
+  (row) =>
+    row.metricId === 'bjs-imprisonment-rate-black-nation' && row.referencePeriod === '2022',
+)!;
+const bjsWhite2022 = bjsImprisonmentNational.find(
+  (row) =>
+    row.metricId === 'bjs-imprisonment-rate-white-nation' && row.referencePeriod === '2022',
+)!;
+const bjsBlack2023 = bjsImprisonmentNational.find(
+  (row) =>
+    row.metricId === 'bjs-imprisonment-rate-black-nation' && row.referencePeriod === '2023',
+)!;
+const bjsWhite2023 = bjsImprisonmentNational.find(
+  (row) =>
+    row.metricId === 'bjs-imprisonment-rate-white-nation' && row.referencePeriod === '2023',
+)!;
+
+const bjsNationalImprisonmentDerived = [
+  derived({
+    derivedId: 'der_bjs_black_white_imprisonment_ratio_2013',
+    methodId: 'black_white_imprisonment_rate_ratio',
+    value: Number((bjsBlack2013.estimate / bjsWhite2013.estimate).toFixed(2)),
+    unit: 'ratio',
+    formula: 'Black national imprisonment rate divided by White national imprisonment rate',
+    inputObservationIds: [bjsBlack2013.observationId, bjsWhite2013.observationId],
+    label: 'Black-to-White national imprisonment-rate ratio, 2013 (BJS-published)',
+    sourceUrl: BJS_P23_TABLES_ZIP_URL,
+    humanCitation:
+      'Derived from BJS Prisoners in 2023 Table 6 adult imprisonment rates, 2013.',
+  }),
+  derived({
+    derivedId: 'der_bjs_black_white_imprisonment_ratio_2022',
+    methodId: 'black_white_imprisonment_rate_ratio',
+    value: Number((bjsBlack2022.estimate / bjsWhite2022.estimate).toFixed(2)),
+    unit: 'ratio',
+    formula: 'Black national imprisonment rate divided by White national imprisonment rate',
+    inputObservationIds: [bjsBlack2022.observationId, bjsWhite2022.observationId],
+    label: 'Black-to-White national imprisonment-rate ratio, 2022 (BJS-published)',
+    sourceUrl: BJS_P23_TABLES_ZIP_URL,
+    humanCitation:
+      'Derived from BJS Prisoners in 2023 Table 6 adult imprisonment rates, 2022.',
+  }),
+  derived({
+    derivedId: 'der_bjs_black_white_imprisonment_ratio_2023',
+    methodId: 'black_white_imprisonment_rate_ratio',
+    value: Number((bjsBlack2023.estimate / bjsWhite2023.estimate).toFixed(2)),
+    unit: 'ratio',
+    formula: 'Black national imprisonment rate divided by White national imprisonment rate',
+    inputObservationIds: [bjsBlack2023.observationId, bjsWhite2023.observationId],
+    label: 'Black-to-White national imprisonment-rate ratio, 2023 (BJS-published)',
+    sourceUrl: BJS_P23_TABLES_ZIP_URL,
+    humanCitation:
+      'Derived from BJS Prisoners in 2023 Table 6 adult imprisonment rates, 2023.',
+  }),
+] as const;
+
 const METHOD_REDLINE =
-  'Chicago and Cook County are an example reading of a national housing-credit system. Historical artifacts and later indicators are connected by place and policy era. They are not treated as proof that one map or program alone caused every later disparity.';
+  'Housing, credit, income, and wealth series sit beside the segregation record with geography and period labeled. Co-movement is not proof that a 1930s Home Owners\' Loan Corporation sheet caused each later gap. Where NHGIS tenure ends in 2010 and American Community Survey homeownership resumes for 2020–2024, the arc names that catalog seam rather than splicing methods silently.';
 const METHOD_REDLINE_CAUSAL =
-  'Gated causal claim for the federal HOLC/FHA underwriting system enabling durable residential segregation. Named secondary consensus: Richard Rothstein, The Color of Law (2017); Douglas S. Massey and Nancy A. Denton, American Apartheid (1993); Banaji, Fiske, and Massey (2021). Chicago is the example metro for reading that national pattern. Contested map-only shortcuts remain outside this claim.';
+  'Gated causal claim: the federal Home Owners\' Loan Corporation and Federal Housing Administration underwriting system enabled durable residential segregation. Named secondary consensus: Richard Rothstein, The Color of Law (2017); Douglas S. Massey and Nancy A. Denton, American Apartheid (1993); Banaji, Fiske, and Massey (2021). Map-only shortcuts stay outside the claim. Later American Community Survey, Home Mortgage Disclosure Act, HUD CHAS, and Survey of Consumer Finances readings remain juxtaposition.';
 const METHOD_JUSTICE =
-  'Statutes, jail trends, sentencing data, and imprisonment rates describe different systems and geographic scales. They are juxtaposed, not combined into a single causal estimate. State imprisonment rates divide BJS year-end prisoner counts by 2023 ACS 5-year non-Hispanic race estimates because the aligned PEP query returned no rows; treat the exact ratios as descriptive warehouse estimates, not BJS-published rates.';
+  'Statutes, jail trends, sentencing data, and imprisonment rates describe different systems and scales. They are juxtaposed, not combined into one causal estimate. Two labeled instruments stay apart: BJS Prisoners Table 6 publishes national adult rates for 2013–2023; a warehouse state spine divides BJS year-end prisoner counts (2020, 2022, 2023) by fixed 2023 ACS 5-year non-Hispanic race denominators because the aligned PEP query returned no rows. Those warehouse ratios are descriptive estimates and are never silently merged into the BJS-published national line.';
 const METHOD_URBAN_RENEWAL =
-  'Federal project records and county demographic series are read together for context. County trends cannot identify neighborhood-level displacement effects, and missing project fields remain unknown.';
+  'Federal project records and county demographic series are read together for context. County trends cannot identify neighborhood-level displacement, and missing project fields remain unknown. NHGIS Black population share (1970–2010) and the ACS 2020–2024 share form one county spine with an explicit catalog handoff in the beat.';
 const METHOD_ENVIRONMENT =
-  'This is an ecological, county-level descriptive comparison. EJI, TRI counts, and population share measure different constructs; none is an individual exposure or causal estimate.';
+  'Ecological, county-level descriptive comparison. CDC EJI environmental-burden scores, EPA TRI facility counts, and ACS Black population share measure different constructs; none is an individual exposure or a causal estimate.';
 const METHOD_SCHOOL =
-  'Cook County is an example metro for reading how residential segregation sits beside later attainment. School-finance and CRDC discipline series are not yet loaded; desegregation artifacts supply the policy timeline. Juxtaposition is not causation.';
+  'Residential segregation sits beside attainment and the desegregation record. Cook County is one metro reading; EPI Chart 5 (ACS 2023) supplies national BA+ context for men aged 25+. School-finance and CRDC discipline series are not yet loaded, so the arc writes through that missing classroom segment without inventing rates. Juxtaposition is not causation.';
 const METHOD_VOTING =
-  'Franchise artifacts tell a national enforcement story. Chicago appears as a northern-city example of Great Migration politics, not as a complete turnout series. MIT Election Lab and Voting Rights Lab indicators remain gap-labeled until ingest.';
+  'Franchise statutes supply the enforcement timeline. Census CPS Historical Reported Voting Rates Table A-1 is the continuous national citizen-turnout spine for presidential years 1992 through 2020; the published workbook ends at 2020, and that endpoint is named in the beat. State voting-policy indexes (Voting Rights Lab; MIT Election Lab returns) remain cite-first until redistribution terms allow warehouse load.';
 
 export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
   buildThemeImpactPacket({
     id: 'tip_chicago_redlining_q1',
     questionId: 'Q1',
     themeId: 'redlining',
-    title: 'How a color line became federal credit policy',
+    title: 'Before the maps: a color line walked into federal credit',
     summary:
-      'Start with people under pressure: Great Migration arrivals on Chicago’s South Side met covenants, blockbusting, and the 1919 race riot before any HOLC map existed. Private real-estate rules then met New Deal credit. HOLC surveyors encoded race and neighborhood risk; FHA underwriting rewarded same-race occupancy and restrictive covenants. Banaji, Fiske, and Massey treat that federal underwriting system as part of a national segregation machine. Scholarship still disagrees about how directly HOLC maps alone steered every loan, so the gated claim here is about the wider HOLC/FHA system, not a map-only shortcut. Chicago is the example city for reading the pattern.',
+      'On July 27, 1919, Eugene Williams drifted across an invisible line in Lake Michigan near 29th Street Beach. White rock throwers chased him; he drowned. For a week after, mobs burned through Chicago\'s South Side and the [[ent_chicago_race_riot_1919_001|Chicago Race Riot of 1919]] made the color line physical long before anyone unrolled a Home Owners\' Loan Corporation sheet. Great Migration families arriving on the South Side had already met private covenants and blockbusting. New Deal credit then made those rules federal. The [[ent_law_home_owners_loan_act_1933|Home Owners\' Loan Act of 1933]] created the Corporation that later graded neighborhoods; surveyors put race into the risk language of those sheets. The [[ent_law_national_housing_act_1934|National Housing Act of 1934]] created the Federal Housing Administration, whose underwriting manual rewarded same-race occupancy and restrictive covenants. Rothstein, Massey and Denton, Banaji, Fiske and Massey: the gated claim is about that underwriting system as a national machine, not one map causing every later loan. Chicago is the classroom where we learn to read the pattern. Sources: National Archives Record Group 195; Federal Housing Administration Underwriting Manual (1938); Rothstein (2017); Massey and Denton (1993); Banaji, Fiske, and Massey (2021).',
     policyEras: ['holc_fha', 'fair_housing', 'cra_contemporary'],
     geography: {
       geographyType: 'nation',
@@ -1126,9 +1457,9 @@ export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
     id: 'tip_chicago_redlining_q2',
     questionId: 'Q2',
     themeId: 'redlining',
-    title: 'What the Chicago HOLC inventory can and cannot count',
+    title: 'Spread the Chicago sheets: most of the city is C or D',
     summary:
-      'On the example city’s maps, a direct recount yields 703 Chicago features: 683 normalized A–D grades (A 49, B 160, C 327, D 147) plus 20 ungraded commercial or industrial features. Area descriptions document racialized appraisal in plain language. The inventory still cannot name how many Black Chicagoans lived inside each grade. That population-by-grade gap is why the story moves from maps to people carefully.',
+      'Spread the Chicago sheets across a kitchen table. A direct recount of the Chicago Home Owners\' Loan Corporation inventory yields 703 features: 683 normalized A–D grades (A 49, B 160, C 327, D 147) plus 20 ungraded commercial or industrial features. Read the area descriptions beside the colors and you hear race named as risk. What the polygons will not give you is how many Black Chicagoans lived inside each grade. That missing count is why we refuse to pretend a polygon is a census. Sources: Mapping Inequality Chicago extract (University of Richmond DSL); National Archives Record Group 195; Hillier (2003).',
     policyEras: ['holc_fha'],
     geography: {
       geographyType: 'city',
@@ -1152,15 +1483,15 @@ export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
     id: 'tip_chicago_redlining_q3',
     questionId: 'Q3',
     themeId: 'redlining',
-    title: 'After the maps: housing, credit, income, and wealth',
+    title: 'After credit learned the color line: ownership, denial, burden, wealth',
     summary:
-      'Follow the same example county forward. Cook County’s Black homeownership rate rose from 37.1% in 1990 to 42.0% in 2000 and was 41.2% in 2010; the White rate stayed about 25 to 27 points higher. In 2023 HMDA aggregates show a 16.9-point Black–White denial-rate gap. HUD CHAS shows a 29.5-point cost-burden gap for 2017–2021. National SCF medians add wealth context and stay labeled national, not Cook County. The numbers do not prove that one 1930s sheet caused each later gap; they show what families faced after the color line was built into credit.',
+      'Leave the 1930s sheets on the desk and walk the county forward with a household still seeking ownership. In Cook County, NHGIS tenure shows Black homeownership rising from 37.1% in 1990 to 42.0% in 2000 and 41.2% in 2010, while the White rate stayed about 25 to 27 points higher. When NHGIS ends, the American Community Survey for 2020–2024 continues the same county ownership question on a later catalog; we name that seam instead of pretending the methods are identical. Home Mortgage Disclosure Act county aggregates for 2018 and 2023 still show a Black–White denial-rate gap (18.7 then 16.9 points). HUD CHAS for 2017–2021 shows a 29.5-point cost-burden gap. National Survey of Consumer Finances medians for 1989, 2010, and 2022 sit beside the metro reading for wealth scale, not as a county substitute. The [[ent_law_fair_housing_act_1968|Fair Housing Act of 1968]] banned discrimination in the sale, rental, and financing of housing; the [[ent_law_community_reinvestment_act_1977|Community Reinvestment Act of 1977]] pressed banks to meet credit needs in the communities they serve. Those statutes sit on the timeline as policy context; they do not turn later instrument gaps into automatic proof of one map\'s causal reach. Sources: IPUMS NHGIS / Census tenure; American Community Survey 2020–2024; FFIEC Home Mortgage Disclosure Act; HUD CHAS; Federal Reserve Survey of Consumer Finances.',
     policyEras: ['holc_fha', 'fair_housing', 'cra_contemporary'],
     geography: {
       geographyType: 'county',
       jurisdictionId: COOK_COUNTY,
       boundaryVersion: 'county-2020',
-      label: 'Cook County, Illinois (example), with national wealth context',
+      label: 'Cook County, Illinois (metro reading), with national wealth context',
     },
     methodStance: 'juxtaposition',
     methodNote: METHOD_REDLINE,
@@ -1180,6 +1511,7 @@ export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
       REDLINING_ARTIFACTS.aaronson,
       REDLINING_ARTIFACTS.banaji,
       REDLINING_ARTIFACTS.fairHousing,
+      EPI_CHARTBOOK_ARTIFACT,
     ],
     status: 'published',
     createdAt: PACKET_CREATED_AT,
@@ -1189,9 +1521,9 @@ export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
     id: 'tip_chicago_redlining_q4',
     questionId: 'Q4',
     themeId: 'redlining',
-    title: 'Bronzeville: a neighborhood story inside a county frame',
+    title: 'Bronzeville on the map; the county still holds the tape measure',
     summary:
-      'Bronzeville is where the example becomes a place people can name. The district is bound to this packet, and the surrounding Cook County series show homeownership, income, poverty, cost burden, and recent mortgage denials. Those series still resolve only to the county. They cannot identify the same households who lived inside a particular HOLC polygon. The human story is local; the measured spine is county-scale until tract linkage closes.',
+      'Stand on State Street in [[ent_bronzeville_001|Bronzeville]] after 1916: Robert S. Abbott\'s Chicago Defender, Overton Hygienic, Supreme Life, the Wabash Avenue YMCA. Drake and Cayton gave the district its lasting name in 1945. The same South Side geography that survived the [[ent_chicago_race_riot_1919_001|1919 riot]] later sat under Home Owners\' Loan Corporation grades and Federal Housing Administration underwriting. Bind the place; then open the Cook County instruments that already walk homeownership across 1990, 2000, 2010, and the American Community Survey handoff, plus Home Mortgage Disclosure Act denial years 2018 and 2023. Those series still resolve only to the county. They cannot find the same households inside a particular Corporation polygon. Local story, county tape measure, until tract linkage closes. Sources: entity binding for Bronzeville; NHGIS / American Community Survey / Home Mortgage Disclosure Act / HUD CHAS county readings; Mapping Inequality for place context.',
     policyEras: ['holc_fha', 'fair_housing', 'cra_contemporary'],
     geography: {
       geographyType: 'county',
@@ -1202,17 +1534,14 @@ export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
     methodStance: 'juxtaposition',
     methodNote: METHOD_REDLINE,
     observations: [
+      ...nhgisHomeownership,
       ACS.blackHomeownership,
-      ACS.blackIncome,
-      ACS.whiteIncome,
-      ACS.blackPoverty,
-      ACS.blackBaAttainment,
-      ...hmdaObservations.filter((row) => row.referencePeriod === '2023'),
+      ...hmdaObservations,
       ...chas,
     ],
     derived: redliningDerived.filter(
       (row) =>
-        row.derivedId === 'der_cook_income_gap_2020_2024' ||
+        row.methodId === 'black_white_homeownership_gap' ||
         row.derivedId === 'der_cook_cost_burden_gap_2017_2021',
     ),
     artifacts: [
@@ -1232,9 +1561,9 @@ export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
     id: 'tip_drug_policy_q5_national',
     questionId: 'Q5',
     themeId: 'drug_policy_state',
-    title: 'Federal drug scheduling and sentencing, in the statutes',
+    title: 'Federal drug statutes raised, then narrowed, crack and powder sentencing disparities',
     summary:
-      'The primary record runs from the 1970 scheduling framework through the 1986 mandatory minimums, the 2010 reduction of the crack/powder quantity ratio, and 2018 retroactivity. The former intelligence-linked drug-market placeholder is removed: no source in that packet met the bar for a settled factual claim.',
+      'People enter this arc through federal rules that changed what a conviction could cost. The Controlled Substances Act (1970) set the scheduling frame; the Anti-Drug Abuse Act (1986) locked in quantity-triggered mandatory minimums, including the 100-to-1 crack/powder ratio; the Fair Sentencing Act (2010) cut that ratio; the First Step Act (2018) opened limited retroactivity. An earlier intelligence-linked drug-market placeholder is removed: no source in that packet met the bar for a settled factual claim. Sources: U.S. Code and Public Laws cited in the artifact list; Congressional Research Service crack/powder disparity brief.',
     policyEras: [
       'pre_drug_war',
       'drug_war_escalation',
@@ -1249,7 +1578,7 @@ export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
     },
     methodStance: 'juxtaposition',
     methodNote: METHOD_JUSTICE,
-    artifacts: DRUG_POLICY_ARTIFACTS,
+    artifacts: [...DRUG_POLICY_ARTIFACTS, EPI_CHARTBOOK_ARTIFACT],
     status: 'published',
     createdAt: PACKET_CREATED_AT,
     updatedAt: PACKET_UPDATED_AT,
@@ -1258,9 +1587,10 @@ export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
     id: 'tip_drug_policy_q6_il_spine',
     questionId: 'Q6',
     themeId: 'drug_policy_state',
-    title: 'Sentencing and incarceration indicators across policy eras',
+    title:
+      'Jail rates, federal crack sentences, and imprisonment moved through different systems after the drug war',
     summary:
-      'The series do not move in one direction. Cook County’s jail rate rose from 107.18 per 100,000 in 1970 to 274.35 in 2000, then fell to 141.51 in 2024. Average federal crack-cocaine trafficking sentences fell from 96 months in 2013 to 60 in 2023, while Black defendants remained 78.9% of the federal crack-cocaine trafficking caseload in 2023. Illinois’s 2023 Black imprisonment rate was 7.29 times its White rate. These measures describe different systems and cannot be read as a single drug-policy effect.',
+      'People move through county jails, federal cocaine caseloads, and state prisons at once. Cook County’s jail rate rose from 107.18 per 100,000 in 1970 to 274.35 in 2000, then fell to 141.51 in 2024 (Vera). Average federal crack-cocaine trafficking sentences fell from 96 months in 2013 to 60 in 2023, while Black defendants remained 78.9% of that federal caseload in 2023 (USSC). Beside those eras, two imprisonment instruments stay labeled apart: BJS Table 6 national adult rates show Black imprisonment falling from 1,818 per 100,000 in 2013 to 1,196 in 2022 (1,218 in 2023), while Illinois’s warehouse ACS-denominator Black-to-White ratio moved from 7.44 in 2020 to 7.15 in 2022 and 7.29 in 2023. The national Table 6 line is not merged with the warehouse state spine.',
     policyEras: [
       'pre_drug_war',
       'drug_war_escalation',
@@ -1271,7 +1601,7 @@ export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
       geographyType: 'state',
       jurisdictionId: 'state:17',
       boundaryVersion: 'state-2020',
-      label: 'Illinois, Cook County, and federal sentencing series',
+      label: 'Illinois and Cook County, with federal sentencing and national BJS rate context',
     },
     methodStance: 'juxtaposition',
     methodNote: METHOD_JUSTICE,
@@ -1279,11 +1609,21 @@ export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
       ...veraObservations,
       ...stateJusticeObservations.filter((row) => row.observationId.includes('state:17')),
       ...usscObservations,
+      ...bjsImprisonmentNational.filter(
+        (row) =>
+          (row.metricId === 'bjs-imprisonment-rate-black-nation' ||
+            row.metricId === 'bjs-imprisonment-rate-white-nation') &&
+          (row.referencePeriod === '2013' ||
+            row.referencePeriod === '2022' ||
+            row.referencePeriod === '2023'),
+      ),
     ],
-    derived: q6Derived,
+    derived: [...q6Derived, ...bjsNationalImprisonmentDerived],
     artifacts: [
       ...DRUG_POLICY_ARTIFACTS,
       CENSUS_STATE_RACE_DENOMINATOR_ARTIFACT,
+      BJS_TABLE6_ARTIFACT,
+      EPI_CHARTBOOK_ARTIFACT,
       artifact({
         artifactId: 'art_vera_incarceration_trends_dataset',
         artifactClass: 'scholarly_partner_table',
@@ -1307,7 +1647,7 @@ export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
     themeId: 'urban_renewal',
     title: 'Chicago projects, reported families, and the scale mismatch',
     summary:
-      'The federal-project compilation identifies 43 Chicago projects, but fields are incomplete. Hyde Park–Kenwood reports 2,333 “non-white families” and 5,940 substandard dwelling units; Lake Meadows reports 3,416 and 1,719. Those period categories are not direct displaced-family counts. Cook County’s Black population share rose from 20.9% in 1970 to 25.0% in 2010, then measured 22.2% in the 2020–2024 ACS. County change cannot isolate what followed inside project footprints.',
+      'The federal-project compilation identifies 43 Chicago projects, but fields are incomplete. Hyde Park–Kenwood reports 2,333 “non-white families” and 5,940 substandard dwelling units; Lake Meadows reports 3,416 and 1,719. Those period categories are not direct displaced-family counts. On the county demographic spine, NHGIS shows Cook County’s Black population share rising from 20.9% in 1970 to 25.0% in 2010; the ACS 2020–2024 reading then continues that county story at 22.2%, with the catalog handoff named rather than hidden. County change still cannot isolate what followed inside project footprints.',
     policyEras: ['urban_renewal_federal'],
     geography: {
       geographyType: 'county',
@@ -1328,22 +1668,22 @@ export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
     id: 'tip_mass_incarceration_q8_states',
     questionId: 'Q8',
     themeId: 'mass_incarceration',
-    title: 'How state Black–White imprisonment disparities vary',
+    title: 'How state Black-White imprisonment disparities vary',
     summary:
-      'The latest comparable cohort is a cross-section, not a modern-era trend. Across 50 states in 2023, the median Black-to-White imprisonment-rate ratio was 5.42 and the observed range was 2.46 to 13.63. Illinois was 7.29, Mississippi 2.46, New Jersey 13.46, and Wisconsin 13.63. The rates divide BJS prisoner counts by 2023 ACS 5-year race estimates and should not be confused with BJS-published rates, admissions, jail detention, or individual risk.',
+      'Read the national BJS-published adult imprisonment spine first: Table 6 shows Black rates falling from 1,818 per 100,000 in 2013 to 1,196 in 2022, then 1,218 in 2023, while White rates moved from 295 to 229 and 231. The Black-to-White national ratio eased from about 6.16 to about 5.22, then 5.27. Against that published national series, a separate warehouse state instrument uses the same ACS denominator vintage across years so the cross-section stays comparable: spotlight Black-to-White ratios for Illinois run 7.44 (2020), 7.15 (2022), and 7.29 (2023); Mississippi 2.60, 2.26, then 2.46; New Jersey 12.63, 11.32, then 13.46; Wisconsin 12.69, 11.97, then 13.63. The 2023 50-state median warehouse ratio is 5.42 (range 2.46 to 13.63). Those state rates are never drawn as if they were the BJS Table 6 national line.',
     policyEras: [],
     geography: {
       geographyType: 'nation',
       jurisdictionId: NATION,
       boundaryVersion: 'state-2020',
-      label: '50-state comparable cross-section',
+      label: 'United States national trend with 50-state comparable cross-section',
     },
     methodStance: 'juxtaposition',
-    methodNote:
-      'This packet compares state systems in one year. It does not claim a historical trend because the warehouse currently has only 2022–2023 comparable state race-rate coverage. The rates divide BJS year-end prisoner counts by 2023 ACS 5-year non-Hispanic race estimates because the aligned PEP query returned no rows; treat the exact ratios as descriptive warehouse estimates, not BJS-published rates.',
-    observations: stateJusticeObservations,
-    derived: q8Derived,
+    methodNote: METHOD_JUSTICE,
+    observations: [...bjsImprisonmentNational, ...stateJusticeObservations],
+    derived: [...bjsNationalImprisonmentDerived, ...q8Derived],
     artifacts: [
+      BJS_TABLE6_ARTIFACT,
       artifact({
         artifactId: 'art_bjs_prisoners_2023',
         artifactClass: 'primary_government_document',
@@ -1351,13 +1691,40 @@ export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
         citation:
           'E. Ann Carson and Rich Kluckow, Prisoners in 2023: Statistical Tables, Bureau of Justice Statistics.',
         source: 'bureau-of-justice-statistics',
-        sourceUrl: 'https://bjs.ojp.gov/document/p23st.pdf',
+        sourceUrl: BJS_P23_PDF_URL,
         contentHash: '22a4cbe8ee0ff6156db97b4825db60907d53f0a345d02166b8484e0ac307b2e9',
         dated: '2023',
         summary:
-          'Primary federal statistical report and appendix counts used with Census population denominators.',
+          'Primary federal statistical report and appendix counts used with Census population denominators for the warehouse state cross-section.',
+      }),
+      artifact({
+        artifactId: 'art_bjs_prisoners_2022_tables_zip',
+        artifactClass: 'primary_government_document',
+        title: 'Prisoners in 2022: Statistical Tables (revised zip)',
+        citation:
+          'Bureau of Justice Statistics, Prisoners in 2022: Statistical Tables, revised data tables zip (p22st_rev.zip), Appendix table 1.',
+        source: 'bureau-of-justice-statistics',
+        sourceUrl: BJS_P22_TABLES_ZIP_URL,
+        contentHash: BJS_P22_STAT01_CONTENT_HASH,
+        dated: '2022',
+        summary:
+          'Appendix table 1 prisoner counts by race for the 2022 warehouse state rates. Denominators remain 2023 ACS 5-year race estimates.',
+      }),
+      artifact({
+        artifactId: 'art_bjs_prisoners_2020_tables_zip',
+        artifactClass: 'primary_government_document',
+        title: 'Prisoners in 2020: Statistical Tables (sheets zip)',
+        citation:
+          'Bureau of Justice Statistics, Prisoners in 2020: Statistical Tables, data tables zip (p20st.zip), Appendix table 2.',
+        source: 'bureau-of-justice-statistics',
+        sourceUrl: BJS_P20_TABLES_ZIP_URL,
+        contentHash: BJS_P20_ZIP_CONTENT_HASH,
+        dated: '2020',
+        summary:
+          'Appendix table 2 prisoner counts by race for the 2020 warehouse state rates (p20stat02). Denominators remain 2023 ACS 5-year race estimates so the multi-year state spine stays comparable; not a BJS-published state rate table.',
       }),
       CENSUS_STATE_RACE_DENOMINATOR_ARTIFACT,
+      EPI_CHARTBOOK_ARTIFACT,
     ],
     gapStates: ['insufficient_evidence'],
     status: 'published',
@@ -1394,19 +1761,25 @@ export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
     themeId: 'school_segregation',
     title: 'From segregated streets to school opportunity',
     summary:
-      'Banaji, Fiske, and Massey argue that neighborhood segregation translates directly into school segregation and uneven school resources. In the Chicago example, Cook County’s Black population share moved from 20.9% in 1970 to 25.0% in 2010 and measured 22.2% in the 2020–2024 ACS, while 26.8% of Black adults 25+ held a bachelor’s degree or higher in that same ACS window. Brown v. Board and later desegregation rulings supply the legal timeline. District discipline and school-finance series are still gap-labeled, so the story links housing to attainment without inventing a classroom-level causal model.',
+      'Neighborhood lines become classroom lines. Banaji, Fiske, and Massey treat residential segregation as the linchpin that carries unequal school resources. In the Cook County metro reading, NHGIS shows Black population share moving from 20.9% in 1970 to 25.0% in 2010; ACS 2020–2024 continues that county spine at 22.2%, while 26.8% of Black adults 25+ held a bachelor’s degree or higher in that ACS window. Nationally, EPI Chart 5 (ACS 2023) places bachelor’s-or-higher shares for men aged 25+ at 30.5% Black and 47.6% White. Brown v. Board and later desegregation rulings supply the legal timeline. District discipline and school-finance series are still unloaded, so the arc links housing to attainment without inventing a classroom causal model or a CRDC rate.',
     policyEras: ['desegregation_era', 'post_busing'],
     geography: {
       geographyType: 'county',
       jurisdictionId: COOK_COUNTY,
       boundaryVersion: 'county-2020',
-      label: 'Cook County, Illinois (example metro)',
+      label: 'Cook County metro reading with national attainment context',
     },
     methodStance: 'juxtaposition',
     methodNote: METHOD_SCHOOL,
-    observations: [ACS.blackShare, ACS.blackBaAttainment, ...nhgisBlackShare],
+    observations: [
+      ACS.blackShare,
+      ACS.blackBaAttainment,
+      ...nhgisBlackShare,
+      ...epiEducationNational,
+    ],
     artifacts: [
       REDLINING_ARTIFACTS.banaji,
+      EPI_CHARTBOOK_ARTIFACT,
       artifact({
         artifactId: 'art_brown_v_board_oyez',
         artifactClass: 'primary_government_document',
@@ -1447,16 +1820,17 @@ export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
     themeId: 'voting_rights',
     title: 'The long fight to make the ballot count',
     summary:
-      'Reconstruction promised the franchise; Jim Crow devices and violence took it back. The Fifteenth Amendment and the Voting Rights Act of 1965 are the primary legal spine. Banaji, Fiske, and Massey place that collapse and recovery inside the same systemic story as housing and schools. Chicago enters as a northern Great Migration city where Black voters reshaped local politics once the ballot was safer, not as a complete turnout dashboard. State turnout and voting-policy indexes stay gap-labeled until MIT Election Lab and Voting Rights Lab series load.',
+      'Reconstruction promised the franchise; Jim Crow devices and violence took it back. The Fifteenth Amendment and the Voting Rights Act of 1965 are the enforcement spine. Banaji, Fiske, and Massey place that collapse and recovery inside the same systemic story as housing and schools. Beside that legal arc, one continuous CPS A-1 citizen-turnout instrument carries presidential years 1992 through 2020: Black turnout rises from 59.2% in 1992 to a peak of 66.2% in 2012, the only year in this series where Black turnout exceeded White non-Hispanic turnout (64.1%), then measures 59.4% in 2016 and 62.6% in 2020. Hispanic and Asian citizen turnout stayed under 50% from 1996 through 2016, then reached 53.7% and 59.7% in 2020. White non-Hispanic turnout ranged from 60.7% (1996) to 70.9% (2020). The published A-1 workbook ends at 2020; later presidential years and state policy indexes stay cite-first rather than a blank dashboard hole.',
     policyEras: ['reconstruction_collapse', 'jim_crow_franchise', 'vra_enforcement'],
     geography: {
       geographyType: 'nation',
       jurisdictionId: NATION,
       boundaryVersion: 'nation-2020',
-      label: 'United States (Chicago as northern-city example)',
+      label: 'United States',
     },
     methodStance: 'juxtaposition',
     methodNote: METHOD_VOTING,
+    observations: [...cpsTurnoutNational],
     artifacts: [
       artifact({
         artifactId: 'art_15th_amendment_nara',
@@ -1484,6 +1858,8 @@ export const RESEARCHED_THEME_IMPACT_PACKETS: readonly ThemeImpactPacket[] = [
         summary:
           'Federal oversight tools, including coverage and preclearance, aimed at jurisdictions with histories of discrimination. Later Court decisions narrowed those tools.',
       }),
+      CPS_A1_ARTIFACT,
+      EPI_CHARTBOOK_ARTIFACT,
       REDLINING_ARTIFACTS.banaji,
       REDLINING_ARTIFACTS.chicago1919,
     ],
@@ -1515,7 +1891,7 @@ export const THEME_RESEARCH_ADJUDICATION = [
     decision: 'rename',
     publicTitle: 'Housing segregation & redlining',
     rationale:
-      'Banaji/Fiske/Massey and Rothstein support a wider housing-segregation spine. Keep Chicago as an example metro, distinguish HOLC maps from the FHA/private system, and gate systemic causation to named secondaries.',
+      'Banaji/Fiske/Massey and Rothstein support a wider housing-segregation spine. Keep Chicago as an example metro, distinguish Home Owners\' Loan Corporation maps from the Federal Housing Administration and private system, and gate systemic causation to named secondaries. Arc prose expands agency and statute names, links entity cards, and shows multi-year instrument spines only.',
   },
   {
     themeId: 'drug_policy_state',
@@ -1534,7 +1910,7 @@ export const THEME_RESEARCH_ADJUDICATION = [
     themeId: 'mass_incarceration',
     decision: 'narrow',
     rationale:
-      'Keep as a distinct cross-state system comparison; do not duplicate the drug-policy era packet or claim a long trend from two years of state data.',
+      'Keep as a distinct system comparison: BJS Prisoners Table 6 supplies published national adult rates for 2013–2023; the warehouse ACS-denominator state spine now covers 2020, 2022, and 2023 for spotlight states and must not be merged into the BJS-published national series or a drug-policy duplicate.',
   },
   {
     themeId: 'environmental_racism',
@@ -1548,13 +1924,13 @@ export const THEME_RESEARCH_ADJUDICATION = [
     decision: 'retain',
     publicTitle: 'School segregation & opportunity',
     rationale:
-      'Massey’s segregation-to-schools linchpin and the Brown/CRA timeline support a first education packet; CRDC and school-finance metrics stay gap-labeled until ingest.',
+      'Massey’s segregation-to-schools linchpin, Brown/CRA timeline, Cook County attainment, and EPI Chart 5 national BA+ shares support the first education packet; CRDC and school-finance metrics stay gap-labeled until ingest.',
   },
   {
     themeId: 'voting_rights',
     decision: 'retain',
     publicTitle: 'Voting rights & political exclusion',
     rationale:
-      'Primary franchise statutes and Banaji/Fiske/Massey’s Reconstruction framing support an artifact spine; turnout and policy indexes remain cite-first until warehouse series load.',
+      'Primary franchise statutes plus Census CPS A-1 citizen turnout for presidential years 1992–2020 support a continuous national civic-engagement spine; Voting Rights Lab terms block commercial redistribution (cite-only: https://tracker.votingrightslab.org/terms); MIT Election Lab publishes election returns, not race-specific turnout rates that fill turnout-rate-black-state.',
   },
 ] as const;

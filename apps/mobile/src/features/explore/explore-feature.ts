@@ -110,3 +110,25 @@ export function toExploreFeature(feature: MapPointFeature): ExploreFeature {
 export function toExploreFeatures(source: MapFeatureCollection): readonly ExploreFeature[] {
   return source.features.map(toExploreFeature);
 }
+
+/**
+ * Rebuilds a map GeoJSON collection from Explore features. Coordinates and
+ * properties pass through unchanged so redaction guarantees stay intact.
+ * Used so filtered catalog pins match the records rail / count mast.
+ */
+export function toMapFeatureCollection(
+  features: readonly ExploreFeature[],
+): MapFeatureCollection {
+  return {
+    type: 'FeatureCollection',
+    features: features.map((feature) => ({
+      type: 'Feature',
+      id: feature.id,
+      geometry: {
+        type: 'Point',
+        coordinates: feature.coordinates,
+      },
+      properties: feature.properties,
+    })),
+  };
+}

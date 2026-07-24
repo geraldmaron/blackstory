@@ -6,15 +6,10 @@
  */
 import Link from 'next/link';
 import { ATMOSPHERE_ATTRIBUTION_HREF } from '../../components/atmosphere/tile-credits';
-import { EditionAtmosphereMosaic } from '../../components/patterns/edition-atmosphere/EditionAtmosphereMosaic';
-import {
-  EDITION_MOSAIC_COUNT_BROWSE,
-} from '../../components/patterns/edition-atmosphere/edition-atmosphere-config';
 import { LAW_EDITION_BROWSE_LEDE } from './law-copy';
 import { buildLawBrowseViewModel, type RawLawBrowseParams } from './law-view-model';
 import { LawBrowseSections } from './LawBrowseSections';
 import {
-  LAW_EDITION_MOSAIC_SEED,
   lawEditionPanelClassName,
   lawEditionRootClassName,
   lawEditionStackClassName,
@@ -37,7 +32,6 @@ export default async function LawBrowsePage({ searchParams }: LawPageProps) {
 
   return (
     <div className={lawEditionRootClassName()} data-law-edition="v6">
-      <EditionAtmosphereMosaic seedKey={LAW_EDITION_MOSAIC_SEED} count={EDITION_MOSAIC_COUNT_BROWSE} />
       <main className="ds-container ds-page" id="main">
         <div className={lawEditionStackClassName()}>
           <article className={lawEditionPanelClassName('intro')}>
@@ -52,7 +46,7 @@ export default async function LawBrowsePage({ searchParams }: LawPageProps) {
                 </h1>
                 <p className="ds-law-edition__lede">{LAW_EDITION_BROWSE_LEDE}</p>
                 <p className="ds-law-edition__credit">
-                  Archive mosaic · symbolic atmosphere · decorative gutter tiles only.{' '}
+                  Archive texture · symbolic atmosphere. {' '}
                   <Link href={ATMOSPHERE_ATTRIBUTION_HREF}>Mosaic credits</Link>
                 </p>
               </div>

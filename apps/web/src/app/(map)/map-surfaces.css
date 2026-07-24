@@ -3,11 +3,14 @@
  * render over it (ADR-017 "Route-group layout owns the canvas"). `.ds-map-stage`
  * (`MapStage.tsx`'s sole canvas mount) is a fixed, full-viewport plate; `.ds-hero-stage` (base
  * panel styling lives in shell.css) and `.ds-explore-stage` each establish their own stacking
- * context above it so paint order never depends on DOM order vs. the canvas. On `/` the plate is
- * interactive under hero chrome via pass-through hit regions (hero root `pointer-events: none`,
- * CTAs/timeline `auto`); `/explore` keeps full hit-testing. The MapLibre style plate follows
- * light/dark via `colorScheme`; Explore v6 floating panels use opaque theme-aware Surface
- * cards (same edition vocabulary as home) — no fixed-ink cockpit, no backdrop blur.
+ * context above it so paint order never depends on DOM order vs. the canvas.
+ *
+ * Gesture contract (mobile Safari/Chrome): scrollable copy/chrome owns touch scrolling;
+ * MapLibre pan/zoom only where chrome intentionally passes hits through (home map readout,
+ * explore gaps between Surface panels). Never set `pointer-events: none` on a text column
+ * that sits over the live plate — that routes swipe to the map instead of the document.
+ * The MapLibre style plate follows light/dark via `colorScheme`; Explore v6 floating panels
+ * use opaque theme-aware Surface cards — no fixed-ink cockpit, no backdrop blur.
  */
 
 .ds-map-surface {
@@ -50,20 +53,20 @@
   pointer-events: auto;
 }
 
-/* Home edition: single Surface panel — CTAs, scroll cue, and micro-facts re-enable hits;
-   the map column is a transparent pass-through to the inset MapStage plate. */
-.ds-home-hero__copy,
-.ds-home-hero__kicker,
-.ds-home-hero__headline,
-.ds-home-hero__lede,
-.ds-home-hero__micro-facts,
-.ds-home-hero__micro-fact,
-.ds-home-hero__map-caption {
-  pointer-events: none;
+/*
+ * Home edition hit regions (loads after shell.css — must not regress copy to `none`):
+ * - Copy column owns document scroll + CTAs (`auto` + `touch-action: pan-y`).
+ * - Map readout is a transparent pass-through to the inset MapStage plate (intentional
+ *   map hit target for pin/state taps and pan/zoom).
+ */
+.ds-home-hero__copy {
+  pointer-events: auto;
+  touch-action: pan-y;
 }
 
 .ds-home-hero__map,
-.ds-home-hero__map-readout {
+.ds-home-hero__map-readout,
+.ds-home-hero__map-caption {
   pointer-events: none;
 }
 
@@ -477,6 +480,8 @@
   min-height: 100%;
   height: 100%;
   color: var(--ds-ink);
+  /* Pass gaps through to MapLibre; Surface panels re-enable hits below. */
+  pointer-events: none;
 }
 
 .ds-explore-stage__notice {
@@ -487,6 +492,7 @@
   width: min(34rem, calc(100% - var(--ds-explore-edge) * 2));
   max-width: calc(100% - var(--ds-explore-edge) * 2);
   transform: translateX(-50%);
+  pointer-events: auto;
 }
 
 /* Left instrument chassis — Filters + Color key share one theme-aware Surface card (v6). */
@@ -502,11 +508,14 @@
   max-height: calc(100svh - var(--ds-island-clearance) - var(--ds-space-8));
   padding: var(--ds-explore-panel-padding, var(--ds-space-5));
   overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
   scroll-padding-top: var(--ds-space-2);
   border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-md);
   background: var(--ds-surface);
   color: var(--ds-ink);
+  pointer-events: auto;
 }
 
 .ds-explore-stage__tabpanel {
@@ -960,11 +969,14 @@
   max-height: calc(100svh - var(--ds-island-clearance) - var(--ds-space-8));
   padding: var(--ds-explore-panel-padding, var(--ds-space-5));
   overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
   scroll-padding-top: var(--ds-space-2);
   border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-md);
   background: var(--ds-surface);
   transition: opacity var(--ds-duration-fast) var(--ds-easing);
+  pointer-events: auto;
 }
 
 /* When a record is open, quiet the LIST only so the spotlight owns attention.
@@ -1016,6 +1028,8 @@
   max-height: min(78svh, 40rem);
   padding: var(--ds-space-8);
   overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
   border: var(--ds-border-width) solid var(--ds-border);
   border-left: 3px solid var(--ds-accent);
   border-radius: var(--ds-radius-lg);

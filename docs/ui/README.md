@@ -31,6 +31,7 @@ Shared kit: `@repo/ui` (`packages/ui`). Binding brand source: root `brand/`. Tok
 | **Mobile shell** (`@repo/mobile`) | [`design-direction-v6-mobile.md`](./design-direction-v6-mobile.md) | `apps/mobile/src/app/(tabs)/*`, `apps/mobile/src/shell/*`, `apps/mobile/src/ui/*` | Binding — **Ledger Line** polish (dense index, canvas + hairlines; see [`mobile-polish-mockups.html`](./mobile-polish-mockups.html)) |
 | **Voice & microcopy** | [`story.md`](./story.md) | All user-facing copy | Binding |
 | **Learning index entity** | [`learning-index-entity.md`](./learning-index-entity.md) | Entity detail / index cards | Contract |
+| **Add to Home Screen** | [`../notes/add-to-home-screen.md`](../notes/add-to-home-screen.md) | `public/manifest.webmanifest`, `layout.tsx` metadata | Installability (online-first; no SW) |
 
 **Component registry:** [`patterns-registry.md`](./patterns-registry.md) — import paths and adopters for `components/patterns/*`.
 

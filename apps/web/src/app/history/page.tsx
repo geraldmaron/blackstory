@@ -1,7 +1,8 @@
 /**
  * History v6 edition page: SSR-first temporal browse with edition Surface panels,
  * decade scrubber, composition data panel, and synchronized list peer. URL filters
- * use native GET navigation (no-JS safe).
+ * use native GET navigation (no-JS safe). Shared edition atmosphere (grain, grid,
+ * gutter mosaic) matches other main archive pages.
  */
 import React from 'react';
 import { FilterBar } from '@repo/ui';
@@ -19,6 +20,7 @@ import { buildHistoryViewModel } from './history-view-model';
 import {
   historyEditionPanelClassName,
   historyEditionRootClassName,
+  historyEditionStackClassName,
 } from './history-panel-chrome';
 import '../(map)/explore/explore-edition.css';
 import '../../components/patterns/edition-fact-icon.css';
@@ -54,8 +56,9 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
   });
 
   return (
-    <main className="ds-container ds-page" id="main">
-      <div className={historyEditionRootClassName()}>
+    <div className={historyEditionRootClassName()} data-history-edition="v6">
+      <main className="ds-container ds-page" id="main">
+        <div className={historyEditionStackClassName()}>
         <article className={historyEditionPanelClassName('intro')}>
           <header className="ds-history-edition__header">
             <span className="ds-history-edition__index" aria-hidden="true">
@@ -210,7 +213,8 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
         </noscript>
 
         <HistoryExperience initial={view} />
-      </div>
-    </main>
+        </div>
+      </main>
+    </div>
   );
 }

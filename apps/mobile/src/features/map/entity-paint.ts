@@ -23,10 +23,16 @@ type KindGlyphPaintSignature = {
   readonly strokeColor: string;
 };
 
-export const ENTITY_POINT_FILL_OPACITY = 0.52;
-export const ENTITY_HALO_OPACITY = 0.16;
-export const ENTITY_CLUSTER_OPACITY = 0.55;
-export const ENTITY_RING_FILL_OPACITY = 0.2;
+/** Solid-fill disc opacity — readable on the dark plate while geography still shows through. */
+export const ENTITY_POINT_FILL_OPACITY = 0.68;
+/** Soft halo under every unclustered point (flat matte wash, not a glow). */
+export const ENTITY_HALO_OPACITY = 0.22;
+/** Cluster aggregate disc opacity. */
+export const ENTITY_CLUSTER_OPACITY = 0.72;
+/** Institution "ring" glyph — mostly hollow by design. */
+export const ENTITY_RING_FILL_OPACITY = 0.22;
+/** Selected orientation ring offset beyond the data radius (web Explore parity). */
+export const ENTITY_SELECTED_RADIUS_OFFSET = 6;
 
 const GLYPH_PAINT_SIGNATURE: Readonly<Record<string, KindGlyphPaintSignature>> = {
   circle: {
@@ -136,11 +142,27 @@ export const ENTITY_EVENT_GLYPH_LAYER_STYLE = {
   circleStrokeOpacity: 0.9,
 } as const;
 
+/**
+ * Selected pin: copper orientation ring (navigational accent) + hollow stroke so
+ * selection is never color-alone. Archive Paper stays the default kind rim.
+ */
 export const ENTITY_SELECTED_LAYER_STYLE = {
+  circleColor: 'transparent',
+  circleRadius: markerRadiusPlusExpression(ENTITY_SELECTED_RADIUS_OFFSET),
+  circleStrokeColor: DIGNITY_PALETTE.selectedAccent,
+  circleStrokeWidth: zoomScaledNumericExpression(2.5),
+  circleStrokeOpacity: 1,
+  circleOpacity: 1,
+} as const;
+
+/** Inner paper ring under the copper accent — dual signal on the dark plate. */
+export const ENTITY_SELECTED_INNER_LAYER_STYLE = {
   circleColor: 'transparent',
   circleRadius: markerRadiusPlusExpression(3),
   circleStrokeColor: DIGNITY_PALETTE.selected,
-  circleStrokeWidth: zoomScaledNumericExpression(2),
+  circleStrokeWidth: zoomScaledNumericExpression(1.5),
+  circleStrokeOpacity: 0.95,
+  circleOpacity: 1,
 } as const;
 
 export const ENTITY_CLUSTER_LAYER_STYLE = {

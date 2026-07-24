@@ -7,7 +7,10 @@ import {
   US_BOUNDS,
   US_CAMERA_BOUNDS_PAD_DEG,
   US_CAMERA_MAX_BOUNDS,
+  WEST_COAST_CLEARANCE_LNG,
+  EXPLORE_MAP_VIEW_PADDING,
   boundsForCoordinates,
+  boundsLngSpan,
   cameraForPreset,
   cameraMotion,
   clampZoom,
@@ -16,6 +19,8 @@ import {
   coarsenTo,
   isInBounds,
   isNoMorePreciseThan,
+  minZoomToFrameLngSpan,
+  nationalBoundsClearWestCoast,
   padBounds,
   type LngLat,
 } from '../mapCamera';
@@ -58,15 +63,55 @@ describe('padBounds / US_CAMERA_MAX_BOUNDS', () => {
     expect(padBounds(US_BOUNDS, Number.NaN)).toEqual(US_BOUNDS);
   });
 
-  it('derives CONUS maxBounds from US_BOUNDS with a small pad (not free-world)', () => {
+  it('derives CONUS maxBounds from US_BOUNDS with a portrait-safe pad (not free-world)', () => {
     expect(US_CAMERA_MAX_BOUNDS).toEqual(padBounds(US_BOUNDS, US_CAMERA_BOUNDS_PAD_DEG));
     expect(US_CAMERA_MAX_BOUNDS[0]).toBeLessThan(US_BOUNDS[0]);
     expect(US_CAMERA_MAX_BOUNDS[2]).toBeGreaterThan(US_BOUNDS[2]);
+    // Wide enough that portrait fitBounds can zoom out past chrome insets.
+    expect(US_CAMERA_BOUNDS_PAD_DEG).toBeGreaterThanOrEqual(3);
     // Still a continental envelope — never global.
     expect(US_CAMERA_MAX_BOUNDS[0]).toBeGreaterThan(-140);
     expect(US_CAMERA_MAX_BOUNDS[2]).toBeLessThan(-50);
-    expect(MAP_MIN_ZOOM).toBeGreaterThanOrEqual(3);
+    expect(MAP_MIN_ZOOM).toBeGreaterThanOrEqual(2);
+    expect(MAP_MIN_ZOOM).toBeLessThan(3);
     expect(MAP_MIN_ZOOM).toBeLessThanOrEqual(MAP_MAX_ZOOM);
+  });
+});
+
+describe('EXPLORE_MAP_VIEW_PADDING', () => {
+  it('reserves top chrome and bottom peek sheet so national framing is not buried', () => {
+    expect(EXPLORE_MAP_VIEW_PADDING.top).toBeGreaterThanOrEqual(56);
+    expect(EXPLORE_MAP_VIEW_PADDING.bottom).toBeGreaterThan(EXPLORE_MAP_VIEW_PADDING.top);
+    expect(EXPLORE_MAP_VIEW_PADDING.left).toBeGreaterThan(0);
+    expect(EXPLORE_MAP_VIEW_PADDING.right).toBeGreaterThan(0);
+  });
+
+  it('keeps horizontal insets modest so portrait CONUS does not over-crop the coasts', () => {
+    expect(EXPLORE_MAP_VIEW_PADDING.left).toBeLessThanOrEqual(20);
+    expect(EXPLORE_MAP_VIEW_PADDING.right).toBeLessThanOrEqual(20);
+  });
+});
+
+describe('national west-coast clearance', () => {
+  it('keeps California / west coast inland of the national west bound', () => {
+    expect(nationalBoundsClearWestCoast()).toBe(true);
+    expect(US_BOUNDS[0]).toBeLessThanOrEqual(WEST_COAST_CLEARANCE_LNG - 0.5);
+    // Cape Mendocino-scale coast must be inside US_BBOX for isInBounds callers.
+    expect(isInBounds([WEST_COAST_CLEARANCE_LNG, 40.4], {
+      west: US_BOUNDS[0],
+      south: US_BOUNDS[1],
+      east: US_BOUNDS[2],
+      north: US_BOUNDS[3],
+    })).toBe(true);
+  });
+
+  it('allows MAP_MIN_ZOOM low enough to frame CONUS on a portrait phone width', () => {
+    // iPhone-class width minus left/right view padding (mast/peek are vertical).
+    const usableWidth =
+      390 - EXPLORE_MAP_VIEW_PADDING.left - EXPLORE_MAP_VIEW_PADDING.right;
+    const required = minZoomToFrameLngSpan(boundsLngSpan(US_BOUNDS), usableWidth);
+    expect(required).toBeLessThan(3);
+    expect(MAP_MIN_ZOOM).toBeLessThanOrEqual(required);
   });
 });
 

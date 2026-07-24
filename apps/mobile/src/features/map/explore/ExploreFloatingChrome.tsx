@@ -1,18 +1,23 @@
 /**
- * v7 Explore floating chrome over the full-bleed map: minimal mast (compact count +
- * ghost icon affordances). Map dominates first glance — no opaque Surface slab.
- * Copper accent only on active filters and selected controls (~10–15% copper budget).
+ * v7 Explore floating chrome over the full-bleed map: Pin Pulse mast (copper count
+ * chip + ghost icon affordances). Map dominates first glance — no opaque Surface slab.
+ * Copper accent on the count chip and active filters (~10–15% copper budget).
  */
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 import { Text, space, radius, MIN_TOUCH_TARGET, Z_LAYER } from '@/ui';
-import type { FilterState } from '@/lib/route-params';
+import { hasActiveFilters, type FilterState } from '@/lib/route-params';
 import {
   exploreContentInset,
   useExploreChromeColors,
   MAP_GHOST_PRESSED,
 } from './explore-chrome';
 import { formatExploreCountLabel } from './explore-count-label';
+import { activeFilterCount } from './active-filter-chips';
+import {
+  shouldShowSparseViewportCoach,
+  SPARSE_VIEWPORT_COACH_COPY,
+} from './sparse-viewport-coach';
 
 const ICON_SIZE = 18;
 const GHOST_SIZE = MIN_TOUCH_TARGET;
@@ -22,7 +27,7 @@ export type ExploreFloatingChromeProps = {
   readonly inViewCount: number;
   /** Full loaded release total (geo-anchored features in the active source). */
   readonly releaseCount: number;
-  /** "In view" once the map reports a region; "All records" before that. */
+  /** "Nearby" once the map reports a region; "All pinned" before that. */
   readonly scopeLabel: string;
   readonly filters: FilterState;
   readonly showDemoHint?: boolean;
@@ -45,6 +50,7 @@ function GhostIconButton({
   accessibilityLabel,
   onPress,
   selected,
+  badgeCount,
   testID,
   chrome,
 }: {
@@ -52,9 +58,11 @@ function GhostIconButton({
   readonly accessibilityLabel: string;
   readonly onPress: () => void;
   readonly selected?: boolean;
+  readonly badgeCount?: number;
   readonly testID?: string;
   readonly chrome: ReturnType<typeof useExploreChromeColors>;
 }) {
+  const showBadge = typeof badgeCount === 'number' && badgeCount > 0;
   return (
     <Pressable
       accessibilityRole="button"
@@ -70,7 +78,7 @@ function GhostIconButton({
             : pressed
               ? MAP_GHOST_PRESSED
               : chrome.mapGhostBg,
-          borderColor: chrome.border,
+          borderColor: selected ? chrome.mapAccent : chrome.border,
           opacity: pressed ? 0.9 : 1,
         },
       ]}
@@ -78,8 +86,20 @@ function GhostIconButton({
       <Ionicons
         name={icon}
         size={ICON_SIZE}
-        color={selected ? chrome.mapInk : chrome.mapInkMuted}
+        color={selected ? chrome.mapAccent : chrome.mapInkMuted}
       />
+      {showBadge ? (
+        <View
+          style={[styles.filterBadge, { backgroundColor: chrome.mapAccent }]}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+          testID={`${testID ?? 'ghost'}-badge`}
+        >
+          <Text variant="code" style={[styles.filterBadgeText, { color: chrome.mapInk }]}>
+            {badgeCount > 9 ? '9+' : String(badgeCount)}
+          </Text>
+        </View>
+      ) : null}
     </Pressable>
   );
 }
@@ -99,7 +119,8 @@ export function ExploreFloatingChrome({
   onLayout,
 }: ExploreFloatingChromeProps) {
   const chrome = useExploreChromeColors();
-  const filtersActive = Boolean(filters.kind || filters.era);
+  const filtersActive = hasActiveFilters(filters);
+  const filterCount = activeFilterCount(filters);
   const countLabel = formatExploreCountLabel({
     inViewCount,
     releaseCount,
@@ -107,6 +128,7 @@ export function ExploreFloatingChrome({
     filters,
     showDemoHint,
   });
+  const showSparseCoach = shouldShowSparseViewportCoach({ inViewCount, releaseCount });
 
   return (
     <View
@@ -121,18 +143,25 @@ export function ExploreFloatingChrome({
             styles.countChip,
             {
               backgroundColor: 'transparent',
-              borderColor: chrome.border,
+              borderColor: chrome.mapAccent,
             },
           ]}
+          accessible
+          accessibilityRole="text"
+          accessibilityLabel={countLabel.accessibilityLabel}
+          testID="explore-mast-count"
         >
+          <Ionicons
+            name="location"
+            size={ICON_SIZE}
+            color={chrome.mapAccent}
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+          />
           <Text
             variant="caption"
             numberOfLines={1}
-            style={[styles.countInline, { color: chrome.accent }]}
-            accessible
-            accessibilityRole="text"
-            accessibilityLabel={countLabel.accessibilityLabel}
-            testID="explore-mast-count"
+            style={[styles.countInline, { color: chrome.mapAccent }]}
           >
             {countLabel.railInline}
           </Text>
@@ -152,11 +181,12 @@ export function ExploreFloatingChrome({
               instrumentsOpen
                 ? 'Hide map instruments'
                 : filtersActive
-                  ? 'Map instruments, filters active'
-                  : 'Open map instruments'
+                  ? `Map instruments, ${filterCount} filter${filterCount === 1 ? '' : 's'} active`
+                  : 'Open map filters'
             }
             onPress={onToggleInstruments}
             selected={instrumentsOpen || filtersActive}
+            badgeCount={filtersActive && !instrumentsOpen ? filterCount : undefined}
             testID="explore-chip-instruments"
             chrome={chrome}
           />
@@ -179,6 +209,30 @@ export function ExploreFloatingChrome({
           />
         </View>
       </View>
+
+      {showSparseCoach ? (
+        <View
+          style={[
+            styles.sparseCoach,
+            {
+              borderColor: chrome.border,
+              backgroundColor: chrome.mapGhostBg,
+            },
+          ]}
+          accessible
+          accessibilityRole="text"
+          accessibilityLabel={SPARSE_VIEWPORT_COACH_COPY}
+          testID="explore-sparse-viewport-coach"
+        >
+          <Text
+            variant="caption"
+            numberOfLines={2}
+            style={[styles.sparseCoachText, { color: chrome.mapInkMuted }]}
+          >
+            {SPARSE_VIEWPORT_COACH_COPY}
+          </Text>
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -200,6 +254,9 @@ const styles = StyleSheet.create({
     minHeight: MIN_TOUCH_TARGET,
   },
   countChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space['1'],
     flexShrink: 1,
     paddingHorizontal: space['2'],
     paddingVertical: space['1'],
@@ -210,6 +267,19 @@ const styles = StyleSheet.create({
   },
   countInline: {
     letterSpacing: 0.3,
+    flexShrink: 1,
+  },
+  sparseCoach: {
+    marginTop: space['2'],
+    alignSelf: 'flex-start',
+    maxWidth: '88%',
+    paddingHorizontal: space['2'],
+    paddingVertical: space['1'],
+    borderRadius: radius.sm,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  sparseCoachText: {
+    letterSpacing: 0.2,
   },
   actions: {
     flexDirection: 'row',
@@ -223,5 +293,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: radius.sm,
     borderWidth: StyleSheet.hairlineWidth,
+  },
+  filterBadge: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    minWidth: 14,
+    height: 14,
+    borderRadius: 7,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 3,
+  },
+  filterBadgeText: {
+    fontSize: 9,
+    lineHeight: 11,
+    letterSpacing: 0,
   },
 });

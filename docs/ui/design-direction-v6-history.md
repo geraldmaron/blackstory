@@ -36,7 +36,7 @@ Design goals:
 - **Navigate** records through a hairline list peer with copper selection affordance.
 - **Trust** through dignity framing, release metadata, and evidence-before-assertion copy.
 
-Chrome is **opaque Surface**, theme-aware, flat matte. No fixed-ink bands, no blur, no decorative atmosphere on this route.
+Chrome is **opaque Surface**, theme-aware, flat matte. No fixed-ink bands, no blur, no scattered mosaic tiles.
 
 ---
 
@@ -49,7 +49,7 @@ Chrome is **opaque Surface**, theme-aware, flat matte. No fixed-ink bands, no bl
 | Deep variant | Paper-deep mix on overview stats | Canvas/rule mix |
 | Ink / Charcoal bands | **Not on history** | **Not on history** |
 | Copper | Text `#8E4F2A`, graphic `#B86B2A` | Text `#D07A32`, graphic `#D07A32` |
-| Atmosphere | **None** — no gutter mosaic, no crumpled map |
+| Atmosphere | Optional grain + archive grid only — **no** `EditionAtmosphereMosaic` |
 
 **Banned on history (carried from brand + v6 home/explore):** shadows, gradients, glows, bevels, `backdrop-filter` blur, `--ds-fixed-*` panel stamps.
 

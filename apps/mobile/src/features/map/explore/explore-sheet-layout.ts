@@ -4,10 +4,10 @@
  */
 import { space } from '@/ui';
 
-/** Peek / half / full as fractions of the sheet container (above the tab bar). */
-export const EXPLORE_SHEET_PEEK_FRACTION = 0.16;
-export const EXPLORE_SHEET_HALF_FRACTION = 0.32;
-export const EXPLORE_SHEET_FULL_FRACTION = 0.48;
+/** Peek / half / full as fractions of the sheet container (above the tab bar). Pin Pulse: map owns first glance. */
+export const EXPLORE_SHEET_PEEK_FRACTION = 0.11;
+export const EXPLORE_SHEET_HALF_FRACTION = 0.34;
+export const EXPLORE_SHEET_FULL_FRACTION = 0.52;
 
 /** Default clearance gap between the attribution pill and the peek sheet top. */
 const ATTRIBUTION_GAP_PX = space['3'];
@@ -15,7 +15,7 @@ const ATTRIBUTION_GAP_PX = space['3'];
 /**
  * Pixel `bottom` for map attribution so the pill sits just above the peek sheet.
  *
- * gorhom resolves a `'16%'` snap point against the FULL sheet container height,
+ * gorhom resolves a percentage snap point against the FULL sheet container height,
  * so the peek sheet top lands at `tabBarInset + mapAreaHeight * peekFraction`
  * (the inset is NOT subtracted before applying the fraction). An earlier
  * `usable = mapAreaHeight - tabBarInset` computation placed the pill a few px

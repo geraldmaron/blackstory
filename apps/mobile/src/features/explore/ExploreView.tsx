@@ -43,9 +43,13 @@ import {
   initialExploreState,
   visibleFeatures,
 } from './explore-controller';
-import { toExploreFeatures } from './explore-feature';
+import { applyFilters, sameFilterState } from './explore-filter';
+import { toExploreFeatures, toMapFeatureCollection } from './explore-feature';
 import { parseRestoredSelection } from './selection';
 import { useReduceMotion } from './useReduceMotion';
+
+/** Stable default so omitting `filters` does not re-trigger the URL sync effect. */
+const EMPTY_FILTERS: FilterState = Object.freeze({});
 
 export type ExploreViewProps = {
   /** Redacted, release-coupled source. Defaults to the demo source (ADR-024). */
@@ -78,7 +82,7 @@ export type ExploreViewProps = {
 
 export function ExploreView({
   source = DEMO_MAP_SOURCE,
-  filters = {},
+  filters = EMPTY_FILTERS,
   selectedParam,
   loadState = { kind: 'ready' },
   usingDemo = false,
@@ -107,6 +111,8 @@ export function ExploreView({
   const [snapIndex, setSnapIndex] = useState(EXPLORE_SHEET_PEEK);
   const [chromeHeight, setChromeHeight] = useState(0);
   const prevSelectedIdRef = useRef<string | null>(null);
+  /** Optimistic chip apply awaiting URL/`filters` prop catch-up. */
+  const pendingFiltersRef = useRef<FilterState | null>(null);
 
   const attributionBottom = useMemo(
     () =>
@@ -140,6 +146,16 @@ export function ExploreView({
   }, [state.selectedId]);
 
   useEffect(() => {
+    // Route params can lag one frame behind an optimistic chip apply. Do not
+    // clobber live local filters with a stale empty/previous props object.
+    const pending = pendingFiltersRef.current;
+    if (pending) {
+      if (sameFilterState(filters, pending)) {
+        pendingFiltersRef.current = null;
+      } else {
+        return;
+      }
+    }
     dispatch({ type: 'filtersChanged', filters });
   }, [filters]);
 
@@ -166,8 +182,26 @@ export function ExploreView({
     onSelectionChange?.(state.selectedId ?? null);
   }, [state.selectedId, onSelectionChange]);
 
+  // Catalog = filter facets only (web parity). List further intersects viewport.
+  // Map pins use the catalog so selected chips hide non-matching pins immediately.
+  const catalogFeatures = useMemo(
+    () => applyFilters(allFeatures, state.filters),
+    [allFeatures, state.filters],
+  );
   const listFeatures = useMemo(() => visibleFeatures(allFeatures, state), [allFeatures, state]);
-  const scopeLabel = state.viewport ? 'In view' : 'All records';
+  const filteredMapSource = useMemo(
+    () => toMapFeatureCollection(catalogFeatures),
+    [catalogFeatures],
+  );
+
+  // Drop selection when the active filters hide the selected pin (selected = visible).
+  useEffect(() => {
+    if (!state.selectedId) return;
+    if (catalogFeatures.some((feature) => feature.entityId === state.selectedId)) return;
+    dispatch({ type: 'entityDeselected' });
+  }, [catalogFeatures, state.selectedId]);
+
+  const scopeLabel = state.viewport ? 'Nearby' : 'All pinned';
   // A selection floors the sheet at half; otherwise the gesture-controlled
   // `snapIndex` IS the sheet position. There is no separate boolean that can
   // recompute a different index and fight the drag.
@@ -226,6 +260,10 @@ export function ExploreView({
 
   const handleFiltersChange = useCallback(
     (next: FilterState) => {
+      // Optimistic local apply so pins / rail / mast update on the same tap as
+      // the chip (selected = active). Route sync may round-trip afterward.
+      pendingFiltersRef.current = onFiltersChange ? next : null;
+      dispatch({ type: 'filtersChanged', filters: next });
       onFiltersChange?.(next);
     },
     [onFiltersChange],
@@ -254,7 +292,7 @@ export function ExploreView({
         onLayout={handleMapAreaLayout}
       >
         <MapScreen
-          source={source}
+          source={filteredMapSource}
           loadState={loadState}
           onRetry={onRetryMap}
           reduceMotion={reduceMotion}
@@ -263,7 +301,7 @@ export function ExploreView({
           showAttribution={false}
           onViewportChange={(bbox) => dispatch({ type: 'viewportChanged', bbox })}
           onFeaturePress={(entityId) => {
-            const feature = allFeatures.find((f) => f.entityId === entityId);
+            const feature = catalogFeatures.find((f) => f.entityId === entityId);
             if (feature) {
               setInstrumentsOpen(false);
               dispatch({ type: 'entitySelected', entityId, point: feature.coordinates });
@@ -283,7 +321,7 @@ export function ExploreView({
             inViewCount={listFeatures.length}
             releaseCount={allFeatures.length}
             scopeLabel={scopeLabel}
-            filters={filters}
+            filters={state.filters}
             showDemoHint={showDemoHint}
             instrumentsOpen={instrumentsOpen}
             recordsExpanded={recordsExpanded}
@@ -306,7 +344,7 @@ export function ExploreView({
             exiting={reduceMotion ? undefined : FadeOutUp.duration(160)}
           >
             <ExploreInstrumentsPanel
-              filters={filters}
+              filters={state.filters}
               features={allFeatures}
               onFiltersChange={handleFiltersChange}
               onHide={() => setInstrumentsOpen(false)}
@@ -351,7 +389,7 @@ export function ExploreView({
               selectedId={state.selectedId}
               scopeLabel={scopeLabel}
               releaseCount={allFeatures.length}
-              filters={filters}
+              filters={state.filters}
               onUserScroll={() => dispatch({ type: 'listScrolled' })}
               onSelect={(feature) =>
                 dispatch({

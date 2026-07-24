@@ -15,7 +15,7 @@ export const metadata = {
 
 export default function CorrectionsPage() {
   return (
-    <UtilityEditionShell mosaicSeed="corrections-edition-v6" editionKey="corrections">
+    <UtilityEditionShell editionKey="corrections">
       <UtilityEditionIntro
         kicker="Trust"
         title="Corrections"

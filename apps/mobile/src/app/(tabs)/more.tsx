@@ -21,7 +21,7 @@ export default function MoreScreen() {
     <BrowseScreenShell
       kicker="BlackStory"
       title="More"
-      dek="About the project, extended catalog, and ways to contribute."
+      dek="About the project, how we work, and ways to contribute."
     >
       {MOBILE_MORE_SECTIONS.map((section, sectionIndex) => (
         <View key={section.id} style={styles.section}>

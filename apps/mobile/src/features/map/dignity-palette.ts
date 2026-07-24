@@ -17,7 +17,26 @@ export const DIGNITY_PALETTE = {
   pointHalo: brandCore.sand,
   cluster: brandCore.mahogany,
   clusterText: brandCore.archivePaper,
+  /** Rim / secondary contrast on dark plate (Archive Paper). */
   selected: brandCore.archivePaper,
+  /** Copper orientation ring for the selected pin (web Explore parity). */
+  selectedAccent: brandCore.copperPin,
+  /**
+   * Continental land plate (warm charcoal). Must stay clearly lighter than
+   * `ocean` so Pacific / west-coast coastline reads at national zoom — OpenMapTiles
+   * has no full-land polygon, so background = land and water polygons = ocean.
+   */
+  land: '#2C2824',
+  /** Deep ink ocean (web Explore dark plate parity). */
+  ocean: '#080606',
+  /** Sand hairline on water polygon outlines — orientation, not glow. */
+  coastline: 'rgba(216, 161, 120, 0.45)',
+  streetCasing: 'rgba(244, 239, 229, 0.22)',
+  street: 'rgba(244, 239, 229, 0.38)',
+  streetLabel: 'rgba(244, 239, 229, 0.55)',
+  placeLabel: 'rgba(244, 239, 229, 0.62)',
+  /** Halo matches land plate so state labels sit on CONUS, not the ocean void. */
+  placeLabelHalo: '#2C2824',
   kindPerson: brandCore.copperPin,
   kindPlace: '#E09A55',
   kindSchool: '#7A8B52',
@@ -83,9 +102,9 @@ export function clusterRadiusZoomExpression(): readonly unknown[] {
     ['linear'],
     ['zoom'],
     3,
-    ['*', step, 0.45],
+    ['*', step, 0.55],
     5.5,
-    ['*', step, 0.85],
+    ['*', step, 0.9],
     9,
     step,
   ] as const;

@@ -5,13 +5,8 @@
  * load from the public release story projection; full bodies load on article pages.
  */
 import Link from 'next/link';
-import { EditionAtmosphereMosaic } from '../../components/patterns/edition-atmosphere/EditionAtmosphereMosaic';
-import {
-  EDITION_MOSAIC_COUNT_BROWSE,
-} from '../../components/patterns/edition-atmosphere/edition-atmosphere-config';
 import { listPublicStoryListItems } from '../../lib/public-data/source';
 import {
-  STORIES_EDITION_MOSAIC_SEED,
   storiesEditionPanelClassName,
   storiesEditionRootClassName,
   storiesEditionStackClassName,
@@ -30,7 +25,6 @@ export default async function StoriesIndexPage() {
 
   return (
     <div className={storiesEditionRootClassName()} data-stories-edition="v6">
-      <EditionAtmosphereMosaic seedKey={STORIES_EDITION_MOSAIC_SEED} count={EDITION_MOSAIC_COUNT_BROWSE} />
       <main className="ds-container ds-page" id="main">
         <div className={storiesEditionStackClassName()}>
           <article className={storiesEditionPanelClassName('intro')}>

@@ -84,11 +84,39 @@ describe('EntityPreviewSheet — focus movement (MOB-017)', () => {
       />,
     );
 
-    expect(getByLabelText(/Selected record: Bethel AME Church\./)).toBeTruthy();
+    expect(getByLabelText(/Pinned place: Bethel AME Church\./)).toBeTruthy();
     expect(getByLabelText('Close preview')).toBeTruthy();
-    expect(getByLabelText('Open full record for Bethel AME Church')).toBeTruthy();
+    expect(getByLabelText('Open place for Bethel AME Church')).toBeTruthy();
+    expect(getByLabelText('Open Bethel AME Church in Maps at public precision')).toBeTruthy();
 
     fireEvent.press(getByLabelText('Bethel AME Church'));
     expect(onOpenEntity).toHaveBeenCalledWith('ent_a');
+  });
+
+  it('shows confidence and linked theme hooks when present on the feature', async () => {
+    const { getByLabelText, getByTestId } = await render(
+      <EntityPreviewSheet
+        feature={{
+          ...feature('ent_a', 'Bethel AME Church'),
+          properties: {
+            ...feature('ent_a', 'Bethel AME Church').properties,
+            oneLineStory: 'A cornerstone of the district.',
+            stateName: 'District of Columbia',
+            eraBuckets: ['1900s'],
+            evidenceCount: 4,
+            confidenceTier: 'high',
+            topicTags: ['education', 'faith'],
+            status: 'historic',
+          },
+        }}
+        onOpenEntity={jest.fn()}
+        onClose={jest.fn()}
+      />,
+    );
+
+    const summary = getByLabelText(/Pinned place: Bethel AME Church\./);
+    expect(summary.props.accessibilityLabel).toMatch(/Confidence: High confidence/);
+    expect(summary.props.accessibilityLabel).toMatch(/Evidence: 4 claims/);
+    expect(getByTestId('entity-preview-linked')).toHaveTextContent(/education · faith/);
   });
 });

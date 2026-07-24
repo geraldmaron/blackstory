@@ -50,6 +50,7 @@ export {
 export {
   toExploreFeature,
   toExploreFeatures,
+  toMapFeatureCollection,
   sanitizeLabel,
   featureSubtitle,
   MAX_LABEL_LENGTH,

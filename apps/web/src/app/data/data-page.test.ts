@@ -19,9 +19,9 @@ const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
 const sectionsSource = readFileSync(join(here, 'DataSections.tsx'), 'utf8');
 const copySource = readFileSync(join(here, 'data-copy.ts'), 'utf8');
 
-test('data page uses shared EditionAtmosphereMosaic and v6 edition root', () => {
-  assert.match(pageSource, /EditionAtmosphereMosaic/);
-  assert.match(pageSource, /DATA_EDITION_MOSAIC_SEED/);
+test('data page does not mount EditionAtmosphereMosaic and v6 edition root', () => {
+  assert.doesNotMatch(pageSource, /EditionAtmosphereMosaic/);
+  assert.doesNotMatch(pageSource, /DATA_EDITION_MOSAIC_SEED/);
   assert.match(pageSource, /dataEditionRootClassName/);
   assert.doesNotMatch(pageSource, /ds-page__title/);
   assert.doesNotMatch(pageSource, /data\.css/);

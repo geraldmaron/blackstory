@@ -7,17 +7,12 @@
 import Link from 'next/link';
 import { MakerCredit } from '../../components/MakerCredit';
 import { ATMOSPHERE_ATTRIBUTION_HREF } from '../../components/atmosphere/tile-credits';
-import { EditionAtmosphereMosaic } from '../../components/patterns/edition-atmosphere/EditionAtmosphereMosaic';
-import {
-  EDITION_MOSAIC_COUNT_BROWSE,
-} from '../../components/patterns/edition-atmosphere/edition-atmosphere-config';
 import {
   ABOUT_DESTINATIONS,
   ABOUT_MISSION_BEATS,
   ABOUT_PILLARS,
 } from './about-copy';
 import {
-  ABOUT_EDITION_MOSAIC_SEED,
   aboutEditionPanelClassName,
   aboutEditionRootClassName,
   aboutEditionStackClassName,
@@ -33,7 +28,6 @@ export const metadata = {
 export default function AboutPage() {
   return (
     <div className={aboutEditionRootClassName()} data-about-edition="v6">
-      <EditionAtmosphereMosaic seedKey={ABOUT_EDITION_MOSAIC_SEED} count={EDITION_MOSAIC_COUNT_BROWSE} />
       <main className="ds-container ds-page" id="main">
         <div className={aboutEditionStackClassName()}>
           <article className={aboutEditionPanelClassName('intro')}>
@@ -59,7 +53,7 @@ export default function AboutPage() {
                   </Link>
                 </p>
                 <p className="ds-about-edition__credit">
-                  Archive mosaic · symbolic atmosphere · decorative gutter tiles only.{' '}
+                  Archive texture · symbolic atmosphere. {' '}
                   <Link href={ATMOSPHERE_ATTRIBUTION_HREF}>Mosaic credits</Link>
                 </p>
               </div>

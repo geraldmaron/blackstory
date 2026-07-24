@@ -4,6 +4,11 @@
  * Route tree:
  *   (tabs)/                 four primary tabs (Explore, History, Stories, More), headerShown:false
  *   data                    stack push — national Data (web `/data`), from More
+ *   books                   stack push — Banned books catalog + detail, from More
+ *   law                     stack push — Law catalog + detail, from More
+ *   memorial                stack push — Memorial names list, from More
+ *   themes                  stack push — Themes catalog + detail, from More
+ *   submit                  stack push — Contribute shell (corrections primary), from More
  *   learn/*                 nested Stories/content stack
  *   entity/[id]             stack push over the tabs, reachable from any tab
  *   filters-sheet           modal presentation (Explore filter sheet)
@@ -48,6 +53,34 @@ function EditionStack() {
         name="data"
         options={{
           title: 'Data',
+          headerBackTitle: 'More',
+          headerShown: true,
+        }}
+      />
+      <Stack.Screen
+        name="books"
+        options={{ headerShown: false, title: 'Banned books' }}
+      />
+      <Stack.Screen
+        name="law"
+        options={{ headerShown: false, title: 'Law' }}
+      />
+      <Stack.Screen
+        name="memorial"
+        options={{
+          title: 'Memorial',
+          headerBackTitle: 'More',
+          headerShown: true,
+        }}
+      />
+      <Stack.Screen
+        name="themes"
+        options={{ headerShown: false, title: 'Themes' }}
+      />
+      <Stack.Screen
+        name="submit"
+        options={{
+          title: 'Submit',
           headerBackTitle: 'More',
           headerShown: true,
         }}

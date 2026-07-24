@@ -20,6 +20,7 @@ export type ThemesEditionPanelVariant =
   | 'method'
   | 'catalog'
   | 'soon'
+  | 'arc'
   | 'storytelling'
   | 'consumers'
   | 'packets'

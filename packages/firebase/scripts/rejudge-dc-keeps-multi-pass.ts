@@ -1,7 +1,8 @@
 /**
  * Multi-model rejudge for unpromoted DC enrichment keeps: runs sequential enrichment passes
- * (GLM → Qwen3 → Qwen3.5), merges best packet per subject, auto-promotes clears, and optionally
- * publishes to Firestore/Postgres via publish-national-catalog.ts.
+ * (Qwen3-32B → Qwen3.5-122B → DeepSeek R1), merges best packet per subject, auto-promotes clears,
+ * and optionally publishes to Firestore/Postgres via publish-national-catalog.ts.
+ * GLM is not used as a pass (high JSON-fail rate as primary).
  */
 import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -39,9 +40,9 @@ type EnrichmentRun = {
 
 const PASSES: readonly { readonly id: string; readonly model: string; readonly concurrency: number }[] =
   [
-    { id: 'pass1-glm', model: 'z-ai/glm-4.5-air', concurrency: 4 },
-    { id: 'pass2-qwen3', model: 'qwen/qwen3-32b', concurrency: 4 },
-    { id: 'pass3-qwen35', model: 'qwen/qwen3.5-122b-a10b', concurrency: 2 },
+    { id: 'pass1-qwen3', model: 'qwen/qwen3-32b', concurrency: 4 },
+    { id: 'pass2-qwen35', model: 'qwen/qwen3.5-122b-a10b', concurrency: 2 },
+    { id: 'pass3-r1', model: 'deepseek/deepseek-r1-0528', concurrency: 2 },
   ];
 
 function readArgFlag(name: string): string | undefined {

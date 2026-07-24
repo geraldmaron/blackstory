@@ -200,7 +200,7 @@ describe('ExploreView — records rail', () => {
       <ExploreView onOpenEntity={noop} reduceMotion />,
     );
     expect(getByTestId('explore-records-rail')).toBeTruthy();
-    expect(getByTestId('explore-mast-count').props.accessibilityLabel).toBe('All records, 3 records');
+    expect(getByTestId('explore-mast-count').props.accessibilityLabel).toBe('All pinned, 3 pinned');
     expect(getByTestId('map-attribution')).toBeTruthy();
   });
 
@@ -221,7 +221,7 @@ describe('ExploreView — records rail', () => {
       <ExploreView filters={{ kind: 'place' }} onOpenEntity={noop} reduceMotion />,
     );
     expect(getByTestId('explore-mast-count').props.accessibilityLabel).toBe(
-      'All records, 2 records · filtered',
+      'All pinned, 2 pinned · filtered',
     );
   });
 
@@ -231,7 +231,7 @@ describe('ExploreView — records rail', () => {
     );
     const mast = getByTestId('explore-mast-count');
     const railHeader = within(getByTestId('explore-records-rail')).getByRole('header');
-    expect(mast.props.accessibilityLabel).toBe('All records, 3 records');
+    expect(mast.props.accessibilityLabel).toBe('All pinned, 3 pinned');
     expect(railHeader.props.accessibilityLabel).toBe(mast.props.accessibilityLabel);
   });
 
@@ -291,6 +291,32 @@ describe('ExploreView — records rail', () => {
     });
     expect(getByTestId('explore-instruments-panel')).toBeTruthy();
   });
+
+  it('applies instrument filter chips live without an Apply confirm step', async () => {
+    const onFiltersChange = jest.fn();
+    const { getByTestId, getByLabelText, queryByText } = await render(
+      <ExploreView onOpenEntity={noop} onFiltersChange={onFiltersChange} reduceMotion />,
+    );
+
+    await act(async () => {
+      fireEvent.press(getByTestId('explore-chip-instruments'));
+    });
+    expect(queryByText('Apply')).toBeNull();
+
+    const beforeLabel = getByTestId('explore-mast-count').props.accessibilityLabel as string;
+    expect(beforeLabel).toBe('All pinned, 3 pinned');
+
+    await act(async () => {
+      fireEvent.press(getByLabelText('Places'));
+    });
+
+    // Optimistic local apply: mast + rail update on the same tap (no URL round-trip).
+    expect(onFiltersChange).toHaveBeenCalledWith({ kind: 'places' });
+    expect(getByTestId('explore-mast-count').props.accessibilityLabel).toBe(
+      'All pinned, 2 pinned · filtered',
+    );
+    expect(getByTestId('explore-active-filters')).toBeTruthy();
+  });
 });
 
 describe('ExploreView — entity preview sheet', () => {
@@ -301,7 +327,7 @@ describe('ExploreView — entity preview sheet', () => {
     );
     fireEvent.press(utils.getByLabelText(/Seed Historical Place/));
     expect(await utils.findByTestId('entity-preview-sheet')).toBeTruthy();
-    fireEvent.press(await utils.findByLabelText(/Open full record for/));
+    fireEvent.press(await utils.findByLabelText(/Open place for/));
     expect(onOpenEntity).toHaveBeenCalledWith('ent_fixture_place_dc');
   });
 
@@ -331,7 +357,7 @@ describe('ExploreView — failed map leaves records usable', () => {
     expect(utils.queryByTestId('maplibre-map')).toBeNull();
     expect(utils.getByTestId('explore-records-rail')).toBeTruthy();
     fireEvent.press(utils.getByLabelText(/Seed Historical Place/));
-    fireEvent.press(await utils.findByLabelText(/Open full record for/));
+    fireEvent.press(await utils.findByLabelText(/Open place for/));
     expect(onOpenEntity).toHaveBeenCalled();
   });
 });
@@ -344,7 +370,7 @@ describe('ExploreView — empty + adversarial', () => {
       <ExploreView source={empty} onOpenEntity={noop} reduceMotion />,
     );
     expect(getByTestId('explore-records-empty')).toBeTruthy();
-    expect(getByTestId('explore-mast-count').props.accessibilityLabel).toBe('All records, None');
+    expect(getByTestId('explore-mast-count').props.accessibilityLabel).toBe('All pinned, None');
   });
 
   it('renders a pathological oversized label without crashing', async () => {

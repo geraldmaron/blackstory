@@ -1,4 +1,3 @@
-import { themeColors } from '@/ui';
 import {
   DEFAULT_MAP_GLYPHS_URL,
   DEFAULT_OPENFREEMAP_TILE_SOURCE_URL,
@@ -8,9 +7,28 @@ import {
   buildBasemapStyle,
   ENTITY_CLUSTER_RADIUS_EXPR,
   ENTITY_POINT_LAYER_STYLE,
+  ENTITY_SELECTED_LAYER_STYLE,
   kindColorExpression,
 } from '../mapStyle';
 import { DIGNITY_PALETTE } from '../dignity-palette';
+
+/** Relative luminance (WCAG) for hex colors — map plate contrast only. */
+function relativeLuminance(hex: string): number {
+  const clean = hex.replace('#', '');
+  const full =
+    clean.length === 3
+      ? clean
+          .split('')
+          .map((c) => c + c)
+          .join('')
+      : clean;
+  const int = parseInt(full, 16);
+  const channels = [(int >> 16) & 255, (int >> 8) & 255, int & 255].map((c) => {
+    const s = c / 255;
+    return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * channels[0]! + 0.7152 * channels[1]! + 0.0722 * channels[2]!;
+}
 
 describe('buildBasemapStyle', () => {
   it('defaults to OpenFreeMap vector tiles when no PMTiles URL is set', () => {
@@ -21,7 +39,13 @@ describe('buildBasemapStyle', () => {
     expect(source.type).toBe('vector');
     expect(source.url).toBe(DEFAULT_OPENFREEMAP_TILE_SOURCE_URL);
     expect(style.layers.some((l) => (l as { id: string }).id === 'water')).toBe(true);
+    expect(style.layers.some((l) => (l as { id: string }).id === 'coastline')).toBe(true);
+    expect(style.layers.some((l) => (l as { id: string }).id === 'landcover')).toBe(true);
     expect(style.layers.some((l) => (l as { id: string }).id === 'admin-boundaries')).toBe(true);
+    expect(style.layers.some((l) => (l as { id: string }).id === 'place-state')).toBe(true);
+    expect(style.layers.some((l) => (l as { id: string }).id === 'place-city')).toBe(true);
+    expect(style.layers.some((l) => (l as { id: string }).id === 'street-label')).toBe(true);
+    expect(style.layers.some((l) => (l as { id: string }).id === 'streets-casing')).toBe(true);
     const boundary = style.layers.find((l) => (l as { id: string }).id === 'admin-boundaries') as {
       'source-layer': string;
     };
@@ -29,7 +53,46 @@ describe('buildBasemapStyle', () => {
     expect(boundary['source-layer']).toBe('boundary');
     const bg = style.layers[0] as { type: string; paint: Record<string, string> };
     expect(bg.type).toBe('background');
-    expect(bg.paint['background-color']).toBe(themeColors.dark.canvas);
+    // Land plate (not ocean/canvas) — water polygons punch the Pacific through.
+    expect(bg.paint['background-color']).toBe(DIGNITY_PALETTE.land);
+  });
+
+  it('keeps land plate lighter than ocean and paints a sand coastline stroke', () => {
+    const style = buildBasemapStyle({ pmtilesUrl: null });
+    const water = style.layers.find((l) => (l as { id: string }).id === 'water') as {
+      paint: Record<string, string>;
+      'source-layer': string;
+    };
+    const coast = style.layers.find((l) => (l as { id: string }).id === 'coastline') as {
+      type: string;
+      paint: Record<string, unknown>;
+      'source-layer': string;
+    };
+    expect(water['source-layer']).toBe('water');
+    expect(water.paint['fill-color']).toBe(DIGNITY_PALETTE.ocean);
+    expect(coast.type).toBe('line');
+    expect(coast['source-layer']).toBe('water');
+    expect(coast.paint['line-color']).toBe(DIGNITY_PALETTE.coastline);
+    expect(DIGNITY_PALETTE.land).not.toBe(DIGNITY_PALETTE.ocean);
+    expect(relativeLuminance(DIGNITY_PALETTE.land)).toBeGreaterThan(
+      relativeLuminance(DIGNITY_PALETTE.ocean),
+    );
+    // Cartographic plate delta — two dark archive colors will not hit WCAG 3:1;
+    // require a perceptible luminance gap so west-coast land≠ocean.
+    expect(
+      relativeLuminance(DIGNITY_PALETTE.land) - relativeLuminance(DIGNITY_PALETTE.ocean),
+    ).toBeGreaterThanOrEqual(0.015);
+  });
+
+  it('keeps state labels required at national zoom (California must not optional-drop)', () => {
+    const style = buildBasemapStyle({ pmtilesUrl: null });
+    const placeState = style.layers.find((l) => (l as { id: string }).id === 'place-state') as {
+      layout: Record<string, unknown>;
+      maxzoom?: number;
+    };
+    expect(placeState.layout['text-optional']).toBe(false);
+    expect(placeState.maxzoom).toBe(7);
+    expect(Array.isArray(placeState.layout['text-size'])).toBe(true);
   });
 
   it('returns the demo dark canvas with ZERO tile sources when basemap is disabled', () => {
@@ -69,7 +132,10 @@ describe('buildBasemapStyle', () => {
       'source-layer': string;
     };
     expect(line['source-layer']).toBe('boundaries');
-    expect(line.paint['line-color']).toBe(themeColors.dark.border);
+    expect(line.paint['line-color']).toBe(DIGNITY_PALETTE.pointHalo);
+    expect(style.layers.some((l) => (l as { id: string }).id === 'coastline')).toBe(true);
+    const bg = style.layers[0] as { paint: Record<string, string> };
+    expect(bg.paint['background-color']).toBe(DIGNITY_PALETTE.land);
   });
 
   it('defaults glyphs to OpenFreeMap when a PMTiles URL is set without glyphsUrl', () => {
@@ -105,6 +171,12 @@ describe('dignity invariant (no crime-heatmap register)', () => {
     const nationalStep = (radius[4] as unknown[])[1] as unknown[];
     expect(nationalStep[0]).toBe('step');
     expect(nationalStep.slice(2)).toEqual([10, 10, 14, 50, 18, 200, 22]);
+    expect((radius[4] as unknown[])[0]).toBe('*');
+    expect((radius[4] as unknown[])[2]).toBe(0.55);
+  });
+
+  it('selected ring uses copper accent (navigational), not Archive Paper alone', () => {
+    expect(ENTITY_SELECTED_LAYER_STYLE.circleStrokeColor).toBe(DIGNITY_PALETTE.selectedAccent);
   });
 
   it('cluster fill uses copper aggregate, not per-kind shades', () => {

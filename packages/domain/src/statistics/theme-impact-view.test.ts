@@ -23,6 +23,10 @@ test('themeImpactPacketToView resolves question text and policy era labels', () 
   const view = themeImpactPacketToView(packet, { dataSource: 'fixture' });
   assert.equal(view.questionId, 'Q3');
   assert.match(view.question, /homeownership/i);
+  assert.equal(
+    view.question,
+    'Black homeownership across housing-credit eras (Baltimore metro fixture)',
+  );
   assert.ok(view.policyEras.some((era) => era.id === 'holc_fha' && era.label.includes('HOLC')));
   assert.equal(view.observations.length, 1);
   assert.match(view.observations[0]?.value ?? '', /%/);

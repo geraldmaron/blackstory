@@ -35,7 +35,7 @@ export function StorySectionIndexScreen({ section }: StorySectionIndexScreenProp
         }}
       >
         <ScreenHeader
-          kicker="Archive"
+          kicker="Stories"
           title={section.title}
           dek={section.subtitle}
           compact

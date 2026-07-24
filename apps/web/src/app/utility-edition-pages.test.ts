@@ -1,5 +1,5 @@
 /**
- * Utility v6 page wiring: shared gutter mosaic, main landmark, no legacy mast.
+ * Utility v6 page wiring: shared edition shell, main landmark, no legacy mast.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -28,13 +28,14 @@ const UTILITY_PAGES = [
 ] as const;
 
 for (const page of UTILITY_PAGES) {
-  test(`${page.route} uses UtilityEditionShell with mosaic and main landmark`, () => {
+  test(`${page.route} uses UtilityEditionShell with main landmark`, () => {
     const sourceFile =
       'delegate' in page ? join(appDir, page.delegate) : join(appDir, page.file);
     const source = readFileSync(sourceFile, 'utf8');
     assert.match(source, /UtilityEditionShell/);
     assert.match(source, /UtilityEditionIntro/);
-    assert.match(source, new RegExp(page.seed));
+    assert.doesNotMatch(source, /mosaicSeed/);
+    assert.doesNotMatch(source, /EditionAtmosphereMosaic/);
     assert.match(source, /editionKey="/);
     assert.doesNotMatch(source, /ds-page__eyebrow/);
     assert.doesNotMatch(source, /ds-entity-mast/);

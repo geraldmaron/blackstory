@@ -4,6 +4,11 @@
  * readable and gives tests a stable contract for CSS and a11y.
  */
 
+import { editionAtmosphereCanvasClassName } from '../../components/patterns/edition-atmosphere/edition-atmosphere-canvas';
+
+/** Mosaic seed for `/history` (distinct scatter from home, about, stories). */
+export const HISTORY_EDITION_MOSAIC_SEED = 'history-edition-v6';
+
 /** Root wrapper on `/history` main content — pairs with history-edition.css. */
 export const HISTORY_EDITION_ROOT_CLASS = 'ds-history-edition';
 
@@ -23,7 +28,11 @@ export const HISTORY_DECADE_TAB_CLASS = 'ds-explore-edition__decade-tab';
 export type HistoryEditionPanelVariant = 'intro' | 'timeline' | 'instruments' | 'composition' | 'records';
 
 export function historyEditionRootClassName(): string {
-  return HISTORY_EDITION_ROOT_CLASS;
+  return `${HISTORY_EDITION_ROOT_CLASS} ${editionAtmosphereCanvasClassName()}`;
+}
+
+export function historyEditionStackClassName(): string {
+  return 'ds-history-edition__stack';
 }
 
 export function historyEditionPanelClassName(variant?: HistoryEditionPanelVariant): string {

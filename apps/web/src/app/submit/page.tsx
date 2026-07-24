@@ -17,7 +17,7 @@ export const metadata = {
 
 export default function SubmitLeadPage() {
   return (
-    <UtilityEditionShell mosaicSeed="submit-edition-v6" editionKey="submit">
+    <UtilityEditionShell editionKey="submit">
       <UtilityEditionIntro
         kicker="Contribute"
         title="Submit a lead"

@@ -6,6 +6,7 @@
 import React from 'react';
 import { Card } from '@repo/ui';
 import type { ThemeImpactPacketView } from '@repo/domain';
+import { LinkedProse } from '../entity/LinkedProse';
 import { ThemeImpactEmptyNotice } from './ThemeImpactEmptyNotice';
 import { ThemeImpactGapBannerList } from './ThemeImpactGapBanner';
 import {
@@ -90,7 +91,7 @@ export function ThemeImpactPacketCard({ packet }: ThemeImpactPacketCardProps) {
         <h4 className="ds-theme-impact__subheading" id={`${packet.questionId}-obs-heading`}>
           Observations summary
         </h4>
-        <p className="ds-theme-impact__summary">{packet.observationsSummary}</p>
+        <LinkedProse className="ds-theme-impact__summary" text={packet.observationsSummary} />
 
         {packet.observations.length > 0 ? (
           <ul className="ds-theme-impact__metric-list">

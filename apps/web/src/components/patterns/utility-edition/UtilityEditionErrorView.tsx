@@ -25,7 +25,7 @@ export function UtilityEditionErrorView({ error, reset }: UtilityEditionErrorVie
   const display = sanitizeClientErrorDisplay(error);
 
   return (
-    <UtilityEditionShell mosaicSeed="error-edition-v6" editionKey="error">
+    <UtilityEditionShell editionKey="error">
       <UtilityEditionIntro
         kicker="Error"
         title="Something went wrong"

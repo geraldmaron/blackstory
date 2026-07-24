@@ -32,6 +32,8 @@ test('identity constants keep product name separate from code prefixes', () => {
   assert.equal(PACKAGE_SCOPE, '@repo');
   assert.equal(GCP_PROJECT_ID_PROD, 'black-book-efaaf');
   assert.equal(BRAND_ASSETS.lockup.dark, '/brand/lockup-dark.png');
+  assert.equal(BRAND_ASSETS.installIcon[192], '/brand/icon-192.png');
+  assert.equal(BRAND_ASSETS.installIcon.maskable512, '/brand/icon-maskable-512.png');
   assert.equal(MAKER.name, 'Gerald Dagher');
   assert.equal(MAKER.url, 'https://geralddagher.com');
   assert.equal(MAKER.mark.light, '/maker/gd-mark-light.png');

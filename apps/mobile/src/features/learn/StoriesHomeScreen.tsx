@@ -7,11 +7,11 @@ import { ScrollView, View } from 'react-native';
 import { router } from 'expo-router';
 import {
   ApiStatusBanner,
+  EditionBrandHeader,
   LedgerRow,
   LedgerSectionLabel,
   NavIcon,
   ScreenCanvas,
-  ScreenHeader,
   useScreenScrollInsets,
 } from '@/ui';
 import { LEARN_SECTIONS } from './sections';
@@ -51,10 +51,10 @@ export function StoriesHomeScreen() {
       >
         <View style={{ gap: insets.gap }}>
           <ApiStatusBanner compact />
-          <ScreenHeader
-            kicker="Longform"
+          <EditionBrandHeader
+            kicker="Stories"
             title="History pinned to place"
-            dek="Each piece links to the records it rests on, with sources you can open. Era and geography stay visible in every entry."
+            dek="Short pieces with sources you can open. Era and place stay visible in every entry."
             compact
             dense
           />

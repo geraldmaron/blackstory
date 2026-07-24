@@ -7,14 +7,9 @@ import {
   PublishingPrinciplesJsonLdScript,
   TrustSiteJsonLdScript,
 } from '../../components/trust/index';
-import { EditionAtmosphereMosaic } from '../../components/patterns/edition-atmosphere/EditionAtmosphereMosaic';
-import {
-  EDITION_MOSAIC_COUNT_BROWSE,
-} from '../../components/patterns/edition-atmosphere/edition-atmosphere-config';
 import { TRUST_PATHS } from '../../lib/trust/site-identity';
 import { MethodologySections } from './MethodologySections';
 import {
-  METHODOLOGY_EDITION_MOSAIC_SEED,
   methodologyEditionRootClassName,
   methodologyEditionStackClassName,
 } from './methodology-panel-chrome';
@@ -29,7 +24,6 @@ export const metadata = {
 export default function MethodologyPage() {
   return (
     <div className={methodologyEditionRootClassName()} data-methodology-edition="v6">
-      <EditionAtmosphereMosaic seedKey={METHODOLOGY_EDITION_MOSAIC_SEED} count={EDITION_MOSAIC_COUNT_BROWSE} />
       <main className="ds-container ds-page" id="main">
         <TrustSiteJsonLdScript />
         <PublishingPrinciplesJsonLdScript

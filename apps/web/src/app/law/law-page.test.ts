@@ -15,9 +15,9 @@ const detailPageSource = readFileSync(join(here, '[slug]', 'page.tsx'), 'utf8');
 const detailSectionsSource = readFileSync(join(here, 'LawDetailSections.tsx'), 'utf8');
 const anatomySource = readFileSync(join(here, 'LawAnatomyStrip.tsx'), 'utf8');
 
-test('law browse page uses shared EditionAtmosphereMosaic and edition stack', () => {
-  assert.match(browsePageSource, /EditionAtmosphereMosaic/);
-  assert.match(browsePageSource, /LAW_EDITION_MOSAIC_SEED/);
+test('law browse page does not mount EditionAtmosphereMosaic and edition stack', () => {
+  assert.doesNotMatch(browsePageSource, /EditionAtmosphereMosaic/);
+  assert.doesNotMatch(browsePageSource, /LAW_EDITION_MOSAIC_SEED/);
   assert.match(browsePageSource, /data-law-edition="v6"/);
   assert.doesNotMatch(browsePageSource, /ds-page__title/);
 });
@@ -32,9 +32,9 @@ test('law browse preserves GET URL contract and auto-submit facets', () => {
   assert.match(browseSectionsSource, /href="\/law"/);
 });
 
-test('law detail page uses per-slug mosaic seed and anatomy strip', () => {
-  assert.match(detailPageSource, /EditionAtmosphereMosaic/);
-  assert.match(detailPageSource, /\$\{LAW_EDITION_MOSAIC_SEED\}:\$\{slug\}/);
+test('law detail page uses anatomy strip without gutter mosaic', () => {
+  assert.doesNotMatch(detailPageSource, /EditionAtmosphereMosaic/);
+  assert.doesNotMatch(detailPageSource, /LAW_EDITION_MOSAIC_SEED/);
   assert.match(detailSectionsSource, /LawAnatomyStrip/);
   assert.match(anatomySource, /EditionFactIcon/);
 });

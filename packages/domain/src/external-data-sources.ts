@@ -705,7 +705,9 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     registryState: 'disabled',
     notes:
       'Franchise and election-admin policy indicators for juxtaposition with law entities. Prefer ' +
-      'cite until redistribution terms are recorded on checksum acquisition.',
+      'cite until redistribution terms are recorded on checksum acquisition. Tracker terms ' +
+      '(https://tracker.votingrightslab.org/terms) prohibit commercial use/redistribution of Site ' +
+      'data — keep cite-only on commercial surfaces (repo-5cc5).',
   },
   {
     id: 'stanford-open-policing',

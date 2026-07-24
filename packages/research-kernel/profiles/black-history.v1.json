@@ -192,7 +192,11 @@
     },
     {
       "mode": "paid-research",
-      "modelIds": ["deepseek/deepseek-v3.2", "qwen/qwen3.5-122b-a10b"],
+      "modelIds": [
+        "deepseek/deepseek-r1-0528",
+        "deepseek/deepseek-v3.2",
+        "qwen/qwen3.5-122b-a10b"
+      ],
       "authority": [
         "structured-extraction",
         "query-planning",

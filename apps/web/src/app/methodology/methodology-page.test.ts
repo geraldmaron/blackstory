@@ -18,9 +18,9 @@ const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
 const sectionsSource = readFileSync(join(here, 'MethodologySections.tsx'), 'utf8');
 const copySource = readFileSync(join(here, 'methodology-copy.ts'), 'utf8');
 
-test('methodology page uses shared EditionAtmosphereMosaic with route seed', () => {
-  assert.match(pageSource, /EditionAtmosphereMosaic/);
-  assert.match(pageSource, /METHODOLOGY_EDITION_MOSAIC_SEED/);
+test('methodology page does not mount EditionAtmosphereMosaic with route seed', () => {
+  assert.doesNotMatch(pageSource, /EditionAtmosphereMosaic/);
+  assert.doesNotMatch(pageSource, /METHODOLOGY_EDITION_MOSAIC_SEED/);
   assert.match(pageSource, /data-methodology-edition="v6"/);
   assert.doesNotMatch(pageSource, /methodology\.css/);
 });

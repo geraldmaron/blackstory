@@ -182,3 +182,8 @@ export {
   THEME_RESEARCH_ADJUDICATION,
   listResearchedThemeImpactPackets,
 } from './researched-theme-impact-packets.js';
+export {
+  listThemeImpactLinkedStatutes,
+  listThemeImpactLinkedStatutesForQuestion,
+} from './theme-impact-linked-statutes.js';
+export type { ThemeImpactLinkedStatuteView } from './theme-impact-linked-statutes.js';

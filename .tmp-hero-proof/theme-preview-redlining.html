@@ -1,0 +1,1893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Housing segregation &amp; redlining · BlackStory theme preview</title>
+  <meta
+    name="description"
+    content="Journey-focused preview of the BlackStory redlining theme: scene-led beats, ink-sketch visuals, instruments beside the arc."
+  />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400;1,8..60,600&family=Sora:wght@500;600&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    /* BlackStory theme journey preview: Archive Paper / Black Ink / Copper, flat matte. */
+    :root {
+      --ink: #0a0a0a;
+      --charcoal: #161616;
+      --paper: #f4efe5;
+      --surface: #fbf8f2;
+      --copper: #b86b2a;
+      --copper-text: #8e4f2a;
+      --page-sand: #d8a178;
+      --stone: #6d675f;
+      --rule: #d7d0c4;
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --font-display: "Sora", system-ui, sans-serif;
+      --font-sans: "Inter", system-ui, sans-serif;
+      --font-editorial: "Source Serif 4", "Iowan Old Style", Georgia, serif;
+      --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+      --inset: 1.5rem;
+      --card-gap: 1.25rem;
+      --panel-pad: 1.25rem;
+      --max: 84rem;
+    }
+
+    @media (max-width: 48rem) {
+      :root {
+        --inset: 1rem;
+      }
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      color-scheme: light;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-size: 1rem;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(color-mix(in srgb, var(--rule) 35%, transparent) 1px, transparent 1px),
+        linear-gradient(90deg, color-mix(in srgb, var(--rule) 35%, transparent) 1px, transparent 1px);
+      background-size: 48px 48px;
+      opacity: 0.28;
+      mask-image: linear-gradient(
+        90deg,
+        #000 0,
+        #000 8%,
+        transparent 14%,
+        transparent 86%,
+        #000 92%,
+        #000 100%
+      );
+    }
+
+    a {
+      color: var(--copper-text);
+      font-weight: 500;
+      text-decoration: none;
+      border-bottom: 2px solid transparent;
+    }
+
+    a:hover,
+    a:focus-visible {
+      border-bottom-color: var(--copper);
+      outline: none;
+    }
+
+    a:focus-visible {
+      outline: 2px solid var(--copper);
+      outline-offset: 3px;
+    }
+
+    .skip {
+      position: absolute;
+      left: -9999px;
+      top: auto;
+    }
+
+    .skip:focus {
+      left: var(--inset);
+      top: var(--inset);
+      z-index: 20;
+      padding: 0.5rem 0.75rem;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-sm);
+    }
+
+    .shell {
+      position: relative;
+      z-index: 1;
+      width: min(100% - (var(--inset) * 2), var(--max));
+      margin: 0 auto;
+      padding: 2rem 0 4rem;
+      display: grid;
+      gap: var(--card-gap);
+    }
+
+    .brand-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.75rem 1.5rem;
+      padding: 0 0.15rem;
+    }
+
+    .brand-bar__mark {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 0.9375rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+    }
+
+    .brand-bar__mark span {
+      color: var(--stone);
+      font-family: var(--font-sans);
+      font-weight: 400;
+      font-size: 0.8125rem;
+      letter-spacing: 0;
+    }
+
+    .brand-bar__note {
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--stone);
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-md);
+      padding: var(--panel-pad);
+    }
+
+    .panel--method {
+      background: color-mix(in srgb, var(--paper) 55%, var(--surface));
+    }
+
+    .header {
+      display: grid;
+      grid-template-columns: 2.75rem minmax(0, 1fr);
+      gap: 0.75rem 1rem;
+      padding-bottom: 1rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .header--flush {
+      padding-bottom: 0;
+      margin-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .header__index {
+      font-family: var(--font-mono);
+      font-size: 1.125rem;
+      font-weight: 500;
+      color: var(--copper-text);
+      letter-spacing: 0.04em;
+      padding-top: 0.15rem;
+    }
+
+    .header__kicker {
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--copper-text);
+    }
+
+    .header__title {
+      margin: 0.35rem 0 0;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: clamp(1.35rem, 1.1rem + 1.2vw, 1.85rem);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      color: var(--ink);
+    }
+
+    .header__lede {
+      margin: 0.75rem 0 0;
+      max-width: 54ch;
+      font-family: var(--font-editorial);
+      font-size: 1.0625rem;
+      line-height: 1.55;
+      color: var(--stone);
+    }
+
+    .panel-title {
+      margin: 0 0 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--copper-text);
+    }
+
+    .method-title {
+      margin: 0;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 1.125rem;
+      letter-spacing: -0.015em;
+      color: var(--ink);
+    }
+
+    .method-body {
+      margin: 0.75rem 0 0;
+      max-width: 62ch;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+      color: var(--ink);
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.15rem 0.5rem;
+      border: 1px solid color-mix(in srgb, var(--copper) 40%, var(--rule));
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      color: var(--copper-text);
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .chip--muted {
+      border-color: var(--rule);
+      color: var(--stone);
+    }
+
+    .you-are-here {
+      margin: 0 0 1.5rem;
+      padding: 1rem 1.1rem;
+      border: 1px solid color-mix(in srgb, var(--copper) 28%, var(--rule));
+      border-radius: var(--radius-md);
+      background: color-mix(in srgb, var(--paper) 72%, var(--surface));
+    }
+
+    .you-are-here__kicker {
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--copper-text);
+    }
+
+    .you-are-here__lede {
+      margin: 0.55rem 0 0;
+      max-width: 58ch;
+      font-family: var(--font-editorial);
+      font-size: 1.0625rem;
+      line-height: 1.6;
+      color: var(--ink);
+    }
+
+    .arc-layout {
+      display: grid;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    @media (min-width: 64rem) {
+      .arc-layout {
+        grid-template-columns: minmax(0, 1.55fr) minmax(16rem, 0.9fr);
+        column-gap: clamp(1.5rem, 3vw, 2.75rem);
+      }
+    }
+
+    .beats {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 1.75rem;
+    }
+
+    .beat {
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .beat:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .journey-sketch {
+      margin: 0 0 1rem;
+      padding: 0.85rem;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-md);
+      background: color-mix(in srgb, var(--paper) 92%, var(--surface));
+    }
+
+    .journey-sketch__svg {
+      display: block;
+      width: 100%;
+      max-width: 28rem;
+      height: auto;
+      color: var(--ink);
+    }
+
+    .journey-sketch__svg text {
+      fill: currentColor;
+      font-family: var(--font-mono);
+    }
+
+    .journey-sketch__label {
+      font-size: 8.5px;
+      letter-spacing: 0.04em;
+    }
+
+    .journey-sketch__caption {
+      font-size: 7.5px;
+      fill: var(--stone);
+    }
+
+    .journey-sketch__stroke {
+      fill: none;
+      stroke: var(--ink);
+      stroke-width: 1.65;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .journey-sketch__stroke--muted {
+      fill: none;
+      stroke: var(--stone);
+      stroke-width: 1.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .journey-sketch__stroke--accent {
+      fill: none;
+      stroke: var(--copper);
+      stroke-width: 1.85;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .journey-sketch__fill {
+      fill: var(--surface);
+      stroke: var(--ink);
+      stroke-width: 1.65;
+      stroke-linejoin: round;
+    }
+
+    .journey-sketch__fill--accent {
+      fill: color-mix(in srgb, var(--copper) 16%, var(--surface));
+      stroke: var(--copper);
+      stroke-width: 1.75;
+      stroke-linejoin: round;
+    }
+
+    .journey-sketch__wash {
+      fill: color-mix(in srgb, var(--paper) 55%, var(--surface));
+      stroke: var(--rule);
+      stroke-width: 1.2;
+    }
+
+    .scene-caption {
+      display: grid;
+      gap: 0.25rem;
+      margin: 0.75rem 0 0;
+      max-width: 42ch;
+    }
+
+    .scene-caption__kicker {
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--copper-text);
+    }
+
+    .scene-caption__line {
+      margin: 0;
+      font-family: var(--font-editorial);
+      font-size: 0.875rem;
+      line-height: 1.45;
+      color: var(--stone);
+    }
+
+    .beat__meta {
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--stone);
+    }
+
+    .beat__title {
+      margin: 0.5rem 0 0;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 1.0625rem;
+      letter-spacing: -0.02em;
+      line-height: 1.3;
+    }
+
+    .beat__body {
+      margin: 0.85rem 0 0;
+      max-width: 62ch;
+      font-family: var(--font-editorial);
+      font-size: 1.02rem;
+      line-height: 1.7;
+      color: var(--ink);
+    }
+
+    .beat__cite {
+      margin: 0.85rem 0 0;
+      max-width: 62ch;
+      font-family: var(--font-sans);
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      color: var(--stone);
+    }
+
+    .beat__cite strong {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--copper-text);
+    }
+
+    .gap-note {
+      margin: 1.25rem 0 0;
+      max-width: 54ch;
+      font-size: 0.875rem;
+      color: var(--stone);
+    }
+
+    .instruments {
+      display: grid;
+      gap: 1.25rem;
+      padding: 1rem;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-md);
+      background: color-mix(in srgb, var(--paper) 88%, var(--rule));
+    }
+
+    .subhead {
+      margin: 0;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.9375rem;
+      letter-spacing: -0.01em;
+    }
+
+    .era-list {
+      margin: 0.75rem 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .era-item {
+      display: grid;
+      grid-template-columns: 1.5rem minmax(0, 1fr);
+      gap: 0.5rem;
+    }
+
+    .era-item__n {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--copper-text);
+      padding-top: 0.15rem;
+    }
+
+    .era-item__label {
+      margin: 0;
+      font-size: 0.875rem;
+      font-weight: 500;
+      line-height: 1.35;
+    }
+
+    .era-item__span {
+      margin: 0.2rem 0 0;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      color: var(--stone);
+    }
+
+    .era-note {
+      margin: 0.85rem 0 0;
+      font-size: 0.75rem;
+      line-height: 1.45;
+      color: var(--stone);
+    }
+
+    .metric-list {
+      margin: 0.75rem 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 0.85rem;
+    }
+
+    .metric-list li {
+      display: grid;
+      gap: 0.15rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .metric-list li:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .metric-label {
+      font-size: 0.8125rem;
+      color: var(--stone);
+      line-height: 1.35;
+    }
+
+    .metric-value {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      line-height: 1.45;
+      color: var(--ink);
+      word-break: break-word;
+    }
+
+    .metric-period {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      color: var(--stone);
+    }
+
+    .related {
+      margin-top: 1.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--rule);
+    }
+
+    .related-list {
+      margin: 0.75rem 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .related-list li {
+      font-size: 0.875rem;
+      color: var(--stone);
+    }
+
+    .related-list a {
+      margin-right: 0.35rem;
+    }
+
+    .detail-lede {
+      margin: 0 0 1.25rem;
+      max-width: 62ch;
+      font-family: var(--font-editorial);
+      font-size: 1rem;
+      line-height: 1.65;
+      color: var(--ink);
+    }
+
+    .detail-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    @media (min-width: 56rem) {
+      .detail-grid {
+        grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      }
+    }
+
+    .chart {
+      padding: 1rem;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-md);
+      background: var(--paper);
+    }
+
+    .chart__caption {
+      margin: 0 0 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--stone);
+    }
+
+    .chart__title {
+      margin: 0 0 0.35rem;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.9375rem;
+    }
+
+    .bars {
+      margin: 1rem 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 0.65rem;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 3.5rem minmax(0, 1fr) 3.25rem;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .bar-row__year {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--stone);
+    }
+
+    .bar-track {
+      height: 0.65rem;
+      background: color-mix(in srgb, var(--rule) 70%, var(--surface));
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: var(--charcoal);
+      border-radius: 2px;
+    }
+
+    .bar-fill--copper {
+      background: var(--copper);
+    }
+
+    .bar-row__val {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-align: right;
+      color: var(--ink);
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.25rem;
+      margin: 1rem 0 0;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      color: var(--stone);
+    }
+
+    .legend span::before {
+      content: "";
+      display: inline-block;
+      width: 0.65rem;
+      height: 0.65rem;
+      margin-right: 0.4rem;
+      vertical-align: -0.05rem;
+      border-radius: 1px;
+      background: var(--charcoal);
+    }
+
+    .legend .leg-copper::before {
+      background: var(--copper);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table.instrument {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+    }
+
+    table.instrument caption {
+      caption-side: top;
+      text-align: left;
+      margin-bottom: 0.75rem;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.9375rem;
+      color: var(--ink);
+    }
+
+    table.instrument th,
+    table.instrument td {
+      padding: 0.55rem 0.4rem;
+      border-bottom: 1px solid var(--rule);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    table.instrument th {
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--stone);
+    }
+
+    table.instrument td.mono {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+    }
+
+    .people-card {
+      margin-top: 1.25rem;
+      padding: 1rem;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-md);
+      background: var(--paper);
+    }
+
+    .people-card__kicker {
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--copper-text);
+    }
+
+    .people-card__title {
+      margin: 0.35rem 0 0;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 1.0625rem;
+    }
+
+    .people-card__body {
+      margin: 0.65rem 0 0;
+      font-family: var(--font-editorial);
+      font-size: 0.9375rem;
+      line-height: 1.6;
+      max-width: 54ch;
+    }
+
+    .people-card__id {
+      margin: 0.75rem 0 0;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      color: var(--stone);
+    }
+
+    .packets {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 0;
+    }
+
+    .packet {
+      display: grid;
+      grid-template-columns: 2.5rem minmax(0, 1fr);
+      gap: 0.75rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .packet:last-child {
+      border-bottom: none;
+    }
+
+    .packet__n {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--stone);
+      padding-top: 0.2rem;
+    }
+
+    .packet__title {
+      margin: 0;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.9375rem;
+    }
+
+    .packet__meta {
+      margin: 0.35rem 0 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      align-items: center;
+    }
+
+    .packet__sum {
+      margin: 0.5rem 0 0;
+      max-width: 52ch;
+      font-family: var(--font-editorial);
+      font-size: 0.875rem;
+      line-height: 1.5;
+      color: var(--ink);
+    }
+
+    .footer {
+      padding: 0.25rem 0.15rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.5rem;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 0.8125rem;
+      color: var(--stone);
+    }
+
+    .footer a {
+      font-weight: 500;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      body::before {
+        opacity: 0.12;
+      }
+    }
+
+    a.entity-link {
+      color: var(--copper-text);
+      font-weight: 600;
+      border-bottom: 1px solid color-mix(in srgb, var(--copper) 45%, transparent);
+    }
+
+    .law-cards {
+      margin: 1.25rem 0 0;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    @media (min-width: 48rem) {
+      .law-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .law-card {
+      margin: 0;
+      padding: 0.85rem 1rem;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+    }
+
+    .law-card__kicker {
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--stone);
+    }
+
+    .law-card__title {
+      margin: 0.35rem 0 0;
+      font-family: var(--font-display);
+      font-size: 0.9375rem;
+      font-weight: 600;
+    }
+
+    .law-card__body {
+      margin: 0.45rem 0 0;
+      font-family: var(--font-editorial);
+      font-size: 0.875rem;
+      line-height: 1.55;
+      color: var(--ink);
+    }
+
+    .statute-list {
+      margin: 0.75rem 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .statute-item {
+      padding: 0.85rem 1rem;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+    }
+
+    .statute-item__kicker {
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--stone);
+    }
+
+    .statute-item__title {
+      margin: 0.35rem 0 0;
+      font-family: var(--font-display);
+      font-size: 0.9375rem;
+      font-weight: 600;
+    }
+
+    .statute-item__body {
+      margin: 0.45rem 0 0;
+      font-family: var(--font-editorial);
+      font-size: 0.875rem;
+      line-height: 1.55;
+      color: var(--ink);
+    }
+
+    .entity-panel-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      background: color-mix(in srgb, var(--ink) 35%, transparent);
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .entity-panel-backdrop[hidden] {
+      display: none;
+    }
+
+    .entity-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 50;
+      width: min(100%, 28rem);
+      height: 100%;
+      margin: 0;
+      padding: 1.25rem;
+      border: 0;
+      border-left: 1px solid var(--rule);
+      background: var(--surface);
+      overflow-y: auto;
+      transform: translateX(100%);
+      transition: transform 180ms ease;
+    }
+
+    .entity-panel[open] {
+      transform: translateX(0);
+    }
+
+    .entity-panel__close {
+      margin: 0 0 1rem;
+      padding: 0.35rem 0.65rem;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-sm);
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .entity-panel__kicker {
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 0.625rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--copper-text);
+    }
+
+    .entity-panel__title {
+      margin: 0.35rem 0 0;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+    }
+
+    .entity-panel__summary {
+      margin: 0.85rem 0 0;
+      font-family: var(--font-editorial);
+      font-size: 1rem;
+      line-height: 1.65;
+      color: var(--ink);
+    }
+
+    .entity-panel__context {
+      margin: 0.85rem 0 0;
+      font-size: 0.875rem;
+      line-height: 1.55;
+      color: var(--stone);
+    }
+
+    .entity-panel__meta {
+      margin: 1rem 0 0;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      color: var(--stone);
+    }
+
+    .entity-panel__live {
+      display: inline-block;
+      margin-top: 1.25rem;
+      padding: 0.45rem 0.75rem;
+      border: 1px solid color-mix(in srgb, var(--copper) 40%, var(--rule));
+      border-radius: var(--radius-sm);
+      background: var(--paper);
+      color: var(--copper-text);
+      font-family: var(--font-sans);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .entity-panel {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <div class="shell">
+    <div class="brand-bar">
+      <p class="brand-bar__mark">BlackStory <span>· History, pinned to place.</span></p>
+      <p class="brand-bar__note">Journey preview · redlining</p>
+    </div>
+
+    <main id="main">
+      <article class="panel" aria-labelledby="intro-title">
+        <header class="header">
+          <span class="header__index" aria-hidden="true">00</span>
+          <div>
+            <p class="header__kicker">Theme · P0</p>
+            <h1 class="header__title" id="intro-title">Housing segregation &amp; redlining</h1>
+            <p class="header__lede">
+              Walk from a named beach in 1919 through federal credit maps, county instruments, and
+              a neighborhood you can still point to on State Street. Scene first; instruments beside
+              the prose; causation only where secondaries hold it.
+            </p>
+          </div>
+        </header>
+      </article>
+
+      <article class="panel panel--method" aria-labelledby="method-title">
+        <p class="panel-title">Method</p>
+        <h2 class="method-title" id="method-title">
+          Walk the journey; gate causation where secondaries require it
+        </h2>
+        <p class="method-body">
+          Each beat places you in a named scene before opening instruments. Co-movement is not proof
+          of cause unless a beat carries a gated causal claim with named secondary sources. Beat Q1
+          gates the federal Home Owners' Loan Corporation and Federal Housing Administration
+          underwriting system as enabling durable residential segregation (Rothstein; Massey and
+          Denton; Banaji, Fiske and Massey). Later American Community Survey, Home Mortgage
+          Disclosure Act, HUD CHAS, and Survey of Consumer Finances readings stay juxtaposition.
+        </p>
+        <p class="method-body">
+          When NHGIS tenure ends in 2010 and American Community Survey homeownership resumes for
+          2020-2024, we say the seam out loud. Hard readers should not have to invent a filter to
+          notice the handoff. The primary instrument rail shows multi-year spines only.
+        </p>
+        <p style="margin: 1rem 0 0">
+          <span class="chip">Juxtaposition · not causation</span>
+          <span class="chip chip--muted" style="margin-left: 0.35rem">Gated causal · Q1</span>
+        </p>
+      </article>
+
+      <article class="panel" aria-labelledby="arc-title" id="arc">
+        <header class="header">
+          <span class="header__index" aria-hidden="true">01</span>
+          <div>
+            <p class="header__kicker">Reading</p>
+            <h2 class="header__title" id="arc-title">The journey</h2>
+            <p class="header__lede">
+              Scene by scene through policy, practice, lived place, and measurement. Ink-sketch
+              visuals pace each beat; instruments sit beside the prose.
+            </p>
+          </div>
+        </header>
+
+        <div class="you-are-here" aria-labelledby="you-are-here-kicker">
+          <p class="you-are-here__kicker" id="you-are-here-kicker">You are here</p>
+          <p class="you-are-here__lede">
+            Start where the color line became physical: Eugene Williams, teenager, 29th Street
+            Beach, Chicago, 1919. The beats below walk policy, practice, lived place, measurement,
+            and what the record still cannot close.
+          </p>
+        </div>
+
+        <div class="arc-layout">
+          <div>
+            <ol class="beats">
+              <li class="beat">
+                <figure class="journey-sketch" aria-labelledby="sketch-q1-title">
+                  <svg class="journey-sketch__svg" viewBox="0 0 360 200" role="img" aria-labelledby="sketch-q1-title" focusable="false" preserveAspectRatio="xMidYMid meet">
+                    <title id="sketch-q1-title">Lake Michigan shoreline sketch, July 1919</title>
+                    <rect class="journey-sketch__wash" x="12" y="12" width="336" height="176" rx="8" />
+                    <path class="journey-sketch__stroke--muted" d="M24 118 Q90 98 156 112 T312 108" />
+                    <path class="journey-sketch__stroke" d="M24 118 L312 108 L312 168 L24 168 Z" />
+                    <path class="journey-sketch__stroke--accent" d="M148 112 C152 104 160 100 168 104 C176 108 174 118 166 122" />
+                    <circle class="journey-sketch__stroke--accent" cx="166" cy="118" r="6" />
+                    <path class="journey-sketch__stroke" d="M48 88 L58 68 L72 88 L88 62 L104 88" />
+                    <path class="journey-sketch__stroke" d="M220 72 L228 52 L244 72 L260 48 L276 72 L292 58 L308 72" />
+                    <text class="journey-sketch__label" x="28" y="36">29th Street Beach</text>
+                    <text class="journey-sketch__caption" x="28" y="186">invisible color line in the water</text>
+                  </svg>
+                  <figcaption class="scene-caption">
+                    <p class="scene-caption__kicker">Scene</p>
+                    <p class="scene-caption__line">Eugene Williams · teenager · 29th Street Beach, Chicago · 1919</p>
+                  </figcaption>
+                </figure>
+                <p class="beat__meta">01 · United States (Chicago classroom)</p>
+                <h3 class="beat__title">Before the maps: a color line walked into federal credit</h3>
+                <p class="beat__body">
+                  On July 27, 1919, Eugene Williams drifted across an invisible color line in Lake
+                  Michigan. A week of mob violence followed on Chicago's South Side. Great Migration
+                  families arriving on the South Side met private covenants, blockbusting, and the
+                  <a class="entity-link" href="#entity-ent_chicago_race_riot_1919_001">Chicago Race Riot of 1919</a>,
+                  a week of mob violence that made the color line physical. Private real estate wrote
+                  those rules first. New Deal credit then made them federal. The
+                  <a class="entity-link" href="#entity-ent_law_home_owners_loan_act_1933">Home Owners' Loan Act of 1933</a>
+                  created the Corporation that later graded neighborhoods; surveyors put race into
+                  the risk language of those sheets. The
+                  <a class="entity-link" href="#entity-ent_law_national_housing_act_1934">National Housing Act of 1934</a>
+                  created the Federal Housing Administration, whose underwriting manual rewarded
+                  same-race occupancy and restrictive covenants. Rothstein, Massey and Denton, Banaji,
+                  Fiske and Massey: the gated claim is about that underwriting system as a national
+                  machine, not one map causing every later loan. Chicago is the classroom where we
+                  learn to read the pattern.
+                </p>
+                <div class="law-cards" aria-label="Statutes on this beat">
+                  <article class="law-card">
+                    <p class="law-card__kicker">Law · 1933</p>
+                    <h4 class="law-card__title">
+                      <a class="entity-link" href="#entity-ent_law_home_owners_loan_act_1933">Home Owners' Loan Act</a>
+                    </h4>
+                    <p class="law-card__body">
+                      Created the Home Owners' Loan Corporation to refinance distressed mortgages.
+                      The Corporation's later residential security maps left a federal paper trail
+                      of neighborhood risk grades that often named race as a credit factor.
+                    </p>
+                  </article>
+                  <article class="law-card">
+                    <p class="law-card__kicker">Law · 1934</p>
+                    <h4 class="law-card__title">
+                      <a class="entity-link" href="#entity-ent_law_national_housing_act_1934">National Housing Act</a>
+                    </h4>
+                    <p class="law-card__body">
+                      Created the Federal Housing Administration to insure private mortgages.
+                      Underwriting manuals of the late 1930s treated racial occupancy change and
+                      missing restrictive covenants as risks to mortgage security.
+                    </p>
+                  </article>
+                </div>
+                <p class="beat__cite">
+                  <strong>On the desk</strong>
+                  National Archives Record Group 195 (Home Owners' Loan Corporation / Federal Home
+                  Loan Bank Board); Federal Housing Administration Underwriting Manual 1938 (FRASER);
+                  Rothstein, <em>The Color of Law</em> (2017); Massey and Denton,
+                  <em>American Apartheid</em> (1993); Banaji, Fiske and Massey (2021).
+                </p>
+              </li>
+
+              <li class="beat">
+                <figure class="journey-sketch" aria-labelledby="sketch-q2-title">
+                  <svg class="journey-sketch__svg" viewBox="0 0 360 200" role="img" aria-labelledby="sketch-q2-title" focusable="false" preserveAspectRatio="xMidYMid meet">
+                    <title id="sketch-q2-title">Home Owners Loan Corporation map unrolled on a table</title>
+                    <rect class="journey-sketch__wash" x="12" y="12" width="336" height="176" rx="8" />
+                    <path class="journey-sketch__stroke" d="M40 148 L320 148" />
+                    <path class="journey-sketch__fill" d="M72 52 L288 44 L296 132 L64 140 Z" />
+                    <path class="journey-sketch__stroke--accent" d="M88 68 L148 64 L152 108 L92 112 Z" />
+                    <path class="journey-sketch__stroke--muted" d="M156 62 L208 58 L212 104 L160 108 Z" />
+                    <path class="journey-sketch__stroke" d="M216 56 L272 52 L276 100 L220 104 Z" />
+                    <path class="journey-sketch__stroke--muted" d="M96 116 L144 112 L148 132 L100 136 Z" />
+                    <text class="journey-sketch__label" x="96" y="82">D</text>
+                    <text class="journey-sketch__label" x="172" y="82">C</text>
+                    <text class="journey-sketch__label" x="236" y="78">B</text>
+                    <text class="journey-sketch__caption" x="28" y="186">683 graded areas · Chicago inventory</text>
+                  </svg>
+                  <figcaption class="scene-caption">
+                    <p class="scene-caption__kicker">Scene</p>
+                    <p class="scene-caption__line">HOLC surveyor · federal mapmaker · Chicago kitchen table · 1939</p>
+                  </figcaption>
+                </figure>
+                <p class="beat__meta">02 · Chicago HOLC survey</p>
+                <h3 class="beat__title">Spread the Chicago sheets: most of the city is C or D</h3>
+                <p class="beat__body">
+                  Now open the maps. A direct recount of the Chicago Home Owners' Loan Corporation
+                  inventory yields 703 features: 683 normalized A-D grades (A 49, B 160, C 327, D 147)
+                  plus 20 ungraded commercial or industrial features. The area descriptions say the
+                  quiet part out loud about race and risk. What they will not give you is how many
+                  Black Chicagoans lived inside each grade. That missing count is why we refuse to
+                  pretend a polygon is a census.
+                </p>
+                <p class="beat__cite">
+                  <strong>On the desk</strong>
+                  Mapping Inequality Chicago extract (University of Richmond DSL); National Archives
+                  Record Group 195; Hillier (2003). Gap: population-by-grade remains insufficient
+                  evidence. Polygons stay cite-only (CC BY-NC-SA).
+                </p>
+              </li>
+
+              <li class="beat">
+                <figure class="journey-sketch" aria-labelledby="sketch-q3-title">
+                  <svg class="journey-sketch__svg" viewBox="0 0 360 200" role="img" aria-labelledby="sketch-q3-title" focusable="false" preserveAspectRatio="xMidYMid meet">
+                    <title id="sketch-q3-title">Multi-year homeownership and credit instrument sketch</title>
+                    <rect class="journey-sketch__wash" x="12" y="12" width="336" height="176" rx="8" />
+                    <path class="journey-sketch__stroke--muted" d="M48 148 L312 148" />
+                    <rect class="journey-sketch__fill--accent" x="56" y="96" width="28" height="52" />
+                    <rect class="journey-sketch__fill" x="104" y="82" width="28" height="66" />
+                    <rect class="journey-sketch__fill--accent" x="152" y="88" width="28" height="60" />
+                    <rect class="journey-sketch__fill--accent" x="200" y="90" width="28" height="58" />
+                    <path class="journey-sketch__stroke" d="M248 72 L296 72" />
+                    <path class="journey-sketch__stroke--accent" d="M248 96 L280 96" />
+                    <path class="journey-sketch__stroke--muted" d="M248 120 L272 120" />
+                    <text class="journey-sketch__label" x="58" y="164">1990</text>
+                    <text class="journey-sketch__label" x="106" y="164">2000</text>
+                    <text class="journey-sketch__label" x="154" y="164">2010</text>
+                    <text class="journey-sketch__label" x="198" y="164">ACS</text>
+                    <text class="journey-sketch__caption" x="28" y="36">Cook County ownership spine</text>
+                  </svg>
+                  <figcaption class="scene-caption">
+                    <p class="scene-caption__kicker">Scene</p>
+                    <p class="scene-caption__line">Cook County household · renter seeking ownership · South Side, Illinois · 1990-2024</p>
+                  </figcaption>
+                </figure>
+                <p class="beat__meta">03 · Cook County · national wealth for scale</p>
+                <h3 class="beat__title">After credit learned the color line: ownership, denial, burden, wealth</h3>
+                <p class="beat__body">
+                  Leave the 1930s sheets on the desk and walk the county forward. In Cook County,
+                  NHGIS tenure shows Black homeownership rising from 37.1% in 1990 to 42.0% in 2000
+                  and 41.2% in 2010, while the White rate stayed about 25 to 27 points higher. When
+                  NHGIS ends, the American Community Survey for 2020-2024 continues the same county
+                  ownership question on a later catalog; we name that seam instead of pretending the
+                  methods are identical. Home Mortgage Disclosure Act county aggregates for 2018 and
+                  2023 still show a Black-White denial-rate gap (18.7 then 16.9 points). HUD CHAS for
+                  2017-2021 shows a 29.5-point cost-burden gap. National Survey of Consumer Finances
+                  medians for 1989, 2010, and 2022 sit beside the metro reading for wealth scale, not
+                  as a county substitute. The
+                  <a class="entity-link" href="#entity-ent_law_fair_housing_act_1968">Fair Housing Act of 1968</a>
+                  banned discrimination in the sale, rental, and financing of housing; the
+                  <a class="entity-link" href="#entity-ent_law_community_reinvestment_act_1977">Community Reinvestment Act of 1977</a>
+                  pressed banks to meet credit needs in the communities they serve. Those statutes
+                  sit on the timeline as policy context; they do not turn later instrument gaps into
+                  automatic proof of one map's causal reach.
+                </p>
+                <div class="law-cards" aria-label="Statutes on this beat">
+                  <article class="law-card">
+                    <p class="law-card__kicker">Law · 1968</p>
+                    <h4 class="law-card__title">
+                      <a class="entity-link" href="#entity-ent_law_fair_housing_act_1968">Fair Housing Act</a>
+                    </h4>
+                    <p class="law-card__body">
+                      Title VIII of the Civil Rights Act of 1968 banned discrimination in the sale,
+                      rental, and financing of housing based on race, color, religion, or national
+                      origin (later amendments added sex, disability, and familial status).
+                    </p>
+                  </article>
+                  <article class="law-card">
+                    <p class="law-card__kicker">Law · 1977</p>
+                    <h4 class="law-card__title">
+                      <a class="entity-link" href="#entity-ent_law_community_reinvestment_act_1977">Community Reinvestment Act</a>
+                    </h4>
+                    <p class="law-card__body">
+                      Directed federal bank regulators to encourage depository institutions to meet
+                      the credit needs of the communities they serve, including low- and
+                      moderate-income neighborhoods, after decades of documented lending withdrawal.
+                    </p>
+                  </article>
+                </div>
+                <p class="beat__cite">
+                  <strong>On the desk</strong>
+                  IPUMS NHGIS / Census tenure (1990-2010); American Community Survey 2020-2024 (Cook);
+                  FFIEC Home Mortgage Disclosure Act county aggregates (2018, 2023); HUD CHAS Table 9
+                  (2017-2021); Federal Reserve Survey of Consumer Finances medians (1989, 2010, 2022
+                  dollars).
+                </p>
+              </li>
+
+              <li class="beat">
+                <figure class="journey-sketch" aria-labelledby="sketch-q4-title">
+                  <svg class="journey-sketch__svg" viewBox="0 0 360 200" role="img" aria-labelledby="sketch-q4-title" focusable="false" preserveAspectRatio="xMidYMid meet">
+                    <title id="sketch-q4-title">State Street Bronzeville streetscape sketch</title>
+                    <rect class="journey-sketch__wash" x="12" y="12" width="336" height="176" rx="8" />
+                    <path class="journey-sketch__stroke--muted" d="M48 152 L312 152" />
+                    <rect class="journey-sketch__fill" x="56" y="72" width="52" height="80" />
+                    <rect class="journey-sketch__fill--accent" x="120" y="56" width="64" height="96" />
+                    <rect class="journey-sketch__fill" x="196" y="68" width="48" height="84" />
+                    <rect class="journey-sketch__fill" x="256" y="80" width="44" height="72" />
+                    <path class="journey-sketch__stroke" d="M132 72 L132 56 M148 72 L148 56" />
+                    <text class="journey-sketch__label" x="124" y="92">Defender</text>
+                    <text class="journey-sketch__label" x="60" y="92">YMCA</text>
+                    <text class="journey-sketch__caption" x="28" y="36">State Street · Black Metropolis</text>
+                  </svg>
+                  <figcaption class="scene-caption">
+                    <p class="scene-caption__kicker">Scene</p>
+                    <p class="scene-caption__line">Robert S. Abbott · publisher / Defender · State Street, Bronzeville · 1919-1945</p>
+                  </figcaption>
+                </figure>
+                <p class="beat__meta">04 · Bronzeville · county tape measure</p>
+                <h3 class="beat__title">Bronzeville on the map; the county still holds the tape measure</h3>
+                <p class="beat__body">
+                  Now name the neighborhood.
+                  <a class="entity-link" href="#entity-ent_bronzeville_001">Bronzeville</a>
+                  is Chicago's Black Metropolis after 1916 along State Street and South Parkway: the
+                  Defender, Overton Hygienic, Supreme Life, the Wabash Avenue YMCA. Robert S. Abbott
+                  built the Chicago Defender into a national voice from this corridor. Drake and Cayton
+                  gave the district its lasting name in 1945. The same South Side geography that
+                  survived the
+                  <a class="entity-link" href="#entity-ent_chicago_race_riot_1919_001">1919 riot</a>
+                  later sat under Home Owners' Loan Corporation grades and Federal Housing
+                  Administration underwriting. Bind the place; then open the Cook County instruments
+                  that already walk homeownership across 1990, 2000, 2010, and the American Community
+                  Survey handoff, plus Home Mortgage Disclosure Act denial years 2018 and 2023. Those
+                  series still resolve only to the county. They cannot find the same households
+                  inside a particular Corporation polygon. Local story, county tape measure, until
+                  tract linkage closes.
+                </p>
+                <p class="beat__cite">
+                  <strong>On the desk</strong>
+                  Entity
+                  <a class="entity-link" href="#entity-ent_bronzeville_001">ent_bronzeville_001</a>
+                  (City of Chicago landmark district; NPS National Heritage Area 2023); NHGIS /
+                  American Community Survey / Home Mortgage Disclosure Act / HUD CHAS county readings
+                  as in beat 03; Mapping Inequality for place context. Gap: tract-level household
+                  linkage still insufficient.
+                </p>
+              </li>
+            </ol>
+
+            <p class="gap-note">
+              Some year spans and district series are still out of the room. The beats already walk
+              through those seams with labels; open a beat when you need the exact coverage and
+              provenance quartet.
+            </p>
+          </div>
+
+          <aside class="instruments" aria-label="Instruments beside the journey">
+            <section aria-labelledby="eras-heading">
+              <h3 class="subhead" id="eras-heading">Policy eras (juxtaposition spine)</h3>
+              <ol class="era-list">
+                <li class="era-item">
+                  <span class="era-item__n" aria-hidden="true">1</span>
+                  <div>
+                    <p class="era-item__label">HOLC / FHA grading &amp; federal mortgage gatekeeping</p>
+                    <p class="era-item__span">circa 1933-1968</p>
+                  </div>
+                </li>
+                <li class="era-item">
+                  <span class="era-item__n" aria-hidden="true">2</span>
+                  <div>
+                    <p class="era-item__label">Fair Housing &amp; early enforcement</p>
+                    <p class="era-item__span">circa 1968-1980s</p>
+                  </div>
+                </li>
+                <li class="era-item">
+                  <span class="era-item__n" aria-hidden="true">3</span>
+                  <div>
+                    <p class="era-item__label">CRA / contemporary lending disparity</p>
+                    <p class="era-item__span">circa 1977-present</p>
+                  </div>
+                </li>
+              </ol>
+              <p class="era-note">
+                Quiet labels on the era rail may use short forms after the prose has already spelled
+                them out. Eras are historical context beside indicators, not proof that any single
+                policy caused later readings.
+              </p>
+            </section>
+
+            <section aria-labelledby="statutes-heading">
+              <h3 class="subhead" id="statutes-heading">Acts and laws</h3>
+              <ul class="statute-list">
+                <li class="statute-item">
+                  <p class="statute-item__kicker">Law · 1933</p>
+                  <p class="statute-item__title">
+                    <a class="entity-link" href="#entity-ent_law_home_owners_loan_act_1933">Home Owners' Loan Act</a>
+                  </p>
+                  <p class="statute-item__body">
+                    Created the Home Owners' Loan Corporation to refinance distressed mortgages.
+                    The Corporation's later residential security maps left a federal paper trail
+                    of neighborhood risk grades that often named race as a credit factor.
+                  </p>
+                </li>
+                <li class="statute-item">
+                  <p class="statute-item__kicker">Law · 1934</p>
+                  <p class="statute-item__title">
+                    <a class="entity-link" href="#entity-ent_law_national_housing_act_1934">National Housing Act</a>
+                  </p>
+                  <p class="statute-item__body">
+                    Created the Federal Housing Administration to insure private mortgages.
+                    Underwriting manuals of the late 1930s treated racial occupancy change and
+                    missing restrictive covenants as risks to mortgage security.
+                  </p>
+                </li>
+                <li class="statute-item">
+                  <p class="statute-item__kicker">Law · 1968</p>
+                  <p class="statute-item__title">
+                    <a class="entity-link" href="#entity-ent_law_fair_housing_act_1968">Fair Housing Act</a>
+                  </p>
+                  <p class="statute-item__body">
+                    Title VIII of the Civil Rights Act of 1968 banned discrimination in the sale,
+                    rental, and financing of housing based on race, color, religion, or national
+                    origin (later amendments added sex, disability, and familial status).
+                  </p>
+                </li>
+                <li class="statute-item">
+                  <p class="statute-item__kicker">Law · 1977</p>
+                  <p class="statute-item__title">
+                    <a class="entity-link" href="#entity-ent_law_community_reinvestment_act_1977">Community Reinvestment Act</a>
+                  </p>
+                  <p class="statute-item__body">
+                    Directed federal bank regulators to encourage depository institutions to meet
+                    the credit needs of the communities they serve, including low- and
+                    moderate-income neighborhoods, after decades of documented lending withdrawal.
+                  </p>
+                </li>
+              </ul>
+              <p class="era-note">
+                Statutes sit on the timeline as policy context beside instruments, not as automatic
+                proof that any single map caused later readings.
+              </p>
+            </section>
+
+            <section aria-labelledby="instruments-heading">
+              <h3 class="subhead" id="instruments-heading">Instruments (multi-year spines)</h3>
+              <ul class="metric-list">
+                <li>
+                  <span class="metric-label">Black homeownership rate, Cook County</span>
+                  <span class="metric-value">37.1% · 42.0% · 41.2% · 41.5%</span>
+                  <span class="metric-period">1990 / 2000 / 2010 / ACS 2020-2024</span>
+                </li>
+                <li>
+                  <span class="metric-label">White homeownership rate, Cook County</span>
+                  <span class="metric-value">63.8% · 66.7% · 67.2%</span>
+                  <span class="metric-period">1990 / 2000 / 2010 (NHGIS)</span>
+                </li>
+                <li>
+                  <span class="metric-label">Black-White denial-rate gap (Cook)</span>
+                  <span class="metric-value">18.7 pp · 16.9 pp</span>
+                  <span class="metric-period">HMDA 2018 / 2023</span>
+                </li>
+                <li>
+                  <span class="metric-label">Median family net worth, Black families (nation)</span>
+                  <span class="metric-value">$9,200 · $21,800 · $44,900</span>
+                  <span class="metric-period">SCF 1989 / 2010 / 2022 · 2022$</span>
+                </li>
+                <li>
+                  <span class="metric-label">Median family net worth, White NH families (nation)</span>
+                  <span class="metric-value">$164,030 · $178,280 · $285,000</span>
+                  <span class="metric-period">SCF 1989 / 2010 / 2022 · 2022$</span>
+                </li>
+              </ul>
+              <p class="era-note">
+                Lone American Community Survey income or poverty snapshots stay off this primary
+                rail; they may appear in packet detail when labeled as single-period context.
+              </p>
+            </section>
+          </aside>
+        </div>
+
+        <nav class="related" aria-label="Related threads">
+          <h3 class="subhead">Related threads</h3>
+          <ul class="related-list">
+            <li>
+              <a href="#related-note">School segregation &amp; opportunity</a>
+              Segregated housing sits beside school opportunity.
+            </li>
+            <li>
+              <a href="#related-note">Voting rights &amp; political exclusion</a>
+              Place and franchise enforcement share a long civic spine.
+            </li>
+            <li>
+              <a href="#related-note">Urban renewal</a>
+              Later clearance projects reworked the same neighborhoods.
+            </li>
+          </ul>
+          <p id="related-note" class="era-note" style="margin-top: 0.75rem">
+            Soft crosslinks in the live product; this preview stays on one theme.
+          </p>
+        </nav>
+      </article>
+
+      <article class="panel" aria-labelledby="detail-title">
+        <p class="panel-title">Instrument detail · beat Q3</p>
+        <h2 class="header__title" id="detail-title" style="margin-top: 0.25rem">Instruments for this beat</h2>
+        <p class="detail-lede">
+          Cook County ownership across NHGIS (1990-2010) and the American Community Survey
+          (2020-2024), with multi-year credit and wealth spines labeled by source. Bars are labeled
+          instruments, not decorative marks.
+        </p>
+
+        <div class="detail-grid">
+          <figure class="chart">
+            <p class="chart__caption">Cook County · homeownership rate</p>
+            <h3 class="chart__title">Black and White tenure across catalogs</h3>
+            <ul class="bars" aria-label="Homeownership rates by year">
+              <li class="bar-row">
+                <span class="bar-row__year">1990</span>
+                <div class="bar-track" title="Black 37.1%"><div class="bar-fill bar-fill--copper" style="width: 37.1%"></div></div>
+                <span class="bar-row__val">37.1%</span>
+              </li>
+              <li class="bar-row" aria-hidden="true">
+                <span class="bar-row__year"></span>
+                <div class="bar-track" title="White 63.8%"><div class="bar-fill" style="width: 63.8%"></div></div>
+                <span class="bar-row__val">63.8%</span>
+              </li>
+              <li class="bar-row">
+                <span class="bar-row__year">2000</span>
+                <div class="bar-track" title="Black 42.0%"><div class="bar-fill bar-fill--copper" style="width: 42%"></div></div>
+                <span class="bar-row__val">42.0%</span>
+              </li>
+              <li class="bar-row" aria-hidden="true">
+                <span class="bar-row__year"></span>
+                <div class="bar-track" title="White 66.7%"><div class="bar-fill" style="width: 66.7%"></div></div>
+                <span class="bar-row__val">66.7%</span>
+              </li>
+              <li class="bar-row">
+                <span class="bar-row__year">2010</span>
+                <div class="bar-track" title="Black 41.2%"><div class="bar-fill bar-fill--copper" style="width: 41.2%"></div></div>
+                <span class="bar-row__val">41.2%</span>
+              </li>
+              <li class="bar-row" aria-hidden="true">
+                <span class="bar-row__year"></span>
+                <div class="bar-track" title="White 67.2%"><div class="bar-fill" style="width: 67.2%"></div></div>
+                <span class="bar-row__val">67.2%</span>
+              </li>
+              <li class="bar-row">
+                <span class="bar-row__year">ACS</span>
+                <div class="bar-track" title="Black 41.5% (2020-2024)"><div class="bar-fill bar-fill--copper" style="width: 41.5%"></div></div>
+                <span class="bar-row__val">41.5%</span>
+              </li>
+            </ul>
+            <div class="legend">
+              <span class="leg-copper">Black (NHGIS / ACS)</span>
+              <span>White (NHGIS 1990-2010)</span>
+            </div>
+            <p class="era-note" style="margin-top: 0.85rem">
+              Seam: NHGIS ends 2010; American Community Survey 2020-2024 resumes ownership on a later
+              catalog. White ACS ownership is not plotted here; the packet keeps White income and
+              HMDA denial beside Black ownership rather than inventing a matched White ACS tenure row
+              in this chart.
+            </p>
+          </figure>
+
+          <div>
+            <div class="table-wrap">
+              <table class="instrument">
+                <caption>Credit and national wealth spines</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Instrument</th>
+                    <th scope="col">Value</th>
+                    <th scope="col">Period</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>HMDA denial gap (Black - White), Cook</td>
+                    <td class="mono">18.7 pp</td>
+                    <td class="mono">2018</td>
+                  </tr>
+                  <tr>
+                    <td>HMDA denial gap (Black - White), Cook</td>
+                    <td class="mono">16.9 pp</td>
+                    <td class="mono">2023</td>
+                  </tr>
+                  <tr>
+                    <td>SCF median net worth · Black families</td>
+                    <td class="mono">$9,200</td>
+                    <td class="mono">1989</td>
+                  </tr>
+                  <tr>
+                    <td>SCF median net worth · Black families</td>
+                    <td class="mono">$21,800</td>
+                    <td class="mono">2010</td>
+                  </tr>
+                  <tr>
+                    <td>SCF median net worth · Black families</td>
+                    <td class="mono">$44,900</td>
+                    <td class="mono">2022</td>
+                  </tr>
+                  <tr>
+                    <td>SCF median net worth · White NH families</td>
+                    <td class="mono">$164,030</td>
+                    <td class="mono">1989</td>
+                  </tr>
+                  <tr>
+                    <td>SCF median net worth · White NH families</td>
+                    <td class="mono">$178,280</td>
+                    <td class="mono">2010</td>
+                  </tr>
+                  <tr>
+                    <td>SCF median net worth · White NH families</td>
+                    <td class="mono">$285,000</td>
+                    <td class="mono">2022</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="era-note" style="margin-top: 0.85rem">
+              Sources: FFIEC Home Mortgage Disclosure Act; Federal Reserve Survey of Consumer
+              Finances (2022 dollars). National wealth sits beside the metro housing reading without
+              collapsing geography. Quiet instrument labels may use short forms after the arc prose
+              has expanded the names.
+            </p>
+          </div>
+        </div>
+
+        <div class="people-card">
+          <p class="people-card__kicker">Place · role · year</p>
+          <h3 class="people-card__title">
+            <a class="entity-link" href="#entity-ent_bronzeville_001">Bronzeville</a>
+            · Black Metropolis · Chicago
+          </h3>
+          <p class="people-card__body">
+            After 1916, Southern migrants built a parallel economy of banks, insurers, publishers,
+            and entertainment venues on the South Side. Chicago landmarked the Black
+            Metropolis-Bronzeville District in 1998; Congress designated the National Heritage Area
+            in 2023. The Q4 beat keeps that named place visible while county instruments stay
+            labeled as county instruments.
+          </p>
+          <p class="people-card__id">
+            PLACE / DISTRICT / CHICAGO / 1910s-present ·
+            <a class="entity-link" href="#entity-ent_bronzeville_001">ent_bronzeville_001</a>
+          </p>
+        </div>
+      </article>
+
+      <article class="panel" aria-labelledby="packets-title" id="packets">
+        <header class="header header--flush">
+          <span class="header__index" aria-hidden="true">02</span>
+          <div>
+            <p class="header__kicker">Verify</p>
+            <h2 class="header__title" id="packets-title">Packets (secondary)</h2>
+            <p class="header__lede">
+              Provenance for hard readers. Primary reading stays the journey above.
+            </p>
+          </div>
+        </header>
+
+        <ol class="packets">
+          <li class="packet">
+            <span class="packet__n">Q1</span>
+            <div>
+              <h3 class="packet__title">Before the maps: a color line walked into federal credit</h3>
+              <div class="packet__meta">
+                <span class="chip">Gated causal</span>
+                <span class="chip chip--muted">holc_fha · fair_housing · cra</span>
+              </div>
+              <p class="packet__sum">
+                Eugene Williams, July 27 1919 beach, riot, Home Owners' Loan Act 1933, National
+                Housing Act 1934, and named secondary consensus for the federal underwriting system;
+                Chicago as classroom.
+              </p>
+            </div>
+          </li>
+          <li class="packet">
+            <span class="packet__n">Q2</span>
+            <div>
+              <h3 class="packet__title">Spread the Chicago sheets: most of the city is C or D</h3>
+              <div class="packet__meta">
+                <span class="chip chip--muted">Juxtaposition</span>
+                <span class="chip chip--muted">Gap · population-by-grade</span>
+              </div>
+              <p class="packet__sum">
+                Spread Chicago HOLC sheets, 703 features, 683 A-D grades (A 49, B 160, C 327, D 147);
+                cite-only polygons.
+              </p>
+            </div>
+          </li>
+          <li class="packet">
+            <span class="packet__n">Q3</span>
+            <div>
+              <h3 class="packet__title">After credit learned the color line: ownership, denial, burden, wealth</h3>
+              <div class="packet__meta">
+                <span class="chip chip--muted">Juxtaposition</span>
+                <span class="chip chip--muted">NHGIS · ACS · HMDA · CHAS · SCF</span>
+              </div>
+              <p class="packet__sum">
+                Cook County household seeking ownership, NHGIS/ACS/HMDA/CHAS/SCF multi-year spines
+                with an explicit NHGIS to ACS catalog handoff; Fair Housing Act and Community
+                Reinvestment Act as timeline context.
+              </p>
+            </div>
+          </li>
+          <li class="packet">
+            <span class="packet__n">Q4</span>
+            <div>
+              <h3 class="packet__title">Bronzeville on the map; the county still holds the tape measure</h3>
+              <div class="packet__meta">
+                <span class="chip chip--muted">Juxtaposition</span>
+                <span class="chip chip--muted">Gap · tract linkage</span>
+              </div>
+              <p class="packet__sum">
+                State Street Bronzeville, Robert S. Abbott Defender, county tape measure gap;
+                named place binding with the same multi-year county spines.
+              </p>
+            </div>
+          </li>
+        </ol>
+      </article>
+    </main>
+
+    <footer class="footer">
+      <span>BlackStory · themes edition preview</span>
+      <span>Journey rewrite · 2026-07-24 · scene-led beats + entity panel</span>
+    </footer>
+  </div>
+
+  <button type="button" class="entity-panel-backdrop" id="entity-panel-backdrop" hidden aria-label="Close record card"></button>
+  <aside class="entity-panel" id="entity-panel" aria-labelledby="entity-panel-title" aria-hidden="true">
+    <button type="button" class="entity-panel__close" id="entity-panel-close">Close record</button>
+    <p class="entity-panel__kicker" id="entity-panel-kicker">Record</p>
+    <h2 class="entity-panel__title" id="entity-panel-title"></h2>
+    <p class="entity-panel__summary" id="entity-panel-summary"></p>
+    <p class="entity-panel__context" id="entity-panel-context"></p>
+    <p class="entity-panel__meta" id="entity-panel-meta"></p>
+    <a class="entity-panel__live" id="entity-panel-live" href="#" target="_blank" rel="noopener noreferrer">Open full record in BlackStory</a>
+  </aside>
+
+  <script>
+    (function () {
+      var catalog = {
+        ent_chicago_race_riot_1919_001: {
+          kind: "Event",
+          title: "Chicago Race Riot of 1919",
+          summary: "After a white man stoned Black teenager Eugene Williams to death for drifting into a segregated section of Lake Michigan on July 27, 1919, a week of mob violence swept Chicago's South Side, killing 38 people and leaving thousands of Black Chicagoans homeless.",
+          context: "The riot erupted as Great Migration families reshaped Chicago's South Side housing and jobs. Federal residential-security mapping and Federal Housing Administration underwriting later graded the same geography.",
+          meta: "EVENT / CHICAGO / 1919"
+        },
+        ent_law_home_owners_loan_act_1933: {
+          kind: "Law",
+          title: "Home Owners' Loan Act of 1933",
+          summary: "Signed June 13, 1933, this New Deal statute created the Home Owners' Loan Corporation to refinance distressed mortgages and, through the Corporation's later residential security maps, left a federal paper trail of neighborhood risk grades that often named race as a credit factor.",
+          context: "The Corporation's mapping program, preserved in National Archives Record Group 195 and digitized by Mapping Inequality, became a core documentary spine for scholarship on federal redlining.",
+          meta: "LAW / WASHINGTON, D.C. / 1933"
+        },
+        ent_law_national_housing_act_1934: {
+          kind: "Law",
+          title: "National Housing Act of 1934",
+          summary: "Enacted June 27, 1934, this statute created the Federal Housing Administration to insure private mortgages and, through underwriting manuals that favored same-race occupancy and restrictive covenants, helped turn segregated neighborhoods into a national credit preference.",
+          context: "Together with Home Owners' Loan Corporation mapping, Federal Housing Administration insurance became the federal machinery scholars cite when arguing that residential segregation was national credit policy.",
+          meta: "LAW / WASHINGTON, D.C. / 1934"
+        },
+        ent_law_fair_housing_act_1968: {
+          kind: "Law",
+          title: "Fair Housing Act of 1968",
+          summary: "Enacted April 11, 1968, as Title VIII of the Civil Rights Act of 1968, this law banned discrimination in the sale, rental, and financing of housing based on race, color, religion, or national origin.",
+          context: "Congress passed the Act one week after Martin Luther King Jr.'s assassination intensified pressure to reach private housing markets that earlier civil-rights statutes had not fully covered.",
+          meta: "LAW / WASHINGTON, D.C. / 1968"
+        },
+        ent_law_community_reinvestment_act_1977: {
+          kind: "Law",
+          title: "Community Reinvestment Act of 1977",
+          summary: "Signed October 12, 1977, this statute directed federal bank regulators to encourage depository institutions to meet the credit needs of the communities they serve, including low- and moderate-income neighborhoods, after decades of documented lending withdrawal from urban Black districts.",
+          context: "The Act sits beside the Fair Housing Act on the enforcement timeline: one statute targets discrimination in housing markets; the other pressures banks to reinvest where they take deposits.",
+          meta: "LAW / WASHINGTON, D.C. / 1977"
+        },
+        ent_bronzeville_001: {
+          kind: "Place",
+          title: "Bronzeville",
+          summary: "Chicago's Black Metropolis grew with the Great Migration after 1916, centered on State Street and South Parkway: the Chicago Defender, Overton Hygienic Building, Supreme Life Insurance, and the Wabash Avenue YMCA.",
+          context: "Chicago landmarked the Black Metropolis-Bronzeville District in 1998; Congress designated the National Heritage Area in 2023. The same South Side geography later sat under Home Owners' Loan Corporation grades and Federal Housing Administration underwriting.",
+          meta: "PLACE / DISTRICT / CHICAGO / 1910s-present"
+        }
+      };
+
+      var panel = document.getElementById("entity-panel");
+      var backdrop = document.getElementById("entity-panel-backdrop");
+      var closeBtn = document.getElementById("entity-panel-close");
+      var liveLink = document.getElementById("entity-panel-live");
+      var lastFocus = null;
+
+      function entityIdFromLink(link) {
+        var href = link.getAttribute("href") || "";
+        if (href.indexOf("#entity-") === 0) {
+          return href.slice("#entity-".length);
+        }
+        return "";
+      }
+
+      function openEntityPanel(entityId) {
+        var record = catalog[entityId];
+        if (!record || !panel) return;
+
+        document.getElementById("entity-panel-kicker").textContent = record.kind;
+        document.getElementById("entity-panel-title").textContent = record.title;
+        document.getElementById("entity-panel-summary").textContent = record.summary;
+        document.getElementById("entity-panel-context").textContent = record.context;
+        document.getElementById("entity-panel-meta").textContent = record.meta + " · " + entityId;
+
+        liveLink.href = "http://127.0.0.1:3000/entity/" + entityId;
+
+        lastFocus = document.activeElement;
+        panel.setAttribute("open", "");
+        panel.setAttribute("aria-hidden", "false");
+        backdrop.hidden = false;
+        closeBtn.focus();
+      }
+
+      function closeEntityPanel() {
+        if (!panel) return;
+        panel.removeAttribute("open");
+        panel.setAttribute("aria-hidden", "true");
+        backdrop.hidden = true;
+        if (lastFocus && typeof lastFocus.focus === "function") {
+          lastFocus.focus();
+        }
+      }
+
+      document.addEventListener("click", function (event) {
+        var link = event.target.closest("a.entity-link");
+        if (!link) return;
+        var entityId = entityIdFromLink(link);
+        if (!entityId || !catalog[entityId]) return;
+        event.preventDefault();
+        openEntityPanel(entityId);
+      });
+
+      closeBtn.addEventListener("click", closeEntityPanel);
+      backdrop.addEventListener("click", closeEntityPanel);
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && panel && panel.hasAttribute("open")) {
+          closeEntityPanel();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
