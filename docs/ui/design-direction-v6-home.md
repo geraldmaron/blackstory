@@ -39,9 +39,9 @@ reader theme toggle (light and dark). Do not hide or disable the theme control o
 | Copper | Text `#8E4F2A`, graphic `#B86B2A` | Text `#D07A32`, graphic `#D07A32` |
 | Reader theme toggle | **Active on `/`** — home is not a light-only exception |
 
-**Atmosphere, not wallpaper:** page gutters carry fixed pseudo-element texture (paper grain + quiet archive index grid / corner brackets on Rule and copper hairlines). Home does **not** mount a scattered gutter mosaic — that collage register stays on other edition routes (`EditionAtmosphereMosaic`). Center content and Surface cards stay opaque (WCAG floor). No crumpled continental silhouettes, no competing fake map under the live hero readout, no sepia stock.
+**Atmosphere, not wallpaper:** page gutters carry fixed pseudo-element texture (paper grain + quiet archive index grid / corner brackets on Rule and copper hairlines). Home does **not** mount a scattered gutter mosaic — that collage register stays on other edition routes (`EditionAtmosphereMosaic`). Center content Surface cards stay opaque (WCAG floor); the home column itself is transparent so atmosphere can show through the hero copy scrim. No crumpled continental silhouettes, no competing fake map under the live hero readout, no sepia stock.
 
-The hero map inside beat 0 is a **Surface-contained live readout**: the persistent MapLibre plate (`MapStage`) is **positioned** into the hero map column (viewport-fixed box from `hero-map-inset.ts`, not `clip-path`) so real archive pins render in-panel — never a decorative sketch, never full-bleed wallpaper under the whole page. The copy column uses a **flat translucent Surface scrim** (`color-mix` Surface 60% light / 60% dark) — not an opaque slab — while the map inset stays map-column-only (do not reframe the plate under the copy).
+The hero map inside beat 0 is a **Surface-contained live readout**: the persistent MapLibre plate (`MapStage`) is **positioned** into the hero map column (viewport-fixed box from `hero-map-inset.ts`, not `clip-path`) so real archive pins render in-panel — never a decorative sketch, never full-bleed wallpaper under the whole page. The copy column sits over a **copy-column-only atmosphere plate** (`.ds-home-hero::before`: Archive Paper canvas + archive grain/grid) with a transparent copy layer on top so the grid reads as clearly as the map-column window — not an opaque Surface slab. Opaque fills on `.ds-home` / home `main` are punched transparent so page atmosphere can also participate; the map inset stays map-column-only (do not reframe the plate under the copy).
 
 ---
 
@@ -271,7 +271,7 @@ Never two copper-filled buttons visible in the same above-the-fold viewport. Raw
 - CSS surface: `apps/web/src/app/(home)/` or page-scoped module; reuse `--ds-*` tokens, no raw hex.
 - Atmosphere texture: `home-edition.css` (`::before` grain/grid). Home does not mount `EditionAtmosphereMosaic` / former `HomeAtmosphereMosaic`.
 - Record carousel: compose from `@repo/ui` primitives where possible; shared browse controls live in `apps/web/src/components/patterns/` (`RecordBrowseControls`, `BrowseModeToggle`, `browse-mode.css`).
-- Live hero map wiring: `hero-map-inset.ts` positions MapStage over `.ds-home-hero__map` (map column only). Copy column is a flat translucent Surface scrim (`60%` light / `60%` dark `color-mix`); do not expand the inset under the copy.
+- Live hero map wiring: `hero-map-inset.ts` positions MapStage over `.ds-home-hero__map` (map column only). Copy column uses a transparent text layer over `.ds-home-hero::before` (canvas + archive grain/grid); `.ds-home` / home `main` stay transparent; do not expand the inset under the copy.
 - Mockup reference file: copy into `docs/ui/fixtures/` when owner drops it in repo; until then, Downloads path above is the binding visual.
 
 ---
