@@ -828,17 +828,17 @@
   padding: var(--ds-home-panel-padding, var(--ds-space-8));
   position: relative;
   min-height: 0;
-  /* Flat matte scrim — Surface at 72% (was opaque 100%). Theme ink stays WCAG
-     AA; dark bumps mix below. No blur/glow/gradient; map inset unchanged. */
-  background: color-mix(in srgb, var(--ds-surface) 72%, transparent);
+  /* Open flat matte scrim — Surface ~48% (was opaque 100%, then 72%). Map inset
+     stays on the map column; no blur/glow/gradient. */
+  background: color-mix(in srgb, var(--ds-surface) 48%, transparent);
   color: var(--ds-ink);
   border-right: var(--ds-border-width) solid var(--ds-border);
   pointer-events: auto;
 }
 
 [data-theme='dark'] .ds-home-hero__copy {
-  /* Slightly denser mix so paper ink keeps AA on charcoal canvas bleed. */
-  background: color-mix(in srgb, var(--ds-surface) 84%, transparent);
+  /* Mid scrim so paper ink keeps AA on charcoal canvas bleed. */
+  background: color-mix(in srgb, var(--ds-surface) 58%, transparent);
 }
 
 .ds-home-hero__copy > * {
@@ -892,7 +892,8 @@
   font-family: var(--ds-font-editorial);
   font-size: 1.0625rem;
   line-height: 1.55;
-  color: var(--ds-ink-muted);
+  /* Primary ink — muted Stone can fail AA on an open canvas bleed. */
+  color: var(--ds-ink);
   max-width: 38ch;
 }
 
