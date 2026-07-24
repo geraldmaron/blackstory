@@ -110,6 +110,10 @@ const BOOLEAN_FLAGS = new Set([
   '--include-curated',
   '--omit-raw-model',
   '--queue-survivors',
+  // Accepted uniformly on every verb (repo-xez5.9): every command already prints JSON by
+  // default (see the file header comment), so this flag is a no-op that makes the contract
+  // explicit and machine-discoverable rather than switching a text-mode command to JSON.
+  '--json',
 ]);
 
 type EditorialSubjectFile = {
@@ -1163,6 +1167,118 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
         stdout(JSON.stringify(result, null, 2));
         return 0;
       }
+      case 'backfill-entity':
+      case 'prose-run': {
+        // Single-entity convenience wrapper over the same `runEnrichmentJudge` bridge
+        // `enrichment-run`/`editorial-run` use (see that case above) — no separate judge,
+        // provider setup, or output shape. `backfill-entity` re-runs enrichment for one
+        // already-known entity id; `prose-run` is the lighter-weight prose verb documented in
+        // docs/research/research-operations.md (short-form vs full `story-research-run`
+        // packets). Both skip the `--subjects` file: build the one-subject input from flags.
+        const entityId = requireFlag(flags, '--entity-id');
+        const title = optionalFlag(flags, '--title') ?? entityId;
+        const existingSummary = optionalFlag(flags, '--summary');
+        const providerName = (optionalFlag(flags, '--provider') ?? 'mock') as
+          'mock' | 'openrouter' | 'ollama' | 'hybrid';
+        if (!['mock', 'openrouter', 'ollama', 'hybrid'].includes(providerName)) {
+          throw new Error('--provider must be mock|openrouter|ollama|hybrid');
+        }
+        const ollamaModel = optionalFlag(flags, '--ollama-model');
+        const model =
+          optionalFlag(flags, '--model') ?? defaultModelForProvider(providerName, ollamaModel);
+        const provider = createLlmProvider({
+          provider: providerName,
+          model,
+          ...(ollamaModel !== undefined ? { ollamaModel } : {}),
+        });
+        const nowIso = new Date(deps.nowMs ?? Date.now()).toISOString();
+        const identity = readOperatorIdentity(flags);
+        const result = await runEnrichmentJudge({
+          subjects: [
+            {
+              subjectId: entityId,
+              title,
+              ...(existingSummary ? { existingSummary } : {}),
+            },
+          ],
+          catalog: [{ id: entityId, displayName: title }],
+          identity,
+          nowIso,
+          provider,
+          concurrency: 1,
+          model,
+          onProgress: () => {},
+        });
+        if (flags.booleans.has('--commit')) {
+          const pepper = optionalFlag(flags, '--privacy-pepper') ?? requirePepperFromEnv();
+          const context = { identity, privacyPepper: pepper, nowMs: deps.nowMs ?? Date.now() };
+          const commits = [];
+          for (const item of result.items) {
+            if (item.packet.decision === 'reject') continue;
+            commits.push(
+              await finish(prepareEditorialPacketIntake(item.packet, context), flags, deps),
+            );
+          }
+          stdout(JSON.stringify({ verb: command, entityId, result, commits }, null, 2));
+          return 0;
+        }
+        stdout(JSON.stringify({ verb: command, entityId, result }, null, 2));
+        return 0;
+      }
+      case 'expand': {
+        // Stub: full entity-network expansion depends on repo-xez5.4 (not yet built). This
+        // documents the intended interface and returns a stable, honest not-implemented
+        // result rather than faking traversal. See docs/research/research-operations.md
+        // ("expand") for the interface contract this stub commits to.
+        const entityId = requireFlag(flags, '--entity-id');
+        const depth = Number(optionalFlag(flags, '--depth') ?? '1');
+        stdout(
+          JSON.stringify(
+            {
+              verb: 'expand',
+              entityId,
+              depth,
+              status: 'not_implemented',
+              dependsOn: 'repo-xez5.4',
+              intendedInterface: {
+                command: 'expand --entity-id <id> [--depth N] [--json]',
+                output: {
+                  entityId: 'string',
+                  neighbors: [{ entityId: 'string', relationshipType: 'string', edgeConfidence: 'number' }],
+                  frontier: 'entities not yet traversed at the requested depth',
+                },
+              },
+            },
+            null,
+            2,
+          ),
+        );
+        return 0;
+      }
+      case 'graylist-read': {
+        // Read path for parked/quarantined items — documented as missing in the
+        // triage-graylist lane. Covers the Postgres-backed quarantine table
+        // (bb_submissions.intake_items, status='quarantined'); Firestore-backed
+        // submissionInbox/discoveryCandidates (moderationState/status fields) are not yet
+        // reachable from this CLI — see docs/research/research-operations.md ("graylist read
+        // path") for that gap.
+        const limitRaw = optionalFlag(flags, '--limit');
+        const limit = limitRaw ? Number(limitRaw) : 50;
+        if (!Number.isFinite(limit) || limit < 1) {
+          throw new Error('--limit must be a positive number');
+        }
+        const pool = getOpsPostgresPool(process.env);
+        const { rows } = await pool.query(
+          `SELECT id, status, kind, source_url, created_at
+             FROM bb_submissions.intake_items
+            WHERE status = 'quarantined'
+            ORDER BY created_at DESC
+            LIMIT $1`,
+          [limit],
+        );
+        stdout(JSON.stringify({ verb: 'graylist-read', source: 'postgres:intake_items', count: rows.length, items: rows }, null, 2));
+        return 0;
+      }
       case 'locate': {
         const storedLat = optionalFlag(flags, '--stored-lat');
         const storedLng = optionalFlag(flags, '--stored-lng');
@@ -1215,9 +1331,13 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
       }
       default: {
         stderr(
-          'Usage: operator-cli <preflight|model-report|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|sundown-town-brief|harness-run|locate> [flags]\n' +
+          'Usage: operator-cli <preflight|model-report|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|sundown-town-brief|harness-run|locate|backfill-entity|prose-run|expand|graylist-read> [flags]\n' +
+          'Every command accepts --json (no-op: output is always JSON) and every id-bearing command uses --entity-id / --case-id for its target.\n' +
           'For model-report: [--since <ISO date>] [--json]\n' +
-          'For harness-run: --theme <theme> --metro <metro> [--connectors dpla,nps_network_to_freedom,web_search] [--enrich] [--provider openrouter|ollama|mock]\n'
+          'For harness-run: --theme <theme> --metro <metro> [--connectors dpla,nps_network_to_freedom,web_search] [--enrich] [--provider openrouter|ollama|mock]\n' +
+          'For backfill-entity/prose-run: --entity-id <id> [--title ...] [--summary ...] [--provider mock|openrouter|ollama|hybrid] [--commit]\n' +
+          'For expand: --entity-id <id> [--depth N] — stub pending repo-xez5.4\n' +
+          'For graylist-read: [--limit N] — Postgres quarantine only, see docs/research/research-operations.md\n'
         );
         return command ? 1 : 0;
       }

@@ -50,6 +50,28 @@ cp -rf source dest          # NOT: cp -r source dest
 
 See `apps/mobile/README.md` for setup (`API_BASE_URL=http://127.0.0.1:8080` in `apps/mobile/.env.local`).
 
+## Research Verbs (black-book lanes)
+
+Canonical how-to for every research/operator-cli verb lives in
+[`docs/research/research-operations.md`](docs/research/research-operations.md) — read it before
+running any of these. This index is the same for any tool/agent (Claude Code, opencode, or a
+bare shell); per-tool skill files (`.claude/skills/black-book/*`) are pointers only, no unique
+content. All commands: `node --conditions development --import tsx packages/operator-cli/src/bin.ts <verb> [flags]`. Every verb accepts `--json`; entity targets use `--entity-id`, case targets use `--case-id`.
+
+| Lane | When to use | Exact command |
+|---|---|---|
+| research-intake | Turn a URL/topic into a proposed lead (fetched, cited, draft research case) | `research-intake --url "<url>" --operator-id "$USER" --session-id "<id>"` |
+| discovery-run | Run a bounded adapter discovery campaign against an assembled batch, get yield | `discovery-run --batch <batch.json> --campaign-id "<id>" --countries US` |
+| editorial-run / enrichment-run | Check pending leads, run LLM editorial/enrichment, stage packets (never publish) | `editorial-run --subjects <subjects.json> --provider mock --operator-id "$USER" --session-id "<id>"` |
+| backfill-entity | Re-run enrichment/backfill for one known entity id | `backfill-entity --entity-id <id> --provider mock --operator-id "$USER" --session-id "<id>"` |
+| prose-run | Short-form prose draft for one subject (lighter than story-research-run) | `prose-run --entity-id <id> --provider mock --operator-id "$USER" --session-id "<id>"` |
+| story-research-run | Draft/recommend longform `/stories` articles via citation-gated story packets | `story-research-run --topics <topics.json> --provider mock --operator-id "$USER" --session-id "<id>"` |
+| harness-run | Run a thematic study (redlining, urban renewal) and draft ThemeImpactPackets | `harness-run --theme <theme> --metro <metro> --connectors dpla,nps-network-to-freedom,shpo --output <out.json>` |
+| locate | Resolve/correct an entity's lat/lng via Census geocoding (no LLM) | `locate --entity-id <id> --address "<address>" --precision institution --operator-id "$USER" --session-id "<id>"` |
+| case-drafting (`attach-evidence`) | Check if a research case is review-ready; fill missing evidence | `attach-evidence --case-id "<id>" --description "<what this fills>" --source-url "<url>" --operator-id "$USER" --session-id "<id>"` |
+| triage-graylist (`graylist-read`, `attach-evidence`) | Walk parked/weak-signal candidates; corroborate or recommend | `graylist-read --limit 20` (Postgres only — see doc); `attach-evidence` to corroborate |
+| expand (stub) | Grow an entity's network outward from an id — pending repo-xez5.4 | `expand --entity-id <id> --depth 1` |
+
 ## Brand Language
 
 The binding source is the root `brand/` directory (masters, 4-page guide, token files — see
@@ -140,6 +162,7 @@ no uppercase file names in new work.
 | [`docs/ui/design-direction-v6-entity.md`](docs/ui/design-direction-v6-entity.md) | `/entity/[id]` record edition, anatomy panel, safe fail states |
 | [`docs/ui/design-direction-v6-mobile.md`](docs/ui/design-direction-v6-mobile.md) | `@repo/mobile` tab bar, More menu, shell chrome, theme tokens |
 | [`docs/ui/design-direction-v5.md`](docs/ui/design-direction-v5.md) | Non-home surfaces, shell chrome, fixed-ink footer (non-home) |
+| [`docs/ui/patterns-cinematic-map.md`](docs/ui/patterns-cinematic-map.md) | Locked-until-invited map plate behind content; Rest → Invite → Engaged state machine |
 | [`docs/ui/patterns-*.md`](docs/ui/) | Reusable site patterns (browse mode, edition fact icon, …) |
 | [`docs/ui/story.md`](docs/ui/story.md) | Voice, microcopy, narrative arc |
 

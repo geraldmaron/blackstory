@@ -1,97 +1,12 @@
 ---
 name: black-book-editorial-enrichment
-description: Use when the owner wants to check pending discovery/obscurity leads, run editorial or enrichment with an LLM (OpenRouter free/local/mock), weed bad items, draft linked prose, and stage packets for quarantine — never publish. Triggers on "check pending", "run editorial", "run enrichment", "stage for publish".
+description: Use when the owner wants to check pending discovery/obscurity leads, run editorial or enrichment with an LLM (OpenRouter free/local/mock), weed bad items, draft linked prose, and stage packets for quarantine — never publish. Also covers backfill-entity (re-run enrichment for one entity id) and prose-run (short-form prose draft). Triggers on "check pending", "run editorial", "run enrichment", "stage for publish", "backfill this entity", "short prose draft".
 ---
 
 # Editorial enrichment (staging only)
 
-Runs the operator-cli editorial/enrichment lane. LLM drafts stay proposals. Promotion and
-release activation are out of scope for this skill.
-
-## Secrets
-
-```bash
-# OpenRouter (1Password via run-with-dev-secrets)
-run-with-dev-secrets env | rg OPENROUTER
-
-# Or local / Corsair Ollama (no key)
-export EDITORIAL_LLM_PROVIDER=ollama
-export OLLAMA_MODEL=qwen3:8b
-export OLLAMA_BASE_URL=http://100.119.72.84:11434/v1   # Corsair via Tailscale
-```
-
-Overnight Corsair job (SearXNG + Wikimedia + hybrid enrichment):
-`docs/runbooks/overnight-hybrid-enrichment.md`. Dev Guides:
-`~/Developer/Guides/Workflows.md`, `CLI-Reference.md`, `Secrets-1Password.md`.
-
-## Pending list
-
-```bash
-node --conditions development --import tsx packages/operator-cli/src/bin.ts pending-list \
-  --from /tmp/obscurity-summary.json
-```
-
-## Editorial / enrichment (dry-run default)
-
-Subjects file shape: `{ "subjects": [{ "subjectId", "title", "existingSummary?" }] }`.
-Optional catalog JSON: `{ "entities": [{ "id", "displayName", "aliases?", "vector?" }] }`.
-Prefer live vectors after backfill: `--catalog-from=firestore` (joins `entityEmbeddings` +
-`publicSearchIndex`).
-
-```bash
-OPERATOR_CLI_PRIVACY_PEPPER=dev node --conditions development --import tsx \
-  packages/operator-cli/src/bin.ts editorial-run \
-  --subjects /tmp/subjects.json \
-  --catalog-from=firestore \
-  --provider mock \
-  --operator-id "$USER" --session-id "cursor-$(date +%s)" --identity-source cursor_session
-```
-
-Embed public catalog first (Gemini Developer API key):
-
-```bash
-GEMINI_API_KEY=… APP_FIREBASE_ALLOW_PRODUCTION=1 FIREBASE_PROJECT_ID=black-book-efaaf \
-  node --conditions development --import tsx \
-  packages/firebase/src/embeddings/backfill-cli.ts \
-  --source=publicSearchIndex --max-items 600 --max-cost-usd 1
-```
-
-Providers: `mock` (default), `openrouter`, `ollama`, `hybrid`. Pass `--model openrouter/free`
-and optional `--ollama-model qwen3:8b` / `--concurrency N` when not using mock.
-When `--model` is omitted, openrouter/hybrid default to `openrouter/free` and ollama to
-`qwen3:8b` (so live providers no longer accidentally request `mock-editorial-v1`).
-
-With `--output path.json`, each finished subject also appends one NDJSON line to
-`path.json.progress.ndjson` and prints the same line on stderr (`enrichment.progress.v1`)
-so long runs show keep/reject/errors without waiting for the final summary.
-
-Enrichment is the same judge with result kind `enrichment.run.v1`:
-
-```bash
-… enrichment-run --subjects … --provider hybrid \
-  --model openrouter/free --ollama-model qwen3:8b --concurrency 4 …
-```
-
-## Commit (stage only)
-
-Add `--commit` only after the owner reviews JSON. That writes quarantine
-`editorial_packet` proposals (and may open draft research cases for keep/needs_evidence).
-There is no `--publish` / `--promote`.
-
-**Catalog dedupe (required before new fixtures):** run
-`packages/firebase/scripts/classify-corsair-keeps-against-catalog.ts` against
-enrichment keep JSON. `existing_match` → enrich that `entityId` (more claims/sources)
-or mine related entities from its story — never recreate. `non_entity` → exclude
-lists/indexes/guides. Only `new_candidate` after human validation may become fixtures
-+ `publish-national-catalog.ts`.
-
-## Prose links
-
-Summaries should use `[[ent_id|Display Name]]` so the web `LinkedProse` component renders
-`EntityLink`s. Catalog linkify also auto-links plain names against related neighbors.
-
-## Never
-
-- Never call promotion gates or release activation.
-- Never treat LLM confidence as publication authority.
-- Never skip `validationIssues` on packets — surface them to the owner.
+Canonical how-to (invocation, providers, `backfill-entity`, `prose-run`, Do/Never) lives in
+[`docs/research/research-operations.md`](../../../../docs/research/research-operations.md#editorial-enrichment-editorial-run--enrichment-run).
+Read that section before running `editorial-run`, `enrichment-run`, `backfill-entity`, or
+`prose-run`. This file exists only for Claude Code's skill-matching UX — it carries no command
+detail of its own.
