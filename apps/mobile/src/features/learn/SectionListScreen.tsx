@@ -1,7 +1,8 @@
 /**
  * Shared list screen for legal/errata-style sections (Ledger Line): canvas masthead
  * + mono section label + compact LedgerRow index — no indexed Surface panels.
- * Stack-pushed (not tab-root), so scroll bottom pad uses static screenScrollInsets.
+ * Stack-pushed (not tab-root), so scroll bottom pad uses static screenScrollInsets
+ * and the native stack header owns the top inset.
  */
 import { ScrollView, StyleSheet, View } from 'react-native';
 import {
@@ -30,7 +31,7 @@ export function SectionListScreen({ title, intro, kicker = 'Archive', rows }: Se
   const countLabel = rows.length === 1 ? '1 page' : `${rows.length} pages`;
 
   return (
-    <ScreenCanvas>
+    <ScreenCanvas edges={['left', 'right', 'bottom']}>
       <ScrollView contentContainerStyle={styles.content}>
         <ScreenHeader kicker={kicker} title={title} dek={intro} compact dense />
         <View>

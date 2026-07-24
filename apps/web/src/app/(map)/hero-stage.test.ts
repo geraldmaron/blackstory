@@ -132,14 +132,15 @@ describe('home shell-on-home', () => {
 });
 
 describe('home edition atmosphere', () => {
-  it('uses shared edition atmosphere (grain + grid + gutter mosaic), not crumpled map', () => {
+  it('uses shared grain + archive grid canvas without mounting a home gutter mosaic', () => {
+    const homePageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
     assert.doesNotMatch(homeEditionCss, /pattern-crumple/);
     assert.doesNotMatch(editionAtmosphereCss, /pattern-crumple/);
     assert.match(homeEditionCss, /@import\s+['"]\.\.\/patterns\/edition-atmosphere\/edition-atmosphere\.css/);
     assert.match(editionAtmosphereCss, /--ds-edition-pattern-grain/);
     assert.match(editionAtmosphereCss, /--ds-edition-pattern-archive-grid/);
-    assert.match(editionAtmosphereCss, /\.ds-edition-atmosphere__mosaic/);
-    assert.match(editionAtmosphereCss, /\.ds-edition-atmosphere__polaroid/);
+    assert.doesNotMatch(homePageSource, /HomeAtmosphereMosaic/);
+    assert.doesNotMatch(homePageSource, /EditionAtmosphereMosaic/);
     assert.doesNotMatch(editionAtmosphereCss, /box-shadow/);
   });
 });

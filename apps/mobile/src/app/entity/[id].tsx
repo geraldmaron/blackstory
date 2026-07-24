@@ -29,6 +29,7 @@ import {
   useEntityDetail,
   type EntityDataDeps,
 } from '@/features/entity';
+import { useEditionStackBack } from '@/shell/use-edition-stack-back';
 import { Button, ScreenCanvas } from '@/ui';
 
 function compactHeaderTitle(title: string): string {
@@ -41,6 +42,11 @@ export default function EntityDetailRoute() {
   const navigation = useNavigation();
   const { id } = useLocalSearchParams<{ id?: string | string[] }>();
   const entityId = parseEntityId(id);
+
+  useEditionStackBack({
+    fallbackHref: '/explore',
+    accessibilityHint: 'Returns to Explore when there is no previous screen',
+  });
 
   const [deps, setDeps] = useState<EntityDataDeps | undefined>(undefined);
   useEffect(() => {

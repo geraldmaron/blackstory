@@ -60,7 +60,7 @@ Relative imports from `apps/web/src` use the paths above without the `@/` alias 
 
 | Surface | Patterns used |
 |---|---|
-| `/` home edition | `RecordBrowseControls`, `EditionFactIcon`, `RecordAnatomyPanel`, `home-featured-set`, `browse-mode` helpers, `EditionAtmosphereMosaic` |
+| `/` home edition | `RecordBrowseControls`, `EditionFactIcon`, `RecordAnatomyPanel`, `home-featured-set`, `browse-mode` helpers (grain/grid canvas; no gutter mosaic) |
 | `HomeFeaturedRecord` | `RecordBrowseControls`, `RecordAnatomyPanel` |
 | `HomeAbout` | `EditionFactIcon` (entry steps) |
 | `/explore` spotlight + instruments | `RecordBrowseControls`, `BrowseModeToggle`, `EditionFactIcon`, edition segmented tabs (`explore-edition.css`), decade stepper rail |

@@ -13,7 +13,6 @@ import {
   type StatePopulationIndexFile,
 } from '@repo/domain/map/state-population';
 import { HomeEdition } from '../../components/home/HomeEdition';
-import { HomeAtmosphereMosaic } from '../../components/home/HomeAtmosphereMosaic';
 import { editionAtmosphereCanvasClassName } from '../../components/patterns/edition-atmosphere/edition-atmosphere-canvas';
 import type { StateStartEntry } from '../../components/home/StateStart';
 import '../../components/data/data-charts.css';
@@ -131,7 +130,6 @@ export default async function HomePage() {
 
   return (
     <div className={`ds-home ${editionAtmosphereCanvasClassName()}`} data-home-edition="v6">
-      <HomeAtmosphereMosaic />
       <HeroStage
         featureCollection={base.featureCollection}
         jurisdictionAreaFeatures={base.jurisdictionAreaFeatures}

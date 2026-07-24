@@ -23,8 +23,13 @@ import {
   type StatusResult,
 } from '@/features/corrections';
 import { UtilityScreenShell } from '@/ui';
+import { useEditionStackBack } from '@/shell/use-edition-stack-back';
 
 export default function CorrectionsStatusScreen() {
+  useEditionStackBack({
+    fallbackHref: '/more',
+    accessibilityHint: 'Returns to More when there is no previous screen',
+  });
   const depsPromise = useMemo(() => createCorrectionClientDeps(), []);
   const [initialCode, setInitialCode] = useState<string | undefined>(undefined);
 

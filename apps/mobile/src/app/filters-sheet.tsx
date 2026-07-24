@@ -13,6 +13,7 @@ import { useMemo, useState } from 'react';
 
 import { type FilterState, filterStateToRouteParams, parseFilterState, parseReturnTo } from '@/lib/route-params';
 import { ScreenCanvas } from '@/ui';
+import { useEditionStackBack } from '@/shell/use-edition-stack-back';
 import { DEMO_MAP_SOURCE } from '@/features/map/demoMapSource';
 import { toExploreFeatures } from '@/features/explore/explore-feature';
 import { buildExploreFacetOptions } from '@/features/explore/explore-filter';
@@ -33,6 +34,11 @@ export default function FiltersSheet() {
   // Never trust `returnTo` directly — only a value that survives the safe-route allowlist is
   // used; anything else (an external URL, an unenumerated path) silently falls back to Explore.
   const safeReturnTo = parseReturnTo(rawParams.returnTo) ?? '/explore';
+
+  useEditionStackBack({
+    fallbackHref: safeReturnTo,
+    accessibilityHint: 'Closes filters when there is no previous screen',
+  });
 
   function apply() {
     const next = filterStateFromPanel(filters);

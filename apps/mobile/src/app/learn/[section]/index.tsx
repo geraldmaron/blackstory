@@ -15,12 +15,30 @@
 import { Redirect, router, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useLayoutEffect } from 'react';
 
-import { ContentPageScreen, SectionListScreen, StorySectionIndexScreen, isLongformSection, listCatalogEntries, parseSectionParam } from '@/features/learn';
+import {
+  ContentPageScreen,
+  SectionListScreen,
+  StorySectionIndexScreen,
+  isLongformSection,
+  learnSectionBackFallback,
+  listCatalogEntries,
+  parseSectionParam,
+} from '@/features/learn';
+import { useEditionStackBack } from '@/shell/use-edition-stack-back';
 
 export default function LearnSectionIndexScreen() {
   const navigation = useNavigation();
   const { section } = useLocalSearchParams<{ section?: string | string[] }>();
   const row = parseSectionParam(section);
+  const fallbackHref = row ? learnSectionBackFallback(row.routeId) : '/learn';
+
+  useEditionStackBack({
+    fallbackHref,
+    accessibilityHint:
+      fallbackHref === '/more'
+        ? 'Returns to More when there is no previous screen'
+        : 'Returns to Stories when there is no previous screen',
+  });
 
   useLayoutEffect(() => {
     if (!row) return;

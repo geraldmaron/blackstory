@@ -23,7 +23,6 @@ import { fileURLToPath } from 'node:url';
 import { createCommonsMediaClient, type WikidataEntity } from '@repo/domain';
 
 const PACKAGE_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const REPO_ROOT = join(PACKAGE_ROOT, '../..');
 const CATALOG_DIR = join(PACKAGE_ROOT, 'fixtures/national-catalog');
 
 const WIKIMEDIA_USER_AGENT =

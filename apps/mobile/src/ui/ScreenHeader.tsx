@@ -1,10 +1,13 @@
 /**
  * Compact tab-screen masthead (Ledger Line): copper-tick mono kicker,
  * 16 Inter Medium title, optional muted dek. Hierarchy from type, not cards.
+ * Optional leading back control for stack-pushed surfaces that share this
+ * masthead (tab roots must omit `onBack`).
  */
 import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { BackControl } from './BackControl';
 import { Text, type TextRole } from './Text';
 import { space, useThemeColors } from './tokens';
 
@@ -19,6 +22,13 @@ export type ScreenHeaderProps = {
   readonly dense?: boolean;
   /** Trailing control (dev menu, map link) aligned to the title row. */
   readonly trailing?: ReactNode;
+  /**
+   * Leading back affordance. When set, renders a copper chevron before the
+   * title row. Do not pass on tab roots (Explore / History / Stories / More).
+   */
+  readonly onBack?: () => void;
+  readonly backAccessibilityLabel?: string;
+  readonly backAccessibilityHint?: string;
 };
 
 function resolveTitleVariant(compact: boolean, dense: boolean): TextRole {
@@ -34,6 +44,9 @@ export function ScreenHeader({
   compact = true,
   dense = true,
   trailing,
+  onBack,
+  backAccessibilityLabel,
+  backAccessibilityHint,
 }: ScreenHeaderProps) {
   const theme = useThemeColors();
   const titleVariant = resolveTitleVariant(compact, dense);
@@ -57,6 +70,13 @@ export function ScreenHeader({
         </View>
       ) : null}
       <View style={[styles.titleRow, tight ? styles.titleRowDense : undefined]}>
+        {onBack ? (
+          <BackControl
+            onPress={onBack}
+            {...(backAccessibilityLabel ? { accessibilityLabel: backAccessibilityLabel } : {})}
+            {...(backAccessibilityHint ? { accessibilityHint: backAccessibilityHint } : {})}
+          />
+        ) : null}
         <Text variant={titleVariant} isHeading style={styles.title}>
           {title}
         </Text>

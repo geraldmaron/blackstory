@@ -106,10 +106,11 @@ Generated from `brand/tokens` via `pnpm --filter @repo/mobile tokens:generate` (
 |---|---|
 | `src/shell/mobile-nav.ts` | Tab IA + More menu parity with web `shell-nav` |
 | `src/shell/edition-chrome.ts` | `useEditionTabBarOptions`, `useEditionStackScreenOptions`, `editionTabIcon` |
+| `src/shell/navigate-back.ts` / `use-edition-stack-back.tsx` | Reliable stack `headerLeft` via `BackControl` — `router.back()` or replace to tab/section root |
 | `src/app/(tabs)/_layout.tsx` | Four tabs via edition tab bar (no inline tint literals) |
 | `src/app/_layout.tsx` | Stack routes via edition stack headers |
 
-Tab bar: matte Surface plate, rule hairline top border, copper active label/icon, stone idle. Stack: canvas header fill, ink title, copper back/actions, no header shadow.
+Tab bar: matte Surface plate, rule hairline top border, copper active label/icon, stone idle. Stack: canvas header fill, ink title, copper back/actions, no header shadow. **Tab roots never show a back control.** Stack/modals always install `useEditionStackBack` so deep links and cold starts still have an exit.
 
 ---
 
