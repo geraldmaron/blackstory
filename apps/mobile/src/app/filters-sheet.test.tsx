@@ -8,10 +8,17 @@
 import { fireEvent, render } from '@testing-library/react-native';
 
 const mockNavigate = jest.fn();
+const mockSetOptions = jest.fn();
 
 jest.mock('expo-router', () => ({
-  router: { navigate: (...args: unknown[]) => mockNavigate(...args) },
+  router: {
+    navigate: (...args: unknown[]) => mockNavigate(...args),
+    canGoBack: () => false,
+    back: jest.fn(),
+    replace: jest.fn(),
+  },
   useLocalSearchParams: () => ({}),
+  useNavigation: () => ({ setOptions: mockSetOptions }),
 }));
 
 // eslint-disable-next-line import/first
@@ -21,6 +28,7 @@ import { EXPLORE_ERA_OPTIONS } from '@/features/map/explore/ExploreFiltersPanel'
 
 beforeEach(() => {
   mockNavigate.mockClear();
+  mockSetOptions.mockClear();
 });
 
 describe('FiltersSheet — kind picker selected state (MOB-017)', () => {
