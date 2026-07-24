@@ -84,6 +84,12 @@ export type EditorialRunResult = {
   readonly concurrency: number;
 };
 
+type ModelLocationJson = {
+  readonly jurisdictionLabel?: string;
+  readonly locationLabel?: string;
+  readonly locationPrecision?: string;
+};
+
 type ModelClaimJson = {
   readonly predicate?: string;
   readonly object?: string;
@@ -91,12 +97,6 @@ type ModelClaimJson = {
   readonly citationSource?: string;
   readonly citationHref?: string;
   readonly citationLabel?: string;
-};
-
-type ModelLocationJson = {
-  readonly jurisdictionLabel?: string;
-  readonly locationLabel?: string;
-  readonly locationPrecision?: string;
 };
 
 type ModelJson = {
@@ -112,14 +112,13 @@ type ModelJson = {
     readonly proposedRelationshipNotes?: string;
     readonly claims?: readonly ModelClaimJson[];
     readonly topicIds?: readonly string[];
+    readonly location?: ModelLocationJson;
     readonly eraBuckets?: readonly string[];
     readonly keywords?: readonly string[];
-    readonly location?: ModelLocationJson;
   };
 };
 
 const TOPIC_ID_LIST = TOPIC_REGISTRY.map((topic) => topic.id).join(', ');
-const LOCATION_PRECISION_VALUES = 'institution, city, site, town, district, campus, neighborhood, address, community';
 
 const EDITORIAL_RESPONSE_SCHEMA = {
   type: 'object',
@@ -186,7 +185,7 @@ const EDITORIAL_RESPONSE_SCHEMA = {
 const SYSTEM_PROMPT = `You are an editorial judge for BlackStory (History, pinned to place).
 Return ONLY JSON with keys: decision (keep|reject|needs_evidence), rationale, confidence (0-1),
 drafts: { publicSummary, historicalContext, identityLabel?, relevanceNote?, relatedEntityIds?,
-proposedRelationshipNotes?, claims?, topicIds?, eraBuckets?, keywords?, location? }.
+proposedRelationshipNotes?, claims?, topicIds?, eraBuckets?, keywords? }.
 Rules:
 - publicSummary 120-400 chars, specific evidence-led prose, no sensational framing, no completeness claims.
 - historicalContext: 1-3 sentences of teaching context — why this record matters, how it connects to
@@ -196,23 +195,9 @@ Rules:
   {predicate, object, confidenceLevel: high|medium|low, citationSource: hostname, citationHref, citationLabel}.
   citationHref MUST be one of the URLs provided in sourceSnippets — never invent or modify a URL.
   If the snippets support no verifiable claim, return an empty claims array and decision needs_evidence.
-  AT LEAST ONE claim MUST be substantively about the subject's OWN Black-history significance —
-  a documented first, a documented role in segregation/civil-rights/enslavement history, a named
-  person's specific achievement there, a specific discriminatory or liberating event. A subject whose
-  ONLY extractable claims are generic institutional facts (founding year, address, mission statement,
-  unrelated famous alumni, org structure) with no Black-history-specific claim is NOT keep-worthy even
-  if those generic facts are well-sourced — decide needs_evidence or reject instead. Being mentioned by
-  a Black historical figure (as an employer, school, or honor) is not itself sufficient; the claim must
-  document what happened there or through it that is actually part of that history.
 - topicIds: 2-5 ids chosen ONLY from this registry: ${TOPIC_ID_LIST}.
 - eraBuckets: decade strings like "1910s", only when the era is evidenced in the material.
 - keywords: 2-5 short search phrases from the material.
-- location: ONLY when the material documents ONE specific, primary site the subject is anchored to
-  (a school's building, a museum's address, a massacre's site, an organization's headquarters) — NOT
-  every place mentioned in passing. { jurisdictionLabel: "City, State", locationLabel: a short
-  human-readable description of the site, locationPrecision: one of [${LOCATION_PRECISION_VALUES}] }.
-  OMIT location entirely for a subject with no single documented site (most laws, court cases, national
-  movements, and organizations legitimately have no one place) — never guess a location to fill the field.
 - proposedRelationshipNotes: propose typed edges to catalog entities (located_at, part_of, governed_by,
   influenced, caused, commemorates, attended, member_of) with a one-line evidence note each; mark any
   caused/enabled proposal as requiring consensus review.
@@ -332,30 +317,26 @@ async function judgeOneSubject(input: {
         : {}),
       ...(draftsIn.claims !== undefined
         ? {
-            claims: (Array.isArray(draftsIn.claims) ? draftsIn.claims : [])
-              .map(
-                (claim): EditorialClaimDraft => ({
-                  predicate: toSafeString(claim?.predicate),
-                  object: toSafeString(claim?.object),
-                  confidenceLevel:
-                    claim?.confidenceLevel === 'high' ||
-                    claim?.confidenceLevel === 'medium' ||
-                    claim?.confidenceLevel === 'low'
-                      ? claim.confidenceLevel
-                      : 'low',
-                  citationSource: toSafeString(claim?.citationSource),
-                  citationHref: toSafeString(claim?.citationHref),
-                  citationLabel: toSafeString(claim?.citationLabel),
-                }),
-              )
-              // Free/paid models occasionally emit stray {} entries alongside real
-              // claims — drop rather than fail validation on an empty predicate/object.
-              .filter((claim) => claim.predicate !== '' && claim.object !== ''),
+            claims: (Array.isArray(draftsIn.claims) ? draftsIn.claims : []).map(
+              (claim): EditorialClaimDraft => ({
+                predicate: toSafeString(claim?.predicate),
+                object: toSafeString(claim?.object),
+                confidenceLevel:
+                  claim?.confidenceLevel === 'high' ||
+                  claim?.confidenceLevel === 'medium' ||
+                  claim?.confidenceLevel === 'low'
+                    ? claim.confidenceLevel
+                    : 'low',
+                citationSource: toSafeString(claim?.citationSource),
+                citationHref: toSafeString(claim?.citationHref),
+                citationLabel: toSafeString(claim?.citationLabel),
+              }),
+            ),
           }
         : {}),
-<<<<<<< HEAD
+      // Free models invent plausible-but-unregistered topic ids — drop rather than block.
       ...(draftsIn.topicIds !== undefined
-        ? { topicIds: toSafeStringArray(draftsIn.topicIds) }
+        ? { topicIds: toSafeStringArray(draftsIn.topicIds).filter(isValidTopicId) }
         : {}),
       ...(draftsIn.eraBuckets !== undefined
         ? { eraBuckets: toSafeStringArray(draftsIn.eraBuckets) }
@@ -363,29 +344,15 @@ async function judgeOneSubject(input: {
       ...(draftsIn.keywords !== undefined
         ? { keywords: toSafeStringArray(draftsIn.keywords) }
         : {}),
-=======
-      // Free models invent plausible-but-unregistered topic ids (e.g. "montgomery-bus-boycott"
-      // for a record about the boycott) despite the full registry being in the prompt. A bad
-      // taxonomy tag isn't fabricated evidence — drop it rather than block an otherwise
-      // well-evidenced record on a categorization miss.
-      ...(draftsIn.topicIds !== undefined
-        ? { topicIds: toSafeStringArray(draftsIn.topicIds).filter(isValidTopicId) }
-        : {}),
-      ...(draftsIn.eraBuckets !== undefined ? { eraBuckets: toSafeStringArray(draftsIn.eraBuckets) } : {}),
-      ...(draftsIn.keywords !== undefined ? { keywords: toSafeStringArray(draftsIn.keywords) } : {}),
       ...(() => {
         const loc = draftsIn.location;
         const jurisdictionLabel = toSafeString(loc?.jurisdictionLabel);
         const locationLabel = toSafeString(loc?.locationLabel);
         const locationPrecision = toSafeString(loc?.locationPrecision);
-        // All-or-nothing: a partial location is not usable downstream (auto-promote
-        // requires all three), and the model should have omitted `location` entirely
-        // rather than half-fill it.
         return jurisdictionLabel && locationLabel && locationPrecision
           ? { location: { jurisdictionLabel, locationLabel, locationPrecision } }
           : {};
       })(),
->>>>>>> feat/national-black-population-timeline
     };
     // Claims may cite only URLs the judge was actually shown — fabricated hrefs fail validation.
     const allowedCitationHrefs = (subject.sourceSnippets ?? []).flatMap(
