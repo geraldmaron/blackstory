@@ -771,9 +771,8 @@
   grid-template-rows: minmax(0, 1fr);
   gap: 0;
   align-items: stretch;
-  /* Transparent shell — copy column is a flat translucent Surface scrim; map
-     column stays a pass-through window to the ADR-017 MapStage inset (map
-     column bounds only — do not reframe the plate under the copy). */
+  /* Transparent shell — MapStage insets to the full rounded panel (under copy +
+     map readout). Copy sits on a light matte scrim; map column is a pass-through. */
   background: transparent;
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
@@ -783,9 +782,9 @@
 }
 
 .ds-home-hero::before {
-  /* Copy-column plate: same Archive Paper + grain/grid as the page atmosphere
-     so the grid reads as clearly as the map-column window. Copy text sits in a
-     transparent layer above. Map column stays clear for the MapStage inset. */
+  /* Copy-column matte scrim over the full-panel map: canvas mix keeps ink at
+     WCAG AA while basemap tiles remain visible under the words. Flat only —
+     no blur, glow, or gradient. Soft grain/grid still register on the plate. */
   content: '';
   grid-column: 1;
   grid-row: 1;
@@ -795,15 +794,18 @@
   justify-self: stretch;
   min-width: 0;
   min-height: 100%;
-  background-color: var(--ds-canvas);
-  background-image: var(--ds-edition-pattern-archive-grid), var(--ds-edition-pattern-grain);
-  background-size: 20rem 20rem, 256px 256px;
-  background-position: 0 0, 0 0;
-  background-repeat: repeat, repeat;
+  /* Light matte only — no archive-grid wash here (that reads as an opaque plate
+     over ocean tiles). Grain stays subtle; map must remain visible under copy. */
+  background-color: color-mix(in srgb, var(--ds-canvas) 38%, transparent);
+  background-image: var(--ds-edition-pattern-grain);
+  background-size: 256px 256px;
+  background-position: 0 0;
+  background-repeat: repeat;
 }
 
 [data-theme='dark'] .ds-home-hero::before {
-  background-image: var(--ds-edition-pattern-archive-grid-dark), var(--ds-edition-pattern-grain);
+  background-color: color-mix(in srgb, var(--ds-canvas) 48%, transparent);
+  background-image: var(--ds-edition-pattern-grain);
 }
 
 .ds-home-hero__map {
@@ -850,9 +852,8 @@
   padding: var(--ds-home-panel-padding, var(--ds-space-8));
   position: relative;
   min-height: 0;
-  /* Transparent — plate fill + archive grid live on `.ds-home-hero::before`
-     so grain/grid is visible (not washed out by a near-identical Surface mix).
-     Map inset stays map-column-only; no blur/glow/gradient. */
+  /* Transparent text layer — matte scrim + grain/grid live on `::before` so
+     map tiles read under the words. No blur/glow/gradient. */
   background: transparent;
   color: var(--ds-ink);
   border-right: var(--ds-border-width) solid var(--ds-border);

@@ -1,8 +1,11 @@
 /**
- * Positions the persistent ADR-017 MapStage plate over the home hero map column.
+ * Positions the persistent ADR-017 MapStage plate over the home hero panel.
  * Uses fixed viewport geometry (not clip-path) so WebGL paints reliably across Safari,
- * Firefox, and Chrome.
+ * Firefox, and Chrome. The plate fills the full rounded hero frame so basemap + pins
+ * extend under the copy column; copy sits above a light matte scrim.
  */
+
+import { CAMERA_PRESETS } from './camera-presets';
 
 const MAP_STAGE_SELECTOR = '.ds-map-stage';
 export const HERO_MAP_INSET_CLASS = 'ds-map-stage--hero-inset';
@@ -12,6 +15,13 @@ export type HeroMapStageGeometry = {
   readonly left: number;
   readonly width: number;
   readonly height: number;
+};
+
+export type HeroCameraPadding = {
+  readonly top: number;
+  readonly right: number;
+  readonly bottom: number;
+  readonly left: number;
 };
 
 function mapStageEl(): HTMLElement | null {
@@ -28,10 +38,14 @@ const DEFAULT_VIEWPORT: ViewportBounds = {
   height: typeof window !== 'undefined' ? window.innerHeight : 4096,
 };
 
-/** Minimum visible share of the hero map column before the inset hides (avoids orphan slivers). */
+/** Minimum visible share of the hero panel before the inset hides (avoids orphan slivers). */
 export const HERO_MAP_INSET_MIN_VISIBLE_RATIO = 0.2;
 
-/** Viewport-fixed box matching the visible hero map column intersection. Returns null when off-screen. */
+/** Matches shell.css `.ds-home-hero` desktop grid (`46fr 54fr`). */
+export const HERO_COPY_COLUMN_FR = 46;
+export const HERO_MAP_COLUMN_FR = 54;
+
+/** Viewport-fixed box matching the visible hero panel intersection. Returns null when off-screen. */
 export function heroMapStageGeometryForRect(
   rect: DOMRect,
   viewport: ViewportBounds = DEFAULT_VIEWPORT,
@@ -61,6 +75,47 @@ export function heroMapStageGeometryForRect(
 }
 
 /**
+ * Asymmetric national padding so CONUS keeps framing in the map readout after the
+ * MapStage plate expands to the full hero panel. Left (desktop) or top (mobile stack)
+ * padding clears the copy column; other edges keep the national preset clearance.
+ *
+ * Without this, expanding the container leftward would recenter/shrink the country
+ * relative to the prior map-column-only inset (user-visible "shifting").
+ */
+export function heroNationalCameraPadding(args: {
+  readonly panel: Pick<DOMRect, 'width' | 'height' | 'left' | 'top'>;
+  readonly copy: Pick<DOMRect, 'width' | 'height' | 'left' | 'top' | 'right' | 'bottom'> | null;
+  readonly basePadding?: number;
+}): HeroCameraPadding {
+  const base = args.basePadding ?? CAMERA_PRESETS.national.padding;
+  if (!args.copy || args.panel.width <= 0 || args.panel.height <= 0) {
+    return { top: base, right: base, bottom: base, left: base };
+  }
+
+  const stacked = args.copy.width >= args.panel.width * 0.9;
+  if (stacked) {
+    const copyBand = Math.round(args.copy.bottom - args.panel.top);
+    // Keep CONUS mostly in the map band; let the upper copy overlap basemap.
+    return {
+      top: Math.max(base, Math.round(copyBand * 0.35)),
+      right: base,
+      bottom: base,
+      left: base,
+    };
+  }
+
+  const copyBand = Math.round(args.copy.right - args.panel.left);
+  // Modest left pad so western states/pins sit under the headline while CONUS
+  // still reads primarily in the map-readout column (not recentered full-bleed).
+  return {
+    top: base,
+    right: base,
+    bottom: base,
+    left: Math.max(base, Math.round(copyBand * 0.22)),
+  };
+}
+
+/**
  * Legacy clip-path helper — kept for regression tests documenting why geometry
  * replaced inset clipping (Safari WebGL + clip-path compositing bugs).
  */
@@ -78,7 +133,7 @@ export function insetClipPathForRect(
   return `inset(${top}px ${right}px ${bottom}px ${left}px)`;
 }
 
-/** Pin the fixed map plate to the hero map column bounds. Returns false when layout is not ready. */
+/** Pin the fixed map plate to the hero panel bounds. Returns false when layout is not ready. */
 export function applyHeroMapInset(panel: HTMLElement): boolean {
   const stage = mapStageEl();
   if (!stage) return false;

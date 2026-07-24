@@ -3,9 +3,10 @@
 /**
  * Homepage hero: a single Surface panel (copy | live map readout) in the home edition
  * flow. The persistent `MapStage` canvas stays mounted for ADR-017 explore handoff; on `/`
- * it is positioned over the hero map column so real archive pins fill the readout beside the opaque copy
- * column (see `hero-map-inset.ts` + map-surfaces.css). Engagement clears the inset, flies
- * the live camera, then routes through `engage()` so the transition continues on `/explore`.
+ * it is positioned over the full hero panel so basemap + archive pins extend under the
+ * lightly scrimmed copy column (see `hero-map-inset.ts` + map-surfaces.css). Engagement
+ * clears the inset, flies the live camera, then routes through `engage()` so the transition
+ * continues on `/explore`.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
@@ -16,6 +17,7 @@ import { CAMERA_POINT_ZOOM } from '../../lib/map-experience/camera-presets';
 import {
   applyHeroMapInset,
   clearHeroMapInset,
+  heroNationalCameraPadding,
 } from '../../lib/map-experience/hero-map-inset';
 import type {
   ExploreMapFeatureCollection,
@@ -129,7 +131,7 @@ export function HeroStage({
   const stageApiRef = useRef(stage);
   stageApiRef.current = stage;
   const heroPanelRef = useRef<HTMLElement | null>(null);
-  const mapColumnRef = useRef<HTMLDivElement | null>(null);
+  const copyColumnRef = useRef<HTMLDivElement | null>(null);
   const [dissolving, setDissolving] = useState(false);
   const archiveFrameIndex = completeFrameIndex(decadeFrames);
 
@@ -151,8 +153,8 @@ export function HeroStage({
       selectedEntity: undefined,
     });
 
-    api.flyPreset('national', { bounds: US_CONUS_BOUNDS }, { mode: 'ease' });
-
+    // National framing with hero padding is owned by the inset sync effect once the
+    // full-panel MapStage box is measured — avoids a map-column-sized first paint then jump.
     let viewport: ExploreViewportFrame | undefined;
     const unsubscribe = api.subscribe('viewport', (frame) => {
       viewport = frame;
@@ -168,7 +170,6 @@ export function HeroStage({
     });
 
     if (target.preset === 'national') {
-      api.flyPreset('national', { bounds: target.bounds }, { mode: 'ease' });
       return;
     }
 
@@ -181,26 +182,46 @@ export function HeroStage({
 
   useEffect(() => {
     const panel = heroPanelRef.current;
-    const mapColumn = mapColumnRef.current;
-    const insetTarget = mapColumn ?? panel;
-    if (!insetTarget || !stage.mapAvailable) return undefined;
+    const copy = copyColumnRef.current;
+    if (!panel || !stage.mapAvailable) return undefined;
 
     let raf = 0;
+    let lastWidth = 0;
+    let lastHeight = 0;
+
+    const frameNational = () => {
+      const panelRect = panel.getBoundingClientRect();
+      const copyRect = copy?.getBoundingClientRect() ?? null;
+      stageApiRef.current.flyPreset(
+        'national',
+        { bounds: US_CONUS_BOUNDS },
+        {
+          mode: 'ease',
+          padding: heroNationalCameraPadding({ panel: panelRect, copy: copyRect }),
+        },
+      );
+    };
+
     const sync = () => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
-        if (applyHeroMapInset(insetTarget)) {
-          stageApiRef.current.resize();
+        if (!applyHeroMapInset(panel)) return;
+        stageApiRef.current.resize();
+        const rect = panel.getBoundingClientRect();
+        const sizeChanged =
+          Math.abs(rect.width - lastWidth) > 1 || Math.abs(rect.height - lastHeight) > 1;
+        if (sizeChanged) {
+          lastWidth = rect.width;
+          lastHeight = rect.height;
+          frameNational();
         }
       });
     };
 
     sync();
     const observer = new ResizeObserver(sync);
-    observer.observe(insetTarget);
-    if (panel && panel !== insetTarget) {
-      observer.observe(panel);
-    }
+    observer.observe(panel);
+    if (copy) observer.observe(copy);
     window.addEventListener('scroll', sync, { passive: true });
     window.addEventListener('resize', sync);
     window.addEventListener('orientationchange', sync);
@@ -320,7 +341,22 @@ export function HeroStage({
 
   function handleExploreClick(event: React.MouseEvent<HTMLAnchorElement>) {
     event.preventDefault();
-    stage.flyPreset('national', { bounds: US_CONUS_BOUNDS });
+    const panel = heroPanelRef.current;
+    const copy = copyColumnRef.current;
+    if (panel) {
+      stage.flyPreset(
+        'national',
+        { bounds: US_CONUS_BOUNDS },
+        {
+          padding: heroNationalCameraPadding({
+            panel: panel.getBoundingClientRect(),
+            copy: copy?.getBoundingClientRect() ?? null,
+          }),
+        },
+      );
+    } else {
+      stage.flyPreset('national', { bounds: US_CONUS_BOUNDS });
+    }
     engage(RESTING_HREF);
   }
 
@@ -345,17 +381,13 @@ export function HeroStage({
         </Notice>
       ) : null}
 
-      <div
-        ref={mapColumnRef}
-        className="ds-home-hero__map"
-        aria-label="Live archive coverage map"
-      >
+      <div className="ds-home-hero__map" aria-label="Live archive coverage map">
         <div className="ds-home-hero__map-readout">
           <p className="ds-home-hero__map-caption">Live coverage · archive pins</p>
         </div>
       </div>
 
-      <div className="ds-home-hero__copy">
+      <div ref={copyColumnRef} className="ds-home-hero__copy">
         <p className="ds-home-hero__kicker">
           <KickerTickIcon />
           Place-connected archive

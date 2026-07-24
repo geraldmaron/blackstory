@@ -1469,8 +1469,16 @@ export function MapStageProvider({
       const reduced = prefersReducedMotion();
       const preset = cameraPresetFor(name, reduced);
 
+      const paddingOption = options?.padding ?? preset.padding;
+      const padding =
+        typeof paddingOption === 'number'
+          ? { top: paddingOption, bottom: paddingOption, left: paddingOption, right: paddingOption }
+          : paddingOption;
+
       let center: [number, number];
       let zoom: number;
+      /** When true, `padding` was already baked into center/zoom via `cameraForBounds`. */
+      let boundsFitted = false;
       if ('center' in target) {
         center = [target.center[0], target.center[1]];
         zoom = target.zoom;
@@ -1481,7 +1489,8 @@ export function MapStageProvider({
             return map.cameraForBounds(
               [west, south, east, north] as [number, number, number, number],
               {
-                padding: preset.padding,
+                // Honor caller padding (incl. asymmetric hero framing) when fitting bounds.
+                padding,
               },
             );
           } catch (error) {
@@ -1492,27 +1501,26 @@ export function MapStageProvider({
         if (camera?.center && typeof camera.zoom === 'number') {
           center = lngLatTuple(camera.center);
           zoom = camera.zoom;
+          boundsFitted = true;
         } else {
           center = [(west + east) / 2, (south + north) / 2];
           zoom = 3.4;
         }
       }
 
-      const paddingOption = options?.padding ?? preset.padding;
-      const padding =
-        typeof paddingOption === 'number'
-          ? { top: paddingOption, bottom: paddingOption, left: paddingOption, right: paddingOption }
-          : paddingOption;
+      // Bounds fits already encode padding in center/zoom — re-applying padding on
+      // ease/fly would double-shift (hero west coast pinned to the copy divider).
+      const motionPadding = boundsFitted ? 0 : padding;
 
       if (reduced || preset.duration <= 0) {
-        map.jumpTo({ center, zoom, padding });
+        map.jumpTo({ center, zoom, padding: motionPadding });
         return true;
       }
       if ((options?.mode ?? 'fly') === 'ease') {
         map.easeTo({
           center,
           zoom,
-          padding,
+          padding: motionPadding,
           duration: preset.duration,
           easing: preset.easing,
           essential: true,
@@ -1521,7 +1529,7 @@ export function MapStageProvider({
         map.flyTo({
           center,
           zoom,
-          padding,
+          padding: motionPadding,
           duration: preset.duration,
           curve: preset.curve,
           speed: preset.speed,

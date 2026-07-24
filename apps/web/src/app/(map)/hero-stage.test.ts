@@ -29,9 +29,10 @@ describe('home hero panel structure', () => {
     assert.match(heroStageSource, /className=\{[^}]*'ds-home-hero ds-hero-stage'/s);
     assert.match(heroStageSource, /className="ds-home-hero__copy"/);
     assert.match(heroStageSource, /className="ds-home-hero__map"/);
-    assert.match(heroStageSource, /mapColumnRef/);
+    assert.match(heroStageSource, /copyColumnRef/);
     assert.match(heroStageSource, /data-hero-map-panel="true"/);
     assert.match(heroStageSource, /heroPanelRef/);
+    assert.doesNotMatch(heroStageSource, /mapColumnRef/);
     assert.doesNotMatch(heroStageSource, /data-hero-map-frame/);
     assert.doesNotMatch(heroStageSource, /ds-home-hero__map-frame/);
   });
@@ -47,14 +48,17 @@ describe('home hero panel structure', () => {
     assert.doesNotMatch(heroStageSource, /ds-hero-timeline/);
   });
 
-  it('positions the persistent MapStage over the hero map column', () => {
+  it('positions the persistent MapStage over the full hero panel under copy', () => {
     assert.match(heroStageSource, /orientationchange/);
     assert.match(heroStageSource, /applyHeroMapInset/);
     assert.match(heroStageSource, /clearHeroMapInset/);
+    assert.match(heroStageSource, /heroNationalCameraPadding/);
     assert.match(heroStageSource, /\.resize\(\)/);
     assert.match(heroMapInsetSource, /HERO_MAP_INSET_CLASS/);
     assert.match(heroMapInsetSource, /heroMapStageGeometryForRect/);
-    assert.match(heroMapInsetSource, /map column/i);
+    assert.match(heroMapInsetSource, /heroNationalCameraPadding/);
+    assert.match(heroMapInsetSource, /full hero panel/i);
+    assert.match(heroMapInsetSource, /under the copy column/i);
   });
 
   it('styles one Surface panel with side-by-side copy and map columns', () => {
@@ -70,11 +74,15 @@ describe('home hero panel structure', () => {
     );
     assert.match(
       shellCss,
-      /\.ds-home-hero::before\s*\{[^}]*background-color:\s*var\(--ds-canvas\)/s,
+      /\.ds-home-hero::before\s*\{[^}]*color-mix\(in srgb,\s*var\(--ds-canvas\)\s*38%/s,
     );
     assert.match(
       shellCss,
-      /\.ds-home-hero::before\s*\{[^}]*grid-column:\s*1[^}]*background-image:\s*var\(--ds-edition-pattern-archive-grid\)/s,
+      /\[data-theme='dark'\]\s+\.ds-home-hero::before\s*\{[^}]*color-mix\(in srgb,\s*var\(--ds-canvas\)\s*48%/s,
+    );
+    assert.match(
+      shellCss,
+      /\.ds-home-hero::before\s*\{[^}]*grid-column:\s*1[^}]*background-image:\s*var\(--ds-edition-pattern-grain\)/s,
     );
     assert.match(shellCss, /\.ds-home-hero__copy\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
     assert.match(shellCss, /\.ds-home-hero__copy\s*\{[^}]*grid-column:\s*1/s);
@@ -90,7 +98,7 @@ describe('home hero panel structure', () => {
     assert.match(shellCss, /--ds-home-panel-padding/);
   });
 
-  it('keeps hero copy above the repositioned map plate', () => {
+  it('keeps hero copy above the full-panel map plate', () => {
     assert.match(
       mapSurfacesCss,
       /\.ds-map-surface:has\(\.ds-home-hero\)\s+\.ds-map-stage--hero-inset\s*\{[^}]*z-index:\s*1/s,
@@ -101,7 +109,7 @@ describe('home hero panel structure', () => {
     );
     assert.match(
       mapSurfacesCss,
-      /\.ds-map-surface:has\(\.ds-home-hero\)\s+\.ds-map-stage--hero-inset\s*\{[^}]*border-radius:/s,
+      /\.ds-map-surface:has\(\.ds-home-hero\)\s+\.ds-map-stage--hero-inset\s*\{[^}]*border-radius:\s*var\(--ds-radius-md\)/s,
     );
     assert.match(shellCss, /\.ds-home-hero__copy\s*\{[^}]*z-index:\s*2/s);
     assert.match(shellCss, /\.ds-home-hero__map\s*\{[^}]*pointer-events:\s*none/s);

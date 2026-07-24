@@ -19,9 +19,10 @@
 }
 
 /* Home edition stack: transparent column so the hero copy scrim can reveal
-   grain/grid. Beat cards stay opaque Surface (v6 canvas law — gaps show
-   Archive Paper atmosphere, not live map tiles). Keep isolation:auto so the
-   ADR-017 MapStage inset can stack above the home column and below copy. */
+   the full-panel live map under the words. Beat cards stay opaque Surface
+   (v6 canvas law — gaps show Archive Paper atmosphere, not live map tiles).
+   Keep isolation:auto so the ADR-017 MapStage inset can stack above the home
+   column and below copy. */
 .ds-map-surface:has(.ds-home-hero) .ds-home {
   background: transparent;
   z-index: auto;
@@ -29,7 +30,7 @@
 }
 
 /* Map-surface main defaults to opaque canvas (explore scroll safety). On home
-   punch that fill so atmosphere under the translucent hero copy is visible. */
+   punch that fill so the full-panel map + copy scrim can compose correctly. */
 .ds-map-surface:has(.ds-home-hero) main {
   background: transparent;
 }
