@@ -96,5 +96,5 @@ fronted by CDN. Until CDN is applied, `makePublic` is best-effort after upload.
 | Entity page | `apps/web/src/app/entity/[id]/page.tsx` |
 | Quiet entity name links | `apps/web/src/components/entity/EntityLink.tsx` (`ds-entity-link`) |
 | Catalog → relationships | `packages/domain/src/graph/catalog-related.ts` + `publish-national-catalog.ts` |
-| Immutable releases | `docs/adr/ADR-004-public-projection-immutable-snapshots.md` |
+| Immutable releases | ADR-004 (removed 2026-07-24; see `docs/decisions-carryover.md` and `docs/runbooks/release-activation-postgres.md`) |
 | Public-media bucket matrix | `infra/gcp/storage-buckets.matrix.md` |

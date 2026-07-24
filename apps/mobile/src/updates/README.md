@@ -7,9 +7,9 @@ not the EAS-side account provisioning — that is a separate human gate (below).
 
 ## The decision (already made — this bead implements it)
 
-`docs/adr/ADR-023-mobile-build-release.md`'s "Adversarial review disposition"
-(2026-07-20) and `docs/mobile/security/threat-model.md` T6 already resolved the
-question this bead was chartered to decide:
+ADR-023's "Adversarial review disposition" (2026-07-20; ADR removed 2026-07-24, see
+`docs/decisions-carryover.md`) and `docs/mobile/security/threat-model.md` T6 already resolved
+the question this bead was chartered to decide:
 
 > **On the free tier, OTA ships without end-to-end code signing.** EAS Update
 > code signing is supported on SDK 56 but is gated to the EAS **Production or

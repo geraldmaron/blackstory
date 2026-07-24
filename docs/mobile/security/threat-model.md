@@ -34,7 +34,7 @@ attack surface.
 
 ### Program invariants this model is bound by
 
-From `docs/mobile/mobile-app-epic.md` and `docs/mobile/decisions/mobile-identity.md`:
+From `docs/mobile/mobile-app-epic.md` (identity/gate record removed 2026-07-24 as part of the ADR/decision-doc purge; still-binding invariants carried to `docs/decisions-carryover.md`):
 
 1. **Read boundary (invariant 2)**: `apps/api-public` is the *only* mobile read surface. No client
    touches canonical/research Firestore directly. Per ADR-011, public clients may read only

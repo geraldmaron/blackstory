@@ -2,7 +2,7 @@
 
 - **Bead**: `repo-fsxq` (MOB-001 human gates)
 - **Blocks**: `black-book-mobile-020` (MOB-020), first real EAS preview submit, TestFlight/Play closed testing
-- **Source**: `docs/mobile/decisions/mobile-identity.md`
+- **Source**: identity/gate decision record (removed 2026-07-24; proposed bundle IDs are now implemented in `apps/mobile/app.config.ts`)
 - **Status**: **none complete** for account enrollment — verified 2026-07-22; store-search research notes added 2026-07-22; Firebase §8 superseded for v1
 
 Owner-ordered checklist. Complete in sequence where noted; do not mark items done until evidence is recorded (account IDs, screenshots of console settings, or 1Password item links — never paste secrets into git).
@@ -11,7 +11,7 @@ Owner-ordered checklist. Complete in sequence where noted; do not mark items don
 
 ## Before you start
 
-- [ ] Read `docs/mobile/decisions/mobile-identity.md` (proposed bundle IDs, URLs, custody rules).
+- [ ] Review bundle IDs, URLs, and custody rules in `apps/mobile/app.config.ts` (source doc removed 2026-07-24).
 - [x] Confirm monthly spend ceiling with project budget posture (free-tier-first; kill-switch if EAS usage spikes).
   - **Owner 2026-07-22:** EAS ≤ **$10/mo** beyond Supabase; stay on Expo **Free** plan (15 iOS + 15 Android builds/mo). Do not subscribe Starter ($19) without raising the ceiling. Alert recipient: `me@geralddagher.com`.
 - [x] Decide **individual vs organization** Apple/Google developer accounts (org may require D-U-N-S; budget 1–2+ weeks).
@@ -170,4 +170,4 @@ All must be true before `eas build --profile preview` is submitted to TestFlight
 - MOB-020 review packet skeleton: `docs/mobile/release/beta-review-packet.md`
 - Mobile privacy SDK inventory: `apps/mobile/PRIVACY.md`
 - EAS profiles: `apps/mobile/eas.json`
-- Identity decision: `docs/mobile/decisions/mobile-identity.md`
+- Identity decision: removed 2026-07-24 (see `apps/mobile/app.config.ts` for the implemented scheme)

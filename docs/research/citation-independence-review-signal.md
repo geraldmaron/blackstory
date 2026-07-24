@@ -75,5 +75,5 @@ then, promotion continues to treat the citations as separate groups; the flag is
 ## Related docs
 
 - `docs/research/confidence-lineage.md` — deterministic confidence and lineage grouping
-- `docs/adr/ADR-014-vector-search.md` — embedding pipeline and similarity helpers
+- ADR-014 (vector search; removed 2026-07-24, see `git log -- docs/adr/`) — embedding pipeline and similarity helpers
 - `docs/research/research-kernel.md` — ledger schemas and human-in-the-loop release policy

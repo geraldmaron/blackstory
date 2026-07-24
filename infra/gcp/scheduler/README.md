@@ -1,9 +1,8 @@
 # Scheduled-job Cloud Scheduler mirror (BB-084)
 
 Declarative Cloud Scheduler mirror of the scheduled-job registry. **Not applied** to live GCP —
-apply via Terraform or `gcloud scheduler jobs create` after human review, per
-[ADR-007](../../../docs/adr/ADR-007-background-workflow-model.md) (Cloud Scheduler -> Cloud
-Tasks -> Cloud Run Jobs/workers).
+apply via Terraform or `gcloud scheduler jobs create` after human review, per ADR-007 (background
+workflow model: Cloud Scheduler -> Cloud Tasks -> Cloud Run Jobs/workers; removed 2026-07-24).
 
 | Artifact | Role |
 |----------|------|

@@ -1,7 +1,8 @@
 # Three-project re-split Terraform stubs (ADR-012, BB-078)
 
-Unapplied Terraform for the [ADR-012](../../../../docs/adr/ADR-012-production-environment-resplit.md)
-target topology: `blackbook-prod` (retained `black-book-efaaf`), `blackbook-staging` (new),
+Unapplied Terraform for the ADR-012 (removed 2026-07-24; see
+`docs/security/environment-isolation.md`) target topology: `blackbook-prod` (retained
+`black-book-efaaf`), `blackbook-staging` (new),
 `blackbook-internal` (new). This module is additive to, and does **not** duplicate,
 [`../`](../) (the original BB-005 single-project stubs, which keep owning `blackbook-prod`'s own
 service accounts, buckets, and same-project IAM). `../locals.tf` and `../buckets.tf` were
@@ -63,7 +64,7 @@ terraform fmt -check -recursive
 
 ## Related
 
-- [ADR-012](../../../../docs/adr/ADR-012-production-environment-resplit.md) — decision record
+- ADR-012 — decision record, removed 2026-07-24 (see `docs/security/environment-isolation.md`)
 - [`../../isolation-matrix.json`](../../isolation-matrix.json) — `productionResplitTarget` +
   `crossProjectGrants` machine encoding
 - [`../../wif/`](../../wif/) — per-project GitHub Actions deploy identities (BB-010, extended)

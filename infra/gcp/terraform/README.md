@@ -1,7 +1,7 @@
 # Terraform single-project isolation stubs (BB-005)
 
 These unapplied stubs target only the existing production project `black-book-efaaf`
-(`blackbook-prod` under [ADR-012](../../../docs/adr/ADR-012-production-environment-resplit.md)).
+(`blackbook-prod` under ADR-012, removed 2026-07-24 — see `docs/security/environment-isolation.md`).
 They model seven per-surface SAs, three buckets with UBLA/PAP posture, and bucket-scoped IAM. The
 four ADR-012-relocated identities (`admin`, `publication`, `security`, `research`) and the
 `private-evidence` bucket are intentionally absent here — they live in

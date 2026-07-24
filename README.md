@@ -34,7 +34,7 @@ Public clients read released projections only. Anonymous clients never write can
 | `docs/` | Architecture, ADRs, security, testing, and runbooks |
 | `brand/` | Brand masters (lockups, symbols, tokens, guide) |
 
-Architecture overview: [`docs/architecture.md`](./docs/architecture.md). Decisions: [`docs/adr/`](./docs/adr/README.md). Brand contract: [`docs/ui/brand.md`](./docs/ui/brand.md). Docs index: [`docs/README.md`](./docs/README.md).
+Architecture overview: [`docs/architecture.md`](./docs/architecture.md). Decisions: formal ADRs removed 2026-07-24, still-binding invariants carried to [`docs/decisions-carryover.md`](./docs/decisions-carryover.md). Brand contract: [`docs/ui/brand.md`](./docs/ui/brand.md). Docs index: [`docs/README.md`](./docs/README.md).
 
 **Docs site:** [geraldmaron.github.io/blackstory](https://geraldmaron.github.io/blackstory/), built from `apps/docs` and published into the repo `docs/` folder on `main`.
 
@@ -119,7 +119,7 @@ Shared TypeScript and ESLint policy lives in `packages/typescript-config` and `p
 
 ## Data plane
 
-Product system of record is Supabase Postgres (`blackstory-app`). Schema and migrations: [`docs/data/postgres-schema.md`](./docs/data/postgres-schema.md), [`supabase/migrations/`](./supabase/migrations/). Decision: [ADR-020](./docs/adr/ADR-020-supabase-postgres-system-of-record.md).
+Product system of record is Supabase Postgres (`blackstory-app`). Schema and migrations: [`docs/data/postgres-schema.md`](./docs/data/postgres-schema.md), [`supabase/migrations/`](./supabase/migrations/). Decision: ADR-020 (removed 2026-07-24, see [`docs/decisions-carryover.md`](./docs/decisions-carryover.md)).
 
 Context indicators (justice, wealth, housing) live in `bb_reference.statistical_*`. Catalog: [`docs/research/context-data-source-matrix.md`](./docs/research/context-data-source-matrix.md). Juxtaposition rules: [`docs/methodology/juxtaposition-not-causation.md`](./docs/methodology/juxtaposition-not-causation.md).
 

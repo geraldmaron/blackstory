@@ -427,8 +427,8 @@ native module is missing there).
 
 ## Package naming — a documented discrepancy, not a guess
 
-`docs/mobile/decisions/mobile-identity.md` states the live package scope is `@black-book`
-and calls `@repo` "a stale pre-rename scope surviving only in build artifacts." Checking this
+The now-removed identity decision record stated the live package scope is `@black-book`
+and called `@repo` "a stale pre-rename scope surviving only in build artifacts." Checking this
 worktree's actual `packages/*/package.json` / `apps/*/package.json` files at scaffold time
 shows the opposite: every existing package here is still `@repo/*` (e.g. `@repo/web`,
 `@repo/config`, `@repo/typescript-config`) — the identity doc's rename claim does not hold in

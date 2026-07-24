@@ -1,6 +1,7 @@
 # BlackStory architecture
 
-> Required project state. Keep this file aligned with live ADRs under `docs/adr/`.
+> Required project state. Formal ADRs were cleared 2026-07-24 (decision-doc purge, `repo-xez5.11`);
+> still-binding invariants extracted from them live in `docs/decisions-carryover.md`.
 
 ## System overview
 
@@ -101,20 +102,8 @@ production `black-book-efaaf` for wind-down/rollback surfaces.
 
 ## Key decisions
 
-Formal ADRs: [`docs/adr/`](./adr/README.md).
-
-| ADR | Topic |
-|-----|-------|
-| [001](./adr/ADR-001-firebase-app-hosting-vs-cloud-run.md) | Public web host vs Cloud Run |
-| [004](./adr/ADR-004-public-projection-immutable-snapshots.md) | Public projections + immutable snapshots |
-| [005](./adr/ADR-005-service-surface-separation.md) | Public / submissions / internal / admin separation |
-| [008](./adr/ADR-008-search-and-geocoding.md) | Search and geocoding (Postgres) |
-| [010](./adr/ADR-010-security-and-abuse-assumptions.md) | Security and abuse assumptions |
-| [011](./adr/ADR-011-firestore-system-of-record.md) | Firestore SoR (**superseded** by 020) |
-| [014](./adr/ADR-014-vector-search.md) | Vector search (`pgvector`) |
-| [020](./adr/ADR-020-supabase-postgres-system-of-record.md) | Supabase Postgres SoR |
-| [026](./adr/ADR-026-postgrest-published-read-surface.md) | PostgREST published reads |
-| [027](./adr/ADR-027-vercel-public-web-hosting.md) | Vercel public web |
-| [028](./adr/ADR-028-discovery-schedule-runtime.md) | Corsair discovery schedules |
-
-Full index: [`adr/README.md`](./adr/README.md).
+Formal ADRs (public web host, projections/snapshots, service separation, search/geocoding,
+security assumptions, Firestore→Supabase SoR migration, vector search, PostgREST reads, Vercel
+hosting, discovery schedules, etc.) were removed 2026-07-24 as part of a decision-doc purge —
+history is preserved in git (`git log -- docs/adr/`). Still-binding invariants extracted from
+them are captured in [`docs/decisions-carryover.md`](./decisions-carryover.md).

@@ -46,7 +46,7 @@ User-visible strings and assets come from identity helpers and
 This docs site is the orientation layer. Deeper operating notes stay in the
 repository:
 
-- Architecture and ADRs: `docs/architecture.md`, `docs/adr/`
+- Architecture: `docs/architecture.md` (formal ADRs removed 2026-07-24; see `docs/decisions-carryover.md`)
 - Methodology: `docs/methodology/`
 - Research pipeline: `docs/research/`
 - Security: `docs/security/`

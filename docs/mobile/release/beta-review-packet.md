@@ -252,6 +252,5 @@ Attach to bead before close:
 ## Related documents
 
 - Owner checklist: `docs/mobile/release/store-account-checklist.md`
-- Identity + gates: `docs/mobile/decisions/mobile-identity.md`
 - SDK inventory: `apps/mobile/PRIVACY.md`
 - Epic index: `docs/mobile/mobile-app-epic.md`

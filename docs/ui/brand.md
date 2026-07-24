@@ -177,6 +177,7 @@ Opaque PNGs for the web app manifest and Android install UI:
 | `icon-192.png` / `icon-512.png` | `brand/app-icons/light/*-512.png` flattened on Archive Paper |
 | `icon-maskable-512.png` | Same mark, ~80% content safe-zone on Archive Paper |
 
-Manifest: `apps/web/public/manifest.webmanifest`. Owner how-to and iOS limits:
-[`docs/notes/add-to-home-screen.md`](../notes/add-to-home-screen.md). No service
-worker is shipped; installability is online-first only.
+Manifest: `apps/web/public/manifest.webmanifest`. No service worker is shipped;
+installability is online-first only. (Owner how-to note for iOS Add to Home
+Screen limits was removed 2026-07-24; iOS requires the user to use Safari's
+Share → Add to Home Screen manually — there is no programmatic install prompt.)

@@ -68,5 +68,6 @@ bump, not by an HTTP write API.
 
 ## Formal decisions
 
-Architecture decision records live in the repository under `docs/adr/`. This
-site's [Architecture decisions](./adrs.md) guide lists selected topics.
+Architecture decision records were removed from the repository 2026-07-24 as part of a
+decision-doc purge (history preserved in git). Still-binding invariants extracted from them
+live in `docs/decisions-carryover.md`.

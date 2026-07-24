@@ -3,7 +3,7 @@
 Declarative Google Cloud WIF design for GitHub Actions. One Workload Identity Pool, hosted in the
 `blackbook-prod` project (`black-book-efaaf`, number `332234323945`), with **per-project deploy
 service accounts** for `blackbook-prod`, `blackbook-staging`, and `blackbook-internal`
-([ADR-012](../../../docs/adr/ADR-012-production-environment-resplit.md)). The pool being
+(ADR-012, removed 2026-07-24 — see `docs/security/environment-isolation.md`). The pool being
 project-scoped does not mean the deploy identities are — a WIF pool can mint principals that are
 granted IAM in any project, which is exactly how this module keeps the three deploy identities
 project-isolated from each other while sharing one pool. Resources are **not applied** by default.
@@ -89,10 +89,9 @@ Then:
 
 Optional `blackbook-staging` deploy identity is gated by `enable_staging_deploy_identity` (default
 false); optional `blackbook-internal` deploy identity is gated by `enable_internal_deploy_identity`
-(default false). Both now target real project boundaries (ADR-012), not same-project configuration
-separation — see
-[`docs/security/environment-isolation.md`](../../../docs/security/environment-isolation.md) and
-[`docs/adr/ADR-012-production-environment-resplit.md`](../../../docs/adr/ADR-012-production-environment-resplit.md).
+(default false). Both now target real project boundaries (ADR-012, removed 2026-07-24), not
+same-project configuration separation — see
+[`docs/security/environment-isolation.md`](../../../docs/security/environment-isolation.md).
 
 ## Related
 

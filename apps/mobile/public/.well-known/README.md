@@ -4,7 +4,7 @@ This folder holds **local template fixtures**, not published files. Nothing here
 `https://blackbook.app/.well-known/` yet — that requires publishing from wherever `blackbook.app`
 is actually hosted (Firebase Hosting per `apps/web`, or its own root), which is explicitly **not**
 done by this bead. `apps/web` is out of this bead's exclusive ownership, and per
-`docs/mobile/decisions/mobile-identity.md`'s open human gates, the real values these files need
+the (now-removed) identity decision record's open human gates, the real values these files need
 don't exist yet.
 
 ## What's real
@@ -20,7 +20,7 @@ don't exist yet.
 ## What's templated (TODO markers inline)
 
 - `apple-app-site-association` — the `appID` field needs a **real Apple Team ID**
-  (`docs/mobile/decisions/mobile-identity.md` open human gate #1: Apple Developer Program account
+  (identity decision record's open human gate #1: Apple Developer Program account
   not yet provisioned). The `paths` list mirrors the web route shapes this app mirrors
   (`/explore`, `/search`, `/entity/*`, etc.) and excludes the web app's own API routes.
 - `assetlinks.json` — the `sha256_cert_fingerprints` entry needs the **real Android release

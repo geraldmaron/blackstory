@@ -38,7 +38,7 @@ target is Cloud Run + IAP.
 
 ## References
 
-- [ADR-005](../../docs/adr/ADR-005-service-surface-separation.md)
-- [ADR-027](../../docs/adr/ADR-027-vercel-public-web-hosting.md)
+- ADR-005 (service surface separation) and ADR-027 (Vercel public web hosting) — removed
+  2026-07-24, see `docs/decisions-carryover.md` and `git log -- docs/adr/`
 - [Service surfaces](../../docs/security/service-surfaces.md)
 - [Surface matrix](../../infra/gcp/surfaces/surface-matrix.json)
