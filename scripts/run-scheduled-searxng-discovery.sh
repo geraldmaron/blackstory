@@ -32,6 +32,16 @@ if [[ -f "${ENV_FILE}" ]]; then
   set +a
 fi
 
+# DATABASE_URL lives in postgres.env (same as overnight enrichment). Source after
+# enrichment.env so scheduled/manual runs share one credential layout.
+POSTGRES_ENV_FILE="${DISCOVERY_POSTGRES_ENV_FILE:-${HOME}/.config/blackstory/postgres.env}"
+if [[ -f "${POSTGRES_ENV_FILE}" ]]; then
+  set -a
+  # shellcheck source=/dev/null
+  . "${POSTGRES_ENV_FILE}"
+  set +a
+fi
+
 HARD_MAX_QUERIES_PER_RUN=12
 HARD_MAX_SURVIVORS=50
 

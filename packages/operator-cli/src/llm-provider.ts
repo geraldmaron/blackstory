@@ -102,16 +102,25 @@ type ChatMessagePayload = {
 /** Prefer message.content; fall back to reasoning/thinking (qwen3 OpenAI-compat quirk). */
 export function extractMessageContent(message: ChatMessagePayload | undefined): string {
   const content = message?.content?.trim();
-  if (content) return content;
+  if (content) return stripMarkdownCodeFence(content);
   const reasoning = message?.reasoning?.trim() || message?.thinking?.trim();
   if (!reasoning) return '';
-  return reasoning;
+  // Preserve the full reasoning payload (callers may need non-JSON prefixes);
+  // still strip a wrapping markdown fence when the whole payload is fenced.
+  return stripMarkdownCodeFence(reasoning);
 }
 
 /** GLM routers on OpenRouter reject strict json_schema; use json_object instead. */
 export function openRouterUsesJsonObjectMode(model: string): boolean {
   const id = model.toLowerCase();
   return id.includes('glm-') || id.includes('/glm');
+}
+
+/** Strip a single markdown code fence so fenced JSON is parseable. */
+export function stripMarkdownCodeFence(content: string): string {
+  const trimmed = content.trim();
+  const fenced = /^```[a-zA-Z]*\n([\s\S]*?)\n?```$/u.exec(trimmed);
+  return fenced?.[1] !== undefined ? fenced[1].trim() : trimmed;
 }
 
 /** Qwen3 thinking models need thinking disabled so JSON lands in message.content. */

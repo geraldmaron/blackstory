@@ -7,6 +7,7 @@
 import {
   TOPIC_REGISTRY,
   buildEditorialPacket,
+  isValidTopicId,
   linkifyProseAgainstCatalog,
   suggestRelatedEntitiesFromVectors,
   validateEditorialDrafts,
@@ -83,6 +84,12 @@ export type EditorialRunResult = {
   readonly concurrency: number;
 };
 
+type ModelLocationJson = {
+  readonly jurisdictionLabel?: string;
+  readonly locationLabel?: string;
+  readonly locationPrecision?: string;
+};
+
 type ModelClaimJson = {
   readonly predicate?: string;
   readonly object?: string;
@@ -105,6 +112,7 @@ type ModelJson = {
     readonly proposedRelationshipNotes?: string;
     readonly claims?: readonly ModelClaimJson[];
     readonly topicIds?: readonly string[];
+    readonly location?: ModelLocationJson;
     readonly eraBuckets?: readonly string[];
     readonly keywords?: readonly string[];
   };
@@ -326,8 +334,9 @@ async function judgeOneSubject(input: {
             ),
           }
         : {}),
+      // Free models invent plausible-but-unregistered topic ids — drop rather than block.
       ...(draftsIn.topicIds !== undefined
-        ? { topicIds: toSafeStringArray(draftsIn.topicIds) }
+        ? { topicIds: toSafeStringArray(draftsIn.topicIds).filter(isValidTopicId) }
         : {}),
       ...(draftsIn.eraBuckets !== undefined
         ? { eraBuckets: toSafeStringArray(draftsIn.eraBuckets) }
@@ -335,6 +344,15 @@ async function judgeOneSubject(input: {
       ...(draftsIn.keywords !== undefined
         ? { keywords: toSafeStringArray(draftsIn.keywords) }
         : {}),
+      ...(() => {
+        const loc = draftsIn.location;
+        const jurisdictionLabel = toSafeString(loc?.jurisdictionLabel);
+        const locationLabel = toSafeString(loc?.locationLabel);
+        const locationPrecision = toSafeString(loc?.locationPrecision);
+        return jurisdictionLabel && locationLabel && locationPrecision
+          ? { location: { jurisdictionLabel, locationLabel, locationPrecision } }
+          : {};
+      })(),
     };
     // Claims may cite only URLs the judge was actually shown — fabricated hrefs fail validation.
     const allowedCitationHrefs = (subject.sourceSnippets ?? []).flatMap(

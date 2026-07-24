@@ -1,0 +1,457 @@
+[
+  {
+    "id": "gap_louisiana_state_legislator",
+    "kind": "other",
+    "displayName": "Louisiana state legislator",
+    "summary": "Felix C. Antoine was the first Black Louisiana state legislator since Reconstruction, serving in the Louisiana House of Representatives from 1868 to 1872. He was also a Republican and served as harbor master in New Orleans.",
+    "eraBuckets": [
+      "1860s",
+      "1870s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "reconstruction",
+      "segregation",
+      "jim-crow",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "reconstruction",
+      "segregation",
+      "jim-crow",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Louisiana",
+      "Reconstruction",
+      "state legislator",
+      "Black history",
+      "New Orleans"
+    ],
+    "jurisdictionLabel": "New Orleans, Louisiana",
+    "locationPrecision": "city",
+    "locationLabel": "New Orleans",
+    "lat": 29.9761,
+    "lng": -90.0783,
+    "claims": [
+      {
+        "predicate": "was",
+        "object": "first Black Louisiana state legislator since Reconstruction",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Felix_C._Antoine",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served",
+        "object": "in the Louisiana House of Representatives from 1868 to 1872",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Felix_C._Antoine",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "a Republican",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Felix_C._Antoine",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served",
+        "object": "as harbor master in New Orleans",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Felix_C._Antoine",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "born in New Orleans",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Felix_C._Antoine",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Felix C. Antoine's role as a Black state legislateur during Reconstruction is significant in understanding the political participation of African Americans in post-Civil War Louisiana. His service reflects the broader context of Reconstruction-era politics and the challenges faced by Black leaders in the Jim Crow South."
+  },
+  {
+    "id": "gap_99th_fighter_squadron",
+    "kind": "organization",
+    "displayName": "99th Fighter Squadron",
+    "summary": "The 99th Fighter Squadron was the first African-American military aviation unit in the U.S. military, part of the Tuskegee Airmen, and played a crucial role in World War II by escorting bombers and earning recognition for their combat record.",
+    "eraBuckets": [
+      "1940s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "military",
+      "segregation",
+      "jim-crow",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "military",
+      "segregation",
+      "jim-crow",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Tuskegee Airmen",
+      "99th Fighter Squadron",
+      "World War II",
+      "African-American",
+      "military"
+    ],
+    "jurisdictionLabel": "Tuskegee, Alabama",
+    "locationPrecision": "campus",
+    "locationLabel": "Tuskegee Army Air Field",
+    "lat": 32.45916667,
+    "lng": -85.68,
+    "claims": [
+      {
+        "predicate": "was",
+        "object": "the first African-American military aviation unit in the U.S. military",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Tuskegee_Airmen",
+        "citationLabel": "Tuskegee Airmen Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "part of the Tuskegee Airmen",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Tuskegee_Airmen",
+        "citationLabel": "Tuskegee Airmen Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "deployed overseas to North Africa in April 1943",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Tuskegee_Airmen",
+        "citationLabel": "Tuskegee Airmen Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "equipped with Curtiss P-40 Warhawk fighter-bomber aircraft",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Tuskegee_Airmen",
+        "citationLabel": "Tuskegee Airmen Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "awarded three Distinguished Unit Citations",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Tuskegee_Airmen",
+        "citationLabel": "Tuskegee Airmen Wikipedia"
+      }
+    ],
+    "historicalContext": "The 99th Fighter Squadron was part of the Tuskegee Airmen, a group of African-American military pilots and airmen who broke racial barriers in the U.S. military during World War II. Their formation and deployment marked a significant step in the fight against segregation in the armed forces."
+  },
+  {
+    "id": "gap_doris_miller_memorial",
+    "kind": "other",
+    "displayName": "Doris Miller Memorial",
+    "summary": "The Doris Miller Memorial honors Doris Miller, the first Black recipient of the Navy Cross, for his heroic actions during the attack on Pearl Harbor and his contributions to the U.S. Navy during World War II.",
+    "eraBuckets": [
+      "1940s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "military",
+      "segregation",
+      "firsts",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "military",
+      "segregation",
+      "firsts",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Doris Miller",
+      "Navy Cross",
+      "Pearl Harbor",
+      "Medal of Honor",
+      "World War II"
+    ],
+    "jurisdictionLabel": "Waco, Texas",
+    "locationPrecision": "city",
+    "locationLabel": "Waco, Texas",
+    "lat": 31.5492,
+    "lng": -97.1472,
+    "claims": [
+      {
+        "predicate": "was",
+        "object": "first Black recipient of the Navy Cross",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Doris_Miller",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "helped carry wounded sailors to safety",
+        "object": "during the attack on Pearl Harbor",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Doris_Miller",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "operated an anti-aircraft gun",
+        "object": "despite no prior training in gunnery",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Doris_Miller",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was nominated for the Medal of Honor",
+        "object": "by a congressman and a senator",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Doris_Miller",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was killed in action",
+        "object": "when his ship was torpedoed",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Doris_Miller",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Doris Miller's actions during the attack on Pearl Harbor and his subsequent recognition as the first Black recipient of the Navy Cross highlight the challenges and contributions of Black individuals in the U.S. military during World War II. His story is part of the broader narrative of racial discrimination and the fight for recognition and equality within the armed forces."
+  },
+  {
+    "id": "gap_82nd_airborne_division",
+    "kind": "organization",
+    "displayName": "82nd Airborne Division",
+    "summary": "The 82nd Airborne Division, based in Fort Bragg, North Carolina, is notable for being commanded by the first African American general in 1976, marking a significant milestone in military integration and civil rights history.",
+    "eraBuckets": [
+      "1910s",
+      "1940s",
+      "1970s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "military",
+      "segregation",
+      "history",
+      "firsts"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "military",
+      "segregation",
+      "history",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "82nd Airborne Division",
+      "Fort Bragg",
+      "All American",
+      "military integration",
+      "civil rights"
+    ],
+    "jurisdictionLabel": "Fort Bragg, North Carolina",
+    "locationPrecision": "city",
+    "locationLabel": "Fort Bragg, North Carolina",
+    "lat": 35.13916667,
+    "lng": -78.99916667,
+    "claims": [
+      {
+        "predicate": "commanded_by",
+        "object": "first African American general",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/82nd_Airborne_Division",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "based_at",
+        "object": "Fort Bragg, North Carolina",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/82nd_Airborne_Division",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "nicknamed",
+        "object": "All American Division",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/82nd_Airborne_Division",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "activated",
+        "object": "August 5, 1917",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/82nd_Airborne_Division",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "part_of",
+        "object": "XVII Airborne Corps",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/82nd_Airborne_Division",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The 82nd Airborne Division's history includes its role in World War I and World War II, and its significance is amplified by the appointment of the first African American commander in 1976, reflecting broader trends in the desegregation of the U.S. military and the advancement of Black leadership."
+  },
+  {
+    "id": "gap_rodney_king_unrest",
+    "kind": "event",
+    "displayName": "Rodney King unrest",
+    "summary": "The 1992 Los Angeles riots, sparked by the acquittal of officers involved in the beating of Rodney King, highlighted deep-seated racial tensions and systemic issues within law enforcement, leading to widespread violence and significant loss of life.",
+    "eraBuckets": [
+      "1990s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "police-violence"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "police-violence"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Rodney King",
+      "Los Angeles riots",
+      "police brutality",
+      "racial tensions",
+      "systemic racism"
+    ],
+    "jurisdictionLabel": "Los Angeles, California",
+    "locationPrecision": "neighborhood",
+    "locationLabel": "South Central Los Angeles",
+    "lat": 33.98055556,
+    "lng": -118.28611111,
+    "claims": [
+      {
+        "predicate": "caused",
+        "object": "riots",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/1992_Los_Angeles_riots",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "involved",
+        "object": "Rodney King",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/1992_Los_Angeles_riots",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "resulted_in",
+        "object": "systemic issues",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/1992_Los_Angeles_riots",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "led_to",
+        "object": "reforms",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/1992_Los_Angeles_riots",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The Rodney King unrest occurred in the context of broader civil rights struggles and systemic racism in the United States. It was a direct result of long-standing issues of police brutality and racial discrimination, which were exacerbated by the acquittal of officers involved in the beating of Rodney King. The event also reflected the impact of the crack epidemic and gang violence in the 1990s."
+  },
+  {
+    "id": "gap_1890_land",
+    "kind": "law",
+    "displayName": "1890 land",
+    "summary": "The 1890 land-grant system required Southern states to fund Black colleges to maintain federal agricultural funding, establishing a framework for historically Black colleges and universities (HBCUs) in the U.S.",
+    "eraBuckets": [
+      "1890s"
+    ],
+    "topicTags": [
+      "land-grant",
+      "civil-rights",
+      "segregation",
+      "education",
+      "history"
+    ],
+    "topicIds": [
+      "land-grant",
+      "civil-rights",
+      "segregation",
+      "education",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "land-grant",
+      "HBCUs",
+      "agricultural education",
+      "segregation",
+      "funding"
+    ],
+    "jurisdictionLabel": "United States",
+    "locationPrecision": "country",
+    "locationLabel": "National legislative system",
+    "lat": 38.88972222,
+    "lng": -77.00888889,
+    "claims": [
+      {
+        "predicate": "established",
+        "object": "1890 land-grant system",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Land-grant_university",
+        "citationLabel": "Land-grant university Wikipedia"
+      },
+      {
+        "predicate": "required",
+        "object": "Southern states to fund Black colleges",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Land-grant_university",
+        "citationLabel": "Land-grant university Wikipedia"
+      },
+      {
+        "predicate": "led_to",
+        "object": "historically Black colleges and universities (HBCUs)",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Land-grant_university",
+        "citationLabel": "Land-grant university Wikipedia"
+      },
+      {
+        "predicate": "funded",
+        "object": "agricultural education",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Land-grant_university",
+        "citationLabel": "Land-grant university Wikipedia"
+      }
+    ],
+    "historicalContext": "The 1890 land-grant system was a legislative response to educational segregation in the South, requiring Southern states to fund Black colleges to retain federal agricultural support. This system laid the foundation for the development of HBCUs, which became critical institutions in advancing educational and civil rights for African Americans."
+  }
+]

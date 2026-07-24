@@ -1,0 +1,160 @@
+[
+  {
+    "id": "gap_great_dismal_swamp_landscape_study",
+    "kind": "organization",
+    "displayName": "Great Dismal Swamp Landscape Study",
+    "summary": "The Great Dismal Swamp Landscape Study documents the historical significance of the Great Dismal Swamp as a refuge for maroons, self-liberated Africans who escaped enslavement and lived in the swamp between the 17th and 19th centuries.",
+    "eraBuckets": [
+      "1700s",
+      "1800s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "civil-rights",
+      "history",
+      "migration"
+    ],
+    "topicIds": [
+      "enslavement",
+      "civil-rights",
+      "history",
+      "migration"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Great Dismal Swamp",
+      "maroons",
+      "enslavement",
+      "refuge",
+      "Underground Railroad"
+    ],
+    "jurisdictionLabel": "Virginia, North Carolina",
+    "locationPrecision": "site",
+    "locationLabel": "Great Dismal Swamp",
+    "lat": 36.640876,
+    "lng": -76.451797,
+    "claims": [
+      {
+        "predicate": "was",
+        "object": "a refuge for maroons",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Great_Dismal_Swamp_maroons",
+        "citationLabel": "Great Dismal Swamp maroons"
+      },
+      {
+        "predicate": "were",
+        "object": "self-liberated Africans",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Great_Dismal_Swamp_maroons",
+        "citationLabel": "Great Dismal Swamp maroons"
+      },
+      {
+        "predicate": "lived",
+        "object": "in the Great Dismal Swamp",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Great_Dismal_Swamp_maroons",
+        "citationLabel": "Great Dismal Swamp maroons"
+      },
+      {
+        "predicate": "existed",
+        "object": "between the 17th and 19th centuries",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Great_Dismal_Swamp_maroons",
+        "citationLabel": "Great Dismal Swamp maroons"
+      },
+      {
+        "predicate": "were",
+        "object": "part of the Underground Railroad",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Great_Dismal_Swamp_maroons",
+        "citationLabel": "Great Dismal Swamp maroons"
+      }
+    ],
+    "historicalContext": "The Great Dismal Swamp maroons were a significant part of Black history, representing resistance to enslavement and the formation of self-sustaining communities. Their existence is tied to broader historical contexts of slavery, escape, and the Underground Railroad."
+  },
+  {
+    "id": "gap_pilgrim_baptist_church",
+    "kind": "institution",
+    "displayName": "Pilgrim Baptist Church",
+    "summary": "Pilgrim Baptist Church in Chicago was a central institution in the development of gospel music, serving as the long-term home for Thomas A. Dorsey, a key figure in blending blues and gospel traditions. Dorsey's work at the church helped shape the Black church music movement, influencing generations of musicians and religious expression.",
+    "eraBuckets": [
+      "1910s",
+      "1920s",
+      "1930s",
+      "1940s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "jim-crow",
+      "music",
+      "religion"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "jim-crow",
+      "music",
+      "religion"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "gospel music",
+      "blues",
+      "church",
+      "Thomas Dorsey",
+      "Chicago"
+    ],
+    "jurisdictionLabel": "Chicago, Illinois",
+    "locationPrecision": "institution",
+    "locationLabel": "Pilgrim Baptist Church",
+    "lat": 41.83444444,
+    "lng": -87.62138889,
+    "claims": [
+      {
+        "predicate": "served_as",
+        "object": "music_director",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Thomas_A._Dorsey",
+        "citationLabel": "Thomas A. Dorsey"
+      },
+      {
+        "predicate": "influenced",
+        "object": "gospel_music_movement",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Thomas_A._Dorsey",
+        "citationLabel": "Thomas A. Dorsey"
+      },
+      {
+        "predicate": "introduced",
+        "object": "musical_improvisation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Thomas_A._Dorsey",
+        "citationLabel": "Thomas A. Dorsey"
+      },
+      {
+        "predicate": "encouraged",
+        "object": "participation_in_church_services",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Thomas_A._Dorsey",
+        "citationLabel": "Thomas A. Dorsey"
+      },
+      {
+        "predicate": "co-founded",
+        "object": "National_Convention_of_Gospel_Choirs_and_Choruses",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Thomas_A._Dorsey",
+        "citationLabel": "Thomas A. Dorsey"
+      }
+    ],
+    "historicalContext": "Pilgrim Baptist Church in Chicago was a vital hub for Black religious and cultural life in the early to mid-20th century. It provided a space for the evolution of gospel music, which became a powerful form of expression and resistance during the Jim Crow era. The church's role in nurturing artists like Thomas A. Dorsey highlights its significance in the broader Black church music movement."
+  }
+]

@@ -18,7 +18,7 @@ import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'r
 import { StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated';
 import { useEditionTabBarInset } from '@/shell/edition-chrome';
-import { ApiStatusBanner, ScreenCanvas, Z_LAYER, space } from '@/ui';
+import { ApiStatusBanner, ScreenCanvas, Z_LAYER, space, useThemeColors } from '@/ui';
 import {
   MapAttribution,
   MapScreen,
@@ -94,6 +94,7 @@ export function ExploreView({
   const osReduceMotion = useReduceMotion();
   const reduceMotion = reduceMotionProp ?? osReduceMotion;
   const tabBarHeight = useEditionTabBarInset();
+  const theme = useThemeColors();
   const [mapAreaHeight, setMapAreaHeight] = useState(0);
 
   const allFeatures = useMemo(() => toExploreFeatures(source), [source]);
@@ -362,6 +363,16 @@ export function ExploreView({
             />
           )}
         </ExploreBottomSheet>
+
+        {/* Floor: prevents dark map tiles from bleeding into the tab-bar gap
+            left by gorhom's bottomInset. Sits below the sheet, above the map. */}
+        <View
+          style={[
+            styles.tabBarFloor,
+            { height: tabBarHeight, backgroundColor: theme.surface },
+          ]}
+          pointerEvents="none"
+        />
       </View>
     </ScreenCanvas>
   );
@@ -369,6 +380,13 @@ export function ExploreView({
 
 const styles = StyleSheet.create({
   mapArea: { flex: 1, position: 'relative' },
+  tabBarFloor: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    // backgroundColor + height are set inline from theme + tabBarHeight
+  },
   instrumentsOverlay: {
     position: 'absolute',
     left: 0,

@@ -1,0 +1,593 @@
+[
+  {
+    "id": "gap_miner_teachers_college",
+    "kind": "institution",
+    "displayName": "Miner Teachers College",
+    "summary": "Miner Teachers College, established in 1851 as the Normal School for Colored Girls, was the first normal school in Washington, D.C., and the fourth in the U.S. It trained African-American women as teachers during the Jim Crow era and was later merged into the [[gap_university_of_the_district_of_columbia|University of the District of Columbia]].",
+    "eraBuckets": [
+      "1910s",
+      "1920s",
+      "1930s",
+      "1950s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "education",
+      "segregation",
+      "jim-crow",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "education",
+      "segregation",
+      "jim-crow",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Miner Teachers College",
+      "Normal School for Colored Girls",
+      "teacher training",
+      "education",
+      "segregation"
+    ],
+    "jurisdictionLabel": "Washington, D.C.",
+    "locationPrecision": "address",
+    "locationLabel": "2565 Georgia Ave., NW",
+    "lat": 38.92333333,
+    "lng": -77.0225,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "Normal School for Colored Girls",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Normal_School_for_Colored_Girls",
+        "citationLabel": "Normal School for Colored Girls"
+      },
+      {
+        "predicate": "location",
+        "object": "2565 Georgia Ave., NW, Washington, D.C.",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/91001490",
+        "citationLabel": "National Register of Historic Places"
+      },
+      {
+        "predicate": "accredited",
+        "object": "Miner Teachers College",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Normal_School_for_Colored_Girls",
+        "citationLabel": "Normal School for Colored Girls"
+      },
+      {
+        "predicate": "merged",
+        "object": "Wilson Teachers College",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Normal_School_for_Colored_Girls",
+        "citationLabel": "Normal School for Colored Girls"
+      },
+      {
+        "predicate": "merged_into",
+        "object": "University of the District of Columbia",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Normal_School_for_Colored_Girls",
+        "citationLabel": "Normal School for Colored Girls"
+      }
+    ],
+    "historicalContext": "Miner Teachers College was founded in 1851 as a response to systemic racial barriers in education. It was a pioneering institution for African-American women, providing teacher training during a time of segregation and racial exclusion. The college's accreditation in 1929 and its eventual merger with white institutions in 1955 reflect the broader struggles for educational equity in the U.S."
+  },
+  {
+    "id": "gap_university_of_the_district_of_columbia",
+    "kind": "institution",
+    "displayName": "University of the District of Columbia",
+    "summary": "The University of the District of Columbia (UDC) is a historically Black land-grant institution established in 1851 as the Normal School for Colored Girls, founded by Myrtilla Miner. It has since evolved into a public university offering degrees and programs in various fields.",
+    "eraBuckets": [
+      "1850s",
+      "1950s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "education",
+      "history",
+      "hbcu",
+      "segregation"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "education",
+      "history",
+      "hbcu",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "University of the District of Columbia",
+      "Myrtilla Miner",
+      "Normal School for Colored Girls",
+      "Black education",
+      "land-grant university"
+    ],
+    "jurisdictionLabel": "Washington, D.C., United States",
+    "locationPrecision": "neighborhood",
+    "locationLabel": "Van Ness, North Cleveland Park neighborhood",
+    "lat": 38.94394444,
+    "lng": -77.06533333,
+    "claims": [
+      {
+        "predicate": "founded_by",
+        "object": "Myrtilla Miner",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/University_of_the_District_of_Columbia",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "established_in",
+        "object": "1851",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/University_of_the_District_of_Columbia",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "type",
+        "object": "historically black land-grant university",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/University_of_the_District_of_Columbia",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "originally_named",
+        "object": "Normal School for Colored Girls",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/University_of_the_District_of_Columbia",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "merged_into",
+        "object": "District of Columbia Teachers College",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/University_of_the_District_of_Columbia",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The University of the District of Columbia traces its origins to the Normal School for Colored Girls, the first normal school for African American women in the United States. This institution was part of the broader movement to provide educational opportunities for Black Americans during the 19th century, despite significant racial opposition. UDC's history is intertwined with the development of Black education and civil rights in the United States."
+  },
+  {
+    "id": "gap_north_carolina_central_university",
+    "kind": "institution",
+    "displayName": "North Carolina Central University",
+    "summary": "North Carolina Central University, founded in 1910 as the National Religious Training School and Chautauqua for the Colored Race, is a historically Black university that played a key role in Black teacher development during the Jim Crow era.",
+    "eraBuckets": [
+      "1910s",
+      "1920s",
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "education",
+      "history",
+      "jim-crow",
+      "hbcu"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "education",
+      "history",
+      "jim-crow",
+      "hbcu"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "North Carolina Central University",
+      "historically Black university",
+      "teacher development",
+      "Jim Crow",
+      "Chautauqua"
+    ],
+    "jurisdictionLabel": "Durham, North Carolina",
+    "locationPrecision": "city",
+    "locationLabel": "Durham, North Carolina",
+    "lat": 35.97416667,
+    "lng": -78.89861111,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "National Religious Training School and Chautauqua for the Colored Race",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/North_Carolina_Central_University",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "renamed",
+        "object": "North Carolina Central University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/North_Carolina_Central_University",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "supported",
+        "object": "Black teacher development",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/North_Carolina_Central_University",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "chartered",
+        "object": "private institution",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/North_Carolina_Central_University",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "state-funded",
+        "object": "Durham State Normal School",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/North_Carolina_Central_University",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "North Carolina Central University was established in 1910 as part of the Chautauqua movement, which aimed to provide educational opportunities to marginalized communities. It was later renamed and became a state-funded institution in 1923, reflecting broader efforts to support Black education during the Jim Crow era."
+  },
+  {
+    "id": "gap_boston_university_school_of_medicine",
+    "kind": "school",
+    "displayName": "Boston University School of Medicine",
+    "summary": "In 1864, the New England Female Medical College, predecessor to Boston University School of Medicine, awarded the first MD to an African American woman, Dr. Rebecca Lee Crumpler. The institution merged with Boston University in 1873, continuing its legacy in medical education.",
+    "eraBuckets": [
+      "1860s",
+      "1870s"
+    ],
+    "topicTags": [
+      "firsts",
+      "education",
+      "women",
+      "women-leaders",
+      "hbcu"
+    ],
+    "topicIds": [
+      "firsts",
+      "education",
+      "women",
+      "women-leaders",
+      "hbcu"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "first African American woman MD",
+      "Rebecca Lee Crumpler",
+      "New England Female Medical College"
+    ],
+    "jurisdictionLabel": "Boston, Massachusetts",
+    "locationPrecision": "neighborhood",
+    "locationLabel": "South End neighborhood",
+    "lat": 42.3356,
+    "lng": -71.0716,
+    "claims": [
+      {
+        "predicate": "awarded MD degree to first African American woman",
+        "object": "Rebecca Lee Crumpler",
+        "confidenceLevel": "high",
+        "citationSource": "cfmedicine.nlm.nih.gov",
+        "citationHref": "https://cfmedicine.nlm.nih.gov/physicians/biography_73.html",
+        "citationLabel": "NLM Biography of Dr. Rebecca Lee Crumpler"
+      },
+      {
+        "predicate": "was predecessor institution to",
+        "object": "Boston University School of Medicine",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Boston_University_School_of_Medicine",
+        "citationLabel": "Wikipedia: Boston University School of Medicine"
+      },
+      {
+        "predicate": "merged with",
+        "object": "Boston University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Boston_University_School_of_Medicine",
+        "citationLabel": "Wikipedia: Boston University School of Medicine"
+      }
+    ],
+    "historicalContext": "The awarding of an MD to Dr. Rebecca Lee Crumpler in 1864 occurred during Reconstruction, a period when access to professional education for African Americans\u2014especially Black women\u2014was severely restricted. Her achievement challenged racial and gender barriers in medicine, occurring decades before widespread desegregation of medical schools."
+  },
+  {
+    "id": "gap_harvard_medical_school",
+    "kind": "school",
+    "displayName": "Harvard Medical School",
+    "summary": "Harvard Medical School, founded in 1782, is the third-oldest medical school in the U.S. and has a documented history of Black representation, including its first Black tenured professor.",
+    "eraBuckets": [
+      "1780s",
+      "1900s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "higher-education",
+      "history",
+      "segregation"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "higher-education",
+      "history",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Harvard Medical School",
+      "Black history",
+      "medical education",
+      "first Black professor"
+    ],
+    "jurisdictionLabel": "Boston, Massachusetts",
+    "locationPrecision": "campus",
+    "locationLabel": "Longwood Medical Area",
+    "lat": 42.33694444,
+    "lng": -71.10388889,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "Harvard Medical School",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Harvard_Medical_School",
+        "citationLabel": "Harvard Medical School Wikipedia"
+      },
+      {
+        "predicate": "location",
+        "object": "Boston, Massachusetts",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Harvard_Medical_School",
+        "citationLabel": "Harvard Medical School Wikipedia"
+      },
+      {
+        "predicate": "has_first_black_tenured_professor",
+        "object": "Harvard Medical School",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Harvard_Medical_School",
+        "citationLabel": "Harvard Medical School Wikipedia"
+      }
+    ],
+    "historicalContext": "Harvard Medical School's role in medical education and research has been shaped by broader historical forces, including the development of medical institutions in the U.S. and the gradual inclusion of Black professionals in academic and clinical settings."
+  },
+  {
+    "id": "gap_sharp_street_memorial_united_methodist_church",
+    "kind": "organization",
+    "displayName": "Sharp Street Memorial United Methodist Church",
+    "summary": "Sharp Street Memorial United Methodist Church, established in 1787, was a pivotal institution in Black Methodism in Maryland, playing a key role in the antebellum freedom movement and the founding of the first Black school in Baltimore after slavery's abolition.",
+    "eraBuckets": [
+      "1800s",
+      "1900s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "education",
+      "church",
+      "history",
+      "segregation"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "education",
+      "church",
+      "history",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Sharp Street Church",
+      "Black Methodist",
+      "NAACP",
+      "Baltimore",
+      "education"
+    ],
+    "jurisdictionLabel": "Baltimore, Maryland",
+    "locationPrecision": "address",
+    "locationLabel": "508--516 Dolphin St. & 1206--1210 Etting St.",
+    "lat": 39.30083333,
+    "lng": -76.62888889,
+    "claims": [
+      {
+        "predicate": "established",
+        "object": "1787",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Sharp_Street_Memorial_United_Methodist_Church_and_Community_House",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "influential_in",
+        "object": "antebellum_freedom_movement",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Sharp_Street_Memorial_United_Methodist_Church_and_Community_House",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "founded_first_black_school_in",
+        "object": "Baltimore",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Sharp_Street_Memorial_United_Methodist_Church_and_Community_House",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served_as_meeting_place_for",
+        "object": "NAACP",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Sharp_Street_Memorial_United_Methodist_Church_and_Community_House",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "known_as",
+        "object": "Mother_Church_of_Black_Methodism_in_Maryland",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Sharp_Street_Memorial_United_Methodist_Church_and_Community_House",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "This church was central to the development of Black Methodist institutions in Maryland and was a meeting place for the NAACP during its formative years. It reflects the broader struggles and achievements of African American communities in the 19th century, including education and civil rights activism."
+  },
+  {
+    "id": "gap_gospel_pilgrim_society",
+    "kind": "organization",
+    "displayName": "Gospel Pilgrim Society",
+    "summary": "The Gospel Pilgrim Society, founded in 1882, established the Gospel Pilgrim Cemetery as a burial ground for African Americans in Athens, Georgia. The cemetery, listed on the National Register of Historic Places, represents a significant example of Black-controlled land and burial practices during the Jim Crow era.",
+    "eraBuckets": [
+      "1880s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "land-ownership",
+      "burial-ground",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "land-ownership",
+      "burial-ground",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Gospel Pilgrim Society",
+      "Gospel Pilgrim Cemetery",
+      "African American",
+      "burial ground",
+      "National Register"
+    ],
+    "jurisdictionLabel": "Athens, Georgia",
+    "locationPrecision": "site",
+    "locationLabel": "Gospel Pilgrim Cemetery",
+    "lat": 33.96972222,
+    "lng": -83.36166667,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "Gospel Pilgrim Cemetery",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Gospel_Pilgrim_Cemetery",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "controlled_by",
+        "object": "African Americans",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Gospel_Pilgrim_Cemetery",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "listed_on",
+        "object": "National Register of Historic Places",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Gospel_Pilgrim_Cemetery",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "established",
+        "object": "burial ground",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Gospel_Pilgrim_Cemetery",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "part_of",
+        "object": "Jim Crow era",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Gospel_Pilgrim_Cemetery",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The Gospel Pilgrim Society was a Black fraternal burial-insurance organization that played a key role in establishing the Gospel Pilgrim Cemetery in Athens, Georgia. The cemetery, founded in 1882, was one of the first major burial sites controlled by African Americans in the region, reflecting the broader historical context of segregation, land ownership, and the need for Black-controlled spaces during the Jim Crow era."
+  },
+  {
+    "id": "gap_dexter_avenue_baptist_church",
+    "kind": "institution",
+    "displayName": "Dexter Avenue Baptist Church",
+    "summary": "Dexter Avenue Baptist Church in Montgomery, Alabama, is a National Historic Landmark and a key site in the civil rights movement, where Dr. Martin Luther King Jr. organized the 1955 Montgomery bus boycott.",
+    "eraBuckets": [
+      "1950s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "history",
+      "segregation"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "history",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "civil rights",
+      "Montgomery bus boycott",
+      "Martin Luther King Jr.",
+      "National Historic Landmark"
+    ],
+    "jurisdictionLabel": "Montgomery, Alabama",
+    "locationPrecision": "institution",
+    "locationLabel": "Dexter Avenue Baptist Church",
+    "lat": 32.37729444,
+    "lng": -86.30277778,
+    "claims": [
+      {
+        "predicate": "was_pastored_by",
+        "object": "Dr. Martin Luther King Jr.",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Dexter_Avenue_Baptist_Church",
+        "citationLabel": "Dexter Avenue Baptist Church Wikipedia"
+      },
+      {
+        "predicate": "organized",
+        "object": "Montgomery bus boycott",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Dexter_Avenue_Baptist_Church",
+        "citationLabel": "Dexter Avenue Baptist Church Wikipedia"
+      },
+      {
+        "predicate": "designated_as",
+        "object": "National Historic Landmark",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Dexter_Avenue_Baptist_Church",
+        "citationLabel": "Dexter Avenue Baptist Church Wikipedia"
+      },
+      {
+        "predicate": "located_at",
+        "object": "Montgomery, Alabama",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Dexter_Avenue_Baptist_Church",
+        "citationLabel": "Dexter Avenue Baptist Church Wikipedia"
+      }
+    ],
+    "historicalContext": "Dexter Avenue Baptist Church played a pivotal role in the civil rights movement, particularly as the base for Dr. Martin Luther King Jr.'s efforts during the Montgomery bus boycott. Its designation as a National Historic Landmark underscores its significance in American history."
+  }
+]

@@ -55,6 +55,32 @@ test('linkifyProseAgainstCatalog prefers longest names and skips protected marku
   assert.equal(result.links.length, 2);
 });
 
+// Reproduces a live incident: "John" (a lynching victim recorded under only a
+// first name in the historical source, id lynching_john_marshall_missouri)
+// was wrongly auto-linked from inside OTHER, unrelated victims' summaries —
+// "John Tucker", "John Taylor" — just because their names also start with
+// "John", and separately "Jim Crow" was auto-linked to a same-named "Jim".
+test('linkifyProseAgainstCatalog does not absorb a short name into someone else\'s longer name', () => {
+  const catalog = [{ id: 'lynching_john_marshall_missouri', displayName: 'John' }];
+  const result = linkifyProseAgainstCatalog('John Tucker was lynched in Indianapolis.', catalog);
+  assert.equal(result.text, 'John Tucker was lynched in Indianapolis.');
+  assert.equal(result.links.length, 0);
+});
+
+test('linkifyProseAgainstCatalog does not link a short name into an unrelated capitalized phrase', () => {
+  const catalog = [{ id: 'lynching_jim_marshall_missouri', displayName: 'Jim' }];
+  const result = linkifyProseAgainstCatalog('Segregation continued into the Jim Crow era.', catalog);
+  assert.equal(result.text, 'Segregation continued into the Jim Crow era.');
+  assert.equal(result.links.length, 0);
+});
+
+test('linkifyProseAgainstCatalog still links a short name when not followed by a capitalized word', () => {
+  const catalog = [{ id: 'lynching_john_marshall_missouri', displayName: 'John' }];
+  const result = linkifyProseAgainstCatalog('John was tied to a stake by the mob.', catalog);
+  assert.equal(result.text, '[[lynching_john_marshall_missouri|John]] was tied to a stake by the mob.');
+  assert.equal(result.links.length, 1);
+});
+
 test('linkifyProseAgainstCatalog skips subject ids and uses case-sensitive boundaries', () => {
   const catalog = [{ id: 'entity-a', displayName: 'Alpha' }];
   const skipped = linkifyProseAgainstCatalog('Alpha alpha', catalog, {

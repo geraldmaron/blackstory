@@ -1,0 +1,82 @@
+[
+  {
+    "id": "gap_harlem_ymca",
+    "kind": "institution",
+    "displayName": "Harlem YMCA",
+    "summary": "The Harlem YMCA, located at 180 West 135th Street, was a key institution during the Harlem Renaissance, housing notable figures like Claude McKay and serving as a hub for African-American cultural and social life.",
+    "eraBuckets": [
+      "1930s",
+      "1940s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "harlem-renaissance",
+      "history",
+      "architecture",
+      "culture"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "harlem-renaissance",
+      "history",
+      "architecture",
+      "culture"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Harlem YMCA",
+      "Harlem Renaissance",
+      "Claude McKay",
+      "National Historic Landmark",
+      "African-American culture"
+    ],
+    "jurisdictionLabel": "New York City, New York",
+    "locationPrecision": "address",
+    "locationLabel": "180 West 135th Street",
+    "lat": 40.81416667,
+    "lng": -73.94166667,
+    "claims": [
+      {
+        "predicate": "located_at",
+        "object": "180 West 135th Street, New York City",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Harlem_YMCA",
+        "citationLabel": "Harlem YMCA Wikipedia"
+      },
+      {
+        "predicate": "designated_as",
+        "object": "National Historic Landmark",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Harlem_YMCA",
+        "citationLabel": "Harlem YMCA Wikipedia"
+      },
+      {
+        "predicate": "associated_with",
+        "object": "Claude McKay",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Harlem_YMCA",
+        "citationLabel": "Harlem YMCA Wikipedia"
+      },
+      {
+        "predicate": "served_as",
+        "object": "center for the Harlem Renaissance",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Harlem_YMCA",
+        "citationLabel": "Harlem YMCA Wikipedia"
+      },
+      {
+        "predicate": "hosted",
+        "object": "notable African-American writers and artists",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Harlem_YMCA",
+        "citationLabel": "Harlem YMCA Wikipedia"
+      }
+    ],
+    "historicalContext": "The Harlem YMCA was established in 1931-32 and was one of the few YMCAs open to African-American men at a time when most were segregated. It played a central role in the Harlem Renaissance, providing space for writers, artists, and activists, and was designated a National Historic Landmark in 1976."
+  }
+]

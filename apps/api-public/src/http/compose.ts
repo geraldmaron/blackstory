@@ -4,7 +4,7 @@
  * replace Firebase App Check after ADR-020 cutover.
  */
 import { createPublicApiClientAttestationGuard } from '../client-attestation.js';
-import { createPublicRateLimitGuard } from '../rate-limits.js';
+import { createPublicRateLimitGuard, createNoopRateLimitGuard } from '../rate-limits.js';
 import { createPublicSearchGuard } from '../search-guardrails.js';
 import {
   createFirestorePublicDataAccess,
@@ -34,7 +34,10 @@ export function createProductionHandlerDeps(options: ComposeHandlerDepsOptions =
   return {
     dataAccess,
     clientAttestationGuard: createPublicApiClientAttestationGuard({ environment }),
-    rateLimitGuard: createPublicRateLimitGuard(),
+    rateLimitGuard:
+      environment['RATE_LIMIT_DISABLED'] === '1'
+        ? createNoopRateLimitGuard()
+        : createPublicRateLimitGuard(),
     searchGuard: createPublicSearchGuard(),
   };
 }

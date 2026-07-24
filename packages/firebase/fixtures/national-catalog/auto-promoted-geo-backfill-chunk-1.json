@@ -1,0 +1,292 @@
+[
+  {
+    "id": "gap_u_s_electric_lighting_company",
+    "kind": "institution",
+    "displayName": "U.S. Electric Lighting Company",
+    "summary": "The U.S. Electric Lighting Company, founded in 1878, played a pivotal role in the development of electric lighting technology. It was associated with key inventors like Lewis Latimer, a Black inventor who contributed significantly to the field of incandescent lighting.",
+    "eraBuckets": [
+      "1870s",
+      "1880s",
+      "1890s"
+    ],
+    "topicTags": [
+      "technology",
+      "invention",
+      "civil-rights",
+      "history",
+      "engineering"
+    ],
+    "topicIds": [
+      "technology",
+      "invention",
+      "civil-rights",
+      "history",
+      "engineering"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "electric lighting",
+      "invention",
+      "Lewis Latimer",
+      "patent disputes",
+      "technology"
+    ],
+    "jurisdictionLabel": "Newark, New Jersey",
+    "locationPrecision": "city",
+    "locationLabel": "Headquarters of the U.S. Electric Lighting Company",
+    "lat": 40,
+    "lng": -74.5,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "1878",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/United_States_Electric_Lighting_Company",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "associated_with",
+        "object": "Lewis Latimer",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.uspto.gov/learning-and-resources/journeys-innovation/historical-stories/bringing-light-all",
+        "citationLabel": "USPTO"
+      },
+      {
+        "predicate": "involved_in",
+        "object": "patent_disputes",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/United_States_Electric_Lighting_Company",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "contributed_to",
+        "object": "electric_lighting_technology",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.uspto.gov/learning-and-resources/journeys-innovation/historical-stories/bringing-light-all",
+        "citationLabel": "USPTO"
+      }
+    ],
+    "historicalContext": "The U.S. Electric Lighting Company was a major player in the electric lighting industry during the late 19th century. Its involvement in patent disputes and its connection to the broader context of technological innovation and racial dynamics in the 19th century highlight its significance in the history of American industry and technology."
+  },
+  {
+    "id": "gap_african_methodist_episcopal_denomination",
+    "kind": "organization",
+    "displayName": "African Methodist Episcopal denomination",
+    "summary": "The African Methodist Episcopal denomination, founded in 1787 by Richard Allen, was the first independent Protestant denomination established by Black people in response to racial discrimination. It played a significant role in the abolitionist movement and supported civil rights efforts.",
+    "eraBuckets": [
+      "1780s",
+      "1800s",
+      "1900s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "abolition",
+      "jim-crow",
+      "religion",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "abolition",
+      "jim-crow",
+      "religion",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "African Methodist Episcopal",
+      "Richard Allen",
+      "abolitionist movement",
+      "Underground Railroad",
+      "civil rights"
+    ],
+    "jurisdictionLabel": "Nashville, Tennessee",
+    "locationPrecision": "city",
+    "locationLabel": "Headquarters",
+    "lat": 36.16222222,
+    "lng": -86.77444444,
+    "claims": [
+      {
+        "predicate": "founded_by",
+        "object": "Richard Allen",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/African_Methodist_Episcopal_Church",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "founded_in",
+        "object": "1787",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/African_Methodist_Episcopal_Church",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "response_to",
+        "object": "racial discrimination",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/African_Methodist_Episcopal_Church",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "role_in",
+        "object": "abolitionist movement",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://obamawhitehouse.archives.gov/blog/2012/06/30/first-lady-michelle-obama-african-methodist-episcopal-churchs-general-conference",
+        "citationLabel": "Obama White House Blog"
+      },
+      {
+        "predicate": "part_of",
+        "object": "Underground Railroad",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://obamawhitehouse.archives.gov/blog/2012/06/30/first-lady-michelle-obama-african-methodist-episcopal-churchs-general-conference",
+        "citationLabel": "Obama White House Blog"
+      }
+    ],
+    "historicalContext": "The African Methodist Episcopal denomination emerged in the late 18th century as a response to systemic racial discrimination within existing Protestant churches. It became a key player in the abolitionist movement and later supported civil rights efforts, including being a part of the Underground Railroad."
+  },
+  {
+    "id": "gap_african_methodist_episcopal_congregation",
+    "kind": "organization",
+    "displayName": "African Methodist Episcopal congregation",
+    "summary": "The African Methodist Episcopal Church (AME) was founded in 1787 by Black people in response to racial discrimination in the Methodist Episcopal Church. It became a central institution in Black history, playing a key role in the Underground Railroad, civil rights movements, and the founding of universities.",
+    "eraBuckets": [
+      "1700s",
+      "1800s",
+      "1900s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "history",
+      "education",
+      "religion",
+      "underground-railroad"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "history",
+      "education",
+      "religion",
+      "underground-railroad"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "AME Church",
+      "Black history",
+      "Underground Railroad",
+      "civil rights",
+      "education"
+    ],
+    "jurisdictionLabel": "Nashville, Tennessee",
+    "locationPrecision": "city",
+    "locationLabel": "Headquarters",
+    "lat": 36.16222222,
+    "lng": -86.77444444,
+    "claims": [
+      {
+        "predicate": "founded_by",
+        "object": "Black people",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/African_Methodist_Episcopal_Church",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "role_in",
+        "object": "Underground Railroad",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://obamawhitehouse.archives.gov/blog/2012/06/30/first-lady-michelle-obama-african-methodist-episcopal-churchs-general-conference",
+        "citationLabel": "Obama White House Blog"
+      },
+      {
+        "predicate": "role_in",
+        "object": "civil rights movements",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://obamawhitehouse.archives.gov/blog/2012/06/30/first-lady-michelle-obama-african-methodist-episcopal-churchs-general-conference",
+        "citationLabel": "Obama White House Blog"
+      },
+      {
+        "predicate": "founded",
+        "object": "universities",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://obamawhitehouse.archives.gov/blog/2012/06/30/first-lady-michelle-obama-african-methodist-episcopal-churchs-general-conference",
+        "citationLabel": "Obama White House Blog"
+      }
+    ],
+    "historicalContext": "The AME Church was established as a response to systemic racial discrimination within the Methodist Episcopal Church, which segregated Black congregations. It became a vital part of the Black community, supporting civil rights activism, the Underground Railroad, and the establishment of educational institutions."
+  },
+  {
+    "id": "gap_east_end_memorial_burial_association",
+    "kind": "organization",
+    "displayName": "East End Memorial Burial Association",
+    "summary": "The East End Memorial Burial Association, organized in 1897, was a key entity in the burial practices of African Americans in Richmond, Virginia, reflecting the broader historical context of segregation and land ownership in the region.",
+    "eraBuckets": [
+      "1890s"
+    ],
+    "topicTags": [
+      "burial-ground",
+      "segregation",
+      "land-ownership",
+      "civil-rights",
+      "history"
+    ],
+    "topicIds": [
+      "burial-ground",
+      "segregation",
+      "land-ownership",
+      "civil-rights",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "burial association",
+      "Richmond",
+      "African American cemeteries",
+      "segregation",
+      "land ownership"
+    ],
+    "jurisdictionLabel": "Richmond, Virginia",
+    "locationPrecision": "site",
+    "locationLabel": "East End Cemetery",
+    "lat": 37.53666667,
+    "lng": -77.38611111,
+    "claims": [
+      {
+        "predicate": "organized",
+        "object": "Richmond's East End Memorial Burial Association",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/African_burial_grounds_and_historic_African_American_cemeteries_of_Richmond%2C_Virginia",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "established",
+        "object": "East End Cemetery",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.dhr.virginia.gov/historic-registers/127-7231/",
+        "citationLabel": "Virginia Historic Registers"
+      },
+      {
+        "predicate": "located",
+        "object": "partially in the city of Richmond and partially in Henrico County",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.dhr.virginia.gov/historic-registers/127-7231/",
+        "citationLabel": "Virginia Historic Registers"
+      }
+    ],
+    "historicalContext": "The East End Memorial Burial Association was part of a larger network of African American cemeteries in Richmond, which were often established in response to discriminatory practices and the need for dignified burial spaces. These cemeteries are significant for understanding the history of segregation, land ownership, and the treatment of Black communities in the United States."
+  }
+]

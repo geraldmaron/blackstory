@@ -1,0 +1,161 @@
+[
+  {
+    "id": "gap_18th_and_vine_jazz_district",
+    "kind": "place",
+    "displayName": "18th and Vine Jazz District",
+    "summary": "The 18th and Vine Jazz District in Kansas City, Missouri, is internationally recognized as a historical origin of jazz and a hub of African-American culture and business, with a legacy of Black musicians and institutions.",
+    "eraBuckets": [
+      "1930s",
+      "1940s",
+      "1990s"
+    ],
+    "topicTags": [
+      "jazz",
+      "civil-rights",
+      "history",
+      "music"
+    ],
+    "topicIds": [
+      "jazz",
+      "civil-rights",
+      "history",
+      "music"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "jazz",
+      "African-American culture",
+      "Kansas City",
+      "historic district",
+      "National Register"
+    ],
+    "jurisdictionLabel": "Kansas City, Missouri",
+    "locationPrecision": "district",
+    "locationLabel": "18th and Vine Historic District",
+    "lat": 39.08888889,
+    "lng": -94.56111111,
+    "claims": [
+      {
+        "predicate": "isRecognizedAs",
+        "object": "origin of jazz music",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/18th_and_Vine",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "isPartOf",
+        "object": "African-American culture",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/18th_and_Vine",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "isHomeTo",
+        "object": "African-American businesses",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/18th_and_Vine",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "isHomeTo",
+        "object": "jazz musicians",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/18th_and_Vine",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "isPartOf",
+        "object": "National Register of Historic Places",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/18th_and_Vine",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The 18th and Vine Jazz District is a historically significant neighborhood in Kansas City, Missouri, known for its role in the development of jazz music and as a center of African-American culture and business. It is part of the broader context of Black history in the United States, particularly in the evolution of jazz and the contributions of Black musicians and institutions."
+  },
+  {
+    "id": "gap_alcorn_university",
+    "kind": "school",
+    "displayName": "Alcorn University",
+    "summary": "Alcorn University, now known as Alcorn State University, was the first state-supported land-grant college for Black Americans, established in 1871 during the Reconstruction era. It played a pivotal role in the development of Black higher education in the United States.",
+    "eraBuckets": [
+      "1870s",
+      "1970s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "land-grant",
+      "segregation",
+      "education",
+      "reconstruction"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "land-grant",
+      "segregation",
+      "education",
+      "reconstruction"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Alcorn University",
+      "land-grant college",
+      "Black education",
+      "Reconstruction",
+      "Mississippi"
+    ],
+    "jurisdictionLabel": "Lorman, Mississippi",
+    "locationPrecision": "campus",
+    "locationLabel": "Alcorn State University campus",
+    "lat": 31.8769,
+    "lng": -91.1411,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "Alcorn University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Alcorn_State_University",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "first_black_land_grant_college",
+        "object": "Alcorn University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Alcorn_State_University",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "established_during_reconstruction",
+        "object": "Alcorn University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Alcorn_State_University",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "received_state_funding",
+        "object": "Alcorn University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Alcorn_State_University",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "faced_funding_reduction_after_redeemers",
+        "object": "Alcorn University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Alcorn_State_University",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Alcorn University was founded in 1871 as part of Mississippi's Reconstructionist legislature's efforts to educate formerly enslaved people. It was the first Black land-grant college in the U.S., receiving state funding and land scrip to support its agricultural and mechanical programs. The university faced significant challenges after the Redeemers took over the legislature, including a drastic reduction in funding and the appointment of an all-white board of trustees."
+  }
+]

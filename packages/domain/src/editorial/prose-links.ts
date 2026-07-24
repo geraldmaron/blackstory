@@ -137,6 +137,14 @@ function buildNameCandidates(
   return candidates.sort((left, right) => right.name.length - left.name.length);
 }
 
+
+// Reject catalog-name matches that are only a prefix of a longer proper-noun
+// phrase (e.g. victim first name "John" matching inside "John Tucker"). Live
+// incident on lynching-victim summaries.
+function isFollowedByCapitalizedWord(text: string, end: number): boolean {
+  return /^ [A-Z]/.test(text.slice(end, end + 2));
+}
+
 function findSpanMatches(
   plain: string,
   candidates: readonly NameCandidate[],
@@ -153,6 +161,7 @@ function findSpanMatches(
       const start = match.index ?? 0;
       const end = start + candidate.name.length;
       if (occupied.slice(start, end).some(Boolean)) continue;
+      if (isFollowedByCapitalizedWord(plain, end)) continue;
       for (let index = start; index < end; index += 1) {
         occupied[index] = true;
       }

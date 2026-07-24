@@ -1,0 +1,652 @@
+[
+  {
+    "id": "recon_alonzo_j_ransier",
+    "kind": "person",
+    "displayName": "Alonzo J. Ransier",
+    "summary": "Alonzo J. Ransier was a Reconstruction-era Black politician in South Carolina, serving as the first Black lieutenant governor and a U.S. Congressman. He was a key advocate for civil rights and the Civil Rights Act of 1875.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "reconstruction",
+      "black-codes",
+      "segregation",
+      "firsts"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "reconstruction",
+      "black-codes",
+      "segregation",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "civil rights",
+      "Black politics",
+      "South Carolina",
+      "Congressman"
+    ],
+    "jurisdictionLabel": "Charleston, South Carolina",
+    "locationPrecision": "city",
+    "locationLabel": "Charleston, South Carolina",
+    "lat": 32.81388889,
+    "lng": -79.93194444,
+    "claims": [
+      {
+        "predicate": "served_as",
+        "object": "U.S. House of Representatives from South Carolina's 2nd district",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Alonzo_J._Ransier",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served_as",
+        "object": "54th Lieutenant Governor of South Carolina",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Alonzo_J._Ransier",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "advocated_for",
+        "object": "Civil Rights Act of 1875",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Alonzo_J._Ransier",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "first Black lieutenant governor of South Carolina",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Alonzo_J._Ransier",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "Reconstruction-era Black officeholder",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Alonzo_J._Ransier",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Alonzo J. Ransier's political career during Reconstruction was pivotal in advancing civil rights for Black Americans in South Carolina. His work as a U.S. Congressman and lieutenant governor highlights the role of Black leaders in shaping post-Civil War political and social reforms."
+  },
+  {
+    "id": "recon_james_k_greene",
+    "kind": "person",
+    "displayName": "James K. Greene",
+    "summary": "James K. Greene was a Black Republican who served in the Alabama Senate and House during the Reconstruction era, representing Hale County. His political involvement highlights the role of Black legislators in shaping post-Civil War Alabama.",
+    "eraBuckets": [
+      "1860s",
+      "1870s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "segregation"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Alabama",
+      "Black legislators",
+      "Hale County",
+      "state legislature"
+    ],
+    "jurisdictionLabel": "Hale County, Alabama",
+    "locationPrecision": "county",
+    "locationLabel": "Hale County, Alabama",
+    "lat": 32.76083333,
+    "lng": -87.62972222,
+    "claims": [
+      {
+        "predicate": "served_in",
+        "object": "Alabama Senate",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/James_K._Greene",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served_in",
+        "object": "Alabama House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/James_K._Greene",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "participated_in",
+        "object": "1867 Alabama Constitutional Convention",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/James_K._Greene",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "represented",
+        "object": "Hale County",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/James_K._Greene",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "listed_on",
+        "object": "historical marker",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/James_K._Greene",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "James K. Greene's service in the Alabama legislature during the Reconstruction era (1867–1876) reflects the broader participation of Black Americans in state governance following the Civil War. His role was part of the larger movement to establish civil rights and political representation for freedmen in the South."
+  },
+  {
+    "id": "recon_benjamin_f_alexander",
+    "kind": "person",
+    "displayName": "Benjamin F. Alexander",
+    "summary": "Benjamin F. Alexander was a Black politician in Alabama during the Reconstruction era, serving in the Alabama House of Representatives and participating in the 1867 Constitutional Convention. His role highlights the political engagement of Black citizens during this transformative period.",
+    "eraBuckets": [
+      "1860s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "segregation",
+      "black-nationalism"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "segregation",
+      "black-nationalism"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Alabama",
+      "Black officeholder",
+      "Constitutional Convention",
+      "political participation"
+    ],
+    "jurisdictionLabel": "Eutaw, Alabama",
+    "locationPrecision": "city",
+    "locationLabel": "Eutaw, Alabama",
+    "lat": 32.84611111,
+    "lng": -87.89722222,
+    "claims": [
+      {
+        "predicate": "held_office",
+        "object": "Alabama House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Benjamin_F._Alexander",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "participated_in",
+        "object": "Alabama's 1867 Constitutional Convention",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Benjamin_F._Alexander",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "lived_in",
+        "object": "Eutaw, Alabama",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Benjamin_F._Alexander",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Benjamin F. Alexander's political career during the Reconstruction era is significant as it reflects the broader context of Black political participation in the post-Civil War South. His involvement in the Alabama Constitutional Convention and state legislature underscores the efforts of Black leaders to shape the political landscape during a time of significant social and political change."
+  },
+  {
+    "id": "recon_george_w_braxdell",
+    "kind": "person",
+    "displayName": "George W. Braxdell",
+    "summary": "George W. Braxdell was a Reconstruction-era Black officeholder in Alabama, serving as a state representative and the first Grand Master of the Grand Lodge of Alabama, Prince Hall. His leadership in Black Freemasonry and political engagement during Reconstruction highlights his role in shaping Black political and institutional life in the post-Civil War South.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Alabama",
+      "Black Freemasonry",
+      "state representative",
+      "Grand Master"
+    ],
+    "jurisdictionLabel": "Talladega, Alabama",
+    "locationPrecision": "site",
+    "locationLabel": "Oak Hill Cemetery",
+    "lat": 33.52555556,
+    "lng": -86.81666667,
+    "claims": [
+      {
+        "predicate": "was",
+        "object": "Alabama State Representative during Reconstruction",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/George_W._Braxdell",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "First Grand Master of the Grand Lodge of Alabama, Prince Hall",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/George_W._Braxdell",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "first African-American law enforcement officer in Alabama",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/George_W._Braxdell",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "buried in Oak Hill Cemetery in Talladega, Alabama",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/George_W._Braxdell",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "George W. Braxdell's political career during Reconstruction reflects the broader context of Black political participation in the South, including the establishment of Black-led institutions like the Prince Hall Freemasons. His role as the first Grand Master of the Grand Lodge of Alabama, Prince Hall, underscores the significance of Black Freemasonry in fostering community and political networks during this period."
+  },
+  {
+    "id": "recon_nathan_a_brewington",
+    "kind": "person",
+    "displayName": "Nathan A. Brewington",
+    "summary": "Nathan A. Brewington was a Black state legislator in Alabama during the Reconstruction era, representing Lowndes County in the Alabama House of Representatives from 1868 to 1870. His role as a Black officeholder during this period is significant in the context of post-Civil War political participation and the broader struggle for civil rights.",
+    "eraBuckets": [
+      "1860s",
+      "1870s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Black legislator",
+      "Reconstruction era",
+      "Alabama",
+      "Lowndes County",
+      "state representative"
+    ],
+    "jurisdictionLabel": "Lowndes County, Alabama",
+    "locationPrecision": "county",
+    "locationLabel": "Lowndes County, Alabama",
+    "lat": 32.15,
+    "lng": -86.65,
+    "claims": [
+      {
+        "predicate": "was",
+        "object": "a Black state legislator in Alabama",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Nathan_Brewington",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "represented",
+        "object": "Lowndes County",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Nathan_Brewington",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served",
+        "object": "in the Alabama House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Nathan_Brewington",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served",
+        "object": "from 1868 to 1870",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Nathan_Brewington",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "a Black officeholder during the Reconstruction era",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://archives.alabama.gov/afro/AfricanAmerican%2520Legislators%2520in%2520Reconstruction%2520Alabama1867.pdf",
+        "citationLabel": "Alabama Archives"
+      }
+    ],
+    "historicalContext": "Nathan A. Brewington's election to the Alabama House of Representatives during the Reconstruction era marks a pivotal moment in the political empowerment of Black Americans following the Civil War. His service reflects the broader context of Black political participation and the challenges faced by African Americans in the South during this period."
+  },
+  {
+    "id": "recon_adam_gachet",
+    "kind": "person",
+    "displayName": "Adam Gachet",
+    "summary": "Adam Gachet, a Baptist minister and state legislator in Alabama, represented Barbour County during the Reconstruction era. He was enslaved until 1865 and is commemorated on a historical marker listing African American state legislators from that period.",
+    "eraBuckets": [
+      "1860s",
+      "1870s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "enslavement",
+      "freedom"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "enslavement",
+      "freedom"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Black legislator",
+      "Alabama",
+      "historical marker",
+      "enslavement"
+    ],
+    "jurisdictionLabel": "Barbour County, Alabama",
+    "locationPrecision": "county",
+    "locationLabel": "Barbour County, Alabama",
+    "lat": 31.86583333,
+    "lng": -85.39611111,
+    "claims": [
+      {
+        "predicate": "was_enslaved_until",
+        "object": "1865",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Adam_Gachet",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served_as",
+        "object": "state_legislator",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Adam_Gachet",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "represented",
+        "object": "Barbour County, Alabama",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Adam_Gachet",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is_commemorated_on",
+        "object": "historical_marker",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Adam_Gachet",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Adam Gachet's role as a Black legislator during Reconstruction highlights the political participation of formerly enslaved individuals in post-Civil War Alabama. His service reflects the broader context of Black leadership and the establishment of civil rights during the Reconstruction era, which was marked by efforts to integrate formerly enslaved people into political life."
+  },
+  {
+    "id": "recon_green_t_johnston",
+    "kind": "person",
+    "displayName": "Green T. Johnston",
+    "summary": "Green T. Johnston was a Black state legislator in Alabama during the Reconstruction era, representing Dallas County in the Alabama House of Representatives in 1876. He sponsored a bill to repeal sunset laws that restricted African American farmers' ability to sell crops after sunset.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "segregation",
+      "black-codes",
+      "jim-crow"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "segregation",
+      "black-codes",
+      "jim-crow"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Alabama",
+      "Black Belt",
+      "sunset laws",
+      "Black legislators"
+    ],
+    "jurisdictionLabel": "Hamburg, Alabama",
+    "locationPrecision": "city",
+    "locationLabel": "Hamburg, Alabama",
+    "lat": 32.52777778,
+    "lng": -87.28638889,
+    "claims": [
+      {
+        "predicate": "was_elected_to",
+        "object": "Alabama House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Green_T._Johnston",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "represented",
+        "object": "Dallas County, Alabama",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Green_T._Johnston",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "sponsored_bill_to",
+        "object": "repeal sunset laws",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Green_T._Johnston",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_a",
+        "object": "farmer",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Green_T._Johnston",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "lived_in",
+        "object": "Hamburg, Alabama",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Green_T._Johnston",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Green T. Johnston's election and legislative work during the Reconstruction era reflect the broader context of Black political participation in Alabama, a state known for its 'Black Belt' counties. His efforts to repeal sunset laws highlight the systemic barriers faced by African American farmers and the role of Black legislators in advocating for their rights during this period."
+  },
+  {
+    "id": "recon_george_w_bell",
+    "kind": "person",
+    "displayName": "George W. Bell",
+    "summary": "George W. Bell was a Reconstruction-era Black officeholder in Arkansas, serving in the Arkansas Senate from 1891 to 1895. He opposed separate coach laws, contributing to the political landscape of the Reconstruction era.",
+    "eraBuckets": [
+      "1890s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "segregation",
+      "civil-rights"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "segregation",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Arkansas Senate",
+      "Reconstruction",
+      "separate coach laws",
+      "Black officeholder",
+      "Lincoln University"
+    ],
+    "jurisdictionLabel": "Arkansas, United States",
+    "locationPrecision": "institution",
+    "locationLabel": "Arkansas Senate",
+    "lat": 34.7467387,
+    "lng": -92.289222,
+    "claims": [
+      {
+        "predicate": "served_in",
+        "object": "Arkansas Senate",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/George_W._Bell",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "opposed",
+        "object": "separate coach laws",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/George_W._Bell",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "educated_at",
+        "object": "Lincoln University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/George_W._Bell",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "graduated_from",
+        "object": "Southland College",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/George_W._Bell",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "represented",
+        "object": "Desha and Chicot counties",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/George_W._Bell",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "George W. Bell's service in the Arkansas Senate during the Reconstruction era highlights the role of Black legislators in shaping state policies. His opposition to separate coach laws reflects the broader struggle against segregation and the push for civil rights during this period."
+  },
+  {
+    "id": "recon_samuel_h_holland",
+    "kind": "person",
+    "displayName": "Samuel H. Holland",
+    "summary": "Samuel H. Holland was a Reconstruction-era Black officeholder in Arkansas, serving in the Arkansas Senate from 1873 to 1874. He represented Ashley, Chicot, Drew, Desha, and Lincoln counties and was involved in education and local governance.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "education",
+      "segregation",
+      "history"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "education",
+      "segregation",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Arkansas Senate",
+      "Reconstruction era",
+      "education",
+      "Black officeholder",
+      "Howard School"
+    ],
+    "jurisdictionLabel": "Arkansas, United States",
+    "locationPrecision": "county",
+    "locationLabel": "Ashley, Chicot, Drew, Desha, and Lincoln counties",
+    "lat": 32.72291,
+    "lng": -92.06402,
+    "claims": [
+      {
+        "predicate": "served_in",
+        "object": "Arkansas Senate",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Samuel_H._Holland",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "represented",
+        "object": "Ashley, Chicot, Drew, Desha, and Lincoln counties",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Samuel_H._Holland",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "involved_in",
+        "object": "establishment_of_millage_fees_to_fund_area_schools",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Samuel_H._Holland",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "taught_at",
+        "object": "Howard School",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Samuel_H._Holland",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Samuel H. Holland's service in the Arkansas Senate during the Reconstruction era highlights the role of African Americans in shaping post-Civil War political structures. His work in education and local governance reflects broader efforts to establish institutions and systems that supported Black communities during this period."
+  }
+]

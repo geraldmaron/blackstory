@@ -15,6 +15,9 @@ retired; `functions/README.md` is its tombstone.
 ## Live SearXNG
 
 ```bash
+# On Corsair, DATABASE_URL is in ~/.config/blackstory/postgres.env (also sourced by
+# the run script and by blackstory-discovery-web-search.service). enrichment.env alone
+# is not enough — that was the 2026-07-21 timer preflight failure.
 SEARXNG_BASE_URL=http://127.0.0.1:8888 \
 DISCOVERY_STORAGE_TERMS_CONFIRMED=true \
 DISCOVERY_KILL_SWITCH=disengaged \
@@ -25,6 +28,14 @@ The script rotates through
 `packages/config/src/scheduled-jobs/data/corsair-web-search-queries.json`. A single query may be
 selected with `DISCOVERY_SEARXNG_QUERY`. Results are leads until their underlying evidence is
 captured and reviewed.
+
+Required env files on Corsair (same layout as overnight enrichment):
+
+| File | Purpose |
+|---|---|
+| `~/.config/blackstory/enrichment.env` | OpenRouter / optional pepper |
+| `~/.config/blackstory/postgres.env` | `DATABASE_URL`, research profile versions |
+| `~/.config/blackstory/discovery.env` | Optional discovery-only overrides |
 
 ## Where committed survivors go
 

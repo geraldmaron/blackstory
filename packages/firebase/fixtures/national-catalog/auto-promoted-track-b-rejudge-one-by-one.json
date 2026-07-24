@@ -1,0 +1,956 @@
+[
+  {
+    "id": "dc-black-history-sites-c24",
+    "kind": "place",
+    "displayName": "Lincoln Memorial Arch",
+    "summary": "Commemorative arch at 601 50th Street NE in Washington, DC (1914), built by the National Training School for Women and Girls to mark the 50th anniversary of Lincoln's death. Now part of the Nannie Helen Burroughs School, a National Historic Landmark.",
+    "eraBuckets": [
+      "1910s"
+    ],
+    "topicTags": [
+      "commemoration",
+      "education",
+      "civil-rights",
+      "history",
+      "national-capital"
+    ],
+    "topicIds": [
+      "commemoration",
+      "education",
+      "civil-rights",
+      "history",
+      "national-capital"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Lincoln Memorial Arch",
+      "Nannie Helen Burroughs School",
+      "National Training School for Women and Girls",
+      "commemorative arch",
+      "National Historic Landmark"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "site",
+    "locationLabel": "601 50th Street NE, Washington, DC",
+    "lat": 38.898223,
+    "lng": -76.929634,
+    "claims": [
+      {
+        "predicate": "constructed_by",
+        "object": "National Training School for Women and Girls",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/419",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "commemorates",
+        "object": "50th anniversary of Abraham Lincoln's death",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/419",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "located_at",
+        "object": "601 50th Street NE, Washington, DC",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/419",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "part_of",
+        "object": "Nannie Helen Burroughs School",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/419",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "designated_as",
+        "object": "National Historic Landmark",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/419",
+        "citationLabel": "DC Historic Preservation Office"
+      }
+    ],
+    "historicalContext": "The Lincoln Memorial Arch is part of the Nannie Helen Burroughs School, founded in 1909 by Nannie Helen Burroughs, a prominent African American educator and civil rights leader. The arch was constructed in 1914 to commemorate the 50th anniversary of Abraham Lincoln's death. The school, which educated Black women and girls, was notable for not relying on white donors and for offering a comprehensive curriculum that included academic, vocational, and religious instruction. The site is a National Historic Landmark and reflects the educational and civil rights efforts of Burroughs, who advocated for the empowerment of Black women and girls."
+  },
+  {
+    "id": "dc-black-history-sites-i101",
+    "kind": "place",
+    "displayName": "Union Station",
+    "summary": "Union Station (1907), located at 50 Massachusetts Avenue NE in Washington, DC, is a monumental railway terminal designed by Daniel H. Burnham. Documented in the DC Historic Preservation Office’s 'Black History Sites: Washington' inventory, it reflects the city’s architectural and urban planning legacy.",
+    "eraBuckets": [
+      "1900s"
+    ],
+    "topicTags": [
+      "architecture",
+      "government",
+      "transportation",
+      "preservation"
+    ],
+    "topicIds": [
+      "architecture",
+      "government",
+      "transportation",
+      "preservation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Union Station Washington DC",
+      "McMillan Commission",
+      "Roman-inspired architecture",
+      "Black History Sites inventory"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "institution",
+    "locationLabel": "50 Massachusetts Avenue NE, Washington, DC",
+    "lat": 38.897619,
+    "lng": -77.006176,
+    "claims": [
+      {
+        "predicate": "located_at",
+        "object": "50 Massachusetts Avenue NE, Washington, DC",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/615",
+        "citationLabel": "DC Historic Preservation Office inventory"
+      },
+      {
+        "predicate": "completed_in",
+        "object": "1907",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/615",
+        "citationLabel": "DC Historic Preservation Office inventory"
+      },
+      {
+        "predicate": "designed_by",
+        "object": "Daniel H. Burnham",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/615",
+        "citationLabel": "DC Historic Preservation Office inventory"
+      },
+      {
+        "predicate": "documented_in",
+        "object": "DC Historic Preservation Office 'Black History Sites: Washington' inventory",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/615",
+        "citationLabel": "DC Historic Preservation Office inventory"
+      }
+    ],
+    "historicalContext": "Union Station was a cornerstone of the McMillan Commission’s efforts to revive Pierre L’Enfant’s original city plan. Its Roman-inspired design and role as a transportation hub highlight its significance in early 20th-century urban development. The site’s inclusion in the Black History Sites inventory underscores its cultural and institutional relevance to Washington’s history."
+  },
+  {
+    "id": "dc-black-history-sites-i105",
+    "kind": "place",
+    "displayName": "Vermont Avenue Baptist Church",
+    "summary": "Vermont Avenue Baptist Church (1866) served as a civil rights hub in Washington, DC, hosting MLK Jr., NAACP meetings, and community organizing from the 1920s through 1968. Documented in DC Historic Preservation Office records.",
+    "eraBuckets": [
+      "1920s",
+      "1930s",
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "church",
+      "community-organizing",
+      "movement"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "church",
+      "community-organizing",
+      "movement"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "civil rights organizing",
+      "NAACP meetings",
+      "Martin Luther King Jr. speeches",
+      "DC Black history sites"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "institution",
+    "locationLabel": "1630 Vermont Avenue NW, Washington, DC",
+    "lat": 38.911835,
+    "lng": -77.028772,
+    "claims": [
+      {
+        "predicate": "hosted_event",
+        "object": "1935 NAACP DC Branch meeting with Nannie Helen Burroughs",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/973",
+        "citationLabel": "DC Historic Sites Inventory"
+      },
+      {
+        "predicate": "hosted_event",
+        "object": "1956 MLK Jr. speech on civil rights",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/973",
+        "citationLabel": "DC Historic Sites Inventory"
+      },
+      {
+        "predicate": "hosted_event",
+        "object": "1968 MLK Jr. Vietnam War protest speech",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/973",
+        "citationLabel": "DC Historic Sites Inventory"
+      },
+      {
+        "predicate": "connected_to",
+        "object": "NAACP DC Branch activism",
+        "confidenceLevel": "medium",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/973",
+        "citationLabel": "DC Historic Sites Inventory"
+      }
+    ],
+    "historicalContext": "This church was central to civil rights activism in DC, hosting speeches by MLK Jr., Nannie Helen Burroughs, and John P. Davis. Its role in the 1935 NAACP meeting and 1968 March on Washington highlights its significance in national civil rights efforts."
+  },
+  {
+    "id": "dc-black-history-sites-i17",
+    "kind": "place",
+    "displayName": "Charles Sumner School",
+    "summary": "The Charles Sumner School (1871) at 1201 17th Street NW in Washington, D.C., is one of three post-Civil War Black schools in the city. Named after abolitionist Charles Sumner, it was built on the site of a 1866 Freedmen's Bureau school and features Second Empire architecture by Adolph Cluss. The school, now a museum, was listed in the DC Inventory (1978) and National Register (1979).",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "education",
+      "freedom",
+      "reconstruction",
+      "architecture",
+      "black-architects"
+    ],
+    "topicIds": [
+      "education",
+      "freedom",
+      "reconstruction",
+      "architecture",
+      "black-architects"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Charles Sumner School",
+      "Freedmen's Bureau",
+      "Adolph Cluss",
+      "Second Empire architecture",
+      "Black education history"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "institution",
+    "locationLabel": "1201 17th Street NW, Washington, DC",
+    "lat": 38.905966,
+    "lng": -77.038145,
+    "claims": [
+      {
+        "predicate": "constructed_in",
+        "object": "1871-1872",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/578",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "located_at",
+        "object": "1201 17th Street NW, Washington, D.C.",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/578",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "named_after",
+        "object": "Charles Sumner",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/578",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "architect",
+        "object": "Adolph Cluss",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/578",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "awarded_medal",
+        "object": "1873 Vienna Exposition",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/578",
+        "citationLabel": "DC Historic Preservation Office"
+      }
+    ],
+    "historicalContext": "This school represents post-Civil War efforts to establish Black education in segregated Washington, D.C. Its construction followed the Freedmen's Bureau's 1866 initiative and reflects broader struggles over educational equity during Reconstruction. The building's architecture by Adolph Cluss symbolizes municipal improvements in the 1870s, while its preservation highlights the value placed on Black educational history."
+  },
+  {
+    "id": "dc-black-history-sites-i38",
+    "kind": "place",
+    "displayName": "Frederick Douglass House/Museum of African Art/Frederick Douglass Museum and Hall of Fame for Caring Americans",
+    "summary": "Frederick Douglass's final home (1877-1895) at 316 A Street NE, Washington, DC, now a National Historic Site operated by the National Park Service. The property, expanded in 2022, preserves his legacy as an abolitionist and civil rights leader through its historic structures and reconstructed Growlery writing retreat.",
+    "eraBuckets": [
+      "1870s",
+      "1890s",
+      "1960s",
+      "2020s"
+    ],
+    "topicTags": [
+      "abolition",
+      "civil-rights",
+      "preservation"
+    ],
+    "topicIds": [
+      "abolition",
+      "civil-rights",
+      "preservation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Frederick Douglass",
+      "Cedar Hill",
+      "National Historic Site",
+      "abolitionist",
+      "civil rights"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "institution",
+    "locationLabel": "316 A Street NE, Washington, DC",
+    "lat": 38.891124,
+    "lng": -77.001102,
+    "claims": [
+      {
+        "predicate": "residence",
+        "object": "Frederick Douglass purchased Cedar Hill in 1877 and resided there until his death in 1895",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/156",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "designation",
+        "object": "The site was designated a National Historic Site in 1964",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/156",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "listing",
+        "object": "Added to National Register of Historic Places in 1966",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/156",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "feature",
+        "object": "The Growlery writing retreat was reconstructed in 2020",
+        "confidenceLevel": "medium",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/156",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "boundary_change",
+        "object": "Site boundaries were expanded in 2022",
+        "confidenceLevel": "medium",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/156",
+        "citationLabel": "DC Historic Preservation Office"
+      }
+    ],
+    "historicalContext": "This site preserves the final home of Frederick Douglass, a pivotal abolitionist and civil rights leader who lived here during the post-Reconstruction era. The property's designation as a National Historic Site and its inclusion in the National Register reflect its role in documenting African American history and the struggle for equality. The 2020 boundary expansion and Growlery reconstruction enhance understanding of Douglass's intellectual and political life."
+  },
+  {
+    "id": "dc-black-history-sites-i57",
+    "kind": "place",
+    "displayName": "Mary McLeod Bethune Council House (National Council of Negro Women, Inc. Headquarters)",
+    "summary": "The Mary McLeod Bethune Council House at 1318 Vermont Avenue NW in Washington, DC served as headquarters for the National Council of Negro Women (1940s-1960s) and residence of civil rights leader Mary McLeod Bethune until 1949. Documented in DC Historic Preservation Office records, it became a museum in 1979 under National Park Service administration.",
+    "eraBuckets": [
+      "1930s",
+      "1940s",
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "women",
+      "national-capital",
+      "civil-war",
+      "affirmative-action"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "women",
+      "national-capital",
+      "civil-war",
+      "affirmative-action"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "National Council of Negro Women",
+      "Mary McLeod Bethune",
+      "Logan Circle",
+      "Black women's history",
+      "museum preservation"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "institution",
+    "locationLabel": "1318 Vermont Avenue NW, Washington, DC",
+    "lat": 38.908168,
+    "lng": -77.030863,
+    "claims": [
+      {
+        "predicate": "served as headquarters for",
+        "object": "National Council of Negro Women",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/870",
+        "citationLabel": "DC Historic Preservation Office inventory"
+      },
+      {
+        "predicate": "residence of",
+        "object": "Mary McLeod Bethune",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/870",
+        "citationLabel": "DC Historic Preservation Office inventory"
+      },
+      {
+        "predicate": "fire damaged in",
+        "object": "1966",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/870",
+        "citationLabel": "DC Historic Preservation Office inventory"
+      },
+      {
+        "predicate": "listed in DC Inventory of Historic Sites",
+        "object": "1975",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/870",
+        "citationLabel": "DC Historic Preservation Office inventory"
+      },
+      {
+        "predicate": "reopened as museum in",
+        "object": "1979",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/870",
+        "citationLabel": "DC Historic Preservation Office inventory"
+      }
+    ],
+    "historicalContext": "This site exemplifies mid-20th century civil rights organizing by Black women through the NCNW's headquarters. Its preservation within the Logan Circle district reflects shifting racial demographics and institutional efforts to safeguard Black history. The fire damage and subsequent restoration (1975-1979) highlight community preservation efforts amid urban change."
+  },
+  {
+    "id": "dc-black-history-sites-i6",
+    "kind": "place",
+    "displayName": "Armstrong Manual Training School (Samuel Chapman Armstrong Technical High School)",
+    "summary": "Armstrong Manual Training School, established in 1902 at 122 P Street NW, DC, was a pivotal institution for African American education. Designed by architect Waddy B. Wood in Classical Revival style, it offered vocational and academic training. Renamed Armstrong Technical High School in 1925, it now houses Friendship Armstrong Academy as a public charter school.",
+    "eraBuckets": [
+      "1900s",
+      "1920s"
+    ],
+    "topicTags": [
+      "education",
+      "civil-rights",
+      "architecture",
+      "jim-crow",
+      "segregation"
+    ],
+    "topicIds": [
+      "education",
+      "civil-rights",
+      "architecture",
+      "jim-crow",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "African American education",
+      "vocational training",
+      "Classical Revival architecture",
+      "Booker T. Washington",
+      "Jim Crow"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "institution",
+    "locationLabel": "122 P Street NW, Washington, DC",
+    "lat": 38.909317,
+    "lng": -77.013246,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "1902",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/831",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "designed_by",
+        "object": "Waddy B. Wood",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/831",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "counterpart_to",
+        "object": "Manual Training School #1",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/831",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "renamed",
+        "object": "1925",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/831",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "now_houses",
+        "object": "Friendship Armstrong Academy",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/831",
+        "citationLabel": "DC Historic Preservation Office"
+      }
+    ],
+    "historicalContext": "In the early 1900s, Armstrong Manual Training School was one of only two high schools in DC admitting Black students, reflecting segregated education under Jim Crow. Its 1925 renaming to Armstrong Technical High School aligned with Booker T. Washington's vocational training advocacy. The Classical Revival design by Waddy B. Wood symbolized the community's investment in Black education despite systemic racism."
+  },
+  {
+    "id": "dc-black-history-sites-i68",
+    "kind": "place",
+    "displayName": "National Council of Negro Women, Inc. Headquarters",
+    "summary": "The National Council of Negro Women, Inc. (NCNW), founded in 1935 by Mary McLeod Bethune, is headquartered at 633 Pennsylvania Avenue NW in Washington, DC. Under Dorothy Height's leadership, it became a key player in the Civil Rights Movement, advocating for Black women and securing War on Poverty funds in the 1960s. The organization moved to its current location in 1995.",
+    "eraBuckets": [
+      "1930s",
+      "1960s",
+      "1990s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "women",
+      "leadership",
+      "community-organizing",
+      "founding-era"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "women",
+      "leadership",
+      "community-organizing",
+      "founding-era"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "National Council of Negro Women",
+      "Mary McLeod Bethune",
+      "Dorothy Height",
+      "Civil Rights Movement",
+      "War on Poverty"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "institution",
+    "locationLabel": "633 Pennsylvania Avenue NW, Washington, DC",
+    "lat": 38.893393,
+    "lng": -77.021121,
+    "claims": [
+      {
+        "predicate": "founded by",
+        "object": "Mary McLeod Bethune",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/955",
+        "citationLabel": "DISCOVERY SUMMARY"
+      },
+      {
+        "predicate": "founded in",
+        "object": "1935",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/955",
+        "citationLabel": "DISCOVERY SUMMARY"
+      },
+      {
+        "predicate": "headquarters location",
+        "object": "633 Pennsylvania Avenue NW, Washington, DC",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/955",
+        "citationLabel": "DISCOVERY SUMMARY"
+      },
+      {
+        "predicate": "moved to headquarters at 633 Pennsylvania Avenue NW",
+        "object": "1995",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/955",
+        "citationLabel": "DISCOVERY SUMMARY"
+      },
+      {
+        "predicate": "led by",
+        "object": "Dorothy Height",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/955",
+        "citationLabel": "DISCOVERY SUMMARY"
+      },
+      {
+        "predicate": "civil rights initiatives in Mississippi",
+        "object": "1960s War on Poverty funds",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/955",
+        "citationLabel": "DISCOVERY SUMMARY"
+      }
+    ],
+    "historicalContext": "The NCNW, established in 1935, emerged as a significant voice for Black women's organizations and played a pivotal role in the Civil Rights Movement. Dorothy Height, who led the NCNW from 1957 to 1997, was instrumental in organizing civil rights initiatives, particularly in Mississippi, and in securing federal funding for Black women's community programs. The headquarters at 633 Pennsylvania Avenue NW, established in 1995, reflects the organization's enduring presence in Washington, DC, and its commitment to advancing civil rights and women's issues."
+  },
+  {
+    "id": "dc-black-history-sites-i95",
+    "kind": "place",
+    "displayName": "Stephen Decatur House",
+    "summary": "Stephen Decatur House, located at 748 Jackson Place NW in Washington, DC, is a historic site listed in the DC Historic Preservation Office’s Black History Sites inventory. Built in 1819, it served as a residence for enslaved individuals and is part of the Capital City Slavery Tour, highlighting its role in the history of enslavement in the District.",
+    "eraBuckets": [
+      "1810s",
+      "1820s",
+      "1960s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "preservation",
+      "architecture",
+      "history",
+      "black-codes"
+    ],
+    "topicIds": [
+      "enslavement",
+      "preservation",
+      "architecture",
+      "history",
+      "black-codes"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Decatur House",
+      "enslaved individuals",
+      "Lafayette Square",
+      "National Trust for Historic Preservation",
+      "Capital City Slavery Tour"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "institution",
+    "locationLabel": "748 Jackson Place NW, Washington, DC",
+    "lat": 38.900026,
+    "lng": -77.038197,
+    "claims": [
+      {
+        "predicate": "located_at",
+        "object": "748 Jackson Place NW, Washington, DC",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/143",
+        "citationLabel": "DC Historic Preservation Office Inventory"
+      },
+      {
+        "predicate": "part_of",
+        "object": "Lafayette Square Historic District",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/143",
+        "citationLabel": "DC Historic Preservation Office Inventory"
+      },
+      {
+        "predicate": "commemorates",
+        "object": "Enslavement in Washington, DC",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/143",
+        "citationLabel": "DC Historic Preservation Office Inventory"
+      },
+      {
+        "predicate": "governed_by",
+        "object": "National Trust for Historic Preservation",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/143",
+        "citationLabel": "DC Historic Preservation Office Inventory"
+      },
+      {
+        "predicate": "co-stewarded_by",
+        "object": "White House Historical Association",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/143",
+        "citationLabel": "DC Historic Preservation Office Inventory"
+      }
+    ],
+    "historicalContext": "The Decatur House, constructed in 1819, is significant for its role as one of the few remaining structures in Washington, DC, that housed enslaved people. Its inclusion in the Capital City Slavery Tour underscores its importance in documenting the lived experiences of those enslaved in the District. The house also reflects broader historical trends in urban development and preservation efforts in the nation’s capital."
+  },
+  {
+    "id": "dc-black-history-sites-s10",
+    "kind": "place",
+    "displayName": "Freedman's Savings and Trust Co. (Site)",
+    "summary": "Freedman's Savings and Trust Co. (Site) at 701 Madison Place NW in Washington, DC, was a Reconstruction-era bank established in 1865 to support newly emancipated African Americans. Documented in the DC Historic Preservation Office's Black History Sites inventory, it reflects efforts to promote economic independence amid post-Civil War challenges.",
+    "eraBuckets": [
+      "1860s",
+      "1870s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "economic-justice",
+      "reconstruction"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "economic-justice",
+      "reconstruction"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Freedman's Savings and Trust Company",
+      "Reconstruction-era bank",
+      "African American financial institutions",
+      "DC Historic Preservation Office",
+      "post-Civil War economic policies"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "site",
+    "locationLabel": "701 Madison Place NW, Washington, DC",
+    "lat": 38.898935,
+    "lng": -77.03498,
+    "claims": [
+      {
+        "predicate": "established in",
+        "object": "March 1868",
+        "confidenceLevel": "high",
+        "citationSource": "hmdb.org",
+        "citationHref": "https://www.hmdb.org/m.asp?m=32482",
+        "citationLabel": "Historical Marker"
+      },
+      {
+        "predicate": "purpose",
+        "object": "secure savings for African American soldiers and freed people",
+        "confidenceLevel": "high",
+        "citationSource": "archives.gov",
+        "citationHref": "https://www.archives.gov/publications/prologue/1997/summer/freedmans-savings-and-trust.html",
+        "citationLabel": "National Archives"
+      },
+      {
+        "predicate": "collapsed in",
+        "object": "1874",
+        "confidenceLevel": "medium",
+        "citationSource": "archives.gov",
+        "citationHref": "https://www.archives.gov/publications/prologue/1997/summer/freedmans-savings-and-trust.html",
+        "citationLabel": "National Archives"
+      }
+    ],
+    "historicalContext": "This site symbolizes Reconstruction-era efforts to empower freed people through financial institutions. The Freedman's Savings Bank, chartered in 1865, aimed to provide secure savings for African Americans transitioning from slavery. Its collapse in 1874 highlighted systemic economic barriers faced by Black communities, making it a critical case study in post-emancipation financial exclusion and resilience."
+  },
+  {
+    "id": "dc-black-history-sites-ps11",
+    "kind": "place",
+    "displayName": "John Philip Sousa Junior High School",
+    "summary": "John Philip Sousa Junior High School in Washington, D.C., was central to Bolling v. Sharpe, a landmark 1954 Supreme Court case that ruled against school segregation in the District. The case, part of the broader Brown v. Board of Education decision, was initiated after African American students were denied admission in 1950.",
+    "eraBuckets": [
+      "1950s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "desegregation",
+      "school-desegregation",
+      "supreme-court",
+      "federal-intervention"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "desegregation",
+      "school-desegregation",
+      "supreme-court",
+      "federal-intervention"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Bolling v. Sharpe",
+      "school segregation",
+      "civil rights",
+      "Washington, D.C."
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "site",
+    "locationLabel": "3650 Ely Place SE, Washington, DC",
+    "lat": 38.883993,
+    "lng": -76.953068,
+    "claims": [
+      {
+        "predicate": "was central to",
+        "object": "Bolling v. Sharpe",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/969",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "led to",
+        "object": "desegregation of D.C. schools",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/places/washington-dc-john-philip-sousa-junior-high-school.htm",
+        "citationLabel": "National Park Service"
+      },
+      {
+        "predicate": "part of",
+        "object": "Brown v. Board of Education decision",
+        "confidenceLevel": "medium",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/969",
+        "citationLabel": "DC Historic Preservation Office"
+      }
+    ],
+    "historicalContext": "The school became a focal point in the fight against segregation when parent activist Gardner Bishop and attorney James Nabrit challenged the District of Columbia's segregated school system. The case highlighted the unique legal status of D.C. schools, which were governed by federal law rather than state law, leading to a ruling based on the Fifth Amendment’s due process clause. This decision was pivotal in dismantling the 'separate but equal' doctrine in federal jurisdictions."
+  },
+  {
+    "id": "dc-black-history-sites-s18",
+    "kind": "place",
+    "displayName": "Theodore Roosevelt Island National Memorial (Analostan Island)",
+    "summary": "Theodore Roosevelt Island in Washington, DC, was a 19th-century plantation site where John Mason enslaved 17-31 individuals between 1800-1830. The island's construction and agriculture relied on enslaved labor, later recognized in the Capital City Slavery Tour. The site was later transformed into a presidential memorial.",
+    "eraBuckets": [
+      "1790s",
+      "1800s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "labor",
+      "history"
+    ],
+    "topicIds": [
+      "enslavement",
+      "labor",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "enslaved labor",
+      "John Mason",
+      "Theodore Roosevelt Island"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "site",
+    "locationLabel": "Theodore Roosevelt Island, Washington, DC",
+    "lat": 38.897339,
+    "lng": -77.06414,
+    "claims": [
+      {
+        "predicate": "owned",
+        "object": "17 enslaved persons in 1800",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/518",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "owned",
+        "object": "31 enslaved persons in 1830",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/518",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "used",
+        "object": "enslaved labor for home construction",
+        "confidenceLevel": "medium",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/518",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "designated",
+        "object": "Capital City Slavery Tour site",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/518",
+        "citationLabel": "DC Historic Preservation Office"
+      }
+    ],
+    "historicalContext": "This site reflects the entanglement of enslavement with early Washington's development. Mason's use of enslaved labor for plantation work and home construction (1793-1830) connects to broader patterns of forced labor in the region. Its later designation as a slavery history site and memorialization of Roosevelt highlight contrasting narratives of American history."
+  },
+  {
+    "id": "dc-black-history-sites-s8",
+    "kind": "place",
+    "displayName": "Fort Stevens",
+    "summary": "Fort Stevens, located at 6101 13th St NW in Washington D.C., is the site of the District's only Civil War battle. Reconstructed by the Civilian Conservation Corps during the Great Depression, it is now preserved as a National Park Service site and part of the DC Historic Preservation Office's Black History Sites inventory.",
+    "eraBuckets": [
+      "1860s",
+      "1930s"
+    ],
+    "topicTags": [
+      "civil-war",
+      "military",
+      "preservation",
+      "national-capital"
+    ],
+    "topicIds": [
+      "civil-war",
+      "military",
+      "preservation",
+      "national-capital"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Civil War battle site",
+      "CCC reconstruction",
+      "National Park Service preservation"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "site",
+    "locationLabel": "6101 13th St NW, Washington, DC",
+    "lat": 38.964404,
+    "lng": -77.029477,
+    "claims": [
+      {
+        "predicate": "site_of",
+        "object": "Civil War battle in Washington D.C.",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/1129",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "reconstructed_by",
+        "object": "Civilian Conservation Corps",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/1129",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "administered_by",
+        "object": "National Park Service",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/1129",
+        "citationLabel": "DC Historic Preservation Office"
+      }
+    ],
+    "historicalContext": "Fort Stevens was a key component of Washington D.C.'s Civil War defense system and the only local site to experience combat during the war. Its preservation through CCC efforts in the 1930s reflects broader federal initiatives to protect historical landscapes while addressing economic challenges. The site's current status as a National Park Service-managed resource underscores its educational and historical significance."
+  }
+]

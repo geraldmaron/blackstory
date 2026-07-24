@@ -1,0 +1,393 @@
+[
+  {
+    "id": "gap_tulsa_race_massacre",
+    "kind": "event",
+    "displayName": "Tulsa Race Massacre",
+    "summary": "The Tulsa Race Massacre of May 31 \u2013 June 1, 1921, was a violent attack on the Greenwood District, one of the wealthiest Black communities in the U.S., resulting in widespread destruction and loss of life.",
+    "eraBuckets": [
+      "1910s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "civil-rights",
+      "segregation",
+      "history"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "civil-rights",
+      "segregation",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Tulsa Race Massacre",
+      "Greenwood District",
+      "Black Wall Street",
+      "racial violence",
+      "Jim Crow"
+    ],
+    "jurisdictionLabel": "Tulsa, Oklahoma",
+    "locationPrecision": "district",
+    "locationLabel": "Greenwood District",
+    "lat": 36.1597,
+    "lng": -95.9858,
+    "claims": [
+      {
+        "predicate": "occurred",
+        "object": "Tulsa Race Massacre",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Tulsa_race_massacre",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "location",
+        "object": "Greenwood District, Tulsa, Oklahoma, U.S.",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Tulsa_race_massacre",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "date",
+        "object": "May 31 \u2013 June 1, 1921",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Tulsa_race_massacre",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "target",
+        "object": "Black residents, their homes, businesses, churches, schools, and municipal buildings",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Tulsa_race_massacre",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "perpetrators",
+        "object": "White mob",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Tulsa_race_massacre",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "motive",
+        "object": "Anti-Black racism",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Tulsa_race_massacre",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The Tulsa Race Massacre was a pivotal moment in American history, reflecting the systemic racial violence and segregation that characterized the Jim Crow era. It was fueled by anti-Black racism and resulted in the destruction of a thriving Black community, highlighting the broader patterns of racial discrimination and violence in the United States."
+  },
+  {
+    "id": "gap_durham_freeway",
+    "kind": "other",
+    "displayName": "Durham Freeway",
+    "summary": "The Durham Freeway, constructed during 1960s urban renewal, displaced thousands of homes and hundreds of Black-owned businesses in Durham, North Carolina, reshaping the city's Black neighborhoods through state-backed infrastructure planning.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "economic-justice",
+      "segregation",
+      "land-ownership",
+      "community"
+    ],
+    "topicIds": [
+      "economic-justice",
+      "segregation",
+      "land-ownership",
+      "community"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "urban renewal",
+      "Black-owned businesses",
+      "displacement",
+      "Durham Freeway",
+      "infrastructure"
+    ],
+    "jurisdictionLabel": "Durham, North Carolina",
+    "locationPrecision": "address",
+    "locationLabel": "Durham Freeway corridor",
+    "lat": 35.97861111,
+    "lng": -78.9,
+    "claims": [
+      {
+        "predicate": "was constructed during",
+        "object": "1960s urban renewal",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Durham%2C_North_Carolina",
+        "citationLabel": "Wikipedia - Durham, North Carolina"
+      },
+      {
+        "predicate": "displaced",
+        "object": "thousands of homes",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "http://durhamnc.gov/",
+        "citationLabel": "City of Durham official website"
+      },
+      {
+        "predicate": "displaced",
+        "object": "hundreds of Black-owned businesses",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "http://durhamnc.gov/",
+        "citationLabel": "City of Durham official website"
+      },
+      {
+        "predicate": "contributed to",
+        "object": "racialized community displacement in Durham",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Durham%2C_North_Carolina",
+        "citationLabel": "Wikipedia - Durham, North Carolina"
+      }
+    ],
+    "historicalContext": "Urban renewal projects like the Durham Freeway in the mid-20th century frequently targeted Black communities under the guise of 'slum clearance,' enabling municipal expansion while undermining Black land ownership and economic self-sufficiency. These actions reflect broader patterns of racialized spatial restructuring across U.S. cities during the civil rights era."
+  },
+  {
+    "id": "gap_thompson_ame_zion_church",
+    "kind": "institution",
+    "displayName": "Thompson AME Zion Church",
+    "summary": "The Thompson AME Zion Church in Auburn, New York, was a central place of worship for Harriet Tubman, a key figure in the Underground Railroad and abolitionist movement. Tubman bequeathed her property to the church to support the Harriet Tubman Home for the Aged, highlighting its role in Black history and community care.",
+    "eraBuckets": [
+      "1910s",
+      "1850s",
+      "1890s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "jim-crow",
+      "abolition",
+      "segregation",
+      "history",
+      "church",
+      "community"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "jim-crow",
+      "abolition",
+      "segregation",
+      "history",
+      "church",
+      "community"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Harriet Tubman",
+      "AME Zion Church",
+      "Underground Railroad",
+      "Auburn",
+      "New York"
+    ],
+    "jurisdictionLabel": "Auburn, New York",
+    "locationPrecision": "institution",
+    "locationLabel": "Thompson AME Zion Church",
+    "lat": 42.91110278,
+    "lng": -76.56778056,
+    "claims": [
+      {
+        "predicate": "was_attended_by",
+        "object": "Harriet Tubman",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Harriet_Tubman_National_Historical_Park",
+        "citationLabel": "Harriet Tubman National Historical Park"
+      },
+      {
+        "predicate": "was_bequeathed_to",
+        "object": "Harriet Tubman Home for the Aged",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Harriet_Tubman_National_Historical_Park",
+        "citationLabel": "Harriet Tubman National Historical Park"
+      },
+      {
+        "predicate": "was_part_of",
+        "object": "Harriet Tubman National Historical Park",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Harriet_Tubman_National_Historical_Park",
+        "citationLabel": "Harriet Tubman National Historical Park"
+      },
+      {
+        "predicate": "was_connected_to",
+        "object": "Underground Railroad",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Harriet_Tubman_National_Historical_Park",
+        "citationLabel": "Harriet Tubman National Historical Park"
+      }
+    ],
+    "historicalContext": "The Thompson AME Zion Church is part of the Harriet Tubman National Historical Park, which includes sites associated with Tubman's life and work. The church's connection to Tubman's legacy underscores its significance in the context of abolitionism, the Underground Railroad, and the establishment of institutions for Black elderly care."
+  },
+  {
+    "id": "gap_hampton_institute_historic_district",
+    "kind": "place",
+    "displayName": "Hampton Institute Historic District",
+    "summary": "The Hampton Institute Historic District, listed on the National Register in 1969, includes the Emancipation Oak, where the Emancipation Proclamation was first read in the Confederate states in 1863. It is linked to the founding of Hampton University, a historically Black university established in 1868 to educate freedmen.",
+    "eraBuckets": [
+      "1860s",
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "education",
+      "history",
+      "segregation",
+      "jim-crow"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "education",
+      "history",
+      "segregation",
+      "jim-crow"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Hampton University",
+      "Emancipation Oak",
+      "National Register",
+      "Civil War",
+      "Black education"
+    ],
+    "jurisdictionLabel": "Hampton, Virginia",
+    "locationPrecision": "district",
+    "locationLabel": "Hampton Institute Historic District",
+    "lat": 37.0225,
+    "lng": -76.33472222,
+    "claims": [
+      {
+        "predicate": "isLocatedIn",
+        "object": "Hampton, Virginia",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Hampton_University",
+        "citationLabel": "Hampton University"
+      },
+      {
+        "predicate": "wasFoundedIn",
+        "object": "1868",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Hampton_University",
+        "citationLabel": "Hampton University"
+      },
+      {
+        "predicate": "isPartOf",
+        "object": "National Register of Historic Places",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/69000323",
+        "citationLabel": "National Register of Historic Places"
+      },
+      {
+        "predicate": "isAssociatedWith",
+        "object": "Emancipation Oak",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Hampton_University",
+        "citationLabel": "Hampton University"
+      },
+      {
+        "predicate": "wasFirstReadAt",
+        "object": "Emancipation Oak",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Hampton_University",
+        "citationLabel": "Hampton University"
+      }
+    ],
+    "historicalContext": "The Hampton Institute Historic District is significant for its role in the education of formerly enslaved people and its connection to the Emancipation Proclamation. The site was established by the American Missionary Association to provide education to freedmen after the Civil War, and it became a center for Black education and civil rights activism."
+  },
+  {
+    "id": "gap_ashton_villa",
+    "kind": "place",
+    "displayName": "Ashton Villa",
+    "summary": "Ashton Villa, a restored historic home in Galveston, Texas, was built in 1859 using enslaved labor and served as a Confederate headquarters during the Civil War. It is central to the historical narrative of emancipation in Texas, as it is tied to the 1865 announcement of Juneteenth.",
+    "eraBuckets": [
+      "1850s",
+      "1860s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "enslavement",
+      "jim-crow",
+      "emancipation",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "enslavement",
+      "jim-crow",
+      "emancipation",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Ashton Villa",
+      "Galveston",
+      "Juneteenth",
+      "Confederate headquarters",
+      "enslaved labor"
+    ],
+    "jurisdictionLabel": "Galveston, Texas",
+    "locationPrecision": "institution",
+    "locationLabel": "Ashton Villa",
+    "lat": 29.29972222,
+    "lng": -94.7925,
+    "claims": [
+      {
+        "predicate": "wasBuiltBy",
+        "object": "enslaved labor",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Ashton_Villa",
+        "citationLabel": "Ashton Villa Wikipedia"
+      },
+      {
+        "predicate": "servedAs",
+        "object": "Confederate headquarters",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Ashton_Villa",
+        "citationLabel": "Ashton Villa Wikipedia"
+      },
+      {
+        "predicate": "wasCentralTo",
+        "object": "Juneteenth announcement",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Ashton_Villa",
+        "citationLabel": "Ashton Villa Wikipedia"
+      },
+      {
+        "predicate": "wasDesignedBy",
+        "object": "James Moreau Brown",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Ashton_Villa",
+        "citationLabel": "Ashton Villa Wikipedia"
+      },
+      {
+        "predicate": "wasLocatedAt",
+        "object": "2328 Broadway St., Galveston, Texas",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Ashton_Villa",
+        "citationLabel": "Ashton Villa Wikipedia"
+      }
+    ],
+    "historicalContext": "Ashton Villa is a key site in the history of slavery and emancipation in Texas. Built in 1859 by Colonel James Moreau Brown using enslaved labor, it served as a Confederate headquarters during the Civil War. The home's connection to the 1865 announcement of Juneteenth underscores its role in the broader context of emancipation and civil rights in the United States."
+  }
+]

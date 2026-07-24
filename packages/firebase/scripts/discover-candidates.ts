@@ -180,6 +180,43 @@ const SEED_QUERIES = [
   'African American settlement houses',
   'Black YMCA historic',
   'African American hospitals National Register',
+  'first African American pilot aviator',
+  'first Black woman pilot United States',
+  'first African American judge United States',
+  'first Black state supreme court justice',
+  'first African American woman mayor United States',
+  'first Black woman elected to Congress',
+  'first African American woman senator',
+  'first Black governor United States',
+  'first African American physician United States',
+  'first Black lawyer United States',
+  'plantation historic sites African American enslaved',
+  'Whitney Plantation Louisiana',
+  'McLeod Plantation Charleston',
+  'Boone Hall Plantation history enslaved',
+  'Monticello Mulberry Row enslaved community',
+  'Mount Vernon enslaved community African American',
+  'plantation museums interpreting slavery United States',
+  'slave revolts United States history',
+  'Stono Rebellion South Carolina',
+  'German Coast uprising 1811',
+  'Gabriel Prosser rebellion Richmond',
+  'Denmark Vesey conspiracy Charleston',
+  'Nat Turner rebellion Southampton',
+  'New York slave revolt 1712',
+  'New York Conspiracy 1741',
+  'maroon communities United States',
+  'Great Dismal Swamp maroons',
+  'Black Seminoles Florida history',
+  'Watts rebellion 1965',
+  'Detroit uprising 1967',
+  'Newark rebellion 1967',
+  'Harlem riot 1935 OR 1943',
+  'Tulsa Race Massacre Greenwood',
+  'Rosewood massacre Florida',
+  'African American firsts by state',
+  'Black officeholders Reconstruction era',
+  'first African American in state legislature',
 ] as const;
 
 type SearchHit = {
@@ -346,6 +383,9 @@ function isNonEntityPage(title: string, label: string, description: string | und
     /^(newspaper|organization|timeline|social class|ideology|political concept|films made by)\b/.test(
       d,
     ) ||
+    /^(plantation|plantation house|slave rebellion|slave revolt)$/.test(t) ||
+    /^(plantation|plantation house|slave rebellion|slave revolt)$/.test(l) ||
+    /\bplantations of ireland\b/.test(names) ||
     t.startsWith('timeline of ') ||
     l.startsWith('timeline of ') ||
     names.includes('united kingdom') ||
@@ -358,16 +398,78 @@ function isNonEntityPage(title: string, label: string, description: string | und
   );
 }
 
+/** Place-first US corpus: drop Caribbean/Latin America revolts that lack a US pin. */
+function isOutOfUsPlaceScope(title: string, description: string | undefined): boolean {
+  const hay = `${title} ${description ?? ''}`.toLowerCase();
+  return /\b(jamaica|curaçao|curacao|santo domingo|haiti|saint-domingue|barbados|antigua|guadeloupe|martinique|trinidad|st\. john|saint john|baptist war|tacky's war|coromantee)\b/.test(
+    hay,
+  );
+}
+
 /**
  * Black-history relevance gate. Geo tokens alone are not enough — otherwise every
  * Tulsa/Rosewood page survives. Require a core history term in title or description.
+ * Plantation / revolt pages often only say "slave rebellion" or "historic plantation"
+ * in Wikidata descriptions (no "African American"), so those phrases must count.
+ * Firsts queries (pilot/judge/senator/…) often return people whose Wikidata label is
+ * only "American politician/aviator" — accept those when the *query* already asserts
+ * Black/African American firsts intent, unless the hit is constitution/amendment noise.
  */
-function looksRelevant(title: string, description: string | undefined): boolean {
+function isConstitutionNoise(title: string, description: string | undefined): boolean {
+  const hay = `${title} ${description ?? ''}`.toLowerCase();
+  return (
+    /\bamendment to the (united states )?constitution\b/.test(hay) ||
+    /\bunited states constitution\b/.test(hay) ||
+    /^(first|second|third|fourth|fifth|ninth|tenth|nineteenth|fifteenth|thirteenth|fourteenth) amendment\b/.test(
+      hay,
+    )
+  );
+}
+
+function isFirstsIntentQuery(query: string): boolean {
+  const q = query.toLowerCase();
+  return (
+    /\b(first (african american|black)|african american firsts|black officeholders)\b/.test(q) ||
+    /\b(tuskegee airmen|golden thirteen)\b/.test(q)
+  );
+}
+
+function looksLikePersonPage(title: string, description: string | undefined): boolean {
+  const t = title.trim().toLowerCase();
+  // Bare occupation / office labels are not entities.
+  if (
+    /^(aircraft )?pilot$|^lawyer$|^governor$|^judge$|^senator$|^mayor$|^physician$|^doctor$|^aviator$/.test(
+      t,
+    )
+  ) {
+    return false;
+  }
+  const hay = `${title} ${description ?? ''}`.toLowerCase();
+  return (
+    /\b(politician|judge|justice|lawyer|attorney|aviator|pilot|physician|doctor|mayor|governor|senator|congress|representative|officer|marine|naval|military|activist|educator|minister|clergyman|clergy)\b/.test(
+      hay,
+    ) || /\b\d{4}\s*[–-]\s*(\d{4}|)\b/.test(hay) // lifespan often on person descriptions
+  );
+}
+
+function isSurnameOnlyBlack(title: string): boolean {
+  // "Black" as family name, including middle initials: "Jeremiah S. Black".
+  return (
+    /\b[a-z]+(?:\s+[a-z]\.?)?\s+black\b/i.test(title) &&
+    !/\bblack (american|people|history)\b/i.test(title)
+  );
+}
+
+function looksRelevant(
+  title: string,
+  description: string | undefined,
+  query?: string,
+): boolean {
+  if (isConstitutionNoise(title, description)) return false;
   const hay = `${title} ${description ?? ''}`.toLowerCase();
   const terms = [
     'african american',
     'african-american',
-    'black ',
     'negro',
     'civil rights',
     'race massacre',
@@ -381,8 +483,36 @@ function looksRelevant(title: string, description: string | undefined): boolean 
     'emancipation',
     'black wall street',
     'greenwood district',
+    'slave revolt',
+    'slave rebellion',
+    'slave uprising',
+    'slave insurrection',
+    'enslaved',
+    'slavery',
+    'plantation',
+    'maroon',
+    'freedmen',
+    'freedman',
+    'tuskegee airmen',
+    'reconstruction',
   ];
-  return terms.some((term) => hay.includes(term));
+  if (terms.some((term) => hay.includes(term))) return true;
+  // Prefer phrase "black …" over surname-only matches ("Jeremiah S. Black ").
+  if (
+    /\bblack (american|history|people|church|press|town|belt|codes|panther|seminole|cowboy|women|woman|men|man|pilot|judge|lawyer|mayor|governor|senator|congress|aviator|officeholder)\b/.test(
+      hay,
+    ) || /\b(african|enslaved|formerly enslaved)\b/.test(hay)
+  ) {
+    return true;
+  }
+  // Firsts / officeholder queries: Wikidata often omits race from the one-line description.
+  if (query && isFirstsIntentQuery(query) && looksLikePersonPage(title, description)) {
+    if (isSurnameOnlyBlack(title) && !/\b(african|negro|black american)\b/.test(hay)) {
+      return false;
+    }
+    return true;
+  }
+  return false;
 }
 
 function inferKind(title: string, description: string | undefined): string {
@@ -524,7 +654,8 @@ async function main(): Promise<void> {
       if (
         isGenericContainer(hit.title) ||
         isNonEntityPage(hit.title, label, description) ||
-        !looksRelevant(`${hit.title} ${label}`, description)
+        isOutOfUsPlaceScope(hit.title, description) ||
+        !looksRelevant(`${hit.title} ${label}`, description, query)
       ) {
         skippedFilter += 1;
         report.push({

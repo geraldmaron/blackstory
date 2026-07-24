@@ -1,0 +1,138 @@
+[
+  {
+    "id": "gap_birmingham_motel",
+    "kind": "place",
+    "displayName": "Birmingham Motel",
+    "summary": "The A.G. Gaston Motel in Birmingham, Alabama, was a critical site during the Civil Rights Movement, serving as a headquarters for leaders like Martin Luther King Jr. and later being bombed by white supremacist terrorists.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Civil Rights Movement",
+      "Birmingham Motel",
+      "A.G. Gaston",
+      "Black history",
+      "National Monument"
+    ],
+    "jurisdictionLabel": "Birmingham, Alabama",
+    "locationPrecision": "address",
+    "locationLabel": "1527 Fifth Ave. N",
+    "lat": 33.515,
+    "lng": -86.81416667,
+    "claims": [
+      {
+        "predicate": "was_used_as",
+        "object": "headquarters",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/A.G._Gaston_Motel",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_bombed_by",
+        "object": "white supremacist terrorists",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/A.G._Gaston_Motel",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served_as",
+        "object": "safe lodging for Black travelers",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/A.G._Gaston_Motel",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_listed_in",
+        "object": "The Negro Motorist Green Book",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/A.G._Gaston_Motel",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_part_of",
+        "object": "Birmingham Civil Rights National Monument",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/A.G._Gaston_Motel",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The A.G. Gaston Motel was a rare establishment in segregated Birmingham that provided safe lodging for Black travelers and civil rights leaders. Its use as a headquarters during the 1963 Birmingham campaign and subsequent bombing highlight its role in the struggle against segregation and racial violence."
+  },
+  {
+    "id": "gap_chapel_hill",
+    "kind": "place",
+    "displayName": "Chapel Hill",
+    "summary": "Chapel Hill, North Carolina, was a site of civil rights activism, including the arrest of Bayard Rustin and other riders during the Freedom Rides. The town's history also includes segregation-era laws and the presence of the University of North Carolina.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "history",
+      "education"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "history",
+      "education"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Chapel Hill",
+      "Freedom Riders",
+      "University of North Carolina",
+      "segregation",
+      "civil rights"
+    ],
+    "jurisdictionLabel": "Chapel Hill, North Carolina",
+    "locationPrecision": "city",
+    "locationLabel": "Chapel Hill, North Carolina",
+    "lat": 37.92722222,
+    "lng": -79.03916667,
+    "claims": [
+      {
+        "predicate": "was a site of",
+        "object": "arrest of Bayard Rustin and other riders",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chapel_Hill%2C_North_Carolina",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "had segregation-era laws",
+        "object": "enforcing racial segregation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chapel_Hill%2C_North_Carolina",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was home to",
+        "object": "University of North Carolina",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chapel_Hill%2C_North_Carolina",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Chapel Hill's role in civil rights history is marked by events such as the arrest of Freedom Riders and the enforcement of segregation laws. The town's connection to the University of North Carolina further contextualizes its historical significance in the broader narrative of racial segregation and civil rights movements."
+  }
+]

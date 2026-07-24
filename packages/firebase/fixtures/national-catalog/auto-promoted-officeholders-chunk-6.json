@@ -1,0 +1,180 @@
+[
+  {
+    "id": "recon_berry_o_kelly",
+    "kind": "person",
+    "displayName": "Berry O'Kelly",
+    "summary": "Berry O'Kelly (c. 1861–1931) was a Black businessman, postmaster, and philanthropist in Raleigh, North Carolina, who developed commercial infrastructure in freedmen’s communities and co-founded the Berry O'Kelly School with Rosenwald funding.",
+    "eraBuckets": [
+      "1890s",
+      "1900s",
+      "1910s",
+      "1920s",
+      "1930s"
+    ],
+    "topicTags": [
+      "economic-justice",
+      "education",
+      "entrepreneurship",
+      "civil-rights",
+      "community"
+    ],
+    "topicIds": [
+      "economic-justice",
+      "education",
+      "entrepreneurship",
+      "civil-rights",
+      "community"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Berry O'Kelly School",
+      "East Hargett Street",
+      "Mechanics and Farmers Bank",
+      "Rosenwald School",
+      "Method community"
+    ],
+    "jurisdictionLabel": "Raleigh, North Carolina",
+    "locationPrecision": "community",
+    "locationLabel": "Method Road, Wake County",
+    "lat": 36,
+    "lng": -80,
+    "claims": [
+      {
+        "predicate": "served as first postmaster of Method",
+        "object": "Postmaster of Method, NC",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Berry_O'Kelly",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "co-founded Berry O'Kelly School with Rosenwald funding",
+        "object": "Berry O'Kelly Training School established in 1910 with support from Julius Rosenwald",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.dncr.nc.gov/blog/2023/12/22/berry-okelly-school-h-77",
+        "citationLabel": "NC Department of Natural and Cultural Resources"
+      },
+      {
+        "predicate": "developed Black commercial district on East Hargett Street",
+        "object": "Acquired real estate and leased buildings to Black businesses on East Hargett Street, Raleigh",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Berry_O'Kelly",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served as vice-president of Mechanics and Farmers Bank Raleigh branch",
+        "object": "Branch manager and vice-president of Mechanics and Farmers Bank in Raleigh",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.dncr.nc.gov/blog/2023/12/22/berry-okelly-school-h-77",
+        "citationLabel": "NC Department of Natural and Cultural Resources"
+      },
+      {
+        "predicate": "owned and operated multiple Black-owned businesses",
+        "object": "Owned Woods and O'Kelly general store, Raleigh Shoe Company, and Acme Realty Company",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Berry_O'Kelly",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "donated land for Black education",
+        "object": "Donated 10 acres of land for the construction of the Berry O'Kelly School",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Berry_O'Kelly",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "During the rise of Jim Crow segregation in North Carolina, Black self-reliance and institution-building became critical survival strategies. O'Kelly’s development of Black-owned businesses and a vocational school in Method and Raleigh exemplified this resistance through economic and educational empowerment, supported by national networks like the Rosenwald Fund."
+  },
+  {
+    "id": "recon_john_patterson_green",
+    "kind": "person",
+    "displayName": "John Patterson Green",
+    "summary": "John Patterson Green, born free in North Carolina, became a pioneering African American politician in Cleveland, Ohio. Elected Ohio’s first Black state senator in 1891, he championed Labor Day as a state holiday and served in both legislative chambers, reflecting Black political engagement during Reconstruction and its aftermath in the North.",
+    "eraBuckets": [
+      "1870s",
+      "1880s",
+      "1890s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "firsts",
+      "civil-rights",
+      "free-people-of-color"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "firsts",
+      "civil-rights",
+      "free-people-of-color"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "first African American Ohio Senator",
+      "Labor Day legislation Ohio",
+      "Reconstruction-era politician",
+      "free person of color",
+      "Cuyahoga County Justice of the Peace"
+    ],
+    "jurisdictionLabel": "Cleveland, Ohio",
+    "locationPrecision": "city",
+    "locationLabel": "Cuyahoga County and Ohio Statehouse",
+    "lat": 39.96222222,
+    "lng": -83.00055556,
+    "claims": [
+      {
+        "predicate": "was the first African American elected to the Ohio Senate",
+        "object": "Ohio Senate",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/John_Patterson_Green",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "introduced legislation establishing Labor Day as a state holiday in Ohio",
+        "object": "Labor Day (Ohio)",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/John_Patterson_Green",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was elected Justice of the Peace in Cuyahoga County, Ohio",
+        "object": "Justice of the Peace",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/John_Patterson_Green",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was born a free person of color in antebellum North Carolina",
+        "object": "free person of color",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/John_Patterson_Green",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "authored and self-published a pamphlet to fund his education",
+        "object": "Miscellaneous Subjects by a Self-Educated Colored Youth (1866)",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/John_Patterson_Green",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "represented Cleveland and Cuyahoga County in the Ohio House of Representatives",
+        "object": "Ohio House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/John_Patterson_Green",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Green's political career emerged during Reconstruction and its rollback, a period when Black men in Northern states like Ohio gained elected office despite rising segregation elsewhere. His success in a majority-white electorate illustrates how integrated Northern cities allowed limited but significant Black political advancement before Jim Crow's full entrenchment."
+  }
+]

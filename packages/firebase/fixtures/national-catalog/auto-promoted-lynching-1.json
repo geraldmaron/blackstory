@@ -1,0 +1,711 @@
+[
+  {
+    "id": "lynching_garfield_king_salisbury_maryland",
+    "kind": "person",
+    "displayName": "Garfield King",
+    "summary": "Garfield King, an 18-year-old Black man and graduate of Princess Anne Colored Academy, was lynched by a mob in Salisbury, Maryland, on May 25, 1898, after being accused of shooting a white man. Dragged from jail, hanged, and shot over fifty times, his killing exemplified racial terror during the Jim Crow era.",
+    "eraBuckets": [
+      "1890s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "resistance",
+      "commemoration"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "resistance",
+      "commemoration"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "Salisbury Maryland",
+      "racial violence",
+      "extrajudicial killing",
+      "Nadir of American race relations"
+    ],
+    "jurisdictionLabel": "Salisbury, Maryland",
+    "locationPrecision": "site",
+    "locationLabel": "Wicomico County courthouse",
+    "lat": 38.37,
+    "lng": -75.63,
+    "claims": [
+      {
+        "predicate": "was lynched by a mob",
+        "object": "in Salisbury, Maryland, on May 25, 1898",
+        "confidenceLevel": "high",
+        "citationSource": "msa.maryland.gov",
+        "citationHref": "https://msa.maryland.gov/megafile/msa/speccol/sc3500/sc3520/013700/013747/html/13747bio.html",
+        "citationLabel": "Archives of Maryland"
+      },
+      {
+        "predicate": "was accused of shooting",
+        "object": "Herman Kenney, a 22-year-old white man, following a racial confrontation",
+        "confidenceLevel": "high",
+        "citationSource": "msa.maryland.gov",
+        "citationHref": "https://msa.maryland.gov/megafile/msa/speccol/sc3500/sc3520/013700/013747/html/13747bio.html",
+        "citationLabel": "Archives of Maryland"
+      },
+      {
+        "predicate": "was taken from jail by a mob",
+        "object": "who broke into the Wicomico County jail using a telegraph pole and ax",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_Garfield_King",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was hanged and shot",
+        "object": "more than fifty times after surviving an initial hanging",
+        "confidenceLevel": "high",
+        "citationSource": "msa.maryland.gov",
+        "citationHref": "https://msa.maryland.gov/megafile/msa/speccol/sc3500/sc3520/013700/013747/html/13747bio.html",
+        "citationLabel": "Archives of Maryland"
+      },
+      {
+        "predicate": "sparked community condemnation",
+        "object": "including a resolution drafted by African Americans at John Wesley Methodist Episcopal Church and published in The Salisbury Advertiser",
+        "confidenceLevel": "high",
+        "citationSource": "msa.maryland.gov",
+        "citationHref": "https://msa.maryland.gov/megafile/msa/speccol/sc3500/sc3520/013700/013747/html/13747bio.html",
+        "citationLabel": "Archives of Maryland"
+      },
+      {
+        "predicate": "was memorialized",
+        "object": "with a plaque near the old Salisbury courthouse in 2021 by the Salisbury Lynching Memorial Task Force and Equal Justice Initiative",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_Garfield_King",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "King's lynching occurred during the Nadir of American race relations, a period marked by widespread racial violence and the erosion of Black civil rights. His murder reflects the systemic failure of legal institutions to protect Black lives and the use of extralegal violence to enforce racial hierarchy, particularly in Southern and border states like Maryland. Community responses, including formal protests and appeals to state authorities, illustrate early forms of organized resistance to racial terror."
+  },
+  {
+    "id": "lynching_anderson_gause_henning_tennessee",
+    "kind": "person",
+    "displayName": "Anderson Gause",
+    "summary": "Anderson Gause, a Black man, was lynched on January 16, 1900, in Henning, Tennessee, after being accused of aiding two Black prisoners who had killed two law officers. He was hanged from a tree by a mob, an act of racial terror typical of the Jim Crow South.",
+    "eraBuckets": [
+      "1900s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "criminal-justice",
+      "resistance"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "criminal-justice",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "Henning Tennessee",
+      "racial violence",
+      "mob violence",
+      "Black victim"
+    ],
+    "jurisdictionLabel": "Henning, Tennessee",
+    "locationPrecision": "city",
+    "locationLabel": "Site of Anderson Gause lynching",
+    "lat": 35.67361111,
+    "lng": -89.5775,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "on January 16, 1900, in Henning, Tennessee",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Henning%2C_Tennessee",
+        "citationLabel": "Wikipedia: Henning, Tennessee"
+      },
+      {
+        "predicate": "was accused of",
+        "object": "helping two Black prisoners escape who had killed two law officers",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Henning%2C_Tennessee",
+        "citationLabel": "Wikipedia: Henning, Tennessee"
+      },
+      {
+        "predicate": "was hanged from a tree",
+        "object": "by a mob in Henning, Tennessee",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Henning%2C_Tennessee",
+        "citationLabel": "Wikipedia: Henning, Tennessee"
+      },
+      {
+        "predicate": "is a documented instance of",
+        "object": "racial terror lynching in the Jim Crow South",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Henning%2C_Tennessee",
+        "citationLabel": "Wikipedia: Henning, Tennessee"
+      }
+    ],
+    "historicalContext": "Lynchings like Gause’s were tools of racial control in the post-Reconstruction South, often justified by accusations of crimes but rooted in white supremacy. Henning, located in a region with a history of racial violence, exemplifies how local communities enforced racial hierarchies through extralegal violence."
+  },
+  {
+    "id": "lynching_curtis_and_burley_garfield_brown_newbern_tennessee",
+    "kind": "person",
+    "displayName": "Curtis and Burley, Garfield Brown",
+    "summary": "Curtis and Burley, Garfield Brown were lynched on October 8, 1902, in downtown Newbern, Tennessee, tied together and hanged from a telephone pole near the train depot. Their deaths are documented as part of a broader pattern of racial terror during the Jim Crow era, notable for reported attempts by local leaders to prevent the violence.",
+    "eraBuckets": [
+      "1900s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "resistance",
+      "civil-rights"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "resistance",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "Newbern Tennessee",
+      "Dyer County",
+      "telephone pole",
+      "train depot"
+    ],
+    "jurisdictionLabel": "Newbern, Tennessee",
+    "locationPrecision": "site",
+    "locationLabel": "Downtown Newbern, near Illinois Central Depot",
+    "lat": 36.11638889,
+    "lng": -89.26805556,
+    "claims": [
+      {
+        "predicate": "were lynched on",
+        "object": "October 8, 1902",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Newbern%2C_Tennessee",
+        "citationLabel": "Wikipedia - Newbern, Tennessee"
+      },
+      {
+        "predicate": "were lynched in",
+        "object": "Newbern, Tennessee (Dyer County)",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Newbern%2C_Tennessee",
+        "citationLabel": "Wikipedia - Newbern, Tennessee"
+      },
+      {
+        "predicate": "were tied together and hanged from",
+        "object": "a telephone pole in downtown Newbern",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Newbern%2C_Tennessee",
+        "citationLabel": "Wikipedia - Newbern, Tennessee"
+      },
+      {
+        "predicate": "were lynched within sight of",
+        "object": "the town's train depot",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Newbern%2C_Tennessee",
+        "citationLabel": "Wikipedia - Newbern, Tennessee"
+      },
+      {
+        "predicate": "were victims of a lynching notable for",
+        "object": "efforts by local community leaders to prevent it",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Newbern%2C_Tennessee",
+        "citationLabel": "Wikipedia - Newbern, Tennessee"
+      },
+      {
+        "predicate": "were accused in connection with",
+        "object": "the murder of a white man",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Newbern%2C_Tennessee",
+        "citationLabel": "Wikipedia - Newbern, Tennessee"
+      }
+    ],
+    "historicalContext": "Lynching was a tool of racial control during the Jim Crow era, used to enforce white supremacy and suppress Black autonomy. The public nature of the Brown brothers' lynching—conducted in view of the town depot—reflects the normalization of racial terror, while community efforts to stop it suggest contested local responses to such violence."
+  },
+  {
+    "id": "lynching_james_dillard_sullivan_indiana",
+    "kind": "person",
+    "displayName": "James Dillard",
+    "summary": "James Dillard, a young Black man from Indianapolis, was lynched by a mob near Oaktown, Indiana, on November 20, 1902, after being accused of assaulting two white women. Despite invocation of Indiana's 1899 anti-lynching law, local authorities failed to protect him, and the sheriff was later removed—though reinstated after legal challenges—highlighting systemic failures in upholding due process.",
+    "eraBuckets": [
+      "1900s"
+    ],
+    "topicTags": [
+      "due-process",
+      "civil-rights",
+      "resistance",
+      "segregation"
+    ],
+    "topicIds": [
+      "due-process",
+      "civil-rights",
+      "resistance",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "Indiana 1899 anti-lynching law",
+      "mob violence",
+      "Sheriff John S. Dudley",
+      "Governor Winfield Durbin"
+    ],
+    "jurisdictionLabel": "Oaktown, Indiana",
+    "locationPrecision": "site",
+    "locationLabel": "Site of lynching near telegraph pole",
+    "lat": 31.4417,
+    "lng": -109.9159,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "near Oaktown, Indiana",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_James_Dillard",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was accused of raping",
+        "object": "two white women, wives of Milton Davis and John Lemon",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_James_Dillard",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "led to invocation of",
+        "object": "Indiana's 1899 anti-lynching law",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_James_Dillard",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "resulted in removal of",
+        "object": "Sheriff John S. Dudley by Governor Winfield Durbin",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_James_Dillard",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is documented as",
+        "object": "one of the first tests of Indiana's 1899 anti-lynching law",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_James_Dillard",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is cited as",
+        "object": "the last well-known lynching in Indiana before the 1930 Marion lynching",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_James_Dillard",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The lynching occurred amid widespread racial terror in the U.S. and tested Indiana’s 1899 anti-lynching law, which mandated militia intervention to protect prisoners. Governor Winfield Durbin’s removal of Sheriff John S. Dudley after the lynching marked a rare enforcement attempt, but Dudley’s reinstatement revealed the law’s ineffectiveness in practice, reflecting broader national patterns of state complicity in racial violence."
+  },
+  {
+    "id": "lynching_jennie_steers_rural_area_near_shreveport_louisiana",
+    "kind": "person",
+    "displayName": "Jennie Steers",
+    "summary": "Jennie Steers, a Black domestic servant, was lynched by a white mob in Caddo Parish, Louisiana, on July 25, 1903, after being accused of poisoning her employer's daughter. Her death is part of a documented pattern of racial terror lynchings in the parish during the Jim Crow era.",
+    "eraBuckets": [
+      "1900s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "civil-rights",
+      "resistance"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "civil-rights",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "Caddo Parish",
+      "Jim Crow",
+      "racial violence",
+      "domestic servant"
+    ],
+    "jurisdictionLabel": "Shreveport, Louisiana",
+    "locationPrecision": "site",
+    "locationLabel": "rural area near Shreveport",
+    "lat": 32.58,
+    "lng": -93.88,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "Jennie Steers",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Caddo_Parish%2C_Louisiana",
+        "citationLabel": "Wikipedia: Caddo Parish, Louisiana"
+      },
+      {
+        "predicate": "occurred in",
+        "object": "Caddo Parish, Louisiana",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Caddo_Parish%2C_Louisiana",
+        "citationLabel": "Wikipedia: Caddo Parish, Louisiana"
+      },
+      {
+        "predicate": "occurred on",
+        "object": "July 25, 1903",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Caddo_Parish%2C_Louisiana",
+        "citationLabel": "Wikipedia: Caddo Parish, Louisiana"
+      },
+      {
+        "predicate": "was accused of",
+        "object": "poisoning her employer's daughter",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Caddo_Parish%2C_Louisiana",
+        "citationLabel": "Wikipedia: Caddo Parish, Louisiana"
+      },
+      {
+        "predicate": "was part of a pattern of",
+        "object": "racial terror lynchings in Caddo Parish",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Caddo_Parish%2C_Louisiana",
+        "citationLabel": "Wikipedia: Caddo Parish, Louisiana"
+      },
+      {
+        "predicate": "was a",
+        "object": "Black domestic servant",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Caddo_Parish%2C_Louisiana",
+        "citationLabel": "Wikipedia: Caddo Parish, Louisiana"
+      }
+    ],
+    "historicalContext": "Caddo Parish, like much of the post-Reconstruction South, experienced widespread racial violence aimed at maintaining white supremacy. Between 1877 and the early 20th century, 48 African Americans were lynched there—second highest in Louisiana—reflecting systemic use of terror to suppress Black communities and enforce racial hierarchies."
+  },
+  {
+    "id": "lynching_fred_coker_springfield_missouri",
+    "kind": "person",
+    "displayName": "Fred Coker",
+    "summary": "Fred Coker was lynched on April 14, 1906, in Springfield, Missouri, alongside Horace B. Duncan and William Allen, after being falsely accused of assaulting a white woman. A mob of over 2,000 white citizens hanged and burned the three men in the courthouse square, demonstrating the pervasive threat of racial terror during the Jim Crow era.",
+    "eraBuckets": [
+      "1900s"
+    ],
+    "topicTags": [
+      "resistance"
+    ],
+    "topicIds": [
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "Springfield Missouri",
+      "racial terror",
+      "Gottfried Tower",
+      "false accusation"
+    ],
+    "jurisdictionLabel": "Springfield, Missouri",
+    "locationPrecision": "site",
+    "locationLabel": "Courthouse square, site of Gottfried Tower",
+    "lat": 37.21527778,
+    "lng": -93.29833333,
+    "claims": [
+      {
+        "predicate": "was lynched on",
+        "object": "April 14, 1906",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Springfield%2C_Missouri",
+        "citationLabel": "Wikipedia - Springfield, Missouri"
+      },
+      {
+        "predicate": "was lynched in",
+        "object": "Springfield, Missouri (Greene County)",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Springfield%2C_Missouri",
+        "citationLabel": "Wikipedia - Springfield, Missouri"
+      },
+      {
+        "predicate": "was lynched alongside",
+        "object": "Horace B. Duncan and William (Bill) Allen",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Springfield%2C_Missouri",
+        "citationLabel": "Wikipedia - Springfield, Missouri"
+      },
+      {
+        "predicate": "was falsely accused of",
+        "object": "assaulting a white woman",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Springfield%2C_Missouri",
+        "citationLabel": "Wikipedia - Springfield, Missouri"
+      },
+      {
+        "predicate": "was hanged and burned by a mob of",
+        "object": "more than 2,000 white citizens",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Springfield%2C_Missouri",
+        "citationLabel": "Wikipedia - Springfield, Missouri"
+      },
+      {
+        "predicate": "was lynched at",
+        "object": "the courthouse square in Springfield, Missouri, from the Gottfried Tower",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Springfield%2C_Missouri",
+        "citationLabel": "Wikipedia - Springfield, Missouri"
+      }
+    ],
+    "historicalContext": "The lynching of Fred Coker occurred during a period of widespread racial terror in the United States, particularly in the South and border states like Missouri, where Black men were often targeted by white mobs under false or unproven accusations. These acts of violence were enabled by the complicity or inaction of local authorities and served to enforce racial hierarchy and suppress Black autonomy, even in regions outside the Deep South."
+  },
+  {
+    "id": "lynching_ben_pettigrew_decaturville_tennessee",
+    "kind": "person",
+    "displayName": "Ben Pettigrew",
+    "summary": "Ben Pettigrew, a Black man, was lynched on December 5, 1911, in Decaturville, Tennessee, after being accused of inciting jealousy due to his respectability and financial success. He was shot, hanged, and burned by four men; two were captured, convicted of first-degree murder, and executed in 1912.",
+    "eraBuckets": [
+      "1910s"
+    ],
+    "topicTags": [
+      "jim-crow"
+    ],
+    "topicIds": [
+      "jim-crow"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "Decaturville",
+      "Tennessee",
+      "racial violence",
+      "1911"
+    ],
+    "jurisdictionLabel": "Decaturville, Tennessee",
+    "locationPrecision": "site",
+    "locationLabel": "site of lynching",
+    "lat": 35.615,
+    "lng": -87.04444444,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "on December 5, 1911, in Decaturville, Tennessee",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/List_of_white_defendants_executed_for_killing_a_black_victim",
+        "citationLabel": "Documented lynching victim"
+      },
+      {
+        "predicate": "was accused of inciting jealousy due to",
+        "object": "his respectability and financial success",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/List_of_white_defendants_executed_for_killing_a_black_victim",
+        "citationLabel": "Documented lynching victim"
+      },
+      {
+        "predicate": "was subjected to violence including",
+        "object": "being shot, hanged, and burned by four men",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/List_of_white_defendants_executed_for_killing_a_black_victim",
+        "citationLabel": "Documented lynching victim"
+      },
+      {
+        "predicate": "had two of his attackers",
+        "object": "John Bailey and George Shelton, captured, convicted of first-degree murder, and executed by hanging on July 26, 1912",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/List_of_white_defendants_executed_for_killing_a_black_victim",
+        "citationLabel": "Documented lynching victim"
+      },
+      {
+        "predicate": "is significant as a documented victim of",
+        "object": "racial terror lynching during the Jim Crow era, a form of violence used to enforce racial hierarchy",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/List_of_white_defendants_executed_for_killing_a_black_victim",
+        "citationLabel": "Documented lynching victim"
+      }
+    ],
+    "historicalContext": "Pettigrew's lynching reflects the widespread use of racial terror during the Jim Crow era to suppress Black economic advancement and autonomy. The rare prosecution and execution of his white killers underscores both the extreme violence of the period and exceptional legal accountability in a small number of cases."
+  },
+  {
+    "id": "lynching_pearl_pettigrew_decaturville_tennessee",
+    "kind": "person",
+    "displayName": "Pearl Pettigrew",
+    "summary": "Pearl Pettigrew, a Black woman, was lynched on December 5, 1911, in Decaturville, Tennessee, by four men who accused her of inciting jealousy due to her respectability and financial success. She was shot, hanged, and her body burned. Two of the perpetrators, John Bailey and George Shelton, were captured, convicted of first-degree murder, and executed by hanging on July 26, 1912.",
+    "eraBuckets": [
+      "1910s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "criminal-justice",
+      "resistance"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "criminal-justice",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "Decaturville",
+      "Tennessee",
+      "racial terror",
+      "Black woman"
+    ],
+    "jurisdictionLabel": "Decaturville, Tennessee",
+    "locationPrecision": "city",
+    "locationLabel": "Site of lynching",
+    "lat": 35.615,
+    "lng": -87.04444444,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "on December 5, 1911, in Decaturville, Tennessee",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/List_of_white_defendants_executed_for_killing_a_black_victim",
+        "citationLabel": "Documented lynching victim"
+      },
+      {
+        "predicate": "was accused of inciting jealousy due to",
+        "object": "her respectability and financial success",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/List_of_white_defendants_executed_for_killing_a_black_victim",
+        "citationLabel": "Documented lynching victim"
+      },
+      {
+        "predicate": "was subjected to",
+        "object": "being shot, hanged, and having her body burned",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/List_of_white_defendants_executed_for_killing_a_black_victim",
+        "citationLabel": "Documented lynching victim"
+      },
+      {
+        "predicate": "had two of her killers",
+        "object": "John Bailey and George Shelton, convicted of first-degree murder and executed by hanging on July 26, 1912",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/List_of_white_defendants_executed_for_killing_a_black_victim",
+        "citationLabel": "Documented lynching victim"
+      },
+      {
+        "predicate": "is significant as a documented case of",
+        "object": "a Black victim whose killers were executed, a rare outcome in U.S. history",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/List_of_white_defendants_executed_for_killing_a_black_victim",
+        "citationLabel": "Documented lynching victim"
+      }
+    ],
+    "historicalContext": "Pettigrew's lynching occurred during a period of widespread racial terror in the South, where Black individuals were often targeted for perceived social or economic transgressions. The conviction and execution of her killers was exceptionally rare, reflecting both the severity of the crime and the limited instances in which white perpetrators faced legal consequences for violence against Black victims."
+  },
+  {
+    "id": "lynching_sanford_lewis_fort_smith_arkansas",
+    "kind": "person",
+    "displayName": "Sanford Lewis",
+    "summary": "Sanford Lewis was lynched in Fort Smith, Arkansas, in 1912 following an accusation of shooting a constable. The incident prompted the dismissal of eleven police officers, including the chief, and the mayor was voted out of office. A man charged in the lynching was acquitted, reflecting the era's systemic impunity for racial violence.",
+    "eraBuckets": [
+      "1910s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "law-enforcement",
+      "criminal-justice"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "law-enforcement",
+      "criminal-justice"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "Fort Smith",
+      "Arkansas",
+      "1912",
+      "racial violence"
+    ],
+    "jurisdictionLabel": "Fort Smith, Arkansas",
+    "locationPrecision": "city",
+    "locationLabel": "Site of 1912 lynching of Sanford Lewis",
+    "lat": 35.37972222,
+    "lng": -94.38194444,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "Sanford Lewis",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Fort_Smith%2C_Arkansas",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "occurred in",
+        "object": "Fort Smith, Arkansas",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Fort_Smith%2C_Arkansas",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "followed accusation of",
+        "object": "shooting a constable",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Fort_Smith%2C_Arkansas",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "resulted in firing of",
+        "object": "eleven police officers, including police chief",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Fort_Smith%2C_Arkansas",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "led to mayor being",
+        "object": "voted out of office",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Fort_Smith%2C_Arkansas",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "involved legal outcome of",
+        "object": "acquittal of man charged with lynching",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Fort_Smith%2C_Arkansas",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Lynching was a tool of racial terror used to enforce white supremacy, particularly in Southern and border states like Arkansas. The failure to convict perpetrators, even amid official misconduct, illustrates the complicity of law enforcement and the judiciary in upholding racial hierarchies during the Jim Crow era."
+  }
+]

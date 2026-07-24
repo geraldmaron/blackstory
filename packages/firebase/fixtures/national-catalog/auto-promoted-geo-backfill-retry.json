@@ -1,0 +1,82 @@
+[
+  {
+    "id": "gap_texas_freedom_colonies_project",
+    "kind": "organization",
+    "displayName": "Texas Freedom Colonies Project",
+    "summary": "The Texas Freedom Colonies Project, founded in 2014 by Andrea R. Roberts, documents and preserves the histories of Black settlements in Texas, known as freedom colonies, established after emancipation. These communities were intentionally created and often overlooked in historical records.",
+    "eraBuckets": [
+      "1910s",
+      "2010s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "history",
+      "black-nationalism",
+      "black-power",
+      "jim-crow"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "history",
+      "black-nationalism",
+      "black-power",
+      "jim-crow"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Texas Freedom Colonies",
+      "Black history",
+      "freedom colonies",
+      "African American settlements",
+      "historic preservation"
+    ],
+    "jurisdictionLabel": "Texas, United States",
+    "locationPrecision": "state",
+    "locationLabel": "Texas",
+    "lat": 30.27472222,
+    "lng": -97.74055556,
+    "claims": [
+      {
+        "predicate": "founded_by",
+        "object": "Andrea R. Roberts",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Andrea_R._Roberts",
+        "citationLabel": "Andrea R. Roberts Wikipedia"
+      },
+      {
+        "predicate": "established_in",
+        "object": "Texas",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Andrea_R._Roberts",
+        "citationLabel": "Andrea R. Roberts Wikipedia"
+      },
+      {
+        "predicate": "documents",
+        "object": "Black settlements",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Andrea_R._Roberts",
+        "citationLabel": "Andrea R. Roberts Wikipedia"
+      },
+      {
+        "predicate": "focuses_on",
+        "object": "Black history preservation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Andrea_R._Roberts",
+        "citationLabel": "Andrea R. Roberts Wikipedia"
+      },
+      {
+        "predicate": "maps",
+        "object": "Texas Freedom Colonies",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Andrea_R._Roberts",
+        "citationLabel": "Andrea R. Roberts Wikipedia"
+      }
+    ],
+    "historicalContext": "The Texas Freedom Colonies Project is significant in the context of Black history, as it addresses the intentional creation of Black communities after emancipation, often in marginalized areas. These colonies were part of broader efforts to establish self-sufficient spaces for freed African Americans, reflecting the resilience and agency of Black communities in the face of systemic oppression."
+  }
+]

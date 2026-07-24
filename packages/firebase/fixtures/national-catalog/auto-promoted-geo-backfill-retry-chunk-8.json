@@ -1,0 +1,63 @@
+[
+  {
+    "id": "gap_2002_salt_lake_city_winter_olympics",
+    "kind": "event",
+    "displayName": "2002 Salt Lake City Winter Olympics",
+    "summary": "The 2002 Salt Lake City Winter Olympics hosted the first-ever Olympic women's bobsled event, marking a significant milestone in women's participation in winter sports and highlighting the role of the event in advancing gender inclusion in international athletics.",
+    "eraBuckets": [
+      "2000s"
+    ],
+    "topicTags": [
+      "sports",
+      "women",
+      "civil-rights",
+      "olympics"
+    ],
+    "topicIds": [
+      "sports",
+      "women",
+      "civil-rights",
+      "olympics"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Salt Lake City",
+      "Winter Olympics",
+      "women's bobsled",
+      "Olympic history",
+      "gender equality"
+    ],
+    "jurisdictionLabel": "Salt Lake City, Utah",
+    "locationPrecision": "city",
+    "locationLabel": "Salt Lake City, United States",
+    "lat": 40.76083333,
+    "lng": -111.89111111,
+    "claims": [
+      {
+        "predicate": "hosted",
+        "object": "first-ever Olympic women's bobsled event",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/2002_Winter_Olympics",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "location",
+        "object": "Salt Lake City, United States",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/2002_Winter_Olympics",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "part_of",
+        "object": "Winter Olympics",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/2002_Winter_Olympics",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The 2002 Winter Olympics, held in Salt Lake City, Utah, were notable for hosting the first-ever Olympic women's bobsled event, which contributed to the broader movement toward gender equality in sports. The event also faced controversies related to the bidding process, including allegations of bribery, which impacted its legacy."
+  }
+]

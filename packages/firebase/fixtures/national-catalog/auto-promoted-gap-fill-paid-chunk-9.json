@@ -1,0 +1,159 @@
+[
+  {
+    "id": "gap_boley_rodeo",
+    "kind": "event",
+    "displayName": "Boley Rodeo",
+    "summary": "The Boley Rodeo, an annual event in Boley, Oklahoma, celebrates the town's ranching heritage and its role as a historically Black community established in the early 20th century.",
+    "eraBuckets": [
+      "1910s",
+      "1920s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "jim-crow",
+      "history",
+      "community"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "jim-crow",
+      "history",
+      "community"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Boley Rodeo",
+      "ranching culture",
+      "Black history",
+      "Oklahoma",
+      "safe haven"
+    ],
+    "jurisdictionLabel": "Boley, Oklahoma",
+    "locationPrecision": "city",
+    "locationLabel": "Boley, Oklahoma",
+    "lat": 35.49055556,
+    "lng": -96.47944444,
+    "claims": [
+      {
+        "predicate": "wasEstablishedIn",
+        "object": "Boley, Oklahoma",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Boley%2C_Oklahoma",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "isPartOf",
+        "object": "Black history",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Boley%2C_Oklahoma",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "celebrates",
+        "object": "ranching culture",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Boley%2C_Oklahoma",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "wasFoundedAs",
+        "object": "predominantly Black pioneer town",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Boley%2C_Oklahoma",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "servedAs",
+        "object": "safe haven for Black Southerners",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Boley%2C_Oklahoma",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The Boley Rodeo is part of the town's cultural traditions, which emerged from its founding as a Black pioneer town in Oklahoma. It reflects the resilience of the community and its significance as a safe haven for Black Southerners during the Jim Crow era."
+  },
+  {
+    "id": "gap_colored_agricultural_and_normal_university",
+    "kind": "institution",
+    "displayName": "Colored Agricultural and Normal University",
+    "summary": "Colored Agricultural and Normal University, established in 1897 in Oklahoma, was created under the second Morrill Act to provide educational opportunities for African Americans in a segregated system. It later became Langston University, a prominent HBCU in the United States.",
+    "eraBuckets": [
+      "1890s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "hbcu",
+      "education",
+      "segregation",
+      "land-grant"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "hbcu",
+      "education",
+      "segregation",
+      "land-grant"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Colored Agricultural and Normal University",
+      "Langston University",
+      "HBCU",
+      "land-grant",
+      "segregation"
+    ],
+    "jurisdictionLabel": "Langston, Oklahoma",
+    "locationPrecision": "city",
+    "locationLabel": "Main campus in Langston, Oklahoma",
+    "lat": 35.94472222,
+    "lng": -97.26138889,
+    "claims": [
+      {
+        "predicate": "established",
+        "object": "Colored Agricultural and Normal University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Langston_University",
+        "citationLabel": "Langston University Wikipedia"
+      },
+      {
+        "predicate": "origin",
+        "object": "Langston University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Langston_University",
+        "citationLabel": "Langston University Wikipedia"
+      },
+      {
+        "predicate": "purpose",
+        "object": "educational access for African Americans",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Langston_University",
+        "citationLabel": "Langston University Wikipedia"
+      },
+      {
+        "predicate": "renamed",
+        "object": "Langston University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Langston_University",
+        "citationLabel": "Langston University Wikipedia"
+      },
+      {
+        "predicate": "historical_significance",
+        "object": "response to segregation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Langston_University",
+        "citationLabel": "Langston University Wikipedia"
+      }
+    ],
+    "historicalContext": "The founding of Colored Agricultural and Normal University in 1897 was a direct response to the second Morrill Act, which mandated that states either admit African Americans to their land-grant institutions or provide an alternative. This reflects the broader context of segregation and the systemic barriers faced by Black Americans in accessing higher education."
+  }
+]

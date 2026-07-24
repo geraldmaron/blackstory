@@ -45,7 +45,8 @@ type SideContext = {
 };
 
 type PairSignal =
-  { readonly kind: 'vector'; readonly distance: number } | { readonly kind: 'mention' };
+  | { readonly kind: 'vector'; readonly distance: number }
+  | { readonly kind: 'mention' };
 
 type CandidatePair = {
   readonly pairKey: string;

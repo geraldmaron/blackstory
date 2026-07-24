@@ -10,6 +10,7 @@ import {
   extractMessageContent,
   openRouterModelExtraBody,
   openRouterUsesJsonObjectMode,
+  stripMarkdownCodeFence,
 } from './llm-provider.ts';
 import { runEditorialJudge } from './editorial-run.ts';
 
@@ -343,4 +344,56 @@ test('openrouter rotates to the next model even on a non-retryable error (e.g. 4
     'nvidia/nemotron-3-super-120b-a12b:free',
   ]);
   assert.equal(result.modelId, 'nvidia/nemotron-3-super-120b-a12b:free');
+});
+
+test('stripMarkdownCodeFence removes a ```json fence', () => {
+  const fenced = '```json\n{\n  "decision": "keep"\n}\n```';
+  assert.equal(stripMarkdownCodeFence(fenced), '{\n  "decision": "keep"\n}');
+});
+
+test('stripMarkdownCodeFence removes a bare ``` fence', () => {
+  assert.equal(stripMarkdownCodeFence('```\n{"a":1}\n```'), '{"a":1}');
+});
+
+test('stripMarkdownCodeFence leaves unfenced content untouched', () => {
+  assert.equal(stripMarkdownCodeFence('{"a":1}'), '{"a":1}');
+});
+
+test('extractMessageContent strips a code fence so the content is usable JSON', () => {
+  const fenced = '```json\n{"decision":"keep","rationale":"x"}\n```';
+  assert.equal(extractMessageContent({ content: fenced }), '{"decision":"keep","rationale":"x"}');
+});
+
+test('hybrid does NOT fail over when openrouter wraps valid JSON in a code fence', async () => {
+  let ollamaCalls = 0;
+  const fetchImpl: typeof fetch = async (input) => {
+    const url = String(input);
+    if (url.includes('openrouter.ai')) {
+      return Response.json({
+        model: 'mistralai/mistral-small-3.2-24b-instruct',
+        choices: [
+          {
+            message: {
+              role: 'assistant',
+              content:
+                '```json\n{"decision":"keep","rationale":"ok","confidence":0.8,"drafts":{}}\n```',
+            },
+          },
+        ],
+      });
+    }
+    if (url.includes('/api/chat')) {
+      ollamaCalls += 1;
+      throw new Error('ollama should not be called');
+    }
+    throw new Error(`unexpected ${url}`);
+  };
+  const provider = createHybridLlmProvider({ apiKey: 'test-key', fetchImpl, maxAttempts: 1 });
+  const result = await provider.complete({
+    model: 'openrouter/free',
+    messages: [{ role: 'user', content: 'hi' }],
+  });
+  assert.equal(result.servedBy, 'openrouter');
+  assert.equal(ollamaCalls, 0);
+  assert.equal(result.content, '{"decision":"keep","rationale":"ok","confidence":0.8,"drafts":{}}');
 });

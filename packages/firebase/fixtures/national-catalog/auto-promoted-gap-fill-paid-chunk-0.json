@@ -1,0 +1,714 @@
+[
+  {
+    "id": "gap_tarboro",
+    "kind": "place",
+    "displayName": "Tarboro",
+    "summary": "After Union forces occupied the region in 1865, freed people camped on the Tar River opposite Tarboro, marking a moment of transition from enslavement to self-determined community life during early Reconstruction in eastern North Carolina.",
+    "eraBuckets": [
+      "1860s"
+    ],
+    "topicTags": [
+      "emancipation",
+      "freedom",
+      "great-migration",
+      "resistance",
+      "self-determination"
+    ],
+    "topicIds": [
+      "emancipation",
+      "freedom",
+      "great-migration",
+      "resistance",
+      "self-determination"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "freed people",
+      "Tar River",
+      "Union occupation",
+      "encampment",
+      "Reconstruction"
+    ],
+    "jurisdictionLabel": "Tarboro, North Carolina",
+    "locationPrecision": "site",
+    "locationLabel": "Opposite bank of the Tar River near Tarboro",
+    "lat": 35.905,
+    "lng": -77.55638889,
+    "claims": [
+      {
+        "predicate": "was site of encampment by freed people",
+        "object": "after Union occupation in 1865",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Tarboro%2C_North_Carolina",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Following the Civil War, thousands of freed people moved to establish independent communities near rivers and towns, often occupying land previously controlled by enslavers. Tarboro\u2019s location on the Tar River placed it within this landscape of post-enslavement mobility and settlement, as freed people sought safety, kinship, and economic opportunity in the uncertain period after Emancipation."
+  },
+  {
+    "id": "gap_freedom_hill",
+    "kind": "place",
+    "displayName": "Freedom Hill",
+    "summary": "Freedom Hill, established in 1865 by freed slaves after the Civil War, was named in recognition of a Union soldier's announcement of the Emancipation Proclamation. It became Princeville in 1885 and was the first independently governed African American community in the United States.",
+    "eraBuckets": [
+      "1860s",
+      "1880s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "freedom",
+      "jim-crow",
+      "reconstruction",
+      "segregation"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "freedom",
+      "jim-crow",
+      "reconstruction",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Freedom Hill",
+      "Princeville",
+      "Emancipation Proclamation",
+      "Freedmen's Bureau",
+      "Black self-governance"
+    ],
+    "jurisdictionLabel": "Princeville, North Carolina",
+    "locationPrecision": "site",
+    "locationLabel": "Freedom Hill",
+    "lat": 35.88833333,
+    "lng": -77.52888889,
+    "claims": [
+      {
+        "predicate": "was established by",
+        "object": "freed slaves",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Princeville%2C_North_Carolina",
+        "citationLabel": "Princeville, North Carolina"
+      },
+      {
+        "predicate": "was named",
+        "object": "Freedom Hill",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Princeville%2C_North_Carolina",
+        "citationLabel": "Princeville, North Carolina"
+      },
+      {
+        "predicate": "was incorporated as",
+        "object": "Princeville",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Princeville%2C_North_Carolina",
+        "citationLabel": "Princeville, North Carolina"
+      },
+      {
+        "predicate": "was the first independently governed African American community",
+        "object": "in the United States",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Princeville%2C_North_Carolina",
+        "citationLabel": "Princeville, North Carolina"
+      },
+      {
+        "predicate": "was named in recognition of",
+        "object": "a Union soldier's announcement of the Emancipation Proclamation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Princeville%2C_North_Carolina",
+        "citationLabel": "Princeville, North Carolina"
+      }
+    ],
+    "historicalContext": "Freedom Hill is a pivotal example of Black self-governance and community-building in the post-Civil War South. It was established by freed slaves who sought refuge and autonomy, reflecting the broader struggles for freedom and civil rights. The community's development was influenced by the Freedmen's Bureau and the challenges of Reconstruction."
+  },
+  {
+    "id": "gap_oxford_alabama",
+    "kind": "place",
+    "displayName": "Oxford, Alabama",
+    "summary": "Oxford, Alabama, redrew its limits in 1899 to exclude the [[gap_mooree_quarter|Mooree Quarter]], which became Hobson City, a town with 100% Black government. This reflects the racial dynamics of the Jim Crow era.",
+    "eraBuckets": [
+      "1890s",
+      "1900s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "segregation",
+      "civil-rights",
+      "history",
+      "migration"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "segregation",
+      "civil-rights",
+      "history",
+      "migration"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Oxford, Alabama",
+      "Mooree Quarter",
+      "Hobson City",
+      "Jim Crow",
+      "segregation"
+    ],
+    "jurisdictionLabel": "Oxford, Alabama",
+    "locationPrecision": "city",
+    "locationLabel": "Oxford, Alabama",
+    "lat": 33.61944444,
+    "lng": -85.87222222,
+    "claims": [
+      {
+        "predicate": "redrew its limits",
+        "object": "Mooree Quarter",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Oxford%2C_Alabama",
+        "citationLabel": "Oxford, Alabama Wikipedia"
+      },
+      {
+        "predicate": "created",
+        "object": "Hobson City",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Oxford%2C_Alabama",
+        "citationLabel": "Oxford, Alabama Wikipedia"
+      },
+      {
+        "predicate": "had 100% Black government",
+        "object": "Hobson City",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Oxford%2C_Alabama",
+        "citationLabel": "Oxford, Alabama Wikipedia"
+      }
+    ],
+    "historicalContext": "Oxford, Alabama, is historically significant for its role in the Jim Crow era, particularly through the redrawing of its limits in 1899 to exclude the Mooree Quarter. This action led to the creation of Hobson City, a town with 100% Black government, highlighting the racial segregation and political dynamics of the time."
+  },
+  {
+    "id": "gap_mooree_quarter",
+    "kind": "place",
+    "displayName": "Mooree Quarter",
+    "summary": "The Mooree Quarter, located north and west of [[gap_oxford_alabama|Oxford, Alabama]], was the site of the first all-black incorporated town in the United States, Hobson City, established in 1899. This marked a significant milestone in Black history and civil rights.",
+    "eraBuckets": [
+      "1890s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "black-power",
+      "jim-crow",
+      "firsts"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "black-power",
+      "jim-crow",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Mooree Quarter",
+      "Hobson City",
+      "Black history",
+      "segregation",
+      "civil rights"
+    ],
+    "jurisdictionLabel": "Oxford, Alabama",
+    "locationPrecision": "site",
+    "locationLabel": "Mooree Quarter",
+    "lat": 33.61944444,
+    "lng": -85.87222222,
+    "claims": [
+      {
+        "predicate": "was the site of",
+        "object": "Hobson City",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Oxford%2C_Alabama",
+        "citationLabel": "Oxford, Alabama Wikipedia"
+      },
+      {
+        "predicate": "was incorporated",
+        "object": "Hobson City",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Oxford%2C_Alabama",
+        "citationLabel": "Oxford, Alabama Wikipedia"
+      },
+      {
+        "predicate": "was the first all-black incorporated town",
+        "object": "Hobson City",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Oxford%2C_Alabama",
+        "citationLabel": "Oxford, Alabama Wikipedia"
+      }
+    ],
+    "historicalContext": "The Mooree Quarter's significance lies in its role as the foundation for Hobson City, the first all-black incorporated town in the United States. This development is a key example of Black agency and self-governance during the Jim Crow era, highlighting the broader struggles and achievements of African Americans in the face of systemic segregation."
+  },
+  {
+    "id": "gap_purple_hull_pea_festival",
+    "kind": "event",
+    "displayName": "Purple Hull Pea Festival",
+    "summary": "The Purple Hull Pea Festival is a cultural event that sustains the community's oral and material heritage, rooted in the history of freedmen's settlements in Texas.",
+    "eraBuckets": [
+      "1860s",
+      "1900s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "jim-crow",
+      "community"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "jim-crow",
+      "community"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Purple Hull Pea Festival",
+      "Shankleville",
+      "freedmen's settlements",
+      "cultural heritage",
+      "community"
+    ],
+    "jurisdictionLabel": "Newton County, Texas",
+    "locationPrecision": "town",
+    "locationLabel": "Shankleville",
+    "lat": 30.97027778,
+    "lng": -93.70694444,
+    "claims": [
+      {
+        "predicate": "sustains",
+        "object": "community's oral and material heritage",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Shankleville%2C_Texas",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "rooted_in",
+        "object": "history_of_freedmen's_settlements_in_Texas",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Shankleville%2C_Texas",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "reflects",
+        "object": "community's_resilience_and_cultural_continuity",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Shankleville%2C_Texas",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The Purple Hull Pea Festival is tied to the legacy of freedmen's settlements in Texas, particularly Shankleville, founded by Jim and Winnie Shankle and Stephen McBride. It reflects the community's resilience and cultural continuity in the face of historical challenges such as segregation and economic disenfranchisement."
+  },
+  {
+    "id": "gap_lincoln_townsite_company",
+    "kind": "organization",
+    "displayName": "Lincoln Townsite Company",
+    "summary": "The Lincoln Townsite Company was formed in 1903 by J. A. Roper, Lemuel Jackson, and John Grayson to establish Clearview, Oklahoma, an all-black freedmen's town. This company played a key role in the development of a historically Black community in the Jim Crow South.",
+    "eraBuckets": [
+      "1900s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "civil-rights",
+      "migration",
+      "land-ownership",
+      "history"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "civil-rights",
+      "migration",
+      "land-ownership",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Lincoln Townsite Company",
+      "Clearview",
+      "Oklahoma",
+      "freedmen's town",
+      "Black history"
+    ],
+    "jurisdictionLabel": "Clearview, Oklahoma",
+    "locationPrecision": "city",
+    "locationLabel": "Clearview, Oklahoma",
+    "lat": 35.39861111,
+    "lng": -96.1875,
+    "claims": [
+      {
+        "predicate": "formed",
+        "object": "Lincoln Townsite Company",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Clearview%2C_Oklahoma",
+        "citationLabel": "Clearview, Oklahoma"
+      },
+      {
+        "predicate": "platted",
+        "object": "Clearview",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Clearview%2C_Oklahoma",
+        "citationLabel": "Clearview, Oklahoma"
+      },
+      {
+        "predicate": "designated",
+        "object": "Lincoln",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Clearview%2C_Oklahoma",
+        "citationLabel": "Clearview, Oklahoma"
+      },
+      {
+        "predicate": "established",
+        "object": "Clearview",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Clearview%2C_Oklahoma",
+        "citationLabel": "Clearview, Oklahoma"
+      },
+      {
+        "predicate": "historically",
+        "object": "all-black freedmen's town",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Clearview%2C_Oklahoma",
+        "citationLabel": "Clearview, Oklahoma"
+      }
+    ],
+    "historicalContext": "The Lincoln Townsite Company's formation in 1903 was part of a broader pattern of Black land ownership and community-building in the Jim Crow South. Clearview, Oklahoma, was designated as an all-black freedmen's town, reflecting the historical context of Black migration and the establishment of segregated communities following emancipation."
+  },
+  {
+    "id": "gap_banneker_school",
+    "kind": "school",
+    "displayName": "Banneker School",
+    "summary": "The Banneker School, located in St. Louis, Missouri, was a historic Black school active from 1940 to 2005. It was part of the Banneker District and played a role in the education of African American students during the era of segregation.",
+    "eraBuckets": [
+      "1940s",
+      "1950s",
+      "1970s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "education",
+      "segregation",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "education",
+      "segregation",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Banneker School",
+      "Rosenwald Fund",
+      "St. Louis",
+      "Black school",
+      "National Register"
+    ],
+    "jurisdictionLabel": "St. Louis, Missouri",
+    "locationPrecision": "address",
+    "locationLabel": "2840 Samuel Shepard Drive",
+    "lat": 38.63666667,
+    "lng": -90.21888889,
+    "claims": [
+      {
+        "predicate": "was_funded_by",
+        "object": "Rosenwald Fund",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Banneker_School",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served_as",
+        "object": "Black_school",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Banneker_School",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_part_of",
+        "object": "Banneker_District",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Banneker_School",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_connected_to",
+        "object": "Samuel_T._Shepard_Jr.",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Banneker_School",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_listed_on",
+        "object": "National_Register_of_Historic_Places",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Banneker_School",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The Banneker School is part of the broader history of segregation in education, particularly in St. Louis, Missouri. It was a Rosenwald-funded school and served as a key institution in the Banneker District, which was involved in efforts to provide education to Black students during the mid-20th century. The school's role in the civil rights movement is also evident through its connection to Samuel T. Shepard Jr., who led educational innovations in the district."
+  },
+  {
+    "id": "gap_st_john_s_baptist_church",
+    "kind": "organization",
+    "displayName": "St. John's Baptist Church",
+    "summary": "St. John's Baptist Church in Miami, Florida, has a rich history of community service and leadership, including hosting the National Baptist Convention and contributing to civil rights efforts.",
+    "eraBuckets": [
+      "1900s",
+      "1940s",
+      "1960s",
+      "1980s",
+      "2000s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "history",
+      "community",
+      "church"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "history",
+      "community",
+      "church"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "St. John's Baptist Church",
+      "Miami",
+      "National Baptist Convention",
+      "civil rights",
+      "historic site"
+    ],
+    "jurisdictionLabel": "Miami, Florida",
+    "locationPrecision": "address",
+    "locationLabel": "1328 N.W. 3rd Ave.",
+    "lat": 25.787348,
+    "lng": -80.199993,
+    "claims": [
+      {
+        "predicate": "located_at",
+        "object": "1328 N.W. 3rd Ave., Miami, Florida",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/St._John's_Baptist_Church_(Miami)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "established",
+        "object": "1906",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/St._John's_Baptist_Church_(Miami)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "hosted",
+        "object": "National Baptist Convention",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/St._John's_Baptist_Church_(Miami)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "contributed_to",
+        "object": "civil rights",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/St._John's_Baptist_Church_(Miami)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "added_to",
+        "object": "U.S. National Register of Historic Places",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/St._John's_Baptist_Church_(Miami)",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "St. John's Baptist Church is a historic church in Miami, Florida, that has played a significant role in the community through its leadership in civil rights and community development. It was added to the U.S. National Register of Historic Places in 1992."
+  },
+  {
+    "id": "gap_freedmen_s_hospital",
+    "kind": "institution",
+    "displayName": "Freedmen's Hospital",
+    "summary": "Freedmen's Hospital, established in 1862, was the first hospital to provide medical treatment for former slaves and later became a major hospital for the African American community in Washington, D.C. It is now known as Howard University Hospital and is affiliated with Howard University's medical school.",
+    "eraBuckets": [
+      "1860s",
+      "1900s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "healthcare",
+      "history",
+      "jim-crow"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "healthcare",
+      "history",
+      "jim-crow"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Freedmen's Hospital",
+      "Howard University Hospital",
+      "medical care",
+      "African American community",
+      "Howard University"
+    ],
+    "jurisdictionLabel": "Washington, D.C.",
+    "locationPrecision": "address",
+    "locationLabel": "2041 Georgia Ave., NW",
+    "lat": 38.9175,
+    "lng": -77.02,
+    "claims": [
+      {
+        "predicate": "was_founded_in",
+        "object": "1862",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Howard_University_Hospital",
+        "citationLabel": "Howard University Hospital Wikipedia"
+      },
+      {
+        "predicate": "was_first_hospital_for_former_slaves",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Howard_University_Hospital",
+        "citationLabel": "Howard University Hospital Wikipedia"
+      },
+      {
+        "predicate": "was_affiliated_with",
+        "object": "Howard University Medical School",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Howard_University_Hospital",
+        "citationLabel": "Howard University Hospital Wikipedia"
+      },
+      {
+        "predicate": "served_as_major_hospital_for",
+        "object": "African American community",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Howard_University_Hospital",
+        "citationLabel": "Howard University Hospital Wikipedia"
+      },
+      {
+        "predicate": "was_renamed",
+        "object": "Howard University Hospital",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Howard_University_Hospital",
+        "citationLabel": "Howard University Hospital Wikipedia"
+      }
+    ],
+    "historicalContext": "Freedmen's Hospital was founded in the aftermath of the Civil War to serve the medical needs of freed African Americans, reflecting the broader context of Reconstruction and the establishment of institutions to support Black communities. It later became a key institution in the development of Black medical education and healthcare access."
+  },
+  {
+    "id": "gap_meharry",
+    "kind": "school",
+    "displayName": "Meharry",
+    "summary": "Meharry Medical College, founded in 1876, was the first medical school for African Americans in the South and played a pivotal role in addressing healthcare disparities during segregation.",
+    "eraBuckets": [
+      "1870s",
+      "1900s",
+      "2000s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "healthcare",
+      "education",
+      "segregation",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "healthcare",
+      "education",
+      "segregation",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "medical school",
+      "historically black college",
+      "healthcare disparities",
+      "segregation",
+      "African American education"
+    ],
+    "jurisdictionLabel": "Nashville, Tennessee",
+    "locationPrecision": "city",
+    "locationLabel": "Nashville, Tennessee",
+    "lat": 36.167,
+    "lng": -86.807,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "1876",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Meharry_Medical_College",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "first_medical_school_for_african_americans_in_south",
+        "object": "Meharry Medical College",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Meharry_Medical_College",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "addressed_healthcare_disparities_during_segregation",
+        "object": "Meharry Medical College",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Meharry_Medical_College",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "established_to_combat_medical_education_exclusion",
+        "object": "Meharry Medical College",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Meharry_Medical_College",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "second_largest_educator_of_african_american_medical_doctors",
+        "object": "Meharry Medical College",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Meharry_Medical_College",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Meharry Medical College was established in response to the exclusion of African Americans from many public and private racially segregated institutions of higher education, particularly after the end of Reconstruction. It was one of six medical institutions founded in Tennessee between 1876 and 1900 to address the shortage of African-American physicians and the lack of accessibility to medical education."
+  }
+]

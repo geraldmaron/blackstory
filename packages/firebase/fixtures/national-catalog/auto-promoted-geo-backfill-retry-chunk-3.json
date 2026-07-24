@@ -1,0 +1,161 @@
+[
+  {
+    "id": "gap_10th_u_s_cavalry",
+    "kind": "organization",
+    "displayName": "10th U.S. Cavalry",
+    "summary": "The 10th U.S. Cavalry, known as the Buffalo Soldiers, was one of the first peacetime Black regiments in the U.S. Army, organized at Fort Leavenworth in 1866. The regiment played a significant role in the Indian Wars, the Spanish\u2013American War, and the Mexican Punitive Expedition, with notable contributions by African American officers like Major Charles Young.",
+    "eraBuckets": [
+      "1860s",
+      "1910s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "military",
+      "segregation",
+      "history",
+      "jim-crow"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "military",
+      "segregation",
+      "history",
+      "jim-crow"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Buffalo Soldiers",
+      "10th Cavalry",
+      "Mexican Punitive Expedition",
+      "Major Charles Young",
+      "Fort Leavenworth"
+    ],
+    "jurisdictionLabel": "Kansas, United States",
+    "locationPrecision": "city",
+    "locationLabel": "Fort Leavenworth",
+    "lat": 39.355,
+    "lng": -94.92111111,
+    "claims": [
+      {
+        "predicate": "was",
+        "object": "one of the Army's first peacetime Black regiments",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/10th_Cavalry_Regiment_(United_States)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "organized at",
+        "object": "Fort Leavenworth",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/10th_Cavalry_Regiment_(United_States)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served in",
+        "object": "the Indian Wars",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/10th_Cavalry_Regiment_(United_States)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served in",
+        "object": "the Mexican Punitive Expedition",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.nps.gov/prsf/learn/historyculture/pursuing-pancho-villa.htm",
+        "citationLabel": "NPS"
+      },
+      {
+        "predicate": "notable commander",
+        "object": "Major Charles Young",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.nps.gov/prsf/learn/historyculture/pursuing-pancho-villa.htm",
+        "citationLabel": "NPS"
+      }
+    ],
+    "historicalContext": "The 10th Cavalry was part of the post-Civil War Regular Army and served in various conflicts, including the Indian Wars and the Mexican Punitive Expedition. Its service highlights the role of Black soldiers in U.S. military history and the broader context of segregation and racial discrimination within the military."
+  },
+  {
+    "id": "gap_whipper_elliott_and_allen",
+    "kind": "organization",
+    "displayName": "Whipper, Elliott, and Allen",
+    "summary": "Whipper, Elliott, and Allen is recognized as the first known African American law firm in the United States, established by Robert Brown Elliott and his colleagues in the 1860s.",
+    "eraBuckets": [
+      "1860s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "law",
+      "segregation",
+      "firsts",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "law",
+      "segregation",
+      "firsts",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "law firm",
+      "African American",
+      "civil rights",
+      "Reconstruction",
+      "South Carolina"
+    ],
+    "jurisdictionLabel": "Charleston, South Carolina",
+    "locationPrecision": "city",
+    "locationLabel": "Columbia, South Carolina",
+    "lat": 34.00055556,
+    "lng": -81.03472222,
+    "claims": [
+      {
+        "predicate": "established",
+        "object": "Whipper, Elliott, and Allen",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Robert_B._Elliott",
+        "citationLabel": "Robert Brown Elliott"
+      },
+      {
+        "predicate": "recognized_as",
+        "object": "first known African American law firm",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Robert_B._Elliott",
+        "citationLabel": "Robert Brown Elliott"
+      },
+      {
+        "predicate": "formed",
+        "object": "nation's first known African-American law firm",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Robert_B._Elliott",
+        "citationLabel": "Robert Brown Elliott"
+      },
+      {
+        "predicate": "involved_in",
+        "object": "fight against segregation",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Robert_B._Elliott",
+        "citationLabel": "Robert Brown Elliott"
+      },
+      {
+        "predicate": "advocated_for",
+        "object": "civil rights",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Robert_B._Elliott",
+        "citationLabel": "Robert Brown Elliott"
+      }
+    ],
+    "historicalContext": "Whipper, Elliott, and Allen played a pivotal role in the legal and political landscape of post-Civil War South Carolina, contributing to the fight against segregation and advocating for civil rights during the Reconstruction era."
+  }
+]

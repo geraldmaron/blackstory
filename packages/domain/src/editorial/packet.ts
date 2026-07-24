@@ -22,6 +22,19 @@ export type EditorialClaimDraft = {
   readonly citationLabel: string;
 };
 
+/**
+ * Judge-derived text location, distinct from a subject's own lat/lng (which comes
+ * from a structured source like Wikidata coordinates, never guessed by the judge).
+ * Omit entirely when the subject has no single documented location (most
+ * organizations, laws, and movements legitimately don't) — that's correct, not a
+ * gap to force-fill.
+ */
+export type EditorialLocationDraft = {
+  readonly jurisdictionLabel: string;
+  readonly locationLabel: string;
+  readonly locationPrecision: string;
+};
+
 export type EditorialFieldDraft = {
   readonly publicSummary?: string;
   readonly historicalContext?: string;
@@ -36,6 +49,7 @@ export type EditorialFieldDraft = {
   /** Decade buckets like "1910s"; only when the era is evidenced. */
   readonly eraBuckets?: readonly string[];
   readonly keywords?: readonly string[];
+  readonly location?: EditorialLocationDraft;
 };
 
 export type EditorialPacketModel = {
