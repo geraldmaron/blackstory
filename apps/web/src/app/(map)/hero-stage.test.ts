@@ -60,7 +60,14 @@ describe('home hero panel structure', () => {
   it('styles one Surface panel with side-by-side copy and map columns', () => {
     assert.match(shellCss, /\.ds-home-hero\s*\{[^}]*grid-template-columns:\s*46fr 54fr/s);
     assert.match(shellCss, /\.ds-home-hero\s*\{[^}]*background:\s*transparent/s);
-    assert.match(shellCss, /\.ds-home-hero__copy\s*\{[^}]*background:\s*var\(--ds-surface\)/s);
+    assert.match(
+      shellCss,
+      /\.ds-home-hero__copy\s*\{[^}]*background:\s*color-mix\(in srgb,\s*var\(--ds-surface\)\s*72%,\s*transparent\)/s,
+    );
+    assert.match(
+      shellCss,
+      /\[data-theme='dark'\]\s+\.ds-home-hero__copy\s*\{[^}]*background:\s*color-mix\(in srgb,\s*var\(--ds-surface\)\s*84%,\s*transparent\)/s,
+    );
     assert.match(shellCss, /\.ds-home-hero__copy\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
     assert.match(shellCss, /\.ds-home-hero__copy\s*\{[^}]*grid-column:\s*1/s);
     assert.match(
@@ -71,6 +78,7 @@ describe('home hero panel structure', () => {
     assert.match(shellCss, /\.ds-home-hero__map\s*\{[^}]*background:\s*transparent/s);
     assert.doesNotMatch(shellCss, /\.ds-home-hero__map-frame/);
     assert.doesNotMatch(shellCss, /\.ds-home-hero__copy::after/);
+    assert.doesNotMatch(shellCss, /backdrop-filter/);
     assert.match(shellCss, /--ds-home-panel-padding/);
   });
 

@@ -769,8 +769,9 @@
   grid-template-rows: minmax(0, 1fr);
   gap: 0;
   align-items: stretch;
-  /* Transparent shell — copy column carries opaque Surface; map column is a
-     window through to the clipped ADR-017 MapStage plate beneath `.ds-home`. */
+  /* Transparent shell — copy column is a flat translucent Surface scrim; map
+     column stays a pass-through window to the ADR-017 MapStage inset (map
+     column bounds only — do not reframe the plate under the copy). */
   background: transparent;
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
@@ -827,10 +828,17 @@
   padding: var(--ds-home-panel-padding, var(--ds-space-8));
   position: relative;
   min-height: 0;
-  background: var(--ds-surface);
+  /* Flat matte scrim — Surface at 72% (was opaque 100%). Theme ink stays WCAG
+     AA; dark bumps mix below. No blur/glow/gradient; map inset unchanged. */
+  background: color-mix(in srgb, var(--ds-surface) 72%, transparent);
   color: var(--ds-ink);
   border-right: var(--ds-border-width) solid var(--ds-border);
   pointer-events: auto;
+}
+
+[data-theme='dark'] .ds-home-hero__copy {
+  /* Slightly denser mix so paper ink keeps AA on charcoal canvas bleed. */
+  background: color-mix(in srgb, var(--ds-surface) 84%, transparent);
 }
 
 .ds-home-hero__copy > * {
