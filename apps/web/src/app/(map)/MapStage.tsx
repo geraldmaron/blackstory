@@ -1510,7 +1510,9 @@ export function MapStageProvider({
 
       // Bounds fits already encode padding in center/zoom — re-applying padding on
       // ease/fly would double-shift (hero west coast pinned to the copy divider).
-      const motionPadding = boundsFitted ? 0 : padding;
+      const motionPadding = boundsFitted
+        ? { top: 0, bottom: 0, left: 0, right: 0 }
+        : padding;
 
       if (reduced || preset.duration <= 0) {
         map.jumpTo({ center, zoom, padding: motionPadding });

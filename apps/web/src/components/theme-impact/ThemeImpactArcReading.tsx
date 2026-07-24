@@ -9,6 +9,7 @@ import {
   listThemeImpactLinkedStatutes,
   listThemeImpactLinkedStatutesForQuestion,
   type ThemeImpactPacketView,
+  type ThemeImpactPolicyEraView,
 } from '@repo/domain';
 import { LinkedProse } from '../entity/LinkedProse';
 import { EntityLink } from '../entity/EntityLink';
@@ -26,7 +27,7 @@ export type ThemeImpactArcReadingProps = {
 
 function uniqueEras(packets: readonly ThemeImpactPacketView[]) {
   const seen = new Set<string>();
-  const eras: ThemeImpactPacketView['policyEras'] = [];
+  const eras: ThemeImpactPolicyEraView[] = [];
   for (const packet of packets) {
     for (const era of packet.policyEras) {
       if (seen.has(era.id)) continue;
