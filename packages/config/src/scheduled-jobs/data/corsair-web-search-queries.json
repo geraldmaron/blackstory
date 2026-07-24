@@ -1,12 +1,7 @@
 {
   "schemaVersion": "corsair-web-search-queries.v1",
-<<<<<<< Updated upstream
-  "updatedAt": "2026-07-21",
-  "purpose": "Rotating SearXNG SERP queries for Corsair discovery. These are search-result leads only \u2014 not HTML body scrapes. Full crawl of blackwomenleadproject.org remains gated on source-policy audit (repo-tt2u.13).",
-=======
   "updatedAt": "2026-07-22",
   "purpose": "Rotating SearXNG SERP queries for Corsair discovery. These are search-result leads only — not HTML body scrapes. Full crawl of blackwomenleadproject.org remains gated on source-policy audit (repo-tt2u.13). 2026-07-22 wave adds firsts / plantations / uprisings / state pioneers to cast a broader net.",
->>>>>>> Stashed changes
   "safeties": {
     "serpOnly": true,
     "htmlCrawlForbiddenUntil": "repo-tt2u.13",
@@ -36,14 +31,11 @@
     "reporter.nih.gov",
     "nces.ed.gov",
     "npgallery.nps.gov",
-<<<<<<< Updated upstream
     "pen.org",
-    "ala.org"
-=======
+    "ala.org",
     "blackpast.org",
     "64parishes.org",
     "hmdb.org"
->>>>>>> Stashed changes
   ],
   "queries": [
     {
@@ -155,7 +147,6 @@
       "text": "African American mutual aid society OR fraternal lodge historic"
     },
     {
-<<<<<<< Updated upstream
       "id": "book-bans-pen",
       "intent": "site_focus",
       "theme": "book_challenges",
@@ -178,7 +169,8 @@
       "intent": "open_web",
       "theme": "book_challenges",
       "text": "site:npr.org OR site:apnews.com book ban school library"
-=======
+    },
+    {
       "id": "first-black-pilots",
       "intent": "open_web",
       "theme": "firsts_aviation",
@@ -261,7 +253,6 @@
       "intent": "open_web",
       "theme": "firsts_aviation",
       "text": "Tuskegee Airmen OR Black pilots World War II OR Golden Thirteen Navy African American aviation history"
->>>>>>> Stashed changes
     }
   ]
 }
