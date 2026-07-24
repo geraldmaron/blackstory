@@ -751,7 +751,9 @@
   flex-direction: column;
   gap: var(--ds-space-5);
   padding-block: 0 var(--ds-space-6);
-  background: var(--ds-canvas);
+  /* Transparent — atmosphere ::before supplies canvas + grain; opaque fill here
+     made the hero copy color-mix scrim read as a solid cream slab. */
+  background: transparent;
   --ds-home-panel-padding: var(--ds-space-8);
   --ds-home-panel-padding-compact: var(--ds-space-6);
 }
@@ -781,7 +783,27 @@
 }
 
 .ds-home-hero::before {
-  content: none;
+  /* Copy-column plate: same Archive Paper + grain/grid as the page atmosphere
+     so the grid reads as clearly as the map-column window. Copy text sits in a
+     transparent layer above. Map column stays clear for the MapStage inset. */
+  content: '';
+  grid-column: 1;
+  grid-row: 1;
+  z-index: 1;
+  pointer-events: none;
+  align-self: stretch;
+  justify-self: stretch;
+  min-width: 0;
+  min-height: 100%;
+  background-color: var(--ds-canvas);
+  background-image: var(--ds-edition-pattern-archive-grid), var(--ds-edition-pattern-grain);
+  background-size: 20rem 20rem, 256px 256px;
+  background-position: 0 0, 0 0;
+  background-repeat: repeat, repeat;
+}
+
+[data-theme='dark'] .ds-home-hero::before {
+  background-image: var(--ds-edition-pattern-archive-grid-dark), var(--ds-edition-pattern-grain);
 }
 
 .ds-home-hero__map {
@@ -828,17 +850,17 @@
   padding: var(--ds-home-panel-padding, var(--ds-space-8));
   position: relative;
   min-height: 0;
-  /* Open flat matte scrim — Surface 60% (was opaque 100%, then 72%/48%). Map
-     inset stays on the map column; no blur/glow/gradient. */
-  background: color-mix(in srgb, var(--ds-surface) 60%, transparent);
+  /* Transparent — plate fill + archive grid live on `.ds-home-hero::before`
+     so grain/grid is visible (not washed out by a near-identical Surface mix).
+     Map inset stays map-column-only; no blur/glow/gradient. */
+  background: transparent;
   color: var(--ds-ink);
   border-right: var(--ds-border-width) solid var(--ds-border);
   pointer-events: auto;
 }
 
 [data-theme='dark'] .ds-home-hero__copy {
-  /* Match light at 60% Surface; primary ink keeps AA on charcoal bleed. */
-  background: color-mix(in srgb, var(--ds-surface) 60%, transparent);
+  background: transparent;
 }
 
 .ds-home-hero__copy > * {

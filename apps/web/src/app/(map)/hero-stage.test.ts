@@ -62,11 +62,19 @@ describe('home hero panel structure', () => {
     assert.match(shellCss, /\.ds-home-hero\s*\{[^}]*background:\s*transparent/s);
     assert.match(
       shellCss,
-      /\.ds-home-hero__copy\s*\{[^}]*background:\s*color-mix\(in srgb,\s*var\(--ds-surface\)\s*60%,\s*transparent\)/s,
+      /\.ds-home-hero__copy\s*\{[^}]*background:\s*transparent/s,
     );
     assert.match(
       shellCss,
-      /\[data-theme='dark'\]\s+\.ds-home-hero__copy\s*\{[^}]*background:\s*color-mix\(in srgb,\s*var\(--ds-surface\)\s*60%,\s*transparent\)/s,
+      /\[data-theme='dark'\]\s+\.ds-home-hero__copy\s*\{[^}]*background:\s*transparent/s,
+    );
+    assert.match(
+      shellCss,
+      /\.ds-home-hero::before\s*\{[^}]*background-color:\s*var\(--ds-canvas\)/s,
+    );
+    assert.match(
+      shellCss,
+      /\.ds-home-hero::before\s*\{[^}]*grid-column:\s*1[^}]*background-image:\s*var\(--ds-edition-pattern-archive-grid\)/s,
     );
     assert.match(shellCss, /\.ds-home-hero__copy\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
     assert.match(shellCss, /\.ds-home-hero__copy\s*\{[^}]*grid-column:\s*1/s);
@@ -99,16 +107,17 @@ describe('home hero panel structure', () => {
     assert.match(shellCss, /\.ds-home-hero__map\s*\{[^}]*pointer-events:\s*none/s);
     assert.match(
       homeEditionCss,
-      /\.ds-map-surface:has\(\.ds-home-hero\)\s+\.ds-home\s*\{[^}]*background:\s*var\(--ds-canvas\)/s,
+      /\.ds-map-surface:has\(\.ds-home-hero\)\s+\.ds-home\s*\{[^}]*background:\s*transparent/s,
+    );
+    assert.match(
+      homeEditionCss,
+      /\.ds-map-surface:has\(\.ds-home-hero\)\s+main\s*\{[^}]*background:\s*transparent/s,
     );
     assert.match(
       homeEditionCss,
       /\.ds-home-edition\s*\{[^}]*background:\s*var\(--ds-canvas\)/s,
     );
-    assert.doesNotMatch(
-      mapSurfacesCss,
-      /\.ds-map-surface:has\(\.ds-home-hero\)\s+main\s*\{[^}]*background:\s*transparent/s,
-    );
+    assert.match(shellCss, /\.ds-home\s*\{[^}]*background:\s*transparent/s);
   });
 
   it('documents ADR-017 live map inset on home', () => {
