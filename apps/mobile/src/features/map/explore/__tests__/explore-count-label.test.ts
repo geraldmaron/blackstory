@@ -14,7 +14,7 @@ describe('formatExploreCountLabel', () => {
       }),
     ).toEqual({
       inline: '3 records',
-      railInline: '3 records',
+      railInline: '3 pinned',
       accessibilityLabel: 'All records, 3 records',
     });
   });
@@ -29,7 +29,7 @@ describe('formatExploreCountLabel', () => {
       }),
     ).toEqual({
       inline: '712 in view · 1,365 in release',
-      railInline: '712 · 1,365 in release',
+      railInline: '712 / 1,365',
       accessibilityLabel: 'In view, 712 in view, 1,365 in release',
     });
   });
@@ -44,7 +44,7 @@ describe('formatExploreCountLabel', () => {
       }),
     ).toEqual({
       inline: '2 records · filtered',
-      railInline: '2 records · filtered',
+      railInline: '2 filtered',
       accessibilityLabel: 'All records, 2 records · filtered',
     });
 
@@ -57,7 +57,7 @@ describe('formatExploreCountLabel', () => {
       }),
     ).toEqual({
       inline: '712 · filtered in view · 1,365 in release',
-      railInline: '712 · filtered · 1,365 in release',
+      railInline: '712 / 1,365',
       accessibilityLabel: 'In view, 712 in view · filtered, 1,365 in release',
     });
   });

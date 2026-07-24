@@ -82,13 +82,15 @@ export function DataScreen() {
             title="Census timeline not on this release yet"
             description="The national decade-by-decade series ships on the web when the warehouse snapshot is ready. Open Explore for place layers meanwhile."
           />
-          <Button
-            label="Open Explore"
-            variant="secondary"
-            density="compact"
-            onPress={() => router.push('/explore')}
-            accessibilityHint="Opens the Explore map tab"
-          />
+          <View style={{ alignItems: 'flex-start' }}>
+            <Button
+              label="Open Explore"
+              variant="secondary"
+              density="compact"
+              onPress={() => router.push('/explore')}
+              accessibilityHint="Opens the Explore map tab"
+            />
+          </View>
         </View>
 
         <View style={styles.section}>

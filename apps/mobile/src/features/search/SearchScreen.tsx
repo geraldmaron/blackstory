@@ -174,6 +174,7 @@ export function SearchScreen({
               placeholder="Search names, places, events..."
               placeholderTextColor={theme.inkMuted}
               accessibilityLabel="Search"
+              accessibilityRole="search"
               maxLength={MAX_RAW_INPUT_LENGTH}
               autoCorrect={false}
               autoCapitalize="none"
@@ -185,7 +186,6 @@ export function SearchScreen({
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Clear search"
-                hitSlop={12}
                 onPress={() => setDraft('')}
                 style={({ pressed }) => [
                   styles.clearButton,
