@@ -159,6 +159,17 @@ async function resolveViaSearchThenCoordinates(
   return undefined;
 }
 
+const GENERIC_LOCATION_LABELS = new Set([
+  'headquarters', 'corporate headquarters', 'site', 'location', 'campus', 'building',
+  'office', 'offices', 'institution', 'address', 'facility',
+]);
+
+const LOCATION_STOP_WORDS = new Set(['of', 'the', 'and', 'at', 'in', 'a', 'an', 'for', 'later']);
+
+/**
+ * Real place names are Title Case in every significant word. A judge-written
+ * descriptive sentence filling the same field reads like ordinary prose instead.
+ */
 function looksLikeDescriptiveProse(label: string): boolean {
   const words = label.trim().split(/\s+/);
   if (words.length < 3) return false;
@@ -171,12 +182,6 @@ function looksLikeDescriptiveProse(label: string): boolean {
 export function isUsableLocationLabel(label: string): boolean {
   const normalized = label.trim().toLowerCase();
   if (normalized.length === 0 || GENERIC_LOCATION_LABELS.has(normalized)) return false;
-  // The judge often qualifies an otherwise-generic noun with a scope adjective
-  // ("International headquarters", "National office", "Corporate campus") —
-  // an exact-string check misses these, and searching the literal phrase can
-  // match an unrelated same-named page (real incident: Alpha Kappa Alpha's
-  // "International headquarters" resolved to an unrelated building instead of
-  // falling back to its real Chicago, Illinois jurisdiction).
   const words = normalized.split(/\s+/);
   const lastWord = words[words.length - 1];
   if (words.length <= 3 && lastWord && GENERIC_LOCATION_LABELS.has(lastWord)) return false;
@@ -184,6 +189,12 @@ export function isUsableLocationLabel(label: string): boolean {
   return true;
 }
 
+const DESCRIPTIVE_CLAUSE_MARKERS = [
+  'site of', 'home of', 'birthplace of', 'location of', 'headquarters of',
+  'founding of', 'founding site', 'where ', 'now part of',
+];
+
+/** Drops a trailing descriptive clause after a comma, keeping a real "City, State"-style qualifier intact. */
 export function stripDescriptiveLocationClause(label: string): string {
   const commaIndex = label.indexOf(',');
   if (commaIndex === -1) return label;

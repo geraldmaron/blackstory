@@ -39,14 +39,23 @@ test('extractCatalogRelationships dedups Rosa Parks museum and arrest site locat
   const civilRights = loadFixtureEntities('civil-rights.json');
   const museum = findEntity(institutions, 'ent_rosa_parks_museum_001');
   const arrestSite = findEntity(civilRights, 'ent_rosa_parks_arrest_site_001');
+  // Isolate the mutual located_at pair — fixtures may also carry other related[]
+  // edges (e.g. boycott) that are out of scope for this dedup assertion.
+  const trimmedMuseum: CatalogEntityForRelationships = {
+    ...museum,
+    related: (museum.related ?? []).filter((entry) => entry.id === arrestSite.id),
+  };
   const trimmedArrestSite: CatalogEntityForRelationships = {
     ...arrestSite,
     related: (arrestSite.related ?? []).filter((entry) => entry.id === museum.id),
   };
 
-  const { relationships, skipped } = extractCatalogRelationships([museum, trimmedArrestSite], {
-    generatedAt,
-  });
+  const { relationships, skipped } = extractCatalogRelationships(
+    [trimmedMuseum, trimmedArrestSite],
+    {
+      generatedAt,
+    },
+  );
 
   assert.equal(skipped.length, 0);
   assert.equal(relationships.length, 1);
