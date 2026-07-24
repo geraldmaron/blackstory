@@ -41,7 +41,7 @@ reader theme toggle (light and dark). Do not hide or disable the theme control o
 
 **Atmosphere, not wallpaper:** page gutters carry fixed pseudo-element texture (paper grain + quiet archive index grid / corner brackets on Rule and copper hairlines). Home does **not** mount a scattered gutter mosaic — that collage register stays on other edition routes (`EditionAtmosphereMosaic`). Center content and Surface cards stay opaque (WCAG floor). No crumpled continental silhouettes, no competing fake map under the live hero readout, no sepia stock.
 
-The hero map inside beat 0 is a **Surface-contained live readout**: the persistent MapLibre plate (`MapStage`) is **positioned** into the hero map column (viewport-fixed box from `hero-map-inset.ts`, not `clip-path`) so real archive pins render in-panel — never a decorative sketch, never full-bleed wallpaper under the whole page. The copy column uses a **flat translucent Surface scrim** (`color-mix` Surface ~48% light / ~58% dark) — not an opaque slab — while the map inset stays map-column-only (do not reframe the plate under the copy).
+The hero map inside beat 0 is a **Surface-contained live readout**: the persistent MapLibre plate (`MapStage`) is **positioned** into the hero map column (viewport-fixed box from `hero-map-inset.ts`, not `clip-path`) so real archive pins render in-panel — never a decorative sketch, never full-bleed wallpaper under the whole page. The copy column uses a **flat translucent Surface scrim** (`color-mix` Surface 60% light / 60% dark) — not an opaque slab — while the map inset stays map-column-only (do not reframe the plate under the copy).
 
 ---
 
@@ -271,7 +271,7 @@ Never two copper-filled buttons visible in the same above-the-fold viewport. Raw
 - CSS surface: `apps/web/src/app/(home)/` or page-scoped module; reuse `--ds-*` tokens, no raw hex.
 - Atmosphere texture: `home-edition.css` (`::before` grain/grid). Home does not mount `EditionAtmosphereMosaic` / former `HomeAtmosphereMosaic`.
 - Record carousel: compose from `@repo/ui` primitives where possible; shared browse controls live in `apps/web/src/components/patterns/` (`RecordBrowseControls`, `BrowseModeToggle`, `browse-mode.css`).
-- Live hero map wiring: `hero-map-inset.ts` positions MapStage over `.ds-home-hero__map` (map column only). Copy column is a flat translucent Surface scrim (`48%` light / `58%` dark `color-mix`); do not expand the inset under the copy.
+- Live hero map wiring: `hero-map-inset.ts` positions MapStage over `.ds-home-hero__map` (map column only). Copy column is a flat translucent Surface scrim (`60%` light / `60%` dark `color-mix`); do not expand the inset under the copy.
 - Mockup reference file: copy into `docs/ui/fixtures/` when owner drops it in repo; until then, Downloads path above is the binding visual.
 
 ---

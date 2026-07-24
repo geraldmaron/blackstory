@@ -62,11 +62,11 @@ describe('home hero panel structure', () => {
     assert.match(shellCss, /\.ds-home-hero\s*\{[^}]*background:\s*transparent/s);
     assert.match(
       shellCss,
-      /\.ds-home-hero__copy\s*\{[^}]*background:\s*color-mix\(in srgb,\s*var\(--ds-surface\)\s*48%,\s*transparent\)/s,
+      /\.ds-home-hero__copy\s*\{[^}]*background:\s*color-mix\(in srgb,\s*var\(--ds-surface\)\s*60%,\s*transparent\)/s,
     );
     assert.match(
       shellCss,
-      /\[data-theme='dark'\]\s+\.ds-home-hero__copy\s*\{[^}]*background:\s*color-mix\(in srgb,\s*var\(--ds-surface\)\s*58%,\s*transparent\)/s,
+      /\[data-theme='dark'\]\s+\.ds-home-hero__copy\s*\{[^}]*background:\s*color-mix\(in srgb,\s*var\(--ds-surface\)\s*60%,\s*transparent\)/s,
     );
     assert.match(shellCss, /\.ds-home-hero__copy\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
     assert.match(shellCss, /\.ds-home-hero__copy\s*\{[^}]*grid-column:\s*1/s);

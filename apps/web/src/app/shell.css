@@ -828,17 +828,17 @@
   padding: var(--ds-home-panel-padding, var(--ds-space-8));
   position: relative;
   min-height: 0;
-  /* Open flat matte scrim — Surface ~48% (was opaque 100%, then 72%). Map inset
-     stays on the map column; no blur/glow/gradient. */
-  background: color-mix(in srgb, var(--ds-surface) 48%, transparent);
+  /* Open flat matte scrim — Surface 60% (was opaque 100%, then 72%/48%). Map
+     inset stays on the map column; no blur/glow/gradient. */
+  background: color-mix(in srgb, var(--ds-surface) 60%, transparent);
   color: var(--ds-ink);
   border-right: var(--ds-border-width) solid var(--ds-border);
   pointer-events: auto;
 }
 
 [data-theme='dark'] .ds-home-hero__copy {
-  /* Mid scrim so paper ink keeps AA on charcoal canvas bleed. */
-  background: color-mix(in srgb, var(--ds-surface) 58%, transparent);
+  /* Match light at 60% Surface; primary ink keeps AA on charcoal bleed. */
+  background: color-mix(in srgb, var(--ds-surface) 60%, transparent);
 }
 
 .ds-home-hero__copy > * {
