@@ -139,12 +139,20 @@ the mock text is templated and not suitable to promote as-is even after approval
 
 Checked `bb_canonical.entities.display_name` for all four named figures — **zero matches**:
 
+**Correction, same day, post-audit follow-up:** the table below originally read `committed: false`
+for all four and described them as "staged" — that was wrong. `committed: false` means the
+`research-intake` call ran in preview mode and **never wrote anything to the database** — no
+`bb_submissions.intake_items` row, no `bb_research.cases` row ever existed at the case IDs listed
+below. This was caught when a follow-up review pass queried those exact case IDs and got zero
+rows back. Re-ran all four with `--commit` on 2026-07-24 (later same day) — they are now genuinely
+staged. Table updated with the real, committed case/submission IDs.
+
 | Figure | In bb_canonical? | Staged? |
 |---|---|---|
-| Audre Lorde | No | Yes — `research-intake` against `en.wikipedia.org/wiki/Audre_Lorde`, `researchCaseId 542d3f96-a51d-4f9a-b7e6-b601692ba4ed`, `submissionId b1e09997-0343-4e28-949c-166cd815bb4a`, `moderationState: pending_review`, `committed: false` |
-| James Baldwin | No | Yes — `researchCaseId 3688e8ad-1a45-42f1-8863-17f05b5b97ff` |
-| bell hooks | No | Yes — `researchCaseId 95c9c665-3b79-491e-bfe8-8b0dbd60528a` |
-| Lorraine Hansberry | No | Yes — `researchCaseId 93533b4e-a03d-43ff-9652-3beff9a57164` |
+| Audre Lorde | No | Yes (re-staged, `--commit`) — `submissionId b791ed36-8b9d-4850-bbde-6662fbd03599`, `researchCaseId a5fd0dcf-e8d1-4ca8-a307-ade6d14b45e0`, `committed: true` |
+| James Baldwin | No | Yes (re-staged, `--commit`) — `submissionId cea09361-850b-423d-8473-7ddf3ad87d12`, `researchCaseId 37b0926a-0467-4644-89a9-35b19b1ced2c`, `committed: true` |
+| bell hooks | No | Yes (re-staged, `--commit`) — `submissionId 8aab4342-9edd-4b66-b09d-78705915f334`, `researchCaseId 7209de2e-b24d-452d-aff4-27f24022b3ab`, `committed: true` |
+| Lorraine Hansberry | No | Yes (re-staged, `--commit`) — `submissionId 24568ef6-2ea1-483b-9125-85b33748c7a4`, `researchCaseId c6ac2b79-9731-4031-8b36-845771073466`, `committed: true` |
 
 All four ran through `research-intake` (BB-030 safe-fetch → BB-029 quarantine intake → BB-044
 draft research case), each returning `intake.committed: false` — every one sits in
