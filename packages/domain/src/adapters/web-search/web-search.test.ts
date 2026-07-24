@@ -182,11 +182,11 @@ test('parseBraveSearchResponse tolerates missing title/description and rejects r
 
 test('buildSearxngSearchUrl targets operator base URL with format=json', () => {
   const url = buildSearxngSearchUrl({
-    baseUrl: 'http://100.119.72.84:8888',
+    baseUrl: 'http://203.0.113.5:8888',
     query: 'freedom rider Montgomery Alabama',
   });
   const parsed = new URL(url);
-  assert.equal(parsed.origin, 'http://100.119.72.84:8888');
+  assert.equal(parsed.origin, 'http://203.0.113.5:8888');
   assert.equal(parsed.pathname, '/search');
   assert.equal(parsed.searchParams.get('format'), 'json');
   assert.equal(parsed.searchParams.get('q'), 'freedom rider Montgomery Alabama');

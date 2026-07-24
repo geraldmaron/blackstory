@@ -1,5 +1,9 @@
 # Gap-fill research (Corsair)
 
+> **Operator-specific — not for contributors.** The `## Host` section below names
+> Gerald's personal Corsair workstation. Contributors run this pipeline from their own
+> machine against Postgres directly; no SSH or dedicated host is required.
+
 Finds entities mentioned in published records' claims but not yet in the
 catalog (e.g. a plantation founder named in a claim, a civil-rights case
 referenced by three different entities) and researches them for real —

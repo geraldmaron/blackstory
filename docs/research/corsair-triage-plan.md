@@ -1,5 +1,9 @@
 # Corsair pending-entity triage plan
 
+> **Operator-specific — not for contributors.** Documents Gerald's personal Corsair
+> workstation. Contributors don't need this host; see `.env.corsair.example` and
+> `docs/runbooks/overnight-hybrid-enrichment.md` for the contributor vs. operator split.
+
 Generated: 2026-07-21 (bead acceptance for prioritized triage before bulk research).
 
 Host: `gerald@100.119.72.84` — repo at `~/Developer/Projects/blackstory`.

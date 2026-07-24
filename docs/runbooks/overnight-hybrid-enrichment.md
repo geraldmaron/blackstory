@@ -1,5 +1,14 @@
 # Overnight research enrichment on Corsair
 
+> **Operator-specific — not for contributors.** This runbook documents Gerald's personal
+> "Corsair" workstation profile (hostname/IP below). Contributors running the harness on
+> their own machine do not need a local Ollama or SearXNG instance at all: use the mock
+> providers or the OpenRouter free model roster (`EDITORIAL_LLM_PROVIDER=openrouter`,
+> `OLLAMA_BASE_URL` / `SEARXNG_BASE_URL` left unset). See `.env.example` and
+> `docs/research/agent-local-env.md` for that no-local-device path. Nothing in this file's
+> host/IP values should be copied into `.env.example`, `.env.local`, or any other
+> contributor-facing config — they belong only in `.env.corsair.example`.
+
 Corsair runs bounded discovery and enrichment against the canonical Supabase/Postgres ledger.
 The job never publishes and does not contain a Firebase fallback.
 
@@ -36,6 +45,13 @@ Both files must be mode `0600`:
 
 The scheduled unit no longer reads `discovery.env`. Retire any former ADC/project file rather than
 leaving it on the live service path.
+
+Both entry-point scripts prefer `127.0.0.1` for Ollama/SearXNG and only fall back to a remote
+host when `RESEARCH_LOCAL_LLM_HOST` / `RESEARCH_SEARXNG_HOST` are set (see
+`.env.corsair.example`, which is where Corsair's actual hostname/IP live — never hardcoded in
+the scripts or the systemd unit). If neither localhost nor a configured host is reachable,
+`preflight` reports the endpoint as `unreachable` and exits non-zero; it never retries against
+a baked-in address.
 
 ## Mandatory preflight
 

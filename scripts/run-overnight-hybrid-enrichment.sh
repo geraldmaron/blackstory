@@ -91,13 +91,17 @@ if [[ -f "${ENV_FILE}" ]]; then
   set +a
 fi
 
-# Prefer localhost Ollama on Corsair; else Tailscale peer.
+# Prefer localhost Ollama; fall back to RESEARCH_LOCAL_LLM_HOST only if an
+# operator has set it (e.g. via the operator's own env file). No hardcoded
+# host defaults here — see .env.corsair.example for the one-operator profile.
 if [[ -z "${OLLAMA_BASE_URL:-}" ]]; then
   if curl -fsS --max-time 2 "http://127.0.0.1:11434/api/tags" >/dev/null 2>&1; then
     export OLLAMA_BASE_URL="http://127.0.0.1:11434/v1"
-  else
-    export OLLAMA_BASE_URL="http://100.119.72.84:11434/v1"
+  elif [[ -n "${RESEARCH_LOCAL_LLM_HOST:-}" ]]; then
+    export OLLAMA_BASE_URL="http://${RESEARCH_LOCAL_LLM_HOST}:11434/v1"
   fi
+  # If neither is reachable, OLLAMA_BASE_URL stays unset; preflight reports
+  # this as an informative "unreachable" check rather than retrying a host.
 fi
 
 export EDITORIAL_LLM_PROVIDER="${EDITORIAL_LLM_PROVIDER:-hybrid}"

@@ -4,7 +4,7 @@
  * mutates fixtures or publishes. Human review + attach-evidence remain required.
  *
  * Usage:
- *   SEARXNG_BASE_URL=http://100.119.72.84:8888 \
+ *   SEARXNG_BASE_URL=http://203.0.113.5:8888 \
  *     node --conditions development --import tsx \
  *     packages/firebase/scripts/expand-thin-sources.ts --limit 20 --out /tmp/thin-source-leads.json
  */

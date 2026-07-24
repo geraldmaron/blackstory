@@ -12,7 +12,7 @@ import type { WebSearchParsedBatch, WebSearchRawResult } from './types.js';
 export const SEARXNG_DEFAULT_PATH = '/search' as const;
 
 export type BuildSearxngSearchUrlInput = {
-  /** Origin only, e.g. http://100.119.72.84:8888 — no trailing path required. */
+  /** Origin only, e.g. http://203.0.113.5:8888 — no trailing path required. */
   readonly baseUrl: string;
   readonly query: string;
   readonly categories?: string;

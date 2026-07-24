@@ -20,6 +20,9 @@ Environment=RESEARCH_SCHEMA_VERSION=1.0.0
 Environment=OPENROUTER_MODELS=openai/gpt-oss-20b:free,nvidia/nemotron-3-nano-30b-a3b:free,google/gemma-4-31b-it:free,nvidia/nemotron-3-super-120b-a12b:free
 Environment=OLLAMA_MODEL=qwen3:8b
 Environment=OLLAMA_BASE_URL=http://127.0.0.1:11434/v1
+# Operator-specific host overrides (RESEARCH_LOCAL_LLM_HOST / RESEARCH_SEARXNG_HOST),
+# only needed if Ollama/SearXNG aren't on 127.0.0.1, belong in the private
+# EnvironmentFile below — not in this checked-in unit. See .env.corsair.example.
 Environment=TARGET_CANDIDATES=1000
 Environment=DISCOVERY_LIMIT=25
 Environment=DISCOVERY_CONCURRENCY=2

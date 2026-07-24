@@ -111,7 +111,7 @@ test('SearXNG fixture campaign yields survivors and uses searxng_search adapter'
       apiKey: '',
       storageTermsConfirmed: true,
       planTermsVersion: 'searxng-self-hosted-research-2026-07',
-      baseUrl: 'http://100.119.72.84:8888',
+      baseUrl: 'http://203.0.113.5:8888',
     },
     searchResponseRaw: JSON.parse(readFileSync(searxngPath, 'utf8')),
     stampedAt: FIXED_NOW,

@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
   <!--
+  OPERATOR-SPECIFIC — not a contributor template. This launchd agent belongs to Gerald's
+  Mac and hardcodes his home directory paths; it isn't meant to be copied as-is.
   launchd agent: daily SearXNG web-search discovery (08:30 UTC) → admin researchCases.
   Prefer Corsair systemd (scripts/systemd/blackstory-discovery-web-search.timer) for live.
   This Mac agent is a Tailscale fallback only — unload if Corsair owns the schedule.
+  SEARXNG_BASE_URL below points at the operator's Corsair host; see .env.corsair.example.
   Install (once):
     cp scripts/com.blackstory.discovery-web-search.plist ~/Library/LaunchAgents/
     launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.blackstory.discovery-web-search.plist

@@ -55,7 +55,7 @@ export type WebSearchProviderConfig = {
   readonly storageTermsConfirmed: boolean;
   /** Human-readable plan/terms version stamped on every candidate for audit. */
   readonly planTermsVersion: string;
-  /** Required for live SearXNG fetches (e.g. http://100.119.72.84:8888). Ignored by Brave. */
+  /** Required for live SearXNG fetches (e.g. http://203.0.113.5:8888). Ignored by Brave. */
   readonly baseUrl?: string;
 };
 

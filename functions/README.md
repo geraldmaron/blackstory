@@ -26,7 +26,7 @@ DISCOVERY_JOB_ID=discovery-campaign-web-search \
   pnpm --filter @repo/functions-discovery start
 
 # Live SearXNG (Corsair Tailscale — same entry as onSchedule)
-SEARXNG_BASE_URL=http://100.119.72.84:8888 \
+SEARXNG_BASE_URL=http://203.0.113.5:8888 \
 DISCOVERY_MODE=live \
 DISCOVERY_STORAGE_TERMS_CONFIRMED=true \
 DISCOVERY_JOB_ID=discovery-campaign-web-search \

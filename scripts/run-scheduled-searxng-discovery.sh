@@ -80,14 +80,18 @@ if [[ -z "${NVM_DIR:-}" && -s "${HOME}/.nvm/nvm.sh" ]]; then
   nvm use 22 >/dev/null 2>&1 || true
 fi
 
-# Prefer localhost when SearXNG is on this machine (Corsair); else Tailscale peer.
+# Prefer localhost when SearXNG is on this machine; fall back to
+# RESEARCH_SEARXNG_HOST only if an operator has set it. No hardcoded host
+# defaults here — see .env.corsair.example for the one-operator profile.
 if [[ -z "${SEARXNG_BASE_URL:-}" ]]; then
   if curl -fsS --max-time 2 "http://127.0.0.1:8888/healthz" >/dev/null 2>&1 \
     || curl -fsS --max-time 2 "http://127.0.0.1:8888/" >/dev/null 2>&1; then
     export SEARXNG_BASE_URL="http://127.0.0.1:8888"
-  else
-    export SEARXNG_BASE_URL="http://100.119.72.84:8888"
+  elif [[ -n "${RESEARCH_SEARXNG_HOST:-}" ]]; then
+    export SEARXNG_BASE_URL="http://${RESEARCH_SEARXNG_HOST}:8888"
   fi
+  # If neither is reachable, SEARXNG_BASE_URL stays unset; preflight reports
+  # this as an informative "unreachable" check rather than retrying a host.
 fi
 
 export DISCOVERY_KILL_SWITCH="${DISCOVERY_KILL_SWITCH:-disengaged}"
