@@ -1,0 +1,837 @@
+[
+  {
+    "id": "lynching_ell_persons_memphis_tennessee",
+    "kind": "person",
+    "displayName": "Ell Persons",
+    "summary": "Ell Persons, a Black woodcutter, was lynched on May 22, 1917, near Memphis, Tennessee, after being accused of murdering a white teenager. A mob seized him while in custody, burned him alive before a large crowd, and displayed his remains publicly. No one was ever charged, and the atrocity helped catalyze the founding of the Memphis NAACP chapter.",
+    "eraBuckets": [
+      "1910s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "civil-rights",
+      "resistance"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "civil-rights",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "Memphis NAACP",
+      "Ell Persons",
+      "Antoinette Rappel",
+      "racial terror"
+    ],
+    "jurisdictionLabel": "Memphis, Tennessee",
+    "locationPrecision": "site",
+    "locationLabel": "Near 5400 Summer Ave.",
+    "lat": 35.16,
+    "lng": -89.881,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "on May 22, 1917, in Memphis, Tennessee",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_Ell_Persons",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was accused of",
+        "object": "raping and murdering 15-year-old Antoinette Rappel",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_Ell_Persons",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was subjected to",
+        "object": "brutal interrogation leading to a forced confession",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_Ell_Persons",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was captured by",
+        "object": "a lynch mob while in transit to stand trial",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_Ell_Persons",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was burned alive and dismembered",
+        "object": "in a public spectacle attended by a large crowd",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_Ell_Persons",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "contributed to",
+        "object": "the founding of the Memphis chapter of the NAACP",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_Ell_Persons",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The lynching of Ell Persons occurred during the Nadir of American race relations, a period marked by widespread racial terror and the institutionalization of Jim Crow. Such lynchings were acts of racial control, often met with official complicity or indifference, and served to reinforce segregation and disenfranchisement. In this case, the public spectacle and lack of accountability underscore the failure of legal protections for Black citizens."
+  },
+  {
+    "id": "lynching_jim_mcilherron_estill_springs_tennessee",
+    "kind": "person",
+    "displayName": "Jim McIlherron",
+    "summary": "Jim McIlherron, an African-American man, was lynched on February 12, 1918, in Estill Springs, Tennessee, following an accusation of murdering two white men. The lynching was part of a broader pattern of racial violence during the Jim Crow era.",
+    "eraBuckets": [
+      "1910s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "civil-rights",
+      "segregation"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "civil-rights",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "Estill Springs",
+      "Tennessee",
+      "Jim Crow",
+      "racial violence"
+    ],
+    "jurisdictionLabel": "Estill Springs, Tennessee",
+    "locationPrecision": "city",
+    "locationLabel": "Estill Springs, Tennessee",
+    "lat": 35.27027778,
+    "lng": -86.13277778,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "Jim McIlherron",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_Jim_McIlherron",
+        "citationLabel": "Lynching of Jim McIlherron"
+      },
+      {
+        "predicate": "occurred in",
+        "object": "Estill Springs, Tennessee",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_Jim_McIlherron",
+        "citationLabel": "Lynching of Jim McIlherron"
+      },
+      {
+        "predicate": "accused of",
+        "object": "murders of two white people",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_Jim_McIlherron",
+        "citationLabel": "Lynching of Jim McIlherron"
+      },
+      {
+        "predicate": "tortured and burned alive",
+        "object": "Jim McIlherron",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_Jim_McIlherron",
+        "citationLabel": "Lynching of Jim McIlherron"
+      },
+      {
+        "predicate": "part of",
+        "object": "Nadir of American race relations",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_Jim_McIlherron",
+        "citationLabel": "Lynching of Jim McIlherron"
+      }
+    ],
+    "historicalContext": "The lynching of Jim McIlherron occurred during the Nadir of American race relations, a period marked by widespread racial violence and the enforcement of Jim Crow laws. The event reflects the systemic racial tensions and the use of lynching as a tool of racial control in the South."
+  },
+  {
+    "id": "lynching_alma_howze_shubuta_hanging_bridge_mississippi",
+    "kind": "person",
+    "displayName": "Alma Howze",
+    "summary": "Alma Howze was lynched on December 20, 1918, in Shubuta, Mississippi, at the 'hanging bridge' in Clarke County, following an accusation of murdering a local dentist. The case was entangled in a complex personal conflict involving interracial relationships and pregnancy, and her death is part of a broader pattern of racial and gendered violence during the Jim Crow era.",
+    "eraBuckets": [
+      "1910s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "jim-crow",
+      "women-leaders",
+      "resistance"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "jim-crow",
+      "women-leaders",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "Shubuta",
+      "hanging bridge",
+      "Black women",
+      "racial violence"
+    ],
+    "jurisdictionLabel": "Shubuta, Mississippi",
+    "locationPrecision": "site",
+    "locationLabel": "Hanging Bridge, Clarke County",
+    "lat": 32.04,
+    "lng": -88.69,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "on December 20, 1918, in Shubuta, Mississippi",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_women_in_the_United_States",
+        "citationLabel": "Wikipedia: Lynching of women in the United States"
+      },
+      {
+        "predicate": "was accused of",
+        "object": "alleged murder of a dentist",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_women_in_the_United_States",
+        "citationLabel": "Wikipedia: Lynching of women in the United States"
+      },
+      {
+        "predicate": "was a victim of",
+        "object": "racial terror lynching targeting Black women in the Jim Crow South",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_women_in_the_United_States",
+        "citationLabel": "Wikipedia: Lynching of women in the United States"
+      }
+    ],
+    "historicalContext": "The lynching of Alma Howze occurred during a peak period of racial terror in the American South, where extrajudicial killings were used to enforce white supremacy and racial hierarchy. Such acts, often justified by false or exaggerated accusations, targeted Black individuals with impunity and were central to the system of segregation and disenfranchisement. The 'hanging bridge' in Shubuta was a site of multiple lynchings, symbolizing the localized enforcement of racial control."
+  },
+  {
+    "id": "lynching_maggie_howze_shubuta_hanging_bridge_mississippi",
+    "kind": "person",
+    "displayName": "Maggie Howze",
+    "summary": "Maggie Howze was lynched on December 20, 1918, in Shubuta, Mississippi, at the 'hanging bridge' in Clarke County, following accusations related to the killing of a white dentist. Her death is part of a documented pattern of racial terror targeting Black women in the Jim Crow South.",
+    "eraBuckets": [
+      "1910s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "civil-rights",
+      "resistance"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "civil-rights",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "Shubuta",
+      "hanging bridge",
+      "Black women",
+      "racial violence"
+    ],
+    "jurisdictionLabel": "Shubuta, Mississippi",
+    "locationPrecision": "site",
+    "locationLabel": "Hanging Bridge, Clarke County",
+    "lat": 32.04,
+    "lng": -88.69,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "December 20, 1918, in Shubuta, Mississippi",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_women_in_the_United_States",
+        "citationLabel": "Wikipedia: Lynching of women in the United States"
+      },
+      {
+        "predicate": "was accused of",
+        "object": "alleged murder of a white dentist",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_women_in_the_United_States",
+        "citationLabel": "Wikipedia: Lynching of women in the United States"
+      },
+      {
+        "predicate": "is documented as",
+        "object": "a victim of racial terror lynching targeting Black women in the Jim Crow South",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_women_in_the_United_States",
+        "citationLabel": "Wikipedia: Lynching of women in the United States"
+      }
+    ],
+    "historicalContext": "The lynching of Maggie Howze occurred during a peak period of racial terror in the United States, particularly in the South, where extrajudicial killings were used to enforce racial hierarchy and suppress Black autonomy. Lynchings often followed accusations of crimes, with little or no due process, and were public acts of intimidation rooted in white supremacy and Jim Crow laws."
+  },
+  {
+    "id": "lynching_benny_richards_warrenton_georgia",
+    "kind": "person",
+    "displayName": "Benny Richards",
+    "summary": "Benny Richards, a Black farmer, was lynched on May 2, 1919, in Warrenton, Georgia, by a mob of 300 white men after being accused of killing his ex-wife. His body was shot and burned, an act of racial terror documented in historical accounts of Jim Crow–era violence in Warren County.",
+    "eraBuckets": [
+      "1910s"
+    ],
+    "topicTags": [
+      "resistance"
+    ],
+    "topicIds": [
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "Warrenton Georgia",
+      "racial violence",
+      "Black farmer",
+      "1919"
+    ],
+    "jurisdictionLabel": "Warrenton, Georgia",
+    "locationPrecision": "city",
+    "locationLabel": "Site of lynching in Warrenton",
+    "lat": 33.4075,
+    "lng": -82.66277778,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "Benny Richards",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Warrenton%2C_Georgia",
+        "citationLabel": "Wikipedia - Warrenton, Georgia"
+      },
+      {
+        "predicate": "occurred in",
+        "object": "Warrenton, Georgia",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Warrenton%2C_Georgia",
+        "citationLabel": "Wikipedia - Warrenton, Georgia"
+      },
+      {
+        "predicate": "took place on",
+        "object": "May 2, 1919",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Warrenton%2C_Georgia",
+        "citationLabel": "Wikipedia - Warrenton, Georgia"
+      },
+      {
+        "predicate": "was accused of murdering his ex-wife",
+        "object": "Benny Richards",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Warrenton%2C_Georgia",
+        "citationLabel": "Wikipedia - Warrenton, Georgia"
+      },
+      {
+        "predicate": "was a Black farmer",
+        "object": "Benny Richards",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Warrenton%2C_Georgia",
+        "citationLabel": "Wikipedia - Warrenton, Georgia"
+      },
+      {
+        "predicate": "was killed by a mob of 300 white farmers who shot and burned his body",
+        "object": "Benny Richards",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Warrenton%2C_Georgia",
+        "citationLabel": "Wikipedia - Warrenton, Georgia"
+      }
+    ],
+    "historicalContext": "Lynching was a tool of racial control during the Jim Crow era, used to enforce white supremacy and suppress Black autonomy. The extrajudicial killing of Benny Richards in 1919 reflects the widespread pattern of mob violence in rural Georgia, where legal institutions routinely failed to protect Black citizens or prosecute perpetrators."
+  },
+  {
+    "id": "lynching_obe_cox_georgia",
+    "kind": "person",
+    "displayName": "Obe Cox",
+    "summary": "Obe Cox was lynched on September 10, 1919, in Oglethorpe County, Georgia, after being accused of murdering a white farmer's wife. A mob seized him, shot his body, and burned it at the stake before thousands of witnesses.",
+    "eraBuckets": [
+      "1910s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "resistance",
+      "community-organizing"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "resistance",
+      "community-organizing"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Obe Cox",
+      "Oglethorpe County",
+      "lynching",
+      "racial terror",
+      "1919"
+    ],
+    "jurisdictionLabel": "Lexington, Georgia",
+    "locationPrecision": "site",
+    "locationLabel": "Site of lynching in Oglethorpe County",
+    "lat": 33.88,
+    "lng": -83.08,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "on September 10, 1919, in Oglethorpe County, Georgia",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Oglethorpe_County%2C_Georgia",
+        "citationLabel": "Wikipedia: Oglethorpe County, Georgia"
+      },
+      {
+        "predicate": "was accused of",
+        "object": "murdering a white farmer's wife",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Oglethorpe_County%2C_Georgia",
+        "citationLabel": "Wikipedia: Oglethorpe County, Georgia"
+      },
+      {
+        "predicate": "was subjected to",
+        "object": "a public lynching by a white mob, including being shot and burned at the stake",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Oglethorpe_County%2C_Georgia",
+        "citationLabel": "Wikipedia: Oglethorpe County, Georgia"
+      },
+      {
+        "predicate": "was witnessed by",
+        "object": "several thousand people",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Oglethorpe_County%2C_Georgia",
+        "citationLabel": "Wikipedia: Oglethorpe County, Georgia"
+      },
+      {
+        "predicate": "was followed by",
+        "object": "a controversial reaction in which some members of the local Black community expressed gratitude to the mob for not attacking their neighborhood",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Oglethorpe_County%2C_Georgia",
+        "citationLabel": "Wikipedia: Oglethorpe County, Georgia"
+      },
+      {
+        "predicate": "was reported by",
+        "object": "the Black press as a case where those who thanked the mob 'do not stand for much in the town and are excused for their utter ignorance in condoning [lynching]'",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Oglethorpe_County%2C_Georgia",
+        "citationLabel": "Wikipedia: Oglethorpe County, Georgia"
+      }
+    ],
+    "historicalContext": "This lynching occurred during the Red Summer of 1919, a period of intense racial violence across the U.S. In the Jim Crow South, extrajudicial killings like Cox's were tools of racial control, often justified by accusations against Black men. The reported 'thank you' from some Black residents reflects the terror and constrained agency under which Black communities operated, where survival sometimes required public acquiescence to white mob violence."
+  },
+  {
+    "id": "lynching_elias_clayton_duluth_minnesota",
+    "kind": "person",
+    "displayName": "Elias Clayton",
+    "summary": "Elias Clayton, an African American circus worker, was lynched by a white mob in Duluth, Minnesota, on June 15, 1920, following false accusations of rape. Alongside [[lynching_elmer_jackson_duluth_minnesota|Elmer Jackson]] and [[lynching_isaac_mcghie_duluth_minnesota|Isaac McGhie]], he was taken from jail, beaten, and hanged.",
+    "eraBuckets": [
+      "1920s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "memory",
+      "great-migration",
+      "resistance"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "memory",
+      "great-migration",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Duluth lynching",
+      "Elias Clayton",
+      "1920",
+      "anti-lynching law",
+      "racial terror"
+    ],
+    "jurisdictionLabel": "Duluth, Minnesota",
+    "locationPrecision": "site",
+    "locationLabel": "Site of the 1920 Duluth lynchings",
+    "lat": 46.7893,
+    "lng": -92.0968,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "in Duluth, Minnesota on June 15, 1920",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Duluth_lynchings",
+        "citationLabel": "Duluth lynchings"
+      },
+      {
+        "predicate": "was accused of",
+        "object": "rape of Irene Tusken",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Duluth_lynchings",
+        "citationLabel": "Duluth lynchings"
+      },
+      {
+        "predicate": "was taken from jail",
+        "object": "by a white mob estimated at 1,000–10,000 people",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Duluth_lynchings",
+        "citationLabel": "Duluth lynchings"
+      },
+      {
+        "predicate": "was hanged",
+        "object": "from a light post after being beaten and subjected to a mock trial",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Duluth_lynchings",
+        "citationLabel": "Duluth lynchings"
+      },
+      {
+        "predicate": "is one of the victims of",
+        "object": "the only widely known lynching of African Americans in Minnesota",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Duluth_lynchings",
+        "citationLabel": "Duluth lynchings"
+      },
+      {
+        "predicate": "contributed to",
+        "object": "the passage of Minnesota's anti-lynching legislation in 1921",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Duluth_lynchings",
+        "citationLabel": "Duluth lynchings"
+      }
+    ],
+    "historicalContext": "The 1920 Duluth lynchings occurred during the Red Summer and the Great Migration, when racial tensions flared as Black workers moved North and competed with white ethnics for jobs. This lynching, rare in the Midwest, exemplifies how mob violence enforced racial hierarchy beyond the South, contributing to national debates over civil rights and state responsibility."
+  },
+  {
+    "id": "lynching_elmer_jackson_duluth_minnesota",
+    "kind": "person",
+    "displayName": "Elmer Jackson",
+    "summary": "Elmer Jackson, an African American circus worker, was lynched on June 15, 1920, in Duluth, Minnesota, by a white mob falsely accusing him and two others of assaulting a white woman. Taken from jail, he was beaten and hanged without trial. The incident spurred Minnesota’s 1921 anti-lynching law and was memorialized in 2003.",
+    "eraBuckets": [
+      "1920s"
+    ],
+    "topicTags": [
+      "great-migration",
+      "due-process",
+      "public-safety",
+      "commemoration",
+      "segregation"
+    ],
+    "topicIds": [
+      "great-migration",
+      "due-process",
+      "public-safety",
+      "commemoration",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Duluth lynching",
+      "racial terror",
+      "anti-lynching law",
+      "Great Migration",
+      "mob violence"
+    ],
+    "jurisdictionLabel": "Duluth, Minnesota",
+    "locationPrecision": "site",
+    "locationLabel": "Site of the 1920 Duluth lynching near the downtown jail",
+    "lat": 46.7893,
+    "lng": -92.0968,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "on June 15, 1920, in Duluth, Minnesota, by a white mob",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Duluth_lynchings",
+        "citationLabel": "Wikipedia: Duluth lynchings"
+      },
+      {
+        "predicate": "was accused of",
+        "object": "rape of a white teenage woman, Irene Tusken, an accusation later discredited by a doctor",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Duluth_lynchings",
+        "citationLabel": "Wikipedia: Duluth lynchings"
+      },
+      {
+        "predicate": "was taken from",
+        "object": "the Duluth jail by a mob estimated at 1,000–10,000 people",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Duluth_lynchings",
+        "citationLabel": "Wikipedia: Duluth lynchings"
+      },
+      {
+        "predicate": "was subjected to",
+        "object": "a mock trial and beating before being hanged from a light post",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Duluth_lynchings",
+        "citationLabel": "Wikipedia: Duluth lynchings"
+      },
+      {
+        "predicate": "is part of",
+        "object": "the only widely known lynching of African Americans in Minnesota history",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Duluth_lynchings",
+        "citationLabel": "Wikipedia: Duluth lynchings"
+      },
+      {
+        "predicate": "contributed to",
+        "object": "the passage of Minnesota’s anti-lynching legislation in April 1921",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Duluth_lynchings",
+        "citationLabel": "Wikipedia: Duluth lynchings"
+      }
+    ],
+    "historicalContext": "The lynching of Elmer Jackson occurred during the Nadir of American race relations, a period marked by widespread anti-Black violence and racial scapegoating, particularly as Black migrants moved North during the Great Migration. In industrial cities like Duluth, competition for jobs heightened racial tensions, enabling mob violence despite the absence of evidence. The event catalyzed state-level legal reform, reflecting how such atrocities sometimes prompted institutional responses, albeit without accountability for the perpetrators."
+  },
+  {
+    "id": "lynching_isaac_mcghie_duluth_minnesota",
+    "kind": "person",
+    "displayName": "Isaac McGhie",
+    "summary": "Isaac McGhie, a Black circus worker, was lynched by a white mob in Duluth, Minnesota, on June 15, 1920, after false accusations of rape. Alongside [[lynching_elias_clayton_duluth_minnesota|Elias Clayton]] and [[lynching_elmer_jackson_duluth_minnesota|Elmer Jackson]], he was taken from jail, beaten, and hanged. No one was convicted of murder, though three were jailed for rioting.",
+    "eraBuckets": [
+      "1920s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "jim-crow"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "jim-crow"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Duluth lynching",
+      "racial violence",
+      "anti-lynching law",
+      "Great Migration",
+      "mob violence"
+    ],
+    "jurisdictionLabel": "Duluth, Minnesota",
+    "locationPrecision": "site",
+    "locationLabel": "Site of the 1920 Duluth lynchings",
+    "lat": 46.7893,
+    "lng": -92.0968,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "in Duluth, Minnesota, on June 15, 1920",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Duluth_lynchings",
+        "citationLabel": "Wikipedia: Duluth lynchings"
+      },
+      {
+        "predicate": "was accused of",
+        "object": "rape of a teenage white woman, later discredited by a doctor",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Duluth_lynchings",
+        "citationLabel": "Wikipedia: Duluth lynchings"
+      },
+      {
+        "predicate": "was taken from jail",
+        "object": "by a white mob of 1,000–10,000 people",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Duluth_lynchings",
+        "citationLabel": "Wikipedia: Duluth lynchings"
+      },
+      {
+        "predicate": "was subjected to",
+        "object": "a mock trial and beating before being hanged from a light post",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Duluth_lynchings",
+        "citationLabel": "Wikipedia: Duluth lynchings"
+      },
+      {
+        "predicate": "was one of three African-American victims",
+        "object": "of the 1920 Duluth lynchings, alongside Elias Clayton and Elmer Jackson",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Duluth_lynchings",
+        "citationLabel": "Wikipedia: Duluth lynchings"
+      },
+      {
+        "predicate": "is associated with",
+        "object": "the passage of Minnesota’s anti-lynching law in 1921",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Duluth_lynchings",
+        "citationLabel": "Wikipedia: Duluth lynchings"
+      }
+    ],
+    "historicalContext": "The 1920 Duluth lynchings occurred during the Nadir of American race relations, a period marked by widespread anti-Black violence and the erosion of civil rights. This event reflects the racial tensions exacerbated by the Great Migration and white working-class fears of economic competition, set against a backdrop of systemic failures to protect Black lives. The lack of murder convictions and the subsequent passage of anti-lynching legislation illustrate both the entrenched nature of racial terror and the limited legal responses to it."
+  },
+  {
+    "id": "lynching_lige_daniels_center_texas",
+    "kind": "person",
+    "displayName": "Lige Daniels",
+    "summary": "Lige Daniels was lynched on August 3, 1920, in Center, Texas (Shelby County), after being accused of murdering a white woman. A mob of approximately 1,000 people seized him from jail and hanged him in the town square, an act of racial terror consistent with Jim Crow-era violence targeting Black Americans.",
+    "eraBuckets": [
+      "1920s"
+    ],
+    "topicTags": [
+      "resistance",
+      "jim-crow",
+      "civil-rights"
+    ],
+    "topicIds": [
+      "resistance",
+      "jim-crow",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "racial terror",
+      "mob violence",
+      "Shelby County",
+      "Jim Crow"
+    ],
+    "jurisdictionLabel": "Center, Texas",
+    "locationPrecision": "site",
+    "locationLabel": "Town square, Center, Texas",
+    "lat": 31.79305556,
+    "lng": -94.17944444,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "on August 3, 1920, in Center, Texas, following an accusation of murdering a white woman",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Center%2C_Texas",
+        "citationLabel": "Wikipedia entry for Center, Texas"
+      },
+      {
+        "predicate": "was taken from jail",
+        "object": "by a mob of approximately 1,000 people and hanged in the town square of Center, Texas",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Center%2C_Texas",
+        "citationLabel": "Wikipedia entry for Center, Texas"
+      }
+    ],
+    "historicalContext": "Lynching was a tool of racial control in the Jim Crow South, used to enforce white supremacy and suppress Black autonomy. The extrajudicial killing of Black people—often under accusations of crimes against white individuals—was frequently carried out with community complicity and impunity. Center, Texas, located in a region with a history of racial violence, exemplifies how local institutions failed to protect Black residents from mob rule."
+  },
+  {
+    "id": "lynching_julius_july_perry_ocoee_florida",
+    "kind": "person",
+    "displayName": "Julius \"July\" Perry",
+    "summary": "Julius \"July\" Perry, a prosperous Black farmer in Ocoee, Florida, was lynched on November 3, 1920, after attempting to vote. His home was attacked by a white mob during the Ocoee massacre, a violent suppression of Black suffrage that killed dozens and expelled nearly all African Americans from the town. A sign on his body read, \"This is what we do to niggers that vote.\"",
+    "eraBuckets": [
+      "1920s"
+    ],
+    "topicTags": [
+      "voting-rights",
+      "jim-crow",
+      "mass-mobilization",
+      "resistance",
+      "black-power",
+      "segregation",
+      "civil-rights"
+    ],
+    "topicIds": [
+      "voting-rights",
+      "jim-crow",
+      "mass-mobilization",
+      "resistance",
+      "black-power",
+      "segregation",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Ocoee massacre",
+      "voter suppression",
+      "racial violence",
+      "Black farmer",
+      "lynching"
+    ],
+    "jurisdictionLabel": "Ocoee, Florida",
+    "locationPrecision": "site",
+    "locationLabel": "Home of Julius Perry",
+    "lat": 28.5933,
+    "lng": -81.5276,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "on November 3, 1920, in Ocoee, Florida",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Ocoee_massacre",
+        "citationLabel": "Ocoee massacre"
+      },
+      {
+        "predicate": "was accused of",
+        "object": "voting in the 1920 U.S. presidential election",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Ocoee_massacre",
+        "citationLabel": "Ocoee massacre"
+      },
+      {
+        "predicate": "was targeted because",
+        "object": "he was a prosperous Black farmer and attempted to vote",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Ocoee_massacre",
+        "citationLabel": "Ocoee massacre"
+      },
+      {
+        "predicate": "had a sign placed on his body stating",
+        "object": "\"This is what we do to niggers that vote.\"",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Ocoee_massacre",
+        "citationLabel": "Ocoee massacre"
+      },
+      {
+        "predicate": "was part of",
+        "object": "the Ocoee massacre, which killed 30–80 Black people",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Ocoee_massacre",
+        "citationLabel": "Ocoee massacre"
+      },
+      {
+        "predicate": "owned property in",
+        "object": "northern Ocoee, Florida",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Ocoee_massacre",
+        "citationLabel": "Ocoee massacre"
+      }
+    ],
+    "historicalContext": "The lynching of July Perry occurred during the Ocoee massacre, a direct assault on Black political participation in the Jim Crow South. Amid widespread voter suppression, Black citizens like Perry who challenged disenfranchisement through voter registration drives became targets of racial terror. The massacre exemplifies how economic jealousy, white supremacist violence, and electoral politics converged to maintain racial hierarchy."
+  }
+]

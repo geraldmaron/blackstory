@@ -1,0 +1,413 @@
+[
+  {
+    "id": "gap_the_new_yorker",
+    "kind": "institution",
+    "displayName": "The New Yorker",
+    "summary": "The New Yorker is an American magazine that gained prominence for publishing Hunter, the first Black staff writer, in 1963, marking a significant milestone in the civil rights movement.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "firsts",
+      "journalism"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "firsts",
+      "journalism"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "The New Yorker",
+      "Black staff writer",
+      "civil rights",
+      "Hunter",
+      "1963"
+    ],
+    "jurisdictionLabel": "New York City, New York",
+    "locationPrecision": "city",
+    "locationLabel": "New York City",
+    "lat": 40.7128,
+    "lng": -74.0061,
+    "claims": [
+      {
+        "predicate": "was",
+        "object": "first Black staff writer at The New Yorker",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/The_New_Yorker",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "hired",
+        "object": "Hunter in 1963",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/The_New_Yorker",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The New Yorker's decision to hire Hunter as its first Black staff writer in 1963 was a pivotal moment in the civil rights movement, reflecting broader societal shifts toward racial inclusion in media and journalism. This event is part of the larger narrative of Black history in the United States, highlighting the role of media in advancing civil rights."
+  },
+  {
+    "id": "gap_may_11_1963",
+    "kind": "event",
+    "displayName": "May 11, 1963",
+    "summary": "On May 11, 1963, during the Birmingham campaign, hundreds of African Americans, including children, were arrested in Birmingham, Alabama, as they marched from the Sixteenth Street Baptist Church to protest segregation, drawing national attention to systemic racial injustice.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "direct-action",
+      "desegregation",
+      "student-activism",
+      "police-violence"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "direct-action",
+      "desegregation",
+      "student-activism",
+      "police-violence"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Birmingham campaign",
+      "civil rights protest",
+      "mass arrests",
+      "children's crusade",
+      "segregation"
+    ],
+    "jurisdictionLabel": "Birmingham, Alabama",
+    "locationPrecision": "city",
+    "locationLabel": "Birmingham campaign protest site",
+    "lat": 33,
+    "lng": -87,
+    "claims": [
+      {
+        "predicate": "included mass arrests of African American protesters",
+        "object": "hundreds of African Americans, including children, were arrested in Birmingham, Alabama",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/May_1963",
+        "citationLabel": "Wikipedia entry for May 1963"
+      },
+      {
+        "predicate": "occurred during the Birmingham campaign",
+        "object": "part of organized protests against segregation in Birmingham",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/May_1963",
+        "citationLabel": "Wikipedia entry for May 1963"
+      },
+      {
+        "predicate": "involved nonviolent direct action",
+        "object": "protesters set out from the Sixteenth Street Baptist Church to challenge segregation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/May_1963",
+        "citationLabel": "Wikipedia entry for May 1963"
+      }
+    ],
+    "historicalContext": "The Birmingham campaign was a strategic nonviolent direct-action effort to challenge segregation in one of the most racially divided cities in the U.S. The mass arrests and violent responses, widely covered by media, increased pressure on federal authorities to advance civil rights legislation."
+  },
+  {
+    "id": "gap_nashville_sit",
+    "kind": "event",
+    "displayName": "Nashville sit",
+    "summary": "The Nashville sit-ins, occurring from February 13 to May 10, 1960, were a critical part of the Civil Rights Movement, leading to the desegregation of lunch counters in downtown Nashville and inspiring broader protests across the South.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "sit-ins",
+      "segregation",
+      "nonviolence",
+      "jim-crow"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "sit-ins",
+      "segregation",
+      "nonviolence",
+      "jim-crow"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Nashville sit-ins",
+      "Civil Rights Movement",
+      "nonviolence",
+      "desegregation",
+      "Jim Crow"
+    ],
+    "jurisdictionLabel": "Nashville, Tennessee",
+    "locationPrecision": "city",
+    "locationLabel": "Downtown Nashville",
+    "lat": 36.153,
+    "lng": -86.782,
+    "claims": [
+      {
+        "predicate": "was_part_of",
+        "object": "sit-in movement",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Nashville_sit-ins",
+        "citationLabel": "Nashville sit-ins Wikipedia"
+      },
+      {
+        "predicate": "took_place_in",
+        "object": "Nashville, Tennessee",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Nashville_sit-ins",
+        "citationLabel": "Nashville sit-ins Wikipedia"
+      },
+      {
+        "predicate": "led_to",
+        "object": "desegregation of lunch counters",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Nashville_sit-ins",
+        "citationLabel": "Nashville sit-ins Wikipedia"
+      },
+      {
+        "predicate": "was_coordinated_by",
+        "object": "Nashville Student Movement and Nashville Christian Leadership Council",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Nashville_sit-ins",
+        "citationLabel": "Nashville sit-ins Wikipedia"
+      },
+      {
+        "predicate": "resulted_in",
+        "object": "first desegregation of lunch counters in Nashville",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Nashville_sit-ins",
+        "citationLabel": "Nashville sit-ins Wikipedia"
+      }
+    ],
+    "historicalContext": "The Nashville sit-ins were part of the broader sit-in movement that emerged in response to the 1955 Greensboro sit-ins. They were a direct challenge to Jim Crow segregation, which was legally upheld by the 1896 Plessy v. Ferguson decision. The sit-ins demonstrated the power of nonviolent protest and contributed to the eventual passage of the Civil Rights Act of 1964."
+  },
+  {
+    "id": "gap_the_woman_inventor",
+    "kind": "organization",
+    "displayName": "The Woman Inventor",
+    "summary": "Ellen Eglin, an African-American inventor, created a clothes wringer in the 1880s but faced racial discrimination when attempting to patent it, fearing white customers would reject a product from a Black woman.",
+    "eraBuckets": [
+      "1880s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "invention"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "invention"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Ellen Eglin",
+      "clothes wringer",
+      "invention",
+      "racial discrimination",
+      "Black inventor"
+    ],
+    "jurisdictionLabel": "Washington, D.C.",
+    "locationPrecision": "city",
+    "locationLabel": "Washington, D.C.",
+    "lat": 38.90472222,
+    "lng": -77.01638889,
+    "claims": [
+      {
+        "predicate": "invented",
+        "object": "clothes wringer",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Ellen_Eglin",
+        "citationLabel": "Ellen F. Eglin"
+      },
+      {
+        "predicate": "faced",
+        "object": "racial discrimination",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Ellen_Eglin",
+        "citationLabel": "Ellen F. Eglin"
+      },
+      {
+        "predicate": "sold",
+        "object": "invention",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Ellen_Eglin",
+        "citationLabel": "Ellen F. Eglin"
+      },
+      {
+        "predicate": "feared",
+        "object": "white customers would refuse",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Ellen_Eglin",
+        "citationLabel": "Ellen F. Eglin"
+      }
+    ],
+    "historicalContext": "Ellen Eglin's invention of a clothes wringer in the 1880s highlights the racial barriers Black women faced in the patent process and the broader context of segregation and discrimination in the United States. Her story is part of the larger narrative of Black inventors and the challenges they encountered in gaining recognition and economic success."
+  },
+  {
+    "id": "gap_hidden_figures",
+    "kind": "other",
+    "displayName": "Hidden Figures",
+    "summary": "Hidden Figures is a 2016 film that profiles the contributions of three African-American women mathematicians at NASA during the Space Race, highlighting their roles in the civil rights movement and their experiences with racial and gender discrimination.",
+    "eraBuckets": [
+      "1950s",
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "space",
+      "segregation",
+      "women",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "space",
+      "segregation",
+      "women",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Hidden Figures",
+      "NASA",
+      "segregation",
+      "civil rights",
+      "Black women"
+    ],
+    "jurisdictionLabel": "Hampton, Virginia",
+    "locationPrecision": "institution",
+    "locationLabel": "Langley Research Center",
+    "lat": 37.0925,
+    "lng": -76.3825,
+    "claims": [
+      {
+        "predicate": "was_based_on",
+        "object": "Margot Lee Shetterly's book",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Hidden_Figures",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "features",
+        "object": "Katherine Goble Johnson",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Hidden_Figures",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "features",
+        "object": "Dorothy Vaughan",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Hidden_Figures",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "features",
+        "object": "Mary Jackson",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Hidden_Figures",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "depicts",
+        "object": "segregation at NASA",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Hidden_Figures",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "depicts",
+        "object": "racial and gender discrimination",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Hidden_Figures",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Hidden Figures is set during the 1950s and 1960s, a period marked by segregation and the civil rights movement. The film illustrates the challenges faced by Black women in the scientific community and their pivotal roles in the space program, which were part of broader efforts to challenge racial and gender barriers in the United States."
+  },
+  {
+    "id": "gap_philadelphia_s_pearl",
+    "kind": "place",
+    "displayName": "Philadelphia's Pearl",
+    "summary": "Philadelphia's Pearl, located at 1946 N. 23rd Street, was the childhood home of Pearl Bailey, a pioneering African American actress, singer, and comedian. The site is recognized for its cultural and historical significance in the development of Bailey's career.",
+    "eraBuckets": [
+      "1910s",
+      "1930s",
+      "1940s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "arts",
+      "history",
+      "black-codes"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "arts",
+      "history",
+      "black-codes"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Pearl Bailey",
+      "Philadelphia",
+      "childhood home",
+      "Black history",
+      "cultural significance"
+    ],
+    "jurisdictionLabel": "Philadelphia, Pennsylvania",
+    "locationPrecision": "address",
+    "locationLabel": "1946 N. 23rd Street",
+    "lat": 39.95194444,
+    "lng": -75.19361111,
+    "claims": [
+      {
+        "predicate": "was the childhood home of",
+        "object": "Pearl Bailey",
+        "confidenceLevel": "high",
+        "citationSource": "phila.gov",
+        "citationHref": "https://www.phila.gov/2021-09-22-historic-spotlight-pearl-bailey/",
+        "citationLabel": "Philadelphia Historical Commission"
+      },
+      {
+        "predicate": "is recognized as",
+        "object": "a historically significant site",
+        "confidenceLevel": "high",
+        "citationSource": "phila.gov",
+        "citationHref": "https://www.phila.gov/2021-09-22-historic-spotlight-pearl-bailey/",
+        "citationLabel": "Philadelphia Historical Commission"
+      },
+      {
+        "predicate": "was the starting point of",
+        "object": "Pearl Bailey's career",
+        "confidenceLevel": "medium",
+        "citationSource": "phila.gov",
+        "citationHref": "https://www.phila.gov/2021-09-22-historic-spotlight-pearl-bailey/",
+        "citationLabel": "Philadelphia Historical Commission"
+      }
+    ],
+    "historicalContext": "Philadelphia's Pearl is historically significant as the childhood home of Pearl Bailey, a key figure in Black entertainment history. The site reflects the broader context of Black cultural and artistic development in the early 20th century, particularly in the context of the Great Migration and the rise of Black entertainment venues in urban centers."
+  }
+]

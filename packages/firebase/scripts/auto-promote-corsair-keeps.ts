@@ -90,7 +90,13 @@ type EnrichmentItem = {
       readonly topicIds?: readonly string[];
       readonly eraBuckets?: readonly string[];
       readonly keywords?: readonly string[];
+    
+    readonly location?: {
+      readonly jurisdictionLabel: string;
+      readonly locationLabel: string;
+      readonly locationPrecision: string;
     };
+  };
   };
 };
 
@@ -163,11 +169,25 @@ function main(): void {
       held.push({ subjectId: packet.subjectId, title, reason: 'no structured claims in draft' });
       continue;
     }
-    if (!subject.jurisdictionLabel || !subject.locationLabel || !subject.locationPrecision) {
+    // Location can come from curated subject metadata OR the judge's text-derived
+    // location — but judge-derived still needs real coordinates (never a 0,0 fallback).
+    const location =
+      subject.jurisdictionLabel && subject.locationLabel && subject.locationPrecision
+        ? {
+            jurisdictionLabel: subject.jurisdictionLabel,
+            locationLabel: subject.locationLabel,
+            locationPrecision: subject.locationPrecision,
+          }
+        : packet.drafts.location && subject.lat !== undefined && subject.lng !== undefined
+          ? packet.drafts.location
+          : undefined;
+    if (!location) {
       held.push({
         subjectId: packet.subjectId,
         title,
-        reason: 'missing jurisdiction/location fields',
+        reason: packet.drafts.location
+          ? 'judge-derived location lacks real coordinates'
+          : 'missing jurisdiction/location fields',
       });
       continue;
     }
@@ -231,9 +251,9 @@ function main(): void {
         : {}),
       mentionedEntityIds: [],
       ...(packet.drafts.keywords ? { keywords: packet.drafts.keywords } : {}),
-      jurisdictionLabel: subject.jurisdictionLabel,
-      locationPrecision: subject.locationPrecision,
-      locationLabel: subject.locationLabel,
+      jurisdictionLabel: location.jurisdictionLabel,
+      locationPrecision: location.locationPrecision,
+      locationLabel: location.locationLabel,
       lat: subject.lat ?? 0,
       lng: subject.lng ?? 0,
       claims,

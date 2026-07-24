@@ -1,0 +1,188 @@
+[
+  {
+    "id": "divine9_org_alpha_kappa_alpha_q3308284",
+    "kind": "organization",
+    "displayName": "Alpha Kappa Alpha",
+    "summary": "Founded in 1908 at Howard University, Alpha Kappa Alpha is the first Greek-letter sorority established by African American women. It played a foundational role in advancing Black women's leadership in education and civil rights, expanding nationally while emphasizing service, scholarship, and racial uplift through structured programs and advocacy.",
+    "eraBuckets": [
+      "1900s",
+      "1910s",
+      "1920s",
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s",
+      "1970s",
+      "1980s",
+      "1990s",
+      "2000s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "education",
+      "hbcu",
+      "women-leaders",
+      "community-organizing"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "education",
+      "hbcu",
+      "women-leaders",
+      "community-organizing"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Alpha Kappa Alpha",
+      "Howard University",
+      "Black sorority",
+      "Divine Nine",
+      "Black women's leadership"
+    ],
+    "jurisdictionLabel": "Chicago, Illinois",
+    "locationPrecision": "address",
+    "locationLabel": "International headquarters",
+    "lat": 41.88194444,
+    "lng": -87.62777778,
+    "claims": [
+      {
+        "predicate": "was founded on",
+        "object": "January 15, 1908",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Alpha_Kappa_Alpha",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was founded at",
+        "object": "Howard University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Alpha_Kappa_Alpha",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is a member of",
+        "object": "National Pan-Hellenic Council",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Alpha_Kappa_Alpha",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is the first",
+        "object": "Greek-letter sorority established by African American women",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Alpha_Kappa_Alpha",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "emphasizes",
+        "object": "community service, educational advancement, and civil rights advocacy",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Alpha_Kappa_Alpha",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "expanded nationally during",
+        "object": "the early 20th century to support Black women's leadership and racial uplift",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Alpha_Kappa_Alpha",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "As the first Black collegiate sorority, Alpha Kappa Alpha emerged during the Jim Crow era when African American women were excluded from white Greek organizations and faced systemic barriers in education and public life. Its founding at Howard University—a leading HBCU—reflects the critical role of Black institutions in fostering leadership and resistance through networks of educated women committed to community organizing and social justice."
+  },
+  {
+    "id": "divine9_founder_vertner_woodson_tandy_q7922964",
+    "kind": "person",
+    "displayName": "Vertner Woodson Tandy",
+    "summary": "Vertner Woodson Tandy, born in Lexington, Kentucky, was the first African American registered architect in New York State and a founding member of [[divine9_org_alpha_phi_alpha_q2839513|Alpha Phi Alpha]] fraternity at Cornell University in 1906. He designed Villa Lewaro, the Irvington-on-Hudson mansion of Madam C.J. Walker’s daughter, a landmark of the Harlem Renaissance, and co-founded the…",
+    "eraBuckets": [
+      "1900s",
+      "1910s",
+      "1940s"
+    ],
+    "topicTags": [
+      "architecture",
+      "black-architects",
+      "civil-rights",
+      "hbcu",
+      "harlem-renaissance"
+    ],
+    "topicIds": [
+      "architecture",
+      "black-architects",
+      "civil-rights",
+      "hbcu",
+      "harlem-renaissance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "first African-American architect New York",
+      "Villa Lewaro",
+      "Alpha Phi Alpha founder",
+      "Tandy & Foster",
+      "St. Philip's Church Harlem"
+    ],
+    "jurisdictionLabel": "New York, NY",
+    "locationPrecision": "site",
+    "locationLabel": "St. Philip's Episcopal Church, Harlem",
+    "lat": 40.81472222,
+    "lng": -73.94527778,
+    "claims": [
+      {
+        "predicate": "was founding member of",
+        "object": "Alpha Phi Alpha",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Vertner_Woodson_Tandy",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was first registered African-American architect in",
+        "object": "New York State",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Vertner_Woodson_Tandy",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "designed",
+        "object": "Villa Lewaro",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Vertner_Woodson_Tandy",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "co-founded architectural firm",
+        "object": "Tandy & Foster",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Vertner_Woodson_Tandy",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was first African American to pass",
+        "object": "military commissioning examination for New York National Guard",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Vertner_Woodson_Tandy",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "designed",
+        "object": "St. Philip's Episcopal Church in Harlem",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Vertner_Woodson_Tandy",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "As a founder of Alpha Phi Alpha—the first intercollegiate Black Greek-letter fraternity—Tandy helped establish a durable institution of Black leadership and mutual aid during the Jim Crow era. His architectural work, particularly in Harlem, contributed to the physical and cultural infrastructure of the Great Migration’s urban Black communities."
+  }
+]

@@ -1,0 +1,65 @@
+[
+  {
+    "id": "gap_francis_marion_and_ella_boyer",
+    "kind": "person",
+    "displayName": "Francis Marion and Ella Boyer",
+    "summary": "Francis Marion and Ella Boyer founded Vado, New Mexico in 1920 after their previous Black-founded colony, Blackdom, failed due to water shortages. Their effort reflects a broader 20th-century pattern of African American land colonization in the Southwest, aimed at achieving self-sufficiency and autonomy.",
+    "eraBuckets": [
+      "1920s"
+    ],
+    "topicTags": [
+      "freedom",
+      "self-governance",
+      "great-migration",
+      "land-ownership",
+      "resistance"
+    ],
+    "topicIds": [
+      "freedom",
+      "self-governance",
+      "great-migration",
+      "land-ownership",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "freedom colony",
+      "Black settlers",
+      "New Mexico",
+      "land ownership",
+      "self-determination"
+    ],
+    "jurisdictionLabel": "Vado, New Mexico",
+    "locationPrecision": "community",
+    "locationLabel": "founding site of Vado",
+    "lat": 32.125,
+    "lng": -106.65611111,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "Vado, New Mexico",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Vado%2C_New_Mexico",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "established after the failure of",
+        "object": "Blackdom, New Mexico",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Vado%2C_New_Mexico",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "founded a freedom colony",
+        "object": "Vado, New Mexico",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Vado%2C_New_Mexico",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The founding of Vado by the Boyers followed the collapse of Blackdom, another all-Black settlement in New Mexico. These colonies were part of a larger movement of African Americans seeking land ownership and freedom from Jim Crow segregation in the early 20th century, particularly during the Great Migration. Their efforts illustrate the pursuit of self-governance and economic independence in the face of systemic disenfranchisement."
+  }
+]

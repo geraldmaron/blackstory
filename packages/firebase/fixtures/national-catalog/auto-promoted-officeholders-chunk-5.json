@@ -1,0 +1,425 @@
+[
+  {
+    "id": "recon_isaiah_t_montgomery",
+    "kind": "person",
+    "displayName": "Isaiah T. Montgomery",
+    "summary": "Isaiah T. Montgomery, born into slavery at Davis Bend, founded Mound Bayou, Mississippi—an independent Black town established in 1887. He served as its mayor from 1888 to 1902 and as postmaster from 1888 to 1894.",
+    "eraBuckets": [
+      "1860s",
+      "1870s",
+      "1880s",
+      "1890s",
+      "1900s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "jim-crow",
+      "self-governance",
+      "land-ownership",
+      "civil-rights",
+      "community",
+      "desegregation",
+      "founding-era",
+      "government",
+      "leadership"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "jim-crow",
+      "self-governance",
+      "land-ownership",
+      "civil-rights",
+      "community",
+      "desegregation",
+      "founding-era",
+      "government",
+      "leadership"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Mound Bayou",
+      "Mississippi Constitutional Convention 1890",
+      "Black town founder",
+      "accommodationism",
+      "post-Reconstruction"
+    ],
+    "jurisdictionLabel": "Mound Bayou, Mississippi",
+    "locationPrecision": "town",
+    "locationLabel": "Founding site and municipal center of Mound Bayou",
+    "lat": 34.12513056,
+    "lng": -84.80766389,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "Mound Bayou, Mississippi",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Isaiah_Montgomery",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served_as",
+        "object": "mayor of Mound Bayou from 1888 to 1902",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Isaiah_Montgomery",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served_as",
+        "object": "postmaster of Mound Bayou from June 12, 1888 to March 14, 1894",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Isaiah_Montgomery",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "participated_in",
+        "object": "1890 Mississippi Constitutional Convention as a delegate",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Isaiah_Montgomery",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "advocated_for",
+        "object": "accommodationist policies including literacy tests and poll taxes to maintain Black political survival",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.mshistorynow.mdah.ms.gov/issue/isaiah-t-montgomery-1847-1924-part-ii",
+        "citationLabel": "Mississippi History Now"
+      },
+      {
+        "predicate": "was_born_into",
+        "object": "slavery at Davis Bend, Mississippi",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Isaiah_Montgomery",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Montgomery’s founding of Mound Bayou reflected a broader post-Reconstruction strategy of Black self-governance and land ownership amid increasing disenfranchisement. His participation in the 1890 constitutional convention—where he accepted voter suppression measures—illustrates the constrained choices Black leaders faced under Jim Crow, balancing survival against resistance in a white-dominated political system."
+  },
+  {
+    "id": "recon_william_thornton_montgomery",
+    "kind": "person",
+    "displayName": "William Thornton Montgomery",
+    "summary": "William Thornton Montgomery, born into slavery at Davis Bend, Mississippi, served as postmaster of Hurricane from 1867 to 1880, a rare federal appointment for a Black man during Reconstruction.",
+    "eraBuckets": [
+      "1860s",
+      "1870s",
+      "1880s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "self-governance"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "self-governance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "postmaster",
+      "Davis Bend",
+      "Mound Bayou",
+      "Montgomery family"
+    ],
+    "jurisdictionLabel": "Warren County, Mississippi",
+    "locationPrecision": "site",
+    "locationLabel": "Hurricane Plantation, Davis Bend",
+    "lat": 32.1532,
+    "lng": -91.12094,
+    "claims": [
+      {
+        "predicate": "held federal office as postmaster",
+        "object": "postmaster of Hurricane, Mississippi",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/William_Thornton_Montgomery",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was born into slavery",
+        "object": "on Joseph Davis' Hurricane plantation in Warren County, Mississippi",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/William_Thornton_Montgomery",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was son of",
+        "object": "Benjamin Thornton Montgomery",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/William_Thornton_Montgomery",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was brother of",
+        "object": "Isaiah Montgomery",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/William_Thornton_Montgomery",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served during",
+        "object": "Reconstruction era",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/William_Thornton_Montgomery",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is buried at",
+        "object": "Mound Bayou Cemetery",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/William_Thornton_Montgomery",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Montgomery’s federal appointment as postmaster reflects the brief expansion of Black political participation during Reconstruction, enabled by federal oversight in the South. His family’s leadership at Davis Bend and later in founding Mound Bayou illustrates a broader pattern of Black self-governance and economic autonomy in the postbellum era."
+  },
+  {
+    "id": "recon_hawkins_w_carter",
+    "kind": "person",
+    "displayName": "Hawkins W. Carter",
+    "summary": "Hawkins Wesley Carter, an African American farmer and Republican, served in the North Carolina House of Representatives from 1874 to 1880 and the state Senate in 1881 and 1883, representing Warren County during Reconstruction. His legislative service occurred amid efforts to expand Black political participation before the onset of widespread disenfranchisement.",
+    "eraBuckets": [
+      "1870s",
+      "1880s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "government"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "government"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "North Carolina Senate",
+      "Warren County",
+      "African American legislator",
+      "Republican Party"
+    ],
+    "jurisdictionLabel": "Warrenton, North Carolina",
+    "locationPrecision": "city",
+    "locationLabel": "Residence and political base",
+    "lat": 36,
+    "lng": -80,
+    "claims": [
+      {
+        "predicate": "served in",
+        "object": "North Carolina House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Hawkins_Wesley_Carter",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served in",
+        "object": "North Carolina Senate",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Hawkins_Wesley_Carter",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "represented",
+        "object": "Warren County",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Hawkins_Wesley_Carter",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was member of",
+        "object": "Republican Party",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Hawkins_Wesley_Carter",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was African American",
+        "object": "African American",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Hawkins_Wesley_Carter",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served during",
+        "object": "Reconstruction era",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Hawkins_Wesley_Carter",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Carter’s election and service occurred during Reconstruction, a period when newly enfranchised African Americans in the South gained political representation despite rising white resistance. His tenure ended as Democratic 'Redeemer' governments reasserted control and began dismantling Black political power through legal and extralegal means."
+  },
+  {
+    "id": "recon_w_t_j_hayes",
+    "kind": "person",
+    "displayName": "W. T. J. Hayes",
+    "summary": "W. T. J. Hayes, an African American Republican, served as a delegate from Halifax County to the 1868 North Carolina Constitutional Convention, where he signed the state's new constitution and served on the Committees on Militia and Education.",
+    "eraBuckets": [
+      "1860s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "voting-rights",
+      "firsts",
+      "politics",
+      "education",
+      "segregation"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "voting-rights",
+      "firsts",
+      "politics",
+      "education",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "1868 Constitution",
+      "Halifax County",
+      "Black Caucus",
+      "Republican",
+      "justice of the peace"
+    ],
+    "jurisdictionLabel": "Raleigh, North Carolina",
+    "locationPrecision": "site",
+    "locationLabel": "State Capitol, site of the 1868 Constitutional Convention",
+    "lat": 35.78320278,
+    "lng": -78.63895556,
+    "claims": [
+      {
+        "predicate": "served as delegate to",
+        "object": "North Carolina Constitutional Convention of 1868",
+        "confidenceLevel": "high",
+        "citationSource": "ncdcr.gov",
+        "citationHref": "https://www.ncdcr.gov/blog/2016/01/14/black-delegates-had-voice-1868-convention",
+        "citationLabel": "NCDcr.gov"
+      },
+      {
+        "predicate": "was signatory of",
+        "object": "North Carolina's 1868 Constitution",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/W._T._J._Hayes",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served on committee",
+        "object": "Committee on Militia, 1868 NC Constitutional Convention",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/W._T._J._Hayes",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served on committee",
+        "object": "Committee on Education, 1868 NC Constitutional Convention",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/W._T._J._Hayes",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was one of the first African Americans to serve in",
+        "object": "North Carolina House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/W._T._J._Hayes",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was member of",
+        "object": "first Black Caucus in North Carolina",
+        "confidenceLevel": "high",
+        "citationSource": "ncdcr.gov",
+        "citationHref": "https://www.ncdcr.gov/blog/2016/01/14/black-delegates-had-voice-1868-convention",
+        "citationLabel": "NCDcr.gov"
+      }
+    ],
+    "historicalContext": "The 1868 North Carolina Constitutional Convention was a pivotal moment in Reconstruction, mandated by Congress to reestablish the state's governance under new terms that included Black male suffrage. As a Black delegate and legislator, Hayes participated in reshaping state laws during a period of expanded civil rights, contributing to efforts in education reform and militia organization amid rising white resistance to Black political participation."
+  },
+  {
+    "id": "recon_moses_j_bullock",
+    "kind": "person",
+    "displayName": "Moses J. Bullock",
+    "summary": "Moses J. Bullock served as postmaster of Townsville, North Carolina, from February 19, 1874, to February 8, 1886, during the Reconstruction era. His appointment reflects documented Black participation in federal offices in the postbellum South, a period marked by expanded civic roles for African Americans under federal protection.",
+    "eraBuckets": [
+      "1870s",
+      "1880s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "government"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "government"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "postmaster",
+      "Reconstruction",
+      "Vance County",
+      "federal appointment",
+      "Black officeholder"
+    ],
+    "jurisdictionLabel": "Townsville, North Carolina",
+    "locationPrecision": "community",
+    "locationLabel": "Townsville post office",
+    "lat": 36.49472222,
+    "lng": -78.42361111,
+    "claims": [
+      {
+        "predicate": "served as postmaster of",
+        "object": "Townsville, North Carolina",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Townsville%2C_North_Carolina",
+        "citationLabel": "Wikipedia: Townsville, North Carolina"
+      },
+      {
+        "predicate": "held federal office during",
+        "object": "Reconstruction era",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Townsville%2C_North_Carolina",
+        "citationLabel": "Wikipedia: Townsville, North Carolina"
+      },
+      {
+        "predicate": "served in federal position from",
+        "object": "February 19, 1874 to February 8, 1886",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Townsville%2C_North_Carolina",
+        "citationLabel": "Wikipedia: Townsville, North Carolina"
+      }
+    ],
+    "historicalContext": "During Reconstruction, federal appointments like postmaster provided rare avenues for Black men to hold public office in the South, especially in rural areas where local power remained dominated by white elites. The U.S. Postal Service was one of the few integrated federal institutions, and Black postmasters symbolized both federal authority and local Black agency in the face of rising white resistance and the eventual rollback of civil rights."
+  }
+]

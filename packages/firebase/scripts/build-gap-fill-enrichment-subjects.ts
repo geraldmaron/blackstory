@@ -65,6 +65,7 @@ async function main(): Promise<void> {
   let foundSource = 0;
   let foundTier1 = 0;
   let noSource = 0;
+  let completedCount = 0;
   const subjects = await mapPool(
     candidates,
     async (candidate) => {
@@ -76,8 +77,11 @@ async function main(): Promise<void> {
       // Sequenced, not parallel: primary lookup (Wikipedia API first) gives us a page
       // whose OWN citation trail is checked for Tier-1 corroboration before falling
       // back to a fresh (SearXNG) search — avoids firing two independent, partly
-      // redundant lookups per candidate.
-      const primary = await findAnySource(candidate.displayName);
+      // redundant lookups per candidate. The mention context (what the citing record
+      // actually says about this subject) is passed through so the lookup can reject
+      // a same-named-but-wrong Wikipedia article instead of accepting it blindly.
+      const context = candidate.gapFill.mentionContexts.join(' ');
+      const primary = await findAnySource(candidate.displayName, { context, kind: candidate.kind });
       const tier1 = await findCorroboratingTier1Source(candidate.displayName, {
         ...(primary?.html ? { html: primary.html, url: primary.url } : {}),
       });
@@ -101,6 +105,10 @@ async function main(): Promise<void> {
         );
       }
 
+      // Real Wikidata coordinates when the article has any (a specific place/located
+      // event) — legitimately absent for an organization/law/movement with no single
+      // point; those correctly stay held for human review, not force-geocoded.
+      const coordinates = primary?.coordinates ?? tier1?.coordinates;
       return {
         subjectId: candidate.id,
         title: candidate.displayName,
@@ -108,9 +116,17 @@ async function main(): Promise<void> {
         existingSummary: candidate.summary.slice(0, 400),
         sourceSnippets: snippets,
         ...(tier1 ? { corroboratingSourceUrl: tier1.url } : {}),
+        ...(coordinates ? { lat: coordinates.lat, lng: coordinates.lng } : {}),
       };
     },
-    { concurrency },
+    {
+      concurrency,
+      onItemComplete: (result, _index, total) => {
+        completedCount += 1;
+        const src = (result as { corroboratingSourceUrl?: string }).corroboratingSourceUrl ? 'tier1' : 'source-only';
+        console.error(`[subjects ${completedCount}/${total}] ${(result as { title: string }).title} (${src})`);
+      },
+    },
   );
 
   mkdirSync(dirname(outPath), { recursive: true });

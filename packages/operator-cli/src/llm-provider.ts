@@ -105,7 +105,13 @@ export function extractMessageContent(message: ChatMessagePayload | undefined): 
   if (content) return content;
   const reasoning = message?.reasoning?.trim() || message?.thinking?.trim();
   if (!reasoning) return '';
-  return reasoning;
+  const stripped = stripMarkdownCodeFence(reasoning);
+  const jsonStart = stripped.indexOf('{');
+  const jsonEnd = stripped.lastIndexOf('}');
+  if (jsonStart >= 0 && jsonEnd > jsonStart) {
+    return stripped.slice(jsonStart, jsonEnd + 1);
+  }
+  return stripped;
 }
 
 /** GLM routers on OpenRouter reject strict json_schema; use json_object instead. */
@@ -115,6 +121,12 @@ export function openRouterUsesJsonObjectMode(model: string): boolean {
 }
 
 /** Qwen3 thinking models need thinking disabled so JSON lands in message.content. */
+export function stripMarkdownCodeFence(content: string): string {
+  const trimmed = content.trim();
+  const fenced = /^```[a-zA-Z]*\n([\s\S]*?)\n?```$/u.exec(trimmed);
+  return fenced?.[1] !== undefined ? fenced[1].trim() : trimmed;
+}
+
 export function openRouterModelExtraBody(model: string): Record<string, unknown> {
   const id = model.toLowerCase();
   if (/qwen\/qwen3/i.test(id) || /qwen3/i.test(id.split('/').pop() ?? '')) {

@@ -1,0 +1,83 @@
+[
+  {
+    "id": "gap_singleton_colony_at_dunlap",
+    "kind": "place",
+    "displayName": "Singleton Colony at Dunlap",
+    "summary": "The Singleton Colony at Dunlap was a Black community established in 1878 by Exodusters, including Benjamin Singleton, as part of the broader movement of African Americans migrating from the South to Kansas. The community created its own cemetery in 1880 due to racial segregation, marking a significant example of Black self-determination.",
+    "eraBuckets": [
+      "1870s",
+      "1880s",
+      "1930s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "black-codes",
+      "jim-crow",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "black-codes",
+      "jim-crow",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Exodusters",
+      "Dunlap Colony",
+      "Black cemetery",
+      "Benjamin Singleton",
+      "Emancipation Day"
+    ],
+    "jurisdictionLabel": "Dunlap, Kansas",
+    "locationPrecision": "site",
+    "locationLabel": "Dunlap Colored Cemetery",
+    "lat": 38.5875,
+    "lng": -96.20333333,
+    "claims": [
+      {
+        "predicate": "founded_by",
+        "object": "Benjamin 'Pap' Singleton",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Dunlap_Colored_Cemetery",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "established",
+        "object": "Dunlap Colored Cemetery",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Dunlap_Colored_Cemetery",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "created_during",
+        "object": "Exoduster movement",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Dunlap_Colored_Cemetery",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "purpose",
+        "object": "segregated burial space",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Dunlap_Colored_Cemetery",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "last_celebration",
+        "object": "Emancipation Day in 1931",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Dunlap_Colored_Cemetery",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The Singleton Colony at Dunlap represents the Exoduster movement, a significant migration of African Americans from the South to Kansas in the late 19th century. This movement was driven by the desire to escape racial oppression and establish independent Black communities. The colony's cemetery, established in 1880, reflects the racial segregation and the need for Black communities to create their own spaces for burial and remembrance."
+  }
+]

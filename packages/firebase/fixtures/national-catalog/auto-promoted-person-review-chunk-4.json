@@ -1,0 +1,73 @@
+[
+  {
+    "id": "gap_samuel_meharry",
+    "kind": "person",
+    "displayName": "Samuel Meharry",
+    "summary": "Samuel Meharry, an Irish American trader, donated $30,000 to establish Meharry Medical College in 1876, the first medical school for African Americans in the South. His contribution was pivotal in addressing the lack of medical education and care for Black communities during segregation.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "jim-crow",
+      "healthcare",
+      "education",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "jim-crow",
+      "healthcare",
+      "education",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "medical school",
+      "African American",
+      "Black history",
+      "healthcare",
+      "education"
+    ],
+    "jurisdictionLabel": "Nashville, Tennessee",
+    "locationPrecision": "city",
+    "locationLabel": "Nashville, Tennessee",
+    "lat": 36.167,
+    "lng": -86.807,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "Meharry Medical College",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Meharry_Medical_College",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "donated",
+        "object": "$30,000",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Meharry_Medical_College",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "first medical school for African Americans in the South",
+        "object": "Meharry Medical College",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Meharry_Medical_College",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "addressed lack of medical education for African Americans",
+        "object": "Meharry Medical College",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Meharry_Medical_College",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Meharry Medical College was founded in 1876 as a response to the exclusion of African Americans from medical education and healthcare during the Jim Crow era. It was the first medical school for African Americans in the South and played a critical role in training Black physicians and addressing health disparities."
+  }
+]

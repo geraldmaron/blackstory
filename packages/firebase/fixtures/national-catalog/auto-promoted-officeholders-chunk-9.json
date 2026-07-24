@@ -1,0 +1,1466 @@
+[
+  {
+    "id": "recon_joshua_e_wilson",
+    "kind": "person",
+    "displayName": "Joshua E. Wilson",
+    "summary": "Joshua E. Wilson served as an early principal of the Colored Graded School in Florence, South Carolina, established in 1866 by the Freedmen’s Bureau as a school for Black children. His leadership helped shape one of the city’s first institutions dedicated to African American education during Reconstruction, a period of fragile progress before the imposition of Jim Crow laws.",
+    "eraBuckets": [
+      "1860s",
+      "1870s"
+    ],
+    "topicTags": [
+      "education",
+      "reconstruction",
+      "hbcu",
+      "community",
+      "firsts"
+    ],
+    "topicIds": [
+      "education",
+      "reconstruction",
+      "hbcu",
+      "community",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Freedmen's Bureau",
+      "Colored Graded School",
+      "Black education",
+      "Reconstruction",
+      "Florence SC"
+    ],
+    "jurisdictionLabel": "Florence, South Carolina",
+    "locationPrecision": "institution",
+    "locationLabel": "Colored Graded School, Florence",
+    "lat": 34.2198772,
+    "lng": -79.7308945,
+    "claims": [
+      {
+        "predicate": "served as early principal of",
+        "object": "Colored Graded School in Florence, South Carolina",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Wilson_High_School_(South_Carolina)",
+        "citationLabel": "Wilson High School (South Carolina) - Wikipedia"
+      },
+      {
+        "predicate": "was associated with",
+        "object": "Freedmen’s Bureau school for Black children",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Wilson_High_School_(South_Carolina)",
+        "citationLabel": "Wilson High School (South Carolina) - Wikipedia"
+      },
+      {
+        "predicate": "contributed to development of African American education during",
+        "object": "Reconstruction era in South Carolina",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Wilson_High_School_(South_Carolina)",
+        "citationLabel": "Wilson High School (South Carolina) - Wikipedia"
+      }
+    ],
+    "historicalContext": "After the Civil War, the Freedmen’s Bureau supported the creation of schools for newly freed African Americans, recognizing education as central to citizenship and autonomy. In South Carolina, where Black people briefly gained political and civil rights during Reconstruction, schools like the Colored Graded School in Florence became vital community institutions—spaces of resistance and resilience amid rising white supremacist backlash."
+  },
+  {
+    "id": "recon_jacob_e_freeman",
+    "kind": "person",
+    "displayName": "Jacob E. Freeman",
+    "summary": "Jacob E. Freeman served in the Texas House of Representatives during the Fourteenth and Sixteenth Legislatures (1874, 1880), representing Waller, Fort Bend, and Wharton counties. His tenure occurred during Reconstruction, a period of expanded political participation for African Americans in the post-Civil War South.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "voting-rights",
+      "politics",
+      "firsts"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "voting-rights",
+      "politics",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Texas House of Representatives",
+      "Black legislator",
+      "Fort Bend County",
+      "Waller County"
+    ],
+    "jurisdictionLabel": "Austin, TX",
+    "locationPrecision": "institution",
+    "locationLabel": "Texas State Capitol",
+    "lat": 30.27472222,
+    "lng": -97.74055556,
+    "claims": [
+      {
+        "predicate": "served in",
+        "object": "Texas House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Jacob_E._Freeman",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "represented",
+        "object": "Waller, Fort Bend, and Wharton counties",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Jacob_E._Freeman",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served during",
+        "object": "Fourteenth Texas Legislature",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Jacob_E._Freeman",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served during",
+        "object": "Sixteenth Texas Legislature",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Jacob_E._Freeman",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "ran for",
+        "object": "Governor of Texas",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Jacob_E._Freeman",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was active during",
+        "object": "Reconstruction era",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Jacob_E._Freeman",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "During Reconstruction, the 14th and 15th Amendments enabled Black men to vote and hold office across the South. Freeman’s election reflected broader efforts by newly enfranchised African Americans to shape state governments, even as white supremacist resistance grew. Texas saw dozens of Black legislators elected during this brief window before Jim Crow laws dismantled these gains."
+  },
+  {
+    "id": "recon_jeremiah_j_hamilton",
+    "kind": "person",
+    "displayName": "Jeremiah J. Hamilton",
+    "summary": "Jeremiah J. Hamilton, born enslaved in 1838, became a Republican legislator in Texas during Reconstruction, representing Fayette and Bastrop counties from 1870 to 1873. He founded a school for Black students in Bastrop in 1866 and served as secretary of the Texas State Central Committee of Colored Men, advocating for civil rights and political inclusion.",
+    "eraBuckets": [
+      "1860s",
+      "1870s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "education",
+      "civil-rights",
+      "firsts"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "education",
+      "civil-rights",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction legislator",
+      "Black school founder",
+      "Texas House of Representatives",
+      "Republican",
+      "Hamilton House"
+    ],
+    "jurisdictionLabel": "Austin, Texas",
+    "locationPrecision": "address",
+    "locationLabel": "Hamilton House at Symphony Square",
+    "lat": 30.25936,
+    "lng": -97.74172,
+    "claims": [
+      {
+        "predicate": "was born into enslavement",
+        "object": "in Tennessee in 1838",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Jeremiah_J._Hamilton",
+        "citationLabel": "Wikipedia: Jeremiah J. Hamilton"
+      },
+      {
+        "predicate": "founded a school for Black students",
+        "object": "in Bastrop, Texas, in 1866",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Jeremiah_J._Hamilton",
+        "citationLabel": "Wikipedia: Jeremiah J. Hamilton"
+      },
+      {
+        "predicate": "served as secretary of the Texas State Central Committee of Colored Men",
+        "object": "in March 1866",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Jeremiah_J._Hamilton",
+        "citationLabel": "Wikipedia: Jeremiah J. Hamilton"
+      },
+      {
+        "predicate": "served as a Republican member of the Texas House of Representatives",
+        "object": "representing Fayette and Bastrop counties from 1870 to 1873",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Jeremiah_J._Hamilton",
+        "citationLabel": "Wikipedia: Jeremiah J. Hamilton"
+      },
+      {
+        "predicate": "built the Hamilton House in Austin",
+        "object": "an extant structure in Symphony Square, completed in 1871",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Jeremiah_J._Hamilton",
+        "citationLabel": "Wikipedia: Jeremiah J. Hamilton"
+      }
+    ],
+    "historicalContext": "Hamilton’s political service occurred during Reconstruction, a brief window when Black men in the South gained elected office under federal protection. His work reflects broader efforts by freedmen to build educational and political institutions amid rising white resistance and the eventual imposition of Jim Crow laws that dismantled these gains."
+  },
+  {
+    "id": "recon_robert_a_kerr",
+    "kind": "person",
+    "displayName": "Robert A. Kerr",
+    "summary": "Robert A. Kerr, born in New Orleans and enslaved by his father, became a Reconstruction-era legislator in Texas, elected in 1880 as a Greenback Party representative from Bastrop County. He opposed the convict lease system and helped establish the first high school for African Americans in his county, contributing to Black civic institution-building during a period of resurgent white supremacy.",
+    "eraBuckets": [
+      "1880s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "education",
+      "firsts",
+      "government",
+      "reconstruction",
+      "resistance"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "education",
+      "firsts",
+      "government",
+      "reconstruction",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Greenback Party",
+      "Bastrop County",
+      "convict lease system",
+      "Reconstruction",
+      "Black legislators"
+    ],
+    "jurisdictionLabel": "Bastrop, Texas",
+    "locationPrecision": "cemetery",
+    "locationLabel": "Fairview Cemetery",
+    "lat": 30.11555556,
+    "lng": -97.30583333,
+    "claims": [
+      {
+        "predicate": "elected to",
+        "object": "Texas House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Robert_A._Kerr",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served on",
+        "object": "Military Affairs Committee",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Robert_A._Kerr",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "opposed",
+        "object": "convict lease system",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Robert_A._Kerr",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "helped establish",
+        "object": "first high school for African Americans in Bastrop County",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Robert_A._Kerr",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was born",
+        "object": "in New Orleans",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Robert_A._Kerr",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was enslaved by",
+        "object": "his father, Major A. Kerr",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Robert_A._Kerr",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Kerr’s election occurred during Reconstruction, a brief window of Black political participation after the Civil War, when federal enforcement of civil rights enabled African Americans to hold office in Southern states. His role in opposing the convict lease system—a practice that criminalized Black laborers and perpetuated forced labor—places him within broader struggles against post-slavery racial control mechanisms in the South."
+  },
+  {
+    "id": "recon_doc_c_lewis",
+    "kind": "person",
+    "displayName": "Doc C. Lewis",
+    "summary": "Doc C. Lewis, a Black Republican farmer from Wharton County, served in the Texas House of Representatives from 1881 to 1883 during the Seventeenth Legislature. He was one of four African American members at the time, representing a rare period of Black political participation in Texas during Reconstruction before disenfranchisement intensified.",
+    "eraBuckets": [
+      "1880s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "firsts",
+      "politics",
+      "grassroots-leadership"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "firsts",
+      "politics",
+      "grassroots-leadership"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Texas House of Representatives",
+      "Wharton County",
+      "Black legislator",
+      "Republican"
+    ],
+    "jurisdictionLabel": "Wharton County, TX",
+    "locationPrecision": "county",
+    "locationLabel": "Wharton County",
+    "lat": 29.31166667,
+    "lng": -96.10277778,
+    "claims": [
+      {
+        "predicate": "served in",
+        "object": "Texas House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Doc_C._Lewis",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was one of four African American members of",
+        "object": "Texas House of Representatives during the Seventeenth Legislature",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Doc_C._Lewis",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "represented",
+        "object": "Wharton County, Texas",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Doc_C._Lewis",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was elected during",
+        "object": "Reconstruction era",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Doc_C._Lewis",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was a Black political leader during",
+        "object": "Reconstruction in Texas",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Doc_C._Lewis",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Lewis’s service occurred during Reconstruction, when constitutional amendments and federal oversight enabled formerly enslaved men to vote and hold office. His tenure reflects the brief expansion of Black political power in the South, which was later dismantled by segregation laws, voter suppression, and racial violence after federal troops withdrew in 1877."
+  },
+  {
+    "id": "recon_sheppard_mullens",
+    "kind": "person",
+    "displayName": "Sheppard Mullens",
+    "summary": "Sheppard Mullens served in the Texas House of Representatives and as a McLennan County commissioner during Reconstruction, part of a generation of Black officials elected after federal enforcement enabled Black male suffrage. His tenure reflects the brief expansion of political power for African Americans in the postwar South before Jim Crow restrictions.",
+    "eraBuckets": [
+      "1860s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "firsts",
+      "politics",
+      "government"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "firsts",
+      "politics",
+      "government"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Texas House of Representatives",
+      "McLennan County",
+      "constitutional convention",
+      "Black legislator"
+    ],
+    "jurisdictionLabel": "Waco, Texas",
+    "locationPrecision": "cemetery",
+    "locationLabel": "First Street Cemetery",
+    "lat": 29.76527778,
+    "lng": -95.38583333,
+    "claims": [
+      {
+        "predicate": "served_as",
+        "object": "delegate to the Texas Constitutional Convention of 1868",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Sheppard_Mullens",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served_in",
+        "object": "Texas House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Sheppard_Mullens",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "appointed_to",
+        "object": "McLennan County commissioner",
+        "confidenceLevel": "high",
+        "citationSource": "other",
+        "citationHref": "https://lrl.texas.gov/mobile/memberDisplay.cfm?memberID=4453",
+        "citationLabel": "https://lrl.texas.gov/mobile/memberDisplay.cfm?memberID=4453"
+      },
+      {
+        "predicate": "buried_at",
+        "object": "First Street Cemetery, Waco",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Sheppard_Mullens",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "married",
+        "object": "Sallie Downs",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Sheppard_Mullens",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "appointed_by",
+        "object": "Joseph J. Reynolds",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Sheppard_Mullens",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Mullens' appointments and election occurred under the 1867 Reconstruction Acts, which required Southern states to enfranchise Black men and ratify new constitutions. As a delegate to Texas' 1868 Constitutional Convention and later legislator, he participated in a transformative but short-lived era of biracial democracy enforced by federal authority."
+  },
+  {
+    "id": "recon_alonzo_sledge",
+    "kind": "person",
+    "displayName": "Alonzo Sledge",
+    "summary": "Alonzo Sledge served as a Republican member of the Texas House of Representatives from 1879 to 1881, representing Washington and Burleson counties during the Reconstruction era. As one of the African American legislators elected in the post-Civil War period, his service reflects the brief expansion of Black political power in the South before the rise of Jim Crow laws restricted it.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "self-governance"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "self-governance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Texas House of Representatives",
+      "Black legislator",
+      "Republican",
+      "1879"
+    ],
+    "jurisdictionLabel": "Chappell Hill, Texas",
+    "locationPrecision": "city",
+    "locationLabel": "Residence and political base of Alonzo Sledge",
+    "lat": 38.8898,
+    "lng": -77.0101,
+    "claims": [
+      {
+        "predicate": "served as member of",
+        "object": "Texas House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Alonzo_Sledge",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "represented",
+        "object": "Washington and Burleson counties, Texas",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Alonzo_Sledge",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served during",
+        "object": "1879–1881",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Alonzo_Sledge",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was political party",
+        "object": "Republican",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Alonzo_Sledge",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is commemorated by",
+        "object": "monument to 19th-century African American legislators in Texas",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Alonzo_Sledge",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was part of",
+        "object": "Reconstruction-era Black political leadership in Texas",
+        "confidenceLevel": "high",
+        "citationSource": "other",
+        "citationHref": "https://lrl.texas.gov/legeleaders/members/memberdisplay.cfm?memberID=4359",
+        "citationLabel": "https://lrl.texas.gov/legeleaders/members/memberdisplay.cfm?memberID=4359"
+      }
+    ],
+    "historicalContext": "During Reconstruction, newly enfranchised African American men in Texas and across the South gained access to political office, often as Republicans. Sledge’s election was part of this transformative moment, when Black legislators helped shape state policies despite facing increasing opposition and violence. His tenure ended as white Democrats regained control and began enacting laws to disenfranchise Black voters and exclude them from office."
+  },
+  {
+    "id": "recon_henry_sneed",
+    "kind": "person",
+    "displayName": "Henry Sneed",
+    "summary": "Henry Sneed, formerly enslaved, was elected to the Texas House of Representatives in 1876, representing Waller, Wharton, and Fort Bend counties during Reconstruction. He was one of three African Americans in the 15th Texas Legislature, illustrating Black political engagement amid postwar societal transformation.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "firsts",
+      "politics",
+      "enslavement"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "firsts",
+      "politics",
+      "enslavement"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Texas Legislature",
+      "African American legislator",
+      "post-Civil War",
+      "Black officeholder"
+    ],
+    "jurisdictionLabel": "Austin, Texas",
+    "locationPrecision": "institution",
+    "locationLabel": "Texas State Capitol",
+    "lat": 30.27472222,
+    "lng": -97.74055556,
+    "claims": [
+      {
+        "predicate": "was elected to",
+        "object": "Texas House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Henry_Sneed",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "represented",
+        "object": "Waller County, Texas",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Henry_Sneed",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "represented",
+        "object": "Wharton County, Texas",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Henry_Sneed",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "represented",
+        "object": "Fort Bend County, Texas",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Henry_Sneed",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was one of three African Americans in",
+        "object": "15th Texas Legislature",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Henry_Sneed",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was formerly enslaved",
+        "object": "enslavement in Texas",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Henry_Sneed",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Sneed's election occurred during Reconstruction, a period when formerly enslaved men gained political rights and held office across the South before Jim Crow laws suppressed Black participation. His role reflects broader efforts by African Americans to shape governance in the absence of legal segregation, which would later be imposed through disenfranchisement and racial terror."
+  },
+  {
+    "id": "recon_james_h_stewart",
+    "kind": "person",
+    "displayName": "James H. Stewart",
+    "summary": "James H. Stewart, born in Louisiana and later of Hearne, Texas, served in the Texas House of Representatives from 1885 to 1887 as a Republican representing the 48th District. A graduate of Prairie View State Normal School, he was among the first Black legislators in Texas during Reconstruction, contributing to early efforts in Black political representation after Emancipation.",
+    "eraBuckets": [
+      "1880s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "education",
+      "hbcu"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "education",
+      "hbcu"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Texas Legislature",
+      "Black legislator",
+      "Prairie View",
+      "Republican"
+    ],
+    "jurisdictionLabel": "Hearne, Texas",
+    "locationPrecision": "city",
+    "locationLabel": "Residence and community base during political service",
+    "lat": 30.61,
+    "lng": -96.35,
+    "claims": [
+      {
+        "predicate": "served in",
+        "object": "Texas House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/James_H._Stewart",
+        "citationLabel": "Wikipedia: James H. Stewart"
+      },
+      {
+        "predicate": "represented",
+        "object": "48th District, Robertson County",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/James_H._Stewart",
+        "citationLabel": "Wikipedia: James H. Stewart"
+      },
+      {
+        "predicate": "was elected during",
+        "object": "Reconstruction era",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/James_H._Stewart",
+        "citationLabel": "Wikipedia: James H. Stewart"
+      },
+      {
+        "predicate": "attended",
+        "object": "Prairie View State Normal School",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/James_H._Stewart",
+        "citationLabel": "Wikipedia: James H. Stewart"
+      },
+      {
+        "predicate": "was member of",
+        "object": "Republican Party",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/James_H._Stewart",
+        "citationLabel": "Wikipedia: James H. Stewart"
+      },
+      {
+        "predicate": "was part of",
+        "object": "19th Texas Legislature",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/James_H._Stewart",
+        "citationLabel": "Wikipedia: James H. Stewart"
+      }
+    ],
+    "historicalContext": "Stewart's election occurred during the waning years of Reconstruction, a period when Black men in the South briefly gained political power before the rise of Jim Crow laws. His service in the 19th Texas Legislature reflects the broader struggle for Black civic participation amid increasing racial suppression in the post-Reconstruction South."
+  },
+  {
+    "id": "recon_james_h_washington",
+    "kind": "person",
+    "displayName": "James H. Washington",
+    "summary": "James H. Washington, born in Virginia and educated at Oberlin, served as a Republican representative for Grimes County in the Texas House during the 1873 Thirteenth Legislature, following a contested election. He later served on the Galveston city council and as a customs inspector, contributing to Black political leadership during Reconstruction before systemic disfranchisement.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "government"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "government"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction legislator",
+      "Texas House of Representatives",
+      "Grimes County",
+      "Black officeholder",
+      "Republican Party Texas"
+    ],
+    "jurisdictionLabel": "Galveston, Texas",
+    "locationPrecision": "city",
+    "locationLabel": "Residence and city council service location",
+    "lat": 32.77916667,
+    "lng": -96.80888889,
+    "claims": [
+      {
+        "predicate": "served_in",
+        "object": "Texas House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "lrl.texas.gov",
+        "citationHref": "https://lrl.texas.gov/legeleaders/members/memberdisplay.cfm?memberID=4833",
+        "citationLabel": "Legislative Reference Library | Legislators and Leaders | Member profile"
+      },
+      {
+        "predicate": "represented",
+        "object": "Grimes County, Texas",
+        "confidenceLevel": "high",
+        "citationSource": "lrl.texas.gov",
+        "citationHref": "https://lrl.texas.gov/legeleaders/members/memberdisplay.cfm?memberID=4833",
+        "citationLabel": "Legislative Reference Library | Legislators and Leaders | Member profile"
+      },
+      {
+        "predicate": "was_elected_after_contested_election",
+        "object": "February 1873",
+        "confidenceLevel": "high",
+        "citationSource": "lrl.texas.gov",
+        "citationHref": "https://lrl.texas.gov/legeleaders/members/memberdisplay.cfm?memberID=4833",
+        "citationLabel": "Through Many Dangers, Toils, and Snares: Black Leadership in Texas, 1868-1898, 2016"
+      },
+      {
+        "predicate": "was_member_of",
+        "object": "Republican Party (Texas)",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/James_H._Washington",
+        "citationLabel": "Wikipedia: James H. Washington"
+      },
+      {
+        "predicate": "served_as",
+        "object": "alderman in Galveston, Eighth Ward",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/James_H._Washington",
+        "citationLabel": "Wikipedia: James H. Washington"
+      },
+      {
+        "predicate": "attended",
+        "object": "Colored Men's Convention of 1873",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/James_H._Washington",
+        "citationLabel": "Wikipedia: James H. Washington"
+      }
+    ],
+    "historicalContext": "Washington’s election occurred during Reconstruction, a period when constitutional amendments and federal enforcement briefly enabled Black men to hold office in the South. His service in the Texas legislature and local government reflects the expansion of African American civic participation before the rise of Jim Crow laws that systematically dismantled Black political power in the late 19th century."
+  },
+  {
+    "id": "recon_george_w_wyatt",
+    "kind": "person",
+    "displayName": "George W. Wyatt",
+    "summary": "George W. Wyatt, an African American Republican and teacher from Hempstead, Texas, served in the Texas House of Representatives from 1883 to 1885 during the Eighteenth Legislature. He was one of only two Black members in the chamber at the time, representing Waller and Fort Bend counties during Reconstruction's waning years of Black political engagement.",
+    "eraBuckets": [
+      "1880s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "firsts",
+      "politics",
+      "government"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "firsts",
+      "politics",
+      "government"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Texas legislator",
+      "Reconstruction",
+      "African American politician",
+      "Republican",
+      "Hempstead"
+    ],
+    "jurisdictionLabel": "Austin, Texas",
+    "locationPrecision": "institution",
+    "locationLabel": "Texas State Capitol",
+    "lat": 30.27472222,
+    "lng": -97.74055556,
+    "claims": [
+      {
+        "predicate": "served_in",
+        "object": "Texas House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/George_W._Wyatt",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "represented",
+        "object": "Waller and Fort Bend counties",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/George_W._Wyatt",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_member_of",
+        "object": "Republican Party",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/George_W._Wyatt",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served_during",
+        "object": "Eighteenth Texas Legislature",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/George_W._Wyatt",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_one_of_only_two_African_Americans_in",
+        "object": "Texas House of Representatives, 1883–1885",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/George_W._Wyatt",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_profession",
+        "object": "teacher",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/George_W._Wyatt",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Wyatt’s election reflects the brief expansion of Black political power in the post-Civil War South under Reconstruction, when Black men gained suffrage and held office despite rising white resistance. His service occurred just before the systematic disenfranchisement of Black voters through poll taxes, literacy tests, and violence that dismantled multiracial democracy in Texas by the early 20th century."
+  },
+  {
+    "id": "recon_stephen_bates",
+    "kind": "person",
+    "displayName": "Stephen Bates",
+    "summary": "Stephen Bates, born into slavery at Shirley Plantation, Virginia, became the first Black sheriff in Vermont history when elected in Vergennes in 1879. He served 25 years as sheriff and police chief, winning repeated elections in a small, predominantly white city, and was recognized with a state commemorative day in 2021.",
+    "eraBuckets": [
+      "1870s",
+      "1880s",
+      "1890s",
+      "1900s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "firsts",
+      "civil-rights",
+      "enslavement",
+      "law-enforcement"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "firsts",
+      "civil-rights",
+      "enslavement",
+      "law-enforcement"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "first Black sheriff Vermont",
+      "self-emancipated",
+      "Vergennes",
+      "Reconstruction officeholder"
+    ],
+    "jurisdictionLabel": "Vergennes, Vermont",
+    "locationPrecision": "city",
+    "locationLabel": "Vergennes City Park and former sheriff's jurisdiction",
+    "lat": 44,
+    "lng": -72.7,
+    "claims": [
+      {
+        "predicate": "was the first Black sheriff in Vermont history",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Stephen_Bates_(sheriff)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was born into slavery at Shirley Plantation, Virginia",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Stephen_Bates_(sheriff)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "self-emancipated by fleeing to Union lines in 1862",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Stephen_Bates_(sheriff)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served as sheriff and police chief of Vergennes, Vermont from 1879 to 1905",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Stephen_Bates_(sheriff)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was likely the first Black sheriff elected outside the Reconstruction-era South",
+        "object": "true",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Stephen_Bates_(sheriff)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was commemorated with a Vermont historical marker and official state recognition in 2021",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Stephen_Bates_(sheriff)",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Bates’s election as sheriff in 1879 occurred during a period of retrenchment in Black civil rights nationally, making his sustained political success in a Northern, non-urban setting exceptional. His trajectory—from enslavement to elected office—reflects both the possibilities of Reconstruction-era political inclusion and the localized nature of Black leadership in rural New England communities."
+  },
+  {
+    "id": "recon_briton_baskerville_jr",
+    "kind": "person",
+    "displayName": "Briton Baskerville, Jr.",
+    "summary": "Briton Baskerville, Jr. (1863–1892), born into slavery in Mecklenburg County, Virginia, served in the Virginia House of Delegates from 1887 to 1888 as a Republican. A graduate of Boydton Academic and Bible Institute and Wayland Institute, he was a schoolteacher and Sunday school superintendent at Bloom Hill Baptist Church.",
+    "eraBuckets": [
+      "1880s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "education",
+      "enslavement",
+      "firsts",
+      "politics",
+      "voting-rights",
+      "grassroots-leadership"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "education",
+      "enslavement",
+      "firsts",
+      "politics",
+      "voting-rights",
+      "grassroots-leadership"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Virginia House of Delegates",
+      "Mecklenburg County",
+      "Reconstruction",
+      "African American legislator",
+      "Boydton Academic and Bible Institute"
+    ],
+    "jurisdictionLabel": "Chase City, Virginia",
+    "locationPrecision": "district",
+    "locationLabel": "Flat Creek District, Mecklenburg County",
+    "lat": 35.650631,
+    "lng": -80.6371002,
+    "claims": [
+      {
+        "predicate": "served as member of",
+        "object": "Virginia House of Delegates",
+        "confidenceLevel": "high",
+        "citationSource": "history.house.virginia.gov",
+        "citationHref": "https://history.house.virginia.gov/members/5864",
+        "citationLabel": "Virginia House of Delegates History"
+      },
+      {
+        "predicate": "represented",
+        "object": "Mecklenburg County",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Britton_Baskerville_Jr.",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was born into enslavement",
+        "object": "Mecklenburg County, Virginia",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Britton_Baskerville_Jr.",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "graduated from",
+        "object": "Boydton Academic and Bible Institute",
+        "confidenceLevel": "high",
+        "citationSource": "history.house.virginia.gov",
+        "citationHref": "https://history.house.virginia.gov/members/5864",
+        "citationLabel": "Virginia House of Delegates History"
+      },
+      {
+        "predicate": "graduated from",
+        "object": "Wayland Institute",
+        "confidenceLevel": "high",
+        "citationSource": "history.house.virginia.gov",
+        "citationHref": "https://history.house.virginia.gov/members/5864",
+        "citationLabel": "Virginia House of Delegates History"
+      },
+      {
+        "predicate": "served on committee",
+        "object": "House Committee on Privileges and Elections",
+        "confidenceLevel": "high",
+        "citationSource": "history.house.virginia.gov",
+        "citationHref": "https://history.house.virginia.gov/members/5864",
+        "citationLabel": "Virginia House of Delegates History"
+      }
+    ],
+    "historicalContext": "Baskerville’s election occurred during the waning years of Reconstruction-era Black political representation in Virginia, when African Americans briefly gained access to state legislatures before being systematically excluded through poll taxes, literacy tests, and violence. His service reflects both the possibilities of emancipation and the fragility of those gains in the face of resurgent white Democratic power."
+  },
+  {
+    "id": "recon_peter_j_carter",
+    "kind": "person",
+    "displayName": "Peter J. Carter",
+    "summary": "Peter J. Carter, born enslaved in Northampton County, Virginia, became one of the first African Americans elected to the Virginia House of Delegates (1871–1879). A Union Army veteran of the 10th U.S. Colored Infantry, he advocated for civil rights, prison reform, and equitable jury representation, and helped lead a delegation to President Grant supporting the Civil Rights Act of 1875.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "voting-rights",
+      "military",
+      "desegregation",
+      "grassroots-leadership",
+      "firsts"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "voting-rights",
+      "military",
+      "desegregation",
+      "grassroots-leadership",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction politician",
+      "U.S. Colored Infantry",
+      "Virginia House of Delegates",
+      "Civil Rights Act of 1875",
+      "Hampton Institute"
+    ],
+    "jurisdictionLabel": "Eastville, Virginia",
+    "locationPrecision": "city",
+    "locationLabel": "Birthplace and political district of Northampton County",
+    "lat": 42.33333333,
+    "lng": -72.65,
+    "claims": [
+      {
+        "predicate": "served_as",
+        "object": "member of the Virginia House of Delegates from Northampton County",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Peter_J._Carter",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "enlisted_in",
+        "object": "10th Regiment United States Colored Infantry",
+        "confidenceLevel": "high",
+        "citationSource": "history.house.virginia.gov",
+        "citationHref": "https://history.house.virginia.gov/members/5871",
+        "citationLabel": "Virginia House of Delegates History"
+      },
+      {
+        "predicate": "advocated_for",
+        "object": "ending exclusion of African Americans from jury service",
+        "confidenceLevel": "high",
+        "citationSource": "history.house.virginia.gov",
+        "citationHref": "https://history.house.virginia.gov/members/5871",
+        "citationLabel": "Virginia House of Delegates History"
+      },
+      {
+        "predicate": "participated_in",
+        "object": "delegation to President Ulysses S. Grant supporting the Civil Rights Act of 1875",
+        "confidenceLevel": "high",
+        "citationSource": "history.house.virginia.gov",
+        "citationHref": "https://history.house.virginia.gov/members/5871",
+        "citationLabel": "Virginia House of Delegates History"
+      },
+      {
+        "predicate": "educated_at",
+        "object": "Hampton Normal and Agricultural Institute",
+        "confidenceLevel": "high",
+        "citationSource": "history.house.virginia.gov",
+        "citationHref": "https://history.house.virginia.gov/members/5871",
+        "citationLabel": "Virginia House of Delegates History"
+      },
+      {
+        "predicate": "donated_land_for",
+        "object": "Bethel Baptist Church",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Peter_J._Carter",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "During Reconstruction, formerly enslaved men like Peter J. Carter gained political office under new constitutional amendments and federal enforcement. His tenure in Virginia’s legislature reflects the brief expansion of Black political power before Jim Crow laws dismantled it. His advocacy for jury inclusion and prisoner rights directly challenged enduring racial hierarchies."
+  },
+  {
+    "id": "recon_miles_connor",
+    "kind": "person",
+    "displayName": "Miles Connor",
+    "summary": "Miles Connor (c. 1830s–1893), born enslaved in Norfolk County, Virginia, became a community leader and Republican officeholder during Reconstruction. He served in the Virginia House of Delegates (1875–1877), held local offices including justice of the peace, and co-founded Churchland Grove Baptist Church. His son, Miles Washington Connor, became the first president of Coppin State University.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "religion",
+      "community-organizing",
+      "emancipation",
+      "black-power"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "politics",
+      "firsts",
+      "religion",
+      "community-organizing",
+      "emancipation",
+      "black-power"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Virginia House of Delegates",
+      "Black Baptist church",
+      "freedman politician",
+      "Norfolk County"
+    ],
+    "jurisdictionLabel": "Norfolk County, Virginia",
+    "locationPrecision": "community",
+    "locationLabel": "Western Branch area, now Chesapeake",
+    "lat": 36.767398,
+    "lng": -76.287405,
+    "claims": [
+      {
+        "predicate": "served_in",
+        "object": "Virginia House of Delegates",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Miles_Connor",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "elected_as",
+        "object": "justice of the peace in Norfolk County",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://history.house.virginia.gov/members/5877",
+        "citationLabel": "Virginia House of Delegates History"
+      },
+      {
+        "predicate": "co-founded",
+        "object": "Churchland Grove Baptist Church",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Miles_Connor",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_born_into",
+        "object": "slavery in Norfolk County, Virginia",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Miles_Connor",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "father_of",
+        "object": "Miles Washington Connor, first president of Coppin State University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Miles_Connor",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served_as",
+        "object": "county supervisor in Norfolk County",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Miles_Connor",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "During Reconstruction, formerly enslaved men like Miles Connor gained access to political office under new constitutional amendments and federal oversight. His election reflected broader efforts by Black Virginians to shape local governance and institutions in the face of rising white resistance and the eventual rollback of rights after 1877."
+  },
+  {
+    "id": "recon_ballard_t_edwards",
+    "kind": "person",
+    "displayName": "Ballard T. Edwards",
+    "summary": "Ballard T. Edwards served as a member of the Virginia House of Delegates representing Chesterfield and Powhatan counties from 1869 to 1871 during the Reconstruction era, a time when newly enfranchised African Americans began participating in state governance following emancipation.",
+    "eraBuckets": [
+      "1860s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "reconstruction",
+      "politics",
+      "firsts",
+      "government"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "reconstruction",
+      "politics",
+      "firsts",
+      "government"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Virginia House of Delegates",
+      "Chesterfield County",
+      "Powhatan County",
+      "Black legislator"
+    ],
+    "jurisdictionLabel": "Richmond, Virginia",
+    "locationPrecision": "institution",
+    "locationLabel": "Virginia State Capitol",
+    "lat": 37.538758,
+    "lng": -77.433594,
+    "claims": [
+      {
+        "predicate": "served_in",
+        "object": "Virginia House of Delegates",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/List_of_first_African-American_U.S._state_legislators",
+        "citationLabel": "Wikipedia: List of first African-American U.S. state legislators"
+      },
+      {
+        "predicate": "represented",
+        "object": "Chesterfield and Powhatan counties",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/List_of_first_African-American_U.S._state_legislators",
+        "citationLabel": "Wikipedia: List of first African-American U.S. state legislators"
+      },
+      {
+        "predicate": "held_office",
+        "object": "1869–1871",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/List_of_first_African-American_U.S._state_legislators",
+        "citationLabel": "Wikipedia: List of first African-American U.S. state legislators"
+      },
+      {
+        "predicate": "was_elected_during",
+        "object": "Reconstruction era",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/List_of_first_African-American_U.S._state_legislators",
+        "citationLabel": "Wikipedia: List of first African-American U.S. state legislators"
+      },
+      {
+        "predicate": "was_part_of",
+        "object": "first generation of African American state legislators in Virginia",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/List_of_first_African-American_U.S._state_legislators",
+        "citationLabel": "Wikipedia: List of first African-American U.S. state legislators"
+      }
+    ],
+    "historicalContext": "Edwards's service in the Virginia legislature occurred during Reconstruction, a period when constitutional amendments and federal enforcement briefly enabled Black men to vote and hold office in the South. His election reflects the transformative yet fragile political gains made by African Americans in former Confederate states before the rise of Jim Crow laws dismantled these advancements."
+  },
+  {
+    "id": "recon_james_a_fields",
+    "kind": "person",
+    "displayName": "James A. Fields",
+    "summary": "James A. Fields, born enslaved in Hanover County in 1844, escaped to Union lines during the Civil War, became a lawyer, and was elected to the Virginia House of Delegates in 1889 representing Hampton Roads communities.",
+    "eraBuckets": [
+      "1860s",
+      "1870s",
+      "1880s",
+      "1890s"
+    ],
+    "topicTags": [
+      "reconstruction",
+      "civil-rights",
+      "education",
+      "land-ownership",
+      "firsts",
+      "hbcu",
+      "law",
+      "politics",
+      "self-determination"
+    ],
+    "topicIds": [
+      "reconstruction",
+      "civil-rights",
+      "education",
+      "land-ownership",
+      "firsts",
+      "hbcu",
+      "law",
+      "politics",
+      "self-determination"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Hampton Institute",
+      "Virginia House of Delegates",
+      "Black landowner",
+      "Black lawyer"
+    ],
+    "jurisdictionLabel": "Newport News, Virginia",
+    "locationPrecision": "address",
+    "locationLabel": "James A. Fields House",
+    "lat": 36.98472222,
+    "lng": -76.42194444,
+    "claims": [
+      {
+        "predicate": "was born into enslavement in",
+        "object": "Hanover County, Virginia",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/James_A._Fields",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "escaped enslavement and joined Union lines during",
+        "object": "the Civil War",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/James_A._Fields",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was elected to the",
+        "object": "Virginia House of Delegates",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.dhr.virginia.gov/press_releases/13-new-state-historical-highway-markers-approved/",
+        "citationLabel": "Virginia DHR"
+      },
+      {
+        "predicate": "founded the first hospital serving Black residents in",
+        "object": "Newport News and Elizabeth City",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/James_A._Fields",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "owned at least twenty-five properties in",
+        "object": "Newport News and Elizabeth City County by 1900",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/James_A._Fields",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was among the first graduates of",
+        "object": "Hampton Normal and Agricultural Institute",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.dhr.virginia.gov/press_releases/13-new-state-historical-highway-markers-approved/",
+        "citationLabel": "Virginia DHR"
+      }
+    ],
+    "historicalContext": "Fields' political career unfolded during Reconstruction's waning years, when Black Virginians briefly gained elected office before Jim Crow laws systematically disenfranchised them. His election and public service occurred amid rising white supremacist resistance, making his achievements part of a fragile but transformative era of Black political participation in the South."
+  }
+]

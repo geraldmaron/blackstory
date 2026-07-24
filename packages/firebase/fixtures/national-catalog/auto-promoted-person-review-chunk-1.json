@@ -1,0 +1,158 @@
+[
+  {
+    "id": "gap_addie_mae_collins",
+    "kind": "person",
+    "displayName": "Addie Mae Collins",
+    "summary": "Addie Mae Collins was one of four girls killed in the 1963 16th Street Baptist Church bombing in Birmingham, Alabama, a pivotal act of racial violence during the Civil Rights Movement.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "jim-crow",
+      "anti-miscegenation",
+      "movement"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "jim-crow",
+      "anti-miscegenation",
+      "movement"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "16th Street Baptist Church bombing",
+      "Civil Rights Movement",
+      "Birmingham, Alabama",
+      "Ku Klux Klan",
+      "racial violence"
+    ],
+    "jurisdictionLabel": "Birmingham, Alabama",
+    "locationPrecision": "institution",
+    "locationLabel": "16th Street Baptist Church",
+    "lat": 33.51666667,
+    "lng": -86.815,
+    "claims": [
+      {
+        "predicate": "killed_in",
+        "object": "16th Street Baptist Church bombing",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/16th_Street_Baptist_Church_bombing",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "date_of_death",
+        "object": "September 15, 1963",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/16th_Street_Baptist_Church_bombing",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "location_of_death",
+        "object": "Birmingham, Alabama, U.S.",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/16th_Street_Baptist_Church_bombing",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "victim_of",
+        "object": "Ku Klux Klan",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/16th_Street_Baptist_Church_bombing",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "part_of",
+        "object": "Civil Rights Movement",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/16th_Street_Baptist_Church_bombing",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The 16th Street Baptist Church bombing was a terrorist attack by the Ku Klux Klan, targeting a prominent African American church in Birmingham, Alabama, a city known for its extreme segregation and racial violence. The bombing, which killed four girls including Addie Mae Collins, galvanized national attention and contributed to the passage of the Civil Rights Act of 1964."
+  },
+  {
+    "id": "gap_cynthia_wesley",
+    "kind": "person",
+    "displayName": "Cynthia Wesley",
+    "summary": "Cynthia Wesley was one of four girls killed in the 16th Street Baptist Church bombing in Birmingham, Alabama, on September 15, 1963. The bombing, carried out by the Ku Klux Klan, was a violent act of anti-Black racism that galvanized the civil rights movement.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "jim-crow",
+      "anti-miscegenation"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "jim-crow",
+      "anti-miscegenation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "16th Street Baptist Church bombing",
+      "Cynthia Wesley",
+      "civil rights",
+      "Ku Klux Klan",
+      "Birmingham"
+    ],
+    "jurisdictionLabel": "Birmingham, Alabama",
+    "locationPrecision": "institution",
+    "locationLabel": "16th Street Baptist Church",
+    "lat": 33.51666667,
+    "lng": -86.815,
+    "claims": [
+      {
+        "predicate": "killed_in",
+        "object": "16th Street Baptist Church bombing",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/16th_Street_Baptist_Church_bombing",
+        "citationLabel": "16th Street Baptist Church bombing"
+      },
+      {
+        "predicate": "victim_of",
+        "object": "Ku Klux Klan",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/16th_Street_Baptist_Church_bombing",
+        "citationLabel": "16th Street Baptist Church bombing"
+      },
+      {
+        "predicate": "date_of_death",
+        "object": "September 15, 1963",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/16th_Street_Baptist_Church_bombing",
+        "citationLabel": "16th Street Baptist Church bombing"
+      },
+      {
+        "predicate": "location_of_death",
+        "object": "Birmingham, Alabama",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/16th_Street_Baptist_Church_bombing",
+        "citationLabel": "16th Street Baptist Church bombing"
+      },
+      {
+        "predicate": "part_of",
+        "object": "Civil Rights movement",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/16th_Street_Baptist_Church_bombing",
+        "citationLabel": "16th Street Baptist Church bombing"
+      }
+    ],
+    "historicalContext": "The 16th Street Baptist Church bombing was a terrorist attack by the Ku Klux Klan during the civil rights movement, targeting a prominent African American church in Birmingham, Alabama. The event intensified national attention on racial segregation and violence, contributing to the passage of the Civil Rights Act of 1964."
+  }
+]

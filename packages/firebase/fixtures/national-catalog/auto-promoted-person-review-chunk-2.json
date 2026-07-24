@@ -1,0 +1,71 @@
+[
+  {
+    "id": "gap_delano_middleton",
+    "kind": "person",
+    "displayName": "Delano Middleton",
+    "summary": "Delano Middleton was one of three students killed during the Orangeburg Massacre of 1968, a violent incident involving police gunfire against civil rights protesters at [[gap_south_carolina_state_college|South Carolina State College]]. His death is a significant part of the civil rights movement's history in the U.S.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "police-violence",
+      "segregation",
+      "student-activism"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "police-violence",
+      "segregation",
+      "student-activism"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Orangeburg Massacre",
+      "Delano Middleton",
+      "civil rights",
+      "police brutality",
+      "student protest"
+    ],
+    "jurisdictionLabel": "Orangeburg, South Carolina",
+    "locationPrecision": "campus",
+    "locationLabel": "South Carolina State College campus",
+    "lat": 33.4952,
+    "lng": -80.8547,
+    "claims": [
+      {
+        "predicate": "was_killed_in",
+        "object": "Orangeburg Massacre",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Orangeburg_Massacre",
+        "citationLabel": "Orangeburg Massacre Wikipedia"
+      },
+      {
+        "predicate": "was_a_student_protester_at",
+        "object": "South Carolina State College",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Orangeburg_Massacre",
+        "citationLabel": "Orangeburg Massacre Wikipedia"
+      },
+      {
+        "predicate": "was_a_victim_of_police_brutality",
+        "object": "South Carolina Highway Patrol",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Orangeburg_Massacre",
+        "citationLabel": "Orangeburg Massacre Wikipedia"
+      },
+      {
+        "predicate": "was_part_of_the_civil_rights_movement",
+        "object": "South Carolina",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Orangeburg_Massacre",
+        "citationLabel": "Orangeburg Massacre Wikipedia"
+      }
+    ],
+    "historicalContext": "The Orangeburg Massacre was a pivotal moment in the civil rights movement, marking the first instance of police killing student protesters at an American university. It occurred during the broader struggle against segregation and racial injustice in South Carolina, with lasting impacts on civil rights activism and legal accountability."
+  }
+]

@@ -1,0 +1,1472 @@
+[
+  {
+    "id": "west_allen_allensworth_q4731504",
+    "kind": "person",
+    "displayName": "Allen Allensworth",
+    "summary": "Allen Allensworth, born enslaved in Kentucky in 1842, became the first African American to attain the rank of lieutenant colonel in the U.S. Army, serving as a chaplain with the Buffalo Soldiers. After retiring, he co-founded Allensworth, California in 1908—the first town in the state established, governed, and financed by African Americans.",
+    "eraBuckets": [
+      "1840s",
+      "1850s",
+      "1860s",
+      "1870s",
+      "1880s",
+      "1900s",
+      "1910s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "military",
+      "civil-rights",
+      "self-governance",
+      "community",
+      "firsts",
+      "great-migration",
+      "religion"
+    ],
+    "topicIds": [
+      "enslavement",
+      "military",
+      "civil-rights",
+      "self-governance",
+      "community",
+      "firsts",
+      "great-migration",
+      "religion"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Buffalo Soldiers",
+      "Allensworth California",
+      "lieutenant colonel",
+      "self-governance",
+      "Baptist minister"
+    ],
+    "jurisdictionLabel": "Allensworth, California",
+    "locationPrecision": "town",
+    "locationLabel": "Founding site of the Allensworth community",
+    "lat": 35.86361111,
+    "lng": -119.38888889,
+    "claims": [
+      {
+        "predicate": "was born into slavery in Kentucky",
+        "object": "Kentucky",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Allen_Allensworth",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "became the first African American to attain the rank of lieutenant colonel in the U.S. Army",
+        "object": "lieutenant colonel",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Allen_Allensworth",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served as a chaplain with the Buffalo Soldiers",
+        "object": "Buffalo Soldiers",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Allen_Allensworth",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "co-founded Allensworth, California in 1908",
+        "object": "Allensworth, California",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Allen_Allensworth",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was ordained as a Baptist minister in 1871",
+        "object": "Baptist minister",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Allen_Allensworth",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "retired from military service in 1906",
+        "object": "1906",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Allen_Allensworth",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Allensworth’s founding of a self-governing Black town in California responded to the systemic disenfranchisement and racial violence of the Jim Crow era. The creation of Allensworth, California, reflected broader efforts by African Americans to achieve land ownership, political autonomy, and community resilience through intentional settlement, akin to other Black town movements in Oklahoma and Kansas."
+  },
+  {
+    "id": "west_black_seminole_scouts_q4921811",
+    "kind": "person",
+    "displayName": "Black Seminole Scouts",
+    "summary": "The Black Seminole Scouts, active from 1870 to 1914, were a U.S. Army unit composed primarily of Black Seminoles who served as guides and scouts during the Indian Wars. They played a key role in campaigns against hostile tribes and cross-border raids, notably under Colonel Ranald S. Mackenzie. Despite promises of land and provisions, the U.S.",
+    "eraBuckets": [
+      "1870s",
+      "1880s",
+      "1890s",
+      "1900s",
+      "1910s"
+    ],
+    "topicTags": [
+      "military",
+      "civil-war",
+      "frontier",
+      "enslavement",
+      "resistance",
+      "firsts",
+      "self-determination"
+    ],
+    "topicIds": [
+      "military",
+      "civil-war",
+      "frontier",
+      "enslavement",
+      "resistance",
+      "firsts",
+      "self-determination"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Black Seminole Scouts",
+      "Indian scouts",
+      "Fort Clark",
+      "John Horse",
+      "Texas-Indian Wars"
+    ],
+    "jurisdictionLabel": "Brackettville, Texas",
+    "locationPrecision": "garrison",
+    "locationLabel": "Fort Clark",
+    "lat": 29.30444444,
+    "lng": -100.42305556,
+    "claims": [
+      {
+        "predicate": "was active between",
+        "object": "1870 and 1914",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Black_Seminole_Scouts",
+        "citationLabel": "Wikipedia - Black Seminole Scouts"
+      },
+      {
+        "predicate": "served as scouts for",
+        "object": "United States Army during the Indian Wars",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Black_Seminole_Scouts",
+        "citationLabel": "Wikipedia - Black Seminole Scouts"
+      },
+      {
+        "predicate": "played a significant role in ending",
+        "object": "the Texas-Indian Wars",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Black_Seminole_Scouts",
+        "citationLabel": "Wikipedia - Black Seminole Scouts"
+      },
+      {
+        "predicate": "were recruited from",
+        "object": "Black Seminoles who had fled to Mexico to escape re-enslavement",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Black_Seminole_Scouts",
+        "citationLabel": "Wikipedia - Black Seminole Scouts"
+      },
+      {
+        "predicate": "fought in engagements against",
+        "object": "Comanches, Kiowas, Apaches, and Kickapoos",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Black_Seminole_Scouts",
+        "citationLabel": "Wikipedia - Black Seminole Scouts"
+      },
+      {
+        "predicate": "were promised land and provisions by the U.S. government",
+        "object": "but the treaty was lost and promises unfulfilled",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Black_Seminole_Scouts",
+        "citationLabel": "Wikipedia - Black Seminole Scouts"
+      }
+    ],
+    "historicalContext": "The Black Seminole Scouts emerged from a community of formerly enslaved people who had gained autonomy among the Seminole in Florida and later fled to Mexico to avoid re-enslavement. Their recruitment by the U.S. Army reflects both the strategic value of Black military labor and the federal government’s inconsistent fulfillment of promises to Black servicemembers. Their service occurred amid westward expansion, the suppression of Native resistance, and the marginalization of Black and Indigenous communities under settler colonialism."
+  },
+  {
+    "id": "west_lewis_broadus_q18533660",
+    "kind": "organization",
+    "displayName": "Lewis Broadus",
+    "summary": "Lewis Broadus, born in 1877 in Virginia, served as a Buffalo Soldier in the 25th Infantry Regiment and later became a captain in the 92nd Division during World War I. One of the first African American line officers commissioned through the Fort Des Moines program, he earned the Distinguished Service Cross for bravery.",
+    "eraBuckets": [
+      "1890s",
+      "1900s",
+      "1910s",
+      "1920s"
+    ],
+    "topicTags": [
+      "military",
+      "civil-rights",
+      "firsts",
+      "segregation"
+    ],
+    "topicIds": [
+      "military",
+      "civil-rights",
+      "firsts",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Buffalo Soldier",
+      "25th Infantry Regiment",
+      "Distinguished Service Cross",
+      "Fort Des Moines",
+      "Black officer"
+    ],
+    "jurisdictionLabel": "Montana, USA",
+    "locationPrecision": "site",
+    "locationLabel": "Fort Custer",
+    "lat": 45.72694444,
+    "lng": -107.57444444,
+    "claims": [
+      {
+        "predicate": "served in",
+        "object": "25th Infantry Regiment",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lewis_Broadus",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served in",
+        "object": "92nd Division",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lewis_Broadus",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "awarded",
+        "object": "Distinguished Service Cross",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lewis_Broadus",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "commissioned at",
+        "object": "Fort Des Moines",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lewis_Broadus",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "participated in",
+        "object": "Spanish–American War",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lewis_Broadus",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "participated in",
+        "object": "World War I",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lewis_Broadus",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Broadus's commissioning as a Black officer in 1917 occurred during a pivotal expansion of African American military leadership, enabled by the Fort Des Moines Officer Training School—a rare institutional opening amid Jim Crow segregation. His service in multiple conflicts highlights the paradox of Black Americans fighting for democracy abroad while denied full rights at home."
+  },
+  {
+    "id": "west_arthur_mckinnon_brown_q128092514",
+    "kind": "person",
+    "displayName": "Arthur McKinnon Brown",
+    "summary": "Arthur McKinnon Brown (1867–1939) was one of Birmingham, Alabama’s earliest African American physicians and the first Black surgeon in the U.S. Army. He served with the 10th Cavalry Regiment in Cuba, advocated for Black medical professionals, and helped establish the Children's Home Hospital of Birmingham—the only hospital in the city at the time where Black doctors could practice.",
+    "eraBuckets": [
+      "1890s",
+      "1910s",
+      "1930s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "military",
+      "healthcare",
+      "education",
+      "firsts",
+      "black-codes",
+      "resistance"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "military",
+      "healthcare",
+      "education",
+      "firsts",
+      "black-codes",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "African American surgeon",
+      "Children's Home Hospital",
+      "National Medical Association",
+      "Buffalo Soldiers",
+      "segregation in medicine"
+    ],
+    "jurisdictionLabel": "Birmingham, Alabama",
+    "locationPrecision": "city",
+    "locationLabel": "Home and practice location",
+    "lat": 33,
+    "lng": -87,
+    "claims": [
+      {
+        "predicate": "was the first African American surgeon in the United States Army",
+        "object": "first African American surgeon in the U.S. Army",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Arthur_McKinnon_Brown",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served as a surgeon in the 10th Cavalry Regiment during the Spanish-American War",
+        "object": "surgeon in the 10th Cavalry Regiment (Buffalo Soldiers) during the Spanish-American War",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Arthur_McKinnon_Brown",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was dishonorably discharged from the U.S. Army after being shot by a white hospital steward",
+        "object": "dishonorably discharged in June 1899 after being shot by Thomas C. Reeds",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Arthur_McKinnon_Brown",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was an influential figure in the founding of the Children's Home Hospital of Birmingham",
+        "object": "helped create the Children's Home Hospital of Birmingham",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Arthur_McKinnon_Brown",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was president of the National Medical Association in 1914",
+        "object": "president of the National Medical Association",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Arthur_McKinnon_Brown",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "graduated from the University of Michigan Medical School in 1891",
+        "object": "M.D. from University of Michigan Medical School, 1891",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Arthur_McKinnon_Brown",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "During the Jim Crow era, racial segregation in healthcare severely limited opportunities for Black physicians. Brown’s work advanced access to medical training and practice for African Americans, countering systemic exclusion through institution-building and military service despite discriminatory treatment."
+  },
+  {
+    "id": "west_charles_c_dawson_q64006081",
+    "kind": "person",
+    "displayName": "Charles C. Dawson",
+    "summary": "Charles C. Dawson (1889–1981) was an African American artist and arts administrator who played a pivotal role in Chicago’s Black cultural scene during the early 20th century. He designed the 1940 American Negro Exposition’s 20-diorama layout and curated exhibitions promoting racial art, including the 1927 Negro in Art Week.",
+    "eraBuckets": [
+      "1910s",
+      "1920s",
+      "1930s",
+      "1940s"
+    ],
+    "topicTags": [
+      "art",
+      "harlem-renaissance",
+      "civil-rights",
+      "hbcu",
+      "military",
+      "great-migration",
+      "public-accommodations"
+    ],
+    "topicIds": [
+      "art",
+      "harlem-renaissance",
+      "civil-rights",
+      "hbcu",
+      "military",
+      "great-migration",
+      "public-accommodations"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Negro in Art Week",
+      "American Negro Exposition",
+      "Buffalo Soldiers",
+      "New Negro Movement",
+      "Works Progress Administration"
+    ],
+    "jurisdictionLabel": "Chicago, Illinois",
+    "locationPrecision": "site",
+    "locationLabel": "Chicago Coliseum",
+    "lat": 41.86194444,
+    "lng": -87.625,
+    "claims": [
+      {
+        "predicate": "served as a Buffalo Soldier in the U.S. Army",
+        "object": "Charles C. Dawson",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Charles_C._Dawson",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "designed the layout for the 1940 American Negro Exposition at the Chicago Coliseum",
+        "object": "Charles C. Dawson",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Charles_C._Dawson",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was chairman of the subcommittee on fine arts for the 1927 Negro in Art Week Exhibition",
+        "object": "Charles C. Dawson",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Charles_C._Dawson",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "participated in the Works Progress Administration as Director of Arts and Crafts for Chicago's National Youth Administration",
+        "object": "Charles C. Dawson",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Charles_C._Dawson",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "created a watercolor titled 'The Crisis' exhibited in 'The Art of the American Negro (1851 to 1940)'",
+        "object": "Charles C. Dawson",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Charles_C._Dawson",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was the first Black student at the Art Students League of New York",
+        "object": "Charles C. Dawson",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Charles_C._Dawson",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Dawson's work emerged during the Great Migration and the New Negro Movement, periods when Black artists in Chicago and Harlem sought to define a distinct cultural identity amid segregation and racial violence. His leadership in federally funded arts programs and major exhibitions reflects how Black artists used New Deal institutions to assert visibility and historical narrative control."
+  },
+  {
+    "id": "west_isaiah_mays_q16031086",
+    "kind": "person",
+    "displayName": "Isaiah Mays",
+    "summary": "Isaiah Mays, born into slavery in Virginia, served as a corporal in the 24th Infantry Regiment during the Wham Paymaster Robbery in 1889, where he assumed command under fire and made a critical tactical withdrawal. He received the Medal of Honor in 1890 for his actions, one of few Black soldiers so honored in the Indian Wars era.",
+    "eraBuckets": [
+      "1880s",
+      "1890s",
+      "1920s"
+    ],
+    "topicTags": [
+      "military",
+      "civil-war",
+      "segregation",
+      "firsts",
+      "resistance"
+    ],
+    "topicIds": [
+      "military",
+      "civil-war",
+      "segregation",
+      "firsts",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Buffalo Soldier",
+      "Medal of Honor",
+      "Wham Paymaster Robbery",
+      "24th Infantry Regiment",
+      "Arizona Territory"
+    ],
+    "jurisdictionLabel": "Phoenix, Arizona",
+    "locationPrecision": "cemetery",
+    "locationLabel": "Arizona State Hospital cemetery",
+    "lat": 33.4533,
+    "lng": -112.0279,
+    "claims": [
+      {
+        "predicate": "was born into slavery in Virginia",
+        "object": "Virginia",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Isaiah_Mays",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served as a corporal in the 24th Infantry Regiment during the Wham Paymaster Robbery",
+        "object": "24th Infantry Regiment",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Isaiah_Mays",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "assumed command during the Wham Paymaster Robbery after Sergeant Brown became separated",
+        "object": "assumed command under fire",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Isaiah_Mays",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was awarded the Medal of Honor for actions in the Wham Paymaster Robbery",
+        "object": "Medal of Honor",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Isaiah_Mays",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is buried in the cemetery adjoining the Arizona State Hospital in Phoenix",
+        "object": "Phoenix, Arizona",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Isaiah_Mays",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "had his grave marked with an official Department of Veterans Affairs headstone in 2001",
+        "object": "United States Department of Veterans Affairs headstone",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Isaiah_Mays",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Mays served in the Buffalo Soldiers, all-Black regiments formed after the Civil War amid military segregation. These units were tasked with western frontier duty, often under harsh conditions and racial discrimination, yet earned distinction for bravery. His Medal of Honor reflects rare federal recognition of Black valor during an era when such awards were seldom granted to African American troops."
+  },
+  {
+    "id": "west_john_morton_finney_q6249571",
+    "kind": "person",
+    "displayName": "John Morton-Finney",
+    "summary": "John Morton-Finney (1889–1998) was a civil rights activist, lawyer, and educator who served in the Buffalo Soldiers and taught for 47 years in Indianapolis Public Schools, including as founding faculty at Crispus Attucks High School. He earned eleven academic degrees, including five law degrees, and was admitted to the U.S. Supreme Court bar at age 83.",
+    "eraBuckets": [
+      "1880s",
+      "1890s",
+      "1900s",
+      "1910s",
+      "1920s",
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s",
+      "1970s",
+      "1980s",
+      "1990s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "education",
+      "segregation",
+      "military",
+      "jim-crow",
+      "firsts",
+      "hbcu",
+      "law"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "education",
+      "segregation",
+      "military",
+      "jim-crow",
+      "firsts",
+      "hbcu",
+      "law"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Buffalo Soldiers",
+      "Crispus Attucks High School",
+      "civil rights lawyer",
+      "segregated education",
+      "Indiana civil rights"
+    ],
+    "jurisdictionLabel": "Indianapolis, Indiana",
+    "locationPrecision": "institution",
+    "locationLabel": "Crispus Attucks High School and Indianapolis Public Schools",
+    "lat": 39.78288611,
+    "lng": -86.16993889,
+    "claims": [
+      {
+        "predicate": "served_in",
+        "object": "24th U.S. Infantry Regiment (Buffalo Soldiers)",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/John_Morton-Finney",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "denied_officer_commission_due_to",
+        "object": "racial discrimination",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/John_Morton-Finney",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_founding_faculty_member_at",
+        "object": "Crispus Attucks High School",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/John_Morton-Finney",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "earned_five_law_degrees",
+        "object": "including JD from Indiana University School of Law",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/John_Morton-Finney",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_admitted_to_practice_before",
+        "object": "U.S. Supreme Court",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/John_Morton-Finney",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_last_surviving_member_of",
+        "object": "Buffalo Soldiers unit in World War I",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.govinfo.gov/content/pkg/CREC-1998-02-04/html/CREC-1998-02-04-pt1-PgH304.htm",
+        "citationLabel": "Congressional Record, 1998"
+      }
+    ],
+    "historicalContext": "Morton-Finney’s career unfolded during the rise of segregated education and systemic racial exclusion in law and military service. His teaching at Crispus Attucks—a segregated high school created under discriminatory policies—exemplifies how Black educators sustained excellence despite underfunding. His legal work and military service reflect persistent Black efforts to claim full citizenship through institutions that often denied it."
+  },
+  {
+    "id": "west_prince_romerson_q24578819",
+    "kind": "organization",
+    "displayName": "Prince Romerson",
+    "summary": "Prince Romerson, born around 1840, served in the Union Navy and 5th Massachusetts Colored Cavalry during the Civil War, later joining the 25th U.S. Infantry as a Buffalo Soldier. His military career reflects the diverse racial backgrounds and segregated service of Black and Indigenous soldiers in the 19th-century U.S. Army.",
+    "eraBuckets": [
+      "1860s",
+      "1870s"
+    ],
+    "topicTags": [
+      "civil-war",
+      "military",
+      "segregation",
+      "civil-rights"
+    ],
+    "topicIds": [
+      "civil-war",
+      "military",
+      "segregation",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Buffalo Soldiers",
+      "United States Colored Troops",
+      "5th Massachusetts Colored Cavalry",
+      "25th Infantry",
+      "Black soldiers"
+    ],
+    "jurisdictionLabel": "Honolulu, HI",
+    "locationPrecision": "cemetery",
+    "locationLabel": "National Memorial Cemetery of the Pacific",
+    "lat": 21.31277778,
+    "lng": -157.84638889,
+    "claims": [
+      {
+        "predicate": "served in",
+        "object": "5th Regiment Massachusetts Colored Volunteer Cavalry",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Prince_Romerson",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "achieved rank of",
+        "object": "Sergeant",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Prince_Romerson",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served in",
+        "object": "25th United States Infantry Regiment",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Prince_Romerson",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "fought in",
+        "object": "American Civil War",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Prince_Romerson",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "fought in",
+        "object": "American Indian Wars",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Prince_Romerson",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was part of",
+        "object": "Buffalo Soldiers",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Prince_Romerson",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Romerson's service in the United States Colored Troops (USCT) and subsequent role as a Buffalo Soldier situates him within the broader history of segregated military units. After the Civil War, the U.S. Army stationed Black regiments like the 25th Infantry on the Western frontier, where they faced systemic discrimination despite their service, a pattern central to understanding post-emancipation racial dynamics."
+  },
+  {
+    "id": "west_william_h_thompkins_q8010618",
+    "kind": "person",
+    "displayName": "William H. Thompkins",
+    "summary": "William H. Thompkins, a Buffalo Soldier in the 10th Cavalry Regiment, earned the Medal of Honor for a daring nighttime rescue under enemy fire during the Spanish–American War’s Battle of Tayacoba in 1898. Alongside three fellow Black soldiers, he helped retrieve stranded U.S. troops in Cuba, marking one of the last such honors awarded to Black servicemen for over 50 years.",
+    "eraBuckets": [
+      "1890s"
+    ],
+    "topicTags": [
+      "military",
+      "army",
+      "civil-rights",
+      "firsts",
+      "resistance"
+    ],
+    "topicIds": [
+      "military",
+      "army",
+      "civil-rights",
+      "firsts",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Medal of Honor",
+      "Buffalo Soldier",
+      "10th Cavalry",
+      "Spanish-American War",
+      "Battle of Tayacoba"
+    ],
+    "jurisdictionLabel": "San Francisco, California",
+    "locationPrecision": "cemetery",
+    "locationLabel": "San Francisco National Cemetery",
+    "lat": 37.79972222,
+    "lng": -122.46444444,
+    "claims": [
+      {
+        "predicate": "served_in",
+        "object": "10th Cavalry Regiment",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/William_H._Thompkins",
+        "citationLabel": "Wikipedia - William H. Thompkins"
+      },
+      {
+        "predicate": "awarded",
+        "object": "Medal of Honor",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/William_H._Thompkins",
+        "citationLabel": "Wikipedia - William H. Thompkins"
+      },
+      {
+        "predicate": "participated_in",
+        "object": "Battle of Tayacoba",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/William_H._Thompkins",
+        "citationLabel": "Wikipedia - William H. Thompkins"
+      },
+      {
+        "predicate": "was_member_of",
+        "object": "Buffalo Soldiers",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/William_H._Thompkins",
+        "citationLabel": "Wikipedia - William H. Thompkins"
+      },
+      {
+        "predicate": "rescued_stranded_troops_under_fire",
+        "object": "during the Battle of Tayacoba, 1898",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/William_H._Thompkins",
+        "citationLabel": "Wikipedia - William H. Thompkins"
+      },
+      {
+        "predicate": "was_one_of_last_black_soldiers_awarded_medal_of_honor_before_half-century_gap",
+        "object": "awarded 1899, next Black recipient not until 1944",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/William_H._Thompkins",
+        "citationLabel": "Wikipedia - William H. Thompkins"
+      }
+    ],
+    "historicalContext": "Thompkins' recognition occurred during an era of entrenched racial segregation in the U.S. military, where Black soldiers served in segregated units like the 10th Cavalry. Despite their valor, systemic racism led to decades of exclusion from the Medal of Honor, making his award a rare acknowledgment of Black heroism in a discriminatory structure."
+  },
+  {
+    "id": "west_george_h_wanton_q5540116",
+    "kind": "person",
+    "displayName": "George H. Wanton",
+    "summary": "George H. Wanton, a Buffalo Soldier in the 10th Cavalry Regiment, received the Medal of Honor for bravery during the 1898 Battle of Tayacoba in the Spanish–American War. He and three fellow Black soldiers were the last African Americans to receive the award for over half a century, underscoring racial inequities in military recognition.",
+    "eraBuckets": [
+      "1890s",
+      "1920s"
+    ],
+    "topicTags": [
+      "military",
+      "segregation",
+      "civil-rights",
+      "firsts"
+    ],
+    "topicIds": [
+      "military",
+      "segregation",
+      "civil-rights",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Buffalo Soldier",
+      "Medal of Honor",
+      "10th Cavalry",
+      "Battle of Tayacoba",
+      "Spanish–American War"
+    ],
+    "jurisdictionLabel": "Arlington, Virginia",
+    "locationPrecision": "cemetery",
+    "locationLabel": "Arlington National Cemetery",
+    "lat": 38.87916667,
+    "lng": -77.07222222,
+    "claims": [
+      {
+        "predicate": "received Medal of Honor",
+        "object": "for actions during the Battle of Tayacoba in the Spanish–American War",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/George_H._Wanton",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served in",
+        "object": "Troop M, 10th Cavalry Regiment",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/George_H._Wanton",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was one of four Buffalo Soldiers",
+        "object": "awarded the Medal of Honor in 1899, the last Black recipients for over 50 years",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/George_H._Wanton",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "voluntarily participated in rescue mission",
+        "object": "under enemy fire to retrieve stranded American forces during the Battle of Tayacoba",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/George_H._Wanton",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served over 35 years in the U.S. Army",
+        "object": "from 1889 to 1925, retiring as a master sergeant",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/George_H._Wanton",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was selected as honorary pallbearer",
+        "object": "at the burial of the Unknown Soldier in 1921",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/George_H._Wanton",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "As a member of the 10th Cavalry Regiment, one of the original 'Buffalo Soldier' units established after the Civil War, Wanton served in a segregated military during an era of entrenched racial discrimination. His Medal of Honor highlights both valor and the systemic exclusion of Black soldiers from recognition, as no Black service member received the honor again until the 1990s. The unit played a critical role in U.S. military campaigns while facing pervasive racism within the armed forces."
+  },
+  {
+    "id": "west_david_wingfield_q101003004",
+    "kind": "person",
+    "displayName": "David Wingfield",
+    "summary": "David Wingfield, a Black second baseman in the Negro leagues from 1920 to 1923, served in the 10th Cavalry Regiment before being imprisoned at Leavenworth for a fatal 1915 gunfight. While incarcerated, he played for the prison's African American team, the 'Booker T's,' which produced multiple future Negro leaguers, illustrating how segregated penal institutions shaped Black athletic opportunity.",
+    "eraBuckets": [
+      "1910s",
+      "1920s"
+    ],
+    "topicTags": [
+      "baseball",
+      "criminal-justice",
+      "segregation",
+      "resilience",
+      "military",
+      "jim-crow"
+    ],
+    "topicIds": [
+      "baseball",
+      "criminal-justice",
+      "segregation",
+      "resilience",
+      "military",
+      "jim-crow"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Negro leagues",
+      "Leavenworth",
+      "Buffalo Soldiers",
+      "prison baseball",
+      "10th Cavalry"
+    ],
+    "jurisdictionLabel": "Leavenworth, Kansas",
+    "locationPrecision": "institution",
+    "locationLabel": "Leavenworth Federal Penitentiary",
+    "lat": 39.33,
+    "lng": -94.93638889,
+    "claims": [
+      {
+        "predicate": "served in",
+        "object": "10th Cavalry Regiment",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/David_Wingfield",
+        "citationLabel": "Wikipedia - David Wingfield"
+      },
+      {
+        "predicate": "was court-martialed for",
+        "object": "a fatal gunfight resulting in the death of an officer",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/David_Wingfield",
+        "citationLabel": "Wikipedia - David Wingfield"
+      },
+      {
+        "predicate": "was imprisoned at",
+        "object": "Leavenworth Federal Penitentiary",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/David_Wingfield",
+        "citationLabel": "Wikipedia - David Wingfield"
+      },
+      {
+        "predicate": "played for",
+        "object": "the 'Booker T's,' an African American prison baseball team at Leavenworth",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.archives.gov/publications/prologue/2004/summer/booker-t-four",
+        "citationLabel": "Prologue Magazine - The Booker T Four’s Unlikely Journey"
+      },
+      {
+        "predicate": "debuted in the Negro leagues",
+        "object": "in 1920 with the Dayton Marcos",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/David_Wingfield",
+        "citationLabel": "Wikipedia - David Wingfield"
+      },
+      {
+        "predicate": "was part of a group of four inmates",
+        "object": "from Leavenworth’s 'Booker T's' who reached the Negro leagues",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.archives.gov/publications/prologue/2004/summer/booker-t-four",
+        "citationLabel": "Prologue Magazine - The Booker T Four’s Unlikely Journey"
+      }
+    ],
+    "historicalContext": "Wingfield’s path from the Buffalo Soldiers to Leavenworth and then the Negro leagues reflects the constrained mobility of Black men in the early 20th century. His imprisonment and subsequent athletic development occurred within a Jim Crow prison system that used baseball as a tool of control, yet inadvertently enabled rare professional advancement for a few Black athletes despite systemic barriers."
+  },
+  {
+    "id": "west_bruce_s_beach_q106548590",
+    "kind": "person",
+    "displayName": "Bruce's Beach",
+    "summary": "Bruce's Beach in Manhattan Beach, California, was a Black-owned resort established in 1912 by Charles and Willa Bruce to serve African Americans excluded from segregated beaches. The city seized the land in 1924 using eminent domain under the guise of park development, though it remained vacant for decades.",
+    "eraBuckets": [
+      "1910s",
+      "1920s",
+      "1950s",
+      "1960s",
+      "2020s"
+    ],
+    "topicTags": [
+      "desegregation",
+      "economic-justice",
+      "great-migration",
+      "land-ownership",
+      "reconstruction",
+      "resistance",
+      "segregation",
+      "self-determination"
+    ],
+    "topicIds": [
+      "desegregation",
+      "economic-justice",
+      "great-migration",
+      "land-ownership",
+      "reconstruction",
+      "resistance",
+      "segregation",
+      "self-determination"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Bruce's Beach",
+      "eminent domain",
+      "Manhattan Beach",
+      "land restitution",
+      "Black resort"
+    ],
+    "jurisdictionLabel": "Manhattan Beach, California",
+    "locationPrecision": "address",
+    "locationLabel": "26th Street and Highland Avenue",
+    "lat": 33.89444444,
+    "lng": -118.41555556,
+    "claims": [
+      {
+        "predicate": "was founded by",
+        "object": "Charles and Willa Bruce",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Bruce's_Beach",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "provided beach access to African Americans during racial segregation",
+        "object": "Bruce's Beach",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Bruce's_Beach",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was seized via eminent domain by Manhattan Beach City Council in 1924",
+        "object": "Bruce's Beach",
+        "confidenceLevel": "high",
+        "citationSource": "ceo.lacounty.gov",
+        "citationHref": "https://ceo.lacounty.gov/ardi/bruces-beach/",
+        "citationLabel": "Los Angeles County CEO"
+      },
+      {
+        "predicate": "was racially motivated to eliminate a successful Black business",
+        "object": "eminent domain action against Bruce's Beach",
+        "confidenceLevel": "high",
+        "citationSource": "ceo.lacounty.gov",
+        "citationHref": "https://ceo.lacounty.gov/ardi/bruces-beach/",
+        "citationLabel": "Los Angeles County CEO"
+      },
+      {
+        "predicate": "was returned to the Bruce family heirs in 2022",
+        "object": "Bruce's Beach land",
+        "confidenceLevel": "high",
+        "citationSource": "ceo.lacounty.gov",
+        "citationHref": "https://ceo.lacounty.gov/ardi/bruces-beach/",
+        "citationLabel": "Los Angeles County CEO"
+      },
+      {
+        "predicate": "was part of the Great Migration movement",
+        "object": "Charles and Willa Bruce's relocation to California",
+        "confidenceLevel": "medium",
+        "citationSource": "ceo.lacounty.gov",
+        "citationHref": "https://ceo.lacounty.gov/ardi/bruces-beach/",
+        "citationLabel": "Los Angeles County CEO"
+      }
+    ],
+    "historicalContext": "Bruce's Beach exemplifies the systemic use of eminent domain and zoning laws to dispossess Black families of property during the Jim Crow era, particularly in rapidly developing white communities. Its seizure reflects broader patterns of racial exclusion in coastal California, where Black access to public spaces was restricted despite constitutional guarantees. The 2022 land return represents a significant, though rare, governmental acknowledgment of historical racial injustice in property rights."
+  },
+  {
+    "id": "west_alvin_aaron_coffey_sr_q135193214",
+    "kind": "person",
+    "displayName": "Alvin Aaron Coffey Sr.",
+    "summary": "Alvin Aaron Coffey Sr. (1822–1902), born enslaved in Kentucky, was forced to California during the Gold Rush, where he labored under enslavers before earning freedom for himself and his family. He returned to Missouri to retrieve them, settled in Red Bluff, and founded a school for African American and Indigenous children.",
+    "eraBuckets": [
+      "1820s",
+      "1840s",
+      "1850s",
+      "1860s",
+      "1880s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "great-migration",
+      "education",
+      "firsts",
+      "land-ownership"
+    ],
+    "topicIds": [
+      "enslavement",
+      "great-migration",
+      "education",
+      "firsts",
+      "land-ownership"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "California Gold Rush",
+      "manumission",
+      "Society of California Pioneers",
+      "Red Bluff",
+      "African American pioneer"
+    ],
+    "jurisdictionLabel": "Red Bluff, California",
+    "locationPrecision": "address",
+    "locationLabel": "Family farm and residence in Red Bluff",
+    "lat": 40.09944444,
+    "lng": -122.44527778,
+    "claims": [
+      {
+        "predicate": "was born enslaved",
+        "object": "in Mason County, Kentucky, on July 14, 1822",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Alvin_Aaron_Coffey_Sr.",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was forced to travel to California by enslaver",
+        "object": "with Dr. William Bassett in 1849 during the Gold Rush",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/people/alvin-aaron-coffey.htm",
+        "citationLabel": "National Park Service"
+      },
+      {
+        "predicate": "negotiated manumission fee",
+        "object": "of $1,000 with the Tindell family and earned freedom for himself and his family through mining labor in Shasta and Sutter counties",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Alvin_Aaron_Coffey_Sr.",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "founded a school",
+        "object": "for African American and Indigenous children in Shasta County after arriving with his family in 1857",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/people/alvin-aaron-coffey.htm",
+        "citationLabel": "National Park Service"
+      },
+      {
+        "predicate": "became the only African American inducted",
+        "object": "into the Society of California Pioneers in 1887",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Alvin_Aaron_Coffey_Sr.",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "settled in Red Bluff, California",
+        "object": "where he and his family worked as farmers, turkey ranchers, and laundry operators",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/people/alvin-aaron-coffey.htm",
+        "citationLabel": "National Park Service"
+      }
+    ],
+    "historicalContext": "Coffey’s life reflects the complex legal and social terrain Black people navigated in Gold Rush-era California—a free state that still permitted enslaved labor under certain conditions. His ability to negotiate manumission and establish a free Black household in Northern California illustrates both the opportunities and persistent vulnerabilities faced by African Americans during westward migration."
+  },
+  {
+    "id": "west_colonel_allensworth_state_historic_park_q5148087",
+    "kind": "person",
+    "displayName": "Colonel Allensworth State Historic Park",
+    "summary": "Colonel Allensworth State Historic Park preserves Allensworth, the only California town founded, financed, and governed by African Americans in 1908. Led by Lt. Colonel [[west_allen_allensworth_q4731504|Allen Allensworth]] and other Black leaders, it was established as a self-reliant community with its own schools, businesses, and local government, aiming to realize economic and social autonomy…",
+    "eraBuckets": [
+      "1900s",
+      "1910s",
+      "1970s"
+    ],
+    "topicTags": [
+      "self-governance",
+      "land-ownership",
+      "economic-justice",
+      "hbcu",
+      "civil-rights",
+      "segregation",
+      "community"
+    ],
+    "topicIds": [
+      "self-governance",
+      "land-ownership",
+      "economic-justice",
+      "hbcu",
+      "civil-rights",
+      "segregation",
+      "community"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Allensworth",
+      "African American town",
+      "self-determination",
+      "Tulare County",
+      "state historic park"
+    ],
+    "jurisdictionLabel": "Tulare County, California",
+    "locationPrecision": "site",
+    "locationLabel": "Colonel Allensworth State Historic Park",
+    "lat": 35.86361111,
+    "lng": -119.38888889,
+    "claims": [
+      {
+        "predicate": "was founded in",
+        "object": "1908",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Colonel_Allensworth_State_Historic_Park",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was founded by",
+        "object": "Allen Allensworth",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Colonel_Allensworth_State_Historic_Park",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was the only California town founded, financed, and governed by African Americans",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Colonel_Allensworth_State_Historic_Park",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was administered by",
+        "object": "Allensworth Progressive Association",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Colonel_Allensworth_State_Historic_Park",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was listed on the National Register of Historic Places",
+        "object": "February 23, 1972",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/72000263",
+        "citationLabel": "NPS NRHP"
+      },
+      {
+        "predicate": "was established as a state park",
+        "object": "1973",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Colonel_Allensworth_State_Historic_Park",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Allensworth was founded during the Jim Crow era as a deliberate act of Black self-determination, offering refuge from racial oppression and a model of autonomous governance and land ownership. Its founding reflects broader efforts by African Americans to create independent communities in response to disenfranchisement and restrictive covenants limiting property ownership elsewhere."
+  },
+  {
+    "id": "west_history_of_slavery_in_california_q5868820",
+    "kind": "person",
+    "displayName": "history of slavery in California",
+    "summary": "Under Spanish colonial rule, over 90,000 Indigenous Californians were subjected to forced labor in mission compounds, a system described as de facto slavery. After Mexican independence, President Vicente Guerrero abolished slavery in 1829, but U.S. settlers later brought enslaved African Americans to California during the Gold Rush.",
+    "eraBuckets": [
+      "1770s",
+      "1820s",
+      "1830s",
+      "1840s",
+      "1850s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "great-migration",
+      "labor"
+    ],
+    "topicIds": [
+      "enslavement",
+      "great-migration",
+      "labor"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Spanish missions",
+      "Indigenous enslavement",
+      "Mexican abolition",
+      "Gold Rush",
+      "Edmond Edward Wysinger"
+    ],
+    "jurisdictionLabel": "California, USA",
+    "locationPrecision": "region",
+    "locationLabel": "Spanish missions and Gold Rush mining regions",
+    "lat": 38.8003,
+    "lng": -120.8922,
+    "claims": [
+      {
+        "predicate": "involved forced labor of Indigenous Californians",
+        "object": "Spanish missions in California between 1770 and 1834",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/History_of_slavery_in_California",
+        "citationLabel": "Wikipedia - History of slavery in California"
+      },
+      {
+        "predicate": "described as de facto slavery",
+        "object": "the system of forced labor and control at Spanish missions including monjeríos",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/History_of_slavery_in_California",
+        "citationLabel": "Wikipedia - History of slavery in California"
+      },
+      {
+        "predicate": "abolished slavery in Mexican territory including California",
+        "object": "President Vicente Guerrero in 1829",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/History_of_slavery_in_California",
+        "citationLabel": "Wikipedia - History of slavery in California"
+      },
+      {
+        "predicate": "brought enslaved African Americans to California during the Gold Rush",
+        "object": "white colonists from the Southern United States",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/History_of_slavery_in_California",
+        "citationLabel": "Wikipedia - History of slavery in California"
+      },
+      {
+        "predicate": "gained freedom through gold mining in California",
+        "object": "Edmond Edward Wysinger, an enslaved African American miner",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/History_of_slavery_in_California",
+        "citationLabel": "Wikipedia - History of slavery in California"
+      },
+      {
+        "predicate": "worked under forced conditions in mission compounds",
+        "object": "Indigenous girls held in monjeríos for religious conversion and sexual control",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/History_of_slavery_in_California",
+        "citationLabel": "Wikipedia - History of slavery in California"
+      }
+    ],
+    "historicalContext": "California’s history of slavery reflects broader patterns of racialized labor control across colonial and national transitions. Spanish missions institutionalized forced Indigenous labor under religious justification, while Mexican abolition in 1829 sought to limit U.S. settler expansion. Despite legal bans, the influx of Southern slaveholders during the Gold Rush entrenched chattel slavery in practice, challenging California’s free-state status and contributing to national tensions over slavery’s expansion."
+  },
+  {
+    "id": "west_george_washington_bush_q5545944",
+    "kind": "person",
+    "displayName": "George Washington Bush",
+    "summary": "George Washington Bush, a free Black man of African and Irish descent, was among the first non-Amerindian settlers of the Pacific Northwest. In 1846, he established a farm in what became Tumwater, Washington, circumventing Oregon Territory’s exclusion laws by settling north of the Columbia River, enabling the founding of one of the region’s earliest American communities.",
+    "eraBuckets": [
+      "1820s",
+      "1830s",
+      "1840s"
+    ],
+    "topicTags": [
+      "frontier",
+      "self-determination",
+      "land-ownership",
+      "migration",
+      "resistance"
+    ],
+    "topicIds": [
+      "frontier",
+      "self-determination",
+      "land-ownership",
+      "migration",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Black pioneer",
+      "Oregon Trail",
+      "War of 1812 veteran",
+      "land ownership",
+      "racial exclusion"
+    ],
+    "jurisdictionLabel": "Tumwater, Washington",
+    "locationPrecision": "site",
+    "locationLabel": "Bush Prairie Farm settlement site",
+    "lat": 46.74722222,
+    "lng": -123.00277778,
+    "claims": [
+      {
+        "predicate": "was among the first African-American non-Amerindian settlers of the Pacific Northwest",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/George_Bush_(pioneer)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "fought under Andrew Jackson in the War of 1812 at the Battle of New Orleans",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/George_Bush_(pioneer)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "purchased 80 acres of land in Missouri in 1828 with cash",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/George_Bush_(pioneer)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "settled in present-day Tumwater, Washington in 1846 to avoid Oregon Territory's exclusion laws",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/George_Bush_(pioneer)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was a free man of African and Irish descent who never enslaved",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/George_Bush_(pioneer)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "co-founded one of the earliest American settlements in Washington Territory",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/George_Bush_(pioneer)",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Bush’s settlement occurred amid Oregon Territory’s exclusionary laws that banned Black residents, reflecting broader efforts to create white-only settlements in the West. His successful land claim and community leadership challenged racial restrictions and enabled Black presence in the region despite legal hostility."
+  }
+]

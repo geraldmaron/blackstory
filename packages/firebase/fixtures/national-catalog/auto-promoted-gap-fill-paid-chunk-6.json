@@ -1,0 +1,234 @@
+[
+  {
+    "id": "gap_dan_river_plant",
+    "kind": "institution",
+    "displayName": "Dan River plant",
+    "summary": "The Dan River Steam Station, owned by Duke Energy, is notable for its role in the 1971 Griggs v. Duke Power Co. Supreme Court case, which addressed racial discrimination in employment practices, and for the 2014 coal ash spill that caused significant environmental damage.",
+    "eraBuckets": [
+      "1970s",
+      "2010s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "law"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "law"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Dan River plant",
+      "Griggs v. Duke Power Co.",
+      "coal ash spill",
+      "environmental impact",
+      "civil rights"
+    ],
+    "jurisdictionLabel": "Eden, North Carolina",
+    "locationPrecision": "institution",
+    "locationLabel": "Dan River Steam Station",
+    "lat": 36.487,
+    "lng": -79.718,
+    "claims": [
+      {
+        "predicate": "was_involved_in",
+        "object": "Griggs v. Duke Power Co.",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Dan_River_Steam_Station",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "caused",
+        "object": "coal ash spill",
+        "confidenceLevel": "high",
+        "citationSource": "cerc.usgs.gov",
+        "citationHref": "https://www.cerc.usgs.gov/orda_docs/CaseDetails?ID=984",
+        "citationLabel": "USGS"
+      },
+      {
+        "predicate": "was_subject_to",
+        "object": "Title VII of the Civil Rights Act",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Dan_River_Steam_Station",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "had_impact_on",
+        "object": "environment",
+        "confidenceLevel": "high",
+        "citationSource": "cerc.usgs.gov",
+        "citationHref": "https://www.cerc.usgs.gov/orda_docs/CaseDetails?ID=984",
+        "citationLabel": "USGS"
+      }
+    ],
+    "historicalContext": "The Dan River Steam Station was central to the Griggs v. Duke Power Co. case, which examined the legality of employment practices that disproportionately affected African-American workers. The plant also experienced a major environmental incident in 2014, highlighting its impact on local ecosystems and regulatory responses."
+  },
+  {
+    "id": "gap_bishop_college",
+    "kind": "school",
+    "displayName": "Bishop College",
+    "summary": "Bishop College, founded in 1881 in Marshall, Texas, was a historically Black college that played a key role in educating African American students during the Jim Crow era. It closed in 1988 after a financial scandal and its campus is now used by Paul Quinn College.",
+    "eraBuckets": [
+      "1910s",
+      "1920s",
+      "1930s",
+      "1940s",
+      "1950s",
+      "1960s",
+      "1970s",
+      "1980s"
+    ],
+    "topicTags": [
+      "hbcu",
+      "education",
+      "civil-rights",
+      "segregation",
+      "history"
+    ],
+    "topicIds": [
+      "hbcu",
+      "education",
+      "civil-rights",
+      "segregation",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Bishop College",
+      "HBCU",
+      "Marshall, Texas",
+      "education",
+      "Jim Crow"
+    ],
+    "jurisdictionLabel": "Marshall, Texas",
+    "locationPrecision": "city",
+    "locationLabel": "Marshall, Texas",
+    "lat": 32.6781,
+    "lng": -96.7552,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "Bishop College",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Bishop_College",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "location",
+        "object": "Marshall, Texas",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Bishop_College",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "role",
+        "object": "education for African American students",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Bishop_College",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "closure",
+        "object": "1988",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Bishop_College",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "legacy",
+        "object": "Paul Quinn College",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Bishop_College",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Bishop College was established in 1881 as part of the broader movement to create educational institutions for African Americans during the Jim Crow era. It was founded by the Baptist Home Mission Society and served as a vital institution for Black education in Texas. The college's closure in 1988 marked the end of an era for HBCUs in the region."
+  },
+  {
+    "id": "gap_abiel_smith_school",
+    "kind": "school",
+    "displayName": "Abiel Smith School",
+    "summary": "The Abiel Smith School, founded in 1835, was the first public school for free Black children in Boston. It was established with funds from Abiel Smith, a white philanthropist, and played a central role in the fight against segregation in Boston's schools.",
+    "eraBuckets": [
+      "1830s",
+      "1850s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "education",
+      "black-codes",
+      "jim-crow"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "education",
+      "black-codes",
+      "jim-crow"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Abiel Smith School",
+      "Boston",
+      "segregation",
+      "education",
+      "civil rights"
+    ],
+    "jurisdictionLabel": "Boston, Massachusetts",
+    "locationPrecision": "address",
+    "locationLabel": "46 Joy Street",
+    "lat": 42.36001,
+    "lng": -71.06515,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "1835",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Abiel_Smith_School",
+        "citationLabel": "Abiel Smith School Wikipedia"
+      },
+      {
+        "predicate": "located",
+        "object": "46 Joy Street, Boston, Massachusetts",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Abiel_Smith_School",
+        "citationLabel": "Abiel Smith School Wikipedia"
+      },
+      {
+        "predicate": "funded_by",
+        "object": "Abiel Smith",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Abiel_Smith_School",
+        "citationLabel": "Abiel Smith School Wikipedia"
+      },
+      {
+        "predicate": "first_public_school_for_black_children",
+        "object": "yes",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Abiel_Smith_School",
+        "citationLabel": "Abiel Smith School Wikipedia"
+      },
+      {
+        "predicate": "desegregation",
+        "object": "1855",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Abiel_Smith_School",
+        "citationLabel": "Abiel Smith School Wikipedia"
+      }
+    ],
+    "historicalContext": "The Abiel Smith School is a key example of segregated education in the United States, reflecting the systemic racial inequalities in the 19th century. It was part of the broader struggle for educational equality and civil rights, culminating in the desegregation of Boston's schools in 1855."
+  }
+]

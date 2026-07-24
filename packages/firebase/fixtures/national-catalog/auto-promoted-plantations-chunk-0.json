@@ -1,0 +1,2432 @@
+[
+  {
+    "id": "plantation_boone_hall_q4943634",
+    "kind": "place",
+    "displayName": "Boone Hall",
+    "summary": "Boone Hall Plantation in Mount Pleasant, South Carolina, operated for over 320 years with labor from enslaved African Americans who produced bricks, built infrastructure, and cultivated pecans. Enslaved workers planted the iconic 1843 Avenue of Oaks and made millions of hand-formed bricks bearing their fingerprints. Recognized as an African American Historic Place in 2009, the site reflects the…",
+    "eraBuckets": [
+      "1680s",
+      "1740s",
+      "1840s",
+      "1850s",
+      "1930s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "architecture",
+      "labor",
+      "resistance"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "architecture",
+      "labor",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "enslaved labor",
+      "Avenue of Oaks",
+      "brickmaking",
+      "pecan production",
+      "Colonial Revival"
+    ],
+    "jurisdictionLabel": "Mount Pleasant, South Carolina",
+    "locationPrecision": "address",
+    "locationLabel": "1235 Long Point Rd, Mount Pleasant, SC",
+    "lat": 32.85755833,
+    "lng": -79.82204722,
+    "claims": [
+      {
+        "predicate": "was_operated_using_enslaved_african_american_labor",
+        "object": "enslaved African Americans performed the majority of labor at Boone Hall, including brickmaking and construction",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Boone_Hall",
+        "citationLabel": "Wikipedia - Boone Hall"
+      },
+      {
+        "predicate": "features_landscape_constructed_by_enslaved_labor",
+        "object": "Enslaved gardeners planted the Avenue of Oaks in 1843 using hand tools",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Boone_Hall",
+        "citationLabel": "Wikipedia - Boone Hall"
+      },
+      {
+        "predicate": "produced_bricks_with_physical_traces_of_enslaved_workers",
+        "object": "Enslaved laborers produced millions of bricks per year by hand, many bearing visible fingerprints",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Boone_Hall",
+        "citationLabel": "Wikipedia - Boone Hall"
+      },
+      {
+        "predicate": "was_recognized_as_african_american_historic_place",
+        "object": "Boone Hall was named one of the African American Historic Places in South Carolina in 2009",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Boone_Hall",
+        "citationLabel": "Wikipedia - Boone Hall"
+      },
+      {
+        "predicate": "cultivated_commodity_crops_via_enslaved_labor",
+        "object": "Enslaved workers cultivated pecans, making Boone Hall one of the leading U.S. producers by the late 19th century",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Boone_Hall",
+        "citationLabel": "Wikipedia - Boone Hall"
+      },
+      {
+        "predicate": "was_site_of_enslaved_skill_development",
+        "object": "Enslaved workers applied self-taught skills in carpentry, mathematics, and geometry to construction projects",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Boone_Hall",
+        "citationLabel": "Wikipedia - Boone Hall"
+      }
+    ],
+    "historicalContext": "Boone Hall exemplifies how enslaved African Americans were central to the economic and physical development of Southern plantations, not only through field labor but also through skilled craftsmanship in brickmaking and landscaping. Their work supported Charleston’s urban expansion and agricultural commodification under a system of racialized slavery that shaped regional wealth and built environments."
+  },
+  {
+    "id": "plantation_chicora_wood_plantation_q5096493",
+    "kind": "place",
+    "displayName": "Chicora Wood Plantation",
+    "summary": "Chicora Wood Plantation in Georgetown County, South Carolina, was a major rice-producing estate reliant on enslaved labor, with 401 enslaved people in 1850 and 630 by 1860. Operated by Robert F.W. Allston and later his daughter Elizabeth Allston Pringle, it exemplifies the Lowcountry’s plantation economy and the continuity of planter-class control before and after emancipation.",
+    "eraBuckets": [
+      "1810s",
+      "1820s",
+      "1830s",
+      "1840s",
+      "1850s",
+      "1860s",
+      "1890s",
+      "1900s",
+      "1910s",
+      "1920s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "labor",
+      "resistance",
+      "land-ownership"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "labor",
+      "resistance",
+      "land-ownership"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "rice plantation",
+      "enslaved labor",
+      "Georgetown County",
+      "Allston family",
+      "Elizabeth Allston Pringle"
+    ],
+    "jurisdictionLabel": "Georgetown, South Carolina",
+    "locationPrecision": "address",
+    "locationLabel": "12 miles northeast of Georgetown on County Road 52",
+    "lat": 33.5175,
+    "lng": -79.17555556,
+    "claims": [
+      {
+        "predicate": "was_operated_using_enslaved_labor",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chicora_Wood_Plantation",
+        "citationLabel": "Wikipedia - Chicora Wood Plantation"
+      },
+      {
+        "predicate": "had_630_enslaved_people_in_1860",
+        "object": "630",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chicora_Wood_Plantation",
+        "citationLabel": "Wikipedia - Chicora Wood Plantation"
+      },
+      {
+        "predicate": "produced_1.5_million_pounds_of_rice_in_1860",
+        "object": "1,500,000 pounds",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chicora_Wood_Plantation",
+        "citationLabel": "Wikipedia - Chicora Wood Plantation"
+      },
+      {
+        "predicate": "was_managed_by_elizabeth_allston_pringle_from_1896_to_1921",
+        "object": "Elizabeth Allston Pringle",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chicora_Wood_Plantation",
+        "citationLabel": "Wikipedia - Chicora Wood Plantation"
+      },
+      {
+        "predicate": "is_part_of_pee_dee_river_rice_planters_historic_district",
+        "object": "Pee Dee River Rice Planters Historic District",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chicora_Wood_Plantation",
+        "citationLabel": "Wikipedia - Chicora Wood Plantation"
+      },
+      {
+        "predicate": "had_surviving_outbuildings_including_rice_mill_and_slave_cabin",
+        "object": "rice mill, slave cabin",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Chicora_Wood_Plantation",
+        "citationLabel": "Wikipedia - Chicora Wood Plantation"
+      }
+    ],
+    "historicalContext": "Chicora Wood was part of the South Carolina Lowcountry’s rice plantation complex, an economy built on the knowledge and forced labor of enslaved Africans and African Americans. The scale of its enslaved workforce and production reflects the region’s dependence on Black labor under chattel slavery, and its post-emancipation management by Pringle illustrates how white landholding families retained control over land and labor after the Civil War."
+  },
+  {
+    "id": "plantation_coffin_point_plantation_q5141010",
+    "kind": "place",
+    "displayName": "Coffin Point Plantation",
+    "summary": "Coffin Point Plantation, built around 1801 on St. Helena Island, South Carolina, was a Sea Island plantation where 260 people were enslaved by 1862. The site features a tabby foundation and a half-mile avenue of oaks, and it was owned by Ebenezer Coffin, who received land and 63 enslaved individuals from his father-in-law.",
+    "eraBuckets": [
+      "1800s",
+      "1860s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "history"
+    ],
+    "topicIds": [
+      "enslavement",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Sea Island plantation",
+      "enslaved labor",
+      "tabby foundation",
+      "St. Helena Island",
+      "Ebenezer Coffin"
+    ],
+    "jurisdictionLabel": "Frogmore, South Carolina",
+    "locationPrecision": "site",
+    "locationLabel": "Coffin Point Plantation, Seaside Road, St. Helena Island",
+    "lat": 32.43277778,
+    "lng": -80.47555556,
+    "claims": [
+      {
+        "predicate": "was built around",
+        "object": "1801",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Coffin_Point_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "had",
+        "object": "260 enslaved people recorded in 1862",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Coffin_Point_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was built by",
+        "object": "Ebenezer Coffin",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Coffin_Point_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "received",
+        "object": "1120 acres and 63 enslaved people from his father-in-law",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Coffin_Point_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "features",
+        "object": "tabby foundation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Coffin_Point_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is listed on",
+        "object": "National Register of Historic Places",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/75001687",
+        "citationLabel": "NRIS"
+      }
+    ],
+    "historicalContext": "As a Sea Island plantation in the Lowcountry, Coffin Point was part of a region central to the cultivation of Sea Island cotton, a labor-intensive crop dependent on the forced labor of enslaved Africans. The 1862 record of 260 enslaved people reflects the scale of human bondage in this area, which had one of the highest concentrations of enslaved populations in the antebellum South."
+  },
+  {
+    "id": "plantation_friendfield_plantation_q16993831",
+    "kind": "place",
+    "displayName": "Friendfield Plantation",
+    "summary": "Friendfield Plantation in Georgetown County, South Carolina, was a rice-producing plantation where over 230 African Americans were enslaved in the 1850s. It is linked to the Gullah-GeeChee cultural heritage and to Michelle Obama through her ancestor Jim Robinson, who was born into slavery there and later became a sharecropper after emancipation.",
+    "eraBuckets": [
+      "1830s",
+      "1850s",
+      "1860s",
+      "1930s",
+      "1950s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "great-migration",
+      "agriculture",
+      "genealogy",
+      "resistance",
+      "resilience"
+    ],
+    "topicIds": [
+      "enslavement",
+      "great-migration",
+      "agriculture",
+      "genealogy",
+      "resistance",
+      "resilience"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Friendfield Plantation",
+      "Gullah-GeeChee",
+      "Jim Robinson",
+      "Michelle Obama ancestry",
+      "rice plantation"
+    ],
+    "jurisdictionLabel": "Georgetown, South Carolina",
+    "locationPrecision": "site",
+    "locationLabel": "Historic rice plantation along the Sampit River",
+    "lat": 33.3682,
+    "lng": -79.3226,
+    "claims": [
+      {
+        "predicate": "was_operated_as_a_rice_plantation_using_enslaved_labor",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Friendfield_Plantation",
+        "citationLabel": "Wikipedia: Friendfield Plantation"
+      },
+      {
+        "predicate": "enslaved_over_230_african_americans_in_the_1850s",
+        "object": "230",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Friendfield_Plantation",
+        "citationLabel": "Wikipedia: Friendfield Plantation"
+      },
+      {
+        "predicate": "was_linked_to_the_gullah_geechee_culture",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Friendfield_Plantation",
+        "citationLabel": "Wikipedia: Friendfield Plantation"
+      },
+      {
+        "predicate": "was_the_site_of_enslavement_of_jim_robinson",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Friendfield_Plantation",
+        "citationLabel": "Wikipedia: Friendfield Plantation"
+      },
+      {
+        "predicate": "is_ancestral_home_of_michelle_obama",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Friendfield_Plantation",
+        "citationLabel": "Wikipedia: Friendfield Plantation"
+      },
+      {
+        "predicate": "continued_to_use_african_american_sharecroppers_after_emancipation",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Friendfield_Plantation",
+        "citationLabel": "Wikipedia: Friendfield Plantation"
+      }
+    ],
+    "historicalContext": "Friendfield Plantation was part of the Lowcountry rice economy that relied on enslaved African labor and contributed to the formation of the Gullah-GeeChee culture, a distinct African American society shaped by isolation and African cultural retention. After the Civil War, the shift to sharecropping sustained Black agricultural labor under exploitative conditions, illustrating the continuity of racialized economic control in the postbellum South."
+  },
+  {
+    "id": "plantation_keithfield_plantation_q16998190",
+    "kind": "place",
+    "displayName": "Keithfield Plantation",
+    "summary": "Keithfield Plantation in Georgetown County, South Carolina, was a rice plantation reliant on enslaved Black labor, with a surviving slave cabin from circa 1830 and remnants of historic ricefields, canals, and dikes. It is listed on the National Register of Historic Places for its significance in Black agriculture and social history during the antebellum and postbellum periods.",
+    "eraBuckets": [
+      "1830s",
+      "1850s",
+      "1860s",
+      "1900s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "black-codes",
+      "hbcu"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "black-codes",
+      "hbcu"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "slave cabin",
+      "rice plantation",
+      "Georgetown County",
+      "Black agriculture",
+      "National Register of Historic Places"
+    ],
+    "jurisdictionLabel": "Georgetown, South Carolina",
+    "locationPrecision": "address",
+    "locationLabel": "Off County Road 52, near Georgetown",
+    "lat": 33.43916667,
+    "lng": -79.24416667,
+    "claims": [
+      {
+        "predicate": "has physical remnant of",
+        "object": "slave cabin built circa 1830",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Keithfield_Plantation",
+        "citationLabel": "Wikipedia: Keithfield Plantation"
+      },
+      {
+        "predicate": "was part of",
+        "object": "Georgetown County Rice Culture MPS",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/88000529",
+        "citationLabel": "NPGallery Asset Detail: Keithfield Plantation"
+      },
+      {
+        "predicate": "is significant for",
+        "object": "Black agriculture and social history",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/88000529",
+        "citationLabel": "NPGallery Asset Detail: Keithfield Plantation"
+      },
+      {
+        "predicate": "includes contributing structures from",
+        "object": "historic ricefields, canals, dikes, and trunks",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Keithfield_Plantation",
+        "citationLabel": "Wikipedia: Keithfield Plantation"
+      },
+      {
+        "predicate": "was listed on",
+        "object": "National Register of Historic Places in 1988",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Keithfield_Plantation",
+        "citationLabel": "Wikipedia: Keithfield Plantation"
+      },
+      {
+        "predicate": "was operational during",
+        "object": "antebellum and postbellum periods with significant activity in 1853 and 1866",
+        "confidenceLevel": "medium",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/88000529",
+        "citationLabel": "NPGallery Asset Detail: Keithfield Plantation"
+      }
+    ],
+    "historicalContext": "Rice plantations like Keithfield in the South Carolina Lowcountry were built on the skilled labor of enslaved Africans and African Americans, whose expertise in wetland cultivation made the region's rice economy profitable. The preservation of structures such as slave cabins and ricefield systems provides tangible evidence of this forced innovation and the broader system of enslavement that shaped regional development."
+  },
+  {
+    "id": "plantation_laurel_bay_plantation_q17016351",
+    "kind": "place",
+    "displayName": "Laurel Bay Plantation",
+    "summary": "Laurel Bay Plantation, near Beaufort, South Carolina, is a 26.8-acre archaeological site containing tabby and brick remnants from the late 18th and 19th centuries. It preserves evidence of domestic outbuildings and enslaved labor associated with both Laurel Bay and Woodward Plantations, offering insight into Lowcountry plantation systems and African American material life under enslavement.",
+    "eraBuckets": [
+      "1770s",
+      "1800s",
+      "1840s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "history"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "tabby ruins",
+      "Beaufort County",
+      "enslaved labor",
+      "archaeological site",
+      "plantation"
+    ],
+    "jurisdictionLabel": "Beaufort, South Carolina",
+    "locationPrecision": "site",
+    "locationLabel": "near Beaufort, South Carolina",
+    "lat": 32.43333333,
+    "lng": -80.68333333,
+    "claims": [
+      {
+        "predicate": "is an archaeological site",
+        "object": "Laurel Bay Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Laurel_Bay_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was built in 1779",
+        "object": "Laurel Bay Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Laurel_Bay_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "contains tabby wall remnants",
+        "object": "Laurel Bay Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/97000095",
+        "citationLabel": "NPS National Register Information System"
+      },
+      {
+        "predicate": "is associated with enslaved labor in South Carolina",
+        "object": "Laurel Bay Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/97000095",
+        "citationLabel": "NPS National Register Information System"
+      },
+      {
+        "predicate": "was listed on the National Register of Historic Places in 1997",
+        "object": "Laurel Bay Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/97000095",
+        "citationLabel": "NPS National Register Information System"
+      },
+      {
+        "predicate": "was used during the period 1772–1779",
+        "object": "Laurel Bay Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/97000095",
+        "citationLabel": "NPS National Register Information System"
+      }
+    ],
+    "historicalContext": "As a plantation site in coastal South Carolina, Laurel Bay was part of a region deeply dependent on enslaved African labor for rice and agricultural production. Its tabby construction and archaeological features reflect the enduring physical legacy of enslavement and the economic structures of the antebellum South."
+  },
+  {
+    "id": "plantation_lewisfield_plantation_q16894117",
+    "kind": "place",
+    "displayName": "Lewisfield Plantation",
+    "summary": "Lewisfield Plantation, established c. 1774 near Moncks Corner, South Carolina, was a site of large-scale enslavement with records documenting over 100 enslaved individuals in 1835. Its history intersects with the Revolutionary War and elite landholding families, reflecting broader patterns of plantation economy and racial subjugation in the Lowcountry.",
+    "eraBuckets": [
+      "1770s",
+      "1830s",
+      "1930s",
+      "1940s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "land-ownership",
+      "history",
+      "segregation"
+    ],
+    "topicIds": [
+      "enslavement",
+      "land-ownership",
+      "history",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Lewisfield Plantation",
+      "enslaved people 1835",
+      "Moncks Corner",
+      "Revolutionary War skirmish",
+      "Sedgewick Lewis"
+    ],
+    "jurisdictionLabel": "Moncks Corner, South Carolina",
+    "locationPrecision": "site",
+    "locationLabel": "Historic plantation house near U.S. Route 52",
+    "lat": 33.16,
+    "lng": -79.99361111,
+    "claims": [
+      {
+        "predicate": "was built around",
+        "object": "1774",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lewisfield_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "had over 100 enslaved people held in bondage as of",
+        "object": "1835",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lewisfield_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was the site of a Revolutionary War skirmish involving",
+        "object": "Colonel Wade Hampton surprising a British force",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lewisfield_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was originally known as",
+        "object": "Little Landing",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lewisfield_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was renamed",
+        "object": "Lewisfield after Sedgewick Lewis",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lewisfield_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is located near",
+        "object": "Moncks Corner, Berkeley County, South Carolina",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lewisfield_Plantation",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Lewisfield Plantation operated within the plantation complex of the South Carolina Lowcountry, where rice and later lumber economies depended on enslaved African labor. Its documentation of over 100 enslaved people in 1835 reflects the region's reliance on forced labor under chattel slavery, a system protected by state laws and integral to the antebellum Southern economy."
+  },
+  {
+    "id": "plantation_magnolia_plantation_and_gardens_charleston_south_q11684456",
+    "kind": "place",
+    "displayName": "Magnolia Plantation and Gardens (Charleston, South Carolina)",
+    "summary": "Magnolia Plantation in Charleston, South Carolina, established in 1679, was a rice plantation built and worked by enslaved Africans from rice-growing regions, whose labor created extensive irrigation systems and contributed to the development of Gullah culture in the Lowcountry. After the Civil War, the site evolved into a public garden and museum that includes interpretive materials on slavery.",
+    "eraBuckets": [
+      "1670s",
+      "1730s",
+      "1840s",
+      "1860s",
+      "1940s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "segregation",
+      "memory",
+      "resistance"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "segregation",
+      "memory",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Gullah culture",
+      "rice plantation",
+      "enslaved labor",
+      "Drayton family",
+      "Ashley River"
+    ],
+    "jurisdictionLabel": "Charleston, South Carolina",
+    "locationPrecision": "address",
+    "locationLabel": "3550 Ashley River Road, Charleston County",
+    "lat": 32.87651,
+    "lng": -80.08351,
+    "claims": [
+      {
+        "predicate": "was established as a rice plantation using enslaved African labor",
+        "object": "Magnolia Plantation and Gardens (Charleston, South Carolina)",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Magnolia_Plantation_and_Gardens_(Charleston%2C_South_Carolina)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "enslaved Africans from rice-growing regions built irrigation systems for rice cultivation at the site",
+        "object": "Magnolia Plantation and Gardens (Charleston, South Carolina)",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Magnolia_Plantation_and_Gardens_(Charleston%2C_South_Carolina)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "contributed to the development of Gullah language and culture in the Lowcountry",
+        "object": "Enslaved people at Magnolia Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Magnolia_Plantation_and_Gardens_(Charleston%2C_South_Carolina)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is listed on the National Register of Historic Places",
+        "object": "Magnolia Plantation and Gardens (Charleston, South Carolina)",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/72001198",
+        "citationLabel": "National Park Service"
+      },
+      {
+        "predicate": "includes public interpretation of slavery on its official website and grounds",
+        "object": "Magnolia Plantation and Gardens (Charleston, South Carolina)",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Magnolia_Plantation_and_Gardens_(Charleston%2C_South_Carolina)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was partially burned during the Civil War, likely by Union troops",
+        "object": "Magnolia Plantation house",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Magnolia_Plantation_and_Gardens_(Charleston%2C_South_Carolina)",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Magnolia Plantation exemplifies the rice plantation economy of the South Carolina Lowcountry, which depended on the skilled labor of enslaved Africans from West African rice-growing societies. Their forced labor not only produced wealth for the Drayton family but also laid the foundation for the Gullah-Geechee cultural corridor, where African linguistic and cultural traditions have persisted despite centuries of oppression."
+  },
+  {
+    "id": "plantation_mansfield_plantation_q6751671",
+    "kind": "place",
+    "displayName": "Mansfield Plantation",
+    "summary": "Mansfield Plantation, established in 1718 in Georgetown County, South Carolina, was a major rice producer reliant on enslaved African American labor. It exemplifies the Lowcountry’s plantation economy and the role of enslaved people in cultivating 'Carolina Gold' rice using tidal irrigation techniques. Today, it preserves original structures including a restored slave village and the only…",
+    "eraBuckets": [
+      "1710s",
+      "1780s",
+      "1810s",
+      "1850s",
+      "2000s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "labor",
+      "preservation"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "labor",
+      "preservation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Carolina Gold rice",
+      "slave labor",
+      "tidal irrigation",
+      "antebellum plantation",
+      "slave village restoration"
+    ],
+    "jurisdictionLabel": "Georgetown, South Carolina",
+    "locationPrecision": "site",
+    "locationLabel": "5 miles north of Georgetown off U.S. Route 701",
+    "lat": 33.43472222,
+    "lng": -79.25916667,
+    "claims": [
+      {
+        "predicate": "was established in",
+        "object": "1718",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mansfield_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "relied on African American slave labor for rice cultivation",
+        "object": "enslaved labor",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mansfield_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "produced Carolina Gold rice for export to Europe",
+        "object": "Carolina Gold rice",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mansfield_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "used tidal irrigation and manmade dykes for rice farming",
+        "object": "tidal irrigation system",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mansfield_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "includes a restored slave village with seven cabins and a chapel",
+        "object": "restored slave village",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mansfield_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "contains the only remaining winnowing barn in Georgetown County",
+        "object": "winnowing barn",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mansfield_Plantation",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Rice plantations like Mansfield in the South Carolina Lowcountry were built on the knowledge and forced labor of enslaved Africans, many from rice-growing regions of West Africa. The development of tidal irrigation and labor-intensive processing systems made 'Carolina Gold' a valuable export, entrenching slavery as a central institution. After the Civil War, the collapse of this labor system led to the decline of rice production and the dispersal of plantation lands."
+  },
+  {
+    "id": "plantation_middleburg_plantation_q14709564",
+    "kind": "place",
+    "displayName": "Middleburg Plantation",
+    "summary": "Middleburg Plantation, established in 1699 near Huger, South Carolina, is one of the state's oldest surviving wood-frame structures and operated as a rice plantation using enslaved African labor. The site includes a brick commissary building that housed a slave jail, reflecting its role in the enforcement of slave labor systems during the colonial and antebellum periods.",
+    "eraBuckets": [
+      "1690s",
+      "1700s",
+      "1770s",
+      "1800s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "architecture",
+      "history",
+      "land-ownership"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "architecture",
+      "history",
+      "land-ownership"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Middleburg Plantation",
+      "slave jail",
+      "rice plantation",
+      "Benjamin Simons",
+      "Cooper River"
+    ],
+    "jurisdictionLabel": "Huger, South Carolina",
+    "locationPrecision": "site",
+    "locationLabel": "2 miles southwest of Huger on the East Branch of the Cooper River",
+    "lat": 33.08111111,
+    "lng": -79.84305556,
+    "claims": [
+      {
+        "predicate": "was established in",
+        "object": "1699",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Middleburg_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was built by",
+        "object": "Benjamin Simons, a French Huguenot refugee",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Middleburg_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "includes a brick commissary building that housed a slave jail",
+        "object": "slave jail",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Middleburg_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is one of the oldest surviving wood-frame buildings in South Carolina",
+        "object": "oldest wood-frame building",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Middleburg_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was designated a National Historic Landmark",
+        "object": "April 15, 1970",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Middleburg_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "operated as a rice plantation using enslaved African labor",
+        "object": "enslaved labor",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Middleburg_Plantation",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Middleburg Plantation functioned within the Lowcountry rice economy, which relied on the forced labor of enslaved Africans whose expertise in wetland agriculture was critical to its success. The presence of a slave jail on-site documents the coercive mechanisms used to maintain control over enslaved people, situating the plantation within broader systems of racialized labor exploitation and domestic punishment under slavery in the American South."
+  },
+  {
+    "id": "plantation_milldam_rice_mill_and_rice_barn_q17016811",
+    "kind": "place",
+    "displayName": "Milldam Rice Mill and Rice Barn",
+    "summary": "Milldam Rice Mill and Rice Barn, also known as Kinloch Plantation, was a rice plantation near Georgetown, South Carolina, where enslaved people constructed dikes and managed rice fields. The site includes surviving infrastructure from the antebellum period tied to the forced labor system of the Lowcountry. It was added to the National Register of Historic Places in 1988.",
+    "eraBuckets": [
+      "1750s",
+      "1760s",
+      "1770s",
+      "1780s",
+      "1790s",
+      "1800s",
+      "1810s",
+      "1820s",
+      "1830s",
+      "1840s",
+      "1850s",
+      "1860s",
+      "1870s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "engineering",
+      "history",
+      "land-ownership"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "engineering",
+      "history",
+      "land-ownership"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "rice plantation",
+      "enslaved labor",
+      "Georgetown County",
+      "dike construction",
+      "antebellum agriculture"
+    ],
+    "jurisdictionLabel": "Georgetown, South Carolina",
+    "locationPrecision": "site",
+    "locationLabel": "Off County Road 30, near Georgetown",
+    "lat": 33.2025,
+    "lng": -79.33277778,
+    "claims": [
+      {
+        "predicate": "was known as",
+        "object": "Kinloch Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Milldam_Rice_Mill_and_Rice_Barn",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "included infrastructure built by",
+        "object": "enslaved people",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Milldam_Rice_Mill_and_Rice_Barn",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was associated with",
+        "object": "rice cultivation on the Santee River",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Milldam_Rice_Mill_and_Rice_Barn",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was listed on",
+        "object": "National Register of Historic Places",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/88000530",
+        "citationLabel": "NPGallery"
+      },
+      {
+        "predicate": "had period of significance during",
+        "object": "1750–1799, 1800–1824, 1825–1849, 1850–1874",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/88000530",
+        "citationLabel": "NPGallery"
+      },
+      {
+        "predicate": "is part of",
+        "object": "Georgetown County Rice Culture MPS",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/88000530",
+        "citationLabel": "NPGallery"
+      }
+    ],
+    "historicalContext": "Rice plantations in Georgetown County were central to the antebellum Southern economy and depended on the skilled labor of enslaved Africans, many from rice-growing regions of West Africa. The engineering of canals, dikes, and trunks at sites like Milldam reflects the coerced innovation and labor that underpinned this agricultural system, which persisted under conditions of brutal exploitation."
+  },
+  {
+    "id": "plantation_pee_dee_river_rice_planters_historic_district_q17016905",
+    "kind": "place",
+    "displayName": "Pee Dee River Rice Planters Historic District",
+    "summary": "The Pee Dee River Rice Planters Historic District encompasses over 5,000 acres of former rice plantations along the Pee Dee and Waccamaw Rivers in Georgetown County, South Carolina, where enslaved Africans and African Americans cultivated rice using sophisticated hydraulic engineering from the mid-18th to early 20th century. The district includes surviving structures such as plantation houses…",
+    "eraBuckets": [
+      "1750s",
+      "1760s",
+      "1770s",
+      "1780s",
+      "1790s",
+      "1800s",
+      "1810s",
+      "1820s",
+      "1830s",
+      "1840s",
+      "1850s",
+      "1860s",
+      "1870s",
+      "1880s",
+      "1890s",
+      "1900s",
+      "1910s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "labor",
+      "black-architects",
+      "engineering",
+      "land-ownership"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "labor",
+      "black-architects",
+      "engineering",
+      "land-ownership"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "rice plantation",
+      "enslaved labor",
+      "Georgetown County",
+      "tidal irrigation",
+      "National Register of Historic Places"
+    ],
+    "jurisdictionLabel": "Georgetown, South Carolina",
+    "locationPrecision": "district",
+    "locationLabel": "Along the Pee Dee and Waccamaw Rivers, near Georgetown",
+    "lat": 33.2025,
+    "lng": -79.33277778,
+    "claims": [
+      {
+        "predicate": "is a historic district encompassing former rice plantations along the Pee Dee and Waccamaw Rivers in Georgetown County, South Carolina",
+        "object": "Pee Dee River Rice Planters Historic District",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Pee_Dee_River_Rice_Planters_Historic_District",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "includes extant ricefields, canals, dikes, trunks, and plantation structures associated with 17 rice plantations active from approximately 1750 to 1910",
+        "object": "Pee Dee River Rice Planters Historic District",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Pee_Dee_River_Rice_Planters_Historic_District",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was listed on the National Register of Historic Places on October 3, 1988, as part of the Georgetown County Rice Culture Multiple Property Submission",
+        "object": "Pee Dee River Rice Planters Historic District",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/88000532",
+        "citationLabel": "National Park Service"
+      },
+      {
+        "predicate": "contains documented slave cabin at Arundel Plantation, recorded by Historic American Buildings Survey (HABS No. SC-631-A)",
+        "object": "Pee Dee River Rice Planters Historic District",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Pee_Dee_River_Rice_Planters_Historic_District",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "preserves evidence of rice cultivation system dependent on enslaved African American labor and West African agricultural knowledge",
+        "object": "Pee Dee River Rice Planters Historic District",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Pee_Dee_River_Rice_Planters_Historic_District",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The rice plantations of Georgetown County were central to the Lowcountry's economy and depended on the skilled labor of enslaved Africans, many of whom came from rice-growing regions of West Africa. The engineering of tidal irrigation systems, including canals, dikes, and floodgates, reflects the forced transfer of African agricultural knowledge under slavery. This district preserves physical evidence of a landscape shaped by centuries of enslaved labor and the racial hierarchies of the antebellum South."
+  },
+  {
+    "id": "plantation_charles_pinckney_national_historic_site_q5081670",
+    "kind": "place",
+    "displayName": "Charles Pinckney National Historic Site",
+    "summary": "Charles Pinckney National Historic Site preserves Snee Farm, a Low Country plantation in Mount Pleasant, South Carolina, where Charles Pinckney—a Founding Father and enslaver—held African people in bondage while developing rice and indigo as commodity crops. The site interprets the lives of the enslaved and the political legacy of its owner.",
+    "eraBuckets": [
+      "1750s",
+      "1780s",
+      "1820s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "history",
+      "economic-justice"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "history",
+      "economic-justice"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Snee Farm",
+      "Charles Pinckney",
+      "enslavement",
+      "rice plantation",
+      "Low Country"
+    ],
+    "jurisdictionLabel": "Mount Pleasant, South Carolina",
+    "locationPrecision": "address",
+    "locationLabel": "1254 Long Point Road, former Snee Farm plantation",
+    "lat": 32.84611111,
+    "lng": -79.82472222,
+    "claims": [
+      {
+        "predicate": "was a plantation where enslaved African people labored",
+        "object": "enslaved African people",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/chpi/index.htm",
+        "citationLabel": "National Park Service - Charles Pinckney National Historic Site"
+      },
+      {
+        "predicate": "produced rice and indigo as commodity crops using enslaved labor",
+        "object": "rice and indigo",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charles_Pinckney_National_Historic_Site",
+        "citationLabel": "Wikipedia - Charles Pinckney National Historic Site"
+      },
+      {
+        "predicate": "was owned by Charles Pinckney, a signer of the U.S. Constitution",
+        "object": "Charles Pinckney",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charles_Pinckney_National_Historic_Site",
+        "citationLabel": "Wikipedia - Charles Pinckney National Historic Site"
+      },
+      {
+        "predicate": "includes archaeological and structural remains of a plantation complex including a main house and slave quarters",
+        "object": "main house and slave row of cabins",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Charles_Pinckney_National_Historic_Site",
+        "citationLabel": "Wikipedia - Charles Pinckney National Historic Site"
+      },
+      {
+        "predicate": "is administered by the National Park Service to interpret plantation life and the legacy of enslavement",
+        "object": "National Park Service",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/chpi/index.htm",
+        "citationLabel": "National Park Service - Charles Pinckney National Historic Site"
+      }
+    ],
+    "historicalContext": "Snee Farm was part of the Low Country plantation economy that relied on the forced labor of enslaved Africans to produce rice and indigo, cash crops central to South Carolina's colonial wealth. The site reflects the entanglement of Founding Era political leadership with the institution of enslavement, illustrating how constitutional framers like Pinckney shaped national laws while maintaining systems of racial subjugation."
+  },
+  {
+    "id": "plantation_sams_plantation_complex_tabby_ruins_q16899686",
+    "kind": "place",
+    "displayName": "Sams Plantation Complex Tabby Ruins",
+    "summary": "Sams Plantation Complex Tabby Ruins is a 10-acre archaeological site on Dataw Island, South Carolina, containing ruins of a plantation established c. 1783. It includes tabby remains of the main house, five slave quarters, a kitchen, dependencies, and a cemetery. The site was occupied by freedmen after the Civil War, and its structures reflect the material conditions of enslavement and…",
+    "eraBuckets": [
+      "1780s",
+      "1800s",
+      "1850s",
+      "1860s"
+    ],
+    "topicTags": [
+      "enslavement"
+    ],
+    "topicIds": [
+      "enslavement"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "tabby ruins",
+      "slave quarters",
+      "freedmen",
+      "plantation complex",
+      "Dataw Island"
+    ],
+    "jurisdictionLabel": "Frogmore, South Carolina",
+    "locationPrecision": "site",
+    "locationLabel": "Southern end of Dataw Island near Mink's Point",
+    "lat": 32.43083333,
+    "lng": -80.59444444,
+    "claims": [
+      {
+        "predicate": "built",
+        "object": "c. 1783",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Sams_Plantation_Complex_Tabby_Ruins",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "includes",
+        "object": "five tabby slave quarters",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Sams_Plantation_Complex_Tabby_Ruins",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "occupied_by",
+        "object": "freedmen after the American Civil War",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Sams_Plantation_Complex_Tabby_Ruins",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "listed_on",
+        "object": "National Register of Historic Places",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/88001820",
+        "citationLabel": "NPS NRIS"
+      },
+      {
+        "predicate": "includes",
+        "object": "Sams family cemetery and Episcopal chapel enclosed by tabby walls",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Sams_Plantation_Complex_Tabby_Ruins",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "constructed_with",
+        "object": "tabby architecture",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Sams_Plantation_Complex_Tabby_Ruins",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Plantations like Sams were central to the rice economy of the South Carolina Lowcountry, built on the forced labor of enslaved Africans and African Americans. The survival of tabby slave quarters and communal spaces provides rare physical evidence of enslaved people's living conditions and community life. Post-emancipation occupation by freedmen illustrates the continuity of Black presence and adaptation on former plantation land."
+  },
+  {
+    "id": "plantation_stoney_baynard_plantation_q7619391",
+    "kind": "place",
+    "displayName": "Stoney-Baynard Plantation",
+    "summary": "Stoney-Baynard Plantation on Hilton Head Island, South Carolina, was a 19th-century cotton plantation with documented slave quarters and tabby-constructed buildings. After Union forces occupied the area during the Civil War, the site housed troops before the main house was burned. Its archaeological remains, including sub-surface features and ruins, are preserved within Sea Pines Plantation.",
+    "eraBuckets": [
+      "1790s",
+      "1830s",
+      "1840s",
+      "1860s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "civil-war",
+      "segregation"
+    ],
+    "topicIds": [
+      "enslavement",
+      "civil-war",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Stoney-Baynard ruins",
+      "Hilton Head Island plantation",
+      "slave house",
+      "tabby construction",
+      "Union occupation"
+    ],
+    "jurisdictionLabel": "Hilton Head Island, South Carolina",
+    "locationPrecision": "site",
+    "locationLabel": "Intersection of Baynard Park Road and Plantation Drive",
+    "lat": 32.12888889,
+    "lng": -80.81472222,
+    "claims": [
+      {
+        "predicate": "was built by Captain Jack Stoney in 1793",
+        "object": "Captain Jack Stoney built Baynard Plantation as part of Braddock's Point Plantation in 1793",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Stoney-Baynard_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "included a slave house associated with the plantation",
+        "object": "A slave house is associated with the Stoney-Baynard Plantation, dating to the early 19th century",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Stoney-Baynard_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was occupied by Union forces during the Civil War",
+        "object": "After William Baynard's death, the plantation was raided by Union forces and housed soldiers during the Civil War",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Stoney-Baynard_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was listed on the National Register of Historic Places in 1994",
+        "object": "Stoney-Baynard Plantation was listed on the NRHP on February 23, 1994, with reference number 94000038",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Stoney-Baynard_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "contains archaeological remains of sub-surface features from the plantation era",
+        "object": "Archaeological testing documented intact sub-surface features and clear horizontal patterning of artifacts",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Stoney-Baynard_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was burned to the ground shortly after the Civil War",
+        "object": "Shortly after the war ended, the home was burned to the ground",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Stoney-Baynard_Plantation",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Plantations like Stoney-Baynard were central to the Lowcountry’s slave-based agricultural economy, where enslaved Africans and African Americans cultivated Sea Island cotton under brutal conditions. The site’s later use by Union troops during the Civil War reflects the broader pattern of Confederate plantation abandonment and the role of occupied Southern lands in emancipation and military strategy."
+  },
+  {
+    "id": "plantation_wicklow_hall_plantation_q17090097",
+    "kind": "place",
+    "displayName": "Wicklow Hall Plantation",
+    "summary": "Wicklow Hall Plantation, near Georgetown, South Carolina, was a mid-19th-century rice plantation spanning hundreds of acres between the Santee rivers, operated by the prominent Lowndes family using enslaved labor. The property includes the main Greek Revival house, built c. 1840, and surviving outbuildings such as a kitchen, carriage house, and servants' quarters. It was listed on the National…",
+    "eraBuckets": [
+      "1840s",
+      "1850s",
+      "1910s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "economic-justice",
+      "segregation",
+      "history"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "economic-justice",
+      "segregation",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "rice plantation",
+      "Georgetown County",
+      "Lowndes family",
+      "Greek Revival",
+      "enslaved labor"
+    ],
+    "jurisdictionLabel": "Georgetown, South Carolina",
+    "locationPrecision": "address",
+    "locationLabel": "South of Georgetown on SC Highway 30",
+    "lat": 33.21388889,
+    "lng": -79.31555556,
+    "claims": [
+      {
+        "predicate": "was a rice plantation during the mid-1800s",
+        "object": "rice plantation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Wicklow_Hall",
+        "citationLabel": "Wikipedia - Wicklow Hall"
+      },
+      {
+        "predicate": "is associated with the Lowndes family of South Carolina",
+        "object": "Lowndes family",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Wicklow_Hall",
+        "citationLabel": "Wikipedia - Wicklow Hall"
+      },
+      {
+        "predicate": "includes surviving dependencies such as servants' quarters",
+        "object": "servants' quarters",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Wicklow_Hall",
+        "citationLabel": "Wikipedia - Wicklow Hall"
+      },
+      {
+        "predicate": "was listed on the National Register of Historic Places in 1978",
+        "object": "NRHP 78002511",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Wicklow_Hall",
+        "citationLabel": "Wikipedia - Wicklow Hall"
+      },
+      {
+        "predicate": "was part of the Lowcountry rice plantation economy based on enslaved labor",
+        "object": "enslavement",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Wicklow_Hall",
+        "citationLabel": "Wikipedia - Wicklow Hall"
+      }
+    ],
+    "historicalContext": "Rice plantations like Wicklow Hall in the Georgetown County region were central to South Carolina’s antebellum economy and relied on the skilled labor of enslaved Africans and African Americans, many descended from the Rice Coast of West Africa. The layout and surviving structures reflect the racial and economic hierarchies of the plantation system, where agricultural wealth was built on forced labor and land expropriation."
+  },
+  {
+    "id": "plantation_butler_greenwood_plantation_q5002612",
+    "kind": "place",
+    "displayName": "Butler Greenwood Plantation",
+    "summary": "Butler [[plantation_greenwood_plantation_q5605053|Greenwood Plantation]] in St. Francisville, Louisiana, operated using the forced labor of nearly 100 enslaved people by 1860, producing cotton, sugar, corn, and molasses. The estate, tied to prominent judicial and political figures, reflects the economic and social structures of antebellum plantation life in the Deep South.",
+    "eraBuckets": [
+      "1810s",
+      "1820s",
+      "1830s",
+      "1840s",
+      "1850s",
+      "1860s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "history",
+      "economic-justice"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "history",
+      "economic-justice"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "enslaved labor",
+      "antebellum plantation",
+      "sugar production",
+      "cotton",
+      "St. Francisville"
+    ],
+    "jurisdictionLabel": "St. Francisville, Louisiana",
+    "locationPrecision": "site",
+    "locationLabel": "Butler Greenwood Plantation grounds on U.S. Route 61",
+    "lat": 30.8201,
+    "lng": -91.3903,
+    "claims": [
+      {
+        "predicate": "used enslaved labor to produce agricultural goods",
+        "object": "cotton, sugarcane, corn, and indigo",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Butler_Greenwood_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "had 96 enslaved people living in 18 dwellings in 1860",
+        "object": "96 enslaved individuals",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Butler_Greenwood_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "produced 175 hogsheads of sugar and over 10,000 gallons of molasses in 1860",
+        "object": "sugar and molasses",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Butler_Greenwood_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was owned by Harriett Flower Mathews and her son Charles Lewis Mathews after 1836",
+        "object": "Harriett Flower Mathews",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Butler_Greenwood_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was listed on the National Register of Historic Places",
+        "object": "NRHP reference No. 79001103",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Butler_Greenwood_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is associated with the forced labor system central to antebellum Southern economy",
+        "object": "enslavement",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Butler_Greenwood_Plantation",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Butler Greenwood Plantation exemplifies the plantation economy of the antebellum South, where enslaved labor produced cash crops like cotton and sugar for national and international markets. Its operation under Judge George Mathews—a high-ranking legal official—illustrates the intersection of judicial power and slaveholding, reinforcing the institutional entrenchment of slavery in Southern governance and economy."
+  },
+  {
+    "id": "plantation_disharoon_s_plantation_q5282200",
+    "kind": "place",
+    "displayName": "Disharoon's plantation",
+    "summary": "Disharoon's Plantation, located in Tensas Parish, Louisiana, served as a strategic Union Army staging point in 1863 during the Vicksburg Campaign. Its high natural levee and proximity to the Mississippi River made it a key landing site, though forces ultimately shifted to Bruinsburg after intelligence from an escaped slave revealed better access downstream.",
+    "eraBuckets": [
+      "1830s",
+      "1840s",
+      "1850s",
+      "1860s"
+    ],
+    "topicTags": [
+      "civil-war",
+      "enslavement",
+      "military",
+      "resistance"
+    ],
+    "topicIds": [
+      "civil-war",
+      "enslavement",
+      "military",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Disharoon's Plantation",
+      "Tensas Parish",
+      "Union Army",
+      "steamboat landing",
+      "escaped slave"
+    ],
+    "jurisdictionLabel": "Tensas Parish, Louisiana",
+    "locationPrecision": "site",
+    "locationLabel": "Historic site along the Mississippi River, southwest of Grand Gulf",
+    "lat": 32.02541,
+    "lng": -91.10804,
+    "claims": [
+      {
+        "predicate": "was located in",
+        "object": "Tensas Parish, Louisiana",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Disharoon's_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served as a steamboat landing used by",
+        "object": "Union Army General Ulysses S. Grant",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Disharoon's_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was occupied by",
+        "object": "Union Maj. Gen. John A. McClernand's XII Corps",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Disharoon's_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was named after",
+        "object": "William Disharoon, an early settler",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Disharoon's_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was informed by intelligence from",
+        "object": "an escaped slave regarding landing sites",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Disharoon's_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was destroyed by",
+        "object": "Mississippi River flood waters after the Civil War",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Disharoon's_Plantation",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Disharoon's Plantation was part of the antebellum plantation economy dependent on enslaved labor, situated in a region central to Mississippi River logistics during the Civil War. Its use by Union forces in 1863 highlights the strategic importance of riverfront plantations and the role of escaped slaves in providing critical intelligence, reflecting broader patterns of Black agency in undermining Confederate infrastructure."
+  },
+  {
+    "id": "plantation_goodrich_s_landing_louisiana_q128693367",
+    "kind": "place",
+    "displayName": "Goodrich's Landing, Louisiana",
+    "summary": "Goodrich's Landing, Louisiana, was the site of a June 1863 Civil War battle where Confederate forces captured a Union outpost defended by the 1st Arkansas Infantry (African Descent). It served as a training and recruitment site for Black Union troops and was part of a network of leased plantations where freedmen labored under U.S. government supervision during the Vicksburg campaign.",
+    "eraBuckets": [
+      "1860s"
+    ],
+    "topicTags": [
+      "civil-war",
+      "enslavement",
+      "emancipation",
+      "military",
+      "civil-rights",
+      "labor"
+    ],
+    "topicIds": [
+      "civil-war",
+      "enslavement",
+      "emancipation",
+      "military",
+      "civil-rights",
+      "labor"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Battle of Goodrich's Landing",
+      "United States Colored Troops",
+      "African Descent regiments",
+      "Vicksburg campaign",
+      "freedmen labor"
+    ],
+    "jurisdictionLabel": "Carroll Parish, Louisiana",
+    "locationPrecision": "site",
+    "locationLabel": "Historic site near the Mississippi River, northeast Louisiana",
+    "lat": 32.6863,
+    "lng": -91.2021,
+    "claims": [
+      {
+        "predicate": "was the site of a Civil War battle involving African Descent regiments",
+        "object": "Battle of Goodrich's Landing, June 29–30, 1863",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Battle_of_Goodrich's_Landing",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "hosted training and recruitment of Black Union soldiers",
+        "object": "1st Arkansas Infantry (African Descent) and 10th Louisiana Infantry (African Descent)",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.nps.gov/vick/learn/historyculture/goodrichs-landing-june-29-30-1863.htm",
+        "citationLabel": "National Park Service"
+      },
+      {
+        "predicate": "was part of Union efforts to utilize freedmen for military and agricultural labor",
+        "object": "leased plantations for cotton production and troop training during the Vicksburg campaign",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.nps.gov/vick/learn/historyculture/goodrichs-landing-june-29-30-1863.htm",
+        "citationLabel": "National Park Service"
+      },
+      {
+        "predicate": "Confederate forces captured and killed Black soldiers after surrender",
+        "object": "post-surrender killings of members of the 1st Arkansas Infantry (African Descent)",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Battle_of_Goodrich's_Landing",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "During the Civil War, sites like Goodrich's Landing became crucial to Union strategy in the Mississippi Valley, where abandoned plantations were repurposed for military and economic use. The recruitment and training of Black soldiers there directly challenged the racial and legal foundations of enslavement and marked a shift toward emancipation as a war aim, while also exposing the risks Black troops faced when captured by Confederate forces."
+  },
+  {
+    "id": "plantation_isle_brevelle_q107342386",
+    "kind": "place",
+    "displayName": "Isle Brevelle",
+    "summary": "Isle Brevelle, in Natchitoches Parish, Louisiana, is a historic Creole settlement founded in the mid-18th century by Jean Baptiste Brevelle II, a man of French and Adai Caddo descent. It became a center of free Black and mixed-race landownership and cultural development, notably through figures like Nicolas Augustin Metoyer, and is now part of the Cane River Creole National Historical Park and…",
+    "eraBuckets": [
+      "1750s",
+      "1760s",
+      "1790s",
+      "1800s"
+    ],
+    "topicTags": [
+      "free-people-of-color",
+      "enslavement",
+      "land-ownership",
+      "resistance"
+    ],
+    "topicIds": [
+      "free-people-of-color",
+      "enslavement",
+      "land-ownership",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Creole culture",
+      "Cane River",
+      "free people of color",
+      "Jean Baptiste Brevelle II",
+      "Metoyer family"
+    ],
+    "jurisdictionLabel": "Natchitoches Parish, Louisiana",
+    "locationPrecision": "community",
+    "locationLabel": "Area between Cane River and Bayou Brevelle",
+    "lat": 31.64361111,
+    "lng": -93.02861111,
+    "claims": [
+      {
+        "predicate": "was founded by",
+        "object": "Jean Baptiste Brevelle II",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Isle_Brevelle",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is named after",
+        "object": "Jean Baptiste Brevelle II",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Isle_Brevelle",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was granted to Jean Baptiste Brevelle II in 1765",
+        "object": "the island",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Isle_Brevelle",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is the birthplace of Creole culture",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Isle_Brevelle",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is home to",
+        "object": "Cane River Creole National Historical Park",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Isle_Brevelle",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is part of",
+        "object": "Louisiana African American Heritage Trail",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Isle_Brevelle",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Isle Brevelle emerged during the transition from French to Spanish rule in Louisiana, a period that allowed some free people of color to acquire land and build enduring communities. Its development reflects the complex racial and cultural synthesis of the colonial Gulf South, where African, Native American, and European lineages converged. The persistence of Creole identity and landholding here challenges the later imposition of binary racial hierarchies under U.S. rule and Jim Crow."
+  },
+  {
+    "id": "plantation_milliken_s_bend_louisiana_q127867477",
+    "kind": "place",
+    "displayName": "Milliken's Bend, Louisiana",
+    "summary": "Milliken's Bend, Louisiana, was the site of a significant 1863 Civil War battle where newly recruited African American Union soldiers repelled a Confederate assault. The engagement, part of the Vicksburg Campaign, demonstrated the combat effectiveness of Black troops and influenced broader Union military policy on their deployment.",
+    "eraBuckets": [
+      "1860s"
+    ],
+    "topicTags": [
+      "civil-war",
+      "enslavement",
+      "military"
+    ],
+    "topicIds": [
+      "civil-war",
+      "enslavement",
+      "military"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Milliken's Bend",
+      "Battle of Milliken's Bend",
+      "African American soldiers",
+      "Vicksburg Campaign",
+      "Union Army"
+    ],
+    "jurisdictionLabel": "Madison Parish, Louisiana",
+    "locationPrecision": "site",
+    "locationLabel": "Historic site along the Mississippi River",
+    "lat": 32.44,
+    "lng": -91.1,
+    "claims": [
+      {
+        "predicate": "was the site of",
+        "object": "Battle of Milliken's Bend",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Battle_of_Milliken's_Bend",
+        "citationLabel": "Wikipedia: Battle of Milliken's Bend"
+      },
+      {
+        "predicate": "involved combat participation by",
+        "object": "African American soldiers in the Union Army",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Battle_of_Milliken's_Bend",
+        "citationLabel": "Wikipedia: Battle of Milliken's Bend"
+      },
+      {
+        "predicate": "was part of",
+        "object": "Vicksburg Campaign during the American Civil War",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/vick/learn/historyculture/battle-of-millikens-bend-june-7-1863.htm",
+        "citationLabel": "National Park Service: Battle of Milliken's Bend"
+      },
+      {
+        "predicate": "demonstrated the military value of",
+        "object": "African American soldiers to the Union Army",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Battle_of_Milliken's_Bend",
+        "citationLabel": "Wikipedia: Battle of Milliken's Bend"
+      },
+      {
+        "predicate": "included units from",
+        "object": "23rd Iowa Infantry Regiment and the USS Choctaw gunboat",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Battle_of_Milliken's_Bend",
+        "citationLabel": "Wikipedia: Battle of Milliken's Bend"
+      },
+      {
+        "predicate": "was commanded by Union colonel",
+        "object": "Hermann Lieb of the 9th Louisiana Infantry (African Descent)",
+        "confidenceLevel": "medium",
+        "citationSource": "nps.gov",
+        "citationHref": "https://www.nps.gov/vick/learn/historyculture/battle-of-millikens-bend-june-7-1863.htm",
+        "citationLabel": "National Park Service: Battle of Milliken's Bend"
+      }
+    ],
+    "historicalContext": "The Battle of Milliken's Bend occurred during the Siege of Vicksburg, a turning point in the Civil War. At a time when the Union's use of African American soldiers was still controversial, their determined resistance here helped dispel doubts about their valor and capability, contributing to the expansion of Black enlistment in the U.S. Army. The battle unfolded in the context of Confederate efforts to disrupt Union supply lines and sustain enslaved labor systems along the Mississippi River."
+  },
+  {
+    "id": "plantation_mulberry_grove_q26902531",
+    "kind": "place",
+    "displayName": "Mulberry Grove",
+    "summary": "Mulberry Grove, a plantation in Chatham County, Georgia, is historically significant as the site where Eli Whitney developed the cotton gin in the 1790s, a device that transformed cotton production and intensified the use of enslaved labor. Once the estate of Revolutionary War General Nathanael Greene, the plantation exemplifies the intersection of technological innovation and plantation slavery…",
+    "eraBuckets": [
+      "1790s",
+      "1780s",
+      "1850s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "invention",
+      "agriculture",
+      "history",
+      "civil-war"
+    ],
+    "topicIds": [
+      "enslavement",
+      "invention",
+      "agriculture",
+      "history",
+      "civil-war"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "cotton gin",
+      "Eli Whitney",
+      "Nathanael Greene",
+      "rice plantation",
+      "slavery"
+    ],
+    "jurisdictionLabel": "Port Wentworth, Georgia",
+    "locationPrecision": "site",
+    "locationLabel": "Former plantation site north of Port Wentworth",
+    "lat": 32.19,
+    "lng": -81.16,
+    "claims": [
+      {
+        "predicate": "was the location where Eli Whitney invented the cotton gin",
+        "object": "Eli Whitney invented the cotton gin at Mulberry Grove",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mulberry_Grove_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was granted to General Nathanael Greene by the State of Georgia after the Revolutionary War",
+        "object": "the State Legislature appropriated the estate for General Nathanael Greene in 1782",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mulberry_Grove_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was visited by George Washington in 1791",
+        "object": "George Washington dined at Mulberry Grove and visited Mrs. Greene, widow of General Greene",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mulberry_Grove_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was a rice plantation that relied on enslaved labor",
+        "object": "Mulberry Grove was a rice plantation whose prosperity was built on slavery",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Mulberry_Grove_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was listed on the National Register of Historic Places",
+        "object": "NRHP reference number 75000575, added July 17, 1975",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/75000575",
+        "citationLabel": "National Park Service"
+      }
+    ],
+    "historicalContext": "Mulberry Grove was central to the expansion of the cotton economy following the invention of the cotton gin, which dramatically increased the profitability of short-staple cotton and deepened the entrenchment of slavery in the South. Its history reflects broader patterns of agricultural innovation, land use, and forced labor in the post-Revolutionary War South."
+  },
+  {
+    "id": "plantation_myrtle_grove_plantation_q6948619",
+    "kind": "place",
+    "displayName": "Myrtle Grove Plantation",
+    "summary": "Myrtle Grove Plantation in Waterproof, Louisiana, built around 1840, was the site of enslavement where Alfred Fairfax, later a Union Army soldier, lived before escaping during the Civil War. The Greek Revival plantation house is listed on the National Register of Historic Places for its architectural significance.",
+    "eraBuckets": [
+      "1840s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "civil-war",
+      "resistance",
+      "architecture"
+    ],
+    "topicIds": [
+      "enslavement",
+      "civil-war",
+      "resistance",
+      "architecture"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Myrtle Grove Plantation",
+      "enslavement",
+      "Alfred Fairfax",
+      "Waterproof Louisiana",
+      "Greek Revival architecture"
+    ],
+    "jurisdictionLabel": "Waterproof, Louisiana",
+    "locationPrecision": "site",
+    "locationLabel": "Myrtle Grove Plantation site",
+    "lat": 31.81306,
+    "lng": -91.36861,
+    "claims": [
+      {
+        "predicate": "built_in_year",
+        "object": "c. 1840",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Myrtle_Grove_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "listed_on_nrhp",
+        "object": "May 10, 1979",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Myrtle_Grove_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "architectural_style",
+        "object": "Greek Revival",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Myrtle_Grove_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "enslaved_person_at",
+        "object": "Alfred Fairfax",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Myrtle_Grove_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "escape_to_join_union_army",
+        "object": "Alfred Fairfax",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Myrtle_Grove_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "significant_for_enslavement_history",
+        "object": "Myrtle Grove Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Myrtle_Grove_Plantation",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Myrtle Grove Plantation operated during the height of the antebellum cotton economy in Louisiana, a system built on the forced labor of enslaved Black people. The escape of Alfred Fairfax to join the Union Army reflects broader patterns of self-liberation during the Civil War, illustrating how enslaved individuals actively seized opportunities to undermine the Confederacy and claim freedom."
+  },
+  {
+    "id": "plantation_burge_plantation_q16966966",
+    "kind": "place",
+    "displayName": "Burge Plantation",
+    "summary": "Burge Plantation in Newborn, Georgia, was a forced-labor estate where multiple generations of enslaved families lived. The journal of Dolly Sumner Lunt Burge (1848–1879), published in 'Southern Voices from the Past,' documents the lives of these families, offering rare insight into enslavement in the antebellum South and the arrival of Union forces during the Civil War.",
+    "eraBuckets": [
+      "1830s",
+      "1840s",
+      "1850s",
+      "1860s",
+      "1870s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "civil-war",
+      "jim-crow",
+      "resistance"
+    ],
+    "topicIds": [
+      "enslavement",
+      "civil-war",
+      "jim-crow",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "enslaved families",
+      "Dolly Sumner Lunt Burge",
+      "Sherman's March",
+      "Newton County",
+      "plantation journal"
+    ],
+    "jurisdictionLabel": "Newborn, Georgia",
+    "locationPrecision": "site",
+    "locationLabel": "Burge Plantation site",
+    "lat": 33.54629,
+    "lng": -83.72962,
+    "claims": [
+      {
+        "predicate": "was operated as a plantation using enslaved labor",
+        "object": "enslaved Africans and their descendants",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Burge_Plantation",
+        "citationLabel": "Wikipedia - Burge Plantation"
+      },
+      {
+        "predicate": "documented the lives of enslaved people through first-hand account",
+        "object": "Dolly Sumner Lunt Burge's journal (1848–1879) includes details about three enslaved families, including four sisters who married and raised children under slavery",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Burge_Plantation",
+        "citationLabel": "Wikipedia - Burge Plantation"
+      },
+      {
+        "predicate": "journal has been published in historical series",
+        "object": "Southern Voices from the Past: Women’s Letters, Diaries, and Writings",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Burge_Plantation",
+        "citationLabel": "Wikipedia - Burge Plantation"
+      },
+      {
+        "predicate": "depicted events related to emancipation and Union military movement",
+        "object": "arrival of General Tecumseh Sherman's army during the Civil War",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Burge_Plantation",
+        "citationLabel": "Wikipedia - Burge Plantation"
+      }
+    ],
+    "historicalContext": "Plantations like Burge were central to the Southern agrarian economy built on enslaved labor. The survival of first-person accounts from both enslavers and, indirectly, the enslaved—through curated publications—helps reconstruct the social dynamics of these sites, especially during the collapse of slavery in the Civil War era."
+  },
+  {
+    "id": "plantation_chief_vann_house_historic_site_q5096950",
+    "kind": "place",
+    "displayName": "Chief Vann House Historic Site",
+    "summary": "The Chief Vann House, built in 1804 in Chatsworth, Georgia, was the first brick residence in the Cherokee Nation and served as the home of Cherokee leader James Vann, a wealthy planter who enslaved Black and Indigenous people. Known as the 'Showplace of the Cherokee Nation,' the house reflects the intersection of Indigenous elite adoption of Euro-American plantation systems and the use of…",
+    "eraBuckets": [
+      "1800s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "segregation",
+      "history"
+    ],
+    "topicIds": [
+      "enslavement",
+      "segregation",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Cherokee Nation",
+      "James Vann",
+      "enslaved labor",
+      "plantation house",
+      "Federal architecture"
+    ],
+    "jurisdictionLabel": "Chatsworth, Georgia",
+    "locationPrecision": "address",
+    "locationLabel": "82 Highway 225 N, Chatsworth, Georgia",
+    "lat": 34.76308333,
+    "lng": -84.82224722,
+    "claims": [
+      {
+        "predicate": "was built in",
+        "object": "1804",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Chief_Vann_House_Historic_Site",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was the first brick residence in",
+        "object": "the Cherokee Nation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Chief_Vann_House_Historic_Site",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was owned by",
+        "object": "James Vann, a Cherokee chief and enslaver",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Chief_Vann_House_Historic_Site",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "used enslaved labor for construction and operation",
+        "object": "including Black and Indigenous people",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Chief_Vann_House_Historic_Site",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "included a basement room used to punish enslaved people",
+        "object": "to whom James Vann was known to be exceptionally cruel",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Chief_Vann_House_Historic_Site",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is listed on the National Register of Historic Places",
+        "object": "NRIS 69000044",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/69000044",
+        "citationLabel": "NPS NRIS"
+      }
+    ],
+    "historicalContext": "The Chief Vann House exemplifies how some elite members of the Cherokee Nation adopted Southern plantation economies, including the ownership of enslaved Black and Indigenous people, during a period of forced assimilation and land dispossession. Its construction and operation were enabled by enslaved labor, situating it within broader regional systems of racial hierarchy and economic exploitation that preceded Indian Removal."
+  },
+  {
+    "id": "plantation_gascoigne_bluff_q5526387",
+    "kind": "place",
+    "displayName": "Gascoigne Bluff",
+    "summary": "Gascoigne Bluff on St. Simons Island, Georgia, was part of a plantation complex where timber harvested by enslaved labor contributed to the construction of the USS Constitution. The site includes two surviving tabby slave cabins from before 1833, among the better-preserved examples in the South, now maintained by the Cassina Garden Club.",
+    "eraBuckets": [
+      "1830s",
+      "1870s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "architecture",
+      "civil-war",
+      "emancipation",
+      "history",
+      "land-ownership",
+      "segregation"
+    ],
+    "topicIds": [
+      "enslavement",
+      "architecture",
+      "civil-war",
+      "emancipation",
+      "history",
+      "land-ownership",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "slave cabins",
+      "tabby construction",
+      "Hamilton Plantation",
+      "USS Constitution",
+      "St. Simons Island"
+    ],
+    "jurisdictionLabel": "St. Simons Island, Georgia",
+    "locationPrecision": "site",
+    "locationLabel": "Site of Hamilton Plantation slave cabins and naval timber harvesting",
+    "lat": 31.16694444,
+    "lng": -81.41138889,
+    "claims": [
+      {
+        "predicate": "was site of enslaved labor",
+        "object": "enslaved people worked at Gascoigne Bluff to harvest live oak timber used in U.S. Navy frigates",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Gascoigne_Bluff",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "contains surviving slave cabins",
+        "object": "two tabby slave cabins built before 1833 survive at Gascoigne Bluff",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Gascoigne_Bluff",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "contributed to USS Constitution construction",
+        "object": "timber from 2,000 live oak trees at Gascoigne Bluff was used to build the USS Constitution",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Gascoigne_Bluff",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "part of Hamilton Plantation",
+        "object": "the slave cabins at Gascoigne Bluff were part of Hamilton Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Gascoigne_Bluff",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "built using tabby construction",
+        "object": "the slave cabins were constructed using tabby, a mixture of lime, water, and crushed oyster shells",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Gascoigne_Bluff",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "owned by John Couper",
+        "object": "John Couper, father of James Hamilton Couper, owned the plantation at Gascoigne Bluff",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Gascoigne_Bluff",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Gascoigne Bluff was central to the plantation economy of coastal Georgia, where enslaved Africans were forced to harvest live oak for naval construction. The use of enslaved labor to produce materials for the U.S. Navy underscores the national dependence on slavery in military and economic development during the antebellum era."
+  },
+  {
+    "id": "plantation_gordon_lee_mansion_q5584759",
+    "kind": "place",
+    "displayName": "Gordon-Lee Mansion",
+    "summary": "The Gordon-Lee Mansion in Chickamauga, Georgia, built circa 1840 using enslaved labor, served as a Union field hospital during the Battle of Chickamauga in 1863. Its grounds include a surviving slave house and other outbuildings, and it is listed on the National Register of Historic Places for its role in military and social history.",
+    "eraBuckets": [
+      "1840s",
+      "1860s",
+      "1900s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "civil-war",
+      "military",
+      "architecture",
+      "history"
+    ],
+    "topicIds": [
+      "enslavement",
+      "civil-war",
+      "military",
+      "architecture",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Gordon-Lee Mansion",
+      "Chickamauga",
+      "slave house",
+      "Civil War hospital",
+      "Greek Revival"
+    ],
+    "jurisdictionLabel": "Chickamauga, Georgia",
+    "locationPrecision": "address",
+    "locationLabel": "217 Cove Road, Chickamauga, Georgia",
+    "lat": 34.87181,
+    "lng": -85.29479,
+    "claims": [
+      {
+        "predicate": "was built using enslaved labor",
+        "object": "enslaved labor",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Gordon-Lee_Mansion",
+        "citationLabel": "Gordon-Lee Mansion"
+      },
+      {
+        "predicate": "served as Union headquarters prior to the Battle of Chickamauga",
+        "object": "Union headquarters",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Gordon-Lee_Mansion",
+        "citationLabel": "Gordon-Lee Mansion"
+      },
+      {
+        "predicate": "was used as a field hospital during the Battle of Chickamauga",
+        "object": "field hospital",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Gordon-Lee_Mansion",
+        "citationLabel": "Gordon-Lee Mansion"
+      },
+      {
+        "predicate": "includes a surviving slave house as a contributing structure",
+        "object": "slave house",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Gordon-Lee_Mansion",
+        "citationLabel": "Gordon-Lee Mansion"
+      },
+      {
+        "predicate": "was constructed on land acquired after the removal of the Cherokee in 1836",
+        "object": "Cherokee removal",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Gordon-Lee_Mansion",
+        "citationLabel": "Gordon-Lee Mansion"
+      }
+    ],
+    "historicalContext": "The mansion exemplifies the dual legacy of antebellum plantation architecture and the Civil War’s human toll. Its construction relied on enslaved labor following the forced removal of the Cherokee, and its use as a hospital during the Battle of Chickamauga underscores the brutality of war on Black and white bodies alike. The site reflects broader patterns of land seizure, racial subjugation, and wartime transformation in the South."
+  },
+  {
+    "id": "plantation_hofwyl_broadfield_plantation_q22058900",
+    "kind": "place",
+    "displayName": "Hofwyl-Broadfield Plantation",
+    "summary": "Hofwyl-Broadfield Plantation in Glynn County, Georgia, operated as a rice plantation using enslaved African labor from 1800 until emancipation in 1865. Enslaved workers, many from Senegal and Sierra Leone, cultivated rice on over 7,000 acres, contributing to the Gullah Geechee cultural heritage. Now a state historic site, it preserves the physical and cultural landscape of coastal plantation…",
+    "eraBuckets": [
+      "1800s",
+      "1810s",
+      "1820s",
+      "1830s",
+      "1840s",
+      "1850s",
+      "1860s",
+      "1910s",
+      "1940s",
+      "1970s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "civil-war",
+      "segregation",
+      "economic-justice"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "civil-war",
+      "segregation",
+      "economic-justice"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "rice plantation",
+      "enslaved labor",
+      "Gullah Geechee",
+      "Georgia Lowcountry",
+      "antebellum"
+    ],
+    "jurisdictionLabel": "Brunswick, Georgia",
+    "locationPrecision": "site",
+    "locationLabel": "Hofwyl-Broadfield Plantation State Historic Site",
+    "lat": 31.305,
+    "lng": -81.45366,
+    "claims": [
+      {
+        "predicate": "operated as a forced-labor farm using enslaved peoples until 1865",
+        "object": "enslavement",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Hofwyl-Broadfield_Plantation",
+        "citationLabel": "Wikipedia - Hofwyl-Broadfield Plantation"
+      },
+      {
+        "predicate": "produced rice from 1800 until 1915 with labor of over 350 enslaved people from Senegal and Sierra Leone",
+        "object": "rice cultivation by enslaved West Africans",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Hofwyl-Broadfield_Plantation",
+        "citationLabel": "Wikipedia - Hofwyl-Broadfield Plantation"
+      },
+      {
+        "predicate": "was added to the National Register of Historic Places on July 12, 1976",
+        "object": "NRHP listing",
+        "confidenceLevel": "high",
+        "citationSource": "nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/76000635",
+        "citationLabel": "NRIS - 76000635"
+      },
+      {
+        "predicate": "current main house was built in the early 1850s during slavery era",
+        "object": "antebellum architecture",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Hofwyl-Broadfield_Plantation",
+        "citationLabel": "Wikipedia - Hofwyl-Broadfield Plantation"
+      },
+      {
+        "predicate": "managed by Georgia Department of Natural Resources as a state historic site since 1976",
+        "object": "state heritage management",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Hofwyl-Broadfield_Plantation",
+        "citationLabel": "Wikipedia - Hofwyl-Broadfield Plantation"
+      },
+      {
+        "predicate": "owned by James M. Troup in 1849 who held 357 enslaved people",
+        "object": "large-scale enslavement",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Hofwyl-Broadfield_Plantation",
+        "citationLabel": "Wikipedia - Hofwyl-Broadfield Plantation"
+      }
+    ],
+    "historicalContext": "Rice plantations like Hofwyl-Broadfield were central to the antebellum Southern economy and depended on the skilled labor of enslaved Africans, particularly from the Rice Coast of West Africa. The site reflects the forced migration, cultural retention, and brutal labor systems underpinned by slavery laws and racial hierarchy in Georgia, a state with extensive Black Codes and later Jim Crow segregation. Its preservation allows for the interpretation of Black resilience and the material conditions of enslavement."
+  }
+]

@@ -1,0 +1,84 @@
+[
+  {
+    "id": "gap_spelman_family",
+    "kind": "person",
+    "displayName": "Spelman family",
+    "summary": "The Spelman family played a pivotal role in founding Spelman College in 1881, which became a cornerstone of Black higher education for women. Their support, including financial contributions and advocacy, helped establish the institution as a leading historically Black college.",
+    "eraBuckets": [
+      "1880s",
+      "1900s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "education",
+      "history",
+      "hbcu",
+      "abolition",
+      "segregation"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "education",
+      "history",
+      "hbcu",
+      "abolition",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Spelman College",
+      "abolitionist movement",
+      "Black education",
+      "historically Black college",
+      "founding"
+    ],
+    "jurisdictionLabel": "Atlanta, Georgia",
+    "locationPrecision": "campus",
+    "locationLabel": "Spelman College campus",
+    "lat": 33.746,
+    "lng": -84.411,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "Spelman College",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Spelman_College",
+        "citationLabel": "Spelman College Wikipedia"
+      },
+      {
+        "predicate": "supported",
+        "object": "Spelman College",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Spelman_College",
+        "citationLabel": "Spelman College Wikipedia"
+      },
+      {
+        "predicate": "named_after",
+        "object": "Spelman College",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Spelman_College",
+        "citationLabel": "Spelman College Wikipedia"
+      },
+      {
+        "predicate": "donated_to",
+        "object": "Spelman College",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Spelman_College",
+        "citationLabel": "Spelman College Wikipedia"
+      },
+      {
+        "predicate": "involved_in",
+        "object": "abolitionist movement",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Spelman_College",
+        "citationLabel": "Spelman College Wikipedia"
+      }
+    ],
+    "historicalContext": "The Spelman family's involvement in the abolitionist movement and their financial support for Spelman College are critical to understanding the development of Black higher education in the United States. Their contributions enabled the college to grow and become a significant institution for Black women."
+  }
+]

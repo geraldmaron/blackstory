@@ -1,0 +1,381 @@
+[
+  {
+    "id": "gap_illinois_s_1st_congressional_district",
+    "kind": "place",
+    "displayName": "Illinois's 1st congressional district",
+    "summary": "Illinois's 1st congressional district, based in Chicago, was the first in the 20th century to elect an African American to Congress, Oscar Stanton De Priest, in 1929. It has maintained continuous Black representation in the House of Representatives since then.",
+    "eraBuckets": [
+      "1910s",
+      "1920s",
+      "1930s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "firsts",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "firsts",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Illinois",
+      "congressional district",
+      "Oscar De Priest",
+      "Black representation",
+      "civil rights"
+    ],
+    "jurisdictionLabel": "Chicago, Illinois",
+    "locationPrecision": "district",
+    "locationLabel": "Illinois's 1st congressional district",
+    "lat": 41.545,
+    "lng": -87.83583333,
+    "claims": [
+      {
+        "predicate": "represented",
+        "object": "Oscar Stanton De Priest",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Illinois's_1st_congressional_district",
+        "citationLabel": "Illinois's 1st congressional district"
+      },
+      {
+        "predicate": "first",
+        "object": "African American to be elected to Congress in the 20th century",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Illinois's_1st_congressional_district",
+        "citationLabel": "Illinois's 1st congressional district"
+      },
+      {
+        "predicate": "maintained",
+        "object": "continuous Black representation in the House of Representatives",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Illinois's_1st_congressional_district",
+        "citationLabel": "Illinois's 1st congressional district"
+      }
+    ],
+    "historicalContext": "Illinois's 1st congressional district has been a majority-minority district since at least the 1920s, with a significant African American population. It played a key role in the civil rights movement by providing continuous representation for Black Americans in Congress, starting with Oscar Stanton De Priest in 1929."
+  },
+  {
+    "id": "gap_houston_independent_school_district",
+    "kind": "school",
+    "displayName": "Houston Independent School District",
+    "summary": "The Houston Independent School District (HISD) was established in 1923 and played a significant role in the history of racial segregation and integration in the United States, particularly through its efforts to integrate schools starting in 1960.",
+    "eraBuckets": [
+      "1920s",
+      "1960s"
+    ],
+    "topicTags": [
+      "segregation",
+      "civil-rights",
+      "desegregation",
+      "education",
+      "history"
+    ],
+    "topicIds": [
+      "segregation",
+      "civil-rights",
+      "desegregation",
+      "education",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Houston ISD",
+      "segregation",
+      "integration",
+      "Black students",
+      "education"
+    ],
+    "jurisdictionLabel": "Houston, Texas",
+    "locationPrecision": "institution",
+    "locationLabel": "Hattie Mae White Educational Support Center",
+    "lat": 29.802779,
+    "lng": -95.454267,
+    "claims": [
+      {
+        "predicate": "established",
+        "object": "1923",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Houston_Independent_School_District",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "served_as",
+        "object": "largest racially segregated school system in the United States",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Houston_Independent_School_District",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "admitted_black_students",
+        "object": "1960",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Houston_Independent_School_District",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "had_black_board_members",
+        "object": "Hattie Mae White",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Houston_Independent_School_District",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "expanded_infrastructure_for_black_students",
+        "object": "1924-1929",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Houston_Independent_School_District",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The Houston Independent School District (HISD) was a major site of racial segregation in the United States, with Black students historically attending separate schools. The district's integration efforts in the 1960s, including the admission of Black students to previously white schools, were part of broader civil rights movements and reflected the structural forces of segregation and desegregation in the U.S."
+  },
+  {
+    "id": "gap_fort_sill",
+    "kind": "place",
+    "displayName": "Fort Sill",
+    "summary": "Fort Sill, established in 1869 in Oklahoma, was a key military post where the 10th U.S. Cavalry, a unit of African American soldiers known as the Buffalo Soldiers, was stationed. The fort played a significant role in the Indian Wars and later became a training center for the U.S. Army.",
+    "eraBuckets": [
+      "1860s",
+      "1870s",
+      "1880s",
+      "1890s"
+    ],
+    "topicTags": [
+      "military",
+      "civil-rights",
+      "segregation",
+      "history",
+      "jim-crow",
+      "black-codes",
+      "black-power",
+      "civil-war"
+    ],
+    "topicIds": [
+      "military",
+      "civil-rights",
+      "segregation",
+      "history",
+      "jim-crow",
+      "black-codes",
+      "black-power",
+      "civil-war"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Fort Sill",
+      "military post",
+      "10th U.S. Cavalry",
+      "Buffalo Soldiers",
+      "Oklahoma"
+    ],
+    "jurisdictionLabel": "Lawton, Oklahoma",
+    "locationPrecision": "city",
+    "locationLabel": "Fort Sill, Oklahoma",
+    "lat": 34.67111111,
+    "lng": -98.38972222,
+    "claims": [
+      {
+        "predicate": "was established",
+        "object": "Fort Sill",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Fort_Sill",
+        "citationLabel": "Fort Sill Wikipedia"
+      },
+      {
+        "predicate": "was assigned to the 10th U.S. Cavalry",
+        "object": "Fort Sill",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Fort_Sill",
+        "citationLabel": "Fort Sill Wikipedia"
+      },
+      {
+        "predicate": "served as a training center for the U.S. Army",
+        "object": "Fort Sill",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Fort_Sill",
+        "citationLabel": "Fort Sill Wikipedia"
+      },
+      {
+        "predicate": "was a site for the Buffalo Soldiers",
+        "object": "Fort Sill",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Fort_Sill",
+        "citationLabel": "Fort Sill Wikipedia"
+      }
+    ],
+    "historicalContext": "Fort Sill was established during the Indian Wars to protect settlers from Native American raids. It became a significant site for the 10th U.S. Cavalry, a unit of African American soldiers, who were stationed there and contributed to the military's efforts. The fort also evolved into a major training center for artillery and air defense units."
+  },
+  {
+    "id": "gap_fort_gregg",
+    "kind": "place",
+    "displayName": "Fort Gregg",
+    "summary": "Fort Gregg-Adams, formerly known as Fort Lee, was renamed in 2023 to honor Lieutenant General Arthur J. Gregg and Lieutenant Colonel Charity Adams Earley, marking the first U.S. military base named for African Americans.",
+    "eraBuckets": [
+      "2020s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "military",
+      "history",
+      "jim-crow"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "military",
+      "history",
+      "jim-crow"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Fort Lee",
+      "Fort Gregg-Adams",
+      "renaming",
+      "military history",
+      "Black history"
+    ],
+    "jurisdictionLabel": "Prince George County, Virginia",
+    "locationPrecision": "institution",
+    "locationLabel": "Fort Gregg-Adams",
+    "lat": 37.235,
+    "lng": -77.33277778,
+    "claims": [
+      {
+        "predicate": "was renamed",
+        "object": "Fort Gregg-Adams",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Fort_Lee_(military_base)",
+        "citationLabel": "Fort Lee (military base) - Wikipedia"
+      },
+      {
+        "predicate": "honors",
+        "object": "Lieutenant General Arthur J. Gregg and Lieutenant Colonel Charity Adams Earley",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Fort_Lee_(military_base)",
+        "citationLabel": "Fort Lee (military base) - Wikipedia"
+      },
+      {
+        "predicate": "was the first U.S. military base",
+        "object": "named for African Americans",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Fort_Lee_(military_base)",
+        "citationLabel": "Fort Lee (military base) - Wikipedia"
+      },
+      {
+        "predicate": "was renamed",
+        "object": "Fort Lee",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Fort_Lee_(military_base)",
+        "citationLabel": "Fort Lee (military base) - Wikipedia"
+      },
+      {
+        "predicate": "was renamed to honor",
+        "object": "Buffalo Soldier Private Fitz Lee",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Fort_Lee_(military_base)",
+        "citationLabel": "Fort Lee (military base) - Wikipedia"
+      }
+    ],
+    "historicalContext": "Fort Gregg-Adams, located in Prince George County, Virginia, was originally named after Confederate General Robert E. Lee. The renaming in 2023 reflects a broader movement to address historical ties to slavery and segregation, highlighting the intersection of military history and racial justice."
+  },
+  {
+    "id": "gap_first_college_owned_and_operated_by_african_americans",
+    "kind": "event",
+    "displayName": "First college owned and operated by African Americans",
+    "summary": "Morris Brown College, founded in 1881, was the first educational institution in Georgia to be owned and operated entirely by African Americans, under the African Methodist Episcopal Church. It played a pivotal role in Black education and community development.",
+    "eraBuckets": [
+      "1880s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "education",
+      "hbcu",
+      "history",
+      "segregation"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "education",
+      "hbcu",
+      "history",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Morris Brown College",
+      "African Methodist Episcopal Church",
+      "Black education",
+      "Georgia",
+      "1881"
+    ],
+    "jurisdictionLabel": "Atlanta, Georgia",
+    "locationPrecision": "campus",
+    "locationLabel": "Morris Brown College campus",
+    "lat": 33.7548,
+    "lng": -84.4089,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "Morris Brown College",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Morris_Brown_College",
+        "citationLabel": "Morris Brown College Wikipedia"
+      },
+      {
+        "predicate": "owned_and_operated_by",
+        "object": "African Americans",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Morris_Brown_College",
+        "citationLabel": "Morris Brown College Wikipedia"
+      },
+      {
+        "predicate": "first_in_state",
+        "object": "Georgia",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Morris_Brown_College",
+        "citationLabel": "Morris Brown College Wikipedia"
+      },
+      {
+        "predicate": "religious_affiliation",
+        "object": "African Methodist Episcopal Church",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Morris_Brown_College",
+        "citationLabel": "Morris Brown College Wikipedia"
+      },
+      {
+        "predicate": "established",
+        "object": "1881",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Morris_Brown_College",
+        "citationLabel": "Morris Brown College Wikipedia"
+      }
+    ],
+    "historicalContext": "Morris Brown College's founding in 1881 was a significant milestone in the history of Black education in the United States. It was established by African Americans affiliated with the A.M.E. Church, which was the first independent black denomination in the U.S. The college's establishment reflected the broader efforts of African Americans to create and sustain educational institutions in the post-Civil War era, despite systemic racial barriers."
+  }
+]

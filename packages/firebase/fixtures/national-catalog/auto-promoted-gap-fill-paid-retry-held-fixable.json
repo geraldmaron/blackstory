@@ -1,0 +1,79 @@
+[
+  {
+    "id": "gap_merritt_college",
+    "kind": "institution",
+    "displayName": "Merritt College",
+    "summary": "Merritt College in Oakland, California, is notable for being the meeting place of Huey P. Newton and Bobby Seale, who founded the Black Panther Party for Self-Defense in 1966. The college played a key role in Black activism and civil rights history.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "black-power",
+      "history",
+      "movement"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "black-power",
+      "history",
+      "movement"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Black Panther Party",
+      "Huey P. Newton",
+      "Bobby Seale",
+      "Oakland",
+      "civil rights"
+    ],
+    "jurisdictionLabel": "Oakland, California",
+    "locationPrecision": "campus",
+    "locationLabel": "Merritt College campus",
+    "lat": 37.78881111,
+    "lng": -122.16639167,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "Black Panther Party for Self-Defense",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Merritt_College",
+        "citationLabel": "Merritt College Wikipedia"
+      },
+      {
+        "predicate": "met",
+        "object": "Huey P. Newton and Bobby Seale",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Merritt_College",
+        "citationLabel": "Merritt College Wikipedia"
+      },
+      {
+        "predicate": "influenced",
+        "object": "Black Panther Party",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Merritt_College",
+        "citationLabel": "Merritt College Wikipedia"
+      },
+      {
+        "predicate": "hosted",
+        "object": "Black Panther Party meetings",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Merritt_College",
+        "citationLabel": "Merritt College Wikipedia"
+      },
+      {
+        "predicate": "located",
+        "object": "Oakland, California",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Merritt_College",
+        "citationLabel": "Merritt College Wikipedia"
+      }
+    ],
+    "historicalContext": "Merritt College, established in 1954, became a hub for Black student activism in the 1960s. It was the site where Huey P. Newton and Bobby Seale met and began organizing the Black Panther Party, which significantly influenced the civil rights movement and Black power movements. The college's location in Oakland, a center of Black activism, further underscores its historical significance."
+  }
+]

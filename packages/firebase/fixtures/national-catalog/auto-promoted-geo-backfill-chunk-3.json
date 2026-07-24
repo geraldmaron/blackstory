@@ -1,0 +1,525 @@
+[
+  {
+    "id": "gap_penny_savings_bank",
+    "kind": "institution",
+    "displayName": "Penny Savings Bank",
+    "summary": "The Penny Savings Bank, founded by Maggie Lena Walker, was a cornerstone of Richmond's Black business district and played a key role in empowering the African American community during the Jim Crow era.",
+    "eraBuckets": [
+      "1900s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "segregation",
+      "economic-justice",
+      "firsts"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "segregation",
+      "economic-justice",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Penny Savings Bank",
+      "Maggie Lena Walker",
+      "Black business district",
+      "economic empowerment",
+      "Jim Crow"
+    ],
+    "jurisdictionLabel": "Richmond, Virginia",
+    "locationPrecision": "city",
+    "locationLabel": "Richmond, Virginia",
+    "lat": 37.54083333,
+    "lng": -77.43666667,
+    "claims": [
+      {
+        "predicate": "founded_by",
+        "object": "Maggie Lena Walker",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Maggie_L._Walker",
+        "citationLabel": "Maggie Lena Walker"
+      },
+      {
+        "predicate": "first_black_woman_bank_president",
+        "object": "Maggie Lena Walker",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.nps.gov/mawa/learn/historyculture/female-bank-presidents.htm",
+        "citationLabel": "Female Bank Presidents"
+      },
+      {
+        "predicate": "part_of_black_business_district",
+        "object": "Fourth Avenue",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Maggie_L._Walker",
+        "citationLabel": "Maggie Lena Walker"
+      },
+      {
+        "predicate": "economic_empowerment",
+        "object": "African American community",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.nps.gov/mawa/learn/historyculture/female-bank-presidents.htm",
+        "citationLabel": "Female Bank Presidents"
+      }
+    ],
+    "historicalContext": "The Penny Savings Bank was part of a compact Black business district on Fourth Avenue, which included the Famous and Carver theaters and the Colored Masonic Temple. It was established during the Jim Crow era, a time of severe racial segregation and discrimination, and served as a vital institution for economic empowerment within the African American community."
+  },
+  {
+    "id": "gap_southern_aid_society",
+    "kind": "organization",
+    "displayName": "Southern Aid Society",
+    "summary": "The Southern Aid Society of Virginia, founded in 1893 in Richmond, Virginia, was the first Black-owned and operated insurance company in the United States. It provided affordable insurance to African-Americans and promoted economic opportunities for Black youth.",
+    "eraBuckets": [
+      "1890s",
+      "1930s",
+      "1940s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "business",
+      "history",
+      "jim-crow"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "business",
+      "history",
+      "jim-crow"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "insurance",
+      "Black-owned",
+      "African-American",
+      "Virginia",
+      "Richmond"
+    ],
+    "jurisdictionLabel": "Richmond, Virginia",
+    "locationPrecision": "city",
+    "locationLabel": "Richmond, Virginia",
+    "lat": 37.54083333,
+    "lng": -77.43666667,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "Southern Aid and Insurance Company",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Southern_Aid_and_Insurance_Company",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "first_black_owned_insurance_company",
+        "object": "Southern Aid and Insurance Company",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Southern_Aid_and_Insurance_Company",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "provided_insurance_protection",
+        "object": "African-Americans",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Southern_Aid_and_Insurance_Company",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "promoted_jobs_for_black_youth",
+        "object": "Southern Aid and Insurance Company",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Southern_Aid_and_Insurance_Company",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "changed_name_to",
+        "object": "Southern Aid Society of Virginia",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Southern_Aid_and_Insurance_Company",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "purchased_building",
+        "object": "John Mitchell, Jr.'s Mechanics Savings Bank building",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Southern_Aid_and_Insurance_Company",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The Southern Aid Society of Virginia emerged during the post-Civil War era, a time when African-Americans faced significant racial discrimination and limited access to financial services. The company's establishment marked a significant step in the economic empowerment of Black communities and challenged the systemic barriers they faced."
+  },
+  {
+    "id": "gap_clotilda",
+    "kind": "other",
+    "displayName": "Clotilda",
+    "summary": "The Clotilda was the last known U.S. slave ship to transport Africans to the United States, arriving in 1860. Its wreckage was discovered in 2021, and its legacy is preserved in Africatown, Alabama, where descendants of the enslaved people continue to live.",
+    "eraBuckets": [
+      "1860s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "history",
+      "jim-crow",
+      "migration",
+      "segregation"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "history",
+      "jim-crow",
+      "migration",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Clotilda",
+      "slavery",
+      "Africatown",
+      "Mobile Bay",
+      "transatlantic slave trade"
+    ],
+    "jurisdictionLabel": "Mobile, Alabama",
+    "locationPrecision": "site",
+    "locationLabel": "Mobile Bay",
+    "lat": 30.44277778,
+    "lng": -88.00916667,
+    "claims": [
+      {
+        "predicate": "was",
+        "object": "the last known U.S. slave ship to bring captives from Africa to the United States",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Clotilda_(slave_ship)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "scuttled in Mobile Bay in July 1860",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Clotilda_(slave_ship)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "refitted as a slave ship with a false deck",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Clotilda_(slave_ship)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "involved in the transatlantic slave trade",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Clotilda_(slave_ship)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "associated with the founding of Africatown",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Clotilda_(slave_ship)",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The Clotilda's voyage in 1860 exemplifies the illegal continuation of the transatlantic slave trade despite the 1807 Act Prohibiting Importation of Slaves. Its discovery and the establishment of Africatown highlight the enduring impact of slavery on African American communities."
+  },
+  {
+    "id": "gap_477th_bombardment_group",
+    "kind": "organization",
+    "displayName": "477th Bombardment Group",
+    "summary": "The 477th Bombardment Group was a unit of the U.S. Army Air Forces during World War II, known for training the Tuskegee Airmen, a group of African-American pilots who made significant contributions to the war effort and challenged racial barriers in the military.",
+    "eraBuckets": [
+      "1940s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "military",
+      "history",
+      "jim-crow",
+      "firsts"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "military",
+      "history",
+      "jim-crow",
+      "firsts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "477th Bombardment Group",
+      "Tuskegee Airmen",
+      "African-American pilots",
+      "World War II",
+      "civil rights"
+    ],
+    "jurisdictionLabel": "Fort Knox, Kentucky",
+    "locationPrecision": "site",
+    "locationLabel": "Godman Field",
+    "lat": 38.9247,
+    "lng": -85.9083,
+    "claims": [
+      {
+        "predicate": "was_part_of",
+        "object": "Tuskegee Airmen",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/477th_Fighter_Group",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_reactivated",
+        "object": "1944",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/477th_Fighter_Group",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "trained",
+        "object": "African-American pilots",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/477th_Fighter_Group",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_assigned_to",
+        "object": "First Air Force",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/477th_Fighter_Group",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was_part_of",
+        "object": "World War II",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/477th_Fighter_Group",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The 477th Bombardment Group was reactivated in 1944 as part of the U.S. Army Air Forces, tasked with training African-American pilots who would later become the Tuskegee Airmen. This unit played a crucial role in the broader civil rights movement by challenging segregation and demonstrating the capabilities of Black servicemen."
+  },
+  {
+    "id": "gap_54th_massachusetts",
+    "kind": "organization",
+    "displayName": "54th Massachusetts",
+    "summary": "The 54th Massachusetts Infantry Regiment was one of the first African-American regiments formed in the North during the Civil War, led by Colonel Robert Gould Shaw. The regiment played a pivotal role in the Union Army's efforts, including the Battle of Fort Wagner, and became a symbol of Black military service and sacrifice.",
+    "eraBuckets": [
+      "1860s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "civil-war",
+      "jim-crow",
+      "military",
+      "segregation"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "civil-war",
+      "jim-crow",
+      "military",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "54th Massachusetts",
+      "Civil War",
+      "Fort Wagner",
+      "African-American regiments",
+      "Robert Gould Shaw"
+    ],
+    "jurisdictionLabel": "Boston, Massachusetts",
+    "locationPrecision": "camp",
+    "locationLabel": "Camp Meigs",
+    "lat": 42.23059167,
+    "lng": -71.13416667,
+    "claims": [
+      {
+        "predicate": "was",
+        "object": "one of the first Black regiments recruited in the North",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/54th_Massachusetts_Infantry_Regiment",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "commanded by white officers",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/54th_Massachusetts_Infantry_Regiment",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "participated in",
+        "object": "the Battle of Fort Wagner",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/54th_Massachusetts_Infantry_Regiment",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "a major force in the pioneering of African-American civil war regiments",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/54th_Massachusetts_Infantry_Regiment",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was",
+        "object": "a symbol of Black military service and sacrifice",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/54th_Massachusetts_Infantry_Regiment",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The 54th Massachusetts Infantry Regiment was authorized by the Emancipation Proclamation and was part of the broader movement to recruit African-American soldiers for the Union Army. Its formation and service during the Civil War were significant in the context of segregation, civil rights, and the fight against slavery, with the regiment's actions influencing the recruitment of thousands of Black soldiers."
+  },
+  {
+    "id": "gap_south_carolina_general_assembly",
+    "kind": "organization",
+    "displayName": "South Carolina General Assembly",
+    "summary": "In 1870, the South Carolina General Assembly elected Jonathan Jasper Wright as an associate justice of the state Supreme Court, making him one of the first African Americans to serve on a state supreme court in the United States during the Reconstruction era.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "reconstruction",
+      "firsts",
+      "judiciary",
+      "government"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "reconstruction",
+      "firsts",
+      "judiciary",
+      "government"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Reconstruction",
+      "Black judge",
+      "state legislature",
+      "Supreme Court",
+      "Jonathan Jasper Wright"
+    ],
+    "jurisdictionLabel": "Columbia, SC",
+    "locationPrecision": "institution",
+    "locationLabel": "South Carolina State House",
+    "lat": 34.00043333,
+    "lng": -81.03314722,
+    "claims": [
+      {
+        "predicate": "elected",
+        "object": "Jonathan Jasper Wright as associate justice of the South Carolina Supreme Court",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/South_Carolina_General_Assembly",
+        "citationLabel": "Wikipedia: South Carolina General Assembly"
+      }
+    ],
+    "historicalContext": "During Reconstruction, the South Carolina General Assembly included a significant number of Black legislators due to federal enforcement of civil rights and voting protections. This enabled the election of Black officials to high offices, such as Jonathan Jasper Wright to the state Supreme Court, reflecting a brief period of multiracial democracy before the reimposition of Jim Crow laws dismantled these gains."
+  },
+  {
+    "id": "gap_virginia_normal_and_collegiate_institute",
+    "kind": "school",
+    "displayName": "Virginia Normal and Collegiate Institute",
+    "summary": "Virginia State University, originally founded as the Virginia Normal and Collegiate Institute in 1882, was the first state-supported four-year institution of higher learning for Black Americans. It played a pivotal role in Black education and civil rights history.",
+    "eraBuckets": [
+      "1880s",
+      "1900s",
+      "1920s",
+      "1940s",
+      "1970s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "education",
+      "land-grant",
+      "segregation",
+      "history"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "education",
+      "land-grant",
+      "segregation",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Virginia State University",
+      "land-grant",
+      "Black education",
+      "Jim Crow",
+      "historically Black university"
+    ],
+    "jurisdictionLabel": "Ettrick, Virginia",
+    "locationPrecision": "city",
+    "locationLabel": "Ettrick, Virginia",
+    "lat": 37.24277778,
+    "lng": -77.42555556,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "Virginia State University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Virginia_State_University",
+        "citationLabel": "Virginia State University Wikipedia"
+      },
+      {
+        "predicate": "first_state_supported_four_year_institution_for_Black_students",
+        "object": "Virginia State University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Virginia_State_University",
+        "citationLabel": "Virginia State University Wikipedia"
+      },
+      {
+        "predicate": "established_in_1882",
+        "object": "Virginia Normal and Collegiate Institute",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Virginia_State_University",
+        "citationLabel": "Virginia State University Wikipedia"
+      },
+      {
+        "predicate": "land_grant_university",
+        "object": "Virginia State University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Virginia_State_University",
+        "citationLabel": "Virginia State University Wikipedia"
+      },
+      {
+        "predicate": "part_of_thurgood_marshall_college_fund",
+        "object": "Virginia State University",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Virginia_State_University",
+        "citationLabel": "Virginia State University Wikipedia"
+      }
+    ],
+    "historicalContext": "The Virginia Normal and Collegiate Institute was established in 1882 as a response to the need for higher education for Black Americans during the Jim Crow era. It was the first state-supported four-year institution for Black students, reflecting the broader struggle for educational equity and the role of land-grant universities in advancing Black education."
+  }
+]

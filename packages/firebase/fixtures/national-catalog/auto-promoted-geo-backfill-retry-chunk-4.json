@@ -1,0 +1,76 @@
+[
+  {
+    "id": "gap_congressional_black_caucus",
+    "kind": "organization",
+    "displayName": "Congressional Black Caucus",
+    "summary": "The Congressional Black Caucus (CBC), founded in 1969, was established by African American members of the U.S. Congress to advocate for civil rights and representation. It played a key role in shaping policies related to racial equality and economic justice.",
+    "eraBuckets": [
+      "1960s",
+      "1970s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "government"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "government"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Congressional Black Caucus",
+      "civil rights",
+      "representation",
+      "non-partisan",
+      "legislation"
+    ],
+    "jurisdictionLabel": "Washington, D.C.",
+    "locationPrecision": "city",
+    "locationLabel": "Washington, D.C.",
+    "lat": 38.90472222,
+    "lng": -77.01638889,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "Congressional Black Caucus",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Congressional_Black_Caucus",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "founding_members",
+        "object": "Shirley Chisholm, Bill Clay, Charles Diggs, Louis Stokes, and others",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Congressional_Black_Caucus",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "role",
+        "object": "advocacy for civil rights and representation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Congressional_Black_Caucus",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "non_partisan",
+        "object": "Congressional Black Caucus",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Congressional_Black_Caucus",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "influenced",
+        "object": "legislation on housing, education, and voting rights",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Congressional_Black_Caucus",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The CBC emerged during the Civil Rights Movement of the 1960s, as more Black representatives were elected to Congress. It was formed from the Democratic Select Committee and became a non-partisan organization, influencing legislation and policy on issues like housing, education, and voting rights."
+  }
+]

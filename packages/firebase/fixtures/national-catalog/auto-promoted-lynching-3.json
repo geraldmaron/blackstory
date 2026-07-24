@@ -1,0 +1,470 @@
+[
+  {
+    "id": "lynching_demon_lowman_aiken_vicinity_south_carolina",
+    "kind": "person",
+    "displayName": "Demon Lowman",
+    "summary": "Demon Lowman was lynched on October 8, 1926, near Aiken, South Carolina, after being removed from jail during a retrial for allegedly killing a sheriff. A crowd attended the extrajudicial killing, reflecting patterns of racial terror during the Jim Crow era.",
+    "eraBuckets": [
+      "1920s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "due-process",
+      "civil-rights"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "due-process",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "Aiken County",
+      "extrajudicial killing",
+      "racial violence",
+      "Jim Crow"
+    ],
+    "jurisdictionLabel": "Aiken, South Carolina",
+    "locationPrecision": "site",
+    "locationLabel": "outskirts of Aiken",
+    "lat": 34.17833333,
+    "lng": -82.37055556,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "on October 8, 1926, in Aiken vicinity, South Carolina",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_women_in_the_United_States",
+        "citationLabel": "Wikipedia: Lynching of women in the United States"
+      },
+      {
+        "predicate": "was taken from jail during retrial",
+        "object": "after the second day of a retrial for alleged murder of a sheriff",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_women_in_the_United_States",
+        "citationLabel": "Wikipedia: Lynching of women in the United States"
+      },
+      {
+        "predicate": "was extrajudicially killed",
+        "object": "by being shot at the outskirts of Aiken with a large crowd in attendance",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_women_in_the_United_States",
+        "citationLabel": "Wikipedia: Lynching of women in the United States"
+      },
+      {
+        "predicate": "is part of documented pattern of racial terror lynching",
+        "object": "targeting African American men during the Jim Crow era in the South",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_women_in_the_United_States",
+        "citationLabel": "Wikipedia: Lynching of women in the United States"
+      }
+    ],
+    "historicalContext": "Lynchings like that of Demon Lowman were tools of racial control in the South, often occurring when Black individuals faced legal proceedings that threatened mob-imposed 'justice.' These acts undermined due process and reinforced segregationist social order, particularly when victims were accused of crimes against white authority figures."
+  },
+  {
+    "id": "lynching_george_armwood_princess_anne_maryland",
+    "kind": "person",
+    "displayName": "George Armwood",
+    "summary": "George Armwood, a 22- or 23-year-old African American laborer, was lynched by a white mob in Princess Anne, Maryland, on October 18, 1933, after being accused of assaulting a white woman. Despite being moved between jails for safety, he was seized from the Somerset County jail, beaten, hanged, and burned before a crowd.",
+    "eraBuckets": [
+      "1930s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "civil-rights",
+      "resistance"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "civil-rights",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "Princess Anne",
+      "Maryland",
+      "racial violence",
+      "mob justice"
+    ],
+    "jurisdictionLabel": "Princess Anne, Maryland",
+    "locationPrecision": "site",
+    "locationLabel": "Site of the Somerset County jail and lynching",
+    "lat": 38.20972222,
+    "lng": -75.695,
+    "claims": [
+      {
+        "predicate": "was lynched in",
+        "object": "Princess Anne, Maryland",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_George_Armwood",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was the last recorded lynching in",
+        "object": "Maryland",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_George_Armwood",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was accused of",
+        "object": "attempted assault and rape of Mary Denston",
+        "confidenceLevel": "high",
+        "citationSource": "msa.maryland.gov",
+        "citationHref": "https://msa.maryland.gov/megafile/msa/speccol/sc3500/sc3520/013700/013750/html/13750bio.html",
+        "citationLabel": "Maryland State Archives"
+      },
+      {
+        "predicate": "was seized from jail by a mob and",
+        "object": "beaten, hanged, and burned",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_George_Armwood",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was not prosecuted after",
+        "object": "a grand jury declined to indict any of the lynchers despite state police identifications",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_George_Armwood",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "inspired the poem",
+        "object": "Flag Salute by Esther Popel",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_George_Armwood",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Armwood's lynching occurred amid a pattern of racial terror in the Jim Crow South, where accusations against Black men often triggered mob violence with impunity. The failure of Maryland authorities to prosecute lynchers—even after state police identified them—reflected systemic complicity in racial violence and eroded trust in legal protections for Black citizens. This case contributed to growing national pressure for anti-lynching legislation and highlighted the vulnerability of Black lives under segregation."
+  },
+  {
+    "id": "lynching_albert_gooden_covington_tennessee",
+    "kind": "person",
+    "displayName": "Albert Gooden",
+    "summary": "Albert Gooden was lynched on August 16, 1937, in Covington, Tennessee, after being accused of killing a white police officer. A mob of about 100 men seized him from sheriff's custody and hanged him from a bridge over Beaver Creek; his body was later recovered from the river. This act reflects the pattern of racial terror during the Jim Crow era.",
+    "eraBuckets": [
+      "1930s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "criminal-justice",
+      "resistance"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "criminal-justice",
+      "resistance"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "Covington",
+      "Tipton County",
+      "mob violence",
+      "racial terror"
+    ],
+    "jurisdictionLabel": "Covington, Tennessee",
+    "locationPrecision": "site",
+    "locationLabel": "Bridge over Beaver Creek",
+    "lat": 35.56416667,
+    "lng": -89.64638889,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "in Covington, Tennessee",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Covington%2C_Tennessee",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was accused of",
+        "object": "murdering white police officer Marshall Chester Doyle",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.covingtontn.gov/",
+        "citationLabel": "City of Covington, TN official website"
+      },
+      {
+        "predicate": "was taken from sheriff's custody by",
+        "object": "a mob of approximately 100 men",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.covingtontn.gov/",
+        "citationLabel": "City of Covington, TN official website"
+      },
+      {
+        "predicate": "was executed by",
+        "object": "hanging from a bridge over Beaver Creek",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.covingtontn.gov/",
+        "citationLabel": "City of Covington, TN official website"
+      },
+      {
+        "predicate": "had body recovered from",
+        "object": "the river by sheriff's deputies",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.covingtontn.gov/",
+        "citationLabel": "City of Covington, TN official website"
+      },
+      {
+        "predicate": "is part of",
+        "object": "the history of racial terror lynching in Tennessee",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.covingtontn.gov/",
+        "citationLabel": "City of Covington, TN official website"
+      }
+    ],
+    "historicalContext": "Lynching was a tool of racial control in the post-Reconstruction South, used to enforce white supremacy and suppress Black autonomy. In Tennessee, despite Union occupation during the Civil War and a relatively smaller enslaved population than the Deep South, racial violence persisted into the 20th century. The lynching of Albert Gooden occurred amid a broader pattern of mob violence targeting Black men accused of crimes, often without due process, and highlights the systemic failure of law enforcement to protect Black lives."
+  },
+  {
+    "id": "lynching_alton_collier_coronado_california",
+    "kind": "person",
+    "displayName": "Alton Collier",
+    "summary": "Alton Collier, an African American man in Coronado, California, was forced from a ferry into San Diego Bay on April 27, 1946, by a group of white sailors following an alleged stabbing. He drowned and was initially ruled a suicide, but in 2024 the Equal Justice Initiative reclassified his death as a lynching due to racialized mob violence and official neglect.",
+    "eraBuckets": [
+      "1940s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "resistance",
+      "memory"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "resistance",
+      "memory"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "racial violence",
+      "ferry",
+      "Coronado",
+      "Equal Justice Initiative"
+    ],
+    "jurisdictionLabel": "Coronado, California",
+    "locationPrecision": "site",
+    "locationLabel": "Site of ferry where Alton Collier was forced into San Diego Bay",
+    "lat": 32.67805556,
+    "lng": -117.1725,
+    "claims": [
+      {
+        "predicate": "was lynched on",
+        "object": "April 27, 1946",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Coronado%2C_California",
+        "citationLabel": "Wikipedia - Coronado, California"
+      },
+      {
+        "predicate": "was forced off a ferry by white sailors in Coronado, California",
+        "object": "following an accusation of stabbing a white sailor",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Coronado%2C_California",
+        "citationLabel": "Wikipedia - Coronado, California"
+      },
+      {
+        "predicate": "drowned in San Diego Bay under circumstances of mob racial violence",
+        "object": "and was initially ruled a suicide",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Coronado%2C_California",
+        "citationLabel": "Wikipedia - Coronado, California"
+      },
+      {
+        "predicate": "had death reclassified as a lynching by the Equal Justice Initiative",
+        "object": "in 2024",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Coronado%2C_California",
+        "citationLabel": "Wikipedia - Coronado, California"
+      },
+      {
+        "predicate": "is an example of post-World War II racial terror against African Americans outside the Southern United States",
+        "object": "illustrating the national scope of anti-Black lynching",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Coronado%2C_California",
+        "citationLabel": "Wikipedia - Coronado, California"
+      }
+    ],
+    "historicalContext": "Collier’s lynching occurred during a wave of racial violence against Black Americans in the post-World War II era, even in Western states like California. His case reflects how racial terror persisted beyond the South and how official narratives often obscured racially motivated killings through misclassification, delaying accountability and remembrance."
+  },
+  {
+    "id": "lynching_mack_charles_parker_bridge_over_pearl_river_between_mississippi_and_louisiana_mississippi",
+    "kind": "person",
+    "displayName": "Mack Charles Parker",
+    "summary": "Mack Charles Parker, a Black man, was abducted from his jail cell in Pearl River County, Mississippi, on April 24, 1959, beaten, shot, and dumped in the Pearl River after being accused of raping a white woman. Despite FBI investigation and confessions, no one was indicted, marking it as one of the last documented lynchings in the U.S.",
+    "eraBuckets": [
+      "1950s"
+    ],
+    "topicTags": [
+      "jim-crow",
+      "due-process",
+      "civil-rights"
+    ],
+    "topicIds": [
+      "jim-crow",
+      "due-process",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "Pearl River County",
+      "FBI investigation",
+      "no indictments",
+      "racial violence"
+    ],
+    "jurisdictionLabel": "Poplarville, Mississippi",
+    "locationPrecision": "site",
+    "locationLabel": "Pearl River, near bridge between Mississippi and Louisiana",
+    "lat": 29.15111111,
+    "lng": -89.25333333,
+    "claims": [
+      {
+        "predicate": "was lynched",
+        "object": "April 24, 1959",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_Mack_Charles_Parker",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was abducted from",
+        "object": "Pearl River County Courthouse jail cell",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_Mack_Charles_Parker",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "body was found in",
+        "object": "Pearl River, 20 miles west of Poplarville",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_Mack_Charles_Parker",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was investigated by",
+        "object": "Federal Bureau of Investigation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_Mack_Charles_Parker",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "no one was indicted despite confessions",
+        "object": "in the killing of Mack Charles Parker",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_Mack_Charles_Parker",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is described as",
+        "object": "the 'last classic lynching in America' by historian Howard Smead",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Lynching_of_Mack_Charles_Parker",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Parker's lynching occurred during the height of Jim Crow segregation, when racial terror was used to enforce white supremacy. The failure to prosecute perpetrators, despite federal investigation, underscores the complicity of local institutions in upholding racial hierarchy and denying Black Americans due process."
+  },
+  {
+    "id": "lynching_ahmaud_arbery_satilla_shores_georgia",
+    "kind": "person",
+    "displayName": "Ahmaud Arbery",
+    "summary": "Ahmaud Arbery, a 25-year-old Black man, was pursued and fatally shot on February 23, 2020, in Satilla Shores, Georgia, by three white men who falsely suspected him of burglary. The incident, captured on video and widely shared, exposed racial bias in local law enforcement's delayed response.",
+    "eraBuckets": [
+      "2020s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "police-violence",
+      "resistance",
+      "voting-rights"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "police-violence",
+      "resistance",
+      "voting-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "racial profiling",
+      "citizen's arrest",
+      "hate crime",
+      "Black jogger",
+      "Glynn County"
+    ],
+    "jurisdictionLabel": "Brunswick, Georgia",
+    "locationPrecision": "neighborhood",
+    "locationLabel": "Satilla Shores neighborhood",
+    "lat": 31.12416667,
+    "lng": -81.55611111,
+    "claims": [
+      {
+        "predicate": "was killed in a racially motivated attack",
+        "object": "Ahmaud Arbery",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Murder_of_Ahmaud_Arbery",
+        "citationLabel": "Wikipedia: Murder of Ahmaud Arbery"
+      },
+      {
+        "predicate": "was pursued and shot by three white men who claimed he was a burglar",
+        "object": "Ahmaud Arbery",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Murder_of_Ahmaud_Arbery",
+        "citationLabel": "Wikipedia: Murder of Ahmaud Arbery"
+      },
+      {
+        "predicate": "had the case handling investigated by the Georgia Attorney General for prosecutorial conflicts and delays",
+        "object": "Ahmaud Arbery",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://law.georgia.gov/press-releases/2020-05-10/carr-requests-doj-conduct-investigation-handling-ahmaud-arbery-case",
+        "citationLabel": "Georgia Attorney General's Office: Request for DOJ Investigation"
+      },
+      {
+        "predicate": "was the victim of a hate crime resulting in federal convictions for interference with rights",
+        "object": "Ahmaud Arbery",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Murder_of_Ahmaud_Arbery",
+        "citationLabel": "Wikipedia: Murder of Ahmaud Arbery"
+      },
+      {
+        "predicate": "sparked national protests and policy changes regarding racial profiling and citizen's arrest laws",
+        "object": "Ahmaud Arbery",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Murder_of_Ahmaud_Arbery",
+        "citationLabel": "Wikipedia: Murder of Ahmaud Arbery"
+      }
+    ],
+    "historicalContext": "Arbery's killing reflects a legacy of extralegal racial violence in the American South, where white civilians have historically policed Black movement under pretext of crime prevention. The case reignited scrutiny of 'citizen's arrest' laws rooted in slave codes and underscored how local judicial networks can enable racial bias, delaying justice until external intervention and public pressure forced accountability."
+  }
+]

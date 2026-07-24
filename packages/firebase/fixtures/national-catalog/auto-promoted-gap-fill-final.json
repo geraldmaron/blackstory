@@ -1,0 +1,1340 @@
+[
+  {
+    "id": "gap_cane_river_creole_national_historical_park",
+    "kind": "place",
+    "displayName": "Cane River Creole National Historical Park",
+    "summary": "Established in 1994, Cane River Creole National Historical Park near Natchitoches, Louisiana preserves Oakland and Magnolia plantations\u2014among the most intact French Creole cotton plantations in the U.S.\u2014with 65 historic structures documenting over 200 years of enslaved, free, and tenant worker life.",
+    "eraBuckets": [
+      "1750s",
+      "1830s",
+      "1850s",
+      "1990s"
+    ],
+    "topicTags": [
+      "history",
+      "enslavement",
+      "land-ownership",
+      "agriculture",
+      "preservation"
+    ],
+    "topicIds": [
+      "history",
+      "enslavement",
+      "land-ownership",
+      "agriculture",
+      "preservation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Creole cotton plantations",
+      "Oakland Plantation",
+      "Magnolia Plantation",
+      "Natchitoches Parish",
+      "enslaved workers"
+    ],
+    "jurisdictionLabel": "Natchez, Louisiana",
+    "locationPrecision": "address",
+    "locationLabel": "Cane River Creole National Historical Park, 4386 Hwy 494",
+    "lat": 31.66555556,
+    "lng": -93.00277778,
+    "claims": [
+      {
+        "predicate": "established in",
+        "object": "1994",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Cane_River_Creole_National_Historical_Park",
+        "citationLabel": "Cane River Creole National Historical Park Wikipedia"
+      },
+      {
+        "predicate": "includes plantations named",
+        "object": "Oakland and Magnolia",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Cane_River_Creole_National_Historical_Park",
+        "citationLabel": "Cane River Creole National Historical Park Wikipedia"
+      },
+      {
+        "predicate": "preserves number of historic structures",
+        "object": "65",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Cane_River_Creole_National_Historical_Park",
+        "citationLabel": "Cane River Creole National Historical Park Wikipedia"
+      },
+      {
+        "predicate": "interpreted by",
+        "object": "National Park Service",
+        "confidenceLevel": "high",
+        "citationSource": "www.nps.gov",
+        "citationHref": "https://www.nps.gov/cari/index.htm",
+        "citationLabel": "NPS Cane River Creole NHP official page"
+      }
+    ],
+    "historicalContext": "The park preserves cultural landscapes where generations of Creole families and workers lived under plantation agriculture from the French colonial era through emancipation and tenant farming. It reflects how federal preservation policy documents the built environment of enslavement and post-Civil War labor systems in Louisiana."
+  },
+  {
+    "id": "gap_nasa",
+    "kind": "organization",
+    "displayName": "NASA",
+    "summary": "NASA, formed July 29, 1958 as a U.S. federal space agency headquartered in Washington, D.C., appears in 8 catalog records as employer of Black pioneers: Bluford recruited in its push, Jemison joined its astronaut corps in 1987, and it named its first Black Administrator and first Black female engineer in 1958.",
+    "eraBuckets": [
+      "1950s",
+      "1980s"
+    ],
+    "topicTags": [
+      "space",
+      "government",
+      "firsts",
+      "science",
+      "engineering"
+    ],
+    "topicIds": [
+      "space",
+      "government",
+      "firsts",
+      "science",
+      "engineering"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "NASA",
+      "space agency",
+      "Black engineers",
+      "astronaut corps",
+      "1958"
+    ],
+    "jurisdictionLabel": "Washington, D.C.",
+    "locationPrecision": "institution",
+    "locationLabel": "NASA Headquarters",
+    "lat": 38.88305556,
+    "lng": -77.01638889,
+    "claims": [
+      {
+        "predicate": "was formed on",
+        "object": "July 29, 1958",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/NASA",
+        "citationLabel": "NASA agency overview, Wikipedia"
+      },
+      {
+        "predicate": "is headquartered in",
+        "object": "Washington, D.C.",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/NASA",
+        "citationLabel": "NASA headquarters, Wikipedia"
+      },
+      {
+        "predicate": "employed as first Black female engineer in 1958",
+        "object": "a Black woman engineer (catalog-referenced)",
+        "confidenceLevel": "medium",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/NASA",
+        "citationLabel": "Catalog mention summary via Wikipedia API"
+      },
+      {
+        "predicate": "recruited",
+        "object": "Bluford as part of its push",
+        "confidenceLevel": "medium",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/NASA",
+        "citationLabel": "Catalog mention summary via Wikipedia API"
+      }
+    ],
+    "historicalContext": "NASA's 1958 founding amid the Space Race created federal scientific and engineering careers that several Black Americans entered as firsts, intersecting with broader histories of desegregated federal employment and civil rights-era access to technical institutions."
+  },
+  {
+    "id": "gap_mit",
+    "kind": "school",
+    "displayName": "MIT",
+    "summary": "MIT, chartered in 1861 in Massachusetts, is a private research university in Cambridge. In 1973 Shirley Ann Jackson became the first Black woman to earn a doctorate there, in theoretical elementary particle physics.",
+    "eraBuckets": [
+      "1860s",
+      "1970s"
+    ],
+    "topicTags": [
+      "history",
+      "higher-education",
+      "firsts",
+      "science",
+      "architecture"
+    ],
+    "topicIds": [
+      "history",
+      "higher-education",
+      "firsts",
+      "science",
+      "architecture"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "private research university",
+      "Cambridge Massachusetts",
+      "first Black woman doctorate",
+      "1861 charter",
+      "Shirley Ann Jackson"
+    ],
+    "jurisdictionLabel": "Cambridge, Massachusetts",
+    "locationPrecision": "campus",
+    "locationLabel": "Massachusetts Institute of Technology campus along the Charles River",
+    "lat": 42.3597,
+    "lng": -71.0919,
+    "claims": [
+      {
+        "predicate": "was founded as a private research university in",
+        "object": "1861 in Massachusetts",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Massachusetts_Institute_of_Technology",
+        "citationLabel": "MIT Wikipedia article"
+      },
+      {
+        "predicate": "is located in",
+        "object": "Cambridge, Massachusetts, United States",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Massachusetts_Institute_of_Technology",
+        "citationLabel": "MIT Wikipedia article"
+      },
+      {
+        "predicate": "awarded a PhD in theoretical elementary particle physics to Shirley Ann Jackson in 1973, the first Black woman to earn a doctorate from the institution",
+        "object": "Shirley Ann Jackson",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Massachusetts_Institute_of_Technology",
+        "citationLabel": "MIT Wikipedia article"
+      }
+    ],
+    "historicalContext": "MIT was founded under a Massachusetts General Court charter in 1861 to advance practical science and industrialization, later becoming a major research university. Its record as the institution where Shirley Ann Jackson earned the first doctorate by a Black woman in 1973 sits within broader histories of Black access to elite scientific education."
+  },
+  {
+    "id": "gap_u_s_supreme_court",
+    "kind": "institution",
+    "displayName": "U.S. Supreme Court",
+    "summary": "The U.S. [[gap_supreme_court|Supreme Court]], established in 1789 and seated in its D.C. building since the 1930s, is the highest federal court. Catalog records tie it to 1963 and 1967 rulings\u2014including Loving v. Virginia\u2014that shaped Black civil rights and desegregation.",
+    "eraBuckets": [
+      "1780s",
+      "1960s"
+    ],
+    "topicTags": [
+      "supreme-court",
+      "judiciary",
+      "constitutional-law",
+      "anti-miscegenation",
+      "government"
+    ],
+    "topicIds": [
+      "supreme-court",
+      "judiciary",
+      "constitutional-law",
+      "anti-miscegenation",
+      "government"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Supreme Court",
+      "Loving v. Virginia",
+      "judicial review",
+      "federal judiciary",
+      "Constitution"
+    ],
+    "jurisdictionLabel": "Washington, D.C.",
+    "locationPrecision": "address",
+    "locationLabel": "United States Supreme Court Building, 1 First Street NE",
+    "lat": 38.89055556,
+    "lng": -77.00444444,
+    "claims": [
+      {
+        "predicate": "established",
+        "object": "March 4, 1789",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Supreme_Court_of_the_United_States",
+        "citationLabel": "Supreme Court of the United States (Wikipedia)"
+      },
+      {
+        "predicate": "located at",
+        "object": "United States Supreme Court Building, 1 First Street, Northeast D.C., U.S.",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Supreme_Court_of_the_United_States",
+        "citationLabel": "Supreme Court of the United States (Wikipedia)"
+      },
+      {
+        "predicate": "issued unanimous decision in",
+        "object": "Loving v. Virginia on June 12, 1967",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Supreme_Court_of_the_United_States",
+        "citationLabel": "Catalog mention snippet (Loving v. Virginia)"
+      }
+    ],
+    "historicalContext": "As the apex of the federal judiciary, the Court interpreted the Constitution in cases that either upheld or dismantled segregation structures\u2014e.g., Loving v. Virginia (1967) struck down anti-miscegenation statutes, while earlier appointments and rulings affected legislative representation and employment discrimination."
+  },
+  {
+    "id": "gap_langley_research_center",
+    "kind": "place",
+    "displayName": "Langley Research Center",
+    "summary": "Langley Research Center in Hampton, Virginia, opened in 1917 as NACA's first aeronautics lab. From 1943\u20131958, African American women known as the West Area Computers worked there as human computers, segregated under Virginia's Jim Crow laws from white staff in the East section.",
+    "eraBuckets": [
+      "1910s",
+      "1940s",
+      "1950s"
+    ],
+    "topicTags": [
+      "history",
+      "science",
+      "space",
+      "segregation",
+      "jim-crow"
+    ],
+    "topicIds": [
+      "history",
+      "science",
+      "space",
+      "segregation",
+      "jim-crow"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "West Area Computers",
+      "Jim Crow",
+      "Hampton Virginia",
+      "NACA",
+      "human computers"
+    ],
+    "jurisdictionLabel": "Hampton, Virginia",
+    "locationPrecision": "institution",
+    "locationLabel": "NASA Langley Research Center headquarters",
+    "lat": 37.0925,
+    "lng": -76.3825,
+    "claims": [
+      {
+        "predicate": "established as NACA's first aeronautics laboratory in",
+        "object": "1917 at Hampton, Virginia",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Langley_Research_Center",
+        "citationLabel": "Langley Research Center overview"
+      },
+      {
+        "predicate": "employed African American female mathematicians known as West Area Computers from",
+        "object": "1943 through 1958",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Langley_Research_Center",
+        "citationLabel": "West Area Computers section"
+      },
+      {
+        "predicate": "subjected West Area Computers to Virginia's Jim Crow laws with separate West/East work sections",
+        "object": "racial segregation at the facility",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Langley_Research_Center",
+        "citationLabel": "West Area Computers segregation note"
+      }
+    ],
+    "historicalContext": "Langley's West Area Computing unit operated within Virginia's Jim Crow system, which mandated racial segregation in workplaces and public life. The unit's existence shows how federal installations mirrored state segregation statutes until NACA/NASA desegregated in the late 1950s."
+  },
+  {
+    "id": "gap_university_of_chicago",
+    "kind": "school",
+    "displayName": "University of Chicago",
+    "summary": "The University of Chicago, a private research university in Hyde Park, Chicago, was founded in 1890. By 1907 it had awarded a PhD to the first African American graduate of the institution, and by 1916 another earned a zoology PhD there.",
+    "eraBuckets": [
+      "1900s",
+      "1910s"
+    ],
+    "topicTags": [
+      "higher-education",
+      "history",
+      "firsts",
+      "education"
+    ],
+    "topicIds": [
+      "higher-education",
+      "history",
+      "firsts",
+      "education"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "University of Chicago",
+      "African American PhD",
+      "Hyde Park",
+      "1907 doctorate",
+      "zoology 1916"
+    ],
+    "jurisdictionLabel": "Chicago, Illinois",
+    "locationPrecision": "campus",
+    "locationLabel": "University of Chicago Hyde Park campus",
+    "lat": 41.78972222,
+    "lng": -87.59972222,
+    "claims": [
+      {
+        "predicate": "was founded in",
+        "object": "1890",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/University_of_Chicago",
+        "citationLabel": "University of Chicago Wikipedia"
+      },
+      {
+        "predicate": "awarded first African American PhD to",
+        "object": "a graduate in 1907",
+        "confidenceLevel": "medium",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/University_of_Chicago",
+        "citationLabel": "University of Chicago Wikipedia"
+      },
+      {
+        "predicate": "awarded zoology PhD to",
+        "object": "an African American scholar in 1916",
+        "confidenceLevel": "medium",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/University_of_Chicago",
+        "citationLabel": "University of Chicago Wikipedia"
+      }
+    ],
+    "historicalContext": "As a major research university founded with Rockefeller funds in 1890, the University of Chicago admitted and credentialed Black scholars in the early 1900s, a period when few white institutions granted doctoral degrees to African Americans amid prevailing segregation."
+  },
+  {
+    "id": "gap_catholic_university_of_america",
+    "kind": "institution",
+    "displayName": "Catholic University of America",
+    "summary": "The Catholic University of America, a private Catholic research university in Washington, D.C. founded in 1887, awarded Euphemia Lofton Haynes her PhD in mathematics in 1943 \u2014 the first mathematics doctorate earned by an African American woman.",
+    "eraBuckets": [
+      "1940s",
+      "1880s"
+    ],
+    "topicTags": [
+      "higher-education",
+      "firsts",
+      "women",
+      "history"
+    ],
+    "topicIds": [
+      "higher-education",
+      "firsts",
+      "women",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Euphemia Lofton Haynes",
+      "mathematics PhD",
+      "1943",
+      "Catholic university",
+      "African American woman first"
+    ],
+    "jurisdictionLabel": "Washington, D.C.",
+    "locationPrecision": "campus",
+    "locationLabel": "Catholic University of America main campus, adjacent to Brookland neighborhood",
+    "lat": 38.93361111,
+    "lng": -76.99861111,
+    "claims": [
+      {
+        "predicate": "awarded PhD in mathematics to",
+        "object": "Euphemia Lofton Haynes in 1943",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Catholic_University_of_America",
+        "citationLabel": "Catholic University of America Wikipedia"
+      },
+      {
+        "predicate": "was established in",
+        "object": "1887 in Washington, D.C.",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Catholic_University_of_America",
+        "citationLabel": "Catholic University of America Wikipedia"
+      }
+    ],
+    "historicalContext": "As a federally chartered Catholic institution in the nation's capital, CUA became an unlikely site of Black academic firsts during the Jim Crow era, when most white universities barred African American graduate students. Its 1943 doctorate to Haynes reflects narrow pathways to advanced study for Black women in segregated America."
+  },
+  {
+    "id": "gap_university_of_michigan",
+    "kind": "other",
+    "displayName": "University of Michigan",
+    "summary": "The University of Michigan, a public research university in Ann Arbor founded in 1817, awarded Marjorie Lee Browne her mathematics doctorate in 1949. Browne was among the first Black women to earn a PhD in mathematics in the U.S.",
+    "eraBuckets": [
+      "1940s"
+    ],
+    "topicTags": [
+      "higher-education",
+      "hbcu",
+      "firsts",
+      "women",
+      "mathematics"
+    ],
+    "topicIds": [
+      "higher-education",
+      "hbcu",
+      "firsts",
+      "women",
+      "mathematics"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Marjorie Lee Browne",
+      "mathematics doctorate",
+      "1949",
+      "Ann Arbor",
+      "public university"
+    ],
+    "jurisdictionLabel": "Ann Arbor, Michigan",
+    "locationPrecision": "campus",
+    "locationLabel": "University of Michigan main campus",
+    "lat": 42.27694444,
+    "lng": -83.73805556,
+    "claims": [
+      {
+        "predicate": "awarded mathematics doctorate to",
+        "object": "Marjorie Lee Browne in 1949",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/University_of_Michigan",
+        "citationLabel": "University of Michigan Wikipedia"
+      },
+      {
+        "predicate": "is a public research university established in",
+        "object": "1817 in Ann Arbor, Michigan",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/University_of_Michigan",
+        "citationLabel": "University of Michigan Wikipedia"
+      }
+    ],
+    "historicalContext": "As a major public research university, Michigan was among the institutions that, by the mid-20th century, admitted Black scholars into doctoral programs. Browne's 1949 doctorate reflects uneven but real access to higher education for Black women before widespread civil-rights-era desegregation reforms."
+  },
+  {
+    "id": "gap_national_inventors_hall_of_fame",
+    "kind": "institution",
+    "displayName": "National Inventors Hall of Fame",
+    "summary": "The National Inventors Hall of Fame (NIHF), founded in 1973, is a not-for-profit honoring US patent holders. Catalog records show Black inventors inducted across years\u2014including two Black women in 2022\u2014linking the site to Black scientific recognition.",
+    "eraBuckets": [
+      "1970s",
+      "1990s",
+      "2000s",
+      "2010s",
+      "2020s"
+    ],
+    "topicTags": [
+      "invention",
+      "firsts",
+      "science",
+      "technology",
+      "history"
+    ],
+    "topicIds": [
+      "invention",
+      "firsts",
+      "science",
+      "technology",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "National Inventors Hall of Fame",
+      "Black inventors",
+      "patent induction",
+      "Alexandria museum",
+      "US patent"
+    ],
+    "jurisdictionLabel": "Alexandria, Virginia",
+    "locationPrecision": "address",
+    "locationLabel": "National Inventors Hall of Fame museum at U.S. Patent and Trademark Office, 600 Dulany Street",
+    "lat": 38.8014,
+    "lng": -77.064,
+    "claims": [
+      {
+        "predicate": "founded in",
+        "object": "1973",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/National_Inventors_Hall_of_Fame",
+        "citationLabel": "National Inventors Hall of Fame Wikipedia"
+      },
+      {
+        "predicate": "headquarters location",
+        "object": "3701 Highland Park N.W. North Canton, Ohio 44720",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/National_Inventors_Hall_of_Fame",
+        "citationLabel": "National Inventors Hall of Fame Wikipedia"
+      },
+      {
+        "predicate": "operates museum at",
+        "object": "600 Dulany Street, Alexandria, Virginia in U.S. Patent and Trademark Office building",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/National_Inventors_Hall_of_Fame",
+        "citationLabel": "National Inventors Hall of Fame Wikipedia"
+      },
+      {
+        "predicate": "inducted Black inventors in years including",
+        "object": "1999, 2003, 2007, 2014, 2018, 2022",
+        "confidenceLevel": "medium",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/National_Inventors_Hall_of_Fame",
+        "citationLabel": "Catalog snippet aggregation via Wikipedia"
+      }
+    ],
+    "historicalContext": "NIHF reflects structural patterns of invention recognition in the US patent system. Its inductions of Black inventors\u2014often decades posthumously\u2014highlight uneven historical acknowledgment of Black contributions to science and technology."
+  },
+  {
+    "id": "gap_march_on_washington",
+    "kind": "event",
+    "displayName": "March on Washington",
+    "summary": "The March on Washington for Jobs and Freedom drew ~250,000 to Washington, D.C., on Aug. 28, 1963. Organized by Bayard Rustin and A. Philip Randolph, it advocated civil and economic rights and featured King's 'I Have a Dream' speech at the Lincoln Memorial.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "movement",
+      "labor",
+      "voting-rights"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "movement",
+      "labor",
+      "voting-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "March on Washington",
+      "Jobs and Freedom",
+      "Bayard Rustin",
+      "A. Philip Randolph",
+      "I Have a Dream"
+    ],
+    "jurisdictionLabel": "Washington, D.C.",
+    "locationPrecision": "site",
+    "locationLabel": "Lincoln Memorial, site of the 1963 march's main program",
+    "lat": 38.88916667,
+    "lng": -77.05,
+    "claims": [
+      {
+        "predicate": "held in",
+        "object": "Washington, D.C. on August 28, 1963",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/March_on_Washington",
+        "citationLabel": "March on Washington Wikipedia"
+      },
+      {
+        "predicate": "organized by",
+        "object": "Bayard Rustin and A. Philip Randolph",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/March_on_Washington",
+        "citationLabel": "March on Washington Wikipedia"
+      },
+      {
+        "predicate": "featured speech",
+        "object": "Martin Luther King Jr.'s 'I Have a Dream' at Lincoln Memorial",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/March_on_Washington",
+        "citationLabel": "March on Washington Wikipedia"
+      },
+      {
+        "predicate": "advocated for",
+        "object": "civil and economic rights of African Americans",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/March_on_Washington",
+        "citationLabel": "March on Washington Wikipedia"
+      }
+    ],
+    "historicalContext": "The march emerged from the Jim Crow system that disenfranchised Black Americans after Reconstruction and built on earlier 1940s march efforts. It helped generate momentum for the Civil Rights Act of 1964 and the Voting Rights Act of 1965."
+  },
+  {
+    "id": "gap_troy_university",
+    "kind": "school",
+    "displayName": "Troy University",
+    "summary": "Troy University, founded in 1887 as a normal school in Alabama, evolved into a public university with multiple campuses and a focus on education and innovation. It is known for its Rosa Parks Museum and its role in training teachers.",
+    "eraBuckets": [
+      "1910s",
+      "2000s"
+    ],
+    "topicTags": [
+      "education",
+      "civil-rights",
+      "history",
+      "museum"
+    ],
+    "topicIds": [
+      "education",
+      "civil-rights",
+      "history",
+      "museum"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Troy University",
+      "Rosa Parks Museum",
+      "normal school",
+      "merger",
+      "public university"
+    ],
+    "jurisdictionLabel": "Troy, Alabama",
+    "locationPrecision": "city",
+    "locationLabel": "Troy University Main Campus",
+    "lat": 31.79805556,
+    "lng": -85.95388889,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "1887",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Troy_University",
+        "citationLabel": "Troy University Wikipedia"
+      },
+      {
+        "predicate": "merged",
+        "object": "2005",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Troy_University",
+        "citationLabel": "Troy University Wikipedia"
+      },
+      {
+        "predicate": "location",
+        "object": "Troy, Alabama",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Troy_University",
+        "citationLabel": "Troy University Wikipedia"
+      },
+      {
+        "predicate": "has_museum",
+        "object": "Rosa Parks Museum",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Troy_University",
+        "citationLabel": "Troy University Wikipedia"
+      },
+      {
+        "predicate": "type",
+        "object": "public university",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Troy_University",
+        "citationLabel": "Troy University Wikipedia"
+      }
+    ],
+    "historicalContext": "Troy University's founding in 1887 as a normal school reflects the 19th-century trend of state-funded institutions to train teachers for expanding public education. Its 2005 merger with other Troy State campuses marked a significant expansion, and its Rosa Parks Museum highlights its role in civil rights history."
+  },
+  {
+    "id": "gap_california_state_assembly",
+    "kind": "institution",
+    "displayName": "California State Assembly",
+    "summary": "The California State Assembly is the lower house of the California State Legislature, convening at the California State Capitol in Sacramento. It has 80 members representing districts with over 490,000 residents each, and operates under a nonpartisan blanket primary system.",
+    "eraBuckets": [
+      "1980s",
+      "2000s",
+      "2010s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "government",
+      "law"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "government",
+      "law"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "California State Assembly",
+      "legislature",
+      "Sacramento",
+      "nonpartisan",
+      "primary system"
+    ],
+    "jurisdictionLabel": "Sacramento, California",
+    "locationPrecision": "site",
+    "locationLabel": "California State Capitol",
+    "lat": 38.57638889,
+    "lng": -121.49333333,
+    "claims": [
+      {
+        "predicate": "is",
+        "object": "the lower house of the California State Legislature",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/California_State_Assembly",
+        "citationLabel": "California State Assembly Wikipedia"
+      },
+      {
+        "predicate": "convenes",
+        "object": "at the California State Capitol in Sacramento",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/California_State_Assembly",
+        "citationLabel": "California State Assembly Wikipedia"
+      },
+      {
+        "predicate": "has",
+        "object": "80 members representing districts with over 490,000 residents each",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/California_State_Assembly",
+        "citationLabel": "California State Assembly Wikipedia"
+      },
+      {
+        "predicate": "operates under",
+        "object": "a nonpartisan blanket primary system",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/California_State_Assembly",
+        "citationLabel": "California State Assembly Wikipedia"
+      }
+    ],
+    "historicalContext": "The California State Assembly is a key institution in the state's legislative process, responsible for drafting and passing laws. It has historically been a site of political and social change, particularly in the context of civil rights and legislative representation for marginalized communities."
+  },
+  {
+    "id": "gap_west_point",
+    "kind": "school",
+    "displayName": "West Point",
+    "summary": "West Point, established in 1802, is a U.S. military academy located in New York, known for its rigorous academic and military training. It has produced notable alumni, including U.S. presidents and military leaders.",
+    "eraBuckets": [
+      "1800s",
+      "1900s"
+    ],
+    "topicTags": [
+      "military",
+      "education",
+      "history",
+      "civil-war",
+      "civil-rights"
+    ],
+    "topicIds": [
+      "military",
+      "education",
+      "history",
+      "civil-war",
+      "civil-rights"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "West Point",
+      "military academy",
+      "U.S. Army",
+      "education",
+      "alumni"
+    ],
+    "jurisdictionLabel": "West Point, New York",
+    "locationPrecision": "institution",
+    "locationLabel": "United States Military Academy",
+    "lat": 41.3925,
+    "lng": -73.9575,
+    "claims": [
+      {
+        "predicate": "established",
+        "object": "1802",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/United_States_Military_Academy",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "location",
+        "object": "West Point, New York",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/United_States_Military_Academy",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "type",
+        "object": "U.S. Service Academy",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/United_States_Military_Academy",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "alumni",
+        "object": "U.S. presidents Dwight D. Eisenhower and Ulysses S. Grant",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/United_States_Military_Academy",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "academic_program",
+        "object": "Bachelor of Science degree",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/United_States_Military_Academy",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "West Point is a significant institution in U.S. military and educational history, reflecting the nation's development of military leadership and engineering education. Its establishment in 1802 and its role in training officers for the Army highlight its importance in shaping military and national leadership."
+  },
+  {
+    "id": "gap_supreme_court",
+    "kind": "institution",
+    "displayName": "Supreme Court",
+    "summary": "The Supreme Court has played a pivotal role in shaping civil rights and constitutional law in the United States, including landmark decisions on segregation, voting rights, and racial equality.",
+    "eraBuckets": [
+      "1800s",
+      "1900s",
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "constitutional-law",
+      "segregation",
+      "equal-protection",
+      "supreme-court"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "constitutional-law",
+      "segregation",
+      "equal-protection",
+      "supreme-court"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Supreme Court",
+      "civil rights",
+      "segregation",
+      "equal protection",
+      "landmark cases"
+    ],
+    "jurisdictionLabel": "Washington, D.C.",
+    "locationPrecision": "institution",
+    "locationLabel": "United States Supreme Court Building",
+    "lat": 38.89055556,
+    "lng": -77.00444444,
+    "claims": [
+      {
+        "predicate": "ruled",
+        "object": "Plessy v. Ferguson",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Supreme_Court_of_the_United_States",
+        "citationLabel": "Supreme Court of the United States"
+      },
+      {
+        "predicate": "struck down",
+        "object": "private racially restrictive covenants",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Supreme_Court_of_the_United_States",
+        "citationLabel": "Supreme Court of the United_States"
+      },
+      {
+        "predicate": "upheld",
+        "object": "racially restrictive covenant",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Supreme_Court_of_the_United_States",
+        "citationLabel": "Supreme Court of the United_States"
+      },
+      {
+        "predicate": "barred",
+        "object": "lower court's plan to bus students across Detroit's city-suburb school district lines",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Supreme_Court_of_the_United_States",
+        "citationLabel": "Supreme Court of the United_States"
+      },
+      {
+        "predicate": "ruled",
+        "object": "race-conscious college admissions programs at Harvard and the University of North Carolina violate the Equal Protection Clause",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Supreme_Court_of_the_United_States",
+        "citationLabel": "Supreme Court of the United_States"
+      }
+    ],
+    "historicalContext": "The Supreme Court's rulings on segregation, voting rights, and racial equality have had profound impacts on American society, reflecting the broader struggles for civil rights and the evolution of constitutional interpretation."
+  },
+  {
+    "id": "gap_colfax_massacre",
+    "kind": "event",
+    "displayName": "Colfax Massacre",
+    "summary": "The 1873 Colfax Massacre, occurring on April 13 in Colfax, Louisiana, was a violent confrontation between armed white militia and Black freedmen and state militia occupying the Grant Parish courthouse following a disputed election. The event resulted in numerous deaths and marked a significant instance of racial violence during Reconstruction.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "reconstruction",
+      "segregation",
+      "jim-crow"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "reconstruction",
+      "segregation",
+      "jim-crow"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Colfax Massacre",
+      "Reconstruction",
+      "Black freedmen",
+      "violence",
+      "Ku Klux Klan"
+    ],
+    "jurisdictionLabel": "Colfax, Louisiana",
+    "locationPrecision": "site",
+    "locationLabel": "Grant Parish courthouse",
+    "lat": 31.51691,
+    "lng": -92.71175,
+    "claims": [
+      {
+        "predicate": "occurred",
+        "object": "April 13, 1873",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Colfax_massacre",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "location",
+        "object": "Colfax, Louisiana",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Colfax_massacre",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "casualties",
+        "object": "Between 62 and 153 Black men killed",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Colfax_massacre",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "context",
+        "object": "Reconstruction era",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Colfax_massacre",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "legal_impact",
+        "object": "United States v. Cruikshank (1876)",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Colfax_massacre",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The Colfax Massacre is a pivotal event in the Reconstruction era, reflecting the intense racial tensions and political conflicts in Louisiana following the Civil War. It underscores the use of violence to suppress Black political participation and the broader struggle over civil rights and governance."
+  },
+  {
+    "id": "gap_national_baseball_hall_of_fame",
+    "kind": "institution",
+    "displayName": "National Baseball Hall of Fame",
+    "summary": "The National Baseball Hall of Fame, established in 1939 in Cooperstown, New York, honors baseball's history and excellence through artifacts, exhibits, and educational programs. It serves as a central repository for the sport's legacy.",
+    "eraBuckets": [
+      "1930s",
+      "2000s"
+    ],
+    "topicTags": [
+      "sports",
+      "history",
+      "baseball"
+    ],
+    "topicIds": [
+      "sports",
+      "history",
+      "baseball"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "baseball",
+      "hall of fame",
+      "Cooperstown",
+      "history",
+      "museum"
+    ],
+    "jurisdictionLabel": "Cooperstown, New York",
+    "locationPrecision": "institution",
+    "locationLabel": "National Baseball Hall of Fame and Museum",
+    "lat": 42.7,
+    "lng": -74.92333333,
+    "claims": [
+      {
+        "predicate": "established",
+        "object": "1939",
+        "confidenceLevel": "high",
+        "citationSource": "govinfo.gov",
+        "citationHref": "https://www.govinfo.gov/link/plaw/112/public/152?link-type=html",
+        "citationLabel": "Public Law 112-152"
+      },
+      {
+        "predicate": "location",
+        "object": "Cooperstown, New York",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/National_Baseball_Hall_of_Fame_and_Museum",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "role",
+        "object": "central repository for baseball history",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/National_Baseball_Hall_of_Fame_and_Museum",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "motto",
+        "object": "Preserving History, Honoring Excellence, Connecting Generations",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/National_Baseball_Hall_of_Fame_and_Museum",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "induction_criteria",
+        "object": "election by Baseball Writers' Association of America or Veterans Committee",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/National_Baseball_Hall_of_Fame_and_Museum",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The National Baseball Hall of Fame was founded in 1939 by Stephen Carlton Clark to promote tourism in Cooperstown during the Great Depression. It has since become a key institution for preserving baseball history and recognizing its cultural impact, including the induction of notable players and pioneers."
+  },
+  {
+    "id": "gap_naismith_memorial_basketball_hall_of_fame",
+    "kind": "institution",
+    "displayName": "Naismith Memorial Basketball Hall of Fame",
+    "summary": "The Naismith Memorial Basketball Hall of Fame, established in 1959, is a sports museum and hall of fame in Springfield, Massachusetts, dedicated to preserving basketball history and honoring its pioneers.",
+    "eraBuckets": [
+      "1950s",
+      "1960s",
+      "1980s",
+      "2000s"
+    ],
+    "topicTags": [
+      "sports",
+      "history",
+      "basketball",
+      "hall-of-fame"
+    ],
+    "topicIds": [
+      "sports",
+      "history",
+      "basketball",
+      "hall-of-fame"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "basketball",
+      "hall of fame",
+      "James Naismith",
+      "Springfield",
+      "sports history"
+    ],
+    "jurisdictionLabel": "Springfield, Massachusetts",
+    "locationPrecision": "institution",
+    "locationLabel": "Naismith Memorial Basketball Hall of Fame",
+    "lat": 42.09375,
+    "lng": -72.58472222,
+    "claims": [
+      {
+        "predicate": "established",
+        "object": "1959",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Naismith_Basketball_Hall_of_Fame",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "location",
+        "object": "Springfield, Massachusetts, U.S.",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Naismith_Basketball_Hall_of_Fame",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "type",
+        "object": "Sports hall of fame",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Naismith_Basketball_Hall_of_Fame",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "dedicated_to",
+        "object": "James Naismith",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Naismith_Basketball_Hall_of_Fame",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "first_induction",
+        "object": "1959",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Naismith_Basketball_Hall_of_Fame",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The Hall of Fame was founded to commemorate James Naismith, the inventor of basketball, and has played a key role in promoting the sport's history and recognizing its most influential figures. It reflects the evolution of basketball as a global sport and its cultural significance."
+  },
+  {
+    "id": "gap_pro_football_hall_of_fame",
+    "kind": "institution",
+    "displayName": "Pro Football Hall of Fame",
+    "summary": "The Pro Football Hall of Fame, established in 1963 in Canton, Ohio, honors exceptional figures in professional football, including players, coaches, and officials. It is a key institution in American sports history.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "sports",
+      "history",
+      "football"
+    ],
+    "topicIds": [
+      "sports",
+      "history",
+      "football"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Pro Football Hall of Fame",
+      "Canton",
+      "NFL",
+      "sports history",
+      "hall of fame"
+    ],
+    "jurisdictionLabel": "Canton, Ohio",
+    "locationPrecision": "institution",
+    "locationLabel": "Pro Football Hall of Fame",
+    "lat": 40.82111111,
+    "lng": -81.39777778,
+    "claims": [
+      {
+        "predicate": "established",
+        "object": "1963",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Pro_Football_Hall_of_Fame",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "location",
+        "object": "Canton, Ohio",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Pro_Football_Hall_of_Fame",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "type",
+        "object": "Professional sports hall of fame",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Pro_Football_Hall_of_Fame",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "inductees",
+        "object": "387 members as of 2026",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Pro_Football_Hall_of_Fame",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "affiliation",
+        "object": "No official affiliation with the NFL",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Pro_Football_Hall_of_Fame",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The Pro Football Hall of Fame was founded in 1963 in Canton, Ohio, a city with deep ties to the NFL's origins. Its establishment was driven by local efforts to commemorate the NFL's founding and the city's historical role in professional football. The Hall of Fame has since become a central institution for recognizing achievements in the sport."
+  },
+  {
+    "id": "gap_metropolitan_opera",
+    "kind": "institution",
+    "displayName": "Metropolitan Opera",
+    "summary": "The Metropolitan Opera, founded in 1883, is an American opera company based in New York City. It is known for its grand productions and has been a significant cultural institution in the United States.",
+    "eraBuckets": [
+      "1910s",
+      "1960s"
+    ],
+    "topicTags": [
+      "culture",
+      "history",
+      "arts"
+    ],
+    "topicIds": [
+      "culture",
+      "history",
+      "arts"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "opera",
+      "New York",
+      "Metropolitan Opera",
+      "Lincoln Center",
+      "1955"
+    ],
+    "jurisdictionLabel": "New York, NY",
+    "locationPrecision": "institution",
+    "locationLabel": "Metropolitan Opera House at Lincoln Center",
+    "lat": 40.77277778,
+    "lng": -73.98416667,
+    "claims": [
+      {
+        "predicate": "founded",
+        "object": "1883",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Metropolitan_Opera",
+        "citationLabel": "Metropolitan Opera Wikipedia"
+      },
+      {
+        "predicate": "location",
+        "object": "New York City",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Metropolitan_Opera",
+        "citationLabel": "Metropolitan Opera Wikipedia"
+      },
+      {
+        "predicate": "current_residence",
+        "object": "Lincoln Center",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Metropolitan_Opera",
+        "citationLabel": "Metropolitan Opera Wikipedia"
+      },
+      {
+        "predicate": "notable_event",
+        "object": "first Black artist to sing a leading role",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Metropolitan_Opera",
+        "citationLabel": "Metropolitan Opera Wikipedia"
+      }
+    ],
+    "historicalContext": "The Metropolitan Opera was established as an alternative to the Academy of Music opera house, reflecting the social and economic dynamics of New York's elite. Its founding was influenced by the exclusion of newly wealthy industrialists from traditional social circles, leading to the creation of a new opera house that would showcase their status."
+  }
+]

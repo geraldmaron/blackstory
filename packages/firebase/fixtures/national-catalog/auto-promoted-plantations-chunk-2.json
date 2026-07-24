@@ -1,0 +1,1520 @@
+[
+  {
+    "id": "plantation_cypress_grove_plantation_q18711552",
+    "kind": "place",
+    "displayName": "Cypress Grove Plantation",
+    "summary": "Cypress Grove Plantation, owned by President Zachary Taylor near Rodney, Mississippi, spanned 1,923 acres and held 81 enslaved African Americans who labored in cotton production, built levees, and maintained the estate. Taylor managed it until his presidency, and it later became known as Buena Vista Plantation. Most of the land has since eroded into the Mississippi River.",
+    "eraBuckets": [
+      "1840s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "land-ownership",
+      "history"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "land-ownership",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Cypress Grove Plantation",
+      "Zachary Taylor",
+      "enslaved labor",
+      "Mississippi River",
+      "cotton plantation"
+    ],
+    "jurisdictionLabel": "Rodney, Mississippi",
+    "locationPrecision": "site",
+    "locationLabel": "near Rodney along the Mississippi River",
+    "lat": 31.77508,
+    "lng": -91.288021,
+    "claims": [
+      {
+        "predicate": "was owned by",
+        "object": "Zachary Taylor",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Cypress_Grove_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "held",
+        "object": "81 enslaved African or African Americans",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Cypress_Grove_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was located near",
+        "object": "Rodney, Mississippi",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Cypress_Grove_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "produced",
+        "object": "cotton, tobacco, corn, and wheat",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Cypress_Grove_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was renamed",
+        "object": "Buena Vista Plantation after Taylor's 1847 victory",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Cypress_Grove_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "encompassed",
+        "object": "1,923 acres",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Cypress_Grove_Plantation",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Cypress Grove Plantation was part of the antebellum Mississippi River plantation economy that relied on enslaved labor to produce cash crops like cotton. Its operation reflects the broader system of enslavement that underpinned Southern agriculture and enriched political elites, including U.S. presidents."
+  },
+  {
+    "id": "plantation_forestdale_plantation_q24063799",
+    "kind": "place",
+    "displayName": "Forestdale Plantation",
+    "summary": "Forestdale Plantation, built between 1855 and 1857 near Pachuta, Mississippi, was constructed by enslaved laborers for the McGowan brothers. The site reflects the antebellum plantation economy rooted in forced labor and is listed on the National Register of Historic Places as part of the Clarke County Antebellum Houses TR.",
+    "eraBuckets": [
+      "1850s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "architecture",
+      "history"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "architecture",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "plantation",
+      "enslaved labor",
+      "McGowan brothers",
+      "Greek Revival",
+      "National Register of Historic Places"
+    ],
+    "jurisdictionLabel": "Pachuta, Mississippi",
+    "locationPrecision": "site",
+    "locationLabel": "Historic plantation site near Pachuta",
+    "lat": 32.01194444,
+    "lng": -88.82027778,
+    "claims": [
+      {
+        "predicate": "was built between 1855 and 1857",
+        "object": "1855–1857",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Forestdale_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was constructed using forced labor of enslaved people",
+        "object": "enslaved labor",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Forestdale_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was built for Hamilton, Elbert, and Robert McGowan",
+        "object": "McGowan brothers",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Forestdale_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is listed on the National Register of Historic Places",
+        "object": "NRHP reference No. 80002229",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Forestdale_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is part of the Clarke County Antebellum Houses TR",
+        "object": "Clarke County Antebellum Houses TR",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Forestdale_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is located in Pachuta, Mississippi",
+        "object": "Pachuta, Mississippi",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Forestdale_Plantation",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Plantations like Forestdale were central to the agricultural economy of the antebellum South, relying on the systematic enslavement of African Americans. Their preservation offers insight into the spatial and social structures of enslavement, particularly in rural Mississippi where such sites are tied to broader patterns of land ownership and racial hierarchy."
+  },
+  {
+    "id": "plantation_homewood_plantation_q22060083",
+    "kind": "place",
+    "displayName": "Homewood Plantation",
+    "summary": "Homewood Plantation, established in 1855 near Natchez, Mississippi, was a Greek Revival estate built as a wedding gift for Catherine Hunt and William S. Balfour. Though used as a hunting estate, it was economically supported by Fairland Plantation, where William S. Balfour held 177 enslaved people in 1860. The site reflects the interwoven wealth and landholding networks of elite Mississippi…",
+    "eraBuckets": [
+      "1850s",
+      "1860s",
+      "1930s",
+      "1940s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "land-ownership",
+      "economic-justice"
+    ],
+    "topicIds": [
+      "enslavement",
+      "land-ownership",
+      "economic-justice"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Homewood Plantation",
+      "Natchez Mississippi",
+      "William S. Balfour",
+      "Catherine Hunt",
+      "enslaved labor"
+    ],
+    "jurisdictionLabel": "Natchez, Mississippi",
+    "locationPrecision": "site",
+    "locationLabel": "north of Natchez on M.L. King, Jr. Road",
+    "lat": 31.576563,
+    "lng": -91.37027,
+    "claims": [
+      {
+        "predicate": "was established as a wedding gift in 1855",
+        "object": "Homewood Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Homewood_Plantation_(Natchez%2C_Mississippi)",
+        "citationLabel": "Wikipedia - Homewood Plantation"
+      },
+      {
+        "predicate": "was owned by William S. Balfour who held 177 enslaved people in 1860",
+        "object": "Fairland Plantation in Issaquena County, Mississippi",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Homewood_Plantation_(Natchez%2C_Mississippi)",
+        "citationLabel": "Wikipedia - Homewood Plantation"
+      },
+      {
+        "predicate": "was built with wealth derived from enslaved labor",
+        "object": "Homewood Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Homewood_Plantation_(Natchez%2C_Mississippi)",
+        "citationLabel": "Wikipedia - Homewood Plantation"
+      },
+      {
+        "predicate": "was located north of Natchez on M.L. King, Jr. Road",
+        "object": "Homewood Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Homewood_Plantation_(Natchez%2C_Mississippi)",
+        "citationLabel": "Wikipedia - Homewood Plantation"
+      },
+      {
+        "predicate": "was used as a setting in Stark Young's 1934 novel So Red the Rose",
+        "object": "Homewood Plantation",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Homewood_Plantation_(Natchez%2C_Mississippi)",
+        "citationLabel": "Wikipedia - Homewood Plantation"
+      },
+      {
+        "predicate": "burnt down in 1940",
+        "object": "Homewood Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Homewood_Plantation_(Natchez%2C_Mississippi)",
+        "citationLabel": "Wikipedia - Homewood Plantation"
+      }
+    ],
+    "historicalContext": "Homewood exemplifies how elite antebellum Southern families consolidated wealth through intermarriage, land inheritance, and the forced labor of enslaved Africans. Its existence as a non-productive estate—funded by profits from cotton plantations worked by enslaved labor—illustrates the economic structures of the plantation complex and the concentration of power among a small planter aristocracy in Mississippi, a state central to the expansion of slavery in the 19th century."
+  },
+  {
+    "id": "plantation_avirett_stephens_plantation_q19460327",
+    "kind": "place",
+    "displayName": "Avirett–Stephens Plantation",
+    "summary": "Avirett–Stephens Plantation, established in 1851 near Richlands, North Carolina, was a slaveholding estate during the antebellum period. The property includes a Greek Revival plantation house, an antebellum cistern, and a family cemetery, and was listed on the National Register of Historic Places in 1991 as part of the Onslow County MPS. It stands as a physical remnant of the plantation system…",
+    "eraBuckets": [
+      "1850s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "segregation",
+      "history",
+      "black-codes"
+    ],
+    "topicIds": [
+      "enslavement",
+      "segregation",
+      "history",
+      "black-codes"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "plantation",
+      "enslavement",
+      "Greek Revival",
+      "Onslow County",
+      "National Register of Historic Places"
+    ],
+    "jurisdictionLabel": "Richlands, North Carolina",
+    "locationPrecision": "site",
+    "locationLabel": "US 258/24 .25 miles N of NC 1227",
+    "lat": 34.85111111,
+    "lng": -77.53527778,
+    "claims": [
+      {
+        "predicate": "was built",
+        "object": "1851",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Avirett%E2%80%93Stephens_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is a historic slave plantation complex",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Avirett%E2%80%93Stephens_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is located in",
+        "object": "Onslow County, North Carolina",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Avirett%E2%80%93Stephens_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was listed on the National Register of Historic Places",
+        "object": "April 18, 1991",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Avirett%E2%80%93Stephens_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "includes contributing resources from the antebellum period",
+        "object": "antebellum cistern, family cemetery",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Avirett%E2%80%93Stephens_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is associated with the history of enslavement",
+        "object": "enslaved African Americans",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Avirett%E2%80%93Stephens_Plantation",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Plantations like Avirett–Stephens were foundational to the economic and social structure of the antebellum South, relying on the forced labor of enslaved Black people. Their preservation as historic sites allows for critical engagement with the legacy of slavery, even when individual narratives of the enslaved are underdocumented."
+  },
+  {
+    "id": "plantation_humphrey_williams_plantation_q5941268",
+    "kind": "place",
+    "displayName": "Humphrey-Williams Plantation",
+    "summary": "The Humphrey-Williams Plantation near Lumberton, North Carolina, established by 1846, was built and operated using the forced labor of enslaved people. This 566.6-acre complex includes the main Greek Revival farmhouse and several outbuildings, reflecting the agricultural and social structure of antebellum Robeson County. Listed on the National Register of Historic Places in 1973 and expanded in…",
+    "eraBuckets": [
+      "1840s",
+      "1970s",
+      "1980s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "architecture",
+      "agriculture",
+      "history",
+      "segregation"
+    ],
+    "topicIds": [
+      "enslavement",
+      "architecture",
+      "agriculture",
+      "history",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "enslaved labor",
+      "Greek Revival",
+      "plantation complex",
+      "National Register of Historic Places",
+      "Robeson County"
+    ],
+    "jurisdictionLabel": "Lumberton, North Carolina",
+    "locationPrecision": "site",
+    "locationLabel": "West of Lumberton on NC 211, between SR 1001 and SR 1769",
+    "lat": 34.70222222,
+    "lng": -79.06138889,
+    "claims": [
+      {
+        "predicate": "was built using forced labor of enslaved people",
+        "object": "Humphrey-Williams House",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Humphrey%E2%80%93Williams_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is listed on the National Register of Historic Places",
+        "object": "Humphrey-Williams Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/73001367",
+        "citationLabel": "National Park Service"
+      },
+      {
+        "predicate": "features a vernacular Greek Revival style farmhouse constructed c. 1846",
+        "object": "main house of Humphrey-Williams Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Humphrey%E2%80%93Williams_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "includes contributing structures such as a tobacco barn, smokehouse, and store-post office",
+        "object": "Humphrey-Williams Plantation complex",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Humphrey%E2%80%93Williams_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was originally listed on the NRHP in 1973, with a boundary increase in 1988",
+        "object": "Humphrey-Williams Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/73001367",
+        "citationLabel": "National Park Service"
+      },
+      {
+        "predicate": "is located west of Lumberton on NC 211 in Robeson County, North Carolina",
+        "object": "Humphrey-Williams Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Humphrey%E2%80%93Williams_Plantation",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Plantations like Humphrey-Williams were central to the Southern economy and social order in the 19th century, relying on the forced labor of enslaved African Americans. In North Carolina, such estates were embedded in a legal and cultural framework of racial subjugation, contributing to the broader system of chattel slavery that shaped Black life and resistance across the region."
+  },
+  {
+    "id": "plantation_brabson_s_ferry_plantation_q4953185",
+    "kind": "place",
+    "displayName": "Brabson's Ferry Plantation",
+    "summary": "Brabson's Ferry Plantation in Sevier County, Tennessee, was an antebellum plantation established in the 1790s that grew to 5,000 acres by 1848 and held 49 enslaved people. Its structures and land reflect the expansion of plantation economies into East Tennessee, the use of enslaved labor in agriculture and infrastructure, and the region's divided loyalties during the Civil War.",
+    "eraBuckets": [
+      "1790s",
+      "1840s",
+      "1850s",
+      "1860s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "civil-war",
+      "land-ownership",
+      "segregation"
+    ],
+    "topicIds": [
+      "enslavement",
+      "civil-war",
+      "land-ownership",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Brabson's Ferry",
+      "Sevier County",
+      "French Broad River",
+      "antebellum plantation",
+      "enslaved labor"
+    ],
+    "jurisdictionLabel": "Sevierville, Tennessee",
+    "locationPrecision": "site",
+    "locationLabel": "Confluence of Boyds Creek and French Broad River",
+    "lat": 35.92916667,
+    "lng": -83.65083333,
+    "claims": [
+      {
+        "predicate": "was established in",
+        "object": "1790s",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Brabson's_Ferry_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "owned 5,000 acres by",
+        "object": "1848",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Brabson's_Ferry_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "held 49 enslaved people",
+        "object": "by 1848",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Brabson's_Ferry_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was added to the National Register of Historic Places",
+        "object": "June 25, 1975",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/75001780",
+        "citationLabel": "NPS NRIS"
+      },
+      {
+        "predicate": "was located at a strategic crossing of",
+        "object": "the French Broad River",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Brabson's_Ferry_Plantation",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "supported the Confederacy during",
+        "object": "the U.S. Civil War",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Brabson's_Ferry_Plantation",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Brabson's Ferry Plantation exemplifies how plantation-scale agriculture and enslavement expanded beyond the Deep South into East Tennessee, a region often perceived as less dependent on slavery. Its growth and operation illustrate the integration of forced labor into local economies and the social hierarchies maintained through land and slave ownership, even in areas with Unionist majorities."
+  },
+  {
+    "id": "plantation_enoch_ensley_plantation_q134614464",
+    "kind": "place",
+    "displayName": "Enoch (Ensley) Plantation",
+    "summary": "Enoch (Ensley) Plantation, located near Memphis, Tennessee, operated as a large agricultural and manufacturing site that relied heavily on convict labor after the Civil War. It encompassed over 2,000 acres and used coerced labor under brutal conditions, reflecting broader systems of racial control during Reconstruction.",
+    "eraBuckets": [
+      "1850s",
+      "1860s",
+      "1870s",
+      "1880s",
+      "1930s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "reconstruction",
+      "labor",
+      "segregation"
+    ],
+    "topicIds": [
+      "enslavement",
+      "reconstruction",
+      "labor",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "convict labor",
+      "plantation",
+      "Memphis",
+      "Reconstruction",
+      "cotton farming"
+    ],
+    "jurisdictionLabel": "Memphis, Tennessee",
+    "locationPrecision": "site",
+    "locationLabel": "2,000-acre plantation 12 miles southwest of Memphis",
+    "lat": 35.06138889,
+    "lng": -90.13583333,
+    "claims": [
+      {
+        "predicate": "was established by",
+        "object": "Enoch Ensley",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Enoch_(Ensley)_Plantation",
+        "citationLabel": "Wikipedia - Enoch (Ensley) Plantation"
+      },
+      {
+        "predicate": "used convict labor during Reconstruction",
+        "object": "thousands of convict-laborers under poor conditions",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Enoch_(Ensley)_Plantation",
+        "citationLabel": "Wikipedia - Enoch (Ensley) Plantation"
+      },
+      {
+        "predicate": "covered over 2,000 acres near the Mississippi River",
+        "object": "farmland extending from barracks to river",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Enoch_(Ensley)_Plantation",
+        "citationLabel": "Wikipedia - Enoch (Ensley) Plantation"
+      },
+      {
+        "predicate": "was used to harvest and transport cotton",
+        "object": "agricultural production focused on cotton",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Enoch_(Ensley)_Plantation",
+        "citationLabel": "Wikipedia - Enoch (Ensley) Plantation"
+      },
+      {
+        "predicate": "contributed land to an early African American park",
+        "object": "nearly 1,000 acres used for a segregated park opening in 1938",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Enoch_(Ensley)_Plantation",
+        "citationLabel": "Wikipedia - Enoch (Ensley) Plantation"
+      }
+    ],
+    "historicalContext": "Following emancipation, convict leasing became a widespread mechanism to re-enslave Black men through the criminal justice system, particularly in the South. Enoch Plantation's use of this system exemplifies how economic interests and racial subjugation were maintained post-slavery, with long-term impacts on Black communities in Tennessee and beyond."
+  },
+  {
+    "id": "plantation_wheatlands_q7991913",
+    "kind": "place",
+    "displayName": "Wheatlands",
+    "summary": "Wheatlands, established in 1791 in Sevier County, Tennessee, was a large antebellum plantation worked by enslaved people. After emancipation, its owner deeded land to freed slaves, who founded the Chandler Gap community, a predominantly African American settlement that persisted into the 20th century.",
+    "eraBuckets": [
+      "1790s",
+      "1820s",
+      "1850s",
+      "1870s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "land-ownership",
+      "emancipation",
+      "community",
+      "agriculture"
+    ],
+    "topicIds": [
+      "enslavement",
+      "land-ownership",
+      "emancipation",
+      "community",
+      "agriculture"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Wheatlands",
+      "Chandler Gap",
+      "antebellum plantation",
+      "enslaved labor",
+      "post-emancipation land transfer"
+    ],
+    "jurisdictionLabel": "Sevierville, Tennessee",
+    "locationPrecision": "site",
+    "locationLabel": "Corner of TN Route 338 and Cedar Springs Valley Road, Boyds Creek",
+    "lat": 35.91861111,
+    "lng": -83.66833333,
+    "claims": [
+      {
+        "predicate": "was established as a family farm by Timothy Chandler in 1791",
+        "object": "1791",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Wheatlands_(Sevierville%2C_Tennessee)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "used enslaved labor to operate as a large antebellum plantation",
+        "object": "John Chandler and 14 slaves produced 3,000 bushels of corn, 400 bushels of oats, and 6,000 gallons of whiskey by 1850",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Wheatlands_(Sevierville%2C_Tennessee)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "transferred land to freed slaves upon the owner's death in 1875",
+        "object": "John Chandler left a portion of land to his former slaves, forming the Chandler Gap community",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Wheatlands_(Sevierville%2C_Tennessee)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "enabled the formation of the Chandler Gap community",
+        "object": "The Chandler Gap community remained a predominantly African-American community well into the 20th century",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Wheatlands_(Sevierville%2C_Tennessee)",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is listed on the National Register of Historic Places",
+        "object": "NRHP reference No. 75001785, added July 7, 1975",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/75001785",
+        "citationLabel": "National Park Service"
+      }
+    ],
+    "historicalContext": "Wheatlands exemplifies the transition from enslavement to limited Black land ownership in the postbellum South. The transfer of land to freed slaves in 1875—rare but documented in some Appalachian regions—enabled the formation of autonomous Black communities like Chandler Gap, which resisted full erasure despite Jim Crow pressures in East Tennessee."
+  },
+  {
+    "id": "plantation_liendo_plantation_q6544183",
+    "kind": "place",
+    "displayName": "Liendo Plantation",
+    "summary": "Liendo Plantation in Waller County, Texas, operated as a cotton plantation under Leonard Waller Groce, who enslaved over 100 people. During the Civil War, it served as Camp Groce, a Confederate training camp and later a prison for Union prisoners of war, where hundreds were held and some died. The site is now recognized on the National Register of Historic Places.",
+    "eraBuckets": [
+      "1850s",
+      "1860s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "civil-war",
+      "military",
+      "segregation"
+    ],
+    "topicIds": [
+      "enslavement",
+      "civil-war",
+      "military",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Liendo Plantation",
+      "Camp Groce",
+      "enslavement in Texas",
+      "Confederate prison camp",
+      "Waller County"
+    ],
+    "jurisdictionLabel": "Hempstead, Texas",
+    "locationPrecision": "site",
+    "locationLabel": "2 miles northeast of Hempstead off FM 1488",
+    "lat": 30.09638889,
+    "lng": -96.02972222,
+    "claims": [
+      {
+        "predicate": "enslaved over 100 people",
+        "object": "Leonard Waller Groce",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Liendo_Plantation",
+        "citationLabel": "Wikipedia - Liendo Plantation"
+      },
+      {
+        "predicate": "used as Confederate military prison known as Camp Groce",
+        "object": "Liendo Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Liendo_Plantation",
+        "citationLabel": "Wikipedia - Liendo Plantation"
+      },
+      {
+        "predicate": "held 427 U.S. prisoners of war in 1863",
+        "object": "Camp Groce",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Liendo_Plantation",
+        "citationLabel": "Wikipedia - Liendo Plantation"
+      },
+      {
+        "predicate": "21 prisoners died at Camp Groce in 1863",
+        "object": "Camp Groce",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Liendo_Plantation",
+        "citationLabel": "Wikipedia - Liendo Plantation"
+      },
+      {
+        "predicate": "held 683 U.S. prisoners of war in 1864",
+        "object": "Camp Groce",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Liendo_Plantation",
+        "citationLabel": "Wikipedia - Liendo Plantation"
+      },
+      {
+        "predicate": "was built in 1853 as a working cotton plantation",
+        "object": "Liendo Plantation",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Liendo_Plantation",
+        "citationLabel": "Wikipedia - Liendo Plantation"
+      }
+    ],
+    "historicalContext": "Liendo Plantation exemplifies the dual role of Southern plantations during the Civil War: as centers of enslaved labor and as military installations supporting the Confederacy. Its transformation into Camp Groce reflects how agricultural economies built on enslavement were integrated into wartime infrastructure, reinforcing systems of racial control and conflict that shaped postwar racial hierarchies."
+  },
+  {
+    "id": "plantation_ward_hall_q7969015",
+    "kind": "place",
+    "displayName": "Ward Hall",
+    "summary": "Ward Hall, a Greek Revival mansion in Georgetown, Kentucky, was built circa 1857 for planter Junius Richard Ward on a 500-acre plantation worked by enslaved African Americans. The property included intact antebellum slave quarters and support structures, and served as a summer residence while the family operated a cotton plantation in Mississippi. Enslaved laborers cultivated tobacco, hemp, and…",
+    "eraBuckets": [
+      "1850s",
+      "1860s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "agriculture",
+      "architecture",
+      "land-ownership"
+    ],
+    "topicIds": [
+      "enslavement",
+      "agriculture",
+      "architecture",
+      "land-ownership"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "enslaved labor",
+      "antebellum mansion",
+      "Junius Richard Ward",
+      "Greek Revival architecture",
+      "Scott County Kentucky"
+    ],
+    "jurisdictionLabel": "Georgetown, Kentucky",
+    "locationPrecision": "address",
+    "locationLabel": "1782 Frankfort Pike",
+    "lat": 38.20638889,
+    "lng": -84.58833333,
+    "claims": [
+      {
+        "predicate": "was built by enslaved African Americans and free people of color",
+        "object": "James Bailey, a free man of color, assisted in building Ward Hall",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Ward_Hall_(Georgetown%2C_Kentucky)",
+        "citationLabel": "Wikipedia: Ward Hall (Georgetown, Kentucky)"
+      },
+      {
+        "predicate": "used enslaved African Americans as domestic and field laborers",
+        "object": "Enslaved African Americans worked in the fields, with livestock, and as domestic servants in the basement of Ward Hall",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Ward_Hall_(Georgetown%2C_Kentucky)",
+        "citationLabel": "Wikipedia: Ward Hall (Georgetown, Kentucky)"
+      },
+      {
+        "predicate": "is associated with the system of enslavement in Kentucky",
+        "object": "The basement of Ward Hall contains one of the most intact antebellum servant (enslaved) quarters in the country",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Ward_Hall_(Georgetown%2C_Kentucky)",
+        "citationLabel": "Wikipedia: Ward Hall (Georgetown, Kentucky)"
+      },
+      {
+        "predicate": "was owned by a family that operated cotton plantations in the Mississippi Delta",
+        "object": "Junius Richard Ward owned a large cotton plantation near Leota Landing, Mississippi, where the family wintered",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Ward_Hall_(Georgetown%2C_Kentucky)",
+        "citationLabel": "Wikipedia: Ward Hall (Georgetown, Kentucky)"
+      },
+      {
+        "predicate": "reflects the architectural influence of Minard Lafever and Palladian design",
+        "object": "Ward Hall embodies design elements from Minard Lafever’s 1829 and 1835 pattern books and follows Palladian floor plan #17/18",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Ward_Hall_(Georgetown%2C_Kentucky)",
+        "citationLabel": "Wikipedia: Ward Hall (Georgetown, Kentucky)"
+      },
+      {
+        "predicate": "is a documented site of Black labor and resistance under enslavement",
+        "object": "Enslaved African Americans were laborers and artisans on the Ward plantation, contributing to construction and agricultural production",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Ward_Hall_(Georgetown%2C_Kentucky)",
+        "citationLabel": "Wikipedia: Ward Hall (Georgetown, Kentucky)"
+      }
+    ],
+    "historicalContext": "Ward Hall exemplifies the interconnected plantation economies of the Upper and Deep South, where elite families like the Wards maintained seasonal residences in Kentucky and winter plantations in the Mississippi Delta. Its construction and operation relied on enslaved African American labor, both as skilled artisans and agricultural workers, illustrating how slavery underpinned regional wealth and architectural grandeur. The intact basement quarters and documented use of enslaved people provide rare physical and historical evidence of domestic and artisanal enslavement in Kentucky, a border state with complex ties to the Confederacy."
+  },
+  {
+    "id": "plantation_belmont_estate_q4884350",
+    "kind": "place",
+    "displayName": "Belmont Estate",
+    "summary": "Belmont Estate in Elkridge, Maryland, established in the 1730s as 'Moore's Morning Choice,' was a forced-labor plantation where the Dorsey family enslaved up to 94 people to cultivate cash crops and operate iron forges. The 1738 plantation house is a well-preserved example of Colonial Georgian architecture. Now a 68-acre historic park managed by Howard County, it is listed on the National…",
+    "eraBuckets": [
+      "1730s",
+      "1770s",
+      "1870s",
+      "1910s",
+      "1960s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "segregation",
+      "history",
+      "land-ownership",
+      "architecture"
+    ],
+    "topicIds": [
+      "enslavement",
+      "segregation",
+      "history",
+      "land-ownership",
+      "architecture"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Belmont Estate",
+      "enslaved labor",
+      "Dorsey family",
+      "Howard County",
+      "Colonial Georgian architecture"
+    ],
+    "jurisdictionLabel": "Elkridge, Maryland",
+    "locationPrecision": "site",
+    "locationLabel": "Belmont Manor and Historic Park",
+    "lat": 39.22,
+    "lng": -76.73138889,
+    "claims": [
+      {
+        "predicate": "was established as a forced-labor plantation",
+        "object": "in the 1730s",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Belmont_Estate",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "used enslaved labor",
+        "object": "up to 94 enslaved Black people for cash crops and iron forges",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Belmont_Estate",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was built",
+        "object": "in 1738",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Belmont_Estate",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is listed on the National Register of Historic Places",
+        "object": "as part of the Lawyers Hill Historic District",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Belmont_Estate",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was operated by Caleb Dorsey and his sons",
+        "object": "who used enslaved labor to run forges and farms",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Belmont_Estate",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is a documented site of enslavement in Howard County",
+        "object": "one of the earliest forced-labor farms in the county",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Belmont_Estate",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Belmont Estate exemplifies the entanglement of agricultural and industrial economies in colonial Maryland, where enslaved Black labor supported both plantation farming and iron production. Its history reflects the broader pattern of land grants to white elites, the expansion of forced labor systems, and the post-emancipation reconfiguration of such properties into symbols of elite heritage—often obscuring the enslaved community's presence. The site's preservation offers opportunities to interpret the lives and resistance of enslaved people within regional economic networks."
+  },
+  {
+    "id": "plantation_darnall_s_chance_q5224091",
+    "kind": "place",
+    "displayName": "Darnall's Chance",
+    "summary": "Darnall's Chance in Upper Marlboro, Maryland, was a plantation where merchant James Wardrop enslaved 32 people in the 18th century. Originally part of a 27,000-acre estate owned by Colonel Henry Darnall, the site reflects the economic and social structures of slavery in colonial Maryland. Today, it operates as a museum interpreting the lives of women, including those enslaved, in the region's…",
+    "eraBuckets": [
+      "1740s",
+      "1710s",
+      "1850s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "economic-justice",
+      "history"
+    ],
+    "topicIds": [
+      "enslavement",
+      "economic-justice",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Darnall's Chance",
+      "enslavement in Maryland",
+      "Prince George's County plantation",
+      "James Wardrop",
+      "Colonel Henry Darnall"
+    ],
+    "jurisdictionLabel": "Upper Marlboro, Maryland",
+    "locationPrecision": "address",
+    "locationLabel": "14800 Governor Oden Bowie Drive",
+    "lat": 38.81922778,
+    "lng": -76.74930833,
+    "claims": [
+      {
+        "predicate": "was_a_plantation_where_enslaved_people_lived",
+        "object": "32 enslaved people were held at Darnall's Chance by James Wardrop",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Darnall's_Chance",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "owned_by_colonel_henry_darnall",
+        "object": "Colonel Henry Darnall owned 27,000 acres in Prince George's County, including the land that became Darnall's Chance",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Darnall's_Chance",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "associated_with_enslavement_in_colonial_maryland",
+        "object": "The property was part of the colonial plantation system in Maryland that relied on enslaved African labor",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Darnall's_Chance",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Darnall's Chance exemplifies the plantation economy in Prince George's County, where large landholdings depended on enslaved labor. Its history connects to broader patterns of land concentration among colonial elites and the systemic exploitation of African Americans, even as the site later became a public museum engaging with that legacy."
+  },
+  {
+    "id": "plantation_fairview_plantation_q5430850",
+    "kind": "place",
+    "displayName": "Fairview Plantation",
+    "summary": "Fairview Plantation in Prince George's County, Maryland, was a major slaveholding estate with over 100 enslaved people at its peak and 47 during the ownership of Governor Oden Bowie, who was born and buried there. The site reflects the entwined histories of elite political families and enslaved labor in the antebellum South.",
+    "eraBuckets": [
+      "1780s",
+      "1790s",
+      "1800s",
+      "1810s",
+      "1820s",
+      "1890s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "civil-war",
+      "great-migration",
+      "segregation"
+    ],
+    "topicIds": [
+      "enslavement",
+      "civil-war",
+      "great-migration",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Fairview Plantation",
+      "enslaved labor",
+      "Oden Bowie",
+      "Prince George's County",
+      "plantation architecture"
+    ],
+    "jurisdictionLabel": "Fairwood, Maryland",
+    "locationPrecision": "site",
+    "locationLabel": "Fairview Plantation house and cemetery",
+    "lat": 38.95167,
+    "lng": -76.78417,
+    "claims": [
+      {
+        "predicate": "was_a_slaveholding_plantation_with_over_100_enslaved_people_at_its_peak",
+        "object": "Fairview Plantation held over 100 enslaved individuals at its height of production.",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Fairview_Plantation",
+        "citationLabel": "Wikipedia - Fairview Plantation"
+      },
+      {
+        "predicate": "held_47_enslaved_people_during_oden_bowie's_ownership",
+        "object": "During Oden Bowie's ownership, 47 enslaved people were held at Fairview Plantation.",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Fairview_Plantation",
+        "citationLabel": "Wikipedia - Fairview Plantation"
+      },
+      {
+        "predicate": "was_the_birthplace_and_burial_site_of_oden_bowie",
+        "object": "Oden Bowie, Governor of Maryland, was born at Fairview Plantation in 1826 and buried on its grounds in 1894.",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Fairview_Plantation",
+        "citationLabel": "Wikipedia - Fairview Plantation"
+      },
+      {
+        "predicate": "was_owned_by_baruch_duckett_and_later_inherited_by_william_duckett_bowie",
+        "object": "Baruch Duckett commissioned Fairview Plantation around 1788; upon his death in 1810, it passed to his son-in-law Captain William Duckett Bowie.",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Fairview_Plantation",
+        "citationLabel": "Wikipedia - Fairview Plantation"
+      },
+      {
+        "predicate": "is_a_federal_greek_revival_plantation_house_completed_around_1790",
+        "object": "Fairview is a two-story stuccoed brick plantation house in a transitional Federal/Greek Revival style, completed circa 1790.",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Fairview_Plantation",
+        "citationLabel": "Wikipedia - Fairview Plantation"
+      },
+      {
+        "predicate": "is_recognized_as_a_historic_site_by_maryland_national_capital_park_and_planning_commission",
+        "object": "The Maryland National Capital Park and Planning Commission recognizes Fairview House and cemetery as historic site #71A-13.",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Fairview_Plantation",
+        "citationLabel": "Wikipedia - Fairview Plantation"
+      }
+    ],
+    "historicalContext": "As one of the larger plantations in Maryland's most heavily enslaved county, Fairview exemplifies the economic and social structures of the antebellum Chesapeake region, where agricultural production relied on enslaved labor and elite families like the Bowies gained wealth and political power. Its operation into the late 19th century underscores the persistence of plantation systems even after emancipation."
+  },
+  {
+    "id": "plantation_howard_lodge_q16892494",
+    "kind": "place",
+    "displayName": "Howard Lodge",
+    "summary": "Howard Lodge is a historic plantation house in Howard County, Maryland, built around 1750 by Edward Dorsey. The property, which included enslaved African Americans, reflects the architectural and social history of early Maryland plantations and is listed on the National Register of Historic Places.",
+    "eraBuckets": [
+      "1750s",
+      "1800s",
+      "1820s",
+      "1850s",
+      "1870s",
+      "1900s",
+      "1920s",
+      "1950s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "architecture",
+      "history",
+      "segregation"
+    ],
+    "topicIds": [
+      "enslavement",
+      "architecture",
+      "history",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Howard Lodge",
+      "plantation",
+      "enslavement",
+      "Maryland",
+      "National Register of Historic Places"
+    ],
+    "jurisdictionLabel": "Sykesville, Maryland",
+    "locationPrecision": "address",
+    "locationLabel": "12301 Howard Lodge Road",
+    "lat": 39.33722222,
+    "lng": -76.93972222,
+    "claims": [
+      {
+        "predicate": "was built around",
+        "object": "1750",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Howard_Lodge",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was built by",
+        "object": "Edward Dorsey",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Howard_Lodge",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was given ownership of seven African-American slaves by",
+        "object": "John Dorsey",
+        "confidenceLevel": "high",
+        "citationSource": "en.wikipedia.org",
+        "citationHref": "https://en.wikipedia.org/wiki/Howard_Lodge",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is listed on",
+        "object": "National Register of Historic Places",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/12000845",
+        "citationLabel": "NPGallery"
+      }
+    ],
+    "historicalContext": "Howard Lodge exemplifies the plantation system in colonial Maryland, where wealth and land ownership were built on enslaved labor. Its preservation offers insight into the lives of enslaved people and the economic structures of the era, contributing to the broader understanding of American slavery and its legacies."
+  },
+  {
+    "id": "plantation_howard_s_adventure_q107524533",
+    "kind": "place",
+    "displayName": "Howard's Adventure",
+    "summary": "Howard's Adventure was a colonial-era tobacco plantation in Anne Arundel County, Maryland, owned by the Hammond family, who held over 100 enslaved people by 1760. Colonel Rezin Hammond, a Revolutionary-era politician, attempted to manumit 166 enslaved people in his will, but his heirs refused to honor it. The site, later used by the U.S. Naval Academy, includes remnants of the manor and the…",
+    "eraBuckets": [
+      "1710s",
+      "1720s",
+      "1730s",
+      "1740s",
+      "1750s",
+      "1760s",
+      "1770s",
+      "1780s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "resistance",
+      "land-ownership"
+    ],
+    "topicIds": [
+      "enslavement",
+      "resistance",
+      "land-ownership"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Howard's Adventure",
+      "Hammond family",
+      "tobacco plantation",
+      "enslaved people",
+      "manumission"
+    ],
+    "jurisdictionLabel": "Gambrills, Maryland",
+    "locationPrecision": "site",
+    "locationLabel": "Former manor house and graveyard within U.S. Naval Academy dairy farm",
+    "lat": 39.085,
+    "lng": -76.65527778,
+    "claims": [
+      {
+        "predicate": "was established as a tobacco plantation using enslaved labor",
+        "object": "Howard's Adventure operated as a slave plantation in colonial Maryland, cultivating tobacco with enslaved workers.",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Howard's_Adventure",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "owned over 100 enslaved people by 1760",
+        "object": "At the time of Philip Hammond's death in 1760, he held 107 enslaved individuals on the property.",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Howard's_Adventure",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "attempted large-scale manumission in will",
+        "object": "Colonel Rezin Hammond directed in his will that 166 enslaved people be freed and supported, but his heirs did not comply.",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Howard's_Adventure",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was listed on the National Register of Historic Places",
+        "object": "The Hammond Manor House was added to the NRHP on October 16, 1974, and removed in 1978 after demolition.",
+        "confidenceLevel": "high",
+        "citationSource": "npgallery.nps.gov",
+        "citationHref": "https://npgallery.nps.gov/AssetDetail/NRIS/74002341",
+        "citationLabel": "NPS NRHP Database"
+      },
+      {
+        "predicate": "was owned and operated by the U.S. Naval Academy",
+        "object": "The United States Naval Academy purchased the property and operated a dairy farm there for over eighty years.",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Howard's_Adventure",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "is associated with resistance to emancipation",
+        "object": "The failure to execute Rezin Hammond’s manumission directive illustrates systemic resistance to Black freedom even when legally stipulated.",
+        "confidenceLevel": "medium",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Howard's_Adventure",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "Howard's Adventure exemplifies the entrenchment of slavery in Maryland's colonial economy, where elite planters accumulated land and enslaved labor under British rule. Rezin Hammond’s unfulfilled manumission directive reflects both the contradictions of revolutionary ideals and the systemic resistance to Black freedom, even when promised by enslavers."
+  },
+  {
+    "id": "plantation_pleasant_prospect_q7203929",
+    "kind": "place",
+    "displayName": "Pleasant Prospect",
+    "summary": "Pleasant Prospect, built c. 1798 in Mitchellville, Maryland, for Dr. Isaac Duckett, was an elite plantation house reflecting the wealth of Southern planters who relied on enslaved labor. Its architectural grandeur, documented in federal surveys, is tied to the economic and social structures of slavery in Prince George's County.",
+    "eraBuckets": [
+      "1790s",
+      "1800s",
+      "1830s",
+      "1930s",
+      "1980s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "architecture",
+      "economic-justice",
+      "land-ownership"
+    ],
+    "topicIds": [
+      "enslavement",
+      "architecture",
+      "economic-justice",
+      "land-ownership"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "plantation",
+      "Federal style architecture",
+      "Isaac Duckett",
+      "Prince George's County",
+      "Historic American Buildings Survey"
+    ],
+    "jurisdictionLabel": "Mitchellville, Maryland",
+    "locationPrecision": "address",
+    "locationLabel": "12806 Woodmore Road",
+    "lat": 38.93444444,
+    "lng": -76.78333333,
+    "claims": [
+      {
+        "predicate": "was built by",
+        "object": "Dr. Isaac Duckett",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Pleasant_Prospect",
+        "citationLabel": "Wikipedia - Pleasant Prospect"
+      },
+      {
+        "predicate": "was constructed in",
+        "object": "1798",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Pleasant_Prospect",
+        "citationLabel": "Wikipedia - Pleasant Prospect"
+      },
+      {
+        "predicate": "is a plantation house associated with",
+        "object": "enslaved labor and slaveholding economy",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Pleasant_Prospect",
+        "citationLabel": "Wikipedia - Pleasant Prospect"
+      },
+      {
+        "predicate": "is one of three plantations built by",
+        "object": "the Duckett family in Prince George's County",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Pleasant_Prospect",
+        "citationLabel": "Wikipedia - Pleasant Prospect"
+      },
+      {
+        "predicate": "reflects the wealth of",
+        "object": "upper-class planters in Prince George's County during the late 18th and early 19th century",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Pleasant_Prospect",
+        "citationLabel": "Wikipedia - Pleasant Prospect"
+      },
+      {
+        "predicate": "was documented in",
+        "object": "the Historic American Buildings Survey at the Library of Congress in 1936 and 1983",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Pleasant_Prospect",
+        "citationLabel": "Wikipedia - Pleasant Prospect"
+      }
+    ],
+    "historicalContext": "Pleasant Prospect exemplifies the concentration of wealth among slaveholding elites in post-Revolutionary Maryland, where large plantations were sustained by enslaved labor and reinforced racial hierarchies. Its scale and opulence, noted in the 1798 Federal Direct Tax, reflect how slavery enabled economic dominance by families like the Ducketts in Southern Maryland."
+  },
+  {
+    "id": "plantation_river_hill_farm_q18157693",
+    "kind": "place",
+    "displayName": "River Hill Farm",
+    "summary": "River Hill Farm in Clarksville, Maryland, was an 18th-century slave plantation on the \"Four Brothers Portion\" land tract, featuring a fieldstone house and outbuildings including slave quarters. Owned by Major Henry Owings, it later faced demolition during 20th-century development, reflecting tensions between historic preservation and urban expansion in Howard County.",
+    "eraBuckets": [
+      "1700s",
+      "1970s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "segregation",
+      "land-ownership",
+      "preservation"
+    ],
+    "topicIds": [
+      "enslavement",
+      "segregation",
+      "land-ownership",
+      "preservation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "slave quarters",
+      "Howard County",
+      "Major Henry Owings",
+      "Four Brothers Portion",
+      "plantation demolition"
+    ],
+    "jurisdictionLabel": "Clarksville, Maryland",
+    "locationPrecision": "site",
+    "locationLabel": "Former site of River Hill House, Clarksville",
+    "lat": 39.19444444,
+    "lng": -76.91583333,
+    "claims": [
+      {
+        "predicate": "was a slave plantation",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/River_Hill_Farm",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "included slave quarters",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/River_Hill_Farm",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was built in the 18th century",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/River_Hill_Farm",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was owned by Major Henry Owings",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/River_Hill_Farm",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was located on land patented as Four Brothers Portion",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/River_Hill_Farm",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "was demolished during 20th-century development",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/River_Hill_Farm",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "As a slaveholding plantation in Maryland, River Hill Farm was part of a regional agricultural economy dependent on enslaved labor before emancipation. Its documented slave quarters and 18th-century origins situate it within the broader history of Southern plantations, while its 20th-century redevelopment underscores how post-segregation era land use often erased physical traces of enslavement."
+  },
+  {
+    "id": "plantation_stoopley_gibson_manor_q56274220",
+    "kind": "place",
+    "displayName": "Stoopley Gibson Manor",
+    "summary": "Stoopley Gibson Manor in Kent Island, Maryland, was a plantation where enslaved people labored under the Bright family; Henry Massey escaped from the property in 1854 and was later recaptured, an event documented by the National Park Service Network to Freedom. Census records confirm the presence of enslaved individuals on the site during the antebellum period.",
+    "eraBuckets": [
+      "1760s",
+      "1790s",
+      "1850s",
+      "1860s"
+    ],
+    "topicTags": [
+      "enslavement",
+      "fugitive-slave-law",
+      "resistance",
+      "firsts",
+      "civil-war"
+    ],
+    "topicIds": [
+      "enslavement",
+      "fugitive-slave-law",
+      "resistance",
+      "firsts",
+      "civil-war"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Stoopley Gibson Manor",
+      "Henry Massey escape",
+      "Maryland plantation",
+      "enslaved labor",
+      "Network to Freedom"
+    ],
+    "jurisdictionLabel": "Kent Island, Maryland",
+    "locationPrecision": "site",
+    "locationLabel": "North shore of Kent Island along the Chester River",
+    "lat": 38.98097222,
+    "lng": -76.27580556,
+    "claims": [
+      {
+        "predicate": "was site of enslavement during the antebellum period",
+        "object": "Stoopley Gibson Manor",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Stoopley_Gibson_Manor",
+        "citationLabel": "Wikipedia - Stoopley Gibson Manor"
+      },
+      {
+        "predicate": "documented presence of enslaved people via census records",
+        "object": "Stoopley Gibson Manor",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Stoopley_Gibson_Manor",
+        "citationLabel": "Wikipedia - Stoopley Gibson Manor"
+      },
+      {
+        "predicate": "site of Henry Massey's escape in 1854",
+        "object": "Stoopley Gibson Manor",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Stoopley_Gibson_Manor",
+        "citationLabel": "Wikipedia - Stoopley Gibson Manor"
+      },
+      {
+        "predicate": "Henry Massey's escape is listed in the National Park Service Network to Freedom",
+        "object": "Stoopley Gibson Manor",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Stoopley_Gibson_Manor",
+        "citationLabel": "Wikipedia - Stoopley Gibson Manor"
+      },
+      {
+        "predicate": "operated as a plantation with enslaved labor through the Civil War",
+        "object": "Stoopley Gibson Manor",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Stoopley_Gibson_Manor",
+        "citationLabel": "Wikipedia - Stoopley Gibson Manor"
+      }
+    ],
+    "historicalContext": "As a mid-Atlantic plantation operating through the 18th and 19th centuries, Stoopley Gibson Manor exemplifies the agrarian slave economy of Maryland, a border state where enslaved labor sustained agricultural production even as northern states moved toward abolition. The documented escape of Henry Massey in 1854 connects this site to broader networks of resistance and federal enforcement of the Fugitive Slave Act."
+  }
+]

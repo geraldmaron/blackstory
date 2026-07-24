@@ -1,0 +1,158 @@
+[
+  {
+    "id": "gap_emmett_till_lynching",
+    "kind": "event",
+    "displayName": "Emmett Till lynching",
+    "summary": "The lynching of Emmett Till in 1955, a 14-year-old African-American boy, was a brutal act of racial violence that exposed the systemic racism of the Jim Crow South and became a catalyst for the civil rights movement.",
+    "eraBuckets": [
+      "1950s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "jim-crow",
+      "emancipation",
+      "segregation"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "jim-crow",
+      "emancipation",
+      "segregation"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "lynching",
+      "civil rights",
+      "Emmett Till",
+      "Mississippi",
+      "Jim Crow"
+    ],
+    "jurisdictionLabel": "Money, Mississippi",
+    "locationPrecision": "site",
+    "locationLabel": "Tallahatchie River",
+    "lat": 33.55166667,
+    "lng": -90.18111111,
+    "claims": [
+      {
+        "predicate": "was_abducted_and_murdered",
+        "object": "Emmett Till",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Emmett_Till",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "acquitted_by_all-white_jury",
+        "object": "Roy Bryant and J.W. Milam",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Emmett_Till",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "became_icon_of_civil_rights_movement",
+        "object": "Emmett Till",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Emmett_Till",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "murder_catalyzed_civil_rights_movement",
+        "object": "Emmett Till",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Emmett_Till",
+        "citationLabel": "Wikipedia"
+      },
+      {
+        "predicate": "lynching_made_federal_hate_crime",
+        "object": "Emmett Till",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Emmett_Till",
+        "citationLabel": "Wikipedia"
+      }
+    ],
+    "historicalContext": "The lynching of Emmett Till in Mississippi in 1955 is a landmark event in the history of racial violence and civil rights in the United States. It highlights the entrenched racism of the Jim Crow South and the broader context of lynching as a tool of racial control. The case also underscores the limitations of the American legal system in addressing racial injustice."
+  },
+  {
+    "id": "gap_may_20_1961_mob_attack_on_freedom_riders",
+    "kind": "event",
+    "displayName": "May 20, 1961 mob attack on Freedom Riders",
+    "summary": "The May 20, 1961 mob attack on Freedom Riders in Birmingham, Alabama, prompted federal marshals to be sent to Montgomery, highlighting the violent resistance to civil rights activism in the South.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "freedom",
+      "segregation",
+      "jim-crow",
+      "movement"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "freedom",
+      "segregation",
+      "jim-crow",
+      "movement"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Freedom Riders",
+      "mob attack",
+      "civil rights",
+      "Birmingham",
+      "federal intervention"
+    ],
+    "jurisdictionLabel": "Birmingham, Alabama",
+    "locationPrecision": "city",
+    "locationLabel": "Birmingham, Alabama",
+    "lat": 33.5175,
+    "lng": -86.80944444,
+    "claims": [
+      {
+        "predicate": "was_part_of",
+        "object": "civil-rights",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Freedom_Riders",
+        "citationLabel": "Freedom Riders Wikipedia"
+      },
+      {
+        "predicate": "was_caused_by",
+        "object": "Jim_Crow",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Freedom_Riders",
+        "citationLabel": "Freedom Riders Wikipedia"
+      },
+      {
+        "predicate": "involved",
+        "object": "Benjamin_Elton_Cox",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.highpointnc.gov/Blog.aspx?IID=135",
+        "citationLabel": "High Point Historical Marker"
+      },
+      {
+        "predicate": "was_part_of",
+        "object": "Freedom_Rides",
+        "confidenceLevel": "high",
+        "citationSource": "citation_trail",
+        "citationHref": "https://www.highpointnc.gov/Blog.aspx?IID=135",
+        "citationLabel": "High Point Historical Marker"
+      },
+      {
+        "predicate": "led_to",
+        "object": "federal_intervention",
+        "confidenceLevel": "high",
+        "citationSource": "wikipedia_api",
+        "citationHref": "https://en.wikipedia.org/wiki/Freedom_Riders",
+        "citationLabel": "Freedom Riders Wikipedia"
+      }
+    ],
+    "historicalContext": "The attack on Freedom Riders was part of the broader civil rights movement, which sought to dismantle segregation and enforce federal laws. The violence against the riders underscored the systemic resistance to desegregation and the need for federal intervention."
+  }
+]
