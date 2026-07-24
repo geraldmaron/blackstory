@@ -35,6 +35,7 @@ import {
   type ReleaseEntityUpsertRow,
   type SearchIndexUpsertRow,
 } from './lib/incremental-publish.ts';
+import { applyReleaseTaxonomySync, planReleaseTaxonomySync } from './lib/release-taxonomy-sync.ts';
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(SCRIPT_DIR, '../../..');
@@ -458,6 +459,23 @@ async function main(): Promise<void> {
       }
     }
     await client.query('COMMIT');
+
+    // repo-xez5.12 follow-up: taxonomy (topicIds/topicTags) lives on
+    // bb_canonical.entities.kind_detail->'classification', not on whatever this run built the
+    // entity row from (landscape payload / fixture) — those never carry topics. Any entity this
+    // run just published that ALREADY has canonical kind_detail (e.g. re-publishing something an
+    // editorial pass already tagged) would otherwise ship with the taxonomy this run computed
+    // (usually blank) instead of what canonical actually knows. Re-sync from canonical
+    // immediately after commit so this incremental path can't reopen the taxonomy-drop gap that
+    // the one-time backfill (sync-release-taxonomy-from-canonical.ts) just fixed for the rest of
+    // the release. Idempotent and cheap (single scan of the release) — safe to run every time.
+    if (prepared.length > 0) {
+      const taxonomyPlan = await planReleaseTaxonomySync(client, releaseId);
+      if (taxonomyPlan.changed.length > 0) {
+        await applyReleaseTaxonomySync(client, releaseId, taxonomyPlan);
+        console.log(`Re-synced taxonomy from canonical for ${taxonomyPlan.changed.length} entities.`);
+      }
+    }
 
     const pendingAfter = Number((await client.query<{ n: string }>(PENDING_COUNT_SQL)).rows[0]?.n ?? 0);
     console.log('');

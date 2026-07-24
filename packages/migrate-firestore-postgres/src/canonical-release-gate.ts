@@ -150,8 +150,24 @@ export async function assertReleaseRowsDerivableFromCanonical(
     if ((row.summary ?? '') !== (typeof editorial.summary === 'string' ? editorial.summary : '')) {
       failures.push(`${row.entity_id}: summary diverges from canonical editorial data`);
     }
+    // `classification.taxonomy` is a vestigial always-empty sub-key from the original
+    // Firestore->Postgres migration (see canonical-convergence.ts's buildEditorialDetail) — the
+    // real topic data canonical carries is `classification.topicIds`/`topicTags`, which is what
+    // `row.taxonomy` (built by release-taxonomy-sync.ts / toReleaseEntityRow) actually contains.
+    // Comparing against `classification.taxonomy` compared row.taxonomy to a field that is always
+    // `{}`, so this check could never catch real divergence — fixed to compare the fields both
+    // sides actually populate.
     const classification = asRecord(asRecord(canonical.kind_detail).classification);
-    if (stableJson(row.taxonomy ?? {}) !== stableJson(classification.taxonomy ?? {})) {
+    const rowTaxonomy = asRecord(row.taxonomy);
+    const canonicalTaxonomy = {
+      topicIds: classification.topicIds ?? [],
+      topicTags: classification.topicTags ?? [],
+    };
+    const rowTaxonomyTopics = {
+      topicIds: rowTaxonomy.topicIds ?? [],
+      topicTags: rowTaxonomy.topicTags ?? [],
+    };
+    if (stableJson(rowTaxonomyTopics) !== stableJson(canonicalTaxonomy)) {
       failures.push(`${row.entity_id}: taxonomy diverges from canonical classification data`);
     }
     if (row.primary_image !== undefined) {

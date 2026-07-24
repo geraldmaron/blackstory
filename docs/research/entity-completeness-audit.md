@@ -4,6 +4,34 @@ Date: 2026-07-24. All numbers below queried directly against Supabase project
 `twykhihqkcldpreuovay` (`bb_canonical`, `bb_public`, `bb_publication`). No canonical data was
 written; all backfill/discovery output is staged (review-gated), not published.
 
+**Correction, same day, post-audit follow-up:** the `taxonomy` finding below (§2, §6.2) measured
+`bb_public.release_entities.taxonomy`, a denormalized column. The web/API actually serve
+`release_entities.projection->>'topicIds'`/`'topicTags'` (`apps/api-public`,
+`apps/web/src/lib/public-data/postgres-readers.ts`, parsed by `@repo/schemas`'
+`publicEntityProjectionSchema`) — confirmed by reading the render path
+(`apps/web/src/components/entity/EntityTopicTags.tsx` reads `entity.topicTags`). `projection` was
+**already correctly populated** for the same 1,175 entities the original query flagged as blank
+(verified directly: `ent_diane_nash_001`'s `projection.topicIds` was `["civil-rights",
+"nonviolence", "student-activism"]` before any fix). The live entity page was never missing
+topics. What was real: the separate `taxonomy` column had silently drifted out of sync with both
+`projection` and canonical `kind_detail.classification` — used only by
+`canonical-release-gate.ts`'s convergence check, which was comparing against itself
+(`classification.taxonomy`, always `{}`) rather than `classification.topicIds`/`topicTags`, so it
+could never have caught this drift. Fixed via `packages/firebase/scripts/lib/release-taxonomy-sync.ts`
+(one-time backfill: 1,167/1,375 rows synced, 200 have no canonical topic data at all — a real
+gap, left alone) and wired into `publish-release-entities-incremental.ts` so future incremental
+publishes re-sync automatically instead of drifting again. See git commit for repo-xez5.12b.
+
+The `primary_image` finding (§2, §6.1) holds: `projection.primaryImage` is blank on 1,137/1,375
+(82.7%) — real and still the single largest content gap. (Side note found while verifying: the
+flat `primary_image` column undercounts further, blank on 1,229 vs 1,137 in `projection` — same
+kind of denormalized-column drift, on the columns that already have data rather than losing it;
+not user-facing, not fixed in this pass, flagged for anyone touching that column next.) The
+`related` finding (§2, §6.3) also holds as originally stated — sparse `entity_relationships` is a
+real canonical-data gap, not a projection artifact (verified: zero entities have `related` data in
+one field and not the other; the apparent divergence was a JSON key-presence artifact, not a
+content gap).
+
 ## 1. Fields audited
 
 Enumerated from the live render paths:

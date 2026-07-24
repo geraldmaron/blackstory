@@ -27,7 +27,7 @@ const publicRow = {
   summary: 'A documented place.',
   lat: 38.9,
   lng: -77.01,
-  taxonomy: { topics: ['education'] },
+  taxonomy: { topicIds: ['education'], topicTags: ['education'] },
   claims: [
     {
       id: 'claim_1',
@@ -49,7 +49,7 @@ const canonical = {
       kind: 'place',
       kind_detail: {
         editorial: { summary: 'A documented place.' },
-        classification: { taxonomy: { topics: ['education'] } },
+        classification: { taxonomy: {}, topicIds: ['education'], topicTags: ['education'] },
       },
     },
   ],
@@ -94,5 +94,14 @@ test('canonical release gate rejects changed claim text', async () => {
       },
     ]),
     /object diverges from canonical/,
+  );
+});
+
+test('canonical release gate rejects a taxonomy that has drifted from canonical topics', async () => {
+  await assert.rejects(
+    assertReleaseRowsDerivableFromCanonical(writer(canonical), [
+      { ...publicRow, taxonomy: { topicIds: [], topicTags: [] } },
+    ]),
+    /taxonomy diverges from canonical classification data/,
   );
 });
