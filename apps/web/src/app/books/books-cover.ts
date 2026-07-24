@@ -15,7 +15,9 @@ export function coverIsbnForBook(book: Pick<BannedBookRecord, 'identifiers'>): s
 
 export function openLibraryCoverUrl(isbn: string, size: 'S' | 'M' | 'L' = 'M'): string {
   const normalized = isbn.replace(/[^0-9Xx]/g, '');
-  return `https://covers.openlibrary.org/b/isbn/${encodeURIComponent(normalized)}-${size}.jpg`;
+  // default=false → HTTP 404 when no cover exists (fires img onError → initials placeholder)
+  // instead of Open Library's tiny placeholder JPEG that would otherwise render blank.
+  return `https://covers.openlibrary.org/b/isbn/${encodeURIComponent(normalized)}-${size}.jpg?default=false`;
 }
 
 export function coverInitialsForTitle(title: string): string {

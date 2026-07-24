@@ -12,7 +12,12 @@ export function securityHeadersForNextConfig() {
     ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
     : "script-src 'self' 'unsafe-inline'";
   const mapTiles = 'https://demotiles.maplibre.org https://tiles.openfreemap.org';
-  const publicMedia = 'https://storage.googleapis.com';
+  // Keep in sync with csp.ts DEFAULT_IMG_SRC (GCS + Supabase public-media + book covers).
+  const publicMedia =
+    'https://storage.googleapis.com https://twykhihqkcldpreuovay.supabase.co';
+  // Open Library cover URLs redirect to archive.org / ia*.us.archive.org — allow each hop.
+  const bookCovers =
+    'https://covers.openlibrary.org https://archive.org https://*.us.archive.org';
   const connectSrc = isDev
     ? `connect-src 'self' ws: wss: ${mapTiles}`
     : `connect-src 'self' ${mapTiles}`;
@@ -24,7 +29,7 @@ export function securityHeadersForNextConfig() {
     "object-src 'none'",
     scriptSrc,
     "style-src 'self' 'unsafe-inline'",
-    `img-src 'self' data: blob: ${mapTiles} ${publicMedia}`,
+    `img-src 'self' data: blob: ${mapTiles} ${publicMedia} ${bookCovers}`,
     `font-src 'self' ${mapTiles}`,
     connectSrc,
     "manifest-src 'self'",

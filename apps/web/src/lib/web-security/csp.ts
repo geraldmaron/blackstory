@@ -2,7 +2,8 @@
  * Content-Security-Policy builder for the public web surface.
  * Production allows inline scripts for Next.js App Router flight/hydration until a
  * nonce pipeline lands; development also allows eval for HMR. MapLibre needs blob
- * workers and OpenFreeMap / demotiles connect+font+img hosts.
+ * workers and OpenFreeMap / demotiles connect+font+img hosts. Banned-books covers
+ * need Open Library + archive.org img hosts (see BOOK_COVER_IMG_SRC).
  */
 
 export type CspBuildOptions = {
@@ -26,7 +27,25 @@ const PUBLIC_MEDIA_IMG_SRC = [
   'https://twykhihqkcldpreuovay.supabase.co',
 ];
 
-const DEFAULT_IMG_SRC = ["'self'", 'data:', 'blob:', ...MAP_TILE_SRC, ...PUBLIC_MEDIA_IMG_SRC];
+/**
+ * Banned-books cover thumbnails: Open Library ISBN URLs redirect to archive.org
+ * (and ia*.us.archive.org). Each hop must match img-src or the browser blocks the
+ * image and BooksCoverArt falls back to initials placeholders.
+ */
+export const BOOK_COVER_IMG_SRC = [
+  'https://covers.openlibrary.org',
+  'https://archive.org',
+  'https://*.us.archive.org',
+];
+
+const DEFAULT_IMG_SRC = [
+  "'self'",
+  'data:',
+  'blob:',
+  ...MAP_TILE_SRC,
+  ...PUBLIC_MEDIA_IMG_SRC,
+  ...BOOK_COVER_IMG_SRC,
+];
 const DEFAULT_CONNECT_SRC = ["'self'", ...MAP_TILE_SRC];
 const DEFAULT_FONT_SRC = ["'self'", ...MAP_TILE_SRC];
 

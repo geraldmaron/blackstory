@@ -17,10 +17,10 @@ test('coverIsbnForBook prefers isbn-13 over isbn-10', () => {
   );
 });
 
-test('openLibraryCoverUrl builds ISBN cover path', () => {
+test('openLibraryCoverUrl builds ISBN cover path with fail-closed default', () => {
   assert.equal(
     openLibraryCoverUrl('9780307278449', 'M'),
-    'https://covers.openlibrary.org/b/isbn/9780307278449-M.jpg',
+    'https://covers.openlibrary.org/b/isbn/9780307278449-M.jpg?default=false',
   );
 });
 
