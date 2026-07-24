@@ -39,6 +39,10 @@ test('CSP includes strict defaults and frame-ancestors none', () => {
   assert.match(csp, /demotiles\.maplibre\.org/);
   assert.match(csp, /storage\.googleapis\.com/);
   assert.match(csp, /twykhihqkcldpreuovay\.supabase\.co/);
+  // Banned-books covers: Open Library + archive.org redirect chain (see BOOK_COVER_IMG_SRC).
+  assert.match(csp, /covers\.openlibrary\.org/);
+  assert.match(csp, /archive\.org/);
+  assert.match(csp, /\*\.us\.archive\.org/);
   assert.match(csp, /frame-src 'none'/);
 });
 
@@ -80,6 +84,23 @@ test('next.config.mjs wires global security headers', () => {
     mjsHeaders.map((h: { key: string }) => h.key).sort(),
     tsHeaders.map((h) => h.key).sort(),
   );
+
+  const mjsCsp = mjsHeaders.find((h: { key: string }) => h.key === 'Content-Security-Policy')
+    ?.value as string;
+  const tsCsp = tsHeaders.find((h) => h.key === 'Content-Security-Policy')?.value as string;
+  assert.ok(mjsCsp);
+  assert.ok(tsCsp);
+  // Production next.config uses the .mjs builder — keep img-src hosts aligned with csp.ts.
+  for (const host of [
+    'covers.openlibrary.org',
+    'archive.org',
+    '*.us.archive.org',
+    'storage.googleapis.com',
+    'twykhihqkcldpreuovay.supabase.co',
+  ]) {
+    assert.match(mjsCsp, new RegExp(host.replace(/\./g, '\\.').replace(/\*/g, '\\*')));
+    assert.match(tsCsp, new RegExp(host.replace(/\./g, '\\.').replace(/\*/g, '\\*')));
+  }
 });
 
 test('secure cookie defaults are HttpOnly with SameSite', () => {
