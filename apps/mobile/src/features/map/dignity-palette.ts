@@ -31,7 +31,7 @@ export const DIGNITY_PALETTE = {
   kindArtifact: '#A68968',
   kindMovement: '#C4683A',
   kindOther: '#6D675F',
-  kindMassacre: '#B83A2A',
+  kindMassacre: '#8E4F2A',
   kindPlantation: '#2C2824',
   kindEpicenter: '#C9A227',
   confidenceHigh: '#2F6B3C',

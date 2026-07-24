@@ -37,7 +37,7 @@ export function Link({ href, children, onPress, textRole = 'body', accessibility
     <Pressable
       accessibilityRole="link"
       accessibilityLabel={accessibilityLabel ?? children}
-      hitSlop={8}
+      hitSlop={{ top: 12, bottom: 12, left: 8, right: 8 }}
       onPress={handlePress}
       android_ripple={{ color: theme.border }}
       // Links had no press feedback at all. Tint only — no padding/alignment change —

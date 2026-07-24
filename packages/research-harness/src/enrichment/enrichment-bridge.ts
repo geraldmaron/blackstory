@@ -60,7 +60,8 @@ Cites: ${subject.cites.join(', ') || 'None'}
 INSTRUCTIONS:
 1. ${backfillInstruction}
 2. Think step-by-step. Validate geographic coordinates and temporal timelines before asserting facts.
-3. Output the result in the exact JSON schema below.
+3. Extract at most 5 highly relevant claims to prevent response truncation.
+4. Output the result in the exact JSON schema below.
 
 {
   "reasoning": "Step-by-step logic validating your extractions and confidence scores",
@@ -83,30 +84,50 @@ INSTRUCTIONS:
   `.trim();
 
   const responseText = await client.complete(prompt, 'enriched-candidate.v1');
-  let parsed: any;
+  let parsed: Record<string, unknown>;
   try {
-    parsed = JSON.parse(cleanJsonResponse(responseText));
+    const raw: unknown = JSON.parse(cleanJsonResponse(responseText));
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+      throw new Error('Enrichment response must be a JSON object');
+    }
+    parsed = raw as Record<string, unknown>;
   } catch (e) {
     console.error('Failed to parse JSON response:', responseText);
     throw e;
   }
 
-  const parsedLat = parsed.latitude ? parseFloat(parsed.latitude) : undefined;
-  const parsedLng = parsed.longitude ? parseFloat(parsed.longitude) : undefined;
+  const parsedLat =
+    typeof parsed.latitude === 'number' || typeof parsed.latitude === 'string'
+      ? parseFloat(String(parsed.latitude))
+      : undefined;
+  const parsedLng =
+    typeof parsed.longitude === 'number' || typeof parsed.longitude === 'string'
+      ? parseFloat(String(parsed.longitude))
+      : undefined;
 
   const coords =
     parsedLat !== undefined && parsedLng !== undefined && !isNaN(parsedLat) && !isNaN(parsedLng)
       ? { latitude: parsedLat, longitude: parsedLng }
       : subject.coordinates;
 
+  const claims = (Array.isArray(parsed.claims) ? parsed.claims : [])
+    .filter((claim): claim is Record<string, unknown> => !!claim && typeof claim === 'object')
+    .map((claim) => ({
+      id: typeof claim.id === 'string' ? claim.id : 'claim',
+      predicate: typeof claim.predicate === 'string' ? claim.predicate : '',
+      object: typeof claim.object === 'string' ? claim.object : '',
+      confidence: typeof claim.confidence === 'number' ? claim.confidence : 0,
+      ...(typeof claim.citationUrl === 'string' ? { citationUrl: claim.citationUrl } : {}),
+    }));
+
   return {
     id: subject.id,
-    title: parsed.title || subject.title,
-    publicSummary: parsed.publicSummary || '',
-    historicalContext: parsed.historicalContext || '',
+    title: typeof parsed.title === 'string' && parsed.title ? parsed.title : subject.title,
+    publicSummary: typeof parsed.publicSummary === 'string' ? parsed.publicSummary : '',
+    historicalContext: typeof parsed.historicalContext === 'string' ? parsed.historicalContext : '',
     ...(coords ? { coordinates: coords } : {}),
-    confidence: parsed.confidence || 0.5,
-    claims: parsed.claims || [],
+    confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.5,
+    claims,
   };
 }
 
@@ -147,14 +168,18 @@ INSTRUCTIONS:
   `.trim();
 
   const responseText = await client.complete(prompt, 'adjudicated-relationship.v1');
-  const parsed = JSON.parse(cleanJsonResponse(responseText));
+  const raw: unknown = JSON.parse(cleanJsonResponse(responseText));
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    throw new Error('Adjudication response must be a JSON object');
+  }
+  const parsed = raw as Record<string, unknown>;
 
   return {
     subjectAId: overlap.subjectA.id,
     subjectBId: overlap.subjectB.id,
-    relationType: parsed.relationType || 'none',
-    confidence: parsed.confidence || 0.0,
-    rationale: parsed.rationale || '',
+    relationType: typeof parsed.relationType === 'string' ? parsed.relationType : 'none',
+    confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.0,
+    rationale: typeof parsed.rationale === 'string' ? parsed.rationale : '',
   };
 }
 
