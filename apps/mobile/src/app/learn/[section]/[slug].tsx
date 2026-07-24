@@ -8,7 +8,13 @@
  */
 import { Redirect, useLocalSearchParams } from 'expo-router';
 
-import { ContentPageScreen, parseSectionParam, parseSlugParam } from '@/features/learn';
+import {
+  ContentPageScreen,
+  learnSectionBackFallback,
+  parseSectionParam,
+  parseSlugParam,
+} from '@/features/learn';
+import { useEditionStackBack } from '@/shell/use-edition-stack-back';
 
 export default function LearnContentPageScreen() {
   const { section, slug } = useLocalSearchParams<{
@@ -17,6 +23,15 @@ export default function LearnContentPageScreen() {
   }>();
   const row = parseSectionParam(section);
   const safeSlug = row ? parseSlugParam(slug, row) : undefined;
+  const fallbackHref = row ? learnSectionBackFallback(row.routeId) : '/learn';
+
+  useEditionStackBack({
+    fallbackHref,
+    accessibilityHint:
+      fallbackHref === '/more'
+        ? 'Returns to More when there is no previous screen'
+        : 'Returns to Stories when there is no previous screen',
+  });
 
   if (!row || !safeSlug) {
     return <Redirect href="/explore" />;

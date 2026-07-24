@@ -3,7 +3,15 @@
  * `src/app/(tabs)/more.tsx`, and `src/app/learn/**` consume this; nothing outside
  * `src/features/learn/**` should import this feature's internals directly.
  */
-export { LEARN_SECTIONS, MORE_SECTIONS, ALL_SECTIONS, findSectionRow, type LearnMoreSectionRow } from './sections';
+export {
+  LEARN_SECTIONS,
+  MORE_SECTIONS,
+  ALL_SECTIONS,
+  findSectionRow,
+  isMoreLearnSection,
+  learnSectionBackFallback,
+  type LearnMoreSectionRow,
+} from './sections';
 export {
   CONTENT_CATALOG,
   listCatalogEntries,

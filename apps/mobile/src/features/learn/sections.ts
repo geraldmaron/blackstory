@@ -95,3 +95,16 @@ export const ALL_SECTIONS: readonly LearnMoreSectionRow[] = [...LEARN_SECTIONS, 
 export function findSectionRow(routeId: string): LearnMoreSectionRow | undefined {
   return ALL_SECTIONS.find((row) => row.routeId === routeId);
 }
+
+/** True when the learn section is reached from the More tab overflow (not Stories). */
+export function isMoreLearnSection(routeId: string): boolean {
+  return MORE_SECTIONS.some((row) => row.routeId === routeId);
+}
+
+/**
+ * Tab root to land on when a learn stack screen has no history
+ * (deep link / cold start). More-origin sections → `/more`; Stories → `/learn`.
+ */
+export function learnSectionBackFallback(routeId: string): '/more' | '/learn' {
+  return isMoreLearnSection(routeId) ? '/more' : '/learn';
+}

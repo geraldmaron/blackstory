@@ -1,7 +1,7 @@
 /**
  * ScreenHeader — edition masthead with copper kicker tick.
  */
-import { render } from '@testing-library/react-native';
+import { fireEvent, render } from '@testing-library/react-native';
 
 import { Text } from '../Text';
 import { ScreenHeader } from '../ScreenHeader';
@@ -48,5 +48,20 @@ describe('ScreenHeader', () => {
       <ScreenHeader title="Archive edition" dense={false} compact={false} />,
     );
     expect(getByText('Archive edition')).toBeTruthy();
+  });
+
+  it('renders a leading back control when onBack is provided', async () => {
+    const onBack = jest.fn();
+    const { getByLabelText, queryByLabelText } = await render(
+      <ScreenHeader title="Methodology" onBack={onBack} />,
+    );
+    fireEvent.press(getByLabelText('Go back'));
+    expect(onBack).toHaveBeenCalledTimes(1);
+    expect(queryByLabelText('Go back')).toBeTruthy();
+  });
+
+  it('omits back control on tab-root mastheads without onBack', async () => {
+    const { queryByLabelText } = await render(<ScreenHeader title="More" />);
+    expect(queryByLabelText('Go back')).toBeNull();
   });
 });

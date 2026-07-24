@@ -34,11 +34,17 @@ import { CorrectionForm,
   type SubmitResult,
 } from '@/features/corrections';
 import { UtilityScreenShell } from '@/ui';
+import { useEditionStackBack } from '@/shell/use-edition-stack-back';
 
 export default function CorrectionsSubmitSheet() {
   const params = useLocalSearchParams<{ entityId?: string | string[]; returnTo?: string | string[] }>();
   const entityId = parseEntityId(params.entityId);
   const safeReturnTo = parseReturnTo(params.returnTo) ?? '/more';
+
+  useEditionStackBack({
+    fallbackHref: safeReturnTo,
+    accessibilityHint: 'Closes this sheet when there is no previous screen',
+  });
 
   // The receipt is held only in local state — never in a route/URL param.
   const [receiptCode, setReceiptCode] = useState<string | null>(null);

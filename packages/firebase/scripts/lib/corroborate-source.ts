@@ -103,13 +103,6 @@ export function isPlausibleMatch(
   return matched.length >= required;
 }
 
-function buildContextQuery(subjectName: string, context: string | undefined): string {
-  if (!context) return `"${subjectName}"`;
-  const nameTerms = extractSignificantTerms(subjectName);
-  const contextTerms = [...extractSignificantTerms(context)].filter((term) => !nameTerms.has(term)).slice(0, 6);
-  return contextTerms.length > 0 ? `"${subjectName}" ${contextTerms.join(' ')}` : `"${subjectName}"`;
-}
-
 async function fetchWikipediaCoordinates(title: string): Promise<{ lat: number; lng: number } | undefined> {
   try {
     const params = new URLSearchParams({ action: 'query', prop: 'coordinates', titles: title, format: 'json' });

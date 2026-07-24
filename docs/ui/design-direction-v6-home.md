@@ -39,7 +39,7 @@ reader theme toggle (light and dark). Do not hide or disable the theme control o
 | Copper | Text `#8E4F2A`, graphic `#B86B2A` | Text `#D07A32`, graphic `#D07A32` |
 | Reader theme toggle | **Active on `/`** — home is not a light-only exception |
 
-**Atmosphere, not wallpaper:** page gutters carry a **two-layer stack** — fixed pseudo-element texture (paper grain + quiet archive index grid / corner brackets on Rule and copper hairlines) and an optional **scattered archive mosaic variant** (`HomeAtmosphereMosaic`) that reuses the rights-cleared `/brand/collage/tiles/` pool from story/about atmosphere. Tiles render as **flat matte polaroid frames** (Surface/archive-paper border, portrait inset, slight rotation variety; no shadow or glow) deterministically scattered into left/right gutter bands only. Frames are **collision-packed and never overlap** within a gutter; browse editions target **~40 placements**, detail routes **~28**, with pool reuse and varied crop when unique assets are fewer than placements. Center content and Surface cards stay opaque (WCAG floor). Mosaic opacity scales down in dark theme; `prefers-reduced-motion` hides live mosaic tiles. No crumpled continental silhouettes, no competing fake map under the live hero readout, no sepia stock.
+**Atmosphere, not wallpaper:** page gutters carry fixed pseudo-element texture (paper grain + quiet archive index grid / corner brackets on Rule and copper hairlines). Home does **not** mount a scattered gutter mosaic — that collage register stays on other edition routes (`EditionAtmosphereMosaic`). Center content and Surface cards stay opaque (WCAG floor). No crumpled continental silhouettes, no competing fake map under the live hero readout, no sepia stock.
 
 The hero map inside beat 0 is a **Surface-contained live readout**: the persistent MapLibre plate (`MapStage`) is **positioned** into the hero map column (viewport-fixed box from `hero-map-inset.ts`, not `clip-path`) so real archive pins render in-panel — never a decorative sketch, never full-bleed wallpaper under the whole page.
 
@@ -58,7 +58,7 @@ The hero map inside beat 0 is a **Surface-contained live readout**: the persiste
 │  [ Beat 05 — Atlas rewind ]                                    │
 │  [ Footer — Surface card, three job columns ]                  │
 └────────────────────────────────────────────────────────────────┘
-     ↑ archive texture + scattered mosaic in outer gutters only ↑
+     ↑ archive texture (grain + grid) in outer gutters; no home mosaic ↑
 ```
 
 **Rhythm tokens (mockup anchors, map to `--ds-space-*` in implementation):**
@@ -258,7 +258,7 @@ Never two copper-filled buttons visible in the same above-the-fold viewport. Raw
 | Shell | Full-width theme-aware bar, blur | Sticky Surface card inside `main` |
 | Story discovery | 3-up top-rule story rail | Record carousel with facts anatomy |
 | Proof band | About thesis + data viz + trust section | Beats 03–04 as explicit middle proof band |
-| Atmosphere | Map plate + optional scrim | Paper grain + archive grid in gutters; scattered mosaic variant; live map in hero frame |
+| Atmosphere | Map plate + optional scrim | Paper grain + archive grid in gutters; no home mosaic; live map in hero frame |
 | Theme on home | Follows reader light/dark | Follows reader light/dark (same as rest of site) |
 | Place entry | Secondary under thesis | Beat 01 lead geography block |
 
@@ -269,7 +269,7 @@ Never two copper-filled buttons visible in the same above-the-fold viewport. Raw
 ## 10. Implementation pointers (non-binding hints)
 
 - CSS surface: `apps/web/src/app/(home)/` or page-scoped module; reuse `--ds-*` tokens, no raw hex.
-- Atmosphere texture: `home-edition.css` (`::before` grain/grid); mosaic variant: `HomeAtmosphereMosaic` + `compute-scattered-mosaic-layout.ts`
+- Atmosphere texture: `home-edition.css` (`::before` grain/grid). Home does not mount `EditionAtmosphereMosaic` / former `HomeAtmosphereMosaic`.
 - Record carousel: compose from `@repo/ui` primitives where possible; shared browse controls live in `apps/web/src/components/patterns/` (`RecordBrowseControls`, `BrowseModeToggle`, `browse-mode.css`).
 - Live hero map wiring: `hero-map-inset.ts` positions MapStage over `.ds-home-hero__map` (map column); copy column is opaque Surface beside it.
 - Mockup reference file: copy into `docs/ui/fixtures/` when owner drops it in repo; until then, Downloads path above is the binding visual.
@@ -281,7 +281,7 @@ Never two copper-filled buttons visible in the same above-the-fold viewport. Raw
 Use this list to sign off home implementation against v6:
 
 - [ ] `/` renders on theme-aware canvas + Surface cards — no ink/charcoal bands; theme toggle works on home
-- [ ] Paper grain + archive grid atmosphere in gutters; scattered mosaic optional; no text atop mosaic without Surface
+- [ ] Paper grain + archive grid atmosphere in gutters; no scattered home mosaic; no text atop atmosphere without Surface
 - [ ] Shell is sticky Surface card with one copper CTA; mobile nav collapses per v5 sheet law
 - [ ] Hero is one panel with hairline-split copy and map columns (stacked on mobile)
 - [ ] Hero has exactly one copper and one quiet CTA; micro-facts render three-up with labels

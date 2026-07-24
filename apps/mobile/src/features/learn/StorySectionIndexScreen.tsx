@@ -1,6 +1,7 @@
 /**
  * Story-shaped section index (`/learn/history`, `/learn/topics`, `/learn/myths`):
  * Ledger Line canvas masthead + mono section label + compact story rows.
+ * Stack-pushed under the learn navigator — native header owns the top inset.
  */
 import { ScrollView, View } from 'react-native';
 import { router } from 'expo-router';
@@ -24,7 +25,7 @@ export function StorySectionIndexScreen({ section }: StorySectionIndexScreenProp
   const countLabel = entries.length === 1 ? '1 story' : `${entries.length} stories`;
 
   return (
-    <ScreenCanvas>
+    <ScreenCanvas edges={['left', 'right', 'bottom']}>
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: screenScrollInsets.paddingHorizontal,

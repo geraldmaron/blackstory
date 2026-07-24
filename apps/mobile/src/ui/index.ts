@@ -26,6 +26,7 @@ export {
   type ScreenScrollInsets,
 } from './ScreenCanvas';
 export { ScreenHeader, type ScreenHeaderProps } from './ScreenHeader';
+export { BackControl, type BackControlProps } from './BackControl';
 export { EditionPanelHeader, type EditionPanelHeaderProps } from './EditionPanelHeader';
 export { BrowseScreenShell, type BrowseScreenShellProps } from './BrowseScreenShell';
 export { EditionSurfacePanel, type EditionSurfacePanelProps } from './EditionSurfacePanel';

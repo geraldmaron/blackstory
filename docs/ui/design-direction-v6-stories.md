@@ -147,7 +147,7 @@ Reuse shared `.ds-story-link` / `.ds-story-rail` from shell; stories edition CSS
 | Scattered layout | `components/patterns/edition-atmosphere/compute-scattered-mosaic-layout.ts` | Deterministic tile positions |
 | Stories panel chrome | `app/stories/stories-panel-chrome.ts` | Class-name helpers + mosaic seed |
 | Stories edition CSS | `app/stories/stories-edition.css` | Surface stack + typography |
-| Home wrapper | `components/home/HomeAtmosphereMosaic.tsx` | Thin wrapper; seed `home-edition-v6` |
+| Home wrapper | _(removed)_ | Home keeps grain/grid canvas only; no gutter mosaic on `/` |
 
 Import `edition-atmosphere.css` once per route bundle that renders the canvas class.
 
