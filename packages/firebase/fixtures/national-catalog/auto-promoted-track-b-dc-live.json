@@ -1,0 +1,486 @@
+[
+  {
+    "id": "dc-black-history-sites-b16",
+    "kind": "place",
+    "displayName": "O Street Market",
+    "summary": "The O Street Market, located at 1400 7th Street NW in Washington, DC, was built in 1881 and served as a central shopping destination for the diverse Shaw neighborhood. After the 1968 riots, it was partially restored and reopened in 1980.",
+    "eraBuckets": [
+      "1880s",
+      "1960s"
+    ],
+    "topicTags": [
+      "architecture",
+      "business",
+      "civil-rights",
+      "community",
+      "history"
+    ],
+    "topicIds": [
+      "architecture",
+      "business",
+      "civil-rights",
+      "community",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "O Street Market",
+      "Shaw neighborhood",
+      "1881",
+      "1968 riots",
+      "redevelopment"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "site",
+    "locationLabel": "1400 7th Street NW, Washington, DC",
+    "lat": 38.908926,
+    "lng": -77.022224,
+    "claims": [
+      {
+        "predicate": "The O Street Market was built in 1881.",
+        "object": "1881",
+        "confidenceLevel": "high",
+        "citationSource": "https://historicsites.dcpreservation.org/items/show/433",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/433",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "The O Street Market served as a central shopping destination for the diverse Shaw neighborhood.",
+        "object": "Shaw neighborhood",
+        "confidenceLevel": "high",
+        "citationSource": "https://historicsites.dcpreservation.org/items/show/433",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/433",
+        "citationLabel": "DC Historic Preservation Office"
+      }
+    ],
+    "historicalContext": "The O Street Market exemplifies the large, functional, well-designed market buildings erected in DC under the massive public works campaign headed by Alexander “Boss” Shepherd. After the Civil War, DC sought to revamp its small-town image, and the market was part of a broader effort to modernize the city."
+  },
+  {
+    "id": "dc-black-history-sites-b3",
+    "kind": "place",
+    "displayName": "Ben's Chili Bowl",
+    "summary": "Ben's Chili Bowl, located at 1213 U Street NW in Washington, DC, has been a landmark since 1968. It played a crucial role during the 1968 civil unrest following Martin Luther King Jr.'s assassination, providing food and shelter.",
+    "eraBuckets": [
+      "1960s"
+    ],
+    "topicTags": [
+      "civil-rights",
+      "architecture",
+      "business",
+      "civil-war",
+      "community",
+      "history",
+      "memorial"
+    ],
+    "topicIds": [
+      "civil-rights",
+      "architecture",
+      "business",
+      "civil-war",
+      "community",
+      "history",
+      "memorial"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Ben's Chili Bowl",
+      "U Street",
+      "civil rights",
+      "1968",
+      "Martin Luther King Jr."
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "site",
+    "locationLabel": "1213 U Street NW, Washington, DC",
+    "lat": 38.917328,
+    "lng": -77.02876,
+    "claims": [
+      {
+        "predicate": "established",
+        "object": "1968",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/878",
+        "citationLabel": "DC Historic Preservation Office \"Black History Sites: Washington\" inventory"
+      },
+      {
+        "predicate": "provided food and shelter",
+        "object": "during civil unrest",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/878",
+        "citationLabel": "DC Historic Preservation Office \"Black History Sites: Washington\" inventory"
+      }
+    ],
+    "historicalContext": "Ben's Chili Bowl is part of the Greater U Street Historic District, which was developed in the late 19th century and became a significant commercial and cultural center for Washington's African American community. The area was transformed after racial restrictions were lifted, making it a key site in the civil rights movement."
+  },
+  {
+    "id": "dc-black-history-sites-b8",
+    "kind": "place",
+    "displayName": "Eastern Market",
+    "summary": "Eastern Market, located at 201 7th Street SE in Washington, DC, opened in 1873 and has continuously operated as a public market. It was designed by prominent architect Adolf Cluss and served as a model for modernizing the city post-Civil War.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "architecture",
+      "commerce-clause",
+      "civil-war",
+      "commerce-clause",
+      "community",
+      "history"
+    ],
+    "topicIds": [
+      "architecture",
+      "commerce-clause",
+      "civil-war",
+      "commerce-clause",
+      "community",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Eastern Market",
+      "Adolf Cluss",
+      "public market",
+      "Washington, DC",
+      "urbanization"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "site",
+    "locationLabel": "201 7th Street SE, Washington, DC",
+    "lat": 38.886966,
+    "lng": -76.996479,
+    "claims": [
+      {
+        "predicate": "Eastern Market",
+        "object": "was built in 1873",
+        "confidenceLevel": "high",
+        "citationSource": "https://historicsites.dcpreservation.org/items/show/169",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/169",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "Eastern Market",
+        "object": "was designed by Adolf Cluss",
+        "confidenceLevel": "high",
+        "citationSource": "https://historicsites.dcpreservation.org/items/show/169",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/169",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "Eastern Market",
+        "object": "served as a model for modernizing Washington, DC",
+        "confidenceLevel": "high",
+        "citationSource": "https://historicsites.dcpreservation.org/items/show/169",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/169",
+        "citationLabel": "DC Historic Preservation Office"
+      }
+    ],
+    "historicalContext": "Eastern Market was one of several public markets built in Washington, DC, during the late 19th century to modernize the city and cater to the growing urban population. Its construction was part of a broader effort to transform Washington into a more urbanized and modern city following the Civil War."
+  },
+  {
+    "id": "dc-black-history-sites-c10",
+    "kind": "place",
+    "displayName": "Lincoln Park/Emancipation Monument",
+    "summary": "The Lincoln Park/[[dc-black-history-sites-c6|Emancipation Monument]] in Washington, DC, was erected in 1876 by contributions from formerly enslaved individuals. It commemorates President Lincoln and features a sculpture of Lincoln freeing a shackled man, symbolizing the end of slavery.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "abolition",
+      "civil-war",
+      "emancipation",
+      "freedom",
+      "memorial"
+    ],
+    "topicIds": [
+      "abolition",
+      "civil-war",
+      "emancipation",
+      "freedom",
+      "memorial"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Emancipation Monument",
+      "Lincoln",
+      "Washington, DC",
+      "freedmen",
+      "monument",
+      "abolition"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "site",
+    "locationLabel": "1100 East Capitol Street NE, Washington, DC",
+    "lat": 38.889796,
+    "lng": -76.98994,
+    "claims": [
+      {
+        "predicate": "The Emancipation Monument was financed by contributions from formerly enslaved individuals.",
+        "object": "Emancipation Monument",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/176",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "The monument was dedicated on the anniversary of Lincoln's assassination in 1876.",
+        "object": "Emancipation Monument",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/176",
+        "citationLabel": "DC Historic Preservation Office"
+      }
+    ],
+    "historicalContext": "The monument was a principal memorial to Abraham Lincoln in Washington, DC, until 1922, and was dedicated on the anniversary of Lincoln's assassination. It reflects the ongoing struggle for freedom and the contributions of African Americans to public monuments."
+  },
+  {
+    "id": "dc-black-history-sites-c4",
+    "kind": "place",
+    "displayName": "District of Columbia World War I Memorial",
+    "summary": "The District of Columbia War Memorial, built in 1931, honors the 26,000 DC residents who served in World War I, including the 499 who died. Designed by local architect Frederick H. Brooke, it serves as both a war memorial and a bandstand.",
+    "eraBuckets": [
+      "1930s"
+    ],
+    "topicTags": [
+      "architecture",
+      "memorial",
+      "military",
+      "black-codes",
+      "black-power"
+    ],
+    "topicIds": [
+      "architecture",
+      "memorial",
+      "military",
+      "black-codes",
+      "black-power"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "District of Columbia War Memorial",
+      "World War I",
+      "DC community",
+      "Frederick H. Brooke",
+      "war memorial"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "site",
+    "locationLabel": "D.C. War Memorial, Washington, DC",
+    "lat": 38.887524,
+    "lng": -77.043502,
+    "claims": [
+      {
+        "predicate": "The memorial was constructed in 1931",
+        "object": "1931",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/722",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "The memorial honors 26,000 DC residents who served in World War I",
+        "object": "26,000 DC residents",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/722",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "The memorial honors 499 DC residents who died in World War I",
+        "object": "499 DC residents",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/722",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "The memorial was designed by local architect Frederick H. Brooke",
+        "object": "Frederick H. Brooke",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/722",
+        "citationLabel": "DC Historic Preservation Office"
+      }
+    ],
+    "historicalContext": "The memorial was constructed following a five-year campaign by the DC community to honor veterans and fallen soldiers. It reflects the national sentiment of remembrance and public service during the 'War to End All Wars'."
+  },
+  {
+    "id": "dc-black-history-sites-c6",
+    "kind": "place",
+    "displayName": "Emancipation Monument",
+    "summary": "The Emancipation Monument in Lincoln Park, Washington, DC, was financed by formerly enslaved individuals and commemorates President Lincoln’s role in emancipation. Dedicated in 1876, it features a sculpture by Thomas Ball depicting Lincoln and a freedman breaking free from shackles.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "abolition",
+      "civil-rights",
+      "civil-war",
+      "emancipation",
+      "memorial"
+    ],
+    "topicIds": [
+      "abolition",
+      "civil-rights",
+      "civil-war",
+      "emancipation",
+      "memorial"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Emancipation Monument",
+      "Lincoln Park",
+      "Abraham Lincoln",
+      "Thomas Ball",
+      "freedmen"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "site",
+    "locationLabel": "Lincoln Park, Washington, DC",
+    "lat": 38.889796,
+    "lng": -76.98994,
+    "claims": [
+      {
+        "predicate": "The Emancipation Monument was financed by formerly enslaved individuals.",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/176",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "The monument was dedicated in 1876.",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/176",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "The monument features a sculpture by Thomas Ball.",
+        "object": "true",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/176",
+        "citationLabel": "DC Historic Preservation Office"
+      }
+    ],
+    "historicalContext": "The monument was a principal memorial to Abraham Lincoln until 1922, reflecting the ongoing struggle for civil rights and the recognition of African American contributions to American history."
+  },
+  {
+    "id": "dc-black-history-sites-c7",
+    "kind": "place",
+    "displayName": "Georgetown University, Healy Hall",
+    "summary": "Healy Hall, built in 1879, is a significant architectural landmark at Georgetown University, commemorating President Patrick Francis Healy. It stands as a testament to the Gothic Revival style and the university's rich history.",
+    "eraBuckets": [
+      "1870s"
+    ],
+    "topicTags": [
+      "architecture",
+      "education",
+      "history"
+    ],
+    "topicIds": [
+      "architecture",
+      "education",
+      "history"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "Georgetown University",
+      "Healy Hall",
+      "Gothic Revival",
+      "1879",
+      "Washington, DC"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "site",
+    "locationLabel": "1300 37th St NW, Washington, DC",
+    "lat": 38.907303,
+    "lng": -77.072526,
+    "claims": [
+      {
+        "predicate": "Healy Hall",
+        "object": "was constructed in 1879",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/772",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "Healy Hall",
+        "object": "is a Gothic Revival architectural style building",
+        "confidenceLevel": "high",
+        "citationSource": "historicsites.dcpreservation.org",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/772",
+        "citationLabel": "DC Historic Preservation Office"
+      }
+    ],
+    "historicalContext": "Healy Hall, constructed in the 1870s, exemplifies the Gothic Revival architectural style and reflects the educational and cultural advancements of the late 19th century in Washington, DC."
+  },
+  {
+    "id": "dc-black-history-sites-i1",
+    "kind": "place",
+    "displayName": "African American Public School Campus",
+    "summary": "The John Mercer Langston School, located at 45 P Street NW in Washington, DC, was built in 1902 to accommodate overflow from neighboring schools. Named after the first African American congressman from Virginia, the school played a crucial role in educating African American children in the early 20th century.",
+    "eraBuckets": [
+      "1910s"
+    ],
+    "topicTags": [
+      "education",
+      "civil-rights",
+      "architecture",
+      "history",
+      "black-power"
+    ],
+    "topicIds": [
+      "education",
+      "civil-rights",
+      "architecture",
+      "history",
+      "black-power"
+    ],
+    "mentionedEntityIds": [],
+    "keywords": [
+      "John Mercer Langston School",
+      "African American Public School",
+      "Washington, DC",
+      "North Capitol Street",
+      "educational segregation"
+    ],
+    "jurisdictionLabel": "Washington, District of Columbia",
+    "locationPrecision": "institution",
+    "locationLabel": "45 P Street NW, Washington, DC",
+    "lat": 38.909885,
+    "lng": -77.010558,
+    "claims": [
+      {
+        "predicate": "The John Mercer Langston School was built in 1902.",
+        "object": "1902",
+        "confidenceLevel": "high",
+        "citationSource": "https://historicsites.dcpreservation.org/items/show/713",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/713",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "The school was named after John Mercer Langston, the first African American congressman from Virginia.",
+        "object": "John Mercer Langston",
+        "confidenceLevel": "high",
+        "citationSource": "https://historicsites.dcpreservation.org/items/show/713",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/713",
+        "citationLabel": "DC Historic Preservation Office"
+      },
+      {
+        "predicate": "The school was part of a network of schools for African American children along the North Capitol Street corridor.",
+        "object": "North Capitol Street corridor",
+        "confidenceLevel": "high",
+        "citationSource": "https://historicsites.dcpreservation.org/items/show/713",
+        "citationHref": "https://historicsites.dcpreservation.org/items/show/713",
+        "citationLabel": "DC Historic Preservation Office"
+      }
+    ],
+    "historicalContext": "The school was part of a network of institutions designed to educate African American children in Washington, DC, during a time when segregation and systemic racism were prevalent. Its construction reflects the efforts to provide educational opportunities for African American students in the late 19th and early 20th centuries."
+  }
+]

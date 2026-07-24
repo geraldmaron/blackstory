@@ -17,8 +17,11 @@ Environment=DISCOVERY_STORAGE_TERMS_CONFIRMED=true
 Environment=COMMIT_SURVIVORS=1
 Environment=DISCOVERY_OPERATOR_ID=scheduled-discovery-corsair
 # Optional: DISCOVERY_QUERIES_PER_RUN=3 (default) — rotates corsair-web-search-queries.json
-# Load Firebase / privacy pepper from a root-owned or user env file (never commit secrets).
+# Load secrets from env files (never commit). postgres.env has DATABASE_URL —
+# without it preflight fails the same way as the 2026-07-21 timer run.
 EnvironmentFile=-%h/.config/blackstory/discovery.env
+EnvironmentFile=-%h/.config/blackstory/enrichment.env
+EnvironmentFile=-%h/.config/blackstory/postgres.env
 ExecStart=%h/Developer/Projects/blackstory/scripts/run-scheduled-searxng-discovery.sh
 Nice=10
 

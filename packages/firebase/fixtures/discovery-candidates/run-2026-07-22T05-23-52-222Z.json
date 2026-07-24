@@ -1,0 +1,3936 @@
+{
+  "generatedAt": "2026-07-22T05:23:52.223Z",
+  "summary": {
+    "queriesRun": 1,
+    "queryFailures": 0,
+    "searchHits": 12,
+    "skippedDuplicate": 0,
+    "skippedFilter": 11,
+    "skippedCatalog": 0,
+    "newCandidates": 1,
+    "priorCandidates": 301,
+    "mergedCandidates": 297,
+    "newlyFoundThisRun": 1,
+    "weededA2Noise": [
+      "African American history",
+      "African-American Heritage Sites",
+      "Commendation Medal",
+      "abolitionism"
+    ]
+  },
+  "candidates": [
+    {
+      "id": "disc_tulsa_race_massacre_q1824714",
+      "kind": "event",
+      "displayName": "Tulsa Race Massacre",
+      "summary": "racially charged mass attack in Tulsa, Oklahoma, USA in May-June 1921",
+      "wikidataId": "Q1824714",
+      "aliases": [
+        "Tulsa Massacre",
+        "Tulsa Pogrom",
+        "Tulsa Race Riot",
+        "Greenwood Massacre",
+        "Black Wall Street Riot",
+        "Black Wall Street Massacre",
+        "Tulsa Riot"
+      ],
+      "sourceQuery": "Tulsa Race Massacre Greenwood",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Tulsa_race_massacre",
+      "lat": 36.15972,
+      "lng": -95.98583,
+      "discoveredAt": "2026-07-22T05:23:38.812Z"
+    },
+    {
+      "id": "disc_black_wall_street_q16952102",
+      "kind": "other",
+      "displayName": "Black Wall Street",
+      "summary": "Hub of African-American business in the 19-20th centuries",
+      "wikidataId": "Q16952102",
+      "aliases": [],
+      "sourceQuery": "Black Wall Street",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Wall_Street_(Durham%2C_North_Carolina)",
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_the_black_wall_street_times_q122945494",
+      "kind": "organization",
+      "displayName": "The Black Wall Street Times",
+      "summary": "African-American newspaper founded in Tulsa, Oklahoma in 2017",
+      "wikidataId": "Q122945494",
+      "aliases": [],
+      "sourceQuery": "Black Wall Street",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/The_Black_Wall_Street_Times",
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_jim_crow_laws_q865365",
+      "kind": "other",
+      "displayName": "Jim Crow laws",
+      "summary": "state and local laws enforcing racial segregation in the Southern United States",
+      "wikidataId": "Q865365",
+      "aliases": [],
+      "sourceQuery": "Black officeholders Reconstruction era",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Jim_Crow_laws",
+      "discoveredAt": "2026-07-22T05:23:47.676Z"
+    },
+    {
+      "id": "disc_underground_railroad_q868393",
+      "kind": "other",
+      "displayName": "Underground Railroad",
+      "summary": "network of secret routes & safehouses in 19th-century U.S. used by slaves to find freedom",
+      "wikidataId": "Q868393",
+      "aliases": [],
+      "sourceQuery": "Underground Railroad conductors",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Underground_Railroad",
+      "discoveredAt": "2026-07-22T05:23:08.598Z"
+    },
+    {
+      "id": "disc_harriet_tubman_underground_railroad_national_mon_q14691942",
+      "kind": "other",
+      "displayName": "Harriet Tubman Underground Railroad National Monument",
+      "summary": "National Historical Park of the United States in Maryland",
+      "wikidataId": "Q14691942",
+      "aliases": [
+        "HATU"
+      ],
+      "sourceQuery": "Underground Railroad sites",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Harriet_Tubman_Underground_Railroad_National_Historical_Park",
+      "lat": 38.4483,
+      "lng": -76.1387,
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_harriet_tubman_underground_railroad_visitor_cent_q29097633",
+      "kind": "place",
+      "displayName": "Harriet Tubman Underground Railroad Visitor Center",
+      "summary": "museum and visitor center in Maryland",
+      "wikidataId": "Q29097633",
+      "aliases": [],
+      "sourceQuery": "Underground Railroad sites",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Harriet_Tubman_Underground_Railroad_Visitor_Center",
+      "lat": 38.44975,
+      "lng": -76.13816,
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_the_underground_rail_road_q7771382",
+      "kind": "other",
+      "displayName": "The Underground Rail Road",
+      "summary": "1872 book by William Still",
+      "wikidataId": "Q7771382",
+      "aliases": [
+        "The Underground Railroad"
+      ],
+      "sourceQuery": "Underground Railroad sites",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/The_Underground_Railroad_(Still)",
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_black_press_q4921504",
+      "kind": "organization",
+      "displayName": "Black Press",
+      "summary": "Canadian publisher of newspapers",
+      "wikidataId": "Q4921504",
+      "aliases": [
+        "Black Press Group",
+        "Black Press Media",
+        "Black Press Group Ltd"
+      ],
+      "sourceQuery": "Black owned newspapers",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Press",
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_amsterdam_news_q1140177",
+      "kind": "organization",
+      "displayName": "Amsterdam News",
+      "summary": "African-American newspaper from Harlem, Manhattan, New York City",
+      "wikidataId": "Q1140177",
+      "aliases": [
+        "The New York Amsterdam News",
+        "New York Amsterdam News",
+        "The New York Amsterdam news",
+        "amsterdamnews.com",
+        "N.Y. Amsterdam News",
+        "The Amsterdam News",
+        "NY Amsterdam News"
+      ],
+      "sourceQuery": "Black owned newspapers",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/New_York_Amsterdam_News",
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_seattle_medium_q7442135",
+      "kind": "organization",
+      "displayName": "Seattle Medium",
+      "summary": "Black newspaper serving Seattle",
+      "wikidataId": "Q7442135",
+      "aliases": [
+        "The Medium"
+      ],
+      "sourceQuery": "Black owned newspapers",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Seattle_Medium",
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_california_african_american_museum_q5020212",
+      "kind": "place",
+      "displayName": "California African American Museum",
+      "summary": "museum in Los Angeles, California",
+      "wikidataId": "Q5020212",
+      "aliases": [
+        "CAAM",
+        "California Afro-American Museum"
+      ],
+      "sourceQuery": "African American museums",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/California_African_American_Museum",
+      "lat": 34.0158,
+      "lng": -118.283,
+      "discoveredAt": "2026-07-19T02:35:03.075Z"
+    },
+    {
+      "id": "disc_rural_african_american_museum_q65807727",
+      "kind": "place",
+      "displayName": "Rural African American Museum",
+      "summary": "African American Museum in Opelousas, Louisiana",
+      "wikidataId": "Q65807727",
+      "aliases": [],
+      "sourceQuery": "African American museums",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Rural_African_American_Museum",
+      "lat": 30.54667,
+      "lng": -92.07944,
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_bontemps_african_american_museum_q4942613",
+      "kind": "place",
+      "displayName": "Bontemps African American Museum",
+      "summary": "museum in Alexandria, Louisiana, U.S",
+      "wikidataId": "Q4942613",
+      "aliases": [],
+      "sourceQuery": "African American museums",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Bontemps_African_American_Museum",
+      "lat": 31.3099,
+      "lng": -92.4423,
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_jews_in_the_civil_rights_movement_q123758211",
+      "kind": "event",
+      "displayName": "Jews in the civil rights movement",
+      "summary": "Jewish organizations and individuals in the American Civil Rights Movement",
+      "wikidataId": "Q123758211",
+      "aliases": [],
+      "sourceQuery": "Civil Rights Movement leaders",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Jews_in_the_civil_rights_movement",
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_civil_rights_movement_1896_1954_q10579095",
+      "kind": "event",
+      "displayName": "civil rights movement (1896\u20131954)",
+      "summary": "social movement in the United States",
+      "wikidataId": "Q10579095",
+      "aliases": [],
+      "sourceQuery": "Civil Rights Movement leaders",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Civil_rights_movement_(1896%E2%80%931954)",
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_oakland_black_cowboy_association_q107969508",
+      "kind": "organization",
+      "displayName": "Oakland Black Cowboy Association",
+      "summary": "American nonprofit organization",
+      "wikidataId": "Q107969508",
+      "aliases": [],
+      "sourceQuery": "Black cowboys",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Oakland_Black_Cowboy_Association",
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_national_association_for_black_veterans_q6970559",
+      "kind": "organization",
+      "displayName": "National Association for Black Veterans",
+      "summary": "US Veterans Service Organization",
+      "wikidataId": "Q6970559",
+      "aliases": [],
+      "sourceQuery": "Black veterans organizations",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/National_Association_for_Black_Veterans",
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_alfred_niger_q111214355",
+      "kind": "person",
+      "displayName": "Alfred Niger",
+      "summary": "antebellum Black suffrage activist and barber from Providence, Rhode Island",
+      "wikidataId": "Q111214355",
+      "aliases": [],
+      "sourceQuery": "Black suffrage movement",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Alfred_Niger",
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_richmond_s_african_burial_grounds_and_historic_a_q116636568",
+      "kind": "place",
+      "displayName": "Richmond's African Burial Grounds and Historic African American Cemeteries",
+      "summary": "historic African American cemetery in Richmond, Virginia",
+      "wikidataId": "Q116636568",
+      "aliases": [],
+      "sourceQuery": "African American cemeteries",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/African_burial_grounds_and_historic_African_American_cemeteries_of_Richmond%2C_Virginia",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_frank_e_petersen_q5486398",
+      "kind": "other",
+      "displayName": "Frank E. Petersen",
+      "summary": "U.S. Marine Corps general; First African-American Marine Corps general; First African-American Marine Corps aviator",
+      "wikidataId": "Q5486398",
+      "aliases": [],
+      "sourceQuery": "first African American pilot aviator",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Frank_E._Petersen",
+      "discoveredAt": "2026-07-22T05:18:14.483Z"
+    },
+    {
+      "id": "disc_soul_food_q555997",
+      "kind": "other",
+      "displayName": "soul food",
+      "summary": "the ethnic cuisine of African Americans originating in the American South from the cuisines of enslaved Africans transported from Africa through the Atlantic slave trade",
+      "wikidataId": "Q555997",
+      "aliases": [
+        "African American cuisine",
+        "Black food"
+      ],
+      "sourceQuery": "Mount Vernon enslaved community African American",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Soul_food",
+      "discoveredAt": "2026-07-22T05:17:28.605Z"
+    },
+    {
+      "id": "disc_black_codes_q880661",
+      "kind": "other",
+      "displayName": "Black Codes",
+      "summary": "discriminatory state and local laws passed after the Civil War",
+      "wikidataId": "Q880661",
+      "aliases": [],
+      "sourceQuery": "Black judges United States history",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Codes_(United_States)",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_louisiana_african_american_heritage_trail_q6689060",
+      "kind": "other",
+      "displayName": "Louisiana African American Heritage Trail",
+      "summary": "cultural heritage trail with 38 sites in Louisiana",
+      "wikidataId": "Q6689060",
+      "aliases": [],
+      "sourceQuery": "Whitney Plantation Louisiana",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Louisiana_African_American_Heritage_Trail",
+      "discoveredAt": "2026-07-22T05:17:21.586Z"
+    },
+    {
+      "id": "disc_sheppard_mullins_q130248737",
+      "kind": "other",
+      "displayName": "Sheppard Mullins",
+      "summary": "african-American legislator and delegate",
+      "wikidataId": "Q130248737",
+      "aliases": [],
+      "sourceQuery": "Black officeholders Reconstruction era",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Sheppard_Mullins",
+      "discoveredAt": "2026-07-22T05:23:47.676Z"
+    },
+    {
+      "id": "disc_tuskegee_airmen_q39372",
+      "kind": "other",
+      "displayName": "Tuskegee Airmen",
+      "summary": "African-American military pilots during World War II",
+      "wikidataId": "Q39372",
+      "aliases": [
+        "Red Tails",
+        "332nd Fighter Group"
+      ],
+      "sourceQuery": "Tuskegee Airmen",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Tuskegee_Airmen",
+      "discoveredAt": "2026-07-22T05:18:42.607Z"
+    },
+    {
+      "id": "disc_freeman_field_mutiny_q5501005",
+      "kind": "other",
+      "displayName": "Freeman Field Mutiny",
+      "summary": "civil rights protest",
+      "wikidataId": "Q5501005",
+      "aliases": [],
+      "sourceQuery": "Tuskegee Airmen",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Freeman_Field_mutiny",
+      "lat": 38.92472,
+      "lng": -85.90833,
+      "discoveredAt": "2026-07-22T05:18:42.608Z"
+    },
+    {
+      "id": "disc_slave_songs_of_the_united_states_q7539166",
+      "kind": "other",
+      "displayName": "Slave Songs of the United States",
+      "summary": "collection of African-American spirituals",
+      "wikidataId": "Q7539166",
+      "aliases": [],
+      "sourceQuery": "slave revolts United States history",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Slave_Songs_of_the_United_States",
+      "discoveredAt": "2026-07-22T05:17:21.552Z"
+    },
+    {
+      "id": "disc_brown_fellowship_society_q24891974",
+      "kind": "organization",
+      "displayName": "Brown Fellowship Society",
+      "summary": "African-American self-help organization in South Carolina",
+      "wikidataId": "Q24891974",
+      "aliases": [],
+      "sourceQuery": "Denmark Vesey conspiracy Charleston",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Brown_Fellowship_Society",
+      "discoveredAt": "2026-07-22T05:17:40.242Z"
+    },
+    {
+      "id": "disc_negro_head_road_q27958368",
+      "kind": "other",
+      "displayName": "Negro Head Road",
+      "summary": "Place near Wilmington, North Carolina, U.S.",
+      "wikidataId": "Q27958368",
+      "aliases": [],
+      "sourceQuery": "Nat Turner rebellion Southampton",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Negro_Head_Road",
+      "discoveredAt": "2026-07-22T05:17:41.949Z"
+    },
+    {
+      "id": "disc_black_seminoles_q1315711",
+      "kind": "other",
+      "displayName": "Black Seminoles",
+      "summary": "ethnic group",
+      "wikidataId": "Q1315711",
+      "aliases": [
+        "Black Seminole"
+      ],
+      "sourceQuery": "Free Black communities antebellum",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Seminoles",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_black_august_q98399906",
+      "kind": "other",
+      "displayName": "Black August",
+      "summary": "annual commemoration",
+      "wikidataId": "Q98399906",
+      "aliases": [],
+      "sourceQuery": "Watts rebellion 1965",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_August_(commemoration)",
+      "discoveredAt": "2026-07-22T05:17:21.553Z"
+    },
+    {
+      "id": "disc_1967_detroit_riot_q768155",
+      "kind": "event",
+      "displayName": "1967 Detroit riot",
+      "summary": "the bloodiest episode in the race riots erupted in the USA during the summer 1967, a series of confrontations between black residents and the Detroit Police Department, begun in the early morning hours of Sunday July 23, 1967, in Detroit, Michigan",
+      "wikidataId": "Q768155",
+      "aliases": [
+        "1967 Detroit riots",
+        "1967 Detroit Rebellion",
+        "12th Street riot",
+        "1967 Detroit race riot"
+      ],
+      "sourceQuery": "Detroit uprising 1967",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/1967_Detroit_riot",
+      "lat": 42.37639,
+      "lng": -83.09944,
+      "discoveredAt": "2026-07-22T05:17:21.553Z"
+    },
+    {
+      "id": "disc_1967_tampa_riots_q107293067",
+      "kind": "event",
+      "displayName": "1967 Tampa riots",
+      "summary": "Race riot in Tampa, Florida, USA",
+      "wikidataId": "Q107293067",
+      "aliases": [],
+      "sourceQuery": "Detroit uprising 1967",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/1967_Tampa_riots",
+      "discoveredAt": "2026-07-22T05:14:52.272Z"
+    },
+    {
+      "id": "disc_1967_newark_riots_q4572764",
+      "kind": "other",
+      "displayName": "1967 Newark riots",
+      "summary": "one of the many race riots that swept cities in the U.S. during the \"Long Hot Summer of 1967\"",
+      "wikidataId": "Q4572764",
+      "aliases": [],
+      "sourceQuery": "Newark rebellion 1967",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/1967_Newark_riots",
+      "lat": 40.732,
+      "lng": -74.191,
+      "discoveredAt": "2026-07-22T05:17:21.553Z"
+    },
+    {
+      "id": "disc_long_hot_summer_of_1967_q17044485",
+      "kind": "other",
+      "displayName": "Long Hot Summer of 1967",
+      "summary": "race riots in the US in 1967",
+      "wikidataId": "Q17044485",
+      "aliases": [
+        "Long, Hot Summer of 1967"
+      ],
+      "sourceQuery": "Newark rebellion 1967",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Long%2C_hot_summer_of_1967",
+      "discoveredAt": "2026-07-22T05:17:21.553Z"
+    },
+    {
+      "id": "disc_1967_plainfield_riots_q4572785",
+      "kind": "other",
+      "displayName": "1967 Plainfield riots",
+      "summary": "one of the many race riots that swept cities in the U.S. during the \"Long Hot Summer of 1967\"",
+      "wikidataId": "Q4572785",
+      "aliases": [],
+      "sourceQuery": "Newark rebellion 1967",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/1967_Plainfield_riots",
+      "discoveredAt": "2026-07-22T05:17:21.553Z"
+    },
+    {
+      "id": "disc_1967_riviera_beach_riot_q107427691",
+      "kind": "event",
+      "displayName": "1967 Riviera Beach riot",
+      "summary": "civil rights disorder in Florida in 1967",
+      "wikidataId": "Q107427691",
+      "aliases": [],
+      "sourceQuery": "Newark rebellion 1967",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/1967_Riviera_Beach_riot",
+      "discoveredAt": "2026-07-22T05:14:55.063Z"
+    },
+    {
+      "id": "disc_harlem_riot_of_1943_q5658573",
+      "kind": "event",
+      "displayName": "Harlem Riot of 1943",
+      "summary": "disturbances that began after a NYPD policeman shot and wounded a black U.S. Army soldier",
+      "wikidataId": "Q5658573",
+      "aliases": [],
+      "sourceQuery": "Harlem riot 1935 OR 1943",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Harlem_riot_of_1943",
+      "discoveredAt": "2026-07-22T05:14:56.629Z"
+    },
+    {
+      "id": "disc_harlem_riot_of_1935_q5658575",
+      "kind": "event",
+      "displayName": "Harlem Riot of 1935",
+      "summary": "race riot in New York City, United States",
+      "wikidataId": "Q5658575",
+      "aliases": [],
+      "sourceQuery": "Harlem riot 1935 OR 1943",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Harlem_riot_of_1935",
+      "discoveredAt": "2026-07-22T05:23:34.557Z"
+    },
+    {
+      "id": "disc_black_buck_q4920442",
+      "kind": "other",
+      "displayName": "Black Buck",
+      "summary": "American racial slur",
+      "wikidataId": "Q4920442",
+      "aliases": [],
+      "sourceQuery": "Harlem riot 1935 OR 1943",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Buck",
+      "discoveredAt": "2026-07-22T05:14:56.630Z"
+    },
+    {
+      "id": "disc_viola_fletcher_q108438891",
+      "kind": "event",
+      "displayName": "Viola Fletcher",
+      "summary": "oldest known living survivor of the Tulsa race massacre (1914\u20132025)",
+      "wikidataId": "Q108438891",
+      "aliases": [
+        "Viola Ford Fletcher",
+        "Viola Ford",
+        "Mother Fletcher"
+      ],
+      "sourceQuery": "Tulsa Race Massacre Greenwood",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Viola_Fletcher",
+      "discoveredAt": "2026-07-22T05:23:38.814Z"
+    },
+    {
+      "id": "disc_dick_rowland_q5273327",
+      "kind": "other",
+      "displayName": "Dick Rowland",
+      "summary": "African American shoeshiner",
+      "wikidataId": "Q5273327",
+      "aliases": [],
+      "sourceQuery": "Tulsa Race Massacre Greenwood",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Dick_Rowland",
+      "discoveredAt": "2026-07-22T05:23:38.814Z"
+    },
+    {
+      "id": "disc_mary_e_jones_parrish_q132356227",
+      "kind": "event",
+      "displayName": "Mary E. Jones Parrish",
+      "summary": "African-American author, witness and survivor of the Tulsa race massacre",
+      "wikidataId": "Q132356227",
+      "aliases": [
+        "Mary Elizabeth Jones Parrish",
+        "Mary E. Jones"
+      ],
+      "sourceQuery": "Tulsa Race Massacre Greenwood",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Mary_Jones_Parrish",
+      "discoveredAt": "2026-07-22T05:23:38.814Z"
+    },
+    {
+      "id": "disc_atlanta_race_riot_q4816127",
+      "kind": "event",
+      "displayName": "Atlanta Race Riot",
+      "summary": "Massacre of African Americans in September 1906",
+      "wikidataId": "Q4816127",
+      "aliases": [],
+      "sourceQuery": "Tulsa Race Massacre Greenwood",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/1906_Atlanta_race_massacre",
+      "lat": 33.75432,
+      "lng": -84.38979,
+      "discoveredAt": "2026-07-22T05:23:38.814Z"
+    },
+    {
+      "id": "disc_a_j_smitherman_q112749131",
+      "kind": "person",
+      "displayName": "A. J. Smitherman",
+      "summary": "American lawyer, journalist, and civil rights activist",
+      "wikidataId": "Q112749131",
+      "aliases": [],
+      "sourceQuery": "Tulsa Race Massacre Greenwood",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/A._J._Smitherman",
+      "discoveredAt": "2026-07-22T05:23:38.814Z"
+    },
+    {
+      "id": "disc_buck_colbert_franklin_q106980822",
+      "kind": "other",
+      "displayName": "Buck Colbert Franklin",
+      "summary": "African American lawyer",
+      "wikidataId": "Q106980822",
+      "aliases": [
+        "B. C. Franklin",
+        "Buck Franklin"
+      ],
+      "sourceQuery": "Tulsa Race Massacre Greenwood",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Buck_Colbert_Franklin",
+      "discoveredAt": "2026-07-22T05:14:58.380Z"
+    },
+    {
+      "id": "disc_ocoee_massacre_q17107953",
+      "kind": "event",
+      "displayName": "Ocoee massacre",
+      "summary": "white mob attack on African-American residents in Ocoee, Florida",
+      "wikidataId": "Q17107953",
+      "aliases": [],
+      "sourceQuery": "Rosewood massacre Florida",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Ocoee_massacre",
+      "lat": 28.5933,
+      "lng": -81.5276,
+      "discoveredAt": "2026-07-22T05:23:43.221Z"
+    },
+    {
+      "id": "disc_perry_race_riot_q15706453",
+      "kind": "event",
+      "displayName": "Perry race riot",
+      "summary": "racially motivated conflict in Florida, USA",
+      "wikidataId": "Q15706453",
+      "aliases": [],
+      "sourceQuery": "Rosewood massacre Florida",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Perry_massacre",
+      "lat": 30.1134,
+      "lng": -83.5819,
+      "discoveredAt": "2026-07-22T05:23:43.222Z"
+    },
+    {
+      "id": "disc_whitney_plantation_historic_district_q7996735",
+      "kind": "place",
+      "displayName": "Whitney Plantation Historic District",
+      "summary": "US museum in Louisiana devoted to the history of slavery for sugar cane production on 2,000 acres",
+      "wikidataId": "Q7996735",
+      "aliases": [
+        "Whitney Plantation Museum",
+        "Whitney Plantation",
+        "Habitation Haydel"
+      ],
+      "sourceQuery": "Whitney Plantation Louisiana",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Whitney_Plantation_Historic_District",
+      "lat": 30.03917,
+      "lng": -90.65056,
+      "discoveredAt": "2026-07-22T05:17:21.584Z"
+    },
+    {
+      "id": "disc_nottoway_plantation_q7063764",
+      "kind": "other",
+      "displayName": "Nottoway Plantation",
+      "summary": "Historic plantation in Louisiana, United States",
+      "wikidataId": "Q7063764",
+      "aliases": [
+        "Nottoway Plantation House"
+      ],
+      "sourceQuery": "Whitney Plantation Louisiana",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Nottoway_Plantation",
+      "lat": 30.18556,
+      "lng": -91.16694,
+      "discoveredAt": "2026-07-22T05:17:21.585Z"
+    },
+    {
+      "id": "disc_laura_plantation_q6499319",
+      "kind": "place",
+      "displayName": "Laura Plantation",
+      "summary": "human settlement in United States of America",
+      "wikidataId": "Q6499319",
+      "aliases": [
+        "Habitation Duparc"
+      ],
+      "sourceQuery": "Laura Plantation",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Laura_Plantation",
+      "lat": 30.0087,
+      "lng": -90.7253,
+      "discoveredAt": "2026-07-22T05:17:48.796Z"
+    },
+    {
+      "id": "disc_evergreen_plantation_q5417235",
+      "kind": "place",
+      "displayName": "Evergreen Plantation",
+      "summary": "human settlement in Louisiana, United States of America",
+      "wikidataId": "Q5417235",
+      "aliases": [],
+      "sourceQuery": "Whitney Plantation Louisiana",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Evergreen_Plantation_(Wallace%2C_Louisiana)",
+      "lat": 30.02722,
+      "lng": -90.64056,
+      "discoveredAt": "2026-07-22T05:17:21.585Z"
+    },
+    {
+      "id": "disc_frogmore_plantation_q28124929",
+      "kind": "other",
+      "displayName": "Frogmore Plantation",
+      "summary": "plantation area in Louisiana, United States",
+      "wikidataId": "Q28124929",
+      "aliases": [],
+      "sourceQuery": "Whitney Plantation Louisiana",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Frogmore_Plantation",
+      "lat": 31.59444,
+      "lng": -91.67167,
+      "discoveredAt": "2026-07-22T05:17:21.586Z"
+    },
+    {
+      "id": "disc_history_of_slavery_in_louisiana_q5868843",
+      "kind": "other",
+      "displayName": "history of slavery in Louisiana",
+      "summary": "overview of chattel slavery in the territories collectively known as Louisiana",
+      "wikidataId": "Q5868843",
+      "aliases": [
+        "slavery in Louisiana history"
+      ],
+      "sourceQuery": "Whitney Plantation Louisiana",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/History_of_slavery_in_Louisiana",
+      "discoveredAt": "2026-07-22T05:17:21.586Z"
+    },
+    {
+      "id": "disc_magnolia_plantation_and_gardens_charleston_south_q11684456",
+      "kind": "place",
+      "displayName": "Magnolia Plantation and Gardens (Charleston, South Carolina)",
+      "summary": "human settlement in South Carolina, United States of America",
+      "wikidataId": "Q11684456",
+      "aliases": [
+        "Magnolia Gardens"
+      ],
+      "sourceQuery": "Hampton Plantation South Carolina",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Magnolia_Plantation_and_Gardens_(Charleston%2C_South_Carolina)",
+      "lat": 32.87641,
+      "lng": -80.0835,
+      "discoveredAt": "2026-07-22T05:17:50.721Z"
+    },
+    {
+      "id": "disc_gordon_q16200625",
+      "kind": "other",
+      "displayName": "Gordon",
+      "summary": "American enslaved man",
+      "wikidataId": "Q16200625",
+      "aliases": [
+        "Peter"
+      ],
+      "sourceQuery": "plantation historic sites African American enslaved",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Peter_(enslaved_man)",
+      "discoveredAt": "2026-07-22T05:17:08.870Z"
+    },
+    {
+      "id": "disc_myrtles_plantation_q6948645",
+      "kind": "other",
+      "displayName": "Myrtles Plantation",
+      "summary": "antebellum plantation in St. Francisville, Louisiana",
+      "wikidataId": "Q6948645",
+      "aliases": [],
+      "sourceQuery": "List of plantations of the United States",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Myrtles_Plantation",
+      "lat": 30.80306,
+      "lng": -91.3875,
+      "discoveredAt": "2026-07-22T05:17:33.432Z"
+    },
+    {
+      "id": "disc_westover_plantation_q2310858",
+      "kind": "other",
+      "displayName": "Westover Plantation",
+      "summary": "place in Virginia listed on National Register of Historic Places",
+      "wikidataId": "Q2310858",
+      "aliases": [],
+      "sourceQuery": "plantation historic sites African American enslaved",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Westover_Plantation",
+      "lat": 37.3328,
+      "lng": -77.1731,
+      "discoveredAt": "2026-07-22T05:17:08.870Z"
+    },
+    {
+      "id": "disc_stratford_hall_q569047",
+      "kind": "other",
+      "displayName": "Stratford Hall",
+      "summary": "plantation",
+      "wikidataId": "Q569047",
+      "aliases": [],
+      "sourceQuery": "plantation historic sites African American enslaved",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Stratford_Hall_(plantation)",
+      "lat": 38.1517,
+      "lng": -76.8397,
+      "discoveredAt": "2026-07-22T05:17:08.870Z"
+    },
+    {
+      "id": "disc_homewood_plantation_q22060083",
+      "kind": "other",
+      "displayName": "Homewood Plantation",
+      "summary": "antebellum plantation near Natchez, Mississippi",
+      "wikidataId": "Q22060083",
+      "aliases": [],
+      "sourceQuery": "plantation historic sites African American enslaved",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Homewood_Plantation_(Natchez%2C_Mississippi)",
+      "lat": 31.57656,
+      "lng": -91.37027,
+      "discoveredAt": "2026-07-22T05:17:08.870Z"
+    },
+    {
+      "id": "disc_cherokee_plantation_q106949843",
+      "kind": "other",
+      "displayName": "Cherokee Plantation",
+      "summary": "historic site, former plantation, house of Charles Emile Sompayrac and Clarisse Prudhomme",
+      "wikidataId": "Q106949843",
+      "aliases": [
+        "Cherokee Plantation House",
+        "Cherokee Plantation House, Natchez, Louisiana",
+        "Emile Sompayrac Place",
+        "Murphy Place",
+        "E. G. Murphy Estate"
+      ],
+      "sourceQuery": "plantation historic sites African American enslaved",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Cherokee_Plantation_(Natchez%2C_Louisiana)",
+      "lat": 31.68972,
+      "lng": -93.03361,
+      "discoveredAt": "2026-07-22T05:17:08.870Z"
+    },
+    {
+      "id": "disc_shirley_plantation_q7498824",
+      "kind": "other",
+      "displayName": "Shirley Plantation",
+      "summary": "estate in Virginia, United States of America",
+      "wikidataId": "Q7498824",
+      "aliases": [
+        "Shirley Hundred",
+        "West and Sherley Hundred",
+        "Sherley Hundred"
+      ],
+      "sourceQuery": "plantation historic sites African American enslaved",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Shirley_Plantation",
+      "lat": 37.3558,
+      "lng": -77.2442,
+      "discoveredAt": "2026-07-22T05:17:08.870Z"
+    },
+    {
+      "id": "disc_callaway_plantation_q5021801",
+      "kind": "place",
+      "displayName": "Callaway Plantation",
+      "summary": "historic house museum and plantation in Washington, Georgia, United States of America",
+      "wikidataId": "Q5021801",
+      "aliases": [
+        "Arnold-Callaway Plantation"
+      ],
+      "sourceQuery": "plantation historic sites African American enslaved",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Callaway_Plantation",
+      "lat": 33.7756,
+      "lng": -82.81201,
+      "discoveredAt": "2026-07-22T05:17:08.870Z"
+    },
+    {
+      "id": "disc_monticello_q199618",
+      "kind": "other",
+      "displayName": "Monticello",
+      "summary": "the primary plantation of Thomas Jefferson",
+      "wikidataId": "Q199618",
+      "aliases": [
+        "Monticello, Virginia",
+        "Monticello, VA"
+      ],
+      "sourceQuery": "Monticello Mulberry Row enslaved community",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Monticello",
+      "lat": 38.01031,
+      "lng": -78.45233,
+      "discoveredAt": "2026-07-22T05:17:26.566Z"
+    },
+    {
+      "id": "disc_african_american_korean_american_relations_q123982952",
+      "kind": "other",
+      "displayName": "African American - Korean American relations",
+      "summary": "race relations in the United States",
+      "wikidataId": "Q123982952",
+      "aliases": [],
+      "sourceQuery": "African-American neighborhoods",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/African_American%E2%80%93Korean_American_relations",
+      "discoveredAt": "2026-07-22T05:17:21.547Z"
+    },
+    {
+      "id": "disc_leon_black_q5578461",
+      "kind": "other",
+      "displayName": "Leon Black",
+      "summary": "American billionaire businessman, MoMa Chairman, art collector (born 1951)",
+      "wikidataId": "Q5578461",
+      "aliases": [
+        "Leon David Black"
+      ],
+      "sourceQuery": "Black Wall Street",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Leon_Black",
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_underground_railroad_bicycle_route_q24191509",
+      "kind": "other",
+      "displayName": "Underground Railroad Bicycle Route",
+      "summary": "bicycle route which follows the Underground Railroad",
+      "wikidataId": "Q24191509",
+      "aliases": [],
+      "sourceQuery": "Underground Railroad sites",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Underground_Railroad_Bicycle_Route",
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_l_union_american_newspaper_q123631118",
+      "kind": "organization",
+      "displayName": "L'Union (American newspaper)",
+      "summary": "African-American newspaper",
+      "wikidataId": "Q123631118",
+      "aliases": [
+        "Union"
+      ],
+      "sourceQuery": "Black owned newspapers",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/L'Union_(American_newspaper)",
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_national_museum_of_african_american_music_q55453584",
+      "kind": "place",
+      "displayName": "National Museum of African American Music",
+      "summary": "African-American museum",
+      "wikidataId": "Q55453584",
+      "aliases": [],
+      "sourceQuery": "African American museums",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/National_Museum_of_African_American_Music",
+      "lat": 36.17586,
+      "lng": -86.78998,
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_civil_rights_movement_1865_1896_q4689617",
+      "kind": "event",
+      "displayName": "civil rights movement (1865\u20131896)",
+      "summary": "movement aiming to eliminate racial discrimination against African Americans",
+      "wikidataId": "Q4689617",
+      "aliases": [],
+      "sourceQuery": "Civil Rights Movement leaders",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Civil_rights_movement_(1865%E2%80%931896)",
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_savannah_protest_movement_q122850677",
+      "kind": "event",
+      "displayName": "Savannah Protest Movement",
+      "summary": "American civil rights campaign in Savannah, Georgia (1960\u20131963)",
+      "wikidataId": "Q122850677",
+      "aliases": [],
+      "sourceQuery": "Civil Rights Movement leaders",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Savannah_Protest_Movement",
+      "lat": 32.07806,
+      "lng": -81.08944,
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_civil_rights_movement_in_popular_culture_q19866606",
+      "kind": "event",
+      "displayName": "civil rights movement in popular culture",
+      "summary": "1954\u20131968 American civil rights movement in popular culture",
+      "wikidataId": "Q19866606",
+      "aliases": [
+        "American civil rights movement in popular culture"
+      ],
+      "sourceQuery": "Civil Rights Movement leaders",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Civil_rights_movement_in_popular_culture",
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_african_american_trail_rides_q123845586",
+      "kind": "other",
+      "displayName": "African-American trail rides",
+      "summary": "louisiana\u2013Texas cultural festivals",
+      "wikidataId": "Q123845586",
+      "aliases": [],
+      "sourceQuery": "Black cowboys",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/African_American_trail_rides",
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_benjamin_black_q135246262",
+      "kind": "other",
+      "displayName": "Benjamin Black",
+      "summary": "American businessman",
+      "wikidataId": "Q135246262",
+      "aliases": [],
+      "sourceQuery": "Black veterans organizations",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Benjamin_Black_(investor)",
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_alice_augusta_ball_q16059113",
+      "kind": "other",
+      "displayName": "Alice Augusta Ball",
+      "summary": "African American chemist (1892\u20131916)",
+      "wikidataId": "Q16059113",
+      "aliases": [],
+      "sourceQuery": "African American inventors",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Alice_Ball",
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_suffrage_q185387",
+      "kind": "other",
+      "displayName": "suffrage",
+      "summary": "right to vote in public and political elections",
+      "wikidataId": "Q185387",
+      "aliases": [
+        "active right to vote",
+        "political franchise",
+        "franchise",
+        "active suffrage",
+        "voter eligibility",
+        "voting rights",
+        "right to vote"
+      ],
+      "sourceQuery": "Black suffrage movement",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Suffrage",
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_woman_suffrage_procession_q8030700",
+      "kind": "other",
+      "displayName": "Woman Suffrage Procession",
+      "summary": "1913 suffragist parade in Washington, D.C., United States",
+      "wikidataId": "Q8030700",
+      "aliases": [
+        "1913 Woman Suffrage Procession",
+        "1913 Women's march",
+        "1913 Women's Suffrage Parade",
+        "Woman Suffrage Procession and Pageant",
+        "Women's Suffrage Parade",
+        "Women's suffrage parade",
+        "Woman Suffrage Parade of 1913"
+      ],
+      "sourceQuery": "Black suffrage movement",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Woman_Suffrage_Procession",
+      "lat": 38.895,
+      "lng": -77.02778,
+      "discoveredAt": "2026-07-22T05:17:21.548Z"
+    },
+    {
+      "id": "disc_black_mesa_q880398",
+      "kind": "other",
+      "displayName": "Black Mesa",
+      "summary": "mesa in the U.S. states of Colorado, New Mexico and Oklahoma",
+      "wikidataId": "Q880398",
+      "aliases": [],
+      "sourceQuery": "Black towns Oklahoma",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Mesa_(Oklahoma%2C_Colorado%2C_New_Mexico)",
+      "lat": 36.93185,
+      "lng": -102.99737,
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_east_hargett_street_q109728124",
+      "kind": "place",
+      "displayName": "East Hargett Street",
+      "summary": "street and historically African American neighborhood in Raleigh, North Carolina",
+      "wikidataId": "Q109728124",
+      "aliases": [],
+      "sourceQuery": "Black business districts",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/East_Hargett_Street_(Raleigh%2C_North_Carolina)",
+      "lat": 35.778,
+      "lng": -78.63,
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_black_rock_q4921694",
+      "kind": "place",
+      "displayName": "Black Rock",
+      "summary": "neighborhood in Bridgeport, Connecticut",
+      "wikidataId": "Q4921694",
+      "aliases": [
+        "Black Rock, CT"
+      ],
+      "sourceQuery": "Black business districts",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Rock%2C_Bridgeport",
+      "lat": 41.1586,
+      "lng": -73.2253,
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_rye_african_american_cemetery_q4689715",
+      "kind": "place",
+      "displayName": "Rye African-American Cemetery",
+      "summary": "historic cemetery in Westchester County, New York",
+      "wikidataId": "Q4689715",
+      "aliases": [
+        "African Cemetery, Rye"
+      ],
+      "sourceQuery": "African American cemeteries",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Rye_African-American_Cemetery",
+      "lat": 40.97611,
+      "lng": -73.70333,
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_nora_l_baston_q132178356",
+      "kind": "other",
+      "displayName": "Nora L. Baston",
+      "summary": "Will be the first African American woman to be police commissioner in Boston",
+      "wikidataId": "Q132178356",
+      "aliases": [],
+      "sourceQuery": "Black Women Lead Boston",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Nora_L._Baston",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_mattie_may_adams_q132200982",
+      "kind": "other",
+      "displayName": "Mattie May Adams",
+      "summary": "First licensed African American interior designer in New England",
+      "wikidataId": "Q132200982",
+      "aliases": [
+        "Mattie Adams"
+      ],
+      "sourceQuery": "Black Women Lead Boston",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Mattie_Adams",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_de_ama_battle_q96746960",
+      "kind": "other",
+      "displayName": "De Ama Battle",
+      "summary": "American dancer, dance teacher, scholar of African dance; founder of Art of Black Dance and Music",
+      "wikidataId": "Q96746960",
+      "aliases": [
+        "Dolores Haynes",
+        "DeAma Battle"
+      ],
+      "sourceQuery": "Black Women Lead Boston",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/De_Ama_Battle",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_letitia_campfield_q132528973",
+      "kind": "institution",
+      "displayName": "Letitia Campfield",
+      "summary": "One of the first African American women to attend Boston City Hospital School of Nursing and to train for nursing at Boston City Hospital",
+      "wikidataId": "Q132528973",
+      "aliases": [],
+      "sourceQuery": "Black Women Lead Boston",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Letitia_Campfield",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_charlene_carroll_q133818892",
+      "kind": "other",
+      "displayName": "Charlene Carroll",
+      "summary": "African American hairstylist from Boston, MA recognized for developing hair wrapping",
+      "wikidataId": "Q133818892",
+      "aliases": [],
+      "sourceQuery": "Black Women Lead Boston",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Charlene_Carroll",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_karen_miller_q125516183",
+      "kind": "other",
+      "displayName": "Karen Miller",
+      "summary": "Boston's first Black female firefighter",
+      "wikidataId": "Q125516183",
+      "aliases": [],
+      "sourceQuery": "Black Women Lead Boston",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Karen_Miller_(firefighter)",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_black_decker_dustbuster_q133974539",
+      "kind": "other",
+      "displayName": "Black & Decker DustBuster",
+      "summary": "cordless vacuum cleaner",
+      "wikidataId": "Q133974539",
+      "aliases": [],
+      "sourceQuery": "Black women inventors United States",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_%26_Decker_DustBuster",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_hidden_figures_the_american_dream_and_the_untold_q28464870",
+      "kind": "other",
+      "displayName": "Hidden Figures: The American Dream and the Untold Story of the Black Women Mathematicians Who Helped Win the Space Race",
+      "summary": "2016 non-fiction work by Margot Lee Shetterly",
+      "wikidataId": "Q28464870",
+      "aliases": [
+        "Hidden Figures",
+        "Hidden Figures: The Story of the African-american Women Who Helped Win the Space Race",
+        "Hidden Figures (book)"
+      ],
+      "sourceQuery": "Black women engineers NASA",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Hidden_Figures_(book)",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_karen_d_king_q95970469",
+      "kind": "other",
+      "displayName": "Karen D. King",
+      "summary": "African-American mathematics educator",
+      "wikidataId": "Q95970469",
+      "aliases": [
+        "Karen Denise King",
+        "Karen D King"
+      ],
+      "sourceQuery": "African American women mathematicians",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Karen_D._King",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_african_american_architects_a_biographical_dicti_q42060015",
+      "kind": "other",
+      "displayName": "African American Architects: A Biographical Dictionary, 1865-1945",
+      "summary": "book by Dreck Spurlock Wilson",
+      "wikidataId": "Q42060015",
+      "aliases": [
+        "African American Architects"
+      ],
+      "sourceQuery": "African American architects",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/African_American_Architects%3A_A_Biographical_Dictionary%2C_1865%E2%80%931945",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_kenneth_roderick_o_neal_q111698711",
+      "kind": "other",
+      "displayName": "Kenneth Roderick O'Neal",
+      "summary": "African-American architect (1908\u20131989)",
+      "wikidataId": "Q111698711",
+      "aliases": [
+        "Kenneth Roderick O\u2019Neal",
+        "K. Roderick O'Neal",
+        "Kenneth R. O'Neal"
+      ],
+      "sourceQuery": "African American architects",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Kenneth_Roderick_O'Neal",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_buffalo_soldier_q1002108",
+      "kind": "other",
+      "displayName": "Buffalo Soldier",
+      "summary": "African American regiments of the US Army created 1866, the first black regulars in peacetime",
+      "wikidataId": "Q1002108",
+      "aliases": [
+        "Buffalo Soldiers",
+        "Negro Cavalry"
+      ],
+      "sourceQuery": "Buffalo Soldiers",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Buffalo_Soldier",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_buffalo_soldiers_national_museum_q96742033",
+      "kind": "place",
+      "displayName": "Buffalo Soldiers National Museum",
+      "summary": "Museum for history of African Americans across all branches of the US military",
+      "wikidataId": "Q96742033",
+      "aliases": [],
+      "sourceQuery": "Buffalo Soldiers",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Buffalo_Soldiers_National_Museum",
+      "lat": 29.736,
+      "lng": -95.3781,
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_charles_young_buffalo_soldiers_national_monument_q5148107",
+      "kind": "other",
+      "displayName": "Charles Young Buffalo Soldiers National Monument",
+      "summary": "National Monument of the United States commemorating Charles Young (1864-1922), an escaped slave who became a Buffalo Soldier in the U.S. Army and its first African-American colonel",
+      "wikidataId": "Q5148107",
+      "aliases": [
+        "CHYO"
+      ],
+      "sourceQuery": "Buffalo Soldiers",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Charles_Young_Buffalo_Soldiers_National_Monument",
+      "lat": 39.70818,
+      "lng": -83.89329,
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_harlem_renaissance_q829895",
+      "kind": "event",
+      "displayName": "Harlem Renaissance",
+      "summary": "African-American cultural movement in New York City in the 1920s",
+      "wikidataId": "Q829895",
+      "aliases": [
+        "New Negro Movement"
+      ],
+      "sourceQuery": "Harlem Renaissance figures",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Harlem_Renaissance",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_black_renaissance_in_d_c_q98079009",
+      "kind": "event",
+      "displayName": "Black Renaissance in D.C.",
+      "summary": "african-American cultural movement in Washington DC",
+      "wikidataId": "Q98079009",
+      "aliases": [],
+      "sourceQuery": "Harlem Renaissance figures",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Renaissance_in_D.C.",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_chicago_black_renaissance_q16957374",
+      "kind": "other",
+      "displayName": "Chicago Black Renaissance",
+      "summary": "african-American cultural flowering in 1930s & 1940s Illinois",
+      "wikidataId": "Q16957374",
+      "aliases": [
+        "Black Renaissance"
+      ],
+      "sourceQuery": "Harlem Renaissance figures",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Chicago_Black_Renaissance",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_black_belt_q880087",
+      "kind": "other",
+      "displayName": "Black Belt",
+      "summary": "historical region of the Southeastern United States populated by people of Niger-Congo descent",
+      "wikidataId": "Q880087",
+      "aliases": [],
+      "sourceQuery": "Chicago Black Belt history",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Belt_in_the_American_South",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_black_history_month_q458206",
+      "kind": "other",
+      "displayName": "Black History Month",
+      "summary": "Annual celebration of Black history",
+      "wikidataId": "Q458206",
+      "aliases": [
+        "African-American History Month",
+        "African History Month",
+        "National African American History Month"
+      ],
+      "sourceQuery": "Chicago Black Belt history",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_History_Month",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_prince_hall_freemasonry_q16238196",
+      "kind": "other",
+      "displayName": "Prince Hall Freemasonry",
+      "summary": "African American Branch of Freemasonry",
+      "wikidataId": "Q16238196",
+      "aliases": [],
+      "sourceQuery": "Black freemasonry lodges",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Prince_Hall_Freemasonry",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_black_creek_site_q120549406",
+      "kind": "other",
+      "displayName": "Black Creek Site",
+      "summary": "archaeological site in Sussex County, New Jersey",
+      "wikidataId": "Q120549406",
+      "aliases": [
+        "Black Creek Site (28-Sx-297)"
+      ],
+      "sourceQuery": "National Register Black history sites",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Creek_Site_(28SX297)",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_cia_black_sites_q108131731",
+      "kind": "other",
+      "displayName": "CIA black sites",
+      "summary": "secret headquarters used by the CIA",
+      "wikidataId": "Q108131731",
+      "aliases": [],
+      "sourceQuery": "National Register Black history sites",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/CIA_black_sites",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_racial_segregation_q59816",
+      "kind": "other",
+      "displayName": "racial segregation",
+      "summary": "separation of humans based on race",
+      "wikidataId": "Q59816",
+      "aliases": [
+        "segregation"
+      ],
+      "sourceQuery": "Black schools segregation era",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Racial_segregation",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_history_of_african_american_education_q123134782",
+      "kind": "other",
+      "displayName": "History of African-American education",
+      "summary": "U.S. educational institutions for Black people (late-1860s\u20131960s)",
+      "wikidataId": "Q123134782",
+      "aliases": [],
+      "sourceQuery": "Black schools segregation era",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/History_of_African-American_education",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_segregation_academy_q7446325",
+      "kind": "institution",
+      "displayName": "segregation academy",
+      "summary": "segregationist private schools",
+      "wikidataId": "Q7446325",
+      "aliases": [],
+      "sourceQuery": "Black schools segregation era",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Segregation_academy",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_sex_segregation_in_iran_q7458537",
+      "kind": "other",
+      "displayName": "sex segregation in Iran",
+      "summary": "Islamic culture in Iran",
+      "wikidataId": "Q7458537",
+      "aliases": [],
+      "sourceQuery": "Black schools segregation era",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Sex_segregation_in_Iran",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_brown_v_board_of_education_q875738",
+      "kind": "institution",
+      "displayName": "Brown v. Board of Education",
+      "summary": "1954 U.S. Supreme Court case which declared school segregation unconstitutional",
+      "wikidataId": "Q875738",
+      "aliases": [
+        "Brown v Board of Education",
+        "Brown case",
+        "Brown v. Board of Education of Topeka",
+        "Oliver Brown, et al. v. Board of Education of Topeka, et al."
+      ],
+      "sourceQuery": "Black schools segregation era",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Brown_v._Board_of_Education",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_freedom_riders_q538790",
+      "kind": "other",
+      "displayName": "Freedom Riders",
+      "summary": "U.S. activists who rode interstate buses in interracial groups to show the continuing prevalence of segregation",
+      "wikidataId": "Q538790",
+      "aliases": [
+        "Freedom riders",
+        "Freedom rides"
+      ],
+      "sourceQuery": "Freedom Schools",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Freedom_Riders",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_student_nonviolent_coordinating_committee_q127723",
+      "kind": "event",
+      "displayName": "Student Nonviolent Coordinating Committee",
+      "summary": "largest student-led civil rights organization during the American Civil Rights Movement",
+      "wikidataId": "Q127723",
+      "aliases": [
+        "SNCC",
+        "S N C C",
+        "Student Non-violent Coordinating Committee",
+        "Student Nonviolent Coordinating Committee (U.S.)"
+      ],
+      "sourceQuery": "Student Nonviolent Coordinating Committee",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Student_Nonviolent_Coordinating_Committee",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_congress_of_racial_equality_q1125901",
+      "kind": "organization",
+      "displayName": "Congress of Racial Equality",
+      "summary": "United States civil rights organization",
+      "wikidataId": "Q1125901",
+      "aliases": [
+        "CORE"
+      ],
+      "sourceQuery": "Congress of Racial Equality",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Congress_of_Racial_Equality",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_steelworkers_and_shipyard_workers_for_equality_q109283893",
+      "kind": "organization",
+      "displayName": "Steelworkers and Shipyard Workers for Equality",
+      "summary": "former labor organization of Black workers",
+      "wikidataId": "Q109283893",
+      "aliases": [],
+      "sourceQuery": "Congress of Racial Equality",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Steelworkers_and_Shipyard_Workers_for_Equality",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_james_l_farmer_jr_q3806642",
+      "kind": "person",
+      "displayName": "James L. Farmer, Jr.",
+      "summary": "African Americans' rights activist (1920-1999)",
+      "wikidataId": "Q3806642",
+      "aliases": [],
+      "sourceQuery": "Congress of Racial Equality",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/James_Farmer",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_ruth_denny_q111317467",
+      "kind": "person",
+      "displayName": "Ruth Denny",
+      "summary": "African American educator and civil rights activist in Denver, Colorado",
+      "wikidataId": "Q111317467",
+      "aliases": [
+        "Ruth Cousins Denny"
+      ],
+      "sourceQuery": "Congress of Racial Equality",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Ruth_Denny",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_million_man_march_q1581794",
+      "kind": "event",
+      "displayName": "Million Man March",
+      "summary": "large gathering of African-American men in Washington, D.C. during 1995",
+      "wikidataId": "Q1581794",
+      "aliases": [],
+      "sourceQuery": "March on Washington organizers",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Million_Man_March",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_black_panther_party_q189150",
+      "kind": "organization",
+      "displayName": "Black Panther Party",
+      "summary": "US Black power organization (1966\u20131982)",
+      "wikidataId": "Q189150",
+      "aliases": [
+        "Black Pather Party For Self Defense",
+        "BPP",
+        "The Black Panthers"
+      ],
+      "sourceQuery": "Black Panther Party chapters",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Panther_Party",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_new_black_panther_party_q2640783",
+      "kind": "organization",
+      "displayName": "New Black Panther Party",
+      "summary": "U.S.-based political organization (1989-)",
+      "wikidataId": "Q2640783",
+      "aliases": [
+        "NBPP"
+      ],
+      "sourceQuery": "Black Panther Party chapters",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/New_Black_Panther_Party",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_new_afrikan_black_panther_party_q23017282",
+      "kind": "organization",
+      "displayName": "New Afrikan Black Panther Party",
+      "summary": "Maoist organization in the United States",
+      "wikidataId": "Q23017282",
+      "aliases": [
+        "New Afrikan Black Panther Party \u2013 Prison Chapter",
+        "NABPP",
+        "NABPP-PC"
+      ],
+      "sourceQuery": "Black Panther Party chapters",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/New_Afrikan_Black_Panther_Party",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_black_panther_militia_q106726791",
+      "kind": "organization",
+      "displayName": "Black Panther Militia",
+      "summary": "militant Black Power organization",
+      "wikidataId": "Q106726791",
+      "aliases": [],
+      "sourceQuery": "Black Panther Party chapters",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Panther_Militia",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_black_panther_party_winston_salem_north_carolina_q17985943",
+      "kind": "organization",
+      "displayName": "Black Panther Party, Winston-Salem, North Carolina Chapter",
+      "summary": "reginal chapter of the African-American revolutionary organization",
+      "wikidataId": "Q17985943",
+      "aliases": [],
+      "sourceQuery": "Black Panther Party chapters",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Panther_Party%2C_Winston-Salem%2C_North_Carolina_Chapter",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_des_moines_iowa_chapter_of_the_black_panther_par_q125894909",
+      "kind": "other",
+      "displayName": "Des Moines, Iowa chapter of the Black Panther Party",
+      "summary": "chapter of Black Panther Party",
+      "wikidataId": "Q125894909",
+      "aliases": [],
+      "sourceQuery": "Black Panther Party chapters",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Des_Moines%2C_Iowa_chapter_of_the_Black_Panther_Party",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_free_breakfast_for_children_q5499756",
+      "kind": "place",
+      "displayName": "Free Breakfast for Children",
+      "summary": "community service program run by the Black Panther Party",
+      "wikidataId": "Q5499756",
+      "aliases": [],
+      "sourceQuery": "Black Panther Party chapters",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Free_Breakfast_for_Children",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_new_haven_black_panther_trials_q7008501",
+      "kind": "other",
+      "displayName": "New Haven Black Panther trials",
+      "summary": "1969-71 criminal prosecutions",
+      "wikidataId": "Q7008501",
+      "aliases": [],
+      "sourceQuery": "Black Panther Party chapters",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/New_Haven_Black_Panther_trials",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_freedom_q104844813",
+      "kind": "organization",
+      "displayName": "Freedom",
+      "summary": "monthly newspaper on African-American issues",
+      "wikidataId": "Q104844813",
+      "aliases": [
+        "Freedom (New York, N.Y. : 1951)"
+      ],
+      "sourceQuery": "African American newspapers editors",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Freedom_(American_newspaper)",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_eugene_r_black_sr_q1373171",
+      "kind": "other",
+      "displayName": "Eugene R. Black, Sr.",
+      "summary": "American banker (1898\u20131992)",
+      "wikidataId": "Q1373171",
+      "aliases": [
+        "Eugene \"Gene\" Robert Black, Sr.",
+        "Eugene Robert Black"
+      ],
+      "sourceQuery": "Black bankers United States",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Eugene_R._Black_Sr.",
+      "discoveredAt": "2026-07-22T05:17:21.549Z"
+    },
+    {
+      "id": "disc_the_black_stallion_q884454",
+      "kind": "other",
+      "displayName": "The Black Stallion",
+      "summary": "literary work",
+      "wikidataId": "Q884454",
+      "aliases": [],
+      "sourceQuery": "Black jockeys horse racing",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/The_Black_Stallion",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_black_gold_q4920844",
+      "kind": "other",
+      "displayName": "Black Gold",
+      "summary": "American Thoroughbred racehorse",
+      "wikidataId": "Q4920844",
+      "aliases": [],
+      "sourceQuery": "Black jockeys horse racing",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Gold_(horse)",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_negro_american_league_q6987577",
+      "kind": "organization",
+      "displayName": "Negro American League",
+      "summary": "American Baseball League",
+      "wikidataId": "Q6987577",
+      "aliases": [],
+      "sourceQuery": "Negro League baseball stadiums",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Negro_American_League",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_west_coast_negro_baseball_league_q7984819",
+      "kind": "organization",
+      "displayName": "West Coast Negro Baseball League",
+      "summary": "one of the several Negro baseball leagues in the USA",
+      "wikidataId": "Q7984819",
+      "aliases": [],
+      "sourceQuery": "Negro League baseball stadiums",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/West_Coast_Negro_Baseball_Association",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_kansas_city_monarchs_q731544",
+      "kind": "organization",
+      "displayName": "Kansas City Monarchs",
+      "summary": "Negro League baseball team",
+      "wikidataId": "Q731544",
+      "aliases": [],
+      "sourceQuery": "Negro League baseball stadiums",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Kansas_City_Monarchs",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_wilford_horace_smith_q18912758",
+      "kind": "other",
+      "displayName": "Wilford Horace Smith",
+      "summary": "African-American lawyer",
+      "wikidataId": "Q18912758",
+      "aliases": [
+        "Wilford H. Smith"
+      ],
+      "sourceQuery": "African American lawyers pioneers",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Wilford_Horace_Smith",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_black_company_of_pioneers_q4920565",
+      "kind": "other",
+      "displayName": "Black Company of Pioneers",
+      "summary": "military unit",
+      "wikidataId": "Q4920565",
+      "aliases": [
+        "Black Pioneers",
+        "Clinton's Black Pioneers"
+      ],
+      "sourceQuery": "African American engineers pioneers",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Company_of_Pioneers",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_william_tebeau_q22806753",
+      "kind": "institution",
+      "displayName": "William Tebeau",
+      "summary": "first African-American man to graduate from Oregon State College (1948)",
+      "wikidataId": "Q22806753",
+      "aliases": [
+        "William Henry Tebeau"
+      ],
+      "sourceQuery": "African American engineers pioneers",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/William_Tebeau",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_african_american_vernacular_english_q8002",
+      "kind": "other",
+      "displayName": "African American Vernacular English",
+      "summary": "non-standard variety of English spoken by most working- and middle-class African Americans and some Black Canadians",
+      "wikidataId": "Q8002",
+      "aliases": [
+        "Black Vernacular",
+        "Black English Vernacular",
+        "Black Vernacular English",
+        "AAVE",
+        "Ebonics",
+        "BVE",
+        "BEV"
+      ],
+      "sourceQuery": "African American nurses historic",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/African-American_Vernacular_English",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_sara_iredell_fleetwood_q49689478",
+      "kind": "other",
+      "displayName": "Sara Iredell Fleetwood",
+      "summary": "African American nurse and teacher",
+      "wikidataId": "Q49689478",
+      "aliases": [],
+      "sourceQuery": "African American nurses historic",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Sara_Iredell_Fleetwood",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_susie_taylor_q14954671",
+      "kind": "other",
+      "displayName": "Susie Taylor",
+      "summary": "African American nurse & writer (1848-1912)",
+      "wikidataId": "Q14954671",
+      "aliases": [
+        "Susie King Taylor",
+        "Susie King Baker",
+        "Susan Ann Baker"
+      ],
+      "sourceQuery": "African American nurses historic",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Susie_King_Taylor",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_black_britons_q3244280",
+      "kind": "other",
+      "displayName": "Black Britons",
+      "summary": "British people of African or Melanesian descent",
+      "wikidataId": "Q3244280",
+      "aliases": [
+        "Afro Britons",
+        "Black Briton",
+        "Afro Briton",
+        "African Britons",
+        "African British",
+        "African Briton",
+        "Black British"
+      ],
+      "sourceQuery": "Black midwives United States",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_British_people",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_mammy_q3844185",
+      "kind": "other",
+      "displayName": "mammy",
+      "summary": "archetypal stock character of a rotund, homely, and matronly black woman",
+      "wikidataId": "Q3844185",
+      "aliases": [],
+      "sourceQuery": "Black midwives United States",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Mammy_stereotype",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_black_hawk_q714534",
+      "kind": "person",
+      "displayName": "Black Hawk",
+      "summary": "Sauk leader",
+      "wikidataId": "Q714534",
+      "aliases": [
+        "Chief Black Hawk"
+      ],
+      "sourceQuery": "Boston Black women leaders history",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Hawk_(Sauk_leader)",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_eliza_ann_gardner_q22018527",
+      "kind": "person",
+      "displayName": "Eliza Ann Gardner",
+      "summary": "African-American abolitionist and religious leader",
+      "wikidataId": "Q22018527",
+      "aliases": [],
+      "sourceQuery": "Boston Black women leaders history",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Eliza_Ann_Gardner",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_juanita_brooks_wade_q133872148",
+      "kind": "place",
+      "displayName": "Juanita Brooks Wade",
+      "summary": "Bostonian African American community organizer and business development professional.",
+      "wikidataId": "Q133872148",
+      "aliases": [],
+      "sourceQuery": "Boston Black women leaders history",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Juanita_Brooks_Wade",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_barbara_gomes_beach_q132201345",
+      "kind": "person",
+      "displayName": "Barbara Gomes-Beach",
+      "summary": "Boston African American Activist for individuals with HIV and AIDS",
+      "wikidataId": "Q132201345",
+      "aliases": [],
+      "sourceQuery": "Blue Hill Avenue Black Women Lead",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Barbara_Gomes-Beach",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_teri_williams_q133273105",
+      "kind": "other",
+      "displayName": "Teri Williams",
+      "summary": "President & Chief Operating Officer of OneUnited Bank, the nation's largest African American owned bank.",
+      "wikidataId": "Q133273105",
+      "aliases": [],
+      "sourceQuery": "Blue Hill Avenue Black Women Lead",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Teri_Williams",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_black_dahlia_q233693",
+      "kind": "other",
+      "displayName": "Black Dahlia",
+      "summary": "American murder victim (1924-1947)",
+      "wikidataId": "Q233693",
+      "aliases": [
+        "the Black Dahlia"
+      ],
+      "sourceQuery": "Blue Hill Avenue Black Women Lead",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Dahlia",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_greene_vardiman_black_q1356596",
+      "kind": "other",
+      "displayName": "Greene Vardiman Black",
+      "summary": "American dentistry academic",
+      "wikidataId": "Q1356596",
+      "aliases": [
+        "G.V. Black"
+      ],
+      "sourceQuery": "Black dentists United States history",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Greene_Vardiman_Black",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_maudelle_brown_bousfield_q95974673",
+      "kind": "institution",
+      "displayName": "Maudelle Brown Bousfield",
+      "summary": "American educator, First African-American to serve as principal of a Chicago public school (1885-1971)",
+      "wikidataId": "Q95974673",
+      "aliases": [
+        "Maudelle Tanner Bousfield"
+      ],
+      "sourceQuery": "African American educators pioneers",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Maudelle_Bousfield",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_alma_stone_williams_q20984608",
+      "kind": "other",
+      "displayName": "Alma Stone Williams",
+      "summary": "African-American musician, educator, music scholar, and pioneer in racial integration",
+      "wikidataId": "Q20984608",
+      "aliases": [],
+      "sourceQuery": "African American educators pioneers",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Alma_Stone_Williams",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_john_warren_davis_q90649402",
+      "kind": "institution",
+      "displayName": "John Warren Davis",
+      "summary": "African American educator, college administrator and civil rights leader (1888-1980)",
+      "wikidataId": "Q90649402",
+      "aliases": [
+        "John W. Davis"
+      ],
+      "sourceQuery": "African American educators pioneers",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/John_Warren_Davis_(college_president)",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_elise_johnson_mcdougald_q19974907",
+      "kind": "person",
+      "displayName": "Elise Johnson McDougald",
+      "summary": "American educator, writer, activist and first African-American woman principal in New York City public schools (1885\u20131971)",
+      "wikidataId": "Q19974907",
+      "aliases": [
+        "Gertrude Elise McDougald Ayer",
+        "Gertrude Elise Ayer",
+        "Gertrude Elise Johnson McDougald Ayer"
+      ],
+      "sourceQuery": "African American educators pioneers",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Elise_Johnson_McDougald",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_black_lives_matter_q19600530",
+      "kind": "event",
+      "displayName": "Black Lives Matter",
+      "summary": "social movement originating in the USA",
+      "wikidataId": "Q19600530",
+      "aliases": [
+        "#BlackLivesMatter",
+        "BLM"
+      ],
+      "sourceQuery": "Black librarians United States",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Lives_Matter",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_blackpast_org_q30049687",
+      "kind": "other",
+      "displayName": "BlackPast.org",
+      "summary": "website on African American History",
+      "wikidataId": "Q30049687",
+      "aliases": [
+        "BlackPast",
+        "Black Past"
+      ],
+      "sourceQuery": "Black librarians United States",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/BlackPast.org",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_roy_wood_sr_q96579990",
+      "kind": "other",
+      "displayName": "Roy Wood Sr.",
+      "summary": "African-American radio pioneer, civil rights journalist, commentator, entrepreneur (1915-1995)",
+      "wikidataId": "Q96579990",
+      "aliases": [
+        "Roy Wood",
+        "Roy N. Wood Sr.",
+        "Roy N. Wood",
+        "Roy Norris Wood",
+        "Roy Norris Wood Sr."
+      ],
+      "sourceQuery": "African American journalists pioneers",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Roy_Wood_Sr.",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_african_american_musical_theater_q4689684",
+      "kind": "other",
+      "displayName": "African American musical theater",
+      "summary": "prominent especially in New York City",
+      "wikidataId": "Q4689684",
+      "aliases": [],
+      "sourceQuery": "African American theaters historic",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/African-American_musical_theater",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_african_american_english_q48767245",
+      "kind": "other",
+      "displayName": "African American English",
+      "summary": "set of English dialects primarily spoken by most black people in the United States",
+      "wikidataId": "Q48767245",
+      "aliases": [
+        "AAE",
+        "Black English",
+        "African-American English"
+      ],
+      "sourceQuery": "African American theaters historic",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/African-American_English",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_chitlin_circuit_q1074909",
+      "kind": "other",
+      "displayName": "Chitlin' circuit",
+      "summary": "venues central to Black American culture in the 1930s-70s",
+      "wikidataId": "Q1074909",
+      "aliases": [],
+      "sourceQuery": "African American theaters historic",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Chitlin'_Circuit",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_long_live_the_black_parade_tour_q131180494",
+      "kind": "other",
+      "displayName": "Long Live The Black Parade Tour",
+      "summary": "concert tour by My Chemical Romance",
+      "wikidataId": "Q131180494",
+      "aliases": [],
+      "sourceQuery": "Black opera singers United States",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Long_Live_The_Black_Parade",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_fisk_jubilee_singers_q4038788",
+      "kind": "other",
+      "displayName": "Fisk Jubilee Singers",
+      "summary": "African-American a cappella ensemble",
+      "wikidataId": "Q4038788",
+      "aliases": [
+        "Fisk University Jubilee Quartet",
+        "Booker Male Quartet",
+        "The Fisk Jubilee Singers",
+        "Fisk University Male Quartette"
+      ],
+      "sourceQuery": "Black opera singers United States",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Fisk_Jubilee_Singers",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_thomas_bowers_q7787781",
+      "kind": "other",
+      "displayName": "Thomas Bowers",
+      "summary": "African American concert artist (1823\u20131885)",
+      "wikidataId": "Q7787781",
+      "aliases": [
+        "Thomas J. Bowers",
+        "The Colored Mario",
+        "The American Mario"
+      ],
+      "sourceQuery": "Black opera singers United States",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Thomas_Bowers_(singer)",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_african_american_film_score_composers_q134828303",
+      "kind": "other",
+      "displayName": "African American film score composers",
+      "summary": "cultural overview article",
+      "wikidataId": "Q134828303",
+      "aliases": [
+        "African-American film score composers",
+        "African American film composers",
+        "African-American film composers"
+      ],
+      "sourceQuery": "African American composers",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/African_American_film_score_composers",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_francis_johnson_q1441586",
+      "kind": "other",
+      "displayName": "Francis Johnson",
+      "summary": "African American musician and composer (1792\u20131844)",
+      "wikidataId": "Q1441586",
+      "aliases": [
+        "Frank Johnson"
+      ],
+      "sourceQuery": "African American composers",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Francis_Johnson_(composer)",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_black_swan_records_q2470060",
+      "kind": "other",
+      "displayName": "Black Swan Records",
+      "summary": "record label",
+      "wikidataId": "Q2470060",
+      "aliases": [
+        "Black Swan",
+        "Pace Phonograph Corporation"
+      ],
+      "sourceQuery": "Black classical musicians",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Swan_Records",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_african_american_art_q4689680",
+      "kind": "other",
+      "displayName": "African American art",
+      "summary": "visual arts of the people of African descent in the United States of America",
+      "wikidataId": "Q4689680",
+      "aliases": [],
+      "sourceQuery": "African American visual artists",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/African-American_art",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_aaron_douglas_q4661979",
+      "kind": "other",
+      "displayName": "Aaron Douglas",
+      "summary": "African-American painter, illustrator and visual arts educator (1899\u20131979)",
+      "wikidataId": "Q4661979",
+      "aliases": [
+        "The father of Black American art"
+      ],
+      "sourceQuery": "African American visual artists",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Aaron_Douglas_(artist)",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_black_abstractionism_q130251315",
+      "kind": "event",
+      "displayName": "Black Abstractionism",
+      "summary": "modern arts movement",
+      "wikidataId": "Q130251315",
+      "aliases": [],
+      "sourceQuery": "African American visual artists",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Abstract_art_by_African-American_artists",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_united_states_colored_troops_q3550735",
+      "kind": "organization",
+      "displayName": "United States Colored Troops",
+      "summary": "African American soldiers for the Union in the American Civil War",
+      "wikidataId": "Q3550735",
+      "aliases": [],
+      "sourceQuery": "Black sculptors United States",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/United_States_Colored_Troops",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_david_black_sculptor_q33123628",
+      "kind": "other",
+      "displayName": "David Black (sculptor)",
+      "summary": "American sculptor (1928\u20132023)",
+      "wikidataId": "Q33123628",
+      "aliases": [
+        "David E. Black",
+        "David Black",
+        "David Black (sculptor)"
+      ],
+      "sourceQuery": "Black sculptors United States",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/David_Black_(sculptor)",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_archibald_motley_q4786462",
+      "kind": "other",
+      "displayName": "Archibald Motley",
+      "summary": "African American artist (1891-1981)",
+      "wikidataId": "Q4786462",
+      "aliases": [
+        "Archibald John Motley, Jr.",
+        "Archibald John Motley",
+        "Archibald Motley, Jr."
+      ],
+      "sourceQuery": "Chicago Black Renaissance",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Archibald_Motley",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_the_last_poets_q1811622",
+      "kind": "event",
+      "displayName": "The Last Poets",
+      "summary": "several groups of black poets active in the late 1960s Black Power movement",
+      "wikidataId": "Q1811622",
+      "aliases": [],
+      "sourceQuery": "African American poets Harlem",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/The_Last_Poets",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_the_book_of_american_negro_poetry_q105773150",
+      "kind": "other",
+      "displayName": "The Book of American Negro Poetry",
+      "summary": "1922 poetry anthology",
+      "wikidataId": "Q105773150",
+      "aliases": [],
+      "sourceQuery": "African American poets Harlem",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/The_Book_of_American_Negro_Poetry",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_william_black_q1397722",
+      "kind": "other",
+      "displayName": "William Black",
+      "summary": "British novelist (1841\u20131898)",
+      "wikidataId": "Q1397722",
+      "aliases": [],
+      "sourceQuery": "Black novelists United States",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/William_Black_(novelist)",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_black_hebrew_israelites_q2415143",
+      "kind": "other",
+      "displayName": "Black Hebrew Israelites",
+      "summary": "a group of Black Americans holding the antisemitic pseudoscientific belief that they are the only descendants of ancient Israelites",
+      "wikidataId": "Q2415143",
+      "aliases": [
+        "Hebrew Israelites",
+        "Black Hebrews",
+        "Black Israelites",
+        "African Hebrew Israelites"
+      ],
+      "sourceQuery": "Black novelists United States",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Hebrew_Israelites",
+      "discoveredAt": "2026-07-22T05:17:21.550Z"
+    },
+    {
+      "id": "disc_black_coffee_q16215736",
+      "kind": "other",
+      "displayName": "Black Coffee",
+      "summary": "South African DJ and record producer",
+      "wikidataId": "Q16215736",
+      "aliases": [
+        "Nkosinathi Maphumulo",
+        "Nkosinathi Innocent Maphumulo"
+      ],
+      "sourceQuery": "Black dance companies historic",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Coffee_(DJ)",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_african_american_music_q388207",
+      "kind": "other",
+      "displayName": "African-American music",
+      "summary": "broad term covering a diverse range of musical genres largely developed by African Americans and their culture",
+      "wikidataId": "Q388207",
+      "aliases": [
+        "Black music",
+        "Black American music",
+        "Afro-American music",
+        "African American music"
+      ],
+      "sourceQuery": "African American athletic pioneers",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/African-American_music",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_african_american_muslims_q28219783",
+      "kind": "other",
+      "displayName": "African-American Muslims",
+      "summary": "African American religious minority",
+      "wikidataId": "Q28219783",
+      "aliases": [
+        "Black Muslims"
+      ],
+      "sourceQuery": "African American athletic pioneers",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/African-American_Muslims",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_negro_national_league_q6987611",
+      "kind": "organization",
+      "displayName": "Negro National League",
+      "summary": "US baseball league active from 1933 to 1948",
+      "wikidataId": "Q6987611",
+      "aliases": [],
+      "sourceQuery": "Negro National League teams",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Negro_National_League_(1933%E2%80%931948)",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_negro_national_league_q6987609",
+      "kind": "organization",
+      "displayName": "Negro National League",
+      "summary": "US baseball league active from 1920 to 1931",
+      "wikidataId": "Q6987609",
+      "aliases": [],
+      "sourceQuery": "Negro National League teams",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Negro_National_League_(1920%E2%80%931931)",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_negro_league_baseball_q1371594",
+      "kind": "organization",
+      "displayName": "Negro league baseball",
+      "summary": "former United States professional baseball leagues",
+      "wikidataId": "Q1371594",
+      "aliases": [
+        "Negro Leagues",
+        "Negro American League",
+        "Negro National League"
+      ],
+      "sourceQuery": "Negro National League teams",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Negro_league_baseball",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_negro_world_series_q16147465",
+      "kind": "other",
+      "displayName": "Negro World Series",
+      "summary": "American baseball tournament (1924\u20131927, 1942\u20131948)",
+      "wikidataId": "Q16147465",
+      "aliases": [],
+      "sourceQuery": "Negro National League teams",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Negro_World_Series",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_negro_southern_league_q30597414",
+      "kind": "organization",
+      "displayName": "Negro Southern League",
+      "summary": "baseball league composed of African Americans",
+      "wikidataId": "Q30597414",
+      "aliases": [],
+      "sourceQuery": "Negro National League teams",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Negro_Southern_League_(1920%E2%80%931936)",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_american_civil_war_q8676",
+      "kind": "other",
+      "displayName": "American Civil War",
+      "summary": "1861\u20131865 civil war in the United States between the North and the South over the enslavement of African-Americans",
+      "wikidataId": "Q8676",
+      "aliases": [
+        "War Between the States",
+        "Civil War",
+        "The Civil War",
+        "U.S. Civil War",
+        "US Civil War",
+        "United States Civil War",
+        "War of the Rebellion",
+        "War of Northern Aggression"
+      ],
+      "sourceQuery": "African American Civil War soldiers",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/American_Civil_War",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_african_american_civil_war_memorial_and_museum_q55340690",
+      "kind": "place",
+      "displayName": "African American Civil War Memorial and Museum",
+      "summary": "memorial and museum in Washington, DC",
+      "wikidataId": "Q55340690",
+      "aliases": [
+        "African American Civil War Memorial & Museum"
+      ],
+      "sourceQuery": "African American Civil War soldiers",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/African_American_Civil_War_Memorial_Museum",
+      "lat": 38.91624,
+      "lng": -77.02549,
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_1st_louisiana_native_guard_q4596437",
+      "kind": "other",
+      "displayName": "1st Louisiana Native Guard",
+      "summary": "all-black regiment in the American Civil War",
+      "wikidataId": "Q4596437",
+      "aliases": [
+        "Corps d'Afrique",
+        "1st Corps d'Afrique Engineers",
+        "Louisiana Native Guards",
+        "First Louisiana Native Guards"
+      ],
+      "sourceQuery": "United States Colored Troops",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/1st_Louisiana_Native_Guard_(Union)",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_free_negro_q13534615",
+      "kind": "other",
+      "displayName": "free Negro",
+      "summary": "non-slave black person in pre-emancipation USA",
+      "wikidataId": "Q13534615",
+      "aliases": [
+        "free Negroes",
+        "free blacks",
+        "free black"
+      ],
+      "sourceQuery": "Free Black communities antebellum",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Free_Blacks",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_gibson_family_q140196898",
+      "kind": "other",
+      "displayName": "Gibson family",
+      "summary": "family of free African-American origin from the Colony of Virginia",
+      "wikidataId": "Q140196898",
+      "aliases": [],
+      "sourceQuery": "Free Black communities antebellum",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Gibson_family_(Virginia)",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_black_refugee_q4921578",
+      "kind": "other",
+      "displayName": "Black refugee",
+      "summary": "Black refugees during the War of 1812",
+      "wikidataId": "Q4921578",
+      "aliases": [],
+      "sourceQuery": "Free Black communities antebellum",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_refugee_(War_of_1812)",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_new_york_african_society_for_mutual_relief_q104844761",
+      "kind": "organization",
+      "displayName": "New York African Society for Mutual Relief",
+      "summary": "mutual aid society for African Americans in New York City",
+      "wikidataId": "Q104844761",
+      "aliases": [
+        "NYASMR"
+      ],
+      "sourceQuery": "African American mutual aid societies",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/New_York_African_Society_for_Mutual_Relief",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_free_african_society_q5499728",
+      "kind": "organization",
+      "displayName": "Free African Society",
+      "summary": "African American mutual aid organization",
+      "wikidataId": "Q5499728",
+      "aliases": [
+        "Free African Society of Philadelphia"
+      ],
+      "sourceQuery": "African American mutual aid societies",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Free_African_Society",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_ancient_egyptian_arabic_order_of_the_nobles_of_t_q125101412",
+      "kind": "organization",
+      "displayName": "Ancient Egyptian Arabic Order of the Nobles of the Mystic Shrine",
+      "summary": "fraternal organization of African Americans and other Blacks",
+      "wikidataId": "Q125101412",
+      "aliases": [],
+      "sourceQuery": "Prince Hall Freemasonry",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Ancient_Egyptian_Arabic_Order_of_the_Nobles_of_the_Mystic_Shrine",
+      "lat": 35.06829,
+      "lng": -89.98903,
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_crispus_attucks_q288241",
+      "kind": "event",
+      "displayName": "Crispus Attucks",
+      "summary": "African American/Native American, first victim of the Boston Massacre",
+      "wikidataId": "Q288241",
+      "aliases": [],
+      "sourceQuery": "Prince Hall Freemasonry",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Crispus_Attucks",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_national_black_chamber_of_commerce_q6971011",
+      "kind": "organization",
+      "displayName": "National Black Chamber of Commerce",
+      "summary": "American nonprofit organization",
+      "wikidataId": "Q6971011",
+      "aliases": [],
+      "sourceQuery": "African American chambers of commerce",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/National_Black_Chamber_of_Commerce",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_african_methodist_episcopal_zion_church_q384125",
+      "kind": "place",
+      "displayName": "African Methodist Episcopal Zion Church",
+      "summary": "predominantly African American religious organization",
+      "wikidataId": "Q384125",
+      "aliases": [
+        "AME Zion Church",
+        "A.M.E. Zion Church"
+      ],
+      "sourceQuery": "African Methodist Episcopal historic churches",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/African_Methodist_Episcopal_Zion_Church",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_african_methodist_episcopal_church_q384121",
+      "kind": "place",
+      "displayName": "African Methodist Episcopal Church",
+      "summary": "African American Protestant denomination",
+      "wikidataId": "Q384121",
+      "aliases": [
+        "A.M.E. Church",
+        "AME Church",
+        "African Methodist Episcopalian Church",
+        "AME church",
+        "African Methodist Episcopal",
+        "A.M.E.",
+        "African Methodist Episcopal (A.M.E.) Church",
+        "African Methodist Episcopalian",
+        "A.M.E",
+        "A. M. E.",
+        "Ame church"
+      ],
+      "sourceQuery": "African Methodist Episcopal historic churches",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/African_Methodist_Episcopal_Church",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_christian_methodist_episcopal_church_q1081108",
+      "kind": "place",
+      "displayName": "Christian Methodist Episcopal Church",
+      "summary": "Black Methodist church in the United States.",
+      "wikidataId": "Q1081108",
+      "aliases": [
+        "C.M.E.",
+        "CME",
+        "Colored Methodist Episcopal Church in America"
+      ],
+      "sourceQuery": "African Methodist Episcopal historic churches",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Christian_Methodist_Episcopal_Church",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_odd_fellows_cemetery_q7077343",
+      "kind": "place",
+      "displayName": "Odd Fellows Cemetery",
+      "summary": "African-American cemetery in Starkville, Mississippi",
+      "wikidataId": "Q7077343",
+      "aliases": [
+        "Odd Fellows Black Cemetery"
+      ],
+      "sourceQuery": "African American cemeteries National Register",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Odd_Fellows_Cemetery_(Starkville%2C_Mississippi)",
+      "lat": 33.46667,
+      "lng": -88.82083,
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_mount_zion_cemetery_q6924771",
+      "kind": "place",
+      "displayName": "Mount Zion Cemetery",
+      "summary": "two historic African American cemeteries in Georgetown, Washington, D.C., United States",
+      "wikidataId": "Q6924771",
+      "aliases": [
+        "Mt Zion - Female Union Band Society Cemetery",
+        "Female Union Band Cemetery",
+        "Mount Zion Cemetery / Female Union Band Cemetery",
+        "Mount Zion Cemetery - Female Union Band Cemetery",
+        "Mt. Zion and Female Union Band Society Cemeteries",
+        "Old Methodist Burying Ground",
+        "Mount Zion Cemetery/Female Union Band Society Cemetery",
+        "Mount Zion Cemetery (Washington, D.C.)",
+        "Mount Zion Cemetery, Washington, D.C.",
+        "Mt. Zion Cemetery (Washington, D.C.)",
+        "Mt. Zion Cemetery, Washington, D.C.",
+        "Mount Zion Cemetery/ Female Union Band Cemetery",
+        "Montgomery Street Methodist Church Cemetery",
+        "Mount Zion-Female Union Band Society cemetery"
+      ],
+      "sourceQuery": "African American cemeteries National Register",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Mount_Zion_Cemetery_(Washington%2C_D.C.)",
+      "lat": 38.91112,
+      "lng": -77.05466,
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_philander_smith_university_q7182919",
+      "kind": "institution",
+      "displayName": "Philander Smith University",
+      "summary": "private historically black college in Little Rock, Arkansas, United States",
+      "wikidataId": "Q7182919",
+      "aliases": [
+        "PSC",
+        "Philander Smith College"
+      ],
+      "sourceQuery": "HBCU campuses historic",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Philander_Smith_University",
+      "lat": 34.7369,
+      "lng": -92.2825,
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_talladega_college_q7680006",
+      "kind": "institution",
+      "displayName": "Talladega College",
+      "summary": "Alabama's oldest private historically black college",
+      "wikidataId": "Q7680006",
+      "aliases": [],
+      "sourceQuery": "HBCU campuses historic",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Talladega_College",
+      "lat": 33.4321,
+      "lng": -86.1133,
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_virginia_university_of_lynchburg_q7934641",
+      "kind": "institution",
+      "displayName": "Virginia University of Lynchburg",
+      "summary": "Private HBCU in Lynchburg, Virginia, U.S.",
+      "wikidataId": "Q7934641",
+      "aliases": [],
+      "sourceQuery": "HBCU campuses historic",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Virginia_University_of_Lynchburg",
+      "lat": 37.3952,
+      "lng": -79.1517,
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_african_american_student_access_to_medical_schoo_q138535273",
+      "kind": "other",
+      "displayName": "African American student access to medical schools",
+      "summary": "history of segregation of medical studies",
+      "wikidataId": "Q138535273",
+      "aliases": [],
+      "sourceQuery": "Meharry Medical College history",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/African_American_student_access_to_medical_schools",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_dorothy_lavinia_brown_q4793436",
+      "kind": "other",
+      "displayName": "Dorothy Lavinia Brown",
+      "summary": "African-American surgeon, teacher and politician (1919\u20132004)",
+      "wikidataId": "Q4793436",
+      "aliases": [
+        "Dr Dorothy Lavinia Brown"
+      ],
+      "sourceQuery": "Meharry Medical College history",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Dorothy_Lavinia_Brown",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_william_a_campbell_q16019325",
+      "kind": "other",
+      "displayName": "William A. Campbell",
+      "summary": "African American pilot (1917\u20132012); Tuskegee Airman",
+      "wikidataId": "Q16019325",
+      "aliases": [
+        "William Campbell",
+        "Wild Bill Campbell",
+        "Bill Campbell"
+      ],
+      "sourceQuery": "Tuskegee Institute historic",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/William_A._Campbell_(Tuskegee_Airman)",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_african_american_history_of_nebraska_q116443555",
+      "kind": "other",
+      "displayName": "African American History of Nebraska",
+      "summary": "ethnic group in Nebraska",
+      "wikidataId": "Q116443555",
+      "aliases": [],
+      "sourceQuery": "African American homesteaders",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/African-American_history_of_Nebraska",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_sundown_town_q3298871",
+      "kind": "place",
+      "displayName": "sundown town",
+      "summary": "all-white municipalities that practice a form of racial segregation",
+      "wikidataId": "Q3298871",
+      "aliases": [
+        "sunset town",
+        "gray town",
+        "sundowner town",
+        "sundown county",
+        "sundown suburb",
+        "sunset towns"
+      ],
+      "sourceQuery": "Black towns Texas",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Sundown_town",
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_black_ankle_q4920275",
+      "kind": "place",
+      "displayName": "Black Ankle",
+      "summary": "ghost town in San Augustine County, Texas",
+      "wikidataId": "Q4920275",
+      "aliases": [
+        "Black Ankle, Texas",
+        "Black Ankle, TX"
+      ],
+      "sourceQuery": "Black towns Texas",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Ankle%2C_Texas",
+      "lat": 31.5239,
+      "lng": -94.0047,
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_black_q85747467",
+      "kind": "place",
+      "displayName": "Black",
+      "summary": "unincorporated community in Texas, United States",
+      "wikidataId": "Q85747467",
+      "aliases": [
+        "Black, TX"
+      ],
+      "sourceQuery": "Black towns Texas",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black%2C_Texas",
+      "lat": 34.68233,
+      "lng": -102.60956,
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_nicodemus_national_historic_site_q7028918",
+      "kind": "place",
+      "displayName": "Nicodemus National Historic Site",
+      "summary": "National Historic Site, African-American museum and open-air museum in Graham County, Kansas",
+      "wikidataId": "Q7028918",
+      "aliases": [
+        "NICO"
+      ],
+      "sourceQuery": "Nicodemus Kansas",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Nicodemus_National_Historic_Site",
+      "lat": 39.3908,
+      "lng": -99.6175,
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_birmingham_civil_rights_national_monument_q28336825",
+      "kind": "other",
+      "displayName": "Birmingham Civil Rights National Monument",
+      "summary": "United States National Monument in Birmingham, Alabama",
+      "wikidataId": "Q28336825",
+      "aliases": [
+        "BICR"
+      ],
+      "sourceQuery": "Birmingham civil rights landmarks",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Birmingham_Civil_Rights_National_Monument",
+      "lat": 33.51528,
+      "lng": -86.81472,
+      "discoveredAt": "2026-07-22T05:17:21.551Z"
+    },
+    {
+      "id": "disc_civil_rights_act_of_1968_q1094483",
+      "kind": "other",
+      "displayName": "Civil Rights Act of 1968",
+      "summary": "United States law",
+      "wikidataId": "Q1094483",
+      "aliases": [
+        "Fair Housing Act"
+      ],
+      "sourceQuery": "Birmingham civil rights landmarks",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Civil_Rights_Act_of_1968",
+      "discoveredAt": "2026-07-22T05:17:21.552Z"
+    },
+    {
+      "id": "disc_united_states_commission_on_civil_rights_q7889639",
+      "kind": "other",
+      "displayName": "United States Commission on Civil Rights",
+      "summary": "government agency",
+      "wikidataId": "Q7889639",
+      "aliases": [
+        "Commission on Civil Rights",
+        "U.S. Commission on Civil Rights",
+        "USCCR",
+        "CCR"
+      ],
+      "sourceQuery": "Memphis civil rights sites",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/United_States_Commission_on_Civil_Rights",
+      "discoveredAt": "2026-07-22T05:17:21.552Z"
+    },
+    {
+      "id": "disc_little_rock_central_high_school_desegregation_si_q65045795",
+      "kind": "institution",
+      "displayName": "Little Rock Central High School Desegregation silver dollar",
+      "summary": "2007 United States commemorative coin",
+      "wikidataId": "Q65045795",
+      "aliases": [],
+      "sourceQuery": "Little Rock Central High",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Little_Rock_Central_High_School_Desegregation_silver_dollar",
+      "discoveredAt": "2026-07-22T05:17:21.552Z"
+    },
+    {
+      "id": "disc_black_heritage_trail_q4464436",
+      "kind": "other",
+      "displayName": "Black Heritage Trail",
+      "summary": "urban walking trail in Boston, USA",
+      "wikidataId": "Q4464436",
+      "aliases": [],
+      "sourceQuery": "Black heritage trails United States",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Heritage_Trail",
+      "discoveredAt": "2026-07-22T05:17:21.552Z"
+    },
+    {
+      "id": "disc_stepping_q7611114",
+      "kind": "other",
+      "displayName": "stepping",
+      "summary": "percussive dance in which the participant's entire body is used as an instrument",
+      "wikidataId": "Q7611114",
+      "aliases": [],
+      "sourceQuery": "African American historic districts",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Stepping_(African-American)",
+      "discoveredAt": "2026-07-22T05:17:21.552Z"
+    },
+    {
+      "id": "disc_african_american_resort_q121878949",
+      "kind": "other",
+      "displayName": "African American resort",
+      "summary": "any resort established or run by African-Americans",
+      "wikidataId": "Q121878949",
+      "aliases": [
+        "African-American resorts",
+        "black resorts"
+      ],
+      "sourceQuery": "African American historic districts",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/African_American_resorts",
+      "discoveredAt": "2026-07-22T05:17:21.552Z"
+    },
+    {
+      "id": "disc_grand_united_order_of_true_reformers_q117184128",
+      "kind": "organization",
+      "displayName": "Grand United Order of True Reformers",
+      "summary": "African American fraternal organization",
+      "wikidataId": "Q117184128",
+      "aliases": [
+        "Grand Fountain of the United Order of True Reformers"
+      ],
+      "sourceQuery": "African American fraternal organizations",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Grand_United_Order_of_True_Reformers",
+      "discoveredAt": "2026-07-22T05:17:21.552Z"
+    },
+    {
+      "id": "disc_wine_psi_phi_q28401776",
+      "kind": "other",
+      "displayName": "Wine Psi Phi",
+      "summary": "African American collegiate fraternity",
+      "wikidataId": "Q28401776",
+      "aliases": [
+        "HUMS",
+        "W.I.N.E. Psi Phi"
+      ],
+      "sourceQuery": "Black Greek letter organizations founders",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Wine_Psi_Phi",
+      "discoveredAt": "2026-07-22T05:17:21.552Z"
+    },
+    {
+      "id": "disc_black_september_q152211",
+      "kind": "organization",
+      "displayName": "Black September",
+      "summary": "Palestinian militant organization (1970 \u2013 c. 1988)",
+      "wikidataId": "Q152211",
+      "aliases": [
+        "Black September Organization"
+      ],
+      "sourceQuery": "Black Greek letter organizations founders",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_September_Organization",
+      "discoveredAt": "2026-07-22T05:17:21.552Z"
+    },
+    {
+      "id": "disc_oscar_james_cooper_q110409084",
+      "kind": "person",
+      "displayName": "Oscar James Cooper",
+      "summary": "african-American physician and cultural leader",
+      "wikidataId": "Q110409084",
+      "aliases": [],
+      "sourceQuery": "Black Greek letter organizations founders",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Oscar_James_Cooper",
+      "discoveredAt": "2026-07-22T05:17:21.552Z"
+    },
+    {
+      "id": "disc_mcleod_plantation_q6802238",
+      "kind": "place",
+      "displayName": "McLeod Plantation",
+      "summary": "human settlement in South Carolina, United States of America",
+      "wikidataId": "Q6802238",
+      "aliases": [],
+      "sourceQuery": "McLeod Plantation Charleston",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/McLeod_Plantation",
+      "lat": 32.76278,
+      "lng": -79.97236,
+      "discoveredAt": "2026-07-22T05:17:23.191Z"
+    },
+    {
+      "id": "disc_middleton_place_q6842034",
+      "kind": "other",
+      "displayName": "Middleton Place",
+      "summary": "historic plantation in Dorchester County, South Carolina, U.S.A.",
+      "wikidataId": "Q6842034",
+      "aliases": [
+        "Middleton Place Plantation and Gardens"
+      ],
+      "sourceQuery": "McLeod Plantation Charleston",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Middleton_Place",
+      "lat": 32.9018,
+      "lng": -80.1376,
+      "discoveredAt": "2026-07-22T05:17:23.192Z"
+    },
+    {
+      "id": "disc_botany_bay_plantation_wildlife_management_area_q4925733",
+      "kind": "other",
+      "displayName": "Botany Bay Plantation Wildlife Management Area",
+      "summary": "state preserve on Edisto Island, South Carolina, United States",
+      "wikidataId": "Q4925733",
+      "aliases": [],
+      "sourceQuery": "McLeod Plantation Charleston",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Botany_Bay_Plantation_Wildlife_Management_Area",
+      "lat": 32.5525,
+      "lng": -80.23361,
+      "discoveredAt": "2026-07-22T05:17:23.192Z"
+    },
+    {
+      "id": "disc_henry_middleton_q143317",
+      "kind": "other",
+      "displayName": "Henry Middleton",
+      "summary": "Plantation owner and public official from South Carolina (1717\u20131784)",
+      "wikidataId": "Q143317",
+      "aliases": [],
+      "sourceQuery": "McLeod Plantation Charleston",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Henry_Middleton",
+      "discoveredAt": "2026-07-22T05:17:23.192Z"
+    },
+    {
+      "id": "disc_mount_vernon_q731635",
+      "kind": "other",
+      "displayName": "Mount Vernon",
+      "summary": "plantation estate of George Washington, in Fairfax County, Virginia, United States",
+      "wikidataId": "Q731635",
+      "aliases": [
+        "Mount Vernon Estate",
+        "Mount Vernon Estate & Gardens",
+        "Epsewasson",
+        "Little Hunting Creek Plantation",
+        "Mansion House Farm",
+        "George Washington's Mount Vernon"
+      ],
+      "sourceQuery": "Mount Vernon enslaved community African American",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Mount_Vernon",
+      "lat": 38.70778,
+      "lng": -77.08611,
+      "discoveredAt": "2026-07-22T05:17:28.603Z"
+    },
+    {
+      "id": "disc_george_washington_and_slavery_q5546058",
+      "kind": "other",
+      "displayName": "George Washington and slavery",
+      "summary": "George Washington's relationship with slavery",
+      "wikidataId": "Q5546058",
+      "aliases": [],
+      "sourceQuery": "Mount Vernon enslaved community African American",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/George_Washington_and_slavery",
+      "discoveredAt": "2026-07-22T05:17:28.604Z"
+    },
+    {
+      "id": "disc_slavery_in_colonial_spanish_america_q938405",
+      "kind": "other",
+      "displayName": "slavery in colonial Spanish America",
+      "summary": "economic and social institution central to the operation of the Spanish Empire",
+      "wikidataId": "Q938405",
+      "aliases": [
+        "slavery in the Spanish New World colonies"
+      ],
+      "sourceQuery": "plantation museums interpreting slavery United States",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Slavery_in_colonial_Spanish_America",
+      "discoveredAt": "2026-07-22T05:17:31.051Z"
+    },
+    {
+      "id": "disc_slavery_in_britain_q7539278",
+      "kind": "other",
+      "displayName": "Slavery in Britain",
+      "summary": "historical slavery in Great Britain",
+      "wikidataId": "Q7539278",
+      "aliases": [],
+      "sourceQuery": "plantation museums interpreting slavery United States",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Slavery_in_Britain",
+      "discoveredAt": "2026-07-22T05:17:31.051Z"
+    },
+    {
+      "id": "disc_destrehan_plantation_q3391526",
+      "kind": "place",
+      "displayName": "Destrehan Plantation",
+      "summary": "human settlement in St. Charles Parish, Louisiana, United States of America",
+      "wikidataId": "Q3391526",
+      "aliases": [],
+      "sourceQuery": "Destrehan Plantation",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Destrehan_Plantation",
+      "lat": 29.94543,
+      "lng": -90.36531,
+      "discoveredAt": "2026-07-22T05:17:46.952Z"
+    },
+    {
+      "id": "disc_history_of_slavery_q12981973",
+      "kind": "other",
+      "displayName": "history of slavery",
+      "summary": "historical aspect and field of study",
+      "wikidataId": "Q12981973",
+      "aliases": [
+        "slavery history"
+      ],
+      "sourceQuery": "plantation museums interpreting slavery United States",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/History_of_slavery",
+      "discoveredAt": "2026-07-22T05:17:31.052Z"
+    },
+    {
+      "id": "disc_sexual_slavery_q875521",
+      "kind": "other",
+      "displayName": "sexual slavery",
+      "summary": "attachment of any ownership right over one or more people with the intent of coercing or otherwise forcing them to engage in sexual activities",
+      "wikidataId": "Q875521",
+      "aliases": [
+        "sexual exploitation",
+        "sexual servitude"
+      ],
+      "sourceQuery": "plantation museums interpreting slavery United States",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Sexual_slavery",
+      "discoveredAt": "2026-07-22T05:17:31.052Z"
+    },
+    {
+      "id": "disc_the_hermitage_q2376587",
+      "kind": "place",
+      "displayName": "The Hermitage",
+      "summary": "historical plantation and museum in Tennessee",
+      "wikidataId": "Q2376587",
+      "aliases": [
+        "Andrew Jackson's Hermitage"
+      ],
+      "sourceQuery": "plantation museums interpreting slavery United States",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/The_Hermitage_(Nashville%2C_Tennessee)",
+      "lat": 36.215,
+      "lng": -86.61306,
+      "discoveredAt": "2026-07-22T05:17:31.052Z"
+    },
+    {
+      "id": "disc_nat_turner_s_slave_rebellion_q6967898",
+      "kind": "other",
+      "displayName": "Nat Turner's slave rebellion",
+      "summary": "slave rebellion that took place in Southampton County, Virginia, during August 1831",
+      "wikidataId": "Q6967898",
+      "aliases": [
+        "Nat Turner's Rebellion"
+      ],
+      "sourceQuery": "New York slave revolt 1712",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Nat_Turner's_Rebellion",
+      "lat": 36.77,
+      "lng": -77.161,
+      "discoveredAt": "2026-07-22T05:17:43.468Z"
+    },
+    {
+      "id": "disc_charleston_workhouse_slave_rebellion_q126391651",
+      "kind": "other",
+      "displayName": "Charleston Workhouse Slave Rebellion",
+      "summary": "1849 slave revolt in Charleston, South Carolina, U.S",
+      "wikidataId": "Q126391651",
+      "aliases": [],
+      "sourceQuery": "New York slave revolt 1712",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Charleston_Workhouse_Slave_Rebellion",
+      "lat": 32.77857,
+      "lng": -79.9372,
+      "discoveredAt": "2026-07-22T05:17:43.469Z"
+    },
+    {
+      "id": "disc_jean_noel_destr_han_q435963",
+      "kind": "other",
+      "displayName": "Jean Noel Destr\u00e9han",
+      "summary": "American slave plantation owner and politician (1759-1823)",
+      "wikidataId": "Q435963",
+      "aliases": [
+        "Jean Noel Destrehan"
+      ],
+      "sourceQuery": "Destrehan Plantation",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Jean_No%C3%ABl_Destr%C3%A9han",
+      "discoveredAt": "2026-07-22T05:17:46.953Z"
+    },
+    {
+      "id": "disc_gabriel_q1393002",
+      "kind": "other",
+      "displayName": "Gabriel",
+      "summary": "American enslaved person",
+      "wikidataId": "Q1393002",
+      "aliases": [
+        "Gabriel Prosser"
+      ],
+      "sourceQuery": "Brookfield plantation Gabriel",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Gabriel's_Rebellion",
+      "discoveredAt": "2026-07-22T05:17:45.207Z"
+    },
+    {
+      "id": "disc_nat_turner_q329730",
+      "kind": "person",
+      "displayName": "Nat Turner",
+      "summary": "American slave rebellion leader (1800-1831)",
+      "wikidataId": "Q329730",
+      "aliases": [],
+      "sourceQuery": "Brookfield plantation Gabriel",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Nat_Turner",
+      "discoveredAt": "2026-07-22T05:17:45.208Z"
+    },
+    {
+      "id": "disc_pointe_coup_e_slave_conspiracy_of_1791_q109536297",
+      "kind": "other",
+      "displayName": "Pointe Coup\u00e9e Slave Conspiracy of 1791",
+      "summary": "Slave rebellion in Spanish Louisiana",
+      "wikidataId": "Q109536297",
+      "aliases": [
+        "Mina Conspiracy"
+      ],
+      "sourceQuery": "Denmark Vesey conspiracy Charleston",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Pointe_Coup%C3%A9e_Slave_Conspiracy_of_1791",
+      "discoveredAt": "2026-07-22T05:17:40.242Z"
+    },
+    {
+      "id": "disc_edward_brown_q48976799",
+      "kind": "other",
+      "displayName": "Edward Brown",
+      "summary": "South Carolina lawyer and proslavery writer",
+      "wikidataId": "Q48976799",
+      "aliases": [],
+      "sourceQuery": "Denmark Vesey conspiracy Charleston",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Edward_Brown_(American_lawyer)",
+      "discoveredAt": "2026-07-22T05:17:40.242Z"
+    },
+    {
+      "id": "disc_ormond_plantation_house_q7103448",
+      "kind": "place",
+      "displayName": "Ormond Plantation House",
+      "summary": "human settlement in St. Charles Parish, Louisiana, United States of America",
+      "wikidataId": "Q7103448",
+      "aliases": [],
+      "sourceQuery": "Destrehan Plantation",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Ormond_Plantation_House",
+      "lat": 29.95417,
+      "lng": -90.38694,
+      "discoveredAt": "2026-07-22T05:17:46.953Z"
+    },
+    {
+      "id": "disc_st_joseph_plantation_q7589354",
+      "kind": "place",
+      "displayName": "St. Joseph Plantation",
+      "summary": "human settlement in Louisiana, United States of America",
+      "wikidataId": "Q7589354",
+      "aliases": [],
+      "sourceQuery": "Laura Plantation",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/St._Joseph_Plantation",
+      "lat": 30.00597,
+      "lng": -90.77225,
+      "discoveredAt": "2026-07-22T05:17:48.796Z"
+    },
+    {
+      "id": "disc_ingleside_plantation_q6032651",
+      "kind": "place",
+      "displayName": "Ingleside Plantation",
+      "summary": "human settlement in United States of America",
+      "wikidataId": "Q6032651",
+      "aliases": [],
+      "sourceQuery": "Laura Plantation",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Ingleside_Plantation",
+      "lat": 30.5604,
+      "lng": -84.0139,
+      "discoveredAt": "2026-07-22T05:17:48.797Z"
+    },
+    {
+      "id": "disc_hampton_plantation_q5646268",
+      "kind": "other",
+      "displayName": "Hampton Plantation",
+      "summary": "Historic plantation home in South Carolina, United States of America",
+      "wikidataId": "Q5646268",
+      "aliases": [],
+      "sourceQuery": "Hampton Plantation South Carolina",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Hampton_Plantation",
+      "lat": 33.19833,
+      "lng": -79.43778,
+      "discoveredAt": "2026-07-22T05:17:50.720Z"
+    },
+    {
+      "id": "disc_millford_plantation_q6859486",
+      "kind": "other",
+      "displayName": "Millford Plantation",
+      "summary": "historic place in South Carolina",
+      "wikidataId": "Q6859486",
+      "aliases": [],
+      "sourceQuery": "Hampton Plantation South Carolina",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Millford_Plantation",
+      "lat": 33.7484,
+      "lng": -80.5375,
+      "discoveredAt": "2026-07-22T05:17:50.722Z"
+    },
+    {
+      "id": "disc_gravel_hill_plantation_q17105899",
+      "kind": "other",
+      "displayName": "Gravel Hill Plantation",
+      "summary": "historic house in South Carolina, United States",
+      "wikidataId": "Q17105899",
+      "aliases": [],
+      "sourceQuery": "Hampton Plantation South Carolina",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Gravel_Hill_Plantation_(Hampton%2C_South_Carolina)",
+      "lat": 32.6775,
+      "lng": -81.32556,
+      "discoveredAt": "2026-07-22T05:17:50.722Z"
+    },
+    {
+      "id": "disc_lewisfield_plantation_q16894117",
+      "kind": "other",
+      "displayName": "Lewisfield Plantation",
+      "summary": "historic house in South Carolina, United States",
+      "wikidataId": "Q16894117",
+      "aliases": [],
+      "sourceQuery": "Hampton Plantation South Carolina",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Lewisfield_Plantation",
+      "lat": 33.16,
+      "lng": -79.9936,
+      "discoveredAt": "2026-07-22T05:17:50.722Z"
+    },
+    {
+      "id": "disc_salisbury_plantation_q7404795",
+      "kind": "place",
+      "displayName": "Salisbury Plantation",
+      "summary": "human settlement in Maryland, United States of America",
+      "wikidataId": "Q7404795",
+      "aliases": [],
+      "sourceQuery": "Somerset Place plantation",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Salisbury_Plantation_(Westover%2C_Maryland)",
+      "lat": 38.0883,
+      "lng": -75.7369,
+      "discoveredAt": "2026-07-22T05:17:52.298Z"
+    },
+    {
+      "id": "disc_pomfret_plantation_q7227305",
+      "kind": "place",
+      "displayName": "Pomfret Plantation",
+      "summary": "human settlement in Maryland, United States of America",
+      "wikidataId": "Q7227305",
+      "aliases": [],
+      "sourceQuery": "Somerset Place plantation",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Pomfret_Plantation",
+      "lat": 38.0419,
+      "lng": -75.8017,
+      "discoveredAt": "2026-07-22T05:17:52.298Z"
+    },
+    {
+      "id": "disc_zephaniah_kingsley_q8069285",
+      "kind": "other",
+      "displayName": "Zephaniah Kingsley",
+      "summary": "plantation owner, slave trader, merchant",
+      "wikidataId": "Q8069285",
+      "aliases": [
+        "Zephaniah Kingsley Jr.",
+        "Zaphaniah Kingsley",
+        "Z. Kingsley"
+      ],
+      "sourceQuery": "Kingsley Plantation",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Zephaniah_Kingsley",
+      "discoveredAt": "2026-07-22T05:17:54.051Z"
+    },
+    {
+      "id": "disc_john_robinson_q16073477",
+      "kind": "person",
+      "displayName": "John Robinson",
+      "summary": "American aviator and activist",
+      "wikidataId": "Q16073477",
+      "aliases": [
+        "John Charles Robinson",
+        "John C. Robinson",
+        "Brown Condor"
+      ],
+      "sourceQuery": "first African American pilot aviator",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/John_Robinson_(aviator)",
+      "discoveredAt": "2026-07-22T05:18:14.481Z"
+    },
+    {
+      "id": "disc_jesse_l_brown_q392039",
+      "kind": "other",
+      "displayName": "Jesse L. Brown",
+      "summary": "United States Navy officer (1926\u20131950)",
+      "wikidataId": "Q392039",
+      "aliases": [
+        "Jesse LeRoy Brown"
+      ],
+      "sourceQuery": "first African American pilot aviator",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Jesse_L._Brown",
+      "discoveredAt": "2026-07-22T05:18:14.482Z"
+    },
+    {
+      "id": "disc_donnie_cochran_q5296636",
+      "kind": "other",
+      "displayName": "Donnie Cochran",
+      "summary": "US Naval aviator",
+      "wikidataId": "Q5296636",
+      "aliases": [],
+      "sourceQuery": "first African American pilot aviator",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Donnie_Cochran",
+      "discoveredAt": "2026-07-22T05:18:14.483Z"
+    },
+    {
+      "id": "disc_jennifer_mcclellan_q6178602",
+      "kind": "other",
+      "displayName": "Jennifer McClellan",
+      "summary": "American politician in Virginia (born 1972)",
+      "wikidataId": "Q6178602",
+      "aliases": [],
+      "sourceQuery": "first Black woman elected to Congress",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Jennifer_McClellan",
+      "discoveredAt": "2026-07-22T05:18:25.337Z"
+    },
+    {
+      "id": "disc_ayanna_pressley_q13562359",
+      "kind": "other",
+      "displayName": "Ayanna Pressley",
+      "summary": "U.S. Representative from Massachusetts",
+      "wikidataId": "Q13562359",
+      "aliases": [
+        "Ayanna Soyini Pressley",
+        "Rep. Ayanna S. Pressley",
+        "Ayanna S. Pressley"
+      ],
+      "sourceQuery": "first Black woman elected to Congress",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Ayanna_Pressley",
+      "discoveredAt": "2026-07-22T05:18:25.338Z"
+    },
+    {
+      "id": "disc_jahana_hayes_q24951316",
+      "kind": "other",
+      "displayName": "Jahana Hayes",
+      "summary": "American politician and educator",
+      "wikidataId": "Q24951316",
+      "aliases": [
+        "Jahana Flemming Hayes"
+      ],
+      "sourceQuery": "first Black woman elected to Congress",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Jahana_Hayes",
+      "discoveredAt": "2026-07-22T05:18:25.338Z"
+    },
+    {
+      "id": "disc_summer_lee_q56222614",
+      "kind": "other",
+      "displayName": "Summer Lee",
+      "summary": "American politician (born 1987)",
+      "wikidataId": "Q56222614",
+      "aliases": [
+        "Summer Lynn Lee"
+      ],
+      "sourceQuery": "first Black woman elected to Congress",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Summer_Lee",
+      "discoveredAt": "2026-07-22T05:18:25.338Z"
+    },
+    {
+      "id": "disc_barbara_rose_collins_q461629",
+      "kind": "other",
+      "displayName": "Barbara-Rose Collins",
+      "summary": "American politician",
+      "wikidataId": "Q461629",
+      "aliases": [],
+      "sourceQuery": "first Black woman elected to Congress",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Barbara-Rose_Collins",
+      "discoveredAt": "2026-07-22T05:18:25.338Z"
+    },
+    {
+      "id": "disc_angela_alsobrooks_q58755148",
+      "kind": "other",
+      "displayName": "Angela Alsobrooks",
+      "summary": "American politician and lawyer (born 1971)",
+      "wikidataId": "Q58755148",
+      "aliases": [
+        "Angela Deneece Alsobrooks",
+        "Angela D. Alsobrooks"
+      ],
+      "sourceQuery": "first African American woman senator",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Angela_Alsobrooks",
+      "discoveredAt": "2026-07-22T05:18:27.416Z"
+    },
+    {
+      "id": "disc_louise_lucas_q6688832",
+      "kind": "other",
+      "displayName": "Louise Lucas",
+      "summary": "American politician",
+      "wikidataId": "Q6688832",
+      "aliases": [
+        "Lillie Louise Boone Lucas",
+        "Lillie Louise Boone"
+      ],
+      "sourceQuery": "first African American woman senator",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/L._Louise_Lucas",
+      "discoveredAt": "2026-07-22T05:18:27.416Z"
+    },
+    {
+      "id": "disc_raphael_warnock_q84146599",
+      "kind": "other",
+      "displayName": "Raphael Warnock",
+      "summary": "American pastor and politician (born 1969)",
+      "wikidataId": "Q84146599",
+      "aliases": [
+        "Raphael G. Warnock",
+        "Raphael Gamaliel Warnock",
+        "Senator Raphael Warnock",
+        "Senator Warnock",
+        "Sen. Warnock",
+        "Rev. Raphael Warnock",
+        "Rev. Raphael G. Warnock",
+        "Rev. Warnock",
+        "Reverend Raphael Warnock",
+        "Reverend Raphael G. Warnock",
+        "Reverend Warnock"
+      ],
+      "sourceQuery": "first African American woman senator",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Raphael_Warnock",
+      "discoveredAt": "2026-07-22T05:18:27.416Z"
+    },
+    {
+      "id": "disc_thomas_mccain_q111912853",
+      "kind": "other",
+      "displayName": "Thomas McCain",
+      "summary": "American politician",
+      "wikidataId": "Q111912853",
+      "aliases": [],
+      "sourceQuery": "Black officeholders Reconstruction era",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Thomas_McCain",
+      "discoveredAt": "2026-07-22T05:23:47.676Z"
+    },
+    {
+      "id": "disc_john_h_anderson_q123357764",
+      "kind": "other",
+      "displayName": "John H. Anderson",
+      "summary": "State representative, 1887",
+      "wikidataId": "Q123357764",
+      "aliases": [],
+      "sourceQuery": "Black officeholders Reconstruction era",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/John_H._Anderson_(Florida_politician)",
+      "discoveredAt": "2026-07-22T05:23:47.676Z"
+    },
+    {
+      "id": "disc_hiram_rhodes_revels_q719200",
+      "kind": "other",
+      "displayName": "Hiram Rhodes Revels",
+      "summary": "American politician (1827-1901)",
+      "wikidataId": "Q719200",
+      "aliases": [],
+      "sourceQuery": "Black officeholders Reconstruction era",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Hiram_R._Revels",
+      "discoveredAt": "2026-07-22T05:18:38.900Z"
+    },
+    {
+      "id": "disc_james_g_patterson_q106497786",
+      "kind": "other",
+      "displayName": "James G. Patterson",
+      "summary": "American politician",
+      "wikidataId": "Q106497786",
+      "aliases": [],
+      "sourceQuery": "Black officeholders Reconstruction era",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/James_G._Patterson",
+      "discoveredAt": "2026-07-22T05:23:47.676Z"
+    },
+    {
+      "id": "disc_jonathan_clarkson_gibbs_q3809911",
+      "kind": "other",
+      "displayName": "Jonathan Clarkson Gibbs",
+      "summary": "American state official (1821-1874)",
+      "wikidataId": "Q3809911",
+      "aliases": [
+        "Jonathan Gibbs"
+      ],
+      "sourceQuery": "Black officeholders Reconstruction era",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Jonathan_Clarkson_Gibbs",
+      "discoveredAt": "2026-07-22T05:18:38.900Z"
+    },
+    {
+      "id": "disc_samuel_anderson_q123592059",
+      "kind": "other",
+      "displayName": "Samuel Anderson",
+      "summary": "American farmer and state legislator from Florida",
+      "wikidataId": "Q123592059",
+      "aliases": [],
+      "sourceQuery": "Black officeholders Reconstruction era",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Samuel_Anderson_(Florida_politician)",
+      "discoveredAt": "2026-07-22T05:23:47.677Z"
+    },
+    {
+      "id": "disc_tuskegee_airmen_national_historic_site_q7856793",
+      "kind": "place",
+      "displayName": "Tuskegee Airmen National Historic Site",
+      "summary": "museum in Tuskegee, Alabama, USA",
+      "wikidataId": "Q7856793",
+      "aliases": [
+        "Tuskegee Airmen Museum",
+        "TUAI"
+      ],
+      "sourceQuery": "Tuskegee Airmen",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Tuskegee_Airmen_National_Historic_Site",
+      "lat": 32.45718,
+      "lng": -85.68036,
+      "discoveredAt": "2026-07-22T05:18:42.608Z"
+    },
+    {
+      "id": "disc_james_clayton_flowers_q98238391",
+      "kind": "other",
+      "displayName": "James Clayton Flowers",
+      "summary": "tuskegee Airmen (1915)",
+      "wikidataId": "Q98238391",
+      "aliases": [],
+      "sourceQuery": "Tuskegee Airmen",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/James_Clayton_Flowers",
+      "discoveredAt": "2026-07-22T05:18:42.608Z"
+    },
+    {
+      "id": "disc_james_h_harvey_q107363540",
+      "kind": "other",
+      "displayName": "James H. Harvey",
+      "summary": "American fighter pilot",
+      "wikidataId": "Q107363540",
+      "aliases": [
+        "James H. Harvey III",
+        "James Henry Harvey",
+        "James Harvey",
+        "James Henry Harvey III",
+        "James Henry Harvey Jr"
+      ],
+      "sourceQuery": "Tuskegee Airmen",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/James_H._Harvey",
+      "discoveredAt": "2026-07-22T05:18:42.608Z"
+    },
+    {
+      "id": "disc_charles_alfred_anderson_sr_q16013563",
+      "kind": "other",
+      "displayName": "Charles Alfred Anderson Sr.",
+      "summary": "American aviator (1907\u20131996)",
+      "wikidataId": "Q16013563",
+      "aliases": [
+        "Charles Alfred Anderson",
+        "Charles A. Anderson Sr.",
+        "Chief Anderson"
+      ],
+      "sourceQuery": "Tuskegee Airmen",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/C._Alfred_%22Chief%22_Anderson",
+      "discoveredAt": "2026-07-22T05:18:42.609Z"
+    },
+    {
+      "id": "disc_golden_thirteen_q5579862",
+      "kind": "other",
+      "displayName": "Golden Thirteen",
+      "summary": "military unit",
+      "wikidataId": "Q5579862",
+      "aliases": [],
+      "sourceQuery": "Golden Thirteen Navy",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Golden_Thirteen",
+      "discoveredAt": "2026-07-22T05:22:55.565Z"
+    },
+    {
+      "id": "disc_william_sylvester_white_q116976103",
+      "kind": "other",
+      "displayName": "William Sylvester White",
+      "summary": "American judge (1914\u20132004)",
+      "wikidataId": "Q116976103",
+      "aliases": [],
+      "sourceQuery": "Golden Thirteen Navy",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/William_Sylvester_White",
+      "discoveredAt": "2026-07-22T05:22:55.566Z"
+    },
+    {
+      "id": "disc_graham_e_martin_q124827219",
+      "kind": "other",
+      "displayName": "Graham E. Martin",
+      "summary": "United States Navy officer",
+      "wikidataId": "Q124827219",
+      "aliases": [],
+      "sourceQuery": "Golden Thirteen Navy",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Graham_E._Martin",
+      "discoveredAt": "2026-07-22T05:22:55.567Z"
+    },
+    {
+      "id": "disc_joseph_james_dengelo_q4045981",
+      "kind": "other",
+      "displayName": "Joseph James Dengelo",
+      "summary": "American serial killer, rapist, burglar and former police officer",
+      "wikidataId": "Q4045981",
+      "aliases": [
+        "Diamond Knot Killer",
+        "East Bay Rapist",
+        "East Side Killer",
+        "Original Night Stalker",
+        "Visalia Ransacker",
+        "GSK",
+        "EARONS",
+        "Rancho Cordova Cat",
+        "EAR/ONS",
+        "East Area Rapist",
+        "Cordova Meadows Burglar",
+        "Cordova Cat Burglar",
+        "Exeter Ransacker",
+        "EAR",
+        "ONS",
+        "Golden State Killer",
+        "Joseph DeAngelo",
+        "Joe DeAngelo",
+        "JJD",
+        "The Night Stalker",
+        "Night Stalker",
+        "The Original Night Stalker"
+      ],
+      "sourceQuery": "Golden Thirteen Navy",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Joseph_James_DeAngelo",
+      "discoveredAt": "2026-07-22T05:22:55.567Z"
+    },
+    {
+      "id": "disc_charles_hamilton_houston_q5078726",
+      "kind": "other",
+      "displayName": "Charles Hamilton Houston",
+      "summary": "American lawyer and civil rights attorney",
+      "wikidataId": "Q5078726",
+      "aliases": [
+        "Charles H. Houston"
+      ],
+      "sourceQuery": "first Black Supreme Court justice",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Charles_Hamilton_Houston",
+      "discoveredAt": "2026-07-22T05:18:46.391Z"
+    },
+    {
+      "id": "disc_black_cabinet_q4920472",
+      "kind": "other",
+      "displayName": "Black Cabinet",
+      "summary": "African American advisors to President Franklin D. Roosevelt",
+      "wikidataId": "Q4920472",
+      "aliases": [
+        "Federal Council of Negro Affairs",
+        "Black Brain Trust"
+      ],
+      "sourceQuery": "first African American cabinet member",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Black_Cabinet",
+      "discoveredAt": "2026-07-22T05:18:48.291Z"
+    },
+    {
+      "id": "disc_jean_l_harris_q63977955",
+      "kind": "other",
+      "displayName": "Jean L. Harris",
+      "summary": "American physician and politician",
+      "wikidataId": "Q63977955",
+      "aliases": [
+        "Jean Louise Harris"
+      ],
+      "sourceQuery": "first African American cabinet member",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Jean_L._Harris",
+      "discoveredAt": "2026-07-22T05:18:48.292Z"
+    },
+    {
+      "id": "disc_arthur_l_hardge_q124343795",
+      "kind": "person",
+      "displayName": "Arthur L. Hardge",
+      "summary": "African American civil rights activist, academic administrator, and minister (1927\u20131983)",
+      "wikidataId": "Q124343795",
+      "aliases": [],
+      "sourceQuery": "first African American cabinet member",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Arthur_L._Hardge",
+      "discoveredAt": "2026-07-22T05:18:48.293Z"
+    },
+    {
+      "id": "disc_caesar_antoine_q5016969",
+      "kind": "organization",
+      "displayName": "Caesar Antoine",
+      "summary": "American businessman, farmer, newspaper editor and politician",
+      "wikidataId": "Q5016969",
+      "aliases": [
+        "Caesar Carpentier Antoine"
+      ],
+      "sourceQuery": "first African American cabinet member",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/C._C._Antoine",
+      "discoveredAt": "2026-07-22T05:18:48.293Z"
+    },
+    {
+      "id": "disc_arianna_j_freeman_q110622371",
+      "kind": "other",
+      "displayName": "Arianna J. Freeman",
+      "summary": "American judge",
+      "wikidataId": "Q110622371",
+      "aliases": [
+        "Arianna Freeman",
+        "Arianna Julia Freeman"
+      ],
+      "sourceQuery": "first Black woman federal judge",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Arianna_J._Freeman",
+      "discoveredAt": "2026-07-22T05:18:50.274Z"
+    },
+    {
+      "id": "disc_denise_jefferson_casper_q5257686",
+      "kind": "other",
+      "displayName": "Denise Jefferson Casper",
+      "summary": "American judge",
+      "wikidataId": "Q5257686",
+      "aliases": [],
+      "sourceQuery": "first Black woman federal judge",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Denise_J._Casper",
+      "discoveredAt": "2026-07-22T05:18:50.275Z"
+    },
+    {
+      "id": "disc_elreta_melton_alexander_ralston_q16014051",
+      "kind": "other",
+      "displayName": "Elreta Melton Alexander-Ralston",
+      "summary": "American lawyer and judge (1919-1998)",
+      "wikidataId": "Q16014051",
+      "aliases": [
+        "Elreta Alexander",
+        "Elreta Narcissus Melton",
+        "Elreta Melton",
+        "Elreta Alexander-Ralston"
+      ],
+      "sourceQuery": "first Black woman federal judge",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Elreta_Alexander-Ralston",
+      "discoveredAt": "2026-07-22T05:18:50.275Z"
+    },
+    {
+      "id": "disc_nusrat_jahan_choudhury_q110621901",
+      "kind": "other",
+      "displayName": "Nusrat Jahan Choudhury",
+      "summary": "American lawyer",
+      "wikidataId": "Q110621901",
+      "aliases": [
+        "Nusrat Choudhury"
+      ],
+      "sourceQuery": "first Black woman federal judge",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Nusrat_Jahan_Choudhury",
+      "discoveredAt": "2026-07-22T05:18:50.275Z"
+    },
+    {
+      "id": "disc_dusable_museum_of_african_american_history_q3040299",
+      "kind": "place",
+      "displayName": "DuSable Museum of African American History",
+      "summary": "Chicago museum of African American history, culture, and art",
+      "wikidataId": "Q3040299",
+      "aliases": [
+        "DuSable Black History Museum and Education Center"
+      ],
+      "sourceQuery": "African American maritime history",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/DuSable_Black_History_Museum",
+      "lat": 41.7921,
+      "lng": -87.6073,
+      "discoveredAt": "2026-07-22T05:22:29.993Z"
+    },
+    {
+      "id": "disc_gullah_q13560779",
+      "kind": "other",
+      "displayName": "Gullah",
+      "summary": "African American people in South Carolina, Georgia, Florida",
+      "wikidataId": "Q13560779",
+      "aliases": [],
+      "sourceQuery": "Geechee communities Georgia",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Gullah",
+      "discoveredAt": "2026-07-22T05:23:25.709Z"
+    },
+    {
+      "id": "disc_ring_shout_q7334818",
+      "kind": "other",
+      "displayName": "ring shout",
+      "summary": "Earliest expressive practice found among enslaved Africans",
+      "wikidataId": "Q7334818",
+      "aliases": [
+        "shout"
+      ],
+      "sourceQuery": "Gullah Geechee communities",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Ring_shout",
+      "discoveredAt": "2026-07-22T05:22:34.438Z"
+    },
+    {
+      "id": "disc_exodusters_q5420574",
+      "kind": "event",
+      "displayName": "Exodusters",
+      "summary": "movement of African Americans in Kansas to live freely from their former slave masters",
+      "wikidataId": "Q5420574",
+      "aliases": [
+        "Exoduster Movement"
+      ],
+      "sourceQuery": "Exodusters Kansas",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Exodusters",
+      "discoveredAt": "2026-07-22T05:22:47.250Z"
+    },
+    {
+      "id": "disc_navy_midshipmen_men_s_soccer_q6982665",
+      "kind": "institution",
+      "displayName": "Navy Midshipmen men's soccer",
+      "summary": "United States Naval Academy NCAA Division 1 soccer team",
+      "wikidataId": "Q6982665",
+      "aliases": [],
+      "sourceQuery": "Golden Thirteen Navy",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Navy_Midshipmen_men's_soccer",
+      "discoveredAt": "2026-07-22T05:22:55.567Z"
+    },
+    {
+      "id": "disc_african_american_medal_of_honor_recipients_memor_q55106560",
+      "kind": "other",
+      "displayName": "African-American Medal of Honor Recipients Memorial",
+      "summary": "historic site in Wilmington, Delaware",
+      "wikidataId": "Q55106560",
+      "aliases": [],
+      "sourceQuery": "African American Medal of Honor",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/African-American_Medal_of_Honor_Recipients_Memorial",
+      "lat": 39.75497,
+      "lng": -75.54681,
+      "discoveredAt": "2026-07-22T05:22:59.882Z"
+    },
+    {
+      "id": "disc_songs_of_the_underground_railroad_q7561611",
+      "kind": "other",
+      "displayName": "Songs of the Underground Railroad",
+      "summary": "spiritual and work songs",
+      "wikidataId": "Q7561611",
+      "aliases": [],
+      "sourceQuery": "Underground Railroad conductors",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Songs_of_the_Underground_Railroad",
+      "discoveredAt": "2026-07-22T05:23:08.599Z"
+    },
+    {
+      "id": "disc_elijah_anderson_q110643927",
+      "kind": "other",
+      "displayName": "Elijah Anderson",
+      "summary": "underground Railroad conductor",
+      "wikidataId": "Q110643927",
+      "aliases": [],
+      "sourceQuery": "Underground Railroad conductors",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Elijah_Anderson_(Underground_Railroad)",
+      "discoveredAt": "2026-07-22T05:23:08.600Z"
+    },
+    {
+      "id": "disc_the_underground_railroad_q55635599",
+      "kind": "other",
+      "displayName": "The Underground Railroad",
+      "summary": "American historical fiction drama miniseries",
+      "wikidataId": "Q55635599",
+      "aliases": [],
+      "sourceQuery": "Underground Railroad conductors",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/The_Underground_Railroad_(miniseries)",
+      "discoveredAt": "2026-07-22T05:23:08.600Z"
+    },
+    {
+      "id": "disc_william_brinkley_q107265790",
+      "kind": "other",
+      "displayName": "William Brinkley",
+      "summary": "American railway conductor and hero",
+      "wikidataId": "Q107265790",
+      "aliases": [],
+      "sourceQuery": "Underground Railroad conductors",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/William_Brinkley_(Underground_Railroad)",
+      "discoveredAt": "2026-07-22T05:23:08.600Z"
+    },
+    {
+      "id": "disc_penn_school_historic_district_q7163219",
+      "kind": "institution",
+      "displayName": "Penn School Historic District",
+      "summary": "museum, former African-American school, historic district",
+      "wikidataId": "Q7163219",
+      "aliases": [],
+      "sourceQuery": "Gullah islands South Carolina",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Penn_Center_(Saint_Helena_Island%2C_South_Carolina)",
+      "lat": 32.3883,
+      "lng": -80.5753,
+      "discoveredAt": "2026-07-22T05:23:16.541Z"
+    },
+    {
+      "id": "disc_richard_h_harris_q108215593",
+      "kind": "person",
+      "displayName": "Richard H. Harris",
+      "summary": "Civil rights leader and pharmacist (1918\u20131976)",
+      "wikidataId": "Q108215593",
+      "aliases": [],
+      "sourceQuery": "Selma to Montgomery sites",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Richard_H._Harris",
+      "discoveredAt": "2026-07-22T05:23:30.366Z"
+    },
+    {
+      "id": "disc_end_of_reconstruction_q137885608",
+      "kind": "other",
+      "displayName": "End of Reconstruction",
+      "summary": "1877 ending of period in US history",
+      "wikidataId": "Q137885608",
+      "aliases": [],
+      "sourceQuery": "Black officeholders Reconstruction era",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/End_of_Reconstruction",
+      "discoveredAt": "2026-07-22T05:23:47.674Z"
+    },
+    {
+      "id": "disc_reconstruction_era_q623429",
+      "kind": "other",
+      "displayName": "Reconstruction Era",
+      "summary": "era after American Civil War (1865\u20131877)",
+      "wikidataId": "Q623429",
+      "aliases": [
+        "Reconstruction era of the United States",
+        "Reconstruction of the Rebel States",
+        "Reconstruction of the South",
+        "Reconstruction of the Southern States"
+      ],
+      "sourceQuery": "Black officeholders Reconstruction era",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Reconstruction_era",
+      "discoveredAt": "2026-07-22T05:23:47.676Z"
+    },
+    {
+      "id": "disc_bibliography_of_reconstruction_q4903391",
+      "kind": "other",
+      "displayName": "bibliography of Reconstruction",
+      "summary": "era's main scholarly literature (1863\u20131877)",
+      "wikidataId": "Q4903391",
+      "aliases": [],
+      "sourceQuery": "Black officeholders Reconstruction era",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Bibliography_of_the_Reconstruction_era",
+      "discoveredAt": "2026-07-22T05:23:47.676Z"
+    },
+    {
+      "id": "disc_richard_howell_gleaves_q7326567",
+      "kind": "other",
+      "displayName": "Richard Howell Gleaves",
+      "summary": "American politician",
+      "wikidataId": "Q7326567",
+      "aliases": [],
+      "sourceQuery": "Black officeholders Reconstruction era",
+      "canonicalUrl": "https://en.wikipedia.org/wiki/Richard_Howell_Gleaves",
+      "discoveredAt": "2026-07-22T05:23:47.676Z"
+    }
+  ]
+}

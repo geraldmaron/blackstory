@@ -1,7 +1,12 @@
 {
   "schemaVersion": "corsair-web-search-queries.v1",
+<<<<<<< Updated upstream
   "updatedAt": "2026-07-21",
   "purpose": "Rotating SearXNG SERP queries for Corsair discovery. These are search-result leads only \u2014 not HTML body scrapes. Full crawl of blackwomenleadproject.org remains gated on source-policy audit (repo-tt2u.13).",
+=======
+  "updatedAt": "2026-07-22",
+  "purpose": "Rotating SearXNG SERP queries for Corsair discovery. These are search-result leads only — not HTML body scrapes. Full crawl of blackwomenleadproject.org remains gated on source-policy audit (repo-tt2u.13). 2026-07-22 wave adds firsts / plantations / uprisings / state pioneers to cast a broader net.",
+>>>>>>> Stashed changes
   "safeties": {
     "serpOnly": true,
     "htmlCrawlForbiddenUntil": "repo-tt2u.13",
@@ -9,7 +14,7 @@
       "blackwomenleadproject.org"
     ],
     "livingPersonSensitive": true,
-    "livingPersonNote": "Black Women Lead includes present-day leaders; treat SERP hits as leads, never harvest private contact data.",
+    "livingPersonNote": "Black Women Lead and living officeholders/firsts: treat SERP hits as leads, never harvest private contact data; living persons stay privacy_review.",
     "maxQueriesPerRunHardCap": 12,
     "maxSurvivorsHardCap": 50,
     "neverPublish": true
@@ -31,8 +36,14 @@
     "reporter.nih.gov",
     "nces.ed.gov",
     "npgallery.nps.gov",
+<<<<<<< Updated upstream
     "pen.org",
     "ala.org"
+=======
+    "blackpast.org",
+    "64parishes.org",
+    "hmdb.org"
+>>>>>>> Stashed changes
   ],
   "queries": [
     {
@@ -144,6 +155,7 @@
       "text": "African American mutual aid society OR fraternal lodge historic"
     },
     {
+<<<<<<< Updated upstream
       "id": "book-bans-pen",
       "intent": "site_focus",
       "theme": "book_challenges",
@@ -166,6 +178,90 @@
       "intent": "open_web",
       "theme": "book_challenges",
       "text": "site:npr.org OR site:apnews.com book ban school library"
+=======
+      "id": "first-black-pilots",
+      "intent": "open_web",
+      "theme": "firsts_aviation",
+      "text": "first Black pilot OR aviator African American Bessie Coleman Eugene Bullard history"
+    },
+    {
+      "id": "first-black-judges-state",
+      "intent": "open_web",
+      "theme": "firsts_law",
+      "text": "\"first Black\" OR \"first African American\" judge OR justice state history United States"
+    },
+    {
+      "id": "first-black-women-office",
+      "intent": "open_web",
+      "theme": "firsts_women",
+      "text": "\"first Black woman\" OR \"first African American woman\" mayor OR senator OR congress OR governor history"
+    },
+    {
+      "id": "first-black-physicians-lawyers",
+      "intent": "open_web",
+      "theme": "firsts_professions",
+      "text": "\"first African American\" physician OR lawyer OR pharmacist OR architect United States history"
+    },
+    {
+      "id": "plantations-nps",
+      "intent": "site_focus",
+      "theme": "plantations",
+      "text": "site:nps.gov plantation African American OR enslaved OR slavery heritage OR historic site"
+    },
+    {
+      "id": "plantations-nrhp",
+      "intent": "site_focus",
+      "theme": "plantations",
+      "text": "site:npgallery.nps.gov OR site:nps.gov National Register plantation African American OR Black history"
+    },
+    {
+      "id": "plantations-interpretive",
+      "intent": "open_web",
+      "theme": "plantations",
+      "text": "plantation museum enslaved interpretation Whitney OR McLeod OR Boone Hall OR Magnolia OR Kingsley African American"
+    },
+    {
+      "id": "slave-revolts-uprisings",
+      "intent": "open_web",
+      "theme": "resistance_uprisings",
+      "text": "slave revolt OR slave uprising OR rebellion African American Stono OR Nat Turner OR German Coast OR Gabriel OR Vesey"
+    },
+    {
+      "id": "maroon-communities",
+      "intent": "open_web",
+      "theme": "resistance_uprisings",
+      "text": "maroon community OR Great Dismal Swamp OR Black Seminole resistance African American history site"
+    },
+    {
+      "id": "civil-rights-uprisings",
+      "intent": "open_web",
+      "theme": "resistance_uprisings",
+      "text": "urban uprising OR rebellion 1960s African American Watts OR Detroit OR Newark OR Harlem historic"
+    },
+    {
+      "id": "blackpast-firsts",
+      "intent": "site_focus",
+      "theme": "firsts_authority",
+      "text": "site:blackpast.org \"first African American\" OR \"first Black\" judge OR pilot OR mayor OR woman"
+    },
+    {
+      "id": "nps-underground-resistance",
+      "intent": "site_focus",
+      "theme": "resistance_uprisings",
+      "text": "site:nps.gov Underground Railroad OR slave rebellion OR African American resistance historic site"
+    },
+    {
+      "id": "state-first-black-officeholders",
+      "intent": "open_web",
+      "theme": "firsts_government",
+      "text": "\"first African American\" OR \"first Black\" elected OR appointed statewide office OR legislature history"
+    },
+    {
+      "id": "tuskegee-aviation-military",
+      "intent": "open_web",
+      "theme": "firsts_aviation",
+      "text": "Tuskegee Airmen OR Black pilots World War II OR Golden Thirteen Navy African American aviation history"
+>>>>>>> Stashed changes
     }
   ]
 }
