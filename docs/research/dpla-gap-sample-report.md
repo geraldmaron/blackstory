@@ -2,7 +2,7 @@
 
 # DPLA bulk gap analysis — sample report
 
-**Generated:** 2026-07-21T17:49:20.351Z
+**Generated:** 2026-07-24T20:32:10.953Z
 **DPLA input:** `packages/domain/src/adapters/dpla/fixtures/gap-analysis-dpla-sample.json`
 **Corpus input:** `packages/domain/src/adapters/dpla/fixtures/gap-analysis-corpus-sample.json`
 **Coverage threshold:** 15% (corpus ÷ DPLA)
@@ -110,3 +110,122 @@
 }
 ```
 
+
+## Per-entity field completeness (bb_public.release_entities)
+
+_Snapshot as of 2026-07-24. Methodology: docs/research/entity-completeness-audit.md §1-2._
+
+| kind | n | blank summary | blank location | blank geo | blank claims | blank related | blank image | blank taxonomy | blank historicalContext | blank eraBuckets |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| place | 565 | 0 | 0 | 0 | 0 | 208 | 551 | 0 | 208 | 202 |
+| person | 394 | 0 | 0 | 0 | 0 | 0 | 280 | 0 | 0 | 1 |
+| event | 79 | 0 | 0 | 0 | 0 | 0 | 77 | 0 | 0 | 0 |
+| institution | 79 | 0 | 0 | 0 | 0 | 0 | 75 | 0 | 0 | 0 |
+| school | 77 | 0 | 0 | 0 | 0 | 0 | 69 | 0 | 0 | 12 |
+| organization | 57 | 0 | 0 | 0 | 0 | 0 | 57 | 0 | 0 | 0 |
+| case | 48 | 0 | 0 | 0 | 0 | 0 | 48 | 0 | 0 | 0 |
+| law | 26 | 0 | 0 | 0 | 0 | 0 | 22 | 0 | 0 | 0 |
+| publication | 21 | 0 | 0 | 0 | 0 | 0 | 21 | 0 | 0 | 0 |
+| movement | 15 | 0 | 0 | 0 | 0 | 0 | 15 | 0 | 0 | 0 |
+| other | 14 | 0 | 0 | 0 | 0 | 0 | 14 | 0 | 0 | 0 |
+
+## Figure-category coverage vs reference list
+
+_Snapshot as of 2026-07-24._
+
+Sources checked:
+- https://www.blackpast.org/ (403 — blocked automated fetch, cited as attempted primary source)
+- https://en.wikipedia.org/wiki/List_of_civil_rights_leaders (fetched successfully; used as fallback roster)
+
+**Civil Rights Movement leaders: 18 of 30 known figures present in bb_canonical (as person entities).**
+
+| Figure | Present | Note |
+|---|---|---|
+| Amelia Boynton Robinson | Yes |  |
+| Andrew Young | Yes |  |
+| Bayard Rustin | Yes |  |
+| C.T. Vivian | Yes |  |
+| Diane Nash | Yes |  |
+| Ella Baker | Yes |  |
+| Fannie Lou Hamer | Yes |  |
+| Fred Shuttlesworth | Yes |  |
+| Hosea Williams | Yes |  |
+| James Bevel | Yes |  |
+| James Meredith | Yes |  |
+| John Lewis | Yes |  |
+| Julian Bond | Yes |  |
+| Malcolm X | Yes |  |
+| Martin Luther King Jr. | Yes |  |
+| Ralph Abernathy | Yes |  |
+| Stokely Carmichael | Yes | stored as "Stokely Carmichael (Kwame Ture)" |
+| Wyatt Tee Walker | Yes |  |
+| A. Philip Randolph | No |  |
+| Claudette Colvin | No |  |
+| Coretta Scott King | No |  |
+| Dorothy Height | No |  |
+| Fred Hampton | No |  |
+| James Farmer | No |  |
+| Jesse Jackson | No |  |
+| Jo Ann Robinson | No |  |
+| Medgar Evers | No | a "Medgar and Myrlie Evers Home National Monument" place entity exists, but no person entity |
+| Rosa Parks | No | "Rosa Parks Museum"/"Rosa Parks Arrest Site" place entities exist, but no person entity |
+| Roy Wilkins | No |  |
+| Whitney M. Young, Jr. | No |  |
+
+## Theme evidence sufficiency (theme-impact-questions.ts)
+
+_Generated 2026-07-24T20:32:10.963Z._
+
+**4 of 12 theme-impact questions can be answered today using data outside Chicago/Cook County.**
+
+| ID | Theme | Priority | Answerable beyond Chicago today? | Needed metro-level data if not |
+|---|---|---|---|---|
+| Q1 | redlining | P0 | Yes | _n/a_ |
+| Q2 | redlining | P0 | No | HOLC redlining-grade area/population-share data for metros beyond Chicago (Mapping Inequality has it; not yet ingested for other cities). |
+| Q3 | redlining | P0 | No | County-level ACS/NHGIS/HMDA/SCF/SIPP/eviction/HUD-CHAS series for a comparison set of redlined metros beyond Cook County. |
+| Q4 | redlining | P0 | No | A second (or third) formerly-graded place with the same county-level indicator series ingested, to write a comparable place narrative. |
+| Q5 | drug_policy_state | P0 | Yes | _n/a_ |
+| Q6 | drug_policy_state | P0 | No | State/national BJS imprisonment and USSC crack/powder sentencing series are national by definition, but the county-level jail (Vera) leg is Cook-County-only today. |
+| Q7 | urban_renewal | P1 | No | County-level demographic-change indicators (ACS/NHGIS) plus a project-level urban-renewal source for a metro other than Chicago. |
+| Q8 | mass_incarceration | P1 | No | State-level BJS imprisonment-rate series for the full 50-state panel (currently only demonstrated for Illinois/Cook County in fixtures). |
+| Q9 | environmental_racism | P1 | No | County-level CDC EJI and EPA TRI facility counts for counties outside Cook County. |
+| Q10 | cross_cutting | meta | Yes | _n/a_ |
+| Q11 | school_segregation | P1 | No | District-level CRDC school civil-rights data and county ACS/NHGIS attainment series for a metro other than Chicago. |
+| Q12 | voting_rights | P1 | Yes | _n/a_ |
+
+## Decade coverage of PERSON entities (not just DPLA items/places)
+
+_Snapshot as of 2026-07-24._
+
+- Person entities analyzed: **394**; with at least one dated claim: **343**
+
+- Decade gaps in the person-claims story (no dated claim for any person in this decade, within the observed range): **7** — 1710s, 1730s, 1740s, 1750s, 1760s, 1780s, 1800s
+
+| Decade | Person count | Claim count |
+|---|---:|---:|
+| 1700s | 1 | 1 |
+| 1720s | 1 | 1 |
+| 1770s | 2 | 2 |
+| 1790s | 2 | 3 |
+| 1810s | 1 | 1 |
+| 1820s | 3 | 3 |
+| 1830s | 5 | 7 |
+| 1840s | 8 | 9 |
+| 1850s | 7 | 8 |
+| 1860s | 26 | 33 |
+| 1870s | 34 | 47 |
+| 1880s | 17 | 19 |
+| 1890s | 13 | 18 |
+| 1900s | 18 | 19 |
+| 1910s | 19 | 21 |
+| 1920s | 23 | 29 |
+| 1930s | 10 | 12 |
+| 1940s | 28 | 31 |
+| 1950s | 29 | 31 |
+| 1960s | 75 | 97 |
+| 1970s | 32 | 42 |
+| 1980s | 40 | 45 |
+| 1990s | 33 | 37 |
+| 2000s | 37 | 43 |
+| 2010s | 25 | 28 |
+| 2020s | 16 | 17 |
