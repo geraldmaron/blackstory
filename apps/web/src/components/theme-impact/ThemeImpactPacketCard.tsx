@@ -169,6 +169,11 @@ export function ThemeImpactPacketCard({ packet }: ThemeImpactPacketCardProps) {
       ) : (
         <ThemeImpactEmptyNotice kind="provenance" />
       )}
+
+      <p className="ds-theme-impact__methodology-note ds-mono">
+        Methodology: juxtaposition-not-causation.md and scholarship-principles.md
+        (docs/methodology) govern the causal-confidence and sourcing rules applied above.
+      </p>
     </Card>
   );
 }

@@ -8,9 +8,20 @@ export const STORY_REVIEW_INTENT_COPY =
 /** Numbered operator steps for the story review queue. */
 export const STORY_REVIEW_STEPS = [
   'Open a story packet (or select rows for bulk).',
+  'Check naming, agency framing, and (for sensitive subject matter) community-review status against docs/methodology/scholarship-principles.md before deciding.',
   'Add a decision note if helpful (optional, but stored with your review).',
   'Choose approve, needs evidence, or reject. Approval prepares a seed handoff; shipping happens separately.',
 ] as const;
+
+/**
+ * v1 advisory community-review note (docs/methodology/scholarship-principles.md, §5, modeled
+ * on the SNCC Digital Gateway editorial-partnership pattern). Not a formal board gate — records
+ * who was asked and what they said, or that community input has not yet been sought, so the
+ * absence of that input is visible rather than silent for packets on sensitive subject matter
+ * (redlining, racial violence, forced displacement, family separation).
+ */
+export const STORY_REVIEW_COMMUNITY_NOTE_PROMPT =
+  'Community review (sensitive subject matter): who was asked, what they said — or "not yet sought".';
 
 export type StoryReviewAction = 'approved' | 'rejected' | 'needs_evidence';
 

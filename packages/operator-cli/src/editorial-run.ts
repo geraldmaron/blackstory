@@ -204,7 +204,12 @@ Rules:
 - When mentioning other catalog entities, use markup [[entityId|Display Name]] for known ids only.
 - Do not invent citations or claim legal procedural status.
 - reject spam/commerce/off-topic; needs_evidence when thin; keep when learnable with place context.
-- relatedEntityIds must be existing catalog ids only.`;
+- relatedEntityIds must be existing catalog ids only.
+- Naming and agency (see docs/methodology/scholarship-principles.md): name the person as an agent
+  and creator of the record, not a passive data subject; credit Black women's organizing labor by
+  name where the material supports it; prefer agency-centered verbs ("self-liberating",
+  "organized", "sued for", "petitioned") over passive or crime-framed language ("runaway",
+  "fugitive", "escaped slave") except in a clearly marked verbatim quote from a historical source.`;
 
 /**
  * Free-model JSON output is not guaranteed to match the declared shape at runtime
