@@ -73,6 +73,9 @@ Workflow: `.github/workflows/ci.yml` (`name: CI`)
 | E2E Harness |
 | Governance |
 
-Permissions are `contents: read`. Third-party actions are pinned to immutable SHAs. `pull_request_target` is not used.
+Job-level path filters skip heavy lanes on docs/brand/mobile-only changes; skipped required
+checks still count as success. Mobile Typecheck / Mobile Unit Tests are not required and
+only run when mobile-related paths change. Permissions are `contents: read`. Third-party
+actions are pinned to immutable SHAs. `pull_request_target` is not used.
 
 Governance policy: `pnpm validate:governance` checks workflow pins/permissions/events plus checked-in ruleset/CODEOWNERS/Dependabot/SECURITY artifacts. Remote ruleset application is documented in `infra/github/README.md` (blocked until a GitHub remote + admin `gh` auth exist).

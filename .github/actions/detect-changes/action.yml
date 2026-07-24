@@ -1,0 +1,135 @@
+# Path-change detection for CI job gating.
+# Caller must checkout with sufficient history (fetch-depth: 0 for PRs/pushes).
+# Skipped required checks still count as success under GitHub rulesets.
+name: Detect path changes
+description: Emit code/mobile/python/security_code outputs for job-level if conditions
+
+outputs:
+  code:
+    description: Monorepo JS/TS/infra/scripts (excludes docs/beads/md/brand and apps/mobile-only)
+    value: ${{ steps.filter.outputs.code }}
+  mobile:
+    description: apps/mobile, packages/public-contracts, or brand (mobile token source)
+    value: ${{ steps.filter.outputs.mobile }}
+  python:
+    description: Python workspace / workers / pyproject / uv.lock / .py files
+    value: ${{ steps.filter.outputs.python }}
+  security_code:
+    description: Same as code, or security-policy paths (for CodeQL/SBOM gating)
+    value: ${{ steps.filter.outputs.security_code }}
+
+runs:
+  using: composite
+  steps:
+    - name: Classify changed paths
+      id: filter
+      shell: bash
+      env:
+        EVENT_NAME: ${{ github.event_name }}
+        PR_BASE: ${{ github.event.pull_request.base.sha }}
+        PR_HEAD: ${{ github.event.pull_request.head.sha }}
+        BEFORE_SHA: ${{ github.event.before }}
+        HEAD_SHA: ${{ github.sha }}
+      run: |
+        set -euo pipefail
+
+        if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+          echo "code=true" >> "$GITHUB_OUTPUT"
+          echo "mobile=true" >> "$GITHUB_OUTPUT"
+          echo "python=true" >> "$GITHUB_OUTPUT"
+          echo "security_code=true" >> "$GITHUB_OUTPUT"
+          echo "detect-changes: workflow_dispatch → run all lanes"
+          exit 0
+        fi
+
+        if [[ "$EVENT_NAME" == "pull_request" ]]; then
+          BASE="$PR_BASE"
+          HEAD="$PR_HEAD"
+        else
+          BASE="${BEFORE_SHA:-}"
+          HEAD="$HEAD_SHA"
+        fi
+
+        # First push / missing base: fail open (run everything).
+        if [[ -z "$BASE" || "$BASE" =~ ^0+$ ]]; then
+          echo "code=true" >> "$GITHUB_OUTPUT"
+          echo "mobile=true" >> "$GITHUB_OUTPUT"
+          echo "python=true" >> "$GITHUB_OUTPUT"
+          echo "security_code=true" >> "$GITHUB_OUTPUT"
+          echo "detect-changes: missing base SHA → run all lanes"
+          exit 0
+        fi
+
+        mapfile -t FILES < <(git diff --name-only "$BASE" "$HEAD")
+        if [[ ${#FILES[@]} -eq 0 ]]; then
+          echo "code=true" >> "$GITHUB_OUTPUT"
+          echo "mobile=true" >> "$GITHUB_OUTPUT"
+          echo "python=true" >> "$GITHUB_OUTPUT"
+          echo "security_code=true" >> "$GITHUB_OUTPUT"
+          echo "detect-changes: empty diff → run all lanes"
+          exit 0
+        fi
+
+        code=false
+        mobile=false
+        python=false
+        security_code=false
+
+        is_noise() {
+          local f="$1"
+          [[ "$f" =~ ^(docs/|\.beads/|brand/) ]] && return 0
+          [[ "$f" =~ \.md$ ]] && return 0
+          [[ "$f" == "LICENSE" || "$f" == "LICENSE.txt" ]] && return 0
+          return 1
+        }
+
+        is_mobile() {
+          local f="$1"
+          [[ "$f" =~ ^(apps/mobile/|packages/public-contracts/|brand/) ]]
+        }
+
+        is_python() {
+          local f="$1"
+          [[ "$f" == "pyproject.toml" || "$f" == "uv.lock" || "$f" == "uv.toml" ]] && return 0
+          [[ "$f" =~ \.py$ ]] && return 0
+          [[ "$f" =~ (^|/)python/ ]] && return 0
+          [[ "$f" =~ ^workers/(research|security|publication)/ ]] && return 0
+          [[ "$f" =~ ^packages/(research-kernel|constitution)/ ]] && return 0
+          return 1
+        }
+
+        is_security_extra() {
+          local f="$1"
+          [[ "$f" =~ ^(\.github/workflows/security\.yml|infra/github/security|packages/security/|SECURITY\.md) ]]
+        }
+
+        for f in "${FILES[@]}"; do
+          [[ -z "$f" ]] && continue
+          if is_mobile "$f"; then
+            mobile=true
+          fi
+          if is_python "$f"; then
+            python=true
+          fi
+          if is_security_extra "$f"; then
+            security_code=true
+          fi
+          if is_noise "$f"; then
+            continue
+          fi
+          # Isolated mobile tree does not force the root pnpm lane.
+          if [[ "$f" =~ ^apps/mobile/ ]]; then
+            continue
+          fi
+          code=true
+          security_code=true
+        done
+
+        # public-contracts / brand already set mobile; public-contracts also sets code above.
+        echo "code=${code}" >> "$GITHUB_OUTPUT"
+        echo "mobile=${mobile}" >> "$GITHUB_OUTPUT"
+        echo "python=${python}" >> "$GITHUB_OUTPUT"
+        echo "security_code=${security_code}" >> "$GITHUB_OUTPUT"
+        echo "detect-changes: code=${code} mobile=${mobile} python=${python} security_code=${security_code}"
+        printf 'Changed files (%d):\n' "${#FILES[@]}"
+        printf '  %s\n' "${FILES[@]}"
