@@ -125,3 +125,25 @@ export function createPublicRateLimitGuard(options: PublicRateLimitGuardOptions 
     },
   };
 }
+
+/**
+ * No-op rate-limit guard: every request is allowed, no concurrency slots are
+ * tracked. Safe for local dev/simulator sessions where the in-memory quota
+ * would otherwise be exhausted by repeated test launches.
+ *
+ * Enable with `RATE_LIMIT_DISABLED=1` in the server environment. Never set
+ * this in production — the env var is validated absent by the prod deploy check.
+ */
+export function createNoopRateLimitGuard(): ReturnType<typeof createPublicRateLimitGuard> {
+  return {
+    evaluate(_request: PublicRateLimitRequest): PublicRateLimitGuardDecision | null {
+      return null; // null → caller skips rate-limit enforcement
+    },
+    release(_key: string): void {
+      // no-op
+    },
+    formatDeniedResponse(decision: Extract<QuotaDecision, { allowed: false }>) {
+      return formatRateLimitResponse(decision);
+    },
+  };
+}

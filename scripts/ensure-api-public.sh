@@ -202,7 +202,7 @@ start_api_public() {
       echo "ensure-api-public: no DATABASE_URL in shell — starting via run-with-dev-secrets"
       (
         cd "$ROOT/apps/api-public"
-        nohup run-with-dev-secrets env PUBLIC_DATA_SOURCE=postgres DATABASE_SSL=1 pnpm dev >>"$LOG_FILE" 2>&1 &
+        nohup run-with-dev-secrets env PUBLIC_DATA_SOURCE=postgres DATABASE_SSL=1 RATE_LIMIT_DISABLED=1 pnpm dev >>"$LOG_FILE" 2>&1 &
         echo $! >"$PID_FILE"
       )
       return 0
@@ -215,7 +215,7 @@ start_api_public() {
   echo "ensure-api-public: starting api-public on :${API_PUBLIC_PORT} (postgres, DATABASE_SSL=1)…"
   (
     cd "$ROOT/apps/api-public"
-    nohup env PUBLIC_DATA_SOURCE=postgres DATABASE_SSL=1 pnpm dev >>"$LOG_FILE" 2>&1 &
+    nohup env PUBLIC_DATA_SOURCE=postgres DATABASE_SSL=1 RATE_LIMIT_DISABLED=1 pnpm dev >>"$LOG_FILE" 2>&1 &
     echo $! >"$PID_FILE"
   )
 }
