@@ -493,6 +493,21 @@ export type {
   PlaceFields,
 } from './geography/location.js';
 
+// HOLC-polygon -> modern-tract crosswalk schema (repo-xez5.7). No rows populated
+// yet — see geography/holc-tract-crosswalk.ts module doc for the GIS-tooling blocker.
+export {
+  HOLC_TRACT_CROSSWALK_METHODS,
+  HOLC_TRACT_CROSSWALK_CONFIDENCE_LEVELS,
+  HOLC_TRACT_CROSSWALK_ROWS,
+  findTractsForHolcArea,
+} from './geography/holc-tract-crosswalk.js';
+export type {
+  CrosswalkProvenanceQuartet,
+  HolcTractCrosswalkMethod,
+  HolcTractCrosswalkConfidence,
+  HolcTractCrosswalkRow,
+} from './geography/holc-tract-crosswalk.js';
+
 export {
   LOCATION_EVIDENCE_CLASSES,
   LOCATION_DRIFT_THRESHOLDS_METERS,

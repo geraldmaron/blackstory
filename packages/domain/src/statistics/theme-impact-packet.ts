@@ -9,6 +9,20 @@ import type { StatisticalGeographyType } from './types.js';
 
 export const THEME_IMPACT_PACKET_KIND = 'theme.impact.packet.v1' as const;
 
+/**
+ * Public methodology citations for theme-impact content. Redlining-themed packets should link
+ * both docs when the packet's public "methodology"/"sources" surface renders — see
+ * docs/methodology/juxtaposition-not-causation.md (default juxtaposition, causal-claim gate) and
+ * docs/methodology/scholarship-principles.md (§6 names the boundary-discontinuity-grade
+ * citations, e.g. Aaronson/Hartley/Mazumder, Faber, NCRC, required for any gated causal claim in
+ * a redlining narrative). Additive reference only — does not change packet shape or the publish
+ * gate below (repo-xez5.7 owns structural changes to that gate).
+ */
+export const THEME_IMPACT_METHODOLOGY_DOC_PATHS = Object.freeze([
+  'docs/methodology/juxtaposition-not-causation.md',
+  'docs/methodology/scholarship-principles.md',
+] as const);
+
 export const THEME_IMPACT_METHOD_STANCES = ['juxtaposition', 'gated_causal_claim'] as const;
 export type ThemeImpactMethodStance = (typeof THEME_IMPACT_METHOD_STANCES)[number];
 
@@ -17,6 +31,43 @@ export type ThemeImpactPacketStatus = (typeof THEME_IMPACT_PACKET_STATUSES)[numb
 
 export const THEME_IMPACT_GAP_STATES = ['insufficient_evidence', 'modeled'] as const;
 export type ThemeImpactGapState = (typeof THEME_IMPACT_GAP_STATES)[number];
+
+/**
+ * Multi-decade evidence-spine checklist (repo-xez5.7). A published theme-impact
+ * packet must account for every item — either with real evidence in the packet,
+ * or with an explicit gap_state entry naming why the spine is missing. Silent
+ * absence (an item just not mentioned) is never acceptable for a published packet.
+ */
+export const THEME_IMPACT_MULTI_DECADE_CHECKLIST_ITEMS = [
+  /** At least one primary observation/derived/artifact anchoring the theme. */
+  'primary_layer',
+  /** Historical-geography -> modern-tract (or county) crosswalk backing the geography. */
+  'crosswalk_layer',
+  /** Outcomes measured across more than one era/decade, not a single snapshot. */
+  'longitudinal_outcomes',
+  /** Named person/organization/institution entities bound to the packet. */
+  'named_actors',
+  /** Dated artifacts/events forming a timeline, not a single undated fact. */
+  'event_timeline',
+  /** Explicit causal-confidence stance (juxtaposition vs. gated_causal_claim + claim ids). */
+  'causal_confidence_metadata',
+] as const;
+export type ThemeImpactMultiDecadeChecklistItem =
+  (typeof THEME_IMPACT_MULTI_DECADE_CHECKLIST_ITEMS)[number];
+
+/** A checklist item is either backed by real packet content, or named as a gap. */
+export type ThemeImpactChecklistEntry =
+  | { readonly present: true }
+  | {
+      readonly present: false;
+      readonly gapState: ThemeImpactGapState;
+      /** Human-readable reason the spine is missing (e.g. "no NHGIS API key registered"). */
+      readonly note: string;
+    };
+
+export type ThemeImpactMultiDecadeChecklist = Readonly<
+  Record<ThemeImpactMultiDecadeChecklistItem, ThemeImpactChecklistEntry>
+>;
 
 export const THEME_IMPACT_BINDING_PURPOSES = ['map_panel', 'story', 'research'] as const;
 export type ThemeImpactBindingPurpose = (typeof THEME_IMPACT_BINDING_PURPOSES)[number];
@@ -95,6 +146,7 @@ export type ThemeImpactPacket = {
   readonly gapStates: readonly ThemeImpactGapState[];
   readonly entityBinding?: ThemeImpactEntityBinding;
   readonly causalClaimIds?: readonly string[];
+  readonly multiDecadeChecklist?: ThemeImpactMultiDecadeChecklist;
   readonly status: ThemeImpactPacketStatus;
   readonly createdAt: string;
   readonly updatedAt: string;
@@ -116,6 +168,7 @@ export type BuildThemeImpactPacketInput = {
   readonly gapStates?: readonly ThemeImpactGapState[];
   readonly entityBinding?: ThemeImpactEntityBinding;
   readonly causalClaimIds?: readonly string[];
+  readonly multiDecadeChecklist?: ThemeImpactMultiDecadeChecklist;
   readonly status?: ThemeImpactPacketStatus;
   readonly createdAt: string;
   readonly updatedAt: string;
@@ -190,6 +243,77 @@ function provenanceComplete(p: ThemeImpactProvenanceQuartet, path: string): void
   requireNonEmpty(p.humanCitation, `${path}.humanCitation`);
 }
 
+function freezeChecklistEntry(entry: ThemeImpactChecklistEntry): ThemeImpactChecklistEntry {
+  return entry.present
+    ? Object.freeze({ present: true })
+    : Object.freeze({ present: false, gapState: entry.gapState, note: entry.note });
+}
+
+function freezeMultiDecadeChecklist(
+  checklist: ThemeImpactMultiDecadeChecklist,
+): ThemeImpactMultiDecadeChecklist {
+  const frozen = {} as Record<ThemeImpactMultiDecadeChecklistItem, ThemeImpactChecklistEntry>;
+  for (const item of THEME_IMPACT_MULTI_DECADE_CHECKLIST_ITEMS) {
+    if (checklist[item] !== undefined) {
+      frozen[item] = freezeChecklistEntry(checklist[item]);
+    }
+  }
+  return Object.freeze(frozen);
+}
+
+function present(): ThemeImpactChecklistEntry {
+  return { present: true };
+}
+
+function gap(gapState: ThemeImpactGapState, note: string): ThemeImpactChecklistEntry {
+  return { present: false, gapState, note };
+}
+
+/**
+ * Derives the multi-decade checklist from what the packet actually contains —
+ * never fabricates presence. Callers that have crosswalk/longitudinal/actor
+ * evidence not representable in the current shape should pass an explicit
+ * `multiDecadeChecklist` to `buildThemeImpactPacket` instead of relying on this.
+ */
+export function deriveDefaultMultiDecadeChecklist(
+  input: Pick<
+    BuildThemeImpactPacketInput,
+    'observations' | 'derived' | 'artifacts' | 'entityBinding' | 'geography'
+  >,
+): ThemeImpactMultiDecadeChecklist {
+  const observations = input.observations ?? [];
+  const derived = input.derived ?? [];
+  const artifacts = input.artifacts ?? [];
+
+  const referencePeriods = new Set<string>([
+    ...observations.map((o) => o.referencePeriod),
+    ...artifacts.map((a) => a.dated).filter((d): d is string => Boolean(d)),
+  ]);
+
+  return {
+    primary_layer:
+      observations.length + derived.length + artifacts.length > 0
+        ? present()
+        : gap('insufficient_evidence', 'no observations, derived measurements, or artifacts on this packet'),
+    crosswalk_layer: gap(
+      'insufficient_evidence',
+      'no HOLC-polygon -> modern-tract (or historical-geography -> modern-jurisdiction) crosswalk applied to this packet\'s geography yet',
+    ),
+    longitudinal_outcomes:
+      referencePeriods.size >= 2
+        ? present()
+        : gap('insufficient_evidence', 'packet carries a single reference period; no era-spanning observations yet'),
+    named_actors:
+      input.entityBinding !== undefined
+        ? present()
+        : gap('insufficient_evidence', 'no named-actor entity binding on this packet'),
+    event_timeline: artifacts.some((a) => Boolean(a.dated))
+      ? present()
+      : gap('insufficient_evidence', 'no dated artifacts on this packet to anchor an event timeline'),
+    causal_confidence_metadata: present(),
+  };
+}
+
 /** Pure builder for a theme-impact answer packet. */
 export function buildThemeImpactPacket(input: BuildThemeImpactPacketInput): ThemeImpactPacket {
   requireNonEmpty(input.id, 'id');
@@ -221,6 +345,9 @@ export function buildThemeImpactPacket(input: BuildThemeImpactPacketInput): Them
     ...(input.causalClaimIds !== undefined
       ? { causalClaimIds: Object.freeze([...input.causalClaimIds]) }
       : {}),
+    multiDecadeChecklist: freezeMultiDecadeChecklist(
+      input.multiDecadeChecklist ?? deriveDefaultMultiDecadeChecklist(input),
+    ),
     status: input.status ?? 'draft',
     createdAt: input.createdAt,
     updatedAt: input.updatedAt,
@@ -272,6 +399,40 @@ export function assertThemeImpactPacketPublishable(packet: ThemeImpactPacket): v
         'gated_causal_claim requires claimId on an artifact or causalClaimIds on the packet',
       );
     }
+  }
+
+  if (!isMethodologyGate) {
+    assertThemeImpactPacketMultiDecadeChecklist(packet);
+  }
+}
+
+/**
+ * Multi-decade evidence-spine checklist gate (repo-xez5.7). A publishable packet
+ * must declare all six checklist items: primary_layer, crosswalk_layer,
+ * longitudinal_outcomes, named_actors, event_timeline, causal_confidence_metadata.
+ * Each item must be either `{ present: true }` (backed by real packet content) or
+ * an explicit gap_state entry naming why the spine is missing. A missing key —
+ * the item simply absent from the checklist — fails closed: silent absence is
+ * never treated as "not applicable."
+ */
+export function assertThemeImpactPacketMultiDecadeChecklist(packet: ThemeImpactPacket): void {
+  const checklist = packet.multiDecadeChecklist;
+  if (checklist === undefined) {
+    throw new Error(
+      'published theme-impact packet requires multiDecadeChecklist ' +
+        `(${THEME_IMPACT_MULTI_DECADE_CHECKLIST_ITEMS.join(', ')})`,
+    );
+  }
+  for (const item of THEME_IMPACT_MULTI_DECADE_CHECKLIST_ITEMS) {
+    const entry = checklist[item];
+    if (entry === undefined) {
+      throw new Error(`multiDecadeChecklist missing required item "${item}"`);
+    }
+    if (entry.present) continue;
+    if (!THEME_IMPACT_GAP_STATES.includes(entry.gapState)) {
+      throw new Error(`multiDecadeChecklist["${item}"].gapState must be a valid gap_state`);
+    }
+    requireNonEmpty(entry.note, `multiDecadeChecklist["${item}"].note`);
   }
 }
 

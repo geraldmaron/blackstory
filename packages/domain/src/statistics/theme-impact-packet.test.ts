@@ -2,10 +2,13 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
+  THEME_IMPACT_MULTI_DECADE_CHECKLIST_ITEMS,
   THEME_IMPACT_PACKET_KIND,
+  assertThemeImpactPacketMultiDecadeChecklist,
   assertThemeImpactPacketPublishable,
   buildThemeImpactPacket,
   createRedliningQ3FixturePacket,
+  deriveDefaultMultiDecadeChecklist,
 } from './theme-impact-packet.js';
 import {
   RESEARCHED_THEME_IMPACT_PACKETS,
@@ -257,4 +260,67 @@ test('Census CPS A-1 and BJS Table 6 primary series back voting and national imp
       (artifact) => artifact.artifactId === 'art_bjs_prisoners_2020_tables_zip',
     ),
   );
+});
+
+test('published packet without multiDecadeChecklist fails closed', () => {
+  const packet = buildThemeImpactPacket({
+    id: 'tip_test_missing_checklist',
+    questionId: 'Q3',
+    themeId: 'redlining',
+    title: 'Missing checklist',
+    geography: { geographyType: 'county', boundaryVersion: 'county-2020' },
+    methodNote: 'test',
+    observations: [
+      {
+        observationId: 'obs1',
+        metricId: 'm1',
+        estimate: 1,
+        unit: 'percent',
+        referencePeriod: '2020',
+        provenance: {
+          source: 's',
+          sourceUrl: 'https://example.com',
+          retrievedAt: '2026-01-01T00:00:00.000Z',
+          contentHash: 'sha256:x',
+          humanCitation: 'cite',
+        },
+      },
+    ],
+    status: 'published',
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+    // multiDecadeChecklist omitted from the constructor call is impossible via
+    // buildThemeImpactPacket (it always derives a default) — assert the raw gate
+    // rejects a packet whose checklist was stripped after construction instead.
+  });
+  const stripped = { ...packet, multiDecadeChecklist: undefined } as typeof packet;
+  assert.throws(
+    () => assertThemeImpactPacketMultiDecadeChecklist(stripped),
+    /requires multiDecadeChecklist/,
+  );
+});
+
+test('deriveDefaultMultiDecadeChecklist marks every item present or an explicit gap_state', () => {
+  const checklist = deriveDefaultMultiDecadeChecklist({
+    observations: [],
+    derived: [],
+    artifacts: [],
+    geography: { geographyType: 'county', boundaryVersion: 'county-2020' },
+  });
+  for (const item of THEME_IMPACT_MULTI_DECADE_CHECKLIST_ITEMS) {
+    const entry = checklist[item];
+    assert.ok(entry, `missing ${item}`);
+    if (!entry.present) {
+      assert.ok(entry.note.length > 0);
+    }
+  }
+  assert.equal(checklist.primary_layer.present, false);
+  assert.equal(checklist.crosswalk_layer.present, false);
+});
+
+test('Chicago redlining fixture publishes with an auto-derived checklist (crosswalk still a gap)', () => {
+  const packet = createRedliningQ3FixturePacket({ status: 'published' });
+  assert.doesNotThrow(() => assertThemeImpactPacketPublishable(packet));
+  assert.equal(packet.multiDecadeChecklist?.primary_layer.present, true);
+  assert.equal(packet.multiDecadeChecklist?.crosswalk_layer.present, false);
 });
