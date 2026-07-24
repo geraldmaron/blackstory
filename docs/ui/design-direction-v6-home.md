@@ -41,7 +41,7 @@ reader theme toggle (light and dark). Do not hide or disable the theme control o
 
 **Atmosphere, not wallpaper:** page gutters carry fixed pseudo-element texture (paper grain + quiet archive index grid / corner brackets on Rule and copper hairlines). Home does **not** mount a scattered gutter mosaic — that collage register stays on other edition routes (`EditionAtmosphereMosaic`). Center content Surface cards stay opaque (WCAG floor); the home column itself is transparent so atmosphere can show through the hero copy scrim. No crumpled continental silhouettes, no competing fake map under the live hero readout, no sepia stock.
 
-The hero map inside beat 0 is a **Surface-contained live readout**: the persistent MapLibre plate (`MapStage`) is **positioned** into the hero map column (viewport-fixed box from `hero-map-inset.ts`, not `clip-path`) so real archive pins render in-panel — never a decorative sketch, never full-bleed wallpaper under the whole page. The copy column sits over a **copy-column-only atmosphere plate** (`.ds-home-hero::before`: Archive Paper canvas + archive grain/grid) with a transparent copy layer on top so the grid reads as clearly as the map-column window — not an opaque Surface slab. Opaque fills on `.ds-home` / home `main` are punched transparent so page atmosphere can also participate; the map inset stays map-column-only (do not reframe the plate under the copy).
+The hero map inside beat 0 is a **Surface-contained live readout**: the persistent MapLibre plate (`MapStage`) is **positioned** to the **full hero panel** (viewport-fixed box from `hero-map-inset.ts`, not `clip-path`) so basemap + archive pins render under the copy column as well as the map readout — never a decorative sketch, never full-bleed wallpaper under the whole page. The copy column sits over a **light matte scrim** (`.ds-home-hero::before`: ~38% canvas mix + soft grain only; ~48% on dark — no archive-grid wash on the scrim, which read as an opaque plate over ocean) with a transparent copy layer on top so map tiles remain visible under the words while ink stays WCAG AA. Opaque fills on `.ds-home` / home `main` are punched transparent so the inset can stack correctly. National framing uses asymmetric padding (`heroNationalCameraPadding`: left ≈ 22% of copy width on desktop; top ≈ 35% of copy height when stacked) so western states/pins sit under the headline while CONUS still reads primarily in the map-readout band. Bounds flights apply padding only in `cameraForBounds` (not again on `easeTo`) to avoid double-shifting.
 
 ---
 
@@ -119,11 +119,12 @@ The hero is **one Surface card** containing copy and map. It is **not** a full-v
 
 - Caption: mono uppercase, centered — e.g. "Live coverage · archive pins" (middle dot separator, not em dash).
 - Frame: fills column height (`min-height` ~`min(48vh, 28rem)` desktop; ~14rem mobile).
-- Content: **live MapLibre plate** positioned into the map column (`hero-map-inset.ts`) with real archive entity pins from the active release — stays inside the panel, never bleeds to viewport edges.
-- Map column is a transparent pass-through (`pointer-events: none`); MapStage plate receives pin/state hits beneath it.
+- Content: **live MapLibre plate** positioned to the **full hero panel** (`hero-map-inset.ts`) with real archive entity pins — clipped to the rounded panel so the map appears cut off by the hero frame / copy scrim, not a separate right-only window.
+- Map column is a transparent pass-through (`pointer-events: none`); MapStage plate receives pin/state hits in the readout band (copy column blocks hits for legibility).
+- Camera: after inset apply, national `fitBounds` uses `heroNationalCameraPadding` (left ≈ 22% copy width on desktop; top ≈ 35% copy height when stacked) so western states sit under the words while CONUS framing stays mostly in the map readout. Bounds padding is applied once in `cameraForBounds` only.
 - `engage()` clears the hero geometry before routing to `/explore` (ADR-017 handoff).
 
-**Cross-browser (Safari, Chrome, Firefox; mobile WebKit):** Hero inset uses viewport-fixed geometry from `hero-map-inset.ts`, not `clip-path` (Safari WebGL compositing). Inset resyncs on scroll, resize, and `orientationchange`; MapStage calls `resize()` after each apply. See [`patterns-map-canvas.md`](./patterns-map-canvas.md).
+**Cross-browser (Safari, Chrome, Firefox; mobile WebKit):** Hero inset uses viewport-fixed geometry from `hero-map-inset.ts`, not `clip-path` (Safari WebGL compositing). Inset resyncs on scroll, resize, and `orientationchange`; MapStage calls `resize()` after each apply and reframes national when panel size changes. See [`patterns-map-canvas.md`](./patterns-map-canvas.md).
 
 ### 5.4 Mobile
 
@@ -271,7 +272,7 @@ Never two copper-filled buttons visible in the same above-the-fold viewport. Raw
 - CSS surface: `apps/web/src/app/(home)/` or page-scoped module; reuse `--ds-*` tokens, no raw hex.
 - Atmosphere texture: `home-edition.css` (`::before` grain/grid). Home does not mount `EditionAtmosphereMosaic` / former `HomeAtmosphereMosaic`.
 - Record carousel: compose from `@repo/ui` primitives where possible; shared browse controls live in `apps/web/src/components/patterns/` (`RecordBrowseControls`, `BrowseModeToggle`, `browse-mode.css`).
-- Live hero map wiring: `hero-map-inset.ts` positions MapStage over `.ds-home-hero__map` (map column only). Copy column uses a transparent text layer over `.ds-home-hero::before` (canvas + archive grain/grid); `.ds-home` / home `main` stay transparent; do not expand the inset under the copy.
+- Live hero map wiring: `hero-map-inset.ts` positions MapStage over the full `.ds-home-hero` panel (under copy + map readout). Copy uses a transparent text layer over `.ds-home-hero::before` (light canvas scrim + grain); `.ds-home` / home `main` stay transparent; `heroNationalCameraPadding` keeps CONUS mostly in the map-readout band while western coast reads under the headline.
 - Mockup reference file: copy into `docs/ui/fixtures/` when owner drops it in repo; until then, Downloads path above is the binding visual.
 
 ---

@@ -76,9 +76,9 @@
 
 /*
  * ADR-017: MapStage stays mounted for explore handoff. On `/` the fixed plate is sized and
- * positioned to the hero map column (`hero-map-inset.ts`) so real archive pins render in-panel;
- * geometry positioning replaces clip-path for cross-browser WebGL reliability. `/explore` clears
- * the inset for full-bleed cockpit.
+ * positioned to the full hero panel (`hero-map-inset.ts`) so basemap + pins extend under the
+ * copy column as well as the map readout; geometry positioning replaces clip-path for
+ * cross-browser WebGL reliability. `/explore` clears the inset for full-bleed cockpit.
  */
 .ds-map-surface:has(.ds-home-hero) .ds-map-stage {
   visibility: visible;
@@ -93,14 +93,9 @@
 .ds-map-surface:has(.ds-home-hero) .ds-map-stage--hero-inset {
   z-index: 1;
   overflow: hidden;
-  border-radius: 0 var(--ds-radius-md) var(--ds-radius-md) 0;
+  /* Match the rounded hero frame — map is cut off by the panel, not a right-only window. */
+  border-radius: var(--ds-radius-md);
   /* Viewport box from hero-map-inset.ts — no clip-path (Safari WebGL compositing). */
-}
-
-@media (max-width: 47.9375rem) {
-  .ds-map-surface:has(.ds-home-hero) .ds-map-stage--hero-inset {
-    border-radius: 0 0 var(--ds-radius-md) var(--ds-radius-md);
-  }
 }
 
 .ds-map-surface:has(.ds-home-hero:not(.ds-hero-stage--dissolving)) .maplibregl-ctrl-top-right {
