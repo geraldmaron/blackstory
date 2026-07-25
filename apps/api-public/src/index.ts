@@ -61,7 +61,7 @@ export { dispatch as dispatchV1 } from './http/router.js';
 export type { ApiRequest, HandlerDeps } from './http/handlers.js';
 export {
   createInMemoryPublicDataAccess,
-  createFirestorePublicDataAccess,
+  createPublicDataAccessFromReaders,
   EMPTY_FACETS,
 } from './http/data-access.js';
 export type {
@@ -69,7 +69,7 @@ export type {
   ReleasePointer,
   SearchPage,
   InMemoryPublicDataOptions,
-  FirestoreDataAccessReaders,
+  PublicDataAccessReaders,
 } from './http/data-access.js';
 export type {
   FindNearestEndpoint,

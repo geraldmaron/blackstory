@@ -78,38 +78,31 @@ gains nothing because every parameter is re-validated server-side and there is n
 
 ## Data access
 
-Handlers depend on the `PublicDataAccess` port (`data-access.ts`). Three adapters ship:
+Handlers depend on the `PublicDataAccess` port (`data-access.ts`). Two adapters ship:
 
 - `createInMemoryPublicDataAccess` — real, fully tested; also usable as the ADR-004
   degraded/immutable-snapshot source. Used when `./live-policy.ts`'s gate is false (emulators,
   missing `DATABASE_URL`, explicit `PUBLIC_DATA_SOURCE=fixtures|seed`, or `PUBLIC_READ_API_DISABLED`).
-- `createPostgresDataAccessReaders` + `createFirestorePublicDataAccess` — **primary production path**:
-  reads Supabase Postgres `bb_public.*` (same queries as
+- `createPostgresDataAccessReaders` + `createPublicDataAccessFromReaders` — **the only live
+  production path**: reads Supabase Postgres `bb_public.*` (same queries as
   `apps/web/src/lib/public-data/postgres-readers.ts`). Selected when
   `PUBLIC_DATA_SOURCE=postgres` and `DATABASE_URL` (or `APP_DATABASE_URL`) are set.
-- `createFirestoreDataAccessReaders` + `createFirestorePublicDataAccess` — **legacy wind-down path**:
-  explicit `PUBLIC_DATA_SOURCE=firestore` only (never a silent production default).
+
+The legacy Firestore read path (`firestore-data-access.ts`, `firestore-read-budget.ts`,
+`emulator-harness.ts`, and the `PUBLIC_DATA_SOURCE=firestore` branch) was removed in repo-348e.3
+once repo-348e.1 confirmed no production deploy path ever set it; Postgres has been the sole SoR
+since ADR-020 and there is no Firestore fallback, silent or explicit.
 
 **Live wiring gap (honest):** timeline hydration — the projection has no timeline field (always
 `[]` until the release builder adds one).
 
-**Fixed in repo-rw1p (closed 2026-07-20):** Firestore-emulator integration tests
-(`firestore-data-access.integration.test.ts`), load/cost read-budget report (`read-budget.md`), and
-independent adversarial reviewer sign-off on authorization/redaction/cost paths (PR #19).
-
-**Fixed in MOB-004 read-budget pass:** deterministic Firestore read counts per `/v1` endpoint with
-an injectable recording fake — see [`read-budget.md`](./read-budget.md).
+**Fixed in MOB-004 read-budget pass:** deterministic read counts per `/v1` endpoint — see
+[`read-budget.md`](./read-budget.md) (numbers now describe the Postgres path only).
 
 **Fixed in MOB-004 index search pass (2f8563c9):** live `/v1/search` prefers the release-scoped
-`publicSearchIndex` composite query (`releaseId == activeRelease`, `orderBy __name__`, paginated at
-400 docs/page — same shape as `apps/web/src/lib/public-data/firestore-readers.ts`) and runs
-`@repo/domain`'s `runPublicSearch` for filters, facets, ranking, and depth pagination. When no
-index rows exist for the release, search honestly falls back to a bounded entity-collection scan
-(`MAX_LIVE_SEARCH_SCAN`, free-text match only, empty facets).
-
-**Fixed in MOB-004 artifact parity pass:** live search now prefers release `search-index.json`
-(CDN/GCS via `@repo/firebase`'s `fetchReleaseSearchIndexArtifact`, same object path as web) before
-the Firestore `publicSearchIndex` query — matching `apps/web`'s artifact-first order.
+`publicSearchIndex` query and runs `@repo/domain`'s `runPublicSearch` for filters, facets, ranking,
+and depth pagination. When no index rows exist for the release, search honestly falls back to a
+bounded entity-collection scan (`MAX_LIVE_SEARCH_SCAN`, free-text match only, empty facets).
 
 ## Local run against live Postgres (production SoR — preferred)
 
@@ -147,53 +140,10 @@ env PUBLIC_DATA_SOURCE=postgres DATABASE_SSL=1 APP_CHECK_MODE=monitor pnpm dev
 Fresh clone: from the repo root run `pnpm install && pnpm --filter @repo/public-contracts build`
 before `pnpm dev` so `@repo/public-contracts` resolves.
 
-## Local run against live Firebase (legacy — explicit opt-in)
-
-Requires `PUBLIC_DATA_SOURCE=firestore` in addition to the Firebase prerequisites below.
-Same convention as `apps/web` / `apps/admin`: Application Default Credentials (ADC), an explicit
-production break-glass flag, and optional `run-with-dev-secrets` for any `op://` references in
-`~/.env.1password` (never commit secrets; never print resolved values).
-
-**Prerequisites**
-
-1. `gcloud auth application-default login` (user ADC — no service-account JSON in the repo).
-2. Quota project for Google APIs App Check / Identity Toolkit calls over ADC:
-   `gcloud auth application-default set-quota-project black-book-efaaf`, or set
-   `GOOGLE_CLOUD_QUOTA_PROJECT=black-book-efaaf` in the environment.
-3. Production break-glass: `BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1` (required for local
-   `NODE_ENV=development`; Cloud Run production omits this).
-
-**Start the server**
-
-```bash
-cd apps/api-public
-
-# Inject any 1Password-backed env refs (GOOGLE_APPLICATION_CREDENTIALS op://, etc.) without
-# writing secrets to disk. Confirm injection with `env | rg '^[A-Z_]+='` — never echo key values.
-run-with-dev-secrets env \
-  PUBLIC_DATA_SOURCE=firestore \
-  BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1 \
-  FIREBASE_PROJECT_ID=black-book-efaaf \
-  GOOGLE_CLOUD_QUOTA_PROJECT=black-book-efaaf \
-  APP_CHECK_MODE=monitor \
-  pnpm dev
-```
-
-Smoke (no App Check token required for bootstrap/entity in monitor mode):
-
-```bash
-curl -sS 'http://127.0.0.1:8080/v1/health' | jq .
-curl -sS 'http://127.0.0.1:8080/v1/bootstrap' | jq .
-```
-
 **Environment reference**
 
 | Variable | Role |
 |----------|------|
-| `BLACK_BOOK_FIREBASE_ALLOW_PRODUCTION=1` | Break-glass for local reads against `black-book-efaaf` |
-| `FIREBASE_PROJECT_ID` / `GOOGLE_CLOUD_PROJECT` | Must resolve to `black-book-efaaf` unless `PUBLIC_DATA_SOURCE=firestore` |
-| `GOOGLE_CLOUD_QUOTA_PROJECT` | ADC quota project for App Check verifier API calls |
-| `GOOGLE_APPLICATION_CREDENTIALS` | Optional; ADC is preferred. If set via `op://`, use `run-with-dev-secrets` |
 | `PUBLIC_READ_API_DISABLED=1` | Kill-switch — forces empty in-memory adapter |
 | `PUBLIC_DATA_SOURCE=fixtures\|seed` | Force in-memory adapter |
 | `APP_CHECK_MODE` | `monitor` (default) or `enforce` — see `app-check.ts` |
@@ -211,12 +161,11 @@ body (413), JSON depth bomb (`parseJsonWithDepthLimit` rejects), malformed entit
 query injection (SQL/regex/field-selection denied via the shared guardrail), unbounded-array defense
 (response schema caps), negative redaction snapshots (internal/ranking/precise-geo fields absent),
 T3 enumeration indistinguishability (`enumeration-indistinguishability.test.ts` — deterministic
-backend trace, no flaky wall-clock timing; emulator HTTP layer in
-`firestore-data-access.integration.test.ts`), and SSRF-through-citation/media-URL regression
+backend trace, no flaky wall-clock timing), and SSRF-through-citation/media-URL regression
 (`ssrf-url-safety.test.ts` — handler never server-fetches user-controlled URLs; malicious schemes
 rejected at the data-access port).
 
-Read budgets and per-endpoint Firestore costs are documented in [`read-budget.md`](./read-budget.md).
+Read budgets and per-endpoint Postgres query costs are documented in [`read-budget.md`](./read-budget.md).
 
 ## Contract artifacts (MOB-004 evidence to close)
 

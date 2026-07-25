@@ -3,18 +3,18 @@
  *
  * Reads the same Supabase Postgres projections as `apps/web/src/lib/public-data/postgres-readers.ts`
  * and maps them onto `@repo/public-contracts` DTOs via the shared projection mapper in
- * `./firestore-data-access.ts` (storage-neutral mapping — no Firestore dependency at runtime).
+ * `./projection-mapping.ts` (storage-neutral mapping — Postgres is the only live read path).
  */
 import type { NotabilityBasisRecord, PublicSearchIndexDoc } from '@repo/domain';
 import type { PublicSearchProjectionDoc } from '@repo/schemas';
 import type { CanonicalSearchQuery } from '@repo/security';
 import { entityV1Schema, type EntityV1 } from '@repo/public-contracts/v1/entity';
-import type { FirestoreDataAccessReaders, ReleasePointer, SearchPage } from './data-access.js';
+import type { PublicDataAccessReaders, ReleasePointer, SearchPage } from './data-access.js';
 import { searchOverEntities, searchOverIndex } from './data-access.js';
 import {
   mapProjectionToEntityV1,
   MAX_LIVE_SEARCH_SCAN,
-} from './firestore-data-access.js';
+} from './projection-mapping.js';
 import {
   fetchActiveRelease,
   fetchPublicEntityProjection,
@@ -73,7 +73,7 @@ function mapActiveReleaseToPointer(
 
 export function createPostgresDataAccessReaders(
   options: CreatePostgresDataAccessReadersOptions = {},
-): FirestoreDataAccessReaders {
+): PublicDataAccessReaders {
   const runQuery: PostgresQueryFn = options.query ?? queryPostgres;
   return {
     async readReleasePointer(): Promise<ReleasePointer | undefined> {

@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { PublicEntityProjectionDoc } from '@repo/schemas';
 import { entityV1Schema } from '@repo/public-contracts/v1/entity';
-import { createFirestorePublicDataAccess } from './data-access.js';
+import { createPublicDataAccessFromReaders } from './data-access.js';
 import {
   createPostgresDataAccessReaders,
   mapPublicSearchProjection,
@@ -83,7 +83,7 @@ test('createPostgresDataAccessReaders maps active release pointer', async () => 
       },
     }),
   });
-  const access = createFirestorePublicDataAccess(readers);
+  const access = createPublicDataAccessFromReaders(readers);
   const pointer = await access.getReleasePointer();
   assert.equal(pointer?.activeRelease.releaseId, RELEASE_ID);
   assert.equal(pointer?.searchIndexVersion, 'idx_v1');
@@ -95,7 +95,7 @@ test('createPostgresDataAccessReaders maps entity projection to EntityV1', async
       entities: new Map([[`${RELEASE_ID}:${sampleProjection.id}`, sampleProjection]]),
     }),
   });
-  const access = createFirestorePublicDataAccess(readers);
+  const access = createPublicDataAccessFromReaders(readers);
   const entity = await access.getEntity(RELEASE_ID, sampleProjection.id);
   assert.ok(entity);
   assert.equal(entity?.displayName, sampleProjection.displayName);
@@ -141,7 +141,7 @@ test('createPostgresDataAccessReaders uses search index when present', async () 
       ],
     }),
   });
-  const access = createFirestorePublicDataAccess(readers);
+  const access = createPublicDataAccessFromReaders(readers);
   const page = await access.search(
     { q: '', depth: 1, pageSize: 10, filters: [], sort: 'relevance' },
     { releaseId: RELEASE_ID },

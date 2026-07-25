@@ -1,11 +1,8 @@
 /**
  * `PublicDataAccess` — the read port every `/v1` handler depends on, and its adapters.
  *
- * Why a port (dependency injection) rather than a hard-wired Firestore client here:
- * - It keeps the handlers pure and unit-testable without a Firebase emulator (the emulator-backed
- *   integration test the bead lists is a real, separate lane — see this repo's `packages/firebase`
- *   rules/integration tests — and is DEFERRED in this pass because the sandbox has no emulator
- *   credentials; that deferral is called out honestly, not faked with a green stub).
+ * Why a port (dependency injection) rather than a hard-wired Postgres client here:
+ * - It keeps the handlers pure and unit-testable without a live database.
  * - It mirrors the factory-injection style already used by `createFindNearestEndpoint`
  *   (`vector-search-endpoint.ts`), where every dependency (verifier, store, embedding provider) is
  *   injected so the composition — not the I/O — is what's tested.
@@ -14,13 +11,14 @@
  * 1. `createInMemoryPublicDataAccess` — a REAL, fully-tested implementation used by the handler
  *    tests and legitimately usable as the ADR-004 degraded/immutable-snapshot source (it reads a
  *    fixed set of already-released, already-redacted public projections held in memory).
- * 2. `createFirestorePublicDataAccess` — binds the port to injected `@repo/firebase` public
- *    projection readers + a projection→DTO mapper. The readers are injected, not invented here, so
- *    this module never imports a server-only Firestore shape it would have to redact; the concrete
- *    live binding (real `@repo/firebase` reads + the projection→`EntityV1` mapper) lives in
- *    `./firestore-data-access.ts` and is selected at runtime by `./compose.ts` per
- *    `./live-policy.ts`'s live/fixture gate (MOB-004 live wiring landed; see that file's header for
- *    what remains a documented gap — e.g. `related` hydration and index-backed search).
+ * 2. `createPublicDataAccessFromReaders` — binds the port to injected public projection readers + a
+ *    projection→DTO mapper. The readers are injected, not invented here, so this module never
+ *    imports a server-only storage shape it would have to redact; the concrete live binding (real
+ *    Postgres `bb_public` reads + the projection→`EntityV1` mapper) lives in
+ *    `./postgres-data-access.ts` and `./projection-mapping.ts`, and is selected at runtime by
+ *    `./compose.ts` per `./live-policy.ts`'s live/fixture gate (ADR-020 SoR cutover; Postgres is
+ *    the only live path — see that file's header for what remains a documented gap, e.g. `related`
+ *    hydration and index-backed search).
  *
  * All entity data returned by any adapter is validated against the shared `entityV1Schema` before
  * it leaves this module, so the response-redaction guarantee (no internal/ranking/precise-geo
@@ -90,7 +88,7 @@ export type InMemoryPublicDataOptions = {
   /**
    * Omit when no active release is configured — `getReleasePointer` then honestly reports
    * `undefined` (ADR-004 pre-release bootstrap) instead of fabricating one. This is the default
-   * fallback `./compose.ts` uses when the runtime environment does not satisfy the live-Firestore
+   * fallback `./compose.ts` uses when the runtime environment does not satisfy the live-Postgres
    * gate (`./live-policy.ts`): an unconfigured deployment returns `UPSTREAM_UNAVAILABLE` rather
    * than silently serving stale/fake sample data as if it were a real release.
    */
@@ -134,8 +132,8 @@ export function createInMemoryPublicDataAccess(options: InMemoryPublicDataOption
 
 /**
  * Substring match + cursor-offset pagination over an already-loaded entity array. Used by the
- * in-memory adapter and as a bounded safety-net fallback when live Firestore has no
- * `publicSearchIndex` rows for the active release (`./firestore-data-access.ts`). Does not apply
+ * in-memory adapter and as a bounded safety-net fallback when live Postgres has no
+ * `publicSearchIndex` rows for the active release (`./postgres-data-access.ts`). Does not apply
  * facet filters or domain ranking — only free-text `q` on displayName/summary.
  */
 export function searchOverEntities(
@@ -167,7 +165,7 @@ export function searchOverEntities(
  * Index-backed search via `@repo/domain`'s `runPublicSearch` (same pipeline as
  * `apps/web/src/app/search/api/handler.ts`). Applies facet filters, facets, ranking, and
  * depth-based pagination over persisted `publicSearchIndex` docs loaded by
- * `./firestore-data-access.ts`.
+ * `./postgres-data-access.ts`.
  */
 export function searchOverIndex(
   index: readonly PublicSearchIndexDoc[],
@@ -230,19 +228,19 @@ function toSearchResult(entity: EntityV1, needle: string): SearchResultV1 {
 }
 
 // ---------------------------------------------------------------------------
-// Firestore adapter (live wiring via `./firestore-data-access.ts` + `./compose.ts`)
+// Postgres adapter (live wiring via `./postgres-data-access.ts` + `./compose.ts`)
 // ---------------------------------------------------------------------------
 
 /**
  * Injected readers that bind the port to live released public projections. In production these are
- * `@repo/firebase`'s public-projection readers (`fetchActiveRelease`, `fetchPublicEntityProjection`
- * — see `apps/web/src/lib/public-data/firestore-readers.ts` for the same access pattern) composed
- * with the domain projection→`EntityV1` mapper. They are injected rather than imported here so this
- * app module never depends on a raw Firestore document shape, and so the port stays unit-testable
- * with fakes (`./firestore-data-access.test.ts`). Firebase-emulator integration tests remain a
- * repo-rw1p follow-up; live production wiring is selected at runtime by `./live-policy.ts`.
+ * `./postgres-readers.ts`'s public-projection readers (`fetchActiveRelease`,
+ * `fetchPublicEntityProjection` — see `apps/web/src/lib/public-data/postgres-readers.ts` for the
+ * same access pattern) composed with `./projection-mapping.ts`'s projection→`EntityV1` mapper. They
+ * are injected rather than imported here so this app module never depends on a raw storage document
+ * shape, and so the port stays unit-testable with fakes. Live production wiring is selected at
+ * runtime by `./live-policy.ts`.
  */
-export type FirestoreDataAccessReaders = {
+export type PublicDataAccessReaders = {
   readonly readReleasePointer: () => Promise<ReleasePointer | undefined>;
   /** MUST already collapse unpublished/nonexistent to `undefined` (T3). */
   readonly readEntity: (releaseId: string, entityId: string) => Promise<EntityV1 | undefined>;
@@ -254,7 +252,7 @@ export type FirestoreDataAccessReaders = {
   ) => Promise<SearchPage>;
 };
 
-export function createFirestorePublicDataAccess(readers: FirestoreDataAccessReaders): PublicDataAccess {
+export function createPublicDataAccessFromReaders(readers: PublicDataAccessReaders): PublicDataAccess {
   return {
     async getReleasePointer() {
       return readers.readReleasePointer();
