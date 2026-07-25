@@ -15,7 +15,6 @@ void React;
 
 const chapters: readonly ThemeSpineChapter[] = [
   {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     story: {
       id: 'story-1',
       releaseId: 'rel-1',

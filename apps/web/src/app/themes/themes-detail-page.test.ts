@@ -66,7 +66,7 @@ test('theme detail branches cleanly on chapters.length === 0 vs > 0', () => {
   assert.match(detailSource, /\{hasChapters \? \(/);
 });
 
-test('theme detail zero-chapter branch preserves the beat-00\/beat-01 arc unchanged', () => {
+test('theme detail zero-chapter branch preserves the beat-00/beat-01 arc unchanged', () => {
   assert.match(
     detailSource,
     /: \(\s*<article\s*\n\s*className=\{themesEditionPanelClassName\('arc'\)\}\s*\n\s*aria-labelledby="theme-arc-heading"\s*\n\s*id="arc"/,
