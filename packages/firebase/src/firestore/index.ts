@@ -210,35 +210,6 @@ export { resolveStaffRoles, canPublish, canResearchWrite, researchMayPublish } f
 export type { StaffRole } from './claims.js';
 
 export {
-  RELEASE_ACTIVATION_STATUSES,
-  parseImmutablePublicationRelease,
-  resolveActivePublicRelease,
-  activatePublicationRelease,
-} from './release-activation.js';
-export type {
-  ReleaseActivationStatus,
-  ImmutablePublicationReleaseDoc,
-  ActivePublicReleasePointer,
-  ActivateReleaseInput,
-  ActivateReleaseResult,
-} from './release-activation.js';
-
-export {
-  MOBILE_RELEASE_POINTER_PATH,
-  createAdminFirestoreReleaseStore,
-  createFirestoreReleaseStore,
-} from './release-store.js';
-export type { FirestoreReleaseStore, ReleaseStoreBackend } from './release-store.js';
-
-export { promoteClaimToPublicationCandidate } from './promotion.js';
-export type {
-  AcceptedPromotionDoc,
-  PublicationCandidateDoc,
-  PromoteClaimInput,
-  PromoteClaimResult,
-} from './promotion.js';
-
-export {
   RESEARCH_CASE_SERVER_ACTIONS,
   assertResearchCaseActionAuthorized,
   assertResearchCaseTransitionAuthorized,
