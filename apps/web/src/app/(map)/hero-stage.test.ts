@@ -89,14 +89,16 @@ describe('home hero panel structure', () => {
       /\[data-theme='dark'\]\s+\.ds-home-hero__copy\s*\{[^}]*background:\s*transparent/s,
     );
     // repo-pyyw: one continuous canvas wash across the FULL hero, faded by a long
-    // horizontal mask ramp — never a flat column-1 plate with a hard edge.
+    // horizontal mask ramp — never a flat column-1 plate with a hard edge. The wash is a
+    // solid, theme-aware canvas fill (var(--ds-canvas)) lifted by the mask, not a
+    // per-theme color-mix opacity step.
     assert.match(
       shellCss,
-      /\.ds-home-hero::before\s*\{[^}]*color-mix\(in srgb,\s*var\(--ds-canvas\)\s*78%/s,
+      /\.ds-home-hero::before\s*\{[^}]*background-color:\s*var\(--ds-canvas\)[^}]*opacity:\s*1/s,
     );
     assert.match(
       shellCss,
-      /\[data-theme='dark'\]\s+\.ds-home-hero::before\s*\{[^}]*color-mix\(in srgb,\s*var\(--ds-canvas\)\s*84%/s,
+      /\[data-theme='dark'\]\s+\.ds-home-hero::before\s*\{[^}]*background-color:\s*var\(--ds-canvas\)/s,
     );
     assert.match(
       shellCss,
@@ -210,9 +212,11 @@ describe('home shell-on-home', () => {
       shellCss,
       /\.ds-shell:has\(\.ds-home-hero\)\s+\.ds-shell-header\s*\{[^}]*position:\s*sticky/s,
     );
+    // Flattened header chrome: sits on the canvas with a hairline bottom rule — no card
+    // ring or radius (repo hero-copy-scrim flatten pass).
     assert.match(
       shellCss,
-      /\.ds-shell:has\(\.ds-home-hero\)\s+\.ds-shell-header__inner\s*\{[^}]*border-radius:\s*var\(--ds-radius-md\)/s,
+      /\.ds-shell:has\(\.ds-home-hero\)\s+\.ds-shell-header__inner\s*\{[^}]*border-radius:\s*0/s,
     );
     assert.doesNotMatch(shellCss, /\.ds-shell:has\(\.ds-home-hero\)\s+\.ds-shell-wordmark::after/);
   });
