@@ -44,7 +44,7 @@ type FetchOptions = {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURE_DIR = join(
   __dirname,
-  '../../../../firebase/fixtures/reference-indicators',
+  '../../../../ops-data/fixtures/reference-indicators',
 );
 const DEFAULT_FIXTURE_PATH = join(FIXTURE_DIR, NHGIS_COOK_RACE_POPULATION_SHARE_FIXTURE_FILENAME);
 const DEFAULT_TENURE_FIXTURE_PATH = join(

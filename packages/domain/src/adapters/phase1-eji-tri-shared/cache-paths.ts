@@ -1,6 +1,6 @@
 /**
  * Cache path helpers for Phase 1 EJI/TRI live downloads under repo `.cache/phase1-eji-tri/`.
- * Cached artifacts are gitignored; committed rollups live under firebase/fixtures/.
+ * Cached artifacts are gitignored; committed rollups live under ops-data/fixtures/.
  */
 import { mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';

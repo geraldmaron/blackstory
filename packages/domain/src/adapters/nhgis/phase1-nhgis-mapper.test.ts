@@ -27,7 +27,7 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURE_DIR = join(
   __dirname,
-  '../../../../firebase/fixtures/reference-indicators',
+  '../../../../ops-data/fixtures/reference-indicators',
 );
 const RACE_FIXTURE_CSV = readFileSync(
   join(FIXTURE_DIR, 'nhgis-cook-county-17031-race-population-share-1970-2010.csv'),

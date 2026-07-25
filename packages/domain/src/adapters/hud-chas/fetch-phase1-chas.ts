@@ -34,7 +34,7 @@ type FetchOptions = {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DEFAULT_FIXTURE_PATH = join(
   __dirname,
-  '../../../../firebase/fixtures/reference-indicators',
+  '../../../../ops-data/fixtures/reference-indicators',
   HUD_CHAS_COOK_COST_BURDEN_FIXTURE_FILENAME,
 );
 

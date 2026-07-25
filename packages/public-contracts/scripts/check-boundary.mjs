@@ -27,10 +27,10 @@
  *    satisfying "walks ... its resolved dependency graph." Any `node:*` built-in, bare Node
  *    built-in name, or non-`zod` external specifier reachable from an entrypoint fails the gate.
  *
- * This is an honest stand-in, not a full bundler: it does not execute code, does not resolve
- * conditional/dynamic requires, and does not model Metro's actual resolver algorithm. A real
- * Metro bundle test should be added once `apps/mobile` exists (MOB-006) and can import this
- * package for real; until then, this is the strongest CI-runnable proxy available.
+ * An honest stand-in, not a full bundler: no code execution, no resolution of
+ * conditional/dynamic requires, no model of Metro's actual resolver algorithm. A real
+ * Metro bundle test belongs here once `apps/mobile` exists (MOB-006) and can import the
+ * package for real; until then, the strongest CI-runnable proxy available.
  */
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -53,12 +53,12 @@ const FORBIDDEN_PACKAGE_SPECIFIERS = [
   'firebase-admin',
   '@repo/domain',
   '@repo/security',
-  '@repo/firebase',
+  '@repo/ops-data',
   // Legacy/current scope kept during the @repo -> @repo rename (see MOB-003 evidence
   // report) so the gate does not go blind if a file is copy-pasted from an @repo-scoped module.
   '@repo/domain',
   '@repo/security',
-  '@repo/firebase',
+  '@repo/ops-data',
 ];
 
 /** The only runtime dependency this package is allowed to declare (ADR-021 §1: "dependency list

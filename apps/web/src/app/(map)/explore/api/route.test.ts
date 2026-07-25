@@ -7,6 +7,7 @@ import { test } from 'node:test';
 import { CSRF_COOKIE_NAME, CSRF_HEADER_NAME } from '../../../../lib/web-security/csrf';
 import { createExploreRequestIntegrityGuard } from './request-integrity-guard';
 import { createExploreRateLimitGuard } from './rate-limit-guard';
+import { listPublicEntities } from '../../../../data/public-seed';
 import { handleExploreRefineRequest, type ExploreRouteDependencies } from './handler';
 
 const INTEGRITY_TOKEN = 'a'.repeat(64);
@@ -21,6 +22,7 @@ async function buildDeps(
   return {
     integrityGuard,
     rateLimitGuard: createExploreRateLimitGuard({ now: () => 0 }),
+    loadEntities: () => Promise.resolve({ data: listPublicEntities(), source: 'live' as const }),
     ...overrides,
   };
 }

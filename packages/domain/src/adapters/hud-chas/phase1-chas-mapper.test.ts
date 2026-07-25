@@ -25,7 +25,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURE_CSV = readFileSync(
   join(
     __dirname,
-    '../../../../firebase/fixtures/reference-indicators',
+    '../../../../ops-data/fixtures/reference-indicators',
     HUD_CHAS_COOK_COST_BURDEN_FIXTURE_FILENAME,
   ),
   'utf8',

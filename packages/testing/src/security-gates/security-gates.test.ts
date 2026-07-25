@@ -7,7 +7,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { assertAdminPermission } from '../../../firebase/src/admin-auth.ts';
+import { assertAdminPermission } from '../../../ops-data/src/admin-auth.ts';
 import {
   evaluateDailyBudget,
   evaluateSearchQueryGuardrails,

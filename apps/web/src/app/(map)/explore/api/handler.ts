@@ -32,6 +32,11 @@ function integritySatisfiesRateLimitGate(decision: {
 export type ExploreRouteDependencies = {
   readonly integrityGuard: ExploreRequestIntegrityGuard;
   readonly rateLimitGuard: ReturnType<typeof createExploreRateLimitGuard>;
+  /**
+   * Entity catalog loader. Defaults to the live Postgres projection reader. Injected in tests
+   * so the explore filter pipeline can run against the bundled seed catalog without a database.
+   */
+  readonly loadEntities?: () => Promise<Awaited<ReturnType<typeof listPublicEntityViews>>>;
 };
 
 function jsonError(status: number, error: string, extra?: Record<string, unknown>): Response {
@@ -162,7 +167,7 @@ export async function handleExploreRefineRequest(
       return jsonError(400, 'invalid_explore_query', { reason: filterState.error });
     }
 
-    const entities = await listPublicEntityViews();
+    const entities = await (deps.loadEntities ?? listPublicEntityViews)();
     const source = buildExploreMapSource(entities.data);
     const filtered = applyExploreFilters(source.featureCollection.features, filterState);
 
