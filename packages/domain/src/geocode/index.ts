@@ -5,7 +5,7 @@
  *
  * Not yet re-exported from `../index.ts` (the `@repo/domain` package barrel). Until that
  * lands, `apps/web`'s `locate` route/components import via the documented mirror under
- * `apps/web/src/lib/geocode/` (same pattern as `packages/firebase/src/jurisdictions/resolver.ts`).
+ * `apps/web/src/lib/geocode/` (same pattern as `packages/ops-data/src/jurisdictions/resolver.ts`).
  */
 export {
   countryJurisdictionId,

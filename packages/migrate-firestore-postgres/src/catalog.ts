@@ -1,7 +1,7 @@
 /**
  * Collection catalog: Firestore path → Postgres target, migrate priority, empty-skip policy.
  */
-import { FIRESTORE_ROOT } from '@repo/firebase';
+import { FIRESTORE_ROOT } from '@repo/ops-data';
 
 export type MigratePriority = 'high' | 'medium' | 'large' | 'skip-empty-expected';
 

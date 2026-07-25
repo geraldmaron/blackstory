@@ -15,13 +15,6 @@ test('postgres: false with no env at all', () => {
   assert.equal(shouldUsePublicPostgresDataAccess({}), false);
 });
 
-test('postgres: false when explicitly disabled', () => {
-  assert.equal(
-    shouldUsePublicPostgresDataAccess({ ...POSTGRES_PRODUCTION, PUBLIC_READ_API_DISABLED: '1' }),
-    false,
-  );
-});
-
 test('postgres: false when caller forces fixtures/seed source', () => {
   assert.equal(
     shouldUsePublicPostgresDataAccess({ ...POSTGRES_PRODUCTION, PUBLIC_DATA_SOURCE: 'fixtures' }),

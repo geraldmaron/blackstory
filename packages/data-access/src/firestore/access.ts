@@ -1,6 +1,6 @@
 /**
  * Server-side Firestore collection map and publish guards.
- * Mirrors @repo/firebase path names without requiring a runtime Firebase import
+ * Mirrors @repo/ops-data path names without requiring a runtime Firebase import
  * for static allowlists used by APIs and workers.
  */
 import { assertServerOnly } from '../server-only.js';

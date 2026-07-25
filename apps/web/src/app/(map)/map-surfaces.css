@@ -101,6 +101,18 @@
   /* Viewport box from hero-map-inset.ts — no clip-path (Safari WebGL compositing). */
 }
 
+@media (max-width: 47.9375rem) {
+  /* Mobile stacked hero: the inset plate is pinned to the map row beneath the copy
+     (hero-map-inset.ts targets `.ds-home-hero__map`). Make it a NON-interactive preview so a
+     one-finger drag scrolls the page instead of panning the map and trapping vertical scroll —
+     the classic embedded-map defect on touch. Tapping "Explore the map" clears the inset class
+     and engages the full-bleed interactive map, which is interactive again (rule no longer
+     matches). */
+  .ds-map-surface:has(.ds-home-hero) .ds-map-stage--hero-inset {
+    pointer-events: none;
+  }
+}
+
 .ds-map-surface:has(.ds-home-hero:not(.ds-hero-stage--dissolving)) .maplibregl-ctrl-top-right {
   display: none;
 }

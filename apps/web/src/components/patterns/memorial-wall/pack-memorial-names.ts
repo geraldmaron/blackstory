@@ -38,6 +38,8 @@ export type PackMemorialNamesOptions = {
   readonly boxGap?: number;
   readonly edgePad?: number;
   readonly maxAttempts?: number;
+  /** Inclusive [min, max] font size in px; defaults to [14, 28]. */
+  readonly fontSizeRange?: readonly [number, number];
   /** Permanently occupied regions (e.g. the held message) names must never land in. */
   readonly avoidBoxes?: readonly MemorialAvoidBox[] | undefined;
 };
@@ -171,6 +173,7 @@ export function packMemorialNames(options: PackMemorialNamesOptions): readonly P
   // O(all placed boxes), so a much lower attempt cap still yields comparable
   // packing quality at a fraction of the cost.
   const maxAttempts = options.maxAttempts ?? 60;
+  const [minFontSize, maxFontSize] = options.fontSizeRange ?? [14, 28];
   const fonts = options.fonts;
   if (fonts.length === 0 || options.canvasWidth <= 0 || options.canvasHeight <= 0) {
     return [];
@@ -190,7 +193,8 @@ export function packMemorialNames(options: PackMemorialNamesOptions): readonly P
 
   ordered.forEach((name, index) => {
     const fontFamily = fonts[Math.floor(rng() * fonts.length)]!;
-    const fontSizePx = 14 + Math.floor(rng() * 14);
+    const fontSizePx =
+      minFontSize + Math.floor(rng() * Math.max(1, maxFontSize - minFontSize + 1));
     const rotationDeg = (rng() - 0.5) * 14;
     const measured = options.measure(name, fontFamily, fontSizePx);
     const bounds = rotatedBounds(measured.width, measured.height, rotationDeg);

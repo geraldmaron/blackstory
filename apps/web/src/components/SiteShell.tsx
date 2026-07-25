@@ -6,7 +6,6 @@
  */
 
 import type { ReactNode } from 'react';
-import { DegradedModeNotice } from './DegradedModeNotice';
 import { OfflineNotice } from './OfflineNotice';
 import { SiteHeader } from './SiteHeader';
 import { SiteShellFooter } from './SiteShellFooter';
@@ -20,7 +19,6 @@ export function SiteShell({ children }: SiteShellProps) {
     <div className="ds-shell">
       {/* Skip link (WCAG 2.4.1) renders once in app/layout.tsx, ahead of this shell. */}
       <SiteHeader />
-      <DegradedModeNotice />
       <OfflineNotice />
       <div className="ds-shell-body">{children}</div>
       <SiteShellFooter />

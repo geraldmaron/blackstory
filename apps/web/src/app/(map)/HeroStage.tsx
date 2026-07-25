@@ -64,6 +64,11 @@ export type HeroStageProps = {
 const TRANSITION_FLAG = 'ds-map-transition';
 const PLACE_SCROLL_TARGET = '#beat-a';
 
+/** Matches shell.css `.ds-home-hero` stacked-layout breakpoint (max-width: 47.9375rem). Below
+ * this the hero stacks copy-over-map, and the fixed MapStage plate is pinned to the map row
+ * only (not the full panel) so it stays a bounded band beneath the copy. */
+const HERO_MOBILE_QUERY = '(max-width: 47.9375rem)';
+
 function markTransition(): void {
   try {
     window.sessionStorage.setItem(TRANSITION_FLAG, '1');
@@ -214,7 +219,11 @@ function HeroStagePanel({
   stageApiRef.current = stage;
   const heroPanelRef = useRef<HTMLElement | null>(null);
   const copyColumnRef = useRef<HTMLDivElement | null>(null);
+  const mapColumnRef = useRef<HTMLDivElement | null>(null);
   const [dissolving, setDissolving] = useState(false);
+  // Tracked in a ref (not state) so the scroll-sync loop reads the live breakpoint without
+  // re-subscribing its listeners on every change.
+  const isMobileRef = useRef(false);
   const archiveFrameIndex = completeFrameIndex(decadeFrames);
   const inviteBeats = inviteBeatEntities(featureCollection);
 
@@ -231,6 +240,28 @@ function HeroStagePanel({
     [router],
   );
 
+  // Keep the breakpoint ref live so the inset loop pins to the map row (mobile) vs full
+  // panel (desktop) without re-subscribing. `resize` re-runs the inset effect on transition.
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return undefined;
+    const mql = window.matchMedia(HERO_MOBILE_QUERY);
+    isMobileRef.current = mql.matches;
+    const onChange = () => {
+      isMobileRef.current = mql.matches;
+    };
+    mql.addEventListener('change', onChange);
+    return () => mql.removeEventListener('change', onChange);
+  }, []);
+
+  /** Box the fixed plate tracks: the map row on mobile (bounded band under the copy),
+   * or `undefined` on desktop so the plate tracks the full hero panel (map bleeds under the
+   * lightly scrimmed copy column). */
+  const heroInsetTarget = useCallback(
+    (): HTMLElement | undefined =>
+      isMobileRef.current ? (mapColumnRef.current ?? undefined) : undefined,
+    [],
+  );
+
   // Engage in place: unlock the full-bleed interactive map; Close (spec §2 rule 4) relocks and
   // restores the hero inset + home camera via `cinematic.close()` -> the driver's `flyTo`.
   useEffect(() => {
@@ -240,10 +271,10 @@ function HeroStagePanel({
       stageApiRef.current.resize();
       stageApiRef.current.flyPreset('national', { bounds: US_CONUS_BOUNDS }, { mode: 'ease' });
     } else if (panel) {
-      applyHeroMapInset(panel);
+      applyHeroMapInset(panel, heroInsetTarget());
       stageApiRef.current.resize();
     }
-  }, [cinematic.state]);
+  }, [cinematic.state, heroInsetTarget]);
 
   useEffect(() => {
     const api = stageApiRef.current;
@@ -289,15 +320,16 @@ function HeroStagePanel({
     let lastWidth = 0;
     let lastHeight = 0;
 
-    const frameNational = () => {
-      const panelRect = panel.getBoundingClientRect();
-      const copyRect = copy?.getBoundingClientRect() ?? null;
+    const frameNational = (box: HTMLElement) => {
+      // Mobile: plain national framing inside the map row — no copy-overlap push, since the
+      // plate no longer sits behind the copy column. Desktop: pad CONUS clear of the copy.
+      const copyRect = isMobileRef.current ? null : (copy?.getBoundingClientRect() ?? null);
       stageApiRef.current.flyPreset(
         'national',
         { bounds: US_CONUS_BOUNDS },
         {
           mode: 'ease',
-          padding: heroNationalCameraPadding({ panel: panelRect, copy: copyRect }),
+          padding: heroNationalCameraPadding({ panel: box.getBoundingClientRect(), copy: copyRect }),
         },
       );
     };
@@ -308,15 +340,19 @@ function HeroStagePanel({
         // Engaged: the plate is full-bleed (spec §5 Engaged behavior); the inset-follow loop
         // stays inert so it never fights the driver's engage/close camera calls.
         if (cinematicStateRef.current === 'engaged') return;
-        if (!applyHeroMapInset(panel)) return;
-        stageApiRef.current.resize();
-        const rect = panel.getBoundingClientRect();
+        const target = heroInsetTarget() ?? panel;
+        if (!applyHeroMapInset(panel, heroInsetTarget())) return;
+        const rect = target.getBoundingClientRect();
         const sizeChanged =
           Math.abs(rect.width - lastWidth) > 1 || Math.abs(rect.height - lastHeight) > 1;
+        // Only pay for a GL viewport resize + reframe when the plate box actually changes size.
+        // Pure scroll just repositions the fixed plate (cheap inline style writes) — avoids the
+        // per-frame canvas resizes that jank and drain battery on mobile.
         if (sizeChanged) {
           lastWidth = rect.width;
           lastHeight = rect.height;
-          frameNational();
+          stageApiRef.current.resize();
+          frameNational(target);
         }
       });
     };
@@ -325,6 +361,7 @@ function HeroStagePanel({
     const observer = new ResizeObserver(sync);
     observer.observe(panel);
     if (copy) observer.observe(copy);
+    if (mapColumnRef.current) observer.observe(mapColumnRef.current);
     window.addEventListener('scroll', sync, { passive: true });
     window.addEventListener('resize', sync);
     window.addEventListener('orientationchange', sync);
@@ -337,7 +374,7 @@ function HeroStagePanel({
       window.removeEventListener('orientationchange', sync);
       clearHeroMapInset();
     };
-  }, [stage.mapAvailable]);
+  }, [stage.mapAvailable, heroInsetTarget]);
 
   const archiveFrame = decadeFrames[archiveFrameIndex];
   const archiveDecade = archiveFrame?.decade ?? '';
@@ -465,7 +502,7 @@ function HeroStagePanel({
 
       <CinematicScrim />
 
-      <div className="ds-home-hero__map" aria-label="Live archive coverage map">
+      <div ref={mapColumnRef} className="ds-home-hero__map" aria-label="Live archive coverage map">
         <div className="ds-home-hero__map-readout">
           <p className="ds-home-hero__map-caption">Live coverage · archive pins</p>
         </div>

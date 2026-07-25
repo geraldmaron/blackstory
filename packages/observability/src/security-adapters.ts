@@ -16,7 +16,7 @@ import {
 } from './security-events.js';
 import { fingerprintDimension } from './security-redaction.js';
 
-/** Mirrors @repo/firebase AppCheckTelemetryEvent without a runtime dependency. */
+/** Mirrors @repo/ops-data AppCheckTelemetryEvent without a runtime dependency. */
 export type AppCheckTelemetryInput = {
   readonly event: 'app_check_verification';
   readonly mode: 'monitor' | 'enforce';

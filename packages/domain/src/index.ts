@@ -3,17 +3,11 @@
  * claims confidence, append-only audit contracts, immutable
  * publication releases, and source adapter registry contracts.
  * Living-status and public precision rules come from
- * @repo/schemas (constitution). Firestore converters live in @repo/firebase;
+ * @repo/schemas (constitution). Firestore converters live in @repo/ops-data;
  * Cloud SQL PostGIS are deferred (ADR-011).
  */
 export { asEntityId, asRelationshipId, asMergeId, asLocationId } from './ids.js';
 export type { EntityId, RelationshipId, MergeId, LocationId } from './ids.js';
-
-export {
-  SEED_STORY_PROJECTIONS,
-  listSeedStoryProjections,
-  getSeedStoryProjection,
-} from './publication/public-story-seed.js';
 
 export {
   asSourceOrganizationId,
@@ -151,7 +145,7 @@ export type {
 
 // entity ontology shared era/date-precision model, kind-specific status vocabularies,
 // notability-basis inclusion rubric, and the schema-only sensitivity classification. Additive
-// barrel export so packages/firebase/src/embeddings/text.ts can import the shared
+// barrel export so packages/ops-data/src/embeddings/text.ts can import the shared
 // `deriveEraBuckets` (replacing its local duplicate) and so have a
 // single vocabulary source to import from — see ADR-015.
 export {
@@ -629,12 +623,17 @@ export * from './external-data-sources.js';
 export * from './banned-books/index.js';
 export * from './public-numeric-policy.js';
 export * from './publication/index.js';
+export {
+  SEED_STORY_PROJECTIONS,
+  listSeedStoryProjections,
+  getSeedStoryProjection,
+} from './publication/public-story-seed.js';
 export * from './datapacks/index.js';
 
 // Map data platform. Demo/test fixtures in ./map/fixtures.js are
 // intentionally NOT re-exported here — they are internal to this package
 // (imported by relative path from map-source.test.ts and the demo generator
-// script), the same way packages/firebase/fixtures/ sits outside that
+// script), the same way packages/ops-data/fixtures/ sits outside that
 // package's public src/index.ts surface.
 export {
   US_STATES,

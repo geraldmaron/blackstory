@@ -1,6 +1,6 @@
 /**
  * Tests for jurisdiction-id resolution proves the id scheme matches
- * `packages/firebase/src/jurisdictions/schema.ts` exactly (`us`, `us-{state}`,
+ * `packages/ops-data/src/jurisdictions/schema.ts` exactly (`us`, `us-{state}`,
  * `us-{state}-{county}`) and that place/city resolution stays on-demand-only (ADR-016).
  */
 import assert from 'node:assert/strict';
@@ -14,7 +14,7 @@ import {
   stateJurisdictionId,
 } from './jurisdiction-ids.js';
 
-test('id builders match the packages/firebase/src/jurisdictions/schema.ts scheme exactly', () => {
+test('id builders match the packages/ops-data/src/jurisdictions/schema.ts scheme exactly', () => {
   assert.equal(countryJurisdictionId(), 'us');
   assert.equal(stateJurisdictionId('11'), 'us-11');
   assert.equal(countyJurisdictionId('11', '001'), 'us-11-001');

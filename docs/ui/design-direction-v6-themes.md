@@ -50,6 +50,15 @@ Theme arcs are written as if a New York urban-history seminar is in session: you
 
 Do not advertise a slogan for this pattern. The page should simply read that way. EPI chartbook numbers remain useful instruments; EPI’s cool policy-institute register is not the voice. If an entity card needed for an inline link is missing or thin, backfill it in national-catalog fixtures in the same change.
 
+**Folded chapters (stories promoted into a theme's spine):** when a story
+folds into a theme arc as a chapter, its prose must additionally follow the
+five rules in `docs/ui/voice-theme-chapters.md` (named actor/hour, prose
+builds stakes before a `DataMoment` delivers the verdict, sentence rhythm,
+disputes shown in prose not only in metadata, at most one earned closing
+flourish). That document extends `docs/ui/story.md`'s presence+proof
+principle for this specific prose format and includes a labeled illustrative
+sample chapter.
+
 ### 1.2 Journey beats (redlining pilot)
 
 | Beat | Scene (person · role · place · year) | Sketch subject | Statutes inline |
@@ -216,6 +225,7 @@ Never two copper-filled buttons in the same above-the-fold viewport.
 - Safe fails: `theme-impact-copy.ts`, `ThemeImpactEmptyNotice.tsx`
 - Packet UI: `components/theme-impact/*` (journey visuals, arc reading, instruments aside, packets secondary)
 - Soft related threads: `lib/theme-impact/theme-related-threads.ts`
+- Folded-chapter prose voice: `docs/ui/voice-theme-chapters.md`
 
 ---
 

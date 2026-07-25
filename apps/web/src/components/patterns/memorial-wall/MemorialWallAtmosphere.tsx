@@ -146,12 +146,20 @@ function usePrefersReducedMotion(): boolean {
   return reduced;
 }
 
-/** Estimated bounding box for the held message, centered at (viewportWidth/2, 50vh). */
-function estimateMessageAvoidBox(width: number, height: number): MemorialAvoidBox {
+/**
+ * Estimated bounding box for the held message, centered at the visual viewport
+ * center expressed in wall coordinates (the wall starts offsetTop below the
+ * viewport top, matching the CSS `calc(50svh - offset)` placement).
+ */
+function estimateMessageAvoidBox(
+  width: number,
+  height: number,
+  offsetTop: number,
+): MemorialAvoidBox {
   const boxWidth = Math.min(width * 0.94, 46 * 16 + 64);
   const boxHeight = Math.min(height * 0.55, 480);
   const cx = width / 2;
-  const cy = height / 2;
+  const cy = height / 2 - offsetTop;
   return {
     left: cx - boxWidth / 2,
     right: cx + boxWidth / 2,
@@ -236,6 +244,13 @@ export function MemorialWallAtmosphere({
       const width = window.innerWidth;
       const height = window.innerHeight;
 
+      // The wall doesn't start at the top of the viewport (the shell header
+      // sits above it), so "centered at 50svh" in wall coordinates lands
+      // header-height/2 below the visual center. Expose the wall's document
+      // offset so the CSS can subtract it (see --memorial-wall-offset-top).
+      const offsetTop = root.getBoundingClientRect().top + window.scrollY;
+      root.style.setProperty('--memorial-wall-offset-top', `${offsetTop}px`);
+
       const subset = selectWallSubset(
         displayNames,
         requiredDisplayNames,
@@ -251,7 +266,12 @@ export function MemorialWallAtmosphere({
         canvasHeight: height,
         seed: hashSeed(seedKey, width, height) + rotation,
         cycleSeconds: CYCLE_SECONDS,
-        avoidBoxes: hasMessage ? [estimateMessageAvoidBox(width, height)] : undefined,
+        // Fixed 14–28px reads oversized on phones; scale the range down so a
+        // long handwritten name never spans most of a narrow canvas.
+        fontSizeRange: width < 640 ? [11, 18] : width < 1024 ? [12, 22] : [14, 28],
+        avoidBoxes: hasMessage
+          ? [estimateMessageAvoidBox(width, height, offsetTop)]
+          : undefined,
         measure: (name, fontFamily, fontSizePx) => {
           ctx.font = `${fontSizePx}px ${resolveFontFamily(fontFamily)}`;
           const metrics = ctx.measureText(name);

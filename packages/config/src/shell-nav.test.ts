@@ -14,7 +14,7 @@ test('absolutizeShellNav prefixes relative hrefs with the public origin', () => 
   const items = absolutizeShellNav(PRIMARY_NAV, 'http://localhost:3048/');
   assert.equal(items[0]?.href, 'http://localhost:3048/explore');
   assert.equal(items[1]?.label, 'History');
-  assert.equal(items[2]?.label, 'Stories');
+  assert.equal(items[2]?.label, 'Chapters');
 });
 
 test('isShellNavActive understands absolute sibling hrefs', () => {

@@ -219,6 +219,18 @@
   color: var(--ds-ink-muted);
 }
 
+.ds-story-rail-group + .ds-story-rail-group {
+  margin-top: var(--ds-space-8);
+}
+
+.ds-story-rail-group__heading {
+  margin: 0 0 var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--ds-ink-muted);
+}
+
 .ds-stories-edition .ds-story-rail {
   margin: 0;
   gap: 0;

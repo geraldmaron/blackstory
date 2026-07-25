@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Themes redesign — direction A (two modes)</title>
+<style>
+  :root {
+    --ink: #0A0A0A;
+    --paper: #F4EFE5;
+    --surface: #FBF8F2;
+    --copper: #B86B2A;
+    --copper-text: #8E4F2A;
+    --sand: #D8A178;
+    --stone: #6D675F;
+    --rule: #D7D0C4;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: Georgia, 'Times New Roman', serif;
+  }
+  .note {
+    background: #222;
+    color: #fff;
+    font-family: -apple-system, sans-serif;
+    font-size: 13px;
+    padding: 10px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .note b { color: var(--sand); }
+  .wrap { max-width: 78rem; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
+
+  /* ---- INDEX MODE ---- */
+  .index-head { margin-bottom: 2.5rem; }
+  .kicker {
+    font-family: -apple-system, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 12px;
+    color: var(--copper-text);
+    margin: 0 0 0.5rem;
+  }
+  h1 { font-size: 2.4rem; margin: 0 0 0.75rem; line-height: 1.15; }
+  .lede { color: var(--stone); font-size: 1.05rem; max-width: 42rem; line-height: 1.55; margin: 0; }
+
+  .cardgrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: var(--ink);
+    display: block;
+    position: relative;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+  .card .eyebrow {
+    font-family: -apple-system, sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--stone);
+    display: flex;
+    justify-content: space-between;
+  }
+  .card h2 { font-size: 1.3rem; margin: .6rem 0 .5rem; }
+  .card p { color: var(--stone); font-size: .92rem; line-height: 1.5; margin: 0; }
+  .card .pin { width: 8px; height: 8px; border-radius: 50%; background: var(--copper); display: inline-block; margin-right: 6px; }
+  .card.soon { opacity: .55; }
+  .card.soon .eyebrow span:last-child { color: var(--stone); }
+
+  hr.sep { border: none; border-top: 1px solid var(--rule); margin: 3.5rem 0; }
+
+  /* ---- DETAIL / ARC MODE ---- */
+  .arc-head { max-width: 46rem; margin-bottom: 2rem; }
+  .arc-head .kicker { display: flex; align-items: center; gap: .5rem; }
+  .arc-head h1 { font-size: 2rem; }
+  .arc-meta { display: flex; gap: 1.25rem; font-family: -apple-system, sans-serif; font-size: 12.5px; color: var(--stone); margin-top: .75rem; }
+  .arc-meta button {
+    font: inherit; color: var(--copper-text); background: none; border: none; cursor: pointer; padding: 0; text-decoration: underline dotted;
+  }
+
+  .arc-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 3rem;
+  }
+  @media (max-width: 860px) { .arc-layout { grid-template-columns: 1fr; } }
+
+  .arc-body p { font-size: 1.08rem; line-height: 1.7; margin: 0 0 1.3rem; }
+  .arc-body .beat-label {
+    font-family: -apple-system, sans-serif; font-size: 11px; text-transform: uppercase;
+    letter-spacing: .06em; color: var(--copper-text); margin: 2.5rem 0 .6rem;
+  }
+  .inline-source {
+    font-family: -apple-system, sans-serif; font-size: 12px; color: var(--stone);
+    border-bottom: 1px dotted var(--stone); cursor: pointer;
+  }
+  .source-pop {
+    background: var(--surface); border: 1px solid var(--rule); border-radius: 8px;
+    padding: .9rem 1rem; margin: .4rem 0 1.3rem; font-family: -apple-system, sans-serif;
+    font-size: 12.5px; color: var(--stone); display: none;
+  }
+  .source-pop.open { display: block; }
+
+  .rail { position: sticky; top: 2rem; align-self: start; }
+  .rail h3 {
+    font-family: -apple-system, sans-serif; font-size: 11px; text-transform: uppercase;
+    letter-spacing: .06em; color: var(--stone); margin: 0 0 .75rem;
+  }
+  .instrument {
+    border-left: 2px solid var(--sand); padding: .4rem 0 .4rem .75rem; margin-bottom: .9rem;
+  }
+  .instrument .yr { font-family: -apple-system, sans-serif; font-size: 11px; color: var(--copper-text); }
+  .instrument p { font-size: .85rem; margin: .15rem 0 0; color: var(--stone); }
+
+  .related {
+    margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--rule);
+    font-family: -apple-system, sans-serif; font-size: 13px;
+  }
+  .related a { color: var(--copper-text); }
+</style>
+</head>
+<body>
+<div class="note">
+  <b>Mockup — direction A:</b> two modes only (browse cards / read essay). Method + provenance folded inline as expanders, no separate ledger/verify sections. Not wired to real data.
+</div>
+
+<!-- ============ INDEX MODE ============ -->
+<div class="wrap">
+  <div class="index-head">
+    <p class="kicker">Themes</p>
+    <h1>Policy eras beside evidence.</h1>
+    <p class="lede">Six through-lines in the archive — housing, drug policy, incarceration, environmental burden — each read as one essay with sources beside the prose.</p>
+  </div>
+
+  <div class="cardgrid">
+    <a class="card" href="#redlining">
+      <div class="eyebrow"><span><span class="pin"></span>Housing</span><span>1919–2024</span></div>
+      <h2>Redlining and the color line</h2>
+      <p>How a federal grading map became eighty years of unequal ownership on the South Side.</p>
+    </a>
+    <a class="card" href="#drug-policy">
+      <div class="eyebrow"><span><span class="pin"></span>Justice</span><span>1971–2020</span></div>
+      <h2>The war on drugs, block by block</h2>
+      <p>Sentencing law and enforcement geography, traced through three decades of county data.</p>
+    </a>
+    <a class="card" href="#renewal">
+      <div class="eyebrow"><span><span class="pin"></span>Housing</span><span>1949–1974</span></div>
+      <h2>Urban renewal's second displacement</h2>
+      <p>Clearance, highways, and where the promised replacement housing never arrived.</p>
+    </a>
+    <a class="card soon">
+      <div class="eyebrow"><span>Environment</span><span>Coming soon</span></div>
+      <h2>Unequal environmental burden</h2>
+      <p>Siting patterns for industry and waste against the same historical boundaries.</p>
+    </a>
+  </div>
+
+  <p style="font-family:-apple-system,sans-serif;font-size:12px;color:var(--stone);margin-top:1.5rem;">
+    Figures are juxtaposed beside sources, not collapsed into causal claims. <a href="#method" style="color:var(--copper-text)">How we read the evidence →</a>
+  </p>
+</div>
+
+<hr class="sep" />
+
+<!-- ============ DETAIL / ARC MODE ============ -->
+<div class="wrap" id="redlining">
+  <div class="arc-head">
+    <p class="kicker"><span class="pin" style="background:var(--copper)"></span>Housing · 1919–2024</p>
+    <h1>Redlining and the color line</h1>
+    <div class="arc-meta">
+      <span>≈ 9 min read</span>
+      <button onclick="document.querySelectorAll('.source-pop').forEach(e=>e.classList.toggle('open'))">Sources cited inline — expand all</button>
+      <a href="#related" style="color:var(--copper-text)">Related themes</a>
+    </div>
+  </div>
+
+  <div class="arc-layout">
+    <article class="arc-body">
+      <p class="beat-label">Q1 — 1919</p>
+      <p>On a July afternoon, <a href="#" style="color:var(--copper-text)">Eugene Williams</a> drifted across an invisible line in Lake Michigan off the 29th Street Beach. No buoy marked it, no ordinance named it — but the stones that killed him for crossing it were real, and so was the boundary they enforced.</p>
+      <p><span class="inline-source" onclick="this.nextElementSibling.classList.toggle('open')">National Archives Record Group 195 ↗</span></p>
+      <div class="source-pop">Home Owners' Loan Corporation survey records, 1933–1940. Digitized area description sheets for Cook County, accessed via NARA catalog. <a href="#" style="color:var(--copper-text)">View packet →</a></div>
+
+      <p class="beat-label">Q2 — 1939</p>
+      <p>Twenty years later a federal surveyor unrolled a different kind of map on a Chicago kitchen table: the Home Owners' Loan Corporation's grading sheets, four letters — A through D — sorting neighborhoods by "risk" that tracked race more reliably than it tracked repayment.</p>
+
+      <p class="beat-label">Q3 — 1990–2024</p>
+      <p>Ownership on the South Side never closed the gap the grading map opened. Three census decades apart, the same tracts graded D in 1939 show homeownership rates roughly half those graded A or B two miles north.</p>
+      <p><span class="inline-source" onclick="this.nextElementSibling.classList.toggle('open')">Decennial Census 1990/2000/2010, ACS 2022 ↗</span></p>
+      <div class="source-pop">Multi-year ownership spine, Cook County tract level, harmonized to 1939 HOLC boundaries. Method note: tract geography crosswalked via NHGIS; seam documented in packet.</div>
+
+      <p class="beat-label">Q4 — 1919–1945</p>
+      <p><a href="#" style="color:var(--copper-text)">Robert S. Abbott</a>'s Defender covered the aftermath from a State Street office in Bronzeville — the same blocks the 1939 map would grade lowest fourteen years later.</p>
+    </article>
+
+    <aside class="rail">
+      <h3>Instruments in the room</h3>
+      <div class="instrument"><span class="yr">1939</span><p>HOLC area description sheets, Cook County</p></div>
+      <div class="instrument"><span class="yr">1990 · 2000 · 2010</span><p>Decennial Census homeownership</p></div>
+      <div class="instrument"><span class="yr">2022</span><p>American Community Survey (continuing the spine)</p></div>
+      <h3 style="margin-top:1.5rem">How to read this</h3>
+      <p style="font-family:-apple-system,sans-serif;font-size:12.5px;color:var(--stone);line-height:1.5">
+        Figures sit beside the prose that explains them. Where sources hand off methods, the seam is named, not smoothed.
+      </p>
+    </aside>
+  </div>
+
+  <div class="related" id="related">
+    Related through-lines: <a href="#">Urban renewal's second displacement →</a> · <a href="#">Mass incarceration →</a>
+  </div>
+</div>
+
+</body>
+</html>

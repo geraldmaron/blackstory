@@ -143,11 +143,19 @@ export function insetClipPathForRect(
   return `inset(${top}px ${right}px ${bottom}px ${left}px)`;
 }
 
-/** Pin the fixed map plate to the hero panel bounds. Returns false when layout is not ready. */
-export function applyHeroMapInset(panel: HTMLElement): boolean {
+/**
+ * Pin the fixed map plate to a hero region. Returns false when layout is not ready.
+ *
+ * `insetTarget` chooses which box the plate tracks: on desktop it is the full hero panel
+ * (map bleeds under the copy column — the cinematic treatment). On the mobile stacked
+ * layout the caller passes the map-row element instead, so the plate is bounded to the
+ * map band beneath the copy and never expands into a full-panel-tall dark plate that
+ * trails as a black gap on scroll (repo mobile-hero-black-space).
+ */
+export function applyHeroMapInset(panel: HTMLElement, insetTarget?: HTMLElement): boolean {
   const stage = mapStageEl();
   if (!stage) return false;
-  const geometry = heroMapStageGeometryForRect(panel.getBoundingClientRect());
+  const geometry = heroMapStageGeometryForRect((insetTarget ?? panel).getBoundingClientRect());
   if (!geometry) {
     stage.classList.remove(HERO_MAP_INSET_CLASS);
     stage.style.visibility = 'hidden';

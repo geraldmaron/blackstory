@@ -65,6 +65,8 @@ const DEFAULT_OPENROUTER_ROSTER: readonly string[] = [
 ];
 const DEFAULT_OLLAMA_MODEL = 'qwen3:8b';
 const DEFAULT_MOCK_MODEL = 'mock-editorial-v1';
+/** A stalled/dead connection must not hang a caller forever every retry path assumes this. */
+const REQUEST_TIMEOUT_MS = 90_000;
 
 export function createMockLlmProvider(modelId = DEFAULT_MOCK_MODEL): LlmProvider {
   return {
@@ -202,19 +204,34 @@ async function completeOpenAiCompatible(
         : {};
   const modelExtraBody =
     providerId === 'openrouter' ? openRouterModelExtraBody(request.model) : {};
-  const response = await fetchImpl(`${baseUrl.replace(/\/$/, '')}/chat/completions`, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({
-      model: request.model,
-      temperature: request.temperature ?? 0.2,
-      max_tokens: request.maxTokens ?? 4000,
-      messages: request.messages,
-      ...responseFormat,
-      ...modelExtraBody,
-      ...extraBody,
-    }),
-  });
+  let response: Response;
+  try {
+    response = await fetchImpl(`${baseUrl.replace(/\/$/, '')}/chat/completions`, {
+      method: 'POST',
+      headers,
+      // Without this, a stalled request (dead connection, provider hang) blocks the caller
+      // forever every retry/rotation path below assumes a fetch eventually settles.
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      body: JSON.stringify({
+        model: request.model,
+        temperature: request.temperature ?? 0.2,
+        max_tokens: request.maxTokens ?? 4000,
+        messages: request.messages,
+        ...responseFormat,
+        ...modelExtraBody,
+        ...extraBody,
+      }),
+    });
+  } catch (error) {
+    const err = new Error(
+      `${providerId} request timed out or failed before a response: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+      { cause: error },
+    ) as Error & { retryable?: boolean };
+    err.retryable = true;
+    throw err;
+  }
   if (!response.ok) {
     const body = await response.text();
     const err = new Error(
@@ -262,21 +279,34 @@ async function completeOllamaNative(
   fetchImpl: typeof fetch,
 ): Promise<LlmCompletionResult> {
   const root = baseUrl.replace(/\/$/, '').replace(/\/v1$/, '');
-  const response = await fetchImpl(`${root}/api/chat`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({
-      model: request.model,
-      stream: false,
-      think: false,
-      options: {
-        temperature: request.temperature ?? 0.2,
-        num_predict: request.maxTokens ?? 900,
-      },
-      messages: request.messages,
-      format: request.responseSchema?.schema ?? 'json',
-    }),
-  });
+  let response: Response;
+  try {
+    response = await fetchImpl(`${root}/api/chat`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      body: JSON.stringify({
+        model: request.model,
+        stream: false,
+        think: false,
+        options: {
+          temperature: request.temperature ?? 0.2,
+          num_predict: request.maxTokens ?? 900,
+        },
+        messages: request.messages,
+        format: request.responseSchema?.schema ?? 'json',
+      }),
+    });
+  } catch (error) {
+    const err = new Error(
+      `ollama request timed out or failed before a response: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+      { cause: error },
+    ) as Error & { retryable?: boolean };
+    err.retryable = true;
+    throw err;
+  }
   if (!response.ok) {
     const body = await response.text();
     const err = new Error(

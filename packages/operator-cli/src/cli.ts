@@ -1,7 +1,7 @@
 /**
  * Thin argument-parsing CLI over this package's real, tested functions mirrors the
  * parse-args-then-call-a-tested-function shape of
- * packages/firebase/src/embeddings/backfill-cli.ts elsewhere in this repo. No business logic
+ * packages/ops-data/src/embeddings/backfill-cli.ts elsewhere in this repo. No business logic
  * lives in this file: every command below builds an input object and calls a `prepare*`/`run*`
  * function from `intake.ts`, `bulk-import.ts`, or `discovery-run.ts`.
  *
@@ -83,6 +83,8 @@ import { assertPostgresOpsDataSource, editorialCatalogFromError } from './ops-da
 import {
   buildBraveWebSearchUrl,
   parseBraveSearchResponse,
+  buildSearxngSearchUrl,
+  parseSearxngSearchResponse,
   type WebSearchRawResult,
 } from '@repo/domain';
 
@@ -206,6 +208,32 @@ function emitEditorialProgress(options: {
     ...(options.event.servedBy !== undefined ? { servedBy: options.event.servedBy } : {}),
     ...(options.event.modelId !== undefined ? { modelId: options.event.modelId } : {}),
   });
+  options.stderr(line);
+  if (options.progressPath) {
+    options.appendFile(options.progressPath, `${line}\n`);
+  }
+}
+
+function emitQuarantineTriageProgress(options: {
+  readonly line: Readonly<Record<string, unknown>>;
+  readonly stderr: (line: string) => void;
+  readonly appendFile: (path: string, contents: string) => void;
+  readonly progressPath?: string;
+}): void {
+  const line = JSON.stringify({ kind: 'quarantine.triage.progress.v1', ...options.line });
+  options.stderr(line);
+  if (options.progressPath) {
+    options.appendFile(options.progressPath, `${line}\n`);
+  }
+}
+
+function emitHarnessProgress(options: {
+  readonly line: Readonly<Record<string, unknown>>;
+  readonly stderr: (line: string) => void;
+  readonly appendFile: (path: string, contents: string) => void;
+  readonly progressPath?: string;
+}): void {
+  const line = JSON.stringify({ kind: 'harness.run.progress.v1', ...options.line });
   options.stderr(line);
   if (options.progressPath) {
     options.appendFile(options.progressPath, `${line}\n`);
@@ -979,11 +1007,28 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
       case 'harness-run': {
         const theme = requireFlag(flags, '--theme');
         const metro = requireFlag(flags, '--metro');
+        const harnessProgressPath = optionalFlag(flags, '--progress-path');
+        if (harnessProgressPath) writeFile(harnessProgressPath, '');
+        const reportHarnessProgress = (line: Readonly<Record<string, unknown>>): void => {
+          emitHarnessProgress({
+            line,
+            stderr,
+            appendFile,
+            ...(harnessProgressPath !== undefined ? { progressPath: harnessProgressPath } : {}),
+          });
+        };
         const connectorList = (optionalFlag(flags, '--connectors') ?? 'dpla,nps_network_to_freedom')
           .split(',')
           .map((c) => c.trim().toLowerCase());
         const query = optionalFlag(flags, '--query') ?? theme;
         const urlToScrape = optionalFlag(flags, '--url');
+
+        reportHarnessProgress({
+          stage: 'start',
+          theme,
+          metro,
+          connectors: connectorList,
+        });
 
         let rawSubjects: HarnessRawSubject[] = [];
 
@@ -1011,6 +1056,11 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         }
 
         if (connectorList.includes('nps_network_to_freedom')) {
+          reportHarnessProgress({
+            stage: 'connector.mock_fixture',
+            connectorKind: 'nps_network_to_freedom',
+            note: 'hardcoded fixture rows, not a live NPS pull',
+          });
           const csvData = `id,name,abstract,latitude,longitude,address,city,county,state,source_url
 ntf-1,Chicago Quinn Chapel A.M.E. Church,"Historic church that served as an Underground Railroad station, active from 1847.",41.854,-87.625,"2401 S Wabash Ave",Chicago,Cook,Illinois,https://nps.gov/quinn-chapel
 ntf-2,Dunbar High School,"Dunbar was established in 1870 as the first public high school for Black students.",38.909,-77.017,"1301 New Jersey Ave NW",Washington,D.C.,DC,https://nps.gov/dunbar
@@ -1020,6 +1070,11 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
         }
 
         if (connectorList.includes('dpla')) {
+          reportHarnessProgress({
+            stage: 'connector.mock_fixture',
+            connectorKind: 'dpla',
+            note: 'hardcoded fixture rows, not a live DPLA API pull',
+          });
           const mockDpla = [
             {
               id: 'dpla-1',
@@ -1044,14 +1099,24 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
         if (connectorList.includes('web_search')) {
           const searchQuery = `${theme} ${metro} historical sites`;
           try {
-            const apiKey = process.env.BRAVE_SEARCH_API_KEY;
+            const searxngBaseUrl = process.env.SEARXNG_BASE_URL;
+            const braveApiKey = process.env.BRAVE_SEARCH_API_KEY;
             let rawResults: readonly WebSearchRawResult[];
-            if (apiKey) {
+            let servedBy: 'searxng' | 'brave' | 'mock';
+            if (searxngBaseUrl) {
+              // Project's chosen web-search provider (see provider-decision.ts): self-hosted
+              // SearXNG on Corsair, preferred over commercial Brave/Exa keys.
+              const res = await fetch(buildSearxngSearchUrl({ baseUrl: searxngBaseUrl, query: searchQuery }));
+              const json: unknown = await res.json();
+              rawResults = parseSearxngSearchResponse(json).results;
+              servedBy = 'searxng';
+            } else if (braveApiKey) {
               const res = await fetch(buildBraveWebSearchUrl({ query: searchQuery }), {
-                headers: { 'X-Subscription-Token': apiKey },
+                headers: { 'X-Subscription-Token': braveApiKey },
               });
               const json: unknown = await res.json();
               rawResults = parseBraveSearchResponse(json).results;
+              servedBy = 'brave';
             } else {
               rawResults = [
                 {
@@ -1060,20 +1125,28 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
                   url: 'https://example.com/mock',
                 },
               ];
+              servedBy = 'mock';
             }
+            reportHarnessProgress({ stage: 'web_search.servedBy', servedBy, resultCount: rawResults.length });
             const webSubjects: HarnessRawSubject[] = rawResults.slice(0, 5).map((result, index) => ({
               id: `web-${index}`,
               connectorKind: 'web_search',
               title: result.title ?? 'Unknown Page',
               description: result.description ?? '',
               cites: [result.url],
-              rawRecord: { ...result },
+              rawRecord: { ...result, servedBy },
             }));
             rawSubjects = [...rawSubjects, ...webSubjects];
           } catch (err) {
             stderr(`Warning: Web search failed: ${String(err)}\n`);
           }
         }
+
+        reportHarnessProgress({
+          stage: 'connectors.complete',
+          rawSubjectsCount: rawSubjects.length,
+          connectorKinds: [...new Set(rawSubjects.map((s) => s.connectorKind))],
+        });
 
         // 2. Fetch existing catalog profiles from Postgres for deduplication check
         let existingProfiles: { name: string; entity_id: string }[] = [];
@@ -1103,6 +1176,13 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
         });
 
         const overlaps = findSpatialTemporalOverlaps(deduplicatedSubjects, { maxDistanceMeters: 10000 });
+
+        reportHarnessProgress({
+          stage: 'dedup.complete',
+          rawSubjectsCount: deduplicatedSubjects.length,
+          duplicateCount: deduplicatedSubjects.filter((s) => s.isDuplicate).length,
+          overlapsCount: overlaps.length,
+        });
 
         type EnrichmentFailure = { readonly id: string; readonly error: string };
         type RelationFailure = {
@@ -1135,28 +1215,70 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
             },
           };
 
-          for (const subject of deduplicatedSubjects) {
+          for (const [index, subject] of deduplicatedSubjects.entries()) {
             try {
               const candidate = await enrichSubjectCandidate(subject, bridgeClient, theme, metro);
               enrichedCandidates.push(candidate);
+              reportHarnessProgress({
+                stage: 'enrich.subject',
+                index: index + 1,
+                total: deduplicatedSubjects.length,
+                subjectId: subject.id,
+                title: subject.title,
+                ok: true,
+              });
             } catch (err) {
               enrichedCandidates.push({ id: subject.id, error: String(err) });
+              reportHarnessProgress({
+                stage: 'enrich.subject',
+                index: index + 1,
+                total: deduplicatedSubjects.length,
+                subjectId: subject.id,
+                title: subject.title,
+                ok: false,
+                error: String(err).slice(0, 240),
+              });
             }
           }
 
-          for (const overlap of overlaps) {
+          for (const [index, overlap] of overlaps.entries()) {
             try {
               const relation = await adjudicateRelationship(overlap, bridgeClient, theme, metro);
               adjudicatedRelations.push(relation);
+              reportHarnessProgress({
+                stage: 'adjudicate.relationship',
+                index: index + 1,
+                total: overlaps.length,
+                subjectAId: overlap.subjectA.id,
+                subjectBId: overlap.subjectB.id,
+                ok: true,
+              });
             } catch (err) {
               adjudicatedRelations.push({
                 subjectAId: overlap.subjectA.id,
                 subjectBId: overlap.subjectB.id,
                 error: String(err),
               });
+              reportHarnessProgress({
+                stage: 'adjudicate.relationship',
+                index: index + 1,
+                total: overlaps.length,
+                subjectAId: overlap.subjectA.id,
+                subjectBId: overlap.subjectB.id,
+                ok: false,
+                error: String(err).slice(0, 240),
+              });
             }
           }
         }
+
+        reportHarnessProgress({
+          stage: 'done',
+          rawSubjectsCount: deduplicatedSubjects.length,
+          overlapsCount: overlaps.length,
+          enrichedCount: enrichedCandidates.length,
+          adjudicatedCount: adjudicatedRelations.length,
+        });
 
         const result = {
           theme,
@@ -1327,20 +1449,55 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
           createdAt: new Date(row.created_at).toISOString(),
         }));
         const nowIso = new Date(deps.nowMs ?? Date.now()).toISOString();
+        const progressPath = optionalFlag(flags, '--progress-path');
+        if (progressPath) writeFile(progressPath, '');
+        const shouldCommit = flags.booleans.has('--commit');
+        const identity = shouldCommit ? readOperatorIdentity(flags) : undefined;
         const plans: QuarantineTriagePlan[] = [];
         const errors: Array<{ id: string; error: string }> = [];
-        for (const item of items) {
+        let committedCount = 0;
+        let skippedAlreadyProcessed = 0;
+        for (const [index, item] of items.entries()) {
+          const startedAt = Date.now();
+          let outcome: 'judged' | 'error' = 'judged';
+          let plan: QuarantineTriagePlan | undefined;
+          let errorMessage: string | undefined;
           try {
             const judgment = await judgeQuarantineItem({ item, provider, model: model ?? '' });
-            plans.push(prepareQuarantineTriageDecision(item, judgment, { confidenceThreshold, nowIso }));
+            plan = prepareQuarantineTriageDecision(item, judgment, { confidenceThreshold, nowIso });
+            plans.push(plan);
           } catch (error) {
-            errors.push({ id: item.id, error: error instanceof Error ? error.message : String(error) });
+            outcome = 'error';
+            errorMessage = error instanceof Error ? error.message : String(error);
+            errors.push({ id: item.id, error: errorMessage });
           }
+          let committedThisItem = false;
+          if (plan && shouldCommit && identity) {
+            const result = await commitQuarantineTriagePlans(pool, [plan], identity, nowIso);
+            committedCount += result.committed;
+            skippedAlreadyProcessed += result.skippedAlreadyProcessed.length;
+            committedThisItem = result.committed > 0;
+          }
+          emitQuarantineTriageProgress({
+            line: {
+              completed: index + 1,
+              total: items.length,
+              intakeItemId: item.id,
+              outcome,
+              ...(plan ? { decision: plan.effectiveDecision } : {}),
+              ...(plan ? { confidence: plan.judgment.confidence } : {}),
+              ...(errorMessage ? { error: errorMessage.slice(0, 240) } : {}),
+              committed: committedThisItem,
+              elapsedMs: Date.now() - startedAt,
+            },
+            stderr,
+            appendFile,
+            ...(progressPath !== undefined ? { progressPath } : {}),
+          });
         }
-        let commitSummary: Awaited<ReturnType<typeof commitQuarantineTriagePlans>> | undefined;
-        if (flags.booleans.has('--commit') && plans.length > 0) {
-          commitSummary = await commitQuarantineTriagePlans(pool, plans, readOperatorIdentity(flags), nowIso);
-        }
+        const commitSummary = shouldCommit
+          ? { committed: committedCount, skippedAlreadyProcessed }
+          : undefined;
         const counts = plans.reduce<Record<string, number>>((acc, plan) => {
           acc[plan.effectiveDecision] = (acc[plan.effectiveDecision] ?? 0) + 1;
           return acc;
@@ -1353,7 +1510,7 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
               judged: plans.length,
               errors,
               counts,
-              committed: flags.booleans.has('--commit'),
+              committed: shouldCommit,
               commitSummary,
               plans: plans.map((plan) => ({
                 intakeItemId: plan.intakeItemId,
@@ -1424,7 +1581,7 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
           'Usage: operator-cli <preflight|model-report|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|sundown-town-brief|harness-run|locate|backfill-entity|prose-run|expand|graylist-read> [flags]\n' +
           'Every command accepts --json (no-op: output is always JSON) and every id-bearing command uses --entity-id / --case-id for its target.\n' +
           'For model-report: [--since <ISO date>] [--json]\n' +
-          'For harness-run: --theme <theme> --metro <metro> [--connectors dpla,nps_network_to_freedom,web_search] [--enrich] [--provider openrouter|ollama|mock]\n' +
+          'For harness-run: --theme <theme> --metro <metro> [--connectors dpla,nps_network_to_freedom,web_search] [--enrich] [--provider openrouter|ollama|mock] [--progress-path <file>]\n' +
           'For backfill-entity/prose-run: --entity-id <id> [--title ...] [--summary ...] [--provider mock|openrouter|ollama|hybrid] [--commit]\n' +
           'For expand: --entity-id <id> [--depth N] — stub pending repo-xez5.4\n' +
           'For graylist-read: [--limit N] — Postgres quarantine only, see docs/research/research-operations.md\n'

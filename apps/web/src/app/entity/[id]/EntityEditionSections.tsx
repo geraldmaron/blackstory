@@ -5,9 +5,15 @@
 import React from 'react';
 import { Timeline } from '@repo/ui';
 import type { PublicEntityView } from '../../../data/public-seed';
+import Link from 'next/link';
 import type { PublicWhyThisAppears } from '@repo/domain';
 import type { EvidenceClaimInput } from '../../../lib/evidence';
 import type { WhyAppearsEvidenceCitation } from './adapters';
+import {
+  entityCrossReferenceHref,
+  entityCrossReferenceLabel,
+  type EntityCrossReferenceSurface,
+} from '../../../lib/theme-impact/source';
 import { EntityEvidencePanel } from '../../../components/evidence';
 import { WhyThisAppears } from '../../../components/why-appears';
 import { EntityStatusPanel } from '../../../components/entity/EntityStatusPanel';
@@ -28,9 +34,15 @@ export type EntityEditionSectionsProps = {
   readonly whyAppearsEvidenceById: Readonly<Record<string, WhyAppearsEvidenceCitation>>;
   readonly evidenceClaims: readonly EvidenceClaimInput[];
   readonly entityLinkCatalog: readonly EntityLinkCatalogEntry[];
+  /** Chapters/stories/theme packets this entity appears on elsewhere (repo-cqey.8). Optional —
+   * an entity with zero cross-references renders no "Appears in" panel at all. */
+  readonly crossReferences?: readonly EntityCrossReferenceSurface[];
 };
 
-function entityBeatIndices(entity: PublicEntityView) {
+function entityBeatIndices(
+  entity: PublicEntityView,
+  hasCrossReferences: boolean,
+) {
   let current = 2;
   const next = () => String(current++).padStart(2, '0');
   const relevance = next();
@@ -40,8 +52,9 @@ function entityBeatIndices(entity: PublicEntityView) {
   const claims = next();
   const timeline = entity.timeline.length > 0 ? next() : undefined;
   const connected = next();
+  const appearsIn = hasCrossReferences ? next() : undefined;
   const provenance = next();
-  return { relevance, context, reading, status, claims, timeline, connected, provenance };
+  return { relevance, context, reading, status, claims, timeline, connected, appearsIn, provenance };
 }
 
 export function EntityEditionSections({
@@ -51,11 +64,12 @@ export function EntityEditionSections({
   whyAppearsEvidenceById,
   evidenceClaims,
   entityLinkCatalog,
+  crossReferences = [],
 }: EntityEditionSectionsProps) {
   const continueLearning = entity.continueLearning ?? [];
   const statusHeading =
     entity.kind === 'event' ? 'When this happened' : 'Status and history';
-  const beats = entityBeatIndices(entity);
+  const beats = entityBeatIndices(entity, crossReferences.length > 0);
 
   return (
     <>
@@ -244,6 +258,37 @@ export function EntityEditionSections({
           </div>
         ) : null}
       </article>
+
+      {crossReferences.length > 0 ? (
+        <article
+          className={entityEditionPanelClassName('appears-in')}
+          aria-labelledby="appears-in-heading"
+        >
+          <header className="ds-entity-edition__header">
+            <span className="ds-entity-edition__index" aria-hidden="true">
+              {beats.appearsIn}
+            </span>
+            <div>
+              <p className="ds-entity-edition__kicker">Appears in</p>
+              <h2 className="ds-entity-edition__panel-heading" id="appears-in-heading">
+                Elsewhere in the archive
+              </h2>
+              <p className="ds-entity-edition__lede">
+                Chapters and theme instruments that reference this record.
+              </p>
+            </div>
+          </header>
+          <ul className="ds-entity-edition__appears-in-list" aria-label="Appears in">
+            {crossReferences.map((surface) => (
+              <li key={`${surface.kind}-${entityCrossReferenceHref(surface)}`}>
+                <Link href={entityCrossReferenceHref(surface)}>
+                  {entityCrossReferenceLabel(surface)}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </article>
+      ) : null}
 
       <article
         className={entityEditionPanelClassName('provenance')}

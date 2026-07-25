@@ -10,7 +10,10 @@
      — no fixed-position overlay fighting that content for stacking order. */
   position: absolute;
   inset: 0 0 auto 0;
+  /* svh: the visible viewport before the mobile URL bar collapses; plain vh
+     is taller than what's on screen at load. vh line kept as fallback. */
   height: 100vh;
+  height: 100svh;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
@@ -92,10 +95,14 @@
    handwriting mechanic, then rests as one paragraph, permanently. Does not
    fade with scroll (unlike ambient names — no --memorial-wall-fade here). */
 .ds-memorial-wall__message-field {
-  /* 50vh, not 50%: centers within the actual opening viewport regardless of
-     the (much taller) .ds-memorial-wall container it's absolutely placed in. */
+  /* 50svh, not 50%: centers within the actual opening viewport regardless of
+     the (much taller) .ds-memorial-wall container it's absolutely placed in.
+     The offset subtraction compensates for the shell header above the wall
+     (set by MemorialWallAtmosphere); svh keeps the mobile URL bar out of the
+     math. vh line kept as fallback for browsers without svh. */
   position: absolute;
-  top: 50vh;
+  top: calc(50vh - var(--memorial-wall-offset-top, 0px));
+  top: calc(50svh - var(--memorial-wall-offset-top, 0px));
   left: 50%;
   z-index: 1;
   width: min(94vw, 46rem);

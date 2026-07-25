@@ -14,7 +14,7 @@
   "dependencies": {
     "@repo/config": "workspace:*",
     "@repo/domain": "workspace:*",
-    "@repo/firebase": "workspace:*",
+    "@repo/ops-data": "workspace:*",
     "@repo/public-contracts": "workspace:*",
     "@repo/schemas": "workspace:*",
     "@repo/security": "workspace:*",

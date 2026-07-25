@@ -9,9 +9,9 @@
  * This module is pure and framework-independent: it does not touch Firestore. It follows
  * audit/outbox shape at the domain layer (DomainAuditEvent DomainOutboxMessage,
  * ./audit/index.js) so a storage adapter can hand `auditEvent` + `outboxMessage` straight to
- * the existing `commitWithAudit` path (packages/firebase/src/firestore/audit-outbox.ts) the
+ * the existing `commitWithAudit` path (packages/ops-data/src/firestore/audit-outbox.ts) the
  * same way every other audited mutation in this repo does, and can translate `mutations` into
- * real deletes against its own store. packages/firebase is out of scope for this (read-only
+ * real deletes against its own store. packages/ops-data is out of scope for this (read-only
  * context), so that translation step is deliberately left to the caller.
  */
 import { randomUUID } from 'node:crypto';

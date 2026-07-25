@@ -302,7 +302,7 @@ export const EVENT_OR_LAW_SHAPED_LEGACY_TAGS: ReadonlySet<string> = new Set([
 
 /**
  * Canonical national-catalog entity ids for legacy org/event/law-shaped topic tags.
- * Keep in sync with fixtures under `packages/firebase/fixtures/national-catalog/`.
+ * Keep in sync with fixtures under `packages/ops-data/fixtures/national-catalog/`.
  */
 export const LEGACY_MENTION_TAG_TO_ENTITY_ID: Readonly<Record<string, string>> = {
   cofo: 'ent_cofo_001',

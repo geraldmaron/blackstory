@@ -4,8 +4,7 @@
  * corrections, and degraded-mode shells not live fetches.
  */
 
-export type CoreJourneyId =
-  'search' | 'explore' | 'entity' | 'locate' | 'corrections' | 'degraded-shell';
+export type CoreJourneyId = 'search' | 'explore' | 'entity' | 'locate' | 'corrections';
 
 export type CoreJourneyFixture = {
   readonly id: CoreJourneyId;
@@ -129,28 +128,10 @@ const CORRECTIONS_FIXTURE = `
   </main>
 `;
 
-/** Root shell degraded banner paired with stable main content. */
-const DEGRADED_SHELL_FIXTURE = `
-  <a class="ds-skip-link" href="#main">Skip to main content</a>
-  <div role="status">
-    <p>Showing snapshot data</p>
-    <p>Live reads are temporarily disabled. Pages are serving the last published release snapshot.</p>
-  </div>
-  <main id="main">
-    <h1>Search</h1>
-    <p>Snapshot catalog remains readable during degraded mode.</p>
-  </main>
-`;
-
 export const CORE_JOURNEY_FIXTURES: readonly CoreJourneyFixture[] = Object.freeze([
   { id: 'search', label: 'Search results ()', html: SEARCH_FIXTURE },
   { id: 'explore', label: 'Explore map + list peer ()', html: EXPLORE_FIXTURE },
   { id: 'entity', label: 'Entity detail ()', html: ENTITY_FIXTURE },
   { id: 'locate', label: 'Locate jurisdiction ()', html: LOCATE_FIXTURE },
   { id: 'corrections', label: 'Corrections intake ()', html: CORRECTIONS_FIXTURE },
-  {
-    id: 'degraded-shell',
-    label: 'Degraded snapshot shell ()',
-    html: DEGRADED_SHELL_FIXTURE,
-  },
 ]);

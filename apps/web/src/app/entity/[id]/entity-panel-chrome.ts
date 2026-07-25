@@ -25,6 +25,7 @@ export type EntityEditionPanelVariant =
   | 'claims'
   | 'timeline'
   | 'connected'
+  | 'appears-in'
   | 'provenance';
 
 export function entityEditionRootClassName(): string {

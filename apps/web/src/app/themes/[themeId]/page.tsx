@@ -5,6 +5,8 @@
 
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { ChapterEssay } from '../../../components/theme-spine/ChapterEssay';
+import '../../../components/theme-spine/theme-spine.css';
 import { ThemeImpactArcReading } from '../../../components/theme-impact/ThemeImpactArcReading';
 import { ThemeImpactMapStrip } from '../../../components/theme-impact/ThemeImpactMapStrip';
 import { ThemeImpactPacketCard } from '../../../components/theme-impact/ThemeImpactPacketCard';
@@ -16,7 +18,12 @@ import {
 } from '../../../components/theme-impact/fixtures';
 import { THEMES_PUBLIC_SURFACE_ENABLED } from '../../../lib/theme-impact/public-surface';
 import { shouldShowThemeImpactStorytelling } from '../../../lib/theme-impact/storytelling-series';
-import { listThemeImpactPacketViews, resolveRedliningPilotPacketView } from '../../../lib/theme-impact/source';
+import {
+  listThemeImpactPacketViews,
+  resolveChapterEntityExits,
+  resolveRedliningPilotPacketView,
+  resolveThemeSpine,
+} from '../../../lib/theme-impact/source';
 import {
   themesEditionPanelClassName,
   themesEditionRootClassName,
@@ -68,6 +75,11 @@ export default async function ThemeDetailPage({ params }: ThemeDetailPageProps) 
     shouldShowThemeImpactStorytelling(packet.questionId),
   );
   const hasGatedCausal = packets.some((packet) => packet.methodStance === 'gated_causal_claim');
+  const spine = await resolveThemeSpine(themeId);
+  const hasChapters = spine.chapters.length > 0;
+  const entityExitsByStoryId = hasChapters
+    ? await resolveChapterEntityExits(spine.chapters)
+    : new Map();
 
   return (
     <div className={themesEditionRootClassName()} data-themes-edition="v6">
@@ -112,32 +124,61 @@ export default async function ThemeDetailPage({ params }: ThemeDetailPageProps) 
             ) : null}
           </article>
 
-          <article
-            className={themesEditionPanelClassName('arc')}
-            aria-labelledby="theme-arc-heading"
-            id="arc"
-          >
-            <header className="ds-themes-edition__header">
-              <span className="ds-themes-edition__index" aria-hidden="true">
-                01
-              </span>
-              <div>
-                <p className="ds-themes-edition__kicker">Reading</p>
-                <h2 className="ds-themes-edition__title" id="theme-arc-heading">
-                  The journey
-                </h2>
-                <p className="ds-themes-edition__lede">
-                  Scene by scene through policy, practice, lived place, and measurement. Ink-sketch
-                  visuals pace each beat; instruments sit beside the prose.
-                </p>
-              </div>
-            </header>
-            <ThemeImpactArcReading
-              themeId={themeId}
-              packets={packets}
-              headingId="theme-arc-reading"
-            />
-          </article>
+          {hasChapters ? (
+            <article
+              className={themesEditionPanelClassName('chapter')}
+              aria-labelledby="theme-chapter-heading"
+              id="arc"
+            >
+              <header className="ds-themes-edition__header">
+                <span className="ds-themes-edition__index" aria-hidden="true">
+                  01
+                </span>
+                <div>
+                  <p className="ds-themes-edition__kicker">Reading</p>
+                  <h2 className="ds-themes-edition__title" id="theme-chapter-heading">
+                    The journey
+                  </h2>
+                  <p className="ds-themes-edition__lede">
+                    A continuous essay across bound chapters, with instruments folded in-flow.
+                    Full packets remain in the instruments rail below for hard readers.
+                  </p>
+                </div>
+              </header>
+              <ChapterEssay
+                themeTitle={entry.title}
+                chapters={spine.chapters}
+                entityExitsByStoryId={entityExitsByStoryId}
+              />
+            </article>
+          ) : (
+            <article
+              className={themesEditionPanelClassName('arc')}
+              aria-labelledby="theme-arc-heading"
+              id="arc"
+            >
+              <header className="ds-themes-edition__header">
+                <span className="ds-themes-edition__index" aria-hidden="true">
+                  01
+                </span>
+                <div>
+                  <p className="ds-themes-edition__kicker">Reading</p>
+                  <h2 className="ds-themes-edition__title" id="theme-arc-heading">
+                    The journey
+                  </h2>
+                  <p className="ds-themes-edition__lede">
+                    Scene by scene through policy, practice, lived place, and measurement. Ink-sketch
+                    visuals pace each beat; instruments sit beside the prose.
+                  </p>
+                </div>
+              </header>
+              <ThemeImpactArcReading
+                themeId={themeId}
+                packets={packets}
+                headingId="theme-arc-reading"
+              />
+            </article>
+          )}
 
           {storytellingPackets.map((packet) => (
             <article

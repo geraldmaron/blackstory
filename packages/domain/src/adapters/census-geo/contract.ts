@@ -62,7 +62,7 @@ export function createCensusGeoAdapterContract(
       refreshSchedule: '0 6 2 1 *', // annual, Jan 2 — matches the ADR's "at most annual" cadence.
       notes:
         'Bulk static reference file (Census Gazetteer county file + the existing US_STATES ' +
-        'table), loaded by packages/firebase/src/jurisdictions/load-cli.ts. Not a live-scraping ' +
+        'table), loaded by packages/ops-data/src/jurisdictions/load-cli.ts. Not a live-scraping ' +
         'adapter; adapterEnabled/registryState still gate whether a run may write ().',
     },
     rights: CENSUS_GEO_RIGHTS,

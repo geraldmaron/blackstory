@@ -5,7 +5,7 @@
  *   APP_FIREBASE_ALLOW_PRODUCTION=1 FIREBASE_PROJECT_ID=black-book-efaaf \
  *     pnpm --filter @repo/migrate-firestore-postgres census
  */
-import { createServerFirebaseApp, getServerFirestore } from '@repo/firebase';
+import { createServerFirebaseApp, getServerFirestore } from '@repo/ops-data';
 import { runCensus } from '../migrate.js';
 
 async function main(): Promise<void> {

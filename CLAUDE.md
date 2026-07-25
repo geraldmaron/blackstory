@@ -31,12 +31,13 @@ bd close <id>         # Complete work
 1. **File issues for remaining work** - Create issues for anything that needs follow-up
 2. **Run quality gates** (if code changed) - Tests, linters, builds
 3. **Update issue status** - Close finished work, update in-progress items
-4. **PUSH TO REMOTE** - This is MANDATORY:
+4. **PUSH TO REMOTE** - This is MANDATORY. Push to `staging`, never directly to `main`
+   (see **Branching & Release Policy** below):
    ```bash
-   git pull --rebase
+   git pull --rebase origin staging
    bd dolt push
-   git push
-   git status  # MUST show "up to date with origin"
+   git push origin HEAD:staging
+   git status  # MUST show local branch is up to date with what you pushed
    ```
 5. **Clean up** - Clear stashes, prune remote branches
 6. **Verify** - All changes committed AND pushed
@@ -49,6 +50,20 @@ bd close <id>         # Complete work
 - If push fails, resolve and retry until it succeeds
 <!-- END BEADS INTEGRATION -->
 
+
+## Branching & Release Policy
+
+`main` is GitHub-branch-protected: no direct pushes, no force-pushes, no deletions (PR required
+to merge). This is enforced server-side, not just a convention.
+
+- **Day-to-day work** (agent sessions, exploratory commits, WIP) lands on `staging` (or a
+  feature branch merged into `staging`) — never pushed straight to `main`.
+- **staging → main is an explicit, separate action**, not something a session does as part of
+  its normal close-out: open a PR from `staging` to `main` and merge it deliberately (`gh pr
+  create --base main --head staging` then `gh pr merge`), only when `staging` is in a state
+  intended for release. Do this only when asked, not automatically at session end.
+- If you're unsure whether a change belongs on `staging` alone or should also go to `main`,
+  default to `staging` and ask.
 
 ## Mobile local QA (agents)
 

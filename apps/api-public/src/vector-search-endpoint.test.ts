@@ -5,13 +5,13 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type { AppCheckDecision } from '@repo/firebase';
+import type { AppCheckDecision } from '@repo/ops-data';
 import {
   createDeterministicMockEmbeddingProvider,
   createInMemoryVectorIndexStore,
   truncateAndNormalize,
   EMBEDDING_DIMS,
-} from '@repo/firebase';
+} from '@repo/ops-data';
 import {
   createFindNearestEndpoint,
   type FindNearestHttpRequest,

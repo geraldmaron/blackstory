@@ -21,11 +21,13 @@
   inset: 0;
   z-index: 1;
   pointer-events: none;
+  /* Theme-aware: tint with the page canvas so the scrim dims toward paper in light
+     mode and toward ink in dark mode — never a black veil over a cream page. */
   background: linear-gradient(
     180deg,
-    rgba(10, 10, 10, 0.55) 0%,
-    rgba(10, 10, 10, 0.12) 45%,
-    rgba(10, 10, 10, 0.6) 100%
+    color-mix(in srgb, var(--ds-canvas) 55%, transparent) 0%,
+    color-mix(in srgb, var(--ds-canvas) 12%, transparent) 45%,
+    color-mix(in srgb, var(--ds-canvas) 60%, transparent) 100%
   );
   opacity: 1;
   transition: opacity var(--ds-duration-base) var(--ds-easing);

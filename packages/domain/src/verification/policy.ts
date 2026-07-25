@@ -2,11 +2,11 @@
  * Verification policy model (the related workstream): governs how often a published claim/relationship
  * (identified by entityClass + predicate) must be independently re-checked, and what source(s)
  * count as authoritative for that check. Firestore schema mirror lives at
- * `packages/firebase/src/firestore/types.ts` (`verificationPolicySchema`,
+ * `packages/ops-data/src/firestore/types.ts` (`verificationPolicySchema`,
  * `verificationPolicies/{policyId}`).
  *
  * This module has NO zod dependency (this package does not depend on zod; only
- * `packages/firebase` and `packages/schemas` do) — validation here follows this package's own
+ * `packages/ops-data` and `packages/schemas` do) — validation here follows this package's own
  * `assertXValid` convention (see `../claims/claim.ts`), not a parsed schema.
  */
 import type { EntityClass } from '../entity-class.js';

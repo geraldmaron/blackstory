@@ -18,7 +18,7 @@
  *      Storage object referenced by bb_reference.holc_areas.geometry
  *      (raw-sources/mapping-inequality/2023-full-download/mappinginequality.json),
  *      not inline in Postgres.
- * A follow-up loader (packages/firebase/scripts/ingest-holc-tract-crosswalk.ts,
+ * A follow-up loader (packages/ops-data/scripts/ingest-holc-tract-crosswalk.ts,
  * not yet written) should: load that GeoJSON, load TIGER tract boundaries for the
  * target county/state, compute area-weighted overlay fractions per HOLC area id,
  * and upsert one HolcTractCrosswalkRow per (holcAreaId, tractGeoid) pair with

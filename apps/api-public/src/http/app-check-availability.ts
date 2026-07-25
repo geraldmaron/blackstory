@@ -6,7 +6,7 @@
  * when set. The circuit breaker complements it by detecting sustained verifier throws without
  * treating a lone missing/invalid token as an outage.
  */
-import type { AppCheckCircuitBreaker } from '@repo/firebase';
+import type { AppCheckCircuitBreaker } from '@repo/ops-data';
 import type { AppCheckAvailability } from '@repo/security';
 
 export const APP_CHECK_OUTAGE_OVERRIDE_ENV = 'APP_CHECK_OUTAGE_OVERRIDE' as const;

@@ -5,9 +5,14 @@
  * body, required Sources footnote, related entity off-ramps, and a copper map CTA
  * when a related entity has a geo anchor. Story bodies load from the public release
  * projection. Emits schema.org Article JSON-LD only, never ClaimReview.
+ *
+ * Stories bound to a theme (`themeBinding`) permanently redirect to their theme's
+ * chaptered essay at `/themes/[themeId]#chapter-N` — the story now reads as one
+ * chapter of that theme's arc rather than a standalone article. Unbound stories
+ * render exactly as before.
  */
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { assertNeverClaimReview } from '@repo/domain';
 import { renderStoryTitle } from '../../../components/atmosphere/story-title';
 import { SourceFootnote } from '../../../components/data/SourceFootnote';
@@ -92,6 +97,12 @@ export default async function StoryDetailPage({ params }: StoryPageProps) {
   const storyResult = await resolvePublicStoryView(slug);
   const story = storyResult.data;
   if (!story) notFound();
+
+  if (story.themeBinding) {
+    permanentRedirect(
+      `/themes/${story.themeBinding.themeId}#chapter-${story.themeBinding.chapterIndex}`,
+    );
+  }
 
   const { data: relatedEntities } = await listPublicEntityViewsByIds(story.relatedEntityIds);
   const mapCta = mapCtaForRelatedEntities(relatedEntities);

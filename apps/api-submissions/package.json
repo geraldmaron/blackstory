@@ -13,7 +13,7 @@
   "dependencies": {
     "@repo/config": "workspace:*",
     "@repo/domain": "workspace:*",
-    "@repo/firebase": "workspace:*",
+    "@repo/ops-data": "workspace:*",
     "@repo/security": "workspace:*"
   },
   "devDependencies": {

@@ -6,7 +6,7 @@
  * fixture — a living person with a precise residential coordinate — used by the
  * redaction regression test and by the `/map` demo route.
  *
- * Shapes mirror `packages/firebase/fixtures/firestore-seed.ts` in spirit but are
+ * Shapes mirror `packages/ops-data/fixtures/firestore-seed.ts` in spirit but are
  * independent.
  */
 import type { MapSourceEntityInput } from './map-source.js';

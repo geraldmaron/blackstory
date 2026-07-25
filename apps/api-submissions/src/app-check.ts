@@ -14,7 +14,7 @@ import {
   type AppCheckTelemetry,
   type AppCheckVerifier,
   type EnvironmentLike,
-} from '@repo/firebase';
+} from '@repo/ops-data';
 
 export type SubmissionsApiAppCheckOptions = {
   readonly environment?: EnvironmentLike;

@@ -108,7 +108,7 @@ export function buildEdgeLineCatalog(): {
 export function buildExploreViewModel(
   raw: RawExploreSearchParams,
   entities: readonly PublicEntityView[] = listPublicEntities(),
-  dataSource: PublicReadSource = 'snapshot',
+  dataSource: PublicReadSource = 'none',
 ): ExploreViewModel {
   const viewState = parseExploreSearchParams(raw);
   const source = buildExploreMapSource(entities);
