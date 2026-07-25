@@ -132,8 +132,8 @@ test('bulk selection enforces non-empty unique capped ids', () => {
 
 test('STORY_REVIEW copy explains intent, steps, and actions without jargon', () => {
   assert.match(STORY_REVIEW_INTENT_COPY, /do not publish|nothing here publishes/i);
-  assert.equal(STORY_REVIEW_STEPS.length, 3);
-  assert.match(STORY_REVIEW_STEPS[1]!, /optional/i);
+  assert.equal(STORY_REVIEW_STEPS.length, 4);
+  assert.match(STORY_REVIEW_STEPS[2]!, /optional/i);
   assert.match(storyReviewActionHelp('approved'), /does not publish/i);
   assert.match(storyReviewActionHelp('needs_evidence'), /evidence/i);
 });
