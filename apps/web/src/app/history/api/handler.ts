@@ -14,6 +14,7 @@ import {
   resolveHistoryGraphSlice,
 } from '../../../lib/history/build-history-graph';
 import { listPublicEntityViews } from '../../../lib/public-data/source';
+import type { PublicEntityView } from '../../../data/public-seed';
 import {
   parseHistoryConnectionsFilter,
   parseHistorySort,
@@ -37,6 +38,11 @@ function integritySatisfiesRateLimitGate(decision: {
 export type HistoryRouteDependencies = {
   readonly integrityGuard: HistoryRequestIntegrityGuard;
   readonly rateLimitGuard: ReturnType<typeof createHistoryRateLimitGuard>;
+  /**
+   * Entity catalog loader. Defaults to the live Postgres projection reader. Injected in tests
+   * so the refine pipeline can run against the bundled seed catalog without a database.
+   */
+  readonly loadEntities?: () => Promise<{ readonly data: readonly PublicEntityView[] }>;
 };
 
 function jsonError(status: number, error: string, extra?: Record<string, unknown>): Response {
@@ -145,7 +151,7 @@ export async function handleHistoryRefineRequest(
     }
 
     const decade = parseDecadeParam(url.searchParams.get('decade') ?? undefined);
-    const { data: entities } = await listPublicEntityViews();
+    const { data: entities } = await (deps.loadEntities ?? listPublicEntityViews)();
     const artifact = getHistoryGraphReleaseArtifact(entities);
     const context = buildHistoryGraphContext(artifact, entities);
     const slice = resolveHistoryGraphSlice(artifact, decade ? 'decade' : 'all-time', decade);

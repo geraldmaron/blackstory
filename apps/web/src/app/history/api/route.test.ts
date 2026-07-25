@@ -5,6 +5,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { resetHistoryGraphReleaseArtifactForTests } from '../../../data/history-graph-seed';
+import { listPublicEntities } from '../../../data/public-seed';
 import { handleHistoryRefineRequest } from './handler';
 
 test.beforeEach(() => {
@@ -76,6 +77,7 @@ function createDeps(overrides?: {
         },
       }),
     },
+    loadEntities: () => Promise.resolve({ data: listPublicEntities() }),
   };
 }
 
