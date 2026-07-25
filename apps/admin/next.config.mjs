@@ -23,6 +23,7 @@ const nextConfig = {
     '/*': ['../../packages/domain/dist/graph/data/**/*'],
   },
   transpilePackages: [
+    '@repo/config',
     '@repo/domain',
     '@repo/data-access',
     '@repo/schemas',
