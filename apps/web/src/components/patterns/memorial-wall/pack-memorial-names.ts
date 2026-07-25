@@ -20,6 +20,13 @@ export type PlacedMemorialName = {
   readonly delaySeconds: number;
 };
 
+export type MemorialAvoidBox = {
+  readonly left: number;
+  readonly top: number;
+  readonly right: number;
+  readonly bottom: number;
+};
+
 export type PackMemorialNamesOptions = {
   readonly names: readonly string[];
   readonly fonts: readonly string[];
@@ -31,14 +38,11 @@ export type PackMemorialNamesOptions = {
   readonly boxGap?: number;
   readonly edgePad?: number;
   readonly maxAttempts?: number;
+  /** Permanently occupied regions (e.g. the held message) names must never land in. */
+  readonly avoidBoxes?: readonly MemorialAvoidBox[] | undefined;
 };
 
-type Box = {
-  readonly left: number;
-  readonly top: number;
-  readonly right: number;
-  readonly bottom: number;
-};
+type Box = MemorialAvoidBox;
 
 function createRng(seed: number): () => number {
   let state = seed >>> 0;
@@ -94,6 +98,68 @@ function boxesOverlap(a: Box, b: Box, gap: number): boolean {
 }
 
 /**
+ * Coarse uniform grid over placed boxes so collision checks only scan boxes
+ * in nearby cells instead of the full (growing) placed-box list. This is
+ * what keeps packing near-linear instead of O(n^2): without it, packing
+ * ~220 names against up to ~220 growing boxes with up to 280 placement
+ * attempts each can reach ~13M brute-force overlap checks synchronously.
+ */
+class SpatialGrid {
+  private readonly cellSize: number;
+  private readonly cells = new Map<string, { box: Box; isAvoidBox: boolean }[]>();
+
+  constructor(cellSize: number) {
+    this.cellSize = Math.max(1, cellSize);
+  }
+
+  private cellKey(gx: number, gy: number): string {
+    return `${gx},${gy}`;
+  }
+
+  private cellRange(box: Box, gap: number): { gx0: number; gy0: number; gx1: number; gy1: number } {
+    return {
+      gx0: Math.floor((box.left - gap) / this.cellSize),
+      gy0: Math.floor((box.top - gap) / this.cellSize),
+      gx1: Math.floor((box.right + gap) / this.cellSize),
+      gy1: Math.floor((box.bottom + gap) / this.cellSize),
+    };
+  }
+
+  hasCollision(candidate: Box, gap: number, avoidGap: number): boolean {
+    const range = this.cellRange(candidate, Math.max(gap, avoidGap));
+    for (let gx = range.gx0; gx <= range.gx1; gx += 1) {
+      for (let gy = range.gy0; gy <= range.gy1; gy += 1) {
+        const bucket = this.cells.get(this.cellKey(gx, gy));
+        if (!bucket) {
+          continue;
+        }
+        for (const entry of bucket) {
+          if (boxesOverlap(candidate, entry.box, entry.isAvoidBox ? avoidGap : gap)) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  insert(box: Box, isAvoidBox: boolean): void {
+    const range = this.cellRange(box, 0);
+    for (let gx = range.gx0; gx <= range.gx1; gx += 1) {
+      for (let gy = range.gy0; gy <= range.gy1; gy += 1) {
+        const key = this.cellKey(gx, gy);
+        const bucket = this.cells.get(key);
+        if (bucket) {
+          bucket.push({ box, isAvoidBox });
+        } else {
+          this.cells.set(key, [{ box, isAvoidBox }]);
+        }
+      }
+    }
+  }
+}
+
+/**
  * Pack unique names across the canvas with random positions and no overlaps.
  * Longer names are attempted first. Names that cannot fit are skipped.
  */
@@ -101,7 +167,10 @@ export function packMemorialNames(options: PackMemorialNamesOptions): readonly P
   const cycleSeconds = options.cycleSeconds ?? 20;
   const boxGap = options.boxGap ?? 10;
   const edgePad = options.edgePad ?? 14;
-  const maxAttempts = options.maxAttempts ?? 280;
+  // Collision checks are now O(nearby boxes) via a spatial grid rather than
+  // O(all placed boxes), so a much lower attempt cap still yields comparable
+  // packing quality at a fraction of the cost.
+  const maxAttempts = options.maxAttempts ?? 60;
   const fonts = options.fonts;
   if (fonts.length === 0 || options.canvasWidth <= 0 || options.canvasHeight <= 0) {
     return [];
@@ -110,7 +179,13 @@ export function packMemorialNames(options: PackMemorialNamesOptions): readonly P
   const rng = createRng(options.seed);
   const unique = [...new Set(options.names)];
   const ordered = shuffle(unique, rng).sort((a, b) => b.length - a.length);
-  const placedBoxes: Box[] = [];
+  // Cell size tuned to roughly one typical name box so most candidates only
+  // touch a small, near-constant number of neighboring cells.
+  const grid = new SpatialGrid(Math.max(40, boxGap * 4));
+  const avoidBoxes = options.avoidBoxes ?? [];
+  for (const box of avoidBoxes) {
+    grid.insert(box, true);
+  }
   const placements: PlacedMemorialName[] = [];
 
   ordered.forEach((name, index) => {
@@ -136,8 +211,7 @@ export function packMemorialNames(options: PackMemorialNamesOptions): readonly P
       cx = minX + rng() * (maxX - minX);
       cy = minY + rng() * (maxY - minY);
       const candidate = boxFromCenter(cx, cy, bounds.width, bounds.height);
-      const collision = placedBoxes.some((existing) => boxesOverlap(candidate, existing, boxGap));
-      if (!collision) {
+      if (!grid.hasCollision(candidate, boxGap, boxGap * 2)) {
         placedBox = candidate;
         break;
       }
@@ -146,7 +220,7 @@ export function packMemorialNames(options: PackMemorialNamesOptions): readonly P
       return;
     }
 
-    placedBoxes.push(placedBox);
+    grid.insert(placedBox, false);
     placements.push({
       name,
       fontFamily,

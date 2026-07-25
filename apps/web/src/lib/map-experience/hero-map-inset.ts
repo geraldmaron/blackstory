@@ -45,7 +45,14 @@ export const HERO_MAP_INSET_MIN_VISIBLE_RATIO = 0.2;
 export const HERO_COPY_COLUMN_FR = 46;
 export const HERO_MAP_COLUMN_FR = 54;
 
-/** Viewport-fixed box matching the visible hero panel intersection. Returns null when off-screen. */
+/**
+ * Viewport-fixed box that tracks the FULL hero panel (top may be negative), so the fixed
+ * MapStage plate translates up off-screen with the hero as it scrolls past — instead of
+ * clamping its top to 0 and shrinking into a clipped band pinned under the sticky nav
+ * (repo-3lzc). The hide decision uses the TRUE visible overlap ratio (not the clamped box),
+ * so the plate disappears cleanly once the panel is mostly gone rather than leaving a sliver.
+ * Returns null when off-screen or below the min-visible ratio.
+ */
 export function heroMapStageGeometryForRect(
   rect: DOMRect,
   viewport: ViewportBounds = DEFAULT_VIEWPORT,
@@ -54,23 +61,26 @@ export function heroMapStageGeometryForRect(
   if (rect.bottom <= 0 || rect.top >= viewport.height) return null;
   if (rect.right <= 0 || rect.left >= viewport.width) return null;
 
+  // True intersection with the viewport, used only to decide when to hide.
   const visibleTop = Math.max(0, rect.top);
   const visibleLeft = Math.max(0, rect.left);
   const visibleBottom = Math.min(viewport.height, rect.bottom);
   const visibleRight = Math.min(viewport.width, rect.right);
-  const width = visibleRight - visibleLeft;
-  const height = visibleBottom - visibleTop;
+  const visibleWidth = visibleRight - visibleLeft;
+  const visibleHeight = visibleBottom - visibleTop;
 
-  if (width <= 0 || height <= 0) return null;
+  if (visibleWidth <= 0 || visibleHeight <= 0) return null;
 
-  const visibleRatio = (width * height) / (rect.width * rect.height);
+  const visibleRatio = (visibleWidth * visibleHeight) / (rect.width * rect.height);
   if (visibleRatio < HERO_MAP_INSET_MIN_VISIBLE_RATIO) return null;
 
+  // Track the full panel box (not the clamped intersection): the plate stays glued to the
+  // hero panel and scrolls away with it, keeping the map's natural framing intact.
   return {
-    top: visibleTop,
-    left: visibleLeft,
-    width,
-    height,
+    top: rect.top,
+    left: rect.left,
+    width: rect.width,
+    height: rect.height,
   };
 }
 

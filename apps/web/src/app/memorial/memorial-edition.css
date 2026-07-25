@@ -18,13 +18,15 @@
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  padding-block: 0 var(--ds-space-16);
+  /* First viewport reads as blank-except-names: push the readable list panel
+     below the fold so the "Held in the Wall" sequence plays uninterrupted. */
+  padding-block: 100vh var(--ds-space-16);
 }
 
 @media (max-width: 47.9375rem) {
   .ds-memorial-edition__stack {
     gap: var(--ds-space-4);
-    padding-block: 0 var(--ds-space-12);
+    padding-block: 100vh var(--ds-space-12);
   }
 }
 
@@ -146,6 +148,61 @@
   border-bottom: var(--ds-border-width) solid color-mix(in srgb, var(--ds-rule) 70%, transparent);
 }
 
+/* Quiet "this one goes further" cue: exact-match names with a real entity
+   page (~3% of the list). Copper accent instead of a normal underline-blue
+   link, so it reads as a subtle signal rather than a generic hyperlink. */
+.ds-memorial-edition__name-link {
+  color: var(--ds-accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+.ds-memorial-edition__name-link:focus-visible {
+  outline: 2px solid var(--ds-focus-ring, var(--ds-accent-graphic));
+  outline-offset: 2px;
+}
+
+.ds-memorial-edition__name-year {
+  font-family: var(--ds-font-mono);
+  font-size: 0.8em;
+  color: var(--ds-ink-muted);
+}
+
+/* Contrast lift for the long list once it's mostly in view: the wall's
+   ambient names have faded out behind it by this point (scroll fade), so
+   this replaces that atmosphere with a legibility boost rather than
+   competing with it. No full theme toggle, just this zone's own background. */
+.ds-memorial-edition__list-zone {
+  transition: background-color 0.4s ease-out, padding 0.4s ease-out;
+  border-radius: var(--ds-radius-md);
+}
+
+/* The panel inside fills the zone edge to edge, so the boosted background
+   needs a little breathing room to actually show — plus the panel's own
+   surface darkens a touch for a real contrast lift on the list text. */
+.ds-memorial-edition__list-zone[data-contrast='boosted'] {
+  background: color-mix(in srgb, var(--ds-canvas) 90%, black 10%);
+  padding: var(--ds-space-3);
+}
+
+.ds-memorial-edition__list-zone[data-contrast='boosted'] .ds-memorial-edition__panel {
+  background: color-mix(in srgb, var(--ds-surface-raised) 92%, black 8%);
+}
+
+[data-theme='dark'] .ds-memorial-edition__list-zone[data-contrast='boosted'] {
+  background: color-mix(in srgb, var(--ds-canvas) 70%, black 30%);
+}
+
+[data-theme='dark'] .ds-memorial-edition__list-zone[data-contrast='boosted'] .ds-memorial-edition__panel {
+  background: color-mix(in srgb, var(--ds-surface-raised) 82%, black 18%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-memorial-edition__list-zone {
+    transition: none;
+  }
+}
+
 .ds-memorial-edition__note {
   margin: var(--ds-space-4) 0 0;
   padding-top: var(--ds-space-4);
@@ -169,4 +226,47 @@
 
 .ds-memorial-edition [id] {
   scroll-margin-top: var(--ds-island-clearance);
+}
+
+/* Accessible title/lede kept for screen readers and SEO; not shown visually
+   so the opening viewport reads as blank-except-names. */
+.ds-memorial-edition__sr-intro {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Single small quiet text link to the full list, anchored near the bottom of
+   the viewport. Not a card or button. */
+.ds-memorial-edition__quiet-links {
+  position: fixed;
+  z-index: 2;
+  left: 50%;
+  bottom: var(--ds-space-4);
+  transform: translateX(-50%);
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--ds-ink-muted);
+  background: color-mix(in srgb, var(--ds-canvas) 55%, transparent);
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--ds-radius-md);
+}
+
+.ds-memorial-edition__quiet-links a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+.ds-memorial-edition__quiet-links a:focus-visible {
+  outline: 2px solid var(--ds-focus-ring, var(--ds-accent-graphic));
+  outline-offset: 2px;
 }

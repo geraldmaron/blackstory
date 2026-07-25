@@ -104,7 +104,7 @@ export function PopulationByDecadeChart({ rows, sources }: PopulationByDecadeCha
       }
     >
       <svg
-        className="ds-data-chart__svg"
+        className="ds-data-chart__svg ds-data-chart__svg--spine"
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         role="img"
         aria-hidden="true"
@@ -142,7 +142,7 @@ export function PopulationByDecadeChart({ rows, sources }: PopulationByDecadeCha
                     x2={x}
                     y1={MARGIN.top}
                     y2={zeroY}
-                    stroke="var(--ds-text-muted, #888)"
+                    stroke="var(--ds-ink-muted)"
                     strokeDasharray="4 4"
                   />
                   <text

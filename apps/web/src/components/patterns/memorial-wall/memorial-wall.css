@@ -4,14 +4,16 @@
  */
 
 .ds-memorial-wall {
+  /* Sits at the top of the normal-flow edition root (position: relative), so
+     absolute coordinates in [0, 100vh] land in the opening viewport and
+     scroll away naturally once the reader moves down to the full list below
+     — no fixed-position overlay fighting that content for stacking order. */
   position: absolute;
   inset: 0 0 auto 0;
-  width: 100%;
-  min-height: 100%;
+  height: 100vh;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
-  background-color: var(--ds-canvas);
 }
 
 .ds-memorial-wall__measurer {
@@ -41,6 +43,25 @@
   color: color-mix(in srgb, var(--ds-ink-muted) 90%, var(--ds-ink));
 }
 
+/* Quiet "this one goes further" cue: exact-match names with a real entity
+   page. Mouse-clickable only (tabIndex=-1, wall stays aria-hidden) — the
+   full list carries the keyboard/screen-reader-reachable version of the
+   same link. No underline/hover chrome; the copper tint alone signals it. */
+.ds-memorial-wall__name-link {
+  color: var(--ds-accent, currentColor);
+  text-decoration: none;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* Small, dimmer year suffix — distinct weight from the handwritten name. */
+.ds-memorial-wall__name-year {
+  font-family: var(--ds-font-mono, monospace);
+  font-size: 0.7em;
+  opacity: 0.72;
+  margin-left: 0.15em;
+}
+
 @keyframes ds-memorial-name-cycle {
   0%,
   100% {
@@ -50,10 +71,10 @@
     opacity: 0;
   }
   14% {
-    opacity: var(--memorial-peak, 0.48);
+    opacity: calc(var(--memorial-peak, 0.48) * var(--memorial-wall-fade, 1));
   }
   28% {
-    opacity: var(--memorial-peak, 0.48);
+    opacity: calc(var(--memorial-peak, 0.48) * var(--memorial-wall-fade, 1));
   }
   38% {
     opacity: 0;
@@ -64,5 +85,56 @@
   .ds-memorial-wall__name {
     animation: none;
     opacity: 0.28;
+  }
+}
+
+/* "Held in the Wall" message: assembles clause by clause from the wall's own
+   handwriting mechanic, then rests as one paragraph, permanently. Does not
+   fade with scroll (unlike ambient names — no --memorial-wall-fade here). */
+.ds-memorial-wall__message-field {
+  /* 50vh, not 50%: centers within the actual opening viewport regardless of
+     the (much taller) .ds-memorial-wall container it's absolutely placed in. */
+  position: absolute;
+  top: 50vh;
+  left: 50%;
+  z-index: 1;
+  width: min(94vw, 46rem);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* Legibility backdrop: flat, near-solid canvas tone, no blur/glow/shadow
+   (flat-matte brand rule). Packer also reserves this footprint (avoidBoxes)
+   so names never land underneath it — belt and suspenders. */
+.ds-memorial-wall__message-scrim {
+  position: absolute;
+  inset: -1rem -1.25rem;
+  border-radius: var(--ds-radius-md, 0.5rem);
+  background: color-mix(in srgb, var(--ds-canvas) 88%, transparent);
+}
+
+.ds-memorial-wall__message {
+  position: relative;
+  margin: 0;
+  padding: 1.5rem 1.75rem;
+  font-family: var(--ds-font-hand-caveat, cursive);
+  font-size: clamp(1.05rem, 0.85rem + 1vw, 1.6rem);
+  line-height: 1.5;
+  color: var(--ds-ink);
+  text-align: center;
+}
+
+.ds-memorial-wall__message-clause {
+  opacity: 0;
+  transition: opacity 1.4s ease-out;
+}
+
+.ds-memorial-wall__message-clause--shown {
+  opacity: 0.94;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-memorial-wall__message-clause {
+    transition: none;
   }
 }

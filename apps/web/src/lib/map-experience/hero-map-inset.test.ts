@@ -68,17 +68,19 @@ describe('hero-map-inset', () => {
     );
   });
 
-  it('clamps geometry to the viewport-visible hero panel intersection', () => {
+  it('tracks the full panel box (negative top) so the plate scrolls away with the hero', () => {
+    // Panel scrolled partly above the viewport top: the plate keeps its full height and a
+    // negative top instead of pinning to top:0 and shrinking into a clipped band (repo-3lzc).
     assert.deepEqual(
       heroMapStageGeometryForRect(
         { ...SAMPLE_RECT, top: -40, bottom: 260 } as DOMRect,
         { width: 1320, height: 840 },
       ),
       {
-        top: 0,
+        top: -40,
         left: 200,
         width: 780,
-        height: 260,
+        height: 300,
       },
     );
   });

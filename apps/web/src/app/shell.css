@@ -735,12 +735,6 @@
   border-bottom: var(--ds-border-width) solid var(--ds-border);
 }
 
-@media (min-width: 48rem) {
-  .ds-shell:has(.ds-home-hero) .ds-shell-wordmark__img--lockup {
-    width: auto;
-    height: 2.25rem;
-  }
-}
 
 .ds-home {
   position: relative;
@@ -782,11 +776,13 @@
 }
 
 .ds-home-hero::before {
-  /* Copy-column matte scrim over the full-panel map: canvas mix keeps ink at
-     WCAG AA while basemap tiles remain visible under the words. Flat only —
-     no blur, glow, or gradient. Soft grain/grid still register on the plate. */
+  /* Legibility scrim over the full-panel map (repo-pyyw): one continuous canvas-tinted
+     wash spanning the WHOLE hero, faded by a long horizontal mask ramp — near-opaque
+     behind the copy column, gradually clearing over the map focus area. The mask fades
+     the flat color and the grain together, so no vertical seam/edge line exists at any
+     point. WCAG AA ink contrast holds on the left where copy sits. */
   content: '';
-  grid-column: 1;
+  grid-column: 1 / -1;
   grid-row: 1;
   z-index: 1;
   pointer-events: none;
@@ -794,18 +790,44 @@
   justify-self: stretch;
   min-width: 0;
   min-height: 100%;
-  /* Light matte only — no archive-grid wash here (that reads as an opaque plate
-     over ocean tiles). Grain stays subtle; map must remain visible under copy. */
-  background-color: color-mix(in srgb, var(--ds-canvas) 38%, transparent);
+  background-color: color-mix(in srgb, var(--ds-canvas) 78%, transparent);
   background-image: var(--ds-edition-pattern-grain);
   background-size: 256px 256px;
   background-position: 0 0;
   background-repeat: repeat;
+  opacity: 1;
+  transition: opacity var(--ds-duration-base) var(--ds-easing);
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    rgb(0 0 0) 0%,
+    rgb(0 0 0 / 0.96) 32%,
+    rgb(0 0 0 / 0.78) 44%,
+    rgb(0 0 0 / 0.52) 56%,
+    rgb(0 0 0 / 0.28) 68%,
+    rgb(0 0 0 / 0.1) 80%,
+    rgb(0 0 0 / 0) 94%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    rgb(0 0 0) 0%,
+    rgb(0 0 0 / 0.96) 32%,
+    rgb(0 0 0 / 0.78) 44%,
+    rgb(0 0 0 / 0.52) 56%,
+    rgb(0 0 0 / 0.28) 68%,
+    rgb(0 0 0 / 0.1) 80%,
+    rgb(0 0 0 / 0) 94%
+  );
 }
 
 [data-theme='dark'] .ds-home-hero::before {
-  background-color: color-mix(in srgb, var(--ds-canvas) 48%, transparent);
+  background-color: color-mix(in srgb, var(--ds-canvas) 84%, transparent);
   background-image: var(--ds-edition-pattern-grain);
+}
+
+/* Engaged: the wash lifts with the cinematic scrim so the full-bleed interactive map
+   is unobstructed (spec §5 Engaged behavior). */
+.ds-home-hero:has(.ds-map-scrim[data-cinematic-state='engaged'])::before {
+  opacity: 0;
 }
 
 .ds-home-hero__map {
@@ -856,7 +878,8 @@
      map tiles read under the words. No blur/glow/gradient. */
   background: transparent;
   color: var(--ds-ink);
-  border-right: var(--ds-border-width) solid var(--ds-border);
+  /* No border-right: the hero is one continuous map surface (repo-pyyw); legibility
+     comes from the `::before` gradient wash, never a hard column edge. */
   /* Owns document scroll over the full-panel map; map-surfaces.css must keep this auto. */
   pointer-events: auto;
 }
@@ -1029,9 +1052,31 @@
     padding: var(--ds-space-5) var(--ds-home-panel-padding-compact, var(--ds-space-6));
   }
 
+  /* Stacked layout: copy sits above the map row, so the legibility ramp turns
+     vertical — opaque behind the copy, fading down into the map. No border seam. */
+  .ds-home-hero::before {
+    grid-row: 1 / -1;
+    -webkit-mask-image: linear-gradient(
+      180deg,
+      rgb(0 0 0) 0%,
+      rgb(0 0 0 / 0.96) 40%,
+      rgb(0 0 0 / 0.6) 58%,
+      rgb(0 0 0 / 0.28) 74%,
+      rgb(0 0 0 / 0.1) 86%,
+      rgb(0 0 0 / 0) 100%
+    );
+    mask-image: linear-gradient(
+      180deg,
+      rgb(0 0 0) 0%,
+      rgb(0 0 0 / 0.96) 40%,
+      rgb(0 0 0 / 0.6) 58%,
+      rgb(0 0 0 / 0.28) 74%,
+      rgb(0 0 0 / 0.1) 86%,
+      rgb(0 0 0 / 0) 100%
+    );
+  }
+
   .ds-home-hero__copy {
-    border-right: 0;
-    border-bottom: var(--ds-border-width) solid var(--ds-border);
     padding: var(--ds-home-panel-padding-compact, var(--ds-space-6));
   }
 
@@ -2414,7 +2459,7 @@
   width: min(100%, 24rem);
   border-radius: var(--ds-radius-sm);
   background: color-mix(in srgb, var(--ds-ink) 12%, var(--ds-canvas));
-  animation: ds-pulse 1.2s ease-in-out infinite;
+  animation: ds-pulse 1.2s var(--ds-easing) infinite;
 }
 
 .ds-loading__bar--wide {

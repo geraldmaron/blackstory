@@ -161,6 +161,27 @@ export function markerRadiusPlusExpression(offset: number): readonly unknown[] {
   ]);
 }
 
+/**
+ * Same as `markerRadiusPlusExpression`, with an extra plain-JS multiplier baked
+ * into each zoom stop (e.g. the selected pulse ring's scale-over-time factor).
+ * MapLibre requires a `["zoom"]` read to be the input of a TOP-LEVEL
+ * `interpolate`/`step` — wrapping an already-built zoom `interpolate` in a
+ * further `['*', ..., factor]` throws "zoom expression may only be used as
+ * input to a top-level interpolate/step expression" at runtime. Baking
+ * `extraScale` into the stops (as this function does) keeps the interpolate
+ * over zoom the true top level, so the multiplier is safe.
+ */
+export function markerRadiusPlusScaledExpression(
+  offset: number,
+  extraScale: number,
+): readonly unknown[] {
+  return zoomScaledRadiusExpression((dataRadius, scale) => [
+    '*',
+    ['+', dataRadius, offset],
+    scale * extraScale,
+  ]);
+}
+
 /** Top-level zoom interpolate scaling a numeric paint expression/literal by zoom stops. */
 export function zoomScaledNumericExpression(
   value: readonly unknown[] | number,

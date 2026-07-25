@@ -47,6 +47,11 @@ import {
   ENTITY_SELECTED_INNER_LAYER_STYLE,
   ENTITY_SELECTED_LAYER_STYLE,
 } from './mapStyle';
+import {
+  ENTITY_SELECTED_PULSE_DURATION_MS,
+  entitySelectedPulseLayerStyle,
+  entitySelectedPulseStaticLayerStyle,
+} from './entity-paint';
 import { enrichMapFeatureCollection } from './enrich-map-features';
 import { DIGNITY_PALETTE } from './dignity-palette';
 import {
@@ -78,6 +83,52 @@ import {
 /** MapLibre RN Layer style typing is narrower than valid expression arrays. */
 function circleLayerStyle(style: Record<string, unknown>): Record<string, unknown> {
   return style;
+}
+
+/**
+ * Selected pulsing orientation ring (docs/ui/patterns-cinematic-map.md §2 rule 6,
+ * §3). ALWAYS mounted — same reasoning as the two selection layers above: this
+ * is the third layer in that always-mounted family, so selecting/deselecting
+ * only ever changes its `filter`, never its presence, and neighbors stay
+ * untouched. When reduced motion is on, ticks nothing and renders one static
+ * enlarged ring; otherwise a local `requestAnimationFrame` loop re-renders only
+ * THIS component (a leaf inside `GeoJSONSource`) once per frame — `MapScreen`
+ * and the other layers do not re-render alongside it.
+ */
+function SelectedPulseRing({
+  filter,
+  reduceMotion,
+}: {
+  readonly filter: readonly unknown[];
+  readonly reduceMotion: boolean;
+}) {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    if (reduceMotion) return;
+    let frame: number;
+    const start = Date.now();
+    const tick = () => {
+      const elapsed = (Date.now() - start) % ENTITY_SELECTED_PULSE_DURATION_MS;
+      setProgress(elapsed / ENTITY_SELECTED_PULSE_DURATION_MS);
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [reduceMotion]);
+
+  const style = reduceMotion
+    ? entitySelectedPulseStaticLayerStyle()
+    : entitySelectedPulseLayerStyle(progress);
+
+  return (
+    <Layer
+      id="entity-selected-pulse"
+      type="circle"
+      filter={filter as never}
+      style={circleLayerStyle(style)}
+    />
+  );
 }
 
 /** A one-shot camera instruction; `token` must strictly increase so each move fires once. */
@@ -121,6 +172,15 @@ export type MapScreenProps = {
   readonly cameraCommand?: MapCameraCommand | null;
   /** Collapse camera animation to an instant jump (OS reduce-motion). */
   readonly reduceMotion?: boolean;
+  /**
+   * Cinematic Map Backdrop gesture lock (docs/ui/patterns-cinematic-map.md §2
+   * rule 2, §5b). When false (Rest), the map is inert to touch — pan/zoom/
+   * rotate/pitch are disabled and feature/cluster presses are no-ops — so the
+   * bottom sheet fully owns the gesture surface. When true (Engaged), the map
+   * gets live hands-on gestures. Default true so surfaces that don't adopt the
+   * pattern (or MOB-011 tests) keep the map always interactive.
+   */
+  readonly interactive?: boolean;
   /**
    * When false, skips the in-map attribution pill so a parent (Explore) can
    * host it as a sibling under the bottom sheet. Default true (MOB-011).
@@ -175,6 +235,7 @@ export function MapScreen({
   selectedEntityId,
   cameraCommand,
   reduceMotion = false,
+  interactive = true,
   showAttribution = true,
   onMapEngineFailure,
 }: MapScreenProps) {
@@ -185,6 +246,20 @@ export function MapScreen({
   const [engineFailed, setEngineFailed] = useState(false);
 
   const encodedSource = useMemo(() => enrichMapFeatureCollection(source), [source]);
+
+  // Selection filter is memoized on `selectedEntityId` alone (not recreated on
+  // every MapScreen re-render, e.g. from a viewport/zoom update) so the
+  // selection layers' `filter` prop keeps a stable identity except when the
+  // selection actually changes. Falls back to a sentinel that matches no real
+  // feature ("" is never a valid entityId) so the layers stay MOUNTED at all
+  // times — toggling them in/out of the GeoJSONSource's children (as opposed to
+  // just updating their filter) was forcing MapLibre to re-encode/repaint the
+  // whole source, which read as the map reloading and made neighboring markers
+  // flash on select/deselect (repo-96j2, repo-mrmh).
+  const selectedEntityFilter = useMemo(
+    () => ['==', ['get', 'entityId'], selectedEntityId ?? ''],
+    [selectedEntityId],
+  );
 
   // Apply a one-shot camera command exactly once per token. Guarded so a mocked
   // (null-ref) map in tests and a missing command are both no-ops.
@@ -282,6 +357,9 @@ export function MapScreen({
       lngLat?: unknown;
     }>,
   ): void {
+    // Rest is locked (spec §2 rule 2): no selection through the map canvas
+    // until Engaged hands over live gestures.
+    if (!interactive) return;
     const feature = event?.nativeEvent?.features?.[0];
     if (!feature) return;
     const props = (feature.properties ?? {}) as Record<string, unknown>;
@@ -321,7 +399,14 @@ export function MapScreen({
   }
 
   return (
-    <View style={styles.container} testID="map-screen">
+    <View
+      style={styles.container}
+      testID="map-screen"
+      // Locked map is inert to assistive tech until Engaged hands over
+      // gestures (spec §4): screen readers / keyboard focus skip the canvas.
+      accessibilityElementsHidden={!interactive}
+      importantForAccessibility={interactive ? 'auto' : 'no-hide-descendants'}
+    >
       <Map
         style={StyleSheet.absoluteFill}
         mapStyle={JSON.stringify(style)}
@@ -333,6 +418,12 @@ export function MapScreen({
           setEngineFailed(true);
           onMapEngineFailure?.();
         }}
+        dragPan={interactive}
+        touchZoom={interactive}
+        doubleTapZoom={interactive}
+        doubleTapHoldZoom={interactive}
+        touchRotate={interactive}
+        touchPitch={interactive}
         testID="maplibre-map"
       >
         <Camera
@@ -419,24 +510,25 @@ export function MapScreen({
             }
             style={circleLayerStyle(ENTITY_EVENT_GLYPH_LAYER_STYLE as Record<string, unknown>)}
           />
-          {selectedEntityId ? (
-            <>
-              <Layer
-                id="entity-selected-inner"
-                type="circle"
-                filter={['==', ['get', 'entityId'], selectedEntityId]}
-                style={circleLayerStyle(
-                  ENTITY_SELECTED_INNER_LAYER_STYLE as Record<string, unknown>,
-                )}
-              />
-              <Layer
-                id="entity-selected"
-                type="circle"
-                filter={['==', ['get', 'entityId'], selectedEntityId]}
-                style={circleLayerStyle(ENTITY_SELECTED_LAYER_STYLE as Record<string, unknown>)}
-              />
-            </>
-          ) : null}
+          {/* Always mounted (never conditionally added/removed) so selecting or
+              deselecting an entity only updates these two layers' `filter` —
+              it never changes the GeoJSONSource's children shape, which is what
+              was forcing a full-source re-encode/repaint on every selection
+              change (repo-96j2, repo-mrmh). When nothing is selected, the
+              filter matches no feature and both layers render nothing. */}
+          <Layer
+            id="entity-selected-inner"
+            type="circle"
+            filter={selectedEntityFilter as never}
+            style={circleLayerStyle(ENTITY_SELECTED_INNER_LAYER_STYLE as Record<string, unknown>)}
+          />
+          <Layer
+            id="entity-selected"
+            type="circle"
+            filter={selectedEntityFilter as never}
+            style={circleLayerStyle(ENTITY_SELECTED_LAYER_STYLE as Record<string, unknown>)}
+          />
+          <SelectedPulseRing filter={selectedEntityFilter} reduceMotion={reduceMotion} />
         </GeoJSONSource>
       </Map>
       {showAttribution ? <MapAttribution /> : null}

@@ -68,7 +68,7 @@ Relative imports from `apps/web/src` use the paths above without the `@/` alias 
 
 | Surface | Patterns used |
 |---|---|
-| `/` home edition | `RecordBrowseControls`, `EditionFactIcon`, `RecordAnatomyPanel`, `home-featured-set`, `browse-mode` helpers (grain/grid canvas; no gutter mosaic) |
+| `/` home edition | `CinematicMapProvider`, `useCinematicMap`, `ExploreMapControl`, `CinematicScrim`, `MapIntroBeat` (Rest → Invite → Engaged); `RecordBrowseControls`, `EditionFactIcon`, `RecordAnatomyPanel`, `home-featured-set`, `browse-mode` helpers (grain/grid canvas; no gutter mosaic) |
 | `HomeFeaturedRecord` | `RecordBrowseControls`, `RecordAnatomyPanel` |
 | `HomeAbout` | `EditionFactIcon` (entry steps) |
 | `/explore` spotlight + instruments | `RecordBrowseControls`, `BrowseModeToggle`, `EditionFactIcon`, edition segmented tabs (`explore-edition.css`), decade stepper rail |
@@ -77,13 +77,13 @@ Relative imports from `apps/web/src` use the paths above without the `@/` alias 
 | `/stories` longform edition | `EditionAtmosphereMosaic`, edition Surface panels, story rail ledger |
 | `/books` challenged titles | `EditionAtmosphereMosaic`, `BooksRipRow`, `EditionFactIcon`, `BooksCoverArt`, `RecordAnatomyPanel` (detail place), `books-edition.css` |
 | `/themes` impact browse | `EditionAtmosphereMosaic`, edition Surface panels, theme-impact packet cards |
-| `/entity/[id]` record detail | `EditionAtmosphereMosaic`, `RecordAnatomyPanel`, `EditionFactIcon`, `EntityMastMedia` fail-closed, session nav |
+| `/entity/[id]` record detail | `EditionAtmosphereMosaic`, `RecordAnatomyPanel`, `EditionFactIcon`, `EntityMastMedia` fail-closed, session nav; `CinematicMapProvider`, `useCinematicMap`, `ExploreMapControl`, `CinematicMapClose`, `CinematicScrim` around the place-context locator map (`EntityLocationCinematicMap`, Rest → Engaged, no Invite) |
 | `/search` | Redirect only → `/history` (legacy URLs preserved) |
 | `/explore` `NarrativeCard` | `RecordAnatomyPanel`, `RecordBrowseControls` browse toolbar |
 | `/explore` shell | Footer omitted by design (`design-direction-v6-explore.md` §3); other routes use [`patterns-site-footer.md`](./patterns-site-footer.md) |
 | `/locate`, `/submit`, `/corrections`, status, 404, error | `UtilityEditionShell`, `UtilityEditionIntro`, `UtilityEditionBodyPanel` |
 
-Planned adopters — **Cinematic map backdrop** (`patterns-cinematic-map.md`): `/` home + mobile Explore tab first (reference implementations), then `/explore`, `/history`, `/entity/[id]` place context. Rest → Engaged everywhere; Rest → Invite → Engaged only on landing/narrative surfaces.
+**Cinematic map backdrop** adoption status: `/` home shipped (Rest → Invite → Engaged); mobile Explore tab shipped (Rest → Engaged, reference impl); `/explore` shipped (Rest → Engaged, dense surface); `/entity/[id]` place-context locator shipped (Rest → Engaged, supplementary-surface shape — starts Rest, explicit "View interactive map" tap engages, no auto-engage/Invite since the map sits inside other record content rather than being the page's point). `/history` has no existing map surface to adopt this onto — building one is tracked separately as new feature work in `repo-fnb5`, not started. See [`patterns-cinematic-map.md`](./patterns-cinematic-map.md) §1 for surface-specific guidance on Invite state eligibility.
 
 Planned adopters (same modules, no new chrome): `/errata`, `/support`, `/privacy` (`repo-49wc`). Entity detail session nav keeps `EntitySessionNav` (explicit back stack); see browse-mode doc.
 

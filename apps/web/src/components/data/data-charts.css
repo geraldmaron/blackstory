@@ -184,6 +184,15 @@
   max-width: min(100%, 45rem);
 }
 
+/*
+ * Spine chart (Black population by decade): viewBox is 960 wide to fit 24 census
+ * decades. Capping at 40rem forced a ~0.57 downscale, shrinking mono axis labels to
+ * ~6px. Let it render close to 1:1 so the section's primary chart stays legible.
+ */
+.ds-data-chart__svg--spine {
+  max-width: min(100%, 60rem);
+}
+
 .ds-data-chart__meta {
   font-family: var(--ds-font-mono);
   font-size: 0.8125rem;

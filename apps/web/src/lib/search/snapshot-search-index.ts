@@ -123,11 +123,23 @@ let cachedIndex: readonly PublicSearchIndexDoc[] | undefined;
  */
 export function getSnapshotSearchIndex(): readonly PublicSearchIndexDoc[] {
   if (!cachedIndex) {
-    const records = listPublicEntities().map(toSearchableRecord);
-    const { docs } = buildPublicSearchIndexDocs(SNAPSHOT_RELEASE_ID, records);
-    cachedIndex = docs;
+    cachedIndex = buildSearchIndexForEntities(listPublicEntities());
   }
   return cachedIndex;
+}
+
+/**
+ * Builds a search index from an arbitrary entity catalog (e.g. the live public release the
+ * `/history` page actually renders), so search covers the same records on screen rather than
+ * the bundled seed snapshot. Not memoized — callers own caching of the source catalog.
+ */
+export function buildSearchIndexForEntities(
+  entities: readonly PublicEntityView[],
+  releaseId: string = SNAPSHOT_RELEASE_ID,
+): readonly PublicSearchIndexDoc[] {
+  const records = entities.map(toSearchableRecord);
+  const { docs } = buildPublicSearchIndexDocs(releaseId, records);
+  return docs;
 }
 
 export function resetSnapshotSearchIndexCache(): void {

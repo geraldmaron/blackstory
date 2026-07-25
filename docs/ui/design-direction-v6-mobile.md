@@ -40,6 +40,8 @@ Larger Sora display / Inter subtitle roles remain for sparse utility heroes when
 
 ### Explore chrome (Pin Pulse)
 
+The Explore tab map implements the **Rest → Engaged** pattern from [`patterns-cinematic-map.md`](./patterns-cinematic-map.md): the sheet holds content locked over a fixed map (Rest); tapping **Explore the map** collapses the sheet and enables full gestures (Engaged). A floating **Close** relocks and restores the home camera.
+
 - **Signature:** Copper count chip over a near-full dark map plate; ghost icons stay muted paper-on-map. Copper ~10–15% of composition.
 - **Detents:** peek **11%** / half **34%** / full **52%** of sheet container (above tab bar). Peek is handle + invite line so the map owns first glance.
 - **Scope vocabulary:** `Nearby` (camera reported) / `All pinned` (pre-viewport). Mast shows compact `712 / 1,365` or `N pinned`. Peek rail invite: **Pull up for places** (count stays in the floating chip).

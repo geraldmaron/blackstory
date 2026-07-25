@@ -42,11 +42,23 @@ jest.mock('@maplibre/maplibre-react-native', () => {
       testID,
       mapStyle,
       onDidFailLoadingMap,
+      dragPan,
+      touchZoom,
+      doubleTapZoom,
+      doubleTapHoldZoom,
+      touchRotate,
+      touchPitch,
     }: {
       children?: unknown;
       testID?: string;
       mapStyle?: string;
       onDidFailLoadingMap?: () => void;
+      dragPan?: boolean;
+      touchZoom?: boolean;
+      doubleTapZoom?: boolean;
+      doubleTapHoldZoom?: boolean;
+      touchRotate?: boolean;
+      touchPitch?: boolean;
     }) =>
       React.createElement(
         View,
@@ -54,6 +66,12 @@ jest.mock('@maplibre/maplibre-react-native', () => {
           testID: testID ?? 'maplibre-map',
           accessibilityLabel: mapStyle,
           onDidFailLoadingMap,
+          dragPan,
+          touchZoom,
+          doubleTapZoom,
+          doubleTapHoldZoom,
+          touchRotate,
+          touchPitch,
         },
         children as never,
       ),
@@ -94,6 +112,7 @@ import {
   US_CAMERA_MAX_BOUNDS,
 } from '../mapCamera';
 import { ENTITY_CLUSTER_RADIUS_EXPR } from '../mapStyle';
+import { ENTITY_SELECTED_PULSE_STATIC_OPACITY } from '../entity-paint';
 import { DIGNITY_PALETTE } from '../dignity-palette';
 import { MAP_ATTRIBUTION_ABOVE_SHEET_BOTTOM } from '../MapAttribution';
 
@@ -188,6 +207,39 @@ describe('MapScreen — ready state', () => {
     expect(strokes).toContain(DIGNITY_PALETTE.selected);
   });
 
+  it('mounts the selected pulse ring even with no selection (filter matches nothing, layer stays present)', async () => {
+    const { getAllByTestId } = await render(<MapScreen />);
+    const layers = getAllByTestId('maplibre-layer');
+    const strokes = layers
+      .map((node) => JSON.parse(node.props.accessibilityLabel as string) as { circleStrokeColor?: string })
+      .map((style) => style.circleStrokeColor)
+      .filter((color): color is string => typeof color === 'string');
+    // The pulse ring is always mounted (never conditionally added), same
+    // reasoning as the two static selection layers — selecting/deselecting
+    // must only ever change its `filter`, never remount it.
+    expect(strokes).toContain(DIGNITY_PALETTE.selectedAccent);
+  });
+
+  it('renders a fixed, non-animating pulse ring under reduced motion', async () => {
+    const { getAllByTestId } = await render(
+      <MapScreen selectedEntityId="ent_selected" reduceMotion />,
+    );
+    const layers = getAllByTestId('maplibre-layer');
+    const pulse = layers
+      .map((node) => JSON.parse(node.props.accessibilityLabel as string) as {
+        circleStrokeColor?: string;
+        circleStrokeOpacity?: number;
+        circleColor?: string;
+      })
+      .find(
+        (style) =>
+          style.circleColor === 'transparent' &&
+          style.circleStrokeOpacity === ENTITY_SELECTED_PULSE_STATIC_OPACITY,
+      );
+    expect(pulse).toBeTruthy();
+    expect(pulse?.circleStrokeColor).toBe(DIGNITY_PALETTE.selectedAccent);
+  });
+
   it('eases the camera to a selection command with Explore view padding', async () => {
     const { rerender } = await render(<MapScreen />);
     await act(async () => {
@@ -251,6 +303,72 @@ describe('MapScreen — ready state', () => {
       fireEvent.press(getByTestId('map-attribution-toggle'));
     });
     expect(getByText(/OpenStreetMap contributors/)).toBeTruthy();
+  });
+});
+
+describe('MapScreen — Cinematic Map Backdrop gesture lock (interactive prop)', () => {
+  it('defaults to interactive (dragPan/touchZoom on) for surfaces that omit the prop', async () => {
+    const { getByTestId } = await render(<MapScreen />);
+    const map = getByTestId('maplibre-map');
+    expect(map.props.dragPan).toBe(true);
+    expect(map.props.touchZoom).toBe(true);
+    expect(map.props.touchRotate).toBe(true);
+    expect(map.props.touchPitch).toBe(true);
+  });
+
+  it('locks all touch gestures when interactive=false (Rest)', async () => {
+    const { getByTestId } = await render(<MapScreen interactive={false} />);
+    const map = getByTestId('maplibre-map', { includeHiddenElements: true });
+    expect(map.props.dragPan).toBe(false);
+    expect(map.props.touchZoom).toBe(false);
+    expect(map.props.doubleTapZoom).toBe(false);
+    expect(map.props.doubleTapHoldZoom).toBe(false);
+    expect(map.props.touchRotate).toBe(false);
+    expect(map.props.touchPitch).toBe(false);
+  });
+
+  it('hides the locked map from assistive tech (spec §4)', async () => {
+    const { getByTestId } = await render(<MapScreen interactive={false} />);
+    const screen = getByTestId('map-screen', { includeHiddenElements: true });
+    expect(screen.props.accessibilityElementsHidden).toBe(true);
+    expect(screen.props.importantForAccessibility).toBe('no-hide-descendants');
+  });
+
+  it('ignores feature presses while locked (Rest never selects through the canvas)', async () => {
+    const onFeaturePress = jest.fn();
+    const { getByTestId } = await render(
+      <MapScreen interactive={false} onFeaturePress={onFeaturePress} />,
+    );
+    fireEvent(getByTestId('maplibre-geojson-source', { includeHiddenElements: true }), 'press', {
+      nativeEvent: {
+        features: [
+          {
+            type: 'Feature',
+            geometry: { type: 'Point', coordinates: [-77.04, 38.9] },
+            properties: { entityId: 'ent_leaf' },
+          },
+        ],
+        lngLat: [-77.04, 38.9],
+      },
+    });
+    expect(onFeaturePress).not.toHaveBeenCalled();
+  });
+
+  it('ignores cluster presses while locked', async () => {
+    const { getByTestId } = await render(<MapScreen interactive={false} />);
+    fireEvent(getByTestId('maplibre-geojson-source', { includeHiddenElements: true }), 'press', {
+      nativeEvent: {
+        features: [
+          {
+            type: 'Feature',
+            geometry: { type: 'Point', coordinates: [-95.37, 29.76] },
+            properties: { point_count: 8, cluster: true },
+          },
+        ],
+        lngLat: [-95.37, 29.76],
+      },
+    });
+    expect(mockFlyTo).not.toHaveBeenCalled();
   });
 });
 

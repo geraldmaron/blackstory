@@ -60,6 +60,23 @@ load_mobile_env() {
     production) IOS_BUNDLE_ID="app.blackbook.mobile" ;;
     *) IOS_BUNDLE_ID="app.blackbook.mobile.dev" ;;
   esac
+
+  local prebuilt
+  prebuilt="$(prebuilt_bundle_id)"
+  if [[ -n "$prebuilt" && "$prebuilt" != "$IOS_BUNDLE_ID" ]]; then
+    echo "mobile-ios-release: NOTE — ios/ was prebuilt for '${prebuilt}' but APP_VARIANT='${APP_VARIANT}' resolves to '${IOS_BUNDLE_ID}'; using the prebuilt bundle id (ios/ reflects the last 'expo prebuild', not .env.local)." >&2
+    IOS_BUNDLE_ID="$prebuilt"
+  fi
+}
+
+prebuilt_bundle_id() {
+  # The native ios/ project's baked PRODUCT_BUNDLE_IDENTIFIER can drift from
+  # .env.local's APP_VARIANT (e.g. prebuilt with preview, .env.local later
+  # switched to development). Trust what was actually prebuilt over the env.
+  local pbxproj
+  pbxproj="$(find "$MOBILE_DIR/ios" -maxdepth 2 -name project.pbxproj 2>/dev/null | head -1)"
+  [[ -n "$pbxproj" ]] || return 1
+  grep -m1 'PRODUCT_BUNDLE_IDENTIFIER' "$pbxproj" | sed -E 's/.*= *([^;]+);.*/\1/'
 }
 
 booted_simulator_udid() {

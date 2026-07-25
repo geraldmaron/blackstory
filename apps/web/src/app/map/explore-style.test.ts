@@ -30,6 +30,16 @@ import {
   ENTITY_CLUSTER_OPACITY,
   ENTITY_HALO_OPACITY,
   ENTITY_POINT_FILL_OPACITY,
+  ENTITY_SELECTED_PULSE_OPACITY_FROM,
+  ENTITY_SELECTED_PULSE_OPACITY_TO,
+  ENTITY_SELECTED_PULSE_SCALE_FROM,
+  ENTITY_SELECTED_PULSE_SCALE_TO,
+  ENTITY_SELECTED_PULSE_STATIC_OPACITY,
+  ENTITY_SELECTED_PULSE_STATIC_SCALE,
+  ENTITY_SELECTED_RADIUS_OFFSET,
+  entitySelectedPulseOpacity,
+  entitySelectedPulseRadiusExpression,
+  entitySelectedPulseStaticRadiusExpression,
   EXPLORE_CLUSTER_LAYER_ID,
   EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
   EXPLORE_COUNTY_LABEL_LAYER_ID,
@@ -48,7 +58,9 @@ import {
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
   PLATE_BACKGROUND_OPACITY,
   PLATE_STATE_FILL_OPACITY,
+  selectedPointFilterExpression,
 } from './explore-style';
+import { markerRadiusPlusScaledExpression } from '../../lib/map-experience/marker-size';
 
 type LayerLike = {
   readonly id: string;
@@ -152,6 +164,75 @@ test('selected-entity ring layer exists and starts with an empty filter', () => 
   assert.ok(selected, 'expected selected point ring layer');
   assert.deepEqual(selected.filter, ['==', ['get', 'entityId'], '']);
   assert.equal(selected.paint?.['circle-color'], 'rgba(0,0,0,0)');
+});
+
+test('selectedPointFilterExpression matches only the selected feature, never all/none ambiguously', () => {
+  assert.deepEqual(selectedPointFilterExpression(undefined), ['==', ['get', 'entityId'], '']);
+  assert.deepEqual(selectedPointFilterExpression(''), ['==', ['get', 'entityId'], '']);
+  assert.deepEqual(selectedPointFilterExpression('e-123'), ['==', ['get', 'entityId'], 'e-123']);
+  // Deselecting (undefined) after a selection must resolve back to the same empty-match
+  // filter the style boots with — no feature's `entityId` is ever `''`, so this matches
+  // zero features rather than "select everything".
+  assert.deepEqual(selectedPointFilterExpression(undefined), ['==', ['get', 'entityId'], '']);
+});
+
+test('entitySelectedPulseRadiusExpression scales the ring from 1x to ~2.1x over the loop (patterns-cinematic-map.md §3)', () => {
+  assert.deepEqual(
+    entitySelectedPulseRadiusExpression(0),
+    markerRadiusPlusScaledExpression(ENTITY_SELECTED_RADIUS_OFFSET, ENTITY_SELECTED_PULSE_SCALE_FROM),
+  );
+  assert.deepEqual(
+    entitySelectedPulseRadiusExpression(1),
+    markerRadiusPlusScaledExpression(ENTITY_SELECTED_RADIUS_OFFSET, ENTITY_SELECTED_PULSE_SCALE_TO),
+  );
+  // Ease-in-out is monotonic-ish across the loop midpoint — not asserting the exact eased value,
+  // just that mid-loop sits strictly between the two endpoints.
+  const midExpression = entitySelectedPulseRadiusExpression(0.5) as unknown[];
+  assert.notDeepEqual(midExpression, entitySelectedPulseRadiusExpression(0));
+  assert.notDeepEqual(midExpression, entitySelectedPulseRadiusExpression(1));
+});
+
+test('entitySelectedPulseOpacity fades from 0.9 to 0.12 over the loop (patterns-cinematic-map.md §3)', () => {
+  assert.equal(entitySelectedPulseOpacity(0), ENTITY_SELECTED_PULSE_OPACITY_FROM);
+  assert.equal(entitySelectedPulseOpacity(1), ENTITY_SELECTED_PULSE_OPACITY_TO);
+  const mid = entitySelectedPulseOpacity(0.5);
+  assert.ok(mid < ENTITY_SELECTED_PULSE_OPACITY_FROM && mid > ENTITY_SELECTED_PULSE_OPACITY_TO);
+});
+
+test('entitySelectedPulseStaticRadiusExpression matches the reduced-motion static ring (scale ~1.35)', () => {
+  assert.deepEqual(
+    entitySelectedPulseStaticRadiusExpression(),
+    markerRadiusPlusScaledExpression(ENTITY_SELECTED_RADIUS_OFFSET, ENTITY_SELECTED_PULSE_STATIC_SCALE),
+  );
+  assert.equal(ENTITY_SELECTED_PULSE_STATIC_SCALE, 1.35);
+  assert.equal(ENTITY_SELECTED_PULSE_STATIC_OPACITY, 0.85);
+});
+
+test('selection touches only the dedicated ring layer — main entity layers never filter/paint on entityId', () => {
+  const style = buildStyleFixture('presence');
+  // Selecting/deselecting must remain single-feature: the shared point/halo/cluster layers that
+  // paint every pin carry no filter or paint expression that reads `entityId`, so a selection
+  // change can only ever update EXPLORE_SELECTED_POINT_LAYER_ID's filter, never re-filter or
+  // re-encode the layers/source neighboring pins render from (patterns-cinematic-map.md §2 rule 5).
+  const neighborLayerIds = [
+    EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
+    EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
+    EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
+    EXPLORE_CLUSTER_LAYER_ID,
+  ];
+  for (const id of neighborLayerIds) {
+    const layer = layerById(style, id) as LayerLike & { filter?: unknown };
+    const serializedFilter = JSON.stringify(layer.filter ?? null);
+    const serializedPaint = JSON.stringify(layer.paint ?? {});
+    assert.ok(
+      !serializedFilter.includes('entityId'),
+      `${id}'s filter must not depend on entityId/selection`,
+    );
+    assert.ok(
+      !serializedPaint.includes('entityId'),
+      `${id}'s paint must not depend on entityId/selection`,
+    );
+  }
 });
 
 test('state density source starts empty with promoteId for feature-state morphs', () => {

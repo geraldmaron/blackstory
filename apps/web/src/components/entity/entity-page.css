@@ -97,6 +97,56 @@
   margin: 0;
 }
 
+/*
+ * Cinematic Map Backdrop adoption (bead repo-4v3a.6). `cinematic-map.css`'s scrim/rail/lock
+ * rules are authored for `MapStage`'s full-viewport persistent plate (`position: fixed` scrim,
+ * `.ds-map-surface`/`.ds-map-stage` ancestor-descendant lock selector). This locator map is a
+ * small contained-in-flow figure instead, so these overrides re-scope the same mechanics —
+ * scrim confined to the box, pointer lock keyed off this surface's own scrim state — using
+ * higher specificity so they win regardless of stylesheet import order.
+ */
+.ds-entity-location-map-surface {
+  position: relative;
+  border-radius: var(--ds-radius-md);
+  overflow: hidden;
+}
+
+.ds-entity-location-map-surface .ds-map-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.ds-entity-location-map-surface .ds-map-stage {
+  position: relative;
+  z-index: 0;
+  /* Reserve the map plate's height (matches `.ds-entity-location-map__frame`'s 14rem) so the
+   * surface never collapses to 0 while the lazy MapLibre chunk / MapFrame placeholder is still
+   * resolving. Without this the absolutely-positioned `.ds-cinematic-rail` button lands at y≈0
+   * over the page header and real pointer clicks miss it, so "View interactive map" appears dead
+   * even though the engage wiring is correct (bead repo-gsl7). */
+  min-height: 14rem;
+}
+
+/* Rest/Invite: locked, natural page scroll (spec §1/§2 rule 2). */
+.ds-entity-location-map-surface:has(.ds-map-scrim:not([data-cinematic-state='engaged']))
+  .ds-map-stage {
+  pointer-events: none;
+}
+
+/* Engaged: live map control. */
+.ds-entity-location-map-surface:has(.ds-map-scrim[data-cinematic-state='engaged']) .ds-map-stage {
+  pointer-events: auto;
+}
+
+.ds-entity-location-map-surface .ds-cinematic-rail {
+  position: absolute;
+  top: var(--ds-space-3);
+  right: var(--ds-space-3);
+  left: auto;
+  z-index: 3;
+}
+
 .ds-entity-location-map__frame {
   position: relative;
   width: 100%;
@@ -105,12 +155,12 @@
   border: var(--ds-border-width) solid var(--ds-rule);
   border-radius: var(--ds-radius-md);
   /* Pre-style-load flash — matches MapStage ocean plate per theme. */
-  background: #080606;
+  background: var(--ds-canvas);
   overflow: hidden;
 }
 
 [data-theme='light'] .ds-entity-location-map__frame {
-  background: #f4efe5;
+  background: var(--ds-canvas);
 }
 
 .ds-entity-location-map__frame[data-load-state='loading']::after {

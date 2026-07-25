@@ -32,6 +32,7 @@ import {
   markerHaloRadiusExpression,
   markerRadiusExpression,
   markerRadiusPlusExpression,
+  markerRadiusPlusScaledExpression,
   zoomScaledNumericExpression,
 } from '../../lib/map-experience/marker-size';
 import type {
@@ -287,6 +288,91 @@ export const ENTITY_RING_FILL_OPACITY = 0.2;
  */
 export const PLATE_BACKGROUND_OPACITY = 1;
 export const PLATE_STATE_FILL_OPACITY = 1;
+
+/**
+ * Filter for the single-feature selection ring layer (`EXPLORE_SELECTED_POINT_LAYER_ID`).
+ * This is the ONLY place selection state touches a MapLibre expression: it is a `setFilter`
+ * on a dedicated one-feature layer, never a re-filter/re-encode of the main entities source
+ * or its point/halo layers (whose filters and paint never reference `entityId`/selection —
+ * see `patterns-cinematic-map.md` §2 rule 5 / §6). Selecting or deselecting therefore mutates
+ * only this tiny layer's filter; every neighboring pin's paint is untouched and does not repaint.
+ * Exported so both the initial style (empty selection) and `MapStage`'s live `setFilter` calls
+ * share one definition instead of hand-rolling the expression twice.
+ */
+export function selectedPointFilterExpression(
+  entityId: string | undefined,
+): ExpressionSpecification {
+  const value = entityId && entityId.length > 0 ? entityId : '';
+  return ['==', ['get', 'entityId'], value] as unknown as ExpressionSpecification;
+}
+
+// ---------------------------------------------------------------------------
+// Selected pulse ring (docs/ui/patterns-cinematic-map.md §3 "Selection pulse",
+// §3 "Reduced motion"). Copper ring, one feature, loops 1.8s ease-in-out
+// scaling ~1x -> ~2.1x while fading 0.9 -> 0.12. Reduced motion replaces the
+// loop with a single static enlarged ring (opacity ~0.85, scale ~1.35). Mirrors
+// mobile's `apps/mobile/src/features/map/entity-paint.ts` pulse constants/pure
+// functions so both platforms hit the same target visual values.
+// ---------------------------------------------------------------------------
+
+/** Halo offset the selection ring renders beyond the base marker radius (matches mobile's
+ * `ENTITY_SELECTED_RADIUS_OFFSET` and the `EXPLORE_SELECTED_POINT_LAYER_ID` layer's base radius). */
+export const ENTITY_SELECTED_RADIUS_OFFSET = 6;
+/** One full pulse loop, ease-in-out (spec §3). */
+export const ENTITY_SELECTED_PULSE_DURATION_MS = 1800;
+/** Ring scale at the start (`progress === 0`) of the loop. */
+export const ENTITY_SELECTED_PULSE_SCALE_FROM = 1;
+/** Ring scale at the end (`progress === 1`) of the loop — spec's "~2.1". */
+export const ENTITY_SELECTED_PULSE_SCALE_TO = 2.1;
+/** Stroke opacity at the start of the loop — spec's "0.9". */
+export const ENTITY_SELECTED_PULSE_OPACITY_FROM = 0.9;
+/** Stroke opacity at the end of the loop — spec's "0.12". */
+export const ENTITY_SELECTED_PULSE_OPACITY_TO = 0.12;
+/** Reduced-motion static ring scale — spec's "~1.35". */
+export const ENTITY_SELECTED_PULSE_STATIC_SCALE = 1.35;
+/** Reduced-motion static ring opacity — spec's "~0.85". */
+export const ENTITY_SELECTED_PULSE_STATIC_OPACITY = 0.85;
+
+function clamp01(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.max(0, Math.min(1, value));
+}
+
+/** Cosine ease-in-out over `[0, 1]`; symmetric acceleration in and out. Exported so the pulse
+ * curve is unit-testable independent of `requestAnimationFrame`/MapLibre. */
+export function pulseEaseInOut(progress: number): number {
+  const clamped = clamp01(progress);
+  return (1 - Math.cos(clamped * Math.PI)) / 2;
+}
+
+function lerp(from: number, to: number, eased: number): number {
+  return from + (to - from) * eased;
+}
+
+/**
+ * Selected pulse ring paint for one animation frame. `progress` is `[0, 1]` within the loop;
+ * the caller (`MapStage`'s `startSelectedEntityPulse`) is the only thing that ticks it via
+ * `requestAnimationFrame`, so this stays a pure function of one number.
+ */
+export function entitySelectedPulseRadiusExpression(progress: number): ExpressionSpecification {
+  const eased = pulseEaseInOut(progress);
+  const scale = lerp(ENTITY_SELECTED_PULSE_SCALE_FROM, ENTITY_SELECTED_PULSE_SCALE_TO, eased);
+  return markerRadiusPlusScaledExpression(ENTITY_SELECTED_RADIUS_OFFSET, scale);
+}
+
+/** Stroke opacity for one animation frame at `progress` — same ease-in-out curve as the radius. */
+export function entitySelectedPulseOpacity(progress: number): number {
+  const eased = pulseEaseInOut(progress);
+  return lerp(ENTITY_SELECTED_PULSE_OPACITY_FROM, ENTITY_SELECTED_PULSE_OPACITY_TO, eased);
+}
+
+/** Reduced-motion static ring radius: no timer, fixed enlarged scale. */
+export function entitySelectedPulseStaticRadiusExpression(): ExpressionSpecification {
+  return markerRadiusPlusScaledExpression(
+    ENTITY_SELECTED_RADIUS_OFFSET,
+    ENTITY_SELECTED_PULSE_STATIC_SCALE,
+  );
+}
 
 const GLYPH_PAINT_SIGNATURE: Readonly<Record<string, KindGlyphPaintSignature>> = {
   // Solid-fill kinds sit below full opacity so geography stays legible through the disc.
@@ -1121,9 +1207,9 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         id: EXPLORE_SELECTED_POINT_LAYER_ID,
         type: 'circle',
         source: EXPLORE_ENTITIES_SOURCE_ID,
-        filter: ['==', ['get', 'entityId'], ''],
+        filter: selectedPointFilterExpression(undefined),
         paint: {
-          'circle-radius': markerRadiusPlusExpression(6),
+          'circle-radius': markerRadiusPlusExpression(ENTITY_SELECTED_RADIUS_OFFSET),
           'circle-color': 'rgba(0,0,0,0)',
           'circle-stroke-width': zoomScaledNumericExpression(2.5),
           // Copper orientation ring (graphic accent) — MapStage pulses stroke opacity when selected.

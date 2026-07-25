@@ -15,13 +15,24 @@
  * remains fully mounted and interactive — a failed map never strands the reader.
  */
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { StyleSheet, View, type LayoutChangeEvent } from 'react-native';
+import { Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated';
+import { Ionicons } from '@expo/vector-icons';
 import { useEditionTabBarInset } from '@/shell/edition-chrome';
-import { ApiStatusBanner, ScreenCanvas, Z_LAYER, space, useThemeColors } from '@/ui';
+import {
+  ApiStatusBanner,
+  ScreenCanvas,
+  Z_LAYER,
+  duration,
+  space,
+  useThemeColors,
+  MIN_TOUCH_TARGET,
+} from '@/ui';
 import {
   MapAttribution,
   MapScreen,
+  CINEMATIC_MAP_INITIAL_STATE,
+  cinematicMapReducer,
   type MapFeatureCollection,
   type MapLoadState,
 } from '@/features/map';
@@ -103,6 +114,20 @@ export function ExploreView({
 
   const allFeatures = useMemo(() => toExploreFeatures(source), [source]);
   const [state, dispatch] = useReducer(exploreReducer, filters, initialExploreState);
+  // Cinematic Map Backdrop rest|invite|engaged toggle (docs/ui/patterns-cinematic-map.md
+  // §2, §5b; repo-4v3a.8). Reuses the mobile state core from repo-4v3a.7 for the
+  // lock/engage transitions only — camera + single-feature selection already flow
+  // through `exploreReducer` above (its `presetRequested`/`entitySelected` actions
+  // already produce one-shot tokened `cameraCommand`s via `mapCamera.ts`), so this
+  // reducer is not asked to duplicate that; it only tracks Rest vs Engaged so the
+  // map's gesture lock (`MapScreen`'s `interactive` prop) and the Explore/Close
+  // chrome know which state they're in. Invite is unused here per the bead (ship
+  // Rest -> Engaged first).
+  const [cinematic, cinematicDispatch] = useReducer(
+    cinematicMapReducer,
+    CINEMATIC_MAP_INITIAL_STATE,
+  );
+  const mapEngaged = cinematic.state === 'engaged';
   const [instrumentsOpen, setInstrumentsOpen] = useState(false);
   // Single controlled source of truth for the sheet snap (the gesture is
   // authoritative — see `onSnapIndexChange`). A separate `recordsExpanded`
@@ -281,6 +306,28 @@ export function ExploreView({
     dispatch({ type: 'entitySelected', entityId: next.entityId, point: next.coordinates });
   }, [listFeatures, selectedIndex]);
 
+  // Rest -> Engaged (spec §2 rule 3): "Explore the map" lives in the sheet
+  // (ExploreRecordsRail header). Collapse the sheet toward peek so the map
+  // takes the majority of the surface once it goes live.
+  const handleMapEngage = useCallback(() => {
+    cinematicDispatch({ type: 'engage' });
+    setInstrumentsOpen(false);
+    setSnapIndex(EXPLORE_SHEET_PEEK);
+  }, []);
+
+  // Any state -> Rest (spec §2 rule 4): relock, deselect, and restore the
+  // surface's home camera preset. Reuses exploreReducer's own preset action
+  // (and therefore mapCamera.ts's cameraForPreset) rather than inventing a
+  // second camera-command source.
+  const handleMapClose = useCallback(() => {
+    cinematicDispatch({ type: 'close' });
+    if (state.selectedId) {
+      dispatch({ type: 'entityDeselected' });
+    }
+    dispatch({ type: 'presetRequested', preset: 'national' });
+    setSnapIndex(EXPLORE_SHEET_PEEK);
+  }, [state.selectedId]);
+
   return (
     <ScreenCanvas edges={['top', 'left', 'right']}>
       <ApiStatusBanner compact />
@@ -299,6 +346,7 @@ export function ExploreView({
           selectedEntityId={state.selectedId}
           cameraCommand={cameraCommand}
           showAttribution={false}
+          interactive={mapEngaged}
           onViewportChange={(bbox) => dispatch({ type: 'viewportChanged', bbox })}
           onFeaturePress={(entityId) => {
             const feature = catalogFeatures.find((f) => f.entityId === entityId);
@@ -309,6 +357,26 @@ export function ExploreView({
           }}
         />
 
+        {mapLive && mapEngaged ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Close map"
+            accessibilityHint="Relocks the map and returns to the records sheet"
+            testID="explore-map-close"
+            onPress={handleMapClose}
+            style={({ pressed }) => [
+              styles.closeControl,
+              {
+                top: space['2'],
+                backgroundColor: pressed ? theme.surfacePressed : theme.surfaceRaised,
+                borderColor: theme.border,
+              },
+            ]}
+          >
+            <Ionicons name="close" size={20} color={theme.ink} />
+          </Pressable>
+        ) : null}
+
         <MapAttribution
           bottom={attributionBottom}
           visible={attributionVisible}
@@ -316,7 +384,7 @@ export function ExploreView({
           compact
         />
 
-        {mapLive ? (
+        {mapLive && !mapEngaged ? (
           <ExploreFloatingChrome
             inViewCount={listFeatures.length}
             releaseCount={allFeatures.length}
@@ -333,15 +401,15 @@ export function ExploreView({
           />
         ) : null}
 
-        {mapLive && instrumentsOpen ? (
+        {mapLive && !mapEngaged && instrumentsOpen ? (
           <Animated.View
             style={[
               styles.instrumentsOverlay,
               { top: instrumentsTop, bottom: attributionBottom },
             ]}
             pointerEvents="box-none"
-            entering={reduceMotion ? undefined : FadeInDown.duration(160)}
-            exiting={reduceMotion ? undefined : FadeOutUp.duration(160)}
+            entering={reduceMotion ? undefined : FadeInDown.duration(duration.durationFast)}
+            exiting={reduceMotion ? undefined : FadeOutUp.duration(duration.durationFast)}
           >
             <ExploreInstrumentsPanel
               filters={state.filters}
@@ -398,6 +466,7 @@ export function ExploreView({
                   point: feature.coordinates,
                 })
               }
+              onExplore={mapLive && !mapEngaged ? handleMapEngage : undefined}
             />
           )}
         </ExploreBottomSheet>
@@ -424,6 +493,18 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     // backgroundColor + height are set inline from theme + tabBarHeight
+  },
+  closeControl: {
+    position: 'absolute',
+    right: space['2'],
+    width: MIN_TOUCH_TARGET,
+    height: MIN_TOUCH_TARGET,
+    borderRadius: MIN_TOUCH_TARGET / 2,
+    borderWidth: StyleSheet.hairlineWidth,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: Z_LAYER.overlay,
+    elevation: Z_LAYER.overlay,
   },
   instrumentsOverlay: {
     position: 'absolute',

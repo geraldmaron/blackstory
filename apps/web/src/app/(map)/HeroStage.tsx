@@ -8,7 +8,7 @@
  * clears the inset, flies the live camera, then routes through `engage()` so the transition
  * continues on `/explore`.
  */
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Notice } from '@repo/ui';
@@ -39,6 +39,15 @@ import {
 import { shouldFadeDecadePatch } from '../map/decade-layer-transition';
 import { HeroHeadlineMorph } from './HeroHeadlineMorph';
 import { useMapStage } from './MapStage';
+import {
+  CinematicMapProvider,
+  useCinematicMap,
+  type CinematicMapDriver,
+} from '../../components/patterns/cinematic-map/CinematicMapProvider';
+import { CinematicScrim } from '../../components/patterns/cinematic-map/CinematicScrim';
+import { ExploreMapControl } from '../../components/patterns/cinematic-map/ExploreMapControl';
+import { CinematicMapClose } from '../../components/patterns/cinematic-map/CinematicMapClose';
+import { MapIntroBeat } from '../../components/patterns/cinematic-map/MapIntroBeat';
 
 export type HeroStageProps = {
   readonly featureCollection: ExploreMapFeatureCollection;
@@ -52,10 +61,6 @@ export type HeroStageProps = {
   readonly eraSpan?: string | undefined;
 };
 
-const RESTING_HREF = buildExploreHref({
-  filters: DEFAULT_EXPLORE_FILTERS,
-  ...defaultExploreOverlayState(),
-});
 const TRANSITION_FLAG = 'ds-map-transition';
 const PLACE_SCROLL_TARGET = '#beat-a';
 
@@ -118,7 +123,81 @@ function completeFrameIndex(frames: readonly DecadeFlowFrame[]): number {
   return completeIndex >= 0 ? completeIndex : frames.length - 1;
 }
 
-export function HeroStage({
+/** Up to two point-geometry features to drive the home Invite beats (spec §1 Invite row).
+ * Home is a landing/narrative surface, so a short scroll-driven camera sequence is in scope
+ * (§1 "When to use"). Falls back to zero beats gracefully when the release has no point pins. */
+function inviteBeatEntities(
+  featureCollection: ExploreMapFeatureCollection,
+): readonly ExploreMapFeatureCollection['features'][number][] {
+  return featureCollection.features.filter((feature) => feature.geometry.type === 'Point').slice(0, 2);
+}
+
+/** Wraps its children in a `MapIntroBeat` scroll-anchor when a beat entity is available;
+ * otherwise renders the children plain (no release features -> no Invite sequence, §1
+ * "graceful when the release has no point pins"). Keeps `HeroStagePanel`'s JSX from branching
+ * on `entityId` presence at every call site. */
+function HeroInviteBeat({
+  beat,
+  preset = 'national',
+  children,
+}: {
+  readonly beat: ExploreMapFeatureCollection['features'][number] | undefined;
+  readonly preset?: 'national' | 'state' | 'locality' | 'point';
+  readonly children: ReactNode;
+}) {
+  if (!beat) return <>{children}</>;
+  return (
+    <MapIntroBeat preset={preset} entityId={beat.properties.entityId}>
+      {children}
+    </MapIntroBeat>
+  );
+}
+
+export function HeroStage(props: HeroStageProps) {
+  const stage = useMapStage();
+  const stageApiRef = useRef(stage);
+  stageApiRef.current = stage;
+  const { featureCollection } = props;
+
+  const driver = useMemo<CinematicMapDriver>(
+    () => ({
+      select: (entityId: string) => {
+        const feature = featureCollection.features.find(
+          (item) => item.properties.entityId === entityId,
+        );
+        stageApiRef.current.applyViewState({
+          selectedState: undefined,
+          selectedEdge: undefined,
+          selectedEntity: entityId,
+        });
+        if (feature?.geometry.type === 'Point') {
+          const [lng, lat] = feature.geometry.coordinates;
+          stageApiRef.current.flyPreset('point', { center: [lng, lat], zoom: CAMERA_POINT_ZOOM });
+        }
+      },
+      deselect: () => {
+        stageApiRef.current.applyViewState({
+          selectedState: undefined,
+          selectedEdge: undefined,
+          selectedEntity: undefined,
+        });
+      },
+      flyTo: (preset) => {
+        if (preset !== 'national') return;
+        stageApiRef.current.flyPreset('national', { bounds: US_CONUS_BOUNDS }, { mode: 'ease' });
+      },
+    }),
+    [featureCollection],
+  );
+
+  return (
+    <CinematicMapProvider homePreset="national" driver={driver}>
+      <HeroStagePanel {...props} />
+    </CinematicMapProvider>
+  );
+}
+
+function HeroStagePanel({
   featureCollection,
   jurisdictionAreaFeatures,
   featureCount,
@@ -128,14 +207,21 @@ export function HeroStage({
 }: HeroStageProps) {
   const router = useRouter();
   const stage = useMapStage();
+  const cinematic = useCinematicMap();
+  const cinematicStateRef = useRef(cinematic.state);
+  cinematicStateRef.current = cinematic.state;
   const stageApiRef = useRef(stage);
   stageApiRef.current = stage;
   const heroPanelRef = useRef<HTMLElement | null>(null);
   const copyColumnRef = useRef<HTMLDivElement | null>(null);
   const [dissolving, setDissolving] = useState(false);
   const archiveFrameIndex = completeFrameIndex(decadeFrames);
+  const inviteBeats = inviteBeatEntities(featureCollection);
 
-  const engage = useCallback(
+  /** Deep-action navigation: selecting a specific entity/state, or the legacy full-hero
+   * dissolve-to-/explore handoff. The base "Explore the map" control no longer routes away
+   * (spec §1: Engaged happens in place) — only these deliberate deep actions still navigate. */
+  const navigateToExplore = useCallback(
     (href: string) => {
       markTransition();
       clearHeroMapInset();
@@ -144,6 +230,20 @@ export function HeroStage({
     },
     [router],
   );
+
+  // Engage in place: unlock the full-bleed interactive map; Close (spec §2 rule 4) relocks and
+  // restores the hero inset + home camera via `cinematic.close()` -> the driver's `flyTo`.
+  useEffect(() => {
+    const panel = heroPanelRef.current;
+    if (cinematic.state === 'engaged') {
+      clearHeroMapInset();
+      stageApiRef.current.resize();
+      stageApiRef.current.flyPreset('national', { bounds: US_CONUS_BOUNDS }, { mode: 'ease' });
+    } else if (panel) {
+      applyHeroMapInset(panel);
+      stageApiRef.current.resize();
+    }
+  }, [cinematic.state]);
 
   useEffect(() => {
     const api = stageApiRef.current;
@@ -205,6 +305,9 @@ export function HeroStage({
     const sync = () => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
+        // Engaged: the plate is full-bleed (spec §5 Engaged behavior); the inset-follow loop
+        // stays inert so it never fights the driver's engage/close camera calls.
+        if (cinematicStateRef.current === 'engaged') return;
         if (!applyHeroMapInset(panel)) return;
         stageApiRef.current.resize();
         const rect = panel.getBoundingClientRect();
@@ -297,7 +400,7 @@ export function HeroStage({
         if (feature?.geometry.type === 'Point') {
           const [lng, lat] = feature.geometry.coordinates;
           stage.flyPreset('point', { center: [lng, lat], zoom: CAMERA_POINT_ZOOM });
-          engage(
+          navigateToExplore(
             buildExploreHref({
               filters: DEFAULT_EXPLORE_FILTERS,
               ...defaultExploreOverlayState(),
@@ -315,7 +418,7 @@ export function HeroStage({
         if (viewport) {
           stage.flyPreset('state', { center: [viewport.lng, viewport.lat], zoom: viewport.zoom });
         }
-        engage(
+        navigateToExplore(
           buildExploreHref({
             filters: DEFAULT_EXPLORE_FILTERS,
             ...defaultExploreOverlayState(),
@@ -325,7 +428,7 @@ export function HeroStage({
       }),
       stage.subscribe('activate', (viewport: ExploreViewport) => {
         stage.flyPreset('locality', { center: [viewport.lng, viewport.lat], zoom: viewport.zoom });
-        engage(
+        navigateToExplore(
           buildExploreHref({
             filters: DEFAULT_EXPLORE_FILTERS,
             ...defaultExploreOverlayState(),
@@ -337,28 +440,7 @@ export function HeroStage({
     return () => {
       for (const unsub of unsubscribe) unsub();
     };
-  }, [stage, featureCollection, engage, router]);
-
-  function handleExploreClick(event: React.MouseEvent<HTMLAnchorElement>) {
-    event.preventDefault();
-    const panel = heroPanelRef.current;
-    const copy = copyColumnRef.current;
-    if (panel) {
-      stage.flyPreset(
-        'national',
-        { bounds: US_CONUS_BOUNDS },
-        {
-          padding: heroNationalCameraPadding({
-            panel: panel.getBoundingClientRect(),
-            copy: copy?.getBoundingClientRect() ?? null,
-          }),
-        },
-      );
-    } else {
-      stage.flyPreset('national', { bounds: US_CONUS_BOUNDS });
-    }
-    engage(RESTING_HREF);
-  }
+  }, [stage, featureCollection, navigateToExplore, router]);
 
   const stateLabel = `${stateCount} state${stateCount === 1 ? '' : 's'}`;
   const eraFact = displayEraSpan(eraSpan);
@@ -381,51 +463,66 @@ export function HeroStage({
         </Notice>
       ) : null}
 
+      <CinematicScrim />
+
       <div className="ds-home-hero__map" aria-label="Live archive coverage map">
         <div className="ds-home-hero__map-readout">
           <p className="ds-home-hero__map-caption">Live coverage · archive pins</p>
         </div>
       </div>
 
+      <div
+        className="ds-cinematic-rail"
+        style={{ gridColumn: '1 / -1', gridRow: 1, justifySelf: 'end', alignSelf: 'start' }}
+      >
+        <CinematicMapClose />
+      </div>
+
       <div ref={copyColumnRef} className="ds-home-hero__copy">
-        <p className="ds-home-hero__kicker">
-          <KickerTickIcon />
-          Place-connected archive
-        </p>
-        <HeroHeadlineMorph />
-        <p className="ds-home-hero__lede">
-          Every record ties to a place you can stand in. Start where you are, then follow the
-          evidence across time.
-        </p>
-        <div className="ds-home-hero__ctas">
-          <Link className="ds-cta ds-cta--copper" href="/locate">
-            Find what happened near you
-          </Link>
-          <a
-            className="ds-home-hero__cta-quiet"
-            href={RESTING_HREF}
-            onClick={handleExploreClick}
-          >
-            Explore the map
+        <div className="ds-cinematic-content" data-cinematic-state={cinematic.state}>
+          {/* Lead beat: always in view at first paint (no scroll yet), so its copy is not
+              gated behind `MapIntroBeat`'s IntersectionObserver — firing a camera flight before
+              the initial national framing settles would risk the "no map flash on load"
+              acceptance criterion. `HeroHeadlineMorph` is preserved as the lead beat's copy
+              per the bead description; the camera sequence itself begins at the second beat,
+              once the reader has actually scrolled. */}
+          <p className="ds-home-hero__kicker">
+            <KickerTickIcon />
+            Place-connected archive
+          </p>
+          <HeroHeadlineMorph />
+          <p className="ds-home-hero__lede">
+            Every record ties to a place you can stand in. Start where you are, then follow the
+            evidence across time.
+          </p>
+          <div className="ds-home-hero__ctas">
+            <Link className="ds-cta ds-cta--copper" href="/locate">
+              Find what happened near you
+            </Link>
+            <ExploreMapControl className="ds-home-hero__cta-quiet" label="Explore the map" />
+          </div>
+          <a className="ds-home-hero__scroll-cue" href={PLACE_SCROLL_TARGET}>
+            Your place
+            <ScrollCueIcon />
           </a>
-        </div>
-        <a className="ds-home-hero__scroll-cue" href={PLACE_SCROLL_TARGET}>
-          Your place
-          <ScrollCueIcon />
-        </a>
-        <div className="ds-home-hero__micro-facts" aria-label="Archive at a glance">
-          <div className="ds-home-hero__micro-fact">
-            <span className="ds-home-hero__micro-fact-value">{formatCount(featureCount)}</span>
-            <span className="ds-home-hero__micro-fact-label">Records pinned</span>
-          </div>
-          <div className="ds-home-hero__micro-fact">
-            <span className="ds-home-hero__micro-fact-value">{stateLabel}</span>
-            <span className="ds-home-hero__micro-fact-label">On the map</span>
-          </div>
-          <div className="ds-home-hero__micro-fact">
-            <span className="ds-home-hero__micro-fact-value">{eraFact}</span>
-            <span className="ds-home-hero__micro-fact-label">Eras spanned</span>
-          </div>
+          <HeroInviteBeat beat={inviteBeats[0]} preset="locality">
+            <div className="ds-home-hero__micro-facts" aria-label="Archive at a glance">
+              <div className="ds-home-hero__micro-fact">
+                <span className="ds-home-hero__micro-fact-value">
+                  {formatCount(featureCount)}
+                </span>
+                <span className="ds-home-hero__micro-fact-label">Records pinned</span>
+              </div>
+              <div className="ds-home-hero__micro-fact">
+                <span className="ds-home-hero__micro-fact-value">{stateLabel}</span>
+                <span className="ds-home-hero__micro-fact-label">On the map</span>
+              </div>
+              <div className="ds-home-hero__micro-fact">
+                <span className="ds-home-hero__micro-fact-value">{eraFact}</span>
+                <span className="ds-home-hero__micro-fact-label">Eras spanned</span>
+              </div>
+            </div>
+          </HeroInviteBeat>
         </div>
       </div>
     </section>

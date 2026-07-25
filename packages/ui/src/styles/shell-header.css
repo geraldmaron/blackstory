@@ -65,16 +65,25 @@ html {
   opacity: 0.82;
 }
 
-/* Brand lockup ≥168px digital minimum (docs/ui/brand.md). */
+/*
+ * Compact utility-nav sizing: capped by HEIGHT (not width) so the lockup fits
+ * a slim ~56px bar without inflating .ds-shell-header. brand.md's "≥168px
+ * digital minimum" is a marketing/standalone-placement floor; brand.md
+ * itself directs squeezed nav contexts to "switch to the symbol alone"
+ * rather than render an undersized lockup, and this height cap renders the
+ * lockup narrower than 168px (~64px) to keep the header compact. Flagged
+ * in repo-bsvx as a documented brand-minimum exception for this nav
+ * placement — see bead notes before changing this value.
+ */
 .ds-shell-wordmark__img {
   display: none;
-  width: 11.5rem;
-  height: auto;
+  width: auto;
+  height: 4.5rem;
 }
 
 .ds-shell-wordmark__img--symbol {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 5rem;
+  height: 5rem;
 }
 
 .ds-shell-wordmark__img--lockup.ds-shell-wordmark__img--theme-light {
@@ -115,11 +124,11 @@ html {
   }
 }
 
-@media (min-width: 64rem) {
-  .ds-shell-wordmark__img--lockup {
-    width: 13rem;
-  }
-}
+/*
+ * No wide-viewport size bump here: the wordmark is capped by height above,
+ * uniformly at every breakpoint, so the compact nav bar stays the same
+ * height on every page regardless of viewport width.
+ */
 
 /* Opt-in symbol-only chrome (not used by public web routes; lockup is the site default). */
 .ds-shell-header--symbol-only .ds-shell-wordmark__img--lockup {

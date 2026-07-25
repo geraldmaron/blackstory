@@ -34,6 +34,12 @@ export type ExploreRecordsRailProps = {
   readonly emptyTitle?: string;
   readonly emptyDescription?: string;
   readonly testID?: string;
+  /**
+   * Cinematic Map Backdrop "Explore the map" control (spec §2 rule 3, §5b).
+   * Omitted while the map is already Engaged — the sheet is collapsed toward
+   * peek and Close (floating, top-trailing) is the way back, not this list.
+   */
+  readonly onExplore?: () => void;
 };
 
 const RecordRow = memo(function RecordRow({
@@ -101,6 +107,7 @@ export function ExploreRecordsRail({
   emptyTitle = 'No places nearby',
   emptyDescription = 'Pan or zoom the map, or clear a filter, to see pins here.',
   testID = 'explore-records-rail',
+  onExplore,
 }: ExploreRecordsRailProps) {
   const theme = useThemeColors();
   const headerCount = formatExploreCountLabel({
@@ -123,34 +130,72 @@ export function ExploreRecordsRail({
 
   const listHeader = useMemo(
     () => (
-      <View
-        style={[styles.header, { borderBottomColor: theme.border }]}
-        accessible
-        accessibilityRole="header"
-        accessibilityLabel={headerCount.accessibilityLabel}
-      >
-        <View style={styles.inviteRow}>
-          <Ionicons
-            name="chevron-up"
-            size={14}
-            color={theme.accent}
-            accessibilityElementsHidden
-            importantForAccessibility="no-hide-descendants"
-          />
-          <Ionicons
-            name="location-outline"
-            size={14}
-            color={theme.inkMuted}
-            accessibilityElementsHidden
-            importantForAccessibility="no-hide-descendants"
-          />
-          <Text variant="code" colorRole="inkMuted">
-            Pull up for places
-          </Text>
-        </View>
+      <View style={[styles.header, { borderBottomColor: theme.border }]}>
+        {/* Carries the count/scope label as its own accessible "header" landmark
+            (a11y contract §4) without swallowing the Explore/Close button below
+            into one opaque VoiceOver stop — an `accessible` container would make
+            the button unreachable in tab order (spec §4). */}
+        <View
+          style={styles.headerLabel}
+          accessible
+          accessibilityRole="header"
+          accessibilityLabel={headerCount.accessibilityLabel}
+        />
+        {onExplore ? null : (
+          <View style={styles.inviteRow}>
+            <Ionicons
+              name="chevron-up"
+              size={14}
+              color={theme.accent}
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            />
+            <Ionicons
+              name="location-outline"
+              size={14}
+              color={theme.inkMuted}
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            />
+            <Text variant="code" colorRole="inkMuted">
+              Pull up for places
+            </Text>
+          </View>
+        )}
+        {onExplore ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Explore the map"
+            testID="explore-map-engage"
+            onPress={onExplore}
+            style={({ pressed }) => [
+              styles.exploreButton,
+              { backgroundColor: pressed ? theme.accentGraphic : theme.accent },
+            ]}
+          >
+            <Ionicons
+              name="navigate-outline"
+              size={16}
+              color={theme.inverseInk}
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            />
+            <Text variant="code" style={{ color: theme.inverseInk }}>
+              Explore the map
+            </Text>
+          </Pressable>
+        ) : null}
       </View>
     ),
-    [headerCount.accessibilityLabel, theme.accent, theme.border, theme.inkMuted],
+    [
+      headerCount.accessibilityLabel,
+      onExplore,
+      theme.accent,
+      theme.accentGraphic,
+      theme.border,
+      theme.inkMuted,
+      theme.inverseInk,
+    ],
   );
 
   const listEmpty = useMemo(
@@ -206,6 +251,21 @@ const styles = StyleSheet.create({
     paddingVertical: space['2'],
     borderBottomWidth: StyleSheet.hairlineWidth,
     minHeight: MIN_TOUCH_TARGET,
+  },
+  // Zero-size: exists only to carry the "header" a11y role/label without
+  // taking layout space or intercepting touches.
+  headerLabel: {
+    position: 'absolute',
+    width: 0,
+    height: 0,
+  },
+  exploreButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space['1'],
+    paddingHorizontal: space['3'],
+    minHeight: MIN_TOUCH_TARGET,
+    borderRadius: radius.sm,
   },
   inviteRow: {
     flexDirection: 'row',

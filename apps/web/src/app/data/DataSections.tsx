@@ -193,7 +193,7 @@ export function DataSections({
         />
         {timelineRows.length > 0 ? (
           <>
-            <div className="ds-data-edition__viz ds-data-edition__viz--pair">
+            <div className="ds-data-edition__viz">
               <PopulationByDecadeChart rows={timelineRows} sources={chartSources} />
               <BlackPopulationShareChart rows={timelineRows} sources={chartSources} />
             </div>

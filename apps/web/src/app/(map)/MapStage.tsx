@@ -74,7 +74,17 @@ import {
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from '../map/explore-layer-ids';
-import { buildExploreMapStyle } from '../map/explore-style';
+import {
+  buildExploreMapStyle,
+  selectedPointFilterExpression,
+  ENTITY_SELECTED_PULSE_DURATION_MS,
+  ENTITY_SELECTED_RADIUS_OFFSET,
+  entitySelectedPulseOpacity,
+  entitySelectedPulseRadiusExpression,
+  entitySelectedPulseStaticRadiusExpression,
+  ENTITY_SELECTED_PULSE_STATIC_OPACITY,
+} from '../map/explore-style';
+import { markerRadiusPlusExpression } from '../../lib/map-experience/marker-size';
 import {
   applyDensityBlendProgress,
   buildDensityColorMorphStates,
@@ -91,6 +101,10 @@ import {
 } from '../map/decade-layer-transition';
 import type { MapColorScheme } from '../../lib/map-experience/dignity-style';
 import { EXPLORE_CLUSTER_CONFIG } from '../../lib/map-experience/dignity-style';
+import {
+  diffEntityMarkerIds,
+  shouldMountEntityMarkers,
+} from '../../lib/map-experience/entity-marker-diff';
 import {
   bindMapResizeLifecycle,
   bindWebGlContextRecovery,
@@ -290,6 +304,47 @@ function clearMarkers(markers: Marker[]): void {
   markers.length = 0;
 }
 
+/** Marker element paint shared by create + in-place update — kept idempotent so a keyed
+ * reuse never resets classes/animations on markers whose feature did not change. */
+function applyEntityMarkerElementProps(
+  el: HTMLButtonElement,
+  feature: ExploreMapFeatureCollection['features'][number],
+  label: string,
+  isSelected: boolean,
+): void {
+  el.classList.toggle('ds-map-entity-marker--selected', isSelected);
+  if (el.getAttribute('aria-label') !== label) {
+    el.setAttribute('aria-label', label);
+    el.title = label;
+  }
+  // Mirror the GL circle kind shade so the hit-target disc matches KindBadge / explore-point
+  // (transparent overlays previously left only the sand halo readable as "the" circle color).
+  const shade =
+    typeof feature.properties.shade === 'string' && feature.properties.shade.length > 0
+      ? feature.properties.shade
+      : brandPalette.copperPin;
+  if (el.style.getPropertyValue('--ds-map-entity-shade') !== shade) {
+    el.style.setProperty('--ds-map-entity-shade', shade);
+  }
+  if (el.dataset.kind !== feature.properties.kind) {
+    el.dataset.kind = feature.properties.kind;
+  }
+  if (typeof feature.properties.mapTone === 'string') {
+    if (el.dataset.mapTone !== feature.properties.mapTone) {
+      el.dataset.mapTone = feature.properties.mapTone;
+    }
+  } else if (el.dataset.mapTone !== undefined) {
+    delete el.dataset.mapTone;
+  }
+}
+
+/**
+ * Keyed sync of the DOM hit-target markers — the single-feature invariant (repo-4v3a.1 /
+ * repo-mrmh / repo-pgzr) extended to the DOM path: markers are keyed by `entityId` and reused
+ * in place, so a selection change or `zoomend` resync never mass-unmounts and recreates the
+ * whole collection (which read as "all entities light up"). Only genuinely new ids mount and
+ * only stale ids unmount.
+ */
 function syncCircularMarkers(
   map: MapLibreMap,
   maplibregl: MaplibreModule['default'],
@@ -298,46 +353,59 @@ function syncCircularMarkers(
   onSelect: (entityId: string) => void,
   selectedEntityId: string | undefined,
 ): void {
-  clearMarkers(markers);
-
   // Below clusterMaxZoom, MapLibre aggregates points — HTML hit-targets for every feature
   // sit above clusters and steal clicks. Only mount DOM targets once individuals are visible.
-  if (map.getZoom() <= EXPLORE_CLUSTER_CONFIG.clusterMaxZoom) {
+  if (!shouldMountEntityMarkers(map.getZoom(), EXPLORE_CLUSTER_CONFIG.clusterMaxZoom)) {
+    clearMarkers(markers);
     return;
   }
 
+  const mountedById = new Map<string, Marker>();
+  for (const marker of markers) {
+    const id = marker.getElement().dataset.entityId;
+    if (typeof id === 'string') mountedById.set(id, marker);
+  }
+
+  type PointFeature = ExploreMapFeatureCollection['features'][number];
+  const featureById = new Map<string, { feature: PointFeature; lng: number; lat: number }>();
   for (const feature of features) {
     if (feature.geometry.type !== 'Point') continue;
     const [lng, lat] = feature.geometry.coordinates;
     if (typeof lng !== 'number' || typeof lat !== 'number') continue;
     const entityId = feature.properties.entityId;
     if (typeof entityId !== 'string') continue;
+    if (featureById.has(entityId)) continue;
+    featureById.set(entityId, { feature, lng, lat });
+  }
 
-    const label =
-      typeof feature.properties.displayName === 'string'
-        ? feature.properties.displayName
-        : 'Documented record';
+  const diff = diffEntityMarkerIds(mountedById.keys(), featureById.keys());
 
+  for (const entityId of diff.keep) {
+    const mounted = mountedById.get(entityId);
+    const entry = featureById.get(entityId);
+    if (!mounted || !entry) continue;
+    applyEntityMarkerElementProps(
+      mounted.getElement() as HTMLButtonElement,
+      entry.feature,
+      markerLabelFor(entry.feature),
+      selectedEntityId === entityId,
+    );
+    mounted.setLngLat([entry.lng, entry.lat]);
+  }
+
+  for (const entityId of diff.add) {
+    const entry = featureById.get(entityId);
+    if (!entry) continue;
     const el = document.createElement('button');
     el.type = 'button';
-    el.className =
-      selectedEntityId === entityId
-        ? 'ds-map-entity-marker ds-map-entity-marker--selected'
-        : 'ds-map-entity-marker';
+    el.className = 'ds-map-entity-marker';
     el.dataset.entityId = entityId;
-    el.setAttribute('aria-label', label);
-    el.title = label;
-    // Mirror the GL circle kind shade so the hit-target disc matches KindBadge / explore-point
-    // (transparent overlays previously left only the sand halo readable as "the" circle color).
-    const shade =
-      typeof feature.properties.shade === 'string' && feature.properties.shade.length > 0
-        ? feature.properties.shade
-        : brandPalette.copperPin;
-    el.style.setProperty('--ds-map-entity-shade', shade);
-    el.dataset.kind = feature.properties.kind;
-    if (typeof feature.properties.mapTone === 'string') {
-      el.dataset.mapTone = feature.properties.mapTone;
-    }
+    applyEntityMarkerElementProps(
+      el,
+      entry.feature,
+      markerLabelFor(entry.feature),
+      selectedEntityId === entityId,
+    );
     // The map canvas is `aria-hidden` (see `MapStageProvider`'s render) — the synchronized
     // result list is the accessible-parity surface for the same entities, so these buttons
     // are deliberately pulled out of the tab order rather than left focusable-but-hidden
@@ -348,12 +416,29 @@ function syncCircularMarkers(
       event.stopPropagation();
       onSelect(entityId);
     });
-
     const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
-      .setLngLat([lng, lat])
+      .setLngLat([entry.lng, entry.lat])
       .addTo(map);
-    markers.push(marker);
+    mountedById.set(entityId, marker);
   }
+
+  // Unmount only stale ids — never the survivors.
+  for (const entityId of diff.remove) {
+    mountedById.get(entityId)?.remove();
+    mountedById.delete(entityId);
+  }
+
+  markers.length = 0;
+  for (const entityId of featureById.keys()) {
+    const marker = mountedById.get(entityId);
+    if (marker) markers.push(marker);
+  }
+}
+
+function markerLabelFor(feature: ExploreMapFeatureCollection['features'][number]): string {
+  return typeof feature.properties.displayName === 'string'
+    ? feature.properties.displayName
+    : 'Documented record';
 }
 
 /** Toggles the selected pulse class without rebuilding every marker. */
@@ -371,14 +456,16 @@ function syncSelectedEntityMarkerClass(
   }
 }
 
+/**
+ * Selects/deselects the single-feature ring layer only (`setFilter` on
+ * `EXPLORE_SELECTED_POINT_LAYER_ID` from `selectedPointFilterExpression`) — never a re-filter
+ * or `setData` on the main entities source, so neighboring pins never repaint. See
+ * `patterns-cinematic-map.md` §2 rule 5.
+ */
 function setSelectedEntityFilter(map: MapLibreMap, entityId: string | undefined): void {
   if (!map.getLayer(EXPLORE_SELECTED_POINT_LAYER_ID)) return;
-  const filter =
-    entityId && entityId.length > 0
-      ? (['==', ['get', 'entityId'], entityId] as unknown as [string, ...unknown[]])
-      : (['==', ['get', 'entityId'], ''] as unknown as [string, ...unknown[]]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- FilterSpecification ambient typing unavailable
-  map.setFilter(EXPLORE_SELECTED_POINT_LAYER_ID, filter as any);
+  map.setFilter(EXPLORE_SELECTED_POINT_LAYER_ID, selectedPointFilterExpression(entityId) as any);
 }
 
 function setHistoryEdgeData(map: MapLibreMap, collection: HistoryEdgeLineCollection): void {
@@ -997,6 +1084,12 @@ export function MapStageProvider({
     }
     const map = mapRef.current;
     if (map?.getLayer(EXPLORE_SELECTED_POINT_LAYER_ID)) {
+      // Reset to the base (un-pulsed) ring — scale 1x, full opacity.
+      map.setPaintProperty(
+        EXPLORE_SELECTED_POINT_LAYER_ID,
+        'circle-radius',
+        markerRadiusPlusExpression(ENTITY_SELECTED_RADIUS_OFFSET),
+      );
       map.setPaintProperty(EXPLORE_SELECTED_POINT_LAYER_ID, 'circle-stroke-opacity', 1);
     }
   }, []);
@@ -1007,7 +1100,18 @@ export function MapStageProvider({
       const map = mapRef.current;
       if (!map?.getLayer(EXPLORE_SELECTED_POINT_LAYER_ID)) return;
       if (prefersReducedMotion()) {
-        map.setPaintProperty(EXPLORE_SELECTED_POINT_LAYER_ID, 'circle-stroke-opacity', 1);
+        // Reduced motion (patterns-cinematic-map.md §3): no loop — a single static
+        // enlarged ring (scale ~1.35, opacity ~0.85).
+        map.setPaintProperty(
+          EXPLORE_SELECTED_POINT_LAYER_ID,
+          'circle-radius',
+          entitySelectedPulseStaticRadiusExpression(),
+        );
+        map.setPaintProperty(
+          EXPLORE_SELECTED_POINT_LAYER_ID,
+          'circle-stroke-opacity',
+          ENTITY_SELECTED_PULSE_STATIC_OPACITY,
+        );
         return;
       }
 
@@ -1022,13 +1126,20 @@ export function MapStageProvider({
           selectedPulseRafRef.current = null;
           return;
         }
-        // One soft breath every ~1.8s — opacity only, no glow/shadow paint.
-        const phase = ((now - startedAt) % 1800) / 1800;
-        const opacity = 0.28 + 0.72 * (0.5 - 0.5 * Math.cos(phase * Math.PI * 2));
+        // 1.8s ease-in-out loop — ring scales ~1x -> ~2.1x while fading 0.9 -> 0.12
+        // (patterns-cinematic-map.md §3 "Selection pulse").
+        const progress =
+          ((now - startedAt) % ENTITY_SELECTED_PULSE_DURATION_MS) /
+          ENTITY_SELECTED_PULSE_DURATION_MS;
+        activeMap.setPaintProperty(
+          EXPLORE_SELECTED_POINT_LAYER_ID,
+          'circle-radius',
+          entitySelectedPulseRadiusExpression(progress),
+        );
         activeMap.setPaintProperty(
           EXPLORE_SELECTED_POINT_LAYER_ID,
           'circle-stroke-opacity',
-          opacity,
+          entitySelectedPulseOpacity(progress),
         );
         selectedPulseRafRef.current = requestAnimationFrame(tick);
       };
@@ -1796,7 +1907,19 @@ export function MapStageProvider({
         notify(listenersRef.current, 'viewport', lastViewportRef.current);
         updateStateLabelOpacity(activeMap.getZoom());
       });
-      activeMap.on('zoom', () => updateStateLabelOpacity(activeMap.getZoom()));
+      activeMap.on('zoom', () => {
+        updateStateLabelOpacity(activeMap.getZoom());
+        // DOM hit-target discs are fixed-pixel; a camera ease that crosses the cluster gate
+        // (closing a record card flies point zoom -> national) must unmount them at the
+        // crossing, not at `zoomend` — otherwise every disc rides the whole flight oversized
+        // and the map reads as "all entities light up" (repo-pgzr).
+        if (
+          !shouldMountEntityMarkers(activeMap.getZoom(), EXPLORE_CLUSTER_CONFIG.clusterMaxZoom) &&
+          markersRef.current.length > 0
+        ) {
+          clearMarkers(markersRef.current);
+        }
+      });
       activeMap.on('zoomend', () => {
         syncEntityMarkers();
         requestCountyPolygonLoad(activeMap, configRef.current);

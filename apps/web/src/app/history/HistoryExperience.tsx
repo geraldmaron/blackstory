@@ -20,7 +20,9 @@ import {
 } from '../../components/history';
 import {
   DEFAULT_HISTORY_FILTERS,
+  HISTORY_FILTER_GROUPS,
   HISTORY_SORT_OPTIONS,
+  isHistoryKindCategory,
   type HistoryFacetOption,
   type HistorySort,
 } from '../../lib/history/filters';
@@ -180,12 +182,16 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
 
   const handleKindChange = useCallback(
     (kind: string) => {
-      const valid = view.facetOptions.kind.some((option) => option.value === kind);
+      // Accept both consolidated category ids (primary chips) and raw entity kinds
+      // (advanced disclosure + graph-node kind clicks).
+      const valid =
+        view.facetOptions.kind.some((option) => option.value === kind) ||
+        view.facetOptions.kindDetail.some((option) => option.value === kind);
       applyFilters({
         kind: (valid ? kind : 'all') as HistoryViewModel['viewState']['filters']['kind'],
       });
     },
-    [applyFilters, view.facetOptions.kind],
+    [applyFilters, view.facetOptions.kind, view.facetOptions.kindDetail],
   );
 
   const handleStatusChange = useCallback(
@@ -259,9 +265,13 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
     if (trimmed === view.viewState.filters.q) return undefined;
     const timer = window.setTimeout(() => {
       applyFilters({ q: trimmed });
-    }, 400);
+    }, 250);
     return () => window.clearTimeout(timer);
   }, [applyFilters, queryDraft, view.viewState.filters.q]);
+
+  const activeKind = view.viewState.filters.kind;
+  const rawKindSelected =
+    activeKind !== DEFAULT_HISTORY_FILTERS.kind && !isHistoryKindCategory(activeKind);
 
   const hasActiveFilters =
     view.viewState.filters.q.length > 0 ||
@@ -315,11 +325,20 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
 
       <article className={historyEditionPanelClassName('instruments')}>
         <p className="ds-history-edition__panel-title">Refine view</p>
-        <div className="ds-history__toolbar">
-          <form className="ds-history__search" onSubmit={handleQuerySubmit} role="search">
-            <label className="ds-history__search-label" htmlFor="history-q">
-              Search records
-            </label>
+
+        {/* Primary entry action: search elevated to its own full-width, emphasized row
+            above the secondary filter groups (repo-et18). */}
+        <form className="ds-history__search" onSubmit={handleQuerySubmit} role="search">
+          <label className="ds-history__search-label" htmlFor="history-q">
+            Search records
+          </label>
+          <div className="ds-history__search-field">
+            <span className="ds-history__search-icon" aria-hidden="true">
+              <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor">
+                <circle cx="9" cy="9" r="6" strokeWidth="1.75" />
+                <line x1="13.5" y1="13.5" x2="17.5" y2="17.5" strokeWidth="1.75" strokeLinecap="round" />
+              </svg>
+            </span>
             <input
               className="ds-history__search-input"
               id="history-q"
@@ -327,19 +346,29 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
               type="search"
               value={queryDraft}
               onChange={(event) => setQueryDraft(event.currentTarget.value)}
-              placeholder="Search by name or summary"
+              placeholder="Search records by name or summary"
               autoComplete="off"
             />
-            <button className="ds-button ds-button--secondary" type="submit">
+            <button className="ds-button ds-button--primary ds-history__search-submit" type="submit">
               Search
             </button>
-          </form>
+          </div>
+        </form>
 
-          <fieldset className="ds-history-kind-chips" role="radiogroup" aria-label="Kind">
-            <legend className="ds-history-kind-chips__legend">Kind</legend>
+        {/* Secondary filters, regrouped by data structure (repo-5rtl). */}
+        <div className="ds-history__filters">
+          <fieldset
+            className="ds-history-kind-chips ds-history__filter-group"
+            role="radiogroup"
+            aria-label={HISTORY_FILTER_GROUPS.recordType.label}
+          >
+            <legend className="ds-history-kind-chips__legend">
+              {HISTORY_FILTER_GROUPS.recordType.label}
+            </legend>
+            {/* Primary chips: consolidated high-level categories (repo-k1t9) so the type
+                filter stays scannable instead of a wall of ~11 raw-kind chips. */}
             {view.facetOptions.kind.map((option) => {
               const isActive = view.viewState.filters.kind === option.value;
-              const encoding = option.value === 'all' ? undefined : kindEncodingFor(option.value);
               return (
                 <button
                   key={option.value}
@@ -352,122 +381,189 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
                   aria-checked={isActive}
                   onClick={() => handleKindChange(option.value)}
                 >
-                  {encoding ? (
-                    <span
-                      className={cx(
-                        'ds-legend-glyph',
-                        `ds-legend-glyph--${encoding.glyph}`,
-                        'ds-history-kind-chips__glyph',
-                      )}
-                      style={
-                        encoding.glyph === 'ring'
-                          ? { borderColor: encoding.shade, background: 'transparent' }
-                          : { background: encoding.shade, borderColor: encoding.shade }
-                      }
-                      aria-hidden="true"
-                    />
-                  ) : null}
                   {formatFacetOptionLabel(option)}
                 </button>
               );
             })}
+
+            {/* Advanced: full raw entity-kind vocabulary, deferred into a disclosure and
+                auto-opened when a raw kind is the active filter (e.g. via a graph node). */}
+            <details
+              className="ds-history-kind-chips__advanced"
+              open={rawKindSelected}
+            >
+              <summary className="ds-history-kind-chips__advanced-summary">
+                All record types
+              </summary>
+              <div
+                className="ds-history-kind-chips__advanced-body"
+                role="group"
+                aria-label="All record types"
+              >
+                {view.facetOptions.kindDetail
+                  .filter((option) => option.value !== 'all')
+                  .map((option) => {
+                    const isActive = view.viewState.filters.kind === option.value;
+                    const encoding = kindEncodingFor(option.value);
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        className={cx(
+                          'ds-history-kind-chips__chip',
+                          isActive && 'ds-history-kind-chips__chip--active',
+                        )}
+                        aria-pressed={isActive}
+                        onClick={() => handleKindChange(option.value)}
+                      >
+                        {encoding ? (
+                          <span
+                            className={cx(
+                              'ds-legend-glyph',
+                              `ds-legend-glyph--${encoding.glyph}`,
+                              'ds-history-kind-chips__glyph',
+                            )}
+                            style={
+                              encoding.glyph === 'ring'
+                                ? { borderColor: encoding.shade, background: 'transparent' }
+                                : { background: encoding.shade, borderColor: encoding.shade }
+                            }
+                            aria-hidden="true"
+                          />
+                        ) : null}
+                        {formatFacetOptionLabel(option)}
+                      </button>
+                    );
+                  })}
+              </div>
+            </details>
           </fieldset>
 
-          <div className="ds-history-edition__facets">
-            <div className="ds-history-edition__facet">
-              <label className="ds-history-edition__facet-label" htmlFor="history-status">
-                Status
-              </label>
-              <select
-                className="ds-pill-select__control"
-                id="history-status"
-                value={view.viewState.filters.status}
-                onChange={(event) => handleStatusChange(event.currentTarget.value)}
-              >
-                {view.facetOptions.status.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {formatFacetOptionLabel(option)}
-                  </option>
-                ))}
-              </select>
-            </div>
+          {/* TIME & CONTEXT: Era + Status collapsed into one grouped control (both
+              temporal/contextual facets). */}
+          <fieldset className="ds-history__filter-group">
+            <legend className="ds-history__filter-group-label">
+              {HISTORY_FILTER_GROUPS.timeContext.label}
+            </legend>
+            <div className="ds-history-edition__facets">
+              <div className="ds-history-edition__facet">
+                <label className="ds-history-edition__facet-label" htmlFor="history-era">
+                  Era
+                </label>
+                <select
+                  className="ds-pill-select__control"
+                  id="history-era"
+                  value={view.viewState.filters.era}
+                  onChange={(event) => handleEraChange(event.currentTarget.value)}
+                >
+                  {view.facetOptions.era.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {formatFacetOptionLabel(option)}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            <div className="ds-history-edition__facet">
-              <label className="ds-history-edition__facet-label" htmlFor="history-era">
-                Era
-              </label>
-              <select
-                className="ds-pill-select__control"
-                id="history-era"
-                value={view.viewState.filters.era}
-                onChange={(event) => handleEraChange(event.currentTarget.value)}
-              >
-                {view.facetOptions.era.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {formatFacetOptionLabel(option)}
-                  </option>
-                ))}
-              </select>
+              <div className="ds-history-edition__facet">
+                <label className="ds-history-edition__facet-label" htmlFor="history-status">
+                  Status
+                </label>
+                <select
+                  className="ds-pill-select__control"
+                  id="history-status"
+                  value={view.viewState.filters.status}
+                  onChange={(event) => handleStatusChange(event.currentTarget.value)}
+                >
+                  {view.facetOptions.status.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {formatFacetOptionLabel(option)}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
+          </fieldset>
 
-            <div className="ds-history-edition__facet">
-              <label className="ds-history-edition__facet-label" htmlFor="history-topic">
-                Topic
-              </label>
-              <select
-                className="ds-pill-select__control"
-                id="history-topic"
-                value={view.viewState.filters.topic}
-                onChange={(event) => handleTopicChange(event.currentTarget.value)}
-              >
-                {view.facetOptions.topic.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {formatFacetOptionLabel(option)}
-                  </option>
-                ))}
-              </select>
+          {/* RELATIONSHIPS: ternary connections filter as a compact segmented toggle. */}
+          <fieldset className="ds-history__filter-group">
+            <legend className="ds-history__filter-group-label">
+              {HISTORY_FILTER_GROUPS.relationships.label}
+            </legend>
+            <div
+              className="ds-history__segment-strip"
+              role="group"
+              aria-label="Filter by connections"
+            >
+              {HISTORY_CONNECTIONS_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  className="ds-history__segment"
+                  aria-pressed={view.viewState.filters.connections === option.value}
+                  onClick={() => handleConnectionsChange(option.value)}
+                >
+                  {option.label}
+                </button>
+              ))}
             </div>
+          </fieldset>
 
-            <div className="ds-history-edition__facet">
-              <label className="ds-history-edition__facet-label" htmlFor="history-connections">
-                Connections
-              </label>
-              <select
-                className="ds-pill-select__control"
-                id="history-connections"
-                value={view.viewState.filters.connections}
-                onChange={(event) => handleConnectionsChange(event.currentTarget.value)}
-              >
-                {HISTORY_CONNECTIONS_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+          {/* TOPICS: large, growing tag vocabulary deferred into a disclosure so it does
+              not crowd the primary filter row. */}
+          <details className="ds-history__more" open={view.viewState.filters.topic !== 'all'}>
+            <summary className="ds-history__more-summary">More filters</summary>
+            <div className="ds-history__more-body">
+              <fieldset className="ds-history__filter-group">
+                <legend className="ds-history__filter-group-label">
+                  {HISTORY_FILTER_GROUPS.topics.label}
+                </legend>
+                <div className="ds-history-edition__facets">
+                  <div className="ds-history-edition__facet">
+                    <label className="ds-history-edition__facet-label" htmlFor="history-topic">
+                      Topic
+                    </label>
+                    <select
+                      className="ds-pill-select__control"
+                      id="history-topic"
+                      value={view.viewState.filters.topic}
+                      onChange={(event) => handleTopicChange(event.currentTarget.value)}
+                    >
+                      {view.facetOptions.topic.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {formatFacetOptionLabel(option)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </fieldset>
             </div>
+          </details>
+        </div>
 
-            <div className="ds-history-edition__facet">
-              <label className="ds-history-edition__facet-label" htmlFor="history-sort">
-                Sort
-              </label>
-              <select
-                className="ds-pill-select__control"
-                id="history-sort"
-                value={view.viewState.filters.sort}
-                onChange={(event) => handleSortChange(event.currentTarget.value)}
-              >
-                {HISTORY_SORT_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+        {/* Sort is result ordering, not a filter — kept visually separate. */}
+        <div className="ds-history__result-bar">
+          <div className="ds-history__sort">
+            <label className="ds-history-edition__facet-label" htmlFor="history-sort">
+              Sort
+            </label>
+            <select
+              className="ds-pill-select__control"
+              id="history-sort"
+              value={view.viewState.filters.sort}
+              onChange={(event) => handleSortChange(event.currentTarget.value)}
+            >
+              {HISTORY_SORT_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </div>
 
           {hasActiveFilters ? (
             <button
-              className="ds-button ds-button--secondary"
+              className="ds-button ds-button--secondary ds-button--compact"
               type="button"
               onClick={handleClearFilters}
             >
@@ -477,9 +573,11 @@ export function HistoryExperience({ initial }: HistoryExperienceProps) {
 
           <p className="ds-sans ds-history__count">
             {view.totalMatched} record{view.totalMatched === 1 ? '' : 's'} in view
-            {view.viewState.mode === 'decade' && view.activeDecade
-              ? ` · ${view.activeDecade}`
-              : ' · all time'}
+            {view.searchSpansAllTime
+              ? ' · all decades (search)'
+              : view.viewState.mode === 'decade' && view.activeDecade
+                ? ` · ${view.activeDecade}`
+                : ' · all time'}
           </p>
 
           <p className="ds-history__release-meta" aria-label="Release metadata">

@@ -17,6 +17,7 @@ import {
 import { KindBadge } from '../../../components/map-experience';
 import { MapsExternalLink } from '../../../components/map-experience/MapsExternalLink';
 import { EntitySensitivityBanner } from '../../../components/entity/EntitySensitivityBanner';
+import { EntityLocationCinematicMap } from '../../../components/entity/EntityLocationCinematicMap';
 import '../../../components/entity/entity-page.css';
 import { EntityMastMedia } from '../../../components/entity/EntityMastMedia';
 import { LinkedProse, type EntityLinkCatalogEntry } from '../../../components/entity/LinkedProse';
@@ -291,6 +292,16 @@ export default async function EntityPage({ params }: EntityPageProps) {
               Location precision: <strong>{entity.locationPrecision}</strong>. Showing{' '}
               {entity.locationLabel}. Exact residential addresses are never rendered on public pages.
             </p>
+            {geoAnchor ? (
+              <EntityLocationCinematicMap
+                entityId={entity.id}
+                lat={geoAnchor.lat}
+                lng={geoAnchor.lng}
+                label={entity.locationLabel}
+                precision={entity.locationPrecision}
+                caption={`${entity.locationLabel} · ${entity.locationPrecision} precision`}
+              />
+            ) : null}
           </article>
 
           <div className="ds-entity-edition__trust">

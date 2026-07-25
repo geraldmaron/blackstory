@@ -25,8 +25,22 @@ jest.mock('@maplibre/maplibre-react-native', () => {
   );
   GeoJSONSource.displayName = 'GeoJSONSource';
   return {
-    Map: ({ children, testID }: { children?: unknown; testID?: string }) =>
-      React.createElement(View, { testID: testID ?? 'maplibre-map' }, children as never),
+    Map: ({
+      children,
+      testID,
+      dragPan,
+      touchZoom,
+    }: {
+      children?: unknown;
+      testID?: string;
+      dragPan?: boolean;
+      touchZoom?: boolean;
+    }) =>
+      React.createElement(
+        View,
+        { testID: testID ?? 'maplibre-map', dragPan, touchZoom },
+        children as never,
+      ),
     Camera,
     GeoJSONSource,
     Layer: () => React.createElement(View, { testID: 'maplibre-layer' }),
@@ -316,6 +330,70 @@ describe('ExploreView — records rail', () => {
       'All pinned, 2 pinned · filtered',
     );
     expect(getByTestId('explore-active-filters')).toBeTruthy();
+  });
+});
+
+describe('ExploreView — Cinematic Map Backdrop (Rest -> Engaged -> Close)', () => {
+  it('starts locked (Rest) with the map non-interactive and shows Explore the map in the sheet', async () => {
+    const { getByTestId, queryByTestId } = await render(
+      <ExploreView onOpenEntity={noop} reduceMotion />,
+    );
+    expect(getByTestId('maplibre-map', { includeHiddenElements: true }).props.dragPan).toBe(
+      false,
+    );
+    expect(getByTestId('explore-map-engage')).toBeTruthy();
+    expect(queryByTestId('explore-map-close')).toBeNull();
+  });
+
+  it('unlocks the map and collapses the sheet toward peek on Explore the map', async () => {
+    const { getByTestId, queryByTestId } = await render(
+      <ExploreView onOpenEntity={noop} reduceMotion />,
+    );
+    await act(async () => {
+      // Raise the rail to full first so collapse-to-peek is observable.
+      fireEvent.press(getByTestId('explore-chip-records'));
+    });
+    expect(getByTestId('sheet-controlled-index')).toHaveTextContent('2');
+
+    await act(async () => {
+      fireEvent.press(getByTestId('explore-map-engage'));
+    });
+
+    expect(getByTestId('maplibre-map').props.dragPan).toBe(true);
+    expect(getByTestId('sheet-controlled-index')).toHaveTextContent('0');
+    expect(getByTestId('explore-map-close')).toBeTruthy();
+    expect(queryByTestId('explore-map-engage')).toBeNull();
+    // The mast (search/instruments/records/national) yields to the single Close
+    // control while Engaged (spec §2 rule 3: "Engage is one control").
+    expect(queryByTestId('explore-floating-chrome')).toBeNull();
+  });
+
+  it('relocks the map, deselects, and restores the home preset on Close', async () => {
+    const { getByTestId, queryByTestId, findByTestId } = await render(
+      <ExploreView selectedParam="ent_fixture_place_dc" onOpenEntity={noop} reduceMotion />,
+    );
+    expect(await findByTestId('entity-preview-sheet')).toBeTruthy();
+
+    // Deselect first so the records rail (which hosts Explore the map) shows.
+    await act(async () => {
+      fireEvent.press(getByTestId('sheet-settle-peek'));
+    });
+    expect(queryByTestId('entity-preview-sheet')).toBeNull();
+
+    await act(async () => {
+      fireEvent.press(getByTestId('explore-map-engage'));
+    });
+    expect(getByTestId('maplibre-map').props.dragPan).toBe(true);
+
+    await act(async () => {
+      fireEvent.press(getByTestId('explore-map-close'));
+    });
+
+    expect(getByTestId('maplibre-map', { includeHiddenElements: true }).props.dragPan).toBe(
+      false,
+    );
+    expect(queryByTestId('explore-map-close')).toBeNull();
+    expect(getByTestId('explore-map-engage')).toBeTruthy();
   });
 });
 

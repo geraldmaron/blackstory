@@ -61,6 +61,31 @@ export type {
   PreviewMetaFeature,
 } from './explore';
 export {
+  CINEMATIC_MAP_INITIAL_STATE,
+  cinematicMapReducer,
+  type CinematicMapAction,
+  type CinematicMapReducerState,
+  type CinematicMapState,
+} from './cinematic-map-state';
+export {
+  useCinematicMap,
+  type CinematicMapCameraCommand,
+  type UseCinematicMapOptions,
+  type UseCinematicMapResult,
+} from './useCinematicMap';
+export {
+  ENTITY_SELECTED_PULSE_DURATION_MS,
+  ENTITY_SELECTED_PULSE_SCALE_FROM,
+  ENTITY_SELECTED_PULSE_SCALE_TO,
+  ENTITY_SELECTED_PULSE_OPACITY_FROM,
+  ENTITY_SELECTED_PULSE_OPACITY_TO,
+  ENTITY_SELECTED_PULSE_STATIC_SCALE,
+  ENTITY_SELECTED_PULSE_STATIC_OPACITY,
+  pulseEaseInOut,
+  entitySelectedPulseLayerStyle,
+  entitySelectedPulseStaticLayerStyle,
+} from './entity-paint';
+export {
   MAP_MAX_ZOOM,
   MAP_MIN_ZOOM,
   US_BOUNDS,

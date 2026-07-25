@@ -27,6 +27,7 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -113,6 +114,14 @@ import {
 import { useMapStage } from '../MapStage';
 import { clearHeroMapInset } from '../../../lib/map-experience/hero-map-inset';
 import { pickExploreEdgeSlice } from './explore-edge-catalog';
+import {
+  CinematicMapProvider,
+  useCinematicMap,
+  type CinematicMapDriver,
+} from '../../../components/patterns/cinematic-map/CinematicMapProvider';
+import { CinematicScrim } from '../../../components/patterns/cinematic-map/CinematicScrim';
+import { ExploreMapControl } from '../../../components/patterns/cinematic-map/ExploreMapControl';
+import { CinematicMapClose } from '../../../components/patterns/cinematic-map/CinematicMapClose';
 import {
   EXPLORE_SINGLE_PANEL_MEDIA,
   exploreEditionTabClassName,
@@ -314,8 +323,48 @@ function shareableExploreHref(viewState: ExploreViewState): string {
   return buildExploreHref(shareable);
 }
 
-export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
+/**
+ * Explore adopts the Cinematic Map Backdrop pattern (Rest -> Engaged only, no Invite — a dense
+ * instrument-led surface never uses the scroll-driven Invite state, `docs/ui/patterns-cinematic-
+ * map.md` §1 "When to use"). The map plate + floating instruments ARE the point on this surface,
+ * so the route auto-engages once on mount (see the layout effect below) rather than gating the
+ * reader behind an extra tap — but Close still fully relocks to Rest (scrim, locked map,
+ * instruments hidden) so the pattern's Rest state is real and reachable, not decorative.
+ */
+export function ExploreMapExperience(props: ExploreMapExperienceProps) {
   const stage = useMapStage();
+  const stageRef = useRef(stage);
+  stageRef.current = stage;
+
+  // No-op driver: pin/list selection already drives the map through its own robust pipeline
+  // (`handleSelect` below — feature-state selection, camera fly, session stack, URL state) per
+  // `repo-4v3a.1`. The cinematic pattern's `select`/`deselect` exist to support `MapIntroBeat`
+  // (home only) and `close()`'s built-in cleanup call; Explore does not use `MapIntroBeat`, and
+  // `ExploreMapExperienceBody` handles close-time cleanup itself (fly home + clear selection)
+  // via its own effect keyed on `cinematic.state`, so this driver only needs to exist to satisfy
+  // the provider's contract.
+  const driver = useMemo<CinematicMapDriver>(
+    () => ({
+      select: () => {},
+      deselect: () => {},
+      flyTo: (preset) => {
+        if (preset !== 'national') return;
+        stageRef.current.flyPreset('national', { bounds: US_CONUS_BOUNDS }, { mode: 'ease' });
+      },
+    }),
+    [],
+  );
+
+  return (
+    <CinematicMapProvider homePreset="national" driver={driver}>
+      <ExploreMapExperienceBody {...props} />
+    </CinematicMapProvider>
+  );
+}
+
+function ExploreMapExperienceBody({ initial }: ExploreMapExperienceProps) {
+  const stage = useMapStage();
+  const cinematic = useCinematicMap();
   const stageRef = useRef(stage);
   stageRef.current = stage;
   const [view, setView] = useState(initial);
@@ -1443,19 +1492,48 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
     };
   }, [stage, handleSelect, handleStateSelect, handleEdgeSelect, handleViewportChange]);
 
+  // Cinematic Map Backdrop (spec §1 "When to use": Rest -> Engaged only, no Invite on a dense
+  // instrument-led surface). Explore's map + instruments ARE the point, so it auto-engages once
+  // on mount — before paint, so there is no visible Rest flash — rather than gating readers
+  // behind an extra tap. This fires exactly once (empty deps), so it is not the "effect fires on
+  // every render" bug class the home Invite beats had; it is a one-time default posture, not a
+  // recurring auto-engage.
+  useLayoutEffect(() => {
+    cinematic.engage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Relock cleanup (spec §2 rule 4): when Close (or Escape) drops Engaged -> Rest, deselect any
+  // entity and restore the national home framing, mirroring `handleClearSelected` /
+  // `handleClearState` above. Guarded so it only runs on the Engaged -> Rest transition, never on
+  // mount (cinematic.state starts 'rest' for one tick before the effect above engages it).
+  const previousCinematicStateRef = useRef(cinematic.state);
+  useEffect(() => {
+    const previous = previousCinematicStateRef.current;
+    previousCinematicStateRef.current = cinematic.state;
+    if (previous !== 'engaged' || cinematic.state !== 'rest') return;
+    stage.flyPreset('national', { bounds: US_CONUS_BOUNDS }, { mode: 'ease' });
+    if (view.viewState.selected || view.selectedEdge) {
+      commitViewState(
+        mergeViewState(view.viewState, { clearSelected: true, clearEdge: true }),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cinematic.state]);
+
   const degradedCopy = stage.mapAvailable ? null : DEGRADED_MODE_COPY.map_canvas_unavailable;
   const selectedStateName = view.viewState.state
     ? findUsStateByPostalCode(view.viewState.state)?.name
     : undefined;
   const filtersVisible = view.viewState.showFilters;
-  const resultsVisible = view.viewState.showResults;
+  const resultsVisible = cinematic.state === 'engaged' && view.viewState.showResults;
   const keyVisible = view.viewState.showKey;
   const leftTab = resolveExploreLeftTab({
     showFilters: filtersVisible,
     showKey: keyVisible,
     preferredTab: leftTabPreference,
   });
-  const instrumentsVisible = leftTab !== null;
+  const instrumentsVisible = cinematic.state === 'engaged' && leftTab !== null;
   const resultsDimmed = Boolean(view.selectedEdge || selectedFeature);
 
   const listProps = {
@@ -1481,6 +1559,15 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
       data-map-journey={entering ? 'entering' : 'explore'}
       {...stageChrome}
     >
+      <CinematicScrim />
+      <div
+        className="ds-cinematic-rail ds-explore-stage__cinematic-rail"
+        style={{ position: 'fixed', top: 'auto', bottom: 'var(--ds-space-4)', left: '50%', transform: 'translateX(-50%)' }}
+      >
+        <ExploreMapControl />
+        <CinematicMapClose />
+      </div>
+
       {!stage.mapAvailable && degradedCopy ? (
         <div className="ds-explore-stage__notice">
           <Notice tone="warning" title="Map unavailable">
@@ -1825,7 +1912,7 @@ export function ExploreMapExperience({ initial }: ExploreMapExperienceProps) {
         </div>
       </div>
 
-      {!instrumentsVisible || !resultsVisible ? (
+      {cinematic.state === 'engaged' && (!instrumentsVisible || !resultsVisible) ? (
         <div className="ds-explore-stage__restore-dock" aria-label="Show map panels">
           {!instrumentsVisible ? (
             <>

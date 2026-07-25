@@ -22,6 +22,7 @@ import {
   applyHistoryStatusFilter,
   applyHistoryTopicFilter,
   buildHistoryEraFacetOptions,
+  buildHistoryKindCategoryFacetOptions,
   buildHistoryKindFacetOptionsWithCounts,
   buildHistoryStatusFacetOptions,
   buildHistoryTopicFacetOptions,
@@ -30,6 +31,7 @@ import {
   type HistoryFilterState,
 } from './filters';
 import { applyHistorySearchFilter } from './history-search';
+import { buildSearchIndexForEntities } from '../search/snapshot-search-index';
 import { buildHistoryOverview } from './overview';
 import {
   parseHistorySearchParams,
@@ -66,7 +68,17 @@ export function buildHistoryViewModel(
     ...(options.releaseId ? { releaseId: options.releaseId } : {}),
   });
   const context = buildHistoryGraphContext(artifact, entities);
-  const slice = resolveHistoryGraphSlice(artifact, viewState.mode, viewState.decade);
+
+  // A text query searches the FULL dataset, not just the active decade (repo-k1t9). Without
+  // this, resolving the decade slice first silently scoped search to that decade — e.g.
+  // searching "obama" while parked on any decade other than the 2000s returned nothing. When
+  // a query is present we resolve the all-time slice for matching and flag the scope-break so
+  // the UI can say results span every decade.
+  const hasQuery = viewState.filters.q.trim().length > 0;
+  const searchSpansAllTime = hasQuery && viewState.mode === 'decade';
+  const slice = searchSpansAllTime
+    ? resolveHistoryGraphSlice(artifact, 'all-time', undefined)
+    : resolveHistoryGraphSlice(artifact, viewState.mode, viewState.decade);
 
   const kindFiltered = buildSliceNodesWithCounts(
     slice,
@@ -90,7 +102,8 @@ export function buildHistoryViewModel(
   );
 
   const facetOptions = {
-    kind: buildHistoryKindFacetOptionsWithCounts(sliceForKindFacets),
+    kind: buildHistoryKindCategoryFacetOptions(sliceForKindFacets),
+    kindDetail: buildHistoryKindFacetOptionsWithCounts(sliceForKindFacets),
     status: buildHistoryStatusFacetOptions(kindFiltered),
     era: buildHistoryEraFacetOptions(kindFiltered),
     topic: buildHistoryTopicFacetOptions(kindFiltered),
@@ -101,8 +114,12 @@ export function buildHistoryViewModel(
   filtered = applyHistoryEraFilter(filtered, viewState.filters.era);
   filtered = applyHistoryTopicFilter(filtered, viewState.filters.topic);
   filtered = applyHistoryConnectionsFilter(filtered, viewState.filters.connections);
-  if (viewState.filters.q.trim()) {
-    filtered = applyHistorySearchFilter(filtered, viewState.filters.q);
+  if (hasQuery) {
+    // Search the same live catalog that is on screen, not the bundled seed snapshot index
+    // (repo-k1t9): otherwise the full release renders 1000+ records while search only queried
+    // the ~13 seed docs, so real records like the 2009 Obama inauguration returned nothing.
+    const searchIndex = buildSearchIndexForEntities(entities, artifact.releaseId);
+    filtered = applyHistorySearchFilter(filtered, viewState.filters.q, searchIndex);
   }
   const nodes = sortHistoryNodes(filtered, viewState.filters.sort);
 
@@ -128,6 +145,7 @@ export function buildHistoryViewModel(
     facetOptions,
     overview,
     totalMatched: nodes.length,
+    searchSpansAllTime,
     releaseId: context.releaseId,
     contentHash: context.contentHash,
     ...(selectedNode ? { selectedNode } : {}),

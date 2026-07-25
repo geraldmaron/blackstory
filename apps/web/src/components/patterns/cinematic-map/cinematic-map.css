@@ -1,0 +1,185 @@
+/**
+ * Cinematic Map Backdrop chrome (`docs/ui/patterns-cinematic-map.md` §5, §7). Import once per
+ * adopting route, AFTER `apps/web/src/app/(map)/map-surfaces.css` so the pointer-events
+ * overrides below win the cascade against that file's baseline `.ds-map-stage` rules.
+ *
+ * Paint order (spec §5):
+ *   z0  .ds-map-stage         persistent MapLibre plate (map-surfaces.css, unchanged here)
+ *   z1  .ds-map-scrim         gradient legibility scrim               (CinematicScrim.tsx)
+ *   z2  .ds-cinematic-content page content / beats                    (route-owned wrapper)
+ *   z3  .ds-cinematic-rail    Explore-the-map / Close controls        (route-owned wrapper)
+ *
+ * Flat matte only (spec §7 "Don't add bevels, glows, or shadows") — no box-shadow, no blur,
+ * no gradients beyond the scrim's own legibility gradient. Motion uses `--ds-duration-base` /
+ * `--ds-easing` only (tokens.css); never invent new timing values here.
+ */
+
+/* ---- Scrim (z1) --------------------------------------------------------------------- */
+
+.ds-map-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 10, 0.55) 0%,
+    rgba(10, 10, 10, 0.12) 45%,
+    rgba(10, 10, 10, 0.6) 100%
+  );
+  opacity: 1;
+  transition: opacity var(--ds-duration-base) var(--ds-easing);
+}
+
+/* Rest and Invite are both "locked, dimmed" (spec §1 table); only Engaged lifts the scrim. */
+.ds-map-scrim[data-cinematic-state='engaged'] {
+  opacity: 0;
+}
+
+/* ---- Content (z2) -------------------------------------------------------------------- */
+
+/* Route-owned wrapper around page copy/beats. Recedes and goes inert while Engaged
+   (spec §5 "content pointer-events: none + faded"). */
+.ds-cinematic-content {
+  position: relative;
+  z-index: 2;
+  opacity: 1;
+  transition: opacity var(--ds-duration-base) var(--ds-easing);
+}
+
+.ds-cinematic-content[data-cinematic-state='engaged'] {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* ---- Rail (z3) — Explore/Close controls ----------------------------------------------- */
+
+.ds-cinematic-rail {
+  position: sticky;
+  top: var(--ds-space-4);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--ds-space-2);
+  /* The rail itself never blocks scroll/hits between its controls. */
+  pointer-events: none;
+}
+
+.ds-cinematic-rail > * {
+  pointer-events: auto;
+}
+
+/* ---- Markers: locked until Engaged (spec §5, acceptance criteria) --------------------- */
+
+/* Scoped to a surface that also mounts `.ds-map-scrim`, so surfaces that have not adopted the
+   cinematic pattern (no scrim rendered) are unaffected by this rule. */
+.ds-map-surface:has(.ds-map-scrim:not([data-cinematic-state='engaged'])) .ds-map-stage {
+  pointer-events: none;
+}
+
+.ds-map-surface:has(.ds-map-scrim[data-cinematic-state='engaged']) .ds-map-stage {
+  pointer-events: auto;
+}
+
+/* ---- Explore the map control ----------------------------------------------------------- */
+
+.ds-explore-map-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem; /* 44px */
+  min-width: 2.75rem;
+  padding: 0 var(--ds-space-5);
+  border: var(--ds-border-width) solid var(--ds-accent-graphic);
+  border-radius: var(--ds-radius-full);
+  background: var(--ds-accent-graphic);
+  color: var(--ds-inverse-ink);
+  font-family: var(--ds-font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--ds-duration-base) var(--ds-easing);
+}
+
+.ds-explore-map-control:hover {
+  opacity: 0.88;
+}
+
+/* Engaged: the control reads as "active" (outline chip) rather than a filled button, since the
+   ✕ Close control is now the primary action. */
+.ds-explore-map-control[aria-pressed='true'] {
+  background: transparent;
+  color: var(--ds-accent-graphic);
+}
+
+.ds-explore-map-control:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-accent-graphic);
+  outline-offset: var(--ds-focus-offset);
+}
+
+/* ---- Close control (Engaged only) ------------------------------------------------------ */
+
+.ds-cinematic-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem; /* 44px */
+  height: 2.75rem;
+  padding: 0;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-full);
+  background: var(--ds-surface-raised);
+  color: var(--ds-ink);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.ds-cinematic-close:hover {
+  color: var(--ds-accent);
+  border-color: var(--ds-accent-graphic);
+}
+
+.ds-cinematic-close:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-accent-graphic);
+  outline-offset: var(--ds-focus-offset);
+}
+
+/* ---- Invite beats ----------------------------------------------------------------------- */
+
+/* No chrome of its own — purely a scroll-anchor for the IntersectionObserver in
+   MapIntroBeat.tsx. Route content supplies the actual copy inside. */
+.ds-cinematic-beat {
+  position: relative;
+}
+
+/* ---- Selected pulse ring: dual-signal inner rim (spec §3 rule 6) ------------------------- */
+
+/*
+ * Layers an Archive-Paper inner rim inside the existing copper pulse ring
+ * (`.ds-map-entity-marker--selected::after` in map-surfaces.css) so the selection ring reads
+ * against the dark map plate in both themes (the plate itself is a fixed dark ocean regardless
+ * of site theme — see map-surfaces.css). `#f4efe5` mirrors `brandPalette.archivePaper`
+ * (packages/ui/src/tokens/brand-palette.ts); no theme-invariant CSS var exists for it yet
+ * (tokens.css's `--ds-inverse-ink` flips per theme, which would go black-on-black in dark mode),
+ * so this follows tokens.css's own convention of mirroring the brand hex directly rather than
+ * inventing a new token.
+ */
+.ds-map-entity-marker--selected::before {
+  content: '';
+  position: absolute;
+  inset: -0.2rem;
+  border: 1.5px solid #f4efe5;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: ds-map-entity-selected-pulse 1.8s var(--ds-easing) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-map-entity-marker--selected::before {
+    animation: none;
+    opacity: 0.85;
+    transform: scale(1.2);
+  }
+}

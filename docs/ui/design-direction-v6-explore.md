@@ -40,6 +40,8 @@ Chrome is **opaque Surface**, theme-aware, flat matte. The map stays visible bet
 
 **Cross-browser:** Explore clears hero inset on mount and calls `MapStage.resize()` for full-bleed geometry. The persistent plate uses shared lifecycle hooks (`orientationchange`, `visibilitychange`, `ResizeObserver`) and degrades to the accessible list when WebGL fails. See [`patterns-map-canvas.md`](./patterns-map-canvas.md).
 
+**Binding pattern:** The map interaction implements the **Rest → Engaged** state machine from [`patterns-cinematic-map.md`](./patterns-cinematic-map.md) (dense utility surface, no Invite scroll-scene). Instruments and records stay locked to the page; the full map surface activates only when the reader explicitly engages.
+
 ---
 
 ## 3. Page scaffold

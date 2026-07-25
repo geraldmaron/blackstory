@@ -3,15 +3,114 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { ENTITY_KINDS } from '@repo/domain';
 import {
   applyHistoryConnectionsFilter,
+  applyHistoryKindFilter,
   applyHistoryStatusFilter,
   applyHistoryTopicFilter,
+  buildHistoryKindCategoryFacetOptions,
   buildHistoryStatusFacetOptions,
   buildHistoryTopicFacetOptions,
+  DEFAULT_HISTORY_FILTERS,
+  HISTORY_FILTER_GROUPS,
+  HISTORY_KIND_CATEGORIES,
+  HISTORY_KIND_TO_CATEGORY,
+  historyKindsForCategory,
+  isHistoryKindCategory,
   statusLabelToSlug,
   trimHistoryEdgesToNodes,
 } from './filters';
+
+test('HISTORY_FILTER_GROUPS covers every non-sort facet exactly once', () => {
+  const grouped = Object.values(HISTORY_FILTER_GROUPS).flatMap((group) => group.facets);
+  // Sort is result ordering, deliberately excluded from the filter groups.
+  assert.deepEqual([...grouped].sort(), ['connections', 'era', 'kind', 'status', 'topic']);
+  assert.equal(new Set(grouped).size, grouped.length, 'no facet appears in two groups');
+});
+
+test('HISTORY_FILTER_GROUPS groups era + status together and defers topics', () => {
+  assert.deepEqual([...HISTORY_FILTER_GROUPS.timeContext.facets].sort(), ['era', 'status']);
+  assert.deepEqual(HISTORY_FILTER_GROUPS.recordType.facets, ['kind']);
+  assert.deepEqual(HISTORY_FILTER_GROUPS.relationships.facets, ['connections']);
+  assert.equal(HISTORY_FILTER_GROUPS.topics.advanced, true);
+});
+
+test('every canonical entity kind maps to exactly one consolidated category', () => {
+  for (const kind of ENTITY_KINDS) {
+    const categoryId = HISTORY_KIND_TO_CATEGORY[kind];
+    assert.ok(categoryId, `kind "${kind}" is not assigned to any category`);
+    const owners = HISTORY_KIND_CATEGORIES.filter((category) =>
+      (category.kinds as readonly string[]).includes(kind),
+    );
+    assert.equal(owners.length, 1, `kind "${kind}" must belong to exactly one category`);
+  }
+  // No category references a kind outside the canonical vocabulary.
+  for (const category of HISTORY_KIND_CATEGORIES) {
+    for (const kind of category.kinds) {
+      assert.ok(
+        (ENTITY_KINDS as readonly string[]).includes(kind),
+        `category "${category.id}" references non-canonical kind "${kind}"`,
+      );
+    }
+  }
+});
+
+test('category ids and raw kinds are distinguishable', () => {
+  assert.equal(isHistoryKindCategory('organizations'), true);
+  assert.equal(isHistoryKindCategory('place'), false);
+  assert.equal(isHistoryKindCategory('all'), false);
+  assert.deepEqual([...historyKindsForCategory('organizations')].sort(), [
+    'institution',
+    'organization',
+    'school',
+  ]);
+  assert.deepEqual(historyKindsForCategory('nope'), []);
+});
+
+test('buildHistoryKindCategoryFacetOptions rolls raw kinds up by category with summed counts', () => {
+  const options = buildHistoryKindCategoryFacetOptions([
+    { kind: 'school' },
+    { kind: 'institution' },
+    { kind: 'organization' },
+    { kind: 'person' },
+    { kind: 'place' },
+  ]);
+  assert.equal(options[0]!.value, 'all');
+  const organizations = options.find((entry) => entry.value === 'organizations');
+  assert.ok(organizations);
+  assert.equal(organizations!.count, 3);
+  // Categories with zero records in the slice are omitted (no events/law/works here).
+  assert.equal(
+    options.some((entry) => entry.value === 'events'),
+    false,
+  );
+  // Declared category order is preserved (people before places before organizations).
+  const ordered = options.filter((entry) => entry.value !== 'all').map((entry) => entry.value);
+  assert.deepEqual(ordered, ['people', 'places', 'organizations']);
+});
+
+test('applyHistoryKindFilter matches a category by any member kind, and raw kinds exactly', () => {
+  const nodes = [
+    { kind: 'school' },
+    { kind: 'institution' },
+    { kind: 'person' },
+    { kind: 'place' },
+  ];
+  const orgs = applyHistoryKindFilter(nodes, {
+    ...DEFAULT_HISTORY_FILTERS,
+    kind: 'organizations',
+  });
+  assert.deepEqual(
+    orgs.map((node) => node.kind).sort(),
+    ['institution', 'school'],
+  );
+  const rawSchools = applyHistoryKindFilter(nodes, { ...DEFAULT_HISTORY_FILTERS, kind: 'school' });
+  assert.equal(rawSchools.length, 1);
+  assert.equal(rawSchools[0]!.kind, 'school');
+  const all = applyHistoryKindFilter(nodes, { ...DEFAULT_HISTORY_FILTERS, kind: 'all' });
+  assert.equal(all.length, 4);
+});
 
 test('statusLabelToSlug produces stable hyphenated slugs', () => {
   assert.equal(statusLabelToSlug('Historic'), 'historic');

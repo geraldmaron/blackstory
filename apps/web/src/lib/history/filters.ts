@@ -4,7 +4,14 @@
  * and sort. Decade selection lives in URL state separately (`./url-state.ts`).
  */
 
-export type HistoryKindFilter = 'all' | 'place' | 'school' | 'event' | 'institution';
+/**
+ * A kind filter value is one of: `'all'`, a consolidated category id (see
+ * {@link HISTORY_KIND_CATEGORIES}), or a single raw entity kind exposed via the advanced
+ * "all record types" disclosure. Kept as a broad `string` because both the category ids
+ * and the raw kind vocabulary are data-driven and validated against live facet options
+ * before application (see `HistoryExperience.handleKindChange`).
+ */
+export type HistoryKindFilter = string;
 
 export type HistorySort = 'name' | 'kind' | 'connections';
 
@@ -32,6 +39,68 @@ export const DEFAULT_HISTORY_FILTERS: HistoryFilterState = {
   topic: 'all',
   connections: 'all',
 };
+
+/**
+ * Grouping metadata for the `/history` refine panel. Facets are regrouped by the
+ * shape of {@link HistoryFilterState} / `HistoryNodeView` rather than presented as a
+ * flat row of controls: record identity, temporal/contextual facets, relationship
+ * presence, and the large-vocabulary topic tags (deferred into a disclosure). Sort is
+ * result ordering, deliberately kept out of the filter groups.
+ */
+export const HISTORY_FILTER_GROUPS = {
+  recordType: { label: 'Record type', facets: ['kind'] },
+  timeContext: { label: 'Time & context', facets: ['era', 'status'] },
+  relationships: { label: 'Relationships', facets: ['connections'] },
+  topics: { label: 'Topics', facets: ['topic'], advanced: true },
+} as const;
+
+/**
+ * Consolidated record-type taxonomy (repo-k1t9). The published release spans 11 of the 12
+ * canonical entity kinds (see `@repo/domain` ENTITY_KINDS), which renders as a wall of ~11
+ * kind chips. To keep the primary type filter scannable, related kinds roll up into a small
+ * set of high-level categories; the raw kinds stay reachable via an advanced disclosure.
+ *
+ * Data basis (active release, 1375 records, 2026-07-24):
+ *   place 565 · person 394 · event 79 · institution 79 · school 77 · organization 57 ·
+ *   case 48 · law 26 · publication 21 · movement 15 · other 14  (artifact 0)
+ *
+ * Every canonical kind maps to exactly one category (verified by test). This mapping is a
+ * product judgment and may be revised after review.
+ */
+export const HISTORY_KIND_CATEGORIES = [
+  { id: 'people', label: 'People', kinds: ['person'] },
+  { id: 'places', label: 'Places', kinds: ['place'] },
+  {
+    id: 'organizations',
+    label: 'Organizations',
+    kinds: ['school', 'institution', 'organization'],
+  },
+  { id: 'events', label: 'Events & movements', kinds: ['event', 'movement'] },
+  { id: 'law', label: 'Law & courts', kinds: ['law', 'case'] },
+  { id: 'works', label: 'Works & other', kinds: ['publication', 'artifact', 'other'] },
+] as const;
+
+export type HistoryKindCategoryId = (typeof HISTORY_KIND_CATEGORIES)[number]['id'];
+
+/** Reverse lookup: raw entity kind -> consolidated category id. */
+export const HISTORY_KIND_TO_CATEGORY: Readonly<Record<string, HistoryKindCategoryId>> =
+  Object.freeze(
+    Object.fromEntries(
+      HISTORY_KIND_CATEGORIES.flatMap((category) =>
+        category.kinds.map((kind) => [kind, category.id] as const),
+      ),
+    ),
+  );
+
+/** True when `value` is a consolidated category id rather than a raw kind. */
+export function isHistoryKindCategory(value: string): value is HistoryKindCategoryId {
+  return HISTORY_KIND_CATEGORIES.some((category) => category.id === value);
+}
+
+/** Raw kinds belonging to a category id, or an empty list for unknown ids. */
+export function historyKindsForCategory(categoryId: string): readonly string[] {
+  return HISTORY_KIND_CATEGORIES.find((category) => category.id === categoryId)?.kinds ?? [];
+}
 
 export const HISTORY_SORT_OPTIONS: readonly {
   readonly value: HistorySort;
@@ -84,6 +153,30 @@ export function buildHistoryKindFacetOptionsWithCounts(
       label: kind.charAt(0).toUpperCase() + kind.slice(1),
       count,
     }));
+  return [{ value: 'all', label: 'All kinds' }, ...options];
+}
+
+/**
+ * Consolidated primary type facet: one option per {@link HISTORY_KIND_CATEGORIES} category
+ * that has at least one record in the current slice, with counts summed across the raw kinds
+ * it rolls up. Preserves the declared category order so the control is stable across slices.
+ */
+export function buildHistoryKindCategoryFacetOptions(
+  nodes: readonly { readonly kind: string }[],
+): readonly HistoryFacetOption[] {
+  const counts = new Map<string, number>();
+  for (const node of nodes) {
+    const categoryId = HISTORY_KIND_TO_CATEGORY[node.kind];
+    if (!categoryId) continue;
+    counts.set(categoryId, (counts.get(categoryId) ?? 0) + 1);
+  }
+  const options = HISTORY_KIND_CATEGORIES.filter((category) => (counts.get(category.id) ?? 0) > 0).map(
+    (category) => ({
+      value: category.id,
+      label: category.label,
+      count: counts.get(category.id) ?? 0,
+    }),
+  );
   return [{ value: 'all', label: 'All kinds' }, ...options];
 }
 
@@ -148,6 +241,12 @@ export function applyHistoryKindFilter<T extends { readonly kind: string }>(
   filters: HistoryFilterState,
 ): readonly T[] {
   if (filters.kind === 'all') return items;
+  // Consolidated category selection matches any of its member kinds; otherwise fall back to
+  // an exact raw-kind match (advanced "all record types" disclosure).
+  if (isHistoryKindCategory(filters.kind)) {
+    const memberKinds = new Set(historyKindsForCategory(filters.kind));
+    return items.filter((item) => memberKinds.has(item.kind));
+  }
   return items.filter((item) => item.kind === filters.kind);
 }
 

@@ -25,24 +25,13 @@
   margin: 0;
 }
 
-.ds-history__toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ds-space-2) var(--ds-space-3);
-  align-items: flex-end;
+/* Elevated primary search (repo-et18): full-width dedicated row, sized and
+   copper-accented to read as the primary entry action above the secondary filters. */
+.ds-history__search {
+  display: block;
   width: 100%;
   max-width: 100%;
   min-width: 0;
-}
-
-.ds-history__search {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ds-space-2);
-  align-items: flex-end;
-  flex: 1 1 16rem;
-  min-width: 0;
-  max-width: 100%;
 }
 
 .ds-history__search-label {
@@ -57,24 +46,200 @@
   border: 0;
 }
 
+.ds-history__search-field {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: var(--ds-space-1) var(--ds-space-2);
+  border: var(--ds-border-width-strong) solid var(--ds-border-strong);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface);
+}
+
+.ds-history__search-field:focus-within {
+  border-color: var(--ds-accent);
+  outline: var(--ds-border-width) solid var(--ds-accent);
+  outline-offset: -2px;
+}
+
+.ds-history__search-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  padding-left: var(--ds-space-2);
+  color: var(--ds-accent-graphic);
+}
+
 .ds-history__search-input {
-  flex: 1 1 12rem;
+  flex: 1 1 auto;
   min-width: 0;
   width: 100%;
   max-width: 100%;
-  min-height: 2.75rem;
-  padding: 0 var(--ds-space-3);
-  border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-sm);
-  background: var(--ds-surface);
+  min-height: 3rem;
+  padding: 0 var(--ds-space-2);
+  border: 0;
+  background: transparent;
   color: var(--ds-ink);
   font-family: var(--ds-font-sans);
-  font-size: 0.875rem;
+  font-size: 1rem;
+}
+
+.ds-history__search-input::placeholder {
+  color: var(--ds-ink-subtle);
 }
 
 .ds-history__search-input:focus-visible {
-  outline: 2px solid var(--ds-accent);
-  outline-offset: 2px;
+  outline: none;
+}
+
+.ds-history__search-submit {
+  flex: 0 0 auto;
+}
+
+/* Grouped secondary filters (repo-5rtl): each facet family gets a labeled group,
+   cutting the flat control row down to a small number of scannable clusters. */
+.ds-history__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-4) var(--ds-space-5);
+  align-items: flex-start;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.ds-history__filter-group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.ds-history__filter-group-label {
+  margin: 0 0 var(--ds-space-2);
+  padding: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+/* Compact segmented toggle for the ternary connections facet. */
+.ds-history__segment-strip {
+  display: inline-flex;
+  align-items: stretch;
+  max-width: 100%;
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-canvas);
+  overflow: hidden;
+}
+
+.ds-history__segment {
+  flex: 0 1 auto;
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  padding: 0 var(--ds-space-3);
+  border: 0;
+  border-right: var(--ds-border-width) solid var(--ds-rule);
+  background: transparent;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.ds-history__segment:last-child {
+  border-right: 0;
+}
+
+.ds-history__segment:hover {
+  color: var(--ds-ink);
+  background: var(--ds-surface-raised);
+}
+
+.ds-history__segment[aria-pressed='true'] {
+  background: var(--ds-surface-raised);
+  color: var(--ds-accent);
+  box-shadow: inset 0 0 0 var(--ds-border-width) var(--ds-accent);
+}
+
+.ds-history__segment:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-accent-graphic);
+  outline-offset: -2px;
+  z-index: 1;
+}
+
+/* "More filters" disclosure — defers the large topic-tag vocabulary. */
+.ds-history__more {
+  flex: 1 1 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.ds-history__more-summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  cursor: pointer;
+  font-family: var(--ds-font-sans);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-history__more-summary:hover {
+  color: var(--ds-ink);
+}
+
+.ds-history__more-summary:focus-visible {
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+.ds-history__more[open] > .ds-history__more-summary {
+  color: var(--ds-accent);
+}
+
+.ds-history__more-body {
+  padding-top: var(--ds-space-2);
+}
+
+/* Result bar: Sort (result ordering) + clear + count, separated from filters. */
+.ds-history__result-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2) var(--ds-space-3);
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding-top: var(--ds-space-3);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-history__sort {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  min-width: 0;
+}
+
+.ds-history__sort .ds-history-edition__facet-label {
+  flex: 0 0 auto;
 }
 
 .ds-history__count {
@@ -688,6 +853,44 @@
 .ds-history-kind-chips__chip:focus-visible {
   outline: 2px solid var(--ds-accent);
   outline-offset: 2px;
+}
+
+/* Advanced raw-kind disclosure (repo-k1t9): full entity-kind vocabulary deferred behind a
+   summary so the primary type row stays a small set of consolidated categories. */
+.ds-history-kind-chips__advanced {
+  flex: 0 0 100%;
+  min-width: 0;
+}
+
+.ds-history-kind-chips__advanced-summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+  padding: var(--ds-space-1) 0;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.ds-history-kind-chips__advanced-summary:hover {
+  color: var(--ds-ink);
+}
+
+.ds-history-kind-chips__advanced-summary:focus-visible {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 2px;
+}
+
+.ds-history-kind-chips__advanced-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-1) var(--ds-space-2);
+  align-items: center;
+  margin-top: var(--ds-space-1);
 }
 
 /* Data panel — replaces relationship-graph SVG */

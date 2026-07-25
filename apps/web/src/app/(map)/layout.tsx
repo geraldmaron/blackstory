@@ -18,6 +18,7 @@ import type { ReactNode } from 'react';
 import { loadMapStageBase } from './shared-map-data';
 import { MapStageProvider } from './MapStage';
 import './map-surfaces.css';
+import '../../components/patterns/cinematic-map/cinematic-map.css';
 
 export const dynamic = 'force-dynamic';
 

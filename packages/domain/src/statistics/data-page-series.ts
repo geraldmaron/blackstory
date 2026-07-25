@@ -154,7 +154,7 @@ export const DATA_PAGE_INDICATOR_FIXTURE_BUNDLE: DataPageIndicatorBundle = {
     yAxisLabel: 'Homeownership rate',
     series: [
       { id: 'black', label: 'Black householder', fill: 'var(--ds-viz-1)' },
-      { id: 'white', label: 'White householder', fill: 'var(--ds-viz-3)' },
+      { id: 'white', label: 'White householder', fill: 'var(--ds-viz-2)' },
     ],
     points: [
       { period: '1990', values: { black: 37.1, white: 63.8 } },
@@ -175,7 +175,7 @@ export const DATA_PAGE_INDICATOR_FIXTURE_BUNDLE: DataPageIndicatorBundle = {
     yAxisLabel: 'Denial rate',
     series: [
       { id: 'black', label: 'Black applicants', fill: 'var(--ds-viz-1)' },
-      { id: 'white', label: 'White applicants', fill: 'var(--ds-viz-3)' },
+      { id: 'white', label: 'White applicants', fill: 'var(--ds-viz-2)' },
     ],
     points: [
       { period: '2022', values: { black: 10.9, white: 6.5 } },
@@ -195,7 +195,7 @@ export const DATA_PAGE_INDICATOR_FIXTURE_BUNDLE: DataPageIndicatorBundle = {
     yAxisLabel: 'Average sentence (months)',
     series: [
       { id: 'crack', label: 'Crack cocaine', fill: 'var(--ds-viz-1)' },
-      { id: 'powder', label: 'Powder cocaine', fill: 'var(--ds-viz-3)' },
+      { id: 'powder', label: 'Powder cocaine', fill: 'var(--ds-viz-2)' },
     ],
     points: [
       { period: 'FY2016', values: { crack: 79, powder: 70 } },

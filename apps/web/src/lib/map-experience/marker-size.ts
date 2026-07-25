@@ -240,6 +240,23 @@ export function markerRadiusPlusExpression(offset: number): ExpressionSpecificat
   ]);
 }
 
+/** `markerRadiusPlusExpression()` with an additional flat `extraScale` multiplier baked into
+ * every zoom stop's output — used by the selected-entity pulse ring (docs/ui/patterns-cinematic-map.md
+ * §3) to grow the ring beyond the halo offset while it animates. `extraScale` cannot be applied
+ * as an outer `['*', ...]` around the finished expression: the style spec only permits `['zoom']`
+ * to be read by a top-level `interpolate`/`step`, so it must be multiplied into each stop like
+ * `scale` already is (same constraint documented on `zoomScaledRadiusExpression()`). */
+export function markerRadiusPlusScaledExpression(
+  offset: number,
+  extraScale: number,
+): ExpressionSpecification {
+  return zoomScaledRadiusExpression((dataRadius, scale) => [
+    '*',
+    ['+', dataRadius, offset],
+    scale * extraScale,
+  ]);
+}
+
 /**
  * Top-level zoom interpolate that scales a numeric paint expression (or literal) by
  * `MARKER_ZOOM_SCALE_STOPS` — used for circle-stroke-width so rims shrink with fills.

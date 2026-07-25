@@ -16,6 +16,10 @@ void React;
 
 const ROW_HEIGHT = 28;
 const CENTER_GUTTER = 8;
+// Row labels are full state/territory names (up to "District of Columbia"), much longer
+// than the numeric axis labels the shared CHART_MARGIN.left is sized for — use a wider
+// label column here so long names don't get clipped against the SVG's left edge.
+const LABEL_MARGIN_LEFT = 152;
 
 export type StatePopulationShiftChartProps = {
   readonly fromDecade: string;
@@ -67,7 +71,7 @@ function StateShiftBars({
           <g key={row.stateFips}>
             <text
               className="ds-data-chart__axis-label"
-              x={CHART_MARGIN.left - 8}
+              x={LABEL_MARGIN_LEFT - 8}
               y={y + 4}
               textAnchor="end"
             >
@@ -108,8 +112,8 @@ export function StatePopulationShiftChart({
 
   const { maxAbs } = divergingBarDomain(rows);
   const plotHeight = rows.length * ROW_HEIGHT;
-  const plotWidth = CHART_WIDTH - CHART_MARGIN.left - CHART_MARGIN.right;
-  const centerX = CHART_MARGIN.left + plotWidth / 2;
+  const plotWidth = CHART_WIDTH - LABEL_MARGIN_LEFT - CHART_MARGIN.right;
+  const centerX = LABEL_MARGIN_LEFT + plotWidth / 2;
   const barMaxWidth = plotWidth / 2 - CENTER_GUTTER;
   const viewHeight = CHART_MARGIN.top + plotHeight + CHART_MARGIN.bottom;
 

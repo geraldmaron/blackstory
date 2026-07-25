@@ -72,21 +72,28 @@ describe('home hero panel structure', () => {
       shellCss,
       /\[data-theme='dark'\]\s+\.ds-home-hero__copy\s*\{[^}]*background:\s*transparent/s,
     );
+    // repo-pyyw: one continuous canvas wash across the FULL hero, faded by a long
+    // horizontal mask ramp — never a flat column-1 plate with a hard edge.
     assert.match(
       shellCss,
-      /\.ds-home-hero::before\s*\{[^}]*color-mix\(in srgb,\s*var\(--ds-canvas\)\s*38%/s,
+      /\.ds-home-hero::before\s*\{[^}]*color-mix\(in srgb,\s*var\(--ds-canvas\)\s*78%/s,
     );
     assert.match(
       shellCss,
-      /\[data-theme='dark'\]\s+\.ds-home-hero::before\s*\{[^}]*color-mix\(in srgb,\s*var\(--ds-canvas\)\s*48%/s,
+      /\[data-theme='dark'\]\s+\.ds-home-hero::before\s*\{[^}]*color-mix\(in srgb,\s*var\(--ds-canvas\)\s*84%/s,
     );
     assert.match(
       shellCss,
-      /\.ds-home-hero::before\s*\{[^}]*grid-column:\s*1[^}]*background-image:\s*var\(--ds-edition-pattern-grain\)/s,
+      /\.ds-home-hero::before\s*\{[^}]*grid-column:\s*1\s*\/\s*-1[^}]*background-image:\s*var\(--ds-edition-pattern-grain\)/s,
+    );
+    assert.match(
+      shellCss,
+      /\.ds-home-hero::before\s*\{[^}]*mask-image:\s*linear-gradient\(\s*90deg/s,
     );
     assert.match(shellCss, /\.ds-home-hero__copy\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
     assert.match(shellCss, /\.ds-home-hero__copy\s*\{[^}]*grid-column:\s*1/s);
-    assert.match(
+    // No border seam between copy and map (repo-pyyw).
+    assert.doesNotMatch(
       shellCss,
       /\.ds-home-hero__copy\s*\{[^}]*border-right:[^}]*var\(--ds-border\)/s,
     );
@@ -192,10 +199,6 @@ describe('home shell-on-home', () => {
       /\.ds-shell:has\(\.ds-home-hero\)\s+\.ds-shell-header__inner\s*\{[^}]*border-radius:\s*var\(--ds-radius-md\)/s,
     );
     assert.doesNotMatch(shellCss, /\.ds-shell:has\(\.ds-home-hero\)\s+\.ds-shell-wordmark::after/);
-    assert.match(
-      shellCss,
-      /\.ds-shell:has\(\.ds-home-hero\)\s+\.ds-shell-wordmark__img--lockup/s,
-    );
   });
 });
 

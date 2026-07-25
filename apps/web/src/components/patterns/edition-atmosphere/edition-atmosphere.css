@@ -11,9 +11,20 @@
   --ds-edition-gutter-band: max(0px, calc((100vw - min(100% - (var(--ds-gutter) * 2), var(--ds-grid-max))) / 2));
 }
 
+/*
+ * Decorative paper texture, not a viewport-pinned watermark: it must cover the
+ * root's own content height and scroll with the page. `position: fixed` here
+ * stacked a second full-viewport compositor layer against the shell header's
+ * own `position: fixed` bar (repo-i0c4) — on some paint/scroll timings the
+ * layer went stale and rendered as a large solid block over the page instead
+ * of repainting, most visible against the dark theme's near-black canvas
+ * color. Every consumer of this class already sets `position: relative` (see
+ * `.ds-entity-edition`, `.ds-history-edition`, `.ds-home`, etc.), so `absolute`
+ * sizes correctly to the full page instead of just the viewport.
+ */
 .ds-edition-atmosphere-canvas::before {
   content: '';
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
@@ -31,7 +42,7 @@
 }
 
 .ds-edition-atmosphere {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;

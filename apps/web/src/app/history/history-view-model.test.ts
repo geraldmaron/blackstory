@@ -102,6 +102,41 @@ test('kind filter reduces results without hiding unmatched entities silently', (
   }
 });
 
+test('text search spans the full dataset, not just the active decade slice', () => {
+  const entities = listPublicEntities();
+  const targetId = 'ent_dunbar_school_001';
+  const all = buildHistoryViewModel({}, entities);
+  const target = all.nodes.find((node) => node.entityId === targetId);
+  assert.ok(target, 'expected the Dunbar seed record in the all-time view');
+
+  // Find a decade slice that does NOT contain the target record.
+  let decadeWithout: string | undefined;
+  for (const decade of all.availableDecades) {
+    const decadeView = buildHistoryViewModel({ decade }, entities);
+    if (!decadeView.nodes.some((node) => node.entityId === targetId)) {
+      decadeWithout = decade;
+      break;
+    }
+  }
+  assert.ok(decadeWithout, 'expected at least one decade without the target record');
+
+  // Sanity: searching within that decade WITHOUT the scope-break would find nothing —
+  // confirm the record is genuinely absent from that decade's slice.
+  const decadeOnly = buildHistoryViewModel({ decade: decadeWithout }, entities);
+  assert.equal(
+    decadeOnly.nodes.some((node) => node.entityId === targetId),
+    false,
+  );
+
+  // With a query, the search broadens to all decades and still returns the record.
+  const searched = buildHistoryViewModel({ decade: decadeWithout, q: 'Dunbar' }, entities);
+  assert.equal(searched.searchSpansAllTime, true);
+  assert.ok(
+    searched.nodes.some((node) => node.entityId === targetId),
+    'query matching a record in another decade must still return it',
+  );
+});
+
 test('edges expose evidence-backed citations and omit evidence-free connections', () => {
   const view = buildHistoryViewModel({});
   assert.ok(view.edges.length > 0);

@@ -16,6 +16,9 @@ import {
 export const ENTITY_LOCATION_PIN_SOURCE_ID = 'entity-location-pin';
 export const ENTITY_LOCATION_PIN_HALO_LAYER_ID = 'entity-location-pin-halo';
 export const ENTITY_LOCATION_PIN_LAYER_ID = 'entity-location-pin-point';
+/** Only feature in the source — fixed numeric id so `map.setFeatureState` can target it
+ * for the Cinematic Map Backdrop selection pulse (single-feature selection, spec §2 rule 5). */
+export const ENTITY_LOCATION_PIN_FEATURE_ID = 1;
 
 type RoadClassWidths = {
   readonly motorway: number;
@@ -161,6 +164,7 @@ export function buildEntityLocationMapStyle(
           features: [
             {
               type: 'Feature',
+              id: ENTITY_LOCATION_PIN_FEATURE_ID,
               properties: {},
               geometry: {
                 type: 'Point',
@@ -227,9 +231,25 @@ export function buildEntityLocationMapStyle(
         type: 'circle',
         source: ENTITY_LOCATION_PIN_SOURCE_ID,
         paint: {
-          'circle-radius': 14,
+          // Base radius/opacity; the Cinematic Map selection pulse (EntityLocationMap.tsx)
+          // drives these higher via a rAF loop keyed off `feature-state.selected`, mirroring the
+          // dual-signal ring spec (docs/ui/patterns-cinematic-map.md §3 rule 6) without depending
+          // on the DOM-marker-only `.ds-map-entity-marker--selected` CSS (this pin is canvas-painted).
+          'circle-radius': [
+            'case',
+            ['boolean', ['feature-state', 'selected'], false],
+            18,
+            14,
+          ] as unknown as ExpressionSpecification,
           'circle-color': DIGNITY_PALETTE.pointHalo,
-          'circle-opacity': 0.35,
+          'circle-opacity': [
+            'case',
+            ['boolean', ['feature-state', 'selected'], false],
+            0.55,
+            0.35,
+          ] as unknown as ExpressionSpecification,
+          'circle-radius-transition': { duration: 280 },
+          'circle-opacity-transition': { duration: 280 },
         },
       },
       {
@@ -239,8 +259,14 @@ export function buildEntityLocationMapStyle(
         paint: {
           'circle-radius': 7,
           'circle-color': DIGNITY_PALETTE.point,
-          'circle-stroke-width': 2,
+          'circle-stroke-width': [
+            'case',
+            ['boolean', ['feature-state', 'selected'], false],
+            3,
+            2,
+          ] as unknown as ExpressionSpecification,
           'circle-stroke-color': DIGNITY_PALETTE.pointHalo,
+          'circle-stroke-width-transition': { duration: 280 },
         },
       },
     ],

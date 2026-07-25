@@ -16,13 +16,22 @@ export type HistoryViewModel = {
   readonly nodes: readonly HistoryNodeView[];
   readonly edges: readonly HistoryEdgeView[];
   readonly facetOptions: {
+    /** Consolidated high-level type categories (primary chips). */
     readonly kind: readonly HistoryFacetOption[];
+    /** Full raw entity-kind vocabulary for the advanced "all record types" disclosure. */
+    readonly kindDetail: readonly HistoryFacetOption[];
     readonly status: readonly HistoryFacetOption[];
     readonly era: readonly HistoryFacetOption[];
     readonly topic: readonly HistoryFacetOption[];
   };
   readonly overview: HistoryOverview;
   readonly totalMatched: number;
+  /**
+   * True when an active text query broadened the result set from the selected decade to the
+   * full dataset (search is never scoped to a single decade). Drives the "spanning all
+   * decades" hint in the result bar.
+   */
+  readonly searchSpansAllTime: boolean;
   readonly releaseId: string;
   readonly contentHash: string;
   readonly selectedNode?: HistoryNodeView;
