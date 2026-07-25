@@ -14,10 +14,15 @@ import {
   HMDA_DERIVED_RACE_BLACK,
   HMDA_DERIVED_RACE_WHITE,
   HMDA_DENIAL_RATE_ACTIONS_TAKEN,
+  HMDA_NATION_AGGREGATE_STRATEGY_NOTE,
   PHASE1_HMDA_DATASET_VINTAGE,
   PHASE1_HMDA_DENIAL_RATE_BLACK_COUNTY_METRIC_ID,
   PHASE1_HMDA_DENIAL_RATE_GAP_BLACK_WHITE_COUNTY_METRIC_ID,
   PHASE1_HMDA_DENIAL_RATE_WHITE_COUNTY_METRIC_ID,
+  PHASE1_HMDA_DENIAL_RATE_BLACK_NATION_METRIC_ID,
+  PHASE1_HMDA_DENIAL_RATE_GAP_BLACK_WHITE_NH_NATION_METRIC_ID,
+  PHASE1_HMDA_DENIAL_RATE_WHITE_NH_NATION_METRIC_ID,
+  PHASE1_HMDA_NATION_DATASET_VINTAGE,
 } from './constants.js';
 
 export type HmdaAggregationSlice = {
@@ -344,4 +349,201 @@ export function listPhase1HmdaIndicators(): readonly Phase1IndicatorDefinition[]
     (row) => row.externalDataSourceId === 'hmda-loan-level',
   );
   return fromMain.length > 0 ? fromMain : PHASE1_HMDA_INDICATOR_DEFINITIONS;
+}
+
+// National aggregations (no county validation needed)
+
+type NationRaceYearCounts = {
+  readonly race: string;
+  readonly referenceYear: number;
+  readonly applications: number;
+  readonly denials: number;
+};
+
+function parseAggregationYearForNation(parameters?: Record<string, string>): number | undefined {
+  const yearsRaw = parameters?.years ?? parameters?.year;
+  const years = yearsRaw === undefined ? undefined : String(yearsRaw).trim();
+  if (!years) return undefined;
+  const first = years.split(',')[0]?.trim();
+  if (first && /^\d{4}$/.test(first)) {
+    return Number(first);
+  }
+  return undefined;
+}
+
+/** Parses one FFIEC national aggregations JSON payload into race-year application/denial counts. */
+export function parseHmdaNationAggregationResponse(
+  payload: HmdaAggregationsResponse,
+): {
+  readonly rows: readonly NationRaceYearCounts[];
+  readonly rejected: readonly string[];
+} {
+  const fallbackYear = parseAggregationYearForNation(payload.parameters);
+  const grouped = new Map<string, NationRaceYearCounts>();
+  const rejected: string[] = [];
+
+  for (const slice of payload.aggregations) {
+    const referenceYear = inferReferenceYear(slice, fallbackYear);
+    if (referenceYear === undefined) {
+      rejected.push(`missing activity_year for race=${slice.races}`);
+      continue;
+    }
+
+    if (
+      slice.races !== HMDA_DERIVED_RACE_WHITE &&
+      slice.races !== HMDA_DERIVED_RACE_BLACK
+    ) {
+      rejected.push(`unsupported race slice: ${JSON.stringify(slice.races)}`);
+      continue;
+    }
+
+    if (
+      !HMDA_DENIAL_RATE_ACTIONS_TAKEN.includes(
+        String(slice.actions_taken) as '1' | '2' | '3',
+      )
+    ) {
+      rejected.push(
+        `unsupported actions_taken=${JSON.stringify(slice.actions_taken)} for race=${slice.races}`,
+      );
+      continue;
+    }
+
+    if (!Number.isFinite(slice.count) || slice.count < 0) {
+      rejected.push(`invalid count for race=${slice.races} year=${referenceYear}`);
+      continue;
+    }
+
+    const key = `${referenceYear}:${slice.races}`;
+    const existing = grouped.get(key) ?? {
+      race: slice.races,
+      referenceYear,
+      applications: 0,
+      denials: 0,
+    };
+
+    const applications = existing.applications + slice.count;
+    const denials =
+      existing.denials + (String(slice.actions_taken) === '3' ? slice.count : 0);
+    grouped.set(key, {
+      ...existing,
+      applications,
+      denials,
+    });
+  }
+
+  return { rows: [...grouped.values()], rejected };
+}
+
+function nationJurisdictionId(): string {
+  return 'nation:US';
+}
+
+function buildNationDraft(input: {
+  readonly metricId: string;
+  readonly referencePeriod: string;
+  readonly estimate: number;
+  readonly retrievedAt: string;
+  readonly raceEthnicitySlice?: string;
+  readonly applicationCount?: number;
+  readonly denialCount?: number;
+}): Phase1HmdaObservationDraft {
+  const metric = metricById(input.metricId);
+  const jurisdictionId = nationJurisdictionId();
+  const boundaryVersion = 'nation-2020';
+  const draft: Phase1HmdaObservationDraft = {
+    id: observationId(metric.metricId, jurisdictionId, input.referencePeriod),
+    metricId: metric.metricId,
+    jurisdictionId,
+    boundaryVersion,
+    referencePeriod: input.referencePeriod,
+    datasetVintage: PHASE1_HMDA_NATION_DATASET_VINTAGE,
+    estimate: input.estimate,
+    source: metric.externalDataSourceId,
+    sourceUrl: HMDA_DATA_BROWSER_HOMEPAGE_URL,
+    retrievedAt: input.retrievedAt,
+    contentHash: contentHash({
+      metricId: metric.metricId,
+      jurisdictionId,
+      referencePeriod: input.referencePeriod,
+      estimate: input.estimate,
+      boundaryVersion,
+    }),
+    methodologyNote: HMDA_NATION_AGGREGATE_STRATEGY_NOTE,
+    ...(input.raceEthnicitySlice !== undefined ? { raceEthnicitySlice: input.raceEthnicitySlice } : {}),
+    ...(input.applicationCount !== undefined ? { applicationCount: input.applicationCount } : {}),
+    ...(input.denialCount !== undefined ? { denialCount: input.denialCount } : {}),
+  };
+  assertPublishedStatisticProvenance({
+    source: draft.source,
+    sourceUrl: draft.sourceUrl,
+    retrievedAt: draft.retrievedAt,
+    contentHash: draft.contentHash,
+  });
+  return draft;
+}
+
+/** Converts parsed national race-year counts into Black, White, and gap observation drafts. */
+export function mapHmdaNationCountsToObservations(
+  rows: readonly NationRaceYearCounts[],
+  retrievedAt: string,
+): readonly Phase1HmdaObservationDraft[] {
+  const byYear = new Map<number, Map<string, NationRaceYearCounts>>();
+  for (const row of rows) {
+    const raceMap = byYear.get(row.referenceYear) ?? new Map<string, NationRaceYearCounts>();
+    raceMap.set(row.race, row);
+    byYear.set(row.referenceYear, raceMap);
+  }
+
+  const drafts: Phase1HmdaObservationDraft[] = [];
+
+  for (const [referenceYear, raceMap] of byYear) {
+    const black = raceMap.get(HMDA_DERIVED_RACE_BLACK);
+    const white = raceMap.get(HMDA_DERIVED_RACE_WHITE);
+    if (!black || !white) continue;
+
+    const referencePeriod = String(referenceYear);
+
+    const blackRate = denialRatePct(black.applications, black.denials);
+    if (blackRate !== undefined) {
+      drafts.push(
+        buildNationDraft({
+          metricId: PHASE1_HMDA_DENIAL_RATE_BLACK_NATION_METRIC_ID,
+          referencePeriod,
+          estimate: blackRate,
+          retrievedAt,
+          raceEthnicitySlice: 'black',
+          applicationCount: black.applications,
+          denialCount: black.denials,
+        }),
+      );
+    }
+
+    const whiteRate = denialRatePct(white.applications, white.denials);
+    if (whiteRate !== undefined) {
+      drafts.push(
+        buildNationDraft({
+          metricId: PHASE1_HMDA_DENIAL_RATE_WHITE_NH_NATION_METRIC_ID,
+          referencePeriod,
+          estimate: whiteRate,
+          retrievedAt,
+          raceEthnicitySlice: 'white',
+          applicationCount: white.applications,
+          denialCount: white.denials,
+        }),
+      );
+    }
+
+    if (blackRate !== undefined && whiteRate !== undefined) {
+      drafts.push(
+        buildNationDraft({
+          metricId: PHASE1_HMDA_DENIAL_RATE_GAP_BLACK_WHITE_NH_NATION_METRIC_ID,
+          referencePeriod,
+          estimate: roundGap(blackRate - whiteRate),
+          retrievedAt,
+        }),
+      );
+    }
+  }
+
+  return drafts;
 }
