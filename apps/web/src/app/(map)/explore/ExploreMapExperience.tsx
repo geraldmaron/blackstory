@@ -1500,7 +1500,6 @@ function ExploreMapExperienceBody({ initial }: ExploreMapExperienceProps) {
   // recurring auto-engage.
   useLayoutEffect(() => {
     cinematic.engage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Relock cleanup (spec §2 rule 4): when Close (or Escape) drops Engaged -> Rest, deselect any
@@ -1518,7 +1517,6 @@ function ExploreMapExperienceBody({ initial }: ExploreMapExperienceProps) {
         mergeViewState(view.viewState, { clearSelected: true, clearEdge: true }),
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cinematic.state]);
 
   const degradedCopy = stage.mapAvailable ? null : DEGRADED_MODE_COPY.map_canvas_unavailable;

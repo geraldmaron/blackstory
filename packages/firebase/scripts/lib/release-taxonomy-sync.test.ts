@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import type { PoolClient } from 'pg';
 import { applyReleaseTaxonomySync, planReleaseTaxonomySync } from './release-taxonomy-sync.ts';
 
 type Row = {
@@ -22,7 +23,7 @@ function fakeClient(rows: readonly Row[]) {
       return { rows: [] };
     },
     // biome-ignore lint: test double, cast to the shape the module expects
-  } as unknown as import('pg').PoolClient & { readonly updates: typeof updates };
+  } as unknown as PoolClient & { readonly updates: typeof updates };
 }
 
 test('planReleaseTaxonomySync proposes topics for a row with real canonical classification and no release taxonomy', async () => {

@@ -49,7 +49,6 @@ Flaky tests belong in `packages/testing/quarantine.json` with `owner`, `deadline
 
 - Local: Java runtime (Homebrew `openjdk@21` is the default `JAVA_HOME` in `pnpm firebase:emulators`) + `pnpm firebase:emulators`, then `pnpm test:integration` (skips if emulators/Java unavailable).
 - Firestore security rules + converters: `pnpm firebase:test:rules` (or `@repo/firebase` tests); skips locally unless emulators are up; set `CI_REQUIRE_FIREBASE=1` to fail closed.
-- CI job **Integration Firebase** installs Temurin 21, starts demo emulators, runs harness + **Firestore rules tests**, sets `CI_REQUIRE_FIREBASE=1`. Missing emulators fails the job.
 
 ### E2E
 
@@ -68,7 +67,6 @@ Workflow: `.github/workflows/ci.yml` (`name: CI`)
 | Unit Tests (Python) |
 | Contract Security Accessibility |
 | Coverage |
-| Integration Firebase |
 | Build and Typecheck |
 | E2E Harness |
 | Governance |

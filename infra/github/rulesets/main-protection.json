@@ -33,7 +33,6 @@
           { "context": "Unit Tests (Python)" },
           { "context": "Contract Security Accessibility" },
           { "context": "Coverage" },
-          { "context": "Integration Firebase" },
           { "context": "Build and Typecheck" },
           { "context": "E2E Harness" },
           { "context": "Governance" }

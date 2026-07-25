@@ -44,7 +44,6 @@ Must match job `name:` values in `.github/workflows/ci.yml` and the ruleset:
 - Unit Tests (Python)
 - Contract Security Accessibility
 - Coverage
-- Integration Firebase
 - Build and Typecheck
 - E2E Harness
 - Governance

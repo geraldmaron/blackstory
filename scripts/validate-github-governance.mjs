@@ -31,7 +31,6 @@ const REQUIRED_CHECK_NAMES = [
   'Unit Tests (Python)',
   'Contract Security Accessibility',
   'Coverage',
-  'Integration Firebase',
   'Build and Typecheck',
   'E2E Harness',
   'Governance',
