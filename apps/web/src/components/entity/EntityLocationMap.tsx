@@ -7,8 +7,10 @@
  */
 'use client';
 
-import { useEffect, useId, useRef, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 import type { Map as MapLibreMap } from 'maplibre-gl';
+
+void React;
 import type { MapColorScheme } from '../../lib/map-experience/dignity-style';
 import {
   ENTITY_LOCATION_PIN_FEATURE_ID,

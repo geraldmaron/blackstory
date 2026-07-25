@@ -4,11 +4,11 @@
  * `./index.ts` already owns release-level infrastructure (manifest hashing, signing, lifecycle
  * transitions). This module owns the CONTENT of one entity's release artifacts — the piece that
  * was previously duplicated, thinned-out logic living inline in
- * `packages/firebase/scripts/publish-national-catalog.ts`. That script is today's only writer of
+ * `packages/ops-data/scripts/publish-national-catalog.ts`. That script is today's only writer of
  * `publicReleases/{releaseId}/entities/{id}` + `publicSearchIndex/{id}` docs, and it works from a
  * `CatalogEntry` fixture shape (see that script's header) rather than the richer
  * `CanonicalEntityDoc`/`CanonicalClaimDoc` model — so `ReleaseSourceEntity` below intentionally
- * mirrors `CatalogEntry`'s shape, generalized so it carries no dependency on `@repo/firebase`'s
+ * mirrors `CatalogEntry`'s shape, generalized so it carries no dependency on `@repo/ops-data`'s
  * Zod schemas (this package must not depend on that package). When a canonical-graph release
  * builder replaces the fixture-driven one, adapt a `CanonicalEntityDoc` into this same
  * `ReleaseSourceEntity` shape rather than writing a second builder.

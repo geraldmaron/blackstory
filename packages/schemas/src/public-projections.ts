@@ -7,6 +7,25 @@
  */
 import { z } from 'zod';
 
+/**
+ * Mirrors ThemeImpactThemeId / THEME_IMPACT_THEME_IDS from
+ * packages/domain/src/statistics/theme-impact-questions.ts. Kept as a local literal
+ * (not imported) so schemas does not take a reverse dependency on @repo/domain — see
+ * banned-books.ts for the same pattern. Keep this list in sync with that file.
+ */
+const THEME_IMPACT_THEME_IDS_MIRROR = [
+  'redlining',
+  'drug_policy_state',
+  'urban_renewal',
+  'mass_incarceration',
+  'environmental_racism',
+  'school_segregation',
+  'voting_rights',
+  'cross_cutting',
+] as const;
+
+const themeImpactThemeIdSchema = z.enum(THEME_IMPACT_THEME_IDS_MIRROR);
+
 const entityKindSchema = z.enum([
   'person',
   'place',
@@ -162,9 +181,40 @@ export const publicEntityProjectionSchema = z.object({
 });
 export type PublicEntityProjectionDoc = z.infer<typeof publicEntityProjectionSchema>;
 
+/**
+ * Anchors a theme-impact packet's data moment (observation/derived/artifact) to a
+ * point within a story body section. Additive/optional — projection layer only,
+ * does not change how sections are assembled or rendered by default.
+ */
+export const publicStorySectionMomentSchema = z.object({
+  packetId: z.string().min(1),
+  kind: z.enum(['observation', 'artifact', 'derived', 'timeline', 'map']),
+  refId: z.string().min(1),
+  placement: z.enum(['after']),
+});
+export type PublicStorySectionMomentDoc = z.infer<typeof publicStorySectionMomentSchema>;
+
+/** One side of a two-source dispute surfaced within a story body section. */
+export const publicStorySectionDisputeSideSchema = z.object({
+  sourceLabel: z.string().min(1),
+  claim: z.string().min(1),
+});
+export type PublicStorySectionDisputeSideDoc = z.infer<
+  typeof publicStorySectionDisputeSideSchema
+>;
+
+export const publicStorySectionDisputeSchema = z.object({
+  label: z.string().min(1),
+  sideA: publicStorySectionDisputeSideSchema,
+  sideB: publicStorySectionDisputeSideSchema,
+});
+export type PublicStorySectionDisputeDoc = z.infer<typeof publicStorySectionDisputeSchema>;
+
 export const publicStorySectionSchema = z.object({
   heading: z.string().min(1).optional(),
   paragraphs: z.array(z.string().min(1)).min(1),
+  moments: z.array(publicStorySectionMomentSchema).optional(),
+  disputes: z.array(publicStorySectionDisputeSchema).optional(),
 });
 export type PublicStorySectionDoc = z.infer<typeof publicStorySectionSchema>;
 
@@ -173,6 +223,18 @@ export const publicStorySourceSchema = z.object({
   url: z.string().url().max(2048),
 });
 export type PublicStorySourceDoc = z.infer<typeof publicStorySourceSchema>;
+
+/**
+ * Binds a story to a themeId (mirrors ThemeImpactThemeId — see
+ * THEME_IMPACT_THEME_IDS_MIRROR above) as one chapter of a multi-story theme arc.
+ * Projection-layer only: does not merge or reorder stories in any pipeline.
+ */
+export const publicStoryThemeBindingSchema = z.object({
+  themeId: themeImpactThemeIdSchema,
+  chapterIndex: z.number().int().positive(),
+  chapterCount: z.number().int().positive(),
+});
+export type PublicStoryThemeBindingDoc = z.infer<typeof publicStoryThemeBindingSchema>;
 
 export const publicStoryProjectionSchema = z.object({
   id: z.string().min(1),
@@ -189,6 +251,7 @@ export const publicStoryProjectionSchema = z.object({
   body: z.array(publicStorySectionSchema).min(1),
   relatedEntityIds: z.array(z.string().min(1)).min(1),
   sources: z.array(publicStorySourceSchema).min(1),
+  themeBinding: publicStoryThemeBindingSchema.optional(),
 });
 export type PublicStoryProjectionDoc = z.infer<typeof publicStoryProjectionSchema>;
 

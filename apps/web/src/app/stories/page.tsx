@@ -1,11 +1,16 @@
 /**
- * Stories index: longform history narratives pinned to place and evidence.
+ * Stories index ("Chapters"): longform history narratives pinned to place and
+ * evidence, grouped by theme. Stories bound to a theme (`themeBinding`) link
+ * into their theme's chaptered essay at `/themes/[themeId]#chapter-N`; stories
+ * with no theme binding are listed under a final "Standalone" group and keep
+ * linking to their own article page.
  *
  * v6 edition Surface stack with shared gutter mosaic atmosphere. Thin list items
  * load from the public release story projection; full bodies load on article pages.
  */
 import Link from 'next/link';
 import { listPublicStoryListItems } from '../../lib/public-data/source';
+import { groupStoriesByTheme, storyHref } from './story-groups';
 import {
   storiesEditionPanelClassName,
   storiesEditionRootClassName,
@@ -14,7 +19,7 @@ import {
 import './stories-edition.css';
 
 export const metadata = {
-  title: 'Stories',
+  title: 'Chapters',
   description:
     'Longform history from the BlackStory archive: place-first articles with sources and links to records.',
 };
@@ -22,6 +27,7 @@ export const metadata = {
 export default async function StoriesIndexPage() {
   const { data: stories } = await listPublicStoryListItems();
   const countLabel = stories.length === 1 ? '1 story' : `${stories.length} stories`;
+  const groups = groupStoriesByTheme(stories);
 
   return (
     <div className={storiesEditionRootClassName()} data-stories-edition="v6">
@@ -59,19 +65,24 @@ export default async function StoriesIndexPage() {
               Published stories
             </h2>
             <p className="ds-stories-edition__count">{countLabel}</p>
-            <ul className="ds-story-rail ds-story-rail--grid">
-              {stories.map((story) => (
-                <li key={story.slug}>
-                  <Link className="ds-story-link" href={`/stories/${story.slug}`}>
-                    <span className="ds-story-link__meta">
-                      {story.eraLabel} · {story.placeLabel}
-                    </span>
-                    <h3 className="ds-story-link__title">{story.title}</h3>
-                    <p className="ds-story-link__summary">{story.dek}</p>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            {groups.map((group) => (
+              <div className="ds-story-rail-group" key={group.key}>
+                <h3 className="ds-story-rail-group__heading">{group.label.toUpperCase()}</h3>
+                <ul className="ds-story-rail ds-story-rail--grid">
+                  {group.stories.map((story) => (
+                    <li key={story.slug}>
+                      <Link className="ds-story-link" href={storyHref(story)}>
+                        <span className="ds-story-link__meta">
+                          {story.eraLabel} · {story.placeLabel}
+                        </span>
+                        <h3 className="ds-story-link__title">{story.title}</h3>
+                        <p className="ds-story-link__summary">{story.dek}</p>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </article>
         </div>
       </main>

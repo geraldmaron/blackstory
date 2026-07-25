@@ -17,7 +17,7 @@ export type ResolvedJurisdictionIds = {
   /**
    * On-demand place id (Census place FIPS-keyed), per ADR-016 "cities: on-demand only." This
    * product does not yet have a live `jurisdictions/{id}` writer for the `city` kind
-   * (`packages/firebase` owns that write path). `placeId` is the deterministic id a future
+   * (`packages/ops-data` owns that write path). `placeId` is the deterministic id a future
    * on-demand-city-creation pass should use, and `placeCreateHint` carries the minimal fields
    * that pass would need to actually create the doc. Neither is written to Firestore by this
    * module.

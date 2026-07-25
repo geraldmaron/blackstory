@@ -12,7 +12,7 @@ export type ShellNavItem = {
 export const PRIMARY_NAV: readonly ShellNavItem[] = [
   { href: '/explore', label: 'Explore' },
   { href: '/history', label: 'History' },
-  { href: '/stories', label: 'Stories' },
+  { href: '/stories', label: 'Chapters' },
   { href: '/about', label: 'About' },
 ] as const;
 
@@ -40,7 +40,7 @@ export const FOOTER_NAV_COLUMNS: readonly FooterNavColumn[] = [
     items: [
       { href: '/explore', label: 'Explore' },
       { href: '/history', label: 'History' },
-      { href: '/stories', label: 'Stories' },
+      { href: '/stories', label: 'Chapters' },
       { href: '/data', label: 'Data' },
       { href: '/law', label: 'Law' },
       { href: '/books', label: 'Banned books' },

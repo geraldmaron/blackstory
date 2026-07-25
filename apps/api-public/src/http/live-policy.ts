@@ -7,7 +7,7 @@
  * convention. Postgres is the only production SoR path (ADR-020) — the legacy Firestore read
  * branch was removed (repo-348e.3); there is no fallback to Firestore, silent or explicit.
  */
-import { hasEmulatorSignals, type EnvironmentLike } from '@repo/firebase';
+import { hasEmulatorSignals, type EnvironmentLike } from '@repo/ops-data';
 
 export type PublicDataSource = 'seed' | 'postgres' | 'fixtures';
 
@@ -36,12 +36,6 @@ function hasPostgresConnection(environment: EnvironmentLike): boolean {
 export function shouldUsePublicPostgresDataAccess(
   environment: EnvironmentLike = process.env,
 ): boolean {
-  if (
-    environment.PUBLIC_READ_API_DISABLED === '1' ||
-    environment.PUBLIC_READ_API_DISABLED === 'true'
-  ) {
-    return false;
-  }
   if (
     environment.PUBLIC_DATA_SOURCE === 'fixtures' ||
     environment.PUBLIC_DATA_SOURCE === 'seed'

@@ -11,7 +11,7 @@
  * Not wired live: call `assertJurisdictionReferencesResolve` with every `jurisdictionId` /
  * `jurisdictionIds` entry collected off the claims/entities/locations slated for a projection
  * build, and a `JurisdictionResolver` backed by the real `jurisdictions` Firestore collection
- * (see `packages/firebase/src/jurisdictions/resolver.ts`,
+ * (see `packages/ops-data/src/jurisdictions/resolver.ts`,
  * `createFirestoreJurisdictionResolver`), immediately before the release manifest is built
  * (`buildReleaseManifest` in `packages/domain/src/publication/index.ts`, or its Python
  * equivalent in `workers/publication/` per ADR-007). Do not proceed to build/activate the

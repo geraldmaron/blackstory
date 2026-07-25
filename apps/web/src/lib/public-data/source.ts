@@ -1,8 +1,9 @@
 /**
- * Public data source selector: Postgres plus portable release artifacts and seed snapshot
- * fallback. Hydrates 1-hop related neighbor stubs and composes capped 2-hop continue-learning on
- * entity pages only. List/map/search/stories may use versioned release artifacts as a cache,
- * while canonical live reads always come from `bb_public.*`.
+ * Public data source selector: Supabase Postgres (`bb_public.*`) is the sole source of truth.
+ * Hydrates 1-hop related neighbor stubs and composes capped 2-hop continue-learning on
+ * entity pages only. List/map/search/stories may use versioned release artifacts as a read-through
+ * cache, but canonical live reads always come from `bb_public.*`. Postgres read failures propagate
+ * as errors — there is no hardcoded seed/snapshot fallback.
  * The `/stories` index caches field-masked list items (no body). Story detail / about mosaic /
  * similar card rails use a thin batched point-get (`listPublicEntityViewsByIds`) — never the
  * 2-hop learning graph. Sitemap and entity `generateStaticParams` use `getPublicSearchIndex`
@@ -10,8 +11,6 @@
  * process memory only; Next's 2MB data-cache limit must not receive the fat array.
  *
  * Cost knobs (env / Vercel):
- * - `PUBLIC_READ_API_DISABLED=1` — snapshot-only (no live Postgres/artifact reads)
- * - `PUBLIC_DATA_SOURCE=seed|postgres` — force seed vs canonical live backend
  * - `APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL` — CDN/GCS base for entities.json / search-index.json
  * - Vercel Fluid Compute / function concurrency — primary idle/active cost driver
  */
@@ -29,41 +28,22 @@ import {
   composeContinueLearningStubs,
   type NeighborLookup,
 } from '@repo/domain/learning-index';
-import {
-  getPublicEntity,
-  listPublicEntities,
-  type PublicEntityView,
-  type RelatedNeighborView,
-} from '../../data/public-seed';
+import type { PublicEntityView, RelatedNeighborView } from '../../data/public-seed';
 import { buildGraphTimeline } from '../../data/entity-graph-seed';
-import {
-  isPublicReadApiDisabled,
-  resolvePublicEntity,
-  type PublicReadResult,
-  type PublicReadSource,
-} from '../runtime-hardening/degraded-mode';
-import { getSnapshotSearchIndex } from '../search/snapshot-search-index';
 import {
   fetchActiveRelease,
   fetchPublicEntityProjection,
   fetchPublicEntityProjectionsByIds,
   fetchPublicStoryProjection,
-  getSnapshotStoryProjection,
   listPublicEntityProjections,
   listPublicSearchIndexDocs,
   listPublicStoryProjections,
   listPublicStorySummaries,
-  listSnapshotStoryListItems,
-  listSnapshotStoryProjections,
   parseEntityProjection,
   parseSearchIndexDoc,
   shouldUseLivePublicProjections,
 } from './public-readers';
-import {
-  isPostgresPublicDataMisconfigured,
-  isPostgresPublicDataSource,
-  shouldPreferReleaseArtifacts,
-} from './live-policy';
+import { isPostgresPublicDataMisconfigured, shouldPreferReleaseArtifacts } from './live-policy';
 import {
   createLiveCatalogMemoryCache,
   isOversizedLiveCatalogSentinel,
@@ -79,8 +59,6 @@ import {
   fetchReleaseEntitiesListArtifact,
   fetchReleaseSearchIndexArtifact,
 } from './release-artifacts';
-
-export type { PublicReadSource };
 
 /** Cross-request cache window for release catalog / search index / stories (seconds). */
 const RELEASE_CATALOG_REVALIDATE_SECONDS = 300;
@@ -417,107 +395,72 @@ async function loadLiveEntitiesByIdsThin(
   return projections.map((item) => mapProjectionToPublicEntityView(item as PublicProjectionInput));
 }
 
+/** Source of a public read result. `'none'` means a genuine miss (not-found), never a degraded fallback. */
+export type PublicReadSource = 'live' | 'none';
+
+export interface PublicReadResult<T> {
+  readonly data: T | undefined;
+  readonly source: PublicReadSource;
+}
+
 /**
- * Resolve one entity: live projection first. Seed snapshot only when not in postgres SoR
- * mode (see `resolvePublicEntity`); postgres misses return not-found rather than Dunbar.
+ * Resolve one entity: live Postgres projection only. Postgres failures propagate as errors;
+ * a genuine miss returns not-found. No seed/snapshot fallback.
  */
 export const resolvePublicEntityView = cache(async function resolvePublicEntityView(
   entityId: string,
 ): Promise<PublicReadResult<PublicEntityView>> {
-  return resolvePublicEntity(entityId, () => loadLiveEntity(entityId));
+  const live = await loadLiveEntity(entityId);
+  return live !== undefined ? { data: live, source: 'live' } : { data: undefined, source: 'none' };
 });
 
 /**
- * List entities from live release artifacts/cache.
- * Seed snapshot is only for explicit seed / read-disabled modes — never as a silent
- * postgres fallback (that baked 4 Dunbar pins into the hero while explore stayed live).
+ * List entities from live release artifacts/cache. Postgres is the sole source of truth;
+ * misconfiguration or read failure surfaces as a thrown error, never a seed fallback.
  */
 export const listPublicEntityViews = cache(async function listPublicEntityViews(): Promise<{
   readonly data: readonly PublicEntityView[];
   readonly source: PublicReadSource;
 }> {
-  if (isPublicReadApiDisabled()) {
-    return { data: listPublicEntities(), source: 'snapshot' };
-  }
-
-  if (isPostgresPublicDataSource()) {
-    if (isPostgresPublicDataMisconfigured()) {
-      console.error(
-        '[public-data] PUBLIC_DATA_SOURCE=postgres requires DATABASE_URL (or APP_DATABASE_URL). ' +
-          'Returning empty catalog (seed refused). Fix: ./scripts/dev-web.sh or apps/web/.env.local.',
-      );
-      return { data: [], source: 'none' };
-    }
-    try {
-      const live = await loadLiveEntities();
-      if (live !== undefined) {
-        return { data: live, source: 'live' };
-      }
-      console.warn(
-        '[public-data] postgres live catalog unavailable; refusing seed fallback (empty catalog)',
-      );
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      console.warn(
-        `[public-data] postgres live catalog failed; refusing seed fallback (empty catalog): ${message}`,
-      );
-    }
-    return { data: [], source: 'none' };
-  }
-
-  try {
-    const live = await loadLiveEntities();
-    if (live !== undefined) {
-      return { data: live, source: 'live' };
-    }
-  } catch {
-    // Non-postgres modes may fall through to the bundled seed snapshot.
-  }
-
-  const snapshot = listPublicEntities();
-  if (process.env.NODE_ENV === 'development') {
-    console.warn(
-      `[public-data] Serving Dunbar seed snapshot (${snapshot.length} entities). ` +
-        'National dig looks empty without the live catalog — set PUBLIC_DATA_SOURCE=postgres ' +
-        'and DATABASE_URL, or run ./scripts/dev-web.sh.',
+  if (isPostgresPublicDataMisconfigured()) {
+    throw new Error(
+      '[public-data] PUBLIC_DATA_SOURCE=postgres requires DATABASE_URL (or APP_DATABASE_URL).',
     );
   }
-  return { data: snapshot, source: 'snapshot' };
+
+  const live = await loadLiveEntities();
+  if (live === undefined) {
+    throw new Error('[public-data] postgres live catalog unavailable');
+  }
+  return { data: live, source: 'live' };
 });
 
 /**
- * Search index: prefer a version-matched release artifact, then Postgres `bb_public.search_index`,
- * then bundled seed. Never rebuilds from a full entity projection scan when live index exists.
+ * Search index: prefer a version-matched release artifact, then Postgres `bb_public.search_index`.
+ * Never rebuilds from a full entity projection scan when live index exists. No seed fallback.
  */
 export const getPublicSearchIndex = cache(async function getPublicSearchIndex(): Promise<{
   readonly data: readonly PublicSearchIndexDoc[];
   readonly source: PublicReadSource;
 }> {
-  if (isPublicReadApiDisabled()) {
-    return { data: getSnapshotSearchIndex(), source: 'snapshot' };
+  if (!shouldUseLivePublicProjections()) {
+    throw new Error('[public-data] live public projections are not enabled');
   }
-
-  try {
-    if (shouldUseLivePublicProjections()) {
-      const active = await getCachedActiveRelease();
-      if (active) {
-        const live = await cachedLiveSearchIndex(active.releaseId, active.activatedAt);
-        if (live !== undefined && live.length > 0) {
-          return { data: live, source: 'live' };
-        }
-      }
-    }
-  } catch {
-    // fall through
+  const active = await getCachedActiveRelease();
+  if (!active) {
+    throw new Error('[public-data] no active release for search index');
   }
-
-  return { data: getSnapshotSearchIndex(), source: 'snapshot' };
+  const live = await cachedLiveSearchIndex(active.releaseId, active.activatedAt);
+  if (live === undefined || live.length === 0) {
+    throw new Error('[public-data] postgres search index unavailable');
+  }
+  return { data: live, source: 'live' };
 });
 
 /**
  * Batched entity cards for non-entity pages (story related rails). Dedupes + sorts ids for a
  * stable `React.cache` key (arrays are reference-unstable), then reorders to request order.
- * Never runs learning-graph hydration.
+ * Never runs learning-graph hydration. No seed fallback.
  */
 const listPublicEntityViewsByIdsCached = cache(async function listPublicEntityViewsByIdsCached(
   stableIdsKey: string,
@@ -528,40 +471,13 @@ const listPublicEntityViewsByIdsCached = cache(async function listPublicEntityVi
   const unique =
     stableIdsKey.length === 0 ? ([] as string[]) : stableIdsKey.split('\u0001').filter(Boolean);
 
-  function fromSnapshot(): ReadonlyMap<string, PublicEntityView> {
-    const map = new Map<string, PublicEntityView>();
-    for (const id of unique) {
-      const entity = getPublicEntity(id);
-      if (entity) map.set(id, entity);
-    }
-    return map;
-  }
-
   if (unique.length === 0) {
     return { byId: new Map(), source: 'none' };
   }
 
-  if (isPublicReadApiDisabled()) {
-    return { byId: fromSnapshot(), source: 'snapshot' };
-  }
-
-  try {
-    const live = await loadLiveEntitiesByIdsThin(unique);
-    if (live !== undefined && live.length > 0) {
-      const byId = new Map(live.map((entity) => [entity.id, entity] as const));
-      for (const id of unique) {
-        if (!byId.has(id)) {
-          const seed = getPublicEntity(id);
-          if (seed) byId.set(id, seed);
-        }
-      }
-      return { byId, source: 'live' };
-    }
-  } catch {
-    // fall through
-  }
-
-  return { byId: fromSnapshot(), source: 'snapshot' };
+  const live = await loadLiveEntitiesByIdsThin(unique);
+  const byId = new Map((live ?? []).map((entity) => [entity.id, entity] as const));
+  return { byId, source: 'live' };
 });
 
 export async function listPublicEntityViewsByIds(
@@ -587,15 +503,6 @@ export async function listPublicEntityViewsByIds(
   return { data: ordered, source };
 }
 
-/** Sync helpers for call sites that still need seed during static generation.  */
-export function getSeedPublicEntity(entityId: string): PublicEntityView | undefined {
-  return getPublicEntity(entityId);
-}
-
-export function listSeedPublicEntities(): readonly PublicEntityView[] {
-  return listPublicEntities();
-}
-
 export type PublicStoryView = PublicStoryProjectionDoc;
 export type PublicStoryListItem = PublicStoryListItemDoc;
 
@@ -615,74 +522,43 @@ async function loadLiveStory(slug: string): Promise<PublicStoryView | undefined>
 
 /**
  * Thin story list for `/stories` index cards. Live path reads Postgres release projections
- * + process TTL / `unstable_cache`; never pulls full `body[]` into the list cache.
+ * + process TTL / `unstable_cache`; never pulls full `body[]` into the list cache. No fallback:
+ * a Postgres read failure propagates.
  */
 export const listPublicStoryListItems = cache(async function listPublicStoryListItems(): Promise<{
   readonly data: readonly PublicStoryListItem[];
   readonly source: PublicReadSource;
 }> {
-  if (isPublicReadApiDisabled()) {
-    return { data: listSnapshotStoryListItems(), source: 'snapshot' };
+  const live = await loadLiveStoryListItems();
+  if (live === undefined) {
+    throw new Error('[public-data] postgres story list unavailable');
   }
-
-  try {
-    const live = await loadLiveStoryListItems();
-    if (live !== undefined) {
-      return { data: live, source: 'live' };
-    }
-  } catch {
-    // fall through
-  }
-
-  return { data: listSnapshotStoryListItems(), source: 'snapshot' };
+  return { data: live, source: 'live' };
 });
 
 /**
  * Full story docs for `generateStaticParams` and callers that need bodies/related ids.
- * Not used by the `/stories` index (see `listPublicStoryListItems`).
+ * Not used by the `/stories` index (see `listPublicStoryListItems`). No fallback.
  */
 export const listPublicStoryViews = cache(async function listPublicStoryViews(): Promise<{
   readonly data: readonly PublicStoryView[];
   readonly source: PublicReadSource;
 }> {
-  if (isPublicReadApiDisabled()) {
-    return { data: listSnapshotStoryProjections(), source: 'snapshot' };
+  if (!shouldUseLivePublicProjections()) {
+    throw new Error('[public-data] live public projections are not enabled');
   }
-
-  try {
-    if (shouldUseLivePublicProjections()) {
-      const active = await getCachedActiveRelease();
-      if (active) {
-        const stories = await listPublicStoryProjections(active.releaseId);
-        if (stories.length > 0) {
-          return { data: stories, source: 'live' };
-        }
-      }
-    }
-  } catch {
-    // fall through
+  const active = await getCachedActiveRelease();
+  if (!active) {
+    throw new Error('[public-data] no active release for stories');
   }
-
-  return { data: listSnapshotStoryProjections(), source: 'snapshot' };
+  const stories = await listPublicStoryProjections(active.releaseId);
+  return { data: stories, source: 'live' };
 });
 
-/** Resolve one story by slug: live projection, then Firebase seed snapshot. */
+/** Resolve one story by slug: live Postgres projection only. No seed fallback. */
 export const resolvePublicStoryView = cache(async function resolvePublicStoryView(
   slug: string,
 ): Promise<PublicReadResult<PublicStoryView>> {
-  if (isPublicReadApiDisabled()) {
-    const snapshot = getSnapshotStoryProjection(slug);
-    return snapshot ? { data: snapshot, source: 'snapshot' } : { data: undefined, source: 'none' };
-  }
-
-  try {
-    const live = await loadLiveStory(slug);
-    if (live) return { data: live, source: 'live' };
-  } catch {
-    // fall through
-  }
-
-  const snapshot = getSnapshotStoryProjection(slug);
-  if (snapshot) return { data: snapshot, source: 'snapshot' };
-  return { data: undefined, source: 'none' };
+  const live = await loadLiveStory(slug);
+  return live ? { data: live, source: 'live' } : { data: undefined, source: 'none' };
 });

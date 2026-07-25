@@ -6,6 +6,7 @@ import { resolveThemeImpactPolicyEras } from './theme-impact-policy-eras.js';
 import {
   THEME_IMPACT_BINDING_PURPOSES,
   type ThemeImpactBindingPurpose,
+  type ThemeImpactEntityBinding,
   type ThemeImpactGapState,
   type ThemeImpactMethodStance,
   type ThemeImpactPacket,
@@ -48,6 +49,8 @@ export type ThemeImpactPacketView = {
   readonly artifacts: readonly ThemeImpactArtifactView[];
   readonly gapStates: readonly ThemeImpactGapState[];
   readonly dataSource?: 'live' | 'fixture';
+  /** Entity this packet is bound to (e.g. for map-panel/story consumers) — repo-cqey.8 entity cross-referencing. */
+  readonly entityBinding?: ThemeImpactEntityBinding;
 };
 
 export type ThemeImpactObservationView = {
@@ -178,6 +181,7 @@ export function themeImpactPacketToView(
     derived: packet.derived.map(derivedToView),
     artifacts: packet.artifacts.map(artifactToView),
     gapStates: [...packet.gapStates],
+    ...(packet.entityBinding !== undefined ? { entityBinding: packet.entityBinding } : {}),
   };
 }
 

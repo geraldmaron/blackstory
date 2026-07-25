@@ -50,9 +50,6 @@ export function isPostgresPublicDataMisconfigured(env: EnvironmentLike = process
 
 /** Whether this runtime should attempt live public projection reads.  */
 export function shouldUseLivePublicProjections(env: EnvironmentLike = process.env): boolean {
-  if (env.PUBLIC_READ_API_DISABLED === '1' || env.PUBLIC_READ_API_DISABLED === 'true') {
-    return false;
-  }
   if (env.PUBLIC_DATA_SOURCE === 'seed') {
     return false;
   }

@@ -1,15 +1,15 @@
 /**
  * Every automated write a job makes carries the job-run id as (or alongside)
  * the correlation id, and is traceable back to the exact run that made it. This test
- * imports the REAL commitWithAudit (packages/firebase/src/firestore/audit-outbox.ts, devDep-only
- * import @repo/config does not depend on @repo/firebase at runtime, see audit.ts's
+ * imports the REAL commitWithAudit (packages/ops-data/src/firestore/audit-outbox.ts, devDep-only
+ * import @repo/config does not depend on @repo/ops-data at runtime, see audit.ts's
  * module doc) and proves objects built by buildJobRunAuditEvent/buildJobRunOutboxMessage are
  * accepted by it unmodified, i.e. this module follows commitWithAudit's exact calling
  * convention rather than a parallel one that merely looks similar.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { commitWithAudit, type AtomicStore, type AtomicTransaction } from '@repo/firebase';
+import { commitWithAudit, type AtomicStore, type AtomicTransaction } from '@repo/ops-data';
 import { buildJobRunAuditEvent, buildJobRunOutboxMessage } from './audit.ts';
 
 type StagedOperation =
@@ -24,7 +24,7 @@ type StagedOperation =
       readonly data: Readonly<Record<string, unknown>>;
     };
 
-/** Minimal in-memory AtomicStore double, mirroring packages/firebase/src/audit-outbox.test.ts. */
+/** Minimal in-memory AtomicStore double, mirroring packages/ops-data/src/audit-outbox.test.ts. */
 class MemoryAtomicStore implements AtomicStore {
   private documents = new Map<string, Readonly<Record<string, unknown>>>();
 

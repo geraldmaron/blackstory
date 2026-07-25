@@ -7,7 +7,7 @@
  * same one every other proposer (public submitter, adapter) uses.
  *
  * Invariant this module protects: an `OperatorIdentity` is a *proposer* identity only. It is
- * never accepted anywhere a `VerifiedAdminToken` (packages/firebase/src/admin-auth.ts) or a
+ * never accepted anywhere a `VerifiedAdminToken` (packages/ops-data/src/admin-auth.ts) or a
  * fresh-reauth approver identity is required see promotion-boundary.test.ts.
  */
 import type { AuditActor } from '@repo/domain';

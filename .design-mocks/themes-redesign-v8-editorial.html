@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Themes redesign — direction B (editorial long-form)</title>
+<style>
+  :root {
+    --ink: #0A0A0A;
+    --paper: #F4EFE5;
+    --surface: #FBF8F2;
+    --copper: #B86B2A;
+    --copper-deep: #8E4F2A;
+    --sand: #D8A178;
+    --stone: #6D675F;
+    --rule: #D7D0C4;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  }
+  .note {
+    background: #161616; color: #fff; font-family: -apple-system, sans-serif; font-size: 13px;
+    padding: 10px 16px; position: sticky; top: 0; z-index: 50;
+  }
+  .note b { color: var(--sand); }
+
+  .sans { font-family: -apple-system, 'Inter', sans-serif; }
+
+  /* ---- masthead ---- */
+  .masthead {
+    max-width: 46rem; margin: 0 auto; padding: 4rem 1.5rem 2rem; text-align: left;
+  }
+  .masthead .kicker {
+    font-family: -apple-system, sans-serif; text-transform: uppercase; letter-spacing: .14em;
+    font-size: 11px; color: var(--copper-deep); display: flex; align-items: center; gap: .5rem;
+  }
+  .masthead .kicker::before { content: ''; width: 22px; height: 2px; background: var(--copper); display: inline-block; }
+  .masthead h1 {
+    font-size: clamp(2.6rem, 6vw, 4.2rem); line-height: 0.98; margin: .6rem 0 1.1rem; letter-spacing: -0.01em;
+    font-weight: 400;
+  }
+  .masthead .deck {
+    font-size: 1.25rem; color: var(--stone); line-height: 1.5; max-width: 38rem; font-style: italic;
+  }
+  .masthead .byline {
+    font-family: -apple-system, sans-serif; font-size: 12px; color: var(--stone); margin-top: 2rem;
+    display: flex; gap: 1.5rem; border-top: 1px solid var(--rule); padding-top: 1rem;
+  }
+  .masthead .byline strong { color: var(--ink); }
+
+  /* ---- article column ---- */
+  .col { max-width: 42rem; margin: 0 auto; padding: 0 1.5rem; }
+  .col p { font-size: 1.16rem; line-height: 1.75; margin: 0 0 1.4rem; }
+  .col p.lead::first-letter {
+    float: left; font-size: 4.6rem; line-height: 0.8; padding: .1rem .5rem 0 0; color: var(--copper);
+    font-family: Georgia, serif;
+  }
+  .cite {
+    font-size: .68em; vertical-align: super; color: var(--copper-deep); cursor: pointer; font-family: -apple-system, sans-serif;
+  }
+  .footnote {
+    display: none; font-family: -apple-system, sans-serif; font-size: 12.5px; color: var(--stone);
+    background: var(--surface); border-left: 2px solid var(--sand); padding: .6rem .9rem; margin: -.6rem 0 1.4rem;
+  }
+  .footnote.open { display: block; }
+
+  /* ---- big number callout, full width breakout ---- */
+  .breakout { max-width: 58rem; margin: 3rem auto; padding: 0 1.5rem; }
+  .stat-row {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule);
+    border: 1px solid var(--rule); border-radius: 4px; overflow: hidden;
+  }
+  .stat {
+    background: var(--surface); padding: 1.75rem 1.5rem; text-align: left;
+  }
+  .stat .num {
+    font-family: -apple-system, sans-serif; font-weight: 700; font-size: 2.6rem; color: var(--copper-deep); line-height: 1;
+  }
+  .stat .lbl { font-family: -apple-system, sans-serif; font-size: 12.5px; color: var(--stone); margin-top: .5rem; line-height: 1.4; }
+
+  /* ---- inline chart ---- */
+  .chart-block { max-width: 58rem; margin: 3rem auto; padding: 0 1.5rem; }
+  .chart-block h4 { font-family: -apple-system, sans-serif; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--stone); margin: 0 0 1rem; }
+  .bars { display: flex; align-items: flex-end; gap: 1.75rem; height: 180px; border-bottom: 1px solid var(--rule); padding-bottom: 0; }
+  .bar-col { display: flex; flex-direction: column; align-items: center; flex: 1; height: 100%; justify-content: flex-end; }
+  .bar { width: 100%; max-width: 64px; background: var(--sand); border-radius: 3px 3px 0 0; position: relative; }
+  .bar.hi { background: var(--copper); }
+  .bar .v { position: absolute; top: -22px; left: 0; right: 0; text-align: center; font-family: -apple-system, sans-serif; font-size: 13px; font-weight: 600; color: var(--ink); }
+  .bar-labels { display: flex; gap: 1.75rem; margin-top: .6rem; }
+  .bar-labels span { flex: 1; text-align: center; font-family: -apple-system, sans-serif; font-size: 11.5px; color: var(--stone); }
+  .chart-cap { font-family: -apple-system, sans-serif; font-size: 12px; color: var(--stone); margin-top: .9rem; }
+
+  /* ---- pull quote ---- */
+  blockquote {
+    max-width: 34rem; margin: 3rem auto; padding: 0 1.5rem; text-align: center;
+    font-size: 1.7rem; line-height: 1.35; font-style: italic; color: var(--ink);
+  }
+  blockquote cite {
+    display: block; font-family: -apple-system, sans-serif; font-size: 12px; font-style: normal;
+    color: var(--stone); margin-top: 1rem; text-transform: uppercase; letter-spacing: .06em;
+  }
+
+  /* ---- map/image breakout ---- */
+  .visual-break {
+    max-width: 64rem; margin: 3rem auto; padding: 0 1.5rem;
+  }
+  .visual-frame {
+    background: linear-gradient(135deg, #2C2824, #0A0A0A);
+    border-radius: 6px; height: 340px; position: relative; overflow: hidden;
+    display: flex; align-items: flex-end;
+  }
+  .visual-frame::after {
+    content: ''; position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(45deg, rgba(184,107,42,.08) 0 2px, transparent 2px 22px);
+  }
+  .visual-frame .cap {
+    position: relative; z-index: 1; color: #F4EFE5; font-family: -apple-system, sans-serif; font-size: 12.5px;
+    padding: 1rem 1.25rem; background: rgba(10,10,10,.55); backdrop-filter: blur(2px); margin: 0 0 0 0; width: 100%;
+  }
+  .visual-frame .pin-mark {
+    position: absolute; width: 10px; height: 10px; border-radius: 50%; background: var(--copper);
+    box-shadow: 0 0 0 4px rgba(184,107,42,.25);
+  }
+
+  /* ---- section divider ---- */
+  .divider { max-width: 42rem; margin: 3.5rem auto 2rem; padding: 0 1.5rem; display: flex; align-items: center; gap: 1rem; }
+  .divider .num { font-family: -apple-system, sans-serif; font-size: 12px; color: var(--copper-deep); font-weight: 700; }
+  .divider hr { flex: 1; border: none; border-top: 1px solid var(--rule); }
+
+  /* ---- footer ---- */
+  .end { max-width: 42rem; margin: 4rem auto 0; padding: 2rem 1.5rem 4rem; border-top: 1px solid var(--rule); font-family: -apple-system, sans-serif; }
+  .end h4 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--stone); }
+  .end .next { display: flex; justify-content: space-between; align-items: baseline; padding: .9rem 0; border-bottom: 1px solid var(--rule); text-decoration: none; color: var(--ink); }
+  .end .next span { color: var(--stone); font-size: 12px; }
+  .end .next strong { font-family: 'Iowan Old Style', Georgia, serif; font-size: 1.05rem; font-weight: 400; }
+</style>
+</head>
+<body>
+<div class="note">
+  <b>Mockup — direction B (editorial long-form):</b> prose + inline data as one continuous reading experience — big-number callouts, inline chart, full-bleed map breakout, pull quote, footnote-on-click citations. No sidebar rail, no beat labels, no card chrome.
+</div>
+
+<div class="masthead">
+  <p class="kicker">Housing · 1919–2024</p>
+  <h1>Redlining and the color line</h1>
+  <p class="deck">A federal grading map drawn in one Chicago winter still sorts who owns a home on the South Side, eighty years later.</p>
+  <div class="byline sans">
+    <span>≈ 9 min read</span>
+    <span><strong>4</strong> instruments cited</span>
+    <span><strong>1919–2024</strong></span>
+  </div>
+</div>
+
+<div class="col">
+  <p class="lead">On a July afternoon in 1919, <a href="#" style="color:var(--copper-deep)">Eugene Williams</a> drifted across an invisible line in Lake Michigan off the 29th Street Beach. No buoy marked it, no ordinance named it — but the stones that killed him for crossing it were real, and so was the boundary they enforced.<span class="cite" onclick="this.nextElementSibling.classList.toggle('open')">[1]</span></p>
+  <div class="footnote sans">[1] National Archives Record Group 195 — contemporary press accounts and the Chicago Commission on Race Relations report, 1922.</div>
+
+  <p>Twenty years later a federal surveyor unrolled a different kind of map on a Chicago kitchen table: the Home Owners' Loan Corporation's grading sheets, sorting neighborhoods into four letters — A through D — by "risk" that tracked race more reliably than it ever tracked repayment.</p>
+</div>
+
+<div class="breakout">
+  <div class="stat-row">
+    <div class="stat"><div class="num">4</div><div class="lbl">HOLC risk grades assigned per Cook County tract, 1939</div></div>
+    <div class="stat"><div class="num">83%</div><div class="lbl">of grade-D tracts had majority-Black residents by 1940</div></div>
+    <div class="stat"><div class="num">2×</div><div class="lbl">homeownership gap between grade-A and grade-D tracts, still measurable in 2022</div></div>
+  </div>
+</div>
+
+<div class="col">
+  <p>Ownership on the South Side never closed the gap the grading map opened. Three census decades apart, the same tracts graded D in 1939 show homeownership rates roughly half those graded A or B two miles north.<span class="cite" onclick="this.nextElementSibling.classList.toggle('open')">[2]</span></p>
+  <div class="footnote sans">[2] Decennial Census 1990/2000/2010; American Community Survey 2022. Tract geography crosswalked to 1939 HOLC boundaries via NHGIS — method seam documented, not smoothed.</div>
+</div>
+
+<div class="chart-block">
+  <h4 class="sans">Homeownership rate by 1939 HOLC grade, Cook County</h4>
+  <div class="bars">
+    <div class="bar-col"><div class="bar hi" style="height:78%"><span class="v">61%</span></div></div>
+    <div class="bar-col"><div class="bar" style="height:60%"><span class="v">47%</span></div></div>
+    <div class="bar-col"><div class="bar" style="height:44%"><span class="v">34%</span></div></div>
+    <div class="bar-col"><div class="bar" style="height:38%"><span class="v">29%</span></div></div>
+  </div>
+  <div class="bar-labels sans"><span>Grade A</span><span>Grade B</span><span>Grade C</span><span>Grade D</span></div>
+  <p class="chart-cap">2022 American Community Survey, 5-year estimates, tracts binned by nearest 1939 HOLC boundary.</p>
+</div>
+
+<blockquote>
+  "The map didn't just describe the neighborhood. Eventually the neighborhood grew to match the map."
+  <cite>Robert S. Abbott, publisher, the Defender</cite>
+</blockquote>
+
+<div class="visual-break">
+  <div class="visual-frame">
+    <div class="pin-mark" style="top:38%; left:52%;"></div>
+    <div class="pin-mark" style="top:61%; left:35%;"></div>
+    <p class="cap">1939 HOLC area description map, Cook County — grade D boundaries overlaid on present-day tract lines. Ink-sketch rendering; source: National Archives Record Group 195.</p>
+  </div>
+</div>
+
+<div class="divider"><span class="num sans">04</span><hr /></div>
+
+<div class="col">
+  <p><a href="#" style="color:var(--copper-deep)">Robert S. Abbott</a>'s Defender covered the aftermath from a State Street office in Bronzeville — the same blocks the 1939 map would grade lowest fourteen years later.</p>
+</div>
+
+<div class="end">
+  <h4>Continue reading</h4>
+  <a class="next" href="#"><strong>Urban renewal's second displacement</strong><span>Housing · 1949–1974 →</span></a>
+  <a class="next" href="#"><strong>Mass incarceration, county by county</strong><span>Justice · 1971–2020 →</span></a>
+</div>
+
+</body>
+</html>

@@ -25,6 +25,7 @@ export type ThemesEditionPanelVariant =
   | 'consumers'
   | 'packets'
   | 'packet'
+  | 'chapter'
   | 'close';
 
 export function themesEditionRootClassName(): string {

@@ -3,7 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { createAppCheckCircuitBreaker } from '@repo/firebase';
+import { createAppCheckCircuitBreaker } from '@repo/ops-data';
 import {
   APP_CHECK_OUTAGE_OVERRIDE_ENV,
   createAppCheckAvailabilityProvider,

@@ -24,7 +24,7 @@
     "lint": "echo 'lint: use root pnpm lint'"
   },
   "dependencies": {
-    "@repo/firebase": "workspace:*",
+    "@repo/ops-data": "workspace:*",
     "firebase-admin": "^14.2.0",
     "pg": "^8.16.3"
   },

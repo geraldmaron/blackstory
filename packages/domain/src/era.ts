@@ -5,7 +5,7 @@
  * touch" — consumed by the FactRecord spec, law status badges, era pre-filters, and the
  * entity-lifecycle `statusHistory` records (see `./entity-status.ts`). `deriveEraBuckets`
  * replaces the embeddings-package-local `deriveEraBucket` duplicate previously defined in
- * `packages/firebase/src/embeddings/text.ts` (that file now delegates its decade math to this
+ * `packages/ops-data/src/embeddings/text.ts` (that file now delegates its decade math to this
  * module — see ADR-015).
  */
 

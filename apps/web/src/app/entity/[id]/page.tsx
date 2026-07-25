@@ -39,6 +39,7 @@ import {
   getPublicSearchIndex,
   resolvePublicEntityView,
 } from '../../../lib/public-data/source';
+import { resolveEntityCrossReferences } from '../../../lib/theme-impact/source';
 import { isDisplayableJurisdictionLabel } from '../../../lib/public-data/map-projection';
 import {
   buildWhyThisAppearsForEntity,
@@ -139,6 +140,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
   });
   const { data: searchIndex } = await getPublicSearchIndex();
   const orderedIds = searchIndex.map((doc) => doc.id);
+  const crossReferences = await resolveEntityCrossReferences(entity.id);
 
   const anatomyInputs = buildEntityAnatomyInputs(entity, mapTone);
   const anatomyPlace = buildEntityAnatomyPlace(entity, geoAnchor);
@@ -319,6 +321,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
             whyAppearsEvidenceById={whyAppearsEvidenceById(entity)}
             evidenceClaims={evidenceClaims}
             entityLinkCatalog={entityLinkCatalog}
+            crossReferences={crossReferences}
           />
 
           <EntitySessionNavClient

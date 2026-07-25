@@ -3,7 +3,7 @@
  *
  * Reuses domain validation and manifest generation from `@repo/domain` while persisting through
  * the Postgres `PostgresReleaseStore`. Firestore remains an explicit opt-in rollback path via
- * `@repo/firebase` — this module is the primary activation surface after ADR-020 cutover.
+ * `@repo/ops-data` — this module is the primary activation surface after ADR-020 cutover.
  */
 import {
   ReleaseActivationError,

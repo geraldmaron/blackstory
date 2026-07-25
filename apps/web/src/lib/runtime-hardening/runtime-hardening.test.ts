@@ -12,7 +12,6 @@ import {
   isWithinResponseLimit,
   utf8ByteLength,
 } from './response-size-limits';
-import { isPublicReadApiDisabled, readEntityFromReleaseSnapshot } from './degraded-mode';
 import { isProductionPublicRuntime, sanitizeClientErrorDisplay } from './error-surface';
 
 const APP_ROOT = new URL('../../app', import.meta.url).pathname;
@@ -66,17 +65,6 @@ test('collectPublicRenderPathFindings flags forbidden imports', () => {
     `// re-exported from '@repo/data-access' upstream`,
   );
   assert.equal(findings.length, 1);
-});
-
-test('degraded mode reads bundled release snapshots', () => {
-  const prior = process.env.PUBLIC_READ_API_DISABLED;
-  process.env.PUBLIC_READ_API_DISABLED = '1';
-  assert.equal(isPublicReadApiDisabled(), true);
-  assert.equal(
-    readEntityFromReleaseSnapshot('ent_15th_st_church_001')?.displayName,
-    'Fifteenth Street Presbyterian Church',
-  );
-  process.env.PUBLIC_READ_API_DISABLED = prior;
 });
 
 test('entity detail route stays force-dynamic so RUNTIME DATABASE_URL is used', () => {

@@ -8,7 +8,7 @@
  * and event slugs). A resolved mention becomes a minimal `related_to` edge only — it is
  * deliberately NOT typed any more specifically than that. Specific edge typing (e.g. `member_of`,
  * `attended`, `participated_in`) is the candidate/proposal pipeline's job
- * (`./relationship-candidates.ts` + `packages/firebase/scripts/generate-relationship-candidates.ts`
+ * (`./relationship-candidates.ts` + `packages/ops-data/scripts/generate-relationship-candidates.ts`
  * stage 2), which has the context to assign a real type per `docs/relationship-taxonomy.md` and
  * route through human review before publication. This extraction path publishes directly
  * (`workflowStatus: 'accepted'`), so it only ever emits the one edge type that's true by

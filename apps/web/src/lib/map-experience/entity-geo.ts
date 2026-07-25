@@ -4,7 +4,7 @@
  * Live public projections carry `location` → `PublicEntityView.geoAnchor` via
  * `map-projection.ts`; `buildExploreMapSource` prefers that field and only falls
  * back here for offline seed fixtures. National-catalog coordinates live in
- * Firestore releases (republished from `packages/firebase/fixtures/national-catalog/`).
+ * Firestore releases (republished from `packages/ops-data/fixtures/national-catalog/`).
  *
  * Precision comes from each entity's own `locationPrecision` field (never duplicated
  * here) so this table can never drift from what the entity page itself displays.

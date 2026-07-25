@@ -1,7 +1,7 @@
 /**
  * Maps Eviction Lab county proprietary-valid CSV rows into Phase 1 statistical observation
  * drafts for bb_reference.statistical_observations. Pure functions — network fetch lives in
- * ./fetch-phase1-eviction.ts and packages/firebase/scripts/ingest-phase1-eviction-lab.ts.
+ * ./fetch-phase1-eviction.ts and packages/ops-data/scripts/ingest-phase1-eviction-lab.ts.
  */
 import { assertPublishedStatisticProvenance } from '../../public-numeric-policy.js';
 import { sha256Json } from '../../publication/index.js';

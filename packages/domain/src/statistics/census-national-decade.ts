@@ -6,7 +6,7 @@
  * historical free/enslaved Black sub-series (1790–1860) the county modern lane does not have.
  * Like the county module, this holds series definitions and transcription/derivation logic —
  * never a population NUMBER (counts come from parsed twps0056 Table 1; see
- * @repo/firebase demographics national loader).
+ * @repo/ops-data demographics national loader).
  */
 import {
   changeCrossesDefinitionBoundary,

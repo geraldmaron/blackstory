@@ -7,10 +7,8 @@ import { ALL_ADVERSARIAL_INTEGRITY_SCENARIO_IDS } from '../adversarial-integrity
 import { ALL_LOAD_ABUSE_SCENARIO_IDS } from '../load-abuse/types.js';
 import { evaluateCorpus } from '../gold-corpus/metrics.js';
 import { loadGoldCorpus, loadGoldPredictions } from '../gold-corpus/load.js';
-const PUBLIC_READ_API_DISABLED_ENV = 'PUBLIC_READ_API_DISABLED';
 const PUBLIC_STATIC_MODE_SWITCH_ID = 'public-static-mode';
 const BETA_DISABLE_RUNBOOK = 'docs/launch/disable-public-beta.md';
-const BETA_DISABLE_ENV_PROBES = [BETA_DISABLE_RUNBOOK, '.env.example'] as const;
 
 function pathExists(repoRoot: string, relativePath: string): boolean {
   return existsSync(join(repoRoot, relativePath));
@@ -138,27 +136,14 @@ export function checkBetaDisablePath(repoRoot: string): MachineCheckResult {
   if (!killSwitchSource.includes(`'${PUBLIC_STATIC_MODE_SWITCH_ID}'`)) {
     return { pass: false, message: 'public-static-mode is not registered in kill switches.' };
   }
-  for (const file of BETA_DISABLE_ENV_PROBES) {
-    if (!pathExists(repoRoot, file)) {
-      return { pass: false, message: `Missing beta-disable probe file: ${file}` };
-    }
-    const content = readFileSync(join(repoRoot, file), 'utf8');
-    if (!content.includes(PUBLIC_READ_API_DISABLED_ENV)) {
-      return { pass: false, message: `${file} does not declare ${PUBLIC_READ_API_DISABLED_ENV}.` };
-    }
-  }
   if (!pathExists(repoRoot, BETA_DISABLE_RUNBOOK)) {
     return { pass: false, message: `Missing disable runbook: ${BETA_DISABLE_RUNBOOK}` };
   }
   const runbook = readFileSync(join(repoRoot, BETA_DISABLE_RUNBOOK), 'utf8');
-  if (
-    !runbook.includes(PUBLIC_READ_API_DISABLED_ENV) ||
-    !runbook.includes(PUBLIC_STATIC_MODE_SWITCH_ID) ||
-    !/Vercel/i.test(runbook)
-  ) {
+  if (!runbook.includes(PUBLIC_STATIC_MODE_SWITCH_ID) || !/Vercel/i.test(runbook)) {
     return {
       pass: false,
-      message: 'Disable runbook must document Vercel env flag and static-mode switch.',
+      message: 'Disable runbook must document Vercel host and the static-mode switch.',
     };
   }
   return { pass: true };

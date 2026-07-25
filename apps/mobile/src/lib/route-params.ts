@@ -162,7 +162,7 @@ function looksLikeExternalTarget(value: string): boolean {
 
 /**
  * Real ids look like `ent_caam_los_angeles_001` (see
- * packages/firebase/fixtures/national-catalog/*.json): lowercase ASCII letters, digits,
+ * packages/ops-data/fixtures/national-catalog/*.json): lowercase ASCII letters, digits,
  * underscore, hyphen. This is intentionally an *allowlist*, stricter than the generic
  * server-side `idString` bound (which is any non-empty trimmed string) — threat-model T4
  * explicitly calls for "character set + length" validation on the mobile side before an

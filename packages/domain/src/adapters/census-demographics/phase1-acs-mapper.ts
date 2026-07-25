@@ -1,7 +1,7 @@
 /**
  * Maps parsed ACS 5-year rows into Phase 1 statistical observation drafts for
  * bb_reference.statistical_observations. Pure functions — fetch lives in
- * ./fetch-phase1-acs.ts and packages/firebase/scripts/ingest-phase1-acs.ts.
+ * ./fetch-phase1-acs.ts and packages/ops-data/scripts/ingest-phase1-acs.ts.
  */
 import { ACS_PROGRAM_HOMEPAGE_URL } from './acs-url-builder.js';
 import type { AcsProfileRow, AcsVintage } from './acs-types.js';

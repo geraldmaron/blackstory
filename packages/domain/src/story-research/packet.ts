@@ -6,15 +6,48 @@
 import type { NamedAnchor } from './anchor.js';
 import type { StoryResearchBrief } from './brief.js';
 import type { StoryCiteEntry } from './cite-map.js';
+import type { ThemeImpactThemeId } from '../statistics/theme-impact-questions.js';
 
 export const STORY_RESEARCH_PACKET_KIND = 'story.research.packet.v1' as const;
 
 export type StoryResearchDecision = 'recommend' | 'needs_evidence' | 'reject';
 
+/**
+ * Mirrors publicStorySectionMomentSchema in packages/schemas/src/public-projections.ts.
+ * Anchors a theme-impact packet's data moment to a point within a body section.
+ */
+export type StoryDraftSectionMoment = {
+  readonly packetId: string;
+  readonly kind: 'observation' | 'artifact' | 'derived' | 'timeline' | 'map';
+  readonly refId: string;
+  readonly placement: 'after';
+};
+
+/** Mirrors publicStorySectionDisputeSchema in packages/schemas/src/public-projections.ts. */
+export type StoryDraftSectionDisputeSide = {
+  readonly sourceLabel: string;
+  readonly claim: string;
+};
+
+export type StoryDraftSectionDispute = {
+  readonly label: string;
+  readonly sideA: StoryDraftSectionDisputeSide;
+  readonly sideB: StoryDraftSectionDisputeSide;
+};
+
 /** Mirrors publicStoryProjection draft fields without coupling to Firestore. */
 export type StoryDraftSection = {
   readonly heading?: string;
   readonly paragraphs: readonly string[];
+  readonly moments?: readonly StoryDraftSectionMoment[];
+  readonly disputes?: readonly StoryDraftSectionDispute[];
+};
+
+/** Mirrors publicStoryThemeBindingSchema in packages/schemas/src/public-projections.ts. */
+export type StoryDraftThemeBinding = {
+  readonly themeId: ThemeImpactThemeId;
+  readonly chapterIndex: number;
+  readonly chapterCount: number;
 };
 
 export type StoryDraft = {
@@ -24,6 +57,7 @@ export type StoryDraft = {
   readonly eraLabel: string;
   readonly placeLabel: string;
   readonly body: readonly StoryDraftSection[];
+  readonly themeBinding?: StoryDraftThemeBinding;
 };
 
 export type StoryResearchPacketModel = {
@@ -89,9 +123,28 @@ function freezeDraft(draft: StoryDraft): StoryDraft {
         Object.freeze({
           ...(section.heading !== undefined ? { heading: section.heading } : {}),
           paragraphs: Object.freeze([...section.paragraphs]),
+          ...(section.moments !== undefined
+            ? { moments: Object.freeze(section.moments.map((m) => Object.freeze({ ...m }))) }
+            : {}),
+          ...(section.disputes !== undefined
+            ? {
+                disputes: Object.freeze(
+                  section.disputes.map((d) =>
+                    Object.freeze({
+                      label: d.label,
+                      sideA: Object.freeze({ ...d.sideA }),
+                      sideB: Object.freeze({ ...d.sideB }),
+                    }),
+                  ),
+                ),
+              }
+            : {}),
         }),
       ),
     ),
+    ...(draft.themeBinding !== undefined
+      ? { themeBinding: Object.freeze({ ...draft.themeBinding }) }
+      : {}),
   });
 }
 
@@ -124,7 +177,7 @@ export function buildStoryResearchPacket(
 /**
  * Map an approved packet onto the public story projection shape (human paste path).
  * Does not write anything. Returns a plain object for operator handoff into
- * `packages/firebase` public story seed / release fixtures.
+ * `packages/ops-data` public story seed / release fixtures.
  * `sources` is required: public stories must ship with a cited receipt list.
  */
 export function storyPacketToSeedRecord(

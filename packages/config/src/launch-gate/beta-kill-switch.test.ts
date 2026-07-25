@@ -9,19 +9,17 @@ import {
   assertBetaDisableConfigDocumented,
   assertBetaDisableConfigKeys,
   BETA_DISABLE_CONTROLS,
-  PUBLIC_READ_API_DISABLED_ENV,
   PUBLIC_STATIC_MODE_SWITCH_ID,
 } from './beta-kill-switch.js';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
 
-test('beta disable controls inventory includes env and static-mode switch', () => {
+test('beta disable controls inventory includes the static-mode switch', () => {
   const keys = BETA_DISABLE_CONTROLS.map((control) => control.key);
-  assert.ok(keys.includes(PUBLIC_READ_API_DISABLED_ENV));
   assert.ok(keys.includes(PUBLIC_STATIC_MODE_SWITCH_ID));
 });
 
-test('Vercel disable docs declare PUBLIC_READ_API_DISABLED', () => {
+test('public-static-mode kill switch is registered', () => {
   assert.doesNotThrow(() => assertBetaDisableConfigKeys(repoRoot));
 });
 

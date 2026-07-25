@@ -13,7 +13,7 @@
  *   pnpm --filter @repo/migrate-firestore-postgres migrate -- --apply --large
  *   pnpm --filter @repo/migrate-firestore-postgres migrate -- --apply --all
  */
-import { createServerFirebaseApp, getServerFirestore } from '@repo/firebase';
+import { createServerFirebaseApp, getServerFirestore } from '@repo/ops-data';
 import { createPgWriter } from '../pg-writer.js';
 import {
   ALL_MIGRANTS,

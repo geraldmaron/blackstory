@@ -1,14 +1,14 @@
 /**
  * Builds job-run audit events and outbox messages using the exact DomainAuditEvent
  * DomainOutboxMessage shapes (packages/domain/src/audit/index.ts) that
- * @repo/firebase's commitWithAudit (packages/firebase/src/firestore/audit-outbox.ts)
+ * @repo/ops-data's commitWithAudit (packages/ops-data/src/firestore/audit-outbox.ts)
  * consumes unmodified.
  *
- * This module deliberately does NOT depend on @repo/firebase at runtime pulling
+ * This module deliberately does NOT depend on @repo/ops-data at runtime pulling
  * firebase-admin into the operational-config layer would be architecturally wrong for a package
  * other lightweight surfaces (web, edge) may also import. It only builds plain,
  * framework-independent objects matching commitWithAudit's exact calling convention; the worker
- * or app that actually performs the Firestore write already depends on @repo/firebase and
+ * or app that actually performs the Firestore write already depends on @repo/ops-data and
  * passes the objects built here straight through. audit.test.ts proves this concretely by
  * importing the real commitWithAudit (as a devDependency-only, test-time import) and calling it
  * with objects built by this module, unmodified.

@@ -26,7 +26,7 @@
 import { findUsStateForPoint } from '@repo/domain';
 import { ENTITY_KINDS, entityV1Schema, type EntityV1 } from '@repo/public-contracts/v1/entity';
 import type { ClaimV1 } from '@repo/public-contracts/v1/claim';
-import type { PublicClaimProjectionDoc, PublicEntityProjectionDoc } from '@repo/firebase';
+import type { PublicClaimProjectionDoc, PublicEntityProjectionDoc } from '@repo/ops-data';
 
 /** Bounds entity-collection fallback reads when no `publicSearchIndex` rows exist for the active
  * release (MOB-004 safety net — not the primary search path). Index-backed search uses the
