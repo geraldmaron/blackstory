@@ -1,9 +1,21 @@
-# Discovery campaigns — manual dispatch and a safe weekly fixture schedule.
+# Discovery campaigns — scheduled roster (ADR-018 replacement) plus manual dispatch.
+#
+# Replaces the 5 Firebase Functions v2 onSchedule triggers in functions/src/index.ts
+# (repo-348e.4). Each scheduled job below matches the cadence in
+# functions/src/schedules.ts and invokes the same underlying CLI command
+# (`discovery-dispatch`) the Cloud Function called via runScheduledDiscovery.
+# functions/ and firebase.discovery.json are NOT removed yet — see repo-348e.8.
+#
+# Kill switch: the Firebase path read `killSwitches/{id}` from Firestore
+# (functions/src/kill-switch-env.ts) and failed closed (engaged) if the doc was missing.
+# This workflow reads the Postgres-native equivalent, `bb_ops.kill_switches`, via
+# apps/admin/scripts/check-kill-switch.mjs (same table apps/admin's /switches route reads),
+# with the same fail-closed behavior, then passes the result to discovery-dispatch
+# via --kill-switch.
 #
 # Manual runs use workflow_dispatch to exercise any discovery roster job in fixture or live
-# mode. The weekly schedule runs community-obscurity-discovery in fixture mode only (no live
-# network required). Production live cadences remain on GCP Cloud Scheduler → Cloud Run Job;
-# see workers/research-node/README.md.
+# mode. Default mode everywhere is fixture, matching DISCOVERY_MODE=fixture in
+# functions/README.md ("never publish").
 
 name: Discovery campaigns
 
@@ -29,14 +41,22 @@ on:
           - fixture
           - live
   schedule:
-    # Safe weekly smoke: community obscurity fixture only (Sundays 10:15 UTC).
-    - cron: '15 10 * * 0'
+    # discovery-campaign-rss — hourly (functions/src/schedules.ts: '0 * * * *')
+    - cron: '0 * * * *'
+    # community-obscurity-discovery — weekly, Sundays 10:00 UTC ('0 10 * * 0')
+    - cron: '0 10 * * 0'
+    # discovery-campaign-wikimedia-federal — weekly, Mondays 06:00 UTC ('0 6 * * 1')
+    - cron: '0 6 * * 1'
+    # discovery-campaign-archive-dpla — weekly, Tuesdays 07:00 UTC ('0 7 * * 2')
+    - cron: '0 7 * * 2'
+    # discovery-campaign-web-search — daily 08:30 UTC ('30 8 * * *')
+    - cron: '30 8 * * *'
 
 permissions:
   contents: read
 
 concurrency:
-  group: discovery-campaigns-${{ github.workflow }}-${{ github.event_name == 'schedule' && 'community-obscurity-discovery' || inputs.job_id }}-${{ github.event_name == 'schedule' && 'fixture' || inputs.mode }}
+  group: discovery-campaigns-${{ github.workflow }}-${{ github.event_name == 'schedule' && github.event.schedule || inputs.job_id }}-${{ github.event_name == 'schedule' && 'fixture' || inputs.mode }}
   cancel-in-progress: true
 
 jobs:
@@ -45,12 +65,22 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      DISCOVERY_JOB_ID: ${{ github.event_name == 'schedule' && 'community-obscurity-discovery' || inputs.job_id }}
+      # Map each cron expression back to its roster job id (functions/src/schedules.ts).
+      DISCOVERY_JOB_ID: >-
+        ${{
+          github.event_name != 'schedule' && inputs.job_id ||
+          github.event.schedule == '0 * * * *' && 'discovery-campaign-rss' ||
+          github.event.schedule == '0 10 * * 0' && 'community-obscurity-discovery' ||
+          github.event.schedule == '0 6 * * 1' && 'discovery-campaign-wikimedia-federal' ||
+          github.event.schedule == '0 7 * * 2' && 'discovery-campaign-archive-dpla' ||
+          github.event.schedule == '30 8 * * *' && 'discovery-campaign-web-search' ||
+          'community-obscurity-discovery'
+        }}
       DISCOVERY_MODE: ${{ github.event_name == 'schedule' && 'fixture' || inputs.mode }}
-      DISCOVERY_KILL_SWITCH: disengaged
       NODE_ENV: test
       LOG_LEVEL: info
       FIREBASE_PROJECT_ID: demo-repo
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -69,13 +99,22 @@ jobs:
       - name: Install JavaScript dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Resolve kill switch (bb_ops.kill_switches, Postgres-native)
+        id: kill_switch
+        run: |
+          set -euo pipefail
+          if [ -z "${DATABASE_URL:-}" ]; then
+            echo "No DATABASE_URL secret configured; failing closed (engaged)."
+            echo "state=engaged" >> "$GITHUB_OUTPUT"
+          else
+            STATE="$(pnpm --filter @repo/admin exec node scripts/check-kill-switch.mjs research-campaigns)"
+            echo "kill switch state: $STATE"
+            echo "state=$STATE" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Dispatch discovery campaign
         run: |
           set -euo pipefail
-          JOB_ID="${DISCOVERY_JOB_ID}"
-          MODE="${DISCOVERY_MODE}"
-          if grep -q "discovery-dispatch" packages/operator-cli/src/cli.ts; then
-            node --conditions development --import tsx packages/operator-cli/src/bin.ts discovery-dispatch --job "$JOB_ID" --mode "$MODE"
-          else
-            node --conditions development --import tsx packages/config/src/scheduled-jobs/discovery-dispatcher-cli.ts --job "$JOB_ID" --mode "$MODE"
-          fi
+          node --conditions development --import tsx packages/operator-cli/src/bin.ts \
+            discovery-dispatch --job "$DISCOVERY_JOB_ID" --mode "$DISCOVERY_MODE" \
+            --kill-switch "${{ steps.kill_switch.outputs.state }}"
