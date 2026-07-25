@@ -8,7 +8,6 @@
   "include": ["src/**/*.ts"],
   "exclude": [
     "src/**/*.test.ts",
-    "src/http/emulator-harness.ts",
     "dist"
   ]
 }
