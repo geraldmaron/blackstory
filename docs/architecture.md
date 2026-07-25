@@ -13,7 +13,7 @@ workers, and admin tools.
 
 ```
 apps/web                 Public Next.js (Vercel — ADR-027)
-apps/admin               Private Next.js admin/research (App Hosting interim; Cloud Run + IAP — target)
+apps/admin               Private Next.js admin/research (separate Vercel project; isolated write-capable DB env)
 apps/api-public          Public read/search/location API (Cloud Run)
 apps/api-submissions     Corrections / contribution intake (Cloud Run)
 apps/api-internal        Publication / promotion / internal control (private Cloud Run)
