@@ -13,9 +13,9 @@
  *
  * Match strategies, in precedence order:
  *  1. Direct id hit — the token IS already a canonical entity id present in the set.
- *  2. Explicit override map (`MENTION_OVERRIDES`, loaded at runtime from
+ *  2. Explicit override map (`MENTION_OVERRIDES`, loaded from
  *     `./data/mention-overrides.json` — repo-xez5.10 moved it out of source so curation edits
- *     don't require a code deploy; see that file for provenance) — a small, hand-verified table
+ *     don't require a code change; see that file for provenance) — a small, hand-verified table
  *     for tokens that
  *     are unambiguous to a human researcher but not safely disambiguable by the automated
  *     strategies below (either because the normalized name doesn't literally match the token, or
@@ -30,9 +30,10 @@
  *     "Southern Christian Leadership Conference (SCLC)") whose lowercased acronym matches the
  *     token, AND exactly one entity in the set carries that acronym.
  */
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+// Imported (not fs-read) so bundlers inline the data: a readFileSync on an import.meta.url-derived
+// path gets compiled to the build machine's absolute path and 500s in serverless runtimes where
+// that path doesn't exist.
+import mentionOverridesJson from './data/mention-overrides.json' with { type: 'json' };
 
 export type MentionResolvableEntity = {
   readonly id: string;
@@ -40,24 +41,18 @@ export type MentionResolvableEntity = {
   readonly aliases?: readonly string[];
 };
 
-const MENTION_OVERRIDES_PATH = join(
-  dirname(fileURLToPath(import.meta.url)),
-  'data',
-  'mention-overrides.json',
-);
-
 type MentionOverridesFile = {
   readonly overrides: readonly { readonly token: string; readonly entityId: string }[];
 };
 
 function loadMentionOverrides(): ReadonlyMap<string, string> {
-  const parsed = JSON.parse(readFileSync(MENTION_OVERRIDES_PATH, 'utf8')) as MentionOverridesFile;
+  const parsed = mentionOverridesJson as MentionOverridesFile;
   return new Map(parsed.overrides.map((entry) => [entry.token, entry.entityId]));
 }
 
 /**
  * Hand-verified overrides for tokens seen in the national-catalog fixtures today that the
- * automated strategies cannot safely resolve alone. Loaded at runtime from
+ * automated strategies cannot safely resolve alone. Loaded from
  * `./data/mention-overrides.json` (repo-xez5.10) — see that file for per-entry provenance/notes
  * and the deliberately-excluded tokens (`mfdp`, `freedom-rides`, `little-rock-nine`) that stay
  * unresolved rather than guessed.

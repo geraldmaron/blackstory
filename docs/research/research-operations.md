@@ -335,6 +335,29 @@ has no Firestore Admin SDK wiring. Until that lands, use the admin console's
 `/console/submissions` / `/console/candidate-queue` surfaces or a direct Firestore read for
 those two collections.
 
+### quarantine-triage (LLM-assisted, repo-t2vh)
+
+```bash
+node --conditions development --import tsx packages/operator-cli/src/bin.ts \
+  quarantine-triage --limit 200 --provider openrouter --commit \
+  --operator-id "$USER" --session-id "$(date +%s)"
+```
+
+Judges each `bb_submissions.intake_items` row with an LLM (`mock`/`openrouter`/`ollama`/`hybrid`,
+see `llm-provider.ts`) into `case` / `reject` / `spam`, then downgrades anything below
+`--confidence-threshold` (default `0.6`) to `needs_human` and leaves it quarantined untouched.
+This is a lightweight triage pass, not the full editorial/enrichment harness: a `case` decision
+only opens a bare draft research case (`bb_research.cases`, `state: 'candidate'`) so it enters
+the normal research pipeline actual sourcing/enrichment still happens later via
+`editorial-run`/`enrichment-run`. Safe by default (prints JSON only); `--commit` is required to
+write. Every decision including `reject`/`spam` is logged to `bb_audit.events` with the
+model's rationale. Never writes `bb_canonical.*` or evaluates a promotion gate see
+`quarantine-triage.ts`'s header and `promotion-boundary.test.ts`.
+
+Run in batches (`--limit 200`–300), review the `needs_human` items in the output, then repeat
+until the backlog clears. Free-tier OpenRouter rosters come from `OPENROUTER_MODELS`
+(comma-separated); omit `--model` to let the roster rotate.
+
 **Propose corroborating evidence** (strengthens a weak-signal item tied to a case) and
 **prepare a recommendation** both go through `attach-evidence` exactly as in case-drafting
 above — state accept/reject/needs-more-evidence explicitly in `--description`.

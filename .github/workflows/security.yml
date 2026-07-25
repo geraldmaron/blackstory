@@ -77,7 +77,7 @@ jobs:
             packages/testing/src/security-gates/index.ts 2>&1 | tee -a security-contracts.log
       - name: Retain policy and API security evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: security-policy-api-${{ github.sha }}
           path: |
@@ -121,7 +121,7 @@ jobs:
           upload: always
       - name: Retain CodeQL evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: codeql-${{ matrix.language }}-${{ github.sha }}
           path: codeql-results
@@ -151,7 +151,7 @@ jobs:
             "$GITHUB_SHA" "$GITHUB_RUN_ID" > dependency-review-evidence.json
       - name: Retain dependency-review evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: dependency-review-${{ github.sha }}
           path: dependency-review-evidence.json
@@ -183,7 +183,7 @@ jobs:
             "$GITHUB_SHA" "$GITHUB_RUN_ID" > secret-scan-evidence.json
       - name: Retain secret-scan evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: secret-scan-${{ github.sha }}
           path: |
@@ -215,7 +215,7 @@ jobs:
           output-file: sbom.spdx.json
           upload-artifact: false
       - name: Retain SBOM with release inputs
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: sbom-${{ github.sha }}
           path: sbom.spdx.json
@@ -248,7 +248,7 @@ jobs:
           output: trivy-filesystem.sarif
       - name: Retain vulnerability evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: trivy-filesystem-${{ github.sha }}
           path: trivy-filesystem.sarif
@@ -294,7 +294,7 @@ jobs:
             | tee cosign-verification.json
       - name: Retain image and signature evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: image-signature-${{ github.sha }}
           path: |
