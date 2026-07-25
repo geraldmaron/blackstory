@@ -29,7 +29,7 @@ type FetchOptions = {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DEFAULT_FIXTURE_PATH = join(
   __dirname,
-  '../../../../firebase/fixtures/reference-indicators',
+  '../../../../ops-data/fixtures/reference-indicators',
   USSC_QUICK_FACTS_DRUG_FIXTURE_FILENAME,
 );
 

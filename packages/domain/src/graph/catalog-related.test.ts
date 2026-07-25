@@ -15,7 +15,7 @@ import {
 
 const fixtureRoot = join(
   dirname(fileURLToPath(import.meta.url)),
-  '../../../firebase/fixtures/national-catalog',
+  '../../../ops-data/fixtures/national-catalog',
 );
 
 function loadFixtureEntities(filename: string): CatalogEntityForRelationships[] {

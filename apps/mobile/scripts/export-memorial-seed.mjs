@@ -14,7 +14,7 @@ const namesPath = resolve(
 );
 const milestonesPath = resolve(
   here,
-  '../../../packages/firebase/fixtures/national-catalog/memorial-milestones-2026-07-23.json',
+  '../../../packages/ops-data/fixtures/national-catalog/memorial-milestones-2026-07-23.json',
 );
 const outPath = resolve(here, '../src/features/memorial/catalog-seed.json');
 

@@ -26,7 +26,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const SAMPLE_CSV = readFileSync(
   join(
     __dirname,
-    '../../../../firebase/fixtures/reference-indicators/dsl-renewing-inequality-chicago-attributes-sample.csv',
+    '../../../../ops-data/fixtures/reference-indicators/dsl-renewing-inequality-chicago-attributes-sample.csv',
   ),
   'utf8',
 );

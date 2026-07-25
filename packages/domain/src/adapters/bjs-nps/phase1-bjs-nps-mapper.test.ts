@@ -19,7 +19,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const SAMPLE_CSV = readFileSync(
   join(
     __dirname,
-    '../../../../firebase/fixtures/reference-indicators/bjs-nps-p23stat01-snippet.csv',
+    '../../../../ops-data/fixtures/reference-indicators/bjs-nps-p23stat01-snippet.csv',
   ),
   'utf8',
 );
@@ -29,7 +29,7 @@ test('parseBjsNpsStat01Csv reads Prisoners in 2020 Appendix table 2 state counts
   const csv = readFileSync(
     join(
       __dirname,
-      '../../../../firebase/fixtures/reference-indicators/bjs-nps-p20stat02-full.csv',
+      '../../../../ops-data/fixtures/reference-indicators/bjs-nps-p20stat02-full.csv',
     ),
     'utf8',
   );

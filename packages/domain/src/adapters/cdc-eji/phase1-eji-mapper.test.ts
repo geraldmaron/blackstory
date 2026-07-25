@@ -19,7 +19,7 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURE_PATH = join(
   __dirname,
-  '../../../../firebase/fixtures/reference-indicators/eji-il-counties-sample.csv',
+  '../../../../ops-data/fixtures/reference-indicators/eji-il-counties-sample.csv',
 );
 
 test('parseEjiTractCsv loads tract ranks for Cook, DuPage, and Lake counties', () => {

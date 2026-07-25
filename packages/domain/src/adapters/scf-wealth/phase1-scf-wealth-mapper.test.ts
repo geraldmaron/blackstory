@@ -20,7 +20,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURE_CSV = readFileSync(
   join(
     __dirname,
-    '../../../../firebase/fixtures/reference-indicators/scf-median-net-worth-by-race-1989-2022.csv',
+    '../../../../ops-data/fixtures/reference-indicators/scf-median-net-worth-by-race-1989-2022.csv',
   ),
   'utf8',
 );

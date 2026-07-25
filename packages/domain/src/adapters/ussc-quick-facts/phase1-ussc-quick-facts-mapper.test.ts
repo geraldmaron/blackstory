@@ -21,7 +21,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURE_CSV = readFileSync(
   join(
     __dirname,
-    '../../../../firebase/fixtures/reference-indicators/ussc-quick-facts-drug-sentencing-fy2013-2023.csv',
+    '../../../../ops-data/fixtures/reference-indicators/ussc-quick-facts-drug-sentencing-fy2013-2023.csv',
   ),
   'utf8',
 );

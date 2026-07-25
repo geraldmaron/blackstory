@@ -22,7 +22,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const SAMPLE_CSV = readFileSync(
   join(
     __dirname,
-    '../../../../firebase/fixtures/reference-indicators/eviction-lab-county-proprietary-sample.csv',
+    '../../../../ops-data/fixtures/reference-indicators/eviction-lab-county-proprietary-sample.csv',
   ),
   'utf8',
 );

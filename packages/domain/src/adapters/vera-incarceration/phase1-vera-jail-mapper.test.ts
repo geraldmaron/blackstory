@@ -16,7 +16,7 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SAMPLE_CSV = readFileSync(
-  join(__dirname, '../../../../firebase/fixtures/reference-indicators/vera-county-snippet.csv'),
+  join(__dirname, '../../../../ops-data/fixtures/reference-indicators/vera-county-snippet.csv'),
   'utf8',
 );
 const RETRIEVED_AT = '2026-07-22T00:00:00.000Z';
