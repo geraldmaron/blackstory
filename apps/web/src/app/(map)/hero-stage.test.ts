@@ -32,9 +32,25 @@ describe('home hero panel structure', () => {
     assert.match(heroStageSource, /copyColumnRef/);
     assert.match(heroStageSource, /data-hero-map-panel="true"/);
     assert.match(heroStageSource, /heroPanelRef/);
-    assert.doesNotMatch(heroStageSource, /mapColumnRef/);
+    // Map row carries a ref so the fixed plate can pin to it (not the full panel) on the
+    // mobile stacked layout — see the mobile inset test below.
+    assert.match(heroStageSource, /mapColumnRef/);
     assert.doesNotMatch(heroStageSource, /data-hero-map-frame/);
     assert.doesNotMatch(heroStageSource, /ds-home-hero__map-frame/);
+  });
+
+  it('pins the plate to the map row (not the full panel) on the mobile stacked layout', () => {
+    // Breakpoint matches shell.css `.ds-home-hero` stacked query.
+    assert.match(heroStageSource, /max-width:\s*47\.9375rem/);
+    assert.match(heroStageSource, /matchMedia/);
+    assert.match(heroStageSource, /heroInsetTarget/);
+    // Inset helper accepts an explicit target box (map row) beyond the panel.
+    assert.match(heroMapInsetSource, /insetTarget/);
+    // Mobile inset plate is a non-interactive preview so it never traps vertical page scroll.
+    assert.match(
+      mapSurfacesCss,
+      /@media\s*\(max-width:\s*47\.9375rem\)[\s\S]*?\.ds-map-stage--hero-inset\s*\{[^}]*pointer-events:\s*none/s,
+    );
   });
 
   it('uses morphing headline and place-connected micro-facts strip', () => {
