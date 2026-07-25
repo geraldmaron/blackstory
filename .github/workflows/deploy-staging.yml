@@ -1,7 +1,7 @@
 # Staging deploy pipeline.
 # Public web ships on Vercel from the staging git branch (ADR-027). This workflow pins a
-# commit SHA, dry-runs Firestore migrate sequencing, records provenance, and optionally
-# smokes E2E_BASE_URL. It does not promote Firebase App Hosting.
+# commit SHA, records provenance, and optionally smokes E2E_BASE_URL. It does not promote
+# Firebase App Hosting.
 
 name: Deploy Staging
 
@@ -25,10 +25,6 @@ permissions:
 concurrency:
   group: deploy-staging
   cancel-in-progress: false
-
-env:
-  FIREBASE_PROJECT_ID: black-book-efaaf
-  FIREBASE_CONFIG: infra/firebase/firebase.json
 
 jobs:
   gate:
@@ -76,23 +72,9 @@ jobs:
         with:
           ref: ${{ needs.gate.outputs.commit_sha }}
 
-  migrate-firestore:
-    name: Migrate Firestore Rules Indexes
-    needs: [gate, checkout-pinned]
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    environment: staging
-    steps:
-      - name: Checkout exact commit
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          ref: ${{ needs.gate.outputs.commit_sha }}
-      - name: Firestore rules and indexes sequencing (dry-run)
-        run: bash infra/github/release-pipeline/migrate-firestore-dry-run.sh "${{ needs.gate.outputs.commit_sha }}"
-
   record-vercel-staging:
     name: Record Vercel Staging Expectation
-    needs: [gate, migrate-firestore]
+    needs: [gate, checkout-pinned]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

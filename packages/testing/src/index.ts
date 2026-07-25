@@ -68,13 +68,6 @@ export {
 } from './harness/postgres.js';
 export type { PostgresHarness } from './harness/postgres.js';
 
-export {
-  REQUIRE_FIREBASE_ENV,
-  createFirebaseHarness,
-  firebaseHarnessGate,
-} from './harness/firebase.js';
-export type { FirebaseHarness } from './harness/firebase.js';
-
 export { auditHtmlSmoke } from './a11y/html-smoke.js';
 export type { A11yFixtureIssue } from './a11y/html-smoke.js';
 

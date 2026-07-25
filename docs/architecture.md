@@ -22,11 +22,14 @@ apps/mobile              Expo mobile (isolated lockfile)
 workers/research         Research compute (Corsair schedules + Jobs/Tasks when applied)
 workers/publication      Projection, snapshot, indexing, release
 workers/security         Quarantine, content validation, integrity
-functions/               Tombstone (ADR-018 superseded by ADR-028)
 packages/*               Shared TypeScript libraries
 supabase/                Postgres migrations and project config
-infra/*                  Firebase wind-down, GCP, GitHub scaffolding
+infra/*                  GCP, GitHub scaffolding; infra/firebase/ keeps only the App Check
+                          reference docs, the backup/DR archive, and registered-apps.json
 ```
+
+`functions/` (the 5 Firebase Cloud Functions v2 schedules, ADR-018) was deleted `repo-348e.8`;
+its scheduling role moved to `.github/workflows/discovery-campaigns.yml` (ADR-028).
 
 Do not add deployable microservices beyond this set. See [ADR-005](./adr/ADR-005-service-surface-separation.md).
 
@@ -34,11 +37,13 @@ Do not add deployable microservices beyond this set. See [ADR-005](./adr/ADR-005
 
 - **Data:** **Supabase Postgres** on `blackstory-app` is the product system of record
   ([ADR-020](./adr/ADR-020-supabase-postgres-system-of-record.md)). Blobs: Supabase Storage for
-  `public-media` (GCS dual-serve / rollback). Firestore is export/rollback only
-  (`docs/data/firebase-wind-down.md`). Cloud SQL / SQL Connect under `infra/database/` stay parked.
+  `public-media` (GCS dual-serve / rollback). Firestore itself is gone — no live database, rules,
+  or indexes remain (`docs/data/firebase-wind-down.md`). Cloud SQL / SQL Connect under
+  `infra/database/` stay parked.
 - **App data access:** Postgres via server `DATABASE_URL` / `@repo/data-access`; PostgREST
   published views ([ADR-026](./adr/ADR-026-postgrest-published-read-surface.md)); `@repo/domain`
-  models. `@repo/firebase` remains for utilities / migration / GCS helpers, not SoR.
+  models. `@repo/firebase` remains only for Firebase App Check client/verification helpers and
+  embedding utilities — not for any Firestore/Firebase SoR access, which no longer exists.
 - **Public web vs APIs:** Vercel for `apps/web` ([ADR-027](./adr/ADR-027-vercel-public-web-hosting.md));
   Cloud Run for APIs + admin ([ADR-001](./adr/ADR-001-firebase-app-hosting-vs-cloud-run.md)).
 - **Auth / abuse:** Supabase Auth for admin (`app_metadata.bb_role`); request-integrity / client
@@ -90,8 +95,10 @@ binding in [ADR-010](./adr/ADR-010-security-and-abuse-assumptions.md).
 ## Environment isolation
 
 Single-project GCP design (partially applied): [`security/environment-isolation.md`](./security/environment-isolation.md).
-Matrices and Terraform stubs: [`../infra/gcp/`](../infra/gcp/). Root `.firebaserc` still names
-production `black-book-efaaf` for wind-down/rollback surfaces.
+Matrices and Terraform stubs: [`../infra/gcp/`](../infra/gcp/). Root `.firebaserc` was deleted in
+`repo-348e.8` (no Firestore/Firebase Hosting deploy target remains); the production Firebase
+project id (`black-book-efaaf`) that App Check still targets is documented in
+`infra/firebase/registered-apps.json` and `apps/admin`'s Cloud Run env, not in a `.firebaserc`.
 
 | Acceptance | Design enforcement |
 |------------|--------------------|

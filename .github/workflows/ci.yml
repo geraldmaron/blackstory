@@ -261,63 +261,6 @@ jobs:
           pnpm db:verify
           pnpm test:db:integration
 
-  integration-firebase:
-    name: Integration Firebase
-    needs: changes
-    if: needs.changes.outputs.code == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    env:
-      CI_REQUIRE_FIREBASE: '1'
-      FIREBASE_PROJECT_ID: demo-repo
-      FIRESTORE_EMULATOR_HOST: 127.0.0.1:8080
-      FIREBASE_AUTH_EMULATOR_HOST: 127.0.0.1:9099
-      FIREBASE_STORAGE_EMULATOR_HOST: 127.0.0.1:9199
-      FIREBASE_CLI_DISABLE_UPDATE_CHECK: 'true'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - name: Setup Node and pnpm
-        uses: ./.github/actions/setup-node-pnpm
-      - name: Setup Java (Firebase emulators)
-        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
-        with:
-          distribution: temurin
-          java-version: '21'
-      - name: Start Firebase emulators
-        run: |
-          set -euo pipefail
-          pnpm firebase:emulators > /tmp/firebase-emulators.log 2>&1 &
-          echo $! > /tmp/firebase-emulators.pid
-          # Wait for Firestore + Storage (Auth alone is not enough for rules tests).
-          for i in $(seq 1 120); do
-            if (echo > /dev/tcp/127.0.0.1/8080) >/dev/null 2>&1 \
-              && (echo > /dev/tcp/127.0.0.1/9199) >/dev/null 2>&1 \
-              && (echo > /dev/tcp/127.0.0.1/9099) >/dev/null 2>&1; then
-              echo "Firebase emulators are accepting TCP connections (attempt ${i})"
-              exit 0
-            fi
-            if ! kill -0 "$(cat /tmp/firebase-emulators.pid)" 2>/dev/null; then
-              echo "Firebase emulator process exited early"
-              cat /tmp/firebase-emulators.log || true
-              exit 1
-            fi
-            sleep 2
-          done
-          echo "Firebase emulators failed to start within timeout"
-          cat /tmp/firebase-emulators.log || true
-          exit 1
-      - name: Firebase emulator integration tests
-        run: pnpm --filter @repo/testing exec node --import tsx --test src/harness/firebase.integration.test.ts
-      - name: Firestore security rules (primary data path)
-        run: pnpm --filter @repo/firebase test
-      - name: Stop Firebase emulators
-        if: always()
-        run: |
-          if [ -f /tmp/firebase-emulators.pid ]; then
-            kill "$(cat /tmp/firebase-emulators.pid)" || true
-          fi
-
   build-typecheck:
     name: Build and Typecheck
     needs: changes

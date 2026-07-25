@@ -1,9 +1,0 @@
-{
-  "projects": {
-    "default": "black-book-efaaf",
-    "production": "black-book-efaaf",
-    "staging": "blackbook-staging",
-    "internal": "blackbook-internal"
-  }
-}
-

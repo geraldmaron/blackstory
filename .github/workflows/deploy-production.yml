@@ -1,8 +1,8 @@
 # Production deploy gate for pinned SHA (ADR-006 / ADR-027).
 # workflow_dispatch only — not a required status check. Requires protected Environment "production".
 # Public web Production traffic is Vercel (git main + explicit Production promote in Vercel).
-# This workflow dry-runs Firestore migrate sequencing, records that Vercel is the host,
-# runs optional health/E2E gates, and writes provenance. It does not promote App Hosting.
+# This workflow records that Vercel is the host, runs optional health/E2E gates, and writes
+# provenance. It does not promote App Hosting.
 
 name: Deploy Production
 
@@ -28,10 +28,6 @@ permissions:
 concurrency:
   group: deploy-production
   cancel-in-progress: false
-
-env:
-  FIREBASE_PROJECT_ID: black-book-efaaf
-  FIREBASE_CONFIG: infra/firebase/firebase.json
 
 jobs:
   gate:
@@ -69,23 +65,9 @@ jobs:
       - name: Assert automatic production deploys disabled
         run: node infra/github/release-pipeline/assert-no-auto-rollout.mjs
 
-  migrate-firestore:
-    name: Migrate Firestore Rules Indexes
-    needs: gate
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    environment: production
-    steps:
-      - name: Checkout exact commit
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        with:
-          ref: ${{ needs.gate.outputs.commit_sha }}
-      - name: Firestore rules and indexes before traffic (dry-run)
-        run: bash infra/github/release-pipeline/migrate-firestore-dry-run.sh "${{ needs.gate.outputs.commit_sha }}"
-
   deploy-surfaces:
     name: Deploy Surfaces Dry Run
-    needs: [gate, migrate-firestore]
+    needs: gate
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: production
