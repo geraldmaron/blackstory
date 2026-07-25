@@ -1,5 +1,6 @@
 {
   "name": "@repo/migrate-firestore-postgres",
+  "description": "Postgres canonical-release validation + one-time historical Firestore migration tooling. See README: canonical-convergence/canonical-release-gate/pg-writer/backfill-canonical are ongoing Postgres-only utilities; migrate.ts/cli/migrate.ts/cli/census.ts are the historical one-time Firestore export.",
   "version": "0.0.0",
   "private": true,
   "type": "module",

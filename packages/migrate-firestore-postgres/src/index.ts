@@ -1,5 +1,10 @@
 /**
  * Public exports for @repo/migrate-firestore-postgres.
+ *
+ * These exports are all part of the historical, one-time Firestore export path (live
+ * firebase-admin/firestore calls). The ongoing Postgres-only utilities (canonical-release-gate.ts,
+ * canonical-convergence.ts, pg-writer.ts) are consumed via direct relative imports by
+ * packages/operator-cli and this package's own cli/backfill-canonical.ts — see README.md.
  */
 export { COLLECTION_SPECS, LIVE_ONLY_COLLECTIONS, allKnownFirestoreCollections } from './catalog.js';
 export type { CollectionSpec, MigratePriority } from './catalog.js';
