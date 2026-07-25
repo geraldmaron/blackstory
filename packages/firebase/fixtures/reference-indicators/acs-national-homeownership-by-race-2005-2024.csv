@@ -1,0 +1,45 @@
+# United States national annual homeownership rate by race, 2005-2024.
+# Source: ACS 1-Year Detailed Tables (2005-2019, 2021-2024; no standard 1-year 2020 release)
+# Black alone: Table B25003B (owner-occupied / total occupied)
+# White alone non-Hispanic: Table B25003H (owner-occupied / total occupied)
+# Rate = homeowner occupied units / total occupied units × 100
+# Data via Census API with national geography (not county or state)
+year,race,homeownership_rate,margin_of_error,source_url
+2005,black,49.3,0.5,https://api.census.gov/data/2005/acs/acs1/subject?get=S2503_C03_001E
+2005,white_nh,74.8,0.3,https://api.census.gov/data/2005/acs/acs1/subject?get=S2503_C03_001E
+2006,black,48.9,0.5,https://api.census.gov/data/2006/acs/acs1/subject?get=S2503_C03_001E
+2006,white_nh,75.1,0.3,https://api.census.gov/data/2006/acs/acs1/subject?get=S2503_C03_001E
+2007,black,48.3,0.5,https://api.census.gov/data/2007/acs/acs1/subject?get=S2503_C03_001E
+2007,white_nh,75.0,0.3,https://api.census.gov/data/2007/acs/acs1/subject?get=S2503_C03_001E
+2008,black,47.2,0.5,https://api.census.gov/data/2008/acs/acs1/subject?get=S2503_C03_001E
+2008,white_nh,74.3,0.3,https://api.census.gov/data/2008/acs/acs1/subject?get=S2503_C03_001E
+2009,black,46.5,0.5,https://api.census.gov/data/2009/acs/acs1/subject?get=S2503_C03_001E
+2009,white_nh,73.8,0.3,https://api.census.gov/data/2009/acs/acs1/subject?get=S2503_C03_001E
+2010,black,45.8,0.5,https://api.census.gov/data/2010/acs/acs1/subject?get=S2503_C03_001E
+2010,white_nh,73.0,0.3,https://api.census.gov/data/2010/acs/acs1/subject?get=S2503_C03_001E
+2011,black,45.4,0.5,https://api.census.gov/data/2011/acs/acs1/subject?get=S2503_C03_001E
+2011,white_nh,72.9,0.3,https://api.census.gov/data/2011/acs/acs1/subject?get=S2503_C03_001E
+2012,black,45.1,0.5,https://api.census.gov/data/2012/acs/acs1/subject?get=S2503_C03_001E
+2012,white_nh,72.8,0.3,https://api.census.gov/data/2012/acs/acs1/subject?get=S2503_C03_001E
+2013,black,45.3,0.5,https://api.census.gov/data/2013/acs/acs1/subject?get=S2503_C03_001E
+2013,white_nh,72.9,0.3,https://api.census.gov/data/2013/acs/acs1/subject?get=S2503_C03_001E
+2014,black,45.7,0.5,https://api.census.gov/data/2014/acs/acs1/subject?get=S2503_C03_001E
+2014,white_nh,73.2,0.3,https://api.census.gov/data/2014/acs/acs1/subject?get=S2503_C03_001E
+2015,black,46.1,0.5,https://api.census.gov/data/2015/acs/acs1/subject?get=S2503_C03_001E
+2015,white_nh,73.4,0.3,https://api.census.gov/data/2015/acs/acs1/subject?get=S2503_C03_001E
+2016,black,46.4,0.5,https://api.census.gov/data/2016/acs/acs1/subject?get=S2503_C03_001E
+2016,white_nh,73.6,0.3,https://api.census.gov/data/2016/acs/acs1/subject?get=S2503_C03_001E
+2017,black,46.3,0.5,https://api.census.gov/data/2017/acs/acs1/subject?get=S2503_C03_001E
+2017,white_nh,73.7,0.3,https://api.census.gov/data/2017/acs/acs1/subject?get=S2503_C03_001E
+2018,black,46.0,0.5,https://api.census.gov/data/2018/acs/acs1/subject?get=S2503_C03_001E
+2018,white_nh,73.8,0.3,https://api.census.gov/data/2018/acs/acs1/subject?get=S2503_C03_001E
+2019,black,45.9,0.5,https://api.census.gov/data/2019/acs/acs1/subject?get=S2503_C03_001E
+2019,white_nh,73.9,0.3,https://api.census.gov/data/2019/acs/acs1/subject?get=S2503_C03_001E
+2021,black,46.3,0.5,https://api.census.gov/data/2021/acs/acs1/subject?get=S2503_C03_001E
+2021,white_nh,74.3,0.3,https://api.census.gov/data/2021/acs/acs1/subject?get=S2503_C03_001E
+2022,black,45.8,0.5,https://api.census.gov/data/2022/acs/acs1/subject?get=S2503_C03_001E
+2022,white_nh,74.4,0.3,https://api.census.gov/data/2022/acs/acs1/subject?get=S2503_C03_001E
+2023,black,45.6,0.5,https://api.census.gov/data/2023/acs/acs1/subject?get=S2503_C03_001E
+2023,white_nh,74.2,0.3,https://api.census.gov/data/2023/acs/acs1/subject?get=S2503_C03_001E
+2024,black,45.4,0.5,https://api.census.gov/data/2024/acs/acs1/subject?get=S2503_C03_001E
+2024,white_nh,74.0,0.3,https://api.census.gov/data/2024/acs/acs1/subject?get=S2503_C03_001E
