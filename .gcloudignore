@@ -1,0 +1,52 @@
+# This file specifies files that are *not* uploaded to Google Cloud Platform
+# using gcloud. It follows the same syntax as .gitignore, with the addition of
+# "#!include" directives (which insert the entries of the given .gitignore-style
+# file at that point).
+#
+# For more information, run:
+#   $ gcloud topic gcloudignore
+#
+# gcloud's automatic .gitignore-derived ignore only reads the ROOT .gitignore,
+# not nested per-package .gitignore files (e.g. apps/mobile/.gitignore, which is
+# what actually excludes apps/mobile/node_modules and apps/mobile/ios/Pods from
+# git). Without this file, `gcloud builds submit .` uploads those gitignored-but-
+# only-nested-ignored directories anyway — confirmed 2026-07-24, an 803MB source
+# tarball for a Cloud Run deploy that should only need apps/admin + its workspace
+# deps. This file explicitly excludes everything git already ignores everywhere
+# in the tree, not just at root.
+
+.git
+.gitignore
+
+# Dependencies (every depth — pnpm workspaces have per-package node_modules too)
+node_modules/
+**/node_modules/
+.pnpm-store/
+.venv/
+__pycache__/
+
+# Build artifacts (every depth)
+dist/
+**/dist/
+build/
+**/build/
+.next/
+**/.next/
+out/
+**/out/
+*.tsbuildinfo
+coverage/
+**/coverage/
+.turbo/
+.cache/
+**/.cache/
+
+# Mobile native build artifacts (large: CocoaPods, Xcode/Gradle output)
+apps/mobile/ios/
+apps/mobile/android/build/
+apps/mobile/android/app/build/
+apps/mobile/.expo/
+
+# Editor/OS
+.DS_Store
+*.log
