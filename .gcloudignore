@@ -47,6 +47,16 @@ apps/mobile/android/build/
 apps/mobile/android/app/build/
 apps/mobile/.expo/
 
+# Terraform provider binaries (~116MB each, one per infra dir — never needed in a build)
+**/.terraform/
+*.tfstate
+*.tfstate.*
+
+# Beads issue-tracker local state: embedded Dolt DB (~180MB) + backups.
+# None of it is git-tracked; it only ever bloats build uploads.
+.beads/embeddeddolt/
+.beads/backup/
+
 # Editor/OS
 .DS_Store
 *.log
