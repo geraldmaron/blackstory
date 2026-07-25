@@ -729,10 +729,13 @@
   width: min(100%, var(--ds-grid-max));
   max-width: none;
   margin-inline: auto;
-  padding: 0.75rem 1.25rem;
-  border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
-  border-bottom: var(--ds-border-width) solid var(--ds-border);
+  padding: 0.5rem 1rem;
+  /* Blend into the paper: chrome sits on the canvas, not a lighter floating plate.
+     Hairline bottom rule only — no ring, no card radius. */
+  background: var(--ds-canvas);
+  border: 0;
+  border-radius: 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
 }
 
 
@@ -777,7 +780,7 @@
 
 .ds-home-hero::before {
   /* Legibility scrim over the full-panel map (repo-pyyw): one continuous canvas-tinted
-     wash spanning the WHOLE hero, faded by a long horizontal mask ramp — near-opaque
+     wash spanning the WHOLE hero, faded by a long horizontal mask ramp — opaque canvas
      behind the copy column, gradually clearing over the map focus area. The mask fades
      the flat color and the grain together, so no vertical seam/edge line exists at any
      point. WCAG AA ink contrast holds on the left where copy sits. */
@@ -790,7 +793,7 @@
   justify-self: stretch;
   min-width: 0;
   min-height: 100%;
-  background-color: color-mix(in srgb, var(--ds-canvas) 78%, transparent);
+  background-color: var(--ds-canvas);
   background-image: var(--ds-edition-pattern-grain);
   background-size: 256px 256px;
   background-position: 0 0;
@@ -820,7 +823,7 @@
 }
 
 [data-theme='dark'] .ds-home-hero::before {
-  background-color: color-mix(in srgb, var(--ds-canvas) 84%, transparent);
+  background-color: var(--ds-canvas);
   background-image: var(--ds-edition-pattern-grain);
 }
 
