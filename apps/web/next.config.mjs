@@ -35,7 +35,13 @@ const nextConfig = {
   // Constitution JSON is read at runtime via fs (not import); include it in serverless traces.
   outputFileTracingRoot: monorepoRoot,
   outputFileTracingIncludes: {
-    '/*': ['./packages/schemas/constitution/**/*'],
+    '/*': [
+      './packages/schemas/constitution/**/*',
+      // Mention overrides are read at runtime via fs from @repo/domain's dist (repo-xez5.10);
+      // without this include the serverless bundle 500s with ENOENT on every dynamic route.
+      './packages/domain/dist/graph/data/**/*',
+      './packages/domain/src/graph/data/**/*',
+    ],
   },
   webpack: (config, { isServer }) => {
     // NodeNext packages emit `.js` specifiers that map to `.ts`/`.tsx` sources.
