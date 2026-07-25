@@ -39,6 +39,13 @@ import { prepareEditorialPacketIntake } from './editorial-intake.js';
 import { runEnrichmentJudge } from './enrichment-run.js';
 import { createLlmProvider } from './llm-provider.js';
 import { loadPendingEditorialItems } from './pending-list.js';
+import {
+  commitQuarantineTriagePlans,
+  judgeQuarantineItem,
+  prepareQuarantineTriageDecision,
+  type QuarantineIntakeItem,
+  type QuarantineTriagePlan,
+} from './quarantine-triage.js';
 import { runStoryResearch, type StoryTopicSeed } from './story-research-run.js';
 import { prepareStoryPacketIntake } from './story-intake.js';
 import { prepareEdgeIntake, type EdgeIntakeInput } from './edge-intake.js';
@@ -1278,6 +1285,89 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
         );
         stdout(JSON.stringify({ verb: 'graylist-read', source: 'postgres:intake_items', count: rows.length, items: rows }, null, 2));
         return 0;
+      }
+      case 'quarantine-triage': {
+        // Write path for the graylist: judges each quarantined bb_submissions.intake_items
+        // row with an LLM (see quarantine-triage.ts for the authority this does and does not
+        // have) and, with --commit, moves it to promoted/rejected/spam.
+        const limitRaw = optionalFlag(flags, '--limit');
+        const limit = limitRaw ? Number(limitRaw) : 50;
+        if (!Number.isFinite(limit) || limit < 1) {
+          throw new Error('--limit must be a positive number');
+        }
+        const thresholdRaw = optionalFlag(flags, '--confidence-threshold');
+        const confidenceThreshold = thresholdRaw ? Number(thresholdRaw) : 0.6;
+        if (!Number.isFinite(confidenceThreshold) || confidenceThreshold < 0 || confidenceThreshold > 1) {
+          throw new Error('--confidence-threshold must be a number between 0 and 1');
+        }
+        const providerName = (optionalFlag(flags, '--provider') ?? 'mock') as
+          'mock' | 'openrouter' | 'ollama' | 'hybrid';
+        const model = optionalFlag(flags, '--model');
+        const provider = createLlmProvider({ provider: providerName, ...(model ? { model } : {}) });
+        const pool = getOpsPostgresPool(process.env);
+        const { rows } = await pool.query(
+          `SELECT id, kind, payload, source_url, created_at
+             FROM bb_submissions.intake_items
+            WHERE status = 'quarantined'
+            ORDER BY created_at ASC
+            LIMIT $1`,
+          [limit],
+        );
+        const items: QuarantineIntakeItem[] = rows.map((row: {
+          id: string;
+          kind: string | null;
+          payload: unknown;
+          source_url: string | null;
+          created_at: Date | string;
+        }) => ({
+          id: row.id,
+          kind: row.kind,
+          payload: row.payload,
+          sourceUrl: row.source_url,
+          createdAt: new Date(row.created_at).toISOString(),
+        }));
+        const nowIso = new Date(deps.nowMs ?? Date.now()).toISOString();
+        const plans: QuarantineTriagePlan[] = [];
+        const errors: Array<{ id: string; error: string }> = [];
+        for (const item of items) {
+          try {
+            const judgment = await judgeQuarantineItem({ item, provider, model: model ?? '' });
+            plans.push(prepareQuarantineTriageDecision(item, judgment, { confidenceThreshold, nowIso }));
+          } catch (error) {
+            errors.push({ id: item.id, error: error instanceof Error ? error.message : String(error) });
+          }
+        }
+        let commitSummary: Awaited<ReturnType<typeof commitQuarantineTriagePlans>> | undefined;
+        if (flags.booleans.has('--commit') && plans.length > 0) {
+          commitSummary = await commitQuarantineTriagePlans(pool, plans, readOperatorIdentity(flags), nowIso);
+        }
+        const counts = plans.reduce<Record<string, number>>((acc, plan) => {
+          acc[plan.effectiveDecision] = (acc[plan.effectiveDecision] ?? 0) + 1;
+          return acc;
+        }, {});
+        stdout(
+          JSON.stringify(
+            {
+              verb: 'quarantine-triage',
+              fetched: items.length,
+              judged: plans.length,
+              errors,
+              counts,
+              committed: flags.booleans.has('--commit'),
+              commitSummary,
+              plans: plans.map((plan) => ({
+                intakeItemId: plan.intakeItemId,
+                decision: plan.effectiveDecision,
+                confidence: plan.judgment.confidence,
+                rationale: plan.judgment.rationale,
+                researchCaseId: plan.write?.caseWrite?.record.id,
+              })),
+            },
+            null,
+            2,
+          ),
+        );
+        return errors.length > 0 && plans.length === 0 ? 1 : 0;
       }
       case 'locate': {
         const storedLat = optionalFlag(flags, '--stored-lat');
