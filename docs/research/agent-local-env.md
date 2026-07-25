@@ -54,6 +54,11 @@ test -n "$CENSUS_API_KEY" && echo census-ok
 Optional 1Password path when signed in: `run-with-dev-secrets bash -c 'test -n "$OPENROUTER_API_KEY" && echo ok'`.
 Corsair overnight jobs continue to use `~/.config/blackstory/enrichment.env` (see overnight runbook).
 
+**Note:** `run-with-dev-secrets <cmd>` alone will fail with `DATABASE_URL or APP_DATABASE_URL is
+required` — it only wraps `op run --env-file=~/.env.1password`, and that file does not carry
+`DATABASE_URL`/`OPENROUTER_API_KEY`. Source `apps/web/.env.local` as shown above instead; it's
+the default local path for those keys.
+
 ## Phase 1 ACS ingest
 
 `packages/firebase/scripts/ingest-phase1-acs.ts` reads `CENSUS_API_KEY` from env or `apps/web/.env.local`
