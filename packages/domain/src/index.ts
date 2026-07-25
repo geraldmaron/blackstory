@@ -623,6 +623,11 @@ export * from './external-data-sources.js';
 export * from './banned-books/index.js';
 export * from './public-numeric-policy.js';
 export * from './publication/index.js';
+export {
+  SEED_STORY_PROJECTIONS,
+  listSeedStoryProjections,
+  getSeedStoryProjection,
+} from './publication/public-story-seed.js';
 export * from './datapacks/index.js';
 
 // Map data platform. Demo/test fixtures in ./map/fixtures.js are

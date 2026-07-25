@@ -1,12 +1,13 @@
 /**
  * Confirms `/stories` list items strip body/related fields and preserve seed
- * corpus order via `listPublicStoryListItems` / `toStoryListItem`.
+ * corpus order via `toStoryListItem`. The live `/stories` index reads Postgres
+ * projections only (no snapshot fallback), so runtime list assembly is covered
+ * by integration tests, not here.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { listSeedStoryProjections } from '@repo/domain';
-import { listSnapshotStoryListItems, toStoryListItem } from './public-readers';
-import { listPublicStoryListItems } from './source';
+import { toStoryListItem } from './public-readers';
 
 test('toStoryListItem omits body, relatedEntityIds, and sources', () => {
   const full = listSeedStoryProjections()[0];
@@ -26,27 +27,13 @@ test('toStoryListItem omits body, relatedEntityIds, and sources', () => {
   assert.equal('sources' in item, false);
 });
 
-test('listSnapshotStoryListItems matches seed corpus length and order', () => {
+test('mapping the seed corpus preserves length and order', () => {
   const full = listSeedStoryProjections();
-  const items = listSnapshotStoryListItems();
+  const items = full.map(toStoryListItem);
   assert.equal(items.length, full.length);
   assert.equal(items.length, 5);
   for (let i = 0; i < full.length; i += 1) {
     assert.equal(items[i]?.slug, full[i]?.slug);
     assert.equal(items[i]?.title, full[i]?.title);
-  }
-});
-
-test('listPublicStoryListItems returns empty-safe snapshot list items', async () => {
-  const { data, source } = await listPublicStoryListItems();
-  assert.equal(source, 'snapshot');
-  assert.equal(data.length, 5);
-  for (const item of data) {
-    assert.ok(item.slug.length > 0);
-    assert.ok(item.title.length > 0);
-    assert.ok(item.dek.length > 0);
-    assert.equal('body' in item, false);
-    assert.equal('relatedEntityIds' in item, false);
-    assert.equal('sources' in item, false);
   }
 });
