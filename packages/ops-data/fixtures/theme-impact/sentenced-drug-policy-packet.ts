@@ -189,6 +189,13 @@ const derived = [
 const artifacts = [
   {
     artifactId: 'art_anti_drug_abuse_act_1986',
+    provenance: {
+      source: 'govinfo-us-statutes-at-large',
+      sourceUrl: 'https://www.govinfo.gov/content/pkg/STATUTE-100/pdf/STATUTE-100-Pg3207.pdf',
+      retrievedAt: '2026-07-26T00:00:00.000Z',
+      contentHash: '36e3965982e8d7a8c2cdb5d01a524e3ea97bdc59b25e3ab30a83dd10ee6520a3',
+      humanCitation: 'Anti-Drug Abuse Act of 1986, Pub. L. 99-570, 100 Stat. 3207 (govinfo Statutes at Large PDF).',
+    },
     artifactClass: 'primary_government_document',
     title: 'Anti-Drug Abuse Act of 1986',
     dated: '1986-10-27',
@@ -199,6 +206,13 @@ const artifacts = [
   },
   {
     artifactId: 'art_usc_841_cocaine_thresholds',
+    provenance: {
+      source: 'office-of-law-revision-counsel',
+      sourceUrl: USC841_URL,
+      retrievedAt: '2026-07-25T00:00:00.000Z',
+      contentHash: '185e2bf4800b1f55b6afbabb04d4986be29c97229abc923af78189a1e813d27b',
+      humanCitation: '21 U.S.C. 841 with Pub. L. 111-220 amendment notes, Office of the Law Revision Counsel (curated evidence capture).',
+    },
     artifactClass: 'primary_government_document',
     title: '21 U.S.C. 841 cocaine-base quantity thresholds and amendment notes',
     dated: '1986-2010',
@@ -210,6 +224,13 @@ const artifacts = [
   },
   {
     artifactId: 'art_fair_sentencing_act_2010',
+    provenance: {
+      source: 'govinfo-us-statutes-at-large',
+      sourceUrl: 'https://www.govinfo.gov/content/pkg/STATUTE-124/pdf/STATUTE-124-Pg2372.pdf',
+      retrievedAt: '2026-07-26T00:00:00.000Z',
+      contentHash: 'fa411384f83c246d84f9b02762ce3f89b08dbd308a9063b8a436381becf598db',
+      humanCitation: 'Fair Sentencing Act of 2010, Pub. L. 111-220, 124 Stat. 2372 (govinfo Statutes at Large PDF).',
+    },
     artifactClass: 'primary_government_document',
     title: 'Fair Sentencing Act of 2010',
     dated: '2010-08-03',
@@ -220,6 +241,13 @@ const artifacts = [
   },
   {
     artifactId: 'art_crs_crack_powder_disparities',
+    provenance: {
+      source: 'congressional-research-service',
+      sourceUrl: 'https://www.congress.gov/crs_external_products/IF/PDF/IF11965/IF11965.1.pdf',
+      retrievedAt: '2026-07-26T00:00:00.000Z',
+      contentHash: '7701ac222943db0e35c2b9c69b316fe604a506d18e56a9950cbcbf36cf68eec3',
+      humanCitation: 'Congressional Research Service, Cocaine: Crack and Powder Sentencing Disparities, IF11965.',
+    },
     artifactClass: 'primary_government_document',
     title: 'Congressional Research Service: crack and powder sentencing disparities',
     dated: '2022',

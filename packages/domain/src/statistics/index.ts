@@ -145,6 +145,7 @@ export {
   buildThemeImpactPacket,
   assertThemeImpactPacketPublishable,
   assertThemeImpactPacketMultiDecadeChecklist,
+  deriveDefaultMultiDecadeChecklist,
   createRedliningQ3FixturePacket,
 } from './theme-impact-packet.js';
 export type {

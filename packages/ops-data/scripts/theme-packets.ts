@@ -22,6 +22,7 @@ import { resolve } from 'node:path';
 import {
   assertThemeImpactPacketMultiDecadeChecklist,
   assertThemeImpactPacketPublishable,
+  deriveDefaultMultiDecadeChecklist,
   parseThemeImpactPacketRow,
   type ThemeImpactPacket,
 } from '@repo/domain';
@@ -346,7 +347,14 @@ async function commandPromote(packetIds: readonly string[]): Promise<void> {
     if (missing.length > 0) throw new Error(`packets not found: ${missing.join(', ')}`);
 
     const packets = rows.rows.map((row) => parseThemeImpactPacketRow(row));
-    const promotable = packets.map((packet) => ({ ...packet, status: 'published' as const }));
+    // Rows round-tripped through the DB carry no checklist; derive the default,
+    // exactly as buildThemeImpactPacket does at authoring time.
+    const promotable = packets.map((packet) => ({
+      ...packet,
+      status: 'published' as const,
+      multiDecadeChecklist:
+        packet.multiDecadeChecklist ?? deriveDefaultMultiDecadeChecklist(packet),
+    }));
     for (const packet of promotable) {
       assertThemeImpactPacketPublishable(packet);
       assertThemeImpactPacketMultiDecadeChecklist(packet);
