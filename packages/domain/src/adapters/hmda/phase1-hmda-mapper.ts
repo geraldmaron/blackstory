@@ -348,7 +348,11 @@ export function listPhase1HmdaIndicators(): readonly Phase1IndicatorDefinition[]
   const fromMain = PHASE1_INDICATOR_CATALOG.filter(
     (row) => row.externalDataSourceId === 'hmda-loan-level',
   );
-  return fromMain.length > 0 ? fromMain : PHASE1_HMDA_INDICATOR_DEFINITIONS;
+  const fromMainIds = new Set(fromMain.map((row) => row.metricId));
+  const nationOnly = PHASE1_HMDA_INDICATOR_DEFINITIONS.filter(
+    (row) => !fromMainIds.has(row.metricId),
+  );
+  return [...fromMain, ...nationOnly];
 }
 
 // National aggregations (no county validation needed)

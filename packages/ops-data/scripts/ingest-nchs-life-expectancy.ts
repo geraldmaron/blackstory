@@ -233,7 +233,7 @@ async function applyObservations(
           'United States Life Tables',
           'e(0) [life expectancy at age 0]',
           'nation',
-          'estimate',
+          'mean',
           'annual',
           null, // external_data_source_id — could point to NCHS if registered
           'health',
@@ -265,7 +265,7 @@ async function applyObservations(
         [
           obs.id,
           obs.metricId,
-          'nation:united-states', // jurisdiction_id for US national data
+          'nation:US', // jurisdiction_id for US national data
           '2020', // boundary_version — can be '2020' or generic
           obs.referencePeriod,
           '1900-present', // dataset_vintage

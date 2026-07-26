@@ -264,7 +264,7 @@ function buildSeriesDefinitions(): SeriesDefinition[] {
       raceEthnicitySlice: 'black',
     },
     {
-      metricId: 'census-decennial-homeownership-white-nh-nation',
+      metricId: 'census-decennial-homeownership-white_nh-nation',
       metricDefinition: 'Homeownership rate for White Non-Hispanic householders (decennial Census historical tables)',
       universe: 'occupied housing units with White Non-Hispanic householder',
       unit: 'percent',
@@ -294,7 +294,7 @@ function buildSeriesDefinitions(): SeriesDefinition[] {
       raceEthnicitySlice: 'black',
     },
     {
-      metricId: 'acs-homeownership-rate-white-nh-nation',
+      metricId: 'acs-homeownership-rate-white_nh-nation',
       metricDefinition: 'Homeownership rate for White alone Non-Hispanic householders (ACS 1-Year)',
       universe: 'occupied housing units',
       unit: 'percent',

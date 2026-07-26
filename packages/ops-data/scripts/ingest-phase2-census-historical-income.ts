@@ -66,6 +66,7 @@ const METRIC_IDS = {
 
 const NATIONAL_JURISDICTION_ID = 'nation:US';
 const DATASET_VINTAGE = 'Census CPS 1967-2024 (2025 release)';
+const CENSUS_HISTORICAL_INCOME_BOUNDARY_VERSION = 'nation-2024';
 
 function arg(name: string): string | undefined {
   const hit = process.argv.find((a) => a.startsWith(`--${name}=`));
@@ -359,7 +360,7 @@ async function applyObservations(
           obs.id,
           obs.metricId,
           NATIONAL_JURISDICTION_ID,
-          null, // boundary_version not applicable for national
+          CENSUS_HISTORICAL_INCOME_BOUNDARY_VERSION,
           obs.referencePeriod,
           DATASET_VINTAGE,
           obs.estimate,
