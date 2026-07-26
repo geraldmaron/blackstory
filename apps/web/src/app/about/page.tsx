@@ -197,8 +197,8 @@ export default function AboutPage() {
               <Link className="ds-cta ds-cta--copper" href="/explore">
                 Explore the map
               </Link>
-              <Link className="ds-cta ds-cta--quiet" href="/stories">
-                Read stories
+              <Link className="ds-cta ds-cta--quiet" href="/chapters">
+                Read chapters
               </Link>
             </p>
           </article>

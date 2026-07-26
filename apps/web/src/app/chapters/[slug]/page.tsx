@@ -1,5 +1,5 @@
 /**
- * Article detail page at `/articles/[slug]`. The publication layout: title →
+ * Chapter detail page at `/chapters/[slug]`. The publication layout: title →
  * hero image → summary → body (prose with inline citations, figures, stat
  * callouts, primary documents, timelines, map insets, disputes) → numbered
  * references. Emits schema.org Article JSON-LD only.
@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: ArticlePageProps) {
   return {
     title: doc.title,
     description: doc.summary,
-    alternates: { canonical: `/articles/${doc.slug}` },
+    alternates: { canonical: `/chapters/${doc.slug}` },
   };
 }
 
@@ -46,7 +46,7 @@ function buildArticleJsonLd(article: HydratedArticle) {
     description: doc.summary,
     datePublished: doc.publishedAt,
     ...(doc.updatedAt ? { dateModified: doc.updatedAt } : {}),
-    '@id': `/articles/${doc.slug}`,
+    '@id': `/chapters/${doc.slug}`,
     author: { '@type': 'Organization', name: 'BlackStory' },
     ...(doc.heroImage ? { image: doc.heroImage.url } : {}),
   };
@@ -64,8 +64,8 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
         <main className="ds-container ds-page" id="main">
           <div className="ds-articles-edition__stack">
             <p className="ds-articles-edition__notice">
-              This article is temporarily unavailable while we reconnect to the live record.{' '}
-              <Link href="/articles">Back to all articles</Link>.
+              This chapter is temporarily unavailable while we reconnect to the live record.{' '}
+              <Link href="/chapters">Back to all chapters</Link>.
             </p>
           </div>
         </main>
@@ -118,7 +118,7 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
           </section>
 
           <p className="ds-article__footer">
-            <Link href="/articles">All articles</Link>
+            <Link href="/chapters">All chapters</Link>
           </p>
         </article>
       </main>

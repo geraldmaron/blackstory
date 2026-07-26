@@ -1,19 +1,20 @@
 /**
- * Articles index at `/articles`: the single long-form publication surface that
- * replaces the old /themes + /stories + /topics split. Thin list items load
- * from the active-release article projection; full bodies load on detail pages.
+ * Chapters index at `/chapters`: the single long-form publication surface that
+ * replaces the old /themes + /stories + /topics + /articles split. Thin list
+ * items load from the active-release article projection; full bodies load on
+ * detail pages.
  */
 import Link from 'next/link';
 import { listPublicArticleListItems } from '../../lib/articles/source';
 import './articles-edition.css';
 
 export const metadata = {
-  title: 'Articles',
+  title: 'Chapters',
   description:
-    'Evidence-led long-form articles from the BlackStory archive: history pinned to place and records, with every figure and claim cited inline.',
+    'Evidence-led long-form chapters from the BlackStory archive: history pinned to place and records, with every figure and claim cited inline.',
 };
 
-export default async function ArticlesIndexPage() {
+export default async function ChaptersIndexPage() {
   const { items, source } = await listPublicArticleListItems();
 
   return (
@@ -21,7 +22,7 @@ export default async function ArticlesIndexPage() {
       <main className="ds-container ds-page" id="main">
         <div className="ds-articles-edition__stack">
           <header className="ds-articles-edition__intro">
-            <p className="ds-articles-edition__kicker">Articles</p>
+            <p className="ds-articles-edition__kicker">Chapters</p>
             <h1 className="ds-articles-edition__title">
               History pinned to <em>place</em> and <em>record</em>.
             </h1>
@@ -37,12 +38,12 @@ export default async function ArticlesIndexPage() {
               here is lost; please check back shortly.
             </p>
           ) : items.length === 0 ? (
-            <p className="ds-articles-edition__notice">No articles are published yet.</p>
+            <p className="ds-articles-edition__notice">No chapters are published yet.</p>
           ) : (
             <ul className="ds-articles-grid">
               {items.map((item) => (
                 <li key={item.slug} className="ds-articles-grid__item">
-                  <Link className="ds-article-card" href={`/articles/${item.slug}`}>
+                  <Link className="ds-article-card" href={`/chapters/${item.slug}`}>
                     {item.heroImage ? (
                       <span className="ds-article-card__media">
                         {/* eslint-disable-next-line @next/next/no-img-element */}

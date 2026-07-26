@@ -79,14 +79,54 @@ const nextConfig = {
   },
   async redirects() {
     return [
+      // Legacy publication surfaces all fold into /chapters. Article detail
+      // slugs carry over 1:1 (/articles/:slug -> /chapters/:slug); the theme,
+      // story, and topic indexes collapse to the chapters index.
+      {
+        source: '/articles/:slug',
+        destination: '/chapters/:slug',
+        permanent: true,
+      },
+      {
+        source: '/articles',
+        destination: '/chapters',
+        permanent: true,
+      },
+      {
+        source: '/stories',
+        destination: '/chapters',
+        permanent: true,
+      },
+      // Site-wide atmosphere-tile attribution keeps its own page (moved under
+      // /chapters); this specific rule must precede the /stories/:path* catch-all.
+      {
+        source: '/stories/mosaic-credits',
+        destination: '/chapters/mosaic-credits',
+        permanent: true,
+      },
+      {
+        source: '/stories/:path*',
+        destination: '/chapters',
+        permanent: true,
+      },
+      {
+        source: '/themes',
+        destination: '/chapters',
+        permanent: true,
+      },
+      {
+        source: '/themes/:path*',
+        destination: '/chapters',
+        permanent: true,
+      },
       {
         source: '/topics',
-        destination: '/stories',
+        destination: '/chapters',
         permanent: true,
       },
       {
         source: '/topics/:path*',
-        destination: '/stories',
+        destination: '/chapters',
         permanent: true,
       },
       {

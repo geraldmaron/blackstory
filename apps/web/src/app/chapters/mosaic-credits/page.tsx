@@ -8,8 +8,8 @@ import {
   storiesEditionPanelClassName,
   storiesEditionRootClassName,
   storiesEditionStackClassName,
-} from '../stories-panel-chrome';
-import '../stories-edition.css';
+} from '../../stories/stories-panel-chrome';
+import '../../stories/stories-edition.css';
 
 export const metadata = {
   title: 'Archive mosaic credits',
@@ -70,7 +70,7 @@ export default function MosaicCreditsPage() {
           </article>
 
           <p className="ds-stories-edition__footer">
-            <Link href="/stories">All stories</Link>
+            <Link href="/chapters">All chapters</Link>
             {' · '}
             <Link href="/about">About</Link>
           </p>

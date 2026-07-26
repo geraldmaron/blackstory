@@ -18,9 +18,9 @@ test('absolutizeShellNav prefixes relative hrefs with the public origin', () => 
 });
 
 test('isShellNavActive understands absolute sibling hrefs', () => {
-  assert.equal(isShellNavActive('/stories', 'http://localhost:3048/stories'), true);
-  assert.equal(isShellNavActive('/stories/review', '/stories/review'), true);
-  assert.equal(isShellNavActive('/explore', '/stories'), false);
+  assert.equal(isShellNavActive('/chapters', 'http://localhost:3048/chapters'), true);
+  assert.equal(isShellNavActive('/chapters/buying-a-home', '/chapters/buying-a-home'), true);
+  assert.equal(isShellNavActive('/explore', '/chapters'), false);
 });
 
 test('footer IA groups Law under Explore, not Trust', () => {
@@ -30,7 +30,7 @@ test('footer IA groups Law under Explore, not Trust', () => {
   assert.ok(trust);
   assert.deepEqual(
     explore.items.map((item) => item.href),
-    ['/explore', '/history', '/stories', '/data', '/law', '/books'],
+    ['/explore', '/history', '/chapters', '/data', '/law', '/books'],
   );
   assert.deepEqual(
     trust.items.map((item) => item.href),
