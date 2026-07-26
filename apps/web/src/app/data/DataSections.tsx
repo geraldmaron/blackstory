@@ -276,6 +276,9 @@ export function DataSections({
         />
         <div className="ds-data-edition__viz">
           <RacePairComparisonChart series={indicators.wealthComparison} />
+          {indicators.wealthTrend ? (
+            <GroupedBarIndicatorChart series={indicators.wealthTrend} />
+          ) : null}
         </div>
       </article>
 

@@ -5,9 +5,8 @@
 import Link from 'next/link';
 import React from 'react';
 import type { DataPageRacePairSeries } from '@repo/domain/statistics/data-page-series';
-import { THEMES_PUBLIC_SURFACE_ENABLED } from '../../lib/theme-impact/public-surface';
 import { DataChartFrame } from './DataChartFrame';
-import { formatDataPageValue } from './chart-utils';
+import { chapterHrefForTheme, formatDataPageValue } from './chart-utils';
 
 export type RacePairComparisonChartProps = {
   readonly series: DataPageRacePairSeries;
@@ -15,11 +14,6 @@ export type RacePairComparisonChartProps = {
 
 const PRIMARY_FILL = 'var(--ds-viz-2)';
 const COMPARISON_FILL = 'var(--ds-viz-3)';
-
-function themeHref(themeId: string | undefined): string | undefined {
-  if (!THEMES_PUBLIC_SURFACE_ENABLED || !themeId) return undefined;
-  return `/themes/${themeId}`;
-}
 
 export function RacePairComparisonChart({ series }: RacePairComparisonChartProps) {
   const maxValue = Math.max(series.primary.value, series.comparison.value);
@@ -29,7 +23,7 @@ export function RacePairComparisonChart({ series }: RacePairComparisonChartProps
 
   const primaryWidth = (series.primary.value / maxValue) * 100;
   const comparisonWidth = (series.comparison.value / maxValue) * 100;
-  const themeLink = themeHref(series.themeId);
+  const themeLink = chapterHrefForTheme(series.themeId);
 
   return (
     <DataChartFrame
@@ -44,7 +38,7 @@ export function RacePairComparisonChart({ series }: RacePairComparisonChartProps
             <>
               {' '}
               <Link className="ds-data-page__theme-link" href={themeLink}>
-                See this in Themes
+                Read the chapter
               </Link>
             </>
           ) : null}

@@ -46,22 +46,50 @@ export function humanSourceLabel(label: string): string {
   if (id.includes('twps') || id.includes('working-paper-56')) {
     return 'U.S. Census Bureau, Working Paper 56';
   }
+  if (id.includes('consumer-finances') || id.startsWith('scf')) {
+    return 'Board of Governors of the Federal Reserve System, Survey of Consumer Finances';
+  }
+  if (id.includes('bjs')) {
+    return 'Bureau of Justice Statistics, National Prisoner Statistics';
+  }
+  if (id.includes('nhgis')) {
+    return 'IPUMS NHGIS / U.S. Census decennial county tables';
+  }
+  if (id.includes('ussc')) {
+    return 'United States Sentencing Commission Quick Facts';
+  }
+  if (id.includes('hmda')) {
+    return 'FFIEC Home Mortgage Disclosure Act Data Browser';
+  }
+  if (id.includes('chas')) {
+    return 'HUD Comprehensive Housing Affordability Strategy (CHAS)';
+  }
   return id;
 }
 
+/**
+ * Dedupe on the reader-facing label so a curated citation and its warehouse
+ * ingest rows (same publisher, per-year URLs) collapse to one footnote entry.
+ * Falls back to URL when a label is missing.
+ */
 export function sourceKey(source: DataSourceRef): string {
-  const url = source.url.trim().toLowerCase();
-  if (url.length > 0) return `url:${url}`;
-  return `label:${source.label.trim().toLowerCase()}`;
+  const label = humanSourceLabel(source.label).trim().toLowerCase();
+  if (label.length > 0) return `label:${label}`;
+  return `url:${source.url.trim().toLowerCase()}`;
 }
 
 export function dedupeSources(sources: readonly DataSourceRef[]): readonly DataSourceRef[] {
-  const seen = new Set<string>();
+  const seenUrls = new Set<string>();
+  const seenLabels = new Set<string>();
   const out: DataSourceRef[] = [];
   for (const source of sources) {
-    const key = sourceKey(source);
-    if (seen.has(key)) continue;
-    seen.add(key);
+    const url = source.url.trim().toLowerCase();
+    const label = humanSourceLabel(source.label).trim().toLowerCase();
+    if ((url.length > 0 && seenUrls.has(url)) || (label.length > 0 && seenLabels.has(label))) {
+      continue;
+    }
+    if (url.length > 0) seenUrls.add(url);
+    if (label.length > 0) seenLabels.add(label);
     out.push(source);
   }
   return out;

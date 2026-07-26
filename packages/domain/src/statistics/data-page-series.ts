@@ -61,6 +61,7 @@ export type DataPageGroupedBarSeries = {
 
 export type DataPageIndicatorBundle = {
   readonly wealthComparison: DataPageRacePairSeries;
+  readonly wealthTrend?: DataPageGroupedBarSeries;
   readonly imprisonmentComparison: DataPageRacePairSeries;
   readonly cookHomeownership: DataPageGroupedBarSeries;
   readonly hmdaDenialRates: DataPageGroupedBarSeries;
@@ -118,7 +119,7 @@ export const DATA_PAGE_INDICATOR_FIXTURE_BUNDLE: DataPageIndicatorBundle = {
     id: 'wealth-scf-median-nation',
     title: 'Median family net worth, Black vs White',
     caption:
-      'National median family net worth from the Survey of Consumer Finances. Wealth is measured at a point in time — not income — and reflects decades of policy and market context.',
+      'National median family net worth from the Survey of Consumer Finances, latest survey wave, in 2022 dollars. Wealth is measured at a point in time — not income — and reflects decades of policy and market context.',
     geographyLabel: 'United States',
     referencePeriod: '2022',
     primary: { label: 'Black families', value: 44_900, unit: 'usd' },
@@ -126,20 +127,50 @@ export const DATA_PAGE_INDICATOR_FIXTURE_BUNDLE: DataPageIndicatorBundle = {
     ratioLabel: 'White-to-Black wealth ratio',
     ratioValue: 6.3,
     sources: [FEDERAL_RESERVE_SCF],
-    themeId: 'redlining',
+    themeId: 'wealth_gap',
+    themeQuestionId: 'Q3',
+  },
+  wealthTrend: {
+    id: 'wealth-scf-median-trend-nation',
+    title: 'Median family net worth since 1989',
+    caption:
+      'Every Survey of Consumer Finances wave, in 2022 dollars. The gap never closes: Black family wealth loses its 1990s and 2000s gains to the Great Recession and only passes its 2007 level after 2019. The Fed cautions that the 1989 Black sample is small — read that first pair as rough.',
+    geographyLabel: 'United States',
+    unit: 'usd',
+    yAxisLabel: 'Median net worth (2022 dollars)',
+    series: [
+      { id: 'black', label: 'Black families', fill: 'var(--ds-viz-1)' },
+      { id: 'white', label: 'White non-Hispanic families', fill: 'var(--ds-viz-2)' },
+    ],
+    points: [
+      { period: '1989', values: { black: 9_200, white: 164_030 } },
+      { period: '1992', values: { black: 20_510, white: 144_420 } },
+      { period: '1995', values: { black: 21_130, white: 148_330 } },
+      { period: '1998', values: { black: 28_260, white: 174_750 } },
+      { period: '2001', values: { black: 32_450, white: 205_530 } },
+      { period: '2004', values: { black: 32_090, white: 221_470 } },
+      { period: '2007', values: { black: 30_140, white: 245_110 } },
+      { period: '2010', values: { black: 21_800, white: 178_280 } },
+      { period: '2013', values: { black: 16_780, white: 180_680 } },
+      { period: '2016', values: { black: 21_090, white: 210_940 } },
+      { period: '2019', values: { black: 27_970, white: 218_140 } },
+      { period: '2022', values: { black: 44_900, white: 285_000 } },
+    ],
+    sources: [FEDERAL_RESERVE_SCF],
+    themeId: 'wealth_gap',
     themeQuestionId: 'Q3',
   },
   imprisonmentComparison: {
     id: 'justice-bjs-imprisonment-md',
-    title: 'State imprisonment rate, Black vs White adults',
+    title: 'State imprisonment rate, Black vs White residents',
     caption:
-      'Maryland imprisonment rates under state or federal jurisdiction per 100,000 adult residents. Rates are context for policy eras — not proof that any single law caused the gap.',
+      'Maryland prisoners under state jurisdiction per 100,000 non-Hispanic Black and White residents — derived from BJS National Prisoner Statistics counts and Census population estimates. Rates are context for policy eras — not proof that any single law caused the gap.',
     geographyLabel: 'Maryland',
-    referencePeriod: '2022',
-    primary: { label: 'Black adults', value: 912, unit: 'per_100k' },
-    comparison: { label: 'White adults', value: 178, unit: 'per_100k' },
+    referencePeriod: '2023',
+    primary: { label: 'Black residents', value: 648, unit: 'per_100k' },
+    comparison: { label: 'White residents', value: 119, unit: 'per_100k' },
     ratioLabel: 'Black-to-White rate ratio',
-    ratioValue: 5.1,
+    ratioValue: 5.4,
     sources: [BJS_NPS],
     themeId: 'drug_policy_state',
     themeQuestionId: 'Q6',
@@ -169,7 +200,7 @@ export const DATA_PAGE_INDICATOR_FIXTURE_BUNDLE: DataPageIndicatorBundle = {
     id: 'credit-hmda-denial-cook',
     title: 'Mortgage denial rate by applicant race, Cook County',
     caption:
-      'Share of home mortgage applications denied (HMDA actions taken 1–3) for derived-race Black and White applicants. County aggregates — not individual lending decisions.',
+      'Share of home mortgage applications denied — denials divided by originations, approvals not accepted, and denials (HMDA actions taken 1–3), all loan purposes — for Black and White applicants. County aggregates — not individual lending decisions.',
     geographyLabel: 'Cook County, Illinois',
     unit: 'percent',
     yAxisLabel: 'Denial rate',
@@ -178,8 +209,12 @@ export const DATA_PAGE_INDICATOR_FIXTURE_BUNDLE: DataPageIndicatorBundle = {
       { id: 'white', label: 'White applicants', fill: 'var(--ds-viz-2)' },
     ],
     points: [
-      { period: '2022', values: { black: 10.9, white: 6.5 } },
-      { period: '2023', values: { black: 11.1, white: 7.2 } },
+      { period: '2018', values: { black: 41.5, white: 22.8 } },
+      { period: '2019', values: { black: 37.1, white: 18.3 } },
+      { period: '2020', values: { black: 29.1, white: 12.7 } },
+      { period: '2021', values: { black: 29.1, white: 12.4 } },
+      { period: '2022', values: { black: 35.1, white: 18.5 } },
+      { period: '2023', values: { black: 39, white: 22.1 } },
     ],
     sources: [HMDA],
     themeId: 'redlining',
@@ -242,16 +277,30 @@ function mergeSources(
   return out;
 }
 
-function observationByMetric(
+/**
+ * Latest reference period present in BOTH metrics of a race pair. Warehouse rows
+ * arrive in arbitrary period order; taking the first match silently rendered the
+ * oldest survey wave (e.g. SCF 1989) as the "at a glance" number.
+ */
+function latestPairedObservations(
   rows: readonly DataPageObservationRow[],
-  metricId: string,
-  jurisdictionId?: string,
-): DataPageObservationRow | undefined {
-  return rows.find(
-    (row) =>
-      row.metricId === metricId &&
-      (jurisdictionId === undefined || row.jurisdictionId === jurisdictionId),
-  );
+  primaryMetricId: string,
+  comparisonMetricId: string,
+  jurisdictionId: string,
+  pinnedPeriod?: string,
+): { primary: DataPageObservationRow; comparison: DataPageObservationRow } | undefined {
+  const primaryRows = observationsByMetric(rows, primaryMetricId, jurisdictionId);
+  const comparisonRows = observationsByMetric(rows, comparisonMetricId, jurisdictionId);
+  for (let index = primaryRows.length - 1; index >= 0; index -= 1) {
+    const candidate = primaryRows[index];
+    if (candidate === undefined) continue;
+    if (pinnedPeriod !== undefined && candidate.referencePeriod !== pinnedPeriod) continue;
+    const match = comparisonRows.find((row) => row.referencePeriod === candidate.referencePeriod);
+    if (match) {
+      return { primary: candidate, comparison: match };
+    }
+  }
+  return undefined;
 }
 
 function observationsByMetric(
@@ -278,43 +327,79 @@ export function mergeDataPageIndicatorBundle(
   }
 
   let wealth = base.wealthComparison;
-  const scfBlack = observationByMetric(rows, 'scf-median-wealth-black-nation', 'nation:US');
-  const scfWhite = observationByMetric(rows, 'scf-median-wealth-white-nation', 'nation:US');
-  if (scfBlack && scfWhite) {
+  const scfPair = latestPairedObservations(
+    rows,
+    'scf-median-wealth-black-nation',
+    'scf-median-wealth-white-nation',
+    'nation:US',
+  );
+  if (scfPair) {
     const ratioValue =
-      scfBlack.estimate > 0
-        ? Math.round((scfWhite.estimate / scfBlack.estimate) * 10) / 10
+      scfPair.primary.estimate > 0
+        ? Math.round((scfPair.comparison.estimate / scfPair.primary.estimate) * 10) / 10
         : undefined;
     wealth = {
       ...wealth,
-      referencePeriod: scfBlack.referencePeriod,
-      primary: { ...wealth.primary, value: scfBlack.estimate },
-      comparison: { ...wealth.comparison, value: scfWhite.estimate },
+      referencePeriod: scfPair.primary.referencePeriod,
+      primary: { ...wealth.primary, value: scfPair.primary.estimate },
+      comparison: { ...wealth.comparison, value: scfPair.comparison.estimate },
       ...(ratioValue !== undefined ? { ratioValue } : {}),
       sources: mergeSources(wealth.sources, [
-        sourceFromObservation(scfBlack),
-        sourceFromObservation(scfWhite),
+        sourceFromObservation(scfPair.primary),
+        sourceFromObservation(scfPair.comparison),
       ]),
     };
   }
 
+  let wealthTrend = base.wealthTrend;
+  if (wealthTrend) {
+    const scfBlackAll = observationsByMetric(rows, 'scf-median-wealth-black-nation', 'nation:US');
+    const scfWhiteAll = observationsByMetric(rows, 'scf-median-wealth-white-nation', 'nation:US');
+    if (scfBlackAll.length > 0 && scfWhiteAll.length > 0) {
+      const whiteByPeriod = new Map(scfWhiteAll.map((row) => [row.referencePeriod, row]));
+      const points = scfBlackAll
+        .filter((row) => whiteByPeriod.has(row.referencePeriod))
+        .map((row) => ({
+          period: row.referencePeriod,
+          values: {
+            black: row.estimate,
+            white: whiteByPeriod.get(row.referencePeriod)?.estimate ?? 0,
+          },
+        }));
+      if (points.length > 0) {
+        wealthTrend = {
+          ...wealthTrend,
+          points,
+          sources: mergeSources(
+            wealthTrend.sources,
+            [...scfBlackAll, ...scfWhiteAll].map(sourceFromObservation),
+          ),
+        };
+      }
+    }
+  }
+
   let imprisonment = base.imprisonmentComparison;
-  const bjsBlack = observationByMetric(rows, 'imprisonment-rate-black-state', 'state:24');
-  const bjsWhite = observationByMetric(rows, 'imprisonment-rate-white-state', 'state:24');
-  if (bjsBlack && bjsWhite) {
+  const bjsPair = latestPairedObservations(
+    rows,
+    'imprisonment-rate-black-state',
+    'imprisonment-rate-white-state',
+    'state:24',
+  );
+  if (bjsPair) {
     const ratioValue =
-      bjsWhite.estimate > 0
-        ? Math.round((bjsBlack.estimate / bjsWhite.estimate) * 10) / 10
+      bjsPair.comparison.estimate > 0
+        ? Math.round((bjsPair.primary.estimate / bjsPair.comparison.estimate) * 10) / 10
         : undefined;
     imprisonment = {
       ...imprisonment,
-      referencePeriod: bjsBlack.referencePeriod,
-      primary: { ...imprisonment.primary, value: bjsBlack.estimate },
-      comparison: { ...imprisonment.comparison, value: bjsWhite.estimate },
+      referencePeriod: bjsPair.primary.referencePeriod,
+      primary: { ...imprisonment.primary, value: bjsPair.primary.estimate },
+      comparison: { ...imprisonment.comparison, value: bjsPair.comparison.estimate },
       ...(ratioValue !== undefined ? { ratioValue } : {}),
       sources: mergeSources(imprisonment.sources, [
-        sourceFromObservation(bjsBlack),
-        sourceFromObservation(bjsWhite),
+        sourceFromObservation(bjsPair.primary),
+        sourceFromObservation(bjsPair.comparison),
       ]),
     };
   }
@@ -405,26 +490,26 @@ export function mergeDataPageIndicatorBundle(
   }
 
   let costBurdenComparison = base.costBurdenComparison;
-  const chasBlack = observationByMetric(
+  // Pinned: the 2016-2020 vintage is the suburban-Cook Table 20 tabulation the card's
+  // caption describes (and carries verifiable household counts). The 2017-2021 rows in
+  // the warehouse are a different universe (all Cook County, CHAS Table 9) — do not mix.
+  const chasPair = latestPairedObservations(
     rows,
     'hud-chas-cost-burden-black-county',
-    'county:17031',
-  );
-  const chasWhite = observationByMetric(
-    rows,
     'hud-chas-cost-burden-white-county',
     'county:17031',
+    '2016-2020',
   );
-  if (chasBlack && chasWhite) {
+  if (chasPair) {
     costBurdenComparison = {
       ...costBurdenComparison,
-      referencePeriod: chasBlack.referencePeriod,
-      primary: { ...costBurdenComparison.primary, value: chasBlack.estimate },
-      comparison: { ...costBurdenComparison.comparison, value: chasWhite.estimate },
-      ratioValue: Math.round((chasBlack.estimate - chasWhite.estimate) * 10) / 10,
+      primary: { ...costBurdenComparison.primary, value: chasPair.primary.estimate },
+      comparison: { ...costBurdenComparison.comparison, value: chasPair.comparison.estimate },
+      ratioValue:
+        Math.round((chasPair.primary.estimate - chasPair.comparison.estimate) * 10) / 10,
       sources: mergeSources(costBurdenComparison.sources, [
-        sourceFromObservation(chasBlack),
-        sourceFromObservation(chasWhite),
+        sourceFromObservation(chasPair.primary),
+        sourceFromObservation(chasPair.comparison),
       ]),
     };
   }
@@ -432,6 +517,7 @@ export function mergeDataPageIndicatorBundle(
   return {
     ...base,
     wealthComparison: wealth,
+    ...(wealthTrend !== undefined ? { wealthTrend } : {}),
     imprisonmentComparison: imprisonment,
     cookHomeownership,
     hmdaDenialRates,
