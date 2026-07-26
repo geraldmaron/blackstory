@@ -22,9 +22,12 @@ import { resolve } from 'node:path';
 import {
   assertThemeImpactPacketMultiDecadeChecklist,
   assertThemeImpactPacketPublishable,
+  checkDoiCitation,
   deriveDefaultMultiDecadeChecklist,
   lookupSourceTier,
   parseThemeImpactPacketRow,
+  satisfiesTwoAnchorRule,
+  type SafeHttpClient,
   type SourceTier,
   type ThemeImpactPacket,
 } from '@repo/domain';
@@ -210,6 +213,29 @@ function gateSourceTiers(packets: readonly ThemeImpactPacket[]): {
 }
 
 /**
+ * Two-anchor corroboration rule, warning half (repo-k2q3 crit 3 / repo-xjxf). Published
+ * packets are already hard-gated by assertThemeImpactPacketPublishable (via
+ * satisfiesTwoAnchorRule) at validate/promote time; this surfaces the same check as a
+ * warning for draft/review packets, so authors see the gap before it blocks a publish.
+ */
+function gatePacketAnchorWarnings(packets: readonly ThemeImpactPacket[]): { warnings: string[] } {
+  const warnings: string[] = [];
+  for (const packet of packets) {
+    if (packet.status === 'published') continue;
+    packet.observations.forEach((row, index) => {
+      if (row.anchors === undefined) return;
+      if (!satisfiesTwoAnchorRule(row)) {
+        warnings.push(
+          `${packet.id} / observations[${index}] (${row.observationId}): declares anchors but ` +
+            'has neither two independent T1/T2 anchors nor one T1/T2 anchor + replicationVerified',
+        );
+      }
+    });
+  }
+  return { warnings };
+}
+
+/**
  * Every observation a packet cites must exist verbatim in canonical
  * statistical_observations — at every lifecycle status, not just publish.
  */
@@ -344,6 +370,58 @@ async function withDb<T>(run: (ctx: DbContext) => Promise<T>): Promise<T> {
   }
 }
 
+/** Minimal SafeHttpClient for the two free/keyless DOI-resolution APIs only. */
+const doiHttpClient: SafeHttpClient = async (request) => {
+  const url = new URL(request.url);
+  if (!['api.crossref.org', 'api.openalex.org'].includes(url.hostname)) {
+    throw new Error(`doiHttpClient only supports crossref/openalex; got ${url.hostname}`);
+  }
+  const response = await fetch(request.url, {
+    method: request.method ?? 'GET',
+    headers: request.headers,
+  });
+  const bodyText = await response.text();
+  const headers: Record<string, string | undefined> = {};
+  response.headers.forEach((value, key) => {
+    headers[key.toLowerCase()] = value;
+  });
+  return { status: response.status, headers, bodyText, finalUrl: response.url };
+};
+
+/**
+ * DOI resolution gate (repo-k2q3 crit 2 / repo-vdtm): live network call against
+ * Crossref/OpenAlex, gated behind CHECK_DOIS=1 (mirrors articles.ts's gateDoiCitations).
+ * Checks any artifact carrying a `scholarlyCitation.doi` field; a mismatch or failure
+ * to resolve is a hard error regardless of packet status.
+ */
+async function gateDoiCitations(packets: readonly ThemeImpactPacket[]): Promise<void> {
+  const errors: string[] = [];
+  for (const packet of packets) {
+    for (const artifact of packet.artifacts) {
+      const citation = artifact.scholarlyCitation;
+      if (!citation) continue;
+      const result = await checkDoiCitation(doiHttpClient, citation.doi, {
+        title: citation.title,
+        firstAuthorSurname: citation.firstAuthorSurname,
+        venue: citation.venue,
+      });
+      if (result.outcome === 'unresolved') {
+        errors.push(
+          `${packet.id} / artifact ${artifact.artifactId}: DOI ${citation.doi} did not resolve (${result.reason})`,
+        );
+      } else if (result.outcome === 'mismatch') {
+        const detail = result.mismatches
+          .map((m) => `${m.field}: stored=${JSON.stringify(m.stored)} resolved=${JSON.stringify(m.resolved)}`)
+          .join('; ');
+        errors.push(`${packet.id} / artifact ${artifact.artifactId}: DOI ${citation.doi} mismatch (${detail})`);
+      }
+    }
+  }
+  if (errors.length > 0) {
+    throw new Error(`DOI resolution gate failed:\n  ${errors.join('\n  ')}`);
+  }
+}
+
 async function commandValidate(paths: readonly string[]): Promise<void> {
   const packets = await loadFixturePackets(paths);
   for (const packet of packets) validatePacketShape(packet);
@@ -352,6 +430,8 @@ async function commandValidate(paths: readonly string[]): Promise<void> {
   // Offline gate: source-quality tiering — T4 hosts fail published packets.
   const { tally: sourceTiers, warnings: sourceTierWarnings } = gateSourceTiers(packets);
   for (const warning of sourceTierWarnings) console.warn(`warning: ${warning}`);
+  const { warnings: anchorWarnings } = gatePacketAnchorWarnings(packets);
+  for (const warning of anchorWarnings) console.warn(`warning: ${warning}`);
 
   // DB-binding gate: when DATABASE_URL is present, every observation must match
   // its canonical statistical_observations / spine row exactly (estimate,
@@ -365,12 +445,19 @@ async function commandValidate(paths: readonly string[]): Promise<void> {
     bound = 'db-verified';
   }
 
+  let doiChecked = false;
+  if (process.env.CHECK_DOIS === '1') {
+    await gateDoiCitations(packets);
+    doiChecked = true;
+  }
+
   console.log(
     JSON.stringify(
       {
         command: 'validate',
         ok: true,
         bound,
+        doiChecked,
         verifiedObservations,
         sourceTiers,
         packets: packets.map((packet) => ({

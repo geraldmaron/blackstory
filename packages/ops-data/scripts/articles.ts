@@ -23,7 +23,13 @@ import {
   assertArticleCitationIntegrity,
   publicArticleProjectionSchema,
 } from '@repo/schemas';
-import { isAnchorTierUrl, lookupSourceTier, type SourceTier } from '@repo/domain';
+import {
+  checkDoiCitation,
+  isAnchorTierUrl,
+  lookupSourceTier,
+  type SourceTier,
+  type SafeHttpClient,
+} from '@repo/domain';
 import { z } from 'zod';
 import pg from 'pg';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
@@ -385,6 +391,56 @@ function contentHash(payload: unknown): string {
   return createHash('sha256').update(JSON.stringify(payload)).digest('hex');
 }
 
+/** Minimal SafeHttpClient for the two free/keyless DOI-resolution APIs only. */
+const doiHttpClient: SafeHttpClient = async (request) => {
+  const url = new URL(request.url);
+  if (!['api.crossref.org', 'api.openalex.org'].includes(url.hostname)) {
+    throw new Error(`doiHttpClient only supports crossref/openalex; got ${url.hostname}`);
+  }
+  const response = await fetch(request.url, {
+    method: request.method ?? 'GET',
+    headers: request.headers,
+  });
+  const bodyText = await response.text();
+  const headers: Record<string, string | undefined> = {};
+  response.headers.forEach((value, key) => {
+    headers[key.toLowerCase()] = value;
+  });
+  return { status: response.status, headers, bodyText, finalUrl: response.url };
+};
+
+/**
+ * DOI resolution gate (repo-k2q3 crit 2 / repo-vdtm): live network call against
+ * Crossref/OpenAlex, so gated behind CHECK_DOIS=1 rather than run unconditionally like
+ * the offline hash/tier lints. Any reference with a `scholarlyCitation.doi` field is
+ * checked; a stored citation whose DOI resolves to a mismatching title/author/venue,
+ * or fails to resolve at all, is a hard error regardless of article status — an
+ * attached DOI is a specific factual claim, not a soft-linted quality signal.
+ */
+async function gateDoiCitations(article: ArticleAuthoring): Promise<void> {
+  const errors: string[] = [];
+  for (const reference of article.references) {
+    const citation = reference.scholarlyCitation;
+    if (!citation) continue;
+    const result = await checkDoiCitation(doiHttpClient, citation.doi, {
+      title: citation.title,
+      firstAuthorSurname: citation.firstAuthorSurname,
+      venue: citation.venue,
+    });
+    if (result.outcome === 'unresolved') {
+      errors.push(`${article.id} / reference ${reference.id}: DOI ${citation.doi} did not resolve (${result.reason})`);
+    } else if (result.outcome === 'mismatch') {
+      const detail = result.mismatches
+        .map((m) => `${m.field}: stored=${JSON.stringify(m.stored)} resolved=${JSON.stringify(m.resolved)}`)
+        .join('; ');
+      errors.push(`${article.id} / reference ${reference.id}: DOI ${citation.doi} mismatch (${detail})`);
+    }
+  }
+  if (errors.length > 0) {
+    throw new Error(`DOI resolution gate failed:\n  ${errors.join('\n  ')}`);
+  }
+}
+
 async function commandValidate(paths: readonly string[]): Promise<void> {
   const articles = await loadFixtureArticles(paths);
   for (const article of articles) validateArticleOffline(article);
@@ -402,12 +458,19 @@ async function commandValidate(paths: readonly string[]): Promise<void> {
     bound = 'db-verified';
   }
 
+  let doiChecked = false;
+  if (process.env.CHECK_DOIS === '1') {
+    for (const article of articles) await gateDoiCitations(article);
+    doiChecked = true;
+  }
+
   console.log(
     JSON.stringify(
       {
         command: 'validate',
         ok: true,
         bound,
+        doiChecked,
         articles: articles.map((a) => ({
           id: a.id,
           slug: a.slug,

@@ -9,6 +9,7 @@ import {
   buildThemeImpactPacket,
   createRedliningQ3FixturePacket,
   deriveDefaultMultiDecadeChecklist,
+  satisfiesTwoAnchorRule,
 } from './theme-impact-packet.js';
 
 test('buildThemeImpactPacket defaults to juxtaposition and freezes arrays', () => {
@@ -57,6 +58,64 @@ test('assertThemeImpactPacketPublishable requires provenance on published rows',
 test('published fixture with complete provenance passes', () => {
   const packet = createRedliningQ3FixturePacket({ status: 'published' });
   assert.doesNotThrow(() => assertThemeImpactPacketPublishable(packet));
+});
+
+test('satisfiesTwoAnchorRule: no anchors field is not load-bearing (opt-in, passes)', () => {
+  const packet = createRedliningQ3FixturePacket();
+  assert.equal(satisfiesTwoAnchorRule(packet.observations[0]!), true);
+});
+
+test('satisfiesTwoAnchorRule: two independent T1/T2 anchors satisfies the rule', () => {
+  const packet = createRedliningQ3FixturePacket({
+    observations: [
+      {
+        ...createRedliningQ3FixturePacket().observations[0]!,
+        anchors: [
+          { url: 'https://www.census.gov/anchor-a', label: 'Census' },
+          { url: 'https://www.federalreserve.gov/anchor-b', label: 'Fed' },
+        ],
+      },
+    ],
+  });
+  assert.equal(satisfiesTwoAnchorRule(packet.observations[0]!), true);
+});
+
+test('satisfiesTwoAnchorRule: a single anchor without replicationVerified fails', () => {
+  const packet = createRedliningQ3FixturePacket({
+    observations: [
+      {
+        ...createRedliningQ3FixturePacket().observations[0]!,
+        anchors: [{ url: 'https://www.census.gov/anchor-a', label: 'Census' }],
+      },
+    ],
+  });
+  assert.equal(satisfiesTwoAnchorRule(packet.observations[0]!), false);
+});
+
+test('satisfiesTwoAnchorRule: one T1 anchor + replicationVerified satisfies the exception', () => {
+  const packet = createRedliningQ3FixturePacket({
+    observations: [
+      {
+        ...createRedliningQ3FixturePacket().observations[0]!,
+        anchors: [{ url: 'https://www.census.gov/anchor-a', label: 'Census' }],
+        replicationVerified: true,
+      },
+    ],
+  });
+  assert.equal(satisfiesTwoAnchorRule(packet.observations[0]!), true);
+});
+
+test('assertThemeImpactPacketPublishable rejects a published observation with an unsatisfied anchor declaration', () => {
+  const packet = createRedliningQ3FixturePacket({
+    status: 'published',
+    observations: [
+      {
+        ...createRedliningQ3FixturePacket().observations[0]!,
+        anchors: [{ url: 'https://www.census.gov/anchor-a', label: 'Census' }],
+      },
+    ],
+  });
+  assert.throws(() => assertThemeImpactPacketPublishable(packet), /declares anchors/);
 });
 
 test('gated_causal_claim without claim ids fails publish', () => {

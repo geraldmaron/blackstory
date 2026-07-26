@@ -51,6 +51,21 @@ export const articleImageSchema = z.object({
 export type ArticleImageDoc = z.infer<typeof articleImageSchema>;
 
 /**
+ * Optional scholarly-citation metadata for a reference whose source is a peer-reviewed
+ * paper (repo-k2q3 crit 2). When present, `doi` is checked against Crossref/OpenAlex at
+ * validate time (gated behind CHECK_DOIS=1 — see checkDoiCitation in @repo/domain and
+ * the validate wiring in ops-data/scripts/articles.ts) so a citation can't silently drift
+ * or be fabricated with a plausible-looking DOI attached.
+ */
+export const articleScholarlyCitationSchema = z.object({
+  doi: z.string().min(1).max(200),
+  title: z.string().min(1).max(400),
+  firstAuthorSurname: z.string().min(1).max(120),
+  venue: z.string().min(1).max(240),
+});
+export type ArticleScholarlyCitationDoc = z.infer<typeof articleScholarlyCitationSchema>;
+
+/**
  * One entry in the article's numbered references section. `id` is the stable
  * slug that inline `[ref:<id>]` markers point at; `locator` narrows to a page,
  * clause, or table within the cited source.
@@ -63,6 +78,7 @@ export const articleReferenceSchema = z.object({
   label: z.string().min(1).max(240),
   url: z.string().url().max(2048),
   locator: z.string().min(1).max(240).optional(),
+  scholarlyCitation: articleScholarlyCitationSchema.optional(),
 });
 export type ArticleReferenceDoc = z.infer<typeof articleReferenceSchema>;
 
