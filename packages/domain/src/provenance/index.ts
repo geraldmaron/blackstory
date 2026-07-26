@@ -92,6 +92,14 @@ export {
 } from './source-tiers.js';
 export type { SourceTier, SourceTierRule, SourceTierResult } from './source-tiers.js';
 
+export { checkDoiCitation, normalizeDoi } from './doi-resolution.js';
+export type {
+  StoredCitation,
+  ResolvedCitation,
+  DoiFieldMismatch,
+  DoiResolutionResult,
+} from './doi-resolution.js';
+
 export {
   RETRIEVAL_STATUSES,
   assertCaptureHashValid,

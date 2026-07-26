@@ -57,6 +57,8 @@ export {
   LINEAGE_KINDS,
   assertLineageEndpointsDistinct,
   resolveLineageRoot,
+  checkDoiCitation,
+  normalizeDoi,
 } from './provenance/index.js';
 export type {
   SourceOrganizationId,
@@ -96,6 +98,10 @@ export type {
   EvidenceRecord,
   LineageKind,
   EvidenceLineage,
+  StoredCitation,
+  ResolvedCitation,
+  DoiFieldMismatch,
+  DoiResolutionResult,
 } from './provenance/index.js';
 
 export {
