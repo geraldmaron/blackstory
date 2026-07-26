@@ -50,6 +50,9 @@ import { runStoryResearch, type StoryTopicSeed } from './story-research-run.js';
 import { prepareStoryPacketIntake } from './story-intake.js';
 import { prepareEdgeIntake, type EdgeIntakeInput } from './edge-intake.js';
 import { createNodeSafeFetchDependencies, runQuickAddFetch } from './fetch.js';
+import { createMetadataOnlyStorage, type CaptureDeps } from './source-capture.js';
+import { runCaptureBackfill } from './capture-backfill.js';
+import { createHash } from 'node:crypto';
 import { OPERATOR_SOURCES, type OperatorIdentity, type OperatorSource } from './identity.js';
 import {
   prepareEvidenceAttachmentIntake,
@@ -793,6 +796,33 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
           );
         }
         stdout(JSON.stringify(loadPendingEditorialItems(fromPaths), null, 2));
+        return 0;
+      }
+      case 'capture-backfill': {
+        // Anti-rot/anti-spoof: snapshot every cited URL. Safe by default (dry-run
+        // inventory + coverage report); --commit performs SSRF-safe fetches + writes.
+        const pool = getOpsPostgresPool(process.env);
+        const commit = flags.booleans.has('--commit');
+        const maxRaw = optionalFlag(flags, '--max-captures');
+        const maxCaptures = maxRaw === undefined ? undefined : Number.parseInt(maxRaw, 10);
+        if (maxCaptures !== undefined && (!Number.isFinite(maxCaptures) || maxCaptures < 0)) {
+          throw new Error('--max-captures must be a non-negative integer');
+        }
+        const fetchDependencies = deps.fetchDependencies ?? createNodeSafeFetchDependencies();
+        const captureDeps: CaptureDeps = {
+          fetchUrl: (url) => runQuickAddFetch(url, fetchDependencies),
+          storage: createMetadataOnlyStorage(),
+          parserVersion: 'capture-backfill-v1',
+          newId: (prefix, seed) =>
+            `${prefix}_${createHash('sha1').update(seed).digest('hex').slice(0, 16)}`,
+          now: () => new Date().toISOString(),
+        };
+        const report = await runCaptureBackfill(
+          pool,
+          { commit, ...(maxCaptures !== undefined ? { maxCaptures } : {}) },
+          captureDeps,
+        );
+        stdout(JSON.stringify({ command: 'capture-backfill', ...report }, null, 2));
         return 0;
       }
       case 'editorial-run':
