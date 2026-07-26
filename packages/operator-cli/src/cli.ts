@@ -50,8 +50,19 @@ import { runStoryResearch, type StoryTopicSeed } from './story-research-run.js';
 import { prepareStoryPacketIntake } from './story-intake.js';
 import { prepareEdgeIntake, type EdgeIntakeInput } from './edge-intake.js';
 import { createNodeSafeFetchDependencies, runQuickAddFetch } from './fetch.js';
-import { createMetadataOnlyStorage, type CaptureDeps } from './source-capture.js';
+import { createMetadataOnlyStorage, type CaptureDeps, type CaptureStorage } from './source-capture.js';
+import { createSupabaseStorage, supabaseStorageConfigFromEnv } from './supabase-storage.js';
 import { runCaptureBackfill, persistCapture } from './capture-backfill.js';
+
+/**
+ * Capture blob sink selection: Supabase Storage when SUPABASE_URL + SUPABASE_SECRET_KEY are
+ * configured (blobs live next to the evidence DB, no legacy GCP dependency), else honest
+ * metadata-only (hash + excerpt inline).
+ */
+function captureStorageFromEnv(env: Record<string, string | undefined>): CaptureStorage {
+  const config = supabaseStorageConfigFromEnv(env);
+  return config ? createSupabaseStorage(config) : createMetadataOnlyStorage();
+}
 import type { ResearchCaptureSink } from './research-intake.js';
 import { createHash } from 'node:crypto';
 import { OPERATOR_SOURCES, type OperatorIdentity, type OperatorSource } from './identity.js';
@@ -465,7 +476,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         if (flags.booleans.has('--commit')) {
           const pool = getOpsPostgresPool(process.env);
           researchCaptureSink = {
-            storage: createMetadataOnlyStorage(),
+            storage: captureStorageFromEnv(process.env),
             newId: (prefix, seed) =>
               `${prefix}_${createHash('sha1').update(seed).digest('hex').slice(0, 16)}`,
             persist: async (capture, event) => {
@@ -828,7 +839,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         const fetchDependencies = deps.fetchDependencies ?? createNodeSafeFetchDependencies();
         const captureDeps: CaptureDeps = {
           fetchUrl: (url) => runQuickAddFetch(url, fetchDependencies),
-          storage: createMetadataOnlyStorage(),
+          storage: captureStorageFromEnv(process.env),
           parserVersion: 'capture-backfill-v1',
           newId: (prefix, seed) =>
             `${prefix}_${createHash('sha1').update(seed).digest('hex').slice(0, 16)}`,
