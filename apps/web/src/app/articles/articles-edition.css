@@ -1,0 +1,121 @@
+/**
+ * Articles surface chrome: the index intro + card grid and the shared detail
+ * stack container. Uses the design-system tokens; no per-surface color forks.
+ */
+
+.ds-articles-edition__stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-8);
+  padding-block: var(--ds-space-8);
+  max-width: 74rem;
+  margin-inline: auto;
+}
+
+.ds-articles-edition__intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-3);
+  padding-block: var(--ds-space-8);
+  max-width: 74rem;
+  margin-inline: auto;
+}
+
+.ds-articles-edition__kicker {
+  font-family: var(--ds-font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.75rem;
+  color: var(--ds-accent);
+  margin: 0;
+}
+
+.ds-articles-edition__title {
+  font-family: var(--ds-font-display);
+  font-size: clamp(2.25rem, 5vw + 1rem, 3.75rem);
+  line-height: 1.03;
+  margin: 0;
+  color: var(--ds-ink);
+}
+
+.ds-articles-edition__lede {
+  font-family: var(--ds-font-editorial);
+  font-size: clamp(1.1rem, 1vw + 1rem, 1.4rem);
+  line-height: 1.55;
+  color: var(--ds-ink-muted);
+  max-width: 52ch;
+  margin: 0;
+}
+
+.ds-articles-edition__notice {
+  font-family: var(--ds-font-sans);
+  color: var(--ds-ink-muted);
+  padding: var(--ds-space-6);
+  border: var(--ds-border-width) dashed var(--ds-border);
+  border-radius: var(--ds-radius-md);
+}
+
+/* Index grid */
+.ds-articles-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  gap: var(--ds-space-6);
+}
+
+.ds-article-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
+  height: 100%;
+  padding: var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface);
+  text-decoration: none;
+  transition: border-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-article-card:hover,
+.ds-article-card:focus-visible {
+  border-color: var(--ds-accent);
+}
+
+.ds-article-card__media {
+  display: block;
+  margin: calc(-1 * var(--ds-space-4)) calc(-1 * var(--ds-space-4)) var(--ds-space-2);
+  border-radius: var(--ds-radius-md) var(--ds-radius-md) 0 0;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+}
+
+.ds-article-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ds-article-card__meta {
+  font-family: var(--ds-font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ds-ink-subtle);
+}
+
+.ds-article-card__title {
+  font-family: var(--ds-font-display);
+  font-size: 1.35rem;
+  line-height: 1.15;
+  color: var(--ds-ink);
+}
+
+.ds-article-card__summary {
+  font-family: var(--ds-font-sans);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}

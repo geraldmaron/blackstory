@@ -58,6 +58,8 @@ export type ThemeImpactObservationView = {
   readonly metricId?: string;
   readonly label: string;
   readonly value: string;
+  readonly estimate: number;
+  readonly unit: string;
   readonly referencePeriod?: string;
   readonly provenance: ThemeImpactProvenanceView;
 };
@@ -121,6 +123,8 @@ function observationToView(row: ThemeImpactPacketObservation): ThemeImpactObserv
     metricId: row.metricId,
     label: row.label ?? row.metricId,
     value: formatThemeImpactEstimate(row.estimate, row.unit),
+    estimate: row.estimate,
+    unit: row.unit,
     referencePeriod: row.referencePeriod,
     provenance: provenanceToView(row.provenance),
   };

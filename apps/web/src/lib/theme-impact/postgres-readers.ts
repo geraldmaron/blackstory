@@ -52,6 +52,20 @@ export async function fetchReleaseThemeImpactPacket(
   return row ? mapRow(row) : undefined;
 }
 
+export async function listReleaseThemeImpactPacketsByIds(
+  ids: readonly string[],
+): Promise<readonly ThemeImpactPacket[]> {
+  if (ids.length === 0) return [];
+  const rows = await queryPostgres<ReleasePacketRow>(
+    `SELECT packets.payload
+     FROM bb_public.release_theme_impact_packets packets
+     ${ACTIVE_RELEASE_JOIN}
+     WHERE packets.packet_id = ANY($1::text[])`,
+    [[...ids]],
+  );
+  return rows.map(mapRow);
+}
+
 export async function listReleaseThemeImpactThemeIds(): Promise<readonly string[]> {
   const rows = await queryPostgres<{ readonly theme_id: string }>(
     `SELECT DISTINCT packets.theme_id

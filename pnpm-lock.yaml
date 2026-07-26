@@ -541,6 +541,9 @@ importers:
       '@repo/domain':
         specifier: workspace:*
         version: link:../domain
+      '@repo/schemas':
+        specifier: workspace:*
+        version: link:../schemas
       '@repo/security':
         specifier: workspace:*
         version: link:../security

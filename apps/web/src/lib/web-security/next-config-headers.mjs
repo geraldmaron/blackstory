@@ -15,6 +15,9 @@ export function securityHeadersForNextConfig() {
   // Keep in sync with csp.ts DEFAULT_IMG_SRC (GCS + Supabase public-media + book covers).
   const publicMedia =
     'https://storage.googleapis.com https://twykhihqkcldpreuovay.supabase.co';
+  // Article hero/inline imagery from public-domain archival collections (Wikimedia
+  // Commons). Production should re-host into the Supabase media bucket.
+  const articleMedia = 'https://upload.wikimedia.org';
   // Open Library cover URLs redirect to archive.org / ia*.us.archive.org — allow each hop.
   const bookCovers =
     'https://covers.openlibrary.org https://archive.org https://*.us.archive.org';
@@ -29,7 +32,7 @@ export function securityHeadersForNextConfig() {
     "object-src 'none'",
     scriptSrc,
     "style-src 'self' 'unsafe-inline'",
-    `img-src 'self' data: blob: ${mapTiles} ${publicMedia} ${bookCovers}`,
+    `img-src 'self' data: blob: ${mapTiles} ${publicMedia} ${articleMedia} ${bookCovers}`,
     `font-src 'self' ${mapTiles}`,
     connectSrc,
     "manifest-src 'self'",

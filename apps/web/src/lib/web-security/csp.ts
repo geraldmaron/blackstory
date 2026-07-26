@@ -28,6 +28,15 @@ const PUBLIC_MEDIA_IMG_SRC = [
 ];
 
 /**
+ * Article hero/inline imagery sourced from public-domain archival collections.
+ * Wikimedia Commons serves file bytes from upload.wikimedia.org. Production
+ * should re-host these into the Supabase media bucket for durability (see
+ * repo issue: re-host article hero images); this host keeps them rendering
+ * until that pipeline lands.
+ */
+const ARTICLE_MEDIA_IMG_SRC = ['https://upload.wikimedia.org'];
+
+/**
  * Banned-books cover thumbnails: Open Library ISBN URLs redirect to archive.org
  * (and ia*.us.archive.org). Each hop must match img-src or the browser blocks the
  * image and BooksCoverArt falls back to initials placeholders.
@@ -44,6 +53,7 @@ const DEFAULT_IMG_SRC = [
   'blob:',
   ...MAP_TILE_SRC,
   ...PUBLIC_MEDIA_IMG_SRC,
+  ...ARTICLE_MEDIA_IMG_SRC,
   ...BOOK_COVER_IMG_SRC,
 ];
 const DEFAULT_CONNECT_SRC = ["'self'", ...MAP_TILE_SRC];
