@@ -126,13 +126,10 @@ export {
   STORY_REWRITE_ARTIFACT_DIR,
   buildMockStoryRewriteBody,
   createMockStoryRewriteProvider,
-  formatStoryRewriteLaneResult,
   hasOpenRouterCredentials,
   resolveStoryRewriteProvider,
-  runStoryRewriteLane,
   writeStoryRewriteArtifact,
   type StoryRewriteLaneInput,
-  type StoryRewriteLaneSummary,
 } from './story-rewrite-lane.js';
 
 export { mapPool } from './map-pool.js';
