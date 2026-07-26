@@ -12,10 +12,7 @@ import { ThemeImpactMapStrip } from '../../../components/theme-impact/ThemeImpac
 import { ThemeImpactPacketCard } from '../../../components/theme-impact/ThemeImpactPacketCard';
 import { ThemeImpactStoryEmbed } from '../../../components/theme-impact/ThemeImpactStoryEmbed';
 import { ThemeImpactStorytellingPanel } from '../../../components/theme-impact/ThemeImpactStorytellingPanel';
-import {
-  getThemeCatalogEntry,
-  listAvailableThemeIds,
-} from '../../../components/theme-impact/fixtures';
+import { getThemeCatalogEntry, listCatalogThemeIds } from '../../../lib/theme-impact/catalog';
 import { THEMES_PUBLIC_SURFACE_ENABLED } from '../../../lib/theme-impact/public-surface';
 import { shouldShowThemeImpactStorytelling } from '../../../lib/theme-impact/storytelling-series';
 import {
@@ -38,7 +35,7 @@ type ThemeDetailPageProps = {
 
 export async function generateStaticParams() {
   if (!THEMES_PUBLIC_SURFACE_ENABLED) return [];
-  return listAvailableThemeIds().map((themeId) => ({ themeId }));
+  return listCatalogThemeIds().map((themeId) => ({ themeId }));
 }
 
 export async function generateMetadata({ params }: ThemeDetailPageProps) {
@@ -47,7 +44,7 @@ export async function generateMetadata({ params }: ThemeDetailPageProps) {
   }
   const { themeId } = await params;
   const entry = getThemeCatalogEntry(themeId);
-  if (!entry?.available) {
+  if (!entry) {
     return { title: 'Theme not found' };
   }
   return {
@@ -64,11 +61,42 @@ export default async function ThemeDetailPage({ params }: ThemeDetailPageProps) 
   const { themeId } = await params;
   const entry = getThemeCatalogEntry(themeId);
 
-  if (!entry?.available) {
+  if (!entry) {
     notFound();
   }
 
   const { packets, source } = await listThemeImpactPacketViews(themeId);
+
+  if (source === 'unavailable') {
+    return (
+      <div className={themesEditionRootClassName()} data-themes-edition="v6">
+        <main className="ds-container ds-page" id="main">
+          <div className={themesEditionStackClassName()}>
+            <article className={themesEditionPanelClassName('intro')}>
+              <header className="ds-themes-edition__header">
+                <div>
+                  <p className="ds-themes-edition__kicker">Theme · {entry.priority}</p>
+                  <h1 className="ds-themes-edition__title">{entry.title}</h1>
+                  <p className="ds-themes-edition__lede">
+                    This theme is temporarily unavailable while we reconnect to the live record.
+                    Nothing here is lost; please check back shortly.
+                  </p>
+                  <p className="ds-themes-edition__lede">
+                    <Link href="/themes">Back to all themes</Link>
+                  </p>
+                </div>
+              </header>
+            </article>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (packets.length === 0) {
+    notFound();
+  }
+
   const pilotPacket =
     themeId === 'redlining' ? await resolveRedliningPilotPacketView() : undefined;
   const storytellingPackets = packets.filter((packet) =>
@@ -117,11 +145,9 @@ export default async function ThemeDetailPage({ params }: ThemeDetailPageProps) 
               . See <Link href="/methodology">methodology</Link> for confidence grades and when
               impact language is allowed.
             </p>
-            {source !== 'fixture' ? (
-              <p className="ds-mono ds-themes-edition__live-badge">
-                Data source: {source === 'live' ? 'live warehouse' : 'live + fixture fallback'}
-              </p>
-            ) : null}
+            <p className="ds-mono ds-themes-edition__live-badge">
+              Data source: published release
+            </p>
           </article>
 
           {hasChapters ? (
@@ -213,7 +239,7 @@ export default async function ThemeDetailPage({ params }: ThemeDetailPageProps) 
                   </h2>
                   <p className="ds-themes-edition__lede">
                     Both surfaces read the same housing Q3 packet (indicators, citations, and
-                    juxtaposition method note) from {pilotPacket.dataSource ?? 'fixture'} data.
+                    juxtaposition method note) from the published release.
                   </p>
                 </div>
               </header>

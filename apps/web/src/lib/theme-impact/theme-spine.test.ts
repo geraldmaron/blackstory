@@ -109,7 +109,7 @@ function stubbedDeps(themeId: string) {
     listStories: async () => ({ data: STORIES, source: 'live' as const }),
     listPackets: async (queriedThemeId: string) => ({
       packets: queriedThemeId === themeId ? [PACKET_VIEW] : [],
-      source: 'fixture' as const,
+      source: 'live' as const,
     }),
   };
 }
@@ -214,7 +214,7 @@ const TIMELINE_MAP_STORIES = [
 function timelineMapDeps() {
   return {
     listStories: async () => ({ data: TIMELINE_MAP_STORIES, source: 'live' as const }),
-    listPackets: async () => ({ packets: [TIMELINE_MAP_PACKET_VIEW], source: 'fixture' as const }),
+    listPackets: async () => ({ packets: [TIMELINE_MAP_PACKET_VIEW], source: 'live' as const }),
     listEntities: async (ids: readonly string[]) => ({
       data: ids
         .filter((id) => id === 'ent_church')

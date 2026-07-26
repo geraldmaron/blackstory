@@ -9,18 +9,21 @@ import {
   listP0Themes,
   listP1Themes,
   type ThemeImpactCatalogEntry,
-} from '../../components/theme-impact/fixtures';
+} from '../../lib/theme-impact/catalog';
+import { resolveAvailableThemeIds } from '../../lib/theme-impact/source';
 import { themesEditionPanelClassName } from './themes-panel-chrome';
 
 function ThemeCatalogRow({
   entry,
   index,
+  available,
 }: {
   readonly entry: ThemeImpactCatalogEntry;
   readonly index: number;
+  readonly available: boolean;
 }) {
   const priorityLabel = entry.priority === 'P0' ? 'Priority P0' : 'Priority P1';
-  const statusLabel = entry.available ? 'Available now' : 'Coming soon';
+  const statusLabel = available ? 'Available now' : 'Coming soon';
   const indexLabel = String(index + 1).padStart(2, '0');
 
   return (
@@ -31,22 +34,22 @@ function ThemeCatalogRow({
       <div className="ds-theme-impact__catalog-body">
         <div className="ds-theme-impact__catalog-head">
           <h3 className="ds-theme-impact__catalog-title">
-            {entry.available ? (
+            {available ? (
               <Link href={`/themes/${entry.id}`}>{entry.title}</Link>
             ) : (
               entry.title
             )}
           </h3>
           <span
-            className={`ds-theme-impact__chip ${entry.available ? 'ds-theme-impact__chip--live' : 'ds-theme-impact__chip--soon'}`}
+            className={`ds-theme-impact__chip ${available ? 'ds-theme-impact__chip--live' : 'ds-theme-impact__chip--soon'}`}
             aria-label={`${priorityLabel}; ${statusLabel}`}
           >
             {entry.priority}
-            {!entry.available ? ' · coming soon' : ''}
+            {!available ? ' · coming soon' : ''}
           </span>
         </div>
         <p className="ds-theme-impact__catalog-lede">{entry.lede}</p>
-        {entry.available ? (
+        {available ? (
           <p className="ds-theme-impact__catalog-meta">
             <Link className="ds-cta-link" href={`/themes/${entry.id}`}>
               Open theme
@@ -58,12 +61,29 @@ function ThemeCatalogRow({
   );
 }
 
-export function ThemeBrowseSections() {
+export async function ThemeBrowseSections() {
   const p0 = listP0Themes();
   const p1 = listP1Themes();
+  const availability = await resolveAvailableThemeIds();
+  const availableIds = new Set(availability.ids);
 
   return (
     <>
+      {!availability.ok ? (
+        <article
+          className={themesEditionPanelClassName('method')}
+          aria-labelledby="theme-availability-notice"
+        >
+          <p className="ds-themes-edition__panel-title">Notice</p>
+          <h2 className="ds-themes-edition__method-title" id="theme-availability-notice">
+            Live themes are temporarily unavailable
+          </h2>
+          <p className="ds-themes-edition__method-body">
+            We could not reach the published record just now, so every theme below is shown as
+            coming soon. Nothing is lost; please check back shortly.
+          </p>
+        </article>
+      ) : null}
       <article
         className={themesEditionPanelClassName('method')}
         aria-labelledby="theme-method-heading"
@@ -102,7 +122,12 @@ export function ThemeBrowseSections() {
         </header>
         <ul className="ds-theme-impact__catalog" aria-label="Priority P0 themes">
           {p0.map((entry, index) => (
-            <ThemeCatalogRow key={entry.id} entry={entry} index={index} />
+            <ThemeCatalogRow
+              key={entry.id}
+              entry={entry}
+              index={index}
+              available={availableIds.has(entry.id)}
+            />
           ))}
         </ul>
       </article>
@@ -130,7 +155,12 @@ export function ThemeBrowseSections() {
         </header>
         <ul className="ds-theme-impact__catalog" aria-label="Priority P1 themes">
           {p1.map((entry, index) => (
-            <ThemeCatalogRow key={entry.id} entry={entry} index={index} />
+            <ThemeCatalogRow
+              key={entry.id}
+              entry={entry}
+              index={index}
+              available={availableIds.has(entry.id)}
+            />
           ))}
         </ul>
       </article>

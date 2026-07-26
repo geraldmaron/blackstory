@@ -1,20 +1,21 @@
 /**
  * Researched public theme-impact packets.
  *
- * This is the single checked-in packet source used by Postgres publication and
- * web fallback rendering. Observation values are verified snapshots of
+ * Authoring fixture for the published packets, applied and promoted via
+ * scripts/theme-packets.ts. The database is the source of truth at runtime;
+ * this file records authoring lineage. Observation values are verified snapshots of
  * bb_reference.statistical_observations. Artifact hashes are SHA-256 digests of
  * bytes fetched directly from the cited source (CPS A-1 and BJS NPS refreshes
  * on 2026-07-24; earlier rows retain their fetch-day hashes).
  */
-import { sha256Json } from '../publication/index.js';
 import {
   buildThemeImpactPacket,
+  sha256Json,
   type ThemeImpactPacket,
   type ThemeImpactPacketArtifact,
   type ThemeImpactPacketDerived,
   type ThemeImpactPacketObservation,
-} from './theme-impact-packet.js';
+} from '@repo/domain';
 
 const PACKET_CREATED_AT = '2026-07-22T23:00:00.000Z';
 const PACKET_UPDATED_AT = '2026-07-24T09:45:00.000Z';

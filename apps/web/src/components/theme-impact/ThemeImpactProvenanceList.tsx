@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import type { ThemeImpactProvenance } from './fixtures/types';
+import type { ThemeImpactProvenanceView as ThemeImpactProvenance } from '@repo/domain';
 
 export type ThemeImpactProvenanceListProps = {
   readonly items: readonly ThemeImpactProvenance[];

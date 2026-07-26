@@ -94,7 +94,7 @@ function stubbedPacketDeps(packetsByTheme: Record<string, readonly unknown[]>) {
     listPackets: async (themeId: string) => ({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       packets: (packetsByTheme[themeId] ?? []) as any,
-      source: 'fixture' as const,
+      source: 'live' as const,
     }),
     themeIds: Object.keys(packetsByTheme),
     getThemeTitle: (themeId: string) =>

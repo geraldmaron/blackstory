@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { Notice } from '@repo/ui';
-import type { ThemeImpactGapState } from './fixtures/types';
+import type { ThemeImpactGapState } from '@repo/domain';
 import { THEME_IMPACT_GAP_COPY } from './theme-impact-copy';
 
 export type ThemeImpactGapBannerProps = {

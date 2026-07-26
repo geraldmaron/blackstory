@@ -1,13 +1,12 @@
 /**
  * Theme-impact map context strip — horizontal packet consumer for map panels.
- * Shares the Chicago redlining pilot fixture (Q3) with ThemeImpactStoryEmbed.
+ * Renders the packet the caller resolved from the active release.
  */
 
 import Link from 'next/link';
 import React from 'react';
 import type { ThemeImpactPacketView } from '@repo/domain';
 import { collectPacketProvenance } from './ThemeImpactProvenanceList';
-import { REDLINING_PILOT_PACKET } from './ThemeImpactStoryEmbed';
 import { ThemeImpactEmptyNotice } from './ThemeImpactEmptyNotice';
 import { THEME_IMPACT_METHOD_STANCE_LABEL } from './theme-impact-copy';
 
@@ -15,12 +14,12 @@ const METHOD_STANCE_LABEL = THEME_IMPACT_METHOD_STANCE_LABEL;
 const INDICATOR_LIMIT = 3;
 
 export type ThemeImpactMapStripProps = {
-  readonly packet?: ThemeImpactPacketView;
+  readonly packet: ThemeImpactPacketView;
   readonly labelId?: string;
 };
 
 export function ThemeImpactMapStrip({
-  packet = REDLINING_PILOT_PACKET,
+  packet,
   labelId = 'theme-impact-map-strip',
 }: ThemeImpactMapStripProps) {
   const indicators = packet.observations.slice(0, INDICATOR_LIMIT);

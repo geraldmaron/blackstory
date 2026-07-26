@@ -1,5 +1,8 @@
 /**
- * Theme-impact read routing: live Postgres packets with graceful fixture fallback.
+ * Theme-impact read routing: active-release Postgres packets only. There is no
+ * checked-in content fallback; when the release read path is unavailable the
+ * caller receives an explicit `unavailable` source and renders a friendly
+ * degraded state instead of stale substitute content.
  */
 import {
   THEME_IMPACT_THEME_IDS,
@@ -13,28 +16,17 @@ import type {
   PublicStorySectionDisputeDoc,
   PublicStorySectionMomentDoc,
 } from '@repo/schemas';
-import {
-  getPacketFixture,
-  getThemeCatalogEntry,
-  listPacketsForTheme as listFixturePacketsForTheme,
-} from '../../components/theme-impact/fixtures';
-import type { ThemeImpactPacketFixture } from '../../components/theme-impact/fixtures/types';
 import type { PublicEntityView } from '../../data/public-seed';
 import { hasPostgresConnection } from '../public-data/live-policy';
 import { listPublicEntityViewsByIds, listPublicStoryViews } from '../public-data/source';
+import { getThemeCatalogEntry, listCatalogThemeIds } from './catalog';
 import {
-  fetchPublishedThemeImpactPacket,
-  listPublishedThemeImpactPacketsByTheme,
+  fetchReleaseThemeImpactPacket,
+  listReleaseThemeImpactPacketsByTheme,
+  listReleaseThemeImpactThemeIds,
 } from './postgres-readers';
 
-export type ThemeImpactReadSource = 'live' | 'fixture' | 'mixed';
-
-function fixtureToView(packet: ThemeImpactPacketFixture): ThemeImpactPacketView {
-  return {
-    ...packet,
-    dataSource: 'fixture',
-  };
-}
+export type ThemeImpactReadSource = 'live' | 'unavailable';
 
 function liveToView(packet: ThemeImpactPacket): ThemeImpactPacketView {
   return themeImpactPacketToView(packet, { dataSource: 'live' });
@@ -44,86 +36,78 @@ function shouldAttemptLiveReads(): boolean {
   return hasPostgresConnection();
 }
 
-const listLivePacketsByTheme = cache(async (themeId: string) => {
-  if (!shouldAttemptLiveReads()) return [] as readonly ThemeImpactPacket[];
-  try {
-    return await listPublishedThemeImpactPacketsByTheme(themeId);
-  } catch {
-    return [] as readonly ThemeImpactPacket[];
-  }
-});
+function logReadFailure(context: string, error: unknown): void {
+  const message = error instanceof Error ? error.message : String(error);
+  console.error(`[theme-impact] ${context} failed; rendering unavailable state: ${message}`);
+}
 
-const fetchLivePacket = cache(async (themeId: string, questionId: string) => {
-  if (!shouldAttemptLiveReads()) return undefined;
-  try {
-    return await fetchPublishedThemeImpactPacket(themeId, questionId);
-  } catch {
-    return undefined;
-  }
-});
+const listLivePacketsByTheme = cache(
+  async (
+    themeId: string,
+  ): Promise<{
+    readonly packets: readonly ThemeImpactPacket[];
+    readonly source: ThemeImpactReadSource;
+  }> => {
+    if (!shouldAttemptLiveReads()) return { packets: [], source: 'unavailable' };
+    try {
+      return { packets: await listReleaseThemeImpactPacketsByTheme(themeId), source: 'live' };
+    } catch (error) {
+      logReadFailure(`listReleaseThemeImpactPacketsByTheme(${themeId})`, error);
+      return { packets: [], source: 'unavailable' };
+    }
+  },
+);
+
+/**
+ * Theme ids that are available on the public surface: catalog themes whose
+ * active release carries at least one packet. `ok: false` means the release
+ * read path itself failed, which callers should surface as a temporary outage
+ * rather than an empty catalog.
+ */
+export const resolveAvailableThemeIds = cache(
+  async (): Promise<{ readonly ids: readonly string[]; readonly ok: boolean }> => {
+    if (!shouldAttemptLiveReads()) return { ids: [], ok: false };
+    try {
+      const releaseThemeIds = new Set(await listReleaseThemeImpactThemeIds());
+      return { ids: listCatalogThemeIds().filter((id) => releaseThemeIds.has(id)), ok: true };
+    } catch (error) {
+      logReadFailure('listReleaseThemeImpactThemeIds', error);
+      return { ids: [], ok: false };
+    }
+  },
+);
+
+export async function isThemeAvailable(themeId: string): Promise<boolean> {
+  const { ids } = await resolveAvailableThemeIds();
+  return ids.includes(themeId);
+}
 
 export async function listThemeImpactPacketViews(
   themeId: string,
 ): Promise<{ readonly packets: readonly ThemeImpactPacketView[]; readonly source: ThemeImpactReadSource }> {
-  const fixtures = listFixturePacketsForTheme(themeId).map(fixtureToView);
-  const live = await listLivePacketsByTheme(themeId);
-
-  if (live.length === 0) {
-    return { packets: fixtures, source: 'fixture' };
-  }
-
-  const liveByQuestion = new Map(live.map((packet) => [packet.questionId, liveToView(packet)]));
-  const merged: ThemeImpactPacketView[] = [];
-  const seen = new Set<string>();
-
-  for (const fixture of fixtures) {
-    const fromLive = liveByQuestion.get(fixture.questionId);
-    if (fromLive) {
-      merged.push(fromLive);
-      seen.add(fixture.questionId);
-    } else {
-      merged.push(fixture);
-    }
-  }
-
-  for (const packet of live) {
-    if (!seen.has(packet.questionId)) {
-      merged.push(liveToView(packet));
-    }
-  }
-
-  merged.sort((a, b) => a.questionId.localeCompare(b.questionId));
-
-  const source: ThemeImpactReadSource =
-    seen.size === fixtures.length && live.length >= fixtures.length
-      ? 'live'
-      : seen.size > 0
-        ? 'mixed'
-        : 'fixture';
-
-  return { packets: merged, source };
+  const { packets, source } = await listLivePacketsByTheme(themeId);
+  return { packets: packets.map(liveToView), source };
 }
 
 export async function resolveThemeImpactPacketView(
   themeId: string,
   questionId: string,
 ): Promise<ThemeImpactPacketView | undefined> {
-  const live = await fetchLivePacket(themeId, questionId);
-  if (live) return liveToView(live);
-  const fixture = getPacketFixture(themeId, questionId);
-  return fixture ? fixtureToView(fixture) : undefined;
+  if (!shouldAttemptLiveReads()) return undefined;
+  try {
+    const live = await fetchReleaseThemeImpactPacket(themeId, questionId);
+    return live ? liveToView(live) : undefined;
+  } catch (error) {
+    logReadFailure(`fetchReleaseThemeImpactPacket(${themeId}, ${questionId})`, error);
+    return undefined;
+  }
 }
 
 /** Redlining Q3 pilot packet for story embed / map strip consumers. */
-export async function resolveRedliningPilotPacketView(): Promise<ThemeImpactPacketView> {
-  const resolved = await resolveThemeImpactPacketView('redlining', 'Q3');
-  if (resolved) return resolved;
-  const fixtures = listFixturePacketsForTheme('redlining');
-  const fallback = fixtures.find((packet) => packet.questionId === 'Q3');
-  if (!fallback) {
-    throw new Error('redlining Q3 fixture missing');
-  }
-  return fixtureToView(fallback);
+export async function resolveRedliningPilotPacketView(): Promise<
+  ThemeImpactPacketView | undefined
+> {
+  return resolveThemeImpactPacketView('redlining', 'Q3');
 }
 
 /* -------------------------------------------------------------------------------------------- *

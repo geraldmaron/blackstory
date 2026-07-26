@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ThemeImpactPacketCard } from '../../../../../components/theme-impact/ThemeImpactPacketCard';
 import { ThemeImpactStorytellingPanel } from '../../../../../components/theme-impact/ThemeImpactStorytellingPanel';
-import { getThemeCatalogEntry } from '../../../../../components/theme-impact/fixtures';
+import { getThemeCatalogEntry } from '../../../../../lib/theme-impact/catalog';
 import { THEMES_PUBLIC_SURFACE_ENABLED } from '../../../../../lib/theme-impact/public-surface';
 import { resolveThemeImpactPacketView } from '../../../../../lib/theme-impact/source';
 import { shouldShowThemeImpactStorytelling } from '../../../../../lib/theme-impact/storytelling-series';
@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: ThemeQuestionPageProps) {
   const { themeId, questionId } = await params;
   const entry = getThemeCatalogEntry(themeId);
   const packet = await resolveThemeImpactPacketView(themeId, questionId);
-  if (!entry?.available || !packet) {
+  if (!entry || !packet) {
     return { title: 'Question not found' };
   }
   return {
@@ -45,7 +45,7 @@ export default async function ThemeQuestionPage({ params }: ThemeQuestionPagePro
 
   const { themeId, questionId } = await params;
   const entry = getThemeCatalogEntry(themeId);
-  if (!entry?.available) {
+  if (!entry) {
     notFound();
   }
 

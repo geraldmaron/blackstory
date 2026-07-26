@@ -7,22 +7,31 @@
  * the fixture stories must independently validate against `publicStoryProjectionSchema`.
  */
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 import { test } from 'node:test';
-import { RESEARCHED_THEME_IMPACT_PACKETS, themeImpactPacketToView } from '@repo/domain';
+import { fileURLToPath } from 'node:url';
+import type { ThemeImpactPacketView } from '@repo/domain';
 import { publicStoryProjectionSchema } from '@repo/schemas';
 import { REDLINING_SPINE_STORIES } from './redlining-spine.fixtures.js';
 import { resolveThemeSpine } from './source.js';
 
-const REDLINING_PACKET_VIEWS = RESEARCHED_THEME_IMPACT_PACKETS.filter(
-  (packet) => packet.themeId === 'redlining',
-).map((packet) => themeImpactPacketToView(packet, { dataSource: 'fixture' }));
+// Snapshot of the published redlining packet views (see redlining-packets.snapshot.json).
+// Content-integrity against the live release is enforced by the ops theme-packets audit;
+// this test pins hydration behavior against realistic packet documents.
+const REDLINING_PACKET_VIEWS: readonly ThemeImpactPacketView[] = JSON.parse(
+  readFileSync(
+    join(dirname(fileURLToPath(import.meta.url)), 'redlining-packets.snapshot.json'),
+    'utf8',
+  ),
+);
 
 function stubbedRealDeps() {
   return {
     listStories: async () => ({ data: REDLINING_SPINE_STORIES, source: 'live' as const }),
     listPackets: async (themeId: string) => ({
       packets: themeId === 'redlining' ? REDLINING_PACKET_VIEWS : [],
-      source: 'fixture' as const,
+      source: 'live' as const,
     }),
   };
 }

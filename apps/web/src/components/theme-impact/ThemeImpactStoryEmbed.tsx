@@ -1,31 +1,26 @@
 /**
  * Theme-impact story embed — compact packet consumer for narrative surfaces.
- * Resolves live Q3 packet when Postgres is configured; falls back to fixtures.
+ * Renders the packet the caller resolved from the active release.
  */
 
 import Link from 'next/link';
 import React from 'react';
 import type { ThemeImpactPacketView } from '@repo/domain';
-import { getPacketFixture } from './fixtures';
 import { collectPacketProvenance } from './ThemeImpactProvenanceList';
 import { ThemeImpactEmptyNotice } from './ThemeImpactEmptyNotice';
 import { THEME_IMPACT_METHOD_STANCE_COMPACT } from './theme-impact-copy';
-
-/** Fixture fallback when live reads are unavailable at build time. */
-export const REDLINING_PILOT_PACKET: ThemeImpactPacketView =
-  getPacketFixture('redlining', 'Q3')!;
 
 const METHOD_STANCE_LABEL = THEME_IMPACT_METHOD_STANCE_COMPACT;
 const INDICATOR_LIMIT = 3;
 
 export type ThemeImpactStoryEmbedProps = {
-  readonly packet?: ThemeImpactPacketView;
+  readonly packet: ThemeImpactPacketView;
   readonly headingId?: string;
   readonly citationsHeading?: string;
 };
 
 export function ThemeImpactStoryEmbed({
-  packet = REDLINING_PILOT_PACKET,
+  packet,
   headingId = 'theme-impact-story-embed',
   citationsHeading = 'Sources',
 }: ThemeImpactStoryEmbedProps) {
