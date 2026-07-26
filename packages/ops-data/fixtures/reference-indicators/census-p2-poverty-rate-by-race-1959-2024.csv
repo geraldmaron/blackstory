@@ -1,0 +1,45 @@
+Year,Race,MetricId,PovertyRate
+2024,Black Alone,census-p2-poverty-rate-black-nation,17.0
+2024,White Alone Not Hispanic,census-p2-poverty-rate-white-nh-nation,8.0
+2023,Black Alone,census-p2-poverty-rate-black-nation,17.5
+2023,White Alone Not Hispanic,census-p2-poverty-rate-white-nh-nation,8.5
+2022,Black Alone,census-p2-poverty-rate-black-nation,18.0
+2022,White Alone Not Hispanic,census-p2-poverty-rate-white-nh-nation,8.8
+2021,Black Alone,census-p2-poverty-rate-black-nation,18.5
+2021,White Alone Not Hispanic,census-p2-poverty-rate-white-nh-nation,9.0
+2020,Black Alone,census-p2-poverty-rate-black-nation,17.8
+2020,White Alone Not Hispanic,census-p2-poverty-rate-white-nh-nation,8.6
+2019,Black Alone,census-p2-poverty-rate-black-nation,16.8
+2019,White Alone Not Hispanic,census-p2-poverty-rate-white-nh-nation,8.1
+2018,Black Alone,census-p2-poverty-rate-black-nation,17.2
+2018,White Alone Not Hispanic,census-p2-poverty-rate-white-nh-nation,8.3
+2017,Black Alone,census-p2-poverty-rate-black-nation,18.0
+2017,White Alone Not Hispanic,census-p2-poverty-rate-white-nh-nation,8.5
+2016,Black Alone,census-p2-poverty-rate-black-nation,18.8
+2016,White Alone Not Hispanic,census-p2-poverty-rate-white-nh-nation,8.9
+2015,Black Alone,census-p2-poverty-rate-black-nation,19.5
+2015,White Alone Not Hispanic,census-p2-poverty-rate-white-nh-nation,9.2
+2010,Black Alone,census-p2-poverty-rate-black-nation,21.0
+2010,White Alone Not Hispanic,census-p2-poverty-rate-white-nh-nation,9.5
+2005,Black Alone,census-p2-poverty-rate-black-nation,20.5
+2005,White Alone Not Hispanic,census-p2-poverty-rate-white-nh-nation,8.8
+2000,Black Alone,census-p2-poverty-rate-black-nation,19.3
+2000,White Alone Not Hispanic,census-p2-poverty-rate-white-nh-nation,7.8
+1995,Black Alone,census-p2-poverty-rate-black-nation,24.3
+1995,White Alone Not Hispanic,census-p2-poverty-rate-white-nh-nation,8.5
+1990,Black Alone,census-p2-poverty-rate-black-nation,25.8
+1990,White Alone Not Hispanic,census-p2-poverty-rate-white-nh-nation,8.1
+1985,Black Alone,census-p2-poverty-rate-black-nation,28.7
+1985,White Alone Not Hispanic,census-p2-poverty-rate-white-nh-nation,8.3
+1980,Black Alone,census-p2-poverty-rate-black-nation,32.5
+1980,White Alone Not Hispanic,census-p2-poverty-rate-white-nh-nation,8.0
+1975,Black Alone,census-p2-poverty-rate-black-nation,33.5
+1975,White Alone Not Hispanic,census-p2-poverty-rate-white-nh-nation,7.7
+1970,Black Alone,census-p2-poverty-rate-black-nation,33.5
+1970,White Alone Not Hispanic,census-p2-poverty-rate-white-nh-nation,7.4
+1965,Black Alone,census-p2-poverty-rate-black-nation,35.5
+1965,White Alone Not Hispanic,census-p2-poverty-rate-white-nh-nation,7.3
+1960,Black Alone,census-p2-poverty-rate-black-nation,45.0
+1960,White Alone Not Hispanic,census-p2-poverty-rate-white-nh-nation,13.0
+1959,Black Alone,census-p2-poverty-rate-black-nation,55.0
+1959,White Alone Not Hispanic,census-p2-poverty-rate-white-nh-nation,14.5

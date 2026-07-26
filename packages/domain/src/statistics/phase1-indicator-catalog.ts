@@ -39,6 +39,7 @@ import { PHASE1_DSL_RENEWING_INEQUALITY_INDICATOR_DEFINITIONS } from './phase1-d
 import { PHASE1_NHGIS_INDICATOR_DEFINITIONS } from './phase1-nhgis-indicator-catalog.js';
 import { PHASE1_EJI_TRI_INDICATOR_DEFINITIONS } from './phase1-eji-tri-indicator-catalog.js';
 import { PHASE1_CHAS_INDICATOR_DEFINITIONS } from './phase1-chas-indicator-catalog.js';
+import { PHASE1_NATIONAL_HOMEOWNERSHIP_INDICATOR_DEFINITIONS } from './phase1-national-homeownership-indicator-catalog.js';
 
 /** Curated Phase 1 MVP metrics (~15). Expand only with registry + loader beads. */
 export const PHASE1_INDICATOR_CATALOG: readonly Phase1IndicatorDefinition[] = [
@@ -314,11 +315,72 @@ export const PHASE1_INDICATOR_CATALOG: readonly Phase1IndicatorDefinition[] = [
     externalDataSourceId: 'census-sipp-wealth',
     raceEthnicitySlice: 'black',
   }),
+  series({
+    metricId: 'census-h5-median-hh-income-black-nation',
+    metricDefinition: 'Median household income for Black householders (Census H-5)',
+    universe: 'households',
+    unit: 'USD',
+    sourceDataset: 'Census Current Population Survey Historical Income Tables',
+    sourceTable: 'H-5',
+    sourceVariable: 'H-5 median income',
+    geographyType: 'nation',
+    estimateType: 'median',
+    periodType: 'annual',
+    theme: 'wealth',
+    externalDataSourceId: 'census-historical-income-poverty',
+    raceEthnicitySlice: 'black_alone',
+  }),
+  series({
+    metricId: 'census-h5-median-hh-income-white-nh-nation',
+    metricDefinition: 'Median household income for White non-Hispanic householders (Census H-5)',
+    universe: 'households',
+    unit: 'USD',
+    sourceDataset: 'Census Current Population Survey Historical Income Tables',
+    sourceTable: 'H-5',
+    sourceVariable: 'H-5 median income',
+    geographyType: 'nation',
+    estimateType: 'median',
+    periodType: 'annual',
+    theme: 'wealth',
+    externalDataSourceId: 'census-historical-income-poverty',
+    raceEthnicitySlice: 'white_nonhispanic',
+  }),
+  series({
+    metricId: 'census-p2-poverty-rate-black-nation',
+    metricDefinition: 'Poverty rate for Black population (Census Table 2)',
+    universe: 'population for whom poverty status is determined',
+    unit: 'percent',
+    sourceDataset: 'Census Current Population Survey Historical Poverty Tables',
+    sourceTable: '2',
+    sourceVariable: 'Table 2 poverty rate',
+    geographyType: 'nation',
+    estimateType: 'percentage',
+    periodType: 'annual',
+    theme: 'wealth',
+    externalDataSourceId: 'census-historical-income-poverty',
+    raceEthnicitySlice: 'black_alone',
+  }),
+  series({
+    metricId: 'census-p2-poverty-rate-white-nh-nation',
+    metricDefinition: 'Poverty rate for White non-Hispanic population (Census Table 2)',
+    universe: 'population for whom poverty status is determined',
+    unit: 'percent',
+    sourceDataset: 'Census Current Population Survey Historical Poverty Tables',
+    sourceTable: '2',
+    sourceVariable: 'Table 2 poverty rate',
+    geographyType: 'nation',
+    estimateType: 'percentage',
+    periodType: 'annual',
+    theme: 'wealth',
+    externalDataSourceId: 'census-historical-income-poverty',
+    raceEthnicitySlice: 'white_nonhispanic',
+  }),
   ...PHASE1_USSC_INDICATOR_DEFINITIONS,
   ...PHASE1_DSL_RENEWING_INEQUALITY_INDICATOR_DEFINITIONS,
   ...PHASE1_NHGIS_INDICATOR_DEFINITIONS,
   ...PHASE1_EJI_TRI_INDICATOR_DEFINITIONS,
   ...PHASE1_CHAS_INDICATOR_DEFINITIONS,
+  ...PHASE1_NATIONAL_HOMEOWNERSHIP_INDICATOR_DEFINITIONS,
 ];
 
 export function getPhase1Indicator(metricId: string): Phase1IndicatorDefinition | undefined {
