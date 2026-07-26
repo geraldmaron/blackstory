@@ -26,7 +26,7 @@ export const MEMORIAL_LIST_NOTE =
  * Approved copy. Do not rewrite without checking with product first.
  */
 export const MEMORIAL_HELD_MESSAGE_LINES = [
-  'We say the names because silence is how forgetting starts.',
+  'We say their names because silence is how forgetting starts.',
   "Some of these names you know. Most of them, until now, you didn't.",
   'Every one is a reminder: the fight for equality is not over.',
   'This list will never be finished. That is not a flaw. It is the truth.',
