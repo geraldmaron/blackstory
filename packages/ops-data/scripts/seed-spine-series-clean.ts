@@ -1,9 +1,8 @@
 /**
- * Seed the trustworthy national spine series (repo-zxjz.11, first pass).
+ * Seed the trustworthy national spine series (repo-zxjz.11).
  *
- * Assembles the spine_series / spine_segments rows for the FOUR data domains
- * that passed value-validation (see repo-ypfp / repo-gfyn for the two that did
- * NOT and are deliberately excluded here):
+ * Assembles spine_series / spine_segments rows for the data domains that have
+ * passed value-validation:
  *   1. Wealth ratio, mean per-capita   — DKKS 1860-2019 (single authentic backbone)
  *   2. Wealth ratio, median household   — SCF 1989-2022 (computed here as a derived
  *      ratio; kept as a SEPARATE spine, never spliced onto #1, because mean-per-capita
@@ -12,11 +11,16 @@
  *   4. Life expectancy (Black + White)  — NCHS 1900-2021 (single source; race-label
  *      seam nonwhite/colored -> Black at 1980 documented in comparability_note)
  *   5. Turnout (Black + White)          — CPS A-1 1980-2020 (single source)
- *
- * DELIBERATELY EXCLUDED until their data is re-ingested from real sources:
- *   - imprisonment rate + admissions share (fabricated, repo-ypfp)
- *   - median household income + poverty rate (smoothed/rounded, repo-gfyn)
- *   - unemployment (BLS API rate-limited, never ingested)
+ *   6. Median household income (Black + White NH) — Census H-5 1967/1972-2024
+ *      (real gap: no White NH series before 1972 in the source table)
+ *   7. Poverty rate (Black + White NH) — Census Table 2 1959/1973-2024 (real
+ *      gaps: Black 1960-1965 unpublished; White NH not published before 1973)
+ *   8. Imprisonment rate (Black + White) — BJS 2010-2023 (real gap: 1978-2009
+ *      not yet re-sourced after the repo-ypfp fabrication purge, tracked on
+ *      repo-77sl; a seam note flags the unreconciled 2012->2013 methodology jump)
+ *   9. Admissions share, Black (no white twin — single-race share metric) —
+ *      BJS "Race of Prisoners Admitted" 1926-1986 (real gaps in years the NPS
+ *      admission series never collected/published)
  *
  * Idempotent: re-running replaces the spine rows and upserts the SCF ratio.
  *
@@ -326,6 +330,190 @@ async function main() {
           seamCheck: {
             type: 'single-source',
             note: 'No seam; coverage 1980–2020 only.',
+          },
+        },
+      ],
+    },
+    {
+      spineId: 'spine-median-hh-income-black-us',
+      title: 'Black median household income, 1967–2024',
+      outcome: 'median-household-income',
+      raceSlice: 'black',
+      unit: 'USD (2024 dollars)',
+      definition:
+        'Median household income for Black householders, national, in 2024 constant dollars, from Census CPS ASEC Table H-5.',
+      comparabilityNote:
+        'Single Census source across the whole span; no splice. Re-ingested from the real published table after repo-gfyn found the prior fixture smoothed/rounded to 5-year sampled points — this is now the full annual series.',
+      theme: 'wealth',
+      segments: [
+        {
+          metricId: 'census-h5-median-hh-income-black-nation',
+          periodStart: '1967',
+          periodEnd: '2024',
+          priority: 1,
+          spliceNote: 'Census H-5, single source, full annual span.',
+          seamCheck: { type: 'single-source', note: 'No seam.' },
+        },
+      ],
+    },
+    {
+      spineId: 'spine-median-hh-income-white-us',
+      title: 'White (non-Hispanic) median household income, 1972–2024',
+      outcome: 'median-household-income',
+      raceSlice: 'white-non-hispanic',
+      unit: 'USD (2024 dollars)',
+      definition:
+        'Median household income for White non-Hispanic householders, national, in 2024 constant dollars, from Census CPS ASEC Table H-5.',
+      comparabilityNote:
+        'Single Census source. REAL GAP: the source table has no White-non-Hispanic-specific series before 1972 (only a "White" series that includes Hispanic white households, a different race/ethnicity slice, so it is not substituted in here); 1983 is also unpublished ("N") in the source and is omitted rather than interpolated.',
+      theme: 'wealth',
+      segments: [
+        {
+          metricId: 'census-h5-median-hh-income-white-nh-nation',
+          periodStart: '1972',
+          periodEnd: '2024',
+          priority: 1,
+          spliceNote: 'Census H-5, single source; coverage starts 1972 in the published table.',
+          seamCheck: {
+            type: 'single-source',
+            note: 'No seam; coverage 1972–2024 only (no White-NH series before 1972; 1983 unpublished).',
+          },
+        },
+      ],
+    },
+    {
+      spineId: 'spine-poverty-rate-black-us',
+      title: 'Black poverty rate, 1959–2024',
+      outcome: 'poverty-rate',
+      raceSlice: 'black',
+      unit: 'percent',
+      definition:
+        'Share of the Black population below the poverty line, national, from Census CPS ASEC Table 2.',
+      comparabilityNote:
+        'Single Census source. REAL GAP: 1960–1965 were never published in the source table (jumps from 1959 to 1966). Re-ingested from the real published table after repo-gfyn found the prior fixture smoothed to a perfectly linear recent tail.',
+      theme: 'wealth',
+      segments: [
+        {
+          metricId: 'census-p2-poverty-rate-black-nation',
+          periodStart: '1959',
+          periodEnd: '2024',
+          priority: 1,
+          spliceNote: 'Census Table 2, single source; 1960–1965 unpublished gap preserved.',
+          seamCheck: {
+            type: 'single-source',
+            note: 'No seam; genuine reporting gap 1960–1965 (source never published those years).',
+          },
+        },
+      ],
+    },
+    {
+      spineId: 'spine-poverty-rate-white-us',
+      title: 'White (non-Hispanic) poverty rate, 1973–2024',
+      outcome: 'poverty-rate',
+      raceSlice: 'white-non-hispanic',
+      unit: 'percent',
+      definition:
+        'Share of the White non-Hispanic population below the poverty line, national, from Census CPS ASEC Table 2.',
+      comparabilityNote:
+        'Single Census source. REAL GAP: no White-non-Hispanic-specific series before 1973 in the source table.',
+      theme: 'wealth',
+      segments: [
+        {
+          metricId: 'census-p2-poverty-rate-white-nh-nation',
+          periodStart: '1973',
+          periodEnd: '2024',
+          priority: 1,
+          spliceNote: 'Census Table 2, single source; coverage starts 1973 in the published table.',
+          seamCheck: {
+            type: 'single-source',
+            note: 'No seam; coverage 1973–2024 only (no White-NH series before 1973).',
+          },
+        },
+      ],
+    },
+    {
+      spineId: 'spine-imprisonment-rate-black-us',
+      title: 'Black imprisonment rate, 2010–2023',
+      outcome: 'imprisonment-rate',
+      raceSlice: 'black',
+      unit: 'per 100,000 residents',
+      definition:
+        'Sentenced prisoners under state or federal jurisdiction per 100,000 Black U.S. residents, national, from BJS National Prisoner Statistics.',
+      comparabilityNote:
+        'REAL GAP: 1978–2009 was purged as fabricated (repo-ypfp) and has not yet been re-sourced from real annual BJS bulletins (tracked on repo-77sl) — do not present this as a full 1978-present series. UNRESOLVED SEAM at 2012→2013 (1377 to 1818, a 32% jump): 2010-2012 comes from "Prisoners in 2020" Table 5 ("all ages" basis) while 2013-2023 comes from the pre-existing NPS series; the basis difference has not been reconciled and both segments are given equal priority pending investigation.',
+      theme: 'justice',
+      segments: [
+        {
+          metricId: 'bjs-imprisonment-rate-black-nation',
+          periodStart: '2010',
+          periodEnd: '2023',
+          priority: 1,
+          spliceNote:
+            'BJS NPS, single metric ID but two source vintages internally (see comparability_note for the unreconciled 2012->2013 seam).',
+          seamCheck: {
+            type: 'unresolved',
+            seam_year_from: '2012',
+            seam_year_to: '2013',
+            value_from: 1377,
+            value_to: 1818,
+            divergence_pct: Number((((1818 - 1377) / 1377) * 100).toFixed(2)),
+            note:
+              'Possible all-ages vs adults-18+ basis mismatch between two legitimate BJS tables; not yet reconciled. Also: 1978-2009 is a real, unfilled gap (repo-77sl).',
+          },
+        },
+      ],
+    },
+    {
+      spineId: 'spine-imprisonment-rate-white-us',
+      title: 'White imprisonment rate, 2010–2023',
+      outcome: 'imprisonment-rate',
+      raceSlice: 'white',
+      unit: 'per 100,000 residents',
+      definition:
+        'Sentenced prisoners under state or federal jurisdiction per 100,000 white U.S. residents, national, from BJS National Prisoner Statistics.',
+      comparabilityNote:
+        'Same structure and same caveats as the Black imprisonment spine: 1978-2009 gap (repo-77sl) and an unreconciled 2012->2013 seam (238 to 295, a comparatively larger +24% jump on a smaller base).',
+      theme: 'justice',
+      segments: [
+        {
+          metricId: 'bjs-imprisonment-rate-white-nation',
+          periodStart: '2010',
+          periodEnd: '2023',
+          priority: 1,
+          spliceNote: 'BJS NPS, single metric ID, same seam caveat as the Black twin.',
+          seamCheck: {
+            type: 'unresolved',
+            seam_year_from: '2012',
+            seam_year_to: '2013',
+            value_from: 238,
+            value_to: 295,
+            divergence_pct: Number((((295 - 238) / 238) * 100).toFixed(2)),
+            note: 'Same unreconciled basis-mismatch caveat as the Black twin; 1978-2009 gap tracked on repo-77sl.',
+          },
+        },
+      ],
+    },
+    {
+      spineId: 'spine-admissions-share-black-us',
+      title: 'Black share of prison admissions, 1926–1986',
+      outcome: 'admissions-share',
+      raceSlice: 'black',
+      unit: 'percent',
+      definition:
+        'Black share of total State and Federal prison admissions (race-known base), national, from the BJS "Race of Prisoners Admitted to State and Federal Institutions, 1926-86" bulletin (Langan, NCJ-125618, Table 2).',
+      comparabilityNote:
+        'Single primary source, real reporting gaps preserved (no data 1951-59, 1961-63, 1965-69, 1971-73) — not to be confused with a rate; this is a SHARE of admissions, not admissions per capita. No white twin: the source reports White/Black/Other as shares of one total rather than as independent per-capita rates, so a "white share" spine would just be the complement and add no information.',
+      theme: 'justice',
+      segments: [
+        {
+          metricId: 'bjs-admissions-share-black-nation',
+          periodStart: '1926',
+          periodEnd: '1986',
+          priority: 1,
+          spliceNote: 'BJS Langan bulletin Table 2, single source, real gaps preserved.',
+          seamCheck: {
+            type: 'single-source',
+            note: 'No seam; genuine multi-year reporting gaps in the underlying NPS admission series.',
           },
         },
       ],
