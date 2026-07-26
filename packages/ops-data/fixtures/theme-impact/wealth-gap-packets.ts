@@ -156,7 +156,7 @@ const OBS = {
       source: CENSUS_INCOME_SOURCE,
       sourceUrl: CENSUS_INCOME_URL,
       retrievedAt: NOW,
-      contentHash: 'eyJtZXRyaWNJ',
+      contentHash: '23170bebf08194faf9ecd7320af877f57d1f0353414f42dea1ec519284685f2b',
       humanCitation:
         'U.S. Census Bureau, Historical Household Income Tables H-5, Black householders, 1972.',
     },
@@ -174,7 +174,10 @@ const OBS = {
       source: CENSUS_INCOME_SOURCE,
       sourceUrl: CENSUS_INCOME_URL,
       retrievedAt: NOW,
-      contentHash: 'spine:spine-median-hh-income-white-us:1972',
+      // Spine refs carry no canonical content_hash of their own; bind to the
+      // underlying source row (census-h5-median-hh-income-white-nh-nation:1972,
+      // estimate 64730), the real content this spliced spine value derives from.
+      contentHash: 'a813fa452ea4b0d5072b6a80e1fe17d05f200a4b60be47a4561f7f4746729ff8',
       humanCitation:
         'U.S. Census Bureau, Historical Household Income Tables H-5, White householders, 1972 (spine series spine-median-hh-income-white-us; series begins 1972).',
     },

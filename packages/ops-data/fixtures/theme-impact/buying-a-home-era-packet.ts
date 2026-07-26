@@ -218,7 +218,7 @@ const OBSERVATIONS: Observation[] = [
     label: 'Median household income, Black householders, United States, 1985',
     source: CENSUS_INCOME_SOURCE,
     sourceUrl: CENSUS_INCOME_URL,
-    contentHash: 'eyJtZXRyaWNJ',
+    contentHash: 'aecca67184ffc8d81c70d2a11ab1f5ec2c6ec83d50205ab15fd023c224292455',
     humanCitation:
       'U.S. Census Bureau, Historical Household Income Table H-5, median household income for Black householders, United States, 1985.',
   }),
@@ -231,7 +231,7 @@ const OBSERVATIONS: Observation[] = [
     label: 'Median household income, White non-Hispanic householders, United States, 1985',
     source: CENSUS_INCOME_SOURCE,
     sourceUrl: CENSUS_INCOME_URL,
-    contentHash: 'eyJtZXRyaWNJ',
+    contentHash: 'f63528bcc394a3f336380b2bc5b4fc46f3f9472363781a427b277b3eca53cef7',
     humanCitation:
       'U.S. Census Bureau, Historical Household Income Table H-5, median household income for White non-Hispanic householders, United States, 1985.',
   }),

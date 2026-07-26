@@ -25,6 +25,7 @@
  *   node --conditions development --import tsx \
  *     packages/ops-data/scripts/ingest-phase2-census-historical-income.ts
  */
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -65,6 +66,24 @@ const METRIC_IDS = {
 };
 
 const NATIONAL_JURISDICTION_ID = 'nation:US';
+
+/**
+ * Canonical value fingerprint for a statistical observation: full sha256 hex of
+ * a stable serialization of (metricId, referencePeriod, estimate). referencePeriod
+ * is the string form used on the stored row so the same hash is reproducible from
+ * the row alone (see scripts/backfill-census-income-hashes.ts). Replaces an
+ * earlier broken formula that base64-truncated to 12 chars — identical across all
+ * rows and not a hash — which wrote 222 placeholder 'eyJtZXRyaWNJ' content_hashes.
+ */
+function observationContentHash(
+  metricId: string,
+  referencePeriod: string,
+  estimate: number,
+): string {
+  return createHash('sha256')
+    .update(JSON.stringify({ metricId, referencePeriod, estimate }))
+    .digest('hex');
+}
 const DATASET_VINTAGE = 'Census CPS 1967-2024 (2025 release)';
 const CENSUS_HISTORICAL_INCOME_BOUNDARY_VERSION = 'nation-2024';
 
@@ -129,11 +148,7 @@ function parseCensusIncomeCsv(csvText: string): {
       race === 'Black Alone' ? 'black_alone' : 'white_nonhispanic';
 
     const id = `${metricId}:${NATIONAL_JURISDICTION_ID}:${year}`;
-    const contentHash = Buffer.from(
-      JSON.stringify({ metricId, year, estimate, race }),
-    )
-      .toString('base64')
-      .slice(0, 12);
+    const contentHash = observationContentHash(metricId, `${year}`, estimate);
 
     observations.push({
       id,
@@ -199,11 +214,7 @@ function parseCensusPovertyCsv(csvText: string): {
       race === 'Black Alone' ? 'black_alone' : 'white_nonhispanic';
 
     const id = `${metricId}:${NATIONAL_JURISDICTION_ID}:${year}`;
-    const contentHash = Buffer.from(
-      JSON.stringify({ metricId, year, estimate, race }),
-    )
-      .toString('base64')
-      .slice(0, 12);
+    const contentHash = observationContentHash(metricId, `${year}`, estimate);
 
     observations.push({
       id,
