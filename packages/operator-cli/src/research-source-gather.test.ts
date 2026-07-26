@@ -19,7 +19,23 @@ test('formatGatheredSourceSnippet labels prefetched vs fetched sources', () => {
   assert.match(formatted, /Anna Illinois/iu);
 
   const fetched = { ...prefetched!, fetched: true as const, finalUrl: prefetched!.url };
-  assert.match(formatGatheredSourceSnippet(fetched), /^Source: https:\/\//u);
+  assert.match(formatGatheredSourceSnippet(fetched), /^Source \(Tier: T2\): https:\/\//u);
+});
+
+test('formatGatheredSourceSnippet tags the source tier from the shared registry', () => {
+  const snippet = wrapPrefetchedSourceSnippet(
+    'https://census.gov/some-report',
+    'A'.repeat(150),
+  );
+  assert.ok(snippet);
+  assert.match(formatGatheredSourceSnippet(snippet!), /Tier: T1/u);
+
+  const untrusted = wrapPrefetchedSourceSnippet(
+    'https://random-blogspot-example.com/post',
+    'B'.repeat(150),
+  );
+  assert.ok(untrusted);
+  assert.match(formatGatheredSourceSnippet(untrusted!), /Tier: T4/u);
 });
 
 test('wrapPrefetchedSourceSnippet rejects text shorter than the usable threshold', () => {

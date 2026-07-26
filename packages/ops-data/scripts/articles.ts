@@ -23,6 +23,7 @@ import {
   assertArticleCitationIntegrity,
   publicArticleProjectionSchema,
 } from '@repo/schemas';
+import { lookupSourceTier, type SourceTier } from '@repo/domain';
 import { z } from 'zod';
 import pg from 'pg';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
@@ -72,9 +73,44 @@ async function loadFixtureArticles(paths: readonly string[]): Promise<readonly A
   return [...articles.values()];
 }
 
-/** Offline gates: schema (via loader) + inline-citation integrity. */
+/**
+ * Source-quality gate (consults the shared tier registry, not a parallel list — same
+ * rule theme-packets.ts's gateSourceTiers enforces for packet observations): every
+ * reference's url is classified into a trust tier. T4 (untrusted, unclassified) is a
+ * hard error on published articles and a surfaced warning otherwise.
+ */
+function gateArticleSourceTiers(article: ArticleAuthoring): {
+  tally: Record<SourceTier, number>;
+  warnings: string[];
+} {
+  const tally: Record<SourceTier, number> = { T1: 0, T2: 0, T3: 0, T4: 0 };
+  const warnings: string[] = [];
+  const errors: string[] = [];
+  for (const reference of article.references) {
+    let tier: SourceTier = 'T4';
+    try {
+      tier = lookupSourceTier(reference.url).tier;
+    } catch {
+      tier = 'T4';
+    }
+    tally[tier] += 1;
+    if (tier === 'T4') {
+      const message = `${article.id} / reference ${reference.id}: untrusted (T4) url ${JSON.stringify(reference.url)}`;
+      if (article.status === 'published') errors.push(message);
+      else warnings.push(message);
+    }
+  }
+  if (errors.length > 0) {
+    throw new Error(`source-tier gate failed (published articles):\n  ${errors.join('\n  ')}`);
+  }
+  return { tally, warnings };
+}
+
+/** Offline gates: schema (via loader) + inline-citation integrity + source-tier gate. */
 function validateArticleOffline(article: ArticleAuthoring): void {
   assertArticleCitationIntegrity(article);
+  const { warnings } = gateArticleSourceTiers(article);
+  for (const warning of warnings) console.warn(`warning: ${warning}`);
 }
 
 type PacketRow = {

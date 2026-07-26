@@ -66,6 +66,9 @@ export const SOURCE_TIER_RULES: readonly SourceTierRule[] = [
   { domain: 'dataverse.harvard.edu', tier: 'T2', rationale: 'Harvard Dataverse (deposited replication data)' },
   { domain: 'openicpsr.org', tier: 'T2', rationale: 'openICPSR replication archive' },
   { domain: 'icpsr.umich.edu', tier: 'T2', rationale: 'ICPSR data archive' },
+  { domain: 'fraser.stlouisfed.org', tier: 'T2', rationale: "FRASER — St. Louis Fed's federal document/economic history archive" },
+  { domain: 'supreme.justia.com', tier: 'T2', rationale: 'Justia Supreme Court — primary case-text archive' },
+  { domain: 'aeaweb.org', tier: 'T1', rationale: 'American Economic Association — peer-reviewed journal host' },
 
   // ---- T3: established nonprofits / journalism with named methodology ----
   { domain: 'vera.org', tier: 'T3', rationale: 'Vera Institute of Justice' },

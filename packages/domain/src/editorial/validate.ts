@@ -11,6 +11,7 @@ import {
   type LearningIndexContractIssue,
 } from '../learning-index/index.js';
 import { isValidTopicId } from '../taxonomy/topics.js';
+import { lookupSourceTier } from '../provenance/source-tiers.js';
 import { stripProseEntityLinks } from './prose-links.js';
 import type { EditorialClaimDraft, EditorialFieldDraft } from './packet.js';
 
@@ -55,6 +56,16 @@ function validateClaimDraft(claim: EditorialClaimDraft, index: number, issues: s
   }
   if (typeof claim.citationHref !== 'string' || !/^https?:\/\//u.test(claim.citationHref)) {
     issues.push(`claims[${index}]: citationHref must be an http(s) URL`);
+    return;
+  }
+  // A claim's only source is its citationHref, so "forbid T4-only claims" (repo-k2q3 crit 4)
+  // reduces to: that one URL must not classify as untrusted (T4). Same registry every
+  // surface consults (theme-packets.ts gateSourceTiers, articles.ts, this validator) —
+  // one policy module, not a parallel per-surface tier list.
+  if (lookupSourceTier(claim.citationHref).tier === 'T4') {
+    issues.push(
+      `claims[${index}]: citationHref is an untrusted (T4) source — claims must cite a T1-T3 source`,
+    );
   }
 }
 
