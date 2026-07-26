@@ -157,13 +157,149 @@
 
 /* Evidence blocks sit slightly wider than the prose measure */
 .ds-article__figure,
-.ds-article__stat,
 .ds-article__document,
 .ds-article__timeline,
 .ds-article__map,
 .ds-article__dispute,
 .ds-article__image {
   margin-block: var(--ds-space-2);
+}
+
+/* ----------------------------------------------------------------------------
+ * Collapsed evidence drawers. Native <details>; charts are never wrapped here.
+ * Begins closed so prose reads as prose; the reader opens the receipt on demand.
+ * ------------------------------------------------------------------------- */
+.ds-article__drawer {
+  margin-block: var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface-raised);
+  overflow: hidden;
+}
+
+.ds-article__drawer-summary {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-3) var(--ds-space-4);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  transition: background 120ms ease;
+}
+
+.ds-article__drawer-summary::-webkit-details-marker {
+  display: none;
+}
+
+.ds-article__drawer-summary:hover {
+  background: color-mix(in srgb, var(--ds-accent) 6%, transparent);
+}
+
+.ds-article__drawer-summary:focus-visible {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: -2px;
+}
+
+.ds-article__drawer-kind {
+  flex: none;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+}
+
+.ds-article__drawer-lead {
+  flex: 1 1 auto;
+  font-family: var(--ds-font-sans);
+  font-size: 0.95rem;
+  color: var(--ds-ink);
+}
+
+/* Chevron cue that rotates when the drawer opens. */
+.ds-article__drawer-cue {
+  flex: none;
+  align-self: center;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 2px solid var(--ds-ink-subtle);
+  border-bottom: 2px solid var(--ds-ink-subtle);
+  transform: rotate(45deg);
+  transition: transform 160ms ease;
+}
+
+.ds-article__drawer[open] .ds-article__drawer-cue {
+  transform: rotate(-135deg);
+}
+
+.ds-article__drawer-body {
+  padding: 0 var(--ds-space-4) var(--ds-space-4);
+}
+
+/* The wrapped artifact loses its own outer card chrome inside the drawer. */
+.ds-article__drawer-body .ds-article__document {
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-article__drawer-cue,
+  .ds-article__drawer-summary {
+    transition: none;
+  }
+}
+
+/* ----------------------------------------------------------------------------
+ * Stat rail — consecutive figures as one compact comparison strip, not a wall
+ * of stacked cards. Two-up when the run is a pair; auto-fit otherwise.
+ * ------------------------------------------------------------------------- */
+.ds-article__statrail {
+  margin-block: var(--ds-space-4);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: var(--ds-space-3);
+}
+
+.ds-article__statrail[data-count='2'] {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.ds-article__statcell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-1);
+  padding: var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  border-left: 3px solid var(--ds-accent);
+  background: var(--ds-surface-raised);
+}
+
+.ds-article__statfigure {
+  font-family: var(--ds-font-display);
+  font-size: clamp(1.6rem, 2vw + 1rem, 2.25rem);
+  line-height: 1.05;
+  color: var(--ds-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-article__statlabel {
+  font-family: var(--ds-font-sans);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--ds-ink-muted);
+}
+
+.ds-article__statcell .ds-article-source-line {
+  margin-top: auto;
+}
+
+@media (max-width: 30rem) {
+  .ds-article__statrail,
+  .ds-article__statrail[data-count='2'] {
+    grid-template-columns: 1fr;
+  }
 }
 
 .ds-article__source-line {
