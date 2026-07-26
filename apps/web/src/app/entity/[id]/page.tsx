@@ -39,6 +39,7 @@ import {
   getPublicSearchIndex,
   resolvePublicEntityView,
 } from '../../../lib/public-data/source';
+import { shouldUseLivePublicProjections } from '../../../lib/public-data/live-policy';
 import { resolveEntityCrossReferences } from '../../../lib/theme-impact/source';
 import { isDisplayableJurisdictionLabel } from '../../../lib/public-data/map-projection';
 import {
@@ -83,6 +84,12 @@ function entityLinkCatalogFromNeighbors(
 }
 
 export async function generateStaticParams() {
+  // Build time has no live Postgres connection (App Hosting mounts DATABASE_URL at runtime
+  // only) — skip enumeration rather than throw. This route is force-dynamic, so an empty
+  // static param list is harmless; every id still renders on-demand at request time.
+  if (!shouldUseLivePublicProjections()) {
+    return [];
+  }
   const { data: index } = await getPublicSearchIndex();
   return index.map((doc) => ({ id: doc.id }));
 }
