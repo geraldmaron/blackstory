@@ -19,6 +19,7 @@ export const THEME_IMPACT_THEME_IDS = [
   'environmental_racism',
   'school_segregation',
   'voting_rights',
+  'wealth_gap',
   'cross_cutting',
 ] as const;
 
@@ -369,6 +370,17 @@ export const THEME_IMPACT_QUESTIONS: readonly ThemeImpactQuestion[] = [
       'primary_government_document',
       'peer_reviewed_synthesis',
     ],
+  },
+  {
+    id: 'Q13',
+    themeId: 'wealth_gap',
+    priority: 'P1',
+    question:
+      'Across eras from emancipation to the present, how wide has the Black–White wealth gap been, and how has it moved?',
+    answerShape: 'era_indicators',
+    policyEraFamily: 'none',
+    metricBindings: [],
+    artifactClasses: ['peer_reviewed_synthesis', 'primary_government_document'],
   },
 ];
 

@@ -21,6 +21,7 @@ const THEME_IMPACT_THEME_IDS_MIRROR = [
   'environmental_racism',
   'school_segregation',
   'voting_rights',
+  'wealth_gap',
   'cross_cutting',
 ] as const;
 
