@@ -1,0 +1,466 @@
+/**
+ * Seed the trustworthy national spine series (repo-zxjz.11, first pass).
+ *
+ * Assembles the spine_series / spine_segments rows for the FOUR data domains
+ * that passed value-validation (see repo-ypfp / repo-gfyn for the two that did
+ * NOT and are deliberately excluded here):
+ *   1. Wealth ratio, mean per-capita   — DKKS 1860-2019 (single authentic backbone)
+ *   2. Wealth ratio, median household   — SCF 1989-2022 (computed here as a derived
+ *      ratio; kept as a SEPARATE spine, never spliced onto #1, because mean-per-capita
+ *      and median-household measure different gaps)
+ *   3. Homeownership (Black + White NH) — decennial 1900-2000 + ACS 2005-2024
+ *   4. Life expectancy (Black + White)  — NCHS 1900-2021 (single source; race-label
+ *      seam nonwhite/colored -> Black at 1980 documented in comparability_note)
+ *   5. Turnout (Black + White)          — CPS A-1 1980-2020 (single source)
+ *
+ * DELIBERATELY EXCLUDED until their data is re-ingested from real sources:
+ *   - imprisonment rate + admissions share (fabricated, repo-ypfp)
+ *   - median household income + poverty rate (smoothed/rounded, repo-gfyn)
+ *   - unemployment (BLS API rate-limited, never ingested)
+ *
+ * Idempotent: re-running replaces the spine rows and upserts the SCF ratio.
+ *
+ * Usage (repo root):
+ *   # Dry-run (default)
+ *   node --conditions development --import tsx \
+ *     packages/ops-data/scripts/seed-spine-series-clean.ts
+ *
+ *   # Apply
+ *   DRY_RUN=0 SEED_SPINE_CLEAN_APPLY=1 DATABASE_URL=postgresql://... \
+ *     node --conditions development --import tsx \
+ *     packages/ops-data/scripts/seed-spine-series-clean.ts
+ */
+import { createHash } from 'node:crypto';
+import pg from 'pg';
+import { normalizePgConnectionString } from './lib/pg-connection.ts';
+
+const DRY_RUN = process.env.DRY_RUN !== '0';
+const APPLY = process.env.SEED_SPINE_CLEAN_APPLY === '1';
+
+const SCF_RATIO_METRIC = 'scf-wealth-ratio-white-black-nation';
+const SCF_SOURCE = 'fed-survey-consumer-finances';
+const SCF_SOURCE_URL =
+  'https://www.federalreserve.gov/econres/notes/feds-notes/greater-wealth-greater-uncertainty-changes-in-racial-inequality-in-the-survey-of-consumer-finances-accessible-20231018.htm';
+
+type SpineSeed = {
+  spineId: string;
+  title: string;
+  outcome: string;
+  raceSlice: string | null;
+  unit: string;
+  definition: string;
+  comparabilityNote: string;
+  theme: string;
+  segments: Array<{
+    metricId: string;
+    periodStart: string;
+    periodEnd: string;
+    priority: number;
+    spliceNote: string;
+    seamCheck: Record<string, unknown>;
+  }>;
+};
+
+function hash(...parts: Array<string | number>): string {
+  return createHash('sha256').update(parts.join('|')).digest('hex');
+}
+
+async function computeScfRatio(pool: pg.Pool) {
+  const q = async (metric: string) => {
+    const r = await pool.query<{ id: string; reference_period: string; estimate: string }>(
+      `SELECT id, reference_period, estimate FROM bb_reference.statistical_observations
+       WHERE metric_id=$1 ORDER BY reference_period`,
+      [metric],
+    );
+    return r.rows;
+  };
+  const black = await q('scf-median-wealth-black-nation');
+  const white = await q('scf-median-wealth-white-nation');
+  const whiteByYear = new Map(white.map((r) => [r.reference_period, r]));
+  const rows = [];
+  for (const b of black) {
+    const w = whiteByYear.get(b.reference_period);
+    if (!w) continue;
+    const bv = Number(b.estimate);
+    const wv = Number(w.estimate);
+    if (!bv) continue;
+    rows.push({
+      year: b.reference_period,
+      value: wv / bv,
+      inputIds: [w.id, b.id],
+      whiteVal: wv,
+      blackVal: bv,
+    });
+  }
+  return rows;
+}
+
+async function main() {
+  const conn = normalizePgConnectionString(process.env.DATABASE_URL!);
+  const pool = new pg.Pool({
+    connectionString: conn.connectionString,
+    ...(conn.ssl ? { ssl: conn.ssl } : {}),
+  });
+  const now = new Date().toISOString();
+
+  const scfRatio = await computeScfRatio(pool);
+  if (scfRatio.length < 10) {
+    throw new Error(`SCF ratio computed only ${scfRatio.length} years — expected 12; aborting.`);
+  }
+
+  const spines: SpineSeed[] = [
+    {
+      spineId: 'spine-wealth-ratio-white-black-us',
+      title: 'The white-to-Black wealth ratio (mean per capita), 1860–2019',
+      outcome: 'wealth-ratio-mean-percapita',
+      raceSlice: null,
+      unit: 'ratio',
+      definition:
+        'Ratio of white to Black per-capita wealth, national, from Derenoncourt, Kim, Kuhn & Schularick, "Wealth of Two Nations" (QJE 2024). Benchmark years only (census years, early state tax records, SCF survey years) — the authors do not publish an annual series.',
+      comparabilityNote:
+        'Single authentic source across the whole span; no splice. This is a MEAN per-capita ratio and is a different measure from the median-household ratio in spine-wealth-ratio-median-hh-white-black-us — the two are companions, never to be joined into one line. Note the 1929 benchmark lacks a usable white value in the source and is omitted from the segment (it would otherwise resolve to a spurious 0).',
+      theme: 'wealth',
+      segments: [
+        {
+          metricId: 'dkks-wealth-ratio-white-black-nation',
+          periodStart: '1860',
+          periodEnd: '2019',
+          priority: 1,
+          spliceNote: 'DKKS benchmark-year mean per-capita ratio, full span, single source.',
+          seamCheck: { type: 'single-source', note: 'No seam; one source across 1860–2019.' },
+        },
+      ],
+    },
+    {
+      spineId: 'spine-wealth-ratio-median-hh-white-black-us',
+      title: 'The white-to-Black wealth ratio (median household), 1989–2022',
+      outcome: 'wealth-ratio-median-household',
+      raceSlice: null,
+      unit: 'ratio',
+      definition:
+        'Ratio of white to Black median family net worth, national, computed from the Federal Reserve Survey of Consumer Finances triennial series (2022 dollars). Registered as derived_measurements with formula white_median / black_median.',
+      comparabilityNote:
+        'MEDIAN household measure — captures the typical family and is far more volatile than the mean per-capita ratio (spikes to ~10.8x after the 2008 crisis as Black median wealth collapsed). Deliberately a SEPARATE spine from the DKKS mean ratio; the two answer different questions and must not be spliced. 1989 (17.8x) is a genuine SCF outlier (Black median net worth of $9,200), retained as reported.',
+      theme: 'wealth',
+      segments: [
+        {
+          metricId: SCF_RATIO_METRIC,
+          periodStart: '1989',
+          periodEnd: '2022',
+          priority: 1,
+          spliceNote: 'SCF triennial median-household ratio, single source.',
+          seamCheck: { type: 'single-source', note: 'No seam; one source across 1989–2022.' },
+        },
+      ],
+    },
+    {
+      spineId: 'spine-homeownership-black-us',
+      title: 'Black homeownership rate, 1900–2024',
+      outcome: 'homeownership-rate',
+      raceSlice: 'black',
+      unit: 'percent',
+      definition:
+        'Share of Black households owning their home, national. Decennial census 1900–2000 spliced to ACS 1-year 2005–2024.',
+      comparabilityNote:
+        'Two instruments: decennial full-count (1900–2000) and ACS survey (2005–2024). No overlapping years; the seam is a 5-year adjacency at 2000→2005. Divergence at the seam is small and directionally consistent with the early-2000s ownership boom.',
+      theme: 'housing',
+      segments: [
+        {
+          metricId: 'census-decennial-homeownership-black-nation',
+          periodStart: '1900',
+          periodEnd: '2000',
+          priority: 2,
+          spliceNote: 'Decennial census full count; wins its own span (ACS does not cover it).',
+          seamCheck: {
+            type: 'adjacency',
+            seam_year_from: '2000',
+            seam_year_to: '2005',
+            value_from: 46.3,
+            value_to: 49.3,
+            gap_years: 5,
+            divergence_pct: Number((((49.3 - 46.3) / 46.3) * 100).toFixed(2)),
+            note: 'Decennial 2000 (46.3%) to ACS 2005 (49.3%): +3.0pp over 5 years, plausible boom-era rise; instruments differ (full count vs survey).',
+          },
+        },
+        {
+          metricId: 'acs-homeownership-rate-black-nation',
+          periodStart: '2005',
+          periodEnd: '2024',
+          priority: 1,
+          spliceNote: 'ACS 1-year survey; wins 2005–2024 (no 2020 standard 1-year release).',
+          seamCheck: {},
+        },
+      ],
+    },
+    {
+      spineId: 'spine-homeownership-white-us',
+      title: 'White (non-Hispanic) homeownership rate, 1900–2024',
+      outcome: 'homeownership-rate',
+      raceSlice: 'white-non-hispanic',
+      unit: 'percent',
+      definition:
+        'Share of white non-Hispanic households owning their home, national. Decennial census 1900–2000 spliced to ACS 1-year 2005–2024.',
+      comparabilityNote:
+        'Same two-instrument structure as the Black spine. Seam is a 5-year adjacency at 2000→2005 (73.1%→74.8%, +1.7pp), small and boom-consistent.',
+      theme: 'housing',
+      segments: [
+        {
+          metricId: 'census-decennial-homeownership-white_nh-nation',
+          periodStart: '1900',
+          periodEnd: '2000',
+          priority: 2,
+          spliceNote: 'Decennial census full count.',
+          seamCheck: {
+            type: 'adjacency',
+            seam_year_from: '2000',
+            seam_year_to: '2005',
+            value_from: 73.1,
+            value_to: 74.8,
+            gap_years: 5,
+            divergence_pct: Number((((74.8 - 73.1) / 73.1) * 100).toFixed(2)),
+            note: 'Decennial 2000 (73.1%) to ACS 2005 (74.8%): +1.7pp over 5 years.',
+          },
+        },
+        {
+          metricId: 'acs-homeownership-rate-white_nh-nation',
+          periodStart: '2005',
+          periodEnd: '2024',
+          priority: 1,
+          spliceNote: 'ACS 1-year survey.',
+          seamCheck: {},
+        },
+      ],
+    },
+    {
+      spineId: 'spine-life-expectancy-black-us',
+      title: 'Black life expectancy at birth, 1900–2021',
+      outcome: 'life-expectancy-birth',
+      raceSlice: 'black',
+      unit: 'years',
+      definition:
+        'Life expectancy at birth for the Black population, national, from NCHS historical life tables.',
+      comparabilityNote:
+        'Single NCHS source, but the race label changes over time: "nonwhite" (1900–1940, 1970), "colored" (1950–1960), and true "Black" only from 1980 on. Pre-1980 values are a nonwhite/colored PROXY for Black and should be read as such — this is a within-series definitional seam at 1980, not a source splice. Includes the real 2015–2017 stagnation and the 2020–2021 COVID collapse (74.8→70.8).',
+      theme: 'health',
+      segments: [
+        {
+          metricId: 'nchs-life-expectancy-birth-black-nation',
+          periodStart: '1900',
+          periodEnd: '2021',
+          priority: 1,
+          spliceNote:
+            'Single source; race-label proxy seam at 1980 (nonwhite/colored before, Black after) documented in comparability_note.',
+          seamCheck: {
+            type: 'definitional',
+            seam_year: '1980',
+            note: 'Label transitions nonwhite/colored -> Black at 1980; pre-1980 is a proxy.',
+          },
+        },
+      ],
+    },
+    {
+      spineId: 'spine-life-expectancy-white-us',
+      title: 'White life expectancy at birth, 1900–2021',
+      outcome: 'life-expectancy-birth',
+      raceSlice: 'white',
+      unit: 'years',
+      definition:
+        'Life expectancy at birth for the white population, national, from NCHS historical life tables.',
+      comparabilityNote:
+        'Single NCHS source. White labeling is stable across the span (unlike the Black spine). Includes the 2020–2021 COVID decline (78.8→76.1).',
+      theme: 'health',
+      segments: [
+        {
+          metricId: 'nchs-life-expectancy-birth-white-nation',
+          periodStart: '1900',
+          periodEnd: '2021',
+          priority: 1,
+          spliceNote: 'Single source, stable white definition.',
+          seamCheck: { type: 'single-source', note: 'No seam.' },
+        },
+      ],
+    },
+    {
+      spineId: 'spine-turnout-black-us',
+      title: 'Black voter turnout (citizen), presidential years 1980–2020',
+      outcome: 'voter-turnout-citizen',
+      raceSlice: 'black',
+      unit: 'percent',
+      definition:
+        'Reported voting rate as a share of Black citizens, presidential elections, from Census CPS Table A-1.',
+      comparabilityNote:
+        'Single CPS source. COVERAGE GAP: only presidential years 1980–2020 landed; the 1964/68/72/76 elections and 2024 are not yet ingested (tracked on repo-zxjz.8). Do not present as a full 1964-onward series until backfilled.',
+      theme: 'political-participation',
+      segments: [
+        {
+          metricId: 'cps-a1-turnout-black-nation',
+          periodStart: '1980',
+          periodEnd: '2020',
+          priority: 1,
+          spliceNote: 'CPS A-1 citizen turnout; single source; pre-1980 not yet ingested.',
+          seamCheck: {
+            type: 'single-source',
+            note: 'No seam; coverage 1980–2020 only (pre-1980 + 2024 pending, repo-zxjz.8).',
+          },
+        },
+      ],
+    },
+    {
+      spineId: 'spine-turnout-white-us',
+      title: 'White voter turnout (citizen), presidential years 1980–2020',
+      outcome: 'voter-turnout-citizen',
+      raceSlice: 'white',
+      unit: 'percent',
+      definition:
+        'Reported voting rate as a share of white citizens, presidential elections, from Census CPS Table A-1.',
+      comparabilityNote:
+        'Single CPS source. Same 1980–2020 coverage gap as the Black turnout spine (repo-zxjz.8).',
+      theme: 'political-participation',
+      segments: [
+        {
+          metricId: 'cps-a1-turnout-white-nation',
+          periodStart: '1980',
+          periodEnd: '2020',
+          priority: 1,
+          spliceNote: 'CPS A-1 citizen turnout; single source.',
+          seamCheck: {
+            type: 'single-source',
+            note: 'No seam; coverage 1980–2020 only.',
+          },
+        },
+      ],
+    },
+  ];
+
+  const plan = {
+    scfRatioYears: scfRatio.map((r) => r.year),
+    scfRatioSample: scfRatio.slice(0, 3).map((r) => `${r.year}=${r.value.toFixed(3)}`),
+    spineCount: spines.length,
+    segmentCount: spines.reduce((n, s) => n + s.segments.length, 0),
+    spineIds: spines.map((s) => s.spineId),
+  };
+  console.log(JSON.stringify({ dryRun: DRY_RUN || !APPLY, plan }, null, 2));
+
+  if (DRY_RUN || !APPLY) {
+    console.log('\nDry-run only. Set DRY_RUN=0 SEED_SPINE_CLEAN_APPLY=1 to apply.');
+    await pool.end();
+    return;
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    // 1. SCF ratio statistical_series
+    await client.query(
+      `INSERT INTO bb_reference.statistical_series
+         (metric_id, metric_definition, universe, unit, source_dataset, source_table, source_variable,
+          geography_type, estimate_type, period_type, external_data_source_id, theme, metadata)
+       VALUES ($1,$2,$3,'ratio',$4,'SCF bulletin (derived)','median_net_worth_white / median_net_worth_black',
+          'nation','ratio','point-in-time',$4,'wealth', $5::jsonb)
+       ON CONFLICT (metric_id) DO UPDATE SET updated_at=now()`,
+      [
+        SCF_RATIO_METRIC,
+        'White-to-Black median family net worth ratio, national, computed from SCF median wealth series (2022 dollars).',
+        'as published by source',
+        SCF_SOURCE,
+        JSON.stringify({ raceEthnicitySlice: null, derived: true }),
+      ],
+    );
+
+    // 2. SCF ratio observations + derived_measurements audit
+    for (const r of scfRatio) {
+      const obsId = `obs:${SCF_RATIO_METRIC}:nation:US:${r.year}`;
+      const ch = hash(SCF_RATIO_METRIC, r.year, r.whiteVal, r.blackVal);
+      await client.query(
+        `INSERT INTO bb_reference.statistical_observations
+           (id, metric_id, jurisdiction_id, boundary_version, reference_period, dataset_vintage,
+            estimate, race_ethnicity_slice, status, source, source_url, retrieved_at, content_hash, metadata)
+         VALUES ($1,$2,'nation:US','nation-2022',$3,$4,$5,NULL,'observed',$6,$7,$8,$9,$10::jsonb)
+         ON CONFLICT (id) DO UPDATE SET estimate=EXCLUDED.estimate, content_hash=EXCLUDED.content_hash`,
+        [
+          obsId,
+          SCF_RATIO_METRIC,
+          r.year,
+          'SCF triennial bulletin — derived white/black median net worth ratio (2022 dollars)',
+          r.value,
+          SCF_SOURCE,
+          SCF_SOURCE_URL,
+          now,
+          ch,
+          JSON.stringify({
+            humanCitation: `White-to-Black median family net worth ratio, ${r.year}, computed from SCF (2022 dollars): ${r.whiteVal} / ${r.blackVal}.`,
+            derived: true,
+          }),
+        ],
+      );
+      const dmId = `dm:${SCF_RATIO_METRIC}:${r.year}`;
+      await client.query(
+        `INSERT INTO bb_reference.derived_measurements
+           (id, method_id, method_version, input_observation_ids, value, formula, assumptions, status,
+            generated_at, jurisdiction_id, reference_period, metric_id, source, source_url, content_hash, metadata)
+         VALUES ($1,'ratio-of-medians','1',$2,$3,$4,$5,'derived',$6,'nation:US',$7,$8,$9,$10,$11,$12::jsonb)
+         ON CONFLICT (id) DO UPDATE SET value=EXCLUDED.value, content_hash=EXCLUDED.content_hash`,
+        [
+          dmId,
+          r.inputIds,
+          r.value,
+          'white_median_net_worth / black_median_net_worth',
+          ['Both inputs are SCF median family net worth in 2022 dollars, same vintage.'],
+          now,
+          r.year,
+          SCF_RATIO_METRIC,
+          SCF_SOURCE,
+          SCF_SOURCE_URL,
+          hash('dm', SCF_RATIO_METRIC, r.year, r.value),
+          JSON.stringify({ whiteInput: r.whiteVal, blackInput: r.blackVal }),
+        ],
+      );
+    }
+
+    // 3. spine_series + spine_segments (replace)
+    for (const s of spines) {
+      await client.query(`DELETE FROM bb_reference.spine_segments WHERE spine_id=$1`, [s.spineId]);
+      await client.query(`DELETE FROM bb_reference.spine_series WHERE spine_id=$1`, [s.spineId]);
+      await client.query(
+        `INSERT INTO bb_reference.spine_series
+           (spine_id, title, outcome, race_ethnicity_slice, geography_type, unit, definition, comparability_note, theme, status)
+         VALUES ($1,$2,$3,$4,'nation',$5,$6,$7,$8,'review')`,
+        [s.spineId, s.title, s.outcome, s.raceSlice, s.unit, s.definition, s.comparabilityNote, s.theme],
+      );
+      let i = 0;
+      for (const seg of s.segments) {
+        await client.query(
+          `INSERT INTO bb_reference.spine_segments
+             (id, spine_id, metric_id, period_start, period_end, priority, splice_note, seam_check)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8::jsonb)`,
+          [
+            `${s.spineId}:seg${i}`,
+            s.spineId,
+            seg.metricId,
+            seg.periodStart,
+            seg.periodEnd,
+            seg.priority,
+            seg.spliceNote,
+            JSON.stringify(seg.seamCheck),
+          ],
+        );
+        i += 1;
+      }
+    }
+
+    await client.query('COMMIT');
+    console.log(`\nApplied: SCF ratio (${scfRatio.length} obs + derived), ${spines.length} spines, ${plan.segmentCount} segments.`);
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
+  await pool.end();
+}
+
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
