@@ -142,6 +142,34 @@ function validatePacketShape(packet: ThemeImpactPacket): void {
   }
 }
 
+const SHA256_HEX = /^[0-9a-f]{64}$/;
+
+/**
+ * Offline hash-discipline lint (always on, no DB required): every observation's
+ * provenance.contentHash must be a 64-char lowercase hex sha256. This alone
+ * catches placeholder hashes — e.g. wealth-gap-packets.ts once carried
+ * 'eyJtZXRyaWNJ' (truncated base64) and a literal spine-id string, both of which
+ * passed the old shape-only validate and would have shipped fabricated figures.
+ */
+function lintObservationHashes(packets: readonly ThemeImpactPacket[]): void {
+  const problems: string[] = [];
+  for (const packet of packets) {
+    for (const observation of packet.observations) {
+      const hash = observation.provenance.contentHash;
+      if (!SHA256_HEX.test(hash)) {
+        problems.push(
+          `${packet.id} / ${observation.observationId}: contentHash is not 64-char lowercase hex sha256 (got ${JSON.stringify(
+            hash.length > 24 ? `${hash.slice(0, 24)}…` : hash,
+          )})`,
+        );
+      }
+    }
+  }
+  if (problems.length > 0) {
+    throw new Error(`contentHash format lint failed:\n  ${problems.join('\n  ')}`);
+  }
+}
+
 /**
  * Every observation a packet cites must exist verbatim in canonical
  * statistical_observations — at every lifecycle status, not just publish.
@@ -280,11 +308,28 @@ async function withDb<T>(run: (ctx: DbContext) => Promise<T>): Promise<T> {
 async function commandValidate(paths: readonly string[]): Promise<void> {
   const packets = await loadFixturePackets(paths);
   for (const packet of packets) validatePacketShape(packet);
+  // Offline gate: hash-format discipline runs on every validate, DB or not.
+  lintObservationHashes(packets);
+
+  // DB-binding gate: when DATABASE_URL is present, every observation must match
+  // its canonical statistical_observations / spine row exactly (estimate,
+  // period, source, contentHash). Skipped only when offline (CI-safe).
+  let bound: 'db-verified' | 'offline-skipped' = 'offline-skipped';
+  let verifiedObservations = 0;
+  if (process.env.DATABASE_URL?.trim()) {
+    verifiedObservations = await withDb(({ client }) =>
+      verifyObservationsAgainstCanonical(client, packets),
+    );
+    bound = 'db-verified';
+  }
+
   console.log(
     JSON.stringify(
       {
         command: 'validate',
         ok: true,
+        bound,
+        verifiedObservations,
         packets: packets.map((packet) => ({
           id: packet.id,
           status: packet.status,

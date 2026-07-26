@@ -302,11 +302,26 @@ function contentHash(payload: unknown): string {
 async function commandValidate(paths: readonly string[]): Promise<void> {
   const articles = await loadFixtureArticles(paths);
   for (const article of articles) validateArticleOffline(article);
+
+  // DB-binding gate: when DATABASE_URL is present, transitively resolve every
+  // figure/stat/primaryDocument/timeline refId against its published packet's
+  // rows (and mapInset entities against the release), so a validate that passes
+  // with DB access proves the article's citations actually exist. Skipped when
+  // offline (CI-safe); offline still runs schema + inline-citation integrity.
+  let bound: 'db-verified' | 'offline-skipped' = 'offline-skipped';
+  if (process.env.DATABASE_URL?.trim()) {
+    await withDb(async ({ client }) => {
+      for (const article of articles) await verifyArticleReferences(client, article);
+    });
+    bound = 'db-verified';
+  }
+
   console.log(
     JSON.stringify(
       {
         command: 'validate',
         ok: true,
+        bound,
         articles: articles.map((a) => ({
           id: a.id,
           slug: a.slug,
