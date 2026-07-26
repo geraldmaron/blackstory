@@ -86,7 +86,7 @@ export type BackfillReport = {
 };
 
 /** Persist one capture + its retrieval event; DB dedups on (algorithm, digest). */
-async function persist(
+export async function persistCapture(
   db: CaptureDb,
   capture: SourceCaptureRow | null,
   event: RetrievalEventRow,
@@ -164,7 +164,7 @@ export async function runCaptureBackfill(
   for (const ref of target) {
     perSurface[ref.surface].attempted += 1;
     const outcome = await captureCitedUrl(ref, captureDeps);
-    const { deduped: wasDup } = await persist(db, outcome.capture, outcome.retrievalEvent);
+    const { deduped: wasDup } = await persistCapture(db, outcome.capture, outcome.retrievalEvent);
     if (outcome.status === 'failure') {
       failed += 1;
     } else if (wasDup) {

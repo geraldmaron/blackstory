@@ -183,6 +183,27 @@ export async function captureCitedUrl(ref: CitedUrl, deps: CaptureDeps): Promise
     };
   }
 
+  const { capture, retrievalEvent } = await buildCaptureFromFetch(
+    ref,
+    result,
+    deps,
+    'capture-backfill',
+  );
+  return { url: ref.url, surface: ref.surface, refId: ref.refId, status: 'success', capture, retrievalEvent };
+}
+
+/**
+ * Build the capture + success retrieval-event rows from an already-successful safe-fetch
+ * result — no fetch of its own. Shared by the backfill lane (which fetched via captureCitedUrl)
+ * and research-intake (which already holds the fetch result), so both persist identical rows.
+ */
+export async function buildCaptureFromFetch(
+  ref: CitedUrl,
+  result: Extract<SafeFetchResult, { ok: true }>,
+  deps: Pick<CaptureDeps, 'storage' | 'parserVersion' | 'newId' | 'now'>,
+  adapterId: string,
+): Promise<{ capture: SourceCaptureRow; retrievalEvent: RetrievalEventRow }> {
+  const occurredAt = deps.now();
   const storageObject = await deps.storage.store({
     url: ref.url,
     sha256: result.contentHash,
@@ -190,12 +211,7 @@ export async function captureCitedUrl(ref: CitedUrl, deps: CaptureDeps): Promise
     byteLength: result.byteLength,
     text: result.parser.extractedText,
   });
-
   return {
-    url: ref.url,
-    surface: ref.surface,
-    refId: ref.refId,
-    status: 'success',
     capture: {
       id: deps.newId('cap', result.contentHash),
       sourceItemId: null,
@@ -210,7 +226,7 @@ export async function captureCitedUrl(ref: CitedUrl, deps: CaptureDeps): Promise
     retrievalEvent: {
       id: deps.newId('rev', `${ref.url}|ok|${occurredAt}`),
       sourceId: ref.refId,
-      adapterId: 'capture-backfill',
+      adapterId,
       status: 'success',
       httpStatus: 200,
       detail: {

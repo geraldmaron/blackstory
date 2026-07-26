@@ -22,6 +22,24 @@ import {
   type OperatorIntakeContext,
   type OperatorIntakeOutcome,
 } from './intake.js';
+import {
+  buildCaptureFromFetch,
+  type CaptureStorage,
+  type SourceCaptureRow,
+  type RetrievalEventRow,
+} from './source-capture.js';
+
+/**
+ * Optional capture sink. When provided, a successful research-intake fetch is persisted as a
+ * real bb_evidence.source_capture (+ retrieval_event) instead of only planning one — closing
+ * the no-op that let intake-cited URLs go uncaptured.
+ */
+export type ResearchCaptureSink = {
+  readonly storage: CaptureStorage;
+  readonly parserVersion?: string;
+  readonly newId: (prefix: string, seed: string) => string;
+  persist: (capture: SourceCaptureRow, event: RetrievalEventRow) => Promise<void>;
+};
 
 export type ResearchIntakeInput = {
   readonly url: string;
@@ -37,6 +55,8 @@ export type ResearchIntakeOutcome = {
   readonly fetch: SafeFetchResult;
   readonly citation?: CitationPrefill;
   readonly capturePlan?: CapturePlan;
+  /** Present when a capture sink is wired and the fetch succeeded: the persisted capture id. */
+  readonly capture?: { readonly captureId: string; readonly contentHash: string };
   readonly intake?: OperatorIntakeOutcome;
 };
 
@@ -50,6 +70,7 @@ export async function runResearchIntake(
   input: ResearchIntakeInput,
   context: OperatorIntakeContext,
   dependencies: SafeFetchDependencies = createNodeSafeFetchDependencies(),
+  captureSink?: ResearchCaptureSink,
 ): Promise<ResearchIntakeOutcome> {
   const fetchResult = await runQuickAddFetch(input.url, dependencies);
   if (!fetchResult.ok) {
@@ -59,6 +80,23 @@ export async function runResearchIntake(
   const now = new Date(context.nowMs ?? Date.now()).toISOString();
   const citation = buildCitationPrefill(input.url, fetchResult, now);
   const capturePlan = planSelectiveCapture(fetchResult);
+
+  let capture: ResearchIntakeOutcome['capture'];
+  if (captureSink) {
+    const { capture: row, retrievalEvent } = await buildCaptureFromFetch(
+      { url: input.url, surface: 'entity', refId: input.targetRecordId ?? input.url },
+      fetchResult,
+      {
+        storage: captureSink.storage,
+        parserVersion: captureSink.parserVersion ?? 'research-intake-v1',
+        newId: captureSink.newId,
+        now: () => now,
+      },
+      'research-intake',
+    );
+    await captureSink.persist(row, retrievalEvent);
+    capture = { captureId: row.id, contentHash: row.contentHashDigest };
+  }
 
   const title = input.title ?? citation.suggestedTitle;
   const description = input.description?.trim() || citation.excerpt;
@@ -80,5 +118,5 @@ export async function runResearchIntake(
     context,
   );
 
-  return { fetch: fetchResult, citation, capturePlan, intake };
+  return { fetch: fetchResult, citation, capturePlan, ...(capture ? { capture } : {}), intake };
 }

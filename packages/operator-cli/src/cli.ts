@@ -51,7 +51,8 @@ import { prepareStoryPacketIntake } from './story-intake.js';
 import { prepareEdgeIntake, type EdgeIntakeInput } from './edge-intake.js';
 import { createNodeSafeFetchDependencies, runQuickAddFetch } from './fetch.js';
 import { createMetadataOnlyStorage, type CaptureDeps } from './source-capture.js';
-import { runCaptureBackfill } from './capture-backfill.js';
+import { runCaptureBackfill, persistCapture } from './capture-backfill.js';
+import type { ResearchCaptureSink } from './research-intake.js';
 import { createHash } from 'node:crypto';
 import { OPERATOR_SOURCES, type OperatorIdentity, type OperatorSource } from './identity.js';
 import {
@@ -458,6 +459,20 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         const targetRecordId = optionalFlag(flags, '--target-record-id');
         const contact = optionalFlag(flags, '--contact');
         const fetchDependencies = deps.fetchDependencies ?? createNodeSafeFetchDependencies();
+        // With --commit, persist a real evidence capture for the fetched URL instead of
+        // only planning one; without it, intake stays a dry preview (no DB write).
+        let researchCaptureSink: ResearchCaptureSink | undefined;
+        if (flags.booleans.has('--commit')) {
+          const pool = getOpsPostgresPool(process.env);
+          researchCaptureSink = {
+            storage: createMetadataOnlyStorage(),
+            newId: (prefix, seed) =>
+              `${prefix}_${createHash('sha1').update(seed).digest('hex').slice(0, 16)}`,
+            persist: async (capture, event) => {
+              await persistCapture(pool, capture, event);
+            },
+          };
+        }
         const research = await runResearchIntake(
           {
             url: requireFlag(flags, '--url'),
@@ -470,6 +485,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
           },
           buildContext(flags, deps),
           fetchDependencies,
+          researchCaptureSink,
         );
         if (!research.fetch.ok) {
           stdout(JSON.stringify({ fetch: research.fetch }, null, 2));
@@ -488,6 +504,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
               },
               citation: research.citation,
               capturePlan: research.capturePlan,
+              capture: research.capture,
               intake: intakeSummary,
             },
             null,

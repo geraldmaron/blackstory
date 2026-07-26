@@ -12,6 +12,7 @@ import type {
   SafeFetchDependencies,
 } from '@repo/security/url-safety';
 import { runResearchIntake } from './research-intake.ts';
+import { createMetadataOnlyStorage } from './source-capture.ts';
 import type { OperatorIntakeContext } from './intake.ts';
 
 const PUBLIC_ADDRESS = '93.184.216.34';
@@ -58,6 +59,38 @@ test('a successful fetch pre-fills citation metadata, plans capture, and opens a
   if (outcome.intake?.accepted) {
     assert.ok(outcome.intake.researchCase, 'research-intake opens a draft research case');
   }
+});
+
+test('with a capture sink, a successful fetch persists a real capture (not just a plan)', async () => {
+  const persisted: { captureId: string; digest: string }[] = [];
+  const outcome = await runResearchIntake(
+    { url: 'https://archive.example.org/douglass-ave', targetRecordId: 'entity-42' },
+    context(),
+    fakeDependencies(),
+    {
+      storage: createMetadataOnlyStorage(),
+      newId: (prefix, seed) => `${prefix}_${seed.replace(/[^a-z0-9]/gi, '').slice(0, 10)}`,
+      persist: async (capture, event) => {
+        assert.equal(event.adapterId, 'research-intake');
+        assert.equal(event.status, 'success');
+        persisted.push({ captureId: capture.id, digest: capture.contentHashDigest });
+      },
+    },
+  );
+  assert.ok(outcome.capture, 'outcome reports the persisted capture');
+  assert.equal(persisted.length, 1);
+  assert.equal(persisted[0]?.captureId, outcome.capture?.captureId);
+  assert.match(persisted[0]?.digest ?? '', /^[0-9a-f]{64}$/);
+});
+
+test('without a capture sink, no capture is persisted (backward compatible)', async () => {
+  const outcome = await runResearchIntake(
+    { url: 'https://archive.example.org/douglass-ave' },
+    context(),
+    fakeDependencies(),
+  );
+  assert.equal(outcome.capture, undefined);
+  assert.ok(outcome.capturePlan, 'the plan is still returned');
 });
 
 test('an explicit description overrides the fetched excerpt, but the citation is still attached', async () => {
