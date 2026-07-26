@@ -779,7 +779,9 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
           delete payload.campaign;
         }
         stdout(JSON.stringify(payload, null, 2));
-        return result.status === 'success' ? 0 : 1;
+        // skipped_kill_switch is an intentional no-op (kill switch engaged), not a failure —
+        // only a real dispatch error should fail the exit code.
+        return result.status === 'error' ? 1 : 0;
       }
       case 'pending-list': {
         const paths = flags.repeated.get('--from') ?? [];
