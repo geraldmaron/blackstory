@@ -46,6 +46,39 @@ test('valid article passes the projection schema', () => {
   assert.equal(parsed.body.length, 3);
 });
 
+test('stat/figure/pullquote blocks accept an optional anchors + replicationVerified declaration', () => {
+  const parsed = publicArticleProjectionSchema.parse({
+    ...baseArticle,
+    body: [
+      ...baseArticle.body,
+      {
+        type: 'stat',
+        packetId: 'redlining-q3',
+        kind: 'observation',
+        refId: 'obs-1',
+        anchors: [
+          { url: 'https://census.gov/a', label: 'Census' },
+          { url: 'https://www.federalreserve.gov/b', label: 'Fed' },
+        ],
+      },
+      {
+        type: 'pullquote',
+        text: 'A verified figure.',
+        anchors: [{ url: 'https://census.gov/a', label: 'Census' }],
+        replicationVerified: true,
+      },
+    ],
+  });
+  assert.equal(parsed.body.length, 5);
+});
+
+test('a block with no anchors field still parses (opt-in, not retroactive)', () => {
+  const parsed = publicArticleProjectionSchema.parse(baseArticle);
+  const figure = parsed.body.find((block) => block.type === 'figure');
+  assert.ok(figure);
+  assert.equal((figure as { anchors?: unknown }).anchors, undefined);
+});
+
 test('extractInlineCitationIds finds distinct marker ids', () => {
   const ids = extractInlineCitationIds('a [ref:one] b [ref:two] c [ref:one]');
   assert.deepEqual([...ids].sort(), ['one', 'two']);

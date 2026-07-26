@@ -23,7 +23,7 @@ import {
   assertArticleCitationIntegrity,
   publicArticleProjectionSchema,
 } from '@repo/schemas';
-import { lookupSourceTier, type SourceTier } from '@repo/domain';
+import { isAnchorTierUrl, lookupSourceTier, type SourceTier } from '@repo/domain';
 import { z } from 'zod';
 import pg from 'pg';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
@@ -106,11 +106,61 @@ function gateArticleSourceTiers(article: ArticleAuthoring): {
   return { tally, warnings };
 }
 
+const ANCHORABLE_BLOCKS = new Set(['stat', 'figure', 'pullquote']);
+
+/**
+ * Two-anchor corroboration rule (repo-k2q3 crit 3). A stat/figure/pullquote block
+ * that declares `anchors` is asserting itself as a load-bearing figure; validate then
+ * enforces the declaration: published requires two independent T1/T2 anchors, or one
+ * T1 anchor plus `replicationVerified: true` (a human attesting the cited replication
+ * package was checked — see repo-fj3a). A block with no `anchors` field is not
+ * considered load-bearing and is not gated; this rule doesn't retroactively demand
+ * anchors on every existing figure, only ones an author flags as needing them.
+ */
+function gateLoadBearingAnchors(article: ArticleAuthoring): { warnings: string[] } {
+  const warnings: string[] = [];
+  const errors: string[] = [];
+  article.body.forEach((block, index) => {
+    if (!ANCHORABLE_BLOCKS.has(block.type)) return;
+    const anchors = (block as { anchors?: readonly { url: string }[] }).anchors;
+    if (anchors === undefined) return;
+    const replicationVerified = (block as { replicationVerified?: boolean }).replicationVerified === true;
+
+    const anchorTiers = anchors.map((anchor) => isAnchorTierUrl(anchor.url));
+    const independentHosts = new Set(
+      anchors.map((anchor) => {
+        try {
+          return new URL(anchor.url).hostname.toLowerCase();
+        } catch {
+          return anchor.url;
+        }
+      }),
+    );
+    const anchorTierCount = anchorTiers.filter(Boolean).length;
+    const satisfiesTwoAnchors = anchorTierCount >= 2 && independentHosts.size >= 2;
+    const satisfiesReplicationException = anchorTierCount >= 1 && replicationVerified;
+
+    if (!satisfiesTwoAnchors && !satisfiesReplicationException) {
+      const message =
+        `${article.id} / body[${index}] (${block.type}): load-bearing figure declares anchors ` +
+        `but has neither two independent T1/T2 anchors nor one T1/T2 anchor + replicationVerified`;
+      if (article.status === 'published') errors.push(message);
+      else warnings.push(message);
+    }
+  });
+  if (errors.length > 0) {
+    throw new Error(`load-bearing anchor gate failed (published articles):\n  ${errors.join('\n  ')}`);
+  }
+  return { warnings };
+}
+
 /** Offline gates: schema (via loader) + inline-citation integrity + source-tier gate. */
 function validateArticleOffline(article: ArticleAuthoring): void {
   assertArticleCitationIntegrity(article);
-  const { warnings } = gateArticleSourceTiers(article);
-  for (const warning of warnings) console.warn(`warning: ${warning}`);
+  const { warnings: tierWarnings } = gateArticleSourceTiers(article);
+  for (const warning of tierWarnings) console.warn(`warning: ${warning}`);
+  const { warnings: anchorWarnings } = gateLoadBearingAnchors(article);
+  for (const warning of anchorWarnings) console.warn(`warning: ${warning}`);
 }
 
 type PacketRow = {

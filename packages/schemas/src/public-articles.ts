@@ -66,6 +66,18 @@ export const articleReferenceSchema = z.object({
 });
 export type ArticleReferenceDoc = z.infer<typeof articleReferenceSchema>;
 
+/**
+ * One independent corroborating source for a load-bearing figure (repo-k2q3 crit 3:
+ * two-anchor corroboration rule). `url` is checked against the shared source-tier
+ * registry at validate time (packages/domain's isAnchorTierUrl) — tier is derived,
+ * never stored here, so there is one source of truth for what counts as trusted.
+ */
+export const articleAnchorSchema = z.object({
+  url: z.string().url().max(2048),
+  label: z.string().min(1).max(240),
+});
+export type ArticleAnchorDoc = z.infer<typeof articleAnchorSchema>;
+
 /* ------------------------------------------------------------------------- *
  * Body blocks — discriminated on `type`.
  * ------------------------------------------------------------------------- */
@@ -83,11 +95,17 @@ const articleParagraphBlockSchema = z.object({
   text: z.string().min(1),
 });
 
-/** A block quotation, optionally attributed. */
+/**
+ * A block quotation, optionally attributed. `anchors`/`replicationVerified` back the
+ * two-anchor corroboration rule when the quoted figure is load-bearing (repo-k2q3
+ * crit 3) — see gateLoadBearingAnchors in ops-data/scripts/articles.ts.
+ */
 const articlePullQuoteBlockSchema = z.object({
   type: z.literal('pullquote'),
   text: z.string().min(1).max(600),
   attribution: z.string().min(1).max(240).optional(),
+  anchors: z.array(articleAnchorSchema).optional(),
+  replicationVerified: z.boolean().optional(),
 });
 
 /**
@@ -100,6 +118,8 @@ const articleFigureBlockSchema = z.object({
   packetId: z.string().min(1),
   metricIds: z.array(z.string().min(1)).min(1).optional(),
   caption: z.string().min(1).max(400),
+  anchors: z.array(articleAnchorSchema).optional(),
+  replicationVerified: z.boolean().optional(),
 });
 
 /** A single-observation callout (rendered as a DataMoment). */
@@ -109,6 +129,8 @@ const articleStatBlockSchema = z.object({
   kind: z.enum(['observation', 'derived']),
   refId: z.string().min(1),
   caption: z.string().min(1).max(400).optional(),
+  anchors: z.array(articleAnchorSchema).optional(),
+  replicationVerified: z.boolean().optional(),
 });
 
 /** A primary-document excerpt drawn from a packet artifact. */
