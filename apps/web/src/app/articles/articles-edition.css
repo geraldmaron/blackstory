@@ -8,16 +8,18 @@
   flex-direction: column;
   gap: var(--ds-space-8);
   padding-block: var(--ds-space-8);
-  max-width: 74rem;
+  max-width: 60rem;
   margin-inline: auto;
 }
 
 .ds-articles-edition__intro {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
   gap: var(--ds-space-3);
   padding-block: var(--ds-space-8);
-  max-width: 74rem;
+  max-width: 48rem;
   margin-inline: auto;
 }
 
@@ -40,10 +42,10 @@
 
 .ds-articles-edition__lede {
   font-family: var(--ds-font-editorial);
-  font-size: clamp(1.1rem, 1vw + 1rem, 1.4rem);
+  font-size: clamp(1rem, 0.4vw + 0.95rem, 1.15rem);
   line-height: 1.55;
   color: var(--ds-ink-muted);
-  max-width: 52ch;
+  max-width: 46ch;
   margin: 0;
 }
 
@@ -61,7 +63,8 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 22rem));
+  justify-content: center;
   gap: var(--ds-space-6);
 }
 
