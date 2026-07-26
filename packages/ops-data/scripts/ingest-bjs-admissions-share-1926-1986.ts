@@ -36,7 +36,7 @@ const DEFAULT_FIXTURE = join(
   '../fixtures/reference-indicators/bjs-admissions-share-black-1926-1986.csv',
 );
 
-const BJS_HOMEPAGE = 'https://bjs.ojp.gov/';
+const BJS_HOMEPAGE = 'https://www.ojp.gov/pdffiles1/nij/125618.pdf';
 
 // National jurisdiction ID for US
 const NATION_JURISDICTION_ID = 'nation:US';

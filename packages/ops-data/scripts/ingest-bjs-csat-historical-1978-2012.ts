@@ -36,7 +36,7 @@ const DEFAULT_FIXTURE = join(
   '../fixtures/reference-indicators/bjs-csat-national-rates-1978-2012.csv',
 );
 
-const CSAT_HOMEPAGE = 'https://csat.bjs.ojp.gov/';
+const CSAT_HOMEPAGE = 'https://bjs.ojp.gov/content/pub/pdf/p20st.pdf';
 const BJS_HOMEPAGE = 'https://bjs.ojp.gov/';
 
 // National jurisdiction ID for US
@@ -214,7 +214,7 @@ function buildObservations(
         jurisdictionId: NATION_JURISDICTION_ID,
         boundaryVersion: 'nation-2020',
         referencePeriod: year,
-        datasetVintage: 'BJS CSAT-Prisoners National Rates 1978-2012',
+        datasetVintage: 'BJS Prisoners in 2020 - Statistical Tables, Table 5 (2010-2012 verified subset)',
         estimate: row.blackRate,
         raceEthnicitySlice: 'black',
         source: 'bjs-csat-prisoners',
@@ -231,7 +231,7 @@ function buildObservations(
         jurisdictionId: NATION_JURISDICTION_ID,
         boundaryVersion: 'nation-2020',
         referencePeriod: year,
-        datasetVintage: 'BJS CSAT-Prisoners National Rates 1978-2012',
+        datasetVintage: 'BJS Prisoners in 2020 - Statistical Tables, Table 5 (2010-2012 verified subset)',
         estimate: row.whiteRate,
         raceEthnicitySlice: 'white',
         source: 'bjs-csat-prisoners',
@@ -248,7 +248,7 @@ function buildObservations(
         jurisdictionId: NATION_JURISDICTION_ID,
         boundaryVersion: 'nation-2020',
         referencePeriod: year,
-        datasetVintage: 'BJS CSAT-Prisoners National Rates 1978-2012',
+        datasetVintage: 'BJS Prisoners in 2020 - Statistical Tables, Table 5 (2010-2012 verified subset)',
         estimate: row.hispanicRate,
         raceEthnicitySlice: 'hispanic',
         source: 'bjs-csat-prisoners',
@@ -353,7 +353,7 @@ async function main(): Promise<void> {
     rejectedParseRows: parseResult.rejected.length,
     sourceUrl: CSAT_HOMEPAGE,
     bjsHomepage: BJS_HOMEPAGE,
-    datasetVintage: 'BJS CSAT-Prisoners National Rates 1978-2012',
+    datasetVintage: 'BJS Prisoners in 2020 - Statistical Tables, Table 5 (2010-2012 verified subset)',
   };
 
   if (!apply) {

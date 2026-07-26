@@ -1,36 +1,14 @@
+# Source: BJS, "Prisoners in 2020 - Statistical Tables", NCJ 302776, Dec 2021,
+# Table 5 (p.13). Imprisonment rate = sentenced prisoners per 100,000 US
+# residents of each race/ethnicity (national, all ages, non-Hispanic white /
+# non-Hispanic black / Hispanic).
+# https://bjs.ojp.gov/content/pub/pdf/p20st.pdf
+#
+# 1978-2009 is a REAL GAP: no verified per-race annual rate table has been
+# located yet for this span (the CSAT-Prisoners online tool and/or individual
+# "Prisoners in YYYY" annual reports would need to be pulled year-by-year).
+# Do NOT interpolate to fill it -- see repo-ypfp follow-up.
 Year,Black Rate,White Rate,Hispanic Rate
-1978,605,120,
-1979,615,125,
-1980,665,130,
-1981,715,135,
-1982,760,140,
-1983,815,145,
-1984,890,155,
-1985,990,160,
-1986,1135,165,
-1987,1310,170,
-1988,1465,180,
-1989,1665,185,
-1990,1860,190,700
-1991,2010,195,750
-1992,2130,200,800
-1993,2280,205,850
-1994,2440,210,900
-1995,2600,215,950
-1996,2750,225,1000
-1997,2890,235,1050
-1998,3060,250,1120
-1999,3290,275,1200
-2000,3500,295,1300
-2001,3750,310,1400
-2002,3960,325,1480
-2003,4050,340,1520
-2004,4100,350,1550
-2005,4150,360,1580
-2006,4200,370,1600
-2007,2250,380,1320
-2008,2180,375,1280
-2009,2050,370,1240
-2010,1960,360,1200
-2011,1920,350,1180
-2012,1818,295,935
+2010,1489,248,658
+2011,1438,243,650
+2012,1377,238,629
