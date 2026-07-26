@@ -39,6 +39,99 @@ type Provenance = {
   humanCitation: string;
 };
 
+const RETRIEVED = '2026-07-26T00:00:00.000Z';
+
+/**
+ * Mechanism-spine artifacts: primary-document-backed events the racial-wealth-gap
+ * literature (Brookings, Urban Institute, Boston Fed, Darity & Mullen) treats as
+ * central to how the gap was made and kept, placed beside the DKKS/SCF ratio rather
+ * than asserted as its single cause (method_stance stays juxtaposition — no
+ * causalClaimIds). Each carries a live, checkable T1-T3 sourceUrl and a real sha256
+ * contentHash over {artifactId, title, sourceUrl, dated}. Figures inside the summaries
+ * are quoted from the cited source, not the packet's DB-bound statistical_observations.
+ */
+const MECHANISM_ARTIFACTS = [
+  {
+    artifactId: 'art_special_field_orders_15_1865',
+    artifactClass: 'primary_government_document',
+    title: 'Special Field Orders, No. 15 (Sherman, Jan. 16, 1865)',
+    citation:
+      'Special Field Orders, No. 15, Headquarters Military Division of the Mississippi, by Maj. Gen. W. T. Sherman, Jan. 16, 1865; William A. Gladstone Afro-American Military Collection, Library of Congress (mss83434256). Original in RG 94, Records of the Adjutant General’s Office, National Archives.',
+    sourceUrl: 'https://www.loc.gov/item/mss83434256/',
+    dated: '1865-01-16',
+    summary:
+      'The "forty acres" promise, and its reversal. Sherman’s order set aside the abandoned coastal rice lands from Charleston, South Carolina to the St. Johns River in Florida for settlement by freed families in plots "not more than forty acres of tillable ground." Within months roughly 40,000 freedpeople had settled on about 400,000 acres. Later in 1865 President Andrew Johnson rescinded the order and restored the land to its former Confederate owners, ending the one federal attempt to hand freed families a landed asset base. The 1870 benchmark that follows (about twenty-one to one) is the wealth ledger of a freed population that started with almost nothing to hold.',
+    provenance: {
+      source: 'library-of-congress',
+      sourceUrl: 'https://www.loc.gov/item/mss83434256/',
+      retrievedAt: RETRIEVED,
+      contentHash: '422fb1ec9f5ad2406ffd37523dd66113d7c805a40ad8afde4acf943432c11024',
+      humanCitation:
+        'Special Field Orders, No. 15 (Jan. 16, 1865), Gladstone Afro-American Military Collection, Library of Congress; original in RG 94, National Archives.',
+    },
+  },
+  {
+    artifactId: 'art_freedmans_savings_bank_collapse_1874',
+    artifactClass: 'primary_government_document',
+    title: "Freedman's Savings and Trust Company failure, 1874",
+    citation:
+      "Office of the Comptroller of the Currency, “The Freedman’s Savings Bank: Good Intentions Were Not Enough,” OCC history; corroborated by the National Archives, Prologue, “Providing for the Freedmen’s Savings and Trust Company” (1997).",
+    sourceUrl:
+      'https://www.occ.gov/about/who-we-are/history/history-of-the-occ/1863-1865/1863-1865-freedmans-savings-bank.html',
+    dated: '1874',
+    summary:
+      'When the Freedman’s Savings Bank closed on June 29, 1874, the OCC records "61,144 depositors" with "losses of nearly $3 million." The bank’s deposits were not federally guaranteed and Congress declined to make depositors whole; many petitioned for decades and, in the end, only about half of depositors recovered roughly three-fifths of their accounts (National Archives, Prologue). The first Black financial institution most freedpeople trusted erased much of the small savings they had managed to accumulate after emancipation.',
+    provenance: {
+      source: 'office-of-the-comptroller-of-the-currency',
+      sourceUrl:
+        'https://www.occ.gov/about/who-we-are/history/history-of-the-occ/1863-1865/1863-1865-freedmans-savings-bank.html',
+      retrievedAt: RETRIEVED,
+      contentHash: 'f085ba67c293f2dfc2bf22a68e4879b2327df184a9316b4dda98fb5ec6ce06a0',
+      humanCitation:
+        'OCC history, "The Freedman’s Savings Bank"; 61,144 depositors, losses of nearly $3 million at the 1874 failure.',
+    },
+  },
+  {
+    artifactId: 'art_social_security_act_1935_exclusions',
+    artifactClass: 'primary_government_document',
+    title: 'Social Security Act of 1935: exclusion of agricultural labor and domestic service',
+    citation:
+      'Social Security Act of 1935, Pub. L. 74-271 (full text, SSA history office); context in Larry DeWitt, "The Decision to Exclude Agricultural and Domestic Workers from the 1935 Social Security Act," Social Security Bulletin 70(4), 2010.',
+    sourceUrl: 'https://www.ssa.gov/history/35act.html',
+    dated: '1935',
+    summary:
+      'The Act that built old-age insurance excluded, in its definition of covered "employment," both "agricultural labor" and "domestic service in a private home." At the time a large majority of Black workers were employed in exactly those two categories, so the exclusion left most Black workers outside the new program. The SSA history office’s own review (DeWitt, 2010) argues the exclusion was driven by tax-collection feasibility rather than proven racial intent; whatever the motive, the disproportionate effect on Black workers is not disputed. Shown here as juxtaposition, not a claim that this one statute set the later gap.',
+    provenance: {
+      source: 'social-security-administration',
+      sourceUrl: 'https://www.ssa.gov/history/35act.html',
+      retrievedAt: RETRIEVED,
+      contentHash: 'ec1bba24facc76587a3e6d4e5203439fa9eb515d6b16a5ac428b93aa87f38f31',
+      humanCitation:
+        'Social Security Act of 1935 (SSA history office full text); "agricultural labor" and "domestic service" excluded from covered employment.',
+    },
+  },
+  {
+    artifactId: 'art_gi_bill_1944_local_administration',
+    artifactClass: 'peer_reviewed_synthesis',
+    title:
+      "Servicemen's Readjustment Act of 1944 (GI Bill): local administration and the racial benefit gap",
+    citation:
+      'Sarah E. Turner and John Bound, "Closing the Gap or Widening the Divide: The Effects of the G.I. Bill and World War II on the Educational Outcomes of Black Americans," NBER Working Paper 9044 (2002); published in Journal of Economic History 63(1), 2003.',
+    sourceUrl: 'https://www.nber.org/papers/w9044',
+    dated: '1944',
+    summary:
+      'The GI Bill promised veterans college tuition and low-cost home and business loans, but delivered them through local banks, colleges, and Veterans Administration offices. Turner and Bound find that for Black veterans confined to the segregated South, the bill "had little effect on collegiate outcomes" and, on balance, widened rather than closed the Black-white education gap, because the local institutions that administered it were segregated or would not serve Black applicants. The largest asset-building program of its generation reached Black families far more weakly than white ones. Juxtaposed with the gap series, not asserted as its sole cause.',
+    provenance: {
+      source: 'national-bureau-of-economic-research',
+      sourceUrl: 'https://www.nber.org/papers/w9044',
+      retrievedAt: RETRIEVED,
+      contentHash: '315deac078427fd867d91d0644ac7acb9f70464d0f43378d61b18798ebe4c494',
+      humanCitation:
+        'Turner & Bound, "Closing the Gap or Widening the Divide," NBER WP 9044 (2002) / J. Econ. History 63(1), 2003.',
+    },
+  },
+] as const;
+
 /**
  * Every number the packet asserts, each bound to a verified obs id or spine id.
  * observationId uses the real statistical_observations id where one exists; where a
@@ -76,6 +169,54 @@ const OBS = {
       retrievedAt: NOW,
       contentHash: '271431ae37c1cd77e3ddc71eca8044f07446ebe3f2b01236aa0c1a186394f978',
       humanCitation: `${DKKS_HUMAN} 1870 benchmark.`,
+    },
+  },
+  dkks1880: {
+    observationId: 'obs:dkks-wealth-ratio-white-black-nation:nation:US:1880',
+    spineId: 'spine-wealth-ratio-white-black-us',
+    metricId: 'dkks-wealth-ratio-white-black-nation',
+    estimate: 19.031258,
+    unit: 'ratio',
+    referencePeriod: '1880',
+    label: 'White-to-Black per-capita wealth ratio (1880 benchmark)',
+    provenance: {
+      source: DKKS_SOURCE,
+      sourceUrl: DKKS_URL,
+      retrievedAt: NOW,
+      contentHash: '2aad7b5b3ffa492509ff4ce06a298354f5614320833d014035053118d29bbc29',
+      humanCitation: `${DKKS_HUMAN} 1880 benchmark.`,
+    },
+  },
+  dkks1890: {
+    observationId: 'obs:dkks-wealth-ratio-white-black-nation:nation:US:1890',
+    spineId: 'spine-wealth-ratio-white-black-us',
+    metricId: 'dkks-wealth-ratio-white-black-nation',
+    estimate: 14.90131,
+    unit: 'ratio',
+    referencePeriod: '1890',
+    label: 'White-to-Black per-capita wealth ratio (1890 benchmark)',
+    provenance: {
+      source: DKKS_SOURCE,
+      sourceUrl: DKKS_URL,
+      retrievedAt: NOW,
+      contentHash: '8b873ed1e88f066f4e51b02ca720e038dc902a234ee0f004aac82427a99abd52',
+      humanCitation: `${DKKS_HUMAN} 1890 benchmark.`,
+    },
+  },
+  dkks1900: {
+    observationId: 'obs:dkks-wealth-ratio-white-black-nation:nation:US:1900',
+    spineId: 'spine-wealth-ratio-white-black-us',
+    metricId: 'dkks-wealth-ratio-white-black-nation',
+    estimate: 11.366488,
+    unit: 'ratio',
+    referencePeriod: '1900',
+    label: 'White-to-Black per-capita wealth ratio (1900 benchmark)',
+    provenance: {
+      source: DKKS_SOURCE,
+      sourceUrl: DKKS_URL,
+      retrievedAt: NOW,
+      contentHash: '82d4fc91f9fdd3664c1ef8da1f203ab3871a4752d0f5007b377a822fd87bbec5',
+      humanCitation: `${DKKS_HUMAN} 1900 benchmark.`,
     },
   },
   dkks1922: {
@@ -234,8 +375,10 @@ const OBS = {
 } as const;
 
 const SUMMARY = [
-  'You are freed in 1863 with what the law lets you keep, which is nothing. Land, tools, a house: none of it comes with emancipation. At the last count taken before the war the distance is almost total. For every dollar of wealth a Black person holds, a white person holds about fifty-six. The first count taken after slavery, in 1870, still reads about twenty-one to one.',
+  'You are freed in 1863 with what the law lets you keep, which is nothing. Land, tools, a house: none of it comes with emancipation. The one federal attempt to hand freed families land, Sherman’s Special Field Orders No. 15 in 1865, set aside coastal acres in forty-acre plots, then President Johnson rescinded it that same year and gave the land back to its former owners. At the last count taken before the war the distance is almost total. For every dollar of wealth a Black person holds, a white person holds about fifty-six. The first count taken after slavery, in 1870, still reads about twenty-one to one.',
+  'The century after that is a long, incomplete fall, not a jump: the ratio reads about nineteen to one in 1880, about fifteen to one in 1890, about eleven to one in 1900. Two events sit on that slope. In 1874 the Freedman’s Savings Bank fails, wiping out much of the small savings 61,144 depositors had managed to put away. The gap keeps narrowing, but slowly, and never closes.',
   '1921. In [[ent_greenwood_district_001|Greenwood]], thirty-five blocks on the north side of Tulsa, you have built something: banks, theaters, doctors, a grocery you own. Over two days the [[disc_tulsa_race_massacre_q1824714|Tulsa Race Massacre]] burns it to the ground. The national wealth ledger that decade reads about eleven to one. The series is national and the place is Greenwood; the number is not Greenwood’s alone.',
+  'The New Deal and the postwar boom build the modern American middle class, largely on federal help that reached Black families weakly. The Social Security Act of 1935 excludes agricultural labor and domestic service, the two jobs that then held most Black workers. The 1944 GI Bill funds college and home loans through local banks and colleges that, in the segregated South, would not serve Black veterans. These are placed beside the gap, not asserted as its single cause.',
   '1968. You are reaching for the ladder everyone says is there. Two years later the census counts about forty-two Black families owning their home for every hundred, against about sixty-five white families, a gap of more than twenty homes in every hundred. When the household-income tape first measures both groups side by side, in 1972, a white family’s median sits close to one and three-quarter times a Black family’s.',
   '2022. You check your accounts. The Survey of Consumer Finances puts a typical Black family’s net worth at $44,900 against a typical white family’s $285,000, still about six to one. Counted per person rather than per household, the long benchmark series lands near seven to one. Either way the ratio has barely moved in four decades.',
   'Closing chart: the white-to-Black wealth ratio from 1860 to 2022, drawn as two distinguished segments (the per-capita mean back to 1860 and the household median from 1989), kept apart rather than spliced into one line. The century-long fall halts around 1980 and the post-1980 stall is marked where it flattens.',
@@ -246,6 +389,8 @@ const METHOD_NOTE = [
   'Two wealth series appear together and are kept visually distinct rather than spliced. The per-capita mean ratio (Derenoncourt, Kim, Kuhn & Schularick; spine-wealth-ratio-white-black-us) runs on benchmark years from 1860 to 2019. The emancipation-era readings (about fifty-six to one in 1860, about twenty-one to one in 1870) sit over a denominator near zero and are benchmark points, not annual figures.',
   'The household-median ratio (Survey of Consumer Finances; spine-wealth-ratio-median-hh-white-black-us) runs triennially from 1989 to 2022 and measures a different construct (median household net worth, not per-capita mean), so the two segments are never averaged or joined.',
   'The 1921 figure is the national 1922 benchmark; no Greenwood-specific wealth series exists, so the place is named while the number stays national. Homeownership is the 1970 decennial (nearest to 1968). The white-householder household-income series in this spine begins in 1972, so the income comparison uses 1972 rather than 1968. The per-capita benchmark series ends at 2019, so the most recent per-capita point is 2019, not 2020.',
+  'The per-capita benchmark series is read at more than its endpoints: the 1880 (about 19.0), 1890 (about 14.9), and 1900 (about 11.4) benchmarks are shown so the century-long fall reads as a slow, incomplete decline rather than a jump from 1870 to the 1920s. These are the existing DKKS benchmark rows, not new derivations.',
+  'Four primary-document-backed events sit on the packet as artifacts, each with a checkable T1-T3 source: Special Field Orders No. 15 (1865, Library of Congress / National Archives), the Freedman’s Savings Bank failure (1874, OCC history; National Archives Prologue), the Social Security Act’s exclusion of agricultural and domestic labor (1935, SSA full text), and the GI Bill’s local administration (1944, Turner & Bound, NBER WP 9044). They are placed beside the ratio as mechanism context; the packet stance stays juxtaposition, with no causal-claim ids. Where a source’s own historians dispute motive (the 1935 exclusion), the dispute is stated rather than resolved.',
   'The DKKS convergence-dynamics literature is cited for method context only; nothing in the narrative claims one era’s policy caused a later gap.',
 ].join(' ');
 
@@ -274,6 +419,9 @@ export const wealthGapPackets = [
     observations: [
       OBS.dkks1860,
       OBS.dkks1870,
+      OBS.dkks1880,
+      OBS.dkks1890,
+      OBS.dkks1900,
       OBS.dkks1922,
       OBS.dkks2019,
       OBS.homeownBlack1970,
@@ -285,7 +433,7 @@ export const wealthGapPackets = [
       OBS.scfRatio2022,
     ],
     derived: [],
-    artifacts: [],
+    artifacts: MECHANISM_ARTIFACTS,
     gap_states: ['insufficient_evidence'],
     entity_id: 'ent_greenwood_district_001',
     binding_purpose: 'story',

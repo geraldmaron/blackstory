@@ -66,6 +66,12 @@ export const SOURCE_TIER_RULES: readonly SourceTierRule[] = [
   { domain: 'dataverse.harvard.edu', tier: 'T2', rationale: 'Harvard Dataverse (deposited replication data)' },
   { domain: 'openicpsr.org', tier: 'T2', rationale: 'openICPSR replication archive' },
   { domain: 'icpsr.umich.edu', tier: 'T2', rationale: 'ICPSR data archive' },
+  {
+    domain: 'elloraderenoncourt.com',
+    tier: 'T2',
+    rationale:
+      'Author-hosted replication data for Derenoncourt, Kim, Kuhn & Schularick, "Wealth of Two Nations" (QJE 2024); mirrors the Harvard Dataverse (doi:10.7910/DVN/H6NXUH) and openICPSR 194203 deposits',
+  },
   { domain: 'fraser.stlouisfed.org', tier: 'T2', rationale: "FRASER — St. Louis Fed's federal document/economic history archive" },
   { domain: 'supreme.justia.com', tier: 'T2', rationale: 'Justia Supreme Court — primary case-text archive' },
   { domain: 'aeaweb.org', tier: 'T1', rationale: 'American Economic Association — peer-reviewed journal host' },
