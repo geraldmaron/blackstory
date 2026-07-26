@@ -23,7 +23,9 @@ import {
   assertThemeImpactPacketMultiDecadeChecklist,
   assertThemeImpactPacketPublishable,
   deriveDefaultMultiDecadeChecklist,
+  lookupSourceTier,
   parseThemeImpactPacketRow,
+  type SourceTier,
   type ThemeImpactPacket,
 } from '@repo/domain';
 import pg from 'pg';
@@ -171,6 +173,43 @@ function lintObservationHashes(packets: readonly ThemeImpactPacket[]): void {
 }
 
 /**
+ * Source-quality gate (consults the shared tier registry, not a parallel list):
+ * every observation's sourceUrl is classified into a trust tier. T4 (untrusted,
+ * unclassified) sources are a hard error on published packets and a surfaced
+ * warning otherwise, so slop/citation-mill hosts can't quietly back a live
+ * figure. Returns the per-tier tally for the validate report.
+ */
+function gateSourceTiers(packets: readonly ThemeImpactPacket[]): {
+  tally: Record<SourceTier, number>;
+  warnings: string[];
+} {
+  const tally: Record<SourceTier, number> = { T1: 0, T2: 0, T3: 0, T4: 0 };
+  const warnings: string[] = [];
+  const errors: string[] = [];
+  for (const packet of packets) {
+    for (const observation of packet.observations) {
+      const url = observation.provenance.sourceUrl;
+      let tier: SourceTier = 'T4';
+      try {
+        tier = lookupSourceTier(url).tier;
+      } catch {
+        tier = 'T4';
+      }
+      tally[tier] += 1;
+      if (tier === 'T4') {
+        const message = `${packet.id} / ${observation.observationId}: untrusted (T4) sourceUrl ${JSON.stringify(url)}`;
+        if (packet.status === 'published') errors.push(message);
+        else warnings.push(message);
+      }
+    }
+  }
+  if (errors.length > 0) {
+    throw new Error(`source-tier gate failed (published packets):\n  ${errors.join('\n  ')}`);
+  }
+  return { tally, warnings };
+}
+
+/**
  * Every observation a packet cites must exist verbatim in canonical
  * statistical_observations — at every lifecycle status, not just publish.
  */
@@ -310,6 +349,9 @@ async function commandValidate(paths: readonly string[]): Promise<void> {
   for (const packet of packets) validatePacketShape(packet);
   // Offline gate: hash-format discipline runs on every validate, DB or not.
   lintObservationHashes(packets);
+  // Offline gate: source-quality tiering — T4 hosts fail published packets.
+  const { tally: sourceTiers, warnings: sourceTierWarnings } = gateSourceTiers(packets);
+  for (const warning of sourceTierWarnings) console.warn(`warning: ${warning}`);
 
   // DB-binding gate: when DATABASE_URL is present, every observation must match
   // its canonical statistical_observations / spine row exactly (estimate,
@@ -330,6 +372,7 @@ async function commandValidate(paths: readonly string[]): Promise<void> {
         ok: true,
         bound,
         verifiedObservations,
+        sourceTiers,
         packets: packets.map((packet) => ({
           id: packet.id,
           status: packet.status,

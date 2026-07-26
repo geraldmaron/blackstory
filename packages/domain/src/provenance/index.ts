@@ -84,6 +84,15 @@ export type {
 } from './source.js';
 
 export {
+  SOURCE_TIERS,
+  ANCHOR_TIERS,
+  SOURCE_TIER_RULES,
+  lookupSourceTier,
+  isAnchorTierUrl,
+} from './source-tiers.js';
+export type { SourceTier, SourceTierRule, SourceTierResult } from './source-tiers.js';
+
+export {
   RETRIEVAL_STATUSES,
   assertCaptureHashValid,
   assertSelectiveSnapshotPolicy,

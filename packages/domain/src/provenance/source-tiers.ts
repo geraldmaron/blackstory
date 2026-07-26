@@ -1,0 +1,123 @@
+/**
+ * Source-quality tier registry.
+ *
+ * The adapter layer validates shape/volume/drift but not source *quality*. This
+ * module classifies a citation URL into a trust tier so gates and the enrichment
+ * judge can weight or discard low-quality sources (SEO farms, citation mills,
+ * AI-slop laundering) before they create or modify claims.
+ *
+ * Tiers (highest trust first):
+ *   T1 — official statistical agencies + peer-reviewed journals (DOI-resolvable).
+ *   T2 — working papers (NBER/Fed), university presses, .edu research centers,
+ *        national archives / libraries of record.
+ *   T3 — established nonprofits / journalism with a named public methodology.
+ *   T4 — everything else (unclassified; treated as untrusted by default).
+ *
+ * One policy module, consulted by adapter gates, packet/article validate, and
+ * the enrichment judge bridge alike — not per-surface copies.
+ */
+import { normalizeHostname } from './source.js';
+
+export const SOURCE_TIERS = ['T1', 'T2', 'T3', 'T4'] as const;
+export type SourceTier = (typeof SOURCE_TIERS)[number];
+
+/** T1/T2 are the "independent anchor" tiers for the corroboration rule. */
+export const ANCHOR_TIERS: readonly SourceTier[] = ['T1', 'T2'];
+
+export type SourceTierRule = {
+  /**
+   * Registrable-domain suffix, lowercase, no scheme (e.g. "census.gov").
+   * Matches the host itself and any subdomain of it. Longest match wins, so a
+   * more specific rule (bjs.ojp.gov) overrides a broader one (ojp.gov).
+   */
+  readonly domain: string;
+  readonly tier: SourceTier;
+  readonly rationale: string;
+};
+
+/**
+ * Curated registry. Order does not matter — lookup selects the longest matching
+ * domain suffix. Keep entries specific; a bare TLD rule (.gov/.edu) is a
+ * deliberate fallback, not a substitute for naming a real statistical agency.
+ */
+export const SOURCE_TIER_RULES: readonly SourceTierRule[] = [
+  // ---- T1: official statistical agencies ----
+  { domain: 'census.gov', tier: 'T1', rationale: 'U.S. Census Bureau' },
+  { domain: 'bls.gov', tier: 'T1', rationale: 'Bureau of Labor Statistics' },
+  { domain: 'bjs.ojp.gov', tier: 'T1', rationale: 'Bureau of Justice Statistics' },
+  { domain: 'bjs.gov', tier: 'T1', rationale: 'Bureau of Justice Statistics (legacy host)' },
+  { domain: 'cdc.gov', tier: 'T1', rationale: 'Centers for Disease Control (incl. NCHS)' },
+  { domain: 'ussc.gov', tier: 'T1', rationale: 'U.S. Sentencing Commission' },
+  { domain: 'federalreserve.gov', tier: 'T1', rationale: 'Federal Reserve Board (incl. SCF)' },
+  { domain: 'bea.gov', tier: 'T1', rationale: 'Bureau of Economic Analysis' },
+  { domain: 'hud.gov', tier: 'T1', rationale: 'HUD (official housing statistics)' },
+  { domain: 'huduser.gov', tier: 'T1', rationale: 'HUD User (CHAS, AHS microdata)' },
+  { domain: 'eeoc.gov', tier: 'T1', rationale: 'Equal Employment Opportunity Commission' },
+  { domain: 'fbi.gov', tier: 'T1', rationale: 'FBI UCR / NIBRS crime statistics' },
+  { domain: 'ojp.gov', tier: 'T1', rationale: 'Office of Justice Programs statistical bureaus' },
+
+  // ---- T2: working papers, presses, archives, research libraries ----
+  { domain: 'nber.org', tier: 'T2', rationale: 'NBER working papers (pre-peer-review)' },
+  { domain: 'doi.org', tier: 'T2', rationale: 'DOI resolver — tier confirmed by DOI check, not host' },
+  { domain: 'nara.gov', tier: 'T2', rationale: 'National Archives' },
+  { domain: 'archives.gov', tier: 'T2', rationale: 'National Archives' },
+  { domain: 'loc.gov', tier: 'T2', rationale: 'Library of Congress' },
+  { domain: 'si.edu', tier: 'T2', rationale: 'Smithsonian Institution' },
+  { domain: 'dataverse.harvard.edu', tier: 'T2', rationale: 'Harvard Dataverse (deposited replication data)' },
+  { domain: 'openicpsr.org', tier: 'T2', rationale: 'openICPSR replication archive' },
+  { domain: 'icpsr.umich.edu', tier: 'T2', rationale: 'ICPSR data archive' },
+
+  // ---- T3: established nonprofits / journalism with named methodology ----
+  { domain: 'vera.org', tier: 'T3', rationale: 'Vera Institute of Justice' },
+  { domain: 'sentencingproject.org', tier: 'T3', rationale: 'The Sentencing Project' },
+  { domain: 'evictionlab.org', tier: 'T3', rationale: 'Eviction Lab (Princeton)' },
+  { domain: 'brennancenter.org', tier: 'T3', rationale: 'Brennan Center for Justice' },
+  { domain: 'propublica.org', tier: 'T3', rationale: 'ProPublica (documented methodology)' },
+  { domain: 'pewresearch.org', tier: 'T3', rationale: 'Pew Research Center' },
+  { domain: 'urban.org', tier: 'T3', rationale: 'Urban Institute' },
+  { domain: 'crmvet.org', tier: 'T3', rationale: 'Civil Rights Movement Archive (primary-document archive)' },
+
+  // ---- generic fallbacks (least specific; longest-match keeps these last) ----
+  { domain: 'gov', tier: 'T2', rationale: 'U.S. government host (unspecified agency)' },
+  { domain: 'edu', tier: 'T2', rationale: 'Academic institution (unspecified)' },
+];
+
+export type SourceTierResult = {
+  readonly tier: SourceTier;
+  readonly rationale: string;
+  /** The rule domain that matched, or null when nothing matched (defaulted to T4). */
+  readonly matchedDomain: string | null;
+  readonly hostname: string;
+};
+
+/** A rule matches when the host equals its domain or is a subdomain of it. */
+function ruleMatches(hostname: string, domain: string): boolean {
+  return hostname === domain || hostname.endsWith(`.${domain}`);
+}
+
+/**
+ * Classify a citation URL into a source-quality tier. Unmatched hosts default to
+ * T4 (untrusted). Throws only on an unparseable/empty URL — callers that must
+ * tolerate junk should catch and treat failures as T4.
+ */
+export function lookupSourceTier(url: string): SourceTierResult {
+  const hostname = normalizeHostname(url);
+  let best: SourceTierRule | null = null;
+  for (const rule of SOURCE_TIER_RULES) {
+    if (!ruleMatches(hostname, rule.domain)) continue;
+    if (best === null || rule.domain.length > best.domain.length) best = rule;
+  }
+  if (best === null) {
+    return { tier: 'T4', rationale: 'unclassified host', matchedDomain: null, hostname };
+  }
+  return { tier: best.tier, rationale: best.rationale, matchedDomain: best.domain, hostname };
+}
+
+/** True when the URL resolves to a tier eligible to serve as an independent anchor (T1/T2). */
+export function isAnchorTierUrl(url: string): boolean {
+  try {
+    return ANCHOR_TIERS.includes(lookupSourceTier(url).tier);
+  } catch {
+    return false;
+  }
+}
