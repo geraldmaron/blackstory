@@ -1,9 +1,11 @@
 # Voice: era-immersion theme packets
 
-**Status:** binding structure + voice guide for the three (soon four) flagship
-theme packets built on the spine-series data engine (`repo-zxjz`): "Buying a
-home," "The gap that never closed," "Sentenced," and "Casting a ballot."
-**Extends** `docs/ui/voice-theme-chapters.md` and `docs/ui/story.md` — it does
+**Status:** binding structure + voice guide for every flagship theme packet
+built on the spine-series data engine (`repo-zxjz`), regardless of how many
+are live at a given time. Applies to "Buying a home," "The gap that never
+closed," "Sentenced," "Casting a ballot," and any packet added later on the
+same architecture — this document does not need updating when a new packet
+ships; a new packet simply follows it. **Extends** `docs/ui/voice-theme-chapters.md` and `docs/ui/story.md` — it does
 not replace either. Those documents still govern named-actor scene voice,
 presence+proof, dispute phrasing, and legal-status vocabulary. This document
 adds the second-person era-jump structure that a spine-anchored packet uses
