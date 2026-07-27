@@ -12,9 +12,16 @@ import {
 
 test('absolutizeShellNav prefixes relative hrefs with the public origin', () => {
   const items = absolutizeShellNav(PRIMARY_NAV, 'http://localhost:3048/');
-  assert.equal(items[0]?.href, 'http://localhost:3048/explore');
-  assert.equal(items[1]?.label, 'History');
+  assert.equal(items[0]?.href, 'http://localhost:3048/');
+  assert.equal(items[1]?.href, 'http://localhost:3048/explore');
   assert.equal(items[2]?.label, 'Chapters');
+});
+
+test('primary nav leads with Home and ends with About', () => {
+  assert.deepEqual(
+    PRIMARY_NAV.map((item) => item.href),
+    ['/', '/explore', '/chapters', '/history', '/about'],
+  );
 });
 
 test('isShellNavActive understands absolute sibling hrefs', () => {
@@ -30,7 +37,7 @@ test('footer IA groups Law under Explore, not Trust', () => {
   assert.ok(trust);
   assert.deepEqual(
     explore.items.map((item) => item.href),
-    ['/explore', '/history', '/chapters', '/data', '/law', '/books'],
+    ['/explore', '/chapters', '/history', '/data', '/law', '/books'],
   );
   assert.deepEqual(
     trust.items.map((item) => item.href),

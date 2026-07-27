@@ -17,8 +17,7 @@ export const QUERY_NORMALIZATION_MATCHER = [
   '/history',
   '/about',
   '/methodology',
-  '/topics',
-  '/stories',
+  '/chapters',
   '/corrections',
 ];
 
