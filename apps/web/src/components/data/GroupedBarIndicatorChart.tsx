@@ -5,9 +5,8 @@
 import Link from 'next/link';
 import React from 'react';
 import type { DataPageGroupedBarSeries } from '@repo/domain/statistics/data-page-series';
-import { THEMES_PUBLIC_SURFACE_ENABLED } from '../../lib/theme-impact/public-surface';
 import { DataChartFrame } from './DataChartFrame';
-import { formatDataPageValue, niceMax, scaleLinear } from './chart-utils';
+import { chapterHrefForTheme, formatDataPageValue, niceMax, scaleLinear } from './chart-utils';
 
 export type GroupedBarIndicatorChartProps = {
   readonly series: DataPageGroupedBarSeries;
@@ -16,11 +15,6 @@ export type GroupedBarIndicatorChartProps = {
 const WIDTH = 720;
 const HEIGHT = 300;
 const MARGIN = { top: 20, right: 16, bottom: 56, left: 72 } as const;
-
-function themeHref(themeId: string | undefined): string | undefined {
-  if (!THEMES_PUBLIC_SURFACE_ENABLED || !themeId) return undefined;
-  return `/themes/${themeId}`;
-}
 
 export function GroupedBarIndicatorChart({ series }: GroupedBarIndicatorChartProps) {
   if (series.points.length === 0 || series.series.length === 0) {
@@ -39,7 +33,7 @@ export function GroupedBarIndicatorChart({ series }: GroupedBarIndicatorChartPro
   const yScale = scaleLinear(0, maxValue, MARGIN.top + plotH, MARGIN.top);
   const zeroY = yScale(0);
   const yTicks = [0, maxValue / 2, maxValue];
-  const themeLink = themeHref(series.themeId);
+  const themeLink = chapterHrefForTheme(series.themeId);
 
   return (
     <DataChartFrame
@@ -52,7 +46,7 @@ export function GroupedBarIndicatorChart({ series }: GroupedBarIndicatorChartPro
             <>
               {' '}
               <Link className="ds-data-page__theme-link" href={themeLink}>
-                See this in Themes
+                Read the chapter
               </Link>
             </>
           ) : null}

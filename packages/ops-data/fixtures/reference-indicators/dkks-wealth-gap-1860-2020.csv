@@ -1,0 +1,59 @@
+# Derenoncourt, Kim, Kuhn, Schularick — "Wealth of Two Nations: The U.S. Racial
+# Wealth Gap, 1860-2020" (QJE 2024). Headline benchmark-year series: per-capita
+# wealth (2019 USD) for Black and non-Black populations, and the white-to-Black
+# (nonblack-to-black proxy pre-1950; see paper Sec. II/appendix) per-capita
+# wealth ratio.
+#
+# Authors publish this as an irregular benchmark-year series (census years,
+# early state tax records, and SCF survey years) — NOT an annual series. The
+# paper's Figure 1 shows a visually-smoothed line between these same benchmark
+# points; the authors do not publish an interpolated annual dataset. We ingest
+# exactly the benchmark points below with no interpolation of our own.
+#
+# Values are the authors' own "nonblack" proxy for "white" pre-1950 (their
+# wealthgap_wb / nonblack_wealth_pc columns) — see online appendix for the
+# distinction between wealthgap_wb (white) and wealthgap_nbb (nonblack) in
+# later years, which converge once Black/non-Black populations are dominated
+# by Black/white.
+#
+# source: Derenoncourt, Kim, Kuhn, Schularick (2024), QJE 139(2):693-750.
+# source_url: https://www.elloraderenoncourt.com/us-inequality-data
+# source_file: WealthGapFinal18602020.xlsx (author-hosted "final dataset")
+# source_file_sha256: f929e2a0ec070c86fa4f74085021c59b847b75352ddea8da51e0401d260b6987
+# retrieved: 2026-07-25
+# units: black_wealth_pc_usd2019, white_wealth_pc_usd2019 are per-capita wealth in 2019 USD.
+#   wealth_ratio_white_black is a unitless ratio (white / black per-capita wealth).
+year,black_wealth_pc_usd2019,white_wealth_pc_usd2019,wealth_ratio_white_black
+1860,338,18974,56.343502
+1870,698,15958,21.376862
+1880,1127,21453,19.031258
+1890,1911,28477,14.901310
+1900,2986,33943,11.366488
+1904,3334,35760,10.727411
+1912,4323,48911,11.315195
+1922,3956,42115,10.646770
+1926,4414,45932,10.406828
+1929,5166,,
+1930,5241,47685,9.098268
+1936,5771,50906,8.820790
+1950,8716,62464,7.119313
+1953,8384,64715,7.605126
+1956,9723,72514,6.832119
+1959,9018,76146,8.110412
+1962,9994,81026,7.570323
+1965,13014,88843,6.872385
+1968,14476,97764,6.518669
+1971,15595,97386,6.094546
+1977,17356,97454,6.133898
+1983,24563,114681,5.717948
+1989,27906,154051,5.507054
+1992,29816,156224,5.623628
+1995,32323,165564,5.632230
+1998,36286,200863,6.182922
+2001,47037,219966,5.749752
+2004,54658,244583,5.621184
+2007,54324,273815,5.549147
+2010,47139,228785,6.304117
+2013,48762,255599,6.851265
+2016,53237,301033,6.880177
+2019,60128,338093,6.581615

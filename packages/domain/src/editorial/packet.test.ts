@@ -118,6 +118,26 @@ test('validateEditorialDrafts rejects fabricated citation hrefs and unknown topi
   assert.ok(result.issues.some((issue) => issue.includes('possible fabrication')));
 });
 
+test('validateEditorialDrafts rejects a claim citing an untrusted (T4) source', () => {
+  const result = validateEditorialDrafts(
+    {
+      claims: [
+        {
+          predicate: 'documented_site',
+          object: 'A random blog says this happened.',
+          confidenceLevel: 'high',
+          citationSource: 'random-blogspot-example.com',
+          citationHref: 'https://random-blogspot-example.com/post',
+          citationLabel: 'Some Blog',
+        },
+      ],
+    },
+    { allowedCitationHrefs: ['https://random-blogspot-example.com/post'] },
+  );
+  assert.equal(result.ok, false);
+  assert.ok(result.issues.some((issue) => issue.includes('untrusted (T4) source')));
+});
+
 test('validateEditorialDrafts never throws on malformed (non-string) fields from free-model JSON', () => {
   assert.doesNotThrow(() => {
     const result = validateEditorialDrafts(

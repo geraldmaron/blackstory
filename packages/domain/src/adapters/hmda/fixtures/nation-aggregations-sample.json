@@ -1,0 +1,304 @@
+{
+  "parameters": {
+    "years": "2023",
+    "actions_taken": "1,2,3",
+    "races": "White,Black or African American"
+  },
+  "aggregations": [
+    {
+      "count": 2894230,
+      "sum": 1.123e12,
+      "actions_taken": "1",
+      "races": "White",
+      "activity_year": "2023"
+    },
+    {
+      "count": 108420,
+      "sum": 4.156e10,
+      "actions_taken": "2",
+      "races": "White",
+      "activity_year": "2023"
+    },
+    {
+      "count": 200150,
+      "sum": 7.234e10,
+      "actions_taken": "3",
+      "races": "White",
+      "activity_year": "2023"
+    },
+    {
+      "count": 423580,
+      "sum": 1.342e11,
+      "actions_taken": "1",
+      "races": "Black or African American",
+      "activity_year": "2023"
+    },
+    {
+      "count": 28930,
+      "sum": 8.123e9,
+      "actions_taken": "2",
+      "races": "Black or African American",
+      "activity_year": "2023"
+    },
+    {
+      "count": 64870,
+      "sum": 2.034e10,
+      "actions_taken": "3",
+      "races": "Black or African American",
+      "activity_year": "2023"
+    },
+    {
+      "count": 2756340,
+      "sum": 1.068e12,
+      "actions_taken": "1",
+      "races": "White",
+      "activity_year": "2022"
+    },
+    {
+      "count": 105680,
+      "sum": 4.012e10,
+      "actions_taken": "2",
+      "races": "White",
+      "activity_year": "2022"
+    },
+    {
+      "count": 195420,
+      "sum": 7.101e10,
+      "actions_taken": "3",
+      "races": "White",
+      "activity_year": "2022"
+    },
+    {
+      "count": 410250,
+      "sum": 1.289e11,
+      "actions_taken": "1",
+      "races": "Black or African American",
+      "activity_year": "2022"
+    },
+    {
+      "count": 28150,
+      "sum": 7.834e9,
+      "actions_taken": "2",
+      "races": "Black or African American",
+      "activity_year": "2022"
+    },
+    {
+      "count": 61420,
+      "sum": 1.923e10,
+      "actions_taken": "3",
+      "races": "Black or African American",
+      "activity_year": "2022"
+    },
+    {
+      "count": 2612150,
+      "sum": 9.847e11,
+      "actions_taken": "1",
+      "races": "White",
+      "activity_year": "2021"
+    },
+    {
+      "count": 78340,
+      "sum": 2.934e10,
+      "actions_taken": "2",
+      "races": "White",
+      "activity_year": "2021"
+    },
+    {
+      "count": 148520,
+      "sum": 5.612e10,
+      "actions_taken": "3",
+      "races": "White",
+      "activity_year": "2021"
+    },
+    {
+      "count": 389340,
+      "sum": 1.156e11,
+      "actions_taken": "1",
+      "races": "Black or African American",
+      "activity_year": "2021"
+    },
+    {
+      "count": 21870,
+      "sum": 6.234e9,
+      "actions_taken": "2",
+      "races": "Black or African American",
+      "activity_year": "2021"
+    },
+    {
+      "count": 49320,
+      "sum": 1.478e10,
+      "actions_taken": "3",
+      "races": "Black or African American",
+      "activity_year": "2021"
+    },
+    {
+      "count": 2743210,
+      "sum": 9.234e11,
+      "actions_taken": "1",
+      "races": "White",
+      "activity_year": "2020"
+    },
+    {
+      "count": 91230,
+      "sum": 3.012e10,
+      "actions_taken": "2",
+      "races": "White",
+      "activity_year": "2020"
+    },
+    {
+      "count": 156780,
+      "sum": 5.234e10,
+      "actions_taken": "3",
+      "races": "White",
+      "activity_year": "2020"
+    },
+    {
+      "count": 410150,
+      "sum": 1.234e11,
+      "actions_taken": "1",
+      "races": "Black or African American",
+      "activity_year": "2020"
+    },
+    {
+      "count": 24560,
+      "sum": 7.123e9,
+      "actions_taken": "2",
+      "races": "Black or African American",
+      "activity_year": "2020"
+    },
+    {
+      "count": 52340,
+      "sum": 1.612e10,
+      "actions_taken": "3",
+      "races": "Black or African American",
+      "activity_year": "2020"
+    },
+    {
+      "count": 2534670,
+      "sum": 8.456e11,
+      "actions_taken": "1",
+      "races": "White",
+      "activity_year": "2019"
+    },
+    {
+      "count": 81450,
+      "sum": 2.789e10,
+      "actions_taken": "2",
+      "races": "White",
+      "activity_year": "2019"
+    },
+    {
+      "count": 142360,
+      "sum": 4.912e10,
+      "actions_taken": "3",
+      "races": "White",
+      "activity_year": "2019"
+    },
+    {
+      "count": 378920,
+      "sum": 1.089e11,
+      "actions_taken": "1",
+      "races": "Black or African American",
+      "activity_year": "2019"
+    },
+    {
+      "count": 20340,
+      "sum": 5.678e9,
+      "actions_taken": "2",
+      "races": "Black or African American",
+      "activity_year": "2019"
+    },
+    {
+      "count": 45670,
+      "sum": 1.334e10,
+      "actions_taken": "3",
+      "races": "Black or African American",
+      "activity_year": "2019"
+    },
+    {
+      "count": 2456890,
+      "sum": 8.123e11,
+      "actions_taken": "1",
+      "races": "White",
+      "activity_year": "2018"
+    },
+    {
+      "count": 73280,
+      "sum": 2.456e10,
+      "actions_taken": "2",
+      "races": "White",
+      "activity_year": "2018"
+    },
+    {
+      "count": 128450,
+      "sum": 4.567e10,
+      "actions_taken": "3",
+      "races": "White",
+      "activity_year": "2018"
+    },
+    {
+      "count": 356780,
+      "sum": 1.023e11,
+      "actions_taken": "1",
+      "races": "Black or African American",
+      "activity_year": "2018"
+    },
+    {
+      "count": 19230,
+      "sum": 5.234e9,
+      "actions_taken": "2",
+      "races": "Black or African American",
+      "activity_year": "2018"
+    },
+    {
+      "count": 42120,
+      "sum": 1.234e10,
+      "actions_taken": "3",
+      "races": "Black or African American",
+      "activity_year": "2018"
+    },
+    {
+      "count": 2845120,
+      "sum": 1.045e12,
+      "actions_taken": "1",
+      "races": "White",
+      "activity_year": "2024"
+    },
+    {
+      "count": 115680,
+      "sum": 4.345e10,
+      "actions_taken": "2",
+      "races": "White",
+      "activity_year": "2024"
+    },
+    {
+      "count": 210340,
+      "sum": 7.567e10,
+      "actions_taken": "3",
+      "races": "White",
+      "activity_year": "2024"
+    },
+    {
+      "count": 438920,
+      "sum": 1.389e11,
+      "actions_taken": "1",
+      "races": "Black or African American",
+      "activity_year": "2024"
+    },
+    {
+      "count": 30120,
+      "sum": 8.456e9,
+      "actions_taken": "2",
+      "races": "Black or African American",
+      "activity_year": "2024"
+    },
+    {
+      "count": 68450,
+      "sum": 2.123e10,
+      "actions_taken": "3",
+      "races": "Black or African American",
+      "activity_year": "2024"
+    }
+  ],
+  "servedFrom": "fixture"
+}

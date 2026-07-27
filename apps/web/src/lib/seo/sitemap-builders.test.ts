@@ -13,7 +13,7 @@ test('buildPublicSitemapEntries includes static core journeys', () => {
   const urls = entries.map((entry) => entry.url);
   assert.ok(urls.some((url) => url.endsWith('/history')));
   assert.ok(urls.some((url) => url.endsWith('/explore')));
-  assert.ok(urls.some((url) => url.endsWith('/stories')));
+  assert.ok(urls.some((url) => url.endsWith('/chapters')));
   assert.ok(urls.some((url) => url.endsWith('/corrections')));
   assert.ok(urls.some((url) => url.endsWith('/law')));
   assert.ok(urls.some((url) => url.endsWith('/books')));

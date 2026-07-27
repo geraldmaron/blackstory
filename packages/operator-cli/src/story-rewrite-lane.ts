@@ -5,7 +5,6 @@
  * `.cache/story-rewrites/`, and never publishes seed corpus changes.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { listSeedStoryProjections } from '@repo/domain';
 import {
   createHybridLlmProvider,
   createLlmProvider,
@@ -14,9 +13,7 @@ import {
   type LlmProvider,
 } from './llm-provider.js';
 import {
-  DEFAULT_STORY_REWRITE_MODEL,
   DEFAULT_STORY_REWRITE_MODELS,
-  rewriteStory,
   STORY_REWRITE_MIN_WORDS,
   type StoryProjection,
   type StoryRewriteResult,
@@ -26,19 +23,10 @@ import {
 export const STORY_REWRITE_ARTIFACT_DIR = '.cache/story-rewrites';
 
 export type StoryRewriteLaneInput = {
-  readonly slug?: string;
-  readonly output?: string;
   readonly provider?: CreateLlmProviderOptions['provider'];
   readonly model?: string;
   readonly models?: readonly string[];
   readonly apiKey?: string;
-};
-
-export type StoryRewriteLaneSummary = {
-  readonly outputDir: string;
-  readonly providerId: string;
-  readonly liveGeneration: boolean;
-  readonly results: readonly StoryRewriteResult[];
 };
 
 const MOCK_MODEL_ID = 'mock-story-rewrite-v1';
@@ -188,59 +176,8 @@ export function writeStoryRewriteArtifact(
   return path;
 }
 
-export async function runStoryRewriteLane(
-  input: StoryRewriteLaneInput = {},
-): Promise<StoryRewriteLaneSummary> {
-  const outputDir = input.output ?? STORY_REWRITE_ARTIFACT_DIR;
-  const stories = listSeedStoryProjections().filter((story) => !input.slug || story.slug === input.slug);
-  if (stories.length === 0) {
-    throw new Error(`No seed story matched ${input.slug ?? '(all)'}`);
-  }
-  const { provider, liveGeneration } = resolveStoryRewriteProvider(input);
-  const model = input.model ?? process.env.STORY_REWRITE_MODEL ?? DEFAULT_STORY_REWRITE_MODEL;
-  const results: StoryRewriteResult[] = [];
-  for (const seed of stories) {
-    const story: StoryProjection = {
-      id: seed.id,
-      releaseId: seed.releaseId,
-      slug: seed.slug,
-      title: seed.title,
-      dek: seed.dek,
-      publishedAt: seed.publishedAt,
-      eraLabel: seed.eraLabel,
-      placeLabel: seed.placeLabel,
-      body: seed.body.map((section) => ({
-        paragraphs: [...section.paragraphs],
-        ...(section.heading !== undefined ? { heading: section.heading } : {}),
-      })),
-      relatedEntityIds: [...seed.relatedEntityIds],
-      sources: seed.sources.map((source) => ({
-        label: source.label,
-        url: source.url,
-      })),
-    };
-    const result = await rewriteStory(story, {
-      provider,
-      ...(liveGeneration ? { model } : {}),
-    });
-    writeStoryRewriteArtifact(result, outputDir);
-    results.push(result);
-  }
-  return {
-    outputDir,
-    providerId: provider.id,
-    liveGeneration,
-    results: Object.freeze(results),
-  };
-}
-
-export function formatStoryRewriteLaneResult(result: StoryRewriteResult, path: string): string {
-  return JSON.stringify({
-    slug: result.slug,
-    modelId: result.modelId,
-    words: result.wordCount,
-    originalWords: result.originalWordCount,
-    issues: result.validationIssues,
-    path,
-  });
-}
+// NOTE: The batch lane that rewrote the legacy 5-story seed corpus
+// (runStoryRewriteLane / formatStoryRewriteLaneResult) was removed when the
+// seed stories were retired in favor of theme-chapter essays (repo-gvd0).
+// The provider resolution and artifact-writing utilities above remain
+// available for any future rewrite tooling against the live catalog.

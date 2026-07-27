@@ -64,6 +64,22 @@ jobs:
     name: Dispatch discovery campaign
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # Same local Postgres service pattern as ci.yml's integration-postgres job — no secret
+    # needed, the kill switch just needs a real bb_ops.kill_switches table to read.
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_USER: blackbook
+          POSTGRES_PASSWORD: blackbook
+          POSTGRES_DB: blackbook
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U blackbook -d blackbook"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
     env:
       # Map each cron expression back to its roster job id (functions/src/schedules.ts).
       DISCOVERY_JOB_ID: >-
@@ -80,7 +96,7 @@ jobs:
       NODE_ENV: test
       LOG_LEVEL: info
       FIREBASE_PROJECT_ID: demo-repo
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DATABASE_URL: postgresql://blackbook:blackbook@127.0.0.1:5432/blackbook
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -98,6 +114,9 @@ jobs:
 
       - name: Install JavaScript dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Apply DB foundation (creates bb_ops.kill_switches)
+        run: pnpm db:init
 
       - name: Resolve kill switch (bb_ops.kill_switches, Postgres-native)
         id: kill_switch

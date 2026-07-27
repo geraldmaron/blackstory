@@ -9,6 +9,7 @@ import type { ThemeImpactPacketView } from '@repo/domain';
 import { LinkedProse } from '../entity/LinkedProse';
 import { ThemeImpactEmptyNotice } from './ThemeImpactEmptyNotice';
 import { ThemeImpactGapBannerList } from './ThemeImpactGapBanner';
+import { ThemeImpactMetricChart } from './ThemeImpactMetricChart';
 import {
   ThemeImpactProvenanceList,
   collectPacketProvenance,
@@ -92,6 +93,8 @@ export function ThemeImpactPacketCard({ packet }: ThemeImpactPacketCardProps) {
           Observations summary
         </h4>
         <LinkedProse className="ds-theme-impact__summary" text={packet.observationsSummary} />
+
+        <ThemeImpactMetricChart observations={packet.observations} />
 
         {packet.observations.length > 0 ? (
           <ul className="ds-theme-impact__metric-list">

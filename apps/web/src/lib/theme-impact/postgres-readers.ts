@@ -1,70 +1,50 @@
 /**
- * Server-side Postgres readers for published theme-impact packets in
- * `bb_reference.theme_impact_packets`.
+ * Server-side Postgres readers for theme-impact packets in the active release
+ * (`bb_public.release_theme_impact_packets`). The payload column carries the
+ * full packet document frozen at projection time by the ops
+ * `theme-packets.ts project` step; the envelope is validated here and the rest
+ * of the document is trusted as the projection pipeline's output.
  */
-import {
-  parseThemeImpactPacketRow,
-  type ThemeImpactPacket,
-} from '@repo/domain';
+import type { ThemeImpactPacket } from '@repo/domain';
+import { publicThemeImpactPacketProjectionSchema } from '@repo/schemas';
 import { queryPostgres } from '../public-data/postgres-client';
 
-type ThemeImpactPacketRow = {
-  readonly id: string;
-  readonly question_id: string;
-  readonly theme_id: string;
-  readonly title: string;
-  readonly summary: string;
-  readonly policy_eras: readonly string[];
-  readonly geography: unknown;
-  readonly method_stance: string;
-  readonly method_note: string;
-  readonly observations: unknown;
-  readonly derived: unknown;
-  readonly artifacts: unknown;
-  readonly gap_states: readonly string[];
-  readonly causal_claim_ids: readonly string[] | null;
-  readonly entity_id: string | null;
-  readonly binding_purpose: 'map_panel' | 'story' | 'research' | 'mcp' | null;
-  readonly status: string;
-  readonly created_at: Date | string;
-  readonly updated_at: Date | string;
+const ACTIVE_RELEASE_JOIN = `
+  JOIN bb_public.active_release active
+    ON active.id = 'active' AND active.release_id = packets.release_id`;
+
+type ReleasePacketRow = {
+  readonly payload: unknown;
 };
 
-function mapRow(row: ThemeImpactPacketRow): ThemeImpactPacket {
-  return parseThemeImpactPacketRow({
-    ...row,
-    created_at: row.created_at,
-    updated_at: row.updated_at,
-  });
+function mapRow(row: ReleasePacketRow): ThemeImpactPacket {
+  publicThemeImpactPacketProjectionSchema.parse(row.payload);
+  return row.payload as ThemeImpactPacket;
 }
 
-export async function listPublishedThemeImpactPacketsByTheme(
+export async function listReleaseThemeImpactPacketsByTheme(
   themeId: string,
 ): Promise<readonly ThemeImpactPacket[]> {
-  const rows = await queryPostgres<ThemeImpactPacketRow>(
-    `SELECT id, question_id, theme_id, title, summary, policy_eras, geography,
-            method_stance, method_note, observations, derived, artifacts, gap_states,
-            causal_claim_ids, entity_id, binding_purpose,
-            status, created_at, updated_at
-     FROM bb_reference.theme_impact_packets
-     WHERE status = 'published' AND theme_id = $1
-     ORDER BY question_id`,
+  const rows = await queryPostgres<ReleasePacketRow>(
+    `SELECT packets.payload
+     FROM bb_public.release_theme_impact_packets packets
+     ${ACTIVE_RELEASE_JOIN}
+     WHERE packets.theme_id = $1
+     ORDER BY packets.question_id`,
     [themeId],
   );
   return rows.map(mapRow);
 }
 
-export async function fetchPublishedThemeImpactPacket(
+export async function fetchReleaseThemeImpactPacket(
   themeId: string,
   questionId: string,
 ): Promise<ThemeImpactPacket | undefined> {
-  const rows = await queryPostgres<ThemeImpactPacketRow>(
-    `SELECT id, question_id, theme_id, title, summary, policy_eras, geography,
-            method_stance, method_note, observations, derived, artifacts, gap_states,
-            causal_claim_ids, entity_id, binding_purpose,
-            status, created_at, updated_at
-     FROM bb_reference.theme_impact_packets
-     WHERE status = 'published' AND theme_id = $1 AND question_id = $2
+  const rows = await queryPostgres<ReleasePacketRow>(
+    `SELECT packets.payload
+     FROM bb_public.release_theme_impact_packets packets
+     ${ACTIVE_RELEASE_JOIN}
+     WHERE packets.theme_id = $1 AND packets.question_id = $2
      LIMIT 1`,
     [themeId, questionId],
   );
@@ -72,12 +52,26 @@ export async function fetchPublishedThemeImpactPacket(
   return row ? mapRow(row) : undefined;
 }
 
-export async function listPublishedThemeImpactThemeIds(): Promise<readonly string[]> {
+export async function listReleaseThemeImpactPacketsByIds(
+  ids: readonly string[],
+): Promise<readonly ThemeImpactPacket[]> {
+  if (ids.length === 0) return [];
+  const rows = await queryPostgres<ReleasePacketRow>(
+    `SELECT packets.payload
+     FROM bb_public.release_theme_impact_packets packets
+     ${ACTIVE_RELEASE_JOIN}
+     WHERE packets.packet_id = ANY($1::text[])`,
+    [[...ids]],
+  );
+  return rows.map(mapRow);
+}
+
+export async function listReleaseThemeImpactThemeIds(): Promise<readonly string[]> {
   const rows = await queryPostgres<{ readonly theme_id: string }>(
-    `SELECT DISTINCT theme_id
-     FROM bb_reference.theme_impact_packets
-     WHERE status = 'published'
-     ORDER BY theme_id`,
+    `SELECT DISTINCT packets.theme_id
+     FROM bb_public.release_theme_impact_packets packets
+     ${ACTIVE_RELEASE_JOIN}
+     ORDER BY packets.theme_id`,
   );
   return rows.map((row) => row.theme_id);
 }

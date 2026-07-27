@@ -7,10 +7,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import {
-  listAvailableThemeIds,
-  listPacketsForTheme,
-} from '../../components/theme-impact/fixtures';
+import { listCatalogThemeIds, THEME_IMPACT_CATALOG } from '../../lib/theme-impact/catalog';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -72,24 +69,28 @@ test('themes method notice cites methodology without legacy notice chrome', () =
   assert.doesNotMatch(browseSource, /ds-theme-impact__notice-title/);
 });
 
-test('all adjudicated themes are available with researched packets', () => {
-  const themeIds = listAvailableThemeIds();
-  assert.deepEqual(themeIds, [
+test('theme catalog covers the adjudicated themes with unique ids and full metadata', () => {
+  const themeIds = listCatalogThemeIds();
+  for (const expected of [
     'redlining',
     'drug_policy_state',
+    'wealth_gap',
     'urban_renewal',
     'mass_incarceration',
     'environmental_racism',
     'school_segregation',
     'voting_rights',
-  ]);
-  assert.equal(
-    themeIds.reduce((count, themeId) => count + listPacketsForTheme(themeId).length, 0),
-    11,
-  );
-  for (const themeId of themeIds) {
-    assert.ok(listPacketsForTheme(themeId).length > 0);
+  ]) {
+    assert.ok(themeIds.includes(expected), `catalog missing theme ${expected}`);
   }
+  assert.equal(new Set(themeIds).size, themeIds.length, 'catalog theme ids must be unique');
+  for (const entry of THEME_IMPACT_CATALOG) {
+    assert.ok(entry.title.length > 0);
+    assert.ok(entry.lede.length > 0);
+    assert.ok(entry.priority === 'P0' || entry.priority === 'P1');
+  }
+  // Availability is derived from the active release at request time (resolveAvailableThemeIds),
+  // so it is deliberately not pinned here.
 });
 
 test('themes browse no longer describes available P1 themes as coming soon', () => {

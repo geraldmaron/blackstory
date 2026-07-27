@@ -32,7 +32,7 @@ const STATIC_PUBLIC_ROUTES: readonly {
   { path: '/law', changeFrequency: 'weekly', priority: 0.7 },
   { path: '/books', changeFrequency: 'weekly', priority: 0.6 },
   { path: '/history', changeFrequency: 'weekly', priority: 0.8 },
-  { path: '/stories', changeFrequency: 'weekly', priority: 0.6 },
+  { path: '/chapters', changeFrequency: 'weekly', priority: 0.6 },
 ]);
 
 function resolveSiteUrl(siteUrl: string | undefined): string {

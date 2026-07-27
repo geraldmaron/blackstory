@@ -1,0 +1,408 @@
+/**
+ * Article publication layout: header, hero, editorial body with inline
+ * citations, evidence blocks, and the numbered references section. Shares the
+ * design-system tokens with the theme-spine and theme-impact surfaces.
+ */
+
+.ds-article {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-8);
+  max-width: 44rem;
+  margin-inline: auto;
+}
+
+.ds-article__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--ds-space-3);
+}
+
+.ds-article__meta-row {
+  color: var(--ds-ink-muted);
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+}
+
+.ds-article__title {
+  font-family: var(--ds-font-display);
+  font-size: clamp(2rem, 4vw + 1rem, 3.25rem);
+  line-height: 1.05;
+  margin: 0;
+  color: var(--ds-ink);
+}
+
+.ds-article__summary {
+  font-family: var(--ds-font-editorial);
+  font-size: clamp(1rem, 0.4vw + 0.95rem, 1.2rem);
+  line-height: 1.55;
+  color: var(--ds-ink-muted);
+  max-width: 46ch;
+  margin: 0;
+}
+
+.ds-article__byline {
+  color: var(--ds-ink-subtle);
+  font-size: 0.8rem;
+}
+
+/* Hero + inline images */
+.ds-article__hero,
+.ds-article__image,
+.ds-article__figure,
+.ds-article__document {
+  margin: 0;
+}
+
+.ds-article__hero img,
+.ds-article__image img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: var(--ds-radius-md);
+  border: var(--ds-border-width) solid var(--ds-border);
+}
+
+.ds-article__figcaption {
+  margin-top: var(--ds-space-2);
+  font-family: var(--ds-font-sans);
+  font-size: 0.85rem;
+  color: var(--ds-ink-muted);
+  line-height: 1.5;
+}
+
+.ds-article__credit {
+  color: var(--ds-ink-subtle);
+  font-style: italic;
+}
+
+/* Editorial body — same centered column as the header */
+.ds-article__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-5);
+  width: 100%;
+}
+
+.ds-article__heading--2 {
+  font-family: var(--ds-font-display);
+  font-size: 1.75rem;
+  line-height: 1.15;
+  margin: var(--ds-space-6) 0 0;
+  color: var(--ds-ink);
+}
+
+.ds-article__heading--3 {
+  font-family: var(--ds-font-display);
+  font-size: 1.3rem;
+  margin: var(--ds-space-4) 0 0;
+  color: var(--ds-ink);
+}
+
+.ds-article__p {
+  font-family: var(--ds-font-editorial);
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: var(--ds-ink);
+  margin: 0;
+}
+
+/* Inline citation superscript */
+.ds-article-cite {
+  font-family: var(--ds-font-sans);
+  font-size: 0.65em;
+  line-height: 0;
+  margin-left: 0.1em;
+  white-space: nowrap;
+}
+
+.ds-article-cite a {
+  color: var(--ds-accent);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0 0.08em;
+}
+
+.ds-article-cite a:hover,
+.ds-article-cite a:focus-visible {
+  text-decoration: underline;
+}
+
+.ds-article__pullquote {
+  margin: var(--ds-space-2) 0;
+  padding-left: var(--ds-space-5);
+  border-left: 3px solid var(--ds-accent);
+}
+
+.ds-article__pullquote p {
+  font-family: var(--ds-font-display);
+  font-size: 1.5rem;
+  line-height: 1.3;
+  color: var(--ds-ink);
+  margin: 0;
+}
+
+.ds-article__pullquote-cite {
+  display: block;
+  margin-top: var(--ds-space-2);
+  font-family: var(--ds-font-sans);
+  font-size: 0.85rem;
+  font-style: normal;
+  color: var(--ds-ink-muted);
+}
+
+/* Evidence blocks sit slightly wider than the prose measure */
+.ds-article__figure,
+.ds-article__document,
+.ds-article__timeline,
+.ds-article__map,
+.ds-article__dispute,
+.ds-article__image {
+  margin-block: var(--ds-space-2);
+}
+
+/* ----------------------------------------------------------------------------
+ * Collapsed evidence drawers. Native <details>; charts are never wrapped here.
+ * Begins closed so prose reads as prose; the reader opens the receipt on demand.
+ * ------------------------------------------------------------------------- */
+.ds-article__drawer {
+  margin-block: var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface-raised);
+  overflow: hidden;
+}
+
+.ds-article__drawer-summary {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-3) var(--ds-space-4);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  transition: background 120ms ease;
+}
+
+.ds-article__drawer-summary::-webkit-details-marker {
+  display: none;
+}
+
+.ds-article__drawer-summary:hover {
+  background: color-mix(in srgb, var(--ds-accent) 6%, transparent);
+}
+
+.ds-article__drawer-summary:focus-visible {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: -2px;
+}
+
+.ds-article__drawer-kind {
+  flex: none;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+}
+
+.ds-article__drawer-lead {
+  flex: 1 1 auto;
+  font-family: var(--ds-font-sans);
+  font-size: 0.95rem;
+  color: var(--ds-ink);
+}
+
+/* Chevron cue that rotates when the drawer opens. */
+.ds-article__drawer-cue {
+  flex: none;
+  align-self: center;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 2px solid var(--ds-ink-subtle);
+  border-bottom: 2px solid var(--ds-ink-subtle);
+  transform: rotate(45deg);
+  transition: transform 160ms ease;
+}
+
+.ds-article__drawer[open] .ds-article__drawer-cue {
+  transform: rotate(-135deg);
+}
+
+.ds-article__drawer-body {
+  padding: 0 var(--ds-space-4) var(--ds-space-4);
+}
+
+/* The wrapped artifact loses its own outer card chrome inside the drawer. */
+.ds-article__drawer-body .ds-article__document {
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-article__drawer-cue,
+  .ds-article__drawer-summary {
+    transition: none;
+  }
+}
+
+/* ----------------------------------------------------------------------------
+ * Stat rail — consecutive figures as one compact comparison strip, not a wall
+ * of stacked cards. Two-up when the run is a pair; auto-fit otherwise.
+ * ------------------------------------------------------------------------- */
+.ds-article__statrail {
+  margin-block: var(--ds-space-4);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: var(--ds-space-3);
+}
+
+.ds-article__statrail[data-count='2'] {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.ds-article__statcell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-1);
+  padding: var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  border-left: 3px solid var(--ds-accent);
+  background: var(--ds-surface-raised);
+}
+
+.ds-article__statfigure {
+  font-family: var(--ds-font-display);
+  font-size: clamp(1.6rem, 2vw + 1rem, 2.25rem);
+  line-height: 1.05;
+  color: var(--ds-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-article__statlabel {
+  font-family: var(--ds-font-sans);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--ds-ink-muted);
+}
+
+.ds-article__statcell .ds-article-source-line {
+  margin-top: auto;
+}
+
+@media (max-width: 30rem) {
+  .ds-article__statrail,
+  .ds-article__statrail[data-count='2'] {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ds-article__source-line {
+  margin: var(--ds-space-1) 0 0;
+  font-family: var(--ds-font-sans);
+  font-size: 0.8rem;
+  color: var(--ds-ink-subtle);
+}
+
+.ds-article__document {
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface-raised);
+  padding: var(--ds-space-4);
+}
+
+.ds-article__document-head {
+  display: flex;
+  gap: var(--ds-space-3);
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.ds-article__document-date {
+  color: var(--ds-accent);
+  font-size: 0.8rem;
+}
+
+.ds-article__document-title {
+  font-family: var(--ds-font-sans);
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+.ds-article__document-quote {
+  margin: var(--ds-space-3) 0 0;
+  font-family: var(--ds-font-editorial);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--ds-ink);
+  font-style: italic;
+}
+
+.ds-article__document-summary {
+  margin-top: var(--ds-space-3);
+  font-family: var(--ds-font-sans);
+  font-size: 0.9rem;
+  color: var(--ds-ink-muted);
+}
+
+/* References */
+.ds-article__references-section {
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  padding-top: var(--ds-space-6);
+}
+
+.ds-article-references {
+  list-style: none;
+  margin: var(--ds-space-4) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-3);
+  counter-reset: none;
+}
+
+.ds-article-references__item {
+  display: grid;
+  grid-template-columns: 2.25rem 1fr;
+  gap: var(--ds-space-2);
+  font-family: var(--ds-font-sans);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  scroll-margin-top: var(--ds-space-8);
+}
+
+.ds-article-references__item:target {
+  background: var(--ds-surface-raised);
+  border-radius: var(--ds-radius-sm);
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 2px;
+}
+
+.ds-article-references__num {
+  color: var(--ds-ink-subtle);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-article-references__body a {
+  color: var(--ds-accent);
+}
+
+.ds-article-references__locator {
+  color: var(--ds-ink-subtle);
+}
+
+.ds-article__footer {
+  margin-top: var(--ds-space-6);
+  font-family: var(--ds-font-sans);
+  font-size: 0.9rem;
+}
+
+.ds-article__footer a {
+  color: var(--ds-accent);
+}

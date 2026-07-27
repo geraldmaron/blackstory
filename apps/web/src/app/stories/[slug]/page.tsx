@@ -23,6 +23,7 @@ import {
   resolvePublicStoryView,
   type PublicStoryView,
 } from '../../../lib/public-data/source';
+import { shouldUseLivePublicProjections } from '../../../lib/public-data/live-policy';
 import { geoAnchorFor } from '../../../lib/map-experience/entity-geo';
 import {
   buildExploreHref,
@@ -40,6 +41,11 @@ type StoryPageProps = {
 };
 
 export async function generateStaticParams() {
+  // Build time has no live Postgres connection — skip enumeration rather than throw.
+  // Unresolved slugs still render on request (dynamicParams defaults to true).
+  if (!shouldUseLivePublicProjections()) {
+    return [];
+  }
   const { data: stories } = await listPublicStoryListItems();
   return stories.map((story) => ({ slug: story.slug }));
 }

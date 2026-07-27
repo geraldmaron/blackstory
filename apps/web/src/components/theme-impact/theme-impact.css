@@ -1074,3 +1074,110 @@
   line-height: 1.45;
   color: var(--ds-ink-muted);
 }
+
+/* Metric charts: built from the packet's own cited observations, grouped by metric. */
+
+.ds-theme-impact-chart-group {
+  display: grid;
+  gap: var(--ds-space-4);
+  margin: var(--ds-space-4) 0 var(--ds-space-5);
+}
+
+.ds-theme-impact-chart {
+  margin: 0;
+  padding: var(--ds-space-3) var(--ds-space-4) var(--ds-space-2);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+}
+
+.ds-theme-impact-chart__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.ds-theme-impact-chart__gridline {
+  stroke: var(--ds-rule);
+  stroke-width: 1;
+  opacity: 0.6;
+}
+
+.ds-theme-impact-chart__tick {
+  fill: var(--ds-ink-subtle);
+  font-family: var(--ds-font-mono);
+  font-size: 8.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.ds-theme-impact-chart__tick--y {
+  text-anchor: end;
+  dominant-baseline: middle;
+}
+
+.ds-theme-impact-chart__tick--x {
+  text-anchor: middle;
+}
+
+.ds-theme-impact-chart__line {
+  fill: none;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ds-theme-impact-chart__line--a {
+  stroke: var(--ds-accent-graphic);
+}
+
+.ds-theme-impact-chart__line--b {
+  stroke: var(--ds-ink-muted);
+  stroke-dasharray: 3 2.5;
+}
+
+.ds-theme-impact-chart__dot--a {
+  fill: var(--ds-accent-graphic);
+}
+
+.ds-theme-impact-chart__dot--b {
+  fill: var(--ds-ink-muted);
+}
+
+.ds-theme-impact-chart__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  margin: var(--ds-space-1) 0 var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  color: var(--ds-ink-muted);
+}
+
+.ds-theme-impact-chart__legend-item {
+  position: relative;
+  padding-left: 1rem;
+}
+
+.ds-theme-impact-chart__legend-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 0.75rem;
+  height: 2px;
+}
+
+.ds-theme-impact-chart__legend-item--a::before {
+  background: var(--ds-accent-graphic);
+}
+
+.ds-theme-impact-chart__legend-item--b::before {
+  background: var(--ds-ink-muted);
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--ds-ink-muted) 0,
+    var(--ds-ink-muted) 3px,
+    transparent 3px,
+    transparent 5.5px
+  );
+}

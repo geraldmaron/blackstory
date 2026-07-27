@@ -21,6 +21,7 @@ const THEME_IMPACT_THEME_IDS_MIRROR = [
   'environmental_racism',
   'school_segregation',
   'voting_rights',
+  'wealth_gap',
   'cross_cutting',
 ] as const;
 
@@ -287,3 +288,21 @@ export const publicSearchProjectionSchema = z.object({
   claimCount: z.number().int().min(0),
 });
 export type PublicSearchProjectionDoc = z.infer<typeof publicSearchProjectionSchema>;
+
+/**
+ * Frozen ThemeImpactPacket projection payload — one row per packet in
+ * `bb_public.release_theme_impact_packets.payload`. The payload is the packet
+ * document exactly as authored in `bb_reference.theme_impact_packets` at
+ * promotion time; the domain parser (`parseThemeImpactPacketRow`) remains the
+ * deep validator. This schema pins only the envelope fields the read path and
+ * projection step key on, so schemas keeps no reverse dependency on domain.
+ */
+export const publicThemeImpactPacketProjectionSchema = z.object({
+  id: z.string().min(1),
+  themeId: themeImpactThemeIdSchema,
+  questionId: z.string().regex(/^Q\d+$/),
+  status: z.literal('published'),
+});
+export type PublicThemeImpactPacketProjectionDoc = z.infer<
+  typeof publicThemeImpactPacketProjectionSchema
+>;

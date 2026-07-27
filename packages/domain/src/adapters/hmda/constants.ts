@@ -31,8 +31,16 @@ export const PHASE1_HMDA_DENIAL_RATE_WHITE_COUNTY_METRIC_ID = 'hmda-denial-rate-
 export const PHASE1_HMDA_DENIAL_RATE_GAP_BLACK_WHITE_COUNTY_METRIC_ID =
   'hmda-denial-rate-gap-black-white-county';
 
+export const PHASE1_HMDA_DENIAL_RATE_BLACK_NATION_METRIC_ID = 'hmda-denial-rate-black-nation';
+export const PHASE1_HMDA_DENIAL_RATE_WHITE_NH_NATION_METRIC_ID = 'hmda-denial-rate-white-nh-nation';
+export const PHASE1_HMDA_DENIAL_RATE_GAP_BLACK_WHITE_NH_NATION_METRIC_ID =
+  'hmda-denial-rate-gap-black-white-nh-nation';
+
 export const PHASE1_HMDA_DATASET_VINTAGE =
   'FFIEC HMDA Data Browser county aggregations (derived_race; actions 1–3)';
+
+export const PHASE1_HMDA_NATION_DATASET_VINTAGE =
+  'FFIEC HMDA Data Browser national aggregations (derived_race; actions 1–3; conventional purchase)';
 
 /** Chicago pilot — Cook County, Illinois. */
 export const PHASE1_HMDA_DEFAULT_COUNTY_FIPS = '17031';
@@ -40,7 +48,14 @@ export const PHASE1_HMDA_DEFAULT_COUNTY_FIPS = '17031';
 /** Recent annual vintages supported by post-2018 derived_race roll-ups. */
 export const PHASE1_HMDA_DEFAULT_YEARS = [2018, 2019, 2020, 2021, 2022, 2023] as const;
 
+/** National HMDA years (2018–2024 available; see bead for 2007–2017 status). */
+export const PHASE1_HMDA_NATION_YEARS = [2018, 2019, 2020, 2021, 2022, 2023, 2024] as const;
+
 /** Aggregate strategy note stored on observations — no loan-level persistence. */
 export const HMDA_AGGREGATE_STRATEGY_NOTE =
   'County denial rates computed from FFIEC Data Browser /view/aggregations counts only; ' +
   'loan-level HMDA rows are never stored in bb_reference.';
+
+export const HMDA_NATION_AGGREGATE_STRATEGY_NOTE =
+  'National denial rates computed from FFIEC Data Browser /view/aggregations counts (conventional purchase, ' +
+  'first-lien, owner-occupied, 1–4 unit); loan-level HMDA rows are never stored in bb_reference.';

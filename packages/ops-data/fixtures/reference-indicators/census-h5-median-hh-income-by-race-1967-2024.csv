@@ -1,0 +1,118 @@
+# Source: U.S. Census Bureau, CPS ASEC, Table H-5 "Race and Hispanic Origin of
+# Householder--Households by Median and Mean Income: 1967 to 2024", median
+# income in 2024 constant dollars.
+# https://www2.census.gov/programs-surveys/cps/tables/time-series/historical-income-households/h05.xlsx
+# White NH series only goes back to 1972 in the source table (real gap before
+# that -- the older "White" (not NH-restricted) series is a different metric
+# and not substituted in here).
+Year,Race,MetricId,MedianIncome2024Dollars
+2024,Black Alone,census-h5-median-hh-income-black-nation,56020
+2024,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,92530
+2023,Black Alone,census-h5-median-hh-income-black-nation,57950
+2023,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,91360
+2022,Black Alone,census-h5-median-hh-income-black-nation,56350
+2022,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,86410
+2021,Black Alone,census-h5-median-hh-income-black-nation,55450
+2021,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,89550
+2020,Black Alone,census-h5-median-hh-income-black-nation,55210
+2020,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,90430
+2019,Black Alone,census-h5-median-hh-income-black-nation,55070
+2019,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,92180
+2018,Black Alone,census-h5-median-hh-income-black-nation,50870
+2018,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,86880
+2017,Black Alone,census-h5-median-hh-income-black-nation,50510
+2017,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,85500
+2016,Black Alone,census-h5-median-hh-income-black-nation,50420
+2016,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,83040
+2015,Black Alone,census-h5-median-hh-income-black-nation,47530
+2015,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,81080
+2014,Black Alone,census-h5-median-hh-income-black-nation,45560
+2014,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,77550
+2013,Black Alone,census-h5-median-hh-income-black-nation,46110
+2013,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,78750
+2012,Black Alone,census-h5-median-hh-income-black-nation,44020
+2012,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,75320
+2011,Black Alone,census-h5-median-hh-income-black-nation,43400
+2011,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,74620
+2010,Black Alone,census-h5-median-hh-income-black-nation,44610
+2010,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,75620
+2009,Black Alone,census-h5-median-hh-income-black-nation,45860
+2009,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,76660
+2008,Black Alone,census-h5-median-hh-income-black-nation,47970
+2008,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,77850
+2007,Black Alone,census-h5-median-hh-income-black-nation,49290
+2007,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,79820
+2006,Black Alone,census-h5-median-hh-income-black-nation,47650
+2006,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,78140
+2005,Black Alone,census-h5-median-hh-income-black-nation,47330
+2005,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,77900
+2004,Black Alone,census-h5-median-hh-income-black-nation,47500
+2004,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,77190
+2003,Black Alone,census-h5-median-hh-income-black-nation,47960
+2003,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,77290
+2002,Black Alone,census-h5-median-hh-income-black-nation,47940
+2002,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,77460
+2001,Black Alone,census-h5-median-hh-income-black-nation,49280
+2001,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,77430
+2000,Black Alone,census-h5-median-hh-income-black-nation,50720
+2000,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,78010
+1999,Black Alone,census-h5-median-hh-income-black-nation,49370
+1999,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,78100
+1998,Black Alone,census-h5-median-hh-income-black-nation,45770
+1998,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,76620
+1997,Black Alone,census-h5-median-hh-income-black-nation,45840
+1997,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,74260
+1996,Black Alone,census-h5-median-hh-income-black-nation,43890
+1996,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,72500
+1995,Black Alone,census-h5-median-hh-income-black-nation,42960
+1995,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,71330
+1994,Black Alone,census-h5-median-hh-income-black-nation,41300
+1994,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,68990
+1993,Black Alone,census-h5-median-hh-income-black-nation,39200
+1993,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,68580
+1992,Black Alone,census-h5-median-hh-income-black-nation,38570
+1992,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,68460
+1991,Black Alone,census-h5-median-hh-income-black-nation,39660
+1991,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,68160
+1990,Black Alone,census-h5-median-hh-income-black-nation,40820
+1990,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,69810
+1989,Black Alone,census-h5-median-hh-income-black-nation,41440
+1989,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,71180
+1988,Black Alone,census-h5-median-hh-income-black-nation,39250
+1988,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,70750
+1987,Black Alone,census-h5-median-hh-income-black-nation,38880
+1987,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,69990
+1986,Black Alone,census-h5-median-hh-income-black-nation,38680
+1986,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,68660
+1985,Black Alone,census-h5-median-hh-income-black-nation,38630
+1985,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,66390
+1984,Black Alone,census-h5-median-hh-income-black-nation,36310
+1984,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,65060
+1983,Black Alone,census-h5-median-hh-income-black-nation,34910
+1982,Black Alone,census-h5-median-hh-income-black-nation,35020
+1982,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,62830
+1981,Black Alone,census-h5-median-hh-income-black-nation,35090
+1981,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,63440
+1980,Black Alone,census-h5-median-hh-income-black-nation,36590
+1980,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,64640
+1979,Black Alone,census-h5-median-hh-income-black-nation,38250
+1979,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,66070
+1978,Black Alone,census-h5-median-hh-income-black-nation,38890
+1978,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,65940
+1977,Black Alone,census-h5-median-hh-income-black-nation,37180
+1977,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,64260
+1976,Black Alone,census-h5-median-hh-income-black-nation,37150
+1976,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,63740
+1975,Black Alone,census-h5-median-hh-income-black-nation,36810
+1975,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,61780
+1974,Black Alone,census-h5-median-hh-income-black-nation,37490
+1974,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,63570
+1973,Black Alone,census-h5-median-hh-income-black-nation,38340
+1973,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,65700
+1972,Black Alone,census-h5-median-hh-income-black-nation,37250
+1972,White Alone Not Hispanic,census-h5-median-hh-income-white-nh-nation,64730
+1971,Black Alone,census-h5-median-hh-income-black-nation,36160
+1970,Black Alone,census-h5-median-hh-income-black-nation,37430
+1969,Black Alone,census-h5-median-hh-income-black-nation,37520
+1968,Black Alone,census-h5-median-hh-income-black-nation,35130
+1967,Black Alone,census-h5-median-hh-income-black-nation,33230

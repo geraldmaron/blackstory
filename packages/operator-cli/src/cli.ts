@@ -50,6 +50,21 @@ import { runStoryResearch, type StoryTopicSeed } from './story-research-run.js';
 import { prepareStoryPacketIntake } from './story-intake.js';
 import { prepareEdgeIntake, type EdgeIntakeInput } from './edge-intake.js';
 import { createNodeSafeFetchDependencies, runQuickAddFetch } from './fetch.js';
+import { createMetadataOnlyStorage, type CaptureDeps, type CaptureStorage } from './source-capture.js';
+import { createSupabaseStorage, supabaseStorageConfigFromEnv } from './supabase-storage.js';
+import { runCaptureBackfill, persistCapture } from './capture-backfill.js';
+
+/**
+ * Capture blob sink selection: Supabase Storage when SUPABASE_URL + SUPABASE_SECRET_KEY are
+ * configured (blobs live next to the evidence DB, no legacy GCP dependency), else honest
+ * metadata-only (hash + excerpt inline).
+ */
+function captureStorageFromEnv(env: Record<string, string | undefined>): CaptureStorage {
+  const config = supabaseStorageConfigFromEnv(env);
+  return config ? createSupabaseStorage(config) : createMetadataOnlyStorage();
+}
+import type { ResearchCaptureSink } from './research-intake.js';
+import { createHash } from 'node:crypto';
 import { OPERATOR_SOURCES, type OperatorIdentity, type OperatorSource } from './identity.js';
 import {
   prepareEvidenceAttachmentIntake,
@@ -455,6 +470,20 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
         const targetRecordId = optionalFlag(flags, '--target-record-id');
         const contact = optionalFlag(flags, '--contact');
         const fetchDependencies = deps.fetchDependencies ?? createNodeSafeFetchDependencies();
+        // With --commit, persist a real evidence capture for the fetched URL instead of
+        // only planning one; without it, intake stays a dry preview (no DB write).
+        let researchCaptureSink: ResearchCaptureSink | undefined;
+        if (flags.booleans.has('--commit')) {
+          const pool = getOpsPostgresPool(process.env);
+          researchCaptureSink = {
+            storage: captureStorageFromEnv(process.env),
+            newId: (prefix, seed) =>
+              `${prefix}_${createHash('sha1').update(seed).digest('hex').slice(0, 16)}`,
+            persist: async (capture, event) => {
+              await persistCapture(pool, capture, event);
+            },
+          };
+        }
         const research = await runResearchIntake(
           {
             url: requireFlag(flags, '--url'),
@@ -467,6 +496,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
           },
           buildContext(flags, deps),
           fetchDependencies,
+          researchCaptureSink,
         );
         if (!research.fetch.ok) {
           stdout(JSON.stringify({ fetch: research.fetch }, null, 2));
@@ -485,6 +515,7 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
               },
               citation: research.citation,
               capturePlan: research.capturePlan,
+              capture: research.capture,
               intake: intakeSummary,
             },
             null,
@@ -779,7 +810,9 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
           delete payload.campaign;
         }
         stdout(JSON.stringify(payload, null, 2));
-        return result.status === 'success' ? 0 : 1;
+        // skipped_kill_switch is an intentional no-op (kill switch engaged), not a failure —
+        // only a real dispatch error should fail the exit code.
+        return result.status === 'error' ? 1 : 0;
       }
       case 'pending-list': {
         const paths = flags.repeated.get('--from') ?? [];
@@ -791,6 +824,33 @@ export async function runCli(argv: readonly string[], deps: CliDependencies = {}
           );
         }
         stdout(JSON.stringify(loadPendingEditorialItems(fromPaths), null, 2));
+        return 0;
+      }
+      case 'capture-backfill': {
+        // Anti-rot/anti-spoof: snapshot every cited URL. Safe by default (dry-run
+        // inventory + coverage report); --commit performs SSRF-safe fetches + writes.
+        const pool = getOpsPostgresPool(process.env);
+        const commit = flags.booleans.has('--commit');
+        const maxRaw = optionalFlag(flags, '--max-captures');
+        const maxCaptures = maxRaw === undefined ? undefined : Number.parseInt(maxRaw, 10);
+        if (maxCaptures !== undefined && (!Number.isFinite(maxCaptures) || maxCaptures < 0)) {
+          throw new Error('--max-captures must be a non-negative integer');
+        }
+        const fetchDependencies = deps.fetchDependencies ?? createNodeSafeFetchDependencies();
+        const captureDeps: CaptureDeps = {
+          fetchUrl: (url) => runQuickAddFetch(url, fetchDependencies),
+          storage: captureStorageFromEnv(process.env),
+          parserVersion: 'capture-backfill-v1',
+          newId: (prefix, seed) =>
+            `${prefix}_${createHash('sha1').update(seed).digest('hex').slice(0, 16)}`,
+          now: () => new Date().toISOString(),
+        };
+        const report = await runCaptureBackfill(
+          pool,
+          { commit, ...(maxCaptures !== undefined ? { maxCaptures } : {}) },
+          captureDeps,
+        );
+        stdout(JSON.stringify({ command: 'capture-backfill', ...report }, null, 2));
         return 0;
       }
       case 'editorial-run':

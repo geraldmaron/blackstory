@@ -3,7 +3,7 @@
  * `page.tsx` so these can be unit tested without pulling in CSS/next imports.
  */
 import type { PublicStoryListItem } from '../../lib/public-data/source';
-import { getThemeCatalogEntry } from '../../components/theme-impact/fixtures';
+import { getThemeCatalogEntry } from '../../lib/theme-impact/catalog';
 
 export const STANDALONE_GROUP_LABEL = 'Standalone';
 

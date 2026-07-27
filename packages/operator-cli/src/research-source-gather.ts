@@ -7,6 +7,7 @@
  * bare `fetch()` against URLs scraped from untrusted pages.
  */
 import type { SafeFetchDependencies, SafeFetchResult } from '@repo/security/url-safety';
+import { lookupSourceTier } from '@repo/domain';
 import { createNodeSafeFetchDependencies, runQuickAddFetch } from './fetch.js';
 import { mapPool } from './map-pool.js';
 
@@ -36,11 +37,18 @@ function excerptFromText(text: string, maxLength = 500): string {
   return clipText(text, maxLength);
 }
 
-/** Formats one gathered page for LLM prompt consumption (cite-bound, URL-labeled). */
+/**
+ * Formats one gathered page for LLM prompt consumption (cite-bound, URL-labeled). Tags the
+ * source tier (repo-k2q3 crit 4) so the judge sees trust level before drafting claims, using
+ * the same registry every surface consults (@repo/domain's lookupSourceTier) — not a parallel
+ * enrichment-only classifier.
+ */
 export function formatGatheredSourceSnippet(snippet: GatheredSourceSnippet): string {
+  const url = snippet.finalUrl ?? snippet.url;
+  const tier = lookupSourceTier(url).tier;
   const header = snippet.fetched
-    ? `Source: ${snippet.finalUrl ?? snippet.url}`
-    : `Source (prefetched): ${snippet.url}`;
+    ? `Source (Tier: ${tier}): ${url}`
+    : `Source (prefetched, Tier: ${tier}): ${snippet.url}`;
   return `${header}\n${snippet.excerpt}`;
 }
 

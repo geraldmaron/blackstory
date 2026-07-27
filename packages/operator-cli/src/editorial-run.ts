@@ -195,6 +195,11 @@ Rules:
   {predicate, object, confidenceLevel: high|medium|low, citationSource: hostname, citationHref, citationLabel}.
   citationHref MUST be one of the URLs provided in sourceSnippets — never invent or modify a URL.
   If the snippets support no verifiable claim, return an empty claims array and decision needs_evidence.
+- Each sourceSnippet is tagged with its trust tier (Tier: T1-T4; T1/T2 = official statistical
+  agencies, peer-reviewed work, archives; T3 = established nonprofits/journalism with named
+  methodology; T4 = unclassified/untrusted). Prefer T1-T3 snippets for claims. A claim citing
+  only a T4 snippet will be rejected by validation — if the only support for a fact is a T4
+  snippet, drop that claim rather than including it.
 - topicIds: 2-5 ids chosen ONLY from this registry: ${TOPIC_ID_LIST}.
 - eraBuckets: decade strings like "1910s", only when the era is evidenced in the material.
 - keywords: 2-5 short search phrases from the material.

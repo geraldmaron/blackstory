@@ -13,14 +13,21 @@
  * as one coarse analytics event via `../../lib/geocode/analytics-client.ts` (never the resolution
  * itself, never a coordinate/address/ZIP; see that module's doc for the console-only interim
  * sink).
+ *
+ * A resolved jurisdiction auto-navigates straight into `/explore` instead of waiting for a
+ * second "Explore nearby" click the panel below still renders for the instant before the
+ * route change lands (and stays put for every non-resolved outcome fallback, rate limit,
+ * error), but the happy path is one press of "Use my current location" and the map opens.
  */
 import React, { useId, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { getRequestIntegrityHeaders } from '../../lib/request-integrity/client';
 import {
   fetchLocateByAddress,
   fetchLocateByCoordinates,
   type LocateClientResult,
 } from '../../lib/geocode/locate-client';
+import { buildLocateExploreHref } from '../../lib/geocode/locate-explore-href';
 import {
   buildCoarseLocationAnalyticsEvent,
   recordCoarseLocationAnalyticsEvent,
@@ -65,6 +72,21 @@ function recordOutcome(
 export function LocateExperience() {
   const [state, setState] = useState<LocateState>({ status: 'idle' });
   const statusRegionId = useId();
+  const router = useRouter();
+
+  function finishWithResult(
+    origin: 'browser_location_used' | 'address_lookup',
+    result: LocateClientResult,
+  ) {
+    recordOutcome(origin, result);
+    setState({ status: 'done', result });
+    if (result.kind === 'resolved') {
+      // Skip the extra "Explore nearby" click on the happy path the panel renders for the
+      // instant before this navigation lands, so a slow connection still shows the resolved
+      // jurisdiction rather than a blank gap.
+      router.push(buildLocateExploreHref(result.resolution));
+    }
+  }
 
   async function handleCoordinates(position: { readonly lat: number; readonly lng: number }) {
     setState({ status: 'loading' });
@@ -72,16 +94,14 @@ export function LocateExperience() {
     const result = await fetchLocateByCoordinates(position.lat, position.lng, integrityHeaders, {
       forCamera: true,
     });
-    recordOutcome('browser_location_used', result);
-    setState({ status: 'done', result });
+    finishWithResult('browser_location_used', result);
   }
 
   async function handleAddress(address: string) {
     setState({ status: 'loading' });
     const integrityHeaders = await getRequestIntegrityHeaders();
     const result = await fetchLocateByAddress(address, integrityHeaders, { forCamera: true });
-    recordOutcome('address_lookup', result);
-    setState({ status: 'done', result });
+    finishWithResult('address_lookup', result);
   }
 
   function handleDenied() {

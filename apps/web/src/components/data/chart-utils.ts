@@ -87,6 +87,22 @@ export function formatDataPageValue(value: number, unit: 'usd' | 'percent' | 'pe
   }
 }
 
+/**
+ * Chapter deep-link for a theme id. `/themes/*` was retired (next.config redirects it
+ * to the /chapters index, losing the destination), so link straight to the chapter
+ * that tells the story behind the number. Themes without a published chapter get no link.
+ */
+const CHAPTER_SLUG_BY_THEME_ID: Readonly<Record<string, string>> = {
+  redlining: 'buying-a-home',
+  wealth_gap: 'the-gap-that-never-closed',
+};
+
+export function chapterHrefForTheme(themeId: string | undefined): string | undefined {
+  if (!themeId) return undefined;
+  const slug = CHAPTER_SLUG_BY_THEME_ID[themeId];
+  return slug ? `/chapters/${slug}` : undefined;
+}
+
 /** Unique {label,url} pairs from decade rows — for multi-source chart footnotes. */
 export function sourcesFromDecadeRows(
   rows: readonly { readonly source: string; readonly sourceUrl: string }[],

@@ -53,8 +53,8 @@ export default async function BooksBrowsePage({ searchParams }: BooksPageProps) 
                     Also find publications in History
                   </Link>
                   {' · '}
-                  <Link className="ds-cta-link" href="/stories">
-                    Stories
+                  <Link className="ds-cta-link" href="/chapters">
+                    Chapters
                   </Link>
                   {' · '}
                   <Link className="ds-cta-link" href="/methodology">

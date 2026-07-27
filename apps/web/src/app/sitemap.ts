@@ -11,11 +11,18 @@ import {
   getPublicActiveReleaseMeta,
   getPublicSearchIndex,
 } from '../lib/public-data/source';
+import { shouldUseLivePublicProjections } from '../lib/public-data/live-policy';
 import { buildPublicSitemapEntries } from '../lib/seo/sitemap-builders';
 
 export const dynamic = 'force-dynamic';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  // Build time has no live Postgres connection — emit an empty sitemap rather than throw.
+  // force-dynamic means this route re-runs per request in production, where DATABASE_URL
+  // is mounted; only the build-time probe needs this guard.
+  if (!shouldUseLivePublicProjections()) {
+    return [];
+  }
   const [{ data: index }, release] = await Promise.all([
     getPublicSearchIndex(),
     getPublicActiveReleaseMeta(),

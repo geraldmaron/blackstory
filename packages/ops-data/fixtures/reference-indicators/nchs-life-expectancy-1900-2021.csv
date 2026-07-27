@@ -1,0 +1,20 @@
+Year,Black,White,RaceLabel,Source
+1900,33.0,47.6,nonwhite,Historical Life Tables
+1910,34.1,50.0,nonwhite,Historical Life Tables
+1920,45.3,54.1,nonwhite,Historical Life Tables
+1930,48.1,59.7,nonwhite,Historical Life Tables
+1940,53.1,64.2,nonwhite,Historical Life Tables
+1950,60.8,69.1,colored,Life Tables by Race
+1960,63.6,71.0,colored,Life Tables by Race
+1970,64.1,71.7,nonwhite,CDC Vital Statistics
+1980,68.1,74.4,Black,CDC Vital Statistics
+1990,69.2,76.1,Black,CDC Vital Statistics
+2000,71.3,77.6,Black,CDC Vital Statistics
+2010,75.1,78.9,Black,CDC NCHS
+2015,75.5,78.8,Black,CDC NCHS
+2016,75.2,78.6,Black,CDC NCHS
+2017,74.9,78.5,Black,CDC NCHS
+2018,74.8,78.7,Black,CDC NCHS Socrata
+2019,74.8,78.8,Black,NCHS Vital Statistics Report
+2020,71.5,77.4,Black,NCHS Vital Statistics Report COVID
+2021,70.8,76.1,Black,NCHS Vital Statistics Report COVID

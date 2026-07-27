@@ -4,6 +4,7 @@
  * provenance, method stance, and gap labels. Juxtaposition is the default;
  * gated causal language requires claim ids. Does not ingest or publish data.
  */
+import { isAnchorTierUrl } from '../provenance/source-tiers.js';
 import type { ThemeImpactThemeId } from './theme-impact-questions.js';
 import type { StatisticalGeographyType } from './types.js';
 
@@ -88,6 +89,16 @@ export type ThemeImpactPacketGeography = {
   readonly label?: string;
 };
 
+/**
+ * One independent corroborating source for a load-bearing observation (repo-k2q3 crit 3,
+ * extended to packets by repo-xjxf). Mirrors ArticleAnchorDoc in @repo/schemas — tier is
+ * derived at validate time via isAnchorTierUrl, never stored here.
+ */
+export type ThemeImpactAnchor = {
+  readonly url: string;
+  readonly label: string;
+};
+
 export type ThemeImpactPacketObservation = {
   readonly observationId: string;
   readonly metricId: string;
@@ -96,7 +107,36 @@ export type ThemeImpactPacketObservation = {
   readonly referencePeriod: string;
   readonly provenance: ThemeImpactProvenanceQuartet;
   readonly label?: string;
+  readonly anchors?: readonly ThemeImpactAnchor[];
+  readonly replicationVerified?: boolean;
 };
+
+/**
+ * Two-anchor corroboration rule (repo-k2q3 crit 3 / repo-xjxf), packet-observation form.
+ * An observation that declares `anchors` is asserting itself as load-bearing; this then
+ * requires two independent-host T1/T2 anchors, or one T1/T2 anchor plus
+ * `replicationVerified: true`. An observation with no `anchors` field is not considered
+ * load-bearing and is not gated — same opt-in, non-retroactive design as the article-level
+ * rule in ops-data/scripts/articles.ts's gateLoadBearingAnchors.
+ */
+export function satisfiesTwoAnchorRule(observation: ThemeImpactPacketObservation): boolean {
+  const anchors = observation.anchors;
+  if (anchors === undefined) return true;
+  const anchorTiers = anchors.map((anchor) => isAnchorTierUrl(anchor.url));
+  const independentHosts = new Set(
+    anchors.map((anchor) => {
+      try {
+        return new URL(anchor.url).hostname.toLowerCase();
+      } catch {
+        return anchor.url;
+      }
+    }),
+  );
+  const anchorTierCount = anchorTiers.filter(Boolean).length;
+  const satisfiesTwoAnchors = anchorTierCount >= 2 && independentHosts.size >= 2;
+  const satisfiesReplicationException = anchorTierCount >= 1 && observation.replicationVerified === true;
+  return satisfiesTwoAnchors || satisfiesReplicationException;
+}
 
 export type ThemeImpactPacketDerived = {
   readonly derivedId: string;
@@ -108,6 +148,21 @@ export type ThemeImpactPacketDerived = {
   readonly inputObservationIds: readonly string[];
   readonly provenance: ThemeImpactProvenanceQuartet;
   readonly label?: string;
+};
+
+/**
+ * Optional scholarly-citation metadata for an artifact whose source is a peer-reviewed
+ * paper (repo-k2q3 crit 2). When present, `doi` is checked against Crossref/OpenAlex at
+ * validate time (gated behind CHECK_DOIS=1 — see checkDoiCitation and the validate wiring
+ * in ops-data/scripts/theme-packets.ts) so a citation can't silently drift or be fabricated
+ * with a plausible-looking DOI attached. Mirrors ArticleScholarlyCitationDoc in
+ * @repo/schemas — same shape, kept local here since this file has no schemas dependency.
+ */
+export type ThemeImpactScholarlyCitation = {
+  readonly doi: string;
+  readonly title: string;
+  readonly firstAuthorSurname: string;
+  readonly venue: string;
 };
 
 export type ThemeImpactPacketArtifact = {
@@ -122,6 +177,7 @@ export type ThemeImpactPacketArtifact = {
   readonly claimId?: string;
   readonly captureId?: string;
   readonly sourceUrl?: string;
+  readonly scholarlyCitation?: ThemeImpactScholarlyCitation;
 };
 
 export type ThemeImpactEntityBinding = {
@@ -196,6 +252,12 @@ function freezeObservation(row: ThemeImpactPacketObservation): ThemeImpactPacket
     referencePeriod: row.referencePeriod,
     provenance: freezeProvenance(row.provenance),
     ...(row.label !== undefined ? { label: row.label } : {}),
+    ...(row.anchors !== undefined
+      ? { anchors: Object.freeze(row.anchors.map((anchor) => Object.freeze({ ...anchor }))) }
+      : {}),
+    ...(row.replicationVerified !== undefined
+      ? { replicationVerified: row.replicationVerified }
+      : {}),
   });
 }
 
@@ -380,6 +442,12 @@ export function assertThemeImpactPacketPublishable(packet: ThemeImpactPacket): v
 
   packet.observations.forEach((row, index) => {
     provenanceComplete(row.provenance, `observations[${index}].provenance`);
+    if (!satisfiesTwoAnchorRule(row)) {
+      throw new Error(
+        `observations[${index}] (${row.observationId}) declares anchors but has neither two ` +
+          'independent T1/T2 anchors nor one T1/T2 anchor + replicationVerified',
+      );
+    }
   });
   packet.derived.forEach((row, index) => {
     provenanceComplete(row.provenance, `derived[${index}].provenance`);

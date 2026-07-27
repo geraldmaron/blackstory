@@ -248,7 +248,7 @@ test('compactOutcomeFieldLabel shortens long Opportunity Atlas field names', () 
   );
 });
 
-test('RacePairComparisonChart renders wealth juxtaposition with the public Themes link', () => {
+test('RacePairComparisonChart renders wealth juxtaposition with a chapter link', () => {
   const html = renderToStaticMarkup(
     createElement(RacePairComparisonChart, {
       series: DATA_PAGE_INDICATOR_FIXTURE_BUNDLE.wealthComparison,
@@ -257,8 +257,8 @@ test('RacePairComparisonChart renders wealth juxtaposition with the public Theme
   assert.match(html, /Median family net worth/);
   assert.match(html, /\$44,900/);
   assert.match(html, /\$285,000/);
-  assert.match(html, /See this in Themes/);
-  assert.match(html, /\/themes\/redlining/);
+  assert.match(html, /Read the chapter/);
+  assert.match(html, /\/chapters\/the-gap-that-never-closed/);
 });
 
 test('GroupedBarIndicatorChart renders NHGIS homeownership decades', () => {

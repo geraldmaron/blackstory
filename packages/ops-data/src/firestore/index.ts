@@ -5,12 +5,6 @@ export { FIRESTORE_ROOT, firestorePaths } from './paths.js';
 export type { FirestoreRootCollection } from './paths.js';
 
 export {
-  SEED_STORY_PROJECTIONS,
-  listSeedStoryProjections,
-  getSeedStoryProjection,
-} from './public-story-seed.js';
-
-export {
   authClaimFlagsSchema,
   entityKindSchema,
   geoPointFieldsSchema,

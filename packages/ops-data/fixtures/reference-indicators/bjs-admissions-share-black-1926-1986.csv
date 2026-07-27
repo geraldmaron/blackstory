@@ -1,0 +1,48 @@
+# Source: Patrick A. Langan, "Race of Prisoners Admitted to State and Federal
+# Institutions, 1926-86", BJS, NCJ-125618, May 1991, Table 2 (p.5), Black % of
+# total State+Federal prison admissions (race-known base).
+# https://www.ojp.gov/pdffiles1/nij/125618.pdf
+# Gaps are real reporting gaps in the NPS admission series (no data collected/
+# published for those years) -- do NOT interpolate.
+Year,Black Share (%)
+1926,21
+1927,21
+1928,21
+1929,21
+1930,22
+1931,22
+1932,22
+1933,23
+1934,24
+1935,25
+1936,26
+1937,26
+1938,26
+1939,26
+1940,28
+1941,29
+1942,31
+1943,30
+1944,30
+1945,31
+1946,33
+1947,30
+1948,29
+1949,29
+1950,30
+1960,32
+1964,33
+1970,39
+1974,38
+1975,35
+1976,35
+1977,38
+1978,41
+1979,39
+1980,41
+1981,42
+1982,44
+1983,41
+1984,41
+1985,43
+1986,44
