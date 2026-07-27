@@ -81,8 +81,12 @@ z 3   .ds-cinematic-rail    Explore-the-map control (sticky), Close (Engaged onl
 ```
 
 - Rest/Invite: `.ds-map-stage` markers `pointer-events: none`; content scrolls.
-- Engaged: add `.is-engaged` on the stage root → scrim `opacity: 0`, content `pointer-events: none` + faded, markers `pointer-events: auto`.
+- Engaged: scrim `opacity: 0`, markers `pointer-events: auto`, and the page recedes — see below.
 - Never use `clip-path` to inset the map (WebGL reliability) — use fixed viewport geometry via `hero-map-inset.ts` `applyHeroMapInset()` / `clearHeroMapInset()`.
+
+**Engaged recedes the whole document, not just the route's copy.** `CinematicMapProvider` mirrors Engaged onto `<html>` as `data-cinematic-engaged`, and `cinematic-map.css` keys off `:root[data-cinematic-engaged]` to fade + `visibility: hidden` the site header, the site footer, anything the route marks `data-cinematic-recede`, and the route's `edition-atmosphere` wash; it also suspends document scroll and pins `.ds-cinematic-rail` to the viewport. Fading only `.ds-cinematic-content` leaves the surrounding page legible over a live map, which reads as "the map zoomed in on top of the page" rather than a transition into it.
+
+**The plate's geometry change is animated, and the camera is fitted after it lands.** `animateHeroMapPlate()` (`hero-map-inset.ts`) transitions the plate box between hero-inset and full-bleed, resizing the GL buffer every frame so the canvas does not stretch, and runs the camera fit only once the box has stopped moving — a fit computed mid-flight lands off-centre. Reduced motion skips straight to the destination.
 
 ## 5b. Sheet & pointer-events (mobile)
 

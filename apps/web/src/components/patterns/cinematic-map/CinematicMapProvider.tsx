@@ -20,6 +20,7 @@ import React, {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useReducer,
   type ReactNode,
@@ -67,6 +68,16 @@ export type UseCinematicMapResult = {
 
 const CinematicMapContext = createContext<UseCinematicMapResult | undefined>(undefined);
 
+/**
+ * Document-level Engaged flag. The page chrome that has to recede while Engaged (spec §1
+ * Engaged row: "content recedes", "page scroll suspended") lives OUTSIDE this provider's
+ * subtree — the site header and footer are siblings of the route, and the rest of the
+ * document sits beside the hero. So the state is mirrored onto `<html>` and
+ * `cinematic-map.css` keys the recede + scroll suspend off `:root[data-cinematic-engaged]`.
+ * The provider is the single writer; nothing else sets or reads this attribute.
+ */
+export const CINEMATIC_ENGAGED_ROOT_ATTRIBUTE = 'data-cinematic-engaged';
+
 export type CinematicMapProviderProps = {
   readonly children: ReactNode;
   /** Camera/selection side effects. Defaults to a no-op driver (state-only mount). */
@@ -104,6 +115,18 @@ export function CinematicMapProvider(props: CinematicMapProviderProps) {
   }, [driver]);
 
   const flyTo = useCallback((preset: CameraPresetName) => driver.flyTo(preset), [driver]);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return undefined;
+    const root = document.documentElement;
+    if (reducerState.state === 'engaged') {
+      root.setAttribute(CINEMATIC_ENGAGED_ROOT_ATTRIBUTE, 'true');
+    } else {
+      root.removeAttribute(CINEMATIC_ENGAGED_ROOT_ATTRIBUTE);
+    }
+    // Unmounting mid-engage (route change) must not leave the document scroll-locked.
+    return () => root.removeAttribute(CINEMATIC_ENGAGED_ROOT_ATTRIBUTE);
+  }, [reducerState.state]);
 
   const value = useMemo<UseCinematicMapResult>(
     () => ({

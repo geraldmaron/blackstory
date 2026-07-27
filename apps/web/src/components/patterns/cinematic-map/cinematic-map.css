@@ -49,9 +49,92 @@
   transition: opacity var(--ds-duration-base) var(--ds-easing);
 }
 
+/* Engaged dissolves the copy entirely (spec §1 Engaged row: "content recedes"). A partial
+   fade left the whole page legible behind the live map, which read as "the map zoomed in on
+   top of the homepage" rather than a transition into the map. `visibility` is delayed by the
+   fade so the faded copy also leaves the tab order (and returns instantly on close, before
+   `ExploreMapControl` restores focus to itself). */
 .ds-cinematic-content[data-cinematic-state='engaged'] {
-  opacity: 0.35;
+  opacity: 0;
   pointer-events: none;
+  visibility: hidden;
+  transition:
+    opacity var(--ds-duration-base) var(--ds-easing),
+    visibility 0s linear var(--ds-duration-base);
+}
+
+/* ---- Engaged: the surrounding document recedes with the content ---------------------- */
+
+/*
+ * `:root[data-cinematic-engaged]` is written by `CinematicMapProvider`. It exists because the
+ * chrome that must fade is not inside the provider's subtree: the site header and footer are
+ * siblings of the route, and the rest of the page sits beside the map-bearing panel. Routes
+ * mark their own non-map content with `data-cinematic-recede`.
+ */
+
+/* Page scroll is suspended while Engaged (spec §1 Engaged row) so the map is the whole
+   surface — scrolling away from a full-bleed live map is what made this read as a cut. */
+:root[data-cinematic-engaged='true'] body {
+  overflow: hidden;
+}
+
+:root[data-cinematic-engaged='true'] .ds-shell-header,
+:root[data-cinematic-engaged='true'] .ds-shell-footer,
+:root[data-cinematic-engaged='true'] [data-cinematic-recede] {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition:
+    opacity var(--ds-duration-base) var(--ds-easing),
+    visibility 0s linear var(--ds-duration-base);
+}
+
+.ds-shell-header,
+.ds-shell-footer,
+[data-cinematic-recede] {
+  transition: opacity var(--ds-duration-base) var(--ds-easing);
+}
+
+/* The route's paper atmosphere (`edition-atmosphere.css`) is an absolutely-positioned wash
+   over the whole page root, and the root outlives Engaged because the map-bearing panel is
+   inside it. Left painting, it veils the full-bleed plate — the washed-out map with a visible
+   page-column edge across it. It fades with the rest of the page instead. */
+.ds-edition-atmosphere-canvas::before {
+  transition: opacity var(--ds-duration-base) var(--ds-easing);
+}
+
+:root[data-cinematic-engaged='true'] .ds-edition-atmosphere-canvas::before {
+  opacity: 0;
+}
+
+/* Engaged has no hero inset, so the plate drops to its baseline z-index — which is below the
+   page root that still hosts the (now transparent) hero. Raise it for the duration. */
+:root[data-cinematic-engaged='true'] .ds-map-surface .ds-map-stage {
+  z-index: 1;
+}
+
+/* Receding content keeps its layout box (`visibility`, not `display`), and the bare layout
+   containers around it have no `visibility` of their own — so without this the transparent
+   page wrapper still swallows drags meant for the full-bleed plate. Only the plate and the
+   rail controls take hits while Engaged. */
+:root[data-cinematic-engaged='true'] .ds-map-surface {
+  pointer-events: none;
+}
+
+:root[data-cinematic-engaged='true'] .ds-map-surface .ds-map-stage,
+:root[data-cinematic-engaged='true'] .ds-cinematic-rail > * {
+  pointer-events: auto;
+}
+
+/* The rail is the only chrome that survives Engaged, so it detaches from the (now hidden)
+   page flow and pins to the viewport — otherwise Close would sit wherever the host panel
+   happened to be scrolled to. */
+:root[data-cinematic-engaged='true'] .ds-cinematic-rail {
+  position: fixed;
+  top: var(--ds-space-4);
+  right: var(--ds-space-4);
+  left: auto;
+  z-index: 5;
 }
 
 /* ---- Rail (z3) — Explore/Close controls ----------------------------------------------- */
