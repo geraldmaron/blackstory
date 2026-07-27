@@ -99,8 +99,8 @@ test('next.config.mjs wires global security headers', () => {
     'twykhihqkcldpreuovay.supabase.co',
     'upload.wikimedia.org',
   ]) {
-    assert.match(mjsCsp, new RegExp(host.replace(/\./g, '\\.').replace(/\*/g, '\\*')));
-    assert.match(tsCsp, new RegExp(host.replace(/\./g, '\\.').replace(/\*/g, '\\*')));
+    assert.ok(mjsCsp.includes(host), `mjs CSP missing host ${host}`);
+    assert.ok(tsCsp.includes(host), `ts CSP missing host ${host}`);
   }
 });
 

@@ -6,7 +6,6 @@
 import type { FetchLike } from '../census-demographics/fetch-county-populations.js';
 import {
   HMDA_DATA_BROWSER_AGGREGATIONS_API_URL,
-  HMDA_DATA_BROWSER_HOMEPAGE_URL,
   PHASE1_HMDA_NATION_YEARS,
 } from './constants.js';
 import {

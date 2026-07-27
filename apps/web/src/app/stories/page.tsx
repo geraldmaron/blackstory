@@ -24,6 +24,9 @@ export const metadata = {
     'Longform history from the BlackStory archive: place-first articles with sources and links to records.',
 };
 
+/** Runtime Postgres reads; never bake seed data at build without DATABASE_URL. */
+export const dynamic = 'force-dynamic';
+
 export default async function StoriesIndexPage() {
   const { data: stories } = await listPublicStoryListItems();
   const countLabel = stories.length === 1 ? '1 story' : `${stories.length} stories`;

@@ -13,9 +13,7 @@ import {
   type LlmProvider,
 } from './llm-provider.js';
 import {
-  DEFAULT_STORY_REWRITE_MODEL,
   DEFAULT_STORY_REWRITE_MODELS,
-  rewriteStory,
   STORY_REWRITE_MIN_WORDS,
   type StoryProjection,
   type StoryRewriteResult,

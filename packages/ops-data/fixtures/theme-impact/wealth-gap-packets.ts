@@ -31,14 +31,6 @@ const CENSUS_INCOME_SOURCE = 'U.S. Census Bureau';
 const CENSUS_INCOME_URL =
   'https://www2.census.gov/programs-surveys/cps/tables/time-series/historical-income-households/h05.xlsx';
 
-type Provenance = {
-  source: string;
-  sourceUrl: string;
-  retrievedAt: string;
-  contentHash: string;
-  humanCitation: string;
-};
-
 const RETRIEVED = '2026-07-26T00:00:00.000Z';
 
 /**
