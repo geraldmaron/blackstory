@@ -61,7 +61,7 @@ jobs:
           echo "Production deploy pinned to: $SHA"
 
       - name: Checkout policy files
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Assert automatic production deploys disabled
         run: node infra/github/release-pipeline/assert-no-auto-rollout.mjs
 
@@ -73,7 +73,7 @@ jobs:
     environment: production
     steps:
       - name: Checkout exact commit
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ needs.gate.outputs.commit_sha }}
       - name: Surface deploy plan (no live apply)
@@ -95,7 +95,7 @@ jobs:
     environment: production
     steps:
       - name: Checkout exact commit
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ needs.gate.outputs.commit_sha }}
       - name: Public web and admin are Vercel Production
@@ -118,7 +118,7 @@ jobs:
       CI_REQUIRE_HEALTH_CHECK: ${{ vars.CI_REQUIRE_HEALTH_CHECK }}
     steps:
       - name: Checkout exact commit
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ needs.gate.outputs.commit_sha }}
       - name: Post-promote health gate
@@ -135,7 +135,7 @@ jobs:
       CI_REQUIRE_E2E: ${{ vars.CI_REQUIRE_E2E }}
     steps:
       - name: Checkout exact commit
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ needs.gate.outputs.commit_sha }}
       - name: Setup Node and pnpm
@@ -151,7 +151,7 @@ jobs:
     environment: production
     steps:
       - name: Checkout exact commit
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ needs.gate.outputs.commit_sha }}
           fetch-depth: 0
@@ -201,7 +201,7 @@ jobs:
     environment: production
     steps:
       - name: Checkout exact commit
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ needs.gate.outputs.commit_sha }}
       - name: Rollback dry-run rehearsal
