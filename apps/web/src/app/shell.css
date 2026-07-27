@@ -792,7 +792,13 @@
   align-self: stretch;
   justify-self: stretch;
   min-width: 0;
-  min-height: 100%;
+  /* Full-area coverage comes from align/justify-self: stretch alone. Never set
+     min-height: 100% here: on the stacked mobile grid this ::before spans the auto-sized
+     copy row, and WebKit resolves the percentage against the container it is inflating —
+     a layout feedback loop that grows the hero by thousands of px (the mobile "long black
+     gap before the map" on iOS Safari/Chrome). Blink happens not to loop, so Chrome looks
+     fine — test hero layout changes in WebKit. */
+  min-height: 0;
   background-color: var(--ds-canvas);
   background-image: var(--ds-edition-pattern-grain);
   background-size: 256px 256px;

@@ -8,15 +8,25 @@ export type ShellNavItem = {
   readonly label: string;
 };
 
-/** Always-visible top-level nav — sans caps; active route gets a copper underline. */
+/**
+ * Always-visible top-level nav — sans caps; active route gets a copper underline.
+ * Journey order: orient (Home) → act (Explore) → read (Chapters) → go deep (History)
+ * → meta (About last). `isShellNavActive` exact-matches `/`, so Home only lights on
+ * the homepage.
+ */
 export const PRIMARY_NAV: readonly ShellNavItem[] = [
+  { href: '/', label: 'Home' },
   { href: '/explore', label: 'Explore' },
-  { href: '/history', label: 'History' },
   { href: '/chapters', label: 'Chapters' },
+  { href: '/history', label: 'History' },
   { href: '/about', label: 'About' },
 ] as const;
 
-/** Overflow routes: desktop "More" disclosure + mobile drawer. */
+/**
+ * Overflow routes: desktop "More" disclosure + mobile drawer.
+ * Grouped to mirror the footer IA: archive reference (Data → Memorial), then trust
+ * (Methodology → Errata), then contribute (Submit) — keep additions inside their group.
+ */
 export const OVERFLOW_NAV: readonly ShellNavItem[] = [
   { href: '/data', label: 'Data' },
   { href: '/law', label: 'Law' },
@@ -39,8 +49,8 @@ export const FOOTER_NAV_COLUMNS: readonly FooterNavColumn[] = [
     title: 'Explore',
     items: [
       { href: '/explore', label: 'Explore' },
-      { href: '/history', label: 'History' },
       { href: '/chapters', label: 'Chapters' },
+      { href: '/history', label: 'History' },
       { href: '/data', label: 'Data' },
       { href: '/law', label: 'Law' },
       { href: '/books', label: 'Banned books' },
