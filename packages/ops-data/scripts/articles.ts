@@ -160,13 +160,47 @@ function gateLoadBearingAnchors(article: ArticleAuthoring): { warnings: string[]
   return { warnings };
 }
 
-/** Offline gates: schema (via loader) + inline-citation integrity + source-tier gate. */
+/**
+ * Immersion floor (editorial direction, 2026-07-27): a published chapter carries
+ * at least 2,000 words of body prose across its paragraph blocks. Counted after
+ * stripping `[ref:id]` markers and reducing `[[entityId|Label]]` markup to its
+ * visible label, so citation plumbing never pads the floor. Hard error on
+ * published articles, surfaced warning otherwise — same posture as the tier gate.
+ */
+const MIN_PUBLISHED_PROSE_WORDS = 2000;
+
+function countProseWords(article: ArticleAuthoring): number {
+  let words = 0;
+  for (const block of article.body) {
+    if (block.type !== 'paragraph') continue;
+    const visible = ((block as { text?: string }).text ?? '')
+      .replace(/\[ref:[a-z0-9-]+\]/g, ' ')
+      .replace(/\[\[[^\]|]+\|([^\]]+)\]\]/g, '$1')
+      .replace(/\[\[([^\]]+)\]\]/g, '$1');
+    words += visible.split(/\s+/).filter(Boolean).length;
+  }
+  return words;
+}
+
+function gateProseWordFloor(article: ArticleAuthoring): { proseWords: number; warnings: string[] } {
+  const proseWords = countProseWords(article);
+  if (proseWords >= MIN_PUBLISHED_PROSE_WORDS) return { proseWords, warnings: [] };
+  const message = `${article.id}: body prose is ${proseWords} words, below the ${MIN_PUBLISHED_PROSE_WORDS}-word chapter floor`;
+  if (article.status === 'published') {
+    throw new Error(`prose word-floor gate failed (published articles):\n  ${message}`);
+  }
+  return { proseWords, warnings: [message] };
+}
+
+/** Offline gates: schema (via loader) + inline-citation integrity + source-tier gate + prose floor. */
 function validateArticleOffline(article: ArticleAuthoring): void {
   assertArticleCitationIntegrity(article);
   const { warnings: tierWarnings } = gateArticleSourceTiers(article);
   for (const warning of tierWarnings) console.warn(`warning: ${warning}`);
   const { warnings: anchorWarnings } = gateLoadBearingAnchors(article);
   for (const warning of anchorWarnings) console.warn(`warning: ${warning}`);
+  const { warnings: floorWarnings } = gateProseWordFloor(article);
+  for (const warning of floorWarnings) console.warn(`warning: ${warning}`);
 }
 
 type PacketRow = {
@@ -478,6 +512,7 @@ async function commandValidate(paths: readonly string[]): Promise<void> {
           status: a.status,
           blocks: a.body.length,
           references: a.references.length,
+          proseWords: countProseWords(a),
         })),
       },
       null,

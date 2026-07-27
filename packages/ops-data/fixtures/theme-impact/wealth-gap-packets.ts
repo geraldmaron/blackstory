@@ -44,6 +44,26 @@ const RETRIEVED = '2026-07-26T00:00:00.000Z';
  */
 const MECHANISM_ARTIFACTS = [
   {
+    artifactId: 'art_savannah_colloquy_1865',
+    artifactClass: 'primary_government_document',
+    title:
+      'Minutes of the meeting between Black religious leaders and Union authorities, Savannah (Jan. 12, 1865)',
+    citation:
+      'Minutes of an interview between the colored ministers and church officers at Savannah with the Secretary of War and Major-Gen. Sherman, Jan. 12, 1865; published in the New-York Daily Tribune, Feb. 13, 1865. Transcription: Freedmen and Southern Society Project, University of Maryland.',
+    sourceUrl: 'https://www.freedmen.umd.edu/savmtg.htm',
+    dated: '1865-01-12',
+    summary:
+      'Four days before Special Field Orders No. 15, Sherman and Secretary of War Stanton met twenty Black religious leaders at Sherman’s Savannah headquarters and asked what their people needed. The group’s spokesman, Garrison Frazier, a 67-year-old Baptist minister who had bought freedom for himself and his wife about eight years earlier for $1,000 in gold and silver, answered: "The way we can best take care of ourselves is to have land, and turn it and till it by our own labor." The order that followed traces directly to this recorded answer.',
+    provenance: {
+      source: 'freedmen-and-southern-society-project',
+      sourceUrl: 'https://www.freedmen.umd.edu/savmtg.htm',
+      retrievedAt: '2026-07-27T00:00:00.000Z',
+      contentHash: '4a0308333c3eb6e677377cbdabefb095f088f09403830a1567e57fdb6df53dea',
+      humanCitation:
+        'Savannah Colloquy minutes (Jan. 12, 1865), Freedmen and Southern Society Project transcription; published New-York Daily Tribune, Feb. 13, 1865.',
+    },
+  },
+  {
     artifactId: 'art_special_field_orders_15_1865',
     artifactClass: 'primary_government_document',
     title: 'Special Field Orders, No. 15 (Sherman, Jan. 16, 1865)',
@@ -84,6 +104,27 @@ const MECHANISM_ARTIFACTS = [
     },
   },
   {
+    artifactId: 'art_tulsa_tribune_1921_nab_negro',
+    artifactClass: 'newspaper_report',
+    title: '"Nab Negro for Attacking Girl in an Elevator," Tulsa Tribune (May 31, 1921)',
+    citation:
+      'Tulsa Tribune, May 31, 1921, front page. The article was torn out of the bound city edition before microfilming; its text survives in Loren Gill’s 1946 transcription (reprinted in the 2001 Oklahoma Commission report, p. 58) and a duplicate printed in the Tribune’s June 1 State Edition (Library of Congress, Headlines & Heroes).',
+    sourceUrl:
+      'https://blogs.loc.gov/headlinesandheroes/2021/05/tulsa-race-massacre-newspaper-complicity-and-coverage/',
+    dated: '1921-05-31',
+    summary:
+      'The afternoon story that put a crowd outside the Tulsa County Courthouse. It reported the arrest of Dick Rowland, a Black shoe shiner, "charged with attempting to assault the 17-year-old white elevator girl in the Drexel Building." No record survives of what Sarah Page actually told police, and the case against Rowland was dismissed that September when she did not appear. Whether the same edition also carried a lynching editorial is disputed: eyewitness recollection says yes; the surviving copies are missing the pages that could settle it.',
+    provenance: {
+      source: 'library-of-congress',
+      sourceUrl:
+        'https://blogs.loc.gov/headlinesandheroes/2021/05/tulsa-race-massacre-newspaper-complicity-and-coverage/',
+      retrievedAt: '2026-07-27T00:00:00.000Z',
+      contentHash: 'cbcafb2b447a3b228eb8fb7b238c21f1472ea70f8a0e0d4ddb676a3474b23f5d',
+      humanCitation:
+        'Tulsa Tribune, May 31, 1921 (text via Gill 1946 transcription and June 1 State Edition; Library of Congress, Headlines & Heroes, 2021).',
+    },
+  },
+  {
     artifactId: 'art_social_security_act_1935_exclusions',
     artifactClass: 'primary_government_document',
     title: 'Social Security Act of 1935: exclusion of agricultural labor and domestic service',
@@ -120,6 +161,46 @@ const MECHANISM_ARTIFACTS = [
       contentHash: '315deac078427fd867d91d0644ac7acb9f70464d0f43378d61b18798ebe4c494',
       humanCitation:
         'Turner & Bound, "Closing the Gap or Widening the Divide," NBER WP 9044 (2002) / J. Econ. History 63(1), 2003.',
+    },
+  },
+  {
+    artifactId: 'art_fair_housing_act_1968',
+    artifactClass: 'primary_government_document',
+    title: 'Civil Rights Act of 1968, Title VIII (Fair Housing Act), § 801 (Apr. 11, 1968)',
+    citation:
+      'Pub. L. 90-284, title VIII, § 801, Apr. 11, 1968, 82 Stat. 81; codified at 42 U.S.C. § 3601 (govinfo, U.S. Code). Passage sequence: U.S. House of Representatives, History, Art & Archives, "The Fair Housing Act of 1968."',
+    sourceUrl:
+      'https://www.govinfo.gov/content/pkg/USCODE-2023-title42/html/USCODE-2023-title42-chap45-subchapI-sec3601.htm',
+    dated: '1968-04-11',
+    summary:
+      'The statute that made housing discrimination illegal, signed April 11, 1968 — one week after Dr. King was assassinated and one day after the House passed it. Its declaration of policy reads in full: "It is the policy of the United States to provide, within constitutional limitations, for fair housing throughout the United States." The homeownership gap the 1970 census counted two years later (about 42 Black homeowning families per hundred against about 65 white) is juxtaposed with this text, not attributed to it.',
+    provenance: {
+      source: 'govinfo-us-code',
+      sourceUrl:
+        'https://www.govinfo.gov/content/pkg/USCODE-2023-title42/html/USCODE-2023-title42-chap45-subchapI-sec3601.htm',
+      retrievedAt: '2026-07-27T00:00:00.000Z',
+      contentHash: 'e4aa3b5955ffae26ecb41d32451828a72640a425e5533b18400149a51c77c20b',
+      humanCitation:
+        'Fair Housing Act, Pub. L. 90-284, title VIII, § 801 (Apr. 11, 1968), 82 Stat. 81; 42 U.S.C. § 3601.',
+    },
+  },
+  {
+    artifactId: 'art_tulsa_race_riot_commission_2001',
+    artifactClass: 'primary_government_document',
+    title: 'Oklahoma Commission to Study the Tulsa Race Riot of 1921, final report (Feb. 28, 2001)',
+    citation:
+      'Oklahoma Commission to Study the Tulsa Race Riot of 1921, "Tulsa Race Riot" (Feb. 28, 2001), Oklahoma Historical Society.',
+    sourceUrl: 'https://www.okhistory.org/research/forms/freport.pdf',
+    dated: '2001-02-28',
+    summary:
+      'The state’s own accounting, eighty years on. The commission preserved the Red Cross count of 1,256 houses burned, found nearly ten thousand people left homeless, and confronted a death toll it could not fix: an official contemporary count of 36, a forensic floor of 38 identified victims, and "credible evidence" that the dead "likely number[ed] between one and three hundred." It also documented what blocked recovery: a June 7, 1921 fire ordinance aimed at preventing rebuilding (struck down in court), insurance denials under riot exclusion clauses, and a grand jury that blamed the victims; no white Tulsan was ever sent to prison.',
+    provenance: {
+      source: 'oklahoma-historical-society',
+      sourceUrl: 'https://www.okhistory.org/research/forms/freport.pdf',
+      retrievedAt: '2026-07-27T00:00:00.000Z',
+      contentHash: '719c8a22083bc3a577e3040b54ed2be7fd6db6504cf858258aa9066ebdf93df1',
+      humanCitation:
+        'Oklahoma Commission to Study the Tulsa Race Riot of 1921, final report (2001), Oklahoma Historical Society.',
     },
   },
 ] as const;
@@ -382,7 +463,7 @@ const METHOD_NOTE = [
   'The household-median ratio (Survey of Consumer Finances; spine-wealth-ratio-median-hh-white-black-us) runs triennially from 1989 to 2022 and measures a different construct (median household net worth, not per-capita mean), so the two segments are never averaged or joined.',
   'The 1921 figure is the national 1922 benchmark; no Greenwood-specific wealth series exists, so the place is named while the number stays national. Homeownership is the 1970 decennial (nearest to 1968). The white-householder household-income series in this spine begins in 1972, so the income comparison uses 1972 rather than 1968. The per-capita benchmark series ends at 2019, so the most recent per-capita point is 2019, not 2020.',
   'The per-capita benchmark series is read at more than its endpoints: the 1880 (about 19.0), 1890 (about 14.9), and 1900 (about 11.4) benchmarks are shown so the century-long fall reads as a slow, incomplete decline rather than a jump from 1870 to the 1920s. These are the existing DKKS benchmark rows, not new derivations.',
-  'Four primary-document-backed events sit on the packet as artifacts, each with a checkable T1-T3 source: Special Field Orders No. 15 (1865, Library of Congress / National Archives), the Freedman’s Savings Bank failure (1874, OCC history; National Archives Prologue), the Social Security Act’s exclusion of agricultural and domestic labor (1935, SSA full text), and the GI Bill’s local administration (1944, Turner & Bound, NBER WP 9044). They are placed beside the ratio as mechanism context; the packet stance stays juxtaposition, with no causal-claim ids. Where a source’s own historians dispute motive (the 1935 exclusion), the dispute is stated rather than resolved.',
+  'Eight primary-document-backed artifacts sit on the packet, each with a checkable T1-T3 source: the Savannah Colloquy minutes (1865, Freedmen and Southern Society Project), Special Field Orders No. 15 (1865, Library of Congress / National Archives), the Freedman’s Savings Bank failure (1874, OCC history; National Archives Prologue), the Tulsa Tribune’s May 31, 1921 front page (Library of Congress; 2001 commission transcription), the Social Security Act’s exclusion of agricultural and domestic labor (1935, SSA full text), the GI Bill’s local administration (1944, Turner & Bound, NBER WP 9044), the Fair Housing Act’s declaration of policy (1968, govinfo), and the 2001 Oklahoma commission report on the Tulsa massacre (Oklahoma Historical Society). They are placed beside the ratio as mechanism context; the packet stance stays juxtaposition, with no causal-claim ids. Where the record itself is disputed (the 1935 exclusion’s motive; the 1921 death toll; the Tribune’s alleged lynching editorial), the dispute is stated rather than resolved. Narrative facts in the companion article follow docs/methodology/chapter-fact-validation.md: two independent fetched sources per fact, or a named primary-record holder attributed in the sentence.',
   'The DKKS convergence-dynamics literature is cited for method context only; nothing in the narrative claims one era’s policy caused a later gap.',
 ].join(' ');
 

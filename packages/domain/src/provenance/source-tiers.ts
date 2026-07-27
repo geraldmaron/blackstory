@@ -73,6 +73,12 @@ export const SOURCE_TIER_RULES: readonly SourceTierRule[] = [
       'Author-hosted replication data for Derenoncourt, Kim, Kuhn & Schularick, "Wealth of Two Nations" (QJE 2024); mirrors the Harvard Dataverse (doi:10.7910/DVN/H6NXUH) and openICPSR 194203 deposits',
   },
   { domain: 'fraser.stlouisfed.org', tier: 'T2', rationale: "FRASER — St. Louis Fed's federal document/economic history archive" },
+  {
+    domain: 'okhistory.org',
+    tier: 'T2',
+    rationale:
+      'Oklahoma Historical Society — state agency archive of record; publisher of the 2001 Tulsa Race Riot Commission report',
+  },
   { domain: 'supreme.justia.com', tier: 'T2', rationale: 'Justia Supreme Court — primary case-text archive' },
   { domain: 'aeaweb.org', tier: 'T1', rationale: 'American Economic Association — peer-reviewed journal host' },
 
@@ -85,6 +91,7 @@ export const SOURCE_TIER_RULES: readonly SourceTierRule[] = [
   { domain: 'pewresearch.org', tier: 'T3', rationale: 'Pew Research Center' },
   { domain: 'urban.org', tier: 'T3', rationale: 'Urban Institute' },
   { domain: 'crmvet.org', tier: 'T3', rationale: 'Civil Rights Movement Archive (primary-document archive)' },
+  { domain: 'tulsahistory.org', tier: 'T3', rationale: 'Tulsa Historical Society & Museum (named collections, primary-document archive)' },
 
   // ---- generic fallbacks (least specific; longest-match keeps these last) ----
   { domain: 'gov', tier: 'T2', rationale: 'U.S. government host (unspecified agency)' },
