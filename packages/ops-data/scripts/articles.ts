@@ -244,11 +244,12 @@ async function verifyArticleReferences(
 
   if (entityIds.size > 0) {
     const releaseId = await resolveActiveReleaseId(client);
-    const rows = await client.query<{ id: string }>(
-      `SELECT id FROM bb_public.release_entities WHERE release_id = $1 AND id = ANY($2::text[])`,
+    const rows = await client.query<{ entity_id: string }>(
+      `SELECT entity_id FROM bb_public.release_entities
+       WHERE release_id = $1 AND entity_id = ANY($2::text[])`,
       [releaseId, [...entityIds]],
     );
-    const found = new Set(rows.rows.map((row) => row.id));
+    const found = new Set(rows.rows.map((row) => row.entity_id));
     for (const id of entityIds) {
       if (!found.has(id)) problems.push(`mapInset entity "${id}" not in the active release`);
     }

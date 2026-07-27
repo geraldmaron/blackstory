@@ -4,19 +4,26 @@
  * design-system tokens with the theme-spine and theme-impact surfaces.
  */
 
+/*
+ * One measure governs the whole chapter column: header, hero, body prose,
+ * evidence blocks, and references all share `--ds-content-max` so every left
+ * and right edge lines up down the page. The body carries `.ds-prose`, which
+ * caps at the same token — keep these in step rather than reintroducing a
+ * wider shell around a narrower reading column.
+ */
 .ds-article {
   display: flex;
   flex-direction: column;
   gap: var(--ds-space-8);
-  max-width: 44rem;
+  max-width: var(--ds-content-max);
   margin-inline: auto;
 }
 
 .ds-article__header {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  align-items: flex-start;
+  text-align: start;
   gap: var(--ds-space-3);
 }
 
@@ -39,7 +46,6 @@
   font-size: clamp(1rem, 0.4vw + 0.95rem, 1.2rem);
   line-height: 1.55;
   color: var(--ds-ink-muted);
-  max-width: 46ch;
   margin: 0;
 }
 
