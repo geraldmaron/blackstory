@@ -16,7 +16,7 @@
     "@repo/domain": "file:../../packages/domain",
     "@repo/public-contracts": "file:../../packages/public-contracts",
     "@tanstack/react-query": "^5.101.2",
-    "@tanstack/react-query-persist-client": "^5.101.2",
+    "@tanstack/react-query-persist-client": "^5.101.4",
     "expo": "56.0.16",
     "expo-build-properties": "~57.0.7",
     "expo-clipboard": "~56.0.0",
