@@ -488,14 +488,31 @@ export async function resolveEntityCrossReferences(
 }
 
 /** Build an in-app href for a resolved cross-reference surface. Never returns a dead link. */
+/**
+ * Theme ids with an authored chapter under /chapters. Themes not listed here
+ * have no chapter yet (repo-8602) and fall back to the chapters index — the
+ * same place the /themes/:path* catch-all redirect would land them, but
+ * without the extra 308 hop.
+ */
+const THEME_CHAPTER_SLUGS: Readonly<Record<string, string>> = {
+  redlining: 'buying-a-home',
+  wealth_gap: 'the-gap-that-never-closed',
+};
+
+function themeHref(themeId: string, fragment?: string): string {
+  const slug = THEME_CHAPTER_SLUGS[themeId];
+  if (slug === undefined) return '/chapters';
+  return fragment === undefined ? `/chapters/${slug}` : `/chapters/${slug}#${fragment}`;
+}
+
 export function entityCrossReferenceHref(surface: EntityCrossReferenceSurface): string {
   switch (surface.kind) {
     case 'chapter':
-      return `/themes/${surface.themeId}#chapter-${surface.chapterIndex}`;
+      return themeHref(surface.themeId, `chapter-${surface.chapterIndex}`);
     case 'story':
       return `/stories/${surface.storySlug}`;
     case 'theme_packet':
-      return `/themes/${surface.themeId}/questions/${surface.questionId}`;
+      return themeHref(surface.themeId);
   }
 }
 

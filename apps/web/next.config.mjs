@@ -114,6 +114,28 @@ const nextConfig = {
         destination: '/chapters',
         permanent: true,
       },
+      // Theme ids with an authored chapter redirect to it; these must precede
+      // the /themes/:path* catch-all.
+      {
+        source: '/themes/redlining',
+        destination: '/chapters/buying-a-home',
+        permanent: true,
+      },
+      {
+        source: '/themes/redlining/:path*',
+        destination: '/chapters/buying-a-home',
+        permanent: true,
+      },
+      {
+        source: '/themes/wealth_gap',
+        destination: '/chapters/the-gap-that-never-closed',
+        permanent: true,
+      },
+      {
+        source: '/themes/wealth_gap/:path*',
+        destination: '/chapters/the-gap-that-never-closed',
+        permanent: true,
+      },
       {
         source: '/themes/:path*',
         destination: '/chapters',
