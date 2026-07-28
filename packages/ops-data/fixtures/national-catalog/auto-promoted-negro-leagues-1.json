@@ -33,9 +33,9 @@
     ],
     "jurisdictionLabel": "Starkville, Mississippi",
     "locationPrecision": "city",
-    "locationLabel": "birthplace",
-    "lat": 34.259971,
-    "lng": -88.679963,
+    "locationLabel": "Starkville, Mississippi (birthplace)",
+    "lat": 33.4504,
+    "lng": -88.8184,
     "claims": [
       {
         "predicate": "played in the Negro Leagues from 1922 to 1946",
@@ -86,7 +86,8 @@
         "citationLabel": "Mississippi History Now"
       }
     ],
-    "historicalContext": "Bell's career unfolded during the era of Jim Crow segregation, which excluded Black athletes from Major League Baseball. The Negro Leagues emerged as a vital institution of Black excellence and cultural resilience, providing a platform for elite competition and community pride in the face of systemic exclusion."
+    "historicalContext": "Bell's career unfolded during the era of Jim Crow segregation, which excluded Black athletes from Major League Baseball. The Negro Leagues emerged as a vital institution of Black excellence and cultural resilience, providing a platform for elite competition and community pride in the face of systemic exclusion.",
+    "livingStatus": "deceased"
   },
   {
     "id": "negro_leagues_player_willard_brown",
@@ -169,7 +170,8 @@
         "citationLabel": "VA Memorial: Willard Brown"
       }
     ],
-    "historicalContext": "Brown's MLB debut came during the early phase of baseball's desegregation, just years after Jackie Robinson broke the color barrier. His performance in the Negro Leagues and brief MLB tenure highlight both the talent excluded by segregation and the challenges Black athletes faced in Major League integration."
+    "historicalContext": "Brown's MLB debut came during the early phase of baseball's desegregation, just years after Jackie Robinson broke the color barrier. His performance in the Negro Leagues and brief MLB tenure highlight both the talent excluded by segregation and the challenges Black athletes faced in Major League integration.",
+    "livingStatus": "deceased"
   },
   {
     "id": "negro_leagues_player_andy_cooper",
@@ -248,7 +250,8 @@
         "citationLabel": "Congressional Resolution"
       }
     ],
-    "historicalContext": "Andy Cooper's career in the Negro Leagues occurred during the Jim Crow era, when racial segregation enforced the separation of Black and white athletes. His induction into the National Baseball Hall of Fame in 2006 marked a significant recognition of the contributions of Black players to American baseball history."
+    "historicalContext": "Andy Cooper's career in the Negro Leagues occurred during the Jim Crow era, when racial segregation enforced the separation of Black and white athletes. His induction into the National Baseball Hall of Fame in 2006 marked a significant recognition of the contributions of Black players to American baseball history.",
+    "livingStatus": "deceased"
   },
   {
     "id": "negro_leagues_team_cuban_giants",
