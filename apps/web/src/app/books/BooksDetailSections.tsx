@@ -4,10 +4,16 @@
  */
 import React from 'react';
 import Link from 'next/link';
-import type { BooksBrowseItem, BooksDetailViewModel } from './books-view-model';
+import { activeBookChallenges, type BooksBrowseItem, type BooksDetailViewModel } from './books-view-model';
 import { BooksRipRow } from './BooksRipRow';
 import { booksEditionPanelClassName } from './books-panel-chrome';
 import { BOOKS_DETAIL } from './books-copy';
+
+const CHALLENGE_STATUS_LABEL: Record<string, string> = {
+  unknown: 'status unknown',
+  banned: 'banned',
+  restricted: 'restricted',
+};
 
 export type BooksDetailSectionsProps = {
   readonly view: Extract<BooksDetailViewModel, { readonly kind: 'ok' }>;
@@ -18,9 +24,7 @@ export type BooksDetailSectionsProps = {
 export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDetailSectionsProps) {
   const { book, states } = view;
   const otherPurchase = book.purchaseLinks.filter((link) => link.retailer !== 'bookshop');
-  const activeChallenges = book.challenges.filter(
-    (challenge) => challenge.status === 'reported' || challenge.status === 'unknown',
-  );
+  const activeChallenges = activeBookChallenges(book);
 
   return (
     <>
@@ -86,6 +90,12 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
                       <span className="ds-books-edition__evidence-scope">
                         {' '}
                         · {challenge.schoolYear}
+                      </span>
+                    ) : null}
+                    {challenge.status !== 'reported' ? (
+                      <span className="ds-books-edition__evidence-scope">
+                        {' '}
+                        · {CHALLENGE_STATUS_LABEL[challenge.status]}
                       </span>
                     ) : null}
                   </p>

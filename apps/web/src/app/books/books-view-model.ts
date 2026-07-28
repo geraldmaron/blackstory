@@ -112,10 +112,15 @@ function formatAuthorNames(book: BannedBookRecord): string {
   return book.authors.map((author) => author.name).join(', ');
 }
 
+const ACTIVE_CHALLENGE_STATUSES = new Set(['reported', 'unknown', 'banned', 'restricted']);
+
+/** Challenges that are currently in effect (reported, unknown, banned, or restricted). */
+export function activeBookChallenges(book: BannedBookRecord): BannedBookRecord['challenges'] {
+  return book.challenges.filter((challenge) => ACTIVE_CHALLENGE_STATUSES.has(challenge.status));
+}
+
 function activeChallengeCount(book: BannedBookRecord): number {
-  return book.challenges.filter(
-    (challenge) => challenge.status === 'reported' || challenge.status === 'unknown',
-  ).length;
+  return activeBookChallenges(book).length;
 }
 
 function recordToBrowseItem(book: BannedBookRecord): BooksBrowseItem {

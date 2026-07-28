@@ -6,6 +6,7 @@ import { US_STATES } from '../map/us-geography.js';
 import {
   MAX_BANNED_BOOK_PURCHASE_LINKS,
   MIN_BANNED_BOOK_CITATIONS,
+  type BannedBookChallengeStatus,
   type BannedBookRecord,
   type BannedBooksListingSnapshot,
 } from './types.js';
@@ -132,6 +133,23 @@ function collectBannedBookRecordErrors(book: BannedBookRecord): string[] {
         `BannedBookRecord.challenges[${index}].citation.href must be a valid http(s) URL`,
       );
     }
+    if (challenge.challengeYear !== undefined) {
+      const maxYear = new Date().getFullYear();
+      if (
+        !Number.isInteger(challenge.challengeYear) ||
+        challenge.challengeYear < 1900 ||
+        challenge.challengeYear > maxYear
+      ) {
+        errors.push(
+          `BannedBookRecord.challenges[${index}].challengeYear must be an integer between 1900 and ${maxYear}`,
+        );
+      }
+    }
+    if (challenge.titleAtChallenge !== undefined && !isNonEmpty(challenge.titleAtChallenge)) {
+      errors.push(
+        `BannedBookRecord.challenges[${index}].titleAtChallenge must be non-empty when present`,
+      );
+    }
   }
 
   if (!isNonEmpty(book.provenance.source)) {
@@ -189,14 +207,24 @@ export function validateBannedBooksListing(
   return Object.freeze({ ok: true });
 }
 
+/** Challenge statuses that represent a currently-in-effect ban or restriction. */
+const ACTIVE_CHALLENGE_STATUSES: ReadonlySet<BannedBookChallengeStatus> = new Set([
+  'reported',
+  'unknown',
+  'banned',
+  'restricted',
+]);
+
 /**
- * Sorted unique validated USPS state codes from reported or unknown challenges.
+ * Sorted unique validated USPS state codes from challenges that are currently in effect
+ * (reported, unknown, banned, or restricted). Rescinded and retained challenges are excluded,
+ * since the title is not currently banned or restricted in that jurisdiction.
  * Invalid codes are omitted (records should already fail `assertBannedBookRecord`).
  */
 export function bannedBookReportedStates(book: BannedBookRecord): string[] {
   const states = new Set<string>();
   for (const challenge of book.challenges) {
-    if (challenge.status !== 'reported' && challenge.status !== 'unknown') {
+    if (!ACTIVE_CHALLENGE_STATUSES.has(challenge.status)) {
       continue;
     }
     const code = challenge.state.toUpperCase();

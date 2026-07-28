@@ -15,7 +15,7 @@ const SNAPSHOT = getBannedBooksListingSnapshot();
 
 test('buildBooksBrowseViewModel returns all seed entries by default', () => {
   const view = buildBooksBrowseViewModel(SNAPSHOT, {});
-  assert.equal(view.totalMatched, 58);
+  assert.equal(view.totalMatched, 77);
   assert.equal(view.state, 'all');
   assert.equal(view.author, 'all');
   assert.equal(view.items.length, Math.min(BOOKS_BROWSE_PAGE_SIZE, view.totalMatched));

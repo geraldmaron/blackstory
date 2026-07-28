@@ -32,8 +32,22 @@ export type BannedBookPurchaseLink = {
   readonly validationStatus?: 'valid' | 'invalid' | 'unchecked';
 };
 
-/** Whether a reported challenge is still active, withdrawn, or undetermined. */
-export type BannedBookChallengeStatus = 'reported' | 'rescinded' | 'unknown';
+/**
+ * Disposition of a reported challenge, as carried by the PEN America status detail:
+ * - `reported`: challenge filed, outcome not yet resolved in the source.
+ * - `banned`: removed from circulation/shelves as a result of the challenge.
+ * - `restricted`: access limited (e.g. age-gated, parental permission, restricted shelving) rather than removed.
+ * - `retained`: challenge resolved in favor of keeping the title, with no restriction.
+ * - `rescinded`: the ban/restriction itself was later withdrawn.
+ * - `unknown`: source does not specify a resolved status.
+ */
+export type BannedBookChallengeStatus =
+  | 'reported'
+  | 'banned'
+  | 'restricted'
+  | 'retained'
+  | 'rescinded'
+  | 'unknown';
 
 /** A jurisdiction-specific challenge event tied to one evidence citation. */
 export type BannedBookChallenge = {
@@ -41,6 +55,7 @@ export type BannedBookChallenge = {
   readonly jurisdictionLabel?: string;
   readonly schoolYear?: string;
   readonly challengeYear?: number;
+  readonly titleAtChallenge?: string;
   readonly status: BannedBookChallengeStatus;
   readonly citation: BannedBookCitation;
 };

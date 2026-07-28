@@ -27,7 +27,7 @@ export const BOOKS_ABOUT = {
   kicker: 'About',
   title: 'How to read this list',
   lede:
-    'Entries document reported school and library restrictions with public citations. State codes are validated USPS abbreviations from those reports, not a claim of statewide removal. Bookshop.org links use BlackStory affiliate referral to support independent bookstores.',
+    'A title counts as currently banned or restricted here only while a cited challenge remains in reported, unknown, banned, or restricted status in that jurisdiction; challenges resolved as rescinded or retained are excluded. State codes are validated USPS abbreviations from those reports, not a claim of statewide removal. Bookshop.org links use BlackStory affiliate referral to support independent bookstores.',
 } as const;
 
 export const BOOKS_DETAIL = {
@@ -37,7 +37,7 @@ export const BOOKS_DETAIL = {
   challengesKicker: 'Challenges',
   challengesTitle: 'States on challenge lists',
   challengesLede:
-    'Validated USPS codes for reported or unknown challenges. Rescinded entries are omitted. Codes follow cited public reports, not a claim of statewide removal.',
+    'Validated USPS codes for challenges currently reported, unknown, banned, or restricted. Rescinded and retained entries are omitted. Codes follow cited public reports, not a claim of statewide removal.',
   evidenceKicker: 'Evidence',
   evidenceTitle: 'Citations',
   lookupKicker: 'Lookup',
