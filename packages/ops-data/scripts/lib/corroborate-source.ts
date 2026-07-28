@@ -351,37 +351,56 @@ function throttledSearxngCall<T>(run: () => Promise<T>): Promise<T> {
   return result;
 }
 
+/**
+ * A reachable page is not corroboration unless it actually mentions the subject.
+ * Guards against soft-404s (e.g. nps.gov returns 200 + a "page not found"
+ * template for reorganized URLs) and stale citation-trail links.
+ */
+function pageMentionsSubject(subjectName: string, pageText: string): boolean {
+  const nameTerms = extractSignificantTerms(subjectName);
+  if (nameTerms.size === 0) return true;
+  const textTerms = extractSignificantTerms(pageText);
+  const matched = [...nameTerms].filter((term) => textTerms.has(term)).length;
+  // One shared token ("civil", "college") is coincidence, not a mention.
+  return matched >= Math.min(2, nameTerms.size);
+}
+
 async function fetchFirstReachableLink(
   links: readonly string[],
   method: CorroboratingSource['method'],
+  subjectName: string,
 ): Promise<CorroboratingSource | undefined> {
   for (const link of links.slice(0, MAX_TRAIL_FETCHES)) {
     const page = await fetchPage(link);
-    if (page) return { url: link, text: page.text, method, html: page.html };
+    if (page && pageMentionsSubject(subjectName, page.text)) {
+      return { url: link, text: page.text, method, html: page.html };
+    }
   }
   return undefined;
 }
 
 /** Checks a fetched page's outbound and inline links for a reachable Tier-1 hit. */
 async function findViaCitationTrail(
+  subjectName: string,
   html: string,
   baseUrl: string,
   excludeUrls: readonly string[] = [],
   text?: string,
 ): Promise<CorroboratingSource | undefined> {
   const tier1Links = collectTier1TrailLinks(html, baseUrl, { excludeUrls, ...(text ? { text } : {}) });
-  return fetchFirstReachableLink(tier1Links, 'citation_trail');
+  return fetchFirstReachableLink(tier1Links, 'citation_trail', subjectName);
 }
 
 /** Tier-2 citation-trail on the primary page — curated secondary hosts only. */
 async function findViaTier2CitationTrail(
+  subjectName: string,
   html: string,
   baseUrl: string,
   excludeUrls: readonly string[] = [],
   text?: string,
 ): Promise<CorroboratingSource | undefined> {
   const tier2Links = collectTier2TrailLinks(html, baseUrl, { excludeUrls, ...(text ? { text } : {}) });
-  return fetchFirstReachableLink(tier2Links, 'tier2_citation_trail');
+  return fetchFirstReachableLink(tier2Links, 'tier2_citation_trail', subjectName);
 }
 
 /**
@@ -398,7 +417,7 @@ async function findViaWikipediaTier1Trail(
     excludeUrls: [...excludeUrls, viaWikipedia.url],
     text: viaWikipedia.text,
   });
-  const corroboration = await fetchFirstReachableLink(tier1Links, 'citation_trail');
+  const corroboration = await fetchFirstReachableLink(tier1Links, 'citation_trail', subjectName);
   if (!corroboration) return undefined;
   if (hostLineageKey(corroboration.url) === hostLineageKey(viaWikipedia.url)) return undefined;
   return corroboration;
@@ -448,6 +467,7 @@ async function searchAndFetch(
   searxngBaseUrl: string,
   pick: (results: readonly SearchHit[]) => SearchHit | undefined,
   method: CorroboratingSource['method'],
+  subjectName?: string,
 ): Promise<CorroboratingSource | undefined> {
   const hit = await throttledSearxngCall(async () => {
     try {
@@ -465,6 +485,7 @@ async function searchAndFetch(
   if (!hit) return undefined;
   const page = await fetchPage(hit.url);
   if (!page) return undefined;
+  if (subjectName !== undefined && !pageMentionsSubject(subjectName, page.text)) return undefined;
   return {
     url: hit.url,
     ...(hit.title ? { title: hit.title } : {}),
@@ -535,6 +556,7 @@ export async function findCorroboratingTier1Source(
 
   if (originalSource.html && originalSource.url) {
     const viaPrimaryTrail = await findViaCitationTrail(
+      subjectName,
       originalSource.html,
       originalSource.url,
       excludeUrls,
@@ -555,6 +577,7 @@ export async function findCorroboratingTier1Source(
 
   if (originalSource.html && originalSource.url) {
     const viaTier2Trail = await findViaTier2CitationTrail(
+      subjectName,
       originalSource.html,
       originalSource.url,
       excludeUrls,
