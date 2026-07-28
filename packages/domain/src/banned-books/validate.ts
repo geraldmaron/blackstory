@@ -6,6 +6,7 @@ import { US_STATES } from '../map/us-geography.js';
 import {
   MAX_BANNED_BOOK_PURCHASE_LINKS,
   MIN_BANNED_BOOK_CITATIONS,
+  type BannedBookChallengeStatus,
   type BannedBookRecord,
   type BannedBooksListingSnapshot,
 } from './types.js';
@@ -206,14 +207,24 @@ export function validateBannedBooksListing(
   return Object.freeze({ ok: true });
 }
 
+/** Challenge statuses that represent a currently-in-effect ban or restriction. */
+const ACTIVE_CHALLENGE_STATUSES: ReadonlySet<BannedBookChallengeStatus> = new Set([
+  'reported',
+  'unknown',
+  'banned',
+  'restricted',
+]);
+
 /**
- * Sorted unique validated USPS state codes from reported or unknown challenges.
+ * Sorted unique validated USPS state codes from challenges that are currently in effect
+ * (reported, unknown, banned, or restricted). Rescinded and retained challenges are excluded,
+ * since the title is not currently banned or restricted in that jurisdiction.
  * Invalid codes are omitted (records should already fail `assertBannedBookRecord`).
  */
 export function bannedBookReportedStates(book: BannedBookRecord): string[] {
   const states = new Set<string>();
   for (const challenge of book.challenges) {
-    if (challenge.status !== 'reported' && challenge.status !== 'unknown') {
+    if (!ACTIVE_CHALLENGE_STATUSES.has(challenge.status)) {
       continue;
     }
     const code = challenge.state.toUpperCase();

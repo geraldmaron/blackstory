@@ -15,6 +15,7 @@ import { geoAnchorFor } from '../../../lib/map-experience/entity-geo';
 import { resolvePublicEntityView } from '../../../lib/public-data/source';
 import { loadBannedBooksListing } from '../../../lib/banned-books/public-source';
 import {
+  activeBookChallenges,
   buildBooksDetailViewModel,
   buildBooksRelatedItems,
   listBooksStaticParams,
@@ -67,9 +68,7 @@ export default async function BooksDetailPage({ params }: BooksDetailPageProps) 
   const isbn = book.identifiers.find((id) => id.system === 'isbn-13' || id.system === 'isbn-10');
   const coverIsbn = coverIsbnForBook(book);
   const bookshop = book.purchaseLinks.find((link) => link.retailer === 'bookshop');
-  const activeChallenges = book.challenges.filter(
-    (challenge) => challenge.status === 'reported' || challenge.status === 'unknown',
-  );
+  const activeChallenges = activeBookChallenges(book);
   const relatedItems = buildBooksRelatedItems(snapshot, book);
 
   let entityPlacePanel: ReactNode = null;
