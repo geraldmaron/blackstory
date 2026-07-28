@@ -132,6 +132,23 @@ function collectBannedBookRecordErrors(book: BannedBookRecord): string[] {
         `BannedBookRecord.challenges[${index}].citation.href must be a valid http(s) URL`,
       );
     }
+    if (challenge.challengeYear !== undefined) {
+      const maxYear = new Date().getFullYear();
+      if (
+        !Number.isInteger(challenge.challengeYear) ||
+        challenge.challengeYear < 1900 ||
+        challenge.challengeYear > maxYear
+      ) {
+        errors.push(
+          `BannedBookRecord.challenges[${index}].challengeYear must be an integer between 1900 and ${maxYear}`,
+        );
+      }
+    }
+    if (challenge.titleAtChallenge !== undefined && !isNonEmpty(challenge.titleAtChallenge)) {
+      errors.push(
+        `BannedBookRecord.challenges[${index}].titleAtChallenge must be non-empty when present`,
+      );
+    }
   }
 
   if (!isNonEmpty(book.provenance.source)) {

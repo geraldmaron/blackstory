@@ -41,6 +41,7 @@ export type BannedBookChallenge = {
   readonly jurisdictionLabel?: string;
   readonly schoolYear?: string;
   readonly challengeYear?: number;
+  readonly titleAtChallenge?: string;
   readonly status: BannedBookChallengeStatus;
   readonly citation: BannedBookCitation;
 };

@@ -1,6 +1,6 @@
 {
-  "version": "2026-07-21.5",
-  "generatedAt": "2026-07-21T12:00:00.000Z",
+  "version": "2026-07-28.1",
+  "generatedAt": "2026-07-28T00:00:00.000Z",
   "books": [
     {
       "id": "bb-book-bluest-eye",
@@ -91,7 +91,7 @@
       "provenance": {
         "source": "American Library Association",
         "sourceUrl": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/top10",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "f7a5cd7f5ab449c8ec05731e17e0365d2f47e50b684fa84404bec11fdddbf0a7"
       }
     },
@@ -171,7 +171,7 @@
       "provenance": {
         "source": "PEN America",
         "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "c3d80d6d8338f0ee1a1d26c071ffe444f6ab7d2ac0a5b000c686d8ab0c851ddd"
       }
     },
@@ -260,7 +260,7 @@
       "provenance": {
         "source": "PEN America",
         "sourceUrl": "https://pen.org/book-bans/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "c5e8f47a4ce60d6abdd676e289e0b6d67335d4ac5e3d4310e2a0c6796a1e89f5"
       }
     },
@@ -344,7 +344,7 @@
       "provenance": {
         "source": "PEN America",
         "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "7662b023a7b6724809e057c6c0fbfd09b6beaced52e6b97818e008dc6b4d6e13"
       }
     },
@@ -422,7 +422,7 @@
       "provenance": {
         "source": "PEN America",
         "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "bd8ceb67e7b52ed3e4191d8e5ee7d19b8f45b1d9d103ac5e18fc9aac83fc80d8"
       }
     },
@@ -509,7 +509,7 @@
       "provenance": {
         "source": "American Library Association",
         "sourceUrl": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/top10",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "0f4adba7fe89df55d78ac37a94f9819ea23ff3be4430f69900e144802115464d"
       }
     },
@@ -586,7 +586,7 @@
       "provenance": {
         "source": "American Library Association",
         "sourceUrl": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/top10",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "bc591b3147144023791f0f8ba8a7a4822b87aa1ca9a9a7d382c323cf927b2ff1"
       }
     },
@@ -664,7 +664,7 @@
       "provenance": {
         "source": "PEN America",
         "sourceUrl": "https://pen.org/book-bans/pen-america-book-ban-index-data/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "37d2b21ea07a8b1ad5ea85a2b1173958fe9988fd326270aca26d5c459029c033"
       }
     },
@@ -688,29 +688,36 @@
       "publishedDate": "1952",
       "challenges": [
         {
-          "state": "NC",
+          "state": "FL",
+          "jurisdictionLabel": "Collier County Public Schools",
+          "schoolYear": "2023-2024",
+          "challengeYear": 2023,
           "status": "reported",
           "citation": {
-            "label": "ALA Top 10 Most Challenged Books",
-            "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/top10",
-            "publisher": "American Library Association"
+            "label": "More Than 300 Book Titles Banned by Collier County, FL",
+            "href": "https://pen.org/press-release/more-than-300-book-titles-banned-by-collier-county-fl-including-literary-classics-by-aldous-huxley-ralph-ellison-and-joseph-heller/",
+            "publisher": "PEN America",
+            "publishedAt": "2023-11-06"
           }
         },
         {
-          "state": "WA",
-          "status": "reported",
+          "state": "NC",
+          "jurisdictionLabel": "Randolph County School System",
+          "challengeYear": 2013,
+          "status": "rescinded",
           "citation": {
-            "label": "PEN America Index of School Book Bans 2022–2023",
-            "href": "https://pen.org/book-bans/2023-banned-book-list/",
-            "publisher": "PEN America"
+            "label": "Randolph County Board of Education reverses ban on Invisible Man",
+            "href": "https://www.acluofnorthcarolina.org/press-releases/randolph-county-board-education-reverses-ban-invisible-man/",
+            "publisher": "ACLU of North Carolina",
+            "publishedAt": "2013-09"
           }
         }
       ],
       "citations": [
         {
-          "label": "ALA Top 10 Most Challenged Books",
-          "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/top10",
-          "publisher": "American Library Association"
+          "label": "PEN America Index of School Book Bans 2023–2024",
+          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
+          "publisher": "PEN America"
         },
         {
           "label": "PEN America Book Bans hub",
@@ -741,7 +748,7 @@
       "provenance": {
         "source": "American Library Association",
         "sourceUrl": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/top10",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "653e6f53a889731e33f40fbb36428807a6abb01c8470ab51ce8db21888798297"
       }
     },
@@ -828,7 +835,7 @@
       "provenance": {
         "source": "American Library Association",
         "sourceUrl": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/top10",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "2a23c70ffbe3fdff65524e1d26c73f729dc25a0a96e77d785d79c1c8e3150c21"
       }
     },
@@ -897,7 +904,7 @@
       "provenance": {
         "source": "Houston Chronicle",
         "sourceUrl": "https://www.houstonchronicle.com/neighborhood/conroe/article/conroe-isd-book-policy-ban-19520063.php",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "419716c4b439c4edcffc044e3f95152753471653aeffe91fccf6eff6c67b050c"
       }
     },
@@ -969,7 +976,7 @@
       "provenance": {
         "source": "Nashville Banner",
         "sourceUrl": "https://nashvillebanner.com/2024/10/25/wilson-county-bans-390-books/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "a50e995cdebd34872f6b15ad82f81a561bb7f34ec555a42b92935a47201d551b"
       }
     },
@@ -1041,7 +1048,7 @@
       "provenance": {
         "source": "PEN America",
         "sourceUrl": "https://pen.org/report/beyond-the-shelves/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "01338b01cf78220d51425631700ec3cdeaeb4e91059ff4fe32e32d2c94cece91"
       }
     },
@@ -1112,7 +1119,7 @@
       "provenance": {
         "source": "ACLU of Missouri",
         "sourceUrl": "https://www.aclu-mo.org/sites/default/files/field_documents/ck-w_v_wentzville_complaint.pdf",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "26b2a183f63f6911996d947b1b8e4a2e2b0009723626c341ed4ea39865d18ef4"
       }
     },
@@ -1181,7 +1188,7 @@
       "provenance": {
         "source": "TODAY",
         "sourceUrl": "https://www.today.com/popculture/books/banned-books-black-authors-list-rcna193062",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "708e6f1ce27d1166604ba327997a008e209e8e5e984886301eca0a04fb7ef767"
       }
     },
@@ -1260,7 +1267,7 @@
       "provenance": {
         "source": "TODAY",
         "sourceUrl": "https://www.today.com/popculture/books/banned-books-black-authors-list-rcna193062",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "c71e23da2a14d901e710de40450e253ab3aa6ac10b18580d06fd242c084cac7e"
       }
     },
@@ -1329,7 +1336,7 @@
       "provenance": {
         "source": "Houston Press",
         "sourceUrl": "https://www.houstonpress.com/news/conroe-isd-trustees-wont-restore-books-in-a-policy-one-calls-racist-18369680/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "625f4abbe20a32330cf882bdc3471f9b84e5845687119666d438976e063c35ba"
       }
     },
@@ -1358,33 +1365,33 @@
           "schoolYear": "2023-2024",
           "status": "reported",
           "citation": {
-            "label": "PEN America Index of School Book Bans 2022–2023",
-            "href": "https://pen.org/book-bans/2023-banned-book-list/",
+            "label": "PEN America Index of School Book Bans 2023–2024",
+            "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
             "publisher": "PEN America"
           },
           "challengeYear": 2023
         },
         {
           "state": "VA",
-          "jurisdictionLabel": "Stonewall Jackson High School",
-          "status": "reported",
+          "jurisdictionLabel": "Stonewall Jackson High School (Prince William County Public Schools)",
+          "status": "rescinded",
           "citation": {
-            "label": "ALA Banned and Challenged Classics",
-            "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
-            "publisher": "American Library Association"
+            "label": "Their Eyes Were Watching God — FIRE First Amendment Library",
+            "href": "https://www.thefire.org/first-amendment-library/special-collections/banned-challenged-book/their-eyes-were-watching-god/",
+            "publisher": "FIRE"
           },
           "challengeYear": 1997
         }
       ],
       "citations": [
         {
-          "label": "ALA Banned and Challenged Classics",
-          "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
-          "publisher": "American Library Association"
+          "label": "Their Eyes Were Watching God — FIRE First Amendment Library",
+          "href": "https://www.thefire.org/first-amendment-library/special-collections/banned-challenged-book/their-eyes-were-watching-god/",
+          "publisher": "FIRE"
         },
         {
-          "label": "PEN America Index of School Book Bans 2022–2023",
-          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "label": "PEN America Index of School Book Bans 2023–2024",
+          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
           "publisher": "PEN America"
         },
         {
@@ -1411,260 +1418,8 @@
       "provenance": {
         "source": "American Library Association",
         "sourceUrl": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "a30ef32deff079a4c3589cb893e12411c5d91889025aab5f0a1b2d97ec1443b0"
-      }
-    },
-    {
-      "id": "bb-book-song-of-solomon",
-      "slug": "song-of-solomon",
-      "title": "Song of Solomon",
-      "authors": [
-        {
-          "name": "Toni Morrison",
-          "role": "author"
-        }
-      ],
-      "identifiers": [
-        {
-          "system": "isbn-13",
-          "value": "9781400033423"
-        }
-      ],
-      "description": "Morrison’s National Book Critics Circle winner traces Milkman Dead from Michigan to the South as he uncovers family history and flight’s legacy. ALA challenge records cite language, sexuality, and complaints that the novel is degrading to Black characters.",
-      "publishedDate": "1977",
-      "challenges": [
-        {
-          "state": "GA",
-          "jurisdictionLabel": "Richmond County School District",
-          "status": "reported",
-          "citation": {
-            "label": "ALA Banned and Challenged Classics",
-            "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
-            "publisher": "American Library Association"
-          },
-          "challengeYear": 1994
-        },
-        {
-          "state": "FL",
-          "jurisdictionLabel": "St. Johns County Schools",
-          "status": "reported",
-          "citation": {
-            "label": "ALA Banned and Challenged Classics",
-            "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
-            "publisher": "American Library Association"
-          },
-          "challengeYear": 1995
-        },
-        {
-          "state": "MD",
-          "jurisdictionLabel": "St. Mary's County schools",
-          "status": "reported",
-          "citation": {
-            "label": "ALA Banned and Challenged Classics",
-            "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
-            "publisher": "American Library Association"
-          },
-          "challengeYear": 1998
-        }
-      ],
-      "citations": [
-        {
-          "label": "ALA Banned and Challenged Classics",
-          "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
-          "publisher": "American Library Association"
-        },
-        {
-          "label": "ALA Top 10 Most Challenged Books",
-          "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/top10",
-          "publisher": "American Library Association"
-        },
-        {
-          "label": "PEN America Book Bans hub",
-          "href": "https://pen.org/book-bans/",
-          "publisher": "PEN America"
-        }
-      ],
-      "purchaseLinks": [
-        {
-          "retailer": "bookshop",
-          "label": "Buy on Bookshop.org",
-          "href": "https://bookshop.org/a/gerald69/9781400033423",
-          "validationStatus": "unchecked"
-        },
-        {
-          "retailer": "open-library",
-          "label": "View on Open Library",
-          "href": "https://openlibrary.org/isbn/9781400033423",
-          "validationStatus": "unchecked"
-        }
-      ],
-      "provenance": {
-        "source": "American Library Association",
-        "sourceUrl": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
-        "contentHash": "fc897a08a590cc13862f7dd105ccff2efee8132d2ac604be1d4a248b22cce13a"
-      }
-    },
-    {
-      "id": "bb-book-go-tell-it-on-the-mountain",
-      "slug": "go-tell-it-on-the-mountain",
-      "title": "Go Tell It on the Mountain",
-      "authors": [
-        {
-          "name": "James Baldwin",
-          "role": "author"
-        }
-      ],
-      "identifiers": [
-        {
-          "system": "isbn-13",
-          "value": "9780345806543"
-        }
-      ],
-      "description": "Baldwin’s semiautobiographical novel follows fourteen-year-old John Grimes through a day of spiritual crisis in 1930s Harlem. ALA records document challenges in New York and Virginia over profanity, sexual content, and treatment of women.",
-      "publishedDate": "1953",
-      "challenges": [
-        {
-          "state": "NY",
-          "jurisdictionLabel": "Hudson Falls schools",
-          "status": "reported",
-          "citation": {
-            "label": "ALA Banned and Challenged Classics",
-            "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
-            "publisher": "American Library Association"
-          },
-          "challengeYear": 1994
-        },
-        {
-          "state": "VA",
-          "jurisdictionLabel": "Prince William County",
-          "status": "reported",
-          "citation": {
-            "label": "ALA Banned and Challenged Classics",
-            "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
-            "publisher": "American Library Association"
-          },
-          "challengeYear": 1988
-        }
-      ],
-      "citations": [
-        {
-          "label": "ALA Banned and Challenged Classics",
-          "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
-          "publisher": "American Library Association"
-        },
-        {
-          "label": "Read These Banned Books By Black Authors",
-          "href": "https://www.today.com/popculture/books/banned-books-black-authors-list-rcna193062",
-          "publisher": "TODAY",
-          "publishedAt": "2024-02"
-        },
-        {
-          "label": "PEN America Book Bans hub",
-          "href": "https://pen.org/book-bans/",
-          "publisher": "PEN America"
-        }
-      ],
-      "purchaseLinks": [
-        {
-          "retailer": "bookshop",
-          "label": "Buy on Bookshop.org",
-          "href": "https://bookshop.org/a/gerald69/9780345806543",
-          "validationStatus": "unchecked"
-        },
-        {
-          "retailer": "open-library",
-          "label": "View on Open Library",
-          "href": "https://openlibrary.org/isbn/9780345806543",
-          "validationStatus": "unchecked"
-        }
-      ],
-      "provenance": {
-        "source": "American Library Association",
-        "sourceUrl": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
-        "contentHash": "91288638b863805104fc54971de5af35c564062707932630e0f25ecf5eddd356"
-      }
-    },
-    {
-      "id": "bb-book-black-boy",
-      "slug": "black-boy",
-      "title": "Black Boy",
-      "authors": [
-        {
-          "name": "Richard Wright",
-          "role": "author"
-        }
-      ],
-      "identifiers": [
-        {
-          "system": "isbn-13",
-          "value": "9780061130243"
-        }
-      ],
-      "description": "Wright’s memoir of growing up in the Jim Crow South records hunger, violence, and the making of a writer. It appears on ALA frequently-challenged lists and PEN America’s school ban index for profanity, race themes, and suitability disputes.",
-      "publishedDate": "1945",
-      "challenges": [
-        {
-          "state": "FL",
-          "jurisdictionLabel": "Brevard Public Schools",
-          "schoolYear": "2022-2023",
-          "status": "reported",
-          "citation": {
-            "label": "PEN America Index of School Book Bans 2022–2023",
-            "href": "https://pen.org/book-bans/2023-banned-book-list/",
-            "publisher": "PEN America"
-          },
-          "challengeYear": 2022
-        },
-        {
-          "state": "TX",
-          "status": "reported",
-          "citation": {
-            "label": "PEN America Index of School Book Bans 2022–2023",
-            "href": "https://pen.org/book-bans/2023-banned-book-list/",
-            "publisher": "PEN America"
-          }
-        }
-      ],
-      "citations": [
-        {
-          "label": "ALA Banned and Challenged Classics",
-          "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
-          "publisher": "American Library Association"
-        },
-        {
-          "label": "PEN America Index of School Book Bans 2022–2023",
-          "href": "https://pen.org/book-bans/2023-banned-book-list/",
-          "publisher": "PEN America"
-        },
-        {
-          "label": "School book bans show no signs of slowing, PEN America finds",
-          "href": "https://www.npr.org/2023/09/21/1200725104/book-bans-school-pen-america",
-          "publisher": "NPR",
-          "publishedAt": "2023-09-21"
-        }
-      ],
-      "purchaseLinks": [
-        {
-          "retailer": "bookshop",
-          "label": "Buy on Bookshop.org",
-          "href": "https://bookshop.org/a/gerald69/9780061130243",
-          "validationStatus": "unchecked"
-        },
-        {
-          "retailer": "open-library",
-          "label": "View on Open Library",
-          "href": "https://openlibrary.org/isbn/9780061130243",
-          "validationStatus": "unchecked"
-        }
-      ],
-      "provenance": {
-        "source": "PEN America",
-        "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
-        "contentHash": "47fabcf5f2f844c0934d4612f989387ef80937187cdf75be90efca88939999bc"
       }
     },
     {
@@ -1687,8 +1442,8 @@
       "publishedDate": "1973",
       "challenges": [
         {
-          "state": "MO",
-          "jurisdictionLabel": "Wentzville School District",
+          "state": "VA",
+          "jurisdictionLabel": "Madison County Public Schools",
           "schoolYear": "2022-2023",
           "status": "reported",
           "citation": {
@@ -1696,7 +1451,19 @@
             "href": "https://pen.org/book-bans/2023-banned-book-list/",
             "publisher": "PEN America"
           },
-          "challengeYear": 2022
+          "challengeYear": 2023
+        },
+        {
+          "state": "FL",
+          "jurisdictionLabel": "Collier County Public Schools",
+          "schoolYear": "2023-2024",
+          "status": "reported",
+          "citation": {
+            "label": "PEN America Index of School Book Bans 2023–2024",
+            "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
+            "publisher": "PEN America"
+          },
+          "challengeYear": 2023
         }
       ],
       "citations": [
@@ -1706,9 +1473,9 @@
           "publisher": "PEN America"
         },
         {
-          "label": "ALA Top 10 Most Challenged Books",
-          "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/top10",
-          "publisher": "American Library Association"
+          "label": "PEN America Index of School Book Bans 2023–2024",
+          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
+          "publisher": "PEN America"
         },
         {
           "label": "PEN America Book Bans hub",
@@ -1733,7 +1500,7 @@
       "provenance": {
         "source": "PEN America",
         "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "96d8114829fcba1a04004a25285cf70ca5ea307cb7728e45891e6a3078b01ef3"
       }
     },
@@ -1760,6 +1527,7 @@
           "state": "MO",
           "jurisdictionLabel": "Wentzville School District",
           "schoolYear": "2022-2023",
+          "titleAtChallenge": "Kindred: A Graphic Novel Adaptation",
           "status": "reported",
           "citation": {
             "label": "PEN America Index of School Book Bans 2022–2023",
@@ -1767,17 +1535,6 @@
             "publisher": "PEN America"
           },
           "challengeYear": 2022
-        },
-        {
-          "state": "TX",
-          "jurisdictionLabel": "Keller Independent School District",
-          "schoolYear": "2022-2023",
-          "status": "reported",
-          "citation": {
-            "label": "PEN America Index of School Book Bans 2022–2023",
-            "href": "https://pen.org/book-bans/2023-banned-book-list/",
-            "publisher": "PEN America"
-          }
         }
       ],
       "citations": [
@@ -1815,7 +1572,7 @@
       "provenance": {
         "source": "PEN America",
         "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "2185ad335d7804eade827c82439ac50d3e72415b33f27cf5264d1423a08fc930"
       }
     },
@@ -1897,7 +1654,7 @@
       "provenance": {
         "source": "PEN America",
         "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "a90081cc263e3ff4fe48642f45818c4c541f915763806cfbe7c2364428544a51"
       }
     },
@@ -1978,7 +1735,7 @@
       "provenance": {
         "source": "American Library Association",
         "sourceUrl": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "0f9aa53195bf91b37e306629b326d8842f33f5ea2a1bad07c35f3fae92b10cb3"
       }
     },
@@ -2049,7 +1806,7 @@
       "provenance": {
         "source": "PEN America",
         "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "d5440c1fc0ef3d4f4d6952e792ea9532964a3d50371366dc88009a3c0a85aca6"
       }
     },
@@ -2148,7 +1905,7 @@
       "provenance": {
         "source": "PEN America Index of School Book Bans",
         "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "c7b0c8ed633b353759318eda591850e6ae50a4d1fa8759db2da431bf79a33569"
       }
     },
@@ -2242,7 +1999,7 @@
       "provenance": {
         "source": "PEN America Index of School Book Bans",
         "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "a7a6e95e6f3194a14e29cedb3b1c3bbd4c7f17a043db306218602e80e7a3e955"
       }
     },
@@ -2337,7 +2094,7 @@
       "provenance": {
         "source": "PEN America Index of School Book Bans",
         "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "6dc45b38bb65a4c4b96933635b741ad7204d6187ad92d741b172b0b3951b4bab"
       }
     },
@@ -2431,7 +2188,7 @@
       "provenance": {
         "source": "PEN America Index of School Book Bans",
         "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "61190a867ee2ed698a4ae265649b8bb4e10f878b78ab0ec07ba724fe3765492b"
       }
     },
@@ -2513,7 +2270,7 @@
       "provenance": {
         "source": "PEN America Index of School Book Bans",
         "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "8f6825cf698a65873ba0f99535c0c22eb7c13d2fc879aaed833fbef8243ce8f4"
       }
     },
@@ -2607,7 +2364,7 @@
       "provenance": {
         "source": "PEN America Index of School Book Bans",
         "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "497c2a658168566b4760c3cfdd84e2652063cea4ec5282fce17178172f95036d"
       }
     },
@@ -2702,7 +2459,7 @@
       "provenance": {
         "source": "PEN America Index of School Book Bans",
         "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "26ec2f070e54fde07b5532406fee338e3e787589f3545e00e258ff68dfb1f520"
       }
     },
@@ -2796,7 +2553,7 @@
       "provenance": {
         "source": "PEN America Index of School Book Bans",
         "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "7d18e03fca0caa43d7fd5bdf25771065e96b332e852c8d1370cf7aa415fcc3e9"
       }
     },
@@ -2866,7 +2623,7 @@
       "provenance": {
         "source": "PEN America Index of School Book Bans",
         "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "84eea400113bcadd0aa1aded74f231233a83c41b03f81e1af7e9dea6e1b69b03"
       }
     },
@@ -2952,7 +2709,7 @@
       "provenance": {
         "source": "PEN America",
         "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "b32b5499beab50ebefb95348db6daad8f6f87f9b244424044431c150fee0ed51"
       }
     },
@@ -3033,7 +2790,7 @@
       "provenance": {
         "source": "PEN America",
         "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "ad1a3e4e8b11a4e0e414445a84b2a7b5ff737d95474b540e03ac0e7fe22eec87"
       }
     },
@@ -3123,7 +2880,7 @@
       "provenance": {
         "source": "PEN America",
         "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "234d89ea8ad9401b1d11b4cc96882172da90591f0dc20cd6aa664e4a2a6729f4"
       }
     },
@@ -3213,7 +2970,7 @@
       "provenance": {
         "source": "PEN America",
         "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "be6d1b20fc40a6ea5a0f71fd9d4ed7d2b071f2d0c434fac5a64aead353835bd2"
       }
     },
@@ -3299,7 +3056,7 @@
       "provenance": {
         "source": "PEN America",
         "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "afb576d370c4e146792cc76b8f2fbf28f444986f6b2c0fd3b122914cc68d782f"
       }
     },
@@ -3324,7 +3081,7 @@
       "challenges": [
         {
           "state": "OK",
-          "jurisdictionLabel": "Edmond Public Schools",
+          "jurisdictionLabel": "Edmond Public Schools (disputed curriculum removal; district denies a ban)",
           "schoolYear": "2021-2022",
           "challengeYear": 2021,
           "status": "reported",
@@ -3333,31 +3090,6 @@
             "href": "https://kfor.com/news/local/lawsuit-alleges-book-banning-related-to-new-oklahoma-law/",
             "publisher": "KFOR",
             "publishedAt": "2021-10"
-          }
-        },
-        {
-          "state": "OK",
-          "jurisdictionLabel": "Edmond Public Schools",
-          "schoolYear": "2021-2022",
-          "challengeYear": 2021,
-          "status": "reported",
-          "citation": {
-            "label": "Fearful of new laws, many teachers deterred from covering race-related topics",
-            "href": "https://www.pbs.org/newshour/education/fearful-of-new-laws-many-teachers-deterred-from-covering-race-related-topics",
-            "publisher": "PBS NewsHour",
-            "publishedAt": "2021-12-15"
-          }
-        },
-        {
-          "state": "OK",
-          "jurisdictionLabel": "Edmond School District",
-          "schoolYear": "2021-2022",
-          "challengeYear": 2021,
-          "status": "reported",
-          "citation": {
-            "label": "October's book bundle: Banned Books",
-            "href": "http://www.freebirdbooks.com/home/octobers-book-bundle-banned-books",
-            "publisher": "NYC Books Through Bars"
           }
         }
       ],
@@ -3395,7 +3127,7 @@
       "provenance": {
         "source": "KFOR",
         "sourceUrl": "https://kfor.com/news/local/lawsuit-alleges-book-banning-related-to-new-oklahoma-law/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "2c1f508eff15a752e91e4426cfbea6c2af85cb938b4356765d3b2b6faf16def6"
       }
     },
@@ -3429,19 +3161,6 @@
             "href": "https://www.oif.ala.org/student-action-results-in-decision-by-school-board-to-unfreeze-anti-racist-resources-in-central-york-pa/",
             "publisher": "ALA Office for Intellectual Freedom",
             "publishedAt": "2021-09"
-          }
-        },
-        {
-          "state": "PA",
-          "jurisdictionLabel": "Central York School District",
-          "schoolYear": "2021-2022",
-          "challengeYear": 2021,
-          "status": "reported",
-          "citation": {
-            "label": "Pennsylvania school district reverses ban on books by authors of colour",
-            "href": "https://www.theguardian.com/books/2021/sep/22/pennsylvania-school-district-reverses-ban-on-books-by-authors-of-colour",
-            "publisher": "The Guardian",
-            "publishedAt": "2021-09-22"
           }
         }
       ],
@@ -3481,7 +3200,7 @@
       "provenance": {
         "source": "ALA Office for Intellectual Freedom",
         "sourceUrl": "https://www.oif.ala.org/student-action-results-in-decision-by-school-board-to-unfreeze-anti-racist-resources-in-central-york-pa/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "3f32f1e30c7d4197199710590435ae4fb10af8e6d8253a5db3b58bee9adb07f8"
       }
     },
@@ -3577,7 +3296,7 @@
       "provenance": {
         "source": "PEN America",
         "sourceUrl": "https://pen.org/book-bans/2023-banned-book-list/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "c69745914584978a631201ad6fde6312d601828b021a167e96d957854f39ecb4"
       }
     },
@@ -3600,19 +3319,6 @@
       "description": "Anderson argues that policy backlash—not only individual prejudice—has repeatedly blocked Black political and economic progress from Reconstruction forward. PEN America records classroom bans, including Central York, Pennsylvania, in 2021.",
       "publishedDate": "2016",
       "challenges": [
-        {
-          "state": "PA",
-          "jurisdictionLabel": "Central York School District",
-          "schoolYear": "2021-2022",
-          "challengeYear": 2021,
-          "status": "reported",
-          "citation": {
-            "label": "PEN America's Index of School Book Bans",
-            "href": "https://docs.house.gov/meetings/GO/GO02/20220407/114616/HHRG-117-GO02-20220407-SD018.pdf",
-            "publisher": "PEN America",
-            "publishedAt": "2022-04"
-          }
-        },
         {
           "state": "PA",
           "jurisdictionLabel": "Central York School District",
@@ -3661,7 +3367,7 @@
       "provenance": {
         "source": "PEN America",
         "sourceUrl": "https://docs.house.gov/meetings/GO/GO02/20220407/114616/HHRG-117-GO02-20220407-SD018.pdf",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "99028832d43f4fb86ea196e2493539fc50f3ff4127f2de977cb3d866e51fc54f"
       }
     },
@@ -3755,98 +3461,8 @@
       "provenance": {
         "source": "PEN America",
         "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "9a24fe67f2811a1a35be4716c5696824286e3e36ba0b0bb1927f55f35b3104f2"
-      }
-    },
-    {
-      "id": "bb-book-critical-race-theory-an-introduction",
-      "slug": "critical-race-theory-an-introduction",
-      "title": "Critical Race Theory: An Introduction",
-      "authors": [
-        {
-          "name": "Richard Delgado",
-          "role": "author"
-        },
-        {
-          "name": "Jean Stefancic",
-          "role": "contributor"
-        }
-      ],
-      "identifiers": [
-        {
-          "system": "isbn-13",
-          "value": "9781479802760"
-        }
-      ],
-      "description": "Delgado and Stefancic’s primer explains critical race theory’s origins, methods, and critiques of colorblind law. Tucson Unified School District removed it from Mexican American Studies classes in 2012 after Arizona banned ethnically divisive curriculum.",
-      "publishedDate": "2017",
-      "challenges": [
-        {
-          "state": "AZ",
-          "jurisdictionLabel": "Tucson Unified School District",
-          "schoolYear": "2011-2012",
-          "challengeYear": 2012,
-          "status": "reported",
-          "citation": {
-            "label": "Reflections on NYU Press book banned in Arizona",
-            "href": "https://nyupress.org/blog/2012/10/10/reflections-on-nyu-press-book-banned-in-arizona/",
-            "publisher": "NYU Press",
-            "publishedAt": "2012-10-10"
-          }
-        },
-        {
-          "state": "AZ",
-          "jurisdictionLabel": "Tucson Unified School District",
-          "schoolYear": "2011-2012",
-          "challengeYear": 2012,
-          "status": "reported",
-          "citation": {
-            "label": "Book Banning in Arizona",
-            "href": "https://academeblog.org/2012/01/24/book-banning-in-arizona/",
-            "publisher": "Academe Blog",
-            "publishedAt": "2012-01-24"
-          }
-        }
-      ],
-      "citations": [
-        {
-          "label": "Reflections on NYU Press book banned in Arizona",
-          "href": "https://nyupress.org/blog/2012/10/10/reflections-on-nyu-press-book-banned-in-arizona/",
-          "publisher": "NYU Press",
-          "publishedAt": "2012-10-10"
-        },
-        {
-          "label": "Making the banned book list: Richard Delgado and Jean Stefancic",
-          "href": "https://www.fromthesquare.org/making-the-banned-book-list-richard-delgado-and-jean-stefancic/",
-          "publisher": "From the Square",
-          "publishedAt": "2012-02"
-        },
-        {
-          "label": "Book Banning in Arizona",
-          "href": "https://academeblog.org/2012/01/24/book-banning-in-arizona/",
-          "publisher": "Academe Blog"
-        }
-      ],
-      "purchaseLinks": [
-        {
-          "retailer": "bookshop",
-          "label": "Buy on Bookshop.org",
-          "href": "https://bookshop.org/a/gerald69/9781479802760",
-          "validationStatus": "unchecked"
-        },
-        {
-          "retailer": "open-library",
-          "label": "View on Open Library",
-          "href": "https://openlibrary.org/isbn/9781479802760",
-          "validationStatus": "unchecked"
-        }
-      ],
-      "provenance": {
-        "source": "NYU Press",
-        "sourceUrl": "https://nyupress.org/blog/2012/10/10/reflections-on-nyu-press-book-banned-in-arizona/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
-        "contentHash": "e61511e22cd5f58bf4b14c745e5de488c54053ccd4be3754d0e3f0fccb91fcb3"
       }
     },
     {
@@ -3875,7 +3491,8 @@
           "status": "reported",
           "citation": {
             "label": "PEN America Index of School Book Bans 2023–2024",
-            "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+            "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
+            "publisher": "PEN America"
           }
         },
         {
@@ -3884,43 +3501,40 @@
           "challengeYear": 2024,
           "status": "reported",
           "citation": {
-            "label": "Refinery29 — On the Come Up banned in Texas and Pennsylvania",
-            "href": "https://www.refinery29.com/en-us/2021/12/10758842/book-bans-schools-authors-color-children-suffer"
+            "label": "PEN America Index of School Book Bans 2023–2024",
+            "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
+            "publisher": "PEN America"
           }
         },
         {
           "state": "PA",
           "jurisdictionLabel": "Central York School District",
           "challengeYear": 2021,
-          "status": "reported",
+          "status": "rescinded",
           "citation": {
-            "label": "Texas Library Association — SB 13 implementation context",
-            "href": "https://txla.org/advocacy/sb-13-school-library-acquisition-reconsideration-collection-development/sb-13-implementation/"
-          }
-        },
-        {
-          "state": "TX",
-          "jurisdictionLabel": "New Braunfels Independent School District",
-          "challengeYear": 2026,
-          "status": "reported",
-          "citation": {
-            "label": "PEN America Index of School Book Bans 2023–2024",
-            "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+            "label": "Pennsylvania school district reverses ban on books by authors of colour",
+            "href": "https://www.theguardian.com/books/2021/sep/22/pennsylvania-school-district-reverses-ban-on-books-by-authors-of-colour",
+            "publisher": "The Guardian",
+            "publishedAt": "2021-09-22"
           }
         }
       ],
       "citations": [
         {
           "label": "PEN America Index of School Book Bans 2023–2024",
-          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
+          "publisher": "PEN America"
         },
         {
-          "label": "Refinery29 — On the Come Up banned in Texas and Pennsylvania",
-          "href": "https://www.refinery29.com/en-us/2021/12/10758842/book-bans-schools-authors-color-children-suffer"
+          "label": "On the Come Up censorship history (PEN America aggregates)",
+          "href": "https://www.banned-books.org/books/on-the-come-up",
+          "publisher": "Banned Books"
         },
         {
-          "label": "Texas Library Association — SB 13 implementation context",
-          "href": "https://txla.org/advocacy/sb-13-school-library-acquisition-reconsideration-collection-development/sb-13-implementation/"
+          "label": "Pennsylvania school district reverses ban on books by authors of colour",
+          "href": "https://www.theguardian.com/books/2021/sep/22/pennsylvania-school-district-reverses-ban-on-books-by-authors-of-colour",
+          "publisher": "The Guardian",
+          "publishedAt": "2021-09-22"
         }
       ],
       "purchaseLinks": [
@@ -3940,7 +3554,7 @@
       "provenance": {
         "source": "PEN America Index of School Book Bans",
         "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "eedb1353670e2adcbea3488418a96f6a857634c6d083fedf99513e173f912fb6"
       }
     },
@@ -3971,16 +3585,6 @@
           "citation": {
             "label": "PEN America Index of School Book Bans 2022–2023 (PDF)",
             "href": "https://thisbookisbanned.com/wp-content/uploads/2024/10/PEN-Americas-Index-of-School-Book-Bans-July-1-2022-June-30-2023-Sorted-by-State-District.pdf"
-          }
-        },
-        {
-          "state": "FL",
-          "jurisdictionLabel": "Escambia County Public Schools",
-          "challengeYear": 2023,
-          "status": "reported",
-          "citation": {
-            "label": "Book Riot — Black Boy Joy among 2023 school bans",
-            "href": "https://bookriot.com/they-may-not-be-the-most-targeted-but-theyre-still-banned/"
           }
         },
         {
@@ -4025,7 +3629,7 @@
       "provenance": {
         "source": "PEN America Index of School Book Bans 2022–2023",
         "sourceUrl": "https://thisbookisbanned.com/wp-content/uploads/2024/10/PEN-Americas-Index-of-School-Book-Bans-July-1-2022-June-30-2023-Sorted-by-State-District.pdf",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "5dcd1156e307f12d0ca8a1ff32c59f48813fcdd8c065bc8b283a21ac53881429"
       }
     },
@@ -4051,21 +3655,23 @@
         {
           "state": "FL",
           "jurisdictionLabel": "Hernando County School District",
-          "challengeYear": 2024,
+          "challengeYear": 2023,
           "status": "reported",
           "citation": {
             "label": "PEN America Index of School Book Bans 2023–2024",
-            "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+            "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
+            "publisher": "PEN America"
           }
         },
         {
           "state": "FL",
           "jurisdictionLabel": "Volusia County School District",
-          "challengeYear": 2024,
+          "challengeYear": 2023,
           "status": "reported",
           "citation": {
-            "label": "Chalkbeat Tennessee — Wilson County library book purge list",
-            "href": "https://www.chalkbeat.org/tennessee/2024/11/16/tennessee-school-districts-share-wilson-county-library-book-ban-list/"
+            "label": "PEN America Index of School Book Bans 2022–2023",
+            "href": "https://pen.org/book-bans/2023-banned-book-list/",
+            "publisher": "PEN America"
           }
         },
         {
@@ -4082,11 +3688,13 @@
       "citations": [
         {
           "label": "PEN America Index of School Book Bans 2023–2024",
-          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
+          "publisher": "PEN America"
         },
         {
-          "label": "Chalkbeat Tennessee — Wilson County library book purge list",
-          "href": "https://www.chalkbeat.org/tennessee/2024/11/16/tennessee-school-districts-share-wilson-county-library-book-ban-list/"
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
         },
         {
           "label": "Nashville Banner — Wilson County bans include Felix Ever After",
@@ -4110,7 +3718,7 @@
       "provenance": {
         "source": "PEN America Index of School Book Bans; Florida Department of Education reports",
         "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "d766a98d8da596d57faeabf52d786238d6f043d4a230cadaacc63a9ecd7aea63"
       }
     },
@@ -4137,10 +3745,11 @@
           "state": "PA",
           "jurisdictionLabel": "Central York School District",
           "challengeYear": 2021,
-          "status": "reported",
+          "status": "rescinded",
           "citation": {
-            "label": "ALA Office for Intellectual Freedom — Clap When You Land temporary ban",
-            "href": "https://www.oif.ala.org/happy-birthday-elizabeth-acevedo/"
+            "label": "PEN America Index of School Book Bans 2021–2022 (PDF)",
+            "href": "https://docs.house.gov/meetings/GO/GO02/20220407/114616/HHRG-117-GO02-20220407-SD018.pdf",
+            "publisher": "PEN America"
           }
         },
         {
@@ -4149,8 +3758,9 @@
           "challengeYear": 2022,
           "status": "reported",
           "citation": {
-            "label": "Refinery29 — Clap When You Land banned in York, Pennsylvania",
-            "href": "https://www.refinery29.com/en-us/2021/12/10758842/book-bans-schools-authors-color-children-suffer"
+            "label": "PEN America Index of School Book Bans 2022–2023",
+            "href": "https://pen.org/book-bans/2023-banned-book-list/",
+            "publisher": "PEN America"
           }
         },
         {
@@ -4160,7 +3770,8 @@
           "status": "reported",
           "citation": {
             "label": "PEN America Index of School Book Bans 2023–2024",
-            "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+            "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
+            "publisher": "PEN America"
           }
         },
         {
@@ -4169,23 +3780,38 @@
           "challengeYear": 2023,
           "status": "reported",
           "citation": {
-            "label": "Banned Books — Clap When You Land challenge records",
-            "href": "https://www.banned-books.org/books/clap-when-you-land"
+            "label": "PEN America Index of School Book Bans 2023–2024",
+            "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
+            "publisher": "PEN America"
+          }
+        },
+        {
+          "state": "IA",
+          "jurisdictionLabel": "Shenandoah Community School District",
+          "challengeYear": 2024,
+          "status": "reported",
+          "citation": {
+            "label": "PEN America Index of School Book Bans 2023–2024",
+            "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
+            "publisher": "PEN America"
           }
         }
       ],
       "citations": [
         {
-          "label": "ALA Office for Intellectual Freedom — Clap When You Land temporary ban",
-          "href": "https://www.oif.ala.org/happy-birthday-elizabeth-acevedo/"
-        },
-        {
-          "label": "Refinery29 — Clap When You Land banned in York, Pennsylvania",
-          "href": "https://www.refinery29.com/en-us/2021/12/10758842/book-bans-schools-authors-color-children-suffer"
-        },
-        {
           "label": "PEN America Index of School Book Bans 2023–2024",
-          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
+          "publisher": "PEN America"
+        },
+        {
+          "label": "PEN America Index of School Book Bans 2022–2023",
+          "href": "https://pen.org/book-bans/2023-banned-book-list/",
+          "publisher": "PEN America"
+        },
+        {
+          "label": "PEN America Index of School Book Bans 2021–2022 (PDF)",
+          "href": "https://docs.house.gov/meetings/GO/GO02/20220407/114616/HHRG-117-GO02-20220407-SD018.pdf",
+          "publisher": "PEN America"
         },
         {
           "label": "Banned Books — Clap When You Land challenge records",
@@ -4209,7 +3835,7 @@
       "provenance": {
         "source": "PEN America Index of School Book Bans; ALA Office for Intellectual Freedom",
         "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "2326b90645eb69e45461c299812df71684c9efc2b4cbf450e4ec4990c9c62355"
       }
     },
@@ -4239,42 +3865,27 @@
           "status": "reported",
           "citation": {
             "label": "PEN America Index of School Book Bans 2023–2024",
-            "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
-          }
-        },
-        {
-          "state": "FL",
-          "jurisdictionLabel": "Union County School District",
-          "challengeYear": 2025,
-          "status": "reported",
-          "citation": {
-            "label": "ClickOrlando — Florida school book removal reporting",
-            "href": "https://www.clickorlando.com/news/florida/2025/12/03/these-books-have-now-been-banned-in-florida-schools/"
-          }
-        },
-        {
-          "state": "FL",
-          "jurisdictionLabel": "Escambia County Public Schools",
-          "challengeYear": 2024,
-          "status": "reported",
-          "citation": {
-            "label": "Publishers Weekly — Tyler Johnson Was Here review",
-            "href": "https://www.publishersweekly.com/9780316440776"
+            "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
+            "publisher": "PEN America"
           }
         }
       ],
       "citations": [
         {
           "label": "PEN America Index of School Book Bans 2023–2024",
-          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
+          "publisher": "PEN America"
         },
         {
-          "label": "ClickOrlando — Florida school book removal reporting",
-          "href": "https://www.clickorlando.com/news/florida/2025/12/03/these-books-have-now-been-banned-in-florida-schools/"
+          "label": "PEN America Book Bans hub",
+          "href": "https://pen.org/book-bans/",
+          "publisher": "PEN America"
         },
         {
-          "label": "Publishers Weekly — Tyler Johnson Was Here review",
-          "href": "https://www.publishersweekly.com/9780316440776"
+          "label": "The number of book titles that people tried to ban rose by 65% last year",
+          "href": "https://www.npr.org/2024/03/14/1238647724/the-number-of-book-titles-that-people-tried-to-ban-rose-by-65-last-year",
+          "publisher": "NPR",
+          "publishedAt": "2024-03-14"
         }
       ],
       "purchaseLinks": [
@@ -4294,7 +3905,7 @@
       "provenance": {
         "source": "PEN America Index of School Book Bans; Florida Department of Education annual reports",
         "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "6302a9a6379f96b788a5e32da887357c80a9fcb99d5fe2f30dd39acb8d9dfec7"
       }
     },
@@ -4330,11 +3941,12 @@
         {
           "state": "TX",
           "jurisdictionLabel": "Katy Independent School District",
-          "challengeYear": 2022,
+          "challengeYear": 2024,
           "status": "reported",
           "citation": {
-            "label": "Knox News — The 57 Bus author on school book ban",
-            "href": "https://www.knoxnews.com/story/news/education/2025/01/21/the-57-bus-author-dashka-slater-school-book-ban-i-never-get-used-to-it/77048486007/"
+            "label": "PEN America Index of School Book Bans 2024–2025 (PDF)",
+            "href": "https://www.dallasobserver.com/wp-content/uploads/sites/3/2025/01/PEN-America-Index-of-School-Book-Bans-%E2%80%93-2024-2025-PEN-America.pdf",
+            "publisher": "PEN America"
           }
         },
         {
@@ -4343,18 +3955,9 @@
           "challengeYear": 2022,
           "status": "reported",
           "citation": {
-            "label": "PEN America Index of School Book Bans 2023–2024",
-            "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
-          }
-        },
-        {
-          "state": "IA",
-          "jurisdictionLabel": "Shenandoah Community School District",
-          "challengeYear": 2024,
-          "status": "reported",
-          "citation": {
-            "label": "Artists at Risk Connection — Dashka Slater on nationwide bans",
-            "href": "https://artistsatriskconnection.org/artist-voice/dashka-slater/"
+            "label": "PEN America Index of School Book Bans 2022–2023",
+            "href": "https://pen.org/book-bans/2023-banned-book-list/",
+            "publisher": "PEN America"
           }
         }
       ],
@@ -4393,7 +3996,7 @@
       "provenance": {
         "source": "PEN America Index of School Book Bans; Knox News reporting",
         "sourceUrl": "https://www.knoxnews.com/story/news/education/2024/12/05/knox-county-schools-pulls-48-books-in-accordance-with-tennessee-law/76770330007/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "1aaa2d8633ed3d95d9a59aa149552661ecfdf22641e43f443211f4cd29f53eb6"
       }
     },
@@ -4423,7 +4026,8 @@
           "status": "reported",
           "citation": {
             "label": "PEN America Index of School Book Bans 2023–2024",
-            "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+            "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
+            "publisher": "PEN America"
           }
         },
         {
@@ -4432,29 +4036,22 @@
           "challengeYear": 2022,
           "status": "reported",
           "citation": {
-            "label": "CBS News — Florida Escambia County book ban lawsuit context",
-            "href": "https://www.cbsnews.com/news/florida-escambia-county-sued-book-ban-penguin-random-house/"
-          }
-        },
-        {
-          "state": "TN",
-          "jurisdictionLabel": "Monroe County Schools",
-          "challengeYear": 2025,
-          "status": "reported",
-          "citation": {
-            "label": "PEN America v. Escambia County School District",
-            "href": "https://pen.org/pen-america-v-escambia-county/"
+            "label": "PEN America Index of School Book Bans 2021–2022 (PDF)",
+            "href": "https://docs.house.gov/meetings/GO/GO02/20220407/114616/HHRG-117-GO02-20220407-SD018.pdf",
+            "publisher": "PEN America"
           }
         }
       ],
       "citations": [
         {
           "label": "PEN America Index of School Book Bans 2023–2024",
-          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/"
+          "href": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
+          "publisher": "PEN America"
         },
         {
-          "label": "CBS News — Florida Escambia County book ban lawsuit context",
-          "href": "https://www.cbsnews.com/news/florida-escambia-county-sued-book-ban-penguin-random-house/"
+          "label": "PEN America Index of School Book Bans 2021–2022 (PDF)",
+          "href": "https://docs.house.gov/meetings/GO/GO02/20220407/114616/HHRG-117-GO02-20220407-SD018.pdf",
+          "publisher": "PEN America"
         },
         {
           "label": "PEN America v. Escambia County School District",
@@ -4478,160 +4075,8 @@
       "provenance": {
         "source": "PEN America Index of School Book Bans; PEN America v. Escambia County litigation",
         "sourceUrl": "https://pen.org/book-bans/pen-america-index-of-school-book-bans-2023-2024/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "fdb67fe4e2d431a2363c00804bbc9b78ab40ccffddd8dda073ff114fd8d58973"
-      }
-    },
-    {
-      "id": "bb-book-fallen-angels",
-      "slug": "fallen-angels",
-      "title": "Fallen Angels",
-      "authors": [
-        {
-          "name": "Walter Dean Myers",
-          "role": "author"
-        }
-      ],
-      "identifiers": [
-        {
-          "system": "isbn-13",
-          "value": "9780545055765"
-        }
-      ],
-      "description": "Richie Perry, a Harlem teenager, lands in Vietnam after his college plans collapse. Myers documents combat's randomness, boredom between firefights, and the racial tensions inside a segregated-era military. Winner of the Coretta Scott King Award.",
-      "publishedDate": "1988",
-      "challenges": [
-        {
-          "state": "CA",
-          "jurisdictionLabel": "Laton Unified School District",
-          "challengeYear": 1999,
-          "status": "reported",
-          "citation": {
-            "label": "Timeline entry for 1999: Fallen Angels — ALA Intellectual Freedom Blog",
-            "href": "https://www.oif.ala.org/timeline-entry-for-1999-fallen-angels/",
-            "publisher": "American Library Association",
-            "publishedAt": "2012"
-          }
-        },
-        {
-          "state": "MI",
-          "jurisdictionLabel": "Livonia Public Schools",
-          "challengeYear": 1999,
-          "status": "reported",
-          "citation": {
-            "label": "Timeline entry for 1999: Fallen Angels — ALA Intellectual Freedom Blog",
-            "href": "https://www.oif.ala.org/timeline-entry-for-1999-fallen-angels/",
-            "publisher": "American Library Association",
-            "publishedAt": "2012"
-          }
-        }
-      ],
-      "citations": [
-        {
-          "label": "Fallen Angels — ALA Top 100 Most Challenged Books lists",
-          "href": "https://www.ala.org/bbooks/frequentlychallengedbooks/top10",
-          "publisher": "American Library Association"
-        },
-        {
-          "label": "Fallen Angels (Myers novel) — Wikipedia",
-          "href": "https://en.wikipedia.org/wiki/Fallen_Angels_(Myers_novel)",
-          "publisher": "Wikipedia"
-        },
-        {
-          "label": "Fallen Angels — Open Library edition record",
-          "href": "https://openlibrary.org/books/OL35350623M/Fallen_angels",
-          "publisher": "Open Library"
-        }
-      ],
-      "purchaseLinks": [
-        {
-          "retailer": "bookshop",
-          "label": "Buy on Bookshop.org",
-          "href": "https://bookshop.org/a/gerald69/9780545055765",
-          "validationStatus": "unchecked"
-        },
-        {
-          "retailer": "open-library",
-          "label": "View on Open Library",
-          "href": "https://openlibrary.org/isbn/9780545055765",
-          "validationStatus": "unchecked"
-        }
-      ],
-      "provenance": {
-        "source": "American Library Association Office for Intellectual Freedom",
-        "sourceUrl": "https://www.oif.ala.org/timeline-entry-for-1999-fallen-angels/",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
-        "contentHash": "5f06fb95d8fe54a93c6e57eb7eb73d14c02996a4cfed472beeb7c4d0f77731cf"
-      }
-    },
-    {
-      "id": "bb-book-hoops",
-      "slug": "hoops",
-      "title": "Hoops",
-      "authors": [
-        {
-          "name": "Walter Dean Myers",
-          "role": "author"
-        }
-      ],
-      "identifiers": [
-        {
-          "system": "isbn-13",
-          "value": "9780440938842"
-        }
-      ],
-      "description": "Lonnie Jackson, a Harlem high-school basketball standout, navigates a city summer league where coaches, scouts, and gamblers press on his future. Myers writes the pressures on Black youth with the same documentary eye he brought to war and prison.",
-      "publishedDate": "1981",
-      "challenges": [
-        {
-          "state": "IA",
-          "jurisdictionLabel": "Council Bluffs Community School District",
-          "challengeYear": 2009,
-          "status": "reported",
-          "citation": {
-            "label": "'Hoops' Challenged — National Coalition Against Censorship",
-            "href": "https://ncac.org/news/blog/hoops-challenged",
-            "publisher": "National Coalition Against Censorship",
-            "publishedAt": "2009"
-          }
-        }
-      ],
-      "citations": [
-        {
-          "label": "Hoops — ALA diverse-content challenged-books list",
-          "href": "https://www.ala.org/advocacy/bbooks/frequentlychallengedbooks/classics",
-          "publisher": "American Library Association"
-        },
-        {
-          "label": "Walter Dean Myers Talks Book-Banning — NCAC",
-          "href": "https://ncac.org/news/blog/walter-dean-myers-talks-book-banning-writing-for-troublemakers",
-          "publisher": "National Coalition Against Censorship"
-        },
-        {
-          "label": "Hoops — Open Library edition record",
-          "href": "https://openlibrary.org/books/OL7523559M/Hoops",
-          "publisher": "Open Library"
-        }
-      ],
-      "purchaseLinks": [
-        {
-          "retailer": "bookshop",
-          "label": "Buy on Bookshop.org",
-          "href": "https://bookshop.org/a/gerald69/9780440938842",
-          "validationStatus": "unchecked"
-        },
-        {
-          "retailer": "open-library",
-          "label": "View on Open Library",
-          "href": "https://openlibrary.org/isbn/9780440938842",
-          "validationStatus": "unchecked"
-        }
-      ],
-      "provenance": {
-        "source": "National Coalition Against Censorship",
-        "sourceUrl": "https://ncac.org/news/blog/hoops-challenged",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
-        "contentHash": "5b884c9de22c6f326ca291f22d4b65b7f6fbb59471203cbf23b52af99f2eeda2"
       }
     },
     {
@@ -4703,150 +4148,8 @@
       "provenance": {
         "source": "American Library Association Office for Intellectual Freedom",
         "sourceUrl": "https://www.ala.org/bbooks/frequentlychallengedbooks/top10",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
+        "retrievedAt": "2026-07-28T00:00:00.000Z",
         "contentHash": "32401c1a5e84bf3085a9e91b4bbd39230d0b3d49f5e2b59697ae2a1d0b8647a9"
-      }
-    },
-    {
-      "id": "bb-book-in-love-and-trouble",
-      "slug": "in-love-and-trouble",
-      "title": "In Love and Trouble: Stories of Black Women",
-      "authors": [
-        {
-          "name": "Alice Walker",
-          "role": "author"
-        }
-      ],
-      "identifiers": [
-        {
-          "system": "isbn-13",
-          "value": "9780156028639"
-        }
-      ],
-      "description": "Thirteen stories—including \"Roselily\" and \"Am I Blue?\"—trace rural and urban Black women's desire, grief, and resistance across the South. Walker published the collection three years before The Color Purple.",
-      "publishedDate": "1973",
-      "challenges": [
-        {
-          "state": "CA",
-          "jurisdictionLabel": "California Learning Assessment System (statewide exam)",
-          "challengeYear": 1994,
-          "status": "reported",
-          "citation": {
-            "label": "State Yanks Academic Test Question, Sparks Outcry — Los Angeles Times",
-            "href": "https://www.latimes.com/archives/la-xpm-1994-02-26-mn-27357-story.html",
-            "publisher": "Los Angeles Times",
-            "publishedAt": "1994-02-26"
-          }
-        }
-      ],
-      "citations": [
-        {
-          "label": "Stories Deleted From Tests to Be Reinstated — Los Angeles Times",
-          "href": "https://www.latimes.com/archives/la-xpm-1994-03-12-mn-33016-story.html",
-          "publisher": "Los Angeles Times",
-          "publishedAt": "1994-03-12"
-        },
-        {
-          "label": "Alice Walker: Writing What's Right — Guernica",
-          "href": "https://www.guernicamag.com/alice-walker-writing-whats-right/",
-          "publisher": "Guernica",
-          "publishedAt": "2012"
-        },
-        {
-          "label": "In Love & Trouble — Open Library edition record",
-          "href": "https://openlibrary.org/books/OL5415759M/In_love_trouble",
-          "publisher": "Open Library"
-        }
-      ],
-      "purchaseLinks": [
-        {
-          "retailer": "bookshop",
-          "label": "Buy on Bookshop.org",
-          "href": "https://bookshop.org/a/gerald69/9780156028639",
-          "validationStatus": "unchecked"
-        },
-        {
-          "retailer": "open-library",
-          "label": "View on Open Library",
-          "href": "https://openlibrary.org/isbn/9780156028639",
-          "validationStatus": "unchecked"
-        }
-      ],
-      "provenance": {
-        "source": "Los Angeles Times reporting on California state testing controversy",
-        "sourceUrl": "https://www.latimes.com/archives/la-xpm-1994-02-26-mn-27357-story.html",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
-        "contentHash": "9923ffba0c1eea81d283ac161215ddfbdb5309e01a1c2e921d624c930d4cd6d3"
-      }
-    },
-    {
-      "id": "bb-book-best-short-stories-by-black-writers",
-      "slug": "best-short-stories-by-black-writers",
-      "title": "The Best Short Stories by Black Writers",
-      "authors": [
-        {
-          "name": "Langston Hughes",
-          "role": "author"
-        }
-      ],
-      "identifiers": [
-        {
-          "system": "isbn-13",
-          "value": "9780316380317"
-        }
-      ],
-      "description": "Hughes edited this landmark anthology—first published as The Best Short Stories by Negro Writers—collecting work from 1899 to 1967 by writers including Baldwin, Hurston, and Wright. It remains a syllabus touchstone for short-form Black literary history.",
-      "publishedDate": "1967",
-      "challenges": [
-        {
-          "state": "NY",
-          "jurisdictionLabel": "Island Trees Union Free School District",
-          "challengeYear": 1975,
-          "status": "reported",
-          "citation": {
-            "label": "Island Trees Union Free School District v. Pico (1982) — Encyclopedia.com",
-            "href": "https://www.encyclopedia.com/law/legal-and-political-magazines/island-trees-union-free-school-district-board-education-v-pico-1982",
-            "publisher": "Encyclopedia.com"
-          }
-        }
-      ],
-      "citations": [
-        {
-          "label": "2025 Banned Books Read-Out — Midwest Writing Center (Pico case context)",
-          "href": "https://www.mwcqc.org/events/banned-books-read-out-2025/",
-          "publisher": "Midwest Writing Center",
-          "publishedAt": "2025"
-        },
-        {
-          "label": "The Best Short Stories by Black Writers — Hachette Book Group catalog",
-          "href": "https://www.hachettebookgroup.com/titles/langston-hughes/the-best-short-stories-by-black-writers/9780316380317/",
-          "publisher": "Hachette Book Group"
-        },
-        {
-          "label": "The Best Short Stories by Black Writers — Open Library edition record",
-          "href": "https://openlibrary.org/books/OL21268870M/The_Best_short_stories_by_black_writers",
-          "publisher": "Open Library"
-        }
-      ],
-      "purchaseLinks": [
-        {
-          "retailer": "bookshop",
-          "label": "Buy on Bookshop.org",
-          "href": "https://bookshop.org/a/gerald69/9780316380317",
-          "validationStatus": "unchecked"
-        },
-        {
-          "retailer": "open-library",
-          "label": "View on Open Library",
-          "href": "https://openlibrary.org/isbn/9780316380317",
-          "validationStatus": "unchecked"
-        }
-      ],
-      "provenance": {
-        "source": "Board of Education v. Pico (1982) censorship record",
-        "sourceUrl": "https://www.encyclopedia.com/law/legal-and-political-magazines/island-trees-union-free-school-district-board-education-v-pico-1982",
-        "retrievedAt": "2026-07-21T12:00:00.000Z",
-        "contentHash": "48da2444b698699dbb3110efa6d3c3ac52b00570ddcb5abdbccce8ba87e965e1"
       }
     }
   ]
