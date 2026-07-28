@@ -207,6 +207,14 @@ export function buildReleaseSourceFromLandscape(row: LandscapePublishRow): Relea
       ? review.livingStatus
       : undefined;
 
+  // A geocode fallback (e.g. reconcile-nrhp-county-locations.ts) records the real precision
+  // of its coordinates here so the map renders an honest radius affordance instead of a
+  // sharpened pin implying site-level accuracy the source data doesn't have.
+  const geocode = asRecord(row.payload.geocode);
+  const locationPrecision = typeof geocode.precision === 'string' && geocode.precision.trim().length > 0
+    ? geocode.precision
+    : 'site';
+
   const claim: ReleaseSourceClaim = {
     predicate: 'documented_site',
     object: summary,
@@ -223,7 +231,7 @@ export function buildReleaseSourceFromLandscape(row: LandscapePublishRow): Relea
     summary,
     ...(livingStatus !== undefined ? { livingStatus } : {}),
     jurisdictionLabel: jurisdictionFromProvenance(provenance),
-    locationPrecision: 'site',
+    locationPrecision,
     locationLabel: locationLabelFromProvenance(displayName, provenance),
     lat: row.lat,
     lng: row.lng,
