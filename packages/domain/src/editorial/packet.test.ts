@@ -138,6 +138,54 @@ test('validateEditorialDrafts rejects a claim citing an untrusted (T4) source', 
   assert.ok(result.issues.some((issue) => issue.includes('untrusted (T4) source')));
 });
 
+test('validateEditorialDrafts accepts a claim with a complete scholarlyCitation', () => {
+  const result = validateEditorialDrafts(
+    {
+      claims: [
+        {
+          predicate: 'documented_site',
+          object: 'A peer-reviewed study documents this.',
+          confidenceLevel: 'high',
+          citationSource: 'nps.gov',
+          citationHref: 'https://www.nps.gov/places/shiloh-rosenwald-school.htm',
+          citationLabel: 'National Park Service',
+          scholarlyCitation: {
+            doi: '10.1234/abc',
+            title: 'The Wages of Whiteness',
+            firstAuthorSurname: 'Roediger',
+            venue: 'Verso Books',
+          },
+        },
+      ],
+    },
+    { allowedCitationHrefs: ['https://www.nps.gov/places/shiloh-rosenwald-school.htm'] },
+  );
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.issues, []);
+});
+
+test('validateEditorialDrafts rejects a claim with an incomplete scholarlyCitation', () => {
+  const result = validateEditorialDrafts(
+    {
+      claims: [
+        {
+          predicate: 'documented_site',
+          object: 'A peer-reviewed study documents this.',
+          confidenceLevel: 'high',
+          citationSource: 'nps.gov',
+          citationHref: 'https://www.nps.gov/places/shiloh-rosenwald-school.htm',
+          citationLabel: 'National Park Service',
+          // @ts-expect-error simulating a model returning a partial scholarlyCitation
+          scholarlyCitation: { doi: '10.1234/abc', title: 'The Wages of Whiteness' },
+        },
+      ],
+    },
+    { allowedCitationHrefs: ['https://www.nps.gov/places/shiloh-rosenwald-school.htm'] },
+  );
+  assert.equal(result.ok, false);
+  assert.ok(result.issues.some((issue) => issue.includes('scholarlyCitation requires')));
+});
+
 test('validateEditorialDrafts never throws on malformed (non-string) fields from free-model JSON', () => {
   assert.doesNotThrow(() => {
     const result = validateEditorialDrafts(

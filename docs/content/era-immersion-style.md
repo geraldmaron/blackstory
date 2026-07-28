@@ -186,6 +186,7 @@ throughout (no gated causal claim wired to this illustrative excerpt).
 | Theme arc structure, journey beats, ink-sketch visuals, instrument rail rules | `docs/ui/design-direction-v6-themes.md` §1.1-1.2 |
 | Second-person era-jump structure, odds-not-decimals numeric voice, method-note gap handling, causal-language tiers | This document |
 | Juxtaposition-vs-causal-claim gate, boundary-discontinuity citation requirements | `docs/methodology/juxtaposition-not-causation.md`, `docs/methodology/scholarship-principles.md` §6 |
+| Narrative-fact sourcing (two independent sources per fact, three-layer research/verify/integrate protocol), event buildup requirement, 2,000-word prose floor | `docs/methodology/chapter-fact-validation.md` |
 | `methodStance` / multi-decade checklist data contract | `packages/domain/src/statistics/theme-impact-packet.ts` |
 | Spine segment structure, seam checks | `bb_reference.spine_series` / `spine_segments` |
 

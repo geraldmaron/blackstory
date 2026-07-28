@@ -13,6 +13,7 @@ is preserved, and how this archive compares to aggregation portals and specializ
 | [`capture-and-aggregators.md`](./capture-and-aggregators.md) | Archived captures, Umbra link-rot, and aggregator comparison in detail |
 | [`national-black-population-timeline.md`](./national-black-population-timeline.md) | Census-sourced national Black population timeline, 1790–2020 — sources, comparability, and lane boundaries |
 | [`juxtaposition-not-causation.md`](./juxtaposition-not-causation.md) | Laws/places beside indicators are context, not automated causal impact claims |
+| [`chapter-fact-validation.md`](./chapter-fact-validation.md) | How narrative facts enter chapter prose: two independent sources per fact, three-layer research/verify/integrate protocol, immersion + 2,000-word floor |
 | [`../research/theme-impact-canonical-questions.md`](../research/theme-impact-canonical-questions.md) | Canonical theme-impact questions, policy eras, and metric/artifact catalog |
 
 ## Public surfaces

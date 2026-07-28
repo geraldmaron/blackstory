@@ -15,6 +15,7 @@ import { Notice } from '@repo/ui';
 import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import { CAMERA_POINT_ZOOM } from '../../lib/map-experience/camera-presets';
 import {
+  animateHeroMapPlate,
   applyHeroMapInset,
   clearHeroMapInset,
   heroNationalCameraPadding,
@@ -221,6 +222,8 @@ function HeroStagePanel({
   const copyColumnRef = useRef<HTMLDivElement | null>(null);
   const mapColumnRef = useRef<HTMLDivElement | null>(null);
   const [dissolving, setDissolving] = useState(false);
+  // Previous cinematic state, so only the engage/close crossings animate the plate geometry.
+  const previousCinematicStateRef = useRef(cinematic.state);
   // Tracked in a ref (not state) so the scroll-sync loop reads the live breakpoint without
   // re-subscribing its listeners on every change.
   const isMobileRef = useRef(false);
@@ -262,19 +265,61 @@ function HeroStagePanel({
     [],
   );
 
+  /** National framing padded clear of the hero copy column (desktop) or copy band (mobile).
+   * Shared by the scroll-sync loop and the close-back-to-rest flight so both frame the hero
+   * plate the same way. `box` is whichever element the plate is currently pinned to. */
+  const frameHeroNational = useCallback((box: HTMLElement) => {
+    const copyRect = isMobileRef.current
+      ? null
+      : (copyColumnRef.current?.getBoundingClientRect() ?? null);
+    stageApiRef.current.flyPreset(
+      'national',
+      { bounds: US_CONUS_BOUNDS },
+      {
+        mode: 'ease',
+        padding: heroNationalCameraPadding({ panel: box.getBoundingClientRect(), copy: copyRect }),
+      },
+    );
+  }, []);
+
   // Engage in place: unlock the full-bleed interactive map; Close (spec §2 rule 4) relocks and
-  // restores the hero inset + home camera via `cinematic.close()` -> the driver's `flyTo`.
+  // restores the hero inset + home camera. Both crossings fit the camera only after the plate
+  // geometry has settled — see `animateHeroMapPlate`.
   useEffect(() => {
     const panel = heroPanelRef.current;
-    if (cinematic.state === 'engaged') {
-      clearHeroMapInset();
-      stageApiRef.current.resize();
-      stageApiRef.current.flyPreset('national', { bounds: US_CONUS_BOUNDS }, { mode: 'ease' });
-    } else if (panel) {
-      applyHeroMapInset(panel, heroInsetTarget());
-      stageApiRef.current.resize();
+    const resize = () => stageApiRef.current.resize();
+    // Only the engage/close crossings are animated. The first pass (mount, and rest -> invite)
+    // just places the plate — animating those would fight the initial national framing.
+    const crossing =
+      cinematic.state === 'engaged' || previousCinematicStateRef.current === 'engaged';
+    previousCinematicStateRef.current = cinematic.state;
+
+    const place = () => {
+      if (cinematic.state === 'engaged') {
+        clearHeroMapInset();
+      } else if (panel) {
+        applyHeroMapInset(panel, heroInsetTarget());
+      }
+    };
+
+    if (cinematic.state !== 'engaged' && !panel) return;
+
+    const settle = () => {
+      if (cinematic.state === 'engaged') {
+        // Full-bleed: plain national framing, no copy-column padding to clear.
+        stageApiRef.current.flyPreset('national', { bounds: US_CONUS_BOUNDS }, { mode: 'ease' });
+      } else if (panel) {
+        frameHeroNational(heroInsetTarget() ?? panel);
+      }
+    };
+
+    if (crossing) {
+      animateHeroMapPlate(place, resize, settle);
+    } else {
+      place();
+      resize();
     }
-  }, [cinematic.state, heroInsetTarget]);
+  }, [cinematic.state, heroInsetTarget, frameHeroNational]);
 
   useEffect(() => {
     const api = stageApiRef.current;
@@ -320,20 +365,6 @@ function HeroStagePanel({
     let lastWidth = 0;
     let lastHeight = 0;
 
-    const frameNational = (box: HTMLElement) => {
-      // Mobile: plain national framing inside the map row — no copy-overlap push, since the
-      // plate no longer sits behind the copy column. Desktop: pad CONUS clear of the copy.
-      const copyRect = isMobileRef.current ? null : (copy?.getBoundingClientRect() ?? null);
-      stageApiRef.current.flyPreset(
-        'national',
-        { bounds: US_CONUS_BOUNDS },
-        {
-          mode: 'ease',
-          padding: heroNationalCameraPadding({ panel: box.getBoundingClientRect(), copy: copyRect }),
-        },
-      );
-    };
-
     const sync = () => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
@@ -352,7 +383,9 @@ function HeroStagePanel({
           lastWidth = rect.width;
           lastHeight = rect.height;
           stageApiRef.current.resize();
-          frameNational(target);
+          // Mobile: plain national framing inside the map row — no copy-overlap push, since the
+          // plate no longer sits behind the copy column. Desktop: pad CONUS clear of the copy.
+          frameHeroNational(target);
         }
       });
     };
@@ -374,7 +407,7 @@ function HeroStagePanel({
       window.removeEventListener('orientationchange', sync);
       clearHeroMapInset();
     };
-  }, [stage.mapAvailable, heroInsetTarget]);
+  }, [stage.mapAvailable, heroInsetTarget, frameHeroNational]);
 
   const archiveFrame = decadeFrames[archiveFrameIndex];
   const archiveDecade = archiveFrame?.decade ?? '';

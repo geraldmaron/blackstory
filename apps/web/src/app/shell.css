@@ -839,6 +839,24 @@
   opacity: 0;
 }
 
+/* ...and the hero frame itself dissolves with it. The plate is full-bleed while Engaged, so a
+   bordered, centered panel still drawn over it reads as a window onto the map rather than a
+   transition into it (the "the rest of the page is still there" defect). */
+.ds-home-hero:has(.ds-map-scrim[data-cinematic-state='engaged']) {
+  border-color: transparent;
+}
+
+.ds-home-hero:has(.ds-map-scrim[data-cinematic-state='engaged']) .ds-home-hero__map-readout {
+  opacity: 0;
+}
+
+.ds-home-hero,
+.ds-home-hero__map-readout {
+  transition:
+    opacity var(--ds-duration-base) var(--ds-easing),
+    border-color var(--ds-duration-base) var(--ds-easing);
+}
+
 .ds-home-hero__map {
   grid-column: 2;
   grid-row: 1;

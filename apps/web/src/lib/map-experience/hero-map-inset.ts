@@ -33,10 +33,18 @@ export type ViewportBounds = {
   readonly height: number;
 };
 
-const DEFAULT_VIEWPORT: ViewportBounds = {
-  width: typeof window !== 'undefined' ? window.innerWidth : 4096,
-  height: typeof window !== 'undefined' ? window.innerHeight : 4096,
-};
+/**
+ * Read live, never captured at module load: a window that is 0-sized when this module first
+ * evaluates (headless panes, a preview iframe that sizes after hydration) would otherwise
+ * freeze a 0x0 viewport for the session, and every hero rect would then read as "off-screen"
+ * — the plate hides itself and the hero map never appears until a full reload.
+ */
+function currentViewport(): ViewportBounds {
+  if (typeof window === 'undefined' || window.innerHeight <= 0 || window.innerWidth <= 0) {
+    return { width: 4096, height: 4096 };
+  }
+  return { width: window.innerWidth, height: window.innerHeight };
+}
 
 /** Minimum visible share of the hero panel before the inset hides (avoids orphan slivers). */
 export const HERO_MAP_INSET_MIN_VISIBLE_RATIO = 0.2;
@@ -55,7 +63,7 @@ export const HERO_MAP_COLUMN_FR = 54;
  */
 export function heroMapStageGeometryForRect(
   rect: DOMRect,
-  viewport: ViewportBounds = DEFAULT_VIEWPORT,
+  viewport: ViewportBounds = currentViewport(),
 ): HeroMapStageGeometry | null {
   if (rect.width <= 0 || rect.height <= 0) return null;
   if (rect.bottom <= 0 || rect.top >= viewport.height) return null;
@@ -171,6 +179,65 @@ export function applyHeroMapInset(panel: HTMLElement, insetTarget?: HTMLElement)
   stage.style.right = 'auto';
   stage.style.bottom = 'auto';
   return true;
+}
+
+/** Class carrying the geometry transition — see `map-surfaces.css`. */
+export const HERO_MAP_PLATE_TRANSITION_CLASS = 'ds-map-stage--plate-transition';
+
+/** Must match the transition duration in `map-surfaces.css` (`--ds-duration-slow`, 480ms). */
+export const HERO_MAP_PLATE_TRANSITION_MS = 480;
+
+function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined' || !window.matchMedia) return false;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+/**
+ * Run a geometry change (`clearHeroMapInset` on engage, `applyHeroMapInset` on close) as an
+ * animated box change instead of a snap. Without this the plate cuts from the hero panel to
+ * full-bleed in one frame while the content is still fading — the "hard cut" the Engaged
+ * transition is supposed to avoid.
+ *
+ * `onFrame` (the caller's `MapStage.resize()`) runs every frame for the duration: the CSS
+ * box animates but the WebGL drawing buffer only changes when MapLibre is told to resize, so
+ * a static buffer would visibly stretch across the flight. Reduced motion skips straight to
+ * the destination (spec §3 "camera flights become cuts").
+ */
+export function animateHeroMapPlate(
+  applyGeometry: () => void,
+  onFrame: () => void,
+  onSettled: () => void = () => {},
+): void {
+  const stage = mapStageEl();
+  if (!stage || prefersReducedMotion()) {
+    applyGeometry();
+    onFrame();
+    onSettled();
+    return;
+  }
+
+  stage.classList.add(HERO_MAP_PLATE_TRANSITION_CLASS);
+  applyGeometry();
+
+  let running = true;
+  const tick = () => {
+    if (!running) return;
+    onFrame();
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+
+  // The end of the transition is a timer, not the rAF loop: rAF is suspended while the tab is
+  // hidden, and a reader who tabs away mid-transition would otherwise come back to a plate
+  // that never got its final resize or its framing.
+  window.setTimeout(() => {
+    running = false;
+    stage.classList.remove(HERO_MAP_PLATE_TRANSITION_CLASS);
+    onFrame();
+    // Framing is fitted only once the box has stopped moving: a fit computed against the
+    // mid-flight box lands off-centre by however much the box still had left to grow.
+    onSettled();
+  }, HERO_MAP_PLATE_TRANSITION_MS);
 }
 
 /** Restore full-bleed map plate (explore handoff or unmount). */

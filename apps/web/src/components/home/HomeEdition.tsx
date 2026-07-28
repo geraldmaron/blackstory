@@ -46,8 +46,11 @@ export function HomeEdition({
   timeline,
   OrientControl,
 }: HomeEditionProps) {
+  // `data-cinematic-recede`: everything below the hero fades out and goes inert while the
+  // Cinematic Map Backdrop is Engaged (`cinematic-map.css`), so tapping "Explore the map"
+  // transitions into the map instead of zooming it on top of a still-visible homepage.
   return (
-    <main id="main" className="ds-home-edition" data-home-edition="v6">
+    <main id="main" className="ds-home-edition" data-home-edition="v6" data-cinematic-recede>
       <HomeAbout
         topStates={topStates}
         {...(OrientControl ? { OrientControl } : {})}

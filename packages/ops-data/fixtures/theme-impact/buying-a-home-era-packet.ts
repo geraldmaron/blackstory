@@ -381,19 +381,103 @@ const ARTIFACTS = [
     artifactClass: 'primary_government_document',
     title: 'Restrictive covenant at issue in Shelley v. Kraemer (St. Louis, recorded 1911)',
     citation:
-      'Racially restrictive covenant, Labadie Avenue, St. Louis, Missouri (recorded Feb. 16, 1911); at issue in Shelley v. Kraemer, 334 U.S. 1 (1948).',
-    sourceUrl: 'https://supreme.justia.com/cases/federal/us/334/1/',
+      'Racially restrictive covenant, Labadie Avenue, St. Louis, Missouri (signed Feb. 1911); at issue in Shelley v. Kraemer, 334 U.S. 1 (1948). The Court’s opinion dates the signing Feb. 16, 1911; the National Historic Landmark nomination for 4600 Labadie dates the instrument Feb. 6, 1911. No fetched source establishes a recording date distinct from signing.',
+    sourceUrl:
+      'https://tile.loc.gov/storage-services/service/ll/usrep/usrep334/usrep334001/usrep334001.pdf',
     dated: '1911-02-16',
     summary:
       'Rule in force, covenant era. Verbatim: ". . . that hereafter no part of said property or any portion thereof shall be, for said term of Fifty-years, occupied by any person not of the Caucasian race, it being intended hereby to restrict the use of said property ... against the occupancy as owners or tenants of any portion of said property for resident or other purpose by people of the Negro or Mongolian Race." (evidence ev_shelley_covenant_st_louis / claim_shelley_covenant_stlouis; public domain). Judicial enforcement of such covenants was held unconstitutional in Shelley v. Kraemer (1948).',
     provenance: {
       source: 'shelley-v-kraemer-record',
-      sourceUrl: 'https://supreme.justia.com/cases/federal/us/334/1/',
+      sourceUrl:
+      'https://tile.loc.gov/storage-services/service/ll/usrep/usrep334/usrep334001/usrep334001.pdf',
       retrievedAt: RETRIEVED,
       contentHash: 'ev_shelley_covenant_st_louis',
       humanCitation:
         'Restrictive covenant, Labadie Avenue, St. Louis; Shelley v. Kraemer, 334 U.S. 1 (1948).',
     },
+  },
+  {
+    artifactId: 'art_holc_ns_form8_area_description_1937',
+    artifactClass: 'primary_government_document',
+    title: 'HOLC Area Description form, NS Form-8 (rev. June 1, 1937), with printed instructions',
+    citation:
+      'Home Owners’ Loan Corporation, "Area Description," NS Form-8 (rev. 6-1-37), front and printed instructions on reverse; in "Charlotte, NC, Security Map and Area Description No. 1," Records of the Federal Home Loan Bank Board, Record Group 195, National Archives at College Park.',
+    sourceUrl: 'https://catalog.archives.gov/id/326761289',
+    dated: '1937-06-01',
+    summary:
+      'The instrument itself: one sheet, fifteen numbered items on the front, fifteen matching instructions on the reverse. Item 5, "Inhabitants," collects type, estimated annual family income, foreign-born nationality and percent, "d. Negro (Yes or No); %", "e. Infiltration of", relief families, and whether population is increasing, decreasing or static. The printed instruction for item 5e supplies the government’s own worked example of the answer: "Any threat of infiltration of foreign born, negro or lower grade population? If so, indicate these by nationality and rate of infiltration like this: ‘Negro - rapid’." Item 4 directs the surveyor to record, among detrimental influences, "infiltrations of lower grade population or different racial groups" (public domain).',
+    provenance: {
+      source: 'national-archives-rg195',
+      sourceUrl: 'https://catalog.archives.gov/id/326761289',
+      retrievedAt: RETRIEVED,
+      contentHash: '96e3c2fc0b68ce9d6123b00871696f463da7dc7035d50139e86ac115cea58150',
+      humanCitation:
+        'HOLC Area Description form, NS Form-8 (rev. 6-1-37), RG 195, National Archives (Charlotte, NC, Area 1).',
+    },
+  },
+  {
+    artifactId: 'art_buchanan_v_warley_1917',
+    artifactClass: 'primary_government_document',
+    title: 'Buchanan v. Warley, 245 U.S. 60 (Nov. 5, 1917)',
+    citation:
+      'Buchanan v. Warley, 245 U.S. 60 (1917); official United States Reports, Library of Congress.',
+    sourceUrl:
+      'https://tile.loc.gov/storage-services/service/ll/usrep/usrep245/usrep245060/usrep245060.pdf',
+    dated: '1917-11-05',
+    summary:
+      'Rule in force, covenant era. The Court struck down Louisville’s racial-occupancy ordinance on Fourteenth Amendment property grounds, resting on an owner’s right to dispose of property rather than on a buyer’s right to acquire it: "Property is more than the mere thing which a person owns. It is elementary that it includes the right to acquire, use, and dispose of it." The opinion describes that right as running to Black and white owners alike, and states that Black citizens "have the right to purchase property and enjoy and use the same without laws discriminating against them solely on account of color." Closing the statutory route left the private covenant as the working instrument: covenant-writing in St. Louis, already under way by 1910, rose from 35 across the 1910s to 286 in the following decade (public domain).',
+    provenance: {
+      source: 'library-of-congress-us-reports',
+      sourceUrl:
+        'https://tile.loc.gov/storage-services/service/ll/usrep/usrep245/usrep245060/usrep245060.pdf',
+      retrievedAt: RETRIEVED,
+      contentHash: 'ddc4dcea60ac92c770dd0afbfcf61b13b4ab816f0c38c3f937b4c6e1e9b89a07',
+      humanCitation: 'Buchanan v. Warley, 245 U.S. 60 (1917).',
+    },
+  },
+  {
+    artifactId: 'art_shelley_v_kraemer_1948',
+    artifactClass: 'primary_government_document',
+    title: 'Shelley v. Kraemer, 334 U.S. 1 (May 3, 1948)',
+    citation:
+      'Shelley v. Kraemer, 334 U.S. 1 (1948); official United States Reports, Library of Congress. Procedural history, vote tally and local aftermath: National Park Service, "The Shelley House," National Register registration form (ref. 88000437).',
+    sourceUrl:
+      'https://tile.loc.gov/storage-services/service/ll/usrep/usrep334/usrep334001/usrep334001.pdf',
+    dated: '1948-05-03',
+    summary:
+      'Rule in force, 1948. The holding is narrow and the narrowness is the point: "Such private agreements standing alone do not violate any rights guaranteed by the Fourteenth Amendment," and owners remain free to honor them voluntarily; what is unconstitutional is judicial enforcement, because "the action of state courts and judicial officers in their official capacities is to be regarded as action of the State." The Shelleys received a warranty deed to 4600 Labadie Avenue on Aug. 11, 1945, and the trial court found they had no actual knowledge of the 1911 agreement when they bought. The 6–0 tally, with three Justices not sitting, is the Park Service’s; the opinion itself records only that Justices Reed, Jackson and Rutledge took no part (public domain).',
+    provenance: {
+      source: 'library-of-congress-us-reports',
+      sourceUrl:
+        'https://tile.loc.gov/storage-services/service/ll/usrep/usrep334/usrep334001/usrep334001.pdf',
+      retrievedAt: RETRIEVED,
+      contentHash: '83d0f83a1b0cb9980d3267bf58c5ac8cb5357d982c0d18fcf0695ff543cc19d6',
+      humanCitation: 'Shelley v. Kraemer, 334 U.S. 1 (1948).',
+    },
+  },
+  {
+    artifactId: 'art_cfpb_contract_for_deed_2024',
+    artifactClass: 'federal_agency_report',
+    title: 'CFPB, Report on Contract for Deed Lending (Aug. 2024)',
+    citation:
+      'Consumer Financial Protection Bureau, "Report on Contract for Deed Lending" (August 2024), ch. 3 and Appendix A. Chicago findings quoted therein from the Samuel DuBois Cook Center on Social Equity, Duke University, "The Plunder of Black Wealth in Chicago" (May 2019), at iii.',
+    sourceUrl:
+      'https://files.consumerfinance.gov/f/documents/cfpb_contract-for-deed_report_2024-08.pdf',
+    dated: '2024-08',
+    summary:
+      'The federal government’s own account of the instrument that filled the gap where mortgages were refused. Under a contract for deed "the seller retains legal title of a home until the borrower completes the payments," while the buyer carries taxes, repairs and improvements; on default the seller "may repossess the home and retain all accumulated equity and payments." No appraisal, inspection or title search is performed, and default ends in eviction rather than the 120-day pre-foreclosure process mainstream mortgages require. The report records that 75 to 95 percent of homes sold to Black families in Chicago in the 1950s and 1960s were sold on contract, at an average 84 percent above the speculator’s own purchase price.',
+    provenance: {
+      source: 'consumer-financial-protection-bureau',
+      sourceUrl:
+        'https://files.consumerfinance.gov/f/documents/cfpb_contract-for-deed_report_2024-08.pdf',
+      retrievedAt: RETRIEVED,
+      contentHash: '14418e7e0575dcc733fbeb02da06c3fb52a018982a73be48265ace7f2cda8344',
+      humanCitation:
+        'Consumer Financial Protection Bureau, Report on Contract for Deed Lending (August 2024).',
+    },
+    uncertaintyLabel:
+      'The Chicago share and markup figures originate with the Duke Cook Center report and are quoted here as reproduced in the CFPB report, whose host is reachable; the Cook Center’s own host no longer serves the PDF.',
   },
   {
     artifactId: 'art_fair_housing_act_1968_doj',
@@ -412,6 +496,44 @@ const ARTIFACTS = [
       contentHash: 'fa07ed8cfb835e172dfc8d21ad9629ed244652d73c207eae42a97dba8a9cb32e',
       humanCitation:
         'Civil Rights Act of 1968, Title VIII (Fair Housing Act), 42 U.S.C. §§ 3601 et seq.',
+    },
+  },
+  {
+    artifactId: 'art_fair_housing_act_1968_sec810_conciliation',
+    artifactClass: 'primary_government_document',
+    title:
+      'Civil Rights Act of 1968, Title VIII, § 810(a) — conciliation as the only remedy (Apr. 11, 1968)',
+    citation:
+      'Civil Rights Act of 1968, Pub. L. 90-284, title VIII, § 810(a), Apr. 11, 1968, 82 Stat. 85; U.S. Government Publishing Office, Statutes at Large.',
+    sourceUrl: 'https://www.govinfo.gov/content/pkg/STATUTE-82/pdf/STATUTE-82-Pg73.pdf',
+    dated: '1968-04-11',
+    summary:
+      'The enforcement clause of the law that made housing discrimination illegal, verbatim: "If the Secretary decides to resolve the complaint, he shall proceed to try to eliminate or correct the alleged discriminatory housing practice by informal methods of conference, conciliation, and persuasion." Where conciliation failed, § 810(d) gave the complainant thirty days to bring their own federal suit; § 812(c) capped punitive damages at $1,000 and allowed attorney’s fees only where the plaintiff was found unable to pay them; § 813(a) limited the Attorney General to pattern-or-practice cases. The Justice Department’s own history records that the Act gave the Secretary "no cease-and-desist authority" (public domain).',
+    provenance: {
+      source: 'govinfo-statutes-at-large',
+      sourceUrl: 'https://www.govinfo.gov/content/pkg/STATUTE-82/pdf/STATUTE-82-Pg73.pdf',
+      retrievedAt: RETRIEVED,
+      contentHash: '6f769a06db36c70e8b1295ce2f96fd5e3e7317f3e9f2da9f45e937d4d0a2badd',
+      humanCitation:
+        'Civil Rights Act of 1968, Pub. L. 90-284, title VIII, § 810(a), 82 Stat. 85.',
+    },
+  },
+  {
+    artifactId: 'art_fair_housing_amendments_act_1988',
+    artifactClass: 'primary_government_document',
+    title: 'Fair Housing Amendments Act of 1988, Pub. L. 100-430 (Sept. 13, 1988)',
+    citation:
+      'Fair Housing Amendments Act of 1988, Pub. L. 100-430, 102 Stat. 1619; civil penalties at 102 Stat. 1630; effective date at sec. 13(a). U.S. Government Publishing Office, Statutes at Large.',
+    sourceUrl: 'https://www.govinfo.gov/content/pkg/STATUTE-102/pdf/STATUTE-102-Pg1619.pdf',
+    dated: '1988-09-13',
+    summary:
+      'The enforcement machinery stripped out of the 1968 Act, restored twenty years and eleven months later: administrative law judges empowered to order relief, and civil penalties not exceeding $10,000 for a first adjudicated violation, $25,000 for a second within five years and $50,000 for a third within seven. By its own terms the Act took effect on the 180th day after enactment, March 12, 1989 (public domain).',
+    provenance: {
+      source: 'govinfo-statutes-at-large',
+      sourceUrl: 'https://www.govinfo.gov/content/pkg/STATUTE-102/pdf/STATUTE-102-Pg1619.pdf',
+      retrievedAt: RETRIEVED,
+      contentHash: 'ac7358f924861ba712bd782d704e3057a3abb5817834597fd3e046c089d3ce27',
+      humanCitation: 'Fair Housing Amendments Act of 1988, Pub. L. 100-430, 102 Stat. 1619.',
     },
   },
   {
@@ -470,6 +592,8 @@ const METHOD_NOTE = [
   'Wealth: the mid-century figure is the Derenoncourt et al. white-to-Black average wealth ratio at the 1959 benchmark; the present-day figures are Federal Reserve Survey of Consumer Finances median family net worth for 2022, in 2022 dollars. Income: Census Historical Household Income Table H-5 median household income for 1985. Mortgage denial: FFIEC HMDA national application denial rates for 2023.',
   'Causal language is gated. Only the 1938 sentence citing Aaronson, Hartley & Mazumder (2021) uses causal wording, resting on that study’s boundary-discontinuity design and its stated limits. Every other pairing (homeownership, income, wealth, denial) is juxtaposition: the facts are placed next to each other and the prose does not claim one produced another.',
   'The Chicago HOLC area description is quoted as period evidence of how grades were written; grade text describes mapped areas, not a lending outcome. Primary-document quotes are verbatim from public-domain sources; the restrictive covenant is the St. Louis instrument at issue in Shelley v. Kraemer, 334 U.S. 1 (1948).',
+  'Narrative facts in the chapter built on this packet follow docs/methodology/chapter-fact-validation.md: gathered from fetched primary or official sources, independently re-verified against those sources by a second pass, and cut or attributed by name where only one institution carries them. Eleven dated artifacts now anchor the chronology: the 1911 Labadie Avenue covenant, Buchanan v. Warley (1917), the 1938 FHA Underwriting Manual paragraph 935, the 1940 HOLC area description for Chicago D-30, Shelley v. Kraemer (1948), the Fair Housing Act of 1968 with its section 810(a) enforcement clause, the Fair Housing Amendments Act of 1988, the CFPB contract-for-deed report (2024), the Aaronson/Hartley/Mazumder study, and the national homeownership spine.',
+  'Two dating disputes are preserved rather than resolved. The Labadie Avenue agreement is dated Feb. 16, 1911 in the Supreme Court’s opinion and Feb. 6, 1911 in the National Historic Landmark nomination; the chapter says February 1911. Nothing in the fetched record establishes a recording date distinct from signing, so "recorded" is not used. Chicago contract-selling shares and markups originate with the Duke Cook Center’s 2019 report and are cited as reproduced in the CFPB’s 2024 report, since the Cook Center host no longer serves the original PDF; the report’s dollar-total estimates are omitted because no reachable source carries them.',
 ].join(' ');
 
 export const buyingAHomeEraPacket = {

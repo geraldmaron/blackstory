@@ -101,6 +101,19 @@
   /* Viewport box from hero-map-inset.ts — no clip-path (Safari WebGL compositing). */
 }
 
+/* Engage/close geometry flight (hero-map-inset.ts `animateHeroMapPlate`): the plate grows
+   from the hero box to full-bleed instead of cutting. Applied only for the duration of the
+   transition so the per-scroll inset writes stay instant (a permanent transition here would
+   make the plate lag behind the hero panel on every scroll frame). */
+.ds-map-stage--plate-transition {
+  transition:
+    top var(--ds-duration-slow) var(--ds-easing),
+    left var(--ds-duration-slow) var(--ds-easing),
+    width var(--ds-duration-slow) var(--ds-easing),
+    height var(--ds-duration-slow) var(--ds-easing),
+    border-radius var(--ds-duration-slow) var(--ds-easing);
+}
+
 @media (max-width: 47.9375rem) {
   /* Mobile stacked hero: the inset plate is pinned to the map row beneath the copy
      (hero-map-inset.ts targets `.ds-home-hero__map`). Make it a NON-interactive preview so a
