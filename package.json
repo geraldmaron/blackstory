@@ -35,6 +35,8 @@
     "validate:web-entity-visibility": "node scripts/check-web-entity-visibility-guards.mjs",
     "validate:governance": "node scripts/validate-github-governance.mjs",
     "dev:web": "./scripts/dev-web.sh",
+    "mobile:seeds": "node --conditions=development --import tsx apps/mobile/scripts/generate-seeds.mjs",
+    "mobile:seeds:check": "node --conditions=development --import tsx apps/mobile/scripts/generate-seeds.mjs --check",
     "mobile:ios:release": "./scripts/mobile-ios-release.sh",
     "mobile:ios:verify": "./scripts/mobile-ios-release.sh --verify-only",
     "mobile:ios:launch": "./scripts/mobile-ios-release.sh --launch-only",

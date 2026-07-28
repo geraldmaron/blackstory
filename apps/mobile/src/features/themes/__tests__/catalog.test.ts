@@ -15,11 +15,15 @@ import {
 } from '../catalog';
 
 describe('themes catalog', () => {
-  it('loads curated fixture themes and packets', () => {
+  it('loads themes and packets exported from the active Supabase release', () => {
     const snap = loadThemesCatalog();
     expect(snap.themes.length).toBeGreaterThanOrEqual(7);
     expect(snap.packets.length).toBeGreaterThanOrEqual(11);
-    expect(snap.source).toBe('domain-researched-fixture');
+    // Seed is exported from bb_public.release_theme_impact_packets, never a
+    // committed fixture — that is what keeps unreleased packets out of the app.
+    expect(snap.source).toBe('supabase-active-release');
+    expect(snap.releaseId).toMatch(/^rel_/);
+    expect(snap.packets.every((packet) => packet.dataSource === 'release')).toBe(true);
     expect(snap.releaseLabel.length).toBeGreaterThan(0);
   });
 

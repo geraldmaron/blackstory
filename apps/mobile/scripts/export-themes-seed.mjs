@@ -1,17 +1,21 @@
 /**
  * Export theme-impact catalog + researched packet views into mobile JSON.
- * Run from repo root:
- *   pnpm --filter @repo/domain exec node --conditions=development --import tsx ../../apps/mobile/scripts/export-themes-seed.mjs
+ * Run from repo root via the single entrypoint:
+ *   node --conditions=development --import tsx apps/mobile/scripts/generate-seeds.mjs themes
  */
 import { writeFileSync, mkdirSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import {
-  listResearchedThemeImpactPackets,
-  themeImpactPacketToView,
-} from '@repo/domain';
+import { themeImpactPacketToView } from '@repo/domain/statistics';
+import { normalizePgConnectionString } from '../../../packages/ops-data/scripts/lib/pg-connection.ts';
 
 const here = dirname(fileURLToPath(import.meta.url));
+// `pg` is a dependency of ops-data, not the mobile app — resolve it from there.
+const requireFromOpsData = createRequire(
+  resolve(here, '../../../packages/ops-data/package.json'),
+);
+const pg = requireFromOpsData('pg');
 const outPath = resolve(here, '../src/features/themes/catalog-seed.json');
 
 /** Mirror of web `THEME_IMPACT_CATALOG` (browse title/lede not in domain). */
@@ -74,15 +78,42 @@ const THEME_IMPACT_CATALOG = [
   },
 ];
 
-const packets = listResearchedThemeImpactPackets().map((packet) =>
-  themeImpactPacketToView(packet, { dataSource: 'fixture' }),
+// Source of truth is the active Supabase release, not a committed fixture. Reading
+// the release is what keeps unreleased packets (status 'review') out of the app —
+// the old fixture path shipped tip_drug_policy_q6_il_spine, which is not released.
+const databaseUrl = process.env.DATABASE_URL?.trim() || process.env.APP_DATABASE_URL?.trim();
+if (!databaseUrl) {
+  throw new Error('DATABASE_URL (or APP_DATABASE_URL) is required — source apps/web/.env.local');
+}
+const conn = normalizePgConnectionString(databaseUrl);
+const client = new pg.Client({
+  connectionString: conn.connectionString,
+  ...(conn.ssl ? { ssl: conn.ssl } : {}),
+});
+await client.connect();
+const { rows: released } = await client.query(`
+  SELECT release_id, packet_id, payload
+  FROM bb_public.release_theme_impact_packets
+  WHERE release_id = (SELECT release_id FROM bb_public.active_release WHERE id = 'active')
+  ORDER BY packet_id
+`);
+await client.end();
+
+if (released.length === 0) {
+  throw new Error('active release contains no theme-impact packets — refusing to write an empty seed');
+}
+
+const releaseId = released[0].release_id;
+const packets = released.map((row) =>
+  themeImpactPacketToView(row.payload, { dataSource: 'release' }),
 );
 
 const snapshot = {
-  version: 'theme-impact-fixture-2026-07-24',
+  version: `theme-impact-${releaseId}`,
   generatedAt: new Date().toISOString(),
-  source: 'domain-researched-fixture',
-  releaseLabel: 'Curated on-device fixture',
+  source: 'supabase-active-release',
+  releaseId,
+  releaseLabel: 'Published release',
   themes: THEME_IMPACT_CATALOG,
   packets,
 };
