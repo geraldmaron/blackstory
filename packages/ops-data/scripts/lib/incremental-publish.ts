@@ -84,6 +84,26 @@ function asRecord(value: unknown): Readonly<Record<string, unknown>> {
   return {};
 }
 
+/**
+ * Person rows are blocked from incremental publish unless an operator has
+ * recorded an explicit privacy review on the row: payload.personReview must
+ * be an object with approved=true plus approvedBy/approvedAt/basis strings.
+ * The marker is written manually (or by an operator-run script) after a human
+ * confirms the person is a deceased historical figure — never by an agent.
+ */
+export function personReviewApproved(payload: Readonly<Record<string, unknown>>): boolean {
+  const review = asRecord(payload.personReview);
+  return (
+    review.approved === true &&
+    typeof review.approvedBy === 'string' &&
+    review.approvedBy.length > 0 &&
+    typeof review.approvedAt === 'string' &&
+    review.approvedAt.length > 0 &&
+    typeof review.basis === 'string' &&
+    review.basis.length > 0
+  );
+}
+
 export function resolveSourceCategory(row: LandscapePublishRow): string | null {
   const fromProvenance = row.provenance.sourceCategory;
   if (typeof fromProvenance === 'string' && fromProvenance.length > 0) return fromProvenance;
@@ -212,10 +232,11 @@ export function gateLandscapePublishCandidate(input: {
   const floor = input.confidenceFloor ?? INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR;
   const row = input.row;
 
-  if (row.kind === 'person') {
+  const reviewed = personReviewApproved(row.payload);
+  if (row.kind === 'person' && !reviewed) {
     return { eligible: false, reason: 'person_kind', detail: 'kind=person requires privacy review' };
   }
-  if (resolveSourceCategory(row) === 'People') {
+  if (resolveSourceCategory(row) === 'People' && !reviewed) {
     return {
       eligible: false,
       reason: 'people_category',

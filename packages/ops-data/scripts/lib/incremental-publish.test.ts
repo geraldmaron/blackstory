@@ -60,6 +60,37 @@ test('gateLandscapePublishCandidate rejects person privacy holds', () => {
   if (!result.eligible) assert.equal(result.reason, 'person_kind');
 });
 
+test('gateLandscapePublishCandidate lets an operator-reviewed person past the privacy hold', () => {
+  const reviewed = baseRow({
+    kind: 'person',
+    payload: {
+      personReview: {
+        approved: true,
+        approvedBy: 'operator',
+        approvedAt: '2026-07-28T00:00:00.000Z',
+        basis: 'deceased historical figure',
+      },
+    },
+  });
+  const result = gateLandscapePublishCandidate({
+    row: reviewed,
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+  });
+  // Passes the person hold; may still fail later gates, but not person_kind.
+  if (!result.eligible) assert.notEqual(result.reason, 'person_kind');
+});
+
+test('gateLandscapePublishCandidate rejects incomplete personReview markers', () => {
+  const result = gateLandscapePublishCandidate({
+    row: baseRow({ kind: 'person', payload: { personReview: { approved: true } } }),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+  });
+  assert.equal(result.eligible, false);
+  if (!result.eligible) assert.equal(result.reason, 'person_kind');
+});
+
 test('gateLandscapePublishCandidate rejects greenbook lane', () => {
   const result = gateLandscapePublishCandidate({
     row: baseRow({ lane: 'greenbook' }),
