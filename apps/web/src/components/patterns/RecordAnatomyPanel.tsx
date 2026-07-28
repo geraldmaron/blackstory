@@ -23,7 +23,7 @@ export type RecordAnatomyPlace = {
   readonly lat: number;
   readonly lng: number;
   readonly label: string;
-  readonly precision: 'city' | 'neighborhood' | 'campus' | 'institution';
+  readonly precision: 'county' | 'city' | 'neighborhood' | 'campus' | 'institution';
   readonly precisionCaption?: string;
 };
 

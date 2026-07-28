@@ -38,7 +38,7 @@ export type EntityLocationMapProps = {
   readonly lat: number;
   readonly lng: number;
   readonly label: string;
-  readonly precision: 'city' | 'neighborhood' | 'campus' | 'institution';
+  readonly precision: 'county' | 'city' | 'neighborhood' | 'campus' | 'institution';
   readonly caption?: string;
   /** Cinematic Map Backdrop selection state (spec §2 rule 5/6) — pulses the halo ring when true. */
   readonly selected?: boolean;

@@ -163,7 +163,7 @@ export type PublicEntityView = {
   readonly topicIds?: readonly string[];
   readonly jurisdictionLabel: string;
   /** City, campus, or neighborhood — never street or residence. */
-  readonly locationPrecision: 'city' | 'neighborhood' | 'campus' | 'institution';
+  readonly locationPrecision: 'county' | 'city' | 'neighborhood' | 'campus' | 'institution';
   readonly locationLabel: string;
   readonly relevanceExplanation: string;
   /** Concise framing of this record's place within documented Black history general context,
