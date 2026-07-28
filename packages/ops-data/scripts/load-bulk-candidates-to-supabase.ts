@@ -62,7 +62,13 @@ function resolveFixturePath(lane: BulkLane, explicit?: string): string {
   }
   const absolute = join(REPO_ROOT, relative);
   if (!existsSync(absolute)) {
-    throw new Error(`fixture not found: ${absolute}`);
+    // Bulk fixtures are no longer committed — Supabase holds the loaded candidates
+    // (bb_research.landscape_candidates), and this directory is gitignored working
+    // space that --fetch repopulates.
+    throw new Error(
+      `fixture not found: ${absolute}\n` +
+        `Bulk fixtures are not committed. Re-fetch with --lane=${lane} --fetch, or pass --fixture=<path>.`,
+    );
   }
   return absolute;
 }
@@ -192,48 +198,58 @@ async function upsertPlan(client: pg.PoolClient, plan: BulkFixtureLoadPlan): Pro
     );
   }
 
-  const batchSize = 50;
+  // One multi-row INSERT per batch. Slicing into batches but awaiting a query per
+  // candidate meant 2556 sequential round-trips to a remote pooler inside one
+  // transaction, which is what stalled the greenbook lane; this makes it ~52.
+  const COLUMNS = 16;
+  const batchSize = 250;
   for (let index = 0; index < plan.candidates.length; index += batchSize) {
     const batch = plan.candidates.slice(index, index + batchSize);
-    for (const candidate of batch) {
-      await client.query(
-        `INSERT INTO bb_research.landscape_candidates
-          (id, run_id, lane, source_program_id, source_item_id, display_name, kind, summary,
-           lat, lng, canonical_url, research_lane_only, status, provenance, payload,
-           discovered_at, updated_at)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,now())
-         ON CONFLICT (id) DO UPDATE SET
-           run_id = EXCLUDED.run_id,
-           display_name = EXCLUDED.display_name,
-           kind = EXCLUDED.kind,
-           summary = EXCLUDED.summary,
-           lat = EXCLUDED.lat,
-           lng = EXCLUDED.lng,
-           canonical_url = EXCLUDED.canonical_url,
-           provenance = EXCLUDED.provenance,
-           payload = EXCLUDED.payload,
-           discovered_at = EXCLUDED.discovered_at,
-           updated_at = now()`,
-        [
-          candidate.id,
-          candidate.run_id,
-          candidate.lane,
-          candidate.source_program_id,
-          candidate.source_item_id,
-          candidate.display_name,
-          candidate.kind,
-          candidate.summary,
-          candidate.lat,
-          candidate.lng,
-          candidate.canonical_url,
-          candidate.research_lane_only,
-          candidate.status,
-          JSON.stringify(candidate.provenance),
-          JSON.stringify(candidate.payload),
-          candidate.discovered_at,
-        ],
+    const values: unknown[] = [];
+    const tuples = batch.map((candidate, row) => {
+      const base = row * COLUMNS;
+      values.push(
+        candidate.id,
+        candidate.run_id,
+        candidate.lane,
+        candidate.source_program_id,
+        candidate.source_item_id,
+        candidate.display_name,
+        candidate.kind,
+        candidate.summary,
+        candidate.lat,
+        candidate.lng,
+        candidate.canonical_url,
+        candidate.research_lane_only,
+        candidate.status,
+        JSON.stringify(candidate.provenance),
+        JSON.stringify(candidate.payload),
+        candidate.discovered_at,
       );
-    }
+      const placeholders = Array.from({ length: COLUMNS }, (_, col) => `$${base + col + 1}`);
+      return `(${placeholders.join(',')},now())`;
+    });
+
+    await client.query(
+      `INSERT INTO bb_research.landscape_candidates
+        (id, run_id, lane, source_program_id, source_item_id, display_name, kind, summary,
+         lat, lng, canonical_url, research_lane_only, status, provenance, payload,
+         discovered_at, updated_at)
+       VALUES ${tuples.join(',')}
+       ON CONFLICT (id) DO UPDATE SET
+         run_id = EXCLUDED.run_id,
+         display_name = EXCLUDED.display_name,
+         kind = EXCLUDED.kind,
+         summary = EXCLUDED.summary,
+         lat = EXCLUDED.lat,
+         lng = EXCLUDED.lng,
+         canonical_url = EXCLUDED.canonical_url,
+         provenance = EXCLUDED.provenance,
+         payload = EXCLUDED.payload,
+         discovered_at = EXCLUDED.discovered_at,
+         updated_at = now()`,
+      values,
+    );
   }
 }
 

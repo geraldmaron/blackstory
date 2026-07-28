@@ -6,11 +6,8 @@
  * The projection payload is the same document shape the seed exposes, so callers
  * get one type either way.
  */
-import {
-  SEED_LEGAL_SNAPSHOTS,
-  getLegalCatalogEntry,
-  listLegalSnapshots,
-} from '../../data/legal-seed';
+import { getLegalCatalogEntry, listLegalSnapshots } from '../../data/legal-seed';
+import type { SEED_LEGAL_SNAPSHOTS } from '../../data/legal-seed';
 import { listPublicLegalSnapshots } from '../public-data/public-readers';
 
 export type LegalSnapshotDocument = (typeof SEED_LEGAL_SNAPSHOTS)[number];
