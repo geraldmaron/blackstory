@@ -7,6 +7,7 @@
 import {
   TOPIC_REGISTRY,
   buildEditorialPacket,
+  checkDoiCitation,
   isValidTopicId,
   linkifyProseAgainstCatalog,
   suggestRelatedEntitiesFromVectors,
@@ -16,6 +17,7 @@ import {
   type EditorialDecision,
   type EditorialPacket,
   type EmbeddingVector,
+  type SafeHttpClient,
 } from '@repo/domain';
 import { createLlmProvider, type LlmProvider } from './llm-provider.js';
 import type { OperatorIdentity } from './identity.js';
@@ -90,6 +92,13 @@ type ModelLocationJson = {
   readonly locationPrecision?: string;
 };
 
+type ModelScholarlyCitationJson = {
+  readonly doi?: string;
+  readonly title?: string;
+  readonly firstAuthorSurname?: string;
+  readonly venue?: string;
+};
+
 type ModelClaimJson = {
   readonly predicate?: string;
   readonly object?: string;
@@ -97,6 +106,7 @@ type ModelClaimJson = {
   readonly citationSource?: string;
   readonly citationHref?: string;
   readonly citationLabel?: string;
+  readonly scholarlyCitation?: ModelScholarlyCitationJson;
 };
 
 type ModelJson = {
@@ -168,6 +178,16 @@ const EDITORIAL_RESPONSE_SCHEMA = {
               citationSource: { type: 'string' },
               citationHref: { type: 'string' },
               citationLabel: { type: 'string' },
+              scholarlyCitation: {
+                type: 'object',
+                additionalProperties: false,
+                properties: {
+                  doi: { type: 'string' },
+                  title: { type: 'string' },
+                  firstAuthorSurname: { type: 'string' },
+                  venue: { type: 'string' },
+                },
+              },
             },
           },
         },
@@ -195,6 +215,10 @@ Rules:
   {predicate, object, confidenceLevel: high|medium|low, citationSource: hostname, citationHref, citationLabel}.
   citationHref MUST be one of the URLs provided in sourceSnippets — never invent or modify a URL.
   If the snippets support no verifiable claim, return an empty claims array and decision needs_evidence.
+  When a claim's source is a specific peer-reviewed paper with a known DOI, also include
+  scholarlyCitation: {doi, title, firstAuthorSurname, venue} taken verbatim from the snippet — its
+  DOI is checked against Crossref/OpenAlex, so never guess or invent a plausible-looking DOI; omit
+  scholarlyCitation entirely when the source isn't a scholarly paper or the DOI isn't given.
 - Each sourceSnippet is tagged with its trust tier (Tier: T1-T4; T1/T2 = official statistical
   agencies, peer-reviewed work, archives; T3 = established nonprofits/journalism with named
   methodology; T4 = unclassified/untrusted). Prefer T1-T3 snippets for claims. A claim citing
@@ -253,6 +277,58 @@ function extractJsonObject(content: string): ModelJson {
     }
   }
   throw new Error('Model response did not contain a JSON object');
+}
+
+/** Minimal SafeHttpClient for the two free/keyless DOI-resolution APIs only. */
+const doiHttpClient: SafeHttpClient = async (request) => {
+  const url = new URL(request.url);
+  if (!['api.crossref.org', 'api.openalex.org'].includes(url.hostname)) {
+    throw new Error(`doiHttpClient only supports crossref/openalex; got ${url.hostname}`);
+  }
+  const response = await fetch(request.url, {
+    method: request.method ?? 'GET',
+    ...(request.headers !== undefined ? { headers: request.headers } : {}),
+  });
+  const bodyText = await response.text();
+  const headers: Record<string, string | undefined> = {};
+  response.headers.forEach((value, key) => {
+    headers[key.toLowerCase()] = value;
+  });
+  return { status: response.status, headers, bodyText, finalUrl: response.url };
+};
+
+/**
+ * DOI resolution gate (repo-k2q3 crit 2 / repo-yj2q): live network call against
+ * Crossref/OpenAlex, gated behind CHECK_DOIS=1 (mirrors articles.ts's and
+ * theme-packets.ts's gateDoiCitations). Unlike those CLI-validate gates — which throw
+ * to hard-fail a fixture batch — this returns issue strings instead of throwing, since
+ * runEditorialJudge processes many subjects concurrently and a single bad DOI must not
+ * abort the overnight batch; the returned issues feed into the packet's validationIssues,
+ * which already blocks promotion downstream (commit-enrichment-keeps.ts and the
+ * auto-promote scripts hold any packet with validationIssues.length > 0).
+ */
+async function gateClaimDoiCitations(
+  claims: readonly EditorialClaimDraft[],
+): Promise<readonly string[]> {
+  const issues: string[] = [];
+  for (const [index, claim] of claims.entries()) {
+    const citation = claim.scholarlyCitation;
+    if (!citation) continue;
+    const result = await checkDoiCitation(doiHttpClient, citation.doi, {
+      title: citation.title,
+      firstAuthorSurname: citation.firstAuthorSurname,
+      venue: citation.venue,
+    });
+    if (result.outcome === 'unresolved') {
+      issues.push(`claims[${index}]: DOI ${citation.doi} did not resolve (${result.reason})`);
+    } else if (result.outcome === 'mismatch') {
+      const detail = result.mismatches
+        .map((m) => `${m.field}: stored=${JSON.stringify(m.stored)} resolved=${JSON.stringify(m.resolved)}`)
+        .join('; ');
+      issues.push(`claims[${index}]: DOI ${citation.doi} mismatch (${detail})`);
+    }
+  }
+  return issues;
 }
 
 function ensureLinkedSummary(
@@ -328,19 +404,29 @@ async function judgeOneSubject(input: {
       ...(draftsIn.claims !== undefined
         ? {
             claims: (Array.isArray(draftsIn.claims) ? draftsIn.claims : []).map(
-              (claim): EditorialClaimDraft => ({
-                predicate: toSafeString(claim?.predicate),
-                object: toSafeString(claim?.object),
-                confidenceLevel:
-                  claim?.confidenceLevel === 'high' ||
-                  claim?.confidenceLevel === 'medium' ||
-                  claim?.confidenceLevel === 'low'
-                    ? claim.confidenceLevel
-                    : 'low',
-                citationSource: toSafeString(claim?.citationSource),
-                citationHref: toSafeString(claim?.citationHref),
-                citationLabel: toSafeString(claim?.citationLabel),
-              }),
+              (claim): EditorialClaimDraft => {
+                const sc = claim?.scholarlyCitation;
+                const doi = toSafeString(sc?.doi);
+                const title = toSafeString(sc?.title);
+                const firstAuthorSurname = toSafeString(sc?.firstAuthorSurname);
+                const venue = toSafeString(sc?.venue);
+                return {
+                  predicate: toSafeString(claim?.predicate),
+                  object: toSafeString(claim?.object),
+                  confidenceLevel:
+                    claim?.confidenceLevel === 'high' ||
+                    claim?.confidenceLevel === 'medium' ||
+                    claim?.confidenceLevel === 'low'
+                      ? claim.confidenceLevel
+                      : 'low',
+                  citationSource: toSafeString(claim?.citationSource),
+                  citationHref: toSafeString(claim?.citationHref),
+                  citationLabel: toSafeString(claim?.citationLabel),
+                  ...(doi && title && firstAuthorSurname && venue
+                    ? { scholarlyCitation: { doi, title, firstAuthorSurname, venue } }
+                    : {}),
+                };
+              },
             ),
           }
         : {}),
@@ -369,6 +455,13 @@ async function judgeOneSubject(input: {
       (snippet) => snippet.match(/https?:\/\/\S+/gu) ?? [],
     );
     const validation = validateEditorialDrafts(drafts, { allowedCitationHrefs });
+    // Live network call (repo-k2q3 crit 2 / repo-yj2q) so gated behind CHECK_DOIS=1 rather
+    // than run unconditionally like the offline checks above — mirrors articles.ts/
+    // theme-packets.ts's CHECK_DOIS gating for scholarly citations.
+    const doiIssues =
+      process.env.CHECK_DOIS === '1' && drafts.claims
+        ? await gateClaimDoiCitations(drafts.claims)
+        : [];
     const targetVector =
       input.targetVectorBySubjectId?.get(subject.subjectId) ??
       input.catalog.find((entry) => entry.id === subject.subjectId)?.vector;
@@ -399,7 +492,7 @@ async function judgeOneSubject(input: {
         ...drafts,
         ...(relatedIds.length > 0 ? { relatedEntityIds: relatedIds } : {}),
       },
-      validationIssues: validation.issues,
+      validationIssues: [...validation.issues, ...doiIssues],
       model: {
         provider: completion.servedBy ?? completion.provider,
         modelId: completion.modelId,

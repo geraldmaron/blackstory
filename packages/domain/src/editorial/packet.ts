@@ -9,6 +9,22 @@ export const EDITORIAL_PACKET_KIND = 'editorial.packet.v1' as const;
 export type EditorialDecision = 'keep' | 'reject' | 'needs_evidence';
 
 /**
+ * Optional scholarly-citation metadata for a claim whose source is a peer-reviewed paper
+ * (repo-k2q3 crit 2 / repo-yj2q). When present, `doi` is checked against Crossref/OpenAlex
+ * at judge time (gated behind CHECK_DOIS=1 — see checkDoiCitation in @repo/domain and the
+ * gate in operator-cli/editorial-run.ts) so a claim can't cite a paper under a fabricated or
+ * drifted DOI. Mirrors `ArticleScholarlyCitationDoc` in @repo/schemas — same shape, kept
+ * local here since this file has no schemas dependency (same convention as
+ * `ThemeImpactScholarlyCitation` in @repo/domain's theme-impact-packet.ts).
+ */
+export type EditorialClaimScholarlyCitation = {
+  readonly doi: string;
+  readonly title: string;
+  readonly firstAuthorSurname: string;
+  readonly venue: string;
+};
+
+/**
  * Structured claim draft mirroring `ReleaseSourceClaim` so kept subjects arrive
  * publish-shaped instead of needing a manual claims backfill. Citations must point
  * at sources the judge was actually given — validation rejects fabricated hrefs.
@@ -20,6 +36,7 @@ export type EditorialClaimDraft = {
   readonly citationSource: string;
   readonly citationHref: string;
   readonly citationLabel: string;
+  readonly scholarlyCitation?: EditorialClaimScholarlyCitation;
 };
 
 /**

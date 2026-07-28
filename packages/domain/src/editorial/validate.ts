@@ -67,6 +67,17 @@ function validateClaimDraft(claim: EditorialClaimDraft, index: number, issues: s
       `claims[${index}]: citationHref is an untrusted (T4) source — claims must cite a T1-T3 source`,
     );
   }
+  // Offline shape check only — the live Crossref/OpenAlex resolution check (repo-k2q3 crit 2)
+  // runs in operator-cli/editorial-run.ts's gateClaimDoiCitations, gated behind CHECK_DOIS=1,
+  // since this validator is a pure sync function that must never make a network call.
+  if (claim.scholarlyCitation !== undefined) {
+    const { doi, title, firstAuthorSurname, venue } = claim.scholarlyCitation;
+    if (![doi, title, firstAuthorSurname, venue].every(isNonEmptyString)) {
+      issues.push(
+        `claims[${index}]: scholarlyCitation requires non-empty doi, title, firstAuthorSurname, and venue`,
+      );
+    }
+  }
 }
 
 /** Validates editorial draft fields; never throws. */
