@@ -711,13 +711,13 @@ const RAW_BOOKS: BannedBookRecord[] = [
     slug: 'dear-justyce',
     title: "Dear Justyce",
     authors: [{ name: "Nic Stone", role: 'author' }],
-    identifiers: [{ system: 'isbn-13', value: '9781984824979' }],
+    identifiers: [{ system: 'isbn-13', value: '9781984829665' }],
     description:
       "Stone’s sequel shifts focus to Quan, a Black teenager awaiting trial who writes letters to his friend Justyce. PEN America documents bans in Florida and Texas school districts alongside other Nic Stone titles.",
     publishedDate: '2020',
     challenges: [{ state: 'FL', jurisdictionLabel: "Clay County School District", schoolYear: "2022-2023", status: 'reported', citation: PEN_INDEX_2023 }, { state: 'TX', jurisdictionLabel: "Frisco Independent School District", schoolYear: "2022-2023", status: 'reported', citation: PEN_INDEX_2023 }],
     citations: [PEN_INDEX_2023, { label: "Florida School District Slaps Warning Labels on Books", href: "https://pen.org/press-release/florida-school-district-slaps-stigmatizing-and-alarming-warning-labels-on-books-deemed-unsuitable-for-children/", publisher: "PEN America" }, NPR_PEN_2023],
-    purchaseLinks: seedPurchaseLinks('9781984824979'),
+    purchaseLinks: seedPurchaseLinks('9781984829665'),
     provenance: provenance("PEN America", "https://pen.org/book-bans/2023-banned-book-list/", 'bb-book-dear-justyce', "Dear Justyce"),
   },
   {
@@ -739,13 +739,13 @@ const RAW_BOOKS: BannedBookRecord[] = [
     slug: 'all-because-you-matter',
     title: "All Because You Matter",
     authors: [{ name: "Tami Charles", role: 'author' }, { name: "Bryan Collier", role: 'illustrator' }],
-    identifiers: [{ system: 'isbn-13', value: '9781338574855' }],
+    identifiers: [{ system: 'isbn-13', value: '9781338674743' }],
     description:
       "Charles and Collier’s picture book affirms Black children’s worth through lyrical address to a young reader. PEN America documents school bans in Florida, Missouri, and Texas alongside other race-centered titles.",
     publishedDate: '2020',
     challenges: [{ state: 'FL', status: 'reported', citation: PEN_INDEX_2023 }, { state: 'MO', status: 'reported', citation: PEN_INDEX_2023 }, { state: 'TX', status: 'reported', citation: PEN_INDEX_2023 }],
     citations: [PEN_INDEX_2023, PEN_INDEX_DATA, NPR_PEN_2023],
-    purchaseLinks: seedPurchaseLinks('9781338574855'),
+    purchaseLinks: seedPurchaseLinks('9781338674743'),
     provenance: provenance("PEN America", "https://pen.org/book-bans/2023-banned-book-list/", 'bb-book-all-because-you-matter', "All Because You Matter"),
   },
   {
@@ -753,13 +753,13 @@ const RAW_BOOKS: BannedBookRecord[] = [
     slug: 'mondays-not-coming',
     title: "Monday's Not Coming",
     authors: [{ name: "Tiffany D. Jackson", role: 'author' }],
-    identifiers: [{ system: 'isbn-13', value: '9780062422641' }],
+    identifiers: [{ system: 'isbn-13', value: '9780062422675' }],
     description:
       "Jackson’s thriller follows Claudia as she searches for her missing best friend Monday in a Washington, D.C., neighborhood where adults dismiss her concerns. PEN America documents bans in Pennsylvania, South Carolina, Utah, and North Carolina.",
     publishedDate: '2018',
     challenges: [{ state: 'PA', status: 'reported', citation: PEN_INDEX_2023 }, { state: 'SC', status: 'reported', citation: PEN_INDEX_2023 }, { state: 'UT', status: 'reported', citation: PEN_INDEX_2023 }],
     citations: [PEN_INDEX_2023, PEN_BOOK_BANS, NPR_ALA_2024],
-    purchaseLinks: seedPurchaseLinks('9780062422641'),
+    purchaseLinks: seedPurchaseLinks('9780062422675'),
     provenance: provenance("PEN America", "https://pen.org/book-bans/2023-banned-book-list/", 'bb-book-mondays-not-coming', "Monday's Not Coming"),
   },
   {
