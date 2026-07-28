@@ -120,9 +120,54 @@ function normalizeNameForDiff(name: string): string {
     .toLowerCase()
     .normalize('NFKD')
     .replace(/[̀-ͯ]/gu, '')
-    .replace(/&/gu, 'and')
+    .replace(/&/gu, ' and ')
     .replace(/[^a-z0-9]+/gu, ' ')
     .trim();
+}
+
+/**
+ * Institution-name synonym folds for dedup keys. College/University are folded
+ * together on purpose: the roster's remaining "net-new" rows in the 2026-07-28
+ * run were all College->University renames of institutions we already track
+ * (repo-9qp9), and two distinct HBCUs never differ only by that word.
+ */
+const DEDUP_TOKEN_FOLDS: Readonly<Record<string, string>> = {
+  university: 'univ',
+  college: 'univ',
+  agricultural: 'a',
+  mechanical: 'm',
+  saint: 'st',
+};
+
+/** Connectives dropped from dedup keys ('a'/'m' stay — they carry A&M). */
+const DEDUP_DROP_TOKENS = new Set(['the', 'of', 'at', 'and', 'in', 'for']);
+
+/**
+ * Canonical dedup key: normalized tokens with synonym folds applied. Two rows
+ * are duplicates when keys match exactly, or when one key extends the other
+ * (campus and school sub-units, e.g. "University of the District of Columbia
+ * David A. Clarke School of Law" extends "University of the District of
+ * Columbia").
+ */
+function dedupKey(name: string): string {
+  return normalizeNameForDiff(name)
+    .split(' ')
+    .filter((token) => token && !DEDUP_DROP_TOKENS.has(token))
+    .map((token) => DEDUP_TOKEN_FOLDS[token] ?? token)
+    .join(' ');
+}
+
+function matchesExistingKey(candidateKey: string, existingKeys: ReadonlySet<string>): boolean {
+  if (existingKeys.has(candidateKey)) return true;
+  const candidateCompact = candidateKey.replace(/ /gu, '');
+  for (const existingKey of existingKeys) {
+    if (candidateKey.startsWith(`${existingKey} `) || existingKey.startsWith(`${candidateKey} `)) {
+      return true;
+    }
+    // Spacing variants: "Le Moyne-Owen" vs "LeMoyne-Owen".
+    if (existingKey.replace(/ /gu, '') === candidateCompact) return true;
+  }
+  return false;
 }
 
 function slugify(name: string): string {
@@ -213,9 +258,9 @@ async function main(): Promise<void> {
   );
 
   const existingLandscapeDisplayNames = existingLandscapeRes.rows.map((row) => row.display_name);
-  const existingLandscapeNames = new Set(existingLandscapeDisplayNames.map(normalizeNameForDiff));
+  const existingLandscapeNames = new Set(existingLandscapeDisplayNames.map(dedupKey));
   const existingEntityNames = new Set(
-    existingEntitiesRes.rows.map((row) => normalizeNameForDiff(row.display_name)),
+    existingEntitiesRes.rows.map((row) => dedupKey(row.display_name)),
   );
 
   console.log(
@@ -235,12 +280,12 @@ async function main(): Promise<void> {
   const likelyNameVariantWarnings: { candidateName: string; matchesExisting: string }[] = [];
 
   for (const institution of scraped) {
-    const normalized = normalizeNameForDiff(institution.displayName);
-    if (existingLandscapeNames.has(normalized)) {
+    const candidateKey = dedupKey(institution.displayName);
+    if (matchesExistingKey(candidateKey, existingLandscapeNames)) {
       dedupedOutLandscapeLaneNames.push(institution.displayName);
       continue;
     }
-    if (existingEntityNames.has(normalized)) {
+    if (matchesExistingKey(candidateKey, existingEntityNames)) {
       dedupedOutCanonicalEntityNames.push(institution.displayName);
       continue;
     }
