@@ -10,7 +10,7 @@
 import { US_STATES } from '@repo/domain';
 import type { Firestore } from 'firebase-admin/firestore';
 import type { EntityKindDoc } from '../firestore/types.js';
-import type { CanonicalEntitySource, CanonicalEntitySourcePage } from './backfill-cli.js';
+import type { CanonicalEntitySource } from './backfill-cli.js';
 import type { EntityEmbeddingInput } from './pipeline.js';
 
 const PAGE_SIZE = 200;
@@ -114,20 +114,6 @@ export function mapSearchIndexRecordToEmbeddingInput(
           },
         }
       : {}),
-  };
-}
-
-function pageItems(
-  items: readonly EntityEmbeddingInput[],
-  cursor: string | undefined,
-  pageSize: number,
-): CanonicalEntitySourcePage {
-  const startIndex = cursor ? items.findIndex((item) => item.entityId === cursor) + 1 : 0;
-  const page = items.slice(startIndex, startIndex + pageSize);
-  const last = page.at(-1);
-  return {
-    items: page,
-    ...(last && startIndex + pageSize < items.length ? { nextCursor: last.entityId } : {}),
   };
 }
 

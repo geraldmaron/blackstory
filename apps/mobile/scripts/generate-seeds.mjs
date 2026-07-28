@@ -19,7 +19,7 @@
  * nothing about whether the content drifted.
  */
 import { spawnSync } from 'node:child_process';
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -75,8 +75,13 @@ if (unknown.length) {
 
 /** Strip the run timestamp so only real content differences are reported. */
 function contentOf(path) {
-  if (!existsSync(path)) return null;
-  const raw = readFileSync(path, 'utf8');
+  let raw;
+  try {
+    raw = readFileSync(path, 'utf8');
+  } catch (error) {
+    if (error.code === 'ENOENT') return null;
+    throw error;
+  }
   try {
     const parsed = JSON.parse(raw);
     if (parsed && typeof parsed === 'object' && 'generatedAt' in parsed) {
@@ -105,7 +110,12 @@ for (const seed of selected) {
   }
 
   const before = contentOf(outPath);
-  const original = existsSync(outPath) ? readFileSync(outPath, 'utf8') : null;
+  let original = null;
+  try {
+    original = readFileSync(outPath, 'utf8');
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+  }
 
   const result = spawnSync(
     process.execPath,
