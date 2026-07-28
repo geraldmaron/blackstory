@@ -5,6 +5,7 @@
  */
 import { notFound } from 'next/navigation';
 import { buildLawDetailViewModel, listLawStaticParams } from '../law-view-model';
+import { loadLegalCatalog } from '../../../lib/legal/public-source';
 import { LawDetailIntro, LawDetailSections } from '../LawDetailSections';
 import {
   lawEditionRootClassName,
@@ -17,12 +18,12 @@ type LawDetailPageProps = {
 };
 
 export async function generateStaticParams() {
-  return [...listLawStaticParams()];
+  return [...listLawStaticParams(await loadLegalCatalog())];
 }
 
 export async function generateMetadata({ params }: LawDetailPageProps) {
   const { slug } = await params;
-  const view = buildLawDetailViewModel(slug);
+  const view = buildLawDetailViewModel(slug, await loadLegalCatalog());
   if (view.kind !== 'ok') {
     return { title: 'Law entry not found' };
   }
@@ -34,7 +35,7 @@ export async function generateMetadata({ params }: LawDetailPageProps) {
 
 export default async function LawDetailPage({ params }: LawDetailPageProps) {
   const { slug } = await params;
-  const view = buildLawDetailViewModel(slug);
+  const view = buildLawDetailViewModel(slug, await loadLegalCatalog());
   if (view.kind !== 'ok') {
     notFound();
   }

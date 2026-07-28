@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { ATMOSPHERE_ATTRIBUTION_HREF } from '../../components/atmosphere/tile-credits';
 import { LAW_EDITION_BROWSE_LEDE } from './law-copy';
 import { buildLawBrowseViewModel, type RawLawBrowseParams } from './law-view-model';
+import { loadLegalCatalog } from '../../lib/legal/public-source';
 import { LawBrowseSections } from './LawBrowseSections';
 import {
   lawEditionPanelClassName,
@@ -28,7 +29,7 @@ type LawPageProps = {
 
 export default async function LawBrowsePage({ searchParams }: LawPageProps) {
   const params = await searchParams;
-  const view = buildLawBrowseViewModel(params);
+  const view = buildLawBrowseViewModel(params, await loadLegalCatalog());
 
   return (
     <div className={lawEditionRootClassName()} data-law-edition="v6">
