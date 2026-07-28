@@ -119,7 +119,7 @@ test('resolveEntityCrossReferences resolves a single cross-reference (one chapte
   const [surface] = surfaces;
   assert.ok(surface);
   assert.equal(surface.kind, 'chapter');
-  assert.equal(entityCrossReferenceHref(surface), '/themes/redlining#chapter-1');
+  assert.equal(entityCrossReferenceHref(surface), '/chapters/buying-a-home#chapter-1');
   assert.equal(entityCrossReferenceLabel(surface), 'Housing segregation & redlining: Chapter One');
 });
 
@@ -137,7 +137,7 @@ test('resolveEntityCrossReferences resolves multiple cross-references across cha
   const kinds = surfaces.map((surface) => surface.kind).sort();
   assert.deepEqual(kinds, ['chapter', 'chapter', 'theme_packet']);
   for (const surface of surfaces) {
-    assert.match(entityCrossReferenceHref(surface), /^\/(themes|stories)\//);
+    assert.match(entityCrossReferenceHref(surface), /^\/(chapters|stories)/);
     assert.ok(entityCrossReferenceLabel(surface).length > 0);
   }
 });
@@ -209,7 +209,8 @@ test('resolveChapterEntityExits renders one exit link when exactly one other sur
   assert.ok(exit);
   assert.equal(exit.entityLabel, '1114 Fourth Avenue');
   assert.equal(exit.targetLabel, 'Urban renewal: Chapter Two');
-  assert.equal(exit.href, '/themes/urban_renewal#chapter-1');
+  // urban_renewal has no authored chapter yet, so the exit lands on the index.
+  assert.equal(exit.href, '/chapters');
 });
 
 test('resolveChapterEntityExits renders multiple exit links when several entities have other surfaces', async () => {
@@ -247,7 +248,7 @@ test('resolveChapterEntityExits renders multiple exit links when several entitie
   const chapterOneExits = exits.get(STORY_CHAPTER_ONE.id) ?? [];
   assert.equal(chapterOneExits.length, 2);
   for (const exit of chapterOneExits) {
-    assert.match(exit.href, /^\/themes\//);
+    assert.match(exit.href, /^\/chapters/);
     assert.ok(exit.targetLabel.length > 0);
   }
   const entityIds = chapterOneExits.map((exit) => exit.entityId).sort();

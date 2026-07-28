@@ -570,13 +570,17 @@ async function verifyPlan(
         (
           SELECT count(*)::int
           FROM public_entities p
-          WHERE NOT EXISTS (
-            SELECT 1
-            FROM bb_canonical.entity_locations l
-            WHERE l.entity_id = p.entity_id
-              AND l.lat IS NOT NULL
-              AND l.lng IS NOT NULL
-          )
+          -- Mirrors buildCanonicalConvergencePlan's own gate (canonical-convergence.ts):
+          -- a location row is only ever planned when the release row carries coordinates,
+          -- so entities without them (e.g. kind='person') must not be required to have one.
+          WHERE p.lat IS NOT NULL AND p.lng IS NOT NULL
+            AND NOT EXISTS (
+              SELECT 1
+              FROM bb_canonical.entity_locations l
+              WHERE l.entity_id = p.entity_id
+                AND l.lat IS NOT NULL
+                AND l.lng IS NOT NULL
+            )
         ) AS missing_canonical_locations,
         (SELECT count(*)::int FROM planned_claims) AS planned_claims,
         (

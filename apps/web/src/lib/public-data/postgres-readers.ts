@@ -180,6 +180,17 @@ export async function listPublicStorySummaries(
   return summaries;
 }
 
+/** Reads the frozen legal snapshot documents projected into the active release. */
+export async function listPublicLegalSnapshots(): Promise<readonly unknown[]> {
+  const rows = await queryPostgres<MaterializedSnapshotRow>(
+    `SELECT payload
+     FROM bb_public.release_legal_snapshots
+     WHERE release_id = (SELECT release_id FROM bb_public.active_release WHERE id = 'active')
+     ORDER BY slug`,
+  );
+  return rows.map((row) => row.payload);
+}
+
 /** Reads one materialized `publicMeta` snapshot migrated into `bb_public.materialized_snapshots`. */
 export async function fetchMaterializedSnapshot(name: string): Promise<unknown | undefined> {
   const rows = await queryPostgres<MaterializedSnapshotRow>(

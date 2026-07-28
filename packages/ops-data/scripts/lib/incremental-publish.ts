@@ -2,8 +2,6 @@
  * Pure helpers for gated incremental upsert into bb_public.release_entities (+ search_index).
  * Used by publish-release-entities-incremental.ts and unit tests — no database I/O.
  */
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import {
   US_STATES,
   buildReleaseEntityArtifacts,
@@ -40,6 +38,7 @@ export type PublishGateSkipReason =
   | 'already_in_public'
   | 'name_overlap'
   | 'missing_canonical_url'
+  | 'summary_too_short'
   | 'build_failed'
   | 'confidence_below_floor';
 
@@ -84,6 +83,26 @@ function asRecord(value: unknown): Readonly<Record<string, unknown>> {
     return value as Readonly<Record<string, unknown>>;
   }
   return {};
+}
+
+/**
+ * Person rows are blocked from incremental publish unless an operator has
+ * recorded an explicit privacy review on the row: payload.personReview must
+ * be an object with approved=true plus approvedBy/approvedAt/basis strings.
+ * The marker is written manually (or by an operator-run script) after a human
+ * confirms the person is a deceased historical figure — never by an agent.
+ */
+export function personReviewApproved(payload: Readonly<Record<string, unknown>>): boolean {
+  const review = asRecord(payload.personReview);
+  return (
+    review.approved === true &&
+    typeof review.approvedBy === 'string' &&
+    review.approvedBy.length > 0 &&
+    typeof review.approvedAt === 'string' &&
+    review.approvedAt.length > 0 &&
+    typeof review.basis === 'string' &&
+    review.basis.length > 0
+  );
 }
 
 export function resolveSourceCategory(row: LandscapePublishRow): string | null {
@@ -181,6 +200,21 @@ export function buildReleaseSourceFromLandscape(row: LandscapePublishRow): Relea
     // keep fallback
   }
 
+  // Operator-attested living status from the privacy review marker (person rows).
+  const review = asRecord(row.payload.personReview);
+  const livingStatus =
+    review.livingStatus === 'deceased' || review.livingStatus === 'living' || review.livingStatus === 'unknown'
+      ? review.livingStatus
+      : undefined;
+
+  // A geocode fallback (e.g. reconcile-nrhp-county-locations.ts) records the real precision
+  // of its coordinates here so the map renders an honest radius affordance instead of a
+  // sharpened pin implying site-level accuracy the source data doesn't have.
+  const geocode = asRecord(row.payload.geocode);
+  const locationPrecision = typeof geocode.precision === 'string' && geocode.precision.trim().length > 0
+    ? geocode.precision
+    : 'site';
+
   const claim: ReleaseSourceClaim = {
     predicate: 'documented_site',
     object: summary,
@@ -195,8 +229,9 @@ export function buildReleaseSourceFromLandscape(row: LandscapePublishRow): Relea
     kind: row.kind,
     displayName,
     summary,
+    ...(livingStatus !== undefined ? { livingStatus } : {}),
     jurisdictionLabel: jurisdictionFromProvenance(provenance),
-    locationPrecision: 'site',
+    locationPrecision,
     locationLabel: locationLabelFromProvenance(displayName, provenance),
     lat: row.lat,
     lng: row.lng,
@@ -207,7 +242,6 @@ export function buildReleaseSourceFromLandscape(row: LandscapePublishRow): Relea
 
 export function gateLandscapePublishCandidate(input: {
   readonly row: LandscapePublishRow;
-  readonly catalogEntry?: ReleaseSourceEntity;
   readonly releaseId: string;
   readonly generatedAt: string;
   readonly confidenceFloor?: number;
@@ -215,10 +249,11 @@ export function gateLandscapePublishCandidate(input: {
   const floor = input.confidenceFloor ?? INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR;
   const row = input.row;
 
-  if (row.kind === 'person') {
+  const reviewed = personReviewApproved(row.payload);
+  if (row.kind === 'person' && !reviewed) {
     return { eligible: false, reason: 'person_kind', detail: 'kind=person requires privacy review' };
   }
-  if (resolveSourceCategory(row) === 'People') {
+  if (resolveSourceCategory(row) === 'People' && !reviewed) {
     return {
       eligible: false,
       reason: 'people_category',
@@ -242,14 +277,21 @@ export function gateLandscapePublishCandidate(input: {
     return { eligible: false, reason: 'name_overlap', detail: 'display_name overlaps existing release entity' };
   }
 
-  const entry =
-    input.catalogEntry ??
-    buildReleaseSourceFromLandscape(row);
+  const entry = buildReleaseSourceFromLandscape(row);
   if (!entry) {
     return {
       eligible: false,
       reason: 'missing_canonical_url',
       detail: 'insufficient landscape fields to build release source',
+    };
+  }
+  // publicEntityProjectionSchema requires summary 120..400 chars; anything
+  // outside that range would publish an unparseable (invisible) projection.
+  if (entry.summary.length < 120 || entry.summary.length > 400) {
+    return {
+      eligible: false,
+      reason: 'summary_too_short',
+      detail: `summary length ${entry.summary.length} outside projection schema bounds 120..400`,
     };
   }
 
@@ -306,7 +348,9 @@ export function toSearchIndexRow(
   geohash: string,
 ): SearchIndexUpsertRow {
   return {
-    id: searchIndex.id,
+    // Composite id matches the primary release publisher; a plain entity id here
+    // creates a second search row for entities that already have a composite-id row.
+    id: `${searchIndex.releaseId}:${searchIndex.id}`,
     release_id: searchIndex.releaseId,
     entity_id: searchIndex.id,
     name: searchIndex.displayName,
@@ -348,22 +392,6 @@ export function buildArtifactsForEntry(input: {
   const entityRow = toReleaseEntityRow(build.projection);
   const searchRow = toSearchIndexRow(build.searchIndex, build.projection.location.geohash);
   return { ok: true, entityRow, searchRow };
-}
-
-export function loadCatalogEntriesById(catalogDir: string): Map<string, ReleaseSourceEntity> {
-  const index = new Map<string, ReleaseSourceEntity>();
-  if (!existsSync(catalogDir)) return index;
-  for (const file of readdirSync(catalogDir).filter((name) => name.endsWith('.json')).sort()) {
-    if (file.startsWith('auto-promoted-track-b-')) continue;
-    const parsed = JSON.parse(readFileSync(join(catalogDir, file), 'utf8')) as unknown;
-    if (!Array.isArray(parsed)) continue;
-    for (const entry of parsed) {
-      if (entry && typeof entry === 'object' && typeof (entry as { id?: string }).id === 'string') {
-        index.set((entry as ReleaseSourceEntity).id, entry as ReleaseSourceEntity);
-      }
-    }
-  }
-  return index;
 }
 
 export function incrementalPublishProvenancePatch(entityId: string): Record<string, unknown> {

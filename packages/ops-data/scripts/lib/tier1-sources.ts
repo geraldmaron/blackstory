@@ -73,6 +73,30 @@ export const REPUTABLE_SECONDARY_HOST_SUFFIXES = [
   'hmdb.org',
   'dclibrary.org',
   'blackpast.org',
+  // Source review 2026-07-28 (operator, session notes in repo-bmmo):
+  // - baseballhall.org — official site of the National Baseball Hall of Fame
+  //   and Museum, Cooperstown NY (verified via /about-the-hall). Accredited
+  //   museum + research library; the canonical registry of inductees.
+  // - sabr.org — Society for American Baseball Research (verified via
+  //   /about/): scholarly body whose BioProject publishes peer-edited player
+  //   biographies and which runs the Jerry Malloy Negro League Conference.
+  'baseballhall.org',
+  'sabr.org',
+  // - The nine NPHC (Divine Nine) domains below — each verified 2026-07-28 as
+  //   the organization's official national site (homepage title carries the
+  //   incorporated org name; domain embeds the founding year). Century-old
+  //   national institutions, authoritative for their own founding history
+  //   (dates, campuses, founder rosters). Corroboration still requires an
+  //   independent second host before any of this publishes.
+  'apa1906.net',
+  'aka1908.com',
+  'kappaalphapsi1911.com',
+  'oppf.org',
+  'deltasigmatheta.org',
+  'phibetasigma1914.org',
+  'zphib1920.org',
+  'sgrho1922.org',
+  'iotaphitheta.org',
 ] as const;
 
 export function isReputableSecondaryHost(url: string | undefined): boolean {

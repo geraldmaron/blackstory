@@ -74,13 +74,15 @@ export type ThemePacketView = {
   readonly derived: readonly ThemePacketDerived[];
   readonly artifacts: readonly ThemePacketArtifact[];
   readonly gapStates: readonly ThemeImpactGapState[];
-  readonly dataSource?: 'live' | 'fixture';
+  readonly dataSource?: 'live' | 'fixture' | 'release';
 };
 
 export type ThemesCatalogSnapshot = {
   readonly version: string;
   readonly generatedAt: string;
   readonly source: string;
+  /** Supabase release the packets were exported from (`rel_…`). */
+  readonly releaseId: string;
   readonly releaseLabel: string;
   readonly themes: readonly ThemeCatalogEntry[];
   readonly packets: readonly ThemePacketView[];

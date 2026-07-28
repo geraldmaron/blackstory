@@ -63,6 +63,7 @@ export function loadThemesCatalog(): ThemesCatalogSnapshot {
       version: 'unavailable',
       generatedAt: new Date(0).toISOString(),
       source: 'unavailable',
+      releaseId: 'unavailable',
       releaseLabel: 'Unavailable',
       themes: [],
       packets: [],
@@ -87,6 +88,8 @@ export function loadThemesCatalog(): ThemesCatalogSnapshot {
     version: catalogSeed.version,
     generatedAt: catalogSeed.generatedAt,
     source: typeof catalogSeed.source === 'string' ? catalogSeed.source : 'curated-seed',
+    releaseId:
+      typeof catalogSeed.releaseId === 'string' ? catalogSeed.releaseId : 'unknown',
     releaseLabel:
       typeof catalogSeed.releaseLabel === 'string'
         ? catalogSeed.releaseLabel

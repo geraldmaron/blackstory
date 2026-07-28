@@ -22,4 +22,5 @@ export const listPublicSearchIndexDocs = postgresReaders.listPublicSearchIndexDo
 export const fetchPublicStoryProjection = postgresReaders.fetchPublicStoryProjection;
 export const listPublicStoryProjections = postgresReaders.listPublicStoryProjections;
 export const listPublicStorySummaries = postgresReaders.listPublicStorySummaries;
+export const listPublicLegalSnapshots = postgresReaders.listPublicLegalSnapshots;
 export const fetchMaterializedSnapshot = postgresReaders.fetchMaterializedSnapshot;

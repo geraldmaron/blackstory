@@ -104,7 +104,12 @@ export type PublicProjectionInput = {
 function locationPrecisionFromProjection(
   precision: string | undefined,
 ): PublicEntityView['locationPrecision'] {
-  if (precision === 'neighborhood' || precision === 'campus' || precision === 'institution') {
+  if (
+    precision === 'neighborhood' ||
+    precision === 'campus' ||
+    precision === 'institution' ||
+    precision === 'county'
+  ) {
     return precision;
   }
   return 'city';

@@ -128,8 +128,9 @@ function streetFillWidthExpression(): ExpressionSpecification {
 
 /** Camera zoom matched to the public precision label shown on the entity page. */
 export function zoomForLocationPrecision(
-  precision: 'city' | 'neighborhood' | 'campus' | 'institution',
+  precision: 'county' | 'city' | 'neighborhood' | 'campus' | 'institution',
 ): number {
+  if (precision === 'county') return 8;
   if (precision === 'city') return 10;
   if (precision === 'neighborhood') return 12;
   return 13;

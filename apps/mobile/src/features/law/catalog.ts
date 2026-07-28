@@ -90,13 +90,6 @@ export function jurisdictionLabel(jurisdictionId: string): string {
   return LAW_JURISDICTION_LABELS[jurisdictionId] ?? jurisdictionId.toUpperCase();
 }
 
-/** Drop seed-only entity ids that are not on the public mobile entity API. */
-function publicEntityId(raw: string | undefined): string | undefined {
-  if (!raw) return undefined;
-  if (raw.startsWith('ent_seed_')) return undefined;
-  return raw;
-}
-
 export function toCatalogRow(entry: LawCatalogEntry): LawCatalogRow {
   return {
     id: entry.id,
@@ -120,13 +113,12 @@ export function loadLawCatalog(): LawCatalogSnapshot {
   const entries: LawCatalogEntry[] = [];
   for (const raw of catalogSeed.entries as readonly unknown[]) {
     if (!isEntry(raw)) continue;
-    const entityId = publicEntityId(raw.canonicalEntityId);
-    const { canonicalEntityId: _drop, explainer, factId, ...rest } = raw;
+    const { canonicalEntityId, explainer, factId, ...rest } = raw;
     const entry: LawCatalogEntry = {
       ...rest,
       topics: raw.topics.filter(isTopic),
       ...(factId ? { factId } : {}),
-      ...(entityId ? { canonicalEntityId: entityId } : {}),
+      ...(canonicalEntityId ? { canonicalEntityId } : {}),
       ...(explainer ? { explainer } : {}),
     };
     entries.push(entry);

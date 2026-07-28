@@ -68,8 +68,17 @@ SELECT
   ) AS name_overlap
 FROM bb_research.landscape_candidates lc
 WHERE lc.status = 'pending'
-  AND lc.kind <> 'person'
-  AND COALESCE(lc.provenance->>'sourceCategory', lc.payload->'provenance'->>'sourceCategory') <> 'People'
+  -- Persons/People stay excluded unless an operator recorded a privacy review
+  -- (payload.personReview), mirroring gateLandscapePublishCandidate. The
+  -- IS DISTINCT FROM keeps rows with no sourceCategory at all in scope.
+  AND (
+    (lc.payload->'personReview'->>'approved')::boolean IS TRUE
+    OR (
+      lc.kind <> 'person'
+      AND COALESCE(lc.provenance->>'sourceCategory', lc.payload->'provenance'->>'sourceCategory')
+        IS DISTINCT FROM 'People'
+    )
+  )
 ORDER BY lc.id
 `;
 
@@ -83,6 +92,14 @@ function readLimit(): number | undefined {
   if (!raw) return undefined;
   const parsed = Number.parseInt(raw, 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
+}
+
+/** Optional comma-separated lane scope, e.g. --lanes=hbcu,dc-sites. Unscoped runs crawl every pending lane. */
+function readLanes(): readonly string[] | undefined {
+  const raw = readArg('--lanes=');
+  if (!raw) return undefined;
+  const lanes = raw.split(',').map((entry) => entry.trim()).filter(Boolean);
+  return lanes.length > 0 ? lanes : undefined;
 }
 
 function asRecord(value: unknown): Readonly<Record<string, unknown>> {
@@ -110,6 +127,35 @@ function isProgramSourceUrl(url: string): boolean {
   }
 }
 
+function hostnameOf(url: string): string | null {
+  try {
+    return new URL(url).hostname.toLowerCase().replace(/^www\./, '');
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The publish gate only counts https:// corroborating URLs
+ * (corroboratingSourcesForLandscape in lib/incremental-publish.ts), and lineage
+ * independence is keyed on hostname. Upgrade http finds to https when the https
+ * variant actually serves the page; reject same-host "corroboration" outright.
+ */
+async function normalizeCorroborationUrl(
+  url: string,
+  canonicalUrl: string,
+): Promise<string | null> {
+  const host = hostnameOf(url);
+  if (!host) return null;
+  const canonicalHost = canonicalUrl ? hostnameOf(canonicalUrl) : null;
+  if (canonicalHost !== null && host === canonicalHost) return null; // same lineage root — not independent
+  if (url.startsWith('https://')) return url;
+  if (!url.startsWith('http://')) return null;
+  const httpsUrl = `https://${url.slice('http://'.length)}`;
+  const page = await fetchPage(httpsUrl);
+  return page ? httpsUrl : null;
+}
+
 type PendingRow = LandscapePublishRow & {
   readonly provenance: Readonly<Record<string, unknown>>;
   readonly payload: Readonly<Record<string, unknown>>;
@@ -123,6 +169,7 @@ async function main(): Promise<void> {
   }
 
   const limit = readLimit();
+  const lanes = readLanes();
   const { connectionString, ssl } = normalizePgConnectionString(databaseUrl);
   const pool = new pg.Pool({ connectionString, ...(ssl ? { ssl } : {}) });
   const client = await pool.connect();
@@ -145,6 +192,7 @@ async function main(): Promise<void> {
 
     const result = await client.query(PENDING_BELOW_GATE_SQL);
     let rows = result.rows as PendingRow[];
+    if (lanes !== undefined) rows = rows.filter((row) => lanes.includes(row.lane));
     if (limit !== undefined) rows = rows.slice(0, limit);
 
     const generatedAt = new Date().toISOString();
@@ -197,7 +245,11 @@ async function main(): Promise<void> {
             : {}),
         });
 
-        if (!corroboration || isProgramSourceUrl(corroboration.url)) {
+        const corroborationUrl =
+          corroboration && !isProgramSourceUrl(corroboration.url)
+            ? await normalizeCorroborationUrl(corroboration.url, canonicalUrl)
+            : null;
+        if (!corroboration || corroborationUrl === null) {
           unchanged += 1;
           updates.push({
             id: row.id,
@@ -211,7 +263,7 @@ async function main(): Promise<void> {
         corroborated += 1;
         const nextProvenance = {
           ...asRecord(row.provenance),
-          sourceUrl: corroboration.url,
+          sourceUrl: corroborationUrl,
           corroborationMethod: corroboration.method,
           corroborationEnrichedAt: generatedAt,
         };
@@ -219,13 +271,13 @@ async function main(): Promise<void> {
           ...asRecord(row.payload),
           provenance: {
             ...asRecord(asRecord(row.payload).provenance),
-            sourceUrl: corroboration.url,
+            sourceUrl: corroborationUrl,
             corroborationMethod: corroboration.method,
             corroborationEnrichedAt: generatedAt,
           },
           enrichment: {
             ...asRecord(asRecord(row.payload).enrichment),
-            corroboratingSourceUrl: corroboration.url,
+            corroboratingSourceUrl: corroborationUrl,
             corroborationMethod: corroboration.method,
             enrichedAt: generatedAt,
           },
@@ -259,7 +311,7 @@ async function main(): Promise<void> {
           id: row.id,
           displayName: row.display_name,
           afterConfidence,
-          corroboratingUrl: corroboration.url,
+          corroboratingUrl: corroborationUrl,
           method: corroboration.method,
           status: clearsGate ? 'clears_gate' : 'updated',
           ...(beforeDetail ? { beforeDetail } : {}),

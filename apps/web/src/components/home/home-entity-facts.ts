@@ -18,7 +18,7 @@ export type HomeFeaturedEntity = {
   readonly era?: string;
   readonly eraBuckets?: readonly string[];
   readonly claims?: readonly ClaimConfidence[];
-  readonly locationPrecision?: 'city' | 'neighborhood' | 'campus' | 'institution';
+  readonly locationPrecision?: 'county' | 'city' | 'neighborhood' | 'campus' | 'institution';
   readonly geoAnchor?: { readonly lat: number; readonly lng: number };
 };
 

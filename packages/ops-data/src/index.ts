@@ -295,9 +295,7 @@ export {
   createFirestoreCanonicalEntitySource,
   createFirestoreExistingHashLookup,
   createFirestorePublicSearchIndexEntitySource,
-  createNationalCatalogFixtureEntitySource,
   mapSearchIndexRecordToEmbeddingInput,
-  mapCatalogFixtureRecordToEmbeddingInput,
   parseStateCodeFromJurisdiction,
 } from './embeddings/index.js';
 export type {
@@ -326,7 +324,6 @@ export type {
   CanonicalEntitySourcePage,
   ExistingEmbeddingHashLookup,
   SearchIndexEmbeddingRecord,
-  CatalogFixtureEmbeddingRecord,
 } from './embeddings/index.js';
 export type {
   FirestoreRootCollection,

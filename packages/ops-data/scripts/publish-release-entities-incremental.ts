@@ -1,6 +1,7 @@
 /**
  * Incremental upsert of selected entity rows into bb_public.release_entities (+ search_index).
- * Never replays the full national-catalog directory — only the IDs you pass or gated landscape pending.
+ * Sources rows exclusively from bb_research.landscape_candidates — the IDs you pass or gated
+ * landscape pending. (Fixture-catalog sourcing was removed when entity data moved to Supabase.)
  *
  * Usage (from repo root):
  *   set -a && source apps/web/.env.local && set +a
@@ -10,7 +11,7 @@
  *   node --conditions development --import tsx \
  *     packages/ops-data/scripts/publish-release-entities-incremental.ts --from-landscape-pending
  *
- *   # Dry-run explicit IDs (catalog fixture preferred, else landscape row)
+ *   # Dry-run explicit IDs (resolved from landscape rows)
  *   node --conditions development --import tsx \
  *     packages/ops-data/scripts/publish-release-entities-incremental.ts \
  *     --ids=dc-black-history-sites-b10,dc-black-history-sites-b11
@@ -23,13 +24,11 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
-import type { ReleaseSourceEntity } from '@repo/domain';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import {
   buildArtifactsForEntry,
   gateLandscapePublishCandidate,
   incrementalPublishProvenancePatch,
-  loadCatalogEntriesById,
   type LandscapePublishRow,
   type PublishGateSkipReason,
   type ReleaseEntityUpsertRow,
@@ -39,7 +38,6 @@ import { applyReleaseTaxonomySync, planReleaseTaxonomySync } from './lib/release
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(SCRIPT_DIR, '../../..');
-const CATALOG_DIR = join(REPO_ROOT, 'packages/ops-data/fixtures/national-catalog');
 const REPORT_PATH = join(REPO_ROOT, '.cache/landscape-intake/incremental-publish-report.json');
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
@@ -254,7 +252,6 @@ async function markLandscapeAccepted(
 
 function preparePublish(input: {
   readonly row: LandscapePublishRow | null;
-  readonly catalogEntry: ReleaseSourceEntity | undefined;
   readonly releaseId: string;
   readonly generatedAt: string;
   readonly entityId: string;
@@ -263,7 +260,6 @@ function preparePublish(input: {
   if (input.fromLandscape && input.row) {
     const gate = gateLandscapePublishCandidate({
       row: input.row,
-      ...(input.catalogEntry ? { catalogEntry: input.catalogEntry } : {}),
       releaseId: input.releaseId,
       generatedAt: input.generatedAt,
     });
@@ -287,28 +283,10 @@ function preparePublish(input: {
     };
   }
 
-  if (!input.catalogEntry) {
-    return {
-      id: input.entityId,
-      reason: 'build_failed',
-      detail: 'no catalog entry or landscape row for id',
-    };
-  }
-
-  const built = buildArtifactsForEntry({
-    entry: input.catalogEntry,
-    releaseId: input.releaseId,
-    generatedAt: input.generatedAt,
-  });
-  if (!built.ok) {
-    return { id: input.entityId, reason: 'build_failed', detail: `${built.reason}: ${built.detail}` };
-  }
   return {
     id: input.entityId,
-    confidence: 1,
-    entityRow: built.entityRow,
-    searchRow: built.searchRow,
-    fromLandscape: false,
+    reason: 'build_failed',
+    detail: 'no landscape row for id',
   };
 }
 
@@ -327,7 +305,6 @@ async function main(): Promise<void> {
   }
 
   const limit = readLimit();
-  const catalogIndex = loadCatalogEntriesById(CATALOG_DIR);
   const generatedAt = new Date().toISOString();
 
   const conn = normalizePgConnectionString(databaseUrl);
@@ -381,10 +358,8 @@ async function main(): Promise<void> {
     const skipCounts = new Map<PublishGateSkipReason, number>();
 
     for (const item of sliced) {
-      const catalogEntry = catalogIndex.get(item.entityId);
       const result = preparePublish({
         row: item.row,
-        catalogEntry,
         releaseId,
         generatedAt,
         entityId: item.entityId,

@@ -3,12 +3,10 @@
  */
 import type { LegalBrowseItem } from '../../components/legal';
 import { isLawStatus } from '../../components/legal/format';
-import {
-  getLegalCatalogEntry,
-  getLegalSnapshotBySlug,
-  listLegalSnapshots,
-  type SEED_LEGAL_SNAPSHOTS,
-} from '../../data/legal-seed';
+import type {
+  LegalCatalogSource,
+  LegalSnapshotDocument,
+} from '../../lib/legal/public-source';
 
 export type RawLawBrowseParams = {
   readonly q?: string;
@@ -32,8 +30,8 @@ export type LawDetailViewModel =
   | { readonly kind: 'not_found' }
   | {
       readonly kind: 'ok';
-      readonly snapshot: (typeof SEED_LEGAL_SNAPSHOTS)[number];
-      readonly explainer?: NonNullable<ReturnType<typeof getLegalCatalogEntry>>['explainer'];
+      readonly snapshot: LegalSnapshotDocument;
+      readonly explainer?: ReturnType<LegalCatalogSource['explainerFor']>;
     };
 
 function cleanSelectParam(raw: string | undefined): string {
@@ -41,8 +39,11 @@ function cleanSelectParam(raw: string | undefined): string {
   return trimmed === '' ? 'all' : trimmed;
 }
 
-function snapshotToBrowseItem(snapshot: (typeof SEED_LEGAL_SNAPSHOTS)[number]): LegalBrowseItem {
-  const catalog = getLegalCatalogEntry(snapshot.id);
+function snapshotToBrowseItem(
+  snapshot: LegalSnapshotDocument,
+  source: LegalCatalogSource,
+): LegalBrowseItem {
+  const explainer = source.explainerFor(snapshot.id);
   return {
     id: snapshot.id,
     slug: snapshot.slug,
@@ -51,7 +52,7 @@ function snapshotToBrowseItem(snapshot: (typeof SEED_LEGAL_SNAPSHOTS)[number]): 
     citation: snapshot.citation.canonicalCitation,
     lawStatus: snapshot.lawStatus,
     topics: snapshot.topics,
-    hasExplainer: catalog !== undefined,
+    hasExplainer: explainer !== undefined,
   };
 }
 
@@ -63,13 +64,16 @@ function buildFacetOptions(
   return [{ value: 'all', label: allLabel }, ...unique.map((value) => ({ value, label: value }))];
 }
 
-export function buildLawBrowseViewModel(raw: RawLawBrowseParams): LawBrowseViewModel {
+export function buildLawBrowseViewModel(
+  raw: RawLawBrowseParams,
+  source: LegalCatalogSource,
+): LawBrowseViewModel {
   const q = (raw.q ?? '').trim().toLowerCase();
   const kind = cleanSelectParam(raw.kind);
   const topic = cleanSelectParam(raw.topic);
   const status = cleanSelectParam(raw.status);
 
-  const allSnapshots = listLegalSnapshots();
+  const allSnapshots = source.snapshots;
   const filtered = allSnapshots.filter((snapshot) => {
     if (kind !== 'all' && snapshot.kind !== kind) return false;
     if (topic !== 'all' && !snapshot.topics.includes(topic as never)) return false;
@@ -87,7 +91,7 @@ export function buildLawBrowseViewModel(raw: RawLawBrowseParams): LawBrowseViewM
     kind,
     topic,
     status,
-    items: filtered.map(snapshotToBrowseItem),
+    items: filtered.map((snapshot) => snapshotToBrowseItem(snapshot, source)),
     totalMatched: filtered.length,
     kindOptions: buildFacetOptions(
       allSnapshots.map((s) => s.kind),
@@ -100,21 +104,26 @@ export function buildLawBrowseViewModel(raw: RawLawBrowseParams): LawBrowseViewM
   };
 }
 
-export function buildLawDetailViewModel(slug: string): LawDetailViewModel {
-  const snapshot = getLegalSnapshotBySlug(slug);
+export function buildLawDetailViewModel(
+  slug: string,
+  source: LegalCatalogSource,
+): LawDetailViewModel {
+  const snapshot = source.snapshots.find((row) => row.slug === slug);
   if (!snapshot) return { kind: 'not_found' };
 
-  const catalog = getLegalCatalogEntry(snapshot.id);
+  const explainer = source.explainerFor(snapshot.id);
 
   return {
     kind: 'ok',
     snapshot,
-    ...(catalog ? { explainer: catalog.explainer } : {}),
+    ...(explainer ? { explainer } : {}),
   };
 }
 
-export function listLawStaticParams(): readonly { readonly slug: string }[] {
-  return listLegalSnapshots().map((snapshot) => ({ slug: snapshot.slug }));
+export function listLawStaticParams(
+  source: LegalCatalogSource,
+): readonly { readonly slug: string }[] {
+  return source.snapshots.map((snapshot) => ({ slug: snapshot.slug }));
 }
 
 export { isLawStatus };

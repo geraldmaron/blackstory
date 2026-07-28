@@ -87,12 +87,7 @@ export type {
 
 export {
   createFirestorePublicSearchIndexEntitySource,
-  createNationalCatalogFixtureEntitySource,
   mapSearchIndexRecordToEmbeddingInput,
-  mapCatalogFixtureRecordToEmbeddingInput,
   parseStateCodeFromJurisdiction,
 } from './backfill-sources.js';
-export type {
-  SearchIndexEmbeddingRecord,
-  CatalogFixtureEmbeddingRecord,
-} from './backfill-sources.js';
+export type { SearchIndexEmbeddingRecord } from './backfill-sources.js';
