@@ -1,13 +1,202 @@
 {
   "version": "memorial-seed-2026-07-24",
-  "generatedAt": "2026-07-24T04:38:25.600Z",
+  "generatedAt": "2026-07-28T05:13:42.163Z",
   "incompleteByDesign": true,
   "names": [
     {
-      "name": "Addie Mae Collins"
+      "name": "\"General\" Lee"
     },
     {
-      "name": "Ahmaud Arbery"
+      "name": "\"Jack\" Dillingham"
+    },
+    {
+      "name": "A. C. Hall"
+    },
+    {
+      "name": "A'donte Washington"
+    },
+    {
+      "name": "Aaren Gwinn"
+    },
+    {
+      "name": "Aaron Bailey"
+    },
+    {
+      "name": "Aaron Campbell"
+    },
+    {
+      "name": "Abdul Kamal"
+    },
+    {
+      "name": "Abe Banks"
+    },
+    {
+      "name": "Abraham Wilson"
+    },
+    {
+      "name": "Abram Smith"
+    },
+    {
+      "name": "Adam Trammell"
+    },
+    {
+      "name": "Addie Mae Collins",
+      "entityId": "gap_addie_mae_collins",
+      "locationLabel": "16th Street Baptist Church",
+      "placeLabel": "Birmingham, Alabama",
+      "lat": 33.51666667,
+      "lng": -86.815,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "Adolph Archie"
+    },
+    {
+      "name": "Adrena Kitt"
+    },
+    {
+      "name": "Adrien Campbell"
+    },
+    {
+      "name": "Ahmad Abdullah"
+    },
+    {
+      "name": "Ahmaud Arbery",
+      "entityId": "lynching_ahmaud_arbery_satilla_shores_georgia",
+      "locationLabel": "Satilla Shores neighborhood",
+      "placeLabel": "Brunswick, Georgia",
+      "lat": 31.12416667,
+      "lng": -81.55611111,
+      "locationPrecision": "neighborhood"
+    },
+    {
+      "name": "Aiyana Jones"
+    },
+    {
+      "name": "Aiyana Stanley-Jones"
+    },
+    {
+      "name": "Akai Gurley"
+    },
+    {
+      "name": "Akeem Terrell"
+    },
+    {
+      "name": "Akiel Denkins"
+    },
+    {
+      "name": "Albert Dorsey"
+    },
+    {
+      "name": "Albert Easley"
+    },
+    {
+      "name": "Albert Gooden",
+      "entityId": "lynching_albert_gooden_covington_tennessee",
+      "locationLabel": "Bridge over Beaver Creek",
+      "placeLabel": "Covington, Tennessee",
+      "lat": 35.56416667,
+      "lng": -89.64638889,
+      "locationPrecision": "site"
+    },
+    {
+      "name": "Albert Pitts"
+    },
+    {
+      "name": "Albert Robinson"
+    },
+    {
+      "name": "Albert Williams"
+    },
+    {
+      "name": "Alberta Spruill"
+    },
+    {
+      "name": "Alex Smith"
+    },
+    {
+      "name": "Alexander Jamar Marion"
+    },
+    {
+      "name": "Alexia Christian"
+    },
+    {
+      "name": "Alexio Allen"
+    },
+    {
+      "name": "Alfontish Cockerham"
+    },
+    {
+      "name": "Alfred Daniels"
+    },
+    {
+      "name": "Alfred Olango"
+    },
+    {
+      "name": "Alfred Peachlum"
+    },
+    {
+      "name": "Alfred Williams"
+    },
+    {
+      "name": "Ali Osman"
+    },
+    {
+      "name": "Allen Brooks"
+    },
+    {
+      "name": "Allen Green"
+    },
+    {
+      "name": "Allen Simpson"
+    },
+    {
+      "name": "Allen Turner"
+    },
+    {
+      "name": "Allie Thompson"
+    },
+    {
+      "name": "Allie/Halley Richardson"
+    },
+    {
+      "name": "Alma Howze",
+      "entityId": "lynching_alma_howze_shubuta_hanging_bridge_mississippi",
+      "locationLabel": "Hanging Bridge, Clarke County",
+      "placeLabel": "Shubuta, Mississippi",
+      "lat": 32.04,
+      "lng": -88.69,
+      "locationPrecision": "site"
+    },
+    {
+      "name": "Alonzo Ashley"
+    },
+    {
+      "name": "Alonzo Bagley"
+    },
+    {
+      "name": "Alonzo Green"
+    },
+    {
+      "name": "Alonzo Tucker"
+    },
+    {
+      "name": "Alphonso Harris"
+    },
+    {
+      "name": "Alphonso Smith"
+    },
+    {
+      "name": "Alteria Woods"
+    },
+    {
+      "name": "Alton Collier",
+      "entityId": "lynching_alton_collier_coronado_california",
+      "locationLabel": "Site of ferry where Alton Collier was forced into San Diego Bay",
+      "placeLabel": "Coronado, California",
+      "lat": 32.67805556,
+      "lng": -117.1725,
+      "locationPrecision": "site"
     },
     {
       "name": "Alton Sterling"
@@ -22,38 +211,800 @@
       "locationPrecision": "institution"
     },
     {
+      "name": "Amir Locke"
+    },
+    {
+      "name": "Amos Miller"
+    },
+    {
+      "name": "Anderson Gause",
+      "entityId": "lynching_anderson_gause_henning_tennessee",
+      "locationLabel": "Site of Anderson Gause lynching",
+      "placeLabel": "Henning, Tennessee",
+      "lat": 35.67361111,
+      "lng": -89.5775,
+      "locationPrecision": "city"
+    },
+    {
+      "name": "Andre DeMon Thomas"
+    },
+    {
+      "name": "Andre Green"
+    },
+    {
+      "name": "Andre Hill"
+    },
+    {
+      "name": "Andre Johnson"
+    },
+    {
+      "name": "Andrea Nicole Reedy"
+    },
+    {
+      "name": "Andrew Brown Jr."
+    },
+    {
+      "name": "Andrew Clark"
+    },
+    {
+      "name": "Andrew Depeiza"
+    },
+    {
       "name": "Andrew Goodman"
     },
     {
       "name": "Andrew Joseph III"
     },
     {
+      "name": "Andrew Lee Anderson"
+    },
+    {
+      "name": "Andrew McHenry"
+    },
+    {
+      "name": "Andrew Williams"
+    },
+    {
+      "name": "Angel Adams"
+    },
+    {
+      "name": "Angelo Brown"
+    },
+    {
+      "name": "Angelo Crooms"
+    },
+    {
+      "name": "Angelo West"
+    },
+    {
+      "name": "Annette Green"
+    },
+    {
+      "name": "Anthonie Smith"
+    },
+    {
+      "name": "Anthony Anderson"
+    },
+    {
+      "name": "Anthony Antonio Ford"
+    },
+    {
+      "name": "Anthony Ashford"
+    },
+    {
+      "name": "Anthony Baez"
+    },
+    {
+      "name": "Anthony Bess"
+    },
+    {
+      "name": "Anthony Briggs"
+    },
+    {
+      "name": "Anthony Crawford"
+    },
+    {
+      "name": "Anthony Davis"
+    },
+    {
+      "name": "Anthony Gomez Jr"
+    },
+    {
+      "name": "Anthony Hill"
+    },
+    {
+      "name": "Anthony Jones"
+    },
+    {
+      "name": "Anthony Lee"
+    },
+    {
+      "name": "Anthony Marcel Green"
+    },
+    {
+      "name": "Anthony McKinney"
+    },
+    {
+      "name": "Anthony Merisier"
+    },
+    {
+      "name": "Anthony Nelson"
+    },
+    {
+      "name": "Anthony Smashum"
+    },
+    {
+      "name": "Anton Barrett Sr."
+    },
+    {
+      "name": "Anton Black"
+    },
+    {
+      "name": "Antonio Butler"
+    },
+    {
+      "name": "Antonio Clements"
+    },
+    {
+      "name": "Antronie Scott"
+    },
+    {
       "name": "Antwon Rose II"
+    },
+    {
+      "name": "Antwon Rose Jr."
+    },
+    {
+      "name": "Antwun Shumpert"
+    },
+    {
+      "name": "Aquan Salmon"
+    },
+    {
+      "name": "Archie Wooden"
+    },
+    {
+      "name": "Ariston Waiters"
+    },
+    {
+      "name": "Armando Frank"
+    },
+    {
+      "name": "Artago Howard"
+    },
+    {
+      "name": "Artavious DeBose"
+    },
+    {
+      "name": "Arteair Porter Jr"
+    },
+    {
+      "name": "Arthur DaRosa"
+    },
+    {
+      "name": "Arthur Green Jr."
+    },
+    {
+      "name": "Arthur James Hill"
+    },
+    {
+      "name": "Arthur Johnson"
+    },
+    {
+      "name": "Arthur McDuffie"
+    },
+    {
+      "name": "Arthur Miller Jr."
+    },
+    {
+      "name": "Arthur W. St. Clair"
+    },
+    {
+      "name": "Ashtian Barnes"
+    },
+    {
+      "name": "Asshams Manley"
     },
     {
       "name": "Atatiana Jefferson"
     },
     {
+      "name": "Augustus Goodman"
+    },
+    {
       "name": "Aura Rosser"
+    },
+    {
+      "name": "Austin Callaway"
+    },
+    {
+      "name": "Avery Cody Jr."
+    },
+    {
+      "name": "Avery Mills"
+    },
+    {
+      "name": "Ballie Crutchfield"
+    },
+    {
+      "name": "Baron Pikes"
+    },
+    {
+      "name": "Barry Gedeus"
+    },
+    {
+      "name": "Bayner Blackwell"
+    },
+    {
+      "name": "Ben Chester White"
+    },
+    {
+      "name": "Ben Pettigrew",
+      "entityId": "lynching_ben_pettigrew_decaturville_tennessee",
+      "locationLabel": "site of lynching",
+      "placeLabel": "Decaturville, Tennessee",
+      "lat": 35.615,
+      "lng": -87.04444444,
+      "locationPrecision": "site"
+    },
+    {
+      "name": "Benjamin Brown"
+    },
+    {
+      "name": "Benjamin Uwumarogie"
+    },
+    {
+      "name": "Bennie Edwards"
+    },
+    {
+      "name": "Bennie Lee Tignor"
+    },
+    {
+      "name": "Bennie/Dennis Simmons"
+    },
+    {
+      "name": "Benny Richards",
+      "entityId": "lynching_benny_richards_warrenton_georgia",
+      "locationLabel": "Site of lynching in Warrenton",
+      "placeLabel": "Warrenton, Georgia",
+      "lat": 33.4075,
+      "lng": -82.66277778,
+      "locationPrecision": "city"
+    },
+    {
+      "name": "Bernard Rogers"
+    },
+    {
+      "name": "Bernard Wells III"
+    },
+    {
+      "name": "Bernard Whitehurst"
+    },
+    {
+      "name": "Bernice Raspberry"
+    },
+    {
+      "name": "Berry Lawson"
+    },
+    {
+      "name": "Berry Washington"
+    },
+    {
+      "name": "Bert Dennis"
+    },
+    {
+      "name": "Bert Moore"
+    },
+    {
+      "name": "Bertha Lowman"
+    },
+    {
+      "name": "Bertrand Davis"
+    },
+    {
+      "name": "Bettie Jones"
+    },
+    {
+      "name": "Betty Gardner"
+    },
+    {
+      "name": "Bilal Dashawn Colbert"
+    },
+    {
+      "name": "Bill McAllister"
+    },
+    {
+      "name": "Bill Saul Thompson"
+    },
+    {
+      "name": "Bob Addison"
+    },
+    {
+      "name": "Bob Ashley"
+    },
+    {
+      "name": "Bobby Daniels"
+    },
+    {
+      "name": "Bobby Gross"
+    },
+    {
+      "name": "Bobby Moore"
+    },
+    {
+      "name": "Bonita Carter"
+    },
+    {
+      "name": "Booker T. Mixon"
     },
     {
       "name": "Botham Jean"
     },
     {
+      "name": "Brandon Cole"
+    },
+    {
+      "name": "Brandon Devone Smith"
+    },
+    {
+      "name": "Brandon Foy"
+    },
+    {
+      "name": "Brandon Glenn"
+    },
+    {
+      "name": "Brandon Jones"
+    },
+    {
+      "name": "Brandon Moore"
+    },
+    {
+      "name": "Brandon Washington"
+    },
+    {
+      "name": "Brandon Webster"
+    },
+    {
+      "name": "Brendon Glenn"
+    },
+    {
       "name": "Breonna Taylor",
       "entityId": "ent_breonna_taylor_001",
-      "locationLabel": "St. Anthony Gardens, 3003 Springfield Drive #4, Louisville, Kentucky",
+      "locationLabel": "Jefferson Square Park (2020 Racial Justice Protests historical marker), Sixth and Jefferson Streets, Louisville, Kentucky",
       "placeLabel": "Louisville, Kentucky",
-      "lat": 38.147966694128,
-      "lng": -85.814305837087,
+      "lat": 38.2538,
+      "lng": -85.76,
       "locationPrecision": "institution"
     },
     {
-      "name": "Carole Robertson"
+      "name": "Breonte Johnson- Davis"
+    },
+    {
+      "name": "Brett Rosenau"
+    },
+    {
+      "name": "Brian Crawford"
+    },
+    {
+      "name": "Brian Edmund Andrew"
+    },
+    {
+      "name": "Briatay McDuffie"
+    },
+    {
+      "name": "Broderick Dixon"
+    },
+    {
+      "name": "Brownie Tuggles"
+    },
+    {
+      "name": "Bruce Kelley Jr"
+    },
+    {
+      "name": "Bud Rowland"
+    },
+    {
+      "name": "Bunk Richardson"
+    },
+    {
+      "name": "Burt Johnson"
+    },
+    {
+      "name": "Byron Herbert"
+    },
+    {
+      "name": "Byron Williams"
+    },
+    {
+      "name": "C. H. Pickett"
+    },
+    {
+      "name": "Caesar Sheffield"
+    },
+    {
+      "name": "Calin Devonte Roquemore"
+    },
+    {
+      "name": "Calin Roquemore"
+    },
+    {
+      "name": "Calvin Cains III"
+    },
+    {
+      "name": "Calvin McDowell"
+    },
+    {
+      "name": "Calvin McKinnis"
+    },
+    {
+      "name": "Calvin Smith"
+    },
+    {
+      "name": "Calvin Wilks Jr."
+    },
+    {
+      "name": "Calvon Reid"
+    },
+    {
+      "name": "Cameron Ford"
+    },
+    {
+      "name": "Cameron Lamb"
+    },
+    {
+      "name": "Cameron Massey"
+    },
+    {
+      "name": "Cameron Tillman"
+    },
+    {
+      "name": "Carl Cooper"
+    },
+    {
+      "name": "Carl Dorsey"
+    },
+    {
+      "name": "Carl Grant"
+    },
+    {
+      "name": "Carleton Wallace"
+    },
+    {
+      "name": "Carlumandarlo Zaramo"
+    },
+    {
+      "name": "Carnell Russ"
+    },
+    {
+      "name": "Carnell Snell Jr"
+    },
+    {
+      "name": "Carole Robertson",
+      "entityId": "gap_carole_robertson",
+      "locationLabel": "16th Street Baptist Church",
+      "placeLabel": "Birmingham, Alabama",
+      "lat": 33.51666667,
+      "lng": -86.815,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "Carolyn Sue Boetticher"
+    },
+    {
+      "name": "Carrie Brumfield"
+    },
+    {
+      "name": "Casey Goodson Jr."
+    },
+    {
+      "name": "Caso Jackson"
+    },
+    {
+      "name": "Cedric Ford"
+    },
+    {
+      "name": "Cedric Lofton"
+    },
+    {
+      "name": "Cedric Norris"
+    },
+    {
+      "name": "Cedric Williams"
+    },
+    {
+      "name": "Cedrick Chatman"
+    },
+    {
+      "name": "Cellos Harrison"
+    },
+    {
+      "name": "Chacarion Avant"
+    },
+    {
+      "name": "Chad Robertson"
+    },
+    {
+      "name": "Charleena Lyles"
+    },
+    {
+      "name": "Charles Adair"
+    },
+    {
+      "name": "Charles Atkins"
+    },
+    {
+      "name": "Charles Brown"
+    },
+    {
+      "name": "Charles Craven"
+    },
+    {
+      "name": "Charles Davis"
+    },
+    {
+      "name": "Charles Dixon Sr."
+    },
+    {
+      "name": "Charles Eddie Moore"
+    },
+    {
+      "name": "Charles Goodridge"
+    },
+    {
+      "name": "Charles Howard Nelson"
+    },
+    {
+      "name": "Charles Roundtree Jr."
+    },
+    {
+      "name": "Charles Ruggles"
+    },
+    {
+      "name": "Charles Smith"
+    },
+    {
+      "name": "Charles Strong"
+    },
+    {
+      "name": "Charles Thurber"
+    },
+    {
+      "name": "Charles Whitley"
+    },
+    {
+      "name": "Charles William Orebo"
+    },
+    {
+      "name": "Charles Ziegler"
+    },
+    {
+      "name": "Charley Leundeu Keunang"
+    },
+    {
+      "name": "Charley Scott"
+    },
+    {
+      "name": "Charlie Lang"
+    },
+    {
+      "name": "Charlie Mack Murphy"
+    },
+    {
+      "name": "Charlin Charles"
+    },
+    {
+      "name": "Charmene Pickering"
+    },
+    {
+      "name": "Charquissa Johnson"
+    },
+    {
+      "name": "Chavis Carter"
+    },
+    {
+      "name": "Che Taylor"
+    },
+    {
+      "name": "Chilton Jennings"
+    },
+    {
+      "name": "Chinedu Okobi"
+    },
+    {
+      "name": "Chrislon Talbott"
+    },
+    {
+      "name": "Christian Black"
+    },
+    {
+      "name": "Christian Taylor"
+    },
+    {
+      "name": "Christopher Davis"
+    },
+    {
+      "name": "Christopher De’Andre Mitchell"
+    },
+    {
+      "name": "Christopher Eisinger"
+    },
+    {
+      "name": "Christopher Goodlow"
+    },
+    {
+      "name": "Christopher Hicks"
+    },
+    {
+      "name": "Christopher Kalonji"
+    },
+    {
+      "name": "Christopher Middleton"
+    },
+    {
+      "name": "Christopher Nelms"
+    },
+    {
+      "name": "Christopher Rogers"
+    },
+    {
+      "name": "Christopher Sowell"
+    },
+    {
+      "name": "Christopher Thomas"
+    },
+    {
+      "name": "Christopher Whitfield"
+    },
+    {
+      "name": "Christopher Wilson"
+    },
+    {
+      "name": "Cjavar Galmon"
+    },
+    {
+      "name": "Clarence Lowman"
+    },
+    {
+      "name": "Clarence Triggs"
+    },
+    {
+      "name": "Claude Neal"
+    },
+    {
+      "name": "Clement Lloyd"
+    },
+    {
+      "name": "Clementa C. Pinckney",
+      "entityId": "ent_clementa_c_pinckney_001",
+      "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
+      "placeLabel": "Charleston, South Carolina",
+      "lat": 32.7875,
+      "lng": -79.93305556,
+      "locationPrecision": "institution"
     },
     {
       "name": "Clementa Pinckney",
       "entityId": "ent_clementa_c_pinckney_001",
+      "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
+      "placeLabel": "Charleston, South Carolina",
+      "lat": 32.7875,
+      "lng": -79.93305556,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "Cleo Wright"
+    },
+    {
+      "name": "Cletis Williams"
+    },
+    {
+      "name": "Cleveland Williams"
+    },
+    {
+      "name": "Clifford Brooks"
+    },
+    {
+      "name": "Clifford Butler Jr"
+    },
+    {
+      "name": "Clifford Glover"
+    },
+    {
+      "name": "Clifford Lewis"
+    },
+    {
+      "name": "Clifton Walker"
+    },
+    {
+      "name": "Clinton Allen"
+    },
+    {
+      "name": "Clinton Melton"
+    },
+    {
+      "name": "Colby Friday"
+    },
+    {
+      "name": "Colby Robinson"
+    },
+    {
+      "name": "Coleman Brown"
+    },
+    {
+      "name": "Collie Hampton"
+    },
+    {
+      "name": "Commodore Jones"
+    },
+    {
+      "name": "Cordella Stevenson"
+    },
+    {
+      "name": "Corey Brown"
+    },
+    {
+      "name": "Corey Jones"
+    },
+    {
+      "name": "Corey Mobley"
+    },
+    {
+      "name": "Corey Ward"
+    },
+    {
+      "name": "Cornelius Brown"
+    },
+    {
+      "name": "Cornelius Murray"
+    },
+    {
+      "name": "Cornelius Ware"
+    },
+    {
+      "name": "Cornell Warren"
+    },
+    {
+      "name": "Cory Tanner"
+    },
+    {
+      "name": "Craig Cousin"
+    },
+    {
+      "name": "Craig Demps"
+    },
+    {
+      "name": "Craig McKinnis"
+    },
+    {
+      "name": "Craig Ruise Jr"
+    },
+    {
+      "name": "Crayton West"
+    },
+    {
+      "name": "Crystalline Barnes"
+    },
+    {
+      "name": "Cupid(also Found As Cubrit Dixon) Dickson"
+    },
+    {
+      "name": "Curtis And Burley, Garfield Brown",
+      "entityId": "lynching_curtis_and_burley_garfield_brown_newbern_tennessee",
+      "locationLabel": "Downtown Newbern, near Illinois Central Depot",
+      "placeLabel": "Newbern, Tennessee",
+      "lat": 36.11638889,
+      "lng": -89.26805556,
+      "locationPrecision": "site"
+    },
+    {
+      "name": "Curtis Smith"
+    },
+    {
+      "name": "Cynthia Ann Fields"
+    },
+    {
+      "name": "Cynthia Graham Hurd",
+      "entityId": "ent_cynthia_graham_hurd_001",
       "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
       "placeLabel": "Charleston, South Carolina",
       "lat": 32.7875,
@@ -70,7 +1021,97 @@
       "locationPrecision": "institution"
     },
     {
-      "name": "Cynthia Wesley"
+      "name": "Cynthia Wesley",
+      "entityId": "gap_cynthia_wesley",
+      "locationLabel": "16th Street Baptist Church",
+      "placeLabel": "Birmingham, Alabama",
+      "lat": 33.51666667,
+      "lng": -86.815,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "D'Andre Berghardt"
+    },
+    {
+      "name": "D'Angelo Stallworth"
+    },
+    {
+      "name": "D'Ettrick Griffin"
+    },
+    {
+      "name": "D'Juantez Anthony Mitchell"
+    },
+    {
+      "name": "D'Koy Dancy"
+    },
+    {
+      "name": "Dago Pete"
+    },
+    {
+      "name": "Dahir Adan"
+    },
+    {
+      "name": "Dainell Simmons"
+    },
+    {
+      "name": "Dakota Bright"
+    },
+    {
+      "name": "Dallas Shields"
+    },
+    {
+      "name": "Dalton Branch"
+    },
+    {
+      "name": "Dalvin Hollins"
+    },
+    {
+      "name": "Damien Cameron"
+    },
+    {
+      "name": "Damon Grimes"
+    },
+    {
+      "name": "Damon Lamarr Johnson"
+    },
+    {
+      "name": "Damon Lamont Falls"
+    },
+    {
+      "name": "Dan Anderson"
+    },
+    {
+      "name": "Dan Davis"
+    },
+    {
+      "name": "Dan Jenkins"
+    },
+    {
+      "name": "Dana Young"
+    },
+    {
+      "name": "Dane Scott Jr."
+    },
+    {
+      "name": "Daniel Bell"
+    },
+    {
+      "name": "Daniel Kenneth Henry"
+    },
+    {
+      "name": "Daniel L. Simmons Sr.",
+      "entityId": "ent_daniel_l_simmons_sr_001",
+      "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
+      "placeLabel": "Charleston, South Carolina",
+      "lat": 32.7875,
+      "lng": -79.93305556,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "Daniel Mack"
+    },
+    {
+      "name": "Daniel Prude"
     },
     {
       "name": "Daniel Simmons",
@@ -82,10 +1123,250 @@
       "locationPrecision": "institution"
     },
     {
+      "name": "Daniel Wolfe"
+    },
+    {
+      "name": "Danny Ray Thomas"
+    },
+    {
+      "name": "Dante Osborne"
+    },
+    {
+      "name": "Dante Parker"
+    },
+    {
+      "name": "Darcel Edwards"
+    },
+    {
+      "name": "Darick Napper"
+    },
+    {
+      "name": "Darin Hutchins"
+    },
+    {
+      "name": "Darion Baker"
+    },
+    {
+      "name": "Darius Jones"
+    },
+    {
+      "name": "Darius Pinex"
+    },
+    {
+      "name": "Darius Smith"
+    },
+    {
+      "name": "Darius Wimberly"
+    },
+    {
+      "name": "Darnell Wicker"
+    },
+    {
+      "name": "Darnesha Harris"
+    },
+    {
+      "name": "Darrell Swain"
+    },
+    {
+      "name": "Darren Faulkner"
+    },
+    {
+      "name": "Darrick Collins"
+    },
+    {
+      "name": "Darrien Hunt"
+    },
+    {
+      "name": "Darrin Langford"
+    },
+    {
+      "name": "Darrius Stewart"
+    },
+    {
+      "name": "Darryl Chisholm"
+    },
+    {
+      "name": "Darryl Williams"
+    },
+    {
+      "name": "Daryl Vance"
+    },
+    {
       "name": "Daunte Wright"
     },
     {
-      "name": "Denise McNair"
+      "name": "Dave Hurst"
+    },
+    {
+      "name": "Dave Tillis"
+    },
+    {
+      "name": "Daverion Kinard"
+    },
+    {
+      "name": "David Antjuan Ware"
+    },
+    {
+      "name": "David Baker"
+    },
+    {
+      "name": "David Felix"
+    },
+    {
+      "name": "David Gregory"
+    },
+    {
+      "name": "David Jones"
+    },
+    {
+      "name": "David Joseph"
+    },
+    {
+      "name": "David McAtee"
+    },
+    {
+      "name": "David Pitts"
+    },
+    {
+      "name": "David Smith"
+    },
+    {
+      "name": "David Thomas"
+    },
+    {
+      "name": "David Weston"
+    },
+    {
+      "name": "David Wyatt"
+    },
+    {
+      "name": "David,his Wife Andfour Children Walker"
+    },
+    {
+      "name": "Davinian Williams"
+    },
+    {
+      "name": "Deandre Lloyd Armstrong-Starks"
+    },
+    {
+      "name": "Deaundre Phillips"
+    },
+    {
+      "name": "DeAunta Farrow"
+    },
+    {
+      "name": "Deborah Danner"
+    },
+    {
+      "name": "DeCarlos Moore"
+    },
+    {
+      "name": "Dedrick Marshall"
+    },
+    {
+      "name": "Delaneo Martin"
+    },
+    {
+      "name": "Delano Herman Middleton",
+      "entityId": "gap_delano_middleton",
+      "locationLabel": "South Carolina State College campus",
+      "placeLabel": "Orangeburg, South Carolina",
+      "lat": 33.4952,
+      "lng": -80.8547,
+      "locationPrecision": "campus"
+    },
+    {
+      "name": "Delano Middleton",
+      "entityId": "gap_delano_middleton",
+      "locationLabel": "South Carolina State College campus",
+      "placeLabel": "Orangeburg, South Carolina",
+      "lat": 33.4952,
+      "lng": -80.8547,
+      "locationPrecision": "campus"
+    },
+    {
+      "name": "Delrawn Small"
+    },
+    {
+      "name": "Delvin Simmons"
+    },
+    {
+      "name": "Demarco Newman"
+    },
+    {
+      "name": "Demarco Rhymes"
+    },
+    {
+      "name": "Demarcus Brodie"
+    },
+    {
+      "name": "Demarcus Semer"
+    },
+    {
+      "name": "Demaris Turner"
+    },
+    {
+      "name": "Demetrius Bryant"
+    },
+    {
+      "name": "Demetrius Dorsey"
+    },
+    {
+      "name": "Demetrius DuBose"
+    },
+    {
+      "name": "Demon Lowman",
+      "entityId": "lynching_demon_lowman_aiken_vicinity_south_carolina",
+      "locationLabel": "outskirts of Aiken",
+      "placeLabel": "Aiken, South Carolina",
+      "lat": 34.17833333,
+      "lng": -82.37055556,
+      "locationPrecision": "site"
+    },
+    {
+      "name": "Demouria Hogg"
+    },
+    {
+      "name": "Deng Manyoun"
+    },
+    {
+      "name": "Denise McNair",
+      "entityId": "gap_denise_mcnair",
+      "locationLabel": "16th Street Baptist Church",
+      "placeLabel": "Birmingham, Alabama",
+      "lat": 33.51666667,
+      "lng": -86.815,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "Dennis Bodden"
+    },
+    {
+      "name": "Dennis Crawford"
+    },
+    {
+      "name": "Dennis Gregory"
+    },
+    {
+      "name": "Dennis Grigsby"
+    },
+    {
+      "name": "Dennis Hudson"
+    },
+    {
+      "name": "Dennis Plowden"
+    },
+    {
+      "name": "Denzel Brown"
+    },
+    {
+      "name": "Denzel Marshal Taylor"
+    },
+    {
+      "name": "Deon Studiemyer"
+    },
+    {
+      "name": "Deondre Brunston"
     },
     {
       "name": "Depayne Middleton Doctor",
@@ -97,7 +1378,355 @@
       "locationPrecision": "institution"
     },
     {
+      "name": "Depayne Middleton-Doctor",
+      "entityId": "ent_depayne_middleton_doctor_001",
+      "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
+      "placeLabel": "Charleston, South Carolina",
+      "lat": 32.7875,
+      "lng": -79.93305556,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "Deravis Caine Rogers"
+    },
+    {
+      "name": "Derek Love"
+    },
+    {
+      "name": "Derek Stokes"
+    },
+    {
+      "name": "Derek Williams"
+    },
+    {
+      "name": "Deresha Armstrong"
+    },
+    {
+      "name": "Deron Grimmitt"
+    },
+    {
+      "name": "Derrick Ambrose Jr."
+    },
+    {
+      "name": "Derrick Jones"
+    },
+    {
+      "name": "Derrick Jordan"
+    },
+    {
+      "name": "Desmond Luster"
+    },
+    {
+      "name": "Desmond Rudolph"
+    },
+    {
+      "name": "Desmond Willis"
+    },
+    {
+      "name": "Devin Brown"
+    },
+    {
+      "name": "Devin Gates"
+    },
+    {
+      "name": "Devon Guisherd"
+    },
+    {
+      "name": "Devon Martes"
+    },
+    {
+      "name": "Devonte Gates"
+    },
+    {
+      "name": "Dewayne Carr"
+    },
+    {
+      "name": "Dewayne Chatt"
+    },
+    {
+      "name": "Dewey Lake"
+    },
+    {
+      "name": "Dexter Luckett"
+    },
+    {
+      "name": "Dexter Wade"
+    },
+    {
+      "name": "Dhal Pothwi"
+    },
+    {
+      "name": "Diahlo Grant"
+    },
+    {
+      "name": "Diante Yarber"
+    },
+    {
+      "name": "Dick And Thompson Robinson"
+    },
+    {
+      "name": "Dick Lundy"
+    },
+    {
+      "name": "Dijon Kizzee"
+    },
+    {
+      "name": "Divel Rucker"
+    },
+    {
+      "name": "Doll Pierre-Louis"
+    },
+    {
+      "name": "Dominic Felder"
+    },
+    {
+      "name": "Dominic Hutchinson"
+    },
+    {
+      "name": "Dominique Clayton"
+    },
+    {
+      "name": "Dominique Lewis"
+    },
+    {
+      "name": "Dominique Silva"
+    },
+    {
+      "name": "Dominique Williams"
+    },
+    {
+      "name": "Domonick Washington"
+    },
+    {
+      "name": "Don Myrick"
+    },
+    {
+      "name": "Don Smith"
+    },
+    {
+      "name": "Donald D.J. Venable"
+    },
+    {
+      "name": "Donald Dontay Ivy"
+    },
+    {
+      "name": "Donald Harp"
+    },
+    {
+      "name": "Donald Rasberry"
+    },
+    {
+      "name": "Donnell Rochester"
+    },
+    {
+      "name": "Donnell Thompson Jr."
+    },
+    {
+      "name": "Donnie Sanders"
+    },
+    {
+      "name": "Donovan Lewis"
+    },
+    {
+      "name": "Donta Dawson"
+    },
+    {
+      "name": "Donta Taylor"
+    },
+    {
+      "name": "Dontae Melton"
+    },
+    {
+      "name": "Dontaze Storey Jr."
+    },
+    {
+      "name": "Donte Sowell"
+    },
+    {
+      "name": "Dontre Hamilton"
+    },
+    {
+      "name": "Dontrell Stephens"
+    },
+    {
+      "name": "Dooley Morton"
+    },
+    {
+      "name": "Dorothy Dorsey Malcom"
+    },
+    {
+      "name": "Douglas Harris"
+    },
+    {
+      "name": "Dujuan Armstrong"
+    },
+    {
+      "name": "Dwight Person"
+    },
+    {
+      "name": "Dwight Stiggons"
+    },
+    {
+      "name": "Dyonta Quarles Jr."
+    },
+    {
+      "name": "Earl Jackson"
+    },
+    {
+      "name": "Earl McNeil"
+    },
+    {
+      "name": "Earl Murray"
+    },
+    {
+      "name": "Early, Thomas (aka Thomas Early, Jim Earlie)"
+    },
+    {
+      "name": "Earnest Fells"
+    },
+    {
+      "name": "Earnest Williams"
+    },
+    {
+      "name": "Ed Dodson"
+    },
+    {
+      "name": "Ed Johnson"
+    },
+    {
+      "name": "Ed Lang"
+    },
+    {
+      "name": "Ed Smith"
+    },
+    {
+      "name": "Eddie James Stewart"
+    },
+    {
+      "name": "Eddie Lee Macklin"
+    },
+    {
+      "name": "Eddie Moss"
+    },
+    {
+      "name": "Edmund Perry"
+    },
+    {
+      "name": "Edson Thevenin"
+    },
+    {
+      "name": "Edward \"Red\" Roach"
+    },
+    {
+      "name": "Edward Anderson"
+    },
+    {
+      "name": "Edward Foster"
+    },
+    {
+      "name": "Edward Garner"
+    },
+    {
+      "name": "Edward Kemp"
+    },
+    {
+      "name": "Edward Lamont Hunt"
+    },
+    {
+      "name": "Edward Mallet"
+    },
+    {
+      "name": "Edward Woodson"
+    },
+    {
+      "name": "Egbert David Dewgard"
+    },
+    {
+      "name": "Elbert Williams"
+    },
+    {
+      "name": "Eldred Wells Sr."
+    },
+    {
+      "name": "Eleanor Bumpurs"
+    },
+    {
+      "name": "Eleanor Northington"
+    },
+    {
+      "name": "Eli Brumfield"
+    },
+    {
+      "name": "Eli Pigot"
+    },
+    {
+      "name": "Elias Clayton",
+      "entityId": "lynching_elias_clayton_duluth_minnesota",
+      "locationLabel": "Site of the 1920 Duluth lynchings",
+      "placeLabel": "Duluth, Minnesota",
+      "lat": 46.7893,
+      "lng": -92.0968,
+      "locationPrecision": "site"
+    },
+    {
       "name": "Elijah McClain"
+    },
+    {
+      "name": "Elisha Harper"
+    },
+    {
+      "name": "Eliza Woods"
+    },
+    {
+      "name": "Elizabeth Lawrence"
+    },
+    {
+      "name": "Ell Persons",
+      "entityId": "lynching_ell_persons_memphis_tennessee",
+      "locationLabel": "Near 5400 Summer Ave.",
+      "placeLabel": "Memphis, Tennessee",
+      "lat": 35.16,
+      "lng": -89.881,
+      "locationPrecision": "site"
+    },
+    {
+      "name": "Ellis Woodland"
+    },
+    {
+      "name": "Elmer Jackson",
+      "entityId": "lynching_elmer_jackson_duluth_minnesota",
+      "locationLabel": "Site of the 1920 Duluth lynching near the downtown jail",
+      "placeLabel": "Duluth, Minnesota",
+      "lat": 46.7893,
+      "lng": -92.0968,
+      "locationPrecision": "site"
+    },
+    {
+      "name": "Eloise Spellman"
+    },
+    {
+      "name": "Elroy Clarke"
+    },
+    {
+      "name": "Elton Simpson"
+    },
+    {
+      "name": "Elwood Higginbotham"
+    },
+    {
+      "name": "Emantic Fitzgerald Bradford Jr."
+    },
+    {
+      "name": "Emanuel Cosbey"
+    },
+    {
+      "name": "Emery Robinson"
+    },
+    {
+      "name": "Emeshyon Wilkins"
+    },
+    {
+      "name": "Emmanuel Millard"
     },
     {
       "name": "Emmett Till",
@@ -109,6 +1738,18 @@
       "locationPrecision": "site"
     },
     {
+      "name": "Erdman Bascomb"
+    },
+    {
+      "name": "Eric Allen"
+    },
+    {
+      "name": "Eric Cole"
+    },
+    {
+      "name": "Eric Daniel Foster Jr."
+    },
+    {
       "name": "Eric Garner",
       "entityId": "ent_eric_garner_001",
       "locationLabel": "202 Bay Street, Tompkinsville, Staten Island",
@@ -116,6 +1757,57 @@
       "lat": 40.636922406365,
       "lng": -74.076463862902,
       "locationPrecision": "institution"
+    },
+    {
+      "name": "Eric Harris"
+    },
+    {
+      "name": "Eric Holmes"
+    },
+    {
+      "name": "Eric Pitt"
+    },
+    {
+      "name": "Eric Smith"
+    },
+    {
+      "name": "Erickson Brito"
+    },
+    {
+      "name": "Ernest Green"
+    },
+    {
+      "name": "Ernest Harrison"
+    },
+    {
+      "name": "Ernest Hunter"
+    },
+    {
+      "name": "Ernest Jells"
+    },
+    {
+      "name": "Ernest Lacy"
+    },
+    {
+      "name": "Ernest McPharland"
+    },
+    {
+      "name": "Ernest Ponder"
+    },
+    {
+      "name": "Ernest Roquemore"
+    },
+    {
+      "name": "Ernest Satterwhite"
+    },
+    {
+      "name": "Ernest Sayon"
+    },
+    {
+      "name": "Errol Shaw"
+    },
+    {
+      "name": "Erson Alexander Welchen"
     },
     {
       "name": "Ethel Lance",
@@ -127,22 +1819,1180 @@
       "locationPrecision": "institution"
     },
     {
+      "name": "Ethel Lee Lance",
+      "entityId": "ent_ethel_lee_lance_001",
+      "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
+      "placeLabel": "Charleston, South Carolina",
+      "lat": 32.7875,
+      "lng": -79.93305556,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "Eugene Daniel"
+    },
+    {
+      "name": "Eugene Ellison"
+    },
+    {
+      "name": "Eugene Hamilton"
+    },
+    {
+      "name": "Eugene Marshall"
+    },
+    {
+      "name": "Eugene McSwain"
+    },
+    {
+      "name": "Eugene Pitchford"
+    },
+    {
+      "name": "Eugene Walker"
+    },
+    {
+      "name": "Eugene Williams"
+    },
+    {
+      "name": "Eurie Martin"
+    },
+    {
+      "name": "Everette Howard"
+    },
+    {
+      "name": "Ezell Ford"
+    },
+    {
+      "name": "Fanta Bility"
+    },
+    {
+      "name": "Fednel Rhinvil"
+    },
+    {
+      "name": "Felix Hall"
+    },
+    {
+      "name": "Felix Kumi"
+    },
+    {
+      "name": "Felix Lake"
+    },
+    {
+      "name": "Felton Brigman"
+    },
+    {
+      "name": "Ferguson Laurent"
+    },
+    {
+      "name": "Flint Farmer"
+    },
+    {
+      "name": "Francis McIntosh"
+    },
+    {
+      "name": "Frank Andrews"
+    },
+    {
+      "name": "Frank Embree"
+    },
+    {
+      "name": "Frank Howard"
+    },
+    {
+      "name": "Frank Lake"
+    },
+    {
+      "name": "Frank Livingston"
+    },
+    {
+      "name": "Frank Morris"
+    },
+    {
+      "name": "Frank Shephard"
+    },
+    {
+      "name": "Frank Tanner"
+    },
+    {
+      "name": "Frank Tyson"
+    },
+    {
+      "name": "Frank Williams"
+    },
+    {
+      "name": "Frankie Ann Perkins"
+    },
+    {
+      "name": "Franklyn Reid"
+    },
+    {
+      "name": "Frazier B. Baker"
+    },
+    {
+      "name": "Fred Alexander"
+    },
+    {
+      "name": "Fred Brown"
+    },
+    {
+      "name": "Fred Coker",
+      "entityId": "lynching_fred_coker_springfield_missouri",
+      "locationLabel": "Courthouse square, site of Gottfried Tower",
+      "placeLabel": "Springfield, Missouri",
+      "lat": 37.21527778,
+      "lng": -93.29833333,
+      "locationPrecision": "site"
+    },
+    {
       "name": "Fred Hampton"
+    },
+    {
+      "name": "Fred Petttigrew"
+    },
+    {
+      "name": "Fred Robinson"
+    },
+    {
+      "name": "Fred Rochelle"
+    },
+    {
+      "name": "Fred Rouse"
+    },
+    {
+      "name": "Fred Sullivan"
+    },
+    {
+      "name": "Freddie Blue"
     },
     {
       "name": "Freddie Gray"
     },
     {
+      "name": "Freddie Lee Thomas"
+    },
+    {
+      "name": "Freddie Walker"
+    },
+    {
+      "name": "Frederick Cox"
+    },
+    {
+      "name": "Frederick Devon McAllister"
+    },
+    {
+      "name": "Frederick Farmer"
+    },
+    {
+      "name": "Frederick Holder"
+    },
+    {
+      "name": "Frederick Roy"
+    },
+    {
+      "name": "French Godley"
+    },
+    {
+      "name": "Frisco Blackwood"
+    },
+    {
+      "name": "Fritz Severe"
+    },
+    {
+      "name": "Garland Tyree"
+    },
+    {
+      "name": "Genesis Hicks"
+    },
+    {
+      "name": "Genie McMeans Jr"
+    },
+    {
+      "name": "George Adams"
+    },
+    {
+      "name": "George Armwood",
+      "entityId": "lynching_george_armwood_princess_anne_maryland",
+      "locationLabel": "Site of the Somerset County jail and lynching",
+      "placeLabel": "Princess Anne, Maryland",
+      "lat": 38.20972222,
+      "lng": -75.695,
+      "locationPrecision": "site"
+    },
+    {
+      "name": "George Bibins"
+    },
+    {
+      "name": "George Buddington"
+    },
+    {
+      "name": "George Bush III",
+      "entityId": "west_george_washington_bush_q5545944",
+      "locationLabel": "Bush Prairie Farm settlement site",
+      "placeLabel": "Tumwater, Washington",
+      "lat": 46.74722222,
+      "lng": -123.00277778,
+      "locationPrecision": "site"
+    },
+    {
+      "name": "George Carter"
+    },
+    {
       "name": "George Floyd"
+    },
+    {
+      "name": "George Gay"
+    },
+    {
+      "name": "George Grant"
+    },
+    {
+      "name": "George Holden"
+    },
+    {
+      "name": "George Hughes"
+    },
+    {
+      "name": "George Irwin"
+    },
+    {
+      "name": "George Johnson"
+    },
+    {
+      "name": "George King Jr"
+    },
+    {
+      "name": "George Love"
+    },
+    {
+      "name": "George Marshall Clarke"
+    },
+    {
+      "name": "George Meadows"
+    },
+    {
+      "name": "George Richards-Meyers"
+    },
+    {
+      "name": "George Robinson"
+    },
+    {
+      "name": "George Talbert"
+    },
+    {
+      "name": "George Taylor"
+    },
+    {
+      "name": "George Tillman"
+    },
+    {
+      "name": "George Tompkins"
+    },
+    {
+      "name": "George W. Dorsey"
+    },
+    {
+      "name": "George Ward"
+    },
+    {
+      "name": "George Washington Peck"
+    },
+    {
+      "name": "George Wesley Lee"
+    },
+    {
+      "name": "George White"
+    },
+    {
+      "name": "George(AKA Joe Coe) Smith"
+    },
+    {
+      "name": "Gerald Hall"
+    },
+    {
+      "name": "Germichael Kennedy"
+    },
+    {
+      "name": "Germonta Wallace"
+    },
+    {
+      "name": "Gershun Freeman"
+    },
+    {
+      "name": "Gilbert Harris"
+    },
+    {
+      "name": "Gilbert Quinn"
+    },
+    {
+      "name": "Gilbert Wilson"
+    },
+    {
+      "name": "Glen Boldware"
+    },
+    {
+      "name": "Glenn Lewis"
+    },
+    {
+      "name": "Grady Alexis"
+    },
+    {
+      "name": "Grant Richardson"
+    },
+    {
+      "name": "Greg Gunn"
+    },
+    {
+      "name": "Gregory Edwards"
+    },
+    {
+      "name": "Gregory Frazier"
+    },
+    {
+      "name": "Gregory Riley"
+    },
+    {
+      "name": "Gregory Towns"
+    },
+    {
+      "name": "Gregory Walker"
+    },
+    {
+      "name": "Grover C. Everett"
+    },
+    {
+      "name": "Gus Roberson",
+      "entityId": "lynching_gus_roberson_clarkesville_georgia",
+      "locationLabel": "Clarkesville, Georgia",
+      "placeLabel": "Clarkesville, Georgia",
+      "lat": 34.61027778,
+      "lng": -83.52833333,
+      "locationPrecision": "city"
+    },
+    {
+      "name": "Guy Jarreau Jr"
+    },
+    {
+      "name": "Haki Thurston"
+    },
+    {
+      "name": "Harith Augustus"
+    },
+    {
+      "name": "Harold Phillips"
+    },
+    {
+      "name": "Harriet Finch",
+      "entityId": "lynching_harriet_finch_north_carolina",
+      "locationLabel": "Chatham County Jail",
+      "placeLabel": "Pittsboro, North Carolina",
+      "lat": 35.7,
+      "lng": -79.25,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "Harriette Moore"
+    },
+    {
+      "name": "Harrison Gillespie"
+    },
+    {
+      "name": "Harrison Johnson"
+    },
+    {
+      "name": "Harry T. Moore"
+    },
+    {
+      "name": "Hayes Turner"
+    },
+    {
+      "name": "Henry \"Peg\" Gilbert"
+    },
+    {
+      "name": "Henry Argo"
+    },
+    {
+      "name": "Henry Bennett"
+    },
+    {
+      "name": "Henry Bryant"
+    },
+    {
+      "name": "Henry Cade"
+    },
+    {
+      "name": "Henry Choate"
+    },
+    {
+      "name": "Henry Davis"
+    },
+    {
+      "name": "Henry Denson"
+    },
+    {
+      "name": "Henry Ezekial Smith"
+    },
+    {
+      "name": "Henry Gentry"
+    },
+    {
+      "name": "Henry Glover"
+    },
+    {
+      "name": "Henry Grizzard"
+    },
+    {
+      "name": "Henry Hezekiah Dee"
+    },
+    {
+      "name": "Henry Lee"
+    },
+    {
+      "name": "Henry Lee Jones Jr."
+    },
+    {
+      "name": "Henry Lowry"
+    },
+    {
+      "name": "Henry Prince"
+    },
+    {
+      "name": "Henry Ruffin"
+    },
+    {
+      "name": "Henry Scott"
+    },
+    {
+      "name": "Henry Simmons"
+    },
+    {
+      "name": "Henry Stewart"
+    },
+    {
+      "name": "Henry Truman"
+    },
+    {
+      "name": "Henry White"
+    },
+    {
+      "name": "Herbert Hill"
+    },
+    {
+      "name": "Herbert Lee"
+    },
+    {
+      "name": "Herman Arthur"
+    },
+    {
+      "name": "Herman Barnes"
+    },
+    {
+      "name": "Herman Canty"
+    },
+    {
+      "name": "Herman Whitfield"
+    },
+    {
+      "name": "Hilliard Brooks"
+    },
+    {
+      "name": "Horace B. Duncan"
+    },
+    {
+      "name": "Horace Maples"
+    },
+    {
+      "name": "Howard Bowe"
+    },
+    {
+      "name": "Howard Eugene Martin"
+    },
+    {
+      "name": "Hubert Orsby"
+    },
+    {
+      "name": "Hubert Varner"
+    },
+    {
+      "name": "Hugh Furz"
+    },
+    {
+      "name": "Huie Conorly"
+    },
+    {
+      "name": "Hullen Owens"
+    },
+    {
+      "name": "Ian Sherrod"
+    },
+    {
+      "name": "Icarus Randolph"
+    },
+    {
+      "name": "Immanueal Clark-Johnson"
+    },
+    {
+      "name": "India Beaty"
+    },
+    {
+      "name": "India Kager"
+    },
+    {
+      "name": "Irecas Valentine"
+    },
+    {
+      "name": "Irving Arthur"
+    },
+    {
+      "name": "Irvo Otieno"
+    },
+    {
+      "name": "Isaac Goodlow III"
+    },
+    {
+      "name": "Isaac Holmes"
+    },
+    {
+      "name": "Isaac McGhie",
+      "entityId": "lynching_isaac_mcghie_duluth_minnesota",
+      "locationLabel": "Site of the 1920 Duluth lynchings",
+      "placeLabel": "Duluth, Minnesota",
+      "lat": 46.7893,
+      "lng": -92.0968,
+      "locationPrecision": "site"
+    },
+    {
+      "name": "Isaac Moore"
+    },
+    {
+      "name": "Isadore Banks"
+    },
+    {
+      "name": "Isaiah Brown"
+    },
+    {
+      "name": "Isaiah Core III"
+    },
+    {
+      "name": "Isaiah Lewis"
+    },
+    {
+      "name": "Isaiah Taylor"
+    },
+    {
+      "name": "Isiah Hampton"
+    },
+    {
+      "name": "Ismael Miranda"
+    },
+    {
+      "name": "Izell Henry"
+    },
+    {
+      "name": "J. D. Mayfield"
+    },
+    {
+      "name": "J. E. Evanston"
+    },
+    {
+      "name": "J.C. Collins"
+    },
+    {
+      "name": "J'Allen Jones"
+    },
+    {
+      "name": "Jabril Cheevers"
+    },
+    {
+      "name": "Jabril Robinson"
+    },
+    {
+      "name": "Jacai Colson"
+    },
+    {
+      "name": "Jack Lamar Roberson"
+    },
+    {
+      "name": "Jack Robertson"
+    },
+    {
+      "name": "Jacob Hamilton"
+    },
+    {
+      "name": "Jaffort Smith"
+    },
+    {
+      "name": "Jake Brooks"
+    },
+    {
+      "name": "Jalen Randle"
+    },
+    {
+      "name": "Jamaal Moore"
+    },
+    {
+      "name": "Jamail Amron"
+    },
+    {
+      "name": "Jamal Rollins"
+    },
+    {
+      "name": "Jamalis Hall"
+    },
+    {
+      "name": "Jamar Clark"
+    },
+    {
+      "name": "Jamarion Robinson"
+    },
+    {
+      "name": "Jamarr Thompson"
+    },
+    {
+      "name": "Jameek Lowery"
+    },
+    {
+      "name": "James Allen"
+    },
+    {
+      "name": "James Anderson"
+    },
+    {
+      "name": "James Andrew Miller"
+    },
+    {
+      "name": "James Bauduy"
+    },
+    {
+      "name": "James Bearden"
+    },
+    {
+      "name": "James Brazier"
+    },
+    {
+      "name": "James Brisette"
+    },
+    {
+      "name": "James Brissette"
+    },
+    {
+      "name": "James Brown Jr."
+    },
+    {
+      "name": "James Byrd Jr."
+    },
+    {
+      "name": "James Carter"
     },
     {
       "name": "James Chaney"
     },
     {
+      "name": "James Clark"
+    },
+    {
+      "name": "James Cooper"
+    },
+    {
+      "name": "James Cordie Cheek"
+    },
+    {
+      "name": "James Covington Jr"
+    },
+    {
+      "name": "James Craig Anderson"
+    },
+    {
+      "name": "James D. Green"
+    },
+    {
+      "name": "James Dennis"
+    },
+    {
+      "name": "James Dillard",
+      "entityId": "lynching_james_dillard_sullivan_indiana",
+      "locationLabel": "Site of lynching near telegraph pole",
+      "placeLabel": "Oaktown, Indiana",
+      "lat": 31.4417,
+      "lng": -109.9159,
+      "locationPrecision": "site"
+    },
+    {
+      "name": "James Earl Chaney"
+    },
+    {
+      "name": "James Earl Motley"
+    },
+    {
+      "name": "James Gerth"
+    },
+    {
+      "name": "James Gillespie"
+    },
+    {
+      "name": "James Harper"
+    },
+    {
+      "name": "James Harvey"
+    },
+    {
+      "name": "James Holland Sr."
+    },
+    {
+      "name": "James Jahar Perez"
+    },
+    {
+      "name": "James Jordan"
+    },
+    {
+      "name": "James Lanier"
+    },
+    {
+      "name": "James Leatherwood"
+    },
+    {
+      "name": "James Lionel Johnson"
+    },
+    {
+      "name": "James Lowery"
+    },
+    {
+      "name": "James Rivera Jr."
+    },
+    {
+      "name": "James Rutledge"
+    },
+    {
+      "name": "James Sims"
+    },
+    {
+      "name": "James Stokes"
+    },
+    {
+      "name": "James Strong"
+    },
+    {
+      "name": "James T. Scott"
+    },
+    {
+      "name": "James Waymers"
+    },
+    {
+      "name": "James West",
+      "entityId": "ent_james_west_001",
+      "locationLabel": "Johns Hopkins University, Baltimore, Maryland",
+      "placeLabel": "Baltimore, Maryland",
+      "lat": 39.3302,
+      "lng": -76.6219,
+      "locationPrecision": "campus"
+    },
+    {
+      "name": "James Wilborn"
+    },
+    {
+      "name": "Jamie Croom"
+    },
+    {
+      "name": "Jane Sullivan"
+    },
+    {
+      "name": "Janet Wilson"
+    },
+    {
+      "name": "Janisha Fonville"
+    },
+    {
+      "name": "Jaquan Fletcher"
+    },
+    {
+      "name": "Jaquyn Oneill Light"
+    },
+    {
+      "name": "Jared Johnson"
+    },
+    {
+      "name": "Jarrell Garris"
+    },
+    {
+      "name": "Jarveon Hudspeth"
+    },
+    {
+      "name": "Jashon Bryant"
+    },
+    {
+      "name": "Jason Brooks"
+    },
+    {
+      "name": "Jason Day"
+    },
+    {
+      "name": "Jason Hendley"
+    },
+    {
+      "name": "Jason King"
+    },
+    {
+      "name": "Jason Lipscomb"
+    },
+    {
+      "name": "Jason Moore"
+    },
+    {
+      "name": "Jason Walker"
+    },
+    {
+      "name": "Jasper Greenwood"
+    },
+    {
+      "name": "Javier Ambler"
+    },
+    {
+      "name": "Javon Hawkins"
+    },
+    {
+      "name": "Javoris Washington"
+    },
+    {
+      "name": "Jawan Dallas"
+    },
+    {
+      "name": "Jawari Porter"
+    },
+    {
+      "name": "Jay Anderson"
+    },
+    {
+      "name": "Jayland Walker"
+    },
+    {
+      "name": "Jaylen Lewis"
+    },
+    {
+      "name": "Jayvis Benjamin"
+    },
+    {
+      "name": "Jeff Brown"
+    },
+    {
+      "name": "Jeffery McCallum"
+    },
+    {
+      "name": "Jeffrey Melvin"
+    },
+    {
+      "name": "Jeffrey Smith"
+    },
+    {
+      "name": "Jemel Roberson"
+    },
+    {
+      "name": "Jennie Steers",
+      "entityId": "lynching_jennie_steers_rural_area_near_shreveport_louisiana",
+      "locationLabel": "rural area near Shreveport",
+      "placeLabel": "Shreveport, Louisiana",
+      "lat": 32.58,
+      "lng": -93.88,
+      "locationPrecision": "site"
+    },
+    {
+      "name": "Jenoah Donald"
+    },
+    {
+      "name": "Jerame Reid"
+    },
+    {
+      "name": "Jeray Chatham"
+    },
+    {
+      "name": "Jeremy Lett"
+    },
+    {
+      "name": "Jeremy McDole"
+    },
+    {
+      "name": "Jermaine Johnson"
+    },
+    {
+      "name": "Jermaine Jones"
+    },
+    {
+      "name": "Jermaine McBean"
+    },
+    {
+      "name": "Jermaine Sonnier"
+    },
+    {
+      "name": "Jermon Seals"
+    },
+    {
+      "name": "Jermonte Fletcher"
+    },
+    {
+      "name": "Jerome Caldwell"
+    },
+    {
+      "name": "Jerome Damon"
+    },
+    {
+      "name": "Jerriel Da'Shawn Allen"
+    },
+    {
+      "name": "Jerry Atkins"
+    },
+    {
+      "name": "Jerry Dwight Brown"
+    },
+    {
+      "name": "Jerry Evans"
+    },
+    {
+      "name": "Jerry Finch"
+    },
+    {
+      "name": "Jerry Ingram"
+    },
+    {
+      "name": "Jerry Jackson"
+    },
+    {
+      "name": "Jerry Lee Amie"
+    },
+    {
+      "name": "Jesse Eley"
+    },
+    {
+      "name": "Jesse Levelt Everett Jones"
+    },
+    {
+      "name": "Jesse Thomas"
+    },
+    {
+      "name": "Jesse Thornton"
+    },
+    {
+      "name": "Jesse Washington"
+    },
+    {
+      "name": "Jessica Williams"
+    },
+    {
+      "name": "Jessie Brown"
+    },
+    {
+      "name": "Jessie James Shelby"
+    },
+    {
+      "name": "Jim Fox"
+    },
+    {
+      "name": "Jim Green"
+    },
+    {
+      "name": "Jim Henderson"
+    },
+    {
+      "name": "Jim Johnston"
+    },
+    {
+      "name": "Jim McIlherron",
+      "entityId": "lynching_jim_mcilherron_estill_springs_tennessee",
+      "locationLabel": "Estill Springs, Tennessee",
+      "placeLabel": "Estill Springs, Tennessee",
+      "lat": 35.27027778,
+      "lng": -86.13277778,
+      "locationPrecision": "city"
+    },
+    {
+      "name": "Jim Quinn"
+    },
+    {
+      "name": "Jim Reed Long"
+    },
+    {
+      "name": "Jim Rogers"
+    },
+    {
+      "name": "Jim Taylor"
+    },
+    {
+      "name": "Jim Waters"
+    },
+    {
+      "name": "Jim Williams"
+    },
+    {
+      "name": "Jim Wilson"
+    },
+    {
+      "name": "Jimmie Lee Griffith"
+    },
+    {
       "name": "Jimmie Lee Jackson"
     },
     {
+      "name": "Jimmie Sanders"
+    },
+    {
+      "name": "Jimmy Atchison"
+    },
+    {
+      "name": "Jimmy Powell"
+    },
+    {
+      "name": "Joe Franklin Jeter"
+    },
+    {
+      "name": "Joe Green"
+    },
+    {
+      "name": "Joe Jordan"
+    },
+    {
+      "name": "Joe Pemberton"
+    },
+    {
+      "name": "Joe Pullen"
+    },
+    {
+      "name": "Joe Smith"
+    },
+    {
+      "name": "Joe Winters"
+    },
+    {
+      "name": "John (or Harry Harrison) Harrison"
+    },
+    {
+      "name": "John Allen"
+    },
+    {
+      "name": "John Bennett"
+    },
+    {
+      "name": "John Brown"
+    },
+    {
+      "name": "John Carter"
+    },
+    {
+      "name": "John Cecil Jones"
+    },
+    {
+      "name": "John Crawford III"
+    },
+    {
+      "name": "John Diggs-Dorsey"
+    },
+    {
+      "name": "John Earl Reese"
+    },
+    {
+      "name": "John Eric Henderson"
+    },
+    {
+      "name": "John Gillepsie"
+    },
+    {
+      "name": "John Glover"
+    },
+    {
+      "name": "John H. Wilkins"
+    },
+    {
+      "name": "John Hartfield"
+    },
+    {
+      "name": "John Henry James"
+    },
+    {
+      "name": "John L. DanielsJr."
+    },
+    {
+      "name": "John Lee"
+    },
+    {
+      "name": "John LeRoy"
+    },
+    {
+      "name": "John McCloud"
+    },
+    {
+      "name": "John Parker"
+    },
+    {
+      "name": "John Pattishall",
+      "entityId": "lynching_john_pattishall_north_carolina",
+      "locationLabel": "Chatham County, North Carolina",
+      "placeLabel": "Chatham County, North Carolina",
+      "lat": 35.7,
+      "lng": -79.25,
+      "locationPrecision": "county"
+    },
+    {
+      "name": "John Richards"
+    },
+    {
+      "name": "John Ruffin"
+    },
+    {
+      "name": "John Ruggles"
+    },
+    {
+      "name": "John Steelman"
+    },
+    {
+      "name": "John Tucker"
+    },
+    {
+      "name": "John Wesley Wilder"
+    },
+    {
+      "name": "John West"
+    },
+    {
+      "name": "John Williams"
+    },
+    {
+      "name": "Johnnie Cromartie"
+    },
+    {
+      "name": "Johnnie Mae Chappell"
+    },
+    {
+      "name": "Johnny (or H. Varney) Cornish"
+    },
+    {
+      "name": "Johnny Gammage"
+    },
+    {
+      "name": "Johnny Hollman"
+    },
+    {
+      "name": "Johnny Lorenzo Bolton"
+    },
+    {
+      "name": "Johnny Queen"
+    },
+    {
+      "name": "Johnny Robinson"
+    },
+    {
+      "name": "Johnson Spencer"
+    },
+    {
+      "name": "Jonathan Daniels"
+    },
+    {
       "name": "Jonathan Ferrell"
+    },
+    {
+      "name": "Jonathan Price"
+    },
+    {
+      "name": "Jonathan Sanders"
+    },
+    {
+      "name": "Jonny Gammage"
+    },
+    {
+      "name": "Jordan Baker"
     },
     {
       "name": "Jordan Davis"
@@ -151,28 +3001,922 @@
       "name": "Jordan Edwards"
     },
     {
+      "name": "Jordan Jameson"
+    },
+    {
+      "name": "Jordan Neely",
+      "entityId": "ent_jordan_neely_001",
+      "locationLabel": "Broadway–Lafayette Street station (F train), Manhattan",
+      "placeLabel": "New York, New York",
+      "lat": 40.725297,
+      "lng": -73.996204,
+      "locationPrecision": "site"
+    },
+    {
+      "name": "Jordan West-Morson"
+    },
+    {
+      "name": "Jorevis Scruggs"
+    },
+    {
+      "name": "Josef Richardson"
+    },
+    {
+      "name": "Joseph Black"
+    },
+    {
+      "name": "Joseph Chandler"
+    },
+    {
+      "name": "Joseph Forrest"
+    },
+    {
+      "name": "Joseph Gould"
+    },
+    {
+      "name": "Joseph Hill Dumas"
+    },
+    {
+      "name": "Joseph Mann"
+    },
+    {
+      "name": "Joseph Pettaway"
+    },
+    {
+      "name": "Joseph Richardson"
+    },
+    {
+      "name": "Joseph Riley"
+    },
+    {
+      "name": "Joseph Upchurch"
+    },
+    {
+      "name": "Joshua Beebee"
+    },
+    {
+      "name": "Joshua Boyd"
+    },
+    {
+      "name": "Joshua Brooks"
+    },
+    {
+      "name": "Joshua Leon Wright"
+    },
+    {
+      "name": "Jovontay Williams"
+    },
+    {
+      "name": "JR Williams"
+    },
+    {
+      "name": "Juan Markee Jones"
+    },
+    {
+      "name": "Judge Jones"
+    },
+    {
+      "name": "Julia Baker"
+    },
+    {
+      "name": "Julian Alexander"
+    },
+    {
+      "name": "Julian Edward Roosevelt Lewis"
+    },
+    {
+      "name": "Julian Mosley"
+    },
+    {
+      "name": "Julius \"July\" Perry",
+      "entityId": "lynching_julius_july_perry_ocoee_florida",
+      "locationLabel": "Home of Julius Perry",
+      "placeLabel": "Ocoee, Florida",
+      "lat": 28.5933,
+      "lng": -81.5276,
+      "locationPrecision": "site"
+    },
+    {
+      "name": "Julius Graves"
+    },
+    {
+      "name": "Jumbo Clark"
+    },
+    {
+      "name": "Junior Prosper"
+    },
+    {
+      "name": "Justin Fields"
+    },
+    {
+      "name": "Justin Griffin"
+    },
+    {
+      "name": "Justus Howell"
+    },
+    {
+      "name": "Kadarius Smith"
+    },
+    {
+      "name": "Kajuan Raye"
+    },
+    {
+      "name": "Kaleb Alexander"
+    },
+    {
+      "name": "Kathryn Johnston"
+    },
+    {
+      "name": "Kawanza Beaty"
+    },
+    {
+      "name": "Kayla Moore"
+    },
+    {
+      "name": "Keenan Anderson"
+    },
+    {
+      "name": "Keeven Robinson"
+    },
+    {
+      "name": "Keita O'Neil"
+    },
+    {
+      "name": "Keith Bowen"
+    },
+    {
+      "name": "Keith Briscoe"
+    },
+    {
+      "name": "Keith Bursey"
+    },
+    {
+      "name": "Keith Childress"
+    },
+    {
+      "name": "Keith Daughtry"
+    },
+    {
+      "name": "Keith Lamont Scott"
+    },
+    {
+      "name": "Keith McLeod"
+    },
+    {
+      "name": "Keith Montgomery Jr"
+    },
+    {
+      "name": "Keith Murriel"
+    },
+    {
       "name": "Keith Scott"
+    },
+    {
+      "name": "Kelvin Goldston"
+    },
+    {
+      "name": "Kemp Yarborough"
+    },
+    {
+      "name": "Kendra James"
+    },
+    {
+      "name": "Kendre Alston"
+    },
+    {
+      "name": "Kendrec McDade"
+    },
+    {
+      "name": "Kenneth Anderson"
+    },
+    {
+      "name": "Kenneth Chamberlain Sr."
+    },
+    {
+      "name": "Kenneth Dothard"
+    },
+    {
+      "name": "Kenneth Johnson"
+    },
+    {
+      "name": "Kenneth Knotts"
+    },
+    {
+      "name": "Kenneth Marion"
+    },
+    {
+      "name": "Kenneth Strother"
+    },
+    {
+      "name": "Kenney Watkins"
+    },
+    {
+      "name": "Kerrick Majors"
+    },
+    {
+      "name": "Kerwin Harris"
+    },
+    {
+      "name": "Kevin Allen"
+    },
+    {
+      "name": "Kevin Bruce Mason"
+    },
+    {
+      "name": "Kevin Brunson"
+    },
+    {
+      "name": "Kevin Hicks"
+    },
+    {
+      "name": "Kevin Matthews"
+    },
+    {
+      "name": "Kevin Peterson Jr."
+    },
+    {
+      "name": "Kevin Robinson"
+    },
+    {
+      "name": "Khari Westly"
+    },
+    {
+      "name": "Khiel Coppin"
+    },
+    {
+      "name": "Ki'Azia Miller"
+    },
+    {
+      "name": "Kilyn Lewis"
+    },
+    {
+      "name": "Kimani Gray"
+    },
+    {
+      "name": "Kimani Johnson"
+    },
+    {
+      "name": "King Johnson"
+    },
+    {
+      "name": "Kirk Figueroa"
+    },
+    {
+      "name": "Kisha Arrone"
+    },
+    {
+      "name": "Kisha Michael"
+    },
+    {
+      "name": "Kiwane Carrington"
+    },
+    {
+      "name": "Kohen Wiley"
     },
     {
       "name": "Korryn Gaines"
     },
     {
+      "name": "Kris Jackson"
+    },
+    {
+      "name": "Kurt Reinhold"
+    },
+    {
+      "name": "Kwame Jones"
+    },
+    {
+      "name": "Kyeiree Myers"
+    },
+    {
+      "name": "Kyle Dail"
+    },
+    {
+      "name": "L. Q. Ivy"
+    },
+    {
+      "name": "L.D. Nelson"
+    },
+    {
+      "name": "La'Mello Parker"
+    },
+    {
+      "name": "Lacy Mitchell"
+    },
+    {
+      "name": "Lafayette Evans"
+    },
+    {
+      "name": "Lamar Harris"
+    },
+    {
+      "name": "Lamar Smith"
+    },
+    {
+      "name": "Lamont Gulley"
+    },
+    {
+      "name": "Lamont Harmon"
+    },
+    {
+      "name": "Lamontez Jones"
+    },
+    {
+      "name": "Landon Nobles"
+    },
+    {
       "name": "Laquan McDonald"
+    },
+    {
+      "name": "Laronda Sweatt"
+    },
+    {
+      "name": "Larry Bolden"
+    },
+    {
+      "name": "Larry Eugene Jackson Jr."
+    },
+    {
+      "name": "Larry Jackson"
+    },
+    {
+      "name": "Larry Payne"
+    },
+    {
+      "name": "Lashano Gilbert"
+    },
+    {
+      "name": "LaTanya Haggerty"
+    },
+    {
+      "name": "Lation Scott"
+    },
+    {
+      "name": "Latoya James"
+    },
+    {
+      "name": "Laura Nelson"
+    },
+    {
+      "name": "Lavall Hall"
+    },
+    {
+      "name": "LaVaughn Coleman"
+    },
+    {
+      "name": "Lawrence Allen"
+    },
+    {
+      "name": "Lawrence Bowman"
+    },
+    {
+      "name": "Lawrence Green"
+    },
+    {
+      "name": "Lawrence Hawkins"
+    },
+    {
+      "name": "Lawrence McClendon"
+    },
+    {
+      "name": "Lawrence Meyers"
+    },
+    {
+      "name": "Lawson \"Nelse\" Patton"
+    },
+    {
+      "name": "Leander Shaw"
+    },
+    {
+      "name": "Lee Tyson"
+    },
+    {
+      "name": "Lejoy Grissom"
+    },
+    {
+      "name": "Lemuel Augustus Penn"
+    },
+    {
+      "name": "Lemuel Penn"
+    },
+    {
+      "name": "Lemuel Walters"
+    },
+    {
+      "name": "Leneal Frazier"
+    },
+    {
+      "name": "Leonard Bailey Jr."
+    },
+    {
+      "name": "Leonard Bennett"
+    },
+    {
+      "name": "Leonard Brown"
+    },
+    {
+      "name": "Leonard Cure"
+    },
+    {
+      "name": "Leonard Deadwyler"
+    },
+    {
+      "name": "Leonard Parker Jr."
+    },
+    {
+      "name": "Leonard Thomas"
+    },
+    {
+      "name": "Leonard Woods"
+    },
+    {
+      "name": "Leroy Boyd"
+    },
+    {
+      "name": "Leroy Browning"
+    },
+    {
+      "name": "Leslie Portis Jr"
+    },
+    {
+      "name": "Leslie Prater"
+    },
+    {
+      "name": "Leslie Sapp III"
+    },
+    {
+      "name": "Less Smith"
+    },
+    {
+      "name": "Lester Steven Yarbrough"
+    },
+    {
+      "name": "Levincer Swanson"
+    },
+    {
+      "name": "Levonia Riggins"
+    },
+    {
+      "name": "Lewis Hodges"
+    },
+    {
+      "name": "Lige Daniels",
+      "entityId": "lynching_lige_daniels_center_texas",
+      "locationLabel": "Town square, Center, Texas",
+      "placeLabel": "Center, Texas",
+      "lat": 31.79305556,
+      "lng": -94.17944444,
+      "locationPrecision": "site"
+    },
+    {
+      "name": "Lindani Myeni"
+    },
+    {
+      "name": "Linden Cameron"
+    },
+    {
+      "name": "Lionel Gibson"
+    },
+    {
+      "name": "Lizzie Durr"
+    },
+    {
+      "name": "Lloyd Clay"
+    },
+    {
+      "name": "Lloyd D. Stevenson"
+    },
+    {
+      "name": "Lorenzo Matthews"
+    },
+    {
+      "name": "Louis \"Slim\" Seeman"
+    },
+    {
+      "name": "Louis Allen"
+    },
+    {
+      "name": "Lueth Mo"
+    },
+    {
+      "name": "Luke Stewart"
+    },
+    {
+      "name": "Luther Holbert"
+    },
+    {
+      "name": "Luther Jackson"
+    },
+    {
+      "name": "Lymond Moses"
+    },
+    {
+      "name": "Lynn Council"
     },
     {
       "name": "Ma'Khia Bryant"
     },
     {
+      "name": "Maalik Roquemore"
+    },
+    {
+      "name": "Mack Charles Parker",
+      "entityId": "lynching_mack_charles_parker_bridge_over_pearl_river_between_mississippi_and_louisiana_mississippi",
+      "locationLabel": "Pearl River, near bridge between Mississippi and Louisiana",
+      "placeLabel": "Poplarville, Mississippi",
+      "lat": 29.15111111,
+      "lng": -89.25333333,
+      "locationPrecision": "site"
+    },
+    {
+      "name": "Mack Long"
+    },
+    {
+      "name": "Mack Wilson"
+    },
+    {
+      "name": "Mack Woodfox"
+    },
+    {
+      "name": "Mae Murray Dorsey"
+    },
+    {
+      "name": "Maggie Howze",
+      "entityId": "lynching_maggie_howze_shubuta_hanging_bridge_mississippi",
+      "locationLabel": "Hanging Bridge, Clarke County",
+      "placeLabel": "Shubuta, Mississippi",
+      "lat": 32.04,
+      "lng": -88.69,
+      "locationPrecision": "site"
+    },
+    {
+      "name": "Major Clark"
+    },
+    {
+      "name": "Major Lake"
+    },
+    {
+      "name": "Malcolm Ferguson"
+    },
+    {
+      "name": "Malcolm X",
+      "entityId": "ent_malcolm_x_001",
+      "locationLabel": "Audubon Ballroom, 3940 Broadway, Washington Heights, Manhattan",
+      "placeLabel": "New York, New York",
+      "lat": 40.8392,
+      "lng": -73.9406,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "Malice Green"
+    },
+    {
+      "name": "Malik Jones"
+    },
+    {
+      "name": "Malissa Williams"
+    },
+    {
+      "name": "Mannix Franklin Sr."
+    },
+    {
+      "name": "Manny Price"
+    },
+    {
+      "name": "Mansur Ball-Bey"
+    },
+    {
       "name": "Manuel Ellis"
+    },
+    {
+      "name": "Manuel Loggins Jr."
+    },
+    {
+      "name": "Marando Salmon"
+    },
+    {
+      "name": "Marcellis Stinnette"
+    },
+    {
+      "name": "Marchello Woodard"
+    },
+    {
+      "name": "Marco Dorsey"
+    },
+    {
+      "name": "Marco Loud"
+    },
+    {
+      "name": "Marcus Burks"
+    },
+    {
+      "name": "Marcus Golden"
+    },
+    {
+      "name": "Marcus Meridy"
+    },
+    {
+      "name": "Marcus Roach-Burris"
+    },
+    {
+      "name": "Marcus Smith"
+    },
+    {
+      "name": "Marcus Wheeler"
+    },
+    {
+      "name": "Marcus-David Peters"
+    },
+    {
+      "name": "Mardio House"
+    },
+    {
+      "name": "Margaret LaVerne Mitchell"
+    },
+    {
+      "name": "Marie Thompson"
+    },
+    {
+      "name": "Mario Clark"
+    },
+    {
+      "name": "Mario Jordan"
+    },
+    {
+      "name": "Mario Romero"
+    },
+    {
+      "name": "Mario Woods"
+    },
+    {
+      "name": "Mark Barmore Jr."
+    },
+    {
+      "name": "Mark Clark"
+    },
+    {
+      "name": "Mark Fox"
+    },
+    {
+      "name": "Mark Henderson"
+    },
+    {
+      "name": "Markell Atkins"
+    },
+    {
+      "name": "Markell Bivins"
+    },
+    {
+      "name": "Marquesha McMillan"
+    },
+    {
+      "name": "Marquez Smart"
+    },
+    {
+      "name": "Marquintan Sandlin"
+    },
+    {
+      "name": "Marquis Hudspeth"
+    },
+    {
+      "name": "Marshall Johnson"
+    },
+    {
+      "name": "Marshall Miles"
+    },
+    {
+      "name": "Marshall Scott Jr."
+    },
+    {
+      "name": "Marshall Smith Jr"
+    },
+    {
+      "name": "Martice Milliner"
+    },
+    {
+      "name": "Martin Anderson"
+    },
+    {
+      "name": "Martin Chambers"
+    },
+    {
+      "name": "Martin Luther King Jr.",
+      "entityId": "ent_martin_luther_king_jr_001",
+      "locationLabel": "Martin Luther King Jr. Birth Home, 501 Auburn Avenue, Atlanta",
+      "placeLabel": "Atlanta, Georgia",
+      "lat": 33.7552,
+      "lng": -84.3712,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "Martin Ryans"
+    },
+    {
+      "name": "Marvin Scott III"
+    },
+    {
+      "name": "Mary Dennis"
+    },
+    {
+      "name": "Mary Truxillo"
+    },
+    {
+      "name": "Mary Turner"
+    },
+    {
+      "name": "Matthew Johnson#Shooting_of_Matthew_Johnson)"
+    },
+    {
+      "name": "Matthew Tucker"
+    },
+    {
+      "name": "Matthew Williams"
+    },
+    {
+      "name": "Matthew Zadok Williams"
+    },
+    {
+      "name": "Mattie Greene"
+    },
+    {
+      "name": "Maurice Gordon"
+    },
+    {
+      "name": "Maurice Granton Jr."
+    },
+    {
+      "name": "Maurice Leroy Cox"
+    },
+    {
+      "name": "Maybelle Mahone"
+    },
+    {
+      "name": "McKenzie Cochran"
+    },
+    {
+      "name": "McKinley Curry"
+    },
+    {
+      "name": "Meagan Hockaday"
     },
     {
       "name": "Medgar Evers"
     },
     {
+      "name": "Melvin Guy"
+    },
+    {
+      "name": "Melvin Williams"
+    },
+    {
+      "name": "Messiah Nantwi"
+    },
+    {
+      "name": "Micah Key"
+    },
+    {
       "name": "Michael Brown"
     },
     {
+      "name": "Michael Byoune"
+    },
+    {
+      "name": "Michael Carpenter"
+    },
+    {
+      "name": "Michael Charles Thompson"
+    },
+    {
+      "name": "Michael Craig"
+    },
+    {
+      "name": "Michael Dean"
+    },
+    {
+      "name": "Michael Donald"
+    },
+    {
+      "name": "Michael Elam Jr."
+    },
+    {
+      "name": "Michael Ellerbe"
+    },
+    {
+      "name": "Michael Green"
+    },
+    {
+      "name": "Michael Griffith",
+      "entityId": "ent_michael_griffith_001",
+      "locationLabel": "Cross Bay Boulevard near 157th Avenue / New Park Pizzeria, Howard Beach, Queens",
+      "placeLabel": "New York, New York",
+      "lat": 40.662278546196,
+      "lng": -73.840839014838,
+      "locationPrecision": "neighborhood"
+    },
+    {
+      "name": "Michael Johnson"
+    },
+    {
+      "name": "Michael Knight"
+    },
+    {
+      "name": "Michael L. Thomas"
+    },
+    {
+      "name": "Michael Lorenzo Dean"
+    },
+    {
+      "name": "Michael Moore"
+    },
+    {
+      "name": "Michael Noel"
+    },
+    {
+      "name": "Michael Patrick Jacobs Jr."
+    },
+    {
+      "name": "Michael Pleasance"
+    },
+    {
+      "name": "Michael Pugh"
+    },
+    {
+      "name": "Michael Ramos"
+    },
+    {
+      "name": "Michael Ricardo Minor"
+    },
+    {
       "name": "Michael Schwerner"
+    },
+    {
+      "name": "Michael Sherard"
+    },
+    {
+      "name": "Michael Smith"
+    },
+    {
+      "name": "Michael Stewart"
+    },
+    {
+      "name": "Michael Thompson Jr"
+    },
+    {
+      "name": "Michael Wayne McKnight Jr."
+    },
+    {
+      "name": "Michelle Cusseaux"
+    },
+    {
+      "name": "Mickel Lewis"
+    },
+    {
+      "name": "Miguel Espinal"
+    },
+    {
+      "name": "Mike Williams"
+    },
+    {
+      "name": "Miles Hall"
+    },
+    {
+      "name": "Miles(or Relius) Phifer"
+    },
+    {
+      "name": "Miriam Carey"
+    },
+    {
+      "name": "Mitchell Adams"
+    },
+    {
+      "name": "Mohamed Barry"
+    },
+    {
+      "name": "Mollie French"
+    },
+    {
+      "name": "Mose Bozier"
+    },
+    {
+      "name": "Mose Jones"
+    },
+    {
+      "name": "Moses Ruben"
+    },
+    {
+      "name": "Moss Spellman"
+    },
+    {
+      "name": "MOVE Bombing"
+    },
+    {
+      "name": "Mrs. Wise"
+    },
+    {
+      "name": "Muhammad Muhaymin Jr."
+    },
+    {
+      "name": "Mya Hall"
     },
     {
       "name": "Myra Thompson",
@@ -184,28 +3928,688 @@
       "locationPrecision": "institution"
     },
     {
+      "name": "Naeschylus Vinzant"
+    },
+    {
+      "name": "Najier Salaam"
+    },
+    {
+      "name": "Nasanto Antonio Crenshaw"
+    },
+    {
+      "name": "Nat Turner"
+    },
+    {
+      "name": "Natasha McKenna"
+    },
+    {
+      "name": "Nathaniel Harris Pickett Jr."
+    },
+    {
+      "name": "Nathaniel Jones"
+    },
+    {
+      "name": "Nathaniel Levi Gaines"
+    },
+    {
+      "name": "Nathaniel Wilks"
+    },
+    {
+      "name": "Nease Gillepsie"
+    },
+    {
+      "name": "Nehemiah Montgomery"
+    },
+    {
+      "name": "Nephi Arriguin"
+    },
+    {
+      "name": "Nicholas Glenn"
+    },
+    {
+      "name": "Nicholas Heyward Jr."
+    },
+    {
+      "name": "Nicholas HeywardJr."
+    },
+    {
+      "name": "Nicholas Robertson"
+    },
+    {
+      "name": "Nicholas Thomas"
+    },
+    {
+      "name": "Norman Cooper"
+    },
+    {
+      "name": "Norman Gary"
+    },
+    {
+      "name": "Norris Dendy"
+    },
+    {
+      "name": "O.J. Johnson"
+    },
+    {
+      "name": "O'Shae Terry"
+    },
+    {
+      "name": "Obe Cox",
+      "entityId": "lynching_obe_cox_georgia",
+      "locationLabel": "Site of lynching in Oglethorpe County",
+      "placeLabel": "Lexington, Georgia",
+      "lat": 33.88,
+      "lng": -83.08,
+      "locationPrecision": "site"
+    },
+    {
+      "name": "Oliver Gregoire"
+    },
+    {
+      "name": "Oliver Moore"
+    },
+    {
+      "name": "Omer Ismail Ali"
+    },
+    {
+      "name": "Oneal Moore"
+    },
+    {
+      "name": "Ontario Billups"
+    },
+    {
+      "name": "Orion Anderson"
+    },
+    {
+      "name": "Orlando Barlow"
+    },
+    {
+      "name": "Orville Edwards"
+    },
+    {
       "name": "Oscar Grant"
+    },
+    {
+      "name": "Oscar Mack"
+    },
+    {
+      "name": "Osee Calix"
+    },
+    {
+      "name": "Ousmane Zongo"
+    },
+    {
+      "name": "Owen Flemming"
+    },
+    {
+      "name": "P. Norman"
+    },
+    {
+      "name": "Pamela Turner"
+    },
+    {
+      "name": "Parnell Smith"
+    },
+    {
+      "name": "Paterson Brown Jr."
+    },
+    {
+      "name": "Patrick Dorismond"
+    },
+    {
+      "name": "Patrick Lyoya"
+    },
+    {
+      "name": "Patrick Warren Sr."
+    },
+    {
+      "name": "Paul Anderson"
+    },
+    {
+      "name": "Paul Gaston"
+    },
+    {
+      "name": "Paul Jones"
+    },
+    {
+      "name": "Paul Monroe"
+    },
+    {
+      "name": "Paul O'Neal"
+    },
+    {
+      "name": "Paul Reed"
+    },
+    {
+      "name": "Pearl Pettigrew",
+      "entityId": "lynching_pearl_pettigrew_decaturville_tennessee",
+      "locationLabel": "Site of lynching",
+      "placeLabel": "Decaturville, Tennessee",
+      "lat": 35.615,
+      "lng": -87.04444444,
+      "locationPrecision": "city"
+    },
+    {
+      "name": "Peter Bell"
+    },
+    {
+      "name": "Peter Berryman"
+    },
+    {
+      "name": "Peter Betters"
+    },
+    {
+      "name": "Peter Fanfan"
+    },
+    {
+      "name": "Peter Gaines"
+    },
+    {
+      "name": "Peter Hampton"
+    },
+    {
+      "name": "Peter John"
+    },
+    {
+      "name": "Pheld Evans"
     },
     {
       "name": "Philando Castile"
     },
     {
+      "name": "Philemon Moore"
+    },
+    {
+      "name": "Philip Hasan"
+    },
+    {
+      "name": "Philip Tankard"
+    },
+    {
+      "name": "Phillip Gathers"
+    },
+    {
+      "name": "Phillip Lafayette Gibbs"
+    },
+    {
+      "name": "Phillip Miller"
+    },
+    {
+      "name": "Phillip Pannell"
+    },
+    {
+      "name": "Phillip Watkins"
+    },
+    {
+      "name": "Pierre Loury"
+    },
+    {
+      "name": "Pierre Woods"
+    },
+    {
+      "name": "Pompey O'Bannon"
+    },
+    {
+      "name": "Presley Eze"
+    },
+    {
+      "name": "Preston Porter"
+    },
+    {
+      "name": "Preston Tate"
+    },
+    {
+      "name": "Prince Jones"
+    },
+    {
+      "name": "Quadry Sanders"
+    },
+    {
+      "name": "Quandavier Hicks"
+    },
+    {
+      "name": "Quanice Hayes"
+    },
+    {
+      "name": "Quantez Burks"
+    },
+    {
+      "name": "Quintonio LeGrier"
+    },
+    {
+      "name": "Quron Williams"
+    },
+    {
+      "name": "Rajon Belt-Stubblefield"
+    },
+    {
+      "name": "Rakeem Bentley"
+    },
+    {
+      "name": "Ralph Morral"
+    },
+    {
+      "name": "Ramarley Graham"
+    },
+    {
+      "name": "Randolph Evans"
+    },
+    {
+      "name": "Randolph McClain"
+    },
+    {
+      "name": "Rashaud Johnson"
+    },
+    {
+      "name": "Rashaun Lloyd"
+    },
+    {
+      "name": "Rashaun Washington"
+    },
+    {
+      "name": "Rasheem Singletary"
+    },
+    {
+      "name": "Raymond Arthur Byrd"
+    },
+    {
+      "name": "Raymond Chaluisant"
+    },
+    {
+      "name": "Raymond Gilmer"
+    },
+    {
+      "name": "Raymond Gunn"
+    },
+    {
+      "name": "Raymond Hodge"
+    },
+    {
+      "name": "Raymond Robair"
+    },
+    {
+      "name": "Raynard Burton"
+    },
+    {
       "name": "Rayshard Brooks"
+    },
+    {
+      "name": "Redel Jones"
+    },
+    {
+      "name": "Reginald Doucet"
+    },
+    {
+      "name": "Reginald Marshall"
+    },
+    {
+      "name": "Reginald McGregor"
+    },
+    {
+      "name": "Reginald Payne"
+    },
+    {
+      "name": "Reginald Wallace"
     },
     {
       "name": "Rekia Boyd"
     },
     {
+      "name": "Renardo Green"
+    },
+    {
       "name": "Renisha McBride"
+    },
+    {
+      "name": "Reuben Micou"
+    },
+    {
+      "name": "Reuben Stacy"
+    },
+    {
+      "name": "Reuben(also Found As Rubin Stacy) Stacey"
+    },
+    {
+      "name": "Rev. Josh J. Baskins"
+    },
+    {
+      "name": "Richard Bard Jr"
+    },
+    {
+      "name": "Richard Davis"
+    },
+    {
+      "name": "Richard Dickerson"
+    },
+    {
+      "name": "Richard Gregory Davis"
+    },
+    {
+      "name": "Richard Grimes"
+    },
+    {
+      "name": "Richard Hawkins"
+    },
+    {
+      "name": "Richard Holtz"
+    },
+    {
+      "name": "Richard Johnson"
+    },
+    {
+      "name": "Richard Lillard"
+    },
+    {
+      "name": "Richard May"
+    },
+    {
+      "name": "Richard Perkins"
+    },
+    {
+      "name": "Richard Risher Jr"
+    },
+    {
+      "name": "Richard Sims"
+    },
+    {
+      "name": "Richard White"
+    },
+    {
+      "name": "Ricky Cobb II"
+    },
+    {
+      "name": "Ripley Johnson"
+    },
+    {
+      "name": "Rita Lloyd"
+    },
+    {
+      "name": "Rob Edwards"
+    },
+    {
+      "name": "Robert \"Bobby\" Hall"
+    },
+    {
+      "name": "Robert Beal"
+    },
+    {
+      "name": "Robert Brooks"
+    },
+    {
+      "name": "Robert Brown"
+    },
+    {
+      "name": "Robert Collins"
+    },
+    {
+      "name": "Robert Crosky"
+    },
+    {
+      "name": "Robert Dentmond"
+    },
+    {
+      "name": "Robert Donnelly"
+    },
+    {
+      "name": "Robert Forbes"
+    },
+    {
+      "name": "Robert Hall"
+    },
+    {
+      "name": "Robert Harper"
+    },
+    {
+      "name": "Robert Henson Hilliard"
+    },
+    {
+      "name": "Robert Johnson",
+      "entityId": "ent_robert_l_johnson_001",
+      "locationLabel": "Former BET Networks headquarters, 1235 W Street NE, Washington, D.C.",
+      "placeLabel": "Washington, District of Columbia",
+      "lat": 38.9188,
+      "lng": -76.9888,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "Robert Jones"
+    },
+    {
+      "name": "Robert Junior Langley"
+    },
+    {
+      "name": "Robert Lawrence White"
+    },
+    {
+      "name": "Robert Lewis"
+    },
+    {
+      "name": "Robert Loggins"
+    },
+    {
+      "name": "Robert Mallard"
+    },
+    {
+      "name": "Robert Marshall"
+    },
+    {
+      "name": "Robert McDaniels"
+    },
+    {
+      "name": "Robert McNair"
+    },
+    {
+      "name": "Robert Mitchell"
+    },
+    {
+      "name": "Robert Phoenix"
+    },
+    {
+      "name": "Robert Robinson"
+    },
+    {
+      "name": "Robert Russ"
+    },
+    {
+      "name": "Robert Scruggs"
+    },
+    {
+      "name": "Robert V. Logan"
+    },
+    {
+      "name": "Robert Washington"
+    },
+    {
+      "name": "Rodell Williamson"
+    },
+    {
+      "name": "Roderick Brooks"
     },
     {
       "name": "Rodney King"
     },
     {
+      "name": "Rodney Turner"
+    },
+    {
+      "name": "Rodney Watts"
+    },
+    {
+      "name": "Roger Malcom"
+    },
+    {
+      "name": "Roger Owensby Jr."
+    },
+    {
+      "name": "Rogers Hamilton"
+    },
+    {
+      "name": "Rogers Kyaruzi"
+    },
+    {
+      "name": "Rolin Hill"
+    },
+    {
+      "name": "Rolly Thomas"
+    },
+    {
+      "name": "Roman Ducksworth Jr."
+    },
+    {
+      "name": "Ronald Beasley"
+    },
+    {
+      "name": "Ronald Evans"
+    },
+    {
+      "name": "Ronald Greene"
+    },
+    {
+      "name": "Ronald Madison"
+    },
+    {
+      "name": "Ronald Singleton"
+    },
+    {
+      "name": "Ronell Wade"
+    },
+    {
+      "name": "Ronnell Foster"
+    },
+    {
+      "name": "Ronnie Diamond"
+    },
+    {
+      "name": "Roosevelt Jackson"
+    },
+    {
+      "name": "Roshod Graham"
+    },
+    {
+      "name": "Roy Banks"
+    },
+    {
+      "name": "Roy Glenn Jr."
+    },
+    {
+      "name": "Roy Jean Williams"
+    },
+    {
+      "name": "Roy Lee Jones"
+    },
+    {
+      "name": "Roy Lee Nelson Jr."
+    },
+    {
+      "name": "Ruben Ortega"
+    },
+    {
+      "name": "Rudy Eugene"
+    },
+    {
+      "name": "Rufus Council"
+    },
+    {
+      "name": "Rumain Brisbon"
+    },
+    {
+      "name": "Ryan Joseph"
+    },
+    {
+      "name": "Ryan Stokes"
+    },
+    {
+      "name": "Ryan Twyman"
+    },
+    {
+      "name": "Saheed Vassell"
+    },
+    {
+      "name": "Sahlah Ridgeway"
+    },
+    {
+      "name": "Sal Saran Scott"
+    },
+    {
+      "name": "Saleam Triggs"
+    },
+    {
+      "name": "Salvado Ellswood"
+    },
+    {
+      "name": "Sam Carter"
+    },
+    {
+      "name": "Sam Holmes"
+    },
+    {
+      "name": "Sam Hose"
+    },
+    {
+      "name": "Sam Mosely"
+    },
+    {
+      "name": "Sam O'Quinn"
+    },
+    {
+      "name": "Sam Reed"
+    },
+    {
+      "name": "Sammie McCullough"
+    },
+    {
+      "name": "Samson Fleurant"
+    },
+    {
+      "name": "Samuel Brown"
+    },
+    {
       "name": "Samuel DuBose"
     },
     {
+      "name": "Samuel Ephesians Hammond Jr."
+    },
+    {
+      "name": "Samuel Gorman"
+    },
+    {
+      "name": "Samuel Hammond Jr."
+    },
+    {
+      "name": "Samuel Leamon Younge Jr."
+    },
+    {
+      "name": "Samuel Nelson"
+    },
+    {
+      "name": "Samuel Smith"
+    },
+    {
+      "name": "Samuel Sterling"
+    },
+    {
       "name": "Sandra Bland"
+    },
+    {
+      "name": "Sanford Lewis",
+      "entityId": "lynching_sanford_lewis_fort_smith_arkansas",
+      "locationLabel": "Site of 1912 lynching of Sanford Lewis",
+      "placeLabel": "Fort Smith, Arkansas",
+      "lat": 35.37972222,
+      "lng": -94.38194444,
+      "locationPrecision": "city"
+    },
+    {
+      "name": "Sanford Taylor"
+    },
+    {
+      "name": "Saveion McConnell"
+    },
+    {
+      "name": "Scott Bennett"
+    },
+    {
+      "name": "Scott Clark"
     },
     {
       "name": "Sean Bell",
@@ -217,6 +4621,30 @@
       "locationPrecision": "institution"
     },
     {
+      "name": "Sean Moore"
+    },
+    {
+      "name": "Semore, Bodius (other Spellings: Semore, Rodius; Leamon, Rodium)"
+    },
+    {
+      "name": "Seth Jayden Eccles"
+    },
+    {
+      "name": "Shacoby Kenny"
+    },
+    {
+      "name": "Shalamar Longer"
+    },
+    {
+      "name": "Shane Whitehead"
+    },
+    {
+      "name": "Shantel Davis"
+    },
+    {
+      "name": "Shaquille Barrow"
+    },
+    {
       "name": "Sharonda Coleman Singleton",
       "entityId": "ent_sharonda_coleman_singleton_001",
       "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
@@ -226,7 +4654,127 @@
       "locationPrecision": "institution"
     },
     {
+      "name": "Sharonda Coleman-Singleton",
+      "entityId": "ent_sharonda_coleman_singleton_001",
+      "locationLabel": "Emanuel AME Church (Mother Emanuel), 110 Calhoun Street, Charleston",
+      "placeLabel": "Charleston, South Carolina",
+      "lat": 32.7875,
+      "lng": -79.93305556,
+      "locationPrecision": "institution"
+    },
+    {
+      "name": "Shatona Evette Robinson"
+    },
+    {
+      "name": "Shaun Fuhr"
+    },
+    {
+      "name": "Shawn Watson"
+    },
+    {
+      "name": "Shedrick Thompson"
+    },
+    {
+      "name": "Shelly Frey"
+    },
+    {
+      "name": "Shem Walker"
+    },
+    {
+      "name": "Shereese Francis"
+    },
+    {
+      "name": "Sherman Evans"
+    },
+    {
+      "name": "Sherron Norman"
+    },
+    {
+      "name": "Shu'aib Abdul-Latif"
+    },
+    {
+      "name": "Sidney Randolph"
+    },
+    {
+      "name": "Sidney Washington"
+    },
+    {
+      "name": "Silas Caston"
+    },
+    {
+      "name": "Silas Estes"
+    },
+    {
+      "name": "Silas Hoskins"
+    },
+    {
+      "name": "Silas Weston"
+    },
+    {
+      "name": "Simeon Garnet"
+    },
+    {
+      "name": "Simmont Donta Thomas"
+    },
+    {
+      "name": "Sincere Pierce"
+    },
+    {
+      "name": "Slab Pitts",
+      "entityId": "lynching_slab_pitts_toyah_texas",
+      "locationLabel": "Site of lynching",
+      "placeLabel": "Toyah, Texas",
+      "lat": 31.31333333,
+      "lng": -103.79305556,
+      "locationPrecision": "city"
+    },
+    {
+      "name": "Sloan Despano"
+    },
+    {
+      "name": "Sonya Massey"
+    },
+    {
+      "name": "Spencer Lee McCain"
+    },
+    {
+      "name": "Spencer McCain"
+    },
+    {
+      "name": "Squire Taylor"
+    },
+    {
+      "name": "Stanley Gibson"
+    },
+    {
+      "name": "Stanly Bearden"
+    },
+    {
+      "name": "Stanton L. Crew"
+    },
+    {
+      "name": "Stella Young"
+    },
+    {
+      "name": "Stephanie Montague"
+    },
+    {
+      "name": "Stephenson King"
+    },
+    {
       "name": "Stephon Clark"
+    },
+    {
+      "name": "Sterling Lester Chest Jr."
+    },
+    {
+      "name": "Steve Clemons"
+    },
+    {
+      "name": "Steve Dormil"
+    },
+    {
+      "name": "Steven Washington"
     },
     {
       "name": "Susie Jackson",
@@ -238,10 +4786,196 @@
       "locationPrecision": "institution"
     },
     {
+      "name": "Sylvester Maxwell"
+    },
+    {
+      "name": "Sylville Smith"
+    },
+    {
+      "name": "Ta'Kiya Young"
+    },
+    {
+      "name": "Ta'Kiya Young & unborn baby"
+    },
+    {
+      "name": "Tahmon Wilson"
+    },
+    {
+      "name": "Talif Scudder"
+    },
+    {
       "name": "Tamir Rice"
     },
     {
+      "name": "Tanisha Anderson"
+    },
+    {
+      "name": "Tarika Wilson"
+    },
+    {
+      "name": "Tasha Grant"
+    },
+    {
+      "name": "Tashii Farmer"
+    },
+    {
+      "name": "Tawon Boyd"
+    },
+    {
+      "name": "Ted Smith"
+    },
+    {
+      "name": "Tedock Bell"
+    },
+    {
+      "name": "Teleak Roberts"
+    },
+    {
+      "name": "Terence Caffey"
+    },
+    {
       "name": "Terence Crutcher"
+    },
+    {
+      "name": "Terence Walker"
+    },
+    {
+      "name": "Terrall Magee"
+    },
+    {
+      "name": "Terrance Ivor Watts"
+    },
+    {
+      "name": "Terrance Kellom"
+    },
+    {
+      "name": "Terrell Miller"
+    },
+    {
+      "name": "Terrell Walker"
+    },
+    {
+      "name": "Terrence Bridges Jr."
+    },
+    {
+      "name": "Terrence Coleman"
+    },
+    {
+      "name": "Terrence Sterling"
+    },
+    {
+      "name": "Terrence Thomas Jr"
+    },
+    {
+      "name": "Terry Garnett Jr"
+    },
+    {
+      "name": "Tevin Barkley"
+    },
+    {
+      "name": "Thaddeus Faison"
+    },
+    {
+      "name": "Thaddeus McCarroll"
+    },
+    {
+      "name": "Theodore Johnson"
+    },
+    {
+      "name": "Theodosia Weston"
+    },
+    {
+      "name": "Thomas Allen Jr"
+    },
+    {
+      "name": "Thomas Bradshaw"
+    },
+    {
+      "name": "Thomas Brewer"
+    },
+    {
+      "name": "Thomas Clayton"
+    },
+    {
+      "name": "Thomas Jones"
+    },
+    {
+      "name": "Thomas Moss"
+    },
+    {
+      "name": "Thomas P. Foster"
+    },
+    {
+      "name": "Thomas Rivers"
+    },
+    {
+      "name": "Thomas Shipp"
+    },
+    {
+      "name": "Thomas Williams"
+    },
+    {
+      "name": "Three Men"
+    },
+    {
+      "name": "Thurman Reynolds"
+    },
+    {
+      "name": "Tiano Meton"
+    },
+    {
+      "name": "Timothy Albert"
+    },
+    {
+      "name": "Timothy McCree Johnson"
+    },
+    {
+      "name": "Timothy Russell"
+    },
+    {
+      "name": "Timothy Stansbury Jr."
+    },
+    {
+      "name": "Timothy Thomas"
+    },
+    {
+      "name": "Tom McLain"
+    },
+    {
+      "name": "Tom Payne"
+    },
+    {
+      "name": "Tonia Blanding"
+    },
+    {
+      "name": "Tony Bean"
+    },
+    {
+      "name": "Tony Bernard Smith Jr."
+    },
+    {
+      "name": "Tony Berry"
+    },
+    {
+      "name": "Tony Champion"
+    },
+    {
+      "name": "Tony Cox"
+    },
+    {
+      "name": "Tony McDade"
+    },
+    {
+      "name": "Tony Robinson"
+    },
+    {
+      "name": "Tory Brown"
+    },
+    {
+      "name": "Tracy Gaeta"
+    },
+    {
+      "name": "Travis Stevenson"
     },
     {
       "name": "Trayvon Martin",
@@ -253,7 +4987,70 @@
       "locationPrecision": "neighborhood"
     },
     {
+      "name": "Tremaine Dantzler"
+    },
+    {
+      "name": "Trepierre Hummons"
+    },
+    {
+      "name": "Trevon Cole"
+    },
+    {
+      "name": "Trey Antuan Lively"
+    },
+    {
+      "name": "Trey Pringle"
+    },
+    {
+      "name": "Troy Stewart"
+    },
+    {
+      "name": "Tsombe Clark"
+    },
+    {
+      "name": "Tyisha Miller"
+    },
+    {
+      "name": "Tyler Woods"
+    },
+    {
+      "name": "Tymar Crawford"
+    },
+    {
+      "name": "Tyre King"
+    },
+    {
       "name": "Tyre Nichols"
+    },
+    {
+      "name": "Tyre Privott"
+    },
+    {
+      "name": "Tyrea Pryor"
+    },
+    {
+      "name": "Tyrie Cuyler"
+    },
+    {
+      "name": "Tyrone Bass"
+    },
+    {
+      "name": "Tyrone Brown"
+    },
+    {
+      "name": "Tyrone Harris"
+    },
+    {
+      "name": "Tyrone Hawkins"
+    },
+    {
+      "name": "Tyrone Holman"
+    },
+    {
+      "name": "Tyrone Reado"
+    },
+    {
+      "name": "Tyrone West"
     },
     {
       "name": "Tywanza Sanders",
@@ -265,10 +5062,346 @@
       "locationPrecision": "institution"
     },
     {
+      "name": "Unidentified Man"
+    },
+    {
+      "name": "Unnamed Female"
+    },
+    {
+      "name": "Vernard Davis"
+    },
+    {
+      "name": "Vernard Toney Jr."
+    },
+    {
+      "name": "Vernell Bing Jr."
+    },
+    {
+      "name": "Vernon Ferdinand Dahmer",
+      "entityId": "ent_vernon_dahmer_001",
+      "locationLabel": "Kelly Settlement, near Hattiesburg, Forrest County, Mississippi",
+      "placeLabel": "Hattiesburg, Mississippi",
+      "lat": 31.3271,
+      "lng": -89.2903,
+      "locationPrecision": "city"
+    },
+    {
+      "name": "Victo Larosa III"
+    },
+    {
+      "name": "Victor White III"
+    },
+    {
+      "name": "Vincent Dahmon"
+    },
+    {
+      "name": "Vincent Smith"
+    },
+    {
       "name": "Viola Liuzzo"
     },
     {
+      "name": "Virgil Jones"
+    },
+    {
+      "name": "Virgil Lamar Ware"
+    },
+    {
+      "name": "Vivian Strong"
+    },
+    {
+      "name": "W. G. Singleton"
+    },
+    {
+      "name": "Wade Patterson"
+    },
+    {
+      "name": "Wade Thomas"
+    },
+    {
+      "name": "Walter Bailey"
+    },
+    {
+      "name": "Walter Cotton"
+    },
+    {
+      "name": "Walter Johnson"
+    },
+    {
       "name": "Walter Scott"
+    },
+    {
+      "name": "Walter Wallace Jr."
+    },
+    {
+      "name": "Waltki Williams"
+    },
+    {
+      "name": "Wardel Davis"
+    },
+    {
+      "name": "Warren Collins"
+    },
+    {
+      "name": "Warren Lewis"
+    },
+    {
+      "name": "Wayne Timothy Coggins"
+    },
+    {
+      "name": "Wendell Allen"
+    },
+    {
+      "name": "Wendell Celestine"
+    },
+    {
+      "name": "Wharlest Jackson"
+    },
+    {
+      "name": "Wilbur Little"
+    },
+    {
+      "name": "Will Brown"
+    },
+    {
+      "name": "Will Cato"
+    },
+    {
+      "name": "Will Johnson"
+    },
+    {
+      "name": "Will Jones"
+    },
+    {
+      "name": "Will Manuel"
+    },
+    {
+      "name": "Will Moore"
+    },
+    {
+      "name": "Will Porter"
+    },
+    {
+      "name": "Will Sherod"
+    },
+    {
+      "name": "Will Stanley"
+    },
+    {
+      "name": "Will Stewart"
+    },
+    {
+      "name": "Will Thrasher"
+    },
+    {
+      "name": "William \"Obie\" Evans"
+    },
+    {
+      "name": "William \"Sam Joe\" Harvey"
+    },
+    {
+      "name": "William Allen"
+    },
+    {
+      "name": "William Anderson"
+    },
+    {
+      "name": "William Arthur Bell"
+    },
+    {
+      "name": "William Baker"
+    },
+    {
+      "name": "William Bell"
+    },
+    {
+      "name": "William Bostick"
+    },
+    {
+      "name": "William Bowen"
+    },
+    {
+      "name": "William Bradford"
+    },
+    {
+      "name": "William Burns"
+    },
+    {
+      "name": "William Byrd"
+    },
+    {
+      "name": "William Chapman"
+    },
+    {
+      "name": "William Dalton"
+    },
+    {
+      "name": "William Fambro"
+    },
+    {
+      "name": "William Furr"
+    },
+    {
+      "name": "William Godley"
+    },
+    {
+      "name": "William Green"
+    },
+    {
+      "name": "William Howard Green"
+    },
+    {
+      "name": "William J. Whitfield"
+    },
+    {
+      "name": "William James"
+    },
+    {
+      "name": "William Johnson"
+    },
+    {
+      "name": "William Lee"
+    },
+    {
+      "name": "William Leonard"
+    },
+    {
+      "name": "William Lomax"
+    },
+    {
+      "name": "William Miller"
+    },
+    {
+      "name": "William Rankin"
+    },
+    {
+      "name": "William Roan"
+    },
+    {
+      "name": "William Roy Prather"
+    },
+    {
+      "name": "William Turner"
+    },
+    {
+      "name": "William Wade Burgess III"
+    },
+    {
+      "name": "William Wright"
+    },
+    {
+      "name": "Willie Brewster"
+    },
+    {
+      "name": "Willie Countryman"
+    },
+    {
+      "name": "Willie Earle"
+    },
+    {
+      "name": "Willie Edwards Jr."
+    },
+    {
+      "name": "Willie Henry Lee"
+    },
+    {
+      "name": "Willie James Howard"
+    },
+    {
+      "name": "Willie Joe Sanford"
+    },
+    {
+      "name": "Willie Lee Bingham Jr."
+    },
+    {
+      "name": "Willie Lee Jenkins"
+    },
+    {
+      "name": "Willie McCoy"
+    },
+    {
+      "name": "Willie Miller"
+    },
+    {
+      "name": "Willie Murray Jr."
+    },
+    {
+      "name": "Willie Ray Banks"
+    },
+    {
+      "name": "Willie Temple"
+    },
+    {
+      "name": "Willie Tillman"
+    },
+    {
+      "name": "Willie Turks"
+    },
+    {
+      "name": "Willie Washington"
+    },
+    {
+      "name": "Willie Wilkins"
+    },
+    {
+      "name": "Windy Gail Thompson"
+    },
+    {
+      "name": "Winifred Rembert"
+    },
+    {
+      "name": "Winston Pounds"
+    },
+    {
+      "name": "Winston Smith"
+    },
+    {
+      "name": "Woodrow Player III"
+    },
+    {
+      "name": "Woodrow Wilson Daniels"
+    },
+    {
+      "name": "Wright, Charles; Young, Albert And An Unidentified Black Man"
+    },
+    {
+      "name": "Wyatt Outlaw"
+    },
+    {
+      "name": "Wyleek Tinsley"
+    },
+    {
+      "name": "Xavier Jones"
+    },
+    {
+      "name": "Xzavier Hill"
+    },
+    {
+      "name": "Yohans Leon"
+    },
+    {
+      "name": "Yonas Alehegne"
+    },
+    {
+      "name": "Youwus Vilpre"
+    },
+    {
+      "name": "Yusef Hawkins"
+    },
+    {
+      "name": "Yuvette Henderson"
+    },
+    {
+      "name": "Yvette Smith"
+    },
+    {
+      "name": "Yvette Williams"
+    },
+    {
+      "name": "Yvonne Smallwood"
+    },
+    {
+      "name": "Zachariah Walker"
     }
   ]
 }

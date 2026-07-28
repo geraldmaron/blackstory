@@ -1,21 +1,23 @@
 /**
- * Export memorial names + optional entity/map anchors from milestones fixture.
+ * Export memorial names + optional entity/map anchors from the active Supabase release.
  * Run from repo root:
- *   node apps/mobile/scripts/export-memorial-seed.mjs
+ *   set -a && source apps/web/.env.local && set +a
+ *   export DATABASE_SSL=1
+ *   node --conditions development --import tsx apps/mobile/scripts/export-memorial-seed.mjs
  */
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { MEMORIAL_NAMES } from '../../web/src/components/patterns/memorial-wall/memorial-names.ts';
+import { normalizePgConnectionString } from '../../../packages/ops-data/scripts/lib/pg-connection.ts';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const namesPath = resolve(
-  here,
-  '../../../apps/web/src/components/patterns/memorial-wall/memorial-names.ts',
+// `pg` is a dependency of ops-data, not the mobile app — resolve it from there.
+const requireFromOpsData = createRequire(
+  resolve(here, '../../../packages/ops-data/package.json'),
 );
-const milestonesPath = resolve(
-  here,
-  '../../../packages/ops-data/fixtures/national-catalog/memorial-milestones-2026-07-23.json',
-);
+const pg = requireFromOpsData('pg');
 const outPath = resolve(here, '../src/features/memorial/catalog-seed.json');
 
 function normalizeName(value) {
@@ -46,43 +48,57 @@ function namesMatch(a, b) {
   return ta[0] === tb[0] && ta[ta.length - 1] === tb[tb.length - 1];
 }
 
-const namesSource = readFileSync(namesPath, 'utf8');
-const namesMatchBlock = namesSource.match(/MEMORIAL_NAMES[^=]*=\s*Object\.freeze\(\[([\s\S]*?)\]\)/);
-if (!namesMatchBlock) {
-  throw new Error('Could not parse MEMORIAL_NAMES from memorial-names.ts');
+const names = [...MEMORIAL_NAMES];
+if (names.length === 0) {
+  throw new Error('MEMORIAL_NAMES import returned no names');
 }
-const names = [...namesMatchBlock[1].matchAll(/'((?:\\'|[^'])*)'|"((?:\\"|[^"])*)"/g)].map(
-  (m) => (m[1] ?? m[2]).replace(/\\'/g, "'").replace(/\\"/g, '"'),
-);
 
-const milestones = JSON.parse(readFileSync(milestonesPath, 'utf8'));
-if (!Array.isArray(milestones)) {
-  throw new Error('Memorial milestones fixture must be an array');
+const databaseUrl = process.env.DATABASE_URL?.trim() || process.env.APP_DATABASE_URL?.trim();
+if (!databaseUrl) {
+  throw new Error('DATABASE_URL (or APP_DATABASE_URL) is required — source apps/web/.env.local');
 }
+const conn = normalizePgConnectionString(databaseUrl);
+const client = new pg.Client({
+  connectionString: conn.connectionString,
+  ...(conn.ssl ? { ssl: conn.ssl } : {}),
+});
+await client.connect();
+const { rows: candidates } = await client.query(`
+  SELECT entity_id, display_name, lat, lng,
+         location->>'precision' AS location_precision,
+         projection->>'locationLabel' AS location_label,
+         projection->>'jurisdictionLabel' AS jurisdiction_label
+  FROM bb_public.release_entities
+  WHERE release_id = (SELECT release_id FROM bb_public.active_release WHERE id = 'active')
+    AND kind = 'person'
+`);
+await client.end();
 
 const alphabetical = [...names].sort((a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' }));
 
 const entries = alphabetical.map((name) => {
-  const hit = milestones.find((row) => typeof row.displayName === 'string' && namesMatch(name, row.displayName));
+  const hit = candidates.find(
+    (row) => typeof row.display_name === 'string' && namesMatch(name, row.display_name),
+  );
   if (!hit) {
     return { name };
   }
   const entry = {
     name,
-    entityId: hit.id,
+    entityId: hit.entity_id,
   };
-  if (typeof hit.locationLabel === 'string' && hit.locationLabel.trim()) {
-    entry.locationLabel = hit.locationLabel;
+  if (typeof hit.location_label === 'string' && hit.location_label.trim()) {
+    entry.locationLabel = hit.location_label;
   }
-  if (typeof hit.jurisdictionLabel === 'string' && hit.jurisdictionLabel.trim()) {
-    entry.placeLabel = hit.jurisdictionLabel;
+  if (typeof hit.jurisdiction_label === 'string' && hit.jurisdiction_label.trim()) {
+    entry.placeLabel = hit.jurisdiction_label;
   }
   if (typeof hit.lat === 'number' && typeof hit.lng === 'number') {
     entry.lat = hit.lat;
     entry.lng = hit.lng;
   }
-  if (typeof hit.locationPrecision === 'string') {
-    entry.locationPrecision = hit.locationPrecision;
+  if (typeof hit.location_precision === 'string') {
+    entry.locationPrecision = hit.location_precision;
   }
   return entry;
 });

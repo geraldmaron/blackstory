@@ -105,3 +105,8 @@ plan.md
 .claude/
 inbox/
 .vercel
+
+# Entity/content data lives only in Supabase — never commit it (repo-8xcc).
+packages/ops-data/fixtures/national-catalog/
+packages/ops-data/fixtures/person-commemorative-locations.json
+packages/ops-data/fixtures/national-catalog-location-overrides.json

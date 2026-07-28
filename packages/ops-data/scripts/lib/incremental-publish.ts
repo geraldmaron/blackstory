@@ -2,8 +2,6 @@
  * Pure helpers for gated incremental upsert into bb_public.release_entities (+ search_index).
  * Used by publish-release-entities-incremental.ts and unit tests — no database I/O.
  */
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import {
   US_STATES,
   buildReleaseEntityArtifacts,
@@ -207,7 +205,6 @@ export function buildReleaseSourceFromLandscape(row: LandscapePublishRow): Relea
 
 export function gateLandscapePublishCandidate(input: {
   readonly row: LandscapePublishRow;
-  readonly catalogEntry?: ReleaseSourceEntity;
   readonly releaseId: string;
   readonly generatedAt: string;
   readonly confidenceFloor?: number;
@@ -242,9 +239,7 @@ export function gateLandscapePublishCandidate(input: {
     return { eligible: false, reason: 'name_overlap', detail: 'display_name overlaps existing release entity' };
   }
 
-  const entry =
-    input.catalogEntry ??
-    buildReleaseSourceFromLandscape(row);
+  const entry = buildReleaseSourceFromLandscape(row);
   if (!entry) {
     return {
       eligible: false,
@@ -306,7 +301,9 @@ export function toSearchIndexRow(
   geohash: string,
 ): SearchIndexUpsertRow {
   return {
-    id: searchIndex.id,
+    // Composite id matches the primary release publisher; a plain entity id here
+    // creates a second search row for entities that already have a composite-id row.
+    id: `${searchIndex.releaseId}:${searchIndex.id}`,
     release_id: searchIndex.releaseId,
     entity_id: searchIndex.id,
     name: searchIndex.displayName,
@@ -348,22 +345,6 @@ export function buildArtifactsForEntry(input: {
   const entityRow = toReleaseEntityRow(build.projection);
   const searchRow = toSearchIndexRow(build.searchIndex, build.projection.location.geohash);
   return { ok: true, entityRow, searchRow };
-}
-
-export function loadCatalogEntriesById(catalogDir: string): Map<string, ReleaseSourceEntity> {
-  const index = new Map<string, ReleaseSourceEntity>();
-  if (!existsSync(catalogDir)) return index;
-  for (const file of readdirSync(catalogDir).filter((name) => name.endsWith('.json')).sort()) {
-    if (file.startsWith('auto-promoted-track-b-')) continue;
-    const parsed = JSON.parse(readFileSync(join(catalogDir, file), 'utf8')) as unknown;
-    if (!Array.isArray(parsed)) continue;
-    for (const entry of parsed) {
-      if (entry && typeof entry === 'object' && typeof (entry as { id?: string }).id === 'string') {
-        index.set((entry as ReleaseSourceEntity).id, entry as ReleaseSourceEntity);
-      }
-    }
-  }
-  return index;
 }
 
 export function incrementalPublishProvenancePatch(entityId: string): Record<string, unknown> {

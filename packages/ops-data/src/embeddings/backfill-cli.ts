@@ -2,8 +2,7 @@
  * Budget-aware bulk (re)embedding CLI for entity corpora.
  *
  * Default live source is `publicSearchIndex` (prod often has searchable projections before
- * `canonicalEntities` is filled). Fixtures and canonical sources remain available via
- * `--source`. Run:
+ * `canonicalEntities` is filled). The canonical source remains available via `--source`. Run:
  * GEMINI_API_KEY=... node --conditions development --import tsx \
  * packages/ops-data/src/embeddings/backfill-cli.ts --source=publicSearchIndex \
  * --max-items 500 --max-cost-usd 1
@@ -12,14 +11,9 @@
  * fully unit-testable without Firestore or network access; only the `if (import.meta.url...)`
  * block at the bottom touches real infrastructure.
  */
-import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import type { Firestore } from 'firebase-admin/firestore';
 import { createServerFirebaseApp } from '../server.js';
-import {
-  createFirestorePublicSearchIndexEntitySource,
-  createNationalCatalogFixtureEntitySource,
-} from './backfill-sources.js';
+import { createFirestorePublicSearchIndexEntitySource } from './backfill-sources.js';
 import { EMBEDDING_DIMS } from './constants.js';
 import { createGeminiEmbeddingProvider } from './gemini-provider.js';
 import {
@@ -221,30 +215,22 @@ export function createFirestoreExistingHashLookup(
   };
 }
 
-export type BackfillEntitySourceName = 'publicSearchIndex' | 'canonicalEntities' | 'fixtures';
-
-const DEFAULT_FIXTURES_DIR = join(
-  dirname(fileURLToPath(import.meta.url)),
-  '../../fixtures/national-catalog',
-);
+export type BackfillEntitySourceName = 'publicSearchIndex' | 'canonicalEntities';
 
 function parseArgs(argv: readonly string[]): {
   maxItems?: number;
   maxCostUsd?: number;
   force: boolean;
   source: BackfillEntitySourceName;
-  fixturesDir: string;
 } {
   const result: {
     maxItems?: number;
     maxCostUsd?: number;
     force: boolean;
     source: BackfillEntitySourceName;
-    fixturesDir: string;
   } = {
     force: false,
     source: 'publicSearchIndex',
-    fixturesDir: DEFAULT_FIXTURES_DIR,
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -253,23 +239,20 @@ function parseArgs(argv: readonly string[]): {
     else if (arg === '--force') result.force = true;
     else if (arg === '--source') {
       const value = argv[++index] as BackfillEntitySourceName;
-      if (value !== 'publicSearchIndex' && value !== 'canonicalEntities' && value !== 'fixtures') {
+      if (value !== 'publicSearchIndex' && value !== 'canonicalEntities') {
         throw new Error(
-          `--source must be publicSearchIndex|canonicalEntities|fixtures (got ${String(value)})`,
+          `--source must be publicSearchIndex|canonicalEntities (got ${String(value)})`,
         );
       }
       result.source = value;
     } else if (arg?.startsWith('--source=')) {
       const value = arg.slice('--source='.length) as BackfillEntitySourceName;
-      if (value !== 'publicSearchIndex' && value !== 'canonicalEntities' && value !== 'fixtures') {
+      if (value !== 'publicSearchIndex' && value !== 'canonicalEntities') {
         throw new Error(
-          `--source must be publicSearchIndex|canonicalEntities|fixtures (got ${String(value)})`,
+          `--source must be publicSearchIndex|canonicalEntities (got ${String(value)})`,
         );
       }
       result.source = value;
-    } else if (arg === '--fixtures-dir') result.fixturesDir = resolve(argv[++index] ?? '');
-    else if (arg?.startsWith('--fixtures-dir=')) {
-      result.fixturesDir = resolve(arg.slice('--fixtures-dir='.length));
     }
   }
   return result;
@@ -277,13 +260,11 @@ function parseArgs(argv: readonly string[]): {
 
 function resolveEntitySource(
   firestore: Firestore,
-  args: { source: BackfillEntitySourceName; fixturesDir: string },
+  args: { source: BackfillEntitySourceName },
 ): CanonicalEntitySource {
   switch (args.source) {
     case 'canonicalEntities':
       return createFirestoreCanonicalEntitySource(firestore);
-    case 'fixtures':
-      return createNationalCatalogFixtureEntitySource(args.fixturesDir);
     case 'publicSearchIndex':
     default:
       return createFirestorePublicSearchIndexEntitySource(firestore);
@@ -310,7 +291,6 @@ async function mainCli(argv: string[]): Promise<void> {
     JSON.stringify(
       {
         source: args.source,
-        ...(args.source === 'fixtures' ? { fixturesDir: args.fixturesDir } : {}),
         ...summary,
       },
       null,
