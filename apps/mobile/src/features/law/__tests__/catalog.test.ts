@@ -34,8 +34,15 @@ describe('law catalog', () => {
     expect(parseLawSlug('../evil')).toBeNull();
   });
 
-  it('omits seed-only entity ids from public catalog', () => {
+  it('carries canonical entity ids that exist in the Supabase release', () => {
+    // Seed is exported from bb_public.release_legal_snapshots, and the loader
+    // rejects any link absent from the active release, so no ent_seed_* fictions.
     const cra = getLawBySlug('civil-rights-act-1964');
-    expect(cra?.canonicalEntityId).toBeUndefined();
+    expect(cra?.canonicalEntityId).toBe('ent_law_civil_rights_act_1964');
+    expect(
+      loadLawCatalog().entries.every(
+        (entry) => !entry.canonicalEntityId?.startsWith('ent_seed_'),
+      ),
+    ).toBe(true);
   });
 });
