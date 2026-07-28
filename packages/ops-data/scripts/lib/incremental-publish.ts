@@ -38,6 +38,7 @@ export type PublishGateSkipReason =
   | 'already_in_public'
   | 'name_overlap'
   | 'missing_canonical_url'
+  | 'summary_too_short'
   | 'build_failed'
   | 'confidence_below_floor';
 
@@ -199,6 +200,13 @@ export function buildReleaseSourceFromLandscape(row: LandscapePublishRow): Relea
     // keep fallback
   }
 
+  // Operator-attested living status from the privacy review marker (person rows).
+  const review = asRecord(row.payload.personReview);
+  const livingStatus =
+    review.livingStatus === 'deceased' || review.livingStatus === 'living' || review.livingStatus === 'unknown'
+      ? review.livingStatus
+      : undefined;
+
   const claim: ReleaseSourceClaim = {
     predicate: 'documented_site',
     object: summary,
@@ -213,6 +221,7 @@ export function buildReleaseSourceFromLandscape(row: LandscapePublishRow): Relea
     kind: row.kind,
     displayName,
     summary,
+    ...(livingStatus !== undefined ? { livingStatus } : {}),
     jurisdictionLabel: jurisdictionFromProvenance(provenance),
     locationPrecision: 'site',
     locationLabel: locationLabelFromProvenance(displayName, provenance),
@@ -266,6 +275,15 @@ export function gateLandscapePublishCandidate(input: {
       eligible: false,
       reason: 'missing_canonical_url',
       detail: 'insufficient landscape fields to build release source',
+    };
+  }
+  // publicEntityProjectionSchema requires summary 120..400 chars; anything
+  // outside that range would publish an unparseable (invisible) projection.
+  if (entry.summary.length < 120 || entry.summary.length > 400) {
+    return {
+      eligible: false,
+      reason: 'summary_too_short',
+      detail: `summary length ${entry.summary.length} outside projection schema bounds 120..400`,
     };
   }
 

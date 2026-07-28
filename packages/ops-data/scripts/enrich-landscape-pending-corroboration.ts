@@ -68,8 +68,17 @@ SELECT
   ) AS name_overlap
 FROM bb_research.landscape_candidates lc
 WHERE lc.status = 'pending'
-  AND lc.kind <> 'person'
-  AND COALESCE(lc.provenance->>'sourceCategory', lc.payload->'provenance'->>'sourceCategory') <> 'People'
+  -- Persons/People stay excluded unless an operator recorded a privacy review
+  -- (payload.personReview), mirroring gateLandscapePublishCandidate. The
+  -- IS DISTINCT FROM keeps rows with no sourceCategory at all in scope.
+  AND (
+    (lc.payload->'personReview'->>'approved')::boolean IS TRUE
+    OR (
+      lc.kind <> 'person'
+      AND COALESCE(lc.provenance->>'sourceCategory', lc.payload->'provenance'->>'sourceCategory')
+        IS DISTINCT FROM 'People'
+    )
+  )
 ORDER BY lc.id
 `;
 
