@@ -71,14 +71,6 @@ interface CpsSeriesDraft {
   readonly raceEthnicitySlice: string | null;
 }
 
-type CsvRow = {
-  year: number;
-  white_non_hispanic_citizen_pct: number | null;
-  black_citizen_pct: number | null;
-  asian_citizen_pct: number | null;
-  hispanic_citizen_pct: number | null;
-};
-
 function arg(name: string): string | undefined {
   const hit = process.argv.find((a) => a.startsWith(`--${name}=`));
   return hit ? hit.slice(name.length + 3) : undefined;
