@@ -12,6 +12,7 @@ import { SynchronizedResultList } from '../../../components/map-experience/Synch
 import { getSharedPublicEntities } from '../shared-map-data';
 import { ExploreMapExperience } from './ExploreMapExperience';
 import { buildExploreViewModel } from './explore-view-model';
+import { toSerializableExploreViewModel } from './explore-view-model-wire';
 import '../../../components/patterns/browse-mode.css';
 import '../../../components/patterns/edition-fact-icon.css';
 import '../../../components/patterns/record-anatomy.css';
@@ -111,7 +112,7 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
         </div>
       </noscript>
 
-      <ExploreMapExperience initial={view} />
+      <ExploreMapExperience initial={toSerializableExploreViewModel(view)} />
     </>
   );
 }
