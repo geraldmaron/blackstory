@@ -126,6 +126,13 @@
    * over the page header and real pointer clicks miss it, so "View interactive map" appears dead
    * even though the engage wiring is correct (bead repo-gsl7). */
   min-height: 14rem;
+  /* The base rule (`map-surfaces.css`) sets `height: 100dvh` and a `#080606` "pre-style-load
+   * flash" background for MapStage's full-viewport persistent plate. Neither is overridden by
+   * repositioning alone: `position: relative` still honors an explicit `height`, so without these
+   * two resets this in-flow figure inherits a full-viewport-tall box and shows that near-black
+   * fallback color as a giant gutter beneath the actual (correctly 14rem-tall) map frame. */
+  height: auto;
+  background: none;
 }
 
 /* Rest/Invite: locked, natural page scroll (spec §1/§2 rule 2). */
