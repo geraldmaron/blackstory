@@ -150,6 +150,29 @@ test('createPostgresDataAccessReaders uses search index when present', async () 
   assert.equal(page.results[0]?.id, sampleProjection.id);
 });
 
+test('createPostgresDataAccessReaders caches readEntities per release id', async () => {
+  let queryCalls = 0;
+  const baseQuery = createFakeQuery({
+    entities: new Map([[`${RELEASE_ID}:${sampleProjection.id}`, sampleProjection]]),
+  });
+  const countingQuery: PostgresQueryFn = async (sql, params) => {
+    if (sql.includes('bb_public.release_entities') && sql.includes('ORDER BY entity_id')) {
+      queryCalls += 1;
+    }
+    return baseQuery(sql, params);
+  };
+
+  const readers = createPostgresDataAccessReaders({ query: countingQuery });
+  const access = createPublicDataAccessFromReaders(readers);
+
+  const first = await access.listEntities(RELEASE_ID);
+  const second = await access.listEntities(RELEASE_ID);
+
+  assert.equal(queryCalls, 1, 'second call within the TTL window must hit the cache, not Postgres');
+  assert.equal(first.length, 1);
+  assert.deepEqual(second, first);
+});
+
 test('mapPublicSearchProjection preserves domain search fields', () => {
   const mapped = mapPublicSearchProjection({
     id: sampleProjection.id,
