@@ -13,6 +13,7 @@ import {
   type CaptureDeps,
   type CaptureSurface,
   type CitedUrl,
+  sourceIdForUrl,
   type SourceCaptureRow,
   type RetrievalEventRow,
 } from './source-capture.js';
@@ -115,6 +116,17 @@ export async function persistCapture(
     deduped = inserted.rows.length === 0;
   }
   const status = deduped ? 'skipped_duplicate' : event.status;
+  // retrieval_events.source_id is a FK into the per-hostname evidence_sources registry,
+  // so register the host before the event insert or the FK rejects the whole capture.
+  const source = sourceIdForUrl(String(event.detail.url ?? ''));
+  if (source && source.id === event.sourceId) {
+    await db.query(
+      `INSERT INTO bb_evidence.evidence_sources (id, display_name, adapter_id, adapter_enabled)
+       VALUES ($1, $2, $3, false)
+       ON CONFLICT (id) DO NOTHING`,
+      [source.id, source.hostname, event.adapterId],
+    );
+  }
   await db.query(
     `INSERT INTO bb_evidence.retrieval_events
        (id, source_id, adapter_id, status, http_status, detail, occurred_at)

@@ -12,10 +12,28 @@
  * raw bytes. When no blob store is configured we persist metadata-only (hash + excerpt),
  * which still anchors the claim; a GCS writer can be injected to store the full snapshot.
  */
+import { createHash } from 'node:crypto';
 import type { SafeFetchResult } from '@repo/security/url-safety';
 
 /** The three cited-URL surfaces the backfill walks. */
 export type CaptureSurface = 'entity' | 'packet' | 'article';
+
+/**
+ * retrieval_events.source_id is a foreign key into bb_evidence.evidence_sources — a
+ * registry keyed per citing *hostname*, not per citing record. Derive a stable id from
+ * the URL's host so every capture from the same domain converges on one registry row,
+ * instead of the citing entity/packet/article id (which evidence_sources never contains).
+ */
+export function sourceIdForUrl(url: string): { readonly id: string; readonly hostname: string } | null {
+  let hostname: string;
+  try {
+    hostname = new URL(url).hostname.toLowerCase();
+  } catch {
+    return null;
+  }
+  const id = `src_web_${createHash('sha256').update(hostname).digest('hex').slice(0, 32)}`;
+  return { id, hostname };
+}
 
 export type CitedUrl = {
   readonly url: string;
@@ -173,7 +191,7 @@ export async function captureCitedUrl(ref: CitedUrl, deps: CaptureDeps): Promise
       capture: null,
       retrievalEvent: {
         id: deps.newId('rev', `${ref.url}|fail|${occurredAt}`),
-        sourceId: ref.refId,
+        sourceId: sourceIdForUrl(ref.url)?.id ?? ref.refId,
         adapterId: 'capture-backfill',
         status: 'failure',
         httpStatus: null,
@@ -225,7 +243,7 @@ export async function buildCaptureFromFetch(
     },
     retrievalEvent: {
       id: deps.newId('rev', `${ref.url}|ok|${occurredAt}`),
-      sourceId: ref.refId,
+      sourceId: sourceIdForUrl(ref.url)?.id ?? ref.refId,
       adapterId,
       status: 'success',
       httpStatus: 200,
