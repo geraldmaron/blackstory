@@ -7,6 +7,7 @@ import { test } from 'node:test';
 import type { ExploreMapFeature } from './build-explore-map-source';
 import {
   applyExploreFilters,
+  buildEntityDecadeCounts,
   buildExploreFacetOptions,
   DEFAULT_EXPLORE_FILTERS,
   filterFeaturesInBounds,
@@ -260,4 +261,19 @@ test('filterFeaturesInBounds handles antimeridian-crossing extents', () => {
     north: 10,
   });
   assert.deepEqual(wrapped.map((f) => f.properties.entityId).sort(), ['east', 'west']);
+});
+
+test('buildEntityDecadeCounts returns chronological decade buckets with counts', () => {
+  const features: ExploreMapFeature[] = [
+    feature({ entityId: 'a', eraBuckets: ['1950s', '1960s'] }),
+    feature({ entityId: 'b', eraBuckets: ['1960s'] }),
+    feature({ entityId: 'c', eraBuckets: ['1890s'] }),
+    feature({ entityId: 'd', eraBuckets: [] }),
+  ];
+
+  assert.deepEqual(buildEntityDecadeCounts(features), [
+    { decade: '1890s', count: 1 },
+    { decade: '1950s', count: 1 },
+    { decade: '1960s', count: 2 },
+  ]);
 });
