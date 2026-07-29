@@ -136,7 +136,10 @@ import {
   shouldAcceptExploreServerViewState,
   type ExploreLeftTab,
 } from './explore-panel-chrome';
-import type { ExploreViewModel } from './explore-view-model';
+import {
+  hydrateExploreViewModel,
+  type SerializableExploreViewModel,
+} from './explore-view-model-wire';
 
 function isExploreSinglePanelViewport(): boolean {
   if (typeof window === 'undefined') return false;
@@ -144,7 +147,7 @@ function isExploreSinglePanelViewport(): boolean {
 }
 
 export type ExploreMapExperienceProps = {
-  readonly initial: ExploreViewModel;
+  readonly initial: SerializableExploreViewModel;
 };
 
 const TRANSITION_FLAG = 'ds-map-transition';
@@ -301,17 +304,20 @@ function resolveNear(
   return {};
 }
 
-/** Facet render order matches how people narrow: what (kind/tone) → when (era) → about
- * (theme) → lifecycle (status) → evidence strength (confidence) → where (state). */
-const FACET_ROWS: readonly {
+type FacetRow = {
   readonly key: keyof ExploreFilterState;
   readonly label: string;
   readonly field: 'kind' | 'tone' | 'era' | 'theme' | 'status' | 'confidence';
-}[] = [
-  { key: 'kind', label: 'Kind', field: 'kind' },
+};
+
+/** Primary narrowing lives on three visible controls: Kind (segment strip), Theme, Where.
+ * Era moved to the always-visible decade rail over the map. */
+const PRIMARY_FACET_ROWS: readonly FacetRow[] = [{ key: 'theme', label: 'Theme', field: 'theme' }];
+
+/** Archival instruments (tone / lifecycle / evidence tier) stay URL-addressable but sit
+ * behind the More filters disclosure — most readers never need them. */
+const ADVANCED_FACET_ROWS: readonly FacetRow[] = [
   { key: 'tone', label: 'Tone', field: 'tone' },
-  { key: 'era', label: 'Era', field: 'era' },
-  { key: 'theme', label: 'Theme', field: 'theme' },
   { key: 'status', label: 'Status', field: 'status' },
   { key: 'confidence', label: 'Confidence', field: 'confidence' },
 ];
@@ -367,7 +373,7 @@ function ExploreMapExperienceBody({ initial }: ExploreMapExperienceProps) {
   const cinematic = useCinematicMap();
   const stageRef = useRef(stage);
   stageRef.current = stage;
-  const [view, setView] = useState(initial);
+  const [view, setView] = useState(() => hydrateExploreViewModel(initial));
   const filterRegionRef = useRef<HTMLDivElement | null>(null);
   const spotlightDialogRef = useRef<HTMLDialogElement | null>(null);
   const spotlightPanelRef = useRef<HTMLDivElement | null>(null);
@@ -442,7 +448,7 @@ function ExploreMapExperienceBody({ initial }: ExploreMapExperienceProps) {
       return;
     }
     lastPushedHrefRef.current = incomingHref;
-    setView(initial);
+    setView(hydrateExploreViewModel(initial));
     viewStateRef.current = initial.viewState;
     urlRadiusAppliedRef.current = null;
   }, [initial]);
@@ -713,6 +719,12 @@ function ExploreMapExperienceBody({ initial }: ExploreMapExperienceProps) {
     view.viewState.filters.status !== DEFAULT_EXPLORE_FILTERS.status ||
     view.viewState.filters.confidence !== DEFAULT_EXPLORE_FILTERS.confidence ||
     Boolean(view.viewState.state);
+
+  /** Deep links carrying an archival filter keep the More filters disclosure open. */
+  const hasAdvancedFilters =
+    view.viewState.filters.tone !== DEFAULT_EXPLORE_FILTERS.tone ||
+    view.viewState.filters.status !== DEFAULT_EXPLORE_FILTERS.status ||
+    view.viewState.filters.confidence !== DEFAULT_EXPLORE_FILTERS.confidence;
 
   // Deterministic reading order for the accessible list (chronological, undated
   // last). A finite place-search radius may scope the list; "All" and no place focus
@@ -1389,18 +1401,41 @@ function ExploreMapExperienceBody({ initial }: ExploreMapExperienceProps) {
     );
   }, [commitViewState, view.viewState]);
 
-  const handleDecadeSelect = useCallback(
+  /** Decade rail: one control owns "when". Sets the era pin filter and keeps the
+   * relationship-line slice on the same decade (all-time when no slice exists). */
+  const handleDecadeRailSelect = useCallback(
     (decade: string | undefined) => {
       commitViewState(
         mergeViewState(view.viewState, {
-          lines: true,
-          clearEdge: true,
+          filters: { ...view.viewState.filters, era: decade ?? 'all' },
           ...(decade ? { decade } : { clearDecade: true }),
         }),
       );
     },
     [commitViewState, view.viewState],
   );
+
+  const handleDecadeStep = useCallback(
+    (direction: 1 | -1) => {
+      const stops = ['all', ...view.entityDecades.map((entry) => entry.decade)];
+      const currentIndex = Math.max(0, stops.indexOf(view.viewState.filters.era));
+      const nextIndex = Math.min(stops.length - 1, Math.max(0, currentIndex + direction));
+      const next = stops[nextIndex];
+      if (next !== undefined && next !== stops[currentIndex]) {
+        handleDecadeRailSelect(next === 'all' ? undefined : next);
+      }
+    },
+    [handleDecadeRailSelect, view.entityDecades, view.viewState.filters.era],
+  );
+
+  // Keep the active decade tab visible as the reader steps or deep-links across the rail.
+  const decadeRailListRef = useRef<HTMLUListElement | null>(null);
+  useEffect(() => {
+    const active = decadeRailListRef.current?.querySelector<HTMLElement>(
+      '[aria-selected="true"]',
+    );
+    active?.scrollIntoView({ inline: 'center', block: 'nearest' });
+  }, [view.viewState.filters.era]);
 
   const handleEdgeSelect = useCallback(
     (edgeId: string) => {
@@ -1566,6 +1601,57 @@ function ExploreMapExperienceBody({ initial }: ExploreMapExperienceProps) {
         <CinematicMapClose />
       </div>
 
+      {cinematic.state === 'engaged' && view.entityDecades.length > 0 ? (
+        <nav className="ds-explore-stage__decade-dock" aria-label="Browse records by decade">
+          <button
+            type="button"
+            className="ds-explore-stage__decade-step"
+            aria-label="Earlier decade"
+            onClick={() => handleDecadeStep(-1)}
+          >
+            <span aria-hidden="true">&#8249;</span>
+          </button>
+          <ul className="ds-explore-stage__decade-scroll" role="tablist" ref={decadeRailListRef}>
+            <li role="presentation">
+              <button
+                type="button"
+                role="tab"
+                className="ds-explore-edition__decade-tab"
+                aria-selected={view.viewState.filters.era === 'all'}
+                onClick={() => handleDecadeRailSelect(undefined)}
+              >
+                All time
+              </button>
+            </li>
+            {view.entityDecades.map(({ decade, count }) => (
+              <li key={decade} role="presentation">
+                <button
+                  type="button"
+                  role="tab"
+                  className="ds-explore-edition__decade-tab"
+                  aria-selected={view.viewState.filters.era === decade}
+                  onClick={() => handleDecadeRailSelect(decade)}
+                >
+                  {decade}
+                  <span className="ds-explore-stage__decade-count" aria-hidden="true">
+                    {count}
+                  </span>
+                  <span className="ds-visually-hidden">{count} records</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+          <button
+            type="button"
+            className="ds-explore-stage__decade-step"
+            aria-label="Later decade"
+            onClick={() => handleDecadeStep(1)}
+          >
+            <span aria-hidden="true">&#8250;</span>
+          </button>
+        </nav>
+      ) : null}
+
       {!stage.mapAvailable && degradedCopy ? (
         <div className="ds-explore-stage__notice">
           <Notice tone="warning" title="Map unavailable">
@@ -1698,7 +1784,27 @@ function ExploreMapExperienceBody({ initial }: ExploreMapExperienceProps) {
             </div>
           ) : null}
           <div className="ds-explore__facets" role="group" aria-labelledby="explore-facets-heading">
-            {FACET_ROWS.map(({ key, label, field }) => (
+            <fieldset className="ds-explore-edition__segment-field">
+              <legend className="ds-explore-edition__segment-label">Kind</legend>
+              <div
+                className="ds-explore-edition__segment-strip ds-explore__kind-strip"
+                role="group"
+                aria-label="Record kind"
+              >
+                {view.facetOptions.kind.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    className="ds-explore-edition__segment"
+                    aria-pressed={view.viewState.filters.kind === option.value}
+                    onClick={() => handleFilterChange('kind', option.value)}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+            {PRIMARY_FACET_ROWS.map(({ key, label, field }) => (
               <label
                 className="ds-pill-select ds-explore__facet"
                 key={key}
@@ -1740,6 +1846,37 @@ function ExploreMapExperienceBody({ initial }: ExploreMapExperienceProps) {
                 </select>
               </label>
             ) : null}
+            <details
+              className="ds-explore-stage__disclosure"
+              open={hasAdvancedFilters}
+            >
+              <summary className="ds-explore-stage__disclosure-summary">More filters</summary>
+              <div className="ds-explore__facets ds-explore__facets--advanced">
+                {ADVANCED_FACET_ROWS.map(({ key, label, field }) => (
+                  <label
+                    className="ds-pill-select ds-explore__facet"
+                    key={key}
+                    htmlFor={`explore-${key}`}
+                  >
+                    <MetaFieldLabel field={field} as="span" className="ds-pill-select__label">
+                      {label}
+                    </MetaFieldLabel>
+                    <select
+                      className="ds-pill-select__control"
+                      id={`explore-${key}`}
+                      value={view.viewState.filters[key]}
+                      onChange={(event) => handleFilterChange(key, event.currentTarget.value)}
+                    >
+                      {view.facetOptions[key].map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ))}
+              </div>
+            </details>
             {hasActiveFilters ? (
               <button
                 type="button"
@@ -1835,37 +1972,10 @@ function ExploreMapExperienceBody({ initial }: ExploreMapExperienceProps) {
                 </fieldset>
 
                 {view.viewState.lines ? (
-                  <fieldset className="ds-explore__settings-fieldset">
-                    <legend className="ds-sans">Decade</legend>
-                    <nav className="ds-explore-edition__decade-stepper" aria-label="Line decade">
-                      <ul className="ds-explore-edition__decade-list" role="tablist">
-                        <li role="presentation">
-                          <button
-                            type="button"
-                            role="tab"
-                            className="ds-explore-edition__decade-tab"
-                            aria-selected={!view.viewState.decade}
-                            onClick={() => handleDecadeSelect(undefined)}
-                          >
-                            All time
-                          </button>
-                        </li>
-                        {view.availableDecades.map((decade) => (
-                          <li key={decade} role="presentation">
-                            <button
-                              type="button"
-                              role="tab"
-                              className="ds-explore-edition__decade-tab"
-                              aria-selected={view.viewState.decade === decade}
-                              onClick={() => handleDecadeSelect(decade)}
-                            >
-                              {decade}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    </nav>
-                  </fieldset>
+                  <p className="ds-sans ds-explore__settings-note">
+                    Lines follow the decade rail beneath the map: pick a decade there to see
+                    only that decade&apos;s connections.
+                  </p>
                 ) : null}
 
                 <p className="ds-sans">

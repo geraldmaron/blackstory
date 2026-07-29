@@ -124,6 +124,14 @@ export function EntityLocationMap({
           cooperativeGestures: true,
         });
         mapRef.current = map;
+        // MapLibre's compact `AttributionControl` mounts pre-expanded (the `<details>` it
+        // renders gets an `open` attribute on first paint, see maplibre-gl's
+        // `_updateCompact`) — it only auto-collapses again once the map is dragged. Force it
+        // shut immediately so this small locator plate opens closed by default, matching every
+        // other compact control on the page.
+        const attribution = container.querySelector('details.maplibregl-ctrl-attrib');
+        attribution?.removeAttribute('open');
+        attribution?.classList.remove('maplibregl-compact-show');
         map.once('load', () => {
           if (cancelled) return;
           contextRecovery = bindWebGlContextRecovery(

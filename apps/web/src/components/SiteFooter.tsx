@@ -31,7 +31,11 @@ export function SiteFooter() {
                 <ul className="ds-shell-footer__links">
                   {column.items.map((item) => (
                     <li key={item.href}>
-                      <Link href={item.href}>{item.label}</Link>
+                      {/* Footer nav mounts on every route; skip the default viewport prefetch
+                          so it doesn't compete with whatever the current page actually needs. */}
+                      <Link href={item.href} prefetch={false}>
+                        {item.label}
+                      </Link>
                     </li>
                   ))}
                 </ul>

@@ -15,10 +15,12 @@ import {
 } from '../../../lib/history/build-history-graph';
 import {
   applyExploreFilters,
+  buildEntityDecadeCounts,
   buildExploreFacetOptions,
   buildHistoryEdgeLineCollection,
   buildStateDensityLevels,
   parseExploreSearchParams,
+  type EntityDecadeCount,
   type ExploreFacetOptions,
   type ExploreViewState,
   type RawExploreSearchParams,
@@ -48,6 +50,8 @@ export type ExploreViewModel = {
   readonly totalMatched: number;
   readonly dataSource: PublicReadSource;
   readonly availableDecades: readonly string[];
+  /** Chronological decade buckets with record counts — drives the decade rail. */
+  readonly entityDecades: readonly EntityDecadeCount[];
   /** All-time + per-decade edge/line catalogs for client toggles without graph rebuild.  */
   readonly edgeLineCatalog: ExploreEdgeLineCatalog;
   readonly historyEdges: readonly HistoryEdgeView[];
@@ -132,6 +136,7 @@ export function buildExploreViewModel(
     totalMatched: filteredFeatures.length,
     dataSource,
     availableDecades,
+    entityDecades: buildEntityDecadeCounts(allFeatures),
     edgeLineCatalog,
     historyEdges: active.edges,
     edgeLineCollection: active.lineCollection,

@@ -27,6 +27,7 @@ export function EntityLink({ entityId, children, className }: EntityLinkProps) {
     <Link
       href={`/entity/${entityId}`}
       className={className ? `ds-entity-link ${className}` : 'ds-entity-link'}
+      prefetch={false}
     >
       {children}
     </Link>

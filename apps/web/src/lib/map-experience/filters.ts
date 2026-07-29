@@ -246,6 +246,23 @@ export function buildExploreFacetOptions(
   };
 }
 
+export type EntityDecadeCount = { readonly decade: string; readonly count: number };
+
+/**
+ * Chronological decade buckets with record counts across the given features — drives the
+ * always-visible explore decade rail. Era derivation already falls back from explicit
+ * `eraBuckets` to event/status spans (see `build-explore-map-source.ts`), so coverage spans
+ * nearly the whole catalog, not just records with hand-authored era buckets.
+ */
+export function buildEntityDecadeCounts(
+  features: readonly ExploreMapFeature[],
+): readonly EntityDecadeCount[] {
+  const counts = countBy(features, (feature) => feature.properties.eraBuckets);
+  return Object.entries(counts)
+    .map(([decade, count]) => ({ decade, count }))
+    .sort((a, b) => a.decade.localeCompare(b.decade, undefined, { numeric: true }));
+}
+
 /** Earliest era-bucket start year for chronological ordering; undated records sort last. */
 function earliestEraYear(feature: ExploreMapFeature): number {
   let earliest = Number.POSITIVE_INFINITY;

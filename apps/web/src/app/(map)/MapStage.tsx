@@ -1020,6 +1020,12 @@ export function MapStageProvider({
    * GeoJSON setData / tile fetches flip that false and force the snap path (full refresh).
    */
   const mapStyleReadyRef = useRef(false);
+  /** Latest apply options waiting for the style to settle — null when nothing is pending. */
+  const pendingStyleApplyRef = useRef<Parameters<typeof applyStyleAndData>[0] | null>(null);
+  /** True while a one-shot `idle` listener for a deferred apply is registered. */
+  const pendingStyleApplyListenerRef = useRef(false);
+  /** Stable handle so the deferred `idle` callback always runs the current apply closure. */
+  const applyStyleAndDataRef = useRef<((options?: Parameters<typeof applyStyleAndData>[0]) => void) | null>(null);
   const memorialFeaturesRef = useRef(
     MEMORIAL_NAMES_MAP_LAYER_ENABLED
       ? buildMemorialNameFeatures({ seedKey: 'map-stage' })
@@ -1164,7 +1170,25 @@ export function MapStageProvider({
       readonly skipPrimaryDensityLoad?: boolean;
     }) => {
       const map = mapRef.current;
-      if (!map || !map.isStyleLoaded()) return;
+      if (!map) return;
+      // Gate on the latched `load` flag, NOT `isStyleLoaded()` — that getter flips false during
+      // routine GeoJSON/tile work (and can sit false indefinitely on slow tile hosts), which
+      // silently dropped whole applies: layer-mode flips, filter patches, choropleth joins.
+      if (!mapStyleReadyRef.current) {
+        // Pre-`load` window: hold the latest requested options; the `load` handler re-applies.
+        pendingStyleApplyRef.current = options ?? {};
+        if (!pendingStyleApplyListenerRef.current) {
+          pendingStyleApplyListenerRef.current = true;
+          map.once('load', () => {
+            pendingStyleApplyListenerRef.current = false;
+            const pending = pendingStyleApplyRef.current;
+            pendingStyleApplyRef.current = null;
+            if (pending) applyStyleAndDataRef.current?.(pending);
+          });
+        }
+        return;
+      }
+      pendingStyleApplyRef.current = null;
       try {
         // Geography layers stay mounted — in-place setData + paint/layout sync.
         // Remove/re-add was cheap CPU-wise but read as a full map refresh and
@@ -1210,6 +1234,7 @@ export function MapStageProvider({
     },
     [startSelectedEntityPulse, stopSelectedEntityPulse, syncEntityMarkers],
   );
+  applyStyleAndDataRef.current = applyStyleAndData;
 
   const syncPlatePaintToTheme = useCallback(
     (map: MapLibreMap, style: StyleSpecification, scheme: MapColorScheme) => {

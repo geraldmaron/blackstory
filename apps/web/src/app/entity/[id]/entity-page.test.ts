@@ -41,10 +41,18 @@ test('entity page preserves session nav and force-dynamic routing', () => {
   assert.match(pageSource, /export const dynamic = 'force-dynamic'/);
 });
 
-test('entity sections use RecordGapNotice fail states for sparse content', () => {
-  assert.match(sectionsSource, /RecordGapNotice kind="relevance"/);
-  assert.match(sectionsSource, /RecordGapNotice kind="context"/);
-  assert.match(sectionsSource, /RecordGapNotice kind="claims"/);
+test('entity sections gate beats on content and disclose gaps once via approved copy', () => {
+  // Adaptive stack: no per-section apology cards; sparse beats simply do not render.
+  assert.doesNotMatch(sectionsSource, /<RecordGapNotice/);
+  assert.match(sectionsSource, /resolveSectionPresence/);
+  // The closing provenance panel discloses every gap with the approved vocabulary.
+  assert.match(sectionsSource, /RECORD_GAP_COPY/);
+  assert.match(sectionsSource, /resolveResearchGaps/);
+  assert.match(sectionsSource, /not an absence of history/);
+});
+
+test('entity intro media renders only when a primary photo exists', () => {
+  assert.match(pageSource, /entity\.primaryImage !== undefined \? \(/);
 });
 
 test('entity media fail-closed: mark fallback on photo exhaustion', () => {

@@ -19,7 +19,10 @@
   flex-direction: column;
   gap: var(--ds-space-5);
   width: 100%;
-  max-width: 100%;
+  /* Record pages are reading columns: cap the stack well below the grid max so
+     sparse records do not sprawl into blank panel space on wide viewports. */
+  max-width: 62rem;
+  margin-inline: auto;
   min-width: 0;
   padding-block: 0 var(--ds-space-16);
 }
@@ -125,7 +128,7 @@
 
 .ds-entity-edition__lede {
   margin: var(--ds-space-3) 0 0;
-  max-width: 54ch;
+  max-width: 68ch;
   font-family: var(--ds-font-editorial);
   font-size: 1.0625rem;
   line-height: 1.55;
@@ -204,6 +207,30 @@
   margin: var(--ds-space-3) 0 0;
   font-size: 0.875rem;
   color: var(--ds-ink-muted);
+}
+
+.ds-entity-edition__coverage {
+  margin-top: var(--ds-space-4);
+  padding-top: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-entity-edition__coverage-list {
+  margin: var(--ds-space-2) 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+}
+
+.ds-entity-edition__coverage-list li {
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  color: var(--ds-ink-muted);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-full, 999px);
+  padding: calc(var(--ds-space-1) + 0.0625rem) var(--ds-space-3);
 }
 
 .ds-entity-edition__meta-list {

@@ -96,11 +96,20 @@ Chrome is **opaque Surface**, theme-aware, flat matte. The map stays visible bet
 1. **Edition kicker** — mono uppercase copper slug: `Map instruments` (visible label; tabs remain primary).
 2. **Place search** — address/entity finder + radius chips (44px targets).
 3. **Place focus status** — live region when a radius search is active.
-4. **Facet rows** — Kind group · Tone · Era · Theme · Status · Confidence · Where; label + select per row. Kind options use five families (see [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md)), not twelve micro-kinds.
-5. **Clear filters** — quiet secondary when any facet differs from default.
-6. **Layer model** — presence / Black share / share change + geography/decade controls.
-7. **Map settings disclosure** — relationship lines + decade scrubber (timeline instrument).
-8. **Context actions** — clear state / clear map focus when applicable.
+4. **Kind chips** — five-family segment strip (see [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md)) with counts; All + families, aria-pressed selection.
+5. **Primary facet rows** — Theme · Where; label + select per row. Era lives on the decade rail (§4.4), never as a dropdown here.
+6. **More filters disclosure** — Tone · Status · Confidence selects. URL-addressable archival instruments; the disclosure opens automatically when a deep link carries one.
+7. **Clear filters** — quiet secondary when any facet differs from default.
+8. **Layer model** — presence / Black share / share change + geography/decade controls.
+9. **Map settings disclosure** — relationship lines toggle; lines follow the decade rail (§4.4), no second decade control.
+10. **Context actions** — clear state / clear map focus when applicable.
+
+### 4.4 Decade rail (persistent "when" control)
+
+- Fixed bottom-center dock above the cinematic rail, visible whenever the stage is Engaged.
+- `All time` tab + every catalog decade with live record counts (`buildEntityDecadeCounts`), chronological, horizontally scrollable with edge fade; earlier/later stepper buttons at each end.
+- One control owns "when": selecting a decade sets the `?era=` pin filter AND the relationship-line decade slice (all-time fallback when a decade has no edges). There is no separate line-decade scrubber.
+- Active tab auto-scrolls into view on step or deep link. Tabs reuse `ds-explore-edition__decade-tab`; 44px-class targets.
 
 ### 4.3 Color key tab
 

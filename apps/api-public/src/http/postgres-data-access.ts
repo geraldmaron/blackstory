@@ -58,6 +58,13 @@ export type CreatePostgresDataAccessReadersOptions = {
   readonly query?: PostgresQueryFn;
 };
 
+/** Matches `apps/web`'s release-catalog cache window (`RELEASE_CATALOG_REVALIDATE_SECONDS`). */
+const ENTITY_PROJECTIONS_CACHE_TTL_MS = 5 * 60 * 1000;
+/** Only ever 1-2 releases are active in practice; bounded defensively against release churn. */
+const MAX_CACHED_RELEASES = 4;
+
+type EntityProjectionsList = Awaited<ReturnType<typeof listPublicEntityProjections>>;
+
 function mapActiveReleaseToPointer(
   active: NonNullable<Awaited<ReturnType<typeof fetchActiveRelease>>>,
 ): ReleasePointer {
@@ -75,6 +82,32 @@ export function createPostgresDataAccessReaders(
   options: CreatePostgresDataAccessReadersOptions = {},
 ): PublicDataAccessReaders {
   const runQuery: PostgresQueryFn = options.query ?? queryPostgres;
+
+  // `readEntities` and `readSearchPage`'s fallback both pull every entity in the active
+  // release — by far the most expensive query against Postgres (DB advisor: ~80% of all
+  // query time in the project) because it re-runs on every request even though the underlying
+  // data only changes when a release publishes. Cache it in-process, keyed by release id, for
+  // the life of this long-running Cloud Run instance — same TTL convention `apps/web` already
+  // uses for its release-catalog cache.
+  const projectionsCache = new Map<
+    string,
+    { readonly value: EntityProjectionsList; readonly expiresAtMs: number }
+  >();
+
+  async function listPublicEntityProjectionsCached(releaseId: string): Promise<EntityProjectionsList> {
+    const now = Date.now();
+    const hit = projectionsCache.get(releaseId);
+    if (hit && hit.expiresAtMs > now) {
+      return hit.value;
+    }
+    const value = await listPublicEntityProjections(releaseId, runQuery);
+    if (!projectionsCache.has(releaseId) && projectionsCache.size >= MAX_CACHED_RELEASES) {
+      projectionsCache.clear();
+    }
+    projectionsCache.set(releaseId, { value, expiresAtMs: now + ENTITY_PROJECTIONS_CACHE_TTL_MS });
+    return value;
+  }
+
   return {
     async readReleasePointer(): Promise<ReleasePointer | undefined> {
       const active = await fetchActiveRelease(runQuery);
@@ -89,7 +122,7 @@ export function createPostgresDataAccessReaders(
     },
 
     async readEntities(releaseId): Promise<readonly EntityV1[]> {
-      const projections = await listPublicEntityProjections(releaseId, runQuery);
+      const projections = await listPublicEntityProjectionsCached(releaseId);
       const entities: EntityV1[] = [];
       for (const projection of projections) {
         const mapped = mapProjectionToEntityV1(projection);
@@ -110,7 +143,7 @@ export function createPostgresDataAccessReaders(
         );
       }
 
-      const projections = await listPublicEntityProjections(searchOptions.releaseId, runQuery);
+      const projections = await listPublicEntityProjectionsCached(searchOptions.releaseId);
       const entities: EntityV1[] = [];
       for (const projection of projections.slice(0, MAX_LIVE_SEARCH_SCAN)) {
         const mapped = mapProjectionToEntityV1(projection);

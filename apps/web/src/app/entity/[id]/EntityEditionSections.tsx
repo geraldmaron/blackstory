@@ -1,6 +1,11 @@
 /**
- * Entity detail body: v6 edition Surface panels for relevance, context, status,
+ * Entity detail body: v6 edition Surface panels for context, relevance, status,
  * claims, timeline, connected records, and provenance.
+ *
+ * Adaptive stack: a content beat renders only when the record actually has that
+ * content. Research gaps are disclosed once, in the closing "About this record"
+ * panel, using the approved `RECORD_GAP_COPY` vocabulary, never as a run of
+ * per-section apology cards on sparse records.
  */
 import React from 'react';
 import { Timeline } from '@repo/ui';
@@ -20,7 +25,7 @@ import { EntityStatusPanel } from '../../../components/entity/EntityStatusPanel'
 import { EntityRelatedList } from '../../../components/entity/EntityRelatedList';
 import { EntityLinkDiscoveryHint } from '../../../components/entity/EntityLink';
 import { LinkedProse, type EntityLinkCatalogEntry } from '../../../components/entity/LinkedProse';
-import { RecordGapNotice } from '../../../components/entity/RecordGapNotice';
+import { RECORD_GAP_COPY, type RecordGapKind } from '../../../components/entity/copy';
 import { humanizeToken } from '../../../components/entity/format';
 import type { HistoricalFraming } from './entity-view-model';
 import { entityEditionPanelClassName } from './entity-panel-chrome';
@@ -34,27 +39,53 @@ export type EntityEditionSectionsProps = {
   readonly whyAppearsEvidenceById: Readonly<Record<string, WhyAppearsEvidenceCitation>>;
   readonly evidenceClaims: readonly EvidenceClaimInput[];
   readonly entityLinkCatalog: readonly EntityLinkCatalogEntry[];
-  /** Chapters/stories/theme packets this entity appears on elsewhere (repo-cqey.8). Optional —
+  /** Chapters/stories/theme packets this entity appears on elsewhere (repo-cqey.8). Optional:
    * an entity with zero cross-references renders no "Appears in" panel at all. */
   readonly crossReferences?: readonly EntityCrossReferenceSurface[];
 };
 
-function entityBeatIndices(
+type SectionPresence = {
+  readonly hasContext: boolean;
+  readonly hasRelevance: boolean;
+  readonly hasReading: boolean;
+  readonly hasStatus: boolean;
+  readonly hasClaims: boolean;
+  readonly hasTimeline: boolean;
+  readonly hasConnected: boolean;
+};
+
+function resolveSectionPresence(
   entity: PublicEntityView,
-  hasCrossReferences: boolean,
-) {
-  let current = 2;
-  const next = () => String(current++).padStart(2, '0');
-  const relevance = next();
-  const context = next();
-  const reading = entity.extendedNarrative ? next() : undefined;
-  const status = next();
-  const claims = next();
-  const timeline = entity.timeline.length > 0 ? next() : undefined;
-  const connected = next();
-  const appearsIn = hasCrossReferences ? next() : undefined;
-  const provenance = next();
-  return { relevance, context, reading, status, claims, timeline, connected, appearsIn, provenance };
+  whyThisAppears: PublicWhyThisAppears | undefined,
+): SectionPresence {
+  const hasStatus =
+    entity.kind === 'event'
+      ? entity.eventWindow !== undefined
+      : Boolean(entity.status) || (entity.statusHistory?.length ?? 0) > 0;
+  return {
+    hasContext: entity.historicalContext.trim().length > 0,
+    hasRelevance: whyThisAppears !== undefined,
+    hasReading: Boolean(entity.extendedNarrative),
+    hasStatus,
+    hasClaims: entity.claims.length > 0,
+    hasTimeline: entity.timeline.length > 0,
+    hasConnected:
+      (entity.relatedNeighbors?.length ?? 0) > 0 ||
+      (entity.related?.length ?? 0) > 0 ||
+      (entity.continueLearning?.length ?? 0) > 0,
+  };
+}
+
+/** Gap disclosures for the "About this record" panel, in reading order. */
+function resolveResearchGaps(presence: SectionPresence): readonly RecordGapKind[] {
+  const gaps: RecordGapKind[] = [];
+  if (!presence.hasContext) gaps.push('context');
+  if (!presence.hasRelevance) gaps.push('relevance');
+  if (!presence.hasStatus) gaps.push('statusHistory');
+  if (!presence.hasClaims) gaps.push('claims');
+  if (!presence.hasTimeline) gaps.push('timeline');
+  if (!presence.hasConnected) gaps.push('related');
+  return gaps;
 }
 
 export function EntityEditionSections({
@@ -69,73 +100,47 @@ export function EntityEditionSections({
   const continueLearning = entity.continueLearning ?? [];
   const statusHeading =
     entity.kind === 'event' ? 'When this happened' : 'Status and history';
-  const beats = entityBeatIndices(entity, crossReferences.length > 0);
+  const presence = resolveSectionPresence(entity, whyThisAppears);
+  const researchGaps = resolveResearchGaps(presence);
+
+  let beatCursor = 2;
+  const nextBeat = () => String(beatCursor++).padStart(2, '0');
 
   return (
     <>
-      <article
-        className={entityEditionPanelClassName('relevance')}
-        aria-labelledby="relevance-heading"
-      >
-        <header className="ds-entity-edition__header">
-          <span className="ds-entity-edition__index" aria-hidden="true">
-            {beats.relevance}
-          </span>
-          <div>
-            <p className="ds-entity-edition__kicker">Relevance</p>
-            <h2 className="ds-entity-edition__panel-heading" id="relevance-heading">
-              Why this appears
-            </h2>
-          </div>
-        </header>
-        <div className="ds-entity-edition__section-body">
-          {whyThisAppears ? (
-            <WhyThisAppears
-              result={whyThisAppears}
-              instanceId={`entity-${entity.id}-why`}
-              evidenceById={whyAppearsEvidenceById}
-            />
-          ) : (
-            <RecordGapNotice kind="relevance" />
-          )}
-        </div>
-      </article>
-
-      <article
-        className={entityEditionPanelClassName('context')}
-        aria-labelledby="context-heading"
-      >
-        <header className="ds-entity-edition__header">
-          <span className="ds-entity-edition__index" aria-hidden="true">
-            {beats.context}
-          </span>
-          <div>
-            <p className="ds-entity-edition__kicker">Context</p>
-            <h2 className="ds-entity-edition__panel-heading" id="context-heading">
-              Historical context
-            </h2>
-          </div>
-        </header>
-        {entity.historicalContext.trim().length > 0 ? (
+      {presence.hasContext ? (
+        <article
+          className={entityEditionPanelClassName('context')}
+          aria-labelledby="context-heading"
+        >
+          <header className="ds-entity-edition__header">
+            <span className="ds-entity-edition__index" aria-hidden="true">
+              {nextBeat()}
+            </span>
+            <div>
+              <p className="ds-entity-edition__kicker">Context</p>
+              <h2 className="ds-entity-edition__panel-heading" id="context-heading">
+                Historical context
+              </h2>
+            </div>
+          </header>
           <LinkedProse
             className="ds-entity-edition__body"
             text={entity.historicalContext}
             skipEntityIds={[entity.id]}
             catalog={entityLinkCatalog}
           />
-        ) : (
-          <RecordGapNotice kind="context" />
-        )}
-      </article>
+        </article>
+      ) : null}
 
-      {entity.extendedNarrative ? (
+      {presence.hasReading ? (
         <article
           className={entityEditionPanelClassName('reading')}
           aria-labelledby="further-heading"
         >
           <header className="ds-entity-edition__header">
             <span className="ds-entity-edition__index" aria-hidden="true">
-              {beats.reading}
+              {nextBeat()}
             </span>
             <div>
               <p className="ds-entity-edition__kicker">Reading</p>
@@ -148,63 +153,89 @@ export function EntityEditionSections({
         </article>
       ) : null}
 
-      <article
-        className={entityEditionPanelClassName('status')}
-        aria-labelledby="status-heading"
-      >
-        <header className="ds-entity-edition__header">
-          <span className="ds-entity-edition__index" aria-hidden="true">
-            {beats.status}
-          </span>
-          <div>
-            <p className="ds-entity-edition__kicker">Status</p>
-            <h2 className="ds-entity-edition__panel-heading" id="status-heading">
-              {statusHeading}
-            </h2>
+      {presence.hasRelevance && whyThisAppears ? (
+        <article
+          className={entityEditionPanelClassName('relevance')}
+          aria-labelledby="relevance-heading"
+        >
+          <header className="ds-entity-edition__header">
+            <span className="ds-entity-edition__index" aria-hidden="true">
+              {nextBeat()}
+            </span>
+            <div>
+              <p className="ds-entity-edition__kicker">Relevance</p>
+              <h2 className="ds-entity-edition__panel-heading" id="relevance-heading">
+                Why this appears
+              </h2>
+            </div>
+          </header>
+          <div className="ds-entity-edition__section-body">
+            <WhyThisAppears
+              result={whyThisAppears}
+              instanceId={`entity-${entity.id}-why`}
+              evidenceById={whyAppearsEvidenceById}
+            />
           </div>
-        </header>
-        <div className="ds-entity-edition__section-body">
-          <EntityStatusPanel entity={entity} framing={framing} />
-        </div>
-      </article>
+        </article>
+      ) : null}
 
-      <article
-        className={entityEditionPanelClassName('claims')}
-        id="accepted-claims"
-        aria-labelledby="claims-heading"
-      >
-        <header className="ds-entity-edition__header">
-          <span className="ds-entity-edition__index" aria-hidden="true">
-            {beats.claims}
-          </span>
-          <div>
-            <p className="ds-entity-edition__kicker">Claims</p>
-            <h2 className="ds-entity-edition__panel-heading" id="claims-heading">
-              Accepted claims
-            </h2>
+      {presence.hasStatus ? (
+        <article
+          className={entityEditionPanelClassName('status')}
+          aria-labelledby="status-heading"
+        >
+          <header className="ds-entity-edition__header">
+            <span className="ds-entity-edition__index" aria-hidden="true">
+              {nextBeat()}
+            </span>
+            <div>
+              <p className="ds-entity-edition__kicker">Status</p>
+              <h2 className="ds-entity-edition__panel-heading" id="status-heading">
+                {statusHeading}
+              </h2>
+            </div>
+          </header>
+          <div className="ds-entity-edition__section-body">
+            <EntityStatusPanel entity={entity} framing={framing} />
           </div>
-        </header>
-        <div className="ds-entity-edition__section-body">
-          {entity.claims.length === 0 ? (
-            <RecordGapNotice kind="claims" />
-          ) : (
+        </article>
+      ) : null}
+
+      {presence.hasClaims ? (
+        <article
+          className={entityEditionPanelClassName('claims')}
+          id="accepted-claims"
+          aria-labelledby="claims-heading"
+        >
+          <header className="ds-entity-edition__header">
+            <span className="ds-entity-edition__index" aria-hidden="true">
+              {nextBeat()}
+            </span>
+            <div>
+              <p className="ds-entity-edition__kicker">Claims</p>
+              <h2 className="ds-entity-edition__panel-heading" id="claims-heading">
+                Accepted claims
+              </h2>
+            </div>
+          </header>
+          <div className="ds-entity-edition__section-body">
             <EntityEvidencePanel
               labelledBy="claims-heading"
               claims={evidenceClaims}
               researchCoverage={{ level: entity.researchCoverage }}
             />
-          )}
-        </div>
-      </article>
+          </div>
+        </article>
+      ) : null}
 
-      {entity.timeline.length > 0 ? (
+      {presence.hasTimeline ? (
         <article
           className={entityEditionPanelClassName('timeline')}
           aria-labelledby="timeline-heading"
         >
           <header className="ds-entity-edition__header">
             <span className="ds-entity-edition__index" aria-hidden="true">
-              {beats.timeline}
+              {nextBeat()}
             </span>
             <div>
               <p className="ds-entity-edition__kicker">Chronology</p>
@@ -222,42 +253,44 @@ export function EntityEditionSections({
         </article>
       ) : null}
 
-      <article
-        className={entityEditionPanelClassName('connected')}
-        aria-labelledby="related-heading"
-      >
-        <header className="ds-entity-edition__header">
-          <span className="ds-entity-edition__index" aria-hidden="true">
-            {beats.connected}
-          </span>
-          <div>
-            <p className="ds-entity-edition__kicker">Connected</p>
-            <h2 className="ds-entity-edition__panel-heading" id="related-heading">
-              Connected records
-            </h2>
+      {presence.hasConnected ? (
+        <article
+          className={entityEditionPanelClassName('connected')}
+          aria-labelledby="related-heading"
+        >
+          <header className="ds-entity-edition__header">
+            <span className="ds-entity-edition__index" aria-hidden="true">
+              {nextBeat()}
+            </span>
+            <div>
+              <p className="ds-entity-edition__kicker">Connected</p>
+              <h2 className="ds-entity-edition__panel-heading" id="related-heading">
+                Connected records
+              </h2>
+            </div>
+          </header>
+          <EntityLinkDiscoveryHint />
+          <div className="ds-entity-edition__section-body">
+            <EntityRelatedList entity={entity} labelledBy="related-heading" />
           </div>
-        </header>
-        <EntityLinkDiscoveryHint />
-        <div className="ds-entity-edition__section-body">
-          <EntityRelatedList entity={entity} labelledBy="related-heading" />
-        </div>
-        {continueLearning.length > 0 ? (
-          <div className="ds-entity-edition__nested" aria-labelledby="continue-heading">
-            <h3 className="ds-entity-edition__nested-heading" id="continue-heading">
-              Also connected
-            </h3>
-            <p className="ds-entity-edition__lede">
-              Nearby records one step further in the published graph: keep learning without dead
-              ends.
-            </p>
-            <EntityRelatedList
-              entity={entity}
-              labelledBy="continue-heading"
-              continueLearning
-            />
-          </div>
-        ) : null}
-      </article>
+          {continueLearning.length > 0 ? (
+            <div className="ds-entity-edition__nested" aria-labelledby="continue-heading">
+              <h3 className="ds-entity-edition__nested-heading" id="continue-heading">
+                Also connected
+              </h3>
+              <p className="ds-entity-edition__lede">
+                Nearby records one step further in the published graph: keep learning without dead
+                ends.
+              </p>
+              <EntityRelatedList
+                entity={entity}
+                labelledBy="continue-heading"
+                continueLearning
+              />
+            </div>
+          ) : null}
+        </article>
+      ) : null}
 
       {crossReferences.length > 0 ? (
         <article
@@ -266,7 +299,7 @@ export function EntityEditionSections({
         >
           <header className="ds-entity-edition__header">
             <span className="ds-entity-edition__index" aria-hidden="true">
-              {beats.appearsIn}
+              {nextBeat()}
             </span>
             <div>
               <p className="ds-entity-edition__kicker">Appears in</p>
@@ -281,7 +314,7 @@ export function EntityEditionSections({
           <ul className="ds-entity-edition__appears-in-list" aria-label="Appears in">
             {crossReferences.map((surface) => (
               <li key={`${surface.kind}-${entityCrossReferenceHref(surface)}`}>
-                <Link href={entityCrossReferenceHref(surface)}>
+                <Link href={entityCrossReferenceHref(surface)} prefetch={false}>
                   {entityCrossReferenceLabel(surface)}
                 </Link>
               </li>
@@ -296,12 +329,12 @@ export function EntityEditionSections({
       >
         <header className="ds-entity-edition__header">
           <span className="ds-entity-edition__index" aria-hidden="true">
-            {beats.provenance}
+            {nextBeat()}
           </span>
           <div>
             <p className="ds-entity-edition__kicker">Provenance</p>
             <h2 className="ds-entity-edition__panel-heading" id="provenance-heading">
-              Record maturity and revision
+              About this record
             </h2>
           </div>
         </header>
@@ -310,6 +343,22 @@ export function EntityEditionSections({
           <strong>{humanizeToken(entity.researchCoverage)}</strong>. Maturity labels follow the
           product constitution vocabulary.
         </p>
+        {researchGaps.length > 0 ? (
+          <div className="ds-entity-edition__coverage" aria-labelledby="coverage-heading">
+            <h3 className="ds-entity-edition__nested-heading" id="coverage-heading">
+              Still being researched
+            </h3>
+            <ul className="ds-entity-edition__coverage-list">
+              {researchGaps.map((gap) => (
+                <li key={gap}>{RECORD_GAP_COPY[gap].title}</li>
+              ))}
+            </ul>
+            <p className="ds-entity-edition__footnote">
+              These gaps reflect the current state of research, not an absence of history.
+              Coverage deepens as research continues.
+            </p>
+          </div>
+        ) : null}
         <p className="ds-entity-edition__footnote ds-mono">{entity.revision.releaseId}</p>
         <dl className="ds-entity-edition__meta-list">
           <div className="ds-entity-edition__meta-list-row">

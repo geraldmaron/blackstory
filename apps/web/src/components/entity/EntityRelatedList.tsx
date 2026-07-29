@@ -38,7 +38,7 @@ function neighborLabelMap(entity: PublicEntityView): ReadonlyMap<string, string>
 function NeighborLink({ neighbor }: { readonly neighbor: RelatedNeighborView }) {
   return (
     <li key={`${neighbor.id}_${neighbor.relationType}_${neighbor.direction}`}>
-      <Link className="ds-story-link" href={`/entity/${neighbor.id}`}>
+      <Link className="ds-story-link" href={`/entity/${neighbor.id}`} prefetch={false}>
         <span className="ds-story-link__meta">
           <span className="ds-story-link__meta-row">
             <KindBadge kind={neighbor.kind} density="compact" />
@@ -81,7 +81,7 @@ export function EntityRelatedList({
             const displayName = labels.get(entry.id) ?? humanizeEntityId(entry.id);
             return (
               <li key={`${entry.id}_${entry.type}`}>
-                <Link className="ds-story-link" href={`/entity/${entry.id}`}>
+                <Link className="ds-story-link" href={`/entity/${entry.id}`} prefetch={false}>
                   <span className="ds-story-link__meta">{humanizeToken(entry.type)}</span>
                   <h3 className="ds-story-link__title">{displayName}</h3>
                   <p className="ds-story-link__summary">
