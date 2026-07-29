@@ -39,7 +39,7 @@
     "expo-sqlite": "~56.0.5",
     "expo-status-bar": "~56.0.4",
     "expo-symbols": "~56.0.6",
-    "expo-system-ui": "~56.0.5",
+    "expo-system-ui": "~57.0.1",
     "expo-updates": "~57.0.10",
     "expo-web-browser": "~57.0.2",
     "react": "19.2.3",
