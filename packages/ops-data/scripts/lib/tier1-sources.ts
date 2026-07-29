@@ -97,6 +97,19 @@ export const REPUTABLE_SECONDARY_HOST_SUFFIXES = [
   'zphib1920.org',
   'sgrho1922.org',
   'iotaphitheta.org',
+  // Source review 2026-07-28 (operator, repo-jy6k.1 local/regional civil
+  // rights leaders lane):
+  // - floridastateparks.org — Florida Park Service's official site, a
+  //   division of the Florida Department of Environmental Protection
+  //   (verified via homepage banner + floridadep.gov link); not on the
+  //   .gov TLD so it can't match TIER1_HOST_PATTERNS, but it is the state
+  //   agency's own record of a park's namesake history.
+  // - floridacivilrightsmuseum.org — Florida Civil Rights Museum, Inc.,
+  //   incorporated May 2021 (verified via /about/), backed by a Tallahassee
+  //   CRA-funded civil rights memorial project; a dedicated civil-rights
+  //   history institution, same evidentiary class as baseballhall.org above.
+  'floridastateparks.org',
+  'floridacivilrightsmuseum.org',
 ] as const;
 
 export function isReputableSecondaryHost(url: string | undefined): boolean {
