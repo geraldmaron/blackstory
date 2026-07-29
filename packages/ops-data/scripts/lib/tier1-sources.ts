@@ -110,6 +110,18 @@ export const REPUTABLE_SECONDARY_HOST_SUFFIXES = [
   //   history institution, same evidentiary class as baseballhall.org above.
   'floridastateparks.org',
   'floridacivilrightsmuseum.org',
+  // Source review 2026-07-29 (operator, repo-jy6k.1 civil rights leaders
+  // lane, second batch — Eula Johnson, Dr. James Sistrunk, Dr. Calvin
+  // Shirley, W. George Allen):
+  // - thewestsidegazette.com — The Westside Gazette, "Broward County's
+  //   oldest and largest African American owned and operated newspaper"
+  //   (verified via /about-us/), publishing continuously since 1971.
+  // - wlrn.org — WLRN Public Media, South Florida's NPR/PBS member
+  //   station, licensed to the Miami-Dade County School Board (verified
+  //   via /about); editorially independent public broadcaster, not a
+  //   blog or aggregator.
+  'thewestsidegazette.com',
+  'wlrn.org',
 ] as const;
 
 export function isReputableSecondaryHost(url: string | undefined): boolean {
