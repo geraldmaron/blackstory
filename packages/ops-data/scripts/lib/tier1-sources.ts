@@ -97,6 +97,31 @@ export const REPUTABLE_SECONDARY_HOST_SUFFIXES = [
   'zphib1920.org',
   'sgrho1922.org',
   'iotaphitheta.org',
+  // Source review 2026-07-28 (operator, repo-jy6k.1 local/regional civil
+  // rights leaders lane):
+  // - floridastateparks.org — Florida Park Service's official site, a
+  //   division of the Florida Department of Environmental Protection
+  //   (verified via homepage banner + floridadep.gov link); not on the
+  //   .gov TLD so it can't match TIER1_HOST_PATTERNS, but it is the state
+  //   agency's own record of a park's namesake history.
+  // - floridacivilrightsmuseum.org — Florida Civil Rights Museum, Inc.,
+  //   incorporated May 2021 (verified via /about/), backed by a Tallahassee
+  //   CRA-funded civil rights memorial project; a dedicated civil-rights
+  //   history institution, same evidentiary class as baseballhall.org above.
+  'floridastateparks.org', // codeql[js/regex/missing-regexp-anchor]: plain string, exact/endsWith match only, never used as a regex
+  'floridacivilrightsmuseum.org', // codeql[js/regex/missing-regexp-anchor]: plain string, exact/endsWith match only, never used as a regex
+  // Source review 2026-07-29 (operator, repo-jy6k.1 civil rights leaders
+  // lane, second batch — Eula Johnson, Dr. James Sistrunk, Dr. Calvin
+  // Shirley, W. George Allen):
+  // - thewestsidegazette.com — The Westside Gazette, "Broward County's
+  //   oldest and largest African American owned and operated newspaper"
+  //   (verified via /about-us/), publishing continuously since 1971.
+  // - wlrn.org — WLRN Public Media, South Florida's NPR/PBS member
+  //   station, licensed to the Miami-Dade County School Board (verified
+  //   via /about); editorially independent public broadcaster, not a
+  //   blog or aggregator.
+  'thewestsidegazette.com', // codeql[js/regex/missing-regexp-anchor]: plain string, exact/endsWith match only, never used as a regex
+  'wlrn.org', // codeql[js/regex/missing-regexp-anchor]: plain string, exact/endsWith match only, never used as a regex
 ] as const;
 
 export function isReputableSecondaryHost(url: string | undefined): boolean {
