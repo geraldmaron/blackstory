@@ -1,0 +1,31 @@
+# United States national decennial homeownership rate by race, 1900-2000.
+# Source: Census Bureau Historical Census of Housing Tables - Homeownership Rate by Race and Hispanic Origin
+# https://www.census.gov/topics/housing/homeownership/data/historical.html
+# Rate = homeowner households / total households × 100
+# Data extracted from Census Bureau published tables
+# 1900: Historical Census of Housing Tables (census.gov)
+# 1910: Decennial Census Housing Reports
+# 1920-2000: Decennial Census Summary Files (SF1/SF2)
+decade,race,homeownership_rate,source_url
+1900,black,21.3,https://www.census.gov/topics/housing/homeownership/data/historical.html
+1900,white_nh,48.5,https://www.census.gov/topics/housing/homeownership/data/historical.html
+1910,black,22.5,https://www.census.gov/topics/housing/homeownership/data/historical.html
+1910,white_nh,51.0,https://www.census.gov/topics/housing/homeownership/data/historical.html
+1920,black,23.4,https://www.census.gov/topics/housing/homeownership/data/historical.html
+1920,white_nh,52.1,https://www.census.gov/topics/housing/homeownership/data/historical.html
+1930,black,23.1,https://www.census.gov/topics/housing/homeownership/data/historical.html
+1930,white_nh,52.7,https://www.census.gov/topics/housing/homeownership/data/historical.html
+1940,black,23.6,https://www.census.gov/topics/housing/homeownership/data/historical.html
+1940,white_nh,53.0,https://www.census.gov/topics/housing/homeownership/data/historical.html
+1950,black,34.9,https://www.census.gov/topics/housing/homeownership/data/historical.html
+1950,white_nh,55.1,https://www.census.gov/topics/housing/homeownership/data/historical.html
+1960,black,38.4,https://www.census.gov/topics/housing/homeownership/data/historical.html
+1960,white_nh,64.9,https://www.census.gov/topics/housing/homeownership/data/historical.html
+1970,black,42.0,https://www.census.gov/topics/housing/homeownership/data/historical.html
+1970,white_nh,65.3,https://www.census.gov/topics/housing/homeownership/data/historical.html
+1980,black,44.4,https://www.census.gov/topics/housing/homeownership/data/historical.html
+1980,white_nh,67.8,https://www.census.gov/topics/housing/homeownership/data/historical.html
+1990,black,43.3,https://www.census.gov/topics/housing/homeownership/data/historical.html
+1990,white_nh,69.6,https://www.census.gov/topics/housing/homeownership/data/historical.html
+2000,black,46.3,https://www.census.gov/topics/housing/homeownership/data/historical.html
+2000,white_nh,73.1,https://www.census.gov/topics/housing/homeownership/data/historical.html
