@@ -85,7 +85,7 @@ function entityLinkCatalogFromNeighbors(
 
 export async function generateStaticParams() {
   // Build time has no live Postgres connection (App Hosting mounts DATABASE_URL at runtime
-  // only) — skip enumeration rather than throw. This route is force-dynamic, so an empty
+  // only): skip enumeration rather than throw. This route is force-dynamic, so an empty
   // static param list is harmless; every id still renders on-demand at request time.
   if (!shouldUseLivePublicProjections()) {
     return [];
@@ -168,6 +168,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
           className="ds-record-anatomy__fact-link"
           href={exploreHrefForKind(anatomyInputs.kind)}
           aria-label={`Browse ${anatomyInputs.kindLabel} records`}
+          prefetch={false}
         >
           {anatomyInputs.kindLabel}
         </Link>
@@ -188,6 +189,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
           className="ds-record-anatomy__fact-link"
           href={anatomyInputs.eraHref}
           aria-label={`Browse records from the ${anatomyInputs.eraLabel}`}
+          prefetch={false}
         >
           {anatomyInputs.eraLabel}
         </Link>
@@ -204,6 +206,7 @@ export default async function EntityPage({ params }: EntityPageProps) {
           className="ds-record-anatomy__fact-link"
           href={entityEvidenceHref(`/entity/${entity.id}`)}
           aria-label={`View ${anatomyInputs.evidenceLabel} on this record`}
+          prefetch={false}
         >
           {anatomyInputs.evidenceLabel}
         </Link>
@@ -248,18 +251,20 @@ export default async function EntityPage({ params }: EntityPageProps) {
                 <EntityTopicTags entity={entity} />
               </div>
             </header>
-            <div className="ds-entity-edition__intro-grid">
-              <div className="ds-entity-edition__media">
-                <EntityMastMedia
-                  entityId={entity.id}
-                  entityName={entity.displayName}
-                  kind={entity.kind}
-                  {...(jurisdictionLabel !== undefined ? { jurisdictionLabel } : {})}
-                  {...(entity.primaryImage !== undefined ? { primaryImage: entity.primaryImage } : {})}
-                  priority
-                />
+            {entity.primaryImage !== undefined ? (
+              <div className="ds-entity-edition__intro-grid">
+                <div className="ds-entity-edition__media">
+                  <EntityMastMedia
+                    entityId={entity.id}
+                    entityName={entity.displayName}
+                    kind={entity.kind}
+                    {...(jurisdictionLabel !== undefined ? { jurisdictionLabel } : {})}
+                    primaryImage={entity.primaryImage}
+                    priority
+                  />
+                </div>
               </div>
-            </div>
+            ) : null}
           </article>
 
           <article

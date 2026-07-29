@@ -1,6 +1,6 @@
 # BlackStory design direction v6 — entity edition
 
-**Status:** binding layout pattern for `/entity/[id]` (2026-07-23).  
+**Status:** binding layout pattern for `/entity/[id]` (2026-07-23; adaptive-beats revision 2026-07-29).  
 **Parent:** `design-direction-v6-home.md` (shared edition vocabulary + atmosphere).  
 **Supersedes:** `design-direction-v5.md` § entity mast, at-a-glance band, and two-column aside layout.  
 **Unchanged:** entity data contract, `force-dynamic` routing, session nav stack, evidence/claims pipeline, `RecordGapNotice` copy.
@@ -126,15 +126,22 @@ Each beat is a Surface panel with:
 - Section title (Sora SemiBold)
 - Body in Source Serif 4 or component-specific typography
 
-| Beat | Kicker | Section | Empty state |
+Beats are **adaptive**: a content beat renders only when the record has that content, and
+indices renumber to stay contiguous. Missing content is disclosed once, in the Provenance
+beat's "Still being researched" list (§8), using the approved `RECORD_GAP_COPY` titles —
+never as a run of per-section gap cards on sparse records.
+
+| Beat (order) | Kicker | Section | Renders when |
 |---|---|---|---|
-| 02 | Relevance | Why this appears | `RecordGapNotice kind="relevance"` |
-| 03 | Context | Historical context | `RecordGapNotice kind="context"` |
-| 04 | Reading | Further reading | Omitted when absent |
-| 05 | Status | When this happened / Status and history | `RecordGapNotice kind="statusHistory"` when no status or event window |
-| 06 | Claims | Accepted claims | `RecordGapNotice kind="claims"` or `EntityEvidencePanel` |
-| 07 | Chronology | Timeline | Omitted when no dated spans |
-| 08 | Connected | Connected records | `EntityRelatedList` + optional continue-learning nested block |
+| Context | Context | Historical context | `historicalContext` non-empty |
+| Reading | Reading | Further reading | `extendedNarrative` present |
+| Relevance | Relevance | Why this appears | `whyThisAppears` resolves (fail-closed) |
+| Status | Status | When this happened / Status and history | event: `eventWindow`; else `status` or `statusHistory` |
+| Claims | Claims | Accepted claims | `claims.length > 0` |
+| Chronology | Chronology | Timeline | dated spans exist |
+| Connected | Connected | Connected records | any neighbor / typed edge / continue-learning stub |
+
+Context (the story) precedes Relevance (the archival justification).
 
 ---
 
@@ -142,9 +149,11 @@ Each beat is a Surface panel with:
 
 | Element | Spec |
 |---|---|
-| Index | `09` |
+| Index | next contiguous beat number |
 | Kicker | `Provenance` |
+| Heading | `About this record` |
 | Maturity | `recordMaturity` + `researchCoverage` in humanized tokens |
+| Coverage | "Still being researched" chip list: one entry per omitted beat, titled from `RECORD_GAP_COPY`, closed by the shared "state of the record, not an absence of history" line |
 | Revision | Release id, record updated, generated timestamps |
 
 ---
@@ -153,11 +162,12 @@ Each beat is a Surface panel with:
 
 | Failure | Behavior |
 |---|---|
-| Missing / broken primary photo | `EntityMastMedia` → `EntityRecordMark` (never broken `<img>`) |
+| No primary photo published | Intro media block omitted entirely (no full-size symbolic-mark placeholder card) |
+| Broken primary photo | `EntityMastMedia` → `EntityRecordMark` (never broken `<img>`) |
 | Missing Font Awesome glyph | `EditionFactIcon` falls back to visible text label (icon `aria-hidden`) |
 | Missing geo | Anatomy place slot: **Place not pinned**; no false pin on national map frame |
 | Missing era | `entityEraFact` → **Undated** only when buckets, spans, and legacy era are all absent |
-| Missing status (non-event) | `RecordGapNotice kind="statusHistory"` — not a silent empty |
+| Missing status (non-event) | Status beat omitted; gap disclosed in Provenance "Still being researched" list — not a silent empty |
 | MapLibre / WebGL fail | `EntityLocationMap` `role="status"` message; maps external link remains |
 
 **Cross-browser:** Mini-map mounts wait for non-zero layout (`waitForContainerLayout`), call `map.resize()` on orientation and tab visibility changes, and probe WebGL before construction. Record anatomy frames use explicit `7.5rem` height. See [`patterns-map-canvas.md`](./patterns-map-canvas.md).
