@@ -6,17 +6,9 @@ import type {
   PublicActiveReleaseDoc,
   PublicEntityProjectionDoc,
   PublicSearchProjectionDoc,
-  PublicStoryListItemDoc,
-  PublicStoryProjectionDoc,
 } from '@repo/schemas';
 import { mapPostgresSearchIndexRow } from './map-postgres-search-index';
-import {
-  parseActiveRelease,
-  parseEntityProjection,
-  parseStoryListItem,
-  parseStoryProjection,
-  toStoryListItem,
-} from './projection-contracts';
+import { parseActiveRelease, parseEntityProjection } from './projection-contracts';
 import { queryPostgres } from './postgres-client';
 
 /** Batch size for `entity_id = ANY($n::text[])` point reads. */
@@ -133,51 +125,6 @@ export async function listPublicSearchIndexDocs(
     if (parsed) docs.push(parsed);
   }
   return docs;
-}
-
-export async function fetchPublicStoryProjection(
-  releaseId: string,
-  slug: string,
-): Promise<PublicStoryProjectionDoc | undefined> {
-  const rows = await queryPostgres<ProjectionRow>(
-    `SELECT projection
-     FROM bb_public.release_stories
-     WHERE release_id = $1 AND slug = $2
-     LIMIT 1`,
-    [releaseId, slug],
-  );
-  const projection = rows[0]?.projection;
-  return projection !== undefined ? parseStoryProjection(projection) : undefined;
-}
-
-export async function listPublicStoryProjections(
-  releaseId: string,
-): Promise<readonly PublicStoryProjectionDoc[]> {
-  const rows = await queryPostgres<ProjectionRow>(
-    `SELECT projection
-     FROM bb_public.release_stories
-     WHERE release_id = $1
-     ORDER BY slug`,
-    [releaseId],
-  );
-  const stories: PublicStoryProjectionDoc[] = [];
-  for (const row of rows) {
-    const parsed = parseStoryProjection(row.projection);
-    if (parsed) stories.push(parsed);
-  }
-  return stories;
-}
-
-export async function listPublicStorySummaries(
-  releaseId: string,
-): Promise<readonly PublicStoryListItemDoc[]> {
-  const stories = await listPublicStoryProjections(releaseId);
-  const summaries: PublicStoryListItemDoc[] = [];
-  for (const story of stories) {
-    const parsed = parseStoryListItem(story);
-    summaries.push(parsed ?? toStoryListItem(story));
-  }
-  return summaries;
 }
 
 /** Reads the frozen legal snapshot documents projected into the active release. */

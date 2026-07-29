@@ -38,19 +38,11 @@ test('search prefix follows history mapping', () => {
   assert.equal(search.motifId, 'rules');
 });
 
-test('stories, about, and topics use bands; legal and submit use pins', () => {
-  const stories = selectPageField('/stories/mosaic-credits');
-  assert.ok(stories);
-  assert.equal(stories.motifId, 'bands');
-  assert.equal(stories.lightPath, `${PAGE_FIELD_BASE}/bands-light.svg`);
-
+test('about uses bands; legal and submit use pins', () => {
   const about = selectPageField('/about/');
   assert.ok(about);
   assert.equal(about.motifId, 'bands');
-
-  const topics = selectPageField('/topics');
-  assert.ok(topics);
-  assert.equal(topics.motifId, 'bands');
+  assert.equal(about.lightPath, `${PAGE_FIELD_BASE}/bands-light.svg`);
 
   const law = selectPageField('/law/civil-rights-act-1964');
   assert.ok(law);

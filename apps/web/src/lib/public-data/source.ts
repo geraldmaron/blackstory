@@ -1,11 +1,10 @@
 /**
  * Public data source selector: Supabase Postgres (`bb_public.*`) is the sole source of truth.
  * Hydrates 1-hop related neighbor stubs and composes capped 2-hop continue-learning on
- * entity pages only. List/map/search/stories may use versioned release artifacts as a read-through
+ * entity pages only. List/map/search may use versioned release artifacts as a read-through
  * cache, but canonical live reads always come from `bb_public.*`. Postgres read failures propagate
  * as errors — there is no hardcoded seed/snapshot fallback.
- * The `/stories` index caches field-masked list items (no body). Story detail / about mosaic /
- * similar card rails use a thin batched point-get (`listPublicEntityViewsByIds`) — never the
+ * Card rails use a thin batched point-get (`listPublicEntityViewsByIds`) — never the
  * 2-hop learning graph. Sitemap and entity `generateStaticParams` use `getPublicSearchIndex`
  * (ids only), not the full hydrated entity catalog. Oversized live catalogs (>~1.8MB) stay in
  * process memory only; Next's 2MB data-cache limit must not receive the fat array.
@@ -18,11 +17,7 @@
 import { unstable_cache } from 'next/cache';
 import { cache } from 'react';
 import type { PublicSearchIndexDoc } from '@repo/domain/search';
-import type {
-  PublicEntityProjectionDoc,
-  PublicStoryListItemDoc,
-  PublicStoryProjectionDoc,
-} from '@repo/schemas';
+import type { PublicEntityProjectionDoc } from '@repo/schemas';
 import {
   buildRelatedNeighborStubs,
   composeContinueLearningStubs,
@@ -34,11 +29,8 @@ import {
   fetchActiveRelease,
   fetchPublicEntityProjection,
   fetchPublicEntityProjectionsByIds,
-  fetchPublicStoryProjection,
   listPublicEntityProjections,
   listPublicSearchIndexDocs,
-  listPublicStoryProjections,
-  listPublicStorySummaries,
   parseEntityProjection,
   parseSearchIndexDoc,
   shouldUseLivePublicProjections,
@@ -60,7 +52,7 @@ import {
   fetchReleaseSearchIndexArtifact,
 } from './release-artifacts';
 
-/** Cross-request cache window for release catalog / search index / stories (seconds). */
+/** Cross-request cache window for release catalog / search index (seconds). */
 const RELEASE_CATALOG_REVALIDATE_SECONDS = 300;
 const RELEASE_CATALOG_TTL_MS = RELEASE_CATALOG_REVALIDATE_SECONDS * 1000;
 
@@ -71,12 +63,7 @@ const liveEntitiesMemory = createLiveCatalogMemoryCache<readonly PublicEntityVie
 const liveSearchIndexMemory = createLiveCatalogMemoryCache<readonly PublicSearchIndexDoc[]>({
   defaultTtlMs: RELEASE_CATALOG_TTL_MS,
 });
-/** Thin story list cards only — never full `body[]` prose. */
-const liveStoriesMemory = createLiveCatalogMemoryCache<readonly PublicStoryListItemDoc[]>({
-  defaultTtlMs: RELEASE_CATALOG_TTL_MS,
-});
-
-/** One active-release pointer read per request (shared across entities/stories/search). */
+/** One active-release pointer read per request (shared across entities/search). */
 const getCachedActiveRelease = cache(fetchActiveRelease);
 
 /**
@@ -320,23 +307,6 @@ function cachedLiveSearchIndex(
   });
 }
 
-function cachedLiveStoryListItems(
-  releaseId: string,
-  activatedAt: string,
-): Promise<readonly PublicStoryListItemDoc[] | undefined> {
-  return cacheLiveCatalog({
-    kind: 'stories',
-    releaseId,
-    activatedAt,
-    memory: liveStoriesMemory,
-    load: async () => {
-      const stories = await listPublicStorySummaries(releaseId);
-      return stories.length > 0 ? stories : undefined;
-    },
-    nextCacheKeyPrefix: 'public-release-stories',
-  });
-}
-
 async function loadLiveEntities(): Promise<readonly PublicEntityView[] | undefined> {
   if (!shouldUseLivePublicProjections()) return undefined;
   const active = await getCachedActiveRelease();
@@ -502,63 +472,3 @@ export async function listPublicEntityViewsByIds(
   }
   return { data: ordered, source };
 }
-
-export type PublicStoryView = PublicStoryProjectionDoc;
-export type PublicStoryListItem = PublicStoryListItemDoc;
-
-async function loadLiveStoryListItems(): Promise<readonly PublicStoryListItem[] | undefined> {
-  if (!shouldUseLivePublicProjections()) return undefined;
-  const active = await getCachedActiveRelease();
-  if (!active) return undefined;
-  return cachedLiveStoryListItems(active.releaseId, active.activatedAt);
-}
-
-async function loadLiveStory(slug: string): Promise<PublicStoryView | undefined> {
-  if (!shouldUseLivePublicProjections()) return undefined;
-  const active = await getCachedActiveRelease();
-  if (!active) return undefined;
-  return fetchPublicStoryProjection(active.releaseId, slug);
-}
-
-/**
- * Thin story list for `/stories` index cards. Live path reads Postgres release projections
- * + process TTL / `unstable_cache`; never pulls full `body[]` into the list cache. No fallback:
- * a Postgres read failure propagates.
- */
-export const listPublicStoryListItems = cache(async function listPublicStoryListItems(): Promise<{
-  readonly data: readonly PublicStoryListItem[];
-  readonly source: PublicReadSource;
-}> {
-  const live = await loadLiveStoryListItems();
-  if (live === undefined) {
-    throw new Error('[public-data] postgres story list unavailable');
-  }
-  return { data: live, source: 'live' };
-});
-
-/**
- * Full story docs for `generateStaticParams` and callers that need bodies/related ids.
- * Not used by the `/stories` index (see `listPublicStoryListItems`). No fallback.
- */
-export const listPublicStoryViews = cache(async function listPublicStoryViews(): Promise<{
-  readonly data: readonly PublicStoryView[];
-  readonly source: PublicReadSource;
-}> {
-  if (!shouldUseLivePublicProjections()) {
-    throw new Error('[public-data] live public projections are not enabled');
-  }
-  const active = await getCachedActiveRelease();
-  if (!active) {
-    throw new Error('[public-data] no active release for stories');
-  }
-  const stories = await listPublicStoryProjections(active.releaseId);
-  return { data: stories, source: 'live' };
-});
-
-/** Resolve one story by slug: live Postgres projection only. No seed fallback. */
-export const resolvePublicStoryView = cache(async function resolvePublicStoryView(
-  slug: string,
-): Promise<PublicReadResult<PublicStoryView>> {
-  const live = await loadLiveStory(slug);
-  return live ? { data: live, source: 'live' } : { data: undefined, source: 'none' };
-});

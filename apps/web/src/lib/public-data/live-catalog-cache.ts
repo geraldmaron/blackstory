@@ -135,7 +135,7 @@ export function createLiveCatalogMemoryCache<Value>(
   };
 }
 
-export type LiveCatalogKind = 'entities' | 'search-index' | 'stories';
+export type LiveCatalogKind = 'entities' | 'search-index';
 
 export function liveCatalogCacheKey(
   kind: LiveCatalogKind,

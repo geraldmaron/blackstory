@@ -531,35 +531,6 @@ export function mapReleaseEntity(
   }) as ReleaseEntityRow;
 }
 
-export type ReleaseStoryRow = {
-  readonly release_id: string;
-  readonly slug: string;
-  readonly title: string;
-  readonly body: unknown;
-  readonly sources: unknown;
-  readonly related_entity_ids: readonly string[];
-  readonly projection: unknown;
-  readonly created_at: string;
-};
-
-export function mapReleaseStory(
-  releaseId: string,
-  docId: string,
-  data: Record<string, unknown>,
-): ReleaseStoryRow {
-  const now = new Date().toISOString();
-  return omitUndefined({
-    release_id: releaseId,
-    slug: asString(data.slug, docId),
-    title: asString(data.title, docId),
-    body: toJsonValue(data.body ?? {}),
-    sources: toJsonValue(data.sources ?? []),
-    related_entity_ids: asStringArray(data.relatedEntityIds),
-    projection: toJsonValue(data),
-    created_at: toIsoTimestamp(data.createdAt, now),
-  }) as ReleaseStoryRow;
-}
-
 export type AuditEventRow = {
   readonly id: string;
   readonly action: string;

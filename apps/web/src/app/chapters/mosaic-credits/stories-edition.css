@@ -3,7 +3,7 @@
  * edition headers. Atmosphere (grain + gutter mosaic) from edition-atmosphere.css.
  */
 
-@import '../../components/patterns/edition-atmosphere/edition-atmosphere.css';
+@import '../../../components/patterns/edition-atmosphere/edition-atmosphere.css';
 
 .ds-stories-edition {
   position: relative;
