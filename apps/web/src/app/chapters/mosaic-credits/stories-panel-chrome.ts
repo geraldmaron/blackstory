@@ -4,7 +4,7 @@
  * tests a stable contract for CSS and a11y.
  */
 
-import { editionAtmosphereCanvasClassName } from '../../components/patterns/edition-atmosphere/edition-atmosphere-canvas';
+import { editionAtmosphereCanvasClassName } from '../../../components/patterns/edition-atmosphere/edition-atmosphere-canvas';
 
 /** Mosaic seed for stories routes (index, article, credits). */
 export const STORIES_EDITION_MOSAIC_SEED = 'stories-edition-v6';

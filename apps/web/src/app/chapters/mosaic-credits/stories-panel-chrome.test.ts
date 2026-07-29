@@ -3,7 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { EDITION_ATMOSPHERE_CANVAS_CLASS } from '../../components/patterns/edition-atmosphere/edition-atmosphere-canvas';
+import { EDITION_ATMOSPHERE_CANVAS_CLASS } from '../../../components/patterns/edition-atmosphere/edition-atmosphere-canvas';
 import {
   STORIES_EDITION_MOSAIC_SEED,
   STORIES_EDITION_PANEL_CLASS,

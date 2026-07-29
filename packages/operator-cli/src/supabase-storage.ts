@@ -47,6 +47,7 @@ export function createSupabaseStorage(config: SupabaseStorageConfig): CaptureSto
           method: 'POST',
           headers: {
             authorization: `Bearer ${config.secretKey}`,
+            apikey: config.secretKey,
             'content-type': 'text/plain; charset=utf-8',
             'x-upsert': 'false',
           },

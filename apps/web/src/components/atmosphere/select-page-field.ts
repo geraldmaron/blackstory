@@ -55,11 +55,7 @@ function resolveMotifId(path: string): PageFieldMotifId {
     return 'rules';
   }
 
-  if (
-    matchesRoutePrefix(path, '/stories') ||
-    matchesRoutePrefix(path, '/about') ||
-    matchesRoutePrefix(path, '/topics')
-  ) {
+  if (matchesRoutePrefix(path, '/about')) {
     return 'bands';
   }
 

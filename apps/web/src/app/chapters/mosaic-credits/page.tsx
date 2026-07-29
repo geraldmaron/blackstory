@@ -8,8 +8,8 @@ import {
   storiesEditionPanelClassName,
   storiesEditionRootClassName,
   storiesEditionStackClassName,
-} from '../../stories/stories-panel-chrome';
-import '../../stories/stories-edition.css';
+} from './stories-panel-chrome';
+import './stories-edition.css';
 
 export const metadata = {
   title: 'Archive mosaic credits',

@@ -36,22 +36,6 @@ export async function listReleaseThemeImpactPacketsByTheme(
   return rows.map(mapRow);
 }
 
-export async function fetchReleaseThemeImpactPacket(
-  themeId: string,
-  questionId: string,
-): Promise<ThemeImpactPacket | undefined> {
-  const rows = await queryPostgres<ReleasePacketRow>(
-    `SELECT packets.payload
-     FROM bb_public.release_theme_impact_packets packets
-     ${ACTIVE_RELEASE_JOIN}
-     WHERE packets.theme_id = $1 AND packets.question_id = $2
-     LIMIT 1`,
-    [themeId, questionId],
-  );
-  const row = rows[0];
-  return row ? mapRow(row) : undefined;
-}
-
 export async function listReleaseThemeImpactPacketsByIds(
   ids: readonly string[],
 ): Promise<readonly ThemeImpactPacket[]> {
@@ -64,14 +48,4 @@ export async function listReleaseThemeImpactPacketsByIds(
     [[...ids]],
   );
   return rows.map(mapRow);
-}
-
-export async function listReleaseThemeImpactThemeIds(): Promise<readonly string[]> {
-  const rows = await queryPostgres<{ readonly theme_id: string }>(
-    `SELECT DISTINCT packets.theme_id
-     FROM bb_public.release_theme_impact_packets packets
-     ${ACTIVE_RELEASE_JOIN}
-     ORDER BY packets.theme_id`,
-  );
-  return rows.map((row) => row.theme_id);
 }

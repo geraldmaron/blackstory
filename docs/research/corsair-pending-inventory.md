@@ -1,5 +1,16 @@
 # Corsair pending entities (not yet in production catalog)
 
+> **STALE — do not trust the counts below.** Generated 2026-07-21 against a
+> `bb_canonical.entities` baseline of 666. Live canonical passed that 2x+ over by
+> 2026-07-27 (1395) and is 4092 as of 2026-07-29 — see
+> `docs/data/entity-count-metric.md` for the current authoritative number and
+> `repo-wa5j` for why this doc drifted. Every "pending" figure here (gap-fill,
+> lynching, confidence-floor, negro-leagues, divine-nine) was diffed against the
+> stale 666 baseline and is unreliable until Corsair is recovered (`repo-8cs6`)
+> and the lanes are re-diffed against live canonical. Corsair is also
+> out-of-scope for the current entity-growth epic (`repo-jy6k`), which reached
+> its target via non-Corsair lanes instead.
+
 Generated: 2026-07-21 from Corsair host inventory vs
 `packages/firebase/fixtures/national-catalog` (name + id match).
 

@@ -29,7 +29,6 @@ import {
   mapReleaseGraphAdjacency,
   mapReleaseGraphAllTime,
   mapReleaseGraphDecade,
-  mapReleaseStory,
   mapResearchCase,
   mapRetrievalEvent,
   mapSearchIndex,
@@ -408,27 +407,24 @@ export async function migratePublicSearchIndex(
 export async function migratePublicReleaseProjections(
   options: MigrateOptions,
 ): Promise<CollectionMigrateResult> {
+  // Story subcollections are intentionally NOT migrated: bb_public.release_stories was
+  // dropped with the legacy /stories surface (repo-8dj0); the story-intake pipeline
+  // (repo-cqey) owns any future story publishing.
   const result = {
-    ...emptyResult('publicReleases/*', 'bb_public.release_entities+stories'),
+    ...emptyResult('publicReleases/*', 'bb_public.release_entities'),
     errors: [] as string[],
   };
   const releaseRefs = await options.db.collection('publicReleases').listDocuments();
   const entityRows: Record<string, unknown>[] = [];
-  const storyRows: Record<string, unknown>[] = [];
   for (const ref of releaseRefs) {
     for await (const doc of iterateSubcollection(options.db, 'publicReleases', ref.id, 'entities')) {
       result.read += 1;
       entityRows.push(mapReleaseEntity(ref.id, doc.id, doc.data));
     }
-    for await (const doc of iterateSubcollection(options.db, 'publicReleases', ref.id, 'stories')) {
-      result.read += 1;
-      storyRows.push(mapReleaseStory(ref.id, doc.id, doc.data));
-    }
   }
   // Validate the complete entity set before the first public write. A malformed or divergent row
   // must not leave a partially accepted release merely because it appeared in a later batch.
   await flushCanonicalReleaseEntities(options, entityRows, result);
-  await flushUpsert(options, 'bb_public.release_stories', storyRows, ['release_id', 'slug'], result);
   return result;
 }
 
