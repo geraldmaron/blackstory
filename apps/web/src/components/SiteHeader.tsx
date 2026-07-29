@@ -20,7 +20,10 @@ function NextShellLink({ href, className, children, ...rest }: ShellHeaderLinkPr
     );
   }
   return (
-    <Link href={href} className={className} {...rest}>
+    // Header nav is on-screen on every route, so its default viewport-triggered prefetch
+    // competes for bandwidth with whatever the landed-on page actually needs (e.g. the entity
+    // page's MapLibre chunk). None of these are the likely next click, so skip prefetch.
+    <Link href={href} className={className} prefetch={false} {...rest}>
       {children}
     </Link>
   );

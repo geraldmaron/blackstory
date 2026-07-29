@@ -31,7 +31,12 @@ export function EntityTopicTags({ entity }: EntityTopicTagsProps) {
   return (
     <div className="ds-entity-tags" role="group" aria-label="Topics and eras">
       {themes.map((tag) => (
-        <Link key={`theme-${tag}`} className="ds-entity-tag" href={chipHref('theme', tag)}>
+        <Link
+          key={`theme-${tag}`}
+          className="ds-entity-tag"
+          href={chipHref('theme', tag)}
+          prefetch={false}
+        >
           {tag}
         </Link>
       ))}
@@ -40,6 +45,7 @@ export function EntityTopicTags({ entity }: EntityTopicTagsProps) {
           key={`era-${era}`}
           className="ds-entity-tag ds-entity-tag--era"
           href={chipHref('era', era)}
+          prefetch={false}
         >
           {era}
         </Link>
