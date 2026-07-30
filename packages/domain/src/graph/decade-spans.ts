@@ -159,7 +159,7 @@ export function deriveGraphDecadeBucketInput(
 /** Decade labels implied by active spans (for coverage metrics). */
 export function deriveGraphDecadeLabelsFromSpans(
   input: DecadeBucketEntityInput,
-  referenceDate: string,
+  _referenceDate: string,
 ): readonly string[] {
   const buckets = new Set<string>();
   for (const span of input.activeSpans) {

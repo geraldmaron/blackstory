@@ -7,7 +7,7 @@
  */
 import { getHistoryGraphReleaseArtifact, resolveHistoryGraphReleaseArtifact } from '../../data/history-graph-seed';
 import { listPublicEntities, type PublicEntityView } from '../../data/public-seed';
-import type { EntityRelationship } from '@repo/domain';
+import type { EntityRelationship, GraphReleaseArtifact } from '@repo/domain';
 import {
   buildHistoryEdges,
   buildHistoryGraphContext,
@@ -57,7 +57,7 @@ export type BuildHistoryViewModelOptions = {
   /** Active public release id when live projections are wired; defaults to seed snapshot. */
   readonly releaseId?: string;
   /** Pre-resolved graph artifact (stored release_graph_* or in-process fallback). */
-  readonly graphArtifact?: import('@repo/domain').GraphReleaseArtifact;
+  readonly graphArtifact?: GraphReleaseArtifact;
 };
 
 export function buildHistoryViewModel(

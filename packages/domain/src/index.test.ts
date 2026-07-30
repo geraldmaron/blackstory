@@ -32,7 +32,11 @@ test('deceased is not treated as living', () => {
 });
 
 test('living status vocabulary comes from constitution', () => {
-  assert.deepEqual([...livingStatuses()], ['living', 'deceased', 'unknown']);
+  assert.deepEqual([...livingStatuses()], ['living', 'deceased', 'presumed_deceased', 'unknown']);
+});
+
+test('presumed_deceased is not treated as living', () => {
+  assert.equal(treatAsLiving('presumed_deceased'), false);
 });
 
 test('EntityId rejects empty strings', () => {
