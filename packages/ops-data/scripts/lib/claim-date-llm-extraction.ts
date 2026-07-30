@@ -91,12 +91,17 @@ export function buildClaimDateExtractionUserPrompt(subject: ClaimDateExtractionS
 }
 
 export function buildClaimDateExtractionRequest(subject: ClaimDateExtractionSubject): LlmCompletionRequest {
+  const model =
+    process.env.OPENROUTER_MODEL?.trim() ||
+    process.env.OLLAMA_MODEL?.trim() ||
+    process.env.EXTRACT_CLAIM_DATE_LLM_MODEL?.trim() ||
+    'openai/gpt-4o-mini';
   return {
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },
       { role: 'user', content: buildClaimDateExtractionUserPrompt(subject) },
     ],
-    model: 'claim-date-extraction-v1',
+    model,
     temperature: 0,
     maxTokens: 512,
     responseSchema: CLAIM_DATE_EXTRACTION_RESPONSE_SCHEMA,

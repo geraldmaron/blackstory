@@ -526,25 +526,16 @@ function hydrateLearningLinks(entities: readonly PublicEntityView[]): readonly P
       neighborsById,
     );
 
-    const toView = (stub: (typeof relatedNeighborStubs)[number]): RelatedNeighborView =>
-      stub.timespan !== undefined
-        ? {
-            id: stub.id,
-            displayName: stub.displayName,
-            kind: stub.kind,
-            summary: stub.summary,
-            relationType: stub.relationType,
-            direction: stub.direction,
-            timespan: stub.timespan,
-          }
-        : {
-            id: stub.id,
-            displayName: stub.displayName,
-            kind: stub.kind,
-            summary: stub.summary,
-            relationType: stub.relationType,
-            direction: stub.direction,
-          };
+    const toView = (stub: (typeof relatedNeighborStubs)[number]): RelatedNeighborView => ({
+      id: stub.id,
+      displayName: stub.displayName,
+      kind: stub.kind,
+      summary: stub.summary,
+      relationType: stub.relationType,
+      direction: stub.direction,
+      ...(stub.timespan !== undefined ? { timespan: stub.timespan } : {}),
+      ...(stub.viaEvent !== undefined ? { viaEvent: stub.viaEvent } : {}),
+    });
 
     const relatedNeighbors = relatedNeighborStubs.map(toView);
     const continueLearning = continueLearningStubs.map(toView);

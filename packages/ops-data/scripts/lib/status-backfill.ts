@@ -630,6 +630,36 @@ export const PLACE_STATUS_FIXES: readonly TerminalStatusFix[] = [
     note: 'Operating institution; historic label was incorrect.',
     rewriteMode: 'replace',
   },
+  {
+    entityId: 'ent_pullman_porters_001',
+    displayName: 'Pullman National Historical Park — A. Philip Randolph Pullman Porter Museum',
+    priorStatus: 'historic',
+    nextStatus: 'active',
+    validFrom: '1894',
+    validTo: '1894',
+    datePrecision: 'year',
+    basisClaimIds: ['ent_pullman_porters_001_claim_0', 'ent_pullman_porters_001_claim_1'],
+    note: 'Operating NPS historical park and museum; historic-only label was incorrect.',
+    rewriteMode: 'replace',
+  },
+  {
+    entityId: 'dc-black-history-sites-i38',
+    displayName:
+      'Frederick Douglass House/Museum of African Art/Frederick Douglass Museum and Hall of Fame for Caring Americans',
+    priorStatus: 'historic',
+    nextStatus: 'active',
+    validFrom: '1870',
+    validTo: '1870',
+    datePrecision: 'year',
+    basisClaimIds: [
+      'dc-black-history-sites-i38_claim_0',
+      'dc-black-history-sites-i38_claim_1',
+      'dc-black-history-sites-i38_claim_2',
+      'dc-black-history-sites-i38_claim_3',
+    ],
+    note: 'Operating historic house/museum sites; historic-only label was incorrect (compound DC sites row).',
+    rewriteMode: 'replace',
+  },
 ];
 
 export const PLACE_STATUS_FIX_ENTITY_IDS = new Set(

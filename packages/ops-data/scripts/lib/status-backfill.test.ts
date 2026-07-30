@@ -175,4 +175,6 @@ test('law and place fix catalogs include named audit targets', () => {
   assert.ok(PLACE_STATUS_FIXES.some((f) => f.entityId === 'ent_negro_fort_001'));
   assert.ok(PLACE_STATUS_FIXES.some((f) => f.entityId === 'ent_charles_wright_museum_001'));
   assert.ok(PLACE_STATUS_FIXES.some((f) => f.entityId === 'ent_little_rock_central_high_001'));
+  assert.ok(PLACE_STATUS_FIXES.some((f) => f.entityId === 'ent_pullman_porters_001'));
+  assert.ok(PLACE_STATUS_FIXES.some((f) => f.entityId === 'dc-black-history-sites-i38'));
 });

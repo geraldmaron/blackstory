@@ -99,26 +99,16 @@ function toNeighborLookup(entity: PublicEntityView): NeighborLookup {
 function asRelatedNeighborViews(
   stubs: ReturnType<typeof buildRelatedNeighborStubs>,
 ): readonly RelatedNeighborView[] {
-  return stubs.map((stub) =>
-    stub.timespan !== undefined
-      ? {
-          id: stub.id,
-          displayName: stub.displayName,
-          kind: stub.kind,
-          summary: stub.summary,
-          relationType: stub.relationType,
-          direction: stub.direction,
-          timespan: stub.timespan,
-        }
-      : {
-          id: stub.id,
-          displayName: stub.displayName,
-          kind: stub.kind,
-          summary: stub.summary,
-          relationType: stub.relationType,
-          direction: stub.direction,
-        },
-  );
+  return stubs.map((stub) => ({
+    id: stub.id,
+    displayName: stub.displayName,
+    kind: stub.kind,
+    summary: stub.summary,
+    relationType: stub.relationType,
+    direction: stub.direction,
+    ...(stub.timespan !== undefined ? { timespan: stub.timespan } : {}),
+    ...(stub.viaEvent !== undefined ? { viaEvent: stub.viaEvent } : {}),
+  }));
 }
 
 /** Attach 1-hop stubs + capped 2-hop continue-learning using a neighbor catalog.
