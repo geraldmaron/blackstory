@@ -375,7 +375,7 @@ Deep links serialize to the params `/explore` already parses (`selected`, `confi
 | Skeletons | `components/patterns/skeleton.css` | Built |
 | Citation | `lib/citation/format.ts` | Built |
 | Share deep link | `lib/share/deep-link.ts` | Built |
-| Annotation overlay | `components/map-experience/AnnotationOverlay.tsx`, `lib/map-experience/arc-geometry.ts` | Pending (WP-07) |
+| Annotation overlay | `components/map-experience/AnnotationOverlay.tsx`, `lib/map-experience/arc-geometry.ts` | Built |
 | Command palette | `components/patterns/command-palette/` | Pending (WP-09) |
 | Command bar | `components/shell/CommandBar.tsx` | Pending (WP-10) |
 | Lens panel | `components/map-experience/LensPanel.tsx` | Pending (WP-11) |
@@ -386,6 +386,13 @@ Deep links serialize to the params `/explore` already parses (`selected`, `confi
 | Record sheet | `components/map-experience/RecordSheet.tsx` | Pending (WP-17) |
 | Collections | `lib/collections/store.ts` | Pending (WP-18) |
 | Story engine | `components/story/StoryMode.tsx`, `lib/story/chapters.ts` | Pending (WP-21) |
+
+**"Built" means built and tested, not mounted.** Every module above exists, typechecks and has
+tests, but none of them is reachable in the running app yet: nothing on `/explore` renders the
+time panel, constructs the camera, or draws a corridor. Composition is WP-23's job, and WP-23
+depends only on WP-11, WP-12, WP-13, WP-16 and WP-17 — so the overlay, palette, command bar,
+decade transition, keyboard layer and collections have no package that mounts them. Read this
+table as an inventory of parts, and check the epic before assuming a surface uses one.
 
 **Plate wiring is not yet done.** The `--ds-map-*` roles exist and are contract-tested, but the MapLibre style builders still read `dignity-style.ts`'s `plateForScheme`. Until that is wired, the live map renders the old plate. This is not covered by any current work package.
 
