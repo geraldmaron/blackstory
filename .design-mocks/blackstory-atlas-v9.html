@@ -4905,8 +4905,12 @@ const SURF_BY_ID = Object.fromEntries(SURFACES.map(s => [s.id, s]));
 /* ---- plate postures ------------------------------------------------------- */
 const GESTURES = ['scrollZoom', 'dragPan', 'dragRotate', 'touchZoomRotate', 'doubleClickZoom', 'keyboard'];
 
+/* These guard on `map` rather than `mapOK`. mapOK means "the load event has been seen",
+   which is the right gate for reading rendered features but the wrong one for camera and
+   resize: both are safe as soon as the map object exists, and gating them on load meant a
+   slow style fetch left every map moment permanently inert. */
 function lockGestures(locked) {
-  if (!mapOK) return;
+  if (!map) return;
   GESTURES.forEach(g => { if (map[g]) locked ? map[g].disable() : map[g].enable(); });
 }
 
@@ -4924,11 +4928,12 @@ function setPlate(posture, rect) {
     el.style.top = el.style.left = el.style.width = el.style.height = el.style.right = el.style.bottom = '';
   }
   lockGestures(posture !== 'live');
-  if (mapOK) map.resize();
+  if (map) map.resize();
 }
 
 /* ---- map moments: the plate, borrowed inside a reading column ------------ */
 let liveMoment = null, momentRaf = 0;
+let pickMoment = () => {};
 
 function momentRect(fig) {
   return fig.querySelector('.mm-plate').getBoundingClientRect();
@@ -4956,6 +4961,16 @@ function frameMoment(fig) {
   liveMoment = fig;
   if (!fig) { setPlate('parked'); return; }
 
+  /* v9 section 10: map failure degrades, it never leaves a blank rectangle. If the plate
+     is unavailable the slot keeps its caption and says so, rather than borrowing nothing. */
+  if (root.dataset.mapfail === '1' || !map) {
+    fig.dataset.live = '0';
+    const idle = fig.querySelector('.mm-idle span');
+    if (idle) idle.textContent = 'The map is unavailable. The caption below carries the point.';
+    setPlate('parked');
+    return;
+  }
+
   fig.dataset.live = '1';
   setPlate('framed', momentRect(fig));
 
@@ -4963,17 +4978,23 @@ function frameMoment(fig) {
   try { spec = JSON.parse(fig.dataset.cam || '{}'); } catch (err) { spec = {}; }
   const plain = fig.dataset.plain === '1';
 
-  if (!mapOK || !spec.center) return;
-  if (plain || reduce) {
-    /* dignity: violence-adjacent subjects get a plain cut, no pitch, no bearing, no drama */
-    map.jumpTo({ center: spec.center, zoom: spec.zoom || 9, pitch: 0, bearing: 0 });
-  } else {
-    map.flyTo({
-      center: spec.center, zoom: spec.zoom || 9,
-      pitch: spec.pitch || 0, bearing: spec.bearing || 0,
-      curve: 1.42, speed: .9, essential: false,
-    });
-  }
+  if (!map || !spec.center) return;
+
+  const apply = () => {
+    if (liveMoment !== fig) return;   // the reader moved on while the style was loading
+    map.resize();
+    if (plain || reduce) {
+      /* dignity: violence-adjacent subjects get a plain cut, no pitch, no bearing, no drama */
+      map.jumpTo({ center: spec.center, zoom: spec.zoom || 9, pitch: 0, bearing: 0 });
+    } else {
+      map.flyTo({
+        center: spec.center, zoom: spec.zoom || 9,
+        pitch: spec.pitch || 0, bearing: spec.bearing || 0,
+        curve: 1.42, speed: .9, essential: false,
+      });
+    }
+  };
+  if (map.isStyleLoaded()) apply(); else map.once('load', apply);
   if (fig.dataset.note) say('Framed · ' + fig.dataset.note.split('.')[0]);
 }
 
@@ -5007,6 +5028,7 @@ function renderSurface(s) {
   decorateDoc();
   citedIn(s);
   buildFooter();
+  requestAnimationFrame(() => pickMoment());
 }
 
 /* the reverse edge: a record page says which rooms cite it, computed rather than hand maintained */
@@ -5200,25 +5222,25 @@ function initRooms() {
   });
 
   /* the framed plate tracks its slot while the reader scrolls */
-  $('#doc').addEventListener('scroll', () => { queueMomentSync(); updateProgress(); }, { passive: true });
+  $('#doc').addEventListener('scroll', () => { queueMomentSync(); pickMoment(); updateProgress(); }, { passive: true });
   addEventListener('resize', () => { queueMomentSync(); });
 
-  /* a moment claims the plate when it is genuinely on screen, and releases it after */
-  const mio = new IntersectionObserver(entries => {
+  /* Which moment owns the plate is a function of what is on screen right now, so it is
+     computed from the DOM rather than accumulated from observer callbacks. An entry-set
+     diff gets this wrong the moment two figures cross a threshold in the same frame, and
+     the failure mode is a plate left stranded at a slot that has scrolled away. */
+  pickMoment = () => {
     if (S.mode !== 'read') return;
-    const on = entries.filter(en => en.isIntersecting && en.intersectionRatio > 0.55)
-      .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-    if (on) frameMoment(on.target);
-    else if (liveMoment && !liveMoment.getBoundingClientRect().height) frameMoment(null);
-    else {
-      const stillOn = entries.some(en => en.target === liveMoment && en.isIntersecting);
-      if (!stillOn && entries.some(en => en.target === liveMoment)) frameMoment(null);
-    }
-  }, { root: $('#doc'), threshold: [0, 0.55, 0.9] });
-
-  const observeMoments = () => $$('#docbody .mapmoment').forEach(f => mio.observe(f));
-  new MutationObserver(observeMoments).observe($('#docbody'), { childList: true });
-  observeMoments();
+    const vh = $('#doc').clientHeight;
+    let best = null, bestVis = 0;
+    $$('#docbody .mapmoment').forEach(f => {
+      const r = f.querySelector('.mm-plate').getBoundingClientRect();
+      if (!r.height) return;
+      const vis = Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0)) / r.height;
+      if (vis > 0.55 && vis > bestVis) { bestVis = vis; best = f; }
+    });
+    frameMoment(best);
+  };
 
   /* deep link: #/chapters opens that room on load */
   const hash = location.hash.replace(/^#/, '');
