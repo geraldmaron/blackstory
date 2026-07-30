@@ -1,0 +1,172 @@
+/**
+ * Time panel — bottom centre, z 20. Density histogram plus playhead.
+ *
+ * Bar states carry the accent hierarchy from design-direction-v9-atlas.md §8:
+ * rest is structure, in-range is secondary data, active is the primary accent.
+ */
+
+.ds-time-panel {
+  position: fixed;
+  left: 50%;
+  bottom: var(--ds-space-4);
+  z-index: 20;
+  transform: translateX(-50%);
+  width: min(760px, calc(100vw - 24px));
+  padding: var(--ds-space-3) var(--ds-space-4) var(--ds-space-2);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+}
+
+.ds-time-panel__header {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  align-items: baseline;
+  gap: var(--ds-space-3);
+  margin-bottom: var(--ds-space-2);
+}
+
+.ds-time-panel__kicker {
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+}
+
+.ds-time-panel__current {
+  font-family: var(--ds-font-display);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ds-ink);
+}
+
+.ds-time-panel__sub {
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  color: var(--ds-ink-muted);
+}
+
+.ds-time-panel__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+.ds-time-panel__play,
+.ds-time-panel__alltime {
+  min-height: 44px;
+  padding: 0 var(--ds-space-3);
+  background: none;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+  cursor: pointer;
+}
+
+.ds-time-panel__alltime:disabled {
+  color: var(--ds-ink-subtle);
+  cursor: default;
+}
+
+.ds-time-panel__play:focus-visible,
+.ds-time-panel__alltime:focus-visible,
+.ds-time-panel__track:focus-visible {
+  outline: var(--ds-border-width-strong) solid var(--ds-accent);
+  outline-offset: var(--ds-focus-offset);
+}
+
+/* The track is the 44px touch target; the bars inside it are decoration. */
+.ds-time-panel__track {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  height: 44px;
+  padding-block: var(--ds-space-1);
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.ds-time-panel__bar {
+  flex: 1 1 0;
+  min-width: 1px;
+  background: var(--ds-border);
+  transition: background-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-time-panel__bar--inrange {
+  background: var(--ds-accent-muted);
+}
+
+.ds-time-panel__bar--active {
+  background: var(--ds-accent-graphic);
+}
+
+/* A decade with no records draws nothing. Presence is never invented. */
+.ds-time-panel__bar--empty {
+  background: none;
+}
+
+.ds-time-panel__playhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--ds-accent-graphic);
+  pointer-events: none;
+  transition:
+    left var(--ds-duration-fast) var(--ds-easing),
+    opacity var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-time-panel__playhead::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 9px;
+  height: 3px;
+  background: var(--ds-accent-graphic);
+  transform: translateX(-50%);
+}
+
+.ds-time-panel__axis {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--ds-font-mono);
+  font-size: 0.59375rem;
+  color: var(--ds-ink-subtle);
+}
+
+@media (max-width: 819px) {
+  .ds-time-panel {
+    padding: var(--ds-space-2) var(--ds-space-3);
+  }
+
+  .ds-time-panel__header {
+    grid-template-columns: auto 1fr auto;
+    row-gap: var(--ds-space-1);
+  }
+
+  /* The sub-line wraps to its own row rather than crushing the controls. */
+  .ds-time-panel__sub {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-time-panel__bar,
+  .ds-time-panel__playhead {
+    transition: none;
+  }
+}
