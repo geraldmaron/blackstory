@@ -707,20 +707,23 @@
   opacity: 0.7;
 }
 
-/* —— Home edition — Archive Paper scroll document + inset shell panel —— */
+/* —— Home edition — Archive Paper scroll document; flush site header (no floating gap) —— */
 .ds-shell:has(.ds-home-hero) {
   background: var(--ds-canvas);
 }
 
 .ds-shell-body:has(.ds-home-hero) {
-  padding-top: var(--ds-space-4);
+  /* Same clearance as document routes — header is fixed flush to the viewport top. */
+  padding-top: var(--ds-island-clearance);
 }
 
 .ds-shell:has(.ds-home-hero) .ds-shell-header {
-  position: sticky;
-  top: var(--ds-space-4);
+  position: fixed;
+  top: 0;
   z-index: 100;
-  padding-inline: var(--ds-gutter);
+  padding-inline: 0;
+  background: var(--ds-canvas);
+  border-bottom-color: var(--ds-rule);
   pointer-events: none;
 }
 
@@ -729,13 +732,10 @@
   width: min(100%, var(--ds-grid-max));
   max-width: none;
   margin-inline: auto;
-  padding: 0.5rem 1rem;
-  /* Blend into the paper: chrome sits on the canvas, not a lighter floating plate.
-     Hairline bottom rule only — no ring, no card radius. */
-  background: var(--ds-canvas);
+  padding: 0.5rem var(--ds-gutter);
+  background: transparent;
   border: 0;
   border-radius: 0;
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
 }
 
 

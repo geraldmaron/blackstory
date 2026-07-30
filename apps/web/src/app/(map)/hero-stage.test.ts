@@ -207,10 +207,14 @@ describe('home hero panel structure', () => {
 });
 
 describe('home shell-on-home', () => {
-  it('uses inset sticky shell panel aligned to home edition width', () => {
+  it('uses a flush fixed shell bar (no floating top gap) aligned to home edition width', () => {
     assert.match(
       shellCss,
-      /\.ds-shell:has\(\.ds-home-hero\)\s+\.ds-shell-header\s*\{[^}]*position:\s*sticky/s,
+      /\.ds-shell:has\(\.ds-home-hero\)\s+\.ds-shell-header\s*\{[^}]*position:\s*fixed/s,
+    );
+    assert.match(
+      shellCss,
+      /\.ds-shell:has\(\.ds-home-hero\)\s+\.ds-shell-header\s*\{[^}]*top:\s*0/s,
     );
     // Flattened header chrome: sits on the canvas with a hairline bottom rule — no card
     // ring or radius (repo hero-copy-scrim flatten pass).

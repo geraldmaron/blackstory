@@ -21,6 +21,7 @@ import '../../components/patterns/browse-mode.css';
 import '../../components/patterns/edition-fact-icon.css';
 import '../../components/patterns/record-anatomy.css';
 import '../../components/trust/research-pipeline-sketch.css';
+import { getHistoryGraphReleaseArtifact } from '../../data/history-graph-seed';
 import { FEATURED_SEED_IDS } from '../../data/public-seed';
 import { buildHomeFeaturedCarouselSet } from '../../components/patterns/home-featured-set';
 import { initialBrowseIndex } from '../../components/patterns/browse-mode';
@@ -107,7 +108,10 @@ export default async function HomePage() {
 
   // Decades in motion: per-decade edge lines from the history graph release + cumulative record
   // reveal over the shared feature collection. State fills prefer the Census index when present.
-  const { edgeLineCatalog } = buildEdgeLineCatalog();
+  const { edgeLineCatalog } = buildEdgeLineCatalog(
+    getHistoryGraphReleaseArtifact(base.entities),
+    base.entities,
+  );
   const edgesByDecade: Record<string, HistoryEdgeLineCollection> = {};
   for (const [decade, slice] of Object.entries(edgeLineCatalog.byDecade)) {
     edgesByDecade[decade] = slice.lineCollection;

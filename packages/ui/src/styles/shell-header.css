@@ -5,9 +5,10 @@
 
 :root {
   --ds-island-offset: env(safe-area-inset-top, 0px);
-  /* Fallback until ShellHeader measures the live bar (ResizeObserver). */
+  /* Content-bar target height (not the full fixed band). ResizeObserver sets clearance. */
   --ds-island-height: 3.5rem;
   --ds-island-gap: var(--ds-space-3);
+  /* Fallback until ShellHeader measures the live fixed band (safe-area + bar). */
   --ds-island-clearance: calc(
     var(--ds-island-offset) + var(--ds-island-height) + var(--ds-island-gap)
   );
@@ -19,13 +20,17 @@ html {
 
 .ds-shell-header {
   position: fixed;
-  top: var(--ds-island-offset);
+  top: 0;
   left: 0;
   right: 0;
   z-index: 80;
   display: flex;
   justify-content: stretch;
+  padding-top: var(--ds-island-offset);
   padding-inline: 0;
+  /* Opaque plate through the safe-area band so scrolled content never shows above the bar. */
+  background: var(--ds-surface);
+  border-bottom: var(--ds-border-width) solid var(--ds-border);
   pointer-events: none;
 }
 
@@ -39,10 +44,9 @@ html {
   min-height: var(--ds-island-height);
   padding: 0.25rem var(--ds-gutter);
   border: 0;
-  border-bottom: var(--ds-border-width) solid var(--ds-border);
   border-radius: 0;
   /* Follows [data-theme] via --ds-surface / --ds-ink (never a hardcoded cream plate). */
-  background: var(--ds-surface);
+  background: transparent;
   color: var(--ds-ink);
 }
 

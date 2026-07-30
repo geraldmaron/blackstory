@@ -78,7 +78,7 @@
   overflow: hidden;
 }
 
-:root[data-cinematic-engaged='true'] .ds-shell-header,
+/* Explore keeps primary nav for wayfinding. Footer + route-marked chrome still recede. */
 :root[data-cinematic-engaged='true'] .ds-shell-footer,
 :root[data-cinematic-engaged='true'] [data-cinematic-recede] {
   opacity: 0;
@@ -122,16 +122,16 @@
 }
 
 :root[data-cinematic-engaged='true'] .ds-map-surface .ds-map-stage,
-:root[data-cinematic-engaged='true'] .ds-cinematic-rail > * {
+:root[data-cinematic-engaged='true'] .ds-cinematic-rail > *,
+:root[data-cinematic-engaged='true'] .ds-explore-stage__decade-dock {
   pointer-events: auto;
 }
 
-/* The rail is the only chrome that survives Engaged, so it detaches from the (now hidden)
-   page flow and pins to the viewport — otherwise Close would sit wherever the host panel
-   happened to be scrolled to. */
+/* The rail + decade dock survive Engaged; pin the rail below the site header —
+   otherwise Close would sit wherever the host panel happened to be scrolled to. */
 :root[data-cinematic-engaged='true'] .ds-cinematic-rail {
   position: fixed;
-  top: var(--ds-space-4);
+  top: calc(var(--ds-island-clearance) + var(--ds-space-2));
   right: var(--ds-space-4);
   left: auto;
   z-index: 5;

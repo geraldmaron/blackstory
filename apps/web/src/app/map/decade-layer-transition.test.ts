@@ -2,6 +2,7 @@
  * Unit tests for decade-flow dual-buffer morph timing and paint targets.
  */
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import type { Map as MapLibreMap, StyleSpecification } from 'maplibre-gl';
 import {
@@ -32,6 +33,20 @@ test('decade morph duration is a slow ambient dissolve (~1.6s), not the 480ms UI
   assert.equal(DECADE_LAYER_FADE_MS, 1600);
   assert.equal(decadeLayerFadeDurationMs(false), 1600);
   assert.equal(decadeLayerFadeDurationMs(true), 0);
+});
+
+test('explore instrument surface must not request the ambient morph on patchData', () => {
+  // Regression: Explore previously called shouldMorphDecadeDataPatch → fade:true on every
+  // decade/filter click (1.6s dual-buffer), which felt lagged. HeroStage keeps the morph.
+  const exploreSource = readFileSync(
+    new URL('../(map)/explore/ExploreMapExperience.tsx', import.meta.url),
+    'utf8',
+  );
+  assert.doesNotMatch(exploreSource, /from ['"][^'"]*decade-layer-transition['"]/);
+  assert.doesNotMatch(exploreSource, /fade:\s*true/);
+  const heroSource = readFileSync(new URL('../(map)/HeroStage.tsx', import.meta.url), 'utf8');
+  assert.match(heroSource, /shouldFadeDecadePatch/);
+  assert.match(heroSource, /fade:\s*true/);
 });
 
 test('shouldFadeDecadePatch skips the initial apply and reduced motion', () => {

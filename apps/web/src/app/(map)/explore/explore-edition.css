@@ -256,7 +256,12 @@
   left: 50%;
   bottom: calc(var(--ds-space-4) + 3.5rem);
   transform: translateX(-50%);
-  z-index: 2;
+  /* Above cinematic rail (z5) and explore-stage pass-through; must take hits. */
+  z-index: 6;
+  pointer-events: auto;
+  /* Own horizontal scrub; MapLibre must not pan from a drag that started here. */
+  touch-action: none;
+  user-select: none;
   display: flex;
   align-items: stretch;
   gap: var(--ds-space-1);
@@ -269,6 +274,7 @@
 
 .ds-explore-stage__decade-scroll {
   display: flex;
+  flex: 1 1 auto;
   gap: 0;
   list-style: none;
   margin: 0;
@@ -277,6 +283,9 @@
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  /* Own the gesture; JS drag-scroll updates scrollLeft (mouse has no native drag-scroll). */
+  touch-action: none;
+  cursor: grab;
   -webkit-mask-image: linear-gradient(
     to right,
     transparent,
@@ -293,6 +302,10 @@
   );
 }
 
+.ds-explore-stage__decade-scroll:active {
+  cursor: grabbing;
+}
+
 .ds-explore-stage__decade-scroll::-webkit-scrollbar {
   display: none;
 }
@@ -302,6 +315,7 @@
   margin-bottom: 0;
   min-height: 2.5rem;
   gap: var(--ds-space-1);
+  cursor: inherit;
 }
 
 .ds-explore-stage__decade-count {

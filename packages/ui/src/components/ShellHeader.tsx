@@ -10,13 +10,18 @@ import { cx } from '../utils/cx.js';
 
 const DESKTOP_NAV_MQ = '(min-width: 48rem)';
 
-/** Writes measured shell header height to the document root for clearance tokens. */
+/** Writes measured shell header band to the document root for clearance tokens.
+ * Measures the outer fixed header (including safe-area padding) and sets clearance
+ * only — never feeds height back into the bar's min-height (avoids a RO feedback loop). */
 export function syncShellHeaderHeight(header: HTMLElement): void {
   const heightPx = header.getBoundingClientRect().height;
   if (!Number.isFinite(heightPx) || heightPx <= 0) {
     return;
   }
-  document.documentElement.style.setProperty('--ds-island-height', `${heightPx}px`);
+  document.documentElement.style.setProperty(
+    '--ds-island-clearance',
+    `calc(${heightPx}px + var(--ds-island-gap))`,
+  );
 }
 
 export type ShellNavItem = {
