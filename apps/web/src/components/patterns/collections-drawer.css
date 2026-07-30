@@ -1,0 +1,205 @@
+/** Collections drawer — overlay, z 90. Shares the shortcut sheet's overlay geometry. */
+
+.ds-saved {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  padding: var(--ds-space-4);
+}
+
+.ds-saved__scrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: var(--ds-overlay);
+  cursor: default;
+}
+
+.ds-saved__dialog {
+  position: relative;
+  width: min(560px, 100%);
+  max-height: 84dvh;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  background: var(--ds-surface-raised);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  overflow: hidden;
+}
+
+.ds-saved__dialog:focus {
+  outline: none;
+}
+
+.ds-saved__head {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-4) var(--ds-space-5);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-saved__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ds-ink);
+}
+
+.ds-saved__meta {
+  margin-left: auto;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-ink-muted);
+}
+
+.ds-saved__close {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: var(--ds-radius-sm);
+  background: transparent;
+  color: var(--ds-ink-muted);
+  cursor: pointer;
+}
+
+.ds-saved__close:hover {
+  color: var(--ds-ink);
+  background: var(--ds-canvas);
+}
+
+.ds-saved__body {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.ds-saved__empty {
+  margin: 0;
+  padding: var(--ds-space-5);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--ds-ink-muted);
+}
+
+.ds-saved__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-saved__row {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-2) var(--ds-space-5);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-saved__row:last-child {
+  border-bottom: 0;
+}
+
+.ds-saved__glyph {
+  color: var(--ds-ink-muted);
+}
+
+.ds-saved__text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ds-saved__name {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--ds-ink);
+  font-family: inherit;
+  font-size: 0.84375rem;
+  font-weight: 550;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-saved__name:hover {
+  color: var(--ds-accent);
+}
+
+.ds-saved__rowmeta {
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  color: var(--ds-ink-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-saved__remove {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: var(--ds-radius-sm);
+  background: transparent;
+  color: var(--ds-ink-muted);
+  cursor: pointer;
+}
+
+.ds-saved__remove:hover {
+  color: var(--ds-ink);
+  background: var(--ds-canvas);
+}
+
+.ds-saved__foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-4) var(--ds-space-5);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-saved__action {
+  min-height: 36px;
+  padding: 0 var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+  font-family: inherit;
+  font-size: 0.78125rem;
+  cursor: pointer;
+}
+
+.ds-saved__action:hover {
+  border-color: var(--ds-border-strong);
+  background: var(--ds-canvas);
+}
+
+.ds-saved__action--quiet {
+  margin-left: auto;
+  border-color: transparent;
+  color: var(--ds-ink-muted);
+}
+
+.ds-saved__note {
+  flex-basis: 100%;
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  line-height: 1.5;
+  color: var(--ds-ink-muted);
+}

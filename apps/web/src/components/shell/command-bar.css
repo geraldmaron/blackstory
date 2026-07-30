@@ -1,0 +1,183 @@
+/** Command bar — fixed top, z 50, three-zone grid. */
+
+.ds-bar {
+  position: fixed;
+  top: var(--ds-space-2);
+  left: var(--ds-space-2);
+  right: var(--ds-space-2);
+  z-index: 50;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--ds-space-3);
+  height: 56px;
+  padding: 0 var(--ds-space-3);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  box-shadow: 0 10px 30px -20px rgb(0 0 0 / 45%);
+}
+
+/* ---- brand --------------------------------------------------------------- */
+
+.ds-bar__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+.ds-bar__wordmark {
+  font-family: var(--ds-font-display);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.ds-bar__tag {
+  padding: 2px 6px;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-full);
+  font-family: var(--ds-font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+/* ---- search trigger ------------------------------------------------------ */
+
+/*
+ * The most important control on the surface. It is a button rather than an input because it opens
+ * the palette: an input here would give the reader two places to type and one of them would be a
+ * dead end.
+ */
+.ds-bar__search {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  justify-self: center;
+  width: 100%;
+  max-width: 520px;
+  min-height: 38px;
+  padding: 0 var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-full);
+  background: var(--ds-canvas);
+  color: var(--ds-ink-muted);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: border-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-bar__search:hover {
+  border-color: var(--ds-border-strong);
+}
+
+.ds-bar__search-text {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- tools --------------------------------------------------------------- */
+
+.ds-bar__tools {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+.ds-bar__modes {
+  display: inline-flex;
+  padding: 2px;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-full);
+  background: var(--ds-canvas);
+}
+
+.ds-bar__modes button {
+  min-height: 28px;
+  padding: 0 var(--ds-space-3);
+  border: 0;
+  border-radius: var(--ds-radius-full);
+  background: transparent;
+  color: var(--ds-ink-muted);
+  font-family: inherit;
+  font-size: 0.78125rem;
+  cursor: pointer;
+}
+
+.ds-bar__modes button[aria-current='true'] {
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
+}
+
+.ds-bar__tool {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: var(--ds-border-width) solid transparent;
+  border-radius: var(--ds-radius-sm);
+  background: transparent;
+  color: var(--ds-ink-muted);
+  cursor: pointer;
+}
+
+.ds-bar__tool:hover {
+  color: var(--ds-ink);
+  border-color: var(--ds-border);
+  background: var(--ds-canvas);
+}
+
+.ds-bar__badge {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 3px;
+  border-radius: var(--ds-radius-full);
+  background: var(--ds-accent-graphic);
+  color: var(--ds-inverse-ink);
+  font-family: var(--ds-font-mono);
+  font-size: 0.5625rem;
+  line-height: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- narrow -------------------------------------------------------------- */
+
+/*
+ * Below 820px the wordmark, the ATLAS tag and the mode labels go, in that order. The search
+ * trigger never goes: it is the primary affordance and a bar without it is v6's nav again.
+ */
+@media (max-width: 819px) {
+  .ds-bar {
+    height: 50px;
+    gap: var(--ds-space-2);
+  }
+
+  .ds-bar__wordmark,
+  .ds-bar__tag {
+    display: none;
+  }
+
+  .ds-bar__modes {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-bar__search {
+    transition-duration: 0.01ms;
+  }
+}

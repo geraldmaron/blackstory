@@ -23,6 +23,7 @@ import {
   type MapColorScheme,
 } from '../../lib/map-experience/dignity-style';
 import { MAP_LABEL_NAME_FIELD } from '../../lib/map-experience/label-expression';
+import { DECADE_TRANSITION_PAINT } from '../../lib/map-experience/decade-transition';
 import {
   KIND_ENCODING_ENTRIES,
   KIND_FAMILY_ENTRIES,
@@ -981,6 +982,8 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         source: EXPLORE_ENTITIES_SOURCE_ID,
         filter: ['!', ['has', 'point_count']],
         paint: {
+          // A decade change crossfades rather than snapping (v9 §11 supersedes v6 §4.4).
+          ...DECADE_TRANSITION_PAINT,
           // data-driven radius (marker-size.ts's formula + the fixed halo offset), one
           // source of truth with the point layer below. Halo uses the same kind/tone shade as
           // the point (and KindBadge) at low opacity — a neutral sand wash was washing every
@@ -996,6 +999,8 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         source: EXPLORE_ENTITIES_SOURCE_ID,
         filter: ['!', ['has', 'point_count']],
         paint: {
+          // A decade change crossfades rather than snapping (v9 §11 supersedes v6 §4.4).
+          ...DECADE_TRANSITION_PAINT,
           // size from marker-size.ts (evidenceCount + confidenceTier, clamped [6, 16]);
           // color + fill/stroke signature from kind-encoding.ts via DIGNITY_PALETTE (color marks
           // kind only; the fill/stroke signature is the non-color channel WCAG 1.4.1 requires).
@@ -1016,6 +1021,8 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         source: EXPLORE_ENTITIES_SOURCE_ID,
         filter: ['all', ['!', ['has', 'point_count']], ['==', ['get', 'kind'], 'event']],
         paint: {
+          // A decade change crossfades rather than snapping (v9 §11 supersedes v6 §4.4).
+          ...DECADE_TRANSITION_PAINT,
           // Offset ring via marker-size.ts's top-level zoom interpolate — `['+', radiusExpr, 4]`
           // would nest the zoom expression and be rejected by the style spec (see
           // `markerRadiusPlusExpression`'s doc comment).
@@ -1033,6 +1040,8 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         source: EXPLORE_ENTITIES_SOURCE_ID,
         filter: ['has', 'point_count'],
         paint: {
+          // A decade change crossfades rather than snapping (v9 §11 supersedes v6 §4.4).
+          ...DECADE_TRANSITION_PAINT,
           // Zoom-outermost interpolate (MapLibre paint restriction) × count steps — national
           // frames keep aggregates small so dense catalogs do not blot geography.
           'circle-radius': [
