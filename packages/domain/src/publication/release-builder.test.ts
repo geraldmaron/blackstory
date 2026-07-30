@@ -444,4 +444,71 @@ test('buildReleaseEntityArtifacts derives status when entry has no status field'
   assert.ok(result.projection.statusHistory);
   assert.equal(result.projection.statusHistory?.[0]?.status, 'active');
   assert.equal(result.projection.statusHistory?.[0]?.validFrom, '1860');
+  assert.equal(result.projection.statusProvenance, 'derived_heuristic');
+});
+
+test('canonical living_status deceased wins over source hints that would imply living', () => {
+  const entry = baseEntry({
+    kind: 'person',
+    summary:
+      'A'.repeat(130),
+    livingStatus: 'living',
+  });
+  const result = buildReleaseEntityArtifacts(entry, {
+    ...CONTEXT,
+    canonicalStatus: { livingStatus: 'deceased' },
+  });
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.projection.livingStatus, 'deceased');
+  assert.equal(result.projection.status, 'deceased');
+  assert.equal(result.projection.statusProvenance, 'canonical');
+  assert.equal(result.searchIndex.status, 'deceased');
+});
+
+test('canonical status_history uses currentStatus for multi-entry histories', () => {
+  const entry = baseEntry({
+    kind: 'law',
+    summary:
+      'The Civil Rights Act of 1964 outlawed discrimination based on race, color, religion, sex, and national origin in public accommodations and employment nationwide.',
+  });
+  const result = buildReleaseEntityArtifacts(entry, {
+    ...CONTEXT,
+    canonicalStatus: {
+      statusHistory: [
+        {
+          status: 'in_force',
+          validFrom: '1964',
+          validTo: '2020',
+          datePrecision: 'year',
+          basisClaimIds: [],
+        },
+        {
+          status: 'repealed',
+          validFrom: '2020',
+          datePrecision: 'year',
+          basisClaimIds: [],
+        },
+      ],
+    },
+  });
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.projection.status, 'repealed');
+  assert.equal(result.projection.statusProvenance, 'canonical');
+});
+
+test('person projection carries livingStatus and statusProvenance from heuristic backstop', () => {
+  const entry = baseEntry({
+    kind: 'person',
+    summary:
+      'A'.repeat(120) + ' She died in 1972 after decades of community leadership in Atlanta, Georgia.',
+    livingStatus: 'deceased',
+  });
+  const result = buildReleaseEntityArtifacts(entry, CONTEXT);
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.projection.livingStatus, 'deceased');
+  assert.equal(result.projection.status, 'deceased');
+  assert.equal(result.projection.statusProvenance, 'derived_heuristic');
 });

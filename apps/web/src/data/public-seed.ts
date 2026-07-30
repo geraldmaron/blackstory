@@ -96,6 +96,12 @@ export type PublicEntityPrimaryImageView = {
   readonly objectPath?: string;
 };
 
+/** Shared event context for co-participation links (WS4 / event_participation junction). */
+export type RelatedViaEventView = {
+  readonly id: string;
+  readonly displayName: string;
+};
+
 /** Denormalized related neighbor for entity-page learning links (1-hop or 2-hop). */
 export type RelatedNeighborView = {
   readonly id: string;
@@ -104,6 +110,8 @@ export type RelatedNeighborView = {
   readonly summary: string;
   readonly relationType: string;
   readonly direction: 'outgoing' | 'incoming';
+  /** When set, this neighbor is linked through a shared event (co-participation). */
+  readonly viaEvent?: RelatedViaEventView;
   readonly timespan?: {
     readonly label?: string;
     readonly validFrom?: string;

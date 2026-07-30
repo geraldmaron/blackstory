@@ -27,13 +27,26 @@ import pg from 'pg';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import {
   buildArtifactsForEntry,
+  canonicalUpsertParamsFromLandscape,
   gateLandscapePublishCandidate,
   incrementalPublishProvenancePatch,
+  parseCanonicalStatusSnapshot,
+  type CanonicalEntityPublishRow,
   type LandscapePublishRow,
   type PublishGateSkipReason,
+  type PublishStatusLintReport,
   type ReleaseEntityUpsertRow,
   type SearchIndexUpsertRow,
 } from './lib/incremental-publish.ts';
+import { mergePublishStatusLintReports } from './lib/publish-status-linter.ts';
+import {
+  formatReleaseGraphAuditLog,
+  rebuildReleaseGraphForRelease,
+} from './lib/release-graph-publish.ts';
+import {
+  publishRegressionFailureMessage,
+  runPublishRegressionGates,
+} from './lib/publish-regression-gates.ts';
 import { applyReleaseTaxonomySync, planReleaseTaxonomySync } from './lib/release-taxonomy-sync.ts';
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
@@ -123,6 +136,12 @@ const PENDING_COUNT_SQL = `
 SELECT COUNT(*)::text AS n FROM bb_research.landscape_candidates WHERE status = 'pending'
 `;
 
+const CANONICAL_STATUS_BY_IDS_SQL = `
+SELECT id AS entity_id, living_status, status_history, kind_detail
+FROM bb_canonical.entities
+WHERE id = ANY($1::text[])
+`;
+
 function readArg(prefix: string): string | undefined {
   const hit = process.argv.find((entry) => entry.startsWith(prefix));
   return hit ? hit.slice(prefix.length) : undefined;
@@ -150,7 +169,7 @@ function readIdsArg(): readonly string[] {
 
 type SkippedRow = {
   readonly id: string;
-  readonly reason: PublishGateSkipReason;
+  readonly reason: PublishGateSkipReason | 'status_linter_error';
   readonly detail: string;
 };
 
@@ -160,6 +179,8 @@ type PreparedPublish = {
   readonly entityRow: ReleaseEntityUpsertRow;
   readonly searchRow: SearchIndexUpsertRow;
   readonly fromLandscape: boolean;
+  readonly landscapeRow: LandscapePublishRow | null;
+  readonly lintReport: PublishStatusLintReport;
 };
 
 async function upsertEntity(client: pg.PoolClient, row: ReleaseEntityUpsertRow): Promise<void> {
@@ -239,7 +260,22 @@ async function markLandscapeAccepted(
   client: pg.PoolClient,
   candidateId: string,
   entityId: string,
+  landscapeRow: LandscapePublishRow,
 ): Promise<void> {
+  const canonical = canonicalUpsertParamsFromLandscape(landscapeRow, entityId);
+  await client.query(
+    `INSERT INTO bb_canonical.entities
+      (id, kind, entity_class, display_name, living_status, status_history, notability_basis, sensitivity, kind_detail)
+     VALUES ($1, $2, $3, $4, $5, '[]'::jsonb, '[]'::jsonb, '[]'::jsonb, '{}'::jsonb)
+     ON CONFLICT (id) DO UPDATE SET
+       display_name = EXCLUDED.display_name,
+       living_status = CASE
+         WHEN EXCLUDED.kind = 'person' THEN EXCLUDED.living_status
+         ELSE bb_canonical.entities.living_status
+       END,
+       updated_at = now()`,
+    [canonical.id, canonical.kind, canonical.entityClass, canonical.displayName, canonical.livingStatus],
+  );
   await client.query(
     `UPDATE bb_research.landscape_candidates
      SET status = 'accepted',
@@ -256,12 +292,14 @@ function preparePublish(input: {
   readonly generatedAt: string;
   readonly entityId: string;
   readonly fromLandscape: boolean;
+  readonly canonicalStatus?: ReturnType<typeof parseCanonicalStatusSnapshot>;
 }): PreparedPublish | SkippedRow {
   if (input.fromLandscape && input.row) {
     const gate = gateLandscapePublishCandidate({
       row: input.row,
       releaseId: input.releaseId,
       generatedAt: input.generatedAt,
+      ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
     });
     if (!gate.eligible) {
       return { id: input.entityId, reason: gate.reason, detail: gate.detail };
@@ -270,9 +308,14 @@ function preparePublish(input: {
       entry: gate.entry,
       releaseId: input.releaseId,
       generatedAt: input.generatedAt,
+      ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
     });
     if (!built.ok) {
-      return { id: input.entityId, reason: 'build_failed', detail: `${built.reason}: ${built.detail}` };
+      return {
+        id: input.entityId,
+        reason: built.reason,
+        detail: built.reason === 'build_failed' ? built.detail : built.detail,
+      };
     }
     return {
       id: input.entityId,
@@ -280,6 +323,8 @@ function preparePublish(input: {
       entityRow: built.entityRow,
       searchRow: built.searchRow,
       fromLandscape: true,
+      landscapeRow: input.row,
+      lintReport: built.lintReport,
     };
   }
 
@@ -353,9 +398,17 @@ async function main(): Promise<void> {
 
     const sliced = limit !== undefined ? toEvaluate.slice(0, limit) : toEvaluate;
 
+    const canonicalRes = await client.query<CanonicalEntityPublishRow>(CANONICAL_STATUS_BY_IDS_SQL, [
+      sliced.map((item) => item.entityId),
+    ]);
+    const canonicalById = new Map(
+      canonicalRes.rows.map((row) => [row.entity_id, parseCanonicalStatusSnapshot(row)]),
+    );
+
     const prepared: PreparedPublish[] = [];
     const skipped: SkippedRow[] = [];
-    const skipCounts = new Map<PublishGateSkipReason, number>();
+    const skipCounts = new Map<string, number>();
+    const lintReports: PublishStatusLintReport[] = [];
 
     for (const item of sliced) {
       const result = preparePublish({
@@ -364,13 +417,31 @@ async function main(): Promise<void> {
         generatedAt,
         entityId: item.entityId,
         fromLandscape: item.fromLandscape,
+        ...(canonicalById.get(item.entityId) !== undefined
+          ? { canonicalStatus: canonicalById.get(item.entityId) }
+          : {}),
       });
       if ('reason' in result) {
         skipped.push(result);
         skipCounts.set(result.reason, (skipCounts.get(result.reason) ?? 0) + 1);
       } else {
         prepared.push(result);
+        lintReports.push(result.lintReport);
       }
+    }
+
+    const lintSummary = mergePublishStatusLintReports(lintReports);
+
+    const regressionGates = runPublishRegressionGates({
+      statusLintReports: lintReports,
+      projectionStatuses: prepared.map((row) => ({
+        entityId: row.entityRow.entity_id,
+        status: row.entityRow.projection.status as string | undefined,
+        livingStatus: row.entityRow.projection.livingStatus as string | undefined,
+      })),
+    });
+    if (regressionGates.hasErrors) {
+      throw new Error(publishRegressionFailureMessage(regressionGates));
     }
 
     const report = {
@@ -385,6 +456,16 @@ async function main(): Promise<void> {
       skipCounts: Object.fromEntries(skipCounts),
       publishedIds: prepared.map((row) => row.id),
       skippedSample: skipped.slice(0, 20),
+      statusLinter: {
+        errors: lintSummary.findings.filter((finding) => finding.severity === 'error').length,
+        warnings: lintSummary.findings.filter((finding) => finding.severity === 'warn').length,
+        findings: lintSummary.findings.slice(0, 50),
+      },
+      regressionGates: {
+        errors: regressionGates.findings.filter((finding) => finding.severity === 'error').length,
+        warnings: regressionGates.findings.filter((finding) => finding.severity === 'warn').length,
+        findings: regressionGates.findings.slice(0, 20),
+      },
     };
 
     mkdirSync(dirname(REPORT_PATH), { recursive: true });
@@ -410,6 +491,13 @@ async function main(): Promise<void> {
         console.log(`  ${reason}: ${count}`);
       }
     }
+    if (lintSummary.hasWarnings) {
+      console.log('');
+      console.log(`Status linter warnings: ${lintSummary.findings.filter((f) => f.severity === 'warn').length}`);
+      for (const finding of lintSummary.findings.filter((f) => f.severity === 'warn').slice(0, 10)) {
+        console.log(`  [warn] ${finding.entityId}: ${finding.message}`);
+      }
+    }
     console.log('');
     console.log(`Report: ${REPORT_PATH}`);
 
@@ -429,8 +517,8 @@ async function main(): Promise<void> {
     for (const row of prepared) {
       await upsertEntity(client, row.entityRow);
       await upsertSearchIndex(client, row.searchRow);
-      if (row.fromLandscape) {
-        await markLandscapeAccepted(client, row.id, row.entityRow.entity_id);
+      if (row.fromLandscape && row.landscapeRow) {
+        await markLandscapeAccepted(client, row.id, row.entityRow.entity_id, row.landscapeRow);
       }
     }
     await client.query('COMMIT');
@@ -449,6 +537,16 @@ async function main(): Promise<void> {
       if (taxonomyPlan.changed.length > 0) {
         await applyReleaseTaxonomySync(client, releaseId, taxonomyPlan);
         console.log(`Re-synced taxonomy from canonical for ${taxonomyPlan.changed.length} entities.`);
+      }
+
+      const graphRebuild = await rebuildReleaseGraphForRelease(client, {
+        releaseId,
+        generatedAt,
+        dryRun: false,
+        enforceCoverage: process.env.ENFORCE_DECADE_COVERAGE !== '0',
+      });
+      for (const line of formatReleaseGraphAuditLog(graphRebuild.audit)) {
+        console.log(`  graph: ${line}`);
       }
     }
 

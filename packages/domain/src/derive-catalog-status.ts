@@ -34,7 +34,7 @@ export type CatalogStatusSource = {
 export type DerivedCatalogStatus = {
   readonly statusHistory?: readonly StatusHistoryEntry<EntityStatusValue>[];
   /** Derived current status label for public projections. */
-  readonly status?: EntityStatusValue | 'living' | 'deceased';
+  readonly status?: EntityStatusValue | 'living' | 'deceased' | 'presumed_deceased' | 'unknown';
   readonly livingStatus?: LivingStatus;
 };
 
@@ -45,7 +45,22 @@ const ACTIVE_RE =
 const REPEALED_RE = /\b(repealed|struck down|overturned|ruled unconstitutional|enjoined)\b/i;
 const AMENDED_RE = /\b(amended|superseded in part)\b/i;
 const DECEASED_RE =
-  /\b(died|death|deceased|passed away|killed|assassinated|d\.\s*\d{4}|death date)\b/i;
+  /\b(died|death|deceased|passed away|killed|assassinated|d\.\s*\d{4}|death date|hanged|executed|murdered|martyred|slain|posthumous(ly)?|buried at|laid to rest)\b/i;
+
+/**
+ * Lynching verb forms only — bare "Lynch" surnames must not match.
+ * Prefer "was lynched" / "lynched on|in|by" / "lynching of" over bare "lynching".
+ */
+const LYNCHING_DECEASED_RE =
+  /\b(was\s+lynched|lynched\s+(on|in|by)|lynching\s+of)\b/i;
+
+/** Parenthetical life range, e.g. "(1885–1952)" — end year signals deceased when it's not recent. */
+const LIFE_RANGE_RE = /\((1[6-9]\d{2})\s*[–—-]\s*(1[6-9]\d{2}|20[0-2]\d)\)/;
+function isDeceasedByLifeRange(text: string): boolean {
+  const match = LIFE_RANGE_RE.exec(text);
+  if (!match?.[2]) return false;
+  return Number(match[2]) <= new Date().getFullYear() - 2;
+}
 
 function earliestYear(entry: CatalogStatusSource): string | undefined {
   const years: string[] = [];
@@ -109,7 +124,9 @@ function deriveMovement(entry: CatalogStatusSource): MovementStatus {
 function derivePersonLiving(entry: CatalogStatusSource): LivingStatus {
   if (entry.livingStatus) return entry.livingStatus;
   const text = `${entry.summary ?? ''} ${entry.historicalContext ?? ''}`;
-  if (DECEASED_RE.test(text)) return 'deceased';
+  if (DECEASED_RE.test(text) || LYNCHING_DECEASED_RE.test(text) || isDeceasedByLifeRange(text)) {
+    return 'deceased';
+  }
   return 'unknown';
 }
 
@@ -125,7 +142,17 @@ export function deriveCatalogEntityStatus(entry: CatalogStatusSource): DerivedCa
 
   if (entry.kind === 'person') {
     const livingStatus = derivePersonLiving(entry);
-    const status = livingStatus === 'deceased' ? 'deceased' : 'living';
+    // Display status is honest about what we don't know — 'unknown' must NOT collapse to
+    // 'living'. This is distinct from personStatusFromLiving in entity-status.ts, which governs
+    // privacy/redaction and intentionally treats 'unknown' as living for that separate purpose.
+    const status =
+      livingStatus === 'deceased'
+        ? 'deceased'
+        : livingStatus === 'presumed_deceased'
+          ? 'presumed_deceased'
+          : livingStatus === 'unknown'
+            ? 'unknown'
+            : 'living';
     return { livingStatus, status };
   }
 

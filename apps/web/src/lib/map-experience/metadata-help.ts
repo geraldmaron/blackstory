@@ -42,6 +42,9 @@ const STATUS_HELP: Readonly<Record<string, string>> = {
   inactive: 'Inactive: not currently operating.',
   living: 'Living: concerns a living person (privacy rules apply on the public map).',
   deceased: 'Deceased: concerns a person who has died.',
+  presumed_deceased:
+    'Presumed deceased: no death date on record, but birth year exceeds a plausibility bound (WP:BDP). Distinct from evidenced deceased.',
+  unknown: 'Unknown: living status not yet established from evidence.',
   in_force: 'In force: a legal rule or order that is still in effect.',
   amended: 'Amended: legal text that has been changed.',
   repealed: 'Repealed: a legal rule that has been withdrawn.',

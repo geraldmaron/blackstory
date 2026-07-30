@@ -5,7 +5,7 @@
  * injected so callers can pass the live public pool (same as explore/search) while tests keep
  * using the seed snapshot. No Next.js runtime dependency so it is directly unit-testable.
  */
-import { getHistoryGraphReleaseArtifact } from '../../data/history-graph-seed';
+import { getHistoryGraphReleaseArtifact, resolveHistoryGraphReleaseArtifact } from '../../data/history-graph-seed';
 import { listPublicEntities, type PublicEntityView } from '../../data/public-seed';
 import type { EntityRelationship } from '@repo/domain';
 import {
@@ -56,6 +56,8 @@ function buildSliceNodesWithCounts(
 export type BuildHistoryViewModelOptions = {
   /** Active public release id when live projections are wired; defaults to seed snapshot. */
   readonly releaseId?: string;
+  /** Pre-resolved graph artifact (stored release_graph_* or in-process fallback). */
+  readonly graphArtifact?: import('@repo/domain').GraphReleaseArtifact;
 };
 
 export function buildHistoryViewModel(
@@ -64,9 +66,11 @@ export function buildHistoryViewModel(
   options: BuildHistoryViewModelOptions = {},
 ): HistoryViewModel {
   const viewState = parseHistorySearchParams(raw);
-  const artifact = getHistoryGraphReleaseArtifact(entities, {
-    ...(options.releaseId ? { releaseId: options.releaseId } : {}),
-  });
+  const artifact =
+    options.graphArtifact ??
+    getHistoryGraphReleaseArtifact(entities, {
+      ...(options.releaseId ? { releaseId: options.releaseId } : {}),
+    });
   const context = buildHistoryGraphContext(artifact, entities);
 
   // A text query searches the FULL dataset, not just the active decade (repo-k1t9). Without
@@ -151,4 +155,17 @@ export function buildHistoryViewModel(
     ...(selectedNode ? { selectedNode } : {}),
     ...(selectedEdge ? { selectedEdge } : {}),
   };
+}
+
+export async function buildHistoryViewModelAsync(
+  raw: RawHistorySearchParams,
+  entities: readonly PublicEntityView[] = listPublicEntities(),
+  options: BuildHistoryViewModelOptions = {},
+): Promise<HistoryViewModel> {
+  const artifact =
+    options.graphArtifact ??
+    (await resolveHistoryGraphReleaseArtifact(entities, {
+      ...(options.releaseId ? { releaseId: options.releaseId } : {}),
+    }));
+  return buildHistoryViewModel(raw, entities, { ...options, graphArtifact: artifact });
 }

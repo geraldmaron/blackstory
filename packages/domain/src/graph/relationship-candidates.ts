@@ -11,6 +11,7 @@ export const RELATIONSHIP_CANDIDATE_REASONS = [
   'shared_geohash_prefix',
   'shared_jurisdiction',
   'mutual_mention',
+  'shared_decade_overlap',
 ] as const;
 export type RelationshipCandidateReason = (typeof RELATIONSHIP_CANDIDATE_REASONS)[number];
 
@@ -27,7 +28,10 @@ export type RelationshipCandidateEntity = {
   readonly kind?: string;
   readonly jurisdictionLabel?: string;
   readonly geohash?: string;
+  readonly locationPrecision?: string;
   readonly mentionedEntityIds?: readonly string[];
+  /** Inclusive decade bucket labels, e.g. ["1950s", "1960s"]. */
+  readonly decades?: readonly string[];
 };
 
 export type ExistingRelationshipRef = {
@@ -40,15 +44,18 @@ export type ProposeRelationshipCandidatesInput = {
   readonly entities: readonly RelationshipCandidateEntity[];
   readonly existingRelationships?: readonly ExistingRelationshipRef[];
   readonly geohashPrefixLength?: number;
+  /** When omitted, returns all accumulated candidates (full sweep). */
+  readonly maxCandidates?: number;
 };
 
 const DEFAULT_GEOHASH_PREFIX_LENGTH = 4;
-const MAX_CANDIDATES = 200;
+export const DEFAULT_RELATIONSHIP_CANDIDATE_CAP = 200;
 
 const REASON_PRIORITY: Readonly<Record<RelationshipCandidateReason, number>> = {
   mutual_mention: 0,
   shared_geohash_prefix: 1,
-  shared_jurisdiction: 2,
+  shared_decade_overlap: 2,
+  shared_jurisdiction: 3,
 };
 
 function normalizeJurisdiction(value: string | undefined): string | undefined {
@@ -132,7 +139,23 @@ function buildScoreSignals(
   if (reasons.has('mutual_mention')) {
     signals.push('entities mention each other in catalog metadata');
   }
+  if (reasons.has('shared_decade_overlap')) {
+    const decadesA = new Set(entityA.decades ?? []);
+    const shared = (entityB.decades ?? []).filter((decade) => decadesA.has(decade)).sort();
+    if (shared.length > 0) {
+      signals.push(`shared decades ${shared.join(', ')}`);
+    }
+  }
   return signals;
+}
+
+function sharedDecades(
+  entityA: RelationshipCandidateEntity,
+  entityB: RelationshipCandidateEntity,
+): readonly string[] {
+  const decadesA = new Set(entityA.decades ?? []);
+  if (decadesA.size === 0) return [];
+  return (entityB.decades ?? []).filter((decade) => decadesA.has(decade));
 }
 
 /**
@@ -194,6 +217,11 @@ export function proposeRelationshipCandidates(
         reasons.add('mutual_mention');
       }
 
+      const decadesOverlap = sharedDecades(entityA, entityB);
+      if (decadesOverlap.length > 0 && reasons.has('shared_geohash_prefix')) {
+        reasons.add('shared_decade_overlap');
+      }
+
       if (reasons.size === 0) {
         continue;
       }
@@ -230,5 +258,6 @@ export function proposeRelationshipCandidates(
     return leftKey.localeCompare(rightKey);
   });
 
-  return candidates.slice(0, MAX_CANDIDATES);
+  const cap = input.maxCandidates ?? DEFAULT_RELATIONSHIP_CANDIDATE_CAP;
+  return cap > 0 ? candidates.slice(0, cap) : candidates;
 }

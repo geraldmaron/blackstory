@@ -35,7 +35,29 @@ function neighborLabelMap(entity: PublicEntityView): ReadonlyMap<string, string>
   return map;
 }
 
+function coParticipationSummary(neighborDisplayName: string, eventDisplayName: string): string {
+  const event = eventDisplayName.trim();
+  const neighbor = neighborDisplayName.trim();
+  if (event.length === 0) {
+    return `Connected through a shared event with ${neighbor}.`;
+  }
+  return `Connected through ${event} with ${neighbor}.`;
+}
+
+function neighborSummary(neighbor: RelatedNeighborView): string {
+  if (neighbor.viaEvent) {
+    return coParticipationSummary(neighbor.displayName, neighbor.viaEvent.displayName);
+  }
+  if (neighbor.summary.trim().length > 0) {
+    return sanitizePublicProseText(neighbor.summary);
+  }
+  return `${humanizeToken(neighbor.relationType)} connection to this record.`;
+}
+
 function NeighborLink({ neighbor }: { readonly neighbor: RelatedNeighborView }) {
+  const relationLabel = neighbor.viaEvent
+    ? `through ${neighbor.viaEvent.displayName}`
+    : humanizeToken(neighbor.relationType);
   return (
     <li key={`${neighbor.id}_${neighbor.relationType}_${neighbor.direction}`}>
       <Link className="ds-story-link" href={`/entity/${neighbor.id}`} prefetch={false}>
@@ -43,15 +65,11 @@ function NeighborLink({ neighbor }: { readonly neighbor: RelatedNeighborView }) 
           <span className="ds-story-link__meta-row">
             <KindBadge kind={neighbor.kind} density="compact" />
             <span aria-hidden="true">·</span>
-            <span>{humanizeToken(neighbor.relationType)}</span>
+            <span>{relationLabel}</span>
           </span>
         </span>
         <h3 className="ds-story-link__title">{neighbor.displayName}</h3>
-        <p className="ds-story-link__summary">
-          {neighbor.summary.trim().length > 0
-            ? sanitizePublicProseText(neighbor.summary)
-            : `${humanizeToken(neighbor.relationType)} connection to this record.`}
-        </p>
+        <p className="ds-story-link__summary">{neighborSummary(neighbor)}</p>
       </Link>
     </li>
   );

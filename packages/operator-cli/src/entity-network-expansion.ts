@@ -176,6 +176,46 @@ function extractEntityIds(claims: readonly WikidataClaim[] | undefined): string[
   return ids;
 }
 
+function extractYearFromWikidataTimeClaim(claims: readonly WikidataClaim[] | undefined): number | undefined {
+  if (!claims?.length) return undefined;
+  const value = claims[0]?.mainsnak?.datavalue?.value;
+  if (!value || typeof value !== 'object' || !('time' in (value as Record<string, unknown>))) {
+    return undefined;
+  }
+  const time = (value as { time?: unknown }).time;
+  if (typeof time !== 'string') return undefined;
+  const match = /^[+-]?(\d{4})-/.exec(time);
+  if (!match?.[1]) return undefined;
+  const year = Number.parseInt(match[1], 10);
+  return Number.isFinite(year) ? year : undefined;
+}
+
+/** Reads Wikidata P569 (birth) and P570 (death) time claims from an entity claims map. */
+export function extractWikidataBirthDeathYears(
+  claims: Record<string, readonly WikidataClaim[]>,
+): { birthYear?: number; deathYear?: number } {
+  const birthYear = extractYearFromWikidataTimeClaim(claims.P569);
+  const deathYear = extractYearFromWikidataTimeClaim(claims.P570);
+  return {
+    ...(birthYear !== undefined ? { birthYear } : {}),
+    ...(deathYear !== undefined ? { deathYear } : {}),
+  };
+}
+
+/** Fetches a Wikidata item and extracts P569/P570 birth/death years for person seeds. */
+export async function fetchSeedBirthDeathYears(
+  qid: string,
+  fetcher: WikidataFetcher,
+): Promise<{ birthYear?: number; deathYear?: number }> {
+  const doc = (await fetcher(WIKIDATA_ENTITY_DATA(qid))) as WikidataEntityDoc;
+  const claims = doc.entities?.[qid]?.claims ?? {};
+  return extractWikidataBirthDeathYears(claims);
+}
+
+export type EntityNetworkExpansionMeta = {
+  seedBirthDeathYears?: { birthYear?: number; deathYear?: number };
+};
+
 async function fetchLabel(qid: string, fetcher: WikidataFetcher): Promise<string> {
   const doc = (await fetcher(WIKIDATA_ENTITY_DATA(qid))) as WikidataEntityDoc;
   return getLabel(doc, qid);
@@ -186,9 +226,15 @@ async function expandForwardClaims(
   mappings: readonly PropertyMapping[],
   fetcher: WikidataFetcher,
   hop: 1 | 2,
+  seedBirthDeathOut?: { birthYear?: number; deathYear?: number },
 ): Promise<NetworkCandidate[]> {
   const doc = (await fetcher(WIKIDATA_ENTITY_DATA(seedQid))) as WikidataEntityDoc;
   const claims = doc.entities?.[seedQid]?.claims ?? {};
+  if (seedBirthDeathOut) {
+    const extracted = extractWikidataBirthDeathYears(claims);
+    if (extracted.birthYear !== undefined) seedBirthDeathOut.birthYear = extracted.birthYear;
+    if (extracted.deathYear !== undefined) seedBirthDeathOut.deathYear = extracted.deathYear;
+  }
   const out: NetworkCandidate[] = [];
   for (const mapping of mappings) {
     const neighborQids = extractEntityIds(claims[mapping.propertyId]);
@@ -291,8 +337,27 @@ export async function expandEntityNetwork(
   seed: ExpansionSeed,
   config: ExpansionConfig = DEFAULT_EXPANSION_CONFIG,
   fetcher: WikidataFetcher = defaultFetcher,
+  meta?: EntityNetworkExpansionMeta,
 ): Promise<NetworkCandidate[]> {
-  const hop1Forward = await expandForwardClaims(seed.qid, forwardMappingsFor(seed.kind), fetcher, 1);
+  const seedBirthDeathOut =
+    seed.kind === 'person' ? ({} as { birthYear?: number; deathYear?: number }) : undefined;
+  const hop1Forward = await expandForwardClaims(
+    seed.qid,
+    forwardMappingsFor(seed.kind),
+    fetcher,
+    1,
+    seedBirthDeathOut,
+  );
+  if (meta && seedBirthDeathOut) {
+    const hasBirth = seedBirthDeathOut.birthYear !== undefined;
+    const hasDeath = seedBirthDeathOut.deathYear !== undefined;
+    if (hasBirth || hasDeath) {
+      meta.seedBirthDeathYears = {
+        ...(hasBirth ? { birthYear: seedBirthDeathOut.birthYear } : {}),
+        ...(hasDeath ? { deathYear: seedBirthDeathOut.deathYear } : {}),
+      };
+    }
+  }
   const hop1Reverse = await expandReverseClaims(seed.qid, reverseQueriesFor(seed.kind), fetcher, 1);
   let all = dedupeCandidates([...hop1Forward, ...hop1Reverse]);
 
@@ -333,6 +398,8 @@ export type LandscapeCandidateRow = {
   readonly provenance: {
     readonly seed_qid: string;
     readonly seed_entity_id?: string;
+    readonly seed_birth_year?: number;
+    readonly seed_death_year?: number;
     readonly hops: readonly ProvenanceHop[];
   };
   readonly payload: {
@@ -340,6 +407,10 @@ export type LandscapeCandidateRow = {
     readonly direction: 'outgoing' | 'incoming';
     readonly hop: 1 | 2;
     readonly note?: string;
+    readonly seedBirthYear?: number;
+    readonly seedDeathYear?: number;
+    readonly birthYear?: number;
+    readonly deathYear?: number;
   };
   readonly discovered_at: string;
 };
@@ -358,8 +429,11 @@ export async function stageNetworkCandidates(
   runId: string,
   insert: StagingInserter,
   now: () => string = () => new Date().toISOString(),
+  seedBirthDeathYears?: { readonly birthYear?: number; readonly deathYear?: number },
 ): Promise<readonly LandscapeCandidateRow[]> {
   const discoveredAt = now();
+  const hasSeedBirth = seedBirthDeathYears?.birthYear !== undefined;
+  const hasSeedDeath = seedBirthDeathYears?.deathYear !== undefined;
   const rows: LandscapeCandidateRow[] = candidates.map((c) => ({
     id: `landcand_wikidata_${seed.qid}_${c.qid}`,
     run_id: runId,
@@ -376,6 +450,8 @@ export async function stageNetworkCandidates(
     provenance: {
       seed_qid: seed.qid,
       ...(seed.entityId !== undefined ? { seed_entity_id: seed.entityId } : {}),
+      ...(hasSeedBirth ? { seed_birth_year: seedBirthDeathYears!.birthYear } : {}),
+      ...(hasSeedDeath ? { seed_death_year: seedBirthDeathYears!.deathYear } : {}),
       hops: c.provenance,
     },
     payload: {
@@ -383,6 +459,8 @@ export async function stageNetworkCandidates(
       direction: c.hypothesis.direction,
       hop: c.hop,
       ...(c.hypothesis.note !== undefined ? { note: c.hypothesis.note } : {}),
+      ...(hasSeedBirth ? { seedBirthYear: seedBirthDeathYears!.birthYear, birthYear: seedBirthDeathYears!.birthYear } : {}),
+      ...(hasSeedDeath ? { seedDeathYear: seedBirthDeathYears!.deathYear, deathYear: seedBirthDeathYears!.deathYear } : {}),
     },
     discovered_at: discoveredAt,
   }));

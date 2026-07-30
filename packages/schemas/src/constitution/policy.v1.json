@@ -80,7 +80,7 @@
     "publicLanguageCannotExceedProceduralStatus": true
   },
   "livingPersonRules": {
-    "statuses": ["living", "deceased", "unknown"],
+    "statuses": ["living", "deceased", "presumed_deceased", "unknown"],
     "treatUnknownAsLiving": true,
     "neverStoreResidentialAsOrdinaryPersonLocation": true,
     "neverReturnResidentialPublicly": true

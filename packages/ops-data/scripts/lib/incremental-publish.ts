@@ -5,12 +5,20 @@
 import {
   US_STATES,
   buildReleaseEntityArtifacts,
+  normalizeReleaseRelated,
+  type CanonicalStatusSnapshot,
   type ReleaseEntityProjectionFields,
   type ReleaseSearchIndexFields,
   type ReleaseSourceClaim,
   type ReleaseSourceEntity,
+  type StatusHistoryEntry,
+  type EntityStatusValue,
 } from '@repo/domain';
 import { computeClaimConfidence } from '../lib/confidence.ts';
+import {
+  lintPublishStatus,
+  type PublishStatusLintReport,
+} from './publish-status-linter.ts';
 
 export const INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR = 0.75;
 
@@ -62,6 +70,37 @@ export type ReleaseEntityUpsertRow = {
   readonly projection: unknown;
 };
 
+export type CanonicalEntityPublishRow = {
+  readonly entity_id: string;
+  readonly living_status: string | null;
+  readonly status_history: unknown;
+  readonly kind_detail: unknown;
+};
+
+export type CanonicalEntityUpsertParams = {
+  readonly id: string;
+  readonly kind: string;
+  readonly entityClass: string | null;
+  readonly displayName: string;
+  readonly livingStatus: string;
+};
+
+export type PublishLintSkipReason = 'status_linter_error';
+
+export type PublishArtifactsResult =
+  | {
+      readonly ok: true;
+      readonly entityRow: ReleaseEntityUpsertRow;
+      readonly searchRow: SearchIndexUpsertRow;
+      readonly lintReport: PublishStatusLintReport;
+    }
+  | {
+      readonly ok: false;
+      readonly reason: PublishLintSkipReason | 'build_failed';
+      readonly detail: string;
+      readonly lintReport?: PublishStatusLintReport;
+    };
+
 export type SearchIndexUpsertRow = {
   readonly id: string;
   readonly release_id: string;
@@ -78,11 +117,111 @@ export type SearchIndexUpsertRow = {
   readonly facets: unknown;
 };
 
+function isLivingStatus(value: string): value is 'living' | 'deceased' | 'unknown' {
+  return value === 'living' || value === 'deceased' || value === 'unknown';
+}
+
+function buildContext(input: {
+  readonly releaseId: string;
+  readonly generatedAt: string;
+  readonly canonicalStatus?: CanonicalStatusSnapshot;
+}) {
+  return {
+    releaseId: input.releaseId,
+    generatedAt: input.generatedAt,
+    ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
+  };
+}
+
+function lintBuiltProjection(
+  entry: ReleaseSourceEntity,
+  projection: ReleaseEntityProjectionFields,
+): PublishStatusLintReport {
+  return lintPublishStatus({
+    entityId: entry.id,
+    kind: entry.kind,
+    summary: entry.summary,
+    ...(entry.historicalContext !== undefined ? { historicalContext: entry.historicalContext } : {}),
+    ...(projection.status !== undefined ? { status: projection.status } : {}),
+    ...(projection.livingStatus !== undefined ? { livingStatus: projection.livingStatus } : {}),
+  });
+}
+
 function asRecord(value: unknown): Readonly<Record<string, unknown>> {
   if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
     return value as Readonly<Record<string, unknown>>;
   }
   return {};
+}
+
+function parseStatusHistory(raw: unknown): readonly StatusHistoryEntry<EntityStatusValue>[] {
+  if (!Array.isArray(raw)) return [];
+  const parsed: StatusHistoryEntry<EntityStatusValue>[] = [];
+  for (const item of raw) {
+    if (item === null || typeof item !== 'object' || Array.isArray(item)) continue;
+    const record = item as Readonly<Record<string, unknown>>;
+    if (typeof record.status !== 'string') continue;
+    parsed.push({
+      status: record.status as EntityStatusValue,
+      datePrecision:
+        typeof record.datePrecision === 'string' ? (record.datePrecision as never) : 'circa',
+      basisClaimIds: Array.isArray(record.basisClaimIds)
+        ? record.basisClaimIds.filter((id): id is string => typeof id === 'string')
+        : [],
+      ...(typeof record.validFrom === 'string' ? { validFrom: record.validFrom } : {}),
+      ...(record.validTo !== undefined ? { validTo: record.validTo as string | null } : {}),
+    });
+  }
+  return parsed;
+}
+
+export function inferEntityClassForCanonical(kind: string): string | null {
+  if (kind === 'person') return 'person';
+  if (kind === 'place') return 'place';
+  if (kind === 'organization' || kind === 'institution' || kind === 'school') return 'organization';
+  if (kind === 'event') return 'event';
+  if (kind === 'law' || kind === 'case') return 'legal';
+  if (kind === 'publication' || kind === 'artifact') return 'work';
+  if (kind === 'movement') return 'movement';
+  return null;
+}
+
+export function parseCanonicalStatusSnapshot(
+  row: CanonicalEntityPublishRow | null | undefined,
+): CanonicalStatusSnapshot | undefined {
+  if (!row) return undefined;
+  const statusHistory = parseStatusHistory(row.status_history);
+  const livingRaw = row.living_status?.trim();
+  const livingStatus =
+    livingRaw === 'living' ||
+    livingRaw === 'deceased' ||
+    livingRaw === 'unknown' ||
+    livingRaw === 'not_applicable'
+      ? livingRaw
+      : undefined;
+  if (livingStatus === undefined && statusHistory.length === 0) return undefined;
+  return {
+    ...(livingStatus !== undefined ? { livingStatus } : {}),
+    ...(statusHistory.length > 0 ? { statusHistory } : {}),
+  };
+}
+
+export function canonicalUpsertParamsFromLandscape(
+  row: LandscapePublishRow,
+  entityId: string,
+): CanonicalEntityUpsertParams {
+  const review = asRecord(row.payload.personReview);
+  const reviewLivingRaw = review.livingStatus;
+  const reviewLiving =
+    typeof reviewLivingRaw === 'string' && isLivingStatus(reviewLivingRaw) ? reviewLivingRaw : undefined;
+  const livingStatus = row.kind === 'person' ? (reviewLiving ?? 'unknown') : 'not_applicable';
+  return {
+    id: entityId,
+    kind: row.kind,
+    entityClass: inferEntityClassForCanonical(row.kind),
+    displayName: row.display_name.trim(),
+    livingStatus,
+  };
 }
 
 /**
@@ -245,6 +384,7 @@ export function gateLandscapePublishCandidate(input: {
   readonly releaseId: string;
   readonly generatedAt: string;
   readonly confidenceFloor?: number;
+  readonly canonicalStatus?: CanonicalStatusSnapshot;
 }): PublishGateResult {
   const floor = input.confidenceFloor ?? INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR;
   const row = input.row;
@@ -306,10 +446,14 @@ export function gateLandscapePublishCandidate(input: {
     };
   }
 
-  const build = buildReleaseEntityArtifacts(entry, {
-    releaseId: input.releaseId,
-    generatedAt: input.generatedAt,
-  });
+  const build = buildReleaseEntityArtifacts(
+    entry,
+    buildContext({
+      releaseId: input.releaseId,
+      generatedAt: input.generatedAt,
+      ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
+    }),
+  );
   if (!build.ok) {
     return {
       eligible: false,
@@ -322,6 +466,7 @@ export function gateLandscapePublishCandidate(input: {
 }
 
 export function toReleaseEntityRow(projection: ReleaseEntityProjectionFields): ReleaseEntityUpsertRow {
+  const related = normalizeReleaseRelated(projection.related);
   return {
     release_id: projection.releaseId,
     entity_id: projection.id,
@@ -338,8 +483,11 @@ export function toReleaseEntityRow(projection: ReleaseEntityProjectionFields): R
       topicIds: projection.topicIds,
       notabilityLabels: projection.notabilityLabels,
     },
-    related: projection.related ?? [],
-    projection,
+    related,
+    projection: {
+      ...projection,
+      ...(projection.related === undefined && related.length === 0 ? { related: [] } : {}),
+    },
   };
 }
 
@@ -375,24 +523,32 @@ export function buildArtifactsForEntry(input: {
   readonly entry: ReleaseSourceEntity;
   readonly releaseId: string;
   readonly generatedAt: string;
-}):
-  | {
-      readonly ok: true;
-      readonly entityRow: ReleaseEntityUpsertRow;
-      readonly searchRow: SearchIndexUpsertRow;
-    }
-  | { readonly ok: false; readonly reason: string; readonly detail: string } {
-  const build = buildReleaseEntityArtifacts(input.entry, {
-    releaseId: input.releaseId,
-    generatedAt: input.generatedAt,
-  });
+  readonly canonicalStatus?: CanonicalStatusSnapshot;
+}): PublishArtifactsResult {
+  const build = buildReleaseEntityArtifacts(
+    input.entry,
+    buildContext({
+      releaseId: input.releaseId,
+      generatedAt: input.generatedAt,
+      ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
+    }),
+  );
   if (!build.ok) {
-    return { ok: false, reason: build.reason, detail: build.message };
+    return { ok: false, reason: 'build_failed', detail: `${build.reason}: ${build.message}` };
+  }
+  const lintReport = lintBuiltProjection(input.entry, build.projection);
+  if (lintReport.hasErrors) {
+    const detail =
+      lintReport.findings.find((finding) => finding.severity === 'error')?.message ??
+      'publish status linter error';
+    return { ok: false, reason: 'status_linter_error', detail, lintReport };
   }
   const entityRow = toReleaseEntityRow(build.projection);
   const searchRow = toSearchIndexRow(build.searchIndex, build.projection.location.geohash);
-  return { ok: true, entityRow, searchRow };
+  return { ok: true, entityRow, searchRow, lintReport };
 }
+
+export type { PublishStatusLintReport };
 
 export function incrementalPublishProvenancePatch(entityId: string): Record<string, unknown> {
   const at = new Date().toISOString();
