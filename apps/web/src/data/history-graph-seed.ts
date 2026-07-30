@@ -30,13 +30,13 @@ function decadeBucketInputs(
       deriveGraphDecadeBucketInput({
         entityId: entity.id,
         kind: entity.kind,
-        eraBuckets: entity.eraBuckets,
-        statusHistory: entity.statusHistory,
+        ...(entity.eraBuckets !== undefined ? { eraBuckets: entity.eraBuckets } : {}),
+        ...(entity.statusHistory !== undefined ? { statusHistory: entity.statusHistory } : {}),
         ...(entity.eventWindow?.startAt
           ? {
               eventWindow: {
                 startAt: entity.eventWindow.startAt,
-                ...(entity.eventWindow.endAt !== undefined
+                ...(typeof entity.eventWindow.endAt === 'string'
                   ? { endAt: entity.eventWindow.endAt }
                   : {}),
                 datePrecision: entity.eventWindow.datePrecision,
