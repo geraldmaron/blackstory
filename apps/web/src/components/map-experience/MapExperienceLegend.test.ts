@@ -9,10 +9,8 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { test } from 'node:test';
 import { MapExperienceLegend, type MapExperienceLegendProps } from './MapExperienceLegend';
-import {
-  KIND_FAMILY_ENTRIES,
-  SEMANTIC_TONE_ENTRIES,
-} from '../../lib/map-experience/kind-encoding';
+import { plateForScheme } from '../../lib/map-experience/dignity-style';
+import { KIND_FAMILY_ENTRIES, SEMANTIC_TONE_ENTRIES } from '../../lib/map-experience/kind-encoding';
 
 test('explains points, clusters, the density layer, and confidence glyphs in words', () => {
   const html = renderToStaticMarkup(createElement(MapExperienceLegend));
@@ -106,13 +104,17 @@ test('shows a visible color key for boundaries, kinds, and historical tones', ()
 });
 
 test('SSR without colorScheme uses light plate swatches (hydration-safe; no document read)', () => {
-  // Light stateBounds = copperTextLight #8E4F2A; dark would be pageSand #D8A178.
-  // Reading document during render/SSR caused dark-theme clients to hydrate mismatched inline styles.
+  // Reading document during render/SSR caused dark-theme clients to hydrate mismatched inline
+  // styles. Asserted against the plate rather than frozen hexes: the contract is "light, not
+  // dark", and it should survive a token change without a test edit.
+  const light = plateForScheme('light');
+  const dark = plateForScheme('dark');
   const html = renderToStaticMarkup(createElement(MapExperienceLegend));
-  assert.match(html, /background-color:#8[Ee]4[Ff]2[Aa]|backgroundColor:#8[Ee]4[Ff]2[Aa]|#8E4F2A/);
-  assert.match(html, /#6[Dd]675[Ff]|#6D675F/);
-  assert.doesNotMatch(html, /#D8A178/);
-  assert.doesNotMatch(html, /#F4EFE5/);
+
+  assert.match(html, new RegExp(light.stateBounds, 'i'));
+  assert.match(html, new RegExp(light.countyLine, 'i'));
+  assert.doesNotMatch(html, new RegExp(dark.stateBounds, 'i'));
+  assert.notEqual(light.stateBounds, dark.stateBounds, 'the two plates must differ at all');
 });
 
 test('onHide renders an accessible Hide key control beside the Color key heading', () => {

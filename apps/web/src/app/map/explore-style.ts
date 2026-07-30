@@ -78,7 +78,10 @@ import {
   COUNTY_LINES_MIN_ZOOM,
 } from '../../lib/map-experience/us-county-lines';
 import type { ExploreLayerMode } from '../../lib/map-experience/url-state';
-import { DEFAULT_POPULATION_GEO, type ExplorePopulationGeo } from '../../lib/map-experience/explore-population';
+import {
+  DEFAULT_POPULATION_GEO,
+  type ExplorePopulationGeo,
+} from '../../lib/map-experience/explore-population';
 import {
   buildMemorialNameFeatures,
   MEMORIAL_LABEL_TEXT_FONT,
@@ -436,7 +439,12 @@ function kindColorExpression(): ExpressionSpecification {
     ['get', 'shade'],
     ['has', 'mapTone'],
     ['match', ['get', 'mapTone'], ...semanticCases, DEFAULT_KIND_ENCODING.shade],
-    ['match', ['coalesce', ['get', 'kindFamily'], ['get', 'kind']], ...kindCases, DEFAULT_KIND_ENCODING.shade],
+    [
+      'match',
+      ['coalesce', ['get', 'kindFamily'], ['get', 'kind']],
+      ...kindCases,
+      DEFAULT_KIND_ENCODING.shade,
+    ],
   ] as unknown as ExpressionSpecification;
 }
 
@@ -474,7 +482,10 @@ export function buildPresenceDensityFillColorExpression(
   presenceFillActive: boolean,
 ): ExpressionSpecification {
   if (!presenceFillActive) {
-    return plate.densityDisabled as unknown as ExpressionSpecification;
+    // The resting plate. This layer is the landmass, so with no data to show it is `land` — not a
+    // faint wash over the background. An 8% tint on the old white plate is what defect §0 #11
+    // described: the coastline and the state lines had nothing to separate themselves from.
+    return plate.land as unknown as ExpressionSpecification;
   }
 
   const tierFallback = [

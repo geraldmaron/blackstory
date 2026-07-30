@@ -8,13 +8,8 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { listPublicEntities } from '../../data/public-seed';
 import { buildExploreMapSource } from '../../lib/map-experience/build-explore-map-source';
-import {
-  DIGNITY_PALETTE,
-  EXPLORE_CLUSTER_CONFIG,
-  LIGHT_PLATE_OCEAN,
-  plateForScheme,
-} from '../../lib/map-experience';
-import { brandPalette } from '@repo/ui';
+import { DIGNITY_PALETTE, EXPLORE_CLUSTER_CONFIG, plateForScheme } from '../../lib/map-experience';
+import { brandPalette, lightnessDelta, mapPalettes } from '@repo/ui';
 import { KIND_FAMILY_ENTRIES } from '../../lib/map-experience/kind-encoding';
 import {
   markerHaloRadiusExpression,
@@ -179,7 +174,10 @@ test('selectedPointFilterExpression matches only the selected feature, never all
 test('entitySelectedPulseRadiusExpression scales the ring from 1x to ~2.1x over the loop (patterns-cinematic-map.md §3)', () => {
   assert.deepEqual(
     entitySelectedPulseRadiusExpression(0),
-    markerRadiusPlusScaledExpression(ENTITY_SELECTED_RADIUS_OFFSET, ENTITY_SELECTED_PULSE_SCALE_FROM),
+    markerRadiusPlusScaledExpression(
+      ENTITY_SELECTED_RADIUS_OFFSET,
+      ENTITY_SELECTED_PULSE_SCALE_FROM,
+    ),
   );
   assert.deepEqual(
     entitySelectedPulseRadiusExpression(1),
@@ -202,7 +200,10 @@ test('entitySelectedPulseOpacity fades from 0.9 to 0.12 over the loop (patterns-
 test('entitySelectedPulseStaticRadiusExpression matches the reduced-motion static ring (scale ~1.35)', () => {
   assert.deepEqual(
     entitySelectedPulseStaticRadiusExpression(),
-    markerRadiusPlusScaledExpression(ENTITY_SELECTED_RADIUS_OFFSET, ENTITY_SELECTED_PULSE_STATIC_SCALE),
+    markerRadiusPlusScaledExpression(
+      ENTITY_SELECTED_RADIUS_OFFSET,
+      ENTITY_SELECTED_PULSE_STATIC_SCALE,
+    ),
   );
   assert.equal(ENTITY_SELECTED_PULSE_STATIC_SCALE, 1.35);
   assert.equal(ENTITY_SELECTED_PULSE_STATIC_OPACITY, 0.85);
@@ -390,8 +391,9 @@ test('the state-selected fill and density fallback tints are relocated DIGNITY_P
   const tierOutputs = matchExpressionOutputs(tierFallback);
   assert.ok(tierOutputs.includes(DIGNITY_PALETTE.densityUnknownFill));
 
+  // With no data to show, this layer is simply the landmass.
   const densityLayerOff = layerById(off, EXPLORE_STATE_DENSITY_LAYER_ID);
-  assert.equal(densityLayerOff.paint?.['fill-color'], DIGNITY_PALETTE.densityDisabledFill);
+  assert.equal(densityLayerOff.paint?.['fill-color'], plateForScheme('dark').land);
 });
 
 test('OpenFreeMap street layers are present for casing, fill, and labels', () => {
@@ -473,7 +475,7 @@ test('street casing and fill use muted zoom stops with motorway→minor class hi
   assert.ok(widthForClass(casingZ14, 'minor') > (casingZ14[casingZ14.length - 1] as number));
 });
 
-test('light colorScheme uses a white plate with brown state bounds and stone county lines', () => {
+test('the plate reads as a map: land, water and boundaries come from the tokens', () => {
   const source = buildExploreMapSource(listPublicEntities());
   const dark = buildExploreMapStyle({
     featureCollection: source.featureCollection,
@@ -487,16 +489,32 @@ test('light colorScheme uses a white plate with brown state bounds and stone cou
     layerMode: 'off',
     colorScheme: 'light',
   });
+  // The background is water; the state polygons drawn over it are the landmass. That pairing is
+  // what produces a visible coastline, and it is the fix for design law §0 defect 11.
   const darkBg = layerById(dark, 'background').paint?.['background-color'];
   const lightBg = layerById(light, 'background').paint?.['background-color'];
-  assert.equal(darkBg, DIGNITY_PALETTE.ocean);
-  assert.equal(lightBg, LIGHT_PLATE_OCEAN);
+  assert.equal(darkBg, mapPalettes.dark.water);
+  assert.equal(lightBg, mapPalettes.light.water);
   assert.notEqual(darkBg, lightBg);
 
   const lightPlate = plateForScheme('light');
-  assert.equal(lightPlate.ocean, LIGHT_PLATE_OCEAN);
-  assert.equal(lightPlate.stateBounds, brandPalette.copperTextLight);
+  assert.equal(lightPlate.water, mapPalettes.light.water);
+  assert.equal(lightPlate.land, mapPalettes.light.land);
+  assert.equal(lightPlate.stateBounds, mapPalettes.light.line);
+  // County lines are deliberately not a token: §3's `line-2` is the country border, and it is
+  // heavier than `line`, so wiring counties to it would make them out-read states.
   assert.equal(lightPlate.countyLine, brandPalette.stone);
+  assert.notEqual(lightPlate.countyLine, mapPalettes.light.line2);
+
+  // The separation itself, in both themes. `map-contrast.test.ts` guards the token table; this
+  // guards that the rendered plate is actually wired to it.
+  for (const scheme of ['light', 'dark'] as const) {
+    const plate = plateForScheme(scheme);
+    assert.ok(
+      lightnessDelta(plate.land, plate.water) >= 18,
+      `${scheme} land/water is ${lightnessDelta(plate.land, plate.water).toFixed(2)} ΔL*, needs 18`,
+    );
+  }
 
   const stateBounds = layerById(light, 'explore-state-bounds-line');
   assert.equal(stateBounds.paint?.['line-color'], lightPlate.stateBounds);
@@ -623,7 +641,7 @@ test('county names stay hidden until zoomed past the state-label handoff, above 
   assert.equal(opacity[4], 0);
 });
 
-test('dark colorScheme keeps the ink ocean and pageSand state bounds', () => {
+test('dark plate draws its water and boundaries from the dark token set', () => {
   const source = buildExploreMapSource(listPublicEntities());
   const dark = buildExploreMapStyle({
     featureCollection: source.featureCollection,
@@ -631,14 +649,21 @@ test('dark colorScheme keeps the ink ocean and pageSand state bounds', () => {
     layerMode: 'off',
     colorScheme: 'dark',
   });
-  assert.equal(layerById(dark, 'background').paint?.['background-color'], '#080606');
   const darkPlate = plateForScheme('dark');
-  assert.equal(darkPlate.ocean, '#080606');
+  assert.equal(layerById(dark, 'background').paint?.['background-color'], mapPalettes.dark.water);
+  assert.equal(darkPlate.water, mapPalettes.dark.water);
   assert.equal(
     layerById(dark, 'explore-state-bounds-line').paint?.['line-color'],
     darkPlate.stateBounds,
   );
-  assert.equal(darkPlate.stateBounds, DIGNITY_PALETTE.pointHalo);
+  assert.equal(darkPlate.stateBounds, mapPalettes.dark.line);
+
+  // Defect §0 #11's second symptom: state lines vanishing at continental zoom. They have to
+  // separate from the land they are drawn on.
+  assert.ok(
+    lightnessDelta(darkPlate.land, darkPlate.stateBounds) >= 12,
+    `dark land/state-bounds is ${lightnessDelta(darkPlate.land, darkPlate.stateBounds).toFixed(2)} ΔL*`,
+  );
 });
 
 test('plate fills stay opaque — memorial names are a style layer under land, not DOM bleed', () => {
