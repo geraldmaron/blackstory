@@ -46,15 +46,20 @@ async function main(): Promise<void> {
   try {
     const { rows } = await client.query<AttestedRow>(
       `SELECT
-         lc.id AS candidate_id,
+         coalesce(nullif(lc.source_item_id, ''), lc.payload->>'entityId', lc.id) AS candidate_id,
          lc.display_name,
          lc.kind,
          e.living_status,
          (e.id IS NOT NULL) AS has_canonical
        FROM bb_research.landscape_candidates lc
-       LEFT JOIN bb_canonical.entities e ON e.id = lc.id
+       LEFT JOIN bb_canonical.entities e
+         ON e.id = coalesce(nullif(lc.source_item_id, ''), lc.payload->>'entityId', lc.id)
        WHERE lc.payload->'personReview'->>'livingStatus' = 'deceased'
-       ORDER BY lc.id`,
+         AND (
+           (lc.payload->'personReview'->>'approved')::boolean IS TRUE
+           OR lc.lane <> 'living-status-review'
+         )
+       ORDER BY 1`,
     );
 
     console.log('=== Write-back attested living_status=deceased ===');
@@ -115,8 +120,10 @@ async function main(): Promise<void> {
     const verify = await client.query<{ count: string }>(
       `SELECT count(*)::text AS count
        FROM bb_research.landscape_candidates lc
-       JOIN bb_canonical.entities e ON e.id = lc.id
+       JOIN bb_canonical.entities e
+         ON e.id = coalesce(nullif(lc.source_item_id, ''), lc.payload->>'entityId', lc.id)
        WHERE lc.payload->'personReview'->>'livingStatus' = 'deceased'
+         AND (lc.payload->'personReview'->>'approved')::boolean IS TRUE
          AND e.living_status = 'deceased'`,
     );
     console.log(`\nApplied: updated ${updated} rows.`);
