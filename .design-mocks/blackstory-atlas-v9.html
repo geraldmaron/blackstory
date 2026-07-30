@@ -353,9 +353,18 @@ a { color: inherit; }
   border: 1px solid var(--rule); border-radius: var(--r-md);
   box-shadow: var(--shadow-2);
 }
-.brand { display: flex; align-items: center; gap: 9px; }
-.brand svg { flex: none; }
-.brand b { font-family: var(--font-display); font-weight: 600; font-size: 15.5px; letter-spacing: -.025em; }
+/* The official symbol PNG is 512x512 but only 181x292 of that is ink: 57% of the box
+   height is transparent padding. So the rendered box height is NOT the mark size. At a
+   26px box the visible mark was 15px, under brand.md's 20px compact-mark minimum.
+   A 48px box puts the visible mark at ~27px, between the compact (20px) and primary
+   (32px) tiers and comfortable in a 56px bar.
+   Clear space X = the visible width of the copper pin. The artwork's own transparent
+   margin supplies roughly 8px of that at this scale, before the 10px gap and the bar's
+   16px inset are counted, so 1X is cleared on every side. */
+.brand { display: flex; align-items: center; gap: 10px; background: none; border: 0; padding: 0; cursor: pointer; color: inherit; }
+.brandimg { display: none; flex: none; width: auto; height: 48px; }
+[data-theme='light'] .brandimg.symbol.light { display: block; }
+[data-theme='dark'] .brandimg.symbol.dark { display: block; }
 .brand .tag { font-family: var(--font-mono); font-size: 9px; letter-spacing: .1em; color: var(--ink-4); border: 1px solid var(--rule); border-radius: 4px; padding: 2px 4px; }
 
 #cmdtrigger {
@@ -376,10 +385,10 @@ a { color: inherit; }
 @media (max-width: 560px) {
   #cmdtrigger .flex .long { display: none; }
   #cmdtrigger .flex .short { display: inline; }
-  /* v9 5.1: below the mode-switch breakpoint the bar keeps symbol, search and tools.
-     The wordmark yields first, because search is the primary affordance and a
-     15px trigger reading "S." is not one. */
-  .brand b { display: none; }
+  /* Below the mode-switch breakpoint the bar keeps mark, search and tools. The mark is
+     already symbol-only, so the ATLAS tag yields instead: it is a product tag, not brand
+     artwork, and search is the primary affordance. */
+  .brand .tag { display: none; }
 }
 .barnav { display: flex; align-items: center; gap: 2px; }
 .barnav button {
@@ -880,6 +889,7 @@ mark { background: color-mix(in oklab, var(--copper-graphic) 26%, transparent); 
   :root { --bar-h: 52px; }
   #bar { grid-template-columns: auto minmax(0, 1fr) auto; padding: 0 var(--s2) 0 var(--s3); }
   .barnav, .brand .tag { display: none; }
+  .brandimg { height: 40px; }   /* 52px bar: visible mark ~23px, still above the 20px floor */
   #cmdtrigger .kbd { display: none; }
   #results {
     left: var(--s2); right: var(--s2); width: auto; top: auto;
@@ -1286,16 +1296,18 @@ mark { background: color-mix(in oklab, var(--copper-graphic) 26%, transparent); 
      COMMAND BAR
      ====================================================================== -->
 <header id="bar">
-  <div class="brand">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <rect x="3.5" y="2.5" width="15" height="19" rx="2.2" stroke="currentColor" stroke-width="1.5"/>
-      <path d="M7 7h7M7 10.5h7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity=".55"/>
-      <path d="M16.5 12.2c0 2.6-3 5.6-3 5.6s-3-3-3-5.6a3 3 0 1 1 6 0Z" fill="var(--copper-graphic)"/>
-      <circle cx="13.5" cy="12.1" r="1.05" fill="var(--surface)"/>
-    </svg>
-    <b>BlackStory</b>
+  <!-- Official kit artwork, used as provided. brand.md bans reconstructing the lockup by
+       typing the wordmark beside a symbol render, which is what this bar used to do.
+       The primary lockup is 16:9, so its 168px minimum width needs 94px of height and
+       cannot live in a 56px bar. brand.md's own answer to that is the symbol alone, which
+       is also what the logo family assigns to map chrome and small UI. Compact mark
+       minimum is 20px; this is 26px. Theme pairs swap on [data-theme], matching
+       packages/ui ShellWordmark. -->
+  <button class="brand" id="brandhome" aria-label="BlackStory, back to the Atlas">
+    <img class="brandimg symbol light" src="../apps/web/public/brand/symbol-light.png" alt="" aria-hidden="true" />
+    <img class="brandimg symbol dark" src="../apps/web/public/brand/symbol-dark.png" alt="" aria-hidden="true" />
     <span class="tag">ATLAS</span>
-  </div>
+  </button>
 
   <button id="cmdtrigger" aria-label="Search records, places and actions">
     <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -2606,7 +2618,7 @@ function renderSaved() {
 
 function citation(r) {
   const today = new Date().toISOString().slice(0, 10);
-  return `"${r.n}." BlackStory Archive, ${r.pl}, ${eraOf(r.d)}. Evidence grade ${r.g}, ${r.src} sources. Accessed ${today}. https://blackstory.org/entity/${r.id}`;
+  return `"${r.n}." BlackStory Archive, ${r.pl}, ${eraOf(r.d)}. Evidence grade ${r.g}, ${r.src} sources. Accessed ${today}. https://blackstory.example/entity/${r.id}`;
 }
 
 /* ---- command palette ------------------------------------------------------ */
@@ -3002,7 +3014,7 @@ function wire() {
     if (S.decade) p.set('era', eraOf(S.decade));
     if (S.grade) p.set('grade', S.grade);
     if (S.kinds.size) p.set('kind', [...S.kinds].join(','));
-    copy('https://blackstory.org/atlas?' + p, 'Share link copied · filters and selection included');
+    copy('https://blackstory.example/atlas?' + p, 'Share link copied · filters and selection included');
   };
   document.addEventListener('click', e => {
     const g = e.target.closest('[data-goto]');
@@ -5190,6 +5202,7 @@ function initRooms() {
   buildFooter();
 
   $('#btn-legend').onclick = () => openLegend();
+  $('#brandhome').onclick = () => setMode('atlas');
 
   $('#singlekeys').onchange = e => {
     S.singleKeys = e.target.checked;
