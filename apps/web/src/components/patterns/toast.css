@@ -1,0 +1,109 @@
+/**
+ * Toast stack: bottom centre, above the Time panel (z 95 per the canvas law).
+ * Opaque surface, hairline border, no blur — instrument panels never frost.
+ */
+
+.ds-toast-stack {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--ds-space-4) + 148px);
+  z-index: 95;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
+  align-items: center;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: min(520px, calc(100vw - 2 * var(--ds-space-4)));
+  pointer-events: none;
+}
+
+.ds-toast {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  width: 100%;
+  padding: var(--ds-space-3) var(--ds-space-3) var(--ds-space-3) var(--ds-space-4);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  pointer-events: auto;
+  animation: ds-toast-in var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-toast__message {
+  flex: 1 1 auto;
+  margin: 0;
+  font-family: var(--ds-font-sans);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--ds-ink);
+}
+
+.ds-toast__action {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 0 var(--ds-space-3);
+  background: none;
+  border: var(--ds-border-width) solid var(--ds-accent-graphic);
+  border-radius: var(--ds-radius-sm);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+  cursor: pointer;
+}
+
+.ds-toast__action:hover {
+  background: var(--ds-accent-muted);
+}
+
+.ds-toast__close {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  background: none;
+  border: 0;
+  font-size: 1.125rem;
+  line-height: 1;
+  color: var(--ds-ink-muted);
+  cursor: pointer;
+}
+
+.ds-toast__close:hover {
+  color: var(--ds-ink);
+}
+
+.ds-toast__action:focus-visible,
+.ds-toast__close:focus-visible {
+  outline: var(--ds-border-width-strong) solid var(--ds-accent);
+  outline-offset: var(--ds-focus-offset);
+}
+
+@keyframes ds-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Narrow: the Time panel gets shorter, so the stack sits closer to the edge. */
+@media (max-width: 819px) {
+  .ds-toast-stack {
+    bottom: calc(var(--ds-space-4) + 96px);
+    max-width: calc(100vw - 2 * var(--ds-space-3));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-toast {
+    animation: none;
+  }
+}

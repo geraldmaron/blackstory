@@ -22,6 +22,7 @@ import {
   plateForScheme,
   type MapColorScheme,
 } from '../../lib/map-experience/dignity-style';
+import { MAP_LABEL_NAME_FIELD } from '../../lib/map-experience/label-expression';
 import {
   KIND_ENCODING_ENTRIES,
   KIND_FAMILY_ENTRIES,
@@ -746,7 +747,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         'source-layer': 'transportation_name',
         minzoom: 11,
         layout: {
-          'text-field': ['coalesce', ['get', 'name:en'], ['get', 'name']],
+          'text-field': MAP_LABEL_NAME_FIELD,
           'text-font': ['Noto Sans Regular'],
           'text-size': 11,
           'symbol-placement': 'line',
