@@ -32,6 +32,7 @@ import {
   useRef,
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
 } from 'react';
 import Link from 'next/link';
 import { Notice } from '@repo/ui';
@@ -57,7 +58,6 @@ import {
 } from '../../../components/patterns/browse-mode';
 import { SynchronizedResultList } from '../../../components/map-experience/SynchronizedResultList';
 import { MetaFieldLabel } from '../../../components/map-experience/MetaFieldLabel';
-import { shouldMorphDecadeDataPatch } from '../../map/decade-layer-transition';
 import {
   push as sessionPush,
   type SessionStack,
@@ -136,6 +136,10 @@ import {
   shouldAcceptExploreServerViewState,
   type ExploreLeftTab,
 } from './explore-panel-chrome';
+import {
+  applyDecadeRailDrag,
+  beginDecadeRailDrag,
+} from './explore-decade-rail';
 import {
   hydrateExploreViewModel,
   type SerializableExploreViewModel,
@@ -397,11 +401,6 @@ function ExploreMapExperienceBody({ initial }: ExploreMapExperienceProps) {
   const liveViewportRef = useRef<ExploreViewport | undefined>(initial.viewState.viewport);
   /** Bounds used to scope the records list to what's geographically on the map. */
   const [listBounds, setListBounds] = useState<ExploreMapBounds | undefined>(undefined);
-  /** First data patch after mount snaps; later decade/filter patches fade (continuous flow). */
-  const isInitialDataApplyRef = useRef(true);
-  const previousLayerModeRef = useRef(initial.viewState.layerMode);
-  const previousLinesRef = useRef(initial.viewState.lines);
-  const previousPopGeoRef = useRef(initial.viewState.popGeo ?? DEFAULT_POPULATION_GEO);
   /** Guards one-shot fly-to when applying place-search radius from a deep-linked URL. */
   const urlRadiusAppliedRef = useRef<string | null>(null);
   /** Camera before the most recent point-selection flight (hierarchical close target). */
@@ -741,24 +740,11 @@ function ExploreMapExperienceBody({ initial }: ExploreMapExperienceProps) {
 
   // Every source-data-affecting slice of view state patches the shared canvas — never a style
   // rebuild the surface calls into (MapStage.patchData rebuilds the style internally).
-  // After the first paint, patches dual-buffer crossdissolve so decade scrubbing and filter
-  // changes morph presence colors / pins without emptying the plate. Layer-mode flips skip
-  // morph: configOnly never syncs choropleth visibility/paint (blackShare / blackChange).
+  // Explore is an instrument surface: snap pin/line filters immediately. The ambient 1.6s
+  // dual-buffer morph (HeroStage decade flow / DECADE_LAYER_FADE_MS) must not run here —
+  // on the decade rail it made every click feel lagged and aborted/restarted under rapid scrub.
   useEffect(() => {
     const decade = view.viewState.decade;
-    const layerModeChanged = previousLayerModeRef.current !== view.viewState.layerMode;
-    previousLayerModeRef.current = view.viewState.layerMode;
-    const historyEdgesToggled = previousLinesRef.current !== view.viewState.lines;
-    previousLinesRef.current = view.viewState.lines;
-    previousPopGeoRef.current = view.viewState.popGeo ?? DEFAULT_POPULATION_GEO;
-    const fade = shouldMorphDecadeDataPatch({
-      reducedMotion: prefersReducedMotion(),
-      isInitialApply: isInitialDataApplyRef.current,
-      layerModeChanged,
-      populationLayerActive: isPopulationLayerMode(view.viewState.layerMode),
-      historyEdgesToggled,
-    });
-    isInitialDataApplyRef.current = false;
     stage.patchData(
       {
         featureCollection: { type: 'FeatureCollection', features: filteredFeatures },
@@ -773,7 +759,6 @@ function ExploreMapExperienceBody({ initial }: ExploreMapExperienceProps) {
         historyEdgeCollection: view.edgeLineCollection,
       },
       {
-        ...(fade ? { fade: true } : {}),
         ...(decade ? { memorialDecade: decade } : { memorialComplete: true }),
       },
     );
@@ -1430,11 +1415,98 @@ function ExploreMapExperienceBody({ initial }: ExploreMapExperienceProps) {
 
   // Keep the active decade tab visible as the reader steps or deep-links across the rail.
   const decadeRailListRef = useRef<HTMLUListElement | null>(null);
+  const decadeDragRef = useRef<ReturnType<typeof beginDecadeRailDrag> | null>(null);
+  /** Suppress the tab click that follows a completed drag-scroll. */
+  const decadeDragMovedRef = useRef(false);
+
+  /**
+   * Native capture listeners (not React synthetic). A parent
+   * `onPointerDownCapture` + `stopPropagation` previously blocked the strip's
+   * React drag handlers. Capture-phase listeners on the list own the gesture
+   * before MapLibre can fight it. Pointer capture is deferred until the drag
+   * threshold so short presses still deliver click to the tab buttons.
+   */
   useEffect(() => {
+    const list = decadeRailListRef.current;
+    if (!list) return undefined;
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (event.button !== 0) return;
+      event.stopPropagation();
+      decadeDragMovedRef.current = false;
+      decadeDragRef.current = beginDecadeRailDrag(list, event.pointerId, event.clientX);
+      // Do not setPointerCapture here. Capture retargets click to the list, so
+      // tab buttons never receive onClick. Capture only after drag threshold.
+    };
+
+    const onPointerMove = (event: PointerEvent) => {
+      const drag = decadeDragRef.current;
+      if (!drag || drag.pointerId !== event.pointerId) return;
+      if (event.pointerType === 'mouse' && event.buttons === 0) return;
+      event.stopPropagation();
+      const wasMoved = drag.moved;
+      const moved = applyDecadeRailDrag(list, drag, event.clientX);
+      if (moved) {
+        decadeDragMovedRef.current = true;
+        event.preventDefault();
+        if (!wasMoved) {
+          try {
+            list.setPointerCapture(event.pointerId);
+          } catch {
+            // Non-capturable pointers still scroll via move events.
+          }
+        }
+      }
+    };
+
+    const onPointerEnd = (event: PointerEvent) => {
+      const drag = decadeDragRef.current;
+      if (!drag || drag.pointerId !== event.pointerId) return;
+      event.stopPropagation();
+      try {
+        if (list.hasPointerCapture(event.pointerId)) {
+          list.releasePointerCapture(event.pointerId);
+        }
+      } catch {
+        // ignore
+      }
+      decadeDragMovedRef.current = drag.moved;
+      decadeDragRef.current = null;
+    };
+
+    list.addEventListener('pointerdown', onPointerDown, { capture: true });
+    list.addEventListener('pointermove', onPointerMove, { capture: true });
+    list.addEventListener('pointerup', onPointerEnd, { capture: true });
+    list.addEventListener('pointercancel', onPointerEnd, { capture: true });
+    return () => {
+      list.removeEventListener('pointerdown', onPointerDown, { capture: true });
+      list.removeEventListener('pointermove', onPointerMove, { capture: true });
+      list.removeEventListener('pointerup', onPointerEnd, { capture: true });
+      list.removeEventListener('pointercancel', onPointerEnd, { capture: true });
+    };
+  }, [cinematic.state, view.entityDecades.length]);
+
+  const handleDecadeTabClick = useCallback(
+    (event: ReactMouseEvent<HTMLButtonElement>, decade: string | undefined) => {
+      // A drag-scroll ends with a click on the tab under the pointer — ignore it.
+      if (decadeDragMovedRef.current) {
+        event.preventDefault();
+        event.stopPropagation();
+        decadeDragMovedRef.current = false;
+        return;
+      }
+      handleDecadeRailSelect(decade);
+    },
+    [handleDecadeRailSelect],
+  );
+
+  useEffect(() => {
+    // Don't fight an in-progress drag-scroll.
+    if (decadeDragRef.current) return;
     const active = decadeRailListRef.current?.querySelector<HTMLElement>(
       '[aria-selected="true"]',
     );
-    active?.scrollIntoView({ inline: 'center', block: 'nearest' });
+    active?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'auto' });
   }, [view.viewState.filters.era]);
 
   const handleEdgeSelect = useCallback(
@@ -1617,8 +1689,9 @@ function ExploreMapExperienceBody({ initial }: ExploreMapExperienceProps) {
                 type="button"
                 role="tab"
                 className="ds-explore-edition__decade-tab"
+                data-decade-stop="all"
                 aria-selected={view.viewState.filters.era === 'all'}
-                onClick={() => handleDecadeRailSelect(undefined)}
+                onClick={(event) => handleDecadeTabClick(event, undefined)}
               >
                 All time
               </button>
@@ -1629,8 +1702,9 @@ function ExploreMapExperienceBody({ initial }: ExploreMapExperienceProps) {
                   type="button"
                   role="tab"
                   className="ds-explore-edition__decade-tab"
+                  data-decade-stop={decade}
                   aria-selected={view.viewState.filters.era === decade}
-                  onClick={() => handleDecadeRailSelect(decade)}
+                  onClick={(event) => handleDecadeTabClick(event, decade)}
                 >
                   {decade}
                   <span className="ds-explore-stage__decade-count" aria-hidden="true">
@@ -2087,12 +2161,15 @@ function ExploreMapExperienceBody({ initial }: ExploreMapExperienceProps) {
             Hide records
           </button>
         </div>
-        {/* Dim + inert the list peer only; header stays interactive for Hide. */}
+        {/* Dim + inert the list peer only; header stays interactive for Hide.
+            Mount the list only while the panel is open: SSR + Flight used to
+            embed every matching row (~8k) even under `hidden`, which made
+            /explore a 100MB+ document and looked like a stuck load. */}
         <div
           className="ds-explore-stage__results-list"
           {...(resultsDimmed ? { inert: true } : {})}
         >
-          <SynchronizedResultList {...listProps} />
+          {resultsVisible ? <SynchronizedResultList {...listProps} /> : null}
         </div>
       </div>
 

@@ -108,6 +108,8 @@ Chrome is **opaque Surface**, theme-aware, flat matte. The map stays visible bet
 
 - Fixed bottom-center dock above the cinematic rail, visible whenever the stage is Engaged.
 - `All time` tab + every catalog decade with live record counts (`buildEntityDecadeCounts`), chronological, horizontally scrollable with edge fade; earlier/later stepper buttons at each end.
+- Drag scroll: press and drag horizontally to slide the decade strip (native capture + pointer capture; MapLibre must not steal the pan). A short press still selects that decade; a drag suppresses the trailing click.
+- Map response: decade/filter patches **snap** (no 1.6s dual-buffer morph). Ambient morph stays on the home hero decade flow only.
 - One control owns "when": selecting a decade sets the `?era=` pin filter AND the relationship-line decade slice (all-time fallback when a decade has no edges). There is no separate line-decade scrubber.
 - Active tab auto-scrolls into view on step or deep link. Tabs reuse `ds-explore-edition__decade-tab`; 44px-class targets.
 

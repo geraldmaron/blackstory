@@ -165,7 +165,7 @@
    white plastic. Hero keeps top-right; Explore parks zoom bottom-right so the
    records rail never covers it (see `:has(.ds-explore-stage)` rules below). */
 .ds-map-stage .maplibregl-ctrl-top-right {
-  top: calc(var(--ds-island-offset) + var(--ds-island-height) + var(--ds-space-3));
+  top: calc(var(--ds-island-clearance) + var(--ds-space-3));
 }
 
 .ds-map-stage .maplibregl-ctrl-group {

@@ -51,6 +51,45 @@ describe('shell explore header keeps the shared primary nav', () => {
   });
 });
 
+describe('explore decade dock hit target', () => {
+  const exploreEditionCss = readFileSync(
+    join(here, '(map)/explore/explore-edition.css'),
+    'utf8',
+  );
+  const cinematicMapCss = readFileSync(
+    join(here, '../components/patterns/cinematic-map/cinematic-map.css'),
+    'utf8',
+  );
+
+  it('keeps the decade dock above pass-through layers and in the Engaged hit list', () => {
+    assert.match(
+      exploreEditionCss,
+      /\.ds-explore-stage__decade-dock\s*\{[^}]*pointer-events:\s*auto/s,
+    );
+    assert.match(
+      exploreEditionCss,
+      /\.ds-explore-stage__decade-dock\s*\{[^}]*z-index:\s*6/s,
+    );
+    assert.match(
+      exploreEditionCss,
+      /\.ds-explore-stage__decade-dock\s*\{[^}]*touch-action:\s*none/s,
+    );
+    assert.match(
+      exploreEditionCss,
+      /\.ds-explore-stage__decade-scroll\s*\{[^}]*flex:\s*1 1 auto/s,
+    );
+    assert.match(
+      cinematicMapCss,
+      /:root\[data-cinematic-engaged='true'\][\s\S]*\.ds-explore-stage__decade-dock\s*\{[^}]*pointer-events:\s*auto/s,
+    );
+    // Site header must remain visible while Engaged (wayfinding).
+    assert.doesNotMatch(
+      cinematicMapCss,
+      /:root\[data-cinematic-engaged='true'\]\s+\.ds-shell-header\s*\{/,
+    );
+  });
+});
+
 describe('explore map shell layout', () => {
   it('locks the dedicated explore shell to the viewport (not a footer-over-map document)', () => {
     assert.match(
@@ -69,10 +108,15 @@ describe('explore map shell layout', () => {
 });
 
 describe('shell header theme tokens', () => {
-  it('uses theme surface/ink tokens and does not force fixed-ink over map surfaces', () => {
+  it('uses a flush opaque bar with theme surface/ink (no floating top gap)', () => {
+    assert.match(uiShellHeaderCss, /\.ds-shell-header\s*\{[^}]*top:\s*0/s);
     assert.match(
       uiShellHeaderCss,
-      /\.ds-shell-header__inner\s*\{[^}]*background:\s*var\(--ds-surface\)/s,
+      /\.ds-shell-header\s*\{[^}]*background:\s*var\(--ds-surface\)/s,
+    );
+    assert.match(
+      uiShellHeaderCss,
+      /\.ds-shell-header__inner\s*\{[^}]*background:\s*transparent/s,
     );
     assert.match(uiShellHeaderCss, /\.ds-shell-header__inner\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
     // Regression: map routes must not freeze the navbar on charcoal / dark-kit artwork.

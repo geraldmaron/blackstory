@@ -48,8 +48,9 @@ The hero map inside beat 0 is a **Surface-contained live readout**: the persiste
 ## 3. Page scaffold
 
 ```
-┌─ main (max ~84rem, centered, page inset) ─────────────────────┐
-│  [ Shell — sticky Surface card ]                               │
+┌─ viewport ─────────────────────────────────────────────────────┐
+│  [ Shell — fixed flush Surface bar (no floating top gap) ]     │
+├─ main (max ~84rem, centered, page inset; clearance under bar) ┤
 │  [ Hero — single Surface panel, copy | map ]                   │
 │  [ Beat 01 — Your place ]                                      │
 │  [ Beat 02 — One story + record carousel ]                     │
@@ -77,11 +78,11 @@ The hero map inside beat 0 is a **Surface-contained live readout**: the persiste
 
 ## 4. Shell / nav on home
 
-Home shell is a **Surface card inside `main`**, not a full-bleed theme-flipping header bar.
+Home shell is the **same flush fixed Surface bar** as every other route (`packages/ui` `.ds-shell-header`: `top: 0`, opaque plate through the safe-area band). Body uses `--ds-island-clearance` so content never peeks above the bar while scrolling.
 
 | Element | Spec |
 |---|---|
-| Position | `sticky`; `top` = page inset; sits above beat stack |
+| Position | `fixed`; `top: 0`; opaque bar through safe-area; content clears via `--ds-island-clearance` |
 | Surface | Surface fill, 1px Rule border, radius-md |
 | Brand | Symbol (36px) + wordmark; official artwork from `apps/web/public/brand/` — never reconstruct lockup in JSX |
 | Primary nav | Map · Data · Themes · Methodology — Inter 500, Stone default, copper-text on hover/active |
@@ -286,7 +287,7 @@ Use this list to sign off home implementation against v6:
 
 - [ ] `/` renders on theme-aware canvas + Surface cards — no ink/charcoal bands; theme toggle works on home
 - [ ] Paper grain + archive grid atmosphere in gutters; no scattered home mosaic; no text atop atmosphere without Surface
-- [ ] Shell is sticky Surface card with one copper CTA; mobile nav collapses per v5 sheet law
+- [ ] Shell is flush fixed Surface bar with one copper CTA; mobile nav collapses per v5 sheet law
 - [ ] Hero is one panel with hairline-split copy and map columns (stacked on mobile)
 - [ ] Hero has exactly one copper and one quiet CTA; micro-facts render three-up with labels
 - [ ] Beats 01–05 present in order with edition headers and copper index numerals

@@ -105,10 +105,18 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
             {view.totalMatched} documented record{view.totalMatched === 1 ? '' : 's'} matching
             filters · oldest first
           </p>
+          {/* Cap the no-JS list so progressive-enhancement HTML stays small; the
+              interactive client island owns the full synchronized peer. */}
           <SynchronizedResultList
-            features={view.filteredFeatures}
+            features={view.filteredFeatures.slice(0, 100)}
             labelledBy="explore-results-heading-njs"
           />
+          {view.filteredFeatures.length > 100 ? (
+            <p className="ds-sans ds-explore__results-count">
+              Showing the first 100 of {view.filteredFeatures.length}. Enable JavaScript for the
+              full map and records list.
+            </p>
+          ) : null}
         </div>
       </noscript>
 

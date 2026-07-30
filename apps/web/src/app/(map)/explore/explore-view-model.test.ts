@@ -62,3 +62,49 @@ test('decade slice filters relationship lines', () => {
   const fifties = buildExploreViewModel({ lines: '1', decade: '1950s' });
   assert.ok(fifties.historyEdges.length <= allTime.historyEdges.length);
 });
+
+test('lines=1 draws connections from live geoAnchor outside the seed table', () => {
+  // Regression: Explore showed "0 connections" for the national catalog because
+  // buildHistoryEdgeLineCollection only consulted ENTITY_GEO_ANCHORS (Dunbar seed).
+  const [church, school] = listPublicEntities();
+  assert.ok(church && school);
+  const liveEntities = [
+    {
+      ...church,
+      id: 'ent_live_catalog_place_a',
+      relatedIds: ['ent_live_catalog_place_b'],
+      related: [
+        { id: 'ent_live_catalog_place_b', type: 'located_at', direction: 'outgoing' as const },
+      ],
+      geoAnchor: {
+        lat: 33.75,
+        lng: -84.39,
+        geohash: 'dj',
+        matchMethod: 'release_projection',
+      },
+    },
+    {
+      ...school,
+      id: 'ent_live_catalog_place_b',
+      relatedIds: ['ent_live_catalog_place_a'],
+      related: [
+        { id: 'ent_live_catalog_place_a', type: 'located_at', direction: 'incoming' as const },
+      ],
+      geoAnchor: {
+        lat: 29.76,
+        lng: -95.37,
+        geohash: '9v',
+        matchMethod: 'release_projection',
+      },
+    },
+  ];
+  const view = buildExploreViewModel({ lines: '1' }, liveEntities);
+  assert.equal(view.viewState.lines, true);
+  assert.ok(view.historyEdges.length > 0);
+  assert.ok(view.edgeLineCollection.features.length > 0);
+  assert.equal(
+    view.edgeLineCollection.features[0]?.properties.fromEntityId === 'ent_live_catalog_place_a' ||
+      view.edgeLineCollection.features[0]?.properties.toEntityId === 'ent_live_catalog_place_a',
+    true,
+  );
+});

@@ -21,6 +21,7 @@ import {
   buildStateDensityLevels,
   parseExploreSearchParams,
   type EntityDecadeCount,
+  type EntityGeoAnchor,
   type ExploreFacetOptions,
   type ExploreViewState,
   type RawExploreSearchParams,
@@ -59,11 +60,21 @@ export type ExploreViewModel = {
   readonly selectedEdge?: HistoryEdgeView;
 };
 
+/** Prefer each entity's published geoAnchor (national catalog). Seed-table fallback
+ * lives inside `buildHistoryEdgeLineCollection` when this resolver returns undefined. */
+function liveGeoAnchorResolver(
+  entities: readonly PublicEntityView[],
+): (entityId: string) => EntityGeoAnchor | undefined {
+  const byId = new Map(entities.map((entity) => [entity.id, entity] as const));
+  return (entityId) => byId.get(entityId)?.geoAnchor;
+}
+
 function buildEdgeSlice(
   artifact: ReturnType<typeof getHistoryGraphReleaseArtifact>,
   entitiesById: ReturnType<typeof buildHistoryGraphContext>['entitiesById'],
   relationships: ReturnType<typeof buildHistoryGraphContext>['relationships'],
   mode: 'all-time' | 'decade',
+  resolveLiveGeoAnchor: (entityId: string) => EntityGeoAnchor | undefined,
   decade?: string,
 ): ExploreEdgeLineSlice {
   const slice = resolveHistoryGraphSlice(artifact, mode, decade);
@@ -75,7 +86,9 @@ function buildEdgeSlice(
   );
   return {
     edges,
-    lineCollection: buildHistoryEdgeLineCollection(edges),
+    lineCollection: buildHistoryEdgeLineCollection(edges, {
+      geoAnchorFor: resolveLiveGeoAnchor,
+    }),
   };
 }
 
@@ -83,16 +96,19 @@ function buildEdgeSlice(
  * shared by the explore view model and the home hero's decades-in-motion flow. */
 export function buildEdgeLineCatalog(
   artifact: ReturnType<typeof getHistoryGraphReleaseArtifact> = getHistoryGraphReleaseArtifact(),
+  entities: readonly PublicEntityView[] = listPublicEntities(),
 ): {
   readonly edgeLineCatalog: ExploreEdgeLineCatalog;
   readonly availableDecades: readonly string[];
 } {
-  const historyContext = buildHistoryGraphContext(artifact);
+  const historyContext = buildHistoryGraphContext(artifact, entities);
+  const resolveLiveGeoAnchor = liveGeoAnchorResolver(entities);
   const allTime = buildEdgeSlice(
     artifact,
     historyContext.entitiesById,
     historyContext.relationships,
     'all-time',
+    resolveLiveGeoAnchor,
   );
   const byDecade: Record<string, ExploreEdgeLineSlice> = {};
   for (const decade of historyContext.availableDecades) {
@@ -101,6 +117,7 @@ export function buildEdgeLineCatalog(
       historyContext.entitiesById,
       historyContext.relationships,
       'decade',
+      resolveLiveGeoAnchor,
       decade,
     );
   }
@@ -124,6 +141,7 @@ export function buildExploreViewModel(
 
   const { edgeLineCatalog, availableDecades } = buildEdgeLineCatalog(
     graphArtifact ?? getHistoryGraphReleaseArtifact(entities),
+    entities,
   );
   const active = pickExploreEdgeSlice(edgeLineCatalog, viewState);
   const selectedEdge = viewState.edge
