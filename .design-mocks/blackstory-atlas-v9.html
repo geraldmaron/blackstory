@@ -1,0 +1,2659 @@
+<!doctype html>
+<html lang="en" data-theme="dark" data-density="comfortable" data-motion="cinematic">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>BlackStory Atlas · design mock v9</title>
+<meta name="description" content="Modern instrument-first redesign mock for BlackStory. The map is the product." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;450;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" />
+
+<link rel="stylesheet" href="../apps/web/node_modules/maplibre-gl/dist/maplibre-gl.css"
+      onerror="this.onerror=null;this.href='https://unpkg.com/maplibre-gl@5.9.0/dist/maplibre-gl.css'" />
+
+<style>
+/* ============================================================================
+   BlackStory Atlas — v9 design mock
+   Language kept: Archive Paper / Black Ink / Copper Pin, Sora / Inter /
+   Source Serif 4 / IBM Plex Mono, 8-16-28 radii, hairline rules, mono data
+   microtype, Kind / Where / Era / Evidence anatomy, precision honesty,
+   dignity rules (no alarm hues, no crime heat).
+   Language modernised: the map is the substrate, chrome floats as instruments,
+   accent becomes a hierarchy instead of a quota, one tinted shadow earns z-order.
+   ========================================================================== */
+
+/* ---- tokens -------------------------------------------------------------- */
+:root {
+  --font-display: 'Sora', ui-sans-serif, system-ui, sans-serif;
+  --font-ui: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-editorial: 'Source Serif 4', 'Iowan Old Style', Palatino, Georgia, serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  --r-xs: 6px; --r-sm: 8px; --r-md: 16px; --r-lg: 28px; --r-pill: 999px;
+
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 20px;
+  --s6: 24px; --s8: 32px; --s10: 40px; --s12: 48px;
+
+  --tap: 44px;
+  --rail-w: 300px;
+  --results-w: 344px;
+  --bar-h: 56px;
+
+  --dur-1: 120ms; --dur-2: 220ms; --dur-3: 420ms; --dur-4: 720ms;
+  --ease: cubic-bezier(.2, .9, .25, 1);
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --ease-in-out: cubic-bezier(.65, 0, .35, 1);
+
+  --z-map: 0; --z-annot: 5; --z-spot: 6; --z-chrome: 20;
+  --z-sheet: 40; --z-bar: 50; --z-overlay: 90; --z-toast: 95;
+}
+
+[data-density='compact'] {
+  --s3: 10px; --s4: 13px; --s5: 16px; --s6: 19px; --s8: 26px;
+  --rail-w: 276px; --results-w: 316px; --bar-h: 50px;
+}
+
+/* light: Archive Paper */
+[data-theme='light'] {
+  color-scheme: light;
+  --canvas: #f4efe5;
+  --canvas-deep: #ece5d6;
+  --surface: #fbf8f2;
+  --surface-2: #fffdf9;
+  --surface-sunk: #f0ebdf;
+  --ink: #0a0a0a;
+  --ink-2: #4a453d;
+  --ink-3: #6d675f;
+  --ink-4: #8d867c;
+  --rule: #ded6c7;
+  --rule-2: #ebe4d7;
+  --rule-strong: #c3b9a6;
+
+  --copper: #8e4f2a;
+  --copper-hi: #a75c30;
+  --copper-graphic: #b86b2a;
+  --copper-wash: rgba(184, 107, 42, 0.1);
+  --copper-wash-2: rgba(184, 107, 42, 0.18);
+  --sand: #d8a178;
+  --sand-wash: rgba(216, 161, 120, 0.16);
+
+  --ok: #2f6b3c; --ok-wash: rgba(47, 107, 60, 0.12);
+  --warn: #7d5a17; --warn-wash: rgba(125, 90, 23, 0.12);
+  --note: #5a5140; --note-wash: rgba(90, 81, 64, 0.1);
+
+  --shadow-1: 0 1px 1px rgba(52, 40, 22, .04), 0 2px 6px rgba(52, 40, 22, .05);
+  --shadow-2: 0 1px 2px rgba(52, 40, 22, .05), 0 8px 24px -6px rgba(52, 40, 22, .13);
+  --shadow-3: 0 2px 4px rgba(52, 40, 22, .06), 0 20px 48px -12px rgba(52, 40, 22, .2);
+  --scrim: rgba(244, 239, 229, .74);
+
+  --map-ocean: #dcd3c0;
+  --map-land: #f6f2e9;
+  --map-water: #d5cbb6;
+  --map-green: #ebe5d1;
+  --map-line: #bdb19a;
+  --map-line-2: #a2957c;
+  --map-road: #e6dcc6;
+  --map-label: #6d675f;
+  --map-label-hi: #2e2a24;
+  --map-halo: #f8f5ee;
+}
+
+/* dark: Black Ink */
+[data-theme='dark'] {
+  color-scheme: dark;
+  --canvas: #0a0a0a;
+  --canvas-deep: #050505;
+  --surface: #151412;
+  --surface-2: #1c1b18;
+  --surface-sunk: #100f0e;
+  --ink: #f4efe5;
+  --ink-2: #cec7bb;
+  --ink-3: #a49c90;
+  --ink-4: #7d766c;
+  --rule: #2e2b26;
+  --rule-2: #232120;
+  --rule-strong: #454037;
+
+  --copper: #d07a32;
+  --copper-hi: #e08c42;
+  --copper-graphic: #d07a32;
+  --copper-wash: rgba(208, 122, 50, 0.13);
+  --copper-wash-2: rgba(208, 122, 50, 0.22);
+  --sand: #d8a178;
+  --sand-wash: rgba(216, 161, 120, 0.14);
+
+  --ok: #7fc294; --ok-wash: rgba(127, 194, 148, 0.13);
+  --warn: #d4b46a; --warn-wash: rgba(212, 180, 106, 0.13);
+  --note: #b3a993; --note-wash: rgba(179, 169, 147, 0.1);
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, .5);
+  --shadow-2: 0 2px 6px rgba(0, 0, 0, .45), 0 12px 30px -8px rgba(0, 0, 0, .7);
+  --shadow-3: 0 4px 12px rgba(0, 0, 0, .5), 0 28px 60px -16px rgba(0, 0, 0, .8);
+  --scrim: rgba(10, 10, 10, .72);
+
+  --map-ocean: #08080a;
+  --map-land: #221f1a;
+  --map-water: #0a0a0c;
+  --map-green: #272319;
+  --map-line: #453f35;
+  --map-line-2: #5c5446;
+  --map-road: #302b23;
+  --map-label: #9a9284;
+  --map-label-hi: #ded7c9;
+  --map-halo: #16130f;
+}
+
+/* ---- base ---------------------------------------------------------------- */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+[data-density='compact'] body { font-size: 14px; }
+
+h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; margin: 0; letter-spacing: -0.02em; line-height: 1.12; }
+p { margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { background: none; border: 0; cursor: pointer; padding: 0; }
+a { color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--copper);
+  outline-offset: 2px;
+  border-radius: var(--r-xs);
+}
+
+.sr {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* mono microtype — the data register, carried from v6 */
+.mono {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
+}
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.serif { font-family: var(--font-editorial); }
+
+/* ---- scrollbars ---------------------------------------------------------- */
+.scroll { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--rule-strong) transparent; }
+.scroll::-webkit-scrollbar { width: 9px; height: 9px; }
+.scroll::-webkit-scrollbar-track { background: transparent; }
+.scroll::-webkit-scrollbar-thumb { background: var(--rule); border-radius: var(--r-pill); border: 3px solid transparent; background-clip: content-box; }
+.scroll:hover::-webkit-scrollbar-thumb { background: var(--rule-strong); background-clip: content-box; }
+
+/* ============================================================================
+   MAP SUBSTRATE
+   ========================================================================== */
+#map {
+  position: fixed; inset: 0; z-index: var(--z-map);
+  background: var(--map-ocean);
+}
+.maplibregl-ctrl-attrib { font-family: var(--font-mono) !important; font-size: 9.5px !important; }
+.maplibregl-ctrl-bottom-right { z-index: 8 !important; }
+.maplibregl-ctrl-attrib.maplibregl-compact { background: var(--surface) !important; border: 1px solid var(--rule); border-radius: var(--r-pill) !important; }
+.maplibregl-ctrl-attrib a { color: var(--ink-3) !important; }
+
+/* map failure fallback plate */
+#fallback {
+  position: fixed; inset: 0; z-index: 1; display: none;
+  background:
+    radial-gradient(1200px 700px at 42% 46%, color-mix(in oklab, var(--copper-graphic) 8%, transparent), transparent 62%),
+    var(--map-ocean);
+}
+#fallback::before {
+  content: ''; position: absolute; inset: -20%;
+  background-image:
+    linear-gradient(var(--map-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--map-line) 1px, transparent 1px);
+  background-size: 64px 64px;
+  opacity: .5;
+  transition: transform var(--dur-4) var(--ease-out);
+}
+[data-mapfail='1'] #fallback { display: block; }
+[data-mapfail='1'] #map { opacity: 0; }
+
+/* annotation + spotlight overlays */
+#annot {
+  position: fixed; inset: 0; z-index: var(--z-annot);
+  pointer-events: none; overflow: visible;
+}
+#spot {
+  position: fixed; inset: 0; z-index: var(--z-spot);
+  pointer-events: none; opacity: 0;
+  transition: opacity var(--dur-4) var(--ease-out);
+  background: var(--canvas);
+  --sx: 50%; --sy: 50%; --sr: 22%;
+  -webkit-mask-image: radial-gradient(circle at var(--sx) var(--sy), transparent 0, transparent var(--sr), #000 calc(var(--sr) + 16%));
+  mask-image: radial-gradient(circle at var(--sx) var(--sy), transparent 0, transparent var(--sr), #000 calc(var(--sr) + 16%));
+}
+#spot.on { opacity: .82; }
+
+/* film grain — archive atmosphere, kept from v6 */
+#grain {
+  position: fixed; inset: 0; z-index: 7; pointer-events: none; opacity: .3;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+}
+
+/* ============================================================================
+   PRIMITIVES
+   ========================================================================== */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-2);
+  backdrop-filter: none;
+}
+.panel-hd {
+  display: flex; align-items: center; gap: var(--s2);
+  padding: var(--s3) var(--s4);
+  border-bottom: 1px solid var(--rule-2);
+  min-height: 46px;
+}
+.panel-hd h2 { font-size: 12px; font-family: var(--font-mono); font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s2);
+  height: 34px; padding: 0 var(--s3);
+  border: 1px solid var(--rule); border-radius: var(--r-sm);
+  background: var(--surface-2); color: var(--ink);
+  font-size: 13px; font-weight: 500; white-space: nowrap;
+  transition: background var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease), transform var(--dur-1) var(--ease);
+}
+.btn:hover { background: var(--surface-sunk); border-color: var(--rule-strong); }
+.btn:active { transform: translateY(1px); }
+.btn.ghost { background: transparent; border-color: transparent; color: var(--ink-3); }
+.btn.ghost:hover { background: var(--surface-sunk); color: var(--ink); }
+.btn.primary {
+  background: var(--copper-graphic); border-color: var(--copper-graphic);
+  color: #fff; font-weight: 600;
+}
+[data-theme='light'] .btn.primary { color: #fff; }
+[data-theme='dark'] .btn.primary { color: #14100b; }
+.btn.primary:hover { background: var(--copper-hi); border-color: var(--copper-hi); }
+.btn.tall { height: var(--tap); padding: 0 var(--s4); }
+.btn.sq { width: 34px; padding: 0; }
+.btn.sq.tall { width: var(--tap); }
+.btn[aria-pressed='true'] { background: var(--copper-wash); border-color: var(--copper-graphic); color: var(--copper); }
+
+.kbd {
+  font-family: var(--font-mono); font-size: 10px; line-height: 1;
+  padding: 3px 5px; border-radius: 4px;
+  border: 1px solid var(--rule); background: var(--surface-sunk);
+  color: var(--ink-3); letter-spacing: .04em;
+}
+
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 30px; padding: 0 10px;
+  border: 1px solid var(--rule); border-radius: var(--r-pill);
+  background: var(--surface-2); color: var(--ink-2);
+  font-size: 12px; font-weight: 500; white-space: nowrap;
+  transition: all var(--dur-1) var(--ease);
+}
+.chip:hover { border-color: var(--rule-strong); background: var(--surface-sunk); }
+.chip[aria-pressed='true'] { background: var(--copper-wash); border-color: var(--copper-graphic); color: var(--copper); }
+.chip .n { font-family: var(--font-mono); font-size: 10px; color: var(--ink-4); font-variant-numeric: tabular-nums; }
+.chip[aria-pressed='true'] .n { color: var(--copper); }
+
+.field {
+  display: flex; align-items: center; gap: var(--s2);
+  height: 38px; padding: 0 var(--s3);
+  border: 1px solid var(--rule); border-radius: var(--r-sm);
+  background: var(--surface-2);
+  transition: border-color var(--dur-1) var(--ease);
+}
+.field:focus-within { border-color: var(--copper-graphic); }
+.field input, .field select {
+  flex: 1; min-width: 0; border: 0; background: transparent; outline: none;
+  font-size: 13.5px; color: var(--ink);
+}
+.field select { appearance: none; cursor: pointer; }
+
+.rule { height: 1px; background: var(--rule-2); border: 0; margin: 0; }
+
+/* evidence grade dot — glyph + colour, never colour alone */
+.grade { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .06em; }
+.grade i { width: 7px; height: 7px; border-radius: 50%; display: block; }
+.grade.a { color: var(--ok); } .grade.a i { background: var(--ok); }
+.grade.b { color: var(--warn); } .grade.b i { background: var(--warn); box-shadow: inset 0 0 0 1.5px var(--surface); }
+.grade.c { color: var(--note); } .grade.c i { background: transparent; box-shadow: inset 0 0 0 1.5px currentColor; }
+
+/* kind family glyph — shape carries the signal, not colour */
+.kglyph { width: 16px; height: 16px; flex: none; color: var(--ink-3); }
+[data-sel='1'] .kglyph, .row:hover .kglyph { color: var(--copper); }
+
+/* ============================================================================
+   COMMAND BAR (top) — search-first, not a nav menu
+   ========================================================================== */
+#bar {
+  position: fixed; top: var(--s3); left: var(--s3); right: var(--s3); z-index: var(--z-bar);
+  height: var(--bar-h);
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--s3);
+  padding: 0 var(--s3) 0 var(--s4);
+  background: var(--surface);
+  border: 1px solid var(--rule); border-radius: var(--r-md);
+  box-shadow: var(--shadow-2);
+}
+.brand { display: flex; align-items: center; gap: 9px; }
+.brand svg { flex: none; }
+.brand b { font-family: var(--font-display); font-weight: 600; font-size: 15.5px; letter-spacing: -.025em; }
+.brand .tag { font-family: var(--font-mono); font-size: 9px; letter-spacing: .1em; color: var(--ink-4); border: 1px solid var(--rule); border-radius: 4px; padding: 2px 4px; }
+
+#cmdtrigger {
+  display: flex; align-items: center; gap: var(--s2);
+  height: 38px; max-width: 520px; width: 100%; margin: 0 auto; padding: 0 var(--s3);
+  border: 1px solid var(--rule); border-radius: var(--r-pill);
+  background: var(--surface-sunk); color: var(--ink-4);
+  font-size: 13.5px; text-align: left;
+  transition: all var(--dur-1) var(--ease);
+}
+#cmdtrigger:hover { border-color: var(--rule-strong); color: var(--ink-3); background: var(--surface-2); }
+#cmdtrigger .flex { flex: 1; }
+.barnav { display: flex; align-items: center; gap: 2px; }
+.barnav button {
+  height: 32px; padding: 0 11px; border-radius: var(--r-sm);
+  font-size: 12.5px; font-weight: 500; color: var(--ink-3);
+  transition: all var(--dur-1) var(--ease);
+}
+.barnav button:hover { background: var(--surface-sunk); color: var(--ink); }
+.barnav button[aria-current='true'] { background: var(--copper-wash); color: var(--copper); font-weight: 600; }
+.bartools { display: flex; align-items: center; gap: var(--s1); }
+.divider-v { width: 1px; height: 22px; background: var(--rule); margin: 0 var(--s2); }
+
+.savedcount {
+  position: absolute; top: 1px; right: 1px;
+  min-width: 15px; height: 15px; padding: 0 3px;
+  border-radius: var(--r-pill); background: var(--copper-graphic);
+  color: #fff; font-family: var(--font-mono); font-size: 9px; line-height: 15px; text-align: center;
+}
+[data-theme='dark'] .savedcount { color: #14100b; }
+
+/* ============================================================================
+   ATLAS CHROME — floating instruments
+   ========================================================================== */
+.stage { position: fixed; inset: 0; z-index: var(--z-chrome); pointer-events: none; }
+.stage > * { pointer-events: auto; }
+
+/* ---- left: LENS ---------------------------------------------------------- */
+#lens {
+  position: fixed; left: var(--s3); top: calc(var(--bar-h) + var(--s3) * 2);
+  width: var(--rail-w); max-height: calc(100dvh - var(--bar-h) - 190px);
+  display: flex; flex-direction: column;
+  transition: transform var(--dur-3) var(--ease-out), opacity var(--dur-2) var(--ease);
+}
+#lens.hidden { transform: translateX(calc(-100% - var(--s4))); opacity: 0; pointer-events: none; }
+.lens-body { padding: var(--s4); display: flex; flex-direction: column; gap: var(--s5); }
+
+.grp { display: flex; flex-direction: column; gap: var(--s3); }
+.grp-hd { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s2); }
+.grp-hd .mono { font-size: 10px; letter-spacing: .12em; color: var(--copper); }
+.grp-hd .hint { font-family: var(--font-mono); font-size: 10px; color: var(--ink-4); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* presence bars — deepest coverage, hairline rows */
+.bars { display: flex; flex-direction: column; }
+.bar {
+  display: grid; grid-template-columns: 1fr auto; align-items: center; gap: var(--s2);
+  padding: 7px 0; border-bottom: 1px solid var(--rule-2);
+  font-size: 13px; text-align: left; width: 100%;
+  transition: color var(--dur-1) var(--ease);
+}
+.bar:last-child { border-bottom: 0; }
+.bar:hover { color: var(--copper); }
+.bar .track { position: relative; }
+.bar .track::after {
+  content: ''; position: absolute; left: 0; bottom: -4px; height: 2px;
+  width: var(--w, 0%); background: var(--sand); border-radius: 2px;
+  transition: width var(--dur-4) var(--ease-out), background var(--dur-1) var(--ease);
+}
+.bar:hover .track::after { background: var(--copper-graphic); }
+.bar .n { font-family: var(--font-mono); font-size: 11px; color: var(--ink-4); font-variant-numeric: tabular-nums; }
+
+/* ---- right: RESULTS ------------------------------------------------------ */
+#results {
+  position: fixed; right: var(--s3); top: calc(var(--bar-h) + var(--s3) * 2);
+  width: var(--results-w); max-height: calc(100dvh - var(--bar-h) - 190px);
+  display: flex; flex-direction: column;
+  transition: transform var(--dur-3) var(--ease-out), opacity var(--dur-2) var(--ease);
+}
+#results.hidden { transform: translateX(calc(100% + var(--s4))); opacity: 0; pointer-events: none; }
+#resultlist { padding: var(--s2); display: flex; flex-direction: column; gap: 2px; }
+
+.row {
+  display: grid; grid-template-columns: 18px 1fr auto; gap: var(--s3);
+  align-items: start; width: 100%; text-align: left;
+  padding: 10px var(--s3) 11px; border-radius: var(--r-sm);
+  border: 1px solid transparent;
+  transition: background var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease);
+  position: relative;
+}
+.row:hover { background: var(--surface-sunk); }
+.row[data-sel='1'] { background: var(--copper-wash); border-color: color-mix(in oklab, var(--copper-graphic) 40%, transparent); }
+.row[data-sel='1']::before {
+  content: ''; position: absolute; left: 0; top: 8px; bottom: 8px; width: 2.5px;
+  background: var(--copper-graphic); border-radius: var(--r-pill);
+}
+.row .kglyph { margin-top: 2px; }
+.row .nm { font-size: 13.5px; font-weight: 550; line-height: 1.32; letter-spacing: -.006em; }
+.row[data-sel='1'] .nm { color: var(--copper); }
+.row .meta { display: flex; align-items: center; gap: 6px; margin-top: 3px; min-width: 0; }
+.row .meta span { font-family: var(--font-mono); font-size: 10px; color: var(--ink-4); letter-spacing: .03em; white-space: nowrap; }
+.row .meta .pl { overflow: hidden; text-overflow: ellipsis; }
+.row .meta .grade { flex: none; }
+.row .meta .dot { color: var(--rule-strong); }
+.rowsave {
+  width: 26px; height: 26px; border-radius: var(--r-xs); color: var(--ink-4);
+  display: grid; place-items: center; opacity: 0;
+  transition: opacity var(--dur-1) var(--ease), color var(--dur-1) var(--ease), background var(--dur-1) var(--ease);
+}
+.row:hover .rowsave, .rowsave[aria-pressed='true'] { opacity: 1; }
+.rowsave:hover { background: var(--surface-2); color: var(--ink); }
+.rowsave[aria-pressed='true'] { color: var(--copper); }
+
+.emptylist { padding: var(--s8) var(--s5); text-align: center; }
+.emptylist p { font-size: 13px; color: var(--ink-3); margin-top: var(--s2); }
+
+/* skeleton */
+.sk { border-radius: var(--r-xs); background: linear-gradient(90deg, var(--surface-sunk) 0%, var(--rule-2) 50%, var(--surface-sunk) 100%); background-size: 200% 100%; animation: shimmer 1.4s infinite linear; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+/* ---- bottom: TIME -------------------------------------------------------- */
+#time {
+  position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: var(--s3); width: min(760px, calc(100vw - var(--s3) * 2));
+  padding: var(--s3) var(--s4) var(--s3);
+  transition: transform var(--dur-3) var(--ease-out), opacity var(--dur-2) var(--ease);
+}
+#time.hidden { transform: translate(-50%, calc(100% + var(--s4))); opacity: 0; pointer-events: none; }
+.time-hd { display: flex; align-items: center; gap: var(--s3); margin-bottom: 10px; }
+.time-hd .lbl { font-family: var(--font-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--copper); }
+.time-hd .cur { font-family: var(--font-display); font-size: 17px; font-weight: 600; letter-spacing: -.02em; }
+.time-hd .sub { font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-4); font-variant-numeric: tabular-nums; }
+.time-hd .sp { flex: 1; }
+
+#track { position: relative; height: 46px; cursor: pointer; touch-action: none; }
+#ticks { position: absolute; inset: 0 0 16px; display: flex; align-items: flex-end; gap: 2px; }
+.tick { flex: 1; position: relative; border-radius: 2px 2px 0 0; background: var(--rule-strong); min-height: 2px; transition: background var(--dur-2) var(--ease), height var(--dur-3) var(--ease-out), opacity var(--dur-2) var(--ease); opacity: .55; }
+.tick.inrange { background: var(--sand); opacity: 1; }
+.tick.active { background: var(--copper-graphic); opacity: 1; }
+#axis { position: absolute; left: 0; right: 0; bottom: 0; height: 14px; display: flex; justify-content: space-between; }
+#axis span { font-family: var(--font-mono); font-size: 9.5px; color: var(--ink-4); letter-spacing: .04em; }
+#playhead {
+  position: absolute; top: -2px; bottom: 14px; width: 2px; background: var(--copper-graphic);
+  border-radius: var(--r-pill); pointer-events: none;
+  transition: left var(--dur-2) var(--ease-out);
+}
+#playhead::after {
+  content: ''; position: absolute; top: -5px; left: 50%; translate: -50% 0;
+  width: 9px; height: 9px; border-radius: 50%; background: var(--copper-graphic);
+  box-shadow: 0 0 0 3px var(--surface);
+}
+
+/* ---- bottom right: CAMERA HUD (the Johnny Harris console) ---------------- */
+#camera {
+  position: fixed; right: var(--s3); bottom: var(--s3);
+  padding: var(--s2);
+  display: flex; flex-direction: column; gap: 3px;
+  transition: transform var(--dur-3) var(--ease-out), opacity var(--dur-2) var(--ease);
+}
+#camera.hidden { transform: translateX(calc(100% + var(--s4))); opacity: 0; pointer-events: none; }
+.cam-hd { display: flex; align-items: center; gap: 6px; padding: 3px var(--s2) 7px; }
+.cam-hd .mono { font-size: 9.5px; letter-spacing: .12em; color: var(--copper); }
+.camrow { display: flex; gap: 3px; }
+.cambtn {
+  display: flex; align-items: center; gap: 7px;
+  height: 32px; padding: 0 10px; border-radius: var(--r-sm);
+  font-size: 12px; font-weight: 500; color: var(--ink-2); white-space: nowrap;
+  border: 1px solid transparent;
+  transition: all var(--dur-1) var(--ease);
+}
+.cambtn:hover { background: var(--surface-sunk); border-color: var(--rule); color: var(--ink); }
+.cambtn.live { background: var(--copper-wash); border-color: var(--copper-graphic); color: var(--copper); }
+.cambtn svg { flex: none; opacity: .8; }
+.cambtn .kbd { margin-left: auto; }
+
+/* ---- collapsed restore dock --------------------------------------------- */
+#dock {
+  position: fixed; left: var(--s3); bottom: var(--s3); z-index: var(--z-chrome);
+  display: flex; gap: 6px; align-items: center;
+}
+.dockchip {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 34px; padding: 0 12px; border-radius: var(--r-pill);
+  background: var(--surface); border: 1px solid var(--rule); box-shadow: var(--shadow-1);
+  font-size: 12px; font-weight: 500; color: var(--ink-2);
+}
+.dockchip:hover { border-color: var(--rule-strong); color: var(--ink); }
+.dockchip[hidden] { display: none; }
+
+/* scroll fade — makes a clipped panel legible as "there is more below" */
+.fadeb { position: relative; }
+.fadeb::after {
+  content: ''; position: absolute; left: 1px; right: 1px; bottom: 1px; height: 34px;
+  border-radius: 0 0 var(--r-md) var(--r-md); pointer-events: none;
+  background: linear-gradient(to bottom, transparent, var(--surface) 82%);
+  opacity: 0; transition: opacity var(--dur-2) var(--ease);
+}
+.fadeb[data-more='1']::after { opacity: 1; }
+
+/* ---- attribution --------------------------------------------------------- */
+#attrib {
+  position: fixed; left: var(--s3); bottom: var(--s3); z-index: 9;
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: var(--r-pill);
+  background: var(--surface); border: 1px solid var(--rule);
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: .04em; color: var(--ink-4);
+}
+#attrib a { color: var(--ink-3); text-decoration: none; }
+#attrib a:hover { color: var(--copper); }
+#attrib .sep { opacity: .5; }
+@media (max-width: 820px) { #attrib { display: none; } }
+
+/* ---- precision / attribution readout ------------------------------------ */
+#readout {
+  position: fixed; left: 50%; translate: -50% 0; bottom: calc(var(--s3) + 118px);
+  z-index: var(--z-chrome);
+  display: flex; align-items: center; gap: var(--s2);
+  padding: 5px 11px; border-radius: var(--r-pill);
+  background: var(--surface); border: 1px solid var(--rule); box-shadow: var(--shadow-1);
+  font-family: var(--font-mono); font-size: 10px; color: var(--ink-3); letter-spacing: .04em;
+  opacity: 0; transition: opacity var(--dur-2) var(--ease);
+}
+#readout.on { opacity: 1; }
+#readout b { color: var(--copper); font-weight: 500; }
+
+/* ============================================================================
+   RECORD SHEET
+   ========================================================================== */
+#sheet {
+  position: fixed; z-index: var(--z-sheet);
+  right: var(--s3); top: calc(var(--bar-h) + var(--s3) * 2);
+  width: 430px; max-height: calc(100dvh - var(--bar-h) - 100px);
+  display: flex; flex-direction: column;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-3);
+  transform: translateX(calc(100% + var(--s6))); opacity: 0;
+  transition: transform var(--dur-3) var(--ease-out), opacity var(--dur-2) var(--ease);
+  overflow: hidden;
+}
+#sheet.on { transform: none; opacity: 1; }
+#sheet::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--copper-graphic); z-index: 2;
+}
+.sheet-top {
+  display: flex; align-items: center; gap: var(--s2);
+  padding: var(--s3) var(--s3) var(--s3) var(--s5);
+  border-bottom: 1px solid var(--rule-2);
+}
+.sheet-top .mono { font-size: 10px; letter-spacing: .12em; color: var(--copper); }
+.sheet-body { padding: var(--s5) var(--s5) var(--s6); display: flex; flex-direction: column; gap: var(--s5); }
+.sheet-kicker { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.sheet-kicker span { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .06em; color: var(--ink-3); }
+#sheetname { font-size: 27px; line-height: 1.08; letter-spacing: -.03em; }
+#sheetstory { font-family: var(--font-editorial); font-size: 15.5px; line-height: 1.58; color: var(--ink-2); }
+
+/* anatomy: Kind / Where / Era / Evidence — v6 vocabulary, tighter */
+.anat { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--rule-2); border: 1px solid var(--rule-2); border-radius: var(--r-md); overflow: hidden; }
+.anat > div { background: var(--surface); padding: 11px var(--s3) 12px; }
+.anat .k { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-4); display: flex; align-items: center; gap: 5px; }
+.anat .v { font-size: 13.5px; font-weight: 550; margin-top: 4px; letter-spacing: -.008em; }
+
+.srcs { display: flex; flex-direction: column; }
+.src { display: grid; grid-template-columns: auto 1fr auto; align-items: baseline; gap: var(--s3); padding: 9px 0; border-bottom: 1px solid var(--rule-2); font-size: 13px; }
+.src:last-child { border-bottom: 0; }
+.src .i { font-family: var(--font-mono); font-size: 10px; color: var(--ink-4); }
+.src .t { color: var(--ink-2); line-height: 1.4; }
+.src .y { font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-4); }
+
+.sheet-acts { display: flex; gap: var(--s2); flex-wrap: wrap; }
+.precision {
+  display: flex; align-items: flex-start; gap: 7px;
+  padding: 10px var(--s3); border-radius: var(--r-sm);
+  background: var(--note-wash); border: 1px solid var(--rule-2);
+  font-family: var(--font-mono); font-size: 10.5px; line-height: 1.5; color: var(--ink-3);
+}
+.precision svg { flex: none; margin-top: 1px; color: var(--ink-4); }
+
+/* connections */
+.conns { display: flex; flex-direction: column; gap: 2px; }
+.conn {
+  display: grid; grid-template-columns: 16px 1fr auto; gap: var(--s3); align-items: center;
+  padding: 8px 10px; border-radius: var(--r-sm); text-align: left; width: 100%;
+  transition: background var(--dur-1) var(--ease);
+}
+.conn:hover { background: var(--surface-sunk); }
+.conn .nm { font-size: 13px; font-weight: 500; }
+.conn .rel { font-family: var(--font-mono); font-size: 9.5px; color: var(--ink-4); letter-spacing: .06em; }
+
+/* ============================================================================
+   STORY MODE — scroll-driven cinema
+   ========================================================================== */
+#story {
+  position: fixed; inset: 0; z-index: var(--z-chrome);
+  overflow-y: auto; overscroll-behavior-y: contain;
+  display: none; scroll-behavior: smooth;
+}
+[data-mode='story'] #story { display: block; }
+#story::-webkit-scrollbar { width: 0; }
+
+.chapter {
+  min-height: 100dvh; display: flex; align-items: center;
+  padding: 0 var(--s6);
+  scroll-snap-align: start;
+}
+.chapter:nth-child(odd) { justify-content: flex-start; }
+.chapter:nth-child(even) { justify-content: flex-end; }
+.chapter.center { justify-content: center; text-align: center; }
+
+.card {
+  width: min(456px, 100%);
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: var(--r-lg); box-shadow: var(--shadow-3);
+  padding: var(--s8);
+  opacity: 0; transform: translateY(28px) scale(.985);
+  transition: opacity var(--dur-4) var(--ease-out), transform var(--dur-4) var(--ease-out);
+}
+.chapter.active .card { opacity: 1; transform: none; }
+.chapter.center .card { width: min(620px, 100%); }
+
+.card .idx { font-family: var(--font-mono); font-size: 34px; font-weight: 600; color: var(--copper-graphic); letter-spacing: -.03em; line-height: 1; }
+.card .kick { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--copper); margin-top: var(--s3); }
+.card h2 { font-size: clamp(28px, 3.4vw, 40px); margin-top: 10px; letter-spacing: -.035em; }
+.card h2 em { font-family: var(--font-editorial); font-style: italic; color: var(--copper); font-weight: 400; }
+.card p { font-family: var(--font-editorial); font-size: 16.5px; line-height: 1.6; color: var(--ink-2); margin-top: var(--s4); }
+.card .facts { display: flex; gap: var(--s5); margin-top: var(--s5); padding-top: var(--s4); border-top: 1px solid var(--rule-2); flex-wrap: wrap; }
+.card .facts div .v { font-family: var(--font-mono); font-size: 19px; font-weight: 600; color: var(--ink); letter-spacing: -.02em; }
+.card .facts div .l { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-4); margin-top: 2px; }
+.card .cite { font-family: var(--font-mono); font-size: 10px; color: var(--ink-4); margin-top: var(--s4); line-height: 1.5; }
+
+/* kinetic cold open */
+.cold h1 {
+  font-size: clamp(44px, 7.4vw, 96px); letter-spacing: -.045em; line-height: .94;
+}
+.cold h1 em { font-family: var(--font-editorial); font-style: italic; font-weight: 400; color: var(--copper); }
+.cold h1 span { display: inline-block; opacity: 0; transform: translateY(.4em) rotate(1.5deg); }
+.chapter.active .cold h1 span { animation: rise .82s var(--ease-out) forwards; }
+@keyframes rise { to { opacity: 1; transform: none; } }
+.cold .lede { font-family: var(--font-editorial); font-size: clamp(16px, 1.6vw, 19px); color: var(--ink-2); max-width: 46ch; margin: var(--s5) auto 0; line-height: 1.58; }
+
+.scrollcue {
+  position: fixed; left: 50%; translate: -50% 0; bottom: var(--s6); z-index: 25;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-4);
+  transition: opacity var(--dur-3) var(--ease);
+}
+.scrollcue svg { animation: bob 1.9s var(--ease-in-out) infinite; }
+@keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+
+/* story progress rail */
+#storyrail {
+  position: fixed; right: var(--s6); top: 50%; translate: 0 -50%; z-index: 30;
+  display: none; flex-direction: column; gap: 10px; align-items: flex-end;
+}
+[data-mode='story'] #storyrail { display: flex; }
+#storyrail button { display: flex; align-items: center; gap: var(--s2); }
+#storyrail .ln { width: 18px; height: 2px; border-radius: 2px; background: var(--rule-strong); transition: all var(--dur-2) var(--ease); }
+#storyrail button[aria-current='true'] .ln { width: 34px; background: var(--copper-graphic); }
+#storyrail .lb { font-family: var(--font-mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-4); opacity: 0; transition: opacity var(--dur-2) var(--ease); }
+#storyrail button:hover .lb, #storyrail button[aria-current='true'] .lb { opacity: 1; }
+
+/* mode visibility */
+[data-mode='story'] #lens, [data-mode='story'] #results,
+[data-mode='story'] #time, [data-mode='story'] #camera,
+[data-mode='story'] #dock, [data-mode='story'] #readout { opacity: 0 !important; pointer-events: none !important; }
+[data-mode='atlas'] #storyrail { display: none; }
+
+/* ============================================================================
+   ANNOTATIONS (SVG layer)
+   ========================================================================== */
+.an-arc { fill: none; stroke: var(--copper-graphic); stroke-width: 1.6; stroke-linecap: round; opacity: .85; }
+.an-arc.soft { stroke: var(--sand); stroke-width: 1.2; opacity: .6; }
+.an-ring { fill: none; stroke: var(--copper-graphic); stroke-width: 1.2; opacity: .6; }
+.an-lead { stroke: var(--copper-graphic); stroke-width: 1.2; fill: none; }
+.an-dot { fill: var(--copper-graphic); }
+.an-label {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em;
+  text-transform: uppercase; fill: var(--ink); paint-order: stroke;
+  stroke: var(--canvas); stroke-width: 3.5px; stroke-linejoin: round;
+}
+.an-label.sub { font-size: 9px; fill: var(--ink-3); }
+.draw { stroke-dasharray: var(--len); stroke-dashoffset: var(--len); }
+.draw.go { animation: drawon var(--dur, 1400ms) var(--ease-out) forwards; }
+@keyframes drawon { to { stroke-dashoffset: 0; } }
+.fadein { opacity: 0; animation: fin .5s var(--ease-out) forwards; }
+@keyframes fin { to { opacity: 1; } }
+
+/* selected pin marker */
+.pin { position: relative; width: 22px; height: 22px; cursor: pointer; }
+.pin i {
+  position: absolute; inset: 6px; border-radius: 50%;
+  background: var(--copper-graphic); box-shadow: 0 0 0 2px var(--canvas);
+}
+.pin::before, .pin::after {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  border: 1.5px solid var(--copper-graphic); opacity: 0;
+  animation: ping 2.4s var(--ease-out) infinite;
+}
+.pin::after { animation-delay: 1.2s; }
+@keyframes ping { 0% { transform: scale(.4); opacity: .9; } 70% { opacity: 0; } 100% { transform: scale(2.1); opacity: 0; } }
+
+/* ============================================================================
+   COMMAND PALETTE
+   ========================================================================== */
+#palette {
+  position: fixed; inset: 0; z-index: var(--z-overlay);
+  display: none; padding: 12vh var(--s4) var(--s4);
+  background: var(--scrim);
+}
+#palette.on { display: block; animation: fin .16s var(--ease) forwards; }
+.pal {
+  width: min(640px, 100%); margin: 0 auto;
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: var(--r-md); box-shadow: var(--shadow-3);
+  overflow: hidden;
+  animation: palin .22s var(--ease-out) forwards;
+}
+@keyframes palin { from { transform: translateY(-10px) scale(.985); opacity: 0; } to { transform: none; opacity: 1; } }
+.pal-in { display: flex; align-items: center; gap: var(--s3); padding: 0 var(--s4); height: 54px; border-bottom: 1px solid var(--rule-2); }
+.pal-in input { flex: 1; border: 0; background: none; outline: none; font-size: 16px; letter-spacing: -.01em; }
+.pal-in input::placeholder { color: var(--ink-4); }
+.pal-list { max-height: min(52vh, 440px); padding: var(--s2); }
+.pal-sec { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-4); padding: 10px var(--s3) 5px; }
+.pal-item {
+  display: grid; grid-template-columns: 20px 1fr auto; gap: var(--s3); align-items: center;
+  width: 100%; text-align: left; padding: 9px var(--s3); border-radius: var(--r-sm);
+}
+.pal-item[data-hi='1'] { background: var(--copper-wash); }
+.pal-item .t { font-size: 14px; font-weight: 500; letter-spacing: -.008em; }
+.pal-item[data-hi='1'] .t { color: var(--copper); }
+.pal-item .s { font-family: var(--font-mono); font-size: 10px; color: var(--ink-4); margin-top: 1px; letter-spacing: .03em; }
+.pal-item .kglyph { color: var(--ink-4); }
+.pal-item[data-hi='1'] .kglyph { color: var(--copper); }
+.pal-ft { display: flex; align-items: center; gap: var(--s4); padding: 9px var(--s4); border-top: 1px solid var(--rule-2); background: var(--surface-sunk); }
+.pal-ft span { display: flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 10px; color: var(--ink-4); }
+mark { background: color-mix(in oklab, var(--copper-graphic) 26%, transparent); color: inherit; border-radius: 2px; padding: 0 1px; }
+
+/* ============================================================================
+   OVERLAYS: shortcuts, collections
+   ========================================================================== */
+.ov { position: fixed; inset: 0; z-index: var(--z-overlay); display: none; background: var(--scrim); }
+.ov.on { display: grid; place-items: center; padding: var(--s6); animation: fin .16s var(--ease) forwards; }
+.ov-card {
+  width: min(680px, 100%); max-height: 80dvh; display: flex; flex-direction: column;
+  background: var(--surface); border: 1px solid var(--rule);
+  border-radius: var(--r-lg); box-shadow: var(--shadow-3); overflow: hidden;
+  animation: palin .22s var(--ease-out) forwards;
+}
+.ov-hd { display: flex; align-items: center; gap: var(--s3); padding: var(--s5) var(--s6); border-bottom: 1px solid var(--rule-2); }
+.ov-hd h2 { font-size: 19px; letter-spacing: -.025em; }
+.ov-bd { padding: var(--s5) var(--s6) var(--s6); }
+
+.keys { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--s6) var(--s8); }
+.keys section h3 { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--copper); font-weight: 500; margin-bottom: var(--s2); }
+.keys dl { display: flex; flex-direction: column; margin: 0; }
+.keys .kr { display: flex; align-items: center; justify-content: space-between; gap: var(--s4); padding: 7px 0; border-bottom: 1px solid var(--rule-2); }
+.keys .kr:last-child { border-bottom: 0; }
+.keys dt { font-size: 13px; color: var(--ink-2); }
+.keys dd { margin: 0; display: flex; gap: 3px; }
+
+/* ============================================================================
+   TOASTS
+   ========================================================================== */
+#toasts {
+  position: fixed; left: 50%; translate: -50% 0; bottom: calc(var(--s3) + 150px);
+  z-index: var(--z-toast); display: flex; flex-direction: column; gap: var(--s2); align-items: center;
+  pointer-events: none;
+}
+.toast {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px var(--s4); border-radius: var(--r-pill);
+  background: var(--surface); border: 1px solid var(--rule); box-shadow: var(--shadow-2);
+  font-size: 13px; font-weight: 500; pointer-events: auto;
+  animation: toastin .3s var(--ease-out) forwards;
+}
+@keyframes toastin { from { opacity: 0; transform: translateY(10px) scale(.96); } to { opacity: 1; transform: none; } }
+.toast.out { animation: toastout .25s var(--ease) forwards; }
+@keyframes toastout { to { opacity: 0; transform: translateY(6px) scale(.97); } }
+.toast svg { color: var(--copper); flex: none; }
+.toast button { font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--copper); padding: 3px 6px; border-radius: 4px; }
+.toast button:hover { background: var(--copper-wash); }
+
+/* ============================================================================
+   ONBOARDING HINT
+   ========================================================================== */
+#hint {
+  position: fixed; left: 50%; translate: -50% 0; top: calc(var(--bar-h) + var(--s3) * 2);
+  z-index: 45; display: flex; align-items: center; gap: var(--s3);
+  padding: 9px var(--s3) 9px var(--s4); border-radius: var(--r-pill);
+  background: var(--surface); border: 1px solid var(--copper-graphic); box-shadow: var(--shadow-2);
+  font-size: 13px;
+  animation: toastin .5s .6s var(--ease-out) backwards;
+}
+#hint[hidden] { display: none; }
+#hint b { color: var(--copper); font-weight: 600; }
+
+/* ============================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 1180px) {
+  #results { width: 300px; }
+  #camera .cambtn .kbd { display: none; }
+}
+@media (max-width: 980px) {
+  #lens { display: none; }
+  #lens.force { display: flex; z-index: 46; box-shadow: var(--shadow-3); }
+}
+@media (max-width: 820px) {
+  :root { --bar-h: 52px; }
+  #bar { grid-template-columns: auto 1fr auto; padding: 0 var(--s2) 0 var(--s3); }
+  .barnav, .brand .tag { display: none; }
+  #cmdtrigger .kbd { display: none; }
+  #results {
+    left: var(--s2); right: var(--s2); width: auto; top: auto;
+    bottom: calc(var(--s2) + 132px); max-height: 40dvh;
+  }
+  #results.hidden { transform: translateY(calc(100% + 160px)); }
+  #sheet { left: var(--s2); right: var(--s2); width: auto; top: auto; bottom: var(--s2); max-height: 76dvh; }
+  #sheet.on { transform: none; }
+  #sheet:not(.on) { transform: translateY(calc(100% + var(--s6))); }
+  #time { width: calc(100vw - var(--s2) * 2); bottom: var(--s2); padding: var(--s3); }
+  #camera { left: var(--s2); right: var(--s2); bottom: auto; top: calc(var(--bar-h) + var(--s2) * 2); flex-direction: row; overflow-x: auto; }
+  #camera .cam-hd { display: none; }
+  #camera .camrow { flex: none; }
+  #dock { bottom: calc(var(--s2) + 118px); left: var(--s2); }
+  #readout { display: none; }
+  .chapter { padding: 0 var(--s4); justify-content: center !important; }
+  .keys { grid-template-columns: 1fr; }
+  #storyrail { right: var(--s3); }
+  #storyrail .lb { display: none; }
+}
+
+/* ============================================================================
+   MOTION PREFERENCES
+   ========================================================================== */
+[data-motion='calm'] .pin::before, [data-motion='calm'] .pin::after { animation: none; opacity: 0; }
+[data-motion='calm'] .scrollcue svg { animation: none; }
+[data-motion='calm'] .cold h1 span { animation-duration: .01ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+</style>
+</head>
+<body>
+<!-- ==========================================================================
+     MAP SUBSTRATE
+     ====================================================================== -->
+<div id="map" aria-hidden="true"></div>
+<div id="fallback" aria-hidden="true"></div>
+<svg id="annot" aria-hidden="true"></svg>
+<div id="spot" aria-hidden="true"></div>
+<div id="grain" aria-hidden="true"></div>
+
+<!-- ==========================================================================
+     COMMAND BAR
+     ====================================================================== -->
+<header id="bar">
+  <div class="brand">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="3.5" y="2.5" width="15" height="19" rx="2.2" stroke="currentColor" stroke-width="1.5"/>
+      <path d="M7 7h7M7 10.5h7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity=".55"/>
+      <path d="M16.5 12.2c0 2.6-3 5.6-3 5.6s-3-3-3-5.6a3 3 0 1 1 6 0Z" fill="var(--copper-graphic)"/>
+      <circle cx="13.5" cy="12.1" r="1.05" fill="var(--surface)"/>
+    </svg>
+    <b>BlackStory</b>
+    <span class="tag">ATLAS</span>
+  </div>
+
+  <button id="cmdtrigger" aria-label="Search records, places and actions">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <circle cx="7" cy="7" r="4.6" stroke="currentColor" stroke-width="1.4"/>
+      <path d="m10.6 10.6 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+    </svg>
+    <span class="flex">Search 4,078 records, places, eras…</span>
+    <span class="kbd">⌘K</span>
+  </button>
+
+  <div class="bartools">
+    <nav class="barnav" aria-label="Mode">
+      <button data-mode-btn="atlas" aria-current="true">Atlas</button>
+      <button data-mode-btn="story">Story</button>
+    </nav>
+    <div class="divider-v"></div>
+    <button class="btn ghost sq" id="btn-saved" aria-label="Saved records" style="position:relative">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M4 2.6h8a.6.6 0 0 1 .6.6v10.2L8 10.6l-4.6 2.8V3.2a.6.6 0 0 1 .6-.6Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+      </svg>
+      <span class="savedcount" id="savedcount" hidden>0</span>
+    </button>
+    <button class="btn ghost sq" id="btn-keys" aria-label="Keyboard shortcuts">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <rect x="1.4" y="3.6" width="13.2" height="8.8" rx="1.6" stroke="currentColor" stroke-width="1.3"/>
+        <path d="M4 6.4h.01M6.3 6.4h.01M8.6 6.4h.01M10.9 6.4h.01M4.6 9.4h6.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <button class="btn ghost sq" id="btn-theme" aria-label="Toggle theme">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" class="i-sun">
+        <circle cx="8" cy="8" r="3.1" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M8 1.3v1.5M8 13.2v1.5M1.3 8h1.5M13.2 8h1.5M3.4 3.4l1 1M11.6 11.6l1 1M12.6 3.4l-1 1M4.4 11.6l-1 1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<!-- ==========================================================================
+     ATLAS CHROME
+     ====================================================================== -->
+<div class="stage" id="stage">
+
+  <!-- ---- LENS (left) ---- -->
+  <section id="lens" class="panel" aria-label="Lens: what you are looking at">
+    <div class="panel-hd">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" style="color:var(--copper)">
+        <circle cx="6.6" cy="6.6" r="4.2" stroke="currentColor" stroke-width="1.4"/>
+        <path d="m9.8 9.8 4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <h2>Lens</h2>
+      <span class="mono" id="lenscount" style="margin-left:auto;font-size:10px">4,078 in view</span>
+      <button class="btn ghost sq" data-hide="lens" aria-label="Hide lens" style="height:26px;width:26px;margin-right:-4px">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3.5 5.5 8l4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <div class="lens-body scroll">
+      <!-- place -->
+      <div class="grp">
+        <div class="grp-hd"><span class="mono">Where</span><button class="hint" id="btn-near" style="color:var(--copper)">Near me</button></div>
+        <label class="field">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" style="color:var(--ink-4)">
+            <path d="M13 6.9c0 3.7-5 8.6-5 8.6s-5-4.9-5-8.6a5 5 0 0 1 10 0Z" stroke="currentColor" stroke-width="1.3"/>
+            <circle cx="8" cy="6.8" r="1.7" stroke="currentColor" stroke-width="1.3"/>
+          </svg>
+          <select id="f-state" aria-label="State">
+            <option value="">All states</option>
+          </select>
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true" style="color:var(--ink-4)"><path d="m4 6.5 4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </label>
+      </div>
+
+      <!-- kind families -->
+      <div class="grp">
+        <div class="grp-hd"><span class="mono">Kind</span><span class="hint">5 families</span></div>
+        <div class="chips" id="f-kinds" role="group" aria-label="Record kind"></div>
+      </div>
+
+      <!-- evidence -->
+      <div class="grp">
+        <div class="grp-hd"><span class="mono">Evidence floor</span><span class="hint" id="gradehint">Any grade</span></div>
+        <div class="chips" id="f-grades" role="group" aria-label="Minimum evidence grade">
+          <button class="chip" data-grade="" aria-pressed="true">Any</button>
+          <button class="chip" data-grade="C"><span class="grade c"><i></i></span>C and up</button>
+          <button class="chip" data-grade="B"><span class="grade b"><i></i></span>B and up</button>
+          <button class="chip" data-grade="A"><span class="grade a"><i></i></span>A only</button>
+        </div>
+      </div>
+
+      <!-- layers -->
+      <div class="grp">
+        <div class="grp-hd"><span class="mono">Layers</span></div>
+        <div class="chips" id="f-layers" role="group" aria-label="Map layers">
+          <button class="chip" data-layer="pins" aria-pressed="true">Archive pins</button>
+          <button class="chip" data-layer="routes">Migration routes</button>
+          <button class="chip" data-layer="labels" aria-pressed="true">Place labels</button>
+        </div>
+      </div>
+
+      <hr class="rule" />
+
+      <!-- presence -->
+      <div class="grp">
+        <div class="grp-hd"><span class="mono">Deepest coverage</span><span class="hint">this release</span></div>
+        <div class="bars" id="presence"></div>
+      </div>
+
+      <button class="btn ghost" id="btn-clear" style="justify-content:flex-start;height:32px;padding:0 8px;margin:0 -8px;color:var(--ink-3);font-size:12.5px">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.5 3.5l9 9m0-9-9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Reset lens
+      </button>
+    </div>
+  </section>
+
+  <!-- ---- RESULTS (right) ---- -->
+  <section id="results" class="panel" aria-label="Records in view">
+    <div class="panel-hd">
+      <h2>Records</h2>
+      <span class="mono" id="rescount" style="margin-left:auto;font-size:10px"></span>
+      <button class="btn ghost sq" id="btn-sort" aria-label="Sort order" style="height:26px;width:auto;padding:0 6px;font-family:var(--font-mono);font-size:9.5px;letter-spacing:.08em">
+        OLDEST
+      </button>
+      <button class="btn ghost sq" data-hide="results" aria-label="Hide records" style="height:26px;width:26px;margin-right:-4px">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <div id="resultlist" class="scroll" role="listbox" aria-label="Records"></div>
+  </section>
+
+  <!-- ---- TIME (bottom centre) ---- -->
+  <section id="time" class="panel" aria-label="Time">
+    <div class="time-hd">
+      <span class="lbl">When</span>
+      <span class="cur" id="t-cur">All time</span>
+      <span class="sub" id="t-sub">1630s to 2020s</span>
+      <span class="sp"></span>
+      <button class="btn ghost sq" id="btn-play" aria-label="Play through the decades" aria-pressed="false">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true" class="i-play"><path d="M5 3.4v9.2l7.2-4.6L5 3.4Z" fill="currentColor"/></svg>
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true" class="i-pause" style="display:none"><path d="M5.2 3.5h2v9h-2zM8.8 3.5h2v9h-2z" fill="currentColor"/></svg>
+      </button>
+      <button class="btn ghost" id="btn-alltime" style="height:28px;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em">ALL TIME</button>
+    </div>
+    <div id="track" role="slider" tabindex="0" aria-label="Decade" aria-valuemin="1630" aria-valuemax="2020" aria-valuenow="1630" aria-valuetext="All time">
+      <div id="ticks"></div>
+      <div id="axis"><span>1630s</span><span>1750s</span><span>1830s</span><span>1900s</span><span>1960s</span><span>2020s</span></div>
+      <div id="playhead" style="left:0"></div>
+    </div>
+  </section>
+
+  <!-- ---- CAMERA HUD (bottom right) ---- -->
+  <section id="camera" class="panel" aria-label="Camera">
+    <div class="cam-hd">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true" style="color:var(--copper)">
+        <rect x="1.4" y="4.2" width="9.6" height="7.6" rx="1.4" stroke="currentColor" stroke-width="1.3"/>
+        <path d="m11 7.4 3.6-2.2v5.6L11 8.6z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+      </svg>
+      <span class="mono">Camera</span>
+      <span style="flex:1"></span>
+      <button class="btn ghost sq" data-zoom="-1" aria-label="Zoom out" style="height:22px;width:22px">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 8h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+      <button class="btn ghost sq" data-zoom="1" aria-label="Zoom in" style="height:22px;width:22px">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 8h8M8 4v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="camrow">
+      <button class="cambtn" data-cam="wide">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 2.2H2.2V6M10 2.2h3.8V6M6 13.8H2.2V10M10 13.8h3.8V10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Wide <span class="kbd">W</span>
+      </button>
+      <button class="cambtn" data-cam="push">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="4.4" stroke="currentColor" stroke-width="1.4"/><path d="M5.2 7h3.6M7 5.2v3.6M10.4 10.4l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Push in <span class="kbd">P</span>
+      </button>
+    </div>
+    <div class="camrow">
+      <button class="cambtn" data-cam="orbit">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><ellipse cx="8" cy="8" rx="6.2" ry="3.1" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="1.7" fill="currentColor"/></svg>
+        Orbit <span class="kbd">O</span>
+      </button>
+      <button class="cambtn" data-cam="tilt">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 11.4 8 4l6 7.4z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M2 13.4h12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Tilt <span class="kbd">T</span>
+      </button>
+    </div>
+    <div class="camrow">
+      <button class="cambtn" data-cam="spot">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M8 1.6v1.6M8 12.8v1.6M1.6 8h1.6M12.8 8h1.6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Spotlight <span class="kbd">F</span>
+      </button>
+      <button class="cambtn" data-cam="trace">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.4 11.6c3-6.4 8.2-8 11.2-8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-dasharray="1.6 2.2"/><circle cx="2.6" cy="11.8" r="1.5" fill="currentColor"/><circle cx="13.4" cy="3.8" r="1.5" fill="currentColor"/></svg>
+        Trace <span class="kbd">R</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ---- restore dock ---- -->
+  <div id="dock">
+    <button class="dockchip" data-show="lens" hidden>
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="6.6" cy="6.6" r="4.2" stroke="currentColor" stroke-width="1.4"/><path d="m9.8 9.8 4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      Lens
+    </button>
+    <button class="dockchip" data-show="results" hidden>
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.6 4h10.8M2.6 8h10.8M2.6 12h6.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      Records
+    </button>
+  </div>
+
+  <!-- ---- precision readout ---- -->
+  <div id="readout" role="status" aria-live="polite"></div>
+
+  <!-- ---- attribution + mock notice ---- -->
+  <div id="attrib">
+    <span>Mock data · layout study</span>
+    <span class="sep">·</span>
+    <a href="https://openfreemap.org" target="_blank" rel="noreferrer">OpenFreeMap</a>
+    <span class="sep">·</span>
+    <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap</a>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     RECORD SHEET
+     ====================================================================== -->
+<aside id="sheet" class="panel" role="dialog" aria-modal="false" aria-labelledby="sheetname" aria-hidden="true">
+  <div class="sheet-top">
+    <span class="mono">Record</span>
+    <span class="sp" style="flex:1"></span>
+    <button class="btn ghost sq" id="sh-prev" aria-label="Previous record" style="height:28px;width:28px">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3.5 5.5 8l4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <span class="mono" id="sh-pos" style="font-size:10px;min-width:52px;text-align:center"></span>
+    <button class="btn ghost sq" id="sh-next" aria-label="Next record" style="height:28px;width:28px">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="divider-v" style="margin:0 4px"></div>
+    <button class="btn ghost sq" id="sh-close" aria-label="Close record" style="height:28px;width:28px">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.8 3.8l8.4 8.4m0-8.4-8.4 8.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+
+  <div class="sheet-body scroll">
+    <div>
+      <div class="sheet-kicker" id="sheetkicker"></div>
+      <h1 id="sheetname" style="margin-top:10px"></h1>
+    </div>
+
+    <p id="sheetstory" class="serif"></p>
+
+    <div class="anat" id="sheetanat"></div>
+
+    <div class="precision" id="sheetprec">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.2" stroke="currentColor" stroke-width="1.3"/><path d="M8 7.2v4M8 4.9v.9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <span></span>
+    </div>
+
+    <div class="sheet-acts">
+      <button class="btn primary" id="sh-fly">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13 6.9c0 3.7-5 8.6-5 8.6s-5-4.9-5-8.6a5 5 0 0 1 10 0Z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.8" r="1.6" stroke="currentColor" stroke-width="1.4"/></svg>
+        Fly to place
+      </button>
+      <button class="btn" id="sh-save">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 2.6h8a.6.6 0 0 1 .6.6v10.2L8 10.6l-4.6 2.8V3.2a.6.6 0 0 1 .6-.6Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        Save
+      </button>
+      <button class="btn" id="sh-cite">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6.4 4.2c-1.6.8-2.6 2.3-2.6 4.2v3.4h3.6V8.2H5.6c0-1.2.4-2.1 1.4-2.7l-.6-1.3ZM12 4.2c-1.6.8-2.6 2.3-2.6 4.2v3.4H13V8.2h-1.8c0-1.2.4-2.1 1.4-2.7L12 4.2Z" fill="currentColor"/></svg>
+        Cite
+      </button>
+      <button class="btn" id="sh-share">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="12" cy="3.8" r="1.9" stroke="currentColor" stroke-width="1.3"/><circle cx="4" cy="8" r="1.9" stroke="currentColor" stroke-width="1.3"/><circle cx="12" cy="12.2" r="1.9" stroke="currentColor" stroke-width="1.3"/><path d="m5.8 7.1 4.4-2.3M5.8 8.9l4.4 2.3" stroke="currentColor" stroke-width="1.3"/></svg>
+        Share
+      </button>
+    </div>
+
+    <div>
+      <div class="grp-hd" style="margin-bottom:6px"><span class="mono" style="color:var(--copper);font-size:10px">Sources</span><span class="hint" id="sheetsrccount"></span></div>
+      <div class="srcs" id="sheetsrcs"></div>
+    </div>
+
+    <div>
+      <div class="grp-hd" style="margin-bottom:6px"><span class="mono" style="color:var(--copper);font-size:10px">Documented connections</span></div>
+      <div class="conns" id="sheetconns"></div>
+    </div>
+  </div>
+</aside>
+
+<!-- ==========================================================================
+     STORY MODE
+     ====================================================================== -->
+<div id="story">
+  <section class="chapter center cold" data-ch="0" data-cam='{"center":[-96.5,38.6],"zoom":3.35,"pitch":0,"bearing":0}'>
+    <div class="card" style="background:transparent;border:0;box-shadow:none;padding:0">
+      <h1 id="coldopen"></h1>
+      <p class="lede">4,078 documented records, each anchored to a place you can stand in. This is a five minute pass over the archive. The map moves with the story.</p>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:28px">
+        <button class="btn primary tall" data-story-next>Begin</button>
+        <button class="btn tall" data-mode-btn="atlas">Skip to the atlas</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter" data-ch="1"
+           data-cam='{"center":[-90.05,32.3],"zoom":5.1,"pitch":34,"bearing":-14}'
+           data-spot="-90.05,32.3,20"
+           data-pins="south">
+    <div class="card">
+      <div class="idx">01</div>
+      <div class="kick">Where the record is thickest</div>
+      <h2>The archive is not <em>evenly</em> spread.</h2>
+      <p>Coverage follows evidence, not headlines. The Mississippi Delta, the Carolina low country, and the District carry the deepest documentation in this release because that is where the paper survived: church minutes, school registers, deeds, and Register nominations.</p>
+      <div class="facts">
+        <div><div class="v">1,330</div><div class="l">records, 5 states</div></div>
+        <div><div class="v">372</div><div class="l">District of Columbia</div></div>
+        <div><div class="v">285</div><div class="l">South Carolina</div></div>
+      </div>
+      <p class="cite">Counts from the active release. Coverage depth is a statement about surviving sources, not about where history happened.</p>
+    </div>
+  </section>
+
+  <section class="chapter" data-ch="2"
+           data-cam='{"center":[-86.81,33.52],"zoom":13.4,"pitch":56,"bearing":24}'
+           data-focus="ent_gaston_motel_001">
+    <div class="card">
+      <div class="idx">02</div>
+      <div class="kick">One record, up close</div>
+      <h2>Every pin opens into <em>evidence</em>.</h2>
+      <p>The A.G. Gaston Motel, Birmingham. Built in 1954 by a Black businessman, it became the campaign headquarters of the 1963 Birmingham movement. Room 30 was the war room. It is one pin, four blocks from the 16th Street Baptist Church, and it carries six citations you can read before you decide to trust it.</p>
+      <div class="facts">
+        <div><div class="v">Grade A</div><div class="l">evidence</div></div>
+        <div><div class="v">1950s</div><div class="l">era</div></div>
+        <div><div class="v">6</div><div class="l">sources</div></div>
+      </div>
+      <p class="cite">Shown at locality precision. The archive never renders a point sharper than the source supports.</p>
+    </div>
+  </section>
+
+  <section class="chapter" data-ch="3"
+           data-cam='{"center":[-88.2,37.6],"zoom":4.05,"pitch":42,"bearing":0}'
+           data-routes="1">
+    <div class="card">
+      <div class="idx">03</div>
+      <div class="kick">The Great Migration</div>
+      <h2>Six million people, <em>drawn</em> as they moved.</h2>
+      <p>Between 1910 and 1970 six million people left the South. The corridors were not random: rail lines and kin networks decided who landed in Chicago and who landed in Los Angeles. Records cluster at both ends of every line, which is why a Mississippi surname turns up in a Milwaukee school register.</p>
+      <div class="facts">
+        <div><div class="v">6M</div><div class="l">people, 1910 to 1970</div></div>
+        <div><div class="v">7</div><div class="l">corridors drawn</div></div>
+      </div>
+      <p class="cite">Corridors are illustrative of documented migration streams, drawn between origin and destination metros. Not individual paths.</p>
+    </div>
+  </section>
+
+  <section class="chapter" data-ch="4"
+           data-cam='{"center":[-95.2,39.2],"zoom":3.5,"pitch":0,"bearing":0}'
+           data-sweep="1">
+    <div class="card">
+      <div class="idx">04</div>
+      <div class="kick">Four centuries in ten seconds</div>
+      <h2>Watch the record <em>fill in</em>.</h2>
+      <p>Scrub from the 1630s to the 2020s and the map fills unevenly. Thin colonial entries in the tidewater. A thickening through Reconstruction. A hard cluster around the twentieth century civil rights record, where documentation and organising ran together.</p>
+      <div class="facts">
+        <div><div class="v">1630s</div><div class="l">earliest</div></div>
+        <div><div class="v">2020s</div><div class="l">latest</div></div>
+        <div><div class="v">40</div><div class="l">decades</div></div>
+      </div>
+      <p class="cite">Status shown as-of each decade from published status history. Never present-day status backfilled.</p>
+    </div>
+  </section>
+
+  <section class="chapter center" data-ch="5"
+           data-cam='{"center":[-96.5,38.6],"zoom":3.4,"pitch":0,"bearing":0}'>
+    <div class="card">
+      <div class="kick">Your turn</div>
+      <h2>Start where you <em>stand</em>.</h2>
+      <p style="margin-left:auto;margin-right:auto;max-width:44ch">Everything you just watched is a control you can hold. Open the atlas, drop into your own state, and follow the evidence.</p>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:26px;flex-wrap:wrap">
+        <button class="btn primary tall" data-mode-btn="atlas">Open the atlas</button>
+        <button class="btn tall" id="btn-near-2">Find records near me</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="scrollcue" id="scrollcue">
+    Scroll
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2.6v10.2M3.8 8.8 8 13l4.2-4.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+</div>
+
+<nav id="storyrail" aria-label="Story chapters"></nav>
+
+<!-- ==========================================================================
+     COMMAND PALETTE
+     ====================================================================== -->
+<div id="palette" role="dialog" aria-modal="true" aria-label="Command palette">
+  <div class="pal">
+    <div class="pal-in">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style="color:var(--ink-4)">
+        <circle cx="7" cy="7" r="4.6" stroke="currentColor" stroke-width="1.4"/><path d="m10.6 10.6 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <input id="palinput" type="text" placeholder="Search records, jump to a state, run a command…" autocomplete="off" spellcheck="false" />
+      <span class="kbd">ESC</span>
+    </div>
+    <div class="pal-list scroll" id="pallist" role="listbox" aria-label="Results"></div>
+    <div class="pal-ft">
+      <span><span class="kbd">↑</span><span class="kbd">↓</span> navigate</span>
+      <span><span class="kbd">↵</span> open</span>
+      <span><span class="kbd">⌘</span><span class="kbd">↵</span> fly to</span>
+      <span style="margin-left:auto">4,078 records indexed</span>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     SHORTCUTS
+     ====================================================================== -->
+<div class="ov" id="keysov" role="dialog" aria-modal="true" aria-labelledby="keystitle">
+  <div class="ov-card">
+    <div class="ov-hd">
+      <h2 id="keystitle">Keyboard</h2>
+      <span class="mono" style="margin-left:auto">Press <span class="kbd">?</span> anytime</span>
+      <button class="btn ghost sq" data-close-ov aria-label="Close">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.8 3.8l8.4 8.4m0-8.4-8.4 8.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="ov-bd scroll">
+      <div class="keys">
+        <section>
+          <h3>Find</h3>
+          <dl>
+            <div class="kr"><dt>Command palette</dt><dd><span class="kbd">⌘</span><span class="kbd">K</span></dd></div>
+            <div class="kr"><dt>Search records</dt><dd><span class="kbd">/</span></dd></div>
+            <div class="kr"><dt>Records near me</dt><dd><span class="kbd">N</span></dd></div>
+            <div class="kr"><dt>Reset the lens</dt><dd><span class="kbd">⌘</span><span class="kbd">⌫</span></dd></div>
+          </dl>
+        </section>
+        <section>
+          <h3>Camera</h3>
+          <dl>
+            <div class="kr"><dt>Wide, all of it</dt><dd><span class="kbd">W</span></dd></div>
+            <div class="kr"><dt>Push in</dt><dd><span class="kbd">P</span></dd></div>
+            <div class="kr"><dt>Slow orbit</dt><dd><span class="kbd">O</span></dd></div>
+            <div class="kr"><dt>Tilt the plate</dt><dd><span class="kbd">T</span></dd></div>
+            <div class="kr"><dt>Spotlight focus</dt><dd><span class="kbd">F</span></dd></div>
+            <div class="kr"><dt>Trace migration</dt><dd><span class="kbd">R</span></dd></div>
+          </dl>
+        </section>
+        <section>
+          <h3>Records</h3>
+          <dl>
+            <div class="kr"><dt>Next / previous</dt><dd><span class="kbd">J</span><span class="kbd">K</span></dd></div>
+            <div class="kr"><dt>Save this record</dt><dd><span class="kbd">S</span></dd></div>
+            <div class="kr"><dt>Copy citation</dt><dd><span class="kbd">C</span></dd></div>
+            <div class="kr"><dt>Copy share link</dt><dd><span class="kbd">⌘</span><span class="kbd">L</span></dd></div>
+            <div class="kr"><dt>Close the sheet</dt><dd><span class="kbd">ESC</span></dd></div>
+          </dl>
+        </section>
+        <section>
+          <h3>View</h3>
+          <dl>
+            <div class="kr"><dt>Atlas / Story</dt><dd><span class="kbd">1</span><span class="kbd">2</span></dd></div>
+            <div class="kr"><dt>Play the decades</dt><dd><span class="kbd">SPACE</span></dd></div>
+            <div class="kr"><dt>Light / dark</dt><dd><span class="kbd">D</span></dd></div>
+            <div class="kr"><dt>Compact density</dt><dd><span class="kbd">⌥</span><span class="kbd">D</span></dd></div>
+            <div class="kr"><dt>Calm motion</dt><dd><span class="kbd">M</span></dd></div>
+            <div class="kr"><dt>Hide all chrome</dt><dd><span class="kbd">\</span></dd></div>
+          </dl>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     COLLECTIONS
+     ====================================================================== -->
+<div class="ov" id="savedov" role="dialog" aria-modal="true" aria-labelledby="savedtitle">
+  <div class="ov-card">
+    <div class="ov-hd">
+      <h2 id="savedtitle">Saved</h2>
+      <span class="mono" id="savedmeta" style="margin-left:auto"></span>
+      <button class="btn ghost sq" data-close-ov aria-label="Close">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.8 3.8l8.4 8.4m0-8.4-8.4 8.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="ov-bd scroll" id="savedbody"></div>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     ONBOARDING + TOASTS
+     ====================================================================== -->
+<div id="hint">
+  <span>Press <b>⌘K</b> to search 4,078 records, or <b>W</b> to fly wide.</span>
+  <button class="btn ghost sq" id="hintclose" aria-label="Dismiss" style="height:26px;width:26px">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3.8 3.8l8.4 8.4m0-8.4-8.4 8.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </button>
+</div>
+
+<div id="toasts" role="status" aria-live="polite"></div>
+
+<script src="../apps/web/node_modules/maplibre-gl/dist/maplibre-gl.js"
+        onerror="this.onerror=null;var s=document.createElement('script');s.src='https://unpkg.com/maplibre-gl@5.9.0/dist/maplibre-gl.js';s.onload=function(){window.__mlReady&&window.__mlReady()};s.onerror=function(){window.__mlFail&&window.__mlFail()};document.head.appendChild(s)"></script>
+<script>
+/* ============================================================================
+   BlackStory Atlas v9 — design mock
+   Layout, motion and interaction study. Record text is drawn from the live
+   archive; coordinates are locality-level and source titles are illustrative.
+   ========================================================================== */
+'use strict';
+
+const $  = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const root = document.documentElement;
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---- data ---------------------------------------------------------------- */
+const KINDS = {
+  person: { label: 'Person', glyph: 'M8 8.4a2.9 2.9 0 1 0 0-5.8 2.9 2.9 0 0 0 0 5.8Zm0 1.3c-2.7 0-4.9 1.6-4.9 3.6v.7h9.8v-.7c0-2-2.2-3.6-4.9-3.6Z' },
+  place:  { label: 'Place',  glyph: 'M13 6.9c0 3.7-5 8.6-5 8.6s-5-4.9-5-8.6a5 5 0 0 1 10 0Zm-5 1.6a1.7 1.7 0 1 0 0-3.4 1.7 1.7 0 0 0 0 3.4Z' },
+  event:  { label: 'Event',  glyph: 'M8 1.4 9.9 6l4.7.3-3.6 3 1.2 4.6L8 11.4l-4.2 2.5L5 9.3l-3.6-3L6.1 6 8 1.4Z' },
+  school: { label: 'School', glyph: 'M8 2 1.4 5.4 8 8.8l5.2-2.7v3.4h1.4V5.4L8 2ZM3.8 8v3c0 1.3 1.9 2.3 4.2 2.3s4.2-1 4.2-2.3V8L8 10.2 3.8 8Z' },
+  org:    { label: 'Org',    glyph: 'M2.4 13.6V4.2l4.4-2.1v2.3l4.8-2v11.2H2.4Zm2-1.4h2V9.8h-2v2.4Zm0-3.6h2V6.2h-2V8.6Zm3.6 3.6h2.2V9.8H8v2.4Zm0-3.6h2.2V6.2H8V8.6Z' },
+};
+const GRADE_ORDER = { A: 3, B: 2, C: 1 };
+
+const R = [
+  { id:'ent_german_coast_uprising_001', n:'1811 German Coast Uprising', k:'event', st:'Louisiana', pl:'LaPlace, Louisiana', c:[-90.481,30.066], d:1810, g:'A', src:3, prec:'locality',
+    s:'On January 8 to 10, 1811, enslaved men led by Charles Deslondes marched from plantations near LaPlace toward New Orleans in the largest slave revolt in United States history.',
+    sources:['Louisiana State Museum, collection record','Historic New Orleans Collection','Louisiana Endowment for the Humanities, 64 Parishes'] },
+  { id:'ent_abyssinian_baptist_001', n:'Abyssinian Baptist Church', k:'place', st:'New York', pl:'Harlem, New York', c:[-73.942,40.813], d:1800, g:'A', src:5, prec:'locality',
+    s:'Founded in 1808 when Black worshippers left First Baptist Church of New York over segregated seating, Abyssinian moved to Harlem in 1923 and became a centre of political organising.',
+    sources:['National Register of Historic Places, nomination file','Schomburg Center for Research in Black Culture','New York City Landmarks Preservation Commission'] },
+  { id:'gap_abiel_smith_school', n:'Abiel Smith School', k:'school', st:'Massachusetts', pl:'Boston, Massachusetts', c:[-71.065,42.360], d:1830, g:'A', src:4, prec:'locality',
+    s:'Founded in 1835, the Abiel Smith School was the first public school building for free Black children in Boston, and later a centre of the campaign against segregated schooling.',
+    sources:['National Park Service, Boston African American National Historic Site','Massachusetts Historical Society','National Register of Historic Places, nomination file'] },
+  { id:'ent_gaston_motel_001', n:'A.G. Gaston Motel', k:'place', st:'Alabama', pl:'Birmingham, Alabama', c:[-86.815,33.516], d:1950, g:'A', src:6, prec:'locality',
+    s:'Built in 1954 by Black businessman A.G. Gaston, this Birmingham motel served as campaign headquarters for the 1963 Birmingham movement. Room 30 was the planning room.',
+    sources:['National Park Service, Birmingham Civil Rights National Monument','Birmingham Civil Rights Institute','Encyclopedia of Alabama','National Register of Historic Places, nomination file'] },
+  { id:'gap_1963_klan_bombing', n:'16th Street Baptist Church bombing', k:'event', st:'Alabama', pl:'Birmingham, Alabama', c:[-86.815,33.516], d:1960, g:'A', src:7, prec:'locality',
+    s:'The 1963 bombing of the 16th Street Baptist Church in Birmingham killed four young Black girls and became a turning point in national support for the Civil Rights Act.',
+    sources:['Federal Bureau of Investigation, case file summary','Birmingham Civil Rights Institute','Encyclopedia of Alabama','Library of Congress, Prints and Photographs'] },
+  { id:'gap_18th_and_vine_jazz_district', n:'18th and Vine Jazz District', k:'place', st:'Missouri', pl:'Kansas City, Missouri', c:[-94.558,39.092], d:1920, g:'A', src:5, prec:'locality',
+    s:'The 18th and Vine district in Kansas City is internationally recognised as an origin point of a distinct jazz idiom, and was the commercial centre of Black Kansas City under segregation.',
+    sources:['American Jazz Museum','National Register of Historic Places, nomination file','Missouri State Historical Society'] },
+  { id:'nrhp-black-heritage-100006631', n:'100 Block North Greenwood Avenue', k:'place', st:'Oklahoma', pl:'Tulsa, Oklahoma', c:[-95.987,36.160], d:1920, g:'A', src:4, prec:'locality',
+    s:'The surviving block of North Greenwood Avenue is the last standing commercial fabric of the Greenwood district destroyed in the 1921 Tulsa race massacre.',
+    sources:['National Register of Historic Places, nomination file','Tulsa Historical Society and Museum','Oklahoma Historical Society'] },
+  { id:'gap_1866_memphis_race_massacre', n:'1866 Memphis race massacre', k:'event', st:'Tennessee', pl:'Memphis, Tennessee', c:[-90.049,35.150], d:1860, g:'A', src:5, prec:'locality',
+    s:'The 1866 Memphis massacre killed 46 Black residents and destroyed churches and schools. Congressional testimony gathered afterward shaped the Fourteenth Amendment debate.',
+    sources:['U.S. House of Representatives, Select Committee report, 1866','Tennessee State Library and Archives','Library of Congress, Prints and Photographs'] },
+  { id:'lynching_isaac_mcghie_duluth_minnesota', n:'Isaac McGhie', k:'person', st:'Minnesota', pl:'Duluth, Minnesota', c:[-92.101,46.787], d:1920, g:'A', src:6, prec:'locality',
+    s:'Isaac McGhie, a Black circus worker, was lynched by a white mob in Duluth on June 15, 1920, alongside Elias Clayton and Elmer Jackson. No one was convicted of murder.',
+    sources:['Minnesota Historical Society','Clayton Jackson McGhie Memorial records','St. Louis County court records'] },
+  { id:'nrhp-black-heritage-93001537', n:'369th Regiment Armory', k:'place', st:'New York', pl:'Harlem, New York', c:[-73.939,40.818], d:1910, g:'A', src:4, prec:'locality',
+    s:'Home of the 369th Infantry Regiment, the Harlem Hellfighters, who spent more continuous days in combat than any other American unit in the First World War.',
+    sources:['National Register of Historic Places, nomination file','New York State Military Museum','Schomburg Center for Research in Black Culture'] },
+  { id:'dunbar_high_school_dc', n:'Paul Laurence Dunbar High School', k:'school', st:'District of Columbia', pl:'Washington, D.C.', c:[-77.018,38.908], d:1870, g:'A', src:5, prec:'locality',
+    s:'Opened in 1870 as the Preparatory High School for Colored Youth, Dunbar was the first public high school for Black students in the United States and sent graduates to elite colleges for decades.',
+    sources:['District of Columbia Public Schools archive','Moorland-Spingarn Research Center, Howard University','National Register of Historic Places, nomination file'] },
+  { id:'fifteenth_street_presbyterian_dc', n:'Fifteenth Street Presbyterian Church', k:'place', st:'District of Columbia', pl:'Washington, D.C.', c:[-77.035,38.905], d:1840, g:'A', src:4, prec:'locality',
+    s:'Organised in 1841, the church was a station on escape routes north and later a base for Francis Grimké, one of the founders of the Niagara Movement.',
+    sources:['Moorland-Spingarn Research Center, Howard University','Historical Society of Washington, D.C.','National Register of Historic Places, nomination file'] },
+  { id:'sundown_scottsdale_az', n:'Scottsdale, Arizona', k:'place', st:'Arizona', pl:'Scottsdale, Arizona', c:[-111.926,33.494], d:1950, g:'A', src:3, prec:'locality',
+    s:'Scottsdale operated as a sundown town in the mid twentieth century. In 1959 Boston Red Sox player Pumpsie Green was forced to live in Phoenix during spring training because local hotels would not house him.',
+    sources:['Arizona State University, Arizona Collection','Society for American Baseball Research','Arizona Republic archive'] },
+  { id:'gap_54th_massachusetts', n:'54th Massachusetts Infantry', k:'org', st:'Massachusetts', pl:'Boston, Massachusetts', c:[-71.064,42.357], d:1860, g:'A', src:6, prec:'locality',
+    s:'One of the first Black regiments raised in the North during the Civil War. Its assault on Fort Wagner in July 1863 changed the national argument about Black enlistment.',
+    sources:['National Archives, Compiled Military Service Records','Massachusetts Historical Society','Boston African American National Historic Site'] },
+  { id:'gap_99th_fighter_squadron', n:'99th Fighter Squadron', k:'org', st:'Alabama', pl:'Tuskegee, Alabama', c:[-85.691,32.430], d:1940, g:'A', src:5, prec:'locality',
+    s:'The first African American military aviation unit in the United States military, trained at Tuskegee and deployed to North Africa and Italy from 1943.',
+    sources:['National Archives, Army Air Forces records','Tuskegee Airmen National Historic Site','Air Force Historical Research Agency'] },
+  { id:'disc_1967_detroit_riot_q768155', n:'1967 Detroit uprising', k:'event', st:'Michigan', pl:'Detroit, Michigan', c:[-83.090,42.380], d:1960, g:'A', src:6, prec:'locality',
+    s:'Beginning with a police raid on an unlicensed bar on July 23, 1967, the Detroit uprising ran five days and became a central case study in the Kerner Commission report.',
+    sources:['National Advisory Commission on Civil Disorders, 1968 report','Detroit Historical Society','Walter P. Reuther Library, Wayne State University'] },
+  { id:'disc_1967_newark_riots_q4572764', n:'1967 Newark uprising', k:'event', st:'New Jersey', pl:'Newark, New Jersey', c:[-74.172,40.736], d:1960, g:'B', src:4, prec:'locality',
+    s:'The Newark uprising erupted in July 1967 after police beat a Black cab driver. State commission hearings afterward documented housing and policing conditions in the Central Ward.',
+    sources:['Governor’s Select Commission on Civil Disorder, 1968 report','Newark Public Library, Charles F. Cummings collection','Rutgers University, Newark archives'] },
+  { id:'rosewood_fl', n:'Rosewood', k:'place', st:'Florida', pl:'Rosewood, Florida', c:[-82.937,29.238], d:1920, g:'A', src:5, prec:'locality',
+    s:'A Black town destroyed by a white mob in January 1923. In 1994 Florida passed a reparations bill awarding compensation to survivors, one of the first state acts of its kind.',
+    sources:['Florida Board of Regents, 1993 documented history report','State Archives of Florida','Florida Legislature, 1994 session records'] },
+  { id:'ent_1199seiu_healthcare_workers_001', n:'1199SEIU United Healthcare Workers East', k:'org', st:'New York', pl:'New York, New York', c:[-73.984,40.765], d:1930, g:'B', src:3, prec:'locality',
+    s:'Founded in New York City in 1932 as a pharmacists’ union, Local 1199 expanded in the late 1950s into hospital organising and became a significant funder of civil rights campaigns.',
+    sources:['Kheel Center for Labor-Management Documentation, Cornell University','Tamiment Library, New York University','1199SEIU archive'] },
+  { id:'gap_10th_u_s_cavalry', n:'10th U.S. Cavalry', k:'org', st:'Kansas', pl:'Fort Leavenworth, Kansas', c:[-94.920,39.355], d:1860, g:'A', src:5, prec:'locality',
+    s:'Organised at Fort Leavenworth in 1866, the 10th Cavalry was one of the first peacetime Black regiments in the U.S. Army and served across the western plains and in Cuba.',
+    sources:['National Archives, Regimental Returns','U.S. Army Center of Military History','Kansas Historical Society'] },
+  { id:'nrhp-black-heritage-94000456', n:'Aberdeen Gardens', k:'place', st:'Virginia', pl:'Hampton, Virginia', c:[-76.376,37.023], d:1930, g:'A', src:4, prec:'locality',
+    s:'A New Deal resettlement community designed by a Black architect and built by Black workers for Black families, one of the few such projects completed as planned.',
+    sources:['National Register of Historic Places, nomination file','Hampton History Museum','Library of Virginia'] },
+  { id:'nrhp-black-heritage-16000359', n:'Ace Theatre', k:'place', st:'Florida', pl:'Miami, Florida', c:[-80.210,25.858], d:1930, g:'B', src:3, prec:'locality',
+    s:'A segregation era cinema in Miami’s Liberty City, one of a small number of surviving purpose-built theatres serving Black audiences in South Florida.',
+    sources:['National Register of Historic Places, nomination file','HistoryMiami Museum','Florida Division of Historical Resources'] },
+  { id:'nrhp-black-heritage-05001612', n:'Abyssinian Meeting House', k:'place', st:'Maine', pl:'Portland, Maine', c:[-70.253,43.661], d:1820, g:'A', src:4, prec:'locality',
+    s:'Built in 1828 by Portland’s Black community, the third oldest surviving African American meeting house in the United States, and a documented stop on escape routes.',
+    sources:['National Register of Historic Places, nomination file','Maine Historical Society','Committee to Restore the Abyssinian'] },
+  { id:'nrhp-black-heritage-84004142', n:'18th and Vine Historic District', k:'place', st:'Missouri', pl:'Kansas City, Missouri', c:[-94.556,39.093], d:1910, g:'B', src:3, prec:'locality',
+    s:'The district listed on the National Register in 1984, covering the commercial and social core of segregated Black Kansas City.',
+    sources:['National Register of Historic Places, nomination file','Missouri State Historical Society'] },
+  { id:'nrhp-black-heritage-100003908', n:'16th Street Viaduct', k:'place', st:'Wisconsin', pl:'Milwaukee, Wisconsin', c:[-87.930,43.030], d:1960, g:'B', src:3, prec:'locality',
+    s:'Crossed nightly by fair housing marchers in 1967 and 1968, the viaduct separated Milwaukee’s Black North Side from the white South Side and became known as the Mason-Dixon line of the city.',
+    sources:['National Register of Historic Places, nomination file','Milwaukee County Historical Society','University of Wisconsin-Milwaukee archives'] },
+  { id:'greenwood_ok_massacre', n:'Greenwood district', k:'place', st:'Oklahoma', pl:'Tulsa, Oklahoma', c:[-95.988,36.163], d:1920, g:'A', src:6, prec:'locality',
+    s:'Known as Black Wall Street, Greenwood held more than 190 Black-owned businesses before white mobs destroyed 35 blocks in the 1921 Tulsa race massacre.',
+    sources:['Oklahoma Commission to Study the Tulsa Race Riot of 1921','Tulsa Historical Society and Museum','Library of Congress, Prints and Photographs'] },
+  { id:'gap_1890_land', n:'1890 land-grant institutions', k:'org', st:'District of Columbia', pl:'Washington, D.C.', c:[-77.036,38.897], d:1890, g:'A', src:4, prec:'locality',
+    s:'The second Morrill Act of 1890 required Southern states to fund Black colleges to keep federal agricultural money, creating a system of nineteen institutions still operating today.',
+    sources:['U.S. Statutes at Large, 26 Stat. 417','U.S. Department of Agriculture, NIFA','Association of Public and Land-grant Universities'] },
+  { id:'divine-nine-person-pbs-a-langston-taylor', n:'A. Langston Taylor', k:'person', st:'District of Columbia', pl:'Washington, D.C.', c:[-77.020,38.923], d:1910, g:'B', src:3, prec:'locality',
+    s:'Founder of Phi Beta Sigma Fraternity, established in 1914 at Howard University on the principle that the organisation should be a part of the general community rather than apart from it.',
+    sources:['Moorland-Spingarn Research Center, Howard University','Phi Beta Sigma Fraternity archive'] },
+  { id:'ent_authority_net_abraham_hall', n:'Abraham Hall', k:'place', st:'Maryland', pl:'Rossville, Maryland', c:[-76.845,39.037], d:1880, g:'B', src:3, prec:'locality',
+    s:'Built in 1889 by the Benevolent Sons and Daughters of Abraham, the hall served in turn as a lodge, a school, and a house of worship for a freedmen’s community.',
+    sources:['National Register of Historic Places, nomination file','Maryland Historical Trust','Prince George’s County Historical Society'] },
+  { id:'gap_477th_bombardment_group', n:'477th Bombardment Group', k:'org', st:'Indiana', pl:'Seymour, Indiana', c:[-85.890,38.959], d:1940, g:'A', src:4, prec:'locality',
+    s:'A Black bomber unit whose officers were arrested at Freeman Field in 1945 for entering a whites-only officers’ club, a case that fed directly into the 1948 desegregation order.',
+    sources:['National Archives, Army Air Forces records','Air Force Historical Research Agency','Tuskegee Airmen National Historic Site'] },
+];
+
+/* real decade counts through the 1810s from the active release; later decades
+   are illustrative for this mock */
+const DECADES = [];
+for (let y = 1630; y <= 2020; y += 10) DECADES.push(y);
+const REAL_COUNTS = { 1630:1, 1650:1, 1670:2, 1680:1, 1690:1, 1700:10, 1710:5, 1720:3, 1730:9, 1740:8, 1750:11, 1760:8, 1770:16, 1780:19, 1790:29, 1800:46, 1810:23 };
+const COUNTS = {};
+DECADES.forEach((y, i) => {
+  if (REAL_COUNTS[y] != null) { COUNTS[y] = REAL_COUNTS[y]; return; }
+  const t = (y - 1810) / (2020 - 1810);
+  const hump = Math.exp(-Math.pow((y - 1935) / 62, 2));
+  COUNTS[y] = Math.round(24 + t * 70 + hump * 340);
+});
+const TOTAL = 4078;
+
+const PRESENCE = [
+  { st: 'District of Columbia', n: 372 }, { st: 'South Carolina', n: 285 },
+  { st: 'North Carolina', n: 237 }, { st: 'Alabama', n: 224 }, { st: 'Georgia', n: 212 },
+];
+
+/* Great Migration corridors, origin metro to destination metro */
+const ROUTES = [
+  { from: [-90.08, 29.95], to: [-87.63, 41.88], a: 'New Orleans', b: 'Chicago' },
+  { from: [-90.18, 32.30], to: [-87.63, 41.88], a: 'Jackson',     b: 'Chicago' },
+  { from: [-86.81, 33.52], to: [-83.05, 42.33], a: 'Birmingham',  b: 'Detroit' },
+  { from: [-84.39, 33.75], to: [-74.01, 40.71], a: 'Atlanta',     b: 'New York' },
+  { from: [-95.37, 29.76], to: [-118.24, 34.05], a: 'Houston',    b: 'Los Angeles' },
+  { from: [-79.94, 32.78], to: [-75.16, 39.95], a: 'Charleston',  b: 'Philadelphia' },
+  { from: [-90.05, 35.15], to: [-90.20, 38.63], a: 'Memphis',     b: 'St. Louis' },
+];
+
+const CONUS = [[-125.2, 24.4], [-66.6, 49.6]];
+
+/* ---- state ---------------------------------------------------------------- */
+const S = {
+  mode: 'atlas',
+  kinds: new Set(),
+  grade: '',
+  state: '',
+  decade: null,
+  sort: 'oldest',
+  sel: null,
+  saved: new Set(),
+  layers: { pins: true, routes: false, labels: true },
+  playing: false,
+  spot: false,
+  chromeHidden: false,
+};
+
+let map = null, mapOK = false, selMarker = null, playTimer = null, camTimer = null;
+
+/* ---- helpers -------------------------------------------------------------- */
+const cssv = n => getComputedStyle(root).getPropertyValue(n).trim();
+const eraOf = d => d + 's';
+const gradeCls = g => g.toLowerCase();
+
+function kglyph(k, cls = 'kglyph') {
+  return `<svg class="${cls}" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="${KINDS[k].glyph}"/></svg>`;
+}
+
+function toast(msg, actionLabel, onAction) {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.innerHTML = `<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.4 6.4 12l6.6-8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>${msg}</span>`;
+  if (actionLabel) {
+    const b = document.createElement('button');
+    b.textContent = actionLabel;
+    b.onclick = () => { onAction && onAction(); dismiss(); };
+    el.appendChild(b);
+  }
+  $('#toasts').appendChild(el);
+  const t = setTimeout(dismiss, actionLabel ? 6000 : 2600);
+  function dismiss() {
+    clearTimeout(t);
+    el.classList.add('out');
+    setTimeout(() => el.remove(), 240);
+  }
+  return dismiss;
+}
+
+async function copy(text, msg) {
+  try { await navigator.clipboard.writeText(text); toast(msg); }
+  catch { toast('Copy blocked by the browser. Text is in the console.'); console.log(text); }
+}
+
+/* ---- filtering ------------------------------------------------------------ */
+function visible() {
+  let out = R.filter(r => {
+    if (S.kinds.size && !S.kinds.has(r.k)) return false;
+    if (S.grade && GRADE_ORDER[r.g] < GRADE_ORDER[S.grade]) return false;
+    if (S.state && r.st !== S.state) return false;
+    if (S.decade != null && r.d !== S.decade) return false;
+    return true;
+  });
+  out.sort((a, b) => S.sort === 'oldest' ? a.d - b.d || a.n.localeCompare(b.n)
+                                         : b.d - a.d || a.n.localeCompare(b.n));
+  return out;
+}
+
+/* ---- map ------------------------------------------------------------------ */
+/* OpenMapTiles ships localised name fields inconsistently across releases —
+   coalesce rather than pinning name:en, or half the labels vanish. */
+const NAME = ['coalesce', ['get', 'name:en'], ['get', 'name:latin'], ['get', 'name']];
+
+function buildStyle() {
+  const label = cssv('--map-label'), labelHi = cssv('--map-label-hi'), halo = cssv('--map-halo');
+  return {
+    version: 8,
+    glyphs: 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
+    sources: {
+      ofm: {
+        type: 'vector', url: 'https://tiles.openfreemap.org/planet',
+        attribution: '<a href="https://openfreemap.org" target="_blank" rel="noreferrer">OpenFreeMap</a> · <a href="https://www.openmaptiles.org/" target="_blank" rel="noreferrer">OpenMapTiles</a> · © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a>',
+      },
+      pins: { type: 'geojson', data: fc(visible()) },
+    },
+    layers: [
+      { id: 'bg', type: 'background', paint: { 'background-color': cssv('--map-land') } },
+      { id: 'green', type: 'fill', source: 'ofm', 'source-layer': 'landcover',
+        filter: ['match', ['get', 'class'], ['wood', 'grass', 'park'], true, false],
+        paint: { 'fill-color': cssv('--map-green') } },
+      { id: 'water', type: 'fill', source: 'ofm', 'source-layer': 'water',
+        paint: { 'fill-color': cssv('--map-water') } },
+      { id: 'road', type: 'line', source: 'ofm', 'source-layer': 'transportation', minzoom: 6,
+        filter: ['match', ['get', 'class'], ['motorway', 'trunk', 'primary'], true, false],
+        paint: { 'line-color': cssv('--map-road'), 'line-width': ['interpolate', ['linear'], ['zoom'], 6, 0.4, 12, 2.2] } },
+      { id: 'b-state', type: 'line', source: 'ofm', 'source-layer': 'boundary',
+        filter: ['all', ['==', ['get', 'admin_level'], 4], ['!=', ['get', 'maritime'], 1]],
+        paint: { 'line-color': cssv('--map-line'), 'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.6, 8, 1.3], 'line-dasharray': [3, 2] } },
+      { id: 'b-country', type: 'line', source: 'ofm', 'source-layer': 'boundary',
+        filter: ['all', ['<=', ['get', 'admin_level'], 2], ['!=', ['get', 'maritime'], 1]],
+        paint: { 'line-color': cssv('--map-line-2'), 'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.9, 8, 1.8] } },
+
+      { id: 'l-state', type: 'symbol', source: 'ofm', 'source-layer': 'place', minzoom: 3, maxzoom: 7.5,
+        filter: ['==', ['get', 'class'], 'state'],
+        layout: { 'text-field': NAME, 'text-font': ['Noto Sans Regular'], 'text-size': 10.5, 'text-letter-spacing': 0.16, 'text-transform': 'uppercase', 'text-max-width': 8 },
+        paint: { 'text-color': label, 'text-halo-color': halo, 'text-halo-width': 1.2, 'text-opacity': 0.9 } },
+      { id: 'l-city', type: 'symbol', source: 'ofm', 'source-layer': 'place', minzoom: 4.2,
+        filter: ['match', ['get', 'class'], ['city', 'town'], true, false],
+        layout: { 'text-field': NAME, 'text-font': ['Noto Sans Regular'], 'text-size': ['interpolate', ['linear'], ['zoom'], 5, 10, 11, 14], 'text-max-width': 8, 'text-anchor': 'top', 'text-offset': [0, 0.35] },
+        paint: { 'text-color': labelHi, 'text-halo-color': halo, 'text-halo-width': 1.4 } },
+
+      { id: 'pin-halo', type: 'circle', source: 'pins',
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 3, 8, 10, 20],
+          'circle-color': cssv('--copper-graphic'), 'circle-opacity': 0.13,
+          'circle-opacity-transition': { duration: 420 },
+        } },
+      { id: 'pin', type: 'circle', source: 'pins',
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 3, 3.6, 10, 7.5],
+          'circle-color': cssv('--copper-graphic'),
+          'circle-stroke-width': 1.4, 'circle-stroke-color': cssv('--map-land'),
+          'circle-opacity-transition': { duration: 420 },
+        } },
+    ],
+  };
+}
+
+function fc(list) {
+  return { type: 'FeatureCollection', features: list.map(r => ({
+    type: 'Feature', properties: { id: r.id, n: r.n }, geometry: { type: 'Point', coordinates: r.c },
+  })) };
+}
+
+function initMap() {
+  if (typeof maplibregl === 'undefined') return failMap();
+  try {
+    /* Construct on a plain centre/zoom. fitBounds with instrument padding runs
+       once the canvas has a real size, in reveal(). */
+    map = new maplibregl.Map({
+      container: 'map', style: buildStyle(),
+      center: [-96.5, 38.6], zoom: 3.6,
+      pitch: 0, bearing: 0,
+      attributionControl: false,
+      dragRotate: true, maxPitch: 68, fadeDuration: 220,
+    });
+    /* No default NavigationControl: zoom and pitch live in the camera console so
+       the map keeps one control vocabulary instead of two. */
+    map.on('load', () => { mapOK = true; delete root.dataset.mapfail; syncPins(); syncAnnot(); reveal(); });
+    map.on('error', e => console.warn('[map]', (e && e.error && e.error.message) || e));
+    map.on('move', syncAnnot);
+    map.on('click', 'pin', e => {
+      const id = e.features[0].properties.id;
+      const rec = R.find(r => r.id === id);
+      if (rec) select(rec, true);
+    });
+    map.on('mouseenter', 'pin', () => map.getCanvas().style.cursor = 'pointer');
+    map.on('mouseleave', 'pin', () => map.getCanvas().style.cursor = '');
+    setTimeout(() => { if (!mapOK) failMap(); }, 9000);
+  } catch (err) { window.__mapErr = String(err && err.stack || err); console.warn(err); failMap(); }
+}
+window.__mlReady = initMap;
+window.__mlFail = failMap;
+
+function failMap() {
+  window.__mapFailFrom = new Error('failMap').stack;
+  root.dataset.mapfail = '1';
+  toast('Map tiles unavailable. Chrome and camera controls still demo.');
+}
+
+/* Opening move: wide establishing shot, then a slow settle. Start wide, then go
+   deep — the one rule every map story follows. */
+function reveal() {
+  map.once('idle', () => {
+    cam.wide(1600);
+    if (!reduce) setTimeout(() => map.easeTo({ zoom: map.getZoom() + 0.22, duration: 3400, easing: t => t }), 1700);
+  });
+}
+
+function syncPins() {
+  if (!mapOK) return;
+  const src = map.getSource('pins');
+  if (src) src.setData(fc(S.layers.pins ? visible() : []));
+}
+
+/* ---- camera choreography (the Johnny Harris console) ---------------------- */
+const cam = {
+  _mark(btn) {
+    $$('.cambtn').forEach(b => b.classList.toggle('live', b.dataset.cam === btn));
+    clearTimeout(camTimer);
+    camTimer = setTimeout(() => $$('.cambtn').forEach(b => b.classList.remove('live')), 2200);
+  },
+  /* wide establishing shot — always the opening move */
+  wide(dur = 1500) {
+    this._mark('wide'); spotOff();
+    if (!mapOK) return fbTransform(1, 0, 0);
+    try {
+      map.fitBounds(CONUS, { padding: chromePadding(), duration: reduce ? 0 : dur, pitch: 0, bearing: 0, essential: true });
+    } catch {
+      map.easeTo({ center: [-96.5, 38.6], zoom: 3.6, pitch: 0, bearing: 0, duration: reduce ? 0 : dur });
+    }
+    say('Wide · continental');
+  },
+  /* push in — zoom and tilt toward the current or given target */
+  push(target, dur = 1600) {
+    this._mark('push');
+    if (!mapOK) return fbTransform(2.2, 0, 0);
+    const c = target || (S.sel ? S.sel.c : map.getCenter().toArray());
+    map.flyTo({ center: c, zoom: Math.max(map.getZoom() + 2.6, 8.4), pitch: 48, bearing: map.getBearing(),
+                curve: 1.42, speed: 0.85, duration: reduce ? 0 : dur, essential: true });
+    say('Push in · ' + (S.sel ? S.sel.pl : 'centre'));
+  },
+  /* slow orbit — gravitas, scale */
+  orbit(deg = 60, dur = 5200) {
+    this._mark('orbit');
+    if (!mapOK) return;
+    if (map.getPitch() < 24) map.easeTo({ pitch: 46, duration: 700 });
+    setTimeout(() => map.easeTo({ bearing: map.getBearing() + deg, duration: reduce ? 0 : dur, easing: t => t }), 320);
+    say('Orbit · ' + deg + '°');
+  },
+  /* tilt — flat informational plate to angled cinematic plate */
+  tilt() {
+    this._mark('tilt');
+    if (!mapOK) return;
+    const flat = map.getPitch() < 20;
+    map.easeTo({ pitch: flat ? 55 : 0, duration: reduce ? 0 : 900, easing: easeOutQuint });
+    say(flat ? 'Tilt · 55°' : 'Tilt · flat');
+  },
+  /* spotlight — dim the map, keep one region lit */
+  spot(lngLat, radius = 20) {
+    this._mark('spot');
+    S.spot ? spotOff() : spotOn(lngLat || (S.sel ? S.sel.c : map && map.getCenter().toArray()), radius);
+  },
+  /* trace — draw the migration corridors on */
+  trace() {
+    this._mark('trace');
+    setLayer('routes', !S.layers.routes);
+    if (S.layers.routes) {
+      this.wide(1400);
+      setTimeout(() => drawRoutes(true), 900);
+      say('Trace · 7 corridors');
+    }
+  },
+  flyTo(rec, dur = 2200) {
+    if (!mapOK) return;
+    map.flyTo({ center: rec.c, zoom: 12.6, pitch: 52, bearing: -18,
+                curve: 1.42, speed: 0.9, duration: reduce ? 0 : dur,
+                padding: chromePadding(), essential: true });
+    say('Fly to · ' + rec.pl);
+  },
+  apply(spec, dur = 2400) {
+    if (!mapOK) return fbTransform(spec.zoom / 3.4, 0, 0);
+    map.flyTo({ ...spec, curve: 1.42, speed: 0.8, duration: reduce ? 0 : dur, essential: true });
+  },
+};
+const easeOutQuint = t => 1 - Math.pow(1 - t, 5);
+
+/* Padding keeps the subject clear of the floating instruments. It is clamped so
+   the two rails can never eat more of the viewport than the map itself, which
+   is what makes fitBounds bail out to a world view on narrow screens. */
+function chromePadding() {
+  const w = innerWidth, h = innerHeight;
+  if (w < 820) return { top: 88, bottom: Math.min(210, h * 0.3), left: 16, right: 16 };
+
+  const lensOpen = getComputedStyle($('#lens')).display !== 'none' && !$('#lens').classList.contains('hidden');
+  let left = lensOpen ? 330 : 40;
+  let right = $('#sheet').classList.contains('on') ? 468
+            : ($('#results').classList.contains('hidden') ? 40 : 376);
+
+  /* Never let the rails claim more than half the frame, and always leave a
+     usable window. MapLibre throws outright when padding exceeds the canvas. */
+  const budget = w * 0.5;
+  if (left + right > budget) {
+    const k = budget / (left + right);
+    left = Math.round(left * k);
+    right = Math.round(right * k);
+  }
+  const top = 96, bottom = Math.round(Math.min(160, h * 0.22));
+  if (top + bottom > h * 0.5) return { top: 40, bottom: 40, left, right };
+  return { top, bottom, left, right };
+}
+
+function say(txt) {
+  const el = $('#readout');
+  el.innerHTML = `<b>${txt.split(' · ')[0]}</b> · ${txt.split(' · ').slice(1).join(' · ')}`;
+  el.classList.add('on');
+  clearTimeout(say._t);
+  say._t = setTimeout(() => el.classList.remove('on'), 2400);
+}
+
+/* fallback plate pseudo-camera */
+function fbTransform(scale, dx, dy) {
+  const el = $('#fallback');
+  if (el) el.style.setProperty('--fbt', '');
+  const be = getComputedStyle(el, '::before');
+  el.animate?.([], {});
+  el.style.transform = `scale(${scale}) translate(${dx}px, ${dy}px)`;
+  el.style.transition = 'transform 900ms cubic-bezier(.16,1,.3,1)';
+}
+
+/* ---- spotlight ------------------------------------------------------------ */
+function spotOn(lngLat, radiusPct = 20) {
+  if (!lngLat) return;
+  S.spot = true;
+  const el = $('#spot');
+  el.dataset.ll = lngLat.join(',');
+  el.style.setProperty('--sr', radiusPct + '%');
+  positionSpot();
+  el.classList.add('on');
+  say('Spotlight · on');
+}
+function spotOff() {
+  S.spot = false;
+  $('#spot').classList.remove('on');
+}
+function positionSpot() {
+  const el = $('#spot');
+  if (!S.spot || !mapOK || !el.dataset.ll) return;
+  const [lng, lat] = el.dataset.ll.split(',').map(Number);
+  const p = map.project([lng, lat]);
+  el.style.setProperty('--sx', (p.x / innerWidth * 100).toFixed(2) + '%');
+  el.style.setProperty('--sy', (p.y / innerHeight * 100).toFixed(2) + '%');
+}
+
+/* ---- annotations: migration arcs ----------------------------------------- */
+function arcPath(a, b) {
+  const p1 = map.project(a), p2 = map.project(b);
+  const mx = (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2;
+  const dx = p2.x - p1.x, dy = p2.y - p1.y;
+  const len = Math.hypot(dx, dy) || 1;
+  const nx = -dy / len, ny = dx / len;
+  const lift = Math.min(len * 0.22, 190);
+  return { d: `M${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q${(mx + nx * lift).toFixed(1)} ${(my + ny * lift).toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`, p1, p2, len: len + lift };
+}
+
+function drawRoutes(animate) {
+  const svg = $('#annot');
+  svg.innerHTML = '';
+  if (!S.layers.routes || !mapOK) return;
+  ROUTES.forEach((rt, i) => {
+    const { d, p1, p2, len } = arcPath(rt.from, rt.to);
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', d);
+    path.setAttribute('class', 'an-arc' + (i % 2 ? ' soft' : '') + (animate ? ' draw go' : ''));
+    if (animate) { path.style.setProperty('--len', Math.ceil(len * 1.5)); path.style.setProperty('--dur', (900 + i * 130) + 'ms'); path.style.animationDelay = (i * 110) + 'ms'; }
+    svg.appendChild(path);
+
+    [[p1, rt.a, 'end'], [p2, rt.b, 'start']].forEach(([p, name, anchor], j) => {
+      const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      dot.setAttribute('cx', p.x); dot.setAttribute('cy', p.y); dot.setAttribute('r', j ? 3.4 : 2.6);
+      dot.setAttribute('class', 'an-dot' + (animate ? ' fadein' : ''));
+      if (animate) dot.style.animationDelay = (i * 110 + (j ? 700 : 0)) + 'ms';
+      svg.appendChild(dot);
+
+      const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      t.setAttribute('x', p.x + (anchor === 'end' ? -8 : 8));
+      t.setAttribute('y', p.y + 3.5);
+      t.setAttribute('text-anchor', anchor === 'end' ? 'end' : 'start');
+      t.setAttribute('class', 'an-label' + (j ? '' : ' sub') + (animate ? ' fadein' : ''));
+      t.textContent = name;
+      if (animate) t.style.animationDelay = (i * 110 + (j ? 780 : 60)) + 'ms';
+      svg.appendChild(t);
+    });
+  });
+}
+
+function syncAnnot() {
+  positionSpot();
+  if (S.layers.routes) drawRoutes(false);
+  if (selMarker && S.sel) selMarker.setLngLat(S.sel.c);
+}
+
+/* ---- render: lens --------------------------------------------------------- */
+function renderKinds() {
+  const counts = {};
+  R.forEach(r => counts[r.k] = (counts[r.k] || 0) + 1);
+  $('#f-kinds').innerHTML = Object.entries(KINDS).map(([k, v]) =>
+    `<button class="chip" data-kind="${k}" aria-pressed="${S.kinds.has(k)}">${kglyph(k)}${v.label}<span class="n">${counts[k] || 0}</span></button>`
+  ).join('');
+}
+
+function renderStates() {
+  const sel = $('#f-state');
+  const sts = [...new Set(R.map(r => r.st))].sort();
+  sel.innerHTML = '<option value="">All states</option>' + sts.map(s => `<option value="${s}">${s}</option>`).join('');
+  sel.value = S.state;
+}
+
+function renderPresence() {
+  const max = PRESENCE[0].n;
+  $('#presence').innerHTML = PRESENCE.map(p =>
+    `<button class="bar" data-state="${p.st}"><span class="track" style="--w:${(p.n / max * 100).toFixed(0)}%">${p.st}</span><span class="n">${p.n}</span></button>`
+  ).join('');
+}
+
+/* ---- render: results ------------------------------------------------------ */
+function renderResults() {
+  const list = visible();
+  const el = $('#resultlist');
+  $('#rescount').textContent = list.length + ' of ' + R.length;
+  $('#lenscount').textContent = list.length === R.length
+    ? TOTAL.toLocaleString() + ' in view'
+    : list.length + ' in view';
+
+  if (!list.length) {
+    el.innerHTML = `<div class="emptylist">
+      <svg width="22" height="22" viewBox="0 0 16 16" fill="none" style="color:var(--ink-4)"><circle cx="7" cy="7" r="4.6" stroke="currentColor" stroke-width="1.3"/><path d="m10.6 10.6 3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <p>No records match this lens.<br />Widen the evidence floor or clear the decade.</p>
+      <button class="btn" style="margin-top:14px" onclick="resetLens()">Reset lens</button>
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = list.map(r => `
+    <button class="row" role="option" data-id="${r.id}" data-sel="${S.sel && S.sel.id === r.id ? 1 : 0}" aria-selected="${S.sel && S.sel.id === r.id}">
+      ${kglyph(r.k)}
+      <span>
+        <span class="nm">${r.n}</span>
+        <span class="meta">
+          <span class="pl">${r.pl}</span><span class="dot">·</span><span>${eraOf(r.d)}</span>
+          <span class="dot">·</span><span class="grade ${gradeCls(r.g)}"><i></i>${r.g}</span>
+        </span>
+      </span>
+      <span class="rowsave" role="button" tabindex="0" data-save="${r.id}" aria-pressed="${S.saved.has(r.id)}" aria-label="Save ${r.n}">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="${S.saved.has(r.id) ? 'currentColor' : 'none'}" aria-hidden="true"><path d="M4 2.6h8a.6.6 0 0 1 .6.6v10.2L8 10.6l-4.6 2.8V3.2a.6.6 0 0 1 .6-.6Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+      </span>
+    </button>`).join('');
+}
+
+/* ---- render: timeline ----------------------------------------------------- */
+function renderTime() {
+  const max = Math.max(...Object.values(COUNTS));
+  $('#ticks').innerHTML = DECADES.map(y =>
+    `<div class="tick" data-y="${y}" style="height:${(6 + COUNTS[y] / max * 30).toFixed(1)}px" title="${eraOf(y)} · ${COUNTS[y]} records"></div>`
+  ).join('');
+  syncTime();
+}
+
+function syncTime() {
+  const y = S.decade;
+  $$('#ticks .tick').forEach(t => {
+    const ty = +t.dataset.y;
+    t.classList.toggle('active', y != null && ty === y);
+    t.classList.toggle('inrange', y == null);
+  });
+  $('#t-cur').textContent = y == null ? 'All time' : eraOf(y);
+  $('#t-sub').textContent = y == null
+    ? '1630s to 2020s · ' + TOTAL.toLocaleString() + ' records'
+    : COUNTS[y] + ' records · status as-of this decade';
+  const i = y == null ? 0 : DECADES.indexOf(y);
+  const pct = y == null ? 0 : (i + 0.5) / DECADES.length * 100;
+  const ph = $('#playhead');
+  ph.style.left = pct + '%';
+  ph.style.opacity = y == null ? '0' : '1';
+  const track = $('#track');
+  track.setAttribute('aria-valuenow', y == null ? 1630 : y);
+  track.setAttribute('aria-valuetext', y == null ? 'All time' : eraOf(y));
+}
+
+function setDecade(y, fly) {
+  S.decade = y;
+  syncTime(); renderResults(); syncPins();
+  if (fly && mapOK && y != null) {
+    const hits = visible();
+    if (hits.length === 1) cam.flyTo(hits[0], 1600);
+    else if (hits.length) fitTo(hits);
+  }
+}
+
+function fitTo(list) {
+  if (!mapOK || !list.length) return;
+  const b = new maplibregl.LngLatBounds(list[0].c, list[0].c);
+  list.forEach(r => b.extend(r.c));
+  try {
+    map.fitBounds(b, { padding: chromePadding(), maxZoom: 9.5, duration: reduce ? 0 : 1500, essential: true });
+  } catch {
+    map.easeTo({ center: b.getCenter(), zoom: 5, duration: reduce ? 0 : 1200 });
+  }
+}
+
+/* ---- selection + sheet ---------------------------------------------------- */
+function select(rec, fly) {
+  S.sel = rec;
+  renderResults();
+  openSheet(rec);
+  if (selMarker) selMarker.remove();
+  if (mapOK) {
+    const el = document.createElement('div');
+    el.className = 'pin';
+    el.innerHTML = '<i></i>';
+    selMarker = new maplibregl.Marker({ element: el }).setLngLat(rec.c).addTo(map);
+  }
+  if (fly !== false) cam.flyTo(rec);
+  const row = $(`.row[data-id="${rec.id}"]`);
+  if (row) row.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
+}
+
+function openSheet(r) {
+  const list = visible();
+  const i = list.findIndex(x => x.id === r.id);
+  $('#sh-pos').textContent = i >= 0 ? `${i + 1} / ${list.length}` : '';
+  $('#sheetkicker').innerHTML = `${kglyph(r.k)}<span>${KINDS[r.k].label}</span><span style="color:var(--rule-strong)">·</span><span>${r.pl}</span><span style="color:var(--rule-strong)">·</span><span>${eraOf(r.d)}</span>`;
+  $('#sheetname').textContent = r.n;
+  $('#sheetstory').textContent = r.s;
+  $('#sheetanat').innerHTML = [
+    ['Kind', KINDS[r.k].label], ['Where', r.pl], ['Era', eraOf(r.d)],
+    ['Evidence', `<span class="grade ${gradeCls(r.g)}"><i></i>Grade ${r.g} · ${r.src} sources</span>`],
+  ].map(([k, v]) => `<div><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
+  $('#sheetprec').querySelector('span').textContent =
+    `Rendered at ${r.prec} precision. The archive never draws a point sharper than the source supports.`;
+  $('#sheetsrccount').textContent = r.src + ' cited';
+  $('#sheetsrcs').innerHTML = r.sources.map((s, i) =>
+    `<div class="src"><span class="i">${String(i + 1).padStart(2, '0')}</span><span class="t">${s}</span><span class="y">cited</span></div>`
+  ).join('') + (r.src > r.sources.length
+    ? `<div class="src"><span class="i">+</span><span class="t" style="color:var(--ink-4)">${r.src - r.sources.length} further sources in the full record</span><span class="y"></span></div>` : '');
+
+  const near = R.filter(x => x.id !== r.id && (x.st === r.st || x.d === r.d)).slice(0, 4);
+  $('#sheetconns').innerHTML = near.map(x =>
+    `<button class="conn" data-goto="${x.id}">${kglyph(x.k)}<span class="nm">${x.n}</span><span class="rel">${x.st === r.st ? 'SAME STATE' : 'SAME ERA'}</span></button>`
+  ).join('') || '<p class="mono" style="padding:6px 0">No documented connections in this release.</p>';
+
+  syncSaveBtn();
+  const sh = $('#sheet');
+  sh.classList.add('on');
+  sh.setAttribute('aria-hidden', 'false');
+  $('#results').classList.add('hidden');
+  $('[data-show="results"]').hidden = false;
+}
+
+function closeSheet() {
+  $('#sheet').classList.remove('on');
+  $('#sheet').setAttribute('aria-hidden', 'true');
+  $('#results').classList.remove('hidden');
+  $('[data-show="results"]').hidden = true;
+  if (selMarker) { selMarker.remove(); selMarker = null; }
+  S.sel = null;
+  renderResults();
+  spotOff();
+}
+
+function step(delta) {
+  const list = visible();
+  if (!list.length) return;
+  const i = S.sel ? list.findIndex(x => x.id === S.sel.id) : -1;
+  const next = list[(i + delta + list.length) % list.length];
+  select(next);
+}
+
+/* ---- saved ---------------------------------------------------------------- */
+function toggleSave(id) {
+  const on = S.saved.has(id);
+  on ? S.saved.delete(id) : S.saved.add(id);
+  const c = $('#savedcount');
+  c.textContent = S.saved.size;
+  c.hidden = S.saved.size === 0;
+  renderResults(); syncSaveBtn();
+  const r = R.find(x => x.id === id);
+  if (!on) toast(`Saved · ${r.n}`, 'Undo', () => toggleSave(id));
+  else toast('Removed from saved');
+}
+function syncSaveBtn() {
+  const b = $('#sh-save');
+  if (!S.sel) return;
+  const on = S.saved.has(S.sel.id);
+  b.setAttribute('aria-pressed', on);
+  b.lastChild.textContent = on ? ' Saved' : ' Save';
+  b.querySelector('svg').setAttribute('fill', on ? 'currentColor' : 'none');
+}
+function renderSaved() {
+  const list = R.filter(r => S.saved.has(r.id));
+  $('#savedmeta').textContent = list.length + ' record' + (list.length === 1 ? '' : 's');
+  $('#savedbody').innerHTML = list.length ? `
+    <div class="conns">${list.map(r => `
+      <button class="conn" data-goto="${r.id}" style="grid-template-columns:16px 1fr auto auto;gap:14px">
+        ${kglyph(r.k)}<span class="nm">${r.n}</span>
+        <span class="rel">${r.pl.toUpperCase()} · ${eraOf(r.d)}</span>
+        <span class="grade ${gradeCls(r.g)}"><i></i>${r.g}</span>
+      </button>`).join('')}</div>
+    <div style="display:flex;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--rule-2);flex-wrap:wrap">
+      <button class="btn" id="exp-cite">Copy all citations</button>
+      <button class="btn" id="exp-geo">Copy as GeoJSON</button>
+      <button class="btn ghost" id="exp-clear" style="margin-left:auto;color:var(--ink-3)">Clear list</button>
+    </div>`
+    : `<div class="emptylist" style="padding:40px 20px">
+        <svg width="24" height="24" viewBox="0 0 16 16" fill="none" style="color:var(--ink-4)"><path d="M4 2.6h8a.6.6 0 0 1 .6.6v10.2L8 10.6l-4.6 2.8V3.2a.6.6 0 0 1 .6-.6Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        <p>Nothing saved yet.<br />Press <span class="kbd">S</span> on any record, or use the bookmark in the list.</p>
+      </div>`;
+}
+
+function citation(r) {
+  const today = new Date().toISOString().slice(0, 10);
+  return `"${r.n}." BlackStory Archive, ${r.pl}, ${eraOf(r.d)}. Evidence grade ${r.g}, ${r.src} sources. Accessed ${today}. https://blackstory.org/entity/${r.id}`;
+}
+
+/* ---- command palette ------------------------------------------------------ */
+const ACTIONS = [
+  { t: 'Fly wide, continental', s: 'CAMERA · W', run: () => cam.wide() },
+  { t: 'Push in', s: 'CAMERA · P', run: () => cam.push() },
+  { t: 'Slow orbit', s: 'CAMERA · O', run: () => cam.orbit() },
+  { t: 'Tilt the plate', s: 'CAMERA · T', run: () => cam.tilt() },
+  { t: 'Spotlight focus', s: 'CAMERA · F', run: () => cam.spot() },
+  { t: 'Trace the Great Migration', s: 'CAMERA · R', run: () => cam.trace() },
+  { t: 'Play through the decades', s: 'TIME · SPACE', run: () => togglePlay() },
+  { t: 'Open story mode', s: 'VIEW · 2', run: () => setMode('story') },
+  { t: 'Records near me', s: 'FIND · N', run: () => nearMe() },
+  { t: 'Toggle light and dark', s: 'VIEW · D', run: () => toggleTheme() },
+  { t: 'Compact density', s: 'VIEW · ⌥D', run: () => toggleDensity() },
+  { t: 'Calm motion', s: 'VIEW · M', run: () => toggleMotion() },
+  { t: 'Reset the lens', s: 'FIND · ⌘⌫', run: () => resetLens() },
+];
+
+let palIdx = 0, palItems = [];
+
+function openPal(seed) {
+  $('#palette').classList.add('on');
+  const inp = $('#palinput');
+  inp.value = seed || '';
+  inp.focus(); inp.select();
+  renderPal();
+}
+function closePal() { $('#palette').classList.remove('on'); }
+
+function hl(text, q) {
+  if (!q) return text;
+  const i = text.toLowerCase().indexOf(q.toLowerCase());
+  return i < 0 ? text : text.slice(0, i) + '<mark>' + text.slice(i, i + q.length) + '</mark>' + text.slice(i + q.length);
+}
+
+function renderPal() {
+  const q = $('#palinput').value.trim();
+  const lq = q.toLowerCase();
+  const recs = (q ? R.filter(r => (r.n + ' ' + r.pl + ' ' + r.st + ' ' + eraOf(r.d)).toLowerCase().includes(lq)) : R.slice(0, 6)).slice(0, 8);
+  const acts = q ? ACTIONS.filter(a => a.t.toLowerCase().includes(lq)).slice(0, 5) : ACTIONS.slice(0, 5);
+  const states = q ? [...new Set(R.map(r => r.st))].filter(s => s.toLowerCase().includes(lq)).slice(0, 3) : [];
+
+  palItems = [
+    ...recs.map(r => ({ type: 'rec', r })),
+    ...states.map(s => ({ type: 'state', s })),
+    ...acts.map(a => ({ type: 'act', a })),
+  ];
+  palIdx = Math.min(palIdx, Math.max(0, palItems.length - 1));
+
+  let html = '';
+  if (recs.length) {
+    html += `<div class="pal-sec">Records</div>` + recs.map((r, i) => {
+      const gi = i;
+      return `<button class="pal-item" data-i="${gi}" data-hi="${gi === palIdx ? 1 : 0}">
+        ${kglyph(r.k)}
+        <span><span class="t">${hl(r.n, q)}</span><span class="s">${r.pl.toUpperCase()} · ${eraOf(r.d)} · GRADE ${r.g}</span></span>
+        <span class="kbd">↵</span></button>`;
+    }).join('');
+  }
+  if (states.length) {
+    html += `<div class="pal-sec">Jump to state</div>` + states.map((s, i) => {
+      const gi = recs.length + i;
+      return `<button class="pal-item" data-i="${gi}" data-hi="${gi === palIdx ? 1 : 0}">
+        <svg class="kglyph" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="${KINDS.place.glyph}"/></svg>
+        <span><span class="t">${hl(s, q)}</span><span class="s">FILTER THE LENS TO THIS STATE</span></span>
+        <span class="kbd">↵</span></button>`;
+    }).join('');
+  }
+  if (acts.length) {
+    html += `<div class="pal-sec">Actions</div>` + acts.map((a, i) => {
+      const gi = recs.length + states.length + i;
+      return `<button class="pal-item" data-i="${gi}" data-hi="${gi === palIdx ? 1 : 0}">
+        <svg class="kglyph" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M8 3v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span><span class="t">${hl(a.t, q)}</span><span class="s">${a.s}</span></span>
+        <span class="kbd">↵</span></button>`;
+    }).join('');
+  }
+  if (!palItems.length) html = `<div class="emptylist" style="padding:30px"><p>Nothing matches “${q}”.</p></div>`;
+  $('#pallist').innerHTML = html;
+  const hiEl = $('.pal-item[data-hi="1"]');
+  if (hiEl) hiEl.scrollIntoView({ block: 'nearest' });
+}
+
+function runPal(i, withFly) {
+  const it = palItems[i];
+  if (!it) return;
+  closePal();
+  if (it.type === 'rec') { select(it.r, true); }
+  else if (it.type === 'state') { S.state = it.s; renderStates(); applyLens(); toast('Lens · ' + it.s); }
+  else it.a.run();
+}
+
+/* ---- story mode ----------------------------------------------------------- */
+function setMode(m) {
+  S.mode = m;
+  root.dataset.mode = m;
+  $$('[data-mode-btn]').forEach(b => b.setAttribute('aria-current', b.dataset.modeBtn === m));
+  if (m === 'story') {
+    closeSheet(); closePal();
+    $('#story').scrollTop = 0;
+    setLayer('routes', false);
+    setTimeout(() => activateChapter($$('.chapter')[0]), 60);
+  } else {
+    spotOff(); setLayer('routes', false);
+    setDecade(null, false);
+    cam.wide(1600);
+  }
+}
+
+function buildStoryRail() {
+  const chs = $$('.chapter');
+  $('#storyrail').innerHTML = chs.map((c, i) =>
+    `<button data-ch-jump="${i}" aria-current="${i === 0}" aria-label="Chapter ${i}"><span class="lb">${c.dataset.ch === '0' ? 'Open' : (c.querySelector('.kick')?.textContent || 'End')}</span><span class="ln"></span></button>`
+  ).join('');
+}
+
+function activateChapter(ch) {
+  if (!ch || ch.classList.contains('active')) return;
+  $$('.chapter').forEach(c => c.classList.toggle('active', c === ch));
+  const i = +ch.dataset.ch;
+  $$('#storyrail button').forEach((b, j) => b.setAttribute('aria-current', j === i));
+  $('#scrollcue').style.opacity = i === 0 ? '1' : '0';
+
+  if (ch.dataset.cam) cam.apply(JSON.parse(ch.dataset.cam), 2600);
+
+  /* per-chapter cinematic beats */
+  spotOff();
+  setLayer('routes', !!ch.dataset.routes);
+  if (ch.dataset.routes) setTimeout(() => drawRoutes(true), 1400);
+
+  if (ch.dataset.spot) {
+    const [lng, lat, r] = ch.dataset.spot.split(',').map(Number);
+    setTimeout(() => spotOn([lng, lat], r), 1800);
+  }
+  if (ch.dataset.focus) {
+    const rec = R.find(x => x.id === ch.dataset.focus);
+    if (rec) {
+      S.sel = rec;
+      if (selMarker) selMarker.remove();
+      if (mapOK) {
+        const el = document.createElement('div'); el.className = 'pin'; el.innerHTML = '<i></i>';
+        selMarker = new maplibregl.Marker({ element: el }).setLngLat(rec.c).addTo(map);
+      }
+    }
+  } else if (selMarker && !ch.dataset.focus) { selMarker.remove(); selMarker = null; }
+
+  if (ch.dataset.sweep) sweepDecades();
+}
+
+function sweepDecades() {
+  let i = 0;
+  clearInterval(sweepDecades._t);
+  sweepDecades._t = setInterval(() => {
+    if (S.mode !== 'story') return clearInterval(sweepDecades._t);
+    setDecade(DECADES[i % DECADES.length], false);
+    i++;
+    if (i > DECADES.length) { clearInterval(sweepDecades._t); setDecade(null, false); }
+  }, reduce ? 400 : 190);
+}
+
+function coldOpen() {
+  const words = ['History ', 'happened ', '<em>here</em>.'];
+  $('#coldopen').innerHTML = words.map((w, i) =>
+    `<span style="animation-delay:${180 + i * 130}ms">${w}</span>`
+  ).join('');
+}
+
+/* ---- lens plumbing -------------------------------------------------------- */
+function applyLens() {
+  renderResults(); syncPins();
+  const list = visible();
+  if (list.length && list.length < R.length) fitTo(list);
+  $('#gradehint').textContent = S.grade ? `Grade ${S.grade} floor` : 'Any grade';
+}
+
+function resetLens() {
+  S.kinds.clear(); S.grade = ''; S.state = ''; S.decade = null;
+  renderKinds(); renderStates(); syncTime();
+  $$('#f-grades .chip').forEach(c => c.setAttribute('aria-pressed', c.dataset.grade === ''));
+  applyLens();
+  cam.wide(1400);
+  toast('Lens reset · all 4,078 records');
+}
+window.resetLens = resetLens;
+
+function setLayer(name, on) {
+  S.layers[name] = on;
+  const btn = $(`#f-layers .chip[data-layer="${name}"]`);
+  if (btn) btn.setAttribute('aria-pressed', on);
+  if (name === 'pins') syncPins();
+  if (name === 'routes') { on ? drawRoutes(true) : ($('#annot').innerHTML = ''); }
+  if (name === 'labels' && mapOK) {
+    ['l-state', 'l-city'].forEach(id => {
+      if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', on ? 'visible' : 'none');
+    });
+  }
+}
+
+function nearMe() {
+  const done = toast('Locating…');
+  if (!navigator.geolocation) { done(); return toast('Location unavailable in this browser.'); }
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      done();
+      const here = [pos.coords.longitude, pos.coords.latitude];
+      const sorted = [...R].sort((a, b) => dist(a.c, here) - dist(b.c, here));
+      const nearest = sorted[0];
+      if (mapOK) map.flyTo({ center: here, zoom: 6.4, pitch: 40, curve: 1.42, duration: reduce ? 0 : 2600, essential: true });
+      setTimeout(() => { select(nearest, false); spotOn(here, 16); }, reduce ? 0 : 2400);
+      toast(`Nearest record · ${nearest.n}, ${Math.round(dist(nearest.c, here) * 111)} km away`);
+    },
+    () => { done(); toast('Location denied. Pick a state in the lens instead.'); },
+    { timeout: 8000 }
+  );
+}
+const dist = (a, b) => Math.hypot(a[0] - b[0], (a[1] - b[1]) * 1.3);
+
+/* ---- time playback -------------------------------------------------------- */
+function togglePlay() {
+  S.playing = !S.playing;
+  const b = $('#btn-play');
+  b.setAttribute('aria-pressed', S.playing);
+  b.querySelector('.i-play').style.display = S.playing ? 'none' : '';
+  b.querySelector('.i-pause').style.display = S.playing ? '' : 'none';
+  clearInterval(playTimer);
+  if (!S.playing) return;
+  let i = S.decade == null ? 0 : DECADES.indexOf(S.decade) + 1;
+  playTimer = setInterval(() => {
+    if (i >= DECADES.length) { togglePlay(); setDecade(null, false); return; }
+    setDecade(DECADES[i], false);
+    i++;
+  }, reduce ? 320 : 620);
+}
+
+/* ---- view toggles --------------------------------------------------------- */
+function toggleTheme() {
+  const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+  root.dataset.theme = next;
+  if (mapOK) { map.setStyle(buildStyle()); map.once('styledata', () => { syncPins(); syncAnnot(); }); }
+  toast(next === 'dark' ? 'Black Ink' : 'Archive Paper');
+}
+function toggleDensity() {
+  root.dataset.density = root.dataset.density === 'compact' ? 'comfortable' : 'compact';
+  toast('Density · ' + root.dataset.density);
+}
+function toggleMotion() {
+  root.dataset.motion = root.dataset.motion === 'calm' ? 'cinematic' : 'calm';
+  toast('Motion · ' + root.dataset.motion);
+}
+function toggleChrome() {
+  S.chromeHidden = !S.chromeHidden;
+  ['#lens', '#results', '#time', '#camera'].forEach(s => $(s).classList.toggle('hidden', S.chromeHidden));
+  $('#dock').querySelectorAll('.dockchip').forEach(c => c.hidden = !S.chromeHidden);
+  $('#bar').style.opacity = S.chromeHidden ? '.15' : '';
+}
+
+/* ==========================================================================
+   WIRING
+   ========================================================================== */
+function wire() {
+  /* bar */
+  $('#cmdtrigger').onclick = () => openPal();
+  $('#btn-theme').onclick = toggleTheme;
+  $('#btn-keys').onclick = () => $('#keysov').classList.add('on');
+  $('#btn-saved').onclick = () => { renderSaved(); $('#savedov').classList.add('on'); };
+  $$('[data-mode-btn]').forEach(b => b.onclick = () => setMode(b.dataset.modeBtn));
+
+  /* lens */
+  $('#f-kinds').onclick = e => {
+    const b = e.target.closest('[data-kind]'); if (!b) return;
+    const k = b.dataset.kind;
+    S.kinds.has(k) ? S.kinds.delete(k) : S.kinds.add(k);
+    b.setAttribute('aria-pressed', S.kinds.has(k));
+    applyLens();
+  };
+  $('#f-grades').onclick = e => {
+    const b = e.target.closest('[data-grade]'); if (!b) return;
+    S.grade = b.dataset.grade;
+    $$('#f-grades .chip').forEach(c => c.setAttribute('aria-pressed', c === b));
+    applyLens();
+  };
+  $('#f-layers').onclick = e => {
+    const b = e.target.closest('[data-layer]'); if (!b) return;
+    setLayer(b.dataset.layer, b.getAttribute('aria-pressed') !== 'true');
+  };
+  $('#f-state').onchange = e => { S.state = e.target.value; applyLens(); };
+  $('#presence').onclick = e => {
+    const b = e.target.closest('[data-state]'); if (!b) return;
+    S.state = b.dataset.state; renderStates(); applyLens();
+    toast('Lens · ' + b.dataset.state);
+  };
+  $('#btn-clear').onclick = resetLens;
+  $('#btn-near').onclick = nearMe;
+  $('#btn-near-2').onclick = () => { setMode('atlas'); setTimeout(nearMe, 400); };
+
+  /* results */
+  $('#resultlist').onclick = e => {
+    const sv = e.target.closest('[data-save]');
+    if (sv) { e.stopPropagation(); toggleSave(sv.dataset.save); return; }
+    const row = e.target.closest('.row');
+    if (row) { const r = R.find(x => x.id === row.dataset.id); if (r) select(r); }
+  };
+  $('#btn-sort').onclick = e => {
+    S.sort = S.sort === 'oldest' ? 'newest' : 'oldest';
+    e.currentTarget.textContent = S.sort.toUpperCase();
+    renderResults();
+  };
+  $$('[data-hide]').forEach(b => b.onclick = () => {
+    const t = b.dataset.hide;
+    $('#' + t).classList.add('hidden');
+    $(`[data-show="${t}"]`).hidden = false;
+  });
+  $$('[data-show]').forEach(b => b.onclick = () => {
+    const t = b.dataset.show;
+    $('#' + t).classList.remove('hidden');
+    b.hidden = true;
+    if (t === 'results') closeSheet();
+  });
+
+  /* time */
+  const track = $('#track');
+  const pick = e => {
+    const rect = track.getBoundingClientRect();
+    const x = ((e.touches ? e.touches[0].clientX : e.clientX) - rect.left) / rect.width;
+    const i = Math.max(0, Math.min(DECADES.length - 1, Math.floor(x * DECADES.length)));
+    setDecade(DECADES[i], false);
+  };
+  let dragging = false;
+  track.addEventListener('pointerdown', e => { dragging = true; track.setPointerCapture(e.pointerId); pick(e); });
+  track.addEventListener('pointermove', e => { if (dragging) pick(e); });
+  track.addEventListener('pointerup', e => { dragging = false; setDecade(S.decade, true); });
+  track.addEventListener('keydown', e => {
+    const i = S.decade == null ? -1 : DECADES.indexOf(S.decade);
+    if (e.key === 'ArrowRight') { setDecade(DECADES[Math.min(DECADES.length - 1, i + 1)], false); e.preventDefault(); }
+    if (e.key === 'ArrowLeft') { i <= 0 ? setDecade(null, false) : setDecade(DECADES[i - 1], false); e.preventDefault(); }
+  });
+  $('#btn-play').onclick = togglePlay;
+  $('#btn-alltime').onclick = () => { setDecade(null, false); cam.wide(1200); };
+
+  /* camera */
+  $$('.cambtn').forEach(b => b.onclick = () => {
+    const m = b.dataset.cam;
+    if (m === 'wide') cam.wide();
+    else if (m === 'push') cam.push();
+    else if (m === 'orbit') cam.orbit();
+    else if (m === 'tilt') cam.tilt();
+    else if (m === 'spot') cam.spot();
+    else if (m === 'trace') cam.trace();
+  });
+
+  /* sheet */
+  $('#sh-close').onclick = closeSheet;
+  $('#sh-next').onclick = () => step(1);
+  $('#sh-prev').onclick = () => step(-1);
+  $('#sh-fly').onclick = () => S.sel && cam.flyTo(S.sel);
+  $('#sh-save').onclick = () => S.sel && toggleSave(S.sel.id);
+  $('#sh-cite').onclick = () => S.sel && copy(citation(S.sel), 'Citation copied');
+  $('#sh-share').onclick = () => {
+    if (!S.sel) return;
+    const p = new URLSearchParams();
+    p.set('record', S.sel.id);
+    if (S.state) p.set('state', S.state);
+    if (S.decade) p.set('era', eraOf(S.decade));
+    if (S.grade) p.set('grade', S.grade);
+    if (S.kinds.size) p.set('kind', [...S.kinds].join(','));
+    copy('https://blackstory.org/atlas?' + p, 'Share link copied · filters and selection included');
+  };
+  document.addEventListener('click', e => {
+    const g = e.target.closest('[data-goto]');
+    if (!g) return;
+    const r = R.find(x => x.id === g.dataset.goto);
+    if (r) { $$('.ov').forEach(o => o.classList.remove('on')); select(r); }
+  });
+
+  /* overlays */
+  $$('[data-close-ov]').forEach(b => b.onclick = () => b.closest('.ov').classList.remove('on'));
+  $$('.ov').forEach(o => o.addEventListener('click', e => { if (e.target === o) o.classList.remove('on'); }));
+  $('#savedbody').addEventListener('click', e => {
+    if (e.target.id === 'exp-cite') copy(R.filter(r => S.saved.has(r.id)).map(citation).join('\n\n'), `${S.saved.size} citations copied`);
+    if (e.target.id === 'exp-geo') copy(JSON.stringify(fc(R.filter(r => S.saved.has(r.id))), null, 2), 'GeoJSON copied');
+    if (e.target.id === 'exp-clear') { S.saved.clear(); $('#savedcount').hidden = true; renderSaved(); renderResults(); toast('Saved list cleared'); }
+  });
+
+  /* palette */
+  $('#palinput').addEventListener('input', () => { palIdx = 0; renderPal(); });
+  $('#pallist').addEventListener('click', e => {
+    const it = e.target.closest('.pal-item');
+    if (it) runPal(+it.dataset.i, e.metaKey);
+  });
+  $('#palette').addEventListener('click', e => { if (e.target.id === 'palette') closePal(); });
+  $('#palinput').addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown') { palIdx = Math.min(palItems.length - 1, palIdx + 1); renderPal(); e.preventDefault(); }
+    if (e.key === 'ArrowUp') { palIdx = Math.max(0, palIdx - 1); renderPal(); e.preventDefault(); }
+    if (e.key === 'Enter') { runPal(palIdx, e.metaKey || e.ctrlKey); e.preventDefault(); }
+    if (e.key === 'Escape') closePal();
+  });
+
+  /* hint */
+  $('#hintclose').onclick = () => $('#hint').hidden = true;
+  setTimeout(() => { if ($('#hint')) $('#hint').hidden = true; }, 9000);
+
+  /* story scroll */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => { if (en.isIntersecting && en.intersectionRatio > 0.42) activateChapter(en.target); });
+  }, { root: $('#story'), threshold: [0.42] });
+  $$('.chapter').forEach(c => io.observe(c));
+  $$('[data-story-next]').forEach(b => b.onclick = () => {
+    $$('.chapter')[1].scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
+  });
+  $('#storyrail').onclick = e => {
+    const b = e.target.closest('[data-ch-jump]'); if (!b) return;
+    $$('.chapter')[+b.dataset.chJump].scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
+  };
+
+  /* keyboard */
+  document.addEventListener('keydown', e => {
+    const typing = /INPUT|TEXTAREA|SELECT/.test(e.target.tagName);
+    const meta = e.metaKey || e.ctrlKey;
+
+    if (meta && e.key.toLowerCase() === 'k') { e.preventDefault(); return openPal(); }
+    if (!typing && e.key === '/') { e.preventDefault(); return openPal(); }
+    if (meta && e.key === 'Backspace') { e.preventDefault(); return resetLens(); }
+    if (meta && e.key.toLowerCase() === 'l' && S.sel) { e.preventDefault(); return $('#sh-share').click(); }
+    if (typing || meta) return;
+
+    switch (e.key) {
+      case 'Escape':
+        if ($('#palette').classList.contains('on')) return closePal();
+        if ($$('.ov.on').length) return $$('.ov.on').forEach(o => o.classList.remove('on'));
+        if (S.spot) return spotOff();
+        return closeSheet();
+      case '?': $('#keysov').classList.add('on'); break;
+      case '1': setMode('atlas'); break;
+      case '2': setMode('story'); break;
+      case 'w': case 'W': cam.wide(); break;
+      case 'p': case 'P': cam.push(); break;
+      case 'o': case 'O': cam.orbit(); break;
+      case 't': case 'T': cam.tilt(); break;
+      case 'f': case 'F': cam.spot(); break;
+      case 'r': case 'R': cam.trace(); break;
+      case 'j': case 'J': step(1); break;
+      case 'k': case 'K': step(-1); break;
+      case 'n': case 'N': nearMe(); break;
+      case 's': case 'S': if (S.sel) toggleSave(S.sel.id); break;
+      case 'c': case 'C': if (S.sel) copy(citation(S.sel), 'Citation copied'); break;
+      case 'd': case 'D': e.altKey ? toggleDensity() : toggleTheme(); break;
+      case 'm': case 'M': toggleMotion(); break;
+      case '\\': toggleChrome(); break;
+      case ' ': e.preventDefault(); togglePlay(); break;
+    }
+  });
+
+  /* camera zoom stepper */
+  $$('[data-zoom]').forEach(b => b.onclick = () => {
+    if (!mapOK) return;
+    map.easeTo({ zoom: map.getZoom() + (+b.dataset.zoom) * 1.1, duration: 420, easing: easeOutQuint });
+  });
+
+  /* scroll-overflow affordance */
+  const fades = [$('.lens-body'), $('#resultlist'), $('.sheet-body')].filter(Boolean);
+  const markMore = el => {
+    const host = el.closest('.panel') || el.parentElement;
+    host.classList.add('fadeb');
+    host.dataset.more = (el.scrollHeight - el.clientHeight - el.scrollTop > 12) ? '1' : '0';
+  };
+  fades.forEach(el => { el.addEventListener('scroll', () => markMore(el), { passive: true }); });
+  const remark = () => fades.forEach(markMore);
+  remark();
+  new MutationObserver(remark).observe($('#resultlist'), { childList: true });
+
+  addEventListener('resize', () => { syncAnnot(); remark(); });
+}
+
+/* ---- boot ----------------------------------------------------------------- */
+function boot() {
+  if (reduce) root.dataset.motion = 'calm';
+  root.dataset.mode = 'atlas';
+  renderKinds(); renderStates(); renderPresence(); renderResults(); renderTime();
+  buildStoryRail(); coldOpen(); wire();
+  initMap();
+}
+boot();
+</script>
+</body>
+</html>
