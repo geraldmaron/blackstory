@@ -376,7 +376,7 @@ Deep links serialize to the params `/explore` already parses (`selected`, `confi
 | Citation | `lib/citation/format.ts` | Built |
 | Share deep link | `lib/share/deep-link.ts` | Built |
 | Annotation overlay | `components/map-experience/AnnotationOverlay.tsx`, `lib/map-experience/arc-geometry.ts` | Built |
-| Command palette | `components/patterns/command-palette/` | Pending (WP-09) |
+| Command palette | `components/patterns/command-palette/` | Built |
 | Command bar | `components/shell/CommandBar.tsx` | Pending (WP-10) |
 | Lens panel | `components/map-experience/LensPanel.tsx` | Pending (WP-11) |
 | Results rail | `components/map-experience/ResultsRail.tsx` | Pending (WP-12) |
