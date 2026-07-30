@@ -138,6 +138,8 @@ export const publicEntityProjectionSchema = z.object({
   locationLabel: z.string().min(1).optional(),
   status: z.string().min(1).optional(),
   statusHistory: z.array(statusHistoryEntrySchema).optional(),
+  livingStatus: z.enum(['living', 'deceased', 'unknown']).optional(),
+  statusProvenance: z.enum(['canonical', 'derived_heuristic']).optional(),
   eraBuckets: z.array(z.string().min(1)).optional(),
   notabilityLabels: z.array(z.string().min(1)).optional(),
   notabilityBasis: z.array(notabilityBasisRecordSchema).optional(),

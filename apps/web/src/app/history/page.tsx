@@ -16,7 +16,7 @@ import { HISTORY_DECADE_FRAMING, HISTORY_DIGNITY_FRAMING } from '../../lib/histo
 import type { HistoryFacetOption } from '../../lib/history/filters';
 import { listPublicEntityViews, getPublicActiveReleaseMeta } from '../../lib/public-data/source';
 import { HistoryExperience } from './HistoryExperience';
-import { buildHistoryViewModel } from './history-view-model';
+import { buildHistoryViewModelAsync } from './history-view-model';
 import {
   historyEditionPanelClassName,
   historyEditionRootClassName,
@@ -51,7 +51,7 @@ export default async function HistoryPage({ searchParams }: HistoryPageProps) {
     listPublicEntityViews(),
     getPublicActiveReleaseMeta(),
   ]);
-  const view = buildHistoryViewModel(params, entities, {
+  const view = await buildHistoryViewModelAsync(params, entities, {
     ...(releaseMeta?.releaseId ? { releaseId: releaseMeta.releaseId } : {}),
   });
 

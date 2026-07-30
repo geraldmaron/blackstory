@@ -5,7 +5,7 @@
  * `./explore-view-model.test.ts`). Precomputes History edge line catalogs so the client can
  * toggle lines/decade without importing the graph release builder.
  */
-import { getHistoryGraphReleaseArtifact } from '../../../data/history-graph-seed';
+import { getHistoryGraphReleaseArtifact, resolveHistoryGraphReleaseArtifact } from '../../../data/history-graph-seed';
 import { listPublicEntities, type PublicEntityView } from '../../../data/public-seed';
 import {
   buildHistoryEdges,
@@ -81,11 +81,12 @@ function buildEdgeSlice(
 
 /** All-time + per-decade edge/line catalog over the history graph release —
  * shared by the explore view model and the home hero's decades-in-motion flow. */
-export function buildEdgeLineCatalog(): {
+export function buildEdgeLineCatalog(
+  artifact: ReturnType<typeof getHistoryGraphReleaseArtifact> = getHistoryGraphReleaseArtifact(),
+): {
   readonly edgeLineCatalog: ExploreEdgeLineCatalog;
   readonly availableDecades: readonly string[];
 } {
-  const artifact = getHistoryGraphReleaseArtifact();
   const historyContext = buildHistoryGraphContext(artifact);
   const allTime = buildEdgeSlice(
     artifact,
@@ -113,6 +114,7 @@ export function buildExploreViewModel(
   raw: RawExploreSearchParams,
   entities: readonly PublicEntityView[] = listPublicEntities(),
   dataSource: PublicReadSource = 'none',
+  graphArtifact?: ReturnType<typeof getHistoryGraphReleaseArtifact>,
 ): ExploreViewModel {
   const viewState = parseExploreSearchParams(raw);
   const source = buildExploreMapSource(entities);
@@ -120,7 +122,9 @@ export function buildExploreViewModel(
   const filteredFeatures = applyExploreFilters(allFeatures, viewState.filters, viewState.state);
   const densityLevels = buildStateDensityLevels(source.stateAggregates);
 
-  const { edgeLineCatalog, availableDecades } = buildEdgeLineCatalog();
+  const { edgeLineCatalog, availableDecades } = buildEdgeLineCatalog(
+    graphArtifact ?? getHistoryGraphReleaseArtifact(entities),
+  );
   const active = pickExploreEdgeSlice(edgeLineCatalog, viewState);
   const selectedEdge = viewState.edge
     ? active.edges.find((edge) => edge.edgeId === viewState.edge)
@@ -142,4 +146,17 @@ export function buildExploreViewModel(
     edgeLineCollection: active.lineCollection,
     ...(selectedEdge ? { selectedEdge } : {}),
   };
+}
+
+export async function buildExploreViewModelAsync(
+  raw: RawExploreSearchParams,
+  entities: readonly PublicEntityView[] = listPublicEntities(),
+  dataSource: PublicReadSource = 'none',
+  options: { readonly releaseId?: string; readonly generatedAt?: string } = {},
+): Promise<ExploreViewModel> {
+  const artifact = await resolveHistoryGraphReleaseArtifact(entities, {
+    ...(options.releaseId ? { releaseId: options.releaseId } : {}),
+    ...(options.generatedAt ? { generatedAt: options.generatedAt } : {}),
+  });
+  return buildExploreViewModel(raw, entities, dataSource, artifact);
 }

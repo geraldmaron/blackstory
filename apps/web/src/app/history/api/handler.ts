@@ -6,7 +6,7 @@
  */
 import { NextResponse } from 'next/server';
 import { evaluateSearchQueryGuardrails, type SearchQueryInput } from '@repo/security';
-import { getHistoryGraphReleaseArtifact } from '../../../data/history-graph-seed';
+import { resolveHistoryGraphReleaseArtifact } from '../../../data/history-graph-seed';
 import {
   buildHistoryEdges,
   buildHistoryGraphContext,
@@ -152,7 +152,7 @@ export async function handleHistoryRefineRequest(
 
     const decade = parseDecadeParam(url.searchParams.get('decade') ?? undefined);
     const { data: entities } = await (deps.loadEntities ?? listPublicEntityViews)();
-    const artifact = getHistoryGraphReleaseArtifact(entities);
+    const artifact = await resolveHistoryGraphReleaseArtifact(entities);
     const context = buildHistoryGraphContext(artifact, entities);
     const slice = resolveHistoryGraphSlice(artifact, decade ? 'decade' : 'all-time', decade);
     const nodes = buildHistoryNodes(slice, filterState, context.entitiesById);

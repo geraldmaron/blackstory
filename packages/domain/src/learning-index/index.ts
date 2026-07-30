@@ -36,6 +36,10 @@ export type LearningRelatedEdge = {
     readonly validFrom?: string;
     readonly validTo?: string | null;
   };
+  readonly viaEvent?: {
+    readonly id: string;
+    readonly displayName: string;
+  };
 };
 
 export type PublicEntityPrimaryImage = {
@@ -56,6 +60,7 @@ export type RelatedNeighborStub = {
   readonly relationType: string;
   readonly direction: AdjacencyDirection;
   readonly timespan?: LearningRelatedEdge['timespan'];
+  readonly viaEvent?: LearningRelatedEdge['viaEvent'];
 };
 
 export type LearningIndexProjectionFields = {
@@ -196,24 +201,16 @@ export type NeighborLookup = {
 };
 
 function toNeighborStub(entry: LearningRelatedEdge, neighbor: NeighborLookup): RelatedNeighborStub {
-  return entry.timespan !== undefined
-    ? {
-        id: neighbor.id,
-        displayName: neighbor.displayName,
-        kind: neighbor.kind,
-        summary: neighbor.summary,
-        relationType: entry.type,
-        direction: entry.direction,
-        timespan: entry.timespan,
-      }
-    : {
-        id: neighbor.id,
-        displayName: neighbor.displayName,
-        kind: neighbor.kind,
-        summary: neighbor.summary,
-        relationType: entry.type,
-        direction: entry.direction,
-      };
+  return {
+    id: neighbor.id,
+    displayName: neighbor.displayName,
+    kind: neighbor.kind,
+    summary: neighbor.summary,
+    relationType: entry.type,
+    direction: entry.direction,
+    ...(entry.timespan !== undefined ? { timespan: entry.timespan } : {}),
+    ...(entry.viaEvent !== undefined ? { viaEvent: entry.viaEvent } : {}),
+  };
 }
 
 /**

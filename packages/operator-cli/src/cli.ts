@@ -49,6 +49,17 @@ import {
 import { runStoryResearch, type StoryTopicSeed } from './story-research-run.js';
 import { prepareStoryPacketIntake } from './story-intake.js';
 import { prepareEdgeIntake, type EdgeIntakeInput } from './edge-intake.js';
+import {
+  ensureSourceProgramRun,
+  expandEntityNetwork,
+  insertLandscapeCandidateRows,
+  loadExpansionSeed,
+  stageNetworkCandidates,
+} from './expand-verb.js';
+import {
+  HARNESS_ADJUDICATION_PROGRAM_ID,
+  stageHarnessAdjudicatedRelationships,
+} from './harness-relationship-staging.js';
 import { createNodeSafeFetchDependencies, runQuickAddFetch } from './fetch.js';
 import { createMetadataOnlyStorage, type CaptureDeps, type CaptureStorage } from './source-capture.js';
 import { createSupabaseStorage, supabaseStorageConfigFromEnv } from './supabase-storage.js';
@@ -1340,6 +1351,44 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
           adjudicatedCount: adjudicatedRelations.length,
         });
 
+        const successfulAdjudications = adjudicatedRelations.filter(
+          (entry): entry is AdjudicatedRelationship => !('error' in entry),
+        );
+
+        let stagedHarnessRelations: Awaited<ReturnType<typeof stageHarnessAdjudicatedRelationships>> = [];
+        if (flags.booleans.has('--commit') && successfulAdjudications.length > 0) {
+          const pool = getOpsPostgresPool(process.env);
+          const client = await pool.connect();
+          const runId = `harness-adjudication-${theme}-${Date.now()}`;
+          try {
+            await client.query('BEGIN');
+            await ensureSourceProgramRun(
+              client,
+              runId,
+              HARNESS_ADJUDICATION_PROGRAM_ID,
+              'Harness spatiotemporal relationship adjudicator',
+              { theme, metro, adjudicatedCount: successfulAdjudications.length },
+              successfulAdjudications.length,
+              'other',
+            );
+            stagedHarnessRelations = await stageHarnessAdjudicatedRelationships(
+              successfulAdjudications,
+              runId,
+              theme,
+              metro,
+              async (rows) => {
+                await insertLandscapeCandidateRows(client, rows);
+              },
+            );
+            await client.query('COMMIT');
+          } catch (err) {
+            await client.query('ROLLBACK').catch(() => {});
+            throw err;
+          } finally {
+            client.release();
+          }
+        }
+
         const result = {
           theme,
           metro,
@@ -1349,7 +1398,13 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
           overlapsCount: overlaps.length,
           overlaps,
           ...(flags.booleans.has('--enrich')
-            ? { enrichedCandidates, adjudicatedRelations }
+            ? {
+                enrichedCandidates,
+                adjudicatedRelations,
+                ...(flags.booleans.has('--commit')
+                  ? { stagedHarnessRelationsCount: stagedHarnessRelations.length }
+                  : {}),
+              }
             : {}),
         };
 
@@ -1415,28 +1470,69 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
         return 0;
       }
       case 'expand': {
-        // Stub: full entity-network expansion depends on repo-xez5.4 (not yet built). This
-        // documents the intended interface and returns a stable, honest not-implemented
-        // result rather than faking traversal. See docs/research/research-operations.md
-        // ("expand") for the interface contract this stub commits to.
         const entityId = requireFlag(flags, '--entity-id');
-        const depth = Number(optionalFlag(flags, '--depth') ?? '1');
+        const depthRaw = Number(optionalFlag(flags, '--depth') ?? '1');
+        const depth = depthRaw === 2 ? 2 : 1;
+        const maxCandidates = Number(optionalFlag(flags, '--max-candidates') ?? '50');
+        if (!Number.isFinite(maxCandidates) || maxCandidates < 1) {
+          throw new Error('--max-candidates must be a positive number');
+        }
+
+        const pool = getOpsPostgresPool(process.env);
+        const seed = await loadExpansionSeed(pool, entityId);
+        const candidates = await expandEntityNetwork(seed, { depth, maxCandidates });
+
+        if (flags.booleans.has('--commit')) {
+          const client = await pool.connect();
+          const runId = `expand-${entityId}-${Date.now()}`;
+          try {
+            await client.query('BEGIN');
+            await ensureSourceProgramRun(
+              client,
+              runId,
+              'wikidata-network-expansion',
+              'Operator CLI expand verb',
+              { entityId, depth, candidateCount: candidates.length },
+              candidates.length,
+            );
+            const staged = await stageNetworkCandidates(seed, candidates, runId, async (rows) => {
+              await insertLandscapeCandidateRows(client, rows);
+            });
+            await client.query('COMMIT');
+            stdout(
+              JSON.stringify(
+                {
+                  verb: 'expand',
+                  entityId,
+                  depth,
+                  status: 'staged',
+                  candidateCount: candidates.length,
+                  stagedCount: staged.length,
+                  seed,
+                },
+                null,
+                2,
+              ),
+            );
+          } catch (err) {
+            await client.query('ROLLBACK').catch(() => {});
+            throw err;
+          } finally {
+            client.release();
+          }
+          return 0;
+        }
+
         stdout(
           JSON.stringify(
             {
               verb: 'expand',
               entityId,
               depth,
-              status: 'not_implemented',
-              dependsOn: 'repo-xez5.4',
-              intendedInterface: {
-                command: 'expand --entity-id <id> [--depth N] [--json]',
-                output: {
-                  entityId: 'string',
-                  neighbors: [{ entityId: 'string', relationshipType: 'string', edgeConfidence: 'number' }],
-                  frontier: 'entities not yet traversed at the requested depth',
-                },
-              },
+              status: 'dry_run',
+              candidateCount: candidates.length,
+              seed,
+              candidates,
             },
             null,
             2,

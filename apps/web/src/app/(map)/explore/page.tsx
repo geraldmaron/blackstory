@@ -11,7 +11,7 @@ import { FilterBar } from '@repo/ui';
 import { SynchronizedResultList } from '../../../components/map-experience/SynchronizedResultList';
 import { getSharedPublicEntities } from '../shared-map-data';
 import { ExploreMapExperience } from './ExploreMapExperience';
-import { buildExploreViewModel } from './explore-view-model';
+import { buildExploreViewModelAsync } from './explore-view-model';
 import { toSerializableExploreViewModel } from './explore-view-model-wire';
 import '../../../components/patterns/browse-mode.css';
 import '../../../components/patterns/edition-fact-icon.css';
@@ -32,7 +32,7 @@ type ExplorePageProps = {
 export default async function ExplorePage({ searchParams }: ExplorePageProps) {
   const params = await searchParams;
   const { data: entities, source: dataSource } = await getSharedPublicEntities();
-  const view = buildExploreViewModel(params, entities, dataSource);
+  const view = await buildExploreViewModelAsync(params, entities, dataSource);
 
   return (
     <>

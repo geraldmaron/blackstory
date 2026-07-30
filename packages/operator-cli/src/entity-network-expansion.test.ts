@@ -7,6 +7,8 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
   expandEntityNetwork,
+  extractWikidataBirthDeathYears,
+  fetchSeedBirthDeathYears,
   stageNetworkCandidates,
   type ExpansionSeed,
   type WikidataFetcher,
@@ -30,6 +32,48 @@ function entityDataDoc(qid: string, label: string, claims: Record<string, unknow
 function entityClaim(qid: string) {
   return { mainsnak: { datavalue: { value: { id: qid } } } };
 }
+
+function timeClaim(isoTime: string) {
+  return { mainsnak: { datavalue: { value: { time: isoTime, precision: 9 } } } };
+}
+
+test('extractWikidataBirthDeathYears reads P569 and P570 time claims', () => {
+  const years = extractWikidataBirthDeathYears({
+    P569: [timeClaim('+1885-01-01T00:00:00Z')],
+    P570: [timeClaim('+1952-12-31T00:00:00Z')],
+  });
+  assert.equal(years.birthYear, 1885);
+  assert.equal(years.deathYear, 1952);
+});
+
+test('fetchSeedBirthDeathYears loads birth/death from entity data doc', async () => {
+  const fetcher = makeFetcher({
+    'Special:EntityData/Q1.json': entityDataDoc('Q1', 'Test Person', {
+      P569: [timeClaim('+1900-01-01T00:00:00Z')],
+      P570: [timeClaim('+1988-06-15T00:00:00Z')],
+    }),
+  });
+  const years = await fetchSeedBirthDeathYears('Q1', fetcher);
+  assert.equal(years.birthYear, 1900);
+  assert.equal(years.deathYear, 1988);
+});
+
+test('expandEntityNetwork captures seed birth/death years for person seeds via meta out-param', async () => {
+  const fetcher = makeFetcher({
+    'Special:EntityData/Q1.json': entityDataDoc('Q1', 'Test Person', {
+      P569: [timeClaim('+1920-01-01T00:00:00Z')],
+      P570: [timeClaim('+2001-01-01T00:00:00Z')],
+      P108: [entityClaim('Q10')],
+    }),
+    'Special:EntityData/Q10.json': entityDataDoc('Q10', 'Employer Org', {}),
+    'query.wikidata.org': { results: { bindings: [] } },
+  });
+
+  const meta: { seedBirthDeathYears?: { birthYear?: number; deathYear?: number } } = {};
+  await expandEntityNetwork(SEED, { depth: 1, maxCandidates: 50 }, fetcher, meta);
+  assert.equal(meta.seedBirthDeathYears?.birthYear, 1920);
+  assert.equal(meta.seedBirthDeathYears?.deathYear, 2001);
+});
 
 test('forward claims (employer, educated at, member of) surface as typed hypotheses with provenance', async () => {
   const fetcher = makeFetcher({
@@ -115,16 +159,28 @@ test('duplicate neighbor reached via two properties is deduped with merged prove
 
 test('stageNetworkCandidates never targets bb_canonical: rows go to the injected insert only, status pending', async () => {
   const fetcher = makeFetcher({
-    'Special:EntityData/Q1.json': entityDataDoc('Q1', 'Test Person', { P108: [entityClaim('Q10')] }),
+    'Special:EntityData/Q1.json': entityDataDoc('Q1', 'Test Person', {
+      P108: [entityClaim('Q10')],
+      P569: [timeClaim('+1934-02-01T00:00:00Z')],
+      P570: [timeClaim('+1992-11-11T00:00:00Z')],
+    }),
     'Special:EntityData/Q10.json': entityDataDoc('Q10', 'Employer Org', {}),
     'query.wikidata.org': { results: { bindings: [] } },
   });
-  const candidates = await expandEntityNetwork(SEED, { depth: 1, maxCandidates: 50 }, fetcher);
+  const meta: { seedBirthDeathYears?: { birthYear?: number; deathYear?: number } } = {};
+  const candidates = await expandEntityNetwork(SEED, { depth: 1, maxCandidates: 50 }, fetcher, meta);
 
   const staged: unknown[] = [];
-  const rows = await stageNetworkCandidates(SEED, candidates, 'run_test_1', async (r) => {
-    staged.push(...r);
-  });
+  const rows = await stageNetworkCandidates(
+    SEED,
+    candidates,
+    'run_test_1',
+    async (r) => {
+      staged.push(...r);
+    },
+    undefined,
+    meta.seedBirthDeathYears,
+  );
 
   assert.equal(staged.length, rows.length);
   assert.equal(rows.length, 1);
@@ -133,4 +189,10 @@ test('stageNetworkCandidates never targets bb_canonical: rows go to the injected
   assert.equal(rows[0]?.run_id, 'run_test_1');
   assert.equal(rows[0]?.payload.relationship_type, 'employed_by');
   assert.equal(rows[0]?.provenance.hops[0]?.propertyId, 'P108');
+  assert.equal(rows[0]?.payload.birthYear, 1934);
+  assert.equal(rows[0]?.payload.deathYear, 1992);
+  assert.equal(rows[0]?.payload.seedBirthYear, 1934);
+  assert.equal(rows[0]?.payload.seedDeathYear, 1992);
+  assert.equal(rows[0]?.provenance.seed_birth_year, 1934);
+  assert.equal(rows[0]?.provenance.seed_death_year, 1992);
 });

@@ -17,11 +17,18 @@ export const DEFAULT_ADJACENCY_CAP = 25;
 
 export type AdjacencyDirection = 'outgoing' | 'incoming';
 
+export type PublicRelatedViaEvent = {
+  readonly id: string;
+  readonly displayName: string;
+};
+
 export type PublicRelatedEntry = {
   readonly id: string;
   readonly type: RelationshipType;
   readonly direction: AdjacencyDirection;
   readonly timespan?: TemporalContext;
+  /** When set, neighbor is linked through shared event participation. */
+  readonly viaEvent?: PublicRelatedViaEvent;
 };
 
 export type AdjacencyEntry = PublicRelatedEntry & {

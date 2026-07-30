@@ -57,15 +57,32 @@ test('related fallback without neighbor stubs humanizes ids instead of showing r
   assert.match(html, /href="\/entity\/ent_15th_st_church_001"/);
 });
 
-test('renders discovery hint when showDiscoveryHint is true', () => {
+test('renders through-event copy when neighbor carries viaEvent co-participation context', () => {
   const school = requireEntity('ent_dunbar_school_001');
   const html = renderToStaticMarkup(
     createElement(EntityRelatedList, {
-      entity: school,
+      entity: {
+        ...school,
+        related: [],
+        relatedNeighbors: [
+          {
+            id: 'ent_martin_luther_king_jr_001',
+            displayName: 'Martin Luther King Jr.',
+            kind: 'person',
+            summary: '',
+            relationType: 'connected_through',
+            direction: 'outgoing',
+            viaEvent: {
+              id: 'ent_montgomery_bus_boycott_001',
+              displayName: 'Montgomery Bus Boycott',
+            },
+          },
+        ],
+        continueLearning: [],
+      },
       labelledBy: 'related-heading',
-      showDiscoveryHint: true,
     }),
   );
-  assert.match(html, /class="ds-entity-link-hint"/);
-  assert.match(html, /Record names link onward/);
+  assert.match(html, /through Montgomery Bus Boycott/);
+  assert.match(html, /Connected through Montgomery Bus Boycott with Martin Luther King Jr\./);
 });

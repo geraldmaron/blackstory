@@ -174,6 +174,11 @@ function resolveStatusHistory(
     };
   }
 
+  const livingStatus =
+    'livingStatus' in projection && typeof (projection as { livingStatus?: unknown }).livingStatus === 'string'
+      ? ((projection as { livingStatus: string }).livingStatus as 'living' | 'deceased' | 'unknown')
+      : undefined;
+
   const derived = deriveCatalogEntityStatus({
     id: projection.id,
     kind: projection.kind,
@@ -189,7 +194,25 @@ function resolveStatusHistory(
       object: sanitizePublicProseText(claim.object),
     })),
     ...(projection.status !== undefined ? { status: projection.status } : {}),
+    ...(livingStatus !== undefined ? { livingStatus } : {}),
   });
+
+  // Persons: prefer honest derived status over shipped falsehoods (living collapse / missed death cues).
+  if (projection.kind === 'person') {
+    const shipped = projection.status;
+    const preferDerived =
+      derived.status !== undefined &&
+      (shipped === undefined ||
+        derived.status === 'deceased' ||
+        (derived.status === 'unknown' && shipped === 'living'));
+    return {
+      ...(preferDerived
+        ? { status: derived.status }
+        : shipped !== undefined
+          ? { status: shipped }
+          : {}),
+    };
+  }
 
   return {
     ...(projection.status !== undefined

@@ -117,6 +117,46 @@ test('proposeRelationshipCandidates prefers occurred_at when an event shares a g
   assert.equal(candidates[0]?.toEntityId, 'ent_place');
 });
 
+test('proposeRelationshipCandidates adds shared decade overlap only with geohash prefix', () => {
+  const entities: RelationshipCandidateEntity[] = [
+    {
+      id: 'ent_a',
+      kind: 'person',
+      decades: ['1950s', '1960s'],
+      geohash: 'dr5regw3',
+    },
+    {
+      id: 'ent_b',
+      kind: 'place',
+      decades: ['1960s', '1970s'],
+      geohash: 'dr5regw9',
+    },
+    {
+      id: 'ent_c',
+      kind: 'person',
+      decades: ['1960s'],
+      geohash: '9q8yyw1',
+    },
+  ];
+
+  const candidates = proposeRelationshipCandidates({ entities });
+  const ab = candidates.find(
+    (candidate) =>
+      (candidate.fromEntityId === 'ent_a' && candidate.toEntityId === 'ent_b') ||
+      (candidate.fromEntityId === 'ent_b' && candidate.toEntityId === 'ent_a'),
+  );
+  const ac = candidates.find(
+    (candidate) =>
+      (candidate.fromEntityId === 'ent_a' && candidate.toEntityId === 'ent_c') ||
+      (candidate.fromEntityId === 'ent_c' && candidate.toEntityId === 'ent_a'),
+  );
+
+  assert.ok(ab);
+  assert.equal(ab?.reason, 'shared_geohash_prefix');
+  assert.match(ab?.scoreSignals.join(' '), /shared decades 1960s/);
+  assert.equal(ac, undefined);
+});
+
 test('proposeRelationshipCandidates is deterministic and capped at 200 results', () => {
   const entities: RelationshipCandidateEntity[] = Array.from({ length: 30 }, (_, index) => ({
     id: `ent_${String(index).padStart(3, '0')}`,

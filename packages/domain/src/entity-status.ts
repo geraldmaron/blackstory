@@ -109,6 +109,11 @@ export type PersonDerivedStatus = 'living' | 'deceased';
  * Person status DERIVES from livingStatus; unknown is treated as living per. No
  * independent statusHistory field exists on person entities a second source of truth would
  * drift against the living-person compliance lane.
+ *
+ * DISPLAY-FORBIDDEN: this governs privacy/redaction gates (treatAsLiving, commemorative-location
+ * checks) ONLY. Never use this to render a public status badge — public display derives status
+ * from `deriveCatalogEntityStatus` in derive-catalog-status.ts, which reports 'unknown' honestly
+ * instead of collapsing it to 'living'.
  */
 export function personStatusFromLiving(
   livingStatus: LivingStatus | undefined,

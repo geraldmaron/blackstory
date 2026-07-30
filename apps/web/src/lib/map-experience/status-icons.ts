@@ -8,11 +8,13 @@ import {
   faBuilding,
   faCircle,
   faCirclePause,
+  faCircleQuestion,
   faClockRotateLeft,
   faGavel,
   faScaleBalanced,
   faUser,
   faUserSlash,
+  faHourglassHalf,
 } from '@fortawesome/free-solid-svg-icons';
 
 const STATUS_ICONS: Readonly<Record<string, IconDefinition>> = {
@@ -21,6 +23,8 @@ const STATUS_ICONS: Readonly<Record<string, IconDefinition>> = {
   inactive: faCirclePause,
   living: faUser,
   deceased: faUserSlash,
+  presumed_deceased: faHourglassHalf,
+  unknown: faCircleQuestion,
   in_force: faScaleBalanced,
   amended: faGavel,
   repealed: faBan,

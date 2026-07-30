@@ -5,9 +5,12 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   buildReleaseSourceFromLandscape,
+  buildArtifactsForEntry,
+  canonicalUpsertParamsFromLandscape,
   gateLandscapePublishCandidate,
   incrementalPublishProvenancePatch,
   jurisdictionFromProvenance,
+  parseCanonicalStatusSnapshot,
   toReleaseEntityRow,
   type LandscapePublishRow,
 } from './incremental-publish.ts';
@@ -137,4 +140,88 @@ test('incrementalPublishProvenancePatch records publish metadata', () => {
   const patch = incrementalPublishProvenancePatch('dc-black-history-sites-b10');
   assert.equal(patch.publishedReleaseEntityId, 'dc-black-history-sites-b10');
   assert.ok(typeof patch.incremental_publish === 'string');
+});
+
+test('parseCanonicalStatusSnapshot maps bb_canonical row fields', () => {
+  const snapshot = parseCanonicalStatusSnapshot({
+    entity_id: 'ent-1',
+    living_status: 'deceased',
+    status_history: [],
+    kind_detail: {},
+  });
+  assert.equal(snapshot?.livingStatus, 'deceased');
+});
+
+test('buildArtifactsForEntry publishes canonical deceased even when personReview says living', () => {
+  const reviewed = baseRow({
+    kind: 'person',
+    summary:
+      'A'.repeat(120) +
+      ' A community leader who was assassinated in 1968 during the struggle for civil rights in Washington, DC.',
+    payload: {
+      personReview: {
+        approved: true,
+        approvedBy: 'operator',
+        approvedAt: '2026-07-28T00:00:00.000Z',
+        basis: 'deceased historical figure',
+        livingStatus: 'living',
+      },
+    },
+  });
+  const gate = gateLandscapePublishCandidate({
+    row: reviewed,
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+    canonicalStatus: { livingStatus: 'deceased' },
+  });
+  assert.equal(gate.eligible, true);
+  if (!gate.eligible) return;
+  const built = buildArtifactsForEntry({
+    entry: gate.entry,
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+    canonicalStatus: { livingStatus: 'deceased' },
+  });
+  assert.equal(built.ok, true);
+  if (!built.ok) return;
+  assert.equal((built.entityRow.projection as { status?: string }).status, 'deceased');
+});
+
+test('toReleaseEntityRow normalizes empty related to array', () => {
+  const result = gateLandscapePublishCandidate({
+    row: baseRow(),
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+  });
+  assert.equal(result.eligible, true);
+  if (!result.eligible) return;
+  const build = buildReleaseEntityArtifacts(result.entry, {
+    releaseId: 'rel_seed_001',
+    generatedAt: '2026-07-22T00:00:00.000Z',
+  });
+  assert.equal(build.ok, true);
+  if (!build.ok) return;
+  const row = toReleaseEntityRow(build.projection);
+  assert.ok(Array.isArray(row.related));
+  assert.deepEqual(row.related, []);
+});
+
+test('canonicalUpsertParamsFromLandscape maps personReview livingStatus', () => {
+  const params = canonicalUpsertParamsFromLandscape(
+    baseRow({
+      kind: 'person',
+      payload: {
+        personReview: {
+          approved: true,
+          approvedBy: 'operator',
+          approvedAt: '2026-07-28T00:00:00.000Z',
+          basis: 'deceased historical figure',
+          livingStatus: 'deceased',
+        },
+      },
+    }),
+    'dc-black-history-sites-b10',
+  );
+  assert.equal(params.livingStatus, 'deceased');
+  assert.equal(params.kind, 'person');
 });

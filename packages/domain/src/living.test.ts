@@ -15,8 +15,15 @@ test('deriveLivingStatus returns deceased when a death year is present', () => {
   assert.equal(deriveLivingStatus({ birthYear: 1929, deathYear: 1968 }), 'deceased');
 });
 
-test('deriveLivingStatus returns deceased for an implausibly old birth year with no death year', () => {
-  assert.equal(deriveLivingStatus({ birthYear: 1850, asOfYear: 2026 }), 'deceased');
+test('deriveLivingStatus returns presumed_deceased for an implausibly old birth year with no death year', () => {
+  assert.equal(deriveLivingStatus({ birthYear: 1850, asOfYear: 2026 }), 'presumed_deceased');
+});
+
+test('deriveLivingStatus stays unknown when recent life evidence blocks BDP', () => {
+  assert.equal(
+    deriveLivingStatus({ birthYear: 1850, asOfYear: 2026, recentLifeEvidence: true }),
+    DEFAULT_LIVING_STATUS,
+  );
 });
 
 test('deriveLivingStatus stays unknown for a plausible living-age birth year', () => {

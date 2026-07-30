@@ -76,6 +76,41 @@ export {
 } from './build.js';
 export type { GraphReleaseArtifactInput, GraphReleaseArtifact } from './build.js';
 
+export {
+  deriveGraphActiveSpans,
+  deriveGraphDecadeBucketInput,
+  deriveGraphDecadeLabelsFromSpans,
+} from './decade-spans.js';
+export type { GraphDecadeSpanInput } from './decade-spans.js';
+
+export {
+  auditGraphReleaseArtifact,
+  graphPublishAuditFailureMessage,
+  graphPublishAuditPasses,
+} from './publish-audit.js';
+export type {
+  GraphEdgeDropReason,
+  GraphEdgeDrop,
+  AdjacencyCapHit,
+  GraphPublishAuditReport,
+  AuditGraphReleaseArtifactInput,
+} from './publish-audit.js';
+
+export {
+  serializeGraphAdjacency,
+  serializeGraphDecadeView,
+  serializeGraphAllTimeView,
+  decadeIntegerFromLabel,
+  parseStoredDecadeView,
+  parseStoredAllTimeView,
+  graphReleaseArtifactFromStored,
+} from './artifact-serialize.js';
+export type {
+  StoredGraphAdjacencyRow,
+  StoredGraphDecadeRow,
+  StoredGraphAllTimeRow,
+} from './artifact-serialize.js';
+
 export { extractCatalogRelationships, relatedEntriesFromRelationships } from './catalog-related.js';
 export type {
   CatalogRelatedEntry,
@@ -85,8 +120,21 @@ export type {
 } from './catalog-related.js';
 
 export {
+  buildCoParticipationLinks,
+  coParticipationNeighborsForEntity,
+  formatCoParticipationSummary,
+} from './co-participation.js';
+export type {
+  EventParticipationRow,
+  CoParticipationLink,
+  CoParticipationNeighbor,
+  BuildCoParticipationLinksOptions,
+} from './co-participation.js';
+
+export {
   RELATIONSHIP_CANDIDATE_TYPES,
   RELATIONSHIP_CANDIDATE_REASONS,
+  DEFAULT_RELATIONSHIP_CANDIDATE_CAP,
   proposeRelationshipCandidates,
 } from './relationship-candidates.js';
 export type {

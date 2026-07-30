@@ -70,6 +70,47 @@ test('persons derive livingStatus from death cues', () => {
   assert.equal(derived.statusHistory, undefined);
 });
 
+test('was lynched by a white mob yields deceased', () => {
+  const derived = deriveCatalogEntityStatus({
+    id: 'lynching_isaac_mcghie_duluth_minnesota',
+    kind: 'person',
+    summary: 'Isaac McGhie was lynched by a white mob in Duluth, Minnesota, in 1920.',
+  });
+  assert.equal(derived.livingStatus, 'deceased');
+  assert.equal(derived.status, 'deceased');
+});
+
+test('parenthetical life range yields deceased', () => {
+  const derived = deriveCatalogEntityStatus({
+    id: 'ent_person_life_range',
+    kind: 'person',
+    summary: 'Mary Church Terrell (1885–1952) organized for suffrage and civil rights.',
+  });
+  assert.equal(derived.livingStatus, 'deceased');
+  assert.equal(derived.status, 'deceased');
+});
+
+test('Lynch surname alone does not yield deceased', () => {
+  const derived = deriveCatalogEntityStatus({
+    id: 'ent_person_lynch_surname',
+    kind: 'person',
+    summary: 'Loretta Lynch argued the case before the Court.',
+  });
+  assert.equal(derived.livingStatus, 'unknown');
+  assert.equal(derived.status, 'unknown');
+});
+
+test('explicit livingStatus unknown publishes status unknown never living', () => {
+  const derived = deriveCatalogEntityStatus({
+    id: 'ent_person_unknown',
+    kind: 'person',
+    summary: 'An educator whose later life is not yet established from evidence.',
+    livingStatus: 'unknown',
+  });
+  assert.equal(derived.livingStatus, 'unknown');
+  assert.equal(derived.status, 'unknown');
+});
+
 test('authored statusHistory is preserved', () => {
   const history = [
     {

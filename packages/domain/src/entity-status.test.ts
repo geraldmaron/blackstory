@@ -86,6 +86,7 @@ test('statusAsOf answers "what was this entity\'s status in decade D" point-in-t
 test('personStatusFromLiving derives status from livingStatus, unknown treated as living', () => {
   assert.equal(personStatusFromLiving('living'), 'living');
   assert.equal(personStatusFromLiving('deceased'), 'deceased');
+  assert.equal(personStatusFromLiving('presumed_deceased'), 'deceased');
   assert.equal(personStatusFromLiving('unknown'), 'living');
   assert.equal(personStatusFromLiving(undefined), 'living');
 });

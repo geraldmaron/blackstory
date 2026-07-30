@@ -8,64 +8,43 @@
  */
 import {
   buildGraphReleaseArtifact,
+  deriveGraphDecadeBucketInput,
   type DecadeBucketEntityInput,
   type GraphReleaseArtifact,
 } from '@repo/domain';
 import { listPublicEntities, type PublicEntityView } from './public-seed';
 import { resolveHistoryRelationships } from '../lib/history/resolve-history-relationships';
+import {
+  fetchStoredGraphReleaseArtifact,
+  historyGraphInProcessFallbackEnabled,
+} from '../lib/public-data/release-graph-readers';
 
 export const HISTORY_GRAPH_RELEASE_ID = 'seed-snapshot';
 export const HISTORY_GRAPH_GENERATED_AT = '2026-07-17T00:00:00.000Z';
-
-function activeSpansFor(entity: PublicEntityView): DecadeBucketEntityInput['activeSpans'] {
-  if (entity.statusHistory && entity.statusHistory.length > 0) {
-    // Records without a validFrom cannot be placed in a decade bucket — skip them.
-    return entity.statusHistory.flatMap((record) =>
-      record.validFrom !== undefined
-        ? [
-            {
-              validFrom: record.validFrom,
-              ...(record.validTo !== undefined ? { validTo: record.validTo } : {}),
-              datePrecision: record.datePrecision,
-            },
-          ]
-        : [],
-    );
-  }
-  if (entity.eventWindow?.startAt) {
-    return [
-      {
-        validFrom: entity.eventWindow.startAt,
-        ...(entity.eventWindow.endAt !== undefined ? { validTo: entity.eventWindow.endAt } : {}),
-        datePrecision: entity.eventWindow.datePrecision,
-      },
-    ];
-  }
-  if (entity.eraBuckets && entity.eraBuckets.length > 0) {
-    const first = entity.eraBuckets[0]!;
-    const last = entity.eraBuckets[entity.eraBuckets.length - 1]!;
-    const startYear = first.slice(0, 4);
-    const endYear = last.slice(0, 4);
-    return [
-      {
-        validFrom: startYear,
-        validTo: `${Number.parseInt(endYear, 10) + 9}`,
-        datePrecision: 'year',
-      },
-    ];
-  }
-  return [];
-}
 
 function decadeBucketInputs(
   entities: readonly PublicEntityView[],
 ): readonly DecadeBucketEntityInput[] {
   return entities
-    .map((entity) => {
-      const activeSpans = activeSpansFor(entity);
-      if (activeSpans.length === 0) return undefined;
-      return { entityId: entity.id, activeSpans };
-    })
+    .map((entity) =>
+      deriveGraphDecadeBucketInput({
+        entityId: entity.id,
+        kind: entity.kind,
+        eraBuckets: entity.eraBuckets,
+        statusHistory: entity.statusHistory,
+        ...(entity.eventWindow?.startAt
+          ? {
+              eventWindow: {
+                startAt: entity.eventWindow.startAt,
+                ...(entity.eventWindow.endAt !== undefined
+                  ? { endAt: entity.eventWindow.endAt }
+                  : {}),
+                datePrecision: entity.eventWindow.datePrecision,
+              },
+            }
+          : {}),
+      }),
+    )
     .filter((input): input is DecadeBucketEntityInput => input !== undefined);
 }
 
@@ -117,4 +96,28 @@ export function getHistoryGraphReleaseArtifact(
 /** Resets the memoized artifact cache — test-only hook. */
 export function resetHistoryGraphReleaseArtifactForTests(): void {
   artifactCache.clear();
+}
+
+export type ResolveHistoryGraphReleaseOptions = HistoryGraphReleaseOptions & {
+  readonly generatedAt?: string;
+};
+
+/**
+ * Resolves the graph release artifact: prefers stored bb_public.release_graph_* payloads,
+ * falling back to in-process build when HISTORY_GRAPH_IN_PROCESS_FALLBACK=1 or stored rows
+ * are absent.
+ */
+export async function resolveHistoryGraphReleaseArtifact(
+  entities: readonly PublicEntityView[] = listPublicEntities(),
+  options: ResolveHistoryGraphReleaseOptions = {},
+): Promise<GraphReleaseArtifact> {
+  const releaseId = options.releaseId ?? HISTORY_GRAPH_RELEASE_ID;
+  const generatedAt = options.generatedAt ?? HISTORY_GRAPH_GENERATED_AT;
+
+  if (!historyGraphInProcessFallbackEnabled() && releaseId !== HISTORY_GRAPH_RELEASE_ID) {
+    const stored = await fetchStoredGraphReleaseArtifact({ releaseId, generatedAt });
+    if (stored) return stored;
+  }
+
+  return getHistoryGraphReleaseArtifact(entities, { ...options, releaseId });
 }

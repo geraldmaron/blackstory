@@ -39,10 +39,14 @@
 import {
   NOTABILITY_CRITERIA,
   NOTABILITY_RUBRIC,
+  currentStatus,
+  type EntityStatusValue,
   type NotabilityBasisRecord,
   type NotabilityCriterion,
+  type StatusHistoryEntry,
 } from '../entity-status.js';
 import { deriveCatalogEntityStatus } from '../derive-catalog-status.js';
+import type { LivingStatus } from '../living.js';
 import { sanitizePublicProseText } from '../editorial/prose-links.js';
 import { evaluateNotabilityGate } from '../relevance/notability-gate.js';
 import { evaluateFactPublishGate } from '../facts/publish-gate.js';
@@ -166,6 +170,27 @@ export type ReleaseBuildContext = {
   };
   /** Shorthand for `geoIntegrity.stateBoundaries` when no other geo-integrity options are needed. */
   readonly stateBoundaries?: StateBoundaryIndex;
+  /**
+   * Authoritative lifecycle status from `bb_canonical.entities`. When present for an entity,
+   * canonical values win over heuristic derivation from summary text.
+   */
+  readonly canonicalStatus?: CanonicalStatusSnapshot;
+};
+
+/** Where release projection status fields were resolved. */
+export type StatusProvenance = 'canonical' | 'derived_heuristic';
+
+/** Canonical lifecycle fields loaded at publish time (subset of bb_canonical.entities). */
+export type CanonicalStatusSnapshot = {
+  readonly livingStatus?: LivingStatus | 'not_applicable';
+  readonly statusHistory?: readonly StatusHistoryEntry<EntityStatusValue>[];
+};
+
+export type ResolvedReleaseProjectionStatus = {
+  readonly status?: EntityStatusValue | 'living' | 'deceased' | 'unknown';
+  readonly statusHistory?: readonly StatusHistoryEntry<EntityStatusValue>[];
+  readonly livingStatus?: LivingStatus;
+  readonly statusProvenance: StatusProvenance;
 };
 
 export type ReleaseEntityProjectionFields = {
@@ -196,6 +221,10 @@ export type ReleaseEntityProjectionFields = {
     readonly datePrecision: string;
     readonly basisClaimIds: readonly string[];
   }[];
+  /** Person living-status signal (canonical-first at publish). */
+  readonly livingStatus?: LivingStatus;
+  /** Whether status/livingStatus came from canonical or heuristic backstop. */
+  readonly statusProvenance?: StatusProvenance;
   readonly eraBuckets?: readonly string[];
   readonly sensitivityClass?: string;
   readonly topicTags: readonly string[];
@@ -607,6 +636,89 @@ function resolveRelatedEntries(
   return validated;
 }
 
+function personPublicStatusFromLiving(livingStatus: LivingStatus): 'living' | 'deceased' | 'unknown' {
+  if (livingStatus === 'deceased') return 'deceased';
+  if (livingStatus === 'living') return 'living';
+  return 'unknown';
+}
+
+function canonicalHasAssertedStatus(
+  entry: ReleaseSourceEntity,
+  canonical: CanonicalStatusSnapshot | undefined,
+): boolean {
+  if (!canonical) return false;
+  if (entry.kind === 'person') {
+    return canonical.livingStatus !== undefined && canonical.livingStatus !== 'not_applicable';
+  }
+  return (canonical.statusHistory?.length ?? 0) > 0;
+}
+
+/**
+ * Resolves public projection status fields canonical-first, then entry statusHistory via
+ * `currentStatus`, then `deriveCatalogEntityStatus` as heuristic backstop.
+ */
+export function resolveReleaseProjectionStatus(
+  entry: ReleaseSourceEntity,
+  canonical: CanonicalStatusSnapshot | undefined,
+): ResolvedReleaseProjectionStatus {
+  if (canonicalHasAssertedStatus(entry, canonical) && canonical) {
+    if (entry.kind === 'person') {
+      const livingStatus = canonical.livingStatus as LivingStatus;
+      return {
+        livingStatus,
+        status: personPublicStatusFromLiving(livingStatus),
+        statusProvenance: 'canonical',
+      };
+    }
+    const statusHistory = canonical.statusHistory ?? [];
+    const status = currentStatus(statusHistory);
+    return {
+      ...(statusHistory.length > 0 ? { statusHistory } : {}),
+      ...(status !== undefined ? { status } : {}),
+      statusProvenance: 'canonical',
+    };
+  }
+
+  if (entry.statusHistory && entry.statusHistory.length > 0 && entry.kind !== 'person') {
+    const statusHistory = entry.statusHistory as readonly StatusHistoryEntry<EntityStatusValue>[];
+    const status = currentStatus(statusHistory) ?? entry.status;
+    return {
+      statusHistory,
+      ...(status !== undefined ? { status: status as EntityStatusValue | 'living' | 'deceased' | 'unknown' } : {}),
+      statusProvenance: 'derived_heuristic',
+    };
+  }
+
+  const derived = deriveCatalogEntityStatus({
+    id: entry.id,
+    kind: entry.kind,
+    displayName: entry.displayName,
+    summary: entry.summary,
+    ...(entry.historicalContext !== undefined
+      ? { historicalContext: entry.historicalContext }
+      : {}),
+    ...(entry.eraBuckets !== undefined ? { eraBuckets: entry.eraBuckets } : {}),
+    ...(entry.claims !== undefined ? { claims: entry.claims } : {}),
+    ...(entry.statusHistory !== undefined ? { statusHistory: entry.statusHistory as never } : {}),
+    ...(entry.status !== undefined ? { status: entry.status } : {}),
+    ...(entry.livingStatus !== undefined ? { livingStatus: entry.livingStatus } : {}),
+  });
+
+  return {
+    ...(derived.status !== undefined ? { status: derived.status } : {}),
+    ...(derived.statusHistory !== undefined ? { statusHistory: derived.statusHistory } : {}),
+    ...(derived.livingStatus !== undefined ? { livingStatus: derived.livingStatus } : {}),
+    statusProvenance: 'derived_heuristic',
+  };
+}
+
+/** Ensures empty related is always an array, never a legacy `{}` object. */
+export function normalizeReleaseRelated(
+  related: readonly PublicRelatedEntry[] | undefined,
+): readonly PublicRelatedEntry[] {
+  return related ?? [];
+}
+
 /**
  * The single deterministic release/projection builder (the related workstream). Given one source entry,
  * produces BOTH the entity-projection fields and the search-index fields from the same claims,
@@ -686,23 +798,10 @@ export function buildReleaseEntityArtifacts(
   const notabilityLabels = [
     ...new Set(notabilityBasis.map((basis) => NOTABILITY_RUBRIC[basis.criterion])),
   ];
-  const related = resolveRelatedEntries(entry, context);
-  const derivedStatus = deriveCatalogEntityStatus({
-    id: entry.id,
-    kind: entry.kind,
-    displayName: entry.displayName,
-    summary: entry.summary,
-    ...(entry.historicalContext !== undefined
-      ? { historicalContext: entry.historicalContext }
-      : {}),
-    ...(entry.eraBuckets !== undefined ? { eraBuckets: entry.eraBuckets } : {}),
-    ...(entry.claims !== undefined ? { claims: entry.claims } : {}),
-    ...(entry.statusHistory !== undefined ? { statusHistory: entry.statusHistory as never } : {}),
-    ...(entry.status !== undefined ? { status: entry.status } : {}),
-    ...(entry.livingStatus !== undefined ? { livingStatus: entry.livingStatus } : {}),
-  });
-  const publicStatus = derivedStatus.status ?? entry.status;
-  const publicStatusHistory = derivedStatus.statusHistory;
+  const related = normalizeReleaseRelated(resolveRelatedEntries(entry, context));
+  const resolvedStatus = resolveReleaseProjectionStatus(entry, context.canonicalStatus);
+  const publicStatus = resolvedStatus.status;
+  const publicStatusHistory = resolvedStatus.statusHistory;
 
   const projection: ReleaseEntityProjectionFields = {
     id: entry.id,
@@ -726,6 +825,10 @@ export function buildReleaseEntityArtifacts(
     ...(publicStatus !== undefined ? { status: publicStatus } : {}),
     ...(publicStatusHistory !== undefined && publicStatusHistory.length > 0
       ? { statusHistory: publicStatusHistory }
+      : {}),
+    ...(resolvedStatus.livingStatus !== undefined ? { livingStatus: resolvedStatus.livingStatus } : {}),
+    ...(resolvedStatus.statusProvenance !== undefined
+      ? { statusProvenance: resolvedStatus.statusProvenance }
       : {}),
     ...(entry.eraBuckets !== undefined ? { eraBuckets: entry.eraBuckets } : {}),
     ...(entry.sensitivityClass !== undefined ? { sensitivityClass: entry.sensitivityClass } : {}),
