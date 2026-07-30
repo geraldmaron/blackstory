@@ -76,17 +76,21 @@ The current dark plate is not readable as a map. v9 sets minimum separation betw
 
 | Role | Light | Dark | Rule |
 |---|---|---|---|
-| `--map-land` | `#f6f2e9` | `#221f1a` | Base. |
-| `--map-water` | `#d5cbb6` | `#0a0a0c` | ≥ 18 ΔL from land at both themes. |
-| `--map-green` | `#ebe5d1` | `#272319` | Parks/wood, subtle. |
-| `--map-line` (state) | `#bdb19a` | `#453f35` | State boundary. Dashed `[3,2]`. |
-| `--map-line-2` (country) | `#a2957c` | `#5c5446` | Country boundary. Solid, heavier. |
-| `--map-road` | `#e6dcc6` | `#302b23` | Motorway/trunk/primary, `minzoom: 6`. |
-| `--map-label` | `#6d675f` | `#9a9284` | State labels, uppercase, `letter-spacing: .16`. |
-| `--map-label-hi` | `#2e2a24` | `#ded7c9` | City/town labels. |
-| `--map-halo` | `#f8f5ee` | `#16130f` | Label halo, `width: 1.2–1.4`. |
+| `--ds-map-land` | `#f6f2e9` | `#38332b` | Base. |
+| `--ds-map-water` | `#c7bdaa` | `#0a0a0c` | ≥ 18 ΔL\* from land at both themes. |
+| `--ds-map-green` | `#ebe5d1` | `#3e3728` | Parks/wood, subtle. |
+| `--ds-map-line` (state) | `#bdb19a` | `#665e4f` | State boundary. Dashed `[3,2]`. |
+| `--ds-map-line-2` (country) | `#a2957c` | `#776c5a` | Country boundary. Solid, heavier. |
+| `--ds-map-road` | `#e6dcc6` | `#474034` | Motorway/trunk/primary, `minzoom: 6`. |
+| `--ds-map-label` | `#6d675f` | `#9e9587` | State labels, uppercase, `letter-spacing: .16`. |
+| `--ds-map-label-hi` | `#2e2a24` | `#ded7c9` | City/town labels. |
+| `--ds-map-halo` | `#f8f5ee` | `#16130f` | Label halo, `width: 1.2–1.4`. |
 
-**Contract test:** a unit test asserts ≥ 18 relative-luminance-delta between `--map-land` and `--map-water`, and between `--map-land` and `--map-line`, in both themes. See WP-02.
+**Metric:** separation is **CIE L\*** (0–100, perceptually uniform), not WCAG relative luminance. Y is compressed near black — on a dark plate two visibly different colors sit a fraction of a Y point apart, so a Y-based threshold is unreachable by construction. Text contrast (`label-hi` on `land`) still uses the WCAG ratio, which is what WCAG defines.
+
+**Contract test:** `packages/ui/src/tokens/map-contrast.test.ts` asserts, in both themes, ΔL\* ≥ 18 land/water, ≥ 18 land/line, ≥ 24 land/line-2, ≥ 40 label/land, and ≥ 4.5:1 contrast for label-hi on land. See WP-02.
+
+> **Amended 2026-07-30 (owner-approved).** The values first published in this table failed their own contract: dark land/water was 9.14 ΔL\* and dark land/line 15.03, both short of 18; light land/water was 13.61. Dark was not fixable by darkening water — water was already near-black, and even pure `#000000` reaches only 11.92 against the original land — so **`--ds-map-land` was lightened** in dark theme and `green`, `line`, `line-2`, `road` and `label` were moved to keep their relationships to it. Light theme changed one value (`water`). The page canvas (`--ds-canvas`, `#0a0a0a`) is untouched: only the landmass lightened. Prefix is `--ds-map-*`, matching the `--ds-*` rule for every other token in `tokens.css`.
 
 **Label field expression:** always
 ```js

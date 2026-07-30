@@ -87,6 +87,59 @@ export const darkTheme: ThemePalette = {
   accentMuted: brandPalette.pageSand,
 };
 
+/**
+ * Map plate roles. Consumed by the MapLibre style builders, which emit JSON rather than CSS, so
+ * these hexes are the source of truth and `--ds-map-*` in tokens.css mirrors them.
+ *
+ * The separations between adjacent roles are a contract enforced by `map-contrast.test.ts`:
+ * a plate whose land and water sit close together stops reading as a map at continental zoom.
+ */
+export type MapPalette = {
+  readonly land: string;
+  readonly water: string;
+  /** Parks and wood. Subtle against land by design. */
+  readonly green: string;
+  /** State boundary. Dashed. */
+  readonly line: string;
+  /** Country boundary. Solid and heavier than `line`. */
+  readonly line2: string;
+  readonly road: string;
+  /** State labels. */
+  readonly label: string;
+  /** City and town labels. Carries body-size text, so it is contrast-checked against land. */
+  readonly labelHi: string;
+  readonly halo: string;
+};
+
+export const lightMap: MapPalette = {
+  land: '#f6f2e9',
+  water: '#c7bdaa',
+  green: '#ebe5d1',
+  line: '#bdb19a',
+  line2: '#a2957c',
+  road: '#e6dcc6',
+  label: '#6d675f',
+  labelHi: '#2e2a24',
+  halo: '#f8f5ee',
+};
+
+export const darkMap: MapPalette = {
+  land: '#38332b',
+  water: '#0a0a0c',
+  green: '#3e3728',
+  line: '#665e4f',
+  line2: '#776c5a',
+  road: '#474034',
+  label: '#9e9587',
+  labelHi: '#ded7c9',
+  halo: '#16130f',
+};
+
+export const mapPalettes = {
+  light: lightMap,
+  dark: darkMap,
+} as const;
+
 export const lightStatus: Record<'warning' | 'dispute' | 'error', StatusPalette> = {
   warning: {
     fg: '#6B4A17',

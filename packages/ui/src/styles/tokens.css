@@ -58,6 +58,21 @@
   --ds-viz-3: #6d675f;
   --ds-viz-4: #d8a178;
   --ds-viz-grid: #d7d0c4;
+
+  /*
+   * Map plate roles. Separation between adjacent roles is a contract, not a preference:
+   * map-contrast.test.ts asserts the CIE L* deltas in both themes. Change a value and run
+   * `pnpm --filter @repo/ui test` before assuming it is safe.
+   */
+  --ds-map-land: #f6f2e9;
+  --ds-map-water: #c7bdaa;
+  --ds-map-green: #ebe5d1;
+  --ds-map-line: #bdb19a;
+  --ds-map-line-2: #a2957c;
+  --ds-map-road: #e6dcc6;
+  --ds-map-label: #6d675f;
+  --ds-map-label-hi: #2e2a24;
+  --ds-map-halo: #f8f5ee;
 }
 
 [data-theme='dark'] {
@@ -112,6 +127,21 @@
   --ds-viz-3: #bdb5a9;
   --ds-viz-4: #d8a178;
   --ds-viz-grid: #34302c;
+
+  /*
+   * Map plate roles. The landmass is deliberately lighter than the page canvas: water is already
+   * at the floor, so land is the only side of the land/water pair with room to move, and without
+   * that separation coastlines and state lines vanish at continental zoom. See map-contrast.test.ts.
+   */
+  --ds-map-land: #38332b;
+  --ds-map-water: #0a0a0c;
+  --ds-map-green: #3e3728;
+  --ds-map-line: #665e4f;
+  --ds-map-line-2: #776c5a;
+  --ds-map-road: #474034;
+  --ds-map-label: #9e9587;
+  --ds-map-label-hi: #ded7c9;
+  --ds-map-halo: #16130f;
 }
 
 :root {
