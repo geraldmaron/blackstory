@@ -92,8 +92,20 @@ P1  Camera             WP-05 … WP-08     the headline capability
 P2  Chrome             WP-09 … WP-15     the instrument surfaces
 P3  Record + QoL       WP-16 … WP-20     save, cite, share, sheet
 P4  Story mode         WP-21 … WP-22     scroll cinema
-P5  Consolidation      WP-23 … WP-26     decompose monoliths, retire v6, docs
+P5  Consolidation      WP-23 … WP-28     decompose monoliths, mount, retire v6, docs
 ```
+
+> **Amended 2026-07-30.** P5 originally ran WP-23 … WP-26 and made WP-23 responsible for both
+> decomposing `ExploreMapExperience.tsx` *and* composing the new instruments into it. Those two
+> jobs contradict each other: WP-23 is specified behaviour-preserving with "an edited existing
+> test is the stop signal" (§5), but mounting chrome that a surface has never had is a behaviour
+> change and will require editing existing tests. An agent following the original package could
+> not satisfy both halves.
+>
+> The two jobs are now separate. **WP-23 decomposes only.** **WP-27 mounts.** A second gap fell
+> out of the same review: eleven built modules had no package that mounted them at all, and the
+> `--ds-map-*` plate tokens had no package that wired them, so **WP-28** now owns the plate.
+> Nothing built in P0 to P4 reaches a reader until WP-27 and WP-28 run.
 
 Phases are gates. Do not start P1 until every P0 package is closed and green.
 
@@ -541,12 +553,20 @@ Cold open: `History happened here.` split into word spans with 130ms stagger, `t
 
 ### WP-23 · Decompose `ExploreMapExperience.tsx` — **Sonnet**
 
-**Depends on:** WP-11, WP-12, WP-13, WP-16, WP-17.
+**Depends on:** nothing. This package no longer waits on the chrome packages — see below.
 **Touches:** `apps/web/src/app/(map)/explore/ExploreMapExperience.tsx` and new sibling modules.
 
-2,207 lines to an orchestrator under 400 that composes the P2/P3 components. Extract state into hooks under `app/(map)/explore/hooks/`.
+2,207 lines to an orchestrator under 400. Extract state into hooks under `app/(map)/explore/hooks/`.
 
-**Behaviour-preserving only.** No feature changes in this package. Every existing test must pass untouched; if a test needs editing, you have changed behaviour — stop and file a bead instead.
+**Decomposition only. Do not mount anything new.** This package reorganises the code that is
+already there and nothing else. It does not import `LensPanel`, `ResultsRail`, `TimePanel`,
+`CommandPalette`, `AnnotationOverlay`, `CameraConsole`, `RecordSheet` or `createCamera`. Mounting
+those is WP-27, and keeping the two apart is what makes this diff reviewable: a 1,800-line
+restructure with feature changes folded in cannot be bisected when something regresses.
+
+**Behaviour-preserving only.** Every existing test must pass untouched; if a test needs editing,
+you have changed behaviour — stop and file a bead instead. That stop signal is only meaningful
+because this package adds no features, which is why its dependency list is now empty.
 
 ---
 
@@ -561,10 +581,14 @@ Cold open: `History happened here.` split into word spans with 130ms stagger, `t
 
 ### WP-25 · Route consolidation — **Sonnet**
 
-**Depends on:** WP-10, WP-23.
+**Depends on:** WP-10, WP-27. (Was WP-23; WP-27 is what actually makes `/` an Atlas.)
 **Touches:** `apps/web/src/app/(map)/page.tsx`, `app/(map)/explore/page.tsx`, redirects.
 
 `/` becomes the Atlas. `/explore` 308s to `/`. Story is a mode on `/`, not a route.
+
+**This is the irreversible package.** Do not start it without explicit owner approval, and do not
+start it before WP-27 has shipped and been looked at in a browser. Redirecting `/explore` to a `/`
+that is still the old surface loses a working route and gains nothing.
 
 **Before shipping:** every route in `docs/ui/README.md`'s pattern table must still resolve. Add a redirect test asserting `/explore` → `/` and that no previously-public URL 404s. Preserve SEO metadata and canonical tags.
 
@@ -585,18 +609,79 @@ Cold open: `History happened here.` split into word spans with 130ms stagger, `t
 
 ---
 
+### WP-27 · Atlas composition — **Sonnet**
+
+**Depends on:** WP-05, WP-06, WP-07, WP-09, WP-10, WP-11, WP-12, WP-13, WP-14, WP-15, WP-16, WP-17, WP-18, WP-23, WP-24.
+**Touches:** `apps/web/src/app/(map)/explore/ExploreMapExperience.tsx`, `app/(map)/explore/hooks/`, `app/(map)/MapStage.tsx` (props only), and the tests those changes break.
+
+The package that makes the archive reachable. Everything P0 to P4 built is inert until this runs:
+the modules exist, typecheck and have tests, but nothing renders a time panel, constructs a camera
+or draws a corridor.
+
+Mount, in this order, verifying in a browser after each:
+
+1. `createCamera` against the live `MapStage` handle, wired to `chromePadding()` and the reduced
+   motion query. Supply every `CameraDeps` member, including `setRoutes` and `setSpotlight`.
+2. `CommandPalette` + `useCommandPaletteShortcut`, with a fully populated `CommandContext`. The
+   context's members are required on purpose: if one has no real handler yet, that is a missing
+   feature to file, not a no-op to stub.
+3. `LensPanel`, `ResultsRail`, `TimePanel`, `CameraConsole`, `RecordSheet` over the existing view
+   model.
+4. `AnnotationOverlay`, fed `MIGRATION_CORRIDORS` and toggled by the same routes flag `trace()`
+   sets.
+5. Retire the v6 chrome the above replaces. Delete it; do not leave both mounted behind a flag.
+
+**Behaviour changes here, and that is the point.** Existing tests for the v6 chrome will fail
+because that chrome is gone. Editing or deleting those tests is expected in this package and only
+in this package — the WP-23 stop signal does not apply. What must not change: record data, status
+derivation, evidence grading, or any URL that previously resolved.
+
+**Acceptance:** on `/explore`, a reader can open the palette with `⌘K`, run every Camera command
+from the keyboard, scrub the decade histogram, toggle corridors and see arcs draw over the map.
+Camera announcements reach the `role="status"` readout. `pnpm test:a11y` green.
+
+**Do not** fold route consolidation in. That is WP-25, it is irreversible, and it needs its own
+approval.
+
+---
+
+### WP-28 · Wire the map plate to the tokens — **Sonnet**
+
+**Depends on:** WP-01.
+**Touches:** `apps/web/src/lib/map-experience/dignity-style.ts`, `app/map/explore-style.ts`, `lib/map-experience/entity-location-map-style.ts`.
+
+The `--ds-map-*` roles ship and are contract-tested, but no style builder reads them: the live map
+still renders `plateForScheme()`'s palette from `dignity-style.ts`. The legibility defect the whole
+plate rework exists to fix is therefore still on screen.
+
+Make `mapPalettes` from `packages/ui/src/tokens/colors.ts` the single source for plate colour and
+delete the duplicate literals. MapLibre styles are JSON, not CSS, so the TypeScript export is the
+source of truth and `tokens.css` is the mirror — not the other way round.
+
+**Acceptance:** no plate hex literal survives outside `colors.ts`. Land and water separate by at
+least 18 ΔL\* on the rendered map in both themes, checked against the design law §3 table.
+Existing style tests pass or are updated to assert the token values rather than the old hexes.
+
+---
+
 ## 4. Sequencing and parallelism
 
 | Wave | Packages | Concurrent agents |
 |---|---|---|
 | 1 | WP-01, WP-03, WP-04, WP-08, WP-19, WP-20 | 6 (all Haiku except none — fully parallel, no shared files) |
 | 2 | WP-02, WP-05, WP-13 | 3 |
-| 3 | WP-06, WP-07, WP-09, WP-11, WP-12 | 5 |
+| 3 | WP-06, WP-07, WP-09, WP-11, WP-12, WP-28 | 6 |
 | 4 | WP-10, WP-14, WP-15, WP-16, WP-17 | 5 |
 | 5 | WP-18, WP-21 | 2 |
 | 6 | WP-22, WP-23 | 2 |
-| 7 | WP-24, WP-25 | 2 |
-| 8 | WP-26 | 1 |
+| 7 | WP-24 | 1 |
+| 8 | WP-27 | 1 |
+| 9 | WP-25 | 1 (owner approval required) |
+| 10 | WP-26 | 1 |
+
+WP-27 runs alone. It is the first package where the surface visibly changes, it touches files two
+other packages just restructured, and it is the only place a regression in the new chrome can
+surface — sharing a wave with it would make an unbisectable diff.
 
 Waves are gates. Run `pnpm lint && pnpm typecheck && pnpm test:js && pnpm test:a11y` on `staging` between waves; a red wave blocks the next.
 
@@ -610,7 +695,8 @@ Waves are gates. Run `pnpm lint && pnpm typecheck && pnpm test:js && pnpm test:a
 | `fitBounds` throwing and killing map init | WP-03's clamp plus try/catch fallback in WP-05. Cost real debug time in the mock; do not skip. |
 | Motion harming reduced-motion or vestibular users | Reduced motion collapses at both CSS and camera level. `M` gives an in-app calm toggle independent of OS setting. |
 | Route loss during consolidation | WP-25 gates on the README pattern table plus a redirect test. |
-| Monolith refactors changing behaviour | WP-23 and WP-24 are behaviour-preserving; an edited existing test is the stop signal. |
+| Monolith refactors changing behaviour | WP-23 and WP-24 are behaviour-preserving; an edited existing test is the stop signal. That signal only works because neither package mounts anything new — adoption is WP-27, where test edits are expected. |
+| Packages that build modules nothing ever renders | WP-27 owns mounting and WP-28 owns the plate. Both were missing from the original plan, and without them every P0 to P4 package ships code no reader reaches. Treat "built and tested" as unfinished until one of those two consumes it. |
 | Results rail repeating the `/history` 4,078-node problem | WP-12 requires windowing, called out explicitly. |
 | Two agents colliding on a file | The `Touches` list is the lock. One writer per file per wave. |
 | Copy drifting from the archive's voice | WP-22 restates the voice rules; unsourced claims get cut, not softened. |

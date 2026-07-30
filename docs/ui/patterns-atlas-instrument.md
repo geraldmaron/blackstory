@@ -389,12 +389,13 @@ Deep links serialize to the params `/explore` already parses (`selected`, `confi
 
 **"Built" means built and tested, not mounted.** Every module above exists, typechecks and has
 tests, but none of them is reachable in the running app yet: nothing on `/explore` renders the
-time panel, constructs the camera, or draws a corridor. Composition is WP-23's job, and WP-23
-depends only on WP-11, WP-12, WP-13, WP-16 and WP-17 — so the overlay, palette, command bar,
-decade transition, keyboard layer and collections have no package that mounts them. Read this
-table as an inventory of parts, and check the epic before assuming a surface uses one.
+time panel, constructs the camera, or draws a corridor. Mounting is **WP-27**, a package added
+after review found that the original plan had no composition step at all. Read this table as an
+inventory of parts, and check WP-27 before assuming a surface uses one.
 
-**Plate wiring is not yet done.** The `--ds-map-*` roles exist and are contract-tested, but the MapLibre style builders still read `dignity-style.ts`'s `plateForScheme`. Until that is wired, the live map renders the old plate. This is not covered by any current work package.
+**Plate wiring is not yet done.** The `--ds-map-*` roles exist and are contract-tested, but the
+MapLibre style builders still read `dignity-style.ts`'s `plateForScheme`. Until that is wired, the
+live map renders the old plate. **WP-28** owns this.
 
 ---
 
