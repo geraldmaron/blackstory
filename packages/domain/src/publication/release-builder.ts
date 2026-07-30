@@ -187,7 +187,7 @@ export type CanonicalStatusSnapshot = {
 };
 
 export type ResolvedReleaseProjectionStatus = {
-  readonly status?: EntityStatusValue | 'living' | 'deceased' | 'unknown';
+  readonly status?: EntityStatusValue | 'living' | 'deceased' | 'presumed_deceased' | 'unknown';
   readonly statusHistory?: readonly StatusHistoryEntry<EntityStatusValue>[];
   readonly livingStatus?: LivingStatus;
   readonly statusProvenance: StatusProvenance;
@@ -705,9 +705,13 @@ export function resolveReleaseProjectionStatus(
   });
 
   return {
-    ...(derived.status !== undefined ? { status: derived.status } : {}),
+    ...(derived.status !== undefined
+      ? { status: derived.status as EntityStatusValue | 'living' | 'deceased' | 'unknown' | 'presumed_deceased' }
+      : {}),
     ...(derived.statusHistory !== undefined ? { statusHistory: derived.statusHistory } : {}),
-    ...(derived.livingStatus !== undefined ? { livingStatus: derived.livingStatus } : {}),
+    ...(derived.livingStatus !== undefined
+      ? { livingStatus: derived.livingStatus as LivingStatus }
+      : {}),
     statusProvenance: 'derived_heuristic',
   };
 }
