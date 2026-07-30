@@ -21,6 +21,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { cx } from '@repo/ui';
+import { isTypingTarget, matchesPaletteOpen } from '../../../lib/keyboard/bindings';
 import { normalizeTypeaheadQuery, typeaheadMatchTier } from '../../../lib/typeahead/match';
 import { COMMANDS, type Command, type CommandContext } from './command-registry';
 import './command-palette.css';
@@ -94,28 +95,22 @@ function Highlighted({ text, query }: { readonly text: string; readonly query: s
   );
 }
 
-/** True when a keystroke belongs to whatever the reader is typing into, not to the page. */
-function isTypingTarget(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) return false;
-  if (target.isContentEditable) return true;
-  return ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
-}
-
 /**
- * The palette's own opening binding, kept here rather than in the shared keyboard layer: `⌘K` is
- * the one shortcut that must work before any of the others are reachable.
+ * The palette's own opening binding. It stays a separate listener because `⌘K` has to work before
+ * any other binding is reachable, but the chords themselves come from the keyboard layer so the
+ * palette and the shortcut sheet cannot disagree about what opens the palette.
  */
 export function useCommandPaletteShortcut(onOpen: () => void): void {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      const commandK = (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k';
-      // `/` opens too, but only when it is not a character the reader meant to type.
-      const slash = event.key === '/' && !event.metaKey && !event.ctrlKey && !event.altKey;
+      if (!matchesPaletteOpen(event)) return;
+      // `/` is also a character the reader may have meant to type. `⌘K` is not, so it opens the
+      // palette from anywhere, including out of a focused search field.
+      const bareSlash = event.key === '/';
+      if (bareSlash && isTypingTarget(event.target)) return;
 
-      if (commandK || (slash && !isTypingTarget(event.target))) {
-        event.preventDefault();
-        onOpen();
-      }
+      event.preventDefault();
+      onOpen();
     };
 
     window.addEventListener('keydown', onKeyDown);

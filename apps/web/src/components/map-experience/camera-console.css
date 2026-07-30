@@ -1,0 +1,134 @@
+/**
+ * Camera console — bottom right, z 20.
+ *
+ * Positioned clear of the time panel: the time panel is centred at `min(760px, 100vw - 24px)`, so
+ * on a narrow viewport the console stacks above it rather than overlapping.
+ */
+
+.ds-camera {
+  position: fixed;
+  right: var(--ds-space-4);
+  bottom: var(--ds-space-4);
+  z-index: 20;
+  display: grid;
+  gap: var(--ds-space-2);
+  width: 210px;
+  padding: var(--ds-space-3);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  box-shadow: 0 10px 30px -18px rgb(0 0 0 / 45%);
+}
+
+.ds-camera__head {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+}
+
+.ds-camera__kicker {
+  flex: 1;
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+}
+
+.ds-camera__zoom {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+  color: var(--ds-ink-muted);
+  cursor: pointer;
+}
+
+.ds-camera__zoom:hover {
+  color: var(--ds-ink);
+  border-color: var(--ds-border-strong);
+}
+
+.ds-camera__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ds-space-1);
+}
+
+.ds-camera__move {
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 7px;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+  color: var(--ds-ink);
+  font-family: inherit;
+  font-size: 0.75rem;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color var(--ds-duration-fast) var(--ds-easing),
+    border-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-camera__move:hover:not(:disabled) {
+  border-color: var(--ds-border-strong);
+  background: var(--ds-canvas);
+}
+
+/*
+ * The copper wash marks the move that just ran, for 2.2s. It is feedback, not selection: the
+ * camera has no persistent "current move".
+ */
+.ds-camera__move--recent {
+  border-color: var(--ds-accent-graphic);
+  background: var(--ds-canvas);
+  color: var(--ds-accent);
+}
+
+.ds-camera__move[aria-pressed='true'] {
+  border-color: var(--ds-accent-graphic);
+  color: var(--ds-accent);
+}
+
+/*
+ * A refused move stays visible and readable. Dimming it into illegibility would hide the fact
+ * that the archive made a choice here, which is the opposite of the intent.
+ */
+.ds-camera__move:disabled {
+  cursor: not-allowed;
+  color: var(--ds-ink-muted);
+  background: var(--ds-canvas);
+  border-style: dashed;
+}
+
+.ds-camera__move-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-camera__key {
+  flex: none;
+}
+
+@media (max-width: 819px) {
+  .ds-camera {
+    right: var(--ds-space-2);
+    bottom: calc(var(--ds-space-2) + 132px);
+    width: 186px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-camera__move {
+    transition-duration: 0.01ms;
+  }
+}
