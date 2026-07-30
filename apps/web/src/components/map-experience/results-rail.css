@@ -13,7 +13,8 @@
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   width: 344px;
-  max-height: calc(100dvh - 56px - var(--ds-space-4) * 2 - 148px);
+  /* Reserves the camera console's own column: 166px of console plus its bottom margin. */
+  max-height: calc(100dvh - 56px - var(--ds-space-4) * 2 - 200px);
   background: var(--ds-surface);
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-md);
@@ -200,14 +201,15 @@
   color: var(--ds-accent);
 }
 
+/* Narrow: bottom sheet, clear of the time panel and the camera console. See lens-panel.css. */
 @media (max-width: 819px) {
   .ds-results {
     top: auto;
     left: var(--ds-space-2);
     right: var(--ds-space-2);
-    bottom: calc(var(--ds-space-4) + 152px);
+    bottom: calc(var(--ds-space-2) + 138px);
     width: auto;
-    max-height: 46dvh;
+    max-height: min(34dvh, 300px);
   }
 }
 

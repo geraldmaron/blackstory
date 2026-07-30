@@ -6,7 +6,7 @@
  * Client-safe: only import `@repo/domain/map/geography` (pure reference data).
  * Do not import `@repo/domain` or `@repo/domain/entity-status` — those pull
  * `@repo/schemas` constitution loaders (`node:fs` / `node:crypto`) into the
- * Next client graph via NarrativeCard → ExploreMapExperience.
+ * Next client graph via NarrativeCard → the explore surface.
  */
 import { findUsStateByPostalCode } from '@repo/domain/map/geography';
 import { DEFAULT_EXPLORE_FILTERS } from './filters';

@@ -379,14 +379,19 @@
 
 /* ---- narrow -------------------------------------------------------------- */
 
+/*
+ * Narrow: the lens becomes a top sheet under the bar and the results rail takes the bottom half.
+ * They must not share a rect — at 787px both were pinned to the same bottom offset and the rail
+ * rendered straight over the lens.
+ */
 @media (max-width: 819px) {
   .ds-lens {
-    top: auto;
+    top: calc(50px + var(--ds-space-2) * 2);
     left: var(--ds-space-2);
     right: var(--ds-space-2);
-    bottom: calc(var(--ds-space-4) + 152px);
+    bottom: auto;
     width: auto;
-    max-height: 46dvh;
+    max-height: min(38dvh, 320px);
   }
 }
 

@@ -10,7 +10,7 @@
 import { FilterBar } from '@repo/ui';
 import { SynchronizedResultList } from '../../../components/map-experience/SynchronizedResultList';
 import { getSharedPublicEntities } from '../shared-map-data';
-import { ExploreMapExperience } from './ExploreMapExperience';
+import { AtlasExperience } from './AtlasExperience';
 import { buildExploreViewModelAsync } from './explore-view-model';
 import { toSerializableExploreViewModel } from './explore-view-model-wire';
 import '../../../components/patterns/browse-mode.css';
@@ -120,7 +120,7 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
         </div>
       </noscript>
 
-      <ExploreMapExperience initial={toSerializableExploreViewModel(view)} />
+      <AtlasExperience initial={toSerializableExploreViewModel(view)} />
     </>
   );
 }

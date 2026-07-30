@@ -8,11 +8,15 @@
  * Destinations that leave the bar do not leave the site. They stay reachable from the palette and
  * from the site footer, and `CommandBar` deliberately does not render a nav menu of its own so
  * there is no third place for that list to drift.
+ *
+ * Branding comes from `BRAND_ASSETS` through the shell's own wordmark classes, so the Atlas bar
+ * and the site header render the same artwork with the same light/dark swap.
  */
 'use client';
 
 import React from 'react';
-import { cx } from '@repo/ui';
+import { BRAND_ASSETS } from '@repo/config';
+import { cx, ShellWordmark } from '@repo/ui';
 import './command-bar.css';
 
 void React;
@@ -32,34 +36,6 @@ export type CommandBarProps = {
   readonly className?: string;
 };
 
-function BrandMark() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <rect
-        x="3.5"
-        y="2.5"
-        width="15"
-        height="19"
-        rx="2.2"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-      <path
-        d="M7 7h7M7 10.5h7"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        strokeLinecap="round"
-        opacity=".55"
-      />
-      <path
-        d="M16.5 12.2c0 2.6-3 5.6-3 5.6s-3-3-3-5.6a3 3 0 1 1 6 0Z"
-        fill="var(--ds-accent-graphic)"
-      />
-      <circle cx="13.5" cy="12.1" r="1.05" fill="var(--ds-surface)" />
-    </svg>
-  );
-}
-
 export function CommandBar({
   mode,
   onModeChange,
@@ -73,9 +49,10 @@ export function CommandBar({
 }: CommandBarProps) {
   return (
     <header className={cx('ds-bar', className)}>
-      <a className="ds-bar__brand" href="/">
-        <BrandMark />
-        <b className="ds-bar__wordmark">BlackStory</b>
+      {/* The same brand component the site header and the admin shell render, so the Atlas
+          cannot drift to its own artwork or its own light/dark pairing. */}
+      <a className="ds-bar__brand ds-shell-wordmark" href="/" aria-label="BlackStory · home">
+        <ShellWordmark lockup={BRAND_ASSETS.lockup} symbol={BRAND_ASSETS.symbol} />
         <span className="ds-bar__tag">Atlas</span>
       </a>
 

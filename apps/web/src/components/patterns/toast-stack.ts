@@ -5,6 +5,13 @@
  * it, decide, and reach it before it leaves. See docs/ui/design-direction-v9-atlas.md §7.
  */
 
+/*
+ * Named `toast-stack` rather than `toast` because `Toast.tsx` sits beside it: on a
+ * case-insensitive filesystem `./toast` and `./Toast` resolve to the same file, which made
+ * `ToastStack` unimportable. Kebab-case pure module beside a PascalCase component is the
+ * convention the rest of `patterns/` already follows.
+ */
+
 export type ToastAction = {
   readonly label: string;
   readonly run: () => void;

@@ -901,6 +901,27 @@ export type MapStageHandle = {
   readonly clearSearchCenterMarker: () => void;
   /** Re-read container layout after external geometry changes (hero inset, panel open). */
   readonly resize: () => void;
+  /**
+   * The live MapLibre map, or null before it starts and after it fails.
+   *
+   * Deliberately narrow: `camera-moves.ts` drives the plate through a structural `MapLike`, and
+   * this is how that library reaches the one persistent canvas. It is not an invitation to call
+   * `flyTo` directly — ADR-017's ban on raw camera calls still holds, and `flyPreset` remains the
+   * route for preset framing.
+   */
+  readonly getMap: () => AtlasCameraTarget | null;
+};
+
+/** What the camera library needs off the map. Structural, so `MapStage` owes it no import. */
+export type AtlasCameraTarget = {
+  flyTo(options: never): unknown;
+  easeTo(options: never): unknown;
+  fitBounds(bounds: never, options: never): unknown;
+  getZoom(): number;
+  getBearing(): number;
+  getPitch(): number;
+  getCenter(): { lng: number; lat: number };
+  stop(): unknown;
 };
 
 const MapStageContext = createContext<MapStageHandle | null>(null);
@@ -1025,7 +1046,9 @@ export function MapStageProvider({
   /** True while a one-shot `idle` listener for a deferred apply is registered. */
   const pendingStyleApplyListenerRef = useRef(false);
   /** Stable handle so the deferred `idle` callback always runs the current apply closure. */
-  const applyStyleAndDataRef = useRef<((options?: Parameters<typeof applyStyleAndData>[0]) => void) | null>(null);
+  const applyStyleAndDataRef = useRef<
+    ((options?: Parameters<typeof applyStyleAndData>[0]) => void) | null
+  >(null);
   const memorialFeaturesRef = useRef(
     MEMORIAL_NAMES_MAP_LAYER_ENABLED
       ? buildMemorialNameFeatures({ seedKey: 'map-stage' })
@@ -1646,9 +1669,7 @@ export function MapStageProvider({
 
       // Bounds fits already encode padding in center/zoom — re-applying padding on
       // ease/fly would double-shift (hero west coast pinned to the copy divider).
-      const motionPadding = boundsFitted
-        ? { top: 0, bottom: 0, left: 0, right: 0 }
-        : padding;
+      const motionPadding = boundsFitted ? { top: 0, bottom: 0, left: 0, right: 0 } : padding;
 
       if (reduced || preset.duration <= 0) {
         map.jumpTo({ center, zoom, padding: motionPadding });
@@ -1789,7 +1810,9 @@ export function MapStageProvider({
           // Dev-only escape hatch for in-browser inspection and perf traces.
           (window as unknown as Record<string, unknown>).__bpMapStage = map;
         }
-        map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+        // No `NavigationControl`. Zoom and pitch live in the Atlas camera console, so the map
+        // keeps one control vocabulary (design-direction-v9-atlas.md §5.5). Attribution stays:
+        // it is a licence obligation, not chrome we get to choose.
         map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
         map.on('error', (event) => {
           console.error('[MapStage]', event.error);
@@ -1967,11 +1990,7 @@ export function MapStageProvider({
           .then((expansionZoom) => {
             if (typeof lng !== 'number' || typeof lat !== 'number') return;
             const zoom = Math.min(Math.max(expansionZoom, MAP_MIN_ZOOM), MAP_MAX_ZOOM);
-            runFlyPresetRef.current(
-              'locality',
-              { center: [lng, lat], zoom },
-              { mode: 'ease' },
-            );
+            runFlyPresetRef.current('locality', { center: [lng, lat], zoom }, { mode: 'ease' });
           })
           .catch(() => {
             // Cluster may have dissolved between click and lookup (data patch mid-flight);
@@ -2044,6 +2063,9 @@ export function MapStageProvider({
     // changes the way a per-page canvas component's effects used to.
   }, []);
 
+  /** Stable across renders: the ref is the identity, not the map it currently holds. */
+  const getMap = useCallback(() => mapRef.current as unknown as AtlasCameraTarget | null, []);
+
   const handle = useMemo<MapStageHandle>(
     () => ({
       patchData,
@@ -2054,6 +2076,7 @@ export function MapStageProvider({
       setSearchCenterMarker,
       clearSearchCenterMarker,
       resize,
+      getMap,
     }),
     [
       patchData,
@@ -2064,6 +2087,7 @@ export function MapStageProvider({
       setSearchCenterMarker,
       clearSearchCenterMarker,
       resize,
+      getMap,
     ],
   );
 

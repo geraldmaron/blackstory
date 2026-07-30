@@ -20,6 +20,10 @@
 
 /* ---- brand --------------------------------------------------------------- */
 
+/*
+ * `.ds-shell-wordmark` from shell-header.css supplies the artwork and its light/dark swap. This
+ * only sets the bar's own spacing and the height cap for a 56px bar.
+ */
 .ds-bar__brand {
   display: inline-flex;
   align-items: center;
@@ -28,11 +32,13 @@
   text-decoration: none;
 }
 
-.ds-bar__wordmark {
-  font-family: var(--ds-font-display);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+.ds-bar__brand .ds-shell-wordmark__img--lockup {
+  height: 2.75rem;
+}
+
+.ds-bar__brand .ds-shell-wordmark__img--symbol {
+  width: 1.75rem;
+  height: 1.75rem;
 }
 
 .ds-bar__tag {
@@ -166,7 +172,27 @@
     gap: var(--ds-space-2);
   }
 
-  .ds-bar__wordmark,
+  /* Symbol alone below 820px: brand.md directs squeezed placements to drop the lockup. */
+  .ds-bar__brand .ds-shell-wordmark__img--lockup {
+    display: none;
+  }
+
+  .ds-bar__brand .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-light {
+    display: block;
+  }
+
+  [data-theme='dark']
+    .ds-bar__brand
+    .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-light {
+    display: none;
+  }
+
+  [data-theme='dark']
+    .ds-bar__brand
+    .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-dark {
+    display: block;
+  }
+
   .ds-bar__tag {
     display: none;
   }

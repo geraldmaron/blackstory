@@ -1,7 +1,7 @@
 /**
  * Pure class-name / data-attribute helpers for Explore panel chrome: the left instrument
  * chassis (Filters | Color key tabs), the records rail/sheet, and stage data hooks that keep
- * MapLibre zoom clear of open panels. Keeps ExploreMapExperience JSX readable and gives tests
+ * MapLibre zoom clear of open panels. Keeps the explore surface JSX readable and gives tests
  * a stable contract for CSS and a11y. Also formats the records-rail count line.
  */
 

@@ -33,4 +33,5 @@ export {
   type ShellHeaderProps,
   type ShellNavItem,
 } from './ShellHeader.js';
+export { ShellWordmark, type ShellWordmarkProps } from './ShellWordmark.js';
 export { Timeline, type TimelineItem, type TimelineProps } from './Timeline.js';

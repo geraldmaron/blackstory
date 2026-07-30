@@ -43,27 +43,45 @@ export type PaletteState = {
   readonly name: string;
 };
 
+/**
+ * A site destination. The v9 bar carries two modes instead of fourteen links, so this section is
+ * what keeps Data, Law, Banned books, Memorial, Methodology, Corrections, Errata and Submit
+ * reachable from the Atlas. Collapsing the nav without it would strand eight routes.
+ */
+export type PaletteDestination = {
+  readonly href: string;
+  readonly label: string;
+};
+
 export type CommandPaletteProps = {
   readonly open: boolean;
   readonly onClose: () => void;
   readonly records: readonly PaletteRecord[];
   readonly states: readonly PaletteState[];
+  readonly destinations?: readonly PaletteDestination[];
   /** Handlers every registry command dispatches into. */
   readonly context: CommandContext;
   /** `fly` is true when the reader held ⌘ on enter: open the record and take the camera there. */
   readonly onOpenRecord: (record: PaletteRecord, fly: boolean) => void;
   readonly onJumpToState: (state: PaletteState) => void;
+  readonly onNavigate?: (destination: PaletteDestination) => void;
   readonly className?: string;
 };
 
 type Row =
   | { readonly kind: 'record'; readonly key: string; readonly record: PaletteRecord }
   | { readonly kind: 'state'; readonly key: string; readonly state: PaletteState }
-  | { readonly kind: 'action'; readonly key: string; readonly command: Command };
+  | { readonly kind: 'action'; readonly key: string; readonly command: Command }
+  | {
+      readonly kind: 'destination';
+      readonly key: string;
+      readonly destination: PaletteDestination;
+    };
 
 const SECTION_TITLES = {
   record: 'Records',
   state: 'Jump to state',
+  destination: 'Go to',
   action: 'Actions',
 } as const;
 
@@ -140,9 +158,11 @@ export function CommandPalette({
   onClose,
   records,
   states,
+  destinations = [],
   context,
   onOpenRecord,
   onJumpToState,
+  onNavigate,
   className,
 }: CommandPaletteProps) {
   const [query, setQuery] = useState('');
@@ -158,17 +178,27 @@ export function CommandPalette({
     const matchedActions = query
       ? COMMANDS.filter((command) => typeaheadMatchTier(query, command.title) > 0)
       : COMMANDS;
+    // Destinations show only on a query. Listing every route in the resting palette would
+    // reinstate the fourteen-item menu v9 removed, one layer deeper.
+    const matchedDestinations = query
+      ? destinations.filter((entry) => typeaheadMatchTier(query, entry.label) > 0)
+      : [];
 
     return [
       ...matchedRecords.map((record): Row => ({ kind: 'record', key: `r:${record.id}`, record })),
       ...matchedStates.map((state): Row => ({ kind: 'state', key: `s:${state.name}`, state })),
+      ...matchedDestinations.map((destination): Row => ({
+        kind: 'destination',
+        key: `d:${destination.href}`,
+        destination,
+      })),
       ...matchedActions.map((command): Row => ({
         kind: 'action',
         key: `a:${command.id}`,
         command,
       })),
     ];
-  }, [query, records, states]);
+  }, [destinations, query, records, states]);
 
   // Remember the trigger before the dialog steals focus, and reset the query so reopening the
   // palette is a fresh start rather than a return to whatever was typed last time.
@@ -194,11 +224,14 @@ export function CommandPalette({
     (row: Row, fly: boolean) => {
       if (row.kind === 'record') onOpenRecord(row.record, fly);
       else if (row.kind === 'state') onJumpToState(row.state);
-      else row.command.run(context);
+      else if (row.kind === 'destination') {
+        if (onNavigate) onNavigate(row.destination);
+        else window.location.assign(row.destination.href);
+      } else row.command.run(context);
 
       onClose();
     },
-    [context, onClose, onJumpToState, onOpenRecord],
+    [context, onClose, onJumpToState, onNavigate, onOpenRecord],
   );
 
   const onKeyDown = useCallback(
@@ -324,6 +357,15 @@ export function CommandPalette({
                     <span className="ds-palette__title">
                       <Highlighted text={row.state.name} query={query} />
                     </span>
+                  ) : null}
+
+                  {row.kind === 'destination' ? (
+                    <>
+                      <span className="ds-palette__title">
+                        <Highlighted text={row.destination.label} query={query} />
+                      </span>
+                      <span className="ds-palette__meta">{row.destination.href}</span>
+                    </>
                   ) : null}
 
                   {row.kind === 'action' ? (

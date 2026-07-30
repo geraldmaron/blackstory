@@ -15,7 +15,7 @@ import {
   toastDurationMs,
   type ToastAction,
   type ToastSpec,
-} from './toast';
+} from './toast-stack';
 import './toast.css';
 
 void React;

@@ -13,7 +13,7 @@ import {
   TOAST_STACK_LIMIT,
   toastDurationMs,
   type ToastSpec,
-} from './toast';
+} from './toast-stack';
 
 const plain: ToastSpec = { id: 'saved', message: 'Saved to your list.' };
 const actionable: ToastSpec = {
