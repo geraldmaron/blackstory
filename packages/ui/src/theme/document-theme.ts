@@ -22,5 +22,11 @@ export function resolvePreferredTheme(
 /**
  * Inline-safe bootstrap: runs before paint when placed in `<head>`.
  * Must stay free of imports — string is injected via dangerouslySetInnerHTML.
+ *
+ * The storage key is written as a literal rather than interpolated. Building executable code by
+ * substituting a value into a template is the shape CodeQL flags (js/bad-code-sanitization), and
+ * `JSON.stringify` is not an escape for a code context: a value containing `</script` would end
+ * the tag regardless of quoting. `document-theme.test.ts` asserts this literal still equals
+ * THEME_STORAGE_KEY, so the two cannot drift apart silently.
  */
-export const THEME_BOOTSTRAP_SCRIPT = `(function(){try{var k=${JSON.stringify(THEME_STORAGE_KEY)};var s=localStorage.getItem(k);var d=window.matchMedia('(prefers-color-scheme: dark)').matches;var t=(s==='light'||s==='dark')?s:(d?'dark':'light');document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();`;
+export const THEME_BOOTSTRAP_SCRIPT = `(function(){try{var k='ds-theme';var s=localStorage.getItem(k);var d=window.matchMedia('(prefers-color-scheme: dark)').matches;var t=(s==='light'||s==='dark')?s:(d?'dark':'light');document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();`;

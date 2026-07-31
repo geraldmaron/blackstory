@@ -191,11 +191,12 @@ const HTML_TAG = /<[^<>]*>/g;
 function stripTagsCompletely(value: string | undefined): string | undefined {
   if (value === undefined) return undefined;
   let current = value;
-  for (;;) {
-    const next = current.replace(HTML_TAG, ' ');
-    if (next === current) return current;
-    current = next;
-  }
+  let previous: string;
+  do {
+    previous = current;
+    current = current.replace(HTML_TAG, ' ');
+  } while (current !== previous);
+  return current;
 }
 
 export function buildAltText(input: {

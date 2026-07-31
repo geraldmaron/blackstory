@@ -72,7 +72,9 @@ export async function runCommonsMediaEnrichment(
     if (entity.wikidataId && /^Q\d+$/i.test(entity.wikidataId)) {
       resolved.push({
         entity,
-        wikidataId: entity.wikidataId.toUpperCase().replace(/^Q/, 'Q'),
+        // `.replace(/^Q/, 'Q')` used to follow this and replaced Q with itself: `toUpperCase()`
+        // has already normalised the prefix (CodeQL js/identity-replacement).
+        wikidataId: entity.wikidataId.toUpperCase(),
         qidMatchMethod: 'trusted_identifier',
         enwikiTitle: enwikiTitleFromDisplayName(entity.displayName),
       });

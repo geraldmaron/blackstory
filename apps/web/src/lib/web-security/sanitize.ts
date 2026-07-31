@@ -54,14 +54,14 @@ export function sanitizeRichText(input: string): string {
   // It terminates: every replacement only ever deletes characters, so each pass that changes
   // anything strictly shortens the string, and a string of length n admits at most n such passes.
   let sanitized = input;
-  for (;;) {
-    const before = sanitized;
+  let previous: string;
+  do {
+    previous = sanitized;
     sanitized = sanitized
       .replace(BLOCKED_TAG_PATTERN, '')
       .replace(EVENT_HANDLER_ATTR_PATTERN, '')
       .replace(DANGEROUS_URI_PATTERN, '');
-    if (sanitized === before) break;
-  }
+  } while (sanitized !== previous);
 
   sanitized = sanitized.replace(TAG_PATTERN, (match, rawTag: string, rawAttrs: string) => {
     const tag = rawTag.toLowerCase();
