@@ -1,15 +1,59 @@
 /**
  * Unit tests for query normalization and cache key helpers.
+ *
+ * Includes the two-way allowlist drift guard: `EXPLORE_PAGE_PARAM_ALLOWLIST` is generated from
+ * the URL parser's key set, and these tests fail if the parser reads a key the allowlist lacks,
+ * or if the serializer writes one.
  */
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
+import {
+  EXPLORE_VIEWPORT_POLICY_DROPPED_KEYS,
+  parseExploreSearchParams,
+  type RawExploreSearchParams,
+} from '../map-experience/url-state';
 import { buildEntityCacheKey, buildPublicPageCacheKey, buildSearchCacheKey } from './cache-keys';
+import { EXPLORE_PAGE_PARAM_ALLOWLIST } from './constants';
 import {
   buildNormalizedUrl,
+  getAllowedQueryParamsForPath,
   needsQueryNormalizationRedirect,
   normalizeQueryString,
   normalizeSearchParamsRecord,
 } from './query-normalization';
+
+const URL_STATE_SOURCE = new URL('../map-experience/url-state.ts', import.meta.url);
+
+/** Every query key `parseExploreSearchParams` actually touches, recorded through a Proxy. */
+function keysReadByExploreParser(): readonly string[] {
+  const read = new Set<string>();
+  const probe = new Proxy(
+    {},
+    {
+      get(_target, key) {
+        if (typeof key === 'string') read.add(key);
+        return undefined;
+      },
+    },
+  ) as RawExploreSearchParams;
+  parseExploreSearchParams(probe);
+  return [...read].sort();
+}
+
+/** Every literal key `buildExploreSearchParams` can write, read from the serializer's own body. */
+function keysWrittenByExploreBuilder(): readonly string[] {
+  const source = readFileSync(URL_STATE_SOURCE, 'utf8');
+  const start = source.indexOf('export function buildExploreSearchParams');
+  assert.ok(start > 0, 'buildExploreSearchParams not found in url-state.ts');
+  const end = source.indexOf('\nexport ', start + 1);
+  const body = source.slice(start, end === -1 ? undefined : end);
+  const written = new Set<string>();
+  for (const match of body.matchAll(/params\.set\(\s*'([^']+)'/g)) {
+    written.add(match[1]!);
+  }
+  return [...written].sort();
+}
 
 test('normalizeQueryString keeps only allowlisted /search params', () => {
   const qs = normalizeQueryString('/search', {
@@ -85,14 +129,10 @@ test('needsQueryNormalizationRedirect ignores multi-param sort order', () => {
 
 test('search form query order does not redirect (prod ERR_TOO_MANY_REDIRECTS regression)', () => {
   // HTML form field order is q → kind → status → era; alphabetical would be era/kind/q/status.
-  const formSubmit = new URL(
-    'https://blackstory.app/search?q=Obama&kind=all&status=all&era=all',
-  );
+  const formSubmit = new URL('https://blackstory.app/search?q=Obama&kind=all&status=all&era=all');
   assert.equal(needsQueryNormalizationRedirect(formSubmit), false);
   assert.equal(
-    needsQueryNormalizationRedirect(
-      new URL('https://blackstory.app/search?q=Obama&kind=place'),
-    ),
+    needsQueryNormalizationRedirect(new URL('https://blackstory.app/search?q=Obama&kind=place')),
     false,
   );
 });
@@ -124,9 +164,6 @@ test('normalizeQueryString keeps allowlisted /explore map params', () => {
   const qs = normalizeQueryString('/explore', {
     era: '1970s',
     kind: 'school',
-    lat: '38.9',
-    lng: '-77.0',
-    zoom: '6',
     selected: 'ent_dunbar_school_001',
     layerMode: 'presence',
     state: 'DC',
@@ -140,8 +177,115 @@ test('normalizeQueryString keeps allowlisted /explore map params', () => {
   // Default layerMode=presence is omitted from the canonical query (cleaner revisit URLs).
   assert.equal(
     qs,
-    'era=1970s&kind=school&lat=38.9000&lng=-77.0000&zoom=6.00&selected=ent_dunbar_school_001&state=DC&group=1&lines=1&decade=1970s&edge=rel_landmark_occurred_at_school',
+    'era=1970s&kind=school&selected=ent_dunbar_school_001&state=DC&group=1&lines=1&decade=1970s&edge=rel_landmark_occurred_at_school',
   );
+});
+
+test('normalizeQueryString keeps the filter params the earlier hand-written allowlist missed', () => {
+  // tone, status, radius and near are read by the parser and were being stripped at the edge.
+  assert.equal(
+    normalizeQueryString('/explore', {
+      tone: 'resistance',
+      status: 'historic',
+      radius: '10mi',
+      near: 'Palm Beach County, Florida',
+    }),
+    'tone=resistance&status=historic&radius=10mi&near=Palm+Beach+County%2C+Florida',
+  );
+});
+
+test('ADR-017: lat/lng/zoom never survive normalization on the map surface', () => {
+  for (const path of ['/', '/explore']) {
+    assert.equal(
+      normalizeQueryString(path, { lat: '38.9072', lng: '-77.0369', zoom: '11.5', state: 'dc' }),
+      'state=DC',
+      path,
+    );
+  }
+  assert.equal(
+    needsQueryNormalizationRedirect(new URL('https://example.com/explore?lat=38.9&lng=-77&zoom=6')),
+    true,
+  );
+  assert.equal(
+    buildNormalizedUrl(new URL('https://example.com/explore?lat=38.9&lng=-77&zoom=6')).search,
+    '',
+  );
+});
+
+test('panel chrome is not shareable state: panels= and hidePanels= normalize away', () => {
+  assert.equal(normalizeQueryString('/explore', { panels: 'filters,results,key' }), '');
+  assert.equal(normalizeQueryString('/explore', { hidePanels: 'results' }), '');
+  assert.equal(normalizeQueryString('/explore', { panels: 'filters', state: 'dc' }), 'state=DC');
+});
+
+test('/ and /explore normalize identically (one param vocabulary, two paths)', () => {
+  const bag = {
+    era: '1970s',
+    kind: 'school',
+    tone: 'resistance',
+    theme: 'education',
+    status: 'historic',
+    confidence: 'high',
+    selected: 'ent_dunbar_school_001',
+    state: 'dc',
+    layerMode: 'off',
+    group: 'true',
+    lines: '1',
+    decade: '1970s',
+    edge: 'rel_landmark_occurred_at_school',
+    radius: '10mi',
+    near: 'Washington, DC',
+    utm_source: 'x',
+    junk: '1',
+  };
+  assert.equal(normalizeQueryString('/', bag), normalizeQueryString('/explore', bag));
+  assert.notEqual(normalizeQueryString('/', bag), '');
+
+  // The homepage now canonicalizes map state instead of 308ing every param off it.
+  assert.equal(normalizeQueryString('/', { state: 'va', group: 'true' }), 'state=VA&group=1');
+  assert.equal(
+    needsQueryNormalizationRedirect(new URL('https://example.com/?state=VA&group=1')),
+    false,
+  );
+  assert.equal(
+    needsQueryNormalizationRedirect(new URL('https://example.com/?state=VA&junk=1')),
+    true,
+  );
+});
+
+test('drift: the map-surface allowlist covers every key the URL parser reads', () => {
+  const readByParser = keysReadByExploreParser();
+  const allowed = new Set<string>(EXPLORE_PAGE_PARAM_ALLOWLIST);
+  const droppedByPolicy = new Set<string>(EXPLORE_VIEWPORT_POLICY_DROPPED_KEYS);
+
+  assert.ok(readByParser.length > 0);
+
+  // A key the parser reads but the allowlist lacks is stripped by the edge before the page runs.
+  assert.deepEqual(
+    readByParser.filter((key) => !allowed.has(key) && !droppedByPolicy.has(key)),
+    [],
+  );
+
+  // ...and nothing is allowlisted that the parser cannot read.
+  assert.deepEqual([...allowed].filter((key) => !readByParser.includes(key)).sort(), []);
+
+  // The ADR-017 exclusion is a decision about keys the parser genuinely reads, not a leftover.
+  for (const key of droppedByPolicy) {
+    assert.ok(readByParser.includes(key), `${key} is dropped by policy but never parsed`);
+  }
+});
+
+test('drift: buildExploreSearchParams writes no key the allowlist lacks', () => {
+  const written = keysWrittenByExploreBuilder();
+  const allowed = new Set<string>(EXPLORE_PAGE_PARAM_ALLOWLIST);
+  const droppedByPolicy = new Set<string>(EXPLORE_VIEWPORT_POLICY_DROPPED_KEYS);
+
+  assert.ok(written.length > 0);
+  assert.deepEqual(
+    written.filter((key) => !allowed.has(key) && !droppedByPolicy.has(key)),
+    [],
+  );
+  assert.ok(!written.includes('panels'), 'panel chrome must not be serialized into a shared URL');
 });
 
 test('normalizeQueryString preserves /explore?state= revisit links (homepage chips)', () => {
@@ -156,23 +300,13 @@ test('normalizeQueryString preserves /explore?state= revisit links (homepage chi
   );
 });
 
-test('normalizeQueryString canonicalizes explore layerMode and viewport precision', () => {
-  const qs = normalizeQueryString('/explore', {
-    density: 'true',
-    lat: '38.90721234',
-    lng: '-77.03691234',
-    zoom: '11.555',
-  });
+test('normalizeQueryString canonicalizes explore layerMode', () => {
   // density→presence is the default layer; omit layerMode from the canonical query.
-  assert.equal(qs, 'lat=38.9072&lng=-77.0369&zoom=11.55');
+  assert.equal(normalizeQueryString('/explore', { density: 'true' }), '');
+  assert.equal(normalizeQueryString('/explore', { density: 'false' }), 'layerMode=off');
   assert.equal(
-    normalizeQueryString('/explore', {
-      layerMode: 'blackShare',
-      lat: '38.90721234',
-      lng: '-77.03691234',
-      zoom: '11.555',
-    }),
-    'lat=38.9072&lng=-77.0369&zoom=11.55&layerMode=blackShare',
+    normalizeQueryString('/explore', { layerMode: 'blackShare', popGeo: 'state' }),
+    'layerMode=blackShare&popGeo=state',
   );
 });
 
@@ -201,15 +335,59 @@ test('buildNormalizedUrl issues canonical /explore URLs for revisit', () => {
   assert.equal(normalized.search, '?state=VA&group=1&lines=1');
 });
 
+test('/law keeps its GET browse contract (q, kind, topic)', () => {
+  assert.equal(
+    normalizeQueryString('/law', { q: ' voting ', kind: 'statute', topic: 'voting_rights' }),
+    'kind=statute&q=voting&topic=voting_rights',
+  );
+  // The filters reach the page as-is: a form submit must not 308 away its own params.
+  assert.equal(
+    needsQueryNormalizationRedirect(new URL('https://example.com/law?q=voting&kind=statute')),
+    false,
+  );
+  assert.deepEqual(
+    normalizeSearchParamsRecord('/law', { q: 'voting', kind: 'statute', utm_source: 'x' }),
+    { q: 'voting', kind: 'statute' },
+  );
+  // Law detail pages take no params.
+  assert.equal(normalizeQueryString('/law/civil-rights-act-1964', { q: 'voting' }), '');
+});
+
+test('/corrections keeps the CorrectionForm prefill (target, targetType)', () => {
+  assert.equal(
+    normalizeQueryString('/corrections', {
+      target: 'ent_dunbar_school_001',
+      targetType: 'entity',
+      utm_campaign: 'x',
+    }),
+    'target=ent_dunbar_school_001&targetType=entity',
+  );
+  assert.equal(
+    needsQueryNormalizationRedirect(
+      new URL('https://example.com/corrections?target=x&targetType=entity'),
+    ),
+    false,
+  );
+});
+
+test('API paths are not normalized: an endpoint receives its own query', () => {
+  // These are no longer in the middleware matcher, so nothing strips them. Asserted here as the
+  // contract: an empty allowlist plus a matcher entry is what broke them.
+  for (const path of ['/history/api', '/submit/api', '/explore/api', '/search/api']) {
+    assert.deepEqual(getAllowedQueryParamsForPath(path), []);
+  }
+  const matcher = readFileSync(new URL('../../middleware.ts', import.meta.url), 'utf8');
+  assert.ok(!/'\/history\/api'/.test(matcher), '/history/api must not be in the matcher');
+  assert.ok(!/'\/submit\/api'/.test(matcher), '/submit/api must not be in the matcher');
+  assert.ok(!/'\/[a-z-]+\/api'/.test(matcher), 'no API path belongs in the middleware matcher');
+});
+
 test('preserves _vercel_share on redirects so Vercel Authentication cannot loop', () => {
   const withShare = new URL(
     'https://blackstory-git-preview.vercel.app/search?q=obama&_vercel_share=share-token',
   );
   assert.equal(needsQueryNormalizationRedirect(withShare), false);
-  assert.equal(
-    buildNormalizedUrl(withShare).search,
-    '?q=obama&_vercel_share=share-token',
-  );
+  assert.equal(buildNormalizedUrl(withShare).search, '?q=obama&_vercel_share=share-token');
 
   // Cache keys still ignore the share token.
   assert.equal(normalizeQueryString('/search', withShare.searchParams), 'q=obama');

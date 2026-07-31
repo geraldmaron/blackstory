@@ -3,6 +3,13 @@
  * Soft planning defaults for cost and abuse resistance; live scaling is Vercel Fluid Compute.
  */
 
+import {
+  EXPLORE_URL_PARAM_KEYS,
+  EXPLORE_VIEWPORT_POLICY_DROPPED_KEYS,
+  type ExploreUrlParamKey,
+  type ExploreViewportPolicyDroppedKey,
+} from '../map-experience/url-state';
+
 /**
  * Allowed search/filter keys on /search all other query keys are stripped at the edge.
  * Extended to cover every param the `/search/api` route actually reads (q + the 6
@@ -30,34 +37,49 @@ export const SEARCH_PAGE_PARAM_ALLOWLIST = [
 
 export type SearchPageParam = (typeof SEARCH_PAGE_PARAM_ALLOWLIST)[number];
 
-/**
- * Allowed filter/viewport keys on /explore shareable map state.
- * Must stay aligned with `buildExploreSearchParams` in map-experience/url-state.ts —
- * missing keys are stripped by edge middleware and break revisit/share links.
- */
-export const EXPLORE_PAGE_PARAM_ALLOWLIST = [
-  'era',
-  'kind',
-  'theme',
-  'confidence',
-  'lat',
-  'lng',
-  'zoom',
-  'selected',
-  'state',
-  'layerMode',
-  'popGeo',
-  'popDecade',
-  'popFrom',
-  'popTo',
-  'density',
-  'group',
-  'lines',
-  'decade',
-  'edge',
-] as const;
+const VIEWPORT_POLICY_DROPPED = new Set<string>(EXPLORE_VIEWPORT_POLICY_DROPPED_KEYS);
 
-export type ExplorePageParam = (typeof EXPLORE_PAGE_PARAM_ALLOWLIST)[number];
+/**
+ * Allowed filter/selection keys on the map surface (`/` and `/explore`).
+ *
+ * Generated from `EXPLORE_URL_PARAM_KEYS`, the URL parser's own key set, rather than retyped, so
+ * the allowlist and the parser cannot drift: a key added to `parseExploreSearchParams` is
+ * allowlisted the moment it is added, and a key removed from the parser stops being allowlisted.
+ * Drift tests in `query-normalization.test.ts` fail in both directions.
+ *
+ * Viewport policy (ADR-017): `lat`, `lng` and `zoom` are excluded here on purpose. A shareable
+ * URL restores what the reader was looking at, never where the camera was. That exclusion is the
+ * named `EXPLORE_VIEWPORT_POLICY_DROPPED_KEYS` list in map-experience/url-state.ts, not a gap in
+ * this file, and the reasoning lives with it.
+ */
+export const EXPLORE_PAGE_PARAM_ALLOWLIST: readonly ExploreUrlParamKey[] =
+  EXPLORE_URL_PARAM_KEYS.filter((key) => !VIEWPORT_POLICY_DROPPED.has(key));
+
+export type ExplorePageParam = Exclude<ExploreUrlParamKey, ExploreViewportPolicyDroppedKey>;
+
+/**
+ * Allowed browse keys on /law.
+ *
+ * The GET browse contract the page actually renders: `LawBrowseSections` posts exactly these
+ * three fields, and `buildLawBrowseViewModel` reads them. Until this list existed, `/law` was
+ * matched by middleware with an empty allowlist, so every law filter link 308'd to the bare
+ * index and the reader's filters were gone before the page ran. (`status` is read by the view
+ * model but has no rendered control, so it is not part of the browse contract.)
+ */
+export const LAW_PAGE_PARAM_ALLOWLIST = ['q', 'kind', 'topic'] as const;
+
+export type LawPageParam = (typeof LAW_PAGE_PARAM_ALLOWLIST)[number];
+
+/**
+ * Allowed prefill keys on /corrections.
+ *
+ * `CorrectionForm` reads both from `useSearchParams` to pre-select the record under correction.
+ * Matched with an empty allowlist, the edge stripped them before the form mounted, which made
+ * the prefill contract unreachable from any "Suggest a correction" link.
+ */
+export const CORRECTIONS_PAGE_PARAM_ALLOWLIST = ['target', 'targetType'] as const;
+
+export type CorrectionsPageParam = (typeof CORRECTIONS_PAGE_PARAM_ALLOWLIST)[number];
 
 /**
  * Allowed browse keys on /history decade stepper + selection.

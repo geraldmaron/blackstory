@@ -8,18 +8,9 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { buildNormalizedUrl, needsQueryNormalizationRedirect } from './query-normalization';
 
-/** Paths where query normalization runs (public HTML routes).  */
-export const QUERY_NORMALIZATION_MATCHER = [
-  '/',
-  '/search',
-  '/entity/:path*',
-  '/explore',
-  '/history',
-  '/about',
-  '/methodology',
-  '/chapters',
-  '/corrections',
-];
+// The list of matched paths lives only in `apps/web/src/middleware.ts`, where Next actually reads
+// it. A second copy here had already drifted from that one, and a matcher that is wrong in a
+// file nobody reads is worse than no matcher at all.
 
 export function handleQueryNormalization(request: NextRequest): NextResponse {
   const url = request.nextUrl;

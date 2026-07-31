@@ -4,13 +4,14 @@
  * selected edge. Pure parse/serialize so the server-rendered page and the client
  * orchestrator read and write the exact same shape.
  *
- * Camera (`lat`/`lng`/`zoom`): parsed for inbound deep links (e.g. locate → explore with a
- * place radius). The explore client does not continuously sync the live camera into the
- * address bar; pan/zoom stay in-memory. Serialize still emits viewport when a caller builds
- * an intentional deep link (`buildLocateExploreHref`).
+ * Camera (`lat`/`lng`/`zoom`): parsed so an in-process caller can hand the client a camera, and
+ * so old links do not throw. The explore client does not continuously sync the live camera into
+ * the address bar; pan/zoom stay in-memory. See `EXPLORE_VIEWPORT_POLICY_DROPPED_KEYS` below for
+ * why these three never survive into a shareable address.
  *
- * Panel chrome: map-first by default (filters / color key / records collapsed). Open panels
- * serialize as opt-in `panels=filters,results,key`. Legacy `hidePanels=` still parses.
+ * Panel chrome: map-first by default (filters / color key / records collapsed). `panels=` and
+ * legacy `hidePanels=` still parse so previously shared links keep opening what they named, but
+ * the serializer never writes them back (see `buildExploreSearchParams`).
  *
  * Selection note: `selected` opens the preview narrative card and orients the copper ring on
  * the map (e.g. “View on map” from a record page). The full record is reached via the card
@@ -95,6 +96,63 @@ export type RawExploreSearchParams = Readonly<
   Record<string, string | readonly string[] | undefined>
 >;
 
+/**
+ * Every query key `parseExploreSearchParams` reads, in the order it reads them.
+ *
+ * This is the single source of truth for the `/` and `/explore` param vocabulary. The edge
+ * allowlist (`EXPLORE_PAGE_PARAM_ALLOWLIST` in runtime-hardening/constants.ts) is generated from
+ * this list rather than retyped, so a key added to the parser cannot end up stripped by
+ * middleware before the page ever sees it. Drift tests in
+ * `../runtime-hardening/query-normalization.test.ts` fail in both directions: when the parser
+ * reads a key this list lacks, and when the serializer writes one.
+ */
+export const EXPLORE_URL_PARAM_KEYS = [
+  'era',
+  'kind',
+  'tone',
+  'theme',
+  'status',
+  'confidence',
+  'lat',
+  'lng',
+  'zoom',
+  'selected',
+  'state',
+  'group',
+  'lines',
+  'decade',
+  'edge',
+  'layerMode',
+  'density',
+  'popGeo',
+  'popDecade',
+  'popFrom',
+  'popTo',
+  'radius',
+  'near',
+  'hidePanels',
+  'panels',
+] as const;
+
+export type ExploreUrlParamKey = (typeof EXPLORE_URL_PARAM_KEYS)[number];
+
+/**
+ * Viewport policy, ADR-017: a shareable URL restores *what* the reader was looking at, never
+ * *where the camera was*.
+ *
+ * These three keys are parsed, and deliberately excluded from the edge allowlist, so they cannot
+ * reach a bookmarked, shared or crawled address. Pinning a camera hands the recipient a framing
+ * they did not choose and cannot tell apart from the data itself: a tight zoom on one county
+ * reads as an editorial claim about that county. The exclusion is this named list, not an
+ * omission from the allowlist, so removing it is a decision someone has to make on purpose.
+ *
+ * The same reasoning is enforced on the share builder by `assertNoViewportKeys` in
+ * `../share/deep-link.ts`.
+ */
+export const EXPLORE_VIEWPORT_POLICY_DROPPED_KEYS = ['lat', 'lng', 'zoom'] as const;
+
+export type ExploreViewportPolicyDroppedKey = (typeof EXPLORE_VIEWPORT_POLICY_DROPPED_KEYS)[number];
+
 function firstValue(raw: string | readonly string[] | undefined): string | undefined {
   if (raw === undefined) return undefined;
   if (typeof raw === 'string') return raw;
@@ -144,8 +202,6 @@ function parsePopulationDecadeRaw(
   return parseExplorePopulationDecade(raw, popGeoBase, fallback);
 }
 
-type PanelToken = 'filters' | 'results' | 'key';
-
 /** Map-first default: instruments + records collapsed until the reader opens them. */
 const DEFAULT_PANEL_VISIBILITY = {
   showFilters: false,
@@ -154,7 +210,8 @@ const DEFAULT_PANEL_VISIBILITY = {
 } as const;
 
 /**
- * Panel chrome visibility.
+ * Panel chrome visibility. Read-only vocabulary: both forms parse so previously shared links
+ * still open what they named, and neither is ever written back out.
  *
  * - Absent params → map-first (all collapsed).
  * - `panels=` opt-in list of open chrome (`filters`, `results`, `key`).
@@ -196,14 +253,6 @@ function parsePanelVisibility(
   }
 
   return { ...DEFAULT_PANEL_VISIBILITY };
-}
-
-function serializeOpenPanels(state: ExploreViewState): string | undefined {
-  const tokens: PanelToken[] = [];
-  if (state.showFilters) tokens.push('filters');
-  if (state.showResults) tokens.push('results');
-  if (state.showKey) tokens.push('key');
-  return tokens.length > 0 ? tokens.join(',') : undefined;
 }
 
 const VALID_RADIUS_IDS = new Set<string>(EXPLORE_RADIUS_PRESETS.map((preset) => preset.id));
@@ -266,10 +315,7 @@ export function parseExploreSearchParams(raw: RawExploreSearchParams): ExploreVi
     layerMode === 'blackShare' || layerMode === 'blackChange'
       ? coercePopulationGeoForDecade(
           popGeoBase,
-          popDecadeParsed ??
-            popToParsed ??
-            popFromParsed ??
-            defaultPopulationDecade(popGeoBase),
+          popDecadeParsed ?? popToParsed ?? popFromParsed ?? defaultPopulationDecade(popGeoBase),
         )
       : undefined;
   const popDecade =
@@ -363,8 +409,10 @@ export function buildExploreSearchParams(state: ExploreViewState): string {
   if (state.lines) params.set('lines', '1');
   if (state.decade) params.set('decade', state.decade);
   if (state.edge) params.set('edge', state.edge);
-  const panels = serializeOpenPanels(state);
-  if (panels) params.set('panels', panels);
+  // Panel chrome (`showFilters` / `showResults` / `showKey`) is deliberately not serialized.
+  // Which panels a reader has open is session state, not shareable meaning. It is the same class
+  // of thing as the camera that `EXPLORE_VIEWPORT_POLICY_DROPPED_KEYS` keeps out of the address,
+  // for the same reason. Inbound `panels=` and `hidePanels=` still parse; they never round-trip.
   if (state.radius && state.radius !== 'all') params.set('radius', state.radius);
   if (state.near) params.set('near', state.near);
   return params.toString();
