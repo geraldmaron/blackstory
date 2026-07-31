@@ -1,10 +1,12 @@
 # Atlas Instrument
 
-**Status: In build (v9).** The pattern the `/` and `/explore` Atlas surface is made of. Extracted from the runnable reference build [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html) and governed by [`design-direction-v9-atlas.md`](./design-direction-v9-atlas.md) (the design law). Work packages and sequencing live in [`v9-atlas-implementation-plan.md`](./v9-atlas-implementation-plan.md).
+**Status: In build (v9).** The pattern the Instrument surface class is made of: `/` (the Atlas) and `/story`. Extracted from the runnable reference build [`.design-mocks/blackstory-atlas-v9.html`](../../.design-mocks/blackstory-atlas-v9.html) and governed by [`design-direction-v9-atlas.md`](./design-direction-v9-atlas.md), binding since 2026-07-30. Work packages and sequencing live in [`v9-atlas-implementation-plan.md`](./v9-atlas-implementation-plan.md).
 
 Builds on, and does not replace: [`patterns-map-canvas.md`](./patterns-map-canvas.md) (persistent `MapStage`, ADR-017), [`patterns-map-entity-encoding.md`](./patterns-map-entity-encoding.md) (pin colour and shape), [`patterns-record-anatomy.md`](./patterns-record-anatomy.md) (the 2×2 fact grid), [`brand.md`](./brand.md) (flat matte, copper discipline, dignity law).
 
-**Relationship to [`patterns-cinematic-map.md`](./patterns-cinematic-map.md):** that pattern describes a map *behind* editorial content, locked until invited (Rest → Invite → Engaged). This one describes a map that *is* the content, live from first paint. A surface adopts one or the other, never both. `/history`, `/entity/[id]` and the mobile Explore tab stay on the cinematic backdrop.
+**Where the other four surface classes live.** This pattern covers the Instrument only. [`patterns-surface-classes.md`](./patterns-surface-classes.md) names all five classes and which routes are in each; [`patterns-plate-posture.md`](./patterns-plate-posture.md) governs the plate everywhere the Instrument is not; [`patterns-reading-room.md`](./patterns-reading-room.md) and [`patterns-record-page.md`](./patterns-record-page.md) carry the editorial and record surfaces; [`patterns-lens-handoff.md`](./patterns-lens-handoff.md) is how they hand a filter back to this instrument.
+
+**Relationship to [`patterns-cinematic-map.md`](./patterns-cinematic-map.md):** that pattern describes a map *behind* editorial content, locked until invited (Rest → Invite → Engaged). This one describes a map that *is* the content, live from first paint. A surface adopts one or the other, never both. The mobile Explore tab stays on the cinematic backdrop. On web, the v9 resolution replaces the cinematic backdrop's web adopters with the Framed plate posture: `/entity/[id]` becomes a Record page and `/history` dissolves into `/records`. See [`patterns-plate-posture.md`](./patterns-plate-posture.md).
 
 ---
 
@@ -21,7 +23,7 @@ Four properties define the pattern:
 
 ### When to use
 
-Only on the Atlas surface (`/`, and `/explore` until it redirects). This pattern is expensive: it owns the viewport, the keyboard, and the camera. Any surface that also wants scrollable editorial content wants the cinematic backdrop instead.
+Only on a surface whose `data-surface` is `instrument`: `/` and `/story`, with `/explore` and `/locate` redirecting into them. This pattern is expensive: it owns the viewport, the keyboard, and the camera. Any surface that also wants scrollable editorial content takes a Reading room or Record page instead, with the plate Parked or Framed. See [`patterns-plate-posture.md`](./patterns-plate-posture.md).
 
 ---
 
@@ -132,11 +134,13 @@ Five instruments, each independently hideable to a dock chip.
 
 | Zone | Contents |
 |---|---|
-| Left | Book-and-pin symbol (24px), `BlackStory` wordmark, `ATLAS` mono tag |
+| Left | Official symbol artwork alone, from `BRAND_ASSETS.symbol`, light and dark pair swapping on `data-theme`, then the `ATLAS` mono tag |
 | Centre | **`⌘K` trigger**, pill, `max-width: 520px`, right-aligned `⌘K` kbd chip |
 | Right | Mode switch (Atlas / Story), divider, Saved with count badge, Shortcuts, Theme |
 
 The centre slot is the single most important change in v9: navigation moves into the palette, and the bar carries two modes instead of fourteen destinations. Below 820px, drop the mode-switch labels and the `ATLAS` tag.
+
+**No wordmark in the bar, and the symbol is sized by its visible mark, not its box.** Typing the wordmark beside a symbol render is a reconstructed lockup, which [`brand.md`](./brand.md) lists under Misuse (never). The symbol PNG is a 512x512 box holding a 181x292 mark, so visible height is box height x 0.57 and visible width is box height x 0.35. A 40px box in the 56px bar and a 36px box in the 50px compact bar clear brand.md's 20px compact-mark minimum; the 32px primary-mark minimum needs a 57px box, which does not fit. Full derivation and the lockup arithmetic are in [`design-direction-v9-atlas.md`](./design-direction-v9-atlas.md) section 5.1.
 
 **Adoption gate:** every destination that leaves the bar (Data, Law, Banned books, Memorial, Methodology, Corrections, Errata, Submit) must be reachable from the palette **and** the site footer before this ships. No route may become unreachable.
 
