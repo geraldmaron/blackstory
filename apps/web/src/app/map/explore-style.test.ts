@@ -516,6 +516,17 @@ test('the plate reads as a map: land, water and boundaries come from the tokens'
     );
   }
 
+  // The landmass itself, in both schemes: with the presence layer off, the state fill IS the land.
+  // Asserted per scheme because a style built for the wrong one still passes every dark-only check.
+  assert.equal(
+    layerById(light, EXPLORE_STATE_DENSITY_LAYER_ID).paint?.['fill-color'],
+    mapPalettes.light.land,
+  );
+  assert.equal(
+    layerById(dark, EXPLORE_STATE_DENSITY_LAYER_ID).paint?.['fill-color'],
+    mapPalettes.dark.land,
+  );
+
   const stateBounds = layerById(light, 'explore-state-bounds-line');
   assert.equal(stateBounds.paint?.['line-color'], lightPlate.stateBounds);
 

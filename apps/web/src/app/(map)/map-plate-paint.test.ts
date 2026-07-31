@@ -4,7 +4,12 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { StyleSpecification } from 'maplibre-gl';
-import { collectLayerPaintUpdates, PERSISTENT_PLATE_LAYER_IDS } from './map-plate-paint';
+import { mapPalettes } from '@repo/ui';
+import {
+  buildArchiveBaseStyle,
+  collectLayerPaintUpdates,
+  PERSISTENT_PLATE_LAYER_IDS,
+} from './map-plate-paint';
 
 const SAMPLE_STYLE: StyleSpecification = {
   version: 8,
@@ -72,4 +77,21 @@ test('collectLayerPaintUpdates respects an explicit layer id subset', () => {
   assert.equal(updates.length, 1);
   assert.equal(updates[0]?.layerId, 'background');
   assert.equal(updates[0]?.paintKey, 'background-color');
+});
+
+/**
+ * The pre-`load` frame is the one MapLibre paints before any explore layer exists. Pinning it to a
+ * dark literal is what let a light-theme `/explore` render as a solid black plate, so it is
+ * asserted per scheme against the same token table the rest of the plate reads.
+ */
+test('buildArchiveBaseStyle paints the pre-load frame from the scheme water token', () => {
+  function backgroundColor(scheme: 'light' | 'dark'): unknown {
+    const layer = buildArchiveBaseStyle(scheme).layers.find((entry) => entry.id === 'background');
+    assert.ok(layer, `${scheme} archive base must ship a background layer`);
+    return (layer as { paint?: Record<string, unknown> }).paint?.['background-color'];
+  }
+
+  assert.equal(backgroundColor('light'), mapPalettes.light.water);
+  assert.equal(backgroundColor('dark'), mapPalettes.dark.water);
+  assert.notEqual(backgroundColor('light'), backgroundColor('dark'));
 });

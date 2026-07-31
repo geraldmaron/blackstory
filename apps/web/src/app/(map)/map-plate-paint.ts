@@ -4,6 +4,30 @@
  * when the document plate toggles light/dark.
  */
 import type { Map as MapLibreMap, StyleSpecification } from 'maplibre-gl';
+import { plateForScheme, type MapColorScheme } from '../../lib/map-experience/dignity-style';
+
+/**
+ * The frame MapLibre paints between `new Map()` and the first `applyGeographyStyle`.
+ *
+ * It is the ocean plate for the scheme the DOCUMENT is actually in. A fixed dark literal here
+ * flashed a near-black plate at every light-theme reader, and because nothing else re-resolved
+ * the plate at mount it could stay black until some later data patch happened to rebuild the
+ * style — a light `/explore` reading as a solid black map with only state labels on it.
+ */
+export function buildArchiveBaseStyle(colorScheme: MapColorScheme): StyleSpecification {
+  return {
+    version: 8,
+    name: 'BlackStory — Archive (US)',
+    sources: {},
+    layers: [
+      {
+        id: 'background',
+        type: 'background',
+        paint: { 'background-color': plateForScheme(colorScheme).ocean },
+      },
+    ],
+  };
+}
 
 /** Layers that `applyStyleAndData` never removes — paints must be pushed explicitly. */
 export const PERSISTENT_PLATE_LAYER_IDS = [

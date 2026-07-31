@@ -148,6 +148,7 @@ import {
   type ExplorePopulationGeo,
 } from '../../lib/map-experience/explore-population';
 import {
+  buildArchiveBaseStyle,
   PERSISTENT_PLATE_LAYER_IDS,
   syncLayerPaintFromStyle,
   syncSingleLayerPaint,
@@ -188,22 +189,6 @@ const SELECTED_LINE_ID = 'explore-state-selected-line';
 const EMPTY_EDGE_COLLECTION: HistoryEdgeLineCollection = {
   type: 'FeatureCollection',
   features: [],
-};
-
-const ARCHIVE_BASE_STYLE: StyleSpecification = {
-  version: 8,
-  name: 'BlackStory — Archive (US)',
-  sources: {},
-  layers: [
-    {
-      id: 'background',
-      type: 'background',
-      // Ocean plate — one step below Black Ink so the warm landmass fills lift
-      // off it (must match DIGNITY_PALETTE.ocean; this literal exists only to
-      // keep the pre-style-load frame from flashing a different shade).
-      paint: { 'background-color': '#080606' },
-    },
-  ],
 };
 
 const GEOGRAPHY_LAYER_IDS = new Set([
@@ -959,6 +944,26 @@ type StageConfig = {
   selectedEntity: string | undefined;
 };
 
+/**
+ * Rebuild the plate style from the resting stage config for one color scheme.
+ *
+ * The server cannot know the reader's theme — it lives in `localStorage` and is stamped onto
+ * `<html data-theme>` by the pre-paint bootstrap script — so `loadMapStageBase` necessarily ships
+ * ONE scheme's style. Every client-side entry point that needs the plate to match the document
+ * (first mount, `data-theme` toggle) rebuilds through here rather than trusting that prop.
+ */
+function buildStyleForScheme(cfg: StageConfig, colorScheme: MapColorScheme): StyleSpecification {
+  return buildExploreMapStyle({
+    featureCollection: cfg.featureCollection,
+    jurisdictionAreaFeatures: cfg.jurisdictionAreaFeatures,
+    layerMode: cfg.layerMode,
+    popGeo: cfg.popGeo,
+    historyEdgesEnabled: cfg.historyEdgesEnabled,
+    clusteringEnabled: cfg.clusteringEnabled,
+    colorScheme,
+  });
+}
+
 function makeListenerStore(): {
   [K in MapStageEventName]: Set<(...args: MapStageEvents[K]) => void>;
 } {
@@ -1573,14 +1578,7 @@ export function MapStageProvider({
       if (!map || !map.isStyleLoaded()) return;
       const cfg = configRef.current;
       const scheme = readDocumentColorScheme();
-      const style = buildExploreMapStyle({
-        featureCollection: cfg.featureCollection,
-        jurisdictionAreaFeatures: cfg.jurisdictionAreaFeatures,
-        layerMode: cfg.layerMode,
-        historyEdgesEnabled: cfg.historyEdgesEnabled,
-        clusteringEnabled: cfg.clusteringEnabled,
-        colorScheme: scheme,
-      });
+      const style = buildStyleForScheme(cfg, scheme);
       configRef.current = { ...cfg, style };
       applyStyleAndData();
       syncPlatePaintToTheme(map, style, scheme);
@@ -1789,9 +1787,18 @@ export function MapStageProvider({
         maplibreglRef.current = maplibregl;
         if (cancelled || !container.isConnected) return;
 
+        // The style prop was built on the server, which cannot read `<html data-theme>`. Re-resolve
+        // the plate against the document BEFORE the first frame so a light-theme reader never sees
+        // the dark plate — neither in the pre-`load` background nor in the first `applyStyleAndData`.
+        const mountScheme = readDocumentColorScheme();
+        configRef.current = {
+          ...configRef.current,
+          style: buildStyleForScheme(configRef.current, mountScheme),
+        };
+
         map = new maplibregl.Map({
           container,
-          style: ARCHIVE_BASE_STYLE,
+          style: buildArchiveBaseStyle(mountScheme),
           attributionControl: false,
           // Keep the camera US-centered without a tight maxBounds box (see the former
           // ExploreMapCanvas's identical comment): a portrait canvas cannot show full CONUS
