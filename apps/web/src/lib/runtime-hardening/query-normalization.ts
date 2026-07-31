@@ -11,11 +11,9 @@
  */
 
 import { buildExploreSearchParams, parseExploreSearchParams } from '../map-experience/url-state';
-import { buildHistorySearchParams, parseHistorySearchParams } from '../history/url-state';
 import {
   CORRECTIONS_PAGE_PARAM_ALLOWLIST,
   EXPLORE_PAGE_PARAM_ALLOWLIST,
-  HISTORY_PAGE_PARAM_ALLOWLIST,
   LAW_PAGE_PARAM_ALLOWLIST,
   SEARCH_PAGE_PARAM_ALLOWLIST,
   TRACKING_QUERY_KEYS,
@@ -55,9 +53,8 @@ export function getAllowedQueryParamsForPath(pathname: string): readonly string[
   if (EXPLORE_SURFACE_PATHS.has(path)) {
     return EXPLORE_PAGE_PARAM_ALLOWLIST;
   }
-  if (path === '/history') {
-    return HISTORY_PAGE_PARAM_ALLOWLIST;
-  }
+  // No `/history` branch: the route is not in the middleware matcher and must not be. See the
+  // note where HISTORY_PAGE_PARAM_ALLOWLIST used to live in `constants.ts`.
   if (path === '/law') {
     return LAW_PAGE_PARAM_ALLOWLIST;
   }
@@ -107,9 +104,6 @@ export function normalizeQueryString(
 
   if (EXPLORE_SURFACE_PATHS.has(path)) {
     return buildExploreSearchParams(parseExploreSearchParams(bag));
-  }
-  if (path === '/history') {
-    return buildHistorySearchParams(parseHistorySearchParams(bag));
   }
 
   const normalized = new URLSearchParams();

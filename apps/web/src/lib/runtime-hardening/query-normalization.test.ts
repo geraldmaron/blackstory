@@ -310,21 +310,21 @@ test('normalizeQueryString canonicalizes explore layerMode', () => {
   );
 });
 
-test('normalizeQueryString keeps allowlisted /history browse params', () => {
+test('/history carries no browse allowlist, because normalizing it would break the redirect', () => {
+  // The decade stepper and its selection params went with the browse UI (repo-92n2.27). What is
+  // left of /history maps an incoming `decade` onto `era` and 308s to /records, so its params are
+  // cargo for one hop rather than filters on a page.
+  //
+  // Normalization must never touch them: stripping `decade` would land a five-year-old bookmark
+  // on an unfiltered index quietly, which is worse than failing. The route is out of the
+  // middleware matcher (asserted below) and this keeps the allowlist empty so that adding it back
+  // cannot silently start rewriting a redirect's input.
   const qs = normalizeQueryString('/history', {
     decade: '1970s',
     kind: 'event',
-    q: 'dunbar',
-    sort: 'connections',
-    selected: 'ent_dc_landmark_listing_1975',
-    edge: 'edge_1',
     fbclid: 'abc',
-    junk: '1',
   });
-  assert.equal(
-    qs,
-    'decade=1970s&kind=event&q=dunbar&sort=connections&selected=ent_dc_landmark_listing_1975&edge=edge_1',
-  );
+  assert.equal(qs, '');
 });
 
 test('buildNormalizedUrl issues canonical Atlas URLs for revisit', () => {

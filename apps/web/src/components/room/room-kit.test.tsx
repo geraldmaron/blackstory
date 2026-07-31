@@ -39,8 +39,8 @@ const APP_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../.
  * and the test fails in both directions — a file here that no longer exists is a stale
  * exemption, a file on disk that is not here is the v6 system growing back.
  *
- * Two entries outlive the three surface packages by design: `explore-*` belongs to the Atlas
- * until SP-16 closes, and `history-*` goes with repo-92n2.27, which deletes the orphaned
+ * One entry outlives the three surface packages by design: `explore-*` belongs to the Atlas
+ * until SP-16 closes. The `history-*` pair left with repo-92n2.27, which deleted the orphaned
  * render components now that /history is a redirect endpoint.
  */
 const LEGACY_EDITION_CHROME: readonly string[] = [
@@ -57,8 +57,6 @@ const LEGACY_EDITION_CHROME: readonly string[] = [
   'data/data-panel-chrome.ts',
   'entity/[id]/entity-edition.css',
   'entity/[id]/entity-panel-chrome.ts',
-  'history/history-edition.css',
-  'history/history-panel-chrome.ts',
   'law/law-edition.css',
   'law/law-panel-chrome.ts',
   'memorial/memorial-edition.css',

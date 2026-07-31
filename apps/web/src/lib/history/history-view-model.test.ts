@@ -1,5 +1,5 @@
 /**
- * Confirms the history page view-model: graph release artifact drives all-time and decade
+ * Confirms the history graph view-model: graph release artifact drives all-time and decade
  * slices, decade views use point-in-time status (never present-day backfill), and URL state parses
  * shareable decade/filter/selection params.
  */
@@ -271,7 +271,10 @@ test('overview decade density follows active filters', () => {
   assert.ok(allNonZero > placesNonZero);
   assert.ok(
     places.overview.decadeDensity.every(
-      (entry) => entry.count <= (all.overview.decadeDensity.find((row) => row.decade === entry.decade)?.count ?? entry.count),
+      (entry) =>
+        entry.count <=
+        (all.overview.decadeDensity.find((row) => row.decade === entry.decade)?.count ??
+          entry.count),
     ),
   );
 });
