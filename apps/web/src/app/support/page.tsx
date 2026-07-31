@@ -1,11 +1,19 @@
 /**
  * Public support page for BlackStory store gates. Primary path is the corrections lane;
  * secondary trust surfaces and a contact placeholder until the owner sets a live address.
+ *
+ * v9 utility room kit edition. This is a UTILITY room: task surface for helping readers
+ * find corrections, methodology, and contact information.
  */
 import type { Metadata } from 'next';
-import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
+import React from 'react';
 import Link from 'next/link';
+import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
+import { Room, RoomHeader, Prose, CardGrid, RoomCard, UtilityCard } from '../../components/room';
+import '../utility.css';
 import './support.css';
+
+void React;
 
 export const metadata: Metadata = buildStaticPageMetadata({
   path: '/support',
@@ -37,72 +45,56 @@ const SUPPORT_PATHS = [
 
 export default function SupportPage() {
   return (
-    <main className="ds-container ds-page ds-support" id="main">
-      <p className="ds-page__eyebrow">Help</p>
-      <h1 className="ds-page__title">Support</h1>
-      <p className="ds-page__lede">
-        BlackStory is a place-connected research archive. The fastest path for factual issues is the
-        corrections lane — moderated, receipted, and never published as submitted.
-      </p>
+    <Room>
+      <RoomHeader
+        pathname="/support"
+        kicker="Help"
+        title="Support"
+        lede="BlackStory is a place-connected research archive. The fastest path for factual issues is the corrections lane — moderated, receipted, and never published as submitted."
+        showPath={false}
+      />
 
-      <div className="ds-entity-sections">
-        <section
-          className="ds-section ds-record-section ds-section--flush"
-          aria-labelledby="support-paths"
-          id="paths"
-        >
-          <p className="ds-section__kicker">
-            <span className="ds-kicker-index" aria-hidden="true" />
-            Start here
-          </p>
-          <h2 className="ds-section__title" id="support-paths">
-            Common paths
-          </h2>
-          <p className="ds-section__lede">
+      <UtilityCard className="ds-support__section-paths">
+        <Prose>
+          <p className="ds-support__section-intro">
             Most questions about a specific record are best handled through corrections so
             moderators can tie your report to the published projection and sources.
           </p>
-          <ul className="ds-support__paths">
-            {SUPPORT_PATHS.map((path) => (
-              <li key={path.href} className="ds-support__path">
-                <Link className="ds-support__path-link" href={path.href}>
-                  <span className="ds-support__path-label">{path.label}</span>
-                  <span className="ds-support__path-detail">{path.detail}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
+        </Prose>
+        <CardGrid>
+          {SUPPORT_PATHS.map((path) => (
+            <RoomCard
+              key={path.href}
+              href={path.href}
+              kind="OPTION"
+              title={path.label}
+              description={path.detail}
+            />
+          ))}
+        </CardGrid>
+      </UtilityCard>
 
-        <section
-          className="ds-section ds-record-section"
-          aria-labelledby="support-contact"
-          id="contact"
-        >
-          <p className="ds-section__kicker">
-            <span className="ds-kicker-index" aria-hidden="true" />
-            Direct contact
-          </p>
-          <h2 className="ds-section__title" id="support-contact">
-            Reach the team
-          </h2>
-          <p className="ds-section__lede">
+      <UtilityCard title="Reach the team" className="ds-support__section-contact">
+        <Prose>
+          <p className="ds-support__contact-intro">
             For issues that do not fit the corrections form — account of operation questions,
             privacy requests, or accessibility barriers — email the contact below.
           </p>
-          <div className="ds-support__contact">
-            <p className="ds-support__contact-label">Support contact</p>
-            <p className="ds-support__contact-value">
-              <a href="mailto:me@geralddagher.com">me@geralddagher.com</a>
-            </p>
-          </div>
-          <p className="ds-support__follow">
-            Privacy questions: see the <Link href="/privacy">privacy policy</Link>. Store listings
-            link here and to that policy; both URLs must be live on{' '}
-            <span className="ds-phrase-nowrap">blackbook.app</span> before app store submission.
+        </Prose>
+
+        <div className="ds-support__contact">
+          <p className="ds-support__contact-label">Support contact</p>
+          <p className="ds-support__contact-value">
+            <a href="mailto:me@geralddagher.com">me@geralddagher.com</a>
           </p>
-        </section>
-      </div>
-    </main>
+        </div>
+
+        <p className="ds-support__follow">
+          Privacy questions: see the <Link href="/privacy">privacy policy</Link>. Store listings
+          link here and to that policy; both URLs must be live on{' '}
+          <span className="ds-phrase-nowrap">blackbook.app</span> before app store submission.
+        </p>
+      </UtilityCard>
+    </Room>
   );
 }

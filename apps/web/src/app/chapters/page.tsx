@@ -8,6 +8,9 @@ import type { Metadata } from 'next';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { listPublicArticleListItems } from '../../lib/articles/source';
+import { Room, RoomHeader } from '../../components/room';
+import '../reading-room.css';
+// Retained for the chapter card itself, which carries a hero image the kit's RoomCard does not.
 import './articles-edition.css';
 
 export const metadata: Metadata = buildStaticPageMetadata({
@@ -21,50 +24,42 @@ export default async function ChaptersIndexPage() {
   const { items, source } = await listPublicArticleListItems();
 
   return (
-    <div className="ds-articles-edition">
-      <main className="ds-container ds-page" id="main">
-        <div className="ds-articles-edition__stack">
-          <header className="ds-articles-edition__intro">
-            <p className="ds-articles-edition__kicker">Chapters</p>
-            <h1 className="ds-articles-edition__title">
-              History pinned to <em>place</em> and <em>record</em>.
-            </h1>
-            <p className="ds-articles-edition__lede">
-              Long-form pieces that walk from a named year and place through the rules in force and
-              the measured odds under them. Every figure and quotation cites the record it rests on.
-            </p>
-          </header>
+    <Room>
+      <RoomHeader
+        pathname="/chapters"
+        kicker="Chapters"
+        title="History pinned to place and record."
+        lede="Long-form pieces that walk from a named year and place through the rules in force and the measured odds under them. Every figure and quotation cites the record it rests on."
+      />
 
-          {source === 'unavailable' ? (
-            <p className="ds-articles-edition__notice">
-              Articles are temporarily unavailable while we reconnect to the live record. Nothing
-              here is lost; please check back shortly.
-            </p>
-          ) : items.length === 0 ? (
-            <p className="ds-articles-edition__notice">No chapters are published yet.</p>
-          ) : (
-            <ul className="ds-articles-grid">
-              {items.map((item) => (
-                <li key={item.slug} className="ds-articles-grid__item">
-                  <Link className="ds-article-card" href={`/chapters/${item.slug}`}>
-                    {item.heroImage ? (
-                      <span className="ds-article-card__media">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={item.heroImage.url} alt={item.heroImage.alt} loading="lazy" />
-                      </span>
-                    ) : null}
-                    <span className="ds-article-card__meta">
-                      {item.eraLabel} · {item.placeLabel}
-                    </span>
-                    <span className="ds-article-card__title">{item.title}</span>
-                    <span className="ds-article-card__summary">{item.summary}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </main>
-    </div>
+      {source === 'unavailable' ? (
+        <p className="ds-articles-edition__notice">
+          Articles are temporarily unavailable while we reconnect to the live record. Nothing here
+          is lost; please check back shortly.
+        </p>
+      ) : items.length === 0 ? (
+        <p className="ds-articles-edition__notice">No chapters are published yet.</p>
+      ) : (
+        <ul className="ds-articles-grid">
+          {items.map((item) => (
+            <li key={item.slug} className="ds-articles-grid__item">
+              <Link className="ds-article-card" href={`/chapters/${item.slug}`}>
+                {item.heroImage ? (
+                  <span className="ds-article-card__media">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={item.heroImage.url} alt={item.heroImage.alt} loading="lazy" />
+                  </span>
+                ) : null}
+                <span className="ds-article-card__meta">
+                  {item.eraLabel} · {item.placeLabel}
+                </span>
+                <span className="ds-article-card__title">{item.title}</span>
+                <span className="ds-article-card__summary">{item.summary}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </Room>
   );
 }

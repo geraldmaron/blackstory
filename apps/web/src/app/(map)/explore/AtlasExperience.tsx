@@ -142,7 +142,23 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
   const view = useMemo(() => hydrateExploreViewModel(initial), [initial]);
   const toasts = useToasts();
 
+  /**
+   * The Atlas opens in the instrument unless a link asked for the story.
+   *
+   * Rooms outside the map carry Story in the bar as `/#story`, because there is no surface there
+   * to toggle. A fragment rather than a query param: `/` normalizes its query at the edge against
+   * the explore allowlist, so a param would be stripped before this ran.
+   *
+   * Applied after mount, not as the initial value: the server has no fragment, so seeding state
+   * from it would render `atlas` on the server and `story` on the client and fail hydration. Read
+   * once rather than watched, so a reader who then presses Atlas is not pulled back into the story
+   * by a fragment still sitting in the address bar.
+   */
   const [mode, setMode] = useState<AtlasMode>('atlas');
+
+  useEffect(() => {
+    if (window.location.hash === '#story') setMode('story');
+  }, []);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [savedOpen, setSavedOpen] = useState(false);

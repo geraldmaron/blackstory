@@ -1,8 +1,10 @@
 /**
- * Public challenged-books browse surface at `/books`. v6 edition Surface stack with
- * shared gutter mosaic atmosphere, catalog pulse, rip rows, and preserved browse URL params.
+ * Public challenged-books browse surface at `/books`. v9 room kit edition with
+ * shared browse/filter surface. Preserves banned-books catalog pulse, rip rows, and browse
+ * URL params (`q`, `state`, `author`, `sort`, `dir`, `page`).
  */
 import type { Metadata } from 'next';
+import React from 'react';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { ATMOSPHERE_ATTRIBUTION_HREF } from '../../components/atmosphere/tile-credits';
@@ -12,12 +14,11 @@ import { buildBooksBrowseViewModel, type RawBooksBrowseParams } from './books-vi
 import { BooksBrowseSections } from './BooksBrowseSections';
 import { BooksCatalogPulse } from './BooksCatalogPulse';
 import { BOOKS_INTRO, BOOKS_PAGE_DESCRIPTION } from './books-copy';
-import {
-  booksEditionPanelClassName,
-  booksEditionRootClassName,
-  booksEditionStackClassName,
-} from './books-panel-chrome';
+import { OffRamp, Prose, Room, RoomHeader } from '../../components/room';
+import '../reading-room.css';
 import './books-edition.css';
+
+void React;
 
 export const metadata: Metadata = buildStaticPageMetadata({
   path: '/books',
@@ -36,48 +37,59 @@ export default async function BooksBrowsePage({ searchParams }: BooksPageProps) 
   const suggestCorpus = snapshot.books.map(bannedBookToSuggestCorpusItem);
 
   return (
-    <div className={booksEditionRootClassName()} data-books-edition="v6">
-      <main className="ds-container ds-page" id="main">
-        <div className={booksEditionStackClassName()}>
-          <article className={booksEditionPanelClassName('intro')}>
-            <header className="ds-books-edition__header">
-              <span className="ds-books-edition__index" aria-hidden="true">
-                00
-              </span>
-              <div>
-                <p className="ds-books-edition__kicker">{BOOKS_INTRO.kicker}</p>
-                <h1 className="ds-books-edition__title">
-                  Banned <em>{BOOKS_INTRO.titleWarm}</em>.
-                </h1>
-                <p className="ds-books-edition__lede">{BOOKS_INTRO.lede}</p>
-                <BooksCatalogPulse snapshot={snapshot} />
-                <p className="ds-books-edition__crosslink">
-                  {/* `sources` is the record index's family for publications, laws and artifacts;
-                      there is no publication-only facet, so the label names the family honestly
-                      rather than promising a narrowing the index cannot make. */}
-                  <Link className="ds-cta-link" href="/records?kind=sources">
-                    Also find publications in the record index
-                  </Link>
-                  {' · '}
-                  <Link className="ds-cta-link" href="/chapters">
-                    Chapters
-                  </Link>
-                  {' · '}
-                  <Link className="ds-cta-link" href="/methodology">
-                    Methodology
-                  </Link>
-                </p>
-                <p className="ds-books-edition__credit">
-                  Archive texture · symbolic atmosphere.{' '}
-                  <Link href={ATMOSPHERE_ATTRIBUTION_HREF}>Mosaic credits</Link>
-                </p>
-              </div>
-            </header>
-          </article>
+    <Room>
+      <RoomHeader
+        pathname="/books"
+        kicker={BOOKS_INTRO.kicker}
+        title={
+          <>
+            Banned <em>{BOOKS_INTRO.titleWarm}</em>.
+          </>
+        }
+        lede={BOOKS_INTRO.lede}
+      />
 
-          <BooksBrowseSections view={view} suggestCorpus={suggestCorpus} />
-        </div>
-      </main>
-    </div>
+      <BooksCatalogPulse snapshot={snapshot} />
+
+      <Prose>
+        <p>
+          {/* `sources` is the record index's family for publications, laws and artifacts;
+              there is no publication-only facet, so the label names the family honestly
+              rather than promising a narrowing the index cannot make. */}
+          <Link className="ds-cta-link" href="/records?kind=sources">
+            Also find publications in the record index
+          </Link>
+          {' · '}
+          <Link className="ds-cta-link" href="/chapters">
+            Chapters
+          </Link>
+          {' · '}
+          <Link className="ds-cta-link" href="/methodology">
+            Methodology
+          </Link>
+        </p>
+        <p>
+          Archive texture · symbolic atmosphere.{' '}
+          <Link href={ATMOSPHERE_ATTRIBUTION_HREF}>Mosaic credits</Link>
+        </p>
+      </Prose>
+
+      <BooksBrowseSections view={view} suggestCorpus={suggestCorpus} />
+
+      <OffRamp
+        title={
+          <>
+            Or go straight to the <em>records</em>
+          </>
+        }
+        actions={[
+          { label: 'Open the Atlas', href: '/', emphasis: 'copper' },
+          { label: 'Search the archive', href: '/records' },
+        ]}
+      >
+        Press <kbd className="ds-kbd">⌘</kbd>
+        <kbd className="ds-kbd">K</kbd> to search books and records from anywhere.
+      </OffRamp>
+    </Room>
   );
 }

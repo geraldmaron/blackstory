@@ -19,12 +19,16 @@ const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
 const sectionsSource = readFileSync(join(here, 'DataSections.tsx'), 'utf8');
 const copySource = readFileSync(join(here, 'data-copy.ts'), 'utf8');
 
-test('data page does not mount EditionAtmosphereMosaic and v6 edition root', () => {
+test('data page renders through the room kit, with no edition chrome left', () => {
   assert.doesNotMatch(pageSource, /EditionAtmosphereMosaic/);
   assert.doesNotMatch(pageSource, /DATA_EDITION_MOSAIC_SEED/);
-  assert.match(pageSource, /dataEditionRootClassName/);
+  // The v6 edition root is gone; the shared kit draws the room. A per-route chrome surviving next
+  // to the kit is the drift this package exists to remove.
+  assert.doesNotMatch(pageSource, /dataEditionRootClassName/);
+  assert.match(pageSource, /from '\.\.\/\.\.\/components\/room'/);
+  assert.match(pageSource, /<Room>/);
+  assert.match(pageSource, /<RoomHeader/);
   assert.doesNotMatch(pageSource, /ds-page__title/);
-  assert.doesNotMatch(pageSource, /data\.css/);
 });
 
 test('data page preserves census and indicator chart wiring', () => {

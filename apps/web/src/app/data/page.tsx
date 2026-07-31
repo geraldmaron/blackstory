@@ -19,10 +19,10 @@ import {
 import { getDataPageIndicatorBundle } from '../../lib/demographics/data-page-indicators';
 import { timelineChangeStripItems } from '../../components/data/population-change';
 import '../../components/data/data-charts.css';
-import { DATA_PAGE_DESCRIPTION } from './data-copy';
-import { dataEditionRootClassName } from './data-panel-chrome';
+import { DATA_INTRO, DATA_PAGE_DESCRIPTION } from './data-copy';
 import { DataSections } from './DataSections';
-import './data-edition.css';
+import { OffRamp, Room, RoomHeader } from '../../components/room';
+import '../reading-room.css';
 
 export const metadata: Metadata = buildStaticPageMetadata({
   path: '/data',
@@ -84,19 +84,34 @@ export default async function DataPage() {
   }
 
   return (
-    <div className={dataEditionRootClassName()} data-data-edition="v6">
-      <main className="ds-container ds-page" id="main">
-        <DataSections
-          timelineRows={timelineRows}
-          chartSources={chartSources}
-          changeStripItems={changeStripItems}
-          stateChanges={stateChanges}
-          stateNameByFips={STATE_NAME_BY_FIPS}
-          historicalStates={historicalStates}
-          phase1Indicators={phase1}
-          indicators={indicators}
-        />
-      </main>
-    </div>
+    <Room>
+      <RoomHeader pathname="/data" kicker="Numbers" title="Data" lede={DATA_INTRO.lede} />
+
+      <DataSections
+        timelineRows={timelineRows}
+        chartSources={chartSources}
+        changeStripItems={changeStripItems}
+        stateChanges={stateChanges}
+        stateNameByFips={STATE_NAME_BY_FIPS}
+        historicalStates={historicalStates}
+        phase1Indicators={phase1}
+        indicators={indicators}
+      />
+
+      <OffRamp
+        title={
+          <>
+            Go back to the <em>map</em>
+          </>
+        }
+        actions={[
+          { label: 'Explore the map', href: '/', emphasis: 'copper' },
+          { label: 'Read methodology', href: '/methodology' },
+          { label: 'Banned books', href: '/books' },
+        ]}
+      >
+        Use the archive itself—place layers show the records in their geography.
+      </OffRamp>
+    </Room>
   );
 }

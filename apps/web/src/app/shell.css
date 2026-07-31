@@ -2,15 +2,19 @@
  * Public BlackStory shell — design-direction-v5 page surfaces.
  *
  * Navigation chrome lives in @repo/ui `shell-header.css` (theme-aware full-width
- * bar). This file owns document page patterns: oversized Sora masts with a serif
+ * bar). This file owns document page patterns: oversized display masts with a serif
  * italic accent register, hairline-ruled ledger rows, hero timeline, Surface footer card.
  * Copper stays an orientation signal at 10–15% presence — one copper action per
  * composition.
  *
- * Type registers (v5 §3): Sora display · Inter UI/chrome · Source Serif 4
- * editorial · IBM Plex Mono strictly for data (slugs, counts, dates,
- * decades, citations). Caps in exactly two registers: mono data slugs and
- * sans nav/CTA labels.
+ * Type registers, named by role rather than by face: --ds-font-display for masts,
+ * --ds-font-sans for UI/chrome, --ds-font-editorial for longform, --ds-font-mono
+ * strictly for data (slugs, counts, dates, decades, citations). Caps in exactly two
+ * registers: mono data slugs and sans nav/CTA labels.
+ *
+ * The faces behind those roles are set once in packages/ui tokens.css and named
+ * nowhere else. Spelling them out here is what left this file advertising Sora and
+ * Source Serif 4 for a week after the type system had already moved.
  *
  * Fixed-ink surfaces (ink bands only) still use --ds-fixed-* where the plate
  * must not theme-flip — see base.css. Footer is a theme-aware Surface card;

@@ -11,10 +11,10 @@ import {
 } from '../../components/trust/index';
 import { TRUST_PATHS } from '../../lib/trust/site-identity';
 import { MethodologySections } from './MethodologySections';
-import {
-  methodologyEditionRootClassName,
-  methodologyEditionStackClassName,
-} from './methodology-panel-chrome';
+import { Room } from '../../components/room';
+import '../reading-room.css';
+// Retained for the section-level styling MethodologySections still carries; the page chrome it
+// used to provide is drawn by the room kit now.
 import './methodology-edition.css';
 
 export const metadata: Metadata = buildStaticPageMetadata({
@@ -26,17 +26,15 @@ export const metadata: Metadata = buildStaticPageMetadata({
 
 export default function MethodologyPage() {
   return (
-    <div className={methodologyEditionRootClassName()} data-methodology-edition="v6">
-      <main className="ds-container ds-page" id="main">
-        <TrustSiteJsonLdScript />
-        <PublishingPrinciplesJsonLdScript
-          pagePath={TRUST_PATHS.methodology}
-          pageTitle="Methodology"
-        />
-        <div className={methodologyEditionStackClassName()}>
-          <MethodologySections />
-        </div>
-      </main>
-    </div>
+    <Room>
+      <TrustSiteJsonLdScript />
+      <PublishingPrinciplesJsonLdScript
+        pagePath={TRUST_PATHS.methodology}
+        pageTitle="Methodology"
+      />
+      {/* MethodologySections renders its own heading and lede, so the room takes no RoomHeader:
+          a second title would put two h1s on the page the archive uses to prove its own rigour. */}
+      <MethodologySections />
+    </Room>
   );
 }

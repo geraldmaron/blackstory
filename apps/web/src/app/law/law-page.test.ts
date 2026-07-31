@@ -15,10 +15,14 @@ const detailPageSource = readFileSync(join(here, '[slug]', 'page.tsx'), 'utf8');
 const detailSectionsSource = readFileSync(join(here, 'LawDetailSections.tsx'), 'utf8');
 const anatomySource = readFileSync(join(here, 'LawAnatomyStrip.tsx'), 'utf8');
 
-test('law browse page does not mount EditionAtmosphereMosaic and edition stack', () => {
+test('law browse page renders through the room kit, with no edition chrome left', () => {
   assert.doesNotMatch(browsePageSource, /EditionAtmosphereMosaic/);
   assert.doesNotMatch(browsePageSource, /LAW_EDITION_MOSAIC_SEED/);
-  assert.match(browsePageSource, /data-law-edition="v6"/);
+  // `data-law-edition="v6"` marked the per-route chrome the shared kit replaces.
+  assert.doesNotMatch(browsePageSource, /data-law-edition="v6"/);
+  assert.match(browsePageSource, /from '\.\.\/\.\.\/components\/room'/);
+  assert.match(browsePageSource, /<Room>/);
+  assert.match(browsePageSource, /<RoomHeader/);
   assert.doesNotMatch(browsePageSource, /ds-page__title/);
 });
 

@@ -142,7 +142,7 @@ export function stateLabelColorsForScheme(colorScheme: MapColorScheme): {
 }
 
 /**
- * Builds a label's DOM element: IBM Plex Mono caps, theme-aware muted ink, copper when selected, never
+ * Builds a label's DOM element: mono-register caps, theme-aware muted ink, copper when selected, never
  * interactive. Browser-only (calls `document.createElement`) callers must not invoke this in a
  * non-DOM context (SSR/Node tests); `stateLabelPoints`/`buildStateLabelMarkers` above are this
  * module's SSR/test-safe surface.
