@@ -4,6 +4,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { parseContentInSandbox } from './fetch.ts';
 import {
   createUrlEvaluationJob,
   evaluateExternalUrl,
@@ -269,4 +270,21 @@ test('submission path creates a queue contract and validation never publishes di
   assert.equal(validated.quarantineRequired, true);
   assert.equal(validated.publicationAllowed, false);
   assert.throws(() => transitionUrlEvaluation(validated, 'fetching'));
+});
+
+test('sandbox extraction strips script content whose end tag carries whitespace', async () => {
+  // `</script >` is a valid end tag browsers honour. The filter missed it, so the element's
+  // contents survived into extractedText, the text this scanner reports as the safe, tag-free
+  // rendering of a fetched document (CodeQL js/bad-tag-filter).
+  const html = '<html><body>visible<script>secretPayload()</script >tail</body></html>';
+  const result = await parseContentInSandbox(Buffer.from(html), 'text/html');
+  assert.equal(result.extractedText.includes('secretPayload'), false);
+  assert.equal(result.extractedText.includes('visible'), true);
+  assert.equal(result.extractedText.includes('tail'), true);
+});
+
+test('sandbox extraction still strips a plain script end tag', async () => {
+  const html = '<html><body>visible<style>.a{}</style>tail</body></html>';
+  const result = await parseContentInSandbox(Buffer.from(html), 'text/html');
+  assert.equal(result.extractedText.includes('.a{}'), false);
 });
