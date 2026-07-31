@@ -1,24 +1,33 @@
 /**
- * Site header gate for the public shell.
+ * Site header for the public shell.
  *
- * The Instrument renders its own command bar (`components/shell/CommandBar.tsx`), which is the
- * v9 replacement for this header rather than an addition to it. Rendering both would put two
- * brand lockups and two navigations on one surface, and would push the map plate down by 56px
- * on the one route where the map is the product.
+ * One bar, every surface. The site used to run two navigation patterns at once: the Atlas rendered
+ * `components/shell/CommandBar.tsx` and every other room rendered `SiteHeader`, a fourteen-item bar
+ * with a `MORE` menu hiding nine of them. A reader crossing from the map to a reading room met a
+ * different header, in a different place, with a different set of destinations — and the two
+ * disagreed about what the site contained.
  *
- * The decision reads the surface class registry — the same table `shell.css` and the footer
- * read — so the three can never disagree about which surface is the Instrument. It stays a
- * render gate rather than a `display: none` so the Atlas ships no second, hidden navigation.
+ * The Atlas still mounts its own `CommandBar` inside `AtlasExperience`, because there the bar needs
+ * the mode toggle, the palette, the saved drawer and the shortcut sheet, all of which are that
+ * surface's client state. This renders the same component without them: brand, a search slot that
+ * links to the record index, Atlas, Library, and the theme switch. Same component, same position,
+ * same artwork — the parts that cannot work off the Atlas are absent rather than inert.
+ *
+ * The gate reads the surface class registry, the same table `shell.css` and the footer read, so the
+ * three cannot disagree about which surface is the Instrument. It stays a render gate rather than a
+ * `display: none` so the Atlas ships no second, hidden navigation.
  */
 
 'use client';
 
 import { usePathname } from 'next/navigation';
 import { surfaceClassFor } from '../lib/nav/surface-classes';
-import { SiteHeader } from './SiteHeader';
+import { CommandBar } from './shell/CommandBar';
 
 export function SiteShellHeader() {
   const pathname = usePathname() || '/';
   if (surfaceClassFor(pathname) === 'instrument') return null;
-  return <SiteHeader />;
+  // No `recordCount`: the count is a promise only a surface holding the index can keep, and a
+  // reading room does not load one. The placeholder drops the number rather than inventing it.
+  return <CommandBar className="ds-bar--room" />;
 }

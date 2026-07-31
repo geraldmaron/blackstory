@@ -107,7 +107,8 @@
   background: var(--ds-canvas);
 }
 
-.ds-bar__modes button {
+.ds-bar__modes button,
+.ds-bar__mode-link {
   min-height: 28px;
   padding: 0 var(--ds-space-3);
   border: 0;
@@ -117,6 +118,22 @@
   font-family: inherit;
   font-size: 0.78125rem;
   cursor: pointer;
+}
+
+/* The Library link is an anchor in a row of buttons, so it needs the line box the others get
+   from being buttons. Separated from the toggles by a hairline: it leaves the surface. */
+.ds-bar__mode-link {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 2px;
+  border-left: var(--ds-border-width) solid var(--ds-border);
+  border-radius: 0 var(--ds-radius-full) var(--ds-radius-full) 0;
+  text-decoration: none;
+}
+
+.ds-bar__mode-link:hover,
+.ds-bar__mode-link:focus-visible {
+  color: var(--ds-ink);
 }
 
 .ds-bar__modes button[aria-current='true'] {

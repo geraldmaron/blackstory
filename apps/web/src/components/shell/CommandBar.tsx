@@ -9,6 +9,12 @@
  * from the site footer, and `CommandBar` deliberately does not render a nav menu of its own so
  * there is no third place for that list to drift.
  *
+ * The one exception is Library, and it is a hub rather than a destination: `/library` is where the
+ * other eleven rooms are listed, generated from the same registry the palette and the footer read.
+ * Without it the bar offered no route off the Atlas at all, and eleven editorial rooms sat behind a
+ * keyboard shortcut a first-time reader has no reason to know about. One link to the index is not
+ * the fourteen-item menu v9 removed — it is the thing that makes removing it survivable.
+ *
  * Branding comes from `BRAND_ASSETS` through the shell's own wordmark classes, so the Atlas bar
  * and the site header render the same artwork with the same light/dark swap.
  */
@@ -23,12 +29,37 @@ void React;
 
 export type AtlasMode = 'atlas' | 'story';
 
+function SearchGlyph() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <circle cx="7" cy="7" r="4.6" stroke="currentColor" strokeWidth="1.4" />
+      <path d="m10.6 10.6 3 3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** The count is a promise the surface can keep only where it has the index loaded. */
+function searchLabel(recordCount: number | undefined): string {
+  return recordCount === undefined
+    ? 'Search records, places, eras'
+    : `Search ${recordCount.toLocaleString('en-US')} records, places, eras`;
+}
+
 export type CommandBarProps = {
-  readonly mode: AtlasMode;
-  readonly onModeChange: (mode: AtlasMode) => void;
-  readonly onOpenPalette: () => void;
+  /**
+   * Present only on the Atlas, where Atlas and Story are two views of one surface. Every other
+   * room renders the same bar without them: a reading room has no story to switch into, and a
+   * toggle that navigates instead of switching would be lying about what it does.
+   */
+  readonly mode?: AtlasMode;
+  readonly onModeChange?: (mode: AtlasMode) => void;
+  /**
+   * Opens the palette, which needs a client record index only the Atlas has. Off the Atlas the
+   * search slot becomes a real link to /records rather than a button that cannot do anything.
+   */
+  readonly onOpenPalette?: () => void;
   /** Record count for the search placeholder. Reads as a promise the surface can keep. */
-  readonly recordCount: number;
+  readonly recordCount?: number;
   readonly savedCount?: number;
   readonly onOpenSaved?: () => void;
   readonly onOpenShortcuts?: () => void;
@@ -56,38 +87,58 @@ export function CommandBar({
         <span className="ds-bar__tag">Atlas</span>
       </a>
 
-      <button
-        type="button"
-        className="ds-bar__search"
-        onClick={onOpenPalette}
-        aria-label="Search records, places and actions"
-      >
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <circle cx="7" cy="7" r="4.6" stroke="currentColor" strokeWidth="1.4" />
-          <path d="m10.6 10.6 3 3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-        </svg>
-        <span className="ds-bar__search-text">
-          Search {recordCount.toLocaleString('en-US')} records, places, eras
-        </span>
-        <kbd className="ds-kbd">⌘K</kbd>
-      </button>
+      {onOpenPalette ? (
+        <button
+          type="button"
+          className="ds-bar__search"
+          onClick={onOpenPalette}
+          aria-label="Search records, places and actions"
+        >
+          <SearchGlyph />
+          <span className="ds-bar__search-text">{searchLabel(recordCount)}</span>
+          <kbd className="ds-kbd">⌘K</kbd>
+        </button>
+      ) : (
+        /* No palette off the Atlas, so this is a link to the index rather than a dead button.
+           The reader gets the same affordance in the same place, and it works without JS. */
+        <a className="ds-bar__search" href="/records" aria-label="Search the record index">
+          <SearchGlyph />
+          <span className="ds-bar__search-text">{searchLabel(recordCount)}</span>
+        </a>
+      )}
 
       <div className="ds-bar__tools">
-        <nav className="ds-bar__modes" aria-label="Mode">
-          <button
-            type="button"
-            onClick={() => onModeChange('atlas')}
-            aria-current={mode === 'atlas' ? 'true' : undefined}
-          >
-            Atlas
-          </button>
-          <button
-            type="button"
-            onClick={() => onModeChange('story')}
-            aria-current={mode === 'story' ? 'true' : undefined}
-          >
-            Story
-          </button>
+        <nav className="ds-bar__modes" aria-label="Sections">
+          {mode && onModeChange ? (
+            <>
+              <button
+                type="button"
+                onClick={() => onModeChange('atlas')}
+                aria-current={mode === 'atlas' ? 'true' : undefined}
+              >
+                Atlas
+              </button>
+              <button
+                type="button"
+                onClick={() => onModeChange('story')}
+                aria-current={mode === 'story' ? 'true' : undefined}
+              >
+                Story
+              </button>
+            </>
+          ) : (
+            /* Off the Atlas the same slot carries a link back to it, so every room has a way home
+               to the map without a second navigation pattern appearing to hold it. */
+            <a className="ds-bar__mode-link ds-bar__mode-link--first" href="/">
+              Atlas
+            </a>
+          )}
+          {/* An anchor, not a mode button: Atlas and Story are two views of one surface, Library
+              is a different room. A real href is also what lets it be opened in a new tab and
+              followed by a crawler, which a mode toggle never could. */}
+          <a className="ds-bar__mode-link" href="/library">
+            Library
+          </a>
         </nav>
 
         {onOpenSaved ? (

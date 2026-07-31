@@ -69,11 +69,12 @@ test('the corridor chapter carries the honesty line from the corridor data, not 
   );
 });
 
-test('exactly one chapter runs the sweep, and exactly one names a record', () => {
+test('exactly one chapter runs the sweep, draws a record, and rotates a fact', () => {
   // Two sweeps would step the histogram against each other; two record chapters would leave the
   // second one fighting the first for the camera on a fast scroll.
   assert.equal(STORY_CHAPTERS.filter((chapter) => chapter.sweep).length, 1);
-  assert.equal(STORY_CHAPTERS.filter((chapter) => chapter.focusRecordId).length, 1);
+  assert.equal(STORY_CHAPTERS.filter((chapter) => chapter.focusRandomRecord).length, 1);
+  assert.equal(STORY_CHAPTERS.filter((chapter) => chapter.rotatingFact).length, 1);
   assert.equal(STORY_CHAPTERS.filter((chapter) => chapter.routes).length, 1);
 });
 
@@ -82,11 +83,10 @@ test('the intersection threshold fires a chapter before it is centred, but not a
   assert.ok(CHAPTER_INTERSECTION_THRESHOLD < 0.5);
 });
 
-test('a chapter naming a record names one, and the camera goes there rather than to a bare centre', () => {
-  const focused = STORY_CHAPTERS.find((chapter) => chapter.focusRecordId);
+test('the record chapter keeps a valid fallback framing for a release with no eligible record', () => {
+  const focused = STORY_CHAPTERS.find((chapter) => chapter.focusRandomRecord);
   assert.ok(focused);
-  assert.match(focused.focusRecordId!, /^ent_/);
-  // Its camera is still valid: the surface flies to the record, but a plate that cannot resolve
-  // the record falls back to the chapter's own framing rather than to nothing.
+  // The surface flies to whatever record was drawn. A release that yields none falls back to this
+  // chapter's own framing rather than leaving the plate wherever the previous chapter left it.
   assert.ok(isValidChapterCamera(focused.camera));
 });

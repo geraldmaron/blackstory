@@ -6,9 +6,60 @@
  * scroll in Atlas mode: the map is the document.
  */
 
+/*
+ * The shell layers between the plate and the Atlas.
+ *
+ * `.ds-map-stage` sits at z 0 and the shell's page-transition content at z 1, so the entire route
+ * wrapper paints above the canvas and, being `pointer-events: auto` and viewport-sized, consumed
+ * every click, drag and wheel aimed at the map. Pins were unselectable and the camera could not be
+ * panned by hand — the plate was a picture.
+ *
+ * Scoped with `:has(.ds-atlas)` so only the Atlas makes these wrappers transparent. On the reading
+ * and utility rooms the same wrappers carry scrolling text, and map-surfaces.css's standing warning
+ * applies there: a text column over the live plate must keep its own events, or a swipe pans the
+ * map instead of the document.
+ */
+.ds-shell-page-transition:has(.ds-atlas),
+.ds-shell-page-transition:has(.ds-atlas) .ds-shell-page-transition__content,
+.ds-map-surface:has(.ds-atlas) {
+  pointer-events: none;
+}
+
 .ds-atlas {
   position: relative;
   z-index: 1;
+  /*
+   * The plate is underneath this element, and this element covers the viewport. Without this the
+   * container itself took every click, drag and wheel event over the map: pins could not be
+   * selected and the camera could not be panned by hand, because nothing the reader aimed at the
+   * map ever reached the canvas. The instruments are all `position: fixed` children, so the layer
+   * hands its events down to them and passes everything else through to the plate.
+   */
+  pointer-events: none;
+}
+
+/*
+ * Every instrument takes its own events back. Kept as a child rule rather than repeated on each
+ * panel so a new instrument is interactive by existing, not by remembering this line — the failure
+ * it would otherwise cause is silent and looks like a broken component rather than a missing style.
+ * Children that must stay transparent to the pointer (the spotlight mask, the readout) set
+ * `pointer-events: none` in their own rules below, which come later and win.
+ */
+.ds-atlas > * {
+  pointer-events: auto;
+}
+
+/*
+ * The layers that are drawn over the plate but are not aimed at: the corridor plane, the spotlight
+ * mask and the camera readout. Each already declares `pointer-events: none` in its own stylesheet,
+ * but at equal specificity to the rule above, so which one won came down to stylesheet order — and
+ * the blanket rule won, putting a full-viewport SVG in front of the map. Two classes here beats one
+ * there regardless of load order.
+ */
+.ds-atlas > .ds-annotation,
+.ds-atlas > .ds-atlas__spotlight,
+.ds-atlas > .ds-atlas__readout {
+  pointer-events: none;
 }
 
 /* Chrome hidden (`\`): the instruments go, the bar stays but recedes. §7. */

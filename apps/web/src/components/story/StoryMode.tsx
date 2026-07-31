@@ -14,8 +14,14 @@
 
 import React, { useCallback, useEffect, useRef } from 'react';
 import { cx } from '@repo/ui';
-import { CHAPTER_INTERSECTION_THRESHOLD, STORY_CHAPTERS, type StoryChapter } from '../../lib/story/chapters';
+import {
+  CHAPTER_INTERSECTION_THRESHOLD,
+  STORY_CHAPTERS,
+  type StoryChapter,
+} from '../../lib/story/chapters';
 import { COLD_OPEN_WORDS, copyFor, headingParts } from './story-copy';
+import type { StoryRecordSpotlight } from '../../lib/story/pick-story-record';
+import type { StoryFact } from '../../lib/story/story-facts';
 import './story-mode.css';
 
 void React;
@@ -27,18 +33,72 @@ export type StoryModeProps = {
   readonly onOpenAtlas: () => void;
   readonly onNearMe?: () => void;
   readonly reducedMotion?: boolean;
+  /**
+   * The record chapter 2 drew this visit. Absent when the release yielded no eligible record, in
+   * which case the chapter falls back to its written copy rather than rendering a gap.
+   */
+  readonly recordSpotlight?: StoryRecordSpotlight | undefined;
+  /** The fact chapter 3 drew this visit. Absent falls back the same way. */
+  readonly fact?: StoryFact | undefined;
   readonly className?: string;
 };
+
+/** The chapter whose body is a drawn record rather than written prose. */
+const RECORD_CHAPTER_ID = 'one-record';
+/** The chapter whose body is one of the twenty cited facts. */
+const FACT_CHAPTER_ID = 'migration';
+
+type ChapterBody = {
+  readonly prose: string;
+  readonly figures: readonly { readonly value: string; readonly label: string }[] | undefined;
+  readonly cite: string;
+};
+
+/**
+ * What a chapter actually says.
+ *
+ * Two chapters no longer carry fixed prose. Chapter 2 describes whichever record was drawn from the
+ * release this visit, so its body is assembled from that record's own published fields rather than
+ * written about one building. Chapter 3 shows one of twenty cited facts.
+ *
+ * Both fall back to the written copy when the draw came up empty — a release with no eligible
+ * record, or a fact table that failed to resolve. A chapter that renders its fallback is still a
+ * true chapter; a chapter that renders a blank is a bug the reader has to interpret.
+ */
+function chapterBody(
+  chapter: StoryChapter,
+  copy: ReturnType<typeof copyFor> & object,
+  recordSpotlight: StoryRecordSpotlight | undefined,
+  fact: StoryFact | undefined,
+): ChapterBody {
+  if (chapter.id === RECORD_CHAPTER_ID && recordSpotlight) {
+    const sources =
+      recordSpotlight.evidenceCount === 1 ? '1 source' : `${recordSpotlight.evidenceCount} sources`;
+    return {
+      prose: `${recordSpotlight.name}, in ${recordSpotlight.place}. ${recordSpotlight.summary} It is one pin, and you can read its citations before you decide to trust it.`,
+      figures: [
+        { value: recordSpotlight.place, label: 'where' },
+        { value: recordSpotlight.era, label: 'when' },
+        { value: sources, label: 'evidence on the record' },
+      ],
+      // Never a claim that the sources are good, only that they are there and readable. The
+      // reader is being invited to check, which is the entire point of the chapter.
+      cite: 'Drawn from the active release. Shown at the precision its sources support, and every citation opens on the record itself.',
+    };
+  }
+
+  if (chapter.id === FACT_CHAPTER_ID && fact) {
+    return { prose: fact.prose, figures: fact.figures, cite: fact.source };
+  }
+
+  return { prose: copy.prose, figures: copy.facts, cite: copy.cite };
+}
 
 function ColdOpenHeading({ kinetic }: { readonly kinetic: boolean }) {
   return (
     <h1 className={cx('ds-story__cold', kinetic && 'ds-story__cold--kinetic')}>
       {COLD_OPEN_WORDS.map((word, index) => (
-        <span
-          key={word}
-          className="ds-story__word"
-          style={{ animationDelay: `${index * 130}ms` }}
-        >
+        <span key={word} className="ds-story__word" style={{ animationDelay: `${index * 130}ms` }}>
           {word}
         </span>
       ))}
@@ -52,6 +112,8 @@ export function StoryMode({
   onOpenAtlas,
   onNearMe,
   reducedMotion = false,
+  recordSpotlight,
+  fact,
   className,
 }: StoryModeProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -98,6 +160,7 @@ export function StoryMode({
         const copy = copyFor(chapter.id);
         if (!copy) return null;
         const { before, accent, after } = headingParts(copy);
+        const body = chapterBody(chapter, copy, recordSpotlight, fact);
 
         return (
           <section
@@ -130,20 +193,20 @@ export function StoryMode({
                 </>
               )}
 
-              <p className="ds-story__prose">{copy.prose}</p>
+              <p className="ds-story__prose">{body.prose}</p>
 
-              {copy.facts ? (
+              {body.figures ? (
                 <dl className="ds-story__facts">
-                  {copy.facts.map((fact) => (
-                    <div key={fact.label}>
-                      <dt className="ds-story__fact-value">{fact.value}</dt>
-                      <dd className="ds-story__fact-label">{fact.label}</dd>
+                  {body.figures.map((figure) => (
+                    <div key={figure.label}>
+                      <dt className="ds-story__fact-value">{figure.value}</dt>
+                      <dd className="ds-story__fact-label">{figure.label}</dd>
                     </div>
                   ))}
                 </dl>
               ) : null}
 
-              <p className="ds-story__cite">{copy.cite}</p>
+              <p className="ds-story__cite">{body.cite}</p>
 
               {chapter.index === 0 ? (
                 <div className="ds-story__actions">

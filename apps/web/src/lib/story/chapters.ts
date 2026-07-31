@@ -38,8 +38,19 @@ export type StoryChapter = {
   readonly routes?: boolean;
   /** Run the decade sweep while this chapter is in view. */
   readonly sweep?: boolean;
-  /** Select and pin a specific record. */
-  readonly focusRecordId?: string;
+  /**
+   * Draw a record from the release and pin it, rather than naming one here. Chapter 2's argument is
+   * that *every* pin opens into evidence, and a fixed record turns that into an anecdote about one
+   * famous building. The pick is made by `pick-story-record.ts`, which excludes violence-adjacent
+   * records: this chapter pushes in close and dwells, and dwelling on harm is what §4.3 refuses.
+   */
+  readonly focusRandomRecord?: true;
+  /**
+   * Show one of the twenty cited facts in `story-facts.ts` instead of fixed prose. A reader who
+   * returns should not meet the same sentence; every entry carries its own source, which is what
+   * makes rotating them safe.
+   */
+  readonly rotatingFact?: true;
 };
 
 /**
@@ -66,9 +77,11 @@ export const STORY_CHAPTERS: readonly StoryChapter[] = [
   {
     index: 2,
     id: 'one-record',
+    // The fallback framing, used only when the release yields no eligible record. The chapter
+    // normally flies to whatever `pickStoryRecord` returned, at whatever zoom the dignity gate allows.
     camera: { center: [-86.81, 33.52], zoom: 13.4, pitch: 56, bearing: 24 },
     centred: false,
-    focusRecordId: 'ent_gaston_motel_001',
+    focusRandomRecord: true,
   },
   {
     index: 3,
@@ -76,6 +89,7 @@ export const STORY_CHAPTERS: readonly StoryChapter[] = [
     camera: { center: [-88.2, 37.6], zoom: 4.05, pitch: 42, bearing: 0 },
     centred: false,
     routes: true,
+    rotatingFact: true,
   },
   {
     index: 4,

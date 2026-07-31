@@ -41,6 +41,7 @@ import { CameraConsole } from '../../../components/map-experience/CameraConsole'
 import { LensPanel, type LensLayerKey } from '../../../components/map-experience/LensPanel';
 import { ResultsRail, type ResultsSort } from '../../../components/map-experience/ResultsRail';
 import { RecordSheet, type SheetRecord } from '../../../components/map-experience/RecordSheet';
+import type { RecordAnatomyPlace } from '../../../components/patterns/RecordAnatomyPanel';
 import { TimePanel } from '../../../components/map-experience/TimePanel';
 import { createCamera, type CameraMove } from '../../../lib/map-experience/camera-moves';
 import { chromePadding } from '../../../lib/map-experience/chrome-padding';
@@ -48,6 +49,8 @@ import { decadeDensityBars } from '../../../lib/map-experience/decade-density';
 import { sweep, type SweepHandle } from '../../../lib/map-experience/decade-transition';
 import { StoryMode } from '../../../components/story/StoryMode';
 import type { StoryChapter } from '../../../lib/story/chapters';
+import { pickStoryRecord, type StoryRecordSpotlight } from '../../../lib/story/pick-story-record';
+import { pickStoryFact, type StoryFact } from '../../../lib/story/story-facts';
 import {
   applyEvidenceFloor,
   gradeForConfidence,
@@ -106,6 +109,28 @@ function decadeStartYear(bucket: string): number {
 
 function eraBucketFor(decade: number): string {
   return `${decade}s`;
+}
+
+/**
+ * The feature's published precision, narrowed to the five values the anatomy panel captions.
+ *
+ * The map carries `locationPrecision` as an open string because the release vocabulary is wider
+ * than what this panel names. Anything outside the five falls back to `city`, which is the
+ * coarsest of the point-level options and so cannot overstate how sharp the pin is. Overstating
+ * is the only failure mode that matters here: the caption is the archive's claim about what its
+ * own dot means.
+ */
+function anatomyPrecisionFor(precision: string): RecordAnatomyPlace['precision'] {
+  switch (precision) {
+    case 'county':
+    case 'city':
+    case 'neighborhood':
+    case 'campus':
+    case 'institution':
+      return precision;
+    default:
+      return 'city';
+  }
 }
 
 function eraFor(feature: ExploreMapFeature): string {
@@ -409,6 +434,19 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
         ? { mapTone: selectedFeature.properties.mapTone }
         : {}),
       place: placeLabelFor(selectedFeature),
+      /*
+       * The record's own pin, taken from the feature the reader just clicked.
+       *
+       * Without this the sheet fell through to `RecordAnatomyPanel`'s empty slot and read "Place
+       * not pinned" — on a record that is, by definition, a pin on the map it was opened from.
+       * Every record reachable from the plate has coordinates; that is what put it there.
+       */
+      anatomyPlace: {
+        lng: selectedFeature.geometry.coordinates[0],
+        lat: selectedFeature.geometry.coordinates[1],
+        label: selectedFeature.properties.locationLabel ?? placeLabelFor(selectedFeature),
+        precision: anatomyPrecisionFor(selectedFeature.properties.precision),
+      },
       era: eraFor(selectedFeature),
       story: selectedFeature.properties.oneLineStory,
       precision: selectedFeature.properties.geoPrecisionTier,
@@ -698,6 +736,21 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
   }, []);
 
   /**
+   * The record chapter 2 shows and the fact chapter 3 shows, drawn once per mount rather than per
+   * render. Re-rolling on every render would change the card under the reader mid-sentence, and
+   * re-rolling on every chapter change would mean scrolling back up produced a different archive.
+   *
+   * `Math.random` is read here, in an effect-free initialiser, rather than inside the pure pickers,
+   * so both remain reproducible in a test.
+   */
+  const [storyRoll] = useState(() => ({ record: Math.random(), fact: Math.random() }));
+  const storyRecord = useMemo<StoryRecordSpotlight | null>(
+    () => pickStoryRecord(view.allFeatures, storyRoll.record),
+    [storyRoll.record, view.allFeatures],
+  );
+  const storyFact = useMemo<StoryFact>(() => pickStoryFact(storyRoll.fact), [storyRoll.fact]);
+
+  /**
    * Runs a chapter's beats: camera, spotlight, corridors, decade sweep, and the one record chapter
    * 2 is about (design-direction-v9-atlas.md §6). Story mode was a toggle that hid the instruments
    * and put nothing in their place — `StoryMode.tsx` and `chapters.ts` both existed and neither had
@@ -712,13 +765,23 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
       stopSweep();
       camera.cancel();
 
-      const focus = chapter.focusRecordId ? featureById(chapter.focusRecordId) : null;
+      const focus =
+        chapter.focusRandomRecord && storyRecord ? featureById(storyRecord.entityId) : null;
       setSelectedId(focus?.properties.entityId);
+
+      // A rotating fact names its own geography. Without this the plate would keep whatever the
+      // previous chapter framed while the card talked about somewhere else entirely.
+      const factCamera = chapter.rotatingFact ? storyFact.camera : null;
 
       if (focus) {
         const [lng, lat] = focus.geometry.coordinates;
         camera.flyToRecord(
           { center: [lng, lat], place: placeLabelFor(focus) },
+          { trigger: 'ambient' },
+        );
+      } else if (factCamera) {
+        camera.flyToRecord(
+          { center: [factCamera.center[0], factCamera.center[1]], place: storyFact.placeLabel },
           { trigger: 'ambient' },
         );
       } else {
@@ -761,7 +824,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
         setDecade(null);
       }
     },
-    [camera, decadeBars, featureById, stage, stopSweep],
+    [camera, decadeBars, featureById, stage, stopSweep, storyFact, storyRecord],
   );
 
   /**
@@ -773,6 +836,9 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     if (mode === 'story') return;
     stopSweep();
     setSpotlight(null);
+    // The corridor chapter turns the routes layer on. Left on, it draws six arcs and their labels
+    // across an Atlas the reader never asked to annotate, and the lens toggle reads as already-on.
+    setLayers((current) => (current.routes ? { ...current, routes: false } : current));
   }, [mode, stopSweep]);
 
   useEffect(() => stopSweep, [stopSweep]);
@@ -821,6 +887,8 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
         onOpenAtlas={() => setMode('atlas')}
         onNearMe={nearMe}
         reducedMotion={prefersReducedMotion()}
+        recordSpotlight={storyRecord ?? undefined}
+        fact={storyFact}
       />
 
       {spotlight ? (
