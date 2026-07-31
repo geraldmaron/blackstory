@@ -30,7 +30,7 @@ export function MemorialQuietListLink({ label }: MemorialQuietListLinkProps) {
     <p className="ds-memorial-edition__quiet-links">
       <Link href="#memorial-names">{label}</Link>
       <span aria-hidden="true"> · </span>
-      <Link href="/explore">Open the map</Link>
+      <Link href="/">Open the map</Link>
     </p>,
     document.body,
   );

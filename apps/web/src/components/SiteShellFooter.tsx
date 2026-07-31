@@ -6,11 +6,11 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { isExploreMapShell } from './explore-map-shell';
+import { isAtlasShell } from './explore-map-shell';
 import { SiteFooter } from './SiteFooter';
 
 export function SiteShellFooter() {
   const pathname = usePathname() || '/';
-  if (isExploreMapShell(pathname)) return null;
+  if (isAtlasShell(pathname)) return null;
   return <SiteFooter />;
 }

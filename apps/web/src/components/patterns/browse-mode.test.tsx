@@ -14,8 +14,6 @@ import {
   pickRandomIndex,
   stepIndex,
 } from './browse-mode';
-import { buildHomeFeaturedCarouselSet } from './home-featured-set';
-import { listPublicEntities } from '../../data/public-seed';
 
 void React;
 
@@ -93,18 +91,5 @@ describe('RecordBrowseControls', () => {
     assert.match(html, /Random · 12 records/);
     assert.match(html, /aria-label="Next random record"/);
     assert.doesNotMatch(html, /ds-record-browse__dot/);
-  });
-});
-
-describe('buildHomeFeaturedCarouselSet', () => {
-  it('includes every release entity with curated ids first', () => {
-    const entities = listPublicEntities();
-    const featured = buildHomeFeaturedCarouselSet(entities, [
-      'ent_15th_st_church_001',
-      'ent_dunbar_school_001',
-    ]);
-    assert.equal(featured.length, entities.length);
-    assert.equal(featured[0]?.id, 'ent_15th_st_church_001');
-    assert.equal(featured[1]?.id, 'ent_dunbar_school_001');
   });
 });

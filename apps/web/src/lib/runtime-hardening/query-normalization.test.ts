@@ -161,7 +161,7 @@ test('normalizeSearchParamsRecord returns trimmed filter bag', () => {
 });
 
 test('normalizeQueryString keeps allowlisted /explore map params', () => {
-  const qs = normalizeQueryString('/explore', {
+  const qs = normalizeQueryString('/', {
     era: '1970s',
     kind: 'school',
     selected: 'ent_dunbar_school_001',
@@ -184,7 +184,7 @@ test('normalizeQueryString keeps allowlisted /explore map params', () => {
 test('normalizeQueryString keeps the filter params the earlier hand-written allowlist missed', () => {
   // tone, status, radius and near are read by the parser and were being stripped at the edge.
   assert.equal(
-    normalizeQueryString('/explore', {
+    normalizeQueryString('/', {
       tone: 'resistance',
       status: 'historic',
       radius: '10mi',
@@ -195,7 +195,7 @@ test('normalizeQueryString keeps the filter params the earlier hand-written allo
 });
 
 test('ADR-017: lat/lng/zoom never survive normalization on the map surface', () => {
-  for (const path of ['/', '/explore']) {
+  for (const path of ['/', '/']) {
     assert.equal(
       normalizeQueryString(path, { lat: '38.9072', lng: '-77.0369', zoom: '11.5', state: 'dc' }),
       'state=DC',
@@ -213,9 +213,9 @@ test('ADR-017: lat/lng/zoom never survive normalization on the map surface', () 
 });
 
 test('panel chrome is not shareable state: panels= and hidePanels= normalize away', () => {
-  assert.equal(normalizeQueryString('/explore', { panels: 'filters,results,key' }), '');
-  assert.equal(normalizeQueryString('/explore', { hidePanels: 'results' }), '');
-  assert.equal(normalizeQueryString('/explore', { panels: 'filters', state: 'dc' }), 'state=DC');
+  assert.equal(normalizeQueryString('/', { panels: 'filters,results,key' }), '');
+  assert.equal(normalizeQueryString('/', { hidePanels: 'results' }), '');
+  assert.equal(normalizeQueryString('/', { panels: 'filters', state: 'dc' }), 'state=DC');
 });
 
 test('/ and /explore normalize identically (one param vocabulary, two paths)', () => {
@@ -238,7 +238,7 @@ test('/ and /explore normalize identically (one param vocabulary, two paths)', (
     utm_source: 'x',
     junk: '1',
   };
-  assert.equal(normalizeQueryString('/', bag), normalizeQueryString('/explore', bag));
+  assert.equal(normalizeQueryString('/', bag), normalizeQueryString('/', bag));
   assert.notEqual(normalizeQueryString('/', bag), '');
 
   // The homepage now canonicalizes map state instead of 308ing every param off it.
@@ -289,7 +289,7 @@ test('drift: buildExploreSearchParams writes no key the allowlist lacks', () => 
 });
 
 test('normalizeQueryString preserves /explore?state= revisit links (homepage chips)', () => {
-  assert.equal(normalizeQueryString('/explore', { state: 'dc' }), 'state=DC');
+  assert.equal(normalizeQueryString('/', { state: 'dc' }), 'state=DC');
   assert.equal(
     needsQueryNormalizationRedirect(new URL('https://example.com/explore?state=DC')),
     false,
@@ -302,10 +302,10 @@ test('normalizeQueryString preserves /explore?state= revisit links (homepage chi
 
 test('normalizeQueryString canonicalizes explore layerMode', () => {
   // density→presence is the default layer; omit layerMode from the canonical query.
-  assert.equal(normalizeQueryString('/explore', { density: 'true' }), '');
-  assert.equal(normalizeQueryString('/explore', { density: 'false' }), 'layerMode=off');
+  assert.equal(normalizeQueryString('/', { density: 'true' }), '');
+  assert.equal(normalizeQueryString('/', { density: 'false' }), 'layerMode=off');
   assert.equal(
-    normalizeQueryString('/explore', { layerMode: 'blackShare', popGeo: 'state' }),
+    normalizeQueryString('/', { layerMode: 'blackShare', popGeo: 'state' }),
     'layerMode=blackShare&popGeo=state',
   );
 });
@@ -327,11 +327,13 @@ test('normalizeQueryString keeps allowlisted /history browse params', () => {
   );
 });
 
-test('buildNormalizedUrl issues canonical /explore URLs for revisit', () => {
+test('buildNormalizedUrl issues canonical Atlas URLs for revisit', () => {
+  // `/`, not `/explore`: the Atlas answers on `/` and `/explore` left the middleware matcher
+  // when it stopped rendering, so normalising it would only add a hop ahead of the redirect.
   const normalized = buildNormalizedUrl(
-    new URL('https://example.com/explore?utm_source=x&state=va&group=true&lines=1'),
+    new URL('https://example.com/?utm_source=x&state=va&group=true&lines=1'),
   );
-  assert.equal(normalized.pathname, '/explore');
+  assert.equal(normalized.pathname, '/');
   assert.equal(normalized.search, '?state=VA&group=1&lines=1');
 });
 

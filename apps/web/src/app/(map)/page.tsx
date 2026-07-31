@@ -1,158 +1,132 @@
 /**
- * Homepage: single-panel hero + theme-aware edition beats (`HomeEdition`).
- * `HeroStage` positions the live `MapStage` plate over the hero map column; `engage()` clears
- * the inset for ADR-017 explore handoff (see `hero-map-inset.ts` + map-surfaces.css).
+ * `/` is the Atlas: one full-viewport live plate with opaque panels floating over it, and the
+ * canonical URL for the instrument (design-direction-v9-surfaces.md §4, §6). `/explore` 308s
+ * here carrying its query, so this page and that redirect are one contract.
  *
- * Decade fills seed the hidden plate's complete-archive state for explore transitions.
+ * The plate itself is mounted once by the root shell and persists across navigation; this page
+ * only builds the view model and hands it to `AtlasExperience`, which sends the first
+ * `patchData` — the call that builds the GL context on demand. Filters use native GET navigation
+ * so the surface works without JavaScript; the client island adds the camera and cluster
+ * drill-down. The camera stays in memory, so the shareable URL carries filters and selection but
+ * never pan or zoom (ADR-017).
  */
-import { readFile } from 'node:fs/promises';
-import path from 'node:path';
-import { getNationalPopulationTimelineSnapshot } from '../../lib/demographics/public-stats-source';
-import {
-  parseStatePopulationIndexFile,
-  type StatePopulationIndexFile,
-} from '@repo/domain/map/state-population';
-import { HomeEdition } from '../../components/home/HomeEdition';
-import { editionAtmosphereCanvasClassName } from '../../components/patterns/edition-atmosphere/edition-atmosphere-canvas';
-import type { StateStartEntry } from '../../components/home/StateStart';
-import '../../components/data/data-charts.css';
-import '../../components/home/home-edition.css';
+import { FilterBar } from '@repo/ui';
+import { SynchronizedResultList } from '../../components/map-experience/SynchronizedResultList';
+import { getSharedPublicEntities } from './shared-map-data';
+import { AtlasExperience } from './explore/AtlasExperience';
+import { buildExploreViewModelAsync } from './explore/explore-view-model';
+import { toSerializableExploreViewModel } from './explore/explore-view-model-wire';
 import '../../components/patterns/browse-mode.css';
 import '../../components/patterns/edition-fact-icon.css';
 import '../../components/patterns/record-anatomy.css';
-import '../../components/trust/research-pipeline-sketch.css';
-import { getHistoryGraphReleaseArtifact } from '../../data/history-graph-seed';
-import { FEATURED_SEED_IDS } from '../../data/public-seed';
-import { buildHomeFeaturedCarouselSet } from '../../components/patterns/home-featured-set';
-import { initialBrowseIndex } from '../../components/patterns/browse-mode';
-import type { ExploreMapFeatureCollection } from '../../lib/map-experience/build-explore-map-source';
-import type { HistoryEdgeLineCollection } from '../../lib/map-experience/build-history-edge-lines';
-import { buildDecadeFlowFrames } from '../../lib/map-experience/decade-flow';
-import { buildEdgeLineCatalog } from './explore/explore-view-model';
-import { HeroStage } from './HeroStage';
-import { loadMapStageBase } from './shared-map-data';
+import './explore/explore.css';
+import './explore/explore-edition.css';
 
-async function safe<T>(promise: Promise<T | undefined>): Promise<T | undefined> {
-  try {
-    return await promise;
-  } catch {
-    return undefined;
-  }
-}
+/**
+ * No `title`: the root layout's default is the product name, which is what `/` should read as.
+ * A per-route title here would render "Explore · BlackStory" on the site's front door.
+ */
+export const metadata = {
+  description:
+    'Map-first national view of documented Black history: every geo-anchored record in the active release.',
+};
 
-/** How many one-tap state chips the Orient beat shows. */
-const TOP_STATE_LIMIT = 5;
+type AtlasPageProps = {
+  readonly searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
 
-async function loadStatePopulationIndex() {
-  try {
-    const filePath = path.join(process.cwd(), 'public', 'geo', 'state-population-decades.json');
-    const raw = await readFile(filePath, 'utf8');
-    const payload = JSON.parse(raw) as StatePopulationIndexFile;
-    const index = parseStatePopulationIndexFile(payload);
-    if (index.vintages.length === 0 || Object.keys(index.states).length === 0) return undefined;
-    return index;
-  } catch {
-    return undefined;
-  }
-}
-
-/** Distinct states with pinned records, ordered by record count descending. */
-function tallyStates(collection: ExploreMapFeatureCollection): StateStartEntry[] {
-  const byState = new Map<string, { name: string; count: number }>();
-  for (const feature of collection.features) {
-    const { statePostalCode, stateName } = feature.properties;
-    if (!statePostalCode || !stateName) continue;
-    const entry = byState.get(statePostalCode);
-    if (entry) {
-      entry.count += 1;
-    } else {
-      byState.set(statePostalCode, { name: stateName, count: 1 });
-    }
-  }
-  return [...byState.entries()]
-    .map(([postalCode, entry]) => ({ postalCode, name: entry.name, count: entry.count }))
-    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
-}
-
-/** "1820s–1970s" across every feature's era buckets; undefined when nothing is dated. */
-function eraSpanOf(collection: ExploreMapFeatureCollection): string | undefined {
-  let min: number | undefined;
-  let max: number | undefined;
-  for (const feature of collection.features) {
-    for (const bucket of feature.properties.eraBuckets) {
-      const decade = Number.parseInt(bucket, 10);
-      if (Number.isNaN(decade)) continue;
-      if (min === undefined || decade < min) min = decade;
-      if (max === undefined || decade > max) max = decade;
-    }
-  }
-  if (min === undefined || max === undefined) return undefined;
-  return min === max ? `${min}s` : `${min}s to ${max}s`;
-}
-
-export default async function HomePage() {
-  const [base, timeline, statePopulationIndex] = await Promise.all([
-    loadMapStageBase(),
-    safe(getNationalPopulationTimelineSnapshot()).then((snap) => snap ?? undefined),
-    loadStatePopulationIndex(),
-  ]);
-
-  // Full active-release carousel: curated ids lead when present, then every other release entity.
-  const featured = buildHomeFeaturedCarouselSet(base.entities, FEATURED_SEED_IDS);
-  const featuredInitialIndex = initialBrowseIndex(featured.length);
-
-  const states = tallyStates(base.featureCollection);
-  const pinnedRecordCount = base.featureCollection.features.length;
-  const publishedRecordCount = base.entities.length;
-  const eraSpan = eraSpanOf(base.featureCollection);
-
-  // Decades in motion: per-decade edge lines from the history graph release + cumulative record
-  // reveal over the shared feature collection. State fills prefer the Census index when present.
-  const { edgeLineCatalog } = buildEdgeLineCatalog(
-    getHistoryGraphReleaseArtifact(base.entities),
-    base.entities,
-  );
-  const edgesByDecade: Record<string, HistoryEdgeLineCollection> = {};
-  for (const [decade, slice] of Object.entries(edgeLineCatalog.byDecade)) {
-    edgesByDecade[decade] = slice.lineCollection;
-  }
-
-  const nationalBlackByDecade: Record<string, number> = {};
-  for (const row of timeline?.rows ?? []) {
-    nationalBlackByDecade[row.decade] = row.blackPopulation;
-  }
-
-  const decadeFrames = buildDecadeFlowFrames(
-    base.featureCollection,
-    edgesByDecade,
-    edgeLineCatalog.allTime.lineCollection,
-    {
-      ...(statePopulationIndex ? { statePopulationIndex } : {}),
-      ...(Object.keys(nationalBlackByDecade).length > 0 ? { nationalBlackByDecade } : {}),
-    },
-  );
+export default async function AtlasPage({ searchParams }: AtlasPageProps) {
+  const params = await searchParams;
+  const { data: entities, source: dataSource } = await getSharedPublicEntities();
+  const view = await buildExploreViewModelAsync(params, entities, dataSource);
 
   return (
-    <div className={`ds-home ${editionAtmosphereCanvasClassName()}`} data-home-edition="v6">
-      <HeroStage
-        featureCollection={base.featureCollection}
-        jurisdictionAreaFeatures={base.jurisdictionAreaFeatures}
-        featureCount={pinnedRecordCount}
-        stateCount={states.length}
-        decadeFrames={decadeFrames}
-        {...(eraSpan !== undefined ? { eraSpan } : {})}
-      />
+    <>
+      <noscript>
+        <div className="ds-explore__noscript ds-container ds-page">
+          <FilterBar
+            method="get"
+            action="/"
+            legend="Filter documented records"
+            fields={[
+              {
+                id: 'explore-kind-njs',
+                name: 'kind',
+                label: 'Kind',
+                type: 'select',
+                defaultValue: view.viewState.filters.kind,
+                options: view.facetOptions.kind,
+              },
+              {
+                id: 'explore-tone-njs',
+                name: 'tone',
+                label: 'Tone',
+                type: 'select',
+                defaultValue: view.viewState.filters.tone,
+                options: view.facetOptions.tone,
+              },
+              {
+                id: 'explore-era-njs',
+                name: 'era',
+                label: 'Era',
+                type: 'select',
+                defaultValue: view.viewState.filters.era,
+                options: view.facetOptions.era,
+              },
+              {
+                id: 'explore-theme-njs',
+                name: 'theme',
+                label: 'Theme',
+                type: 'select',
+                defaultValue: view.viewState.filters.theme,
+                options: view.facetOptions.theme,
+              },
+              {
+                id: 'explore-status-njs',
+                name: 'status',
+                label: 'Status',
+                type: 'select',
+                defaultValue: view.viewState.filters.status,
+                options: view.facetOptions.status,
+              },
+              {
+                id: 'explore-confidence-njs',
+                name: 'confidence',
+                label: 'Confidence',
+                type: 'select',
+                defaultValue: view.viewState.filters.confidence,
+                options: view.facetOptions.confidence,
+              },
+              {
+                id: 'explore-state-njs',
+                name: 'state',
+                label: 'Where',
+                type: 'select',
+                defaultValue: view.viewState.state ?? 'all',
+                options: view.facetOptions.state,
+              },
+            ]}
+          />
+          <p className="ds-sans ds-explore__results-count" id="explore-results-heading-njs">
+            {view.totalMatched} documented record{view.totalMatched === 1 ? '' : 's'} matching
+            filters · oldest first
+          </p>
+          {/* Cap the no-JS list so progressive-enhancement HTML stays small; the
+              interactive client island owns the full synchronized peer. */}
+          <SynchronizedResultList
+            features={view.filteredFeatures.slice(0, 100)}
+            labelledBy="explore-results-heading-njs"
+          />
+          {view.filteredFeatures.length > 100 ? (
+            <p className="ds-sans ds-explore__results-count">
+              Showing the first 100 of {view.filteredFeatures.length}. Enable JavaScript for the
+              full map and records list.
+            </p>
+          ) : null}
+        </div>
+      </noscript>
 
-      <HomeEdition
-        featured={featured}
-        featuredInitialIndex={featuredInitialIndex}
-        topStates={states.slice(0, TOP_STATE_LIMIT)}
-        publishedRecordCount={publishedRecordCount}
-        pinnedRecordCount={pinnedRecordCount}
-        stateCount={states.length}
-        {...(eraSpan !== undefined ? { eraSpan } : {})}
-        {...(timeline ? { timeline } : {})}
-      />
-    </div>
+      <AtlasExperience initial={toSerializableExploreViewModel(view)} />
+    </>
   );
 }

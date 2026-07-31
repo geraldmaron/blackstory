@@ -334,7 +334,7 @@ export function MethodologySections() {
               <TrustSiteDisclaimer />
             </div>
             <p className="ds-methodology-edition__actions">
-              <Link className="ds-cta ds-cta--solid" href="/explore">
+              <Link className="ds-cta ds-cta--solid" href="/">
                 Open the map
               </Link>
               <Link className="ds-cta ds-cta--quiet" href="/about">
@@ -690,7 +690,7 @@ export function MethodologySections() {
           <Link href="/about">About BlackStory</Link>
           <Link href="/corrections">Corrections</Link>
           <Link href="/errata">Errata</Link>
-          <Link href="/explore">Open the map</Link>
+          <Link href="/">Open the map</Link>
         </nav>
       </article>
     </>

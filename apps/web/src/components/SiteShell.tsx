@@ -1,10 +1,10 @@
 /**
  * App shell wrapper: header, offline notice, main body slot, and document footer.
  *
- * The Atlas (`/explore`) supplies both ends itself: its command bar replaces the site header, and
- * the mega footer is omitted so the composition stays map-first. `SiteShellHeader` and
+ * The Atlas (`/`) supplies both ends itself: its command bar replaces the site header, and the
+ * mega footer is omitted so the composition stays map-first. `SiteShellHeader` and
  * `SiteShellFooter` are the two gates that make that route-specific, and both read the same
- * `isExploreMapShell` predicate so they cannot disagree about which surface is the Atlas.
+ * `isAtlasShell` predicate so they cannot disagree about which surface is the Atlas.
  */
 
 import type { ReactNode } from 'react';

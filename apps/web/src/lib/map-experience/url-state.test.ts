@@ -1,6 +1,6 @@
 /**
  * Confirms shareable URL state round-trips: parse(build(state)) reproduces the same
- * filters/viewport/selection/layerMode, so a copied `/explore?...` URL reproduces the same view.
+ * filters/viewport/selection/layerMode, so a copied `/?...` URL reproduces the same view.
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -58,7 +58,7 @@ test('round-trips a full view state through build -> parse', () => {
   };
 
   const href = buildExploreHref(state);
-  assert.match(href, /^\/explore\?/);
+  assert.match(href, /^\/\?/);
   assert.doesNotMatch(href, /group=/);
   // Intentional deep links may still carry camera; live explore pan/zoom does not rewrite it.
   assert.match(href, /lat=38\.9072/);

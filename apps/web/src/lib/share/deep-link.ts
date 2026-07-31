@@ -64,7 +64,7 @@ export function buildShareSearchParams(link: ShareDeepLink): string {
   return params.toString();
 }
 
-export function buildShareHref(link: ShareDeepLink, pathname = '/explore'): string {
+export function buildShareHref(link: ShareDeepLink, pathname = '/'): string {
   const query = buildShareSearchParams(link);
   return query ? `${pathname}?${query}` : pathname;
 }

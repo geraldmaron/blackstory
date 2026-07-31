@@ -12,11 +12,22 @@ test('buildPublicSitemapEntries includes static core journeys', () => {
   });
   const urls = entries.map((entry) => entry.url);
   assert.ok(urls.some((url) => url.endsWith('/history')));
-  assert.ok(urls.some((url) => url.endsWith('/explore')));
   assert.ok(urls.some((url) => url.endsWith('/chapters')));
   assert.ok(urls.some((url) => url.endsWith('/corrections')));
   assert.ok(urls.some((url) => url.endsWith('/law')));
   assert.ok(urls.some((url) => url.endsWith('/books')));
+});
+
+test('the sitemap never advertises a URL that redirects', () => {
+  const entries = buildPublicSitemapEntries({
+    siteUrl: 'https://blackbook.example',
+    releaseGeneratedAt: '2026-07-17T00:00:00.000Z',
+  });
+  const urls = entries.map((entry) => entry.url);
+  // `/explore` 308s to `/`, which is the Atlas and carries the crawl weight instead. Listing a
+  // redirect spends crawl budget teaching a URL that immediately disowns itself.
+  assert.ok(!urls.some((url) => url.endsWith('/explore')));
+  assert.ok(urls.some((url) => url === 'https://blackbook.example/'));
 });
 
 test('buildPublicSitemapEntries adds entity pages from the active release catalog', () => {

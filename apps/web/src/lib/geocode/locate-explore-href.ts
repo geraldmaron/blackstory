@@ -51,5 +51,5 @@ export function buildLocateExploreHref(resolution: LocateResolution): string {
     });
   }
 
-  return '/explore';
+  return '/';
 }

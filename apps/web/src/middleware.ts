@@ -21,13 +21,15 @@ export function middleware(request: NextRequest) {
  * reader's own params first — a bare `decade=1930` failed the `\d{4}s` parse and was dropped
  * outright — so the fold cost two hops and lost the decade on the way. `/search` stays matched:
  * it carries a free-text `q` that has to be sanitised before it is echoed anywhere.
+ *
+ * `/explore` is out because it stopped rendering: it 308s to `/`, which is the Atlas and is
+ * matched here. Normalising a path on its way to a redirect only buys a second hop.
  */
 export const config = {
   matcher: [
     '/',
     '/search',
     '/entity/:path*',
-    '/explore',
     '/law',
     '/law/:path*',
     '/legal',

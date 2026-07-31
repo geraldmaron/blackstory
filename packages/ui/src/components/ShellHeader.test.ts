@@ -6,15 +6,15 @@ import { describe, it } from 'node:test';
 import { isShellNavActive } from './ShellHeader.js';
 
 describe('isShellNavActive', () => {
-  it('matches home only on exact /', () => {
+  it('matches the Atlas only on exact /', () => {
     assert.equal(isShellNavActive('/', '/'), true);
-    assert.equal(isShellNavActive('/explore', '/'), false);
+    assert.equal(isShellNavActive('/chapters', '/'), false);
   });
 
   it('matches path prefixes for non-home items', () => {
     assert.equal(isShellNavActive('/search', '/search'), true);
     assert.equal(isShellNavActive('/search/results', '/search'), true);
-    assert.equal(isShellNavActive('/explore', '/search'), false);
+    assert.equal(isShellNavActive('/', '/search'), false);
   });
 
   it('compares absolute http(s) hrefs by pathname', () => {

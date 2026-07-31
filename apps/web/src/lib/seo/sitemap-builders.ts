@@ -20,9 +20,12 @@ const STATIC_PUBLIC_ROUTES: readonly {
   readonly changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'];
   readonly priority: number;
 }[] = Object.freeze([
-  { path: '/', changeFrequency: 'weekly', priority: 1 },
+  // `/` is the Atlas, so it carries the instrument's crawl frequency. `/explore` is gone from
+  // this list because it 308s here: a sitemap that advertises a redirect spends crawl budget
+  // teaching crawlers a URL that immediately disowns itself. `/history` is a redirect too and
+  // leaves the list once `/records` exists to replace it (SP-09, SP-19).
+  { path: '/', changeFrequency: 'daily', priority: 1 },
   { path: '/history', changeFrequency: 'daily', priority: 0.9 },
-  { path: '/explore', changeFrequency: 'daily', priority: 0.9 },
   { path: '/locate', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/corrections', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/about', changeFrequency: 'monthly', priority: 0.5 },

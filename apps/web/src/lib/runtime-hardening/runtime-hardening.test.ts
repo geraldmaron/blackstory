@@ -117,14 +117,13 @@ test('map layout and entity page keep force-dynamic after all imports', () => {
   );
 });
 
-test('explore and homepage live only under (map) — no duplicate route segments', () => {
-  // Regression: apps/web/src/app/explore + (map)/explore both claimed /explore;
-  // stale app/page.tsx fought (map)/page.tsx for /. ADR-017: map group owns both.
+test('the Atlas is one route — `/` — with no page rendering at /explore', () => {
+  // `/` IS the Atlas and `/explore` 308s to it, so a second page file claiming /explore would
+  // shadow that redirect and quietly resurrect the surface the redirect exists to retire.
   const explorePages = collectAppRouteFiles(APP_ROOT).filter((file) =>
     /(^|\/)explore\/page\.tsx$/.test(file.slice(APP_ROOT.length + 1).split('\\').join('/')),
   );
-  assert.equal(explorePages.length, 1, `explore pages: ${explorePages.join(', ')}`);
-  assert.match(explorePages[0]!.replace(/\\/g, '/'), /\/\(map\)\/explore\/page\.tsx$/);
+  assert.deepEqual(explorePages, [], `no page may render at /explore: ${explorePages.join(', ')}`);
 
   assert.equal(
     existsSync(join(APP_ROOT, 'explore')),
@@ -134,9 +133,11 @@ test('explore and homepage live only under (map) — no duplicate route segments
   assert.equal(
     existsSync(join(APP_ROOT, 'page.tsx')),
     false,
-    'stale apps/web/src/app/page.tsx must not exist (homepage is (map)/page.tsx)',
+    'stale apps/web/src/app/page.tsx must not exist (the Atlas is (map)/page.tsx)',
   );
   assert.equal(existsSync(join(APP_ROOT, '(map)/page.tsx')), true);
+  // /explore/api keeps its URL — the redirect is the exact path only.
+  assert.equal(existsSync(join(APP_ROOT, '(map)/explore/api/route.ts')), true);
 });
 
 test('production error surface hides stacks and long messages', () => {

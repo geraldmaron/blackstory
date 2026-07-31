@@ -117,14 +117,14 @@ test('resolveExploreLeftTab treats exclusive single-section open as one tab', ()
 test('shouldAcceptExploreServerViewState ignores echo of the last client push', () => {
   assert.equal(
     shouldAcceptExploreServerViewState({
-      incomingHref: '/explore?panels=filters',
-      lastPushedHref: '/explore?panels=filters',
+      incomingHref: '/?panels=filters',
+      lastPushedHref: '/?panels=filters',
     }),
     false,
   );
   assert.equal(
     shouldAcceptExploreServerViewState({
-      incomingHref: '/explore?panels=filters',
+      incomingHref: '/?panels=filters',
       lastPushedHref: null,
     }),
     true,
@@ -135,18 +135,18 @@ test('shouldAcceptExploreServerViewState prefers live address bar over stale RSC
   // Client opened filters via replaceState; Next still re-supplies panels-closed initial.
   assert.equal(
     shouldAcceptExploreServerViewState({
-      incomingHref: '/explore',
-      lastPushedHref: '/explore?panels=filters',
-      liveHref: '/explore?panels=filters',
+      incomingHref: '/',
+      lastPushedHref: '/?panels=filters',
+      liveHref: '/?panels=filters',
     }),
     false,
   );
   // Genuine navigation / back-forward: live URL and last push disagree with incoming → accept.
   assert.equal(
     shouldAcceptExploreServerViewState({
-      incomingHref: '/explore',
-      lastPushedHref: '/explore?panels=filters',
-      liveHref: '/explore',
+      incomingHref: '/',
+      lastPushedHref: '/?panels=filters',
+      liveHref: '/',
     }),
     true,
   );

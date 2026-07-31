@@ -123,6 +123,8 @@ test('every folded path reaches its surface in exactly one hop', () => {
     ['/myths', '/methodology'],
     ['/myths/anything', '/methodology'],
     ['/legal', '/law'],
+    ['/explore', '/'],
+    ['/map', '/'],
   ] as const;
 
   for (const [from, to] of oneHop) {
@@ -137,10 +139,31 @@ test('/legal keeps its slug rather than dumping every statute on the index', () 
   assert.equal(rule?.destination, '/law/:path*');
 });
 
-test('/map is a permanent config rule, not a page-level temporary redirect', () => {
-  const rule = RULES.find((entry) => entry.source === '/map');
-  assert.ok(rule, '/map must have a config rule');
-  assert.equal(rule?.permanent, true);
+test('/map and /explore both land on the Atlas, which is `/`', () => {
+  const map = RULES.find((entry) => entry.source === '/map');
+  const explore = RULES.find((entry) => entry.source === '/explore');
+  assert.ok(map, '/map must have a config rule');
+  assert.equal(map?.destination, '/');
+  assert.equal(map?.permanent, true);
+  assert.ok(explore, '/explore must have a config rule');
+  assert.equal(explore?.destination, '/');
+  assert.equal(explore?.permanent, true);
+});
+
+test('the /explore rule is the exact path, so /explore/api keeps answering', () => {
+  // A `/explore/:path*` rule would swallow the Atlas's own refine endpoint, whose entire
+  // contract is its query string.
+  for (const rule of RULES) {
+    assert.ok(
+      !rule.source.startsWith('/explore/'),
+      `${rule.source} would capture /explore/api`,
+    );
+  }
+  assert.equal(
+    RULES.some((rule) => matches(rule.source, '/explore/api')),
+    false,
+    '/explore/api must not match any redirect rule',
+  );
 });
 
 test('/search reaches /records in one hop, with its params', () => {

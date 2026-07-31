@@ -10,13 +10,14 @@ export type ShellNavItem = {
 
 /**
  * Always-visible top-level nav — sans caps; active route gets a copper underline.
- * Journey order: orient (Home) → act (Explore) → read (Chapters) → go deep (History)
- * → meta (About last). `isShellNavActive` exact-matches `/`, so Home only lights on
- * the homepage.
+ * Journey order: act (Atlas) → read (Chapters) → go deep (History) → meta (About last).
+ * `isShellNavActive` exact-matches `/`, so Atlas only lights on the instrument itself.
+ *
+ * There is no separate Explore entry: `/` IS the Atlas and `/explore` redirects to it, so a
+ * second entry would be the same destination listed twice, reached through an extra hop.
  */
 export const PRIMARY_NAV: readonly ShellNavItem[] = [
-  { href: '/', label: 'Home' },
-  { href: '/explore', label: 'Explore' },
+  { href: '/', label: 'Atlas' },
   { href: '/chapters', label: 'Chapters' },
   { href: '/history', label: 'History' },
   { href: '/about', label: 'About' },
@@ -48,7 +49,7 @@ export const FOOTER_NAV_COLUMNS: readonly FooterNavColumn[] = [
   {
     title: 'Explore',
     items: [
-      { href: '/explore', label: 'Explore' },
+      { href: '/', label: 'Atlas' },
       { href: '/chapters', label: 'Chapters' },
       { href: '/history', label: 'History' },
       { href: '/data', label: 'Data' },

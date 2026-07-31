@@ -45,7 +45,7 @@ export default function AboutPage() {
                   findable, especially the history close to you. People. Places. Evidence. Context.
                 </p>
                 <p className="ds-about-edition__actions">
-                  <Link className="ds-cta ds-cta--solid" href="/explore">
+                  <Link className="ds-cta ds-cta--solid" href="/">
                     Open the map
                   </Link>
                   <Link className="ds-cta ds-cta--quiet" href="/methodology">
@@ -194,7 +194,7 @@ export default function AboutPage() {
               and under your control. Reading here does not require creating an identity with us.
             </p>
             <p className="ds-about-edition__actions">
-              <Link className="ds-cta ds-cta--copper" href="/explore">
+              <Link className="ds-cta ds-cta--copper" href="/">
                 Explore the map
               </Link>
               <Link className="ds-cta ds-cta--quiet" href="/chapters">
