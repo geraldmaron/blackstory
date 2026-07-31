@@ -67,3 +67,13 @@ test('sanitizeRichText allows safe external https links', () => {
   assert.match(output, /href="https:\/\/example\.org\/path"/);
   assert.match(output, /title="Example"/);
 });
+
+test('sanitizeRichText strips markup that a single pass would reconstitute', () => {
+  // One pass can create the thing it just removed: deleting the inner `<script>` from
+  // `<scr<script>ipt>` leaves `<script>` behind. Sanitizing to a fixed point closes that.
+  const nested = sanitizeRichText('<scr<script>ipt>alert(1)</scr</script>ipt>');
+  assert.equal(/<script/i.test(nested), false, 'a reconstituted script tag survived');
+
+  const handler = sanitizeRichText(`<p on<onx="">click="alert(1)">hi</p>`);
+  assert.equal(/onclick\s*=/i.test(handler), false, 'a reconstituted event handler survived');
+});

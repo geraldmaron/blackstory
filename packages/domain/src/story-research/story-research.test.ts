@@ -199,7 +199,14 @@ test('Alamo-shaped skeleton recommends only with resolved cites and off-ramps', 
   });
 
   assert.equal(packet.kind, STORY_RESEARCH_PACKET_KIND);
-  assert.ok(packet.authorityLeadUrls.some((url) => url.includes('nps.gov')));
+  // Host-anchored, not `includes`: "nps.gov" can sit anywhere in a URL, so a substring check
+  // would pass for `https://evil.example/?q=nps.gov` (CodeQL js/incomplete-url-substring-sanitization).
+  assert.ok(
+    packet.authorityLeadUrls.some((url) => {
+      const host = new URL(url).hostname;
+      return host === 'nps.gov' || host.endsWith('.nps.gov');
+    }),
+  );
 
   const seed = storyPacketToSeedRecord(packet, '2026-07-18', [
     {

@@ -175,12 +175,33 @@ export function mapCommonsLicenseToRights(
   return undefined;
 }
 
+/** Bounded: every pass strictly shrinks the string, so this is a backstop, not a limit. */
+const STRIP_TAGS_MAX_PASSES = 8;
+
+/**
+ * Remove HTML tags to a fixed point, replacing each with a space.
+ *
+ * One pass can create the tag it just removed: `<scr<script>ipt>` becomes `<script>` once the
+ * inner match is deleted (CodeQL js/incomplete-multi-character-sanitization). Repeating until the
+ * string stops changing is what closes that.
+ */
+function stripTagsCompletely(value: string | undefined): string | undefined {
+  if (value === undefined) return undefined;
+  let current = value;
+  for (let pass = 0; pass < STRIP_TAGS_MAX_PASSES; pass += 1) {
+    const next = current.replace(/<[^>]+>/g, ' ');
+    if (next === current) break;
+    current = next;
+  }
+  return current;
+}
+
 export function buildAltText(input: {
   readonly displayName: string;
   readonly imageDescription?: string;
   readonly fileTitle: string;
 }): string {
-  const fromDesc = input.imageDescription?.replace(/<[^>]+>/g, '').trim();
+  const fromDesc = stripTagsCompletely(input.imageDescription)?.trim();
   if (fromDesc && fromDesc.length > 0 && fromDesc.length <= 240) {
     return fromDesc;
   }
@@ -231,13 +252,15 @@ export function isUnknownCreatorCredit(value: string | undefined): boolean {
  */
 export function stripHtml(value: string | undefined): string | undefined {
   if (!value) return undefined;
-  const cleaned = value
-    .replace(/<[^>]+>/g, ' ')
+  const cleaned = (stripTagsCompletely(value) ?? '')
     .replace(/&nbsp;/gi, ' ')
-    .replace(/&amp;/gi, '&')
+    // `&amp;` decodes LAST. Decoding it first turned `&amp;lt;` into `&lt;`, which the very next
+    // rule then turned into `<`: one escape of user text became two decodes and reproduced the
+    // character the entity existed to neutralise (CodeQL js/double-escaping).
     .replace(/&lt;/gi, '<')
     .replace(/&gt;/gi, '>')
     .replace(/&quot;/gi, '"')
+    .replace(/&amp;/gi, '&')
     .replace(/\s+/g, ' ')
     .trim();
   return cleaned.length > 0 ? cleaned : undefined;
