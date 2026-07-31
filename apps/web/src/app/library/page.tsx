@@ -36,6 +36,16 @@ import '../reading-room.css';
 
 void React;
 
+/*
+ * Must stay dynamic, same reason as /memorial, /entity/[id] and the map group: the room counts
+ * its rooms from the live public catalog (`getSharedPublicEntities`), and App Hosting mounts
+ * DATABASE_URL at runtime only. Left prerendered, the build tried to fetch the catalog, got
+ * `[public-data] postgres live catalog unavailable`, and failed the whole export on /library.
+ * `/records` reads the same data and escapes this only because its searchParams already opt it
+ * out of prerendering, which is an accident rather than a decision.
+ */
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = buildStaticPageMetadata({
   path: '/library',
   title: 'The library',

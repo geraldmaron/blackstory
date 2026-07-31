@@ -15,10 +15,10 @@
 
 /** Brand type-family names, from brand/tokens/typography.json. */
 export const fontFamilies = {
-  "display": "Sora SemiBold",
-  "uiBody": "Inter",
-  "editorial": "Source Serif 4",
-  "dataMono": "IBM Plex Mono"
+  "display": "Schibsted Grotesk SemiBold",
+  "uiBody": "Geist",
+  "editorial": "Newsreader",
+  "dataMono": "Geist Mono"
 } as const;
 
 /** Role -> size/lineHeight/weight/family-role scale (see supplementary-source.ts for provenance). */

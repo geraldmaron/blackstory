@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "bead": "",
   "evaluator": "cli-test",
-  "evaluatedAt": "2026-07-31T06:39:04.097Z",
+  "evaluatedAt": "2026-07-31T06:48:17.780Z",
   "decision": "NO_GO",
   "requiredFailed": 7,
   "requiredPassed": 8,
