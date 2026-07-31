@@ -353,9 +353,11 @@ a { color: inherit; }
   border: 1px solid var(--rule); border-radius: var(--r-md);
   box-shadow: var(--shadow-2);
 }
-/* The official symbol PNG is 512x512 but only 181x292 of that is ink: 57% of the box
-   height is transparent padding. So the rendered box height is NOT the mark size. At a
-   26px box the visible mark was 15px, under brand.md's 20px compact-mark minimum.
+/* The official symbol PNG is 512x512 but only 181x292 of that is ink, so the visible mark
+   is 57% of the box height and 35% of its width. Put the other way: 43% of the height and
+   65% of the width is transparent padding. Either way the rendered box height is NOT the
+   mark size. Multiply a box height by 0.57 for visible height, 0.35 for visible width.
+   At a 26px box the visible mark was 15px, under brand.md's 20px compact-mark minimum.
    A 48px box puts the visible mark at ~27px, between the compact (20px) and primary
    (32px) tiers and comfortable in a 56px bar.
    Clear space X = the visible width of the copper pin. The artwork's own transparent
