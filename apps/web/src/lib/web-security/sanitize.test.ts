@@ -68,6 +68,41 @@ test('sanitizeRichText allows safe external https links', () => {
   assert.match(output, /title="Example"/);
 });
 
+test('the attribute allowlist drops every dangerous attribute shape', () => {
+  // These used to be caught by blocklist regexes running before the allowlist rebuild. The
+  // rebuild is what actually removes them: RICH_TEXT_ALLOWED_ATTRS permits href/title/rel on
+  // `<a>` and nothing anywhere else, so anything not on the list is dropped by omission.
+  const cases = [
+    `<p onclick="alert(1)">x</p>`,
+    `<p ONCLICK="alert(1)">x</p>`,
+    `<p onmouseover='alert(1)'>x</p>`,
+    `<a href="javascript:alert(1)">x</a>`,
+    `<a href="  JaVaScRiPt:alert(1)">x</a>`,
+    `<a href="data:text/html,<b>">x</a>`,
+    `<a href="vbscript:msgbox">x</a>`,
+    `<button formaction="javascript:alert(1)">x</button>`,
+    `<p xlink:href="javascript:alert(1)">x</p>`,
+    `<img src="javascript:alert(1)">`,
+  ];
+  for (const input of cases) {
+    const out = sanitizeRichText(input);
+    assert.equal(/on\w+\s*=/i.test(out), false, `event handler survived: ${input} -> ${out}`);
+    assert.equal(/javascript:/i.test(out), false, `javascript: survived: ${input} -> ${out}`);
+    assert.equal(/vbscript:/i.test(out), false, `vbscript: survived: ${input} -> ${out}`);
+    assert.equal(/formaction/i.test(out), false, `formaction survived: ${input} -> ${out}`);
+    assert.equal(/xlink:href/i.test(out), false, `xlink:href survived: ${input} -> ${out}`);
+    assert.equal(/\sdata:/i.test(out), false, `data: survived: ${input} -> ${out}`);
+  }
+});
+
+test('a safe link keeps exactly its allowlisted attributes', () => {
+  const out = sanitizeRichText('<a href="https://example.org" title="T" rel="noreferrer" id="x">L</a>');
+  assert.match(out, /href="https:\/\/example\.org"/);
+  assert.match(out, /title="T"/);
+  assert.match(out, /rel="noreferrer"/);
+  assert.equal(/id=/.test(out), false, 'a non-allowlisted attribute survived');
+});
+
 test('sanitizeRichText strips markup that a single pass would reconstitute', () => {
   // One pass can create the thing it just removed: deleting the inner `<script>` from
   // `<scr<script>ipt>` leaves `<script>` behind. Sanitizing to a fixed point closes that.

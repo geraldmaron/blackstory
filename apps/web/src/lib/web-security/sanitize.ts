@@ -33,9 +33,6 @@ const BLOCKED_TAG_PATTERN = new RegExp(
   `<\\/?(?:${BLOCKED_TAG_NAMES})[^>]*>[\\s\\S]*?<\\/(?:${BLOCKED_TAG_NAMES})>|<(?:${BLOCKED_TAG_NAMES})[^>]*\\/?>`,
   'gi',
 );
-const EVENT_HANDLER_ATTR_PATTERN = /\s(?:on\w+|formaction|xlink:href|xmlns)\s*=\s*(['"])[^'"]*\1/gi;
-const DANGEROUS_URI_PATTERN =
-  /\s(?:href|src|action)\s*=\s*(['"])\s*(?:javascript|data|vbscript):[^'"]*\1/gi;
 const TAG_PATTERN = /<\/?([a-zA-Z][\w-]*)([^>]*)>/g;
 
 
@@ -46,21 +43,24 @@ const TAG_PATTERN = /<\/?([a-zA-Z][\w-]*)([^>]*)>/g;
 export function sanitizeRichText(input: string): string {
   if (!input) return '';
 
-  // To a fixed point, not one pass and not a capped number of passes. A single pass can *create*
-  // the thing it just removed: `<scr<script>ipt>` leaves `<script>`, and `on<onx=''>click='...'`
-  // leaves `onclick='...'`. A cap would leave residue on input crafted to exceed it, so this
-  // runs until the string stops changing (CodeQL js/incomplete-multi-character-sanitization).
+  // Blocked elements go first, and to a fixed point: removing the inner match of
+  // `<scr<script>ipt>` leaves `<script>` behind, so one pass can create what it just deleted.
+  // This terminates because the replacement only ever deletes characters, so each pass that
+  // changes anything strictly shortens the string.
   //
-  // It terminates: every replacement only ever deletes characters, so each pass that changes
-  // anything strictly shortens the string, and a string of length n admits at most n such passes.
+  // This pass exists to drop the *contents* of a script or style element, not to police
+  // attributes. Attributes are handled below by rebuilding every surviving tag from an
+  // allowlist, which is a parse rather than a blocklist, and is why the event-handler and
+  // dangerous-URI regexes that used to run here are gone: `RICH_TEXT_ALLOWED_ATTRS` permits
+  // href, title and rel on `<a>` and nothing on anything else, so onclick, formaction,
+  // xlink:href and a javascript: href are all dropped by not being on the list. A blocklist
+  // layered over an allowlist adds no safety and cannot be reasoned about, since it only ever
+  // catches what the allowlist has already refused.
   let sanitized = input;
   let previous: string;
   do {
     previous = sanitized;
-    sanitized = sanitized
-      .replace(BLOCKED_TAG_PATTERN, '')
-      .replace(EVENT_HANDLER_ATTR_PATTERN, '')
-      .replace(DANGEROUS_URI_PATTERN, '');
+    sanitized = sanitized.replace(BLOCKED_TAG_PATTERN, '');
   } while (sanitized !== previous);
 
   sanitized = sanitized.replace(TAG_PATTERN, (match, rawTag: string, rawAttrs: string) => {
