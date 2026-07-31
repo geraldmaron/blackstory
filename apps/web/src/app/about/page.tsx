@@ -32,7 +32,11 @@ export default function AboutPage() {
       <RoomHeader
         pathname="/about"
         kicker="BlackStory"
-        title="History, pinned to <em>place</em>."
+        title={
+          <>
+            History, pinned to <em>place</em>.
+          </>
+        }
         lede="A place-connected Black history research platform, so documented history stays findable, especially the history close to you. People. Places. Evidence. Context."
         showPath={false}
       />

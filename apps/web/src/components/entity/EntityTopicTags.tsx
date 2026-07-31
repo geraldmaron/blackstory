@@ -1,5 +1,11 @@
 /**
- * Learning-index topic / era / notability chips linking into history and explore filters.
+ * Learning-index topic and era chips, linking into the records index and the explore filters.
+ *
+ * Notability labels are deliberately not chips. They are rubric sentences ("The entity is a
+ * documented site of a historically significant event of..."), and squeezing one into a chip
+ * meant truncating it mid-word, so the record shipped a visibly cut-off sentence sitting in a
+ * pill next to two one-word tags. The inclusion rationale is a sentence and renders as one, in
+ * the record's rail; see `page.tsx`.
  */
 import React from 'react';
 import Link from 'next/link';
@@ -22,9 +28,7 @@ function chipHref(kind: 'theme' | 'era', value: string): string {
 export function EntityTopicTags({ entity }: EntityTopicTagsProps) {
   const themes = entity.topicTags ?? [];
   const eras = entity.eraBuckets ?? [];
-  const notability = entity.notabilityLabels ?? [];
-
-  if (themes.length === 0 && eras.length === 0 && notability.length === 0) {
+  if (themes.length === 0 && eras.length === 0) {
     return null;
   }
 
@@ -49,11 +53,6 @@ export function EntityTopicTags({ entity }: EntityTopicTagsProps) {
         >
           {era}
         </Link>
-      ))}
-      {notability.slice(0, 2).map((label) => (
-        <span key={`note-${label.slice(0, 24)}`} className="ds-entity-tag ds-entity-tag--note">
-          {label.length > 72 ? `${label.slice(0, 69)}…` : label}
-        </span>
       ))}
     </div>
   );

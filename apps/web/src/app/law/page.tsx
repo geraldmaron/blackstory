@@ -36,7 +36,11 @@ export default async function LawBrowsePage({ searchParams }: LawPageProps) {
       <RoomHeader
         pathname="/law"
         kicker="Reference"
-        title="Civil rights <em>law</em>"
+        title={
+          <>
+            Civil rights <em>law</em>
+          </>
+        }
         lede={LAW_EDITION_BROWSE_LEDE}
       />
 

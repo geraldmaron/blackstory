@@ -55,8 +55,6 @@ const LEGACY_EDITION_CHROME: readonly string[] = [
   'chapters/mosaic-credits/stories-panel-chrome.ts',
   'data/data-edition.css',
   'data/data-panel-chrome.ts',
-  'entity/[id]/entity-edition.css',
-  'entity/[id]/entity-panel-chrome.ts',
   'law/law-edition.css',
   'law/law-panel-chrome.ts',
   'memorial/memorial-edition.css',
@@ -73,6 +71,20 @@ function walk(dir: string, out: string[] = []): string[] {
   }
   return out;
 }
+
+describe('room kit · a title is JSX, never a string of markup', () => {
+  // `RoomHeader`'s title is a ReactNode so `<em>` renders in the editorial accent. Passed as a
+  // string attribute instead, React escapes it and the reader sees the literal tags: /law shipped
+  // reading "Civil rights <em>law</em>" and /about "History, pinned to <em>place</em>.".
+  it('no room passes markup inside a quoted title attribute', () => {
+    const offenders = walk(APP_DIR)
+      .filter((file) => file.endsWith('.tsx'))
+      .filter((file) => /title="[^"]*<[a-z]/i.test(readFileSync(file, 'utf8')))
+      .map((file) => path.relative(APP_DIR, file));
+
+    assert.deepEqual(offenders, [], 'pass the title as JSX: title={<>Civil rights <em>law</em></>}');
+  });
+});
 
 describe('room kit · the v6 edition system stays retired', () => {
   it('no *-edition.css or *-panel-chrome.ts is added under app/, and none is left behind', () => {
