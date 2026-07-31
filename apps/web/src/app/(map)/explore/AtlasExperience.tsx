@@ -69,6 +69,8 @@ import {
 import { formatCitation } from '../../../lib/citation/format';
 import { buildShareHref } from '../../../lib/share/deep-link';
 import type { ExploreMapFeature } from '../../../lib/map-experience/build-explore-map-source';
+import { placeLabelFor } from '../../../lib/map-experience/place-label';
+import { buildPaletteRecords } from '../../../lib/map-experience/build-palette-records';
 import { useMapStage } from '../MapStage';
 import {
   hydrateExploreViewModel,
@@ -101,10 +103,6 @@ function decadeStartYear(bucket: string): number {
 
 function eraBucketFor(decade: number): string {
   return `${decade}s`;
-}
-
-function placeFor(feature: ExploreMapFeature): string {
-  return feature.properties.locationLabel ?? feature.properties.stateName ?? 'Place not published';
 }
 
 function eraFor(feature: ExploreMapFeature): string {
@@ -373,7 +371,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
       setSelectedId(feature.properties.entityId);
       if (!fly) return;
       const [lng, lat] = feature.geometry.coordinates;
-      camera.flyToRecord({ center: [lng, lat], place: placeFor(feature) });
+      camera.flyToRecord({ center: [lng, lat], place: placeLabelFor(feature) });
     },
     [camera],
   );
@@ -404,7 +402,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
       ...(selectedFeature.properties.mapTone
         ? { mapTone: selectedFeature.properties.mapTone }
         : {}),
-      place: placeFor(selectedFeature),
+      place: placeLabelFor(selectedFeature),
       era: eraFor(selectedFeature),
       story: selectedFeature.properties.oneLineStory,
       precision: selectedFeature.properties.geoPrecisionTier,
@@ -436,7 +434,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     const grade = gradeForConfidence(feature.properties.confidenceTier);
     return formatCitation({
       name: feature.properties.displayName,
-      place: placeFor(feature),
+      place: placeLabelFor(feature),
       era: eraFor(feature),
       grade: grade ?? 'not graded',
       sourceCount: feature.properties.evidenceCount,
@@ -456,7 +454,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
             id,
             name: feature.properties.displayName,
             kind: feature.properties.kind,
-            place: placeFor(feature),
+            place: placeLabelFor(feature),
             era: eraFor(feature),
             grade: gradeForConfidence(feature.properties.confidenceTier),
             href: feature.properties.href,
@@ -639,13 +637,14 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
 
   /* ---- palette data ------------------------------------------------------ */
 
+  /**
+   * Name and place only, until repo-92n2.35 widened this to topic, kind, era and summary. The
+   * build moved to `build-palette-records.ts` so what the index carries has a test over real
+   * release features — a subject missing from the index is a subject the palette cannot find,
+   * and that is not a fact a component test can establish.
+   */
   const paletteRecords = useMemo<readonly PaletteRecord[]>(
-    () =>
-      view.allFeatures.map((feature) => ({
-        id: feature.properties.entityId,
-        name: feature.properties.displayName,
-        place: placeFor(feature),
-      })),
+    () => buildPaletteRecords(view.allFeatures),
     [view.allFeatures],
   );
 

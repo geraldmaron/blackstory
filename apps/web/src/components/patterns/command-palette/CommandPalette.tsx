@@ -32,11 +32,28 @@ void React;
 const MAX_RECORD_ROWS = 7;
 const MAX_STATE_ROWS = 4;
 
+/**
+ * One record in the palette's client index.
+ *
+ * Name and place were the whole index until repo-92n2.35. A reader who types a subject rather
+ * than a proper noun — "restrictive covenant", "Great Migration" — knows what happened without
+ * knowing what any single record is called, and against a name/place index that reader got an
+ * empty palette. The four subject fields below are indexed but not all displayed: what a row
+ * shows is `place`, plus the field the match actually landed in when that was something else.
+ */
 export type PaletteRecord = {
   readonly id: string;
   readonly name: string;
   /** "Birmingham, Alabama". Shown as the row's second line. */
   readonly place: string;
+  /** Human topic labels, not slugs: a query reads "restrictive covenant", never the id. */
+  readonly topics?: readonly string[];
+  /** "School", "Massacre" — the same label the record mark paints. */
+  readonly kindLabel?: string;
+  /** "1920s". Matches a reader who searches a decade instead of a name. */
+  readonly eraLabel?: string;
+  /** The record's one-line story. Last-resort field, and the widest one. */
+  readonly summary?: string;
 };
 
 export type PaletteState = {
@@ -69,7 +86,7 @@ export type CommandPaletteProps = {
 };
 
 type Row =
-  | { readonly kind: 'record'; readonly key: string; readonly record: PaletteRecord }
+  | { readonly kind: 'record'; readonly key: string; readonly ranked: RankedPaletteRecord }
   | { readonly kind: 'state'; readonly key: string; readonly state: PaletteState }
   | { readonly kind: 'action'; readonly key: string; readonly command: Command }
   | {
@@ -136,21 +153,87 @@ export function useCommandPaletteShortcut(onOpen: () => void): void {
   }, [onOpen]);
 }
 
-function rankRecords(records: readonly PaletteRecord[], query: string): readonly PaletteRecord[] {
-  const ranked: { record: PaletteRecord; tier: number }[] = [];
+/**
+ * Which field a row matched on, and the text that matched.
+ *
+ * Carried out of ranking rather than recomputed at render because the row has to be able to say
+ * why it is there. A record surfaced by its summary, showing nothing but its place, reads as a
+ * ranking mistake to the reader who typed a subject — the one field that explains the row is the
+ * one field not on screen.
+ */
+export type RankedPaletteRecord = {
+  readonly record: PaletteRecord;
+  readonly matchedField: 'name' | 'place' | 'topic' | 'kind' | 'era' | 'summary';
+  readonly matchedText: string;
+};
+
+/**
+ * Penalties, in tier points, against a name match.
+ *
+ * Ordering is the claim, not the exact numbers. A name match always outranks every subject match,
+ * because a reader typing a proper noun wants that record and nothing near it. Below the name,
+ * place first (a query is more often a where than a what), then topic — the controlled vocabulary,
+ * so a hit there is a real subject hit — then kind and era, which are coarse buckets that would
+ * otherwise return half the archive, then summary, the widest and least deliberate field.
+ *
+ * The gaps are larger than the 20 points separating an exact match (100) from a substring (80),
+ * so no substring hit in a lower field can climb over an exact hit in a higher one.
+ */
+const FIELD_PENALTY = {
+  name: 0,
+  place: 15,
+  topic: 30,
+  kind: 45,
+  era: 45,
+  summary: 60,
+} as const;
+
+function bestFieldMatch(record: PaletteRecord, query: string): RankedPaletteRecord | null {
+  const candidates: readonly {
+    readonly field: RankedPaletteRecord['matchedField'];
+    readonly text: string | undefined;
+  }[] = [
+    { field: 'name', text: record.name },
+    { field: 'place', text: record.place },
+    ...(record.topics ?? []).map(
+      (topic) => ({ field: 'topic', text: topic }) as { field: 'topic'; text: string },
+    ),
+    { field: 'kind', text: record.kindLabel },
+    { field: 'era', text: record.eraLabel },
+    { field: 'summary', text: record.summary },
+  ];
+
+  let best: { entry: RankedPaletteRecord; tier: number } | null = null;
+  for (const candidate of candidates) {
+    if (!candidate.text) continue;
+    const tier = typeaheadMatchTier(query, candidate.text) - FIELD_PENALTY[candidate.field];
+    if (tier <= 0) continue;
+    if (best && tier <= best.tier) continue;
+    best = {
+      tier,
+      entry: { record, matchedField: candidate.field, matchedText: candidate.text },
+    };
+  }
+  return best ? best.entry : null;
+}
+
+export function rankRecords(
+  records: readonly PaletteRecord[],
+  query: string,
+): readonly RankedPaletteRecord[] {
+  const ranked: { entry: RankedPaletteRecord; tier: number }[] = [];
 
   for (const record of records) {
-    const tier = Math.max(
-      typeaheadMatchTier(query, record.name),
-      // A place match ranks below a name match: "Birmingham" should surface the motel before it
-      // surfaces every record that merely sits in Birmingham.
-      typeaheadMatchTier(query, record.place) - 15,
-    );
-    if (tier > 0) ranked.push({ record, tier });
+    const entry = bestFieldMatch(record, query);
+    if (!entry) continue;
+    ranked.push({
+      entry,
+      tier: typeaheadMatchTier(query, entry.matchedText) - FIELD_PENALTY[entry.matchedField],
+    });
   }
 
-  ranked.sort((a, b) => b.tier - a.tier || a.record.name.length - b.record.name.length);
-  return ranked.slice(0, MAX_RECORD_ROWS).map((entry) => entry.record);
+  ranked.sort((a, b) => b.tier - a.tier || a.entry.record.name.length - b.entry.record.name.length);
+  return ranked.slice(0, MAX_RECORD_ROWS).map((item) => item.entry);
 }
 
 export function CommandPalette({
@@ -185,7 +268,11 @@ export function CommandPalette({
       : [];
 
     return [
-      ...matchedRecords.map((record): Row => ({ kind: 'record', key: `r:${record.id}`, record })),
+      ...matchedRecords.map((ranked): Row => ({
+        kind: 'record',
+        key: `r:${ranked.record.id}`,
+        ranked,
+      })),
       ...matchedStates.map((state): Row => ({ kind: 'state', key: `s:${state.name}`, state })),
       ...matchedDestinations.map((destination): Row => ({
         kind: 'destination',
@@ -222,7 +309,7 @@ export function CommandPalette({
 
   const activate = useCallback(
     (row: Row, fly: boolean) => {
-      if (row.kind === 'record') onOpenRecord(row.record, fly);
+      if (row.kind === 'record') onOpenRecord(row.ranked.record, fly);
       else if (row.kind === 'state') onJumpToState(row.state);
       else if (row.kind === 'destination') {
         if (onNavigate) onNavigate(row.destination);
@@ -345,10 +432,20 @@ export function CommandPalette({
                   {row.kind === 'record' ? (
                     <>
                       <span className="ds-palette__title">
-                        <Highlighted text={row.record.name} query={query} />
+                        <Highlighted text={row.ranked.record.name} query={query} />
                       </span>
                       <span className="ds-palette__meta">
-                        <Highlighted text={row.record.place} query={query} />
+                        <Highlighted text={row.ranked.record.place} query={query} />
+                        {/* The matched field, when it is one the row does not already show.
+                            A subject match with only a place under it looks like a ranking
+                            mistake to the reader who typed the subject. */}
+                        {row.ranked.matchedField !== 'name' &&
+                        row.ranked.matchedField !== 'place' ? (
+                          <span className="ds-palette__reason">
+                            {' · '}
+                            <Highlighted text={row.ranked.matchedText} query={query} />
+                          </span>
+                        ) : null}
                       </span>
                     </>
                   ) : null}
