@@ -24,6 +24,36 @@ const DEFAULT_SUPABASE_URL = 'https://twykhihqkcldpreuovay.supabase.co';
 const SUPABASE_BUCKET = 'public-media';
 const PREFIX = 'public/';
 
+/** Trailing slashes by scan, not `replace(/\/$/, '')`. See packages/config/src/trim.ts. */
+function trimTrailingSlashes(value) {
+  let end = value.length;
+  while (end > 0 && value.charCodeAt(end - 1) === 47) end -= 1;
+  return end === value.length ? value : value.slice(0, end);
+}
+
+/**
+ * The object path comes from a bucket listing, so file input decides part of the request URL
+ * (CodeQL js/file-access-to-http). A `..` segment would climb out of the bucket prefix and a
+ * `?` or `#` would end the path early and turn the rest into a query or fragment.
+ */
+function assertSafeObjectPath(objectPath) {
+  if (typeof objectPath !== 'string' || objectPath.length === 0) {
+    throw new Error('refusing empty object path');
+  }
+  const segments = objectPath.split('/');
+  if (segments.some((segment) => segment === '..' || segment === '')) {
+    throw new Error(`refusing object path with empty or traversal segment: ${objectPath}`);
+  }
+  if (/[?#\\]/.test(objectPath)) {
+    throw new Error(`refusing object path with URL metacharacters: ${objectPath}`);
+  }
+}
+
+/** Percent-encode each segment while keeping the separators. */
+function encodeObjectPath(objectPath) {
+  return objectPath.split('/').map(encodeURIComponent).join('/');
+}
+
 function printUsage() {
   console.log(`Usage: node scripts/copy-gcs-public-media-to-supabase.mjs [options]
 
@@ -122,8 +152,9 @@ function downloadGcsObject(gcsUri, destFile) {
  * @param {string} contentType
  */
 async function uploadToSupabase(supabaseUrl, authKey, objectPath, localFile, contentType) {
-  const base = supabaseUrl.replace(/\/$/, '');
-  const url = `${base}/storage/v1/object/${SUPABASE_BUCKET}/${objectPath}`;
+  assertSafeObjectPath(objectPath);
+  const base = trimTrailingSlashes(supabaseUrl);
+  const url = `${base}/storage/v1/object/${SUPABASE_BUCKET}/${encodeObjectPath(objectPath)}`;
   const body = readFileSync(localFile);
   let lastError = /** @type {Error | null} */ (null);
   for (let attempt = 1; attempt <= 5; attempt += 1) {

@@ -19,6 +19,11 @@ import {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+/** Escape every RegExp metacharacter, so a value built into a pattern stays a literal. */
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function run(command, args = [], options = {}) {
   const result = spawnSync(command, args, {
     encoding: 'utf8',
@@ -57,8 +62,11 @@ function simulatorAppInfo(bundleId = IOS_BUNDLE_ID) {
   if (result.status !== 0) {
     return null;
   }
+  // Every metacharacter escaped, not just the dot. A bundle id is data being built into a
+  // pattern, so a `+` or `(` in it would have stayed live and changed what this matches
+  // (CodeQL js/incomplete-sanitization).
   const block = new RegExp(
-    `"${bundleId.replace(/\./g, '\\.')}"\\s*=\\s*\\{[\\s\\S]*?DataContainer\\s*=\\s*"file://([^"]+)"`,
+    `"${escapeRegExp(bundleId)}"\\s*=\\s*\\{[\\s\\S]*?DataContainer\\s*=\\s*"file://([^"]+)"`,
   ).exec(result.stdout ?? '');
   if (!block) {
     return null;

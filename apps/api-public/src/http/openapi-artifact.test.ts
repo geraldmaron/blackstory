@@ -63,7 +63,11 @@ function assertNoForbiddenKeys(value: unknown, forbidden: readonly string[], lab
 test('OpenAPI artifact lists every `/v1` route the router serves', () => {
   const openapi = readFileSync(OPENAPI_PATH, 'utf8');
   for (const route of ROUTER_PATHS) {
-    assert.match(openapi, new RegExp(`\\n  ${route.replace('{', '\\{').replace('}', '\\}')}:`));
+    // Plain containment. The hand-escaping here only ever escaped the FIRST `{` and the first
+    // `}` (String.replace with a string argument replaces one occurrence), so a route with two
+    // parameters was matched by a pattern that was partly live regex
+    // (CodeQL js/incomplete-sanitization).
+    assert.ok(openapi.includes(`\n  ${route}:`), `OpenAPI artifact is missing ${route}`);
   }
 });
 
