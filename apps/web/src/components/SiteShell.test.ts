@@ -1,30 +1,31 @@
 /**
- * Atlas shell-gate path detection and public header brand display.
+ * Shell gate contracts: the header and footer both read the surface class registry, and the
+ * public header brand display never forks per route.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { isAtlasShell } from './explore-map-shell';
+import { surfaceClassFor } from '../lib/nav/surface-classes';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
-test('isAtlasShell is true only for the Atlas', () => {
-  assert.equal(isAtlasShell('/'), true);
+test('only the Atlas resolves to the instrument class', () => {
+  assert.equal(surfaceClassFor('/'), 'instrument');
   // `/explore` 308s to `/` and never renders, so it must not be treated as a live surface —
-  // a stale `true` here would strip the header from a route that does not exist.
-  assert.equal(isAtlasShell('/explore'), false);
-  assert.equal(isAtlasShell('/explore/api'), false);
-  assert.equal(isAtlasShell('/locate'), false);
-  assert.equal(isAtlasShell('/chapters'), false);
+  // a stale instrument verdict here would strip the header from a route that does not exist.
+  assert.equal(surfaceClassFor('/explore'), null);
+  assert.equal(surfaceClassFor('/explore/api'), null);
+  assert.equal(surfaceClassFor('/locate'), 'utility');
+  assert.equal(surfaceClassFor('/chapters'), 'reading');
 });
 
-test('the two shell gates read the same predicate, so they cannot disagree', () => {
+test('the two shell gates read the same registry, so they cannot disagree', () => {
   const header = readFileSync(join(here, 'SiteShellHeader.tsx'), 'utf8');
   const footer = readFileSync(join(here, 'SiteShellFooter.tsx'), 'utf8');
-  assert.match(header, /isAtlasShell/);
-  assert.match(footer, /isAtlasShell/);
+  assert.match(header, /surfaceClassFor\(pathname\) === 'instrument'/);
+  assert.match(footer, /surfaceClassFor\(pathname\) === 'instrument'/);
 });
 
 test('SiteHeader uses the theme-paired lockup on every route it renders on', () => {

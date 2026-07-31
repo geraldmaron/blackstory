@@ -17,14 +17,14 @@ const uiShellHeaderCss = readFileSync(
 );
 
 describe('shell sticky clearance', () => {
-  it('gives non-map body top clearance and zeros it on map surfaces', () => {
+  it('gives document surfaces top clearance and zeros it on the instrument', () => {
     assert.match(
       shellCss,
       /\.ds-shell-body\s*\{[^}]*padding-top:\s*calc\(var\(--ds-island-clearance\)\)/s,
     );
     assert.match(
       shellCss,
-      /\.ds-shell-body:has\(\[data-surface='map'\]\)\s*\{[^}]*padding-top:\s*0/s,
+      /\.ds-shell-body:has\(\[data-surface='instrument'\]\)\s*\{[^}]*padding-top:\s*0/s,
     );
   });
 
@@ -36,26 +36,36 @@ describe('shell sticky clearance', () => {
   });
 });
 
-describe('shell explore header keeps the shared primary nav', () => {
-  it('never strips the desktop nav, mobile menu, or CTA on the explore surface', () => {
-    // Regression guard: explore is a map surface that must show the same header
-    // navigation as the homepage hero and every other route (no explore-only
-    // display:none on nav chrome).
-    assert.doesNotMatch(shellCss, /\.ds-shell:has\(\.ds-explore-stage\)\s+\.ds-shell-nav--desktop/);
-    assert.doesNotMatch(shellCss, /\.ds-shell:has\(\.ds-explore-stage\)\s+\.ds-shell-menu\b/);
-    assert.doesNotMatch(shellCss, /\.ds-shell:has\(\.ds-explore-stage\)\s+\.ds-shell-header__cta/);
+describe('surface class is the only shell switch', () => {
+  it('reads data-surface, never a marker class a route happens to set', () => {
+    // `.ds-explore-stage` and `.ds-home-hero` were the two markers shell layout used to key
+    // off. Both are rules that silently stop applying the moment the markup changes, which is
+    // exactly what happened when `/` became the Atlas.
+    assert.doesNotMatch(shellCss, /\.ds-shell:has\(\.ds-explore-stage\)/);
+    assert.doesNotMatch(shellCss, /\.ds-shell:has\(\.ds-home-hero\)/);
+    assert.doesNotMatch(shellCss, /\.ds-shell-body:has\(\.ds-home-hero\)/);
+    // The retired marker value must not linger either.
+    assert.doesNotMatch(shellCss, /data-surface='map'/);
   });
 
-  it('scopes any explore rule from .ds-shell so the sibling header can match', () => {
-    assert.doesNotMatch(shellCss, /\.ds-shell-body:has\(\.ds-explore-stage\)\s+\.ds-shell-header/);
+  it('never strips the desktop nav, mobile menu, or CTA on a document surface', () => {
+    assert.doesNotMatch(shellCss, /\[data-surface='reading'\][^{]*\.ds-shell-nav--desktop/);
+    assert.doesNotMatch(shellCss, /\[data-surface='reading'\][^{]*\.ds-shell-menu\b/);
+    assert.doesNotMatch(shellCss, /\[data-surface='reading'\][^{]*\.ds-shell-header__cta/);
+  });
+
+  it('scopes shell-level surface rules from .ds-shell so the sibling header can match', () => {
+    // The header is a sibling of `.ds-shell-body`, so a rule scoped from the body never
+    // reaches it. This is the structural bug the guard exists for.
+    assert.doesNotMatch(
+      shellCss,
+      /\.ds-shell-body:has\(\[data-surface='instrument'\]\)\s+\.ds-shell-header/,
+    );
   });
 });
 
 describe('explore decade dock hit target', () => {
-  const exploreEditionCss = readFileSync(
-    join(here, '(map)/explore/explore-edition.css'),
-    'utf8',
-  );
+  const exploreEditionCss = readFileSync(join(here, '(map)/explore/explore-edition.css'), 'utf8');
   const cinematicMapCss = readFileSync(
     join(here, '../components/patterns/cinematic-map/cinematic-map.css'),
     'utf8',
@@ -66,18 +76,12 @@ describe('explore decade dock hit target', () => {
       exploreEditionCss,
       /\.ds-explore-stage__decade-dock\s*\{[^}]*pointer-events:\s*auto/s,
     );
-    assert.match(
-      exploreEditionCss,
-      /\.ds-explore-stage__decade-dock\s*\{[^}]*z-index:\s*6/s,
-    );
+    assert.match(exploreEditionCss, /\.ds-explore-stage__decade-dock\s*\{[^}]*z-index:\s*6/s);
     assert.match(
       exploreEditionCss,
       /\.ds-explore-stage__decade-dock\s*\{[^}]*touch-action:\s*none/s,
     );
-    assert.match(
-      exploreEditionCss,
-      /\.ds-explore-stage__decade-scroll\s*\{[^}]*flex:\s*1 1 auto/s,
-    );
+    assert.match(exploreEditionCss, /\.ds-explore-stage__decade-scroll\s*\{[^}]*flex:\s*1 1 auto/s);
     assert.match(
       cinematicMapCss,
       /:root\[data-cinematic-engaged='true'\][\s\S]*\.ds-explore-stage__decade-dock\s*\{[^}]*pointer-events:\s*auto/s,
@@ -90,43 +94,44 @@ describe('explore decade dock hit target', () => {
   });
 });
 
-describe('explore map shell layout', () => {
-  it('locks the dedicated explore shell to the viewport (not a footer-over-map document)', () => {
+describe('instrument shell layout', () => {
+  it('locks the instrument to the viewport (not a footer-over-map document)', () => {
     assert.match(
       shellCss,
-      /\.ds-shell:has\(\.ds-explore-stage\)\s*\{[^}]*height:\s*100dvh[^}]*overflow:\s*hidden/s,
+      /\.ds-shell:has\(\[data-surface='instrument'\]\)\s*\{[^}]*height:\s*100dvh[^}]*overflow:\s*hidden/s,
     );
     assert.match(
       shellCss,
-      /\.ds-shell:has\(\.ds-explore-stage\)\s+\.ds-shell-body\s*\{[^}]*min-height:\s*0[^}]*overflow:\s*hidden/s,
+      /\.ds-shell:has\(\[data-surface='instrument'\]\)\s+\.ds-shell-body\s*\{[^}]*min-height:\s*0[^}]*overflow:\s*hidden/s,
     );
     assert.match(
       shellCss,
-      /\.ds-shell:has\(\.ds-explore-stage\)\s+\.ds-map-surface\s*\{[^}]*height:\s*100%/s,
+      /\.ds-shell:has\(\[data-surface='instrument'\]\)\s+\.ds-shell-page-transition,[\s\S]*?\.ds-map-surface\s*\{[^}]*height:\s*100%/s,
     );
+  });
+
+  it('leaves no transform on the page-root wrapper, which would trap the fixed plate', () => {
+    // `animation-fill-mode: both` with a transform keyframe leaves a permanently non-none
+    // computed transform, making this wrapper the containing block for the fixed plate.
+    assert.doesNotMatch(shellCss, /@keyframes ds-shell-page-enter/);
+    assert.doesNotMatch(shellCss, /\.ds-shell-page-transition\s*\{[^}]*animation:/s);
   });
 });
 
 describe('shell header theme tokens', () => {
   it('uses a flush opaque bar with theme surface/ink (no floating top gap)', () => {
     assert.match(uiShellHeaderCss, /\.ds-shell-header\s*\{[^}]*top:\s*0/s);
-    assert.match(
-      uiShellHeaderCss,
-      /\.ds-shell-header\s*\{[^}]*background:\s*var\(--ds-surface\)/s,
-    );
-    assert.match(
-      uiShellHeaderCss,
-      /\.ds-shell-header__inner\s*\{[^}]*background:\s*transparent/s,
-    );
+    assert.match(uiShellHeaderCss, /\.ds-shell-header\s*\{[^}]*background:\s*var\(--ds-surface\)/s);
+    assert.match(uiShellHeaderCss, /\.ds-shell-header__inner\s*\{[^}]*background:\s*transparent/s);
     assert.match(uiShellHeaderCss, /\.ds-shell-header__inner\s*\{[^}]*color:\s*var\(--ds-ink\)/s);
-    // Regression: map routes must not freeze the navbar on charcoal / dark-kit artwork.
+    // Regression: no surface class may freeze the navbar on charcoal / dark-kit artwork.
     assert.doesNotMatch(
       uiShellHeaderCss,
-      /\.ds-shell:has\(\[data-surface='map'\]\)\s+\.ds-shell-header__inner\s*\{[^}]*--ds-fixed-charcoal/s,
+      /\[data-surface='[a-z]+'\]\)?\s+\.ds-shell-header__inner\s*\{[^}]*--ds-fixed-charcoal/s,
     );
     assert.doesNotMatch(
       uiShellHeaderCss,
-      /\.ds-shell:has\(\[data-surface='map'\]\)[\s\S]*ds-shell-wordmark__img--theme-dark\s*\{[^}]*display:\s*block/s,
+      /\[data-surface='[a-z]+'\]\)?[\s\S]*ds-shell-wordmark__img--theme-dark\s*\{[^}]*display:\s*block/s,
     );
   });
 });
@@ -173,10 +178,7 @@ describe('horizontal overflow guards', () => {
       /\.ds-explore-stage__results\s*\{[^}]*background:\s*var\(--ds-surface\)/s,
     );
     assert.doesNotMatch(mapSurfacesCss, /backdrop-filter/);
-    assert.doesNotMatch(
-      mapSurfacesCss,
-      /\.ds-explore-stage__instruments\s*\{[^}]*--ds-fixed-/s,
-    );
+    assert.doesNotMatch(mapSurfacesCss, /\.ds-explore-stage__instruments\s*\{[^}]*--ds-fixed-/s);
   });
 });
 
@@ -188,32 +190,16 @@ describe('shell footer theme tokens', () => {
       shellCss,
       /\.ds-shell-footer__card\s*\{[^}]*border:\s*var\(--ds-border-width\)\s*solid\s*var\(--ds-rule\)/s,
     );
-    assert.match(
-      shellCss,
-      /\.ds-shell-footer__column-title\s*\{[^}]*color:\s*var\(--ds-accent\)/s,
-    );
-    assert.match(
-      shellCss,
-      /\.ds-shell-footer__links a\s*\{[^}]*color:\s*var\(--ds-ink-muted\)/s,
-    );
+    assert.match(shellCss, /\.ds-shell-footer__column-title\s*\{[^}]*color:\s*var\(--ds-accent\)/s);
+    assert.match(shellCss, /\.ds-shell-footer__links a\s*\{[^}]*color:\s*var\(--ds-ink-muted\)/s);
     assert.match(
       shellCss,
       /\.ds-shell-footer__links a:hover\s*\{[^}]*color:\s*var\(--ds-accent\)/s,
     );
-    assert.match(
-      shellCss,
-      /\.ds-shell-footer__operator\s*\{[^}]*color:\s*var\(--ds-ink-muted\)/s,
-    );
+    assert.match(shellCss, /\.ds-shell-footer__operator\s*\{[^}]*color:\s*var\(--ds-ink-muted\)/s);
     assert.doesNotMatch(
       shellCss,
       /\.ds-shell-footer\s*\{[^}]*background:\s*var\(--ds-fixed-charcoal\)/s,
-    );
-  });
-
-  it('aligns the home footer card with the edition stack width', () => {
-    assert.match(
-      shellCss,
-      /\.ds-shell:has\(\.ds-home-hero\)\s+\.ds-shell-footer\s*\{[^}]*width:\s*min\(100%\s*-\s*\(var\(--ds-gutter\)\s*\*\s*2\),\s*var\(--ds-grid-max\)\)/s,
     );
   });
 });
