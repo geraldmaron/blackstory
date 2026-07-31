@@ -8,6 +8,7 @@
  * degrades one hit, never the whole batch.
  */
 import type { WebSearchParsedBatch, WebSearchRawResult } from './types.js';
+import { trimTrailingSlashes } from '../../strings/trim-chars.js';
 
 export const SEARXNG_DEFAULT_PATH = '/search' as const;
 
@@ -21,7 +22,7 @@ export type BuildSearxngSearchUrlInput = {
 };
 
 export function normalizeSearxngBaseUrl(baseUrl: string): string {
-  const trimmed = baseUrl.trim().replace(/\/+$/, '');
+  const trimmed = trimTrailingSlashes(baseUrl.trim());
   if (!trimmed) {
     throw new Error('SearXNG base URL is required');
   }

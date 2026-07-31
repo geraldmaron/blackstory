@@ -10,6 +10,8 @@
  * the current record is later corrected.
  */
 
+import { trimChars, trimTrailingChars } from '../strings/trim-chars.js';
+
 const FACT_ID_PATTERN = /^BB-F-\d{6,}$/;
 
 export type FactId = string & { readonly __brand: 'FactId' };
@@ -49,12 +51,12 @@ export function slugifyFactStatement(shortStatement: string): string {
   if (!slug) {
     throw new Error('shortStatement must produce a non-empty slug');
   }
-  return slug.length > 80 ? slug.slice(0, 80).replace(/-+$/g, '') : slug;
+  return slug.length > 80 ? trimTrailingChars(slug.slice(0, 80), '-') : slug;
 }
 
 /** Public human-facing fact URL — slug only (immutable id is not shown). */
 export function buildFactPath(_id: FactId, slug: string): string {
-  const trimmed = slug.trim().replace(/^\/+|\/+$/g, '');
+  const trimmed = trimChars(slug.trim(), '/');
   if (!trimmed) {
     throw new Error('fact slug must be non-empty');
   }

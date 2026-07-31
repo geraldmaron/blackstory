@@ -2,9 +2,6 @@
  * Tests for national-catalog related-entry extraction and public adjacency projection.
  */
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import { resolveReleaseClaimId } from '../publication/release-builder.js';
 import {
@@ -13,48 +10,55 @@ import {
   type CatalogEntityForRelationships,
 } from './catalog-related.js';
 
-const fixtureRoot = join(
-  dirname(fileURLToPath(import.meta.url)),
-  '../../../ops-data/fixtures/national-catalog',
-);
-
-function loadFixtureEntities(filename: string): CatalogEntityForRelationships[] {
-  const raw = readFileSync(join(fixtureRoot, filename), 'utf8');
-  return JSON.parse(raw) as CatalogEntityForRelationships[];
-}
-
-function findEntity(
-  entities: readonly CatalogEntityForRelationships[],
-  id: string,
-): CatalogEntityForRelationships {
-  const entity = entities.find((entry) => entry.id === id);
-  assert.ok(entity, `expected fixture entity ${id}`);
-  return entity;
-}
-
 const generatedAt = '2026-07-18T00:00:00.000Z';
 
-test('extractCatalogRelationships dedups Rosa Parks museum and arrest site located_at pair', () => {
-  const institutions = loadFixtureEntities('institutions.json');
-  const civilRights = loadFixtureEntities('civil-rights.json');
-  const museum = findEntity(institutions, 'ent_rosa_parks_museum_001');
-  const arrestSite = findEntity(civilRights, 'ent_rosa_parks_arrest_site_001');
-  // Isolate the mutual located_at pair — fixtures may also carry other related[]
-  // edges (e.g. boycott) that are out of scope for this dedup assertion.
-  const trimmedMuseum: CatalogEntityForRelationships = {
-    ...museum,
-    related: (museum.related ?? []).filter((entry) => entry.id === arrestSite.id),
-  };
-  const trimmedArrestSite: CatalogEntityForRelationships = {
-    ...arrestSite,
-    related: (arrestSite.related ?? []).filter((entry) => entry.id === museum.id),
-  };
+const sampleClaim = {
+  predicate: 'p',
+  object: 'o',
+  confidenceLevel: 'high' as const,
+  citationSource: 'src',
+  citationLabel: 'lbl',
+};
 
+
+/*
+ * These three cases used to read packages/ops-data/fixtures/national-catalog/*.json. Those
+ * fixtures were retired in f8c81a06 when Supabase became the only entity store, and because this
+ * file was not on @repo/domain's hardcoded test list it kept "passing" by never running. The
+ * entities are built inline now, which is how the rest of this file already works, and the
+ * assertions are unchanged: the pair still dedups to one canonical edge with both sides'
+ * claim evidence, and the public projection still reports the direction each end sees.
+ */
+const museumFixture: CatalogEntityForRelationships = {
+  id: 'ent_rosa_parks_museum_001',
+  claims: [sampleClaim],
+  related: [{ id: 'ent_rosa_parks_arrest_site_001', type: 'located_at', direction: 'outgoing' }],
+};
+
+const arrestSiteFixture: CatalogEntityForRelationships = {
+  id: 'ent_rosa_parks_arrest_site_001',
+  claims: [sampleClaim],
+  related: [{ id: 'ent_rosa_parks_museum_001', type: 'located_at', direction: 'incoming' }],
+};
+
+const bridgeFixture: CatalogEntityForRelationships = {
+  id: 'ent_edmund_pettus_bridge_001',
+  claims: [sampleClaim],
+  related: [
+    { id: 'ent_selma_to_montgomery_marches_001', type: 'occurred_at', direction: 'incoming' },
+  ],
+};
+
+const marchesFixture: CatalogEntityForRelationships = {
+  id: 'ent_selma_to_montgomery_marches_001',
+  claims: [sampleClaim],
+  related: [{ id: 'ent_edmund_pettus_bridge_001', type: 'occurred_at', direction: 'outgoing' }],
+};
+
+test('extractCatalogRelationships dedups Rosa Parks museum and arrest site located_at pair', () => {
   const { relationships, skipped } = extractCatalogRelationships(
-    [trimmedMuseum, trimmedArrestSite],
-    {
-      generatedAt,
-    },
+    [museumFixture, arrestSiteFixture],
+    { generatedAt },
   );
 
   assert.equal(skipped.length, 0);
@@ -74,27 +78,21 @@ test('extractCatalogRelationships dedups Rosa Parks museum and arrest site locat
   assert.equal(relationship?.createdAt, generatedAt);
   assert.equal(relationship?.updatedAt, generatedAt);
 
-  const museumClaimIds = (museum.claims ?? []).map((claim, index) =>
-    resolveReleaseClaimId(museum, claim, index),
+  // Both ends contribute their claim evidence, museum first.
+  const museumClaimIds = (museumFixture.claims ?? []).map((claim, index) =>
+    resolveReleaseClaimId(museumFixture, claim, index),
   );
-  const arrestSiteClaimIds = (trimmedArrestSite.claims ?? []).map((claim, index) =>
-    resolveReleaseClaimId(trimmedArrestSite, claim, index),
+  const arrestSiteClaimIds = (arrestSiteFixture.claims ?? []).map((claim, index) =>
+    resolveReleaseClaimId(arrestSiteFixture, claim, index),
   );
   assert.deepEqual(relationship?.evidenceIds, [...museumClaimIds, ...arrestSiteClaimIds]);
 });
 
 test('extractCatalogRelationships dedups Edmund Pettus Bridge and Selma marches occurred_at pair', () => {
-  const civilRights = loadFixtureEntities('civil-rights.json');
-  const bridge = findEntity(civilRights, 'ent_edmund_pettus_bridge_001');
-  const marches = findEntity(civilRights, 'ent_selma_to_montgomery_marches_001');
-  const trimmedMarches: CatalogEntityForRelationships = {
-    ...marches,
-    related: (marches.related ?? []).filter((entry) => entry.id === bridge.id),
-  };
-
-  const { relationships, skipped } = extractCatalogRelationships([bridge, trimmedMarches], {
-    generatedAt,
-  });
+  const { relationships, skipped } = extractCatalogRelationships(
+    [bridgeFixture, marchesFixture],
+    { generatedAt },
+  );
 
   assert.equal(skipped.length, 0);
   assert.equal(relationships.length, 1);
@@ -167,27 +165,12 @@ test('extractCatalogRelationships skips pairs with no resolvable claim evidence'
 });
 
 test('relatedEntriesFromRelationships returns public related entries for museum and bridge', () => {
-  const institutions = loadFixtureEntities('institutions.json');
-  const civilRights = loadFixtureEntities('civil-rights.json');
-  const museum = findEntity(institutions, 'ent_rosa_parks_museum_001');
-  const arrestSite = findEntity(civilRights, 'ent_rosa_parks_arrest_site_001');
-  const bridge = findEntity(civilRights, 'ent_edmund_pettus_bridge_001');
-  const marches = findEntity(civilRights, 'ent_selma_to_montgomery_marches_001');
-  const trimmedArrestSite: CatalogEntityForRelationships = {
-    ...arrestSite,
-    related: (arrestSite.related ?? []).filter((entry) => entry.id === museum.id),
-  };
-  const trimmedMarches: CatalogEntityForRelationships = {
-    ...marches,
-    related: (marches.related ?? []).filter((entry) => entry.id === bridge.id),
-  };
-
   const { relationships } = extractCatalogRelationships(
-    [museum, trimmedArrestSite, bridge, trimmedMarches],
+    [museumFixture, arrestSiteFixture, bridgeFixture, marchesFixture],
     { generatedAt },
   );
   const relatedByEntity = relatedEntriesFromRelationships(
-    [museum.id, arrestSite.id, bridge.id, marches.id],
+    [museumFixture.id, arrestSiteFixture.id, bridgeFixture.id, marchesFixture.id],
     relationships,
   );
 
@@ -210,14 +193,6 @@ test('relatedEntriesFromRelationships returns public related entries for museum 
 // ---------------------------------------------------------------------------
 // WS6 — `mentionedEntityIds` wire-forward (see ./mention-resolver.ts).
 // ---------------------------------------------------------------------------
-
-const sampleClaim = {
-  predicate: 'p',
-  object: 'o',
-  confidenceLevel: 'high' as const,
-  citationSource: 'src',
-  citationLabel: 'lbl',
-};
 
 test('extractCatalogRelationships emits a related_to edge for a resolved mention', () => {
   const entities: CatalogEntityForRelationships[] = [
