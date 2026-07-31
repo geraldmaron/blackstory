@@ -62,6 +62,35 @@ type AutoPropose = {
   readonly wikidataId?: string;
 };
 
+/**
+ * Refuse a download URL that is not https, and not on a host this script is meant to fetch from.
+ *
+ * The URL arrives from a local manifest, so it is file input reaching a network call
+ * (CodeQL js/file-access-to-http). Without a check, a bad manifest row turns an image download
+ * into a request to an internal address, which is the SSRF shape the URL-safety module exists to
+ * prevent elsewhere in the repo.
+ */
+const ALLOWED_DOWNLOAD_HOSTS = ['upload.wikimedia.org', 'commons.wikimedia.org'];
+
+function assertDownloadUrlAllowed(rawUrl: string): void {
+  let parsed: URL;
+  try {
+    parsed = new URL(rawUrl);
+  } catch {
+    throw new Error(`refusing malformed download URL: ${JSON.stringify(rawUrl)}`);
+  }
+  if (parsed.protocol !== 'https:') {
+    throw new Error(`refusing non-https download URL: ${rawUrl}`);
+  }
+  const host = parsed.hostname.toLowerCase();
+  const allowed = ALLOWED_DOWNLOAD_HOSTS.some(
+    (domain) => host === domain || host.endsWith(`.${domain}`),
+  );
+  if (!allowed) {
+    throw new Error(`refusing download from unexpected host: ${host}`);
+  }
+}
+
 function arg(name: string): string | undefined {
   const prefix = `--${name}=`;
   const hit = process.argv.find((a) => a.startsWith(prefix));
@@ -98,6 +127,7 @@ async function downloadToFile(
   destWithoutExt: string,
   attempts = 8,
 ): Promise<{ contentType: string; path: string; ext: string }> {
+  assertDownloadUrlAllowed(url);
   let lastError: unknown;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {

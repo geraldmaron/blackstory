@@ -9,9 +9,11 @@
  *     node --conditions development --import tsx \
  *     packages/ops-data/scripts/stage-oral-story-packets.ts --commit \
  *     --reject-mock 425e0db3-02b2-4745-81a2-651ee34ad1d3 \
- *     --report /tmp/story-packets-staged.json
+ *     --report ./story-packets-staged.json   (defaults to a unique temp directory)
  */
-import { writeFileSync } from 'node:fs';
+import { mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import {
   buildNamedAnchor,
   buildStoryCiteEntry,
@@ -623,7 +625,11 @@ function parseArgs(argv: readonly string[]): {
 } {
   let commit = false;
   let rejectMock: string | undefined;
-  let report = '/tmp/story-packets-staged.json';
+  // Default report path lives in a unique per-run directory rather than a fixed /tmp filename.
+  // A predictable name in a world-writable directory can be pre-created or symlinked by another
+  // local user (CodeQL js/insecure-temporary-file). `--report` still overrides it, so an operator
+  // who wants a stable path chooses one deliberately.
+  let report = join(mkdtempSync(join(tmpdir(), 'blackstory-story-packets-')), 'staged.json');
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === '--commit') commit = true;

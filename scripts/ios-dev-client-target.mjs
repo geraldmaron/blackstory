@@ -85,10 +85,14 @@ function readPlistJson(plistPath) {
 }
 
 function writePlistJson(plistPath, data) {
-  const tmpJson = path.join(os.tmpdir(), `metro-client-${process.pid}.json`);
+  // A unique directory, not a pid-named file: a pid is predictable and reused, so another local
+  // user can pre-create or symlink that path (CodeQL js/insecure-temporary-file). mkdtemp gives
+  // a 0700 directory whose name is not guessable.
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'metro-client-'));
+  const tmpJson = path.join(tmpDir, 'client.json');
   fs.writeFileSync(tmpJson, JSON.stringify(data));
   const result = run('plutil', ['-convert', 'binary1', '-o', plistPath, tmpJson]);
-  fs.rmSync(tmpJson, { force: true });
+  fs.rmSync(tmpDir, { recursive: true, force: true });
   if (result.status !== 0) {
     throw new Error(result.stderr || `plutil write failed for ${plistPath}`);
   }

@@ -39,11 +39,42 @@ type Propose = {
   readonly rightsStatus?: string;
 };
 
+/**
+ * Refuse a download URL that is not https, and not on a host this script is meant to fetch from.
+ *
+ * Every tile here comes from the project's own public-media bucket (SUPABASE_PUBLIC_BASE), but
+ * the entity id in the path arrives from a local dry-run JSON, so file input reaches a network
+ * call (CodeQL js/file-access-to-http). Without a check, a bad row turns a tile download into a
+ * request to wherever it points, which is the SSRF shape the URL-safety module exists to prevent
+ * elsewhere in the repo.
+ */
+const ALLOWED_DOWNLOAD_HOSTS = ['twykhihqkcldpreuovay.supabase.co'];
+
+function assertDownloadUrlAllowed(rawUrl: string): void {
+  let parsed: URL;
+  try {
+    parsed = new URL(rawUrl);
+  } catch {
+    throw new Error(`refusing malformed download URL: ${JSON.stringify(rawUrl)}`);
+  }
+  if (parsed.protocol !== 'https:') {
+    throw new Error(`refusing non-https download URL: ${rawUrl}`);
+  }
+  const host = parsed.hostname.toLowerCase();
+  const allowed = ALLOWED_DOWNLOAD_HOSTS.some(
+    (domain) => host === domain || host.endsWith(`.${domain}`),
+  );
+  if (!allowed) {
+    throw new Error(`refusing download from unexpected host: ${host}`);
+  }
+}
+
 async function sleep(ms: number): Promise<void> {
   await new Promise((r) => setTimeout(r, ms));
 }
 
 async function download(url: string, dest: string): Promise<boolean> {
+  assertDownloadUrlAllowed(url);
   const response = await fetch(url, {
     headers: { 'User-Agent': USER_AGENT, Accept: 'image/*,*/*' },
     redirect: 'follow',

@@ -179,6 +179,17 @@ export function normalizeLccn(raw: string | undefined, itemUrl: string | undefin
 
 type ExistingRow = { readonly display_name: string };
 
+/**
+ * A report filename built only from characters we chose. `generatedAt` reaches this point after a
+ * network round trip, so CodeQL sees remote input deciding a write path
+ * (js/http-to-file-access); pinning the shape makes the constraint explicit rather than implied
+ * by the timestamp's format.
+ */
+function safeReportFilename(prefix: string, stamp: string): string {
+  const cleaned = stamp.replace(/[^\w-]/gu, '-').slice(0, 64);
+  return `${prefix}-${cleaned}.json`;
+}
+
 async function main(): Promise<void> {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) throw new Error('DATABASE_URL is required (source apps/web/.env.local)');
@@ -336,7 +347,7 @@ async function main(): Promise<void> {
   }
 
   mkdirSync(REPORT_DIR, { recursive: true });
-  const reportPath = join(REPORT_DIR, `black-newspapers-${generatedAt.replace(/[:.]/gu, '-')}.json`);
+  const reportPath = join(REPORT_DIR, safeReportFilename('black-newspapers', generatedAt));
   writeFileSync(reportPath, JSON.stringify(report, null, 2));
   console.log(`\nReport written to ${reportPath}`);
 
