@@ -6,7 +6,7 @@
  * Client-safe: only import `@repo/domain/map/geography` (pure reference data).
  * Do not import `@repo/domain` or `@repo/domain/entity-status` — those pull
  * `@repo/schemas` constitution loaders (`node:fs` / `node:crypto`) into the
- * Next client graph via NarrativeCard → ExploreMapExperience.
+ * Next client graph via NarrativeCard → the explore surface.
  */
 import { findUsStateByPostalCode } from '@repo/domain/map/geography';
 import { DEFAULT_EXPLORE_FILTERS } from './filters';
@@ -45,7 +45,7 @@ function normalizePostalCode(postalCode: string): string {
 export function exploreHrefForState(postalCode: string): string {
   const normalized = normalizePostalCode(postalCode);
   if (!normalized || !findUsStateByPostalCode(normalized)) {
-    return '/explore';
+    return '/';
   }
 
   return buildDefaultExploreHref({
@@ -53,11 +53,11 @@ export function exploreHrefForState(postalCode: string): string {
   });
 }
 
-/** Explore filtered to one era bucket label (e.g. `1860s`). No-op-ish empty → `/explore`. */
+/** Explore filtered to one era bucket label (e.g. `1860s`). No-op-ish empty → `/`. */
 export function exploreHrefForEra(eraBucket: string): string {
   const trimmed = eraBucket.trim();
   if (!trimmed) {
-    return '/explore';
+    return '/';
   }
 
   return buildExploreHref({
@@ -70,7 +70,7 @@ export function exploreHrefForEra(eraBucket: string): string {
 export function exploreHrefForKind(kind: string): string {
   const trimmed = kind.trim();
   if (!trimmed) {
-    return '/explore';
+    return '/';
   }
 
   return buildExploreHref({
@@ -91,7 +91,7 @@ export function searchHrefForStatus(status: string): string | undefined {
 
   const params = new URLSearchParams();
   params.set('status', trimmed);
-  return `/history?${params.toString()}`;
+  return `/records?${params.toString()}`;
 }
 
 /**

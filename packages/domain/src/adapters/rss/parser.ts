@@ -40,16 +40,43 @@ function decodeEntities(text: string): string {
 }
 
 function stripTagsAndCollapseWhitespace(text: string): string {
-  return text
-    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
-    .replace(/<[^>]+>/g, ' ')
+  // Same index walk as cleanText, and `[^<>]` so a run of '<' has nothing to backtrack over.
+  return unwrapCdata(text)
+    .replace(/<[^<>]*>/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
 
+/**
+ * Unwrap `<![CDATA[ ... ]]>` sections by index rather than with `/<!\[CDATA\[([\s\S]*?)\]\]>/g`.
+ *
+ * The lazy `[\s\S]*?` between two literals makes the engine restart its scan from every position
+ * that begins a `<![CDATA[`, which is quadratic on a feed full of them (CodeQL
+ * js/polynomial-redos). Feeds are remote input, so their shape is not ours to bound. Walking the
+ * string with indexOf does the same job in one pass; an unterminated section keeps its opening
+ * marker, exactly as the non-greedy pattern did by failing to match.
+ */
+function unwrapCdata(raw: string): string {
+  const OPEN = '<![CDATA[';
+  const CLOSE = ']]>';
+  if (!raw.includes(OPEN)) return raw;
+
+  let out = '';
+  let cursor = 0;
+  for (;;) {
+    const open = raw.indexOf(OPEN, cursor);
+    if (open === -1) break;
+    const close = raw.indexOf(CLOSE, open + OPEN.length);
+    if (close === -1) break;
+    out += raw.slice(cursor, open) + raw.slice(open + OPEN.length, close);
+    cursor = close + CLOSE.length;
+  }
+  return out + raw.slice(cursor);
+}
+
 function cleanText(raw: string | undefined): string | undefined {
   if (raw === undefined) return undefined;
-  const withoutCdataMarkers = raw.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1');
+  const withoutCdataMarkers = unwrapCdata(raw);
   const decoded = decodeEntities(stripTagsAndCollapseWhitespace(withoutCdataMarkers));
   return decoded || undefined;
 }
@@ -143,7 +170,13 @@ function parseAtomEntry(block: string): ParsedFeedItem {
 }
 
 function detectFormat(xml: string): ParsedFeedFormat {
-  const withoutProlog = xml.replace(/<\?xml[\s\S]*?\?>/, '').trimStart();
+  // The XML prolog is removed by index for the same reason as CDATA above: `[\s\S]*?` between
+  // two literals rescans from every `<?xml` in the document.
+  const prologStart = xml.startsWith('<?xml') ? 0 : -1;
+  const prologEnd = prologStart === 0 ? xml.indexOf('?>') : -1;
+  const withoutProlog = (
+    prologEnd === -1 ? xml : xml.slice(prologEnd + 2)
+  ).trimStart();
   if (
     /<feed[\s>]/i.test(withoutProlog.slice(0, 200)) ||
     /xmlns=["']http:\/\/www\.w3\.org\/2005\/Atom["']/i.test(xml)

@@ -1,0 +1,267 @@
+/**
+ * `/records` — the only styles this room adds on top of the shared kit.
+ *
+ * Everything structural (the column, the chip, the hairline row, the rail, the off-ramp) comes
+ * from `components/room/room-kit.css`. What is left here is the three blocks the index has that
+ * no other room does: the GET search field, the active-constraint row, and the pager. If a
+ * fourth room ever needs one of them, it moves into the kit rather than being copied.
+ */
+
+/* —— the find field: a plain GET form, not a typeahead ——————————————————————— */
+.ds-records-find {
+  margin: var(--ds-space-6) 0 var(--ds-space-2);
+}
+
+.ds-records-find__label {
+  display: block;
+  margin-bottom: var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--room-ink-4);
+}
+
+.ds-records-find__row {
+  display: flex;
+  gap: var(--ds-space-2);
+}
+
+.ds-records-find__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 38px;
+  padding: 0 var(--ds-space-3);
+  background: var(--ds-surface-raised);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-2);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-ui);
+  font-size: 13.5px;
+}
+
+.ds-records-find__input:focus-visible {
+  outline: 2px solid var(--ds-accent);
+  outline-offset: 1px;
+}
+
+.ds-records-find__go {
+  height: 38px;
+  padding: 0 var(--ds-space-4);
+  background: var(--ds-surface-raised);
+  border: var(--ds-border-width) solid var(--ds-border-strong);
+  border-radius: var(--ds-radius-2);
+  color: var(--ds-ink);
+  font-family: var(--ds-font-ui);
+  font-size: 12.5px;
+  font-weight: 550;
+  cursor: pointer;
+}
+
+.ds-records-find__go:hover {
+  border-color: var(--ds-accent-graphic);
+  color: var(--ds-accent);
+}
+
+/* —— active constraints: every narrowing, stated and clearable ————————————————
+   These are not the facet chips. A facet chip adds a constraint; these say what is currently
+   true of the set and remove it. The design law requires the second thing to be visible on any
+   surface a URL can arrive at pre-filtered. */
+.ds-records-active {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: var(--ds-space-4) 0 var(--ds-space-2);
+}
+
+.ds-records-active__chip {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  background: var(--room-copper-wash);
+  border: var(--ds-border-width) solid var(--ds-accent-graphic);
+  border-radius: var(--ds-radius-full);
+  color: var(--ds-accent);
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.ds-records-active__x {
+  margin-left: 6px;
+  font-size: 10px;
+}
+
+.ds-records-active__chip:hover {
+  background: var(--ds-accent);
+  color: var(--ds-canvas);
+}
+
+.ds-records-active__clear {
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--room-ink-4);
+}
+
+/* —— facet groups ———————————————————————————————————————————————————————————
+   One panel of labelled rows. Six stacked heading-over-chip-bar blocks read as six sections of
+   the page and cost most of a screen before the first record; a label beside its own row costs
+   one line each and scans as a single control. */
+.ds-records-filters {
+  margin-top: var(--ds-space-5);
+  border: var(--ds-border-width) solid var(--room-rule-2);
+  border-radius: var(--ds-radius-md);
+  background: var(--room-sunk);
+}
+
+.ds-records-filters__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-3) var(--ds-space-4);
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--room-ink-3);
+  cursor: pointer;
+}
+
+.ds-records-filters__summary:focus-visible {
+  outline: 2px solid var(--ds-focus-ring, var(--ds-accent-graphic));
+  outline-offset: -2px;
+}
+
+.ds-records-filters__hint {
+  color: var(--room-ink-4);
+}
+
+.ds-records-filters__body {
+  padding: 0 var(--ds-space-4) var(--ds-space-4);
+}
+
+/* Label beside its chips on a wide column, above them once the column is too narrow for both. */
+.ds-records-facet {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr);
+  align-items: start;
+  column-gap: var(--ds-space-3);
+  padding-block: var(--ds-space-2);
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+@media (max-width: 40rem) {
+  .ds-records-facet {
+    grid-template-columns: 1fr;
+    row-gap: var(--ds-space-1);
+  }
+}
+
+.ds-records-facet__title {
+  margin: 0;
+  padding-top: 5px;
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--room-ink-4);
+}
+
+.ds-records-facet .ds-room-idx__bar {
+  margin-block: 0;
+  gap: 5px;
+}
+
+/* One step tighter than a chip standing on its own: inside the panel there are six rows of them
+   and the height of a single chip is multiplied by every row. */
+.ds-records-filters .ds-room-chip {
+  height: 26px;
+  padding: 0 8px;
+  gap: 5px;
+  font-size: 11.5px;
+}
+
+/* —— the grade dot ——————————————————————————————————————————————————————————
+   Grade is never colour alone: the tier word sits beside the dot in mono, which is what makes
+   the row readable to a screen reader and to a reader who cannot separate the hues. */
+.ds-records-grade {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--ds-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--room-ink-4);
+}
+
+.ds-records-grade::before {
+  content: '';
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentcolor;
+}
+
+.ds-records-grade--A {
+  color: var(--ds-accent);
+}
+
+.ds-records-grade--B {
+  color: var(--ds-warning-border);
+}
+
+/* C and ungraded are both drawn as an outline, because neither is a positive assertion of
+   strength. They differ in the letter, which is the channel that survives greyscale. */
+.ds-records-grade--C,
+.ds-records-grade--none {
+  color: var(--room-ink-4);
+}
+
+.ds-records-grade--C::before,
+.ds-records-grade--none::before {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px currentcolor;
+}
+
+/* —— the pager: real anchors, never a client-side page counter ————————————————— */
+.ds-records-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+  margin-top: var(--ds-space-6);
+  padding-top: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-records-pager__link {
+  font-size: 13px;
+  font-weight: 550;
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+.ds-records-pager__link:hover {
+  color: var(--ds-accent);
+}
+
+.ds-records-pager__at {
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--room-ink-4);
+}
+
+.ds-records-pager__spacer {
+  flex: 0 0 1px;
+}

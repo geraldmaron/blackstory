@@ -32,6 +32,25 @@ export function relativeLuminance(hex: string): number {
   return 0.2126 * channelLuminance(r) + 0.7152 * channelLuminance(g) + 0.0722 * channelLuminance(b);
 }
 
+/**
+ * CIE L* lightness (0–100), perceptually uniform.
+ *
+ * Distinct from `relativeLuminance`, which is WCAG's Y and is heavily compressed near black: two
+ * dark colors that look clearly different can sit a fraction of a Y point apart. Comparing map
+ * plate roles needs a scale where "18 apart" means the same thing at both ends, so separation
+ * thresholds use this and text contrast still uses `contrastRatio`.
+ */
+export function perceptualLightness(hex: string): number {
+  const y = relativeLuminance(hex);
+  // CIE 1976 L*, with the linear segment below the 6/29 cubed knee.
+  return y > 0.008856 ? 116 * Math.cbrt(y) - 16 : 903.3 * y;
+}
+
+/** Absolute CIE L* difference between two hex colors (0–100). */
+export function lightnessDelta(a: string, b: string): number {
+  return Math.abs(perceptualLightness(a) - perceptualLightness(b));
+}
+
 /** Contrast ratio between two hex colors (1–21). */
 export function contrastRatio(foreground: string, background: string): number {
   const l1 = relativeLuminance(foreground);

@@ -15,13 +15,18 @@ const browseSectionsSource = readFileSync(join(here, 'BooksBrowseSections.tsx'),
 const ripRowSource = readFileSync(join(here, 'BooksRipRow.tsx'), 'utf8');
 const copySource = readFileSync(join(here, 'books-copy.ts'), 'utf8');
 
-test('books browse page does not mount EditionAtmosphereMosaic and catalog pulse', () => {
+test('books browse page renders through the room kit, with the catalog pulse kept', () => {
   assert.doesNotMatch(browseSource, /EditionAtmosphereMosaic/);
   assert.doesNotMatch(browseSource, /BOOKS_EDITION_MOSAIC_SEED/);
-  assert.match(browseSource, /booksEditionRootClassName/);
+  // The v6 edition root and its `data-books-edition` marker are gone: the room is drawn by the
+  // shared kit now, and a second per-route chrome is what the kit exists to retire.
+  assert.doesNotMatch(browseSource, /booksEditionRootClassName/);
+  assert.doesNotMatch(browseSource, /data-books-edition="v6"/);
+  assert.match(browseSource, /from '\.\.\/\.\.\/components\/room'/);
+  assert.match(browseSource, /<Room>/);
+  assert.match(browseSource, /<RoomHeader/);
+  // The pulse is this room's own content, not chrome, so the conversion must not have dropped it.
   assert.match(browseSource, /BooksCatalogPulse/);
-  assert.match(browseSource, /data-books-edition="v6"/);
-  assert.doesNotMatch(browseSource, /ds-books-page/);
 });
 
 test('books detail page uses anatomy strip and cover art without gutter mosaic', () => {

@@ -112,7 +112,10 @@ export async function parseTextOnly(
   const indicators = checkMalwareSignatures(content);
   const extractedText = contentType.includes('html')
     ? rawHtml
-        .replace(/<(?:script|style)\b[^>]*>[\s\S]*?<\/(?:script|style)>/giu, ' ')
+        // `[^>]*` after the end-tag name: an end tag runs to the first `>`, so `</script >` and
+        // `</script\t\n bar>` close the element and browsers honour both. A stricter pattern
+        // leaves the element's contents in the extracted text (CodeQL js/bad-tag-filter).
+        .replace(/<(?:script|style)\b[^>]*>[\s\S]*?<\/(?:script|style)\b[^>]*>/giu, ' ')
         .replace(/<[^>]+>/gu, ' ')
         .replace(/\s+/gu, ' ')
         .trim()

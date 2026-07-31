@@ -175,12 +175,36 @@ export function mapCommonsLicenseToRights(
   return undefined;
 }
 
+/**
+ * `[^<>]` rather than `[^>]`: a tag body that may not contain `<` gives the engine nothing to
+ * backtrack over, so a run of `<<<<<` cannot drive it quadratic (CodeQL js/polynomial-redos).
+ */
+const HTML_TAG = /<[^<>]*>/g;
+
+/**
+ * Remove HTML tags to a fixed point, replacing each with a space.
+ *
+ * One pass can create the tag it just removed: `<scr<script>ipt>` becomes `<script>` once the
+ * inner match is deleted (CodeQL js/incomplete-multi-character-sanitization). It terminates
+ * because each pass that changes anything strictly shortens the string.
+ */
+function stripTagsCompletely(value: string | undefined): string | undefined {
+  if (value === undefined) return undefined;
+  let current = value;
+  let previous: string;
+  do {
+    previous = current;
+    current = current.replace(HTML_TAG, ' ');
+  } while (current !== previous);
+  return current;
+}
+
 export function buildAltText(input: {
   readonly displayName: string;
   readonly imageDescription?: string;
   readonly fileTitle: string;
 }): string {
-  const fromDesc = input.imageDescription?.replace(/<[^>]+>/g, '').trim();
+  const fromDesc = stripTagsCompletely(input.imageDescription)?.trim();
   if (fromDesc && fromDesc.length > 0 && fromDesc.length <= 240) {
     return fromDesc;
   }
@@ -231,13 +255,15 @@ export function isUnknownCreatorCredit(value: string | undefined): boolean {
  */
 export function stripHtml(value: string | undefined): string | undefined {
   if (!value) return undefined;
-  const cleaned = value
-    .replace(/<[^>]+>/g, ' ')
+  const cleaned = (stripTagsCompletely(value) ?? '')
     .replace(/&nbsp;/gi, ' ')
-    .replace(/&amp;/gi, '&')
+    // `&amp;` decodes LAST. Decoding it first turned `&amp;lt;` into `&lt;`, which the very next
+    // rule then turned into `<`: one escape of user text became two decodes and reproduced the
+    // character the entity existed to neutralise (CodeQL js/double-escaping).
     .replace(/&lt;/gi, '<')
     .replace(/&gt;/gi, '>')
     .replace(/&quot;/gi, '"')
+    .replace(/&amp;/gi, '&')
     .replace(/\s+/g, ' ')
     .trim();
   return cleaned.length > 0 ? cleaned : undefined;
@@ -281,7 +307,9 @@ export function sanitizePrimaryImageCreditForDisplay(input: {
 } {
   const rightsLabel = rightsStatusDisplayLabel(input.rightsStatus);
   const rawParts = input.credit
-    .split(/\s*·\s*/)
+    // Split on the separator alone; the map below already trims. `\s*` either side of it let a
+    // run of spaces be divided many ways (CodeQL js/polynomial-redos).
+    .split('·')
     .map((part) => part.trim())
     .filter((part) => part.length > 0);
 

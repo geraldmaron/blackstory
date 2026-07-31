@@ -1,24 +1,15 @@
 /**
- * Memorial edition Surface sections: "Held in the Wall" reads as blank-except-names
- * at first. The intro thesis is kept for accessibility/SEO but visually hidden;
- * the full alphabetical list stays the accessible record, reached via a single
- * small quiet text link (not a card/button) rather than an up-front panel.
+ * Memorial edition list section. The opening screen is the wall plus the room
+ * header (see page.tsx); this renders the full alphabetical list, which starts
+ * below the fold and is the accessible, readable record of the same names.
  */
 import Link from 'next/link';
 import {
   memorialNameYear,
   memorialNamesAlphabetical,
 } from '../../components/patterns/memorial-wall/memorial-names';
-import {
-  MEMORIAL_INTRO_PARAGRAPHS,
-  MEMORIAL_KICKER,
-  MEMORIAL_LEDE,
-  MEMORIAL_LIST_NOTE,
-  MEMORIAL_PAGE_TITLE,
-  MEMORIAL_QUIET_LIST_LINK_LABEL,
-} from './memorial-copy';
+import { MEMORIAL_LIST_NOTE } from './memorial-copy';
 import { MemorialListContrastZone } from './MemorialListContrastZone';
-import { MemorialQuietListLink } from './MemorialQuietListLink';
 import { memorialEditionPanelClassName } from './memorial-panel-chrome';
 
 export type MemorialSectionsProps = {
@@ -30,21 +21,7 @@ export function MemorialSections({ entityLinksByName }: MemorialSectionsProps) {
   const names = memorialNamesAlphabetical();
 
   return (
-    <>
-      {/* Visually hidden: keeps an accessible title/lede/kicker for screen
-          readers and SEO without showing a header/CTA panel on load. */}
-      <div className="ds-memorial-edition__sr-intro">
-        <p>{MEMORIAL_KICKER}</p>
-        <h1>{MEMORIAL_PAGE_TITLE}. Names held in remembrance.</h1>
-        <p>{MEMORIAL_LEDE}</p>
-        {MEMORIAL_INTRO_PARAGRAPHS.map((paragraph) => (
-          <p key={paragraph.slice(0, 24)}>{paragraph}</p>
-        ))}
-      </div>
-
-      <MemorialQuietListLink label={MEMORIAL_QUIET_LIST_LINK_LABEL} />
-
-      <MemorialListContrastZone>
+    <MemorialListContrastZone>
         <article
           className={memorialEditionPanelClassName('list')}
           aria-labelledby="memorial-names-heading"
@@ -87,7 +64,6 @@ export function MemorialSections({ entityLinksByName }: MemorialSectionsProps) {
             <Link href="/methodology">Methodology</Link>
           </p>
         </article>
-      </MemorialListContrastZone>
-    </>
+    </MemorialListContrastZone>
   );
 }

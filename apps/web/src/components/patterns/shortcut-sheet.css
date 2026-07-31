@@ -1,0 +1,151 @@
+/**
+ * Shortcut sheet — overlay, z 90. Four columns of key caps.
+ *
+ * The `.ds-kbd` cap is defined here because this is where the keyboard is the subject. The palette
+ * footer and the camera console both reuse it rather than each drawing their own key cap.
+ */
+
+.ds-shortcuts {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  padding: var(--ds-space-4);
+}
+
+.ds-shortcuts__scrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: var(--ds-overlay);
+  cursor: default;
+}
+
+.ds-shortcuts__dialog {
+  position: relative;
+  width: min(880px, 100%);
+  max-height: 86dvh;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  background: var(--ds-surface-raised);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  overflow: hidden;
+}
+
+.ds-shortcuts__dialog:focus {
+  outline: none;
+}
+
+.ds-shortcuts__head {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-4) var(--ds-space-5);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-shortcuts__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ds-ink);
+}
+
+.ds-shortcuts__hint {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  color: var(--ds-ink-muted);
+}
+
+.ds-shortcuts__close {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: var(--ds-radius-sm);
+  background: transparent;
+  color: var(--ds-ink-muted);
+  cursor: pointer;
+}
+
+.ds-shortcuts__close:hover {
+  color: var(--ds-ink);
+  background: var(--ds-canvas);
+}
+
+.ds-shortcuts__body {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--ds-space-6);
+  padding: var(--ds-space-5);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.ds-shortcuts__section {
+  margin: 0 0 var(--ds-space-3);
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+}
+
+.ds-shortcuts__list {
+  display: grid;
+  gap: var(--ds-space-1);
+  margin: 0;
+}
+
+.ds-shortcuts__row {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  min-height: 26px;
+}
+
+.ds-shortcuts__label {
+  font-size: 0.8125rem;
+  color: var(--ds-ink);
+}
+
+.ds-shortcuts__keys {
+  margin: 0 0 0 auto;
+  display: inline-flex;
+  gap: 3px;
+  flex: none;
+}
+
+/* ---- key cap ------------------------------------------------------------- */
+
+.ds-kbd {
+  display: inline-block;
+  padding: 3px 5px;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: 4px;
+  background: var(--ds-canvas);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 819px) {
+  .ds-shortcuts__body {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--ds-space-5);
+  }
+}

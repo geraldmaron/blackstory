@@ -1,0 +1,142 @@
+/**
+ * The record room's own two rules, over `record-page.css` (which is itself a thin layer over the
+ * shared kit). Everything structural — measure, centring, header, rail placement, prose, sources,
+ * connections, trust grid — comes from the kit. This file exists for the beats in the column and
+ * the blocks in the rail, and it should not grow past that.
+ *
+ * Not a `*-edition.css`: the v6 entity edition drew its own header, its own panel frame and its
+ * own numbered index, which is exactly what `room-kit.test.tsx` now forbids under app/.
+ */
+
+/* —— column beats ——————————————————————————————————————————————————————————
+   A beat is a heading and its prose, separated by space and a hairline rather than boxed in a
+   card. Cards made every section look like the same object; a rule makes them read as one
+   document that continues. */
+.ds-record-beat + .ds-record-beat {
+  margin-top: var(--ds-space-8);
+  padding-top: var(--ds-space-7);
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+.ds-record-beat__heading {
+  margin: 0 0 var(--ds-space-3);
+  font-family: var(--ds-font-display);
+  font-size: clamp(1.125rem, 1.02rem + 0.42vw, 1.375rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--ds-ink);
+}
+
+.ds-record-beat__subheading {
+  margin: var(--ds-space-6) 0 var(--ds-space-3);
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--room-ink-4);
+}
+
+/* One line under a heading saying what the block is, so a reader knows whether to read it. */
+.ds-record-beat__standfirst {
+  margin: 0 0 var(--ds-space-4);
+  max-width: 62ch;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--room-ink-3);
+}
+
+.ds-record-beat__links {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
+}
+
+/* —— the mast image ————————————————————————————————————————————————————————— */
+.ds-record-mast {
+  margin: var(--ds-space-6) 0 0;
+}
+
+/* —— rail blocks ————————————————————————————————————————————————————————————
+   The rail is a column of consulted things, so each block is titled and ruled off the last.
+   `.ds-room-rail-group__title` supplies the mono caps register the reading rooms already use. */
+.ds-record-rail-block + .ds-record-rail-block {
+  margin-top: var(--ds-space-6);
+  padding-top: var(--ds-space-5);
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+.ds-record-rail-block__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+  margin: var(--ds-space-3) 0 0;
+}
+
+/* The rail is 15rem: full-width buttons stacked, not two half-width ones clipped. */
+.ds-record-rail-block__actions > * {
+  flex: 1 1 100%;
+  justify-content: center;
+  text-align: center;
+}
+
+.ds-record-rail-block__release {
+  margin: var(--ds-space-3) 0 0;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--room-ink-4);
+  overflow-wrap: anywhere;
+}
+
+/* The map is square-ish in a 15rem rail rather than the wide strip it was in the column. */
+.ds-record-rail-block .ds-entity-location-map,
+.ds-record-rail-block .ds-cinematic-map {
+  aspect-ratio: 4 / 3;
+  width: 100%;
+  border-radius: var(--ds-radius-md);
+  overflow: hidden;
+}
+
+/* Below the rail breakpoint the rail stacks under the column, where a 4:3 map is too tall. */
+@media (max-width: 67.9375rem) {
+  .ds-record-rail-block .ds-entity-location-map,
+  .ds-record-rail-block .ds-cinematic-map {
+    aspect-ratio: 16 / 9;
+  }
+
+  .ds-record-rail-block__actions > * {
+    flex: 0 1 auto;
+  }
+}
+
+/* Rubric sentences, set as sentences. These were chips before, which meant cutting them off
+   mid-word; the rail has the column width to let them finish. */
+.ds-record-rail-block__reasons {
+  margin: 0;
+  padding: 0 0 0 var(--ds-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--room-ink-3);
+}
+
+/* The kit's Anatomy is a 2x2 grid, which is right in a 680px column and wrong in a 240px rail:
+   "Fort Lauderdale, FL" broke over three lines and "Grade A · 1 source" over two. In the rail it
+   is one column of rows, so every value gets the full width and the labels stay aligned. */
+.ds-record-rail-block .ds-room-anat {
+  grid-template-columns: 1fr;
+}
+
+/* The map's "View interactive map" control is sized for a full-width figure and covered most of
+   a rail-width tile. Scaled to the rail, keeping the 44px tap target the pattern guarantees. */
+.ds-record-rail-block .ds-explore-map-control {
+  padding: 0 var(--ds-space-3);
+  font-size: 0.8125rem;
+  max-width: calc(100% - var(--ds-space-4));
+}

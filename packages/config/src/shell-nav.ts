@@ -3,6 +3,8 @@
  * Used by web and admin so both surfaces render the same theme-aware shell bar.
  */
 
+import { trimTrailingSlashes } from './trim.js';
+
 export type ShellNavItem = {
   readonly href: string;
   readonly label: string;
@@ -10,15 +12,19 @@ export type ShellNavItem = {
 
 /**
  * Always-visible top-level nav — sans caps; active route gets a copper underline.
- * Journey order: orient (Home) → act (Explore) → read (Chapters) → go deep (History)
- * → meta (About last). `isShellNavActive` exact-matches `/`, so Home only lights on
- * the homepage.
+ * Journey order: act (Atlas) → read (Chapters) → go deep (Library) → meta (About last).
+ * `isShellNavActive` exact-matches `/`, so Atlas only lights on the instrument itself.
+ *
+ * There is no separate Explore entry: `/` IS the Atlas and `/explore` redirects to it, so a
+ * second entry would be the same destination listed twice, reached through an extra hop.
  */
 export const PRIMARY_NAV: readonly ShellNavItem[] = [
-  { href: '/', label: 'Home' },
-  { href: '/explore', label: 'Explore' },
+  { href: '/', label: 'Atlas' },
   { href: '/chapters', label: 'Chapters' },
-  { href: '/history', label: 'History' },
+  // Was `/history`, which became a permanent redirect to `/records` — so the top nav on every
+  // page of the site pointed into a 308. The v9 replacement is the library hub (SP-21): it is
+  // the room every reading and utility surface parents through, and it names `/records` first.
+  { href: '/library', label: 'Library' },
   { href: '/about', label: 'About' },
 ] as const;
 
@@ -28,6 +34,7 @@ export const PRIMARY_NAV: readonly ShellNavItem[] = [
  * (Methodology → Errata), then contribute (Submit) — keep additions inside their group.
  */
 export const OVERFLOW_NAV: readonly ShellNavItem[] = [
+  { href: '/records', label: 'Records' },
   { href: '/data', label: 'Data' },
   { href: '/law', label: 'Law' },
   { href: '/books', label: 'Banned books' },
@@ -43,14 +50,22 @@ export type FooterNavColumn = {
   readonly items: readonly ShellNavItem[];
 };
 
-/** Three mono-caps footer columns per the v3 shell contract. */
+/**
+ * Three mono-caps footer columns per the v3 shell contract.
+ *
+ * The public web footer no longer reads this: it derives its columns from
+ * `apps/web/src/lib/nav/destination-registry.ts`, so a route joins the footer by existing rather
+ * than by being remembered. This list remains for the admin shell, which has no access to the
+ * web app's registry, and is kept in step by `shell-nav.test.ts`.
+ */
 export const FOOTER_NAV_COLUMNS: readonly FooterNavColumn[] = [
   {
     title: 'Explore',
     items: [
-      { href: '/explore', label: 'Explore' },
+      { href: '/', label: 'Atlas' },
+      { href: '/library', label: 'Library' },
+      { href: '/records', label: 'Records' },
       { href: '/chapters', label: 'Chapters' },
-      { href: '/history', label: 'History' },
       { href: '/data', label: 'Data' },
       { href: '/law', label: 'Law' },
       { href: '/books', label: 'Banned books' },
@@ -93,7 +108,7 @@ export function absolutizeShellNav(
   origin: string | null,
 ): readonly ShellNavItem[] {
   if (!origin) return items;
-  const base = origin.replace(/\/+$/, '');
+  const base = trimTrailingSlashes(origin);
   return items.map((item) => ({
     ...item,
     href: item.href.startsWith('http')

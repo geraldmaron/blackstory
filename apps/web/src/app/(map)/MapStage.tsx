@@ -44,6 +44,7 @@ import type {
 import type * as MapLibreNamespace from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { brandPalette, darkTheme, lightTheme } from '@repo/ui';
+import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import {
   EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
   EXPLORE_CLUSTER_COUNT_LAYER_ID,
@@ -148,6 +149,7 @@ import {
   type ExplorePopulationGeo,
 } from '../../lib/map-experience/explore-population';
 import {
+  buildArchiveBaseStyle,
   PERSISTENT_PLATE_LAYER_IDS,
   syncLayerPaintFromStyle,
   syncSingleLayerPaint,
@@ -190,24 +192,20 @@ const EMPTY_EDGE_COLLECTION: HistoryEdgeLineCollection = {
   features: [],
 };
 
-const ARCHIVE_BASE_STYLE: StyleSpecification = {
-  version: 8,
-  name: 'BlackStory — Archive (US)',
-  sources: {},
-  layers: [
-    {
-      id: 'background',
-      type: 'background',
-      // Ocean plate — one step below Black Ink so the warm landmass fills lift
-      // off it (must match DIGNITY_PALETTE.ocean; this literal exists only to
-      // keep the pre-style-load frame from flashing a different shade).
-      paint: { 'background-color': '#080606' },
-    },
-  ],
-};
-
+/**
+ * The geography layers `applyGeographyStyle` is allowed to mount, in stacking order.
+ *
+ * This set is an allowlist, and a layer built in `explore-style.ts` but missing from it is
+ * dropped without a warning — the style says the plate has a coastline and the plate does not.
+ * Adding a base-cartography layer means adding its id here and, if its paint is theme-dependent,
+ * to `PERSISTENT_PLATE_LAYER_IDS` in `map-plate-paint.ts`.
+ */
 const GEOGRAPHY_LAYER_IDS = new Set([
   'background',
+  'plate-landcover',
+  'plate-water',
+  'plate-boundary-country',
+  'plate-place-city',
   'explore-memorial-names-label',
   'explore-street-casing',
   'explore-street-fill',
@@ -901,6 +899,27 @@ export type MapStageHandle = {
   readonly clearSearchCenterMarker: () => void;
   /** Re-read container layout after external geometry changes (hero inset, panel open). */
   readonly resize: () => void;
+  /**
+   * The live MapLibre map, or null before it starts and after it fails.
+   *
+   * Deliberately narrow: `camera-moves.ts` drives the plate through a structural `MapLike`, and
+   * this is how that library reaches the one persistent canvas. It is not an invitation to call
+   * `flyTo` directly — ADR-017's ban on raw camera calls still holds, and `flyPreset` remains the
+   * route for preset framing.
+   */
+  readonly getMap: () => AtlasCameraTarget | null;
+};
+
+/** What the camera library needs off the map. Structural, so `MapStage` owes it no import. */
+export type AtlasCameraTarget = {
+  flyTo(options: never): unknown;
+  easeTo(options: never): unknown;
+  fitBounds(bounds: never, options: never): unknown;
+  getZoom(): number;
+  getBearing(): number;
+  getPitch(): number;
+  getCenter(): { lng: number; lat: number };
+  stop(): unknown;
 };
 
 const MapStageContext = createContext<MapStageHandle | null>(null);
@@ -913,11 +932,21 @@ export function useMapStage(): MapStageHandle {
   return ctx;
 }
 
+/**
+ * All four data props are optional, and the root layout passes none of them.
+ *
+ * Awaiting `loadMapStageBase()` in the root layout would make every route in the app
+ * `force-dynamic`, including the ones that must stay static and keep `generateStaticParams`. The
+ * provider does not need a server-built resting frame anyway: `commitDataPatch` rebuilds the
+ * entire style from the patch, so the first `patchData` a plate-bearing surface sends carries
+ * everything. A surface that wants a plate still does its own `await loadMapStageBase()` in its
+ * own server component and hands the result down as that first patch.
+ */
 export type MapStageProviderProps = {
-  readonly initialStyle: StyleSpecification;
-  readonly initialFeatureCollection: ExploreMapFeatureCollection;
-  readonly initialJurisdictionAreaFeatures: readonly JurisdictionAreaFeature[];
-  readonly bounds: readonly [west: number, south: number, east: number, north: number];
+  readonly initialStyle?: StyleSpecification;
+  readonly initialFeatureCollection?: ExploreMapFeatureCollection;
+  readonly initialJurisdictionAreaFeatures?: readonly JurisdictionAreaFeature[];
+  readonly bounds?: readonly [west: number, south: number, east: number, north: number];
   readonly children: ReactNode;
 };
 
@@ -937,6 +966,26 @@ type StageConfig = {
   selectedEdge: string | undefined;
   selectedEntity: string | undefined;
 };
+
+/**
+ * Rebuild the plate style from the resting stage config for one color scheme.
+ *
+ * The server cannot know the reader's theme — it lives in `localStorage` and is stamped onto
+ * `<html data-theme>` by the pre-paint bootstrap script — so `loadMapStageBase` necessarily ships
+ * ONE scheme's style. Every client-side entry point that needs the plate to match the document
+ * (first mount, `data-theme` toggle) rebuilds through here rather than trusting that prop.
+ */
+function buildStyleForScheme(cfg: StageConfig, colorScheme: MapColorScheme): StyleSpecification {
+  return buildExploreMapStyle({
+    featureCollection: cfg.featureCollection,
+    jurisdictionAreaFeatures: cfg.jurisdictionAreaFeatures,
+    layerMode: cfg.layerMode,
+    popGeo: cfg.popGeo,
+    historyEdgesEnabled: cfg.historyEdgesEnabled,
+    clusteringEnabled: cfg.clusteringEnabled,
+    colorScheme,
+  });
+}
 
 function makeListenerStore(): {
   [K in MapStageEventName]: Set<(...args: MapStageEvents[K]) => void>;
@@ -982,6 +1031,20 @@ export function MapStageProvider({
   const lastViewportRef = useRef<ExploreViewportFrame | undefined>(undefined);
   const [mapAvailable, setMapAvailable] = useState(true);
   const mapAvailableRef = useRef(true);
+  /**
+   * GL lifecycle, held in refs rather than closure locals because construction no longer happens
+   * inside the effect that tears it down — `ensureMap` can fire from any handle call, while the
+   * teardown still belongs to a single unmount effect.
+   */
+  const initStartedRef = useRef(false);
+  const cancelledRef = useRef(false);
+  const resizeTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const resizeLifecycleRef = useRef<ReturnType<typeof bindMapResizeLifecycle> | undefined>(
+    undefined,
+  );
+  const contextRecoveryRef = useRef<ReturnType<typeof bindWebGlContextRecovery> | undefined>(
+    undefined,
+  );
   /** Camera flights requested before MapLibre finished constructing — flushed on `load`. */
   const pendingFlyRef = useRef<{
     readonly name: CameraPresetName;
@@ -989,10 +1052,19 @@ export function MapStageProvider({
     readonly options?: MapStageFlyOptions;
   } | null>(null);
 
+  // Seeded from the props when a surface supplied a server-built resting frame, and from nothing
+  // when the root layout mounted the provider bare. `style` is built here rather than taken as a
+  // given so the bare case still holds a valid style for the theme rebuild to work from.
   const configRef = useRef<StageConfig>({
-    style: initialStyle,
-    featureCollection: initialFeatureCollection,
-    jurisdictionAreaFeatures: initialJurisdictionAreaFeatures,
+    style:
+      initialStyle ??
+      buildExploreMapStyle({
+        featureCollection: initialFeatureCollection ?? EMPTY_FEATURE_COLLECTION,
+        jurisdictionAreaFeatures: initialJurisdictionAreaFeatures ?? [],
+        layerMode: 'off',
+      }),
+    featureCollection: initialFeatureCollection ?? EMPTY_FEATURE_COLLECTION,
+    jurisdictionAreaFeatures: initialJurisdictionAreaFeatures ?? [],
     layerMode: 'off',
     popGeo: DEFAULT_POPULATION_GEO,
     densityLevels: [],
@@ -1025,7 +1097,9 @@ export function MapStageProvider({
   /** True while a one-shot `idle` listener for a deferred apply is registered. */
   const pendingStyleApplyListenerRef = useRef(false);
   /** Stable handle so the deferred `idle` callback always runs the current apply closure. */
-  const applyStyleAndDataRef = useRef<((options?: Parameters<typeof applyStyleAndData>[0]) => void) | null>(null);
+  const applyStyleAndDataRef = useRef<
+    ((options?: Parameters<typeof applyStyleAndData>[0]) => void) | null
+  >(null);
   const memorialFeaturesRef = useRef(
     MEMORIAL_NAMES_MAP_LAYER_ENABLED
       ? buildMemorialNameFeatures({ seedKey: 'map-stage' })
@@ -1550,14 +1624,7 @@ export function MapStageProvider({
       if (!map || !map.isStyleLoaded()) return;
       const cfg = configRef.current;
       const scheme = readDocumentColorScheme();
-      const style = buildExploreMapStyle({
-        featureCollection: cfg.featureCollection,
-        jurisdictionAreaFeatures: cfg.jurisdictionAreaFeatures,
-        layerMode: cfg.layerMode,
-        historyEdgesEnabled: cfg.historyEdgesEnabled,
-        clusteringEnabled: cfg.clusteringEnabled,
-        colorScheme: scheme,
-      });
+      const style = buildStyleForScheme(cfg, scheme);
       configRef.current = { ...cfg, style };
       applyStyleAndData();
       syncPlatePaintToTheme(map, style, scheme);
@@ -1646,9 +1713,7 @@ export function MapStageProvider({
 
       // Bounds fits already encode padding in center/zoom — re-applying padding on
       // ease/fly would double-shift (hero west coast pinned to the copy divider).
-      const motionPadding = boundsFitted
-        ? { top: 0, bottom: 0, left: 0, right: 0 }
-        : padding;
+      const motionPadding = boundsFitted ? { top: 0, bottom: 0, left: 0, right: 0 } : padding;
 
       if (reduced || preset.duration <= 0) {
         map.jumpTo({ center, zoom, padding: motionPadding });
@@ -1750,13 +1815,22 @@ export function MapStageProvider({
     [],
   );
 
-  useEffect(() => {
+  /**
+   * Build the MapLibre instance, once, on first contact with the stage handle.
+   *
+   * The provider mounts on every surface so the plate can persist across navigation, but a
+   * Utility surface has no plate — the parked posture promises no GL cost there, and a provider
+   * that constructed MapLibre on mount would break that promise on `/privacy`. Construction is
+   * therefore deferred to the first `patchData`/`flyPreset`/`applyViewState`/`getMap`/`resize`
+   * call, which is exactly the set of things a surface that wants a plate does and a surface
+   * that does not want one never does. The rule needs no registry: GL exists when, and only
+   * when, a surface has spoken to the stage.
+   */
+  const ensureMap = useCallback(() => {
+    if (initStartedRef.current || cancelledRef.current) return;
     if (!containerRef.current || mapRef.current) return;
+    initStartedRef.current = true;
     const container = containerRef.current;
-    let cancelled = false;
-    let resizeTimer: ReturnType<typeof setTimeout> | undefined;
-    let resizeLifecycle: ReturnType<typeof bindMapResizeLifecycle> | undefined;
-    let contextRecovery: ReturnType<typeof bindWebGlContextRecovery> | undefined;
 
     void (async () => {
       let map: MapLibreMap | undefined;
@@ -1766,11 +1840,20 @@ export function MapStageProvider({
         }
         const maplibregl = (await import('maplibre-gl')).default;
         maplibreglRef.current = maplibregl;
-        if (cancelled || !container.isConnected) return;
+        if (cancelledRef.current || !container.isConnected) return;
+
+        // The style prop was built on the server, which cannot read `<html data-theme>`. Re-resolve
+        // the plate against the document BEFORE the first frame so a light-theme reader never sees
+        // the dark plate — neither in the pre-`load` background nor in the first `applyStyleAndData`.
+        const mountScheme = readDocumentColorScheme();
+        configRef.current = {
+          ...configRef.current,
+          style: buildStyleForScheme(configRef.current, mountScheme),
+        };
 
         map = new maplibregl.Map({
           container,
-          style: ARCHIVE_BASE_STYLE,
+          style: buildArchiveBaseStyle(mountScheme),
           attributionControl: false,
           // Keep the camera US-centered without a tight maxBounds box (see the former
           // ExploreMapCanvas's identical comment): a portrait canvas cannot show full CONUS
@@ -1780,7 +1863,9 @@ export function MapStageProvider({
           // address-level invasion — precision redaction still governs marker honesty.
           minZoom: MAP_MIN_ZOOM,
           maxZoom: MAP_MAX_ZOOM,
-          bounds: bounds as [number, number, number, number],
+          // The national frame is the resting camera for every surface, so a provider mounted
+          // without a `bounds` prop opens on the same view rather than on MapLibre's [0,0].
+          bounds: (bounds ?? US_CONUS_BOUNDS) as [number, number, number, number],
           fitBoundsOptions: { padding: 32 },
         });
 
@@ -1789,17 +1874,19 @@ export function MapStageProvider({
           // Dev-only escape hatch for in-browser inspection and perf traces.
           (window as unknown as Record<string, unknown>).__bpMapStage = map;
         }
-        map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+        // No `NavigationControl`. Zoom and pitch live in the Atlas camera console, so the map
+        // keeps one control vocabulary (design-direction-v9-atlas.md §5.5). Attribution stays:
+        // it is a licence obligation, not chrome we get to choose.
         map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
         map.on('error', (event) => {
           console.error('[MapStage]', event.error);
         });
       } catch {
-        if (!cancelled) markMapUnavailable();
+        if (!cancelledRef.current) markMapUnavailable();
         return;
       }
 
-      if (cancelled || !map) {
+      if (cancelledRef.current || !map) {
         map?.remove();
         mapRef.current = null;
         return;
@@ -1879,13 +1966,13 @@ export function MapStageProvider({
         mapStyleReadyRef.current = true;
         applyStyleAndData();
         const canvas = activeMap.getCanvas();
-        contextRecovery = bindWebGlContextRecovery(
+        contextRecoveryRef.current = bindWebGlContextRecovery(
           canvas,
           () => {
-            if (!cancelled) markMapUnavailable();
+            if (!cancelledRef.current) markMapUnavailable();
           },
           () => {
-            if (!cancelled) activeMap.resize();
+            if (!cancelledRef.current) activeMap.resize();
           },
         );
         if (activeMap.getLayer(EXPLORE_STATE_DENSITY_LAYER_ID)) {
@@ -1967,11 +2054,7 @@ export function MapStageProvider({
           .then((expansionZoom) => {
             if (typeof lng !== 'number' || typeof lat !== 'number') return;
             const zoom = Math.min(Math.max(expansionZoom, MAP_MIN_ZOOM), MAP_MAX_ZOOM);
-            runFlyPresetRef.current(
-              'locality',
-              { center: [lng, lat], zoom },
-              { mode: 'ease' },
-            );
+            runFlyPresetRef.current('locality', { center: [lng, lat], zoom }, { mode: 'ease' });
           })
           .catch(() => {
             // Cluster may have dissolved between click and lookup (data patch mid-flight);
@@ -2004,17 +2087,22 @@ export function MapStageProvider({
         activeMap.getCanvas().style.cursor = '';
       });
 
-      resizeLifecycle = bindMapResizeLifecycle(container, () => {
+      resizeLifecycleRef.current = bindMapResizeLifecycle(container, () => {
         activeMap.resize();
       });
-      resizeTimer = setTimeout(() => {
+      resizeTimerRef.current = setTimeout(() => {
         syncEntityMarkers();
         activeMap.resize();
       }, 200);
     })();
+    // Deliberately no deps: this builds the app's single MapLibre instance, and the guard above
+    // makes a second call a no-op. Teardown is the separate unmount effect below, because
+    // construction is now demand-driven and can happen long after mount.
+  }, []);
 
+  useEffect(() => {
     return () => {
-      cancelled = true;
+      cancelledRef.current = true;
       pendingFlyRef.current = null;
       decadeFadeGenerationRef.current += 1;
       decadeDissolveInFlightRef.current = false;
@@ -2027,9 +2115,9 @@ export function MapStageProvider({
         cancelAnimationFrame(selectedPulseRafRef.current);
         selectedPulseRafRef.current = null;
       }
-      if (resizeTimer) clearTimeout(resizeTimer);
-      resizeLifecycle?.disconnect();
-      contextRecovery?.disconnect();
+      if (resizeTimerRef.current) clearTimeout(resizeTimerRef.current);
+      resizeLifecycleRef.current?.disconnect();
+      contextRecoveryRef.current?.disconnect();
       clearMarkers(markersRef.current);
       clearSearchCenterMarker();
       for (const { marker } of stateLabelMarkersRef.current.values()) marker.remove();
@@ -2038,24 +2126,56 @@ export function MapStageProvider({
       mapRef.current = null;
       maplibreglRef.current = null;
     };
-    // Empty deps, deliberately: this effect must run exactly once for the app's lifetime. The
-    // `(map)` layout that renders `MapStageProvider` never remounts across `/` <-> `/explore`
-    // navigations (ADR-017) — that persistence IS the point, so this must not re-run on prop
-    // changes the way a per-page canvas component's effects used to.
+    // Empty deps, deliberately: this must run exactly once for the app's lifetime. The root
+    // layout renders `MapStageProvider` above every route, so it never remounts on navigation —
+    // that persistence IS the point, and it is what keeps the WebGL context, style and camera
+    // alive between surfaces. Nothing here may re-run on a prop change.
   }, []);
 
+  /** Stable across renders: the ref is the identity, not the map it currently holds. */
+  const getMap = useCallback(() => mapRef.current as unknown as AtlasCameraTarget | null, []);
+
+  /**
+   * Every method that needs a live plate goes through `ensureMap` first, which is what makes the
+   * lazy build self-enforcing: a surface cannot use the stage without asking for it, and a
+   * surface that never asks never pays for a GL context.
+   *
+   * `subscribe` and `mapAvailable` are deliberately NOT wrapped. Subscribing is how a surface
+   * learns the plate failed, and reading availability is a render-time question — building a
+   * WebGL context to answer either would defeat the whole arrangement.
+   */
   const handle = useMemo<MapStageHandle>(
     () => ({
-      patchData,
-      applyViewState,
-      flyPreset,
+      patchData: (patch, options) => {
+        ensureMap();
+        patchData(patch, options);
+      },
+      applyViewState: (patch) => {
+        ensureMap();
+        applyViewState(patch);
+      },
+      flyPreset: (name, target, options) => {
+        ensureMap();
+        flyPreset(name, target, options);
+      },
       subscribe,
       mapAvailable,
-      setSearchCenterMarker,
+      setSearchCenterMarker: (input) => {
+        ensureMap();
+        setSearchCenterMarker(input);
+      },
       clearSearchCenterMarker,
-      resize,
+      resize: () => {
+        ensureMap();
+        resize();
+      },
+      getMap: () => {
+        ensureMap();
+        return getMap();
+      },
     }),
     [
+      ensureMap,
       patchData,
       applyViewState,
       flyPreset,
@@ -2064,6 +2184,7 @@ export function MapStageProvider({
       setSearchCenterMarker,
       clearSearchCenterMarker,
       resize,
+      getMap,
     ],
   );
 

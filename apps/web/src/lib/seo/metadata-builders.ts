@@ -4,6 +4,7 @@
  */
 import type { Metadata } from 'next';
 import { sanitizePublicProseText } from '@repo/domain/editorial';
+import { isNoIndexPath } from '../nav/destination-registry';
 import {
   sanitizePreviewText,
   stripProtectedFields,
@@ -35,6 +36,17 @@ function siteOrigin(): string {
   return process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3048';
 }
 
+/**
+ * The absolute form of a public path, for the routes that build their own `alternates` rather
+ * than going through {@link buildStaticPageMetadata} — the Atlas, which must not carry a title,
+ * and `/records`, whose canonical carries a narrowing. A relative canonical is only resolved by
+ * Next when `metadataBase` is set, and it is not; a relative one would emit as-is and mean
+ * nothing to a crawler, so absolute is the whole site's convention.
+ */
+export function absolutePublicUrl(path: string): string {
+  return absoluteUrl(path);
+}
+
 function absoluteUrl(path: string): string {
   if (/^https?:\/\//i.test(path)) {
     return path;
@@ -47,12 +59,15 @@ function absoluteUrl(path: string): string {
  * Builds a Next.js Metadata object for static public pages.
  */
 export function buildStaticPageMetadata(source: StaticPageMetadataSource): Metadata {
+  // `noIndex` defaults to the registry's answer for this path rather than to false, so a route
+  // marked noIndex there cannot ship an indexable head by forgetting to repeat the flag here.
+  const noIndex = source.noIndex ?? isNoIndexPath(source.path);
   const preview = buildPublicMetadataPreview({
     ...(source.title !== undefined ? { title: source.title } : {}),
     ...(source.description !== undefined ? { description: source.description } : {}),
     canonicalPath: source.path,
     ...(source.imageUrl !== undefined ? { imageUrl: source.imageUrl } : {}),
-    ...(source.noIndex !== undefined ? { noIndex: source.noIndex } : {}),
+    ...(noIndex ? { noIndex: true } : {}),
   });
   return toNextMetadata(preview);
 }
@@ -96,9 +111,13 @@ export function buildPublicMetadataPreview(input: MetadataPreviewInput): PublicM
       ? { images: Object.freeze([{ url: absoluteUrl(input.imageUrl) }]) }
       : {}),
   };
+  // `follow` stays true even when noindexed (SP-19). A noindexed page is still part of the link
+  // graph — /design-system links the room kit, and telling a crawler to drop those links as well
+  // discards the crawl for no benefit. "Do not list this page" and "ignore where it points" are
+  // separate instructions, and only the first one was ever wanted here.
   const robots =
     input.noIndex === true
-      ? Object.freeze({ index: false, follow: false })
+      ? Object.freeze({ index: false, follow: true })
       : Object.freeze({ index: true, follow: true });
 
   return Object.freeze({

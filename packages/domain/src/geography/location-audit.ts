@@ -123,7 +123,8 @@ export function streetAddressesCompatible(locationLabel: string, matchedAddress:
 
 /** Labels that are clearly city/area phrasing even if precision is finer. */
 const AREA_ONLY_HINT =
-  /\b(area|region|county|parish|metro|metropolitan|greater)\b|\(.*\b(site|massacre|arrest)\b.*\)/i;
+  // `[^()]*` rather than `.*`: a run of '(' made the engine retry from every position.
+  /\b(area|region|county|parish|metro|metropolitan|greater)\b|\([^()]*\b(site|massacre|arrest)\b[^()]*\)/i;
 
 export type ClassifyLocationEvidenceInput = {
   readonly locationLabel: string;
@@ -439,7 +440,9 @@ export function placeTitleCandidateFromLabel(locationLabel: string): string {
  */
 export function placeTitleCandidatesFromLabel(locationLabel: string): readonly string[] {
   const cleaned = locationLabel
-    .replace(/\s*\([^)]*\)\s*/g, ' ')
+    // No `\s*` either side: the collapse below already normalises whitespace, and the two
+    // optional runs around the group were the ambiguity (CodeQL js/polynomial-redos).
+    .replace(/\([^()]*\)/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
   const beforeStreet = cleaned.split(/\b\d{1,5}\s+[A-Za-z0-9]/)[0]?.trim();

@@ -24,9 +24,17 @@ test('gcsPublicMediaUrl builds legacy GCS HTTPS URL', () => {
 });
 
 test('resolvePublicMediaUrl defaults to Supabase and can prefer GCS', () => {
-  assert.match(resolvePublicMediaUrl('public/entities/ent_x/primary.jpg'), /supabase\.co/);
-  assert.match(
-    resolvePublicMediaUrl('public/entities/ent_x/primary.jpg', { preferSupabase: false }),
-    /storage\.googleapis\.com/,
+  // Host-anchored: the assertion is about which service serves the object, and a substring
+  // match would also accept `https://evil.example/?x=supabase.co`.
+  assert.ok(
+    new URL(resolvePublicMediaUrl('public/entities/ent_x/primary.jpg')).hostname.endsWith(
+      'supabase.co',
+    ),
+  );
+  assert.equal(
+    new URL(
+      resolvePublicMediaUrl('public/entities/ent_x/primary.jpg', { preferSupabase: false }),
+    ).hostname,
+    'storage.googleapis.com',
   );
 });

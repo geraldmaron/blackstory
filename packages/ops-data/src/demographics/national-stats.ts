@@ -57,6 +57,23 @@ const OPPORTUNITY_ATLAS_HOMEPAGE = 'https://opportunityinsights.org/data/';
  * Maps persisted provenance URLs (or source ids) to owning-body pages for public citations.
  * Machine API/download URLs must not appear as clickable sources in the UI.
  */
+/**
+ * Host membership from a parsed URL, not `sourceUrl.includes(host)`.
+ *
+ * A substring test also accepts `https://evil.example/?ref=ucr.fbi.gov`, so a hostile or merely
+ * wrong URL could route a reader to the wrong authority's homepage
+ * (CodeQL js/incomplete-url-substring-sanitization). Non-URLs answer false rather than throwing:
+ * this function's job is to pick a display link, not to validate.
+ */
+function urlHasHost(rawUrl: string, domain: string): boolean {
+  try {
+    const hostname = new URL(rawUrl).hostname.toLowerCase();
+    return hostname === domain || hostname.endsWith(`.${domain}`);
+  } catch {
+    return false;
+  }
+}
+
 export function publicSourceUrl(input: {
   readonly source: string;
   readonly sourceUrl: string;
@@ -82,8 +99,8 @@ export function publicSourceUrl(input: {
   }
   if (
     source.includes('fbi-ucr') ||
-    sourceUrl.includes('cde.ucr.cjis.gov') ||
-    sourceUrl.includes('ucr.fbi.gov')
+    urlHasHost(sourceUrl, 'cde.ucr.cjis.gov') ||
+    urlHasHost(sourceUrl, 'ucr.fbi.gov')
   ) {
     return FBI_HATE_CRIME_HOMEPAGE;
   }
@@ -95,12 +112,12 @@ export function publicSourceUrl(input: {
     return OPPORTUNITY_ATLAS_HOMEPAGE;
   }
   if (
-    sourceUrl.includes('api.census.gov') ||
+    urlHasHost(sourceUrl, 'api.census.gov') ||
     sourceUrl.includes('signedurl') ||
-    sourceUrl.includes('.amazonaws.com')
+    urlHasHost(sourceUrl, 'amazonaws.com')
   ) {
     // Fail closed toward known hubs rather than exposing a raw machine endpoint.
-    if (sourceUrl.includes('census.gov')) return ACS_HOMEPAGE;
+    if (urlHasHost(sourceUrl, 'census.gov')) return ACS_HOMEPAGE;
   }
   return sourceUrl;
 }

@@ -62,7 +62,7 @@ function DataUnavailable({ topic }: { readonly topic: string }) {
   return (
     <p className="ds-data-edition__empty">
       {topic} is not available on this release yet.{' '}
-      <Link href="/explore">Open the map</Link> for place layers, or check back after the next
+      <Link href="/">Open the map</Link> for place layers, or check back after the next
       update.
     </p>
   );
@@ -384,7 +384,7 @@ export function DataSections({
           headingId="how-to-use-heading"
         />
         <p className="ds-data-edition__actions">
-          <Link className="ds-cta ds-cta--copper" href="/explore">
+          <Link className="ds-cta ds-cta--copper" href="/">
             Explore the map
           </Link>
           <Link className="ds-cta ds-cta--quiet" href="/methodology">

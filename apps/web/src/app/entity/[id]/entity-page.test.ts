@@ -1,5 +1,7 @@
 /**
- * Entity v6 page wiring: shared gutter mosaic, RecordAnatomyPanel, safe fail states.
+ * Entity page wiring, now that the record renders as a v9 Record room rather than a v6 edition
+ * stack: kit composition, the rail/column split, fail-closed media and map states, and the
+ * no-repeated-summary rule the rebuild exists to enforce.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -9,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
-const sectionsSource = readFileSync(join(here, 'EntityEditionSections.tsx'), 'utf8');
+const sectionsSource = readFileSync(join(here, 'EntityRoomSections.tsx'), 'utf8');
 const mapSource = readFileSync(
   join(here, '../../../components/entity/EntityLocationMap.tsx'),
   'utf8',
@@ -19,36 +21,59 @@ const mediaSource = readFileSync(
   'utf8',
 );
 
-test('entity page does not mount EditionAtmosphereMosaic and edition stack', () => {
+test('entity page renders through the room kit, not the retired v6 edition chrome', () => {
+  assert.match(pageSource, /<Room rail=/);
+  assert.match(pageSource, /<RoomHeader/);
+  assert.doesNotMatch(pageSource, /entityEditionRootClassName/);
+  assert.doesNotMatch(pageSource, /entityEditionPanelClassName/);
+  assert.doesNotMatch(pageSource, /data-entity-edition/);
   assert.doesNotMatch(pageSource, /EditionAtmosphereMosaic/);
-  assert.doesNotMatch(pageSource, /entityEditionMosaicSeedFor/);
-  assert.match(pageSource, /entityEditionRootClassName/);
-  assert.match(pageSource, /data-entity-edition="v6"/);
-  assert.doesNotMatch(pageSource, /ds-entity-mast/);
-  assert.doesNotMatch(pageSource, /ds-at-a-glance/);
-  assert.doesNotMatch(pageSource, /ds-entity-layout/);
+  // The measure and the centring belong to the `record` surface class, not to this route.
+  assert.doesNotMatch(pageSource, /ds-container ds-page/);
 });
 
-test('entity page orients with RecordAnatomyPanel and EditionFactIcon facts', () => {
-  assert.match(pageSource, /RecordAnatomyPanel/);
+test('the apparatus is in the rail and the reading is in the column', () => {
+  for (const block of ['<Anatomy', '<SourceList', '<TrustBlock', '<Precision']) {
+    assert.match(pageSource, new RegExp(block), `${block} belongs in the rail`);
+  }
   assert.match(pageSource, /buildEntityAnatomyInputs/);
-  assert.match(pageSource, /record-evidence/);
-  assert.match(pageSource, /record-era/);
+  assert.match(pageSource, /EntityRoomSections/);
+});
+
+test('the summary is the lede and is never restated as a section', () => {
+  // The v6 page printed it three times: lede, "Inclusion evidence", and the accepted claim.
+  assert.match(pageSource, /lede=\{[\s\S]*?entity\.summary/);
+  assert.doesNotMatch(sectionsSource, /entity\.summary/);
+  assert.doesNotMatch(pageSource, /WhyThisAppears/);
+});
+
+test('the location is drawn once', () => {
+  const rendered = pageSource.match(/<EntityLocationCinematicMap/g) ?? [];
+  assert.equal(rendered.length, 1, 'the record must not render two maps for one place');
+  assert.doesNotMatch(pageSource, /RecordAnatomyPanel/);
+});
+
+test('a beat renders only when the record has that content', () => {
+  assert.match(sectionsSource, /hasContext \?/);
+  assert.match(sectionsSource, /evidenceClaims\.length > 0 \?/);
+  assert.match(sectionsSource, /entity\.timeline\.length > 0 \?/);
+  assert.doesNotMatch(sectionsSource, /<RecordGapNotice/);
+});
+
+test('gaps are disclosed once, in the rail, in the approved vocabulary', () => {
+  assert.match(pageSource, /RECORD_GAP_COPY/);
+  assert.match(pageSource, /resolveRecordGaps/);
+  assert.match(pageSource, /not an absence of history/);
+});
+
+test('a related record states its relation in words', () => {
+  assert.match(sectionsSource, /relationPhrase/);
+  assert.match(sectionsSource, /<Connections/);
 });
 
 test('entity page preserves session nav and force-dynamic routing', () => {
   assert.match(pageSource, /EntitySessionNavClient/);
   assert.match(pageSource, /export const dynamic = 'force-dynamic'/);
-});
-
-test('entity sections gate beats on content and disclose gaps once via approved copy', () => {
-  // Adaptive stack: no per-section apology cards; sparse beats simply do not render.
-  assert.doesNotMatch(sectionsSource, /<RecordGapNotice/);
-  assert.match(sectionsSource, /resolveSectionPresence/);
-  // The closing provenance panel discloses every gap with the approved vocabulary.
-  assert.match(sectionsSource, /RECORD_GAP_COPY/);
-  assert.match(sectionsSource, /resolveResearchGaps/);
-  assert.match(sectionsSource, /not an absence of history/);
 });
 
 test('entity intro media renders only when a primary photo exists', () => {

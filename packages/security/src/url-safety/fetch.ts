@@ -157,13 +157,21 @@ export async function parseContentInSandbox(
   }
   if (
     contentType.includes('html') &&
-    /<(?:script|iframe|object|embed)\b|on\w+\s*=|javascript:/iu.test(text)
+    // `on[a-z]{1,32}` rather than `on\w+`: `\w` matches 'o' and 'n', so "ononon..." could be
+    // split across the alternation many ways (CodeQL js/polynomial-redos). No handler name is
+    // 32 characters long.
+    /<(?:script|iframe|object|embed)\b|\bon[a-z]{1,32}\s{0,32}=|javascript:/iu.test(text)
   ) {
     indicators.push('active_content');
   }
   const extractedText = contentType.includes('html')
     ? text
-        .replace(/<(?:script|style)\b[^>]*>[\s\S]*?<\/(?:script|style)>/giu, ' ')
+        // `[^>]*` after the end-tag name, not `\s*` and not nothing. An end tag runs to the
+        // first `>`, so `</script >`, `</script\t\n bar>` and `</style foo>` all close the
+        // element and browsers honour every one of them. A stricter pattern leaves the element's
+        // contents in extractedText, which is the text this scanner reports as the safe, tag-free
+        // rendering of a fetched document (CodeQL js/bad-tag-filter).
+        .replace(/<(?:script|style)\b[^>]*>[\s\S]*?<\/(?:script|style)\b[^>]*>/giu, ' ')
         .replace(/<[^>]+>/gu, ' ')
         .replace(/\s+/gu, ' ')
         .trim()

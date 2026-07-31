@@ -1,0 +1,332 @@
+/** Command bar — fixed top, z 50, three-zone grid. */
+
+.ds-bar {
+  position: fixed;
+  top: var(--ds-space-2);
+  left: var(--ds-space-2);
+  right: var(--ds-space-2);
+  z-index: 50;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--ds-space-3);
+  height: 64px;
+  padding: 0 var(--ds-space-3);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  box-shadow: 0 10px 30px -20px rgb(0 0 0 / 45%);
+}
+
+/* ---- brand --------------------------------------------------------------- */
+
+/*
+ * `.ds-shell-wordmark` from shell-header.css supplies the artwork and its light/dark swap. This
+ * only sets the bar's own spacing and the height cap for a 64px bar. The lockup reads as the
+ * site's signature, not a favicon parked beside the search field, so it takes most of that bar
+ * height rather than sitting two steps below the controls next to it.
+ */
+.ds-bar__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  color: var(--ds-ink);
+  text-decoration: none;
+}
+
+.ds-bar__brand .ds-shell-wordmark__img--lockup {
+  height: 3.25rem;
+}
+
+.ds-bar__brand .ds-shell-wordmark__img--symbol {
+  width: 2.125rem;
+  height: 2.125rem;
+}
+
+/* ---- search trigger ------------------------------------------------------ */
+
+/*
+ * The most important control on the surface. It is a button rather than an input because it opens
+ * the palette: an input here would give the reader two places to type and one of them would be a
+ * dead end.
+ */
+.ds-bar__search {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  justify-self: center;
+  width: 100%;
+  max-width: 520px;
+  min-height: 38px;
+  padding: 0 var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-full);
+  background: var(--ds-canvas);
+  color: var(--ds-ink-muted);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: border-color var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-bar__search:hover {
+  border-color: var(--ds-border-strong);
+}
+
+.ds-bar__search-text {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- the live search combobox -------------------------------------------
+   Same pill, same place, same size as the Atlas's palette trigger, but a real input with a
+   result list under it. The wrapper keeps the pill; the input inside is unstyled so the caret
+   sits where the placeholder was. */
+.ds-bar__search--live {
+  position: relative;
+  cursor: text;
+}
+
+.ds-bar__search-input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--ds-ink);
+  font: inherit;
+  outline: none;
+}
+
+.ds-bar__search-input::placeholder {
+  color: var(--ds-ink-muted);
+}
+
+.ds-bar__search--live:focus-within {
+  border-color: var(--ds-accent-graphic);
+}
+
+/* The list floats over the page rather than pushing the bar taller. */
+.ds-bar__search-list {
+  position: absolute;
+  top: calc(100% + var(--ds-space-2));
+  left: 0;
+  right: 0;
+  z-index: 60;
+  margin: 0;
+  padding: var(--ds-space-1);
+  list-style: none;
+  max-height: min(60vh, 26rem);
+  overflow-y: auto;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface);
+  box-shadow: 0 18px 40px -24px rgb(0 0 0 / 55%);
+}
+
+.ds-bar__search-list .ds-typeahead__option {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ds-space-2);
+  width: 100%;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  border: 0;
+  border-radius: var(--ds-radius-sm);
+  background: none;
+  color: var(--ds-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ds-bar__search-list .ds-typeahead__option--active,
+.ds-bar__search-list .ds-typeahead__option:hover {
+  background: var(--ds-canvas);
+}
+
+.ds-bar__search-list .ds-typeahead__primary {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-bar__search-list .ds-typeahead__secondary {
+  flex: none;
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+/* ---- tools --------------------------------------------------------------- */
+
+.ds-bar__tools {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+}
+
+.ds-bar__modes {
+  display: inline-flex;
+  padding: 2px;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-full);
+  background: var(--ds-canvas);
+}
+
+.ds-bar__modes button,
+.ds-bar__mode-link {
+  min-height: 28px;
+  padding: 0 var(--ds-space-3);
+  border: 0;
+  border-radius: var(--ds-radius-full);
+  background: transparent;
+  color: var(--ds-ink-muted);
+  font-family: inherit;
+  font-size: 0.78125rem;
+  cursor: pointer;
+}
+
+/* The Library link is an anchor in a row of buttons, so it needs the line box the others get
+   from being buttons. Separated from the toggles by a hairline: it leaves the surface. */
+.ds-bar__mode-link {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 2px;
+  border-left: var(--ds-border-width) solid var(--ds-border);
+  border-radius: 0 var(--ds-radius-full) var(--ds-radius-full) 0;
+  text-decoration: none;
+}
+
+.ds-bar__mode-link:hover,
+.ds-bar__mode-link:focus-visible {
+  color: var(--ds-ink);
+}
+
+.ds-bar__modes button[aria-current='true'] {
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
+}
+
+.ds-bar__tool {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: var(--ds-border-width) solid transparent;
+  border-radius: var(--ds-radius-sm);
+  background: transparent;
+  color: var(--ds-ink-muted);
+  cursor: pointer;
+}
+
+.ds-bar__tool:hover {
+  color: var(--ds-ink);
+  border-color: var(--ds-border);
+  background: var(--ds-canvas);
+}
+
+.ds-bar__badge {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 3px;
+  border-radius: var(--ds-radius-full);
+  background: var(--ds-accent-graphic);
+  color: var(--ds-inverse-ink);
+  font-family: var(--ds-font-mono);
+  font-size: 0.5625rem;
+  line-height: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- narrow -------------------------------------------------------------- */
+
+/*
+ * Below 820px the wordmark drops to the symbol. The modes stay: Atlas, Story and Library are how
+ * a reader moves between the three things this site is, and on a phone the palette shortcut that
+ * used to be their only replacement does not exist. They compact instead of disappearing.
+ *
+ * The search trigger never goes either — it is the primary affordance — but below 560px it gives
+ * up its label and becomes the glyph alone, which is the space the modes need.
+ */
+@media (max-width: 819px) {
+  .ds-bar {
+    height: 56px;
+    gap: var(--ds-space-2);
+  }
+
+  /* Symbol alone below 820px: brand.md directs squeezed placements to drop the lockup. */
+  .ds-bar__brand .ds-shell-wordmark__img--lockup {
+    display: none;
+  }
+
+  .ds-bar__brand .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-light {
+    display: block;
+  }
+
+  [data-theme='dark']
+    .ds-bar__brand
+    .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-light {
+    display: none;
+  }
+
+  [data-theme='dark']
+    .ds-bar__brand
+    .ds-shell-wordmark__img--symbol.ds-shell-wordmark__img--theme-dark {
+    display: block;
+  }
+
+  .ds-bar__modes button,
+  .ds-bar__mode-link {
+    min-height: 26px;
+    padding: 0 var(--ds-space-2);
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 559px) {
+  .ds-bar {
+    gap: var(--ds-space-2);
+    padding: 0 var(--ds-space-2);
+  }
+
+  /* Glyph alone. The button keeps its full hit area and its aria-label, so the control is the
+     same size to a thumb and the same thing to a screen reader. */
+  .ds-bar__search-text,
+  .ds-bar__search .ds-kbd {
+    display: none;
+  }
+
+  /* The live field keeps its input at every width: hiding it would leave an empty pill. */
+  .ds-bar__search--live {
+    min-width: 0;
+  }
+
+  .ds-bar__search {
+    justify-content: center;
+    min-width: 44px;
+  }
+
+  .ds-bar__modes button,
+  .ds-bar__mode-link {
+    padding: 0 0.5rem;
+    font-size: 0.6875rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-bar__search {
+    transition-duration: 0.01ms;
+  }
+}

@@ -1,0 +1,278 @@
+/**
+ * Story mode — the scroll container over the map plate, z 20.
+ *
+ * The container scrolls, the plate does not. Cards alternate left and right so the map is never
+ * fully covered: there is always a side of the plate the camera move can be read against, which
+ * is the entire reason the story is over a live map rather than over screenshots.
+ */
+
+.ds-story {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scroll-behavior: smooth;
+  scroll-snap-type: y proximity;
+}
+
+.ds-story__chapter {
+  display: grid;
+  align-content: center;
+  min-height: 100dvh;
+  padding: calc(56px + var(--ds-space-8)) var(--ds-space-6) var(--ds-space-8);
+  scroll-snap-align: start;
+}
+
+/* Alternating sides. Odd chapters sit left, even chapters right. */
+.ds-story__chapter:nth-of-type(odd) {
+  justify-items: start;
+}
+
+.ds-story__chapter:nth-of-type(even) {
+  justify-items: end;
+}
+
+.ds-story__chapter--centred {
+  justify-items: center;
+  text-align: center;
+}
+
+.ds-story__card {
+  width: min(460px, 100%);
+  padding: var(--ds-space-6);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  box-shadow: 0 18px 48px -28px rgb(0 0 0 / 55%);
+}
+
+/* The cold open and the outro are text on the plate, not a panel over it. */
+.ds-story__chapter--centred .ds-story__card {
+  width: min(620px, 100%);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+/*
+ * A soft wash under the two panel-less chapters. Text directly on the plate is the design, but the
+ * plate under the cold open is the densest part of the archive — four thousand pins — and the
+ * prose and the citation line were unreadable against it. A radial scrim keeps the map legible
+ * through the type instead of putting a panel back.
+ */
+.ds-story__chapter--centred {
+  position: relative;
+}
+
+.ds-story__chapter--centred::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 60% 46% at 50% 50%,
+    var(--ds-surface) 0%,
+    color-mix(in srgb, var(--ds-surface) 78%, transparent) 42%,
+    transparent 74%
+  );
+}
+
+.ds-story__chapter--centred .ds-story__card {
+  position: relative;
+}
+
+.ds-story__index {
+  display: block;
+  margin-bottom: var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--ds-accent-graphic);
+}
+
+.ds-story__kicker {
+  margin: 0 0 var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+}
+
+.ds-story__heading {
+  margin: 0 0 var(--ds-space-4);
+  font-family: var(--ds-font-display);
+  font-size: clamp(1.5rem, 3.2vw, 2rem);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  color: var(--ds-ink);
+}
+
+/* Exactly one italic serif accent per heading. §9. */
+.ds-story__heading em {
+  font-family: var(--ds-font-editorial);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ds-accent);
+}
+
+.ds-story__prose {
+  margin: 0 0 var(--ds-space-4);
+  font-family: var(--ds-font-editorial);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--ds-ink);
+}
+
+.ds-story__chapter--centred .ds-story__prose {
+  margin-inline: auto;
+  max-width: 44ch;
+}
+
+.ds-story__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-5);
+  margin: 0 0 var(--ds-space-4);
+  padding-top: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-story__facts > div {
+  min-width: 0;
+}
+
+.ds-story__fact-value {
+  font-family: var(--ds-font-display);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ds-ink);
+}
+
+.ds-story__fact-label {
+  margin: 2px 0 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  color: var(--ds-ink-muted);
+}
+
+/* Sourcing, not a caption. It stays legible rather than fading into the card. */
+.ds-story__cite {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  line-height: 1.6;
+  color: var(--ds-ink-muted);
+}
+
+.ds-story__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+  justify-content: inherit;
+  margin-top: var(--ds-space-6);
+}
+
+.ds-story__chapter--centred .ds-story__actions {
+  justify-content: center;
+}
+
+.ds-story__action {
+  min-height: 44px;
+  padding: 0 var(--ds-space-5);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface);
+  color: var(--ds-ink);
+  font-family: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.ds-story__action:hover {
+  border-color: var(--ds-border-strong);
+  background: var(--ds-canvas);
+}
+
+.ds-story__action--primary {
+  border-color: var(--ds-accent-graphic);
+  background: var(--ds-accent-graphic);
+  color: var(--ds-inverse-ink);
+}
+
+.ds-story__action--primary:hover {
+  border-color: var(--ds-accent);
+  background: var(--ds-accent);
+  color: var(--ds-inverse-ink);
+}
+
+/* ---- kinetic cold open --------------------------------------------------- */
+
+.ds-story__cold {
+  margin: 0 0 var(--ds-space-5);
+  font-family: var(--ds-font-display);
+  font-size: clamp(2.25rem, 7vw, 4.25rem);
+  font-weight: 600;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  color: var(--ds-ink);
+}
+
+.ds-story__word {
+  display: inline-block;
+  margin-right: 0.28em;
+}
+
+.ds-story__word:last-child {
+  margin-right: 0;
+}
+
+/*
+ * Kinetic type is architectural here, not decoration: the words arrive in reading order, which is
+ * the one motion on this surface that carries meaning rather than attention.
+ */
+.ds-story__cold--kinetic .ds-story__word {
+  opacity: 0;
+  transform: translateY(0.4em) rotate(1.5deg);
+  animation: ds-story-word 620ms var(--ds-easing) forwards;
+}
+
+@keyframes ds-story-word {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 819px) {
+  .ds-story__chapter {
+    justify-items: stretch;
+    padding: calc(50px + var(--ds-space-6)) var(--ds-space-3) var(--ds-space-6);
+  }
+
+  .ds-story__chapter:nth-of-type(odd),
+  .ds-story__chapter:nth-of-type(even) {
+    justify-items: stretch;
+  }
+
+  .ds-story__card {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-story {
+    scroll-behavior: auto;
+  }
+
+  /* Chapters still advance; only the kinetic entrance goes. */
+  .ds-story__cold--kinetic .ds-story__word {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}

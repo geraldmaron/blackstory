@@ -1,0 +1,160 @@
+/**
+ * Annotation plane — z 5, between the map plate (z 0) and the chrome (z 20).
+ *
+ * The layer never takes a pointer event. Everything readable on it is a caption for the map
+ * underneath, and a corridor arc is not a click target: a reader who wants a record clicks the
+ * record, not the graphic drawn over it.
+ */
+
+.ds-annotation {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.ds-annotation__plane {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* Endpoint labels sit outside the arc's own box and must not be clipped at the viewport edge. */
+  overflow: visible;
+}
+
+/* ---- arcs ---------------------------------------------------------------- */
+
+.ds-annotation__arc {
+  fill: none;
+  stroke: var(--ds-accent-graphic);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  opacity: 0.85;
+  /*
+   * Both written by the overlay on every reprojection, so a rescaled arc never tears open a gap:
+   * in steady state the dash is exactly as long as the path it covers, offset to zero.
+   */
+  stroke-dasharray: var(--ds-arc-length, none);
+  stroke-dashoffset: var(--ds-arc-length, 0);
+}
+
+/*
+ * Alternating weight. Seven arcs at one weight over a dense archive reads as a grid; dropping
+ * every other one back lets the eye separate them where they cross around Chicago.
+ */
+.ds-annotation__arc--soft {
+  stroke: var(--ds-ink-muted);
+  stroke-width: 1.2;
+  opacity: 0.6;
+}
+
+/* ---- endpoints ----------------------------------------------------------- */
+
+.ds-annotation__dot {
+  fill: var(--ds-accent-graphic);
+}
+
+.ds-annotation__label {
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  fill: var(--ds-ink);
+  /*
+   * The halo is the only reason these stay legible. They are drawn over live map labels and over
+   * whatever the plate is doing underneath, and `paint-order: stroke` puts the stroke behind the
+   * glyph so the halo never eats the letterform.
+   */
+  paint-order: stroke;
+  stroke: var(--ds-canvas);
+  stroke-width: 3.5px;
+  stroke-linejoin: round;
+}
+
+/* Origin is where the stream left. Destination is the claim, so it carries the stronger mark. */
+.ds-annotation__label--origin {
+  font-size: 0.5625rem;
+  fill: var(--ds-ink-muted);
+}
+
+/* ---- honesty note -------------------------------------------------------- */
+
+.ds-annotation__note {
+  position: absolute;
+  left: var(--ds-space-4);
+  bottom: var(--ds-space-4);
+  max-width: 34ch;
+  margin: 0;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--ds-ink-muted);
+  text-wrap: pretty;
+}
+
+/* ---- reveal -------------------------------------------------------------- */
+
+/*
+ * `pending` is the pre-projection state. The overlay cannot know an arc's length until the map
+ * has projected it, so the plane renders empty for one frame rather than flashing seven arcs at
+ * their unprojected positions.
+ */
+.ds-annotation__plane[data-draw='pending'] .ds-annotation__arc,
+.ds-annotation__plane[data-draw='pending'] [data-reveal] {
+  opacity: 0;
+}
+
+/*
+ * `both` fill mode is what makes the stagger work. The keyframe below declares no `from`, so
+ * during its delay each arc holds its own resting `stroke-dashoffset` — a full path length, and
+ * therefore invisible — instead of appearing complete and then redrawing itself. After the
+ * animation, the forwards half of `both` pins the offset at zero.
+ */
+.ds-annotation__plane[data-draw='on'] .ds-annotation__arc {
+  animation: ds-annotation-draw var(--ds-arc-duration, 1100ms) cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ds-annotation__plane[data-draw='on'] [data-reveal] {
+  animation: ds-annotation-fade var(--ds-reveal-duration, 500ms) cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/*
+ * `to`-only on purpose. The implicit `from` is the element's own computed `stroke-dashoffset`,
+ * which already reads `--ds-arc-length`, so the measured length reaches the animation without a
+ * `var()` inside a keyframe. Same result, one less mechanism to be wrong about.
+ */
+@keyframes ds-annotation-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes ds-annotation-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/*
+ * Reduced motion keeps the graphic and drops the choreography. The corridors are information, not
+ * decoration, so they must still be there; it is only the drawing of them that is a performance.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ds-annotation__plane[data-draw='on'] .ds-annotation__arc,
+  .ds-annotation__plane[data-draw='on'] [data-reveal] {
+    animation: none;
+    /*
+     * Load-bearing, not a safeguard. An arc's resting `stroke-dashoffset` is a full path length,
+     * which is invisible; without the animation to close it, only this line puts the corridor on
+     * screen. Opacity needs no such override — dropping the animation hands each element back to
+     * its own opacity rule.
+     */
+    stroke-dashoffset: 0;
+  }
+}

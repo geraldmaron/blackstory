@@ -38,7 +38,7 @@ test('buildHistoricSafetySourceRegistrationInputs records mandatory EJI and Toug
   const eji = inputs.find((input) => input.sourceId === 'eji-lynching-records');
   assert.ok(eji);
   assert.match(eji!.citationRequirements, /Equal Justice Initiative/i);
-  assert.match(eji!.citationRequirements, /eji\.org/i);
+  assert.ok(eji!.citationRequirements.toLowerCase().includes('eji.org'));
   assert.equal(eji!.feedsLayerId, 'documented_events');
 
   const tougaloo = inputs.find((input) => input.sourceId === 'tougaloo-sundown-towns');

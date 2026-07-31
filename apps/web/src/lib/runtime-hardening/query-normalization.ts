@@ -11,10 +11,10 @@
  */
 
 import { buildExploreSearchParams, parseExploreSearchParams } from '../map-experience/url-state';
-import { buildHistorySearchParams, parseHistorySearchParams } from '../history/url-state';
 import {
+  CORRECTIONS_PAGE_PARAM_ALLOWLIST,
   EXPLORE_PAGE_PARAM_ALLOWLIST,
-  HISTORY_PAGE_PARAM_ALLOWLIST,
+  LAW_PAGE_PARAM_ALLOWLIST,
   SEARCH_PAGE_PARAM_ALLOWLIST,
   TRACKING_QUERY_KEYS,
   TRACKING_QUERY_PREFIXES,
@@ -22,6 +22,12 @@ import {
 } from './constants';
 
 export type QueryParamBag = Record<string, string | string[] | undefined>;
+
+/**
+ * The map surface answers on two paths. Both run the same allowlist and the same parse→build
+ * pair, so `/` and `/explore` cannot end up accepting different vocabularies for the same view.
+ */
+const EXPLORE_SURFACE_PATHS = new Set(['/', '/explore']);
 
 function isTrackingKey(key: string): boolean {
   const lower = key.toLowerCase();
@@ -34,17 +40,26 @@ function firstString(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
 }
 
+function normalizePathname(pathname: string): string {
+  return pathname.endsWith('/') && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
+}
+
 /** Routes that may carry user-facing filters; all other paths ignore query strings for caching.  */
 export function getAllowedQueryParamsForPath(pathname: string): readonly string[] {
-  const path = pathname.endsWith('/') && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
+  const path = normalizePathname(pathname);
   if (path === '/search') {
     return SEARCH_PAGE_PARAM_ALLOWLIST;
   }
-  if (path === '/explore') {
+  if (EXPLORE_SURFACE_PATHS.has(path)) {
     return EXPLORE_PAGE_PARAM_ALLOWLIST;
   }
-  if (path === '/history') {
-    return HISTORY_PAGE_PARAM_ALLOWLIST;
+  // No `/history` branch: the route is not in the middleware matcher and must not be. See the
+  // note where HISTORY_PAGE_PARAM_ALLOWLIST used to live in `constants.ts`.
+  if (path === '/law') {
+    return LAW_PAGE_PARAM_ALLOWLIST;
+  }
+  if (path === '/corrections') {
+    return CORRECTIONS_PAGE_PARAM_ALLOWLIST;
   }
   return [];
 }
@@ -76,22 +91,19 @@ function allowlistedBag(pathname: string, bag: QueryParamBag): QueryParamBag {
 
 /**
  * Returns a stable query string containing only allowed, non-tracking params.
- * `/explore` and `/history` go through their parse→build helpers so revisit URLs match
- * what the client writes (`layerMode=presence`, uppercase state, rounded viewport).
+ * The map surface (`/` and `/explore`) and `/history` go through their parse→build helpers so
+ * revisit URLs match what the client writes (`layerMode=presence`, uppercase state).
  * Empty string means no query component should appear in cache keys or redirects.
  */
 export function normalizeQueryString(
   pathname: string,
   input: URLSearchParams | QueryParamBag,
 ): string {
-  const path = pathname.endsWith('/') && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
+  const path = normalizePathname(pathname);
   const bag = allowlistedBag(path, readParamBag(input));
 
-  if (path === '/explore') {
+  if (EXPLORE_SURFACE_PATHS.has(path)) {
     return buildExploreSearchParams(parseExploreSearchParams(bag));
-  }
-  if (path === '/history') {
-    return buildHistorySearchParams(parseHistorySearchParams(bag));
   }
 
   const normalized = new URLSearchParams();
@@ -101,10 +113,6 @@ export function normalizeQueryString(
     normalized.set(key, value);
   }
   return normalized.toString();
-}
-
-function normalizePathname(pathname: string): string {
-  return pathname.endsWith('/') && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
 }
 
 /**

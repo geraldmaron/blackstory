@@ -3,6 +3,8 @@
  * Stays current with docs/ui/design-direction-v5.md — new shell patterns land here too.
  */
 
+import type { Metadata } from 'next';
+import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import {
   Button,
@@ -18,11 +20,16 @@ import {
   Timeline,
 } from '@repo/ui';
 import { DialogFixture } from './DialogFixture';
+import { RoomKitGallery } from './RoomKitGallery';
+// /design-system is a Utility surface, and Utility is one of the three room stylesheets.
+// It carries the whole room kit, which is what makes the fixtures below render.
+import '../utility.css';
 
-export const metadata = {
+export const metadata: Metadata = buildStaticPageMetadata({
+  path: '/design-system',
   title: 'Design system — BlackStory',
   description: 'Component and token fixtures for visual and keyboard review (design-direction-v5)',
-};
+});
 
 export default function DesignSystemPage() {
   return (
@@ -98,7 +105,7 @@ export default function DesignSystemPage() {
               <span className="ds-story-link__meta">School / Washington, D.C.</span>
               <h3 className="ds-story-link__title">Story link entry</h3>
               <p className="ds-story-link__summary">
-                Mono slug, Sora title, serif one-line story — the shared anatomy for rails, related
+                Mono slug, display title, serif one-line story — the shared anatomy for rails, related
                 lists, and browse paths.
               </p>
             </Link>
@@ -282,6 +289,8 @@ export default function DesignSystemPage() {
           Try a broader era filter or remove exact street constraints.
         </EmptyState>
       </section>
+
+      <RoomKitGallery />
     </main>
   );
 }

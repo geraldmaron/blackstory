@@ -18,11 +18,16 @@ const pageSource = readFileSync(join(here, 'page.tsx'), 'utf8');
 const sectionsSource = readFileSync(join(here, 'MethodologySections.tsx'), 'utf8');
 const copySource = readFileSync(join(here, 'methodology-copy.ts'), 'utf8');
 
-test('methodology page does not mount EditionAtmosphereMosaic with route seed', () => {
+test('methodology page renders through the room kit, with no edition chrome left', () => {
   assert.doesNotMatch(pageSource, /EditionAtmosphereMosaic/);
   assert.doesNotMatch(pageSource, /METHODOLOGY_EDITION_MOSAIC_SEED/);
-  assert.match(pageSource, /data-methodology-edition="v6"/);
-  assert.doesNotMatch(pageSource, /methodology\.css/);
+  // `data-methodology-edition="v6"` marked the per-route chrome the shared kit replaces.
+  assert.doesNotMatch(pageSource, /data-methodology-edition="v6"/);
+  assert.match(pageSource, /from '\.\.\/\.\.\/components\/room'/);
+  assert.match(pageSource, /<Room>/);
+  // No RoomHeader on purpose: MethodologySections renders the page's own h1 and lede, and a second
+  // title would put two of each on the page the archive uses to prove its own rigour.
+  assert.doesNotMatch(pageSource, /<RoomHeader/);
 });
 
 test('methodology sections preserve core trust copy and evidence pipeline', () => {

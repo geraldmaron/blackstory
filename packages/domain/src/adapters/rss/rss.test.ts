@@ -34,6 +34,22 @@ import {
   RSS_ADAPTER_ID,
 } from './index.js';
 
+/**
+ * Host-anchored membership, not `url.includes(host)`: "nps.gov" can sit anywhere in a URL, so a
+ * substring check passes for `https://evil.example/?q=nps.gov` (CodeQL
+ * js/incomplete-url-substring-sanitization).
+ */
+function hasHost(urls: readonly string[] | undefined, host: string): boolean {
+  return (urls ?? []).some((url) => {
+    try {
+      const { hostname } = new URL(url);
+      return hostname === host || hostname.endsWith(`.${host}`);
+    } catch {
+      return false;
+    }
+  });
+}
+
 const FIXED_NOW = '2026-07-17T20:00:00.000Z';
 const FIXTURES_DIR = join(dirname(fileURLToPath(import.meta.url)), 'fixtures');
 
@@ -121,9 +137,9 @@ test('parses outbound href linkHints from content:encoded without storing full b
   const parsed = parseRssOrAtomFeed(xml);
   assert.equal(parsed.items.length, 1);
   const hints = parsed.items[0]?.linkHints ?? [];
-  assert.ok(hints.some((url) => url.includes('nps.gov')));
-  assert.ok(hints.some((url) => url.includes('nmaahc.si.edu')));
-  assert.ok(hints.some((url) => url.includes('instagram.com')));
+  assert.ok(hasHost(hints, 'nps.gov'));
+  assert.ok(hasHost(hints, 'nmaahc.si.edu'));
+  assert.ok(hasHost(hints, 'instagram.com'));
   // Summary remains short — linkHints are separate from the capped summary.
   assert.ok((parsed.items[0]?.summary?.length ?? 0) < 200);
 });

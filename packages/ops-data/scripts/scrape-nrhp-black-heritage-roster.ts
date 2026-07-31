@@ -48,7 +48,7 @@
  *     packages/ops-data/scripts/scrape-nrhp-black-heritage-roster.ts
  */
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { closeSync, mkdirSync, openSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
@@ -200,6 +200,34 @@ async function fetchJson(url: string, init?: RequestInit): Promise<unknown | nul
   return null;
 }
 
+/**
+ * The basename of a remote path, with anything that could steer a write stripped out.
+ *
+ * The NPS download link is scraped, so it is remote input choosing a filename. Taking the last
+ * segment is not enough on its own: `..` is a valid last segment, and so is a name full of path
+ * separators once decoded. This keeps word characters, dots and dashes, refuses a name that is
+ * all dots, and caps the length.
+ */
+function safeCacheFilename(remotePath: string): string {
+  const base = remotePath.split('/').pop() ?? '';
+  const cleaned = base.replace(/[^\w.-]/gu, '_').slice(0, 128);
+  if (cleaned.length === 0 || /^\.+$/u.test(cleaned)) {
+    throw new Error(`refusing unsafe download filename: ${JSON.stringify(base)}`);
+  }
+  return cleaned;
+}
+
+/**
+ * A report filename built only from characters we chose. `generatedAt` reaches this point after a
+ * network round trip, so CodeQL sees remote input deciding a write path
+ * (js/http-to-file-access); pinning the shape makes the constraint explicit rather than implied
+ * by the timestamp's format.
+ */
+function safeReportFilename(prefix: string, stamp: string): string {
+  const cleaned = stamp.replace(/[^\w-]/gu, '-').slice(0, 64);
+  return `${prefix}-${cleaned}.json`;
+}
+
 async function main(): Promise<void> {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) throw new Error('DATABASE_URL is required (source apps/web/.env.local)');
@@ -214,13 +242,29 @@ async function main(): Promise<void> {
   if (!xlsxPath) throw new Error('could not find national-register-listed_*.xlsx link on data-downloads page');
   const xlsxUrl = `https://www.nps.gov${xlsxPath}`;
   mkdirSync(CACHE_DIR, { recursive: true });
-  const localXlsx = join(CACHE_DIR, xlsxPath.split('/').pop()!);
-  if (!existsSync(localXlsx)) {
-    console.log(`Downloading ${xlsxUrl}`);
-    const res = await fetch(xlsxUrl, { headers: { 'user-agent': BROWSER_UA } });
-    if (!res.ok) throw new Error(`xlsx download failed: ${res.status}`);
-    writeFileSync(localXlsx, Buffer.from(await res.arrayBuffer()));
-  } else {
+  // The cache filename comes from a link on a page we fetched, so it is remote input deciding
+  // where this process writes (CodeQL js/http-to-file-access). `safeCacheFilename` keeps the
+  // basename and nothing else, so a link of `../../../etc/cron.d/x` cannot escape CACHE_DIR.
+  const localXlsx = join(CACHE_DIR, safeCacheFilename(xlsxPath));
+  // Written with wx, not existsSync-then-write. The check-then-act pair is a race: the file can
+  // appear between the two, and on a shared cache directory that is someone else's file being
+  // clobbered (CodeQL js/file-system-race). EEXIST is the answer to "already cached".
+  let cached = false;
+  try {
+    const handle = openSync(localXlsx, 'wx');
+    try {
+      console.log(`Downloading ${xlsxUrl}`);
+      const res = await fetch(xlsxUrl, { headers: { 'user-agent': BROWSER_UA } });
+      if (!res.ok) throw new Error(`xlsx download failed: ${res.status}`);
+      writeFileSync(handle, Buffer.from(await res.arrayBuffer()));
+    } finally {
+      closeSync(handle);
+    }
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error;
+    cached = true;
+  }
+  if (cached) {
     console.log(`Using cached ${localXlsx}`);
   }
 
@@ -433,7 +477,7 @@ async function main(): Promise<void> {
   console.table(report.netNewPreview);
 
   mkdirSync(REPORT_DIR, { recursive: true });
-  const reportPath = join(REPORT_DIR, `nrhp-black-heritage-${generatedAt.replace(/[:.]/gu, '-')}.json`);
+  const reportPath = join(REPORT_DIR, safeReportFilename('nrhp-black-heritage', generatedAt));
   writeFileSync(
     reportPath,
     JSON.stringify({ ...report, netNewRows }, null, 2),

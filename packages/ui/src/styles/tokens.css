@@ -58,6 +58,21 @@
   --ds-viz-3: #6d675f;
   --ds-viz-4: #d8a178;
   --ds-viz-grid: #d7d0c4;
+
+  /*
+   * Map plate roles. Separation between adjacent roles is a contract, not a preference:
+   * map-contrast.test.ts asserts the CIE L* deltas in both themes. Change a value and run
+   * `pnpm --filter @repo/ui test` before assuming it is safe.
+   */
+  --ds-map-land: #f6f2e9;
+  --ds-map-water: #c7bdaa;
+  --ds-map-green: #ebe5d1;
+  --ds-map-line: #bdb19a;
+  --ds-map-line-2: #a2957c;
+  --ds-map-road: #e6dcc6;
+  --ds-map-label: #6d675f;
+  --ds-map-label-hi: #2e2a24;
+  --ds-map-halo: #f8f5ee;
 }
 
 [data-theme='dark'] {
@@ -112,20 +127,42 @@
   --ds-viz-3: #bdb5a9;
   --ds-viz-4: #d8a178;
   --ds-viz-grid: #34302c;
+
+  /*
+   * Map plate roles. The landmass is deliberately lighter than the page canvas: water is already
+   * at the floor, so land is the only side of the land/water pair with room to move, and without
+   * that separation coastlines and state lines vanish at continental zoom. See map-contrast.test.ts.
+   */
+  --ds-map-land: #38332b;
+  --ds-map-water: #0a0a0c;
+  --ds-map-green: #3e3728;
+  --ds-map-line: #665e4f;
+  --ds-map-line-2: #776c5a;
+  --ds-map-road: #474034;
+  --ds-map-label: #9e9587;
+  --ds-map-label-hi: #ded7c9;
+  --ds-map-halo: #16130f;
 }
 
 :root {
   /*
-   * Display register is Sora per the blap brand pack (p.2 typography system —
-   * headlines, titles, key statements). next/font injects the loaded family via
-   * this same custom property on <body>; this :root chain is the no-JS/out-of-app
-   * fallback. Weight and tracking live in the type-scale tokens.
+   * Four type registers: display for headlines, titles and key statements; sans for UI and
+   * body; editorial for longform prose; mono strictly for data (slugs, counts, dates, decades,
+   * citations). next/font injects each loaded family through these same custom properties on
+   * <body>; this :root chain is the no-JS and out-of-app fallback. Weight and tracking live in
+   * the type-scale tokens, not here.
+   *
+   * Schibsted Grotesk carries an editorial spine that Sora's geometric construction did not,
+   * and Geist reads sharper than Inter at UI sizes without Inter's ubiquity. Geist ships no
+   * italic, which is why the fallback chain ends in system faces that do: an italic in a sans
+   * context is synthesised either way, and real italics belong to the editorial register.
+   * Newsreader is drawn for longform reading on screen and carries an optical-size axis.
    */
-  --ds-font-display: 'Sora', var(--ds-font-sans, 'Inter', system-ui, sans-serif);
+  --ds-font-display: 'Schibsted Grotesk', var(--ds-font-sans, system-ui, sans-serif);
   --ds-font-editorial:
-    'Source Serif 4', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
-  --ds-font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
-  --ds-font-mono: 'IBM Plex Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
+    'Newsreader', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --ds-font-sans: 'Geist', 'Segoe UI', system-ui, sans-serif;
+  --ds-font-mono: 'Geist Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
 
   --ds-space-1: 0.25rem;
   --ds-space-2: 0.5rem;

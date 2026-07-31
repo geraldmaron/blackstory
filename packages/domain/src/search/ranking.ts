@@ -17,6 +17,16 @@ import type { SearchableEntityRecord, SearchMatchField } from './types.js';
 const TIER_NAME_EXACT = 100;
 const TIER_NAME_PREFIX = 90;
 const TIER_NAME_SUBSTRING = 80;
+/**
+ * Every query token present in the name, in any order and not necessarily adjacent.
+ *
+ * Below a contiguous substring, because "calvin shirley" appearing verbatim is a stronger signal
+ * than its two words appearing apart, and above the alias tiers so a direct name hit still leads.
+ * Without this tier, typing a person's first and last name (the most natural way anyone searches
+ * for a person) returned nothing for every record carrying a title or a middle initial:
+ * "calvin shirley" is not a substring of "dr. calvin h. shirley".
+ */
+const TIER_NAME_TOKENS = 75;
 const TIER_ALIAS_EXACT = 70;
 const TIER_ALIAS_PREFIX = 60;
 const TIER_ALIAS_SUBSTRING = 50;
@@ -84,6 +94,17 @@ function tokens(value: string): readonly string[] {
   return value.split(' ').filter((t) => t.length > 0);
 }
 
+/**
+ * True when every token of a multi-word query appears somewhere in `target`. Conjunctive, not
+ * disjunctive: "calvin shirley" must find both words, so it matches "Dr. Calvin H. Shirley" and
+ * not every record that merely mentions a Calvin.
+ */
+function matchesAllTokens(query: string, target: string): boolean {
+  const queryTokens = tokens(query);
+  if (queryTokens.length < 2) return false;
+  return queryTokens.every((token) => target.includes(token));
+}
+
 function isFuzzyMatch(query: string, target: string): boolean {
   if (levenshtein(query, target, MAX_FUZZY_DISTANCE) <= MAX_FUZZY_DISTANCE) return true;
   // Also tolerate a typo of a single token within a multi-word target.
@@ -101,6 +122,8 @@ function bestAliasMatch(query: string, aliases: readonly string[]): MatchInfo | 
     else if (alias.startsWith(query))
       candidate = { tier: TIER_ALIAS_PREFIX, matchedOn: 'alias', matchedText: alias };
     else if (alias.includes(query))
+      candidate = { tier: TIER_ALIAS_SUBSTRING, matchedOn: 'alias', matchedText: alias };
+    else if (matchesAllTokens(query, alias))
       candidate = { tier: TIER_ALIAS_SUBSTRING, matchedOn: 'alias', matchedText: alias };
     if (candidate && (!best || candidate.tier > best.tier)) best = candidate;
   }
@@ -120,6 +143,8 @@ function scoreRecord(query: string, record: SearchableEntityRecord): MatchInfo |
     return { tier: TIER_NAME_PREFIX, matchedOn: 'displayName', matchedText: record.displayName };
   if (name.includes(query))
     return { tier: TIER_NAME_SUBSTRING, matchedOn: 'displayName', matchedText: record.displayName };
+  if (matchesAllTokens(query, name))
+    return { tier: TIER_NAME_TOKENS, matchedOn: 'displayName', matchedText: record.displayName };
 
   const alias = bestAliasMatch(query, record.aliases);
   if (alias) return alias;

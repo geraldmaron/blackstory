@@ -86,6 +86,12 @@ export async function fetchGazetteerCountyFileText(
     if (!entryName) {
       throw new Error('Gazetteer zip did not contain a .txt county file');
     }
+    // The entry name comes from the archive, so it is remote input reaching an argv slot. A name
+    // beginning with '-' would be read by unzip as a flag, and a traversal segment has no
+    // business in a member name (CodeQL js/http-to-file-access).
+    if (entryName.startsWith('-') || entryName.split('/').includes('..')) {
+      throw new Error(`refusing unsafe gazetteer zip entry: ${JSON.stringify(entryName)}`);
+    }
     const text = execFileSync('unzip', ['-p', zipPath, entryName], { encoding: 'utf8' });
     return { text, bytes, sourceUrl };
   } finally {

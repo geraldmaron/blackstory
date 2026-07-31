@@ -19,10 +19,34 @@ import {
   type ClaimEvidenceLink,
   type ConfidenceEngineResult,
 } from '@repo/domain';
-import { isReputableSecondaryHost, isTier1Host } from './tier1-sources.ts';
+import { isReputableSecondaryHost, isTier1Host, isWikipediaHost } from './tier1-sources.ts';
 
-const GOVERNMENT_HOST_PATTERNS = [/\.gov$/iu, /\.mil$/iu, /(^|\.)si\.edu$/iu];
+/**
+ * Host classification by comparison, not by regular expression.
+ *
+ * The `/\.gov$/iu`-style patterns here ran against a parsed hostname and were correct, but an
+ * unanchored expression tested against a URL matches anywhere, which CodeQL cannot distinguish
+ * (js/regex/missing-regexp-anchor). `hostUnderTld` and `hostMatches` say the rule outright.
+ */
+const GOVERNMENT_TLDS = ['gov', 'mil'];
+const GOVERNMENT_DOMAINS = ['si.edu'];
+const ARCHIVAL_DOMAINS = ['rosenwald.fisk.edu', 'archive.org'];
+
+/**
+ * Substrings of a *hostname label*, not of the whole URL. A newspaper's masthead shows up in
+ * its domain (nytimes.com, chicagotribune.com), so the hint has to match inside a label rather
+ * than against the whole name — but it is matched per label, so a path or query cannot smuggle
+ * "times" into the decision.
+ */
 const NEWS_HOST_HINTS = ['news', 'times', 'post', 'tribune', 'gazette', 'herald'];
+
+function hostUnderTld(hostname: string, tld: string): boolean {
+  return hostname.endsWith(`.${tld}`);
+}
+
+function hostMatches(hostname: string, domain: string): boolean {
+  return hostname === domain || hostname.endsWith(`.${domain}`);
+}
 
 /** Maps a source URL to the product constitution's sourceClassifications vocabulary. */
 export function classifySourceForConfidence(url: string): string {
@@ -32,19 +56,26 @@ export function classifySourceForConfidence(url: string): string {
   } catch {
     return 'unknown';
   }
-  if (GOVERNMENT_HOST_PATTERNS.some((pattern) => pattern.test(hostname)))
+  if (
+    GOVERNMENT_TLDS.some((tld) => hostUnderTld(hostname, tld)) ||
+    GOVERNMENT_DOMAINS.some((domain) => hostMatches(hostname, domain))
+  )
     return 'government_record';
-  if (/(^|\.)(rosenwald\.fisk|archive)\./u.test(hostname) || hostname.endsWith('.edu')) {
+  if (
+    ARCHIVAL_DOMAINS.some((domain) => hostMatches(hostname, domain)) ||
+    hostUnderTld(hostname, 'edu')
+  ) {
     // University archival collections hold scanned original records; general .edu pages
     // (e.g. an alma mater mentioned in passing) do not carry the same evidentiary weight,
     // but distinguishing that would need page-content classification this function doesn't
     // have — treat .edu as reputable_secondary, the conservative (lower-authority) choice.
     return 'reputable_secondary';
   }
-  if (hostname.includes('wikipedia.org') || hostname.includes('wikidata.org'))
-    return 'reputable_secondary';
+  if (isWikipediaHost(url)) return 'reputable_secondary';
   if (isReputableSecondaryHost(url)) return 'reputable_secondary';
-  if (NEWS_HOST_HINTS.some((hint) => hostname.includes(hint))) return 'news_reportage';
+  const labels = hostname.split('.');
+  if (NEWS_HOST_HINTS.some((hint) => labels.some((label) => label.includes(hint))))
+    return 'news_reportage';
   return 'unknown';
 }
 

@@ -5,10 +5,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { EmptyState } from '@repo/ui';
-import {
-  LegalBrowseList,
-  LegalDisclaimer,
-} from '../../components/legal';
+import { LegalBrowseList, LegalDisclaimer } from '../../components/legal';
 import { AutoSubmitSelect } from '../../components/forms/AutoSubmitSelect';
 import type { LawBrowseViewModel } from './law-view-model';
 import { lawEditionPanelClassName } from './law-panel-chrome';
@@ -18,8 +15,7 @@ export type LawBrowseSectionsProps = {
 };
 
 export function LawBrowseSections({ view }: LawBrowseSectionsProps) {
-  const countLabel =
-    view.totalMatched === 1 ? '1 law entry' : `${view.totalMatched} law entries`;
+  const countLabel = view.totalMatched === 1 ? '1 law entry' : `${view.totalMatched} law entries`;
 
   return (
     <>
@@ -125,7 +121,7 @@ export function LawBrowseSections({ view }: LawBrowseSectionsProps) {
             About BlackStory
           </Link>
           {' · '}
-          <Link className="ds-cta-link" href="/history">
+          <Link className="ds-cta-link" href="/records">
             Search the archive
           </Link>
         </p>

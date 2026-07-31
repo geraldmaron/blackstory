@@ -2,6 +2,8 @@
  * Public "find your jurisdiction" page: U.S. address and current-location discovery.
  * v6 utility edition with shared gutter mosaic; client island owns consent + lookup.
  */
+import type { Metadata } from 'next';
+import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import React from 'react';
 import { LocateExperience, LocationPrivacyNotice } from '../../components/location';
 import { UtilityEditionBodyPanel } from '../../components/patterns/utility-edition/UtilityEditionBodyPanel';
@@ -11,11 +13,12 @@ import '../../components/patterns/utility-edition/utility-edition.css';
 
 void React;
 
-export const metadata = {
+export const metadata: Metadata = buildStaticPageMetadata({
+  path: '/locate',
   title: 'Find your jurisdiction',
   description:
     'Resolve an address, ZIP, or your current location to the U.S. state, county, and city it falls within.',
-};
+});
 
 export default function LocatePage() {
   return (
@@ -31,7 +34,7 @@ export default function LocatePage() {
         <noscript>
           <p className="ds-sans">
             This page needs JavaScript for location lookup. You can still{' '}
-            <a className="ds-cta ds-cta--ink" href="/history">
+            <a className="ds-cta ds-cta--ink" href="/records">
               search records directly
             </a>
             .

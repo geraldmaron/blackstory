@@ -15,7 +15,13 @@ export type CatalogLinkTarget = {
 };
 
 /** Matches `[[entityId]]` or `[[entityId|Display Label]]` (global, stateful). */
-export const ENTITY_PROSE_LINK_RE = /\[\[([^|\]]+)(?:\|([^\]]+))?\]\]/g;
+/**
+ * `[^|\][]` and `[^\][]` exclude the opening bracket as well as the closing one. With '[' inside
+ * the class a run of `[[[[[[` gave the engine somewhere to backtrack from every position, which
+ * is quadratic (CodeQL js/polynomial-redos). An entity id or label never contains a bracket, so
+ * excluding it costs nothing.
+ */
+export const ENTITY_PROSE_LINK_RE = /\[\[([^|\][]+)(?:\|([^\][]+))?\]\]/g;
 
 /** Returns entity refs in document order without mutating the source string. */
 export function parseProseEntityLinks(text: string): readonly ProseEntityRef[] {

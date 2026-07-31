@@ -304,3 +304,28 @@ test('isPlausibleMatch does not apply the person-only gates to non-person subjec
     true,
   );
 });
+
+test('host classification matches domains and subdomains, never lookalikes', () => {
+  // The old regexes ran on a parsed hostname and were correct, but unanchored and unprovable.
+  // These assertions pin what the replacement actually promises.
+  assert.equal(isTier1Host('https://www.nps.gov/foma/index.htm'), true);
+  assert.equal(isTier1Host('https://nps.gov/'), true);
+  assert.equal(isTier1Host('https://anything.gov/'), true);
+  assert.equal(isTier1Host('https://anything.mil/'), true);
+  assert.equal(isTier1Host('https://collections.si.edu/x'), true);
+
+  // Lookalikes are not Tier 1.
+  assert.equal(isTier1Host('https://nps.gov.attacker.example/'), false);
+  assert.equal(isTier1Host('https://evil-nps.gov.example.com/'), false);
+  assert.equal(isTier1Host('https://notgov/'), false);
+  assert.equal(isTier1Host('https://example.com/?q=nps.gov'), false);
+  assert.equal(isTier1Host(undefined), false);
+  assert.equal(isTier1Host('not a url'), false);
+});
+
+test('wikipedia detection rejects a host that merely contains the domain', () => {
+  assert.equal(isWikipediaHost('https://en.wikipedia.org/wiki/X'), true);
+  assert.equal(isWikipediaHost('https://www.wikidata.org/wiki/Q1'), true);
+  assert.equal(isWikipediaHost('https://wikipedia.org.attacker.example/'), false);
+  assert.equal(isWikipediaHost('https://example.com/?ref=wikipedia.org'), false);
+});

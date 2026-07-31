@@ -5,6 +5,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type ReactNode, type MouseEventHandler } from 'react';
+import { ShellWordmark } from './ShellWordmark.js';
 import { ThemeToggle } from './ThemeToggle.js';
 import { cx } from '../utils/cx.js';
 
@@ -165,44 +166,14 @@ export function ShellHeader({
   return (
     <header
       ref={headerRef}
-      className={cx(
-        'ds-shell-header',
-        brandDisplay === 'symbol' && 'ds-shell-header--symbol-only',
-      )}
+      className={cx('ds-shell-header', brandDisplay === 'symbol' && 'ds-shell-header--symbol-only')}
     >
       <div className="ds-shell-header__inner">
         {renderLink({
           href: homeHref,
           className: 'ds-shell-wordmark',
           'aria-label': 'BlackStory · home',
-          children: (
-            <>
-              <img
-                className="ds-shell-wordmark__img ds-shell-wordmark__img--lockup ds-shell-wordmark__img--theme-light"
-                src={brandLockup.light}
-                alt=""
-                aria-hidden="true"
-              />
-              <img
-                className="ds-shell-wordmark__img ds-shell-wordmark__img--lockup ds-shell-wordmark__img--theme-dark"
-                src={brandLockup.dark}
-                alt=""
-                aria-hidden="true"
-              />
-              <img
-                className="ds-shell-wordmark__img ds-shell-wordmark__img--symbol ds-shell-wordmark__img--theme-light"
-                src={brandSymbol.light}
-                alt=""
-                aria-hidden="true"
-              />
-              <img
-                className="ds-shell-wordmark__img ds-shell-wordmark__img--symbol ds-shell-wordmark__img--theme-dark"
-                src={brandSymbol.dark}
-                alt=""
-                aria-hidden="true"
-              />
-            </>
-          ),
+          children: <ShellWordmark lockup={brandLockup} symbol={brandSymbol} />,
         })}
 
         <nav

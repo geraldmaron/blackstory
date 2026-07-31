@@ -32,6 +32,7 @@ import type {
   SourceAdapterContract,
   SourceRegistryEntry,
 } from '../types.js';
+import { trimTrailingChars } from '../../strings/trim-chars.js';
 
 export const BLACK_PRESS_ADAPTER_ID = 'black-press-v1' as const;
 export const BLACK_PRESS_PARSER_VERSION = 'black-press-parser-1.0.0' as const;
@@ -266,7 +267,7 @@ function httpsOnlyLinkHints(urls: readonly string[] | undefined): readonly strin
   const hints: string[] = [];
   for (const raw of urls) {
     if (hints.length >= BLACK_PRESS_MAX_LINK_HINTS) break;
-    const trimmed = raw.trim().replace(/[.,;:]+$/u, '');
+    const trimmed = trimTrailingChars(raw.trim(), '.,;:');
     if (!/^https:\/\//i.test(trimmed)) continue;
     try {
       const normalized = new URL(trimmed).toString();
@@ -411,7 +412,7 @@ export function extractMentionsFromIssueOcr(
         snippet: capBlackPressSnippet(body.length > 0 ? body : headline),
         ...(issueOcr.issueUrl !== undefined ? { issueUrl: issueOcr.issueUrl } : {}),
         ...(citedUrls.length > 0
-          ? { citedUrls: citedUrls.map((url) => url.replace(/[.,;:]+$/u, '')) }
+          ? { citedUrls: citedUrls.map((url) => trimTrailingChars(url, '.,;:')) }
           : {}),
       });
     }

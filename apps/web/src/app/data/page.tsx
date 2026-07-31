@@ -2,6 +2,8 @@
  * Data page: national Census population plus Phase 1 / theme-impact indicator visualizations
  * (wealth, housing, justice). Charts wire to warehouse observations or verified fixtures.
  */
+import type { Metadata } from 'next';
+import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { US_STATES } from '@repo/domain/map/geography';
 import { buildStateFipsNameMap } from '@repo/domain/statistics/public-data-summaries';
 import {
@@ -17,17 +19,16 @@ import {
 import { getDataPageIndicatorBundle } from '../../lib/demographics/data-page-indicators';
 import { timelineChangeStripItems } from '../../components/data/population-change';
 import '../../components/data/data-charts.css';
-import { DATA_PAGE_DESCRIPTION } from './data-copy';
-import {
-  dataEditionRootClassName,
-} from './data-panel-chrome';
+import { DATA_INTRO, DATA_PAGE_DESCRIPTION } from './data-copy';
 import { DataSections } from './DataSections';
-import './data-edition.css';
+import { OffRamp, Room, RoomHeader } from '../../components/room';
+import '../reading-room.css';
 
-export const metadata = {
+export const metadata: Metadata = buildStaticPageMetadata({
+  path: '/data',
   title: 'Data',
   description: DATA_PAGE_DESCRIPTION,
-};
+});
 
 async function safe<T>(promise: Promise<T | undefined | null>): Promise<T | undefined> {
   try {
@@ -57,7 +58,8 @@ export default async function DataPage() {
 
   const phase1 = phase1Indicators as Phase1IndicatorCoverageSummary | undefined;
   const historicalStates = historicalStateCoverage as HistoricalStatePopulationCoverage | undefined;
-  const timeline = (timelineSnapshot ?? undefined) as NationalPopulationTimelineSnapshot | undefined;
+  const timeline = (timelineSnapshot ?? undefined) as
+    NationalPopulationTimelineSnapshot | undefined;
   const timelineRows = timeline?.rows ?? [];
   const stateChanges = (stateChanges2010to2020 ?? []) as readonly StatePopulationChange[];
   const chartSources = (timeline?.sources ?? []).map((source) => ({
@@ -82,19 +84,34 @@ export default async function DataPage() {
   }
 
   return (
-    <div className={dataEditionRootClassName()} data-data-edition="v6">
-      <main className="ds-container ds-page" id="main">
-        <DataSections
-          timelineRows={timelineRows}
-          chartSources={chartSources}
-          changeStripItems={changeStripItems}
-          stateChanges={stateChanges}
-          stateNameByFips={STATE_NAME_BY_FIPS}
-          historicalStates={historicalStates}
-          phase1Indicators={phase1}
-          indicators={indicators}
-        />
-      </main>
-    </div>
+    <Room>
+      <RoomHeader pathname="/data" kicker="Numbers" title="Data" lede={DATA_INTRO.lede} />
+
+      <DataSections
+        timelineRows={timelineRows}
+        chartSources={chartSources}
+        changeStripItems={changeStripItems}
+        stateChanges={stateChanges}
+        stateNameByFips={STATE_NAME_BY_FIPS}
+        historicalStates={historicalStates}
+        phase1Indicators={phase1}
+        indicators={indicators}
+      />
+
+      <OffRamp
+        title={
+          <>
+            Go back to the <em>map</em>
+          </>
+        }
+        actions={[
+          { label: 'Explore the map', href: '/', emphasis: 'copper' },
+          { label: 'Read methodology', href: '/methodology' },
+          { label: 'Banned books', href: '/books' },
+        ]}
+      >
+        Use the archive itself—place layers show the records in their geography.
+      </OffRamp>
+    </Room>
   );
 }

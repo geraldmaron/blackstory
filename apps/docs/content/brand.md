@@ -47,12 +47,17 @@ Flat matte fills only. No bevels, shadows, glows, or gradients.
 
 ## Type
 
-- **Sora SemiBold**: headlines
-- **Inter**: UI / body
-- **Source Serif 4**: editorial / longform
-- **IBM Plex Mono**: data, citations, dates, confidence
+- **Schibsted Grotesk SemiBold**: headlines
+- **Geist**: UI / body
+- **Newsreader**: editorial / longform
+- **Geist Mono**: data, citations, dates, confidence
 
-All open-source. No licensed fonts.
+All open-source. No licensed fonts. All four are variable faces, so weight and
+optical size are axes rather than separate files.
+
+Replaced Sora / Inter / Source Serif 4 / IBM Plex Mono. Schibsted Grotesk carries an
+editorial spine Sora's geometric construction did not, and Geist reads sharper than
+Inter at UI sizes without Inter's ubiquity.
 
 ## Shape
 

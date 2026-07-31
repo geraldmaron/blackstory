@@ -4,12 +4,10 @@
  */
 
 export const MAP_SEARCH_ACCESSIBLE_PEERS = Object.freeze([
-  {
-    journey: 'history',
-    component: 'HistoryResultList',
-    webPath: 'apps/web/src/components/history/HistoryResultList.tsx',
-    contract: 'Unified find-in-time result list with labelledBy for screen-reader parity',
-  },
+  // The `history` journey's peer left with repo-92n2.27, which deleted the orphaned /history
+  // render layer once /history became a redirect. Its accessibility contract did not disappear
+  // with it: the find-in-time journey now lands on /records, whose rows, filters and page steps
+  // are server-rendered anchors, and the test below asserts exactly that.
   {
     journey: 'explore',
     component: 'SynchronizedResultList',
@@ -17,9 +15,11 @@ export const MAP_SEARCH_ACCESSIBLE_PEERS = Object.freeze([
     contract: 'Full accessibility peer for the map — aria-current tracks selection',
   },
   {
-    journey: 'explore',
-    component: 'Explore noscript filters',
-    webPath: 'apps/web/src/app/(map)/explore/page.tsx',
+    journey: 'atlas',
+    component: 'Atlas noscript filters',
+    // Moved with SP-07 slice 2: `/` is the Atlas and `(map)/explore/page.tsx` was deleted, so the
+    // native GET FilterBar now ships from the Atlas page itself.
+    webPath: 'apps/web/src/app/(map)/page.tsx',
     contract: 'Native GET FilterBar when JavaScript is unavailable',
   },
   {

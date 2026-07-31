@@ -35,18 +35,17 @@ test('decade morph duration is a slow ambient dissolve (~1.6s), not the 480ms UI
   assert.equal(decadeLayerFadeDurationMs(true), 0);
 });
 
-test('explore instrument surface must not request the ambient morph on patchData', () => {
-  // Regression: Explore previously called shouldMorphDecadeDataPatch → fade:true on every
-  // decade/filter click (1.6s dual-buffer), which felt lagged. HeroStage keeps the morph.
-  const exploreSource = readFileSync(
-    new URL('../(map)/explore/ExploreMapExperience.tsx', import.meta.url),
+test('the Atlas must not request the ambient morph on patchData', () => {
+  // The 1.6s dual-buffer dissolve reads as lag on a decade or filter click, which is a direct
+  // interaction. The Atlas's decade crossfade is the 420ms pin transition in
+  // decade-transition.ts; the ambient morph belongs to surfaces that move the camera on their
+  // own. The helpers below stay exercised by the unit tests in this file.
+  const atlasSource = readFileSync(
+    new URL('../(map)/explore/AtlasExperience.tsx', import.meta.url),
     'utf8',
   );
-  assert.doesNotMatch(exploreSource, /from ['"][^'"]*decade-layer-transition['"]/);
-  assert.doesNotMatch(exploreSource, /fade:\s*true/);
-  const heroSource = readFileSync(new URL('../(map)/HeroStage.tsx', import.meta.url), 'utf8');
-  assert.match(heroSource, /shouldFadeDecadePatch/);
-  assert.match(heroSource, /fade:\s*true/);
+  assert.doesNotMatch(atlasSource, /from ['"][^'"]*decade-layer-transition['"]/);
+  assert.doesNotMatch(atlasSource, /fade:\s*true/);
 });
 
 test('shouldFadeDecadePatch skips the initial apply and reduced motion', () => {

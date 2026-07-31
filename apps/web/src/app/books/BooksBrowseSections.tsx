@@ -43,7 +43,8 @@ function BooksActiveFilters({ view }: { readonly view: BooksBrowseViewModel }) {
   }
 
   if (view.state !== 'all') {
-    const stateLabel = view.stateOptions.find((entry) => entry.value === view.state)?.label ?? view.state;
+    const stateLabel =
+      view.stateOptions.find((entry) => entry.value === view.state)?.label ?? view.state;
     chips.push({
       key: 'state',
       label: stateLabel,
@@ -110,7 +111,10 @@ function BooksPagination({ view }: { readonly view: BooksBrowseViewModel }) {
             Previous
           </Link>
         ) : (
-          <span className="ds-cta ds-cta--quiet ds-books-edition__pager-disabled" aria-disabled="true">
+          <span
+            className="ds-cta ds-cta--quiet ds-books-edition__pager-disabled"
+            aria-disabled="true"
+          >
             Previous
           </span>
         )}
@@ -138,7 +142,10 @@ function BooksPagination({ view }: { readonly view: BooksBrowseViewModel }) {
             Next
           </Link>
         ) : (
-          <span className="ds-cta ds-cta--quiet ds-books-edition__pager-disabled" aria-disabled="true">
+          <span
+            className="ds-cta ds-cta--quiet ds-books-edition__pager-disabled"
+            aria-disabled="true"
+          >
             Next
           </span>
         )}
@@ -281,8 +288,8 @@ export function BooksBrowseSections({ view, suggestCorpus }: BooksBrowseSections
               <Link className="ds-cta ds-cta--quiet" href="/methodology">
                 Methodology
               </Link>
-              <Link className="ds-cta ds-cta--quiet" href="/history?kind=publication">
-                Search publications
+              <Link className="ds-cta ds-cta--quiet" href="/records?kind=sources">
+                Search sources
               </Link>
             </p>
           </div>

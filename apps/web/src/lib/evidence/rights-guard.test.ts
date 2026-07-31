@@ -72,7 +72,7 @@ test('a citation flagged as protected withholds its outbound link and source lab
   assert.equal(view.href, undefined);
   assert.equal(view.source, 'Internal case file (protected)');
   assert.ok(view.withheldReason);
-  assert.doesNotMatch(view.withheldReason ?? '', /internal\.example\.org/);
+  assert.equal((view.withheldReason ?? '').includes('internal.example.org'), false);
 });
 
 test('a citation flagged as protected uses a caller-supplied reason when provided', () => {

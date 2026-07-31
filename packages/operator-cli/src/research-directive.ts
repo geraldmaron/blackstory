@@ -259,7 +259,8 @@ export function parseSundownTownPageText(text: string): {
 } {
   const normalized = text.replace(/\s+/gu, ' ').trim();
   const confidenceMatch = normalized.match(
-    /Sundown Town in the Past\?\s*[:-]?\s*(Possible|Probable|Surely|Unlikely)/iu,
+    // `[\s:-]*` rather than `\s*[:-]?\s*`, which lets a run of spaces be split many ways.
+    /Sundown Town in the Past\?[\s:-]*(Possible|Probable|Surely|Unlikely)/iu,
   );
   const confidenceLabel = confidenceMatch?.[1];
   const summary = normalized.slice(0, 600);

@@ -5,7 +5,7 @@
  * runs green→orange, and certain historical tones use red/gold/black while
  * every marker still carries a non-color glyph (WCAG 1.4.1).
  */
-import { brandPalette } from '@repo/ui';
+import { brandPalette, mapPalettes } from '@repo/ui';
 
 export const EXPLORE_CLUSTER_CONFIG = {
   /** Pixel radius for grouping nearby points — tighter than default so metro clouds collapse. */
@@ -155,10 +155,38 @@ export const CONFIDENCE_TIER_COLOR: Readonly<Record<string, string>> = {
 /** Light plate ocean — pure white per cartography direction (pre-flash matches in map-surfaces.css). */
 export const LIGHT_PLATE_OCEAN = '#FFFFFF';
 
+/**
+ * Plate colour for a scheme.
+ *
+ * `land`, `water`, `stateBounds` and `countyLine` come from `mapPalettes` in `@repo/ui`, which is
+ * the source of truth for the plate: MapLibre styles are JSON, not CSS, so the TypeScript export
+ * leads and `tokens.css` mirrors it. Those four carry the ΔL\* contract from design law §3 and are
+ * contract-tested in `map-contrast.test.ts` — do not hand-tune them here.
+ *
+ * The remaining members are still local literals. They are pin, cluster, density and history
+ * encoding, not plate cartography, and §3 does not govern them.
+ */
 export function plateForScheme(scheme: MapColorScheme) {
   if (scheme === 'light') {
     return {
-      ocean: LIGHT_PLATE_OCEAN,
+      /**
+       * The background is LAND. The plate draws real cartography: OpenFreeMap's `water`
+       * source-layer paints the oceans, lakes and rivers over it, so coastline comes from the
+       * tiles rather than from the edge of the state polygons. Before this the background was
+       * water and the only landmass was the 49 state shapes, which is why the plate read as a
+       * floating chart of the United States with no coast, no lakes and no continent around it.
+       */
+      ocean: mapPalettes.light.land,
+      land: mapPalettes.light.land,
+      water: mapPalettes.light.water,
+      green: mapPalettes.light.green,
+      /** Country boundary. Solid and heavier than `stateBounds`. */
+      countryBounds: mapPalettes.light.line2,
+      road: mapPalettes.light.road,
+      /** Place labels from the vector tiles: state register and city/town register. */
+      placeLabel: mapPalettes.light.label,
+      placeLabelHi: mapPalettes.light.labelHi,
+      placeLabelHalo: mapPalettes.light.halo,
       selected: DIGNITY_PALETTE.selectedDark,
       densityUnknown: DIGNITY_PALETTE.densityUnknownFillLight,
       densityDisabled: DIGNITY_PALETTE.densityDisabledFillLight,
@@ -166,9 +194,13 @@ export function plateForScheme(scheme: MapColorScheme) {
       street: DIGNITY_PALETTE.streetLight,
       streetLabel: DIGNITY_PALETTE.streetLabelLight,
       clusterText: DIGNITY_PALETTE.selectedDark,
-      /** State bounds — copper brown; stronger than county hairlines on the white plate. */
-      stateBounds: brandPalette.copperTextLight,
-      /** County hairlines — stone (not rule): rule (#D7D0C4) vanishes on white; stone stays distinct from stateBounds brown. */
+      /** State bounds. `line` is contrast-held against `land` by design law §3. */
+      stateBounds: mapPalettes.light.line,
+      /**
+       * County hairlines stay a local value. The §3 token table has no county role — its `line-2`
+       * is the *country* border, heavier than `line`, and using it here would make counties
+       * out-read states. Stone is deliberate: `rule` (#D7D0C4) vanishes against land.
+       */
       countyLine: brandPalette.stone,
       /** County name labels — stone text + white halo (WCAG: color is not the only boundary signal). */
       countyLabel: brandPalette.stone,
@@ -183,7 +215,16 @@ export function plateForScheme(scheme: MapColorScheme) {
     } as const;
   }
   return {
-    ocean: DIGNITY_PALETTE.ocean,
+    /** See the light branch: the background is land, and the tiles supply the water. */
+    ocean: mapPalettes.dark.land,
+    land: mapPalettes.dark.land,
+    water: mapPalettes.dark.water,
+    green: mapPalettes.dark.green,
+    countryBounds: mapPalettes.dark.line2,
+    road: mapPalettes.dark.road,
+    placeLabel: mapPalettes.dark.label,
+    placeLabelHi: mapPalettes.dark.labelHi,
+    placeLabelHalo: mapPalettes.dark.halo,
     selected: DIGNITY_PALETTE.selected,
     densityUnknown: DIGNITY_PALETTE.densityUnknownFill,
     densityDisabled: DIGNITY_PALETTE.densityDisabledFill,
@@ -191,9 +232,8 @@ export function plateForScheme(scheme: MapColorScheme) {
     street: DIGNITY_PALETTE.streetDark,
     streetLabel: DIGNITY_PALETTE.streetLabelDark,
     clusterText: DIGNITY_PALETTE.clusterText,
-    /** Dark branch frozen — warm pageSand state ruling (explore-state-bounds-line legacy). */
-    stateBounds: DIGNITY_PALETTE.pointHalo,
-    /** Dark county hairlines — archivePaper ink (was plate.selected before theme split). */
+    stateBounds: mapPalettes.dark.line,
+    /** Local, for the reason given on the light branch: §3 has no county role. */
     countyLine: DIGNITY_PALETTE.selected,
     countyLabel: DIGNITY_PALETTE.streetLabelDark,
     countyLabelHalo: DIGNITY_PALETTE.ocean,

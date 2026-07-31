@@ -61,7 +61,8 @@ export const MENTION_OVERRIDES: ReadonlyMap<string, string> = loadMentionOverrid
 
 function normalizeName(value: string): string {
   return value
-    .replace(/\([^)]*\)/g, ' ') // drop parenthetical asides (e.g. an acronym suffix) for name matching.
+    // `[^()]*`, not `[^)]*`: the latter also matches '(', so a run of them backtracks.
+    .replace(/\([^()]*\)/g, ' ') // drop parenthetical asides (e.g. an acronym suffix) for name matching.
     .toLowerCase()
     .replace(/[-_]/g, ' ')
     .replace(/[^a-z0-9\s]/g, ' ')

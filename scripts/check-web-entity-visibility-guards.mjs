@@ -82,16 +82,22 @@ function assertDynamicAfterImports(source, label) {
 function main() {
   const errors = [];
 
-  // --- Route ownership: one explore page, under (map); no stale app/explore ---
+  // --- Route ownership: at most one explore page, and only under (map) ---
+  //
+  // SP-07 slice 2 (f9f9fcc8) promoted `/` to the Atlas and folded `/explore` into it, deleting
+  // `(map)/explore/page.tsx`. The guard still demanded exactly one and had been failing `pnpm
+  // validate` ever since. What it is actually protecting is route ownership: the Atlas must not
+  // sprout a second explore page, and never one outside the `(map)` group. Zero is now a valid
+  // answer to that; two, or one in the wrong place, still is not.
   const explorePages = walkFiles(APP_DIR).filter((f) =>
     /(^|\/)explore\/page\.tsx$/.test(relativeAppPath(f)),
   );
-  if (explorePages.length !== 1) {
+  if (explorePages.length > 1) {
     errors.push(
-      `Expected exactly one explore/page.tsx under apps/web/src/app; found ${explorePages.length}: ` +
+      `Expected at most one explore/page.tsx under apps/web/src/app; found ${explorePages.length}: ` +
         explorePages.map(relativeAppPath).join(', '),
     );
-  } else if (relativeAppPath(explorePages[0]) !== '(map)/explore/page.tsx') {
+  } else if (explorePages.length === 1 && relativeAppPath(explorePages[0]) !== '(map)/explore/page.tsx') {
     errors.push(
       `Explore page must live at (map)/explore/page.tsx (ADR-017); found ${relativeAppPath(explorePages[0])}`,
     );

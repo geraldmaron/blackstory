@@ -1,0 +1,203 @@
+/**
+ * Command palette — the one piece of chrome allowed to cover the map.
+ *
+ * It sits above everything because it is modal: while it is open the map is not the subject. That
+ * is also why the scrim is real rather than a tint. A half-visible map behind a search field
+ * invites the reader to keep reading it, and then the palette is competing with its own backdrop.
+ */
+
+.ds-palette {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  /* Above centre. A dialog pinned to the exact middle reads as an alert, not a tool. */
+  align-content: start;
+  justify-items: center;
+  padding-top: 12vh;
+}
+
+.ds-palette__scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--ds-overlay);
+}
+
+.ds-palette__dialog {
+  position: relative;
+  width: min(640px, calc(100vw - 32px));
+  max-height: 70vh;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  background: var(--ds-surface-raised);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  overflow: hidden;
+}
+
+/* ---- input --------------------------------------------------------------- */
+
+.ds-palette__input {
+  width: 100%;
+  padding: var(--ds-space-4) var(--ds-space-5);
+  border: 0;
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  background: transparent;
+  color: var(--ds-ink);
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.ds-palette__input::placeholder {
+  color: var(--ds-ink-subtle);
+}
+
+/*
+ * No focus ring. Focus is always here — it never leaves the input while the palette is open — so
+ * a ring would mark the only possible state and teach the reader nothing.
+ */
+.ds-palette__input:focus {
+  outline: none;
+}
+
+/* ---- results ------------------------------------------------------------- */
+
+.ds-palette__list {
+  margin: 0;
+  padding: var(--ds-space-2) 0;
+  list-style: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.ds-palette__section {
+  padding: var(--ds-space-3) var(--ds-space-5) var(--ds-space-1);
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ds-ink-subtle);
+}
+
+.ds-palette__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  padding: var(--ds-space-2) var(--ds-space-5);
+  cursor: pointer;
+}
+
+/*
+ * The active row is marked by a filled surface and an accent edge, never by colour alone: the
+ * palette is driven by arrow keys, so the cursor has to survive being read at a glance.
+ */
+.ds-palette__row--active {
+  background: var(--ds-canvas);
+  box-shadow: inset 2px 0 0 0 var(--ds-accent);
+}
+
+.ds-palette__title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ds-ink);
+  font-size: 0.875rem;
+}
+
+/* Why the row matched, when that was a subject rather than the name or place already on screen. */
+.ds-palette__reason {
+  color: var(--ds-ink-subtle, var(--ds-ink-muted));
+}
+
+.ds-palette__meta {
+  grid-column: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ds-ink-muted);
+  font-size: 0.75rem;
+}
+
+/*
+ * The matched substring. Underline as well as tint, so the reason a row matched survives both
+ * a monochrome display and the readers who cannot separate the accent from the body colour.
+ */
+.ds-palette__mark {
+  background: transparent;
+  color: var(--ds-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.ds-palette__empty {
+  padding: var(--ds-space-4) var(--ds-space-5);
+  color: var(--ds-ink-muted);
+  font-size: 0.875rem;
+}
+
+/* ---- keys ---------------------------------------------------------------- */
+
+.ds-palette__keys {
+  display: flex;
+  gap: var(--ds-space-1);
+}
+
+.ds-palette__kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.5em;
+  padding: 0.1em 0.4em;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-canvas);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  line-height: 1.5;
+}
+
+/* ---- footer -------------------------------------------------------------- */
+
+.ds-palette__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-2) var(--ds-space-4);
+  padding: var(--ds-space-2) var(--ds-space-5);
+  border-top: var(--ds-border-width) solid var(--ds-rule);
+  background: var(--ds-surface);
+  font-size: 0.6875rem;
+  color: var(--ds-ink-subtle);
+}
+
+.ds-palette__legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35em;
+}
+
+.ds-palette__count {
+  font-family: var(--ds-font-mono);
+  letter-spacing: 0.04em;
+}
+
+/* On a phone the palette is the whole screen: 640px of dialog inside 375px of viewport is a card
+   with nowhere to go, and the keyboard takes half of what is left. */
+@media (max-width: 480px) {
+  .ds-palette {
+    padding-top: 0;
+  }
+
+  .ds-palette__dialog {
+    width: 100vw;
+    max-height: 100dvh;
+    height: 100dvh;
+    border: 0;
+    border-radius: 0;
+  }
+}

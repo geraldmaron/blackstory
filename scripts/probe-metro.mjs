@@ -46,6 +46,24 @@ const bundleEntry = args['bundle-entry'].replace(/^\//, '');
 const statusTimeoutMs = Number.parseInt(args['status-timeout-ms'], 10);
 const bundleTimeoutMs = Number.parseInt(args['bundle-timeout-ms'], 10);
 
+/**
+ * This tool probes a Metro dev server, which is always on this machine or on the LAN the
+ * simulator shares. The host can come from configuration, so file input reaches a network call
+ * (CodeQL js/file-access-to-http); keeping it on loopback or a private range means a stray
+ * config value cannot turn a dev probe into a request to somewhere else.
+ */
+function assertLocalProbeHost(probeHost) {
+  const host = String(probeHost).toLowerCase();
+  const isLoopback = host === 'localhost' || host === '127.0.0.1' || host === '::1';
+  const isPrivateV4 =
+    /^10\./.test(host) ||
+    /^192\.168\./.test(host) ||
+    /^172\.(1[6-9]|2\d|3[01])\./.test(host);
+  if (!isLoopback && !isPrivateV4) {
+    throw new Error(`refusing to probe a non-local Metro host: ${probeHost}`);
+  }
+}
+
 function timeoutSignal(ms) {
   return AbortSignal.timeout(Number.isFinite(ms) && ms > 0 ? ms : 4_000);
 }
@@ -88,6 +106,7 @@ async function probeBundle(base) {
 }
 
 async function probePort(probeHost, probePort) {
+  assertLocalProbeHost(probeHost);
   const base = `http://${probeHost}:${probePort}`;
   try {
     const status = await readPackagerStatus(base);

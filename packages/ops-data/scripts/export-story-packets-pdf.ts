@@ -7,8 +7,9 @@
  *     --input /tmp/story-packets-staged.json \
  *     --output ~/Downloads/blackstory-new-stories-for-review.pdf
  */
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { readFileSync, writeFileSync, mkdirSync, mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join, resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import type { StoryResearchPacket } from '@repo/domain';
 
@@ -152,7 +153,12 @@ function main(): void {
   if (packets.length === 0) {
     throw new Error(`No packets in ${input}`);
   }
-  const htmlPath = '/tmp/blackstory-story-packets-review.html';
+  // A unique directory per run, not a fixed /tmp filename. A predictable path in a world-writable
+  // directory can be pre-created or symlinked by any local user, so the write lands wherever they
+  // pointed it (CodeQL js/insecure-temporary-file). `mkdtempSync` creates the directory with
+  // 0700 and a name only this process knows.
+  const htmlDir = mkdtempSync(join(tmpdir(), 'blackstory-story-packets-'));
+  const htmlPath = join(htmlDir, 'review.html');
   writeFileSync(htmlPath, buildHtml(packets));
   htmlToPdf(htmlPath, output);
   console.log(`PDF: ${output}`);

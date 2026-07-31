@@ -77,7 +77,7 @@ test('withholds a citation link flagged as protected and never surfaces the unde
   assert.equal(card.citation.href, undefined);
   assert.ok(card.citation.withheldReason);
   const serialized = JSON.stringify(card);
-  assert.doesNotMatch(serialized, /internal\.example\.org/);
+  assert.equal(serialized.includes('internal.example.org'), false);
 });
 
 test('withholds a substantial excerpt lacking resolved rights (AC4)', () => {

@@ -20,26 +20,33 @@ function parseExploreHref(href: string) {
 
 test('exploreHrefForState normalizes postal code and includes state (camera from state param)', () => {
   const href = exploreHrefForState(' tx ');
-  assert.equal(href, '/explore?state=TX');
+  assert.equal(href, '/?state=TX');
 
   const parsed = parseExploreHref(href);
   assert.equal(parsed.state, 'TX');
   assert.equal(parsed.viewport, undefined);
-  assert.deepEqual(parsed.filters, { era: 'all', kind: 'all', tone: 'all', theme: 'all', status: 'all', confidence: 'all' });
+  assert.deepEqual(parsed.filters, {
+    era: 'all',
+    kind: 'all',
+    tone: 'all',
+    theme: 'all',
+    status: 'all',
+    confidence: 'all',
+  });
   assert.equal(parsed.showFilters, false);
   assert.equal(parsed.showResults, false);
   assert.equal(parsed.showKey, false);
 });
 
 test('exploreHrefForState returns bare /explore for empty or unknown postal codes', () => {
-  assert.equal(exploreHrefForState(''), '/explore');
-  assert.equal(exploreHrefForState('   '), '/explore');
-  assert.equal(exploreHrefForState('ZZ'), '/explore');
+  assert.equal(exploreHrefForState(''), '/');
+  assert.equal(exploreHrefForState('   '), '/');
+  assert.equal(exploreHrefForState('ZZ'), '/');
 });
 
 test('exploreHrefForEra filters explore to one era bucket', () => {
   const href = exploreHrefForEra('1860s');
-  assert.equal(href, '/explore?era=1860s');
+  assert.equal(href, '/?era=1860s');
 
   const parsed = parseExploreHref(href);
   assert.equal(parsed.filters.era, '1860s');
@@ -47,13 +54,13 @@ test('exploreHrefForEra filters explore to one era bucket', () => {
 });
 
 test('exploreHrefForEra returns /explore when era bucket is empty', () => {
-  assert.equal(exploreHrefForEra(''), '/explore');
-  assert.equal(exploreHrefForEra('   '), '/explore');
+  assert.equal(exploreHrefForEra(''), '/');
+  assert.equal(exploreHrefForEra('   '), '/');
 });
 
 test('exploreHrefForKind filters explore to one entity kind', () => {
   const href = exploreHrefForKind('place');
-  assert.equal(href, '/explore?kind=place');
+  assert.equal(href, '/?kind=place');
 
   const parsed = parseExploreHref(href);
   assert.equal(parsed.filters.kind, 'place');
@@ -61,13 +68,13 @@ test('exploreHrefForKind filters explore to one entity kind', () => {
 });
 
 test('exploreHrefForKind returns /explore when kind is empty', () => {
-  assert.equal(exploreHrefForKind(''), '/explore');
+  assert.equal(exploreHrefForKind(''), '/');
 });
 
 test('searchHrefForStatus emits /search links only for known non-all status tokens', () => {
-  assert.equal(searchHrefForStatus('active'), '/history?status=active');
-  assert.equal(searchHrefForStatus('in_force'), '/history?status=in_force');
-  assert.equal(searchHrefForStatus('historic'), '/history?status=historic');
+  assert.equal(searchHrefForStatus('active'), '/records?status=active');
+  assert.equal(searchHrefForStatus('in_force'), '/records?status=in_force');
+  assert.equal(searchHrefForStatus('historic'), '/records?status=historic');
 });
 
 test('searchHrefForStatus returns undefined for all, empty, or unknown values', () => {
@@ -99,11 +106,11 @@ test('eraFactLink handles undated, single-bucket, and multi-bucket labels', () =
 
   assert.deepEqual(eraFactLink(['1860s']), {
     label: '1860s',
-    href: '/explore?era=1860s',
+    href: '/?era=1860s',
   });
 
   assert.deepEqual(eraFactLink(['1860s', '1890s', '1920s']), {
     label: '1860s – 1920s',
-    href: '/explore?era=1860s',
+    href: '/?era=1860s',
   });
 });

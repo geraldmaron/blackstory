@@ -1,0 +1,220 @@
+/**
+ * Results — right instrument, z 20.
+ *
+ * The list is absolutely positioned rows inside a spacer of the full list height. That is what
+ * makes windowing possible: the scrollbar reflects 4,078 records while the DOM holds a few dozen.
+ */
+
+.ds-results {
+  position: fixed;
+  top: calc(56px + var(--ds-space-4));
+  right: var(--ds-space-4);
+  z-index: 20;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  width: 344px;
+  /* Reserves the camera console's own column: 166px of console plus its bottom margin. */
+  max-height: calc(100dvh - 56px - var(--ds-space-4) * 2 - 200px);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  box-shadow: 0 10px 30px -18px rgb(0 0 0 / 45%);
+  overflow: hidden;
+}
+
+.ds-results__head {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  padding: var(--ds-space-3) var(--ds-space-4);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+}
+
+.ds-results__title {
+  margin: 0;
+  font-family: var(--ds-font-display);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ds-ink);
+}
+
+.ds-results__count {
+  margin-left: auto;
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-ink-muted);
+}
+
+.ds-results__sort {
+  height: 26px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: var(--ds-radius-sm);
+  background: transparent;
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: 0.59375rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.ds-results__sort:hover {
+  color: var(--ds-ink);
+  background: var(--ds-canvas);
+}
+
+.ds-results__hide {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  margin-right: -4px;
+  border: 0;
+  border-radius: var(--ds-radius-sm);
+  background: transparent;
+  color: var(--ds-ink-muted);
+  cursor: pointer;
+}
+
+.ds-results__hide:hover {
+  color: var(--ds-ink);
+  background: var(--ds-canvas);
+}
+
+/* ---- list ---------------------------------------------------------------- */
+
+.ds-results__scroller {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.ds-results__list {
+  position: relative;
+}
+
+.ds-results__empty {
+  padding: var(--ds-space-4);
+}
+
+.ds-results__row {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--ds-space-2);
+  height: 54px;
+  padding: 0 var(--ds-space-4);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  border-left: 2.5px solid transparent;
+  cursor: pointer;
+}
+
+.ds-results__row:hover {
+  background: var(--ds-canvas);
+}
+
+.ds-results__row--selected {
+  border-left-color: var(--ds-accent-graphic);
+  background: var(--ds-canvas);
+}
+
+.ds-results__glyph {
+  color: var(--ds-ink-muted);
+}
+
+.ds-results__row:hover .ds-results__glyph,
+.ds-results__row--selected .ds-results__glyph {
+  color: var(--ds-accent);
+}
+
+.ds-results__text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ds-results__name {
+  font-size: 0.84375rem;
+  font-weight: 550;
+  color: var(--ds-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*
+ * One line, never wrapping. Only the place is allowed to truncate — era and grade are fixed-width
+ * facts and a clipped grade letter would misreport the evidence.
+ */
+.ds-results__meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  color: var(--ds-ink-muted);
+  white-space: nowrap;
+}
+
+.ds-results__place {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-results__era,
+.ds-results__meta .ds-grade {
+  flex: none;
+}
+
+.ds-results__sep {
+  flex: none;
+  opacity: 0.6;
+}
+
+.ds-results__save {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: var(--ds-radius-sm);
+  background: transparent;
+  color: var(--ds-ink-muted);
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-results__row:hover .ds-results__save,
+.ds-results__row:focus-within .ds-results__save,
+.ds-results__save--on {
+  opacity: 1;
+}
+
+.ds-results__save--on {
+  color: var(--ds-accent);
+}
+
+/* Narrow: bottom sheet, clear of the time panel and the camera console. See lens-panel.css. */
+@media (max-width: 819px) {
+  .ds-results {
+    top: auto;
+    left: var(--ds-space-2);
+    right: var(--ds-space-2);
+    bottom: calc(var(--ds-space-2) + 138px);
+    width: auto;
+    max-height: min(34dvh, 300px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-results__save {
+    transition-duration: 0.01ms;
+  }
+}

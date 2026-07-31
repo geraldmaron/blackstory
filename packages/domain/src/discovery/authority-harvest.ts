@@ -7,6 +7,7 @@
  */
 import { isLowAuthoritySourceTier } from '../relevance/gates.js';
 import type { AuthorityFollowUpLead, DiscoveryCandidateRecord } from './types.js';
+import { trimTrailingChars } from '../strings/trim-chars.js';
 
 export type { AuthorityFollowUpLead };
 
@@ -95,7 +96,7 @@ function extractRawUrls(text: string): readonly string[] {
     if (match[1]) found.push(match[1]);
   }
   for (const match of text.matchAll(BARE_URL_RE)) {
-    found.push(match[0].replace(/[.,;:]+$/u, ''));
+    found.push(trimTrailingChars(match[0], '.,;:'));
   }
   return found;
 }

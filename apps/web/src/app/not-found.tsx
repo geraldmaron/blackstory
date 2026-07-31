@@ -24,7 +24,7 @@ export default function NotFound() {
         <EmptyState
           title="Nothing to show here"
           action={
-            <Link className="ds-button ds-button--primary" href="/history">
+            <Link className="ds-button ds-button--primary" href="/records">
               Find in the archive
             </Link>
           }

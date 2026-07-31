@@ -26,6 +26,10 @@ import { securityHeadersForNextConfig as securityHeadersFromMjs } from './next-c
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const NEXT_CONFIG_PATH = join(__dirname, '../../../next.config.mjs');
 
+// Host allowances are asserted with plain containment rather than host-shaped regexes: the CSP
+// is a header string, the question is whether a source is listed in it, and an unanchored
+// hostname pattern reads as URL validation to a reader and to CodeQL alike
+// (js/regex/missing-regexp-anchor).
 test('CSP includes strict defaults and frame-ancestors none', () => {
   const csp = buildContentSecurityPolicy({ isDev: false });
   assert.match(csp, /default-src 'self'/);
@@ -36,13 +40,13 @@ test('CSP includes strict defaults and frame-ancestors none', () => {
   assert.match(csp, /object-src 'none'/);
   assert.match(csp, /upgrade-insecure-requests/);
   assert.match(csp, /worker-src 'self' blob:/);
-  assert.match(csp, /demotiles\.maplibre\.org/);
-  assert.match(csp, /storage\.googleapis\.com/);
-  assert.match(csp, /twykhihqkcldpreuovay\.supabase\.co/);
+  assert.ok(csp.includes('demotiles.maplibre.org'), 'CSP must allow demotiles.maplibre.org');
+  assert.ok(csp.includes('storage.googleapis.com'), 'CSP must allow storage.googleapis.com');
+  assert.ok(csp.includes('twykhihqkcldpreuovay.supabase.co'), 'CSP must allow twykhihqkcldpreuovay.supabase.co');
   // Banned-books covers: Open Library + archive.org redirect chain (see BOOK_COVER_IMG_SRC).
-  assert.match(csp, /covers\.openlibrary\.org/);
-  assert.match(csp, /archive\.org/);
-  assert.match(csp, /\*\.us\.archive\.org/);
+  assert.ok(csp.includes('covers.openlibrary.org'), 'CSP must allow covers.openlibrary.org');
+  assert.ok(csp.includes('archive.org'), 'CSP must allow archive.org');
+  assert.ok(csp.includes('*.us.archive.org'), 'CSP must allow *.us.archive.org');
   assert.match(csp, /frame-src 'none'/);
 });
 

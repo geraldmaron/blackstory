@@ -67,7 +67,7 @@ test('with onSelect, metadata links are not nested inside the row button', () =>
   );
 
   const buttonClose = html.indexOf('</button>');
-  const firstMetaHref = html.indexOf('href="/explore?kind=place"');
+  const firstMetaHref = html.indexOf('href="/?kind=place"');
   assert.ok(buttonClose > -1, 'expected a row button');
   assert.ok(firstMetaHref > buttonClose, 'expected metadata links after the row button closes');
   assert.doesNotMatch(html, /<button[^>]*>[\s\S]*<a[\s\S]*<\/button>/);

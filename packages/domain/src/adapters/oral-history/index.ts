@@ -44,6 +44,7 @@ import type {
   SourceAdapterContract,
   SourceRegistryEntry,
 } from '../types.js';
+import { trimTrailingChars } from '../../strings/trim-chars.js';
 
 // ---------------------------------------------------------------------------
 // Identity
@@ -405,7 +406,7 @@ const MAX_LINK_HINTS = 40;
 export function extractCitedUrlHints(text: string): readonly string[] {
   const found: string[] = [];
   for (const match of text.matchAll(BARE_URL_RE)) {
-    found.push(match[0].replace(/[.,;:]+$/u, ''));
+    found.push(trimTrailingChars(match[0], '.,;:'));
     if (found.length >= MAX_LINK_HINTS) break;
   }
   return found;

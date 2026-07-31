@@ -6,7 +6,7 @@
 :root {
   --ds-island-offset: env(safe-area-inset-top, 0px);
   /* Content-bar target height (not the full fixed band). ResizeObserver sets clearance. */
-  --ds-island-height: 3.5rem;
+  --ds-island-height: 4rem;
   --ds-island-gap: var(--ds-space-3);
   /* Fallback until ShellHeader measures the live fixed band (safe-area + bar). */
   --ds-island-clearance: calc(

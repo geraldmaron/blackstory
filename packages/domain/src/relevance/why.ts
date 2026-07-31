@@ -54,8 +54,12 @@ export function buildWhyThisAppears(input: BuildWhyInput): string {
 
 export function assertExplanationHasNoNumericScore(explanation: string): void {
   const forbiddenPatterns = [
-    /\bscore\s*[:\s]\s*0?\.\d+/i,
-    /\brelevance\s*[:\s]\s*0?\.\d+/i,
+    // `[\s:]*`, not `\s*[:\s]\s*`: two whitespace matchers either side of a class that also
+    // matches whitespace lets the engine split a run of spaces or tabs many ways, which is
+    // quadratic (CodeQL js/polynomial-redos). One repetition of one class is linear, and it
+    // accepts everything the old form did.
+    /\bscore\b[\s:]*0?\.\d+/i,
+    /\brelevance\b[\s:]*0?\.\d+/i,
     /\b0\.\d{2,}\b/,
   ];
   for (const pattern of forbiddenPatterns) {

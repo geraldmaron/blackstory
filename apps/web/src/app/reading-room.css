@@ -1,0 +1,21 @@
+/**
+ * Reading room surface class — the only stylesheet a Reading route imports.
+ *
+ * Design law: docs/ui/patterns-reading-room.md, design-direction-v9-surfaces.md §4.
+ * Everything drawn here comes from the shared kit; this file sets the measure and the two
+ * rules that are specific to a room you read rather than scan.
+ */
+
+@import '../components/room/room-kit.css';
+
+/* Declared on the room, not the column: the railed grid sizes its first track from this
+   measure so the column-plus-rail pair centres as a unit. The column inherits it. */
+[data-surface='reading'] .ds-room {
+  --room-doc-w: 760px;
+}
+
+/* A reading room ends in an off-ramp. The rule is enforced by room-kit.test.tsx, not by CSS,
+   but the spacing assumes it is the last block in the column. */
+[data-surface='reading'] .ds-room-offramp:not(:last-child) {
+  margin-bottom: var(--ds-space-8);
+}

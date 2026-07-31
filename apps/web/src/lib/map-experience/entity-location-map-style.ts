@@ -12,6 +12,7 @@ import {
   plateForScheme,
   type MapColorScheme,
 } from './dignity-style';
+import { MAP_LABEL_NAME_FIELD } from './label-expression';
 
 export const ENTITY_LOCATION_PIN_SOURCE_ID = 'entity-location-pin';
 export const ENTITY_LOCATION_PIN_HALO_LAYER_ID = 'entity-location-pin-halo';
@@ -215,7 +216,7 @@ export function buildEntityLocationMapStyle(
         'source-layer': 'transportation_name',
         minzoom: 11,
         layout: {
-          'text-field': ['coalesce', ['get', 'name:en'], ['get', 'name']],
+          'text-field': MAP_LABEL_NAME_FIELD,
           'text-font': ['Noto Sans Regular'],
           'text-size': 11,
           'symbol-placement': 'line',

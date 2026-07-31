@@ -358,10 +358,15 @@ export function mapProjectionToPublicEntityView(
     relevanceExplanation:
       claims.length > 0
         ? 'Included as a documented site in the active public release; each accepted claim below cites its source.'
-        : 'This record is served from the live public release projection. Supporting claims and evidence panels may still be sparse until the full publication pipeline lands.',
-    historicalContext:
-      projection.historicalContext ??
-      'Live projection scaffolding — historical framing expands as curated release content is published.',
+        : 'No sourced claims have been accepted for this record yet. It is listed because it is part of the active public release, and it will carry its evidence here as research lands.',
+    /*
+     * Empty, not a note about the publication pipeline. Substituting build-status prose here
+     * made every unenriched record render a "Historical context" chapter whose content was a
+     * sentence about the release process — the page asserted it had context and then spent a
+     * numbered section saying it did not. Empty lets the section collapse and the gap be
+     * disclosed once, in the record's own "Still being researched" list.
+     */
+    historicalContext: projection.historicalContext ?? '',
     ...(projection.extendedNarrative !== undefined
       ? { extendedNarrative: sanitizePublicProseText(projection.extendedNarrative) }
       : {}),

@@ -1,0 +1,24 @@
+/**
+ * Utility surface class — the only stylesheet a Utility route imports.
+ *
+ * Design law: docs/ui/patterns-utility-edition.md, design-direction-v9-surfaces.md §4.
+ * A utility room is a task surface: finished and left. The measure is the narrowest of the
+ * three and the card stack, not prose, is the primary block.
+ */
+
+@import '../components/room/room-kit.css';
+
+/* Declared on the room, not the column: the railed grid sizes its first track from this
+   measure so the column-plus-rail pair centres as a unit. The column inherits it. */
+[data-surface='utility'] .ds-room {
+  --room-doc-w: 560px;
+}
+
+/* Utility titles sit one step down: nothing here is a headline. */
+[data-surface='utility'] .ds-room-header__title {
+  font-size: clamp(26px, 3.2vw, 34px);
+}
+
+[data-surface='utility'] .ds-room-header__lede {
+  font-size: 16.5px;
+}

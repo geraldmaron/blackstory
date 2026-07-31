@@ -48,3 +48,20 @@ test('siblingHref joins origin and path cleanly', () => {
     'http://localhost:3001/stories/review',
   );
 });
+
+test('trailing slashes are stripped without a backtracking regex', () => {
+  // Guards the js/polynomial-redos fix: `replace(/\/+$/, '')` is polynomial on a long run of
+  // slashes, and these values come from deploy configuration.
+  assert.equal(
+    resolvePublicSiteOrigin({ NEXT_PUBLIC_SITE_URL: 'https://example.org///' }),
+    'https://example.org',
+  );
+  assert.equal(
+    resolvePublicSiteOrigin({ NEXT_PUBLIC_SITE_URL: `https://example.org${'/'.repeat(50_000)}` }),
+    'https://example.org',
+  );
+  assert.equal(
+    resolvePublicSiteOrigin({ NEXT_PUBLIC_SITE_URL: 'https://example.org' }),
+    'https://example.org',
+  );
+});
