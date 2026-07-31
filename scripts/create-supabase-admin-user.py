@@ -157,7 +157,11 @@ def main() -> int:
     print(f"user_id={uid}")
     print(f"email={email}")
     print(f"bb_role={role}")
-    print(f"temp_password={temp_password}")
+    # The password itself is never printed and never written to disk: it goes to 1Password
+    # below, and stdout on an operator's terminal is scrollback, shell history and CI logs
+    # (CodeQL py/clear-text-logging-sensitive-data). Replacing the old /tmp file with a print
+    # traded storage-at-rest for logging-in-the-clear, which is not an improvement.
+    print("temp_password=stored in 1Password (see item below)")
 
     # Store temp password into 1Password as a new item field if possible (best-effort)
     try:

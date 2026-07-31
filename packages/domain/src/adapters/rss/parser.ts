@@ -40,9 +40,9 @@ function decodeEntities(text: string): string {
 }
 
 function stripTagsAndCollapseWhitespace(text: string): string {
-  return text
-    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
-    .replace(/<[^>]+>/g, ' ')
+  // Same index walk as cleanText, and `[^<>]` so a run of '<' has nothing to backtrack over.
+  return unwrapCdata(text)
+    .replace(/<[^<>]*>/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
