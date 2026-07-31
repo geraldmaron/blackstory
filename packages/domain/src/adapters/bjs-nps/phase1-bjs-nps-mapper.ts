@@ -50,8 +50,10 @@ const STATE_NAME_TO_FIPS = new Map(
 );
 
 function normalizeStateName(raw: string): string {
-  return raw
-    .replace(/\/.+$/, '')
+  // Everything from the first slash is dropped by index, not by `/\/.+$/`, which is quadratic
+  // on a run of slashes (CodeQL js/polynomial-redos).
+  const slash = raw.indexOf('/');
+  return (slash === -1 ? raw : raw.slice(0, slash))
     .replace(/\*/g, '')
     .replace(/\s+/g, ' ')
     .trim()

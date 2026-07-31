@@ -97,11 +97,12 @@ export function buildWhyThisResult(
 /** Guard that public hybrid explanations never leak numeric scores. */
 export function assertHybridExplanationHasNoNumericScore(reasons: readonly string[]): void {
   const forbiddenPatterns = [
-    /\bscore\s*[:\s]\s*0?\.\d+/i,
-    /\bdistance\s*[:\s]\s*0?\.\d+/i,
-    /\bfusion\s*[:\s]\s*0?\.\d+/i,
+    // See why.ts: one character class, not two whitespace matchers around a third.
+    /\bscore\b[\s:]*0?\.\d+/i,
+    /\bdistance\b[\s:]*0?\.\d+/i,
+    /\bfusion\b[\s:]*0?\.\d+/i,
     /\b0\.\d{2,}\b/,
-    /\brank\s*[:\s]\s*\d+/i,
+    /\brank\b[\s:]*\d+/i,
   ];
   for (const reason of reasons) {
     for (const pattern of forbiddenPatterns) {

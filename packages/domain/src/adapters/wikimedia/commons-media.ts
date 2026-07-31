@@ -307,7 +307,9 @@ export function sanitizePrimaryImageCreditForDisplay(input: {
 } {
   const rightsLabel = rightsStatusDisplayLabel(input.rightsStatus);
   const rawParts = input.credit
-    .split(/\s*·\s*/)
+    // Split on the separator alone; the map below already trims. `\s*` either side of it let a
+    // run of spaces be divided many ways (CodeQL js/polynomial-redos).
+    .split('·')
     .map((part) => part.trim())
     .filter((part) => part.length > 0);
 

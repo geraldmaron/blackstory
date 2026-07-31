@@ -157,7 +157,10 @@ export async function parseContentInSandbox(
   }
   if (
     contentType.includes('html') &&
-    /<(?:script|iframe|object|embed)\b|on\w+\s*=|javascript:/iu.test(text)
+    // `on[a-z]{1,32}` rather than `on\w+`: `\w` matches 'o' and 'n', so "ononon..." could be
+    // split across the alternation many ways (CodeQL js/polynomial-redos). No handler name is
+    // 32 characters long.
+    /<(?:script|iframe|object|embed)\b|\bon[a-z]{1,32}\s{0,32}=|javascript:/iu.test(text)
   ) {
     indicators.push('active_content');
   }
