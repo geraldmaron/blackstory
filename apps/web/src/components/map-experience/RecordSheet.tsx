@@ -61,6 +61,18 @@ export type SheetRecord = {
   readonly precision: string;
   readonly confidenceTier: ConfidenceTierKey;
   readonly evidenceLabel: string;
+  /**
+   * How many accepted claims the record actually has, from the map feature's `evidenceCount`.
+   *
+   * Separate from `sources.length` on purpose: the map payload carries the count but not the
+   * citations (it is a tile-scale payload), so the plate knows how many sources a record has
+   * without holding any of them. Conflating the two is what made this plate contradict itself,
+   * printing "Grade A · 1 source" in the anatomy and "0 sources / none published yet" three
+   * rows below on the same record.
+   */
+  readonly sourceCount?: number;
+  /** Where the citations actually live, when the plate is not carrying them. */
+  readonly href?: string;
   readonly sources: readonly SheetSource[];
   readonly connections: readonly SheetConnection[];
   readonly anatomyPlace?: RecordAnatomyPlace;
@@ -140,6 +152,10 @@ export function RecordSheet({
   }, [open, record?.id]);
 
   if (!record) return null;
+
+  // Falls back to what the plate is holding, so a caller that does pass citations stays honest
+  // when its count is absent.
+  const sourceCount = record.sourceCount ?? record.sources.length;
 
   return (
     <aside
@@ -283,14 +299,33 @@ export function RecordSheet({
           <h3 className="ds-sheet__group-label">
             Sources
             <span className="ds-sheet__group-hint">
-              {record.sources.length === 1 ? '1 source' : `${record.sources.length} sources`}
+              {sourceCount === 1 ? '1 source' : `${sourceCount} sources`}
             </span>
           </h3>
           {record.sources.length === 0 ? (
-            <p className="ds-sheet__empty">
-              No sources are published for this record yet. It is listed because a documented
-              reference exists, and the citation will appear here when it clears review.
-            </p>
+            /*
+             * Two different silences, and saying the wrong one is a published falsehood. A record
+             * with accepted claims HAS sources; the plate just does not carry them, because the
+             * map payload is a count and a confidence tier, not a bibliography. Telling that
+             * reader "no sources are published" is false about a record whose page cites one.
+             */
+            sourceCount > 0 ? (
+              <p className="ds-sheet__empty">
+                {sourceCount === 1
+                  ? 'This record cites one source. '
+                  : `This record cites ${sourceCount} sources. `}
+                {record.href ? (
+                  <a href={record.href}>Open the record to read the citations.</a>
+                ) : (
+                  'Open the record to read the citations.'
+                )}
+              </p>
+            ) : (
+              <p className="ds-sheet__empty">
+                No sources are published for this record yet. It is listed because a documented
+                reference exists, and the citation will appear here when it clears review.
+              </p>
+            )
           ) : (
             <ol className="ds-sheet__sources">
               {record.sources.map((source, index) => (

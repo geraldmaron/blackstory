@@ -468,6 +468,15 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
       precision: selectedFeature.properties.geoPrecisionTier,
       confidenceTier: selectedFeature.properties.confidenceTier,
       evidenceLabel: `${grade ? `Grade ${grade}` : 'Not graded'} · ${sources} ${sources === 1 ? 'source' : 'sources'}`,
+      /*
+       * The count travels even though the citations do not: the map payload is a count and a
+       * confidence tier, not a bibliography (see ExploreMapFeatureProperties). Passing only
+       * `sources: []` made the plate state "0 sources / no sources are published for this record
+       * yet" directly under its own "Grade A · 1 source", which is both a self-contradiction and
+       * false about a record whose page cites a source.
+       */
+      sourceCount: sources,
+      href: selectedFeature.properties.href,
       sources: [],
       connections: [],
     };

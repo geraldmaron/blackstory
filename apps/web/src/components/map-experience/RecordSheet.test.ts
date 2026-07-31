@@ -105,9 +105,27 @@ test('sources are numbered', () => {
   assert.match(html, /2 sources/);
 });
 
-test('a record with no published sources says why rather than showing an empty list', () => {
-  const html = render({ record: { ...RECORD, sources: [] } });
+test('a record with genuinely no sources says why rather than showing an empty list', () => {
+  const html = render({ record: { ...RECORD, sources: [], sourceCount: 0 } });
   assert.match(html, /No sources are published for this record yet/);
+});
+
+test('the plate never claims a cited record has no sources', () => {
+  // The Atlas passes a count without the citations, because the map payload is a count and a
+  // confidence tier rather than a bibliography. The plate used to read "0 sources / no sources
+  // are published for this record yet" directly beneath its own "Grade A · 1 source".
+  const html = render({
+    record: { ...RECORD, sources: [], sourceCount: 1, href: '/entity/abc' },
+  });
+  assert.doesNotMatch(html, /No sources are published for this record yet/);
+  assert.match(html, /This record cites one source/);
+  assert.match(html, /href="\/entity\/abc"/);
+  assert.match(html, />1 source</);
+});
+
+test('the source count in the group label is the record count, not the carried list length', () => {
+  const html = render({ record: { ...RECORD, sources: [], sourceCount: 4 } });
+  assert.match(html, />4 sources</);
 });
 
 test('connections carry the relation slug', () => {
