@@ -45,8 +45,8 @@ Recorded so nobody “fixes” the codebase back to a retired rule:
    3D, or ornamental motion.
 2. **Canvas.** White `#FFFFFF` canvas is superseded by Archive Paper
    `#F4EFE5` + Surface `#FBF8F2`.
-3. **Display type.** Kit headlines use Sora SemiBold; UI Inter; editorial
-   Source Serif 4; data IBM Plex Mono (see `apps/web/src/app/layout.tsx`).
+3. **Display type.** Kit headlines use Schibsted Grotesk SemiBold; UI Geist; editorial
+   Newsreader; data Geist Mono (see `apps/web/src/app/layout.tsx`).
 4. **Lockup rendering.** Official artwork PNGs at `apps/web/public/brand/` —
    never type the wordmark next to a bare symbol in React.
 5. **Copper text.** Use `#8E4F2A` on light / `#D07A32` on dark
@@ -118,8 +118,8 @@ selected filters, primary actions, evidence markers. Dark theme is first-class.
 
 ## Type
 
-Sora SemiBold for headlines; Inter for UI/body; Source Serif 4 for
-editorial/longform; IBM Plex Mono for data, citations, dates, confidence,
+Schibsted Grotesk SemiBold for headlines; Geist for UI/body; Newsreader for
+editorial/longform; Geist Mono for data, citations, dates, confidence,
 and technical labels. All open-source; no licensed fonts.
 
 ## Shape

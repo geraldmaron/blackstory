@@ -4,35 +4,34 @@
  */
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
-import { Sora, Inter, Source_Serif_4, IBM_Plex_Mono } from 'next/font/google';
+import { Schibsted_Grotesk, Geist, Newsreader, Geist_Mono } from 'next/font/google';
 import { DocsShell, type NavSection } from '@/components/docs-shell';
 import { buildSearchIndex, docsByNav } from '@/lib/content';
 import { withBasePath } from '@/lib/base-path';
 import { PRODUCT_NAME, SITE_DESCRIPTION, THEME_BOOTSTRAP_SCRIPT } from '@/lib/site';
 import './docs.css';
 
-const displayFace = Sora({
+const displayFace = Schibsted_Grotesk({
   subsets: ['latin'],
   variable: '--ds-font-display',
   display: 'swap',
 });
 
-const sans = Inter({
+const sans = Geist({
   subsets: ['latin'],
-  axes: ['opsz'],
   variable: '--ds-font-sans',
   display: 'swap',
 });
 
-const editorial = Source_Serif_4({
+const editorial = Newsreader({
   subsets: ['latin'],
+  axes: ['opsz'],
   variable: '--ds-font-editorial',
   display: 'swap',
 });
 
-const mono = IBM_Plex_Mono({
+const mono = Geist_Mono({
   subsets: ['latin'],
-  weight: ['400', '500', '600'],
   variable: '--ds-font-mono',
   display: 'swap',
 });

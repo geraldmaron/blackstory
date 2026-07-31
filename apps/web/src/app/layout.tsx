@@ -3,15 +3,21 @@
  * Loads display + editorial + sans + mono fonts, design-system stylesheet, and app shell.
  * Also wires Add to Home Screen metadata (manifest + Apple web app) without a service worker.
  *
- * Type system per the BlackStory brand kit (brand/tokens/typography.json, binding): Sora
- * SemiBold for headlines/titles/key statements, Inter for UI and body, Source Serif 4 for
- * editorial longform, IBM Plex Mono for data/citations. Sora replaced the earlier
- * Inter-Display display register when the kit landed (2026-07-18) — the wordmark art is
- * unaffected (the lockup ships as provided, never retyped).
+ * Type system per the BlackStory brand kit (brand/tokens/typography.json, binding): Schibsted
+ * Grotesk SemiBold for headlines/titles/key statements, Geist for UI and body, Newsreader for
+ * editorial longform, Geist Mono for data/citations. All four are variable faces, so no weight
+ * list is passed: next/font serves the axis and the type-scale tokens pick weights off it.
+ *
+ * Geist ships no italic and Newsreader carries the optical-size axis, which is why `axes` moved
+ * from the sans register to the editorial one. An `em` inside a headline still resolves to the
+ * editorial italic, which is where real italics live.
+ *
+ * The wordmark art is unaffected by any of this: the lockup ships as provided and is never
+ * retyped in a live face.
  */
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
-import { Sora, Inter, Source_Serif_4, IBM_Plex_Mono } from 'next/font/google';
+import { Schibsted_Grotesk, Geist, Newsreader, Geist_Mono } from 'next/font/google';
 import { brandOpenGraph, PRODUCT_NAME } from '@repo/config';
 import { THEME_BOOTSTRAP_SCRIPT } from '@repo/ui';
 import '@repo/ui/styles.css';
@@ -40,28 +46,27 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-const displayFace = Sora({
+const displayFace = Schibsted_Grotesk({
   subsets: ['latin'],
   variable: '--ds-font-display',
   display: 'swap',
 });
 
-const sans = Inter({
+const sans = Geist({
   subsets: ['latin'],
-  axes: ['opsz'],
   variable: '--ds-font-sans',
   display: 'swap',
 });
 
-const editorial = Source_Serif_4({
+const editorial = Newsreader({
   subsets: ['latin'],
+  axes: ['opsz'],
   variable: '--ds-font-editorial',
   display: 'swap',
 });
 
-const mono = IBM_Plex_Mono({
+const mono = Geist_Mono({
   subsets: ['latin'],
-  weight: ['400', '500', '600'],
   variable: '--ds-font-mono',
   display: 'swap',
 });

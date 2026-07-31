@@ -3,29 +3,27 @@
  * Shared island navbar + brand fonts; matches the public shell traversal chrome.
  */
 import type { ReactNode } from 'react';
-import { Sora, Inter, IBM_Plex_Mono } from 'next/font/google';
+import { Schibsted_Grotesk, Geist, Geist_Mono } from 'next/font/google';
 import { THEME_BOOTSTRAP_SCRIPT } from '@repo/ui';
 import '@repo/ui/styles.css';
 import { AdminAuthProvider } from '../auth/AdminAuthProvider';
 import { AdminShellChrome } from '../components/AdminShellChrome';
 import './admin.css';
 
-const displayFace = Sora({
+const displayFace = Schibsted_Grotesk({
   subsets: ['latin'],
   variable: '--ds-font-display',
   display: 'swap',
 });
 
-const sans = Inter({
+const sans = Geist({
   subsets: ['latin'],
-  axes: ['opsz'],
   variable: '--ds-font-sans',
   display: 'swap',
 });
 
-const mono = IBM_Plex_Mono({
+const mono = Geist_Mono({
   subsets: ['latin'],
-  weight: ['400', '500', '600'],
   variable: '--ds-font-mono',
   display: 'swap',
 });
