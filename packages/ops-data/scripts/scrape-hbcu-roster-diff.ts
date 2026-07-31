@@ -63,13 +63,26 @@ type ScrapedInstitution = {
 };
 
 function stripTags(html: string): string {
-  return html
-    .replace(/<[^>]+>/gu, ' ')
-    .replace(/&amp;/gu, '&')
-    .replace(/&#8217;/gu, "'")
-    .replace(/&nbsp;/gu, ' ')
-    .replace(/\s+/gu, ' ')
-    .trim();
+  // Tags removed to a fixed point with `[^<>]`: one pass over `<scr<script>ipt>` leaves
+  // `<script>` behind, and a class that matches `<` backtracks over a run of them.
+  let withoutTags = html;
+  let previous: string;
+  do {
+    previous = withoutTags;
+    withoutTags = withoutTags.replace(/<[^<>]*>/gu, ' ');
+  } while (withoutTags !== previous);
+
+  return (
+    withoutTags
+      .replace(/&#8217;/gu, "'")
+      .replace(/&nbsp;/gu, ' ')
+      // `&amp;` decodes LAST. Decoding it first turns `&amp;nbsp;` into `&nbsp;`, which the rule
+      // above would then turn into a space: one escape becoming two decodes
+      // (CodeQL js/double-escaping).
+      .replace(/&amp;/gu, '&')
+      .replace(/\s+/gu, ' ')
+      .trim()
+  );
 }
 
 function normalizeWebsiteUrl(raw: string): string | undefined {

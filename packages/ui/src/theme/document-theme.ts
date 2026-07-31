@@ -30,3 +30,10 @@ export function resolvePreferredTheme(
  * THEME_STORAGE_KEY, so the two cannot drift apart silently.
  */
 export const THEME_BOOTSTRAP_SCRIPT = `(function(){try{var k='ds-theme';var s=localStorage.getItem(k);var d=window.matchMedia('(prefers-color-scheme: dark)').matches;var t=(s==='light'||s==='dark')?s:(d?'dark':'light');document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();`;
+
+/**
+ * Compile-time guarantee that the key inlined in THEME_BOOTSTRAP_SCRIPT is THEME_STORAGE_KEY.
+ * Changing either without the other stops this file compiling.
+ */
+const assertBootstrapKeyMatches: typeof THEME_STORAGE_KEY = 'ds-theme';
+void assertBootstrapKeyMatches;

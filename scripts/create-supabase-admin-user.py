@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Create or update BlackStory Supabase admin user. Secrets stay in memory/temp files only."""
+"""Create or update BlackStory Supabase admin user. Secrets stay in memory and 1Password.
+
+Nothing sensitive is written to disk. This used to drop the service-role key and the generated
+temp password into fixed /tmp paths (CodeQL py/clear-text-storage-sensitive-data): cleartext at
+rest, at a predictable filename any local user could pre-create or symlink, and nothing ever read
+either file back. The key is only needed for an Authorization header, and the password is handed
+to the operator on stdout and stored in 1Password.
+"""
 from __future__ import annotations
 
 import json
@@ -9,13 +16,9 @@ import subprocess
 import sys
 import urllib.error
 import urllib.request
-from pathlib import Path
-
 EMAIL = "geraldmdagher@outlook.com"
 PROJECT_REF = "twykhihqkcldpreuovay"
 PROJECT_URL = f"https://{PROJECT_REF}.supabase.co"
-TMP_KEY = Path("/tmp/sb_service_role.key")
-TMP_PASS = Path("/tmp/sb_admin_temp_password.txt")
 
 
 def op_read(ref: str) -> str:
@@ -85,9 +88,6 @@ def main() -> int:
         print("no service_role/secret key found", file=sys.stderr)
         return 1
 
-    TMP_KEY.write_text(svc)
-    TMP_KEY.chmod(0o600)
-
     auth_headers = {
         "Authorization": f"Bearer {svc}",
         "apikey": svc,
@@ -113,9 +113,6 @@ def main() -> int:
 
     alphabet = string.ascii_letters + string.digits + "!@#$%^&*-_"
     temp_password = "".join(secrets.choice(alphabet) for _ in range(28))
-    TMP_PASS.write_text(temp_password)
-    TMP_PASS.chmod(0o600)
-
     app_meta = {"bb_role": "admin"}
 
     if existing:
@@ -160,7 +157,7 @@ def main() -> int:
     print(f"user_id={uid}")
     print(f"email={email}")
     print(f"bb_role={role}")
-    print(f"temp_password_file={TMP_PASS}")
+    print(f"temp_password={temp_password}")
 
     # Store temp password into 1Password as a new item field if possible (best-effort)
     try:

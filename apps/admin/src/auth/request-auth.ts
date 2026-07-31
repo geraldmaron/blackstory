@@ -23,6 +23,12 @@ function supabaseVerifierFromEnv(environment: NodeJS.ProcessEnv | Record<string,
   return { async getUser(accessToken: string) { return client.auth.getUser(accessToken); } };
 }
 
+/** One line, bounded length: log records must not be forgeable by their own subject. */
+function sanitizeForLog(value: unknown): string {
+  const text = value instanceof Error ? `${value.name}: ${value.message}` : String(value);
+  return text.replace(/[\r\n\u2028\u2029]+/g, ' ').slice(0, 500);
+}
+
 export async function authorizeAdminRequest(headers: AdminRequestHeaders): Promise<ResolvedAdminCaller> {
   const identity = await createSupabaseSessionAuthorizer(supabaseVerifierFromEnv()).assertAuthenticated(headers);
   return {
@@ -44,6 +50,9 @@ export function authErrorResponse(error: unknown): Response {
   if (error instanceof ServerAdminAuthorizationError) {
     return Response.json({ error: error.message, code: error.code }, { status: 401 });
   }
-  console.error('admin auth failure', error);
+  // Newlines stripped, length capped. An auth failure can carry a value the caller supplied
+  // (a header, a token fragment), and logging it verbatim lets that value forge extra log lines
+  // that read as though the server wrote them (CodeQL js/log-injection).
+  console.error('admin auth failure', sanitizeForLog(error));
   return Response.json({ error: 'Unauthorized' }, { status: 401 });
 }
