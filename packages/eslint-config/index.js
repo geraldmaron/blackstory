@@ -10,6 +10,11 @@ export default tseslint.config(
   {
     ignores: [
       '**/.next/**',
+      // Next's static export target. `apps/docs` exports here, and linting a build output
+      // directory means linting minified webpack chunks: it produced 2,126 errors about
+      // `importScripts` being undefined and minified expressions being unused, none of which
+      // any author can act on, and it made `pnpm lint` exit non-zero on a clean tree.
+      '**/out/**',
       '**/build/**',
       '**/coverage/**',
       '**/dist/**',

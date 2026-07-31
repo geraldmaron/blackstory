@@ -40,6 +40,48 @@ test('exact name match ranks above a substring match', () => {
   assert.equal(ranked[0]?.matchedOn, 'displayName');
 });
 
+test('a first-name last-name query finds a record carrying a title and a middle initial', () => {
+  // "calvin shirley" is not a substring of "Dr. Calvin H. Shirley", and typing a person's first
+  // and last name is the most ordinary way anyone searches for a person. This returned nothing.
+  const person = record({ id: 'p1', displayName: 'Dr. Calvin H. Shirley', kind: 'person' });
+  const ranked = rankRecords('calvin shirley', [person]);
+  assert.deepEqual(
+    ranked.map((r) => r.record.id),
+    ['p1'],
+  );
+  assert.equal(ranked[0]?.matchedOn, 'displayName');
+});
+
+test('the token tier is conjunctive: every query word must be present', () => {
+  const both = record({ id: 'both', displayName: 'Dr. Calvin H. Shirley' });
+  const onlyOne = record({ id: 'one', displayName: 'Calvin Coolidge High School' });
+  const ranked = rankRecords('calvin shirley', [both, onlyOne]);
+  assert.deepEqual(
+    ranked.map((r) => r.record.id),
+    ['both'],
+  );
+});
+
+test('token order does not matter, but a contiguous substring still outranks tokens', () => {
+  const contiguous = record({ id: 'contig', displayName: 'Calvin Shirley Memorial' });
+  const scattered = record({ id: 'scattered', displayName: 'Dr. Calvin H. Shirley' });
+  const ranked = rankRecords('shirley calvin', [scattered, contiguous]);
+  assert.deepEqual(
+    ranked.map((r) => r.record.id).sort(),
+    ['contig', 'scattered'],
+  );
+  // Reversed to the contiguous order, the verbatim hit must lead.
+  const inOrder = rankRecords('calvin shirley', [scattered, contiguous]);
+  assert.equal(inOrder[0]?.record.id, 'contig');
+});
+
+test('a single-token query never falls through to the token tier', () => {
+  // Otherwise one word would match any record containing it anywhere, which is the substring
+  // tier's job and is already handled above it.
+  const unrelated = record({ id: 'u1', displayName: 'Shirley Chisholm' });
+  assert.equal(rankRecords('zzz', [unrelated]).length, 0);
+});
+
 test('connection strength never overrides a stronger text tier', () => {
   // The substring record is far more connected, but the exact match must still win.
   const exact = record({ id: 'exact', displayName: 'School', relatedCount: 0 });
