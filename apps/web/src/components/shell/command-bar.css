@@ -82,6 +82,88 @@
   white-space: nowrap;
 }
 
+/* ---- the live search combobox -------------------------------------------
+   Same pill, same place, same size as the Atlas's palette trigger, but a real input with a
+   result list under it. The wrapper keeps the pill; the input inside is unstyled so the caret
+   sits where the placeholder was. */
+.ds-bar__search--live {
+  position: relative;
+  cursor: text;
+}
+
+.ds-bar__search-input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--ds-ink);
+  font: inherit;
+  outline: none;
+}
+
+.ds-bar__search-input::placeholder {
+  color: var(--ds-ink-muted);
+}
+
+.ds-bar__search--live:focus-within {
+  border-color: var(--ds-accent-graphic);
+}
+
+/* The list floats over the page rather than pushing the bar taller. */
+.ds-bar__search-list {
+  position: absolute;
+  top: calc(100% + var(--ds-space-2));
+  left: 0;
+  right: 0;
+  z-index: 60;
+  margin: 0;
+  padding: var(--ds-space-1);
+  list-style: none;
+  max-height: min(60vh, 26rem);
+  overflow-y: auto;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface);
+  box-shadow: 0 18px 40px -24px rgb(0 0 0 / 55%);
+}
+
+.ds-bar__search-list .ds-typeahead__option {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ds-space-2);
+  width: 100%;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  border: 0;
+  border-radius: var(--ds-radius-sm);
+  background: none;
+  color: var(--ds-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ds-bar__search-list .ds-typeahead__option--active,
+.ds-bar__search-list .ds-typeahead__option:hover {
+  background: var(--ds-canvas);
+}
+
+.ds-bar__search-list .ds-typeahead__primary {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-bar__search-list .ds-typeahead__secondary {
+  flex: none;
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
 /* ---- tools --------------------------------------------------------------- */
 
 .ds-bar__tools {
@@ -224,6 +306,11 @@
   .ds-bar__search-text,
   .ds-bar__search .ds-kbd {
     display: none;
+  }
+
+  /* The live field keeps its input at every width: hiding it would leave an empty pill. */
+  .ds-bar__search--live {
+    min-width: 0;
   }
 
   .ds-bar__search {

@@ -112,7 +112,12 @@ export function HairlineIndex({
                 {row.glyph}
               </span>
               <span className="ds-room-idx__name">{row.name}</span>
-              <span className="ds-room-idx__place">{row.place}</span>
+              {/* The place column clips with an ellipsis at this measure, and the clipped part is
+                  usually the part that identifies the site ("Broward Health Medical Center (for..."),
+                  so the full string is available on hover and to assistive tech. */}
+              <span className="ds-room-idx__place" title={row.place}>
+                {row.place}
+              </span>
               <span className="ds-room-idx__era">{row.era}</span>
               <span className="ds-room-idx__grade">{row.grade}</span>
             </a>

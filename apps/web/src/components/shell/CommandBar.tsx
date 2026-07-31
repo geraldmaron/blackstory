@@ -23,6 +23,7 @@
 import React from 'react';
 import { BRAND_ASSETS } from '@repo/config';
 import { cx, ShellWordmark } from '@repo/ui';
+import { CommandBarSearch } from './CommandBarSearch';
 import './command-bar.css';
 
 void React;
@@ -101,12 +102,19 @@ export function CommandBar({
           <kbd className="ds-kbd">⌘K</kbd>
         </button>
       ) : (
-        /* No palette off the Atlas, so this is a link to the index rather than a dead button.
-           The reader gets the same affordance in the same place, and it works without JS. */
-        <a className="ds-bar__search" href="/records" aria-label="Search the record index">
-          <SearchGlyph />
-          <span className="ds-bar__search-text">{searchLabel(recordCount)}</span>
-        </a>
+        /* Off the Atlas the slot is a live combobox against /search/api, not a link. It used to
+           be an anchor to /records: identical in look and position to the Atlas's search, and
+           impossible to type into, so on twelve of the thirteen rooms searching meant navigating
+           somewhere else first. `<noscript>` keeps the old link for a reader without JS. */
+        <>
+          <CommandBarSearch placeholder={searchLabel(recordCount)} />
+          <noscript>
+            <a className="ds-bar__search" href="/records" aria-label="Search the record index">
+              <SearchGlyph />
+              <span className="ds-bar__search-text">{searchLabel(recordCount)}</span>
+            </a>
+          </noscript>
+        </>
       )}
 
       <div className="ds-bar__tools">

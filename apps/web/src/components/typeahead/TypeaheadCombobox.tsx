@@ -32,6 +32,8 @@ export type TypeaheadComboboxProps = {
   readonly className?: string;
   readonly inputClassName?: string;
   readonly listLabel: string;
+  /** Lets a host position the dropdown; the bar's floats over the page, a filter's does not. */
+  readonly listClassName?: string;
   readonly minChars?: number;
   /** Sync suggestor — used when suggestions are derived locally (books). */
   readonly suggestLocal?: (query: string) => readonly TypeaheadSuggestion[];
@@ -53,6 +55,7 @@ export function TypeaheadCombobox({
   className,
   inputClassName,
   listLabel,
+  listClassName,
   minChars = 2,
   suggestLocal,
   suggestRemote,
@@ -205,7 +208,7 @@ export function TypeaheadCombobox({
       {showList ? (
         <ul
           id={listboxId}
-          className="ds-typeahead__list"
+          className={listClassName ? `ds-typeahead__list ${listClassName}` : 'ds-typeahead__list'}
           role="listbox"
           aria-label={listLabel}
         >
@@ -226,7 +229,9 @@ export function TypeaheadCombobox({
                   onMouseEnter={() => setActiveIndex(index)}
                   onClick={() => pick(suggestion)}
                 >
-                  <span className="ds-typeahead__primary">{suggestion.primary}</span>
+                  <span className="ds-typeahead__primary" title={suggestion.primary}>
+                    {suggestion.primary}
+                  </span>
                   {suggestion.secondary ? (
                     <span className="ds-mono ds-typeahead__secondary">{suggestion.secondary}</span>
                   ) : null}
