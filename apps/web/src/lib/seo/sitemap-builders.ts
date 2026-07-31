@@ -22,10 +22,16 @@ const STATIC_PUBLIC_ROUTES: readonly {
 }[] = Object.freeze([
   // `/` is the Atlas, so it carries the instrument's crawl frequency. `/explore` is gone from
   // this list because it 308s here: a sitemap that advertises a redirect spends crawl budget
-  // teaching crawlers a URL that immediately disowns itself. `/history` is a redirect too and
-  // leaves the list once `/records` exists to replace it (SP-09, SP-19).
+  // teaching crawlers a URL that immediately disowns itself.
+  //
+  // `/history` left with SP-09: it is a redirect into `/records`, which now exists to replace it.
+  // It was also listed TWICE here, which put a duplicate `<url>` in the sitemap — the exact
+  // defect SP-19's no-duplicate assertion is meant to catch.
+  //
+  // `/locate` is still listed because it still renders; it leaves with SP-14 (repo-92n2.14),
+  // which folds it into the Lens.
   { path: '/', changeFrequency: 'daily', priority: 1 },
-  { path: '/history', changeFrequency: 'daily', priority: 0.9 },
+  { path: '/records', changeFrequency: 'daily', priority: 0.9 },
   { path: '/locate', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/corrections', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/about', changeFrequency: 'monthly', priority: 0.5 },
@@ -34,7 +40,6 @@ const STATIC_PUBLIC_ROUTES: readonly {
   { path: '/errata', changeFrequency: 'weekly', priority: 0.6 },
   { path: '/law', changeFrequency: 'weekly', priority: 0.7 },
   { path: '/books', changeFrequency: 'weekly', priority: 0.6 },
-  { path: '/history', changeFrequency: 'weekly', priority: 0.8 },
   { path: '/chapters', changeFrequency: 'weekly', priority: 0.6 },
 ]);
 

@@ -44,6 +44,90 @@
   padding-block: var(--ds-space-10) var(--ds-space-16);
 }
 
+/* —— the right rail ————————————————————————————————————————————————————————
+   The same set, offered back grouped a second way. It sits beside the column only when there
+   is room for the column to keep its measure; below that it stacks under the list, which is
+   also its reading order in the document. */
+.ds-room--railed {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 68rem) {
+  .ds-room--railed {
+    grid-template-columns: minmax(0, 1fr) 15rem;
+    justify-content: center;
+    column-gap: var(--ds-space-8);
+  }
+
+  .ds-room--railed > .ds-room__doc {
+    margin-inline: 0 0;
+    justify-self: end;
+  }
+
+  .ds-room__rail {
+    padding-block: var(--ds-space-10) var(--ds-space-16);
+    padding-inline-end: var(--ds-gutter);
+  }
+}
+
+.ds-room__rail {
+  padding-inline: var(--ds-gutter);
+  padding-block: 0 var(--ds-space-12);
+}
+
+.ds-room-rail-group + .ds-room-rail-group {
+  margin-top: var(--ds-space-7);
+}
+
+.ds-room-rail-group__title {
+  margin: 0 0 var(--ds-space-3);
+  padding-bottom: var(--ds-space-2);
+  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--room-ink-4);
+}
+
+.ds-room-rail-group__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-room-rail-group__link {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+  padding: 5px 0;
+  color: var(--room-ink-2);
+  font-size: 12.5px;
+  text-decoration: none;
+}
+
+.ds-room-rail-group__link:hover {
+  color: var(--ds-accent);
+}
+
+.ds-room-rail-group__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-room-rail-group__more {
+  /* The bottom margin is load-bearing: this line is the group's last element, and without it the
+     next group's title sits directly under it and reads as part of the same block. */
+  margin: var(--ds-space-2) 0 var(--ds-space-4);
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  color: var(--room-ink-4);
+}
+
 /* —— breadcrumb: where you are, and the way back ——————————————————————————— */
 .ds-room-crumb {
   display: flex;
@@ -546,7 +630,13 @@
   border-color: var(--ds-border-strong);
 }
 
-.ds-room-chip[aria-pressed='true'] {
+/* Anchor chips (the `/records` GET filters) carry `aria-current`, not `aria-pressed`. */
+a.ds-room-chip {
+  text-decoration: none;
+}
+
+.ds-room-chip[aria-pressed='true'],
+.ds-room-chip[aria-current='true'] {
   background: var(--room-copper-wash);
   border-color: var(--ds-accent-graphic);
   color: var(--ds-accent);
@@ -559,7 +649,8 @@
   color: var(--room-ink-4);
 }
 
-.ds-room-chip[aria-pressed='true'] .ds-room-num {
+.ds-room-chip[aria-pressed='true'] .ds-room-num,
+.ds-room-chip[aria-current='true'] .ds-room-num {
   color: var(--ds-accent);
 }
 

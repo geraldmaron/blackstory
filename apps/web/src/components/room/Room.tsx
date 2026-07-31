@@ -18,12 +18,20 @@ export type RoomProps = {
   readonly className?: string;
   /** Overrides the `<main>` element id. Skip-link target; defaults to the shell's `main`. */
   readonly id?: string;
+  /**
+   * Optional right rail, for the Reading rooms whose design law gives them one (`/records` by
+   * era and state, `/chapters` by era and place, `/books` and `/law` by jurisdiction). It renders
+   * AFTER the column in the document so the rail's grouping links never come before the thing
+   * they group; the grid places it alongside on wide viewports and below on narrow.
+   */
+  readonly rail?: ReactNode;
 };
 
-export function Room({ children, className, id = 'main' }: RoomProps) {
+export function Room({ children, className, id = 'main', rail }: RoomProps) {
   return (
-    <main className={cx('ds-room', className)} id={id}>
+    <main className={cx('ds-room', rail !== undefined && 'ds-room--railed', className)} id={id}>
       <div className="ds-room__doc">{children}</div>
+      {rail === undefined ? null : <aside className="ds-room__rail">{rail}</aside>}
     </main>
   );
 }

@@ -24,6 +24,12 @@ export type IndexFilter = {
   readonly id: string;
   readonly label: string;
   readonly count: number;
+  /**
+   * When present the chip renders as a plain anchor instead of a button, so the filter is a real
+   * GET navigation and survives JavaScript being off. `/records` is built this way; a room that
+   * filters in place leaves this off and passes `onFilterChange`.
+   */
+  readonly href?: string;
 };
 
 export type IndexRow = {
@@ -62,17 +68,35 @@ export function HairlineIndex({
     <div className={cx('ds-room-idx', className)}>
       {filters && filters.length > 0 ? (
         <div className="ds-room-idx__bar" role="group" aria-label="Filter the index">
-          {filters.map((filter) => (
-            <button
-              key={filter.id}
-              type="button"
-              className="ds-room-chip"
-              aria-pressed={filter.id === activeFilterId}
-              onClick={() => onFilterChange?.(filter.id)}
-            >
-              {filter.label} <span className="ds-room-num">{filter.count}</span>
-            </button>
-          ))}
+          {filters.map((filter) => {
+            const body = (
+              <>
+                {filter.label} <span className="ds-room-num">{filter.count}</span>
+              </>
+            );
+            return filter.href === undefined ? (
+              <button
+                key={filter.id}
+                type="button"
+                className="ds-room-chip"
+                aria-pressed={filter.id === activeFilterId}
+                onClick={() => onFilterChange?.(filter.id)}
+              >
+                {body}
+              </button>
+            ) : (
+              <a
+                key={filter.id}
+                className="ds-room-chip"
+                href={filter.href}
+                // Not `aria-pressed`: a link is not a toggle button. `aria-current` is the
+                // correct state for "this is the filter you are looking at".
+                aria-current={filter.id === activeFilterId ? true : undefined}
+              >
+                {body}
+              </a>
+            );
+          })}
         </div>
       ) : null}
 

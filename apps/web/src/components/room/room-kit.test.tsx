@@ -316,6 +316,25 @@ describe('room kit · index, table and utility blocks', () => {
     assert.match(html, /<a class="ds-room-idx__row" href="\/entity\/a"/);
   });
 
+  it('a filter carrying an href becomes a real GET link, so /records filters without JS', () => {
+    const html = renderToStaticMarkup(
+      <HairlineIndex
+        countLabel="812 of 3,900 shown"
+        filters={[
+          { id: '', label: 'All kinds', count: 3900, href: '/records' },
+          { id: 'people', label: 'People', count: 812, href: '/records?kind=people' },
+        ]}
+        activeFilterId="people"
+        rows={[{ href: '/entity/a', name: 'Isaac McGhie', place: 'Duluth, MN', era: '1920s' }]}
+      />,
+    );
+    assert.match(html, /<a class="ds-room-chip" href="\/records\?kind=people"/);
+    assert.doesNotMatch(html, /<button[^>]*ds-room-chip/, 'no chip falls back to a button');
+    // A link is not a toggle button: the active filter is `aria-current`, never `aria-pressed`.
+    assert.match(html, /aria-current="true"/);
+    assert.doesNotMatch(html, /aria-pressed/);
+  });
+
   it('an empty index renders the shared empty state, and it names /submit', () => {
     const html = renderToStaticMarkup(
       <HairlineIndex
