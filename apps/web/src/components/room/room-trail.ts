@@ -10,6 +10,13 @@
  * Go section over the same set of routes. When it lands, {@link ROOM_DESTINATIONS} is replaced
  * by a read of that registry and this module keeps only `resolveTrail`. Nothing outside this
  * file may add a per-page chain in the meantime.
+ *
+ * PENDING SP-21: the mock parents every reading and utility room to /library, not to the Atlas
+ * (`SURF_PARENT` defaults to library). /library does not exist as a route yet, and a breadcrumb
+ * whose second step 404s is worse than one step short, so those rooms hang off the Atlas until
+ * SP-21 either ships the route or records the decision not to. The switch is one line: change
+ * the `parent` of each reading and utility entry below from '/' to '/library'. Record pages are
+ * already correct — their parent is their catalogue, and an entity's is the Atlas.
  */
 
 /** A single step in the chain. `href` is null only for the final, non-clickable step. */
@@ -60,11 +67,16 @@ const ROOM_DESTINATIONS: ReadonlyMap<string, Destination> = new Map([
  * Prefixes for dynamic segments, longest first. A record's parent is its catalogue, which is
  * what makes "every record links back to its place and every place back to its records" hold
  * without any record page knowing where it sits.
+ *
+ * `/entity/` is the exception, and it goes up to the Atlas rather than to /records. An entity
+ * is a point on the map that a reader most likely arrived at *from* the map; /records is one
+ * way of listing entities, not the place they live. This matches `SURF_PARENT` in the mock
+ * (`entity: 'atlas'`) and the parent chain SP-21 specifies.
  */
 const DYNAMIC_PARENTS: readonly (readonly [string, string])[] = [
   ['/corrections/status/', '/corrections'],
   ['/chapters/', '/chapters'],
-  ['/entity/', '/records'],
+  ['/entity/', '/'],
   ['/books/', '/books'],
   ['/law/', '/law'],
 ];

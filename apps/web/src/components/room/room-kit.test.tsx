@@ -130,12 +130,11 @@ describe('room kit · the trail is computed, never hand-written', () => {
     ]);
   });
 
-  it('an entity resolves upward through /records, the non-spatial index', () => {
-    const trail = resolveTrail('/entity/abc', 'Isaac McGhie');
-    assert.deepEqual(
-      trail.map((step) => step.href),
-      ['/', '/records', null],
-    );
+  it("an entity's parent is the Atlas, not /records — a record is a point, not a row", () => {
+    assert.deepEqual(resolveTrail('/entity/abc', 'Isaac McGhie'), [
+      { label: 'Atlas', href: '/' },
+      { label: 'Isaac McGhie', href: null },
+    ]);
   });
 
   it('a nested utility room keeps every intermediate step', () => {
@@ -179,7 +178,12 @@ describe('room kit · RoomHeader is the only header a room renders', () => {
     assert.match(html, /<h1 class="ds-room-header__title">Banned books<\/h1>/);
     assert.match(html, /ds-room-header__lede/);
     assert.match(html, /1,204 titles/);
-    assert.match(html, /ds-room-header__path[^>]*>\/books/);
+
+    // The path leads the meta row, ahead of every count. Mock: `#docmeta`, path then meta.
+    assert.match(
+      html,
+      /ds-room-header__meta"><span class="ds-room-header__path">\/books<\/span><span>1,204 titles<\/span>/,
+    );
 
     assert.equal(html.match(/<h1/g)?.length, 1, 'a room renders exactly one h1');
     assert.equal(html.match(/<header/g)?.length, 1, 'a room renders exactly one header');

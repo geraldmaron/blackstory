@@ -52,10 +52,13 @@ export function RoomHeader({
       {lede ? <p className="ds-room-header__lede">{lede}</p> : null}
       {hasMeta ? (
         <div className="ds-room-header__meta">
+          {/* The path leads the row. It is the one fact in it that is the same on every room and
+              the one a reader copies, so it anchors the left edge rather than trailing a list of
+              counts whose length changes per room. Mock: `#docmeta` render, path then meta. */}
+          {showPath ? <span className="ds-room-header__path">{pathname}</span> : null}
           {facts.map((fact) => (
             <span key={fact}>{fact}</span>
           ))}
-          {showPath ? <span className="ds-room-header__path">{pathname}</span> : null}
         </div>
       ) : null}
     </header>
