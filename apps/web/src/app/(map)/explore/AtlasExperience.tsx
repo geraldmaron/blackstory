@@ -1040,8 +1040,17 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
         context={commandContext}
         onOpenRecord={(record, fly) => {
           const feature = featureById(record.id);
-          if (feature) select(feature, fly);
+          if (feature) {
+            select(feature, fly);
+            setPaletteOpen(false);
+            return;
+          }
+          // The palette searches the whole index, but only records with a map feature in the
+          // current projection can be selected on the Atlas. Without this the click was
+          // swallowed: the palette closed and nothing opened, which reads as a broken search.
+          // Every record has a page even when it has no pin, so fall through to it.
           setPaletteOpen(false);
+          window.location.assign(`/entity/${record.id}`);
         }}
         onJumpToState={(paletteState) => {
           const match = stateOptions.find((option) => option.label === paletteState.name);
@@ -1062,10 +1071,13 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
         })}
         onOpenRecord={(record) => {
           const feature = featureById(record.id);
+          setSavedOpen(false);
           if (feature) {
             select(feature);
-            setSavedOpen(false);
+            return;
           }
+          // Same as the palette: a saved record whose pin is not in this projection still opens.
+          window.location.assign(`/entity/${record.id}`);
         }}
         onRemove={(id) => persist(unsaveRecord(collection, id))}
         onClear={() => persist(clearCollection())}
