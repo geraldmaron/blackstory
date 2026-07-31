@@ -32,10 +32,14 @@ export function roomLabelFor(pathname: string): string | null {
 }
 
 /**
- * The full chain for a room, Atlas first and `here` last.
+ * The chain for a room, ending at `here`.
  *
  * `hereLabel` is the one thing a room supplies, because a record's title is data and cannot live
  * in a static table. Every earlier step is resolved, so no page ever names its own parent.
+ *
+ * The Atlas root (`/`) is resolved as a parent but not rendered as a step: it is the site itself,
+ * it is already the brand mark and the first item in the nav bar, and a crumb that reads
+ * "Atlas /" on all thirteen surfaces carries no information about where the reader is.
  */
 export function resolveTrail(pathname: string, hereLabel?: string): readonly RoomCrumb[] {
   const path = normalizeDestinationPath(pathname);
@@ -51,10 +55,12 @@ export function resolveTrail(pathname: string, hereLabel?: string): readonly Roo
     guard += 1;
   }
 
-  const steps: RoomCrumb[] = ancestors.map((ancestor) => ({
-    label: roomLabelFor(ancestor) ?? ancestor,
-    href: ancestor,
-  }));
+  const steps: RoomCrumb[] = ancestors
+    .filter((ancestor) => ancestor !== '/')
+    .map((ancestor) => ({
+      label: roomLabelFor(ancestor) ?? ancestor,
+      href: ancestor,
+    }));
 
   if (path !== '/') steps.push({ label: here, href: null });
   else if (steps.length === 0) steps.push({ label: here, href: null });

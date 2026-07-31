@@ -4,16 +4,21 @@
  */
 
 .ds-memorial-wall {
-  /* Sits at the top of the normal-flow edition root (position: relative), so
-     absolute coordinates in [0, 100vh] land in the opening viewport and
-     scroll away naturally once the reader moves down to the full list below
-     — no fixed-position overlay fighting that content for stacking order. */
+  /* Sits in the normal-flow edition root (position: relative), so absolute
+     coordinates in [0, 100vh] land in the opening viewport and scroll away
+     naturally once the reader moves down to the full list below — no
+     fixed-position overlay fighting that content for stacking order.
+     Pulled up by its own document offset so the field starts at the true top
+     of the viewport and the names run behind the shell header and menu bar
+     rather than starting below them. */
   position: absolute;
-  inset: 0 0 auto 0;
+  inset: calc(-1 * var(--memorial-wall-offset-top, 0px)) 0 auto 0;
   /* svh: the visible viewport before the mobile URL bar collapses; plain vh
-     is taller than what's on screen at load. vh line kept as fallback. */
-  height: 100vh;
-  height: 100svh;
+     is taller than what's on screen at load. vh line kept as fallback.
+     Taller than one screen (see MEMORIAL_OPENING_SCREENS): the names get room
+     to breathe past the fold before the readable list starts. */
+  height: 125vh;
+  height: 125svh;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
@@ -96,13 +101,13 @@
    fade with scroll (unlike ambient names — no --memorial-wall-fade here). */
 .ds-memorial-wall__message-field {
   /* 50svh, not 50%: centers within the actual opening viewport regardless of
-     the (much taller) .ds-memorial-wall container it's absolutely placed in.
-     The offset subtraction compensates for the shell header above the wall
-     (set by MemorialWallAtmosphere); svh keeps the mobile URL bar out of the
-     math. vh line kept as fallback for browsers without svh. */
+     the taller .ds-memorial-wall container it's absolutely placed in. The
+     wall's own top edge is already pulled up to the viewport top, so no
+     header-offset subtraction is needed here. svh keeps the mobile URL bar
+     out of the math; vh line kept as fallback for browsers without svh. */
   position: absolute;
-  top: calc(50vh - var(--memorial-wall-offset-top, 0px));
-  top: calc(50svh - var(--memorial-wall-offset-top, 0px));
+  top: 50vh;
+  top: 50svh;
   left: 50%;
   z-index: 1;
   width: min(94vw, 46rem);

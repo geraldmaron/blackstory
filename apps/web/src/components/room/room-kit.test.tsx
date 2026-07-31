@@ -115,10 +115,10 @@ describe('room kit · the v6 edition system stays retired', () => {
 describe('room kit · the trail is computed, never hand-written', () => {
   // SP-21 (repo-92n2.29) shipped /library, so a reading room's parent is the library rather than
   // the Atlas — matching `SURF_PARENT` in the mock, where library is the default up-link. These
-  // chains were one step short while the route was held.
-  it('a reading room hangs off the library, which hangs off the Atlas', () => {
+  // chains were one step short while the route was held. The Atlas root itself is resolved but
+  // not rendered as a step (see resolveTrail).
+  it('a reading room hangs off the library', () => {
     assert.deepEqual(resolveTrail('/books'), [
-      { label: 'Atlas', href: '/' },
       { label: 'The library', href: '/library' },
       { label: 'Banned books', href: null },
     ]);
@@ -126,7 +126,6 @@ describe('room kit · the trail is computed, never hand-written', () => {
 
   it("a record's parent is its catalogue, not the Atlas", () => {
     assert.deepEqual(resolveTrail('/books/the-bluest-eye', 'The Bluest Eye'), [
-      { label: 'Atlas', href: '/' },
       { label: 'The library', href: '/library' },
       { label: 'Banned books', href: '/books' },
       { label: 'The Bluest Eye', href: null },
@@ -134,15 +133,14 @@ describe('room kit · the trail is computed, never hand-written', () => {
   });
 
   it("an entity's parent is the Atlas, not /records — a record is a point, not a row", () => {
+    // The Atlas root is not a rendered step, so an entity's chain is the entity alone.
     assert.deepEqual(resolveTrail('/entity/abc', 'Isaac McGhie'), [
-      { label: 'Atlas', href: '/' },
       { label: 'Isaac McGhie', href: null },
     ]);
   });
 
   it('a nested utility room keeps every intermediate step', () => {
     assert.deepEqual(resolveTrail('/corrections/status/AB12', 'AB12'), [
-      { label: 'Atlas', href: '/' },
       { label: 'The library', href: '/library' },
       { label: 'Corrections', href: '/corrections' },
       { label: 'AB12', href: null },
@@ -153,9 +151,18 @@ describe('room kit · the trail is computed, never hand-written', () => {
     assert.deepEqual(resolveTrail('/books/?sort=year', 'Books'), resolveTrail('/books', 'Books'));
   });
 
-  it('an unrecognised path still hangs off the Atlas rather than off nothing', () => {
+  it('the Atlas root is never rendered as a crumb step', () => {
+    for (const path of ['/books', '/library', '/entity/abc', '/corrections/status/AB12']) {
+      const trail = resolveTrail(path, 'Here');
+      assert.ok(
+        trail.every((step) => step.href !== '/'),
+        `${path} must not render an Atlas step`,
+      );
+    }
+  });
+
+  it('an unrecognised path still ends at a non-link final step', () => {
     const trail = resolveTrail('/nope', 'Not found');
-    assert.equal(trail[0]?.href, '/');
     assert.equal(trail.at(-1)?.href, null);
   });
 
@@ -204,7 +211,8 @@ describe('room kit · RoomHeader is the only header a room renders', () => {
     const html = renderToStaticMarkup(<Breadcrumb pathname="/law" />);
     assert.match(html, /aria-current="page"/);
     assert.match(html, /ds-room-crumb__here[^>]*>Law/);
-    assert.match(html, /href="\/"/);
+    assert.match(html, /href="\/library"/);
+    assert.doesNotMatch(html, /href="\/"/);
   });
 });
 

@@ -47,9 +47,16 @@ body {
   overflow-x: clip;
   background: var(--ds-canvas);
   color: var(--ds-ink);
-  font-family: var(--ds-font-editorial);
+  /* The interface face is the default, not the editorial serif.
+     Newsreader as the global body font meant every string that had not explicitly opted into a
+     role — index rows, table cells, buttons, form fields, empty states, anything a component had
+     not named — rendered as longform serif. That is why the app read as dated regardless of the
+     modern stack in tokens.css: the modern faces were loaded and almost nothing used them.
+     The serif is now what it was always described as, a register you opt into: `.ds-room-prose`,
+     the lede and the editorial titles ask for it by name. */
+  font-family: var(--ds-font-sans);
   font-size: 1rem;
-  line-height: 1.65;
+  line-height: 1.6;
 }
 
 img,

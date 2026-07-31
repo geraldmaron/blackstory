@@ -22,12 +22,14 @@
  * Scroll behavior: ambient background names fade out with scroll progress
  * through the opening viewport (the held message does not fade).
  *
- * Placement is scoped to the first viewport (not the full document scroll
- * height): this element sits in normal flow at the top of the page
- * (`.ds-memorial-edition`, position: relative), so absolute coordinates in
- * [0, viewportHeight] land exactly in the opening screen and scroll away
- * naturally once the reader moves down to the full list, instead of fighting
- * that content for stacking order.
+ * Placement is scoped to the opening screens (not the full document scroll
+ * height): this element sits in normal flow near the top of the page
+ * (`.ds-memorial-edition`, position: relative) and is pulled up by its own
+ * document offset so it starts at the true viewport top, letting names run
+ * behind the shell header and menu bar. Coordinates in
+ * [0, viewportHeight * MEMORIAL_OPENING_SCREENS] land in the opening field and
+ * scroll away naturally once the reader moves down to the full list, instead
+ * of fighting that content for stacking order.
  */
 'use client';
 
@@ -58,6 +60,14 @@ const SUBSET_ROTATE_MS = 45_000;
 
 /** How often reveal/tick state is recomputed while the opening sequence plays. */
 const REVEAL_TICK_MS = 200;
+
+/**
+ * How many viewports tall the wall is. Above 1 the names keep going past the
+ * fold, so the opening reads as an open field rather than stopping dead where
+ * the readable list begins. Must match `height: 125svh` in memorial-wall.css
+ * and the opening block's reserved height in memorial-edition.css.
+ */
+const MEMORIAL_OPENING_SCREENS = 1.25;
 
 /** Separator between name and year in the composite wall label; controls the split at render. */
 const NAME_YEAR_SEPARATOR = ' · ';
@@ -146,20 +156,45 @@ function usePrefersReducedMotion(): boolean {
   return reduced;
 }
 
+/** Breathing room kept clear around the held message, in px. */
+const MESSAGE_AVOID_MARGIN = 12;
+
 /**
- * Estimated bounding box for the held message, centered at the visual viewport
- * center expressed in wall coordinates (the wall starts offsetTop below the
- * viewport top, matching the CSS `calc(50svh - offset)` placement).
+ * Bounding box for the held message, measured from the rendered element so the
+ * reserved footprint is the message's actual size. The estimate below is a
+ * generous over-guess, and on a phone it walled off most of the canvas: the
+ * packer then had almost nowhere to put a name and the wall came up empty.
  */
-function estimateMessageAvoidBox(
-  width: number,
-  height: number,
-  offsetTop: number,
-): MemorialAvoidBox {
+function measureMessageAvoidBox(
+  root: HTMLElement,
+  field: HTMLElement | null,
+): MemorialAvoidBox | null {
+  if (!field) {
+    return null;
+  }
+  const rootBox = root.getBoundingClientRect();
+  const box = field.getBoundingClientRect();
+  if (box.width === 0 || box.height === 0) {
+    return null;
+  }
+  return {
+    left: box.left - rootBox.left - MESSAGE_AVOID_MARGIN,
+    right: box.right - rootBox.left + MESSAGE_AVOID_MARGIN,
+    top: box.top - rootBox.top - MESSAGE_AVOID_MARGIN,
+    bottom: box.bottom - rootBox.top + MESSAGE_AVOID_MARGIN,
+  };
+}
+
+/**
+ * Estimated bounding box for the held message, used only until the element has
+ * been laid out. The wall's top edge is pulled up to the viewport top, so the
+ * message's `top: 50svh` is simply half a viewport down in wall coordinates.
+ */
+function estimateMessageAvoidBox(width: number, viewportHeight: number): MemorialAvoidBox {
   const boxWidth = Math.min(width * 0.94, 46 * 16 + 64);
-  const boxHeight = Math.min(height * 0.55, 480);
+  const boxHeight = Math.min(viewportHeight * 0.55, 480);
   const cx = width / 2;
-  const cy = height / 2 - offsetTop;
+  const cy = viewportHeight / 2;
   return {
     left: cx - boxWidth / 2,
     right: cx + boxWidth / 2,
@@ -176,6 +211,7 @@ export function MemorialWallAtmosphere({
 }: MemorialWallAtmosphereProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const measureRef = useRef<HTMLSpanElement | null>(null);
+  const messageRef = useRef<HTMLDivElement | null>(null);
   const measureCanvasRef = useRef<CanvasRenderingContext2D | null>(null);
   const resolvedFontsRef = useRef<Map<string, string> | null>(null);
   const [placements, setPlacements] = useState<readonly PlacedMemorialName[]>([]);
@@ -242,13 +278,17 @@ export function MemorialWallAtmosphere({
     // "sparse then building up" beat actually visible without scrolling.
     const rebuild = () => {
       const width = window.innerWidth;
-      const height = window.innerHeight;
+      const viewportHeight = window.innerHeight;
+      const height = viewportHeight * MEMORIAL_OPENING_SCREENS;
 
-      // The wall doesn't start at the top of the viewport (the shell header
-      // sits above it), so "centered at 50svh" in wall coordinates lands
-      // header-height/2 below the visual center. Expose the wall's document
-      // offset so the CSS can subtract it (see --memorial-wall-offset-top).
-      const offsetTop = root.getBoundingClientRect().top + window.scrollY;
+      // The wall's flow position starts below the shell header. Expose that
+      // document offset so the CSS can pull the layer back up to the true top
+      // of the viewport (see --memorial-wall-offset-top), which is what lets
+      // names run behind the header and menu bar.
+      const offsetTop =
+        root.getBoundingClientRect().top +
+        window.scrollY +
+        Number.parseFloat(root.style.getPropertyValue('--memorial-wall-offset-top') || '0');
       root.style.setProperty('--memorial-wall-offset-top', `${offsetTop}px`);
 
       const subset = selectWallSubset(
@@ -270,7 +310,10 @@ export function MemorialWallAtmosphere({
         // long handwritten name never spans most of a narrow canvas.
         fontSizeRange: width < 640 ? [11, 18] : width < 1024 ? [12, 22] : [14, 28],
         avoidBoxes: hasMessage
-          ? [estimateMessageAvoidBox(width, height, offsetTop)]
+          ? [
+              measureMessageAvoidBox(root, messageRef.current) ??
+                estimateMessageAvoidBox(width, viewportHeight),
+            ]
           : undefined,
         measure: (name, fontFamily, fontSizePx) => {
           ctx.font = `${fontSizePx}px ${resolveFontFamily(fontFamily)}`;
@@ -348,7 +391,7 @@ export function MemorialWallAtmosphere({
     let ticking = false;
     const applyFade = () => {
       ticking = false;
-      const span = Math.max(1, window.innerHeight * 0.8);
+      const span = Math.max(1, window.innerHeight * MEMORIAL_OPENING_SCREENS * 0.8);
       const fade = Math.max(0, 1 - window.scrollY / span);
       root.style.setProperty('--memorial-wall-fade', fade.toFixed(3));
     };
@@ -412,7 +455,7 @@ export function MemorialWallAtmosphere({
         );
       })}
       {messageLines && messageLines.length > 0 ? (
-        <div className="ds-memorial-wall__message-field" role="note">
+        <div className="ds-memorial-wall__message-field" role="note" ref={messageRef}>
           <div className="ds-memorial-wall__message-scrim" aria-hidden="true" />
           <p className="ds-memorial-wall__message">
             {messageLines.map((clause, index) => (

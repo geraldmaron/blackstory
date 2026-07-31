@@ -108,9 +108,65 @@
   color: var(--room-ink-4);
 }
 
-/* —— facet groups ——————————————————————————————————————————————————————————— */
+/* —— facet groups ———————————————————————————————————————————————————————————
+   One panel of labelled rows. Six stacked heading-over-chip-bar blocks read as six sections of
+   the page and cost most of a screen before the first record; a label beside its own row costs
+   one line each and scans as a single control. */
+.ds-records-filters {
+  margin-top: var(--ds-space-5);
+  border: var(--ds-border-width) solid var(--room-rule-2);
+  border-radius: var(--ds-radius-md);
+  background: var(--room-sunk);
+}
+
+.ds-records-filters__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-3) var(--ds-space-4);
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--room-ink-3);
+  cursor: pointer;
+}
+
+.ds-records-filters__summary:focus-visible {
+  outline: 2px solid var(--ds-focus-ring, var(--ds-accent-graphic));
+  outline-offset: -2px;
+}
+
+.ds-records-filters__hint {
+  color: var(--room-ink-4);
+}
+
+.ds-records-filters__body {
+  padding: 0 var(--ds-space-4) var(--ds-space-4);
+}
+
+/* Label beside its chips on a wide column, above them once the column is too narrow for both. */
+.ds-records-facet {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr);
+  align-items: start;
+  column-gap: var(--ds-space-3);
+  padding-block: var(--ds-space-2);
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+@media (max-width: 40rem) {
+  .ds-records-facet {
+    grid-template-columns: 1fr;
+    row-gap: var(--ds-space-1);
+  }
+}
+
 .ds-records-facet__title {
-  margin: var(--ds-space-4) 0 0;
+  margin: 0;
+  padding-top: 5px;
   font-family: var(--ds-font-mono);
   font-size: 10px;
   font-weight: 500;
@@ -120,7 +176,17 @@
 }
 
 .ds-records-facet .ds-room-idx__bar {
-  margin-block: var(--ds-space-2) 0;
+  margin-block: 0;
+  gap: 5px;
+}
+
+/* One step tighter than a chip standing on its own: inside the panel there are six rows of them
+   and the height of a single chip is multiplied by every row. */
+.ds-records-filters .ds-room-chip {
+  height: 26px;
+  padding: 0 8px;
+  gap: 5px;
+  font-size: 11.5px;
 }
 
 /* —— the grade dot ——————————————————————————————————————————————————————————

@@ -55,14 +55,18 @@
 
 @media (min-width: 68rem) {
   .ds-room--railed {
-    grid-template-columns: minmax(0, 1fr) 15rem;
+    /* The first track is the column's own measure, not `1fr`. With `1fr` the track ate every
+       spare pixel, `justify-content` had nothing left to centre, and the column — pinned to the
+       end of that oversized track — sat hard against the rail with the whole surplus dumped in
+       the left margin. Sizing the track to the measure makes the pair intrinsically wide, so it
+       centres in the viewport the way an unrailed room already does. */
+    grid-template-columns: minmax(0, var(--room-doc-w, 760px)) 15rem;
     justify-content: center;
     column-gap: var(--ds-space-8);
   }
 
   .ds-room--railed > .ds-room__doc {
-    margin-inline: 0 0;
-    justify-self: end;
+    margin-inline: 0;
   }
 
   .ds-room__rail {

@@ -33,8 +33,13 @@ const FILTER_GROUP_LABELS: Readonly<Record<(typeof RECORDS_FILTER_KEYS)[number],
     evidence: 'Evidence floor',
   });
 
-/** The chip bar shows the vocabulary a reader can act on without drowning the surface. */
-const CHIPS_PER_GROUP = 8;
+/**
+ * The chip bar shows the vocabulary a reader can act on without drowning the surface. Six, not
+ * eight: at eight most groups wrapped to a second line, which doubled the panel's height and put
+ * the first record below the fold. The rail carries the long tail of era and state, and the tail
+ * of every group stays reachable through search.
+ */
+const CHIPS_PER_GROUP = 6;
 
 export type RecordsIndexProps = {
   readonly model: RecordsIndexModel;
@@ -148,27 +153,51 @@ export function RecordsIndexRoom({ model, releaseLabel }: RecordsIndexProps) {
         </div>
       ) : null}
 
-      {RECORDS_FILTER_KEYS.map((key) => {
-        const options = facets[key];
-        if (options.length === 0) return null;
-        return (
-          <div className="ds-records-facet" key={key}>
-            <h2 className="ds-records-facet__title">{FILTER_GROUP_LABELS[key]}</h2>
-            <div className="ds-room-idx__bar" role="group" aria-label={FILTER_GROUP_LABELS[key]}>
-              {options.slice(0, CHIPS_PER_GROUP).map((option) => (
-                <a
-                  className="ds-room-chip"
-                  href={option.href}
-                  key={option.id}
-                  aria-current={option.id === query[key] ? true : undefined}
+      {/*
+        One panel, six labelled rows, rather than six stacked blocks each with a heading above its
+        own chip bar: that shape pushed the first record most of a screen down the page. The label
+        moves inline beside its chips, so the whole vocabulary is scannable in a glance and the
+        list starts where a reader expects it.
+
+        `<details open>`, not a JS disclosure: the filters are visible on arrival (they are how
+        this room is browsed) and can be folded away once a reader has narrowed, with no
+        hydration and no state to lose on a real navigation.
+      */}
+      <details className="ds-records-filters" open>
+        <summary className="ds-records-filters__summary">
+          <span>Narrow these records</span>
+          <span className="ds-records-filters__hint" aria-hidden="true">
+            {constraints.length > 0 ? `${constraints.length} applied` : 'All records'}
+          </span>
+        </summary>
+        <div className="ds-records-filters__body">
+          {RECORDS_FILTER_KEYS.map((key) => {
+            const options = facets[key];
+            if (options.length === 0) return null;
+            return (
+              <div className="ds-records-facet" key={key}>
+                <h2 className="ds-records-facet__title">{FILTER_GROUP_LABELS[key]}</h2>
+                <div
+                  className="ds-room-idx__bar"
+                  role="group"
+                  aria-label={FILTER_GROUP_LABELS[key]}
                 >
-                  {option.label} <span className="ds-room-num">{option.count}</span>
-                </a>
-              ))}
-            </div>
-          </div>
-        );
-      })}
+                  {options.slice(0, CHIPS_PER_GROUP).map((option) => (
+                    <a
+                      className="ds-room-chip"
+                      href={option.href}
+                      key={option.id}
+                      aria-current={option.id === query[key] ? true : undefined}
+                    >
+                      {option.label} <span className="ds-room-num">{option.count}</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </details>
 
       <HairlineIndex
         countLabel={pageCount > 1 ? `${countLabel} · page ${page} of ${pageCount}` : countLabel}

@@ -9,25 +9,54 @@
   background: var(--ds-canvas);
 }
 
-.ds-memorial-edition__stack {
+/* The wall is `position: absolute; z-index: 0`, so it paints above any
+   unpositioned room content that follows it in the document. Without this the
+   handwritten names run straight through the header and the list. */
+.ds-memorial-edition .ds-room {
   position: relative;
   z-index: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-5);
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  /* First viewport reads as blank-except-names: push the readable list panel
-     below the fold so the "Held in the Wall" sequence plays uninterrupted. */
-  padding-block: 100vh var(--ds-space-16);
 }
 
-@media (max-width: 47.9375rem) {
-  .ds-memorial-edition__stack {
-    gap: var(--ds-space-4);
-    padding-block: 100vh var(--ds-space-12);
-  }
+/* First screen reads as wall plus title only: the opening block reserves the
+   whole opening field so the full list starts well below the fold and is
+   reached by scrolling. 125svh matches the wall's own height
+   (MEMORIAL_OPENING_SCREENS) so the names have room past the fold; the 7rem
+   subtraction is the room's offset from the top of the viewport, which keeps
+   the list's top edge landing at the end of the field rather than past it. */
+.ds-memorial-edition__opening {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--ds-space-6);
+  min-block-size: calc(100vh - 7rem);
+  min-block-size: calc(100svh - 7rem);
+  /* Clears the shell's floating bottom-left control, which the cue otherwise
+     sits directly underneath at the foot of the opening screen. */
+  padding-block-end: 5.5rem;
+  /* The remaining quarter screen of wall (MEMORIAL_OPENING_SCREENS = 1.25):
+     open field between the scroll cue and the list. Kept as margin rather
+     than min-height so the cue still lands on the first screen. */
+  margin-block-end: 25vh;
+  margin-block-end: 25svh;
+}
+
+.ds-memorial-edition__scroll-cue {
+  margin: 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.03em;
+  color: var(--ds-ink-muted);
+}
+
+.ds-memorial-edition__scroll-cue a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+.ds-memorial-edition__scroll-cue a:focus-visible {
+  outline: 2px solid var(--ds-focus-ring, var(--ds-accent-graphic));
+  outline-offset: 2px;
 }
 
 .ds-memorial-edition__panel {
@@ -228,45 +257,3 @@
   scroll-margin-top: var(--ds-island-clearance);
 }
 
-/* Accessible title/lede kept for screen readers and SEO; not shown visually
-   so the opening viewport reads as blank-except-names. */
-.ds-memorial-edition__sr-intro {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* Single small quiet text link to the full list, anchored near the bottom of
-   the viewport. Not a card or button. */
-.ds-memorial-edition__quiet-links {
-  position: fixed;
-  z-index: 2;
-  left: 50%;
-  bottom: var(--ds-space-4);
-  transform: translateX(-50%);
-  margin: 0;
-  font-family: var(--ds-font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.03em;
-  color: var(--ds-ink-muted);
-  background: color-mix(in srgb, var(--ds-canvas) 55%, transparent);
-  padding: 0.35rem 0.75rem;
-  border-radius: var(--ds-radius-md);
-}
-
-.ds-memorial-edition__quiet-links a {
-  color: inherit;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.15em;
-}
-
-.ds-memorial-edition__quiet-links a:focus-visible {
-  outline: 2px solid var(--ds-focus-ring, var(--ds-accent-graphic));
-  outline-offset: 2px;
-}

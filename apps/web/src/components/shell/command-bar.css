@@ -10,7 +10,7 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--ds-space-3);
-  height: 56px;
+  height: 64px;
   padding: 0 var(--ds-space-3);
   background: var(--ds-surface);
   border: var(--ds-border-width) solid var(--ds-border);
@@ -22,7 +22,9 @@
 
 /*
  * `.ds-shell-wordmark` from shell-header.css supplies the artwork and its light/dark swap. This
- * only sets the bar's own spacing and the height cap for a 56px bar.
+ * only sets the bar's own spacing and the height cap for a 64px bar. The lockup reads as the
+ * site's signature, not a favicon parked beside the search field, so it takes most of that bar
+ * height rather than sitting two steps below the controls next to it.
  */
 .ds-bar__brand {
   display: inline-flex;
@@ -33,23 +35,12 @@
 }
 
 .ds-bar__brand .ds-shell-wordmark__img--lockup {
-  height: 2.75rem;
+  height: 3.25rem;
 }
 
 .ds-bar__brand .ds-shell-wordmark__img--symbol {
-  width: 1.75rem;
-  height: 1.75rem;
-}
-
-.ds-bar__tag {
-  padding: 2px 6px;
-  border: var(--ds-border-width) solid var(--ds-border);
-  border-radius: var(--ds-radius-full);
-  font-family: var(--ds-font-mono);
-  font-size: 0.5625rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ds-ink-muted);
+  width: 2.125rem;
+  height: 2.125rem;
 }
 
 /* ---- search trigger ------------------------------------------------------ */
@@ -180,12 +171,16 @@
 /* ---- narrow -------------------------------------------------------------- */
 
 /*
- * Below 820px the wordmark, the ATLAS tag and the mode labels go, in that order. The search
- * trigger never goes: it is the primary affordance and a bar without it is v6's nav again.
+ * Below 820px the wordmark drops to the symbol. The modes stay: Atlas, Story and Library are how
+ * a reader moves between the three things this site is, and on a phone the palette shortcut that
+ * used to be their only replacement does not exist. They compact instead of disappearing.
+ *
+ * The search trigger never goes either — it is the primary affordance — but below 560px it gives
+ * up its label and becomes the glyph alone, which is the space the modes need.
  */
 @media (max-width: 819px) {
   .ds-bar {
-    height: 50px;
+    height: 56px;
     gap: var(--ds-space-2);
   }
 
@@ -210,12 +205,36 @@
     display: block;
   }
 
-  .ds-bar__tag {
+  .ds-bar__modes button,
+  .ds-bar__mode-link {
+    min-height: 26px;
+    padding: 0 var(--ds-space-2);
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 559px) {
+  .ds-bar {
+    gap: var(--ds-space-2);
+    padding: 0 var(--ds-space-2);
+  }
+
+  /* Glyph alone. The button keeps its full hit area and its aria-label, so the control is the
+     same size to a thumb and the same thing to a screen reader. */
+  .ds-bar__search-text,
+  .ds-bar__search .ds-kbd {
     display: none;
   }
 
-  .ds-bar__modes {
-    display: none;
+  .ds-bar__search {
+    justify-content: center;
+    min-width: 44px;
+  }
+
+  .ds-bar__modes button,
+  .ds-bar__mode-link {
+    padding: 0 0.5rem;
+    font-size: 0.6875rem;
   }
 }
 

@@ -63,19 +63,16 @@ describe('/library · the room is reachable', () => {
     assert.equal(new Set(chords).size, chords.length, 'two shortcuts share a chord');
   });
 
-  it('is the second breadcrumb step for a reading room and a utility room alike', () => {
+  it('is the first breadcrumb step for a reading room and a utility room alike', () => {
+    // The Atlas root is resolved as a parent but not rendered as a step, so the library leads.
     for (const path of ['/books', '/methodology', '/corrections', '/submit']) {
       const trail = resolveTrail(path);
-      assert.equal(trail[0]?.label, 'Atlas');
-      assert.equal(trail[1]?.label, 'The library');
-      assert.equal(trail[1]?.href, '/library', 'the library step must be a working link');
+      assert.equal(trail[0]?.label, 'The library');
+      assert.equal(trail[0]?.href, '/library', 'the library step must be a working link');
     }
   });
 
-  it('the library itself hangs off the Atlas and does not parent itself', () => {
-    assert.deepEqual(resolveTrail('/library'), [
-      { label: 'Atlas', href: '/' },
-      { label: 'The library', href: null },
-    ]);
+  it('the library does not parent itself', () => {
+    assert.deepEqual(resolveTrail('/library'), [{ label: 'The library', href: null }]);
   });
 });

@@ -83,8 +83,10 @@ export function CommandBar({
       {/* The same brand component the site header and the admin shell render, so the Atlas
           cannot drift to its own artwork or its own light/dark pairing. */}
       <a className="ds-bar__brand ds-shell-wordmark" href="/" aria-label="BlackStory · home">
+        {/* Wordmark only. The `ATLAS` tag that used to sit beside it named one of the two modes
+            the bar already carries as a control, so the same word appeared twice, three inches
+            apart, meaning two different things. */}
         <ShellWordmark lockup={BRAND_ASSETS.lockup} symbol={BRAND_ASSETS.symbol} />
-        <span className="ds-bar__tag">Atlas</span>
       </a>
 
       {onOpenPalette ? (

@@ -1,5 +1,7 @@
 /**
- * Breadcrumb — Atlas / <parent chain> / here, every step a real link.
+ * Breadcrumb — <parent chain> / here, every step above the last a real link.
+ *
+ * The Atlas root is resolved but not rendered; see `resolveTrail`.
  *
  * The chain is resolved from `room-trail.ts`, not passed in per page. A room supplies only
  * the label of the step it is, because a record's title is data.

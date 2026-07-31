@@ -8,7 +8,9 @@
 
 @import '../components/room/room-kit.css';
 
-[data-surface='record'] .ds-room__doc {
+/* Declared on the room, not the column: the railed grid sizes its first track from this
+   measure so the column-plus-rail pair centres as a unit. The column inherits it. */
+[data-surface='record'] .ds-room {
   --room-doc-w: 680px;
 }
 
