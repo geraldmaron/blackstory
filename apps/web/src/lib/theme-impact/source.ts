@@ -12,6 +12,7 @@ import {
 } from '@repo/domain';
 import { cache } from 'react';
 import { hasPostgresConnection } from '../public-data/live-policy';
+import { THEME_CHAPTER_SLUGS } from '../redirects/theme-alias-table.mjs';
 import { getThemeCatalogEntry } from './catalog';
 import { listReleaseThemeImpactPacketsByTheme } from './postgres-readers';
 
@@ -108,16 +109,11 @@ export async function resolveEntityCrossReferences(
 }
 
 /**
- * Theme ids with an authored chapter under /chapters. Themes not listed here
- * have no chapter yet (repo-8602) and fall back to the chapters index — the
- * same place the /themes/:path* catch-all redirect would land them, but
- * without the extra 308 hop.
+ * Themes absent from the table have no chapter yet (repo-8602) and fall back to the chapters
+ * index — the same place the `/themes/:path*` catch-all would land them, without the 308 hop.
+ * The table itself lives in `lib/redirects/theme-alias-table.mjs`, which `next.config.mjs` also
+ * generates its `/themes` rules from, so an in-app href and its redirect cannot disagree.
  */
-const THEME_CHAPTER_SLUGS: Readonly<Record<string, string>> = {
-  redlining: 'buying-a-home',
-  wealth_gap: 'the-gap-that-never-closed',
-};
-
 function themeHref(themeId: string): string {
   const slug = THEME_CHAPTER_SLUGS[themeId];
   return slug === undefined ? '/chapters' : `/chapters/${slug}`;

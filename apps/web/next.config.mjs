@@ -8,6 +8,7 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { securityHeadersForNextConfig } from './src/lib/web-security/next-config-headers.mjs';
+import { redirectsForNextConfig } from './src/lib/redirects/next-config-redirects.mjs';
 
 const appDir = path.dirname(fileURLToPath(import.meta.url));
 const monorepoRoot = path.join(appDir, '../..');
@@ -78,115 +79,7 @@ const nextConfig = {
     },
   },
   async redirects() {
-    return [
-      // Legacy publication surfaces all fold into /chapters. Article detail
-      // slugs carry over 1:1 (/articles/:slug -> /chapters/:slug); the theme,
-      // story, and topic indexes collapse to the chapters index.
-      {
-        source: '/articles/:slug',
-        destination: '/chapters/:slug',
-        permanent: true,
-      },
-      {
-        source: '/articles',
-        destination: '/chapters',
-        permanent: true,
-      },
-      {
-        source: '/stories',
-        destination: '/chapters',
-        permanent: true,
-      },
-      // Site-wide atmosphere-tile attribution keeps its own page (moved under
-      // /chapters); this specific rule must precede the /stories/:path* catch-all.
-      {
-        source: '/stories/mosaic-credits',
-        destination: '/chapters/mosaic-credits',
-        permanent: true,
-      },
-      {
-        source: '/stories/:path*',
-        destination: '/chapters',
-        permanent: true,
-      },
-      {
-        source: '/themes',
-        destination: '/chapters',
-        permanent: true,
-      },
-      // Theme ids with an authored chapter redirect to it; these must precede
-      // the /themes/:path* catch-all.
-      {
-        source: '/themes/redlining',
-        destination: '/chapters/buying-a-home',
-        permanent: true,
-      },
-      {
-        source: '/themes/redlining/:path*',
-        destination: '/chapters/buying-a-home',
-        permanent: true,
-      },
-      {
-        source: '/themes/wealth_gap',
-        destination: '/chapters/the-gap-that-never-closed',
-        permanent: true,
-      },
-      {
-        source: '/themes/wealth_gap/:path*',
-        destination: '/chapters/the-gap-that-never-closed',
-        permanent: true,
-      },
-      {
-        source: '/themes/:path*',
-        destination: '/chapters',
-        permanent: true,
-      },
-      {
-        source: '/topics',
-        destination: '/chapters',
-        permanent: true,
-      },
-      {
-        source: '/topics/:path*',
-        destination: '/chapters',
-        permanent: true,
-      },
-      {
-        source: '/facts',
-        destination: '/history',
-        permanent: true,
-      },
-      {
-        source: '/facts/:path*',
-        destination: '/history',
-        permanent: true,
-      },
-      {
-        source: '/search',
-        destination: '/history',
-        permanent: true,
-      },
-      {
-        source: '/myths',
-        destination: '/methodology',
-        permanent: true,
-      },
-      {
-        source: '/myths/:path*',
-        destination: '/methodology',
-        permanent: true,
-      },
-      {
-        source: '/legal',
-        destination: '/law',
-        permanent: true,
-      },
-      {
-        source: '/legal/:path*',
-        destination: '/law/:path*',
-        permanent: true,
-      },
-    ];
+    return redirectsForNextConfig();
   },
   async headers() {
     return [

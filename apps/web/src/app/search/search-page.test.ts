@@ -1,26 +1,35 @@
 /**
- * Search route redirect contract: /search merged into unified /history surface.
+ * `/search` route contract: a redirect endpoint that resolves to `/records` in one hop.
+ *
+ * The href mapping itself is covered by `lib/redirects/redirect-table.test.ts` alongside the
+ * chain guarantee, so this file only asserts the route is wired to it and renders nothing.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { mapSearchQueryToHistoryHref } from '../../lib/history/search-redirect';
+import { mapSearchQueryToRecordsHref } from '../../lib/search/search-href';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const searchPageTsx = readFileSync(join(here, 'page.tsx'), 'utf8');
 
 describe('/search redirect', () => {
-  it('page.tsx redirects through mapSearchQueryToHistoryHref', () => {
-    assert.match(searchPageTsx, /redirect\(mapSearchQueryToHistoryHref/);
+  it('page.tsx permanently redirects through mapSearchQueryToRecordsHref', () => {
+    // permanentRedirect, not redirect: a 307 would keep /search indexed as a real surface.
+    assert.match(searchPageTsx, /permanentRedirect\(mapSearchQueryToRecordsHref/);
     assert.doesNotMatch(searchPageTsx, /SearchBrowseSections/);
   });
 
-  it('maps legacy search URLs onto history with facets preserved', () => {
+  it('lands on /records rather than routing through /history', () => {
     assert.equal(
-      mapSearchQueryToHistoryHref({ q: 'obama', kind: 'place', status: 'historic', era: '1960s' }),
-      '/history?q=obama&kind=place&status=historic&era=1960s',
+      mapSearchQueryToRecordsHref({
+        q: 'obama',
+        kind: 'place',
+        status: 'historic',
+        era: '1960s',
+      }),
+      '/records?q=obama&kind=place&status=historic&era=1960s',
     );
   });
 });
