@@ -45,6 +45,9 @@ import { TimePanel } from '../../../components/map-experience/TimePanel';
 import { createCamera, type CameraMove } from '../../../lib/map-experience/camera-moves';
 import { chromePadding } from '../../../lib/map-experience/chrome-padding';
 import { decadeDensityBars } from '../../../lib/map-experience/decade-density';
+import { sweep, type SweepHandle } from '../../../lib/map-experience/decade-transition';
+import { StoryMode } from '../../../components/story/StoryMode';
+import type { StoryChapter } from '../../../lib/story/chapters';
 import {
   applyEvidenceFloor,
   gradeForConfidence,
@@ -392,6 +395,9 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
 
   const sheetRecord = useMemo<SheetRecord | null>(() => {
     if (!selectedFeature) return null;
+    // Chapter 2 selects a record so the plate can mark it, but the chapter card is what the reader
+    // is reading. Opening the sheet over it would put two accounts of the same record on screen.
+    if (mode === 'story') return null;
     const grade = gradeForConfidence(selectedFeature.properties.confidenceTier);
     const sources = selectedFeature.properties.evidenceCount;
     return {
@@ -411,7 +417,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
       sources: [],
       connections: [],
     };
-  }, [selectedFeature]);
+  }, [mode, selectedFeature]);
 
   /* ---- actions ----------------------------------------------------------- */
 
@@ -677,6 +683,100 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     [view.allFeatures],
   );
 
+  /* ---- story ------------------------------------------------------------- */
+
+  /**
+   * The running decade sweep, if a chapter asked for one. Held in a ref rather than state because
+   * the next chapter has to cancel it during its own handler, and a state read there would see the
+   * previous render's value and leave two sweeps stepping the histogram against each other.
+   */
+  const sweepRef = useRef<SweepHandle | null>(null);
+
+  const stopSweep = useCallback(() => {
+    sweepRef.current?.cancel();
+    sweepRef.current = null;
+  }, []);
+
+  /**
+   * Runs a chapter's beats: camera, spotlight, corridors, decade sweep, and the one record chapter
+   * 2 is about (design-direction-v9-atlas.md §6). Story mode was a toggle that hid the instruments
+   * and put nothing in their place — `StoryMode.tsx` and `chapters.ts` both existed and neither had
+   * a caller.
+   *
+   * A chapter naming a record goes through `camera.flyToRecord`, not a raw `flyTo`, so the dignity
+   * gate still governs how close the plate is allowed to get. A chapter's own camera spec is a view
+   * of the country rather than of anyone, so it flies directly.
+   */
+  const runChapter = useCallback(
+    (chapter: StoryChapter) => {
+      stopSweep();
+      camera.cancel();
+
+      const focus = chapter.focusRecordId ? featureById(chapter.focusRecordId) : null;
+      setSelectedId(focus?.properties.entityId);
+
+      if (focus) {
+        const [lng, lat] = focus.geometry.coordinates;
+        camera.flyToRecord(
+          { center: [lng, lat], place: placeLabelFor(focus) },
+          { trigger: 'ambient' },
+        );
+      } else {
+        stage.getMap()?.flyTo({
+          center: chapter.camera.center,
+          zoom: chapter.camera.zoom,
+          pitch: chapter.camera.pitch,
+          bearing: chapter.camera.bearing,
+          duration: prefersReducedMotion() ? 0 : 1600,
+        } as never);
+      }
+
+      setLayers((current) => ({ ...current, routes: chapter.routes === true }));
+
+      if (chapter.spotlightRadiusPercent !== undefined) {
+        camera.spotlight({
+          center: chapter.camera.center,
+          radiusPercent: chapter.spotlightRadiusPercent,
+          trigger: 'ambient',
+        });
+      } else {
+        setSpotlight(null);
+      }
+
+      if (chapter.sweep && decadeBars.length > 0) {
+        const first = decadeBars[0];
+        const last = decadeBars[decadeBars.length - 1];
+        if (first && last) {
+          sweepRef.current = sweep({
+            from: first.decade,
+            to: last.decade,
+            onDecade: setDecade,
+            // The sweep ends on the last decade, which would leave the plate filtered to it. All
+            // time is what the chapter is arguing for, so the histogram returns there.
+            onDone: () => setDecade(null),
+            reducedMotion: prefersReducedMotion(),
+          });
+        }
+      } else {
+        setDecade(null);
+      }
+    },
+    [camera, decadeBars, featureById, stage, stopSweep],
+  );
+
+  /**
+   * Leaving the story must not strand its beats on the Atlas. A spotlight mask, a corridor layer or
+   * a stepping histogram left running would read as the map having broken, not as the story having
+   * ended.
+   */
+  useEffect(() => {
+    if (mode === 'story') return;
+    stopSweep();
+    setSpotlight(null);
+  }, [mode, stopSweep]);
+
+  useEffect(() => stopSweep, [stopSweep]);
+
   /* ---- render ------------------------------------------------------------ */
 
   const savedSet = useMemo(() => savedIdSet(collection), [collection]);
@@ -713,6 +813,14 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
         }
         corridors={MIGRATION_CORRIDORS}
         visible={layers.routes}
+      />
+
+      <StoryMode
+        active={mode === 'story'}
+        onChapter={runChapter}
+        onOpenAtlas={() => setMode('atlas')}
+        onNearMe={nearMe}
+        reducedMotion={prefersReducedMotion()}
       />
 
       {spotlight ? (

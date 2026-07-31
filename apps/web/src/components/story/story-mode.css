@@ -56,6 +56,33 @@
   padding: 0;
 }
 
+/*
+ * A soft wash under the two panel-less chapters. Text directly on the plate is the design, but the
+ * plate under the cold open is the densest part of the archive — four thousand pins — and the
+ * prose and the citation line were unreadable against it. A radial scrim keeps the map legible
+ * through the type instead of putting a panel back.
+ */
+.ds-story__chapter--centred {
+  position: relative;
+}
+
+.ds-story__chapter--centred::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 60% 46% at 50% 50%,
+    var(--ds-surface) 0%,
+    color-mix(in srgb, var(--ds-surface) 78%, transparent) 42%,
+    transparent 74%
+  );
+}
+
+.ds-story__chapter--centred .ds-story__card {
+  position: relative;
+}
+
 .ds-story__index {
   display: block;
   margin-bottom: var(--ds-space-2);
