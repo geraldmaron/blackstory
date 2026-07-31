@@ -2,14 +2,17 @@
  * Public support page for BlackStory store gates. Primary path is the corrections lane;
  * secondary trust surfaces and a contact placeholder until the owner sets a live address.
  */
+import type { Metadata } from 'next';
+import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import './support.css';
 
-export const metadata = {
+export const metadata: Metadata = buildStaticPageMetadata({
+  path: '/support',
   title: 'Support',
   description:
     'How to report corrections, read BlackStory trust documentation, and reach the team.',
-};
+});
 
 const SUPPORT_PATHS = [
   {
@@ -56,8 +59,8 @@ export default function SupportPage() {
             Common paths
           </h2>
           <p className="ds-section__lede">
-            Most questions about a specific record are best handled through corrections so moderators
-            can tie your report to the published projection and sources.
+            Most questions about a specific record are best handled through corrections so
+            moderators can tie your report to the published projection and sources.
           </p>
           <ul className="ds-support__paths">
             {SUPPORT_PATHS.map((path) => (
@@ -84,8 +87,8 @@ export default function SupportPage() {
             Reach the team
           </h2>
           <p className="ds-section__lede">
-            For issues that do not fit the corrections form — account of operation questions, privacy
-            requests, or accessibility barriers — email the contact below.
+            For issues that do not fit the corrections form — account of operation questions,
+            privacy requests, or accessibility barriers — email the contact below.
           </p>
           <div className="ds-support__contact">
             <p className="ds-support__contact-label">Support contact</p>

@@ -14,6 +14,7 @@
 import type { Metadata } from 'next';
 import React from 'react';
 import { getSharedPublicEntities } from '../(map)/shared-map-data';
+import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { EMPTY_RECORDS_QUERY, buildRecordsIndex } from '../../lib/records/build-records-index';
 import {
   GROUP_HEADINGS,
@@ -35,12 +36,12 @@ import '../reading-room.css';
 
 void React;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildStaticPageMetadata({
+  path: '/library',
   title: 'The library',
   description:
     'Every room in the archive that is not the map: chapters, law, data, banned books, the memorial, and the receipts that show how a record gets in.',
-  alternates: { canonical: '/library' },
-};
+});
 
 /**
  * The three mono facts under the title, drawn from the release rather than typed.

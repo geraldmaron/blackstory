@@ -2,6 +2,8 @@
  * Public errata log reverse-chronological corrections policy and change history with
  * four-way taxonomy. Companion feeds at /errata/feed.json and /errata/feed.xml.
  */
+import type { Metadata } from 'next';
+import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import {
   PublishingPrinciplesJsonLdScript,
   TrustSiteJsonLdScript,
@@ -10,11 +12,12 @@ import { listErrataEntries } from '../../lib/trust/errata-seed';
 import { TRUST_PATHS } from '../../lib/trust/site-identity';
 import { ErrataSections } from './ErrataSections';
 
-export const metadata = {
+export const metadata: Metadata = buildStaticPageMetadata({
+  path: '/errata',
   title: 'Errata & corrections policy',
   description:
     'Reverse-chronological log of corrections, clarifications, updates, and editor notes — fully, quickly, and without defensiveness.',
-};
+});
 
 export default function ErrataPage() {
   const entries = listErrataEntries();

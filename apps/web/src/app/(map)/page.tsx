@@ -10,7 +10,9 @@
  * drill-down. The camera stays in memory, so the shareable URL carries filters and selection but
  * never pan or zoom (ADR-017).
  */
+import type { Metadata } from 'next';
 import { FilterBar } from '@repo/ui';
+import { absolutePublicUrl } from '../../lib/seo/metadata-builders';
 import { SynchronizedResultList } from '../../components/map-experience/SynchronizedResultList';
 import { getSharedPublicEntities } from './shared-map-data';
 import { AtlasExperience } from './explore/AtlasExperience';
@@ -25,10 +27,18 @@ import './explore/explore-edition.css';
 /**
  * No `title`: the root layout's default is the product name, which is what `/` should read as.
  * A per-route title here would render "Explore · BlackStory" on the site's front door.
+ *
+ * The canonical is the bare `/`, deliberately dropping any query (SP-19, repo-92n2.19). The
+ * Atlas takes state, era, kind, topic and status as filters and `/explore` 308s here carrying all
+ * of them, so the number of reachable URLs that render substantially the same page is the product
+ * of every facet. Self-canonicalising each permutation would offer a crawler thousands of near
+ * duplicates of the front door; collapsing them onto `/` offers one. `/records` is the surface
+ * that self-canonicalises a narrowing, because there the narrowing IS the page.
  */
-export const metadata = {
+export const metadata: Metadata = {
   description:
     'Map-first national view of documented Black history: every geo-anchored record in the active release.',
+  alternates: { canonical: absolutePublicUrl('/') },
 };
 
 type AtlasPageProps = {

@@ -3,6 +3,8 @@
  * stack on shared edition atmosphere. JSON-LD preserved; copy accurate.
  */
 
+import type { Metadata } from 'next';
+import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import {
   PublishingPrinciplesJsonLdScript,
   TrustSiteJsonLdScript,
@@ -15,11 +17,12 @@ import {
 } from './methodology-panel-chrome';
 import './methodology-edition.css';
 
-export const metadata = {
+export const metadata: Metadata = buildStaticPageMetadata({
+  path: '/methodology',
   title: 'Methodology',
   description:
     'How BlackStory decides what qualifies, verifies sources, protects living people, handles corrections, and publishes confidence you can check yourself. History should not be erased, should not be hard to find, and should be accessible because it is about you.',
-};
+});
 
 export default function MethodologyPage() {
   return (

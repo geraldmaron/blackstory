@@ -67,6 +67,23 @@ export type Destination = {
   readonly modifier?: string;
   /** Absent for routes that are real destinations but not somewhere we send a reader browsing. */
   readonly group?: DestinationGroup;
+  /**
+   * Crawl facts, present exactly when this route belongs in the sitemap (SP-19, repo-92n2.19).
+   *
+   * Absent means "do not advertise": either the route is not built yet, or it is deliberately
+   * kept out of the index. Both cases are commented at the entry, because an unexplained missing
+   * `crawl` is indistinguishable from an oversight.
+   */
+  readonly crawl?: {
+    readonly changeFrequency: 'daily' | 'weekly' | 'monthly';
+    readonly priority: number;
+  };
+  /**
+   * Emit `noindex, follow`. Deliberately paired with NO robots.txt Disallow: a Disallowed URL is
+   * never fetched, so the crawler never reads the noindex and the URL can still be indexed from
+   * inbound links alone. Blocking and de-indexing are opposite instructions.
+   */
+  readonly noIndex?: true;
 };
 
 /**
@@ -87,6 +104,7 @@ const DESTINATIONS: readonly Destination[] = [
     kind: 'MAP',
     description: 'Every record that can be placed, on the plate, in time.',
     group: 'find',
+    crawl: { changeFrequency: 'daily', priority: 1 },
   },
   {
     path: '/library',
@@ -95,6 +113,7 @@ const DESTINATIONS: readonly Destination[] = [
     kind: 'HUB',
     description: 'Everything that is not the map, in one place.',
     group: 'find',
+    crawl: { changeFrequency: 'monthly', priority: 0.8 },
   },
   {
     path: '/records',
@@ -103,8 +122,13 @@ const DESTINATIONS: readonly Destination[] = [
     kind: 'INDEX',
     description: 'The whole archive as a list you can filter, page and cite.',
     group: 'find',
+    crawl: { changeFrequency: 'daily', priority: 0.9 },
   },
   {
+    // No `crawl` yet: /story does not render until SP-10 (repo-92n2.10), and a sitemap that
+    // advertises a 404 spends crawl budget teaching a crawler the site is unreliable.
+    // `sitemap-builders.test.ts` asserts every crawled path has a page on disk, so this entry
+    // gains its `crawl` the moment the route exists and not before.
     path: '/story',
     label: 'Story',
     parent: '/',
@@ -122,6 +146,7 @@ const DESTINATIONS: readonly Destination[] = [
     description:
       'The archive argued rather than listed. Sourced narrative that names the records it rests on.',
     group: 'read',
+    crawl: { changeFrequency: 'weekly', priority: 0.6 },
   },
   {
     path: '/law',
@@ -132,6 +157,7 @@ const DESTINATIONS: readonly Destination[] = [
       'The statutes and rulings that shaped what could be built, owned, attended and voted for.',
     modifier: 'PLAIN LANGUAGE',
     group: 'read',
+    crawl: { changeFrequency: 'weekly', priority: 0.7 },
   },
   {
     path: '/data',
@@ -142,6 +168,7 @@ const DESTINATIONS: readonly Destination[] = [
       'National series with their sources attached, and a plain account of what each one cannot tell you.',
     modifier: 'TABULAR',
     group: 'read',
+    crawl: { changeFrequency: 'weekly', priority: 0.6 },
   },
   {
     path: '/books',
@@ -150,6 +177,7 @@ const DESTINATIONS: readonly Destination[] = [
     kind: 'CATALOGUE',
     description: 'Documented challenges to titles, recorded as challenges rather than as verdicts.',
     group: 'read',
+    crawl: { changeFrequency: 'weekly', priority: 0.6 },
   },
   {
     path: '/memorial',
@@ -159,6 +187,7 @@ const DESTINATIONS: readonly Destination[] = [
     description: 'Names, held quietly. No imagery of harm, no counts presented as a score.',
     modifier: 'STILL',
     group: 'read',
+    crawl: { changeFrequency: 'monthly', priority: 0.5 },
   },
 
   /* ---- check the archive ---- */
@@ -171,6 +200,7 @@ const DESTINATIONS: readonly Destination[] = [
       'How a record gets in, what the evidence grades mean, and why a point is never drawn sharper than its source.',
     modifier: 'RECEIPT',
     group: 'check',
+    crawl: { changeFrequency: 'monthly', priority: 0.5 },
   },
   {
     path: '/errata',
@@ -181,6 +211,7 @@ const DESTINATIONS: readonly Destination[] = [
       'The mistakes the archive found and fixed, published rather than quietly overwritten.',
     modifier: 'FEED AVAILABLE',
     group: 'check',
+    crawl: { changeFrequency: 'weekly', priority: 0.6 },
   },
   {
     path: '/about',
@@ -189,6 +220,7 @@ const DESTINATIONS: readonly Destination[] = [
     kind: 'FRAMING',
     description: 'What this is for, who it is for, and what it refuses to do.',
     group: 'check',
+    crawl: { changeFrequency: 'monthly', priority: 0.5 },
   },
 
   /* ---- take part ---- */
@@ -202,6 +234,7 @@ const DESTINATIONS: readonly Destination[] = [
       'Point the archive at something it has missed. Leads are reviewed, not published on arrival.',
     modifier: 'FORM',
     group: 'take-part',
+    crawl: { changeFrequency: 'monthly', priority: 0.5 },
   },
   {
     path: '/corrections',
@@ -212,6 +245,7 @@ const DESTINATIONS: readonly Destination[] = [
     description: 'Tell the archive it is wrong. You get a receipt code and a tracked outcome.',
     modifier: 'FORM · TRACKED',
     group: 'take-part',
+    crawl: { changeFrequency: 'monthly', priority: 0.6 },
   },
   {
     path: '/support',
@@ -220,15 +254,42 @@ const DESTINATIONS: readonly Destination[] = [
     kind: 'HELP',
     description: 'How to get an answer, and how long it should take.',
     group: 'take-part',
+    crawl: { changeFrequency: 'monthly', priority: 0.4 },
   },
 
   /* ---- real destinations, but not somewhere we send a reader browsing ---- */
-  { path: '/chapters/mosaic-credits', label: 'Mosaic credits', parent: '/chapters' },
-  { path: '/corrections/appeal', label: 'Appeal', parent: '/corrections' },
-  { path: '/corrections/abuse', label: 'Report abuse', parent: '/corrections' },
-  { path: '/privacy', label: 'Privacy', parent: '/library' },
-  { path: '/design-system', label: 'Design system', parent: '/library' },
-  { path: '/locate', label: 'Locate', parent: '/library' },
+  {
+    path: '/chapters/mosaic-credits',
+    label: 'Mosaic credits',
+    parent: '/chapters',
+    crawl: { changeFrequency: 'monthly', priority: 0.2 },
+  },
+  // `/corrections/appeal` and `/corrections/abuse` are gone from this list. They were carried
+  // over from the old breadcrumb table as though they were pages, and they are not: both are
+  // API-only directories whose forms render inside the receipt status page. The sitemap's
+  // "every crawled path has a page on disk" assertion is what surfaced it (SP-19).
+  {
+    path: '/privacy',
+    label: 'Privacy',
+    parent: '/library',
+    crawl: { changeFrequency: 'monthly', priority: 0.3 },
+  },
+  {
+    path: '/locate',
+    label: 'Locate',
+    parent: '/library',
+    crawl: { changeFrequency: 'monthly', priority: 0.7 },
+  },
+  {
+    // No `crawl`: a fixture gallery is not a page a reader should arrive at from a search result,
+    // and its content is component names rather than archive material. `noIndex` says so in the
+    // page's own head, where a crawler will actually read it. See the `noIndex` doc above for why
+    // this is NOT paired with a robots.txt Disallow.
+    path: '/design-system',
+    label: 'Design system',
+    parent: '/library',
+    noIndex: true,
+  },
 ];
 
 const DESTINATION_BY_PATH: ReadonlyMap<string, Destination> = new Map(
@@ -340,6 +401,22 @@ export function footerColumns(): readonly FooterColumn[] {
     column('Trust', ['check']),
     column('Contribute', ['take-part']),
   ];
+}
+
+/**
+ * The destinations the sitemap advertises, in registry order (SP-19).
+ *
+ * A route joins the sitemap by gaining `crawl` and leaves by losing it, so the sitemap cannot
+ * drift from the site the way the old hand-kept list did — it listed `/history` twice, which put
+ * a duplicate `<url>` in the XML, and went on listing it after `/history` became a redirect.
+ */
+export function crawlableDestinations(): readonly Destination[] {
+  return DESTINATIONS.filter((destination) => destination.crawl !== undefined);
+}
+
+/** Whether this route asks to be left out of the index. Unknown routes are indexable. */
+export function isNoIndexPath(pathname: string): boolean {
+  return destinationFor(pathname)?.noIndex === true;
 }
 
 /**

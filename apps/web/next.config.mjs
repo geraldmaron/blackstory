@@ -88,6 +88,22 @@ const nextConfig = {
         headers: globalSecurityHeaders,
       },
       {
+        // A receipt code is a private handle to one person's correction. The page is
+        // unguessable rather than access-controlled, so the risk is not someone browsing to it
+        // but a crawler that saw the URL in a referrer or a pasted link putting it in an index.
+        //
+        // `noindex` de-lists it; `follow` is kept because the page links back to /corrections.
+        // Deliberately NOT paired with a robots.txt Disallow (SP-19, repo-92n2.19): a Disallowed
+        // URL is never fetched, so this header would never be read, and the URL could still be
+        // indexed from an inbound link with nothing but its own text. Blocking the fetch and
+        // asking for removal are opposite instructions, and only one of them works here.
+        //
+        // Sent as a header rather than a `<meta>` tag, which covers the non-HTML responses the
+        // path can return as well as the page itself.
+        source: '/corrections/status/:receiptCode*',
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, follow' }],
+      },
+      {
         source: '/entity/:id',
         headers: [
           {

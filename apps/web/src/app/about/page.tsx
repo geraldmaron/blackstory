@@ -4,14 +4,12 @@
  * follows home/history edition vocabulary.
  */
 
+import type { Metadata } from 'next';
+import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { MakerCredit } from '../../components/MakerCredit';
 import { ATMOSPHERE_ATTRIBUTION_HREF } from '../../components/atmosphere/tile-credits';
-import {
-  ABOUT_DESTINATIONS,
-  ABOUT_MISSION_BEATS,
-  ABOUT_PILLARS,
-} from './about-copy';
+import { ABOUT_DESTINATIONS, ABOUT_MISSION_BEATS, ABOUT_PILLARS } from './about-copy';
 import {
   aboutEditionPanelClassName,
   aboutEditionRootClassName,
@@ -19,11 +17,12 @@ import {
 } from './about-panel-chrome';
 import './about-edition.css';
 
-export const metadata = {
+export const metadata: Metadata = buildStaticPageMetadata({
+  path: '/about',
   title: 'About',
   description:
     'BlackStory is a place-connected Black history research platform. History should not be erased, should not be hard to find, and should be accessible because it is about you.',
-};
+});
 
 export default function AboutPage() {
   return (
@@ -53,7 +52,7 @@ export default function AboutPage() {
                   </Link>
                 </p>
                 <p className="ds-about-edition__credit">
-                  Archive texture · symbolic atmosphere. {' '}
+                  Archive texture · symbolic atmosphere.{' '}
                   <Link href={ATMOSPHERE_ATTRIBUTION_HREF}>Mosaic credits</Link>
                 </p>
               </div>
@@ -138,10 +137,10 @@ export default function AboutPage() {
                   Released projections only, with receipts
                 </h2>
                 <p className="ds-about-edition__lede">
-                  Public pages show records that passed citation completeness, provenance checks, and
-                  living-person protections. Draft work stays off public surfaces. Maps never imply
-                  sharper location than the stored precision. The archive is incomplete by nature;
-                  gaps are stated plainly. Completeness is not claimed.
+                  Public pages show records that passed citation completeness, provenance checks,
+                  and living-person protections. Draft work stays off public surfaces. Maps never
+                  imply sharper location than the stored precision. The archive is incomplete by
+                  nature; gaps are stated plainly. Completeness is not claimed.
                 </p>
                 <p className="ds-about-edition__actions">
                   <Link className="ds-cta ds-cta--solid" href="/methodology">
@@ -190,8 +189,9 @@ export default function AboutPage() {
               No account required
             </h2>
             <p className="ds-about-edition__close-body">
-              Every public page works without authentication. Location sharing on the map is optional
-              and under your control. Reading here does not require creating an identity with us.
+              Every public page works without authentication. Location sharing on the map is
+              optional and under your control. Reading here does not require creating an identity
+              with us.
             </p>
             <p className="ds-about-edition__actions">
               <Link className="ds-cta ds-cta--copper" href="/">

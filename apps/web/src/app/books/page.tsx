@@ -2,6 +2,8 @@
  * Public challenged-books browse surface at `/books`. v6 edition Surface stack with
  * shared gutter mosaic atmosphere, catalog pulse, rip rows, and preserved browse URL params.
  */
+import type { Metadata } from 'next';
+import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { ATMOSPHERE_ATTRIBUTION_HREF } from '../../components/atmosphere/tile-credits';
 import { bannedBookToSuggestCorpusItem } from '../../lib/banned-books/suggest-books.js';
@@ -17,10 +19,11 @@ import {
 } from './books-panel-chrome';
 import './books-edition.css';
 
-export const metadata = {
+export const metadata: Metadata = buildStaticPageMetadata({
+  path: '/books',
   title: 'Banned books',
   description: BOOKS_PAGE_DESCRIPTION,
-};
+});
 
 type BooksPageProps = {
   readonly searchParams: Promise<RawBooksBrowseParams>;

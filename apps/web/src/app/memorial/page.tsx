@@ -8,6 +8,8 @@
  * into production (same reasoning as sitemap.ts).
  */
 
+import type { Metadata } from 'next';
+import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { matchMemorialNamesToEntities } from '../../components/patterns/memorial-wall/memorial-entity-links';
 import { MemorialWallAtmosphere } from '../../components/patterns/memorial-wall/MemorialWallAtmosphere';
 import { MEMORIAL_NAMES } from '../../components/patterns/memorial-wall/memorial-names';
@@ -27,10 +29,11 @@ import './memorial-edition.css';
 
 export const dynamic = 'force-dynamic';
 
-export const metadata = {
+export const metadata: Metadata = buildStaticPageMetadata({
+  path: '/memorial',
   title: MEMORIAL_PAGE_TITLE,
   description: MEMORIAL_PAGE_DESCRIPTION,
-};
+});
 
 export default async function MemorialPage() {
   const { data: entities } = await listPublicEntityViews();

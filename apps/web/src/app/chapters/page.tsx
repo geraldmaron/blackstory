@@ -4,15 +4,18 @@
  * items load from the active-release article projection; full bodies load on
  * detail pages.
  */
+import type { Metadata } from 'next';
+import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { listPublicArticleListItems } from '../../lib/articles/source';
 import './articles-edition.css';
 
-export const metadata = {
+export const metadata: Metadata = buildStaticPageMetadata({
+  path: '/chapters',
   title: 'Chapters',
   description:
     'Evidence-led long-form chapters from the BlackStory archive: history pinned to place and records, with every figure and claim cited inline.',
-};
+});
 
 export default async function ChaptersIndexPage() {
   const { items, source } = await listPublicArticleListItems();
@@ -47,11 +50,7 @@ export default async function ChaptersIndexPage() {
                     {item.heroImage ? (
                       <span className="ds-article-card__media">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={item.heroImage.url}
-                          alt={item.heroImage.alt}
-                          loading="lazy"
-                        />
+                        <img src={item.heroImage.url} alt={item.heroImage.alt} loading="lazy" />
                       </span>
                     ) : null}
                     <span className="ds-article-card__meta">

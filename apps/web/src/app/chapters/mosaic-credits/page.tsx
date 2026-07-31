@@ -2,6 +2,8 @@
  * Archive mosaic credits: lists the rights-cleared collage tiles used as
  * decorative atmosphere on story pages and the about-page living mosaic.
  */
+import type { Metadata } from 'next';
+import { buildStaticPageMetadata } from '../../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { ATMOSPHERE_TILE_CREDITS } from '../../../components/atmosphere';
 import {
@@ -11,11 +13,12 @@ import {
 } from './stories-panel-chrome';
 import './stories-edition.css';
 
-export const metadata = {
+export const metadata: Metadata = buildStaticPageMetadata({
+  path: '/chapters/mosaic-credits',
   title: 'Archive mosaic credits',
   description:
     'Source credits for the rights-cleared archive mosaic tiles used as symbolic atmosphere on BlackStory story and about pages.',
-};
+});
 
 export default function MosaicCreditsPage() {
   return (
@@ -33,10 +36,10 @@ export default function MosaicCreditsPage() {
                   Archive mosaic <em>credits</em>
                 </h1>
                 <p className="ds-stories-edition__lede">
-                  Story pages may show a soft black-and-white mosaic in the page gutters. Those tiles
-                  are rights-cleared archive images, served from this site (never hotlinked from
-                  Wikimedia at request time). The mosaic is symbolic atmosphere, not a photograph of
-                  a page subject.
+                  Story pages may show a soft black-and-white mosaic in the page gutters. Those
+                  tiles are rights-cleared archive images, served from this site (never hotlinked
+                  from Wikimedia at request time). The mosaic is symbolic atmosphere, not a
+                  photograph of a page subject.
                 </p>
               </div>
             </header>
@@ -51,8 +54,8 @@ export default function MosaicCreditsPage() {
               {ATMOSPHERE_TILE_CREDITS.length} curated tiles
             </h2>
             <p className="ds-stories-edition__lede">
-              Each tile maps to a published entity primary image (GCS public-media). Rebuild the local
-              pool with the collage tile script when the Commons promote set changes.
+              Each tile maps to a published entity primary image (GCS public-media). Rebuild the
+              local pool with the collage tile script when the Commons promote set changes.
             </p>
             <ol className="ds-story-mosaic-credits">
               {ATMOSPHERE_TILE_CREDITS.map((tile) => (

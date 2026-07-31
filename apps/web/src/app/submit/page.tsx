@@ -2,6 +2,8 @@
  * Public "submit a lead" entry point. v6 utility edition for moderated quarantine
  * intake — nothing submitted here is public.
  */
+import type { Metadata } from 'next';
+import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { EmptyState, Notice } from '@repo/ui';
 import { UtilityEditionBodyPanel } from '../../components/patterns/utility-edition/UtilityEditionBodyPanel';
 import { UtilityEditionIntro } from '../../components/patterns/utility-edition/UtilityEditionIntro';
@@ -9,11 +11,12 @@ import { UtilityEditionShell } from '../../components/patterns/utility-edition/U
 import '../../components/patterns/utility-edition/utility-edition.css';
 import { SubmitLeadForm } from './SubmitLeadForm';
 
-export const metadata = {
+export const metadata: Metadata = buildStaticPageMetadata({
+  path: '/submit',
   title: 'Submit a lead',
   description:
     'Point BlackStory toward a lead — a closed group post, a family paper, an oral account — for moderated review.',
-};
+});
 
 export default function SubmitLeadPage() {
   return (

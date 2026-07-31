@@ -4,6 +4,8 @@
  * v6 edition Surface stack with shared gutter mosaic atmosphere. Preserves GET
  * browse URL contract (`q`, `kind`, `topic`) and auto-submit facet selects.
  */
+import type { Metadata } from 'next';
+import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import { ATMOSPHERE_ATTRIBUTION_HREF } from '../../components/atmosphere/tile-credits';
 import { LAW_EDITION_BROWSE_LEDE } from './law-copy';
@@ -17,11 +19,12 @@ import {
 } from './law-panel-chrome';
 import './law-edition.css';
 
-export const metadata = {
+export const metadata: Metadata = buildStaticPageMetadata({
+  path: '/law',
   title: 'Law',
   description:
     'Plain-language access to landmark civil-rights statutes, regulations, and court decisions.',
-};
+});
 
 type LawPageProps = {
   readonly searchParams: Promise<RawLawBrowseParams>;
@@ -47,7 +50,7 @@ export default async function LawBrowsePage({ searchParams }: LawPageProps) {
                 </h1>
                 <p className="ds-law-edition__lede">{LAW_EDITION_BROWSE_LEDE}</p>
                 <p className="ds-law-edition__credit">
-                  Archive texture · symbolic atmosphere. {' '}
+                  Archive texture · symbolic atmosphere.{' '}
                   <Link href={ATMOSPHERE_ATTRIBUTION_HREF}>Mosaic credits</Link>
                 </p>
               </div>

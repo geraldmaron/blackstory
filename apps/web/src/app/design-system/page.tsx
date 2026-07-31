@@ -3,6 +3,8 @@
  * Stays current with docs/ui/design-direction-v5.md — new shell patterns land here too.
  */
 
+import type { Metadata } from 'next';
+import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import Link from 'next/link';
 import {
   Button,
@@ -23,10 +25,11 @@ import { RoomKitGallery } from './RoomKitGallery';
 // It carries the whole room kit, which is what makes the fixtures below render.
 import '../utility.css';
 
-export const metadata = {
+export const metadata: Metadata = buildStaticPageMetadata({
+  path: '/design-system',
   title: 'Design system — BlackStory',
   description: 'Component and token fixtures for visual and keyboard review (design-direction-v5)',
-};
+});
 
 export default function DesignSystemPage() {
   return (

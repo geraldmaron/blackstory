@@ -331,6 +331,24 @@ Every Reading room ends in a records off ramp into the Atlas or `/records`. Ever
 
 The rule is enforced structurally, not by review. The `/about` destinations block is the adoption gate: a route not in the palette, the footer and that block is not shipped, and the registry test fails when a public route is absent. `/memorial` is the proof case. It has zero inbound hrefs anywhere in `src` today, and the four named inbound links (footer Trust column, palette, `/about` destinations, the living-person-protection section of `/methodology`) are the only thing that stops it staying an orphan.
 
+### 5.7 What a crawler is told, and by which mechanism (SP-19, shipped)
+
+The sitemap is derived from the destination registry: a route is advertised if and only if its entry carries `crawl`, so it cannot drift from the site the way the hand-kept list did. That list carried `/history` **twice** — a duplicate `<url>` element in the shipped XML — and went on carrying it after `/history` became a redirect. `sitemap-builders.test.ts` now asserts no duplicate URL, that the emitted list equals the registry's crawlable set, and that **every advertised path has a `page.tsx` on disk**. That last assertion is the one that earns its keep: it caught `/corrections/appeal` and `/corrections/abuse` being carried as destinations when both are API-only directories that 404, their forms being mounted inside the receipt status page. Both are gone from the registry and from the resolution map.
+
+Absent `crawl` is a decision, and a test pins the list of decisions to exactly two: `/story`, which does not render until SP-10, and `/design-system`, which is noindexed. A third omission fails until someone records why.
+
+Every static room now builds its head through `buildStaticPageMetadata`, which had zero callers outside its own test. Sixteen rooms shipped with **no canonical at all**, so every filter, fragment and tracking permutation of them was a separate URL to a crawler. The canonical is absolute because `metadataBase` is not set — a relative one emits verbatim and means nothing — and `metadata-builders.test.ts` walks the App Router tree and fails any page that exports a bare `metadata` object, so adoption is asserted rather than left to review.
+
+Three deliberate exceptions to self-canonicalisation:
+
+| Surface | Canonical | Why |
+| --- | --- | --- |
+| `/` | bare `/`, always | Filters, `/explore`'s forwarded query and every facet combination render substantially the front door. Self-canonicalising each permutation offers a crawler thousands of near duplicates of one page. |
+| `/records?page=N` | itself, with `rel=prev`/`rel=next` | Here the narrowing **is** the page. A paged index without prev/next teaches a crawler that page 2 is an unrelated document. |
+| `/corrections/status/*` | none | A receipt code is one person's private handle. It gets `X-Robots-Tag: noindex, follow` from `next.config.mjs` instead. |
+
+**Noindex ships alone, with no `robots.txt` Disallow, in both cases.** The two are opposite instructions and pairing them defeats the intent: a Disallowed URL is never fetched, so the noindex is never read, and the URL can still be indexed from an inbound link with nothing but its anchor text. `follow` also stays `true` on both — dropping a page from the index is not a reason to discard where it points. `metadata-builders.test.ts` asserts `robots.txt` gains no Disallow beyond the AI-training agents and that the general crawler is blocked nowhere.
+
 ---
 
 ## 6. What the critiques changed

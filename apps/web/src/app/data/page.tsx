@@ -2,6 +2,8 @@
  * Data page: national Census population plus Phase 1 / theme-impact indicator visualizations
  * (wealth, housing, justice). Charts wire to warehouse observations or verified fixtures.
  */
+import type { Metadata } from 'next';
+import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { US_STATES } from '@repo/domain/map/geography';
 import { buildStateFipsNameMap } from '@repo/domain/statistics/public-data-summaries';
 import {
@@ -18,16 +20,15 @@ import { getDataPageIndicatorBundle } from '../../lib/demographics/data-page-ind
 import { timelineChangeStripItems } from '../../components/data/population-change';
 import '../../components/data/data-charts.css';
 import { DATA_PAGE_DESCRIPTION } from './data-copy';
-import {
-  dataEditionRootClassName,
-} from './data-panel-chrome';
+import { dataEditionRootClassName } from './data-panel-chrome';
 import { DataSections } from './DataSections';
 import './data-edition.css';
 
-export const metadata = {
+export const metadata: Metadata = buildStaticPageMetadata({
+  path: '/data',
   title: 'Data',
   description: DATA_PAGE_DESCRIPTION,
-};
+});
 
 async function safe<T>(promise: Promise<T | undefined | null>): Promise<T | undefined> {
   try {
@@ -57,7 +58,8 @@ export default async function DataPage() {
 
   const phase1 = phase1Indicators as Phase1IndicatorCoverageSummary | undefined;
   const historicalStates = historicalStateCoverage as HistoricalStatePopulationCoverage | undefined;
-  const timeline = (timelineSnapshot ?? undefined) as NationalPopulationTimelineSnapshot | undefined;
+  const timeline = (timelineSnapshot ?? undefined) as
+    NationalPopulationTimelineSnapshot | undefined;
   const timelineRows = timeline?.rows ?? [];
   const stateChanges = (stateChanges2010to2020 ?? []) as readonly StatePopulationChange[];
   const chartSources = (timeline?.sources ?? []).map((source) => ({
