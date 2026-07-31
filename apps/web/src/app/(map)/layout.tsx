@@ -1,40 +1,25 @@
 /**
- * Route-group layout for the two map surfaces (ADR-017 "Route-group layout owns the
- * canvas"). Server component: fetches the active release and builds the base feature collection
- * + MapLibre style exactly once (`loadMapStageBase`, memoized per-request), then renders the
- * client `MapStageProvider` — the app's SOLE `maplibre-gl` instance — around `{children}`.
+ * Route-group layout for the two map surfaces.
  *
- * Because `/` and `/explore` are siblings under this layout, navigating between them re-renders
- * the page trees but never this layout: the canvas element, WebGL context, loaded tiles, and
- * camera all survive by construction. `data-surface="map"` marks the persistent canvas for
- * shell body clearance / page-field opt-out; the site header follows `[data-theme]` like
- * every other route (no map-only fixed-ink navbar override).
+ * The plate provider moved to the root shell, so the canvas now survives navigation to every
+ * surface rather than only between siblings in this group. What is left here is the group's
+ * stylesheets and the `data-surface` marker that shell body clearance and the page-field opt-out
+ * key off; the group itself is dissolved in the slice of SP-07 that promotes `/` to the Atlas.
  *
- * Must stay dynamic: App Hosting mounts DATABASE_URL at RUNTIME only. A build-time static
- * `/` (hero) would bake the 4-entity Dunbar seed into production while `/explore/api` still
- * reads live Postgres — the exact split that made the homepage show 4 pins.
+ * `force-dynamic` stays scoped to this group and must not migrate upward with the provider: App
+ * Hosting mounts DATABASE_URL at RUNTIME only, so a build-time static `/` would bake the
+ * 4-entity Dunbar seed into production while `/explore/api` still reads live Postgres.
  */
 import type { ReactNode } from 'react';
-import { loadMapStageBase } from './shared-map-data';
-import { MapStageProvider } from './MapStage';
 import './map-surfaces.css';
 import '../../components/patterns/cinematic-map/cinematic-map.css';
 
 export const dynamic = 'force-dynamic';
 
-export default async function MapSurfaceLayout({ children }: { readonly children: ReactNode }) {
-  const base = await loadMapStageBase();
-
+export default function MapSurfaceLayout({ children }: { readonly children: ReactNode }) {
   return (
     <div className="ds-map-surface" data-surface="map">
-      <MapStageProvider
-        initialStyle={base.style}
-        initialFeatureCollection={base.featureCollection}
-        initialJurisdictionAreaFeatures={base.jurisdictionAreaFeatures}
-        bounds={base.bounds}
-      >
-        {children}
-      </MapStageProvider>
+      {children}
     </div>
   );
 }

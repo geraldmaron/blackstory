@@ -8,6 +8,7 @@
  */
 
 import type { ReactNode } from 'react';
+import { MapStageProvider } from '../app/(map)/MapStage';
 import { OfflineNotice } from './OfflineNotice';
 import { SiteShellFooter } from './SiteShellFooter';
 import { SiteShellHeader } from './SiteShellHeader';
@@ -18,12 +19,19 @@ export type SiteShellProps = {
 
 export function SiteShell({ children }: SiteShellProps) {
   return (
-    <div className="ds-shell">
-      {/* Skip link (WCAG 2.4.1) renders once in app/layout.tsx, ahead of this shell. */}
-      <SiteShellHeader />
-      <OfflineNotice />
-      <div className="ds-shell-body">{children}</div>
-      <SiteShellFooter />
-    </div>
+    /* The plate provider sits above the shell, not inside a route group, so the WebGL context,
+       style and camera survive every navigation instead of being torn down at a group boundary.
+       It is mounted with no props on purpose: awaiting `loadMapStageBase()` here would make
+       every route force-dynamic. It also builds no GL context until a surface first talks to the
+       stage, so a reader who only ever opens a Utility surface never pays for one. */
+    <MapStageProvider>
+      <div className="ds-shell">
+        {/* Skip link (WCAG 2.4.1) renders once in app/layout.tsx, ahead of this shell. */}
+        <SiteShellHeader />
+        <OfflineNotice />
+        <div className="ds-shell-body">{children}</div>
+        <SiteShellFooter />
+      </div>
+    </MapStageProvider>
   );
 }
