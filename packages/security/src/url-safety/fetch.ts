@@ -163,11 +163,12 @@ export async function parseContentInSandbox(
   }
   const extractedText = contentType.includes('html')
     ? text
-        // `\s*` before the closing bracket: `</script >` is a valid end tag that browsers honour,
-        // and without it the element's contents survived into extractedText, which is the text
-        // this scanner reports as the safe, tag-free rendering of a fetched document
-        // (CodeQL js/bad-tag-filter).
-        .replace(/<(?:script|style)\b[^>]*>[\s\S]*?<\/(?:script|style)\s*>/giu, ' ')
+        // `[^>]*` after the end-tag name, not `\s*` and not nothing. An end tag runs to the
+        // first `>`, so `</script >`, `</script\t\n bar>` and `</style foo>` all close the
+        // element and browsers honour every one of them. A stricter pattern leaves the element's
+        // contents in extractedText, which is the text this scanner reports as the safe, tag-free
+        // rendering of a fetched document (CodeQL js/bad-tag-filter).
+        .replace(/<(?:script|style)\b[^>]*>[\s\S]*?<\/(?:script|style)\b[^>]*>/giu, ' ')
         .replace(/<[^>]+>/gu, ' ')
         .replace(/\s+/gu, ' ')
         .trim()

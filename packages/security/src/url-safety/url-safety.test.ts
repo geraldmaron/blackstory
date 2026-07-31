@@ -288,3 +288,18 @@ test('sandbox extraction still strips a plain script end tag', async () => {
   const result = await parseContentInSandbox(Buffer.from(html), 'text/html');
   assert.equal(result.extractedText.includes('.a{}'), false);
 });
+
+test('sandbox extraction strips every end-tag shape a browser honours', async () => {
+  // An end tag runs to the first `>`, so all of these close the element.
+  const shapes = ['</script>', '</script >', '</script\t\n bar>', '</SCRIPT foo=bar>'];
+  for (const close of shapes) {
+    const html = `<html><body>visible<script>secretPayload()${close}tail</body></html>`;
+    const result = await parseContentInSandbox(Buffer.from(html), 'text/html');
+    assert.equal(
+      result.extractedText.includes('secretPayload'),
+      false,
+      `script content survived ${JSON.stringify(close)}`,
+    );
+    assert.equal(result.extractedText.includes('tail'), true);
+  }
+});
