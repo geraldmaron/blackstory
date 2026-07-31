@@ -32,6 +32,12 @@ export function buildArchiveBaseStyle(colorScheme: MapColorScheme): StyleSpecifi
 /** Layers that `applyStyleAndData` never removes — paints must be pushed explicitly. */
 export const PERSISTENT_PLATE_LAYER_IDS = [
   'background',
+  // Base cartography: land, water, country border and city names all carry theme-dependent
+  // paint, so a light/dark toggle has to push their colours the same way it pushes the streets'.
+  'plate-landcover',
+  'plate-water',
+  'plate-boundary-country',
+  'plate-place-city',
   'explore-street-casing',
   'explore-street-fill',
   'explore-street-label',

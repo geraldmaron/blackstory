@@ -169,10 +169,24 @@ export const LIGHT_PLATE_OCEAN = '#FFFFFF';
 export function plateForScheme(scheme: MapColorScheme) {
   if (scheme === 'light') {
     return {
-      /** The background. It is water: the state polygons on top of it are the landmass. */
-      ocean: mapPalettes.light.water,
+      /**
+       * The background is LAND. The plate draws real cartography: OpenFreeMap's `water`
+       * source-layer paints the oceans, lakes and rivers over it, so coastline comes from the
+       * tiles rather than from the edge of the state polygons. Before this the background was
+       * water and the only landmass was the 49 state shapes, which is why the plate read as a
+       * floating chart of the United States with no coast, no lakes and no continent around it.
+       */
+      ocean: mapPalettes.light.land,
       land: mapPalettes.light.land,
       water: mapPalettes.light.water,
+      green: mapPalettes.light.green,
+      /** Country boundary. Solid and heavier than `stateBounds`. */
+      countryBounds: mapPalettes.light.line2,
+      road: mapPalettes.light.road,
+      /** Place labels from the vector tiles: state register and city/town register. */
+      placeLabel: mapPalettes.light.label,
+      placeLabelHi: mapPalettes.light.labelHi,
+      placeLabelHalo: mapPalettes.light.halo,
       selected: DIGNITY_PALETTE.selectedDark,
       densityUnknown: DIGNITY_PALETTE.densityUnknownFillLight,
       densityDisabled: DIGNITY_PALETTE.densityDisabledFillLight,
@@ -201,9 +215,16 @@ export function plateForScheme(scheme: MapColorScheme) {
     } as const;
   }
   return {
-    ocean: mapPalettes.dark.water,
+    /** See the light branch: the background is land, and the tiles supply the water. */
+    ocean: mapPalettes.dark.land,
     land: mapPalettes.dark.land,
     water: mapPalettes.dark.water,
+    green: mapPalettes.dark.green,
+    countryBounds: mapPalettes.dark.line2,
+    road: mapPalettes.dark.road,
+    placeLabel: mapPalettes.dark.label,
+    placeLabelHi: mapPalettes.dark.labelHi,
+    placeLabelHalo: mapPalettes.dark.halo,
     selected: DIGNITY_PALETTE.selected,
     densityUnknown: DIGNITY_PALETTE.densityUnknownFill,
     densityDisabled: DIGNITY_PALETTE.densityDisabledFill,

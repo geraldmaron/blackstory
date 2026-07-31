@@ -292,7 +292,11 @@ export const ENTITY_RING_FILL_OPACITY = 0.2;
  * fully opaque and state fills occlude names on land. No DOM under-canvas bleed.
  */
 export const PLATE_BACKGROUND_OPACITY = 1;
-export const PLATE_STATE_FILL_OPACITY = 1;
+/**
+ * The density tint sits over real cartography now, not in place of it, so it is translucent:
+ * at 1 it hid every lake, river and park inside a state outline.
+ */
+export const PLATE_STATE_FILL_OPACITY = 0.82;
 
 /**
  * Filter for the single-feature selection ring layer (`EXPLORE_SELECTED_POINT_LAYER_ID`).
@@ -682,6 +686,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           'background-opacity': PLATE_BACKGROUND_OPACITY,
         },
       },
+
       {
         // Memorial typographic field — eligible full names on non-state anchors.
         // Name-only; Italic face + per-feature size/rotation for collage texture
@@ -724,6 +729,88 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           // Flat matte contrast on the ocean plate — not a glow/shadow.
           'text-halo-color': plate.ocean,
           'text-halo-width': 0.75,
+        },
+      },
+      /* —— Base cartography ————————————————————————————————————————————————————————
+         The plate is a map before it is a chart. These four layers come from the
+         OpenFreeMap vector source and read at the continental resting frame, which is where a
+         reader spends most of their time; the archive overlays below them are the data.
+
+         Until they existed, `MapPalette`'s `green`, `line2`, `label`, `labelHi` and `halo`
+         roles were declared, contrast-tested and consumed by nothing, and the plate rendered
+         as state polygons floating on a flat field: no coastline, no Great Lakes, no Canada or
+         Mexico, and no place names between the state abbreviations and street labels at z11.
+         `docs/ui/patterns-map-canvas.md`; reference build `.design-mocks/blackstory-atlas-v9.html`. */
+      {
+        // Parks and wood. Deliberately close to land — texture, not a category.
+        id: 'plate-landcover',
+        type: 'fill',
+        source: OPENFREEMAP_SOURCE_ID,
+        'source-layer': 'landcover',
+        filter: ['match', ['get', 'class'], ['wood', 'grass', 'park'], true, false],
+        paint: { 'fill-color': plate.green },
+      },
+      {
+        // Oceans, lakes and wide rivers. This is what gives the plate a coastline: without it
+        // the only edge on the map is the outer boundary of the state polygon set.
+        id: 'plate-water',
+        type: 'fill',
+        source: OPENFREEMAP_SOURCE_ID,
+        'source-layer': 'water',
+        paint: { 'fill-color': plate.water },
+      },
+      {
+        // Country borders. Solid and heavier than the state hairline, so the continent reads
+        // as a continent rather than as a ragged edge where the state data stops.
+        id: 'plate-boundary-country',
+        type: 'line',
+        source: OPENFREEMAP_SOURCE_ID,
+        'source-layer': 'boundary',
+        filter: ['all', ['<=', ['get', 'admin_level'], 2], ['!=', ['get', 'maritime'], 1]],
+        paint: {
+          'line-color': plate.countryBounds,
+          'line-width': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            3,
+            0.9,
+            8,
+            1.8,
+          ] as unknown as ExpressionSpecification,
+        },
+      },
+      {
+        /* City and town names. Deliberately NOT state names: state labels are DOM markers
+           (`state-labels.ts`) tied to selection and the Lens `Place labels` toggle, and a
+           second symbol layer of the same names would collide with them. Cities are the
+           register that was missing entirely between z4 and z11. */
+        id: 'plate-place-city',
+        type: 'symbol',
+        source: OPENFREEMAP_SOURCE_ID,
+        'source-layer': 'place',
+        minzoom: 4.2,
+        filter: ['match', ['get', 'class'], ['city', 'town'], true, false],
+        layout: {
+          'text-field': MAP_LABEL_NAME_FIELD,
+          'text-font': ['Noto Sans Regular'],
+          'text-size': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            5,
+            10,
+            11,
+            14,
+          ] as unknown as ExpressionSpecification,
+          'text-max-width': 8,
+          'text-anchor': 'top',
+          'text-offset': [0, 0.35],
+        },
+        paint: {
+          'text-color': plate.placeLabelHi,
+          'text-halo-color': plate.placeLabelHalo,
+          'text-halo-width': 1.4,
         },
       },
       {
@@ -783,7 +870,12 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
               ? shareFillExpression
               : changeFillExpression
             : buildPresenceDensityFillColorExpression(plate, presenceFillActive),
-          'fill-opacity': PLATE_STATE_FILL_OPACITY,
+          /* The state polygons stopped being the landmass when the tiles started supplying it,
+             so this layer paints only when it is actually encoding something. An opaque
+             land-coloured fill over real cartography is not neutral: it erases the lakes,
+             rivers and parks inside every state outline it covers. */
+          'fill-opacity':
+            statePopulationFillActive || presenceFillActive ? PLATE_STATE_FILL_OPACITY : 0,
         },
       },
       {
@@ -897,10 +989,20 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         source: EXPLORE_STATE_DENSITY_SOURCE_ID,
         paint: {
           // Warm hairlines, not stark paper strokes — state bounds are the
-          // chart's ruling, and the entity stack must always read above them.
+          // chart's ruling, and the entity stack must always read above them. Dashed, so an
+          // internal division never reads as heavy as the solid country border above it.
           'line-color': plate.stateBounds,
-          'line-width': 1,
-          'line-opacity': 0.55,
+          'line-width': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            3,
+            0.6,
+            8,
+            1.3,
+          ] as unknown as ExpressionSpecification,
+          'line-dasharray': [3, 2],
+          'line-opacity': 0.75,
         },
       },
       {

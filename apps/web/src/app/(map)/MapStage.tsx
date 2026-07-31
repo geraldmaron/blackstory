@@ -192,8 +192,20 @@ const EMPTY_EDGE_COLLECTION: HistoryEdgeLineCollection = {
   features: [],
 };
 
+/**
+ * The geography layers `applyGeographyStyle` is allowed to mount, in stacking order.
+ *
+ * This set is an allowlist, and a layer built in `explore-style.ts` but missing from it is
+ * dropped without a warning — the style says the plate has a coastline and the plate does not.
+ * Adding a base-cartography layer means adding its id here and, if its paint is theme-dependent,
+ * to `PERSISTENT_PLATE_LAYER_IDS` in `map-plate-paint.ts`.
+ */
 const GEOGRAPHY_LAYER_IDS = new Set([
   'background',
+  'plate-landcover',
+  'plate-water',
+  'plate-boundary-country',
+  'plate-place-city',
   'explore-memorial-names-label',
   'explore-street-casing',
   'explore-street-fill',

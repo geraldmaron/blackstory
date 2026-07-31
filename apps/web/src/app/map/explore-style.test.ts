@@ -489,13 +489,24 @@ test('the plate reads as a map: land, water and boundaries come from the tokens'
     layerMode: 'off',
     colorScheme: 'light',
   });
-  // The background is water; the state polygons drawn over it are the landmass. That pairing is
-  // what produces a visible coastline, and it is the fix for design law §0 defect 11.
+  // The background is land, and the tiles' `water` source-layer paints the oceans and lakes
+  // over it. That is what produces a real coastline: the previous pairing (water background,
+  // state polygons as the only landmass) drew the United States floating with no continent
+  // around it, no Great Lakes and no Gulf.
   const darkBg = layerById(dark, 'background').paint?.['background-color'];
   const lightBg = layerById(light, 'background').paint?.['background-color'];
-  assert.equal(darkBg, mapPalettes.dark.water);
-  assert.equal(lightBg, mapPalettes.light.water);
+  assert.equal(darkBg, mapPalettes.dark.land);
+  assert.equal(lightBg, mapPalettes.light.land);
   assert.notEqual(darkBg, lightBg);
+
+  // The water fill is the coastline. Without this layer the plate has no sea.
+  assert.equal(layerById(dark, 'plate-water').paint?.['fill-color'], mapPalettes.dark.water);
+  assert.equal(layerById(light, 'plate-water').paint?.['fill-color'], mapPalettes.light.water);
+  assert.equal(
+    layerById(light, 'plate-boundary-country').paint?.['line-color'],
+    mapPalettes.light.line2,
+  );
+  assert.equal(layerById(light, 'plate-landcover').paint?.['fill-color'], mapPalettes.light.green);
 
   const lightPlate = plateForScheme('light');
   assert.equal(lightPlate.water, mapPalettes.light.water);
@@ -661,7 +672,8 @@ test('dark plate draws its water and boundaries from the dark token set', () => 
     colorScheme: 'dark',
   });
   const darkPlate = plateForScheme('dark');
-  assert.equal(layerById(dark, 'background').paint?.['background-color'], mapPalettes.dark.water);
+  assert.equal(layerById(dark, 'background').paint?.['background-color'], mapPalettes.dark.land);
+  assert.equal(layerById(dark, 'plate-water').paint?.['fill-color'], mapPalettes.dark.water);
   assert.equal(darkPlate.water, mapPalettes.dark.water);
   assert.equal(
     layerById(dark, 'explore-state-bounds-line').paint?.['line-color'],
@@ -679,13 +691,20 @@ test('dark plate draws its water and boundaries from the dark token set', () => 
 
 test('plate fills stay opaque — memorial names are a style layer under land, not DOM bleed', () => {
   assert.equal(PLATE_BACKGROUND_OPACITY, 1, 'ocean plate is fully opaque');
-  assert.equal(PLATE_STATE_FILL_OPACITY, 1, 'state fills occlude memorial names on land');
+  // The memorial field now sits directly above `background` and beneath every cartography
+  // layer, so no name can bleed onto the plate regardless of what the density fill does. That
+  // is a stronger guarantee than the old one, which relied on an opaque state fill to hide it.
+  assert.ok(
+    PLATE_STATE_FILL_OPACITY < 1,
+    'the density tint sits over real cartography, so it must not be opaque',
+  );
 
   const style = buildStyleFixture('presence');
   assert.equal(
     layerById(style, 'background').paint?.['background-opacity'],
     PLATE_BACKGROUND_OPACITY,
   );
+  // Presence encoding is active in this fixture, so the tint paints at its declared opacity.
   assert.equal(
     layerById(style, EXPLORE_STATE_DENSITY_LAYER_ID).paint?.['fill-opacity'],
     PLATE_STATE_FILL_OPACITY,

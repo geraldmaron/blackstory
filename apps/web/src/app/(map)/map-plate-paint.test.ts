@@ -21,6 +21,34 @@ const SAMPLE_STYLE: StyleSpecification = {
       paint: { 'background-color': '#E8E0D2' },
     },
     {
+      id: 'plate-landcover',
+      type: 'fill',
+      source: 'openfreemap',
+      'source-layer': 'landcover',
+      paint: { 'fill-color': '#ebe5d1' },
+    },
+    {
+      id: 'plate-water',
+      type: 'fill',
+      source: 'openfreemap',
+      'source-layer': 'water',
+      paint: { 'fill-color': '#c7bdaa' },
+    },
+    {
+      id: 'plate-boundary-country',
+      type: 'line',
+      source: 'openfreemap',
+      'source-layer': 'boundary',
+      paint: { 'line-color': '#a2957c', 'line-width': 1 },
+    },
+    {
+      id: 'plate-place-city',
+      type: 'symbol',
+      source: 'openfreemap',
+      'source-layer': 'place',
+      paint: { 'text-color': '#2e2a24', 'text-halo-color': '#f8f5ee', 'text-halo-width': 1.4 },
+    },
+    {
       id: 'explore-street-casing',
       type: 'line',
       source: 'openfreemap',
@@ -84,14 +112,17 @@ test('collectLayerPaintUpdates respects an explicit layer id subset', () => {
  * dark literal is what let a light-theme `/explore` render as a solid black plate, so it is
  * asserted per scheme against the same token table the rest of the plate reads.
  */
-test('buildArchiveBaseStyle paints the pre-load frame from the scheme water token', () => {
+test('buildArchiveBaseStyle paints the pre-load frame from the scheme land token', () => {
   function backgroundColor(scheme: 'light' | 'dark'): unknown {
     const layer = buildArchiveBaseStyle(scheme).layers.find((entry) => entry.id === 'background');
     assert.ok(layer, `${scheme} archive base must ship a background layer`);
     return (layer as { paint?: Record<string, unknown> }).paint?.['background-color'];
   }
 
-  assert.equal(backgroundColor('light'), mapPalettes.light.water);
-  assert.equal(backgroundColor('dark'), mapPalettes.dark.water);
+  // The plate's background is LAND: the tiles' `water` source-layer paints the oceans and
+  // lakes over it. A water-coloured pre-load frame would flash the inverse of the map that is
+  // about to arrive — a continent-shaped hole rather than a continent.
+  assert.equal(backgroundColor('light'), mapPalettes.light.land);
+  assert.equal(backgroundColor('dark'), mapPalettes.dark.land);
   assert.notEqual(backgroundColor('light'), backgroundColor('dark'));
 });
