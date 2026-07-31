@@ -11,14 +11,17 @@ import { MakerCredit } from './MakerCredit';
 
 void React;
 
+// Containment, not `new RegExp(value)`: a URL or a name built into a pattern is data being read
+// as syntax, so a dot in the host silently becomes "any character" and CodeQL reads the whole
+// thing as unanchored URL matching (js/regex/missing-regexp-anchor).
 describe('MakerCredit', () => {
   it('footer variant uses theme marks and links to the personal site', () => {
     const html = renderToStaticMarkup(<MakerCredit variant="footer" />);
-    assert.match(html, new RegExp(`href="${MAKER.url}"`));
+    assert.ok(html.includes(`href="${MAKER.url}"`));
     assert.match(html, /Built by/);
-    assert.match(html, new RegExp(MAKER.name));
-    assert.match(html, new RegExp(`src="${MAKER.mark.light}"`));
-    assert.match(html, new RegExp(`src="${MAKER.mark.dark}"`));
+    assert.ok(html.includes(MAKER.name));
+    assert.ok(html.includes(`src="${MAKER.mark.light}"`));
+    assert.ok(html.includes(`src="${MAKER.mark.dark}"`));
     assert.match(html, /ds-maker-credit__mark--theme-light/);
     assert.match(html, /ds-maker-credit__mark--theme-dark/);
     assert.match(html, /ds-maker-credit--footer/);
@@ -27,9 +30,9 @@ describe('MakerCredit', () => {
 
   it('inline variant ships both theme marks for light and dark mode', () => {
     const html = renderToStaticMarkup(<MakerCredit variant="inline" />);
-    assert.match(html, new RegExp(`href="${MAKER.url}"`));
-    assert.match(html, new RegExp(`src="${MAKER.mark.light}"`));
-    assert.match(html, new RegExp(`src="${MAKER.mark.dark}"`));
+    assert.ok(html.includes(`href="${MAKER.url}"`));
+    assert.ok(html.includes(`src="${MAKER.mark.light}"`));
+    assert.ok(html.includes(`src="${MAKER.mark.dark}"`));
     assert.match(html, /ds-maker-credit__mark--theme-light/);
     assert.match(html, /ds-maker-credit__mark--theme-dark/);
     assert.match(html, /ds-maker-credit--inline/);

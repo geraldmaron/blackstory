@@ -13,6 +13,18 @@ import {
 
 const SNAPSHOT = getBannedBooksListingSnapshot();
 
+/**
+ * Host and path checked separately from a parsed URL. A single unanchored pattern over the whole
+ * href also matches `https://evil.example/?r=bookshop.org/a/gerald69/`, which is the affiliate
+ * link the reader is not getting (CodeQL js/regex/missing-regexp-anchor).
+ */
+function assertAffiliateLink(href: string | undefined): void {
+  assert.ok(href, 'expected a purchase link');
+  const url = new URL(href);
+  assert.equal(url.hostname, 'bookshop.org');
+  assert.ok(url.pathname.startsWith('/a/gerald69/'), `unexpected affiliate path: ${url.pathname}`);
+}
+
 test('buildBooksBrowseViewModel returns all seed entries by default', () => {
   const view = buildBooksBrowseViewModel(SNAPSHOT, {});
   assert.equal(view.totalMatched, 77);
@@ -66,11 +78,11 @@ test('browse and detail expose validated USPS state names for challenge lists', 
   if (detail.kind !== 'ok') return;
   assert.ok(detail.states.some((entry) => entry.code === 'FL' && entry.name === 'Florida'));
   assert.equal(detail.book.purchaseLinks[0]?.retailer, 'bookshop');
-  assert.match(detail.book.purchaseLinks[0]?.href ?? '', /bookshop\.org\/a\/gerald69\//);
+  assertAffiliateLink(detail.book.purchaseLinks[0]?.href);
 
   assert.ok(item.purchaseLinks.length >= 1);
   assert.equal(item.purchaseLinks[0]?.retailer, 'bookshop');
-  assert.match(item.purchaseLinks[0]?.href ?? '', /bookshop\.org\/a\/gerald69\//);
+  assertAffiliateLink(item.purchaseLinks[0]?.href);
 });
 
 test('buildBooksBrowseViewModel filters by author', () => {

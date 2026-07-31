@@ -101,7 +101,7 @@ test('withholds a protected citation link and never renders the underlying URL (
       }),
     }),
   );
-  assert.doesNotMatch(html, /internal\.example\.org/);
+  assert.equal(html.includes('internal.example.org'), false);
   assert.match(html, /Source link withheld/);
 });
 
