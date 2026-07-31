@@ -32,6 +32,9 @@ const STATIC_PUBLIC_ROUTES: readonly {
   // which folds it into the Lens.
   { path: '/', changeFrequency: 'daily', priority: 1 },
   { path: '/records', changeFrequency: 'daily', priority: 0.9 },
+  // `/library` arrived with SP-21. It is the hub every reading and utility room parents through,
+  // so it is the page that carries the site's internal link graph to a crawler.
+  { path: '/library', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/locate', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/corrections', changeFrequency: 'monthly', priority: 0.6 },
   { path: '/about', changeFrequency: 'monthly', priority: 0.5 },

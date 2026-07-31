@@ -25,7 +25,14 @@ test('exploreHrefForState normalizes postal code and includes state (camera from
   const parsed = parseExploreHref(href);
   assert.equal(parsed.state, 'TX');
   assert.equal(parsed.viewport, undefined);
-  assert.deepEqual(parsed.filters, { era: 'all', kind: 'all', tone: 'all', theme: 'all', status: 'all', confidence: 'all' });
+  assert.deepEqual(parsed.filters, {
+    era: 'all',
+    kind: 'all',
+    tone: 'all',
+    theme: 'all',
+    status: 'all',
+    confidence: 'all',
+  });
   assert.equal(parsed.showFilters, false);
   assert.equal(parsed.showResults, false);
   assert.equal(parsed.showKey, false);
@@ -65,9 +72,9 @@ test('exploreHrefForKind returns /explore when kind is empty', () => {
 });
 
 test('searchHrefForStatus emits /search links only for known non-all status tokens', () => {
-  assert.equal(searchHrefForStatus('active'), '/history?status=active');
-  assert.equal(searchHrefForStatus('in_force'), '/history?status=in_force');
-  assert.equal(searchHrefForStatus('historic'), '/history?status=historic');
+  assert.equal(searchHrefForStatus('active'), '/records?status=active');
+  assert.equal(searchHrefForStatus('in_force'), '/records?status=in_force');
+  assert.equal(searchHrefForStatus('historic'), '/records?status=historic');
 });
 
 test('searchHrefForStatus returns undefined for all, empty, or unknown values', () => {

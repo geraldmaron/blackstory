@@ -45,6 +45,8 @@ export type CommandContext = {
 
   /* View */
   readonly setMode: (mode: 'atlas' | 'story') => void;
+  /** Leaves the instrument for the library hub. A navigation, not a mode change. */
+  readonly openLibrary: () => void;
   readonly togglePlayback: () => void;
   readonly toggleTheme: () => void;
   readonly toggleDensity: () => void;
@@ -193,6 +195,15 @@ export const COMMANDS: readonly Command[] = [
     section: 'View',
     keys: ['2'],
     run: (context) => context.setMode('story'),
+  },
+  {
+    id: 'view.library',
+    title: 'Open the library',
+    // `L` alone, which does not collide with `⌘L` (copy share link): `chordKey` compares the
+    // full chord, and the duplicate check in `bindings.test.ts` proves it.
+    section: 'View',
+    keys: ['L'],
+    run: (context) => context.openLibrary(),
   },
   {
     id: 'view.play-decades',

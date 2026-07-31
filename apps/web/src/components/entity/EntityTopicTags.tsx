@@ -14,7 +14,7 @@ export type EntityTopicTagsProps = {
 
 function chipHref(kind: 'theme' | 'era', value: string): string {
   if (kind === 'theme') {
-    return `/history?topic=${encodeURIComponent(value)}`;
+    return `/records?topic=${encodeURIComponent(value)}`;
   }
   return exploreHrefForEra(value);
 }

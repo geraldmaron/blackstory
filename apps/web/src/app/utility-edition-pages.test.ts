@@ -29,8 +29,7 @@ const UTILITY_PAGES = [
 
 for (const page of UTILITY_PAGES) {
   test(`${page.route} uses UtilityEditionShell with main landmark`, () => {
-    const sourceFile =
-      'delegate' in page ? join(appDir, page.delegate) : join(appDir, page.file);
+    const sourceFile = 'delegate' in page ? join(appDir, page.delegate) : join(appDir, page.file);
     const source = readFileSync(sourceFile, 'utf8');
     assert.match(source, /UtilityEditionShell/);
     assert.match(source, /UtilityEditionIntro/);
@@ -45,5 +44,7 @@ for (const page of UTILITY_PAGES) {
 test('not-found keeps archive recovery CTA', () => {
   const source = readFileSync(join(appDir, 'not-found.tsx'), 'utf8');
   assert.match(source, /Find in the archive/);
-  assert.match(source, /href="\/history"/);
+  // `/history` became a permanent redirect to `/records`; the recovery CTA on the 404 must land
+  // on the real index rather than teaching a lost reader to take an extra hop (SP-15).
+  assert.match(source, /href="\/records"/);
 });

@@ -19,7 +19,8 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { OVERFLOW_NAV, PRIMARY_NAV } from '@repo/config';
+import { useRouter } from 'next/navigation';
+import { browsableDestinations } from '../../../lib/nav/destination-registry';
 import { findUsStateByPostalCode } from '@repo/domain/map/geography';
 import { Notice } from '@repo/ui';
 import { CommandBar, type AtlasMode } from '../../../components/shell/CommandBar';
@@ -533,6 +534,8 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
 
   /* ---- the keyboard ------------------------------------------------------ */
 
+  const router = useRouter();
+
   const commandContext = useMemo<CommandContext>(
     () => ({
       focusSearch: () => setPaletteOpen(true),
@@ -563,6 +566,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
       },
       closeSheet: () => setSelectedId(undefined),
       setMode,
+      openLibrary: () => router.push('/library'),
       togglePlayback: () => {},
       toggleTheme: () => {
         const root = document.documentElement;
@@ -587,6 +591,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
       kindFamily,
       nearMe,
       resetLens,
+      router,
       selectedFeature,
       selectedId,
       stateCode,
@@ -645,12 +650,21 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
   );
 
   /**
-   * Every site destination, from the same `@repo/config` IA the header and footer read. The bar
-   * carries two modes instead of fourteen links, so this is what keeps Data, Law, Banned books,
-   * Memorial, Methodology, Corrections, Errata and Submit reachable from the Atlas.
+   * Every site destination, from the destination registry the breadcrumb, the library hub and the
+   * footer also read (SP-15). The bar carries two modes instead of fourteen links, so this is what
+   * keeps Data, Law, Banned books, Memorial, Methodology, Corrections, Errata and Submit reachable
+   * from the Atlas.
+   *
+   * It was built from `PRIMARY_NAV` + `OVERFLOW_NAV`, which is why the palette went on offering
+   * "History" after that route became a redirect. Reading the registry means a route is in the Go
+   * section because it exists, and `destination-registry.test.ts` fails when one is missing.
    */
   const destinations = useMemo<readonly PaletteDestination[]>(
-    () => [...PRIMARY_NAV, ...OVERFLOW_NAV].map((item) => ({ href: item.href, label: item.label })),
+    () =>
+      browsableDestinations().map((destination) => ({
+        href: destination.path,
+        label: destination.label,
+      })),
     [],
   );
 

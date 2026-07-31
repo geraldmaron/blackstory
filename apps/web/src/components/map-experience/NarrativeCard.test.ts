@@ -53,7 +53,8 @@ test('links Where to external maps and other metadata to the right site views', 
   assert.match(html, /href="\/entity\/ent_15th_st_church_001#accepted-claims"/);
   assert.match(html, /href="[^"]*kind=place"/);
   assert.match(html, /aria-label="Browse Place records"/);
-  assert.match(html, /href="\/history\?status=active"/);
+  // `/history` is a redirect now; the status facet lives on the record index (SP-15).
+  assert.match(html, /href="\/records\?status=active"/);
 });
 
 test('Where still links to maps when postal code is absent but coordinates exist', () => {

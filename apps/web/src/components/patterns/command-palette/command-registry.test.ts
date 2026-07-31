@@ -45,6 +45,7 @@ function recordingContext(): { calls: string[]; context: CommandContext } {
       copyShareLink: note('copyShareLink'),
       closeSheet: note('closeSheet'),
       setMode: note('setMode'),
+      openLibrary: note('openLibrary'),
       togglePlayback: note('togglePlayback'),
       toggleTheme: note('toggleTheme'),
       toggleDensity: note('toggleDensity'),

@@ -115,17 +115,22 @@ describe('room kit · the v6 edition system stays retired', () => {
 });
 
 describe('room kit · the trail is computed, never hand-written', () => {
-  it('a reading room hangs off the Atlas', () => {
+  // SP-21 (repo-92n2.29) shipped /library, so a reading room's parent is the library rather than
+  // the Atlas — matching `SURF_PARENT` in the mock, where library is the default up-link. These
+  // chains were one step short while the route was held.
+  it('a reading room hangs off the library, which hangs off the Atlas', () => {
     assert.deepEqual(resolveTrail('/books'), [
       { label: 'Atlas', href: '/' },
-      { label: 'Books', href: null },
+      { label: 'The library', href: '/library' },
+      { label: 'Banned books', href: null },
     ]);
   });
 
   it("a record's parent is its catalogue, not the Atlas", () => {
     assert.deepEqual(resolveTrail('/books/the-bluest-eye', 'The Bluest Eye'), [
       { label: 'Atlas', href: '/' },
-      { label: 'Books', href: '/books' },
+      { label: 'The library', href: '/library' },
+      { label: 'Banned books', href: '/books' },
       { label: 'The Bluest Eye', href: null },
     ]);
   });
@@ -140,6 +145,7 @@ describe('room kit · the trail is computed, never hand-written', () => {
   it('a nested utility room keeps every intermediate step', () => {
     assert.deepEqual(resolveTrail('/corrections/status/AB12', 'AB12'), [
       { label: 'Atlas', href: '/' },
+      { label: 'The library', href: '/library' },
       { label: 'Corrections', href: '/corrections' },
       { label: 'AB12', href: null },
     ]);

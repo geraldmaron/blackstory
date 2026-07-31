@@ -57,7 +57,10 @@ export function LawDetailSections({ snapshot, explainer }: LawDetailSectionsProp
       ) : null}
 
       {explainer ? (
-        <article className={lawEditionPanelClassName('explainer')} aria-labelledby="explainer-heading">
+        <article
+          className={lawEditionPanelClassName('explainer')}
+          aria-labelledby="explainer-heading"
+        >
           <p className="ds-law-edition__panel-title">Explainer</p>
           <h2 className="ds-law-edition__panel-heading" id="explainer-heading">
             Plain-language sections
@@ -69,7 +72,10 @@ export function LawDetailSections({ snapshot, explainer }: LawDetailSectionsProp
           />
         </article>
       ) : (
-        <article className={lawEditionPanelClassName('explainer')} aria-labelledby="pending-explainer">
+        <article
+          className={lawEditionPanelClassName('explainer')}
+          aria-labelledby="pending-explainer"
+        >
           <Card>
             <h2 className="ds-law-edition__panel-heading" id="pending-explainer">
               Plain-language explainer pending
@@ -138,7 +144,7 @@ export function LawDetailSections({ snapshot, explainer }: LawDetailSectionsProp
             Methodology
           </Link>
           {' · '}
-          <Link className="ds-cta-link" href="/history">
+          <Link className="ds-cta-link" href="/records">
             Search the archive
           </Link>
         </p>
@@ -169,7 +175,7 @@ export function LawDetailIntro({ snapshot }: LawDetailIntroProps) {
             topics={snapshot.topics}
           />
           <p className="ds-law-edition__credit">
-            Archive texture · symbolic atmosphere. {' '}
+            Archive texture · symbolic atmosphere.{' '}
             <Link href="/chapters/mosaic-credits">Mosaic credits</Link>
           </p>
         </div>

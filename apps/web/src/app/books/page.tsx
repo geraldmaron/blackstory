@@ -49,8 +49,11 @@ export default async function BooksBrowsePage({ searchParams }: BooksPageProps) 
                 <p className="ds-books-edition__lede">{BOOKS_INTRO.lede}</p>
                 <BooksCatalogPulse snapshot={snapshot} />
                 <p className="ds-books-edition__crosslink">
-                  <Link className="ds-cta-link" href="/history?kind=publication">
-                    Also find publications in History
+                  {/* `sources` is the record index's family for publications, laws and artifacts;
+                      there is no publication-only facet, so the label names the family honestly
+                      rather than promising a narrowing the index cannot make. */}
+                  <Link className="ds-cta-link" href="/records?kind=sources">
+                    Also find publications in the record index
                   </Link>
                   {' · '}
                   <Link className="ds-cta-link" href="/chapters">
@@ -62,7 +65,7 @@ export default async function BooksBrowsePage({ searchParams }: BooksPageProps) 
                   </Link>
                 </p>
                 <p className="ds-books-edition__credit">
-                  Archive texture · symbolic atmosphere. {' '}
+                  Archive texture · symbolic atmosphere.{' '}
                   <Link href={ATMOSPHERE_ATTRIBUTION_HREF}>Mosaic credits</Link>
                 </p>
               </div>

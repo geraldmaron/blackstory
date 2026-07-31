@@ -59,10 +59,7 @@ export function NarrativeCard({ feature, onClose, browseControls }: NarrativeCar
     lng,
     label: properties.displayName,
     precision: mapPrecision,
-    precisionCaption: radiusAffordanceLabel(
-      properties.geoPrecisionTier,
-      properties.radiusMeters,
-    ),
+    precisionCaption: radiusAffordanceLabel(properties.geoPrecisionTier, properties.radiusMeters),
   };
   const kindIcon =
     properties.mapTone !== undefined
@@ -216,7 +213,7 @@ export function NarrativeCard({ feature, onClose, browseControls }: NarrativeCar
             <Link
               key={tag}
               className="ds-entity-tag"
-              href={`/history?topic=${encodeURIComponent(tag)}`}
+              href={`/records?topic=${encodeURIComponent(tag)}`}
             >
               {tag}
             </Link>

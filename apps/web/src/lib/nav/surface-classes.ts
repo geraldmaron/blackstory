@@ -31,6 +31,9 @@ const SURFACE_CLASS_BY_PATH: ReadonlyMap<string, SurfaceClass> = new Map([
   ['/story', 'instrument'],
 
   // Reading room — one scrolling, measure-limited column on paper.
+  // `/library` is the hub the rest of this list hangs off: it renders cards, not records, but it
+  // is the same measure-limited column on paper, so it is a Reading room and not a fifth class.
+  ['/library', 'reading'],
   ['/records', 'reading'],
   ['/chapters', 'reading'],
   ['/books', 'reading'],

@@ -21,7 +21,9 @@ test('absolutizeShellNav prefixes relative hrefs with the public origin', () => 
 test('primary nav leads with the Atlas and ends with About', () => {
   assert.deepEqual(
     PRIMARY_NAV.map((item) => item.href),
-    ['/', '/chapters', '/history', '/about'],
+    // `/history` became a permanent redirect; the top nav on every page pointed into a 308 until
+    // the v9 library hub replaced it (SP-21, repo-92n2.29).
+    ['/', '/chapters', '/library', '/about'],
   );
 });
 
@@ -38,7 +40,7 @@ test('footer IA groups Law under Explore, not Trust', () => {
   assert.ok(trust);
   assert.deepEqual(
     explore.items.map((item) => item.href),
-    ['/', '/chapters', '/history', '/data', '/law', '/books'],
+    ['/', '/library', '/records', '/chapters', '/data', '/law', '/books'],
   );
   assert.deepEqual(
     trust.items.map((item) => item.href),

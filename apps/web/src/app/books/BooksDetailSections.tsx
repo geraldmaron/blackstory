@@ -4,7 +4,11 @@
  */
 import React from 'react';
 import Link from 'next/link';
-import { activeBookChallenges, type BooksBrowseItem, type BooksDetailViewModel } from './books-view-model';
+import {
+  activeBookChallenges,
+  type BooksBrowseItem,
+  type BooksDetailViewModel,
+} from './books-view-model';
 import { BooksRipRow } from './BooksRipRow';
 import { booksEditionPanelClassName } from './books-panel-chrome';
 import { BOOKS_DETAIL } from './books-copy';
@@ -53,7 +57,11 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
         {states.length === 0 ? (
           <p className="ds-books-edition__footnote">No reported challenge jurisdictions on file.</p>
         ) : (
-          <div className="ds-books-edition__tags" role="group" aria-label="States on challenge or ban lists">
+          <div
+            className="ds-books-edition__tags"
+            role="group"
+            aria-label="States on challenge or ban lists"
+          >
             {states.map((state) => (
               <Link
                 key={state.code}
@@ -142,7 +150,10 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
         </ul>
       </article>
 
-      <article className={booksEditionPanelClassName('provenance')} aria-labelledby="purchase-heading">
+      <article
+        className={booksEditionPanelClassName('provenance')}
+        aria-labelledby="purchase-heading"
+      >
         <p className="ds-books-edition__panel-title">{BOOKS_DETAIL.lookupKicker}</p>
         <h2 className="ds-books-edition__panel-heading" id="purchase-heading">
           {BOOKS_DETAIL.lookupTitle}
@@ -220,9 +231,7 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
           </h2>
           {book.canonicalEntityId ? (
             <p className="ds-books-edition__footnote">
-              <Link href={`/entity/${book.canonicalEntityId}`}>
-                View related archive record
-              </Link>
+              <Link href={`/entity/${book.canonicalEntityId}`}>View related archive record</Link>
             </p>
           ) : null}
           {relatedItems.length > 0 ? (
@@ -241,7 +250,10 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
         </article>
       ) : null}
 
-      <article className={booksEditionPanelClassName('connected')} aria-labelledby="books-detail-next">
+      <article
+        className={booksEditionPanelClassName('connected')}
+        aria-labelledby="books-detail-next"
+      >
         <p className="ds-books-edition__panel-title">{BOOKS_DETAIL.connectedKicker}</p>
         <h2 className="ds-books-edition__panel-heading" id="books-detail-next">
           {BOOKS_DETAIL.connectedTitle}
@@ -250,8 +262,8 @@ export function BooksDetailSections({ view, relatedItems, placePanel }: BooksDet
           <Link className="ds-cta ds-cta--ink" href="/books">
             All challenged titles
           </Link>
-          <Link className="ds-cta ds-cta--quiet" href="/history?kind=publication">
-            Search publications
+          <Link className="ds-cta ds-cta--quiet" href="/records?kind=sources">
+            Search sources
           </Link>
           <Link className="ds-cta ds-cta--quiet" href="/methodology">
             Methodology

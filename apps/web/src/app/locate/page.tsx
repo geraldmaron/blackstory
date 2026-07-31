@@ -31,7 +31,7 @@ export default function LocatePage() {
         <noscript>
           <p className="ds-sans">
             This page needs JavaScript for location lookup. You can still{' '}
-            <a className="ds-cta ds-cta--ink" href="/history">
+            <a className="ds-cta ds-cta--ink" href="/records">
               search records directly
             </a>
             .

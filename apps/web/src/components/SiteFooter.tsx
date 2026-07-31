@@ -7,13 +7,17 @@
 import Link from 'next/link';
 import React from 'react';
 import { PRODUCT_NAME } from '@repo/config';
-import { FOOTER_NAV_COLUMNS } from '../lib/nav';
+import { footerColumns } from '../lib/nav/destination-registry';
 import { MakerCredit } from './MakerCredit';
 
 void React;
 
 export function SiteFooter() {
   const year = new Date().getFullYear();
+  // Derived from the destination registry, not authored here. The hand-written list is why this
+  // footer went on linking `/history` for months after that route became a redirect — every page
+  // on the site shipped a link into a 308. A route now joins the footer by having a group.
+  const columns = footerColumns();
 
   return (
     <footer className="ds-shell-footer">
@@ -25,7 +29,7 @@ export function SiteFooter() {
           </div>
 
           <nav aria-label="Footer" className="ds-shell-footer__columns">
-            {FOOTER_NAV_COLUMNS.map((column) => (
+            {columns.map((column) => (
               <div key={column.title} className="ds-shell-footer__column">
                 <p className="ds-shell-footer__column-title">{column.title}</p>
                 <ul className="ds-shell-footer__links">
