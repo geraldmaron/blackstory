@@ -1,0 +1,946 @@
+/**
+ * The v9 room kit — the shared surface vocabulary for every Reading, Record and Utility room.
+ *
+ * Design law: docs/ui/design-direction-v9-surfaces.md §2 and §4, patterns-surface-classes.md,
+ * patterns-reading-room.md, patterns-record-page.md, patterns-utility-edition.md.
+ * Reference build: .design-mocks/blackstory-atlas-v9.html.
+ *
+ * WHY THIS FILE EXISTS. The app carried twelve per-route `*-edition.css` files and eleven
+ * `*-panel-chrome.ts` modules: every surface invented its own header, its own kicker, its own
+ * panel frame. That is the specific reason the site reads as a patchwork next to the mock.
+ * This sheet is the one place a room's header, index, prose, sources, cards, table, off-ramp
+ * and empty state are drawn, and `reading-room.css`, `record-page.css` and `utility.css` are
+ * the only three sheets a room route imports — each of them a thin class-specific layer over
+ * this one.
+ *
+ * TOKENS. The mock's four ink steps map onto the app's three plus one derived tint; nothing
+ * here hardcodes a colour. The aliases below exist so the rules read like the mock while
+ * still resolving through `--ds-*`, which is what makes the kit theme-flip correctly.
+ */
+
+.ds-room {
+  /* Mock --ink-2: body prose, one step down from a heading but not yet muted. */
+  --room-ink-2: color-mix(in srgb, var(--ds-ink) 88%, var(--ds-canvas));
+  /* Mock --ink-3 / --ink-4: secondary copy and mono data. */
+  --room-ink-3: var(--ds-ink-muted);
+  --room-ink-4: var(--ds-ink-subtle);
+  /* Mock --surface-sunk: the hover wash and idle plate ground. */
+  --room-sunk: color-mix(in srgb, var(--ds-canvas) 94%, var(--ds-ink));
+  --room-rule-2: color-mix(in srgb, var(--ds-rule) 72%, transparent);
+  --room-copper-wash: color-mix(in oklab, var(--ds-accent) 10%, transparent);
+  --room-note-wash: color-mix(in srgb, var(--ds-canvas) 92%, var(--ds-ink));
+
+  color: var(--ds-ink);
+}
+
+/* —— the column ——————————————————————————————————————————————————————————————
+   One measure, set by the surface class. Reading rooms read at the widest measure the
+   editorial face supports; record pages are narrower because they are scanned, not read;
+   utility rooms are narrower still because they are finished and left. */
+.ds-room__doc {
+  width: min(100%, var(--room-doc-w, 760px));
+  margin-inline: auto;
+  padding-inline: var(--ds-gutter);
+  padding-block: var(--ds-space-10) var(--ds-space-16);
+}
+
+/* —— breadcrumb: where you are, and the way back ——————————————————————————— */
+.ds-room-crumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2);
+  margin-bottom: var(--ds-space-5);
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--room-ink-4);
+}
+
+/* Every block below is an anchor by design — a destination has to be openable in a new tab and
+   crawlable — but none of them is a link *in prose*, so the global underline is wrong on all of
+   them. Their affordance is the hairline, the wash or the border that the block already draws.
+   Prose links (`.ds-room-prose a`) keep the underline, which is where it belongs. */
+.ds-room-crumb__link,
+.ds-room-card,
+.ds-room-conn,
+.ds-room-idx__row {
+  text-decoration: none;
+}
+
+/* Both lists carry their own index: SourceList numbers in mono, Connections is a plain stack.
+   The default marker would double the first and invent one for the second. */
+.ds-room-srcs,
+.ds-room-conns {
+  list-style: none;
+  padding-left: 0;
+}
+
+.ds-room-crumb__link {
+  padding-block: 4px;
+  color: var(--ds-accent);
+  border-bottom: var(--ds-border-width) solid transparent;
+}
+
+.ds-room-crumb__link:hover {
+  border-bottom-color: var(--ds-accent);
+}
+
+.ds-room-crumb__sep {
+  opacity: 0.45;
+}
+
+.ds-room-crumb__here {
+  color: var(--room-ink-3);
+}
+
+/* —— RoomHeader: every room in every class starts with this and nothing else —— */
+.ds-room-header {
+  margin-bottom: var(--ds-space-8);
+}
+
+.ds-room-header__kicker {
+  display: block;
+  margin-bottom: var(--ds-space-3);
+  font-family: var(--ds-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+}
+
+.ds-room-header__title {
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: clamp(30px, 4vw, 44px);
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+}
+
+.ds-room-header__title em {
+  font-family: var(--ds-font-editorial);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ds-accent);
+}
+
+.ds-room-header__lede {
+  margin-top: var(--ds-space-4);
+  max-width: 34em;
+  font-family: var(--ds-font-editorial);
+  font-size: 18.5px;
+  line-height: 1.5;
+  color: var(--room-ink-2);
+}
+
+.ds-room-header__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-3);
+  margin-top: var(--ds-space-5);
+  padding-top: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+.ds-room-header__meta span {
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--room-ink-4);
+}
+
+.ds-room-header__meta span + span::before {
+  content: '·';
+  margin-right: var(--ds-space-3);
+  opacity: 0.5;
+}
+
+.ds-room-header__meta .ds-room-header__path {
+  color: var(--ds-accent);
+  text-transform: none;
+  letter-spacing: 0.04em;
+}
+
+/* —— GroupHeading: quieter than an h2 rule ————————————————————————————————— */
+.ds-room .ds-room-grouphd {
+  margin-top: var(--ds-space-8);
+  padding-bottom: var(--ds-space-2);
+  border-bottom: var(--ds-border-width) solid var(--room-rule-2);
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--room-ink-4);
+}
+
+.ds-room .ds-room-grouphd + .ds-room-cards {
+  margin-top: var(--ds-space-4);
+}
+
+/* —— CardGrid / RoomCard ——————————————————————————————————————————————————— */
+.ds-room-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
+  gap: var(--ds-space-3);
+  margin-block: var(--ds-space-6);
+}
+
+.ds-room-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--ds-space-4);
+  text-align: left;
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+  font-family: var(--ds-font-sans);
+  color: var(--ds-ink);
+  transition:
+    border-color var(--ds-duration-fast) var(--ds-easing),
+    background var(--ds-duration-fast) var(--ds-easing),
+    transform var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-room-card:hover {
+  border-color: var(--ds-accent-graphic);
+  background: var(--ds-surface-raised);
+  transform: translateY(-1px);
+}
+
+.ds-room-card__kind {
+  font-family: var(--ds-font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ds-accent);
+}
+
+.ds-room .ds-room-card__title {
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: 15.5px;
+  letter-spacing: -0.02em;
+  line-height: 1.24;
+}
+
+.ds-room-card__desc {
+  font-family: var(--ds-font-editorial);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--room-ink-3);
+}
+
+.ds-room-card__meta {
+  margin-top: auto;
+  padding-top: var(--ds-space-3);
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+  font-family: var(--ds-font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  color: var(--room-ink-4);
+}
+
+/* —— Prose ————————————————————————————————————————————————————————————————— */
+.ds-room-prose {
+  font-family: var(--ds-font-editorial);
+  font-size: 17px;
+  line-height: 1.66;
+  color: var(--room-ink-2);
+}
+
+.ds-room-prose > * + * {
+  margin-top: var(--ds-space-5);
+}
+
+.ds-room-prose p,
+.ds-room-prose ul,
+.ds-room-prose ol {
+  max-width: 66ch;
+}
+
+.ds-room-prose h2 {
+  margin-top: var(--ds-space-10);
+  padding-top: var(--ds-space-5);
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: 25px;
+  line-height: 1.18;
+  letter-spacing: -0.025em;
+  color: var(--ds-ink);
+}
+
+.ds-room-prose h3 {
+  margin-top: var(--ds-space-8);
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: -0.018em;
+  color: var(--ds-ink);
+}
+
+.ds-room-prose h2 em,
+.ds-room-prose h3 em {
+  font-family: var(--ds-font-editorial);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ds-accent);
+}
+
+.ds-room-prose ul,
+.ds-room-prose ol {
+  padding-left: var(--ds-space-5);
+}
+
+.ds-room-prose li + li {
+  margin-top: var(--ds-space-2);
+}
+
+.ds-room-prose li::marker {
+  color: var(--ds-accent-graphic);
+}
+
+.ds-room-prose strong {
+  font-weight: 600;
+  color: var(--ds-ink);
+}
+
+.ds-room-prose a {
+  color: var(--ds-accent);
+  text-underline-offset: 3px;
+}
+
+/* Section hairlines between prose blocks that are not headed. */
+.ds-room-prose hr {
+  border: 0;
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+  margin-block: var(--ds-space-8);
+}
+
+/* —— RecordRef: prose that reaches back into the Atlas ————————————————————— */
+.ds-room-rref {
+  display: inline;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+  background: none;
+  border: 0;
+  color: var(--ds-accent);
+  border-bottom: var(--ds-border-width) solid color-mix(in oklab, var(--ds-accent) 40%, transparent);
+  cursor: pointer;
+}
+
+.ds-room-rref:hover {
+  border-bottom-color: var(--ds-accent);
+  background: var(--room-copper-wash);
+}
+
+.ds-room-rref__glyph {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 3px;
+  vertical-align: -1px;
+  color: var(--ds-accent);
+}
+
+/* —— SourceList ——————————————————————————————————————————————————————————— */
+.ds-room-srcs {
+  display: flex;
+  flex-direction: column;
+}
+
+.ds-room-src {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: var(--ds-space-3);
+  padding-block: 9px;
+  border-bottom: var(--ds-border-width) solid var(--room-rule-2);
+  font-size: 13px;
+}
+
+.ds-room-src:last-child {
+  border-bottom: 0;
+}
+
+.ds-room-src__i {
+  font-family: var(--ds-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 10px;
+  color: var(--room-ink-4);
+}
+
+.ds-room-src__t {
+  line-height: 1.4;
+  color: var(--room-ink-2);
+}
+
+.ds-room-src__y {
+  font-family: var(--ds-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 10.5px;
+  color: var(--room-ink-4);
+}
+
+/* —— Connections: the relation stated in words, never a bare arrow ————————— */
+.ds-room-conns {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ds-room-conn {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+  width: 100%;
+  padding: 8px var(--ds-space-3);
+  text-align: left;
+  background: none;
+  border: 0;
+  border-radius: var(--ds-radius-sm);
+  color: inherit;
+  cursor: pointer;
+}
+
+.ds-room-conn:hover {
+  background: var(--room-sunk);
+}
+
+.ds-room-conn__name {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.ds-room-conn__rel {
+  font-family: var(--ds-font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  color: var(--room-ink-4);
+}
+
+/* —— Note ————————————————————————————————————————————————————————————————— */
+.ds-room-note {
+  max-width: 42em;
+  margin-block: var(--ds-space-5);
+  padding: var(--ds-space-3) var(--ds-space-4);
+  background: var(--room-note-wash);
+  border-left: var(--ds-border-width-strong) solid var(--ds-border-strong);
+  border-radius: var(--ds-radius-sm);
+  font-family: var(--ds-font-mono);
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--room-ink-3);
+}
+
+/* —— Precision: what this coordinate does and does not claim ——————————————— */
+.ds-room-precision {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: 10.5px;
+  line-height: 1.55;
+  color: var(--room-ink-4);
+}
+
+.ds-room-precision svg {
+  flex: none;
+  margin-top: 1px;
+  color: var(--room-ink-4);
+}
+
+/* —— TrustBlock ——————————————————————————————————————————————————————————— */
+.ds-room-trust {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px;
+  margin-block: var(--ds-space-6);
+  background: var(--room-rule-2);
+  border: var(--ds-border-width) solid var(--room-rule-2);
+  border-radius: var(--ds-radius-md);
+  overflow: hidden;
+}
+
+.ds-room-trust__row {
+  padding: 11px var(--ds-space-4) 12px;
+  background: var(--ds-surface);
+}
+
+.ds-room-trust__k {
+  display: block;
+  font-family: var(--ds-font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--room-ink-4);
+}
+
+.ds-room-trust__v {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--ds-font-sans);
+  font-size: 13.5px;
+  font-weight: 550;
+}
+
+/* —— Anatomy ——————————————————————————————————————————————————————————————— */
+.ds-room-anat {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--room-rule-2);
+  border: var(--ds-border-width) solid var(--room-rule-2);
+  border-radius: var(--ds-radius-md);
+  overflow: hidden;
+}
+
+.ds-room-anat__cell {
+  padding: 11px var(--ds-space-3) 12px;
+  background: var(--ds-surface);
+}
+
+.ds-room-anat__k {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--ds-font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--room-ink-4);
+}
+
+.ds-room-anat__v {
+  margin-top: 4px;
+  font-size: 13.5px;
+  font-weight: 550;
+  letter-spacing: -0.008em;
+}
+
+/* —— HairlineIndex: the archive read as a list, not a map ————————————————— */
+.ds-room-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  background: var(--ds-surface-raised);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-full);
+  color: var(--room-ink-2);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-room-chip:hover {
+  background: var(--room-sunk);
+  border-color: var(--ds-border-strong);
+}
+
+.ds-room-chip[aria-pressed='true'] {
+  background: var(--room-copper-wash);
+  border-color: var(--ds-accent-graphic);
+  color: var(--ds-accent);
+}
+
+.ds-room-chip .ds-room-num {
+  font-family: var(--ds-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 10px;
+  color: var(--room-ink-4);
+}
+
+.ds-room-chip[aria-pressed='true'] .ds-room-num {
+  color: var(--ds-accent);
+}
+
+.ds-room-idx__bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: var(--ds-space-6) 0 var(--ds-space-4);
+}
+
+.ds-room-idx__count {
+  margin-bottom: var(--ds-space-2);
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--room-ink-4);
+}
+
+.ds-room-idx__list {
+  display: flex;
+  flex-direction: column;
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+.ds-room-idx__row {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1.5fr) minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--ds-space-3);
+  width: 100%;
+  padding: 10px var(--ds-space-2);
+  text-align: left;
+  background: none;
+  border: 0;
+  border-bottom: var(--ds-border-width) solid var(--room-rule-2);
+  color: inherit;
+  cursor: pointer;
+}
+
+.ds-room-idx__row:hover {
+  background: var(--room-sunk);
+}
+
+.ds-room-idx__row:hover .ds-room-idx__glyph {
+  color: var(--ds-accent);
+}
+
+.ds-room-idx__glyph {
+  display: grid;
+  place-content: center;
+  color: var(--room-ink-4);
+}
+
+.ds-room-idx__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13.5px;
+  font-weight: 550;
+  letter-spacing: -0.006em;
+}
+
+.ds-room-idx__place,
+.ds-room-idx__era {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--room-ink-4);
+}
+
+.ds-room-idx__era {
+  text-align: right;
+}
+
+@media (max-width: 40rem) {
+  .ds-room-idx__row {
+    grid-template-columns: 16px 1fr auto;
+    row-gap: 3px;
+  }
+
+  .ds-room-idx__name {
+    grid-column: 2 / 4;
+  }
+
+  .ds-room-idx__place {
+    grid-column: 2 / 3;
+    grid-row: 2;
+  }
+
+  .ds-room-idx__era {
+    grid-column: 3 / 4;
+    grid-row: 2;
+    text-align: right;
+  }
+
+  .ds-room-idx__grade {
+    grid-column: 4;
+    grid-row: 1 / 3;
+    align-self: center;
+  }
+}
+
+/* —— DataTable: scrolls inside its own container, never the page ——————————— */
+.ds-room-tblwrap {
+  overflow-x: auto;
+}
+
+.ds-room-tbl {
+  width: 100%;
+  margin-block: var(--ds-space-5);
+  border-collapse: collapse;
+  font-family: var(--ds-font-sans);
+  font-size: 13.5px;
+}
+
+.ds-room-tbl th {
+  padding: 0 var(--ds-space-3) var(--ds-space-2);
+  border-bottom: var(--ds-border-width) solid var(--ds-border-strong);
+  text-align: left;
+  font-family: var(--ds-font-mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--room-ink-4);
+}
+
+.ds-room-tbl td {
+  padding: 9px var(--ds-space-3);
+  border-bottom: var(--ds-border-width) solid var(--room-rule-2);
+  color: var(--room-ink-2);
+}
+
+.ds-room-tbl td.ds-room-num,
+.ds-room-tbl th.ds-room-num {
+  font-family: var(--ds-font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.ds-room-tbl tr:hover td {
+  background: var(--room-sunk);
+}
+
+/* —— Disclosure: collapsed by default, one hairline frame ————————————————— */
+.ds-room-draw {
+  margin-block: var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--room-rule-2);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface);
+}
+
+.ds-room-draw__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-3) var(--ds-space-4);
+  cursor: pointer;
+  font-family: var(--ds-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--room-ink-3);
+  list-style: none;
+}
+
+.ds-room-draw__summary::-webkit-details-marker {
+  display: none;
+}
+
+.ds-room-draw__summary::after {
+  content: '+';
+  font-size: 13px;
+  color: var(--ds-accent);
+}
+
+.ds-room-draw[open] > .ds-room-draw__summary::after {
+  content: '–';
+}
+
+.ds-room-draw__body {
+  padding: 0 var(--ds-space-4) var(--ds-space-4);
+}
+
+/* —— Field ————————————————————————————————————————————————————————————————— */
+.ds-room-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--ds-space-3) var(--ds-space-4);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
+}
+
+.ds-room-field:focus-within {
+  border-color: var(--ds-accent-graphic);
+}
+
+.ds-room-field__label {
+  font-family: var(--ds-font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--room-ink-4);
+}
+
+.ds-room-field input,
+.ds-room-field select,
+.ds-room-field textarea {
+  width: 100%;
+  background: none;
+  border: 0;
+  outline: none;
+  font-family: var(--ds-font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ds-ink);
+}
+
+.ds-room-field select {
+  appearance: none;
+  cursor: pointer;
+}
+
+.ds-room-field textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+/* —— UtilityCard / UtilityStep ————————————————————————————————————————————— */
+.ds-room-ucard {
+  margin-block: var(--ds-space-4);
+  padding: var(--ds-space-6);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+}
+
+.ds-room .ds-room-ucard__title {
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: 17px;
+  letter-spacing: -0.02em;
+}
+
+.ds-room-ucard p {
+  max-width: 36em;
+  margin-top: var(--ds-space-3);
+  font-family: var(--ds-font-editorial);
+  font-size: 15px;
+  line-height: 1.58;
+  color: var(--room-ink-3);
+}
+
+.ds-room-ucard ul,
+.ds-room-ucard ol {
+  margin-top: var(--ds-space-3);
+  padding-left: var(--ds-space-5);
+  font-family: var(--ds-font-editorial);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--room-ink-3);
+}
+
+.ds-room-ucard li + li {
+  margin-top: 6px;
+}
+
+.ds-room-ucard li::marker {
+  color: var(--ds-accent-graphic);
+}
+
+.ds-room-ucard .ds-room-field {
+  margin-top: var(--ds-space-4);
+}
+
+.ds-room-ustep {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ds-space-3);
+  padding-block: var(--ds-space-3);
+  border-bottom: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+.ds-room-ustep:last-child {
+  border-bottom: 0;
+}
+
+.ds-room-ustep__i {
+  flex: none;
+  display: grid;
+  place-content: center;
+  width: 22px;
+  height: 22px;
+  border: var(--ds-border-width) solid var(--ds-border-strong);
+  border-radius: 50%;
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  color: var(--room-ink-4);
+}
+
+.ds-room-ustep[data-done='1'] .ds-room-ustep__i {
+  background: var(--ds-accent-graphic);
+  border-color: var(--ds-accent-graphic);
+  color: var(--ds-surface);
+}
+
+.ds-room-ustep__t {
+  font-size: 14px;
+}
+
+.ds-room-ustep__t small {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--ds-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  color: var(--room-ink-4);
+}
+
+/* —— OffRamp: no reading room is a dead end ———————————————————————————————— */
+.ds-room-offramp {
+  margin-top: var(--ds-space-10);
+  padding: var(--ds-space-6);
+  background: var(--ds-surface);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-lg);
+  box-shadow: var(--ds-elevation-sm);
+}
+
+.ds-room .ds-room-offramp__title {
+  font-family: var(--ds-font-display);
+  font-weight: 600;
+  font-size: 19px;
+  letter-spacing: -0.022em;
+}
+
+.ds-room-offramp p {
+  max-width: 34em;
+  margin-top: var(--ds-space-2);
+  font-family: var(--ds-font-editorial);
+  font-size: 15.5px;
+  line-height: 1.55;
+  color: var(--room-ink-3);
+}
+
+.ds-room-offramp__acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+  margin-top: var(--ds-space-5);
+}
+
+/* —— RecordNav: session previous and next ——————————————————————————————————— */
+.ds-room-recnav {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-space-2);
+  margin-top: var(--ds-space-10);
+  padding-top: var(--ds-space-5);
+  border-top: var(--ds-border-width) solid var(--room-rule-2);
+}
+
+.ds-room-recnav__sp {
+  flex: 1;
+}
+
+/* —— EmptyList: the one empty state, and it always names /submit ——————————— */
+.ds-room-emptylist {
+  padding: var(--ds-space-8) var(--ds-space-5);
+  text-align: center;
+}
+
+.ds-room-emptylist p {
+  margin-top: var(--ds-space-2);
+  font-size: 13px;
+  color: var(--room-ink-3);
+}

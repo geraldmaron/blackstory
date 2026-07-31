@@ -1,0 +1,22 @@
+/**
+ * Record page surface class — the only stylesheet a Record route imports.
+ *
+ * Design law: docs/ui/patterns-record-page.md, design-direction-v9-surfaces.md §4.
+ * A record is scanned, not read, so the measure is narrower than a reading room and the
+ * evidence blocks (anatomy, trust, sources, connections) carry the weight instead of prose.
+ */
+
+@import '../components/room/room-kit.css';
+
+[data-surface='record'] .ds-room__doc {
+  --room-doc-w: 680px;
+}
+
+/* The record's own prose is a caption register, not a chapter register. */
+[data-surface='record'] .ds-room-prose {
+  font-size: 15.5px;
+}
+
+[data-surface='record'] .ds-room-anat {
+  margin-block: var(--ds-space-6);
+}

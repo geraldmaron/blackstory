@@ -18,6 +18,10 @@ import {
   Timeline,
 } from '@repo/ui';
 import { DialogFixture } from './DialogFixture';
+import { RoomKitGallery } from './RoomKitGallery';
+// /design-system is a Utility surface, and Utility is one of the three room stylesheets.
+// It carries the whole room kit, which is what makes the fixtures below render.
+import '../utility.css';
 
 export const metadata = {
   title: 'Design system — BlackStory',
@@ -282,6 +286,8 @@ export default function DesignSystemPage() {
           Try a broader era filter or remove exact street constraints.
         </EmptyState>
       </section>
+
+      <RoomKitGallery />
     </main>
   );
 }
