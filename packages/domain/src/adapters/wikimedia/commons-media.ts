@@ -175,25 +175,27 @@ export function mapCommonsLicenseToRights(
   return undefined;
 }
 
-/** Bounded: every pass strictly shrinks the string, so this is a backstop, not a limit. */
-const STRIP_TAGS_MAX_PASSES = 8;
+/**
+ * `[^<>]` rather than `[^>]`: a tag body that may not contain `<` gives the engine nothing to
+ * backtrack over, so a run of `<<<<<` cannot drive it quadratic (CodeQL js/polynomial-redos).
+ */
+const HTML_TAG = /<[^<>]*>/g;
 
 /**
  * Remove HTML tags to a fixed point, replacing each with a space.
  *
  * One pass can create the tag it just removed: `<scr<script>ipt>` becomes `<script>` once the
- * inner match is deleted (CodeQL js/incomplete-multi-character-sanitization). Repeating until the
- * string stops changing is what closes that.
+ * inner match is deleted (CodeQL js/incomplete-multi-character-sanitization). It terminates
+ * because each pass that changes anything strictly shortens the string.
  */
 function stripTagsCompletely(value: string | undefined): string | undefined {
   if (value === undefined) return undefined;
   let current = value;
-  for (let pass = 0; pass < STRIP_TAGS_MAX_PASSES; pass += 1) {
-    const next = current.replace(/<[^>]+>/g, ' ');
-    if (next === current) break;
+  for (;;) {
+    const next = current.replace(HTML_TAG, ' ');
+    if (next === current) return current;
     current = next;
   }
-  return current;
 }
 
 export function buildAltText(input: {

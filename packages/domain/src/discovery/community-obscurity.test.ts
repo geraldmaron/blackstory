@@ -43,6 +43,22 @@ import { parseQueryPackFixture, buildQueryPack } from '../query-packs/index.js';
 import type { CanonicalEntity } from '../entity.js';
 import type { ResolutionProfile } from '../resolution/index.js';
 
+/**
+ * Host-anchored membership, not `url.includes(host)`: "nps.gov" can sit anywhere in a URL, so a
+ * substring check passes for `https://evil.example/?q=nps.gov` (CodeQL
+ * js/incomplete-url-substring-sanitization).
+ */
+function hasHost(urls: readonly string[] | undefined, host: string): boolean {
+  return (urls ?? []).some((url) => {
+    try {
+      const { hostname } = new URL(url);
+      return hostname === host || hostname.endsWith(`.${host}`);
+    } catch {
+      return false;
+    }
+  });
+}
+
 const FIXED_NOW = '2026-07-18T21:00:00.000Z';
 const FIXTURES = join(dirname(fileURLToPath(import.meta.url)), '..', 'adapters', 'rss', 'fixtures');
 const QUERY_PACK_FIXTURES = join(
@@ -148,7 +164,7 @@ test('ABS fixture normalizes to snippet-only candidates with authority linkHints
   assert.ok(parsed.items.length >= 4);
 
   const buffalo = parsed.items.find((item) => item.title?.includes('Buffalo Soldiers'));
-  assert.ok(buffalo?.linkHints?.some((url) => url.includes('nps.gov')));
+  assert.ok(hasHost(buffalo?.linkHints, 'nps.gov'));
 
   const registryEntry = approvedRssRegistryEntry();
   const candidates = normalizeFeedXml({
@@ -166,7 +182,7 @@ test('ABS fixture normalizes to snippet-only candidates with authority linkHints
     assert.equal('body' in candidate.payload, false);
   }
   const buffaloCandidate = candidates.find((c) => c.title?.includes('Buffalo Soldiers'));
-  assert.ok(buffaloCandidate?.payload.outboundLinkHints?.some((url) => url.includes('nps.gov')));
+  assert.ok(hasHost(buffaloCandidate?.payload.outboundLinkHints, 'nps.gov'));
 });
 
 test('obscurity methodology disclaimer states relative heuristic limits', () => {

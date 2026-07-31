@@ -38,8 +38,6 @@ const DANGEROUS_URI_PATTERN =
   /\s(?:href|src|action)\s*=\s*(['"])\s*(?:javascript|data|vbscript):[^'"]*\1/gi;
 const TAG_PATTERN = /<\/?([a-zA-Z][\w-]*)([^>]*)>/g;
 
-/** Passes are bounded: each one strictly shrinks the string, so this is a backstop, not a limit. */
-const SANITIZE_MAX_PASSES = 8;
 
 /**
  * Strip executable markup from rich text markdown HTML fragments.
@@ -48,12 +46,15 @@ const SANITIZE_MAX_PASSES = 8;
 export function sanitizeRichText(input: string): string {
   if (!input) return '';
 
-  // To a fixed point, not one pass. A single pass can *create* the thing it just removed:
-  // `<scr<script>ipt>` leaves `<script>`, and `on<onx=''>click='...'` leaves `onclick='...'`.
-  // Repeating until the string stops changing is what closes that (CodeQL
-  // js/incomplete-multi-character-sanitization). Bounded so a pathological input cannot spin.
+  // To a fixed point, not one pass and not a capped number of passes. A single pass can *create*
+  // the thing it just removed: `<scr<script>ipt>` leaves `<script>`, and `on<onx=''>click='...'`
+  // leaves `onclick='...'`. A cap would leave residue on input crafted to exceed it, so this
+  // runs until the string stops changing (CodeQL js/incomplete-multi-character-sanitization).
+  //
+  // It terminates: every replacement only ever deletes characters, so each pass that changes
+  // anything strictly shortens the string, and a string of length n admits at most n such passes.
   let sanitized = input;
-  for (let pass = 0; pass < SANITIZE_MAX_PASSES; pass += 1) {
+  for (;;) {
     const before = sanitized;
     sanitized = sanitized
       .replace(BLOCKED_TAG_PATTERN, '')
