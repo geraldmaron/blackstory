@@ -149,9 +149,22 @@ export type FetchReleaseArtifactOptions = {
   readonly localArtifactsRoot?: string;
 };
 
+/**
+ * Trailing slashes removed by scanning back from the end, not `replace(/\/+$/, '')`. That
+ * expression is quadratic on input ending in a long run of slashes (CodeQL js/polynomial-redos),
+ * and these values come from environment configuration and remote responses.
+ */
+function trimTrailingSlashes(value: string): string {
+  let end = value.length;
+  while (end > 0 && value.charCodeAt(end - 1) === 47) {
+    end -= 1;
+  }
+  return end === value.length ? value : value.slice(0, end);
+}
+
 function artifactBaseUrl(env: NodeJS.ProcessEnv = process.env): string | undefined {
   const configured = env.APP_PUBLIC_RELEASE_ARTIFACT_BASE_URL?.trim();
-  if (configured && configured.length > 0) return configured.replace(/\/+$/, '');
+  if (configured && configured.length > 0) return trimTrailingSlashes(configured);
   return undefined;
 }
 

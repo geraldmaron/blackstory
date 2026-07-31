@@ -3,6 +3,8 @@
  * Used by web and admin so both surfaces render the same theme-aware shell bar.
  */
 
+import { trimTrailingSlashes } from './trim.js';
+
 export type ShellNavItem = {
   readonly href: string;
   readonly label: string;
@@ -106,7 +108,7 @@ export function absolutizeShellNav(
   origin: string | null,
 ): readonly ShellNavItem[] {
   if (!origin) return items;
-  const base = origin.replace(/\/+$/, '');
+  const base = trimTrailingSlashes(origin);
   return items.map((item) => ({
     ...item,
     href: item.href.startsWith('http')

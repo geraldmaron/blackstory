@@ -38,8 +38,21 @@ const EXPECTED_PROFILE_ID = 'black-history';
 const EXPECTED_PROFILE_VERSION = '1.0.0';
 const EXPECTED_SCHEMA_VERSION = '1.0.0';
 
+/**
+ * Trailing slashes removed by scanning back from the end, not `replace(/\/+$/, '')`. That
+ * expression is quadratic on input ending in a long run of slashes (CodeQL js/polynomial-redos),
+ * and these values come from environment configuration and remote responses.
+ */
+function trimTrailingSlashes(value: string): string {
+  let end = value.length;
+  while (end > 0 && value.charCodeAt(end - 1) === 47) {
+    end -= 1;
+  }
+  return end === value.length ? value : value.slice(0, end);
+}
+
 function normalizedBaseUrl(value: string): string {
-  return value.replace(/\/+$/u, '');
+  return trimTrailingSlashes(value);
 }
 
 async function endpointCheck(
