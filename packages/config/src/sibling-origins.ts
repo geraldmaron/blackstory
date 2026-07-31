@@ -12,8 +12,22 @@ export type SiblingOriginEnv = {
   readonly NODE_ENV?: string;
 };
 
+const SLASH = '/'.charCodeAt(0);
+
+/**
+ * Trailing slashes removed by scanning back from the end, not by `replace(/\/+$/, '')`.
+ *
+ * That regex is polynomial-time on input ending in a long run of slashes (CodeQL
+ * js/polynomial-redos), and the input here is an environment-supplied origin, so it is
+ * attacker-influenceable wherever these values are populated from a deploy config. The scan is
+ * linear, allocation-free, and behaves identically.
+ */
 function stripTrailingSlash(value: string): string {
-  return value.replace(/\/+$/, '');
+  let end = value.length;
+  while (end > 0 && value.charCodeAt(end - 1) === SLASH) {
+    end -= 1;
+  }
+  return end === value.length ? value : value.slice(0, end);
 }
 
 function isDevelopment(env: SiblingOriginEnv): boolean {
