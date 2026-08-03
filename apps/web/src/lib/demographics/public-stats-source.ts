@@ -2,12 +2,17 @@
  * Demographics read routing for public web surfaces (`/data`, homepage data pulse).
  * Reads materialized census snapshots from `bb_public.materialized_snapshots` when
  * `PUBLIC_DATA_SOURCE=postgres`; otherwise returns empty/absent summaries.
+ *
+ * ACS and FBI hate-crime summaries deliberately do NOT live here. Those datasets belong in the
+ * typed `bb_reference.statistical_series` / `statistical_observations` model — the opaque
+ * `acs_*` / `hate_crime_county_years` payload tables are the legacy loader path (see
+ * supabase/migrations/20260721220000_statistical_series_observations.sql). A bespoke rollup here
+ * would drop margin of error, boundary version, and source-variable provenance, which is the
+ * exact loss the typed model was introduced to prevent.
  */
 import {
   computeStatePopulationChangesFromDecades,
-  type AcsCoverageSummary,
   type CensusCountyDecadeDecade,
-  type HateCrimeYearSummary,
   type HistoricalStatePopulationCoverage,
   type NationalPopulationTimelineSnapshot,
   type OpportunityAtlasCoverageSummary,
@@ -68,7 +73,11 @@ export async function getHistoricalStatePopulationCoverage(): Promise<
 > {
   const payload = await fetchMaterializedSnapshot('historicalStatePopulationCoverage');
   if (!isHistoricalCoverageSnapshot(payload)) return undefined;
-  const { generatedAt: _generatedAt, contentHash: _contentHash, ...coverage } = payload as HistoricalStatePopulationCoverage & {
+  const {
+    generatedAt: _generatedAt,
+    contentHash: _contentHash,
+    ...coverage
+  } = payload as HistoricalStatePopulationCoverage & {
     readonly generatedAt?: string;
     readonly contentHash?: string;
   };
@@ -80,16 +89,15 @@ export async function getOpportunityAtlasCoverageSummary(): Promise<
 > {
   const payload = await fetchMaterializedSnapshot('opportunityAtlasCoverage');
   if (!isOpportunityCoverageSnapshot(payload)) return undefined;
-  const { generatedAt: _generatedAt, contentHash: _contentHash, ...summary } = payload as OpportunityAtlasCoverageSummary & {
+  const {
+    generatedAt: _generatedAt,
+    contentHash: _contentHash,
+    ...summary
+  } = payload as OpportunityAtlasCoverageSummary & {
     readonly generatedAt?: string;
     readonly contentHash?: string;
   };
   return summary;
-}
-
-/** TODO(postgres-cutover): aggregate `bb_reference.acs_*` rollups. */
-export async function getAcsCoverageSummary(): Promise<AcsCoverageSummary | undefined> {
-  return undefined;
 }
 
 /**
@@ -116,21 +124,7 @@ export async function getPhase1IndicatorCoverageSummary(): Promise<
   };
 }
 
-/** TODO(postgres-cutover): read `bb_reference.hate_crime_county_years` rollups. */
-export async function getHateCrimeYearSummary(_year: string): Promise<HateCrimeYearSummary | undefined> {
-  return undefined;
-}
-
-/** TODO(postgres-cutover): read `bb_reference.hate_crime_county_years` rollups. */
-export async function getHateCrimeYearSummaries(
-  _years: readonly string[],
-): Promise<readonly HateCrimeYearSummary[]> {
-  return [];
-}
-
 export type {
-  AcsCoverageSummary,
-  HateCrimeYearSummary,
   HistoricalStatePopulationCoverage,
   NationalPopulationTimelineSnapshot,
   OpportunityAtlasCoverageSummary,

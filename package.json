@@ -64,12 +64,6 @@
     "tsx": "^4.23.1",
     "typescript": "^5.8.3"
   },
-  "pnnm": {
-    "overrides": {
-      "uuid": ">=14.0.0",
-      "@hono/node-server": ">=2.0.0"
-    }
-  },
   "pnpm": {
     "overrides": {
       "uuid": ">=14.0.0",

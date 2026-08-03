@@ -10,6 +10,7 @@ export * from './cookies';
 export * from './csrf';
 export * from './csp';
 export * from './edge-security';
+export * from './privacy-pepper';
 export * from './redirects';
 export * from './request-size-limits';
 export * from './sanitize';

@@ -58,10 +58,8 @@ jobs:
         uses: ./.github/actions/setup-node-pnpm
       - name: Boundary validation and lint
         run: pnpm validate
-      # Full-repo prettier drift is tracked on chore/prettier-reformat; do not fail
-      # every push on hundreds of pre-existing format diffs. Run locally / on that branch.
-      # - name: Format check
-      #   run: pnpm format:check
+      - name: Format check
+        run: pnpm format:check
 
   unit-js-packages:
     name: Unit Tests (JS Packages)

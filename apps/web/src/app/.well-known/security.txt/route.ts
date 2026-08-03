@@ -1,14 +1,13 @@
 /**
- * /.well-known/security.txt. Points researchers/reporters at a role security
- * contact instead of a personal one — the operator-OPSEC half of this surface. Every value below
- * is a clearly-templated placeholder (the `.example` TLD is reserved by RFC 2606 and will never
- * resolve) until the pre-launch-operator-protection runbook's domain-registration and
- * role-mailbox steps are actually executed by a human; see
- * docs/runbooks/pre-launch-operator-protection.md. Swap PLACEHOLDER_DOMAIN and the contact
- * mailbox there, not just here, once the real domain exists.
+ * /.well-known/security.txt — the reachable contact for vulnerability reports.
+ *
+ * `SECURITY_CONTACT` is currently a personal mailbox. The operator-OPSEC intent recorded in
+ * docs/runbooks/pre-launch-operator-protection.md is a *role* mailbox (security@blackstory.app)
+ * so reports do not tie to an individual; move it there once that mailbox exists and set
+ * SECURITY_TXT_CONTACT rather than editing this file again.
  */
-const PLACEHOLDER_DOMAIN = 'blackbook.example';
-const PLACEHOLDER_SECURITY_CONTACT = `security@${PLACEHOLDER_DOMAIN}`;
+const SITE_DOMAIN = 'blackstory.app';
+const SECURITY_CONTACT = process.env.SECURITY_TXT_CONTACT?.trim() || 'me@geralddagher.com';
 const EXPIRES_WINDOW_DAYS = 365;
 
 /** RFC 9116 requires an Expires field; this repo has no scheduler wired up yet (that is a
@@ -23,12 +22,10 @@ function expiresAt(now: Date): string {
 function buildSecurityTxt(now: Date): string {
   const lines = [
     '# security.txt (RFC 9116) — BlackStory',
-    '# TEMPLATE: every value below is a placeholder. Fill in the real role mailbox and domain',
-    '# per docs/runbooks/pre-launch-operator-protection.md before this file is meaningful.',
-    `Contact: mailto:${PLACEHOLDER_SECURITY_CONTACT}`,
+    `Contact: mailto:${SECURITY_CONTACT}`,
     `Expires: ${expiresAt(now)}`,
     'Preferred-Languages: en',
-    `Canonical: https://${PLACEHOLDER_DOMAIN}/.well-known/security.txt`,
+    `Canonical: https://${SITE_DOMAIN}/.well-known/security.txt`,
   ];
   return lines.join('\r\n') + '\r\n';
 }

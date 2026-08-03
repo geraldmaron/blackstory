@@ -9,6 +9,7 @@
 import { NextResponse } from 'next/server';
 import { createHash } from 'node:crypto';
 import { createQuarantinedSubmission } from '@repo/security';
+import { requirePrivacyPepper } from '@/lib/web-security';
 import { createSubmitLeadRequestIntegrityGuard } from '../request-integrity-guard';
 import { createSubmitLeadRateLimitGuard } from '../rate-limit-guard';
 import { validateLeadSubmission, type LeadSubmissionInput } from '../lead-intake';
@@ -26,15 +27,6 @@ function clientIpFrom(request: Request): string | undefined {
   const forwarded = request.headers.get('x-forwarded-for');
   const first = forwarded?.split(',')[0]?.trim();
   return first || undefined;
-}
-
-function requirePrivacyPepper(): string {
-  const pepper = process.env.SUBMISSION_PRIVACY_PEPPER;
-  if (pepper && pepper.trim()) return pepper;
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error('SUBMISSION_PRIVACY_PEPPER must be set in production');
-  }
-  return 'local-dev-only-pepper-do-not-use-in-production';
 }
 
 /** Never store a raw client IP as the campaign-detector network token only a keyed hash.  */
