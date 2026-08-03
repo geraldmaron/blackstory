@@ -16,6 +16,7 @@ import {
 } from '@repo/domain';
 import { computeClaimConfidence } from '../lib/confidence.ts';
 import { lintPublishStatus, type PublishStatusLintReport } from './publish-status-linter.ts';
+import { buildNrhpListingFactObject, buildNrhpSignificanceObject } from './nrhp-area-labels.ts';
 
 export const INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR = 0.75;
 
@@ -360,14 +361,57 @@ export function buildReleaseSourceFromLandscape(
       ? geocode.precision
       : 'site';
 
-  const claim: ReleaseSourceClaim = {
-    predicate: 'documented_site',
-    object: summary,
-    confidenceLevel: 'high',
-    citationSource: hostname,
-    citationHref: canonicalUrl,
-    citationLabel: hostname,
-  };
+  // repo-n7p6.1: the NRHP Black-heritage lane used to reuse `summary` verbatim as the claim
+  // object — one pasted string in summary, claims[0].object, AND (via buildNotabilityBasisNote's
+  // predicate + claim.object derivation) notabilityBasis[0].note. Give it two distinct,
+  // purpose-built claims instead: the listing FACT (claims[0], what the acceptance check reads)
+  // and the significance criterion (its own claim so buildReleaseNotabilityBasis derives a real,
+  // distinct note from it — the "landmark_or_national_register" criterion the listing-fact claim
+  // triggers always sorts after the "documented_site" default the significance claim gets, so
+  // the significance note lands at notabilityBasis[0]). Every other lane keeps the prior
+  // single-claim behavior unchanged.
+  const claims: ReleaseSourceClaim[] =
+    row.lane === 'nrhp-black-heritage'
+      ? [
+          {
+            predicate: 'listing',
+            object: buildNrhpListingFactObject({
+              refnum: typeof row.payload.refnum === 'string' ? row.payload.refnum : undefined,
+              listedDateSerial:
+                typeof row.payload.listedDateSerial === 'string' ||
+                row.payload.listedDateSerial === null
+                  ? (row.payload.listedDateSerial as string | null)
+                  : undefined,
+            }),
+            confidenceLevel: 'high',
+            citationSource: hostname,
+            citationHref: canonicalUrl,
+            citationLabel: hostname,
+          },
+          {
+            predicate: 'significant for',
+            object: buildNrhpSignificanceObject({
+              areaOfSignificance:
+                typeof row.payload.areaOfSignificance === 'string'
+                  ? row.payload.areaOfSignificance
+                  : undefined,
+            }),
+            confidenceLevel: 'high',
+            citationSource: hostname,
+            citationHref: canonicalUrl,
+            citationLabel: hostname,
+          },
+        ]
+      : [
+          {
+            predicate: 'documented_site',
+            object: summary,
+            confidenceLevel: 'high',
+            citationSource: hostname,
+            citationHref: canonicalUrl,
+            citationLabel: hostname,
+          },
+        ];
 
   return {
     id: row.id,
@@ -380,7 +424,7 @@ export function buildReleaseSourceFromLandscape(
     locationLabel: locationLabelFromProvenance(displayName, provenance),
     lat: row.lat,
     lng: row.lng,
-    claims: [claim],
+    claims,
     mentionedEntityIds: [],
   };
 }
@@ -391,6 +435,16 @@ export function gateLandscapePublishCandidate(input: {
   readonly generatedAt: string;
   readonly confidenceFloor?: number;
   readonly canonicalStatus?: CanonicalStatusSnapshot;
+  /**
+   * repo-n7p6.1: a correction pass re-derives claims/notabilityBasis for landscape rows that are
+   * already `status='accepted'` and already published in the active release (e.g. the NRHP
+   * raw-code-leak fix) — `exact_in_release` would otherwise always skip those with
+   * 'already_in_public', since that check exists to stop a *new* candidate from duplicating an
+   * entity id already live. When true, that one check is skipped so the normal build path below
+   * re-derives and upserts the entity's row in place; every other gate (privacy review, lane
+   * bans, location, name_overlap) still applies unchanged.
+   */
+  readonly allowRepublish?: boolean;
 }): PublishGateResult {
   const floor = input.confidenceFloor ?? INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR;
   const row = input.row;
@@ -420,7 +474,7 @@ export function gateLandscapePublishCandidate(input: {
   if (row.lat === null || row.lng === null) {
     return { eligible: false, reason: 'missing_location', detail: 'missing lat/lng' };
   }
-  if (row.exact_in_release) {
+  if (row.exact_in_release && !input.allowRepublish) {
     return {
       eligible: false,
       reason: 'already_in_public',

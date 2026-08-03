@@ -30,6 +30,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
+import { formatNrhpListedDate, humanizeAreas } from './lib/nrhp-area-labels.ts';
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(SCRIPT_DIR, '../../..');
@@ -62,38 +63,9 @@ const CATEGORY_LABELS: Record<string, string> = {
   OBJECT: 'landmark object',
 };
 
-/** Pure — Excel/NPS serial date (days since 1899-12-30) -> "Month D, YYYY". */
-export function formatListedDate(serial: string | null | undefined): string | null {
-  if (!serial) return null;
-  const days = Number.parseInt(serial, 10);
-  if (!Number.isFinite(days) || days <= 0) return null;
-  const epoch = Date.UTC(1899, 11, 30);
-  const ms = epoch + days * 86_400_000;
-  const date = new Date(ms);
-  if (Number.isNaN(date.getTime())) return null;
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    timeZone: 'UTC',
-  }).format(date);
-}
-
-/** Pure — "EDUCATION; BLACK; ARCHITECTURE" -> "education, ethnic heritage (Black), and architecture". */
-export function humanizeAreas(raw: string | undefined): string {
-  if (!raw) return 'African American heritage';
-  const parts = raw
-    .split(';')
-    .map((entry) => entry.trim())
-    .filter(Boolean)
-    .map((entry) =>
-      entry.toUpperCase() === 'BLACK' ? 'ethnic heritage (Black)' : entry.toLowerCase(),
-    );
-  if (parts.length === 0) return 'African American heritage';
-  if (parts.length === 1) return parts[0]!;
-  if (parts.length === 2) return `${parts[0]} and ${parts[1]}`;
-  return `${parts.slice(0, -1).join(', ')}, and ${parts[parts.length - 1]}`;
-}
+/** Re-exported for callers that imported the date formatter from this script before it moved to
+ *  lib/nrhp-area-labels.ts (shared with lib/incremental-publish.ts's claim/notabilityBasis text). */
+export const formatListedDate = formatNrhpListedDate;
 
 const TRAILER =
   ` The National Park Service's National Register program recognizes it as a documented site of ` +
@@ -138,19 +110,32 @@ export function buildSummary(displayName: string, payload: Row['payload']): stri
   return core.length <= MAX_LEN ? core : core.slice(0, MAX_LEN);
 }
 
+// repo-n7p6.1: the original run only backfilled NULL summaries (new rows staged with no prose
+// yet). Fixing the raw-code leak ("(Black)", "historic - non-aboriginal", "entertainment/
+// recreation") requires regenerating summaries that already exist too — set REGENERATE_ALL=1 to
+// re-run buildSummary() over every row in the lane instead of only the NULL/empty ones.
+const REGENERATE_ALL = process.env.REGENERATE_ALL === '1';
+
 async function main(): Promise<void> {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) throw new Error('DATABASE_URL is required (source apps/web/.env.local)');
 
   const pool = new pg.Pool(normalizePgConnectionString(databaseUrl));
   const res = await pool.query<Row>(
-    `SELECT id, display_name, payload
-     FROM bb_research.landscape_candidates
-     WHERE lane = $1 AND (summary IS NULL OR length(trim(summary)) = 0)
-     ORDER BY id`,
+    REGENERATE_ALL
+      ? `SELECT id, display_name, payload
+         FROM bb_research.landscape_candidates
+         WHERE lane = $1
+         ORDER BY id`
+      : `SELECT id, display_name, payload
+         FROM bb_research.landscape_candidates
+         WHERE lane = $1 AND (summary IS NULL OR length(trim(summary)) = 0)
+         ORDER BY id`,
     [LANE],
   );
-  console.log(`Rows needing summary backfill (lane='${LANE}'): ${res.rows.length}`);
+  console.log(
+    `Rows needing summary backfill (lane='${LANE}', regenerateAll=${REGENERATE_ALL}): ${res.rows.length}`,
+  );
 
   const outOfBounds: { id: string; displayName: string; length: number }[] = [];
   const updates: { id: string; summary: string }[] = [];

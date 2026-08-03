@@ -16,6 +16,13 @@
  *     packages/ops-data/scripts/publish-release-entities-incremental.ts \
  *     --ids=dc-black-history-sites-b10,dc-black-history-sites-b11
  *
+ *   # Dry-run a correction pass over an already-published lane (repo-n7p6.1): re-derives every
+ *   # row in the lane regardless of status and, with --republish, doesn't skip rows already live
+ *   # in the active release ('already_in_public') the way a normal new-candidate publish would.
+ *   node --conditions development --import tsx \
+ *     packages/ops-data/scripts/publish-release-entities-incremental.ts \
+ *     --lane=nrhp-black-heritage --republish
+ *
  * Apply (requires explicit flag):
  *   DRY_RUN=0 INCREMENTAL_PUBLISH_APPLY=1 node --conditions development --import tsx \
  *     packages/ops-data/scripts/publish-release-entities-incremental.ts --from-landscape-pending
@@ -127,6 +134,47 @@ SELECT
   ) AS name_overlap
 FROM bb_research.landscape_candidates lc
 WHERE lc.id = ANY($1::text[])
+ORDER BY lc.id
+`;
+
+// repo-n7p6.1: a correction pass (e.g. the NRHP raw-code-leak fix) needs to re-derive every row
+// in one lane regardless of status — unlike LANDSCAPE_PENDING_SQL, no `status = 'pending'` filter.
+// Combine with --republish so gateLandscapePublishCandidate doesn't skip the already-accepted /
+// already-published rows this is meant to correct.
+const LANDSCAPE_BY_LANE_SQL = `
+WITH active AS (
+  SELECT release_id FROM bb_public.active_release LIMIT 1
+)
+SELECT
+  lc.id,
+  lc.lane,
+  lc.kind,
+  lc.display_name,
+  lc.summary,
+  lc.lat,
+  lc.lng,
+  lc.canonical_url,
+  lc.source_item_id,
+  lc.provenance,
+  lc.payload,
+  EXISTS (
+    SELECT 1
+    FROM active a
+    JOIN bb_public.release_entities re
+      ON re.release_id = a.release_id
+      AND (re.entity_id = lc.id OR re.entity_id = lc.source_item_id)
+  ) AS exact_in_release,
+  EXISTS (
+    SELECT 1
+    FROM active a
+    JOIN bb_public.release_entities re
+      ON re.release_id = a.release_id
+      AND lower(re.display_name) = lower(lc.display_name)
+      AND re.entity_id <> lc.id
+      AND re.entity_id <> lc.source_item_id
+  ) AS name_overlap
+FROM bb_research.landscape_candidates lc
+WHERE lc.lane = $1
 ORDER BY lc.id
 `;
 
@@ -299,12 +347,14 @@ function preparePublish(input: {
   readonly entityId: string;
   readonly fromLandscape: boolean;
   readonly canonicalStatus?: ReturnType<typeof parseCanonicalStatusSnapshot>;
+  readonly allowRepublish?: boolean;
 }): PreparedPublish | SkippedRow {
   if (input.fromLandscape && input.row) {
     const gate = gateLandscapePublishCandidate({
       row: input.row,
       releaseId: input.releaseId,
       generatedAt: input.generatedAt,
+      allowRepublish: input.allowRepublish ?? false,
       ...(input.canonicalStatus !== undefined ? { canonicalStatus: input.canonicalStatus } : {}),
     });
     if (!gate.eligible) {
@@ -350,8 +400,10 @@ async function main(): Promise<void> {
 
   const fromLandscapePending = hasFlag('--from-landscape-pending');
   const explicitIds = readIdsArg();
-  if (!fromLandscapePending && explicitIds.length === 0) {
-    console.error('Pass --from-landscape-pending and/or --ids=id1,id2');
+  const laneArg = readArg('--lane=');
+  const allowRepublish = hasFlag('--republish');
+  if (!fromLandscapePending && explicitIds.length === 0 && !laneArg) {
+    console.error('Pass --from-landscape-pending and/or --ids=id1,id2 and/or --lane=<lane>');
     process.exit(2);
   }
 
@@ -382,6 +434,12 @@ async function main(): Promise<void> {
       landscapeRows = rows;
     }
 
+    let laneRows: LandscapePublishRow[] = [];
+    if (laneArg) {
+      const { rows } = await client.query<LandscapePublishRow>(LANDSCAPE_BY_LANE_SQL, [laneArg]);
+      laneRows = rows;
+    }
+
     const pendingBefore = Number(
       (await client.query<{ n: string }>(PENDING_COUNT_SQL)).rows[0]?.n ?? 0,
     );
@@ -398,9 +456,17 @@ async function main(): Promise<void> {
       }
     }
 
+    for (const row of laneRows) {
+      if (toEvaluate.some((entry) => entry.entityId === row.id)) continue;
+      toEvaluate.push({ entityId: row.id, row, fromLandscape: true });
+    }
+
     for (const entityId of explicitIds) {
       if (toEvaluate.some((entry) => entry.entityId === entityId)) continue;
-      const row = landscapeRows.find((candidate) => candidate.id === entityId) ?? null;
+      const row =
+        landscapeRows.find((candidate) => candidate.id === entityId) ??
+        laneRows.find((candidate) => candidate.id === entityId) ??
+        null;
       toEvaluate.push({ entityId, row, fromLandscape: row !== null });
     }
 
@@ -426,6 +492,7 @@ async function main(): Promise<void> {
         generatedAt,
         entityId: item.entityId,
         fromLandscape: item.fromLandscape,
+        allowRepublish,
         ...(canonicalById.get(item.entityId) !== undefined
           ? { canonicalStatus: canonicalById.get(item.entityId) }
           : {}),
