@@ -24,4 +24,7 @@ export const MEMORIAL_HELD_MESSAGE_LINES = [
 export const MEMORIAL_LIST_NOTE =
   'This list is curated and incomplete. If a name belongs here and is missing, use Submit to send evidence for review.';
 
-export const MEMORIAL_QUIET_LIST_LINK_LABEL = 'Read every name held here';
+export const MEMORIAL_QUIET_LIST_LINK_LABEL = 'Read more';
+
+/** Spoken name for the cue above, which is deliberately terse on screen. */
+export const MEMORIAL_QUIET_LIST_LINK_A11Y_LABEL = 'Read every name held here';

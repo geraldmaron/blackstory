@@ -89,6 +89,63 @@ export function memorialNamesAlphabetical(): readonly string[] {
 }
 
 /**
+ * Index letter for a name: its first actual letter, ignoring leading punctuation
+ * and stripping diacritics so `"General" Lee` files under G rather than under a
+ * quote mark, and an accented initial files with its base letter. Names with no
+ * letter at all (none today) fall back to `#` so the grouping is total.
+ */
+export function memorialNameInitial(name: string): string {
+  const letter = /\p{L}/u.exec(name)?.[0];
+  if (letter === undefined) {
+    return '#';
+  }
+  return letter.normalize('NFD').replace(/\p{M}/gu, '').toUpperCase();
+}
+
+export type MemorialNameGroup = {
+  /** Single index character, `A`–`Z` or `#`. */
+  readonly letter: string;
+  readonly names: readonly string[];
+};
+
+/**
+ * The alphabetical list split into one group per index letter.
+ *
+ * The memorial list runs to well over a thousand names, which as one flat `<ul>`
+ * is tens of screens of undifferentiated scrolling with no way to tell where you
+ * are or to reach a particular name. Grouping gives the list headings to scroll
+ * against and anchors to jump to, without paginating it — the names are the
+ * point, and they stay on one page, together.
+ *
+ * Ordering is by index letter first, then by name within the letter, so the
+ * groups read in the same order as the flat list did apart from the handful of
+ * quote-prefixed names, which now sit with their letter instead of ahead of A.
+ */
+export function memorialNamesByInitial(): readonly MemorialNameGroup[] {
+  const groups = new Map<string, string[]>();
+  for (const name of MEMORIAL_NAMES) {
+    const letter = memorialNameInitial(name);
+    const bucket = groups.get(letter);
+    if (bucket) {
+      bucket.push(name);
+    } else {
+      groups.set(letter, [name]);
+    }
+  }
+  return (
+    [...groups.entries()]
+      .map(([letter, names]) => ({
+        letter,
+        names: names.sort((a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' })),
+      }))
+      // `#` last: it is the catch-all, not a letter, so it belongs after Z.
+      .sort((a, b) =>
+        a.letter === '#' ? 1 : b.letter === '#' ? -1 : a.letter.localeCompare(b.letter, 'en'),
+      )
+  );
+}
+
+/**
  * Years for the 15 legacy supplemental names (not yet in the shared archive,
  * so they carry no `.year` field there). Well-documented public record dates
  * for the underlying event: 1964 Freedom Summer murders, 1965 Selma-related
