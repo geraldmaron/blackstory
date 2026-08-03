@@ -52,6 +52,26 @@ npx expo run:android                 # requires Android SDK + a working `java`
 build output from `app.config.ts` + config plugins. Delete and regenerate them any time; a
 stale native directory is never a source of truth.
 
+#### `ios/` is variant-pinned to whichever `APP_VARIANT` last prebuilt it
+
+`expo prebuild` bakes `PRODUCT_BUNDLE_IDENTIFIER` into the generated Xcode project. Changing
+`APP_VARIANT` in `.env.local` afterwards does **not** rewrite it, so a directory prebuilt under
+`preview` keeps `app.blackbook.mobile.preview` even when `.env.local` reads `development`.
+
+`scripts/mobile-ios-release.sh` handles this deliberately: `prebuilt_bundle_id()` reads the
+baked identifier out of `ios/*.xcodeproj/project.pbxproj` and prefers it over the
+`APP_VARIANT`-derived one, printing a `NOTE —` line when they disagree. Trusting what was
+actually built beats trusting the env that was meant to build it.
+
+If you want the two to agree, re-prebuild rather than hand-editing the project:
+
+```bash
+cd apps/mobile && npx expo prebuild --platform ios --clean
+```
+
+Because `ios/` is gitignored, this drift is always a local-machine condition — never something
+a fresh clone inherits.
+
 ### MapLibre / native modules — do not use Expo Go
 
 `@maplibre/maplibre-react-native` (and other custom native code) is **not** in Expo Go.
