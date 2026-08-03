@@ -235,7 +235,7 @@ export const SEED_LEGAL_SNAPSHOTS: readonly LegalSnapshot[] = [
   {
     id: 'legal-13th-amendment',
     slug: 'thirteenth-amendment',
-    kind: 'federal-statute',
+    kind: 'constitutional-amendment',
     title: 'Thirteenth Amendment',
     jurisdictionId: 'us',
     lawStatus: 'in_force',
@@ -251,7 +251,7 @@ export const SEED_LEGAL_SNAPSHOTS: readonly LegalSnapshot[] = [
   {
     id: 'legal-14th-amendment',
     slug: 'fourteenth-amendment',
-    kind: 'federal-statute',
+    kind: 'constitutional-amendment',
     title: 'Fourteenth Amendment',
     jurisdictionId: 'us',
     lawStatus: 'in_force',
@@ -267,7 +267,7 @@ export const SEED_LEGAL_SNAPSHOTS: readonly LegalSnapshot[] = [
   {
     id: 'legal-15th-amendment',
     slug: 'fifteenth-amendment',
-    kind: 'federal-statute',
+    kind: 'constitutional-amendment',
     title: 'Fifteenth Amendment',
     jurisdictionId: 'us',
     lawStatus: 'in_force',

@@ -23,6 +23,7 @@ export const LEGAL_BROWSE_LEDE = LAW_BROWSE_LEDE;
 export const LEGAL_KIND_LABELS: Readonly<Record<string, string>> = {
   'federal-statute': 'Federal statute',
   'federal-regulation': 'Federal regulation',
+  'constitutional-amendment': 'Constitutional amendment',
   'landmark-case': 'Landmark case',
   'state-statute': 'State law',
 };

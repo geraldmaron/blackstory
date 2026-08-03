@@ -17,6 +17,7 @@ export function isLegalLicenseTag(value: string): value is LegalLicenseTag {
 export const LEGAL_SNAPSHOT_KINDS = [
   'federal-statute',
   'federal-regulation',
+  'constitutional-amendment',
   'landmark-case',
   'state-statute',
 ] as const;

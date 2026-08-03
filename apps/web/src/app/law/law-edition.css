@@ -188,10 +188,16 @@
 }
 
 /* —— On-page nav —— */
+/*
+ * The nav also carries `.ds-law-edition__panel`, which supplies the box, its border,
+ * and `--ds-space-5` padding. This rule used to set `padding: var(--ds-space-3) 0 0`,
+ * whose shorthand zeroed the panel's right/bottom/left padding and left the links
+ * flush against the box edges. Keep the panel's padding; only tighten the top, where
+ * the nav title needs less lead-in than a panel heading.
+ */
 .ds-law-edition__nav {
   margin: 0;
-  padding: var(--ds-space-3) 0 0;
-  border-top: var(--ds-border-width) solid var(--ds-rule);
+  padding-top: var(--ds-space-4);
 }
 
 .ds-law-edition__nav-title {
