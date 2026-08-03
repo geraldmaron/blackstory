@@ -50,7 +50,7 @@ import { sweep, type SweepHandle } from '../../../lib/map-experience/decade-tran
 import { StoryMode } from '../../../components/story/StoryMode';
 import type { StoryChapter } from '../../../lib/story/chapters';
 import { pickStoryRecord, type StoryRecordSpotlight } from '../../../lib/story/pick-story-record';
-import { pickStoryFact, type StoryFact } from '../../../lib/story/story-facts';
+import { pickStoryChapters } from '../../../lib/story/pick-story-chapters';
 import {
   applyEvidenceFloor,
   gradeForConfidence,
@@ -768,12 +768,22 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
    * `Math.random` is read here, in an effect-free initialiser, rather than inside the pure pickers,
    * so both remain reproducible in a test.
    */
-  const [storyRoll] = useState(() => ({ record: Math.random(), fact: Math.random() }));
+  const [storyRoll] = useState(() => ({
+    record: Math.random(),
+    fact: Math.random(),
+    order: Math.random(),
+  }));
   const storyRecord = useMemo<StoryRecordSpotlight | null>(
     () => pickStoryRecord(view.allFeatures, storyRoll.record),
     [storyRoll.record, view.allFeatures],
   );
-  const storyFact = useMemo<StoryFact>(() => pickStoryFact(storyRoll.fact), [storyRoll.fact]);
+  /**
+   * Which chapters run this visit and which cited fact each rotating chapter carries. Drawn from
+   * one roll at mount for the same reason as the record above: the renderer, the intersection
+   * observer and `runChapter` all have to agree, and scrolling back up must not re-roll the story
+   * under the reader.
+   */
+  const storyOrder = useMemo(() => pickStoryChapters(storyRoll.order), [storyRoll.order]);
 
   /**
    * Runs a chapter's beats: camera, spotlight, corridors, decade sweep, and the one record chapter
@@ -795,8 +805,12 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
       setSelectedId(focus?.properties.entityId);
 
       // A rotating fact names its own geography. Without this the plate would keep whatever the
-      // previous chapter framed while the card talked about somewhere else entirely.
-      const factCamera = chapter.rotatingFact ? storyFact.camera : null;
+      // previous chapter framed while the card talked about somewhere else entirely. Read per
+      // chapter, since a visit can run two context chapters carrying two different facts.
+      const chapterFact = chapter.rotatingFact ? storyOrder.factByChapterId[chapter.id] : undefined;
+      const factCamera = chapterFact
+        ? { ...chapterFact.camera, place: chapterFact.placeLabel }
+        : null;
 
       if (focus) {
         const [lng, lat] = focus.geometry.coordinates;
@@ -806,7 +820,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
         );
       } else if (factCamera) {
         camera.flyToRecord(
-          { center: [factCamera.center[0], factCamera.center[1]], place: storyFact.placeLabel },
+          { center: [factCamera.center[0], factCamera.center[1]], place: factCamera.place },
           { trigger: 'ambient' },
         );
       } else {
@@ -849,7 +863,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
         setDecade(null);
       }
     },
-    [camera, decadeBars, featureById, stage, stopSweep, storyFact, storyRecord],
+    [camera, decadeBars, featureById, stage, stopSweep, storyOrder, storyRecord],
   );
 
   /**
@@ -913,7 +927,8 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
         onNearMe={nearMe}
         reducedMotion={prefersReducedMotion()}
         recordSpotlight={storyRecord ?? undefined}
-        fact={storyFact}
+        chapters={storyOrder.chapters}
+        factByChapterId={storyOrder.factByChapterId}
       />
 
       {spotlight ? (
