@@ -2409,6 +2409,12 @@
   background: #f4efe5;
 }
 
+/* The monogram mark itself is drawn for a light card; on a dark canvas its own light frame reads
+   as a stray pale rectangle rather than a themed placeholder. */
+[data-theme='dark'] .ds-entity-mark__frame {
+  background: #2a2622;
+}
+
 .ds-entity-mark__svg {
   display: block;
   height: 100%;
@@ -2612,6 +2618,12 @@
 
 .ds-confidence-mark--low {
   color: #d07a32;
+}
+
+/* --high's light-theme green (#2f6b3c) is 2.83:1 against the dark canvas — below WCAG AA (4.5:1).
+   Medium and low already clear AA unchanged (4.97:1, 5.61:1) against --ds-canvas dark (#161616). */
+[data-theme='dark'] .ds-confidence-mark--high {
+  color: #4f9e5f;
 }
 
 .ds-confidence-mark--unrated {

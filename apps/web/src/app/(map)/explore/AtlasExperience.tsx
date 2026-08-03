@@ -22,7 +22,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation';
 import { browsableDestinations } from '../../../lib/nav/destination-registry';
 import { findUsStateByPostalCode } from '@repo/domain/map/geography';
-import { Notice } from '@repo/ui';
+import { Notice, toggleDocumentTheme } from '@repo/ui';
 import { CommandBar, type AtlasMode } from '../../../components/shell/CommandBar';
 import {
   CommandPalette,
@@ -648,8 +648,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
       openLibrary: () => router.push('/library'),
       togglePlayback: () => {},
       toggleTheme: () => {
-        const root = document.documentElement;
-        root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+        toggleDocumentTheme();
       },
       toggleDensity: () => {
         const root = document.documentElement;

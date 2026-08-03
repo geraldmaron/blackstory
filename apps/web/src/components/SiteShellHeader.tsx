@@ -21,6 +21,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { toggleDocumentTheme } from '@repo/ui';
 import { surfaceClassFor } from '../lib/nav/surface-classes';
 import { CommandBar } from './shell/CommandBar';
 
@@ -29,5 +30,5 @@ export function SiteShellHeader() {
   if (surfaceClassFor(pathname) === 'instrument') return null;
   // No `recordCount`: the count is a promise only a surface holding the index can keep, and a
   // reading room does not load one. The placeholder drops the number rather than inventing it.
-  return <CommandBar className="ds-bar--room" />;
+  return <CommandBar className="ds-bar--room" onToggleTheme={toggleDocumentTheme} />;
 }
