@@ -30,23 +30,34 @@ function normalizeName(value) {
     .trim();
 }
 
-/** Drop middle initials / titles so "Clementa C. Pinckney" matches "Clementa Pinckney". */
-function coreTokens(value) {
-  return normalizeName(value)
-    .split(' ')
-    .filter((token) => token.length > 1 && !/^(sr|jr|ii|iii|iv)$/.test(token));
-}
-
-function namesMatch(a, b) {
-  const na = normalizeName(a);
-  const nb = normalizeName(b);
-  if (na === nb) return true;
-  const ta = coreTokens(a);
-  const tb = coreTokens(b);
-  if (ta.length < 2 || tb.length < 2) return false;
-  // First + last token match (ignores middle names/initials).
-  return ta[0] === tb[0] && ta[ta.length - 1] === tb[tb.length - 1];
-}
+/**
+ * Memorial names whose entity record is filed under a fuller or differently punctuated name.
+ * Each pair was checked by hand against the entity's summary in the active release before
+ * being listed here.
+ *
+ * Matching must stay exact; every variant belongs in this table. First-token + last-token
+ * fuzzy matching attached three unrelated people to victims on the wall, along with that
+ * stranger's coordinates on the victim's memorial pin:
+ *   - "Charles Brown"   -> Charles I. Brown, a 1914 founder of Phi Beta Sigma at Howard
+ *   - "George Bush III" -> George Washington Bush, an 1840s Black pioneer settler
+ *   - "Robert Johnson"  -> Robert L. Johnson, who founded BET in 1980 and is living
+ * Common Black surnames make near-miss collisions routine rather than exceptional, and no
+ * entity field separates a memorial victim from anyone else: Charles I. Brown carries
+ * status `deceased` exactly as the real victims do.
+ */
+const VERIFIED_ENTITY_ALIASES = new Map([
+  // Emanuel AME Church, Charleston, June 17 2015.
+  ['clementa pinckney', 'ent_clementa_c_pinckney_001'],
+  ['cynthia hurd', 'ent_cynthia_graham_hurd_001'],
+  ['daniel simmons', 'ent_daniel_l_simmons_sr_001'],
+  ['depayne middleton doctor', 'ent_depayne_middleton_doctor_001'],
+  ['ethel lance', 'ent_ethel_lee_lance_001'],
+  ['sharonda coleman singleton', 'ent_sharonda_coleman_singleton_001'],
+  // Orangeburg Massacre, February 8 1968.
+  ['delano herman middleton', 'gap_delano_middleton'],
+  // NAACP chapter president, killed by Klan arson in Hattiesburg, January 1966.
+  ['vernon ferdinand dahmer', 'ent_vernon_dahmer_001'],
+]);
 
 const names = [...MEMORIAL_NAMES];
 if (names.length === 0) {
@@ -76,11 +87,20 @@ await client.end();
 
 const alphabetical = [...names].sort((a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' }));
 
+const unusedAliases = new Set(VERIFIED_ENTITY_ALIASES.keys());
+
 const entries = alphabetical.map((name) => {
-  const hit = candidates.find(
-    (row) => typeof row.display_name === 'string' && namesMatch(name, row.display_name),
-  );
+  const normalized = normalizeName(name);
+  const aliasId = VERIFIED_ENTITY_ALIASES.get(normalized);
+  if (aliasId) unusedAliases.delete(normalized);
+  const hit = aliasId
+    ? candidates.find((row) => row.entity_id === aliasId)
+    : candidates.find(
+        (row) =>
+          typeof row.display_name === 'string' && normalizeName(row.display_name) === normalized,
+      );
   if (!hit) {
+    // An unlinked name still belongs on the wall; a wrong link does not.
     return { name };
   }
   const entry = {
@@ -102,6 +122,23 @@ const entries = alphabetical.map((name) => {
   }
   return entry;
 });
+
+// A stale alias would quietly revert its name to unlinked, so fail instead of shipping that.
+if (unusedAliases.size > 0) {
+  throw new Error(
+    `VERIFIED_ENTITY_ALIASES has ${unusedAliases.size} entr(ies) matching no memorial name: ` +
+      `${[...unusedAliases].join(', ')}. Remove them or fix the spelling.`,
+  );
+}
+const unresolvedAliases = [...VERIFIED_ENTITY_ALIASES.entries()].filter(
+  ([, id]) => !candidates.some((row) => row.entity_id === id),
+);
+if (unresolvedAliases.length > 0) {
+  throw new Error(
+    `VERIFIED_ENTITY_ALIASES points at entity ids absent from the active release: ` +
+      `${unresolvedAliases.map(([name, id]) => `${name} -> ${id}`).join(', ')}`,
+  );
+}
 
 const linked = entries.filter((e) => e.entityId).length;
 const withCoords = entries.filter((e) => typeof e.lat === 'number').length;
