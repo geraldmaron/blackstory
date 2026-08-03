@@ -32,53 +32,32 @@ import {
 } from 'react';
 import type {
   GeoJSONSource,
-  LayerSpecification,
-  LngLatLike,
   Map as MapLibreMap,
   MapLayerMouseEvent,
   MapMouseEvent,
   Marker,
-  SourceSpecification,
   StyleSpecification,
 } from 'maplibre-gl';
 import type * as MapLibreNamespace from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { brandPalette, darkTheme, lightTheme } from '@repo/ui';
 import { US_CONUS_BOUNDS } from '@repo/domain/map/geography';
 import {
-  EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
-  EXPLORE_CLUSTER_COUNT_LAYER_ID,
-  EXPLORE_CLUSTER_INCOMING_LAYER_ID,
   EXPLORE_CLUSTER_LAYER_ID,
-  EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
-  EXPLORE_COUNTY_LABEL_LAYER_ID,
-  EXPLORE_COUNTY_LINES_LAYER_ID,
-  EXPLORE_COUNTY_LINES_SOURCE_ID,
   EXPLORE_ENTITIES_INCOMING_SOURCE_ID,
   EXPLORE_ENTITIES_SOURCE_ID,
-  EXPLORE_HISTORY_EDGES_INCOMING_LAYER_ID,
   EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID,
   EXPLORE_HISTORY_EDGES_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
-  EXPLORE_HISTORY_EDGES_SOURCE_ID,
   EXPLORE_MEMORIAL_NAMES_SOURCE_ID,
   MEMORIAL_NAMES_MAP_LAYER_ENABLED,
   EXPLORE_SELECTED_POINT_LAYER_ID,
-  SATELLITE_LAYER_ID,
-  EXPLORE_STATE_DENSITY_INCOMING_LAYER_ID,
-  EXPLORE_STATE_DENSITY_INCOMING_SOURCE_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
-  EXPLORE_STATE_DENSITY_SOURCE_ID,
-  EXPLORE_UNCLUSTERED_EVENT_GLYPH_INCOMING_LAYER_ID,
-  EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
-  EXPLORE_UNCLUSTERED_HALO_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
   EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
 } from '../map/explore-layer-ids';
 import {
   buildExploreMapStyle,
-  selectedPointFilterExpression,
   ENTITY_SELECTED_PULSE_DURATION_MS,
   ENTITY_SELECTED_RADIUS_OFFSET,
   entitySelectedPulseOpacity,
@@ -91,10 +70,7 @@ import {
   applyDensityBlendProgress,
   buildDensityColorMorphStates,
   clearDensityMorphFeatureState,
-  DECADE_CROSSFADE_IN_TARGETS,
-  DECADE_CROSSFADE_OUT_TARGETS,
   DECADE_LAYER_FADE_MS,
-  isDecadeFadePaintChannel,
   runDecadeMorphAnimation,
   restoreDecadeFadePaintFromStyle,
   setDecadeCrossfadeTransitions,
@@ -136,14 +112,7 @@ import {
   joinDensityOntoStatePolygons,
   indexDensityFillColors,
 } from '../../lib/map-experience/join-state-polygons';
-import { joinPopulationOntoCountyPolygons } from '../../lib/map-experience/join-county-population';
-import { joinPopulationOntoStatePolygons } from '../../lib/map-experience/join-state-population';
 import * as stateLabels from '../../lib/map-experience/state-labels';
-import { US_STATES_GEOJSON_PATH } from '../../lib/map-experience/us-state-polygons';
-import {
-  COUNTY_LINES_PREFETCH_ZOOM,
-  US_COUNTIES_GEOJSON_PATH,
-} from '../../lib/map-experience/us-county-lines';
 import type { ExploreLayerMode, ExploreViewportFrame } from '../../lib/map-experience/url-state';
 import {
   DEFAULT_POPULATION_GEO,
@@ -153,189 +122,182 @@ import {
   buildArchiveBaseStyle,
   PERSISTENT_PLATE_LAYER_IDS,
   syncLayerPaintFromStyle,
-  syncSingleLayerPaint,
 } from './map-plate-paint';
 import {
   buildExploreSearchCenterMarkerElement,
   type ExploreSearchCenterMarkerInput,
 } from '../../lib/map-experience/explore-search-marker';
-
-function readDocumentColorScheme(): MapColorScheme {
-  if (typeof document === 'undefined') return 'dark';
-  return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
-}
-
-/** Theme-aware label colors; prefers `stateLabelColorsForScheme` from state-labels when exported. */
-function stateLabelColorFor(scheme: MapColorScheme, selected: boolean): string {
-  const colorsForScheme = (
-    stateLabels as {
-      stateLabelColorsForScheme?: (colorScheme: MapColorScheme) => {
-        readonly muted: string;
-        readonly selected: string;
-      };
-    }
-  ).stateLabelColorsForScheme;
-  if (colorsForScheme) {
-    const colors = colorsForScheme(scheme);
-    return selected ? colors.selected : colors.muted;
-  }
-  const theme = scheme === 'light' ? lightTheme : darkTheme;
-  return selected ? brandPalette.copperDark : theme.inkMuted;
-}
+import { readDocumentColorScheme, stateLabelColorFor } from './map-stage/color-scheme';
+import {
+  EMPTY_EDGE_COLLECTION,
+  EMPTY_FEATURE_COLLECTION,
+  type StageConfig,
+} from './map-stage/stage-config';
+import {
+  applyGeographyStyle,
+  buildStyleForScheme,
+  setSelectedStateFilter,
+} from './map-stage/style-application';
+import {
+  applyEntityMarkerElementProps,
+  clearMarkers,
+  markerLabelFor,
+  syncSelectedEntityMarkerClass,
+} from './map-stage/entity-marker-sync';
+import {
+  setHistoryEdgeData,
+  setHistoryEdgesVisibility,
+  setSelectedEdgeFilter,
+  setSelectedEntityFilter,
+} from './map-stage/selection-sync';
+import {
+  fetchStatePolygons,
+  loadStatePolygonsWithDensity,
+  requestCountyPolygonLoad,
+  waitForGeoJsonSourceData,
+} from './map-stage/geo-source-loaders';
+import { lngLatTuple, readViewport } from './map-stage/viewport-geometry';
+import {
+  makeListenerStore,
+  notify,
+  type MapStageEventName,
+  type MapStageEvents,
+} from './map-stage/listener-store';
 
 type MaplibreModule = typeof MapLibreNamespace;
 
-const SELECTED_FILL_ID = 'explore-state-selected-fill';
-const SELECTED_LINE_ID = 'explore-state-selected-line';
+// ---------------------------------------------------------------------------------------------
+// Public stage API
+// ---------------------------------------------------------------------------------------------
 
-const EMPTY_EDGE_COLLECTION: HistoryEdgeLineCollection = {
-  type: 'FeatureCollection',
-  features: [],
+/** Source-data + mode flags a surface (home hero, explore) hands the stage. The stage rebuilds
+ * its MapLibre style from this every call (via `buildExploreMapStyle`, 's style builder —
+ * consumed here, never modified) and reapplies geography layers + resyncs entity markers. Always
+ * the FULL current shape, not a delta — mirrors how `ExploreMapCanvas` used to receive these as
+ * plain re-render props. */
+export type MapStageDataPatch = {
+  readonly featureCollection: ExploreMapFeatureCollection;
+  readonly jurisdictionAreaFeatures: readonly JurisdictionAreaFeature[];
+  readonly layerMode: ExploreLayerMode;
+  readonly popGeo?: ExplorePopulationGeo;
+  readonly densityLevels: readonly StateDensityLevel[];
+  readonly stateChoroplethLevels?: readonly StateChoroplethLevel[];
+  readonly countyChoroplethLevels?: readonly CountyChoroplethLevel[];
+  /** When false, recreate the entities source without MapLibre clustering. Omitted patches keep the current stage value (default false). */
+  readonly clusteringEnabled?: boolean;
+  /** Aerial imagery basemap instead of the flat plate. Omitted patches keep the current value. */
+  readonly satellite?: boolean;
+  readonly historyEdgesEnabled: boolean;
+  readonly historyEdgeCollection: HistoryEdgeLineCollection;
 };
 
-/**
- * The geography layers `applyGeographyStyle` is allowed to mount, in stacking order.
- *
- * This set is an allowlist, and a layer built in `explore-style.ts` but missing from it is
- * dropped without a warning — the style says the plate has a coastline and the plate does not.
- * Adding a base-cartography layer means adding its id here and, if its paint is theme-dependent,
- * to `PERSISTENT_PLATE_LAYER_IDS` in `map-plate-paint.ts`.
- */
-const GEOGRAPHY_LAYER_IDS = new Set([
-  'background',
-  SATELLITE_LAYER_ID,
-  'plate-landcover',
-  'plate-water',
-  'plate-boundary-country',
-  'plate-place-city',
-  'explore-memorial-names-label',
-  'explore-street-casing',
-  'explore-street-fill',
-  'explore-street-label',
-  'explore-state-density-fill',
-  EXPLORE_STATE_DENSITY_INCOMING_LAYER_ID,
-  EXPLORE_COUNTY_CHOROPLETH_LAYER_ID,
-  EXPLORE_COUNTY_LINES_LAYER_ID,
-  EXPLORE_COUNTY_LABEL_LAYER_ID,
-  'explore-state-bounds-line',
-  'explore-state-selected-fill',
-  'explore-state-selected-line',
-  'explore-jurisdiction-area-fill',
-  EXPLORE_HISTORY_EDGES_LAYER_ID,
-  EXPLORE_HISTORY_EDGES_INCOMING_LAYER_ID,
-  EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
-]);
+/** Selection-only view state: cheap filter/paint updates, no style rebuild. `undefined` clears
+ * the corresponding selection (always pass both — this is the current full selection, not a
+ * delta, same convention as `MapStageDataPatch`). */
+export type MapStageViewPatch = {
+  readonly selectedState: string | undefined;
+  readonly selectedEdge: string | undefined;
+  /** Copper orientation ring on the map for a focused record (e.g. return from entity page). */
+  readonly selectedEntity?: string | undefined;
+};
 
-/** The entity-marker stack from `buildExploreMapStyle`, in its stacking order: halo beneath
- * point beneath the event glyph ring, clusters above singles, selected ring on top. Incoming
- * dual-buffer layers sit above the current stack and below the selected ring. Added once
- * then paint-refreshed on style rebuild (theme plate stroke, kind shade expressions). */
-const ENTITY_LAYER_IDS = new Set([
-  EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
-  EXPLORE_UNCLUSTERED_POINT_LAYER_ID,
-  EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
-  EXPLORE_CLUSTER_LAYER_ID,
-  EXPLORE_CLUSTER_COUNT_LAYER_ID,
-  EXPLORE_UNCLUSTERED_HALO_INCOMING_LAYER_ID,
-  EXPLORE_UNCLUSTERED_POINT_INCOMING_LAYER_ID,
-  EXPLORE_UNCLUSTERED_EVENT_GLYPH_INCOMING_LAYER_ID,
-  EXPLORE_CLUSTER_INCOMING_LAYER_ID,
-  EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
-  EXPLORE_SELECTED_POINT_LAYER_ID,
-]);
+export type CameraFlyTarget =
+  | { readonly center: readonly [lng: number, lat: number]; readonly zoom: number }
+  | { readonly bounds: readonly [west: number, south: number, east: number, north: number] };
 
-/** Sources whose real geometry arrives from a lazy client fetch (`loadStatePolygonsWithDensity`,
- * `loadCountyLines`) — their inline style data is an empty placeholder, so a data patch must
- * never `setData` it back over the loaded polygons. */
-const LAZY_GEOGRAPHY_SOURCE_IDS = new Set<string>([
-  EXPLORE_STATE_DENSITY_SOURCE_ID,
-  EXPLORE_STATE_DENSITY_INCOMING_SOURCE_ID,
-  EXPLORE_COUNTY_LINES_SOURCE_ID,
-]);
+export type MapStageFlyOptions = {
+  /** `'fly'` (default): cinematic arc, used for hero-engagement descents. `'ease'`: linear
+   * pan/zoom with the same authored duration/easing but no arc — used to reconcile the camera
+   * against a URL viewport (deep link, back/forward), where a swooping arc would read as an
+   * unrequested flight rather than a restored view. */
+  readonly mode?: 'fly' | 'ease';
+  /** Override uniform preset padding — e.g. clear the right results rail for a selected point. */
+  readonly padding?:
+    | number
+    | {
+        readonly top: number;
+        readonly bottom: number;
+        readonly left: number;
+        readonly right: number;
+      };
+};
 
-/**
- * History edge GeoJSON is owned by `setHistoryEdgeData` / decade incoming staging — the style
- * always ships an empty FeatureCollection placeholder. setData'ing that placeholder on every
- * apply would blank toggled-on relationship lines between sync ticks.
- */
-const EDGE_MANAGED_SOURCE_IDS = new Set<string>([
-  EXPLORE_HISTORY_EDGES_SOURCE_ID,
-  EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID,
-]);
+/** Optional behavior for `patchData`. `fade` runs a dual-buffer crossdissolve on
+ * presence fills, pins, and relationship lines when motion is allowed — geography
+ * never empties. Memorial names couple via `memorialDecade` / `memorialComplete`
+ * (staggered feature-state, not a wipe). */
+export type MapStageDataPatchOptions = {
+  readonly fade?: boolean;
+  /** Ambient decade label ("2010s") — names who died that decade stagger-fade out. */
+  readonly memorialDecade?: string;
+  /** Full-archive / Today frame — restore every memorial name. */
+  readonly memorialComplete?: boolean;
+};
 
-/** Primary decade sources held steady during dual-buffer crossdissolve (incoming stages the next frame). */
-const DECADE_PRIMARY_DATA_SOURCE_IDS = new Set<string>([
-  EXPLORE_ENTITIES_SOURCE_ID,
-  EXPLORE_HISTORY_EDGES_SOURCE_ID,
-]);
+export type { ExploreSearchCenterMarkerInput };
 
-const EMPTY_FEATURE_COLLECTION = { type: 'FeatureCollection', features: [] } as const;
+export type MapStageHandle = {
+  /** Patches source data + density/history-edge mode flags; rebuilds the style and reapplies
+   * geography layers + entity markers. Pass `{ fade: true }` for decade-flow dual-buffer
+   * crossdissolve (presence colors morph; plate never blanks). */
+  readonly patchData: (patch: MapStageDataPatch, options?: MapStageDataPatchOptions) => void;
+  /** Patches the selected-state / selected-edge highlight filters (and the state-label
+   * selection color) without touching source data or the style. */
+  readonly applyViewState: (patch: MapStageViewPatch) => void;
+  /** The only sanctioned way to move the camera (ADR-017: "raw flyTo defaults are banned").
+   * Resolves `target` (an explicit center+zoom, or a bounding box via `cameraForBounds`), then
+   * flies/eases/jumps according to `name`'s preset and the current reduced-motion state. */
+  readonly flyPreset: (
+    name: CameraPresetName,
+    target: CameraFlyTarget,
+    options?: MapStageFlyOptions,
+  ) => void;
+  /** `false` once the canvas has failed to start (WebGL unavailable, marker mount threw); pages
+   * render their own graceful fallback notice off this. */
+  readonly mapAvailable: boolean;
+  /** Subscribes to one canvas event; returns an unsubscribe function. `'error'` and `'viewport'`
+   * replay their latest value immediately to a subscriber that attaches after the fact (the
+   * stage may already be alive with state from a previous page). */
+  readonly subscribe: <E extends MapStageEventName>(
+    event: E,
+    handler: (...args: MapStageEvents[E]) => void,
+  ) => () => void;
+  /** Copper place pin at a geocoded search center — distinct from entity HTML markers. */
+  readonly setSearchCenterMarker: (marker: ExploreSearchCenterMarkerInput) => void;
+  readonly clearSearchCenterMarker: () => void;
+  /** Re-read container layout after external geometry changes (hero inset, panel open). */
+  readonly resize: () => void;
+  /**
+   * The live MapLibre map, or null before it starts and after it fails.
+   *
+   * Deliberately narrow: `camera-moves.ts` drives the plate through a structural `MapLike`, and
+   * this is how that library reaches the one persistent canvas. It is not an invitation to call
+   * `flyTo` directly — ADR-017's ban on raw camera calls still holds, and `flyPreset` remains the
+   * route for preset framing.
+   */
+  readonly getMap: () => AtlasCameraTarget | null;
+};
 
-/** Memorial names breathe via MapStage setData — style rebuilds must not clobber the tick. */
-const BREATH_MANAGED_SOURCE_IDS = new Set<string>([EXPLORE_MEMORIAL_NAMES_SOURCE_ID]);
+/** What the camera library needs off the map. Structural, so `MapStage` owes it no import. */
+export type AtlasCameraTarget = {
+  flyTo(options: never): unknown;
+  easeTo(options: never): unknown;
+  fitBounds(bounds: never, options: never): unknown;
+  getZoom(): number;
+  getBearing(): number;
+  getPitch(): number;
+  getCenter(): { lng: number; lat: number };
+  stop(): unknown;
+};
 
-/** Normalizes `maplibre-gl`'s `LngLatLike` union (a `LngLat` instance, a `{lng,lat}` or
- * `{lon,lat}` object literal, or a `[lng, lat]` tuple) to a plain tuple. `cameraForBounds`
- * types its result this loosely even though the runtime value is always a `LngLat` instance. */
-function lngLatTuple(value: LngLatLike): [number, number] {
-  if (Array.isArray(value)) return [value[0], value[1]];
-  if ('lng' in value) return [value.lng, value.lat];
-  return [value.lon, value.lat];
-}
+const MapStageContext = createContext<MapStageHandle | null>(null);
 
-function readViewport(map: MapLibreMap): ExploreViewportFrame {
-  const center = map.getCenter();
-  const bounds = map.getBounds();
-  return {
-    lat: center.lat,
-    lng: center.lng,
-    zoom: map.getZoom(),
-    bounds: {
-      west: bounds.getWest(),
-      south: bounds.getSouth(),
-      east: bounds.getEast(),
-      north: bounds.getNorth(),
-    },
-  };
-}
-
-function clearMarkers(markers: Marker[]): void {
-  for (const marker of markers) marker.remove();
-  markers.length = 0;
-}
-
-/** Marker element paint shared by create + in-place update — kept idempotent so a keyed
- * reuse never resets classes/animations on markers whose feature did not change. */
-function applyEntityMarkerElementProps(
-  el: HTMLButtonElement,
-  feature: ExploreMapFeatureCollection['features'][number],
-  label: string,
-  isSelected: boolean,
-): void {
-  el.classList.toggle('ds-map-entity-marker--selected', isSelected);
-  if (el.getAttribute('aria-label') !== label) {
-    el.setAttribute('aria-label', label);
-    el.title = label;
+export function useMapStage(): MapStageHandle {
+  const ctx = useContext(MapStageContext);
+  if (!ctx) {
+    throw new Error('useMapStage() must be called within a MapStageProvider');
   }
-  // Mirror the GL circle kind shade so the hit-target disc matches KindBadge / explore-point
-  // (transparent overlays previously left only the sand halo readable as "the" circle color).
-  const shade =
-    typeof feature.properties.shade === 'string' && feature.properties.shade.length > 0
-      ? feature.properties.shade
-      : brandPalette.copperPin;
-  if (el.style.getPropertyValue('--ds-map-entity-shade') !== shade) {
-    el.style.setProperty('--ds-map-entity-shade', shade);
-  }
-  if (el.dataset.kind !== feature.properties.kind) {
-    el.dataset.kind = feature.properties.kind;
-  }
-  if (typeof feature.properties.mapTone === 'string') {
-    if (el.dataset.mapTone !== feature.properties.mapTone) {
-      el.dataset.mapTone = feature.properties.mapTone;
-    }
-  } else if (el.dataset.mapTone !== undefined) {
-    delete el.dataset.mapTone;
-  }
+  return ctx;
 }
 
 /**
@@ -435,507 +397,6 @@ function syncCircularMarkers(
   }
 }
 
-function markerLabelFor(feature: ExploreMapFeatureCollection['features'][number]): string {
-  return typeof feature.properties.displayName === 'string'
-    ? feature.properties.displayName
-    : 'Documented record';
-}
-
-/** Toggles the selected pulse class without rebuilding every marker. */
-function syncSelectedEntityMarkerClass(
-  markers: readonly Marker[],
-  selectedEntityId: string | undefined,
-): void {
-  for (const marker of markers) {
-    const el = marker.getElement();
-    const isSelected =
-      selectedEntityId !== undefined &&
-      selectedEntityId.length > 0 &&
-      el.dataset.entityId === selectedEntityId;
-    el.classList.toggle('ds-map-entity-marker--selected', isSelected);
-  }
-}
-
-/**
- * Selects/deselects the single-feature ring layer only (`setFilter` on
- * `EXPLORE_SELECTED_POINT_LAYER_ID` from `selectedPointFilterExpression`) — never a re-filter
- * or `setData` on the main entities source, so neighboring pins never repaint. See
- * `patterns-cinematic-map.md` §2 rule 5.
- */
-function setSelectedEntityFilter(map: MapLibreMap, entityId: string | undefined): void {
-  if (!map.getLayer(EXPLORE_SELECTED_POINT_LAYER_ID)) return;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- FilterSpecification ambient typing unavailable
-  map.setFilter(EXPLORE_SELECTED_POINT_LAYER_ID, selectedPointFilterExpression(entityId) as any);
-}
-
-function setHistoryEdgeData(map: MapLibreMap, collection: HistoryEdgeLineCollection): void {
-  const source = map.getSource(EXPLORE_HISTORY_EDGES_SOURCE_ID) as GeoJSONSource | undefined;
-  if (!source) return;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
-  source.setData(collection as any);
-}
-
-function setSelectedEdgeFilter(map: MapLibreMap, edgeId: string | undefined): void {
-  const filter =
-    edgeId && edgeId.length > 0
-      ? (['==', ['get', 'edgeId'], edgeId] as unknown as [string, ...unknown[]])
-      : (['==', ['get', 'edgeId'], ''] as unknown as [string, ...unknown[]]);
-  if (map.getLayer(EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID)) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- FilterSpecification ambient typing unavailable
-    map.setFilter(EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID, filter as any);
-  }
-}
-
-function setHistoryEdgesVisibility(map: MapLibreMap, enabled: boolean): void {
-  const visibility = enabled ? 'visible' : 'none';
-  for (const id of [
-    EXPLORE_HISTORY_EDGES_LAYER_ID,
-    EXPLORE_HISTORY_EDGES_INCOMING_LAYER_ID,
-    EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
-  ]) {
-    if (map.getLayer(id)) {
-      map.setLayoutProperty(id, 'visibility', visibility);
-    }
-  }
-}
-
-type StatePolygonCollection = {
-  type: 'FeatureCollection';
-  features: { type: string; id?: string; properties: Record<string, unknown>; geometry: unknown }[];
-};
-
-let statePolygonsPromise: Promise<StatePolygonCollection> | undefined;
-
-function fetchStatePolygons(): Promise<StatePolygonCollection> {
-  if (!statePolygonsPromise) {
-    statePolygonsPromise = fetch(US_STATES_GEOJSON_PATH).then(async (response) => {
-      if (!response.ok) {
-        statePolygonsPromise = undefined;
-        throw new Error(`Failed to load ${US_STATES_GEOJSON_PATH}: ${response.status}`);
-      }
-      return (await response.json()) as StatePolygonCollection;
-    });
-  }
-  return statePolygonsPromise;
-}
-
-async function loadStatePolygonsWithDensity(
-  map: MapLibreMap,
-  densityLevels: readonly StateDensityLevel[],
-  stateChoroplethLevels: readonly StateChoroplethLevel[] = [],
-  sourceId: string = EXPLORE_STATE_DENSITY_SOURCE_ID,
-  colorScheme: MapColorScheme = readDocumentColorScheme(),
-): Promise<ReturnType<typeof joinDensityOntoStatePolygons>> {
-  const source = map.getSource(sourceId) as GeoJSONSource | undefined;
-  if (!source) {
-    return { type: 'FeatureCollection', features: [] };
-  }
-  const collection = await fetchStatePolygons();
-  const joined =
-    stateChoroplethLevels.length > 0
-      ? joinPopulationOntoStatePolygons(collection, stateChoroplethLevels)
-      : joinDensityOntoStatePolygons(collection, densityLevels, { colorScheme });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
-  source.setData(joined as any);
-  await waitForGeoJsonSourceData(map, sourceId);
-  return joined;
-}
-
-/**
- * Resolves after MapLibre finishes applying a GeoJSON `setData` for `sourceId`
- * (sourcedata + isSourceLoaded), or after a short timeout. Promote must not lift
- * the incoming cover until the primary density source holds the new frame.
- */
-function waitForGeoJsonSourceData(
-  map: MapLibreMap,
-  sourceId: string,
-  timeoutMs = 500,
-): Promise<void> {
-  return new Promise((resolve) => {
-    let settled = false;
-    const finish = () => {
-      if (settled) return;
-      settled = true;
-      map.off('sourcedata', onSourceData);
-      window.clearTimeout(timer);
-      resolve();
-    };
-    const onSourceData = (event: { sourceId?: string; isSourceLoaded?: boolean }) => {
-      if (event.sourceId === sourceId && event.isSourceLoaded) finish();
-    };
-    map.on('sourcedata', onSourceData);
-    const timer = window.setTimeout(finish, timeoutMs);
-  });
-}
-
-type CountyPolygonCollection = {
-  type: 'FeatureCollection';
-  features: { type: string; id?: string; properties: Record<string, unknown>; geometry: unknown }[];
-};
-
-let countyLinesPromise: Promise<CountyPolygonCollection> | undefined;
-
-function fetchCountyPolygons(): Promise<CountyPolygonCollection> {
-  if (!countyLinesPromise) {
-    countyLinesPromise = fetch(US_COUNTIES_GEOJSON_PATH)
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error(`Failed to load ${US_COUNTIES_GEOJSON_PATH}: ${response.status}`);
-        }
-        return (await response.json()) as CountyPolygonCollection;
-      })
-      .catch((error) => {
-        // Clear the cached promise so a later blackShare/zoom retry can recover.
-        countyLinesPromise = undefined;
-        throw error;
-      });
-  }
-  return countyLinesPromise;
-}
-
-/** Maps whose county source already holds the real geometry — `zoomend` keeps firing past the
- * prefetch threshold, and re-`setData`ing 3k polygons on every camera settle would churn the
- * GeoJSON worker for nothing. */
-const countyLinesLoaded = new WeakSet<MapLibreMap>();
-/** Per-map generation so a stale empty-levels fetch cannot overwrite a later choropleth join. */
-const countyLinesLoadGeneration = new WeakMap<MapLibreMap, number>();
-/** Once a choropleth join is requested, ignore empty-level loads (even mid-flight). */
-const countyChoroplethJoinRequested = new WeakSet<MapLibreMap>();
-
-/** Lazily fills the county source (hairlines + optional choropleth). Deliberately zoom-triggered
- * by the caller, not eager: the ~2.3 MB asset is invisible below the layer's `minzoom`, so the
- * national resting frame never pays for it — except population choropleths, which load at any
- * zoom when `blackShare` / `blackChange` is active.
- *
- * Empty-level calls after geometry is present — or after a join was requested — are no-ops so
- * fade-path / StrictMode patches with `[]` cannot wipe `shareTier`. */
-async function loadCountyPolygons(
-  map: MapLibreMap,
-  choroplethLevels: readonly CountyChoroplethLevel[],
-): Promise<void> {
-  const source = map.getSource(EXPLORE_COUNTY_LINES_SOURCE_ID) as GeoJSONSource | undefined;
-  if (!source) return;
-  if (choroplethLevels.length > 0) {
-    countyChoroplethJoinRequested.add(map);
-  } else if (countyLinesLoaded.has(map) || countyChoroplethJoinRequested.has(map)) {
-    return;
-  }
-  const generation = (countyLinesLoadGeneration.get(map) ?? 0) + 1;
-  countyLinesLoadGeneration.set(map, generation);
-  const collection = await fetchCountyPolygons();
-  if (countyLinesLoadGeneration.get(map) !== generation) {
-    // A newer load (usually with choropleth tiers) superseded this one mid-flight.
-    return;
-  }
-  const joined =
-    choroplethLevels.length > 0
-      ? joinPopulationOntoCountyPolygons(collection, choroplethLevels)
-      : collection;
-  countyLinesLoaded.add(map);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
-  source.setData(joined as any);
-}
-
-/** County geometry + population join still need to land during decade-morph `configOnly`
- * patches — those skip `applyStyleAndData`, which previously left blackShare without tiers. */
-function requestCountyPolygonLoad(map: MapLibreMap, cfg: StageConfig): void {
-  const popGeo = cfg.popGeo ?? DEFAULT_POPULATION_GEO;
-  const needsCountyGeometry =
-    map.getZoom() >= COUNTY_LINES_PREFETCH_ZOOM ||
-    ((cfg.layerMode === 'blackShare' || cfg.layerMode === 'blackChange') && popGeo === 'county');
-  if (!needsCountyGeometry) return;
-  void loadCountyPolygons(map, cfg.countyChoroplethLevels).catch((error) => {
-    console.error('[MapStage] county polygon load failed', error);
-  });
-}
-
-/** Channels decade morph holds during dissolve — mid-swap style sync must not touch them. */
-const DECADE_FADE_OMIT_CHANNELS = new Set(
-  [...DECADE_CROSSFADE_OUT_TARGETS, ...DECADE_CROSSFADE_IN_TARGETS].map(
-    (target) => `${target.layerId}:${target.paintKey}`,
-  ),
-);
-
-function syncLayerLayoutVisibility(
-  map: MapLibreMap,
-  layer: StyleSpecification['layers'][number],
-): void {
-  if (!('layout' in layer) || !layer.layout || typeof layer.layout !== 'object') return;
-  if (!map.getLayer(layer.id)) return;
-  const visibility = (layer.layout as { visibility?: string }).visibility;
-  if (visibility !== 'visible' && visibility !== 'none') return;
-  try {
-    map.setLayoutProperty(layer.id, 'visibility', visibility);
-  } catch (error) {
-    console.error(`[MapStage] setLayoutProperty ${layer.id}.visibility failed`, error);
-  }
-}
-
-function applyGeographyStyle(
-  map: MapLibreMap,
-  style: StyleSpecification,
-  options?: {
-    readonly recreateEntitiesSource?: boolean;
-    /**
-     * When true, skip decade-crossfade opacity channels so an in-flight dissolve
-     * cannot flash full opacity when setData / paint sync runs.
-     */
-    readonly preserveDecadeFadeOpacities?: boolean;
-    /**
-     * Hold primary entities/edges setData during dual-buffer staging so the
-     * visible frame stays put while incoming sources receive the next decade.
-     */
-    readonly deferPrimaryDecadeData?: boolean;
-  },
-): void {
-  const recreateEntities = options?.recreateEntitiesSource === true;
-  const paintOmit = options?.preserveDecadeFadeOpacities ? DECADE_FADE_OMIT_CHANNELS : undefined;
-
-  if (recreateEntities) {
-    // Clustering is baked into the GeoJSON source at add time — toggling it requires a
-    // deliberate remove/re-add of the entities source + its layers. Do this only on an
-    // explicit grouping flip (not on every data patch), and tear layers down first.
-    for (const layerId of ENTITY_LAYER_IDS) {
-      if (map.getLayer(layerId)) map.removeLayer(layerId);
-    }
-    if (map.getSource(EXPLORE_ENTITIES_SOURCE_ID)) {
-      map.removeSource(EXPLORE_ENTITIES_SOURCE_ID);
-    }
-    if (map.getSource(EXPLORE_ENTITIES_INCOMING_SOURCE_ID)) {
-      map.removeSource(EXPLORE_ENTITIES_INCOMING_SOURCE_ID);
-    }
-  }
-
-  for (const [id, source] of Object.entries(style.sources ?? {})) {
-    const existing = map.getSource(id) as GeoJSONSource | undefined;
-    if (existing) {
-      // Update in place — NEVER removeSource/addSource on a routine data patch. Re-adding a
-      // source id while the worker is still tearing the old one down corrupts the internal
-      // GeoJSON tile pyramid (only the tile in flight at teardown ever renders again), and
-      // patches land in quick succession on mount (hero reset + explore sync, doubled by
-      // StrictMode). Lazy geography sources (states+density, county lines) are skipped: their
-      // inline style data is an empty placeholder that their own loaders overwrite —
-      // setData'ing the placeholder first would just blank-flash the loaded polygons. The
-      // entities source DOES setData here: that is how a surface's filter changes reach the
-      // GL circle layers. During dual-buffer crossdissolve, primary decade sources stay put
-      // while incoming buffers stage the next frame.
-      if (LAZY_GEOGRAPHY_SOURCE_IDS.has(id) || BREATH_MANAGED_SOURCE_IDS.has(id)) continue;
-      if (EDGE_MANAGED_SOURCE_IDS.has(id)) continue;
-      if (options?.deferPrimaryDecadeData && DECADE_PRIMARY_DATA_SOURCE_IDS.has(id)) continue;
-      if (id === EXPLORE_ENTITIES_INCOMING_SOURCE_ID) {
-        continue;
-      }
-      const data = (source as { data?: unknown }).data;
-      if (typeof existing.setData === 'function' && data && typeof data === 'object') {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON ambient namespace unavailable
-        existing.setData(data as any);
-      }
-      continue;
-    }
-    map.addSource(id, source as SourceSpecification);
-  }
-  // Geography + entity layers stay mounted across decade/data patches (in-place setData +
-  // paint/layout sync). Removing them on every apply read as a full map refresh and killed
-  // MapLibre opacity transitions. New layers still append beneath the entity stack when the
-  // halo anchor already exists.
-  const entityAnchor = map.getLayer(EXPLORE_UNCLUSTERED_HALO_LAYER_ID)
-    ? EXPLORE_UNCLUSTERED_HALO_LAYER_ID
-    : undefined;
-  for (const layer of style.layers ?? []) {
-    if (GEOGRAPHY_LAYER_IDS.has(layer.id)) {
-      if (!map.getLayer(layer.id)) {
-        const beforeId = layer.id === 'background' ? undefined : entityAnchor;
-        map.addLayer(layer as LayerSpecification, beforeId);
-      } else {
-        syncSingleLayerPaint(map, layer, paintOmit ? { omitChannels: paintOmit } : undefined);
-        syncLayerLayoutVisibility(map, layer);
-      }
-      continue;
-    }
-    if (ENTITY_LAYER_IDS.has(layer.id)) {
-      if (!map.getLayer(layer.id)) {
-        map.addLayer(layer as LayerSpecification);
-      } else if ('paint' in layer && layer.paint) {
-        // Refresh kind-shade / plate-dependent paint when the style rebuilds (theme toggle,
-        // encoding updates). Source geometry still updates via setData above. Decade-fade
-        // opacity channels are omitted mid-swap so the crossfade stays continuous.
-        for (const [paintKey, paintValue] of Object.entries(layer.paint)) {
-          if (paintOmit && isDecadeFadePaintChannel(layer.id, paintKey)) continue;
-          try {
-            map.setPaintProperty(layer.id, paintKey, paintValue);
-          } catch (error) {
-            console.error(`[MapStage] setPaintProperty ${layer.id}.${paintKey} failed`, error);
-          }
-        }
-      }
-    }
-  }
-}
-
-function setSelectedStateFilter(map: MapLibreMap, postalCode: string | undefined): void {
-  const filter =
-    postalCode && postalCode.length > 0
-      ? (['==', ['get', 'postalCode'], postalCode] as unknown as [string, ...unknown[]])
-      : (['==', ['get', 'postalCode'], ''] as unknown as [string, ...unknown[]]);
-  if (map.getLayer(SELECTED_FILL_ID)) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- FilterSpecification ambient typing unavailable
-    map.setFilter(SELECTED_FILL_ID, filter as any);
-  }
-  if (map.getLayer(SELECTED_LINE_ID)) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- FilterSpecification ambient typing unavailable
-    map.setFilter(SELECTED_LINE_ID, filter as any);
-  }
-}
-
-// ---------------------------------------------------------------------------------------------
-// Public stage API
-// ---------------------------------------------------------------------------------------------
-
-/** Source-data + mode flags a surface (home hero, explore) hands the stage. The stage rebuilds
- * its MapLibre style from this every call (via `buildExploreMapStyle`, 's style builder —
- * consumed here, never modified) and reapplies geography layers + resyncs entity markers. Always
- * the FULL current shape, not a delta — mirrors how `ExploreMapCanvas` used to receive these as
- * plain re-render props. */
-export type MapStageDataPatch = {
-  readonly featureCollection: ExploreMapFeatureCollection;
-  readonly jurisdictionAreaFeatures: readonly JurisdictionAreaFeature[];
-  readonly layerMode: ExploreLayerMode;
-  readonly popGeo?: ExplorePopulationGeo;
-  readonly densityLevels: readonly StateDensityLevel[];
-  readonly stateChoroplethLevels?: readonly StateChoroplethLevel[];
-  readonly countyChoroplethLevels?: readonly CountyChoroplethLevel[];
-  /** When false, recreate the entities source without MapLibre clustering. Omitted patches keep the current stage value (default false). */
-  readonly clusteringEnabled?: boolean;
-  /** Aerial imagery basemap instead of the flat plate. Omitted patches keep the current value. */
-  readonly satellite?: boolean;
-  readonly historyEdgesEnabled: boolean;
-  readonly historyEdgeCollection: HistoryEdgeLineCollection;
-};
-
-/** Selection-only view state: cheap filter/paint updates, no style rebuild. `undefined` clears
- * the corresponding selection (always pass both — this is the current full selection, not a
- * delta, same convention as `MapStageDataPatch`). */
-export type MapStageViewPatch = {
-  readonly selectedState: string | undefined;
-  readonly selectedEdge: string | undefined;
-  /** Copper orientation ring on the map for a focused record (e.g. return from entity page). */
-  readonly selectedEntity?: string | undefined;
-};
-
-export type CameraFlyTarget =
-  | { readonly center: readonly [lng: number, lat: number]; readonly zoom: number }
-  | { readonly bounds: readonly [west: number, south: number, east: number, north: number] };
-
-export type MapStageFlyOptions = {
-  /** `'fly'` (default): cinematic arc, used for hero-engagement descents. `'ease'`: linear
-   * pan/zoom with the same authored duration/easing but no arc — used to reconcile the camera
-   * against a URL viewport (deep link, back/forward), where a swooping arc would read as an
-   * unrequested flight rather than a restored view. */
-  readonly mode?: 'fly' | 'ease';
-  /** Override uniform preset padding — e.g. clear the right results rail for a selected point. */
-  readonly padding?:
-    | number
-    | {
-        readonly top: number;
-        readonly bottom: number;
-        readonly left: number;
-        readonly right: number;
-      };
-};
-
-type MapStageEvents = {
-  select: [entityId: string];
-  stateSelect: [postalCode: string];
-  edgeSelect: [edgeId: string];
-  /** Fired on a background click when nothing else (state, edge) was hit — the
-   * `activateOnBackgroundClick` behavior `HomeMapHero` used to opt into via a prop. Now every
-   * surface gets the event; only the ones that `subscribe('activate', …)` act on it, which is an
-   * equivalent opt-in. */
-  activate: [viewport: ExploreViewportFrame];
-  viewport: [viewport: ExploreViewportFrame];
-  error: [];
-};
-
-type MapStageEventName = keyof MapStageEvents;
-
-/** Optional behavior for `patchData`. `fade` runs a dual-buffer crossdissolve on
- * presence fills, pins, and relationship lines when motion is allowed — geography
- * never empties. Memorial names couple via `memorialDecade` / `memorialComplete`
- * (staggered feature-state, not a wipe). */
-export type MapStageDataPatchOptions = {
-  readonly fade?: boolean;
-  /** Ambient decade label ("2010s") — names who died that decade stagger-fade out. */
-  readonly memorialDecade?: string;
-  /** Full-archive / Today frame — restore every memorial name. */
-  readonly memorialComplete?: boolean;
-};
-
-export type { ExploreSearchCenterMarkerInput };
-
-export type MapStageHandle = {
-  /** Patches source data + density/history-edge mode flags; rebuilds the style and reapplies
-   * geography layers + entity markers. Pass `{ fade: true }` for decade-flow dual-buffer
-   * crossdissolve (presence colors morph; plate never blanks). */
-  readonly patchData: (patch: MapStageDataPatch, options?: MapStageDataPatchOptions) => void;
-  /** Patches the selected-state / selected-edge highlight filters (and the state-label
-   * selection color) without touching source data or the style. */
-  readonly applyViewState: (patch: MapStageViewPatch) => void;
-  /** The only sanctioned way to move the camera (ADR-017: "raw flyTo defaults are banned").
-   * Resolves `target` (an explicit center+zoom, or a bounding box via `cameraForBounds`), then
-   * flies/eases/jumps according to `name`'s preset and the current reduced-motion state. */
-  readonly flyPreset: (
-    name: CameraPresetName,
-    target: CameraFlyTarget,
-    options?: MapStageFlyOptions,
-  ) => void;
-  /** `false` once the canvas has failed to start (WebGL unavailable, marker mount threw); pages
-   * render their own graceful fallback notice off this. */
-  readonly mapAvailable: boolean;
-  /** Subscribes to one canvas event; returns an unsubscribe function. `'error'` and `'viewport'`
-   * replay their latest value immediately to a subscriber that attaches after the fact (the
-   * stage may already be alive with state from a previous page). */
-  readonly subscribe: <E extends MapStageEventName>(
-    event: E,
-    handler: (...args: MapStageEvents[E]) => void,
-  ) => () => void;
-  /** Copper place pin at a geocoded search center — distinct from entity HTML markers. */
-  readonly setSearchCenterMarker: (marker: ExploreSearchCenterMarkerInput) => void;
-  readonly clearSearchCenterMarker: () => void;
-  /** Re-read container layout after external geometry changes (hero inset, panel open). */
-  readonly resize: () => void;
-  /**
-   * The live MapLibre map, or null before it starts and after it fails.
-   *
-   * Deliberately narrow: `camera-moves.ts` drives the plate through a structural `MapLike`, and
-   * this is how that library reaches the one persistent canvas. It is not an invitation to call
-   * `flyTo` directly — ADR-017's ban on raw camera calls still holds, and `flyPreset` remains the
-   * route for preset framing.
-   */
-  readonly getMap: () => AtlasCameraTarget | null;
-};
-
-/** What the camera library needs off the map. Structural, so `MapStage` owes it no import. */
-export type AtlasCameraTarget = {
-  flyTo(options: never): unknown;
-  easeTo(options: never): unknown;
-  fitBounds(bounds: never, options: never): unknown;
-  getZoom(): number;
-  getBearing(): number;
-  getPitch(): number;
-  getCenter(): { lng: number; lat: number };
-  stop(): unknown;
-};
-
-const MapStageContext = createContext<MapStageHandle | null>(null);
-
-export function useMapStage(): MapStageHandle {
-  const ctx = useContext(MapStageContext);
-  if (!ctx) {
-    throw new Error('useMapStage() must be called within a MapStageProvider');
-  }
-  return ctx;
-}
-
 /**
  * All four data props are optional, and the root layout passes none of them.
  *
@@ -953,68 +414,6 @@ export type MapStageProviderProps = {
   readonly bounds?: readonly [west: number, south: number, east: number, north: number];
   readonly children: ReactNode;
 };
-
-type StageConfig = {
-  style: StyleSpecification;
-  featureCollection: ExploreMapFeatureCollection;
-  jurisdictionAreaFeatures: readonly JurisdictionAreaFeature[];
-  layerMode: ExploreLayerMode;
-  popGeo: ExplorePopulationGeo;
-  densityLevels: readonly StateDensityLevel[];
-  stateChoroplethLevels: readonly StateChoroplethLevel[];
-  countyChoroplethLevels: readonly CountyChoroplethLevel[];
-  clusteringEnabled: boolean;
-  satellite: boolean;
-  historyEdgesEnabled: boolean;
-  historyEdgeCollection: HistoryEdgeLineCollection;
-  selectedState: string | undefined;
-  selectedEdge: string | undefined;
-  selectedEntity: string | undefined;
-};
-
-/**
- * Rebuild the plate style from the resting stage config for one color scheme.
- *
- * The server cannot know the reader's theme — it lives in `localStorage` and is stamped onto
- * `<html data-theme>` by the pre-paint bootstrap script — so `loadMapStageBase` necessarily ships
- * ONE scheme's style. Every client-side entry point that needs the plate to match the document
- * (first mount, `data-theme` toggle) rebuilds through here rather than trusting that prop.
- */
-function buildStyleForScheme(cfg: StageConfig, colorScheme: MapColorScheme): StyleSpecification {
-  return buildExploreMapStyle({
-    featureCollection: cfg.featureCollection,
-    jurisdictionAreaFeatures: cfg.jurisdictionAreaFeatures,
-    layerMode: cfg.layerMode,
-    popGeo: cfg.popGeo,
-    historyEdgesEnabled: cfg.historyEdgesEnabled,
-    clusteringEnabled: cfg.clusteringEnabled,
-    satellite: cfg.satellite,
-    colorScheme,
-  });
-}
-
-function makeListenerStore(): {
-  [K in MapStageEventName]: Set<(...args: MapStageEvents[K]) => void>;
-} {
-  return {
-    select: new Set(),
-    stateSelect: new Set(),
-    edgeSelect: new Set(),
-    activate: new Set(),
-    viewport: new Set(),
-    error: new Set(),
-  };
-}
-
-function notify<E extends MapStageEventName>(
-  listeners: ReturnType<typeof makeListenerStore>,
-  event: E,
-  ...args: MapStageEvents[E]
-): void {
-  for (const handler of listeners[event]) {
-    handler(...args);
-  }
-}
 
 export function MapStageProvider({
   initialStyle,
