@@ -21,6 +21,14 @@ const SAMPLE_STYLE: StyleSpecification = {
       paint: { 'background-color': '#E8E0D2' },
     },
     {
+      // Satellite imagery. Persistent for the same reason the rest of this fixture is: its raster
+      // paint is per-scheme, so a theme toggle has to push it onto the already-mounted layer.
+      id: 'plate-satellite',
+      type: 'raster',
+      source: 'usgs-imagery',
+      paint: { 'raster-opacity': 0.76 },
+    },
+    {
       id: 'plate-landcover',
       type: 'fill',
       source: 'openfreemap',

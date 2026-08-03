@@ -19,8 +19,16 @@ import {
   OPENFREEMAP_TILE_SOURCE_URL,
   POPULATION_CHANGE_TIER_FILL,
   POPULATION_SHARE_TIER_FILL,
-  plateForScheme,
+  plateFor,
+  SATELLITE_HALO_WIDTH,
+  SATELLITE_RASTER_PAINT,
+  SATELLITE_STATE_FILL_OPACITY,
+  USGS_IMAGERY_ATTRIBUTION,
+  USGS_IMAGERY_MAX_ZOOM,
+  USGS_IMAGERY_SOURCE_ID,
+  USGS_IMAGERY_TILE_URL,
   type MapColorScheme,
+  type MapPlate,
 } from '../../lib/map-experience/dignity-style';
 import { MAP_LABEL_NAME_FIELD } from '../../lib/map-experience/label-expression';
 import { DECADE_TRANSITION_PAINT } from '../../lib/map-experience/decade-transition';
@@ -63,6 +71,7 @@ import {
   EXPLORE_MEMORIAL_NAMES_SOURCE_ID,
   MEMORIAL_NAMES_MAP_LAYER_ENABLED,
   EXPLORE_SELECTED_POINT_LAYER_ID,
+  SATELLITE_LAYER_ID,
   EXPLORE_STATE_DENSITY_INCOMING_LAYER_ID,
   EXPLORE_STATE_DENSITY_INCOMING_SOURCE_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
@@ -111,6 +120,7 @@ export {
   EXPLORE_MEMORIAL_NAMES_SOURCE_ID,
   MEMORIAL_NAMES_MAP_LAYER_ENABLED,
   EXPLORE_SELECTED_POINT_LAYER_ID,
+  SATELLITE_LAYER_ID,
   EXPLORE_STATE_DENSITY_INCOMING_LAYER_ID,
   EXPLORE_STATE_DENSITY_INCOMING_SOURCE_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
@@ -297,6 +307,9 @@ export const PLATE_BACKGROUND_OPACITY = 1;
  * at 1 it hid every lake, river and park inside a state outline.
  */
 export const PLATE_STATE_FILL_OPACITY = 0.82;
+/** County choropleth fill over the flat plate. Slightly heavier than the state tint: county
+ * polygons are small, and a share ramp has to stay separable at that size. */
+export const COUNTY_FILL_OPACITY = 0.85;
 
 /**
  * Filter for the single-feature selection ring layer (`EXPLORE_SELECTED_POINT_LAYER_ID`).
@@ -483,7 +496,7 @@ function kindStrokeColorExpression(rimColor: string): ExpressionSpecification {
  * feature-state colorA/colorB/blend lerp for decade morphs (A→B per state).
  */
 export function buildPresenceDensityFillColorExpression(
-  plate: ReturnType<typeof plateForScheme>,
+  plate: MapPlate,
   presenceFillActive: boolean,
 ): ExpressionSpecification {
   if (!presenceFillActive) {
@@ -547,6 +560,11 @@ export type BuildExploreMapStyleInput = {
   readonly clusteringEnabled?: boolean;
   /** Site theme — map plate and street ink follow light/dark. */
   readonly colorScheme?: MapColorScheme;
+  /**
+   * Aerial imagery under the archive instead of the flat cartographic plate (`?sat=1`). Changes
+   * the basemap only: which records are on the plate, and how they are encoded, are untouched.
+   */
+  readonly satellite?: boolean;
 };
 
 /**
@@ -559,8 +577,17 @@ export type BuildExploreMapStyleInput = {
  * "every cluster decomposes to named entities within two interactions" when grouping is on.
  */
 export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpecification {
-  const plate = plateForScheme(input.colorScheme ?? 'dark');
+  const colorScheme = input.colorScheme ?? 'dark';
+  const satellite = input.satellite === true;
+  const plate = plateFor(colorScheme, satellite);
+  /** Halo width for every symbol layer — widened over imagery (see `SATELLITE_HALO_WIDTH`). */
+  const haloWidth = (flat: number) => (satellite ? SATELLITE_HALO_WIDTH : flat);
   const clusteringEnabled = input.clusteringEnabled !== false;
+  /* Density and choropleth tints back off over imagery so the ground still reads through them —
+     see `SATELLITE_STATE_FILL_OPACITY`. The tier ramps themselves are unchanged: this scales how
+     hard the whole overlay presses on the basemap, not the relative order of its steps. */
+  const overlayFillOpacity = satellite ? SATELLITE_STATE_FILL_OPACITY : PLATE_STATE_FILL_OPACITY;
+  const countyOverlayFillOpacity = satellite ? SATELLITE_STATE_FILL_OPACITY : COUNTY_FILL_OPACITY;
   const popGeo = input.popGeo ?? DEFAULT_POPULATION_GEO;
   const presenceFillActive = input.layerMode === 'presence';
   const populationFillActive =
@@ -602,6 +629,13 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
     name: 'BlackStory — Explore',
     glyphs: OPENFREEMAP_GLYPHS_URL,
     sources: {
+      [USGS_IMAGERY_SOURCE_ID]: {
+        type: 'raster',
+        tiles: [USGS_IMAGERY_TILE_URL],
+        tileSize: 256,
+        maxzoom: USGS_IMAGERY_MAX_ZOOM,
+        attribution: USGS_IMAGERY_ATTRIBUTION,
+      },
       [OPENFREEMAP_SOURCE_ID]: {
         type: 'vector',
         url: OPENFREEMAP_TILE_SOURCE_URL,
@@ -686,6 +720,20 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
           'background-opacity': PLATE_BACKGROUND_OPACITY,
         },
       },
+      {
+        /* Aerial imagery, directly on top of the plate colour and under everything else.
+           Deliberately translucent: the `background` layer beneath is what scrims it, which is
+           the first half of the contrast strategy documented on `SATELLITE_RASTER_PAINT`.
+
+           The source is declared unconditionally but the layer is hidden when satellite is off,
+           so a reader who never turns it on never requests a tile — MapLibre does not fetch for
+           an invisible layer. */
+        id: SATELLITE_LAYER_ID,
+        type: 'raster',
+        source: USGS_IMAGERY_SOURCE_ID,
+        layout: { visibility: satellite ? 'visible' : 'none' },
+        paint: { ...SATELLITE_RASTER_PAINT[colorScheme] },
+      },
 
       {
         // Memorial typographic field — eligible full names on non-state anchors.
@@ -748,6 +796,9 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         source: OPENFREEMAP_SOURCE_ID,
         'source-layer': 'landcover',
         filter: ['match', ['get', 'class'], ['wood', 'grass', 'park'], true, false],
+        // Off over imagery: a flat green polygon where the aerial already shows the actual tree
+        // canopy is strictly less information, and it hides the thing the reader turned on.
+        layout: { visibility: satellite ? 'none' : 'visible' },
         paint: { 'fill-color': plate.green },
       },
       {
@@ -757,6 +808,10 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         type: 'fill',
         source: OPENFREEMAP_SOURCE_ID,
         'source-layer': 'water',
+        // Same reason as landcover, and more so: the coastline this layer exists to give the flat
+        // plate is already in the imagery, at the resolution the imagery has rather than the
+        // generalisation the vector tiles carry.
+        layout: { visibility: satellite ? 'none' : 'visible' },
         paint: { 'fill-color': plate.water },
       },
       {
@@ -810,7 +865,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         paint: {
           'text-color': plate.placeLabelHi,
           'text-halo-color': plate.placeLabelHalo,
-          'text-halo-width': 1.4,
+          'text-halo-width': haloWidth(1.4),
         },
       },
       {
@@ -855,7 +910,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         paint: {
           'text-color': plate.streetLabel,
           'text-halo-color': plate.ocean,
-          'text-halo-width': 1,
+          'text-halo-width': haloWidth(1),
         },
       },
       {
@@ -874,8 +929,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
              so this layer paints only when it is actually encoding something. An opaque
              land-coloured fill over real cartography is not neutral: it erases the lakes,
              rivers and parks inside every state outline it covers. */
-          'fill-opacity':
-            statePopulationFillActive || presenceFillActive ? PLATE_STATE_FILL_OPACITY : 0,
+          'fill-opacity': statePopulationFillActive || presenceFillActive ? overlayFillOpacity : 0,
         },
       },
       {
@@ -910,7 +964,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
               : input.layerMode === 'blackChange'
                 ? changeFillExpression
                 : plate.densityDisabled,
-          'fill-opacity': countyPopulationFillActive ? 0.85 : 0,
+          'fill-opacity': countyPopulationFillActive ? countyOverlayFillOpacity : 0,
         },
       },
       {
@@ -969,7 +1023,7 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         paint: {
           'text-color': plate.countyLabel,
           'text-halo-color': plate.countyLabelHalo,
-          'text-halo-width': 1.5,
+          'text-halo-width': haloWidth(1.5),
           'text-opacity': [
             'interpolate',
             ['linear'],

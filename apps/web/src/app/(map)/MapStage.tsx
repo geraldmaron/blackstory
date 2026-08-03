@@ -64,6 +64,7 @@ import {
   EXPLORE_MEMORIAL_NAMES_SOURCE_ID,
   MEMORIAL_NAMES_MAP_LAYER_ENABLED,
   EXPLORE_SELECTED_POINT_LAYER_ID,
+  SATELLITE_LAYER_ID,
   EXPLORE_STATE_DENSITY_INCOMING_LAYER_ID,
   EXPLORE_STATE_DENSITY_INCOMING_SOURCE_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
@@ -202,6 +203,7 @@ const EMPTY_EDGE_COLLECTION: HistoryEdgeLineCollection = {
  */
 const GEOGRAPHY_LAYER_IDS = new Set([
   'background',
+  SATELLITE_LAYER_ID,
   'plate-landcover',
   'plate-water',
   'plate-boundary-country',
@@ -804,6 +806,8 @@ export type MapStageDataPatch = {
   readonly countyChoroplethLevels?: readonly CountyChoroplethLevel[];
   /** When false, recreate the entities source without MapLibre clustering. Omitted patches keep the current stage value (default false). */
   readonly clusteringEnabled?: boolean;
+  /** Aerial imagery basemap instead of the flat plate. Omitted patches keep the current value. */
+  readonly satellite?: boolean;
   readonly historyEdgesEnabled: boolean;
   readonly historyEdgeCollection: HistoryEdgeLineCollection;
 };
@@ -960,6 +964,7 @@ type StageConfig = {
   stateChoroplethLevels: readonly StateChoroplethLevel[];
   countyChoroplethLevels: readonly CountyChoroplethLevel[];
   clusteringEnabled: boolean;
+  satellite: boolean;
   historyEdgesEnabled: boolean;
   historyEdgeCollection: HistoryEdgeLineCollection;
   selectedState: string | undefined;
@@ -983,6 +988,7 @@ function buildStyleForScheme(cfg: StageConfig, colorScheme: MapColorScheme): Sty
     popGeo: cfg.popGeo,
     historyEdgesEnabled: cfg.historyEdgesEnabled,
     clusteringEnabled: cfg.clusteringEnabled,
+    satellite: cfg.satellite,
     colorScheme,
   });
 }
@@ -1071,6 +1077,7 @@ export function MapStageProvider({
     stateChoroplethLevels: [],
     countyChoroplethLevels: [],
     clusteringEnabled: false,
+    satellite: false,
     historyEdgesEnabled: false,
     historyEdgeCollection: EMPTY_EDGE_COLLECTION,
     selectedState: undefined,
@@ -1338,6 +1345,7 @@ export function MapStageProvider({
     ) => {
       const clusteringEnabled = patch.clusteringEnabled ?? configRef.current.clusteringEnabled;
       const popGeo = patch.popGeo ?? configRef.current.popGeo;
+      const satellite = patch.satellite ?? configRef.current.satellite;
       const style = buildExploreMapStyle({
         featureCollection: patch.featureCollection,
         jurisdictionAreaFeatures: patch.jurisdictionAreaFeatures,
@@ -1345,6 +1353,7 @@ export function MapStageProvider({
         popGeo,
         historyEdgesEnabled: patch.historyEdgesEnabled,
         clusteringEnabled,
+        satellite,
         colorScheme: readDocumentColorScheme(),
       });
       configRef.current = {
@@ -1358,6 +1367,7 @@ export function MapStageProvider({
         stateChoroplethLevels: patch.stateChoroplethLevels ?? [],
         countyChoroplethLevels: patch.countyChoroplethLevels ?? [],
         clusteringEnabled,
+        satellite,
         historyEdgesEnabled: patch.historyEdgesEnabled,
         historyEdgeCollection: patch.historyEdgeCollection,
       };

@@ -55,3 +55,6 @@ export const EXPLORE_JURISDICTION_AREA_LAYER_ID = 'explore-jurisdiction-area-fil
 export const EXPLORE_HISTORY_EDGES_LAYER_ID = 'explore-history-edges-line';
 export const EXPLORE_HISTORY_EDGES_INCOMING_LAYER_ID = 'explore-history-edges-line-incoming';
 export const EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID = 'explore-history-edges-selected';
+
+/** Aerial imagery basemap (`?sat=1`) — directly above `background`, below all cartography. */
+export const SATELLITE_LAYER_ID = 'plate-satellite';

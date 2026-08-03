@@ -38,7 +38,11 @@ import { EmptyState } from '../../../components/patterns/EmptyState';
 import { ToastStack, useToasts } from '../../../components/patterns/Toast';
 import { AnnotationOverlay } from '../../../components/map-experience/AnnotationOverlay';
 import { CameraConsole } from '../../../components/map-experience/CameraConsole';
-import { LensPanel, type LensLayerKey } from '../../../components/map-experience/LensPanel';
+import {
+  LensPanel,
+  type LensLayerKey,
+  type LensLayers,
+} from '../../../components/map-experience/LensPanel';
 import { ResultsRail, type ResultsSort } from '../../../components/map-experience/ResultsRail';
 import { RecordSheet, type SheetRecord } from '../../../components/map-experience/RecordSheet';
 import type { RecordAnatomyPlace } from '../../../components/patterns/RecordAnatomyPanel';
@@ -180,7 +184,13 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
   );
   const [evidenceFloor, setEvidenceFloor] = useState<EvidenceFloor>('any');
   const [decade, setDecade] = useState<number | null>(null);
-  const [layers, setLayers] = useState({ pins: true, routes: false, labels: true });
+  const [layers, setLayers] = useState<LensLayers>({
+    pins: true,
+    routes: false,
+    labels: true,
+    // Seeded from `?sat=1` so a shared satellite view opens as satellite.
+    satellite: initial.viewState.sat,
+  });
   const [sort, setSort] = useState<ResultsSort>('oldest');
   const [selectedId, setSelectedId] = useState<string | undefined>(initial.viewState.selected);
   const [collection, setCollection] = useState<SavedCollection>(() => readCollection(null));
@@ -307,12 +317,14 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
       jurisdictionAreaFeatures: [],
       layerMode: view.viewState.layerMode,
       densityLevels: view.densityLevels,
+      satellite: layers.satellite,
       historyEdgesEnabled: false,
       historyEdgeCollection: view.edgeLineCollection,
     });
   }, [
     filtered,
     layers.pins,
+    layers.satellite,
     stage,
     view.densityLevels,
     view.edgeLineCollection,

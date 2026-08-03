@@ -42,7 +42,10 @@ test('CSP includes strict defaults and frame-ancestors none', () => {
   assert.match(csp, /worker-src 'self' blob:/);
   assert.ok(csp.includes('demotiles.maplibre.org'), 'CSP must allow demotiles.maplibre.org');
   assert.ok(csp.includes('storage.googleapis.com'), 'CSP must allow storage.googleapis.com');
-  assert.ok(csp.includes('twykhihqkcldpreuovay.supabase.co'), 'CSP must allow twykhihqkcldpreuovay.supabase.co');
+  assert.ok(
+    csp.includes('twykhihqkcldpreuovay.supabase.co'),
+    'CSP must allow twykhihqkcldpreuovay.supabase.co',
+  );
   // Banned-books covers: Open Library + archive.org redirect chain (see BOOK_COVER_IMG_SRC).
   assert.ok(csp.includes('covers.openlibrary.org'), 'CSP must allow covers.openlibrary.org');
   assert.ok(csp.includes('archive.org'), 'CSP must allow archive.org');
@@ -59,6 +62,16 @@ test('CSP development relaxes script-src for Next.js hydration and HMR', () => {
   );
   assert.match(csp, /connect-src[^;]* ws: wss:/);
   assert.doesNotMatch(csp, /upgrade-insecure-requests/);
+});
+
+test('CSP allows the USGS imagery host on both channels the raster basemap uses', () => {
+  // MapLibre pulls raster tiles through the image pipeline, and through fetch on the WebGL path.
+  // Missing either one fails as a silently blank satellite basemap, not as a visible error.
+  const csp = buildContentSecurityPolicy();
+  assert.match(csp, /img-src[^;]*https:\/\/basemap\.nationalmap\.gov/);
+  assert.match(csp, /connect-src[^;]*https:\/\/basemap\.nationalmap\.gov/);
+  // Not in font-src: this host serves imagery, and glyphs still come from OpenFreeMap only.
+  assert.doesNotMatch(csp, /font-src[^;]*basemap\.nationalmap\.gov/);
 });
 
 test('global security headers include clickjacking and MIME sniffing protection', () => {
