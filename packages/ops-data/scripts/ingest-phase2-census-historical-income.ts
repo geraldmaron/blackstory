@@ -144,8 +144,7 @@ function parseCensusIncomeCsv(csvText: string): {
 
     yearsSet.add(year);
 
-    const raceEthnicitySlice =
-      race === 'Black Alone' ? 'black_alone' : 'white_nonhispanic';
+    const raceEthnicitySlice = race === 'Black Alone' ? 'black_alone' : 'white_nonhispanic';
 
     const id = `${metricId}:${NATIONAL_JURISDICTION_ID}:${year}`;
     const contentHash = observationContentHash(metricId, `${year}`, estimate);
@@ -210,8 +209,7 @@ function parseCensusPovertyCsv(csvText: string): {
 
     yearsSet.add(year);
 
-    const raceEthnicitySlice =
-      race === 'Black Alone' ? 'black_alone' : 'white_nonhispanic';
+    const raceEthnicitySlice = race === 'Black Alone' ? 'black_alone' : 'white_nonhispanic';
 
     const id = `${metricId}:${NATIONAL_JURISDICTION_ID}:${year}`;
     const contentHash = observationContentHash(metricId, `${year}`, estimate);
@@ -402,14 +400,12 @@ async function applyObservations(
 }
 
 async function main(): Promise<void> {
-  const apply = process.env.INGEST_PHASE2_CENSUS_HISTORICAL_APPLY === '1' &&
-    process.env.DRY_RUN !== '1';
-  const incomeFixturePath = arg('income-fixture') ||
-    process.env.CENSUS_INCOME_FIXTURE ||
-    DEFAULT_INCOME_FIXTURE;
-  const povertyFixturePath = arg('poverty-fixture') ||
-    process.env.CENSUS_POVERTY_FIXTURE ||
-    DEFAULT_POVERTY_FIXTURE;
+  const apply =
+    process.env.INGEST_PHASE2_CENSUS_HISTORICAL_APPLY === '1' && process.env.DRY_RUN !== '1';
+  const incomeFixturePath =
+    arg('income-fixture') || process.env.CENSUS_INCOME_FIXTURE || DEFAULT_INCOME_FIXTURE;
+  const povertyFixturePath =
+    arg('poverty-fixture') || process.env.CENSUS_POVERTY_FIXTURE || DEFAULT_POVERTY_FIXTURE;
 
   // For now, log what would be needed
   if (!existsSync(incomeFixturePath)) {
@@ -458,20 +454,20 @@ async function main(): Promise<void> {
   }
 
   // Sanity checks
-  const incomeBlackObs = incomeResult.observations.filter((o) =>
-    o.metricId === METRIC_IDS.INCOME_BLACK
+  const incomeBlackObs = incomeResult.observations.filter(
+    (o) => o.metricId === METRIC_IDS.INCOME_BLACK,
   );
-  const incomeWhiteNhObs = incomeResult.observations.filter((o) =>
-    o.metricId === METRIC_IDS.INCOME_WHITE_NH
+  const incomeWhiteNhObs = incomeResult.observations.filter(
+    (o) => o.metricId === METRIC_IDS.INCOME_WHITE_NH,
   );
 
   let sanityCheckNote = '';
   if (incomeBlackObs.length > 0 && incomeWhiteNhObs.length > 0) {
     const newestBlack = incomeBlackObs.reduce((a, b) =>
-      a.referencePeriod > b.referencePeriod ? a : b
+      a.referencePeriod > b.referencePeriod ? a : b,
     );
     const newestWhiteNh = incomeWhiteNhObs.reduce((a, b) =>
-      a.referencePeriod > b.referencePeriod ? a : b
+      a.referencePeriod > b.referencePeriod ? a : b,
     );
     const ratio = newestBlack.estimate / newestWhiteNh.estimate;
 

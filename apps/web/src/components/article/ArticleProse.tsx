@@ -59,11 +59,7 @@ function segmentize(text: string, refNumberById: ReadonlyMap<string, number>): S
   return segments;
 }
 
-export function ArticleCitationMarks({
-  numbers,
-}: {
-  readonly numbers: readonly number[];
-}) {
+export function ArticleCitationMarks({ numbers }: { readonly numbers: readonly number[] }) {
   if (numbers.length === 0) return null;
   return (
     <sup className="ds-article-cite">

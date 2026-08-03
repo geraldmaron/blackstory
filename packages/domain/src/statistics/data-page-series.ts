@@ -505,8 +505,7 @@ export function mergeDataPageIndicatorBundle(
       ...costBurdenComparison,
       primary: { ...costBurdenComparison.primary, value: chasPair.primary.estimate },
       comparison: { ...costBurdenComparison.comparison, value: chasPair.comparison.estimate },
-      ratioValue:
-        Math.round((chasPair.primary.estimate - chasPair.comparison.estimate) * 10) / 10,
+      ratioValue: Math.round((chasPair.primary.estimate - chasPair.comparison.estimate) * 10) / 10,
       sources: mergeSources(costBurdenComparison.sources, [
         sourceFromObservation(chasPair.primary),
         sourceFromObservation(chasPair.comparison),

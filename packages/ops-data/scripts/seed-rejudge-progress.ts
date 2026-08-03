@@ -70,12 +70,27 @@ function loadSubjects(): Map<string, SubjectMeta> {
   return new Map(data.subjects.map((s) => [s.subjectId, s]));
 }
 
-function loadRunItems(): Map<string, { decision: string; confidence: number; validationIssues: string[]; claims: unknown[] }> {
-  const out = new Map<string, { decision: string; confidence: number; validationIssues: string[]; claims: unknown[] }>();
+function loadRunItems(): Map<
+  string,
+  { decision: string; confidence: number; validationIssues: string[]; claims: unknown[] }
+> {
+  const out = new Map<
+    string,
+    { decision: string; confidence: number; validationIssues: string[]; claims: unknown[] }
+  >();
   const runFile = join(cacheDir, 'rejudge-merged-enrichment-run.json');
   if (!existsSync(runFile)) return out;
   const run = JSON.parse(readFileSync(runFile, 'utf8')) as {
-    items: readonly { packet: { subjectId: string; decision: string; confidence: number; validationIssues: string[]; drafts: { claims?: unknown[] } }; error?: string }[];
+    items: readonly {
+      packet: {
+        subjectId: string;
+        decision: string;
+        confidence: number;
+        validationIssues: string[];
+        drafts: { claims?: unknown[] };
+      };
+      error?: string;
+    }[];
   };
   for (const item of run.items) {
     out.set(item.packet.subjectId, {
@@ -90,17 +105,32 @@ function loadRunItems(): Map<string, { decision: string; confidence: number; val
 
 function evaluatePromoteEligible(
   subject: SubjectMeta | undefined,
-  packet: { decision: string; confidence: number; validationIssues: string[]; claims: readonly { citationHref?: string; predicate?: string; object?: string; confidenceLevel?: string; citationSource?: string; citationLabel?: string }[] },
+  packet: {
+    decision: string;
+    confidence: number;
+    validationIssues: string[];
+    claims: readonly {
+      citationHref?: string;
+      predicate?: string;
+      object?: string;
+      confidenceLevel?: string;
+      citationSource?: string;
+      citationLabel?: string;
+    }[];
+  },
 ): boolean {
   if (packet.decision !== 'keep') return false;
   if (packet.confidence < AUTO_PROMOTE_CONFIDENCE_FLOOR) return false;
   if (packet.validationIssues.length > 0) return false;
   if (!subject || subject.kind === 'person') return false;
-  if (!subject.jurisdictionLabel || !subject.locationLabel || !subject.locationPrecision) return false;
+  if (!subject.jurisdictionLabel || !subject.locationLabel || !subject.locationPrecision)
+    return false;
   if (packet.claims.length === 0) return false;
   for (const [index, claim] of packet.claims.entries()) {
     if (!claim.citationHref) return false;
-    const sources: SourceForConfidence[] = [{ url: claim.citationHref, textContainsSubjectName: true }];
+    const sources: SourceForConfidence[] = [
+      { url: claim.citationHref, textContainsSubjectName: true },
+    ];
     if (subject.corroboratingSourceUrl && subject.corroboratingSourceUrl !== claim.citationHref) {
       sources.push({ url: subject.corroboratingSourceUrl, textContainsSubjectName: true });
     }
@@ -111,10 +141,13 @@ function evaluatePromoteEligible(
     predicate: claim.predicate ?? 'documented_site',
     object: claim.object ?? '',
     confidenceLevel:
-      claim.confidenceLevel === 'high' || claim.confidenceLevel === 'medium' || claim.confidenceLevel === 'low'
+      claim.confidenceLevel === 'high' ||
+      claim.confidenceLevel === 'medium' ||
+      claim.confidenceLevel === 'low'
         ? claim.confidenceLevel
         : 'medium',
-    citationSource: claim.citationSource ?? new URL(claim.citationHref ?? 'https://unknown').hostname,
+    citationSource:
+      claim.citationSource ?? new URL(claim.citationHref ?? 'https://unknown').hostname,
     citationHref: claim.citationHref,
     citationLabel: claim.citationLabel ?? claim.citationSource ?? 'Source',
   }));
@@ -145,7 +178,10 @@ function score(decision: string, confidence: number | null, hasError: boolean): 
   return 0;
 }
 
-function readProgressFile(file: string, pass: string): readonly { raw: RawProgress; pass: string }[] {
+function readProgressFile(
+  file: string,
+  pass: string,
+): readonly { raw: RawProgress; pass: string }[] {
   const path = join(cacheDir, file);
   if (!existsSync(path)) return [];
   return readFileSync(path, 'utf8')
@@ -173,7 +209,11 @@ function main(): void {
       const prevScore = prev
         ? score(prev.raw.decision ?? '', prev.raw.confidence ?? null, !!prev.raw.error)
         : -999;
-      const nextScore = score(entry.raw.decision ?? '', entry.raw.confidence ?? null, !!entry.raw.error);
+      const nextScore = score(
+        entry.raw.decision ?? '',
+        entry.raw.confidence ?? null,
+        !!entry.raw.error,
+      );
       if (!prev || nextScore > prevScore) bestById.set(id, entry);
     }
   }
@@ -196,7 +236,14 @@ function main(): void {
 
     const claims = (runPkt?.claims ?? []) as CanonicalLine extends never
       ? never
-      : { citationHref?: string; predicate?: string; object?: string; confidenceLevel?: string; citationSource?: string; citationLabel?: string }[];
+      : {
+          citationHref?: string;
+          predicate?: string;
+          object?: string;
+          confidenceLevel?: string;
+          citationSource?: string;
+          citationLabel?: string;
+        }[];
     const eligible =
       runPkt && subject
         ? evaluatePromoteEligible(subject, {
@@ -224,7 +271,9 @@ function main(): void {
 
   writeFileSync(progressPath, `${lines.map((l) => JSON.stringify(l)).join('\n')}\n`);
 
-  const processed = lines.filter((l) => l.pass !== 'seed-pending' && l.decision !== 'pending').length;
+  const processed = lines.filter(
+    (l) => l.pass !== 'seed-pending' && l.decision !== 'pending',
+  ).length;
   const pending = queue.length - processed;
   const lastFive = lines.filter((l) => l.decision !== 'pending').slice(-5);
 
@@ -269,7 +318,13 @@ ${lastFive.length === 0 ? '_No completed items yet._' : lastFive.map((r) => `- \
 `;
   writeFileSync(statusPath, md);
 
-  console.log(JSON.stringify({ progressPath, statusPath, lines: lines.length, processed, pending, keeps, promoteEligible }, null, 2));
+  console.log(
+    JSON.stringify(
+      { progressPath, statusPath, lines: lines.length, processed, pending, keeps, promoteEligible },
+      null,
+      2,
+    ),
+  );
 }
 
 main();

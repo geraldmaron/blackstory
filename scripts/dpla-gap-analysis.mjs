@@ -238,8 +238,7 @@ function extractDplaFacets(item) {
     spatialState ?? '',
   ];
   const state =
-    (spatialState && normalizeStateToken(spatialState)) ||
-    postalFromText(textParts.join(' '));
+    (spatialState && normalizeStateToken(spatialState)) || postalFromText(textParts.join(' '));
 
   return {
     ...(state ? { state } : {}),
@@ -456,9 +455,7 @@ function renderMarkdown(report, meta) {
   lines.push(
     `- Underrepresented states: **${report.gaps.underrepresentedStates.length}** (DPLA > 0, coverage < threshold)`,
   );
-  lines.push(
-    `- Underrepresented decades: **${report.gaps.underrepresentedDecades.length}**`,
-  );
+  lines.push(`- Underrepresented decades: **${report.gaps.underrepresentedDecades.length}**`);
   lines.push(
     `- Underrepresented state×decade cells: **${report.gaps.underrepresentedCells.length}**`,
   );
@@ -515,7 +512,9 @@ function renderMarkdown(report, meta) {
   lines.push(
     `- DPLA items without a resolved U.S. state: **${report.diagnostics.dplaUnlocated.length}**`,
   );
-  lines.push(`- DPLA items without a resolved decade: **${report.diagnostics.dplaUndated.length}**`);
+  lines.push(
+    `- DPLA items without a resolved decade: **${report.diagnostics.dplaUndated.length}**`,
+  );
   lines.push('');
   lines.push('## Raw counts');
   lines.push('');
@@ -558,17 +557,149 @@ const DB_SNAPSHOT = {
   generatedAt: '2026-07-24',
   source: 'supabase:twykhihqkcldpreuovay (bb_public.release_entities active release; bb_canonical)',
   entityCompletenessByKind: [
-    { kind: 'place', n: 565, blankSummary: 0, blankLocation: 0, blankGeo: 0, blankClaims: 0, blankRelated: 208, blankPrimaryImage: 551, blankTaxonomy: 0, blankHistoricalContext: 208, blankEraBuckets: 202 },
-    { kind: 'person', n: 394, blankSummary: 0, blankLocation: 0, blankGeo: 0, blankClaims: 0, blankRelated: 0, blankPrimaryImage: 280, blankTaxonomy: 0, blankHistoricalContext: 0, blankEraBuckets: 1 },
-    { kind: 'event', n: 79, blankSummary: 0, blankLocation: 0, blankGeo: 0, blankClaims: 0, blankRelated: 0, blankPrimaryImage: 77, blankTaxonomy: 0, blankHistoricalContext: 0, blankEraBuckets: 0 },
-    { kind: 'institution', n: 79, blankSummary: 0, blankLocation: 0, blankGeo: 0, blankClaims: 0, blankRelated: 0, blankPrimaryImage: 75, blankTaxonomy: 0, blankHistoricalContext: 0, blankEraBuckets: 0 },
-    { kind: 'school', n: 77, blankSummary: 0, blankLocation: 0, blankGeo: 0, blankClaims: 0, blankRelated: 0, blankPrimaryImage: 69, blankTaxonomy: 0, blankHistoricalContext: 0, blankEraBuckets: 12 },
-    { kind: 'organization', n: 57, blankSummary: 0, blankLocation: 0, blankGeo: 0, blankClaims: 0, blankRelated: 0, blankPrimaryImage: 57, blankTaxonomy: 0, blankHistoricalContext: 0, blankEraBuckets: 0 },
-    { kind: 'case', n: 48, blankSummary: 0, blankLocation: 0, blankGeo: 0, blankClaims: 0, blankRelated: 0, blankPrimaryImage: 48, blankTaxonomy: 0, blankHistoricalContext: 0, blankEraBuckets: 0 },
-    { kind: 'law', n: 26, blankSummary: 0, blankLocation: 0, blankGeo: 0, blankClaims: 0, blankRelated: 0, blankPrimaryImage: 22, blankTaxonomy: 0, blankHistoricalContext: 0, blankEraBuckets: 0 },
-    { kind: 'publication', n: 21, blankSummary: 0, blankLocation: 0, blankGeo: 0, blankClaims: 0, blankRelated: 0, blankPrimaryImage: 21, blankTaxonomy: 0, blankHistoricalContext: 0, blankEraBuckets: 0 },
-    { kind: 'movement', n: 15, blankSummary: 0, blankLocation: 0, blankGeo: 0, blankClaims: 0, blankRelated: 0, blankPrimaryImage: 15, blankTaxonomy: 0, blankHistoricalContext: 0, blankEraBuckets: 0 },
-    { kind: 'other', n: 14, blankSummary: 0, blankLocation: 0, blankGeo: 0, blankClaims: 0, blankRelated: 0, blankPrimaryImage: 14, blankTaxonomy: 0, blankHistoricalContext: 0, blankEraBuckets: 0 },
+    {
+      kind: 'place',
+      n: 565,
+      blankSummary: 0,
+      blankLocation: 0,
+      blankGeo: 0,
+      blankClaims: 0,
+      blankRelated: 208,
+      blankPrimaryImage: 551,
+      blankTaxonomy: 0,
+      blankHistoricalContext: 208,
+      blankEraBuckets: 202,
+    },
+    {
+      kind: 'person',
+      n: 394,
+      blankSummary: 0,
+      blankLocation: 0,
+      blankGeo: 0,
+      blankClaims: 0,
+      blankRelated: 0,
+      blankPrimaryImage: 280,
+      blankTaxonomy: 0,
+      blankHistoricalContext: 0,
+      blankEraBuckets: 1,
+    },
+    {
+      kind: 'event',
+      n: 79,
+      blankSummary: 0,
+      blankLocation: 0,
+      blankGeo: 0,
+      blankClaims: 0,
+      blankRelated: 0,
+      blankPrimaryImage: 77,
+      blankTaxonomy: 0,
+      blankHistoricalContext: 0,
+      blankEraBuckets: 0,
+    },
+    {
+      kind: 'institution',
+      n: 79,
+      blankSummary: 0,
+      blankLocation: 0,
+      blankGeo: 0,
+      blankClaims: 0,
+      blankRelated: 0,
+      blankPrimaryImage: 75,
+      blankTaxonomy: 0,
+      blankHistoricalContext: 0,
+      blankEraBuckets: 0,
+    },
+    {
+      kind: 'school',
+      n: 77,
+      blankSummary: 0,
+      blankLocation: 0,
+      blankGeo: 0,
+      blankClaims: 0,
+      blankRelated: 0,
+      blankPrimaryImage: 69,
+      blankTaxonomy: 0,
+      blankHistoricalContext: 0,
+      blankEraBuckets: 12,
+    },
+    {
+      kind: 'organization',
+      n: 57,
+      blankSummary: 0,
+      blankLocation: 0,
+      blankGeo: 0,
+      blankClaims: 0,
+      blankRelated: 0,
+      blankPrimaryImage: 57,
+      blankTaxonomy: 0,
+      blankHistoricalContext: 0,
+      blankEraBuckets: 0,
+    },
+    {
+      kind: 'case',
+      n: 48,
+      blankSummary: 0,
+      blankLocation: 0,
+      blankGeo: 0,
+      blankClaims: 0,
+      blankRelated: 0,
+      blankPrimaryImage: 48,
+      blankTaxonomy: 0,
+      blankHistoricalContext: 0,
+      blankEraBuckets: 0,
+    },
+    {
+      kind: 'law',
+      n: 26,
+      blankSummary: 0,
+      blankLocation: 0,
+      blankGeo: 0,
+      blankClaims: 0,
+      blankRelated: 0,
+      blankPrimaryImage: 22,
+      blankTaxonomy: 0,
+      blankHistoricalContext: 0,
+      blankEraBuckets: 0,
+    },
+    {
+      kind: 'publication',
+      n: 21,
+      blankSummary: 0,
+      blankLocation: 0,
+      blankGeo: 0,
+      blankClaims: 0,
+      blankRelated: 0,
+      blankPrimaryImage: 21,
+      blankTaxonomy: 0,
+      blankHistoricalContext: 0,
+      blankEraBuckets: 0,
+    },
+    {
+      kind: 'movement',
+      n: 15,
+      blankSummary: 0,
+      blankLocation: 0,
+      blankGeo: 0,
+      blankClaims: 0,
+      blankRelated: 0,
+      blankPrimaryImage: 15,
+      blankTaxonomy: 0,
+      blankHistoricalContext: 0,
+      blankEraBuckets: 0,
+    },
+    {
+      kind: 'other',
+      n: 14,
+      blankSummary: 0,
+      blankLocation: 0,
+      blankGeo: 0,
+      blankClaims: 0,
+      blankRelated: 0,
+      blankPrimaryImage: 14,
+      blankTaxonomy: 0,
+      blankHistoricalContext: 0,
+      blankEraBuckets: 0,
+    },
   ],
   entityCompletenessSourceQuery: `
     with active as (select release_id from bb_public.active_release limit 1),
@@ -602,7 +733,11 @@ const DB_SNAPSHOT = {
     { name: 'Malcolm X', present: true },
     { name: 'Martin Luther King Jr.', present: true },
     { name: 'Ralph Abernathy', present: true },
-    { name: 'Stokely Carmichael', present: true, note: 'stored as "Stokely Carmichael (Kwame Ture)"' },
+    {
+      name: 'Stokely Carmichael',
+      present: true,
+      note: 'stored as "Stokely Carmichael (Kwame Ture)"',
+    },
     { name: 'Wyatt Tee Walker', present: true },
     { name: 'A. Philip Randolph', present: false },
     { name: 'Claudette Colvin', present: false },
@@ -612,8 +747,16 @@ const DB_SNAPSHOT = {
     { name: 'James Farmer', present: false },
     { name: 'Jesse Jackson', present: false },
     { name: 'Jo Ann Robinson', present: false },
-    { name: 'Medgar Evers', present: false, note: 'a "Medgar and Myrlie Evers Home National Monument" place entity exists, but no person entity' },
-    { name: 'Rosa Parks', present: false, note: '"Rosa Parks Museum"/"Rosa Parks Arrest Site" place entities exist, but no person entity' },
+    {
+      name: 'Medgar Evers',
+      present: false,
+      note: 'a "Medgar and Myrlie Evers Home National Monument" place entity exists, but no person entity',
+    },
+    {
+      name: 'Rosa Parks',
+      present: false,
+      note: '"Rosa Parks Museum"/"Rosa Parks Arrest Site" place entities exist, but no person entity',
+    },
     { name: 'Roy Wilkins', present: false },
     { name: 'Whitney M. Young, Jr.', present: false },
   ],
@@ -707,10 +850,19 @@ async function tryLiveQuery(sql) {
  */
 async function buildEntityCompletenessSection() {
   if (!wantsLiveCompleteness) {
-    return { generatedAt: DB_SNAPSHOT.generatedAt, live: false, byKind: DB_SNAPSHOT.entityCompletenessByKind };
+    return {
+      generatedAt: DB_SNAPSHOT.generatedAt,
+      live: false,
+      byKind: DB_SNAPSHOT.entityCompletenessByKind,
+    };
   }
   const rows = await tryLiveQuery(DB_SNAPSHOT.entityCompletenessSourceQuery);
-  if (!rows) return { generatedAt: DB_SNAPSHOT.generatedAt, live: false, byKind: DB_SNAPSHOT.entityCompletenessByKind };
+  if (!rows)
+    return {
+      generatedAt: DB_SNAPSHOT.generatedAt,
+      live: false,
+      byKind: DB_SNAPSHOT.entityCompletenessByKind,
+    };
   const byKind = rows.map((row) => ({
     kind: row.kind,
     n: Number(row.n),
@@ -761,7 +913,14 @@ async function buildFigureCategoryCoverageSection() {
     }
   }
   const presentCount = roster.filter((r) => r.present).length;
-  return { generatedAt: live ? new Date().toISOString() : DB_SNAPSHOT.generatedAt, live, referenceUrls, roster, presentCount, totalCount: roster.length };
+  return {
+    generatedAt: live ? new Date().toISOString() : DB_SNAPSHOT.generatedAt,
+    live,
+    referenceUrls,
+    roster,
+    presentCount,
+    totalCount: roster.length,
+  };
 }
 
 /**
@@ -779,7 +938,8 @@ async function buildFigureCategoryCoverageSection() {
  */
 function buildThemeEvidenceSufficiencySection() {
   const source = readFileSync(themeImpactQuestionsPath, 'utf8');
-  const blockPattern = /\{\s*id:\s*'(Q\d+)',\s*themeId:\s*'([a-z_]+)',\s*priority:\s*'([A-Za-z0-9]+)',\s*question:\s*'((?:[^'\\]|\\.)*)'/g;
+  const blockPattern =
+    /\{\s*id:\s*'(Q\d+)',\s*themeId:\s*'([a-z_]+)',\s*priority:\s*'([A-Za-z0-9]+)',\s*question:\s*'((?:[^'\\]|\\.)*)'/g;
 
   /** Manual judgment: which questions are metro/county-scoped vs metro-agnostic (per docs above). */
   const METRO_SCOPED_NEEDS = {
@@ -811,7 +971,10 @@ function buildThemeEvidenceSufficiencySection() {
       question: question.replace(/\\'/g, "'"),
       metricBindingCount,
       answerableOutsideChicagoToday: metroAgnostic,
-      neededMetroData: metroAgnostic ? null : (METRO_SCOPED_NEEDS[id] ?? 'Metro-level indicator data beyond Chicago/Cook County has not been ingested for this question yet.'),
+      neededMetroData: metroAgnostic
+        ? null
+        : (METRO_SCOPED_NEEDS[id] ??
+          'Metro-level indicator data beyond Chicago/Cook County has not been ingested for this question yet.'),
     });
   }
 
@@ -833,7 +996,11 @@ async function buildPersonDecadeCoverageSection() {
       data = {
         totalPersonEntities: undefined,
         personsWithAtLeastOneDatedClaim: undefined,
-        byDecade: rows.map((row) => ({ decade: row.decade, personCount: Number(row.person_count), claimCount: Number(row.claim_count) })),
+        byDecade: rows.map((row) => ({
+          decade: row.decade,
+          personCount: Number(row.person_count),
+          claimCount: Number(row.claim_count),
+        })),
       };
       live = true;
     }
@@ -874,7 +1041,9 @@ function renderExtendedSectionsMarkdown(sections) {
     `_${sections.entityCompleteness.live ? 'Live query' : 'Snapshot'} as of ${sections.entityCompleteness.generatedAt}. Methodology: docs/research/entity-completeness-audit.md §1-2._`,
   );
   lines.push('');
-  lines.push('| kind | n | blank summary | blank location | blank geo | blank claims | blank related | blank image | blank taxonomy | blank historicalContext | blank eraBuckets |');
+  lines.push(
+    '| kind | n | blank summary | blank location | blank geo | blank claims | blank related | blank image | blank taxonomy | blank historicalContext | blank eraBuckets |',
+  );
   lines.push('|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|');
   for (const row of sections.entityCompleteness.byKind) {
     lines.push(
@@ -885,7 +1054,9 @@ function renderExtendedSectionsMarkdown(sections) {
 
   lines.push('## Figure-category coverage vs reference list');
   lines.push('');
-  lines.push(`_${sections.figureCategoryCoverage.live ? 'Live query' : 'Snapshot'} as of ${sections.figureCategoryCoverage.generatedAt}._`);
+  lines.push(
+    `_${sections.figureCategoryCoverage.live ? 'Live query' : 'Snapshot'} as of ${sections.figureCategoryCoverage.generatedAt}._`,
+  );
   lines.push('');
   lines.push('Sources checked:');
   for (const url of sections.figureCategoryCoverage.referenceUrls) lines.push(`- ${url}`);
@@ -905,12 +1076,16 @@ function renderExtendedSectionsMarkdown(sections) {
   lines.push('');
   lines.push(`_Generated ${sections.themeEvidenceSufficiency.generatedAt}._`);
   lines.push('');
-  const sufficientCount = sections.themeEvidenceSufficiency.questions.filter((q) => q.answerableOutsideChicagoToday).length;
+  const sufficientCount = sections.themeEvidenceSufficiency.questions.filter(
+    (q) => q.answerableOutsideChicagoToday,
+  ).length;
   lines.push(
     `**${sufficientCount} of ${sections.themeEvidenceSufficiency.questionCount} theme-impact questions can be answered today using data outside Chicago/Cook County.**`,
   );
   lines.push('');
-  lines.push('| ID | Theme | Priority | Answerable beyond Chicago today? | Needed metro-level data if not |');
+  lines.push(
+    '| ID | Theme | Priority | Answerable beyond Chicago today? | Needed metro-level data if not |',
+  );
   lines.push('|---|---|---|---|---|');
   for (const q of sections.themeEvidenceSufficiency.questions) {
     lines.push(
@@ -921,7 +1096,9 @@ function renderExtendedSectionsMarkdown(sections) {
 
   lines.push('## Decade coverage of PERSON entities (not just DPLA items/places)');
   lines.push('');
-  lines.push(`_${sections.personDecadeCoverage.live ? 'Live query' : 'Snapshot'} as of ${sections.personDecadeCoverage.generatedAt}._`);
+  lines.push(
+    `_${sections.personDecadeCoverage.live ? 'Live query' : 'Snapshot'} as of ${sections.personDecadeCoverage.generatedAt}._`,
+  );
   lines.push('');
   if (sections.personDecadeCoverage.totalPersonEntities !== undefined) {
     lines.push(
@@ -962,7 +1139,12 @@ async function main() {
   const figureCategoryCoverage = await buildFigureCategoryCoverageSection();
   const themeEvidenceSufficiency = buildThemeEvidenceSufficiencySection();
   const personDecadeCoverage = await buildPersonDecadeCoverageSection();
-  const extendedSections = { entityCompleteness, figureCategoryCoverage, themeEvidenceSufficiency, personDecadeCoverage };
+  const extendedSections = {
+    entityCompleteness,
+    figureCategoryCoverage,
+    themeEvidenceSufficiency,
+    personDecadeCoverage,
+  };
   const extendedMarkdown = renderExtendedSectionsMarkdown(extendedSections);
   const fullMarkdown = `${markdown}\n${extendedMarkdown}`;
 

@@ -3,9 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {
-  historyGraphInProcessFallbackEnabled,
-} from '../lib/public-data/release-graph-readers';
+import { historyGraphInProcessFallbackEnabled } from '../lib/public-data/release-graph-readers';
 import {
   getHistoryGraphReleaseArtifact,
   resolveHistoryGraphReleaseArtifact,

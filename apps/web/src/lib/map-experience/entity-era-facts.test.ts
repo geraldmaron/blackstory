@@ -29,7 +29,10 @@ test('entityEraFact shows concrete span and explore href from buckets', () => {
 });
 
 test('entityEraFact falls back to legacy era text before Undated', () => {
-  assert.equal(entityEraFact({ era: 'Reconstruction through Jim Crow' }).label, 'Reconstruction through Jim Crow');
+  assert.equal(
+    entityEraFact({ era: 'Reconstruction through Jim Crow' }).label,
+    'Reconstruction through Jim Crow',
+  );
 });
 
 test('entityEraFact is Undated only when no resolvable era signal exists', () => {

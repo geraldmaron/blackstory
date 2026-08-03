@@ -16,11 +16,7 @@ export class OperatorMcpError extends Error {
   readonly code: OperatorMcpErrorCode;
   readonly details?: Record<string, unknown>;
 
-  constructor(
-    code: OperatorMcpErrorCode,
-    message: string,
-    details?: Record<string, unknown>,
-  ) {
+  constructor(code: OperatorMcpErrorCode, message: string, details?: Record<string, unknown>) {
     super(message);
     this.name = 'OperatorMcpError';
     this.code = code;

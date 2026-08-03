@@ -23,7 +23,11 @@ const FIXTURE_PATH = join(
 );
 
 test('parseTriFacilityCsv loads distinct facility rows for IL pilot counties', () => {
-  const parsed = parseTriFacilityCsv(readFileSync(FIXTURE_PATH, 'utf8'), ['17031', '17043', '17097']);
+  const parsed = parseTriFacilityCsv(readFileSync(FIXTURE_PATH, 'utf8'), [
+    '17031',
+    '17043',
+    '17097',
+  ]);
   assert.equal(parsed.rejected.length, 0);
   assert.equal(parsed.rows.length, 28);
 });

@@ -11,10 +11,7 @@ import type { CanonicalSearchQuery } from '@repo/security';
 import { entityV1Schema, type EntityV1 } from '@repo/public-contracts/v1/entity';
 import type { PublicDataAccessReaders, ReleasePointer, SearchPage } from './data-access.js';
 import { searchOverEntities, searchOverIndex } from './data-access.js';
-import {
-  mapProjectionToEntityV1,
-  MAX_LIVE_SEARCH_SCAN,
-} from './projection-mapping.js';
+import { mapProjectionToEntityV1, MAX_LIVE_SEARCH_SCAN } from './projection-mapping.js';
 import {
   fetchActiveRelease,
   fetchPublicEntityProjection,
@@ -25,11 +22,13 @@ import {
 import { queryPostgres } from './postgres-client.js';
 
 export function mapPublicSearchProjection(doc: PublicSearchProjectionDoc): PublicSearchIndexDoc {
-  const notabilityBasis: readonly NotabilityBasisRecord[] = (doc.notabilityBasis ?? []).map((entry) => ({
-    criterion: entry.criterion as NotabilityBasisRecord['criterion'],
-    note: entry.note,
-    evidenceIds: entry.evidenceIds,
-  }));
+  const notabilityBasis: readonly NotabilityBasisRecord[] = (doc.notabilityBasis ?? []).map(
+    (entry) => ({
+      criterion: entry.criterion as NotabilityBasisRecord['criterion'],
+      note: entry.note,
+      evidenceIds: entry.evidenceIds,
+    }),
+  );
 
   return {
     id: doc.id,
@@ -94,7 +93,9 @@ export function createPostgresDataAccessReaders(
     { readonly value: EntityProjectionsList; readonly expiresAtMs: number }
   >();
 
-  async function listPublicEntityProjectionsCached(releaseId: string): Promise<EntityProjectionsList> {
+  async function listPublicEntityProjectionsCached(
+    releaseId: string,
+  ): Promise<EntityProjectionsList> {
     const now = Date.now();
     const hit = projectionsCache.get(releaseId);
     if (hit && hit.expiresAtMs > now) {
@@ -137,10 +138,7 @@ export function createPostgresDataAccessReaders(
     ): Promise<SearchPage> {
       const indexDocs = await listPublicSearchIndexDocs(searchOptions.releaseId, runQuery);
       if (indexDocs.length > 0) {
-        return searchOverIndex(
-          indexDocs.map(mapPublicSearchProjection),
-          canonical,
-        );
+        return searchOverIndex(indexDocs.map(mapPublicSearchProjection), canonical);
       }
 
       const projections = await listPublicEntityProjectionsCached(searchOptions.releaseId);

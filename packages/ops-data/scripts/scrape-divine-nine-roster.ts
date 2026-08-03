@@ -138,7 +138,16 @@ const DIVINE_NINE_ROSTER: readonly RosterRow[] = [
     'Nathaniel Allison Murray',
     'Robert Harold Ogle',
     'Vertner Woodson Tandy',
-  ].map((name) => founderRow(name, 'apa', 'https://apa1906.net/our-history/', 'Alpha Phi Alpha Fraternity, Inc.', 1906, 'Cornell University')),
+  ].map((name) =>
+    founderRow(
+      name,
+      'apa',
+      'https://apa1906.net/our-history/',
+      'Alpha Phi Alpha Fraternity, Inc.',
+      1906,
+      'Cornell University',
+    ),
+  ),
 
   // --- Alpha Kappa Alpha Sorority, Inc. (1908, Howard University) ---
   {
@@ -174,7 +183,14 @@ const DIVINE_NINE_ROSTER: readonly RosterRow[] = [
     foundedAt: 'Howard University',
   },
   ...['Edgar Amos Love', 'Oscar James Cooper', 'Frank Coleman', 'Ernest Everett Just'].map((name) =>
-    founderRow(name, 'opp', 'https://oppf.org/about-omega/', 'Omega Psi Phi Fraternity, Inc.', 1911, 'Howard University'),
+    founderRow(
+      name,
+      'opp',
+      'https://oppf.org/about-omega/',
+      'Omega Psi Phi Fraternity, Inc.',
+      1911,
+      'Howard University',
+    ),
   ),
 
   // --- Delta Sigma Theta Sorority, Inc. (1913, Howard University) ---
@@ -183,8 +199,7 @@ const DIVINE_NINE_ROSTER: readonly RosterRow[] = [
     kind: 'organization',
     sourceItemId: 'org-delta-sigma-theta',
     sourceUrl: 'https://www.deltasigmatheta.org/',
-    description:
-      'Sorority founded January 13, 1913 by 22 collegiate women at Howard University.',
+    description: 'Sorority founded January 13, 1913 by 22 collegiate women at Howard University.',
     orgId: 'org-delta-sigma-theta',
     orgName: 'Delta Sigma Theta Sorority, Inc.',
     foundedYear: 1913,
@@ -200,15 +215,21 @@ const DIVINE_NINE_ROSTER: readonly RosterRow[] = [
     kind: 'organization',
     sourceItemId: 'org-phi-beta-sigma',
     sourceUrl: 'https://phibetasigma1914.org/history/',
-    description:
-      'Fraternity founded January 9, 1914 at Howard University by three students.',
+    description: 'Fraternity founded January 9, 1914 at Howard University by three students.',
     orgId: 'org-phi-beta-sigma',
     orgName: 'Phi Beta Sigma Fraternity, Inc.',
     foundedYear: 1914,
     foundedAt: 'Howard University',
   },
   ...['A. Langston Taylor', 'Leonard F. Morse', 'Charles I. Brown'].map((name) =>
-    founderRow(name, 'pbs', 'https://phibetasigma1914.org/history/', 'Phi Beta Sigma Fraternity, Inc.', 1914, 'Howard University'),
+    founderRow(
+      name,
+      'pbs',
+      'https://phibetasigma1914.org/history/',
+      'Phi Beta Sigma Fraternity, Inc.',
+      1914,
+      'Howard University',
+    ),
   ),
 
   // --- Zeta Phi Beta Sorority, Inc. (1920, Howard University) ---
@@ -223,16 +244,21 @@ const DIVINE_NINE_ROSTER: readonly RosterRow[] = [
     foundedYear: 1920,
     foundedAt: 'Howard University',
   },
-  ...['Arizona Cleaver Stemons', 'Pearl Anna Neal', 'Myrtle Tyler Faithful', 'Viola Tyler Goings', 'Fannie Pettie Watts'].map(
-    (name) =>
-      founderRow(
-        name,
-        'zpb',
-        'https://zphib1920.org/about/founders-first-initiates/',
-        'Zeta Phi Beta Sorority, Inc.',
-        1920,
-        'Howard University',
-      ),
+  ...[
+    'Arizona Cleaver Stemons',
+    'Pearl Anna Neal',
+    'Myrtle Tyler Faithful',
+    'Viola Tyler Goings',
+    'Fannie Pettie Watts',
+  ].map((name) =>
+    founderRow(
+      name,
+      'zpb',
+      'https://zphib1920.org/about/founders-first-initiates/',
+      'Zeta Phi Beta Sorority, Inc.',
+      1920,
+      'Howard University',
+    ),
   ),
 
   // --- Sigma Gamma Rho Sorority, Inc. (1922, Butler University) ---
@@ -256,7 +282,16 @@ const DIVINE_NINE_ROSTER: readonly RosterRow[] = [
     'Hattie Mae Annette Dulin Redford',
     'Bessie Mae Downey Rhoades Martin',
     'Cubena McClure',
-  ].map((name) => founderRow(name, 'sgr', 'https://sgrho1922.org/her-story/', 'Sigma Gamma Rho Sorority, Inc.', 1922, 'Butler University')),
+  ].map((name) =>
+    founderRow(
+      name,
+      'sgr',
+      'https://sgrho1922.org/her-story/',
+      'Sigma Gamma Rho Sorority, Inc.',
+      1922,
+      'Butler University',
+    ),
+  ),
 
   // --- Iota Phi Theta Fraternity, Inc. (1963, Morgan State College) ---
   {
@@ -285,7 +320,14 @@ const DIVINE_NINE_ROSTER: readonly RosterRow[] = [
     'Elias Dorsey, Jr.',
     'Michael Williams',
   ].map((name) =>
-    founderRow(name, 'iota', 'https://iotaphitheta.org/founders/', 'Iota Phi Theta Fraternity, Inc.', 1963, 'Morgan State College'),
+    founderRow(
+      name,
+      'iota',
+      'https://iotaphitheta.org/founders/',
+      'Iota Phi Theta Fraternity, Inc.',
+      1963,
+      'Morgan State College',
+    ),
   ),
 ];
 
@@ -325,7 +367,11 @@ function slugify(name: string): string {
  * no reachable page enumerating all names). Reported in the dry-run summary
  * so the operator knows exactly what was left out and why — never staged.
  */
-const UNVERIFIED_NAMES: readonly { readonly org: string; readonly name: string; readonly reason: string }[] = [
+const UNVERIFIED_NAMES: readonly {
+  readonly org: string;
+  readonly name: string;
+  readonly reason: string;
+}[] = [
   {
     org: 'Alpha Kappa Alpha Sorority, Inc.',
     name: 'Ethel Hedgeman Lyle (and 15 other 1908 founders)',
@@ -347,13 +393,15 @@ const UNVERIFIED_NAMES: readonly { readonly org: string; readonly name: string; 
 ];
 
 function stripTags(html: string): string {
-  return html
-    // `[^>]*` after the end-tag name: an end tag runs to the first `>`, so `</script >` and
-    // `</script\t\n bar>` close the element and browsers honour both. A stricter pattern leaves
-    // the element's contents in the extracted text (CodeQL js/bad-tag-filter).
-    .replace(/<script\b[^>]*>[\s\S]*?<\/script\b[^>]*>/giu, ' ')
-    .replace(/<style\b[^>]*>[\s\S]*?<\/style\b[^>]*>/giu, ' ')
-    .replace(/<[^>]+>/gu, ' ');
+  return (
+    html
+      // `[^>]*` after the end-tag name: an end tag runs to the first `>`, so `</script >` and
+      // `</script\t\n bar>` close the element and browsers honour both. A stricter pattern leaves
+      // the element's contents in the extracted text (CodeQL js/bad-tag-filter).
+      .replace(/<script\b[^>]*>[\s\S]*?<\/script\b[^>]*>/giu, ' ')
+      .replace(/<style\b[^>]*>[\s\S]*?<\/style\b[^>]*>/giu, ' ')
+      .replace(/<[^>]+>/gu, ' ')
+  );
 }
 
 /** Suffix/legal tokens that pages routinely drop or restyle. */
@@ -385,7 +433,10 @@ function normalizeNameForDiff(name: string): string {
 }
 
 type ExistingEntity = { readonly display_name: string };
-type ExistingLandscapeRow = { readonly display_name: string; readonly canonical_url: string | null };
+type ExistingLandscapeRow = {
+  readonly display_name: string;
+  readonly canonical_url: string | null;
+};
 
 type Report = {
   readonly generatedAt: string;
@@ -503,7 +554,12 @@ async function main(): Promise<void> {
 
   console.log('\nWould-be-staged rows (net-new):');
   console.table(
-    netNewRows.map((row) => ({ name: row.displayName, kind: row.kind, org: row.orgName, source_url: row.sourceUrl })),
+    netNewRows.map((row) => ({
+      name: row.displayName,
+      kind: row.kind,
+      org: row.orgName,
+      source_url: row.sourceUrl,
+    })),
   );
   console.log(
     `\nCounts: rosterRows=${report.counts.rosterRows} orgs=${report.counts.orgs} founders=${report.counts.founders} ` +
@@ -524,12 +580,17 @@ async function main(): Promise<void> {
   console.table(UNVERIFIED_NAMES);
 
   mkdirSync(REPORT_DIR, { recursive: true });
-  const reportPath = join(REPORT_DIR, `divine-nine-roster-${report.generatedAt.replace(/[:.]/gu, '-')}.json`);
+  const reportPath = join(
+    REPORT_DIR,
+    `divine-nine-roster-${report.generatedAt.replace(/[:.]/gu, '-')}.json`,
+  );
   writeFileSync(reportPath, JSON.stringify(report, null, 2));
   console.log(`\nReport written to ${reportPath}`);
 
   if (DRY_RUN || !APPLY) {
-    console.log('\nDRY_RUN=1 (default): no database writes. Set DRY_RUN=0 DIVINE_NINE_APPLY=1 to apply.');
+    console.log(
+      '\nDRY_RUN=1 (default): no database writes. Set DRY_RUN=0 DIVINE_NINE_APPLY=1 to apply.',
+    );
     await pool.end();
     return;
   }

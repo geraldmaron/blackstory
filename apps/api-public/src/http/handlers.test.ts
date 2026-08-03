@@ -96,7 +96,10 @@ test('If-None-Match matching the ETag yields a bodiless 304', async () => {
   const deps = makeDeps();
   const first = await dispatch(makeRequest('/v1/bootstrap'), deps);
   const etag = first.headers.ETag as string;
-  const second = await dispatch(makeRequest('/v1/bootstrap', { headers: { 'If-None-Match': etag } }), deps);
+  const second = await dispatch(
+    makeRequest('/v1/bootstrap', { headers: { 'If-None-Match': etag } }),
+    deps,
+  );
   assert.equal(second.status, 304);
   assert.equal(second.body, null);
 });
@@ -201,7 +204,10 @@ test('GET /v1/search mints an opaque nextCursor when more results exist', async 
 
 test('ADVERSARIAL: SQL-injection-shaped query param is denied 400 by the shared guardrail', async () => {
   const res = await dispatch(
-    makeRequest('/v1/search', { query: 'q=dunbar&sql=DROP+TABLE+entities', headers: CLIENT_HEADER }),
+    makeRequest('/v1/search', {
+      query: 'q=dunbar&sql=DROP+TABLE+entities',
+      headers: CLIENT_HEADER,
+    }),
     makeDeps(),
   );
   assert.equal(res.status, 400);
@@ -237,7 +243,10 @@ test('ADVERSARIAL: client header omitted → entity read still served (fail-open
 test('version floor is enforced on entity/search/bootstrap, not only /v1/compatibility', async () => {
   const belowFloor = { 'X-BlackStory-Client': 'mobile/0.9.0; api=0' };
   for (const path of ['/v1/bootstrap', '/v1/entity/ent_dunbar_school_001', '/v1/search']) {
-    const res = await dispatch(makeRequest(path, { headers: belowFloor, query: 'q=x' }), makeDeps());
+    const res = await dispatch(
+      makeRequest(path, { headers: belowFloor, query: 'q=x' }),
+      makeDeps(),
+    );
     assert.equal(res.status, 426, `${path} must reject a below-floor client`);
   }
 });

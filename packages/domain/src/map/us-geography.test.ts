@@ -57,10 +57,7 @@ test('NY/NJ carve-out: Hoboken and Newark stay NJ; Staten Island is NY', () => {
 });
 
 test('findUsStateFromJurisdictionLabel prefers editorial label tails', () => {
-  assert.equal(
-    findUsStateFromJurisdictionLabel('New York City, New York')?.postalCode,
-    'NY',
-  );
+  assert.equal(findUsStateFromJurisdictionLabel('New York City, New York')?.postalCode, 'NY');
   assert.equal(
     findUsStateFromJurisdictionLabel('Harlem, New York City, New York')?.postalCode,
     'NY',

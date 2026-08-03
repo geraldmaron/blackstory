@@ -142,8 +142,7 @@ async function main(): Promise<void> {
     };
 
     const weed = weedRes.rows;
-    const promoteEligible =
-      weed.find((row) => row.skip_reason === 'promote_eligible')?.n ?? 0;
+    const promoteEligible = weed.find((row) => row.skip_reason === 'promote_eligible')?.n ?? 0;
 
     printWeedTable(weed);
 

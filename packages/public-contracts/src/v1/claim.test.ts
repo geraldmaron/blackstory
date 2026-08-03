@@ -26,14 +26,31 @@ test('round-trips a claim carrying dispute + revisionHistory + retraction (prove
       alternates: [{ value: '1917', credible: false, kind: 'contradicting' as const }],
     },
     revisionHistory: [
-      { id: 'rev_1', changedAt: '2026-01-15T00:00:00.000Z', changeKind: 'created' as const, summary: 'Initial fact record created.' },
+      {
+        id: 'rev_1',
+        changedAt: '2026-01-15T00:00:00.000Z',
+        changeKind: 'created' as const,
+        summary: 'Initial fact record created.',
+      },
     ],
-    retraction: { retractedAt: '2026-02-01T00:00:00.000Z', reason: 'Superseded by a corrected fact.', supersededByClaimId: 'BB-F-000010' },
+    retraction: {
+      retractedAt: '2026-02-01T00:00:00.000Z',
+      reason: 'Superseded by a corrected fact.',
+      supersededByClaimId: 'BB-F-000010',
+    },
   };
   const parsed = claimV1Schema.parse(input);
   assert.deepEqual(parsed, input);
-  assert.equal(parsed.dispute?.hasDispute, true, 'disputes must remain visible on the public shape');
-  assert.equal(parsed.retraction?.reason, input.retraction.reason, 'provenance (retraction) must remain visible');
+  assert.equal(
+    parsed.dispute?.hasDispute,
+    true,
+    'disputes must remain visible on the public shape',
+  );
+  assert.equal(
+    parsed.retraction?.reason,
+    input.retraction.reason,
+    'provenance (retraction) must remain visible',
+  );
 });
 
 test('rejects an unknown confidenceLevel (adversarial: unknown enum value)', () => {

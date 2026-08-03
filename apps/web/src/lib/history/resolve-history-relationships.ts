@@ -16,7 +16,9 @@ import type { PublicEntityView } from '../../data/public-seed';
 
 const RELATIONSHIP_TYPE_SET = new Set<string>(RELATIONSHIP_TYPES);
 
-function toCatalogRelatedEntry(entry: NonNullable<PublicEntityView['related']>[number]): CatalogRelatedEntry | undefined {
+function toCatalogRelatedEntry(
+  entry: NonNullable<PublicEntityView['related']>[number],
+): CatalogRelatedEntry | undefined {
   if (!RELATIONSHIP_TYPE_SET.has(entry.type)) return undefined;
   return {
     id: entry.id,

@@ -181,7 +181,10 @@ function ChartFigure({ group }: { readonly group: ChartGroup }) {
 
         {group.series.map((s, index) => {
           const path = s.points
-            .map((p, i) => `${i === 0 ? 'M' : 'L'}${xScale(p.year).toFixed(1)} ${yScale(p.estimate).toFixed(1)}`)
+            .map(
+              (p, i) =>
+                `${i === 0 ? 'M' : 'L'}${xScale(p.year).toFixed(1)} ${yScale(p.estimate).toFixed(1)}`,
+            )
             .join(' ');
           const last = s.points[s.points.length - 1]!;
           return (

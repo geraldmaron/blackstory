@@ -274,7 +274,13 @@ async function markLandscapeAccepted(
          ELSE bb_canonical.entities.living_status
        END,
        updated_at = now()`,
-    [canonical.id, canonical.kind, canonical.entityClass, canonical.displayName, canonical.livingStatus],
+    [
+      canonical.id,
+      canonical.kind,
+      canonical.entityClass,
+      canonical.displayName,
+      canonical.livingStatus,
+    ],
   );
   await client.query(
     `UPDATE bb_research.landscape_candidates
@@ -376,7 +382,9 @@ async function main(): Promise<void> {
       landscapeRows = rows;
     }
 
-    const pendingBefore = Number((await client.query<{ n: string }>(PENDING_COUNT_SQL)).rows[0]?.n ?? 0);
+    const pendingBefore = Number(
+      (await client.query<{ n: string }>(PENDING_COUNT_SQL)).rows[0]?.n ?? 0,
+    );
 
     const toEvaluate: Array<{
       readonly entityId: string;
@@ -398,9 +406,10 @@ async function main(): Promise<void> {
 
     const sliced = limit !== undefined ? toEvaluate.slice(0, limit) : toEvaluate;
 
-    const canonicalRes = await client.query<CanonicalEntityPublishRow>(CANONICAL_STATUS_BY_IDS_SQL, [
-      sliced.map((item) => item.entityId),
-    ]);
+    const canonicalRes = await client.query<CanonicalEntityPublishRow>(
+      CANONICAL_STATUS_BY_IDS_SQL,
+      [sliced.map((item) => item.entityId)],
+    );
     const canonicalById = new Map(
       canonicalRes.rows.map((row) => [row.entity_id, parseCanonicalStatusSnapshot(row)]),
     );
@@ -493,8 +502,12 @@ async function main(): Promise<void> {
     }
     if (lintSummary.hasWarnings) {
       console.log('');
-      console.log(`Status linter warnings: ${lintSummary.findings.filter((f) => f.severity === 'warn').length}`);
-      for (const finding of lintSummary.findings.filter((f) => f.severity === 'warn').slice(0, 10)) {
+      console.log(
+        `Status linter warnings: ${lintSummary.findings.filter((f) => f.severity === 'warn').length}`,
+      );
+      for (const finding of lintSummary.findings
+        .filter((f) => f.severity === 'warn')
+        .slice(0, 10)) {
         console.log(`  [warn] ${finding.entityId}: ${finding.message}`);
       }
     }
@@ -502,7 +515,9 @@ async function main(): Promise<void> {
     console.log(`Report: ${REPORT_PATH}`);
 
     if (DRY_RUN) {
-      console.log('DRY_RUN=1 (default): no database writes. Set DRY_RUN=0 INCREMENTAL_PUBLISH_APPLY=1 to apply.');
+      console.log(
+        'DRY_RUN=1 (default): no database writes. Set DRY_RUN=0 INCREMENTAL_PUBLISH_APPLY=1 to apply.',
+      );
       console.log(
         `INCREMENTAL PUBLISH | committed: pending | published: 0 | left_pending: ${pendingBefore}`,
       );
@@ -536,7 +551,9 @@ async function main(): Promise<void> {
       const taxonomyPlan = await planReleaseTaxonomySync(client, releaseId);
       if (taxonomyPlan.changed.length > 0) {
         await applyReleaseTaxonomySync(client, releaseId, taxonomyPlan);
-        console.log(`Re-synced taxonomy from canonical for ${taxonomyPlan.changed.length} entities.`);
+        console.log(
+          `Re-synced taxonomy from canonical for ${taxonomyPlan.changed.length} entities.`,
+        );
       }
 
       const graphRebuild = await rebuildReleaseGraphForRelease(client, {
@@ -550,7 +567,9 @@ async function main(): Promise<void> {
       }
     }
 
-    const pendingAfter = Number((await client.query<{ n: string }>(PENDING_COUNT_SQL)).rows[0]?.n ?? 0);
+    const pendingAfter = Number(
+      (await client.query<{ n: string }>(PENDING_COUNT_SQL)).rows[0]?.n ?? 0,
+    );
     console.log('');
     console.log(`Applied ${prepared.length} incremental upserts.`);
     console.log(`Pending after: ${pendingAfter}`);

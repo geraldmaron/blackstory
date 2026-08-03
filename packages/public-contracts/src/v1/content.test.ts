@@ -16,5 +16,7 @@ test('rejects a section with an empty paragraph (adversarial: hidden empty conte
 test('rejects an oversized body (adversarial: maliciously large DTO)', () => {
   const fixture = loadFixture<Record<string, unknown>>('content-page.v1.current.json');
   const bigSection = { paragraphs: ['x'.repeat(9000)] };
-  assert.throws(() => contentPageV1Schema.parse({ ...fixture, body: Array.from({ length: 201 }, () => bigSection) }));
+  assert.throws(() =>
+    contentPageV1Schema.parse({ ...fixture, body: Array.from({ length: 201 }, () => bigSection) }),
+  );
 });

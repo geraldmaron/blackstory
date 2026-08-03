@@ -3,10 +3,7 @@
  */
 import type { LegalBrowseItem } from '../../components/legal';
 import { isLawStatus } from '../../components/legal/format';
-import type {
-  LegalCatalogSource,
-  LegalSnapshotDocument,
-} from '../../lib/legal/public-source';
+import type { LegalCatalogSource, LegalSnapshotDocument } from '../../lib/legal/public-source';
 
 export type RawLawBrowseParams = {
   readonly q?: string;

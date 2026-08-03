@@ -11,7 +11,9 @@ export function buildTriFacilityCountyMap(
   const map = new Map<string, string>();
   for (const row of payload) {
     const facilityId = String(row.tri_facility_id ?? row.TRI_FACILITY_ID ?? '').trim();
-    const countyFips = String(row.state_county_fips_code ?? row.STATE_COUNTY_FIPS_CODE ?? '').trim();
+    const countyFips = String(
+      row.state_county_fips_code ?? row.STATE_COUNTY_FIPS_CODE ?? '',
+    ).trim();
     if (!facilityId || !/^\d{5}$/.test(countyFips)) continue;
     map.set(facilityId, countyFips);
   }

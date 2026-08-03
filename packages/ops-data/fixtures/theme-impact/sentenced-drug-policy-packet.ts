@@ -72,52 +72,124 @@ const admissionsObservations = ADMISSIONS.map(([period, estimate, contentHash]) 
 }));
 
 const IMPRISONMENT = [
-  ['bjs-imprisonment-rate-black-nation', '2013', 1818, '37caa9a8e4cc1c7e871b3701124d247ae262222d896c573da770340224806fbb', 'Black'],
-  ['bjs-imprisonment-rate-black-nation', '2020', 1238, 'a30ab89f78dc58899eec2ad19aef158b74290afbb4a6f337a0347d2ca68673ce', 'Black'],
-  ['bjs-imprisonment-rate-black-nation', '2023', 1218, '0308a7af54fa221f222823d91bcbc1ca334588ee193feec8f29aab2450882312', 'Black'],
-  ['bjs-imprisonment-rate-white-nation', '2013', 295, 'cb5a2de335079a4a91c4c06d1ea57f567bc9324b6a47e6503173ae86be68ef14', 'White non-Hispanic'],
-  ['bjs-imprisonment-rate-white-nation', '2020', 224, '42fca7dade873aa7327710e1a132d2b500a85d07008e5dc8521cb1fb23edf7a2', 'White non-Hispanic'],
-  ['bjs-imprisonment-rate-white-nation', '2023', 231, '2d8dc393d493150263bb6f78047d9414e4b60f82e83e36ade684562595fa6151', 'White non-Hispanic'],
+  [
+    'bjs-imprisonment-rate-black-nation',
+    '2013',
+    1818,
+    '37caa9a8e4cc1c7e871b3701124d247ae262222d896c573da770340224806fbb',
+    'Black',
+  ],
+  [
+    'bjs-imprisonment-rate-black-nation',
+    '2020',
+    1238,
+    'a30ab89f78dc58899eec2ad19aef158b74290afbb4a6f337a0347d2ca68673ce',
+    'Black',
+  ],
+  [
+    'bjs-imprisonment-rate-black-nation',
+    '2023',
+    1218,
+    '0308a7af54fa221f222823d91bcbc1ca334588ee193feec8f29aab2450882312',
+    'Black',
+  ],
+  [
+    'bjs-imprisonment-rate-white-nation',
+    '2013',
+    295,
+    'cb5a2de335079a4a91c4c06d1ea57f567bc9324b6a47e6503173ae86be68ef14',
+    'White non-Hispanic',
+  ],
+  [
+    'bjs-imprisonment-rate-white-nation',
+    '2020',
+    224,
+    '42fca7dade873aa7327710e1a132d2b500a85d07008e5dc8521cb1fb23edf7a2',
+    'White non-Hispanic',
+  ],
+  [
+    'bjs-imprisonment-rate-white-nation',
+    '2023',
+    231,
+    '2d8dc393d493150263bb6f78047d9414e4b60f82e83e36ade684562595fa6151',
+    'White non-Hispanic',
+  ],
 ] as const;
 
-const imprisonmentObservations = IMPRISONMENT.map(([metricId, period, estimate, contentHash, race]) => ({
-  observationId: `obs:${metricId}:nation:US:${period}`,
-  metricId,
-  estimate,
-  unit: 'per_100k',
-  referencePeriod: period,
-  label: `${race} imprisonment rate, United States (BJS-published)`,
-  provenance: {
-    source: BJS_IMPRISONMENT_SOURCE,
-    sourceUrl: BJS_IMPRISONMENT_URL,
-    retrievedAt: BJS_IMPRISONMENT_RETRIEVED,
-    contentHash,
-    humanCitation: `Bureau of Justice Statistics, Prisoners in 2023 Statistical Tables, Table 6: ${race} adult imprisonment rate per 100,000 adult U.S. residents, ${period}.`,
-  },
-}));
+const imprisonmentObservations = IMPRISONMENT.map(
+  ([metricId, period, estimate, contentHash, race]) => ({
+    observationId: `obs:${metricId}:nation:US:${period}`,
+    metricId,
+    estimate,
+    unit: 'per_100k',
+    referencePeriod: period,
+    label: `${race} imprisonment rate, United States (BJS-published)`,
+    provenance: {
+      source: BJS_IMPRISONMENT_SOURCE,
+      sourceUrl: BJS_IMPRISONMENT_URL,
+      retrievedAt: BJS_IMPRISONMENT_RETRIEVED,
+      contentHash,
+      humanCitation: `Bureau of Justice Statistics, Prisoners in 2023 Statistical Tables, Table 6: ${race} adult imprisonment rate per 100,000 adult U.S. residents, ${period}.`,
+    },
+  }),
+);
 
 const USSC = [
-  ['ussc-black-share-crack-offenders-nation', '2016', 82.6, 'percent', '3b3130b87b3d130a67ef55ed03a066cef5d742d9b97694819c28b5da645d49c8', 'Crack_Cocaine_FY16.pdf', 'Black share of federal crack-cocaine trafficking defendants'],
-  ['ussc-black-share-crack-offenders-nation', '2023', 78.9, 'percent', '1bae98788c5fbaf66abcad6c41f64f42ea5d8d24fe4c1ec0ad72e16096f67dfd', 'Crack_Cocaine_FY23.pdf', 'Black share of federal crack-cocaine trafficking defendants'],
-  ['ussc-average-sentence-months-crack-nation', '2023', 60, 'months', '2c33b76557c8e97050106138bbf7306c6b623fce468ed238cab3be3560e422ed', 'Crack_Cocaine_FY23.pdf', 'Average federal crack-cocaine trafficking sentence'],
-  ['ussc-average-sentence-months-powder-nation', '2023', 68, 'months', 'd8d20debd719be2ad3c401810dae94f481763968e4b57844b9dd9329f57e7045', 'Powder_Cocaine_FY23.pdf', 'Average federal powder-cocaine trafficking sentence'],
+  [
+    'ussc-black-share-crack-offenders-nation',
+    '2016',
+    82.6,
+    'percent',
+    '3b3130b87b3d130a67ef55ed03a066cef5d742d9b97694819c28b5da645d49c8',
+    'Crack_Cocaine_FY16.pdf',
+    'Black share of federal crack-cocaine trafficking defendants',
+  ],
+  [
+    'ussc-black-share-crack-offenders-nation',
+    '2023',
+    78.9,
+    'percent',
+    '1bae98788c5fbaf66abcad6c41f64f42ea5d8d24fe4c1ec0ad72e16096f67dfd',
+    'Crack_Cocaine_FY23.pdf',
+    'Black share of federal crack-cocaine trafficking defendants',
+  ],
+  [
+    'ussc-average-sentence-months-crack-nation',
+    '2023',
+    60,
+    'months',
+    '2c33b76557c8e97050106138bbf7306c6b623fce468ed238cab3be3560e422ed',
+    'Crack_Cocaine_FY23.pdf',
+    'Average federal crack-cocaine trafficking sentence',
+  ],
+  [
+    'ussc-average-sentence-months-powder-nation',
+    '2023',
+    68,
+    'months',
+    'd8d20debd719be2ad3c401810dae94f481763968e4b57844b9dd9329f57e7045',
+    'Powder_Cocaine_FY23.pdf',
+    'Average federal powder-cocaine trafficking sentence',
+  ],
 ] as const;
 
-const usscObservations = USSC.map(([metricId, period, estimate, unit, contentHash, file, label]) => ({
-  observationId: `obs:${metricId}:nation:US:${period}`,
-  metricId,
-  estimate,
-  unit,
-  referencePeriod: period,
-  label,
-  provenance: {
-    source: USSC_SOURCE,
-    sourceUrl: `${USSC_URL_BASE}/${file}`,
-    retrievedAt: USSC_RETRIEVED,
-    contentHash,
-    humanCitation: `U.S. Sentencing Commission Quick Facts, ${label.toLowerCase()}, fiscal year ${period}.`,
-  },
-}));
+const usscObservations = USSC.map(
+  ([metricId, period, estimate, unit, contentHash, file, label]) => ({
+    observationId: `obs:${metricId}:nation:US:${period}`,
+    metricId,
+    estimate,
+    unit,
+    referencePeriod: period,
+    label,
+    provenance: {
+      source: USSC_SOURCE,
+      sourceUrl: `${USSC_URL_BASE}/${file}`,
+      retrievedAt: USSC_RETRIEVED,
+      contentHash,
+      humanCitation: `U.S. Sentencing Commission Quick Facts, ${label.toLowerCase()}, fiscal year ${period}.`,
+    },
+  }),
+);
 
 // --- Derived (ratios / era deltas; placeholder derived hashes per fixture convention) ---
 
@@ -139,7 +211,8 @@ const derived = [
       sourceUrl: BJS_IMPRISONMENT_URL,
       retrievedAt: NOW,
       contentHash: 'sha256:derived-sentenced-bw-imprisonment-ratio-2013',
-      humanCitation: 'Derived from BJS Prisoners in 2023 Table 6 adult imprisonment rates, 2013 (1,818 vs 295 per 100,000).',
+      humanCitation:
+        'Derived from BJS Prisoners in 2023 Table 6 adult imprisonment rates, 2013 (1,818 vs 295 per 100,000).',
     },
   },
   {
@@ -159,7 +232,8 @@ const derived = [
       sourceUrl: BJS_IMPRISONMENT_URL,
       retrievedAt: NOW,
       contentHash: 'sha256:derived-sentenced-bw-imprisonment-ratio-2023',
-      humanCitation: 'Derived from BJS Prisoners in 2023 Table 6 adult imprisonment rates, 2023 (1,218 vs 231 per 100,000).',
+      humanCitation:
+        'Derived from BJS Prisoners in 2023 Table 6 adult imprisonment rates, 2023 (1,218 vs 231 per 100,000).',
     },
   },
   {
@@ -179,7 +253,8 @@ const derived = [
       sourceUrl: BJS_ADMISSIONS_URL,
       retrievedAt: NOW,
       contentHash: 'sha256:derived-sentenced-admissions-delta-1975-1982',
-      humanCitation: 'Derived from BJS Race of Prisoners 1926-86 Table 2 Black admission shares, 1975 (35%) and 1982 (44%).',
+      humanCitation:
+        'Derived from BJS Race of Prisoners 1926-86 Table 2 Black admission shares, 1975 (35%) and 1982 (44%).',
     },
   },
 ] as const;
@@ -194,7 +269,8 @@ const artifacts = [
       sourceUrl: 'https://www.govinfo.gov/content/pkg/STATUTE-100/pdf/STATUTE-100-Pg3207.pdf',
       retrievedAt: '2026-07-26T00:00:00.000Z',
       contentHash: '36e3965982e8d7a8c2cdb5d01a524e3ea97bdc59b25e3ab30a83dd10ee6520a3',
-      humanCitation: 'Anti-Drug Abuse Act of 1986, Pub. L. 99-570, 100 Stat. 3207 (govinfo Statutes at Large PDF).',
+      humanCitation:
+        'Anti-Drug Abuse Act of 1986, Pub. L. 99-570, 100 Stat. 3207 (govinfo Statutes at Large PDF).',
     },
     artifactClass: 'primary_government_document',
     title: 'Anti-Drug Abuse Act of 1986',
@@ -211,7 +287,8 @@ const artifacts = [
       sourceUrl: USC841_URL,
       retrievedAt: '2026-07-25T00:00:00.000Z',
       contentHash: '185e2bf4800b1f55b6afbabb04d4986be29c97229abc923af78189a1e813d27b',
-      humanCitation: '21 U.S.C. 841 with Pub. L. 111-220 amendment notes, Office of the Law Revision Counsel (curated evidence capture).',
+      humanCitation:
+        '21 U.S.C. 841 with Pub. L. 111-220 amendment notes, Office of the Law Revision Counsel (curated evidence capture).',
     },
     artifactClass: 'primary_government_document',
     title: '21 U.S.C. 841 cocaine-base quantity thresholds and amendment notes',
@@ -229,7 +306,8 @@ const artifacts = [
       sourceUrl: 'https://www.govinfo.gov/content/pkg/STATUTE-124/pdf/STATUTE-124-Pg2372.pdf',
       retrievedAt: '2026-07-26T00:00:00.000Z',
       contentHash: 'fa411384f83c246d84f9b02762ce3f89b08dbd308a9063b8a436381becf598db',
-      humanCitation: 'Fair Sentencing Act of 2010, Pub. L. 111-220, 124 Stat. 2372 (govinfo Statutes at Large PDF).',
+      humanCitation:
+        'Fair Sentencing Act of 2010, Pub. L. 111-220, 124 Stat. 2372 (govinfo Statutes at Large PDF).',
     },
     artifactClass: 'primary_government_document',
     title: 'Fair Sentencing Act of 2010',
@@ -246,14 +324,17 @@ const artifacts = [
       sourceUrl: 'https://www.congress.gov/crs_external_products/IF/PDF/IF11965/IF11965.1.pdf',
       retrievedAt: '2026-07-26T00:00:00.000Z',
       contentHash: '7701ac222943db0e35c2b9c69b316fe604a506d18e56a9950cbcbf36cf68eec3',
-      humanCitation: 'Congressional Research Service, Cocaine: Crack and Powder Sentencing Disparities, IF11965.',
+      humanCitation:
+        'Congressional Research Service, Cocaine: Crack and Powder Sentencing Disparities, IF11965.',
     },
     artifactClass: 'primary_government_document',
     title: 'Congressional Research Service: crack and powder sentencing disparities',
     dated: '2022',
-    citation: 'Congressional Research Service, "Cocaine: Crack and Powder Sentencing Disparities," IF11965.',
+    citation:
+      'Congressional Research Service, "Cocaine: Crack and Powder Sentencing Disparities," IF11965.',
     sourceUrl: 'https://www.congress.gov/crs_external_products/IF/PDF/IF11965/IF11965.1.pdf',
-    summary: 'Nonpartisan synthesis of the statutory ratio, the 2010 reform, and the continuing gap.',
+    summary:
+      'Nonpartisan synthesis of the statutory ratio, the 2010 reform, and the continuing gap.',
   },
 ] as const;
 
@@ -274,12 +355,7 @@ export const sentencedDrugPolicyPacket = {
   theme_id: 'drug_policy_state',
   title: 'Sentenced: five grams, one hundred to one, and a disparity the law only narrowed',
   summary: SUMMARY,
-  policy_eras: [
-    'pre_drug_war',
-    'drug_war_escalation',
-    'crack_cocaine_era',
-    'sentencing_reform',
-  ],
+  policy_eras: ['pre_drug_war', 'drug_war_escalation', 'crack_cocaine_era', 'sentencing_reform'],
   geography: {
     geographyType: 'nation',
     jurisdictionId: 'nation:US',

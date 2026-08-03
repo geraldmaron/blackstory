@@ -11,8 +11,7 @@ export const VERA_INCARCERATION_TRENDS_HOMEPAGE_URL =
 export const VERA_INCARCERATION_TRENDS_COUNTY_CSV_URL =
   'https://raw.githubusercontent.com/vera-institute/incarceration-trends/main/incarceration_trends_county.csv';
 
-export const PHASE1_VERA_JAIL_POPULATION_RATE_COUNTY_METRIC_ID =
-  'vera-jail-population-rate-county';
+export const PHASE1_VERA_JAIL_POPULATION_RATE_COUNTY_METRIC_ID = 'vera-jail-population-rate-county';
 
 export const PHASE1_VERA_DATASET_VINTAGE = 'Vera Incarceration Trends county CSV';
 

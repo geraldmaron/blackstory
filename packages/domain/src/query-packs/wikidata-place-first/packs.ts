@@ -5,10 +5,7 @@
 import { buildQueryPack } from '../pack.js';
 import type { QueryPack } from '../types.js';
 import { WIKIDATA_PLACE_FIRST_ADAPTER_SOURCE_ID } from './constants.js';
-import {
-  CIVIL_RIGHTS_OCCUPATION_SEEDS,
-  US_STATE_PLACE_SEEDS,
-} from './seeds.js';
+import { CIVIL_RIGHTS_OCCUPATION_SEEDS, US_STATE_PLACE_SEEDS } from './seeds.js';
 import type { WikidataPlaceFirstPackSpec } from './types.js';
 
 const PACK_CREATED_AT = '2026-07-21T17:34:38.000Z';
@@ -82,6 +79,8 @@ export function listWikidataPlaceFirstPackSpecs(): readonly WikidataPlaceFirstPa
   return WIKIDATA_PLACE_FIRST_PACK_SPECS;
 }
 
-export function getWikidataPlaceFirstPackSpec(packId: string): WikidataPlaceFirstPackSpec | undefined {
+export function getWikidataPlaceFirstPackSpec(
+  packId: string,
+): WikidataPlaceFirstPackSpec | undefined {
   return WIKIDATA_PLACE_FIRST_PACK_SPECS.find((spec) => spec.pack.id === packId);
 }

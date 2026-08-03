@@ -191,7 +191,4 @@ export function resolveStateFipsName(
   return nameByFips[stateFips] ?? `State ${stateFips}`;
 }
 
-export type {
-  NationalPopulationChange,
-  NationalPopulationTimelineRow,
-};
+export type { NationalPopulationChange, NationalPopulationTimelineRow };

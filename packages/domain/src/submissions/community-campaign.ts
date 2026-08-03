@@ -78,9 +78,7 @@ export const COMMUNITY_HOLDER_TYPES = [
 export type CommunityHolderType = (typeof COMMUNITY_HOLDER_TYPES)[number];
 
 export function isCommunityHolderType(value: unknown): value is CommunityHolderType {
-  return (
-    typeof value === 'string' && (COMMUNITY_HOLDER_TYPES as readonly string[]).includes(value)
-  );
+  return typeof value === 'string' && (COMMUNITY_HOLDER_TYPES as readonly string[]).includes(value);
 }
 
 /** Source classifications a community holder may carry — low-authority tiers only. */
@@ -106,13 +104,7 @@ export type CommunityCampaignCounty = {
 
 /** One field of the structured submission guide handed to a knowledge holder. */
 export type CommunitySubmissionFieldSpec = {
-  readonly field:
-    | 'personName'
-    | 'role'
-    | 'place'
-    | 'year'
-    | 'sourceCitation'
-    | 'oralHistoryRef';
+  readonly field: 'personName' | 'role' | 'place' | 'year' | 'sourceCitation' | 'oralHistoryRef';
   readonly label: string;
   readonly required: boolean;
   readonly guidance: string;
@@ -209,9 +201,7 @@ export const COMMUNITY_PARTNERSHIP_CARE_POLICY: CommunityPartnershipCarePolicy =
     'Never store or surface a living person’s address or private contact details.',
 } as const;
 
-export function assertCommunityPartnershipCarePolicy(
-  care: CommunityPartnershipCarePolicy,
-): void {
+export function assertCommunityPartnershipCarePolicy(care: CommunityPartnershipCarePolicy): void {
   if (
     !care.quarantineFirst ||
     !care.preferCatalogMatch ||
@@ -374,9 +364,7 @@ function assertHasEvidenceReference(submission: CommunitySubmission): void {
   }
 }
 
-function submissionClassification(
-  submission: CommunitySubmission,
-): CommunityHolderClassification {
+function submissionClassification(submission: CommunitySubmission): CommunityHolderClassification {
   return submission.classification ?? COMMUNITY_PARTNERSHIP_CARE_POLICY.defaultClassification;
 }
 

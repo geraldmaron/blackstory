@@ -53,7 +53,11 @@ function input(releaseId: string): GenerateReleaseArtifactsInput {
   return {
     releaseId,
     generatedAt: '2026-07-21T12:00:00.000Z',
-    mapEntities: [PLACE_HARLEM_NY_FIXTURE, INSTITUTION_ATLANTA_GA_SENSITIVE_FIXTURE, DECEASED_RESIDENCE_FIXTURE],
+    mapEntities: [
+      PLACE_HARLEM_NY_FIXTURE,
+      INSTITUTION_ATLANTA_GA_SENSITIVE_FIXTURE,
+      DECEASED_RESIDENCE_FIXTURE,
+    ],
     redactLocation: redactLocationForPublic,
     contentIndex: [{ id: 'story-1', kind: 'story', title: 'A Story', version: 'v1' }],
     entitiesList: { schemaVersion: 1, entities: [{ id: 'ent_a', displayName: 'A' }] },
@@ -129,7 +133,16 @@ function buildEvidencePack() {
 }
 
 function stripGzipSizes(
-  report: Readonly<Record<string, readonly { readonly kind: string; readonly byteLength: number; readonly gzipByteLength: number }[]>>,
+  report: Readonly<
+    Record<
+      string,
+      readonly {
+        readonly kind: string;
+        readonly byteLength: number;
+        readonly gzipByteLength: number;
+      }[]
+    >
+  >,
 ): Record<string, readonly { readonly kind: string; readonly byteLength: number }[]> {
   const out: Record<string, { readonly kind: string; readonly byteLength: number }[]> = {};
   for (const [releaseId, rows] of Object.entries(report)) {
@@ -152,10 +165,7 @@ test('MOB-005 evidence pack is deterministic and matches committed fixtures', ()
   assert.deepEqual(pack.manifests.rel_mob005_a, readJson('manifests/rel_mob005_a.json'));
   assert.deepEqual(pack.manifests.rel_mob005_b, readJson('manifests/rel_mob005_b.json'));
   // gzipByteLength varies across zlib/Node builds; assert stable uncompressed sizes only.
-  assert.deepEqual(
-    stripGzipSizes(pack.sizeReport),
-    stripGzipSizes(readJson('size-report.json')),
-  );
+  assert.deepEqual(stripGzipSizes(pack.sizeReport), stripGzipSizes(readJson('size-report.json')));
   for (const rows of Object.values(pack.sizeReport)) {
     for (const row of rows) {
       assert.ok(row.gzipByteLength > 0);

@@ -112,9 +112,7 @@ async function loadFixturePackets(paths: readonly string[]): Promise<readonly Th
   if (paths.length === 0) throw new Error('at least one fixture module path is required');
   const packets = new Map<string, ThemeImpactPacket>();
   for (const path of paths) {
-    const module: Record<string, unknown> = await import(
-      pathToFileURL(resolve(path)).href
-    );
+    const module: Record<string, unknown> = await import(pathToFileURL(resolve(path)).href);
     let found = 0;
     for (const exported of Object.values(module)) {
       const candidates = Array.isArray(exported) ? exported : [exported];
@@ -255,9 +253,7 @@ async function verifyObservationsAgainstCanonical(
   const packetObservations = new Map(
     [...allObservations].filter(([id]) => !id.startsWith('spine:')),
   );
-  const spineObservations = new Map(
-    [...allObservations].filter(([id]) => id.startsWith('spine:')),
-  );
+  const spineObservations = new Map([...allObservations].filter(([id]) => id.startsWith('spine:')));
 
   const problems: string[] = [];
 
@@ -411,9 +407,14 @@ async function gateDoiCitations(packets: readonly ThemeImpactPacket[]): Promise<
         );
       } else if (result.outcome === 'mismatch') {
         const detail = result.mismatches
-          .map((m) => `${m.field}: stored=${JSON.stringify(m.stored)} resolved=${JSON.stringify(m.resolved)}`)
+          .map(
+            (m) =>
+              `${m.field}: stored=${JSON.stringify(m.stored)} resolved=${JSON.stringify(m.resolved)}`,
+          )
           .join('; ');
-        errors.push(`${packet.id} / artifact ${artifact.artifactId}: DOI ${citation.doi} mismatch (${detail})`);
+        errors.push(
+          `${packet.id} / artifact ${artifact.artifactId}: DOI ${citation.doi} mismatch (${detail})`,
+        );
       }
     }
   }

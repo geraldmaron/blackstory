@@ -23,10 +23,7 @@ test('formatGatheredSourceSnippet labels prefetched vs fetched sources', () => {
 });
 
 test('formatGatheredSourceSnippet tags the source tier from the shared registry', () => {
-  const snippet = wrapPrefetchedSourceSnippet(
-    'https://census.gov/some-report',
-    'A'.repeat(150),
-  );
+  const snippet = wrapPrefetchedSourceSnippet('https://census.gov/some-report', 'A'.repeat(150));
   assert.ok(snippet);
   assert.match(formatGatheredSourceSnippet(snippet!), /Tier: T1/u);
 

@@ -8,7 +8,12 @@ import {
   PLACE_LIKE_STATUS_KINDS,
   type StatusHistoryEntry,
 } from '../entity-status.js';
-import { deriveEraBuckets, decadeStartYearFromLabel, type DatePrecision, type EraSpan } from '../era.js';
+import {
+  deriveEraBuckets,
+  decadeStartYearFromLabel,
+  type DatePrecision,
+  type EraSpan,
+} from '../era.js';
 import { parseEdtfLevel1 } from '../temporal/edtf.js';
 import type { DecadeBucketEntityInput } from './decades.js';
 

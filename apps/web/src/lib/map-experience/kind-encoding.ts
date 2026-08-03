@@ -99,39 +99,38 @@ const KIND_TO_FAMILY: Readonly<Record<MapKind, MapKindFamily>> = {
   other: 'sources',
 };
 
-export const MAP_KIND_FAMILY_ENCODING: Readonly<Record<MapKindFamily, KindFamilyEncodingEntry>> =
-  {
-    people: {
-      shade: DIGNITY_PALETTE.kindPerson,
-      glyph: 'circle',
-      label: 'People',
-      kinds: ['person'],
-    },
-    places: {
-      shade: DIGNITY_PALETTE.kindPlace,
-      glyph: 'circle',
-      label: 'Places',
-      kinds: ['place', 'school'],
-    },
-    organizations: {
-      shade: DIGNITY_PALETTE.kindOrganization,
-      glyph: 'ring',
-      label: 'Organizations',
-      kinds: ['organization', 'institution', 'movement'],
-    },
-    events: {
-      shade: DIGNITY_PALETTE.kindEvent,
-      glyph: 'diamond',
-      label: 'Events',
-      kinds: ['event', 'case'],
-    },
-    sources: {
-      shade: DIGNITY_PALETTE.kindLaw,
-      glyph: 'square',
-      label: 'Sources',
-      kinds: ['law', 'publication', 'artifact', 'other'],
-    },
-  };
+export const MAP_KIND_FAMILY_ENCODING: Readonly<Record<MapKindFamily, KindFamilyEncodingEntry>> = {
+  people: {
+    shade: DIGNITY_PALETTE.kindPerson,
+    glyph: 'circle',
+    label: 'People',
+    kinds: ['person'],
+  },
+  places: {
+    shade: DIGNITY_PALETTE.kindPlace,
+    glyph: 'circle',
+    label: 'Places',
+    kinds: ['place', 'school'],
+  },
+  organizations: {
+    shade: DIGNITY_PALETTE.kindOrganization,
+    glyph: 'ring',
+    label: 'Organizations',
+    kinds: ['organization', 'institution', 'movement'],
+  },
+  events: {
+    shade: DIGNITY_PALETTE.kindEvent,
+    glyph: 'diamond',
+    label: 'Events',
+    kinds: ['event', 'case'],
+  },
+  sources: {
+    shade: DIGNITY_PALETTE.kindLaw,
+    glyph: 'square',
+    label: 'Sources',
+    kinds: ['law', 'publication', 'artifact', 'other'],
+  },
+};
 
 const KNOWN_KINDS = Object.keys(MAP_KIND_ENCODING) as readonly MapKind[];
 const KNOWN_KIND_FAMILIES = Object.keys(MAP_KIND_FAMILY_ENCODING) as readonly MapKindFamily[];
@@ -232,10 +231,7 @@ export type MapToneSource = {
  * named epicenters paint and filter even when topic tags omit those substrings.
  */
 export function resolveMapTone(source: MapToneSource): MapSemanticTone | undefined {
-  const fromTopics = mapToneFromTopics([
-    ...(source.topicTags ?? []),
-    ...(source.topicIds ?? []),
-  ]);
+  const fromTopics = mapToneFromTopics([...(source.topicTags ?? []), ...(source.topicIds ?? [])]);
   if (fromTopics) return fromTopics;
 
   const name = (source.displayName ?? '').trim();

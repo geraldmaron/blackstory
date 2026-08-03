@@ -242,7 +242,12 @@ export function generateReleaseArtifacts(input: GenerateReleaseArtifactsInput): 
     schemaVersion: 1,
     releaseId,
     entries: [...input.contentIndex]
-      .map((entry) => ({ id: entry.id, kind: entry.kind, title: entry.title, version: entry.version }))
+      .map((entry) => ({
+        id: entry.id,
+        kind: entry.kind,
+        title: entry.title,
+        version: entry.version,
+      }))
       .sort((a, b) => a.id.localeCompare(b.id)),
   });
   const entitiesListArtifact = sealArtifact(
@@ -377,7 +382,10 @@ export function createInMemoryReleaseStore(): ReleaseStore {
       return [...releases.keys()];
     },
     deleteRelease(releaseId) {
-      if (pointer && (releaseId === pointer.activeReleaseId || releaseId === pointer.previousReleaseId)) {
+      if (
+        pointer &&
+        (releaseId === pointer.activeReleaseId || releaseId === pointer.previousReleaseId)
+      ) {
         throw new ReleaseActivationError(
           'PROTECTED_RELEASE',
           `Refusing to delete protected release ${releaseId} (active or rollback target)`,

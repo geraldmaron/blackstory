@@ -16,9 +16,7 @@ export const EXPLORE_EDITION_TABS_CLASS = 'ds-explore-edition__tabs';
 /** Individual instrument tab segment. */
 export const EXPLORE_EDITION_TAB_CLASS = 'ds-explore-edition__tab';
 
-export function exploreStageRootClassName(options: {
-  readonly entering: boolean;
-}): string {
+export function exploreStageRootClassName(options: { readonly entering: boolean }): string {
   const parts = ['ds-explore-stage', EXPLORE_EDITION_STAGE_CLASS];
   if (options.entering) {
     parts.push('ds-explore-stage--entering');
@@ -182,15 +180,11 @@ export function formatExploreResultsCountLine(input: ExploreResultsCountLineInpu
     input.releaseCount > 0 &&
     input.releaseCount !== input.listCount
   ) {
-    parts.push(
-      `${input.releaseCount.toLocaleString('en-US')} in release`,
-    );
+    parts.push(`${input.releaseCount.toLocaleString('en-US')} in release`);
   }
 
   if (input.showConnections) {
-    parts.push(
-      `${input.connectionCount} connection${input.connectionCount === 1 ? '' : 's'}`,
-    );
+    parts.push(`${input.connectionCount} connection${input.connectionCount === 1 ? '' : 's'}`);
   }
 
   parts.push('oldest first');

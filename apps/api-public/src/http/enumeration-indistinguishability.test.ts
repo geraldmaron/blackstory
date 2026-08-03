@@ -10,10 +10,7 @@ import type { ClientAttestationHeaders } from '@repo/security';
 import { publicApiErrorEnvelopeSchema } from '@repo/public-contracts/errors';
 import { createPublicRateLimitGuard } from '../rate-limits.js';
 import { createPublicSearchGuard } from '../search-guardrails.js';
-import {
-  createInMemoryPublicDataAccess,
-  type PublicDataAccess,
-} from './data-access.js';
+import { createInMemoryPublicDataAccess, type PublicDataAccess } from './data-access.js';
 import { dispatch } from './router.js';
 import type { ApiRequest, HandlerDeps } from './handlers.js';
 import { makeEntity, SAMPLE_POINTER } from './entity-fixture.js';

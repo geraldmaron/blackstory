@@ -34,9 +34,7 @@ export function methodologyEditionStackClassName(): string {
   return 'ds-methodology-edition__stack';
 }
 
-export function methodologyEditionPanelClassName(
-  variant?: MethodologyEditionPanelVariant,
-): string {
+export function methodologyEditionPanelClassName(variant?: MethodologyEditionPanelVariant): string {
   if (!variant) {
     return METHODOLOGY_EDITION_PANEL_CLASS;
   }

@@ -434,12 +434,8 @@ export function normalizeHbcuCandidate(input: {
     state: candidate.state,
     ...(candidate.summary !== undefined ? { summary: capSnippet(candidate.summary) } : {}),
     ...(candidate.creator !== undefined ? { creator: candidate.creator } : {}),
-    ...(candidate.coveragePeriod !== undefined
-      ? { coveragePeriod: candidate.coveragePeriod }
-      : {}),
-    ...(candidate.eadComponentId !== undefined
-      ? { eadComponentId: candidate.eadComponentId }
-      : {}),
+    ...(candidate.coveragePeriod !== undefined ? { coveragePeriod: candidate.coveragePeriod } : {}),
+    ...(candidate.eadComponentId !== undefined ? { eadComponentId: candidate.eadComponentId } : {}),
     ...(() => {
       const ids = stripForbiddenIdentifiers(candidate.identifiers);
       return ids ? { identifiers: ids } : {};

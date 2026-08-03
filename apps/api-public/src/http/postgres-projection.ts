@@ -11,11 +11,7 @@ import {
   type PublicSearchProjectionDoc,
 } from '@repo/schemas';
 
-export type {
-  PublicActiveReleaseDoc,
-  PublicEntityProjectionDoc,
-  PublicSearchProjectionDoc,
-};
+export type { PublicActiveReleaseDoc, PublicEntityProjectionDoc, PublicSearchProjectionDoc };
 
 export function parseActiveRelease(data: unknown): PublicActiveReleaseDoc | undefined {
   const parsed = publicActiveReleaseSchema.safeParse(data);

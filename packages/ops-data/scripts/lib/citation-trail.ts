@@ -25,10 +25,7 @@ export function collectTier1TrailLinks(
   );
   const seen = new Set<string>();
   const inlineSource = options.text ?? html.replace(/<[^>]+>/gu, ' ');
-  const candidates = [
-    ...extractOutboundLinks(html, baseUrl),
-    ...extractUrlsFromText(inlineSource),
-  ];
+  const candidates = [...extractOutboundLinks(html, baseUrl), ...extractUrlsFromText(inlineSource)];
   const independent = candidates.filter((url) => {
     if (!isTier1Host(url)) return false;
     const host = hostLineageKey(url);
@@ -52,10 +49,7 @@ export function collectTier2TrailLinks(
   );
   const seen = new Set<string>();
   const inlineSource = options.text ?? html.replace(/<[^>]+>/gu, ' ');
-  const candidates = [
-    ...extractOutboundLinks(html, baseUrl),
-    ...extractUrlsFromText(inlineSource),
-  ];
+  const candidates = [...extractOutboundLinks(html, baseUrl), ...extractUrlsFromText(inlineSource)];
   return candidates.filter((url) => {
     if (isWikipediaHost(url)) return false;
     if (!isReputableSecondaryHost(url)) return false;

@@ -57,7 +57,11 @@ async function main(): Promise<void> {
       );
     }
 
-    const overlap = await pool.query<{ reference_period: string; source: string; estimate: number }>(
+    const overlap = await pool.query<{
+      reference_period: string;
+      source: string;
+      estimate: number;
+    }>(
       `SELECT reference_period, source, estimate
        FROM bb_reference.statistical_observations
        WHERE metric_id = ANY($1::text[])

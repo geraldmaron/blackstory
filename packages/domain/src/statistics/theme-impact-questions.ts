@@ -28,11 +28,7 @@ export type ThemeImpactThemeId = (typeof THEME_IMPACT_THEME_IDS)[number];
 export const THEME_IMPACT_PRIORITIES = ['P0', 'P1', 'meta'] as const;
 export type ThemeImpactPriority = (typeof THEME_IMPACT_PRIORITIES)[number];
 
-export const REDLINING_POLICY_ERAS = [
-  'holc_fha',
-  'fair_housing',
-  'cra_contemporary',
-] as const;
+export const REDLINING_POLICY_ERAS = ['holc_fha', 'fair_housing', 'cra_contemporary'] as const;
 
 export type RedliningPolicyEra = (typeof REDLINING_POLICY_ERAS)[number];
 
@@ -46,11 +42,7 @@ export const DRUG_POLICY_ERAS = [
 export type DrugPolicyEra = (typeof DRUG_POLICY_ERAS)[number];
 
 export type ThemeImpactAnswerShape =
-  | 'artifact_timeline'
-  | 'geography'
-  | 'era_indicators'
-  | 'place_narrative'
-  | 'methodology_gate';
+  'artifact_timeline' | 'geography' | 'era_indicators' | 'place_narrative' | 'methodology_gate';
 
 export type ThemeImpactMetricBinding =
   | {
@@ -182,8 +174,7 @@ export const THEME_IMPACT_QUESTIONS: readonly ThemeImpactQuestion[] = [
     id: 'Q4',
     themeId: 'redlining',
     priority: 'P0',
-    question:
-      'For a specific formerly graded place, what followed for the people who lived there?',
+    question: 'For a specific formerly graded place, what followed for the people who lived there?',
     answerShape: 'place_narrative',
     policyEraFamily: 'redlining',
     metricBindings: [
@@ -321,10 +312,7 @@ export const THEME_IMPACT_QUESTIONS: readonly ThemeImpactQuestion[] = [
         sourceFamily: 'crdc-school-civil-rights',
       },
     ],
-    artifactClasses: [
-      'primary_government_document',
-      'peer_reviewed_synthesis',
-    ],
+    artifactClasses: ['primary_government_document', 'peer_reviewed_synthesis'],
   },
   {
     id: 'Q12',
@@ -366,10 +354,7 @@ export const THEME_IMPACT_QUESTIONS: readonly ThemeImpactQuestion[] = [
         sourceFamily: 'voting-rights-lab-indicators',
       },
     ],
-    artifactClasses: [
-      'primary_government_document',
-      'peer_reviewed_synthesis',
-    ],
+    artifactClasses: ['primary_government_document', 'peer_reviewed_synthesis'],
   },
   {
     id: 'Q13',

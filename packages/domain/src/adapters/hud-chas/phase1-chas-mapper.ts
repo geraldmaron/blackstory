@@ -172,9 +172,7 @@ export function parseChasCookCostBurdenFixtureCsv(csvText: string): {
 } {
   const lines = csvText.split(/\r?\n/);
   const headerIndex = lines.findIndex((line) =>
-    /^acs_period,county_fips,race_slice,total_households,cost_burden_gt30_households/i.test(
-      line,
-    ),
+    /^acs_period,county_fips,race_slice,total_households,cost_burden_gt30_households/i.test(line),
   );
   if (headerIndex < 0) {
     throw new Error(

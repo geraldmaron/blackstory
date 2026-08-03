@@ -149,7 +149,10 @@ export function EntityLocationMap({
             recenter: () => {
               const activeMap = mapRef.current;
               if (!activeMap) return;
-              const target = { center: [lng, lat] as [number, number], zoom: zoomForLocationPrecision(precision) };
+              const target = {
+                center: [lng, lat] as [number, number],
+                zoom: zoomForLocationPrecision(precision),
+              };
               if (prefersReducedMotion()) {
                 activeMap.jumpTo(target);
               } else {
@@ -217,7 +220,10 @@ export function EntityLocationMap({
     const map = mapRef.current;
     if (!map || loadState !== 'ready') return undefined;
 
-    const featureTarget = { source: ENTITY_LOCATION_PIN_SOURCE_ID, id: ENTITY_LOCATION_PIN_FEATURE_ID };
+    const featureTarget = {
+      source: ENTITY_LOCATION_PIN_SOURCE_ID,
+      id: ENTITY_LOCATION_PIN_FEATURE_ID,
+    };
 
     if (!selected) {
       map.setFeatureState(featureTarget, { selected: false });
@@ -231,8 +237,16 @@ export function EntityLocationMap({
     map.setFeatureState(featureTarget, { selected: true });
 
     if (prefersReducedMotion()) {
-      map.setPaintProperty(ENTITY_LOCATION_PIN_HALO_LAYER_ID, 'circle-radius', REDUCED_MOTION_HALO_RADIUS);
-      map.setPaintProperty(ENTITY_LOCATION_PIN_HALO_LAYER_ID, 'circle-opacity', REDUCED_MOTION_HALO_OPACITY);
+      map.setPaintProperty(
+        ENTITY_LOCATION_PIN_HALO_LAYER_ID,
+        'circle-radius',
+        REDUCED_MOTION_HALO_RADIUS,
+      );
+      map.setPaintProperty(
+        ENTITY_LOCATION_PIN_HALO_LAYER_ID,
+        'circle-opacity',
+        REDUCED_MOTION_HALO_OPACITY,
+      );
       return undefined;
     }
 

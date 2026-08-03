@@ -94,10 +94,11 @@ export function buildCoParticipationLinks(
     }
   }
 
-  return [...links.values()].sort((a, b) =>
-    a.eventId.localeCompare(b.eventId) ||
-    a.entityAId.localeCompare(b.entityAId) ||
-    a.entityBId.localeCompare(b.entityBId),
+  return [...links.values()].sort(
+    (a, b) =>
+      a.eventId.localeCompare(b.eventId) ||
+      a.entityAId.localeCompare(b.entityAId) ||
+      a.entityBId.localeCompare(b.entityBId),
   );
 }
 
@@ -129,9 +130,10 @@ export function coParticipationNeighborsForEntity(
     });
   }
 
-  return neighbors.sort((a, b) =>
-    a.eventDisplayName.localeCompare(b.eventDisplayName) ||
-    a.neighborId.localeCompare(b.neighborId),
+  return neighbors.sort(
+    (a, b) =>
+      a.eventDisplayName.localeCompare(b.eventDisplayName) ||
+      a.neighborId.localeCompare(b.neighborId),
   );
 }
 

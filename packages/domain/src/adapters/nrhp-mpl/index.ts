@@ -43,10 +43,7 @@ export type {
 import { registerSource, type SourceRegistryStore } from '../registry.js';
 import type { SourceRegistryEntry } from '../types.js';
 import { createNrhpMplAdapterContract } from './contract.js';
-import {
-  createNrhpMplEvidenceSource,
-  NRHP_MPL_REGISTRY_ENTRY_ID,
-} from './definition.js';
+import { createNrhpMplEvidenceSource, NRHP_MPL_REGISTRY_ENTRY_ID } from './definition.js';
 
 export type RegisterNrhpMplAdapterInput = {
   readonly store: SourceRegistryStore;

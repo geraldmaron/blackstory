@@ -5,8 +5,7 @@
  */
 
 /** Registry homepage — cite on every published observation. */
-export const CDC_EJI_HOMEPAGE_URL =
-  'https://www.atsdr.cdc.gov/placeandhealth/eji/index.html';
+export const CDC_EJI_HOMEPAGE_URL = 'https://www.atsdr.cdc.gov/placeandhealth/eji/index.html';
 
 export const CDC_EJI_DATA_DOWNLOAD_URL =
   'https://www.atsdr.cdc.gov/placeandhealth/eji/eji-data-download.html';

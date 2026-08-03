@@ -14,7 +14,10 @@ import {
 } from './stories-panel-chrome';
 
 test('stories edition root includes shared atmosphere canvas class', () => {
-  assert.equal(storiesEditionRootClassName(), `${STORIES_EDITION_ROOT_CLASS} ${EDITION_ATMOSPHERE_CANVAS_CLASS}`);
+  assert.equal(
+    storiesEditionRootClassName(),
+    `${STORIES_EDITION_ROOT_CLASS} ${EDITION_ATMOSPHERE_CANVAS_CLASS}`,
+  );
   assert.equal(STORIES_EDITION_ROOT_CLASS, 'ds-stories-edition');
 });
 

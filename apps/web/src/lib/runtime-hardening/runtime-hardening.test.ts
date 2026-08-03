@@ -121,7 +121,12 @@ test('the Atlas is one route — `/` — with no page rendering at /explore', ()
   // `/` IS the Atlas and `/explore` 308s to it, so a second page file claiming /explore would
   // shadow that redirect and quietly resurrect the surface the redirect exists to retire.
   const explorePages = collectAppRouteFiles(APP_ROOT).filter((file) =>
-    /(^|\/)explore\/page\.tsx$/.test(file.slice(APP_ROOT.length + 1).split('\\').join('/')),
+    /(^|\/)explore\/page\.tsx$/.test(
+      file
+        .slice(APP_ROOT.length + 1)
+        .split('\\')
+        .join('/'),
+    ),
   );
   assert.deepEqual(explorePages, [], `no page may render at /explore: ${explorePages.join(', ')}`);
 

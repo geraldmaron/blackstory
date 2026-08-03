@@ -5,7 +5,10 @@
  * `./explore-view-model.test.ts`). Precomputes History edge line catalogs so the client can
  * toggle lines/decade without importing the graph release builder.
  */
-import { getHistoryGraphReleaseArtifact, resolveHistoryGraphReleaseArtifact } from '../../../data/history-graph-seed';
+import {
+  getHistoryGraphReleaseArtifact,
+  resolveHistoryGraphReleaseArtifact,
+} from '../../../data/history-graph-seed';
 import { listPublicEntities, type PublicEntityView } from '../../../data/public-seed';
 import {
   buildHistoryEdges,
@@ -78,12 +81,7 @@ function buildEdgeSlice(
   decade?: string,
 ): ExploreEdgeLineSlice {
   const slice = resolveHistoryGraphSlice(artifact, mode, decade);
-  const edges = buildHistoryEdges(
-    slice,
-    relationships,
-    entitiesById,
-    new Set(slice.nodeIds),
-  );
+  const edges = buildHistoryEdges(slice, relationships, entitiesById, new Set(slice.nodeIds));
   return {
     edges,
     lineCollection: buildHistoryEdgeLineCollection(edges, {

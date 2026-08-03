@@ -103,12 +103,7 @@ export type BulkFixtureLoadPlan = {
 };
 
 function asLane(value: string): BulkLane {
-  if (
-    value === 'dc-sites' ||
-    value === 'greenbook' ||
-    value === 'hbcu' ||
-    value === 'nrhp'
-  ) {
+  if (value === 'dc-sites' || value === 'greenbook' || value === 'hbcu' || value === 'nrhp') {
     return value;
   }
   return 'other';
@@ -128,7 +123,8 @@ export function mapBulkFixtureToLoadPlan(input: {
   const metadata = input.fixture.metadata;
   const runId = buildSourceProgramRunId(lane, input.fixture.generatedAt);
   const retrievedAt = metadata.retrievedAt ?? input.fixture.generatedAt;
-  const rowsFetched = input.fixture.summary?.rowsFetched ?? metadata.count ?? input.fixture.candidates.length;
+  const rowsFetched =
+    input.fixture.summary?.rowsFetched ?? metadata.count ?? input.fixture.candidates.length;
   const candidateCount = metadata.count ?? input.fixture.candidates.length;
   const droppedCount = metadata.droppedCount ?? input.fixture.summary?.skippedUnusable ?? 0;
 
@@ -203,10 +199,8 @@ export function mapBulkFixtureToLoadPlan(input: {
 }
 
 export const DEFAULT_BULK_FIXTURES: Readonly<Record<BulkLane, string>> = {
-  'dc-sites':
-    'packages/ops-data/fixtures/discovery-candidates/bulk-dc-sites-2026-07-19.json',
-  greenbook:
-    'packages/ops-data/fixtures/discovery-candidates/bulk-greenbook-2026-07-19.json',
+  'dc-sites': 'packages/ops-data/fixtures/discovery-candidates/bulk-dc-sites-2026-07-19.json',
+  greenbook: 'packages/ops-data/fixtures/discovery-candidates/bulk-greenbook-2026-07-19.json',
   hbcu: 'packages/ops-data/fixtures/discovery-candidates/bulk-hbcu-2026-07-21.json',
   nrhp: '',
   other: '',

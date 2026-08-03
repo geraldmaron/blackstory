@@ -30,7 +30,9 @@ function asRecord(value: unknown): Record<string, unknown> {
 }
 
 function asStringArray(value: unknown): readonly string[] {
-  return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === 'string')
+    : [];
 }
 
 function toIso(value: unknown): string | undefined {
@@ -70,7 +72,9 @@ function displayNameFromRow(
   return undefined;
 }
 
-export function mapPostgresSearchIndexRow(row: SearchIndexRow): PublicSearchProjectionDoc | undefined {
+export function mapPostgresSearchIndexRow(
+  row: SearchIndexRow,
+): PublicSearchProjectionDoc | undefined {
   const facets = asRecord(row.facets);
   if (isFullSearchIndexDoc(facets)) {
     return parseSearchProjection(facets);
@@ -86,7 +90,9 @@ export function mapPostgresSearchIndexRow(row: SearchIndexRow): PublicSearchProj
 
   const entityId =
     (typeof row.entity_id === 'string' && row.entity_id.length > 0 ? row.entity_id : undefined) ??
-    (typeof facets.entityId === 'string' && facets.entityId.length > 0 ? facets.entityId : undefined) ??
+    (typeof facets.entityId === 'string' && facets.entityId.length > 0
+      ? facets.entityId
+      : undefined) ??
     row.id;
 
   const doc: Record<string, unknown> = {
@@ -112,7 +118,8 @@ export function mapPostgresSearchIndexRow(row: SearchIndexRow): PublicSearchProj
       facets.researchCoverage === 'substantial'
         ? facets.researchCoverage
         : 'minimal',
-    relatedCount: row.related_count ?? (typeof facets.relatedCount === 'number' ? facets.relatedCount : 0),
+    relatedCount:
+      row.related_count ?? (typeof facets.relatedCount === 'number' ? facets.relatedCount : 0),
     claimCount: row.claim_count ?? (typeof facets.claimCount === 'number' ? facets.claimCount : 0),
     entityId,
     ...(typeof facets.summary === 'string' ? { summary: facets.summary } : {}),

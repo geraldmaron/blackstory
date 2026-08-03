@@ -73,9 +73,7 @@ test('justice and wealth Phase-0 registry additions stay disabled with https dat
     assert.ok(source.dataUrl.startsWith('https://'));
   }
   assert.equal(getExternalDataSource('fed-survey-consumer-finances')?.geographies[0], 'nation');
-  assert.ok(
-    getExternalDataSource('vera-incarceration-trends')?.geographies.includes('county'),
-  );
+  assert.ok(getExternalDataSource('vera-incarceration-trends')?.geographies.includes('county'));
 });
 
 test('PEN America school book bans entry stays disabled pending license gate', () => {

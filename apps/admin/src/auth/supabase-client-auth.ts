@@ -21,10 +21,7 @@ function formatSupabaseAuthError(error: { readonly message?: string }): Error {
   return new Error(message);
 }
 
-function toSessionUser(user: {
-  id: string;
-  email?: string | null;
-}): AdminSessionUser | null {
+function toSessionUser(user: { id: string; email?: string | null }): AdminSessionUser | null {
   if (!user.email) return null;
   return { uid: user.id, email: user.email };
 }

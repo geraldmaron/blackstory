@@ -77,7 +77,8 @@
   border-bottom: var(--ds-border-width) solid var(--ds-rule);
 }
 
-.ds-stories-edition__panel--intro:not(:has(+ .ds-stories-edition__panel)) .ds-stories-edition__header,
+.ds-stories-edition__panel--intro:not(:has(+ .ds-stories-edition__panel))
+  .ds-stories-edition__header,
 .ds-stories-edition__panel--intro:last-child .ds-stories-edition__header {
   margin-bottom: 0;
   padding-bottom: 0;

@@ -117,7 +117,10 @@ type ScrapedInductee = {
 };
 
 /** Pure — parses one Hall of Fame Explorer results page into inductee cards. */
-export function parseExplorerResults(html: string, primaryTeam: string): readonly ScrapedInductee[] {
+export function parseExplorerResults(
+  html: string,
+  primaryTeam: string,
+): readonly ScrapedInductee[] {
   const cardPattern =
     /href="(\/hall-of-famers\/[a-z0-9-]+)"\s+class="image-card[^"]*">[\s\S]*?<h3 class="h4">([^<]+)<\/h3>[\s\S]*?(?:<span class="number">([^<]+)<\/span>)?/giu;
   const inductees: ScrapedInductee[] = [];
@@ -148,7 +151,10 @@ function normalizeNameForDiff(name: string): string {
 }
 
 type ExistingEntity = { readonly display_name: string };
-type ExistingLandscapeRow = { readonly display_name: string; readonly canonical_url: string | null };
+type ExistingLandscapeRow = {
+  readonly display_name: string;
+  readonly canonical_url: string | null;
+};
 
 type Report = {
   readonly generatedAt: string;
@@ -173,7 +179,10 @@ type Report = {
     readonly primaryTeam: string;
     readonly classOf: string | null;
   }[];
-  readonly urlFailedRows: readonly { readonly displayName: string; readonly canonicalUrl: string }[];
+  readonly urlFailedRows: readonly {
+    readonly displayName: string;
+    readonly canonicalUrl: string;
+  }[];
   readonly dedupedOutCanonicalEntityNames: readonly string[];
 };
 
@@ -202,7 +211,9 @@ async function main(): Promise<void> {
     }
   }
   const scraped = [...bySlug.values()];
-  console.log(`\nTotal distinct inductees across ${NEGRO_LEAGUE_TEAM_OPTIONS.length} Negro League franchises: ${scraped.length}`);
+  console.log(
+    `\nTotal distinct inductees across ${NEGRO_LEAGUE_TEAM_OPTIONS.length} Negro League franchises: ${scraped.length}`,
+  );
 
   const pool = new pg.Pool(normalizePgConnectionString(databaseUrl));
   const existingLandscapeRes = await pool.query<ExistingLandscapeRow>(
@@ -249,7 +260,10 @@ async function main(): Promise<void> {
     }
     const verified = await fetchPage(inductee.canonicalUrl);
     if (!verified) {
-      urlFailedRows.push({ displayName: inductee.displayName, canonicalUrl: inductee.canonicalUrl });
+      urlFailedRows.push({
+        displayName: inductee.displayName,
+        canonicalUrl: inductee.canonicalUrl,
+      });
       continue;
     }
     netNewRows.push({
@@ -284,7 +298,11 @@ async function main(): Promise<void> {
 
   console.log('\nWould-be-staged rows (net-new):');
   console.table(
-    netNewRows.map((row) => ({ name: row.displayName, kind: row.kind, canonical_url: row.canonicalUrl })),
+    netNewRows.map((row) => ({
+      name: row.displayName,
+      kind: row.kind,
+      canonical_url: row.canonicalUrl,
+    })),
   );
   console.log(
     `\nCounts: scraped=${report.counts.scraped} ` +
@@ -312,7 +330,9 @@ async function main(): Promise<void> {
   console.log(`\nReport written to ${reportPath}`);
 
   if (DRY_RUN || !APPLY) {
-    console.log('\nDRY_RUN=1 (default): no database writes. Set DRY_RUN=0 NEGRO_LEAGUES_HOF_APPLY=1 to apply.');
+    console.log(
+      '\nDRY_RUN=1 (default): no database writes. Set DRY_RUN=0 NEGRO_LEAGUES_HOF_APPLY=1 to apply.',
+    );
     await pool.end();
     return;
   }
@@ -378,7 +398,9 @@ async function main(): Promise<void> {
       );
     }
     await client.query('COMMIT');
-    console.log(`Applied: upserted run ${runId} (lane='${RUN_LANE}'), inserted up to ${netNewRows.length} candidate row(s) (lane='${LANE}', ON CONFLICT DO NOTHING on (lane, source_item_id)).`);
+    console.log(
+      `Applied: upserted run ${runId} (lane='${RUN_LANE}'), inserted up to ${netNewRows.length} candidate row(s) (lane='${LANE}', ON CONFLICT DO NOTHING on (lane, source_item_id)).`,
+    );
   } catch (error) {
     await client.query('ROLLBACK').catch(() => {});
     throw error;

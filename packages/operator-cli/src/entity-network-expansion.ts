@@ -20,7 +20,8 @@
  */
 import type { RelationshipType } from '@repo/domain';
 
-const WIKIDATA_ENTITY_DATA = (qid: string) => `https://www.wikidata.org/wiki/Special:EntityData/${qid}.json`;
+const WIKIDATA_ENTITY_DATA = (qid: string) =>
+  `https://www.wikidata.org/wiki/Special:EntityData/${qid}.json`;
 const WIKIDATA_ITEM_URL = (qid: string) => `https://www.wikidata.org/wiki/${qid}`;
 const WIKIDATA_SPARQL = 'https://query.wikidata.org/sparql';
 
@@ -46,12 +47,15 @@ export const DEFAULT_EXPANSION_CONFIG: ExpansionConfig = { depth: 1, maxCandidat
 
 export type WikidataFetcher = (url: string) => Promise<unknown>;
 
-const USER_AGENT = 'blackstory-entity-network-expansion/0.1 (repo-xez5.4; research staging lane, never auto-published)';
+const USER_AGENT =
+  'blackstory-entity-network-expansion/0.1 (repo-xez5.4; research staging lane, never auto-published)';
 
 async function fetchWithRetry(url: string, attempts = 3): Promise<Response> {
   let lastError: unknown;
   for (let i = 0; i < attempts; i += 1) {
-    const res = await fetch(url, { headers: { accept: 'application/json', 'user-agent': USER_AGENT } });
+    const res = await fetch(url, {
+      headers: { accept: 'application/json', 'user-agent': USER_AGENT },
+    });
     if (res.ok) return res;
     if (res.status === 429 || res.status === 503) {
       lastError = new Error(`Wikidata request failed: ${res.status} ${url}`);
@@ -176,7 +180,9 @@ function extractEntityIds(claims: readonly WikidataClaim[] | undefined): string[
   return ids;
 }
 
-function extractYearFromWikidataTimeClaim(claims: readonly WikidataClaim[] | undefined): number | undefined {
+function extractYearFromWikidataTimeClaim(
+  claims: readonly WikidataClaim[] | undefined,
+): number | undefined {
   if (!claims?.length) return undefined;
   const value = claims[0]?.mainsnak?.datavalue?.value;
   if (!value || typeof value !== 'object' || !('time' in (value as Record<string, unknown>))) {
@@ -191,9 +197,10 @@ function extractYearFromWikidataTimeClaim(claims: readonly WikidataClaim[] | und
 }
 
 /** Reads Wikidata P569 (birth) and P570 (death) time claims from an entity claims map. */
-export function extractWikidataBirthDeathYears(
-  claims: Record<string, readonly WikidataClaim[]>,
-): { birthYear?: number; deathYear?: number } {
+export function extractWikidataBirthDeathYears(claims: Record<string, readonly WikidataClaim[]>): {
+  birthYear?: number;
+  deathYear?: number;
+} {
   const birthYear = extractYearFromWikidataTimeClaim(claims.P569);
   const deathYear = extractYearFromWikidataTimeClaim(claims.P570);
   return {
@@ -262,7 +269,10 @@ async function expandForwardClaims(
   return out;
 }
 
-type SparqlBinding = { readonly item?: { readonly value?: string }; readonly itemLabel?: { readonly value?: string } };
+type SparqlBinding = {
+  readonly item?: { readonly value?: string };
+  readonly itemLabel?: { readonly value?: string };
+};
 type SparqlResult = { readonly results?: { readonly bindings?: readonly SparqlBinding[] } };
 
 function sparqlUrl(query: string): string {
@@ -459,8 +469,18 @@ export async function stageNetworkCandidates(
       direction: c.hypothesis.direction,
       hop: c.hop,
       ...(c.hypothesis.note !== undefined ? { note: c.hypothesis.note } : {}),
-      ...(hasSeedBirth ? { seedBirthYear: seedBirthDeathYears!.birthYear, birthYear: seedBirthDeathYears!.birthYear } : {}),
-      ...(hasSeedDeath ? { seedDeathYear: seedBirthDeathYears!.deathYear, deathYear: seedBirthDeathYears!.deathYear } : {}),
+      ...(hasSeedBirth
+        ? {
+            seedBirthYear: seedBirthDeathYears!.birthYear,
+            birthYear: seedBirthDeathYears!.birthYear,
+          }
+        : {}),
+      ...(hasSeedDeath
+        ? {
+            seedDeathYear: seedBirthDeathYears!.deathYear,
+            deathYear: seedBirthDeathYears!.deathYear,
+          }
+        : {}),
     },
     discovered_at: discoveredAt,
   }));

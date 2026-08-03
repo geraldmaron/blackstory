@@ -114,11 +114,7 @@ async function main(): Promise<void> {
     let updated = 0;
 
     for (const row of releaseRows.rows) {
-      const coNeighbors = coParticipationNeighborsForEntity(
-        row.entity_id,
-        rows,
-        eventNamesById,
-      );
+      const coNeighbors = coParticipationNeighborsForEntity(row.entity_id, rows, eventNamesById);
       if (coNeighbors.length === 0) continue;
 
       const existingProjectionRelated = Array.isArray(row.projection.related)

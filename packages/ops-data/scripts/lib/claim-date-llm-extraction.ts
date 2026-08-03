@@ -90,7 +90,9 @@ export function buildClaimDateExtractionUserPrompt(subject: ClaimDateExtractionS
   );
 }
 
-export function buildClaimDateExtractionRequest(subject: ClaimDateExtractionSubject): LlmCompletionRequest {
+export function buildClaimDateExtractionRequest(
+  subject: ClaimDateExtractionSubject,
+): LlmCompletionRequest {
   const model =
     process.env.OPENROUTER_MODEL?.trim() ||
     process.env.OLLAMA_MODEL?.trim() ||
@@ -109,7 +111,9 @@ export function buildClaimDateExtractionRequest(subject: ClaimDateExtractionSubj
 }
 
 /** Deterministic mock: anchors the first 4-digit year in prose for tests and dry-runs. */
-export function mockExtractClaimDateFromProse(subject: ClaimDateExtractionSubject): LlmClaimDateExtraction | null {
+export function mockExtractClaimDateFromProse(
+  subject: ClaimDateExtractionSubject,
+): LlmClaimDateExtraction | null {
   const match = /\b(1[0-9]{3}|20[0-9]{2})\b/u.exec(subject.object);
   if (!match?.[0] || match.index === undefined) return null;
   const year = match[0];
@@ -124,7 +128,9 @@ export function mockExtractClaimDateFromProse(subject: ClaimDateExtractionSubjec
   };
 }
 
-export function createMockClaimDateExtractionProvider(modelId = 'mock-claim-date-extraction-v1'): LlmProvider {
+export function createMockClaimDateExtractionProvider(
+  modelId = 'mock-claim-date-extraction-v1',
+): LlmProvider {
   return {
     id: 'mock',
     async complete(request) {
@@ -135,7 +141,8 @@ export function createMockClaimDateExtractionProvider(modelId = 'mock-claim-date
         if (typeof parsed.claimId === 'string' && typeof parsed.object === 'string') {
           subject = {
             claimId: parsed.claimId,
-            claimVersionId: typeof parsed.claimVersionId === 'string' ? parsed.claimVersionId : 'cv_mock',
+            claimVersionId:
+              typeof parsed.claimVersionId === 'string' ? parsed.claimVersionId : 'cv_mock',
             entityId: typeof parsed.entityId === 'string' ? parsed.entityId : 'ent_mock',
             predicate: typeof parsed.predicate === 'string' ? parsed.predicate : '',
             object: parsed.object,
@@ -152,7 +159,12 @@ export function createMockClaimDateExtractionProvider(modelId = 'mock-claim-date
             verbatim_quote: extraction.verbatimQuote,
             char_offsets: extraction.charOffsets,
           }
-        : { edtf: '', property: 'point_in_time', verbatim_quote: '', char_offsets: { start: 0, end: 0 } };
+        : {
+            edtf: '',
+            property: 'point_in_time',
+            verbatim_quote: '',
+            char_offsets: { start: 0, end: 0 },
+          };
       return {
         content: JSON.stringify(payload),
         provider: 'mock',

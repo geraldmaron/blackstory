@@ -25,7 +25,10 @@ export function FactConfidencePanel({ fact }: FactConfidencePanelProps) {
       </h2>
       <div style={{ marginTop: 'var(--bb-space-3)' }}>
         <Confidence level={level} label={label} />
-        <p className="bb-sans" style={{ margin: 'var(--bb-space-3) 0 0 0', color: 'var(--bb-ink-muted)' }}>
+        <p
+          className="bb-sans"
+          style={{ margin: 'var(--bb-space-3) 0 0 0', color: 'var(--bb-ink-muted)' }}
+        >
           {confidenceDefinition(fact.confidence)}
         </p>
         {fact.confidenceNote ? (
@@ -33,9 +36,12 @@ export function FactConfidencePanel({ fact }: FactConfidencePanelProps) {
             <strong>Nuance:</strong> {fact.confidenceNote}
           </p>
         ) : null}
-        <p className="bb-sans" style={{ margin: 'var(--bb-space-2) 0 0 0', color: 'var(--bb-ink-muted)' }}>
-          Workflow status (<span className="bb-mono">{fact.status}</span>) and evidence grade are independent
-          axes — a contested grade can still be published when the dispute is disclosed.
+        <p
+          className="bb-sans"
+          style={{ margin: 'var(--bb-space-2) 0 0 0', color: 'var(--bb-ink-muted)' }}
+        >
+          Workflow status (<span className="bb-mono">{fact.status}</span>) and evidence grade are
+          independent axes — a contested grade can still be published when the dispute is disclosed.
         </p>
       </div>
     </section>

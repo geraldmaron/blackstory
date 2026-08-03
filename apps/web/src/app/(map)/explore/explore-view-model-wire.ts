@@ -20,8 +20,7 @@ export type SerializableExploreViewModel = Omit<
 export function toSerializableExploreViewModel(
   view: ExploreViewModel,
 ): SerializableExploreViewModel {
-  const { allFeatures: _allFeatures, filteredFeatures: _filteredFeatures, ...serializable } =
-    view;
+  const { allFeatures: _allFeatures, filteredFeatures: _filteredFeatures, ...serializable } = view;
   return serializable;
 }
 

@@ -6,7 +6,12 @@
  */
 import pg from 'pg';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
-import { PLACE_STATUS_FIX_ENTITY_IDS, STATUS_REVIEW_LANE, STATUS_REVIEW_PROGRAM_ID, statusReviewRunId } from './lib/status-backfill.ts';
+import {
+  PLACE_STATUS_FIX_ENTITY_IDS,
+  STATUS_REVIEW_LANE,
+  STATUS_REVIEW_PROGRAM_ID,
+  statusReviewRunId,
+} from './lib/status-backfill.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
 const APPLY = process.env.STAGE_PLACE_STATUS_REVIEW_APPLY === '1';
@@ -51,7 +56,8 @@ async function main(): Promise<void> {
     );
 
     const candidates = rows.filter(
-      (row) => !PLACE_STATUS_FIX_ENTITY_IDS.has(row.id) && !isCemeteryOrBurialSite(row.display_name),
+      (row) =>
+        !PLACE_STATUS_FIX_ENTITY_IDS.has(row.id) && !isCemeteryOrBurialSite(row.display_name),
     );
 
     console.log('=== stage-place-status-review ===');
@@ -81,7 +87,9 @@ async function main(): Promise<void> {
     }
 
     for (const candidate of candidates) {
-      const landscapeId = `landcand_status_${candidate.id}`.replace(/[^a-zA-Z0-9_]+/g, '_').slice(0, 180);
+      const landscapeId = `landcand_status_${candidate.id}`
+        .replace(/[^a-zA-Z0-9_]+/g, '_')
+        .slice(0, 180);
       console.log(`  ${candidate.id} (${candidate.display_name})`);
 
       if (DRY_RUN || !APPLY) continue;
@@ -120,7 +128,9 @@ async function main(): Promise<void> {
     if (DRY_RUN || !APPLY) {
       console.log('\nDry run only. Set DRY_RUN=0 STAGE_PLACE_STATUS_REVIEW_APPLY=1 to stage.');
     } else {
-      console.log(`\nStaged ${inserted} new rows to bb_research.landscape_candidates (lane=${STATUS_REVIEW_LANE}).`);
+      console.log(
+        `\nStaged ${inserted} new rows to bb_research.landscape_candidates (lane=${STATUS_REVIEW_LANE}).`,
+      );
     }
   } finally {
     await client.end();

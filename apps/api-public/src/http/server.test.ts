@@ -17,7 +17,10 @@ import { makeEntity, SAMPLE_POINTER } from './entity-fixture.js';
 
 function makeDeps(): HandlerDeps {
   return {
-    dataAccess: createInMemoryPublicDataAccess({ pointer: SAMPLE_POINTER, entities: [makeEntity()] }),
+    dataAccess: createInMemoryPublicDataAccess({
+      pointer: SAMPLE_POINTER,
+      entities: [makeEntity()],
+    }),
     clientAttestationGuard: async ({ headers }: { headers: ClientAttestationHeaders }) => ({
       allowed: true,
       verified: Boolean((headers as Record<string, string | undefined>)['x-blackstory-client']),

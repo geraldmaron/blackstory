@@ -7,10 +7,7 @@ import { notFound } from 'next/navigation';
 import { buildLawDetailViewModel, listLawStaticParams } from '../law-view-model';
 import { loadLegalCatalog } from '../../../lib/legal/public-source';
 import { LawDetailIntro, LawDetailSections } from '../LawDetailSections';
-import {
-  lawEditionRootClassName,
-  lawEditionStackClassName,
-} from '../law-panel-chrome';
+import { lawEditionRootClassName, lawEditionStackClassName } from '../law-panel-chrome';
 import '../law-edition.css';
 
 type LawDetailPageProps = {

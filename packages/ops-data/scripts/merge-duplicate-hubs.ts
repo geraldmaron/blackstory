@@ -23,7 +23,10 @@ import {
   type HubMergePair,
 } from './lib/entity-hub-merge.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
-import { formatEdgeCoverage, type EdgeCoverageSnapshot } from './lib/promote-relationship-candidates.ts';
+import {
+  formatEdgeCoverage,
+  type EdgeCoverageSnapshot,
+} from './lib/promote-relationship-candidates.ts';
 
 const DRY_RUN = process.env.DRY_RUN !== '0';
 const APPLY = process.env.MERGE_DUPLICATE_HUBS_APPLY === '1';
@@ -86,7 +89,10 @@ async function loadDegreeSnapshots(
 }
 
 async function loadEdgeCoverage(client: pg.PoolClient): Promise<EdgeCoverageSnapshot> {
-  const result = await client.query<{ total_entities: string; entities_with_accepted_edge: string }>(
+  const result = await client.query<{
+    total_entities: string;
+    entities_with_accepted_edge: string;
+  }>(
     `WITH touched AS (
        SELECT from_entity_id AS entity_id
        FROM bb_canonical.entity_relationships
@@ -102,85 +108,106 @@ async function loadEdgeCoverage(client: pg.PoolClient): Promise<EdgeCoverageSnap
   );
   return {
     totalEntities: Number.parseInt(result.rows[0]?.total_entities ?? '0', 10),
-    entitiesWithAcceptedEdge: Number.parseInt(result.rows[0]?.entities_with_accepted_edge ?? '0', 10),
+    entitiesWithAcceptedEdge: Number.parseInt(
+      result.rows[0]?.entities_with_accepted_edge ?? '0',
+      10,
+    ),
   };
 }
 
 async function rewriteRelationshipsForPair(
   client: pg.PoolClient,
   pair: HubMergePair,
-): Promise<{ readonly updatedFrom: number; readonly updatedTo: number; readonly deletedSelfLoops: number; readonly deletedDuplicates: number }> {
-  const updatedFrom = (
-    await client.query(
-      `UPDATE bb_canonical.entity_relationships
+): Promise<{
+  readonly updatedFrom: number;
+  readonly updatedTo: number;
+  readonly deletedSelfLoops: number;
+  readonly deletedDuplicates: number;
+}> {
+  const updatedFrom =
+    (
+      await client.query(
+        `UPDATE bb_canonical.entity_relationships
        SET from_entity_id = $2, updated_at = now()
        WHERE from_entity_id = $1`,
-      [pair.absorbedId, pair.survivorId],
-    )
-  ).rowCount ?? 0;
-  const updatedTo = (
-    await client.query(
-      `UPDATE bb_canonical.entity_relationships
+        [pair.absorbedId, pair.survivorId],
+      )
+    ).rowCount ?? 0;
+  const updatedTo =
+    (
+      await client.query(
+        `UPDATE bb_canonical.entity_relationships
        SET to_entity_id = $2, updated_at = now()
        WHERE to_entity_id = $1`,
-      [pair.absorbedId, pair.survivorId],
-    )
-  ).rowCount ?? 0;
-  const deletedSelfLoops = (
-    await client.query(
-      `DELETE FROM bb_canonical.entity_relationships
+        [pair.absorbedId, pair.survivorId],
+      )
+    ).rowCount ?? 0;
+  const deletedSelfLoops =
+    (
+      await client.query(
+        `DELETE FROM bb_canonical.entity_relationships
        WHERE from_entity_id = to_entity_id`,
-    )
-  ).rowCount ?? 0;
-  const deletedDuplicates = (
-    await client.query(
-      `DELETE FROM bb_canonical.entity_relationships r1
+      )
+    ).rowCount ?? 0;
+  const deletedDuplicates =
+    (
+      await client.query(
+        `DELETE FROM bb_canonical.entity_relationships r1
        USING bb_canonical.entity_relationships r2
        WHERE r1.from_entity_id = r2.from_entity_id
          AND r1.to_entity_id = r2.to_entity_id
          AND r1.relationship_type = r2.relationship_type
          AND r1.id > r2.id`,
-    )
-  ).rowCount ?? 0;
+      )
+    ).rowCount ?? 0;
   return { updatedFrom, updatedTo, deletedSelfLoops, deletedDuplicates };
 }
 
 async function rewriteEventParticipationForPair(
   client: pg.PoolClient,
   pair: HubMergePair,
-): Promise<{ readonly updatedParticipant: number; readonly updatedEvent: number; readonly deletedSelfLoops: number; readonly deletedDuplicates: number }> {
-  const updatedParticipant = (
-    await client.query(
-      `UPDATE bb_canonical.event_participation
+): Promise<{
+  readonly updatedParticipant: number;
+  readonly updatedEvent: number;
+  readonly deletedSelfLoops: number;
+  readonly deletedDuplicates: number;
+}> {
+  const updatedParticipant =
+    (
+      await client.query(
+        `UPDATE bb_canonical.event_participation
        SET participant_id = $2, updated_at = now()
        WHERE participant_id = $1`,
-      [pair.absorbedId, pair.survivorId],
-    )
-  ).rowCount ?? 0;
-  const updatedEvent = (
-    await client.query(
-      `UPDATE bb_canonical.event_participation
+        [pair.absorbedId, pair.survivorId],
+      )
+    ).rowCount ?? 0;
+  const updatedEvent =
+    (
+      await client.query(
+        `UPDATE bb_canonical.event_participation
        SET event_id = $2, updated_at = now()
        WHERE event_id = $1`,
-      [pair.absorbedId, pair.survivorId],
-    )
-  ).rowCount ?? 0;
-  const deletedSelfLoops = (
-    await client.query(
-      `DELETE FROM bb_canonical.event_participation
+        [pair.absorbedId, pair.survivorId],
+      )
+    ).rowCount ?? 0;
+  const deletedSelfLoops =
+    (
+      await client.query(
+        `DELETE FROM bb_canonical.event_participation
        WHERE event_id = participant_id`,
-    )
-  ).rowCount ?? 0;
-  const deletedDuplicates = (
-    await client.query(
-      `DELETE FROM bb_canonical.event_participation ep1
+      )
+    ).rowCount ?? 0;
+  const deletedDuplicates =
+    (
+      await client.query(
+        `DELETE FROM bb_canonical.event_participation ep1
        USING bb_canonical.event_participation ep2
        WHERE ep1.event_id = ep2.event_id
          AND ep1.participant_id = ep2.participant_id
          AND ep1.role = ep2.role
          AND ep1.id > ep2.id`,
-    )
-  ).rowCount ?? 0;
+      )
+    ).rowCount ?? 0;
   return { updatedParticipant, updatedEvent, deletedSelfLoops, deletedDuplicates };
 }
 
@@ -200,9 +227,10 @@ async function rewriteReleaseEntitiesForPair(
        )`,
     [pair.absorbedId, pair.survivorId],
   );
-  const updated = (
-    await client.query(
-      `UPDATE bb_public.release_entities re
+  const updated =
+    (
+      await client.query(
+        `UPDATE bb_public.release_entities re
        SET entity_id = $2
        WHERE re.entity_id = $1
          AND NOT EXISTS (
@@ -211,9 +239,9 @@ async function rewriteReleaseEntitiesForPair(
            WHERE re2.release_id = re.release_id
              AND re2.entity_id = $2
          )`,
-      [pair.absorbedId, pair.survivorId],
-    )
-  ).rowCount ?? 0;
+        [pair.absorbedId, pair.survivorId],
+      )
+    ).rowCount ?? 0;
   return { updated, conflicts: conflictRes.rows.map((row) => row.release_id) };
 }
 
@@ -233,9 +261,10 @@ async function rewriteSearchIndexForPair(
        )`,
     [pair.absorbedId, pair.survivorId],
   );
-  const updated = (
-    await client.query(
-      `UPDATE bb_public.search_index si
+  const updated =
+    (
+      await client.query(
+        `UPDATE bb_public.search_index si
        SET entity_id = $2
        WHERE si.entity_id = $1
          AND NOT EXISTS (
@@ -244,9 +273,9 @@ async function rewriteSearchIndexForPair(
            WHERE si2.release_id = si.release_id
              AND si2.entity_id = $2
          )`,
-      [pair.absorbedId, pair.survivorId],
-    )
-  ).rowCount ?? 0;
+        [pair.absorbedId, pair.survivorId],
+      )
+    ).rowCount ?? 0;
   return { updated, conflicts: conflictRes.rows.map((row) => row.release_id) };
 }
 
@@ -373,11 +402,15 @@ async function main(): Promise<void> {
         console.log(`SKIP ${label}: ${entry.skipReason}`);
         continue;
       }
-      console.log(`PLAN ${label}: insert merge ledger, rewrite relationships/participation/candidates, soft-mark absorbed`);
+      console.log(
+        `PLAN ${label}: insert merge ledger, rewrite relationships/participation/candidates, soft-mark absorbed`,
+      );
     }
 
     if (DRY_RUN || !APPLY) {
-      console.log('\nDry run only — no writes made. Set DRY_RUN=0 and MERGE_DUPLICATE_HUBS_APPLY=1 to apply.');
+      console.log(
+        '\nDry run only — no writes made. Set DRY_RUN=0 and MERGE_DUPLICATE_HUBS_APPLY=1 to apply.',
+      );
       return;
     }
 

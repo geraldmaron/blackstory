@@ -82,13 +82,17 @@ describe('computeScatteredMosaicLayout', () => {
 
   it('respects browse and detail density targets when packing fits', () => {
     assert.equal(
-      computeScatteredMosaicLayout({ seedKey: 'about-edition-v6', count: EDITION_MOSAIC_COUNT_BROWSE })
-        .length,
+      computeScatteredMosaicLayout({
+        seedKey: 'about-edition-v6',
+        count: EDITION_MOSAIC_COUNT_BROWSE,
+      }).length,
       EDITION_MOSAIC_COUNT_BROWSE,
     );
     assert.equal(
-      computeScatteredMosaicLayout({ seedKey: 'entity-edition-v6:x', count: EDITION_MOSAIC_COUNT_DETAIL })
-        .length,
+      computeScatteredMosaicLayout({
+        seedKey: 'entity-edition-v6:x',
+        count: EDITION_MOSAIC_COUNT_DETAIL,
+      }).length,
       EDITION_MOSAIC_COUNT_DETAIL,
     );
   });

@@ -32,9 +32,8 @@ test('resolvePublicMediaUrl defaults to Supabase and can prefer GCS', () => {
     ),
   );
   assert.equal(
-    new URL(
-      resolvePublicMediaUrl('public/entities/ent_x/primary.jpg', { preferSupabase: false }),
-    ).hostname,
+    new URL(resolvePublicMediaUrl('public/entities/ent_x/primary.jpg', { preferSupabase: false }))
+      .hostname,
     'storage.googleapis.com',
   );
 });

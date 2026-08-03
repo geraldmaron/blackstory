@@ -68,7 +68,9 @@ function parseSearchResult(
   index: number,
 ): { doc: ChroniclingAmericaNormalizedDoc } | { rejected: ChroniclingAmericaRejectedDoc } {
   if (!raw || typeof raw !== 'object') {
-    return { rejected: { index, stableIdentifier: `ca:unknown:${index}`, reason: 'not_an_object' } };
+    return {
+      rejected: { index, stableIdentifier: `ca:unknown:${index}`, reason: 'not_an_object' },
+    };
   }
 
   const record = raw as Record<string, unknown>;
@@ -153,7 +155,9 @@ function parseItemEnvelope(
   index: number,
 ): { doc: ChroniclingAmericaNormalizedDoc } | { rejected: ChroniclingAmericaRejectedDoc } {
   if (!raw || typeof raw !== 'object') {
-    return { rejected: { index, stableIdentifier: `ca:unknown:${index}`, reason: 'not_an_object' } };
+    return {
+      rejected: { index, stableIdentifier: `ca:unknown:${index}`, reason: 'not_an_object' },
+    };
   }
   const envelope = raw as Record<string, unknown>;
   const item = envelope.item;
@@ -174,8 +178,7 @@ export function parseChroniclingAmericaSearchResponse(raw: unknown): Chronicling
     envelope.pagination && typeof envelope.pagination === 'object'
       ? (envelope.pagination as Record<string, unknown>)
       : undefined;
-  const paginationTotal =
-    typeof pagination?.total === 'number' ? pagination.total : undefined;
+  const paginationTotal = typeof pagination?.total === 'number' ? pagination.total : undefined;
 
   if (!Array.isArray(results)) {
     throw new Error('Chronicling America search fixture must include a results array');

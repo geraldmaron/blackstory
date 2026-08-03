@@ -16,8 +16,7 @@ import {
   type CitationForCaptureCompleteness,
 } from './evaluator.js';
 
-const WAYBACK =
-  'https://web.archive.org/web/20260101000000/https://example.gov/record/1';
+const WAYBACK = 'https://web.archive.org/web/20260101000000/https://example.gov/record/1';
 
 function webCitation(
   citationId: string,
@@ -121,10 +120,7 @@ test('evaluateCaptureCompleteness lists missing web citation ids and computes ra
 
 test('evaluateCaptureCompleteness meets a custom barRatio override', () => {
   const result = evaluateCaptureCompleteness(
-    [
-      webCitation('captured'),
-      webCitation('missing', { capture: { captureId: 'cap-missing' } }),
-    ],
+    [webCitation('captured'), webCitation('missing', { capture: { captureId: 'cap-missing' } })],
     { barRatio: 0.5 },
   );
   assert.equal(result.ratio, 0.5);

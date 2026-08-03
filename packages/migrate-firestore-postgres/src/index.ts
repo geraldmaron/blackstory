@@ -6,7 +6,11 @@
  * canonical-convergence.ts, pg-writer.ts) are consumed via direct relative imports by
  * packages/operator-cli and this package's own cli/backfill-canonical.ts — see README.md.
  */
-export { COLLECTION_SPECS, LIVE_ONLY_COLLECTIONS, allKnownFirestoreCollections } from './catalog.js';
+export {
+  COLLECTION_SPECS,
+  LIVE_ONLY_COLLECTIONS,
+  allKnownFirestoreCollections,
+} from './catalog.js';
 export type { CollectionSpec, MigratePriority } from './catalog.js';
 export { createPgWriter } from './pg-writer.js';
 export type { PgWriter } from './pg-writer.js';

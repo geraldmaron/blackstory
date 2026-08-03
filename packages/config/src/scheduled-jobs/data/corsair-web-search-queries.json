@@ -5,9 +5,7 @@
   "safeties": {
     "serpOnly": true,
     "htmlCrawlForbiddenUntil": "repo-tt2u.13",
-    "gatedHostsNoBodyScrape": [
-      "blackwomenleadproject.org"
-    ],
+    "gatedHostsNoBodyScrape": ["blackwomenleadproject.org"],
     "livingPersonSensitive": true,
     "livingPersonNote": "Black Women Lead and living officeholders/firsts: treat SERP hits as leads, never harvest private contact data; living persons stay privacy_review.",
     "maxQueriesPerRunHardCap": 12,

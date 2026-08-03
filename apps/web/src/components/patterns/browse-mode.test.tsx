@@ -45,9 +45,7 @@ describe('browse-mode helpers', () => {
 
 describe('BrowseModeToggle', () => {
   it('renders segmented ordered/random controls with pressed state', () => {
-    const html = renderToStaticMarkup(
-      <BrowseModeToggle mode="random" onModeChange={() => {}} />,
-    );
+    const html = renderToStaticMarkup(<BrowseModeToggle mode="random" onModeChange={() => {}} />);
     assert.match(html, /aria-label="Browse mode"/);
     assert.match(html, /aria-pressed="false"/);
     assert.match(html, />Ordered</);

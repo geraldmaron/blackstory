@@ -35,9 +35,7 @@ export type EntityLocationAuditRow = {
 };
 
 export type GeoIntegrityMismatchReason =
-  | 'point_not_in_declared_state'
-  | 'unknown_state_code'
-  | 'missing_boundary';
+  'point_not_in_declared_state' | 'unknown_state_code' | 'missing_boundary';
 
 export type GeoIntegrityMismatch = {
   readonly id: string;

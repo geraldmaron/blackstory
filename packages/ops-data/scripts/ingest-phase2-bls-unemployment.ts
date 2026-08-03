@@ -75,9 +75,7 @@ function normalizePgConnectionString(connectionString: string): {
   };
 }
 
-async function fetchBlsData(
-  seriesIds: readonly string[],
-): Promise<Map<string, BlsSeriesData>> {
+async function fetchBlsData(seriesIds: readonly string[]): Promise<Map<string, BlsSeriesData>> {
   const results = new Map<string, BlsSeriesData>();
 
   for (const seriesId of seriesIds) {
@@ -102,13 +100,18 @@ async function fetchBlsData(
         });
 
         if (!response.ok) {
-          console.error(`BLS API error for ${seriesId}: ${response.status} (${startYear}-${endYear})`);
+          console.error(
+            `BLS API error for ${seriesId}: ${response.status} (${startYear}-${endYear})`,
+          );
           continue;
         }
 
         const json = (await response.json()) as BlsApiResponse;
         if (json.status !== 'REQUEST_SUCCEEDED') {
-          console.error(`BLS API request failed for ${seriesId} (${startYear}-${endYear})`, json.message);
+          console.error(
+            `BLS API request failed for ${seriesId} (${startYear}-${endYear})`,
+            json.message,
+          );
           continue;
         }
 
@@ -233,7 +236,10 @@ function createObservations(
   return observations;
 }
 
-async function applyObservations(observations: BlsObservation[], databaseUrl: string): Promise<number> {
+async function applyObservations(
+  observations: BlsObservation[],
+  databaseUrl: string,
+): Promise<number> {
   const conn = normalizePgConnectionString(databaseUrl);
   const pool = new pg.Pool({
     connectionString: conn.connectionString,
@@ -414,7 +420,11 @@ async function main(): Promise<void> {
     },
     sanityChecks: {
       black1983: black1983
-        ? { rate: black1983.rate, expected: '~19–20%', ok: black1983.rate >= 18 && black1983.rate <= 21 }
+        ? {
+            rate: black1983.rate,
+            expected: '~19–20%',
+            ok: black1983.rate >= 18 && black1983.rate <= 21,
+          }
         : null,
       black2019: black2019
         ? { rate: black2019.rate, expected: '~6.1%', ok: Math.abs(black2019.rate - 6.1) <= 0.5 }

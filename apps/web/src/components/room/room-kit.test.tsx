@@ -82,7 +82,11 @@ describe('room kit · a title is JSX, never a string of markup', () => {
       .filter((file) => /title="[^"]*<[a-z]/i.test(readFileSync(file, 'utf8')))
       .map((file) => path.relative(APP_DIR, file));
 
-    assert.deepEqual(offenders, [], 'pass the title as JSX: title={<>Civil rights <em>law</em></>}');
+    assert.deepEqual(
+      offenders,
+      [],
+      'pass the title as JSX: title={<>Civil rights <em>law</em></>}',
+    );
   });
 });
 

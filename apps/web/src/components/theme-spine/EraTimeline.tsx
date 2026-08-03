@@ -62,12 +62,7 @@ function summarizeSpan(sorted: readonly EraTimelineEvent[]): string {
   return `Timeline: ${countLabel}, ${formatDateLabel(first.date)} to ${formatDateLabel(last.date)}`;
 }
 
-export function EraTimeline({
-  events,
-  policyEras,
-  currentEraId,
-  className,
-}: EraTimelineProps) {
+export function EraTimeline({ events, policyEras, currentEraId, className }: EraTimelineProps) {
   const sorted = [...events].sort((a, b) => a.date.localeCompare(b.date));
   if (sorted.length === 0) {
     return null;
@@ -78,10 +73,7 @@ export function EraTimeline({
   const maxYear = Math.max(...years.filter((year) => !Number.isNaN(year)));
   const span = maxYear - minYear || 1;
 
-  const width = Math.max(
-    480,
-    SIDE_PADDING * 2 + (sorted.length - 1) * MIN_EVENT_SPACING,
-  );
+  const width = Math.max(480, SIDE_PADDING * 2 + (sorted.length - 1) * MIN_EVENT_SPACING);
   const usableWidth = width - SIDE_PADDING * 2;
 
   function xForYear(year: number): number {

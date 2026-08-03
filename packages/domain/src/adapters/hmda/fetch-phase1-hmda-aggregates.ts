@@ -151,11 +151,7 @@ export async function fetchPhase1HmdaCountyObservations(
     for (const year of years) {
       try {
         const payload = await fetchAggregationForYear(countyFips, year, fetchImpl);
-        const normalized = normalizeHmdaAggregationPayloadForCountyYear(
-          payload,
-          countyFips,
-          year,
-        );
+        const normalized = normalizeHmdaAggregationPayloadForCountyYear(payload, countyFips, year);
         const parsed = parseHmdaCountyAggregationResponse(normalized, countyFips);
         rejected.push(...parsed.rejected);
         allRows.push(...parsed.rows);

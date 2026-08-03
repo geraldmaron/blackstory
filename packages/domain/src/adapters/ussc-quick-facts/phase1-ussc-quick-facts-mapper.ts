@@ -224,13 +224,16 @@ export function parseUsscQuickFactsDrugFixtureCsv(csvText: string): {
   return { rows, rejected };
 }
 
-function resolveSourceUrl(row: UsscQuickFactsDrugRow, metric: 'crack' | 'powder' | 'blackShare'): string {
+function resolveSourceUrl(
+  row: UsscQuickFactsDrugRow,
+  metric: 'crack' | 'powder' | 'blackShare',
+): string {
   const specific =
     metric === 'crack'
       ? row.crackSourceUrl
       : metric === 'powder'
         ? row.powderSourceUrl
-        : row.blackShareSourceUrl ?? row.crackSourceUrl;
+        : (row.blackShareSourceUrl ?? row.crackSourceUrl);
   return specific ?? USSC_QUICK_FACTS_HOMEPAGE_URL;
 }
 

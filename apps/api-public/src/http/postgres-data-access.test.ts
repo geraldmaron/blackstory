@@ -33,7 +33,8 @@ const sampleProjection: PublicEntityProjectionDoc = {
   },
   claimIds: ['claim_seed_001'],
   topicTags: ['community', 'education'],
-  historicalContext: 'Reconstruction-era Black communities organized schools and mutual aid networks.',
+  historicalContext:
+    'Reconstruction-era Black communities organized schools and mutual aid networks.',
   eraBuckets: ['1860s'],
 };
 

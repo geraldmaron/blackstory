@@ -44,7 +44,12 @@ function connectionString(): string {
   return value;
 }
 
-function buildLandscapeRow(hit: TextMinedDeathHit, person: PersonRow, runId: string, nowIso: string) {
+function buildLandscapeRow(
+  hit: TextMinedDeathHit,
+  person: PersonRow,
+  runId: string,
+  nowIso: string,
+) {
   return {
     id: hit.entityId,
     run_id: runId,

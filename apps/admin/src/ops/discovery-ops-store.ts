@@ -17,11 +17,15 @@ export type DiscoveryCampaignRunListItem = {
   readonly errorMessage?: string;
 };
 
-export async function listDiscoveryCampaignRuns(limit = 50): Promise<readonly DiscoveryCampaignRunListItem[]> {
+export async function listDiscoveryCampaignRuns(
+  limit = 50,
+): Promise<readonly DiscoveryCampaignRunListItem[]> {
   return listDiscoveryCampaignRunsPostgres(limit);
 }
 
-export async function tryListDiscoveryCampaignRuns(limit?: number): Promise<readonly DiscoveryCampaignRunListItem[] | null> {
+export async function tryListDiscoveryCampaignRuns(
+  limit?: number,
+): Promise<readonly DiscoveryCampaignRunListItem[] | null> {
   try {
     return await listDiscoveryCampaignRuns(limit);
   } catch (error) {

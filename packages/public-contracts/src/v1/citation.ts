@@ -12,15 +12,14 @@
 import { z } from 'zod';
 import { httpUrl, nonEmptyText } from '../internal/primitives.js';
 
-export const citationV1Schema = z
-  .object({
-    source: nonEmptyText(300),
-    label: nonEmptyText(300),
-    href: httpUrl(2000).optional(),
-    /** Present only when the underlying source is withheld from public linking (e.g. protects a
-     * living person or an internal-only capture). Human-readable; never the internal reason
-     * verbatim — that redaction is the server's job, this schema only bounds shape. */
-    withheldReason: z.string().max(500).optional(),
-  });
+export const citationV1Schema = z.object({
+  source: nonEmptyText(300),
+  label: nonEmptyText(300),
+  href: httpUrl(2000).optional(),
+  /** Present only when the underlying source is withheld from public linking (e.g. protects a
+   * living person or an internal-only capture). Human-readable; never the internal reason
+   * verbatim — that redaction is the server's job, this schema only bounds shape. */
+  withheldReason: z.string().max(500).optional(),
+});
 
 export type CitationV1 = z.infer<typeof citationV1Schema>;

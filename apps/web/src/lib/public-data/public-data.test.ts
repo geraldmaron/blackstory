@@ -85,10 +85,7 @@ test('shouldUseLivePublicProjections disables postgres mode without DATABASE_URL
 
 test('postgres without DATABASE_URL is an explicit misconfig (empty catalog, not seed)', () => {
   // Local dig footgun: PUBLIC_DATA_SOURCE=postgres in .env without DATABASE_URL → 0 entities.
-  assert.equal(
-    isPostgresPublicDataMisconfigured({ PUBLIC_DATA_SOURCE: 'postgres' }),
-    true,
-  );
+  assert.equal(isPostgresPublicDataMisconfigured({ PUBLIC_DATA_SOURCE: 'postgres' }), true);
   assert.equal(
     isPostgresPublicDataMisconfigured({
       PUBLIC_DATA_SOURCE: 'postgres',

@@ -158,12 +158,7 @@ export const drugPolicyPilotPackets = [
     title: 'Documented federal drug-policy statutes and related artifacts',
     summary:
       'Primary federal statutes that structured drug scheduling and mandatory-minimum enforcement, plus a contested investigative package shown only with an uncertainty label. No causal claim that any statute alone produced later disparities.',
-    policy_eras: [
-      'pre_drug_war',
-      'drug_war_escalation',
-      'crack_cocaine_era',
-      'sentencing_reform',
-    ],
+    policy_eras: ['pre_drug_war', 'drug_war_escalation', 'crack_cocaine_era', 'sentencing_reform'],
     geography: {
       geographyType: 'nation',
       jurisdictionId: 'nation:US',
@@ -229,11 +224,7 @@ export const drugPolicyPilotPackets = [
     title: 'Jail, imprisonment, and wealth indicators beside drug-policy eras (IL / national)',
     summary:
       'Cook County Vera jail rates, Illinois BJS imprisonment rates (2023), and national SCF wealth medians shown beside drug-policy eras for juxtaposition. Causation not asserted.',
-    policy_eras: [
-      'drug_war_escalation',
-      'crack_cocaine_era',
-      'sentencing_reform',
-    ],
+    policy_eras: ['drug_war_escalation', 'crack_cocaine_era', 'sentencing_reform'],
     geography: {
       geographyType: 'state',
       jurisdictionId: 'state:17',

@@ -12,7 +12,8 @@ import {
 } from './normalize-enrichment-drafts.ts';
 
 test('trimPublicSummary keeps text within 400 chars at a sentence boundary', () => {
-  const padding = 'Documented evidence from municipal and federal sources anchors this place record. ';
+  const padding =
+    'Documented evidence from municipal and federal sources anchors this place record. ';
   const summary = padding.repeat(5) + 'Final sentence exceeds the limit and must be removed.';
   assert.ok(summary.length > 400);
   const trimmed = trimPublicSummary(summary);

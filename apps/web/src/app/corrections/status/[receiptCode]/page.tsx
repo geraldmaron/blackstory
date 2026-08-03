@@ -33,11 +33,7 @@ export default async function CorrectionStatusPage({ params }: PageProps) {
   if (!status) {
     return (
       <UtilityEditionShell editionKey="correction-status">
-        <UtilityEditionIntro
-          kicker="Trust"
-          title="Correction status"
-          variant="status"
-        />
+        <UtilityEditionIntro kicker="Trust" title="Correction status" variant="status" />
         <UtilityEditionBodyPanel>
           <Notice tone="error" title="Receipt not found">
             We could not find a correction with that receipt code. Check the code and try again —

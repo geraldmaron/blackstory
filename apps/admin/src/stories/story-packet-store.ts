@@ -93,7 +93,11 @@ export async function recordStoryPacketReviewsBulk(input: {
         ...(recorded.seedHandoff ? { seedHandoff: recorded.seedHandoff } : {}),
       });
     } catch (error) {
-      results.push({ submissionId, ok: false, error: error instanceof Error ? error.message : String(error) });
+      results.push({
+        submissionId,
+        ok: false,
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
   }
   return { results: Object.freeze(results) };

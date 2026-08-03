@@ -224,8 +224,7 @@ export async function syncPublicationPointerRow(
 ): Promise<void> {
   const { client, pointer, manifest } = options;
   const manifestHash = manifestHashFromStamp(manifest.releaseStamp);
-  const searchIndexVersion =
-    manifest.searchIndexVersion ?? manifest.activeRelease.releaseId;
+  const searchIndexVersion = manifest.searchIndexVersion ?? manifest.activeRelease.releaseId;
 
   await client.query(
     `INSERT INTO bb_publication.releases
@@ -269,7 +268,12 @@ export async function syncPublicationPointerRow(
 
 export function createPostgresReleaseStore(
   backend: PostgresReleaseStoreBackend,
-  options: { readonly syncPublicationPointer?: (pointer: ActiveReleasePointer, manifest: MobileBootstrapManifest) => Promise<void> } = {},
+  options: {
+    readonly syncPublicationPointer?: (
+      pointer: ActiveReleasePointer,
+      manifest: MobileBootstrapManifest,
+    ) => Promise<void>;
+  } = {},
 ): PostgresReleaseStore {
   const syncPublication = options.syncPublicationPointer;
 
@@ -385,7 +389,11 @@ export function createPoolPostgresReleaseStoreBackend(pool: pg.Pool): PostgresRe
     async runTransaction(operation) {
       const client = await pool.connect();
       const pending: Array<
-        | { readonly kind: 'upsert'; readonly key: string; readonly payload: Readonly<Record<string, unknown>> }
+        | {
+            readonly kind: 'upsert';
+            readonly key: string;
+            readonly payload: Readonly<Record<string, unknown>>;
+          }
         | { readonly kind: 'delete'; readonly key: string }
       > = [];
       try {

@@ -1,9 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import {
-  fetchNpsNetworkToFreedom,
-  fetchDplaItems,
-} from './core/connector.js';
+import { fetchNpsNetworkToFreedom, fetchDplaItems } from './core/connector.js';
 import {
   findSpatialTemporalOverlaps,
   resolveTemporalWindowsForYear,
@@ -64,7 +61,7 @@ test('Spatial-Temporal Adjacency Overlaps', () => {
       connectorKind: 'nps_network_to_freedom' as const,
       title: 'Site B',
       description: 'Established in 1948.',
-      coordinates: { latitude: 38.910, longitude: -77.018 },
+      coordinates: { latitude: 38.91, longitude: -77.018 },
       cites: [],
       rawRecord: {},
     },

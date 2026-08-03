@@ -4,10 +4,7 @@
  * Conventional home-purchase, first-lien, owner-occupied, 1–4 unit.
  */
 import type { FetchLike } from '../census-demographics/fetch-county-populations.js';
-import {
-  HMDA_DATA_BROWSER_AGGREGATIONS_API_URL,
-  PHASE1_HMDA_NATION_YEARS,
-} from './constants.js';
+import { HMDA_DATA_BROWSER_AGGREGATIONS_API_URL, PHASE1_HMDA_NATION_YEARS } from './constants.js';
 import {
   mapHmdaNationCountsToObservations,
   parseHmdaNationAggregationResponse,
@@ -135,7 +132,9 @@ export async function fetchPhase1NationHmdaObservations(
         rejected.push(...parsed.rejected);
         allRows.push(...parsed.rows);
       } catch (error) {
-        rejected.push(`fetch error for year=${year}: ${error instanceof Error ? error.message : String(error)}`);
+        rejected.push(
+          `fetch error for year=${year}: ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
     }
   }

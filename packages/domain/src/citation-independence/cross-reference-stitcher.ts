@@ -32,10 +32,7 @@ import type {
   DiscoverySignal,
   SourceReference,
 } from '../discovery/types.js';
-import type {
-  AdapterCandidateProvenance,
-  AdapterCandidateRecord,
-} from '../adapters/types.js';
+import type { AdapterCandidateProvenance, AdapterCandidateRecord } from '../adapters/types.js';
 
 export const CROSS_REFERENCE_STITCHER_VERSION = 'cross-reference-stitcher.v1' as const;
 
@@ -280,8 +277,7 @@ export function findCrossSourceMatches(
     }
 
     const sortedMentions = [...acc.mentions].sort(
-      (a, b) =>
-        a.sourceId.localeCompare(b.sourceId) || a.mentionId.localeCompare(b.mentionId),
+      (a, b) => a.sourceId.localeCompare(b.sourceId) || a.mentionId.localeCompare(b.mentionId),
     );
 
     matches.push({
@@ -297,9 +293,10 @@ export function findCrossSourceMatches(
   return matches;
 }
 
-function minMaxCapturedAt(
-  mentions: readonly NormalizedPersonMention[],
-): { readonly earliest: string; readonly latest: string } {
+function minMaxCapturedAt(mentions: readonly NormalizedPersonMention[]): {
+  readonly earliest: string;
+  readonly latest: string;
+} {
   let earliest = mentions[0]!.sourceReference.capturedAt;
   let latest = earliest;
   for (const mention of mentions) {
@@ -398,8 +395,6 @@ export function buildCrossReferenceCandidates(
     }
   }
 
-  candidates.sort((a, b) =>
-    a.identity.stableIdentifier.localeCompare(b.identity.stableIdentifier),
-  );
+  candidates.sort((a, b) => a.identity.stableIdentifier.localeCompare(b.identity.stableIdentifier));
   return candidates;
 }

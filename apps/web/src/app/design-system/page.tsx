@@ -105,8 +105,8 @@ export default function DesignSystemPage() {
               <span className="ds-story-link__meta">School / Washington, D.C.</span>
               <h3 className="ds-story-link__title">Story link entry</h3>
               <p className="ds-story-link__summary">
-                Mono slug, display title, serif one-line story — the shared anatomy for rails, related
-                lists, and browse paths.
+                Mono slug, display title, serif one-line story — the shared anatomy for rails,
+                related lists, and browse paths.
               </p>
             </Link>
           </li>

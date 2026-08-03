@@ -109,10 +109,28 @@ test('reverse claims (founded orgs, authored works) are pulled via SPARQL, not f
   const sparqlAware: WikidataFetcher = async (url: string) => {
     if (url.includes('Special:EntityData/Q1.json')) return entityDataDoc('Q1', 'Test Person', {});
     if (url.includes('P112')) {
-      return { results: { bindings: [{ item: { value: 'http://www.wikidata.org/entity/Q99' }, itemLabel: { value: 'Founded Org' } }] } };
+      return {
+        results: {
+          bindings: [
+            {
+              item: { value: 'http://www.wikidata.org/entity/Q99' },
+              itemLabel: { value: 'Founded Org' },
+            },
+          ],
+        },
+      };
     }
     if (url.includes('P50')) {
-      return { results: { bindings: [{ item: { value: 'http://www.wikidata.org/entity/Q88' }, itemLabel: { value: 'Authored Work' } }] } };
+      return {
+        results: {
+          bindings: [
+            {
+              item: { value: 'http://www.wikidata.org/entity/Q88' },
+              itemLabel: { value: 'Authored Work' },
+            },
+          ],
+        },
+      };
     }
     throw new Error(`unexpected url ${url}`);
   };
@@ -128,7 +146,9 @@ test('reverse claims (founded orgs, authored works) are pulled via SPARQL, not f
 });
 
 test('candidate cap is enforced across hops', async () => {
-  const claims: Record<string, unknown[]> = { P108: [entityClaim('Qa'), entityClaim('Qb'), entityClaim('Qc')] };
+  const claims: Record<string, unknown[]> = {
+    P108: [entityClaim('Qa'), entityClaim('Qb'), entityClaim('Qc')],
+  };
   const fetcher = makeFetcher({
     'Special:EntityData/Q1.json': entityDataDoc('Q1', 'Test Person', claims),
     'Special:EntityData/Qa.json': entityDataDoc('Qa', 'A', {}),
@@ -168,7 +188,12 @@ test('stageNetworkCandidates never targets bb_canonical: rows go to the injected
     'query.wikidata.org': { results: { bindings: [] } },
   });
   const meta: { seedBirthDeathYears?: { birthYear?: number; deathYear?: number } } = {};
-  const candidates = await expandEntityNetwork(SEED, { depth: 1, maxCandidates: 50 }, fetcher, meta);
+  const candidates = await expandEntityNetwork(
+    SEED,
+    { depth: 1, maxCandidates: 50 },
+    fetcher,
+    meta,
+  );
 
   const staged: unknown[] = [];
   const rows = await stageNetworkCandidates(

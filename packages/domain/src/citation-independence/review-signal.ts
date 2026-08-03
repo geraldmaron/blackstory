@@ -23,8 +23,7 @@ export const CITATION_INDEPENDENCE_REVIEW_SIGNAL_VERSION =
   'citation-independence-review.v1' as const;
 
 /** Default cosine floor mirrors near-duplicate recall — permissive enough to surface review. */
-export const DEFAULT_CITATION_INDEPENDENCE_SIMILARITY_THRESHOLD =
-  DEFAULT_NEAR_DUPLICATE_THRESHOLD;
+export const DEFAULT_CITATION_INDEPENDENCE_SIMILARITY_THRESHOLD = DEFAULT_NEAR_DUPLICATE_THRESHOLD;
 
 export type CitationForIndependenceReview = {
   readonly citationId: string;
@@ -74,10 +73,7 @@ function claimsMutualIndependence(
   return independenceKeyForCitation(left) !== independenceKeyForCitation(right);
 }
 
-function canonicalPair(
-  leftId: string,
-  rightId: string,
-): readonly [string, string] {
+function canonicalPair(leftId: string, rightId: string): readonly [string, string] {
   return leftId.localeCompare(rightId) <= 0
     ? ([leftId, rightId] as const)
     : ([rightId, leftId] as const);
@@ -92,8 +88,7 @@ export function findCitationIndependenceReviewFlags(
   citations: readonly CitationForIndependenceReview[],
   options: FindCitationIndependenceReviewFlagsOptions = {},
 ): readonly ReviewFlag[] {
-  const threshold =
-    options.threshold ?? DEFAULT_CITATION_INDEPENDENCE_SIMILARITY_THRESHOLD;
+  const threshold = options.threshold ?? DEFAULT_CITATION_INDEPENDENCE_SIMILARITY_THRESHOLD;
   assertSimilarityThreshold(threshold);
 
   const flags: ReviewFlag[] = [];

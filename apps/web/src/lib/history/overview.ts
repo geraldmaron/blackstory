@@ -4,7 +4,11 @@
  * derived from those same filtered nodes so overview stats stay aligned with "Records in view".
  */
 import type { GraphReleaseArtifact } from '@repo/domain';
-import { filterDecadesAtOrBeforeCurrent, buildInclusiveDecadeRange, type DecadeReferenceDate } from '@repo/domain/era';
+import {
+  filterDecadesAtOrBeforeCurrent,
+  buildInclusiveDecadeRange,
+  type DecadeReferenceDate,
+} from '@repo/domain/era';
 import type { HistoryEdgeView, HistoryNodeView } from './build-history-graph';
 
 export type HistoryOverview = {

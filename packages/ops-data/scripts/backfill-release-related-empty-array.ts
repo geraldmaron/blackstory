@@ -57,7 +57,9 @@ async function main(): Promise<void> {
     console.log(`Rows to update: ${count}`);
 
     if (DRY_RUN || !APPLY) {
-      console.log('DRY_RUN=1 (default): no writes. Set DRY_RUN=0 BACKFILL_RELEASE_RELATED_APPLY=1 to apply.');
+      console.log(
+        'DRY_RUN=1 (default): no writes. Set DRY_RUN=0 BACKFILL_RELEASE_RELATED_APPLY=1 to apply.',
+      );
       return;
     }
 

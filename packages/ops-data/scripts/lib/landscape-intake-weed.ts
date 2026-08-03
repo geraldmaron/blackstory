@@ -40,8 +40,7 @@ export type WeedTriageBucket = {
   readonly candidateIds: readonly string[];
 };
 
-const MOCK_TEST =
-  /\b(mock|fixture|test packet|lorem ipsum)\b/i;
+const MOCK_TEST = /\b(mock|fixture|test packet|lorem ipsum)\b/i;
 
 const INVALID_URL = /^(?:$|(?!https?:\/\/).+)/i;
 

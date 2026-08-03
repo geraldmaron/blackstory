@@ -1,10 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { CSRF_COOKIE_NAME, CSRF_HEADER_NAME } from '../web-security/csrf';
-import {
-  createRequestIntegrityGuard,
-  type RequestIntegrityTelemetryEvent,
-} from './server';
+import { createRequestIntegrityGuard, type RequestIntegrityTelemetryEvent } from './server';
 
 const token = 'a'.repeat(64);
 
@@ -28,7 +25,10 @@ test('enforce mode fails closed for missing, mismatched, and cross-site requests
   if (!missing.allowed) assert.equal(missing.reason, 'missing_token');
 
   const mismatch = await guard({
-    headers: new Headers({ cookie: `${CSRF_COOKIE_NAME}=${token}`, [CSRF_HEADER_NAME]: 'b'.repeat(64) }),
+    headers: new Headers({
+      cookie: `${CSRF_COOKIE_NAME}=${token}`,
+      [CSRF_HEADER_NAME]: 'b'.repeat(64),
+    }),
   });
   assert.equal(mismatch.allowed, false);
   if (!mismatch.allowed) assert.equal(mismatch.reason, 'token_mismatch');

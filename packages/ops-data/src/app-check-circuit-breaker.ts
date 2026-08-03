@@ -62,7 +62,8 @@ type ResolvedConfig = {
 
 function resolveConfig(config: AppCheckCircuitBreakerConfig = {}): ResolvedConfig {
   return {
-    failureThreshold: config.failureThreshold ?? DEFAULT_APP_CHECK_CIRCUIT_BREAKER_CONFIG.failureThreshold,
+    failureThreshold:
+      config.failureThreshold ?? DEFAULT_APP_CHECK_CIRCUIT_BREAKER_CONFIG.failureThreshold,
     windowMs: config.windowMs ?? DEFAULT_APP_CHECK_CIRCUIT_BREAKER_CONFIG.windowMs,
     recoveryTimeoutMs:
       config.recoveryTimeoutMs ?? DEFAULT_APP_CHECK_CIRCUIT_BREAKER_CONFIG.recoveryTimeoutMs,
@@ -148,7 +149,10 @@ export function recordAppCheckVerifierFailure(
     };
   }
 
-  const failureTimestampsMs = [...pruneFailures(advanced.failureTimestampsMs, resolved.windowMs, nowMs), nowMs];
+  const failureTimestampsMs = [
+    ...pruneFailures(advanced.failureTimestampsMs, resolved.windowMs, nowMs),
+    nowMs,
+  ];
   if (failureTimestampsMs.length >= resolved.failureThreshold) {
     return {
       state: 'open',

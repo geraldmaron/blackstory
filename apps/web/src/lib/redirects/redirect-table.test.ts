@@ -154,10 +154,7 @@ test('the /explore rule is the exact path, so /explore/api keeps answering', () 
   // A `/explore/:path*` rule would swallow the Atlas's own refine endpoint, whose entire
   // contract is its query string.
   for (const rule of RULES) {
-    assert.ok(
-      !rule.source.startsWith('/explore/'),
-      `${rule.source} would capture /explore/api`,
-    );
+    assert.ok(!rule.source.startsWith('/explore/'), `${rule.source} would capture /explore/api`);
   }
   assert.equal(
     RULES.some((rule) => matches(rule.source, '/explore/api')),

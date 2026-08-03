@@ -11,9 +11,7 @@ const STATE_BY_POSTAL = new Map(
   US_STATES.map((state) => [state.postalCode.toUpperCase(), state] as const),
 );
 
-const STATE_BY_NAME = new Map(
-  US_STATES.map((state) => [state.name.toLowerCase(), state] as const),
-);
+const STATE_BY_NAME = new Map(US_STATES.map((state) => [state.name.toLowerCase(), state] as const));
 
 export type ParsedCityState = {
   readonly city: string;

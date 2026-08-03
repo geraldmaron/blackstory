@@ -15,18 +15,37 @@ test('round-trips a dated timeline event with precision', () => {
 });
 
 test('accepts an undated entry (at absent, atLabel carries the honest "Undated" label)', () => {
-  const input = { id: 'ev_1', atLabel: 'Undated', datePrecision: 'circa' as const, title: 'Founding', body: 'Date not precisely known.' };
+  const input = {
+    id: 'ev_1',
+    atLabel: 'Undated',
+    datePrecision: 'circa' as const,
+    title: 'Founding',
+    body: 'Date not precisely known.',
+  };
   assert.deepEqual(timelineEventV1Schema.parse(input), input);
 });
 
 test('rejects an unknown datePrecision (adversarial: unknown enum value)', () => {
   assert.throws(() =>
-    timelineEventV1Schema.parse({ id: 'ev_1', atLabel: 'x', datePrecision: 'century', title: 't', body: 'b' }),
+    timelineEventV1Schema.parse({
+      id: 'ev_1',
+      atLabel: 'x',
+      datePrecision: 'century',
+      title: 't',
+      body: 'b',
+    }),
   );
 });
 
 test('rejects a non-parseable `at` timestamp (adversarial: invalid date)', () => {
   assert.throws(() =>
-    timelineEventV1Schema.parse({ id: 'ev_1', atLabel: 'x', at: 'not-a-date', datePrecision: 'year', title: 't', body: 'b' }),
+    timelineEventV1Schema.parse({
+      id: 'ev_1',
+      atLabel: 'x',
+      at: 'not-a-date',
+      datePrecision: 'year',
+      title: 't',
+      body: 'b',
+    }),
   );
 });

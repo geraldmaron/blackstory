@@ -50,7 +50,10 @@ test('buildReleaseSourceFromLandscape produces claims from canonical_url', () =>
   const entry = buildReleaseSourceFromLandscape(baseRow());
   assert.ok(entry);
   assert.equal(entry?.claims?.length, 1);
-  assert.equal(entry?.claims?.[0]?.citationHref, 'https://historicsites.dcpreservation.org/items/show/1055');
+  assert.equal(
+    entry?.claims?.[0]?.citationHref,
+    'https://historicsites.dcpreservation.org/items/show/1055',
+  );
 });
 
 test('gateLandscapePublishCandidate rejects person privacy holds', () => {

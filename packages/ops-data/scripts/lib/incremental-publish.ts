@@ -15,10 +15,7 @@ import {
   type EntityStatusValue,
 } from '@repo/domain';
 import { computeClaimConfidence } from '../lib/confidence.ts';
-import {
-  lintPublishStatus,
-  type PublishStatusLintReport,
-} from './publish-status-linter.ts';
+import { lintPublishStatus, type PublishStatusLintReport } from './publish-status-linter.ts';
 
 export const INCREMENTAL_PUBLISH_CONFIDENCE_FLOOR = 0.75;
 
@@ -141,7 +138,9 @@ function lintBuiltProjection(
     entityId: entry.id,
     kind: entry.kind,
     summary: entry.summary,
-    ...(entry.historicalContext !== undefined ? { historicalContext: entry.historicalContext } : {}),
+    ...(entry.historicalContext !== undefined
+      ? { historicalContext: entry.historicalContext }
+      : {}),
     ...(projection.status !== undefined ? { status: projection.status } : {}),
     ...(projection.livingStatus !== undefined ? { livingStatus: projection.livingStatus } : {}),
   });
@@ -213,7 +212,9 @@ export function canonicalUpsertParamsFromLandscape(
   const review = asRecord(row.payload.personReview);
   const reviewLivingRaw = review.livingStatus;
   const reviewLiving =
-    typeof reviewLivingRaw === 'string' && isLivingStatus(reviewLivingRaw) ? reviewLivingRaw : undefined;
+    typeof reviewLivingRaw === 'string' && isLivingStatus(reviewLivingRaw)
+      ? reviewLivingRaw
+      : undefined;
   const livingStatus = row.kind === 'person' ? (reviewLiving ?? 'unknown') : 'not_applicable';
   return {
     id: entityId,
@@ -321,7 +322,9 @@ function minClaimConfidence(entry: ReleaseSourceEntity, row?: LandscapePublishRo
   return Number.isFinite(min) ? min : 0;
 }
 
-export function buildReleaseSourceFromLandscape(row: LandscapePublishRow): ReleaseSourceEntity | null {
+export function buildReleaseSourceFromLandscape(
+  row: LandscapePublishRow,
+): ReleaseSourceEntity | null {
   const provenance = {
     ...asRecord(row.payload.provenance),
     ...row.provenance,
@@ -342,7 +345,9 @@ export function buildReleaseSourceFromLandscape(row: LandscapePublishRow): Relea
   // Operator-attested living status from the privacy review marker (person rows).
   const review = asRecord(row.payload.personReview);
   const livingStatus =
-    review.livingStatus === 'deceased' || review.livingStatus === 'living' || review.livingStatus === 'unknown'
+    review.livingStatus === 'deceased' ||
+    review.livingStatus === 'living' ||
+    review.livingStatus === 'unknown'
       ? review.livingStatus
       : undefined;
 
@@ -350,9 +355,10 @@ export function buildReleaseSourceFromLandscape(row: LandscapePublishRow): Relea
   // of its coordinates here so the map renders an honest radius affordance instead of a
   // sharpened pin implying site-level accuracy the source data doesn't have.
   const geocode = asRecord(row.payload.geocode);
-  const locationPrecision = typeof geocode.precision === 'string' && geocode.precision.trim().length > 0
-    ? geocode.precision
-    : 'site';
+  const locationPrecision =
+    typeof geocode.precision === 'string' && geocode.precision.trim().length > 0
+      ? geocode.precision
+      : 'site';
 
   const claim: ReleaseSourceClaim = {
     predicate: 'documented_site',
@@ -391,7 +397,11 @@ export function gateLandscapePublishCandidate(input: {
 
   const reviewed = personReviewApproved(row.payload);
   if (row.kind === 'person' && !reviewed) {
-    return { eligible: false, reason: 'person_kind', detail: 'kind=person requires privacy review' };
+    return {
+      eligible: false,
+      reason: 'person_kind',
+      detail: 'kind=person requires privacy review',
+    };
   }
   if (resolveSourceCategory(row) === 'People' && !reviewed) {
     return {
@@ -411,10 +421,18 @@ export function gateLandscapePublishCandidate(input: {
     return { eligible: false, reason: 'missing_location', detail: 'missing lat/lng' };
   }
   if (row.exact_in_release) {
-    return { eligible: false, reason: 'already_in_public', detail: 'entity id already in active release' };
+    return {
+      eligible: false,
+      reason: 'already_in_public',
+      detail: 'entity id already in active release',
+    };
   }
   if (row.name_overlap) {
-    return { eligible: false, reason: 'name_overlap', detail: 'display_name overlaps existing release entity' };
+    return {
+      eligible: false,
+      reason: 'name_overlap',
+      detail: 'display_name overlaps existing release entity',
+    };
   }
 
   const entry = buildReleaseSourceFromLandscape(row);
@@ -465,7 +483,9 @@ export function gateLandscapePublishCandidate(input: {
   return { eligible: true, entry, confidence };
 }
 
-export function toReleaseEntityRow(projection: ReleaseEntityProjectionFields): ReleaseEntityUpsertRow {
+export function toReleaseEntityRow(
+  projection: ReleaseEntityProjectionFields,
+): ReleaseEntityUpsertRow {
   const related = normalizeReleaseRelated(projection.related);
   return {
     release_id: projection.releaseId,

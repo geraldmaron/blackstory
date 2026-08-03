@@ -320,32 +320,47 @@ const CURATED_LOCATIONS: Record<string, LocationFix> = {
   },
 };
 
-function parseNrhpJurisdiction(snippets: readonly string[] | undefined): Partial<LocationFix> | undefined {
+function parseNrhpJurisdiction(
+  snippets: readonly string[] | undefined,
+): Partial<LocationFix> | undefined {
   if (!snippets) return undefined;
   const nrhp = snippets.find((s) => s.includes('State:') && s.includes('County:'));
   if (!nrhp) return undefined;
   const state = nrhp.match(/State:\s*([^\n]+)/)?.[1]?.trim();
   const countyRaw = nrhp.match(/County:\s*([^\n]+)/)?.[1]?.trim();
   if (!state || !countyRaw) return undefined;
-  const county = countyRaw.split(/\s+/).slice(0, 3).join(' ').replace(/\s+(Vacherie|Charleston|McClellanville|White Castle|Ferriday|Marion|Westover).*$/i, '').trim();
-  const jurisdictionLabel = county.includes('Parish') || county.includes('County')
-    ? `${county}, ${state}`
-    : `${county}, ${state}`;
+  const county = countyRaw
+    .split(/\s+/)
+    .slice(0, 3)
+    .join(' ')
+    .replace(
+      /\s+(Vacherie|Charleston|McClellanville|White Castle|Ferriday|Marion|Westover).*$/i,
+      '',
+    )
+    .trim();
+  const jurisdictionLabel =
+    county.includes('Parish') || county.includes('County')
+      ? `${county}, ${state}`
+      : `${county}, ${state}`;
   return { jurisdictionLabel };
 }
 
 function applyLocationFix(subject: SubjectMeta, candidate?: Candidate): SubjectMeta {
   const curated = CURATED_LOCATIONS[subject.subjectId];
   const nrhp = parseNrhpJurisdiction(subject.sourceSnippets);
-  const fix = curated ?? (nrhp?.jurisdictionLabel
-    ? {
-        jurisdictionLabel: nrhp.jurisdictionLabel,
-        locationLabel: subject.title,
-        locationPrecision: (subject.kind === 'place' ? 'site' : 'city') as LocationFix['locationPrecision'],
-        lat: subject.lat ?? candidate?.lat,
-        lng: subject.lng ?? candidate?.lng,
-      }
-    : undefined);
+  const fix =
+    curated ??
+    (nrhp?.jurisdictionLabel
+      ? {
+          jurisdictionLabel: nrhp.jurisdictionLabel,
+          locationLabel: subject.title,
+          locationPrecision: (subject.kind === 'place'
+            ? 'site'
+            : 'city') as LocationFix['locationPrecision'],
+          lat: subject.lat ?? candidate?.lat,
+          lng: subject.lng ?? candidate?.lng,
+        }
+      : undefined);
 
   if (!fix) return subject;
 
@@ -389,10 +404,32 @@ function mergeSubjects(
 function fixEraCentury(bucket: string): string[] {
   const lower = bucket.trim().toLowerCase();
   if (lower === '19th century') {
-    return ['1800s', '1810s', '1820s', '1830s', '1840s', '1850s', '1860s', '1870s', '1880s', '1890s'];
+    return [
+      '1800s',
+      '1810s',
+      '1820s',
+      '1830s',
+      '1840s',
+      '1850s',
+      '1860s',
+      '1870s',
+      '1880s',
+      '1890s',
+    ];
   }
   if (lower === '20th century') {
-    return ['1900s', '1910s', '1920s', '1930s', '1940s', '1950s', '1960s', '1970s', '1980s', '1990s'];
+    return [
+      '1900s',
+      '1910s',
+      '1920s',
+      '1930s',
+      '1940s',
+      '1950s',
+      '1960s',
+      '1970s',
+      '1980s',
+      '1990s',
+    ];
   }
   return [];
 }
@@ -427,7 +464,10 @@ function normalizePacket(item: EnrichmentItem): EnrichmentItem {
   };
 }
 
-function mergeRuns(priorityItems: readonly EnrichmentItem[], e2Items: readonly EnrichmentItem[]): EnrichmentItem[] {
+function mergeRuns(
+  priorityItems: readonly EnrichmentItem[],
+  e2Items: readonly EnrichmentItem[],
+): EnrichmentItem[] {
   const byId = new Map<string, EnrichmentItem>();
 
   for (const item of priorityItems) {
@@ -449,9 +489,9 @@ function main(): void {
   const prioritySubjects = JSON.parse(
     readFileSync(join(cacheDir, 'subjects-priority-batch.json'), 'utf8'),
   ) as { subjects: SubjectMeta[] };
-  const e2Subjects = JSON.parse(
-    readFileSync(join(cacheDir, 'subjects-e2-retry.json'), 'utf8'),
-  ) as { subjects: SubjectMeta[] };
+  const e2Subjects = JSON.parse(readFileSync(join(cacheDir, 'subjects-e2-retry.json'), 'utf8')) as {
+    subjects: SubjectMeta[];
+  };
   const candidates = JSON.parse(
     readFileSync(join(cacheDir, 'priority-batch-candidates.json'), 'utf8'),
   ) as { candidates: Candidate[] };
@@ -475,7 +515,9 @@ function main(): void {
     (s) => !s.jurisdictionLabel || !s.locationLabel || !s.locationPrecision,
   );
   const missingCoords = promoteReadySubjects.filter(
-    (s) => (s.kind === 'place' || s.locationPrecision === 'site') && (s.lat === undefined || s.lng === undefined),
+    (s) =>
+      (s.kind === 'place' || s.locationPrecision === 'site') &&
+      (s.lat === undefined || s.lng === undefined),
   );
 
   mkdirSync(cacheDir, { recursive: true });

@@ -62,9 +62,7 @@ function isWaybackCaptureUrl(value: string): boolean {
 
 function isContentHashPresent(contentHash: ContentHash | undefined): boolean {
   return (
-    contentHash !== undefined &&
-    isNonEmpty(contentHash.algorithm) &&
-    isNonEmpty(contentHash.digest)
+    contentHash !== undefined && isNonEmpty(contentHash.algorithm) && isNonEmpty(contentHash.digest)
   );
 }
 

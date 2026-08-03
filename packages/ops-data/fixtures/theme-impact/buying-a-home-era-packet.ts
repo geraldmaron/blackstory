@@ -390,7 +390,7 @@ const ARTIFACTS = [
     provenance: {
       source: 'shelley-v-kraemer-record',
       sourceUrl:
-      'https://tile.loc.gov/storage-services/service/ll/usrep/usrep334/usrep334001/usrep334001.pdf',
+        'https://tile.loc.gov/storage-services/service/ll/usrep/usrep334/usrep334001/usrep334001.pdf',
       retrievedAt: RETRIEVED,
       contentHash: 'ev_shelley_covenant_st_louis',
       humanCitation:
@@ -514,8 +514,7 @@ const ARTIFACTS = [
       sourceUrl: 'https://www.govinfo.gov/content/pkg/STATUTE-82/pdf/STATUTE-82-Pg73.pdf',
       retrievedAt: RETRIEVED,
       contentHash: '6f769a06db36c70e8b1295ce2f96fd5e3e7317f3e9f2da9f45e937d4d0a2badd',
-      humanCitation:
-        'Civil Rights Act of 1968, Pub. L. 90-284, title VIII, § 810(a), 82 Stat. 85.',
+      humanCitation: 'Civil Rights Act of 1968, Pub. L. 90-284, title VIII, § 810(a), 82 Stat. 85.',
     },
   },
   {

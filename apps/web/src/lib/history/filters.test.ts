@@ -101,10 +101,7 @@ test('applyHistoryKindFilter matches a category by any member kind, and raw kind
     ...DEFAULT_HISTORY_FILTERS,
     kind: 'organizations',
   });
-  assert.deepEqual(
-    orgs.map((node) => node.kind).sort(),
-    ['institution', 'school'],
-  );
+  assert.deepEqual(orgs.map((node) => node.kind).sort(), ['institution', 'school']);
   const rawSchools = applyHistoryKindFilter(nodes, { ...DEFAULT_HISTORY_FILTERS, kind: 'school' });
   assert.equal(rawSchools.length, 1);
   assert.equal(rawSchools[0]!.kind, 'school');

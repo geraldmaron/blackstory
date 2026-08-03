@@ -35,10 +35,7 @@ test('bundled policy copy matches authored constitution JSON', () => {
   const authored = JSON.parse(readFileSync(POLICY_V1_PATH, 'utf8')) as { policyVersion?: string };
   const policy = loadProductConstitution();
   assert.equal(policy.policyVersion, authored.policyVersion);
-  assert.deepEqual(
-    structuredClone(policy),
-    productConstitutionFromFile(),
-  );
+  assert.deepEqual(structuredClone(policy), productConstitutionFromFile());
 });
 
 function productConstitutionFromFile(): unknown {

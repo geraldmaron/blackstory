@@ -16,13 +16,7 @@ export const LAW_EDITION_ROOT_CLASS = 'ds-law-edition';
 export const LAW_EDITION_PANEL_CLASS = 'ds-law-edition__panel';
 
 export type LawEditionPanelVariant =
-  | 'intro'
-  | 'disclaimer'
-  | 'browse'
-  | 'about'
-  | 'explainer'
-  | 'provenance'
-  | 'close';
+  'intro' | 'disclaimer' | 'browse' | 'about' | 'explainer' | 'provenance' | 'close';
 
 export function lawEditionRootClassName(): string {
   return `${LAW_EDITION_ROOT_CLASS} ${editionAtmosphereCanvasClassName()}`;

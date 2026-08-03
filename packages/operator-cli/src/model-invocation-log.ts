@@ -57,7 +57,10 @@ export async function logModelInvocation(
       completion.modelId,
       completion.modelId.split('/')[0] ?? completion.provider,
       JSON.stringify({ servedBy: completion.servedBy, attempts: completion.attempts }),
-      JSON.stringify({ promptTokens: usage.promptTokens, completionTokens: usage.completionTokens }),
+      JSON.stringify({
+        promptTokens: usage.promptTokens,
+        completionTokens: usage.completionTokens,
+      }),
       input.promptHash,
       input.outputSchemaId,
       input.outputSchemaVersion,

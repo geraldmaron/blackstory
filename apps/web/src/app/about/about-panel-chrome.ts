@@ -16,12 +16,7 @@ export const ABOUT_EDITION_ROOT_CLASS = 'ds-about-edition';
 export const ABOUT_EDITION_PANEL_CLASS = 'ds-about-edition__panel';
 
 export type AboutEditionPanelVariant =
-  | 'intro'
-  | 'pillars'
-  | 'mission'
-  | 'publish'
-  | 'destinations'
-  | 'close';
+  'intro' | 'pillars' | 'mission' | 'publish' | 'destinations' | 'close';
 
 export function aboutEditionRootClassName(): string {
   return `${ABOUT_EDITION_ROOT_CLASS} ${editionAtmosphereCanvasClassName()}`;

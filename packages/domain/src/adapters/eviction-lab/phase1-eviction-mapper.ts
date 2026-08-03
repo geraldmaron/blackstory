@@ -213,7 +213,9 @@ export function parsePhase1EvictionCountyCsv(csvText: string): {
       continue;
     }
     if (type !== 'observed') {
-      rejected.push(`skipped non-observed row (${type || 'missing type'}): cofips=${cofips} year=${year}`);
+      rejected.push(
+        `skipped non-observed row (${type || 'missing type'}): cofips=${cofips} year=${year}`,
+      );
       continue;
     }
     if (filingRate === undefined || filingRate < 0) {

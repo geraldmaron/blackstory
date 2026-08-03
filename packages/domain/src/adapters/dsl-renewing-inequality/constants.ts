@@ -4,8 +4,7 @@
  */
 
 /** Registry homepage — cite on every artifact and observation. */
-export const DSL_RENEWING_INEQUALITY_HOMEPAGE_URL =
-  'https://dsl.richmond.edu/panorama/renewal/';
+export const DSL_RENEWING_INEQUALITY_HOMEPAGE_URL = 'https://dsl.richmond.edu/panorama/renewal/';
 
 /** GitHub data repository (non_spatial attributes + gated GeoJSON). */
 export const DSL_RENEWING_INEQUALITY_GITHUB_REPO_URL =

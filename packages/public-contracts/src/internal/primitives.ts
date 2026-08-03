@@ -17,9 +17,12 @@ export const idString = (maxLength = 200) => z.string().trim().min(1).max(maxLen
 
 /** Free text with an explicit upper bound — never `z.string()` unbounded. */
 export const boundedText = (maxLength: number, minLength = 0) =>
-  z.string().max(maxLength).refine((value) => value.length >= minLength, {
-    message: `Expected at least ${minLength} character(s)`,
-  });
+  z
+    .string()
+    .max(maxLength)
+    .refine((value) => value.length >= minLength, {
+      message: `Expected at least ${minLength} character(s)`,
+    });
 
 export const nonEmptyText = (maxLength: number) => boundedText(maxLength, 1);
 
@@ -43,9 +46,12 @@ export const httpUrl = (maxLength = 2000) => {
 
 /** ISO-8601 timestamp string. Rejects non-parseable values (adversarial case: invalid dates). */
 export const isoTimestamp = () =>
-  z.string().max(64).refine((value) => !Number.isNaN(Date.parse(value)), {
-    message: 'Expected an ISO-8601 timestamp',
-  });
+  z
+    .string()
+    .max(64)
+    .refine((value) => !Number.isNaN(Date.parse(value)), {
+      message: 'Expected an ISO-8601 timestamp',
+    });
 
 /** Bounded array — every list-valued public field must go through this, never bare `z.array()`. */
 export const boundedArray = <T extends z.ZodTypeAny>(item: T, maxItems: number) =>

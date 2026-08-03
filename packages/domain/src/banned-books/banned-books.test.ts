@@ -48,7 +48,11 @@ const BASE_BOOK: BannedBookRecord = {
       citation: CITATION,
     },
   ],
-  citations: [CITATION, { ...CITATION, label: 'NCAC Report' }, { ...CITATION, label: 'ALA Office' }],
+  citations: [
+    CITATION,
+    { ...CITATION, label: 'NCAC Report' },
+    { ...CITATION, label: 'ALA Office' },
+  ],
   purchaseLinks: buildIsbnPurchaseLinks('9780307278449'),
   provenance: {
     source: 'PEN America',
@@ -137,11 +141,11 @@ test('assertBannedBookRecord accepts YYYY-MM-DD publishedDate', () => {
 });
 
 test('assertBannedBookRecord rejects empty title and authors', () => {
-  assert.throws(() => assertBannedBookRecord({ ...BASE_BOOK, title: '  ' }), /title must be non-empty/);
   assert.throws(
-    () => assertBannedBookRecord({ ...BASE_BOOK, authors: [] }),
-    /at least one author/,
+    () => assertBannedBookRecord({ ...BASE_BOOK, title: '  ' }),
+    /title must be non-empty/,
   );
+  assert.throws(() => assertBannedBookRecord({ ...BASE_BOOK, authors: [] }), /at least one author/);
   assert.throws(
     () => assertBannedBookRecord({ ...BASE_BOOK, authors: [{ name: ' ' }] }),
     /authors\[0\]\.name must be non-empty/,

@@ -72,7 +72,10 @@ export function formatMonths(value: number): string {
   return `${value.toLocaleString('en-US')} mo.`;
 }
 
-export function formatDataPageValue(value: number, unit: 'usd' | 'percent' | 'per_100k' | 'months'): string {
+export function formatDataPageValue(
+  value: number,
+  unit: 'usd' | 'percent' | 'per_100k' | 'months',
+): string {
   switch (unit) {
     case 'usd':
       return formatUsd(value);

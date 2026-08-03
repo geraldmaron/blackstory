@@ -61,7 +61,10 @@ function kindPairPrior(kindA?: string, kindB?: string): number {
   return 8;
 }
 
-function sharedDecadeCount(entityA: RelationshipCandidateEntity, entityB: RelationshipCandidateEntity): number {
+function sharedDecadeCount(
+  entityA: RelationshipCandidateEntity,
+  entityB: RelationshipCandidateEntity,
+): number {
   const decadesA = new Set(entityA.decades ?? []);
   if (decadesA.size === 0) return 0;
   return (entityB.decades ?? []).filter((decade) => decadesA.has(decade)).length;

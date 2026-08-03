@@ -20,7 +20,6 @@ const sampleClaim = {
   citationLabel: 'lbl',
 };
 
-
 /*
  * These three cases used to read packages/ops-data/fixtures/national-catalog/*.json. Those
  * fixtures were retired in f8c81a06 when Supabase became the only entity store, and because this
@@ -89,10 +88,9 @@ test('extractCatalogRelationships dedups Rosa Parks museum and arrest site locat
 });
 
 test('extractCatalogRelationships dedups Edmund Pettus Bridge and Selma marches occurred_at pair', () => {
-  const { relationships, skipped } = extractCatalogRelationships(
-    [bridgeFixture, marchesFixture],
-    { generatedAt },
-  );
+  const { relationships, skipped } = extractCatalogRelationships([bridgeFixture, marchesFixture], {
+    generatedAt,
+  });
 
   assert.equal(skipped.length, 0);
   assert.equal(relationships.length, 1);

@@ -61,7 +61,11 @@ import {
   stageHarnessAdjudicatedRelationships,
 } from './harness-relationship-staging.js';
 import { createNodeSafeFetchDependencies, runQuickAddFetch } from './fetch.js';
-import { createMetadataOnlyStorage, type CaptureDeps, type CaptureStorage } from './source-capture.js';
+import {
+  createMetadataOnlyStorage,
+  type CaptureDeps,
+  type CaptureStorage,
+} from './source-capture.js';
 import { createSupabaseStorage, supabaseStorageConfigFromEnv } from './supabase-storage.js';
 import { runCaptureBackfill, persistCapture } from './capture-backfill.js';
 
@@ -1152,7 +1156,9 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
               isShownAt: 'https://archive.org/item1',
               sourceResource: {
                 title: ['Chicago Housing segregation study'],
-                description: ['A report detailing HOLC mortgage boundaries and housing credit in Chicago during 1937.'],
+                description: [
+                  'A report detailing HOLC mortgage boundaries and housing credit in Chicago during 1937.',
+                ],
               },
             },
             {
@@ -1160,7 +1166,9 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
               isShownAt: 'https://archive.org/item2',
               sourceResource: {
                 title: ['Providence Hospital Auxiliary Board'],
-                description: ['Organized in 1892 to support Chicago Providence Hospital operations.'],
+                description: [
+                  'Organized in 1892 to support Chicago Providence Hospital operations.',
+                ],
               },
             },
           ];
@@ -1177,7 +1185,9 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
             if (searxngBaseUrl) {
               // Project's chosen web-search provider (see provider-decision.ts): self-hosted
               // SearXNG on Corsair, preferred over commercial Brave/Exa keys.
-              const res = await fetch(buildSearxngSearchUrl({ baseUrl: searxngBaseUrl, query: searchQuery }));
+              const res = await fetch(
+                buildSearxngSearchUrl({ baseUrl: searxngBaseUrl, query: searchQuery }),
+              );
               const json: unknown = await res.json();
               rawResults = parseSearxngSearchResponse(json).results;
               servedBy = 'searxng';
@@ -1198,15 +1208,21 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
               ];
               servedBy = 'mock';
             }
-            reportHarnessProgress({ stage: 'web_search.servedBy', servedBy, resultCount: rawResults.length });
-            const webSubjects: HarnessRawSubject[] = rawResults.slice(0, 5).map((result, index) => ({
-              id: `web-${index}`,
-              connectorKind: 'web_search',
-              title: result.title ?? 'Unknown Page',
-              description: result.description ?? '',
-              cites: [result.url],
-              rawRecord: { ...result, servedBy },
-            }));
+            reportHarnessProgress({
+              stage: 'web_search.servedBy',
+              servedBy,
+              resultCount: rawResults.length,
+            });
+            const webSubjects: HarnessRawSubject[] = rawResults
+              .slice(0, 5)
+              .map((result, index) => ({
+                id: `web-${index}`,
+                connectorKind: 'web_search',
+                title: result.title ?? 'Unknown Page',
+                description: result.description ?? '',
+                cites: [result.url],
+                rawRecord: { ...result, servedBy },
+              }));
             rawSubjects = [...rawSubjects, ...webSubjects];
           } catch (err) {
             stderr(`Warning: Web search failed: ${String(err)}\n`);
@@ -1224,7 +1240,7 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
         try {
           const pool = getOpsPostgresPool(process.env);
           const searchResult = await pool.query<{ name: string; entity_id: string }>(
-            `SELECT name, entity_id FROM bb_public.search_index LIMIT 2000`
+            `SELECT name, entity_id FROM bb_public.search_index LIMIT 2000`,
           );
           existingProfiles = searchResult.rows;
         } catch (err) {
@@ -1233,12 +1249,12 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
 
         const deduplicatedSubjects = rawSubjects.map((subject) => {
           const cleanName = subject.title.toLowerCase().trim();
-          const matched = existingProfiles.find(
-            (p) => {
-              const pName = p.name ? p.name.toLowerCase().trim() : '';
-              return pName === cleanName || pName.startsWith(cleanName) || cleanName.startsWith(pName);
-            }
-          );
+          const matched = existingProfiles.find((p) => {
+            const pName = p.name ? p.name.toLowerCase().trim() : '';
+            return (
+              pName === cleanName || pName.startsWith(cleanName) || cleanName.startsWith(pName)
+            );
+          });
           return {
             ...subject,
             existingEntityId: matched ? matched.entity_id : null,
@@ -1246,7 +1262,9 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
           };
         });
 
-        const overlaps = findSpatialTemporalOverlaps(deduplicatedSubjects, { maxDistanceMeters: 10000 });
+        const overlaps = findSpatialTemporalOverlaps(deduplicatedSubjects, {
+          maxDistanceMeters: 10000,
+        });
 
         reportHarnessProgress({
           stage: 'dedup.complete',
@@ -1355,7 +1373,9 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
           (entry): entry is AdjudicatedRelationship => !('error' in entry),
         );
 
-        let stagedHarnessRelations: Awaited<ReturnType<typeof stageHarnessAdjudicatedRelationships>> = [];
+        let stagedHarnessRelations: Awaited<
+          ReturnType<typeof stageHarnessAdjudicatedRelationships>
+        > = [];
         if (flags.booleans.has('--commit') && successfulAdjudications.length > 0) {
           const pool = getOpsPostgresPool(process.env);
           const client = await pool.connect();
@@ -1561,7 +1581,18 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
             LIMIT $1`,
           [limit],
         );
-        stdout(JSON.stringify({ verb: 'graylist-read', source: 'postgres:intake_items', count: rows.length, items: rows }, null, 2));
+        stdout(
+          JSON.stringify(
+            {
+              verb: 'graylist-read',
+              source: 'postgres:intake_items',
+              count: rows.length,
+              items: rows,
+            },
+            null,
+            2,
+          ),
+        );
         return 0;
       }
       case 'quarantine-triage': {
@@ -1575,7 +1606,11 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
         }
         const thresholdRaw = optionalFlag(flags, '--confidence-threshold');
         const confidenceThreshold = thresholdRaw ? Number(thresholdRaw) : 0.6;
-        if (!Number.isFinite(confidenceThreshold) || confidenceThreshold < 0 || confidenceThreshold > 1) {
+        if (
+          !Number.isFinite(confidenceThreshold) ||
+          confidenceThreshold < 0 ||
+          confidenceThreshold > 1
+        ) {
           throw new Error('--confidence-threshold must be a number between 0 and 1');
         }
         const providerName = (optionalFlag(flags, '--provider') ?? 'mock') as
@@ -1591,19 +1626,21 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
             LIMIT $1`,
           [limit],
         );
-        const items: QuarantineIntakeItem[] = rows.map((row: {
-          id: string;
-          kind: string | null;
-          payload: unknown;
-          source_url: string | null;
-          created_at: Date | string;
-        }) => ({
-          id: row.id,
-          kind: row.kind,
-          payload: row.payload,
-          sourceUrl: row.source_url,
-          createdAt: new Date(row.created_at).toISOString(),
-        }));
+        const items: QuarantineIntakeItem[] = rows.map(
+          (row: {
+            id: string;
+            kind: string | null;
+            payload: unknown;
+            source_url: string | null;
+            created_at: Date | string;
+          }) => ({
+            id: row.id,
+            kind: row.kind,
+            payload: row.payload,
+            sourceUrl: row.source_url,
+            createdAt: new Date(row.created_at).toISOString(),
+          }),
+        );
         const nowIso = new Date(deps.nowMs ?? Date.now()).toISOString();
         const progressPath = optionalFlag(flags, '--progress-path');
         if (progressPath) writeFile(progressPath, '');
@@ -1735,12 +1772,12 @@ ntf-3,Providence Hospital,"First African American owned and operated hospital in
       default: {
         stderr(
           'Usage: operator-cli <preflight|model-report|submit-lead|research-intake|register-source|attach-evidence|bulk-import|propose-edge|discovery-run|community-obscurity-run|rss-campaign-run|discovery-dispatch|pending-list|editorial-run|enrichment-run|story-research-run|sundown-town-brief|harness-run|locate|backfill-entity|prose-run|expand|graylist-read> [flags]\n' +
-          'Every command accepts --json (no-op: output is always JSON) and every id-bearing command uses --entity-id / --case-id for its target.\n' +
-          'For model-report: [--since <ISO date>] [--json]\n' +
-          'For harness-run: --theme <theme> --metro <metro> [--connectors dpla,nps_network_to_freedom,web_search] [--enrich] [--provider openrouter|ollama|mock] [--progress-path <file>]\n' +
-          'For backfill-entity/prose-run: --entity-id <id> [--title ...] [--summary ...] [--provider mock|openrouter|ollama|hybrid] [--commit]\n' +
-          'For expand: --entity-id <id> [--depth N] — stub pending repo-xez5.4\n' +
-          'For graylist-read: [--limit N] — Postgres quarantine only, see docs/research/research-operations.md\n'
+            'Every command accepts --json (no-op: output is always JSON) and every id-bearing command uses --entity-id / --case-id for its target.\n' +
+            'For model-report: [--since <ISO date>] [--json]\n' +
+            'For harness-run: --theme <theme> --metro <metro> [--connectors dpla,nps_network_to_freedom,web_search] [--enrich] [--provider openrouter|ollama|mock] [--progress-path <file>]\n' +
+            'For backfill-entity/prose-run: --entity-id <id> [--title ...] [--summary ...] [--provider mock|openrouter|ollama|hybrid] [--commit]\n' +
+            'For expand: --entity-id <id> [--depth N] — stub pending repo-xez5.4\n' +
+            'For graylist-read: [--limit N] — Postgres quarantine only, see docs/research/research-operations.md\n',
         );
         return command ? 1 : 0;
       }

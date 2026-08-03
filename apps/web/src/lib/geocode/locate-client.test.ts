@@ -53,7 +53,10 @@ test('maps a 200 ok:false response to kind:"fallback"', async () => {
 
 test('maps a 401 to kind:"request_integrity_denied"', async () => {
   const original = globalThis.fetch;
-  globalThis.fetch = stubFetch(401, { error: 'request_integrity_required', reason: 'missing_token' });
+  globalThis.fetch = stubFetch(401, {
+    error: 'request_integrity_required',
+    reason: 'missing_token',
+  });
   try {
     const result = await fetchLocateByAddress('123 Main St');
     assert.equal(result.kind, 'request_integrity_denied');

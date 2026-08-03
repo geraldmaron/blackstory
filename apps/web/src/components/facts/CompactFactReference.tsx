@@ -20,8 +20,13 @@ export function CompactFactReference({ view }: CompactFactReferenceProps) {
       meta={<span className="bb-mono">{view.id}</span>}
       as="article"
     >
-      <p className="bb-sans" style={{ margin: '0 0 var(--bb-space-3) 0' }}>{view.statement}</p>
-      <p className="bb-sans" style={{ margin: '0 0 var(--bb-space-3) 0', color: 'var(--bb-ink-muted)' }}>
+      <p className="bb-sans" style={{ margin: '0 0 var(--bb-space-3) 0' }}>
+        {view.statement}
+      </p>
+      <p
+        className="bb-sans"
+        style={{ margin: '0 0 var(--bb-space-3) 0', color: 'var(--bb-ink-muted)' }}
+      >
         {humanizeToken(view.claimType)} · {humanizeToken(view.confidence)} · {view.citationCount}{' '}
         {view.citationCount === 1 ? 'citation' : 'citations'}
       </p>

@@ -106,16 +106,23 @@ async function fetchLocJson(url: string, label?: string): Promise<unknown | null
       });
       if (res.status === 429 || res.status >= 500) {
         const retryAfterHeader = Number(res.headers.get('retry-after'));
-        const retryAfterMs = Number.isFinite(retryAfterHeader) && retryAfterHeader > 0 ? retryAfterHeader * 1000 : null;
+        const retryAfterMs =
+          Number.isFinite(retryAfterHeader) && retryAfterHeader > 0
+            ? retryAfterHeader * 1000
+            : null;
         const backoffMs = retryAfterMs ?? 8000 * 2 ** attempt;
-        console.log(`  [${label ?? url}] status=${res.status}, backing off ${Math.round(backoffMs / 1000)}s (attempt ${attempt + 1}/5)`);
+        console.log(
+          `  [${label ?? url}] status=${res.status}, backing off ${Math.round(backoffMs / 1000)}s (attempt ${attempt + 1}/5)`,
+        );
         await new Promise((resolve) => setTimeout(resolve, backoffMs));
         continue;
       }
       if (!res.ok) return null;
       return (await res.json()) as unknown;
     } catch (error) {
-      console.log(`  [${label ?? url}] fetch error: ${error instanceof Error ? error.message : error} (attempt ${attempt + 1}/5)`);
+      console.log(
+        `  [${label ?? url}] fetch error: ${error instanceof Error ? error.message : error} (attempt ${attempt + 1}/5)`,
+      );
       await new Promise((resolve) => setTimeout(resolve, 4000 * (attempt + 1)));
     } finally {
       clearTimeout(timeout);
@@ -148,7 +155,10 @@ async function mapWithConcurrency<T, R>(
  * { displayName: "The Advance (Wilmington, Del.)", datePhrase: "1899-19??" }.
  * The "[Online Resource]" suffix (print/online duplicate records) is dropped.
  */
-export function parseDirectoryTitle(raw: string): { displayName: string; datePhrase: string | null } {
+export function parseDirectoryTitle(raw: string): {
+  displayName: string;
+  datePhrase: string | null;
+} {
   const withoutOnline = raw.replace(/\s*\[online resource\]\s*$/iu, '').trim();
   const dateMatch = /\s+((?:1[6-9]|20)\d{2}[0-9u?xX-]*(?:-(?:(?:1[6-9]|20)?[\d?u]{2,4})?)?)$/u.exec(
     withoutOnline,
@@ -236,7 +246,7 @@ async function main(): Promise<void> {
         locationTerms: result.location ?? [],
       });
     }
-    const pageCount = (data.pagination?.total ?? page);
+    const pageCount = data.pagination?.total ?? page;
     if (page >= pageCount) break;
   }
   const scraped = [...byLccn.values()];
@@ -281,18 +291,21 @@ async function main(): Promise<void> {
     return true;
   });
 
-  console.log(`Verifying ${toVerify.length} candidate title(s) against loc.gov item API (concurrency=2)...`);
+  console.log(
+    `Verifying ${toVerify.length} candidate title(s) against loc.gov item API (concurrency=2)...`,
+  );
   let verifiedCount = 0;
   const verifyResults = await mapWithConcurrency(toVerify, 2, async (title) => {
     // Per-row verification: the item's own fo=json endpoint must resolve and
     // its item.title must share tokens with the directory title.
-    const itemJson = (await fetchLocJson(`${title.canonicalUrl}?fo=json`, title.displayName)) as
-      | { item?: { title?: string } }
-      | null;
+    const itemJson = (await fetchLocJson(`${title.canonicalUrl}?fo=json`, title.displayName)) as {
+      item?: { title?: string };
+    } | null;
     const itemTitle = itemJson?.item?.title;
     const bareTitle = title.displayName.replace(/\s*\([^)]*\)\s*$/u, '');
     const ok = Boolean(
-      itemTitle && normalizeNameForDiff(itemTitle).includes(normalizeNameForDiff(bareTitle).split(' ')[0] ?? ''),
+      itemTitle &&
+      normalizeNameForDiff(itemTitle).includes(normalizeNameForDiff(bareTitle).split(' ')[0] ?? ''),
     );
     verifiedCount += 1;
     if (verifiedCount % 25 === 0 || verifiedCount === toVerify.length) {
@@ -303,7 +316,11 @@ async function main(): Promise<void> {
   const netNewRows: ScrapedTitle[] = [];
   for (const result of verifyResults) {
     if (result.ok) netNewRows.push(result.title);
-    else urlFailedRows.push({ displayName: result.title.displayName, canonicalUrl: result.title.canonicalUrl });
+    else
+      urlFailedRows.push({
+        displayName: result.title.displayName,
+        canonicalUrl: result.title.canonicalUrl,
+      });
   }
 
   const generatedAt = new Date().toISOString();
@@ -330,7 +347,11 @@ async function main(): Promise<void> {
 
   console.log('\nWould-be-staged rows (net-new):');
   console.table(
-    netNewRows.map((row) => ({ name: row.displayName, lccn: row.lccn, canonical_url: row.canonicalUrl })),
+    netNewRows.map((row) => ({
+      name: row.displayName,
+      lccn: row.lccn,
+      canonical_url: row.canonicalUrl,
+    })),
   );
   console.log(
     `\nCounts: scraped=${report.counts.scraped} duplicates=${duplicateRecords} malformed=${malformedRecords} ` +
@@ -352,7 +373,9 @@ async function main(): Promise<void> {
   console.log(`\nReport written to ${reportPath}`);
 
   if (DRY_RUN || !APPLY) {
-    console.log('\nDRY_RUN=1 (default): no database writes. Set DRY_RUN=0 BLACK_NEWSPAPERS_APPLY=1 to apply.');
+    console.log(
+      '\nDRY_RUN=1 (default): no database writes. Set DRY_RUN=0 BLACK_NEWSPAPERS_APPLY=1 to apply.',
+    );
     await pool.end();
     return;
   }
@@ -430,7 +453,8 @@ async function main(): Promise<void> {
   }
 }
 
-const invokedDirectly = process.argv[1] != null && import.meta.url === new URL(`file://${process.argv[1]}`).href;
+const invokedDirectly =
+  process.argv[1] != null && import.meta.url === new URL(`file://${process.argv[1]}`).href;
 if (invokedDirectly || process.env.BLACK_NEWSPAPERS_RUN === '1') {
   main().catch((error) => {
     console.error(error);

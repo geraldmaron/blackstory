@@ -12,7 +12,9 @@ export function assertPostgresOpsDataSource(
 ): void {
   resolveOpsDataSource(environment);
   const explicit = (
-    environment.OPS_DATA_SOURCE?.trim() || environment.ADMIN_DATA_SOURCE?.trim() || ''
+    environment.OPS_DATA_SOURCE?.trim() ||
+    environment.ADMIN_DATA_SOURCE?.trim() ||
+    ''
   ).toLowerCase();
   if (explicit !== 'postgres') {
     throw new Error(POSTGRES_OPS_DATA_SOURCE_MESSAGE);

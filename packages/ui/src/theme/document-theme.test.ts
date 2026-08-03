@@ -32,9 +32,9 @@ describe('THEME_BOOTSTRAP_SCRIPT', () => {
 
 describe('bootstrap script', () => {
   it('embeds the real storage key', () => {
-  // The key is inlined rather than interpolated (see document-theme.ts). This is the guard that
-  // keeps the literal and the constant from drifting apart, which would silently break theme
-  // persistence: the bootstrap would read one key and the app would write another.
+    // The key is inlined rather than interpolated (see document-theme.ts). This is the guard that
+    // keeps the literal and the constant from drifting apart, which would silently break theme
+    // persistence: the bootstrap would read one key and the app would write another.
     assert.ok(
       THEME_BOOTSTRAP_SCRIPT.includes(`'${THEME_STORAGE_KEY}'`),
       `bootstrap must read ${THEME_STORAGE_KEY}`,

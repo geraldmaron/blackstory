@@ -202,8 +202,7 @@ async function completeOpenAiCompatible(
             },
           }
         : {};
-  const modelExtraBody =
-    providerId === 'openrouter' ? openRouterModelExtraBody(request.model) : {};
+  const modelExtraBody = providerId === 'openrouter' ? openRouterModelExtraBody(request.model) : {};
   let response: Response;
   try {
     response = await fetchImpl(`${baseUrl.replace(/\/$/, '')}/chat/completions`, {

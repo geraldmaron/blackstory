@@ -66,10 +66,7 @@ test('token order does not matter, but a contiguous substring still outranks tok
   const contiguous = record({ id: 'contig', displayName: 'Calvin Shirley Memorial' });
   const scattered = record({ id: 'scattered', displayName: 'Dr. Calvin H. Shirley' });
   const ranked = rankRecords('shirley calvin', [scattered, contiguous]);
-  assert.deepEqual(
-    ranked.map((r) => r.record.id).sort(),
-    ['contig', 'scattered'],
-  );
+  assert.deepEqual(ranked.map((r) => r.record.id).sort(), ['contig', 'scattered']);
   // Reversed to the contiguous order, the verbatim hit must lead.
   const inOrder = rankRecords('calvin shirley', [scattered, contiguous]);
   assert.equal(inOrder[0]?.record.id, 'contig');

@@ -63,7 +63,10 @@ async function main() {
     console.log(`No canonical topics (real gap, not this bug): ${plan.noCanonicalTopics}`);
     console.log(`Needs update: ${plan.changed.length}`);
 
-    const droppedTotal = plan.changed.reduce((sum, row) => sum + row.droppedInvalidTopicIds.length, 0);
+    const droppedTotal = plan.changed.reduce(
+      (sum, row) => sum + row.droppedInvalidTopicIds.length,
+      0,
+    );
     if (droppedTotal > 0) {
       console.log(
         `Dropped ${droppedTotal} invalid topicId(s) not in TOPIC_REGISTRY across ${
@@ -84,7 +87,9 @@ async function main() {
     if (plan.changed.length > 5) console.log(`  ...and ${plan.changed.length - 5} more`);
 
     if (DRY_RUN || !APPLY) {
-      console.log('\nDry run only — no writes made. Set DRY_RUN=0 and RELEASE_TAXONOMY_SYNC_APPLY=1 to apply.');
+      console.log(
+        '\nDry run only — no writes made. Set DRY_RUN=0 and RELEASE_TAXONOMY_SYNC_APPLY=1 to apply.',
+      );
       return;
     }
 

@@ -57,9 +57,6 @@ test('methodology user-facing copy avoids em dashes', () => {
 });
 
 test('methodology operations section uses theme-aware edition panel, not ds-band', () => {
-  assert.match(
-    sectionsSource,
-    /methodologyEditionPanelClassName\('operations'\)/,
-  );
+  assert.match(sectionsSource, /methodologyEditionPanelClassName\('operations'\)/);
   assert.doesNotMatch(sectionsSource, /ds-band/);
 });

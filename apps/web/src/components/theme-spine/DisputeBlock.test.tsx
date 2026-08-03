@@ -24,7 +24,10 @@ describe('DisputeBlock', () => {
     const html = renderToStaticMarkup(
       <DisputeBlock sideA={sideA} sideB={sideB} standingLine={standingLine} />,
     );
-    assert.match(html, /<aside[^>]*aria-label="Contested record: The record disagrees with itself"/);
+    assert.match(
+      html,
+      /<aside[^>]*aria-label="Contested record: The record disagrees with itself"/,
+    );
   });
 
   it('renders both sides with their source labels and the standing line', () => {

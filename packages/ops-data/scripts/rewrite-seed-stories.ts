@@ -13,11 +13,7 @@ function arg(name: string): string | undefined {
 const slug = arg('--slug');
 const output = arg('--output') ?? STORY_REWRITE_ARTIFACT_DIR;
 const requestedProvider = arg('--provider') as
-  | 'mock'
-  | 'openrouter'
-  | 'ollama'
-  | 'hybrid'
-  | undefined;
+  'mock' | 'openrouter' | 'ollama' | 'hybrid' | undefined;
 const requestedModels = arg('--models')
   ?.split(',')
   .map((value) => value.trim())

@@ -10,10 +10,7 @@ import {
   PHASE1_IMPRISONMENT_RATE_BLACK_STATE_METRIC_ID,
   PHASE1_IMPRISONMENT_RATE_WHITE_STATE_METRIC_ID,
 } from './constants.js';
-import {
-  mapBjsNpsRowsToObservations,
-  parseBjsNpsStat01Csv,
-} from './phase1-bjs-nps-mapper.js';
+import { mapBjsNpsRowsToObservations, parseBjsNpsStat01Csv } from './phase1-bjs-nps-mapper.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SAMPLE_CSV = readFileSync(

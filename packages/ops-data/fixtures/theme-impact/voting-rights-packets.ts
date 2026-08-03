@@ -249,10 +249,7 @@ export const votingRightsPackets = [
         unit: 'percentage_points',
         status: 'derived',
         formula: 'cps-a1-turnout-black-nation:2012 - cps-a1-turnout-white-nation:2012',
-        inputObservationIds: [
-          TURNOUT_BLACK_2012.observationId,
-          TURNOUT_WHITE_2012.observationId,
-        ],
+        inputObservationIds: [TURNOUT_BLACK_2012.observationId, TURNOUT_WHITE_2012.observationId],
         label: 'Black minus White non-Hispanic citizen turnout gap (2012 crossover)',
         provenance: cpsProv(
           'Derived from CPS Table A-1: Black (66.2%) minus White non-Hispanic (64.1%) citizen turnout, November 2012.',
@@ -265,10 +262,7 @@ export const votingRightsPackets = [
         unit: 'percentage_points',
         status: 'derived',
         formula: 'cps-a1-turnout-black-nation:2020 - cps-a1-turnout-white-nation:2020',
-        inputObservationIds: [
-          TURNOUT_BLACK_2020.observationId,
-          TURNOUT_WHITE_2020.observationId,
-        ],
+        inputObservationIds: [TURNOUT_BLACK_2020.observationId, TURNOUT_WHITE_2020.observationId],
         label: 'Black minus White non-Hispanic citizen turnout gap (2020, latest)',
         provenance: cpsProv(
           'Derived from CPS Table A-1: Black (62.6%) minus White non-Hispanic (70.9%) citizen turnout, November 2020.',
@@ -283,7 +277,8 @@ export const votingRightsPackets = [
           sourceUrl: 'https://www.crmvet.org/info/litques.pdf',
           retrievedAt: '2026-07-25T00:00:00.000Z',
           contentHash: '9f81e7c2100614e50f989ceee227c7b2e774ae0ab0a034ba758b9a1769b7a9b2',
-          humanCitation: 'Alabama Literacy Test specimen, Veterans of the Civil Rights Movement archive (curated evidence capture).',
+          humanCitation:
+            'Alabama Literacy Test specimen, Veterans of the Civil Rights Movement archive (curated evidence capture).',
         },
         artifactClass: 'primary_document_specimen',
         title: 'Alabama literacy test specimen (mid-1960s)',
@@ -303,7 +298,8 @@ export const votingRightsPackets = [
           sourceUrl: 'https://www.govinfo.gov/content/pkg/COMPS-350/pdf/COMPS-350.pdf',
           retrievedAt: '2026-07-25T00:00:00.000Z',
           contentHash: '03aeaa3d520cdf0b81d12be1cc9db96edc48bcc60c8077f754a7aeaf8ccfb390',
-          humanCitation: 'Voting Rights Act of 1965, Pub. L. 89-110, govinfo compiled statute COMPS-350 (curated evidence capture).',
+          humanCitation:
+            'Voting Rights Act of 1965, Pub. L. 89-110, govinfo compiled statute COMPS-350 (curated evidence capture).',
         },
         artifactClass: 'primary_government_document',
         title: 'Voting Rights Act of 1965, Sec. 4 and Sec. 5',
@@ -321,7 +317,8 @@ export const votingRightsPackets = [
           sourceUrl: 'https://www.archives.gov/milestone-documents/15th-amendment',
           retrievedAt: '2026-07-26T00:00:00.000Z',
           contentHash: 'a1eb8d6aab2b3a5cc6092c3185040e2ec68095d4fda63782fedb814e9cd77492',
-          humanCitation: 'U.S. Constitution, Amendment XV; National Archives milestone documents page.',
+          humanCitation:
+            'U.S. Constitution, Amendment XV; National Archives milestone documents page.',
         },
         artifactClass: 'primary_government_document',
         title: 'Fifteenth Amendment (1870)',
@@ -335,10 +332,12 @@ export const votingRightsPackets = [
         artifactId: 'art_census_cps_a1_voting_historical',
         provenance: {
           source: 'us-census-cps',
-          sourceUrl: 'https://www2.census.gov/programs-surveys/cps/tables/time-series/voting-historical-time-series/a1.xlsx',
+          sourceUrl:
+            'https://www2.census.gov/programs-surveys/cps/tables/time-series/voting-historical-time-series/a1.xlsx',
           retrievedAt: '2026-07-24T05:02:00.000Z',
           contentHash: 'c2953008866c6f6e5ae1d56e7ec8008ae5478725fb3ecd16786a845e487feda0',
-          humanCitation: 'U.S. Census Bureau, CPS Historical Reported Voting Rates, Table A-1 workbook.',
+          humanCitation:
+            'U.S. Census Bureau, CPS Historical Reported Voting Rates, Table A-1 workbook.',
         },
         artifactClass: 'primary_government_document',
         title: 'CPS Historical Reported Voting Rates, Table A-1',
@@ -357,7 +356,8 @@ export const votingRightsPackets = [
           sourceUrl: 'https://www.supremecourt.gov/opinions/boundvolumes/570bv.pdf',
           retrievedAt: '2026-07-26T00:00:00.000Z',
           contentHash: 'd3c51d2d25acadad443dcbc4e2cb1fa4a50d133e25000ed9c2c7c09a171f42b0',
-          humanCitation: 'Shelby County v. Holder, 570 U.S. 529 (2013), United States Reports bound volume 570.',
+          humanCitation:
+            'Shelby County v. Holder, 570 U.S. 529 (2013), United States Reports bound volume 570.',
         },
         artifactClass: 'primary_government_document',
         title: 'Shelby County v. Holder (2013)',

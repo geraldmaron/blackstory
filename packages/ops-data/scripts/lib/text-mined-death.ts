@@ -30,7 +30,10 @@ function quoteAround(text: string, index: number, length: number): string {
   return text.slice(start, end).replace(/\s+/g, ' ').trim();
 }
 
-function isPlausibleDeathEndYear(year: number, asOfYear: number = new Date().getUTCFullYear()): boolean {
+function isPlausibleDeathEndYear(
+  year: number,
+  asOfYear: number = new Date().getUTCFullYear(),
+): boolean {
   return year <= asOfYear - 2;
 }
 
@@ -69,22 +72,25 @@ function nearestYear(text: string, anchorIndex: number, anchorLength: number): n
   return best?.year ?? null;
 }
 
-export function mineDeathWordNearYear(
-  text: string,
-): { readonly deathYear: number; readonly signal: 'death_lexicon' | 'lynching_verb'; readonly quote: string } | null {
-  const patterns: readonly { readonly re: RegExp; readonly signal: 'death_lexicon' | 'lynching_verb' }[] = [
+export function mineDeathWordNearYear(text: string): {
+  readonly deathYear: number;
+  readonly signal: 'death_lexicon' | 'lynching_verb';
+  readonly quote: string;
+} | null {
+  const patterns: readonly {
+    readonly re: RegExp;
+    readonly signal: 'death_lexicon' | 'lynching_verb';
+  }[] = [
     { re: LYNCHING_DECEASED_RE, signal: 'lynching_verb' },
     { re: DECEASED_LEXICON_RE, signal: 'death_lexicon' },
   ];
 
-  let best:
-    | {
-        readonly deathYear: number;
-        readonly signal: 'death_lexicon' | 'lynching_verb';
-        readonly quote: string;
-        readonly distance: number;
-      }
-    | null = null;
+  let best: {
+    readonly deathYear: number;
+    readonly signal: 'death_lexicon' | 'lynching_verb';
+    readonly quote: string;
+    readonly distance: number;
+  } | null = null;
 
   for (const { re, signal } of patterns) {
     const regex = new RegExp(re.source, `${re.flags.includes('g') ? re.flags : `${re.flags}g`}`);

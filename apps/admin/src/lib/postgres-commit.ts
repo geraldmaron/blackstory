@@ -24,7 +24,10 @@ type IdempotencyRow = {
   readonly outbox_message_id: string | null;
 };
 
-function assertOutboxMatchesAudit(auditEvent: DomainAuditEvent, outboxMessage: DomainOutboxMessage): void {
+function assertOutboxMatchesAudit(
+  auditEvent: DomainAuditEvent,
+  outboxMessage: DomainOutboxMessage,
+): void {
   if (outboxMessage.eventId !== auditEvent.id) {
     throw new Error('Outbox eventId must match audit event id');
   }

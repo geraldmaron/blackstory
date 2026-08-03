@@ -99,9 +99,7 @@ test('unknown inline reference is reported', () => {
 test('unused reference is reported unless data-backed', () => {
   const article = {
     body: [{ type: 'paragraph' as const, text: 'No citations here.' }],
-    references: [
-      { id: 'orphan', label: 'Orphan Source', url: 'https://example.org/x' },
-    ],
+    references: [{ id: 'orphan', label: 'Orphan Source', url: 'https://example.org/x' }],
   };
   assert.deepEqual(collectArticleCitationIssues(article), [
     { kind: 'unused_reference', refId: 'orphan' },

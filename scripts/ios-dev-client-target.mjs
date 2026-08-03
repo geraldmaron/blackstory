@@ -109,7 +109,11 @@ function writePlistJson(plistPath, data) {
 function parsePackagerTarget(url) {
   try {
     const parsed = new URL(url);
-    const port = parsed.port ? Number.parseInt(parsed.port, 10) : parsed.protocol === 'https:' ? 443 : 80;
+    const port = parsed.port
+      ? Number.parseInt(parsed.port, 10)
+      : parsed.protocol === 'https:'
+        ? 443
+        : 80;
     return {
       targetUrl: url,
       targetHost: parsed.hostname,
@@ -193,7 +197,8 @@ export function resetIosDevClientTarget(endpoint = resolveMetroEndpoint(), optio
     return { ok: false, reason: 'app_not_installed', bundleId };
   }
 
-  const packagerUrl = endpoint.packagerUrl ?? buildPackagerUrl(endpoint.deviceHost, endpoint.contractPort);
+  const packagerUrl =
+    endpoint.packagerUrl ?? buildPackagerUrl(endpoint.deviceHost, endpoint.contractPort);
   const deepLink = endpoint.devClientDeepLink ?? buildDevClientDeepLink(packagerUrl, APP_SCHEME);
   const plist = readPlistJson(appInfo.plistPath);
   const registry = plist['expo.devlauncher.recentlyopenedapps'];
@@ -208,7 +213,10 @@ export function resetIosDevClientTarget(endpoint = resolveMetroEndpoint(), optio
   if (registry && typeof registry === 'object') {
     for (const [url] of Object.entries(registry)) {
       const parsed = parsePackagerTarget(url);
-      if (parsed?.targetPort === endpoint.contractPort && parsed.targetHost === endpoint.deviceHost) {
+      if (
+        parsed?.targetPort === endpoint.contractPort &&
+        parsed.targetHost === endpoint.deviceHost
+      ) {
         continue;
       }
     }

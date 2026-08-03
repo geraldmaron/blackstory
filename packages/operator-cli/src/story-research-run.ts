@@ -264,9 +264,7 @@ export async function gatherStoryTopicSourceSnippets(
 
   const gathered = await gatherSourceSnippetsFromUrls(seedUrls, {
     ...(options.fetchDependencies ? { dependencies: options.fetchDependencies } : {}),
-    ...(options.gatherConcurrency !== undefined
-      ? { concurrency: options.gatherConcurrency }
-      : {}),
+    ...(options.gatherConcurrency !== undefined ? { concurrency: options.gatherConcurrency } : {}),
   });
   const formatted = formatGatheredSourceSnippets(gathered);
   if (formatted.length === 0) return topic.sourceSnippets ?? [];

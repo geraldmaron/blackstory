@@ -3,7 +3,11 @@
  * Prefers structured `eraBuckets`; falls back to event/status spans and legacy `era` text
  * before showing "Undated".
  */
-import { deriveEraBuckets, filterDecadesAtOrBeforeCurrent, isDatePrecision } from '@repo/domain/era';
+import {
+  deriveEraBuckets,
+  filterDecadesAtOrBeforeCurrent,
+  isDatePrecision,
+} from '@repo/domain/era';
 import { eraFactLink } from './metadata-hrefs';
 
 export type EntityEraInput = {
@@ -49,7 +53,9 @@ function bucketsFromEraText(era: string): readonly string[] {
   }
   const yearMatches = era.match(/\b(1[0-9]{3}|20[0-9]{2})\b/g);
   if (yearMatches && yearMatches.length > 0) {
-    const decades = yearMatches.map((year) => `${Math.floor(Number.parseInt(year, 10) / 10) * 10}s`);
+    const decades = yearMatches.map(
+      (year) => `${Math.floor(Number.parseInt(year, 10) / 10) * 10}s`,
+    );
     return [...new Set(decades)];
   }
   return [];
@@ -104,7 +110,10 @@ export function entityEraFact(input: EntityEraInput): EntityEraFact {
   if (buckets.length > 0) {
     const link = eraFactLink(buckets);
     return {
-      label: link.label.replace(/\u2013|\u2014/g, ' to ').replace(/\s+/g, ' ').trim(),
+      label: link.label
+        .replace(/\u2013|\u2014/g, ' to ')
+        .replace(/\s+/g, ' ')
+        .trim(),
       ...(link.href !== undefined ? { href: link.href } : {}),
     };
   }

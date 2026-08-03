@@ -17,10 +17,16 @@ import {
 import { canonicalJson, sha256Json } from './index.js';
 
 function hashRef(seed: string): MobileArtifactHashRef {
-  return { path: `public/releases/x/${seed}.json`, hash: sha256Json({ seed }), byteLength: seed.length };
+  return {
+    path: `public/releases/x/${seed}.json`,
+    hash: sha256Json({ seed }),
+    byteLength: seed.length,
+  };
 }
 
-function sampleInput(overrides: Partial<BuildMobileBootstrapManifestInput> = {}): BuildMobileBootstrapManifestInput {
+function sampleInput(
+  overrides: Partial<BuildMobileBootstrapManifestInput> = {},
+): BuildMobileBootstrapManifestInput {
   return {
     releaseId: 'rel_2026_07_19_a',
     generatedAt: '2026-07-19T00:00:00.000Z',
@@ -48,7 +54,10 @@ test('determinism: same input yields a byte-identical manifest and stamp', () =>
   const a = buildMobileBootstrapManifest(sampleInput());
   const b = buildMobileBootstrapManifest(sampleInput());
   assert.equal(a.releaseStamp, b.releaseStamp);
-  assert.equal(canonicalJson(bootstrapManifestToJson(a)), canonicalJson(bootstrapManifestToJson(b)));
+  assert.equal(
+    canonicalJson(bootstrapManifestToJson(a)),
+    canonicalJson(bootstrapManifestToJson(b)),
+  );
 });
 
 test('release stamp is content-derived: it changes with release id and with content', () => {
@@ -81,8 +90,16 @@ test('toReleasePointer projects exactly the /v1/bootstrap pointer shape', () => 
   const manifest = buildMobileBootstrapManifest(sampleInput({ contentVersion: 'content-2026' }));
   const pointer = toReleasePointer(manifest);
   // Field-for-field the shape apps/api-public's handler reads (ReleasePointer / RevisionMetadataV1).
-  assert.deepEqual(Object.keys(pointer).sort(), ['activeRelease', 'contentVersion', 'searchIndexVersion']);
-  assert.deepEqual(Object.keys(pointer.activeRelease).sort(), ['generatedAt', 'recordUpdatedAt', 'releaseId']);
+  assert.deepEqual(Object.keys(pointer).sort(), [
+    'activeRelease',
+    'contentVersion',
+    'searchIndexVersion',
+  ]);
+  assert.deepEqual(Object.keys(pointer.activeRelease).sort(), [
+    'generatedAt',
+    'recordUpdatedAt',
+    'releaseId',
+  ]);
   assert.equal(pointer.activeRelease.releaseId, 'rel_2026_07_19_a');
   assert.ok(pointer.activeRelease.generatedAt.length <= 64);
   assert.ok(pointer.activeRelease.recordUpdatedAt.length <= 64);
@@ -114,8 +131,14 @@ test('ADR-021 client floor: below min app build or wrong api version is incompat
 });
 
 test('invalid inputs fail closed', () => {
-  assert.throws(() => buildMobileBootstrapManifest(sampleInput({ releaseId: '../evil' })), /safe release/);
-  assert.throws(() => buildMobileBootstrapManifest(sampleInput({ generatedAt: 'not-a-date' })), /ISO/);
+  assert.throws(
+    () => buildMobileBootstrapManifest(sampleInput({ releaseId: '../evil' })),
+    /safe release/,
+  );
+  assert.throws(
+    () => buildMobileBootstrapManifest(sampleInput({ generatedAt: 'not-a-date' })),
+    /ISO/,
+  );
   assert.throws(
     () => buildMobileBootstrapManifest(sampleInput({ schemaRange: { min: 3, max: 1 } })),
     /schemaRange/,

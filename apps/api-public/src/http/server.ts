@@ -123,7 +123,10 @@ function writeResponse(res: ServerResponse, method: string, response: ApiRespons
  * Builds the public API `node:http` server. All handler dependencies (data access, App Check guard,
  * rate limiter, search guard) are injected — construction touches no socket and no Firestore.
  */
-export function createPublicApiServer(deps: HandlerDeps, options: PublicApiServerOptions = {}): Server {
+export function createPublicApiServer(
+  deps: HandlerDeps,
+  options: PublicApiServerOptions = {},
+): Server {
   const limits: PublicApiServerLimits = { ...DEFAULT_LIMITS, ...options.limits };
   const makeRequestId = options.requestIdFactory ?? newRequestId;
 
@@ -161,7 +164,10 @@ export function createPublicApiServer(deps: HandlerDeps, options: PublicApiServe
     try {
       if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
         await readBodyWithLimit(req, limits.maxBodyBytes);
-      } else if (req.headers['content-length'] && Number(req.headers['content-length']) > limits.maxBodyBytes) {
+      } else if (
+        req.headers['content-length'] &&
+        Number(req.headers['content-length']) > limits.maxBodyBytes
+      ) {
         throw new RangeError('body_too_large');
       }
     } catch {
@@ -181,7 +187,11 @@ export function createPublicApiServer(deps: HandlerDeps, options: PublicApiServe
     try {
       parsed = new URL(rawUrl, 'http://localhost');
     } catch {
-      writeResponse(res, method, errorResponse('INVALID_REQUEST', 'Malformed request URL.', { requestId }));
+      writeResponse(
+        res,
+        method,
+        errorResponse('INVALID_REQUEST', 'Malformed request URL.', { requestId }),
+      );
       return;
     }
 

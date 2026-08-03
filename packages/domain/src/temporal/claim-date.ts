@@ -4,7 +4,10 @@
  */
 import type { DatePrecision } from '../era.js';
 import { parseEdtfLevel1 } from './edtf.js';
-import { inferTemporalProperty, type TemporalQualifierProperty } from './predicate-temporal-hints.js';
+import {
+  inferTemporalProperty,
+  type TemporalQualifierProperty,
+} from './predicate-temporal-hints.js';
 
 export type ClaimDateParseResult = {
   readonly edtf: string;
@@ -84,10 +87,12 @@ export function parseCleanClaimObjectDate(object: string): ClaimDateParseResult 
 
 /** True when predicate matches a founding-family pattern (may co-occur with a bare year object). */
 export function isFoundingFamilyPredicate(predicate: string): boolean {
-  return inferTemporalProperty(predicate) === 'start' &&
+  return (
+    inferTemporalProperty(predicate) === 'start' &&
     /\b(founded|founded_year|founded_in|co[- ]founded|established|organized|incorporated)\b/u.test(
       predicate.toLowerCase(),
-    );
+    )
+  );
 }
 
 /** Builds a claim_qualifiers draft row from predicate + object when Stage 1 rules match. */

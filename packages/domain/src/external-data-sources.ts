@@ -600,7 +600,8 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     license: {
       name: 'ICPSR public-use terms; restricted files require ResearchDataGov',
       verdict: 'attribution-required',
-      notes: 'Do not ingest full person-level files into product SoR — cite/proxy or derive aggregates.',
+      notes:
+        'Do not ingest full person-level files into product SoR — cite/proxy or derive aggregates.',
     },
     vintage: 'NCRP public-use selected variables (ICPSR releases)',
     geographies: ['state', 'facility'],
@@ -697,7 +698,8 @@ export const EXTERNAL_DATA_SOURCES: readonly ExternalDataSource[] = [
     license: {
       name: 'NGO terms — verify before ingest; default attribution-required',
       verdict: 'attribution-required',
-      notes: 'Confirm redistribution rights before any bulk load; cite portal when unverified for reuse.',
+      notes:
+        'Confirm redistribution rights before any bulk load; cite portal when unverified for reuse.',
     },
     vintage: 'State policy tracker releases',
     geographies: ['state'],

@@ -174,9 +174,7 @@ function detectFormat(xml: string): ParsedFeedFormat {
   // two literals rescans from every `<?xml` in the document.
   const prologStart = xml.startsWith('<?xml') ? 0 : -1;
   const prologEnd = prologStart === 0 ? xml.indexOf('?>') : -1;
-  const withoutProlog = (
-    prologEnd === -1 ? xml : xml.slice(prologEnd + 2)
-  ).trimStart();
+  const withoutProlog = (prologEnd === -1 ? xml : xml.slice(prologEnd + 2)).trimStart();
   if (
     /<feed[\s>]/i.test(withoutProlog.slice(0, 200)) ||
     /xmlns=["']http:\/\/www\.w3\.org\/2005\/Atom["']/i.test(xml)

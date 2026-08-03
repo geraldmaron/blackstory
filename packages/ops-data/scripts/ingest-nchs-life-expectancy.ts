@@ -94,9 +94,7 @@ function parseFixtureCsv(csvText: string): FetchResult {
   const raceLabelIdx = header.indexOf('RaceLabel');
 
   if (yearIdx === -1 || (blackIdx === -1 && whiteIdx === -1)) {
-    throw new Error(
-      'CSV must have Year column and either Black or White life expectancy columns',
-    );
+    throw new Error('CSV must have Year column and either Black or White life expectancy columns');
   }
 
   const observations: ObservationDraft[] = [];
@@ -297,7 +295,8 @@ async function applyObservations(
 }
 
 async function main(): Promise<void> {
-  const apply = process.env.INGEST_NCHS_LIFE_EXPECTANCY_APPLY === '1' && process.env.DRY_RUN !== '1';
+  const apply =
+    process.env.INGEST_NCHS_LIFE_EXPECTANCY_APPLY === '1' && process.env.DRY_RUN !== '1';
   const fixturePath = arg('nchs-fixture-csv') ?? DEFAULT_FIXTURE_PATH;
 
   if (!existsSync(fixturePath)) {
@@ -323,7 +322,10 @@ Example:
     dryRun: !apply,
     yearsIngested: fetchResult.yearsIngested,
     totalYears: fetchResult.yearsIngested.length,
-    yearRange: [fetchResult.yearsIngested[0], fetchResult.yearsIngested[fetchResult.yearsIngested.length - 1]],
+    yearRange: [
+      fetchResult.yearsIngested[0],
+      fetchResult.yearsIngested[fetchResult.yearsIngested.length - 1],
+    ],
     fetchedObservations: fetchResult.observations.length,
     observationsByMetric: Object.fromEntries([...byMetric.entries()].sort()),
     rejectedParseRows: fetchResult.rejected.length,

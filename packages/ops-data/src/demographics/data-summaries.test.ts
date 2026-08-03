@@ -111,14 +111,8 @@ test('getStatePopulationByDecadeSnapshot point-gets the materialized doc', async
 
 test('state snapshot contentHash is deterministic across rebuilds', async () => {
   const firestore = fakeFirestoreForStatePopulation();
-  const a = await buildStatePopulationByDecadeSnapshot(
-    firestore,
-    () => '2026-07-20T00:00:00.000Z',
-  );
-  const b = await buildStatePopulationByDecadeSnapshot(
-    firestore,
-    () => '2030-01-01T00:00:00.000Z',
-  );
+  const a = await buildStatePopulationByDecadeSnapshot(firestore, () => '2026-07-20T00:00:00.000Z');
+  const b = await buildStatePopulationByDecadeSnapshot(firestore, () => '2030-01-01T00:00:00.000Z');
   assert.equal(a.contentHash, b.contentHash);
 });
 
@@ -160,10 +154,7 @@ test('buildOpportunityAtlasCoverageSnapshot aggregates tract outcomes', async ()
   );
   assert.ok(snapshot);
   assert.equal(snapshot!.tractCount, 2);
-  assert.equal(
-    snapshot!.kfrBlackP25Histogram.find((bin) => bin.id === '0-20')?.tractCount,
-    1,
-  );
+  assert.equal(snapshot!.kfrBlackP25Histogram.find((bin) => bin.id === '0-20')?.tractCount, 1);
 });
 
 test('buildHistoricalStatePopulationCoverageSnapshot derives decade bounds', async () => {

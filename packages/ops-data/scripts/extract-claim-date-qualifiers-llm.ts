@@ -22,7 +22,10 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
-import { buildClaimTemporalQualifierDraft, isYearBearingProseClaimObject } from '../../domain/src/temporal/index.ts';
+import {
+  buildClaimTemporalQualifierDraft,
+  isYearBearingProseClaimObject,
+} from '../../domain/src/temporal/index.ts';
 import { createLlmProvider } from '../../operator-cli/src/llm-provider.ts';
 import { normalizePgConnectionString } from './lib/pg-connection.ts';
 import {
@@ -37,13 +40,16 @@ import {
 const DRY_RUN = process.env.DRY_RUN !== '0';
 const APPLY = process.env.EXTRACT_CLAIM_DATE_QUALIFIERS_LLM_APPLY === '1';
 const PROVIDER_NAME = (process.env.EXTRACT_CLAIM_DATE_LLM_PROVIDER ?? 'mock') as
-  | 'mock'
-  | 'openrouter'
-  | 'ollama'
-  | 'hybrid';
+  'mock' | 'openrouter' | 'ollama' | 'hybrid';
 const LIMIT = parseLimitArg();
-const CONCURRENCY = Math.max(1, Number.parseInt(process.env.EXTRACT_CLAIM_DATE_LLM_CONCURRENCY ?? '4', 10));
-const CACHE_DIR = join(dirname(fileURLToPath(import.meta.url)), '../../../.cache/claim-date-extraction');
+const CONCURRENCY = Math.max(
+  1,
+  Number.parseInt(process.env.EXTRACT_CLAIM_DATE_LLM_CONCURRENCY ?? '4', 10),
+);
+const CACHE_DIR = join(
+  dirname(fileURLToPath(import.meta.url)),
+  '../../../.cache/claim-date-extraction',
+);
 
 type ClaimRow = ClaimDateExtractionSubject;
 
@@ -73,7 +79,9 @@ function connectionString(): string {
 }
 
 function qualifierId(claimVersionId: string, property: string): string {
-  const digest = createHash('sha256').update(`${claimVersionId}|temporal|${property}`).digest('hex');
+  const digest = createHash('sha256')
+    .update(`${claimVersionId}|temporal|${property}`)
+    .digest('hex');
   return `cq_${digest.slice(0, 24)}`;
 }
 
@@ -152,7 +160,12 @@ async function insertAcceptedQualifier(
        id, claim_version_id, qualifier_type, property, value
      ) VALUES ($1, $2, 'temporal', $3, $4::jsonb)
      ON CONFLICT (claim_version_id, qualifier_type, property) DO NOTHING`,
-    [qualifierId(subject.claimVersionId, property), subject.claimVersionId, property, JSON.stringify(value)],
+    [
+      qualifierId(subject.claimVersionId, property),
+      subject.claimVersionId,
+      property,
+      JSON.stringify(value),
+    ],
   );
   return result.rowCount ?? 0;
 }
@@ -218,8 +231,12 @@ async function main(): Promise<void> {
     console.log('=== Stage 2 claim date LLM extraction ===');
     console.log(`Provider: ${provider.id} (${PROVIDER_NAME})`);
     console.log(`Temporal qualifiers before: ${beforeQualifiers}`);
-    console.log(`Stage 2 candidates (year-bearing prose, no temporal qualifier): ${allCandidates.length}`);
-    console.log(`Processing: ${candidates.length}${LIMIT !== undefined ? ` (--limit ${LIMIT})` : ''}`);
+    console.log(
+      `Stage 2 candidates (year-bearing prose, no temporal qualifier): ${allCandidates.length}`,
+    );
+    console.log(
+      `Processing: ${candidates.length}${LIMIT !== undefined ? ` (--limit ${LIMIT})` : ''}`,
+    );
 
     const attempts = await mapPool(candidates, CONCURRENCY, async (subject) => {
       const request = buildClaimDateExtractionRequest(subject);
@@ -294,13 +311,23 @@ async function main(): Promise<void> {
           verbatim_quote: extraction.verbatimQuote,
           char_offsets: extraction.charOffsets,
         };
-        inserted += await insertAcceptedQualifier(client, attempt.subject, extraction.property, value);
+        inserted += await insertAcceptedQualifier(
+          client,
+          attempt.subject,
+          extraction.property,
+          value,
+        );
       }
 
       if (activityId) {
         for (const attempt of rejected) {
           if (attempt.validation.ok) continue;
-          await quarantineRejected(client, activityId, attempt.rawContent, attempt.validation.errors);
+          await quarantineRejected(
+            client,
+            activityId,
+            attempt.rawContent,
+            attempt.validation.errors,
+          );
         }
       }
 
@@ -308,7 +335,9 @@ async function main(): Promise<void> {
       const afterQualifiers = await countTemporalQualifiers(client);
       const coveragePct = ((afterQualifiers / 6792) * 100).toFixed(1);
       console.log(`\nApplied: inserted ${inserted} claim_qualifiers rows.`);
-      console.log(`Temporal qualifiers after: ${afterQualifiers} (${coveragePct}% of 6792 claims).`);
+      console.log(
+        `Temporal qualifiers after: ${afterQualifiers} (${coveragePct}% of 6792 claims).`,
+      );
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;

@@ -25,7 +25,8 @@ export type BannedBookCitation = {
 
 /** Retailer or publisher link offered as a neutral acquisition path (max three per record). */
 export type BannedBookPurchaseLink = {
-  readonly retailer: 'bookshop' | 'amazon' | 'barnes-noble' | 'open-library' | 'publisher' | 'other';
+  readonly retailer:
+    'bookshop' | 'amazon' | 'barnes-noble' | 'open-library' | 'publisher' | 'other';
   readonly label: string;
   readonly href: string;
   readonly validatedAt?: string;
@@ -42,12 +43,7 @@ export type BannedBookPurchaseLink = {
  * - `unknown`: source does not specify a resolved status.
  */
 export type BannedBookChallengeStatus =
-  | 'reported'
-  | 'banned'
-  | 'restricted'
-  | 'retained'
-  | 'rescinded'
-  | 'unknown';
+  'reported' | 'banned' | 'restricted' | 'retained' | 'rescinded' | 'unknown';
 
 /** A jurisdiction-specific challenge event tied to one evidence citation. */
 export type BannedBookChallenge = {

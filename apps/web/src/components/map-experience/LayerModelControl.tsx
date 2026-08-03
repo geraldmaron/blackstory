@@ -50,11 +50,12 @@ export function LayerModelControl({
 }: LayerModelControlProps) {
   const resolvedGeo = coercePopulationGeoForDecade(popGeo, popDecade);
   const decades = populationDecadesForGeo(resolvedGeo);
-  const shareNote = layerMode === 'blackShare' ? populationDecadeComparabilityNote(popDecade) : undefined;
+  const shareNote =
+    layerMode === 'blackShare' ? populationDecadeComparabilityNote(popDecade) : undefined;
   const changeNote =
     layerMode === 'blackChange'
-      ? populationChangeComparabilityNote(popFrom, popTo) ??
-        populationDecadeComparabilityNote(popTo)
+      ? (populationChangeComparabilityNote(popFrom, popTo) ??
+        populationDecadeComparabilityNote(popTo))
       : undefined;
 
   return (
@@ -67,7 +68,10 @@ export function LayerModelControl({
           aria-label="Map data model"
         >
           {LAYER_OPTIONS.map((option) => (
-            <label className="ds-explore-edition__segment ds-explore__layer-model-option" key={option.value}>
+            <label
+              className="ds-explore-edition__segment ds-explore__layer-model-option"
+              key={option.value}
+            >
               <input
                 type="radio"
                 name="explore-layer-mode"

@@ -154,12 +154,17 @@ function normalizeState(raw: string): string {
   return raw.trim().toLowerCase();
 }
 
-function isChicagoPilotRow(row: Pick<DslRenewingInequalityAttributeRow, 'city' | 'state'>): boolean {
+function isChicagoPilotRow(
+  row: Pick<DslRenewingInequalityAttributeRow, 'city' | 'state'>,
+): boolean {
   return normalizeCity(row.city) === 'chicago' && normalizeState(row.state) === 'il';
 }
 
 function isWithinAttributeYears(year: number): boolean {
-  return year >= DSL_RENEWING_INEQUALITY_ATTRIBUTE_YEAR_MIN && year <= DSL_RENEWING_INEQUALITY_ATTRIBUTE_YEAR_MAX;
+  return (
+    year >= DSL_RENEWING_INEQUALITY_ATTRIBUTE_YEAR_MIN &&
+    year <= DSL_RENEWING_INEQUALITY_ATTRIBUTE_YEAR_MAX
+  );
 }
 
 /** Parses Renewing Inequality non_spatial_data.csv attribute rows. */

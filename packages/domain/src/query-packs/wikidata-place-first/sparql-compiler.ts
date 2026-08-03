@@ -5,10 +5,7 @@
  */
 import { DEFAULT_WIKIDATA_SPARQL_LIMIT } from './constants.js';
 import { assertPlaceFirstSparqlValid } from './guards.js';
-import {
-  assertOccupationSeedValid,
-  assertPlaceSeedValid,
-} from './seeds.js';
+import { assertOccupationSeedValid, assertPlaceSeedValid } from './seeds.js';
 import type {
   CompiledWikidataSparqlQuery,
   WikidataOccupationSeed,

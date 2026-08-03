@@ -11,14 +11,8 @@ import {
 } from './source-capture.js';
 
 test('normalizeCaptureUrl lowercases host, drops fragment, trims trailing slash', () => {
-  assert.equal(
-    normalizeCaptureUrl('HTTPS://WWW.Census.gov/data/'),
-    'https://www.census.gov/data',
-  );
-  assert.equal(
-    normalizeCaptureUrl('https://x.org/a?b=1#frag'),
-    'https://x.org/a?b=1',
-  );
+  assert.equal(normalizeCaptureUrl('HTTPS://WWW.Census.gov/data/'), 'https://www.census.gov/data');
+  assert.equal(normalizeCaptureUrl('https://x.org/a?b=1#frag'), 'https://x.org/a?b=1');
   assert.equal(normalizeCaptureUrl('ftp://x.org/a'), null);
   assert.equal(normalizeCaptureUrl('not a url'), null);
 });
@@ -79,12 +73,15 @@ test('captureCitedUrl on success builds a capture row + success event', async ()
 test('captureCitedUrl on fetch failure builds only a failure event', async () => {
   const out = await captureCitedUrl(
     { url: 'https://dead.example/x', surface: 'article', refId: 'ref3' },
-    deterministicDeps(async () => ({
-      ok: false,
-      reason: 'transport_failed',
-      quarantineState: 'rejected',
-      publicationAllowed: false,
-    }) as SafeFetchResult),
+    deterministicDeps(
+      async () =>
+        ({
+          ok: false,
+          reason: 'transport_failed',
+          quarantineState: 'rejected',
+          publicationAllowed: false,
+        }) as SafeFetchResult,
+    ),
   );
   assert.equal(out.status, 'failure');
   assert.equal(out.capture, null);

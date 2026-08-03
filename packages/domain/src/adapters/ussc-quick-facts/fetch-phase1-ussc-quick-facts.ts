@@ -5,7 +5,10 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { USSC_QUICK_FACTS_DRUG_FIXTURE_FILENAME, USSC_QUICK_FACTS_HOMEPAGE_URL } from './constants.js';
+import {
+  USSC_QUICK_FACTS_DRUG_FIXTURE_FILENAME,
+  USSC_QUICK_FACTS_HOMEPAGE_URL,
+} from './constants.js';
 import {
   mapUsscQuickFactsRowsToObservations,
   parseUsscQuickFactsDrugFixtureCsv,

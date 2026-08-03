@@ -18,9 +18,7 @@ export type MockIndicatorDbState = {
   readonly jurisdictions: readonly string[];
 };
 
-export function createMockIndicatorDbReader(
-  state: MockIndicatorDbState,
-): IndicatorDbReader {
+export function createMockIndicatorDbReader(state: MockIndicatorDbState): IndicatorDbReader {
   return {
     async listSeries(filters: ListSeriesFilters): Promise<readonly SeriesRow[]> {
       return state.series.filter((row) => {
@@ -56,7 +54,9 @@ export function createMockIndicatorDbReader(
       const rows = await this.listObservations({
         metricId: filters.metricId,
         jurisdictionId: filters.jurisdictionId,
-        ...(filters.referencePeriod !== undefined ? { referencePeriod: filters.referencePeriod } : {}),
+        ...(filters.referencePeriod !== undefined
+          ? { referencePeriod: filters.referencePeriod }
+          : {}),
         limit: 1,
       });
       return rows[0] ?? null;

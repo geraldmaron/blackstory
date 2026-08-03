@@ -23,7 +23,9 @@ export type ReleasesListResult = {
 export async function listPublicationReleases(limit = 50): Promise<ReleasesListResult> {
   return listPublicationReleasesPostgres(limit);
 }
-export async function tryListPublicationReleases(limit?: number): Promise<ReleasesListResult | null> {
+export async function tryListPublicationReleases(
+  limit?: number,
+): Promise<ReleasesListResult | null> {
   try {
     return await listPublicationReleases(limit);
   } catch (error) {

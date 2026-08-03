@@ -49,7 +49,7 @@ export const SEED_STORY_PROJECTIONS: readonly PublicStoryProjectionDoc[] = [
         url: 'https://www.tshaonline.org/handbook/entries/joe',
       },
       {
-        label: 'The Alamo — Joe\'s account of the battle',
+        label: "The Alamo — Joe's account of the battle",
         url: 'https://www.thealamo.org/remember/battle-and-revolution/joes-account',
       },
       {

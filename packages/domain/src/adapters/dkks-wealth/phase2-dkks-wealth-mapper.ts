@@ -56,59 +56,60 @@ function series(
   };
 }
 
-export const PHASE2_DKKS_WEALTH_INDICATOR_CATALOG: readonly Phase2DkksWealthIndicatorDefinition[] = [
-  series({
-    metricId: DKKS_PERCAPITA_WEALTH_BLACK_NATION_METRIC_ID,
-    metricDefinition:
-      'Per-capita household wealth, Black population, national — DKKS (2024) "Wealth of Two Nations" ' +
-      'benchmark-year series, 2019 USD.',
-    universe: 'Black population',
-    unit: 'USD-2019',
-    sourceDataset: DKKS_WEALTH_SOURCE_DATASET,
-    sourceTable: 'WealthGapFinal18602020.xlsx',
-    sourceVariable: 'black_wealth_pc',
-    geographyType: 'nation',
-    estimateType: 'mean',
-    periodType: 'annual',
-    theme: 'wealth',
-    externalDataSourceId: 'derenoncourt-wealth-of-two-nations',
-    raceEthnicitySlice: 'black',
-  }),
-  series({
-    metricId: DKKS_PERCAPITA_WEALTH_WHITE_NATION_METRIC_ID,
-    metricDefinition:
-      'Per-capita household wealth, white population, national — DKKS (2024) "Wealth of Two Nations" ' +
-      'benchmark-year series, 2019 USD. Pre-1950 benchmarks use the authors\' nonblack-population proxy ' +
-      'for white (see paper appendix); denoted nonblack_wealth_pc in the source workbook.',
-    universe: 'white (nonblack proxy pre-1950) population',
-    unit: 'USD-2019',
-    sourceDataset: DKKS_WEALTH_SOURCE_DATASET,
-    sourceTable: 'WealthGapFinal18602020.xlsx',
-    sourceVariable: 'nonblack_wealth_pc',
-    geographyType: 'nation',
-    estimateType: 'mean',
-    periodType: 'annual',
-    theme: 'wealth',
-    externalDataSourceId: 'derenoncourt-wealth-of-two-nations',
-    raceEthnicitySlice: 'white_nonhispanic',
-  }),
-  series({
-    metricId: DKKS_WEALTH_RATIO_WHITE_BLACK_NATION_METRIC_ID,
-    metricDefinition:
-      'White-to-Black per-capita wealth ratio, national — DKKS (2024) "Wealth of Two Nations" ' +
-      'benchmark-year series (wealthgap_wb).',
-    universe: 'white and Black populations',
-    unit: 'ratio',
-    sourceDataset: DKKS_WEALTH_SOURCE_DATASET,
-    sourceTable: 'WealthGapFinal18602020.xlsx',
-    sourceVariable: 'wealthgap_wb',
-    geographyType: 'nation',
-    estimateType: 'ratio',
-    periodType: 'annual',
-    theme: 'wealth',
-    externalDataSourceId: 'derenoncourt-wealth-of-two-nations',
-  }),
-];
+export const PHASE2_DKKS_WEALTH_INDICATOR_CATALOG: readonly Phase2DkksWealthIndicatorDefinition[] =
+  [
+    series({
+      metricId: DKKS_PERCAPITA_WEALTH_BLACK_NATION_METRIC_ID,
+      metricDefinition:
+        'Per-capita household wealth, Black population, national — DKKS (2024) "Wealth of Two Nations" ' +
+        'benchmark-year series, 2019 USD.',
+      universe: 'Black population',
+      unit: 'USD-2019',
+      sourceDataset: DKKS_WEALTH_SOURCE_DATASET,
+      sourceTable: 'WealthGapFinal18602020.xlsx',
+      sourceVariable: 'black_wealth_pc',
+      geographyType: 'nation',
+      estimateType: 'mean',
+      periodType: 'annual',
+      theme: 'wealth',
+      externalDataSourceId: 'derenoncourt-wealth-of-two-nations',
+      raceEthnicitySlice: 'black',
+    }),
+    series({
+      metricId: DKKS_PERCAPITA_WEALTH_WHITE_NATION_METRIC_ID,
+      metricDefinition:
+        'Per-capita household wealth, white population, national — DKKS (2024) "Wealth of Two Nations" ' +
+        "benchmark-year series, 2019 USD. Pre-1950 benchmarks use the authors' nonblack-population proxy " +
+        'for white (see paper appendix); denoted nonblack_wealth_pc in the source workbook.',
+      universe: 'white (nonblack proxy pre-1950) population',
+      unit: 'USD-2019',
+      sourceDataset: DKKS_WEALTH_SOURCE_DATASET,
+      sourceTable: 'WealthGapFinal18602020.xlsx',
+      sourceVariable: 'nonblack_wealth_pc',
+      geographyType: 'nation',
+      estimateType: 'mean',
+      periodType: 'annual',
+      theme: 'wealth',
+      externalDataSourceId: 'derenoncourt-wealth-of-two-nations',
+      raceEthnicitySlice: 'white_nonhispanic',
+    }),
+    series({
+      metricId: DKKS_WEALTH_RATIO_WHITE_BLACK_NATION_METRIC_ID,
+      metricDefinition:
+        'White-to-Black per-capita wealth ratio, national — DKKS (2024) "Wealth of Two Nations" ' +
+        'benchmark-year series (wealthgap_wb).',
+      universe: 'white and Black populations',
+      unit: 'ratio',
+      sourceDataset: DKKS_WEALTH_SOURCE_DATASET,
+      sourceTable: 'WealthGapFinal18602020.xlsx',
+      sourceVariable: 'wealthgap_wb',
+      geographyType: 'nation',
+      estimateType: 'ratio',
+      periodType: 'annual',
+      theme: 'wealth',
+      externalDataSourceId: 'derenoncourt-wealth-of-two-nations',
+    }),
+  ];
 
 function observationId(metricId: string, jurisdictionId: string, referencePeriod: string): string {
   return `obs:${metricId}:${jurisdictionId}:${referencePeriod}`;

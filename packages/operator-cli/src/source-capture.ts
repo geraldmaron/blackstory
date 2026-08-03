@@ -24,7 +24,9 @@ export type CaptureSurface = 'entity' | 'packet' | 'article';
  * the URL's host so every capture from the same domain converges on one registry row,
  * instead of the citing entity/packet/article id (which evidence_sources never contains).
  */
-export function sourceIdForUrl(url: string): { readonly id: string; readonly hostname: string } | null {
+export function sourceIdForUrl(
+  url: string,
+): { readonly id: string; readonly hostname: string } | null {
   let hostname: string;
   try {
     hostname = new URL(url).hostname.toLowerCase();
@@ -207,7 +209,14 @@ export async function captureCitedUrl(ref: CitedUrl, deps: CaptureDeps): Promise
     deps,
     'capture-backfill',
   );
-  return { url: ref.url, surface: ref.surface, refId: ref.refId, status: 'success', capture, retrievalEvent };
+  return {
+    url: ref.url,
+    surface: ref.surface,
+    refId: ref.refId,
+    status: 'success',
+    capture,
+    retrievalEvent,
+  };
 }
 
 /**

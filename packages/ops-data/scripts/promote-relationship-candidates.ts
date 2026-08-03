@@ -52,7 +52,9 @@ async function loadActiveMergeMap(client: pg.PoolClient): Promise<ReadonlyMap<st
   );
 }
 
-async function loadPendingCandidates(client: pg.PoolClient): Promise<readonly LandscapeCandidateRow[]> {
+async function loadPendingCandidates(
+  client: pg.PoolClient,
+): Promise<readonly LandscapeCandidateRow[]> {
   const result = await client.query<{
     id: string;
     status: string;
@@ -119,7 +121,10 @@ async function loadEntityProfiles(
 }
 
 async function loadEdgeCoverage(client: pg.PoolClient): Promise<EdgeCoverageSnapshot> {
-  const result = await client.query<{ total_entities: string; entities_with_accepted_edge: string }>(
+  const result = await client.query<{
+    total_entities: string;
+    entities_with_accepted_edge: string;
+  }>(
     `WITH touched AS (
        SELECT from_entity_id AS entity_id
        FROM bb_canonical.entity_relationships
@@ -135,7 +140,10 @@ async function loadEdgeCoverage(client: pg.PoolClient): Promise<EdgeCoverageSnap
   );
   return {
     totalEntities: Number.parseInt(result.rows[0]?.total_entities ?? '0', 10),
-    entitiesWithAcceptedEdge: Number.parseInt(result.rows[0]?.entities_with_accepted_edge ?? '0', 10),
+    entitiesWithAcceptedEdge: Number.parseInt(
+      result.rows[0]?.entities_with_accepted_edge ?? '0',
+      10,
+    ),
   };
 }
 
@@ -246,7 +254,9 @@ async function main(): Promise<void> {
     }
 
     const coverageAfter = await loadEdgeCoverage(client);
-    console.log(`\nApplied: inserted ${inserted} entity_relationships; accepted ${acceptedCandidates} candidates.`);
+    console.log(
+      `\nApplied: inserted ${inserted} entity_relationships; accepted ${acceptedCandidates} candidates.`,
+    );
     console.log(`Edge coverage after: ${formatEdgeCoverage(coverageAfter)}`);
     console.log(
       '\nOptional next step: rebuild release graph surfaces for the active release:\n' +

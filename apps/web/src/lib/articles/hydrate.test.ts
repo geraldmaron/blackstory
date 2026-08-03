@@ -54,20 +54,27 @@ const doc: PublicArticleProjectionDoc = {
   placeLabel: 'US',
   body: [
     { type: 'paragraph', text: 'The manual said so [ref:census].' },
-    { type: 'stat', packetId: 'p1', kind: 'observation', refId: 'obs1', caption: 'Black rate, 1940.' },
+    {
+      type: 'stat',
+      packetId: 'p1',
+      kind: 'observation',
+      refId: 'obs1',
+      caption: 'Black rate, 1940.',
+    },
     { type: 'figure', packetId: 'p1', caption: 'Rates over time.' },
   ],
   references: [
-    { id: 'census', label: 'U.S. Census Bureau, homeownership tables.', url: 'https://census.gov/manual' },
+    {
+      id: 'census',
+      label: 'U.S. Census Bureau, homeownership tables.',
+      url: 'https://census.gov/manual',
+    },
   ],
   relatedEntityIds: [],
 };
 
 test('inline citation and matching packet provenance dedupe to one numbered reference', () => {
-  const { references, refNumberById } = buildArticleReferences(
-    doc,
-    new Map([['p1', packet]]),
-  );
+  const { references, refNumberById } = buildArticleReferences(doc, new Map([['p1', packet]]));
   // The inline [ref:census] and the stat/figure provenance share census.gov/manual.
   assert.equal(references.length, 1);
   assert.equal(references[0]!.number, 1);

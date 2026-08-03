@@ -16,9 +16,16 @@ import {
   createInMemorySubmissionQuarantineRepository,
   createSubmissionQuarantineService,
 } from '../quarantine.js';
-import { validateCorrectionSubmission, type CorrectionSubmissionInput } from '../corrections/correction-intake.js';
+import {
+  validateCorrectionSubmission,
+  type CorrectionSubmissionInput,
+} from '../corrections/correction-intake.js';
 import { buildPublicCorrectionStatus } from '../corrections/public-status.js';
-import { createCorrectionReceiptStore, buildStoredCorrectionReceipt, type CorrectionReceiptStore } from '../corrections/store.js';
+import {
+  createCorrectionReceiptStore,
+  buildStoredCorrectionReceipt,
+  type CorrectionReceiptStore,
+} from '../corrections/store.js';
 import { createIdempotencyCache, type IdempotencyCache } from '../corrections/idempotency-cache.js';
 import { jsonError, jsonResponse, type ApiResponse } from './responses.js';
 
@@ -123,7 +130,10 @@ export function handleHealth(request: ApiRequest): ApiResponse {
   );
 }
 
-export async function handleCorrectionSubmit(request: ApiRequest, deps: HandlerDeps): Promise<ApiResponse> {
+export async function handleCorrectionSubmit(
+  request: ApiRequest,
+  deps: HandlerDeps,
+): Promise<ApiResponse> {
   const guard = await guardSubmitRequest(request, deps);
   if (!guard.allowed) return guard.response;
 
@@ -158,13 +168,17 @@ export async function handleCorrectionSubmit(request: ApiRequest, deps: HandlerD
       security: {
         attestationAllowed: true,
         quotaAllowed: true,
-        ...(guard.clientIp ? { networkToken: networkTokenFor(guard.clientIp, deps.privacyPepper) } : {}),
+        ...(guard.clientIp
+          ? { networkToken: networkTokenFor(guard.clientIp, deps.privacyPepper) }
+          : {}),
       },
     });
 
     if (!intake.accepted) {
       if (intake.reason === 'validation_failed') {
-        return jsonError(intake.status, 'validation_failed', request.requestId, { issues: intake.issues });
+        return jsonError(intake.status, 'validation_failed', request.requestId, {
+          issues: intake.issues,
+        });
       }
       if (intake.reason === 'attestation_denied') {
         return jsonError(intake.status, 'client_attestation_required', request.requestId);
@@ -212,7 +226,10 @@ export async function handleCorrectionSubmit(request: ApiRequest, deps: HandlerD
   }
 }
 
-export async function handleCorrectionStatus(request: ApiRequest, deps: HandlerDeps): Promise<ApiResponse> {
+export async function handleCorrectionStatus(
+  request: ApiRequest,
+  deps: HandlerDeps,
+): Promise<ApiResponse> {
   if (request.body === undefined) {
     return jsonError(400, 'invalid_json', request.requestId);
   }

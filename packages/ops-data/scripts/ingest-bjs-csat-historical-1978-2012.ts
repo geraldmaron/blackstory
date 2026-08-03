@@ -214,7 +214,8 @@ function buildObservations(
         jurisdictionId: NATION_JURISDICTION_ID,
         boundaryVersion: 'nation-2020',
         referencePeriod: year,
-        datasetVintage: 'BJS Prisoners in 2020 - Statistical Tables, Table 5 (2010-2012 verified subset)',
+        datasetVintage:
+          'BJS Prisoners in 2020 - Statistical Tables, Table 5 (2010-2012 verified subset)',
         estimate: row.blackRate,
         raceEthnicitySlice: 'black',
         source: 'bjs-csat-prisoners',
@@ -231,7 +232,8 @@ function buildObservations(
         jurisdictionId: NATION_JURISDICTION_ID,
         boundaryVersion: 'nation-2020',
         referencePeriod: year,
-        datasetVintage: 'BJS Prisoners in 2020 - Statistical Tables, Table 5 (2010-2012 verified subset)',
+        datasetVintage:
+          'BJS Prisoners in 2020 - Statistical Tables, Table 5 (2010-2012 verified subset)',
         estimate: row.whiteRate,
         raceEthnicitySlice: 'white',
         source: 'bjs-csat-prisoners',
@@ -248,7 +250,8 @@ function buildObservations(
         jurisdictionId: NATION_JURISDICTION_ID,
         boundaryVersion: 'nation-2020',
         referencePeriod: year,
-        datasetVintage: 'BJS Prisoners in 2020 - Statistical Tables, Table 5 (2010-2012 verified subset)',
+        datasetVintage:
+          'BJS Prisoners in 2020 - Statistical Tables, Table 5 (2010-2012 verified subset)',
         estimate: row.hispanicRate,
         raceEthnicitySlice: 'hispanic',
         source: 'bjs-csat-prisoners',
@@ -305,8 +308,7 @@ async function applyObservations(
           obs.contentHash,
           JSON.stringify({
             source_vintage: 'CSAT-Prisoners National Rates',
-            note:
-              'Rates are sentenced prisoners per 100,000 US population of each race/ethnicity group (national aggregates only).',
+            note: 'Rates are sentenced prisoners per 100,000 US population of each race/ethnicity group (national aggregates only).',
           }),
         ],
       );
@@ -353,14 +355,13 @@ async function main(): Promise<void> {
     rejectedParseRows: parseResult.rejected.length,
     sourceUrl: CSAT_HOMEPAGE,
     bjsHomepage: BJS_HOMEPAGE,
-    datasetVintage: 'BJS Prisoners in 2020 - Statistical Tables, Table 5 (2010-2012 verified subset)',
+    datasetVintage:
+      'BJS Prisoners in 2020 - Statistical Tables, Table 5 (2010-2012 verified subset)',
   };
 
   if (!apply) {
     console.log(JSON.stringify(summary, null, 2));
-    console.log(
-      'Dry-run only. Set INGEST_BJS_CSAT_APPLY=1 DRY_RUN=0 DATABASE_URL=… to upsert.',
-    );
+    console.log('Dry-run only. Set INGEST_BJS_CSAT_APPLY=1 DRY_RUN=0 DATABASE_URL=… to upsert.');
     return;
   }
 

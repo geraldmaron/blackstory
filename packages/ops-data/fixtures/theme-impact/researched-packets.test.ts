@@ -13,10 +13,19 @@ import {
 
 test('researched catalog publishes exactly one packet for every substantive question', () => {
   const questionIds = RESEARCHED_THEME_IMPACT_PACKETS.map((packet) => packet.questionId);
-  assert.deepEqual(
-    [...questionIds].sort(),
-    ['Q1', 'Q11', 'Q12', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9'],
-  );
+  assert.deepEqual([...questionIds].sort(), [
+    'Q1',
+    'Q11',
+    'Q12',
+    'Q2',
+    'Q3',
+    'Q4',
+    'Q5',
+    'Q6',
+    'Q7',
+    'Q8',
+    'Q9',
+  ]);
   assert.equal(new Set(questionIds).size, 11);
   for (const packet of RESEARCHED_THEME_IMPACT_PACKETS) {
     assert.doesNotThrow(() => assertThemeImpactPacketPublishable(packet));
@@ -60,17 +69,11 @@ test('every researched theme exposes more than one artifact source lineage', () 
 });
 
 test('research adjudication challenges every public theme', () => {
-  const packetThemeIds = new Set(
-    RESEARCHED_THEME_IMPACT_PACKETS.map((packet) => packet.themeId),
-  );
-  const adjudicatedThemeIds = new Set(
-    THEME_RESEARCH_ADJUDICATION.map((row) => row.themeId),
-  );
+  const packetThemeIds = new Set(RESEARCHED_THEME_IMPACT_PACKETS.map((packet) => packet.themeId));
+  const adjudicatedThemeIds = new Set(THEME_RESEARCH_ADJUDICATION.map((row) => row.themeId));
   assert.deepEqual(adjudicatedThemeIds, packetThemeIds);
   assert.equal(adjudicatedThemeIds.size, 7);
-  assert.ok(
-    THEME_RESEARCH_ADJUDICATION.every((row) => row.rationale.trim().length >= 80),
-  );
+  assert.ok(THEME_RESEARCH_ADJUDICATION.every((row) => row.rationale.trim().length >= 80));
 });
 
 test('redlining Q1 uses gated causal claim with named secondary claim ids', () => {
@@ -108,8 +111,7 @@ test('Census CPS A-1 and BJS Table 6 primary series back voting and national imp
   assert.ok(mass);
 
   const black2012 = voting.observations.find(
-    (row) =>
-      row.metricId === 'cps-a1-turnout-black-nation' && row.referencePeriod === '2012',
+    (row) => row.metricId === 'cps-a1-turnout-black-nation' && row.referencePeriod === '2012',
   );
   assert.equal(black2012?.estimate, 66.2);
   assert.equal(black2012?.provenance.source, 'us-census-cps');
@@ -126,8 +128,7 @@ test('Census CPS A-1 and BJS Table 6 primary series back voting and national imp
 
   const blackImp2022 = mass.observations.find(
     (row) =>
-      row.metricId === 'bjs-imprisonment-rate-black-nation' &&
-      row.referencePeriod === '2022',
+      row.metricId === 'bjs-imprisonment-rate-black-nation' && row.referencePeriod === '2022',
   );
   assert.equal(blackImp2022?.estimate, 1196);
   assert.equal(blackImp2022?.provenance.source, 'bjs-national-prisoner-statistics');
@@ -157,9 +158,6 @@ test('Census CPS A-1 and BJS Table 6 primary series back voting and national imp
     ),
   );
   assert.ok(
-    mass.artifacts.some(
-      (artifact) => artifact.artifactId === 'art_bjs_prisoners_2020_tables_zip',
-    ),
+    mass.artifacts.some((artifact) => artifact.artifactId === 'art_bjs_prisoners_2020_tables_zip'),
   );
 });
-

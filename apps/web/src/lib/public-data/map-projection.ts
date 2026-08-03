@@ -175,7 +175,8 @@ function resolveStatusHistory(
   }
 
   const livingStatus =
-    'livingStatus' in projection && typeof (projection as { livingStatus?: unknown }).livingStatus === 'string'
+    'livingStatus' in projection &&
+    typeof (projection as { livingStatus?: unknown }).livingStatus === 'string'
       ? ((projection as { livingStatus: string }).livingStatus as 'living' | 'deceased' | 'unknown')
       : undefined;
 

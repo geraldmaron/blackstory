@@ -19,7 +19,11 @@ function revisionAgentLabel(revision: FactRevision): string {
   return revision.agent.displayName ?? revision.agent.id;
 }
 
-export function FactRevisionPanel({ fact, currentRevisionNumber, labelledBy }: FactRevisionPanelProps) {
+export function FactRevisionPanel({
+  fact,
+  currentRevisionNumber,
+  labelledBy,
+}: FactRevisionPanelProps) {
   if (fact.revisions.length === 0) {
     return (
       <p className="bb-sans" style={{ color: 'var(--bb-ink-muted)' }}>
@@ -50,14 +54,17 @@ export function FactRevisionPanel({ fact, currentRevisionNumber, labelledBy }: F
               </p>
               {!isCurrent ? (
                 <p style={{ margin: 'var(--bb-space-1) 0 0 0' }}>
-                  <a href={buildFactRevisionPath(fact.id, revision.revisionNumber)}>View revision permalink</a>
+                  <a href={buildFactRevisionPath(fact.id, revision.revisionNumber)}>
+                    View revision permalink
+                  </a>
                 </p>
               ) : null}
               {revision.diff.length > 0 ? (
                 <ul style={{ margin: 'var(--bb-space-2) 0 0 0', paddingLeft: 'var(--bb-space-5)' }}>
                   {revision.diff.map((entry) => (
                     <li key={`${revision.revisionNumber}_${entry.field}`}>
-                      <span className="bb-mono">{entry.field}</span>: {entry.before ?? '∅'} → {entry.after ?? '∅'}
+                      <span className="bb-mono">{entry.field}</span>: {entry.before ?? '∅'} →{' '}
+                      {entry.after ?? '∅'}
                     </li>
                   ))}
                 </ul>

@@ -12,7 +12,10 @@ import {
 
 const entities: MentionResolvableEntity[] = [
   { id: 'ent_sclc_org_001', displayName: 'Southern Christian Leadership Conference (SCLC)' },
-  { id: 'ent_sclc_founding_001', displayName: 'Southern Christian Leadership Conference (SCLC) Founding' },
+  {
+    id: 'ent_sclc_founding_001',
+    displayName: 'Southern Christian Leadership Conference (SCLC) Founding',
+  },
   { id: 'ent_montgomery_bus_boycott_001', displayName: 'Montgomery Bus Boycott' },
   { id: 'ent_birmingham_campaign_001', displayName: 'Birmingham Campaign' },
   { id: 'ent_madam_cj_walker_001', displayName: 'Madam C.J. Walker' },

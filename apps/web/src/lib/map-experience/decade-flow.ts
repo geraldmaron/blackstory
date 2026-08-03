@@ -223,7 +223,9 @@ export function buildDecadeFlowFrames(
   const maxDecadeStart = calendarDecadeStartYear();
   const frames: DecadeFlowFrame[] = [];
   // Newest first so autoplay and the rail both read new → old.
-  for (const start of [...decadeStarts].filter((year) => year <= maxDecadeStart).sort((a, b) => b - a)) {
+  for (const start of [...decadeStarts]
+    .filter((year) => year <= maxDecadeStart)
+    .sort((a, b) => b - a)) {
     const label = `${start}s`;
     const vintage = String(start);
     const cumulative = collection.features.filter((feature) => {

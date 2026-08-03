@@ -41,25 +41,25 @@ export type PublicApiErrorCode = (typeof PUBLIC_API_ERROR_CODES)[number];
 /** The fixed HTTP status `CLIENT_VERSION_UNSUPPORTED` is always paired with (ADR-021 §2). */
 export const CLIENT_VERSION_UNSUPPORTED_HTTP_STATUS = 426 as const;
 
-export const publicApiErrorSchema = z
-  .object({
-    code: z.enum(PUBLIC_API_ERROR_CODES),
-    message: nonEmptyText(2000),
-    requestId: idString(200).optional(),
-    /**
-     * Structured, non-sensitive detail (e.g. which field failed validation). Never a stack trace,
-     * never an internal path, never a secret — server-side serialization is responsible for that
-     * guarantee; this schema only bounds shape and size.
-     */
-    details: z.record(z.string().max(200), z.union([z.string().max(2000), z.number(), z.boolean(), z.null()])).optional(),
-  });
+export const publicApiErrorSchema = z.object({
+  code: z.enum(PUBLIC_API_ERROR_CODES),
+  message: nonEmptyText(2000),
+  requestId: idString(200).optional(),
+  /**
+   * Structured, non-sensitive detail (e.g. which field failed validation). Never a stack trace,
+   * never an internal path, never a secret — server-side serialization is responsible for that
+   * guarantee; this schema only bounds shape and size.
+   */
+  details: z
+    .record(z.string().max(200), z.union([z.string().max(2000), z.number(), z.boolean(), z.null()]))
+    .optional(),
+});
 
 export type PublicApiError = z.infer<typeof publicApiErrorSchema>;
 
-export const publicApiErrorEnvelopeSchema = z
-  .object({
-    error: publicApiErrorSchema,
-  });
+export const publicApiErrorEnvelopeSchema = z.object({
+  error: publicApiErrorSchema,
+});
 
 export type PublicApiErrorEnvelope = z.infer<typeof publicApiErrorEnvelopeSchema>;
 

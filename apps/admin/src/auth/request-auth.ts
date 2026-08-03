@@ -17,10 +17,18 @@ export type ResolvedAdminCaller = {
   readonly admin: VerifiedSupabaseAdminIdentity;
 };
 
-function supabaseVerifierFromEnv(environment: NodeJS.ProcessEnv | Record<string, string | undefined> = process.env) {
+function supabaseVerifierFromEnv(
+  environment: NodeJS.ProcessEnv | Record<string, string | undefined> = process.env,
+) {
   const { url, anonKey } = readSupabaseServerConfig(environment);
-  const client = createClient(url, anonKey, { auth: { persistSession: false, autoRefreshToken: false } });
-  return { async getUser(accessToken: string) { return client.auth.getUser(accessToken); } };
+  const client = createClient(url, anonKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  return {
+    async getUser(accessToken: string) {
+      return client.auth.getUser(accessToken);
+    },
+  };
 }
 
 /** One line, bounded length: log records must not be forgeable by their own subject. */
@@ -29,8 +37,11 @@ function sanitizeForLog(value: unknown): string {
   return text.replace(/[\r\n\u2028\u2029]+/g, ' ').slice(0, 500);
 }
 
-export async function authorizeAdminRequest(headers: AdminRequestHeaders): Promise<ResolvedAdminCaller> {
-  const identity = await createSupabaseSessionAuthorizer(supabaseVerifierFromEnv()).assertAuthenticated(headers);
+export async function authorizeAdminRequest(
+  headers: AdminRequestHeaders,
+): Promise<ResolvedAdminCaller> {
+  const identity =
+    await createSupabaseSessionAuthorizer(supabaseVerifierFromEnv()).assertAuthenticated(headers);
   return {
     mode: 'supabase',
     email: identity.email,

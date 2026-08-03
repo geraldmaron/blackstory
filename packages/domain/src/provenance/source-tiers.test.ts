@@ -30,7 +30,10 @@ test('archives and replication repositories are T2 anchors', () => {
 
 test('state historical societies classify by their registry entries', () => {
   assert.equal(lookupSourceTier('https://www.okhistory.org/research/forms/freport.pdf').tier, 'T2');
-  assert.equal(lookupSourceTier('https://tulsahistory.org/exhibit/1921-tulsa-race-massacre/').tier, 'T3');
+  assert.equal(
+    lookupSourceTier('https://tulsahistory.org/exhibit/1921-tulsa-race-massacre/').tier,
+    'T3',
+  );
 });
 
 test('unclassified hosts default to T4 and are not anchors', () => {

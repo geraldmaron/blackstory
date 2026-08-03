@@ -51,8 +51,7 @@ const DECEASED_RE =
  * Lynching verb forms only — bare "Lynch" surnames must not match.
  * Prefer "was lynched" / "lynched on|in|by" / "lynching of" over bare "lynching".
  */
-const LYNCHING_DECEASED_RE =
-  /\b(was\s+lynched|lynched\s+(on|in|by)|lynching\s+of)\b/i;
+const LYNCHING_DECEASED_RE = /\b(was\s+lynched|lynched\s+(on|in|by)|lynching\s+of)\b/i;
 
 /** Parenthetical life range, e.g. "(1885–1952)" — end year signals deceased when it's not recent. */
 const LIFE_RANGE_RE = /\((1[6-9]\d{2})\s*[–—-]\s*(1[6-9]\d{2}|20[0-2]\d)\)/;

@@ -42,19 +42,14 @@ type FetchOptions = {
 };
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const FIXTURE_DIR = join(
-  __dirname,
-  '../../../../ops-data/fixtures/reference-indicators',
-);
+const FIXTURE_DIR = join(__dirname, '../../../../ops-data/fixtures/reference-indicators');
 const DEFAULT_FIXTURE_PATH = join(FIXTURE_DIR, NHGIS_COOK_RACE_POPULATION_SHARE_FIXTURE_FILENAME);
 const DEFAULT_TENURE_FIXTURE_PATH = join(
   FIXTURE_DIR,
   NHGIS_COOK_TENURE_HOMEOWNERSHIP_FIXTURE_FILENAME,
 );
 
-function loadFixtureText(
-  options: FetchOptions,
-): { readonly text: string; readonly path: string } {
+function loadFixtureText(options: FetchOptions): { readonly text: string; readonly path: string } {
   if (options.fixtureCsvText !== undefined) {
     return {
       text: options.fixtureCsvText,
@@ -93,9 +88,7 @@ function loadTenureFixtureText(
   }
 }
 
-export function fetchPhase1NhgisObservations(
-  options: FetchOptions = {},
-): Phase1NhgisFetchResult {
+export function fetchPhase1NhgisObservations(options: FetchOptions = {}): Phase1NhgisFetchResult {
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const requireThemeImpactDecades = options.requireThemeImpactDecades ?? true;
   const requireTenureDecades = options.requireTenureDecades ?? true;
@@ -136,7 +129,4 @@ export function fetchPhase1NhgisObservations(
   };
 }
 
-export {
-  DEFAULT_FIXTURE_PATH,
-  DEFAULT_TENURE_FIXTURE_PATH,
-};
+export { DEFAULT_FIXTURE_PATH, DEFAULT_TENURE_FIXTURE_PATH };

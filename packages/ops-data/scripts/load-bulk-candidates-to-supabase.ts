@@ -253,7 +253,10 @@ async function upsertPlan(client: pg.PoolClient, plan: BulkFixtureLoadPlan): Pro
   }
 }
 
-async function loadLane(lane: BulkLane, options: { readonly fetch: boolean; readonly fixture?: string }) {
+async function loadLane(
+  lane: BulkLane,
+  options: { readonly fetch: boolean; readonly fixture?: string },
+) {
   let fixturePath = resolveFixturePath(lane, options.fixture);
   if (options.fetch) {
     if (lane === 'greenbook' || lane === 'hbcu' || lane === 'dc-sites') {
@@ -283,7 +286,9 @@ async function loadLane(lane: BulkLane, options: { readonly fetch: boolean; read
   console.log(`Plan written: ${planPath}`);
 
   if (DRY_RUN) {
-    console.log('DRY_RUN=1 (default): no database writes. Set DRY_RUN=0 LOAD_BULK_CANDIDATES_APPLY=1 to apply.');
+    console.log(
+      'DRY_RUN=1 (default): no database writes. Set DRY_RUN=0 LOAD_BULK_CANDIDATES_APPLY=1 to apply.',
+    );
     return plan;
   }
 
@@ -333,9 +338,7 @@ async function main(): Promise<void> {
   const fixture = arg('fixture');
   const fetch = hasFlag('--fetch');
   const lanes: BulkLane[] =
-    laneArg === 'all'
-      ? (['dc-sites', 'hbcu', 'greenbook'] as const)
-      : [laneArg as BulkLane];
+    laneArg === 'all' ? (['dc-sites', 'hbcu', 'greenbook'] as const) : [laneArg as BulkLane];
 
   let totalCandidates = 0;
   for (const lane of lanes) {

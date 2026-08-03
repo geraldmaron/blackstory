@@ -49,7 +49,9 @@ export async function listDiscoveryGraylist(limit = 100): Promise<readonly Grayl
   }));
 }
 
-export async function tryListDiscoveryGraylist(limit?: number): Promise<readonly GraylistListItem[] | null> {
+export async function tryListDiscoveryGraylist(
+  limit?: number,
+): Promise<readonly GraylistListItem[] | null> {
   try {
     return await listDiscoveryGraylist(limit);
   } catch (error) {

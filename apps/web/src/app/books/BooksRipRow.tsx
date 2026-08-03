@@ -23,7 +23,10 @@ function BrowseRowActions({ item }: { readonly item: BooksBrowseItem }) {
   const bookshop = item.purchaseLinks.find((link) => link.retailer === 'bookshop');
 
   return (
-    <div className="ds-books-edition__rip-actions" aria-label={`Purchase options for ${item.title}`}>
+    <div
+      className="ds-books-edition__rip-actions"
+      aria-label={`Purchase options for ${item.title}`}
+    >
       {bookshop ? (
         <a
           className="ds-cta ds-cta--copper ds-books-edition__rip-buy"
@@ -70,10 +73,7 @@ function stateFactValue(
 
 export function BooksRipRow({ item, sort, dir, isFirst = false }: BooksRipRowProps) {
   return (
-    <article
-      className="ds-books-edition__rip-row"
-      {...(isFirst ? { 'data-first-row': true } : {})}
-    >
+    <article className="ds-books-edition__rip-row" {...(isFirst ? { 'data-first-row': true } : {})}>
       <div className="ds-books-edition__rip-main">
         <BooksCoverArt title={item.title} {...(item.coverIsbn ? { isbn: item.coverIsbn } : {})} />
         <div className="ds-books-edition__rip-body">
@@ -112,7 +112,9 @@ export function BooksRipRow({ item, sort, dir, isFirst = false }: BooksRipRowPro
                 <EditionFactIcon variant="record-where" />
                 States
               </dt>
-              <dd className="ds-books-edition__rip-fact-value">{stateFactValue(item, sort, dir)}</dd>
+              <dd className="ds-books-edition__rip-fact-value">
+                {stateFactValue(item, sort, dir)}
+              </dd>
             </div>
           </dl>
         </div>

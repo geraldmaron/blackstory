@@ -323,7 +323,10 @@ async function gateClaimDoiCitations(
       issues.push(`claims[${index}]: DOI ${citation.doi} did not resolve (${result.reason})`);
     } else if (result.outcome === 'mismatch') {
       const detail = result.mismatches
-        .map((m) => `${m.field}: stored=${JSON.stringify(m.stored)} resolved=${JSON.stringify(m.resolved)}`)
+        .map(
+          (m) =>
+            `${m.field}: stored=${JSON.stringify(m.stored)} resolved=${JSON.stringify(m.resolved)}`,
+        )
         .join('; ');
       issues.push(`claims[${index}]: DOI ${citation.doi} mismatch (${detail})`);
     }

@@ -125,8 +125,7 @@ export const buyingAHomeArticle = {
     },
     {
       id: 'fha-annual-report-1959',
-      label:
-        'Federal Housing Administration, 26th Annual Report (calendar year 1959); HUD USER.',
+      label: 'Federal Housing Administration, 26th Annual Report (calendar year 1959); HUD USER.',
       url: 'https://www.huduser.gov/portal/sites/default/files/pdf/26TH-ANNUAL-REPORT-FEDERAL-HOUSING-ADMINISTRATION.pdf',
     },
     {
@@ -247,8 +246,7 @@ export const buyingAHomeArticle = {
     },
     {
       id: 'scf-2022',
-      label:
-        'Board of Governors of the Federal Reserve System, Survey of Consumer Finances, 2022.',
+      label: 'Board of Governors of the Federal Reserve System, Survey of Consumer Finances, 2022.',
       url: 'https://www.federalreserve.gov/econres/scfindex.htm',
     },
   ],

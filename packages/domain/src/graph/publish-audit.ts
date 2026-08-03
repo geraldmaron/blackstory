@@ -85,7 +85,9 @@ export function auditGraphReleaseArtifact(
     if (drop) droppedFromAllTime.push(drop);
   }
 
-  const eligibleCanonical = input.relationships.filter((rel) => edgeInAllTime(rel, releaseEntityIds) === undefined);
+  const eligibleCanonical = input.relationships.filter(
+    (rel) => edgeInAllTime(rel, releaseEntityIds) === undefined,
+  );
   const allTimeEdgeIds = new Set(input.artifact.allTimeView.edgeIds);
   const unexplained: GraphEdgeDrop[] = [];
   for (const rel of eligibleCanonical) {
@@ -104,7 +106,9 @@ export function auditGraphReleaseArtifact(
   }
 
   const entitiesWithDecadeBuckets = input.decadeEntities.filter(
-    (entity) => deriveActiveDecadeBuckets(entity, { stillActiveCutoff: input.artifact.generatedAt }).length > 0,
+    (entity) =>
+      deriveActiveDecadeBuckets(entity, { stillActiveCutoff: input.artifact.generatedAt }).length >
+      0,
   ).length;
 
   const adjacencyCapHits: AdjacencyCapHit[] = [];

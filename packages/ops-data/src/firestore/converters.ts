@@ -3,10 +3,7 @@
  */
 import type { FirestoreDataConverter, QueryDocumentSnapshot } from 'firebase/firestore';
 import type { z } from 'zod';
-import {
-  assertLearningIndexProjection,
-  sanitizePrimaryImageForRelease,
-} from '@repo/domain';
+import { assertLearningIndexProjection, sanitizePrimaryImageForRelease } from '@repo/domain';
 import { assertPublicProjectionSafe } from '@repo/security';
 import {
   auditEventSchema,

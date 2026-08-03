@@ -72,10 +72,7 @@ function requireBearerAccessToken(headers: AdminRequestHeaders): string {
 
 export class SupabaseSessionAuthorizationError extends Error {
   readonly code:
-    | 'ADMIN_EMAIL_REQUIRED'
-    | 'ADMIN_SESSION_INVALID'
-    | 'ADMIN_ROLE_REQUIRED'
-    | 'ADMIN_ROLE_UNKNOWN';
+    'ADMIN_EMAIL_REQUIRED' | 'ADMIN_SESSION_INVALID' | 'ADMIN_ROLE_REQUIRED' | 'ADMIN_ROLE_UNKNOWN';
 
   constructor(code: SupabaseSessionAuthorizationError['code'], message: string) {
     super(message);

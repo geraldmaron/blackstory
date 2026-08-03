@@ -134,7 +134,8 @@ export function satisfiesTwoAnchorRule(observation: ThemeImpactPacketObservation
   );
   const anchorTierCount = anchorTiers.filter(Boolean).length;
   const satisfiesTwoAnchors = anchorTierCount >= 2 && independentHosts.size >= 2;
-  const satisfiesReplicationException = anchorTierCount >= 1 && observation.replicationVerified === true;
+  const satisfiesReplicationException =
+    anchorTierCount >= 1 && observation.replicationVerified === true;
   return satisfiesTwoAnchors || satisfiesReplicationException;
 }
 
@@ -356,22 +357,31 @@ export function deriveDefaultMultiDecadeChecklist(
     primary_layer:
       observations.length + derived.length + artifacts.length > 0
         ? present()
-        : gap('insufficient_evidence', 'no observations, derived measurements, or artifacts on this packet'),
+        : gap(
+            'insufficient_evidence',
+            'no observations, derived measurements, or artifacts on this packet',
+          ),
     crosswalk_layer: gap(
       'insufficient_evidence',
-      'no HOLC-polygon -> modern-tract (or historical-geography -> modern-jurisdiction) crosswalk applied to this packet\'s geography yet',
+      "no HOLC-polygon -> modern-tract (or historical-geography -> modern-jurisdiction) crosswalk applied to this packet's geography yet",
     ),
     longitudinal_outcomes:
       referencePeriods.size >= 2
         ? present()
-        : gap('insufficient_evidence', 'packet carries a single reference period; no era-spanning observations yet'),
+        : gap(
+            'insufficient_evidence',
+            'packet carries a single reference period; no era-spanning observations yet',
+          ),
     named_actors:
       input.entityBinding !== undefined
         ? present()
         : gap('insufficient_evidence', 'no named-actor entity binding on this packet'),
     event_timeline: artifacts.some((a) => Boolean(a.dated))
       ? present()
-      : gap('insufficient_evidence', 'no dated artifacts on this packet to anchor an event timeline'),
+      : gap(
+          'insufficient_evidence',
+          'no dated artifacts on this packet to anchor an event timeline',
+        ),
     causal_confidence_metadata: present(),
   };
 }
@@ -572,8 +582,7 @@ export function createRedliningQ3FixturePacket(
           sourceUrl: 'https://dsl.richmond.edu/panorama/redlining/',
           retrievedAt: '2026-07-22T12:00:00.000Z',
           contentHash: 'sha256:fixture-holc-note',
-          humanCitation:
-            'Mapping Inequality / HOLC residential security map (test fixture).',
+          humanCitation: 'Mapping Inequality / HOLC residential security map (test fixture).',
         },
         dated: '1937',
         uncertaintyLabel: 'Grade polygons are historical; modern boundaries differ.',

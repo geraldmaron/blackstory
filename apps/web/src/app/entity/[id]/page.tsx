@@ -43,15 +43,9 @@ import {
   defaultExploreOverlayState,
 } from '../../../lib/map-experience/url-state';
 import { mapToneFromTopics } from '../../../lib/map-experience/kind-encoding';
-import {
-  entityEvidenceHref,
-  exploreHrefForKind,
-} from '../../../lib/map-experience/metadata-hrefs';
+import { entityEvidenceHref, exploreHrefForKind } from '../../../lib/map-experience/metadata-hrefs';
 import { buildEntityPageMetadata } from '../../../lib/seo/metadata-builders';
-import {
-  getPublicSearchIndex,
-  resolvePublicEntityView,
-} from '../../../lib/public-data/source';
+import { getPublicSearchIndex, resolvePublicEntityView } from '../../../lib/public-data/source';
 import { shouldUseLivePublicProjections } from '../../../lib/public-data/live-policy';
 import { resolveEntityCrossReferences } from '../../../lib/theme-impact/source';
 import { isDisplayableJurisdictionLabel } from '../../../lib/public-data/map-projection';
@@ -120,7 +114,10 @@ export async function generateMetadata({ params }: EntityPageProps) {
 function sourceLabel(claim: PublicEntityView['claims'][number]): string {
   const raw = (claim.citationLabel || claim.citationSource || '').trim();
   const href = claim.citationHref;
-  const publisher = raw.replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/$/, '');
+  const publisher = raw
+    .replace(/^https?:\/\//i, '')
+    .replace(/^www\./i, '')
+    .replace(/\/$/, '');
   if (!href) return publisher;
 
   // A bare host is not a citation, it is a domain. The document's own URL path is the only
@@ -198,7 +195,14 @@ export default async function EntityPage({ params }: EntityPageProps) {
   });
   const entityLinkCatalog = entityLinkCatalogFromNeighbors(entity);
   const exploreHref = buildExploreHref({
-    filters: { era: 'all', kind: 'all', tone: 'all', theme: 'all', status: 'all', confidence: 'all' },
+    filters: {
+      era: 'all',
+      kind: 'all',
+      tone: 'all',
+      theme: 'all',
+      status: 'all',
+      confidence: 'all',
+    },
     ...defaultExploreOverlayState(),
     selected: entity.id,
     ...(geoAnchor ? { viewport: { lat: geoAnchor.lat, lng: geoAnchor.lng, zoom: 11 } } : {}),

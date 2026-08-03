@@ -4,7 +4,11 @@
     "sourceResource": {
       "title": ["Freedmen's Bureau labor contract, Yazoo County, Mississippi, 1868"],
       "date": { "displayDate": "1868" },
-      "subject": [{ "name": "Reconstruction" }, { "name": "Mississippi" }, { "name": "Yazoo County" }]
+      "subject": [
+        { "name": "Reconstruction" },
+        { "name": "Mississippi" },
+        { "name": "Yazoo County" }
+      ]
     },
     "dataProvider": "Mississippi Department of Archives and History",
     "spatial": { "state": "Mississippi" }
@@ -109,7 +113,9 @@
   {
     "id": "dpla-md-school-1931",
     "sourceResource": {
-      "title": ["Ridgeley Rosenwald School dedication program, Prince George's County, Maryland, 1931"],
+      "title": [
+        "Ridgeley Rosenwald School dedication program, Prince George's County, Maryland, 1931"
+      ],
       "date": { "displayDate": "1931" },
       "subject": [{ "name": "Schools" }, { "name": "Maryland" }]
     },

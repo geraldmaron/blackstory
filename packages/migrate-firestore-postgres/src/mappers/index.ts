@@ -19,7 +19,10 @@ export type PolicyActiveRow = {
   readonly activated_at: string;
 };
 
-export function mapPolicyActive(docId: string, data: Record<string, unknown>): PolicyActiveRow | null {
+export function mapPolicyActive(
+  docId: string,
+  data: Record<string, unknown>,
+): PolicyActiveRow | null {
   if (docId !== 'active') return null;
   return {
     id: 'active',
@@ -38,8 +41,7 @@ export type PolicyVersionRow = {
 
 export function mapPolicyVersion(docId: string, data: Record<string, unknown>): PolicyVersionRow {
   const notes = asStringOrUndefined(data.notes);
-  const createdAt =
-    data.createdAt !== undefined ? toIsoTimestamp(data.createdAt) : undefined;
+  const createdAt = data.createdAt !== undefined ? toIsoTimestamp(data.createdAt) : undefined;
   return {
     id: docId,
     policy_version: asString(data.policyVersion, docId),
@@ -86,8 +88,7 @@ export function mapPublicationRelease(
   const searchIndexVersion = asStringOrUndefined(data.searchIndexVersion);
   const notes = asStringOrUndefined(data.notes);
   const createdBy = asStringOrUndefined(data.createdBy);
-  const activatedAt =
-    data.activatedAt !== undefined ? toIsoTimestamp(data.activatedAt) : undefined;
+  const activatedAt = data.activatedAt !== undefined ? toIsoTimestamp(data.activatedAt) : undefined;
   return {
     id: asString(data.releaseId, docId),
     status: asString(data.status, 'draft'),
@@ -307,7 +308,10 @@ export type CaseChecklistItemRow = {
   readonly note?: string;
 };
 
-export function mapResearchCase(docId: string, data: Record<string, unknown>): {
+export function mapResearchCase(
+  docId: string,
+  data: Record<string, unknown>,
+): {
   readonly caseRow: ResearchCaseRow;
   readonly history: readonly CaseHistoryEventRow[];
   readonly checklist: readonly CaseChecklistItemRow[];
@@ -473,7 +477,9 @@ export function mapSearchIndex(
     release_id: asString(data.releaseId, defaultReleaseId),
     entity_id: asStringOrUndefined(data.entityId),
     name: asStringOrUndefined(data.name),
-    name_lower: asStringOrUndefined(data.nameLower ?? (typeof data.name === 'string' ? data.name.toLowerCase() : undefined)),
+    name_lower: asStringOrUndefined(
+      data.nameLower ?? (typeof data.name === 'string' ? data.name.toLowerCase() : undefined),
+    ),
     aliases: asStringArray(data.aliases),
     topics: asStringArray(data.topics),
     kind: asStringOrUndefined(data.kind),
@@ -802,9 +808,7 @@ export function mapEntityRelationship(
   const validFrom = asStringOrUndefined(temporal.validFrom ?? data.validFrom);
   const validToRaw = temporal.validTo ?? data.validTo;
   const validTo =
-    validToRaw === null || validToRaw === undefined
-      ? undefined
-      : asStringOrUndefined(validToRaw);
+    validToRaw === null || validToRaw === undefined ? undefined : asStringOrUndefined(validToRaw);
   return omitUndefined({
     id: asString(data.id, docId),
     from_entity_id: fromId,

@@ -10,11 +10,7 @@
  * reference info" requirement without inventing a parallel, disconnected entity catalog. This
  * file only ADDS facts; it never edits `./public-seed.ts` or `./entity-graph-seed.ts`.
  */
-import {
-  asFactId,
-  buildFactSearchIndexDocs,
-  type FactRecord,
-} from '@repo/domain';
+import { asFactId, buildFactSearchIndexDocs, type FactRecord } from '@repo/domain';
 import { NATIONAL_STORY_FACTS } from './national-story-seed/facts';
 
 export const FACTS_SEED_RELEASE_ID = 'seed-release-2026-07-17';
@@ -34,11 +30,16 @@ export const SEED_FACTS: readonly FactRecord[] = [
     geo: { lat: 32.3792, lng: -86.3077, geoPrecision: 'locality' },
     when: { validFrom: '1955-12-01', datePrecision: 'day' },
     qualifiers: [
-      { kind: 'as-reported-by', key: 'arresting-officer-report', value: 'Montgomery Police Department log, Dec. 1, 1955' },
+      {
+        kind: 'as-reported-by',
+        key: 'arresting-officer-report',
+        value: 'Montgomery Police Department log, Dec. 1, 1955',
+      },
     ],
     counterClaims: [
       {
-        misreading: 'Rosa Parks was simply "tired" that day and acted spontaneously with no prior activism.',
+        misreading:
+          'Rosa Parks was simply "tired" that day and acted spontaneously with no prior activism.',
         refutation:
           'Parks was an active NAACP secretary who had trained in nonviolent resistance at the Highlander Folk School; her refusal was a deliberate act, not an impulsive one.',
       },
@@ -62,8 +63,10 @@ export const SEED_FACTS: readonly FactRecord[] = [
         },
         sourceClass: 'primary',
         role: 'supports',
-        excerpt: 'On December 1, 1955, Mrs. Rosa Parks was arrested for violating the city bus segregation ordinance.',
-        archivedUrl: 'https://web.archive.org/web/20260101000000/https://example.gov/archives/mia-chronology',
+        excerpt:
+          'On December 1, 1955, Mrs. Rosa Parks was arrested for violating the city bus segregation ordinance.',
+        archivedUrl:
+          'https://web.archive.org/web/20260101000000/https://example.gov/archives/mia-chronology',
         archivedAt: '2026-01-01T00:00:00.000Z',
         accessedAt: '2026-01-05T00:00:00.000Z',
         documentId: 'doc-mia-chronology-001',
@@ -92,7 +95,13 @@ export const SEED_FACTS: readonly FactRecord[] = [
     subjects: [{ entityId: 'ent_seed_school_001', kind: 'school', role: 'designated-place' }],
     geo: { lat: 33.749, lng: -84.388, geoPrecision: 'block' },
     when: { validFrom: '1868', datePrecision: 'year' },
-    qualifiers: [{ kind: 'estimated', key: 'founding-month', value: 'exact month not recorded in surviving registers' }],
+    qualifiers: [
+      {
+        kind: 'estimated',
+        key: 'founding-month',
+        value: 'exact month not recorded in surviving registers',
+      },
+    ],
     counterClaims: [],
     relatedFacts: [],
     provenance: {
@@ -110,9 +119,11 @@ export const SEED_FACTS: readonly FactRecord[] = [
         },
         sourceClass: 'primary',
         role: 'supports',
-        excerpt: 'School established 1868 under Freedmen\u2019s Bureau authorization, district register entry 214.',
+        excerpt:
+          'School established 1868 under Freedmen\u2019s Bureau authorization, district register entry 214.',
         accessedAt: '2026-02-01T00:00:00.000Z',
-        sourceNote: 'Consulted via microfilm at the state archives; no stable URL exists for this record.',
+        sourceNote:
+          'Consulted via microfilm at the state archives; no stable URL exists for this record.',
       },
     ],
     revisions: [
@@ -137,7 +148,13 @@ export const SEED_FACTS: readonly FactRecord[] = [
     claimType: 'quantity',
     subjects: [{ entityId: 'ent_seed_institution_001', kind: 'institution', role: 'subject' }],
     when: { validFrom: '1975', datePrecision: 'year' },
-    qualifiers: [{ kind: 'estimated', key: 'attendance-method', value: 'contemporaneous membership rolls, not a headcount' }],
+    qualifiers: [
+      {
+        kind: 'estimated',
+        key: 'attendance-method',
+        value: 'contemporaneous membership rolls, not a headcount',
+      },
+    ],
     counterClaims: [
       {
         misreading: 'The institution had 3,000 founding members.',
@@ -167,7 +184,8 @@ export const SEED_FACTS: readonly FactRecord[] = [
         role: 'supports',
         excerpt: 'Membership roll, 1975: 1,187 recorded members as of the founding assembly.',
         accessedAt: '2026-02-10T00:00:00.000Z',
-        sourceNote: 'Held in the institution\u2019s own archive; no stable URL exists for this record.',
+        sourceNote:
+          'Held in the institution\u2019s own archive; no stable URL exists for this record.',
       },
       {
         csl: {
@@ -178,11 +196,14 @@ export const SEED_FACTS: readonly FactRecord[] = [
         },
         sourceClass: 'secondary',
         role: 'contradicts',
-        excerpt: 'The institution welcomed some 3,000 members at its founding, the article recalled.',
-        archivedUrl: 'https://web.archive.org/web/20260201000000/https://example-news.example/retrospective-1980s',
+        excerpt:
+          'The institution welcomed some 3,000 members at its founding, the article recalled.',
+        archivedUrl:
+          'https://web.archive.org/web/20260201000000/https://example-news.example/retrospective-1980s',
         archivedAt: '2026-02-01T00:00:00.000Z',
         accessedAt: '2026-02-10T00:00:00.000Z',
-        sourceNote: 'Cited here as the contradicting source this record\u2019s correction resolves, not as support.',
+        sourceNote:
+          'Cited here as the contradicting source this record\u2019s correction resolves, not as support.',
       },
     ],
     revisions: [
@@ -202,7 +223,11 @@ export const SEED_FACTS: readonly FactRecord[] = [
         summary:
           'Corrected founding attendance from ~3,000 (single uncited secondary source) to ~1,200, based on the institution\u2019s own 1975 membership rolls.',
         diff: [
-          { field: 'statement', before: 'approximately 3,000 members', after: 'approximately 1,200 members' },
+          {
+            field: 'statement',
+            before: 'approximately 3,000 members',
+            after: 'approximately 1,200 members',
+          },
           { field: 'confidence', before: 'single-source', after: 'contested' },
         ],
       },
@@ -217,7 +242,9 @@ export const SEED_FACTS: readonly FactRecord[] = [
       'The commemorative plaque\u2019s inscribed quotation is attributed to a 1975 dedication speech; no earlier recorded instance of the exact wording has been found.',
     shortStatement: 'Plaque quote traced to 1975 dedication speech',
     claimType: 'quote-attribution',
-    subjects: [{ entityId: 'ent_seed_institution_001', kind: 'institution', role: 'artifact-context' }],
+    subjects: [
+      { entityId: 'ent_seed_institution_001', kind: 'institution', role: 'artifact-context' },
+    ],
     when: { validFrom: '1975', datePrecision: 'year' },
     qualifiers: [],
     counterClaims: [],
@@ -236,9 +263,11 @@ export const SEED_FACTS: readonly FactRecord[] = [
         },
         sourceClass: 'primary',
         role: 'supports',
-        excerpt: 'Recording timestamp 14:02 — the speaker delivers the quotation later inscribed on the plaque.',
+        excerpt:
+          'Recording timestamp 14:02 — the speaker delivers the quotation later inscribed on the plaque.',
         accessedAt: '2026-03-01T00:00:00.000Z',
-        sourceNote: 'Held in the institution\u2019s own archive; no stable URL exists for this record.',
+        sourceNote:
+          'Held in the institution\u2019s own archive; no stable URL exists for this record.',
       },
     ],
     revisions: [
@@ -257,7 +286,8 @@ export const SEED_FACTS: readonly FactRecord[] = [
   {
     id: asFactId('BB-F-000005'),
     slug: 'draft-unreviewed-population-estimate',
-    statement: 'Draft: the neighborhood\u2019s 1930 population is estimated from an unverified secondary tabulation.',
+    statement:
+      'Draft: the neighborhood\u2019s 1930 population is estimated from an unverified secondary tabulation.',
     shortStatement: 'Draft: 1930 population estimate (unreviewed)',
     claimType: 'quantity',
     subjects: [{ entityId: 'ent_seed_place_001', kind: 'place', role: 'subject' }],
@@ -287,7 +317,9 @@ export function listSeedFacts(): readonly FactRecord[] {
 
 /** Facts naming `entityId` as a subject input for entity-page CompactFactReference embeds.  */
 export function seedFactsForEntity(entityId: string): readonly FactRecord[] {
-  return SEED_FACTS.filter((fact) => fact.subjects.some((subject) => subject.entityId === entityId));
+  return SEED_FACTS.filter((fact) =>
+    fact.subjects.some((subject) => subject.entityId === entityId),
+  );
 }
 
 /** The lane hook applied to this seed catalog the same real

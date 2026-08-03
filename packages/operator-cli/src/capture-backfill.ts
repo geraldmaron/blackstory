@@ -132,7 +132,15 @@ export async function persistCapture(
        (id, source_id, adapter_id, status, http_status, detail, occurred_at)
      VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7::timestamptz)
      ON CONFLICT (id) DO NOTHING`,
-    [event.id, event.sourceId, event.adapterId, status, event.httpStatus, JSON.stringify(event.detail), event.occurredAt],
+    [
+      event.id,
+      event.sourceId,
+      event.adapterId,
+      status,
+      event.httpStatus,
+      JSON.stringify(event.detail),
+      event.occurredAt,
+    ],
   );
   return { deduped };
 }

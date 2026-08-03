@@ -8,7 +8,11 @@ import {
   deriveLivingStatus,
   type LivingStatus,
 } from '../../../domain/src/living.ts';
-import type { LawStatus, PlaceLikeStatus, StatusHistoryEntry } from '../../../domain/src/entity-status.ts';
+import type {
+  LawStatus,
+  PlaceLikeStatus,
+  StatusHistoryEntry,
+} from '../../../domain/src/entity-status.ts';
 
 export type LivingStatusDerivedRecord = {
   readonly status: LivingStatus;
@@ -20,11 +24,7 @@ export type LivingStatusDerivedRecord = {
   readonly lane: 'deterministic';
 };
 
-export type PersonLivingSignal =
-  | 'death_claim'
-  | 'death_qualifier'
-  | 'bdp_rule'
-  | 'no_signal';
+export type PersonLivingSignal = 'death_claim' | 'death_qualifier' | 'bdp_rule' | 'no_signal';
 
 export type PersonClaimRow = {
   readonly claimId: string;
@@ -43,11 +43,9 @@ export type PersonQualifierRow = {
 export const DEATH_BEARING_PREDICATE_RE =
   /(?:^|[^a-z0-9_])(?:lynch(?:ed|ing)?|was_killed_in|killed(?:_on|_in)?|died(?:_in|_on)?|death|assassinat(?:ed|ion)?(?:_on)?|hanged|buried(?:_at|_in)?|date_of_death)(?:[^a-z0-9_]|$)/i;
 
-export const DEATH_PREDICATE_RE =
-  /\b(death|died|death_year|deathdate|date_of_death|deceased)\b/i;
+export const DEATH_PREDICATE_RE = /\b(death|died|death_year|deathdate|date_of_death|deceased)\b/i;
 
-export const BIRTH_PREDICATE_RE =
-  /\b(birth|born|birth_year|birthdate|date_of_birth)\b/i;
+export const BIRTH_PREDICATE_RE = /\b(birth|born|birth_year|birthdate|date_of_birth)\b/i;
 
 export const LIFE_EVIDENCE_PREDICATE_RE =
   /\b(appointed|elected|published|graduated|served|retired|honored|awarded|inducted|directed|founded|organized)\b/i;
@@ -214,7 +212,10 @@ export function statusReviewRunId(asOf: Date = new Date()): string {
 /** Builds a two-entry status_history closing an open-ended prior snapshot. */
 export function buildTerminalStatusHistory(
   prior: readonly StatusHistoryEntry<string>[],
-  fix: Pick<TerminalStatusFix, 'priorStatus' | 'nextStatus' | 'validFrom' | 'validTo' | 'datePrecision' | 'basisClaimIds'>,
+  fix: Pick<
+    TerminalStatusFix,
+    'priorStatus' | 'nextStatus' | 'validFrom' | 'validTo' | 'datePrecision' | 'basisClaimIds'
+  >,
 ): readonly StatusHistoryEntry<string>[] {
   const open = prior.find((e) => e.validTo === undefined || e.validTo === null);
   const closedPrior: StatusHistoryEntry<string> = open
@@ -303,10 +304,7 @@ export const LAW_STATUS_FIXES: readonly TerminalStatusFix[] = [
     validFrom: '1868',
     validTo: '1868',
     datePrecision: 'year',
-    basisClaimIds: [
-      'ent_law_14th_amendment_1868_claim_0',
-      'ent_law_14th_amendment_1868_claim_1',
-    ],
+    basisClaimIds: ['ent_law_14th_amendment_1868_claim_0', 'ent_law_14th_amendment_1868_claim_1'],
     note: 'Ratified 1868; prior repealed snapshot was incorrect.',
     rewriteMode: 'replace',
   },
@@ -539,10 +537,7 @@ export const PLACE_STATUS_FIXES: readonly TerminalStatusFix[] = [
     validFrom: '2011',
     validTo: '2011',
     datePrecision: 'year',
-    basisClaimIds: [
-      'ent_freedom_rides_museum_001_claim_0',
-      'ent_freedom_rides_museum_001_claim_1',
-    ],
+    basisClaimIds: ['ent_freedom_rides_museum_001_claim_0', 'ent_freedom_rides_museum_001_claim_1'],
     note: 'Operating visitor site; historic label was incorrect.',
     rewriteMode: 'replace',
   },
@@ -611,10 +606,7 @@ export const PLACE_STATUS_FIXES: readonly TerminalStatusFix[] = [
     validFrom: '2000',
     validTo: '2000',
     datePrecision: 'year',
-    basisClaimIds: [
-      'ent_rosa_parks_museum_001_claim_0',
-      'ent_rosa_parks_museum_001_claim_1',
-    ],
+    basisClaimIds: ['ent_rosa_parks_museum_001_claim_0', 'ent_rosa_parks_museum_001_claim_1'],
     note: 'Operating institution; historic label was incorrect.',
     rewriteMode: 'replace',
   },
@@ -662,8 +654,6 @@ export const PLACE_STATUS_FIXES: readonly TerminalStatusFix[] = [
   },
 ];
 
-export const PLACE_STATUS_FIX_ENTITY_IDS = new Set(
-  PLACE_STATUS_FIXES.map((fix) => fix.entityId),
-);
+export const PLACE_STATUS_FIX_ENTITY_IDS = new Set(PLACE_STATUS_FIXES.map((fix) => fix.entityId));
 
 export { MAX_PLAUSIBLE_HUMAN_AGE_YEARS, RECENT_LIFE_EVIDENCE_YEARS };

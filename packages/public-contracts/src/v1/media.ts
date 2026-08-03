@@ -10,17 +10,16 @@ export const MEDIA_RIGHTS_STATUSES = ['public_domain', 'licensed', 'fair_use'] a
 export const mediaRightsStatusSchema = z.enum(MEDIA_RIGHTS_STATUSES);
 export type MediaRightsStatusV1 = (typeof MEDIA_RIGHTS_STATUSES)[number];
 
-export const mediaV1Schema = z
-  .object({
-    url: httpUrl(2000),
-    alt: nonEmptyText(500),
-    credit: nonEmptyText(500),
-    rightsStatus: mediaRightsStatusSchema,
-    width: z.number().int().positive().max(20_000).optional(),
-    height: z.number().int().positive().max(20_000).optional(),
-    /** Storage object path (not a credential, not a bucket name) — used by the client only to
-     * request a fresh signed/CDN URL if `url` has expired. Never a full `gs://` or bucket ARN. */
-    objectPath: z.string().max(1000).optional(),
-  });
+export const mediaV1Schema = z.object({
+  url: httpUrl(2000),
+  alt: nonEmptyText(500),
+  credit: nonEmptyText(500),
+  rightsStatus: mediaRightsStatusSchema,
+  width: z.number().int().positive().max(20_000).optional(),
+  height: z.number().int().positive().max(20_000).optional(),
+  /** Storage object path (not a credential, not a bucket name) — used by the client only to
+   * request a fresh signed/CDN URL if `url` has expired. Never a full `gs://` or bucket ARN. */
+  objectPath: z.string().max(1000).optional(),
+});
 
 export type MediaV1 = z.infer<typeof mediaV1Schema>;

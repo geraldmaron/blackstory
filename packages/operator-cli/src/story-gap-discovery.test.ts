@@ -5,11 +5,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import type {
-  DiscoveryCandidateRecord,
-  GeographicHint,
-  ObscurityAssessment,
-} from '@repo/domain';
+import type { DiscoveryCandidateRecord, GeographicHint, ObscurityAssessment } from '@repo/domain';
 import {
   buildStoryBriefSubject,
   candidateMatchesGeography,

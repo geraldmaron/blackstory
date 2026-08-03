@@ -4,10 +4,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { OperatorMcpError } from '../errors.js';
-import {
-  createMockIndicatorDbReader,
-  SAMPLE_SERIES,
-} from '../test/mock-reader.js';
+import { createMockIndicatorDbReader, SAMPLE_SERIES } from '../test/mock-reader.js';
 import { lookupSeries } from './lookup-series.js';
 
 describe('lookupSeries', () => {

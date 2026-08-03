@@ -21,7 +21,10 @@ const IDENTITY = {
 const ITEM: QuarantineIntakeItem = {
   id: 'intake-1',
   kind: 'contribution',
-  payload: { title: 'Douglass Avenue mutual-aid office', statement: 'A 1962 photo names its founders.' },
+  payload: {
+    title: 'Douglass Avenue mutual-aid office',
+    statement: 'A 1962 photo names its founders.',
+  },
   sourceUrl: 'https://archive.example.org/douglass-ave-1962',
   createdAt: '2026-07-20T00:00:00.000Z',
 };
@@ -114,7 +117,13 @@ test('prepareQuarantineTriageDecision falls back to the real nested payload.norm
 test('prepareQuarantineTriageDecision downgrades low confidence to needs_human and writes nothing', () => {
   const plan = prepareQuarantineTriageDecision(
     ITEM,
-    { decision: 'case', rationale: 'unsure', confidence: 0.4, modelId: 'stub-model', provider: 'stub' },
+    {
+      decision: 'case',
+      rationale: 'unsure',
+      confidence: 0.4,
+      modelId: 'stub-model',
+      provider: 'stub',
+    },
     { confidenceThreshold: 0.6, nowIso: '2026-07-25T00:00:00.000Z' },
   );
   assert.equal(plan.effectiveDecision, 'needs_human');
@@ -124,7 +133,13 @@ test('prepareQuarantineTriageDecision downgrades low confidence to needs_human a
 test('prepareQuarantineTriageDecision only updates status for reject/spam, no case write', () => {
   const rejectPlan = prepareQuarantineTriageDecision(
     ITEM,
-    { decision: 'reject', rationale: 'out of scope', confidence: 0.9, modelId: 'stub-model', provider: 'stub' },
+    {
+      decision: 'reject',
+      rationale: 'out of scope',
+      confidence: 0.9,
+      modelId: 'stub-model',
+      provider: 'stub',
+    },
     { confidenceThreshold: 0.6, nowIso: '2026-07-25T00:00:00.000Z' },
   );
   assert.equal(rejectPlan.write?.nextStatus, 'rejected');
@@ -132,7 +147,13 @@ test('prepareQuarantineTriageDecision only updates status for reject/spam, no ca
 
   const spamPlan = prepareQuarantineTriageDecision(
     ITEM,
-    { decision: 'spam', rationale: 'promotional', confidence: 0.95, modelId: 'stub-model', provider: 'stub' },
+    {
+      decision: 'spam',
+      rationale: 'promotional',
+      confidence: 0.95,
+      modelId: 'stub-model',
+      provider: 'stub',
+    },
     { confidenceThreshold: 0.6, nowIso: '2026-07-25T00:00:00.000Z' },
   );
   assert.equal(spamPlan.write?.nextStatus, 'spam');

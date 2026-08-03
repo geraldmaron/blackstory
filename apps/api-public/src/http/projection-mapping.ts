@@ -44,9 +44,7 @@ const NOMINAL_CONFIDENCE_SCORE: Record<'high' | 'medium' | 'low', number> = {
   low: 0.4,
 };
 
-function mapLocationPrecision(
-  precision: string | undefined,
-): EntityV1['locationPrecision'] {
+function mapLocationPrecision(precision: string | undefined): EntityV1['locationPrecision'] {
   if (precision === 'neighborhood' || precision === 'campus' || precision === 'institution') {
     return precision;
   }
@@ -95,7 +93,9 @@ function mapClaims(claims: readonly PublicClaimProjectionDoc[] | undefined): Cla
  * projection's kind is out of the v1 API's scope or the mapped result fails contract validation
  * (never thrown — both collapse to the same "not available" signal callers already treat
  * identically to unpublished/nonexistent per T3). Exported for direct unit testing. */
-export function mapProjectionToEntityV1(projection: PublicEntityProjectionDoc): EntityV1 | undefined {
+export function mapProjectionToEntityV1(
+  projection: PublicEntityProjectionDoc,
+): EntityV1 | undefined {
   if (!SUPPORTED_KINDS.has(projection.kind)) {
     return undefined;
   }
@@ -136,8 +136,7 @@ export function mapProjectionToEntityV1(projection: PublicEntityProjectionDoc): 
      */
     historicalContext: projection.historicalContext ?? '',
     recordMaturity: claims.length > 0 ? 'partial_enrichment' : 'projection_stub',
-    researchCoverage:
-      projection.researchCoverage ?? (claims.length >= 2 ? 'partial' : 'minimal'),
+    researchCoverage: projection.researchCoverage ?? (claims.length >= 2 ? 'partial' : 'minimal'),
     claims,
     timeline: [],
     revision: {

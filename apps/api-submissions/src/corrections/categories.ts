@@ -45,5 +45,7 @@ export function isCorrectionCategory(value: unknown): value is CorrectionCategor
 }
 
 export function isCorrectionTargetType(value: unknown): value is CorrectionTargetType {
-  return typeof value === 'string' && (CORRECTION_TARGET_TYPES as readonly string[]).includes(value);
+  return (
+    typeof value === 'string' && (CORRECTION_TARGET_TYPES as readonly string[]).includes(value)
+  );
 }

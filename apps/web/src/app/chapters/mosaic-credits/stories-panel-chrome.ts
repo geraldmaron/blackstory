@@ -16,12 +16,7 @@ export const STORIES_EDITION_ROOT_CLASS = 'ds-stories-edition';
 export const STORIES_EDITION_PANEL_CLASS = 'ds-stories-edition__panel';
 
 export type StoriesEditionPanelVariant =
-  | 'intro'
-  | 'catalog'
-  | 'records'
-  | 'body'
-  | 'sources'
-  | 'credits';
+  'intro' | 'catalog' | 'records' | 'body' | 'sources' | 'credits';
 
 export function storiesEditionRootClassName(): string {
   return `${STORIES_EDITION_ROOT_CLASS} ${editionAtmosphereCanvasClassName()}`;

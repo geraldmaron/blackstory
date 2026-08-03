@@ -56,7 +56,12 @@ test('manual APP_CHECK_OUTAGE_OVERRIDE wins over a closed circuit breaker', () =
 
 test('circuit breaker flips availability to outage on sustained verifier failures', () => {
   const breaker = createAppCheckCircuitBreaker({
-    config: { failureThreshold: 2, windowMs: 60_000, recoveryTimeoutMs: 30_000, halfOpenSuccessThreshold: 1 },
+    config: {
+      failureThreshold: 2,
+      windowMs: 60_000,
+      recoveryTimeoutMs: 30_000,
+      halfOpenSuccessThreshold: 1,
+    },
   });
   const provider = createAppCheckAvailabilityProvider({ environment: {}, circuitBreaker: breaker });
 
@@ -69,7 +74,12 @@ test('circuit breaker flips availability to outage on sustained verifier failure
 
 test('simulated verifier outage pattern flips provider to outage and back on recovery', () => {
   const breaker = createAppCheckCircuitBreaker({
-    config: { failureThreshold: 2, windowMs: 60_000, recoveryTimeoutMs: 1_000, halfOpenSuccessThreshold: 1 },
+    config: {
+      failureThreshold: 2,
+      windowMs: 60_000,
+      recoveryTimeoutMs: 1_000,
+      halfOpenSuccessThreshold: 1,
+    },
     now: () => 5_000,
   });
   const provider = createAppCheckAvailabilityProvider({ environment: {}, circuitBreaker: breaker });

@@ -7,10 +7,7 @@
  * static sitemap would bake the 4-entity seed + localhost site URL into production.
  */
 import type { MetadataRoute } from 'next';
-import {
-  getPublicActiveReleaseMeta,
-  getPublicSearchIndex,
-} from '../lib/public-data/source';
+import { getPublicActiveReleaseMeta, getPublicSearchIndex } from '../lib/public-data/source';
 import { shouldUseLivePublicProjections } from '../lib/public-data/live-policy';
 import { buildPublicSitemapEntries } from '../lib/seo/sitemap-builders';
 

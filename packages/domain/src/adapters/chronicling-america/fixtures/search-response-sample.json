@@ -13,16 +13,12 @@
       "aka": ["The Chicago Defender"],
       "contributor": ["Library of Congress, Washington, DC"],
       "date": "1922-12-26",
-      "description": [
-        "Weekly African American newspaper published in Chicago, Illinois."
-      ],
+      "description": ["Weekly African American newspaper published in Chicago, Illinois."],
       "digitized": true,
       "full_text": "THIS WOULD BE OCR BULK TEXT AND MUST NEVER BE STORED IN SUPABASE",
       "group": ["newspaper"],
       "id": "https://www.loc.gov/resource/sn83045462/1922-12-26/ed-1/?sp=22",
-      "image_url": [
-        "https://tile.loc.gov/image-services/illustration-only.jpg"
-      ],
+      "image_url": ["https://tile.loc.gov/image-services/illustration-only.jpg"],
       "index": 1,
       "language": ["english"],
       "location": ["illinois", "chicago"],

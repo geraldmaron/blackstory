@@ -45,7 +45,9 @@ export function computeMemorialRevealState(
   const clampedElapsed = Math.max(0, elapsedMs);
   const sinceBeat = Math.max(0, clampedElapsed - MEMORIAL_REVEAL_BEAT_MS);
   const namesDensity =
-    clampedElapsed < MEMORIAL_REVEAL_BEAT_MS ? 0 : Math.min(1, sinceBeat / MEMORIAL_REVEAL_BUILD_MS);
+    clampedElapsed < MEMORIAL_REVEAL_BEAT_MS
+      ? 0
+      : Math.min(1, sinceBeat / MEMORIAL_REVEAL_BUILD_MS);
 
   const messageLinesShown = MEMORIAL_MESSAGE_LINE_TIMES_MS.map((time) => clampedElapsed >= time);
 

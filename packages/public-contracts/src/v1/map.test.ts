@@ -12,8 +12,13 @@ test('round-trips a valid map source with one feature', () => {
 
 test('rejects out-of-range GeoJSON coordinates (adversarial: invalid location)', () => {
   const fixture = loadFixture<{ features: unknown[] }>('map-source.v1.current.json');
-  const [feature] = fixture.features as { geometry: { type: 'Point'; coordinates: [number, number] } }[];
-  const broken = { ...feature, geometry: { type: 'Point' as const, coordinates: [999, 38.9] as [number, number] } };
+  const [feature] = fixture.features as {
+    geometry: { type: 'Point'; coordinates: [number, number] };
+  }[];
+  const broken = {
+    ...feature,
+    geometry: { type: 'Point' as const, coordinates: [999, 38.9] as [number, number] },
+  };
   assert.throws(() => mapFeatureV1Schema.parse(broken));
 });
 
@@ -26,5 +31,8 @@ test('drops server-internal ranking fields (relatedCount/claimCount/raw address)
   }
   // The transparency-affordance evidenceCount IS allowed through (see module doc — it's not a
   // ranking signal, just a public claim count), so it should still be present.
-  assert.equal(properties.evidenceCount, (fixture as { properties: { evidenceCount: number } }).properties.evidenceCount);
+  assert.equal(
+    properties.evidenceCount,
+    (fixture as { properties: { evidenceCount: number } }).properties.evidenceCount,
+  );
 });

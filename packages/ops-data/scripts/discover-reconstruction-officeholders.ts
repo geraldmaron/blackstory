@@ -20,7 +20,8 @@ import { writeFileSync } from 'node:fs';
 
 const WIKIPEDIA_API = 'https://en.wikipedia.org/w/api.php';
 const USER_AGENT = 'BlackStory research pipeline (contact: geraldmarondagher@gmail.com)';
-const LIST_ARTICLE_TITLE = 'African American officeholders from the end of the Civil War until before 1900';
+const LIST_ARTICLE_TITLE =
+  'African American officeholders from the end of the Civil War until before 1900';
 
 type GapCandidate = {
   readonly id: string;
@@ -40,7 +41,12 @@ function readArgFlag(name: string): string | undefined {
 }
 
 async function fetchWikitext(title: string): Promise<string> {
-  const params = new URLSearchParams({ action: 'parse', page: title, prop: 'wikitext', format: 'json' });
+  const params = new URLSearchParams({
+    action: 'parse',
+    page: title,
+    prop: 'wikitext',
+    format: 'json',
+  });
   const response = await fetch(`${WIKIPEDIA_API}?${params.toString()}`, {
     headers: { 'User-Agent': USER_AGENT, Accept: 'application/json' },
     signal: AbortSignal.timeout(30_000),
@@ -109,7 +115,10 @@ function extractOfficeholders(wikitext: string, sourceUrl: string): readonly Gap
       gapFill: {
         mentionedByEntityIds: [],
         mentionContexts: [
-          `Reconstruction-era Black officeholder (${currentContext()}): ${officeInfo}`.slice(0, 500),
+          `Reconstruction-era Black officeholder (${currentContext()}): ${officeInfo}`.slice(
+            0,
+            500,
+          ),
         ],
         candidateSourceHrefs: [sourceUrl],
       },
@@ -123,7 +132,12 @@ function extractOfficeholders(wikitext: string, sourceUrl: string): readonly Gap
       flushBlock();
       const level = headerMatch[1].length;
       const title = headerMatch[2];
-      if (title === 'See also' || title === 'Notes' || title === 'References' || title === 'Further reading') {
+      if (
+        title === 'See also' ||
+        title === 'Notes' ||
+        title === 'References' ||
+        title === 'Further reading'
+      ) {
         stopped = true;
         break;
       }
@@ -161,7 +175,13 @@ async function main(): Promise<void> {
   const deduped = candidates.filter((c) => (seen.has(c.id) ? false : (seen.add(c.id), true)));
 
   writeFileSync(outPath, `${JSON.stringify({ candidates: deduped }, null, 2)}\n`);
-  console.log(JSON.stringify({ totalExtracted: candidates.length, uniqueCandidates: deduped.length, outPath }));
+  console.log(
+    JSON.stringify({
+      totalExtracted: candidates.length,
+      uniqueCandidates: deduped.length,
+      outPath,
+    }),
+  );
 }
 
 main().catch((error) => {

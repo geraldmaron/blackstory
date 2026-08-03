@@ -279,7 +279,10 @@ test('App Check OUTAGE search is BOUNDED — degraded quota still exhausts (not 
     }
   }
 
-  assert.ok(deniedDecision, 'degraded outage quota must eventually deny — access is bounded, not free');
+  assert.ok(
+    deniedDecision,
+    'degraded outage quota must eventually deny — access is bounded, not free',
+  );
   assert.ok(
     allowedCount <= degraded.capacity,
     `degraded burst (${allowedCount}) must not exceed degraded capacity (${degraded.capacity})`,
@@ -344,9 +347,18 @@ test('deriveOutageDegradedPolicy is strictly bounded, floored at 1, and single-c
   for (const endpointClass of ['search', 'geocoding', 'nearbyDiscovery', 'corrections'] as const) {
     const base = resolveEndpointPolicy(DEFAULT_ENDPOINT_QUOTA_MATRIX, endpointClass, 'anonymous');
     const degraded = deriveOutageDegradedPolicy(base);
-    assert.ok(degraded.capacity >= 1 && degraded.capacity <= base.capacity, `${endpointClass} capacity`);
-    assert.ok(degraded.windowCap >= 1 && degraded.windowCap <= base.windowCap, `${endpointClass} windowCap`);
-    assert.ok(degraded.dailyCap >= 1 && degraded.dailyCap <= base.dailyCap, `${endpointClass} dailyCap`);
+    assert.ok(
+      degraded.capacity >= 1 && degraded.capacity <= base.capacity,
+      `${endpointClass} capacity`,
+    );
+    assert.ok(
+      degraded.windowCap >= 1 && degraded.windowCap <= base.windowCap,
+      `${endpointClass} windowCap`,
+    );
+    assert.ok(
+      degraded.dailyCap >= 1 && degraded.dailyCap <= base.dailyCap,
+      `${endpointClass} dailyCap`,
+    );
     assert.equal(degraded.maxConcurrency, 1, `${endpointClass} concurrency clamped`);
     assert.ok(degraded.refillPerSec <= base.refillPerSec, `${endpointClass} refill`);
     assert.equal(degraded.costTier, base.costTier, `${endpointClass} cost tier preserved`);

@@ -85,9 +85,7 @@ export const STORY_MULTIPLE_EVENTS_MIN = 2 as const;
 export const STORY_TEMPORAL_DEPTH_SATURATION_YEARS = 40 as const;
 
 export type StoryWorthinessFactorId =
-  | 'obscurity'
-  | 'geographic_specificity'
-  | 'narrative_potential';
+  'obscurity' | 'geographic_specificity' | 'narrative_potential';
 
 export type StoryWorthinessFactorBreakdown = {
   readonly factor: StoryWorthinessFactorId;
@@ -108,11 +106,7 @@ export type StoryWorthinessGates = {
   readonly multipleLifeEvents: boolean;
 };
 
-export type StoryWorthinessBand =
-  | 'strong_story'
-  | 'candidate_story'
-  | 'weak_story'
-  | 'not_story';
+export type StoryWorthinessBand = 'strong_story' | 'candidate_story' | 'weak_story' | 'not_story';
 
 export type StoryWorthinessAssessment = {
   readonly methodologyVersion: typeof STORY_WORTHINESS_METHODOLOGY_VERSION;
@@ -395,10 +389,7 @@ export function candidateMatchesTheme(
     }
   }
 
-  const signalHaystack = [
-    ...candidate.signals.matchedClasses,
-    ...candidate.signals.matchedTerms,
-  ]
+  const signalHaystack = [...candidate.signals.matchedClasses, ...candidate.signals.matchedTerms]
     .join(' ')
     .toLowerCase();
   if (signalHaystack.includes(needleId) || signalHaystack.includes(needleWords)) return true;
@@ -459,7 +450,8 @@ export function buildStoryBriefSubject(
   const title = candidate.adapterRecord.title ?? candidate.identity.stableIdentifier;
   const placeLabel =
     (typeof payload.placeLabel === 'string' && payload.placeLabel.trim()) ||
-    candidate.geographicHints.find((hint) => hint.kind === 'city' || hint.kind === 'region')?.text ||
+    candidate.geographicHints.find((hint) => hint.kind === 'city' || hint.kind === 'region')
+      ?.text ||
     geography ||
     'Place TBD';
   const seedUrls = candidateSeedUrls(candidate);
@@ -545,7 +537,8 @@ export type RunStoryGapDiscoveryInput = {
    */
   readonly candidates?: readonly StoryCandidateInput[];
   /** Optional lazy source of candidates (still bounded, still injected fetch). */
-  readonly discover?: () => Promise<readonly StoryCandidateInput[]> | readonly StoryCandidateInput[];
+  readonly discover?: () =>
+    Promise<readonly StoryCandidateInput[]> | readonly StoryCandidateInput[];
   readonly nowIso: string;
   /** Cap on how many story briefs to run through the directive loop. */
   readonly maxBriefs?: number;
@@ -590,7 +583,7 @@ export type StoryGapDiscoveryResult = {
 export async function runStoryGapDiscovery(
   input: RunStoryGapDiscoveryInput,
 ): Promise<StoryGapDiscoveryResult> {
-  const sourced = input.discover ? await input.discover() : input.candidates ?? [];
+  const sourced = input.discover ? await input.discover() : (input.candidates ?? []);
   const selection = selectStoryCandidates(sourced, input.theme, input.geography, {
     assessedAt: input.nowIso,
     ...input.selectionOptions,

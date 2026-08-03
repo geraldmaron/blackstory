@@ -79,8 +79,7 @@ export function createClientAttestationGuard(
 ): (request: { readonly headers: ClientAttestationHeaders }) => Promise<ClientAttestationDecision> {
   const environment = options.environment ?? process.env;
   const mode =
-    options.mode ??
-    parseClientAttestationMode(environment.CLIENT_ATTESTATION_MODE, environment);
+    options.mode ?? parseClientAttestationMode(environment.CLIENT_ATTESTATION_MODE, environment);
   const telemetry = options.telemetry ?? {
     record(event: ClientAttestationTelemetryEvent) {
       console.info(JSON.stringify(event));
@@ -94,7 +93,12 @@ export function createClientAttestationGuard(
       return { allowed: true, verified: true, mode };
     }
     if (mode === 'monitor') {
-      telemetry.record({ control: 'client_attestation', mode, outcome: 'monitored_failure', reason });
+      telemetry.record({
+        control: 'client_attestation',
+        mode,
+        outcome: 'monitored_failure',
+        reason,
+      });
       return { allowed: true, verified: false, mode };
     }
     telemetry.record({ control: 'client_attestation', mode, outcome: 'denied', reason });

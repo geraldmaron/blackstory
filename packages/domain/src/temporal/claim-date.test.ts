@@ -3,10 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import {
-  buildClaimTemporalQualifierDraft,
-  parseCleanClaimObjectDate,
-} from './claim-date.js';
+import { buildClaimTemporalQualifierDraft, parseCleanClaimObjectDate } from './claim-date.js';
 
 test('parseCleanClaimObjectDate accepts bare year, ISO date, and Month DD, YYYY', () => {
   assert.deepEqual(parseCleanClaimObjectDate('1905'), { edtf: '1905', precision: 'year' });

@@ -60,10 +60,7 @@ import type { DiscoveryCampaignResult, DiscoveryCandidateRecord } from './types.
 export const HBCU_CAMPAIGN_KIND = 'hbcu-collections-discovery.v1' as const;
 
 /** Allowed adapter ids — community DPLA v2 + HBCU collections; never federal `dpla-items-v1`. */
-export const HBCU_CAMPAIGN_ADAPTER_IDS = [
-  DPLA_V2_ADAPTER_ID,
-  HBCU_COLLECTIONS_ADAPTER_ID,
-] as const;
+export const HBCU_CAMPAIGN_ADAPTER_IDS = [DPLA_V2_ADAPTER_ID, HBCU_COLLECTIONS_ADAPTER_ID] as const;
 
 /**
  * Sub-budget policy between the DPLA hub lane and the EAD finding-aid lane.

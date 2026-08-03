@@ -116,10 +116,7 @@ export function createGeographicGapBriefHandlers(): ResearchDirectiveHandlers<
     },
     gather: (plan, context) => defaultDirectiveGather(plan, context),
     extract: async ({ plan, gathered }, context) => {
-      const baseExtracted = await base.extract(
-        { plan, gathered },
-        context,
-      );
+      const baseExtracted = await base.extract({ plan, gathered }, context);
       return {
         ...baseExtracted,
         fips5: plan.subject.fips5,
@@ -127,10 +124,7 @@ export function createGeographicGapBriefHandlers(): ResearchDirectiveHandlers<
       };
     },
     decide: async ({ plan, gathered, extracted }, context) => {
-      const baseDecision = await base.decide(
-        { plan, gathered, extracted },
-        context,
-      );
+      const baseDecision = await base.decide({ plan, gathered, extracted }, context);
       // Stage/hold/reject only — research workers never publish (ADR-009).
       return {
         ...baseDecision,

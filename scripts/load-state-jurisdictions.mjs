@@ -97,7 +97,12 @@ function validatePolygonGeometry(geometry, context) {
       throw new Error(`${context}: each coordinate must be [lng, lat]`);
     }
     const [lng, lat] = pos;
-    if (typeof lng !== 'number' || typeof lat !== 'number' || !Number.isFinite(lng) || !Number.isFinite(lat)) {
+    if (
+      typeof lng !== 'number' ||
+      typeof lat !== 'number' ||
+      !Number.isFinite(lng) ||
+      !Number.isFinite(lat)
+    ) {
       throw new Error(`${context}: coordinates must be finite numbers`);
     }
   }
@@ -239,7 +244,9 @@ async function runDryRun(fixturePath, fixture, validated) {
   }
   console.log('');
   console.log('Next steps (operator-only):');
-  console.log('  node scripts/load-state-jurisdictions.mjs --emit-sql > jurisdictions-state-load.sql');
+  console.log(
+    '  node scripts/load-state-jurisdictions.mjs --emit-sql > jurisdictions-state-load.sql',
+  );
   console.log('  psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f jurisdictions-state-load.sql');
   console.log('');
   console.log('No database writes performed.');

@@ -26,22 +26,26 @@ export const clientBuildVersionSchema = z
 
 export type ClientBuildVersion = z.infer<typeof clientBuildVersionSchema>;
 
-export const clientVersionHeaderV1Schema = z
-  .object({
-    build: clientBuildVersionSchema,
-    apiVersion: z.string().max(10),
-  });
+export const clientVersionHeaderV1Schema = z.object({
+  build: clientBuildVersionSchema,
+  apiVersion: z.string().max(10),
+});
 
 export type ClientVersionHeaderV1 = z.infer<typeof clientVersionHeaderV1Schema>;
 
 function parseSemver(build: ClientBuildVersion): readonly [number, number, number] {
   const versionPart = build.split('/')[1] ?? '0.0.0';
-  const [major, minor, patch] = versionPart.split('.').map((segment) => Number.parseInt(segment, 10));
+  const [major, minor, patch] = versionPart
+    .split('.')
+    .map((segment) => Number.parseInt(segment, 10));
   return [major ?? 0, minor ?? 0, patch ?? 0];
 }
 
 /** Semver comparison: negative if `a` < `b`, 0 if equal, positive if `a` > `b`. */
-function compareSemver(a: readonly [number, number, number], b: readonly [number, number, number]): number {
+function compareSemver(
+  a: readonly [number, number, number],
+  b: readonly [number, number, number],
+): number {
   for (let index = 0; index < 3; index += 1) {
     const diff = (a[index] ?? 0) - (b[index] ?? 0);
     if (diff !== 0) return diff;
@@ -66,7 +70,10 @@ export function isApiVersionBelowFloor(
 
 /** True when `minBuild`'s semver is strictly greater than `build`'s — i.e. `build` is below the
  * minimum-supported build floor for its declared API major. */
-export function isBuildVersionBelowFloor(build: ClientBuildVersion, minBuild: ClientBuildVersion): boolean {
+export function isBuildVersionBelowFloor(
+  build: ClientBuildVersion,
+  minBuild: ClientBuildVersion,
+): boolean {
   return compareSemver(parseSemver(build), parseSemver(minBuild)) < 0;
 }
 

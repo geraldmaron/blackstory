@@ -39,17 +39,29 @@ const HERITAGE_PAGE = `<html><body>
 
 test('isTier1Host accepts federal and DC planning hosts', () => {
   assert.equal(isTier1Host('https://www.nps.gov/places/example.htm'), true);
-  assert.equal(isTier1Host('https://tile.loc.gov/storage-services/service/ll/llscd/llfr002.pdf'), true);
+  assert.equal(
+    isTier1Host('https://tile.loc.gov/storage-services/service/ll/llscd/llfr002.pdf'),
+    true,
+  );
   assert.equal(isTier1Host('https://planning.dc.gov/page/example'), true);
   assert.equal(isTier1Host('https://www.defense.mil/News/example'), true);
   assert.equal(isTier1Host('https://historicsites.dcpreservation.org/items/show/1'), false);
 });
 
 test('isReputableSecondaryHost accepts curated heritage hosts only', () => {
-  assert.equal(isReputableSecondaryHost('https://historicsites.dcpreservation.org/items/show/1'), true);
+  assert.equal(
+    isReputableSecondaryHost('https://historicsites.dcpreservation.org/items/show/1'),
+    true,
+  );
   assert.equal(isReputableSecondaryHost('https://www.hmdb.org/m.asp?m=12345'), true);
-  assert.equal(isReputableSecondaryHost('https://digdc.dclibrary.org/islandora/object/pdc%3A123'), true);
-  assert.equal(isReputableSecondaryHost('https://www.blackpast.org/african-american-history/example/'), true);
+  assert.equal(
+    isReputableSecondaryHost('https://digdc.dclibrary.org/islandora/object/pdc%3A123'),
+    true,
+  );
+  assert.equal(
+    isReputableSecondaryHost('https://www.blackpast.org/african-american-history/example/'),
+    true,
+  );
   assert.equal(isReputableSecondaryHost('https://www.nps.gov/places/example.htm'), false);
 });
 
@@ -97,7 +109,10 @@ test('collectTier1TrailLinks rejects same-lineage heritage links and prefers NPS
   assert.ok(links.includes('https://www.loc.gov/item/example/'));
   assert.ok(links.includes('https://www.nps.gov/places/example.htm'));
   assert.ok(links.includes('https://planning.dc.gov/maps/example'));
-  assert.equal(links.some((url) => isReputableSecondaryHost(url)), false);
+  assert.equal(
+    links.some((url) => isReputableSecondaryHost(url)),
+    false,
+  );
 });
 
 test('collectTier2TrailLinks accepts different curated secondary and rejects same host and wikipedia', () => {
@@ -108,8 +123,14 @@ test('collectTier2TrailLinks accepts different curated secondary and rejects sam
     false,
   );
   assert.equal(links.includes('https://www.hmdb.org/m.asp?m=12345'), true);
-  assert.equal(links.some((url) => isWikipediaHost(url)), false);
-  assert.equal(links.some((url) => isTier1Host(url)), false);
+  assert.equal(
+    links.some((url) => isWikipediaHost(url)),
+    false,
+  );
+  assert.equal(
+    links.some((url) => isTier1Host(url)),
+    false,
+  );
 });
 
 test('collectTier1TrailLinks honors explicit excludeUrls', () => {
@@ -181,10 +202,7 @@ test('pickIndependentTier2SearchHit rejects wikipedia and same-lineage secondary
     )?.url,
     'https://www.hmdb.org/m.asp?m=12345',
   );
-  assert.equal(
-    pickIndependentTier2SearchHit([{ url: primary }], [primary]),
-    undefined,
-  );
+  assert.equal(pickIndependentTier2SearchHit([{ url: primary }], [primary]), undefined);
   assert.equal(
     pickIndependentTier2SearchHit([{ url: 'https://en.wikipedia.org/wiki/Example' }], []),
     undefined,
@@ -206,7 +224,8 @@ test('looksLikeSettlementArticle flags a town article by its own self-descriptio
   assert.equal(looksLikeSettlementArticle(GILMER_TEXAS_TEXT), true);
 });
 test('looksLikeSettlementArticle does not flag an ordinary biography', () => {
-  const bio = 'Clinton Greaves (August 12, 1855 – August 18, 1906) was a Buffalo Soldier in the United States Army.';
+  const bio =
+    'Clinton Greaves (August 12, 1855 – August 18, 1906) was a Buffalo Soldier in the United States Army.';
   assert.equal(looksLikeSettlementArticle(bio), false);
 });
 test('sharesNameToken rejects a completely unrelated title', () => {
@@ -221,7 +240,13 @@ test('isPlausibleMatch rejects a settlement article for a person subject even wh
   // token, and the town's own unrelated 1919 lynching gives enough generic overlap
   // (county, mob, lynched, African American) to have passed the old context check.
   assert.equal(
-    isPlausibleMatch('Bill Gilmer', BILL_GILMER_CONTEXT, GILMER_TEXAS_TEXT, 'Gilmer, Texas', 'person'),
+    isPlausibleMatch(
+      'Bill Gilmer',
+      BILL_GILMER_CONTEXT,
+      GILMER_TEXAS_TEXT,
+      'Gilmer, Texas',
+      'person',
+    ),
     false,
   );
 });
@@ -256,8 +281,12 @@ test('isPlausibleMatch still accepts a genuine match for a person subject', () =
   const greavesText =
     'Clinton Greaves (August 12, 1855 – August 18, 1906) was a Buffalo Soldier in the United States Army ' +
     'and a recipient of the Medal of Honor for his actions in the Indian Wars.';
-  const context = 'Documented Buffalo Soldier: Medal of Honor recipient for actions in the Indian Wars.';
-  assert.equal(isPlausibleMatch('Clinton Greaves', context, greavesText, 'Clinton Greaves', 'person'), true);
+  const context =
+    'Documented Buffalo Soldier: Medal of Honor recipient for actions in the Indian Wars.';
+  assert.equal(
+    isPlausibleMatch('Clinton Greaves', context, greavesText, 'Clinton Greaves', 'person'),
+    true,
+  );
 });
 test('isUsableLocationLabel rejects bare generic labels', () => {
   assert.equal(isUsableLocationLabel('headquarters'), false);
@@ -293,14 +322,23 @@ test('stripDescriptiveLocationClause drops a trailing descriptive clause (the Ch
   );
 });
 test('stripDescriptiveLocationClause keeps a genuine "Place, State/City" qualifier intact', () => {
-  assert.equal(stripDescriptiveLocationClause('South Carolina State House, Columbia'), 'South Carolina State House, Columbia');
+  assert.equal(
+    stripDescriptiveLocationClause('South Carolina State House, Columbia'),
+    'South Carolina State House, Columbia',
+  );
   assert.equal(stripDescriptiveLocationClause('Gilmer, Texas'), 'Gilmer, Texas');
 });
 test('isPlausibleMatch does not apply the person-only gates to non-person subjects', () => {
   // A place/organization/event subject legitimately citing a settlement article
   // (e.g. the town it is itself located in) should not be rejected by these guards.
   assert.equal(
-    isPlausibleMatch('Colonel Allensworth State Historic Park', undefined, GILMER_TEXAS_TEXT, 'Gilmer, Texas', 'place'),
+    isPlausibleMatch(
+      'Colonel Allensworth State Historic Park',
+      undefined,
+      GILMER_TEXAS_TEXT,
+      'Gilmer, Texas',
+      'place',
+    ),
     true,
   );
 });

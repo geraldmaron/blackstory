@@ -43,8 +43,7 @@ export function LawAnatomyStrip({
   citation,
   topics,
 }: LawAnatomyStripProps) {
-  const topicLine =
-    topics.length > 0 ? topics.slice(0, 3).join(' · ') : 'Topic not yet tagged';
+  const topicLine = topics.length > 0 ? topics.slice(0, 3).join(' · ') : 'Topic not yet tagged';
 
   return (
     <section className="ds-law-anatomy" aria-label="Law entry at a glance">

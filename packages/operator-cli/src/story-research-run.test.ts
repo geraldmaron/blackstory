@@ -126,7 +126,9 @@ test('gatherStoryTopicSourceSnippets falls back to preloaded snippets when fetch
       topicId: 'topic-gather',
       title: 'Gather test',
       authorityLeadHints: ['https://www.nps.gov/subjects/alamo/index.htm'],
-      sourceSnippets: ['Preloaded archival excerpt about the Alamo mission with place-first context.'],
+      sourceSnippets: [
+        'Preloaded archival excerpt about the Alamo mission with place-first context.',
+      ],
     },
     {
       fetchDependencies: {

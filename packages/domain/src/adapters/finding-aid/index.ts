@@ -23,11 +23,12 @@
  * `primary_archival`.
  */
 import { ADAPTER_CANDIDATE_SCHEMA_VERSION, stampCandidateProvenance } from '../candidates.js';
-import {
-  registerSource,
-  type SourceRegistryStore,
-} from '../registry.js';
-import type { AdapterCandidateRecord, SourceAdapterContract, SourceRegistryEntry } from '../types.js';
+import { registerSource, type SourceRegistryStore } from '../registry.js';
+import type {
+  AdapterCandidateRecord,
+  SourceAdapterContract,
+  SourceRegistryEntry,
+} from '../types.js';
 import type { EvidenceSource } from '../../provenance/source.js';
 import type { RightsPolicy } from '../../provenance/rights.js';
 import {
@@ -327,12 +328,8 @@ export function normalizeFindingAidCandidate(input: {
     state: candidate.state,
     ...(candidate.summary !== undefined ? { summary: capSnippet(candidate.summary) } : {}),
     ...(candidate.creator !== undefined ? { creator: candidate.creator } : {}),
-    ...(candidate.coveragePeriod !== undefined
-      ? { coveragePeriod: candidate.coveragePeriod }
-      : {}),
-    ...(candidate.eadComponentId !== undefined
-      ? { eadComponentId: candidate.eadComponentId }
-      : {}),
+    ...(candidate.coveragePeriod !== undefined ? { coveragePeriod: candidate.coveragePeriod } : {}),
+    ...(candidate.eadComponentId !== undefined ? { eadComponentId: candidate.eadComponentId } : {}),
     ...(() => {
       const ids = stripForbiddenIdentifiers(candidate.identifiers);
       return ids ? { identifiers: ids } : {};

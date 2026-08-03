@@ -3,10 +3,7 @@
  */
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import {
-  suggestBannedBooks,
-  type BannedBookSuggestCorpusItem,
-} from './suggest-books.js';
+import { suggestBannedBooks, type BannedBookSuggestCorpusItem } from './suggest-books.js';
 const CORPUS: readonly BannedBookSuggestCorpusItem[] = [
   {
     id: 'bb_1',

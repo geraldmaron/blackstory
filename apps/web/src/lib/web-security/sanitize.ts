@@ -35,7 +35,6 @@ const BLOCKED_TAG_PATTERN = new RegExp(
 );
 const TAG_PATTERN = /<\/?([a-zA-Z][\w-]*)([^>]*)>/g;
 
-
 /**
  * Strip executable markup from rich text markdown HTML fragments.
  * Allows a conservative tag allowlist; removes events, scripts, and dangerous URIs.

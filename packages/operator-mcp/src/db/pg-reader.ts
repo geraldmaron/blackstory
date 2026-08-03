@@ -155,7 +155,9 @@ export class PgIndicatorDbReader implements IndicatorDbReader {
     const rows = await this.listObservations({
       metricId: filters.metricId,
       jurisdictionId: filters.jurisdictionId,
-      ...(filters.referencePeriod !== undefined ? { referencePeriod: filters.referencePeriod } : {}),
+      ...(filters.referencePeriod !== undefined
+        ? { referencePeriod: filters.referencePeriod }
+        : {}),
       limit: 1,
     });
     return rows[0] ?? null;

@@ -1,6 +1,13 @@
 /**
  * Multi-year FBI hate crime reporting metrics — anti-Black share and agency participation by
  * year. Each year stands alone; incidents are never summed across years.
+ *
+ * Not currently rendered: `/data` dropped the hate-crime section in 567e2d61, and the dataset is
+ * being re-landed as a typed `statistical_series` metric (repo-zxjz.10, repo-a03ca83f) rather
+ * than the `HateCrimeYearSummary` rollup this takes. Kept because the presentation discipline
+ * here is the point — pairing every count with its participation rate is required by
+ * docs/research/data-ingestion-methodology.md, not a stylistic choice. Retarget to observations
+ * when that work lands; do not delete it as dead code first.
  */
 import React from 'react';
 import type { HateCrimeYearSummary } from '@repo/domain/statistics/public-data-summaries';

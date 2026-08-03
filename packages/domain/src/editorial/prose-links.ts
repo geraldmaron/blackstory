@@ -143,7 +143,6 @@ function buildNameCandidates(
   return candidates.sort((left, right) => right.name.length - left.name.length);
 }
 
-
 // Reject catalog-name matches that are only a prefix of a longer proper-noun
 // phrase (e.g. victim first name "John" matching inside "John Tucker"). Live
 // incident on lynching-victim summaries.

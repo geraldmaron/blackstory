@@ -26,7 +26,9 @@ export const GENERIC_TEMPORAL_WINDOWS: readonly PolicyEraConfig[] = [
 
 /** Resolve generic temporal windows for a given year. */
 export function resolveTemporalWindowsForYear(year: number): readonly string[] {
-  return GENERIC_TEMPORAL_WINDOWS.filter((era) => year >= era.startYear && year <= era.endYear).map((era) => era.id);
+  return GENERIC_TEMPORAL_WINDOWS.filter((era) => year >= era.startYear && year <= era.endYear).map(
+    (era) => era.id,
+  );
 }
 
 /** Parses a year from text description. */

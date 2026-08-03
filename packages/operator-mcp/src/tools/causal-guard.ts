@@ -18,18 +18,15 @@ const CAUSAL_TEXT_PATTERN =
 export function assertNoForbiddenCausalRequest(input: Record<string, unknown>): void {
   for (const [key, value] of Object.entries(input)) {
     if (CAUSAL_FIELD_NAMES.has(key)) {
-      throw new OperatorMcpError(
-        'forbidden_causal',
-        FORBIDDEN_CAUSAL_METHODOLOGY_POINTER,
-        { field: key },
-      );
+      throw new OperatorMcpError('forbidden_causal', FORBIDDEN_CAUSAL_METHODOLOGY_POINTER, {
+        field: key,
+      });
     }
     if (typeof value === 'string' && CAUSAL_TEXT_PATTERN.test(value)) {
-      throw new OperatorMcpError(
-        'forbidden_causal',
-        FORBIDDEN_CAUSAL_METHODOLOGY_POINTER,
-        { field: key, value },
-      );
+      throw new OperatorMcpError('forbidden_causal', FORBIDDEN_CAUSAL_METHODOLOGY_POINTER, {
+        field: key,
+        value,
+      });
     }
   }
 }

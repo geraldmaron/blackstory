@@ -48,9 +48,7 @@ function assertDynamicAfterImports(source, label) {
     const line = lines[i] ?? '';
     const trimmed = line.trimStart();
     const isImport =
-      /^import\s/.test(trimmed) ||
-      /^import["']/.test(trimmed) ||
-      /^import\{/.test(trimmed);
+      /^import\s/.test(trimmed) || /^import["']/.test(trimmed) || /^import\{/.test(trimmed);
     const isDynamic = /^export\s+const\s+dynamic\s*=/.test(trimmed);
 
     if (isImport) {
@@ -97,7 +95,10 @@ function main() {
       `Expected at most one explore/page.tsx under apps/web/src/app; found ${explorePages.length}: ` +
         explorePages.map(relativeAppPath).join(', '),
     );
-  } else if (explorePages.length === 1 && relativeAppPath(explorePages[0]) !== '(map)/explore/page.tsx') {
+  } else if (
+    explorePages.length === 1 &&
+    relativeAppPath(explorePages[0]) !== '(map)/explore/page.tsx'
+  ) {
     errors.push(
       `Explore page must live at (map)/explore/page.tsx (ADR-017); found ${relativeAppPath(explorePages[0])}`,
     );

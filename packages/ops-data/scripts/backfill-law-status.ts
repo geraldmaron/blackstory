@@ -108,12 +108,16 @@ async function main(): Promise<void> {
     let caseReviewCount = 0;
     for (const row of cases) {
       const open = currentStatus(row.status_history ?? undefined);
-      if (!caseNeedsStatusReview({ entityId: row.id, openStatus: open, kindDetail: row.kind_detail })) {
+      if (
+        !caseNeedsStatusReview({ entityId: row.id, openStatus: open, kindDetail: row.kind_detail })
+      ) {
         continue;
       }
       if (fixedCaseIds.has(row.id)) continue;
       caseReviewCount += 1;
-      console.log(`  REVIEW case ${row.id} (${row.display_name}) — in_force vs summary demise language`);
+      console.log(
+        `  REVIEW case ${row.id} (${row.display_name}) — in_force vs summary demise language`,
+      );
     }
     if (caseReviewCount === 0) {
       console.log('  case review lane: no clear in_force + demise-language mismatches');

@@ -5,8 +5,7 @@
  */
 
 /** Registry homepage — cite on every published observation. */
-export const EPA_TRI_HOMEPAGE_URL =
-  'https://www.epa.gov/toxics-release-inventory-tri-program';
+export const EPA_TRI_HOMEPAGE_URL = 'https://www.epa.gov/toxics-release-inventory-tri-program';
 
 export const EPA_TRI_BASIC_DATA_URL =
   'https://www.epa.gov/toxics-release-inventory-tri-program/tri-basic-data-files-calendar-years-1987-present';

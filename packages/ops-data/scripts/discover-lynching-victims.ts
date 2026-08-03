@@ -33,7 +33,17 @@ const WIKIPEDIA_API = 'https://en.wikipedia.org/w/api.php';
 const USER_AGENT = 'BlackStory research pipeline (contact: geraldmarondagher@gmail.com)';
 const LIST_ARTICLE_TITLE = 'List of lynching victims in the United States';
 
-const COLUMNS = ['name', 'age', 'ethnicity', 'city', 'county', 'state', 'date', 'accusation', 'comment'] as const;
+const COLUMNS = [
+  'name',
+  'age',
+  'ethnicity',
+  'city',
+  'county',
+  'state',
+  'date',
+  'accusation',
+  'comment',
+] as const;
 type Column = (typeof COLUMNS)[number];
 type Victim = Record<Column, string>;
 
@@ -55,7 +65,12 @@ function readArgFlag(name: string): string | undefined {
 }
 
 async function fetchWikitext(title: string): Promise<string> {
-  const params = new URLSearchParams({ action: 'parse', page: title, prop: 'wikitext', format: 'json' });
+  const params = new URLSearchParams({
+    action: 'parse',
+    page: title,
+    prop: 'wikitext',
+    format: 'json',
+  });
   const response = await fetch(`${WIKIPEDIA_API}?${params.toString()}`, {
     headers: { 'User-Agent': USER_AGENT, Accept: 'application/json' },
     signal: AbortSignal.timeout(30_000),
@@ -226,7 +241,9 @@ async function main(): Promise<void> {
   const sourceUrl = `https://en.wikipedia.org/wiki/${encodeURIComponent(LIST_ARTICLE_TITLE.replace(/ /gu, '_'))}`;
   const tables = extractAllTables(wikitext);
   const allVictims = tables.flatMap(parseTable);
-  const blackVictims = allVictims.filter((v) => v.ethnicity.includes('African American') && v.state.trim().length > 0);
+  const blackVictims = allVictims.filter(
+    (v) => v.ethnicity.includes('African American') && v.state.trim().length > 0,
+  );
 
   const seen = new Map<string, number>();
   const candidates: GapCandidate[] = [];

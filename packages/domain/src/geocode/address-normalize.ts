@@ -44,13 +44,16 @@ export function normalizeAddressText(raw: string): string {
  * Leading "St" in place names ("St Louis, MO") is left alone.
  */
 export function expandCommonAbbreviations(text: string): string {
-  return text.replace(/(^|,\s*)(\d{1,5}(?:\s+1\/[234])?\s+[^,]+)/g, (full, prefix: string, segment: string) => {
-    const expanded = segment.replace(/\b([A-Za-z]+)\.?\s*$/i, (word) => {
-      const key = word.toLowerCase().replace(/\.$/, '');
-      return STREET_SUFFIX_EXPANSIONS[key] ?? word;
-    });
-    return `${prefix}${expanded}`;
-  });
+  return text.replace(
+    /(^|,\s*)(\d{1,5}(?:\s+1\/[234])?\s+[^,]+)/g,
+    (full, prefix: string, segment: string) => {
+      const expanded = segment.replace(/\b([A-Za-z]+)\.?\s*$/i, (word) => {
+        const key = word.toLowerCase().replace(/\.$/, '');
+        return STREET_SUFFIX_EXPANSIONS[key] ?? word;
+      });
+      return `${prefix}${expanded}`;
+    },
+  );
 }
 
 export type NormalizedAddressInput = {

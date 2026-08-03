@@ -5,7 +5,10 @@
  * injected so callers can pass the live public pool (same as explore/search) while tests keep
  * using the seed snapshot. No Next.js runtime dependency so it is directly unit-testable.
  */
-import { getHistoryGraphReleaseArtifact, resolveHistoryGraphReleaseArtifact } from '../../data/history-graph-seed';
+import {
+  getHistoryGraphReleaseArtifact,
+  resolveHistoryGraphReleaseArtifact,
+} from '../../data/history-graph-seed';
 import { listPublicEntities, type PublicEntityView } from '../../data/public-seed';
 import type { EntityRelationship, GraphReleaseArtifact } from '@repo/domain';
 import {
@@ -33,10 +36,7 @@ import {
 import { applyHistorySearchFilter } from './history-search';
 import { buildSearchIndexForEntities } from '../search/snapshot-search-index';
 import { buildHistoryOverview } from './overview';
-import {
-  parseHistorySearchParams,
-  type RawHistorySearchParams,
-} from './url-state';
+import { parseHistorySearchParams, type RawHistorySearchParams } from './url-state';
 import type { HistoryViewModel } from './history-view-model.types';
 
 export type { HistoryViewModel } from './history-view-model.types';

@@ -13,7 +13,8 @@ test('save + getByReceiptCode round-trip an opaque receipt without exposing subm
     {
       kind: 'correction',
       title: 'Correction',
-      statement: 'The published opening year should be 1924 according to the county superintendent ledger.',
+      statement:
+        'The published opening year should be 1924 according to the county superintendent ledger.',
       sourceUrls: ['https://example.org/ledger'],
       targetRecordId: 'entity-rosewood',
     },

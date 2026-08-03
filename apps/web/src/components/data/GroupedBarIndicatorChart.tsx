@@ -40,8 +40,7 @@ export function GroupedBarIndicatorChart({ series }: GroupedBarIndicatorChartPro
       title={series.title}
       caption={
         <>
-          {series.caption}{' '}
-          <span className="ds-data-chart__meta">{series.geographyLabel}</span>
+          {series.caption} <span className="ds-data-chart__meta">{series.geographyLabel}</span>
           {themeLink ? (
             <>
               {' '}

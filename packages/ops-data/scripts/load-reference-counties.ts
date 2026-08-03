@@ -279,7 +279,9 @@ async function main(): Promise<void> {
   if (!databaseUrl) throw new Error('DATABASE_URL required for apply mode');
 
   const countyCount = await upsertCounties(seeds, plan.provenance, databaseUrl);
-  console.log(`Upserted ${seeds.length} county jurisdictions; verified ${countyCount} county rows.`);
+  console.log(
+    `Upserted ${seeds.length} county jurisdictions; verified ${countyCount} county rows.`,
+  );
 }
 
 main().catch((error) => {

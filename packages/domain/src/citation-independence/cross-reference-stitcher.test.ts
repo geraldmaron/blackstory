@@ -62,7 +62,10 @@ test('extractPersonMentions normalizes and drops empty names, sorted by mentionI
   assert.equal(only!.personKey, 'rebecca lee crumpler');
   assert.equal(only!.displayName, 'Dr. Rebecca Lee Crumpler');
   assert.equal(only!.sourceReference.sourceId, 'src-a');
-  assert.equal(only!.sourceReference.stableIdentifier, 'cross-reference-person:rebecca lee crumpler');
+  assert.equal(
+    only!.sourceReference.stableIdentifier,
+    'cross-reference-person:rebecca lee crumpler',
+  );
 });
 
 test('two datasets with one overlapping unknown person -> single match with both sources', () => {
@@ -82,10 +85,7 @@ test('two datasets with one overlapping unknown person -> single match with both
 });
 
 test('single-source person is not a cross-source match', () => {
-  const datasets = [
-    dataset('src-a', ['Solo Person']),
-    dataset('src-b', ['Different Name']),
-  ];
+  const datasets = [dataset('src-a', ['Solo Person']), dataset('src-b', ['Different Name'])];
 
   const matches = findCrossSourceMatches(datasets, emptyCatalog);
   assert.deepEqual(matches, []);
@@ -139,10 +139,7 @@ test('buildCrossReferenceCandidates aggregates both source references onto a mer
   // Private discovery candidate only — never promotable / published.
   assert.equal(candidate!.signals.outcome, 'candidate_only');
   assert.equal(candidate!.schemaVersion, 'discovery-candidate.v1');
-  assert.equal(
-    candidate!.identity.stableIdentifier,
-    'cross-reference-person:rebecca lee crumpler',
-  );
+  assert.equal(candidate!.identity.stableIdentifier, 'cross-reference-person:rebecca lee crumpler');
 });
 
 test('buildCrossReferenceCandidates is deterministic and pure (stable across calls)', () => {
@@ -158,10 +155,7 @@ test('buildCrossReferenceCandidates is deterministic and pure (stable across cal
   assert.deepEqual(first, second);
   assert.deepEqual(
     first.map((c) => c.identity.stableIdentifier),
-    [
-      'cross-reference-person:ada copeland',
-      'cross-reference-person:bass reeves',
-    ],
+    ['cross-reference-person:ada copeland', 'cross-reference-person:bass reeves'],
   );
   for (const candidate of first) {
     assert.equal(candidate.status, 'merged');

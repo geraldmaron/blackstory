@@ -150,7 +150,12 @@ test('trusted service identities do not use browser App Check tokens', async () 
 
 test('circuit breaker records verifier throws but not missing-token paths', async () => {
   const breaker = createAppCheckCircuitBreaker({
-    config: { failureThreshold: 1, windowMs: 60_000, recoveryTimeoutMs: 30_000, halfOpenSuccessThreshold: 1 },
+    config: {
+      failureThreshold: 1,
+      windowMs: 60_000,
+      recoveryTimeoutMs: 30_000,
+      halfOpenSuccessThreshold: 1,
+    },
   });
   const invalidVerifier: AppCheckVerifier = {
     async verifyToken() {

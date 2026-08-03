@@ -55,7 +55,12 @@ export {
 export { createFindNearestEndpoint } from './vector-search-endpoint.js';
 
 // --- Bounded public read API v1 (MOB-004) ---
-export { createPublicApiServer, DEFAULT_LIMITS, parseJsonWithDepthLimit, readBodyWithLimit } from './http/server.js';
+export {
+  createPublicApiServer,
+  DEFAULT_LIMITS,
+  parseJsonWithDepthLimit,
+  readBodyWithLimit,
+} from './http/server.js';
 export type { PublicApiServerLimits, PublicApiServerOptions } from './http/server.js';
 export { dispatch as dispatchV1 } from './http/router.js';
 export type { ApiRequest, HandlerDeps } from './http/handlers.js';

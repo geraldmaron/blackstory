@@ -36,7 +36,10 @@ test('omits submitterContact when contact is absent', () => {
 });
 
 test('flags classificationDispute metadata for that category', () => {
-  const result = validateCorrectionSubmission({ ...VALID_INPUT, category: 'classification_dispute' });
+  const result = validateCorrectionSubmission({
+    ...VALID_INPUT,
+    category: 'classification_dispute',
+  });
   assert.equal(result.valid, true);
   if (!result.valid) return;
   assert.equal(result.metadata.classificationDispute, true);

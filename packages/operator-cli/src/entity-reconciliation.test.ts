@@ -49,14 +49,20 @@ test('multiple exact-name type-compatible candidates stay ambiguous rather than 
 });
 
 test('a candidate whose description conflicts with the entity kind is excluded, not guessed onto', () => {
-  const candidates: WikidataCandidate[] = [{ qid: 'Q28732995', label: 'Rosa Parks', description: 'Tram stop' }];
+  const candidates: WikidataCandidate[] = [
+    { qid: 'Q28732995', label: 'Rosa Parks', description: 'Tram stop' },
+  ];
   const result = classifyCandidates(PERSON, candidates);
   assert.equal(result.decision, 'ambiguous');
 });
 
 test('alias-only (non-exact label) hits never auto-accept', () => {
   const candidates: WikidataCandidate[] = [
-    { qid: 'Q1', label: 'Rosa Louise McCauley Parks', description: 'American civil rights activist' },
+    {
+      qid: 'Q1',
+      label: 'Rosa Louise McCauley Parks',
+      description: 'American civil rights activist',
+    },
   ];
   const result = classifyCandidates(PERSON, candidates);
   assert.equal(result.decision, 'ambiguous');
@@ -88,7 +94,13 @@ test('WIKIDATA_PROPERTY_MAP uses the property ids verified against Audre Lorde (
 
 test('searchWikidata maps the wbsearchentities response shape into candidates', async () => {
   const fetcher = async () => ({
-    search: [{ id: 'Q41421', display: { label: { value: 'Rosa Parks' } }, description: 'American civil rights activist' }],
+    search: [
+      {
+        id: 'Q41421',
+        display: { label: { value: 'Rosa Parks' } },
+        description: 'American civil rights activist',
+      },
+    ],
   });
   const candidates = await searchWikidata('Rosa Parks', fetcher);
   assert.deepEqual(candidates, [
@@ -119,9 +131,21 @@ test('reconcileEntity end-to-end: accept path fetches identifiers, ambiguous pat
   const fetcher = async (url: string) => {
     calls += 1;
     if (url.includes('wbsearchentities')) {
-      return { search: [{ id: 'Q41421', display: { label: { value: 'Rosa Parks' } }, description: 'American civil rights activist' }] };
+      return {
+        search: [
+          {
+            id: 'Q41421',
+            display: { label: { value: 'Rosa Parks' } },
+            description: 'American civil rights activist',
+          },
+        ],
+      };
     }
-    return { entities: { Q41421: { claims: { P244: [{ mainsnak: { datavalue: { value: 'n50042298' } } }] } } } };
+    return {
+      entities: {
+        Q41421: { claims: { P244: [{ mainsnak: { datavalue: { value: 'n50042298' } } }] } },
+      },
+    };
   };
   const result = await reconcileEntity(PERSON, fetcher);
   assert.equal(result.status, 'matched');

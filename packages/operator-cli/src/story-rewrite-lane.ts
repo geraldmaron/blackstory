@@ -67,8 +67,10 @@ export function buildMockStoryRewriteBody(story: StoryProjection): PublicStorySe
     const heading = SECTION_HEADINGS[index]!;
     const paragraphs: string[] = [];
     while (wordCount([{ paragraphs }]) < Math.ceil(STORY_REWRITE_MIN_WORDS / 4)) {
-      const seed = seedParagraphs[(sections.length + paragraphs.length) % Math.max(seedParagraphs.length, 1)] ??
-        `${story.title} stays anchored to ${story.placeLabel} across ${story.eraLabel}.`;
+      const seed =
+        seedParagraphs[
+          (sections.length + paragraphs.length) % Math.max(seedParagraphs.length, 1)
+        ] ?? `${story.title} stays anchored to ${story.placeLabel} across ${story.eraLabel}.`;
       paragraphs.push(expandParagraph(seed, story.placeLabel, primarySource));
     }
     sections.push({ heading, paragraphs });
@@ -129,14 +131,17 @@ export function resolveStoryRewriteProvider(
   input: Pick<StoryRewriteLaneInput, 'provider' | 'model' | 'models' | 'apiKey'> = {},
 ): { readonly provider: LlmProvider; readonly liveGeneration: boolean } {
   const models = input.models ?? DEFAULT_STORY_REWRITE_MODELS;
-  const requested = input.provider ?? process.env.STORY_REWRITE_LLM_PROVIDER ??
-    process.env.EDITORIAL_LLM_PROVIDER;
+  const requested =
+    input.provider ?? process.env.STORY_REWRITE_LLM_PROVIDER ?? process.env.EDITORIAL_LLM_PROVIDER;
   if (requested === 'mock') {
     return { provider: createMockStoryRewriteProvider(input.model), liveGeneration: false };
   }
   if (requested === 'ollama') {
     return {
-      provider: createLlmProvider({ provider: 'ollama', ...(input.model ? { model: input.model } : {}) }),
+      provider: createLlmProvider({
+        provider: 'ollama',
+        ...(input.model ? { model: input.model } : {}),
+      }),
       liveGeneration: true,
     };
   }
@@ -166,10 +171,7 @@ export function resolveStoryRewriteProvider(
   return { provider: createMockStoryRewriteProvider(input.model), liveGeneration: false };
 }
 
-export function writeStoryRewriteArtifact(
-  result: StoryRewriteResult,
-  outputDir: string,
-): string {
+export function writeStoryRewriteArtifact(result: StoryRewriteResult, outputDir: string): string {
   mkdirSync(outputDir, { recursive: true });
   const path = `${outputDir}/${result.slug}.json`;
   writeFileSync(path, `${JSON.stringify(result, null, 2)}\n`, 'utf8');

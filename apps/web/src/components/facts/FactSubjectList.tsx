@@ -23,14 +23,20 @@ export function FactSubjectList({ subjects, labelledBy }: FactSubjectListProps) 
             <a className="bb-cta bb-cta--ink" href={`/entity/${subject.entityId}`}>
               {subject.entityId}
             </a>
-            <span className="bb-sans" style={{ marginLeft: 'var(--bb-space-2)', color: 'var(--bb-ink-muted)' }}>
+            <span
+              className="bb-sans"
+              style={{ marginLeft: 'var(--bb-space-2)', color: 'var(--bb-ink-muted)' }}
+            >
               {humanizeToken(subject.kind)}
               {subject.role ? ` · ${humanizeToken(subject.role)}` : ''}
             </span>
           </li>
         ))}
       </ul>
-      <p className="bb-sans" style={{ margin: 'var(--bb-space-3) 0 0 0', color: 'var(--bb-ink-muted)' }}>
+      <p
+        className="bb-sans"
+        style={{ margin: 'var(--bb-space-3) 0 0 0', color: 'var(--bb-ink-muted)' }}
+      >
         These subject edges feed the published history graph (BB-092) — mirrored into browse-graph
         relationships at publish time so fact-only entity linkages are not silently absent.
       </p>

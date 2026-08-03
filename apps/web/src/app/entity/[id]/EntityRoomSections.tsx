@@ -113,8 +113,8 @@ export function EntityRoomSections({
             What the sources say
           </h2>
           <p className="ds-record-beat__standfirst">
-            Each statement below is one accepted claim, shown with the source it was taken from
-            and how strongly that source carries it.
+            Each statement below is one accepted claim, shown with the source it was taken from and
+            how strongly that source carries it.
           </p>
           <EntityEvidencePanel
             labelledBy="claims-heading"

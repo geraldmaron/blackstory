@@ -58,9 +58,7 @@ export function normalizePgConnectionString(
     url.searchParams.set('sslmode', 'require');
     normalized = url.toString();
   } catch {
-    normalized = connectionString
-      .replace(/([?&])sslmode=[^&]*/g, '$1')
-      .replace(/[?&]$/, '');
+    normalized = connectionString.replace(/([?&])sslmode=[^&]*/g, '$1').replace(/[?&]$/, '');
     const join = normalized.includes('?') ? '&' : '?';
     normalized = `${normalized}${join}uselibpqcompat=true&sslmode=require`;
   }

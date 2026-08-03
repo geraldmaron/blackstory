@@ -8,7 +8,12 @@ import type { GeoPoint, GeoRing } from './types.js';
 /** ~5 m at mid-latitude; small enough for integrity, large enough for float noise. */
 export const DEFAULT_CONTAINMENT_TOLERANCE_DEGREES = 0.00005;
 
-function ringBBox(ring: GeoRing): { minLng: number; maxLng: number; minLat: number; maxLat: number } {
+function ringBBox(ring: GeoRing): {
+  minLng: number;
+  maxLng: number;
+  minLat: number;
+  maxLat: number;
+} {
   let minLng = Infinity;
   let maxLng = -Infinity;
   let minLat = Infinity;
@@ -22,11 +27,7 @@ function ringBBox(ring: GeoRing): { minLng: number; maxLng: number; minLat: numb
   return { minLng, maxLng, minLat, maxLat };
 }
 
-function pointInRingBBox(
-  point: GeoPoint,
-  ring: GeoRing,
-  tolerance: number,
-): boolean {
+function pointInRingBBox(point: GeoPoint, ring: GeoRing, tolerance: number): boolean {
   const { minLng, maxLng, minLat, maxLat } = ringBBox(ring);
   return (
     point.lng >= minLng - tolerance &&

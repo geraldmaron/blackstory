@@ -57,11 +57,7 @@ test('NRHP MPL adapter id is distinct from the federal NPS NRHP listing adapter 
 
 test('AA curated-net gate accepts allowlisted themes with primary or significant relevance', () => {
   for (const theme of NRHP_MPL_AA_CURATED_THEMES.slice(0, 3)) {
-    assert.equal(
-      qualifiesForAaCuratedNet({ theme, aaHeritageRelevance: 'primary' }),
-      true,
-      theme,
-    );
+    assert.equal(qualifiesForAaCuratedNet({ theme, aaHeritageRelevance: 'primary' }), true, theme);
   }
   assert.equal(
     qualifiesForAaCuratedNet({

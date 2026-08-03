@@ -209,9 +209,7 @@ async function main(): Promise<void> {
 
   if (!apply) {
     console.log(JSON.stringify(summary, null, 2));
-    console.log(
-      'Dry-run only. Set INGEST_PHASE1_USSC_APPLY=1 DRY_RUN=0 DATABASE_URL=… to upsert.',
-    );
+    console.log('Dry-run only. Set INGEST_PHASE1_USSC_APPLY=1 DRY_RUN=0 DATABASE_URL=… to upsert.');
     return;
   }
 

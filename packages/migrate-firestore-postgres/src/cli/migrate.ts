@@ -31,7 +31,8 @@ function parseArgs(argv: readonly string[]) {
   const limit = limitArg ? Number(limitArg.slice('--limit='.length)) : undefined;
   const wantAll = argv.includes('--all');
   const wantLarge = argv.includes('--large');
-  const wantHighValue = argv.includes('--high-value') || (collections.length === 0 && !wantLarge && !wantAll);
+  const wantHighValue =
+    argv.includes('--high-value') || (collections.length === 0 && !wantLarge && !wantAll);
   return {
     mode: mode as 'dry-run' | 'apply',
     wantAll,
@@ -71,10 +72,7 @@ async function main(): Promise<void> {
   }
 
   if (pool.length === 0) {
-    console.error(
-      'No matching collections. Known:',
-      ALL_MIGRANTS.map((m) => m.name).join(', '),
-    );
+    console.error('No matching collections. Known:', ALL_MIGRANTS.map((m) => m.name).join(', '));
     process.exitCode = 1;
     return;
   }

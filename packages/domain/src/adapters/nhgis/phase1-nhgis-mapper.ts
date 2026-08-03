@@ -440,7 +440,9 @@ export function assertNhgisTenureHomeownershipDecadesPresent(
   rows: readonly NhgisCookTenureHomeownershipRow[],
 ): void {
   const decades = new Set(rows.map((row) => row.decade));
-  const missing = PHASE1_NHGIS_TENURE_HOMEOWNERSHIP_DECADES.filter((decade) => !decades.has(decade));
+  const missing = PHASE1_NHGIS_TENURE_HOMEOWNERSHIP_DECADES.filter(
+    (decade) => !decades.has(decade),
+  );
   if (missing.length > 0) {
     throw new Error(
       `NHGIS Cook tenure fixture missing required decades: ${missing.join(', ')} (county ${PHASE1_NHGIS_DEFAULT_COUNTY_FIPS})`,

@@ -12,10 +12,7 @@ import type { EntityV1 } from '@repo/public-contracts/v1/entity';
 import { publicApiErrorEnvelopeSchema } from '@repo/public-contracts/errors';
 import { createPublicRateLimitGuard } from '../rate-limits.js';
 import { createPublicSearchGuard } from '../search-guardrails.js';
-import {
-  createInMemoryPublicDataAccess,
-  type PublicDataAccess,
-} from './data-access.js';
+import { createInMemoryPublicDataAccess, type PublicDataAccess } from './data-access.js';
 import { dispatch } from './router.js';
 import type { ApiRequest, HandlerDeps } from './handlers.js';
 import { makeEntity, SAMPLE_POINTER } from './entity-fixture.js';
@@ -197,7 +194,10 @@ test('SSRF: bypassing port validation yields INTERNAL — malicious href never r
   };
 
   await withFetchBlocked(async (fetchCalls) => {
-    const res = await dispatch(makeRequest('/v1/entity/ent_dunbar_school_001'), makeDeps(bypassingAccess));
+    const res = await dispatch(
+      makeRequest('/v1/entity/ent_dunbar_school_001'),
+      makeDeps(bypassingAccess),
+    );
     assert.equal(res.status, 500);
     assert.equal(publicApiErrorEnvelopeSchema.parse(res.body).error.code, 'INTERNAL');
     assert.equal(fetchCalls.length, 0);

@@ -8,8 +8,7 @@ export const DATA_PAGE_DESCRIPTION =
 
 export const DATA_INTRO = {
   kicker: 'Numbers',
-  lede:
-    'National Census context plus curated indicators for wealth, housing, credit, and justice. Every chart names its source. For county maps, open Explore.',
+  lede: 'National Census context plus curated indicators for wealth, housing, credit, and justice. Every chart names its source. For county maps, open Explore.',
 } as const;
 
 export const DATA_ORIENTATION_BEATS = [
@@ -42,49 +41,42 @@ export const DATA_SECTION_COPY = {
     index: '01',
     kicker: 'Orientation',
     title: 'How to read these numbers',
-    lede:
-      'Census decades anchor the national story. Phase 1 indicators (ACS, NHGIS, HMDA, CHAS, BJS, SCF, USSC, and more) show curated metrics we place beside archive evidence.',
+    lede: 'Census decades anchor the national story. Phase 1 indicators (ACS, NHGIS, HMDA, CHAS, BJS, SCF, USSC, and more) show curated metrics we place beside archive evidence.',
   },
   population: {
     index: '02',
     kicker: 'U.S. Census',
     title: 'Black population over time',
-    lede:
-      'How many Black Americans the Census counted each decade from 1790 to 2020: the spine for national context before place-specific indicators.',
+    lede: 'How many Black Americans the Census counted each decade from 1790 to 2020: the spine for national context before place-specific indicators.',
   },
   wealth: {
     index: '03',
     kicker: 'Survey of Consumer Finances',
     title: 'Wealth gap at a glance',
-    lede:
-      'Median family net worth from the Federal Reserve triennial survey: a national juxtaposition when asking how housing-credit eras relate to wealth.',
+    lede: 'Median family net worth from the Federal Reserve triennial survey: a national juxtaposition when asking how housing-credit eras relate to wealth.',
   },
   housing: {
     index: '04',
     kicker: 'NHGIS · HMDA · CHAS',
     title: 'Housing, credit, and cost burden',
-    lede:
-      'Cook County is our Phase 1 place spine: decennial homeownership (NHGIS), mortgage denial rates (HMDA), and HUD CHAS cost burden from the Consolidated Plan.',
+    lede: 'Cook County is our Phase 1 place spine: decennial homeownership (NHGIS), mortgage denial rates (HMDA), and HUD CHAS cost burden from the Consolidated Plan.',
   },
   justice: {
     index: '05',
     kicker: 'BJS · USSC',
     title: 'Imprisonment and federal drug sentences',
-    lede:
-      'State imprisonment rates (BJS) and federal cocaine sentencing averages (USSC Quick Facts): context for drug-policy eras, not proof that any single law caused a number.',
+    lede: 'State imprisonment rates (BJS) and federal cocaine sentencing averages (USSC Quick Facts): context for drug-policy eras, not proof that any single law caused a number.',
   },
   themes: {
     index: '06',
     kicker: 'Phase 1',
     title: 'Curated indicator coverage',
-    lede:
-      'These indicators sit beside artifacts and policy eras in research packets. Data shows the numbers; Methodology explains how we juxtapose them without causal overclaim.',
+    lede: 'These indicators sit beside artifacts and policy eras in research packets. Data shows the numbers; Methodology explains how we juxtapose them without causal overclaim.',
   },
   next: {
     index: '07',
     kicker: 'Next step',
     title: 'Dig into a place',
-    lede:
-      'Open the map for county layers and local context. Methodology explains how we read outside statistics next to archive records.',
+    lede: 'Open the map for county layers and local context. Methodology explains how we read outside statistics next to archive records.',
   },
 } as const;

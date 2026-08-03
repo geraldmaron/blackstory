@@ -41,19 +41,16 @@ export function createSupabaseStorage(config: SupabaseStorageConfig): CaptureSto
     kind: 'supabase-storage',
     async store({ url, sha256, contentType, byteLength, text }) {
       const path = `captures/${sha256}.txt`;
-      const response = await transport(
-        `${base}/storage/v1/object/${config.bucket}/${path}`,
-        {
-          method: 'POST',
-          headers: {
-            authorization: `Bearer ${config.secretKey}`,
-            apikey: config.secretKey,
-            'content-type': 'text/plain; charset=utf-8',
-            'x-upsert': 'false',
-          },
-          body: text,
+      const response = await transport(`${base}/storage/v1/object/${config.bucket}/${path}`, {
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${config.secretKey}`,
+          apikey: config.secretKey,
+          'content-type': 'text/plain; charset=utf-8',
+          'x-upsert': 'false',
         },
-      );
+        body: text,
+      });
       // 409 Duplicate = the content-addressed object already exists; identical by definition.
       if (!response.ok && response.status !== 409) {
         const detail = await response.text().catch(() => '');

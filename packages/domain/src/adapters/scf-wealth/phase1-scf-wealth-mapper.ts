@@ -110,7 +110,11 @@ function buildDraft(input: {
   const metric = metricById(input.metricId);
   const boundaryVersion = PHASE1_SCF_WEALTH_BOUNDARY_VERSION;
   const draft: Phase1ScfWealthObservationDraft = {
-    id: observationId(metric.metricId, PHASE1_SCF_WEALTH_NATION_JURISDICTION_ID, input.referencePeriod),
+    id: observationId(
+      metric.metricId,
+      PHASE1_SCF_WEALTH_NATION_JURISDICTION_ID,
+      input.referencePeriod,
+    ),
     metricId: metric.metricId,
     jurisdictionId: PHASE1_SCF_WEALTH_NATION_JURISDICTION_ID,
     boundaryVersion,
@@ -143,7 +147,9 @@ export function parseScfMedianWealthFixtureCsv(csvText: string): {
   readonly rejected: readonly string[];
 } {
   const lines = csvText.split(/\r?\n/);
-  const headerIndex = lines.findIndex((line) => /^year,black_median_usd,white_median_usd/i.test(line));
+  const headerIndex = lines.findIndex((line) =>
+    /^year,black_median_usd,white_median_usd/i.test(line),
+  );
   if (headerIndex < 0) {
     throw new Error('SCF wealth fixture CSV missing year,black_median_usd,white_median_usd header');
   }

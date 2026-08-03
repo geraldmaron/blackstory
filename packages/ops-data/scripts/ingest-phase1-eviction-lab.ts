@@ -64,7 +64,9 @@ function parseCountyStateFips(): readonly string[] {
     .filter(Boolean);
   for (const stateFips of states) {
     if (!/^\d{2}$/.test(stateFips)) {
-      throw new Error(`PHASE1_EVICTION_COUNTY_STATES entry must be 2-digit FIPS, got "${stateFips}"`);
+      throw new Error(
+        `PHASE1_EVICTION_COUNTY_STATES entry must be 2-digit FIPS, got "${stateFips}"`,
+      );
     }
   }
   return states;
@@ -204,8 +206,7 @@ async function applyObservations(
 }
 
 async function main(): Promise<void> {
-  const apply =
-    process.env.INGEST_PHASE1_EVICTION_LAB_APPLY === '1' && process.env.DRY_RUN !== '1';
+  const apply = process.env.INGEST_PHASE1_EVICTION_LAB_APPLY === '1' && process.env.DRY_RUN !== '1';
   const countyStates = parseCountyStateFips();
   const fetchResult = await fetchPhase1EvictionCountyObservations(countyStates);
 

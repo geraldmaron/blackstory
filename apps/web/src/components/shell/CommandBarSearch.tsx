@@ -17,10 +17,7 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import {
-  TypeaheadCombobox,
-  type TypeaheadSuggestion,
-} from '../typeahead/TypeaheadCombobox';
+import { TypeaheadCombobox, type TypeaheadSuggestion } from '../typeahead/TypeaheadCombobox';
 
 void React;
 
@@ -57,8 +54,10 @@ export function CommandBarSearch({ placeholder }: CommandBarSearchProps) {
       }
       const payload: unknown = await response.json();
       const results =
-        typeof payload === 'object' && payload !== null && Array.isArray((payload as { results?: unknown }).results)
-          ? ((payload as { results: readonly SearchApiResult[] }).results)
+        typeof payload === 'object' &&
+        payload !== null &&
+        Array.isArray((payload as { results?: unknown }).results)
+          ? (payload as { results: readonly SearchApiResult[] }).results
           : [];
 
       return results.flatMap((result) => {

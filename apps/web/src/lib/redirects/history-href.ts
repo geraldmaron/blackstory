@@ -54,7 +54,8 @@ export function mapHistoryQueryToRecordsHref(raw: RawHistoryRedirectParams): str
   // constraints cannot merge into one param, and dropping the reader's explicit one to honour a
   // derived one would widen the result set they asked to narrow.
   const explicitEra = (firstValue(raw.era) ?? '').trim();
-  const era = explicitEra && explicitEra !== 'all' ? explicitEra : decadeParamToEra(firstValue(raw.decade));
+  const era =
+    explicitEra && explicitEra !== 'all' ? explicitEra : decadeParamToEra(firstValue(raw.decade));
   if (era) params.set('era', era);
 
   const qs = params.toString();

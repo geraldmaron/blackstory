@@ -9,15 +9,13 @@ export const BOOKS_PAGE_DESCRIPTION =
 export const BOOKS_INTRO = {
   kicker: 'Reference',
   titleWarm: 'books',
-  lede:
-    'Challenged and restricted titles tied to Black history and related reading. Each entry carries cited challenge reports and a path to buy or look up the book. Not a complete national census; status can change.',
+  lede: 'Challenged and restricted titles tied to Black history and related reading. Each entry carries cited challenge reports and a path to buy or look up the book. Not a complete national census; status can change.',
 } as const;
 
 export const BOOKS_CATALOG = {
   kicker: 'Catalog',
   title: 'Challenged titles',
-  lede:
-    'Search by title, author, or summary. Filter by state and author. Sort by title, author, year, citations, or challenge breadth.',
+  lede: 'Search by title, author, or summary. Filter by state and author. Sort by title, author, year, citations, or challenge breadth.',
   emptyTitle: 'No titles matched',
   emptyBody: 'Try a broader keyword or reset the state and author filters.',
   emptyAction: 'Clear filters',
@@ -26,8 +24,7 @@ export const BOOKS_CATALOG = {
 export const BOOKS_ABOUT = {
   kicker: 'About',
   title: 'How to read this list',
-  lede:
-    'A title counts as currently banned or restricted here only while a cited challenge remains in reported, unknown, banned, or restricted status in that jurisdiction; challenges resolved as rescinded or retained are excluded. State codes are validated USPS abbreviations from those reports, not a claim of statewide removal. Bookshop.org links use BlackStory affiliate referral to support independent bookstores.',
+  lede: 'A title counts as currently banned or restricted here only while a cited challenge remains in reported, unknown, banned, or restricted status in that jurisdiction; challenges resolved as rescinded or retained are excluded. State codes are validated USPS abbreviations from those reports, not a claim of statewide removal. Bookshop.org links use BlackStory affiliate referral to support independent bookstores.',
 } as const;
 
 export const BOOKS_DETAIL = {

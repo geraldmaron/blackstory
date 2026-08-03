@@ -3,7 +3,12 @@ import { test } from 'node:test';
 import { relatedEntryV1Schema, relatedNeighborV1Schema } from './related.js';
 
 test('round-trips a related entry with an open-ended timespan (validTo: null)', () => {
-  const input = { id: 'ent_15th_st_church_001', type: 'founded_in', direction: 'incoming' as const, timespan: { validFrom: '1870-01-01', validTo: null } };
+  const input = {
+    id: 'ent_15th_st_church_001',
+    type: 'founded_in',
+    direction: 'incoming' as const,
+    timespan: { validFrom: '1870-01-01', validTo: null },
+  };
   assert.deepEqual(relatedEntryV1Schema.parse(input), input);
 });
 
@@ -31,8 +36,13 @@ test('related entry / neighbor schemas are not recursive (no field of their own 
   // module doc comment). Asserting the known, flat field list guards against a future edit
   // accidentally introducing one.
   assert.deepEqual(Object.keys(entryShape).sort(), ['direction', 'id', 'timespan', 'type']);
-  assert.deepEqual(
-    Object.keys(neighborShape).sort(),
-    ['direction', 'displayName', 'id', 'kind', 'relationType', 'summary', 'timespan'],
-  );
+  assert.deepEqual(Object.keys(neighborShape).sort(), [
+    'direction',
+    'displayName',
+    'id',
+    'kind',
+    'relationType',
+    'summary',
+    'timespan',
+  ]);
 });

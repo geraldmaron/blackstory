@@ -69,10 +69,7 @@ test('kind/era/theme/tone/status/confidence filters are opt-in and compose with 
   ];
 
   const placesOnly = applyExploreFilters(features, { ...DEFAULT_EXPLORE_FILTERS, kind: 'places' });
-  assert.deepEqual(
-    placesOnly.map((f) => f.properties.entityId).sort(),
-    ['a', 'b'],
-  );
+  assert.deepEqual(placesOnly.map((f) => f.properties.entityId).sort(), ['a', 'b']);
 
   const legacyMicroKind = applyExploreFilters(features, {
     ...DEFAULT_EXPLORE_FILTERS,
@@ -141,10 +138,10 @@ test('theme filter prefers topicIds over legacy topicTags (same as facet options
     ...DEFAULT_EXPLORE_FILTERS,
     theme: 'education',
   });
-  assert.deepEqual(
-    filtered.map((row) => row.properties.entityId).sort(),
-    ['ids-only', 'tags-only'],
-  );
+  assert.deepEqual(filtered.map((row) => row.properties.entityId).sort(), [
+    'ids-only',
+    'tags-only',
+  ]);
 });
 
 test('facet options lead with an "All ___" option and count real occurrences', () => {

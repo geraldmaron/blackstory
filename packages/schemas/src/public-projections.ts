@@ -202,9 +202,7 @@ export const publicStorySectionDisputeSideSchema = z.object({
   sourceLabel: z.string().min(1),
   claim: z.string().min(1),
 });
-export type PublicStorySectionDisputeSideDoc = z.infer<
-  typeof publicStorySectionDisputeSideSchema
->;
+export type PublicStorySectionDisputeSideDoc = z.infer<typeof publicStorySectionDisputeSideSchema>;
 
 export const publicStorySectionDisputeSchema = z.object({
   label: z.string().min(1),

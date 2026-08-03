@@ -4,7 +4,10 @@
  * disagree, whose EDTF fails parseEdtfLevel1, or whose years are not grounded in the quote.
  */
 import { parseEdtfLevel1 } from './edtf.js';
-import { inferTemporalProperty, type TemporalQualifierProperty } from './predicate-temporal-hints.js';
+import {
+  inferTemporalProperty,
+  type TemporalQualifierProperty,
+} from './predicate-temporal-hints.js';
 import { parseCleanClaimObjectDate } from './claim-date.js';
 
 export type ClaimDateCharOffsets = {
@@ -20,7 +23,11 @@ export type LlmClaimDateExtraction = {
 };
 
 export type LlmClaimDateValidationResult =
-  | { readonly ok: true; readonly parsed: NonNullable<ReturnType<typeof parseEdtfLevel1>>; readonly extraction: LlmClaimDateExtraction }
+  | {
+      readonly ok: true;
+      readonly parsed: NonNullable<ReturnType<typeof parseEdtfLevel1>>;
+      readonly extraction: LlmClaimDateExtraction;
+    }
   | { readonly ok: false; readonly errors: readonly string[] };
 
 const YEAR_IN_PROSE_RE = /\b(1[0-9]{3}|20[0-9]{2})\b/gu;
@@ -109,7 +116,12 @@ export function parseLlmClaimDateExtractionPayload(
   const offsets = offsetsRaw as Record<string, unknown>;
   const start = offsets.start;
   const end = offsets.end;
-  if (typeof start !== 'number' || typeof end !== 'number' || !Number.isInteger(start) || !Number.isInteger(end)) {
+  if (
+    typeof start !== 'number' ||
+    typeof end !== 'number' ||
+    !Number.isInteger(start) ||
+    !Number.isInteger(end)
+  ) {
     return null;
   }
   return {
@@ -132,7 +144,10 @@ export function validateLlmClaimDateExtraction(
   const span = findVerbatimQuoteSpan(claimObject, quote);
   if (!span) {
     errors.push('verbatim_quote not found verbatim in claim object');
-  } else if (span.start !== extraction.charOffsets.start || span.end !== extraction.charOffsets.end) {
+  } else if (
+    span.start !== extraction.charOffsets.start ||
+    span.end !== extraction.charOffsets.end
+  ) {
     errors.push('char_offsets do not match verbatim quote span in claim object');
   }
 

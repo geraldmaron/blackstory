@@ -51,7 +51,10 @@ const sampleFixture: BulkFixtureFile = {
 };
 
 test('buildSourceProgramRunId is stable per lane and day', () => {
-  assert.equal(buildSourceProgramRunId('dc-sites', '2026-07-19T12:00:00.000Z'), 'dc-sites-2026-07-19');
+  assert.equal(
+    buildSourceProgramRunId('dc-sites', '2026-07-19T12:00:00.000Z'),
+    'dc-sites-2026-07-19',
+  );
 });
 
 test('mapBulkFixtureToLoadPlan produces run, captures, and candidate rows', () => {

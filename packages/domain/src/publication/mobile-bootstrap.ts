@@ -116,7 +116,12 @@ export type BuildMobileBootstrapManifestInput = {
 const SAFE_ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,255}$/;
 
 function assertValidRange(range: MobileSchemaRange): void {
-  if (!Number.isInteger(range.min) || !Number.isInteger(range.max) || range.min < 1 || range.max < range.min) {
+  if (
+    !Number.isInteger(range.min) ||
+    !Number.isInteger(range.max) ||
+    range.min < 1 ||
+    range.max < range.min
+  ) {
     throw new Error('schemaRange must be integers with 1 <= min <= max');
   }
 }
@@ -125,9 +130,7 @@ function assertValidRange(range: MobileSchemaRange): void {
  * Serializes just the parts of a manifest that define its identity (everything except the
  * self-referential `releaseStamp`) so the stamp can be derived without a chicken-and-egg cycle.
  */
-function manifestIdentityJson(
-  input: Omit<MobileBootstrapManifest, 'releaseStamp'>,
-): JsonValue {
+function manifestIdentityJson(input: Omit<MobileBootstrapManifest, 'releaseStamp'>): JsonValue {
   const sortedArtifacts: Record<string, JsonValue> = {};
   for (const name of Object.keys(input.artifactHashes).sort()) {
     const ref = input.artifactHashes[name]!;
@@ -147,7 +150,9 @@ function manifestIdentityJson(
     artifactHashes: sortedArtifacts,
     degradedMode: input.degradedMode,
     cacheDirectives: { ...input.cacheDirectives },
-    ...(input.searchIndexVersion !== undefined ? { searchIndexVersion: input.searchIndexVersion } : {}),
+    ...(input.searchIndexVersion !== undefined
+      ? { searchIndexVersion: input.searchIndexVersion }
+      : {}),
     ...(input.contentVersion !== undefined ? { contentVersion: input.contentVersion } : {}),
   };
 }
@@ -194,7 +199,9 @@ export function buildMobileBootstrapManifest(
     artifactHashes: input.artifactHashes,
     degradedMode: input.degradedMode ?? false,
     cacheDirectives: input.cacheDirectives,
-    ...(input.searchIndexVersion !== undefined ? { searchIndexVersion: input.searchIndexVersion } : {}),
+    ...(input.searchIndexVersion !== undefined
+      ? { searchIndexVersion: input.searchIndexVersion }
+      : {}),
     ...(input.contentVersion !== undefined ? { contentVersion: input.contentVersion } : {}),
   };
 
@@ -233,7 +240,9 @@ export type BootstrapReleasePointer = {
 export function toReleasePointer(manifest: MobileBootstrapManifest): BootstrapReleasePointer {
   return {
     activeRelease: { ...manifest.activeRelease },
-    ...(manifest.searchIndexVersion !== undefined ? { searchIndexVersion: manifest.searchIndexVersion } : {}),
+    ...(manifest.searchIndexVersion !== undefined
+      ? { searchIndexVersion: manifest.searchIndexVersion }
+      : {}),
     ...(manifest.contentVersion !== undefined ? { contentVersion: manifest.contentVersion } : {}),
   };
 }
@@ -244,10 +253,7 @@ export function toReleasePointer(manifest: MobileBootstrapManifest): BootstrapRe
  * evidence, search results, map GeoJSON) as invalid. An absent client stamp (first launch) is
  * treated as stale so nothing stale-by-default is ever trusted.
  */
-export function isReleaseStampStale(
-  clientStamp: string | undefined,
-  serverStamp: string,
-): boolean {
+export function isReleaseStampStale(clientStamp: string | undefined, serverStamp: string): boolean {
   return clientStamp !== serverStamp;
 }
 

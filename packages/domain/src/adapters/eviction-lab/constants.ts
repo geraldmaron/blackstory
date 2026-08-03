@@ -16,8 +16,7 @@ export const EVICTION_LAB_COUNTY_PROPRIETARY_VALID_CSV_URL =
 
 export const PHASE1_EVICTION_FILING_RATE_METRIC_ID = 'eviction-filing-rate-county';
 
-export const PHASE1_EVICTION_DATASET_VINTAGE =
-  'Eviction Lab county proprietary valid 2000–2018';
+export const PHASE1_EVICTION_DATASET_VINTAGE = 'Eviction Lab county proprietary valid 2000–2018';
 
 /** ODC-BY 1.0 — required attribution text for stored observations. */
 export const EVICTION_LAB_ATTRIBUTION_NOTE =

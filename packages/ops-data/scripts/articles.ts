@@ -19,10 +19,7 @@
 import { createHash } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
-import {
-  assertArticleCitationIntegrity,
-  publicArticleProjectionSchema,
-} from '@repo/schemas';
+import { assertArticleCitationIntegrity, publicArticleProjectionSchema } from '@repo/schemas';
 import {
   checkDoiCitation,
   isAnchorTierUrl,
@@ -130,7 +127,8 @@ function gateLoadBearingAnchors(article: ArticleAuthoring): { warnings: string[]
     if (!ANCHORABLE_BLOCKS.has(block.type)) return;
     const anchors = (block as { anchors?: readonly { url: string }[] }).anchors;
     if (anchors === undefined) return;
-    const replicationVerified = (block as { replicationVerified?: boolean }).replicationVerified === true;
+    const replicationVerified =
+      (block as { replicationVerified?: boolean }).replicationVerified === true;
 
     const anchorTiers = anchors.map((anchor) => isAnchorTierUrl(anchor.url));
     const independentHosts = new Set(
@@ -155,7 +153,9 @@ function gateLoadBearingAnchors(article: ArticleAuthoring): { warnings: string[]
     }
   });
   if (errors.length > 0) {
-    throw new Error(`load-bearing anchor gate failed (published articles):\n  ${errors.join('\n  ')}`);
+    throw new Error(
+      `load-bearing anchor gate failed (published articles):\n  ${errors.join('\n  ')}`,
+    );
   }
   return { warnings };
 }
@@ -386,7 +386,11 @@ function upsertParams(article: ArticleAuthoring): readonly unknown[] {
   ];
 }
 
-type DbContext = { readonly pool: pg.Pool; readonly client: pg.PoolClient; readonly dryRun: boolean };
+type DbContext = {
+  readonly pool: pg.Pool;
+  readonly client: pg.PoolClient;
+  readonly dryRun: boolean;
+};
 
 async function withDb<T>(run: (ctx: DbContext) => Promise<T>): Promise<T> {
   const databaseUrl = process.env.DATABASE_URL?.trim();
@@ -463,12 +467,19 @@ async function gateDoiCitations(article: ArticleAuthoring): Promise<void> {
       venue: citation.venue,
     });
     if (result.outcome === 'unresolved') {
-      errors.push(`${article.id} / reference ${reference.id}: DOI ${citation.doi} did not resolve (${result.reason})`);
+      errors.push(
+        `${article.id} / reference ${reference.id}: DOI ${citation.doi} did not resolve (${result.reason})`,
+      );
     } else if (result.outcome === 'mismatch') {
       const detail = result.mismatches
-        .map((m) => `${m.field}: stored=${JSON.stringify(m.stored)} resolved=${JSON.stringify(m.resolved)}`)
+        .map(
+          (m) =>
+            `${m.field}: stored=${JSON.stringify(m.stored)} resolved=${JSON.stringify(m.resolved)}`,
+        )
         .join('; ');
-      errors.push(`${article.id} / reference ${reference.id}: DOI ${citation.doi} mismatch (${detail})`);
+      errors.push(
+        `${article.id} / reference ${reference.id}: DOI ${citation.doi} mismatch (${detail})`,
+      );
     }
   }
   if (errors.length > 0) {
@@ -620,7 +631,15 @@ async function commandProject(): Promise<void> {
            content_hash = EXCLUDED.content_hash
          WHERE bb_public.release_articles.content_hash IS DISTINCT FROM EXCLUDED.content_hash
          RETURNING article_id`,
-        [releaseId, doc.id, doc.slug, doc.themeId ?? null, doc.publishedAt, JSON.stringify(doc), hash],
+        [
+          releaseId,
+          doc.id,
+          doc.slug,
+          doc.themeId ?? null,
+          doc.publishedAt,
+          JSON.stringify(doc),
+          hash,
+        ],
       );
       if (upserted.rows[0]) projected.push(doc.id);
       else unchanged.push(doc.id);
@@ -655,7 +674,9 @@ async function commandAudit(): Promise<void> {
       `SELECT article_id, content_hash FROM bb_public.release_articles WHERE release_id = $1`,
       [releaseId],
     );
-    const releaseHashById = new Map(releaseRows.rows.map((row) => [row.article_id, row.content_hash]));
+    const releaseHashById = new Map(
+      releaseRows.rows.map((row) => [row.article_id, row.content_hash]),
+    );
 
     const articles: { article_id: string; state: string }[] = [];
     for (const row of referenceRows.rows) {

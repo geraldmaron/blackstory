@@ -33,11 +33,7 @@ export function pickRandomIndex(input: PickRandomIndexInput): number {
   return candidates[pick]!;
 }
 
-export function formatBrowsePosition(
-  index: number,
-  total: number,
-  mode: BrowseMode,
-): string {
+export function formatBrowsePosition(index: number, total: number, mode: BrowseMode): string {
   if (total <= 0) return '0 / 0';
   if (mode === 'ordered') return `${index + 1} / ${total}`;
   return `Random · ${total} record${total === 1 ? '' : 's'}`;
@@ -58,10 +54,7 @@ export function initialBrowseIndex(input: InitialBrowseIndexInput | number): num
   const total = typeof input === 'number' ? input : input.total;
   if (total <= 1) return 0;
 
-  const pick =
-    typeof input === 'number'
-      ? undefined
-      : input.randomIndex;
+  const pick = typeof input === 'number' ? undefined : input.randomIndex;
   if (pick) return pick(total);
 
   return Math.floor(Math.random() * total);

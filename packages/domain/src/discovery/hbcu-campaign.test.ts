@@ -21,10 +21,7 @@ import {
   type HbcuFindingAid,
 } from '../adapters/hbcu-collections/index.js';
 import { createInMemorySourceRegistry } from '../adapters/index.js';
-import {
-  FORBIDDEN_DISCOVERY_OPERATIONS,
-  assertDiscoveryCannotPublish,
-} from './guard.js';
+import { FORBIDDEN_DISCOVERY_OPERATIONS, assertDiscoveryCannotPublish } from './guard.js';
 import { listCampaignSurvivors } from './campaign-runner.js';
 import {
   HBCU_CAMPAIGN_ADAPTER_IDS,

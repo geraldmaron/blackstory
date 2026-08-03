@@ -71,9 +71,12 @@ export function formatListedDate(serial: string | null | undefined): string | nu
   const ms = epoch + days * 86_400_000;
   const date = new Date(ms);
   if (Number.isNaN(date.getTime())) return null;
-  return new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }).format(
-    date,
-  );
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC',
+  }).format(date);
 }
 
 /** Pure — "EDUCATION; BLACK; ARCHITECTURE" -> "education, ethnic heritage (Black), and architecture". */
@@ -83,7 +86,9 @@ export function humanizeAreas(raw: string | undefined): string {
     .split(';')
     .map((entry) => entry.trim())
     .filter(Boolean)
-    .map((entry) => (entry.toUpperCase() === 'BLACK' ? 'ethnic heritage (Black)' : entry.toLowerCase()));
+    .map((entry) =>
+      entry.toUpperCase() === 'BLACK' ? 'ethnic heritage (Black)' : entry.toLowerCase(),
+    );
   if (parts.length === 0) return 'African American heritage';
   if (parts.length === 1) return parts[0]!;
   if (parts.length === 2) return `${parts[0]} and ${parts[1]}`;
@@ -98,7 +103,8 @@ const FILLER =
   `for preserving African American history and heritage.`;
 
 function coreSentence(displayName: string, payload: Row['payload'], areas: string): string {
-  const categoryLabel = CATEGORY_LABELS[(payload.category ?? '').toUpperCase()] ?? 'historic property';
+  const categoryLabel =
+    CATEGORY_LABELS[(payload.category ?? '').toUpperCase()] ?? 'historic property';
   const place = [payload.city, payload.county ? `${payload.county} County` : null, payload.state]
     .filter(Boolean)
     .join(', ');
@@ -159,7 +165,9 @@ async function main(): Promise<void> {
 
   console.log(`Would update: ${updates.length}. Out-of-bounds (skipped): ${outOfBounds.length}.`);
   console.log('\nSample summaries:');
-  console.table(updates.slice(0, 5).map((u) => ({ id: u.id, len: u.summary.length, summary: u.summary })));
+  console.table(
+    updates.slice(0, 5).map((u) => ({ id: u.id, len: u.summary.length, summary: u.summary })),
+  );
   if (outOfBounds.length > 0) {
     console.log('\nOut-of-bounds rows:');
     console.table(outOfBounds.slice(0, 10));
@@ -167,7 +175,10 @@ async function main(): Promise<void> {
 
   const generatedAt = new Date().toISOString();
   mkdirSync(REPORT_DIR, { recursive: true });
-  const reportPath = join(REPORT_DIR, `nrhp-summary-backfill-${generatedAt.replace(/[:.]/gu, '-')}.json`);
+  const reportPath = join(
+    REPORT_DIR,
+    `nrhp-summary-backfill-${generatedAt.replace(/[:.]/gu, '-')}.json`,
+  );
   writeFileSync(
     reportPath,
     JSON.stringify({ generatedAt, dryRun: DRY_RUN || !APPLY, updates, outOfBounds }, null, 2),
@@ -175,7 +186,9 @@ async function main(): Promise<void> {
   console.log(`\nReport written to ${reportPath}`);
 
   if (DRY_RUN || !APPLY) {
-    console.log('\nDRY_RUN=1 (default): no database writes. Set DRY_RUN=0 NRHP_SUMMARY_BACKFILL_APPLY=1 to apply.');
+    console.log(
+      '\nDRY_RUN=1 (default): no database writes. Set DRY_RUN=0 NRHP_SUMMARY_BACKFILL_APPLY=1 to apply.',
+    );
     await pool.end();
     return;
   }

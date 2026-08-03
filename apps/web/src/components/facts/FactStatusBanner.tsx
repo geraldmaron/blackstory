@@ -17,7 +17,8 @@ export function FactStatusBanner({ fact }: FactStatusBannerProps) {
   const title = statusBannerTitle(fact.status);
   if (!title) return null;
 
-  const tone = fact.status === 'deprecated' ? 'error' : fact.status === 'superseded' ? 'warning' : 'dispute';
+  const tone =
+    fact.status === 'deprecated' ? 'error' : fact.status === 'superseded' ? 'warning' : 'dispute';
 
   return (
     <Notice tone={tone} title={title}>

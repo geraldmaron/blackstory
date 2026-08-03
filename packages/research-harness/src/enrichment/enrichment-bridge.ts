@@ -5,7 +5,7 @@ export interface EnrichmentBridgeClient {
   readonly complete: (
     prompt: string,
     schemaName?: string,
-    schema?: Record<string, unknown>
+    schema?: Record<string, unknown>,
   ) => Promise<string>;
 }
 

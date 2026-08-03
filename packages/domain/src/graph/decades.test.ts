@@ -196,7 +196,10 @@ test('buildDecadeViews excludes decades after the stillActiveCutoff calendar dec
       activeSpans: [{ validFrom: '2020', validTo: '2055', datePrecision: 'year' as const }],
     },
   ];
-  const views = buildDecadeViews({ entities, relationships: [] }, { stillActiveCutoff: '2026-07-17' });
+  const views = buildDecadeViews(
+    { entities, relationships: [] },
+    { stillActiveCutoff: '2026-07-17' },
+  );
   assert.deepEqual(
     views.map((view) => view.decade),
     ['2020s'],

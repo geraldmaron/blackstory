@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { z } from 'zod';
-import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE, cursorPageRequestSchema, cursorPageResponseSchema } from './pagination.js';
+import {
+  DEFAULT_PAGE_SIZE,
+  MAX_PAGE_SIZE,
+  cursorPageRequestSchema,
+  cursorPageResponseSchema,
+} from './pagination.js';
 
 test('cursorPageRequestSchema defaults pageSize when omitted', () => {
   const parsed = cursorPageRequestSchema.parse({});
@@ -30,6 +35,11 @@ test('cursorPageResponseSchema rejects an items array longer than MAX_PAGE_SIZE 
 test('cursorPageResponseSchema round-trips a valid bounded page', () => {
   const itemSchema = z.object({ id: z.string() });
   const responseSchema = cursorPageResponseSchema(itemSchema);
-  const page = { items: [{ id: 'a' }, { id: 'b' }], nextCursor: 'cur_2', hasMore: true, totalMatched: 40 };
+  const page = {
+    items: [{ id: 'a' }, { id: 'b' }],
+    nextCursor: 'cur_2',
+    hasMore: true,
+    totalMatched: 40,
+  };
   assert.deepEqual(responseSchema.parse(page), page);
 });
