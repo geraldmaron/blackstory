@@ -15,7 +15,11 @@ export type LawBrowseSectionsProps = {
 };
 
 export function LawBrowseSections({ view }: LawBrowseSectionsProps) {
-  const countLabel = view.totalMatched === 1 ? '1 law entry' : `${view.totalMatched} law entries`;
+  const noun = view.totalMatched === 1 ? 'law entry' : 'law entries';
+  // When filtered, the denominator tells you how much of the catalog you are not seeing.
+  const countLabel = view.isFiltered
+    ? `${view.totalMatched} of ${view.totalAvailable} ${noun}`
+    : `${view.totalMatched} ${noun}`;
 
   return (
     <>
@@ -33,8 +37,9 @@ export function LawBrowseSections({ view }: LawBrowseSectionsProps) {
           Browse landmark statutes and decisions
         </h2>
         <p className="ds-law-edition__lede">
-          Filter by kind or topic, or search by title and citation. Each entry links to a
-          plain-language explainer with official sources when editorial review is complete.
+          Ordered oldest to newest, so the catalog reads as a sequence: abolition, the
+          Reconstruction Amendments, the Civil Rights era, and what has changed since. Filter by
+          kind or topic, or search by title and citation.
         </p>
 
         <form
@@ -72,9 +77,18 @@ export function LawBrowseSections({ view }: LawBrowseSectionsProps) {
               defaultValue={view.topic}
               options={view.topicOptions}
             />
-            <Link className="ds-cta-link" href="/law">
-              Clear
-            </Link>
+            <AutoSubmitSelect
+              id="sort"
+              name="sort"
+              label="Sort"
+              defaultValue={view.sort}
+              options={view.sortOptions}
+            />
+            {view.isFiltered ? (
+              <Link className="ds-cta-link" href="/law">
+                Clear
+              </Link>
+            ) : null}
           </div>
         </form>
 

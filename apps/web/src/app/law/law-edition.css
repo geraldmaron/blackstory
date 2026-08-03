@@ -250,8 +250,31 @@
   margin: 0;
 }
 
+/*
+ * The refine bar set the whole panel's width. `.ds-search-mast__field` is a flex row of
+ * input + Search button; with the default min-width: auto its min-content (input + an
+ * unshrinkable button) came to ~383px, so on a 375px viewport the panel — and every card
+ * inside it — overflowed into .ds-shell's overflow-x: clip and was cut off. Let the row
+ * wrap and shrink instead. Scoped to /law rather than editing the shared search mast.
+ */
+.ds-law-edition__refine,
+.ds-law-edition__refine .ds-search-mast__refine {
+  min-width: 0;
+}
+
 .ds-law-edition__refine .ds-search-mast__field {
   min-height: 2.75rem;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.ds-law-edition__refine .ds-search-mast__input {
+  min-width: 0;
+}
+
+.ds-law-edition__refine .ds-pill-select,
+.ds-law-edition__refine .ds-pill-select__control {
+  min-width: 0;
 }
 
 .ds-law-edition__refine .ds-search-mast__refine {
@@ -261,21 +284,102 @@
   gap: var(--ds-space-3) var(--ds-space-4);
 }
 
-/* —— Browse ledger (hairline rows) —— */
+/* —— Browse catalog (year-anchored cards) —— */
+/*
+ * min-width: 0 is load-bearing. The ledger is a grid item of .ds-law-edition__panel--browse,
+ * so it defaults to min-width: auto and refuses to shrink below its content's min-content
+ * width. On narrow viewports that pushed the cards ~40px past the panel, where .ds-shell's
+ * overflow-x: clip silently cut them off instead of scrolling.
+ */
 .ds-law__browse-ledger {
   display: grid;
-  gap: 0;
+  gap: var(--ds-space-3);
   margin: var(--ds-space-3) 0 0;
   padding: 0;
   list-style: none;
-  border-top: var(--ds-border-width) solid var(--ds-rule);
+  min-width: 0;
 }
 
 .ds-law__browse-item {
   margin: 0;
-  padding: var(--ds-space-3) 0;
-  border-bottom: var(--ds-border-width) solid var(--ds-rule);
+  padding: 0;
   min-width: 0;
+}
+
+/*
+ * Year rail | body | cue. The rail gives the catalog a chronological spine to scan down,
+ * which is why the default sort is by year rather than by title.
+ */
+.ds-law__card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 4.25rem minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--ds-space-3) var(--ds-space-4);
+  padding: var(--ds-space-4);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface);
+  min-width: 0;
+  transition:
+    border-color var(--ds-duration-fast) var(--ds-easing),
+    background-color var(--ds-duration-fast) var(--ds-easing),
+    transform var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-law__card:hover {
+  border-color: color-mix(in srgb, var(--ds-accent-graphic) 55%, var(--ds-rule));
+  background: var(--ds-surface-raised);
+  transform: translateY(-1px);
+}
+
+/* Focus lands on the inner link, so lift the ring to the card it stretches over. */
+.ds-law__card:focus-within {
+  border-color: var(--ds-accent-graphic);
+  outline: var(--ds-focus-width) solid var(--ds-focus-ring);
+  outline-offset: var(--ds-focus-offset);
+}
+
+.ds-law__card-year {
+  margin: 0;
+  color: var(--ds-accent);
+  font-family: var(--ds-font-mono);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  line-height: 1.35;
+}
+
+.ds-law__card-body {
+  display: grid;
+  gap: var(--ds-space-2);
+  min-width: 0;
+}
+
+.ds-law__card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ds-space-2) var(--ds-space-3);
+}
+
+.ds-law__card-cue {
+  align-self: center;
+  color: var(--ds-ink-muted);
+  font-size: 1rem;
+  line-height: 1;
+  opacity: 0;
+  transition:
+    opacity var(--ds-duration-fast) var(--ds-easing),
+    transform var(--ds-duration-fast) var(--ds-easing);
+}
+
+.ds-law__card:hover .ds-law__card-cue,
+.ds-law__card:focus-within .ds-law__card-cue {
+  color: var(--ds-accent);
+  opacity: 1;
+  transform: translateX(2px);
 }
 
 .ds-law__browse-head {
@@ -288,37 +392,57 @@
 .ds-law__browse-title {
   margin: 0;
   font-family: var(--ds-font-display);
-  font-weight: 500;
-  font-size: 1rem;
+  font-weight: 600;
+  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
   letter-spacing: -0.02em;
   line-height: 1.3;
 }
 
-.ds-law__browse-title a {
+.ds-law__card-link {
   color: var(--ds-ink);
   text-decoration: none;
-  border-bottom: 2px solid transparent;
-  transition: border-color var(--ds-duration-fast) var(--ds-easing);
 }
 
-.ds-law__browse-title a:hover,
-.ds-law__browse-title a:focus-visible {
-  border-bottom-color: var(--ds-accent-graphic);
+/* Stretches the link over the whole card without nesting interactive elements. */
+.ds-law__card-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .ds-law__browse-title a {
-    transition: none;
-  }
+.ds-law__card-link:focus-visible {
+  outline: none;
+}
+
+.ds-law__card:hover .ds-law__card-link {
+  color: var(--ds-accent);
+}
+
+.ds-law__card-summary {
+  margin: 0;
+  max-width: 46rem;
+  color: var(--ds-ink);
+  font-family: var(--ds-font-editorial);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
 .ds-law__browse-citation {
-  margin: var(--ds-space-2) 0 0;
+  margin: 0;
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   line-height: 1.45;
   overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
 }
 
 .ds-law__browse-meta {
@@ -326,7 +450,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--ds-space-2);
-  margin-top: var(--ds-space-2);
+  margin-top: var(--ds-space-1);
 }
 
 .ds-law__chip {
@@ -347,14 +471,88 @@
   overflow-wrap: anywhere;
 }
 
+/* Kind answers "what is this"; topics answer "what is it about". Weight them apart. */
+.ds-law__chip--kind {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--ds-ink) 12%, transparent);
+  color: var(--ds-ink);
+}
+
 .ds-law__chip--topic {
+  background: transparent;
   border-color: color-mix(in srgb, var(--ds-accent-graphic) 35%, var(--ds-border));
+  color: var(--ds-ink-muted);
 }
 
 .ds-law__browse-note {
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-sans);
   font-size: 0.75rem;
+  font-style: italic;
+}
+
+@media (max-width: 35rem) {
+  .ds-law__card {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--ds-space-2);
+  }
+
+  /* The cue reads as a column affordance; with one column it is just clutter. */
+  .ds-law__card-cue {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-law__card,
+  .ds-law__card-cue {
+    transition: none;
+  }
+
+  .ds-law__card:hover {
+    transform: none;
+  }
+}
+
+/* —— Status badge —— */
+/*
+ * `.ds-badge` had no rule anywhere in the repo, so LegalStatusBadge rendered as bare text
+ * that read as part of the title. Tones map to lawStatusTone() in @repo/domain.
+ */
+.ds-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-1);
+  padding: 0.15rem 0.5rem;
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: 999px;
+  background: var(--ds-surface);
+  color: var(--ds-ink-muted);
+  font-family: var(--ds-font-mono);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ds-badge--info {
+  border-color: color-mix(in srgb, var(--ds-accent-graphic) 45%, var(--ds-border));
+  background: color-mix(in srgb, var(--ds-accent-graphic) 12%, transparent);
+  color: var(--ds-accent);
+}
+
+.ds-badge--warning {
+  border-color: var(--ds-warning-border);
+  background: var(--ds-warning-bg);
+  color: var(--ds-warning-fg);
+}
+
+.ds-badge--error {
+  border-color: var(--ds-error-border);
+  background: var(--ds-error-bg);
+  color: var(--ds-error-fg);
 }
 
 /* —— Law anatomy strip —— */

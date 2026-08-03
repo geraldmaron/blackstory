@@ -130,6 +130,7 @@ export const SEED_LEGAL_SNAPSHOTS: readonly LegalSnapshot[] = [
     },
     externalIds: [{ source: 'congress-gov-v3', externalId: '88/pub/352' }],
     factId: 'BB-F-000010',
+    effectiveYear: 1964,
   },
   {
     id: 'legal-vra-1965',
@@ -146,6 +147,7 @@ export const SEED_LEGAL_SNAPSHOTS: readonly LegalSnapshot[] = [
     },
     externalIds: [{ source: 'congress-gov-v3', externalId: '89/pub/110' }],
     factId: 'BB-F-000011',
+    effectiveYear: 1965,
   },
   {
     id: 'legal-fha-1968',
@@ -171,6 +173,7 @@ export const SEED_LEGAL_SNAPSHOTS: readonly LegalSnapshot[] = [
       { source: 'us-code-olrc', externalId: 'title42/section3604' },
     ],
     factId: 'BB-F-000012',
+    effectiveYear: 1968,
   },
   {
     id: 'legal-1983',
@@ -193,6 +196,7 @@ export const SEED_LEGAL_SNAPSHOTS: readonly LegalSnapshot[] = [
     },
     externalIds: [{ source: 'us-code-olrc', externalId: 'title42/section1983' }],
     factId: 'BB-F-000013',
+    effectiveYear: 1871,
   },
   {
     id: 'legal-brown-1954',
@@ -212,6 +216,7 @@ export const SEED_LEGAL_SNAPSHOTS: readonly LegalSnapshot[] = [
     },
     externalIds: [{ source: 'courtlistener-bulk', externalId: '108713' }],
     factId: 'BB-F-000014',
+    effectiveYear: 1954,
   },
   {
     id: 'legal-shelby-2013',
@@ -231,6 +236,7 @@ export const SEED_LEGAL_SNAPSHOTS: readonly LegalSnapshot[] = [
     },
     externalIds: [{ source: 'courtlistener-bulk', externalId: '813086' }],
     factId: 'BB-F-000015',
+    effectiveYear: 2013,
   },
   {
     id: 'legal-13th-amendment',
@@ -247,6 +253,7 @@ export const SEED_LEGAL_SNAPSHOTS: readonly LegalSnapshot[] = [
     },
     externalIds: [{ source: 'congress-gov-v3', externalId: 'const/amend-xiii' }],
     factId: 'BB-F-000016',
+    effectiveYear: 1865,
   },
   {
     id: 'legal-14th-amendment',
@@ -263,6 +270,7 @@ export const SEED_LEGAL_SNAPSHOTS: readonly LegalSnapshot[] = [
     },
     externalIds: [{ source: 'congress-gov-v3', externalId: 'const/amend-xiv' }],
     factId: 'BB-F-000017',
+    effectiveYear: 1868,
   },
   {
     id: 'legal-15th-amendment',
@@ -279,6 +287,7 @@ export const SEED_LEGAL_SNAPSHOTS: readonly LegalSnapshot[] = [
     },
     externalIds: [{ source: 'congress-gov-v3', externalId: 'const/amend-xv' }],
     factId: 'BB-F-000018',
+    effectiveYear: 1870,
   },
   {
     id: 'legal-title-vii-regs',
@@ -301,6 +310,7 @@ export const SEED_LEGAL_SNAPSHOTS: readonly LegalSnapshot[] = [
     },
     externalIds: [{ source: 'ecfr-versioner', externalId: 'title-29/part-1604' }],
     factId: 'BB-F-000019',
+    effectiveYear: 1972,
   },
   {
     id: 'legal-ga-sb202',
@@ -323,6 +333,7 @@ export const SEED_LEGAL_SNAPSHOTS: readonly LegalSnapshot[] = [
     },
     externalIds: [{ source: 'legis-ga-gov', externalId: '20212022/201498' }],
     factId: 'BB-F-000020',
+    effectiveYear: 2021,
   },
   {
     id: 'legal-sffa-2023',
@@ -343,6 +354,7 @@ export const SEED_LEGAL_SNAPSHOTS: readonly LegalSnapshot[] = [
     },
     externalIds: [{ source: 'courtlistener-bulk', externalId: '9383451' }],
     factId: 'BB-F-000021',
+    effectiveYear: 2023,
   },
 ];
 

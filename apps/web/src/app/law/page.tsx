@@ -13,6 +13,9 @@ import { loadLegalCatalog } from '../../lib/legal/public-source';
 import { LawBrowseSections } from './LawBrowseSections';
 import { Room, RoomHeader, OffRamp } from '../../components/room';
 import '../reading-room.css';
+// The browse ledger, chips, and refine bar all live in law-edition.css. Without this
+// import the catalog rendered as unstyled <ul> bullets with default link colors.
+import './law-edition.css';
 
 void React;
 

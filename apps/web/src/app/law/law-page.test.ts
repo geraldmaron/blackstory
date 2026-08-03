@@ -33,7 +33,27 @@ test('law browse preserves GET URL contract and auto-submit facets', () => {
   assert.match(browseSectionsSource, /name="q"/);
   assert.match(browseSectionsSource, /name="kind"/);
   assert.match(browseSectionsSource, /name="topic"/);
+  assert.match(browseSectionsSource, /name="sort"/);
   assert.match(browseSectionsSource, /href="\/law"/);
+});
+
+test('every rendered browse control is in the edge param allowlist', async () => {
+  // A control whose param is missing from the allowlist is stripped by middleware before the
+  // page runs, so the filter silently does nothing. `sort` shipped broken exactly that way.
+  const { LAW_PAGE_PARAM_ALLOWLIST } = await import('../../lib/runtime-hardening/constants');
+  const rendered = [...browseSectionsSource.matchAll(/name="([a-z]+)"/g)].map((m) => m[1]);
+  assert.ok(rendered.length > 0);
+  for (const param of rendered) {
+    assert.ok(
+      (LAW_PAGE_PARAM_ALLOWLIST as readonly string[]).includes(param as string),
+      `browse renders name="${param}" but it is not in LAW_PAGE_PARAM_ALLOWLIST`,
+    );
+  }
+});
+
+test('the browse page imports the stylesheet its ledger and chips live in', () => {
+  // Without this import the catalog rendered as unstyled <ul> bullets.
+  assert.match(browsePageSource, /law-edition\.css/);
 });
 
 test('law detail page uses anatomy strip without gutter mosaic', () => {

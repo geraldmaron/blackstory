@@ -61,12 +61,15 @@ export type ExplorePageParam = Exclude<ExploreUrlParamKey, ExploreViewportPolicy
  * Allowed browse keys on /law.
  *
  * The GET browse contract the page actually renders: `LawBrowseSections` posts exactly these
- * three fields, and `buildLawBrowseViewModel` reads them. Until this list existed, `/law` was
+ * fields, and `buildLawBrowseViewModel` reads them. Until this list existed, `/law` was
  * matched by middleware with an empty allowlist, so every law filter link 308'd to the bare
  * index and the reader's filters were gone before the page ran. (`status` is read by the view
  * model but has no rendered control, so it is not part of the browse contract.)
+ *
+ * `sort` joined the contract with the catalog card redesign — it backs the Sort select, and
+ * omitting it here silently dropped the reader's ordering at the edge.
  */
-export const LAW_PAGE_PARAM_ALLOWLIST = ['q', 'kind', 'topic'] as const;
+export const LAW_PAGE_PARAM_ALLOWLIST = ['q', 'kind', 'topic', 'sort'] as const;
 
 export type LawPageParam = (typeof LAW_PAGE_PARAM_ALLOWLIST)[number];
 
