@@ -8,7 +8,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { buildNormalizedUrl, needsQueryNormalizationRedirect } from './query-normalization';
 
-// The list of matched paths lives only in `apps/web/src/middleware.ts`, where Next actually reads
+// The list of matched paths lives only in `apps/web/src/proxy.ts`, where Next actually reads
 // it. A second copy here had already drifted from that one, and a matcher that is wrong in a
 // file nobody reads is worse than no matcher at all.
 

@@ -1,11 +1,15 @@
 /**
- * Edge middleware web security composed with query normalization.
+ * Edge web security composed with query normalization.
+ *
+ * Was `middleware.ts`. Next 16 deprecated that file convention in favour of `proxy`; the rename is
+ * the whole migration — same request object, same `config.matcher` semantics, same edge runtime.
+ * Only the file name and the exported function name changed.
  */
 
 import { type NextRequest } from 'next/server';
 import { handleWebSecurity } from './lib/web-security/edge-security';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   return handleWebSecurity(request);
 }
 
