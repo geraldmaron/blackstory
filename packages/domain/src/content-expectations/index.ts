@@ -20,7 +20,7 @@
 import type { EntityKind } from '../entity-kinds.js';
 
 /** Bump when any spec's requirements change; recorded on every audit result. */
-export const CONTENT_EXPECTATIONS_SPEC_VERSION = 1;
+export const CONTENT_EXPECTATIONS_SPEC_VERSION = 2;
 
 export type ResearchCoverageTier = 'minimal' | 'partial' | 'substantial';
 
@@ -37,8 +37,12 @@ export interface ContentExpectationSpec {
   readonly minNarrativeParagraphs: number;
   /** Whether an explicit impact-on-Black-Americans statement is required. */
   readonly requiresImpactStatement: boolean;
-  /** Required range of case references (related entities of kind 'case'). Display cap is `max`. */
-  readonly caseReferences?: { readonly min: number; readonly max: number };
+  /**
+   * Case-reference expectation. Not a fixed floor: the record must render
+   * `min(knownCaseReferenceCount, displayCap)` references, and a recorded search is required
+   * before a zero is believable. See the `case_references` check for the three states.
+   */
+  readonly caseReferences?: { readonly displayCap: number };
   /** Minimum distinct evidence sources backing the record (Wikipedia alone = 1). */
   readonly minDistinctSources: number;
   /** Floor on the deterministic researchCoverage tier from the release builder. */
@@ -72,7 +76,7 @@ export const CONTENT_EXPECTATIONS: Record<EntityKind, ContentExpectationSpec> = 
     appliesTo: 'law',
     minNarrativeParagraphs: 2,
     requiresImpactStatement: true,
-    caseReferences: { min: 1, max: 5 },
+    caseReferences: { displayCap: 5 },
     minDistinctSources: 2,
     minResearchCoverage: 'partial',
   },
@@ -106,8 +110,12 @@ export interface ContentExpectationInput {
   readonly narrativeBlocks: readonly (string | undefined)[];
   /** An explicit impact-on-Black-Americans statement, when authored. */
   readonly impactStatement?: string;
-  /** Count of related entities of kind 'case' (or cited cases, for articles). */
+  /** Count of case references rendered on the record (related entities of kind 'case'). */
   readonly caseReferenceCount?: number;
+  /** Count of referencing cases known from the evidence/claims graph, when a search ran. */
+  readonly knownCaseReferenceCount?: number;
+  /** True once a case-reference search has been recorded for this record (even if it found 0). */
+  readonly caseReferenceSearchRecorded?: boolean;
   /** Distinct evidence sources (collectors/source orgs) backing the record. */
   readonly distinctSourceCount?: number;
   /** Tier from `computeReleaseResearchCoverage`; absent means not yet derived. */
@@ -174,12 +182,28 @@ export function evaluateContentExpectations(input: ContentExpectationInput): Con
   }
 
   if (spec.caseReferences) {
-    const n = input.caseReferenceCount ?? 0;
-    checks.push({
-      checkId: 'case_references',
-      passed: n >= spec.caseReferences.min,
-      reason: `${n} case reference(s); requires ≥${spec.caseReferences.min} (display cap ${spec.caseReferences.max}).`,
-    });
+    const rendered = input.caseReferenceCount ?? 0;
+    const { displayCap } = spec.caseReferences;
+    if (!input.caseReferenceSearchRecorded) {
+      // Coverage unknown: without a recorded search, a zero (or any count) is not believable.
+      checks.push({
+        checkId: 'case_references',
+        passed: false,
+        reason:
+          'Case-reference coverage unknown: no case-reference search recorded for this record.',
+      });
+    } else {
+      const known = input.knownCaseReferenceCount ?? 0;
+      const required = Math.min(known, displayCap);
+      checks.push({
+        checkId: 'case_references',
+        passed: rendered >= required,
+        reason:
+          known === 0
+            ? 'Recorded search found no referencing cases; attested zero passes.'
+            : `${rendered} of ${known} known case reference(s) rendered; requires ${required} (display cap ${displayCap}).`,
+      });
+    }
   }
 
   const sources = input.distinctSourceCount ?? 0;

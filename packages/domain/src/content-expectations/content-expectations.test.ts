@@ -48,18 +48,58 @@ test('law with one thin paragraph, no impact statement, no cases fails with reas
   for (const check of result.checks) assert.ok(check.reason.length > 0);
 });
 
+const LAW_AT_BAR = {
+  id: 'law-2',
+  kind: 'law' as const,
+  narrativeBlocks: [`${PARA}\n\n${PARA}`],
+  impactStatement: PARA,
+  distinctSourceCount: 2,
+  researchCoverage: 'substantial' as const,
+};
+
 test('law meeting the full bar passes', () => {
   const result = evaluateContentExpectations({
-    id: 'law-2',
-    kind: 'law',
-    narrativeBlocks: [`${PARA}\n\n${PARA}`],
-    impactStatement: PARA,
+    ...LAW_AT_BAR,
+    caseReferenceSearchRecorded: true,
+    knownCaseReferenceCount: 3,
     caseReferenceCount: 3,
-    distinctSourceCount: 2,
-    researchCoverage: 'substantial',
   });
   assert.equal(result.passed, true);
   assert.deepEqual(result.failedCheckIds, []);
+});
+
+test('case references: unrecorded search fails as coverage-unknown even with zero known', () => {
+  const result = evaluateContentExpectations({ ...LAW_AT_BAR, caseReferenceCount: 0 });
+  assert.deepEqual(result.failedCheckIds, ['case_references']);
+  const check = result.checks.find((c) => c.checkId === 'case_references');
+  assert.match(check?.reason ?? '', /coverage unknown/i);
+});
+
+test('case references: attested zero after a recorded search passes', () => {
+  const result = evaluateContentExpectations({
+    ...LAW_AT_BAR,
+    caseReferenceSearchRecorded: true,
+    knownCaseReferenceCount: 0,
+    caseReferenceCount: 0,
+  });
+  assert.equal(result.passed, true);
+});
+
+test('case references: rendering fewer than min(known, cap) fails; cap bounds the ask', () => {
+  const incomplete = evaluateContentExpectations({
+    ...LAW_AT_BAR,
+    caseReferenceSearchRecorded: true,
+    knownCaseReferenceCount: 4,
+    caseReferenceCount: 2,
+  });
+  assert.deepEqual(incomplete.failedCheckIds, ['case_references']);
+  const capped = evaluateContentExpectations({
+    ...LAW_AT_BAR,
+    caseReferenceSearchRecorded: true,
+    knownCaseReferenceCount: 12,
+    caseReferenceCount: 5,
+  });
+  assert.equal(capped.passed, true);
 });
 
 test('place (historic site) requires a second source beyond Wikipedia', () => {
