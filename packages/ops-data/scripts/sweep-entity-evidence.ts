@@ -82,6 +82,12 @@ const ENTITY_IDS = flag('entity-ids', '')
   .map((id) => id.trim())
   .filter((id) => id.length > 0);
 const STALE_DAYS = Number.parseInt(flag('stale-days', '30'), 10);
+/**
+ * Re-fetch entities that already have captured evidence. Off by default so consecutive batches
+ * advance through the lane instead of redoing the same rows; turn it on after a collector or
+ * parser change, when the same documents should be reprocessed under the new code.
+ */
+const REFETCH = process.argv.includes('--refetch');
 /** Politeness delay between outbound fetches. NPS assets are multi-MB scans. */
 const FETCH_DELAY_MS = Number.parseInt(flag('delay-ms', '750'), 10);
 
@@ -340,9 +346,9 @@ async function main(): Promise<void> {
 
   const pool = new pg.Pool(normalizePgConnectionString(databaseUrl));
 
-  // WS2 selector decides WHO needs work (never enriched, stale, or missing the field WS4 fills),
-  // unless an explicit id list overrides it for a targeted re-sweep.
-  const entityIds =
+  // WS2 selector decides which released entities are in scope, unless an explicit id list
+  // overrides it for a targeted re-sweep.
+  const inScope =
     ENTITY_IDS.length > 0
       ? ENTITY_IDS
       : await selectEntitiesForEnrichment(pool, {
@@ -350,6 +356,31 @@ async function main(): Promise<void> {
           staleDays: STALE_DAYS,
           missingFields: ['historicalContext'],
         });
+
+  // Then subtract what this sweep has already fetched.
+  //
+  // The selector alone is NOT a batching cursor for this script. Its freshness predicates are
+  // about enrichment OUTPUT — `historicalContext` is the field WS4 writes, and it stays empty
+  // until WS4 runs — so an entity whose evidence we captured an hour ago still matches every
+  // one of them. Measured: after the first 100-entity batch, the selector returned all 2,550
+  // lane entities and 99 of them already had captured evidence. Batch 2 would have re-fetched
+  // multi-megabyte PDFs for every entity in batch 1 and never advanced.
+  //
+  // Evidence freshness lives in entity_evidence.fetched_at, so that is what gates a re-fetch.
+  const alreadyCaptured = await pool.query<{ entity_id: string }>(
+    `SELECT DISTINCT entity_id
+       FROM bb_research.entity_evidence
+      WHERE status = 'captured'
+        AND fetched_at >= now() - make_interval(days => $1::int)`,
+    [STALE_DAYS],
+  );
+  const capturedSet = new Set(alreadyCaptured.rows.map((row) => row.entity_id));
+  const entityIds = REFETCH ? inScope : inScope.filter((id) => !capturedSet.has(id));
+  if (!REFETCH && capturedSet.size > 0) {
+    console.log(
+      `Skipping ${inScope.length - entityIds.length} entities with evidence captured in the last ${STALE_DAYS} days (--refetch to override).`,
+    );
+  }
   const targeted = entityIds.slice(0, LIMIT);
   console.log(
     `Selector returned ${entityIds.length} entities needing evidence (lanes=${LANES.join(',')}); taking ${targeted.length}.`,
