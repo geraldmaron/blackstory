@@ -161,19 +161,122 @@ export function dropRepeatedPropertyHeader(text: string, displayName: string): s
     .trim();
 }
 
+/**
+ * Fallback segmentation by narrative heading, for forms whose continuation-sheet table is
+ * destroyed by OCR (repo-n7p6.12).
+ *
+ * The header-based split above depends on reading a section NUMBER out of the form's little
+ * table. On many scans that number is the first thing OCR loses, because it sits alone in a
+ * ruled box: refnum 00000534 yields "Section number Z — Page — I —", 00000793 yields
+ * "Section number Page" with both values gone and sometimes "Continuation Sheet 7 3 Section
+ * number Page" with the values landing BEFORE their own labels. Meanwhile refnum 00000261 (a
+ * Registration Form paginated straight through) has no section table at all — just "Page 2".
+ *
+ * What survives in every one of those is the narrative heading printed in the body text:
+ * "7. DESCRIPTION", "8. STATEMENT OF SIGNIFICANCE", "9. MAJOR BIBLIOGRAPHICAL REFERENCES".
+ * Those are set in ordinary running text rather than in a ruled box, so OCR keeps them.
+ *
+ * The headings appear twice: once on the front form (where they label an empty box that says
+ * "continue on a separate sheet") and again where the actual prose begins. So the LAST
+ * occurrence is the one that opens real narrative, and the section ends at the next
+ * higher-numbered heading after it, or at end of document.
+ */
+const NARRATIVE_HEADINGS: readonly { readonly section: string; readonly pattern: RegExp }[] = [
+  {
+    section: '7',
+    pattern: /(?:\b7\s*[.)]\s*(?:NARRATIVE\s+)?DESCRIPTION|NARRATIVE\s+DESCRIPTION)/giu,
+  },
+  {
+    section: '8',
+    pattern:
+      /(?:\b8\s*[.)]\s*(?:NARRATIVE\s+)?STATEMENT\s+OF\s+SIGNIFICANCE|NARRATIVE\s+STATEMENT\s+OF\s+SIGNIFICANCE|STATEMENT\s+OF\s+SIGNIFICANCE)/giu,
+  },
+  {
+    section: '9',
+    pattern: /(?:\b9\s*[.)]\s*MAJOR\s+BIBLIOGRAPH|MAJOR\s+BIBLIOGRAPHICAL)/giu,
+  },
+];
+
+/** A heading opening less than this much text is a form label, not the start of narrative. */
+const MIN_FALLBACK_SECTION_CHARS = 600;
+
+export function splitByNarrativeHeadings(
+  normalizedText: string,
+): readonly NominationSection[] {
+  const starts = new Map<string, number[]>();
+  for (const { section, pattern } of NARRATIVE_HEADINGS) {
+    pattern.lastIndex = 0;
+    const positions: number[] = [];
+    let match = pattern.exec(normalizedText);
+    while (match !== null) {
+      positions.push(match.index + match[0].length);
+      match = pattern.exec(normalizedText);
+    }
+    starts.set(section, positions);
+  }
+
+  const sections: NominationSection[] = [];
+  for (const wanted of CAPTURED_SECTIONS) {
+    const positions = starts.get(wanted) ?? [];
+    if (positions.length === 0) continue;
+    const begin = positions[positions.length - 1]!;
+
+    // End at the earliest heading of a HIGHER section that starts after this one. Lower and
+    // equal numbers are skipped: a repeated "8. Statement" is the same section continuing on
+    // the next sheet, not a boundary.
+    let end = normalizedText.length;
+    for (const [section, sectionStarts] of starts) {
+      if (section.localeCompare(wanted, 'en') <= 0) continue;
+      for (const start of sectionStarts) {
+        if (start > begin && start < end) end = start;
+      }
+    }
+
+    const text = stripBoilerplate(normalizedText.slice(begin, end));
+    if (text.length >= MIN_FALLBACK_SECTION_CHARS) sections.push({ section: wanted, text });
+  }
+  return sections;
+}
+
+/**
+ * Which strategy actually produced the sections. Recorded on the evidence row so a later pass
+ * can tell whether a capture came from the form's own section table or from the looser
+ * heading-based fallback, without re-parsing the document.
+ */
+export type SectionSegmentation = 'section-table' | 'narrative-headings' | 'none';
+
 export type ParsedNomination = {
   readonly sections: readonly NominationSection[];
   /** Sections 7 + 8 joined, boilerplate and repeated headers removed. Empty when neither found. */
   readonly narrative: string;
   readonly hasSignificance: boolean;
+  readonly segmentation: SectionSegmentation;
 };
 
 export function parseNomination(rawText: string, displayName: string): ParsedNomination {
   const normalized = normalizeExtractedText(rawText);
-  const sections = splitNominationSections(normalized);
-  const captured = CAPTURED_SECTIONS.map((wanted) =>
-    sections.find((section) => section.section === wanted),
-  ).filter((section): section is NominationSection => section !== undefined);
+  const headerSections = splitNominationSections(normalized);
+  const pick = (from: readonly NominationSection[]): readonly NominationSection[] =>
+    CAPTURED_SECTIONS.map((wanted) =>
+      from.find((section) => section.section === wanted),
+    ).filter((section): section is NominationSection => section !== undefined);
+
+  // Prefer the section table; fall back to narrative headings when OCR destroyed it. 21 of the
+  // first 100 forms swept had 18k-158k characters of perfectly good text and no readable
+  // section table at all (repo-n7p6.12), so the fallback is the difference between capturing
+  // that history and discarding it.
+  let sections = headerSections;
+  let captured = pick(headerSections);
+  let segmentation: SectionSegmentation = captured.length > 0 ? 'section-table' : 'none';
+  if (captured.length === 0) {
+    const fallback = splitByNarrativeHeadings(normalized);
+    const fallbackCaptured = pick(fallback);
+    if (fallbackCaptured.length > 0) {
+      sections = fallback;
+      captured = fallbackCaptured;
+      segmentation = 'narrative-headings';
+    }
+  }
 
   const narrative = captured
     .map((section) => dropRepeatedPropertyHeader(section.text, displayName))
@@ -184,6 +287,7 @@ export function parseNomination(rawText: string, displayName: string): ParsedNom
     sections,
     narrative,
     hasSignificance: captured.some((section) => section.section === '8'),
+    segmentation,
   };
 }
 
@@ -204,11 +308,23 @@ export function parseNomination(rawText: string, displayName: string): ParsedNom
 export type NominationIdentity = {
   readonly stateMatch: boolean;
   readonly countyMatch: boolean;
+  readonly cityMatch: boolean;
   readonly nameMatch: boolean;
   /** False when place does not corroborate — caller must quarantine rather than store. */
   readonly placeCorroborated: boolean;
   readonly nameMismatch: boolean;
 };
+
+/**
+ * Place names disagree between the roster and the form in ways that are purely orthographic:
+ * the roster files DeKalb County as "De Kalb", forms print "DeKalb", and either may carry
+ * punctuation ("St. Louis" / "St Louis"). Comparing on letters alone stops those from reading
+ * as a genuine identity failure — which they did: both nomination quarantines in the first
+ * batch were real documents about the right property, refused over a space.
+ */
+function normalizePlace(value: string): string {
+  return value.toLowerCase().replace(/[^a-z]/gu, '');
+}
 
 /** Roster names are inverted for filing ("Jude, George, House"); compare on the bare tokens. */
 function significantNameTokens(displayName: string): readonly string[] {
@@ -224,15 +340,32 @@ function significantNameTokens(displayName: string): readonly string[] {
 }
 
 export function checkNominationIdentity(
-  narrative: string,
-  expected: { readonly displayName: string; readonly state?: string; readonly county?: string },
+  /**
+   * The WHOLE extracted document, not just the narrative we keep. Identity is a property of the
+   * document; the narrative is only the excerpt worth publishing from. Checking the excerpt
+   * quarantined two real documents in the first batch, because the county is printed on the
+   * front form ("Fulton" appears twice in the Herndon Home nomination, both times outside
+   * sections 7 and 8) while the narrative names only the city.
+   */
+  documentText: string,
+  expected: {
+    readonly displayName: string;
+    readonly state?: string;
+    readonly county?: string;
+    readonly city?: string;
+  },
 ): NominationIdentity {
-  const haystack = narrative.toLowerCase();
-  const state = expected.state?.trim().toLowerCase();
-  const county = expected.county?.trim().toLowerCase();
+  const haystack = documentText.toLowerCase();
+  const packed = normalizePlace(documentText);
+  const present = (value: string | undefined): boolean => {
+    const trimmed = value?.trim();
+    if (trimmed === undefined || trimmed.length === 0) return false;
+    return haystack.includes(trimmed.toLowerCase()) || packed.includes(normalizePlace(trimmed));
+  };
 
-  const stateMatch = state !== undefined && state.length > 0 ? haystack.includes(state) : false;
-  const countyMatch = county !== undefined && county.length > 0 ? haystack.includes(county) : false;
+  const stateMatch = present(expected.state);
+  const countyMatch = present(expected.county);
+  const cityMatch = present(expected.city);
 
   const tokens = significantNameTokens(expected.displayName);
   // Majority of distinctive name tokens present. A district nomination mentions its own name
@@ -240,15 +373,23 @@ export function checkNominationIdentity(
   const hits = tokens.filter((token) => haystack.includes(token)).length;
   const nameMatch = tokens.length === 0 ? false : hits / tokens.length >= 0.5;
 
-  // Both place fields when we have both; if the roster only gave one, that one must match.
-  const placeCorroborated =
-    state !== undefined && county !== undefined && state.length > 0 && county.length > 0
-      ? stateMatch && countyMatch
-      : stateMatch || countyMatch;
+  // State plus a locality. City counts as well as county — urban nominations routinely name the
+  // city and never the county, and a city match is the stronger signal of the two anyway. When
+  // the roster gave no state, any locality agreement is all that is available.
+  const hasState = (expected.state?.trim().length ?? 0) > 0;
+  const localityMatch = countyMatch || cityMatch;
+  const hasLocality =
+    (expected.county?.trim().length ?? 0) > 0 || (expected.city?.trim().length ?? 0) > 0;
+  const placeCorroborated = hasState
+    ? hasLocality
+      ? stateMatch && localityMatch
+      : stateMatch
+    : localityMatch;
 
   return {
     stateMatch,
     countyMatch,
+    cityMatch,
     nameMatch,
     placeCorroborated,
     nameMismatch: placeCorroborated && !nameMatch,

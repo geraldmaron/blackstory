@@ -198,10 +198,13 @@ async function collectNomination(row: CandidateRow): Promise<EvidenceRow | null>
   }
 
   const quality = assessText(parsed.narrative);
-  const identity = checkNominationIdentity(parsed.narrative, {
+  // Identity is checked against the WHOLE document, not the narrative excerpt: the county is
+  // printed on the front form, which sections 7 and 8 do not include.
+  const identity = checkNominationIdentity(text, {
     displayName: row.display_name,
     state: row.payload.state,
     county: row.payload.county,
+    city: row.payload.city,
   });
 
   const status: 'captured' | 'quarantined' =
@@ -229,6 +232,11 @@ async function collectNomination(row: CandidateRow): Promise<EvidenceRow | null>
       publisher: 'National Park Service',
       sectionsFound: parsed.sections.map((section) => section.section),
       hasSignificance: parsed.hasSignificance,
+      // 'section-table' came from the form's own numbered section boxes; 'narrative-headings'
+      // came from the looser fallback used when OCR destroyed that table (repo-n7p6.12). Worth
+      // recording: the fallback can run a section to end-of-document when the closing heading
+      // is missing, so its captures are slightly noisier at the tail.
+      segmentation: parsed.segmentation,
       identity,
       // Recorded, not resolved: place agrees but the name does not, so a human decides whether
       // this is one property under two names (the Castle Rock case) or a genuine mis-attach.
