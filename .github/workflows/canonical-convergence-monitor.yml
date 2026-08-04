@@ -11,20 +11,17 @@
 # still runs the actual --apply, informed by this alert instead of by accident.
 #
 # Requires the HOSTED_DATABASE_URL secret (the real Supabase connection string with read access
-# to bb_public/bb_canonical/bb_audit — see docs/runbooks/release-activation-postgres.md). No
-# workflow in this repo has touched the hosted database before now; every existing scheduled job
-# runs against an ephemeral local Postgres service. Until that secret is added, this job fails
-# closed with a clear message rather than silently reporting green, and the schedule trigger
-# stays commented out (matching canary-uptime.yml's pattern) so it doesn't page on an unset
-# secret every run.
+# to bb_public/bb_canonical/bb_audit — see docs/runbooks/release-activation-postgres.md; set
+# 2026-08-04). No other workflow in this repo touches the hosted database — every other scheduled
+# job runs against an ephemeral local Postgres service. If the secret is ever removed, this job
+# fails closed with a clear message rather than silently reporting green.
 
 name: Canonical Convergence Monitor
 
 on:
-  # Uncomment once HOSTED_DATABASE_URL is set (repo secret, Settings -> Secrets and variables ->
-  # Actions). Twice daily is the cadence discussed in repo-8yk8; adjust freely.
-  # schedule:
-  #   - cron: '0 6,18 * * *'
+  # HOSTED_DATABASE_URL set 2026-08-04 (repo secret). Twice daily, per repo-8yk8.
+  schedule:
+    - cron: '0 6,18 * * *'
   workflow_dispatch: {}
 
 permissions:
