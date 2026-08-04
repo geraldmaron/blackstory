@@ -52,11 +52,12 @@ warns if a convergence backlog (`missing_planned_claims`/`missing_planned_relati
 building up unapplied. It does **not** run `--apply` itself — every hosted write against
 `bb_canonical` should go through a human-reviewed dry-run first.
 
-To activate it: add a `HOSTED_DATABASE_URL` repo secret (Settings → Secrets and variables →
-Actions) holding the real Supabase connection string — read access to `bb_public`/`bb_canonical`
-is sufficient, this workflow never writes. Then uncomment the `schedule:` trigger in the
-workflow file. Until the secret exists, the job fails closed with a clear message rather than
-reporting a false green, and `workflow_dispatch` still works for a manual check.
+Activated 2026-08-04: `HOSTED_DATABASE_URL` repo secret set (Settings → Secrets and variables →
+Actions) to the same connection string `apps/web/.env.local` uses locally — read access to
+`bb_public`/`bb_canonical` is sufficient, this workflow never writes. Runs twice daily
+(`0 6,18 * * *`). If the secret is ever rotated or removed, the job fails closed with a clear
+message rather than reporting a false green, and `workflow_dispatch` still works for a manual
+check.
 
 ## Rollback drill
 
