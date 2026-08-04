@@ -1,10 +1,8 @@
 /**
  * Pure, synchronously-testable view-model logic for the entity detail page. The page
  * itself is an async Server Component reading a `Promise<params>` (not renderable via
- * `renderToStaticMarkup` outside a real Next.js request — see
- * `apps/web/src/app/history/history-view-model.test.ts`'s own note on this same constraint); this
- * module extracts the status-driven decision logic the page's JSX consumes so it stays directly
- * testable.
+ * `renderToStaticMarkup` outside a real Next.js request); this module extracts the
+ * status-driven decision logic the page's JSX consumes so it stays directly testable.
  */
 import type { PublicEntityView } from '../../../data/public-seed';
 
