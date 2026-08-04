@@ -25,7 +25,7 @@ const OPS_PRIMARY_NAV = [
 export function AdminShellChrome({ children }: { readonly children: React.ReactNode }) {
   const pathname = usePathname() || '/';
   const router = useRouter();
-  const { email, signOut, user, ready } = useAdminAuth();
+  const { email, role, signOut, user, ready } = useAdminAuth();
   const publicOrigin = adminPublicSiteHref('/')?.replace(/\/$/, '') ?? null;
   const locateHref = adminPublicSiteHref('/locate') ?? null;
 
@@ -67,7 +67,14 @@ export function AdminShellChrome({ children }: { readonly children: React.ReactN
           ? {
               tools: (
                 <>
-                  {email ? <span className="ds-shell-header__session">{email}</span> : null}
+                  {email ? (
+                    <span className="ds-shell-header__session" title={`Signed in as ${email}`}>
+                      <span className="ds-shell-header__session-email">{email}</span>
+                      {role ? (
+                        <span className="ds-shell-header__session-role">{role}</span>
+                      ) : null}
+                    </span>
+                  ) : null}
                   <button
                     type="button"
                     className="ds-shell-header__sign-out"

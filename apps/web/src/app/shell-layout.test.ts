@@ -234,6 +234,22 @@ describe('the plate is styled globally, not from the route group', () => {
     assert.doesNotMatch(mapSurfacesCss, /\.ds-map-stage\b/);
   });
 
+  it('covers the plate on every surface class but the Instrument', () => {
+    // Regression: the plate is fixed on every route and the room sheets set no background, so
+    // once the Instrument built MapLibre the live map stayed lit under every subsequent route
+    // and state labels read through the prose column. Only reproduces after visiting the Atlas
+    // first, which is why a cold load of /library looked fine.
+    assert.match(
+      shellCss,
+      /body:not\(:has\(\[data-surface='instrument'\]\)\)\s+\.ds-map-stage::after\s*\{[^}]*background:\s*var\(--ds-canvas\)/s,
+    );
+    // Covered, not hidden: ADR-017 keeps the MapLibre instance alive across navigation.
+    assert.doesNotMatch(
+      shellCss,
+      /body:not\(:has\(\[data-surface='instrument'\]\)\)\s+\.ds-map-stage\s*\{[^}]*display:\s*none/s,
+    );
+  });
+
   it('never scopes a plate rule under .ds-map-surface, which is not its ancestor', () => {
     assert.doesNotMatch(shellCss, /\.ds-map-surface[^{,]*\s\.ds-map-stage/);
     assert.doesNotMatch(shellCss, /\.ds-map-surface[^{,]*\s\.maplibregl-/);

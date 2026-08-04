@@ -315,8 +315,12 @@ html {
   background: color-mix(in srgb, var(--ds-ink) 6%, transparent);
 }
 
+/* Who am I signed in as, and with what authority. Stays visible at every width — the
+   role chip alone is enough on narrow screens, where the full email does not fit. */
 .ds-shell-header__session {
-  display: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-space-2);
   margin-right: var(--ds-space-1);
   color: var(--ds-ink-muted);
   font-family: var(--ds-font-mono);
@@ -324,10 +328,29 @@ html {
   letter-spacing: 0.04em;
 }
 
+.ds-shell-header__session-email {
+  display: none;
+  max-width: 18ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 @media (min-width: 64rem) {
-  .ds-shell-header__session {
-    display: inline-flex;
+  .ds-shell-header__session-email {
+    display: inline;
   }
+}
+
+.ds-shell-header__session-role {
+  padding: 0.125rem var(--ds-space-2);
+  border: var(--ds-border-width) solid var(--ds-rule);
+  border-radius: var(--ds-radius-sm);
+  color: var(--ds-ink);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .ds-shell-header__sign-out {

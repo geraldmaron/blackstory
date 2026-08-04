@@ -224,6 +224,13 @@
   text-decoration: none;
 }
 
+/* Direct child of the grid meta-row, so without this it stretches the full card width
+   and reads as a banner rather than the quiet handoff it is. */
+.ds-shell-footer__staff {
+  justify-self: start;
+  font-size: 0.75rem;
+}
+
 .ds-shell-footer__operator:hover {
   color: var(--ds-accent);
   text-decoration: underline;
@@ -1806,6 +1813,30 @@
   height: 100dvh;
   /* Pre-style-load flash — dark ocean by default; light theme matches Archive Paper. */
   background: #080606;
+}
+
+/* —— Plate posture ————————————————————————————————————————————————————————————
+   Only the Instrument treats the map as content. Every other class is paper: a Reading room
+   is "one scrolling, measure-limited column on paper", and MapStage.tsx already states that
+   "a Utility surface has no plate".
+
+   Nothing enforced that. The plate is `position: fixed` on every route and the room sheets set
+   no background of their own, so once the Instrument had built MapLibre the live plate stayed
+   lit under every subsequent route — state abbreviation labels and record clusters read
+   straight through the prose column on /library, /about, /methodology and every record page.
+   It only reproduces after visiting the Atlas first: on a cold load of a reading room GL was
+   never constructed, so the plate showed its flat paper fallback and the bug stayed invisible.
+
+   Covering the plate rather than hiding it keeps the persistence contract in ADR-017 — the
+   MapLibre instance is never touched, so returning to the Instrument does not rebuild it, and
+   no resize observer fires against a hidden container. */
+body:not(:has([data-surface='instrument'])) .ds-map-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  /* Generated last, so at the canvas's own z-index it still paints over it. */
+  z-index: var(--ds-z-content);
+  background: var(--ds-canvas);
 }
 
 /* The plate is viewport-fixed under every surface, so document scroll must end on opaque

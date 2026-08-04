@@ -10,6 +10,7 @@ export async function GET(request: Request): Promise<Response> {
     return Response.json({
       email: caller.email,
       uid: caller.uid,
+      role: caller.role,
       mode: caller.mode,
       authMode: resolveAdminAuthMode(),
     });

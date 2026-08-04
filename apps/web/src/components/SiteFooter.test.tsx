@@ -25,4 +25,35 @@ describe('SiteFooter', () => {
     assert.match(html, /class="ds-shell-footer__column-title">Trust</);
     assert.match(html, /class="ds-shell-footer__column-title">Contribute</);
   });
+
+  it('offers a staff sign-in handoff when an admin origin is configured', () => {
+    const previous = process.env.NEXT_PUBLIC_ADMIN_ORIGIN;
+    process.env.NEXT_PUBLIC_ADMIN_ORIGIN = 'http://localhost:3001';
+    try {
+      const html = renderToStaticMarkup(<SiteFooter />);
+      assert.match(html, /href="http:\/\/localhost:3001\/login"/);
+      assert.match(html, />Staff sign-in</);
+      assert.match(html, /rel="nofollow noreferrer"/);
+    } finally {
+      if (previous === undefined) delete process.env.NEXT_PUBLIC_ADMIN_ORIGIN;
+      else process.env.NEXT_PUBLIC_ADMIN_ORIGIN = previous;
+    }
+  });
+
+  it('omits the staff link when no admin origin is configured', () => {
+    // Production leaves NEXT_PUBLIC_ADMIN_ORIGIN unset unless the console is deployed, so the
+    // public site does not advertise an admin console that may not exist at that origin.
+    const previousOrigin = process.env.NEXT_PUBLIC_ADMIN_ORIGIN;
+    const previousEnv = process.env.NEXT_PUBLIC_APP_ENV;
+    delete process.env.NEXT_PUBLIC_ADMIN_ORIGIN;
+    process.env.NEXT_PUBLIC_APP_ENV = 'production';
+    try {
+      const html = renderToStaticMarkup(<SiteFooter />);
+      assert.doesNotMatch(html, /Staff sign-in/);
+    } finally {
+      if (previousOrigin !== undefined) process.env.NEXT_PUBLIC_ADMIN_ORIGIN = previousOrigin;
+      if (previousEnv === undefined) delete process.env.NEXT_PUBLIC_APP_ENV;
+      else process.env.NEXT_PUBLIC_APP_ENV = previousEnv;
+    }
+  });
 });
