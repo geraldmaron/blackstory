@@ -33,6 +33,7 @@ export const CANONICAL_WRITE_VERBS = [
   'entity.merge',
   'entity.merge_reverse',
   'entity.bulk_kind_reassign',
+  'entity.bulk_field_edit',
 ] as const;
 
 export type CanonicalWriteVerb = (typeof CANONICAL_WRITE_VERBS)[number];
@@ -43,6 +44,7 @@ const PERMISSION_BY_VERB: Readonly<Record<CanonicalWriteVerb, AdminPermission>> 
   // Reversing a merge needs the same authority as making one: both rewrite who owns what.
   'entity.merge_reverse': 'canonical:merge',
   'entity.bulk_kind_reassign': 'canonical:bulk_write',
+  'entity.bulk_field_edit': 'canonical:bulk_write',
 };
 
 export function permissionForCanonicalVerb(verb: CanonicalWriteVerb): AdminPermission {
@@ -181,6 +183,10 @@ export async function commitCanonicalWrite(
     affectedCount: request.affectedCount ?? 1,
   };
 
+  // A bulk write has no single entity to point at. Its subject is the set, and `entity_id` is
+  // left null rather than filled with one arbitrary member of it — the ids live in `data`.
+  const isBulk = request.verb.startsWith('entity.bulk');
+
   const auditEvent: DomainAuditEvent = {
     id: eventId,
     // Canonical edits are corrections to a published record, which is what the closed audit
@@ -188,11 +194,15 @@ export async function commitCanonicalWrite(
     action: 'correction.applied',
     category: 'correction',
     actor: actorFor(identity),
-    subject: { type: 'entity', id: subjectId, path: `bb_canonical.entities/${subjectId}` },
+    subject: {
+      type: isBulk ? 'entity_set' : 'entity',
+      id: subjectId,
+      path: isBulk ? `bb_canonical.entities?${subjectId}` : `bb_canonical.entities/${subjectId}`,
+    },
     reason,
     requestId: eventId,
     correlationId,
-    entityId: subjectId,
+    ...(isBulk ? {} : { entityId: subjectId }),
     idempotencyKey,
     occurredAt,
     data: auditData,
@@ -202,7 +212,7 @@ export async function commitCanonicalWrite(
     id: deps.newId(),
     eventId,
     topic: 'canonical.entity.changed',
-    aggregateType: 'entity',
+    aggregateType: isBulk ? 'entity_set' : 'entity',
     aggregateId: subjectId,
     payload: { verb: request.verb, entityId: subjectId, affectedCount: request.affectedCount ?? 1 },
     status: 'pending',

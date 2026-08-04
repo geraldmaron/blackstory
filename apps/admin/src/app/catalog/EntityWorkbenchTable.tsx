@@ -14,6 +14,7 @@ import { DataTable, SelectionBar, type DataTableColumn } from '@repo/ui';
 import { useAdminAuth } from '../../auth/AdminAuthProvider';
 import type { CatalogDecisionAction } from '../../catalog/catalog-decisions-store';
 import type { EntityRow, EntitySortKey } from '../../lib/entity-query';
+import { BulkEditPanel } from './BulkEditPanel';
 import { formatLivingStatusLabel } from './living-status-label';
 
 const ACTION_LABEL: Record<CatalogDecisionAction, string> = {
@@ -42,6 +43,10 @@ type Props = {
    * they hold. Hiding the affordance is presentation — `/catalog/merge` re-checks the role.
    */
   readonly canMerge: boolean;
+  /** Same server-resolved role check, for bulk canonical field edits. */
+  readonly canBulkEdit: boolean;
+  /** Passed down rather than imported: the vocabulary lives in server-only `@repo/domain`. */
+  readonly sensitivityClasses: readonly string[];
 };
 
 /**
@@ -65,6 +70,8 @@ export function EntityWorkbenchTable({
   sortDirection,
   sortHrefs,
   canMerge,
+  canBulkEdit,
+  sensitivityClasses,
 }: Props) {
   const router = useRouter();
   const { getIdToken } = useAdminAuth();
@@ -281,6 +288,10 @@ export function EntityWorkbenchTable({
           </button>
         ))}
       </SelectionBar>
+
+      {canBulkEdit && selectedIds.size > 0 ? (
+        <BulkEditPanel selectedIds={selectedIds} sensitivityClasses={sensitivityClasses} />
+      ) : null}
     </>
   );
 }

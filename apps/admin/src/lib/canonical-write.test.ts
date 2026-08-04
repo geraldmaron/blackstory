@@ -148,7 +148,22 @@ test('audit event, outbox message, and idempotency key are consistent', async ()
   assert.equal(commit.outboxMessage.status, 'pending');
   assert.equal(commit.outboxMessage.attempts, 0);
   assert.equal(commit.auditEvent.data?.affectedCount, 42);
+  // A bulk write has no single entity. `entity_id` stays null rather than naming one arbitrary
+  // member of the set — the ids live in `data`, and the subject is the set itself.
+  assert.equal(commit.auditEvent.entityId, undefined);
+  assert.equal(commit.auditEvent.subject.type, 'entity_set');
+});
+
+test('a single-entity write still names its entity', async () => {
+  const { commits, dependencies } = fixture(identity('admin'));
+
+  await commitCanonicalWrite(request({ verb: 'entity.field_edit' }), dependencies);
+
+  const [commit] = commits;
+  assert.ok(commit);
   assert.equal(commit.auditEvent.entityId, 'entity-1');
+  assert.equal(commit.auditEvent.subject.type, 'entity');
+  assert.equal(commit.auditEvent.subject.path, 'bb_canonical.entities/entity-1');
 });
 
 test('a failing transaction reports failure rather than throwing into the render', async () => {

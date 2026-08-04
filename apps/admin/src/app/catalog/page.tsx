@@ -13,6 +13,7 @@
  * signed-manifest privileged-apply flow remains the only thing that makes anything live.
  */
 import Link from 'next/link';
+import { SENSITIVITY_CLASSES } from '@repo/domain';
 import { FacetRail, Pagination, type FacetGroup } from '@repo/ui';
 import {
   entityQueryHref,
@@ -83,6 +84,9 @@ export default async function CatalogPage({
   // Resolved here, not in the client island: the browser only knows the operator is signed in,
   // not which staff role they hold, so a role-gated affordance has to be decided server-side.
   const canMerge = identity ? staffRoleHasPermission(identity.role, 'canonical:merge') : false;
+  const canBulkEdit = identity
+    ? staffRoleHasPermission(identity.role, 'canonical:bulk_write')
+    : false;
 
   const degradedReason =
     pageOutcome.status === 'degraded'
@@ -222,6 +226,8 @@ export default async function CatalogPage({
             total={page.total}
             searchQuery={serializeEntityQuery(query)}
             canMerge={canMerge}
+            canBulkEdit={canBulkEdit}
+            sensitivityClasses={SENSITIVITY_CLASSES}
             sortKey={query.sort ?? 'updated'}
             sortDirection={query.direction ?? 'desc'}
             sortHrefs={{

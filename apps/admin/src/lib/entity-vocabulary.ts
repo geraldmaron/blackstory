@@ -15,11 +15,19 @@
  */
 
 /**
- * `living_status` is free text whose dominant value is `not_applicable` (3,623 of 4,097 rows —
- * every place, org, and event). There is no `living` row in the table today, but the value is
- * legal and an operator may set one.
+ * `living_status` is constrained by `entities_living_status_check`, and this list is that check
+ * verbatim — the constraint is the authority, not the values that happen to be in use. Today only
+ * three appear (`not_applicable` 3,623, `unknown` 287, `deceased` 187); `living` and
+ * `presumed_deceased` are legal and an operator may set either. Leaving `presumed_deceased` out,
+ * as this list originally did, meant the console could not express a status the database accepts.
  */
-export const LIVING_STATUSES = ['living', 'deceased', 'unknown', 'not_applicable'] as const;
+export const LIVING_STATUSES = [
+  'living',
+  'deceased',
+  'presumed_deceased',
+  'unknown',
+  'not_applicable',
+] as const;
 export type LivingStatus = (typeof LIVING_STATUSES)[number];
 export const ENTITY_KINDS = [
   'person',

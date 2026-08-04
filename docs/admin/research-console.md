@@ -57,11 +57,40 @@ outbox message in one transaction. A canonical write without an audit row cannot
 | `entity.merge` | `canonical:merge` | admin |
 | `entity.merge_reverse` | `canonical:merge` | admin |
 | `entity.bulk_kind_reassign` | `canonical:bulk_write` | admin |
+| `entity.bulk_field_edit` | `canonical:bulk_write` | admin |
 
 `apps/admin/src/auth/staff-permissions.ts` is the single role→permission table; the server gate
 and `useAdminPermissions` both read it, so a hidden button and an enforced permission cannot
 drift apart. Every write requires a non-empty operator reason, and the audit actor is always the
 verified session identity — never an operator id submitted with the form.
+
+## Bulk field edits
+
+Select rows (or Select all matching, which resolves every id under the current filter) and the
+bulk panel applies `kind`, `living_status`, or `sensitivity` to the whole set. Above 250 records
+it takes a review click before the apply click, naming the exact count and the exact change.
+
+The set is **pinned to explicit ids**, not re-derived from the filter at apply time. The operator
+confirmed a count against a specific set; re-running the filter would quietly include rows that
+drifted into it since, which is the surprise the confirm step exists to prevent.
+
+A kind change writes `entity_class` in the same statement. The two are 1:1 across all 4,097 live
+rows, and every class facet reads `entity_class`, so splitting them would file the whole set under
+its old class permanently. The derivation is `entityClassForKind`
+(`apps/admin/src/lib/entity-vocabulary.ts`), which is also what the single-record editor uses.
+
+Absorbed records are skipped: they are merge tombstones pointing at a survivor, and editing one
+changes nothing anyone reads. The skipped count is reported back.
+
+The values being overwritten are read first and recorded on the audit event **grouped by prior
+value** — a thousand rows moving from `institution` to `organization` is one group holding a
+thousand ids, not a thousand before/after pairs. That keeps the event a readable size while still
+carrying what an un-do needs.
+
+One statement, one transaction, one audit event, so 5 rows and 5,000 cost the same and either all
+land or none do. This is why the bulk field-edit path has no 50-row cap: the separate
+bulk-*decision* path (`/api/catalog/bulk-decision`) commits once per entity, which is what that
+cap is protecting against, and it is unchanged.
 
 ## Merging entities
 

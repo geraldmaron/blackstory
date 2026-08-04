@@ -833,3 +833,20 @@ body {
   display: grid;
   gap: var(--ds-space-3, 0.75rem);
 }
+
+/* Bulk field edits on the current selection. */
+.entity-bulk {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--ds-space-3, 0.75rem);
+  border: 1px solid var(--ds-color-border, #d8d2c8);
+  border-radius: var(--ds-radius-md, 6px);
+  padding: var(--ds-space-4, 1rem);
+  margin-block-start: var(--ds-space-3, 0.75rem);
+}
+
+.entity-bulk__confirm {
+  flex-basis: 100%;
+  margin: 0;
+}
