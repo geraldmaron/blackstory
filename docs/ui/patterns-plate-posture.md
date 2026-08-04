@@ -134,7 +134,7 @@ The Framed plate sits above the document layer because it is inset into that lay
 
 | Concern | Module | Status |
 |---|---|---|
-| Persistent plate | `app/(map)/MapStage.tsx`, `lib/map-experience/map-libre-lifecycle.ts` | Built, mounted inside the route group; hoisting is SP-07 |
+| Persistent plate | `components/map-stage/MapStage.tsx`, `lib/map-experience/map-libre-lifecycle.ts` | Built, mounted inside the route group; hoisting is SP-07 |
 | Posture switch | `data-plate` on the document root, shell stylesheet | Pending (SP-07, SP-08) |
 | Framed slot in prose | `components/theme-spine/MapInsetMoment.tsx` | Built, but mounts a second MapLibre instance via `EntityLocationMap`; converted to borrow the persistent plate in SP-08 |
 | Record place frame | `components/patterns/RecordPlacePreview.tsx` | Built |

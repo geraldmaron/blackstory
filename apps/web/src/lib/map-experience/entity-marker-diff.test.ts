@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { diffEntityMarkerIds, shouldMountEntityMarkers } from './entity-marker-diff';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const mapStageSource = readFileSync(join(here, '../../app/(map)/MapStage.tsx'), 'utf8');
+const mapStageSource = readFileSync(join(here, '../../components/map-stage/MapStage.tsx'), 'utf8');
 
 describe('diffEntityMarkerIds', () => {
   it('keeps every id present on both sides — identical sets produce no churn', () => {

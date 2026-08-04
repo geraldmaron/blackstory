@@ -99,7 +99,7 @@ test('every static room routes its head through the builder', () => {
   // other's canonical carries a narrowing), and /history and /search are redirect routes whose
   // metadata never reaches a reader.
   const appDir = join(import.meta.dirname, '../../app');
-  const exempt = new Set(['(map)', 'history', 'search', 'records']);
+  const exempt = new Set(['history', 'search', 'records']);
 
   const walk = (dir: string): void => {
     for (const item of readdirSync(dir, { withFileTypes: true })) {
@@ -113,6 +113,9 @@ test('every static room routes its head through the builder', () => {
         continue;
       }
       if (item.name !== 'page.tsx') continue;
+      // The Atlas (`app/page.tsx`) builds `alternates` directly — it must carry no `title`, which
+      // `buildStaticPageMetadata` always sets — so it is excluded the same way `/records` is.
+      if (dir === appDir) continue;
       const source = readFileSync(join(dir, item.name), 'utf8');
       if (!/^export const metadata/m.test(source)) continue; // generateMetadata builds its own
       assert.match(

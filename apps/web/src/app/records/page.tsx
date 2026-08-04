@@ -12,7 +12,7 @@
  * Plate posture: Parked. This room never shows the map; the off-ramp hands the narrowing to it.
  */
 import type { Metadata } from 'next';
-import { getSharedPublicEntities } from '../(map)/shared-map-data';
+import { getSharedPublicEntities } from '../../lib/map-experience/shared-map-data';
 import { buildRecordsIndex, parseRecordsQuery } from '../../lib/records/build-records-index';
 import { RecordsIndexRoom } from './RecordsIndex';
 import '../reading-room.css';

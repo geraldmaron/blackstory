@@ -13,7 +13,7 @@
  */
 import type { Metadata } from 'next';
 import React from 'react';
-import { getSharedPublicEntities } from '../(map)/shared-map-data';
+import { getSharedPublicEntities } from '../../lib/map-experience/shared-map-data';
 import { buildStaticPageMetadata } from '../../lib/seo/metadata-builders';
 import { EMPTY_RECORDS_QUERY, buildRecordsIndex } from '../../lib/records/build-records-index';
 import {

@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { containerHasLayout, isWebGlAvailable } from './map-libre-lifecycle';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const mapStageSource = readFileSync(join(here, '../../app/(map)/MapStage.tsx'), 'utf8');
+const mapStageSource = readFileSync(join(here, '../../components/map-stage/MapStage.tsx'), 'utf8');
 const entityMapSource = readFileSync(
   join(here, '../../components/entity/EntityLocationMap.tsx'),
   'utf8',

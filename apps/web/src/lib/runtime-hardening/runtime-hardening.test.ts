@@ -106,14 +106,14 @@ function assertForceDynamicAfterImports(source: string, label: string): void {
   );
 }
 
-test('map layout and entity page keep force-dynamic after all imports', () => {
+test('Atlas page and entity page keep force-dynamic after all imports', () => {
   assertForceDynamicAfterImports(
     readFileSync(join(APP_ROOT, 'entity/[id]/page.tsx'), 'utf8'),
     'entity/[id]/page.tsx',
   );
   assertForceDynamicAfterImports(
-    readFileSync(join(APP_ROOT, '(map)/layout.tsx'), 'utf8'),
-    '(map)/layout.tsx',
+    readFileSync(join(APP_ROOT, 'page.tsx'), 'utf8'),
+    'page.tsx',
   );
 });
 
@@ -131,18 +131,13 @@ test('the Atlas is one route — `/` — with no page rendering at /explore', ()
   assert.deepEqual(explorePages, [], `no page may render at /explore: ${explorePages.join(', ')}`);
 
   assert.equal(
-    existsSync(join(APP_ROOT, 'explore')),
+    existsSync(join(APP_ROOT, '(map)')),
     false,
-    'stale apps/web/src/app/explore/ must not exist',
+    'stale apps/web/src/app/(map)/ route group must not exist',
   );
-  assert.equal(
-    existsSync(join(APP_ROOT, 'page.tsx')),
-    false,
-    'stale apps/web/src/app/page.tsx must not exist (the Atlas is (map)/page.tsx)',
-  );
-  assert.equal(existsSync(join(APP_ROOT, '(map)/page.tsx')), true);
+  assert.equal(existsSync(join(APP_ROOT, 'page.tsx')), true);
   // /explore/api keeps its URL — the redirect is the exact path only.
-  assert.equal(existsSync(join(APP_ROOT, '(map)/explore/api/route.ts')), true);
+  assert.equal(existsSync(join(APP_ROOT, 'explore/api/route.ts')), true);
 });
 
 test('production error surface hides stacks and long messages', () => {

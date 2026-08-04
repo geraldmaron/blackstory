@@ -64,11 +64,28 @@
 }
 
 .ds-shell:has([data-surface='instrument']) .ds-shell-page-transition,
-.ds-shell:has([data-surface='instrument']) .ds-shell-page-transition__content,
-.ds-shell:has([data-surface='instrument']) .ds-map-surface {
+.ds-shell:has([data-surface='instrument']) .ds-shell-page-transition__content {
   flex: 1 1 auto;
   min-height: 0;
   height: 100%;
+}
+
+/* Formerly `.ds-map-surface`, a wrapper div the deleted `(map)` route group's layout rendered
+   around every Instrument page. `data-surface='instrument'` is already on the page-root wrapper
+   (ShellPageTransition), so gating on the attribute directly makes the wrapper div unnecessary. */
+[data-surface='instrument'] {
+  position: relative;
+}
+
+/* Below-hero page content on the Instrument. The canvas plate is FIXED behind the whole
+   viewport, and positioned elements (even z-index: 0) paint over static flow content — so a
+   plain `<main>` on this surface would be swallowed by the ink plate the moment the reader
+   scrolls past the hero. Re-establish paint order and bring the theme canvas along as an
+   opaque backdrop. */
+[data-surface='instrument'] main {
+  position: relative;
+  z-index: var(--ds-z-content);
+  background: var(--ds-canvas);
 }
 
 /* Document surfaces keep the shared primary nav in full. Header chrome follows [data-theme]

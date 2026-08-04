@@ -71,7 +71,7 @@ Read platform preference: web `@media (prefers-reduced-motion: reduce)` (already
 
 ## 5. Paint order & pointer-events (web)
 
-Extends the contract in `apps/web/src/app/(map)/map-surfaces.css`.
+Extends the contract in `apps/web/src/app/explore/explore.css`.
 
 ```
 z 0   .ds-map-stage        persistent MapLibre canvas (ADR-017), fixed plate

@@ -44,8 +44,8 @@ const APP_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../.
  * render components now that /history is a redirect endpoint.
  */
 const LEGACY_EDITION_CHROME: readonly string[] = [
-  '(map)/explore/explore-edition.css',
-  '(map)/explore/explore-panel-chrome.ts',
+  'explore/explore-edition.css',
+  'explore/explore-panel-chrome.ts',
   'about/about-edition.css',
   'about/about-panel-chrome.ts',
   'books/books-edition.css',

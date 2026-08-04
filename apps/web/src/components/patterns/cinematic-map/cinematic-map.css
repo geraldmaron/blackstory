@@ -1,10 +1,10 @@
 /**
  * Cinematic Map Backdrop chrome (`docs/ui/patterns-cinematic-map.md` §5, §7). Import once per
- * adopting route, AFTER `apps/web/src/app/(map)/map-surfaces.css` so the pointer-events
+ * adopting route, AFTER `apps/web/src/app/shell.css` so the pointer-events
  * overrides below win the cascade against that file's baseline `.ds-map-stage` rules.
  *
  * Paint order (spec §5):
- *   z0  .ds-map-stage         persistent MapLibre plate (map-surfaces.css, unchanged here)
+ *   z0  .ds-map-stage         persistent MapLibre plate (shell.css, unchanged here)
  *   z1  .ds-map-scrim         gradient legibility scrim               (CinematicScrim.tsx)
  *   z2  .ds-cinematic-content page content / beats                    (route-owned wrapper)
  *   z3  .ds-cinematic-rail    Explore-the-map / Close controls        (route-owned wrapper)
@@ -243,9 +243,9 @@
 
 /*
  * Layers an Archive-Paper inner rim inside the existing copper pulse ring
- * (`.ds-map-entity-marker--selected::after` in map-surfaces.css) so the selection ring reads
+ * (`.ds-map-entity-marker--selected::after` in shell.css) so the selection ring reads
  * against the dark map plate in both themes (the plate itself is a fixed dark ocean regardless
- * of site theme — see map-surfaces.css). `#f4efe5` mirrors `brandPalette.archivePaper`
+ * of site theme — see shell.css). `#f4efe5` mirrors `brandPalette.archivePaper`
  * (packages/ui/src/tokens/brand-palette.ts); no theme-invariant CSS var exists for it yet
  * (tokens.css's `--ds-inverse-ink` flips per theme, which would go black-on-black in dark mode),
  * so this follows tokens.css's own convention of mirroring the brand hex directly rather than

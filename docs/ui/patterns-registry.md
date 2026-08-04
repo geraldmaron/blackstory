@@ -11,7 +11,7 @@ These carry no folder of their own. They are law about how routes, the shell and
 | Pattern | Doc | Modules | Status |
 |---|---|---|---|
 | Surface classes | [`patterns-surface-classes.md`](./patterns-surface-classes.md) | `app/layout.tsx`, `app/shell.css`, `components/SiteShell.tsx`, `lib/keyboard/bindings.ts`, `lib/nav/destination-registry.ts` | Binding. `data-surface` emission pending (SP-07) |
-| Plate posture | [`patterns-plate-posture.md`](./patterns-plate-posture.md) | `app/(map)/MapStage.tsx`, `lib/map-experience/map-libre-lifecycle.ts`, `components/theme-spine/MapInsetMoment.tsx`, `components/patterns/RecordPlacePreview.tsx`; `lib/motion/use-reduced-motion.ts` is new in SP-18 | Binding. Postures pending (SP-07, SP-08) |
+| Plate posture | [`patterns-plate-posture.md`](./patterns-plate-posture.md) | `components/map-stage/MapStage.tsx`, `lib/map-experience/map-libre-lifecycle.ts`, `components/theme-spine/MapInsetMoment.tsx`, `components/patterns/RecordPlacePreview.tsx`; `lib/motion/use-reduced-motion.ts` is new in SP-18 | Binding. Postures pending (SP-07, SP-08) |
 | Reading room | [`patterns-reading-room.md`](./patterns-reading-room.md) | `components/article/*`, `components/SiteFooter.tsx`; `app/reading-room.css` and `components/shell/SiteFooter.tsx` are new in SP-11 and SP-15 | Binding. Stylesheet pending (SP-11) |
 | Record page | [`patterns-record-page.md`](./patterns-record-page.md) | `components/patterns/RecordAnatomyPanel.tsx`, `RecordPlacePreview.tsx`, `lib/citation/format.ts`; `app/record-page.css` is new in SP-12 | Binding. Page class pending (SP-12) |
 | Lens handoff | [`patterns-lens-handoff.md`](./patterns-lens-handoff.md) | `lib/map-experience/url-state.ts`, `lib/share/deep-link.ts`, `lib/runtime-hardening/{constants,query-normalization,edge-query-normalization}.ts`, `middleware.ts` | Binding. Typed builder pending (SP-15, SP-16) |
@@ -175,7 +175,7 @@ Helper: `apps/web/src/lib/map-experience/icon-fallback.ts` (`iconWithFallback`).
 | Search to history redirect | `apps/web/src/lib/history/search-redirect.test.ts`, `apps/web/src/app/search/search-page.test.ts` |
 | Utility edition chrome + page wiring | `apps/web/src/components/patterns/utility-edition/utility-edition-chrome.test.ts`, `apps/web/src/app/utility-edition-pages.test.ts` |
 | Icon fallback helper | `apps/web/src/lib/map-experience/icon-fallback.test.ts` |
-| Explore panel chrome (test style reference) | `apps/web/src/app/(map)/explore/explore-panel-chrome.test.ts` |
+| Explore panel chrome (test style reference) | `apps/web/src/app/explore/explore-panel-chrome.test.ts` |
 
 **No test covers `/chapters` or `/chapters/[slug]` page chrome.** That gap is recorded in [`README.md`](./README.md) § Known gaps and owned by SP-11.
 

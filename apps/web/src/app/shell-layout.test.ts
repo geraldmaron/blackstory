@@ -65,7 +65,7 @@ describe('surface class is the only shell switch', () => {
 });
 
 describe('explore decade dock hit target', () => {
-  const exploreEditionCss = readFileSync(join(here, '(map)/explore/explore-edition.css'), 'utf8');
+  const exploreEditionCss = readFileSync(join(here, 'explore/explore-edition.css'), 'utf8');
   const cinematicMapCss = readFileSync(
     join(here, '../components/patterns/cinematic-map/cinematic-map.css'),
     'utf8',
@@ -109,7 +109,7 @@ describe('instrument shell layout', () => {
     );
     assert.match(
       shellCss,
-      /\.ds-shell:has\(\[data-surface='instrument'\]\)\s+\.ds-shell-page-transition,[\s\S]*?\.ds-map-surface\s*\{[^}]*height:\s*100%/s,
+      /\.ds-shell:has\(\[data-surface='instrument'\]\)\s+\.ds-shell-page-transition,[\s\S]*?\.ds-shell-page-transition__content\s*\{[^}]*height:\s*100%/s,
     );
   });
 
@@ -141,7 +141,7 @@ describe('shell header theme tokens', () => {
 
 describe('horizontal overflow guards', () => {
   const baseCss = readFileSync(join(here, '../../../../packages/ui/src/styles/base.css'), 'utf8');
-  const mapSurfacesCss = readFileSync(join(here, '(map)/map-surfaces.css'), 'utf8');
+  const mapSurfacesCss = readFileSync(join(here, 'explore/explore.css'), 'utf8');
 
   it('clips document and shell sideways overflow without orphaning overflow-y', () => {
     assert.match(baseCss, /html\s*\{[^}]*overflow-x:\s*clip/s);
@@ -223,7 +223,7 @@ describe('maker credit theme marks', () => {
 });
 
 describe('the plate is styled globally, not from the route group', () => {
-  const mapSurfacesCss = readFileSync(join(here, '(map)/map-surfaces.css'), 'utf8');
+  const mapSurfacesCss = readFileSync(join(here, 'explore/explore.css'), 'utf8');
 
   it('styles the plate from the sheet the root layout loads on every route', () => {
     // The provider was hoisted to the root shell, so `.ds-map-stage` renders as a sibling of

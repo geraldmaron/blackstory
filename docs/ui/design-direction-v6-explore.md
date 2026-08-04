@@ -191,7 +191,7 @@ Spotlight session nav uses `RecordBrowseControls` + `BrowseModeToggle` with inde
 
 ## 10. Implementation pointers
 
-- CSS: `apps/web/src/app/(map)/map-surfaces.css` (stage layout + panel surfaces), `apps/web/src/app/(map)/explore/explore-edition.css` (edition kicker + tokens), `explore.css` (facets, narrative card, legend internals).
+- CSS: `apps/web/src/app/explore/explore.css` (stage layout + panel surfaces), `apps/web/src/app/explore/explore-edition.css` (edition kicker + tokens), `explore.css` (facets, narrative card, legend internals).
 - Chrome helpers: `explore-panel-chrome.ts` (+ tests).
 - Client orchestrator: `ExploreMapExperience.tsx` (preserve behavior; class hooks only in v6 pass).
 - Patterns: import `browse-mode.css` and `edition-fact-icon.css` on `/explore` (`page.tsx`); spotlight uses `RecordBrowseControls` + `EditionFactIcon`.

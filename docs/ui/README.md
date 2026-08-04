@@ -24,7 +24,7 @@ The two v9 direction docs are read together. Neither is complete alone.
 | Pattern | Binding doc | Code | Status |
 |---|---|---|---|
 | **Surface classes** (`data-surface`) | [`patterns-surface-classes.md`](./patterns-surface-classes.md) | `app/layout.tsx`, `app/shell.css` | Binding. Pending in code (SP-07) |
-| **Plate posture** (Live / Framed / Parked) | [`patterns-plate-posture.md`](./patterns-plate-posture.md) | `app/(map)/MapStage.tsx`, `components/theme-spine/MapInsetMoment.tsx`, `lib/map-experience/*` | Binding. Pending in code (SP-07, SP-08) |
+| **Plate posture** (Live / Framed / Parked) | [`patterns-plate-posture.md`](./patterns-plate-posture.md) | `components/map-stage/MapStage.tsx`, `components/theme-spine/MapInsetMoment.tsx`, `lib/map-experience/*` | Binding. Pending in code (SP-07, SP-08) |
 | **Atlas instrument** | [`patterns-atlas-instrument.md`](./patterns-atlas-instrument.md) | `components/shell/CommandBar.tsx`, `map-experience/{TimePanel,LensPanel,ResultsRail,CameraConsole,RecordSheet}.tsx`, `lib/map-experience/{camera-moves,camera-dignity,chrome-padding,decade-density}.ts`, `lib/{citation,share}/*` | In build (v9). Mutually exclusive with the cinematic backdrop |
 | **Reading room** | [`patterns-reading-room.md`](./patterns-reading-room.md) | `app/reading-room.css`, `components/article/*` | Binding. Pending in code (SP-09, SP-11) |
 | **Record page** | [`patterns-record-page.md`](./patterns-record-page.md) | `components/patterns/{RecordAnatomyPanel,RecordPlacePreview}.tsx`, `lib/citation/format.ts` | Binding. Pending in code (SP-12) |
@@ -34,7 +34,7 @@ The two v9 direction docs are read together. Neither is complete alone.
 
 | Surface | Binding doc | Code | Status |
 |---|---|---|---|
-| **Atlas** (`/`, `/story`) | [`design-direction-v9-atlas.md`](./design-direction-v9-atlas.md) | `app/(map)/page.tsx`, `app/(map)/explore/*`, `components/story/*` | Binding (supersedes v6 home, explore, search) |
+| **Atlas** (`/`, `/story`) | [`design-direction-v9-atlas.md`](./design-direction-v9-atlas.md) | `app/page.tsx`, `app/explore/*`, `components/story/*` | Binding (supersedes v6 home, explore, search) |
 | **Chapters** (`/chapters`, `/chapters/[slug]`) | [`design-direction-v9-chapters.md`](./design-direction-v9-chapters.md) | `app/chapters/*`, `components/article/*`, `lib/articles/*` | Binding (v9). Chrome still v6 |
 | **Every other public route** | [`design-direction-v9-surfaces.md`](./design-direction-v9-surfaces.md) | see its section 4 resolution map | Proposed, binding on owner approval |
 | **Mobile shell** (`@repo/mobile`) | [`design-direction-v6-mobile.md`](./design-direction-v6-mobile.md) | `apps/mobile/src/app/(tabs)/*`, `apps/mobile/src/shell/*`, `apps/mobile/src/ui/*` | Binding. **Ledger Line** polish (see [`mobile-polish-mockups.html`](./mobile-polish-mockups.html)) |
@@ -150,8 +150,8 @@ Verified against `apps/web/src/app/` on 2026-07-30. Surface classes are from [`p
 
 | Route | File | Class | Purpose |
 |---|---|---|---|
-| `/` | `app/(map)/page.tsx` | Instrument | The Atlas. Live map, records already on it |
-| `/explore` | `app/(map)/explore/page.tsx` | Instrument | Folds into `/`; becomes a 308 |
+| `/` | `app/page.tsx` | Instrument | The Atlas. Live map, records already on it |
+| `/explore` | `app/explore/page.tsx` | Instrument | Folds into `/`; becomes a 308 |
 | `/chapters` | `app/chapters/page.tsx` | Reading room | Long-form publication index. Destination for the articles, stories, themes and topics redirect families |
 | `/chapters/[slug]` | `app/chapters/[slug]/page.tsx` | Reading room | Chapter detail with inline citations and numbered references |
 | `/chapters/mosaic-credits` | `app/chapters/mosaic-credits/page.tsx` | Utility | Rights clearance for the atmosphere tiles |
@@ -187,7 +187,7 @@ Routes that **do not exist**: `app/stories`, `app/themes`, `app/topics`, `app/ar
 
 | Route | File |
 |---|---|
-| `/explore/api` | `app/(map)/explore/api/route.ts` |
+| `/explore/api` | `app/explore/api/route.ts` |
 | `/history/api` | `app/history/api/route.ts` |
 | `/search/api` | `app/search/api/route.ts` |
 | `/locate/api` | `app/locate/api/route.ts` |

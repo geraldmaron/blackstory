@@ -51,8 +51,9 @@ test('the sitemap never lists the same URL twice', () => {
 /**
  * Every static route the App Router actually serves, read off disk.
  *
- * Route groups — `app/(map)/page.tsx` — contribute no URL segment, and dynamic segments are
- * skipped because the sitemap builds those from the release rather than from the registry.
+ * Route groups (a directory wrapped in parens, e.g. `app/(group)/page.tsx`) contribute no URL
+ * segment, and dynamic segments are skipped because the sitemap builds those from the release
+ * rather than from the registry.
  */
 function renderedStaticRoutes(appDir: string): ReadonlySet<string> {
   const routes = new Set<string>();
