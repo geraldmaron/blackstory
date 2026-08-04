@@ -382,7 +382,7 @@ html {
 .ds-shell-drawer-scrim {
   position: fixed;
   inset: 0;
-  z-index: var(--ds-z-scrim-toast);
+  z-index: var(--ds-z-scrim);
   pointer-events: auto;
   background: color-mix(in srgb, var(--ds-fixed-ink) 45%, transparent);
 }

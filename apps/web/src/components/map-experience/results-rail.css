@@ -9,7 +9,7 @@
   position: fixed;
   top: calc(56px + var(--ds-space-4));
   right: var(--ds-space-4);
-  z-index: var(--ds-z-instrument);
+  z-index: var(--ds-z-atlas-instruments);
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   width: 344px;

@@ -137,7 +137,7 @@
   position: fixed;
   left: var(--ds-space-4);
   bottom: calc(var(--ds-space-4) + 34px);
-  z-index: var(--ds-z-instrument);
+  z-index: var(--ds-z-atlas-instruments);
   display: flex;
   gap: var(--ds-space-2);
 }
