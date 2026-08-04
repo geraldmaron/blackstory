@@ -3,9 +3,9 @@
  * wall's automatic opening sequence. On load the canvas is blank; after a
  * short beat names start fading in sparse and build to full density; while
  * that happens a 4-line message assembles from the same handwriting mechanic
- * and, unlike names, holds permanently once shown. Reuses the
- * prefers-reduced-motion "skip choreography, show final state" approach from
- * memorial-decade-fade.ts: reduced motion resolves everything immediately.
+ * and, unlike names, holds permanently once shown. Same prefers-reduced-motion
+ * "skip choreography, show final state" approach used site-wide: reduced
+ * motion resolves everything immediately.
  */
 
 /** Pure canvas, no names, before the sequence begins. */

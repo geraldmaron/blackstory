@@ -21,7 +21,6 @@ import {
   EXPLORE_HISTORY_EDGES_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SOURCE_ID,
-  EXPLORE_MEMORIAL_NAMES_SOURCE_ID,
   EXPLORE_SELECTED_POINT_LAYER_ID,
   SATELLITE_LAYER_ID,
   EXPLORE_STATE_DENSITY_INCOMING_LAYER_ID,
@@ -54,7 +53,6 @@ export const GEOGRAPHY_LAYER_IDS = new Set([
   'plate-water',
   'plate-boundary-country',
   'plate-place-city',
-  'explore-memorial-names-label',
   'explore-street-casing',
   'explore-street-fill',
   'explore-street-label',
@@ -110,8 +108,6 @@ export const DECADE_PRIMARY_DATA_SOURCE_IDS = new Set<string>([
   EXPLORE_ENTITIES_SOURCE_ID,
   EXPLORE_HISTORY_EDGES_SOURCE_ID,
 ]);
-/** Memorial names breathe via MapStage setData — style rebuilds must not clobber the tick. */
-export const BREATH_MANAGED_SOURCE_IDS = new Set<string>([EXPLORE_MEMORIAL_NAMES_SOURCE_ID]);
 /** Channels decade morph holds during dissolve — mid-swap style sync must not touch them. */
 export const DECADE_FADE_OMIT_CHANNELS = new Set(
   [...DECADE_CROSSFADE_OUT_TARGETS, ...DECADE_CROSSFADE_IN_TARGETS].map(
@@ -180,7 +176,7 @@ export function applyGeographyStyle(
       // entities source DOES setData here: that is how a surface's filter changes reach the
       // GL circle layers. During dual-buffer crossdissolve, primary decade sources stay put
       // while incoming buffers stage the next frame.
-      if (LAZY_GEOGRAPHY_SOURCE_IDS.has(id) || BREATH_MANAGED_SOURCE_IDS.has(id)) continue;
+      if (LAZY_GEOGRAPHY_SOURCE_IDS.has(id)) continue;
       if (EDGE_MANAGED_SOURCE_IDS.has(id)) continue;
       if (options?.deferPrimaryDecadeData && DECADE_PRIMARY_DATA_SOURCE_IDS.has(id)) continue;
       if (id === EXPLORE_ENTITIES_INCOMING_SOURCE_ID) {

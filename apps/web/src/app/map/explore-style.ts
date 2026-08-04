@@ -67,9 +67,6 @@ import {
   EXPLORE_HISTORY_EDGES_SOURCE_ID,
   EXPLORE_JURISDICTION_AREA_LAYER_ID,
   EXPLORE_JURISDICTION_AREAS_SOURCE_ID,
-  EXPLORE_MEMORIAL_NAMES_LAYER_ID,
-  EXPLORE_MEMORIAL_NAMES_SOURCE_ID,
-  MEMORIAL_NAMES_MAP_LAYER_ENABLED,
   EXPLORE_SELECTED_POINT_LAYER_ID,
   SATELLITE_LAYER_ID,
   EXPLORE_STATE_DENSITY_INCOMING_LAYER_ID,
@@ -92,11 +89,6 @@ import {
   DEFAULT_POPULATION_GEO,
   type ExplorePopulationGeo,
 } from '../../lib/map-experience/explore-population';
-import {
-  buildMemorialNameFeatures,
-  MEMORIAL_LABEL_TEXT_FONT,
-  type MemorialNameFeatureCollection,
-} from '../../lib/map-experience/build-memorial-name-features';
 
 export {
   EXPLORE_CLUSTER_COUNT_INCOMING_LAYER_ID,
@@ -116,9 +108,6 @@ export {
   EXPLORE_HISTORY_EDGES_SOURCE_ID,
   EXPLORE_JURISDICTION_AREA_LAYER_ID,
   EXPLORE_JURISDICTION_AREAS_SOURCE_ID,
-  EXPLORE_MEMORIAL_NAMES_LAYER_ID,
-  EXPLORE_MEMORIAL_NAMES_SOURCE_ID,
-  MEMORIAL_NAMES_MAP_LAYER_ENABLED,
   EXPLORE_SELECTED_POINT_LAYER_ID,
   SATELLITE_LAYER_ID,
   EXPLORE_STATE_DENSITY_INCOMING_LAYER_ID,
@@ -701,15 +690,6 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         type: 'geojson',
         data: { type: 'FeatureCollection', features: [] },
       },
-      [EXPLORE_MEMORIAL_NAMES_SOURCE_ID]: {
-        type: 'geojson',
-        promoteId: 'id',
-        // Hidden for now — keep the source wired; builders/data stay in-repo.
-        // Re-enable: MEMORIAL_NAMES_MAP_LAYER_ENABLED + restore feature build below.
-        data: (MEMORIAL_NAMES_MAP_LAYER_ENABLED
-          ? buildMemorialNameFeatures({ seedKey: 'map-stage' })
-          : { type: 'FeatureCollection', features: [] }) satisfies MemorialNameFeatureCollection,
-      },
     },
     layers: [
       {
@@ -733,51 +713,6 @@ export function buildExploreMapStyle(input: BuildExploreMapStyleInput): StyleSpe
         source: USGS_IMAGERY_SOURCE_ID,
         layout: { visibility: satellite ? 'visible' : 'none' },
         paint: { ...SATELLITE_RASTER_PAINT[colorScheme] },
-      },
-
-      {
-        // Memorial typographic field — eligible full names on non-state anchors.
-        // Name-only; Italic face + per-feature size/rotation for collage texture
-        // (not a typeset grid). Currently hidden via MEMORIAL_NAMES_MAP_LAYER_ENABLED.
-        // Decade fade via paint feature-state only when the layer is live again.
-        id: EXPLORE_MEMORIAL_NAMES_LAYER_ID,
-        type: 'symbol',
-        source: EXPLORE_MEMORIAL_NAMES_SOURCE_ID,
-        layout: {
-          visibility: MEMORIAL_NAMES_MAP_LAYER_ENABLED ? 'visible' : 'none',
-          'text-field': ['get', 'name'],
-          'text-font': [...MEMORIAL_LABEL_TEXT_FONT],
-          'text-size': ['get', 'size'],
-          'text-rotate': ['get', 'rotate'],
-          'text-letter-spacing': 0.05,
-          'text-max-width': 7,
-          'text-justify': 'center',
-          'text-anchor': 'center',
-          'text-allow-overlap': false,
-          'text-ignore-placement': false,
-          // Minimal padding — pack the ocean field; MapLibre still blocks overlaps.
-          'text-padding': 0.75,
-          'text-optional': false,
-          'symbol-sort-key': ['get', 'priority'],
-          'symbol-z-order': 'source',
-        },
-        paint: {
-          'text-color':
-            (input.colorScheme ?? 'dark') === 'light'
-              ? brandPalette.blackInk
-              : brandPalette.archivePaper,
-          // feature-state is paint-only in MapLibre — layout.text-size cannot use it.
-          'text-opacity': [
-            'case',
-            ['boolean', ['feature-state', 'passed'], false],
-            0,
-            ['get', 'ink'],
-          ],
-          'text-opacity-transition': { duration: 720, delay: 0 },
-          // Flat matte contrast on the ocean plate — not a glow/shadow.
-          'text-halo-color': plate.ocean,
-          'text-halo-width': 0.75,
-        },
       },
       /* —— Base cartography ————————————————————————————————————————————————————————
          The plate is a map before it is a chart. These four layers come from the

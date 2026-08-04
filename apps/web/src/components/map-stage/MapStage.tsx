@@ -48,8 +48,6 @@ import {
   EXPLORE_HISTORY_EDGES_INCOMING_SOURCE_ID,
   EXPLORE_HISTORY_EDGES_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
-  EXPLORE_MEMORIAL_NAMES_SOURCE_ID,
-  MEMORIAL_NAMES_MAP_LAYER_ENABLED,
   EXPLORE_SELECTED_POINT_LAYER_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_UNCLUSTERED_HALO_LAYER_ID,
@@ -92,11 +90,6 @@ import type {
   ExploreMapFeatureCollection,
   JurisdictionAreaFeature,
 } from '../../lib/map-experience/build-explore-map-source';
-import { buildMemorialNameFeatures } from '../../lib/map-experience/build-memorial-name-features';
-import {
-  applyMemorialDecadeFrame,
-  type MemorialDecadeApplyHandle,
-} from '../../lib/map-experience/memorial-decade-fade';
 import {
   MAP_MAX_ZOOM,
   MAP_MIN_ZOOM,
@@ -209,14 +202,9 @@ export type { CameraFlyTarget, MapStageFlyOptions } from './camera';
 
 /** Optional behavior for `patchData`. `fade` runs a dual-buffer crossdissolve on
  * presence fills, pins, and relationship lines when motion is allowed — geography
- * never empties. Memorial names couple via `memorialDecade` / `memorialComplete`
- * (staggered feature-state, not a wipe). */
+ * never empties. */
 export type MapStageDataPatchOptions = {
   readonly fade?: boolean;
-  /** Ambient decade label ("2010s") — names who died that decade stagger-fade out. */
-  readonly memorialDecade?: string;
-  /** Full-archive / Today frame — restore every memorial name. */
-  readonly memorialComplete?: boolean;
 };
 
 export type { ExploreSearchCenterMarkerInput };
@@ -491,13 +479,6 @@ export function MapStageProvider({
   const applyStyleAndDataRef = useRef<
     ((options?: Parameters<typeof applyStyleAndData>[0]) => void) | null
   >(null);
-  const memorialFeaturesRef = useRef(
-    MEMORIAL_NAMES_MAP_LAYER_ENABLED
-      ? buildMemorialNameFeatures({ seedKey: 'map-stage' })
-      : { type: 'FeatureCollection' as const, features: [] },
-  );
-  const memorialDecadeApplyRef = useRef<MemorialDecadeApplyHandle | null>(null);
-
   const markMapUnavailable = useCallback(() => {
     if (!mapAvailableRef.current) return;
     mapAvailableRef.current = false;
@@ -786,24 +767,6 @@ export function MapStageProvider({
     [applyStyleAndData],
   );
 
-  const applyMemorialForPatch = useCallback((options?: MapStageDataPatchOptions) => {
-    // Memorial plate field is parked — skip decade feature-state work until re-enabled.
-    if (!MEMORIAL_NAMES_MAP_LAYER_ENABLED) return;
-    const map = mapRef.current;
-    if (!map || !map.isStyleLoaded()) return;
-    if (!map.getSource(EXPLORE_MEMORIAL_NAMES_SOURCE_ID)) return;
-    memorialDecadeApplyRef.current?.cancel();
-    memorialDecadeApplyRef.current = applyMemorialDecadeFrame(
-      map,
-      memorialFeaturesRef.current.features,
-      {
-        ...(options?.memorialDecade ? { decade: options.memorialDecade } : {}),
-        ...(options?.memorialComplete ? { isComplete: true } : {}),
-      },
-      { reducedMotion: prefersReducedMotion() },
-    );
-  }, []);
-
   const stageIncomingDecadeBuffers = useCallback(async (map: MapLibreMap): Promise<void> => {
     const cfg = configRef.current;
     const entitiesIncoming = map.getSource(EXPLORE_ENTITIES_INCOMING_SOURCE_ID) as
@@ -881,12 +844,7 @@ export function MapStageProvider({
   );
 
   const runDecadeMorph = useCallback(
-    (
-      map: MapLibreMap,
-      generation: number,
-      durationMs: number,
-      options?: MapStageDataPatchOptions,
-    ) => {
+    (map: MapLibreMap, generation: number, durationMs: number) => {
       void (async () => {
         decadeMorphAnimationRef.current?.cancel();
         decadeMorphAnimationRef.current = null;
@@ -911,12 +869,9 @@ export function MapStageProvider({
           if (generation !== decadeFadeGenerationRef.current) return;
           decadeDissolveInFlightRef.current = false;
           applyStyleAndData();
-          applyMemorialForPatch(options);
           return;
         }
         if (generation !== decadeFadeGenerationRef.current) return;
-
-        applyMemorialForPatch(options);
 
         const animation = runDecadeMorphAnimation({
           map,
@@ -938,7 +893,6 @@ export function MapStageProvider({
       })();
     },
     [
-      applyMemorialForPatch,
       applyStyleAndData,
       promoteIncomingDecadeBuffers,
       settleDensityColorMorph,
@@ -993,7 +947,6 @@ export function MapStageProvider({
           clearIncomingDecadeBuffers(map);
         }
         commitDataPatch(patch, recreate);
-        applyMemorialForPatch(options);
         return;
       }
 
@@ -1007,9 +960,9 @@ export function MapStageProvider({
       // Superseding an in-flight morph (including React StrictMode’s double effect) restages
       // incoming and restarts the dissolve; it must not snap primary sources.
       commitDataPatch(patch, { configOnly: true });
-      runDecadeMorph(map, generation, durationMs, options);
+      runDecadeMorph(map, generation, durationMs);
     },
-    [applyMemorialForPatch, clearIncomingDecadeBuffers, commitDataPatch, runDecadeMorph],
+    [clearIncomingDecadeBuffers, commitDataPatch, runDecadeMorph],
   );
 
   useEffect(() => {
@@ -1315,16 +1268,6 @@ export function MapStageProvider({
         }
         activeMap.on('click', handleBackgroundClick);
         activeMap.resize();
-        // Memorial plate field is parked (MEMORIAL_NAMES_MAP_LAYER_ENABLED).
-        // When re-enabled: start complete, then HeroStage/explore decade patches drive fades.
-        if (MEMORIAL_NAMES_MAP_LAYER_ENABLED) {
-          memorialDecadeApplyRef.current?.cancel();
-          memorialDecadeApplyRef.current = applyMemorialDecadeFrame(
-            activeMap,
-            memorialFeaturesRef.current.features,
-            { isComplete: true },
-          );
-        }
         // Flush camera requested while the canvas was still constructing (e.g. locate → explore
         // deep link with radius bounds). Prefer the pending flight over the constructor CONUS frame.
         const pending = pendingFlyRef.current;
@@ -1429,8 +1372,6 @@ export function MapStageProvider({
       decadeMorphAnimationRef.current?.cancel();
       decadeMorphAnimationRef.current = null;
       mapStyleReadyRef.current = false;
-      memorialDecadeApplyRef.current?.cancel();
-      memorialDecadeApplyRef.current = null;
       if (selectedPulseRafRef.current !== null) {
         cancelAnimationFrame(selectedPulseRafRef.current);
         selectedPulseRafRef.current = null;

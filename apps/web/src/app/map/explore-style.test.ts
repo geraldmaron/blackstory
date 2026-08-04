@@ -43,9 +43,6 @@ import {
   EXPLORE_HISTORY_EDGES_LAYER_ID,
   EXPLORE_HISTORY_EDGES_SELECTED_LAYER_ID,
   EXPLORE_JURISDICTION_AREA_LAYER_ID,
-  EXPLORE_MEMORIAL_NAMES_LAYER_ID,
-  EXPLORE_MEMORIAL_NAMES_SOURCE_ID,
-  MEMORIAL_NAMES_MAP_LAYER_ENABLED,
   EXPLORE_SELECTED_POINT_LAYER_ID,
   EXPLORE_STATE_DENSITY_LAYER_ID,
   EXPLORE_UNCLUSTERED_EVENT_GLYPH_LAYER_ID,
@@ -689,11 +686,8 @@ test('dark plate draws its water and boundaries from the dark token set', () => 
   );
 });
 
-test('plate fills stay opaque — memorial names are a style layer under land, not DOM bleed', () => {
+test('plate fills stay opaque', () => {
   assert.equal(PLATE_BACKGROUND_OPACITY, 1, 'ocean plate is fully opaque');
-  // The memorial field now sits directly above `background` and beneath every cartography
-  // layer, so no name can bleed onto the plate regardless of what the density fill does. That
-  // is a stronger guarantee than the old one, which relied on an opaque state fill to hide it.
   assert.ok(
     PLATE_STATE_FILL_OPACITY < 1,
     'the density tint sits over real cartography, so it must not be opaque',
@@ -711,50 +705,16 @@ test('plate fills stay opaque — memorial names are a style layer under land, n
   );
 });
 
-test('memorial names symbol layer stays wired but hidden until re-enabled', () => {
-  assert.equal(
-    MEMORIAL_NAMES_MAP_LAYER_ENABLED,
-    false,
-    'live plate memorial field is parked; flip flag to restore',
-  );
-
+test('no memorial name is painted on the plate — the layer id is absent from the built style', () => {
   const style = buildStyleFixture('presence');
   const layerIds = (style.layers ?? []).map((layer) => layer.id);
-  const backgroundIdx = layerIds.indexOf('background');
-  const memorialIdx = layerIds.indexOf(EXPLORE_MEMORIAL_NAMES_LAYER_ID);
-  const stateIdx = layerIds.indexOf(EXPLORE_STATE_DENSITY_LAYER_ID);
-  assert.ok(backgroundIdx >= 0 && memorialIdx > backgroundIdx);
-  assert.ok(stateIdx > memorialIdx, 'state fills must paint above memorial names');
-
-  const memorial = layerById(style, EXPLORE_MEMORIAL_NAMES_LAYER_ID);
-  assert.equal(memorial.type, 'symbol');
-  assert.equal(memorial.layout?.visibility, 'none');
-  assert.equal(memorial.layout?.['text-allow-overlap'], false);
-  assert.equal(memorial.layout?.['text-ignore-placement'], false);
-  assert.ok((memorial.layout?.['text-padding'] as number) <= 2);
-  assert.deepEqual(memorial.layout?.['text-size'], ['get', 'size']);
-  assert.deepEqual(memorial.layout?.['text-rotate'], ['get', 'rotate']);
-  assert.deepEqual(memorial.layout?.['text-font'], ['Noto Sans Italic']);
-  assert.deepEqual(
-    memorial.layout?.['text-field'],
-    ['get', 'name'],
-    'memorial labels are name-only (no year/place)',
-  );
-  const opacity = memorial.paint?.['text-opacity'];
   assert.ok(
-    JSON.stringify(opacity).includes('feature-state'),
-    'text-opacity must read feature-state.passed for decade fades',
+    !layerIds.some((id) => id.includes('memorial')),
+    'SP-08 deleted the memorial names layer; no layer id may reference it',
   );
-
-  const source = style.sources?.[EXPLORE_MEMORIAL_NAMES_SOURCE_ID] as {
-    data?: { features?: unknown[] };
-    promoteId?: string;
-  };
-  assert.equal(source?.promoteId, 'id');
-  assert.equal(
-    source?.data?.features?.length ?? -1,
-    0,
-    'hidden memorial source stays empty until the layer is re-enabled',
+  assert.ok(
+    !Object.keys(style.sources ?? {}).some((id) => id.includes('memorial')),
+    'SP-08 deleted the memorial names source; no source id may reference it',
   );
 });
 
