@@ -1,361 +1,209 @@
 /**
- * Canonical entity catalog browser — search, filter, link to entity detail pages, and record
- * bulk decisions (flag for retraction / needs review / clear) on published entities.
- * Auth is enforced by the catalog layout gate; APIs re-verify the ID token.
+ * Entity workbench — the desk for managing canonical entities at scale.
  *
- * Decisions recorded here never publish or mutate an entity directly — see
- * apps/admin/src/catalog/catalog-decisions-store.ts's module doc. Promotion/edits otherwise
- * stay in operator triage workflows, not here.
+ * This is a server component. Filters, sort, and page live in the URL and resolve in SQL before
+ * the first byte, replacing a client page whose every navigation cost a hydrate, a token
+ * refresh, and two fetches before anything appeared.
+ *
+ * Reach mattered more than speed: the old page fetched `LIMIT 200 ORDER BY updated_at DESC` and
+ * filtered that slice in the browser, so 3,897 of 4,097 entities could not be reached by any
+ * search term or scroll. Every row is now addressable.
+ *
+ * Decisions recorded here still never publish. The next release build reads them, and the
+ * signed-manifest privileged-apply flow remains the only thing that makes anything live.
  */
-'use client';
-
 import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useAdminAuth } from '../../auth/AdminAuthProvider';
-import type { CatalogDecisionAction } from '../../catalog/catalog-decisions-store';
-import type { CatalogEntityListItem } from '../../catalog/catalog-store';
+import { FacetRail, Pagination, type FacetGroup } from '@repo/ui';
+import {
+  entityQueryHref,
+  hasActiveFilters,
+  parseEntityQuery,
+  serializeEntityQuery,
+  toggleFacetHref,
+} from '../../lib/entity-query-params';
+import {
+  queryEntityFacets,
+  queryEntityPage,
+  type EntityQuery,
+  type EntitySortKey,
+  type FacetBucket,
+} from '../../lib/entity-query';
+import { EntityWorkbenchTable } from './EntityWorkbenchTable';
 import { formatLivingStatusLabel } from './living-status-label';
 
-const CATALOG_BULK_LIMIT = 50;
+const BASE_PATH = '/catalog';
 
-const ACTION_LABEL: Record<CatalogDecisionAction, string> = {
-  flag_for_retraction: 'Flag for retraction',
-  needs_review: 'Needs review',
-  clear_flag: 'Clear flag',
-};
+type FacetKey = 'kinds' | 'entityClasses' | 'livingStatuses' | 'sensitivityClasses';
 
-type CatalogRow = CatalogEntityListItem & {
-  readonly decision?: { readonly action: CatalogDecisionAction; readonly reason: string };
-};
-
-type BulkResult = {
-  readonly succeeded: number;
-  readonly failed: number;
-  readonly errors: readonly { readonly entityId: string; readonly error: string }[];
-};
-
-function formatWhen(iso: string): string {
-  if (!iso) return '—';
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return iso;
-  return date.toLocaleString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+function titleCase(value: string): string {
+  return value.replace(/_/g, ' ').replace(/^./, (character) => character.toUpperCase());
 }
 
-export default function CatalogPage() {
-  const { getIdToken, user } = useAdminAuth();
-  const [rows, setRows] = useState<readonly CatalogRow[]>([]);
-  const [search, setSearch] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<ReadonlySet<string>>(new Set());
-  const [reason, setReason] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [bulkResult, setBulkResult] = useState<BulkResult | null>(null);
+function toFacetGroup(
+  id: string,
+  label: string,
+  key: FacetKey,
+  buckets: readonly FacetBucket[],
+  query: EntityQuery,
+  formatLabel: (value: string) => string = titleCase,
+): FacetGroup {
+  const active = query[key] ?? [];
+  return {
+    id,
+    label,
+    options: buckets.map((bucket) => ({
+      value: bucket.value,
+      label: formatLabel(bucket.value),
+      count: bucket.count,
+      href: toggleFacetHref(BASE_PATH, query, key, bucket.value),
+      active: active.includes(bucket.value),
+    })),
+  };
+}
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = await getIdToken();
-      if (!token) {
-        setRows([]);
-        return;
-      }
-      const params = new URLSearchParams({ limit: '100' });
-      const trimmed = search.trim();
-      if (trimmed) params.set('search', trimmed);
-      const response = await fetch(`/api/catalog/entities?${params.toString()}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const body = (await response.json()) as {
-        items?: CatalogRow[];
-        error?: string;
-      };
-      if (!response.ok) {
-        throw new Error(body.error ?? `Load failed (${response.status})`);
-      }
-      setRows(body.items ?? []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setLoading(false);
-    }
-  }, [getIdToken, search]);
+export default async function CatalogPage({
+  searchParams,
+}: {
+  readonly searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const query = parseEntityQuery(await searchParams);
 
-  useEffect(() => {
-    if (user) void load();
-  }, [user, load]);
+  // Rows and facet counts in parallel — both filtered, both resolved before first paint.
+  const [page, facets] = await Promise.all([queryEntityPage(query), queryEntityFacets(query)]);
 
-  const visible = useMemo(() => {
-    const needle = search.trim().toLowerCase();
-    if (!needle) return rows;
-    return rows.filter(
-      (row) =>
-        row.displayName.toLowerCase().includes(needle) ||
-        row.id.toLowerCase().includes(needle) ||
-        row.kind.toLowerCase().includes(needle),
-    );
-  }, [rows, search]);
+  // Clicking the active sort column flips its direction; a new column takes its natural default.
+  const sortHref = (key: EntitySortKey): string => {
+    const naturalDirection = key === 'name' || key === 'kind' ? 'asc' : 'desc';
+    const direction =
+      query.sort === key ? (query.direction === 'asc' ? 'desc' : 'asc') : naturalDirection;
+    return entityQueryHref(BASE_PATH, query, { sort: key, direction });
+  };
 
-  const allVisibleSelected = visible.length > 0 && visible.every((row) => selectedIds.has(row.id));
+  const facetGroups: readonly FacetGroup[] = [
+    toFacetGroup('class', 'Class', 'entityClasses', facets.entityClass, query),
+    toFacetGroup('kind', 'Kind', 'kinds', facets.kind, query),
+    toFacetGroup(
+      'living',
+      'Living status',
+      'livingStatuses',
+      facets.livingStatus,
+      query,
+      formatLivingStatusLabel,
+    ),
+    toFacetGroup('sensitivity', 'Sensitivity', 'sensitivityClasses', facets.sensitivityClass, query),
+  ];
 
-  function toggleOne(id: string) {
-    setSelectedIds((current) => {
-      const next = new Set(current);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }
+  const filtersActive = hasActiveFilters(query);
 
-  function toggleAllVisible() {
-    setSelectedIds((current) => {
-      if (allVisibleSelected) {
-        const next = new Set(current);
-        for (const row of visible) next.delete(row.id);
-        return next;
-      }
-      const next = new Set(current);
-      for (const row of visible) next.add(row.id);
-      return next;
-    });
-  }
-
-  async function submitDecision(action: CatalogDecisionAction) {
-    const entityIds = [...selectedIds];
-    if (entityIds.length === 0) return;
-    if (!reason.trim()) {
-      setError('A decision reason is required — every bulk action is audited.');
-      return;
-    }
-    setBusy(true);
-    setError(null);
-    setBulkResult(null);
-    try {
-      const token = await getIdToken(true);
-      if (!token) {
-        setError('Sign in required');
-        return;
-      }
-      const response = await fetch('/api/catalog/bulk-decision', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, entityIds, reason: reason.trim() }),
-      });
-      const body = (await response.json()) as {
-        error?: string;
-        succeeded?: number;
-        failed?: number;
-        errors?: BulkResult['errors'];
-      };
-      if (!response.ok) {
-        throw new Error(body.error ?? `Bulk decision failed (${response.status})`);
-      }
-      setBulkResult({
-        succeeded: body.succeeded ?? 0,
-        failed: body.failed ?? 0,
-        errors: body.errors ?? [],
-      });
-      setSelectedIds(new Set());
-      setReason('');
-      await load();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setBusy(false);
-    }
-  }
+  // Carried as hidden inputs so submitting the search box keeps the rest of the view intact.
+  const { search: _omitSearch, ...queryWithoutSearch } = query;
+  const preservedParams = new URLSearchParams(
+    serializeEntityQuery({ ...queryWithoutSearch, page: 1 }),
+  );
 
   return (
-    <main className="story-review ds-container ds-page" id="main">
-      <header className="story-review__header">
-        <div>
-          <p className="ds-page__eyebrow">Canonical catalog</p>
-          <h1 className="ds-page__title">Entities</h1>
-          <p className="ds-page__lede">
-            Browse canonical entities in Postgres with kind, living status, and update timestamps.
-            Select entities to record a bulk decision — this never publishes or edits an entity
-            directly; the next release build reads these decisions, and the existing signed-manifest
-            privileged-apply flow is still what makes anything live.
-          </p>
-          <p className="story-review__notice">
-            Pending research lives in <Link href="/inbox">Inbox</Link>
-            {' · '}
-            <Link href="/cases">All cases</Link>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="ds-button ds-button--secondary"
-          onClick={() => void load()}
-          disabled={loading}
-        >
-          {loading ? 'Refreshing…' : 'Refresh'}
-        </button>
+    <main className="ds-container ds-page" id="main">
+      <header className="ds-page__header">
+        <p className="ds-page__eyebrow">Canonical catalog</p>
+        <h1 className="ds-page__title">Entities</h1>
+        <p className="ds-page__lede">
+          Every canonical entity in the archive — filter, sort, and act in bulk. Nothing here
+          publishes on its own; the next release build reads these decisions, and the signed
+          manifest is still what makes anything live.
+        </p>
+        <p className="story-review__notice">
+          <Link href="/inbox">Pending research</Link>
+          {' · '}
+          <Link href="/cases">All cases</Link>
+        </p>
       </header>
 
-      <section className="story-review__toolbar" aria-label="Search entities">
-        <label className="story-review__field">
-          <span>Search</span>
-          <input
-            type="search"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Display name, kind, id…"
+      <div className="ds-workbench">
+        <div className="ds-workbench__rail">
+          <FacetRail
+            groups={facetGroups}
+            clearHref={BASE_PATH}
+            hasActiveFilters={filtersActive}
+            footer={
+              <ul className="ds-facet__options">
+                <li>
+                  <a
+                    className={`ds-facet__option${
+                      query.withoutClaims ? ' ds-facet__option--active' : ''
+                    }`}
+                    href={entityQueryHref(BASE_PATH, query, {
+                      withoutClaims: !query.withoutClaims,
+                    })}
+                  >
+                    <span className="ds-facet__option-label">No claims yet</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    className={`ds-facet__option${
+                      query.mergeState === 'absorbed' ? ' ds-facet__option--active' : ''
+                    }`}
+                    href={entityQueryHref(BASE_PATH, query, {
+                      mergeState: query.mergeState === 'absorbed' ? 'active' : 'absorbed',
+                    })}
+                  >
+                    <span className="ds-facet__option-label">Merged away</span>
+                  </a>
+                </li>
+              </ul>
+            }
           />
-        </label>
-      </section>
+        </div>
 
-      {error ? (
-        <p className="story-review__alert" role="alert">
-          {error}
-        </p>
-      ) : null}
+        <div className="ds-workbench__main">
+          {/* A plain GET form: search survives with JS off and leaves a shareable URL. */}
+          <form className="story-review__toolbar" action={BASE_PATH} method="get" role="search">
+            <label className="story-review__field">
+              <span>Search</span>
+              <input
+                type="search"
+                name="q"
+                defaultValue={query.search ?? ''}
+                placeholder="Name, id, alias, or identifier…"
+              />
+            </label>
+            {[...preservedParams.entries()].map(([name, value]) => (
+              <input key={name} type="hidden" name={name} value={value} />
+            ))}
+            <button type="submit" className="ds-button ds-button--secondary">
+              Search
+            </button>
+            {filtersActive ? (
+              <a className="ds-button ds-button--secondary" href={BASE_PATH}>
+                Reset
+              </a>
+            ) : null}
+          </form>
 
-      {bulkResult ? (
-        <p className="story-review__notice" role="status">
-          Bulk decision recorded: {bulkResult.succeeded} succeeded
-          {bulkResult.failed > 0 ? `, ${bulkResult.failed} failed` : ''}.
-        </p>
-      ) : null}
+          <EntityWorkbenchTable
+            rows={page.rows}
+            total={page.total}
+            searchQuery={serializeEntityQuery(query)}
+            sortKey={query.sort ?? 'updated'}
+            sortDirection={query.direction ?? 'desc'}
+            sortHrefs={{
+              name: sortHref('name'),
+              kind: sortHref('kind'),
+              claims: sortHref('claims'),
+              updated: sortHref('updated'),
+            }}
+          />
 
-      {selectedIds.size > 0 ? (
-        <section className="story-review__bulk" aria-label="Bulk catalog decision">
-          <p>
-            <strong>{selectedIds.size}</strong> selected
-            {selectedIds.size > CATALOG_BULK_LIMIT ? ` (over limit of ${CATALOG_BULK_LIMIT})` : ''}
-          </p>
-          <label className="story-review__field">
-            <span>Reason (required, audited)</span>
-            <input
-              type="text"
-              value={reason}
-              onChange={(event) => setReason(event.target.value)}
-              placeholder="Why this bulk decision?"
-            />
-          </label>
-          <div className="story-review__bulk-actions">
-            <button
-              type="button"
-              className="ds-button ds-button--primary"
-              disabled={busy || selectedIds.size > CATALOG_BULK_LIMIT}
-              onClick={() => void submitDecision('flag_for_retraction')}
-            >
-              {ACTION_LABEL.flag_for_retraction}
-            </button>
-            <button
-              type="button"
-              className="ds-button ds-button--secondary"
-              disabled={busy || selectedIds.size > CATALOG_BULK_LIMIT}
-              onClick={() => void submitDecision('needs_review')}
-            >
-              {ACTION_LABEL.needs_review}
-            </button>
-            <button
-              type="button"
-              className="ds-button ds-button--secondary"
-              disabled={busy || selectedIds.size > CATALOG_BULK_LIMIT}
-              onClick={() => void submitDecision('clear_flag')}
-            >
-              {ACTION_LABEL.clear_flag}
-            </button>
-            <button
-              type="button"
-              className="ds-button ds-button--secondary"
-              disabled={busy}
-              onClick={() => setSelectedIds(new Set())}
-            >
-              Clear selection
-            </button>
-          </div>
-        </section>
-      ) : null}
-
-      <section className="story-review__queue" aria-label="Entity list">
-        {loading && rows.length === 0 ? (
-          <p className="ds-mono">Loading entities…</p>
-        ) : visible.length === 0 ? (
-          <p className="ds-sans">
-            {rows.length === 0 ? (
-              <>
-                No canonical entities found in this project. New material enters through{' '}
-                <Link href="/inbox">Inbox</Link> triage before it lands here.
-              </>
-            ) : (
-              'No entities match the current search.'
-            )}
-          </p>
-        ) : (
-          <div className="story-review__table-wrap">
-            <table className="story-review__table">
-              <caption className="ds-visually-hidden">
-                Canonical entities with kind, living status, decision, and last update
-              </caption>
-              <thead>
-                <tr>
-                  <th scope="col">
-                    <input
-                      type="checkbox"
-                      checked={allVisibleSelected}
-                      onChange={toggleAllVisible}
-                      aria-label="Select all visible entities"
-                    />
-                  </th>
-                  <th scope="col">Display name</th>
-                  <th scope="col">Kind</th>
-                  <th scope="col">Living</th>
-                  <th scope="col">Decision</th>
-                  <th scope="col">Updated</th>
-                </tr>
-              </thead>
-              <tbody>
-                {visible.map((row) => (
-                  <tr key={row.id}>
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={selectedIds.has(row.id)}
-                        onChange={() => toggleOne(row.id)}
-                        aria-label={`Select ${row.displayName}`}
-                      />
-                    </td>
-                    <td>
-                      <Link href={`/catalog/${row.id}`} className="story-review__row-title">
-                        {row.displayName}
-                      </Link>
-                      <p className="story-review__row-meta ds-mono">{row.id}</p>
-                    </td>
-                    <td className="ds-mono">{row.kind}</td>
-                    <td>{formatLivingStatusLabel(row.livingStatus)}</td>
-                    <td>
-                      {row.decision ? (
-                        <span
-                          className={`story-review__badge story-review__badge--${row.decision.action}`}
-                          title={row.decision.reason}
-                        >
-                          {ACTION_LABEL[row.decision.action]}
-                        </span>
-                      ) : (
-                        '—'
-                      )}
-                    </td>
-                    <td className="ds-mono">{formatWhen(row.updatedAt)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <p className="story-review__queue-foot ds-mono">
-              Showing {visible.length} of {rows.length}
-            </p>
-          </div>
-        )}
-      </section>
+          <Pagination
+            page={page.page}
+            pageCount={page.pageCount}
+            pageSize={page.pageSize}
+            total={page.total}
+            itemLabel="entities"
+            hrefForPage={(target: number) => entityQueryHref(BASE_PATH, query, { page: target })}
+          />
+        </div>
+      </div>
     </main>
   );
 }
