@@ -14,7 +14,7 @@
  */
 import Link from 'next/link';
 import { SENSITIVITY_CLASSES } from '@repo/domain';
-import { FacetRail, Pagination, type FacetGroup } from '@repo/ui';
+import { FacetRail, Pagination, Toolbar, ToolbarField, type FacetGroup } from '@repo/ui';
 import {
   entityQueryHref,
   hasActiveFilters,
@@ -203,29 +203,35 @@ export default async function CatalogPage({
         </div>
 
         <div className="ds-workbench__main">
-          {/* A plain GET form: search survives with JS off and leaves a shareable URL. */}
-          <form className="story-review__toolbar" action={BASE_PATH} method="get" role="search">
-            <label className="story-review__field">
-              <span>Search</span>
+          {/* A plain GET form: search survives with JS off and leaves a shareable URL. The
+              preserved params are what keep a search from silently discarding the facets, sort,
+              and page the operator already chose. */}
+          <Toolbar
+            label="Search entities"
+            action={BASE_PATH}
+            preservedParams={Object.fromEntries(preservedParams.entries())}
+            actions={
+              <>
+                <button type="submit" className="ds-button ds-button--secondary">
+                  Search
+                </button>
+                {filtersActive ? (
+                  <a className="ds-button ds-button--secondary" href={BASE_PATH}>
+                    Reset
+                  </a>
+                ) : null}
+              </>
+            }
+          >
+            <ToolbarField label="Search">
               <input
                 type="search"
                 name="q"
                 defaultValue={query.search ?? ''}
                 placeholder="Name, id, alias, or identifier…"
               />
-            </label>
-            {[...preservedParams.entries()].map(([name, value]) => (
-              <input key={name} type="hidden" name={name} value={value} />
-            ))}
-            <button type="submit" className="ds-button ds-button--secondary">
-              Search
-            </button>
-            {filtersActive ? (
-              <a className="ds-button ds-button--secondary" href={BASE_PATH}>
-                Reset
-              </a>
-            ) : null}
-          </form>
+            </ToolbarField>
+          </Toolbar>
 
           <EntityWorkbenchTable
             rows={page.rows}

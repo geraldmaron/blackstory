@@ -32,6 +32,21 @@
   white-space: nowrap;
 }
 
+/* Virtualized tables scroll in their own viewport, so their sticky head anchors to the top of
+   that box rather than to the page's shell header. */
+.ds-datatable--virtual {
+  overflow-y: auto;
+}
+
+.ds-datatable--virtual .ds-datatable__head th {
+  top: 0;
+}
+
+.ds-datatable__spacer td {
+  padding: 0;
+  border: 0;
+}
+
 .ds-datatable__head th {
   position: sticky;
   top: var(--ds-shell-header-height, 0px);
@@ -433,4 +448,194 @@
   padding: var(--ds-space-4);
   color: var(--ds-ink-muted);
   font-size: 0.875rem;
+}
+
+/* ---------------------------------------------------------------- Toolbar */
+
+.ds-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--ds-space-3) var(--ds-space-4);
+  margin-bottom: var(--ds-space-4);
+}
+
+.ds-toolbar__controls,
+.ds-toolbar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--ds-space-2) var(--ds-space-3);
+}
+
+.ds-toolbar__controls {
+  /* The search box should take the slack, not the action buttons. */
+  flex: 1 1 18rem;
+  min-width: 0;
+}
+
+.ds-toolbar__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-1);
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.ds-toolbar__field-label {
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-toolbar__field input,
+.ds-toolbar__field select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--ds-space-2) var(--ds-space-3);
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-sm);
+  background: var(--ds-surface-raised);
+  color: var(--ds-ink);
+  font: inherit;
+  font-size: 0.875rem;
+}
+
+/* ------------------------------------------------------------ DetailPanel */
+
+.ds-detail {
+  border: var(--ds-border-width) solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  background: var(--ds-surface-raised);
+}
+
+.ds-detail__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ds-space-3);
+  padding: var(--ds-space-4);
+  border-bottom: var(--ds-border-width) solid var(--ds-border);
+}
+
+.ds-detail__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 650;
+}
+
+.ds-detail__meta {
+  margin: var(--ds-space-1) 0 0;
+  font-family: var(--ds-font-mono);
+  font-size: 0.75rem;
+  color: var(--ds-ink-muted);
+}
+
+.ds-detail__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+}
+
+.ds-detail__fields {
+  margin: 0;
+  padding: var(--ds-space-4);
+  display: grid;
+  gap: var(--ds-space-3);
+}
+
+.ds-detail__field {
+  display: grid;
+  grid-template-columns: minmax(7rem, 12rem) minmax(0, 1fr);
+  gap: var(--ds-space-2) var(--ds-space-4);
+  align-items: baseline;
+}
+
+.ds-detail__label {
+  font-family: var(--ds-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ds-ink-muted);
+}
+
+.ds-detail__value {
+  margin: 0;
+  font-size: 0.9375rem;
+  min-width: 0;
+}
+
+.ds-detail__value--mono {
+  font-family: var(--ds-font-mono);
+  font-size: 0.8125rem;
+}
+
+/* Absence is stated, never blank — an empty field and a failed load must not look alike. */
+.ds-detail__empty {
+  color: var(--ds-ink-muted);
+  font-style: italic;
+}
+
+.ds-detail__footer {
+  padding: var(--ds-space-4);
+  border-top: var(--ds-border-width) solid var(--ds-border);
+}
+
+@media (max-width: 40rem) {
+  .ds-detail__field {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ------------------------------------------------------------- InlineEdit */
+
+.ds-inline-edit {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
+}
+
+.ds-inline-edit__control {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-1);
+}
+
+.ds-inline-edit__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-space-2) var(--ds-space-3);
+}
+
+.ds-inline-edit__hint,
+.ds-inline-edit__ok,
+.ds-inline-edit__error {
+  font-size: 0.8125rem;
+}
+
+.ds-inline-edit__hint {
+  color: var(--ds-ink-muted);
+}
+
+.ds-inline-edit__ok {
+  font-family: var(--ds-font-mono);
+  color: var(--ds-ink-muted);
+}
+
+/* Carries a word as well as a colour: failure must survive greyscale. */
+.ds-inline-edit__error {
+  color: var(--ds-error-fg);
+  font-weight: 600;
+}
+
+.ds-inline-edit__submit[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

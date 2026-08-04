@@ -7,8 +7,12 @@
  * name should not have to resubmit aliases and sensitivity along with it, and the audit event is
  * per-field — a single form would either write one event per field or one event that says
  * "several things changed", and neither is what a reviewer reading the log needs.
+ *
+ * The shape lives in `@repo/ui`'s InlineEdit; what stays here is the transport — the server
+ * action, the entity/field identity, and the audit reason carried alongside them.
  */
 import { useActionState } from 'react';
+import { InlineEdit } from '@repo/ui';
 import { saveEntityField } from './actions';
 import { ENTITY_EDIT_INITIAL, type EntityEditState } from './edit-state';
 
@@ -33,30 +37,20 @@ export function FieldForm({
   );
 
   return (
-    <form action={formAction} className="entity-edit__form">
-      <input type="hidden" name="entityId" value={entityId} />
-      <input type="hidden" name="field" value={field} />
-      <input type="hidden" name="reason" value={reason} />
+    <InlineEdit
+      className="entity-edit__form"
+      action={formAction}
+      hiddenFields={{ entityId, field, reason }}
+      submitLabel={submitLabel}
+      pending={pending}
+      disabled={disabled}
+      // The button used to just go dead when no reason was typed, with the explanation sitting
+      // in a paragraph at the top of the record — several fields away from what it was blocking.
+      disabledReason="Give a reason for this change first."
+      status={state.status === 'saved' ? 'saved' : state.status === 'error' ? 'error' : 'idle'}
+      {...(state.status === 'saved' || state.status === 'error' ? { message: state.message } : {})}
+    >
       {children}
-      <div className="entity-edit__actions">
-        <button
-          type="submit"
-          className="ds-button ds-button--secondary"
-          disabled={pending || disabled}
-        >
-          {pending ? 'Saving…' : submitLabel}
-        </button>
-        {state.status === 'saved' ? (
-          <span className="entity-edit__ok ds-mono" role="status">
-            {state.message}
-          </span>
-        ) : null}
-        {state.status === 'error' ? (
-          <span className="entity-edit__error" role="alert">
-            {state.message}
-          </span>
-        ) : null}
-      </div>
-    </form>
+    </InlineEdit>
   );
 }

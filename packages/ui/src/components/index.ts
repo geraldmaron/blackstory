@@ -15,8 +15,20 @@ export {
   type CommandPaletteProps,
 } from './CommandPalette.js';
 export { Confidence, type ConfidenceProps } from './Confidence.js';
-export { DataTable, type DataTableProps, type DataTableColumn } from './DataTable.js';
+export {
+  DataTable,
+  computeRowWindow,
+  type DataTableProps,
+  type DataTableColumn,
+} from './DataTable.js';
+export {
+  DetailPanel,
+  DetailField,
+  type DetailPanelProps,
+  type DetailFieldProps,
+} from './DetailPanel.js';
 export { Dialog, type DialogProps } from './Dialog.js';
+export { InlineEdit, type InlineEditProps, type InlineEditStatus } from './InlineEdit.js';
 export { EmptyState, type EmptyStateProps } from './EmptyState.js';
 export { FacetRail, type FacetRailProps, type FacetGroup, type FacetOption } from './FacetRail.js';
 export { FilterBar, type FilterBarProps, type FilterField } from './FilterBar.js';
@@ -37,6 +49,7 @@ export {
 } from './ResultList.js';
 export { SelectionBar, type SelectionBarProps } from './SelectionBar.js';
 export { ThemeToggle, type ThemeToggleProps } from './ThemeToggle.js';
+export { Toolbar, ToolbarField, type ToolbarProps, type ToolbarFieldProps } from './Toolbar.js';
 export {
   ShellHeader,
   isShellNavActive,
