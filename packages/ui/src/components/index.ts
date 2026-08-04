@@ -5,6 +5,15 @@
 export { Button, type ButtonProps } from './Button.js';
 export { Card, type CardProps } from './Card.js';
 export { Citation, type CitationProps, type CitationLinkStatus } from './Citation.js';
+export {
+  CommandPalette,
+  filterCommandPaletteItems,
+  groupCommandPaletteItems,
+  isCommandPaletteChord,
+  useCommandPaletteHotkey,
+  type CommandPaletteItem,
+  type CommandPaletteProps,
+} from './CommandPalette.js';
 export { Confidence, type ConfidenceProps } from './Confidence.js';
 export { DataTable, type DataTableProps, type DataTableColumn } from './DataTable.js';
 export { Dialog, type DialogProps } from './Dialog.js';

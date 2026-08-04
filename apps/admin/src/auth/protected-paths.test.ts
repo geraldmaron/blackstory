@@ -5,8 +5,8 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { isAuthGatedPath } from './protected-paths';
 
-/** Every page surface in src/app. A new console route must be added here. */
-const CONSOLE_PATHS = [
+/** Every page surface in src/app. A new admin route must be added here. */
+const ADMIN_PATHS = [
   '/',
   '/audit',
   '/cases',
@@ -14,8 +14,6 @@ const CONSOLE_PATHS = [
   '/catalog',
   '/catalog/abc-123',
   '/citation-health',
-  '/console',
-  '/console/research',
   '/discovery',
   '/evidence',
   '/graylist',
@@ -27,8 +25,8 @@ const CONSOLE_PATHS = [
   '/switches',
 ];
 
-test('every console surface is behind the edge auth gate', () => {
-  for (const path of CONSOLE_PATHS) {
+test('every admin surface is behind the edge auth gate', () => {
+  for (const path of ADMIN_PATHS) {
     assert.equal(isAuthGatedPath(path), true, `${path} must be auth-gated`);
   }
 });
