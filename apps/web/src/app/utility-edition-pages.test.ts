@@ -71,3 +71,27 @@ test('not-found keeps archive recovery CTA', () => {
   // on the real index rather than teaching a lost reader to take an extra hop (SP-15).
   assert.match(source, /href="\/records"/);
 });
+
+test('not-found offers the four exits the design law names, and no gallery', () => {
+  // Comments stripped: the file's own header explains which exit was removed and why, so a raw
+  // match on `design-system` would fail on the sentence recording that it is gone.
+  const source = readFileSync(join(appDir, 'not-found.tsx'), 'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/^[ \t]*\/\/.*$/gm, '');
+  // design-direction-v9-surfaces.md §"/_not-found": the palette, the Atlas, Chapters, /records.
+  assert.match(source, /href="\/"/);
+  assert.match(source, /href="\/chapters"/);
+  assert.match(source, /⌘K/);
+  // The `/design-system` exit sent a reader who mistyped a chapter slug to a component gallery.
+  // Its removal is the criterion, so an assertion that it stays removed is the guard.
+  assert.doesNotMatch(source, /design-system/);
+  // `/explore` folded into the Atlas in SP-07. A 404 that still names it teaches a route that
+  // 308s, which is the exact failure this page exists to end.
+  assert.doesNotMatch(source, /Explore/);
+});
+
+test('not-found seeds the bar search with the path it was reached by', () => {
+  const source = readFileSync(join(appDir, 'not-found.tsx'), 'utf8');
+  assert.match(source, /<PaletteSeed \/>/);
+  assert.match(source, /from '\.\.\/components\/shell\/PaletteSeed'/);
+});

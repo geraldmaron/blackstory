@@ -13,13 +13,29 @@
  *
  * The Atlas keeps its palette: there, a record selection also has to move the map, which is a
  * behaviour this component deliberately does not know about.
+ *
+ * It does own `⌘K` and `/` off the Atlas, and that is not a convenience. The palette's own opener
+ * lives inside `CommandPalette`, which only the Atlas mounts, so on the other twelve rooms the
+ * shortcut the bar advertises did nothing at all — including on the root error boundary, where a
+ * thrown segment leaves search as the only way out of the page. The handler below is deliberately
+ * a shell-level listener rather than something a room opts into, because the room is exactly what
+ * is not rendering when it matters most.
  */
 'use client';
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useSyncExternalStore } from 'react';
+import { isTypingTarget, matchesPaletteOpen } from '../../lib/keyboard/bindings';
+import {
+  getPaletteSeed,
+  getServerPaletteSeed,
+  subscribeToPaletteSeed,
+} from '../../lib/shell/palette-seed';
 import { TypeaheadCombobox, type TypeaheadSuggestion } from '../typeahead/TypeaheadCombobox';
 
 void React;
+
+/** The input's id, and the handle the shortcut handler focuses it by. */
+const BAR_SEARCH_INPUT_ID = 'bar-search';
 
 export type CommandBarSearchProps = {
   /** Reads as a promise the surface can keep: the count is only shown where it is known. */
@@ -44,6 +60,30 @@ function entityHrefFrom(id: string): string {
 }
 
 export function CommandBarSearch({ placeholder }: CommandBarSearchProps) {
+  const seed = useSyncExternalStore(subscribeToPaletteSeed, getPaletteSeed, getServerPaletteSeed);
+
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      if (!matchesPaletteOpen(event)) return;
+      // `/` is a character before it is a shortcut. Yielding to whatever the reader is already
+      // typing into is what keeps this from firing inside the correction form's own fields.
+      if (isTypingTarget(event.target)) return;
+      const input = document.getElementById(BAR_SEARCH_INPUT_ID);
+      if (!(input instanceof HTMLInputElement)) return;
+      // Without preventDefault a bare `/` lands in the field it just focused, and the reader's
+      // first real keystroke arrives after a slash they did not type.
+      event.preventDefault();
+      input.focus();
+      // Select rather than clear: on the 404 the field already holds the seeded path, and a
+      // reader who wants to replace it types over the selection while one who wants to edit it
+      // presses an arrow key. Clearing would throw away the only guess the surface has.
+      input.select();
+    }
+
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, []);
+
   const suggestRemote = useCallback(
     async (query: string): Promise<readonly TypeaheadSuggestion[]> => {
       const response = await fetch(`/search/api?q=${encodeURIComponent(query)}`, {
@@ -79,7 +119,13 @@ export function CommandBarSearch({ placeholder }: CommandBarSearchProps) {
 
   return (
     <TypeaheadCombobox
-      id="bar-search"
+      /* The seed arrives from a client effect on the 404, after this component has already
+         mounted holding an empty field, and `defaultValue` is read once. Keying on the seed
+         remounts the combobox so the new default takes — which is also what discards it again
+         when the reader navigates off the 404 and the seed clears. */
+      key={seed}
+      defaultValue={seed}
+      id={BAR_SEARCH_INPUT_ID}
       name="q"
       label="Search records, places and eras"
       hideLabel
