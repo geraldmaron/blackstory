@@ -182,6 +182,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     kindFamily,
     nearMe,
     resetLens,
+    undoLastAction: toasts.runLatestAction,
     selectedFeature,
     selectedId,
     setSelectedId,

@@ -38,6 +38,7 @@ function recordingContext(): { context: CommandContext; calls: string[] } {
     focusSearch: note('focusSearch'),
     nearMe: note('nearMe'),
     resetLens: note('resetLens'),
+    undoLastAction: note('undoLastAction'),
     camera: {
       wide: note('camera.wide'),
       push: note('camera.push'),

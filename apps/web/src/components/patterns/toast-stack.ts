@@ -60,3 +60,18 @@ export function pushToast(stack: readonly ToastSpec[], toast: ToastSpec): readon
 export function dismissToast(stack: readonly ToastSpec[], id: string): readonly ToastSpec[] {
   return stack.filter((entry) => entry.id !== id);
 }
+
+/**
+ * The newest toast carrying an action, or null. What the undo chord acts on.
+ *
+ * Newest rather than oldest: the reader's chord means "undo what just happened", and the stack is
+ * ordered oldest-first. Nothing else in the stack is a candidate — a report-only toast has nothing
+ * to run, so it is skipped rather than blocking the chord.
+ */
+export function latestActionableToast(stack: readonly ToastSpec[]): ToastSpec | null {
+  for (let index = stack.length - 1; index >= 0; index -= 1) {
+    const toast = stack[index];
+    if (toast?.action) return toast;
+  }
+  return null;
+}

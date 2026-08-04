@@ -21,6 +21,7 @@ type UseCommandContextArgs = {
   kindFamily: MapKindFamily | null;
   nearMe: () => void;
   resetLens: () => void;
+  undoLastAction: () => void;
   selectedFeature: ExploreMapFeature | null;
   selectedId: string | undefined;
   setSelectedId: Dispatch<SetStateAction<string | undefined>>;
@@ -51,6 +52,7 @@ export function useCommandContext({
   kindFamily,
   nearMe,
   resetLens,
+  undoLastAction,
   selectedFeature,
   selectedId,
   setSelectedId,
@@ -73,6 +75,7 @@ export function useCommandContext({
       focusSearch: () => setPaletteOpen(true),
       nearMe,
       resetLens,
+      undoLastAction,
       camera,
       stepRecord,
       saveRecord: () => {
@@ -123,6 +126,7 @@ export function useCommandContext({
       nearMe,
       resetLens,
       router,
+      undoLastAction,
       selectedFeature,
       selectedId,
       setChromeHidden,
