@@ -837,7 +837,13 @@ async function main(): Promise<void> {
       await client.query('ROLLBACK');
       if (jsonOutput) {
         console.log(
-          JSON.stringify({ mode, plan: planSummary(plan), preflight, before, warnings: plan.warnings }),
+          JSON.stringify({
+            mode,
+            plan: planSummary(plan),
+            preflight,
+            before,
+            warnings: plan.warnings,
+          }),
         );
       } else {
         console.log(

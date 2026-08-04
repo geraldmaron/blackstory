@@ -11,11 +11,7 @@
 import { randomUUID } from 'node:crypto';
 import { revalidatePath } from 'next/cache';
 import { commitCanonicalWrite } from '@/lib/canonical-write';
-import {
-  applyEntityMerge,
-  readMergeReversalRecord,
-  reverseEntityMerge,
-} from '@/lib/entity-merge';
+import { applyEntityMerge, readMergeReversalRecord, reverseEntityMerge } from '@/lib/entity-merge';
 import {
   countLeftBehind,
   countMoved,

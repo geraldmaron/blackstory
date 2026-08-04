@@ -9,11 +9,11 @@ import {
 } from './palette-seed';
 
 test('a mistyped path becomes the words the reader was reaching for', () => {
+  assert.equal(sanitizePaletteSeed('/chapters/tulsa-race-masacre'), 'chapters tulsa race masacre');
   assert.equal(
-    sanitizePaletteSeed('/chapters/tulsa-race-masacre'),
-    'chapters tulsa race masacre',
+    sanitizePaletteSeed('/entity/lynching_isaac_mcghie'),
+    'entity lynching isaac mcghie',
   );
-  assert.equal(sanitizePaletteSeed('/entity/lynching_isaac_mcghie'), 'entity lynching isaac mcghie');
   assert.equal(sanitizePaletteSeed('/'), '');
 });
 

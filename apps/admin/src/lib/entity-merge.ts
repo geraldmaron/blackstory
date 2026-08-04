@@ -163,7 +163,8 @@ async function moveRelationships(
     moved.rows.map((row) => ({ id: row.id, from: { from: row.old_from, to: row.old_to } })),
     stuck.rows.map((row) => ({
       id: row.id,
-      reason: 'Edge runs between the survivor and an absorbed record; moving it would be a self-loop.',
+      reason:
+        'Edge runs between the survivor and an absorbed record; moving it would be a self-loop.',
     })),
   );
 }
@@ -458,7 +459,8 @@ export async function reverseEntityMerge(
       }
 
       // `entity_aliases` and `entity_identifiers` have no `updated_at` column.
-      const touch = table === 'claims' || table === 'entity_locations' ? ', updated_at = now()' : '';
+      const touch =
+        table === 'claims' || table === 'entity_locations' ? ', updated_at = now()' : '';
       const result = await client.query(
         `UPDATE bb_canonical.${table} SET entity_id = $2${touch} WHERE id = $1`,
         [row.id, row.from.entity],

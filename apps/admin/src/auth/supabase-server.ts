@@ -9,7 +9,10 @@
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import type { StaffRole } from './role-mutation';
-import { readSupabaseRoleFromAppMetadata, readSupabaseServerConfig } from './supabase-session-authorizer';
+import {
+  readSupabaseRoleFromAppMetadata,
+  readSupabaseServerConfig,
+} from './supabase-session-authorizer';
 
 export type ServerAdminIdentity = {
   readonly uid: string;

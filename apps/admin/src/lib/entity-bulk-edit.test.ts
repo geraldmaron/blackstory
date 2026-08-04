@@ -24,8 +24,10 @@ test('a kind change carries its derived class — the form never posts the pair'
     kind: 'institution',
     entityClass: 'organization',
   });
-  assert.equal(parsed.ok && parsed.edit.field === 'kind' && parsed.edit.entityClass,
-    entityClassForKind('institution'));
+  assert.equal(
+    parsed.ok && parsed.edit.field === 'kind' && parsed.edit.entityClass,
+    entityClassForKind('institution'),
+  );
 });
 
 test('the classless kind stays classless rather than being given an invented class', () => {

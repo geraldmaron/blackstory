@@ -17,10 +17,7 @@ import { placeLabelFor } from '../../../lib/map-experience/place-label';
 import type { ExploreMapFeature } from '../../../lib/map-experience/build-explore-map-source';
 import type { DecadeBar } from '../../../lib/map-experience/decade-density';
 import type { StoryChapter } from '../../../lib/story/chapters';
-import {
-  pickStoryRecord,
-  type StoryRecordSpotlight,
-} from '../../../lib/story/pick-story-record';
+import { pickStoryRecord, type StoryRecordSpotlight } from '../../../lib/story/pick-story-record';
 import { pickStoryChapters } from '../../../lib/story/pick-story-chapters';
 
 /**

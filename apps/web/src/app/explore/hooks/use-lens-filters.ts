@@ -3,10 +3,7 @@ import { findUsStateByPostalCode } from '@repo/domain/map/geography';
 import type { UseToasts } from '../../../components/patterns/Toast';
 import type { LensLayers } from '../../../components/map-experience/LensPanel';
 import type { ResultsSort } from '../../../components/map-experience/ResultsRail';
-import {
-  applyEvidenceFloor,
-  type EvidenceFloor,
-} from '../../../lib/map-experience/evidence-grade';
+import { applyEvidenceFloor, type EvidenceFloor } from '../../../lib/map-experience/evidence-grade';
 import { decadeDensityBars } from '../../../lib/map-experience/decade-density';
 import {
   isKnownMapKindFamily,

@@ -62,7 +62,9 @@ export function parseEntityQuery(input: QueryParamInput): EntityQuery {
   const sensitivityClasses = readMany(input, 'sensitivity');
 
   const sortRaw = readOne(input, 'sort');
-  const sort = SORT_KEYS.includes(sortRaw as EntitySortKey) ? (sortRaw as EntitySortKey) : 'updated';
+  const sort = SORT_KEYS.includes(sortRaw as EntitySortKey)
+    ? (sortRaw as EntitySortKey)
+    : 'updated';
 
   const directionRaw = readOne(input, 'dir');
   // Names read naturally A→Z; recency and counts read naturally highest-first.
@@ -156,11 +158,11 @@ export function toggleFacetHref(
 export function hasActiveFilters(query: EntityQuery): boolean {
   return Boolean(
     query.search?.trim() ||
-      query.kinds?.length ||
-      query.entityClasses?.length ||
-      query.livingStatuses?.length ||
-      query.sensitivityClasses?.length ||
-      query.withoutClaims ||
-      (query.mergeState && query.mergeState !== 'active'),
+    query.kinds?.length ||
+    query.entityClasses?.length ||
+    query.livingStatuses?.length ||
+    query.sensitivityClasses?.length ||
+    query.withoutClaims ||
+    (query.mergeState && query.mergeState !== 'active'),
   );
 }

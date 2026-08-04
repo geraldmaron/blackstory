@@ -206,9 +206,7 @@ export function DataTable<Row>({
                     // Mixed state is the honest signal when a page is partly selected.
                     if (node) node.indeterminate = Boolean(someSelected);
                   }}
-                  onChange={() =>
-                    setSelection(allSelected ? new Set() : new Set(rows.map(rowKey)))
-                  }
+                  onChange={() => setSelection(allSelected ? new Set() : new Set(rows.map(rowKey)))}
                 />
               </th>
             ) : null}

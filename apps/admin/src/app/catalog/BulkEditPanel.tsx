@@ -90,7 +90,9 @@ export function BulkEditPanel({
             const next = event.target.value as Field;
             setField(next);
             setConfirming(false);
-            setValue(next === 'kind' ? ENTITY_KINDS[0] : next === 'livingStatus' ? LIVING_STATUSES[0] : '');
+            setValue(
+              next === 'kind' ? ENTITY_KINDS[0] : next === 'livingStatus' ? LIVING_STATUSES[0] : '',
+            );
           }}
         >
           <option value="kind">Kind</option>

@@ -111,10 +111,7 @@ test('Atlas page and entity page keep force-dynamic after all imports', () => {
     readFileSync(join(APP_ROOT, 'entity/[id]/page.tsx'), 'utf8'),
     'entity/[id]/page.tsx',
   );
-  assertForceDynamicAfterImports(
-    readFileSync(join(APP_ROOT, 'page.tsx'), 'utf8'),
-    'page.tsx',
-  );
+  assertForceDynamicAfterImports(readFileSync(join(APP_ROOT, 'page.tsx'), 'utf8'), 'page.tsx');
 });
 
 test('the Atlas is one route — `/` — with no page rendering at /explore', () => {
