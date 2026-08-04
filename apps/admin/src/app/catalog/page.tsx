@@ -29,6 +29,8 @@ import {
   type FacetBucket,
 } from '../../lib/entity-query';
 import { readPostgresOrDegrade } from '../../lib/postgres-client';
+import { readVerifiedAdminIdentity } from '../../auth/supabase-server';
+import { staffRoleHasPermission } from '../../auth/staff-permissions';
 import { EntityWorkbenchTable } from './EntityWorkbenchTable';
 import { formatLivingStatusLabel } from './living-status-label';
 
@@ -72,10 +74,15 @@ export default async function CatalogPage({
   // Rows and facet counts in parallel — both filtered, both resolved before first paint.
   // Both degrade rather than hang: this page blocks first byte on Postgres, so an unreachable
   // database has to cost a banner in seconds, not a render that never returns (repo-7pqy).
-  const [pageOutcome, facetsOutcome] = await Promise.all([
+  const [identity, pageOutcome, facetsOutcome] = await Promise.all([
+    readVerifiedAdminIdentity(),
     readPostgresOrDegrade(() => queryEntityPage(query), 'catalog entities'),
     readPostgresOrDegrade(() => queryEntityFacets(query), 'catalog facets'),
   ]);
+
+  // Resolved here, not in the client island: the browser only knows the operator is signed in,
+  // not which staff role they hold, so a role-gated affordance has to be decided server-side.
+  const canMerge = identity ? staffRoleHasPermission(identity.role, 'canonical:merge') : false;
 
   const degradedReason =
     pageOutcome.status === 'degraded'
@@ -214,6 +221,7 @@ export default async function CatalogPage({
             rows={page.rows}
             total={page.total}
             searchQuery={serializeEntityQuery(query)}
+            canMerge={canMerge}
             sortKey={query.sort ?? 'updated'}
             sortDirection={query.direction ?? 'desc'}
             sortHrefs={{

@@ -787,3 +787,49 @@ body {
 .entity-edit__list-row .entity-edit__form {
   margin: 0;
 }
+
+/* Merge review: choosing a survivor, and the record of merges already made. */
+.entity-merge__form {
+  display: grid;
+  gap: var(--ds-space-4, 1rem);
+}
+
+.entity-merge__choices {
+  display: grid;
+  gap: var(--ds-space-3, 0.75rem);
+  border: 1px solid var(--ds-color-border, #d8d2c8);
+  border-radius: var(--ds-radius-md, 6px);
+  padding: var(--ds-space-4, 1rem);
+}
+
+.entity-merge__choice {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--ds-space-3, 0.75rem);
+  align-items: start;
+}
+
+.entity-merge__choice > span {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.entity-merge__choice-id {
+  font-size: 0.85em;
+  opacity: 0.75;
+}
+
+.entity-merge__cancel {
+  align-self: center;
+}
+
+.entity-merge__record {
+  border-left: 3px solid var(--ds-color-border, #d8d2c8);
+  padding-left: var(--ds-space-4, 1rem);
+  margin-block: var(--ds-space-4, 1rem);
+}
+
+.entity-merge__done {
+  display: grid;
+  gap: var(--ds-space-3, 0.75rem);
+}

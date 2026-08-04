@@ -31,6 +31,7 @@ import { commitWithAuditPostgres, type PostgresCommitInput } from './postgres-co
 export const CANONICAL_WRITE_VERBS = [
   'entity.field_edit',
   'entity.merge',
+  'entity.merge_reverse',
   'entity.bulk_kind_reassign',
 ] as const;
 
@@ -39,6 +40,8 @@ export type CanonicalWriteVerb = (typeof CANONICAL_WRITE_VERBS)[number];
 const PERMISSION_BY_VERB: Readonly<Record<CanonicalWriteVerb, AdminPermission>> = {
   'entity.field_edit': 'canonical:write',
   'entity.merge': 'canonical:merge',
+  // Reversing a merge needs the same authority as making one: both rewrite who owns what.
+  'entity.merge_reverse': 'canonical:merge',
   'entity.bulk_kind_reassign': 'canonical:bulk_write',
 };
 
@@ -62,8 +65,13 @@ export type CanonicalWriteRequest = {
   readonly correlationId?: string;
   /** How many canonical rows this write touches; recorded so bulk edits are legible in the log. */
   readonly affectedCount?: number;
-  /** The actual state change, inside the audited transaction. */
-  readonly applyState: (client: pg.PoolClient) => Promise<void>;
+  /**
+   * The actual state change, inside the audited transaction. Anything it returns is merged into
+   * the audit event's `data` — detail that only exists once the write has run (which row ids
+   * moved, what was left behind) has nowhere else to be recorded, and the audit row is inserted
+   * after this callback, so it lands in the same transaction.
+   */
+  readonly applyState: (client: pg.PoolClient) => Promise<void | Readonly<Record<string, unknown>>>;
 };
 
 export type CanonicalWriteResult =
@@ -163,6 +171,16 @@ export async function commitCanonicalWrite(
   const correlationId = request.correlationId ?? deps.newId();
   const idempotencyKey = request.idempotencyKey ?? `canonical:${request.verb}:${eventId}`;
 
+  // Held by reference: `applyState` runs before the audit row is serialized, so anything it
+  // returns can still be folded in.
+  const auditData: Record<string, unknown> = {
+    ...(request.data ?? {}),
+    verb: request.verb,
+    permission,
+    actorRole: identity.role,
+    affectedCount: request.affectedCount ?? 1,
+  };
+
   const auditEvent: DomainAuditEvent = {
     id: eventId,
     // Canonical edits are corrections to a published record, which is what the closed audit
@@ -177,13 +195,7 @@ export async function commitCanonicalWrite(
     entityId: subjectId,
     idempotencyKey,
     occurredAt,
-    data: {
-      ...(request.data ?? {}),
-      verb: request.verb,
-      permission,
-      actorRole: identity.role,
-      affectedCount: request.affectedCount ?? 1,
-    },
+    data: auditData,
   };
 
   const outboxMessage: DomainOutboxMessage = {
@@ -203,7 +215,14 @@ export async function commitCanonicalWrite(
   };
 
   try {
-    const result = await deps.commit({ auditEvent, outboxMessage, applyState: request.applyState });
+    const result = await deps.commit({
+      auditEvent,
+      outboxMessage,
+      applyState: async (client) => {
+        const extra = await request.applyState(client);
+        if (extra) Object.assign(auditData, extra);
+      },
+    });
     return {
       status: 'ok',
       eventId: result.eventId,

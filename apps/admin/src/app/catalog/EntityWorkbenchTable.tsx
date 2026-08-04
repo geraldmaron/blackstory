@@ -37,7 +37,19 @@ type Props = {
   readonly sortKey: EntitySortKey;
   readonly sortDirection: 'asc' | 'desc';
   readonly sortHrefs: Readonly<Record<'name' | 'kind' | 'claims' | 'updated', string>>;
+  /**
+   * Resolved on the server: the browser only knows someone is signed in, not which staff role
+   * they hold. Hiding the affordance is presentation — `/catalog/merge` re-checks the role.
+   */
+  readonly canMerge: boolean;
 };
+
+/**
+ * A merge review URL carries ids explicitly rather than replaying the filter, because a merge is
+ * about these specific records. Past this many, the URL stops being a reasonable carrier and the
+ * selection is almost certainly wrong anyway.
+ */
+const MAX_MERGE_SELECTION = 26;
 
 function formatWhen(iso: string): string {
   const date = new Date(iso);
@@ -52,6 +64,7 @@ export function EntityWorkbenchTable({
   sortKey,
   sortDirection,
   sortHrefs,
+  canMerge,
 }: Props) {
   const router = useRouter();
   const { getIdToken } = useAdminAuth();
@@ -248,6 +261,14 @@ export function EntityWorkbenchTable({
             placeholder="Reason (required, audited)"
           />
         </label>
+        {canMerge && selectedIds.size >= 2 && selectedIds.size <= MAX_MERGE_SELECTION ? (
+          <Link
+            className="ds-selection-bar__escalate"
+            href={`/catalog/merge?ids=${[...selectedIds].map(encodeURIComponent).join(',')}`}
+          >
+            Merge {selectedIds.size}…
+          </Link>
+        ) : null}
         {(Object.keys(ACTION_LABEL) as CatalogDecisionAction[]).map((action) => (
           <button
             key={action}

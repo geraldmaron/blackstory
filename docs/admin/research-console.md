@@ -55,12 +55,38 @@ outbox message in one transaction. A canonical write without an audit row cannot
 |------|-----------|-------|
 | `entity.field_edit` | `canonical:write` | admin, research |
 | `entity.merge` | `canonical:merge` | admin |
+| `entity.merge_reverse` | `canonical:merge` | admin |
 | `entity.bulk_kind_reassign` | `canonical:bulk_write` | admin |
 
 `apps/admin/src/auth/staff-permissions.ts` is the single role→permission table; the server gate
 and `useAdminPermissions` both read it, so a hidden button and an enforced permission cannot
 drift apart. Every write requires a non-empty operator reason, and the audit actor is always the
 verified session identity — never an operator id submitted with the form.
+
+## Merging entities
+
+Select two or more records in the workbench and choose Merge (`/catalog/merge?ids=…`). The
+survivor keeps its own name, kind, and sensitivity; everything the absorbed records own moves to
+it, and the absorbed records stay in the archive marked `merge_state.status = 'absorbed'`.
+
+**A merge moves rows and never deletes them.** A row that cannot move cleanly stays with the
+absorbed record and is reported on the survivor's page. The live schema produces exactly three
+such cases: an `entity_relationships` edge or an `event_participation` row whose endpoints would
+both become the survivor (a self-loop is not a fact about anything), a participation row that
+would violate `UNIQUE (event_id, participant_id, role)`, and the single-row-per-entity tables
+`entity_embeddings` and `entity_reconciliation_status`, where the survivor's own row wins.
+
+Because nothing is destroyed, the merge is reversible in the literal sense: `applyState` returns
+the id of every row it moved and where it came from, that record is written onto the merge's audit
+event, and Reverse this merge (on the survivor's page) reads it back and repoints each row.
+Merges made before this existed — including the two from
+`packages/ops-data/scripts/merge-duplicate-hubs.ts`, which resolves collisions by deleting the
+losing rows — have no reversal record and are shown as not reversible rather than offering a
+button that would fail.
+
+A merge is a canonical decision and does not touch `bb_public.release_entities` or
+`bb_public.search_index`. The next release build reads canonical; the signed manifest is still the
+only thing that changes what is live.
 
 ## Query timeouts
 

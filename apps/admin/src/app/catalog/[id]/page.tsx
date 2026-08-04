@@ -15,9 +15,11 @@ import { SENSITIVITY_CLASSES } from '@repo/domain';
 import { readVerifiedAdminIdentity } from '../../../auth/supabase-server';
 import { staffRoleHasPermission } from '../../../auth/staff-permissions';
 import { readEntityDetail } from '../../../lib/entity-detail';
+import { readActiveMergesFor } from '../../../lib/entity-merge';
 import { readPostgresOrDegrade } from '../../../lib/postgres-client';
 import { formatLivingStatusLabel } from '../living-status-label';
 import { EntityRecordEditor } from './EntityRecordEditor';
+import { ReverseMergeForm } from './ReverseMergeForm';
 
 function formatWhen(iso: string): string {
   if (!iso) return '—';
@@ -40,9 +42,10 @@ export default async function CatalogEntityDetailPage({
   const { id } = await params;
   const entityId = decodeURIComponent(id);
 
-  const [identity, outcome] = await Promise.all([
+  const [identity, outcome, mergesOutcome] = await Promise.all([
     readVerifiedAdminIdentity(),
     readPostgresOrDegrade(() => readEntityDetail(entityId), 'entity detail'),
+    readPostgresOrDegrade(() => readActiveMergesFor(entityId), 'entity merges'),
   ]);
 
   if (outcome.status === 'degraded') {
@@ -64,6 +67,8 @@ export default async function CatalogEntityDetailPage({
   if (!entity) notFound();
 
   const canEdit = identity ? staffRoleHasPermission(identity.role, 'canonical:write') : false;
+  const canMerge = identity ? staffRoleHasPermission(identity.role, 'canonical:merge') : false;
+  const merges = mergesOutcome.status === 'ok' ? mergesOutcome.value : [];
 
   return (
     <main className="story-review ds-container ds-page" id="main">
@@ -188,6 +193,51 @@ export default async function CatalogEntityDetailPage({
           Locations are read-only here. Each row carries geometry, geohash, jurisdiction, and
           validity fields that need a geocoding flow rather than a text box — tracked separately.
         </p>
+
+        {merges.length > 0 ? (
+          <>
+            <h2 className="ds-section__title">Absorbed records</h2>
+            <p className="ds-sans">
+              This record survived {merges.length === 1 ? 'a merge' : `${merges.length} merges`}.
+              The absorbed records are still in the archive, marked absorbed, and everything that
+              could move is now here.
+            </p>
+            {merges.map((merge) => (
+              <div key={merge.mergeId} className="entity-merge__record">
+                <p className="ds-sans">
+                  {merge.absorbedIds.map((absorbedId, index) => (
+                    <span key={absorbedId}>
+                      {index > 0 ? ', ' : ''}
+                      <Link href={`/catalog/${encodeURIComponent(absorbedId)}`}>{absorbedId}</Link>
+                    </span>
+                  ))}
+                  {' — '}
+                  {merge.reason}
+                </p>
+                <p className="entity-edit__hint ds-sans">
+                  <span className="ds-mono">{merge.mergeId}</span> · {formatWhen(merge.createdAt)}
+                </p>
+                {merge.leftBehind.length > 0 ? (
+                  <ul className="story-review__anchors">
+                    {merge.leftBehind.map((entry, index) => (
+                      <li key={`${merge.mergeId}-${index}`}>
+                        <span className="ds-mono">{entry.table}</span> — {entry.reason}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+                {canMerge && merge.reversible ? (
+                  <ReverseMergeForm mergeId={merge.mergeId} />
+                ) : canMerge ? (
+                  <p className="entity-edit__hint ds-sans">
+                    This merge predates the console&rsquo;s reversal record, so it cannot be undone
+                    from here.
+                  </p>
+                ) : null}
+              </div>
+            ))}
+          </>
+        ) : null}
       </section>
     </main>
   );
