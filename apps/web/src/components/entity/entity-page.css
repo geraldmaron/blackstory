@@ -114,12 +114,12 @@
 .ds-entity-location-map-surface .ds-map-scrim {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: var(--ds-z-map-scrim);
 }
 
 .ds-entity-location-map-surface .ds-map-stage {
   position: relative;
-  z-index: 0;
+  z-index: var(--ds-z-map-plate);
   /* Reserve the map plate's height (matches `.ds-entity-location-map__frame`'s 14rem) so the
    * surface never collapses to 0 while the lazy MapLibre chunk / MapFrame placeholder is still
    * resolving. Without this the absolutely-positioned `.ds-cinematic-rail` button lands at y≈0
@@ -151,7 +151,7 @@
   top: var(--ds-space-3);
   right: var(--ds-space-3);
   left: auto;
-  z-index: 3;
+  z-index: var(--ds-z-cinematic-rail);
 }
 
 .ds-entity-location-map__frame {

@@ -14,7 +14,7 @@
    handwritten names run straight through the header and the list. */
 .ds-memorial-edition .ds-room {
   position: relative;
-  z-index: 1;
+  z-index: var(--ds-z-content);
 }
 
 /* First screen reads as wall plus title only: the opening block reserves the
@@ -52,7 +52,7 @@
   left: var(--memorial-content-left, 3vw);
   top: 60vh;
   top: 60svh;
-  z-index: 1;
+  z-index: var(--ds-z-content);
   display: inline-flex;
   flex-direction: row;
   align-items: center;
@@ -227,7 +227,7 @@
   position: sticky;
   /* Clears the shell's floating bar so the rail is reachable at any depth. */
   top: calc(var(--ds-island-clearance) + var(--ds-space-2));
-  z-index: 2;
+  z-index: var(--ds-z-memorial-jump);
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;

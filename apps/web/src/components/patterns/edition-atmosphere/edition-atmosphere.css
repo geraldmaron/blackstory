@@ -29,7 +29,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  z-index: 0;
+  z-index: 0; /* local: paints under this canvas's own content, not a global tier */
   pointer-events: none;
   background-color: var(--ds-canvas);
   background-image: var(--ds-edition-pattern-archive-grid), var(--ds-edition-pattern-grain);
@@ -51,7 +51,7 @@
 .ds-edition-atmosphere {
   position: absolute;
   inset: 0;
-  z-index: 0;
+  z-index: 0; /* local: paints under this component's own content, not a global tier */
   pointer-events: none;
   overflow: hidden;
 }

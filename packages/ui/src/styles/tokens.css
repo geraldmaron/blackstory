@@ -198,6 +198,59 @@
   --ds-grid-max: 72rem;
   --ds-content-max: 38rem;
   --ds-gutter: var(--ds-space-4);
+
+  /*
+   * z-index ladder (repo-92n2.7). One ladder replacing the three informal numeric bands raw
+   * literals had converged on: local/component stacking (0-6), route-level fixed chrome
+   * (20-30), and shell/portal overlay chrome (40-1000). This is a value-preserving refactor —
+   * every tier below is set to the exact number the selector it names already used; nothing
+   * was reordered or resolved. Declared in strictly ascending (non-decreasing) order; tiers
+   * that share a value intentionally sit adjacent so the collision stays visible.
+   *
+   * Four collisions below are flagged as genuinely ambiguous — same value, unrelated selectors
+   * — and are tokened at their current value rather than re-tiered, because resolving them is
+   * a design decision, not part of this refactor:
+   *   - --ds-z-instrument (20): seven unrelated route-fixed panels share this value.
+   *   - --ds-z-atlas-pill (21) and --ds-z-atlas-search (30): the Atlas pill/search pairing.
+   *   - --ds-z-modal-sheet (90): the shortcuts sheet and the saved/collections drawer.
+   *   - --ds-z-scrim-toast (95): the toast stack and the shell drawer scrim.
+   */
+
+  /* Band A — local/component stacking (route content, page decoration, panel internals). */
+  --ds-z-decoration: 0; /* shell.css .ds-page-field: decorative motif behind page content */
+  --ds-z-map-plate: 0; /* persistent MapLibre plate baseline (map-surfaces.css, entity-page) */
+  --ds-z-content: 1; /* route/page content sitting one level above a local plate or decoration */
+  --ds-z-map-scrim: 1; /* Cinematic Map Backdrop legibility scrim over the plate */
+  --ds-z-map-plate-engaged: 1; /* map plate raised to scrim tier while Cinematic is Engaged */
+  --ds-z-restore-dock: 2; /* explore stage's collapsed-panel restore chips */
+  --ds-z-memorial-jump: 2; /* memorial edition's sticky jump rail */
+  --ds-z-cinematic-content: 2; /* Cinematic Map Backdrop route-owned content wrapper */
+  --ds-z-instrument-panel: 3; /* explore stage's fixed notice/instruments/results panels */
+  --ds-z-cinematic-rail: 3; /* Cinematic Map Backdrop Explore/Close rail controls */
+  --ds-z-spotlight: 4; /* explore stage's native-dialog spotlight */
+  --ds-z-cinematic-rail-engaged: 5; /* cinematic rail pinned above the header while Engaged */
+  --ds-z-annotation: 5; /* map-experience annotation overlay */
+  --ds-z-decade-dock: 6; /* explore edition's persistent decade scrub dock */
+  --ds-z-atlas-modal: 6; /* Atlas spotlight dialog */
+
+  /* Band B — route-level fixed chrome. */
+  --ds-z-instrument: 20; /* flagged: typeahead, camera, lens, results rail, time panel, story
+                             mode, and the Atlas dock all converged on this value independently */
+  --ds-z-atlas-pill: 21; /* flagged: ambiguous relative to --ds-z-instrument (20) */
+  --ds-z-atlas-search: 30; /* flagged: ambiguous relative to --ds-z-atlas-pill (21) */
+
+  /* Band C — shell/portal overlay chrome. */
+  --ds-z-record-sheet: 40;
+  --ds-z-command-bar: 50;
+  --ds-z-command-overlay: 60; /* command bar's own dropdown and the command palette */
+  --ds-z-shell-header: 80;
+  --ds-z-header-menu: 90; /* shell header's "more" overflow panel */
+  --ds-z-modal-sheet: 90; /* flagged: shortcut sheet and saved/collections drawer share this
+                              value; kept together rather than split apart */
+  --ds-z-scrim-toast: 95; /* flagged: toast stack and shell drawer scrim share this value;
+                              kept together rather than split apart */
+  --ds-z-nav-drawer: 100;
+  --ds-z-a11y-escape: 1000; /* skip-link and visually-hidden focus escape hatches */
 }
 
 @media (prefers-reduced-motion: reduce) {

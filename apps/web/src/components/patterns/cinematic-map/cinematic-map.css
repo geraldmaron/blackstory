@@ -19,7 +19,7 @@
 .ds-map-scrim {
   position: fixed;
   inset: 0;
-  z-index: 1;
+  z-index: var(--ds-z-map-scrim);
   pointer-events: none;
   /* Theme-aware: tint with the page canvas so the scrim dims toward paper in light
      mode and toward ink in dark mode — never a black veil over a cream page. */
@@ -44,7 +44,7 @@
    (spec §5 "content pointer-events: none + faded"). */
 .ds-cinematic-content {
   position: relative;
-  z-index: 2;
+  z-index: var(--ds-z-cinematic-content);
   opacity: 1;
   transition: opacity var(--ds-duration-base) var(--ds-easing);
 }
@@ -110,7 +110,7 @@
 /* Engaged has no hero inset, so the plate drops to its baseline z-index — which is below the
    page root that still hosts the (now transparent) hero. Raise it for the duration. */
 :root[data-cinematic-engaged='true'] .ds-map-surface .ds-map-stage {
-  z-index: 1;
+  z-index: var(--ds-z-map-plate-engaged);
 }
 
 /* Receding content keeps its layout box (`visibility`, not `display`), and the bare layout
@@ -134,7 +134,7 @@
   top: calc(var(--ds-island-clearance) + var(--ds-space-2));
   right: var(--ds-space-4);
   left: auto;
-  z-index: 5;
+  z-index: var(--ds-z-cinematic-rail-engaged);
 }
 
 /* ---- Rail (z3) — Explore/Close controls ----------------------------------------------- */
@@ -142,7 +142,7 @@
 .ds-cinematic-rail {
   position: sticky;
   top: var(--ds-space-4);
-  z-index: 3;
+  z-index: var(--ds-z-cinematic-rail);
   display: flex;
   align-items: center;
   justify-content: flex-end;

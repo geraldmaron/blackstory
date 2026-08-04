@@ -331,7 +331,7 @@
   position: fixed;
   top: calc(var(--ds-island-offset) + var(--ds-space-2));
   left: var(--ds-space-2);
-  z-index: 1000;
+  z-index: var(--ds-z-a11y-escape);
   width: auto;
   height: auto;
   margin: 0;
@@ -366,13 +366,13 @@
    surface there, and a motif over it is decoration competing with data. ——  */
 .ds-shell-page-transition__content {
   position: relative;
-  z-index: 1;
+  z-index: var(--ds-z-content);
 }
 
 .ds-page-field {
   position: absolute;
   inset: 0;
-  z-index: 0;
+  z-index: var(--ds-z-decoration);
   pointer-events: none;
   background-color: transparent;
   background-image: var(--ds-page-field-light);
@@ -1785,7 +1785,7 @@
 .ds-map-stage {
   position: fixed;
   inset: 0;
-  z-index: 0;
+  z-index: var(--ds-z-map-plate);
   height: 100dvh;
   /* Pre-style-load flash — dark ocean by default; light theme matches Archive Paper. */
   background: #080606;
@@ -1796,7 +1796,7 @@
    needs no surface gate. */
 .ds-shell-footer {
   position: relative;
-  z-index: 1;
+  z-index: var(--ds-z-content);
 }
 
 [data-theme='light'] .ds-map-stage {
@@ -1810,7 +1810,7 @@
    DOM sibling under this canvas. */
 .ds-map-stage__canvas {
   position: relative;
-  z-index: 1;
+  z-index: var(--ds-z-content);
   width: 100%;
   height: 100%;
   /* Isolate MapLibre stacking so canvas children cannot slip under chrome. */
@@ -1847,7 +1847,7 @@
   bottom: var(--ds-map-attrib-bottom);
   left: var(--ds-map-attrib-left);
   margin: 0;
-  z-index: 1;
+  z-index: var(--ds-z-content);
 }
 
 .ds-map-stage .maplibregl-ctrl-attrib {

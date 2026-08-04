@@ -238,7 +238,7 @@
   position: absolute;
   top: 0;
   right: 0;
-  z-index: 2;
+  z-index: 2; /* local: sits above this card's own content, not a global tier */
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -499,7 +499,7 @@
 .ds-explore__layer-model-option:has(input:focus-visible) {
   outline: var(--ds-focus-width) solid var(--ds-accent-graphic);
   outline-offset: -2px;
-  z-index: 1;
+  z-index: 1; /* local: pops the focused option above its unfocused siblings, not a global tier */
 }
 
 .ds-explore__layer-model-range {

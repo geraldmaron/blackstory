@@ -19,7 +19,7 @@
      to breathe past the fold before the readable list starts. */
   height: 125vh;
   height: 125svh;
-  z-index: 0;
+  z-index: 0; /* local: paints under the room content that follows it, not a global tier */
   overflow: hidden;
   pointer-events: none;
 }
@@ -114,7 +114,7 @@
   top: var(--memorial-message-top, 34vh);
   top: var(--memorial-message-top, 34svh);
   left: var(--memorial-content-left, 3vw);
-  z-index: 1;
+  z-index: 1; /* local: paints over the wall behind it, not a global tier */
   width: min(94vw, 46rem);
   pointer-events: none;
 }

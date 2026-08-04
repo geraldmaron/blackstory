@@ -8,7 +8,7 @@
 .ds-shortcuts {
   position: fixed;
   inset: 0;
-  z-index: 90;
+  z-index: var(--ds-z-modal-sheet);
   display: grid;
   align-content: center;
   justify-items: center;

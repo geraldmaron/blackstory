@@ -24,7 +24,7 @@
    an opaque backdrop. */
 .ds-map-surface main {
   position: relative;
-  z-index: 1;
+  z-index: var(--ds-z-content);
   background: var(--ds-canvas);
 }
 
@@ -75,7 +75,7 @@
   --ds-explore-instruments-width: min(19rem, 88%);
   --ds-explore-results-width: min(22.5rem, 92%);
   position: relative;
-  z-index: 1;
+  z-index: var(--ds-z-content);
   /* Fill the map-explore shell so floating chrome anchors to a real surface height. */
   flex: 1 1 auto;
   min-height: 100%;
@@ -89,7 +89,7 @@
   position: fixed;
   top: calc(var(--ds-island-clearance) + var(--ds-space-2));
   left: 50%;
-  z-index: 3;
+  z-index: var(--ds-z-instrument-panel);
   width: min(34rem, calc(100% - var(--ds-explore-edge) * 2));
   max-width: calc(100% - var(--ds-explore-edge) * 2);
   transform: translateX(-50%);
@@ -101,7 +101,7 @@
   position: fixed;
   top: calc(var(--ds-island-clearance) + var(--ds-space-2));
   left: var(--ds-explore-edge);
-  z-index: 3;
+  z-index: var(--ds-z-instrument-panel);
   display: grid;
   align-content: start;
   gap: var(--ds-space-2);
@@ -401,7 +401,7 @@
 .ds-explore-stage__panel-header {
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: var(--ds-z-content);
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -461,7 +461,7 @@
   top: calc(var(--ds-island-clearance) + var(--ds-space-2));
   left: var(--ds-explore-edge);
   right: var(--ds-explore-edge);
-  z-index: 2;
+  z-index: var(--ds-z-restore-dock);
   display: flex;
   flex-wrap: wrap;
   gap: var(--ds-space-2);
@@ -563,7 +563,7 @@
   position: fixed;
   top: calc(var(--ds-island-clearance) + var(--ds-space-2));
   right: var(--ds-explore-edge);
-  z-index: 3;
+  z-index: var(--ds-z-instrument-panel);
   display: grid;
   gap: var(--ds-space-3);
   width: var(--ds-explore-results-width);
@@ -592,7 +592,7 @@
 .ds-explore-stage__spotlight {
   position: fixed;
   inset: 0;
-  z-index: 4;
+  z-index: var(--ds-z-spotlight);
   display: grid;
   place-items: center;
   width: 100%;
@@ -623,7 +623,7 @@
 
 .ds-explore-stage__spotlight-panel {
   position: relative;
-  z-index: 1;
+  z-index: var(--ds-z-content);
   width: min(32rem, 100%);
   max-width: 100%;
   max-height: min(78svh, 40rem);

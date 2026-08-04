@@ -20,7 +20,7 @@
 .ds-story {
   position: fixed;
   inset: 0;
-  z-index: 20;
+  z-index: var(--ds-z-instrument);
   overflow-y: auto;
   overscroll-behavior-y: contain;
   scroll-snap-type: y proximity;

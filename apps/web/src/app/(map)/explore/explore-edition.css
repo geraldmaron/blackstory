@@ -76,7 +76,7 @@
 .ds-explore-edition__tab:focus-visible {
   outline: var(--ds-focus-width) solid var(--ds-accent-graphic);
   outline-offset: -2px;
-  z-index: 1;
+  z-index: 1; /* local: pops the focused tab above its unfocused siblings, not a global tier */
 }
 
 /* Segmented on/off strips — group nearby, layer model rows (browse-mode register). */
@@ -150,7 +150,7 @@
 .ds-explore-edition__segment:focus-visible {
   outline: var(--ds-focus-width) solid var(--ds-accent-graphic);
   outline-offset: -2px;
-  z-index: 1;
+  z-index: 1; /* local: pops the focused segment above its unfocused siblings, not a global tier */
 }
 
 .ds-explore-edition__segment-strip--stack .ds-explore-edition__segment {
@@ -257,7 +257,7 @@
   bottom: calc(var(--ds-space-4) + 3.5rem);
   transform: translateX(-50%);
   /* Above cinematic rail (z5) and explore-stage pass-through; must take hits. */
-  z-index: 6;
+  z-index: var(--ds-z-decade-dock);
   pointer-events: auto;
   /* Own horizontal scrub; MapLibre must not pan from a drag that started here. */
   touch-action: none;

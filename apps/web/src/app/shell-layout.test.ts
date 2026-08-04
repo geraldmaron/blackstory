@@ -76,7 +76,10 @@ describe('explore decade dock hit target', () => {
       exploreEditionCss,
       /\.ds-explore-stage__decade-dock\s*\{[^}]*pointer-events:\s*auto/s,
     );
-    assert.match(exploreEditionCss, /\.ds-explore-stage__decade-dock\s*\{[^}]*z-index:\s*6/s);
+    assert.match(
+      exploreEditionCss,
+      /\.ds-explore-stage__decade-dock\s*\{[^}]*z-index:\s*var\(--ds-z-decade-dock\)/s,
+    );
     assert.match(
       exploreEditionCss,
       /\.ds-explore-stage__decade-dock\s*\{[^}]*touch-action:\s*none/s,
