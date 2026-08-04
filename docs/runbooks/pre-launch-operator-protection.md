@@ -79,18 +79,20 @@ anything else.
   **Verify:** `git log -1 --format='%an <%ae>'` shows only the pseudonym/role identity; a full
   history scan (step 3) has been run and its result recorded (clean, or rewritten, or
   knowingly-accepted).
-- [ ] **Replace the personal security contact with a role address.**
-  `apps/web/src/app/.well-known/security.txt/route.ts` serves a real RFC 9116 file on
-  `blackstory.app`, but `Contact:` is still the operator's personal mailbox
-  (`me@geralddagher.com`) — reachable, which the old `.example` placeholder was not, but it ties
-  vulnerability reports to an individual rather than a role.
-  1. Create a `security@blackstory.app` mailbox (an alias forwarding to the operator's real inbox
-     is sufficient — it does not need to be a distinct mail account).
-  2. Set `SECURITY_TXT_CONTACT=security@blackstory.app` in the web app's deployment environment.
-     The route reads that env var and needs no code change; the personal address is only the
-     fallback default.
-  **Verify:** `GET https://blackstory.app/.well-known/security.txt` returns a `Contact:` line with
-  the role mailbox, not a personal address.
+- [x] **Published contact address — decided, not outstanding.**
+  **Owner decision, 2026-08-04:** `me@geralddagher.com` is the published contact on `/support`,
+  `/privacy` and `/.well-known/security.txt`. A role alias was considered and declined.
+
+  This is a knowing trade rather than an oversight, and it is worth keeping written down: these
+  are the surfaces a hostile reader reaches for first, and a personal mailbox on them ties reports
+  — and harassment — to an individual rather than to a role. The archive covers racial violence,
+  so that is not a theoretical exposure.
+
+  Nothing needs to be built to revisit it. `apps/web/src/lib/config/contact.ts` is the single
+  source all three surfaces read, and both values stay env-overridable: set `SUPPORT_CONTACT` and
+  `SECURITY_TXT_CONTACT` in the deployment environment and no code changes.
+  **Verify:** `GET https://blackstory.app/.well-known/security.txt` returns a `Contact:` line
+  matching whatever `contact.ts` resolves to.
 
 ## 2. Root-account hardening (free; blocks the worst case)
 

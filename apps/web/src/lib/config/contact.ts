@@ -6,23 +6,17 @@
  * exists to remove: changing one and forgetting the other publishes two different answers to
  * "who do I tell", and the one that rots is the one nobody reads.
  *
- * Both values are env-overridable so the owner can move to role mailboxes without a code change.
- * Until `SUPPORT_CONTACT` and `SECURITY_TXT_CONTACT` are set in the deployed environment the
- * fallback is still a personal address — see repo-92n2.13, which cannot close on that criterion
- * until role mailboxes exist and DNS for them is live.
+ * `me@geralddagher.com` is the published address by the owner's decision (2026-08-04), not a
+ * placeholder waiting on a role mailbox. It is a personal address, and that trade was made
+ * knowingly: these two surfaces are the ones a hostile reader reaches for, and an alias would put
+ * a name between them and the operator's inbox while delivering to the same place. If that trade
+ * is ever revisited, both values stay env-overridable — set `SUPPORT_CONTACT` and
+ * `SECURITY_TXT_CONTACT` in the deployed environment and no code changes.
  */
 
-/** Role mailbox for general support, privacy and accessibility contact. Published on /support. */
+/** General support, privacy and accessibility contact. Published on /support and /privacy. */
 export const SUPPORT_CONTACT: string = process.env.SUPPORT_CONTACT?.trim() || 'me@geralddagher.com';
 
 /** RFC 9116 security contact. Published in /.well-known/security.txt. */
 export const SECURITY_CONTACT: string =
   process.env.SECURITY_TXT_CONTACT?.trim() || 'me@geralddagher.com';
-
-/**
- * True when a published contact is still the personal fallback rather than a role mailbox.
- * Asserted in tests so that shipping the fallback stays a deliberate, visible choice.
- */
-export function isPersonalContactFallback(address: string): boolean {
-  return address.endsWith('@geralddagher.com');
-}

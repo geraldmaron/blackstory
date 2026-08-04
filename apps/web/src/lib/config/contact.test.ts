@@ -12,7 +12,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { isPersonalContactFallback, SECURITY_CONTACT, SUPPORT_CONTACT } from './contact.js';
+import { SECURITY_CONTACT, SUPPORT_CONTACT } from './contact.js';
 
 const srcDir = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -43,7 +43,11 @@ test('both published contacts are non-empty addresses', () => {
   }
 });
 
-test('the personal-fallback detector recognises the unset state', () => {
-  assert.equal(isPersonalContactFallback('me@geralddagher.com'), true);
-  assert.equal(isPersonalContactFallback('support@blackstory.app'), false);
+test('the decided address is the one that ships when the environment sets nothing', () => {
+  // Owner decision, 2026-08-04: this address is the published contact, not a placeholder. Pinned
+  // because it is a personal mailbox on two public surfaces — if it ever changes, that should be
+  // someone editing this line on purpose rather than a default quietly drifting.
+  const expected = 'me@geralddagher.com';
+  assert.equal(process.env.SUPPORT_CONTACT?.trim() || SUPPORT_CONTACT, expected);
+  assert.equal(process.env.SECURITY_TXT_CONTACT?.trim() || SECURITY_CONTACT, expected);
 });
