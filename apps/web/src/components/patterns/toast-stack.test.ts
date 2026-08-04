@@ -22,10 +22,12 @@ const actionable: ToastSpec = {
   action: { label: 'Undo', run: () => {} },
 };
 
-test('an actionable toast stays longer than a report-only toast', () => {
+test('a report-only toast leaves on its own; an actionable one waits for the reader', () => {
   assert.equal(toastDurationMs(plain), TOAST_DURATION_MS);
-  assert.equal(toastDurationMs(actionable), TOAST_ACTION_DURATION_MS);
-  assert.ok(TOAST_ACTION_DURATION_MS > TOAST_DURATION_MS);
+  // Null, not a longer number. Undo behind a timer is a race the reader did not agree to enter,
+  // and the readers who need the longest to reach the button are the ones a timer excludes.
+  assert.equal(TOAST_ACTION_DURATION_MS, null);
+  assert.equal(toastDurationMs(actionable), null);
 });
 
 test('newest toast lands last', () => {

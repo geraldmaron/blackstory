@@ -142,8 +142,15 @@
   gap: var(--ds-space-2);
 }
 
+/*
+ * 44px, not the 30px this used to be. These chips are the only way back to a hidden instrument,
+ * they sit in the bottom corner where a thumb naturally lands, and they are most often reached on
+ * the narrow layout that docks both panels by default. A 30px target there is a miss waiting to
+ * happen on the one control that undoes the reader's last action.
+ */
 .ds-atlas__dock button {
-  min-height: 30px;
+  min-height: 44px;
+  min-width: 44px;
   padding: 0 var(--ds-space-3);
   border: var(--ds-border-width) solid var(--ds-border);
   border-radius: var(--ds-radius-full);

@@ -15,8 +15,9 @@
  */
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Notice } from '@repo/ui';
+import { focusLandmark } from '../../../lib/keyboard/use-focus-trap';
 import { CommandBar } from '../../../components/shell/CommandBar';
 import { CommandPalette } from '../../../components/patterns/command-palette/CommandPalette';
 import { ShortcutSheet } from '../../../components/patterns/ShortcutSheet';
@@ -78,6 +79,41 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     setChromeHidden,
     showPanel,
   } = usePanelVisibility();
+
+  /**
+   * The focus contract for the two panel transitions (design-direction-v9-atlas.md §7).
+   *
+   * Hiding a panel destroys the button the reader just pressed. Without this, focus falls to
+   * `<body>` and their next Tab starts from the top of the document — a keyboard reader loses the
+   * instrument *and* their place, for the crime of tidying the screen. So hide moves focus to the
+   * dock chip that brings the panel back, and restoring moves it to that panel's header.
+   *
+   * Run after paint via a queued state flag rather than inside the click handler, because the
+   * element being focused does not exist until React has committed the new panel state.
+   */
+  const [focusAfterPanels, setFocusAfterPanels] = useState<string | null>(null);
+
+  const hidePanel = useCallback(
+    (panel: 'lens' | 'results') => {
+      setPanels((current) => ({ ...current, [panel]: false }));
+      setFocusAfterPanels(`.ds-atlas__dock [data-dock="${panel}"]`);
+    },
+    [setPanels],
+  );
+
+  const restorePanel = useCallback(
+    (panel: 'lens' | 'results') => {
+      showPanel(panel);
+      setFocusAfterPanels(panel === 'lens' ? '.ds-lens__head' : '.ds-results__head');
+    },
+    [showPanel],
+  );
+
+  useEffect(() => {
+    if (focusAfterPanels === null) return;
+    focusLandmark(document.querySelector(focusAfterPanels));
+    setFocusAfterPanels(null);
+  }, [focusAfterPanels]);
 
   // Owned here, not inside the selection hook: the camera's padding needs to know whether the
   // sheet is open without depending on the camera it drives, so the id has to sit above both.
@@ -167,7 +203,15 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
     panels.results && !chromeHidden && mode === 'atlas' && selectedId === undefined;
 
   return (
-    <div className="ds-atlas" data-chrome={chromeHidden ? 'hidden' : 'shown'} data-mode={mode}>
+    /* `data-key-scope` is what makes the bare camera, time and record keys legal here and nowhere
+       else. `handleKeyStroke` walks up from the keystroke's target looking for it, so the Atlas
+       marking its own root is the entire scope contract — no route check, no second list. */
+    <div
+      className="ds-atlas"
+      data-key-scope="instrument"
+      data-chrome={chromeHidden ? 'hidden' : 'shown'}
+      data-mode={mode}
+    >
       <CommandBar
         mode={mode}
         onModeChange={setMode}
@@ -241,7 +285,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
           }
           presence={presence}
           onReset={resetLens}
-          onHide={() => setPanels((current) => ({ ...current, lens: false }))}
+          onHide={() => hidePanel('lens')}
         />
       ) : null}
 
@@ -255,7 +299,7 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
           onSortChange={setSort}
           savedIds={savedSet}
           onToggleSave={toggleSave}
-          onHide={() => setPanels((current) => ({ ...current, results: false }))}
+          onHide={() => hidePanel('results')}
           emptyState={
             <EmptyState
               constraints={{
@@ -295,13 +339,15 @@ export function AtlasExperience({ initial }: AtlasExperienceProps) {
 
       {(!panels.lens || !panels.results) && !chromeHidden ? (
         <div className="ds-atlas__dock">
+          {/* `data-dock` is the focus contract's handle: hiding a panel moves focus to the chip
+              that brings it back, so the pair has to be addressable from one place. */}
           {!panels.lens ? (
-            <button type="button" onClick={() => showPanel('lens')}>
+            <button type="button" data-dock="lens" onClick={() => restorePanel('lens')}>
               Lens
             </button>
           ) : null}
           {!panels.results ? (
-            <button type="button" onClick={() => showPanel('results')}>
+            <button type="button" data-dock="results" onClick={() => restorePanel('results')}>
               Records
             </button>
           ) : null}

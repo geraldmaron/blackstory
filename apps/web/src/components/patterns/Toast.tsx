@@ -37,7 +37,11 @@ function ToastRow({ toast, onDismiss }: { toast: ToastSpec; onDismiss: (id: stri
   );
 
   useEffect(() => {
-    const timer = setTimeout(dismiss, toastDurationMs(toast));
+    const duration = toastDurationMs(toast);
+    // Null means this toast carries an action and waits for the reader. No timer is started at
+    // all, rather than a very long one: a long timer is still a deadline, just a hidden one.
+    if (duration === null) return;
+    const timer = setTimeout(dismiss, duration);
     return () => clearTimeout(timer);
   }, [dismiss, toast]);
 

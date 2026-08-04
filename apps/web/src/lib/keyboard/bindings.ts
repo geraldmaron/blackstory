@@ -53,6 +53,38 @@ export function matchesPaletteOpen(stroke: KeyStroke): boolean {
   return PALETTE_OPEN_CHORDS.some((chord) => chordMatches(chord, stroke));
 }
 
+/**
+ * The attribute that marks the Instrument's keyboard scope. The Atlas root carries it; nothing
+ * else does.
+ *
+ * Single-key bindings are a property of the surface, not of the document. `W` means "fly wide"
+ * only where there is a camera to fly, and on a Reading room or a Utility surface the same key is
+ * either meaningless or actively wrong — a reader half-way through the corrections form should
+ * never have a stray keystroke reframe a map behind them.
+ */
+export const KEY_SCOPE_ATTRIBUTE = 'data-key-scope';
+export const INSTRUMENT_SCOPE_SELECTOR = `[${KEY_SCOPE_ATTRIBUTE}="instrument"]`;
+
+/** Nothing is focused: the reader has not tabbed anywhere yet, so the surface still owns the key. */
+const UNFOCUSED_TAGS = ['BODY', 'HTML'];
+
+/**
+ * Is this keystroke inside the Instrument's scope?
+ *
+ * Shape-checked like `isTypingTarget`, and for the same reason: `instanceof HTMLElement` fails
+ * across realms and cannot be exercised outside a browser. `closest` is the question being asked,
+ * so its presence is what gets checked.
+ */
+export function isWithinInstrumentScope(target: EventTarget | null): boolean {
+  if (target === null || typeof target !== 'object') return false;
+  const element = target as { tagName?: unknown; closest?: unknown };
+  // A fresh page has focus on <body>. Requiring a focused descendant would mean no shortcut works
+  // until the reader tabs into something, which is not a keyboard surface at all.
+  if (typeof element.tagName === 'string' && UNFOCUSED_TAGS.includes(element.tagName)) return true;
+  if (typeof element.closest !== 'function') return false;
+  return (element.closest as (selector: string) => unknown)(INSTRUMENT_SCOPE_SELECTOR) !== null;
+}
+
 const TYPING_TAGS = ['INPUT', 'TEXTAREA', 'SELECT'];
 
 /**
@@ -67,6 +99,73 @@ export function isTypingTarget(target: EventTarget | null): boolean {
   const element = target as { tagName?: unknown; isContentEditable?: unknown };
   if (element.isContentEditable === true) return true;
   return typeof element.tagName === 'string' && TYPING_TAGS.includes(element.tagName);
+}
+
+/**
+ * The reader's single-key setting, persisted beside `ds-theme`.
+ *
+ * Single-key shortcuts are hostile to some readers by construction: a switch user, a head-pointer
+ * user, or anyone whose hardware repeats keys will trigger camera moves they never asked for. The
+ * setting turns the bare keys off without taking the chorded ones away, so the surface stays fully
+ * operable from the keyboard either way. It is stated in the sheet `?` opens, because a setting a
+ * reader cannot find is not a setting.
+ *
+ * Stored rather than derived: unlike theme there is no media query that reports this preference,
+ * so the only source is the reader saying so once.
+ */
+export const SINGLE_KEY_STORAGE_KEY = 'ds-single-key';
+
+type Listener = () => void;
+const singleKeyListeners = new Set<Listener>();
+/** `null` until first read, so a server render never touches storage. */
+let singleKeyEnabled: boolean | null = null;
+
+function readSingleKeySetting(): boolean {
+  try {
+    // Default on. The bare keys are the Atlas's advertised interface, and a surface that opens
+    // with its own shortcut sheet inert would read as broken rather than as considerate.
+    return window.localStorage.getItem(SINGLE_KEY_STORAGE_KEY) !== 'off';
+  } catch {
+    return true;
+  }
+}
+
+export function isSingleKeyEnabled(): boolean {
+  if (singleKeyEnabled === null) singleKeyEnabled = readSingleKeySetting();
+  return singleKeyEnabled;
+}
+
+/** Server snapshot for `useSyncExternalStore`: the default, with no storage read. */
+export function getServerSingleKeyEnabled(): boolean {
+  return true;
+}
+
+export function setSingleKeyEnabled(next: boolean): void {
+  if (singleKeyEnabled === next) return;
+  singleKeyEnabled = next;
+  try {
+    window.localStorage.setItem(SINGLE_KEY_STORAGE_KEY, next ? 'on' : 'off');
+  } catch {
+    // A reader in private mode still gets the setting for this session; it just will not persist.
+  }
+  for (const listener of singleKeyListeners) listener();
+}
+
+export function subscribeToSingleKey(listener: Listener): () => void {
+  singleKeyListeners.add(listener);
+  return () => {
+    singleKeyListeners.delete(listener);
+  };
+}
+
+/** Test seam: forget the cached read so a case can start from a known storage state. */
+export function resetSingleKeyCache(): void {
+  singleKeyEnabled = null;
+}
+
+/** Does this chord need a modifier? Chorded bindings survive the single-key setting being off. */
+export function isSingleKeyChord(keys: KeyChord): boolean {
+  return !keys.includes('⌘') && !keys.includes('⌥');
 }
 
 /** The subset of a `KeyboardEvent` this module reads. Keeps the resolver testable in plain Node. */
@@ -146,17 +245,37 @@ export function resolveEscape(open: Partial<Record<EscapeLayer, boolean>>): Esca
  * Runs the command a keystroke maps to.
  *
  * Returns true when the keystroke was consumed, so the caller knows whether to `preventDefault`.
- * A keystroke aimed at a text field is never consumed: the reader typing "w" into search must not
- * fly the camera wide.
+ *
+ * Three gates, in order of how cheaply they can be reasoned about:
+ *
+ * 1. A keystroke aimed at a text field is never consumed — the reader typing "w" into search must
+ *    not fly the camera wide.
+ * 2. A bare key is consumed only inside the Instrument's scope. Off the Atlas there is no camera,
+ *    no timeline and no selected record for these commands to act on.
+ * 3. A bare key is consumed only while the reader's single-key setting is on.
+ *
+ * Gates 2 and 3 apply to single-key chords alone. `⌘L` copies a share link wherever it is pressed
+ * and whatever the setting says, because a modifier cannot be produced by accident.
  */
 export function handleKeyStroke(
   stroke: KeyStroke,
   context: CommandContext,
-  options: { readonly target?: EventTarget | null } = {},
+  options: {
+    readonly target?: EventTarget | null;
+    /** Overrides the persisted setting. The scope check reads the target, so it needs no option. */
+    readonly singleKeyEnabled?: boolean;
+  } = {},
 ): boolean {
-  if (isTypingTarget(options.target ?? null)) return false;
+  const target = options.target ?? null;
+  if (isTypingTarget(target)) return false;
   const command = resolveBinding(stroke);
   if (!command) return false;
+
+  if (isSingleKeyChord(command.keys)) {
+    if (!isWithinInstrumentScope(target)) return false;
+    if (!(options.singleKeyEnabled ?? isSingleKeyEnabled())) return false;
+  }
+
   command.run(context);
   return true;
 }

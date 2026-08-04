@@ -67,3 +67,20 @@ test('the scrim is reachable by keyboard rather than a click-only div', () => {
   const html = render();
   assert.match(html, /class="ds-shortcuts__scrim"[^>]*aria-label="Close keyboard shortcuts"/);
 });
+
+test('the single-key setting is stated in the sheet the ? key opens', () => {
+  const html = render();
+  // The criterion is that a reader who finds the keyboard sheet finds the switch. A setting that
+  // exists only in storage, or only in a preferences screen elsewhere, does not satisfy it.
+  assert.match(html, /Single-key shortcuts/);
+  assert.match(html, /type="checkbox"/);
+  // And that it says what turning it off costs, so the reader is not left to discover by testing
+  // that ⌘ and ⌥ still work.
+  assert.match(html, /Off leaves ⌘ and ⌥ chords working/);
+});
+
+test('the setting renders on by default, without reading storage on the server', () => {
+  // `getServerSingleKeyEnabled` is the server snapshot. If the checked state came from a storage
+  // read instead, this render would throw rather than merely disagree.
+  assert.match(render(), /type="checkbox"[^>]*checked/);
+});
