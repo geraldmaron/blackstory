@@ -27,6 +27,9 @@ export type VerifiedAdminIdentity = {
 
 export type AdminPermission =
   | 'research:write'
+  | 'canonical:write'
+  | 'canonical:merge'
+  | 'canonical:bulk_write'
   | 'publication:publish'
   | 'publication:retract'
   | 'rights:change'

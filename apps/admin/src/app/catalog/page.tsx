@@ -28,6 +28,7 @@ import {
   type EntitySortKey,
   type FacetBucket,
 } from '../../lib/entity-query';
+import { readPostgresOrDegrade } from '../../lib/postgres-client';
 import { EntityWorkbenchTable } from './EntityWorkbenchTable';
 import { formatLivingStatusLabel } from './living-status-label';
 
@@ -69,7 +70,28 @@ export default async function CatalogPage({
   const query = parseEntityQuery(await searchParams);
 
   // Rows and facet counts in parallel — both filtered, both resolved before first paint.
-  const [page, facets] = await Promise.all([queryEntityPage(query), queryEntityFacets(query)]);
+  // Both degrade rather than hang: this page blocks first byte on Postgres, so an unreachable
+  // database has to cost a banner in seconds, not a render that never returns (repo-7pqy).
+  const [pageOutcome, facetsOutcome] = await Promise.all([
+    readPostgresOrDegrade(() => queryEntityPage(query), 'catalog entities'),
+    readPostgresOrDegrade(() => queryEntityFacets(query), 'catalog facets'),
+  ]);
+
+  const degradedReason =
+    pageOutcome.status === 'degraded'
+      ? pageOutcome.reason
+      : facetsOutcome.status === 'degraded'
+        ? facetsOutcome.reason
+        : undefined;
+
+  const page =
+    pageOutcome.status === 'ok'
+      ? pageOutcome.value
+      : { rows: [], total: 0, page: 1, pageCount: 1, pageSize: query.pageSize ?? 50 };
+  const facets =
+    facetsOutcome.status === 'ok'
+      ? facetsOutcome.value
+      : { kind: [], entityClass: [], livingStatus: [], sensitivityClass: [] };
 
   // Clicking the active sort column flips its direction; a new column takes its natural default.
   const sortHref = (key: EntitySortKey): string => {
@@ -117,6 +139,14 @@ export default async function CatalogPage({
           <Link href="/cases">All cases</Link>
         </p>
       </header>
+
+      {degradedReason ? (
+        <p className="story-review__alert" role="alert">
+          The catalog database did not answer, so this page is showing nothing rather than
+          waiting. Filters and search still work once it is reachable — reload to retry.{' '}
+          <span className="ds-mono">{degradedReason}</span>
+        </p>
+      ) : null}
 
       <div className="ds-workbench">
         <div className="ds-workbench__rail">

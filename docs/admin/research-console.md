@@ -39,6 +39,39 @@ Browser state, route visibility, hidden buttons, and IAP alone are not authoriza
 roles cannot publish or retract. Publication roles cannot mutate research workflow state.
 `useAdminPermissions` is display-only.
 
+## Canonical writes
+
+The entity workbench edits `bb_canonical.entities` directly. That reverses the console's earlier
+"admin never mutates canonical" rule for the record itself; see the 2026-08-04 entry in
+[`docs/decisions-carryover.md`](../decisions-carryover.md) for why and what did not change.
+
+Every canonical write goes through `commitCanonicalWrite`
+(`apps/admin/src/lib/canonical-write.ts`) — there is no second path. It resolves the verified
+staff identity from the session, checks the role against the verb's permission, and hands the
+state change to `commitWithAuditPostgres`, which writes domain state, the audit event, and the
+outbox message in one transaction. A canonical write without an audit row cannot exist.
+
+| Verb | Permission | Roles |
+|------|-----------|-------|
+| `entity.field_edit` | `canonical:write` | admin, research |
+| `entity.merge` | `canonical:merge` | admin |
+| `entity.bulk_kind_reassign` | `canonical:bulk_write` | admin |
+
+`apps/admin/src/auth/staff-permissions.ts` is the single role→permission table; the server gate
+and `useAdminPermissions` both read it, so a hidden button and an enforced permission cannot
+drift apart. Every write requires a non-empty operator reason, and the audit actor is always the
+verified session identity — never an operator id submitted with the form.
+
+## Query timeouts
+
+Desks are server components, so first byte blocks on Postgres. The pool carries a connect
+timeout, a `statement_timeout`, and a client-side query timeout
+(`apps/admin/src/lib/postgres-client.ts`, overridable via `DATABASE_CONNECT_TIMEOUT_MS`,
+`DATABASE_STATEMENT_TIMEOUT_MS`, `DATABASE_QUERY_TIMEOUT_MS`). Page reads wrap in
+`readPostgresOrDegrade`, which turns an unreachable database into a banner in about five seconds
+instead of a render that hangs for minutes. Genuine query errors still throw — degradation must
+not hide broken SQL.
+
 ## Publication safety
 
 Console and release actions may target canonical drafts or immutable release candidates. They must

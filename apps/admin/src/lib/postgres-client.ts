@@ -73,6 +73,64 @@ export function normalizePgConnectionString(
   };
 }
 
+/**
+ * Timeout budget. Pages are server-rendered, so first byte waits on these queries: an
+ * unreachable database used to hang a render for minutes (repo-7pqy measured `GET / 200 in
+ * 18.4min`) because the pool had no connect or statement bound at all. Every number here is a
+ * ceiling on how long a page can be stuck, not a performance tuning knob.
+ */
+export const POSTGRES_TIMEOUT_DEFAULTS = {
+  /** Give up reaching the host. Covers a wrong pooler host or a dropped IPv6 route. */
+  connectionTimeoutMillis: 5_000,
+  /** Server-side cap: Postgres itself cancels the query, so a slow scan cannot pin a render. */
+  statementTimeoutMillis: 10_000,
+  /** Client-side cap, slightly above statement_timeout, for a connection that stops answering. */
+  queryTimeoutMillis: 12_000,
+  /** Reap idle connections so a restarted database does not hand back dead sockets. */
+  idleTimeoutMillis: 30_000,
+  max: 4,
+} as const;
+
+function readPositiveInteger(raw: string | undefined, fallback: number): number {
+  const value = raw?.trim() ? Number(raw) : Number.NaN;
+  return Number.isInteger(value) && value > 0 ? value : fallback;
+}
+
+export function resolvePostgresPoolSettings(
+  environment: Readonly<Record<string, string | undefined>> = process.env,
+): {
+  readonly max: number;
+  readonly connectionTimeoutMillis: number;
+  readonly idleTimeoutMillis: number;
+  readonly query_timeout: number;
+  readonly statement_timeout: number;
+} {
+  const statementTimeout = readPositiveInteger(
+    environment.DATABASE_STATEMENT_TIMEOUT_MS,
+    POSTGRES_TIMEOUT_DEFAULTS.statementTimeoutMillis,
+  );
+  return {
+    max: readPositiveInteger(environment.DATABASE_POOL_MAX, POSTGRES_TIMEOUT_DEFAULTS.max),
+    connectionTimeoutMillis: readPositiveInteger(
+      environment.DATABASE_CONNECT_TIMEOUT_MS,
+      POSTGRES_TIMEOUT_DEFAULTS.connectionTimeoutMillis,
+    ),
+    idleTimeoutMillis: readPositiveInteger(
+      environment.DATABASE_IDLE_TIMEOUT_MS,
+      POSTGRES_TIMEOUT_DEFAULTS.idleTimeoutMillis,
+    ),
+    statement_timeout: statementTimeout,
+    // Always above statement_timeout so Postgres cancels first and we see the real error.
+    query_timeout: Math.max(
+      statementTimeout + 2_000,
+      readPositiveInteger(
+        environment.DATABASE_QUERY_TIMEOUT_MS,
+        POSTGRES_TIMEOUT_DEFAULTS.queryTimeoutMillis,
+      ),
+    ),
+  };
+}
+
 export function getPostgresPool(
   environment: Readonly<Record<string, string | undefined>> = process.env,
 ): pg.Pool {
@@ -81,13 +139,16 @@ export function getPostgresPool(
     throw new Error('DATABASE_URL or APP_DATABASE_URL is required for postgres admin reads');
   }
   if (!pool) {
-    const maxRaw = environment.DATABASE_POOL_MAX?.trim();
-    const max = maxRaw ? Number(maxRaw) : 4;
     const conn = normalizePgConnectionString(connectionString, environment);
     pool = new pg.Pool({
       connectionString: conn.connectionString,
-      max: Number.isInteger(max) && max > 0 ? max : 4,
+      ...resolvePostgresPoolSettings(environment),
       ...(conn.ssl ? { ssl: conn.ssl } : {}),
+    });
+    // An idle client erroring out (server restart, pooler eviction) emits on the pool. Without a
+    // listener node treats it as an unhandled 'error' event and takes the whole server down.
+    pool.on('error', (error) => {
+      console.error('postgres pool client error', error);
     });
   }
   return pool;
@@ -100,6 +161,50 @@ export async function queryPostgres<T extends pg.QueryResultRow = pg.QueryResult
 ): Promise<readonly T[]> {
   const result = await getPostgresPool(environment).query<T>(sql, [...params]);
   return result.rows;
+}
+
+/** True when a failure is the database being unreachable or too slow, not a bad query. */
+export function isPostgresUnavailableError(error: unknown): boolean {
+  if (!error) return false;
+  const code = (error as { code?: unknown }).code;
+  const message = error instanceof Error ? error.message : String(error);
+  return (
+    // Postgres cancels on statement_timeout; node-pg raises the rest.
+    code === '57014' ||
+    code === 'ECONNREFUSED' ||
+    code === 'ENOTFOUND' ||
+    code === 'ETIMEDOUT' ||
+    code === 'EHOSTUNREACH' ||
+    code === 'ENETUNREACH' ||
+    /timeout|terminated unexpectedly|Connection terminated|ECONNRESET|canceling statement/i.test(
+      message,
+    )
+  );
+}
+
+export type PostgresReadOutcome<T> =
+  | { readonly status: 'ok'; readonly value: T }
+  | { readonly status: 'degraded'; readonly reason: string };
+
+/**
+ * Run a read and degrade instead of hanging or throwing into the render. Server components use
+ * this so an unreachable database costs a page section, not the whole page — and costs seconds,
+ * not minutes.
+ */
+export async function readPostgresOrDegrade<T>(
+  read: () => Promise<T>,
+  label: string,
+): Promise<PostgresReadOutcome<T>> {
+  try {
+    return { status: 'ok', value: await read() };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (isPostgresUnavailableError(error)) {
+      console.error(`postgres read degraded (${label})`, message);
+      return { status: 'degraded', reason: message };
+    }
+    throw error;
+  }
 }
 
 /** Runs a callback inside a single Postgres transaction. */

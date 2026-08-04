@@ -25,6 +25,12 @@ export type {
   PrivilegedActionAuthorizer,
   StaffRole,
 } from './role-mutation';
+export {
+  StaffPermissionDeniedError,
+  assertStaffPermission,
+  permissionsForStaffRole,
+  staffRoleHasPermission,
+} from './staff-permissions';
 export { resolveAdminAuthMode, resolveClientAdminAuthMode, type AdminAuthMode } from './mode';
 export {
   SupabaseSessionAuthorizationError,
